@@ -253,4 +253,36 @@ describe('TuyaHandler.connect', () => {
     expect(handler.autoReconnectAllowed).to.equal(false);
     assert.calledOnce(requestStub);
   });
+
+  it('should map invalid app account uid from empty api response', async () => {
+    const clientStub = {
+      init: sinon.stub().resolves(),
+    };
+    const requestStub = sinon.stub().resolves(null);
+    const TuyaContextStub = function TuyaContextStub() {
+      this.client = clientStub;
+      this.request = requestStub;
+    };
+
+    const connectWithStub = proxyquire('../../../../services/tuya/lib/tuya.connect', {
+      '@tuya/tuya-connector-nodejs': { TuyaContext: TuyaContextStub },
+    });
+    const TuyaHandlerWithStub = proxyquire('../../../../services/tuya/lib/index', {
+      './tuya.connect.js': connectWithStub,
+    });
+    const handler = new TuyaHandlerWithStub(gladys, serviceId);
+    handler.autoReconnectAllowed = true;
+
+    await handler.connect({
+      baseUrl: 'apiUrl',
+      accessKey: 'accessKey',
+      secretKey: 'secretKey',
+      appAccountId: 'appAccountId',
+    });
+
+    expect(handler.status).to.eq(STATUS.ERROR);
+    expect(handler.lastError).to.eq('integration.tuya.setup.errorInvalidAppAccountUid');
+    expect(handler.autoReconnectAllowed).to.equal(false);
+    assert.calledOnce(requestStub);
+  });
 });

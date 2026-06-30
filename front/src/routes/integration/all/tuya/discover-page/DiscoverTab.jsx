@@ -10,6 +10,9 @@ import { Component } from 'preact';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const getDeviceRank = device => {
+  if (!device || typeof device !== 'object') {
+    return 4;
+  }
   const isCreated = !!device.created_at;
   const hasFeatures = device.features && device.features.length > 0;
   const isUpdatable = !!device.updatable;
@@ -34,8 +37,8 @@ const sortDevices = devices =>
     if (rankDiff !== 0) {
       return rankDiff;
     }
-    const nameA = (a.name || '').toLowerCase();
-    const nameB = (b.name || '').toLowerCase();
+    const nameA = ((a && a.name) || '').toLowerCase();
+    const nameB = ((b && b.name) || '').toLowerCase();
     if (nameA < nameB) {
       return -1;
     }
@@ -100,7 +103,7 @@ class DiscoverTab extends Component {
       const response = await this.props.httpClient.post('/api/v1/service/tuya/local-scan', {
         timeoutSeconds: 10
       });
-      if (response && response.devices) {
+      if (response && Array.isArray(response.devices) && response.devices.length > 0) {
         this.setState({
           discoveredDevices: response.devices
         });

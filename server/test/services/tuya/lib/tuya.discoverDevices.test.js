@@ -147,7 +147,7 @@ describe('TuyaHandler.discoverDevices', () => {
             has_feedback: false,
             max: 1,
             min: 0,
-            name: 'cur_power',
+            name: 'Active power',
             read_only: true,
             selector: 'tuya-uuid-cur-power',
             type: 'power',
@@ -159,7 +159,7 @@ describe('TuyaHandler.discoverDevices', () => {
             has_feedback: false,
             max: 1,
             min: 0,
-            name: 'switch_1',
+            name: 'Switch 1',
             read_only: false,
             selector: 'tuya-uuid-switch-1',
             type: 'binary',
@@ -185,6 +185,10 @@ describe('TuyaHandler.discoverDevices', () => {
           {
             name: 'LOCAL_OVERRIDE',
             value: false,
+          },
+          {
+            name: 'CLOUD_READ_STRATEGY',
+            value: 'legacy',
           },
         ],
         properties: {

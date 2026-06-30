@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const proxyquire = require('proxyquire').noCallThru();
 
 const { convertFeature } = require('../../../../../../services/tuya/lib/device/tuya.convertFeature');
 const { DEVICE_TYPES } = require('../../../../../../services/tuya/lib/mappings');
@@ -26,7 +27,7 @@ describe('Tuya convert feature', () => {
       has_feedback: false,
       max: 1000,
       min: 100,
-      name: 'switch_1',
+      name: 'Switch 1',
       read_only: false,
       selector: 'externalid-switch-1',
       type: 'binary',
@@ -50,7 +51,7 @@ describe('Tuya convert feature', () => {
       has_feedback: false,
       max: 1,
       min: 0,
-      name: 'switch_1',
+      name: 'Switch 1',
       read_only: false,
       selector: 'externalid-switch-1',
       type: 'binary',
@@ -93,11 +94,63 @@ describe('Tuya convert feature', () => {
       has_feedback: false,
       max: 8,
       min: 2,
-      name: 'switch_1',
+      name: 'Switch 1',
       read_only: false,
       selector: 'externalid-switch-1',
       type: 'binary',
     });
+  });
+
+  it('should use the curated mapping name and keep the Tuya code (typo) as key', () => {
+    const result = convertFeature(
+      {
+        code: 'energy_forword_a',
+        type: 'Integer',
+        name: 'Forward Energy-A',
+        readOnly: true,
+        values: {},
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_METER,
+      },
+    );
+
+    expect(result.name).to.equal('Forward energy A');
+    expect(result.external_id).to.equal('externalId:energy_forword_a');
+  });
+
+  it('should fall back to the Tuya code as name when the mapping has no name', () => {
+    // Force a mapping that has category/type but no curated name to exercise
+    // the `mapping.name || code` fallback (all real mappings now carry a name).
+    const { convertFeature: convertFeatureNoName } = proxyquire(
+      '../../../../../../services/tuya/lib/device/tuya.convertFeature',
+      {
+        '../mappings': {
+          getFeatureMapping: () => ({ category: 'switch', type: 'binary' }),
+          getIgnoredCloudCodes: () => [],
+          normalizeCode: (value) =>
+            value
+              ? String(value)
+                  .trim()
+                  .toLowerCase()
+              : null,
+        },
+      },
+    );
+
+    const result = convertFeatureNoName(
+      {
+        code: 'unnamed_code',
+        type: 'Boolean',
+        name: 'Thing model name',
+        readOnly: false,
+        values: {},
+      },
+      'externalId',
+    );
+
+    expect(result.name).to.equal('unnamed_code');
   });
 
   it('should keep scale from values payload', () => {

@@ -36,6 +36,7 @@ const TuyaHandler = function TuyaHandler(gladys, serviceId) {
   this.reconnectInterval = null;
   this.quickReconnectTimeouts = [];
   this.quickReconnectInProgress = false;
+  this.degradedDevices = {};
 };
 
 TuyaHandler.prototype.init = init;

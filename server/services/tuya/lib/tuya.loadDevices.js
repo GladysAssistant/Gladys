@@ -38,7 +38,12 @@ async function loadDevices(pageNo = 1, pageSize = 100) {
   }
 
   const result = responsePage.result || [];
-  const list = Array.isArray(result) ? result : result.list || [];
+  let list = [];
+  if (Array.isArray(result)) {
+    list = result;
+  } else if (Array.isArray(result && result.list)) {
+    list = result.list;
+  }
   let hasMore = list.length === pageSize;
   if (!Array.isArray(result) && typeof result.has_more === 'boolean') {
     hasMore = result.has_more;

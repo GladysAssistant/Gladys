@@ -4,8 +4,9 @@ const logger = require('../../../utils/logger');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { mergeDevices } = require('../../../utils/device');
 const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
-const { normalizeExistingDevice, upsertParam } = require('./utils/tuya.deviceParams');
+const { normalizeExistingDevice, upsertParam, getParamValue } = require('./utils/tuya.deviceParams');
 const { addFallbackBinaryFeature } = require('./device/tuya.localMapping');
+const { convertDevice } = require('./device/tuya.convertDevice');
 
 /**
  * @description Poll a Tuya device locally to retrieve DPS map.
@@ -45,9 +46,22 @@ async function localPoll(payload) {
   }
   const tuyaLocal = new TuyaLocalApi(tuyaOptions);
   let lastError = null;
+  const formatSocketError = (err) => {
+    if (!err || !err.message) {
+      return 'Local poll socket error';
+    }
+    const networkErrorCodes = ['EHOSTUNREACH', 'EHOSTDOWN', 'ENETUNREACH', 'ECONNREFUSED', 'ETIMEDOUT'];
+    if (networkErrorCodes.includes(err.code)) {
+      return `Local device unreachable at ${ip}:6668 (${err.code}). Device may be offline, unplugged, or no longer connected to Wi-Fi.`;
+    }
+    if (typeof err.message === 'string' && err.message.includes('EHOSTUNREACH')) {
+      return `Local device unreachable at ${ip}:6668 (EHOSTUNREACH). Device may be offline, unplugged, or no longer connected to Wi-Fi.`;
+    }
+    return `Local poll socket error: ${err.message}`;
+  };
   const onError = (err) => {
     lastError = err;
-    logger.info(`[Tuya][localPoll] socket error for device=${deviceId}: ${err.message}`);
+    logger.info(`[Tuya][localPoll] socket error for device=${deviceId}: ${formatSocketError(err)}`);
   };
   tuyaLocal.on('error', onError);
 
@@ -85,7 +99,7 @@ async function localPoll(payload) {
         }),
         new Promise((_, reject) => {
           errorListener = (err) => {
-            reject(new BadParameters(`Local poll socket error: ${err.message}`));
+            reject(new BadParameters(formatSocketError(err)));
           };
           tuyaLocal.once('error', errorListener);
         }),
@@ -126,7 +140,7 @@ async function localPoll(payload) {
     return data;
   } catch (e) {
     if (lastError && (!e || e.message !== lastError.message)) {
-      logger.info(`[Tuya][localPoll] last socket error for device=${deviceId}: ${lastError.message}`);
+      logger.info(`[Tuya][localPoll] last socket error for device=${deviceId}: ${formatSocketError(lastError)}`);
     }
     logger.warn(`[Tuya][localPoll] failed for device=${deviceId}`, e);
     // Close the socket on failure: leaving it half-open made the device refuse
@@ -164,21 +178,69 @@ function updateDiscoveredDeviceAfterLocalPoll(tuyaManager, payload) {
   }
 
   let device = { ...tuyaManager.discoveredDevices[deviceIndex] };
-  device.protocol_version = protocolVersion;
-  device.ip = ip;
+  const existingParams = Array.isArray(device.params) ? [...device.params] : [];
+  const resolvedProductId = device.product_id || getParamValue(existingParams, DEVICE_PARAM_NAME.PRODUCT_ID);
+  const resolvedProductKey = device.product_key || getParamValue(existingParams, DEVICE_PARAM_NAME.PRODUCT_KEY);
+  const resolvedCloudIp = device.cloud_ip || getParamValue(existingParams, DEVICE_PARAM_NAME.CLOUD_IP);
+  const resolvedProtocolVersion =
+    protocolVersion || getParamValue(existingParams, DEVICE_PARAM_NAME.PROTOCOL_VERSION) || device.protocol_version;
+  const resolvedLocalKey = localKey || getParamValue(existingParams, DEVICE_PARAM_NAME.LOCAL_KEY) || device.local_key;
+  const resolvedIp = ip || getParamValue(existingParams, DEVICE_PARAM_NAME.IP_ADDRESS) || device.ip;
+
+  const hasFeatures = Array.isArray(device.features) && device.features.length > 0;
+  const hasDeviceMetadata = Boolean(device.properties || device.thing_model || device.specifications);
+  if (!hasFeatures && hasDeviceMetadata) {
+    try {
+      const rebuiltDevice = convertDevice.call(tuyaManager, {
+        id: deviceId,
+        name: device.name,
+        product_name: device.model,
+        model: device.model,
+        product_id: resolvedProductId,
+        product_key: resolvedProductKey,
+        local_key: resolvedLocalKey,
+        ip: resolvedIp,
+        cloud_ip: resolvedCloudIp,
+        protocol_version: resolvedProtocolVersion,
+        local_override: true,
+        online: device.online,
+        properties: device.properties,
+        thing_model: device.thing_model,
+        specifications: device.specifications || {},
+        category: device.category,
+        tuya_report: device.tuya_report,
+      });
+
+      if (Array.isArray(rebuiltDevice.features) && rebuiltDevice.features.length > 0) {
+        device = {
+          ...device,
+          ...rebuiltDevice,
+        };
+      }
+    } catch (err) {
+      // Keep the existing device when convertDevice throws on malformed metadata,
+      // so the local-poll update still succeeds with the partial data we already have.
+      logger.warn(`[Tuya][localPoll] convertDevice rebuild failed for device=${deviceId}`, err);
+    }
+  }
+
+  device.product_id = resolvedProductId;
+  device.product_key = resolvedProductKey;
+  device.protocol_version = resolvedProtocolVersion;
+  device.ip = resolvedIp;
   device.local_override = true;
-  if (localKey) {
-    device.local_key = localKey;
+  if (resolvedLocalKey) {
+    device.local_key = resolvedLocalKey;
   }
   device.params = Array.isArray(device.params) ? [...device.params] : [];
-  upsertParam(device.params, DEVICE_PARAM_NAME.IP_ADDRESS, ip);
-  upsertParam(device.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, protocolVersion);
-  if (localKey) {
-    upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, localKey);
+  upsertParam(device.params, DEVICE_PARAM_NAME.IP_ADDRESS, resolvedIp);
+  upsertParam(device.params, DEVICE_PARAM_NAME.PROTOCOL_VERSION, resolvedProtocolVersion);
+  if (resolvedLocalKey) {
+    upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_KEY, resolvedLocalKey);
   }
   upsertParam(device.params, DEVICE_PARAM_NAME.LOCAL_OVERRIDE, true);
-  upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_ID, device.product_id);
-  upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_KEY, device.product_key);
+  upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_ID, resolvedProductId);
+  upsertParam(device.params, DEVICE_PARAM_NAME.PRODUCT_KEY, resolvedProductKey);
 
   device = addFallbackBinaryFeature(device, dps);
 

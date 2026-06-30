@@ -31,6 +31,8 @@ describe('TuyaHandler.init', () => {
   beforeEach(() => {
     sinon.reset();
     tuyaHandler.status = 'UNKNOWN';
+    tuyaHandler.autoReconnectAllowed = false;
+    tuyaHandler.lastError = 'previous-error';
     tuyaHandler.loadDevices = sinon.stub().resolves([]);
     tuyaHandler.startReconnect = sinon.stub();
   });
@@ -141,5 +143,28 @@ describe('TuyaHandler.init', () => {
       type: WEBSOCKET_MESSAGE_TYPES.TUYA.STATUS,
       payload: { status: STATUS.NOT_INITIALIZED, manual_disconnect: true },
     });
+  });
+
+  it('should allow auto-reconnect when last connected hash matches current config', async () => {
+    gladys.variable.getValue
+      .withArgs(GLADYS_VARIABLES.ENDPOINT, serviceId)
+      .returns('apiUrl')
+      .withArgs(GLADYS_VARIABLES.ACCESS_KEY, serviceId)
+      .returns('accessKey')
+      .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
+      .returns('secretKey')
+      .withArgs(GLADYS_VARIABLES.APP_ACCOUNT_UID, serviceId)
+      .returns('appAccountId')
+      .withArgs(GLADYS_VARIABLES.APP_USERNAME, serviceId)
+      .returns('appUsername')
+      .withArgs(GLADYS_VARIABLES.LAST_CONNECTED_CONFIG_HASH, serviceId)
+      .returns('9fa6af9a941ec217207b27f44ce07efcb447bb2173f4ce8f238a2aeb7ad9f8ea')
+      .withArgs(GLADYS_VARIABLES.MANUAL_DISCONNECT, serviceId)
+      .returns(false);
+
+    await tuyaHandler.init();
+
+    expect(tuyaHandler.autoReconnectAllowed).to.equal(true);
+    assert.calledOnce(client.init);
   });
 });

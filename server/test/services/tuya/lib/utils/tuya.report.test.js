@@ -42,6 +42,68 @@ describe('Tuya report utils', () => {
       expect(merged.cloud.raw.device_details).to.deep.equal({ id: 'x' });
       expect(merged.local.scan).to.deep.equal({ source: 'udp' });
     });
+
+    it('should fall back to null for empty currentReport.cloud.assembled and cloud.raw fields', () => {
+      const current = {
+        cloud: {
+          assembled: { specifications: null, properties: null, thing_model: null },
+          raw: {
+            device_list_entry: null,
+            device_specification: null,
+            device_details: null,
+            thing_shadow_properties: null,
+            thing_model: null,
+          },
+        },
+      };
+      const merged = mergeTuyaReport(current, null);
+      expect(merged.cloud.assembled).to.deep.equal({
+        specifications: null,
+        properties: null,
+        thing_model: null,
+      });
+      expect(merged.cloud.raw).to.deep.equal({
+        device_list_entry: null,
+        device_specification: null,
+        device_details: null,
+        thing_shadow_properties: null,
+        thing_model: null,
+      });
+    });
+
+    it('should carry forward all currentReport cloud.assembled and cloud.raw fields', () => {
+      const current = {
+        schema_version: REPORT_SCHEMA_VERSION,
+        cloud: {
+          assembled: {
+            specifications: ['s1'],
+            properties: { p: 1 },
+            thing_model: { m: 1 },
+          },
+          raw: {
+            device_list_entry: { entry: 1 },
+            device_specification: { spec: 1 },
+            device_details: { details: 1 },
+            thing_shadow_properties: { props: 1 },
+            thing_model: { tm: 1 },
+          },
+        },
+        local: { scan: { source: 'udp' } },
+      };
+      const merged = mergeTuyaReport(current, null);
+      expect(merged.cloud.assembled).to.deep.equal({
+        specifications: ['s1'],
+        properties: { p: 1 },
+        thing_model: { m: 1 },
+      });
+      expect(merged.cloud.raw).to.deep.equal({
+        device_list_entry: { entry: 1 },
+        device_specification: { spec: 1 },
+        device_details: { details: 1 },
+        thing_shadow_properties: { props: 1 },
+        thing_model: { tm: 1 },
+      });
+    });
   });
 
   describe('withTuyaReport', () => {
@@ -83,6 +145,21 @@ describe('Tuya report utils', () => {
       expect(report.cloud.raw.device_details).to.equal(null);
       expect(report.cloud.raw.thing_shadow_properties).to.equal(null);
       expect(report.cloud.raw.thing_model).to.equal(null);
+    });
+
+    it('should normalize a rejected settled result with a null reason', () => {
+      const report = buildCloudReport({
+        deviceId: 'abc',
+        listDeviceEntry: null,
+        specResult: { status: 'rejected', reason: null },
+        detailsResult: undefined,
+        propsResult: undefined,
+        modelResult: undefined,
+        device: null,
+      });
+      expect(report.cloud.raw.device_specification.request.method).to.equal('GET');
+      expect(report.cloud.raw.device_specification.response).to.equal(null);
+      expect(report.cloud.raw.device_specification.error).to.equal(null);
     });
 
     it('should normalize fulfilled and rejected settled results', () => {
