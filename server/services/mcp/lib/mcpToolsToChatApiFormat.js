@@ -12,6 +12,27 @@ function toolNameFromIntent(intent) {
 }
 
 /**
+ * @description Require either a device name or both room and device_category in tool parameters.
+ * @param {object} parameters - JSON Schema parameters object.
+ * @returns {object} Parameters with anyOf targeting constraints.
+ * @example
+ * applyDeviceTargetingSchema({ type: 'object', properties: { action: {} }, required: ['action'] });
+ */
+function applyDeviceTargetingSchema(parameters) {
+  const baseRequired = parameters.required ?? [];
+  const requiredWithAction = baseRequired.includes('action') ? baseRequired : ['action', ...baseRequired];
+
+  return {
+    ...parameters,
+    required: requiredWithAction,
+    anyOf: [
+      { required: [...requiredWithAction, 'device'] },
+      { required: [...requiredWithAction, 'room', 'device_category'] },
+    ],
+  };
+}
+
+/**
  * @description Build OpenAI-compatible tool definitions from MCP tool schemas.
  * Uses the same Zod inputSchema as the MCP server (rooms, devices, intervals, etc.)
  * so the model receives the actual enum values from the home.
@@ -22,8 +43,12 @@ function toolNameFromIntent(intent) {
  */
 function mcpToolsToChatApiFormat(mcpTools) {
   return mcpTools.map(({ intent, config }) => {
-    const parameters = z.object(config.inputSchema).toJSONSchema();
+    let parameters = z.object(config.inputSchema).toJSONSchema();
     delete parameters.$schema;
+
+    if (config.requireDeviceTargeting) {
+      parameters = applyDeviceTargetingSchema(parameters);
+    }
 
     return {
       type: 'function',
@@ -39,4 +64,5 @@ function mcpToolsToChatApiFormat(mcpTools) {
 module.exports = {
   mcpToolsToChatApiFormat,
   toolNameFromIntent,
+  applyDeviceTargetingSchema,
 };

@@ -993,6 +993,13 @@
               "unknownDongle": "Nicht definiert",
               "tcpPort": "TCP-Port"
             },
+            "externalMqtt": {
+              "title": "Verbindung für externe Tools",
+              "description": "Schreibgeschützte Anmeldedaten, um externe Tools (z. B. Node-RED) mit dem von Gladys verwalteten MQTT-Broker zu verbinden. Wenn das Tool auf einem anderen Rechner läuft, ersetzen Sie \"localhost\" in der URL durch die IP-Adresse Ihres Gladys-Rechners.",
+              "credentialsPending": "Anmeldedaten sind nach der ersten Aktivierung des Dienstes verfügbar.",
+              "brokerNotRunning": "Der MQTT-Broker läuft noch nicht. Diese Anmeldedaten funktionieren, sobald der Dienst gestartet ist.",
+              "copied": "Kopiert"
+            },
             "containerErrors": {
               "EZSP_PROTOCOL_VERSION": "Warnung: Die Firmware Ihres Ember-Koordinators ist veraltet. Version 7.4.x oder höher ist erforderlich. Bitte folgen Sie der <a href=\"https://www.zigbee2mqtt.io/guide/adapters/emberznet.html#firmware-flashing\" target=\"_blank\" rel=\"noopener noreferrer\">Firmware-Aktualisierungsanleitung</a>, um sie zu aktualisieren. Wählen Sie andernfalls den Dongle (legacy ezsp) in der Konfiguration aus.",
               "unknownErrorPrefix": "Zigbee2MQTT-Containerfehler: "
@@ -2231,7 +2238,7 @@
       },
       "debugContext": {
         "title": "KI-Debug",
-        "description": "Erweiterte Funktion: lädt den JSON-Kontext herunter, der an die KI gesendet wird (System-Prompt, die letzten 10 Nachrichten der Unterhaltung und verfügbare Tools). Nützlich zum Reproduzieren und Diagnostizieren von Benutzerproblemen.",
+        "description": "Erweiterte Funktion: lädt den JSON-Kontext herunter, der an die KI gesendet wird (System-Prompt, die letzten 50 Nachrichten der Unterhaltung und verfügbare Tools). Nützlich zum Reproduzieren und Diagnostizieren von Benutzerproblemen.",
         "downloadButton": "JSON-Kontext für Debug herunterladen",
         "error": "Debug-Kontext konnte nicht erstellt werden. Stelle sicher, dass der MCP-Dienst läuft."
       },
@@ -3173,7 +3180,9 @@
     "downloadLogsDescription": "Lade eine Datei mit den letzten Logs des Gladys-Containers herunter. Um sehr große Downloads zu vermeiden, werden nur die letzten 20 MB exportiert.",
     "downloadLogsButton": "Logs herunterladen",
     "downloadLogsProgress": "Lade {{downloaded}} von {{total}} herunter...",
-    "downloadLogsError": "Logs konnten nicht heruntergeladen werden. Stelle sicher, dass Gladys in Docker läuft und versuche es erneut."
+    "downloadLogsError": "Logs konnten nicht heruntergeladen werden. Stelle sicher, dass Gladys in Docker läuft und versuche es erneut.",
+    "cpuTemperature": "CPU-Temp.",
+    "cpuTemperatureValue": "{{value}} °C"
   },
   "newArea": {
     "createNewZoneButton": "Neue Zone erstellen",
