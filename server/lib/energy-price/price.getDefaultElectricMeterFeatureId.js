@@ -18,8 +18,16 @@ async function getDefaultElectricMeterFeatureId() {
   }
 
   const device = this.stateManager.get('deviceById', energyPrice[0].electric_meter_device_id);
+  if (!device) {
+    return null;
+  }
   const feature = device.features.find((f) => f.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR);
-  return feature.id;
+  if (!feature) {
+    return null;
+  }
+
+  const featureInDb = await db.DeviceFeature.findByPk(feature.id);
+  return featureInDb ? feature.id : null;
 }
 
 module.exports = { getDefaultElectricMeterFeatureId };

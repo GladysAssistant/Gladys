@@ -53,6 +53,7 @@
     ],
     "id": "gladys-id",
     "model": "WXKG01LM",
+    "ieee_address": "0x00158d00033e88d5",
     "name": "device-name",
     "room_id": "room_id",
     "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
@@ -62,6 +63,7 @@
   {
     "name": "0x00158d00033e88d1",
     "model": "TS0043",
+    "ieee_address": "0x00158d00033e88d1",
     "external_id": "zigbee2mqtt:0x00158d00033e88d1",
     "id": "gladys-id-2",
     "room_id": "room_id",
@@ -134,6 +136,7 @@
   {
     "name": "0x00158d0004019127",
     "model": "WXKG11LM",
+    "ieee_address": "0x00158d0004019127",
     "external_id": "zigbee2mqtt:0x00158d0004019127",
     "features": [
       {
@@ -179,6 +182,7 @@
   {
     "name": "0x00158d00045b2740",
     "model": "WSDCGQ11LM",
+    "ieee_address": "0x00158d00045b2740",
     "external_id": "zigbee2mqtt:0x00158d00045b2740",
     "features": [
       {
@@ -264,6 +268,40 @@
         "selector": "zigbee2mqtt-0x00158d00045b2740-signal-integer-linkquality",
         "type": "integer",
         "unit": null
+      }
+    ],
+    "should_poll": false,
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
+  },
+  {
+    "name": "bosch-outdoor-siren",
+    "model": "BSIR-EZ",
+    "ieee_address": "0x00124b0023a1b2c3",
+    "external_id": "zigbee2mqtt:bosch-outdoor-siren",
+    "features": [
+      {
+        "read_only": false,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1,
+        "category": "button",
+        "type": "push",
+        "unit": null,
+        "name": "Trigger alarm",
+        "external_id": "zigbee2mqtt:bosch-outdoor-siren:button:push:trigger_alarm",
+        "selector": "zigbee2mqtt-bosch-outdoor-siren-button-push-trigger-alarm"
+      },
+      {
+        "read_only": false,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1,
+        "category": "button",
+        "type": "push",
+        "unit": null,
+        "name": "Stop alarm",
+        "external_id": "zigbee2mqtt:bosch-outdoor-siren:button:push:stop_alarm",
+        "selector": "zigbee2mqtt-bosch-outdoor-siren-button-push-stop-alarm"
       }
     ],
     "should_poll": false,

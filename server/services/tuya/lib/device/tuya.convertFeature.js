@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { addSelector } = require('../../../../utils/addSelector');
 const { getFeatureMapping, getIgnoredCloudCodes, normalizeCode } = require('../mappings');
 
 /**
@@ -11,7 +12,7 @@ const { getFeatureMapping, getIgnoredCloudCodes, normalizeCode } = require('../m
  * convertFeature({ code: 'switch', type: 'Boolean', values: '{}' }, 'tuya:device_id');
  */
 function convertFeature(tuyaFunctions, externalId, options = {}) {
-  const { code, values, name, readOnly } = tuyaFunctions;
+  const { code, values, readOnly } = tuyaFunctions;
   const { deviceType, ignoredCloudCodes } = options;
 
   const codeLower = normalizeCode(code);
@@ -40,7 +41,6 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
   }
 
   const feature = {
-    name: code || name,
     external_id: `${externalId}:${code}`,
     selector: `${externalId}:${code}`,
     read_only: readOnly,
@@ -49,6 +49,12 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
     max: 1,
     ...featuresCategoryAndType,
   };
+  // Display name priority: a curated mapping name wins so device-type mappings
+  // can fix Tuya typos (e.g. code "energy_forword_a" -> name "Forward energy A").
+  // Otherwise the Tuya code is used as the display name, preserving the existing
+  // behaviour for device types without curated names. (`code` is always defined
+  // here: an empty code is rejected earlier by getFeatureMapping.)
+  feature.name = featuresCategoryAndType.name || code;
   if ('min' in valuesObject) {
     feature.min = valuesObject.min;
   }
@@ -59,6 +65,7 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
     feature.scale = valuesObject.scale;
   }
 
+  addSelector(feature);
   return feature;
 }
 

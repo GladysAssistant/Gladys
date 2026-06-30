@@ -5,9 +5,11 @@ import { Link } from 'preact-router/match';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
+import style from './style.css';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
+import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
 
 class Zigbee2mqttBox extends Component {
   updateName = e => {
@@ -83,7 +85,7 @@ class Zigbee2mqttBox extends Component {
 
   getDeviceProperty = () => {
     if (!this.props.device.features) {
-      return null;
+      return {};
     }
     const batteryLevelDeviceFeature = this.props.device.features.find(
       deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
@@ -163,6 +165,32 @@ class Zigbee2mqttBox extends Component {
                   </select>
                 </div>
 
+                {props.device.ieee_address && (
+                  <div class="form-group">
+                    <label class="form-label" for={`ieee_${props.deviceIndex}`}>
+                      <Text id="integration.zigbee2mqtt.ieeeAddressLabel" />
+                    </label>
+                    <input
+                      id={`ieee_${props.deviceIndex}`}
+                      type="text"
+                      class="form-control"
+                      value={props.device.ieee_address}
+                      readOnly
+                    />
+                    {props.z2mUrl && (
+                      <a
+                        href={`${props.z2mUrl}/#/device/0/${props.device.ieee_address}/info`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class={`${style.z2mDeviceLink} mt-2 text-muted`}
+                      >
+                        <img src={logoZigbee2mqtt} alt="Zigbee2mqtt" class={style.z2mDeviceLinkLogo} />
+                        <Text id="integration.zigbee2mqtt.openInZ2mButton" />
+                      </a>
+                    )}
+                  </div>
+                )}
+
                 <div class="form-group">
                   <label class="form-label">
                     <Text id="integration.zigbee2mqtt.featuresLabel" />
@@ -170,15 +198,18 @@ class Zigbee2mqttBox extends Component {
                   <DeviceFeatures features={props.device.features} />
                 </div>
 
-                <div class="form-group">
-                  <button onClick={this.saveDevice} class="btn btn-success mr-2">
+                <div class={style.z2mActionButtons}>
+                  <button onClick={this.saveDevice} class="btn btn-success flex-fill">
                     <Text id="integration.zigbee2mqtt.saveButton" />
                   </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger">
+                  <button onClick={this.deleteDevice} class="btn btn-danger flex-fill">
                     <Text id="integration.zigbee2mqtt.deleteButton" />
                   </button>
-                  <Link href={`/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`}>
-                    <button class="btn btn-secondary float-right">
+                  <Link
+                    href={`/dashboard/integration/device/zigbee2mqtt/edit/${props.device.selector}`}
+                    class="flex-fill"
+                  >
+                    <button class="btn btn-primary w-100">
                       <Text id="integration.zigbee2mqtt.device.editButton" />
                     </button>
                   </Link>

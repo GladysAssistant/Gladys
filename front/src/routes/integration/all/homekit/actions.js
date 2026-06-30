@@ -7,11 +7,20 @@ const actions = store => ({
       homekitGetSettingsStatus: RequestStatus.Getting
     });
     try {
-      const { value: setupURI } = await state.httpClient.get('/api/v1/service/homekit/variable/HOMEKIT_SETUP_URI');
+      let homekitMdnsAdvertiser = 'bonjour-hap';
 
+      const { value: setupURI } = await state.httpClient.get('/api/v1/service/homekit/variable/HOMEKIT_SETUP_URI');
+      try {
+        ({ value: homekitMdnsAdvertiser } = await state.httpClient.get(
+          '/api/v1/service/homekit/variable/HOMEKIT_MDNS_ADVERTISER'
+        ));
+      } catch (e) {
+        // Variable not set yet
+      }
       QRCode.toDataURL(setupURI, (err, dataUrl) => {
         store.setState({
           homekitSetupDataUrl: dataUrl,
+          homekitMdnsAdvertiser,
           homekitGetSettingsStatus: RequestStatus.Success
         });
       });
@@ -19,6 +28,24 @@ const actions = store => ({
       store.setState({
         homekitGetSettingsStatus: RequestStatus.Error
       });
+    }
+  },
+  updateMDNSAdvertiser(state, e) {
+    store.setState({
+      homekitMdnsAdvertiser: e.target.value
+    });
+  },
+  async saveMDNSAdvertiser(state, e) {
+    e.preventDefault();
+    store.setState({ homekitSaveMDNSStatus: RequestStatus.Getting });
+    try {
+      await state.httpClient.post('/api/v1/service/homekit/variable/HOMEKIT_MDNS_ADVERTISER', {
+        value: state.homekitMdnsAdvertiser
+      });
+      await state.httpClient.get('/api/v1/service/homekit/reload');
+      store.setState({ homekitSaveMDNSStatus: RequestStatus.Success });
+    } catch (e) {
+      store.setState({ homekitSaveMDNSStatus: RequestStatus.Error });
     }
   },
   async refreshBridge(state, e) {

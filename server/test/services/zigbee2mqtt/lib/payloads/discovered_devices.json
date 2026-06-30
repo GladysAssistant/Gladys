@@ -41,11 +41,13 @@
     ],
     "model": "WXKG01LM",
     "name": "0x00158d00033e88d5",
+    "ieee_address": "0x00158d00033e88d5",
     "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
     "should_poll": false
   },
   {
     "name": "0x00158d0004019127",
+    "ieee_address": "0x00158d0004019127",
     "model": "WXKG11LM",
     "external_id": "zigbee2mqtt:0x00158d0004019127",
     "features": [
@@ -79,6 +81,7 @@
   },
   {
     "name": "0x00158d00045b2740",
+    "ieee_address": "0x00158d00045b2740",
     "model": "WSDCGQ11LM",
     "external_id": "zigbee2mqtt:0x00158d00045b2740",
     "features": [

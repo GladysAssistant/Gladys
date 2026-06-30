@@ -1,7 +1,7 @@
 {
   "name": "Chauffage cabinet",
   "external_id": "tuya:bf2be3c32ea4d8f561ujmu",
-  "selector": "tuya:bf2be3c32ea4d8f561ujmu",
+  "selector": "tuya-bf2be3c32ea4d8f561ujmu",
   "device_type": "smart-socket",
   "model": "LSC Power Plug FR incl. Power meter",
   "product_id": "b61eihfqeaexn54g",
@@ -38,9 +38,9 @@
   },
   "features": [
     {
-      "name": "switch_1",
+      "name": "Switch 1",
       "external_id": "tuya:bf2be3c32ea4d8f561ujmu:switch_1",
-      "selector": "tuya:bf2be3c32ea4d8f561ujmu:switch_1",
+      "selector": "tuya-bf2be3c32ea4d8f561ujmu-switch-1",
       "category": "switch",
       "type": "binary",
       "read_only": false,
@@ -49,9 +49,9 @@
       "max": 1
     },
     {
-      "name": "child_lock",
+      "name": "Child lock",
       "external_id": "tuya:bf2be3c32ea4d8f561ujmu:child_lock",
-      "selector": "tuya:bf2be3c32ea4d8f561ujmu:child_lock",
+      "selector": "tuya-bf2be3c32ea4d8f561ujmu-child-lock",
       "category": "child-lock",
       "type": "binary",
       "read_only": false,
@@ -60,9 +60,9 @@
       "max": 1
     },
     {
-      "name": "add_ele",
+      "name": "Total energy",
       "external_id": "tuya:bf2be3c32ea4d8f561ujmu:add_ele",
-      "selector": "tuya:bf2be3c32ea4d8f561ujmu:add_ele",
+      "selector": "tuya-bf2be3c32ea4d8f561ujmu-add-ele",
       "category": "switch",
       "type": "energy",
       "read_only": true,
@@ -73,9 +73,9 @@
       "scale": 3
     },
     {
-      "name": "cur_current",
+      "name": "Current",
       "external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_current",
-      "selector": "tuya:bf2be3c32ea4d8f561ujmu:cur_current",
+      "selector": "tuya-bf2be3c32ea4d8f561ujmu-cur-current",
       "category": "switch",
       "type": "current",
       "read_only": true,
@@ -86,9 +86,9 @@
       "scale": 0
     },
     {
-      "name": "cur_power",
+      "name": "Active power",
       "external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_power",
-      "selector": "tuya:bf2be3c32ea4d8f561ujmu:cur_power",
+      "selector": "tuya-bf2be3c32ea4d8f561ujmu-cur-power",
       "category": "switch",
       "type": "power",
       "read_only": true,
@@ -99,9 +99,9 @@
       "scale": 1
     },
     {
-      "name": "cur_voltage",
+      "name": "Voltage",
       "external_id": "tuya:bf2be3c32ea4d8f561ujmu:cur_voltage",
-      "selector": "tuya:bf2be3c32ea4d8f561ujmu:cur_voltage",
+      "selector": "tuya-bf2be3c32ea4d8f561ujmu-cur-voltage",
       "category": "switch",
       "type": "voltage",
       "read_only": true,

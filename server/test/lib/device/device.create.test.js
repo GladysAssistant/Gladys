@@ -683,4 +683,43 @@ describe('Device', () => {
       'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
     );
   });
+  it('should ignore invalid energy_parent_id when updating a device', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const created = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Energy device',
+      external_id: 'energy-device-invalid-parent',
+      features: [
+        {
+          name: 'Power',
+          external_id: 'energy-device:power',
+          category: 'switch',
+          type: 'power',
+          read_only: true,
+          keep_history: true,
+          has_feedback: false,
+          min: 0,
+          max: 10000,
+        },
+      ],
+    });
+
+    const updated = await device.create({
+      id: created.id,
+      service_id: created.service_id,
+      name: created.name,
+      external_id: created.external_id,
+      features: [
+        {
+          ...created.features[0],
+          energy_parent_id: '00000000-0000-0000-0000-000000000099',
+        },
+      ],
+      params: [],
+    });
+
+    expect(updated.features[0].energy_parent_id).to.equal(null);
+  });
 });

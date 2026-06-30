@@ -142,4 +142,22 @@ describe('Netatmo Load Weather Station Details', () => {
     expect(modulesWeatherStations).to.be.an('array');
     expect(modulesWeatherStations).to.have.lengthOf(0);
   });
+
+  it('should trigger handleApiAuthError on 403 from getstationsdata', async () => {
+    const authErrorSpy = sinon.spy(netatmoHandler, 'handleApiAuthError');
+    try {
+      netatmoMock
+        .intercept({
+          method: 'GET',
+          path: '/api/getstationsdata?get_favorites=false',
+        })
+        .reply(403, { error: { code: 13, message: 'forbidden' } });
+
+      await netatmoHandler.loadWeatherStationDetails();
+
+      sinon.assert.calledWith(authErrorSpy, 403);
+    } finally {
+      authErrorSpy.restore();
+    }
+  });
 });

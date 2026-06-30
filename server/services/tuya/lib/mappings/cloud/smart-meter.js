@@ -27,63 +27,79 @@ module.exports = {
     'voltage_coef',
   ],
   power_a: {
+    name: 'Power A',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
     unit: DEVICE_FEATURE_UNITS.WATT,
   },
   power_b: {
+    name: 'Power B',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
     unit: DEVICE_FEATURE_UNITS.WATT,
   },
   total_power: {
+    name: 'Total power',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
     unit: DEVICE_FEATURE_UNITS.WATT,
   },
   voltage_a: {
+    name: 'Voltage A',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE,
     unit: DEVICE_FEATURE_UNITS.VOLT,
   },
   current_a: {
+    name: 'Current A',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
     unit: DEVICE_FEATURE_UNITS.MILLI_AMPERE,
   },
   current_b: {
+    name: 'Current B',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
     unit: DEVICE_FEATURE_UNITS.MILLI_AMPERE,
   },
   energy_forword_a: {
-    // Intentional: matches Tuya device API code.
+    // Tuya code carries a typo ("forword"); kept as the API key but the
+    // user-facing name is corrected to "Forward energy A".
+    name: 'Forward energy A',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
     unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   },
   energy_forword_b: {
-    // Intentional: matches Tuya device API code.
+    // Tuya code carries a typo ("forword"); kept as the API key but the
+    // user-facing name is corrected to "Forward energy B".
+    name: 'Forward energy B',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
     unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   },
   forward_energy_total: {
+    name: 'Forward energy total',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
     unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   },
   energy_reverse_a: {
+    name: 'Reverse energy A',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX,
     unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   },
   energy_reserse_b: {
+    // Tuya code carries a typo ("reserse"); kept as the API key but the
+    // user-facing name is corrected to "Reverse energy B".
+    name: 'Reverse energy B',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX,
     unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   },
   reverse_energy_total: {
+    name: 'Reverse energy total',
     category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
     type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.EXPORT_INDEX,
     unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,

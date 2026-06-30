@@ -1,5 +1,7 @@
 const {
   OnOff,
+  BooleanState,
+  Switch,
   OccupancySensing,
   IlluminanceMeasurement,
   TemperatureMeasurement,
@@ -12,13 +14,28 @@ const {
   Pm10ConcentrationMeasurement,
   ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
+  HepaFilterMonitoring,
+  FanControl,
+  RvcOperationalState,
+  RvcRunMode,
+  RvcCleanMode,
+  PowerSource,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  FAN_MODE,
+  FAN_AIRFLOW_DIRECTION,
+  FAN_ROCK_SETTING,
+  FAN_WIND_SETTING,
+} = require('../../../utils/constants');
 const { slugify } = require('../../../utils/slugify');
 
 /**
@@ -62,7 +79,7 @@ function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
  * @param {string} devicePath - The path of the device.
  * @example
  * const gladysDevice = await convertToGladysDevice(serviceId, nodeId, node, device);
- * @returns {Promise<object>} The Gladys device.
+ * @returns {Promise<any>} The Gladys device.
  */
 async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDeviceDataBasicInformation, devicePath) {
   const gladysDevice = {
@@ -98,8 +115,10 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
   // Add endpoint number to the name so the user can identify the device
   gladysDevice.name += ` ${device.number}`;
 
-  if (device.clusterClients) {
-    await Promise.each(Array.from(device.clusterClients.entries()), async ([clusterIndex, clusterClient]) => {
+  const allClusterClients = device.getAllClusterClients();
+  if (allClusterClients && allClusterClients.length > 0) {
+    await Promise.each(allClusterClients, async (clusterClient) => {
+      const clusterIndex = clusterClient.id;
       const commonNewFeature = {
         name: `${clusterClient.name} - ${clusterClient.endpointId}`,
         selector: slugify(`matter-${device.name}-${clusterClient.name}`, true),
@@ -114,6 +133,29 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: 0,
           max: 1,
+        });
+      } else if (clusterIndex === BooleanState.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+          type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 1,
+        });
+      } else if (clusterIndex === Switch.Complete.id) {
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Click)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-click`, true),
+          category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+          type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:click`,
+          min: 0,
+          max: 84,
         });
       } else if (clusterIndex === OccupancySensing.Complete.id) {
         gladysDevice.features.push({
@@ -290,6 +332,17 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           min: 0,
           max: 100,
         });
+      } else if (clusterIndex === NitrogenDioxideConcentrationMeasurement.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 100,
+        });
       } else if (clusterIndex === FormaldehydeConcentrationMeasurement.Complete.id) {
         const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
         const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);
@@ -374,6 +427,189 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:energy`,
             min: 0,
             max: 1000000,
+          });
+        }
+      } else if (clusterIndex === HepaFilterMonitoring.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING,
+          type: DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 100,
+        });
+      } else if (clusterIndex === FanControl.Complete.id) {
+        const fanBaseExternalId = `matter:${nodeId}:${devicePath}:${clusterIndex}`;
+        const features = clusterClient.supportedFeatures || {};
+
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Mode)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-mode`, true),
+          category: DEVICE_FEATURE_CATEGORIES.FAN,
+          type: DEVICE_FEATURE_TYPES.FAN.MODE,
+          read_only: false,
+          has_feedback: true,
+          external_id: `${fanBaseExternalId}:mode`,
+          min: FAN_MODE.OFF,
+          max: FAN_MODE.AUTO,
+        });
+
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Speed %)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-percent`, true),
+          category: DEVICE_FEATURE_CATEGORIES.FAN,
+          type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
+          read_only: false,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+          external_id: `${fanBaseExternalId}:percent`,
+          min: 0,
+          max: 100,
+        });
+
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Speed % current)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-percent-current`, true),
+          category: DEVICE_FEATURE_CATEGORIES.FAN,
+          type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+          external_id: `${fanBaseExternalId}:percent-current`,
+          min: 0,
+          max: 100,
+        });
+
+        if (features.multiSpeed) {
+          const speedMax = await clusterClient.getSpeedMaxAttribute();
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Speed)`,
+            selector: slugify(`matter-${device.name}-${clusterClient.name}-speed`, true),
+            category: DEVICE_FEATURE_CATEGORIES.FAN,
+            type: DEVICE_FEATURE_TYPES.FAN.SPEED,
+            read_only: false,
+            has_feedback: true,
+            external_id: `${fanBaseExternalId}:speed`,
+            min: 0,
+            max: speedMax,
+          });
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Speed current)`,
+            selector: slugify(`matter-${device.name}-${clusterClient.name}-speed-current`, true),
+            category: DEVICE_FEATURE_CATEGORIES.FAN,
+            type: DEVICE_FEATURE_TYPES.FAN.SPEED,
+            read_only: true,
+            has_feedback: true,
+            external_id: `${fanBaseExternalId}:speed-current`,
+            min: 0,
+            max: speedMax,
+          });
+        }
+
+        if (features.rocking) {
+          const rockSupport = await clusterClient.getRockSupportAttribute();
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Oscillation)`,
+            selector: slugify(`matter-${device.name}-${clusterClient.name}-rock`, true),
+            category: DEVICE_FEATURE_CATEGORIES.FAN,
+            type: DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
+            read_only: false,
+            has_feedback: true,
+            external_id: `${fanBaseExternalId}:rock`,
+            min: FAN_ROCK_SETTING.OFF,
+            max: rockSupport,
+          });
+        }
+
+        if (features.wind) {
+          const windSupport = await clusterClient.getWindSupportAttribute();
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Wind mode)`,
+            selector: slugify(`matter-${device.name}-${clusterClient.name}-wind`, true),
+            category: DEVICE_FEATURE_CATEGORIES.FAN,
+            type: DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
+            read_only: false,
+            has_feedback: true,
+            external_id: `${fanBaseExternalId}:wind`,
+            min: FAN_WIND_SETTING.OFF,
+            max: windSupport,
+          });
+        }
+
+        if (features.airflowDirection) {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Airflow direction)`,
+            selector: slugify(`matter-${device.name}-${clusterClient.name}-airflow-direction`, true),
+            category: DEVICE_FEATURE_CATEGORIES.FAN,
+            type: DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
+            read_only: false,
+            has_feedback: true,
+            external_id: `${fanBaseExternalId}:airflow-direction`,
+            min: FAN_AIRFLOW_DIRECTION.FORWARD,
+            max: FAN_AIRFLOW_DIRECTION.REVERSE,
+          });
+        }
+      } else if (clusterIndex === RvcOperationalState.Complete.id) {
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (State)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-state`, true),
+          category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+          type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:state`,
+          min: 0,
+          max: 255,
+        });
+        gladysDevice.features.push({
+          name: `${clusterClient.name} - ${clusterClient.endpointId} (Dock)`,
+          selector: slugify(`matter-${device.name}-${clusterClient.name}-dock`, true),
+          category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+          type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK,
+          read_only: false,
+          has_feedback: false,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:dock`,
+          min: 0,
+          max: 1,
+        });
+      } else if (clusterIndex === RvcRunMode.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+          type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 2,
+        });
+      } else if (clusterIndex === RvcCleanMode.Complete.id) {
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER,
+          type: DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE,
+          read_only: false,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: 0,
+          max: 6,
+        });
+      } else if (clusterIndex === PowerSource.Complete.id) {
+        if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.battery) {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Battery)`,
+            selector: slugify(`matter-${device.name}-${clusterClient.name}-battery`, true),
+            category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+            type: DEVICE_FEATURE_TYPES.BATTERY.INTEGER,
+            read_only: true,
+            has_feedback: true,
+            unit: DEVICE_FEATURE_UNITS.PERCENT,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:battery`,
+            min: 0,
+            max: 100,
           });
         }
       }

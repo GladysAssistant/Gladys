@@ -1,10 +1,13 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import { useEffect, useRef } from 'preact/hooks';
 import { connect } from 'unistore/preact';
 import actions from '../../actions/message';
 import { RequestStatus } from '../../utils/consts';
 import ChatItems from './ChatItems';
 import EmptyChat from './EmptyChat';
+import ChatSidebar from './ChatSidebar';
+import style from './style.css';
 
 const IntegrationPage = connect(
   'user,messages,currentMessageTextInput,gladysIsTyping,MessageGetStatus',
@@ -19,45 +22,79 @@ const IntegrationPage = connect(
     onKeyPress,
     sendMessage,
     gladysIsTyping
-  }) => (
-    <div class="page">
-      <div class="page-main">
-        <div class="my-3 my-md-5">
-          <div class="container">
-            <div class="page-header" />
-            <div class="row">
-              <div class="col-lg-8">
-                <div class="card">
-                  <div
-                    class={cx('dimmer', {
-                      active: MessageGetStatus === RequestStatus.Getting
-                    })}
-                  >
-                    <div class="loader" />
-                    <div class="dimmer-content">
-                      {messages && messages.length ? (
-                        <ChatItems user={user} messages={messages} gladysIsTyping={gladysIsTyping} />
-                      ) : (
-                        <EmptyChat />
-                      )}
-                      <div class="card-footer">
-                        <div class="input-group">
-                          <Localizer>
-                            <input
-                              type="text"
-                              class="form-control"
-                              placeholder={<Text id="chat.messagePlaceholder" />}
-                              value={currentMessageTextInput}
-                              onInput={updateMessageTextInput}
-                              onKeyPress={onKeyPress}
-                            />
-                          </Localizer>
-                          <div class="input-group-append">
+  }) => {
+    const textareaRef = useRef(null);
+    const hasMessageToSend = Boolean(currentMessageTextInput && currentMessageTextInput.trim().length > 0);
+
+    const resizeComposerInput = () => {
+      if (!textareaRef.current) {
+        return;
+      }
+      const textarea = textareaRef.current;
+      textarea.style.height = 'auto';
+      const computed = window.getComputedStyle(textarea);
+      const lineHeight = parseFloat(computed.lineHeight) || 24;
+      const verticalPadding = (parseFloat(computed.paddingTop) || 0) + (parseFloat(computed.paddingBottom) || 0);
+      const verticalBorder = (parseFloat(computed.borderTopWidth) || 0) + (parseFloat(computed.borderBottomWidth) || 0);
+      const maxLines = 11;
+      const maxHeight = lineHeight * maxLines + verticalPadding + verticalBorder;
+      textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+      textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
+    };
+
+    const onComposerInput = e => {
+      updateMessageTextInput(e);
+      resizeComposerInput();
+    };
+
+    useEffect(() => {
+      resizeComposerInput();
+    }, [currentMessageTextInput]);
+
+    return (
+      <div class={cx('page', style.chatPage)}>
+        <div class={cx('page-main', style.chatPageMain)}>
+          <div class={cx('my-3 my-md-5', style.chatPageContent)}>
+            <div class={cx('container', style.chatPageContainer)}>
+              <div class="page-header" />
+              <div class={cx('row', style.chatLayout)}>
+                <div class={cx('col-lg-8', style.chatMainColumn)}>
+                  <div class={cx('card', style.chatCard)}>
+                    <div
+                      class={cx('dimmer', style.chatDimmer, {
+                        active: MessageGetStatus === RequestStatus.Getting
+                      })}
+                    >
+                      <div class="loader" />
+                      <div class={cx('dimmer-content', style.chatCardBody)}>
+                        <div class={style.chatMessagesArea}>
+                          {messages && messages.length ? (
+                            <ChatItems user={user} messages={messages} gladysIsTyping={gladysIsTyping} />
+                          ) : (
+                            <EmptyChat />
+                          )}
+                        </div>
+                        <div class={cx('card-footer', style.chatComposer)}>
+                          <div class={style.composerInputWrap}>
+                            <Localizer>
+                              <textarea
+                                ref={textareaRef}
+                                rows="1"
+                                class={cx('form-control', style.chatInput)}
+                                placeholder={<Text id="chat.messagePlaceholder" />}
+                                value={currentMessageTextInput}
+                                onInput={onComposerInput}
+                                onKeyPress={onKeyPress}
+                              />
+                            </Localizer>
                             <button
                               type="button"
-                              class="btn btn-secondary"
+                              class={cx('btn', style.sendButton, {
+                                [style.sendButtonActive]: hasMessageToSend,
+                                [style.sendButtonIdle]: !hasMessageToSend
+                              })}
                               onClick={sendMessage}
-                              disabled={!currentMessageTextInput || currentMessageTextInput.length === 0}
+                              disabled={!hasMessageToSend}
                             >
                               <i class="fe fe-send" />
                             </button>
@@ -67,48 +104,16 @@ const IntegrationPage = connect(
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="col-lg-4">
-                <div class="card">
-                  <div class="card-header">
-                    <h3 class="card-title">
-                      <Text id="chat.whatCanYouAsk" />
-                    </h3>
-                  </div>
-                  <div class="card-body">
-                    <ul>
-                      <li>
-                        <Text id="chat.examples.whatsTheWeatherLike" />
-                      </li>
-                      <li>
-                        <Text id="chat.examples.showCameraImage" />
-                      </li>
-                      <li>
-                        <Text id="chat.examples.whatsTheTemperatureKitchen" />
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="card">
-                  <div class="card-header">
-                    <h3 class="card-title">
-                      <Text id="chat.gpt3Integration" />
-                    </h3>
-                  </div>
-                  <div class="card-body">
-                    <Text id="chat.gpt3IntegrationExplanation" />{' '}
-                    <a href="/dashboard/integration/communication/openai">
-                      <Text id="chat.gpt3ClickHere" />
-                    </a>
-                  </div>
+                <div class={cx('col-lg-4', style.desktopSidebarColumn)}>
+                  <ChatSidebar />
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  )
+    );
+  }
 );
 
 export default IntegrationPage;

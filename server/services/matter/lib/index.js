@@ -14,6 +14,7 @@ const { checkIpv6 } = require('./matter.checkIpv6');
 const { refreshDevices } = require('./matter.refreshDevices');
 const { backupController } = require('./matter.backupController');
 const { restoreBackup } = require('./matter.restoreBackup');
+const { reset } = require('./matter.reset');
 
 /**
  * @description Matter handler.
@@ -34,6 +35,10 @@ const MatterHandler = function MatterHandler(gladys, MatterMain, ProjectChipMatt
   this.nodesMap = new Map();
   this.stateChangeListeners = new Set();
   this.commissioningController = null;
+  // Map to store supported modes for RvcRunMode and RvcCleanMode clusters
+  // Key: external_id (e.g., "matter:nodeId:devicePath:clusterId")
+  // Value: { supportedModes: [{mode: number, label: string, modeTags: [...]}], modeTagToValue: Map }
+  this.supportedModesMap = new Map();
   this.backupController = gladys.job.wrapper(JOB_TYPES.SERVICE_MATTER_BACKUP, this.backupController.bind(this));
   process.on('SIGTERM', this.stop);
   process.on('SIGINT', this.stop);
@@ -52,5 +57,6 @@ MatterHandler.prototype.checkIpv6 = checkIpv6;
 MatterHandler.prototype.refreshDevices = refreshDevices;
 MatterHandler.prototype.backupController = backupController;
 MatterHandler.prototype.restoreBackup = restoreBackup;
+MatterHandler.prototype.reset = reset;
 
 module.exports = MatterHandler;

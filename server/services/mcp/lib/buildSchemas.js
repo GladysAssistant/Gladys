@@ -1,4 +1,15 @@
 const z = require('zod/v4');
+const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
+const {
+  createSceneCreateInputSchema,
+  formatSceneCreateZodIssue,
+  extractProvidedActionTypes,
+  flattenUnionIssues,
+  SCENE_CREATE_TOOL_DESCRIPTION,
+  assertTriggerTypesNotInActions,
+} = require('./sceneSchemas');
+const { fetchWebPage } = require('./webRequest');
+const { compareTimes } = require('./compareTimes');
 
 const noRoom = {
   id: null,
@@ -41,7 +52,8 @@ async function getAllResources() {
     };
   });
 
-  const sensorDevices = (await this.gladys.device.get())
+  const allDevices = await this.gladys.device.get();
+  const sensorDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isSensorFeature(feature));
     })
@@ -66,7 +78,7 @@ async function getAllResources() {
     homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
   });
 
-  const switchableDevices = (await this.gladys.device.get())
+  const switchableDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isSwitchableFeature(feature));
     })
@@ -120,15 +132,24 @@ async function getAllResources() {
 
 /**
  * @description Get all tools available in the MCP service.
+ * @param {string} [userId] - Optional user id used to scope private calendars.
  * @returns {Promise<Array>} Array of tools with their intent and configuration.
  * @example
- * getAllTools()
+ * getAllTools('0cd30aef-9c4e-4a23-88e3-3547971296e5')
  */
-async function getAllTools() {
+async function getAllTools(userId) {
   const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector }) => ({ id, name, selector }));
   rooms.push(noRoom);
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
-  const sensorDevices = (await this.gladys.device.get())
+  const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const houses = (await this.gladys.house.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const calendars = userId
+    ? (await this.gladys.calendar.get(userId)).map(({ id, name, selector }) => ({ id, name, selector }))
+    : [];
+  const areas = (await this.gladys.area.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+
+  const allDevices = await this.gladys.device.get();
+  const sensorDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isSensorFeature(feature));
     })
@@ -147,7 +168,7 @@ async function getAllTools() {
     ),
   ];
 
-  const switchableDevices = (await this.gladys.device.get())
+  const switchableDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isSwitchableFeature(feature));
     })
@@ -165,8 +186,34 @@ async function getAllTools() {
         .flat(),
     ),
   ];
+  const deviceFeatureSelectors = allDevices
+    .map((device) => device.features.map((feature) => feature.selector))
+    .flat()
+    .filter(Boolean);
+  const lightDeviceSelectors = switchableDevices
+    .filter((device) => device.features.some((feature) => feature.category === 'light' && feature.type === 'binary'))
+    .map((device) => device.selector);
+  const switchDeviceSelectors = switchableDevices
+    .filter((device) => device.features.some((feature) => feature.category === 'switch' && feature.type === 'binary'))
+    .map((device) => device.selector);
+  const musicNotificationDeviceSelectors = allDevices
+    .filter((device) =>
+      device.features.some((feature) => feature.category === 'music' && feature.type === 'play_notification'),
+    )
+    .map((device) => device.selector);
+  const sceneCreateInputSchema = createSceneCreateInputSchema(
+    scenes.map(({ selector }) => selector),
+    users.map(({ selector }) => selector),
+    houses.map(({ selector }) => selector),
+    lightDeviceSelectors,
+    switchDeviceSelectors,
+    musicNotificationDeviceSelectors,
+    deviceFeatureSelectors,
+    calendars.map(({ selector }) => selector),
+    areas.map(({ selector }) => selector),
+  );
 
-  const historyDevices = (await this.gladys.device.get())
+  const historyDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isHistoryFeature(feature));
     })
@@ -207,6 +254,47 @@ async function getAllTools() {
             mimeType: 'image/jpeg',
           })),
         };
+      },
+    },
+    {
+      intent: 'scene.create',
+      config: {
+        title: 'Create scene',
+        description: SCENE_CREATE_TOOL_DESCRIPTION,
+        inputSchema: sceneCreateInputSchema.shape,
+      },
+      cb: async (scene) => {
+        try {
+          assertTriggerTypesNotInActions(scene);
+          const parsedScene = sceneCreateInputSchema.parse(scene);
+          const createdScene = await this.gladys.scene.create({
+            ...parsedScene,
+            actions: parsedScene.actions,
+          });
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: this.toon({
+                  id: createdScene.id,
+                  name: createdScene.name,
+                  selector: createdScene.selector,
+                }),
+              },
+            ],
+          };
+        } catch (e) {
+          if (e?.name === 'ZodError') {
+            const details = e.issues.map((issue) => formatSceneCreateZodIssue(issue, scene)).join('; ');
+            throw new Error(`scene.create validation failed (422): ${details}`);
+          }
+          if (e?.name === 'SequelizeValidationError') {
+            const details = (e.errors || []).map((error) => error.message).join('; ');
+            throw new Error(`scene.create failed (422): ${details || e.message}`);
+          }
+          throw e;
+        }
       },
     },
     {
@@ -445,6 +533,23 @@ async function getAllTools() {
             interval ? intervalByName[interval] : THIRTY_DAYS_IN_MINUTES,
             500,
           );
+          aggStates.values = aggStates.values.map((v) => {
+            let decimalPlaces;
+            if (typeof v.value === 'number') {
+              decimalPlaces = Math.max(
+                v.min_value?.toString().split('.')[1]?.length || 2,
+                v.max_value?.toString().split('.')[1]?.length || 2,
+              );
+            }
+
+            return {
+              ...v,
+              ...(decimalPlaces && {
+                value: Number(v.value.toFixed(decimalPlaces)),
+                sum_value: Number(v.sum_value.toFixed(decimalPlaces)),
+              }),
+            };
+          });
 
           return {
             content: [
@@ -469,10 +574,85 @@ async function getAllTools() {
         };
       },
     },
+    {
+      intent: 'web.fetch',
+      config: {
+        title: 'Fetch web page',
+        description:
+          'Fetch a public web page and return its readable text content. Use this to read information from websites such as opening hours, schedules, or public announcements. Only HTTP/HTTPS public URLs are allowed.',
+        inputSchema: {
+          url: z.url().describe('Full public URL of the page to fetch (http or https).'),
+        },
+      },
+      cb: async ({ url }) => {
+        const text = await fetchWebPage({ url });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text,
+            },
+          ],
+        };
+      },
+    },
+    {
+      intent: 'time.compare-times',
+      config: {
+        title: 'Compare times',
+        description:
+          'Compare times deterministically. Use operator in_ranges to check whether the current time (or reference_time) falls within one or more HH:mm ranges. Use before/after/same to compare two times. Prefer this tool over mental time reasoning for schedules and opening hours.',
+        inputSchema: {
+          operator: z
+            .enum(['in_ranges', 'before', 'after', 'same'])
+            .describe('Comparison to perform. Use in_ranges for opening hours.'),
+          ranges: z
+            .array(
+              z.object({
+                start: z.string().describe('Range start time in HH:mm or HHhmm.'),
+                end: z.string().describe('Range end time in HH:mm or HHhmm.'),
+              }),
+            )
+            .optional()
+            .describe('Time ranges to test with in_ranges.'),
+          reference_time: z
+            .string()
+            .optional()
+            .describe('Reference time in HH:mm or HHhmm. Defaults to current home time.'),
+          compare_to: z
+            .string()
+            .optional()
+            .describe('Second time in HH:mm or HHhmm for before/after/same operators.'),
+        },
+      },
+      cb: async ({ operator, ranges, reference_time: referenceTime, compare_to: compareTo }) => {
+        const configuredTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+        const timezoneName = configuredTimezone || 'Europe/Paris';
+        const result = compareTimes({
+          timezone: timezoneName,
+          operator,
+          ranges,
+          reference_time: referenceTime,
+          compare_to: compareTo,
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: this.toon(result),
+            },
+          ],
+        };
+      },
+    },
   ];
 }
 
 module.exports = {
   getAllResources,
   getAllTools,
+  extractProvidedActionTypes,
+  flattenUnionIssues,
 };

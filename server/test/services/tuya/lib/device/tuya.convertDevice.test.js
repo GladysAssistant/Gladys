@@ -170,7 +170,7 @@ describe('tuya.convertDevice', () => {
 
     expect(device.features).to.have.length(2);
     expect(switchFeature.read_only).to.equal(false);
-    expect(switchFeature.name).to.equal('switch_1');
+    expect(switchFeature.name).to.equal('Switch 1');
     expect(powerFeature.scale).to.equal(1);
   });
 

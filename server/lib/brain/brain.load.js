@@ -1,10 +1,21 @@
+const { getAnswers } = require('../../config/brain/index');
+const logger = require('../../utils/logger');
+
 /**
- * @description Train the brain.
+ * @description Load brain answer templates from configuration files.
  * @example
- * brain.train();
+ * brain.load();
  */
 async function load() {
-  this.train();
+  const answers = getAnswers();
+
+  this.answers.clear();
+  answers.forEach((answer) => {
+    const key = `${answer.language}:${answer.label}`;
+    this.answers.set(key, answer.answers);
+  });
+
+  logger.debug('Brain answers loaded');
 }
 
 module.exports = {

@@ -8,6 +8,7 @@ const { DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
 const { normalizeBoolean } = require('./utils/tuya.normalize');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
+const { isLocalSkipNeeded, recordLocalFailure, recordLocalSuccess } = require('./utils/tuya.degraded');
 
 /**
  * @description Send the new device value over device protocol.
@@ -47,10 +48,16 @@ async function setValue(device, deviceFeature, value) {
   const hasLocalConfig = ipAddress && localKey && protocolVersion && localOverride === true;
 
   const localDps = getLocalDpsFromCode(command, device);
+  const localSkipped = hasLocalConfig && isLocalSkipNeeded(this.degradedDevices, topic);
+  if (localSkipped) {
+    logger.debug(`[Tuya][setValue] device=${topic} skipping local (degraded backoff active), using cloud`);
+  }
 
-  if (hasLocalConfig && localDps !== null) {
+  if (hasLocalConfig && localDps !== null && !localSkipped) {
+    const isProtocol34 = protocolVersion === '3.4';
     const isProtocol35 = protocolVersion === '3.5';
-    const TuyaLocalApi = isProtocol35 ? TuyAPINewGen : TuyAPI;
+    const isNewGenProtocol = isProtocol34 || isProtocol35;
+    const TuyaLocalApi = isNewGenProtocol ? TuyAPINewGen : TuyAPI;
     const tuyaOptions = {
       id: topic,
       key: localKey,
@@ -63,25 +70,36 @@ async function setValue(device, deviceFeature, value) {
     if (isProtocol35) {
       tuyaOptions.keepAlive = false;
     }
+    const { degradedDevices } = this;
     const runLocalSet = async () => {
       const tuyaLocal = new TuyaLocalApi(tuyaOptions);
-      let connected = false;
+      // Absorb async socket errors so they do not bubble up as uncaughtException
+      // when the device drops the connection mid-command. The stub-friendly
+      // guard keeps tests working when their TuyAPI stub does not implement on().
+      if (typeof tuyaLocal.on === 'function') {
+        tuyaLocal.on('error', (err) => {
+          logger.info(
+            `[Tuya][setValue][local] socket error for device=${topic}: ${err && err.message ? err.message : err}`,
+          );
+        });
+      }
       try {
         await tuyaLocal.connect();
-        connected = true;
         await tuyaLocal.set({ dps: localDps, set: transformedValue });
         logger.debug(`[Tuya][setValue][local] device=${topic} dps=${localDps} value=${transformedValue}`);
+        recordLocalSuccess(degradedDevices, topic);
         return true;
       } catch (e) {
         logger.warn(`[Tuya][setValue][local] failed, fallback to cloud`, e);
+        recordLocalFailure(degradedDevices, topic, e);
         return false;
       } finally {
-        if (connected) {
-          try {
-            await tuyaLocal.disconnect();
-          } catch (disconnectError) {
-            logger.warn('[Tuya][setValue][local] disconnect failed', disconnectError);
-          }
+        // Always close the socket — even if connect() failed — so the device
+        // does not refuse subsequent local connections (cascading ECONNRESET).
+        try {
+          await tuyaLocal.disconnect();
+        } catch (disconnectError) {
+          logger.warn('[Tuya][setValue][local] disconnect failed', disconnectError);
         }
       }
     };
@@ -90,6 +108,13 @@ async function setValue(device, deviceFeature, value) {
     if (localSuccess) {
       return;
     }
+  }
+
+  if (!this.connector || typeof this.connector.request !== 'function') {
+    logger.warn(
+      `[Tuya][setValue][cloud] connector unavailable for device=${topic} (cloud disconnected); local set did not succeed and no fallback is possible`,
+    );
+    return;
   }
 
   const response = await this.connector.request({
