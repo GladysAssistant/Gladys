@@ -53,7 +53,7 @@ class BluetoothPresenceScanner extends Component {
           <label class="form-label">
             <Text id="integration.bluetooth.setup.presenceScannerFrequencyLabel" />
           </label>
-          <div class="input-group col-sm-3">
+          <div class="input-group flex-nowrap" style={{ maxWidth: '160px' }}>
             <input
               type="number"
               disabled={!enabled || disabled}
