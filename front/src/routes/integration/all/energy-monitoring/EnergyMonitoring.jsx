@@ -132,6 +132,27 @@ class EnergyMonitoringPage extends Component {
     return arr.map(this.slotIndexToLabel).join(',');
   };
 
+  isCalendarContract = contract => contract === 'night-weekend' || contract === 'peak-off-peak';
+
+  isTempoContract = contract => contract === 'edf-tempo';
+
+  getNightHourSlots = () => new Set([46, 47, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+
+  getAllHourSlots = () => new Set(Array.from({ length: 48 }, (_, slot) => slot));
+
+  handleContractChange = contract => {
+    this.setState(({ newPrice }) => {
+      const updates = { contract };
+      if (contract === 'night-weekend' && (newPrice.day_type === 'any' || !newPrice.day_type)) {
+        updates.day_type = 'weekday';
+      }
+      if (contract === 'edf-tempo' && ['weekday', 'weekend', 'holiday'].includes(newPrice.day_type)) {
+        updates.day_type = 'any';
+      }
+      return { newPrice: { ...newPrice, ...updates } };
+    });
+  };
+
   calculateFromBeginning = async () => {
     try {
       this.setState({ calculatingFromBeginning: true, settingsError: null, settingsSuccess: null });
@@ -318,6 +339,8 @@ class EnergyMonitoringPage extends Component {
       // Save hour slots from wizardHourSlots as comma-separated HH:MM string
       if (this.state.wizardHourSlots && this.state.wizardHourSlots.size > 0) {
         payload.hour_slots = this.formatSetToHourSlots(this.state.wizardHourSlots);
+      } else if (['weekend', 'holiday'].includes(payload.day_type)) {
+        payload.hour_slots = '';
       }
       // Convert empty end_date to null
       if (payload.end_date === '' || payload.end_date === 'Invalid date') {
@@ -720,6 +743,9 @@ class EnergyMonitoringPage extends Component {
     // Peak hours are typically during the day (e.g., 08:00-12:00, 18:00-22:00)
     // Off-peak hours typically include night hours (00:00-06:00)
     const isPeakPrice = p => {
+      if (p.day_type === 'weekend' || p.day_type === 'holiday') {
+        return false;
+      }
       if (!p.hour_slots || String(p.hour_slots).trim().length === 0) {
         // No hour slots = base contract, not peak/off-peak
         return null;
@@ -758,6 +784,12 @@ class EnergyMonitoringPage extends Component {
           return '#868e96'; // gray
         case 'red':
           return '#fa5252'; // red
+        case 'weekday':
+          return '#228be6';
+        case 'weekend':
+          return '#7950f2';
+        case 'holiday':
+          return '#e64980';
         default:
           return null;
       }
@@ -789,7 +821,7 @@ class EnergyMonitoringPage extends Component {
 
     // Sort prices within a group: by day_type, then by peak/off-peak
     const sortPricesInGroup = prices => {
-      const dayTypeOrder = { blue: 0, white: 1, red: 2, any: 3 };
+      const dayTypeOrder = { blue: 0, white: 1, red: 2, weekday: 3, weekend: 4, holiday: 5, any: 6 };
       return [...prices].sort((a, b) => {
         // First sort by day_type
         const dayA = dayTypeOrder[a.day_type] !== undefined ? dayTypeOrder[a.day_type] : 99;
@@ -1027,13 +1059,16 @@ class EnergyMonitoringPage extends Component {
                       <select
                         class="form-control"
                         value={state.newPrice.contract}
-                        onChange={e => updateNewPrice({ contract: e.target.value })}
+                        onChange={e => this.handleContractChange(e.target.value)}
                       >
                         <option value="base">
                           <Text id="integration.energyMonitoring.contractTypes.base" />
                         </option>
                         <option value="peak-off-peak">
                           <Text id="integration.energyMonitoring.contractTypes.peak-off-peak" />
+                        </option>
+                        <option value="night-weekend">
+                          <Text id="integration.energyMonitoring.contractTypes.night-weekend" />
                         </option>
                         <option value="edf-tempo">
                           <Text id="integration.energyMonitoring.contractTypes.edf-tempo" />
@@ -1132,18 +1167,45 @@ class EnergyMonitoringPage extends Component {
                         value={state.newPrice.day_type}
                         onChange={e => updateNewPrice({ day_type: e.target.value })}
                       >
-                        <option value="any">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.any" />
-                        </option>
-                        <option value="red">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.red" />
-                        </option>
-                        <option value="white">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.white" />
-                        </option>
-                        <option value="blue">
-                          <Text id="integration.energyMonitoring.dayTypeOptions.blue" />
-                        </option>
+                        {!this.isTempoContract(state.newPrice.contract) && !this.isCalendarContract(state.newPrice.contract) && (
+                          <option value="any">
+                            <Text id="integration.energyMonitoring.dayTypeOptions.any" />
+                          </option>
+                        )}
+                        {this.isTempoContract(state.newPrice.contract) && (
+                          <>
+                            <option value="any">
+                              <Text id="integration.energyMonitoring.dayTypeOptions.any" />
+                            </option>
+                            <option value="red">
+                              <Text id="integration.energyMonitoring.dayTypeOptions.red" />
+                            </option>
+                            <option value="white">
+                              <Text id="integration.energyMonitoring.dayTypeOptions.white" />
+                            </option>
+                            <option value="blue">
+                              <Text id="integration.energyMonitoring.dayTypeOptions.blue" />
+                            </option>
+                          </>
+                        )}
+                        {this.isCalendarContract(state.newPrice.contract) && (
+                          <>
+                            <option value="weekday">
+                              <Text id="integration.energyMonitoring.dayTypeOptions.weekday" />
+                            </option>
+                            <option value="weekend">
+                              <Text id="integration.energyMonitoring.dayTypeOptions.weekend" />
+                            </option>
+                            <option value="holiday">
+                              <Text id="integration.energyMonitoring.dayTypeOptions.holiday" />
+                            </option>
+                            {state.newPrice.contract === 'peak-off-peak' && (
+                              <option value="any">
+                                <Text id="integration.energyMonitoring.dayTypeOptions.any" />
+                              </option>
+                            )}
+                          </>
+                        )}
                       </select>
                     </div>
                   </div>
@@ -1213,6 +1275,26 @@ class EnergyMonitoringPage extends Component {
                           <Text id="integration.energyMonitoring.selectHoursHelp" />
                         </div>
                         <div>
+                          {this.isCalendarContract(state.newPrice.contract) && (
+                            <>
+                              <button
+                                type="button"
+                                class="btn btn-sm btn-outline-secondary mr-2"
+                                onClick={() => this.setState({ wizardHourSlots: this.getNightHourSlots() })}
+                              >
+                                <Text id="integration.energyMonitoring.night2306" />
+                              </button>
+                              {(state.newPrice.day_type === 'weekend' || state.newPrice.day_type === 'holiday') && (
+                                <button
+                                  type="button"
+                                  class="btn btn-sm btn-outline-secondary mr-2"
+                                  onClick={() => this.setState({ wizardHourSlots: this.getAllHourSlots() })}
+                                >
+                                  <Text id="integration.energyMonitoring.allDay" />
+                                </button>
+                              )}
+                            </>
+                          )}
                           <button
                             type="button"
                             class="btn btn-sm btn-outline-secondary mr-2"

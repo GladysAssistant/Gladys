@@ -10,7 +10,7 @@ import {
   DEVICE_FEATURE_UNITS
 } from '../../../../../../server/utils/constants';
 
-const KNOWN_CONTRACT_TYPES = ['peak-off-peak', 'tempo', 'base'];
+const KNOWN_CONTRACT_TYPES = ['night-weekend', 'peak-off-peak', 'tempo', 'base'];
 
 class ImportPricesPage extends Component {
   state = {
