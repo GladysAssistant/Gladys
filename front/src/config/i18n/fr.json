@@ -610,7 +610,10 @@
         "any": "tous",
         "red": "rouge",
         "white": "blanc",
-        "blue": "bleu"
+        "blue": "bleu",
+        "weekday": "semaine",
+        "weekend": "week-end",
+        "holiday": "jours fériés"
       },
       "electricMeter": "Compteur électrique",
       "leaveEndDateEmpty": "Laissez la date de fin vide pour une période ouverte.",
@@ -619,6 +622,8 @@
       "hourSlots": "Créneaux horaires",
       "selectHoursHelp": "Sélectionnez les heures auxquelles ce prix s'applique.",
       "daytime820": "Journée 8-20",
+      "night2306": "Nuit 23h-6h",
+      "allDay": "Toute la journée",
       "clear": "Effacer",
       "selected": "Sélectionné :",
       "none": "aucun",
@@ -631,6 +636,7 @@
       "contractTypes": {
         "base": "base",
         "peak-off-peak": "heures pleines/creuses",
+        "night-weekend": "nuit & week-end",
         "edf-tempo": "EDF Tempo"
       },
       "priceTypes": {

@@ -3,9 +3,22 @@ const timezone = require('dayjs/plugin/timezone');
 
 dayjs.extend(timezone);
 
-const { ENERGY_CONTRACT_TYPES } = require('../../../utils/constants');
+const { ENERGY_CONTRACT_TYPES, ENERGY_PRICE_DAY_TYPES } = require('../../../utils/constants');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
+const { getConsumptionCalendarDayType } = require('./contracts.getConsumptionCalendarDayType');
+
+const TEMPO_DAY_TYPES = new Set([
+  ENERGY_PRICE_DAY_TYPES.RED,
+  ENERGY_PRICE_DAY_TYPES.BLUE,
+  ENERGY_PRICE_DAY_TYPES.WHITE,
+]);
+
+const CALENDAR_DAY_TYPES = new Set([
+  ENERGY_PRICE_DAY_TYPES.WEEKDAY,
+  ENERGY_PRICE_DAY_TYPES.WEEKEND,
+  ENERGY_PRICE_DAY_TYPES.HOLIDAY,
+]);
 
 /**
  * @description Convert a Date to an HH:MM slot label at 30-minute granularity.
@@ -20,6 +33,98 @@ function formatDateToSlotLabel(date, systemTimezone) {
   const minutes = dayjsDate.minute() >= 30 ? '30' : '00';
   const hh = hour < 10 ? `0${hour}` : `${hour}`;
   return `${hh}:${minutes}`;
+}
+
+/**
+ * @description Check if a price row applies to the current calendar day type.
+ * @param {object} price - The energy price row.
+ * @param {string} calendarDayType - The resolved calendar day type.
+ * @returns {boolean} True when the price applies to this day.
+ */
+function priceMatchesCalendarDayType(price, calendarDayType) {
+  const { day_type: dayType } = price;
+  if (!dayType || dayType === 'any') {
+    return true;
+  }
+  if (TEMPO_DAY_TYPES.has(dayType)) {
+    return true;
+  }
+  return dayType === calendarDayType;
+}
+
+/**
+ * @description Check if hour slots match, with all-day support for weekend/holiday rows.
+ * @param {object} price - The energy price row.
+ * @param {string} label - The HH:MM slot label.
+ * @returns {boolean} True when the price applies to this time slot.
+ */
+function priceMatchesHourSlot(price, label) {
+  const hourSlots = (price.hour_slots || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (hourSlots.length === 0) {
+    const { day_type: dayType } = price;
+    return dayType === ENERGY_PRICE_DAY_TYPES.WEEKEND || dayType === ENERGY_PRICE_DAY_TYPES.HOLIDAY;
+  }
+
+  return hourSlots.includes(label);
+}
+
+/**
+ * @description Determine if calendar day filtering should be applied.
+ * @param {string} contract - The contract type.
+ * @param {Array} energyPricesAtConsumptionDate - The price rows for the consumption date.
+ * @returns {boolean} True when day-of-week filtering is required.
+ */
+function usesCalendarDayFiltering(contract, energyPricesAtConsumptionDate) {
+  if (contract === ENERGY_CONTRACT_TYPES.NIGHT_WEEKEND) {
+    return true;
+  }
+  if (contract === ENERGY_CONTRACT_TYPES.PEAK_OFF_PEAK) {
+    return energyPricesAtConsumptionDate.some((price) => CALENDAR_DAY_TYPES.has(price.day_type));
+  }
+  return false;
+}
+
+/**
+ * @description Calculate cost for peak/off-peak contracts, optionally filtered by calendar day type.
+ * @param {Array} energyPricesAtConsumptionDate - The price rows for the consumption date.
+ * @param {Date} consumptionDate - The date of the consumption sample.
+ * @param {number} consumptionValue - The consumption value in kWh.
+ * @param {string} systemTimezone - The timezone of the system.
+ * @param {string} contract - The contract type.
+ * @returns {number} The calculated cost.
+ */
+function calculatePeakOffPeakCost(
+  energyPricesAtConsumptionDate,
+  consumptionDate,
+  consumptionValue,
+  systemTimezone,
+  contract,
+) {
+  const label = formatDateToSlotLabel(consumptionDate, systemTimezone);
+  let pricesToSearch = energyPricesAtConsumptionDate;
+
+  if (usesCalendarDayFiltering(contract, energyPricesAtConsumptionDate)) {
+    const calendarDayType = getConsumptionCalendarDayType(consumptionDate, systemTimezone);
+    pricesToSearch = energyPricesAtConsumptionDate.filter((price) =>
+      priceMatchesCalendarDayType(price, calendarDayType),
+    );
+
+    if (pricesToSearch.length === 0) {
+      throw new NotFoundError(`No price found for calendar day type ${calendarDayType}`);
+    }
+  }
+
+  const price = pricesToSearch.find((p) => priceMatchesHourSlot(p, label));
+  if (!price) {
+    throw new NotFoundError(`No price found for time slot ${label}`);
+  }
+
+  const cost = (price.price / 10000) * consumptionValue;
+  return cost;
 }
 
 module.exports = {
@@ -38,22 +143,27 @@ module.exports = {
     consumptionValue,
     systemTimezone,
   ) => {
-    // Compute the HH:MM slot label
-    const label = formatDateToSlotLabel(consumptionDate, systemTimezone);
-    // Find the price for this time slot
-    const price = energyPricesAtConsumptionDate.find((p) => {
-      const hourSlots = (p.hour_slots || '')
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean);
-      return hourSlots.includes(label);
-    });
-    if (!price) {
-      throw new NotFoundError(`No price found for time slot ${label}`);
-    }
-    // Price are stored as integer with 4 decimals
-    const cost = (price.price / 10000) * consumptionValue;
-    return cost;
+    return calculatePeakOffPeakCost(
+      energyPricesAtConsumptionDate,
+      consumptionDate,
+      consumptionValue,
+      systemTimezone,
+      ENERGY_CONTRACT_TYPES.PEAK_OFF_PEAK,
+    );
+  },
+  [ENERGY_CONTRACT_TYPES.NIGHT_WEEKEND]: async (
+    energyPricesAtConsumptionDate,
+    consumptionDate,
+    consumptionValue,
+    systemTimezone,
+  ) => {
+    return calculatePeakOffPeakCost(
+      energyPricesAtConsumptionDate,
+      consumptionDate,
+      consumptionValue,
+      systemTimezone,
+      ENERGY_CONTRACT_TYPES.NIGHT_WEEKEND,
+    );
   },
   [ENERGY_CONTRACT_TYPES.EDF_TEMPO]: async (
     energyPricesAtConsumptionDate,

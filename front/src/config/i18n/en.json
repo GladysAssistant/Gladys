@@ -1867,7 +1867,10 @@
         "any": "any",
         "red": "red",
         "white": "white",
-        "blue": "blue"
+        "blue": "blue",
+        "weekday": "weekday",
+        "weekend": "weekend",
+        "holiday": "public holidays"
       },
       "electricMeter": "Electric Meter",
       "leaveEndDateEmpty": "Leave the end date empty for an open period.",
@@ -1876,6 +1879,8 @@
       "hourSlots": "Time Slots",
       "selectHoursHelp": "Select the hours when this price applies.",
       "daytime820": "Daytime 8-20",
+      "night2306": "Night 11pm-6am",
+      "allDay": "All day",
       "clear": "Clear",
       "selected": "Selected:",
       "none": "none",
@@ -1888,6 +1893,7 @@
       "contractTypes": {
         "base": "base",
         "peak-off-peak": "peak/off-peak hours",
+        "night-weekend": "night & weekend",
         "edf-tempo": "EDF Tempo"
       },
       "priceTypes": {

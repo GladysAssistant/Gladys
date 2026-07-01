@@ -121,6 +121,141 @@ describe('Contracts.calculateCost', () => {
 
       expect(cost).to.equal(1.5); // 0.1500 * 10 = 1.5 EUR (peak price)
     });
+
+    it('should filter by calendar day type when day_type is set', async () => {
+      const energyPricesAtConsumptionDate = [
+        {
+          price: 1000,
+          currency: 'EUR',
+          day_type: 'weekend',
+          hour_slots: '',
+        },
+        {
+          price: 1500,
+          currency: 'EUR',
+          day_type: 'weekday',
+          hour_slots: '08:00,08:30,09:00,16:00,16:30,17:00',
+        },
+        {
+          price: 1000,
+          currency: 'EUR',
+          day_type: 'weekday',
+          hour_slots: '00:00,00:30,01:00,22:00,22:30,23:00,23:30',
+        },
+      ];
+      const consumptionDate = new Date('2023-10-14T14:30:00.000Z'); // Saturday 16:30 Paris
+      const consumptionValue = 10;
+      const systemTimezone = 'Europe/Paris';
+
+      const cost = await contractsCalculateCost[ENERGY_CONTRACT_TYPES.PEAK_OFF_PEAK](
+        energyPricesAtConsumptionDate,
+        consumptionDate,
+        consumptionValue,
+        systemTimezone,
+      );
+
+      expect(cost).to.equal(1.0);
+    });
+  });
+
+  describe('NIGHT_WEEKEND contract', () => {
+    it('should apply off-peak price on weekday nights (23h-6h)', async () => {
+      const offPeakNightSlots =
+        '23:00,23:30,00:00,00:30,01:00,01:30,02:00,02:30,03:00,03:30,04:00,04:30,05:00,05:30';
+      const peakWeekdaySlots =
+        '06:00,06:30,07:00,07:30,08:00,08:30,09:00,09:30,10:00,10:30,11:00,11:30,12:00,12:30,13:00,13:30,14:00,14:30,15:00,15:30,16:00,16:30,17:00,17:30,18:00,18:30,19:00,19:30,20:00,20:30,21:00,21:30,22:00,22:30';
+
+      const energyPricesAtConsumptionDate = [
+        {
+          price: 1636,
+          currency: 'EUR',
+          day_type: 'weekday',
+          hour_slots: offPeakNightSlots,
+        },
+        {
+          price: 2929,
+          currency: 'EUR',
+          day_type: 'weekday',
+          hour_slots: peakWeekdaySlots,
+        },
+        {
+          price: 1636,
+          currency: 'EUR',
+          day_type: 'weekend',
+          hour_slots: '',
+        },
+        {
+          price: 1636,
+          currency: 'EUR',
+          day_type: 'holiday',
+          hour_slots: '',
+        },
+      ];
+
+      const consumptionDate = new Date('2024-03-12T22:30:00.000Z'); // Wednesday 23:30 Paris
+      const cost = await contractsCalculateCost[ENERGY_CONTRACT_TYPES.NIGHT_WEEKEND](
+        energyPricesAtConsumptionDate,
+        consumptionDate,
+        10,
+        'Europe/Paris',
+      );
+
+      expect(cost).to.be.closeTo(1.636, 0.001);
+    });
+
+    it('should apply off-peak price all day on weekends', async () => {
+      const energyPricesAtConsumptionDate = [
+        {
+          price: 1636,
+          currency: 'EUR',
+          day_type: 'weekend',
+          hour_slots: '',
+        },
+        {
+          price: 2929,
+          currency: 'EUR',
+          day_type: 'weekday',
+          hour_slots: '06:00,06:30,07:00',
+        },
+      ];
+
+      const consumptionDate = new Date('2024-03-16T10:00:00.000Z'); // Saturday 11:00 Paris
+      const cost = await contractsCalculateCost[ENERGY_CONTRACT_TYPES.NIGHT_WEEKEND](
+        energyPricesAtConsumptionDate,
+        consumptionDate,
+        5,
+        'Europe/Paris',
+      );
+
+      expect(cost).to.be.closeTo(0.818, 0.001);
+    });
+
+    it('should apply off-peak price all day on public holidays', async () => {
+      const energyPricesAtConsumptionDate = [
+        {
+          price: 1636,
+          currency: 'EUR',
+          day_type: 'holiday',
+          hour_slots: '',
+        },
+        {
+          price: 2929,
+          currency: 'EUR',
+          day_type: 'weekday',
+          hour_slots: '10:00,10:30,11:00',
+        },
+      ];
+
+      const consumptionDate = new Date('2024-05-01T08:30:00.000Z'); // May 1st 10:30 Paris
+      const cost = await contractsCalculateCost[ENERGY_CONTRACT_TYPES.NIGHT_WEEKEND](
+        energyPricesAtConsumptionDate,
+        consumptionDate,
+        4,
+        'Europe/Paris',
+      );
+
+      expect(cost).to.be.closeTo(0.6544, 0.001);
+    });
   });
 
   describe('EDF_TEMPO contract', () => {

@@ -1650,6 +1650,8 @@ const ENERGY_CONTRACT_TYPES = {
   BASE: 'base',
   // Generic peak off peak contract
   PEAK_OFF_PEAK: 'peak-off-peak',
+  // Night and weekend contract (e.g. Enercoop Flexibilité Nuit & Week-end)
+  NIGHT_WEEKEND: 'night-weekend',
   // EDF Tempo
   EDF_TEMPO: 'edf-tempo',
 };
@@ -1663,6 +1665,9 @@ const ENERGY_PRICE_DAY_TYPES = {
   RED: 'red',
   BLUE: 'blue',
   WHITE: 'white',
+  WEEKDAY: 'weekday',
+  WEEKEND: 'weekend',
+  HOLIDAY: 'holiday',
 };
 
 const createList = (obj) => {
