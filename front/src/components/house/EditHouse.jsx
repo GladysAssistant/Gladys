@@ -168,7 +168,11 @@ const EditHouse = ({ children, ...props }) => (
         </div>
       </div>
       <div class="form-group d-flex flex-wrap">
-        <button onClick={props.saveHouse} class="btn btn-success flex-fill mr-2 mb-2" disabled={Object.keys(props.errors).length > 0}>
+        <button
+          onClick={props.saveHouse}
+          class="btn btn-success flex-fill mr-2 mb-2"
+          disabled={Object.keys(props.errors).length > 0}
+        >
           <Text id="signup.configureHouse.saveHouse" />
         </button>
         {!props.wantToDeleteHouse && (
