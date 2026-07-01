@@ -4,6 +4,7 @@ const db = require('../../models');
 const { isNumeric } = require('../../utils/device');
 const { NotFoundError } = require('../../utils/coreErrors');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 
 const DEFAULT_OPTIONS = {
   skip: 0,
@@ -27,24 +28,7 @@ async function get(options) {
   const optionsWithDefault = { ...DEFAULT_OPTIONS, ...options };
 
   const queryParams = {
-    include: [
-      {
-        model: db.DeviceFeature,
-        as: 'features',
-      },
-      {
-        model: db.DeviceParam,
-        as: 'params',
-      },
-      {
-        model: db.Room,
-        as: 'room',
-      },
-      {
-        model: db.Service,
-        as: 'service',
-      },
-    ],
+    include: getStandardDeviceIncludes(),
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
   };
