@@ -10,12 +10,16 @@ const GatewayPage = ({ children, ...props }) => (
         <Text id="gatewayBackup.title" />
       </h2>
       <div>
-        <button class="btn btn-success flex-shrink-0" onClick={props.createBackup}>
-          <span class="d-none d-sm-inline-block">
-            <Text id="gatewayBackup.backupNowButton" />
-          </span>
-          <i class="fe fe-save d-sm-none" />
-        </button>
+        {props.gatewayCreateBackupStatus === RequestStatus.Success ? (
+          <Text id="gatewayBackup.backupStarted" />
+        ) : (
+          <button class="btn btn-success flex-shrink-0" onClick={props.createBackup}>
+            <span class="d-none d-sm-inline-block">
+              <Text id="gatewayBackup.backupNowButton" />
+            </span>
+            <i class="fe fe-save d-sm-none" />
+          </button>
+        )}
       </div>
     </div>
     <div class="card-body">
