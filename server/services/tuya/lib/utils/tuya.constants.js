@@ -8,6 +8,9 @@ const GLADYS_VARIABLES = {
   APP_USERNAME: 'TUYA_APP_USERNAME',
   MANUAL_DISCONNECT: 'TUYA_MANUAL_DISCONNECT',
   LAST_CONNECTED_CONFIG_HASH: 'TUYA_LAST_CONNECTED_CONFIG_HASH',
+  // Kill-switch for the persistent local connection listener (real-time pushed DP updates).
+  // Defaults to enabled when the variable is unset; set to '0'/'false' to force poll-only behavior.
+  PERSISTENT_PUSH_ENABLED: 'TUYA_PERSISTENT_PUSH_ENABLED',
 };
 
 const TUYA_ENDPOINTS = {

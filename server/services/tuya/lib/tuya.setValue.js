@@ -54,6 +54,25 @@ async function setValue(device, deviceFeature, value) {
   }
 
   if (hasLocalConfig && localDps !== null && !localSkipped) {
+    // Prefer the already-open persistent connection: a Tuya device accepts only one local session at a
+    // time, so opening a dedicated write connection here would contend with the persistent socket
+    // (several seconds of delay). Reusing it makes local writes instant.
+    if (typeof this.sendCommandViaPersistentConnection === 'function') {
+      try {
+        const sentViaPersistent = await this.sendCommandViaPersistentConnection(topic, localDps, transformedValue);
+        if (sentViaPersistent) {
+          logger.debug(`[Tuya][setValue][persistent] device=${topic} dps=${localDps} value=${transformedValue}`);
+          recordLocalSuccess(this.degradedDevices, topic);
+          return;
+        }
+      } catch (e) {
+        logger.warn(
+          `[Tuya][setValue][persistent] set via persistent connection failed for device=${topic}, using a dedicated local connection`,
+          e,
+        );
+      }
+    }
+
     const isProtocol34 = protocolVersion === '3.4';
     const isProtocol35 = protocolVersion === '3.5';
     const isNewGenProtocol = isProtocol34 || isProtocol35;
