@@ -326,9 +326,7 @@ async function poll(device) {
   if (persistentConnected) {
     // Recycle the stale-but-open socket so the single local session frees up: the next cycles then
     // follow the intended priority (persistent -> local poll -> cloud) instead of staying on cloud.
-    if (typeof this.recyclePersistentConnection === 'function') {
-      this.recyclePersistentConnection(topic);
-    }
+    this.recyclePersistentConnection(topic);
     fallbackReason = 'persistent_stale_cloud_refresh';
     logger.debug(`[Tuya][poll] device=${topic} persistent connected but silent: recycling + cloud refresh this cycle`);
   }
