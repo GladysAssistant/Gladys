@@ -25,8 +25,10 @@ const isDegradingError = (error) => {
   return false;
 };
 
-const recordLocalFailure = (map, deviceId, error, now = Date.now()) => {
-  if (!map || !deviceId || !isDegradingError(error)) {
+const recordLocalFailure = (map, deviceId, error, now = Date.now(), force = false) => {
+  // `force` records the failure even for a non-network error (e.g. a device that keeps returning a
+  // malformed local payload): it is still a repeated local failure that should trip the backoff.
+  if (!map || !deviceId || (!force && !isDegradingError(error))) {
     return null;
   }
 
