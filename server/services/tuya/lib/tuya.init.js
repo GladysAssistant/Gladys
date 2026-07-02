@@ -47,6 +47,10 @@ async function init() {
   }
 
   this.startReconnect();
+
+  // Open persistent local connections (real-time pushed DP updates) for local-capable devices.
+  // Internally guarded (kill-switch + per-device config) and never throws, so it cannot break init.
+  await this.startPersistentConnections();
 }
 
 module.exports = {
