@@ -164,6 +164,8 @@ describe('Tuya persistent connection', () => {
     lastTuyapi().emit('disconnected');
     await clock.tickAsync(30000);
     lastTuyapi().emit('disconnected');
+    // A further drop once the connection is already failed is ignored (status stays failed).
+    lastTuyapi().emit('disconnected');
 
     expect(self.persistentConnections.testid.status).to.equal('failed');
     expect(self.isPersistentConnectionHealthy('testid')).to.equal(false);
@@ -503,10 +505,12 @@ describe('TuyaHandler.poll persistent coexistence gate', () => {
     const self = buildPollSelf();
     self.isPersistentConnectionHealthy = gateSandbox.stub().returns(false);
     self.isPersistentConnectionConnected = gateSandbox.stub().returns(true);
+    self.recyclePersistentConnection = gateSandbox.stub();
 
     await poll.call(self, buildDevice());
 
     expect(localPoll.called).to.equal(false);
     expect(self.connector.request.called).to.equal(true);
+    expect(self.recyclePersistentConnection.calledWith('testid')).to.equal(true);
   });
 });
