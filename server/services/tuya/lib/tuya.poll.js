@@ -117,6 +117,51 @@ const extractShadowValues = (response) => {
 };
 
 /**
+ * @description Apply a local DPS map to a device's features and emit their new states. Shared by the
+ * scheduled local poll and the persistent-connection push handler so both go through the exact same
+ * DPS -> feature -> state transformation (single source of truth).
+ * @param {object} gladys - The Gladys instance (stateManager + event emit).
+ * @param {object} device - The Gladys device (with features).
+ * @param {object} dps - The DPS map (full or partial).
+ * @returns {object} { handledCodes: Set<string>, changed: number } of features that were emitted.
+ * @example
+ * const { handledCodes } = emitLocalDpsStates(gladys, device, { '1': true });
+ */
+const emitLocalDpsStates = (gladys, device, dps) => {
+  const handledCodes = new Set();
+  let changed = 0;
+  const deviceFeatures = Array.isArray(device.features) ? device.features : [];
+
+  deviceFeatures.forEach((deviceFeature) => {
+    const code = getFeatureCode(deviceFeature);
+    const dpsKey = getLocalDpsFromCode(code, device);
+    const reader = getFeatureReader(deviceFeature);
+    if (!code || dpsKey === null || !reader || !hasDpsKey(dps, dpsKey)) {
+      return;
+    }
+    const rawValue = Object.prototype.hasOwnProperty.call(dps, String(dpsKey)) ? dps[String(dpsKey)] : dps[dpsKey];
+    if (rawValue === undefined) {
+      return;
+    }
+    let transformedValue;
+    try {
+      transformedValue = reader(rawValue, deviceFeature);
+    } catch (e) {
+      logger.warn(`[Tuya][poll] local reader failed for code=${code}`, e);
+      return;
+    }
+    const { lastValue, lastValueChanged } = getCurrentFeatureState(gladys, deviceFeature);
+    const result = emitFeatureState(gladys, deviceFeature, transformedValue, lastValue, lastValueChanged);
+    if (result.changed) {
+      changed += 1;
+    }
+    handledCodes.add(code);
+  });
+
+  return { handledCodes, changed };
+};
+
+/**
  * @description Poll the given features against the Tuya cloud API and emit state changes.
  * @param {object} self - The TuyaHandler instance (passed explicitly to avoid `this` rebinding).
  * @param {object} device - The Gladys device (used to resolve the cloud read strategy).
@@ -302,46 +347,12 @@ async function poll(device) {
 
       const dps = localResult && localResult.dps ? localResult.dps : null;
       if (dps && typeof dps === 'object') {
-        const pendingCloudFeatures = [];
-
-        deviceFeatures.forEach((deviceFeature) => {
-          const code = getFeatureCode(deviceFeature);
-          const dpsKey = getLocalDpsFromCode(code, device);
-          const reader = getFeatureReader(deviceFeature);
-
-          if (!code || dpsKey === null || !reader || !hasDpsKey(dps, dpsKey)) {
-            pendingCloudFeatures.push(deviceFeature);
-            return;
-          }
-
-          const rawValue = Object.prototype.hasOwnProperty.call(dps, String(dpsKey))
-            ? dps[String(dpsKey)]
-            : dps[dpsKey];
-          if (rawValue === undefined) {
-            pendingCloudFeatures.push(deviceFeature);
-            return;
-          }
-          let transformedValue;
-          try {
-            transformedValue = reader(rawValue, deviceFeature);
-          } catch (e) {
-            pendingCloudFeatures.push(deviceFeature);
-            logger.warn(`[Tuya][poll] local reader failed for device=${topic} code=${code}; falling back to cloud`, e);
-            return;
-          }
-          const { lastValue, lastValueChanged } = getCurrentFeatureState(this.gladys, deviceFeature);
-          const { changed } = emitFeatureState(
-            this.gladys,
-            deviceFeature,
-            transformedValue,
-            lastValue,
-            lastValueChanged,
-          );
-          if (changed) {
-            localChanged += 1;
-          }
-          localHandled += 1;
-        });
+        const { handledCodes, changed: localChangedCount } = emitLocalDpsStates(this.gladys, device, dps);
+        localHandled = handledCodes.size;
+        localChanged = localChangedCount;
+        const pendingCloudFeatures = deviceFeatures.filter(
+          (deviceFeature) => !handledCodes.has(getFeatureCode(deviceFeature)),
+        );
 
         if (pendingCloudFeatures.length === 0) {
           modeUsed = 'local';
@@ -404,6 +415,7 @@ module.exports = {
   poll,
   // Exported so the persistent-connection push handler reuses the exact same DPS -> feature -> state
   // pipeline as the scheduled poll (single source of truth).
+  emitLocalDpsStates,
   getFeatureCode,
   getFeatureReader,
   hasDpsKey,
