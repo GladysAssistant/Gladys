@@ -26,6 +26,10 @@ module.exports = function TuyaService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('Stopping Tuya service');
+    // Persistent local connections are independent of the Tuya cloud, so they are torn down here (on
+    // real service stop) rather than in disconnect() (which is cloud-only and also runs on a manual
+    // cloud disconnect, where local control should keep working).
+    tuyaHandler.stopPersistentConnections();
     await tuyaHandler.disconnect();
   }
 

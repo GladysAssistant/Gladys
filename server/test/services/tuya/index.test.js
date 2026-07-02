@@ -22,6 +22,7 @@ TuyaHandlerMock.prototype.stopReconnect = TuyaHandler.prototype.stopReconnect;
 TuyaHandlerMock.prototype.tryReconnect = TuyaHandler.prototype.tryReconnect;
 TuyaHandlerMock.prototype.scheduleQuickReconnects = TuyaHandler.prototype.scheduleQuickReconnects;
 TuyaHandlerMock.prototype.clearQuickReconnects = TuyaHandler.prototype.clearQuickReconnects;
+TuyaHandlerMock.prototype.stopPersistentConnections = TuyaHandler.prototype.stopPersistentConnections;
 
 const TuyaService = proxyquire('../../../services/tuya/index', { './lib': TuyaHandlerMock });
 

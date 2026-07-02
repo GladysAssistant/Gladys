@@ -22,6 +22,17 @@ const {
   startReconnect,
   stopReconnect,
 } = require('./tuya.reconnect');
+const {
+  startPersistentConnections,
+  startPersistentConnectionForDevice,
+  handlePushedDps,
+  isPersistentConnectionHealthy,
+  isPersistentConnectionConnected,
+  sendCommandViaPersistentConnection,
+  recyclePersistentConnection,
+  stopPersistentConnectionForDevice,
+  stopPersistentConnections,
+} = require('./tuya.persistentConnection');
 
 const { STATUS } = require('./utils/tuya.constants');
 
@@ -37,6 +48,8 @@ const TuyaHandler = function TuyaHandler(gladys, serviceId) {
   this.quickReconnectTimeouts = [];
   this.quickReconnectInProgress = false;
   this.degradedDevices = {};
+  this.persistentConnections = {};
+  this.persistentPushEnabled = true;
 };
 
 TuyaHandler.prototype.init = init;
@@ -61,5 +74,14 @@ TuyaHandler.prototype.scheduleQuickReconnects = scheduleQuickReconnects;
 TuyaHandler.prototype.clearQuickReconnects = clearQuickReconnects;
 TuyaHandler.prototype.startReconnect = startReconnect;
 TuyaHandler.prototype.stopReconnect = stopReconnect;
+TuyaHandler.prototype.startPersistentConnections = startPersistentConnections;
+TuyaHandler.prototype.startPersistentConnectionForDevice = startPersistentConnectionForDevice;
+TuyaHandler.prototype.handlePushedDps = handlePushedDps;
+TuyaHandler.prototype.isPersistentConnectionHealthy = isPersistentConnectionHealthy;
+TuyaHandler.prototype.isPersistentConnectionConnected = isPersistentConnectionConnected;
+TuyaHandler.prototype.sendCommandViaPersistentConnection = sendCommandViaPersistentConnection;
+TuyaHandler.prototype.recyclePersistentConnection = recyclePersistentConnection;
+TuyaHandler.prototype.stopPersistentConnectionForDevice = stopPersistentConnectionForDevice;
+TuyaHandler.prototype.stopPersistentConnections = stopPersistentConnections;
 
 module.exports = TuyaHandler;
