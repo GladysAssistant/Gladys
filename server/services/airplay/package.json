@@ -13,7 +13,7 @@
     "arm64"
   ],
   "dependencies": {
-    "bonjour": "^3.5.0",
-    "node-airtunes2": "^2.5.0"
+    "@lox-audioserver/node-airplay-sender": "^0.4.7",
+    "bonjour": "^3.5.1"
   }
 }

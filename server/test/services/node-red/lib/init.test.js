@@ -91,25 +91,68 @@ describe('NodeRed init', () => {
     const config = {
       nodeRedPassword: 'nodeRedPassword',
     };
+    const expectedConfig = {
+      ...config,
+      dockerNodeRedVersion: '3',
+    };
     nodeRedManager.getConfiguration.resolves({ ...config });
+    gladys.variable.getValue = sinon.stub().callsFake((key) => {
+      if (key === 'DOCKER_NODE_RED_VERSION') {
+        return null;
+      }
+
+      return '1';
+    });
 
     await nodeRedManager.init();
 
     assert.calledOnceWithExactly(nodeRedManager.getConfiguration);
-    assert.calledOnceWithExactly(nodeRedManager.saveConfiguration, config);
-    assert.calledOnceWithExactly(nodeRedManager.checkForContainerUpdates, config);
-    assert.calledOnceWithExactly(nodeRedManager.installContainer, config);
+    assert.calledOnceWithExactly(nodeRedManager.saveConfiguration, expectedConfig);
+    assert.calledOnceWithExactly(nodeRedManager.checkForContainerUpdates, expectedConfig);
+    assert.calledOnceWithExactly(nodeRedManager.installContainer, expectedConfig);
   });
 
-  it('it should save node-red params', async () => {
+  it('it should keep a valid stored major version for existing users', async () => {
+    const config = {
+      nodeRedPassword: 'nodeRedPassword',
+    };
+    const expectedConfig = {
+      ...config,
+      dockerNodeRedVersion: '4',
+    };
+    nodeRedManager.getConfiguration.resolves({ ...config });
+    gladys.variable.getValue = sinon.stub().callsFake((key) => {
+      if (key === 'DOCKER_NODE_RED_VERSION') {
+        return '4';
+      }
+
+      return '1';
+    });
+
+    await nodeRedManager.init();
+
+    assert.calledOnceWithExactly(nodeRedManager.saveConfiguration, expectedConfig);
+    assert.calledOnceWithExactly(nodeRedManager.checkForContainerUpdates, expectedConfig);
+    assert.calledOnceWithExactly(nodeRedManager.installContainer, expectedConfig);
+  });
+
+  it('it should save node-red params with version 5 for new users', async () => {
     const config = {};
     nodeRedManager.getConfiguration.resolves({ ...config });
+    gladys.variable.getValue = sinon.stub().callsFake((key) => {
+      if (key === 'DOCKER_NODE_RED_VERSION') {
+        return null;
+      }
+
+      return '1';
+    });
 
     await nodeRedManager.init();
 
     const expectedNewConfig = {
       nodeRedPassword: 'password',
       nodeRedUsername: 'admin',
+      dockerNodeRedVersion: '5',
     };
 
     assert.calledOnceWithExactly(nodeRedManager.getConfiguration);

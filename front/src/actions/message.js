@@ -58,6 +58,11 @@ function createActions(store) {
       });
       actions.scrollToBottom();
     },
+    setGladysTypingStatus(state, payload) {
+      store.setState({
+        gladysIsTyping: Boolean(payload && payload.thinking)
+      });
+    },
     pushMessage(state, message) {
       store.setState({
         gladysIsTyping: true
@@ -77,12 +82,13 @@ function createActions(store) {
       }, randomWait);
     },
     onKeyPress(state, e) {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
         actions.sendMessage(state);
       }
     },
     async sendMessage(state) {
-      if (!state.currentMessageTextInput || state.currentMessageTextInput.length === 0) {
+      if (!state.currentMessageTextInput || state.currentMessageTextInput.trim().length === 0) {
         return;
       }
       store.setState({

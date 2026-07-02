@@ -5,6 +5,7 @@ const {
   getConfiguredCloudStrategy,
   resolveCloudStrategy,
 } = require('../../../../../services/tuya/lib/utils/tuya.cloudStrategy');
+const { DEVICE_TYPES } = require('../../../../../services/tuya/lib/mappings');
 
 describe('Tuya cloud strategy utils', () => {
   it('should return null when cloud codes are invalid', () => {
@@ -16,6 +17,22 @@ describe('Tuya cloud strategy utils', () => {
         },
       },
       'smart-socket',
+    );
+
+    expect(strategy).to.equal(null);
+  });
+
+  it('should ignore empty cloud codes and return no strategy', () => {
+    const strategy = resolveCloudStrategy(
+      {
+        specifications: {
+          status: [{ code: '' }],
+        },
+        thing_model: {
+          services: [{ properties: [{ code: '   ' }] }],
+        },
+      },
+      DEVICE_TYPES.SMART_SOCKET,
     );
 
     expect(strategy).to.equal(null);

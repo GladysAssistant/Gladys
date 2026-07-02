@@ -6,8 +6,10 @@ import debounce from 'debounce';
 
 import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../utils/consts';
+import { getMatterDeviceSaveError } from '../../../../utils/formatErrors';
 import CardFilter from '../../../../components/layout/CardFilter';
 import MatterDeviceBox from './MatterDeviceBox';
+import MatterDeviceSaveErrorAlert from './MatterDeviceSaveErrorAlert';
 import MatterPage from './MatterPage';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { getDeviceParam } from '../../../../utils/device';
@@ -56,6 +58,9 @@ const compareDevices = (deviceA, deviceB) => {
   return true;
 };
 
+const findGladysDeviceByExternalId = (matterDevices, externalId) =>
+  matterDevices.find(device => device.external_id === externalId);
+
 class MatterDevices extends Component {
   constructor(props) {
     super(props);
@@ -69,7 +74,9 @@ class MatterDevices extends Component {
       error: null,
       matterEnabled: null,
       devicesThatAlreadyExistButWithDifferentNodeId: new Map(),
-      nodesIsConnected: new Map()
+      nodesIsConnected: new Map(),
+      pairedDeviceErrors: new Map(),
+      pairedDeviceLoading: new Map()
     };
     this.debouncedGetMatterDevices = debounce(this.getMatterDevices, 200).bind(this);
   }
@@ -144,38 +151,41 @@ class MatterDevices extends Component {
 
       const devicesThatAlreadyExistButWithDifferentNodeId = new Map();
 
-      // We group all paired devices by unique_id (one unique id can be shared by multiple devices)
-      const pairedDevicesGroupedByUniqueId = pairedDevices.reduce((acc, pairDevice) => {
-        const pairedDeviceUniqueId = getDeviceParam(pairDevice, 'UNIQUE_ID');
-        acc[pairedDeviceUniqueId] = acc[pairedDeviceUniqueId] || [];
-        acc[pairedDeviceUniqueId].push(pairDevice);
-        return acc;
-      }, {});
+      // The external_id of a Matter device is `matter:<nodeId>:<devicePath>`.
+      // The device path identifies the endpoint inside the node and is stable across re-pairings,
+      // while the node id changes when a device is re-commissioned. We use UNIQUE_ID + device path
+      // to reliably match a paired device with its already-existing counterpart in Gladys, even
+      // when multiple endpoints of the same physical device share the same UNIQUE_ID.
+      const getDevicePath = externalId =>
+        externalId
+          .split(':')
+          .slice(2)
+          .join(':');
 
-      // We group all devices already in Gladys by unique_id (one unique id can be shared by multiple devices)
-      const devicesGroupedByUniqueId = this.state.matterDevices.reduce((acc, device) => {
+      // We index all devices already in Gladys by `<unique_id>::<device_path>`
+      const existingDevicesByUniqueIdAndPath = new Map();
+      this.state.matterDevices.forEach(device => {
         const deviceUniqueId = getDeviceParam(device, 'UNIQUE_ID');
-        acc[deviceUniqueId] = acc[deviceUniqueId] || [];
-        acc[deviceUniqueId].push(device);
-        return acc;
-      }, {});
-
-      Object.entries(pairedDevicesGroupedByUniqueId).forEach(([uniqueId, pairedDevices]) => {
-        // We find all devices already created with the same unique id
-        const devices = devicesGroupedByUniqueId[uniqueId];
-        if (!devices) {
+        if (!deviceUniqueId) {
           return;
         }
+        existingDevicesByUniqueIdAndPath.set(`${deviceUniqueId}::${getDevicePath(device.external_id)}`, device);
+      });
 
-        // We can only match paired device with existing device if they have exactly the same number of devices
-        if (devices.length !== pairedDevices.length) {
+      // For each paired device, we look for an existing Gladys device with the same UNIQUE_ID and
+      // the same device path. If found and the external_id differs (i.e. the node id has changed),
+      // we register it so the user can update the existing device instead of creating a duplicate.
+      pairedDevices.forEach(pairedDevice => {
+        const pairedDeviceUniqueId = getDeviceParam(pairedDevice, 'UNIQUE_ID');
+        if (!pairedDeviceUniqueId) {
           return;
         }
-
-        // We match devices by position
-        pairedDevices.forEach((pairedDevice, index) => {
-          devicesThatAlreadyExistButWithDifferentNodeId.set(pairedDevice.external_id, devices[index].external_id);
-        });
+        const existingDevice = existingDevicesByUniqueIdAndPath.get(
+          `${pairedDeviceUniqueId}::${getDevicePath(pairedDevice.external_id)}`
+        );
+        if (existingDevice && existingDevice.external_id !== pairedDevice.external_id) {
+          devicesThatAlreadyExistButWithDifferentNodeId.set(pairedDevice.external_id, existingDevice.external_id);
+        }
       });
 
       this.setState({
@@ -204,23 +214,65 @@ class MatterDevices extends Component {
     }
   };
 
+  setPairedDeviceLoading = (externalId, loading) => {
+    this.setState(prevState => {
+      const pairedDeviceLoading = new Map(prevState.pairedDeviceLoading);
+      if (loading) {
+        pairedDeviceLoading.set(externalId, true);
+      } else {
+        pairedDeviceLoading.delete(externalId);
+      }
+      return { pairedDeviceLoading };
+    });
+  };
+
+  setPairedDeviceError = (externalId, error) => {
+    this.setState(prevState => {
+      const pairedDeviceErrors = new Map(prevState.pairedDeviceErrors);
+      if (error) {
+        pairedDeviceErrors.set(externalId, error);
+      } else {
+        pairedDeviceErrors.delete(externalId);
+      }
+      return { pairedDeviceErrors };
+    });
+  };
+
   addDeviceToGladys = async device => {
+    const { external_id: externalId } = device;
+    this.setPairedDeviceLoading(externalId, true);
+    this.setPairedDeviceError(externalId, null);
     try {
       await this.props.httpClient.post('/api/v1/device', device);
       await this.getMatterDevices();
       await this.getPairedDevices();
     } catch (e) {
       console.error(e);
+      this.setPairedDeviceError(externalId, getMatterDeviceSaveError(e));
+    } finally {
+      this.setPairedDeviceLoading(externalId, false);
     }
   };
 
   replaceGladysDevice = async device => {
+    const { external_id: externalId } = device;
+    this.setPairedDeviceLoading(externalId, true);
+    this.setPairedDeviceError(externalId, null);
     try {
       const gladysDevice = this.state.matterDevices.find(gladysDevice => {
         return (
           gladysDevice.external_id === this.state.devicesThatAlreadyExistButWithDifferentNodeId.get(device.external_id)
         );
       });
+
+      if (!gladysDevice) {
+        this.setPairedDeviceError(externalId, {
+          errorMessage: 'integration.matter.error.replaceDeviceNotFound',
+          errorDetail: null,
+          isKnownError: true
+        });
+        return;
+      }
 
       // We'll update the external_id of the existing device
       const newExternalId = device.external_id;
@@ -249,6 +301,9 @@ class MatterDevices extends Component {
       await this.getPairedDevices();
     } catch (e) {
       console.error(e);
+      this.setPairedDeviceError(externalId, getMatterDeviceSaveError(e));
+    } finally {
+      this.setPairedDeviceLoading(externalId, false);
     }
   };
 
@@ -301,7 +356,9 @@ class MatterDevices extends Component {
       housesWithRooms,
       devicesThatAlreadyExistButWithDifferentNodeId,
       matterEnabled,
-      nodesIsConnected
+      nodesIsConnected,
+      pairedDeviceErrors,
+      pairedDeviceLoading
     }
   ) {
     // Apply client-side filtering to paired devices
@@ -386,54 +443,101 @@ class MatterDevices extends Component {
                       <Text id="integration.matter.device.pairedDevicesTitle" />
                     </h4>
                     <div class="row mt-4">
-                      {sortedPairedDevices.map(device => (
-                        <div class="col-md-6">
-                          <div class="card">
-                            <div class="card-header">
-                              {device.name || device.model}
-                              {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
-                                <div class="page-options d-flex">
-                                  <div class="tag tag-danger">
-                                    <Text id="integration.matter.device.nodeDisconnected" />
-                                    <span class="tag-addon">
-                                      <i class="fe fe-wifi-off" />
-                                    </span>
+                      {sortedPairedDevices.map(device => {
+                        const pairedError = pairedDeviceErrors.get(device.external_id);
+                        const isPairedDeviceLoading = pairedDeviceLoading.get(device.external_id);
+                        const isNodeIdChanged = devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id);
+                        const existingGladysDevice = findGladysDeviceByExternalId(matterDevices, device.external_id);
+                        const isUpdate = existingGladysDevice && !isNodeIdChanged;
+
+                        return (
+                          <div key={device.external_id} class="col-md-6">
+                            <div class="card">
+                              <div class="card-header">
+                                {device.name || device.model}
+                                {nodesIsConnected.get(device.external_id.split(':')[1]) === false && (
+                                  <div class="page-options d-flex">
+                                    <div class="tag tag-danger">
+                                      <Text id="integration.matter.device.nodeDisconnected" />
+                                      <span class="tag-addon">
+                                        <i class="fe fe-wifi-off" />
+                                      </span>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                              <div
+                                class={cx('dimmer', {
+                                  active: isPairedDeviceLoading
+                                })}
+                              >
+                                <div class="loader" />
+                                <div class="dimmer-content">
+                                  <div class="card-body">
+                                    {pairedError && (
+                                      <MatterDeviceSaveErrorAlert
+                                        errorMessage={pairedError.errorMessage}
+                                        errorDetail={pairedError.errorDetail}
+                                        isKnownError={pairedError.isKnownError}
+                                      />
+                                    )}
+                                    {isNodeIdChanged && (
+                                      <div class="alert alert-info">
+                                        <Text id="integration.matter.device.deviceAlreadyExist" />
+                                      </div>
+                                    )}
+                                    {isUpdate && (
+                                      <div class="alert alert-info">
+                                        <Text id="integration.matter.device.deviceHasUpdates" />
+                                      </div>
+                                    )}
+                                    {device.features && device.features.length > 0 && (
+                                      <div class="form-group">
+                                        <label class="form-label">
+                                          <Text id="integration.matter.featuresLabel" />
+                                        </label>
+                                        <DeviceFeatures features={device.features} />
+                                      </div>
+                                    )}
+                                    {isNodeIdChanged && (
+                                      <div class="form-group">
+                                        <button
+                                          onClick={() => this.replaceGladysDevice(device)}
+                                          class={cx('btn btn-info', {
+                                            loading: isPairedDeviceLoading
+                                          })}
+                                          disabled={isPairedDeviceLoading}
+                                        >
+                                          <Text id="integration.matter.device.replaceExisting" />
+                                        </button>
+                                      </div>
+                                    )}
+                                    {!isNodeIdChanged && (
+                                      <div class="form-group">
+                                        <button
+                                          onClick={() => this.addDeviceToGladys(device)}
+                                          class={cx('btn', isUpdate ? 'btn-info' : 'btn-success', {
+                                            loading: isPairedDeviceLoading
+                                          })}
+                                          disabled={isPairedDeviceLoading}
+                                        >
+                                          <Text
+                                            id={
+                                              isUpdate
+                                                ? 'integration.matter.device.updateInGladys'
+                                                : 'integration.matter.device.addToGladys'
+                                            }
+                                          />
+                                        </button>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
-                              )}
-                            </div>
-                            <div class="card-body">
-                              {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                <div class="alert alert-info">
-                                  <Text id="integration.matter.device.deviceAlreadyExist" />
-                                </div>
-                              )}
-                              {device.features && device.features.length > 0 && (
-                                <div class="form-group">
-                                  <label class="form-label">
-                                    <Text id="integration.matter.featuresLabel" />
-                                  </label>
-                                  <DeviceFeatures features={device.features} />
-                                </div>
-                              )}
-                              {devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                <div class="form-group">
-                                  <button onClick={() => this.replaceGladysDevice(device)} class="btn btn-info">
-                                    <Text id="integration.matter.device.replaceExisting" />
-                                  </button>
-                                </div>
-                              )}
-                              {!devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id) && (
-                                <div class="form-group">
-                                  <button onClick={() => this.addDeviceToGladys(device)} class="btn btn-success">
-                                    <Text id="integration.matter.device.addToGladys" />
-                                  </button>
-                                </div>
-                              )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}

@@ -1,8 +1,24 @@
-// eslint-disable-next-line import/no-unresolved
-const { OnOff, WindowCovering, LevelControl, ColorControl, Thermostat } = require('@matter/main/clusters');
+const {
+  OnOff,
+  WindowCovering,
+  LevelControl,
+  ColorControl,
+  Thermostat,
+  FanControl,
+  RvcOperationalState,
+  RvcRunMode,
+  RvcCleanMode,
+  // eslint-disable-next-line import/no-unresolved
+} = require('@matter/main/clusters');
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
 const { intToHsb } = require('../../../utils/colors');
 const logger = require('../../../utils/logger');
+const {
+  gladysFanModeToMatter,
+  gladysRockSettingToMatter,
+  gladysWindSettingToMatter,
+} = require('../utils/fanMatterMapping');
+const { convertGladysRunModeToMatter, convertGladysCleanModeToMatter } = require('../utils/vacuumCleanerStateMapping');
 
 /**
  * @description Find a device recursively through child endpoints.
@@ -27,8 +43,9 @@ function findDeviceRecursively(parentDevice, path) {
   const deviceNumber = Number(currentNumber);
 
   // Look in child endpoints
-  if (parentDevice.childEndpoints) {
-    const childDevice = parentDevice.childEndpoints.find((child) => child.number === deviceNumber);
+  const childEndpoints = parentDevice.getChildEndpoints();
+  if (childEndpoints && childEndpoints.length > 0) {
+    const childDevice = childEndpoints.find((child) => child.number === deviceNumber);
     if (childDevice) {
       return findDeviceRecursively(childDevice, remainingPath);
     }
@@ -85,7 +102,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
 
   // Handle binary device
   if (gladysFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
-    const onOff = targetDevice.clusterClients.get(OnOff.Complete.id);
+    const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
 
     if (!onOff) {
       throw new Error('Device does not support OnOff cluster');
@@ -101,7 +118,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
 
   // Handle shutters
   if (gladysFeature.category === DEVICE_FEATURE_CATEGORIES.SHUTTER) {
-    const windowCovering = targetDevice.clusterClients.get(WindowCovering.Complete.id);
+    const windowCovering = targetDevice.getClusterClientById(WindowCovering.Complete.id);
     // Handle device feature shutter position
     if (gladysFeature.type === DEVICE_FEATURE_TYPES.SHUTTER.POSITION) {
       await windowCovering.goToLiftPercentage({
@@ -125,8 +142,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
   ) {
-    const levelControl = targetDevice.clusterClients.get(LevelControl.Complete.id);
-    const onOff = targetDevice.clusterClients.get(OnOff.Complete.id);
+    const levelControl = targetDevice.getClusterClientById(LevelControl.Complete.id);
+    const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
     await levelControl.moveToLevel({
       level: value,
       transitionTime: null,
@@ -147,8 +164,8 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
   ) {
-    const colorControl = targetDevice.clusterClients.get(ColorControl.Complete.id);
-    const onOff = targetDevice.clusterClients.get(OnOff.Complete.id);
+    const colorControl = targetDevice.getClusterClientById(ColorControl.Complete.id);
+    const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
     const [hue, saturation] = intToHsb(value);
 
     // Convert from standard HSB ranges to Matter ranges
@@ -160,11 +177,9 @@ async function setValue(gladysDevice, gladysFeature, value) {
     await colorControl.moveToHueAndSaturation({
       hue: matterHue,
       saturation: matterSaturation,
-      transitionTime: null,
-      optionsMask: {
-        executeIfOff: true,
-      },
-      optionsOverride: {},
+      transitionTime: 0,
+      optionsMask: 1, // bitmap: bit 0 = executeIfOff
+      optionsOverride: 1, // bitmap: bit 0 = executeIfOff
     });
     // If the user changes the color, we needs to turn on the light
     await onOff.on();
@@ -175,7 +190,7 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE
   ) {
-    const thermostat = targetDevice.clusterClients.get(Thermostat.Complete.id);
+    const thermostat = targetDevice.getClusterClientById(Thermostat.Complete.id);
     await thermostat.setOccupiedHeatingSetpointAttribute(value * 100);
   }
 
@@ -184,8 +199,94 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
     gladysFeature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE
   ) {
-    const thermostat = targetDevice.clusterClients.get(Thermostat.Complete.id);
+    const thermostat = targetDevice.getClusterClientById(Thermostat.Complete.id);
     await thermostat.setOccupiedCoolingSetpointAttribute(value * 100);
+  }
+
+  // Handle fan control (Matter FanControl cluster)
+  if (gladysFeature.category === DEVICE_FEATURE_CATEGORIES.FAN) {
+    const fanControl = targetDevice.getClusterClientById(FanControl.Complete.id);
+    if (!fanControl) {
+      throw new Error('Device does not support FanControl cluster');
+    }
+
+    const externalIdParts = gladysFeature.external_id.split(':');
+    const fanFeatureSuffix = externalIdParts[externalIdParts.length - 1];
+
+    switch (fanFeatureSuffix) {
+      case 'mode':
+        await fanControl.setFanModeAttribute(gladysFanModeToMatter(value));
+        break;
+      case 'percent':
+        await fanControl.setPercentSettingAttribute(value);
+        break;
+      case 'speed':
+        await fanControl.setSpeedSettingAttribute(value);
+        break;
+      case 'rock':
+        await fanControl.setRockSettingAttribute(gladysRockSettingToMatter(value));
+        break;
+      case 'wind':
+        await fanControl.setWindSettingAttribute(gladysWindSettingToMatter(value));
+        break;
+      case 'airflow-direction':
+        await fanControl.setAirflowDirectionAttribute(value);
+        break;
+      default:
+        throw new Error(`Unsupported FanControl feature suffix: ${fanFeatureSuffix}`);
+    }
+  }
+
+  // Handle vacuum cleaner dock command
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK
+  ) {
+    const rvcOperationalState = targetDevice.getClusterClientById(RvcOperationalState.Complete.id);
+    if (!rvcOperationalState) {
+      throw new Error('Device does not support RvcOperationalState cluster');
+    }
+    if (value === 1) {
+      await rvcOperationalState.goHome();
+    } else {
+      throw new Error(`Unsupported dock command value: ${value}. Only value 1 (go home) is supported.`);
+    }
+  }
+
+  // Handle vacuum cleaner run mode
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE
+  ) {
+    const rvcRunMode = targetDevice.getClusterClientById(RvcRunMode.Complete.id);
+    if (!rvcRunMode) {
+      throw new Error('Device does not support RvcRunMode cluster');
+    }
+    // Get supportedModes for dynamic conversion
+    const runModeExternalId = gladysFeature.external_id;
+    const supportedModesData = this.supportedModesMap.get(runModeExternalId);
+    // Convert Gladys standard mode to Matter mode (ensure value is a number)
+    const matterMode = convertGladysRunModeToMatter(Number(value), supportedModesData);
+    logger.debug(`Matter: Setting RvcRunMode to ${matterMode} (Gladys value: ${value})`);
+    await rvcRunMode.changeToMode({ newMode: matterMode });
+  }
+
+  // Handle vacuum cleaner clean mode
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.VACUUM_CLEANER &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE
+  ) {
+    const rvcCleanMode = targetDevice.getClusterClientById(RvcCleanMode.Complete.id);
+    if (!rvcCleanMode) {
+      throw new Error('Device does not support RvcCleanMode cluster');
+    }
+    // Get supportedModes for dynamic conversion
+    const cleanModeExternalId = gladysFeature.external_id;
+    const supportedModesData = this.supportedModesMap.get(cleanModeExternalId);
+    // Convert Gladys standard clean mode to Matter clean mode (ensure value is a number)
+    const matterMode = convertGladysCleanModeToMatter(Number(value), supportedModesData);
+    logger.debug(`Matter: Setting RvcCleanMode to ${matterMode} (Gladys value: ${value})`);
+    await rvcCleanMode.changeToMode({ newMode: matterMode });
   }
 }
 

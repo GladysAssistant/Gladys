@@ -57,6 +57,8 @@ function saveStatus(status) {
         this.connected = false;
         clearInterval(this.pollRefreshToken);
         clearInterval(this.pollRefreshValues);
+        clearTimeout(this.reconnectTimeout);
+        this.reconnectAttempt = 0;
         break;
       case STATUS.CONNECTING:
         this.configured = true;
@@ -83,6 +85,13 @@ function saveStatus(status) {
         this.connected = false;
         clearInterval(this.pollRefreshToken);
         clearInterval(this.pollRefreshValues);
+        clearTimeout(this.reconnectTimeout);
+        this.reconnectAttempt = 0;
+        break;
+      case STATUS.RECONNECTING:
+        this.configured = true;
+        this.status = STATUS.RECONNECTING;
+        this.connected = false;
         break;
       case STATUS.DISCOVERING_DEVICES:
         this.configured = true;

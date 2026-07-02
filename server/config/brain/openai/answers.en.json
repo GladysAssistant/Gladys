@@ -1,10 +1,16 @@
 [
   {
     "label": "openai.request.fail",
-    "answers": ["The request to OpenAI failed, please try again!"]
+    "answers": ["The request to the Artificial Intelligence API failed, please try again!"]
   },
   {
     "label": "openai.request.tooManyRequests",
-    "answers": ["You have made too many requests this month to OpenAI!"]
+    "answers": ["You have made too many requests this month to the Artificial Intelligence API!"]
+  },
+  {
+    "label": "openai.plus-required",
+    "answers": [
+      "The chat uses Gladys Plus AI and is only available with a Gladys Plus subscription. [Subscribe to Gladys Plus](https://gladysassistant.com/plus/?utm_source=gladys_app&utm_medium=in_app&utm_campaign=chat_plus_required&utm_content=brain_reply)"
+    ]
   }
 ]

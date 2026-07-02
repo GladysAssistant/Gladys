@@ -1,5 +1,5 @@
 const { assert, expect } = require('chai');
-const { fake, assert: assertSinon } = require('sinon');
+const { fake } = require('sinon');
 const EventEmitter = require('events');
 const SceneManager = require('../../../lib/scene');
 
@@ -19,8 +19,6 @@ describe('scene.update', () => {
     });
     expect(scene).to.have.property('selector', 'test-scene');
     expect(scene).to.have.property('name', 'Name updated');
-    assertSinon.calledOnce(brain.addNamedEntity);
-    assertSinon.calledOnce(brain.removeNamedEntity);
   });
   it('should update a scene with tags', async () => {
     const scene = await sceneManager.update('test-scene', {
@@ -31,8 +29,6 @@ describe('scene.update', () => {
     expect(scene).to.have.property('name', 'Name updated');
     expect(scene).to.have.property('tags');
     expect(scene.tags).deep.eq([{ name: 'tag 1' }]);
-    assertSinon.calledOnce(brain.addNamedEntity);
-    assertSinon.calledOnce(brain.removeNamedEntity);
   });
   it('should not delete tags when patching scene', async () => {
     const scene = await sceneManager.update('test-scene', {

@@ -116,6 +116,36 @@ describe('TuyaHandler.localPoll', () => {
     expect(get.calledTwice).to.equal(true);
   });
 
+  it('should route protocol 3.4 to tuyapi-newgen with a single schema attempt', async () => {
+    const connect = sinon.stub().resolves();
+    const get = sinon.stub().resolves({ dps: { 1: true } });
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      throw new Error('tuyapi should not be used for protocol 3.4');
+    }
+    function TuyAPINewGenStub() {
+      this.connect = connect;
+      this.get = get;
+      this.disconnect = disconnect;
+      attachEventHandlers(this);
+    }
+    const { localPoll } = proxyquire('../../../../services/tuya/lib/tuya.localPoll', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': TuyAPINewGenStub,
+    });
+    const result = await localPoll({
+      deviceId: 'device',
+      ip: '1.1.1.1',
+      localKey: 'key',
+      protocolVersion: '3.4',
+    });
+    expect(result).to.deep.equal({ dps: { 1: true } });
+    expect(connect.calledOnce).to.equal(true);
+    expect(get.calledOnce).to.equal(true);
+    expect(get.firstCall.args[0]).to.deep.equal({ schema: true });
+    expect(disconnect.calledOnce).to.equal(true);
+  });
+
   it('should throw on object without dps', async () => {
     const connect = sinon.stub().resolves();
     const get = sinon.stub().resolves({ ok: true });
@@ -304,18 +334,15 @@ describe('TuyaHandler.localPoll', () => {
     throw new Error('Expected error');
   });
 
-  it('should fallback to a generic socket error when socket error has no message', async () => {
-    const connect = sinon.stub().resolves();
-    const get = sinon.stub().returns(new Promise(() => {}));
-    const disconnect = sinon.stub().resolves();
+  it('should fall back to a generic message when the socket error has no message', async () => {
     function TuyAPIStub() {
-      this.connect = connect;
-      this.get = get;
-      this.disconnect = disconnect;
+      this.connect = sinon.stub().resolves();
+      this.get = sinon.stub().returns(new Promise(() => {}));
+      this.disconnect = sinon.stub().resolves();
       this.on = sinon.stub();
       this.once = sinon.stub().callsFake((event, cb) => {
         if (event === 'error') {
-          cb({});
+          cb(null);
         }
       });
       this.removeListener = sinon.stub();
@@ -328,7 +355,7 @@ describe('TuyaHandler.localPoll', () => {
     try {
       await localPoll({
         deviceId: 'device',
-        ip: '10.1.0.53',
+        ip: '1.1.1.1',
         localKey: 'key',
         protocolVersion: '3.3',
       });
@@ -340,18 +367,17 @@ describe('TuyaHandler.localPoll', () => {
     throw new Error('Expected error');
   });
 
-  it('should normalize unreachable device errors when EHOSTUNREACH is only present in the message', async () => {
-    const connect = sinon.stub().resolves();
-    const get = sinon.stub().returns(new Promise(() => {}));
-    const disconnect = sinon.stub().resolves();
+  it('should detect EHOSTUNREACH from the error message when err.code is not in the known list', async () => {
     function TuyAPIStub() {
-      this.connect = connect;
-      this.get = get;
-      this.disconnect = disconnect;
+      this.connect = sinon.stub().resolves();
+      this.get = sinon.stub().returns(new Promise(() => {}));
+      this.disconnect = sinon.stub().resolves();
       this.on = sinon.stub();
       this.once = sinon.stub().callsFake((event, cb) => {
         if (event === 'error') {
-          cb({ message: 'Error from socket: connect EHOSTUNREACH 10.1.0.53:6668' });
+          const error = new Error('Network error: connect EHOSTUNREACH 10.1.0.53:6668');
+          error.code = 'UNKNOWN_NETWORK_FAILURE';
+          cb(error);
         }
       });
       this.removeListener = sinon.stub();
@@ -570,5 +596,108 @@ describe('TuyaHandler.updateDiscoveredDeviceAfterLocalPoll', () => {
 
     expect(updated.features).to.have.length(1);
     expect(updated.features[0].external_id).to.equal('tuya:device1:switch_1');
+  });
+
+  it('should rebuild a supported device from existing metadata after local poll', () => {
+    const tuyaManager = {
+      serviceId: 'tuya-service-id',
+      discoveredDevices: [
+        {
+          external_id: 'tuya:device1',
+          model: 'Smart Meter',
+          product_id: 'bbcg1hrkrj5rifsd',
+          params: [],
+          features: [],
+          specifications: {},
+          properties: {
+            properties: [{ code: 'total_power', dp_id: 115, value: 706 }],
+          },
+        },
+      ],
+    };
+
+    const updated = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, {
+      deviceId: 'device1',
+      ip: '1.1.1.1',
+      protocolVersion: '3.5',
+      dps: { 115: 706 },
+    });
+
+    expect(updated.device_type).to.equal('smart-meter');
+    expect(updated.features.length).to.be.greaterThan(0);
+    expect(updated.features.some((feature) => feature.external_id === 'tuya:device1:total_power')).to.equal(true);
+  });
+
+  it('should reuse PRODUCT_ID from params when top-level product_id is missing', () => {
+    const tuyaManager = {
+      serviceId: 'tuya-service-id',
+      discoveredDevices: [
+        {
+          external_id: 'tuya:device1',
+          model: 'Smart Meter',
+          product_id: undefined,
+          params: [{ name: DEVICE_PARAM_NAME.PRODUCT_ID, value: 'bbcg1hrkrj5rifsd' }],
+          features: [],
+          specifications: {},
+          properties: {
+            properties: [{ code: 'total_power', dp_id: 115, value: 706 }],
+          },
+        },
+      ],
+    };
+
+    const updated = updateDiscoveredDeviceAfterLocalPoll(tuyaManager, {
+      deviceId: 'device1',
+      ip: '1.1.1.1',
+      protocolVersion: '3.5',
+      dps: { 115: 706 },
+    });
+
+    expect(updated.product_id).to.equal('bbcg1hrkrj5rifsd');
+    expect(updated.device_type).to.equal('smart-meter');
+    expect(updated.features.length).to.be.greaterThan(0);
+  });
+
+  it('should preserve the existing device when convertDevice throws during rebuild', () => {
+    const { updateDiscoveredDeviceAfterLocalPoll: updateWithThrowingConvertDevice } = proxyquire(
+      '../../../../services/tuya/lib/tuya.localPoll',
+      {
+        './device/tuya.convertDevice': {
+          convertDevice() {
+            throw new Error('convertDevice boom');
+          },
+        },
+      },
+    );
+
+    const tuyaManager = {
+      serviceId: 'tuya-service-id',
+      discoveredDevices: [
+        {
+          external_id: 'tuya:device1',
+          model: 'Smart Meter',
+          product_id: 'bbcg1hrkrj5rifsd',
+          params: [],
+          features: [],
+          specifications: {},
+          properties: {
+            properties: [{ code: 'total_power', dp_id: 115, value: 706 }],
+          },
+        },
+      ],
+    };
+
+    const updated = updateWithThrowingConvertDevice(tuyaManager, {
+      deviceId: 'device1',
+      ip: '1.1.1.1',
+      protocolVersion: '3.5',
+      dps: { 115: 706 },
+    });
+
+    // Rebuild swallowed: features stay empty but the rest of the local-poll
+    // update path still runs and resolves product_id from the existing data.
+    expect(updated).to.not.equal(null);
+    expect(updated.features).to.deep.equal([]);
+    expect(updated.product_id).to.equal('bbcg1hrkrj5rifsd');
   });
 });

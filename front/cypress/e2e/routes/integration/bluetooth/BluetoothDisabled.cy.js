@@ -10,8 +10,10 @@ describe('Bluetooth - Disabled', () => {
     // Check page URL
     cy.location('pathname').should('eq', '/dashboard/integration/device/bluetooth');
 
-    // Check no warning
-    cy.get('.alert.alert-warning').should('be.length', 0);
+    // Check limitation warning is present
+    cy.get('.alert.alert-warning')
+      .should('have.length', 1)
+      .i18n('integration.bluetooth.warningMessage');
   });
 
   it('Discover - Check page', () => {
@@ -21,9 +23,9 @@ describe('Bluetooth - Disabled', () => {
     // Check page URL
     cy.location('pathname').should('eq', '/dashboard/integration/device/bluetooth/setup');
 
-    // Check warning
+    // Check warning (bluetooth not ready)
     cy.get('.alert.alert-warning')
-      .should('be.length', 1)
+      .should('have.length', 1)
       .i18n('integration.bluetooth.bluetoothNotReadyError');
 
     // Check scan button is disabled
@@ -37,9 +39,9 @@ describe('Bluetooth - Disabled', () => {
     // Check page URL
     cy.location('pathname').should('eq', '/dashboard/integration/device/bluetooth/config');
 
-    // Check warning
+    // Check warning (bluetooth not ready)
     cy.get('.alert.alert-warning')
-      .should('be.length', 1)
+      .should('have.length', 1)
       .i18n('integration.bluetooth.bluetoothNotReadyError');
 
     // Check scan button is disabled

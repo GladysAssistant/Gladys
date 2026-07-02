@@ -90,17 +90,18 @@ const DEVICE_TYPE_INDEX = LIST_DEVICE_TYPES.reduce((acc, definition) => {
 
 const matchDeviceType = (typeDefinition, context) => {
   const { category, productId, modelName, codes } = context;
-  if (category && typeDefinition.CATEGORIES.has(category)) {
-    return true;
-  }
   if (productId && typeDefinition.PRODUCT_IDS.has(productId)) {
     return true;
   }
 
   const requiredCodes = typeDefinition.REQUIRED_CODES;
   const keywords = typeDefinition.KEYWORDS;
-
   const hasRequiredCode = requiredCodes.size === 0 || Array.from(requiredCodes).some((code) => codes.has(code));
+
+  if (category && typeDefinition.CATEGORIES.has(category) && hasRequiredCode) {
+    return true;
+  }
+
   if (!hasRequiredCode || !modelName || keywords.length === 0) {
     return false;
   }
@@ -219,6 +220,22 @@ const extractCodesFromProperties = (propertiesPayload) => {
   return codes;
 };
 
+const extractCodesFromStatusList = (statusList) => {
+  const codes = new Set();
+  if (!Array.isArray(statusList)) {
+    return codes;
+  }
+
+  statusList.forEach((entry) => {
+    if (!entry || !entry.code) {
+      return;
+    }
+    codes.add(normalizeCode(entry.code));
+  });
+
+  return codes;
+};
+
 const getDeviceType = (device) => {
   if (!device || typeof device !== 'object') {
     return DEVICE_TYPES.UNKNOWN;
@@ -229,6 +246,7 @@ const getDeviceType = (device) => {
     ...extractCodesFromSpecifications(specifications),
     ...extractCodesFromThingModel(device.thing_model),
     ...extractCodesFromProperties(device.properties),
+    ...extractCodesFromStatusList(device.status),
     ...extractCodesFromFeatures(device.features),
   ]);
 
@@ -292,6 +310,7 @@ module.exports = {
   DEVICE_TYPES,
   extractCodesFromSpecifications,
   extractCodesFromFeatures,
+  extractCodesFromStatusList,
   getCloudMapping,
   getLocalMapping,
   getFeatureMapping,

@@ -136,7 +136,10 @@ class MatterSettingsPage extends Component {
       loadingNodes: true,
       decommissioningNodes: {},
       collapsedDevices: {},
-      visibleKeys: {}
+      visibleKeys: {},
+      showConfirmReset: false,
+      resetting: false,
+      resetError: null
     };
   }
 
@@ -319,6 +322,29 @@ class MatterSettingsPage extends Component {
     window.URL.revokeObjectURL(url);
   };
 
+  showConfirmReset = () => {
+    this.setState({ showConfirmReset: true });
+  };
+
+  cancelReset = () => {
+    this.setState({ showConfirmReset: false });
+  };
+
+  confirmReset = async () => {
+    this.setState({ showConfirmReset: false, resetting: true, resetError: null });
+    try {
+      await this.props.httpClient.post('/api/v1/service/matter/reset');
+      this.setState({
+        resetting: false,
+        matterEnabled: false,
+        nodes: []
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({ resetting: false, resetError: true });
+    }
+  };
+
   render() {
     const {
       matterEnabled,
@@ -330,7 +356,10 @@ class MatterSettingsPage extends Component {
       decommissioningNodes,
       collapsedDevices,
       visibleKeys,
-      hasIpv6
+      hasIpv6,
+      showConfirmReset,
+      resetting,
+      resetError
     } = this.state;
 
     return (
@@ -463,6 +492,47 @@ class MatterSettingsPage extends Component {
                     <button onClick={this.disableMatter} class="btn btn-danger" disabled={saving}>
                       <Text id="integration.matter.settings.disableButton" />
                     </button>
+                  </div>
+
+                  <div class="mt-5">
+                    <h4>
+                      <Text id="integration.matter.settings.reset.title" />
+                    </h4>
+                    <p class="text-muted">
+                      <Text id="integration.matter.settings.reset.description" />
+                    </p>
+
+                    {resetError && (
+                      <div class="alert alert-danger">
+                        <Text id="integration.matter.settings.reset.error" />
+                      </div>
+                    )}
+
+                    {!showConfirmReset && (
+                      <button
+                        class="btn btn-outline-danger"
+                        onClick={this.showConfirmReset}
+                        disabled={saving || resetting}
+                      >
+                        <Text id="integration.matter.settings.reset.button" />
+                      </button>
+                    )}
+
+                    {showConfirmReset && (
+                      <div class="d-flex flex-column align-items-start" style="row-gap: 1em">
+                        <div class="alert alert-danger mb-0">
+                          <Text id="integration.matter.settings.reset.confirmMessage" />
+                        </div>
+                        <div>
+                          <button class="btn btn-danger" onClick={this.confirmReset} disabled={resetting}>
+                            <Text id="integration.matter.settings.reset.confirmButton" />
+                          </button>
+                          <button class="btn ml-2" onClick={this.cancelReset} disabled={resetting}>
+                            <Text id="integration.matter.settings.reset.cancelButton" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               )}

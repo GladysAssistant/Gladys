@@ -36,6 +36,7 @@ describe('zigbee2mqtt saveConfiguration', () => {
   it('should store all variables', async () => {
     // PREPARE
     const config = {
+      z2mFrontendUrl: 'z2mFrontendUrl',
       z2mDriverPath: 'z2mDriverPath',
       z2mDongleName: 'z2mDongleName',
       z2mTcpPort: 'z2mTcpPort',
@@ -50,7 +51,8 @@ describe('zigbee2mqtt saveConfiguration', () => {
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 8);
+    assert.callCount(gladys.variable.setValue, 9);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_FRONTEND_URL', config.z2mFrontendUrl, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', config.z2mTcpPort, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_USERNAME', config.z2mMqttUsername, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_PASSWORD', config.z2mMqttPassword, serviceId);
@@ -67,7 +69,8 @@ describe('zigbee2mqtt saveConfiguration', () => {
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.destroy, 9);
+    assert.callCount(gladys.variable.destroy, 10);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_FRONTEND_URL', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_TCP_PORT', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_PASSWORD', serviceId);

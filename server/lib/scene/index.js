@@ -34,7 +34,7 @@ const SceneManager = function SceneManager(
   http,
   gateway,
   scheduler,
-  brain,
+  _brain,
   service,
 ) {
   this.stateManager = stateManager;
@@ -46,7 +46,6 @@ const SceneManager = function SceneManager(
   this.calendar = calendar;
   this.http = http;
   this.gateway = gateway;
-  this.brain = brain;
   this.service = service;
   this.scenes = {};
   this.timezone = DEFAULT_TIMEZONE;

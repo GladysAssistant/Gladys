@@ -87,10 +87,14 @@ class MatterDiscoverPage extends Component {
                 <Text id="integration.matter.discover.description" />
               </div>
 
+              <div class="alert alert-warning">
+                <MarkupText id="integration.matter.discover.borderRouterWarning" />
+              </div>
+
               {this.state.error && (
                 <>
                   <div class="alert alert-danger">
-                    <Text id="integration.matter.discover.error" />
+                    <MarkupText id="integration.matter.discover.error" />
                   </div>
                   <div class="alert alert-danger">{this.state.error}</div>
                 </>

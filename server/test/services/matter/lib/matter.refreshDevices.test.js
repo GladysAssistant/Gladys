@@ -48,18 +48,22 @@ describe('Matter.refreshDevices', () => {
         },
       ]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([
           {
             id: 'device-1',
             name: 'Test Device',
             number: 1,
-            clusterClients,
-            childEndpoints: [
+            getAllClusterClients: () => Array.from(clusterClients.values()),
+            getClusterClientById: (id) => clusterClients.get(id),
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-1',
                 name: 'Child Endpoint',
                 number: 2,
-                clusterClients,
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getClusterClientById: (id) => clusterClients.get(id),
+                getChildEndpoints: () => [],
               },
             ],
           },
@@ -75,5 +79,99 @@ describe('Matter.refreshDevices', () => {
     await matterHandler.refreshDevices();
     expect(matterHandler.devices).to.have.lengthOf(2);
     expect(matterHandler.nodesMap.size).to.equal(1);
+  });
+
+  it('should continue with other devices when one node fails', async () => {
+    let callCount = 0;
+    // First node throws an error, second node succeeds
+    matterHandler.commissioningController = {
+      getCommissionedNodesDetails: fake.returns([
+        {
+          nodeId: 11111n,
+          deviceData: {
+            basicInformation: {
+              vendorName: 'Unreachable Vendor',
+              productName: 'Unreachable Product',
+            },
+          },
+        },
+        {
+          nodeId: 22222n,
+          deviceData: {
+            basicInformation: {
+              vendorName: 'Reachable Vendor',
+              productName: 'Reachable Product',
+            },
+          },
+        },
+      ]),
+      getNode: sinon.stub().callsFake(async () => {
+        callCount += 1;
+        if (callCount === 1) {
+          throw new Error('Node is not reachable right now');
+        }
+        return {
+          isConnected: true,
+          getDevices: fake.returns([
+            {
+              id: 'device-2',
+              name: 'Reachable Device',
+              number: 1,
+              getAllClusterClients: () => Array.from(clusterClients.values()),
+              getClusterClientById: (id) => clusterClients.get(id),
+              getChildEndpoints: () => [],
+            },
+          ]),
+        };
+      }),
+    };
+
+    await matterHandler.refreshDevices();
+    // Should have 1 device from the second node (first node failed)
+    expect(matterHandler.devices).to.have.lengthOf(1);
+    expect(matterHandler.devices[0].name).to.include('Reachable');
+  });
+
+  it('should continue device discovery when node connection times out', async () => {
+    const clock = sinon.useFakeTimers();
+
+    matterHandler.commissioningController = {
+      getCommissionedNodesDetails: fake.returns([
+        {
+          nodeId: 33333n,
+          deviceData: {
+            basicInformation: {
+              vendorName: 'Offline Vendor',
+              productName: 'Offline Product',
+            },
+          },
+        },
+      ]),
+      getNode: fake.resolves({
+        isConnected: false,
+        connect: fake(),
+        events: {
+          initialized: new Promise(() => {}),
+        },
+        getDevices: fake.returns([
+          {
+            id: 'device-offline',
+            name: 'Offline Device',
+            number: 1,
+            getAllClusterClients: () => Array.from(clusterClients.values()),
+            getClusterClientById: (id) => clusterClients.get(id),
+            getChildEndpoints: () => [],
+          },
+        ]),
+      }),
+    };
+
+    const refreshPromise = matterHandler.refreshDevices();
+    await clock.tickAsync(15000);
+    await refreshPromise;
+
+    expect(matterHandler.devices).to.have.lengthOf(1);
+    expect(matterHandler.devices[0].name).to.include('Offline');
+    clock.restore();
   });
 });

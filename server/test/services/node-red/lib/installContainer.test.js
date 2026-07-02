@@ -11,7 +11,9 @@ const container = {
   state: 'running',
 };
 
-const config = {};
+const config = {
+  dockerNodeRedVersion: '3',
+};
 
 const containerStopped = {
   id: 'docker-test',

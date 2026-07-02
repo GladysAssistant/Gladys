@@ -11,13 +11,8 @@ const connect = proxyquire('../../../../services/tuya/lib/tuya.connect', {
 const TuyaHandler = proxyquire('../../../../services/tuya/lib/index', {
   './tuya.connect.js': connect,
 });
-const {
-  EVENTS,
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
-} = require('../../../../utils/constants');
-const { API, DEVICE_PARAM_NAME } = require('../../../../services/tuya/lib/utils/tuya.constants');
+const { EVENTS } = require('../../../../utils/constants');
+const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
 
 const { BadParameters } = require('../../../../utils/coreErrors');
 
@@ -116,8 +111,33 @@ describe('TuyaHandler.poll', () => {
     expect(logger.warn.firstCall.args[0]).to.include('cloud poll failed');
     assert.callCount(gladys.event.emit, 0);
   });
+
+  it('change state of device feature', async () => {
+    await tuyaHandler.poll({
+      external_id: 'tuya:device',
+      features: [
+        {
+          external_id: 'tuya:device:switch_1',
+          category: 'light',
+          type: 'binary',
+        },
+      ],
+    });
+
+    assert.callCount(tuyaHandler.connector.request, 1);
+    assert.calledWith(tuyaHandler.connector.request, {
+      method: 'GET',
+      path: `${API.VERSION_1_0}/devices/device/status`,
+    });
+
+    assert.callCount(gladys.event.emit, 1);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tuya:device:switch_1',
+      state: 1,
+    });
+  });
   it('should skip cloud feature when code is missing from payload', async () => {
-    await tuyaHandler.poll.call(tuyaHandler, {
+    await tuyaHandler.poll({
       external_id: 'tuya:device',
       features: [
         {
@@ -206,26 +226,6 @@ describe('TuyaHandler.poll', () => {
       device_feature_external_id: 'tuya:device:power_a',
       state: 70.6,
     });
-  });
-
-  it('should skip cloud feature when code is present but reader is missing', async () => {
-    tuyaHandler.connector.request = sinon.stub().resolves({
-      result: [{ code: 'temp_set', value: 210 }],
-    });
-
-    await tuyaHandler.poll({
-      external_id: 'tuya:device',
-      features: [
-        {
-          external_id: 'tuya:device:temp_set',
-          category: 'unknown-category',
-          type: 'unknown-type',
-        },
-      ],
-    });
-
-    assert.callCount(tuyaHandler.connector.request, 1);
-    assert.callCount(gladys.event.emit, 0);
   });
 
   it('should return without cloud request when feature list is empty', async () => {
@@ -383,416 +383,6 @@ describe('TuyaHandler.poll with local mapping', () => {
     expect(emit.calledTwice).to.equal(true);
     expect(emit.firstCall.args[1].state).to.equal(1);
     expect(emit.secondCall.args[1].state).to.equal(0);
-  });
-
-  it('should convert thermostat temperatures from local dps unit and persist reported unit', async () => {
-    const localPoll = sinon.stub().resolves({ dps: { 116: 680, 125: 720, 126: 'f' } });
-    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
-      './tuya.localPoll': { localPoll },
-    });
-
-    const emit = sinon.stub();
-    const setParam = sinon.stub().resolves();
-
-    await poll.call(
-      {
-        connector: { request: sinon.stub() },
-        gladys: {
-          event: { emit },
-        },
-      },
-      {
-        id: 'device-id',
-        external_id: 'tuya:device',
-        device_type: 'pilot-thermostat',
-        properties: {
-          properties: [{ code: 'temp_unit_convert', dp_id: 126, value: 'c' }],
-        },
-        params: [
-          { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '1.1.1.1' },
-          { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
-          { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.5' },
-          { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
-        ],
-        features: [
-          {
-            external_id: 'tuya:device:temp_current',
-            category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            scale: 1,
-            min: 0,
-            max: 50,
-          },
-          {
-            external_id: 'tuya:device:temp_set',
-            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-            type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            scale: 1,
-          },
-        ],
-      },
-    );
-
-    expect(setParam.called).to.equal(false);
-    expect(emit.calledTwice).to.equal(true);
-    expect(emit.firstCall.args[1]).to.deep.equal({
-      device_feature_external_id: 'tuya:device:temp_current',
-      state: 20,
-    });
-    expect(emit.secondCall.args[1]).to.deep.equal({
-      device_feature_external_id: 'tuya:device:temp_set',
-      state: 22,
-    });
-  });
-
-  it('should keep raw current temperature when converted value falls outside feature range', async () => {
-    const localPoll = sinon.stub().resolves({ dps: { 116: 158, 126: 'f' } });
-    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
-      './tuya.localPoll': { localPoll },
-    });
-
-    const emit = sinon.stub();
-
-    await poll.call(
-      {
-        connector: { request: sinon.stub() },
-        gladys: {
-          event: { emit },
-        },
-      },
-      {
-        external_id: 'tuya:device',
-        device_type: 'pilot-thermostat',
-        properties: {
-          properties: [{ code: 'temp_unit_convert', dp_id: 126, value: 'f' }],
-        },
-        params: [
-          { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '1.1.1.1' },
-          { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
-          { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.5' },
-          { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
-        ],
-        features: [
-          {
-            external_id: 'tuya:device:temp_current',
-            category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            scale: 1,
-            min: 0,
-            max: 50,
-          },
-        ],
-      },
-    );
-
-    expect(emit.calledOnce).to.equal(true);
-    expect(emit.firstCall.args[1]).to.deep.equal({
-      device_feature_external_id: 'tuya:device:temp_current',
-      state: 15.8,
-    });
-  });
-
-  it('should fallback to cloud when local value exists but reader is missing', async () => {
-    const localPoll = sinon.stub().resolves({ dps: { 125: 210 } });
-    const request = sinon.stub().resolves({ result: [{ code: 'temp_set', value: 210 }] });
-    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
-      './tuya.localPoll': { localPoll },
-    });
-
-    const emit = sinon.stub();
-
-    await poll.call(
-      {
-        connector: { request },
-        gladys: {
-          event: { emit },
-        },
-      },
-      {
-        external_id: 'tuya:device',
-        device_type: 'pilot-thermostat',
-        params: [
-          { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '1.1.1.1' },
-          { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
-          { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.5' },
-          { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
-        ],
-        features: [
-          {
-            external_id: 'tuya:device:temp_set',
-            category: 'unknown-category',
-            type: 'unknown-type',
-          },
-        ],
-      },
-    );
-
-    expect(localPoll.calledOnce).to.equal(true);
-    expect(request.calledOnce).to.equal(true);
-    expect(emit.called).to.equal(false);
-  });
-
-  it('should convert cloud thermostat temperatures from reported unit', async () => {
-    const request = sinon.stub().resolves({
-      result: [
-        { code: 'temp_unit_convert', value: 'f' },
-        { code: 'temp_current', value: 680 },
-      ],
-    });
-    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {});
-    const emit = sinon.stub();
-    const setParam = sinon.stub().resolves();
-
-    await poll.call(
-      {
-        connector: { request },
-        gladys: {
-          event: { emit },
-        },
-      },
-      {
-        id: 'device-id',
-        external_id: 'tuya:device',
-        properties: {
-          properties: [{ code: 'temp_unit_convert', value: 'c' }],
-        },
-        features: [
-          {
-            external_id: 'tuya:device:temp_current',
-            category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            scale: 1,
-            min: 0,
-            max: 50,
-          },
-        ],
-      },
-    );
-
-    expect(request.calledOnce).to.equal(true);
-    expect(setParam.called).to.equal(false);
-    expect(emit.calledOnce).to.equal(true);
-    expect(emit.firstCall.args[1]).to.deep.equal({
-      device_feature_external_id: 'tuya:device:temp_current',
-      state: 20,
-    });
-  });
-
-  it('should convert cloud thermostat temperatures from celsius to fahrenheit when feature unit is fahrenheit', async () => {
-    const request = sinon.stub().resolves({
-      result: [
-        { code: 'temp_unit_convert', value: 'c' },
-        { code: 'temp_current', value: 20 },
-      ],
-    });
-    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {});
-    const emit = sinon.stub();
-
-    await poll.call(
-      {
-        connector: { request },
-        gladys: {
-          event: { emit },
-        },
-      },
-      {
-        external_id: 'tuya:device',
-        properties: {
-          properties: [{ code: 'temp_unit_convert', value: 'c' }],
-        },
-        features: [
-          {
-            external_id: 'tuya:device:temp_current',
-            category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-            unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
-            min: 0,
-            max: 212,
-          },
-        ],
-      },
-    );
-
-    expect(request.calledOnce).to.equal(true);
-    expect(emit.calledOnce).to.equal(true);
-    expect(emit.firstCall.args[1]).to.deep.equal({
-      device_feature_external_id: 'tuya:device:temp_current',
-      state: 68,
-    });
-  });
-
-  it('should read cloud values from thing shadow when strategy is shadow', async () => {
-    const request = sinon.stub().resolves({
-      result: {
-        properties: [
-          { code: 'temp_unit_convert', value: 'f' },
-          { code: 'temp_current', value: 680 },
-        ],
-      },
-    });
-    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {});
-    const emit = sinon.stub();
-
-    await poll.call(
-      {
-        connector: { request },
-        gladys: {
-          event: { emit },
-        },
-      },
-      {
-        id: 'device-id',
-        external_id: 'tuya:device',
-        params: [{ name: DEVICE_PARAM_NAME.CLOUD_STRATEGY, value: 'shadow' }],
-        properties: {
-          properties: [{ code: 'temp_unit_convert', value: 'c' }],
-        },
-        features: [
-          {
-            external_id: 'tuya:device:temp_current',
-            category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            scale: 1,
-            min: 0,
-            max: 50,
-          },
-        ],
-      },
-    );
-
-    expect(request.calledOnce).to.equal(true);
-    expect(request.firstCall.args[0]).to.deep.equal({
-      method: 'GET',
-      path: `${API.VERSION_2_0}/thing/device/shadow/properties`,
-    });
-    expect(emit.calledOnce).to.equal(true);
-    expect(emit.firstCall.args[1]).to.deep.equal({
-      device_feature_external_id: 'tuya:device:temp_current',
-      state: 20,
-    });
-  });
-
-  it('should keep existing temperature unit when local unit property has no dp_id', async () => {
-    const localPoll = sinon.stub().resolves({ dps: { 116: 158 } });
-    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
-      './tuya.localPoll': { localPoll },
-    });
-    const emit = sinon.stub();
-
-    await poll.call(
-      {
-        connector: { request: sinon.stub() },
-        gladys: {
-          event: { emit },
-        },
-      },
-      {
-        external_id: 'tuya:device',
-        device_type: 'pilot-thermostat',
-        properties: {
-          properties: [{ code: 'temp_unit_convert', value: 'f' }],
-        },
-        params: [
-          { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '1.1.1.1' },
-          { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
-          { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.5' },
-          { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
-        ],
-        features: [
-          {
-            external_id: 'tuya:device:temp_current',
-            category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            scale: 1,
-            min: 0,
-            max: 50,
-          },
-        ],
-      },
-    );
-
-    expect(localPoll.calledOnce).to.equal(true);
-    expect(emit.calledOnce).to.equal(true);
-    expect(emit.firstCall.args[1]).to.deep.equal({
-      device_feature_external_id: 'tuya:device:temp_current',
-      state: 15.8,
-    });
-  });
-
-  it('should fallback to mapping scale for thermostat and power features when stored feature scale is missing', async () => {
-    const localPoll = sinon.stub().resolves({ dps: { 116: 169, 117: 30, 125: 200, 126: 'c' } });
-    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
-      './tuya.localPoll': { localPoll },
-    });
-
-    const emit = sinon.stub();
-
-    await poll.call(
-      {
-        connector: { request: sinon.stub() },
-        gladys: {
-          event: { emit },
-        },
-      },
-      {
-        id: 'device-id',
-        external_id: 'tuya:device',
-        device_type: 'pilot-thermostat',
-        properties: {
-          properties: [{ code: 'temp_unit_convert', dp_id: 126, value: 'c' }],
-        },
-        params: [
-          { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '1.1.1.1' },
-          { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
-          { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.5' },
-          { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
-        ],
-        features: [
-          {
-            external_id: 'tuya:device:temp_current',
-            category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            min: -30,
-            max: 90,
-          },
-          {
-            external_id: 'tuya:device:average_power',
-            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
-            unit: DEVICE_FEATURE_UNITS.WATT,
-          },
-          {
-            external_id: 'tuya:device:temp_set',
-            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-            type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            min: 5,
-            max: 30,
-          },
-        ],
-      },
-    );
-
-    expect(emit.callCount).to.equal(3);
-    expect(emit.getCall(0).args[1]).to.deep.equal({
-      device_feature_external_id: 'tuya:device:temp_current',
-      state: 16.9,
-    });
-    expect(emit.getCall(1).args[1]).to.deep.equal({
-      device_feature_external_id: 'tuya:device:average_power',
-      state: 3,
-    });
-    expect(emit.getCall(2).args[1]).to.deep.equal({
-      device_feature_external_id: 'tuya:device:temp_set',
-      state: 20,
-    });
   });
 
   it('should emit same cloud value only after heartbeat interval', async () => {
@@ -1232,5 +822,131 @@ describe('TuyaHandler.poll additional branch coverage', () => {
     );
 
     expect(emit.called).to.equal(false);
+  });
+
+  it('should skip cloud fallback silently when LOCAL_OVERRIDE=true and connector is unavailable', async () => {
+    const localPollStub = sinon.stub().rejects(new Error('local fail'));
+    const logger = { debug: sinon.stub(), warn: sinon.stub(), info: sinon.stub() };
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      '../../../utils/logger': logger,
+      './tuya.localPoll': { localPoll: localPollStub },
+    });
+
+    await poll.call(
+      {
+        connector: null,
+        gladys: { event: { emit: sinon.stub() } },
+      },
+      {
+        external_id: 'tuya:device',
+        params: [
+          { name: 'LOCAL_OVERRIDE', value: true },
+          { name: 'IP_ADDRESS', value: '10.0.0.2' },
+          { name: 'LOCAL_KEY', value: 'key' },
+          { name: 'PROTOCOL_VERSION', value: '3.3' },
+        ],
+        features: [
+          {
+            external_id: 'tuya:device:switch_1',
+            selector: 'tuya-device-switch-1',
+            category: 'switch',
+            type: 'binary',
+          },
+        ],
+      },
+    );
+
+    // Local poll throws → fallback would normally hit pollCloudFeatures, but
+    // connector is null. The skip block must log a single debug line with
+    // `cloud_unavailable` in the fallback reason and not warn (the cloud-direct
+    // path keeps the warn so a missing connector remains visible there).
+    const debugMessages = logger.debug.getCalls().map((c) => c.args[0]);
+    expect(debugMessages.some((msg) => msg && msg.includes('fallback=local_poll_failed+cloud_unavailable'))).to.equal(
+      true,
+    );
+    const warnConnectorMessages = logger.warn
+      .getCalls()
+      .map((c) => c.args[0])
+      .filter((msg) => msg && msg.includes('connector unavailable'));
+    expect(warnConnectorMessages.length).to.equal(0);
+  });
+});
+
+describe('TuyaHandler.poll degraded backoff', () => {
+  const buildDevice = () => ({
+    external_id: 'tuya:device-degraded',
+    params: [
+      { name: 'IP_ADDRESS', value: '1.1.1.1' },
+      { name: 'LOCAL_KEY', value: 'key' },
+      { name: 'PROTOCOL_VERSION', value: '3.3' },
+      { name: 'LOCAL_OVERRIDE', value: true },
+    ],
+    features: [{ external_id: 'tuya:device-degraded:switch_1', category: 'switch', type: 'binary' }],
+  });
+
+  it('should skip local and use cloud when device is in degraded backoff', async () => {
+    const localPoll = sinon.stub().resolves({ dps: { 1: true } });
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+    });
+    const request = sinon.stub().resolves({ result: [{ code: 'switch_1', value: true }] });
+    const emit = sinon.stub();
+
+    await poll.call(
+      {
+        connector: { request },
+        gladys: { event: { emit } },
+        degradedDevices: {
+          'device-degraded': { status: 'degraded', until: Date.now() + 60000, failureTimestamps: [] },
+        },
+      },
+      buildDevice(),
+    );
+
+    expect(localPoll.called).to.equal(false);
+    expect(request.calledOnce).to.equal(true);
+  });
+
+  it('should record local failure on ECONNRESET so subsequent polls reach the threshold', async () => {
+    const localPoll = sinon.stub().rejects(Object.assign(new Error('connect ECONNRESET'), { code: 'ECONNRESET' }));
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+    });
+    const request = sinon.stub().resolves({ result: [] });
+    const emit = sinon.stub();
+    const degradedDevices = {};
+
+    const ctx = {
+      connector: { request },
+      gladys: { event: { emit } },
+      degradedDevices,
+    };
+    for (let i = 0; i < 3; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      await poll.call(ctx, buildDevice());
+    }
+    expect(degradedDevices['device-degraded']).to.not.equal(undefined);
+    expect(degradedDevices['device-degraded'].status).to.equal('degraded');
+  });
+
+  it('should clear degraded entry on successful local poll', async () => {
+    const localPoll = sinon.stub().resolves({ dps: { 1: true } });
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+    });
+    const degradedDevices = {
+      'device-degraded': { status: 'ok', until: 0, failureTimestamps: [1, 2] },
+    };
+
+    await poll.call(
+      {
+        connector: { request: sinon.stub() },
+        gladys: { event: { emit: sinon.stub() } },
+        degradedDevices,
+      },
+      buildDevice(),
+    );
+
+    expect(degradedDevices['device-degraded']).to.equal(undefined);
   });
 });
