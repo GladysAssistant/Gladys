@@ -42,6 +42,7 @@ describe('Matter.pairDevice', () => {
         },
       ]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([
           {
             id: 'device-1',
@@ -112,6 +113,7 @@ describe('Matter.pairDevice', () => {
         },
       ]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([
           {
             id: 'device-1',

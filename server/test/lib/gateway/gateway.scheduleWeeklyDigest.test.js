@@ -1,15 +1,23 @@
 const { expect } = require('chai');
-const { fake, assert } = require('sinon');
+const { fake, assert, stub, useFakeTimers } = require('sinon');
 
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
-const { scheduleWeeklyDigest } = require('../../../lib/gateway/gateway.scheduleWeeklyDigest');
+const {
+  scheduleWeeklyDigest,
+  getWeeklyDigestRandomDelayMs,
+  WEEKLY_DIGEST_MAX_RANDOM_DELAY_MS,
+} = require('../../../lib/gateway/gateway.scheduleWeeklyDigest');
 
 describe('gateway.scheduleWeeklyDigest', () => {
   let gateway;
   let cancel;
+  let clock;
+  let randomStub;
 
   beforeEach(() => {
     cancel = fake();
+    clock = useFakeTimers();
+    randomStub = stub(Math, 'random').returns(0);
     gateway = {
       weeklyDigestSchedule: null,
       variable: {
@@ -34,6 +42,11 @@ describe('gateway.scheduleWeeklyDigest', () => {
       },
       sendWeeklyDigest: fake.resolves({ sent: 0 }),
     };
+  });
+
+  afterEach(() => {
+    randomStub.restore();
+    clock.restore();
   });
 
   it('should cancel existing schedule when disabled', async () => {
@@ -97,5 +110,31 @@ describe('gateway.scheduleWeeklyDigest', () => {
 
     assert.calledOnce(cancel);
     assert.calledOnce(gateway.scheduler.scheduleJob);
+  });
+
+  it('should wait a random delay before sending the weekly digest', async () => {
+    randomStub.returns(0.5);
+
+    await scheduleWeeklyDigest.call(gateway);
+
+    const scheduledCallback = gateway.scheduler.scheduleJob.firstCall.args[1];
+    const callbackPromise = scheduledCallback();
+
+    assert.notCalled(gateway.sendWeeklyDigest);
+
+    await clock.tickAsync(30500);
+    await callbackPromise;
+
+    assert.calledOnce(gateway.sendWeeklyDigest);
+  });
+});
+
+describe('getWeeklyDigestRandomDelayMs', () => {
+  it('should return a value between 0 and 60 seconds', () => {
+    for (let i = 0; i < 100; i += 1) {
+      const delayMs = getWeeklyDigestRandomDelayMs();
+      expect(delayMs).to.be.at.least(0);
+      expect(delayMs).to.be.at.most(WEEKLY_DIGEST_MAX_RANDOM_DELAY_MS);
+    }
   });
 });

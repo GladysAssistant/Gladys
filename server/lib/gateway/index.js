@@ -35,6 +35,7 @@ const { getTTSApiUrl } = require('./gateway.getTTSApiUrl');
 const { stt } = require('./gateway.stt');
 const { processVoiceMessage } = require('./gateway.processVoiceMessage');
 const { aiChat } = require('./gateway.aiChat');
+const { getOpenAIQuota } = require('./gateway.getOpenAIQuota');
 const { forwardMessageToAiChat } = require('./gateway.forwardMessageToAiChat');
 const { getAiChatDebugContext } = require('./gateway.getAiChatDebugContext');
 const { buildWeeklyDigestData } = require('./gateway.buildWeeklyDigestData');
@@ -93,6 +94,7 @@ const Gateway = function Gateway(
     logger,
   });
   this.backup = this.job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, this.backup.bind(this));
+  this.sendWeeklyDigest = this.job.wrapper(JOB_TYPES.AI_WEEKLY_DIGEST, this.sendWeeklyDigest.bind(this));
 
   this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));
   this.event.on(EVENTS.GATEWAY.CHECK_IF_BACKUP_NEEDED, eventFunctionWrapper(this.checkIfBackupNeeded.bind(this)));
@@ -134,6 +136,7 @@ Gateway.prototype.getEcowattSignals = getEcowattSignals;
 Gateway.prototype.getEdfTempo = getEdfTempo;
 Gateway.prototype.getEdfTempoHistorical = getEdfTempoHistorical;
 Gateway.prototype.aiChat = aiChat;
+Gateway.prototype.getOpenAIQuota = getOpenAIQuota;
 Gateway.prototype.forwardMessageToAiChat = forwardMessageToAiChat;
 Gateway.prototype.getAiChatDebugContext = getAiChatDebugContext;
 Gateway.prototype.buildWeeklyDigestData = buildWeeklyDigestData;

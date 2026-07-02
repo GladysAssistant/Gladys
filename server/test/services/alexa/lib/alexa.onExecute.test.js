@@ -4,7 +4,12 @@ const get = require('get-value');
 
 const { assert, fake } = sinon;
 const AlexaHandler = require('../../../../services/alexa/lib');
-const { EVENTS } = require('../../../../utils/constants');
+const { EVENTS, COVER_STATE } = require('../../../../utils/constants');
+const {
+  BLIND_MODES,
+  BLIND_MODE_CONTROLLER_INSTANCE,
+  BLIND_RANGE_CONTROLLER_INSTANCE,
+} = require('../../../../services/alexa/lib/alexa.constants');
 
 const serviceId = 'd1e45425-fe25-4968-ac0f-bc695d5202d9';
 
@@ -47,6 +52,32 @@ const DEVICE_1_SWITCH = {
       read_only: false,
       category: 'switch',
       type: 'binary',
+    },
+  ],
+  model: 'device-model',
+  room: {
+    name: 'living-room',
+  },
+};
+
+const DEVICE_1_SHUTTER = {
+  name: 'Living Room Shutter',
+  selector: 'device-shutter',
+  external_id: 'device-shutter-external-id',
+  features: [
+    {
+      read_only: false,
+      category: 'shutter',
+      type: 'state',
+      last_value: COVER_STATE.CLOSE,
+    },
+    {
+      read_only: false,
+      category: 'shutter',
+      type: 'position',
+      min: 0,
+      max: 100,
+      last_value: 0,
     },
   ],
   model: 'device-model',
@@ -1372,5 +1403,273 @@ describe('alexa.onExecute', () => {
     expect(() => {
       alexaHandler.onExecute(body);
     }).to.throw('Unknown directive Alexa.UNKNOWN_COMMAND');
+  });
+
+  it('Should open the shutter', async () => {
+    const gladys = {
+      stateManager: {
+        get: () => DEVICE_1_SHUTTER,
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa.ModeController',
+          instance: BLIND_MODE_CONTROLLER_INSTANCE,
+          name: 'SetMode',
+          payloadVersion: '3',
+          messageId: 'message-id',
+          correlationToken: 'correlation-token',
+        },
+        endpoint: { endpointId: 'device-shutter', cookie: {} },
+        payload: { mode: BLIND_MODES.UP },
+      },
+    };
+
+    const result = alexaHandler.onExecute(body);
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      type: 'device.set-value',
+      status: 'pending',
+      value: COVER_STATE.OPEN,
+      device: 'device-shutter',
+      feature_category: 'shutter',
+      feature_type: 'state',
+    });
+    expect(result.context.properties[0]).to.deep.equal({
+      namespace: 'Alexa.ModeController',
+      instance: BLIND_MODE_CONTROLLER_INSTANCE,
+      name: 'mode',
+      value: BLIND_MODES.UP,
+      timeOfSample: get(result, 'context.properties.0.timeOfSample'),
+      uncertaintyInMilliseconds: 500,
+    });
+  });
+
+  it('Should close the shutter', async () => {
+    const gladys = {
+      stateManager: {
+        get: () => DEVICE_1_SHUTTER,
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa.ModeController',
+          instance: BLIND_MODE_CONTROLLER_INSTANCE,
+          name: 'SetMode',
+          payloadVersion: '3',
+          messageId: 'message-id',
+          correlationToken: 'correlation-token',
+        },
+        endpoint: { endpointId: 'device-shutter', cookie: {} },
+        payload: { mode: BLIND_MODES.DOWN },
+      },
+    };
+
+    alexaHandler.onExecute(body);
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      type: 'device.set-value',
+      status: 'pending',
+      value: COVER_STATE.CLOSE,
+      device: 'device-shutter',
+      feature_category: 'shutter',
+      feature_type: 'state',
+    });
+  });
+
+  it('Should set shutter position to 50%', async () => {
+    const gladys = {
+      stateManager: {
+        get: () => DEVICE_1_SHUTTER,
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa.RangeController',
+          instance: BLIND_RANGE_CONTROLLER_INSTANCE,
+          name: 'SetRangeValue',
+          payloadVersion: '3',
+          messageId: 'message-id',
+          correlationToken: 'correlation-token',
+        },
+        endpoint: { endpointId: 'device-shutter', cookie: {} },
+        payload: { rangeValue: 50 },
+      },
+    };
+
+    const result = alexaHandler.onExecute(body);
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      type: 'device.set-value',
+      status: 'pending',
+      value: 50,
+      device: 'device-shutter',
+      feature_category: 'shutter',
+      feature_type: 'position',
+    });
+    expect(result.context.properties[0]).to.deep.equal({
+      namespace: 'Alexa.RangeController',
+      instance: BLIND_RANGE_CONTROLLER_INSTANCE,
+      name: 'rangeValue',
+      value: 50,
+      timeOfSample: get(result, 'context.properties.0.timeOfSample'),
+      uncertaintyInMilliseconds: 500,
+    });
+  });
+
+  it('Should adjust shutter position relatively', async () => {
+    const shutterWithPosition = {
+      ...DEVICE_1_SHUTTER,
+      features: [
+        DEVICE_1_SHUTTER.features[0],
+        {
+          ...DEVICE_1_SHUTTER.features[1],
+          last_value: 40,
+        },
+      ],
+    };
+    const gladys = {
+      stateManager: {
+        get: () => shutterWithPosition,
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa.RangeController',
+          instance: BLIND_RANGE_CONTROLLER_INSTANCE,
+          name: 'AdjustRangeValue',
+          payloadVersion: '3',
+          messageId: 'message-id',
+          correlationToken: 'correlation-token',
+        },
+        endpoint: { endpointId: 'device-shutter', cookie: {} },
+        payload: { rangeValueDelta: 10 },
+      },
+    };
+
+    alexaHandler.onExecute(body);
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      type: 'device.set-value',
+      status: 'pending',
+      value: 50,
+      device: 'device-shutter',
+      feature_category: 'shutter',
+      feature_type: 'position',
+    });
+  });
+
+  it('Should adjust shutter position and clamp to max', async () => {
+    const shutterWithPosition = {
+      ...DEVICE_1_SHUTTER,
+      features: [
+        DEVICE_1_SHUTTER.features[0],
+        {
+          ...DEVICE_1_SHUTTER.features[1],
+          last_value: 95,
+        },
+      ],
+    };
+    const gladys = {
+      stateManager: {
+        get: () => shutterWithPosition,
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa.RangeController',
+          instance: BLIND_RANGE_CONTROLLER_INSTANCE,
+          name: 'AdjustRangeValue',
+          payloadVersion: '3',
+          messageId: 'message-id',
+          correlationToken: 'correlation-token',
+        },
+        endpoint: { endpointId: 'device-shutter', cookie: {} },
+        payload: { rangeValueDelta: 10 },
+      },
+    };
+
+    alexaHandler.onExecute(body);
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      type: 'device.set-value',
+      status: 'pending',
+      value: 100,
+      device: 'device-shutter',
+      feature_category: 'shutter',
+      feature_type: 'position',
+    });
+  });
+
+  it('Should adjust shutter position and clamp to min', async () => {
+    const shutterWithPosition = {
+      ...DEVICE_1_SHUTTER,
+      features: [
+        DEVICE_1_SHUTTER.features[0],
+        {
+          ...DEVICE_1_SHUTTER.features[1],
+          last_value: 5,
+        },
+      ],
+    };
+    const gladys = {
+      stateManager: {
+        get: () => shutterWithPosition,
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa.RangeController',
+          instance: BLIND_RANGE_CONTROLLER_INSTANCE,
+          name: 'AdjustRangeValue',
+          payloadVersion: '3',
+          messageId: 'message-id',
+          correlationToken: 'correlation-token',
+        },
+        endpoint: { endpointId: 'device-shutter', cookie: {} },
+        payload: { rangeValueDelta: -10 },
+      },
+    };
+
+    alexaHandler.onExecute(body);
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      type: 'device.set-value',
+      status: 'pending',
+      value: 0,
+      device: 'device-shutter',
+      feature_category: 'shutter',
+      feature_type: 'position',
+    });
   });
 });
