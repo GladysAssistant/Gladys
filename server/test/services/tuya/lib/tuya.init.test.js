@@ -35,6 +35,7 @@ describe('TuyaHandler.init', () => {
     tuyaHandler.lastError = 'previous-error';
     tuyaHandler.loadDevices = sinon.stub().resolves([]);
     tuyaHandler.startReconnect = sinon.stub();
+    tuyaHandler.startPersistentConnections = sinon.stub().resolves();
   });
 
   afterEach(() => {

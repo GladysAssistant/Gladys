@@ -364,7 +364,38 @@ async function poll(device) {
     logger.debug(`[Tuya][poll] device=${topic} skipping local (degraded backoff active), falling back to cloud`);
   }
 
-  if (hasLocalConfig && !localSkipped) {
+  // Coexistence gate: a Tuya device accepts only one local session at a time, so when a healthy
+  // persistent local connection is already streaming pushed DP updates for this device, the scheduled
+  // poll must not open a second local (or redundant cloud) read. When the persistent connection is
+  // stale/failed, isPersistentConnectionHealthy returns false and the normal local->degraded->cloud
+  // path below runs unchanged (the poll cadence acts as the freshness watchdog / fallback).
+  const persistentHealthy =
+    hasLocalConfig &&
+    typeof this.isPersistentConnectionHealthy === 'function' &&
+    this.isPersistentConnectionHealthy(topic);
+  if (persistentHealthy) {
+    fallbackReason = 'persistent_push_active';
+    logger.debug(`[Tuya][poll] device=${topic} skipping poll (persistent local push active)`);
+    return;
+  }
+
+  // A connected-but-silent persistent socket still holds the single local session. Never open a
+  // competing local poll in that case (it would time out); refresh via cloud instead.
+  const persistentConnected =
+    hasLocalConfig &&
+    typeof this.isPersistentConnectionConnected === 'function' &&
+    this.isPersistentConnectionConnected(topic);
+  if (persistentConnected) {
+    // Recycle the stale-but-open socket so the single local session frees up: the next cycles then
+    // follow the intended priority (persistent -> local poll -> cloud) instead of staying on cloud.
+    if (typeof this.recyclePersistentConnection === 'function') {
+      this.recyclePersistentConnection(topic);
+    }
+    fallbackReason = 'persistent_stale_cloud_refresh';
+    logger.debug(`[Tuya][poll] device=${topic} persistent connected but silent: recycling + cloud refresh this cycle`);
+  }
+
+  if (hasLocalConfig && !localSkipped && !persistentConnected) {
     try {
       const localResult = await localPoll({
         deviceId: topic,
@@ -484,4 +515,11 @@ async function poll(device) {
 
 module.exports = {
   poll,
+  // Exported so the persistent-connection push handler reuses the exact same DPS -> feature -> state
+  // pipeline as the scheduled poll (single source of truth).
+  getFeatureCode,
+  getFeatureReader,
+  hasDpsKey,
+  getCurrentFeatureState,
+  emitFeatureState,
 };
