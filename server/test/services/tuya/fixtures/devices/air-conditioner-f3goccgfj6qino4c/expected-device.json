@@ -10,7 +10,7 @@
       "min": 0,
       "name": "Power",
       "read_only": false,
-      "selector": "tuya:bf5638fc7cc3f25e32i45q:Power",
+      "selector": "tuya-bf5638fc7cc3f25e32i45q-power",
       "type": "binary"
     },
     {
@@ -21,7 +21,7 @@
       "min": 0,
       "name": "horizontal",
       "read_only": false,
-      "selector": "tuya:bf5638fc7cc3f25e32i45q:horizontal",
+      "selector": "tuya-bf5638fc7cc3f25e32i45q-horizontal",
       "type": "swing-horizontal"
     },
     {
@@ -32,7 +32,7 @@
       "min": 0,
       "name": "mode",
       "read_only": false,
-      "selector": "tuya:bf5638fc7cc3f25e32i45q:mode",
+      "selector": "tuya-bf5638fc7cc3f25e32i45q-mode",
       "type": "mode"
     },
     {
@@ -44,7 +44,7 @@
       "name": "temp_set",
       "read_only": false,
       "scale": 1,
-      "selector": "tuya:bf5638fc7cc3f25e32i45q:temp_set",
+      "selector": "tuya-bf5638fc7cc3f25e32i45q-temp-set",
       "type": "target-temperature",
       "unit": "celsius"
     },
@@ -56,7 +56,7 @@
       "min": 0,
       "name": "vertical",
       "read_only": false,
-      "selector": "tuya:bf5638fc7cc3f25e32i45q:vertical",
+      "selector": "tuya-bf5638fc7cc3f25e32i45q-vertical",
       "type": "swing-vertical"
     },
     {
@@ -67,7 +67,7 @@
       "min": 0,
       "name": "windspeed",
       "read_only": false,
-      "selector": "tuya:bf5638fc7cc3f25e32i45q:windspeed",
+      "selector": "tuya-bf5638fc7cc3f25e32i45q-windspeed",
       "type": "fan-speed"
     },
     {
@@ -79,7 +79,7 @@
       "name": "temp_current",
       "read_only": true,
       "scale": 1,
-      "selector": "tuya:bf5638fc7cc3f25e32i45q:temp_current",
+      "selector": "tuya-bf5638fc7cc3f25e32i45q-temp-current",
       "type": "decimal",
       "unit": "celsius"
     }
@@ -101,7 +101,7 @@
   "poll_frequency": 10000,
   "product_id": "f3goccgfj6qino4c",
   "product_key": "keyquxnsj75xc8se",
-  "selector": "tuya:bf5638fc7cc3f25e32i45q",
+  "selector": "tuya-bf5638fc7cc3f25e32i45q",
   "should_poll": true,
   "tuya_mapping": {
     "ignored_cloud_codes": [
