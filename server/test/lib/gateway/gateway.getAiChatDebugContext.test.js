@@ -115,7 +115,7 @@ describe('gateway.getAiChatDebugContext', () => {
     expect(payload._debug.messageCount).to.equal(2);
 
     assert.calledOnce(messageFindAll);
-    expect(messageFindAll.firstCall.args[0].limit).to.equal(10);
+    expect(messageFindAll.firstCall.args[0].limit).to.equal(50);
   });
 
   it('should throw when MCP service is not running', async () => {

@@ -59,6 +59,8 @@ class SetupPanel extends Component {
         setupMode = SETUP_MODES.REMOTE;
       }
       this.setState({ setupMode, configuration });
+    } else if (configuration !== this.props.configuration) {
+      this.setState({ configuration });
     }
   }
 

@@ -18,6 +18,7 @@ const {
 } = require('../../../../services/mcp/lib/selectFeature');
 const { findBySimilarity } = require('../../../../services/mcp/lib/findBySimilarity');
 const { SCENE_CREATE_TOOL_DESCRIPTION } = require('../../../../services/mcp/lib/sceneSchemas');
+const { mcpToolsToChatApiFormat } = require('../../../../services/mcp/lib/mcpToolsToChatApiFormat');
 
 describe('build schemas', () => {
   it('should build home structure resources schema', async () => {
@@ -774,6 +775,19 @@ describe('build schemas', () => {
     // Tool: device.turn-on-off by device
     expect(tools[4].intent).to.eq('device.turn-on-off');
     expect(tools[4].config.title).to.eq('Turn on/off devices');
+    expect(tools[4].config.requireDeviceTargeting).to.eq(true);
+
+    const turnOnOffApiTool = mcpToolsToChatApiFormat(tools).find((tool) => tool.function.name === 'device_turn_on_off');
+    expect(turnOnOffApiTool.function.parameters.anyOf).to.deep.equal([
+      { required: ['action', 'device'] },
+      { required: ['action', 'room', 'device_category'] },
+    ]);
+
+    const missingTargetResult = await tools[4].cb({ action: 'off' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+    expect(missingTargetResult.content[0].text).to.eq(
+      'device.turn-off: missing target. Provide device name, or both room and device_category. Never call with only action.',
+    );
 
     const turnOnResult = await tools[4].cb({ action: 'on', device: 'Living Room Light' });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
@@ -811,7 +825,20 @@ describe('build schemas', () => {
       device: 'non-existent-device',
     });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
-    expect(noDeviceResult.content[0].text).to.eq('device.turn-on command not sent, no device found');
+    expect(noDeviceResult.content[0].text).to.eq(
+      'device.turn-on command not sent, no device found matching "non-existent-device"',
+    );
+
+    const mixedTargetingResult = await tools[4].cb({
+      action: 'off',
+      device: 'Room switch',
+      room: 'salon',
+      device_category: 'light',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+    expect(mixedTargetingResult.content[0].text).to.eq(
+      'device.turn-off: mixed targeting. Provide device name only, or both room and device_category without device.',
+    );
 
     // Test device.get-history
     const getHistoryResult = await tools[5].cb({
@@ -1185,6 +1212,71 @@ describe('build schemas', () => {
       }),
     ).to.deep.equal([{ path: 'actions.2', message: 'invalid 2' }]);
     expect(flattenUnionIssues({ path: ['actions'] })).to.deep.equal([]);
+  });
+
+  it('should reject mixed device turn-on-off targeting instead of widening to room category', async () => {
+    const rooms = [
+      { id: 'room-1', name: 'Salon', selector: 'salon' },
+      { id: 'room-2', name: 'Chambre', selector: 'chambre' },
+    ];
+    const devices = [
+      {
+        selector: 'device-light-1',
+        name: 'Living Room Light',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [{ id: 1, selector: 'f-light', name: 'On/Off', category: 'light', type: 'binary' }],
+      },
+      {
+        selector: 'device-switch-1',
+        name: 'Room switch',
+        room: { selector: 'chambre', name: 'Chambre' },
+        features: [{ id: 2, selector: 'f-switch', name: 'On/Off', category: 'switch', type: 'binary' }],
+      },
+    ];
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().returns({ value: 1 }),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(devices),
+          getBySelector: stub().resolves(devices[0]),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+      toon: stub().returns('ok'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const turnOnOffTool = tools.find((tool) => tool.intent === 'device.turn-on-off');
+
+    const result = await turnOnOffTool.cb({
+      action: 'off',
+      device: 'Room switch',
+      room: 'salon',
+      device_category: 'light',
+    });
+
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+    expect(result.content[0].text).to.eq(
+      'device.turn-off: mixed targeting. Provide device name only, or both room and device_category without device.',
+    );
   });
 
   it('should cover filtered-out feature branches in device state and turn-on-off tools', async () => {
