@@ -950,3 +950,90 @@ describe('TuyaHandler.poll degraded backoff', () => {
     expect(degradedDevices['device-degraded']).to.equal(undefined);
   });
 });
+
+describe('TuyaHandler.poll temperature conversion', () => {
+  // Real scenario: a feature was created while the thermostat reported one unit,
+  // then the user switched the device to the other unit. On the next poll the
+  // device unit (temp_unit_convert) differs from the feature unit, so Gladys must
+  // convert the reading to keep the feature consistent.
+  const pollThermostat = async (statusResult, feature) => {
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {});
+    const request = sinon.stub().resolves({ result: statusResult });
+    const emit = sinon.stub();
+    await poll.call(
+      { connector: { request }, gladys: { event: { emit } } },
+      {
+        external_id: 'tuya:thermostat',
+        params: [{ name: 'LOCAL_OVERRIDE', value: false }],
+        features: [feature],
+      },
+    );
+    return emit.getCalls().find((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
+  };
+
+  it('should convert temp_current from Fahrenheit to the feature Celsius unit', async () => {
+    const stateEvent = await pollThermostat(
+      [
+        { code: 'temp_current', value: 680 },
+        { code: 'temp_unit_convert', value: 'f' },
+      ],
+      {
+        external_id: 'tuya:thermostat:temp_current',
+        category: 'temperature-sensor',
+        type: 'decimal',
+        unit: 'celsius',
+        scale: 1,
+      },
+    );
+
+    expect(stateEvent).to.not.equal(undefined);
+    // 680 -> scale 1 -> 68 °F -> fahrenheitToCelsius(68) = 20 °C
+    expect(stateEvent.args[1].state).to.equal(20);
+  });
+
+  it('should convert temp_set from Celsius to the feature Fahrenheit unit', async () => {
+    const stateEvent = await pollThermostat(
+      [
+        { code: 'temp_set', value: 200 },
+        { code: 'temp_unit_convert', value: 'c' },
+      ],
+      {
+        external_id: 'tuya:thermostat:temp_set',
+        category: 'thermostat',
+        type: 'target-temperature',
+        unit: 'fahrenheit',
+        scale: 1,
+      },
+    );
+
+    expect(stateEvent).to.not.equal(undefined);
+    // 200 -> scale 1 -> 20 °C -> celsiusToFahrenheit(20) = 68 °F -> round(68) = 68
+    expect(stateEvent.args[1].state).to.equal(68);
+  });
+
+  it('should keep the raw temp_current when the converted value falls out of the feature range', async () => {
+    // Firmware inconsistency guard: the device advertises Fahrenheit but the
+    // temp_current value is already Celsius. Converting would push it out of the
+    // feature's [min, max] range while the raw value is inside it, so Gladys
+    // keeps the raw reading instead of double-converting.
+    const stateEvent = await pollThermostat(
+      [
+        { code: 'temp_current', value: 20 },
+        { code: 'temp_unit_convert', value: 'f' },
+      ],
+      {
+        external_id: 'tuya:thermostat:temp_current',
+        category: 'temperature-sensor',
+        type: 'decimal',
+        unit: 'celsius',
+        scale: 0,
+        min: 5,
+        max: 35,
+      },
+    );
+
+    expect(stateEvent).to.not.equal(undefined);
+    // fahrenheitToCelsius(20) = -6.7 (out of [5, 35]) while raw 20 is in range -> keep 20
+    expect(stateEvent.args[1].state).to.equal(20);
+  });
+});
