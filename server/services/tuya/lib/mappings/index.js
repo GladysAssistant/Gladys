@@ -3,18 +3,21 @@ const airConditionerCloud = require('./cloud/air-conditioner');
 const pilotThermostatCloud = require('./cloud/pilot-thermostat');
 const smartMeterCloud = require('./cloud/smart-meter');
 const smartSocketCloud = require('./cloud/smart-socket');
+const videoDoorbellCloud = require('./cloud/video-doorbell');
 
 const globalLocal = require('./local/global');
 const airConditionerLocal = require('./local/air-conditioner');
 const pilotThermostatLocal = require('./local/pilot-thermostat');
 const smartMeterLocal = require('./local/smart-meter');
 const smartSocketLocal = require('./local/smart-socket');
+const videoDoorbellLocal = require('./local/video-doorbell');
 
 const DEVICE_TYPES = {
   AIR_CONDITIONER: 'air-conditioner',
   PILOT_THERMOSTAT: 'pilot-thermostat',
   SMART_METER: 'smart-meter',
   SMART_SOCKET: 'smart-socket',
+  VIDEO_DOORBELL: 'video-doorbell',
   UNKNOWN: 'unknown',
 };
 
@@ -29,6 +32,9 @@ const PILOT_THERMOSTAT_CODES = new Set([
 ]);
 const SWITCH_CODES = new Set(['switch', 'switch_1', 'switch_2', 'power']);
 const SMART_METER_CODES = new Set(['total_power', 'forward_energy_total', 'voltage_a', 'current_a']);
+// doorbell_active is doorbell-specific: pure cameras share category "sp" but do not expose it,
+// so requiring it keeps the broad category/keyword match from capturing plain cameras.
+const VIDEO_DOORBELL_CODES = new Set(['doorbell_active']);
 
 const AIR_CONDITIONER = {
   DEVICE_TYPE_NAME: DEVICE_TYPES.AIR_CONDITIONER,
@@ -70,7 +76,17 @@ const SMART_METER = {
   LOCAL_MAPPINGS: smartMeterLocal,
 };
 
-const LIST_DEVICE_TYPES = [AIR_CONDITIONER, PILOT_THERMOSTAT, SMART_SOCKET, SMART_METER];
+const VIDEO_DOORBELL = {
+  DEVICE_TYPE_NAME: DEVICE_TYPES.VIDEO_DOORBELL,
+  CATEGORIES: new Set(['sp']),
+  PRODUCT_IDS: new Set(['i5e3a4qxcsthszin']),
+  KEYWORDS: ['doorbell', 'sonnette', 'visiophone'],
+  REQUIRED_CODES: VIDEO_DOORBELL_CODES,
+  CLOUD_MAPPINGS: videoDoorbellCloud,
+  LOCAL_MAPPINGS: videoDoorbellLocal,
+};
+
+const LIST_DEVICE_TYPES = [AIR_CONDITIONER, PILOT_THERMOSTAT, SMART_SOCKET, SMART_METER, VIDEO_DOORBELL];
 
 const normalizeCode = (code) => {
   if (!code) {

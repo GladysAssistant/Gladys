@@ -1,0 +1,608 @@
+{
+  "id": "bf0e59548489fcb4ea62of",
+  "name": "Visiophone Wifi",
+  "product_name": "Wifi video doorbell",
+  "model": "Wifi video doorbell",
+  "product_id": "i5e3a4qxcsthszin",
+  "local_key": "***",
+  "cloud_ip": "62.x.x.x",
+  "local_override": false,
+  "online": true,
+  "specifications": {
+    "category": "sp",
+    "functions": [
+      {
+        "code": "basic_indicator",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "Indicator",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "basic_flip",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "Vision Flip",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "basic_osd",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "OSD Watermark",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "motion_sensitivity",
+        "lang_config": {
+          "0": "Low",
+          "1": "Medium",
+          "2": "High"
+        },
+        "name": "Motion Sensitivity",
+        "type": "Enum",
+        "values": "{\"range\":[\"0\",\"1\",\"2\"]}"
+      },
+      {
+        "code": "basic_nightvision",
+        "lang_config": {
+          "0": "Auto",
+          "1": "Off",
+          "2": "On"
+        },
+        "name": "Night Vision",
+        "type": "Enum",
+        "values": "{\"range\":[\"0\",\"1\",\"2\"]}"
+      },
+      {
+        "code": "sd_format",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "Format Memory Card",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "motion_switch",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "Motion Alert",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "record_switch",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "Record Switch",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "record_mode",
+        "lang_config": {
+          "1": "Event Recoding",
+          "2": "Continuous Recoding"
+        },
+        "name": "Recording Mode",
+        "type": "Enum",
+        "values": "{\"range\":[\"1\",\"2\"]}"
+      },
+      {
+        "code": "basic_device_volume",
+        "lang_config": {
+          "unit": "percentage"
+        },
+        "name": "Device Volume Control",
+        "type": "Integer",
+        "values": "{\"min\":1,\"max\":10,\"scale\":0,\"step\":1}"
+      }
+    ],
+    "status": [
+      {
+        "code": "basic_indicator",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "Indicator",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "basic_flip",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "Vision Flip",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "basic_osd",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "OSD Watermark",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "motion_sensitivity",
+        "lang_config": {
+          "0": "Low",
+          "1": "Medium",
+          "2": "High"
+        },
+        "name": "Motion Sensitivity",
+        "type": "Enum",
+        "values": "{\"range\":[\"0\",\"1\",\"2\"]}"
+      },
+      {
+        "code": "basic_nightvision",
+        "lang_config": {
+          "0": "Auto",
+          "1": "Off",
+          "2": "On"
+        },
+        "name": "Night Vision",
+        "type": "Enum",
+        "values": "{\"range\":[\"0\",\"1\",\"2\"]}"
+      },
+      {
+        "code": "sd_storge",
+        "lang_config": {
+          "unit": ""
+        },
+        "name": "Get Memory Card Capacity",
+        "type": "String",
+        "values": "{\"maxlen\":255}"
+      },
+      {
+        "code": "sd_status",
+        "lang_config": {
+          "unit": ""
+        },
+        "name": "Memory Card Status",
+        "type": "Integer",
+        "values": "{\"unit\":\"\",\"min\":1,\"max\":5,\"scale\":1,\"step\":1}"
+      },
+      {
+        "code": "sd_format",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "Format Memory Card",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "movement_detect_pic",
+        "lang_config": {
+          "unit": "Motion Detected"
+        },
+        "name": "Motion Detected",
+        "type": "Raw",
+        "values": "{}"
+      },
+      {
+        "code": "sd_format_state",
+        "lang_config": {
+          "unit": ""
+        },
+        "name": "Formatted State",
+        "type": "Integer",
+        "values": "{\"unit\":\"\",\"min\":-20000,\"max\":20000,\"scale\":1,\"step\":1}"
+      },
+      {
+        "code": "motion_switch",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "Motion Alert",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "doorbell_active",
+        "lang_config": {
+          "unit": ""
+        },
+        "name": "Doorbell Active",
+        "type": "String",
+        "values": "{\"maxlen\":255}"
+      },
+      {
+        "code": "record_switch",
+        "lang_config": {
+          "false": "Off",
+          "true": "On"
+        },
+        "name": "Record Switch",
+        "type": "Boolean",
+        "values": "{}"
+      },
+      {
+        "code": "record_mode",
+        "lang_config": {
+          "1": "Event Recoding",
+          "2": "Continuous Recoding"
+        },
+        "name": "Recording Mode",
+        "type": "Enum",
+        "values": "{\"range\":[\"1\",\"2\"]}"
+      },
+      {
+        "code": "doorbell_pic",
+        "lang_config": {
+          "unit": ""
+        },
+        "name": "Someone ring doorbell",
+        "type": "Raw",
+        "values": "{}"
+      },
+      {
+        "code": "basic_device_volume",
+        "lang_config": {
+          "unit": "percentage"
+        },
+        "name": "Device Volume Control",
+        "type": "Integer",
+        "values": "{\"min\":1,\"max\":10,\"scale\":0,\"step\":1}"
+      }
+    ]
+  },
+  "properties": {
+    "properties": [
+      {
+        "code": "basic_indicator",
+        "custom_name": "",
+        "dp_id": 101,
+        "time": 1772853942804,
+        "type": "bool",
+        "value": true
+      },
+      {
+        "code": "basic_flip",
+        "custom_name": "",
+        "dp_id": 103,
+        "time": 1772853942844,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "basic_osd",
+        "custom_name": "",
+        "dp_id": 104,
+        "time": 1772853942897,
+        "type": "bool",
+        "value": true
+      },
+      {
+        "code": "motion_sensitivity",
+        "custom_name": "",
+        "dp_id": 106,
+        "time": 1772853943010,
+        "type": "enum",
+        "value": "1"
+      },
+      {
+        "code": "basic_nightvision",
+        "custom_name": "",
+        "dp_id": 108,
+        "time": 1772853942925,
+        "type": "enum",
+        "value": "0"
+      },
+      {
+        "code": "sd_storge",
+        "custom_name": "",
+        "dp_id": 109,
+        "time": 1772853943109,
+        "type": "string",
+        "value": "100|0|100"
+      },
+      {
+        "code": "sd_status",
+        "custom_name": "",
+        "dp_id": 110,
+        "time": 1772853984012,
+        "type": "value",
+        "value": 5
+      },
+      {
+        "code": "sd_format",
+        "custom_name": "",
+        "dp_id": 111,
+        "time": 1747493380202,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "movement_detect_pic",
+        "custom_name": "",
+        "dp_id": 115,
+        "time": 1747493380202,
+        "type": "raw"
+      },
+      {
+        "code": "sd_format_state",
+        "custom_name": "",
+        "dp_id": 117,
+        "time": 1747493380202,
+        "type": "value",
+        "value": -20000
+      },
+      {
+        "code": "motion_switch",
+        "custom_name": "",
+        "dp_id": 134,
+        "time": 1772853942975,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "doorbell_active",
+        "custom_name": "",
+        "dp_id": 136,
+        "time": 1747493380202,
+        "type": "string",
+        "value": ""
+      },
+      {
+        "code": "record_switch",
+        "custom_name": "",
+        "dp_id": 150,
+        "time": 1772853943174,
+        "type": "bool",
+        "value": true
+      },
+      {
+        "code": "record_mode",
+        "custom_name": "",
+        "dp_id": 151,
+        "time": 1772853943213,
+        "type": "enum",
+        "value": "2"
+      },
+      {
+        "code": "doorbell_pic",
+        "custom_name": "",
+        "dp_id": 154,
+        "time": 1747493380202,
+        "type": "raw"
+      },
+      {
+        "code": "basic_device_volume",
+        "custom_name": "",
+        "dp_id": 160,
+        "time": 1772853943242,
+        "type": "value",
+        "value": 10
+      }
+    ]
+  },
+  "thing_model": {
+    "modelId": "000001lvka",
+    "services": [
+      {
+        "actions": [],
+        "code": "",
+        "description": "",
+        "events": [],
+        "name": "默认服务",
+        "properties": [
+          {
+            "abilityId": 101,
+            "accessMode": "rw",
+            "code": "basic_indicator",
+            "description": "设备设置页面-基本功能设置\n设备指示灯是否打开，true打开，false关闭",
+            "extensions": {
+              "iconName": "icon-setting"
+            },
+            "name": "状态指示灯",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 103,
+            "accessMode": "rw",
+            "code": "basic_flip",
+            "description": "设备设置页面-基本功能设置\n使直播画面垂直翻转，true打开翻转，false关闭翻转",
+            "name": "画面翻转",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 104,
+            "accessMode": "rw",
+            "code": "basic_osd",
+            "description": "设备设置页面-基本功能设置\n时间水印功能开关，true打开水印，false关闭水印",
+            "name": "时间水印",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 106,
+            "accessMode": "rw",
+            "code": "motion_sensitivity",
+            "description": "0-2，灵敏度依次增加；仅为灵敏度，0并不是关闭移动侦测报警；规定0为低灵敏度，1为中灵敏度，2为高灵敏度。",
+            "name": "移动侦测灵敏度",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["0", "1", "2"]
+            }
+          },
+          {
+            "abilityId": 108,
+            "accessMode": "rw",
+            "code": "basic_nightvision",
+            "description": "0:自动\n1:关\n2:开",
+            "name": "红外夜视",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["0", "1", "2"]
+            }
+          },
+          {
+            "abilityId": 109,
+            "accessMode": "ro",
+            "code": "sd_storge",
+            "description": "示例：\n---2017.07.08更新---\n单位改为kb\n---\n3503775744|778977280|2718158848\n其中第一字符串是总容量，第二个字符串是已使用的容量，第三个是剩余容量",
+            "name": "获取存储卡容量",
+            "typeSpec": {
+              "type": "string",
+              "maxlen": 255
+            }
+          },
+          {
+            "abilityId": 110,
+            "accessMode": "ro",
+            "code": "sd_status",
+            "description": "status：sd卡状态，1-正常，2-异常，3-空间不足，4-正在格式化，5-无SD卡；",
+            "name": "存储卡状态",
+            "typeSpec": {
+              "type": "value",
+              "max": 5,
+              "min": 1,
+              "scale": 1,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "abilityId": 111,
+            "accessMode": "rw",
+            "code": "sd_format",
+            "description": "无参数",
+            "name": "存储卡格式化",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 115,
+            "accessMode": "ro",
+            "code": "movement_detect_pic",
+            "description": "该功能实现请参考SDK\n---------------\n{\"dp_id\",\"bucket;object;key\"}/{\"dp_id\",\"bucket;object;\"}\n\nbucket:根文件夹；objcet:文件路径；key:加密",
+            "name": "检测到移动",
+            "typeSpec": {
+              "type": "raw",
+              "maxlen": 128
+            }
+          },
+          {
+            "abilityId": 117,
+            "accessMode": "ro",
+            "code": "sd_format_state",
+            "description": "返回错误码：\n-2000：SD卡正在格式化\n-2001：SD卡格式化异常\n-2002：无SD卡\n-2003：SD卡错误\n\n//正数为格式化进度",
+            "name": "格式化状态",
+            "typeSpec": {
+              "type": "value",
+              "max": 20000,
+              "min": -20000,
+              "scale": 1,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "abilityId": 134,
+            "accessMode": "rw",
+            "code": "motion_switch",
+            "description": "",
+            "extensions": {
+              "attribute": "4"
+            },
+            "name": "移动报警开关",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 136,
+            "accessMode": "ro",
+            "code": "doorbell_active",
+            "description": "",
+            "name": "门铃-呼叫",
+            "typeSpec": {
+              "type": "string",
+              "maxlen": 255
+            }
+          },
+          {
+            "abilityId": 150,
+            "accessMode": "rw",
+            "code": "record_switch",
+            "description": "设备设置页面-存储卡设置\nSD卡录像开关，true为打开，false为关闭\n功能关闭时，不录像到SD卡",
+            "name": "SD卡录像开关",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "abilityId": 151,
+            "accessMode": "rw",
+            "code": "record_mode",
+            "description": "设备设置页面-存储卡设置\nSD卡录像模式选择，1为事件录像（检测到移动再录像到SD卡），2为连续录像",
+            "name": "录像模式",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["1", "2"]
+            }
+          },
+          {
+            "abilityId": 154,
+            "accessMode": "ro",
+            "code": "doorbell_pic",
+            "description": "用户按下门铃，抓拍图片并上传",
+            "name": "门铃抓拍图片",
+            "typeSpec": {
+              "type": "raw",
+              "maxlen": 128
+            }
+          },
+          {
+            "abilityId": 160,
+            "accessMode": "rw",
+            "code": "basic_device_volume",
+            "description": "控制设备端播放对讲声音的音量",
+            "extensions": {
+              "iconName": "icon-setting"
+            },
+            "name": "设备音量控制",
+            "typeSpec": {
+              "type": "value",
+              "max": 10,
+              "min": 1,
+              "scale": 0,
+              "step": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

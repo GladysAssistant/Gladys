@@ -1,0 +1,71 @@
+{
+  "external_id": "tuya:bf0e59548489fcb4ea62of",
+  "device_type": "video-doorbell",
+  "params": [
+    {
+      "name": "DEVICE_ID",
+      "value": "bf0e59548489fcb4ea62of"
+    },
+    {
+      "name": "LOCAL_KEY",
+      "value": "***"
+    },
+    {
+      "name": "IP_ADDRESS",
+      "value": "10.0.0.20"
+    },
+    {
+      "name": "PROTOCOL_VERSION",
+      "value": "3.3"
+    },
+    {
+      "name": "LOCAL_OVERRIDE",
+      "value": true
+    },
+    {
+      "name": "PRODUCT_ID",
+      "value": "i5e3a4qxcsthszin"
+    },
+    {
+      "name": "CLOUD_STRATEGY",
+      "value": "legacy"
+    }
+  ],
+  "features": [
+    {
+      "external_id": "tuya:bf0e59548489fcb4ea62of:basic_flip",
+      "selector": "tuya-bf0e59548489fcb4ea62of-basic-flip",
+      "category": "switch",
+      "type": "binary",
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:bf0e59548489fcb4ea62of:basic_indicator",
+      "selector": "tuya-bf0e59548489fcb4ea62of-basic-indicator",
+      "category": "switch",
+      "type": "binary",
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:bf0e59548489fcb4ea62of:basic_osd",
+      "selector": "tuya-bf0e59548489fcb4ea62of-basic-osd",
+      "category": "switch",
+      "type": "binary",
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:bf0e59548489fcb4ea62of:motion_switch",
+      "selector": "tuya-bf0e59548489fcb4ea62of-motion-switch",
+      "category": "switch",
+      "type": "binary",
+      "last_value": 0
+    },
+    {
+      "external_id": "tuya:bf0e59548489fcb4ea62of:record_switch",
+      "selector": "tuya-bf0e59548489fcb4ea62of-record-switch",
+      "category": "switch",
+      "type": "binary",
+      "last_value": 0
+    }
+  ]
+}

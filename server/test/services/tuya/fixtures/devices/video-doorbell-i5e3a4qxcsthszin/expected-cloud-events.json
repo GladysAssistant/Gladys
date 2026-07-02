@@ -1,0 +1,22 @@
+[
+  {
+    "device_feature_external_id": "tuya:bf0e59548489fcb4ea62of:basic_flip",
+    "state": 0
+  },
+  {
+    "device_feature_external_id": "tuya:bf0e59548489fcb4ea62of:basic_indicator",
+    "state": 1
+  },
+  {
+    "device_feature_external_id": "tuya:bf0e59548489fcb4ea62of:basic_osd",
+    "state": 1
+  },
+  {
+    "device_feature_external_id": "tuya:bf0e59548489fcb4ea62of:motion_switch",
+    "state": 0
+  },
+  {
+    "device_feature_external_id": "tuya:bf0e59548489fcb4ea62of:record_switch",
+    "state": 1
+  }
+]

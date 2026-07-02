@@ -1,0 +1,92 @@
+{
+  "name": "Visiophone Wifi",
+  "external_id": "tuya:bf0e59548489fcb4ea62of",
+  "selector": "tuya-bf0e59548489fcb4ea62of",
+  "device_type": "video-doorbell",
+  "model": "Wifi video doorbell",
+  "product_id": "i5e3a4qxcsthszin",
+  "online": true,
+  "poll_frequency": 30000,
+  "should_poll": true,
+  "params": {
+    "DEVICE_ID": "bf0e59548489fcb4ea62of",
+    "LOCAL_KEY": "***",
+    "CLOUD_IP": "62.x.x.x",
+    "LOCAL_OVERRIDE": false,
+    "PRODUCT_ID": "i5e3a4qxcsthszin",
+    "CLOUD_STRATEGY": "legacy"
+  },
+  "tuya_mapping": {
+    "ignored_cloud_codes": [
+      "basic_device_volume",
+      "basic_nightvision",
+      "doorbell_active",
+      "doorbell_pic",
+      "motion_sensitivity",
+      "movement_detect_pic",
+      "record_mode",
+      "sd_format_state",
+      "sd_format",
+      "sd_status",
+      "sd_storge"
+    ],
+    "ignored_local_dps": ["106", "108", "109", "110", "111", "115", "117", "136", "151", "154", "160"]
+  },
+  "features": [
+    {
+      "category": "switch",
+      "external_id": "tuya:bf0e59548489fcb4ea62of:basic_flip",
+      "has_feedback": true,
+      "max": 1,
+      "min": 0,
+      "name": "Image flip",
+      "read_only": false,
+      "selector": "tuya-bf0e59548489fcb4ea62of-basic-flip",
+      "type": "binary"
+    },
+    {
+      "category": "switch",
+      "external_id": "tuya:bf0e59548489fcb4ea62of:basic_indicator",
+      "has_feedback": true,
+      "max": 1,
+      "min": 0,
+      "name": "Status LED",
+      "read_only": false,
+      "selector": "tuya-bf0e59548489fcb4ea62of-basic-indicator",
+      "type": "binary"
+    },
+    {
+      "category": "switch",
+      "external_id": "tuya:bf0e59548489fcb4ea62of:basic_osd",
+      "has_feedback": true,
+      "max": 1,
+      "min": 0,
+      "name": "On-screen display",
+      "read_only": false,
+      "selector": "tuya-bf0e59548489fcb4ea62of-basic-osd",
+      "type": "binary"
+    },
+    {
+      "category": "switch",
+      "external_id": "tuya:bf0e59548489fcb4ea62of:motion_switch",
+      "has_feedback": true,
+      "max": 1,
+      "min": 0,
+      "name": "Motion detection",
+      "read_only": false,
+      "selector": "tuya-bf0e59548489fcb4ea62of-motion-switch",
+      "type": "binary"
+    },
+    {
+      "category": "switch",
+      "external_id": "tuya:bf0e59548489fcb4ea62of:record_switch",
+      "has_feedback": true,
+      "max": 1,
+      "min": 0,
+      "name": "Recording",
+      "read_only": false,
+      "selector": "tuya-bf0e59548489fcb4ea62of-record-switch",
+      "type": "binary"
+    }
+  ]
+}

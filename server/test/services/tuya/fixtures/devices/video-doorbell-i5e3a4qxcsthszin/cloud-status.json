@@ -1,0 +1,24 @@
+{
+  "result": [
+    {
+      "code": "basic_indicator",
+      "value": true
+    },
+    {
+      "code": "basic_flip",
+      "value": false
+    },
+    {
+      "code": "basic_osd",
+      "value": true
+    },
+    {
+      "code": "motion_switch",
+      "value": false
+    },
+    {
+      "code": "record_switch",
+      "value": true
+    }
+  ]
+}
