@@ -178,7 +178,8 @@ describe('Tuya convert feature', () => {
         type: 'Enum',
         name: 'Mode',
         readOnly: false,
-        values: '{"range":["hot","eco","cold","comfortable1","comfortable2","auto"]}',
+        // Real-device rw range: it omits comfortable1/comfortable2 that the device actually honors.
+        values: '{"range":["hot","eco","cold","auto"]}',
       },
       'tuya:ecosy-device',
       {
@@ -191,6 +192,60 @@ describe('Tuya convert feature', () => {
     expect(result.type).to.equal('pilot-wire-mode');
     expect(result.name).to.equal('Mode');
     expect(result).to.not.have.property('tuyaEnum');
+    // The curated eCosy vocabulary is the complete truth, even when the rw spec range is narrower
+    // (the real device honors comfortable1/comfortable2 that its range omits): 6 modes offered,
+    // never Off (0) nor Thermostat (7).
+    expect(result.supported_options).to.deep.equal([
+      { value: 1, label: 'Frost Protection', sort_order: 0 },
+      { value: 2, label: 'Eco', sort_order: 1 },
+      { value: 3, label: 'Comfort -1°C', sort_order: 2 },
+      { value: 4, label: 'Comfort -2°C', sort_order: 3 },
+      { value: 5, label: 'Comfort', sort_order: 4 },
+      { value: 6, label: 'Programming', sort_order: 5 },
+    ]);
+  });
+
+  it('should restrict supported_options to the spec enum range of the default vocabulary', () => {
+    const result = convertFeature(
+      {
+        code: 'running_mode',
+        type: 'Enum',
+        name: 'running_mode',
+        readOnly: true,
+        // A status enum narrower than its rw sibling (real thing-model case): no Programming/Thermostat.
+        values: { range: ['Standby', 'Comfort', 'Comfort_1', 'Comfort_2', 'ECO', 'Anti_forst'] },
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.PILOT_THERMOSTAT,
+      },
+    );
+
+    expect(result.supported_options).to.deep.equal([
+      { value: 0, label: 'Off', sort_order: 0 },
+      { value: 1, label: 'Frost Protection', sort_order: 1 },
+      { value: 2, label: 'Eco', sort_order: 2 },
+      { value: 3, label: 'Comfort -1°C', sort_order: 3 },
+      { value: 4, label: 'Comfort -2°C', sort_order: 4 },
+      { value: 5, label: 'Comfort', sort_order: 5 },
+    ]);
+  });
+
+  it('should assume the full vocabulary and skip unknown enum values without a usable range', () => {
+    const noRange = convertFeature(
+      { code: 'mode', type: 'Enum', name: 'mode', readOnly: false, values: '{}' },
+      'externalId',
+      { deviceType: DEVICE_TYPES.PILOT_THERMOSTAT },
+    );
+    expect(noRange.supported_options).to.have.lengthOf(8);
+    expect(noRange.supported_options.map((option) => option.value)).to.deep.equal([0, 1, 2, 3, 4, 5, 6, 7]);
+
+    const unknownValues = convertFeature(
+      { code: 'mode', type: 'Enum', name: 'mode', readOnly: false, values: { range: ['Comfort', 'whatever'] } },
+      'externalId',
+      { deviceType: DEVICE_TYPES.PILOT_THERMOSTAT },
+    );
+    expect(unknownValues.supported_options).to.deep.equal([{ value: 5, label: 'Comfort', sort_order: 0 }]);
   });
 
   it('should apply the variant read_only override and curated name', () => {

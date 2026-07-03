@@ -409,4 +409,63 @@ describe('TuyaHandler.discoverDevices', () => {
     expect(devices).to.be.an('array');
     expect(devices.length).to.be.greaterThan(0);
   });
+
+  it('should flag an already-created device as updatable when its supported_options changed', async () => {
+    // mergeDevices only reacts to feature/param set differences: a mapping upgrade that adds or
+    // changes supported_options on an existing feature must still offer the "update" button.
+    const primePilotConnector = () => {
+      tuyaHandler.connector = {
+        request: sinon
+          .stub()
+          .onCall(0)
+          .resolves({
+            result: [
+              {
+                name: 'Pilot',
+                id: 'uuid',
+                product_name: 'Pilote Thermostat',
+                product_id: 'c03zek9b5daz7omr',
+                local_key: 'localKey',
+                ip: '1.1.1.1',
+                online: true,
+              },
+            ],
+          })
+          .onCall(1)
+          .resolves({
+            result: {
+              functions: [{ name: 'mode', code: 'mode', type: 'Enum', values: '{"range":["Standby","Comfort"]}' }],
+              status: [],
+              category: 'qn',
+            },
+          })
+          .onCall(2)
+          .resolves({ result: { local_key: 'localKey', ip: '1.1.1.1' } })
+          .onCall(3)
+          .resolves({ result: { properties: [] } })
+          .onCall(4)
+          .resolves({ result: { model: '{"services":[]}' } }),
+      };
+    };
+
+    primePilotConnector();
+    const [discovered] = await tuyaHandler.discoverDevices();
+    expect(discovered.features[0].supported_options.map((option) => option.value)).to.deep.equal([0, 5]);
+
+    // Same device already in Gladys but with stale options: the discover must offer the update.
+    const staleExisting = JSON.parse(JSON.stringify(discovered));
+    staleExisting.features[0].supported_options = [{ value: 0, label: 'Off', sort_order: 0 }];
+    gladys.stateManager.get = fake.returns(staleExisting);
+    primePilotConnector();
+    const [rediscovered] = await tuyaHandler.discoverDevices();
+    expect(rediscovered.updatable).to.equal(true);
+
+    // Identical options (order-insensitive): the device stays "already created".
+    const freshExisting = JSON.parse(JSON.stringify(discovered));
+    freshExisting.features[0].supported_options = [...freshExisting.features[0].supported_options].reverse();
+    gladys.stateManager.get = fake.returns(freshExisting);
+    primePilotConnector();
+    const [unchanged] = await tuyaHandler.discoverDevices();
+    expect(unchanged.updatable).to.equal(false);
+  });
 });

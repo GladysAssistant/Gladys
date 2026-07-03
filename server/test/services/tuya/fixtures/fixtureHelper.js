@@ -61,6 +61,9 @@ const normalizeFeatures = (features) =>
       if (feature.scale !== undefined) {
         normalized.scale = feature.scale;
       }
+      if (feature.supported_options !== undefined) {
+        normalized.supported_options = feature.supported_options;
+      }
       return normalized;
     }),
   );
