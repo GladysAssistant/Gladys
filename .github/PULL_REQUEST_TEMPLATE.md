@@ -3,7 +3,7 @@
 To ensure your Pull Request can be accepted as fast as possible, make sure to review and check all of these items:
 
 - [ ] If your changes affect the code, did you write the tests?
-- [ ] Are server tests passing with coverage? (`cd server && npm run coverage`)
+- [ ] Are server tests passing with coverage? (`cd server && npm run coverage`) — Codecov requires **100% coverage on lines changed in this PR**
 - [ ] Did Cypress E2E tests pass? (`npm run cypress:run` from repo root, if UI changed)
 - [ ] Is the linter passing? (`npm run eslint` on both front/server)
 - [ ] Did you run prettier? (`npm run prettier` on both front/server)

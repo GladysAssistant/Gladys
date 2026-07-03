@@ -54,7 +54,10 @@ npm run coverage   # runs ~4100 Mocha tests + generates coverage report
 
 - **Every new or changed server file must have tests.** Place tests in `server/test/` mirroring the source structure (e.g. `server/lib/foo/bar.js` → `server/test/lib/foo/bar.test.js`).
 - CI runs `npm run coverage`, not `npm test` alone. Always use `coverage` before pushing.
-- **Coverage target is 90%** (Codecov project target in `codecov.yml`), not 100%. New untested code can still fail CI if it lowers coverage or breaks existing tests.
+- **Codecov must pass** (`fail_ci_if_error: true` in CI). There are two separate checks:
+  - **Project coverage** (~90% on the whole server codebase — see `codecov.yml`). Legacy untested code is tolerated.
+  - **Patch coverage (100%)** — every line you add or modify in the PR must be executed by a test. This is the check that most often fails on agent PRs: one untested line in new code is enough to block the merge.
+- When writing server code, assume **100% patch coverage is required**. If you add a branch, error path, or helper, write a test that hits it.
 - Do not commit test databases (`gladys-test.db`, `gladys-cypress.db`).
 
 **If you modified `front/`:**
@@ -79,6 +82,7 @@ npm run cypress:run   # starts server + front, then runs E2E specs in front/cypr
 - **Prettier:** CI uses `prettier-check` (read-only). Run `npm run prettier` locally to auto-fix formatting before pushing.
 - **ESLint:** Server uses Airbnb config with JSDoc requirements on exported functions. Front lints `src/` and `cypress/`.
 - **Missing translations:** `compare-translations` checks that all `front/src/config/i18n/*.json` files share the same keys, and that `server/utils/constants.js` device features (`DEVICE_FEATURE_UNITS`, `DEVICE_FEATURE_CATEGORIES`, `DEVICE_FEATURE_TYPES`) have matching entries in `en.json`. Adding a key to one language file requires adding it to **all** language files.
+- **Codecov patch coverage:** CI uploads the coverage report to Codecov, which measures only the lines changed in your PR. Any new server line not hit by a test fails the `codecov/patch` status. Run `npm run coverage` locally and confirm your tests exercise every branch and path you added before pushing.
 - **Server tests:** Changes to `server/lib/`, `server/api/`, `server/controllers/`, or `server/services/` almost always need corresponding tests. Look at neighboring files in `server/test/` for patterns (Mocha + Chai + Sinon).
 - **Cypress:** UI changes to signup, dashboard, scenes, or integration pages can break E2E specs under `front/cypress/e2e/`.
 - **Front build:** Only runs on non-draft PRs. A webpack/build error will block merge when the PR is marked ready.
