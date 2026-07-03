@@ -2,7 +2,7 @@ const logger = require('../../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { addSelector } = require('../../../../utils/addSelector');
 const { getFeatureMapping, getIgnoredCloudCodes, normalizeCode } = require('../mappings');
-const { buildPilotWireSupportedOptions } = require('./tuya.deviceMapping');
+const { buildAcSupportedOptions, buildPilotWireSupportedOptions } = require('./tuya.deviceMapping');
 
 /**
  * @description Transforms Tuya feature as Gladys feature.
@@ -95,6 +95,14 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
     // Restrict UI mode choices to what this device really supports: the spec enum range intersected
     // with the device vocabulary (variants may lack Off/Thermostat — writing them is rejected anyway).
     feature.supported_options = buildPilotWireSupportedOptions(mappingEntry, valuesObject.range);
+  }
+  if (feature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING) {
+    // Same restriction for the AC enums (mode/fan speed/swings): models vary a lot (cold-only
+    // units, no mute/turbo...), the spec range is the per-device truth. Null for non-enum types.
+    const acSupportedOptions = buildAcSupportedOptions(feature.type, valuesObject.range);
+    if (acSupportedOptions) {
+      feature.supported_options = acSupportedOptions;
+    }
   }
 
   addSelector(feature);

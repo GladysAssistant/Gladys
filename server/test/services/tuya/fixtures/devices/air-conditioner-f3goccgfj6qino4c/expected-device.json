@@ -22,6 +22,23 @@
       "name": "horizontal",
       "read_only": false,
       "selector": "tuya-bf5638fc7cc3f25e32i45q-horizontal",
+      "supported_options": [
+        {
+          "label": "Off",
+          "sort_order": 0,
+          "value": 0
+        },
+        {
+          "label": "Same direction",
+          "sort_order": 1,
+          "value": 1
+        },
+        {
+          "label": "Opposite direction",
+          "sort_order": 2,
+          "value": 2
+        }
+      ],
       "type": "swing-horizontal"
     },
     {
@@ -33,6 +50,33 @@
       "name": "mode",
       "read_only": false,
       "selector": "tuya-bf5638fc7cc3f25e32i45q-mode",
+      "supported_options": [
+        {
+          "label": "Auto",
+          "sort_order": 0,
+          "value": 0
+        },
+        {
+          "label": "Cooling",
+          "sort_order": 1,
+          "value": 1
+        },
+        {
+          "label": "Heating",
+          "sort_order": 2,
+          "value": 2
+        },
+        {
+          "label": "Drying",
+          "sort_order": 3,
+          "value": 3
+        },
+        {
+          "label": "Fan",
+          "sort_order": 4,
+          "value": 4
+        }
+      ],
       "type": "mode"
     },
     {
@@ -57,6 +101,43 @@
       "name": "vertical",
       "read_only": false,
       "selector": "tuya-bf5638fc7cc3f25e32i45q-vertical",
+      "supported_options": [
+        {
+          "label": "Off",
+          "sort_order": 0,
+          "value": 0
+        },
+        {
+          "label": "Swing",
+          "sort_order": 1,
+          "value": 1
+        },
+        {
+          "label": "Position 1",
+          "sort_order": 2,
+          "value": 2
+        },
+        {
+          "label": "Position 2",
+          "sort_order": 3,
+          "value": 3
+        },
+        {
+          "label": "Position 3",
+          "sort_order": 4,
+          "value": 4
+        },
+        {
+          "label": "Position 4",
+          "sort_order": 5,
+          "value": 5
+        },
+        {
+          "label": "Position 5",
+          "sort_order": 6,
+          "value": 6
+        }
+      ],
       "type": "swing-vertical"
     },
     {
@@ -68,6 +149,48 @@
       "name": "windspeed",
       "read_only": false,
       "selector": "tuya-bf5638fc7cc3f25e32i45q-windspeed",
+      "supported_options": [
+        {
+          "label": "Auto",
+          "sort_order": 0,
+          "value": 0
+        },
+        {
+          "label": "Low",
+          "sort_order": 1,
+          "value": 1
+        },
+        {
+          "label": "Low-mid",
+          "sort_order": 2,
+          "value": 2
+        },
+        {
+          "label": "Mid",
+          "sort_order": 3,
+          "value": 3
+        },
+        {
+          "label": "Mid-high",
+          "sort_order": 4,
+          "value": 4
+        },
+        {
+          "label": "High",
+          "sort_order": 5,
+          "value": 5
+        },
+        {
+          "label": "Mute",
+          "sort_order": 6,
+          "value": 6
+        },
+        {
+          "label": "Turbo",
+          "sort_order": 7,
+          "value": 7
+        }
+      ],
       "type": "fan-speed"
     },
     {

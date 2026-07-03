@@ -49,6 +49,19 @@ const PILOT_WIRE_MODE_LABELS = {
   [PILOT_WIRE_MODE.THERMOSTAT]: 'Thermostat',
 };
 
+// Turn a list of tuya enum strings into sorted Gladys supported_options (aliases like cold/cool
+// dedupe through the Set; unknown strings are skipped).
+const buildSupportedOptionsFromVocabulary = (vocabulary, tuyaValues, labels) => {
+  const supportedValues = [
+    ...new Set(tuyaValues.map((tuyaValue) => vocabulary[tuyaValue]).filter((value) => value !== undefined)),
+  ].sort((a, b) => a - b);
+  return supportedValues.map((value, index) => ({
+    value,
+    label: labels[value] || String(value),
+    sort_order: index,
+  }));
+};
+
 // Build the supported_options of a pilot-wire-mode feature: the Gladys modes actually reachable on
 // this device. A curated variant vocabulary (explicit `tuyaEnum`, e.g. the eCosy) is the COMPLETE
 // truth — it exists precisely because the device specs are unreliable (the eCosy rw range omits
@@ -60,14 +73,7 @@ const buildPilotWireSupportedOptions = (mappingEntry, range) => {
   const hasCuratedEnum = Boolean(mappingEntry && mappingEntry.tuyaEnum && typeof mappingEntry.tuyaEnum === 'object');
   const tuyaEnum = getPilotWireTuyaEnum(mappingEntry);
   const tuyaValues = !hasCuratedEnum && Array.isArray(range) && range.length > 0 ? range : Object.keys(tuyaEnum);
-  const supportedValues = [
-    ...new Set(tuyaValues.map((tuyaValue) => tuyaEnum[tuyaValue]).filter((value) => value !== undefined)),
-  ].sort((a, b) => a - b);
-  return supportedValues.map((value, index) => ({
-    value,
-    label: PILOT_WIRE_MODE_LABELS[value] || String(value),
-    sort_order: index,
-  }));
+  return buildSupportedOptionsFromVocabulary(tuyaEnum, tuyaValues, PILOT_WIRE_MODE_LABELS);
 };
 
 const TUYA_AC_MODE_TO_GLADYS = {
@@ -146,6 +152,66 @@ const GLADYS_AC_SWING_VERTICAL_TO_TUYA = {
   [AC_SWING_VERTICAL.POSITION_3]: '3',
   [AC_SWING_VERTICAL.POSITION_4]: '4',
   [AC_SWING_VERTICAL.POSITION_5]: '5',
+};
+
+// English fallback labels + vocabulary per AC enum feature type. AC models vary a lot (a cold-only
+// unit has no heat, many lack mute/turbo): the spec enum range is the per-device truth here — there
+// is no curated per-variant vocabulary like the pilot wire, the maps above cover every known alias.
+const AC_SUPPORTED_OPTION_SOURCES = {
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: {
+    vocabulary: TUYA_AC_MODE_TO_GLADYS,
+    labels: {
+      [AC_MODE.AUTO]: 'Auto',
+      [AC_MODE.COOLING]: 'Cooling',
+      [AC_MODE.HEATING]: 'Heating',
+      [AC_MODE.DRYING]: 'Drying',
+      [AC_MODE.FAN]: 'Fan',
+    },
+  },
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.FAN_SPEED]: {
+    vocabulary: TUYA_AC_FAN_SPEED_TO_GLADYS,
+    labels: {
+      [AC_FAN_SPEED.AUTO]: 'Auto',
+      [AC_FAN_SPEED.LOW]: 'Low',
+      [AC_FAN_SPEED.LOW_MID]: 'Low-mid',
+      [AC_FAN_SPEED.MID]: 'Mid',
+      [AC_FAN_SPEED.MID_HIGH]: 'Mid-high',
+      [AC_FAN_SPEED.HIGH]: 'High',
+      [AC_FAN_SPEED.MUTE]: 'Mute',
+      [AC_FAN_SPEED.TURBO]: 'Turbo',
+    },
+  },
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_HORIZONTAL]: {
+    vocabulary: TUYA_AC_SWING_HORIZONTAL_TO_GLADYS,
+    labels: {
+      [AC_SWING_HORIZONTAL.OFF]: 'Off',
+      [AC_SWING_HORIZONTAL.SAME]: 'Same direction',
+      [AC_SWING_HORIZONTAL.OPPOSITE]: 'Opposite direction',
+    },
+  },
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_VERTICAL]: {
+    vocabulary: TUYA_AC_SWING_VERTICAL_TO_GLADYS,
+    labels: {
+      [AC_SWING_VERTICAL.OFF]: 'Off',
+      [AC_SWING_VERTICAL.SWING]: 'Swing',
+      [AC_SWING_VERTICAL.POSITION_1]: 'Position 1',
+      [AC_SWING_VERTICAL.POSITION_2]: 'Position 2',
+      [AC_SWING_VERTICAL.POSITION_3]: 'Position 3',
+      [AC_SWING_VERTICAL.POSITION_4]: 'Position 4',
+      [AC_SWING_VERTICAL.POSITION_5]: 'Position 5',
+    },
+  },
+};
+
+// Build the supported_options of an AC enum feature from the spec range (full vocabulary without
+// one); returns null for non-enum AC feature types (binary, target temperature...).
+const buildAcSupportedOptions = (featureType, range) => {
+  const source = AC_SUPPORTED_OPTION_SOURCES[featureType];
+  if (!source) {
+    return null;
+  }
+  const tuyaValues = Array.isArray(range) && range.length > 0 ? range : Object.keys(source.vocabulary);
+  return buildSupportedOptionsFromVocabulary(source.vocabulary, tuyaValues, source.labels);
 };
 
 const getScale = (deviceFeature, defaultScale = 0) => {
@@ -391,4 +457,4 @@ const readValues = {
   },
 };
 
-module.exports = { readValues, writeValues, buildPilotWireSupportedOptions };
+module.exports = { readValues, writeValues, buildPilotWireSupportedOptions, buildAcSupportedOptions };
