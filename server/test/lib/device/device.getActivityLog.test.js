@@ -49,7 +49,7 @@ describe('Device.getActivityLog', function Describe() {
     });
 
     const entry = entries.find((item) => item.device_feature_selector === 'test-device-feature');
-    expect(entry).to.exist;
+    expect(entry).to.not.equal(undefined);
     expect(entry).to.include({
       value: 1,
       device_name: 'Test device',
@@ -59,7 +59,7 @@ describe('Device.getActivityLog', function Describe() {
       device_feature_type: 'binary',
     });
     expect(entry.service_name).to.be.a('string');
-    expect(entry.created_at).to.exist;
+    expect(entry.created_at).to.not.equal(undefined);
   });
 
   it('should return CO2 sensor values with unit in mode all', async () => {
@@ -88,7 +88,7 @@ describe('Device.getActivityLog', function Describe() {
     });
 
     const co2Entry = entries.find((item) => item.device_feature_selector === 'test-co2-sensor');
-    expect(co2Entry).to.exist;
+    expect(co2Entry).to.not.equal(undefined);
     expect(co2Entry).to.include({
       value: 850,
       device_feature_category: 'co2-sensor',
@@ -124,7 +124,7 @@ describe('Device.getActivityLog', function Describe() {
     });
 
     expect(entries.find((item) => item.device_feature_selector === 'test-co2-sensor')).to.equal(undefined);
-    expect(entries.find((item) => item.device_feature_selector === 'test-device-feature')).to.exist;
+    expect(entries.find((item) => item.device_feature_selector === 'test-device-feature')).to.not.equal(undefined);
   });
 
   it('should filter by categories', async () => {
@@ -137,7 +137,7 @@ describe('Device.getActivityLog', function Describe() {
       to: '2026-07-03T23:59:59.999Z',
     });
 
-    expect(entries.find((item) => item.device_feature_selector === 'test-temperature-sensor')).to.exist;
+    expect(entries.find((item) => item.device_feature_selector === 'test-temperature-sensor')).to.not.equal(undefined);
     expect(entries.find((item) => item.device_feature_selector === 'test-device-feature')).to.equal(undefined);
   });
 
@@ -244,7 +244,7 @@ describe('Device.getActivityLog', function Describe() {
     });
 
     const entry = entries.find((item) => item.device_feature_selector === 'orphan-sensor');
-    expect(entry).to.exist;
+    expect(entry).to.not.equal(undefined);
     expect(entry.room_name).to.equal(null);
     expect(entry.room_selector).to.equal(null);
     expect(entry.device_feature_unit).to.equal('celsius');
@@ -299,7 +299,7 @@ describe('Device.getActivityLog', function Describe() {
       to: '2026-06-01T23:59:59.999Z',
     });
 
-    expect(entries.find((item) => item.device_feature_selector === 'test-device-feature')).to.exist;
+    expect(entries.find((item) => item.device_feature_selector === 'test-device-feature')).to.not.equal(undefined);
   });
 
   it('should use default options when called without parameters', async () => {
@@ -307,7 +307,7 @@ describe('Device.getActivityLog', function Describe() {
 
     const entries = await global.TEST_GLADYS_INSTANCE.device.getActivityLog();
 
-    expect(entries.find((item) => item.device_feature_selector === 'test-device-feature')).to.exist;
+    expect(entries.find((item) => item.device_feature_selector === 'test-device-feature')).to.not.equal(undefined);
   });
 
   it('should use default 24h window when from is not provided', async () => {
@@ -318,6 +318,6 @@ describe('Device.getActivityLog', function Describe() {
       take: 5,
     });
 
-    expect(entries.find((item) => item.device_feature_selector === 'test-device-feature')).to.exist;
+    expect(entries.find((item) => item.device_feature_selector === 'test-device-feature')).to.not.equal(undefined);
   });
 });
