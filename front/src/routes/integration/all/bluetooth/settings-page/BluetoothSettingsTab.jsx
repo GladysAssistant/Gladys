@@ -91,11 +91,10 @@ class BluetoothSettingsTab extends Component {
                 />
               )}
 
-              <div class="d-flex justify-content-between mt-5">
-                <button class="btn btn-success" onClick={this.saveConfig} disabled={!updated}>
+              <div class="d-flex flex-column flex-sm-row justify-content-sm-between mt-5">
+                <button class="btn btn-success mb-2 mb-sm-0" onClick={this.saveConfig} disabled={!updated}>
                   <Text id="integration.bluetooth.setup.saveLabel" />
                 </button>
-
                 <button
                   class="btn btn-outline-primary"
                   onClick={this.scanPresence}

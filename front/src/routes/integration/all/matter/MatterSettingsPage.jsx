@@ -420,8 +420,11 @@ class MatterSettingsPage extends Component {
                         <Text id="integration.matter.settings.nodesTitle" />
                       </h4>
                       {nodes && nodes.length > 0 && (
-                        <button onClick={this.downloadNodesJson} class="btn btn-secondary btn-sm">
-                          <i class="fe fe-download me-2" /> <Text id="integration.matter.settings.downloadNodesJson" />
+                        <button onClick={this.downloadNodesJson} class="btn btn-secondary btn-sm flex-shrink-0 ml-2">
+                          <i class="fe fe-download" />
+                          <span class="d-none d-sm-inline-block ml-2">
+                            <Text id="integration.matter.settings.downloadNodesJson" />
+                          </span>
                         </button>
                       )}
                     </div>
@@ -440,27 +443,25 @@ class MatterSettingsPage extends Component {
                                 {decommissioningNodes[node.node_id] && <div class="loader" />}
                                 <div class="dimmer-content">
                                   <div class="card-header">
-                                    <div class="d-flex justify-content-between align-items-center w-100">
-                                      <div>
+                                    <div class="d-flex justify-content-between align-items-start w-100">
+                                      <div style="min-width: 0;">
                                         <h5 class="mb-0">
                                           {node.node_information.vendor_name} - {node.node_information.product_name}
                                         </h5>
-                                        <small class="text-muted">
+                                        <small class="text-muted" style="overflow-wrap: break-word;">
                                           Node ID: {node.node_id} | Vendor ID: {node.node_information.vendor_id} |
                                           Product ID: {node.node_information.product_id}
                                         </small>
                                       </div>
-                                      <div class="ms-auto">
-                                        <button
-                                          onClick={() => this.decommissionNode(node.node_id)}
-                                          class={cx('btn btn-danger btn-sm', {
-                                            loading: decommissioningNodes[node.node_id]
-                                          })}
-                                          disabled={decommissioningNodes[node.node_id]}
-                                        >
-                                          <Text id="integration.matter.settings.decommissionButton" />
-                                        </button>
-                                      </div>
+                                      <button
+                                        onClick={() => this.decommissionNode(node.node_id)}
+                                        class={cx('btn btn-danger btn-sm flex-shrink-0 ml-2', {
+                                          loading: decommissioningNodes[node.node_id]
+                                        })}
+                                        disabled={decommissioningNodes[node.node_id]}
+                                      >
+                                        <Text id="integration.matter.settings.decommissionButton" />
+                                      </button>
                                     </div>
                                   </div>
                                   <div class="card-body">

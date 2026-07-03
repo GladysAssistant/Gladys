@@ -133,17 +133,38 @@ const UsagePointDevice = ({
               </div>
             </div>
           )}
-          <button class="btn btn-success" onClick={save}>
-            <Text id="integration.enedis.usagePoints.saveButton" />
-          </button>
-          <button class="btn btn-danger ml-2" onClick={destroy}>
-            <Text id="integration.enedis.usagePoints.deleteButton" />
-          </button>
-          {deviceShouldBeUpdated && (
-            <button class="btn btn-primary ml-2" onClick={reCreate}>
-              <Text id="integration.enedis.usagePoints.recreateButton" />
+          <div class="d-sm-none">
+            <div class="row mb-2">
+              <div class="col-6 pr-1">
+                <button class="btn btn-success btn-block" onClick={save}>
+                  <Text id="integration.enedis.usagePoints.saveButton" />
+                </button>
+              </div>
+              <div class="col-6 pl-1">
+                <button class="btn btn-danger btn-block" onClick={destroy}>
+                  <Text id="integration.enedis.usagePoints.deleteButton" />
+                </button>
+              </div>
+            </div>
+            {deviceShouldBeUpdated && (
+              <button class="btn btn-primary btn-block" onClick={reCreate}>
+                <Text id="integration.enedis.usagePoints.recreateButton" />
+              </button>
+            )}
+          </div>
+          <div class="d-none d-sm-block">
+            <button class="btn btn-success" onClick={save}>
+              <Text id="integration.enedis.usagePoints.saveButton" />
             </button>
-          )}
+            <button class="btn btn-danger ml-2" onClick={destroy}>
+              <Text id="integration.enedis.usagePoints.deleteButton" />
+            </button>
+            {deviceShouldBeUpdated && (
+              <button class="btn btn-primary ml-2" onClick={reCreate}>
+                <Text id="integration.enedis.usagePoints.recreateButton" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
