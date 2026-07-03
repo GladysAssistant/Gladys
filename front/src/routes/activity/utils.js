@@ -80,10 +80,7 @@ const getStateLiveFinishedLabel = (dictionary, category, type, value) => {
 const getActivityTitle = (entry, dictionary) => {
   const { device_name: deviceName, device_feature_category: category, device_feature_type: type, value } = entry;
 
-  const titleTemplate = get(
-    dictionary,
-    `activityLog.eventTitle.${category}.${type}.${String(value)}`
-  );
+  const titleTemplate = get(dictionary, `activityLog.eventTitle.${category}.${type}.${String(value)}`);
   if (titleTemplate) {
     return titleTemplate.replace('{{deviceName}}', deviceName);
   }
@@ -118,7 +115,7 @@ const getActivitySource = (entry, dictionary) => {
   return categoryLabel || entry.device_feature_category;
 };
 
-const getEntryStyle = (entry) => {
+const getEntryStyle = entry => {
   const { device_feature_category: category, value } = entry;
   const baseStyle = CATEGORY_STYLES[category] || DEFAULT_STYLE;
   const valueIcon = get(VALUE_ICON_OVERRIDES, `${category}.${value}`);
@@ -172,7 +169,9 @@ const groupEntriesByDay = (entries, language, dictionary) => {
   let currentKey = null;
 
   entries.forEach(entry => {
-    const key = dayjs(entry.created_at).locale(language).format('YYYY-MM-DD');
+    const key = dayjs(entry.created_at)
+      .locale(language)
+      .format('YYYY-MM-DD');
 
     if (key !== currentKey) {
       currentKey = key;

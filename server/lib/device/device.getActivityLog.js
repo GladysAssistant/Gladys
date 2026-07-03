@@ -133,7 +133,7 @@ async function getActivityLog(options = {}) {
 
   return states.map((state) => {
     const feature = featureMap[state.device_feature_id];
-    const device = feature.device;
+    const { device } = feature;
 
     return {
       created_at: state.created_at,

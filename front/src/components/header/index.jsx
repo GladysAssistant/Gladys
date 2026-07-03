@@ -181,7 +181,7 @@ class Header extends Component {
                         active: props.currentUrl === '/dashboard/activity'
                       })}
                     >
-                      <i class="fe fe-activity" /> <Text id="header.activity" />
+                      <i class="fe fe-clock" /> <Text id="header.activity" />
                     </Link>
                   </li>
                   {props.user.role === USER_ROLE.ADMIN && (

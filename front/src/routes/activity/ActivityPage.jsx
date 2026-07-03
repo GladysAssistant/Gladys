@@ -69,43 +69,43 @@ const ActivityPage = ({
                       ))}
                     </div>
                   ) : (
-                  <div class={style.feed}>
-                    {entries.length === 0 && !loading && (
-                      <div class={style.empty}>
-                        <div class={style.emptyIcon}>
-                          <i class="fe fe-activity" />
+                    <div class={style.feed}>
+                      {entries.length === 0 && !loading && (
+                        <div class={style.empty}>
+                          <div class={style.emptyIcon}>
+                            <i class="fe fe-activity" />
+                          </div>
+                          <h3 class={style.emptyTitle}>
+                            <Text id="activityLog.emptyTitle" />
+                          </h3>
+                          <p class={style.emptyText}>
+                            <Text id="activityLog.emptyDescription" />
+                          </p>
                         </div>
-                        <h3 class={style.emptyTitle}>
-                          <Text id="activityLog.emptyTitle" />
-                        </h3>
-                        <p class={style.emptyText}>
-                          <Text id="activityLog.emptyDescription" />
-                        </p>
-                      </div>
-                    )}
+                      )}
 
-                    {dayGroups.map(group => (
-                      <section key={group.key} class={style.daySection}>
-                        {dayGroups.length > 1 && <div class={style.dayHeader}>{group.label}</div>}
-                        {group.entries.map((entry, index) => (
-                          <ActivityLogEntry
-                            key={`${entry.device_feature_selector}-${entry.created_at}-${index}`}
-                            entry={entry}
-                            dictionary={dictionary}
-                            language={language}
-                          />
-                        ))}
-                      </section>
-                    ))}
+                      {dayGroups.map(group => (
+                        <section key={group.key} class={style.daySection}>
+                          {dayGroups.length > 1 && <div class={style.dayHeader}>{group.label}</div>}
+                          {group.entries.map((entry, index) => (
+                            <ActivityLogEntry
+                              key={`${entry.device_feature_selector}-${entry.created_at}-${index}`}
+                              entry={entry}
+                              dictionary={dictionary}
+                              language={language}
+                            />
+                          ))}
+                        </section>
+                      ))}
 
-                    {!isLastPage && entries.length > 0 && (
-                      <div class={style.loadMore}>
-                        <button type="button" class={style.loadMoreBtn} onClick={onLoadMore} disabled={loadingMore}>
-                          {loadingMore ? <Text id="activityLog.loadingMore" /> : <Text id="activityLog.loadMore" />}
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                      {!isLastPage && entries.length > 0 && (
+                        <div class={style.loadMore}>
+                          <button type="button" class={style.loadMoreBtn} onClick={onLoadMore} disabled={loadingMore}>
+                            {loadingMore ? <Text id="activityLog.loadingMore" /> : <Text id="activityLog.loadMore" />}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

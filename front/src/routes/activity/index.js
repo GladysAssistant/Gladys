@@ -96,7 +96,10 @@ class ActivityLog extends Component {
     });
 
     try {
-      const entries = await this.props.httpClient.get('/api/v1/device_feature/activity_log', this.buildQueryParams(skip));
+      const entries = await this.props.httpClient.get(
+        '/api/v1/device_feature/activity_log',
+        this.buildQueryParams(skip)
+      );
       entries.forEach(entry => {
         entry.created_at = convertGladysDateToISO8601(entry.created_at);
       });
