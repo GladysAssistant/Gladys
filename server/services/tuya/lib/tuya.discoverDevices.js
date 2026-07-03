@@ -7,6 +7,36 @@ const { STATUS } = require('./utils/tuya.constants');
 const { convertDevice } = require('./device/tuya.convertDevice');
 const { applyExistingLocalParams, normalizeExistingDevice } = require('./utils/tuya.deviceParams');
 
+// mergeDevices flags `updatable` on feature/param set differences only: a matched feature whose
+// supported_options changed (new mode restrictions after a mapping upgrade) would stay "already
+// created" forever and the options would never reach the database. Compare them explicitly.
+const haveSupportedOptionsChanged = (newDevice, existingDevice) => {
+  if (!existingDevice) {
+    return false;
+  }
+  const existingByExternalId = {};
+  (Array.isArray(existingDevice.features) ? existingDevice.features : []).forEach((feature) => {
+    existingByExternalId[feature.external_id] = feature;
+  });
+  return (Array.isArray(newDevice.features) ? newDevice.features : []).some((feature) => {
+    if (!Array.isArray(feature.supported_options)) {
+      return false;
+    }
+    const existingFeature = existingByExternalId[feature.external_id];
+    if (!existingFeature) {
+      // A brand new feature already flags the device as updatable.
+      return false;
+    }
+    const existingValues = (Array.isArray(existingFeature.supported_options) ? existingFeature.supported_options : [])
+      .map((option) => option.value)
+      .sort((a, b) => a - b);
+    const newValues = feature.supported_options.map((option) => option.value).sort((a, b) => a - b);
+    return (
+      existingValues.length !== newValues.length || newValues.some((value, index) => value !== existingValues[index])
+    );
+  });
+};
+
 /**
  * @description Discover Tuya cloud devices.
  * @returns {Promise<Array>} List of discovered devices.
@@ -63,7 +93,11 @@ async function discoverDevices() {
     .map((device) => {
       const existing = normalizeExistingDevice(this.gladys.stateManager.get('deviceByExternalId', device.external_id));
       const deviceWithLocalParams = applyExistingLocalParams(device, existing);
-      return mergeDevices(deviceWithLocalParams, existing);
+      const merged = mergeDevices(deviceWithLocalParams, existing);
+      if (!merged.updatable && haveSupportedOptionsChanged(deviceWithLocalParams, existing)) {
+        merged.updatable = true;
+      }
+      return merged;
     });
 
   try {
