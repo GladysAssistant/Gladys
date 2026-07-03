@@ -455,7 +455,8 @@
       "scene": {
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
-        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
+        "editSceneLabel": "Sélectionnez les scènes à afficher (glissez pour réordonner) :",
+        "addSceneLabel": "Ajouter une scène :"
       },
       "link": {
         "editTitleLabel": "Titre",

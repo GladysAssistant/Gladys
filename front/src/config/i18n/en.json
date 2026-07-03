@@ -485,7 +485,8 @@
       "scene": {
         "editNameLabel": "Widget Name (optional)",
         "editNamePlaceholder": "Name displayed on the dashboard",
-        "editSceneLabel": "Select the scene you want to display here."
+        "editSceneLabel": "Select the scenes you want to display (drag to reorder):",
+        "addSceneLabel": "Add a scene:"
       },
       "link": {
         "editTitleLabel": "Title",

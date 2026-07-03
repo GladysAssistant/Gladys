@@ -468,7 +468,8 @@
       "scene": {
         "editNameLabel": "Widget-Name (optional)",
         "editNamePlaceholder": "Name auf dem Dashboard angezeigt",
-        "editSceneLabel": "Wähle die Szene aus, die hier angezeigt werden soll."
+        "editSceneLabel": "Wähle die anzuzeigenden Szenen aus (ziehen zum Sortieren):",
+        "addSceneLabel": "Szene hinzufügen:"
       },
       "link": {
         "editTitleLabel": "Titel",
