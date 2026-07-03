@@ -3,6 +3,7 @@ import cx from 'classnames';
 import iro from '@jaames/iro';
 
 import { intToHex, hexToInt } from '../../../../server/utils/colors';
+import ColorPalette from './ColorPalette';
 
 class ColorDeviceType extends Component {
   colorPickerRef = createRef();
@@ -12,6 +13,13 @@ class ColorDeviceType extends Component {
       const colorInt = hexToInt(color.hexString);
       this.props.updateValue(colorInt);
     }
+  };
+
+  selectPaletteColor = colorInt => {
+    if (this.colorPicker) {
+      this.colorPicker.color.hexString = `#${intToHex(colorInt)}`;
+    }
+    this.props.updateValue(colorInt);
   };
 
   componentDidMount() {
@@ -41,7 +49,7 @@ class ColorDeviceType extends Component {
     }
   }
 
-  render({}, {}) {
+  render({ value }) {
     return (
       <div
         class={cx('fade', 'w-100', 'mw-100', {
@@ -49,7 +57,8 @@ class ColorDeviceType extends Component {
         })}
       >
         <div class="row justify-content-end">
-          <div class="col-12 py-3 d-flex justify-content-center">
+          <div class="col-12 py-3 d-flex flex-column align-items-center">
+            <ColorPalette value={value} onSelectColor={this.selectPaletteColor} />
             <div ref={this.colorPickerRef} />
           </div>
         </div>
