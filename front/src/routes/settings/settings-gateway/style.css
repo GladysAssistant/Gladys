@@ -53,6 +53,11 @@
   box-shadow: 0 6px 18px rgba(70, 127, 207, 0.12);
 }
 
+.planBadgeContainer {
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
 .planBadge {
   position: absolute;
   top: -12px;
