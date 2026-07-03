@@ -142,6 +142,7 @@ async function getActivityLog(options = {}) {
       device_feature_name: feature.name,
       device_feature_category: feature.category,
       device_feature_type: feature.type,
+      device_feature_unit: feature.unit,
       device_selector: device.selector,
       device_name: device.name,
       room_name: device.room ? device.room.name : null,

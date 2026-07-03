@@ -24,7 +24,7 @@ class ActivityLog extends Component {
       isLastPage: false,
       period: '24h',
       roomSelector: '',
-      mode: 'events',
+      mode: 'all',
       featureMap: {}
     };
   }
@@ -130,6 +130,7 @@ class ActivityLog extends Component {
       device_feature_name: feature.name,
       device_feature_category: feature.category,
       device_feature_type: feature.type,
+      device_feature_unit: feature.unit,
       device_selector: feature.device_selector,
       device_name: feature.device_name,
       room_name: feature.room_name,

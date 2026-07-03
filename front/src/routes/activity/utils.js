@@ -22,9 +22,20 @@ const CATEGORY_STYLES = {
   'smoke-sensor': { icon: 'alert-triangle', color: '#ef4444' },
   'leak-sensor': { icon: 'droplet', color: '#ef4444' },
   'co-sensor': { icon: 'alert-circle', color: '#ef4444' },
+  'co2-sensor': { icon: 'cloud', color: '#22c55e' },
+  'temperature-sensor': { icon: 'thermometer', color: '#f97316' },
+  'humidity-sensor': { icon: 'droplet', color: '#06b6d4' },
+  'light-sensor': { icon: 'sun', color: '#fbbf24' },
+  'pressure-sensor': { icon: 'bar-chart', color: '#6366f1' },
+  'energy-sensor': { icon: 'zap', color: '#eab308' },
+  'pm25-sensor': { icon: 'wind', color: '#a855f7' },
+  'pm10-sensor': { icon: 'wind', color: '#a855f7' },
+  'airquality-sensor': { icon: 'cloud', color: '#22c55e' },
+  'voc-sensor': { icon: 'cloud', color: '#84cc16' },
   siren: { icon: 'bell', color: '#ef4444' },
   tamper: { icon: 'shield-off', color: '#ef4444' },
   'battery-low': { icon: 'battery', color: '#f59e0b' },
+  battery: { icon: 'battery', color: '#22c55e' },
   'rain-sensor': { icon: 'cloud-rain', color: '#60a5fa' },
   'vibration-sensor': { icon: 'smartphone', color: '#a78bfa' },
   fan: { icon: 'wind', color: '#06b6d4' },
@@ -45,6 +56,26 @@ const VALUE_ICON_OVERRIDES = {
 };
 
 const DEFAULT_STYLE = { icon: 'cpu', color: '#94a3b8' };
+
+const INTEGER_VALUE_TYPES = new Set(['integer', 'click', 'push']);
+
+const formatNumericValue = (value, unit, dictionary) => {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) {
+    return null;
+  }
+
+  const numericValue = Number(value);
+  const formattedValue = Number.isInteger(numericValue)
+    ? String(numericValue)
+    : parseFloat(numericValue.toFixed(1)).toString();
+
+  if (!unit) {
+    return formattedValue;
+  }
+
+  const unitLabel = get(dictionary, `deviceFeatureUnitShort.${unit}`);
+  return unitLabel ? `${formattedValue} ${unitLabel}` : `${formattedValue} ${unit}`;
+};
 
 const getValueLabelKey = (category, type, value) => {
   const customText = get({}, `deviceFeatureValue.category.${category}.${type}`);
@@ -77,8 +108,26 @@ const getStateLiveFinishedLabel = (dictionary, category, type, value) => {
   return null;
 };
 
+const shouldFormatAsNumericValue = (category, type) => {
+  if (type === 'binary' || type === 'state') {
+    return false;
+  }
+
+  if (INTEGER_VALUE_TYPES.has(type) && category !== 'button') {
+    return true;
+  }
+
+  return type === 'decimal' || type === 'brightness' || type === 'position' || type === 'angle' || type === 'volume';
+};
+
 const getActivityTitle = (entry, dictionary) => {
-  const { device_name: deviceName, device_feature_category: category, device_feature_type: type, value } = entry;
+  const {
+    device_name: deviceName,
+    device_feature_category: category,
+    device_feature_type: type,
+    device_feature_unit: unit,
+    value
+  } = entry;
 
   const titleTemplate = get(dictionary, `activityLog.eventTitle.${category}.${type}.${String(value)}`);
   if (titleTemplate) {
@@ -105,6 +154,18 @@ const getActivityTitle = (entry, dictionary) => {
         return `${deviceName} — ${label}`;
       }
     }
+  }
+
+  if (shouldFormatAsNumericValue(category, type)) {
+    const formattedValue = formatNumericValue(value, unit, dictionary);
+    if (formattedValue) {
+      return `${deviceName} — ${formattedValue}`;
+    }
+  }
+
+  const formattedValue = formatNumericValue(value, unit, dictionary);
+  if (formattedValue && unit) {
+    return `${deviceName} — ${formattedValue}`;
   }
 
   return `${deviceName}`;
@@ -213,6 +274,8 @@ export {
   getActivityTitle,
   getActivitySource,
   getEntryStyle,
+  formatNumericValue,
+  shouldFormatAsNumericValue,
   convertGladysDateToISO8601,
   formatEntryTime,
   formatDayHeader,

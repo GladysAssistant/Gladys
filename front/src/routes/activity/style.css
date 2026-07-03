@@ -1,29 +1,20 @@
 /* ── Layout ─────────────────────────────────────────────── */
 
-.page {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 0 0 3rem;
+.pageHeader {
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.header {
-  margin-bottom: 1.75rem;
-}
-
-.title {
-  font-size: 1.625rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
-  margin: 0 0 0.4rem;
-  color: #111827;
+.pageOptions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-left: auto;
 }
 
 .subtitle {
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: #6b7280;
-  margin: 0;
 }
 
 /* ── Toolbar ────────────────────────────────────────────── */
@@ -33,7 +24,7 @@
   align-items: center;
   gap: 0.625rem;
   flex-wrap: wrap;
-  margin-bottom: 1.5rem;
+  justify-content: flex-end;
 }
 
 .segment {
@@ -127,6 +118,7 @@
   border: 1px solid #e5e7eb;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.03);
   overflow: hidden;
+  min-height: 240px;
 }
 
 .daySection {
@@ -284,10 +276,6 @@
 }
 
 /* ── Dark mode ──────────────────────────────────────────── */
-
-.dark-mode .title {
-  color: #f3f4f6;
-}
 
 .dark-mode .subtitle {
   color: #9ca3af;
@@ -447,11 +435,13 @@
 /* ── Responsive ───────────────────────────────────────────── */
 
 @media (max-width: 576px) {
-  .page {
-    padding-bottom: 2rem;
+  .pageOptions {
+    width: 100%;
+    margin-left: 0;
   }
 
   .toolbar {
+    justify-content: flex-start;
     gap: 0.5rem;
   }
 
