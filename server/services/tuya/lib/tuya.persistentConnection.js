@@ -33,7 +33,19 @@ const extractPushedDps = (payload) => {
   return payload;
 };
 
-const formatSocketError = (err) => (err && err.message ? err.message : 'persistent socket error');
+// Tuya lib parser errors ("Prefix does not match: <hex>") embed the whole raw TCP buffer in the
+// message (kBs per log line): the beginning is enough to identify the error.
+const SOCKET_ERROR_MESSAGE_MAX_LENGTH = 160;
+
+const formatSocketError = (err) => {
+  if (!err || !err.message) {
+    return 'persistent socket error';
+  }
+  const message = String(err.message);
+  return message.length > SOCKET_ERROR_MESSAGE_MAX_LENGTH
+    ? `${message.slice(0, SOCKET_ERROR_MESSAGE_MAX_LENGTH)}... (truncated)`
+    : message;
+};
 
 const getRetryDelay = (retryCount) => RETRY_DELAYS_MS[Math.min(retryCount, RETRY_DELAYS_MS.length - 1)];
 

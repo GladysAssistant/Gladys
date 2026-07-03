@@ -430,6 +430,27 @@ describe('Tuya persistent connection', () => {
     expect(() => self.stopPersistentConnections()).to.not.throw();
   });
 
+  it('truncates oversized socket error messages in logs (lib parser dumps the raw buffer)', () => {
+    const loggerStub = { info: sandbox.stub(), debug: sandbox.stub(), warn: sandbox.stub(), error: sandbox.stub() };
+    const pcWithLogger = proxyquire('../../../../services/tuya/lib/tuya.persistentConnection', {
+      tuyapi: FakeTuyapi,
+      '@demirdeniz/tuyapi-newgen': FakeTuyapiNewGen,
+      '../../../utils/logger': loggerStub,
+    });
+    const self = buildSelf();
+    Object.assign(self, pcWithLogger);
+    self.startPersistentConnectionForDevice(buildDevice());
+
+    lastTuyapi().emit('error', new Error(`Prefix does not match: ${'a'.repeat(2000)}`));
+
+    const logged = loggerStub.info
+      .getCalls()
+      .map((call) => call.args[0])
+      .find((message) => typeof message === 'string' && message.includes('socket error'));
+    expect(logged).to.include('(truncated)');
+    expect(logged.length).to.be.below(250);
+  });
+
   describe('device lifecycle hooks (postCreate / postUpdate / postDelete)', () => {
     it('postCreate opens the persistent connection of a new local device', () => {
       const self = buildSelf();
