@@ -3,7 +3,8 @@
 To ensure your Pull Request can be accepted as fast as possible, make sure to review and check all of these items:
 
 - [ ] If your changes affect the code, did you write the tests?
-- [ ] Are tests passing? (`npm test` on both front/server)
+- [ ] Are server tests passing with coverage? (`cd server && npm run coverage`)
+- [ ] Did Cypress E2E tests pass? (`npm run cypress:run` from repo root, if UI changed)
 - [ ] Is the linter passing? (`npm run eslint` on both front/server)
 - [ ] Did you run prettier? (`npm run prettier` on both front/server)
 - [ ] If you are adding a new feature/service, did you run the integration comparator? (`npm run compare-translations` on front)
