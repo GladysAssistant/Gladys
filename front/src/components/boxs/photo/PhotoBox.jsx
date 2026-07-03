@@ -11,6 +11,11 @@ const PHOTO_FIT_CONTAIN = 'contain';
 
 const getValidPhotos = photos => (Array.isArray(photos) ? photos.filter(photo => photo && photo.url) : []);
 
+const getPhotoUrlAtIndex = (photos, index) => {
+  const photo = photos[index];
+  return photo ? photo.url : undefined;
+};
+
 const getBoundedIndex = (index, photosLength) => {
   if (photosLength === 0) {
     return 0;
@@ -65,8 +70,8 @@ class PhotoBox extends Component {
       this.preloadNextImage();
     }
 
-    const prevUrl = prevPhotos[prevState.currentIndex]?.url;
-    const currentUrl = photos[this.state.currentIndex]?.url;
+    const prevUrl = getPhotoUrlAtIndex(prevPhotos, prevState.currentIndex);
+    const currentUrl = getPhotoUrlAtIndex(photos, this.state.currentIndex);
     if (prevUrl !== currentUrl) {
       this.loadCurrentPhoto();
     }
@@ -78,7 +83,7 @@ class PhotoBox extends Component {
 
   getCurrentPhotoUrl = () => {
     const photos = getValidPhotos(get(this.props, 'box.photos', []));
-    return photos[this.state.currentIndex]?.url;
+    return getPhotoUrlAtIndex(photos, this.state.currentIndex);
   };
 
   fetchPhoto = async url => {
@@ -128,7 +133,7 @@ class PhotoBox extends Component {
       return;
     }
     const nextIndex = (this.state.currentIndex + 1) % photos.length;
-    const nextUrl = photos[nextIndex]?.url;
+    const nextUrl = getPhotoUrlAtIndex(photos, nextIndex);
     if (nextUrl && !this.imageCache[nextUrl]) {
       this.fetchPhoto(nextUrl).catch(() => {});
     }

@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const nock = require('nock');
 const { authenticatedRequest } = require('../request.test');
 const { DASHBOARD_VISIBILITY } = require('../../../utils/constants');
 
@@ -128,6 +129,27 @@ describe('DELETE /api/v1/dashboard/:dashboard_selector', () => {
         expect(res.body).to.deep.equal({
           success: true,
         });
+      });
+  });
+});
+
+describe('GET /api/v1/dashboard/photo/proxy', () => {
+  afterEach(() => {
+    nock.cleanAll();
+  });
+
+  it('should proxy an external photo', async () => {
+    const imageBuffer = Buffer.from('fake-image');
+    nock('http://192.168.1.10')
+      .get('/photos/vacation.jpg')
+      .reply(200, imageBuffer, { 'Content-Type': 'image/jpeg' });
+
+    await authenticatedRequest
+      .get('/api/v1/dashboard/photo/proxy')
+      .query({ url: 'http://192.168.1.10/photos/vacation.jpg' })
+      .expect(200)
+      .then((res) => {
+        expect(res.text).to.equal(`image/jpeg;base64,${imageBuffer.toString('base64')}`);
       });
   });
 });
