@@ -9,7 +9,7 @@
     "start:production": "npm run -s serve",
     "start:development": "npm run -s dev",
     "build": "vite build",
-    "postbuild": "cp ./old-sw.js ./build/sw.js && node ./cli/inject-index-tail.js",
+    "postbuild": "cp ./old-sw.js ./build/sw.js && cp ./old-sw.js ./build/sw-esm.js && node ./cli/inject-index-tail.js",
     "serve": "sirv build --port 8080 --cors --single",
     "dev": "vite",
     "start-gateway": "cross-env GATEWAY_MODE=true vite --port 1445",
