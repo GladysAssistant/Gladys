@@ -93,16 +93,6 @@ LIMIT ?
  * @example
  * device.getDeviceFeaturesAggregates('test-devivce');
  */
-function getIntervalDates(intervalInMinutes, offsetInMinutes = 0) {
-  const endDate = new Date(Date.now() - offsetInMinutes * 60 * 1000);
-  endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset());
-
-  const startDate = new Date(Date.now() - (offsetInMinutes + intervalInMinutes) * 60 * 1000);
-  startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset());
-
-  return { startDate, endDate };
-}
-
 async function getDeviceFeaturesAggregates(
   selector,
   intervalInMinutes,
@@ -122,7 +112,11 @@ async function getDeviceFeaturesAggregates(
     throw new BadParameters('Invalid offset parameter. Must be a positive number.');
   }
 
-  const { startDate, endDate } = getIntervalDates(intervalInMinutes, offsetInMinutes);
+  const endDate = new Date(Date.now() - offsetInMinutes * 60 * 1000);
+  endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset());
+
+  const startDate = new Date(Date.now() - (offsetInMinutes + intervalInMinutes) * 60 * 1000);
+  startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset());
 
   let values;
 
@@ -167,5 +161,4 @@ async function getDeviceFeaturesAggregates(
 
 module.exports = {
   getDeviceFeaturesAggregates,
-  getIntervalDates,
 };
