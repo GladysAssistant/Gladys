@@ -245,6 +245,69 @@ describe('Tuya persistent connection', () => {
     expect(sent).to.equal(false);
   });
 
+  it('should refresh freshness when a silent-but-alive socket answers the probe', async () => {
+    const self = buildSelf();
+    self.startPersistentConnectionForDevice(buildDevice());
+    const instance = lastTuyapi();
+    instance.emit('connected');
+    const entry = self.persistentConnections.testid;
+    entry.lastDataAt = Date.now() - 120000;
+    instance.get = sandbox.stub().resolves({ dps: { 1: true } });
+
+    expect(self.isPersistentConnectionHealthy('testid')).to.equal(false);
+    expect(await self.probePersistentConnection('testid')).to.equal(true);
+
+    sinon.assert.calledWith(instance.get, { schema: true });
+    expect(self.isPersistentConnectionHealthy('testid')).to.equal(true);
+  });
+
+  it('should fail the probe without an entry, before connect, on a read error or without get', async () => {
+    const self = buildSelf();
+    expect(await self.probePersistentConnection('unknown')).to.equal(false);
+
+    self.startPersistentConnectionForDevice(buildDevice());
+    const instance = lastTuyapi();
+    instance.get = sandbox.stub().rejects(new Error('read failed'));
+    // Still `connecting`: the probe must not race the initial connect.
+    expect(await self.probePersistentConnection('testid')).to.equal(false);
+
+    instance.emit('connected');
+    expect(await self.probePersistentConnection('testid')).to.equal(false);
+    expect(instance.get.calledOnce).to.equal(true);
+
+    instance.get = undefined;
+    expect(await self.probePersistentConnection('testid')).to.equal(false);
+  });
+
+  it('should fail the probe when the device never answers within the timeout', async () => {
+    const clock = sandbox.useFakeTimers();
+    const self = buildSelf();
+    self.startPersistentConnectionForDevice(buildDevice());
+    const instance = lastTuyapi();
+    instance.emit('connected');
+    instance.get = sandbox.stub().returns(new Promise(() => {}));
+
+    const probePromise = self.probePersistentConnection('testid');
+    await clock.tickAsync(5001);
+
+    expect(await probePromise).to.equal(false);
+    clock.restore();
+  });
+
+  it('should log a recycle teardown as expected and a device drop as unexpected', () => {
+    const self = buildSelf();
+    self.startPersistentConnectionForDevice(buildDevice());
+    const instance = lastTuyapi();
+    instance.emit('connected');
+    const entry = self.persistentConnections.testid;
+
+    self.recyclePersistentConnection('testid');
+    expect(entry.expectedDisconnect).to.equal(true);
+    instance.emit('disconnected');
+    // The flag is consumed by the closed-by-Gladys log branch: a later disconnect is a device drop.
+    expect(entry.expectedDisconnect).to.equal(false);
+  });
+
   it('should emit from a bare dps payload and ignore a null payload', () => {
     const self = buildSelf();
     const device = buildDevice();
@@ -643,6 +706,43 @@ describe('TuyaHandler.poll persistent coexistence gate', () => {
     const self = buildPollSelf();
     self.isPersistentConnectionHealthy = gateSandbox.stub().returns(false);
     self.isPersistentConnectionConnected = gateSandbox.stub().returns(true);
+    self.recyclePersistentConnection = gateSandbox.stub();
+
+    await poll.call(self, buildDevice());
+
+    expect(localPoll.called).to.equal(false);
+    expect(self.connector.request.called).to.equal(true);
+    expect(self.recyclePersistentConnection.calledWith('testid')).to.equal(true);
+  });
+
+  it('should keep the silent socket and skip cloud when it answers the probe', async () => {
+    const localPoll = gateSandbox.stub().resolves({ dps: {} });
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+    });
+    const self = buildPollSelf();
+    self.isPersistentConnectionHealthy = gateSandbox.stub().returns(false);
+    self.isPersistentConnectionConnected = gateSandbox.stub().returns(true);
+    self.probePersistentConnection = gateSandbox.stub().resolves(true);
+    self.recyclePersistentConnection = gateSandbox.stub();
+
+    await poll.call(self, buildDevice());
+
+    expect(self.probePersistentConnection.calledWith('testid')).to.equal(true);
+    expect(localPoll.called).to.equal(false);
+    expect(self.connector.request.called).to.equal(false);
+    expect(self.recyclePersistentConnection.called).to.equal(false);
+  });
+
+  it('should recycle and refresh via cloud when the silent socket fails the probe', async () => {
+    const localPoll = gateSandbox.stub().resolves({ dps: {} });
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+    });
+    const self = buildPollSelf();
+    self.isPersistentConnectionHealthy = gateSandbox.stub().returns(false);
+    self.isPersistentConnectionConnected = gateSandbox.stub().returns(true);
+    self.probePersistentConnection = gateSandbox.stub().resolves(false);
     self.recyclePersistentConnection = gateSandbox.stub();
 
     await poll.call(self, buildDevice());

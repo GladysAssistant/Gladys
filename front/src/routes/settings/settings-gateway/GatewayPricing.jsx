@@ -134,12 +134,14 @@ const GatewayPricing = ({ children, ...props }) => {
             </div>
           </div>
         </div>
-        <div class="col-md-6 col-lg-5 mb-4">
+        <div class="col-md-6 col-lg-5 mb-4 pt-3">
           <div class={`card h-100 ${style.planCard} ${style.planCardHighlight}`}>
-            <div class={style.planBadge}>
-              <Text id="gatewayPricing.plusPlan.popularBadge" />
-            </div>
-            <div class="card-body">
+            <div class="card-body pt-4">
+              <div class={style.planBadgeContainer}>
+                <span class={style.planBadge}>
+                  <Text id="gatewayPricing.plusPlan.popularBadge" />
+                </span>
+              </div>
               <h3 class="mb-1">
                 <Text id="gatewayPricing.plusPlan.name" />
               </h3>

@@ -20,6 +20,10 @@ const RETRY_DELAYS_MS = [3000, 10000, 30000];
 // A "connected" socket that stops delivering data for longer than this is treated as unhealthy so the
 // scheduled poll resumes as a safety net. The poll cadence is thus the freshness watchdog.
 const PERSISTENT_MAX_SILENCE_MS = 90 * 1000;
+// Some firmwares ignore the heartbeat refresh (CMD 18 on 3.3) and only report on change: their socket
+// goes "silent" while being perfectly alive. Before sacrificing it, probe it with an active local read
+// and give the device this long to answer.
+const PERSISTENT_PROBE_TIMEOUT_MS = 5 * 1000;
 
 const isNewGenProtocol = (protocolVersion) => protocolVersion === '3.4' || protocolVersion === '3.5';
 
@@ -174,7 +178,14 @@ function openPersistentConnection(self, entry) {
     if (!isActive()) {
       return;
     }
-    logger.debug(`[Tuya][persistent] disconnected device=${topic}`);
+    // Distinguish a teardown we initiated (silent-socket recycle) from a genuine device-side drop —
+    // both surface as the same tuyapi event and the mislabel sends log readers after a ghost culprit.
+    if (entry.expectedDisconnect) {
+      entry.expectedDisconnect = false;
+      logger.debug(`[Tuya][persistent] socket closed by Gladys (recycle) device=${topic}`);
+    } else {
+      logger.debug(`[Tuya][persistent] connection dropped by the device device=${topic}`);
+    }
     scheduleReconnect(self, entry);
   });
 
@@ -448,6 +459,42 @@ async function sendCommandViaPersistentConnection(topic, dps, value) {
 }
 
 /**
+ * @description Probe a connected-but-silent persistent socket with an active local read to tell
+ * "alive but nothing to say" from "dead". The response flows through the regular data listener
+ * (states emitted + lastDataAt refreshed), so a successful probe fully replaces a cloud refresh;
+ * no answer within the timeout means the socket is really stale and should be recycled.
+ * @param {string} topic - The Tuya device id.
+ * @returns {Promise<boolean>} True when the device answered over the persistent socket.
+ * @example
+ * const alive = await this.probePersistentConnection('device-id');
+ */
+async function probePersistentConnection(topic) {
+  const entry = this.persistentConnections && this.persistentConnections[topic];
+  if (!entry || entry.status !== 'connected' || !entry.api || typeof entry.api.get !== 'function') {
+    return false;
+  }
+  let timer;
+  try {
+    const timeout = new Promise((resolve, reject) => {
+      timer = setTimeout(() => reject(new Error('persistent probe timeout')), PERSISTENT_PROBE_TIMEOUT_MS);
+      if (timer && typeof timer.unref === 'function') {
+        timer.unref();
+      }
+    });
+    await Promise.race([entry.api.get({ schema: true }), timeout]);
+    // The get response also arrives as a data event, but stamp freshness here too so the health
+    // check never depends on the event listener having run first.
+    entry.lastDataAt = Date.now();
+    return true;
+  } catch (e) {
+    logger.debug(`[Tuya][persistent] probe failed device=${topic}: ${formatSocketError(e)}`);
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
  * @description Recycle a persistent connection whose socket is open but no longer delivering data:
  * tear it down and schedule a reconnect. This frees the single local session so the scheduled poll
  * can fall back to a local read on the next cycles (priority: persistent -> local poll -> cloud), and
@@ -461,6 +508,7 @@ function recyclePersistentConnection(topic) {
   if (!entry) {
     return;
   }
+  entry.expectedDisconnect = true;
   teardownApi(entry.api);
   entry.status = 'reconnecting';
   scheduleReconnect(this, entry);
@@ -505,6 +553,7 @@ module.exports = {
   isPersistentConnectionHealthy,
   isPersistentConnectionConnected,
   sendCommandViaPersistentConnection,
+  probePersistentConnection,
   recyclePersistentConnection,
   stopPersistentConnectionForDevice,
   stopPersistentConnections,
