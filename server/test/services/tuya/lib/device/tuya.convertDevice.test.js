@@ -131,6 +131,40 @@ describe('tuya.convertDevice', () => {
     expect(params[DEVICE_PARAM_NAME.CLOUD_STRATEGY]).to.equal('shadow');
   });
 
+  it('should union enum ranges across sources so supported_options miss no reachable mode', () => {
+    // Real cold_heat AC (kt): the cloud specification truncates the mode range to auto/cold/wet
+    // while the thing model lists the full vocabulary — heat and fan must not disappear.
+    const tuyaDevice = {
+      id: 'device-id',
+      name: 'Air Conditioner',
+      model: 'Air Conditioner',
+      local_override: true,
+      specifications: {
+        category: 'kt',
+        functions: [{ code: 'mode', name: 'Mode', type: 'Enum', values: '{"range":["auto","cold","wet"]}' }],
+        status: [{ code: 'mode', name: 'Mode', type: 'Enum', values: '{"range":["auto","cold","wet"]}' }],
+      },
+      thing_model: {
+        services: [
+          {
+            properties: [
+              {
+                code: 'mode',
+                accessMode: 'rw',
+                typeSpec: { type: 'enum', range: ['auto', 'cold', 'wet', 'heat', 'fan'] },
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    const device = convertDevice.call({ serviceId: 'service-id' }, tuyaDevice);
+    const mode = device.features.find((feature) => feature.external_id === 'tuya:device-id:mode');
+
+    expect(mode.supported_options.map((option) => option.value)).to.deep.equal([0, 1, 2, 3, 4]);
+  });
+
   it('should keep specification group when thing model exposes the same code', () => {
     const tuyaDevice = {
       id: 'device-id',

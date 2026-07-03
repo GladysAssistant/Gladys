@@ -2,6 +2,7 @@ import get from 'get-value';
 import { Text } from 'preact-i18n';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { getSupportedOptionValues } from '../../../../utils/supportedOptions';
 import { AC_SWING_HORIZONTAL, AC_SWING_VERTICAL, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 const SWING_HORIZONTAL_OPTIONS = [
@@ -25,8 +26,13 @@ const AirConditioningSwingDeviceFeature = props => {
   const { category, type } = deviceFeature;
   const rawValue = deviceFeature.last_value;
   const lastValue = rawValue != null && !Number.isNaN(Number(rawValue)) ? Number(rawValue) : rawValue;
-  const options =
-    type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_HORIZONTAL ? SWING_HORIZONTAL_OPTIONS : SWING_VERTICAL_OPTIONS;
+  // Only offer the swing positions this AC supports (its supported_options); a feature without
+  // restrictions keeps the full list.
+  const supportedValues = getSupportedOptionValues(deviceFeature);
+  const options = (type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_HORIZONTAL
+    ? SWING_HORIZONTAL_OPTIONS
+    : SWING_VERTICAL_OPTIONS
+  ).filter(option => supportedValues === null || supportedValues.includes(option.value));
 
   const updateValue = e => {
     props.updateValueWithDebounce(deviceFeature, Number(e.currentTarget.value));

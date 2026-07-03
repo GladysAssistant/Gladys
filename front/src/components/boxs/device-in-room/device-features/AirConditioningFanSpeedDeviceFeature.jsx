@@ -2,6 +2,7 @@ import get from 'get-value';
 import { Text } from 'preact-i18n';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { getSupportedOptionValues } from '../../../../utils/supportedOptions';
 import { AC_FAN_SPEED } from '../../../../../../server/utils/constants';
 
 const FAN_SPEED_OPTIONS = [
@@ -21,6 +22,13 @@ const AirConditioningFanSpeedDeviceFeature = props => {
   const rawValue = deviceFeature.last_value;
   const lastValue = rawValue != null && !Number.isNaN(Number(rawValue)) ? Number(rawValue) : rawValue;
 
+  // Only offer the speeds this AC supports (its supported_options); a feature without restrictions
+  // keeps the full list.
+  const supportedValues = getSupportedOptionValues(deviceFeature);
+  const fanSpeedOptions = FAN_SPEED_OPTIONS.filter(
+    option => supportedValues === null || supportedValues.includes(option.value)
+  );
+
   const updateValue = e => {
     props.updateValueWithDebounce(deviceFeature, Number(e.currentTarget.value));
   };
@@ -36,7 +44,7 @@ const AirConditioningFanSpeedDeviceFeature = props => {
         <div class="justify-content-end">
           <div class="form-group mb-0">
             <select value={lastValue} onChange={updateValue} class="form-control form-control-sm">
-              {FAN_SPEED_OPTIONS.map(option => (
+              {fanSpeedOptions.map(option => (
                 <option value={option.value} key={option.value}>
                   <Text id={`deviceFeatureAction.category.${category}.${type}.${option.i18nKey}`} />
                 </option>

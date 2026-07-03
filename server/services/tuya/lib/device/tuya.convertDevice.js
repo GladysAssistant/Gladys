@@ -37,10 +37,17 @@ const mergeFeatureValues = (currentValues, nextValues) => {
 
   if (currentParsed && nextParsed) {
     // Keep existing keys first, enrich missing metadata from the new source.
-    return {
+    const merged = {
       ...nextParsed,
       ...currentParsed,
     };
+    // Enum ranges can be TRUNCATED per source (a kt AC whose specifications range omits heat/fan
+    // that its thing model does list): a mode reachable through ANY source is reachable, so union
+    // the ranges instead of letting the first source win (supported_options depend on it).
+    if (Array.isArray(currentParsed.range) && Array.isArray(nextParsed.range)) {
+      merged.range = [...new Set([...currentParsed.range, ...nextParsed.range])];
+    }
+    return merged;
   }
   if (currentParsed) {
     return currentParsed;

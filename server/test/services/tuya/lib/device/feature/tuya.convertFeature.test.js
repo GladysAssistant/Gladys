@@ -248,6 +248,35 @@ describe('Tuya convert feature', () => {
     expect(unknownValues.supported_options).to.deep.equal([{ value: 5, label: 'Comfort', sort_order: 0 }]);
   });
 
+  it('should restrict AC enum supported_options to the spec range, dedupe aliases and skip non-enums', () => {
+    // A cold-only unit: heat is absent, cold+cool alias to the same Gladys value.
+    const mode = convertFeature(
+      { code: 'mode', type: 'Enum', name: 'mode', readOnly: false, values: '{"range":["cold","cool","wet"]}' },
+      'externalId',
+      { deviceType: DEVICE_TYPES.AIR_CONDITIONER },
+    );
+    expect(mode.supported_options).to.deep.equal([
+      { value: 1, label: 'Cooling', sort_order: 0 },
+      { value: 3, label: 'Drying', sort_order: 1 },
+    ]);
+
+    // No usable range: the full vocabulary is assumed.
+    const vertical = convertFeature(
+      { code: 'vertical', type: 'Enum', name: 'vertical', readOnly: false, values: '{}' },
+      'externalId',
+      { deviceType: DEVICE_TYPES.AIR_CONDITIONER },
+    );
+    expect(vertical.supported_options.map((option) => option.value)).to.deep.equal([0, 1, 2, 3, 4, 5, 6]);
+
+    // Non-enum AC feature types carry no supported_options.
+    const power = convertFeature(
+      { code: 'power', type: 'Boolean', name: 'power', readOnly: false, values: '{}' },
+      'externalId',
+      { deviceType: DEVICE_TYPES.AIR_CONDITIONER },
+    );
+    expect(power).to.not.have.property('supported_options');
+  });
+
   it('should apply the variant read_only override and curated name', () => {
     const result = convertFeature(
       {
