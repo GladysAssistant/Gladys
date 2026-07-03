@@ -226,6 +226,11 @@ class MqttDeviceSetupPage extends Component {
 
   updateFeatureProperty(e, property, featureIndex) {
     let value = e.target.value;
+
+    if (property === 'read_only' || property === 'keep_history') {
+      value = Boolean(e.target.checked);
+    }
+
     let device;
     if (property === 'external_id' && !value.startsWith('mqtt:')) {
       if (value.length < 5) {

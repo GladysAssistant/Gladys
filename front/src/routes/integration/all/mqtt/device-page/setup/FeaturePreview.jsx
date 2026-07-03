@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import DeviceRow from '../../../../../../components/boxs/device-in-room/DeviceRow';
 import style from '../style.css';
 import {
@@ -31,7 +32,7 @@ const FeaturePreview = ({ category, type, label, intl, user }) => {
   };
 
   return (
-    <div class={style.featurePreview}>
+    <div class={cx(style.featurePreview, 'dark-mode-no-invert')}>
       <div class="table-responsive">
         <table class="table card-table table-vcenter table-sm mb-0">
           <tbody>

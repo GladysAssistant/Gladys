@@ -8,6 +8,27 @@
   text-align: center;
 }
 
+.backLink {
+  align-items: center;
+  color: #6c757d;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  gap: 0.35rem;
+  margin-right: 1rem;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: #467fcf;
+  text-decoration: none;
+}
+
+.cardTitleWithBack {
+  flex: 1;
+  min-width: 0;
+}
+
 /* Device list grouped by room */
 .roomGroup {
   margin-bottom: 1.5rem;
@@ -19,7 +40,7 @@
 
 .roomGroupHeader {
   align-items: center;
-  background: #f8f9fa;
+  background: rgba(0, 0, 0, 0.03);
   border-radius: 4px;
   display: flex;
   gap: 0.5rem;
@@ -49,7 +70,7 @@
 
 .deviceListItem {
   align-items: center;
-  border: 1px solid #e9ecef;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   display: flex;
   flex-wrap: wrap;
@@ -59,7 +80,7 @@
 }
 
 .deviceListItem:hover {
-  background-color: #f8f9fa;
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .deviceListItemLoading {
@@ -123,7 +144,7 @@
 
 /* Device edit page */
 .deviceEditSection {
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   margin-bottom: 1.5rem;
   padding-bottom: 1.5rem;
 }
@@ -153,7 +174,7 @@
 }
 
 .featureAccordion {
-  border: 1px solid #e9ecef;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -164,8 +185,9 @@
 
 .featureAccordionHeader {
   align-items: center;
-  background: #fff;
+  background: transparent;
   border: none;
+  color: inherit;
   cursor: pointer;
   display: flex;
   gap: 0.5rem;
@@ -176,7 +198,7 @@
 }
 
 .featureAccordionHeader:hover {
-  background-color: #f8f9fa;
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .featureAccordionIcon {
@@ -214,14 +236,14 @@
 }
 
 .featureAccordionBody {
-  background: #fafbfc;
-  border-top: 1px solid #e9ecef;
+  background: rgba(0, 0, 0, 0.02);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
   padding: 1rem;
 }
 
 .featureAdvancedSection {
-  background: #fff;
-  border: 1px solid #e9ecef;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   margin-bottom: 1rem;
   padding: 1rem;
@@ -229,15 +251,15 @@
 
 /* Feature catalog */
 .featureCatalog {
-  border: 1px solid #e9ecef;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   margin-top: 0.5rem;
   overflow: hidden;
 }
 
 .featureCatalogHeader {
-  background: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   padding: 1rem;
 }
 
@@ -259,6 +281,7 @@
   align-items: center;
   background: none;
   border: none;
+  color: inherit;
   cursor: pointer;
   display: flex;
   font-weight: 600;
@@ -279,9 +302,10 @@
 }
 
 .featureCatalogCard {
-  background: #fff;
-  border: 1px solid #e9ecef;
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
+  color: inherit;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -320,7 +344,7 @@
 }
 
 .featureCatalogCardPreview {
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
   padding-top: 0.5rem;
 }
 
@@ -334,7 +358,7 @@
 }
 
 .featurePreview {
-  background: #f8f9fa;
+  background: rgba(0, 0, 0, 0.03);
   border-radius: 4px;
   overflow: hidden;
   pointer-events: none;
@@ -349,6 +373,46 @@
 .featurePreview button,
 .featurePreview select {
   pointer-events: none;
+}
+
+/* Dark mode: avoid inverted pure-black panels from hardcoded white backgrounds */
+:global(.dark-mode) .roomGroupHeader,
+:global(.dark-mode) .featureCatalogHeader,
+:global(.dark-mode) .featureAccordionBody,
+:global(.dark-mode) .featureAdvancedSection,
+:global(.dark-mode) .featurePreview {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+:global(.dark-mode) .deviceListItem:hover,
+:global(.dark-mode) .featureAccordionHeader:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+:global(.dark-mode) .deviceListItem,
+:global(.dark-mode) .featureAccordion,
+:global(.dark-mode) .featureCatalog,
+:global(.dark-mode) .featureCatalogCard,
+:global(.dark-mode) .deviceEditSection,
+:global(.dark-mode) .featureCatalogCardPreview,
+:global(.dark-mode) .featureAccordionBody,
+:global(.dark-mode) .featureAdvancedSection {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:global(.dark-mode) .backLink {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+:global(.dark-mode) .backLink:hover {
+  color: #9ec5fe;
+}
+
+:global(.dark-mode) .featureCatalogCardDescription,
+:global(.dark-mode) .featureAccordionType,
+:global(.dark-mode) .roomGroupHouse,
+:global(.dark-mode) .emptyState {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 @media (max-width: 576px) {
@@ -372,5 +436,9 @@
 
   .featureCatalogGrid {
     grid-template-columns: 1fr;
+  }
+
+  .backLink {
+    margin-right: 0.5rem;
   }
 }

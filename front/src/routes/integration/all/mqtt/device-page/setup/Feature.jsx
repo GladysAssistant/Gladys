@@ -123,12 +123,12 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
                 <div class="form-label">
                   <Text id="integration.mqtt.feature.readOnlyLabel" />
                 </div>
-                <label class="custom-switch">
+                <label class="custom-switch" onClick={e => e.stopPropagation()}>
                   <input
                     type="checkbox"
                     name={`read_only_${featureIndex}`}
-                    checked={feature.read_only}
-                    onClick={props.updateReadOnly}
+                    checked={Boolean(feature.read_only)}
+                    onChange={props.updateReadOnly}
                     class="custom-switch-input"
                   />
                   <span class="custom-switch-indicator" />
@@ -145,12 +145,12 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
                   <div class="form-label">
                     <Text id="editDeviceForm.keepHistoryLabel" />
                   </div>
-                  <label class="custom-switch">
+                  <label class="custom-switch" onClick={e => e.stopPropagation()}>
                     <input
                       id={`keep_history_${featureIndex}`}
                       type="checkbox"
-                      checked={feature.keep_history}
-                      onClick={props.updateKeepHistory}
+                      checked={Boolean(feature.keep_history)}
+                      onChange={props.updateKeepHistory}
                       class="custom-switch-input"
                     />
                     <span class="custom-switch-indicator" />
@@ -345,20 +345,12 @@ class MqttFeatureBoxComponent extends Component {
   updateUnit = e => {
     this.props.updateFeatureProperty(e, 'unit', this.props.featureIndex);
   };
-  updateReadOnly = () => {
-    const e = {
-      target: {
-        value: !this.props.feature.read_only
-      }
-    };
+  updateReadOnly = e => {
+    e.stopPropagation();
     this.props.updateFeatureProperty(e, 'read_only', this.props.featureIndex);
   };
-  updateKeepHistory = () => {
-    const e = {
-      target: {
-        value: !this.props.feature.keep_history
-      }
-    };
+  updateKeepHistory = e => {
+    e.stopPropagation();
     this.props.updateFeatureProperty(e, 'keep_history', this.props.featureIndex);
   };
   getCustomMqttTopicParamPrefix = () => {

@@ -11,13 +11,12 @@ import style from '../style.css';
 
 const FeatureTab = ({ children, ...props }) => (
   <div class="card">
-    <div class="card-header">
-      <Link href="/dashboard/integration/device/mqtt">
-        <button class="btn btn-secondary mr-2">
-          <Text id="global.backButton" />
-        </button>
+    <div class="card-header d-flex align-items-center">
+      <Link href="/dashboard/integration/device/mqtt" class={style.backLink}>
+        <i class="fe fe-arrow-left" />
+        <Text id="global.backButton" />
       </Link>
-      <h3 class="card-title">
+      <h3 class={cx('card-title mb-0', style.cardTitleWithBack)}>
         {(props.device && props.device.name) || <Text id="integration.mqtt.device.noNameLabel" />}
       </h3>
       <div class="page-options">
