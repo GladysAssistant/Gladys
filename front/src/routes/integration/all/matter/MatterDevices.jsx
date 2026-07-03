@@ -405,7 +405,7 @@ class MatterDevices extends Component {
                   searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
                 />
               </Localizer>
-              <button onClick={this.init} class="btn btn-sm btn-outline-primary ml-2">
+              <button onClick={this.init} class="btn btn-sm btn-outline-primary ml-2 flex-shrink-0">
                 <i class="fe fe-refresh-cw" />
               </button>
             </div>

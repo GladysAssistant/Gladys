@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
+const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 
 /**
  * @description Update a device feature (by selector).
@@ -57,24 +58,7 @@ async function updateFeature(selector, updates) {
   // Reload the full device from DB with all features (same pattern as device.init)
   const fullDevice = await db.Device.findOne({
     where: { id: plain.device_id },
-    include: [
-      {
-        model: db.DeviceFeature,
-        as: 'features',
-      },
-      {
-        model: db.DeviceParam,
-        as: 'params',
-      },
-      {
-        model: db.Room,
-        as: 'room',
-      },
-      {
-        model: db.Service,
-        as: 'service',
-      },
-    ],
+    include: getStandardDeviceIncludes(),
   });
 
   if (fullDevice) {

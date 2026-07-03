@@ -1,4 +1,5 @@
 const db = require('../../models');
+const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 
 /**
  * @description Create/Update a deviceParam.
@@ -20,24 +21,7 @@ async function destroyParam(device, name) {
   // Reload the full device from DB with all features (same pattern as device.init)
   const fullDevice = await db.Device.findOne({
     where: { id: device.id },
-    include: [
-      {
-        model: db.DeviceFeature,
-        as: 'features',
-      },
-      {
-        model: db.DeviceParam,
-        as: 'params',
-      },
-      {
-        model: db.Room,
-        as: 'room',
-      },
-      {
-        model: db.Service,
-        as: 'service',
-      },
-    ],
+    include: getStandardDeviceIncludes(),
   });
 
   if (fullDevice) {

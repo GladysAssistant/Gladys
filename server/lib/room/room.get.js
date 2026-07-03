@@ -1,4 +1,5 @@
 const db = require('../../models');
+const { getFeaturesInclude } = require('../../utils/deviceQueryIncludes');
 
 const DEFAULT_OPTIONS = {
   expand: [],
@@ -40,11 +41,9 @@ async function get(options) {
       as: 'devices',
       attributes: DEVICE_ATTRIBUTES,
       include: [
-        {
-          model: db.DeviceFeature,
-          as: 'features',
+        getFeaturesInclude({
           attributes: DEVICE_FEATURES_ATTRIBUTES,
-        },
+        }),
         {
           model: db.Service,
           as: 'service',
