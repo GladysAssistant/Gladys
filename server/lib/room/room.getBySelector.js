@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const db = require('../../models');
 const { DEVICE_FEATURE_CATEGORIES } = require('../../utils/constants');
+const { getFeaturesInclude } = require('../../utils/deviceQueryIncludes');
 
 const { NotFoundError } = require('../../utils/coreErrors');
 
@@ -41,16 +42,14 @@ async function getBySelector(selector, options) {
       as: 'devices',
       attributes: DEVICE_ATTRIBUTES,
       include: [
-        {
-          model: db.DeviceFeature,
-          as: 'features',
+        getFeaturesInclude({
           attributes: DEVICE_FEATURES_ATTRIBUTES,
           where: {
             category: {
               [Op.not]: DEVICE_FEATURE_CATEGORIES.CAMERA,
             },
           },
-        },
+        }),
         {
           model: db.Service,
           as: 'service',
