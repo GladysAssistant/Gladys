@@ -35,7 +35,7 @@ const positionTooltipBelowCursor = (event, chartContext) => {
 const getTooltipBelowCursorEvents = existingEvents => ({
   ...existingEvents,
   mouseMove(event, chartContext, config) {
-    if (existingEvents?.mouseMove) {
+    if (existingEvents && existingEvents.mouseMove) {
       existingEvents.mouseMove(event, chartContext, config);
     }
     positionTooltipBelowCursor(event, chartContext);
