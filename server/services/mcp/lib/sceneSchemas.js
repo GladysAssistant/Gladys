@@ -423,8 +423,14 @@ function createSceneCreateInputSchema(
     }),
     triggerSchemaByType(EVENTS.TIME.SUN_POSITION, {
       house: houseSelectorSchema,
-      altitude: z.number().min(-90).max(90),
-      azimuth: z.number().min(0).max(359.999),
+      altitude: z
+        .number()
+        .min(-90)
+        .max(90),
+      azimuth: z
+        .number()
+        .min(0)
+        .max(359.999),
     }),
     triggerSchemaByType(EVENTS.USER_PRESENCE.BACK_HOME, {
       user: userSelectorSchema,

@@ -67,7 +67,9 @@ function matchesSunPosition(
  * @returns {Date[]} Matching times during the day (at most one per crossing window).
  */
 function findSunPositionTimes(sunCalc, latitude, longitude, timezoneName, targetAltitude, targetAzimuth) {
-  const today = dayjs().tz(timezoneName).startOf('day');
+  const today = dayjs()
+    .tz(timezoneName)
+    .startOf('day');
   const matches = [];
   let inMatchWindow = false;
 

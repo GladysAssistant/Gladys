@@ -73,7 +73,7 @@ class SunPositionTrigger extends Component {
                 min="-90"
                 max="90"
                 step="0.1"
-                value={this.props.trigger.altitude ?? ''}
+                value={this.props.trigger.altitude != null ? this.props.trigger.altitude : ''}
                 onInput={this.onAltitudeChange}
                 placeholder="31"
               />
@@ -90,7 +90,7 @@ class SunPositionTrigger extends Component {
                 min="0"
                 max="359.9"
                 step="0.1"
-                value={this.props.trigger.azimuth ?? ''}
+                value={this.props.trigger.azimuth != null ? this.props.trigger.azimuth : ''}
                 onInput={this.onAzimuthChange}
                 placeholder="160"
               />

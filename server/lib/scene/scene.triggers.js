@@ -8,9 +8,7 @@ const matchSunEvent = (self, sceneSelector, event, trigger) =>
   event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0);
 
 const matchSunPositionEvent = (self, sceneSelector, event, trigger) =>
-  event.house.selector === trigger.house &&
-  event.altitude === trigger.altitude &&
-  event.azimuth === trigger.azimuth;
+  event.house.selector === trigger.house && event.altitude === trigger.altitude && event.azimuth === trigger.azimuth;
 
 const triggersFunc = {
   [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {
