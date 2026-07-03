@@ -288,7 +288,8 @@
       "gauge": "Messanzeige",
       "energy-consumption": "Energieverbrauch",
       "voice-assistant": "Sprachassistent",
-      "link": "Link"
+      "link": "Link",
+      "photo": "Foto"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -487,6 +488,23 @@
           "cpu": "Verbundenes Gerät",
           "home": "Zuhause"
         }
+      },
+      "photo": {
+        "description": "Zeige ein oder mehrere Fotos auf deinem Dashboard an. Fotos werden von einer externen URL geladen (NAS, Cloud usw.), um Gladys schlank zu halten.",
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "z. B. Sommerurlaub 2025",
+        "photosLabel": "Fotos",
+        "editUrlPlaceholder": "https://mein-nas.local/fotos/urlaub.jpg",
+        "editCaptionPlaceholder": "Beschriftung (optional)",
+        "addPhotoButton": "Foto hinzufügen",
+        "fitLabel": "Bildanzeige",
+        "fitCover": "Füllen (zuschneiden)",
+        "fitContain": "Enthalten (ganzes Bild)",
+        "slideshowIntervalLabel": "Diashow (Sekunden)",
+        "slideshowIntervalHelp": "0 zum Deaktivieren der Diashow. Empfohlen: 10-30 Sekunden.",
+        "showCaptionLabel": "Beschriftungen anzeigen",
+        "emptyPhotos": "Keine Fotos konfiguriert.",
+        "imageError": "Dieses Bild konnte nicht geladen werden."
       },
       "alarm": {
         "armButton": "Einschalten",

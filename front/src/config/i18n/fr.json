@@ -288,7 +288,8 @@
       "gauge": "Jauge",
       "energy-consumption": "Consommation Énergétique",
       "voice-assistant": "Assistant vocal",
-      "link": "Lien"
+      "link": "Lien",
+      "photo": "Photo"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -474,6 +475,23 @@
           "cpu": "Appareil connecté",
           "home": "Maison"
         }
+      },
+      "photo": {
+        "description": "Affichez une ou plusieurs photos sur votre tableau de bord. Les photos sont chargées depuis une URL externe (NAS, cloud, etc.) pour ne pas alourdir Gladys.",
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Ex : Vacances 2025",
+        "photosLabel": "Photos",
+        "editUrlPlaceholder": "https://mon-nas.local/photos/vacances.jpg",
+        "editCaptionPlaceholder": "Légende (optionnelle)",
+        "addPhotoButton": "Ajouter une photo",
+        "fitLabel": "Affichage de l'image",
+        "fitCover": "Remplir (recadrer)",
+        "fitContain": "Contenir (image entière)",
+        "slideshowIntervalLabel": "Diaporama (secondes)",
+        "slideshowIntervalHelp": "0 pour désactiver le diaporama. Recommandé : 10-30 secondes.",
+        "showCaptionLabel": "Afficher les légendes",
+        "emptyPhotos": "Aucune photo configurée.",
+        "imageError": "Impossible de charger cette image."
       },
       "alarm": {
         "armButton": "Armer",
