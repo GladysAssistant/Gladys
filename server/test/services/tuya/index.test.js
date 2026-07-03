@@ -69,6 +69,13 @@ describe('TuyaService', () => {
     assert.calledOnce(clearIntervalStub);
   });
 
+  it('should still disconnect the cloud when the persistent teardown throws on stop', async () => {
+    await tuyaService.start();
+    tuyaService.device.stopPersistentConnections = sinon.stub().throws(new Error('teardown boom'));
+    await tuyaService.stop();
+    assert.calledOnce(tuyaService.device.disconnect);
+  });
+
   it('isUsed: should return false, service not used', async () => {
     const used = await tuyaService.isUsed();
     expect(used).to.equal(false);

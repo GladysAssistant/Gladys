@@ -1213,7 +1213,7 @@
         "localPollRequired": "Local mode is enabled and local settings changed. Run \"Poll local DPS\" successfully before saving. If local mode doesn't work, switch back to cloud mode.",
         "localPollSuccess": "Local poll OK.",
         "localPollError": "Local poll failed:",
-        "localStatusDegraded": "Local mode unstable: cloud fallback active until {{time}}. Click \"Read local DPs\" to retry.",
+        "localStatusDegraded": "Local mode unstable: cloud fallback active until {{time}}. Click \"Poll local DPS\" to retry.",
         "productIdLabel": "Product ID",
         "productKeyLabel": "Product Key",
         "createGithubIssue": "Suggest this device",

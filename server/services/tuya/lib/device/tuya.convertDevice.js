@@ -184,7 +184,6 @@ function convertDevice(tuyaDevice) {
       groups[code] = {
         ...existingGroup,
         code,
-        name: existingGroup.name || property.name,
         values: mergeFeatureValues(existingGroup.values, property.typeSpec || {}),
         readOnly:
           existingGroup.readOnly !== undefined && existingGroup.readOnly !== null

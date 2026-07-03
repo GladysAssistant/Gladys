@@ -232,6 +232,56 @@ const transformFeatureValue = (device, deviceFeature, code, rawValue, deviceTemp
   return { transformedValue };
 };
 
+/**
+ * @description Apply a local DPS map to a device's features and emit their new states. Shared by the
+ * scheduled local poll and the persistent-connection push handler so both go through the exact same
+ * DPS -> feature -> state transformation (single source of truth), including the temperature divider
+ * and °C/°F conversion applied by transformFeatureValue. The temperature unit is derived from the dps
+ * (then the device properties) when the caller does not pass one, so pushed updates stay correct too.
+ * @param {object} gladys - The Gladys instance (stateManager + event emit).
+ * @param {object} device - The Gladys device (with features).
+ * @param {object} dps - The DPS map (full or partial).
+ * @param {string} [deviceTemperatureUnit] - Device temperature unit; derived from dps/device when omitted.
+ * @returns {object} { handledCodes: Set<string>, changed: number } of features that were emitted.
+ * @example
+ * const { handledCodes } = emitLocalDpsStates(gladys, device, { '1': true });
+ */
+const emitLocalDpsStates = (gladys, device, dps, deviceTemperatureUnit) => {
+  const handledCodes = new Set();
+  let changed = 0;
+  const deviceFeatures = Array.isArray(device.features) ? device.features : [];
+  const temperatureUnit =
+    deviceTemperatureUnit || getTemperatureUnitFromLocalDps(device, dps) || getTemperatureUnitFromProperties(device);
+
+  deviceFeatures.forEach((deviceFeature) => {
+    const code = getFeatureCode(deviceFeature);
+    const dpsKey = getLocalDpsFromCode(code, device);
+    const reader = getFeatureReader(deviceFeature);
+    if (!code || dpsKey === null || !reader || !hasDpsKey(dps, dpsKey)) {
+      return;
+    }
+    const rawValue = Object.prototype.hasOwnProperty.call(dps, String(dpsKey)) ? dps[String(dpsKey)] : dps[dpsKey];
+    if (rawValue === undefined) {
+      return;
+    }
+    let transformedValue;
+    try {
+      ({ transformedValue } = transformFeatureValue(device, deviceFeature, code, rawValue, temperatureUnit));
+    } catch (e) {
+      logger.warn(`[Tuya][poll] local reader failed for code=${code}`, e);
+      return;
+    }
+    const { lastValue, lastValueChanged } = getCurrentFeatureState(gladys, deviceFeature);
+    const result = emitFeatureState(gladys, deviceFeature, transformedValue, lastValue, lastValueChanged);
+    if (result.changed) {
+      changed += 1;
+    }
+    handledCodes.add(code);
+  });
+
+  return { handledCodes, changed };
+};
+
 const pollCloudFeatures = async function pollCloudFeatures(device, deviceFeatures, topic, currentTemperatureUnit) {
   const summary = {
     polled: Array.isArray(deviceFeatures) ? deviceFeatures.length : 0,
@@ -388,9 +438,7 @@ async function poll(device) {
   if (persistentConnected) {
     // Recycle the stale-but-open socket so the single local session frees up: the next cycles then
     // follow the intended priority (persistent -> local poll -> cloud) instead of staying on cloud.
-    if (typeof this.recyclePersistentConnection === 'function') {
-      this.recyclePersistentConnection(topic);
-    }
+    this.recyclePersistentConnection(topic);
     fallbackReason = 'persistent_stale_cloud_refresh';
     logger.debug(`[Tuya][poll] device=${topic} persistent connected but silent: recycling + cloud refresh this cycle`);
   }
@@ -410,50 +458,17 @@ async function poll(device) {
       const dps = localResult && localResult.dps ? localResult.dps : null;
       if (dps && typeof dps === 'object') {
         deviceTemperatureUnit = getTemperatureUnitFromLocalDps(device, dps) || deviceTemperatureUnit;
-        const pendingCloudFeatures = [];
-
-        deviceFeatures.forEach((deviceFeature) => {
-          const code = getFeatureCode(deviceFeature);
-          const dpsKey = getLocalDpsFromCode(code, device);
-          const reader = getFeatureReader(deviceFeature);
-
-          if (!code || dpsKey === null || !reader || !hasDpsKey(dps, dpsKey)) {
-            pendingCloudFeatures.push(deviceFeature);
-            return;
-          }
-
-          const rawValue = Object.prototype.hasOwnProperty.call(dps, String(dpsKey))
-            ? dps[String(dpsKey)]
-            : dps[dpsKey];
-          if (rawValue === undefined) {
-            pendingCloudFeatures.push(deviceFeature);
-            return;
-          }
-          try {
-            const { transformedValue } = transformFeatureValue(
-              device,
-              deviceFeature,
-              code,
-              rawValue,
-              deviceTemperatureUnit,
-            );
-            const { lastValue, lastValueChanged } = getCurrentFeatureState(this.gladys, deviceFeature);
-            const { changed } = emitFeatureState(
-              this.gladys,
-              deviceFeature,
-              transformedValue,
-              lastValue,
-              lastValueChanged,
-            );
-            if (changed) {
-              localChanged += 1;
-            }
-            localHandled += 1;
-          } catch (e) {
-            pendingCloudFeatures.push(deviceFeature);
-            logger.warn(`[Tuya][poll] local reader failed for device=${topic} code=${code}; falling back to cloud`, e);
-          }
-        });
+        const { handledCodes, changed: localChangedCount } = emitLocalDpsStates(
+          this.gladys,
+          device,
+          dps,
+          deviceTemperatureUnit,
+        );
+        localHandled = handledCodes.size;
+        localChanged = localChangedCount;
+        const pendingCloudFeatures = deviceFeatures.filter(
+          (deviceFeature) => !handledCodes.has(getFeatureCode(deviceFeature)),
+        );
 
         if (pendingCloudFeatures.length === 0) {
           modeUsed = 'local';
@@ -482,6 +497,9 @@ async function poll(device) {
 
       fallbackReason = 'invalid_local_payload';
       logger.warn(`[Tuya][poll] local poll returned invalid DPS payload for ${topic}, falling back to cloud`);
+      // A non-throwing but malformed payload is still a local failure: record it (forced, since it is
+      // not a network error) so a device stuck returning garbage trips the degraded backoff too.
+      recordLocalFailure(this.degradedDevices, topic, new Error('invalid_local_payload'), undefined, true);
     } catch (e) {
       logger.warn(`[Tuya][poll] local poll failed for ${topic}, falling back to cloud`, e);
       fallbackReason = 'local_poll_failed';
@@ -517,6 +535,7 @@ module.exports = {
   poll,
   // Exported so the persistent-connection push handler reuses the exact same DPS -> feature -> state
   // pipeline as the scheduled poll (single source of truth).
+  emitLocalDpsStates,
   getFeatureCode,
   getFeatureReader,
   hasDpsKey,

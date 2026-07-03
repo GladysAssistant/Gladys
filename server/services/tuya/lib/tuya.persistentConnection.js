@@ -4,15 +4,10 @@ const logger = require('../../../utils/logger');
 const { DEVICE_PARAM_NAME, GLADYS_VARIABLES } = require('./utils/tuya.constants');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { normalizeBoolean } = require('./utils/tuya.normalize');
-const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
 const { recordLocalFailure, recordLocalSuccess } = require('./utils/tuya.degraded');
-const {
-  getFeatureCode,
-  getFeatureReader,
-  hasDpsKey,
-  getCurrentFeatureState,
-  emitFeatureState,
-} = require('./tuya.poll');
+// Reuse the poll's DPS -> feature -> state pipeline so pushed updates and the scheduled poll apply the
+// exact same transformation (scale, temperature conversion, ...).
+const { emitLocalDpsStates } = require('./tuya.poll');
 
 // A persistent local connection stays open and receives pushed DP updates in real time (events),
 // instead of the one-shot poll. Devices that cannot sustain the socket (battery/asleep, offline,
@@ -75,7 +70,7 @@ const parseLocalConfig = (device) => {
 
 const scheduleReconnect = (self, entry) => {
   const { topic } = entry;
-  if (self.persistentConnections[topic] !== entry || entry.status === 'failed') {
+  if (entry.status === 'failed') {
     return;
   }
   if (entry.retryCount >= MAX_PERSISTENT_RETRIES) {
@@ -92,9 +87,6 @@ const scheduleReconnect = (self, entry) => {
     clearTimeout(entry.retryTimer);
   }
   entry.retryTimer = setTimeout(() => {
-    if (self.persistentConnections[topic] !== entry) {
-      return;
-    }
     teardownApi(entry.api);
     // eslint-disable-next-line no-use-before-define
     openPersistentConnection(self, entry);
@@ -264,12 +256,7 @@ async function startPersistentConnections() {
   }
 
   (Array.isArray(devices) ? devices : []).forEach((device) => {
-    try {
-      this.startPersistentConnectionForDevice(device);
-    } catch (e) {
-      // never let a single device break the startup loop
-      logger.info(`[Tuya][persistent] start error: ${formatSocketError(e)}`);
-    }
+    this.startPersistentConnectionForDevice(device);
   });
 }
 
@@ -295,33 +282,9 @@ function handlePushedDps(device, dps) {
   if (entry) {
     entry.lastDataAt = Date.now();
   }
-  const deviceFeatures = Array.isArray(device.features) ? device.features : [];
-  let handled = 0;
 
-  deviceFeatures.forEach((deviceFeature) => {
-    const code = getFeatureCode(deviceFeature);
-    const dpsKey = getLocalDpsFromCode(code, device);
-    const reader = getFeatureReader(deviceFeature);
-    if (!code || dpsKey === null || !reader || !hasDpsKey(dps, dpsKey)) {
-      return;
-    }
-    const rawValue = Object.prototype.hasOwnProperty.call(dps, String(dpsKey)) ? dps[String(dpsKey)] : dps[dpsKey];
-    if (rawValue === undefined) {
-      return;
-    }
-    let transformedValue;
-    try {
-      transformedValue = reader(rawValue, deviceFeature);
-    } catch (e) {
-      logger.warn(`[Tuya][persistent] reader failed device=${topic} code=${code}`, e);
-      return;
-    }
-    const { lastValue, lastValueChanged } = getCurrentFeatureState(this.gladys, deviceFeature);
-    emitFeatureState(this.gladys, deviceFeature, transformedValue, lastValue, lastValueChanged);
-    handled += 1;
-  });
-
-  if (handled > 0) {
+  const { handledCodes } = emitLocalDpsStates(this.gladys, device, dps);
+  if (handledCodes.size > 0) {
     recordLocalSuccess(this.degradedDevices, topic);
   }
 }
