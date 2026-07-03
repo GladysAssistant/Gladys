@@ -114,7 +114,7 @@ async function dailyUpdate() {
         }
         scheduledSunPositions.add(key);
 
-        const times = findSunPositionTimes(
+        const sunPositionTimes = findSunPositionTimes(
           this.sunCalc,
           house.latitude,
           house.longitude,
@@ -123,7 +123,7 @@ async function dailyUpdate() {
           azimuth,
         );
 
-        times.forEach((time) => {
+        sunPositionTimes.forEach((time) => {
           const job = this.scheduler.scheduleJob(time, () =>
             this.event.emit(EVENTS.TRIGGERS.CHECK, {
               type: EVENTS.TIME.SUN_POSITION,
@@ -146,7 +146,7 @@ async function dailyUpdate() {
           }
         });
 
-        if (times.length === 0) {
+        if (sunPositionTimes.length === 0) {
           logger.info(
             `Sun position (altitude ${altitude}°, azimuth ${azimuth}°): no matching time found today for this house.`,
           );
