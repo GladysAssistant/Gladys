@@ -8,6 +8,10 @@ const { normalizeExistingDevice, upsertParam, getParamValue } = require('./utils
 const { addFallbackBinaryFeature } = require('./device/tuya.localMapping');
 const { convertDevice } = require('./device/tuya.convertDevice');
 
+// Tuya lib parser errors ("Prefix does not match: <hex>") embed the whole raw TCP buffer in the
+// message (kBs per log line): the beginning is enough to identify the error.
+const SOCKET_ERROR_MESSAGE_MAX_LENGTH = 160;
+
 /**
  * @description Poll a Tuya device locally to retrieve DPS map.
  * @param {object} payload - Local connection info.
@@ -57,7 +61,12 @@ async function localPoll(payload) {
     if (typeof err.message === 'string' && err.message.includes('EHOSTUNREACH')) {
       return `Local device unreachable at ${ip}:6668 (EHOSTUNREACH). Device may be offline, unplugged, or no longer connected to Wi-Fi.`;
     }
-    return `Local poll socket error: ${err.message}`;
+    const message = String(err.message);
+    const truncatedMessage =
+      message.length > SOCKET_ERROR_MESSAGE_MAX_LENGTH
+        ? `${message.slice(0, SOCKET_ERROR_MESSAGE_MAX_LENGTH)}... (truncated)`
+        : message;
+    return `Local poll socket error: ${truncatedMessage}`;
   };
   const onError = (err) => {
     lastError = err;
