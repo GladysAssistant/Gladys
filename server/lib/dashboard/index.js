@@ -4,6 +4,7 @@ const { destroy } = require('./dashboard.destroy');
 const { getBySelector } = require('./dashboard.getBySelector');
 const { update } = require('./dashboard.update');
 const { updateOrder } = require('./dashboard.updateOrder');
+const { getPhoto } = require('./dashboard.getPhoto');
 
 const Dashboard = function Dashboard() {};
 
@@ -13,5 +14,6 @@ Dashboard.prototype.get = get;
 Dashboard.prototype.getBySelector = getBySelector;
 Dashboard.prototype.update = update;
 Dashboard.prototype.updateOrder = updateOrder;
+Dashboard.prototype.getPhoto = getPhoto;
 
 module.exports = Dashboard;

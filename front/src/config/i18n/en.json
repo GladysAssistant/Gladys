@@ -507,7 +507,7 @@
         }
       },
       "photo": {
-        "description": "Display one or more photos on your dashboard. Photos are loaded from an external URL (NAS, cloud, etc.) to keep Gladys lightweight.",
+        "description": "Display one or more photos on your dashboard. Images are fetched by your Gladys instance (not by your browser), so photos hosted on a local NAS work remotely via Gladys Plus.",
         "editNameLabel": "Widget name (optional)",
         "editNamePlaceholder": "E.g. Summer vacation 2025",
         "photosLabel": "Photos",

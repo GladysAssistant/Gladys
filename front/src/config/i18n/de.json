@@ -490,7 +490,7 @@
         }
       },
       "photo": {
-        "description": "Zeige ein oder mehrere Fotos auf deinem Dashboard an. Fotos werden von einer externen URL geladen (NAS, Cloud usw.), um Gladys schlank zu halten.",
+        "description": "Zeige ein oder mehrere Fotos auf deinem Dashboard an. Bilder werden von deiner Gladys-Instanz geladen (nicht vom Browser), sodass Fotos auf einem lokalen NAS auch per Gladys Plus aus der Ferne funktionieren.",
         "editNameLabel": "Widget-Name (optional)",
         "editNamePlaceholder": "z. B. Sommerurlaub 2025",
         "photosLabel": "Fotos",

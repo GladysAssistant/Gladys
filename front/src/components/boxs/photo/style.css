@@ -147,6 +147,12 @@
   color: #ef4444;
 }
 
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+}
+
 .editPhotoRow {
   display: flex;
   align-items: flex-start;

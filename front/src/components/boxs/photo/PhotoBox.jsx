@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
@@ -20,9 +21,12 @@ const getBoundedIndex = (index, photosLength) => {
 class PhotoBox extends Component {
   constructor(props) {
     super(props);
+    this.imageCache = {};
     this.state = {
       currentIndex: 0,
+      image: null,
       imageError: false,
+      loading: false,
       isTransitioning: false
     };
   }
@@ -32,13 +36,14 @@ class PhotoBox extends Component {
     const boundedIndex = getBoundedIndex(state.currentIndex, photos.length);
 
     if (boundedIndex !== state.currentIndex) {
-      return { currentIndex: boundedIndex, imageError: false };
+      return { currentIndex: boundedIndex, image: null, imageError: false };
     }
 
     return null;
   }
 
   componentDidMount() {
+    this.loadCurrentPhoto();
     this.startSlideshow();
     this.preloadNextImage();
   }
@@ -56,7 +61,14 @@ class PhotoBox extends Component {
     }
 
     if (prevState.currentIndex !== this.state.currentIndex) {
+      this.loadCurrentPhoto();
       this.preloadNextImage();
+    }
+
+    const prevUrl = prevPhotos[prevState.currentIndex]?.url;
+    const currentUrl = photos[this.state.currentIndex]?.url;
+    if (prevUrl !== currentUrl) {
+      this.loadCurrentPhoto();
     }
   }
 
@@ -64,14 +76,62 @@ class PhotoBox extends Component {
     clearInterval(this.slideshowInterval);
   }
 
+  getCurrentPhotoUrl = () => {
+    const photos = getValidPhotos(get(this.props, 'box.photos', []));
+    return photos[this.state.currentIndex]?.url;
+  };
+
+  fetchPhoto = async url => {
+    if (!url) {
+      return null;
+    }
+
+    if (this.imageCache[url]) {
+      return this.imageCache[url];
+    }
+
+    const image = await this.props.httpClient.get('/api/v1/dashboard/photo/proxy', { url });
+    this.imageCache[url] = image;
+    return image;
+  };
+
+  loadCurrentPhoto = async () => {
+    const url = this.getCurrentPhotoUrl();
+
+    if (!url) {
+      this.setState({ image: null, imageError: false, loading: false });
+      return;
+    }
+
+    if (this.imageCache[url]) {
+      this.setState({ image: this.imageCache[url], imageError: false, loading: false });
+      return;
+    }
+
+    this.setState({ loading: true, imageError: false, image: null });
+
+    try {
+      const image = await this.fetchPhoto(url);
+      if (this.getCurrentPhotoUrl() === url) {
+        this.setState({ image, imageError: false, loading: false });
+      }
+    } catch (e) {
+      if (this.getCurrentPhotoUrl() === url) {
+        this.setState({ imageError: true, loading: false, image: null });
+      }
+    }
+  };
+
   preloadNextImage = () => {
     const photos = getValidPhotos(get(this.props, 'box.photos', []));
     if (photos.length <= 1) {
       return;
     }
     const nextIndex = (this.state.currentIndex + 1) % photos.length;
-    const img = new Image();
-    img.src = photos[nextIndex].url;
+    const nextUrl = photos[nextIndex]?.url;
+    if (nextUrl && !this.imageCache[nextUrl]) {
+      this.fetchPhoto(nextUrl).catch(() => {});
+    }
   };
 
   startSlideshow = () => {
@@ -95,6 +155,7 @@ class PhotoBox extends Component {
     }
     this.setState(prevState => ({
       currentIndex: (prevState.currentIndex + 1) % photos.length,
+      image: null,
       imageError: false,
       isTransitioning: true
     }));
@@ -108,6 +169,7 @@ class PhotoBox extends Component {
     }
     this.setState(prevState => ({
       currentIndex: (prevState.currentIndex - 1 + photos.length) % photos.length,
+      image: null,
       imageError: false,
       isTransitioning: true
     }));
@@ -116,17 +178,9 @@ class PhotoBox extends Component {
   };
 
   goToIndex = index => {
-    this.setState({ currentIndex: index, imageError: false, isTransitioning: true });
+    this.setState({ currentIndex: index, image: null, imageError: false, isTransitioning: true });
     setTimeout(() => this.setState({ isTransitioning: false }), 600);
     this.startSlideshow();
-  };
-
-  handleImageError = () => {
-    this.setState({ imageError: true });
-  };
-
-  handleImageLoad = () => {
-    this.setState({ imageError: false });
   };
 
   render(props, state) {
@@ -134,7 +188,7 @@ class PhotoBox extends Component {
     const name = get(props, 'box.name', '');
     const fit = get(props, 'box.photo_fit', PHOTO_FIT_COVER);
     const showCaption = get(props, 'box.photo_show_caption', true);
-    const { currentIndex, imageError, isTransitioning } = state;
+    const { currentIndex, image, imageError, loading, isTransitioning } = state;
 
     if (photos.length === 0) {
       return (
@@ -159,10 +213,10 @@ class PhotoBox extends Component {
         )}
         <div class={style.photoContainer}>
           <div class={style.imageWrapper}>
-            {!imageError ? (
+            {image && !imageError && (
               <img
                 key={currentPhoto.url}
-                src={currentPhoto.url}
+                src={`data:${image}`}
                 alt={currentPhoto.caption || ''}
                 class={cx(style.photo, {
                   [style.photoCover]: fit === PHOTO_FIT_COVER,
@@ -170,17 +224,23 @@ class PhotoBox extends Component {
                   [style.photoTransitioning]: isTransitioning
                 })}
                 loading="lazy"
-                onError={this.handleImageError}
-                onLoad={this.handleImageLoad}
               />
-            ) : (
+            )}
+
+            {imageError && (
               <div class={style.errorState}>
                 <i class={`fe fe-alert-circle ${style.errorIcon}`} />
                 <Text id="dashboard.boxes.photo.imageError" />
               </div>
             )}
 
-            {showCaption && currentPhoto.caption && !imageError && (
+            {loading && !image && !imageError && (
+              <div class={cx('dimmer active', style.loadingOverlay)}>
+                <div class="loader" />
+              </div>
+            )}
+
+            {showCaption && currentPhoto.caption && image && !imageError && (
               <div class={style.captionOverlay}>
                 <span class={style.captionText}>{currentPhoto.caption}</span>
               </div>
@@ -227,4 +287,4 @@ class PhotoBox extends Component {
   }
 }
 
-export default PhotoBox;
+export default connect('httpClient', {})(PhotoBox);

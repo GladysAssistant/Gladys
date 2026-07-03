@@ -477,7 +477,7 @@
         }
       },
       "photo": {
-        "description": "Affichez une ou plusieurs photos sur votre tableau de bord. Les photos sont chargées depuis une URL externe (NAS, cloud, etc.) pour ne pas alourdir Gladys.",
+        "description": "Affichez une ou plusieurs photos sur votre tableau de bord. Les images sont chargées par votre instance Gladys (et non par votre navigateur), ce qui permet d'afficher des photos hébergées sur un NAS local, y compris à distance via Gladys Plus.",
         "editNameLabel": "Nom du widget (optionnel)",
         "editNamePlaceholder": "Ex : Vacances 2025",
         "photosLabel": "Photos",
