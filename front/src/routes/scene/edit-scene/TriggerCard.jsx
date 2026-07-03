@@ -79,6 +79,7 @@ const TriggerCard = ({ children, ...props }) => (
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}
+          setVariablesTrigger={props.setVariablesTrigger}
         />
       )}
       {props.trigger.type === EVENTS.TIME.CHANGED && (
@@ -172,6 +173,7 @@ const TriggerCard = ({ children, ...props }) => (
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}
+          setVariablesTrigger={props.setVariablesTrigger}
         />
       )}
     </div>

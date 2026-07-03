@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
+import get from 'get-value';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
@@ -15,8 +16,57 @@ import FanModeDeviceState from './device-states/FanModeDeviceState';
 import FanLabeledDeviceState from './device-states/FanLabeledDeviceState';
 import LevelSensorDeviceState from './device-states/LevelSensorDeviceState';
 import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDeviceState';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 class TurnOnLight extends Component {
+  setVariables = () => {
+    const DEVICE_NAME_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.trigger.device.name');
+    const DEVICE_FEATURE_NAME_VARIABLE = get(
+      this.props.intl.dictionary,
+      'editScene.variables.trigger.deviceFeature.name'
+    );
+    const LAST_VALUE_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.trigger.deviceFeature.last_value');
+    const PREVIOUS_VALUE_VARIABLE = get(
+      this.props.intl.dictionary,
+      'editScene.variables.trigger.deviceFeature.previous_value'
+    );
+
+    this.props.setVariablesTrigger(this.props.index, [
+      {
+        name: 'device.name',
+        type: 'trigger',
+        ready: true,
+        label: DEVICE_NAME_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'deviceFeature.name',
+        type: 'trigger',
+        ready: true,
+        label: DEVICE_FEATURE_NAME_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'deviceFeature.last_value',
+        type: 'trigger',
+        ready: true,
+        label: LAST_VALUE_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'deviceFeature.previous_value',
+        type: 'trigger',
+        ready: true,
+        label: PREVIOUS_VALUE_VARIABLE,
+        data: {}
+      }
+    ]);
+  };
+
+  componentDidMount() {
+    this.setVariables();
+  }
+
   onDeviceFeatureChange = deviceFeature => {
     this.setState({ selectedDeviceFeature: deviceFeature });
     if (deviceFeature) {
@@ -170,4 +220,4 @@ class TurnOnLight extends Component {
   }
 }
 
-export default connect('httpClient', {})(TurnOnLight);
+export default connect('httpClient', {})(withIntlAsProp(TurnOnLight));

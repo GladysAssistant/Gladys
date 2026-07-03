@@ -2742,6 +2742,20 @@
       },
       "askAi": {
         "answer": "Réponse de l'IA"
+      },
+      "trigger": {
+        "device": {
+          "name": "Nom de l'appareil déclencheur"
+        },
+        "deviceFeature": {
+          "name": "Nom de la fonctionnalité déclencheuse",
+          "last_value": "Valeur actuelle du déclencheur",
+          "previous_value": "Valeur précédente du déclencheur"
+        },
+        "mqtt": {
+          "topic": "Topic MQTT reçu",
+          "message": "Message MQTT reçu"
+        }
       }
     },
     "triggers": {
