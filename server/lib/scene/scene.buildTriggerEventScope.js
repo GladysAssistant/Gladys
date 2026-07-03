@@ -7,6 +7,8 @@ const { EVENTS } = require('../../utils/constants');
  * @param {object} event - The raw trigger event.
  * @param {object} stateManager - The Gladys state manager.
  * @returns {object} The enriched trigger event.
+ * @example
+ * buildTriggerEventScope({ type: 'device.new-state', device_feature: 'door-sensor' }, stateManager);
  */
 function buildTriggerEventScope(event, stateManager) {
   const triggerEvent = cloneDeep(event);

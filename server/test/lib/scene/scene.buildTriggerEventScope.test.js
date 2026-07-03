@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
 
 const { EVENTS, ACTIONS } = require('../../../utils/constants');
@@ -88,7 +89,7 @@ describe('scene triggerEvent in actions', () => {
     });
 
     const message = {
-      sendToUser: require('sinon').fake.resolves(null),
+      sendToUser: fake.resolves(null),
     };
 
     const scope = {
@@ -110,18 +111,15 @@ describe('scene triggerEvent in actions', () => {
           {
             type: ACTIONS.MESSAGE.SEND,
             user: 'pepper',
-            text: 'Alert: {{triggerEvent.device.name}} - {{triggerEvent.deviceFeature.name}} is now {{triggerEvent.deviceFeature.last_value}}',
+            text:
+              'Alert: {{triggerEvent.device.name}} - {{triggerEvent.deviceFeature.name}} is now {{triggerEvent.deviceFeature.last_value}}',
           },
         ],
       ],
       scope,
     );
 
-    require('sinon').assert.calledWith(
-      message.sendToUser,
-      'pepper',
-      'Alert: Door sensor - Front door is now 1',
-    );
+    assert.calledWith(message.sendToUser, 'pepper', 'Alert: Door sensor - Front door is now 1');
   });
 });
 
@@ -129,7 +127,7 @@ describe('scene.checkTrigger triggerEvent', () => {
   let sceneManager;
   const event = new EventEmitter();
   const device = {
-    setValue: require('sinon').fake.resolves(null),
+    setValue: fake.resolves(null),
   };
   const brain = {};
 
@@ -149,22 +147,10 @@ describe('scene.checkTrigger triggerEvent', () => {
     });
 
     const message = {
-      sendToUser: require('sinon').fake.resolves(null),
+      sendToUser: fake.resolves(null),
     };
 
-    sceneManager = new SceneManager(
-      stateManager,
-      event,
-      device,
-      message,
-      {},
-      {},
-      {},
-      {},
-      {},
-      {},
-      brain,
-    );
+    sceneManager = new SceneManager(stateManager, event, device, message, {}, {}, {}, {}, {}, {}, brain);
   });
 
   it('should pass enriched triggerEvent when scene is triggered by device state', async () => {
@@ -200,11 +186,7 @@ describe('scene.checkTrigger triggerEvent', () => {
     await new Promise((resolve, reject) => {
       sceneManager.queue.start(() => {
         try {
-          require('sinon').assert.calledWith(
-            sceneManager.message.sendToUser,
-            'pepper',
-            'Opened: Front door',
-          );
+          assert.calledWith(sceneManager.message.sendToUser, 'pepper', 'Opened: Front door');
           resolve();
         } catch (e) {
           reject(e);
