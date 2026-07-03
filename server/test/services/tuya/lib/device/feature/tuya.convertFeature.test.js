@@ -170,4 +170,47 @@ describe('Tuya convert feature', () => {
 
     expect(result.scale).to.equal(1);
   });
+
+  it('should resolve the product-variant mapping and not leak tuyaEnum onto the feature', () => {
+    const result = convertFeature(
+      {
+        code: 'mode',
+        type: 'Enum',
+        name: 'Mode',
+        readOnly: false,
+        values: '{"range":["hot","eco","cold","comfortable1","comfortable2","auto"]}',
+      },
+      'tuya:ecosy-device',
+      {
+        deviceType: DEVICE_TYPES.PILOT_THERMOSTAT,
+        productId: 'evyy1wbhi4t7uftn',
+      },
+    );
+
+    expect(result.category).to.equal('heater');
+    expect(result.type).to.equal('pilot-wire-mode');
+    expect(result.name).to.equal('Mode');
+    expect(result).to.not.have.property('tuyaEnum');
+  });
+
+  it('should apply the variant read_only override and curated name', () => {
+    const result = convertFeature(
+      {
+        code: 'cur_mode',
+        type: 'Enum',
+        name: 'cur_mode',
+        readOnly: false,
+        values: '{}',
+      },
+      'tuya:ecosy-device',
+      {
+        deviceType: DEVICE_TYPES.PILOT_THERMOSTAT,
+        productId: 'evyy1wbhi4t7uftn',
+      },
+    );
+
+    expect(result.name).to.equal('Current mode');
+    expect(result.read_only).to.equal(true);
+    expect(result.has_feedback).to.equal(false);
+  });
 });

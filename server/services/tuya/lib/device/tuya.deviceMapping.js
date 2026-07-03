@@ -24,13 +24,13 @@ const TUYA_PILOT_WIRE_MODE_TO_GLADYS = {
   Thermostat: PILOT_WIRE_MODE.THERMOSTAT,
 };
 
-const GLADYS_PILOT_WIRE_MODE_TO_TUYA = Object.entries(TUYA_PILOT_WIRE_MODE_TO_GLADYS).reduce(
-  (accumulator, [tuyaValue, gladysValue]) => {
-    accumulator[gladysValue] = tuyaValue;
-    return accumulator;
-  },
-  {},
-);
+// Every pilot-wire product uses its own mode string vocabulary (there is no Tuya standard for
+// fil pilote). A cloud-mapping entry can therefore carry a `tuyaEnum` map (tuya string -> Gladys
+// PILOT_WIRE_MODE); the map above stays the default vocabulary for the default variant.
+const getPilotWireTuyaEnum = (mappingEntry) =>
+  mappingEntry && mappingEntry.tuyaEnum && typeof mappingEntry.tuyaEnum === 'object'
+    ? mappingEntry.tuyaEnum
+    : TUYA_PILOT_WIRE_MODE_TO_GLADYS;
 
 const getScale = (deviceFeature, defaultScale = 0) => {
   const parsedScale =
@@ -98,9 +98,12 @@ const writeValues = {
     },
   },
   [DEVICE_FEATURE_CATEGORIES.HEATER]: {
-    [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: (valueFromGladys) => {
+    [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: (valueFromGladys, deviceFeature, mappingEntry) => {
       const parsedValue = parseInt(valueFromGladys, 10);
-      return GLADYS_PILOT_WIRE_MODE_TO_TUYA[parsedValue];
+      const tuyaEnum = getPilotWireTuyaEnum(mappingEntry);
+      // Returns undefined when the device vocabulary has no such mode (e.g. OFF on a device whose
+      // on/off is a separate switch DPS): setValue rejects it instead of sending garbage.
+      return Object.keys(tuyaEnum).find((tuyaValue) => tuyaEnum[tuyaValue] === parsedValue);
     },
   },
 
@@ -199,10 +202,9 @@ const readValues = {
     },
   },
   [DEVICE_FEATURE_CATEGORIES.HEATER]: {
-    [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: (valueFromDevice) => {
-      return Object.prototype.hasOwnProperty.call(TUYA_PILOT_WIRE_MODE_TO_GLADYS, valueFromDevice)
-        ? TUYA_PILOT_WIRE_MODE_TO_GLADYS[valueFromDevice]
-        : null;
+    [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: (valueFromDevice, deviceFeature, mappingEntry) => {
+      const tuyaEnum = getPilotWireTuyaEnum(mappingEntry);
+      return Object.prototype.hasOwnProperty.call(tuyaEnum, valueFromDevice) ? tuyaEnum[valueFromDevice] : null;
     },
   },
   [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {

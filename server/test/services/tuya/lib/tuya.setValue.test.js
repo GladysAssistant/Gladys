@@ -13,6 +13,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
+  PILOT_WIRE_MODE,
 } = require('../../../../utils/constants');
 const { BadParameters } = require('../../../../utils/coreErrors');
 
@@ -140,6 +141,84 @@ describe('TuyaHandler.setValue', () => {
     expect(connect.calledOnce).to.equal(true);
     expect(set.calledOnce).to.equal(true);
     expect(disconnect.calledOnce).to.equal(true);
+    expect(ctx.connector.request.called).to.equal(false);
+  });
+
+  it('should write the pilot-wire mode with the product-variant vocabulary and DPS', async () => {
+    const set = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = sinon.stub().resolves();
+      this.set = set;
+      this.disconnect = sinon.stub().resolves();
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    const device = {
+      device_type: 'pilot-thermostat',
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.46' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+        { name: DEVICE_PARAM_NAME.PRODUCT_ID, value: 'evyy1wbhi4t7uftn' },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:ecosy-device:mode',
+      category: DEVICE_FEATURE_CATEGORIES.HEATER,
+      type: DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub() },
+      gladys: {},
+    };
+
+    await setValue.call(ctx, device, deviceFeature, PILOT_WIRE_MODE.COMFORT);
+
+    expect(set.calledOnce).to.equal(true);
+    expect(set.firstCall.args[0]).to.deep.equal({ dps: 2, set: 'hot' });
+    expect(ctx.connector.request.called).to.equal(false);
+  });
+
+  it('should reject a pilot-wire mode the device vocabulary does not support', async () => {
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: function TuyAPIStub() {},
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    const device = {
+      device_type: 'pilot-thermostat',
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.46' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+        { name: DEVICE_PARAM_NAME.PRODUCT_ID, value: 'evyy1wbhi4t7uftn' },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:ecosy-device:mode',
+      category: DEVICE_FEATURE_CATEGORIES.HEATER,
+      type: DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE,
+    };
+
+    const ctx = {
+      connector: { request: sinon.stub() },
+      gladys: {},
+    };
+
+    try {
+      // The eCosy has no OFF mode order (on/off is its dedicated switch DPS).
+      await setValue.call(ctx, device, deviceFeature, PILOT_WIRE_MODE.OFF);
+      assert.fail();
+    } catch (error) {
+      expect(error).to.be.an.instanceof(BadParameters);
+      expect(error.message).to.include('is not supported for command "mode"');
+    }
     expect(ctx.connector.request.called).to.equal(false);
   });
 

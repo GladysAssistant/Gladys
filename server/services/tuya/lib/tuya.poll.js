@@ -9,7 +9,7 @@ const { CLOUD_STRATEGY, getConfiguredCloudStrategy } = require('./utils/tuya.clo
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { localPoll } = require('./tuya.localPoll');
 const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
-const { getDeviceType, getFeatureMapping } = require('./mappings');
+const { getDeviceType, getFeatureMapping, getProductIdFromDevice } = require('./mappings');
 const { isLocalSkipNeeded, recordLocalFailure, recordLocalSuccess } = require('./utils/tuya.degraded');
 
 const SAME_VALUE_EMIT_INTERVAL_MS = 3 * 60 * 1000;
@@ -60,12 +60,17 @@ const updatePropertyValue = (device, code, value) => {
   };
 };
 
+// Resolve the (possibly product-variant) cloud-mapping entry of a feature code for this device.
+const resolveFeatureMappingEntry = (device, code) => {
+  const deviceType = device && device.device_type ? device.device_type : getDeviceType(device);
+  return getFeatureMapping(code, deviceType, getProductIdFromDevice(device));
+};
+
 const getFeatureWithFallbackScale = (device, deviceFeature, code) => {
   if (!deviceFeature || deviceFeature.scale !== undefined) {
     return deviceFeature;
   }
-  const deviceType = device && device.device_type ? device.device_type : getDeviceType(device);
-  const mapping = getFeatureMapping(code, deviceType);
+  const mapping = resolveFeatureMappingEntry(device, code);
   if (!mapping || mapping.scale === undefined) {
     return deviceFeature;
   }
@@ -219,7 +224,9 @@ const extractShadowValues = (device, response) => {
 const transformFeatureValue = (device, deviceFeature, code, rawValue, deviceTemperatureUnit) => {
   const featureWithFallbackScale = getFeatureWithFallbackScale(device, deviceFeature, code);
   const reader = getFeatureReader(featureWithFallbackScale);
-  let transformedValue = reader(rawValue, featureWithFallbackScale);
+  // The mapping entry gives the reader per-variant metadata (e.g. the tuyaEnum mode vocabulary).
+  const mappingEntry = resolveFeatureMappingEntry(device, code);
+  let transformedValue = reader(rawValue, featureWithFallbackScale, mappingEntry);
   if (isTemperatureFeature(featureWithFallbackScale, code)) {
     transformedValue = convertTemperatureValue(
       transformedValue,

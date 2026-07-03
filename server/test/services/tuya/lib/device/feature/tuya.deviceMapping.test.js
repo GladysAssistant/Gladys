@@ -56,6 +56,21 @@ describe('Tuya device mapping', () => {
       );
       expect(result).to.eq('Programming');
     });
+    describe('heater pilot wire mode with a variant tuyaEnum vocabulary', () => {
+      const mappingEntry = { tuyaEnum: { hot: PILOT_WIRE_MODE.COMFORT, eco: PILOT_WIRE_MODE.ECO } };
+      const writePilotWire = writeValues[DEVICE_FEATURE_CATEGORIES.HEATER][DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE];
+
+      it('writes the variant tuya string', () => {
+        expect(writePilotWire(PILOT_WIRE_MODE.COMFORT, {}, mappingEntry)).to.eq('hot');
+        expect(writePilotWire(PILOT_WIRE_MODE.ECO, {}, mappingEntry)).to.eq('eco');
+      });
+      it('returns undefined for a mode absent from the variant vocabulary', () => {
+        expect(writePilotWire(PILOT_WIRE_MODE.OFF, {}, mappingEntry)).to.eq(undefined);
+      });
+      it('falls back to the default vocabulary without a tuyaEnum entry', () => {
+        expect(writePilotWire(PILOT_WIRE_MODE.COMFORT, {}, {})).to.eq('Comfort');
+      });
+    });
     describe('curtain state', () => {
       it('open', () => {
         const result = writeValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.STATE](
@@ -290,6 +305,21 @@ describe('Tuya device mapping', () => {
           'Boost',
         );
         expect(result).to.eq(null);
+      });
+      describe('with a variant tuyaEnum vocabulary', () => {
+        const mappingEntry = { tuyaEnum: { hot: PILOT_WIRE_MODE.COMFORT, cold: PILOT_WIRE_MODE.FROST_PROTECTION } };
+        const readPilotWire = readValues[DEVICE_FEATURE_CATEGORIES.HEATER][DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE];
+
+        it('reads the variant tuya string', () => {
+          expect(readPilotWire('hot', {}, mappingEntry)).to.eq(PILOT_WIRE_MODE.COMFORT);
+          expect(readPilotWire('cold', {}, mappingEntry)).to.eq(PILOT_WIRE_MODE.FROST_PROTECTION);
+        });
+        it('returns null for a string absent from the variant vocabulary', () => {
+          expect(readPilotWire('Comfort', {}, mappingEntry)).to.eq(null);
+        });
+        it('falls back to the default vocabulary without a tuyaEnum entry', () => {
+          expect(readPilotWire('Comfort', {}, {})).to.eq(PILOT_WIRE_MODE.COMFORT);
+        });
       });
     });
     describe('curtain state', () => {

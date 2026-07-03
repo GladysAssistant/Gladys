@@ -1,12 +1,16 @@
 const globalCloud = require('./cloud/global');
 const pilotThermostatCloud = require('./cloud/pilot-thermostat');
+const pilotThermostatEcosyCloud = require('./cloud/pilot-thermostat-ecosy');
 const smartMeterCloud = require('./cloud/smart-meter');
 const smartSocketCloud = require('./cloud/smart-socket');
 
 const globalLocal = require('./local/global');
 const pilotThermostatLocal = require('./local/pilot-thermostat');
+const pilotThermostatEcosyLocal = require('./local/pilot-thermostat-ecosy');
 const smartMeterLocal = require('./local/smart-meter');
 const smartSocketLocal = require('./local/smart-socket');
+
+const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
 
 const DEVICE_TYPES = {
   PILOT_THERMOSTAT: 'pilot-thermostat',
@@ -34,6 +38,18 @@ const PILOT_THERMOSTAT = {
   REQUIRED_CODES: PILOT_THERMOSTAT_CODES,
   CLOUD_MAPPINGS: pilotThermostatCloud,
   LOCAL_MAPPINGS: pilotThermostatLocal,
+  // Per-product variants (tuya-local pattern): same conceptual family, different DP layout and/or
+  // enum vocabulary. A variant mapping fully REPLACES the family default one (no merge) — the family
+  // CLOUD_MAPPINGS/LOCAL_MAPPINGS above act as the default variant. A future product sharing an
+  // existing layout is added to that variant's PRODUCT_IDS.
+  VARIANTS: [
+    {
+      VARIANT_NAME: 'konyks-ecosy',
+      PRODUCT_IDS: new Set(['evyy1wbhi4t7uftn']),
+      CLOUD_MAPPINGS: pilotThermostatEcosyCloud,
+      LOCAL_MAPPINGS: pilotThermostatEcosyLocal,
+    },
+  ],
 };
 
 const SMART_SOCKET = {
@@ -84,13 +100,45 @@ const DEVICE_TYPE_INDEX = LIST_DEVICE_TYPES.reduce((acc, definition) => {
       ? definition.KEYWORDS.map((keyword) => String(keyword).toLowerCase())
       : [],
     REQUIRED_CODES: normalizeStringSet(definition.REQUIRED_CODES),
+    VARIANTS: (Array.isArray(definition.VARIANTS) ? definition.VARIANTS : []).map((variant) => ({
+      ...variant,
+      PRODUCT_IDS: normalizeStringSet(variant.PRODUCT_IDS),
+    })),
   };
   return acc;
 }, {});
 
+const getVariantDefinition = (deviceType, productId) => {
+  const normalizedProductId = normalizeCode(productId);
+  if (!normalizedProductId) {
+    return null;
+  }
+  const definition = DEVICE_TYPE_INDEX[normalizeCode(deviceType)];
+  if (!definition) {
+    return null;
+  }
+  return definition.VARIANTS.find((variant) => variant.PRODUCT_IDS.has(normalizedProductId)) || null;
+};
+
+const getProductIdFromDevice = (device) => {
+  if (!device || typeof device !== 'object') {
+    return null;
+  }
+  if (device.product_id) {
+    return device.product_id;
+  }
+  // Devices loaded from the Gladys DB only carry the product id as a param.
+  const params = Array.isArray(device.params) ? device.params : [];
+  const productIdParam = params.find((param) => param && param.name === DEVICE_PARAM_NAME.PRODUCT_ID);
+  return productIdParam && productIdParam.value ? productIdParam.value : null;
+};
+
 const matchDeviceType = (typeDefinition, context) => {
   const { category, productId, modelName, codes } = context;
   if (productId && typeDefinition.PRODUCT_IDS.has(productId)) {
+    return true;
+  }
+  if (productId && typeDefinition.VARIANTS.some((variant) => variant.PRODUCT_IDS.has(productId))) {
     return true;
   }
 
@@ -109,9 +157,13 @@ const matchDeviceType = (typeDefinition, context) => {
   return keywords.some((keyword) => modelName.includes(keyword));
 };
 
-const getCloudMapping = (deviceType) => {
+const getCloudMapping = (deviceType, productId) => {
   if (!deviceType || deviceType === DEVICE_TYPES.UNKNOWN) {
     return { ...globalCloud };
+  }
+  const variant = getVariantDefinition(deviceType, productId);
+  if (variant && variant.CLOUD_MAPPINGS) {
+    return { ...variant.CLOUD_MAPPINGS };
   }
   const definition = DEVICE_TYPE_INDEX[normalizeCode(deviceType)];
   if (definition && definition.CLOUD_MAPPINGS) {
@@ -120,7 +172,7 @@ const getCloudMapping = (deviceType) => {
   return { ...globalCloud };
 };
 
-const getLocalMapping = (deviceType) => {
+const getLocalMapping = (deviceType, productId) => {
   const normalizeLocalMapping = (mapping) => {
     const current = mapping && typeof mapping === 'object' ? mapping : {};
     return {
@@ -135,6 +187,10 @@ const getLocalMapping = (deviceType) => {
 
   if (!deviceType || deviceType === DEVICE_TYPES.UNKNOWN) {
     return normalizeLocalMapping(globalLocal);
+  }
+  const variant = getVariantDefinition(deviceType, productId);
+  if (variant && variant.LOCAL_MAPPINGS) {
+    return normalizeLocalMapping(variant.LOCAL_MAPPINGS);
   }
   const definition = DEVICE_TYPE_INDEX[normalizeCode(deviceType)];
   if (definition && definition.LOCAL_MAPPINGS) {
@@ -273,12 +329,12 @@ const getDeviceType = (device) => {
   return DEVICE_TYPES.UNKNOWN;
 };
 
-const getFeatureMapping = (code, deviceType) => {
+const getFeatureMapping = (code, deviceType, productId) => {
   const normalized = normalizeCode(code);
   if (!normalized) {
     return null;
   }
-  const mapping = getCloudMapping(deviceType);
+  const mapping = getCloudMapping(deviceType, productId);
   const candidate = mapping[normalized];
 
   if (!candidate || typeof candidate !== 'object') {
@@ -291,13 +347,13 @@ const getFeatureMapping = (code, deviceType) => {
   return candidate;
 };
 
-const getIgnoredLocalDps = (deviceType) => {
-  const { ignoredDps } = getLocalMapping(deviceType);
+const getIgnoredLocalDps = (deviceType, productId) => {
+  const { ignoredDps } = getLocalMapping(deviceType, productId);
   return Array.isArray(ignoredDps) ? ignoredDps : [];
 };
 
-const getIgnoredCloudCodes = (deviceType) => {
-  const mapping = getCloudMapping(deviceType);
+const getIgnoredCloudCodes = (deviceType, productId) => {
+  const mapping = getCloudMapping(deviceType, productId);
   const ignored = Array.isArray(mapping.ignoredCodes) ? mapping.ignoredCodes : [];
   const normalized = ignored
     .filter((value) => value !== null && value !== undefined)
@@ -317,5 +373,6 @@ module.exports = {
   getIgnoredLocalDps,
   getIgnoredCloudCodes,
   getDeviceType,
+  getProductIdFromDevice,
   normalizeCode,
 };

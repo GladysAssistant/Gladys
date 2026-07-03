@@ -14,19 +14,24 @@ const { getFeatureMapping, getIgnoredCloudCodes, normalizeCode } = require('../m
  */
 function convertFeature(tuyaFunctions, externalId, options = {}) {
   const { code, values, readOnly } = tuyaFunctions;
-  const { deviceType, ignoredCloudCodes, temperatureUnit } = options;
+  const { deviceType, ignoredCloudCodes, temperatureUnit, productId } = options;
 
   const codeLower = normalizeCode(code);
-  const ignoredCodes = Array.isArray(ignoredCloudCodes) ? ignoredCloudCodes : getIgnoredCloudCodes(deviceType);
+  const ignoredCodes = Array.isArray(ignoredCloudCodes)
+    ? ignoredCloudCodes
+    : getIgnoredCloudCodes(deviceType, productId);
   if (codeLower && ignoredCodes.includes(codeLower)) {
     return undefined;
   }
 
-  const featuresCategoryAndType = getFeatureMapping(code, deviceType);
-  if (!featuresCategoryAndType) {
+  const mappingEntry = getFeatureMapping(code, deviceType, productId);
+  if (!mappingEntry) {
     logger.warn(`Tuya function with "${code}" code is not managed`);
     return undefined;
   }
+  // tuyaEnum is mapping-only metadata (per-variant mode vocabulary consumed by the read/write
+  // pipeline); it must not leak onto the persisted Gladys feature.
+  const { tuyaEnum, ...featuresCategoryAndType } = mappingEntry;
 
   let valuesObject = {};
   if (values && typeof values === 'object') {

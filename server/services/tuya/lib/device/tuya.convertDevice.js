@@ -219,13 +219,14 @@ function convertDevice(tuyaDevice) {
     };
   });
 
-  const ignoredCloudCodes = getIgnoredCloudCodes(deviceType);
-  const ignoredLocalDps = getIgnoredLocalDps(deviceType);
+  const ignoredCloudCodes = getIgnoredCloudCodes(deviceType, productId);
+  const ignoredLocalDps = getIgnoredLocalDps(deviceType, productId);
   const features = Object.values(groups).map((group) =>
     convertFeature(group, externalId, {
       deviceType,
       ignoredCloudCodes,
       temperatureUnit,
+      productId,
     }),
   );
   const filteredFeatures = features.filter((feature) => feature);
