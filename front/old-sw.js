@@ -7,9 +7,11 @@ self.addEventListener('activate', function(event) {
     caches
       .keys()
       .then(function(cacheNames) {
-        return Promise.all(cacheNames.map(function(cacheName) {
-          return caches.delete(cacheName);
-        }));
+        return Promise.all(
+          cacheNames.map(function(cacheName) {
+            return caches.delete(cacheName);
+          })
+        );
       })
       .then(function() {
         return self.registration.unregister();

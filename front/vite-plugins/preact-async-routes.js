@@ -7,8 +7,7 @@ const require = createRequire(import.meta.url);
 const PLUGIN_QUERY = '?preact-async-route';
 const ROUTE_ENTRY_PATTERN = /\/src\/routes\/(?:[^/]+\.(?:jsx?|tsx?)|[^/]+\/index\.(?:jsx?|tsx?))$/;
 
-const cleanFilename = name =>
-  name.replace(/(^\/routes\/|(\/index)?\.[jt]sx?$)/g, '');
+const cleanFilename = name => name.replace(/(^\/routes\/|(\/index)?\.[jt]sx?$)/g, '');
 
 export function getRouteChunkName(filePath, srcRoot) {
   const relativePath = '/' + relative(srcRoot, filePath).replace(/\\/g, '/');
