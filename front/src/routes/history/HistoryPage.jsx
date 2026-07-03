@@ -86,16 +86,28 @@ const HistoryPage = ({ intl, user, ...props }) => {
             <div class="page-header">
               <h1 class="page-title">
                 <Text id="history.title" />
-                <span class={style.liveBadge}>
-                  <span class={style.liveDot} />
-                  <Text id="history.live" />
-                </span>
+                {!props.selectedDate && (
+                  <span class={style.liveIndicator}>
+                    <span class={style.liveDot} />
+                    <Text id="history.live" />
+                  </span>
+                )}
               </h1>
               <div class="page-subtitle">
                 <Text id="history.subtitle" />
               </div>
               <div class="page-options d-flex">
-                <select onChange={props.selectRoom} class="form-control custom-select w-auto">
+                <Localizer>
+                  <input
+                    type="date"
+                    class={cx('form-control', 'w-auto', style.dateInput)}
+                    value={props.selectedDate || ''}
+                    onChange={props.selectDate}
+                    max={dayjs().format('YYYY-MM-DD')}
+                    title={<Text id="history.jumpToDate" />}
+                  />
+                </Localizer>
+                <select onChange={props.selectRoom} class="form-control custom-select w-auto ml-2">
                   <option value="">
                     <Text id="history.allRooms" />
                   </option>
@@ -146,6 +158,19 @@ const HistoryPage = ({ intl, user, ...props }) => {
                 </button>
               ))}
             </div>
+
+            {props.selectedDate && (
+              <div class={style.pastBanner}>
+                <span>
+                  <i class="fe fe-clock mr-2" />
+                  <Text id="history.browsingPast" fields={{ date: dayjs(props.selectedDate).format('DD/MM/YYYY') }} />
+                </span>
+                <button type="button" class="btn btn-sm btn-outline-primary" onClick={props.backToLive}>
+                  <i class="fe fe-zap mr-1" />
+                  <Text id="history.backToLive" />
+                </button>
+              </div>
+            )}
 
             {props.pendingLiveEvents.length > 0 && (
               <button type="button" class={style.newEventsPill} onClick={props.showPendingLiveEvents}>

@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import debounce from 'debounce';
+import dayjs from 'dayjs';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import HistoryPage from './HistoryPage';
@@ -81,6 +82,11 @@ class History extends Component {
       const params = this.buildQueryParams();
       if (!reset && this.state.events.length > 0) {
         params.before = this.state.events[this.state.events.length - 1].created_at;
+      } else if (this.state.selectedDate) {
+        // Jump to the end of the selected day, in the user's timezone
+        params.before = dayjs(this.state.selectedDate)
+          .endOf('day')
+          .toISOString();
       }
       const newEvents = await this.props.httpClient.get('/api/v1/device_feature/states_history', params);
       this.setState(prevState => ({
@@ -118,6 +124,18 @@ class History extends Component {
     this.setState({ selectedRoomId: e.target.value || null, expandedGroups: {} }, this.refreshEvents);
   };
 
+  selectDate = e => {
+    this.setState(
+      { selectedDate: e.target.value || null, expandedGroups: {}, pendingLiveEvents: [] },
+      this.refreshEvents
+    );
+  };
+
+  backToLive = () => {
+    this.setState({ selectedDate: null, expandedGroups: {}, pendingLiveEvents: [] }, this.refreshEvents);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   search = e => {
     this.setState({ search: e.target.value, expandedGroups: {} });
     this.debouncedRefreshEvents();
@@ -150,6 +168,10 @@ class History extends Component {
   };
 
   onNewState = payload => {
+    // When browsing a past date, don't disturb the view with live events
+    if (this.state.selectedDate) {
+      return;
+    }
     if (!this.featuresBySelector) {
       return;
     }
@@ -197,6 +219,7 @@ class History extends Component {
       expandedGroups: {},
       selectedGroup: null,
       selectedRoomId: null,
+      selectedDate: null,
       search: '',
       loading: true,
       initialized: false,
@@ -226,6 +249,8 @@ class History extends Component {
         user={props.user}
         selectGroup={this.selectGroup}
         selectRoom={this.selectRoom}
+        selectDate={this.selectDate}
+        backToLive={this.backToLive}
         search={this.search}
         loadMore={this.loadMore}
         toggleExpand={this.toggleExpand}
