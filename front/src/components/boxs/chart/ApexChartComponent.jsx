@@ -12,7 +12,9 @@ import { getApexChartAreaOptions } from './ApexChartAreaOptions';
 import { getApexChartLineOptions } from './ApexChartLineOptions';
 import { getApexChartStepLineOptions } from './ApexChartStepLineOptions';
 import { getApexChartTimelineOptions } from './ApexChartTimelineOptions';
+import { applyApexChartTooltipOptions } from './apexChartTooltipOptions';
 import mergeArray from '../../../utils/mergeArray';
+import './style.css';
 
 dayjs.extend(localizedFormat);
 
@@ -46,19 +48,7 @@ class ApexChartComponent extends Component {
           .format('LL');
       };
     }
-    // Configure tooltip with fixed position and date formatter
-    options.tooltip = {
-      followCursor: false,
-      fixed: {
-        enabled: true,
-        position: 'topLeft',
-        offsetX: 0,
-        offsetY: -30
-      },
-      x: {
-        formatter
-      }
-    };
+    applyApexChartTooltipOptions(options, { xFormatter: formatter });
   }
   addDateFormatterRangeBar(options) {
     const createTooltipContent = (opts, startDate, endDate) => {
@@ -109,6 +99,7 @@ class ApexChartComponent extends Component {
     options.tooltip.custom = function(opts) {
       return formatter_custom(opts);
     };
+    applyApexChartTooltipOptions(options);
   }
   getBarChartOptions = () => {
     const options = getApexChartBarOptions({
