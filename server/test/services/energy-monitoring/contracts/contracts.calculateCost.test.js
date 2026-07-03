@@ -253,6 +253,18 @@ describe('Contracts.calculateCost', () => {
       );
       expect(cost).to.equal(1.0);
     });
+
+    it('should throw NotFoundError when no matching rate price is found', async () => {
+      const promise = contractsCalculateCost[ENERGY_CONTRACT_TYPES.ENERCOOP_NUIT_WEEKEND](
+        [{ price: 1500, currency: 'EUR', rate_type: 'peak' }],
+        new Date('2025-03-10T22:30:00.000Z'),
+        10,
+        'Europe/Paris',
+        { publicHolidaysSet },
+      );
+
+      return assert.isRejected(promise, 'No off-peak price found for Enercoop Nuit & Week-end contract');
+    });
   });
 
   describe('ENERCOOP_2_SAISONS contract', () => {
@@ -282,6 +294,18 @@ describe('Contracts.calculateCost', () => {
         { publicHolidaysSet },
       );
       expect(cost).to.be.closeTo(0.9, 0.0001);
+    });
+
+    it('should throw NotFoundError when no matching rate price is found', async () => {
+      const promise = contractsCalculateCost[ENERGY_CONTRACT_TYPES.ENERCOOP_2_SAISONS](
+        [{ price: 1400, currency: 'EUR', rate_type: 'peak' }],
+        new Date('2025-07-15T12:00:00.000Z'),
+        10,
+        'Europe/Paris',
+        { publicHolidaysSet },
+      );
+
+      return assert.isRejected(promise, 'No off-peak price found for Enercoop 2 Saisons contract');
     });
   });
 });

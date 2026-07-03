@@ -4,6 +4,7 @@ const EventEmitter = require('events');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
+const nock = require('nock');
 const historicalTempoData = require('./data/tempo_mock');
 
 dayjs.extend(utc);
@@ -394,6 +395,51 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(deviceFeatureState[3]).to.have.property('value', 10 * 0.1447);
     expect(deviceFeatureState[4]).to.have.property('value', 10 * 0.1552);
     expect(deviceFeatureState[5]).to.have.property('value', 10 * 0.1288);
+  });
+  it('should calculate cost from a specific date for an Enercoop nuit & week-end contract', async () => {
+    nock('https://calendrier.api.gouv.fr')
+      .get('/jours-feries/metropole/2025.json')
+      .reply(200, { '2025-05-01': 'Fête du travail' });
+    nock('https://calendrier.api.gouv.fr')
+      .get('/jours-feries/metropole/2026.json')
+      .reply(200, {});
+
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.ENERCOOP_NUIT_WEEKEND,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1000,
+      rate_type: 'off_peak',
+    });
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.ENERCOOP_NUIT_WEEKEND,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      price: 1800,
+      rate_type: 'peak',
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        created_at: dayjs.tz('2025-03-10T23:30:00.000Z', 'Europe/Paris').toDate(),
+      },
+    ]);
+    const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
+    const date = new Date('2025-03-01T00:00:00.000Z');
+    await energyMonitoring.calculateCostFrom(date);
+    const deviceFeatureState = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      dayjs.tz('2025-01-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+      dayjs.tz('2025-12-01T00:00:00.000Z', 'Europe/Paris').toDate(),
+    );
+    expect(deviceFeatureState).to.have.lengthOf(1);
+    expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.1);
+
+    nock.cleanAll();
   });
   it('should calculate cost from a specific date for a base contract on a daily consumption', async () => {
     // We create a new device with consumption & consumption cost
