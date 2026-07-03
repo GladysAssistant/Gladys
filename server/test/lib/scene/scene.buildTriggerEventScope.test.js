@@ -69,6 +69,70 @@ describe('scene.buildTriggerEventScope', () => {
     expect(triggerEvent).to.not.have.property('device');
     expect(triggerEvent.device_feature).to.equal('unknown-sensor');
   });
+
+  it('should enrich user presence event with user and house info', () => {
+    stateManager.setState('user', 'john', {
+      selector: 'john',
+      firstname: 'John',
+      lastname: 'Doe',
+    });
+    stateManager.setState('house', 'main-house', {
+      selector: 'main-house',
+      name: 'Home',
+    });
+
+    const event = {
+      type: EVENTS.USER_PRESENCE.BACK_HOME,
+      user: 'john',
+      house: 'main-house',
+    };
+
+    const triggerEvent = buildTriggerEventScope(event, stateManager);
+
+    expect(triggerEvent.user).to.deep.equal({
+      selector: 'john',
+      firstname: 'John',
+      lastname: 'Doe',
+    });
+    expect(triggerEvent.house).to.deep.equal({
+      selector: 'main-house',
+      name: 'Home',
+    });
+  });
+
+  it('should enrich area event with user info', () => {
+    stateManager.setState('user', 'john', {
+      selector: 'john',
+      firstname: 'John',
+      lastname: 'Doe',
+    });
+
+    const event = {
+      type: EVENTS.AREA.USER_ENTERED,
+      user: 'john',
+      area: 'kitchen',
+    };
+
+    const triggerEvent = buildTriggerEventScope(event, stateManager);
+
+    expect(triggerEvent.user).to.deep.equal({
+      selector: 'john',
+      firstname: 'John',
+      lastname: 'Doe',
+    });
+  });
+
+  it('should return event unchanged for unsupported trigger types', () => {
+    const event = {
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'gladys/test',
+      message: 'hello',
+    };
+
+    const triggerEvent = buildTriggerEventScope(event, stateManager);
+
+    expect(triggerEvent).to.deep.equal(event);
+  });
 });
 
 describe('scene triggerEvent in actions', () => {
