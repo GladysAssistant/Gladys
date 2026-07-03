@@ -4575,7 +4575,18 @@
       "allRooms": "Alle Räume",
       "type": "Anzeige",
       "eventsOnly": "Ereignisse",
-      "allStates": "Alle"
+      "allStates": "Alle",
+      "deviceTypes": "Typen",
+      "clearCategories": "Alle anzeigen"
+    },
+    "categoryGroups": {
+      "access": "Türen & Zugang",
+      "motion": "Bewegung",
+      "shutters": "Rollläden",
+      "lights": "Beleuchtung",
+      "climate": "Heizung & Klima",
+      "sensors": "Sensoren",
+      "security": "Sicherheit"
     },
     "eventTitle": {
       "opening-sensor": {

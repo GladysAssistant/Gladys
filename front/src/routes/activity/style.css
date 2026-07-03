@@ -24,6 +24,13 @@
   line-height: 1.5;
 }
 
+.filterBars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
 /* ── Toolbar ────────────────────────────────────────────── */
 
 .toolbar {
@@ -80,7 +87,7 @@
 }
 
 .dateRangeBar {
-  margin: 0 0 1.25rem;
+  margin: 0;
 }
 
 .dateRangeBarInner {
@@ -146,6 +153,91 @@
 .dateInput:focus {
   outline: none;
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+}
+
+.categoryBar {
+  margin: 0;
+}
+
+.categoryBarInner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.categoryBarLabel {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.categoryChips {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.categoryChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.categoryChip:hover {
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.categoryChipActive {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+  box-shadow: 0 1px 2px rgba(59, 130, 246, 0.12);
+}
+
+.categoryChipIcon {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.categoryClear {
+  border: none;
+  background: transparent;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-radius: 6px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.categoryClear:hover {
+  background: #f3f4f6;
+  color: #374151;
 }
 
 .roomSelect {
@@ -411,6 +503,42 @@
   color-scheme: dark;
 }
 
+.dark-mode .categoryBarInner {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark-mode .categoryBarLabel {
+  color: #9ca3af;
+}
+
+.dark-mode .categoryChip {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #9ca3af;
+}
+
+.dark-mode .categoryChip:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #d1d5db;
+}
+
+.dark-mode .categoryChipActive {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(96, 165, 250, 0.45);
+  color: #93c5fd;
+  box-shadow: none;
+}
+
+.dark-mode .categoryClear {
+  color: #9ca3af;
+}
+
+.dark-mode .categoryClear:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #d1d5db;
+}
+
 .dark-mode .roomSelect {
   background-color: rgba(255, 255, 255, 0.07);
   color: #d1d5db;
@@ -576,6 +704,22 @@
 
   .dateRangeSep {
     display: none;
+  }
+
+  .categoryBarInner {
+    align-items: flex-start;
+  }
+
+  .categoryBarLabel {
+    width: 100%;
+  }
+
+  .categoryChips {
+    width: 100%;
+  }
+
+  .categoryClear {
+    margin-left: 0;
   }
 
   .roomSelect {

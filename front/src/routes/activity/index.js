@@ -6,6 +6,8 @@ import {
   convertGladysDateToISO8601,
   formatDateInputValue,
   getCustomDateRangeISO,
+  getCategoriesFromGroups,
+  isCategoryInGroups,
   isCustomRangeIncludingToday
 } from './utils';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
@@ -34,6 +36,7 @@ class ActivityLog extends Component {
       customTo: today,
       roomSelector: '',
       mode: 'all',
+      categoryGroups: [],
       featureMap: {}
     };
   }
@@ -61,7 +64,7 @@ class ActivityLog extends Component {
   };
 
   buildQueryParams = (skip = 0) => {
-    const { roomSelector, mode } = this.state;
+    const { roomSelector, mode, categoryGroups } = this.state;
     const { from, to } = this.getDateRange();
     const params = {
       from,
@@ -72,6 +75,10 @@ class ActivityLog extends Component {
     };
     if (roomSelector) {
       params.room_selector = roomSelector;
+    }
+    const categories = getCategoriesFromGroups(categoryGroups);
+    if (categories.length > 0) {
+      params.categories = categories.join(',');
     }
     return params;
   };
@@ -145,9 +152,13 @@ class ActivityLog extends Component {
       return;
     }
 
-    const { featureMap } = this.state;
+    const { featureMap, categoryGroups } = this.state;
     const feature = featureMap[payload.device_feature_selector];
     if (!feature) {
+      return;
+    }
+
+    if (!isCategoryInGroups(feature.category, categoryGroups)) {
       return;
     }
 
@@ -199,6 +210,25 @@ class ActivityLog extends Component {
     this.setState({ mode }, () => this.loadEntries());
   };
 
+  handleCategoryGroupToggle = groupId => {
+    this.setState(
+      prevState => {
+        const { categoryGroups } = prevState;
+        const isSelected = categoryGroups.indexOf(groupId) !== -1;
+        const nextCategoryGroups = isSelected
+          ? categoryGroups.filter(id => id !== groupId)
+          : [...categoryGroups, groupId];
+
+        return { categoryGroups: nextCategoryGroups };
+      },
+      () => this.loadEntries()
+    );
+  };
+
+  handleCategoryGroupsClear = () => {
+    this.setState({ categoryGroups: [] }, () => this.loadEntries());
+  };
+
   handleRefresh = () => {
     this.loadEntries();
   };
@@ -230,6 +260,7 @@ class ActivityLog extends Component {
         roomSelector={state.roomSelector}
         rooms={state.rooms}
         mode={state.mode}
+        categoryGroups={state.categoryGroups}
         dictionary={props.intl.dictionary}
         language={props.user.language}
         onPeriodChange={this.handlePeriodChange}
@@ -237,6 +268,8 @@ class ActivityLog extends Component {
         onCustomToChange={this.handleCustomToChange}
         onRoomChange={this.handleRoomChange}
         onModeChange={this.handleModeChange}
+        onCategoryGroupToggle={this.handleCategoryGroupToggle}
+        onCategoryGroupsClear={this.handleCategoryGroupsClear}
         onRefresh={this.handleRefresh}
         onLoadMore={this.handleLoadMore}
       />

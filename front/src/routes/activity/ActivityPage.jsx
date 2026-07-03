@@ -3,6 +3,7 @@ import cx from 'classnames';
 import ActivityLogEntry from './ActivityLogEntry';
 import ActivityLogFilters from './ActivityLogFilters';
 import ActivityDateRangeBar from './ActivityDateRangeBar';
+import ActivityCategoryFilters from './ActivityCategoryFilters';
 import { groupEntriesByDay } from './utils';
 import style from './style.css';
 
@@ -17,6 +18,7 @@ const ActivityPage = ({
   roomSelector,
   rooms,
   mode,
+  categoryGroups,
   dictionary,
   language,
   onPeriodChange,
@@ -24,6 +26,8 @@ const ActivityPage = ({
   onCustomToChange,
   onRoomChange,
   onModeChange,
+  onCategoryGroupToggle,
+  onCategoryGroupsClear,
   onRefresh,
   onLoadMore
 }) => {
@@ -57,14 +61,21 @@ const ActivityPage = ({
               </div>
             </div>
 
-            {period === 'custom' && (
-              <ActivityDateRangeBar
-                customFrom={customFrom}
-                customTo={customTo}
-                onCustomFromChange={onCustomFromChange}
-                onCustomToChange={onCustomToChange}
+            <div class={style.filterBars}>
+              {period === 'custom' && (
+                <ActivityDateRangeBar
+                  customFrom={customFrom}
+                  customTo={customTo}
+                  onCustomFromChange={onCustomFromChange}
+                  onCustomToChange={onCustomToChange}
+                />
+              )}
+              <ActivityCategoryFilters
+                categoryGroups={categoryGroups}
+                onCategoryGroupToggle={onCategoryGroupToggle}
+                onCategoryGroupsClear={onCategoryGroupsClear}
               />
-            )}
+            </div>
 
             <div class={cx('dimmer', style.dimmerWrap, { active: loading && entries.length > 0 })}>
               <div class="loader" />

@@ -57,6 +57,81 @@ const VALUE_ICON_OVERRIDES = {
 
 const DEFAULT_STYLE = { icon: 'cpu', color: '#94a3b8' };
 
+const ACTIVITY_CATEGORY_GROUPS = [
+  {
+    id: 'access',
+    icon: 'lock',
+    categories: ['opening-sensor', 'lock', 'child-lock']
+  },
+  {
+    id: 'motion',
+    icon: 'activity',
+    categories: ['motion-sensor', 'presence-sensor', 'vibration-sensor']
+  },
+  {
+    id: 'shutters',
+    icon: 'sidebar',
+    categories: ['shutter', 'curtain']
+  },
+  {
+    id: 'lights',
+    icon: 'sun',
+    categories: ['light', 'switch', 'button']
+  },
+  {
+    id: 'climate',
+    icon: 'thermometer',
+    categories: ['heater', 'thermostat', 'air-conditioning', 'fan']
+  },
+  {
+    id: 'sensors',
+    icon: 'cloud',
+    categories: [
+      'temperature-sensor',
+      'humidity-sensor',
+      'co2-sensor',
+      'co-sensor',
+      'light-sensor',
+      'pressure-sensor',
+      'energy-sensor',
+      'pm25-sensor',
+      'pm10-sensor',
+      'airquality-sensor',
+      'voc-sensor',
+      'rain-sensor'
+    ]
+  },
+  {
+    id: 'security',
+    icon: 'shield',
+    categories: ['smoke-sensor', 'leak-sensor', 'siren', 'tamper', 'battery-low']
+  }
+];
+
+const getCategoriesFromGroups = groupIds => {
+  if (!groupIds || groupIds.length === 0) {
+    return [];
+  }
+
+  const categories = new Set();
+
+  ACTIVITY_CATEGORY_GROUPS.forEach(group => {
+    if (groupIds.indexOf(group.id) !== -1) {
+      group.categories.forEach(category => categories.add(category));
+    }
+  });
+
+  return Array.from(categories);
+};
+
+const isCategoryInGroups = (category, groupIds) => {
+  if (!groupIds || groupIds.length === 0) {
+    return true;
+  }
+
+  return getCategoriesFromGroups(groupIds).indexOf(category) !== -1;
+};
+
 const INTEGER_VALUE_TYPES = new Set(['integer', 'click', 'push']);
 
 const formatNumericValue = (value, unit, dictionary) => {
@@ -312,7 +387,10 @@ export {
   formatDateInputValue,
   getCustomDateRangeISO,
   isCustomRangeIncludingToday,
+  getCategoriesFromGroups,
+  isCategoryInGroups,
   groupEntriesByDay,
   groupEntriesByDate,
+  ACTIVITY_CATEGORY_GROUPS,
   CATEGORY_STYLES
 };
