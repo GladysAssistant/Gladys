@@ -1,30 +1,34 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import { Text } from 'preact-i18n';
 import Select from 'react-select';
+import get from 'get-value';
 
 import { getDeviceFeatureName } from '../../utils/device';
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import './SelectDeviceFeature.css';
+
+const sortByLabel = (a, b) => a.label.localeCompare(b.label);
 
 class SelectDeviceFeature extends Component {
+  getFeatureTypeLabel = (category, type) => {
+    const label = get(this.props.intl.dictionary, `deviceFeatureCategory.${category}.${type}`);
+    if (label) {
+      return label;
+    }
+    return `${category} / ${type}`;
+  };
+
   getOptions = async () => {
     try {
       const rooms = await this.props.httpClient.get('/api/v1/room', { expand: 'devices' });
-      const deviceOptions = [];
 
       const deviceDictionnary = {};
       const deviceFeaturesDictionnary = {};
+      const allFeatures = [];
+      const roomOptions = [];
 
-      const sortByLabel = (a, b) => {
-        if (a.label < b.label) {
-          return -1;
-        }
-        if (a.label > b.label) {
-          return 1;
-        }
-        return 0;
-      };
-
-      const pushDeviceFeatures = (devices, targetFeatures) => {
+      const pushDeviceFeatures = (devices, roomId = null, roomName = null) => {
         devices.forEach(device => {
           device.features.forEach(feature => {
             deviceFeaturesDictionnary[feature.selector] = feature;
@@ -34,24 +38,19 @@ class SelectDeviceFeature extends Component {
               return;
             }
 
-            targetFeatures.push({
-              value: feature.selector,
-              label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+            allFeatures.push({
+              feature,
+              device,
+              roomId,
+              roomName
             });
           });
         });
       };
 
       rooms.forEach(room => {
-        const roomDeviceFeatures = [];
-        pushDeviceFeatures(room.devices, roomDeviceFeatures);
-        if (roomDeviceFeatures.length > 0) {
-          roomDeviceFeatures.sort(sortByLabel);
-          deviceOptions.push({
-            label: room.name,
-            options: roomDeviceFeatures
-          });
-        }
+        roomOptions.push({ value: room.id, label: room.name });
+        pushDeviceFeatures(room.devices, room.id, room.name);
       });
 
       let devicesWithoutRoom = [];
@@ -62,23 +61,81 @@ class SelectDeviceFeature extends Component {
         console.error('Could not load devices without room', e);
       }
 
-      const noRoomDeviceFeatures = [];
-      pushDeviceFeatures(devicesWithoutRoom, noRoomDeviceFeatures);
-      if (noRoomDeviceFeatures.length > 0) {
-        noRoomDeviceFeatures.sort(sortByLabel);
-        deviceOptions.push({
-          label: this.props.intl.dictionary.device.noRoom,
-          options: noRoomDeviceFeatures
-        });
-      }
+      pushDeviceFeatures(devicesWithoutRoom, 'no-room', this.props.intl.dictionary.device.noRoom);
 
-      await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary });
+      const featureTypeOptions = [];
+      const seenFeatureTypes = new Set();
+      allFeatures.forEach(({ feature }) => {
+        const featureTypeKey = `${feature.category}:${feature.type}`;
+        if (!seenFeatureTypes.has(featureTypeKey)) {
+          seenFeatureTypes.add(featureTypeKey);
+          featureTypeOptions.push({
+            value: featureTypeKey,
+            label: this.getFeatureTypeLabel(feature.category, feature.type)
+          });
+        }
+      });
+      featureTypeOptions.sort(sortByLabel);
+      roomOptions.sort(sortByLabel);
+
+      await this.setState({
+        allFeatures,
+        roomOptions,
+        featureTypeOptions,
+        deviceFeaturesDictionnary,
+        deviceDictionnary
+      });
       await this.refreshSelectedOptions(this.props);
-      return deviceOptions;
     } catch (e) {
       console.error(e);
     }
   };
+
+  getFilteredDeviceOptions = () => {
+    const { allFeatures, filterRoom, filterType } = this.state;
+    if (!allFeatures) {
+      return [];
+    }
+
+    let filteredFeatures = allFeatures;
+    if (filterRoom) {
+      filteredFeatures = filteredFeatures.filter(({ roomId }) => roomId === filterRoom);
+    }
+    if (filterType) {
+      filteredFeatures = filteredFeatures.filter(({ feature }) => `${feature.category}:${feature.type}` === filterType);
+    }
+
+    const featureOptions = filteredFeatures.map(({ feature, device }) => ({
+      value: feature.selector,
+      label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+    }));
+    featureOptions.sort(sortByLabel);
+
+    if (filterRoom || filterType) {
+      return featureOptions;
+    }
+
+    const groupedOptions = {};
+    filteredFeatures.forEach(({ feature, device, roomName }) => {
+      const groupLabel = roomName || this.props.intl.dictionary.device.noRoom;
+      if (!groupedOptions[groupLabel]) {
+        groupedOptions[groupLabel] = [];
+      }
+      groupedOptions[groupLabel].push({
+        value: feature.selector,
+        label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+      });
+    });
+
+    return Object.keys(groupedOptions)
+      .sort()
+      .map(label => {
+        const options = groupedOptions[label];
+        options.sort(sortByLabel);
+        return { label, options };
+      });
+  };
+
   handleChange = selectedOption => {
     const { deviceFeaturesDictionnary, deviceDictionnary } = this.state;
     if (selectedOption && selectedOption.value) {
@@ -90,40 +147,91 @@ class SelectDeviceFeature extends Component {
       this.props.onDeviceFeatureChange(null);
     }
   };
-  refreshSelectedOptions = async nextProps => {
-    let selectedOption = '';
-    const { selectedOption: originalSelected } = this.state;
-    if (nextProps.value && this.state.deviceOptions) {
-      let deviceOption;
-      let i = 0;
-      while (i < this.state.deviceOptions.length && deviceOption === undefined) {
-        deviceOption = this.state.deviceOptions[i].options.find(option => option.value === nextProps.value);
-        i++;
-      }
 
-      if (deviceOption) {
-        selectedOption = deviceOption;
-      }
+  handleMultiChange = selectedOptions => {
+    const { deviceFeaturesDictionnary, deviceDictionnary } = this.state;
+
+    if (!selectedOptions || selectedOptions.length === 0) {
+      this.setState({ selectedOption: null, selectedOptions: [] });
+      this.props.onDeviceFeatureChange(null);
+      return;
     }
 
-    await this.setState({ selectedOption });
+    const firstOption = selectedOptions[0];
+    const additionalOptions = selectedOptions.slice(1);
 
-    if (originalSelected !== selectedOption) {
+    this.props.onDeviceFeatureChange(
+      deviceFeaturesDictionnary[firstOption.value],
+      deviceDictionnary[firstOption.value]
+    );
+
+    if (additionalOptions.length > 0 && this.props.onAdditionalDeviceFeaturesSelected) {
+      this.props.onAdditionalDeviceFeaturesSelected(
+        additionalOptions.map(option => ({
+          deviceFeature: deviceFeaturesDictionnary[option.value],
+          device: deviceDictionnary[option.value]
+        }))
+      );
+    }
+
+    this.setState({ selectedOption: firstOption, selectedOptions: [firstOption] });
+  };
+
+  handleRoomFilterChange = selectedOption => {
+    this.setState({ filterRoom: selectedOption ? selectedOption.value : null });
+  };
+
+  handleTypeFilterChange = selectedOption => {
+    this.setState({ filterType: selectedOption ? selectedOption.value : null });
+  };
+
+  refreshSelectedOptions = async nextProps => {
+    const deviceOptions = this.getFilteredDeviceOptions();
+    let selectedOption = null;
+    const { selectedOption: originalSelected } = this.state;
+
+    if (nextProps.value && this.state.deviceFeaturesDictionnary[nextProps.value]) {
+      const feature = this.state.deviceFeaturesDictionnary[nextProps.value];
+      const device = this.state.deviceDictionnary[nextProps.value];
+      selectedOption = {
+        value: nextProps.value,
+        label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+      };
+    }
+
+    const selectedOptions = selectedOption ? [selectedOption] : [];
+
+    await this.setState({
+      selectedOption,
+      selectedOptions,
+      deviceOptions
+    });
+
+    if (!this.props.isMulti && originalSelected !== selectedOption && nextProps.value !== this.props.value) {
       if (selectedOption) {
         this.props.onDeviceFeatureChange(
           this.state.deviceFeaturesDictionnary[selectedOption.value],
           this.state.deviceDictionnary[selectedOption.value]
         );
-      } else {
+      } else if (nextProps.value === null || nextProps.value === undefined) {
         this.props.onDeviceFeatureChange(null, null);
       }
     }
   };
+
   constructor(props) {
     super(props);
     this.state = {
+      allFeatures: null,
+      roomOptions: [],
+      featureTypeOptions: [],
       deviceOptions: null,
-      selectedOption: ''
+      deviceFeaturesDictionnary: {},
+      deviceDictionnary: {},
+      filterRoom: null,
+      filterType: null,
+      selectedOption: null,
+      selectedOptions: []
     };
   }
 
@@ -135,21 +243,76 @@ class SelectDeviceFeature extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOption, deviceOptions }) {
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.filterRoom !== this.state.filterRoom ||
+      prevState.filterType !== this.state.filterType ||
+      prevState.allFeatures !== this.state.allFeatures
+    ) {
+      this.refreshSelectedOptions(this.props);
+    }
+  }
+
+  render(props, state) {
+    const { withFilters, isMulti } = props;
+    const {
+      deviceOptions,
+      roomOptions,
+      featureTypeOptions,
+      filterRoom,
+      filterType,
+      selectedOption,
+      selectedOptions
+    } = state;
+
     if (!deviceOptions) {
       return null;
     }
+
+    const roomFilterValue = filterRoom ? roomOptions.find(option => option.value === filterRoom) : null;
+    const typeFilterValue = filterType ? featureTypeOptions.find(option => option.value === filterType) : null;
+
     return (
-      <Select
-        class="select-device-feature"
-        defaultValue={''}
-        value={selectedOption}
-        onChange={this.handleChange}
-        options={deviceOptions}
-        styles={{ menu: base => ({ ...base, zIndex: 2 }) }}
-        className="react-select-container"
-        classNamePrefix="react-select"
-      />
+      <div>
+        {withFilters && (
+          <div class="select-device-feature-filters">
+            <div class="select-device-feature-filter">
+              <Select
+                isClearable
+                placeholder={<Text id="selectDeviceFeature.filterByRoom" />}
+                value={roomFilterValue}
+                onChange={this.handleRoomFilterChange}
+                options={roomOptions}
+                className="react-select-container"
+                classNamePrefix="react-select"
+              />
+            </div>
+            <div class="select-device-feature-filter">
+              <Select
+                isClearable
+                placeholder={<Text id="selectDeviceFeature.filterByType" />}
+                value={typeFilterValue}
+                onChange={this.handleTypeFilterChange}
+                options={featureTypeOptions}
+                className="react-select-container"
+                classNamePrefix="react-select"
+              />
+            </div>
+          </div>
+        )}
+        <Select
+          class="select-device-feature"
+          defaultValue={isMulti ? [] : ''}
+          isMulti={isMulti}
+          closeMenuOnSelect={!isMulti}
+          value={isMulti ? selectedOptions : selectedOption}
+          onChange={isMulti ? this.handleMultiChange : this.handleChange}
+          options={deviceOptions}
+          styles={{ menu: base => ({ ...base, zIndex: 2 }) }}
+          className="react-select-container"
+          classNamePrefix="react-select"
+        />
+      </div>
     );
   }
 }
