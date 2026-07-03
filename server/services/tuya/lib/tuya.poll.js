@@ -191,6 +191,11 @@ const getTemperatureUnitFromLocalDps = (device, dps) => {
   if (!unitProperty || unitProperty.dp_id === undefined || unitProperty.dp_id === null) {
     return null;
   }
+  // Partial pushes rarely carry the unit DP: keep the remembered unit untouched instead of
+  // clobbering it with undefined (a °F device would silently lose its conversion otherwise).
+  if (!hasDpsKey(dps, unitProperty.dp_id)) {
+    return null;
+  }
   const rawValue = Object.prototype.hasOwnProperty.call(dps, String(unitProperty.dp_id))
     ? dps[String(unitProperty.dp_id)]
     : dps[unitProperty.dp_id];

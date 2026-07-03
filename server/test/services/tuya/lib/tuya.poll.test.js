@@ -1134,6 +1134,36 @@ describe('emitLocalDpsStates temperature transform (local + push regression)', (
     expect(stateEvent.args[1].state).to.equal(20);
   });
 
+  it('keeps the remembered device unit on a partial push without the unit DP', () => {
+    const emit = sinon.stub();
+    const gladysStub = { event: { emit } };
+    const device = {
+      external_id: 'tuya:therm',
+      device_type: 'pilot-thermostat',
+      // The unit was learned earlier (value 'f'); this partial push does not carry DPS 9.
+      properties: { properties: [{ code: 'temp_unit_convert', dp_id: 9, value: 'f' }] },
+      features: [
+        {
+          external_id: 'tuya:therm:temp_current',
+          selector: 'tuya-therm-temp-current',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          unit: 'celsius',
+          scale: 1,
+        },
+      ],
+    };
+
+    const { handledCodes } = emitLocalDpsStates(gladysStub, device, { 116: 680 });
+
+    expect(handledCodes.has('temp_current')).to.equal(true);
+    const stateEvent = emit.getCalls().find((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
+    // 68 °F converted with the REMEMBERED unit -> 20 °C (a clobbered unit would emit the raw 68).
+    expect(stateEvent.args[1].state).to.equal(20);
+    // And the remembered unit is still there for the next partial push.
+    expect(device.properties.properties[0].value).to.equal('f');
+  });
+
   it('derives the temperature unit from the caller when provided', () => {
     const emit = sinon.stub();
     const gladysStub = { event: { emit } };
