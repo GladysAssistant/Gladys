@@ -381,4 +381,75 @@ describe('SceneManager.dailyUpdate', () => {
     await Promise.resolve();
     expect(sceneManager.jobs).to.have.lengthOf(2);
   });
+
+  it('should deduplicate sun position triggers when multiple scenes share the same altitude and azimuth', async () => {
+    const clock = sinon.useFakeTimers(new Date('2026-06-21T06:00:00Z').getTime());
+    try {
+      brain.addNamedEntity = fake.returns(null);
+      await sceneManager.addScene({
+        selector: 'scene-sun-a',
+        active: true,
+        actions: [],
+        triggers: [{ type: EVENTS.TIME.SUN_POSITION, house: 'house-1', altitude: 65, azimuth: 60 }],
+      });
+      await Promise.resolve();
+      await sceneManager.addScene({
+        selector: 'scene-sun-b',
+        active: true,
+        actions: [],
+        triggers: [{ type: EVENTS.TIME.SUN_POSITION, house: 'house-1', altitude: 65, azimuth: 60 }],
+      });
+      await Promise.resolve();
+      // offset=0 sunrise + offset=0 sunset + deduplicated sun position = 3 jobs
+      expect(sceneManager.jobs).to.have.lengthOf(3);
+    } finally {
+      clock.restore();
+    }
+  });
+
+  it('should not schedule sun position job when match time is in the past', async () => {
+    const clock = sinon.useFakeTimers(new Date('2026-06-21T18:00:00Z').getTime());
+    try {
+      scheduler.scheduleJob = (date, callback) => {
+        if (date.getTime() < Date.now()) {
+          return null;
+        }
+        return {
+          callback,
+          date,
+          cancel: () => {},
+        };
+      };
+      brain.addNamedEntity = fake.returns(null);
+      await sceneManager.addScene({
+        selector: 'scene-past-sun',
+        active: true,
+        actions: [],
+        triggers: [{ type: EVENTS.TIME.SUN_POSITION, house: 'house-1', altitude: 65, azimuth: 60 }],
+      });
+      await Promise.resolve();
+      // Sun position match at 09:34 is in the past; only sunrise + sunset jobs remain
+      expect(sceneManager.jobs).to.have.lengthOf(2);
+    } finally {
+      clock.restore();
+    }
+  });
+
+  it('should log when no sun position match is found today', async () => {
+    const clock = sinon.useFakeTimers(new Date('2026-06-21T06:00:00Z').getTime());
+    try {
+      brain.addNamedEntity = fake.returns(null);
+      await sceneManager.addScene({
+        selector: 'scene-no-match',
+        active: true,
+        actions: [],
+        triggers: [{ type: EVENTS.TIME.SUN_POSITION, house: 'house-1', altitude: 31, azimuth: 160 }],
+      });
+      await Promise.resolve();
+      // No sun position match for this house today: only sunrise + sunset = 2 jobs
+      expect(sceneManager.jobs).to.have.lengthOf(2);
+    } finally {
+      clock.restore();
+    }
+  });
 });
