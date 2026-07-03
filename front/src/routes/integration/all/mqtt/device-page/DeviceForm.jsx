@@ -17,7 +17,7 @@ class MqttDeviceForm extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'external_id', e.target.value);
   };
 
-  render({ ...props }) {
+  render({ compact, ...props }) {
     return (
       <div>
         <div class="form-group">
@@ -73,26 +73,28 @@ class MqttDeviceForm extends Component {
           </select>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">
-            <Text id="integration.mqtt.device.featuresLabel" />
-          </label>
-          <DeviceFeatures features={props.device.features} />
-          <p class="mt-4">
-            {props.mostRecentValueAt ? (
-              <Text
-                id="integration.mqtt.device.mostRecentValueAt"
-                fields={{
-                  mostRecentValueAt: dayjs(props.mostRecentValueAt)
-                    .locale(props.user.language)
-                    .fromNow()
-                }}
-              />
-            ) : (
-              <Text id="integration.mqtt.device.noValueReceived" />
-            )}
-          </p>
-        </div>
+        {!compact && (
+          <div class="form-group">
+            <label class="form-label">
+              <Text id="integration.mqtt.device.featuresLabel" />
+            </label>
+            <DeviceFeatures features={props.device.features} />
+            <p class="mt-4">
+              {props.mostRecentValueAt ? (
+                <Text
+                  id="integration.mqtt.device.mostRecentValueAt"
+                  fields={{
+                    mostRecentValueAt: dayjs(props.mostRecentValueAt)
+                      .locale(props.user.language)
+                      .fromNow()
+                  }}
+                />
+              ) : (
+                <Text id="integration.mqtt.device.noValueReceived" />
+              )}
+            </p>
+          </div>
+        )}
       </div>
     );
   }

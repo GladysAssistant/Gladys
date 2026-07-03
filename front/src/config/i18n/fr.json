@@ -1794,7 +1794,93 @@
         },
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes sont uniques ?",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
-        "noValueReceived": "Aucune valeur reçue."
+        "noValueReceived": "Aucune valeur reçue.",
+        "searchPlaceholder": "Rechercher un appareil...",
+        "unassignedRoom": "Sans pièce",
+        "featureCount": "{{count}} fonctionnalité(s)"
+      },
+      "featureCatalog": {
+        "title": "Catalogue des fonctionnalités",
+        "subtitle": "Parcourez les fonctionnalités disponibles et visualisez leur rendu sur le tableau de bord.",
+        "searchPlaceholder": "Rechercher une fonctionnalité (ex : température, variateur, interrupteur...)",
+        "openButton": "Ajouter une fonctionnalité",
+        "closeButton": "Fermer le catalogue",
+        "previewLabel": "Aperçu tableau de bord",
+        "noResults": "Aucune fonctionnalité ne correspond à votre recherche.",
+        "noFeaturesYet": "Aucune fonctionnalité ajoutée. Utilisez le bouton ci-dessous pour parcourir le catalogue.",
+        "sensorBadge": "Capteur",
+        "actuatorBadge": "Actionneur",
+        "historyBadge": "Historisé",
+        "fallbackDescription": "Une fonctionnalité Gladys contrôlable ou consultable via MQTT.",
+        "categoryDescriptions": {
+          "light": "Contrôlez les lumières : marche/arrêt, luminosité, couleur et température de couleur.",
+          "switch": "Contrôlez les interrupteurs, variateurs et mesures de puissance.",
+          "temperature-sensor": "Lisez les valeurs de température de vos capteurs.",
+          "humidity-sensor": "Lisez les niveaux d'humidité de vos capteurs.",
+          "motion-sensor": "Détectez les mouvements dans une pièce ou une zone.",
+          "energy-sensor": "Surveillez la consommation d'énergie, la puissance et l'index électrique.",
+          "shutter": "Contrôlez les volets roulants et stores.",
+          "curtain": "Contrôlez les rideaux et leur position.",
+          "thermostat": "Définissez et lisez les consignes de chauffage.",
+          "button": "Déclenchez des actions à l'appui d'un bouton.",
+          "text": "Affichez ou envoyez des valeurs texte.",
+          "battery": "Surveillez le niveau de batterie de vos appareils."
+        },
+        "descriptions": {
+          "light": {
+            "binary": "Un simple interrupteur marche/arrêt pour contrôler une lumière.",
+            "brightness": "Un curseur pour régler la luminosité de 0% à 100%.",
+            "color": "Un sélecteur de couleur pour définir la teinte de la lumière.",
+            "temperature": "Un curseur pour ajuster la température de couleur (blanc chaud à froid)."
+          },
+          "switch": {
+            "binary": "Un simple interrupteur marche/arrêt pour tout appareil.",
+            "dimmer": "Un curseur pour contrôler l'intensité d'un appareil."
+          },
+          "temperature-sensor": {
+            "decimal": "Affiche la température actuelle avec son unité."
+          },
+          "humidity-sensor": {
+            "decimal": "Affiche le pourcentage d'humidité actuel."
+          },
+          "motion-sensor": {
+            "binary": "Indique si un mouvement est actuellement détecté."
+          },
+          "energy-sensor": {
+            "power": "Affiche la puissance instantanée en watts.",
+            "index": "Affiche l'index cumulé d'énergie (compteur kWh)."
+          },
+          "shutter": {
+            "state": "Ouvrez ou fermez un volet avec les boutons haut/bas.",
+            "position": "Réglez la position du volet avec un curseur (0% = fermé)."
+          },
+          "thermostat": {
+            "target-temperature": "Définissez la température de consigne avec les boutons +/-."
+          },
+          "button": {
+            "push": "Un bouton pour déclencher une action dans Gladys ou via MQTT."
+          },
+          "text": {
+            "text": "Affiche une valeur texte, utile pour des messages ou données personnalisés."
+          },
+          "battery": {
+            "integer": "Affiche le niveau de batterie en pourcentage."
+          }
+        },
+        "keywords": {
+          "light": {
+            "brightness": "variateur curseur slider lampe",
+            "binary": "marche arrêt interrupteur lampe",
+            "temperature": "blanc chaud froid kelvin température couleur"
+          },
+          "switch": {
+            "dimmer": "variateur curseur slider",
+            "binary": "marche arrêt interrupteur prise"
+          },
+          "temperature-sensor": {
+            "decimal": "temp thermomètre climat"
+          }
+        }
       },
       "feature": {
         "nameLabel": "Nom",

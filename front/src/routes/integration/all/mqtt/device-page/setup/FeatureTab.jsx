@@ -1,12 +1,13 @@
 import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import cx from 'classnames';
 
 import Feature from './Feature';
-import Select from 'react-select';
+import FeatureCatalog from './FeatureCatalog';
 import { RequestStatus } from '../../../../../../utils/consts';
 
 import MqttDeviceForm from '../DeviceForm';
-import cx from 'classnames';
+import style from '../style.css';
 
 const FeatureTab = ({ children, ...props }) => (
   <div class="card">
@@ -19,6 +20,11 @@ const FeatureTab = ({ children, ...props }) => (
       <h3 class="card-title">
         {(props.device && props.device.name) || <Text id="integration.mqtt.device.noNameLabel" />}
       </h3>
+      <div class="page-options">
+        <button onClick={props.saveDevice} class="btn btn-success" disabled={props.loading}>
+          <Text id="integration.mqtt.device.saveButton" />
+        </button>
+      </div>
     </div>
     <div
       class={cx('dimmer', {
@@ -70,44 +76,62 @@ const FeatureTab = ({ children, ...props }) => (
           )}
           {props.device && (
             <div>
-              <MqttDeviceForm {...props} />
+              <div class={style.deviceEditSection}>
+                <MqttDeviceForm {...props} compact />
+              </div>
 
-              <div class="d-flex mb-4">
-                <div class="w-50">
-                  <Select
-                    onChange={props.selectFeature}
-                    value={props.selectedFeatureOption}
-                    options={props.deviceFeaturesOptions}
-                    placeholder={<Text id="global.selectPlaceholder" />}
-                  />
+              <div class={style.featuresSection}>
+                <div class={style.featuresSectionHeader}>
+                  <h4 class="mb-0">
+                    <Text id="integration.mqtt.device.featuresLabel" />
+                  </h4>
+                  <span class="badge badge-secondary">{props.device.features ? props.device.features.length : 0}</span>
                 </div>
-                <div>
+
+                {props.device.features && props.device.features.length > 0 && (
+                  <div class={style.featureAccordionList}>
+                    {props.device.features.map((feature, index) => (
+                      <Feature
+                        {...props}
+                        feature={feature}
+                        featureIndex={index}
+                        initiallyExpanded={props.expandedFeatureIndices && props.expandedFeatureIndices.includes(index)}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {(!props.device.features || props.device.features.length === 0) && (
+                  <p class="text-muted">
+                    <Text id="integration.mqtt.featureCatalog.noFeaturesYet" />
+                  </p>
+                )}
+
+                <div class={style.addFeatureSection}>
                   <button
-                    onClick={props.addFeature}
-                    class="btn btn-outline-success ml-2"
-                    disabled={!props.selectedFeature}
+                    type="button"
+                    onClick={props.toggleFeatureCatalog}
+                    class={cx('btn', props.showFeatureCatalog ? 'btn-secondary' : 'btn-outline-primary')}
                   >
-                    <Text id="integration.mqtt.feature.addButton" />
+                    <i class={cx('fe mr-2', props.showFeatureCatalog ? 'fe-x' : 'fe-plus')} />
+                    <Text
+                      id={
+                        props.showFeatureCatalog
+                          ? 'integration.mqtt.featureCatalog.closeButton'
+                          : 'integration.mqtt.featureCatalog.openButton'
+                      }
+                    />
                   </button>
                 </div>
-              </div>
 
-              <div class="row">
-                {props.device &&
-                  props.device.features.map((feature, index) => (
-                    <Feature {...props} feature={feature} featureIndex={index} />
-                  ))}
-              </div>
-
-              <div class="form-group">
-                <Link href="/dashboard/integration/device/mqtt">
-                  <button class="btn btn-secondary mr-2">
-                    <Text id="global.backButton" />
-                  </button>
-                </Link>
-                <button onClick={props.saveDevice} class="btn btn-success mr-2">
-                  <Text id="integration.mqtt.device.saveButton" />
-                </button>
+                {props.showFeatureCatalog && (
+                  <FeatureCatalog
+                    deviceFeaturesOptions={props.deviceFeaturesOptions}
+                    intl={props.intl}
+                    user={props.user}
+                    onSelectFeature={props.selectAndAddFeature}
+                  />
+                )}
               </div>
             </div>
           )}

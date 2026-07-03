@@ -9,6 +9,7 @@ import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
 import { slugify } from '../../../../../../../../server/utils/slugify';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
+import { getFeatureDefaultValues } from '../utils';
 
 import {
   DEVICE_FEATURE_CATEGORIES,
@@ -17,53 +18,31 @@ import {
 } from '../../../../../../../../server/utils/constants';
 
 class MqttDeviceSetupPage extends Component {
-  selectFeature(selectedFeatureOption) {
-    if (selectedFeatureOption && selectedFeatureOption.value) {
-      this.setState({
-        selectedFeature: selectedFeatureOption.value,
-        selectedFeatureOption
-      });
-    } else {
-      this.setState({
-        selectedFeature: null,
-        selectedFeatureOption: null
-      });
-    }
+  toggleFeatureCatalog() {
+    this.setState({
+      showFeatureCatalog: !this.state.showFeatureCatalog
+    });
   }
 
-  addFeature() {
-    const featureData = this.state.selectedFeature.split('|');
-
-    let defaultValues = {};
-
-    if (featureData[1] === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
-      defaultValues.min = 0;
-      defaultValues.max = 1;
+  selectAndAddFeature(selectedFeatureOption) {
+    if (!selectedFeatureOption || !selectedFeatureOption.value) {
+      return;
     }
 
-    if (featureData[1] === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
-      defaultValues.min = 0;
-      defaultValues.max = 0;
-      defaultValues.keep_history = false;
-    }
-
-    if (featureData[1] === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
-      defaultValues.min = 1;
-      defaultValues.max = 1;
-      defaultValues.read_only = false;
-    }
+    const featureData = selectedFeatureOption.value.split('|');
+    const category = featureData[0];
+    const type = featureData[1];
+    const defaultValues = getFeatureDefaultValues(category, type);
+    const newFeatureIndex = this.state.device.features.length;
 
     const device = update(this.state.device, {
       features: {
         $push: [
           {
             id: uuid.v4(),
-            category: featureData[0],
+            category,
             external_id: 'mqtt:',
-            type: featureData[1],
-            read_only: true,
-            has_feedback: false,
-            keep_history: true,
+            type,
             ...defaultValues
           }
         ]
@@ -71,7 +50,9 @@ class MqttDeviceSetupPage extends Component {
     });
 
     this.setState({
-      device
+      device,
+      showFeatureCatalog: false,
+      expandedFeatureIndices: [newFeatureIndex]
     });
   }
 
@@ -372,7 +353,9 @@ class MqttDeviceSetupPage extends Component {
           ) {
             categoryFeatureTypeOptions.push({
               value: `${categoryValue}|${typeValue}`,
-              label: get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`)
+              label: get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`),
+              category: categoryValue,
+              type: typeValue
             });
           }
         });
@@ -389,11 +372,13 @@ class MqttDeviceSetupPage extends Component {
     super(props);
 
     this.state = {
-      loading: true
+      loading: true,
+      showFeatureCatalog: false,
+      expandedFeatureIndices: []
     };
 
-    this.selectFeature = this.selectFeature.bind(this);
-    this.addFeature = this.addFeature.bind(this);
+    this.toggleFeatureCatalog = this.toggleFeatureCatalog.bind(this);
+    this.selectAndAddFeature = this.selectAndAddFeature.bind(this);
     this.deleteFeature = this.deleteFeature.bind(this);
     this.updateDeviceProperty = this.updateDeviceProperty.bind(this);
     this.updateFeatureProperty = this.updateFeatureProperty.bind(this);
@@ -442,8 +427,8 @@ class MqttDeviceSetupPage extends Component {
         <FeatureTab
           {...props}
           {...state}
-          selectFeature={this.selectFeature}
-          addFeature={this.addFeature}
+          toggleFeatureCatalog={this.toggleFeatureCatalog}
+          selectAndAddFeature={this.selectAndAddFeature}
           deleteFeature={this.deleteFeature}
           updateDeviceProperty={this.updateDeviceProperty}
           updateFeatureProperty={this.updateFeatureProperty}

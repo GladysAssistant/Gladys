@@ -1556,7 +1556,93 @@
         },
         "saveConflictError": "Conflict: Are you sure all external IDs are unique?",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
-        "noValueReceived": "No value received."
+        "noValueReceived": "No value received.",
+        "searchPlaceholder": "Search devices...",
+        "unassignedRoom": "No room assigned",
+        "featureCount": "{{count}} feature(s)"
+      },
+      "featureCatalog": {
+        "title": "Feature catalog",
+        "subtitle": "Browse available features and see how they will appear on your dashboard.",
+        "searchPlaceholder": "Search features (e.g. temperature, dimmer, switch...)",
+        "openButton": "Add a feature",
+        "closeButton": "Close catalog",
+        "previewLabel": "Dashboard preview",
+        "noResults": "No features match your search.",
+        "noFeaturesYet": "No features added yet. Use the button below to browse the catalog.",
+        "sensorBadge": "Sensor",
+        "actuatorBadge": "Actuator",
+        "historyBadge": "Logged",
+        "fallbackDescription": "A Gladys feature that can be controlled or monitored via MQTT.",
+        "categoryDescriptions": {
+          "light": "Control lights: on/off, brightness, color and color temperature.",
+          "switch": "Control switches, dimmers and power measurements.",
+          "temperature-sensor": "Read temperature values from your sensors.",
+          "humidity-sensor": "Read humidity levels from your sensors.",
+          "motion-sensor": "Detect motion in a room or area.",
+          "energy-sensor": "Monitor energy consumption, power and electricity index.",
+          "shutter": "Control shutters and blinds.",
+          "curtain": "Control curtains and their position.",
+          "thermostat": "Set and read heating setpoints.",
+          "button": "Trigger actions on button press.",
+          "text": "Display or send text values.",
+          "battery": "Monitor battery level of your devices."
+        },
+        "descriptions": {
+          "light": {
+            "binary": "A simple on/off switch to control a light.",
+            "brightness": "A slider to adjust light brightness from 0% to 100%.",
+            "color": "A color picker to set the light color.",
+            "temperature": "A slider to adjust the color temperature (warm to cool white)."
+          },
+          "switch": {
+            "binary": "A simple on/off switch for any appliance.",
+            "dimmer": "A slider to control the intensity of a device."
+          },
+          "temperature-sensor": {
+            "decimal": "Displays the current temperature with its unit."
+          },
+          "humidity-sensor": {
+            "decimal": "Displays the current humidity percentage."
+          },
+          "motion-sensor": {
+            "binary": "Shows whether motion is currently detected."
+          },
+          "energy-sensor": {
+            "power": "Displays instantaneous power consumption in watts.",
+            "index": "Displays the cumulative energy index (kWh meter)."
+          },
+          "shutter": {
+            "state": "Open or close a shutter with up/down controls.",
+            "position": "Set the shutter position with a slider (0% = closed)."
+          },
+          "thermostat": {
+            "target-temperature": "Set the target temperature with +/- buttons."
+          },
+          "button": {
+            "push": "A button to trigger an action in Gladys or via MQTT."
+          },
+          "text": {
+            "text": "Displays a text value, useful for custom messages or data."
+          },
+          "battery": {
+            "integer": "Shows the battery level as a percentage."
+          }
+        },
+        "keywords": {
+          "light": {
+            "brightness": "dimmer slider variator lamp",
+            "binary": "on off switch lamp",
+            "temperature": "warm cool white kelvin color temperature"
+          },
+          "switch": {
+            "dimmer": "dimmer slider variator",
+            "binary": "on off switch plug outlet"
+          },
+          "temperature-sensor": {
+            "decimal": "temp thermometer climate"
+          }
+        }
       },
       "feature": {
         "nameLabel": "Name",
