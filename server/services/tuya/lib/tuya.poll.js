@@ -254,7 +254,7 @@ const transformFeatureValue = (device, deviceFeature, code, rawValue, deviceTemp
  * @param {object} device - The Gladys device (with features).
  * @param {object} dps - The DPS map (full or partial).
  * @param {string} [deviceTemperatureUnit] - Device temperature unit; derived from dps/device when omitted.
- * @returns {object} { handledCodes: Set<string>, changed: number } of features that were emitted.
+ * @returns {object} The { handledCodes: Set<string>, changed: number } summary of emitted features.
  * @example
  * const { handledCodes } = emitLocalDpsStates(gladys, device, { '1': true });
  */
@@ -448,6 +448,16 @@ async function poll(device) {
     typeof this.isPersistentConnectionConnected === 'function' &&
     this.isPersistentConnectionConnected(topic);
   if (persistentConnected) {
+    // Some firmwares only report on change and ignore the heartbeat refresh: their socket looks
+    // silent while being alive. Probe it with an active local read before sacrificing it — an
+    // answer refreshes the states over the same socket (zero cloud) and ends the cycle here.
+    const probeAnswered =
+      typeof this.probePersistentConnection === 'function' && (await this.probePersistentConnection(topic));
+    if (probeAnswered) {
+      fallbackReason = 'persistent_probe_refreshed';
+      logger.debug(`[Tuya][poll] device=${topic} silent persistent socket answered the probe: state refreshed locally`);
+      return;
+    }
     // Recycle the stale-but-open socket so the single local session frees up: the next cycles then
     // follow the intended priority (persistent -> local poll -> cloud) instead of staying on cloud.
     this.recyclePersistentConnection(topic);

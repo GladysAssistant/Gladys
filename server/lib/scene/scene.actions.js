@@ -58,7 +58,11 @@ const actionsFunc = {
 
     let { value } = action;
     if (action.evaluate_value !== undefined) {
-      value = evaluate(Handlebars.compile(action.evaluate_value)(scope).replace(/\s/g, ''));
+      value = evaluate(
+        Handlebars.compile(action.evaluate_value, {
+          noEscape: true,
+        })(scope).replace(/\s/g, ''),
+      );
     }
 
     if (Number.isNaN(Number(value))) {
@@ -214,7 +218,11 @@ const actionsFunc = {
     // If the value should be calculated from a formula
     if (action.evaluate_value !== undefined) {
       try {
-        value = evaluate(Handlebars.compile(action.evaluate_value)(scope).replace(/\s/g, ''));
+        value = evaluate(
+          Handlebars.compile(action.evaluate_value, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
       } catch (e) {
         logger.warn(`Delay: Error evaluating value: ${action.evaluate_value}`);
         logger.warn(e);
@@ -272,7 +280,9 @@ const actionsFunc = {
     await self.message.sendToUser(action.user, textWithVariables);
   },
   [ACTIONS.MESSAGE.SEND_CAMERA]: async (self, action, scope) => {
-    const textWithVariables = Handlebars.compile(action.text)(scope);
+    const textWithVariables = Handlebars.compile(action.text, {
+      noEscape: true,
+    })(scope);
     const image = await self.device.camera.getLiveImage(action.camera);
     await self.message.sendToUser(action.user, textWithVariables, image);
   },
@@ -312,7 +322,11 @@ const actionsFunc = {
     action.conditions.forEach((condition) => {
       let { value } = condition;
       if (condition.evaluate_value !== undefined) {
-        value = evaluate(Handlebars.compile(condition.evaluate_value)(scope).replace(/\s/g, ''));
+        value = evaluate(
+          Handlebars.compile(condition.evaluate_value, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
       }
 
       // For numeric comparison operators (>, >=, <, <=), value must be a number
@@ -424,12 +438,20 @@ const actionsFunc = {
     const headersObject = {};
     action.headers.forEach((header) => {
       if (header.key && header.value) {
-        headersObject[header.key] = Handlebars.compile(header.value)(scope);
+        headersObject[header.key] = Handlebars.compile(header.value, {
+          noEscape: true,
+        })(scope);
       }
     });
-    const urlWithVariables = Handlebars.compile(action.url)(scope);
+    const urlWithVariables = Handlebars.compile(action.url, {
+      noEscape: true,
+    })(scope);
     // body can be empty
-    const bodyWithVariables = action.body ? Handlebars.compile(action.body)(scope) : undefined;
+    const bodyWithVariables = action.body
+      ? Handlebars.compile(action.body, {
+          noEscape: true,
+        })(scope)
+      : undefined;
     const response = await self.http.request(
       action.method,
       urlWithVariables,
@@ -581,7 +603,9 @@ const actionsFunc = {
     const mqttService = self.service.getService('mqtt');
 
     if (mqttService) {
-      const messageWithVariables = Handlebars.compile(action.message)(scope);
+      const messageWithVariables = Handlebars.compile(action.message, {
+        noEscape: true,
+      })(scope);
       mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
@@ -589,7 +613,9 @@ const actionsFunc = {
     const zigbee2mqttService = self.service.getService('zigbee2mqtt');
 
     if (zigbee2mqttService) {
-      const messageWithVariables = Handlebars.compile(action.message)(scope);
+      const messageWithVariables = Handlebars.compile(action.message, {
+        noEscape: true,
+      })(scope);
       zigbee2mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
