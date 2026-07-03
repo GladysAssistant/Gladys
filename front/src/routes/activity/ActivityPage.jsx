@@ -2,6 +2,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import ActivityLogEntry from './ActivityLogEntry';
 import ActivityLogFilters from './ActivityLogFilters';
+import ActivityDateRangeBar from './ActivityDateRangeBar';
 import { groupEntriesByDay } from './utils';
 import style from './style.css';
 
@@ -34,7 +35,7 @@ const ActivityPage = ({
         <div class="my-3 my-md-5">
           <div class="container">
             <div class={cx('page-header', style.pageHeader)}>
-              <div>
+              <div class={style.pageHeaderTitle}>
                 <h1 class="page-title">
                   <Text id="activityLog.pageTitle" />
                 </h1>
@@ -45,20 +46,25 @@ const ActivityPage = ({
               <div class={cx('page-options', 'd-flex', style.pageOptions)}>
                 <ActivityLogFilters
                   period={period}
-                  customFrom={customFrom}
-                  customTo={customTo}
                   roomSelector={roomSelector}
                   rooms={rooms}
                   mode={mode}
                   onPeriodChange={onPeriodChange}
-                  onCustomFromChange={onCustomFromChange}
-                  onCustomToChange={onCustomToChange}
                   onRoomChange={onRoomChange}
                   onModeChange={onModeChange}
                   onRefresh={onRefresh}
                 />
               </div>
             </div>
+
+            {period === 'custom' && (
+              <ActivityDateRangeBar
+                customFrom={customFrom}
+                customTo={customTo}
+                onCustomFromChange={onCustomFromChange}
+                onCustomToChange={onCustomToChange}
+              />
+            )}
 
             <div class={cx('dimmer', style.dimmerWrap, { active: loading && entries.length > 0 })}>
               <div class="loader" />
