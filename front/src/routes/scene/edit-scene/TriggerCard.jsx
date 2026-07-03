@@ -5,6 +5,7 @@ import DeviceFeatureState from './triggers/DeviceFeatureState';
 import ScheduledTrigger from './triggers/ScheduledTrigger';
 import ChooseTriggerType from './triggers/ChooseTriggerTypeCard';
 import SunriseSunsetTrigger from './triggers/SunriseSunsetTrigger';
+import SunPositionTrigger from './triggers/SunPositionTrigger';
 import UserPresenceTrigger from './triggers/UserPresenceTrigger';
 import HouseEmptyOrNot from './triggers/HouseEmptyOrNot';
 import UserEnteredOrLeftArea from './triggers/UserEnteredOrLeftArea';
@@ -20,6 +21,7 @@ const TRIGGER_ICON = {
   [EVENTS.TIME.CHANGED]: 'fe-watch',
   [EVENTS.TIME.SUNSET]: 'fe-sunset',
   [EVENTS.TIME.SUNRISE]: 'fe-sunrise',
+  [EVENTS.TIME.SUN_POSITION]: 'fe-sun',
   [EVENTS.USER_PRESENCE.BACK_HOME]: 'fe-home',
   [EVENTS.USER_PRESENCE.LEFT_HOME]: 'fe-home',
   [EVENTS.HOUSE.NO_LONGER_EMPTY]: 'fe-home',
@@ -97,6 +99,13 @@ const TriggerCard = ({ children, ...props }) => (
       )}
       {props.trigger.type === EVENTS.TIME.SUNSET && (
         <SunriseSunsetTrigger
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+        />
+      )}
+      {props.trigger.type === EVENTS.TIME.SUN_POSITION && (
+        <SunPositionTrigger
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}

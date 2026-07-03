@@ -2751,7 +2751,8 @@
       "time": {
         "changed": "Déclenchement programmé",
         "sunrise": "A chaque lever de soleil",
-        "sunset": "A chaque coucher de soleil"
+        "sunset": "A chaque coucher de soleil",
+        "sun-position": "Quand le soleil est à une altitude et un azimut précis"
       },
       "user": {
         "back-home": "Retour à la maison",
@@ -2838,6 +2839,11 @@
         "before": "Avant",
         "after": "Après",
         "minutes": "minutes"
+      },
+      "sunPositionTrigger": {
+        "altitudeLabel": "Altitude (°)",
+        "azimuthLabel": "Azimut (°)",
+        "description": "Déclenche la scène quand le soleil atteint l'altitude et l'azimut spécifiés. L'azimut est mesuré dans le sens horaire depuis le nord (0° = nord, 90° = est, 180° = sud, 270° = ouest)."
       },
       "userPresence": {
         "backAtHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné rentrera à la maison sélectionnée.",

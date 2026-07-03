@@ -4,6 +4,7 @@ const timezone = require('dayjs/plugin/timezone');
 const relativeTime = require('dayjs/plugin/relativeTime');
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
+const { findSunPositionTimes } = require('../sun/sunPosition');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -80,6 +81,77 @@ async function dailyUpdate() {
 
       scheduleForOffsets(sunriseOffsets, sunriseBase, EVENTS.TIME.SUNRISE, 'Sunrise');
       scheduleForOffsets(sunsetOffsets, sunsetBase, EVENTS.TIME.SUNSET, 'Sunset');
+
+      // Schedule sun position triggers (altitude + azimuth)
+      const sunPositionTriggers = [];
+      Object.values(this.scenes).forEach((scene) => {
+        if (!scene.active || !scene.triggers) {
+          return;
+        }
+        scene.triggers.forEach((trigger) => {
+          if (trigger.type === EVENTS.TIME.SUN_POSITION && trigger.house === house.selector) {
+            const altitude = Number(trigger.altitude);
+            const azimuth = Number(trigger.azimuth);
+            if (
+              Number.isFinite(altitude) &&
+              altitude >= -90 &&
+              altitude <= 90 &&
+              Number.isFinite(azimuth) &&
+              azimuth >= 0 &&
+              azimuth < 360
+            ) {
+              sunPositionTriggers.push({ altitude, azimuth });
+            }
+          }
+        });
+      });
+
+      const scheduledSunPositions = new Set();
+      sunPositionTriggers.forEach(({ altitude, azimuth }) => {
+        const key = `${altitude}:${azimuth}`;
+        if (scheduledSunPositions.has(key)) {
+          return;
+        }
+        scheduledSunPositions.add(key);
+
+        const times = findSunPositionTimes(
+          this.sunCalc,
+          house.latitude,
+          house.longitude,
+          this.timezone,
+          altitude,
+          azimuth,
+        );
+
+        times.forEach((time) => {
+          const job = this.scheduler.scheduleJob(time, () =>
+            this.event.emit(EVENTS.TRIGGERS.CHECK, {
+              type: EVENTS.TIME.SUN_POSITION,
+              house,
+              altitude,
+              azimuth,
+            }),
+          );
+          if (job) {
+            logger.info(
+              `Sun position (altitude ${altitude}°, azimuth ${azimuth}°) is scheduled at ${dayjs(time)
+                .tz(this.timezone)
+                .format('HH:mm')}, ${dayjs(time).fromNow()}.`,
+            );
+            this.jobs.push(job);
+          } else {
+            logger.info(
+              `Sun position (altitude ${altitude}°, azimuth ${azimuth}°): time is in the past, not scheduling for today.`,
+            );
+          }
+        });
+
+        if (times.length === 0) {
+          logger.info(
+            `Sun position (altitude ${altitude}°, azimuth ${azimuth}°): no matching time found today for this house.`,
+          );
+        }
+      });
     }
   });
 }

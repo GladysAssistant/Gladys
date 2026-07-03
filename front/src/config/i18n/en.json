@@ -2751,7 +2751,8 @@
       "time": {
         "changed": "Scheduled trigger",
         "sunrise": "Every sunrise",
-        "sunset": "Every sunset"
+        "sunset": "Every sunset",
+        "sun-position": "Sun at a specific altitude and azimuth"
       },
       "user": {
         "back-home": "User back at home",
@@ -2838,6 +2839,11 @@
         "before": "Before",
         "after": "After",
         "minutes": "minutes"
+      },
+      "sunPositionTrigger": {
+        "altitudeLabel": "Altitude (°)",
+        "azimuthLabel": "Azimuth (°)",
+        "description": "Triggers when the sun reaches the specified altitude and azimuth. Azimuth is measured clockwise from north (0° = north, 90° = east, 180° = south, 270° = west)."
       },
       "userPresence": {
         "backAtHomeDescription": "This will trigger when the selected user is back at the selected home.",
