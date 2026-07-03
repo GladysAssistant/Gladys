@@ -8,7 +8,7 @@
       "has_feedback": true,
       "max": 1,
       "min": 0,
-      "name": "child_lock",
+      "name": "Child lock",
       "read_only": false,
       "selector": "tuya-bfc3c1dcdd95241afal8mo-child-lock",
       "type": "binary"
@@ -45,7 +45,7 @@
       "has_feedback": true,
       "max": 1,
       "min": 0,
-      "name": "mode",
+      "name": "Mode",
       "read_only": false,
       "selector": "tuya-bfc3c1dcdd95241afal8mo-mode",
       "type": "pilot-wire-mode"
@@ -56,7 +56,7 @@
       "has_feedback": false,
       "max": 1,
       "min": 0,
-      "name": "running_mode",
+      "name": "Current mode",
       "read_only": true,
       "selector": "tuya-bfc3c1dcdd95241afal8mo-running-mode",
       "type": "pilot-wire-mode"
@@ -67,7 +67,7 @@
       "has_feedback": false,
       "max": 1,
       "min": 0,
-      "name": "window_state",
+      "name": "Window state",
       "read_only": true,
       "selector": "tuya-bfc3c1dcdd95241afal8mo-window-state",
       "type": "binary"
