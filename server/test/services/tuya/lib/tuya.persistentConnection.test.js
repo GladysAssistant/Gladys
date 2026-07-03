@@ -5,6 +5,7 @@ const proxyquire = require('proxyquire');
 
 const { EVENTS } = require('../../../../utils/constants');
 const { getLocalDpsFromCode } = require('../../../../services/tuya/lib/device/tuya.localMapping');
+const { loadFixtureCases, normalizeEvents, sortByKey } = require('../fixtures/fixtureHelper');
 
 // Isolated sandbox so this file never touches the global sinon state other test files rely on.
 const sandbox = sinon.createSandbox();
@@ -15,12 +16,21 @@ const newgenInstances = [];
 class FakeTuyapi extends EventEmitter {
   constructor(options) {
     super();
+    if (FakeTuyapi.nextConstructError) {
+      const error = FakeTuyapi.nextConstructError;
+      FakeTuyapi.nextConstructError = null;
+      throw error;
+    }
     this.options = options;
-    this.connect = sandbox.stub().resolves();
+    this.connect = FakeTuyapi.nextConnectError
+      ? sandbox.stub().rejects(FakeTuyapi.nextConnectError)
+      : sandbox.stub().resolves();
     this.disconnect = sandbox.stub();
     tuyapiInstances.push(this);
   }
 }
+FakeTuyapi.nextConnectError = null;
+FakeTuyapi.nextConstructError = null;
 
 class FakeTuyapiNewGen extends EventEmitter {
   constructor(options) {
@@ -87,6 +97,8 @@ describe('Tuya persistent connection', () => {
   beforeEach(() => {
     tuyapiInstances.length = 0;
     newgenInstances.length = 0;
+    FakeTuyapi.nextConnectError = null;
+    FakeTuyapi.nextConstructError = null;
   });
 
   afterEach(() => {
@@ -151,6 +163,8 @@ describe('Tuya persistent connection', () => {
     await clock.tickAsync(10000);
     lastTuyapi().emit('disconnected');
     await clock.tickAsync(30000);
+    lastTuyapi().emit('disconnected');
+    // A further drop once the connection is already failed is ignored (status stays failed).
     lastTuyapi().emit('disconnected');
 
     expect(self.persistentConnections.testid.status).to.equal('failed');
@@ -231,6 +245,345 @@ describe('Tuya persistent connection', () => {
     expect(sent).to.equal(false);
   });
 
+  it('should emit from a bare dps payload and ignore a null payload', () => {
+    const self = buildSelf();
+    const device = buildDevice();
+    self.startPersistentConnectionForDevice(device);
+    const instance = lastTuyapi();
+    instance.emit('connected');
+
+    const dpsKey = getLocalDpsFromCode('switch_1', device);
+    instance.emit('data', { [dpsKey]: true });
+    instance.emit('data', null);
+
+    const calls = self.gladys.event.emit.getCalls().filter((c) => c.args[0] === EVENTS.DEVICE.NEW_STATE);
+    expect(calls).to.have.lengthOf(1);
+  });
+
+  it('should record a failure on a socket error event', () => {
+    const self = buildSelf();
+    self.startPersistentConnectionForDevice(buildDevice());
+
+    lastTuyapi().emit('error', Object.assign(new Error('ETIMEDOUT'), { code: 'ETIMEDOUT' }));
+
+    expect(self.degradedDevices).to.have.property('testid');
+  });
+
+  it('should record a failure and reconnect when connect rejects', async () => {
+    const clock = sandbox.useFakeTimers();
+    FakeTuyapi.nextConnectError = Object.assign(new Error('ETIMEDOUT'), { code: 'ETIMEDOUT' });
+    const self = buildSelf();
+    self.startPersistentConnectionForDevice(buildDevice());
+
+    await clock.tickAsync(0);
+
+    expect(self.degradedDevices).to.have.property('testid');
+    expect(['reconnecting', 'failed']).to.include(self.persistentConnections.testid.status);
+    clock.restore();
+  });
+
+  it('should not open a connection for a device not in local mode', () => {
+    const self = buildSelf();
+    const device = buildDevice();
+    device.params = device.params.map((p) => (p.name === 'LOCAL_OVERRIDE' ? { ...p, value: false } : p));
+
+    self.startPersistentConnectionForDevice(device);
+
+    expect(tuyapiInstances).to.have.lengthOf(0);
+    expect(self.persistentConnections).to.deep.equal({});
+  });
+
+  it('should be idempotent when a connection already exists', () => {
+    const self = buildSelf();
+    self.startPersistentConnectionForDevice(buildDevice());
+    self.startPersistentConnectionForDevice(buildDevice());
+
+    expect(tuyapiInstances).to.have.lengthOf(1);
+  });
+
+  it('should still start devices when the kill-switch variable read fails', async () => {
+    const self = buildSelf();
+    self.gladys.variable.getValue = sandbox.stub().rejects(new Error('db down'));
+    self.gladys.device.get = sandbox.stub().resolves([buildDevice()]);
+
+    await self.startPersistentConnections();
+
+    expect(self.persistentPushEnabled).to.equal(true);
+    expect(tuyapiInstances).to.have.lengthOf(1);
+  });
+
+  it('should open nothing when the device list cannot be loaded', async () => {
+    const self = buildSelf();
+    self.gladys.device.get = sandbox.stub().rejects(new Error('api error'));
+
+    await self.startPersistentConnections();
+
+    expect(tuyapiInstances).to.have.lengthOf(0);
+  });
+
+  it('isPersistentConnectionConnected reflects the socket status', () => {
+    const self = buildSelf();
+    expect(self.isPersistentConnectionConnected('testid')).to.equal(false);
+    self.startPersistentConnectionForDevice(buildDevice());
+    expect(self.isPersistentConnectionConnected('testid')).to.equal(false);
+    lastTuyapi().emit('connected');
+    expect(self.isPersistentConnectionConnected('testid')).to.equal(true);
+  });
+
+  it('should not start a connection when the kill-switch flag is off', () => {
+    const self = buildSelf();
+    self.persistentPushEnabled = false;
+
+    self.startPersistentConnectionForDevice(buildDevice());
+
+    expect(tuyapiInstances).to.have.lengthOf(0);
+  });
+
+  it('should ignore a pushed payload for a non-tuya device', () => {
+    const self = buildSelf();
+    self.handlePushedDps({ external_id: 'zigbee:x', features: [] }, { 1: true });
+
+    const calls = self.gladys.event.emit.getCalls().filter((c) => c.args[0] === EVENTS.DEVICE.NEW_STATE);
+    expect(calls).to.have.lengthOf(0);
+  });
+
+  it('should be unhealthy when connected without any reference timestamp', () => {
+    const self = buildSelf();
+    self.persistentConnections.testid = { status: 'connected', lastDataAt: null, lastConnectedAt: null };
+
+    expect(self.isPersistentConnectionHealthy('testid')).to.equal(false);
+  });
+
+  it('should reconnect when the local api constructor throws', async () => {
+    const clock = sandbox.useFakeTimers();
+    FakeTuyapi.nextConstructError = new Error('ctor failed');
+    const self = buildSelf();
+
+    self.startPersistentConnectionForDevice(buildDevice());
+
+    expect(self.persistentConnections.testid.status).to.equal('reconnecting');
+    clock.restore();
+  });
+
+  it('should ignore events and a late connect failure from a stopped connection', async () => {
+    const clock = sandbox.useFakeTimers();
+    FakeTuyapi.nextConnectError = Object.assign(new Error('ETIMEDOUT'), { code: 'ETIMEDOUT' });
+    const self = buildSelf();
+    self.startPersistentConnectionForDevice(buildDevice());
+    const instance = lastTuyapi();
+
+    self.stopPersistentConnections();
+
+    instance.emit('connected');
+    instance.emit('data', { 1: true });
+    instance.emit('disconnected');
+    instance.emit('error', Object.assign(new Error('ETIMEDOUT'), { code: 'ETIMEDOUT' }));
+    await clock.tickAsync(0);
+
+    const calls = self.gladys.event.emit.getCalls().filter((c) => c.args[0] === EVENTS.DEVICE.NEW_STATE);
+    expect(calls).to.have.lengthOf(0);
+    expect(self.persistentConnections).to.deep.equal({});
+    clock.restore();
+  });
+
+  it('should not start for devices with an invalid external_id', () => {
+    const self = buildSelf();
+    const base = buildDevice();
+    self.startPersistentConnectionForDevice({ ...base, external_id: 123 });
+    self.startPersistentConnectionForDevice({ ...base, external_id: 'zigbee:x' });
+
+    expect(tuyapiInstances).to.have.lengthOf(0);
+  });
+
+  it('should tear down safely when the api was never created', () => {
+    const self = buildSelf();
+    self.persistentConnections.testid = { status: 'connecting', api: null, retryTimer: null };
+
+    expect(() => self.stopPersistentConnectionForDevice('testid')).to.not.throw();
+    expect(self.persistentConnections).to.deep.equal({});
+  });
+
+  it('should no-op when recycling or stopping an unknown device', () => {
+    const self = buildSelf();
+    expect(() => self.recyclePersistentConnection('nope')).to.not.throw();
+    expect(() => self.stopPersistentConnectionForDevice('nope')).to.not.throw();
+  });
+
+  it('should clear a pending retry timer on stop', () => {
+    const clock = sandbox.useFakeTimers();
+    const self = buildSelf();
+    self.startPersistentConnectionForDevice(buildDevice());
+    lastTuyapi().emit('disconnected');
+
+    expect(self.persistentConnections.testid.retryTimer).to.not.equal(null);
+    self.stopPersistentConnections();
+
+    expect(self.persistentConnections).to.deep.equal({});
+    clock.restore();
+  });
+
+  it('should swallow a disconnect error during teardown', () => {
+    const self = buildSelf();
+    self.startPersistentConnectionForDevice(buildDevice());
+    lastTuyapi().disconnect = sandbox.stub().throws(new Error('close failed'));
+
+    expect(() => self.stopPersistentConnections()).to.not.throw();
+  });
+
+  it('truncates oversized socket error messages in logs (lib parser dumps the raw buffer)', () => {
+    const loggerStub = { info: sandbox.stub(), debug: sandbox.stub(), warn: sandbox.stub(), error: sandbox.stub() };
+    const pcWithLogger = proxyquire('../../../../services/tuya/lib/tuya.persistentConnection', {
+      tuyapi: FakeTuyapi,
+      '@demirdeniz/tuyapi-newgen': FakeTuyapiNewGen,
+      '../../../utils/logger': loggerStub,
+    });
+    const self = buildSelf();
+    Object.assign(self, pcWithLogger);
+    self.startPersistentConnectionForDevice(buildDevice());
+
+    lastTuyapi().emit('error', new Error(`Prefix does not match: ${'a'.repeat(2000)}`));
+
+    const logged = loggerStub.info
+      .getCalls()
+      .map((call) => call.args[0])
+      .find((message) => typeof message === 'string' && message.includes('socket error'));
+    expect(logged).to.include('(truncated)');
+    expect(logged.length).to.be.below(250);
+  });
+
+  describe('device lifecycle hooks (postCreate / postUpdate / postDelete)', () => {
+    it('postCreate opens the persistent connection of a new local device', () => {
+      const self = buildSelf();
+      self.postCreate(buildDevice());
+
+      expect(self.persistentConnections.testid).to.not.equal(undefined);
+      expect(lastTuyapi().connect.calledOnce).to.equal(true);
+    });
+
+    it('postUpdate recycles the connection so pushes map against the fresh device', () => {
+      const self = buildSelf();
+      self.startPersistentConnectionForDevice(buildDevice());
+      const staleApi = lastTuyapi();
+      staleApi.emit('connected');
+
+      const updatedDevice = buildDevice();
+      updatedDevice.features.push({
+        external_id: 'tuya:testid:child_lock',
+        selector: 'tuya-testid-child-lock',
+        category: 'child-lock',
+        type: 'binary',
+        last_value: 0,
+      });
+      self.postUpdate(updatedDevice);
+
+      expect(staleApi.disconnect.calledOnce).to.equal(true);
+      expect(self.persistentConnections.testid.device).to.equal(updatedDevice);
+      expect(lastTuyapi()).to.not.equal(staleApi);
+    });
+
+    it('postUpdate stops the connection when the update removed the local config', () => {
+      const self = buildSelf();
+      self.startPersistentConnectionForDevice(buildDevice());
+      const staleApi = lastTuyapi();
+
+      const cloudOnlyDevice = { external_id: 'tuya:testid', params: [], features: [] };
+      self.postUpdate(cloudOnlyDevice);
+
+      expect(staleApi.disconnect.calledOnce).to.equal(true);
+      expect(self.persistentConnections.testid).to.equal(undefined);
+    });
+
+    it('postDelete tears down the persistent connection', () => {
+      const self = buildSelf();
+      self.startPersistentConnectionForDevice(buildDevice());
+      const api = lastTuyapi();
+
+      self.postDelete(buildDevice());
+
+      expect(api.disconnect.calledOnce).to.equal(true);
+      expect(self.persistentConnections.testid).to.equal(undefined);
+    });
+
+    it('lifecycle hooks ignore devices without a tuya external id', () => {
+      const self = buildSelf();
+      expect(() => self.postCreate({ external_id: 'zigbee:whatever' })).to.not.throw();
+      expect(() => self.postDelete({})).to.not.throw();
+      expect(self.persistentConnections).to.deep.equal({});
+      expect(tuyapiInstances.length).to.equal(0);
+    });
+  });
+
+  describe('continuous-sensor push throttle', () => {
+    // Generic (non-strict) local mapping: switch_1 -> dps 1 and power_2 -> dps 2 via the _N fallback.
+    const buildPowerDevice = () => {
+      const device = buildDevice();
+      delete device.device_type;
+      device.features.push({
+        external_id: 'tuya:testid:power_2',
+        selector: 'tuya-testid-power-2',
+        category: 'switch',
+        type: 'power',
+        scale: 1,
+        last_value: 0,
+      });
+      return device;
+    };
+
+    const statesOf = (self, externalId) =>
+      self.gladys.event.emit
+        .getCalls()
+        .filter(
+          (call) => call.args[0] === EVENTS.DEVICE.NEW_STATE && call.args[1].device_feature_external_id === externalId,
+        )
+        .map((call) => call.args[1].state);
+
+    it('caps continuous-sensor emissions to one per interval while event-like features stay instant', () => {
+      const clock = sandbox.useFakeTimers();
+      const self = buildSelf();
+      const device = buildPowerDevice();
+      self.startPersistentConnectionForDevice(device);
+
+      self.handlePushedDps(device, { '1': true, '2': 100 });
+      self.handlePushedDps(device, { '1': false, '2': 200 });
+
+      // power_2 (dps 2) throttled on the second push, switch_1 (dps 1) always through.
+      expect(statesOf(self, 'tuya:testid:power_2')).to.deep.equal([10]);
+      expect(statesOf(self, 'tuya:testid:switch_1')).to.deep.equal([1, 0]);
+
+      clock.tick(10000);
+      self.handlePushedDps(device, { '2': 300 });
+
+      expect(statesOf(self, 'tuya:testid:power_2')).to.deep.equal([10, 30]);
+      clock.restore();
+    });
+
+    it('does not throttle when the push targets a device without a persistent entry', () => {
+      const self = buildSelf();
+      const device = buildPowerDevice();
+
+      self.handlePushedDps(device, { '2': 100 });
+      self.handlePushedDps(device, { '2': 200 });
+
+      expect(statesOf(self, 'tuya:testid:power_2')).to.deep.equal([10, 20]);
+    });
+  });
+
+  it('push should emit the same states as the local poll (transform/scale applied)', () => {
+    const fixtureCase = loadFixtureCases('pollLocal').find((c) => c.directoryName === 'smart-socket-basic');
+    expect(fixtureCase, 'smart-socket-basic pollLocal fixture').to.not.equal(undefined);
+    const device = fixtureCase.load(fixtureCase.manifest.pollLocal.device);
+    const dps = fixtureCase.load(fixtureCase.manifest.pollLocal.dps);
+    const expected = fixtureCase.load(fixtureCase.manifest.pollLocal.expectedEvents);
+
+    const self = buildSelf();
+    self.handlePushedDps(device, dps);
+
+    const events = normalizeEvents(
+      self.gladys.event.emit.getCalls().filter((c) => c.args[0] === EVENTS.DEVICE.NEW_STATE),
+    );
+    expect(events).to.deep.equal(sortByKey(expected));
+  });
+
   it('should become unhealthy after the max-silence window', () => {
     const clock = sandbox.useFakeTimers();
     const self = buildSelf();
@@ -290,10 +643,12 @@ describe('TuyaHandler.poll persistent coexistence gate', () => {
     const self = buildPollSelf();
     self.isPersistentConnectionHealthy = gateSandbox.stub().returns(false);
     self.isPersistentConnectionConnected = gateSandbox.stub().returns(true);
+    self.recyclePersistentConnection = gateSandbox.stub();
 
     await poll.call(self, buildDevice());
 
     expect(localPoll.called).to.equal(false);
     expect(self.connector.request.called).to.equal(true);
+    expect(self.recyclePersistentConnection.calledWith('testid')).to.equal(true);
   });
 });

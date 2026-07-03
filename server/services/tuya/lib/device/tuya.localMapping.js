@@ -1,5 +1,5 @@
 const { convertFeature } = require('./tuya.convertFeature');
-const { getDeviceType, getLocalMapping, normalizeCode } = require('../mappings');
+const { getDeviceType, getLocalMapping, getProductIdFromDevice, normalizeCode } = require('../mappings');
 
 const getLocalDpsFromCode = (code, device) => {
   if (!code) {
@@ -8,7 +8,7 @@ const getLocalDpsFromCode = (code, device) => {
 
   const normalized = normalizeCode(code);
   const deviceType = device && device.device_type ? device.device_type : getDeviceType(device);
-  const localMapping = getLocalMapping(deviceType);
+  const localMapping = getLocalMapping(deviceType, getProductIdFromDevice(device));
 
   if (localMapping.dps && localMapping.dps[normalized] !== undefined) {
     return localMapping.dps[normalized];

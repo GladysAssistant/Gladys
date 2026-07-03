@@ -13,6 +13,7 @@ const TuyaHandler = proxyquire('../../../../services/tuya/lib/index', {
 });
 const { EVENTS } = require('../../../../utils/constants');
 const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
+const { emitLocalDpsStates } = require('../../../../services/tuya/lib/tuya.poll');
 
 const { BadParameters } = require('../../../../utils/coreErrors');
 
@@ -1034,6 +1035,159 @@ describe('TuyaHandler.poll temperature conversion', () => {
 
     expect(stateEvent).to.not.equal(undefined);
     // fahrenheitToCelsius(20) = -6.7 (out of [5, 35]) while raw 20 is in range -> keep 20
+    expect(stateEvent.args[1].state).to.equal(20);
+  });
+});
+
+describe('TuyaHandler.poll product-variant local mapping (Konyks eCosy)', () => {
+  it('should read variant DPS and mode vocabulary locally without any cloud request', async () => {
+    const localPoll = sinon.stub().resolves({ dps: { '1': true, '2': 'hot', '107': false } });
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {
+      './tuya.localPoll': { localPoll },
+    });
+
+    const request = sinon.stub();
+    const emit = sinon.stub();
+
+    await poll.call(
+      { connector: { request }, gladys: { event: { emit } } },
+      {
+        external_id: 'tuya:ecosy-device',
+        device_type: 'pilot-thermostat',
+        params: [
+          { name: 'IP_ADDRESS', value: '10.0.0.46' },
+          { name: 'LOCAL_KEY', value: 'key' },
+          { name: 'PROTOCOL_VERSION', value: '3.5' },
+          { name: 'LOCAL_OVERRIDE', value: true },
+          { name: 'PRODUCT_ID', value: 'evyy1wbhi4t7uftn' },
+        ],
+        features: [
+          {
+            external_id: 'tuya:ecosy-device:switch',
+            selector: 'tuya-ecosy-device-switch',
+            category: 'switch',
+            type: 'binary',
+          },
+          {
+            external_id: 'tuya:ecosy-device:mode',
+            selector: 'tuya-ecosy-device-mode',
+            category: 'heater',
+            type: 'pilot-wire-mode',
+          },
+          {
+            external_id: 'tuya:ecosy-device:lock_switch',
+            selector: 'tuya-ecosy-device-lock-switch',
+            category: 'child-lock',
+            type: 'binary',
+          },
+        ],
+      },
+    );
+
+    expect(localPoll.calledOnce).to.equal(true);
+    expect(request.called).to.equal(false);
+    const states = emit
+      .getCalls()
+      .filter((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE)
+      .map((call) => call.args[1]);
+    expect(states).to.deep.include({ device_feature_external_id: 'tuya:ecosy-device:switch', state: 1 });
+    // "hot" resolves through the eCosy tuyaEnum vocabulary, not the default one.
+    expect(states).to.deep.include({ device_feature_external_id: 'tuya:ecosy-device:mode', state: 5 });
+    // lock_switch lives on the variant DPS 107 (the default family maps child_lock, not lock_switch).
+    expect(states).to.deep.include({ device_feature_external_id: 'tuya:ecosy-device:lock_switch', state: 0 });
+  });
+});
+
+describe('emitLocalDpsStates temperature transform (local + push regression)', () => {
+  // Regression: the persistent-push handler and the local poll both go through emitLocalDpsStates.
+  // It must apply the SAME temperature transform as the cloud path (scale + unit conversion), not the
+  // raw feature reader. Before the fix a pushed/local temp_current emitted the raw °F reading instead
+  // of the feature's °C value.
+  it('converts a pushed local temp_current DPS to the feature unit instead of emitting the raw reader value', () => {
+    const emit = sinon.stub();
+    const gladysStub = { event: { emit } };
+    const device = {
+      external_id: 'tuya:therm',
+      device_type: 'pilot-thermostat',
+      // temp_unit_convert lives on DPS 9 in this fixture and reports Fahrenheit.
+      properties: { properties: [{ code: 'temp_unit_convert', dp_id: 9 }] },
+      features: [
+        {
+          external_id: 'tuya:therm:temp_current',
+          selector: 'tuya-therm-temp-current',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          unit: 'celsius',
+          scale: 1,
+        },
+      ],
+    };
+
+    // DPS 116 = temp_current (pilot-thermostat local mapping), 680 -> scale 1 -> 68 °F.
+    const { handledCodes, changed } = emitLocalDpsStates(gladysStub, device, { 116: 680, 9: 'f' });
+
+    expect(handledCodes.has('temp_current')).to.equal(true);
+    expect(changed).to.equal(1);
+    const stateEvent = emit.getCalls().find((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
+    expect(stateEvent).to.not.equal(undefined);
+    // 680 -> scale 1 -> 68 °F -> fahrenheitToCelsius(68) = 20 °C (the raw-reader path would emit 68).
+    expect(stateEvent.args[1].state).to.equal(20);
+  });
+
+  it('keeps the remembered device unit on a partial push without the unit DP', () => {
+    const emit = sinon.stub();
+    const gladysStub = { event: { emit } };
+    const device = {
+      external_id: 'tuya:therm',
+      device_type: 'pilot-thermostat',
+      // The unit was learned earlier (value 'f'); this partial push does not carry DPS 9.
+      properties: { properties: [{ code: 'temp_unit_convert', dp_id: 9, value: 'f' }] },
+      features: [
+        {
+          external_id: 'tuya:therm:temp_current',
+          selector: 'tuya-therm-temp-current',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          unit: 'celsius',
+          scale: 1,
+        },
+      ],
+    };
+
+    const { handledCodes } = emitLocalDpsStates(gladysStub, device, { 116: 680 });
+
+    expect(handledCodes.has('temp_current')).to.equal(true);
+    const stateEvent = emit.getCalls().find((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
+    // 68 °F converted with the REMEMBERED unit -> 20 °C (a clobbered unit would emit the raw 68).
+    expect(stateEvent.args[1].state).to.equal(20);
+    // And the remembered unit is still there for the next partial push.
+    expect(device.properties.properties[0].value).to.equal('f');
+  });
+
+  it('derives the temperature unit from the caller when provided', () => {
+    const emit = sinon.stub();
+    const gladysStub = { event: { emit } };
+    const device = {
+      external_id: 'tuya:therm',
+      device_type: 'pilot-thermostat',
+      features: [
+        {
+          external_id: 'tuya:therm:temp_current',
+          selector: 'tuya-therm-temp-current',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          unit: 'celsius',
+          scale: 1,
+        },
+      ],
+    };
+
+    // No unit property on the device: the local poll passes the resolved unit explicitly.
+    const { handledCodes } = emitLocalDpsStates(gladysStub, device, { 116: 680 }, 'fahrenheit');
+
+    expect(handledCodes.has('temp_current')).to.equal(true);
+    const stateEvent = emit.getCalls().find((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
+    expect(stateEvent).to.not.equal(undefined);
     expect(stateEvent.args[1].state).to.equal(20);
   });
 });

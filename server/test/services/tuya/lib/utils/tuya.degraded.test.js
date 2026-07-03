@@ -48,6 +48,16 @@ describe('tuya.degraded.recordLocalFailure', () => {
     expect(map).to.deep.equal({});
   });
 
+  it('records a non-degrading error when forced and can flip to degraded', () => {
+    const map = {};
+    const now = 1000;
+    expect(recordLocalFailure(map, 'd1', new Error('invalid_local_payload'), now, true)).to.not.equal(null);
+    expect(map.d1.failureTimestamps).to.have.lengthOf(1);
+    recordLocalFailure(map, 'd1', new Error('invalid_local_payload'), now + 1000, true);
+    recordLocalFailure(map, 'd1', new Error('invalid_local_payload'), now + 2000, true);
+    expect(map.d1.status).to.equal('degraded');
+  });
+
   it('accumulates failure timestamps without flipping to degraded under threshold', () => {
     const map = {};
     const now = 1000;

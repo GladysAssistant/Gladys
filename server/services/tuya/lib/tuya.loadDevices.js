@@ -1,6 +1,11 @@
 const logger = require('../../../utils/logger');
 const { API, GLADYS_VARIABLES } = require('./utils/tuya.constants');
 
+// Safety cap on the recursive cloud pagination: at page_size 100 this already covers 10 000 devices,
+// far beyond any real account. It only ever triggers if the API keeps returning full non-empty pages
+// with has_more=true (a misbehaving upstream), turning a would-be runaway recursion into a bounded stop.
+const MAX_DEVICE_PAGES = 100;
+
 /**
  * @description Discover Tuya cloud devices.
  * @param {number} pageNo - Page number.
@@ -53,6 +58,12 @@ async function loadDevices(pageNo = 1, pageSize = 100) {
     if (list.length === 0) {
       throw new Error('Tuya API pagination did not advance (has_more=true with empty page)');
     }
+    if (pageNo >= MAX_DEVICE_PAGES) {
+      logger.warn(
+        `Tuya device pagination reached the safety cap of ${MAX_DEVICE_PAGES} pages; stopping to avoid runaway recursion`,
+      );
+      return list;
+    }
     const nextResult = await this.loadDevices(pageNo + 1, pageSize);
     list.push(...nextResult);
   }
@@ -64,4 +75,5 @@ async function loadDevices(pageNo = 1, pageSize = 100) {
 
 module.exports = {
   loadDevices,
+  MAX_DEVICE_PAGES,
 };

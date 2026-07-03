@@ -28,8 +28,13 @@ module.exports = function TuyaService(gladys, serviceId) {
     logger.info('Stopping Tuya service');
     // Persistent local connections are independent of the Tuya cloud, so they are torn down here (on
     // real service stop) rather than in disconnect() (which is cloud-only and also runs on a manual
-    // cloud disconnect, where local control should keep working).
-    tuyaHandler.stopPersistentConnections();
+    // cloud disconnect, where local control should keep working). Guarded so a teardown hiccup can
+    // never block the cloud disconnect below.
+    try {
+      tuyaHandler.stopPersistentConnections();
+    } catch (e) {
+      logger.warn('Tuya: failed to stop persistent connections on service stop', e);
+    }
     await tuyaHandler.disconnect();
   }
 

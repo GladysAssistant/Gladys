@@ -15,8 +15,11 @@ const {
   getIgnoredLocalDps,
   getIgnoredCloudCodes,
   getDeviceType,
+  getProductIdFromDevice,
   normalizeCode,
 } = mappings;
+
+const ECOSY_PRODUCT_ID = 'evyy1wbhi4t7uftn';
 
 describe('Tuya mappings index', () => {
   it('should normalize codes', () => {
@@ -201,5 +204,67 @@ describe('Tuya mappings index', () => {
     expect(ignoredCloud).to.include('countdown_1');
     const ignoredCloudUnknown = getIgnoredCloudCodes(DEVICE_TYPES.UNKNOWN);
     expect(ignoredCloudUnknown).to.not.include('countdown');
+  });
+
+  describe('product variants', () => {
+    it('should resolve the variant cloud mapping by product id and fall back to the family default', () => {
+      const variantMapping = getCloudMapping(DEVICE_TYPES.PILOT_THERMOSTAT, ECOSY_PRODUCT_ID);
+      expect(variantMapping.mode.name).to.equal('Mode');
+      expect(variantMapping.mode.tuyaEnum).to.be.an('object');
+      expect(variantMapping.switch).to.be.an('object');
+      // No setpoint on this module (no temperature probe).
+      expect(variantMapping.temp_set).to.equal(undefined);
+
+      const defaultMapping = getCloudMapping(DEVICE_TYPES.PILOT_THERMOSTAT, 'unknown-product');
+      expect(defaultMapping.mode.tuyaEnum).to.equal(undefined);
+      expect(defaultMapping.switch).to.equal(undefined);
+      expect(defaultMapping.temp_set.scale).to.equal(1);
+
+      const noProductMapping = getCloudMapping(DEVICE_TYPES.PILOT_THERMOSTAT);
+      expect(noProductMapping.temp_set.scale).to.equal(1);
+    });
+
+    it('should resolve the variant local mapping by product id and fall back to the family default', () => {
+      const variantLocal = getLocalMapping(DEVICE_TYPES.PILOT_THERMOSTAT, ECOSY_PRODUCT_ID);
+      expect(variantLocal.dps).to.deep.equal({
+        switch: 1,
+        mode: 2,
+        timer_switch: 102,
+        travel_switch: 103,
+        cur_mode: 104,
+        lock_switch: 107,
+      });
+      expect(variantLocal.strict).to.equal(true);
+
+      const defaultLocal = getLocalMapping(DEVICE_TYPES.PILOT_THERMOSTAT);
+      expect(defaultLocal.dps.mode).to.equal(101);
+    });
+
+    it('should resolve the variant feature mapping and ignored codes/dps', () => {
+      const modeEntry = getFeatureMapping('mode', DEVICE_TYPES.PILOT_THERMOSTAT, ECOSY_PRODUCT_ID);
+      expect(modeEntry.tuyaEnum.hot).to.be.a('number');
+
+      expect(getIgnoredCloudCodes(DEVICE_TYPES.PILOT_THERMOSTAT, ECOSY_PRODUCT_ID)).to.deep.equal([
+        'temp_set',
+        'travel_time',
+        'week_data',
+      ]);
+      expect(getIgnoredLocalDps(DEVICE_TYPES.PILOT_THERMOSTAT, ECOSY_PRODUCT_ID)).to.deep.equal(['16', '105', '106']);
+      expect(getIgnoredCloudCodes(DEVICE_TYPES.PILOT_THERMOSTAT)).to.include('week_program_1');
+    });
+
+    it('should detect the device type from a variant product id alone', () => {
+      expect(getDeviceType({ product_id: ECOSY_PRODUCT_ID })).to.equal(DEVICE_TYPES.PILOT_THERMOSTAT);
+    });
+
+    it('should extract the product id from the device or its params', () => {
+      expect(getProductIdFromDevice({ product_id: ECOSY_PRODUCT_ID })).to.equal(ECOSY_PRODUCT_ID);
+      expect(getProductIdFromDevice({ params: [{ name: 'PRODUCT_ID', value: ECOSY_PRODUCT_ID }] })).to.equal(
+        ECOSY_PRODUCT_ID,
+      );
+      expect(getProductIdFromDevice({ params: [{ name: 'IP_ADDRESS', value: '10.0.0.1' }] })).to.equal(null);
+      expect(getProductIdFromDevice({})).to.equal(null);
+      expect(getProductIdFromDevice(null)).to.equal(null);
+    });
   });
 });

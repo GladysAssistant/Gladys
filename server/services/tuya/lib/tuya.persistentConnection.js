@@ -4,15 +4,11 @@ const logger = require('../../../utils/logger');
 const { DEVICE_PARAM_NAME, GLADYS_VARIABLES } = require('./utils/tuya.constants');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { normalizeBoolean } = require('./utils/tuya.normalize');
-const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
 const { recordLocalFailure, recordLocalSuccess } = require('./utils/tuya.degraded');
-const {
-  getFeatureCode,
-  getFeatureReader,
-  hasDpsKey,
-  getCurrentFeatureState,
-  emitFeatureState,
-} = require('./tuya.poll');
+// Reuse the poll's DPS -> feature -> state pipeline so pushed updates and the scheduled poll apply the
+// exact same transformation (scale, temperature conversion, ...).
+const { emitLocalDpsStates, getFeatureCode, hasDpsKey } = require('./tuya.poll');
+const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
 
 // A persistent local connection stays open and receives pushed DP updates in real time (events),
 // instead of the one-shot poll. Devices that cannot sustain the socket (battery/asleep, offline,
@@ -37,7 +33,19 @@ const extractPushedDps = (payload) => {
   return payload;
 };
 
-const formatSocketError = (err) => (err && err.message ? err.message : 'persistent socket error');
+// Tuya lib parser errors ("Prefix does not match: <hex>") embed the whole raw TCP buffer in the
+// message (kBs per log line): the beginning is enough to identify the error.
+const SOCKET_ERROR_MESSAGE_MAX_LENGTH = 160;
+
+const formatSocketError = (err) => {
+  if (!err || !err.message) {
+    return 'persistent socket error';
+  }
+  const message = String(err.message);
+  return message.length > SOCKET_ERROR_MESSAGE_MAX_LENGTH
+    ? `${message.slice(0, SOCKET_ERROR_MESSAGE_MAX_LENGTH)}... (truncated)`
+    : message;
+};
 
 const getRetryDelay = (retryCount) => RETRY_DELAYS_MS[Math.min(retryCount, RETRY_DELAYS_MS.length - 1)];
 
@@ -75,7 +83,7 @@ const parseLocalConfig = (device) => {
 
 const scheduleReconnect = (self, entry) => {
   const { topic } = entry;
-  if (self.persistentConnections[topic] !== entry || entry.status === 'failed') {
+  if (entry.status === 'failed') {
     return;
   }
   if (entry.retryCount >= MAX_PERSISTENT_RETRIES) {
@@ -92,9 +100,6 @@ const scheduleReconnect = (self, entry) => {
     clearTimeout(entry.retryTimer);
   }
   entry.retryTimer = setTimeout(() => {
-    if (self.persistentConnections[topic] !== entry) {
-      return;
-    }
     teardownApi(entry.api);
     // eslint-disable-next-line no-use-before-define
     openPersistentConnection(self, entry);
@@ -264,14 +269,59 @@ async function startPersistentConnections() {
   }
 
   (Array.isArray(devices) ? devices : []).forEach((device) => {
-    try {
-      this.startPersistentConnectionForDevice(device);
-    } catch (e) {
-      // never let a single device break the startup loop
-      logger.info(`[Tuya][persistent] start error: ${formatSocketError(e)}`);
-    }
+    this.startPersistentConnectionForDevice(device);
   });
 }
+
+const getTopicFromDevice = (device) => {
+  const externalId = device && device.external_id;
+  const [prefix, topic] = typeof externalId === 'string' ? externalId.split(':') : [];
+  return prefix === 'tuya' && topic ? topic : null;
+};
+
+// Continuous sensors (measured temperature, power, indexes...) of a running device can push several
+// times per second (e.g. an AC sensor flapping between 23 and 24 °C), flooding the DB/websockets with
+// states the 10s poll used to naturally throttle. Cap their push-driven emissions to one per poll-ish
+// interval; event-like features (switches, doorbell, modes, target temperature) stay instantaneous.
+const CONTINUOUS_SENSOR_TYPES = new Set([
+  'decimal',
+  'integer',
+  'power',
+  'energy',
+  'voltage',
+  'current',
+  'index',
+  'index-today',
+]);
+const PUSH_CONTINUOUS_EMIT_INTERVAL_MS = 10 * 1000;
+
+const filterThrottledContinuousDps = (entry, device, dps) => {
+  if (!entry) {
+    return dps;
+  }
+  const now = Date.now();
+  entry.continuousEmitAt = entry.continuousEmitAt || {};
+  const filtered = { ...dps };
+  const deviceFeatures = Array.isArray(device.features) ? device.features : [];
+  deviceFeatures.forEach((deviceFeature) => {
+    if (!CONTINUOUS_SENSOR_TYPES.has(deviceFeature.type)) {
+      return;
+    }
+    const code = getFeatureCode(deviceFeature);
+    const dpsKey = getLocalDpsFromCode(code, device);
+    if (dpsKey === null || !hasDpsKey(filtered, dpsKey)) {
+      return;
+    }
+    const lastEmitAt = entry.continuousEmitAt[code];
+    if (lastEmitAt !== undefined && now - lastEmitAt < PUSH_CONTINUOUS_EMIT_INTERVAL_MS) {
+      delete filtered[String(dpsKey)];
+      delete filtered[dpsKey];
+      return;
+    }
+    entry.continuousEmitAt[code] = now;
+  });
+  return filtered;
+};
 
 /**
  * @description Handle a pushed DPS map from a persistent connection: emit Gladys states.
@@ -284,46 +334,64 @@ function handlePushedDps(device, dps) {
   if (!dps || typeof dps !== 'object') {
     return;
   }
-  const externalId = device && device.external_id;
-  const parts = typeof externalId === 'string' ? externalId.split(':') : [];
-  const prefix = parts[0];
-  const topic = parts[1];
-  if (prefix !== 'tuya' || !topic) {
+  const topic = getTopicFromDevice(device);
+  if (!topic) {
     return;
   }
   const entry = this.persistentConnections[topic];
   if (entry) {
     entry.lastDataAt = Date.now();
   }
-  const deviceFeatures = Array.isArray(device.features) ? device.features : [];
-  let handled = 0;
 
-  deviceFeatures.forEach((deviceFeature) => {
-    const code = getFeatureCode(deviceFeature);
-    const dpsKey = getLocalDpsFromCode(code, device);
-    const reader = getFeatureReader(deviceFeature);
-    if (!code || dpsKey === null || !reader || !hasDpsKey(dps, dpsKey)) {
-      return;
-    }
-    const rawValue = Object.prototype.hasOwnProperty.call(dps, String(dpsKey)) ? dps[String(dpsKey)] : dps[dpsKey];
-    if (rawValue === undefined) {
-      return;
-    }
-    let transformedValue;
-    try {
-      transformedValue = reader(rawValue, deviceFeature);
-    } catch (e) {
-      logger.warn(`[Tuya][persistent] reader failed device=${topic} code=${code}`, e);
-      return;
-    }
-    const { lastValue, lastValueChanged } = getCurrentFeatureState(this.gladys, deviceFeature);
-    emitFeatureState(this.gladys, deviceFeature, transformedValue, lastValue, lastValueChanged);
-    handled += 1;
-  });
-
-  if (handled > 0) {
+  const throttledDps = filterThrottledContinuousDps(entry, device, dps);
+  const { handledCodes } = emitLocalDpsStates(this.gladys, device, throttledDps);
+  if (handledCodes.size > 0) {
     recordLocalSuccess(this.degradedDevices, topic);
   }
+}
+
+/**
+ * @description Called by the Gladys DeviceManager after a Tuya device is created or updated: recycle
+ * its persistent local connection so it runs against the fresh device. Pushed DPS are mapped against
+ * the device attached to the connection, so a stale one would silently drop states for features added
+ * by the update. Also covers a device switching local mode on (start) or off (stop only).
+ * @param {object} device - The created/updated Gladys device.
+ * @example
+ * this.postCreate(device);
+ */
+function postCreate(device) {
+  const topic = getTopicFromDevice(device);
+  if (!topic) {
+    return;
+  }
+  this.stopPersistentConnectionForDevice(topic);
+  this.startPersistentConnectionForDevice(device);
+}
+
+/**
+ * @description Called by the Gladys DeviceManager after a Tuya device is updated. Same behaviour as
+ * postCreate: recycle the persistent connection with the fresh device.
+ * @param {object} device - The updated Gladys device.
+ * @example
+ * this.postUpdate(device);
+ */
+function postUpdate(device) {
+  this.postCreate(device);
+}
+
+/**
+ * @description Called by the Gladys DeviceManager after a Tuya device is deleted: tear down its
+ * persistent local connection.
+ * @param {object} device - The deleted Gladys device.
+ * @example
+ * this.postDelete(device);
+ */
+function postDelete(device) {
+  const topic = getTopicFromDevice(device);
+  if (!topic) {
+    return;
+  }
+  this.stopPersistentConnectionForDevice(topic);
 }
 
 /**
@@ -440,4 +508,7 @@ module.exports = {
   recyclePersistentConnection,
   stopPersistentConnectionForDevice,
   stopPersistentConnections,
+  postCreate,
+  postUpdate,
+  postDelete,
 };
