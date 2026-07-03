@@ -749,7 +749,7 @@
       "noDeviceFeaturesFound": "Keine Gerätefunktionen gefunden.",
       "settings": "Einstellungen",
       "calculateConsumptionFromIndexDescription": "Dies wird den Energieverbrauch (in kWh) in 30-Minuten-Intervallen aus den \"Index\"-Funktionen neu berechnen, seit Beginn Ihrer Gladys-Installation.",
-      "calculateConsumptionFromIndexFromBeginning": "Verbrauch aus Index von Anfang an berechnen",
+      "calculateConsumptionFromIndexFromBeginning": "Verbrauch neu berechnen",
       "calculatingConsumptionFromBeginning": "Verbrauchsberechnung läuft...",
       "calculateConsumptionFromBeginningStarted": "Die Verbrauchsberechnung wurde gestartet. Sie können den Fortschritt in den Hintergrundaufgaben verfolgen.",
       "calculateConsumptionFromBeginningError": "Beim Starten der Verbrauchsberechnung ist ein Fehler aufgetreten.",

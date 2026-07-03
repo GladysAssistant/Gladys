@@ -15,7 +15,9 @@ function getReply(language, intent, context = {}) {
   if (!answers || answers.length === 0) {
     throw new NotFoundError(`Answer with intent ${intent} and language ${language} not found`);
   }
-  return Handlebars.compile(answers[0])(context);
+  return Handlebars.compile(answers[0], {
+    noEscape: true,
+  })(context);
 }
 
 module.exports = {

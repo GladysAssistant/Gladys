@@ -42,8 +42,8 @@ class LANManagerPresenceScanner extends Component {
               onClick={this.toggleStatus}
               disabled={disabled}
             />
-            <span class="custom-switch-indicator" />
-            <span class="custom-switch-description">
+            <span class="custom-switch-indicator flex-shrink-0" />
+            <span class="custom-switch-description ml-2">
               <Text id="integration.lanManager.setup.presenceScannerStatusLabel" />
             </span>
           </label>

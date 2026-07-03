@@ -24,10 +24,11 @@ const DeviceTab = ({ children, ...props }) => (
             searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
           />
         </Localizer>
-        <Link href="/dashboard/integration/device/mqtt/edit">
-          <button class="btn btn-outline-primary ml-2">
-            <Text id="scene.newButton" /> <i class="fe fe-plus" />
-          </button>
+        <Link href="/dashboard/integration/device/mqtt/edit" class="btn btn-outline-primary ml-2">
+          <span class="d-none d-lg-inline-block mr-2">
+            <Text id="scene.newButton" />
+          </span>
+          <i class="fe fe-plus" />
         </Link>
       </div>
     </div>

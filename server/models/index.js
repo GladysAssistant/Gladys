@@ -35,6 +35,7 @@ const DashboardModel = require('./dashboard');
 const DeviceFeatureStateModel = require('./device_feature_state');
 const DeviceFeatureAggregateModel = require('./device_feature_state_aggregate');
 const DeviceFeatureModel = require('./device_feature');
+const DeviceFeatureSupportedOptionModel = require('./device_feature_supported_option');
 const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
 const EnergyPriceModel = require('./energy_price');
@@ -61,6 +62,7 @@ const models = {
   DeviceFeatureState: DeviceFeatureStateModel(sequelize, Sequelize),
   DeviceFeatureStateAggregate: DeviceFeatureAggregateModel(sequelize, Sequelize),
   DeviceFeature: DeviceFeatureModel(sequelize, Sequelize),
+  DeviceFeatureSupportedOption: DeviceFeatureSupportedOptionModel(sequelize, Sequelize),
   DeviceParam: DeviceParamModel(sequelize, Sequelize),
   Device: DeviceModel(sequelize, Sequelize),
   EnergyPrice: EnergyPriceModel(sequelize, Sequelize),

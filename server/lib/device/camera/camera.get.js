@@ -1,5 +1,6 @@
 const db = require('../../../models');
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
+const { getFeaturesInclude } = require('../../../utils/deviceQueryIncludes');
 
 /**
  * @description Get list of cameras.
@@ -10,14 +11,12 @@ const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
 async function get() {
   const cameras = await db.Device.findAll({
     include: [
-      {
-        model: db.DeviceFeature,
-        as: 'features',
+      getFeaturesInclude({
         attributes: ['name', 'selector'],
         where: {
           category: DEVICE_FEATURE_CATEGORIES.CAMERA,
         },
-      },
+      }),
       {
         model: db.Room,
         as: 'room',
