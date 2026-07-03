@@ -16,7 +16,7 @@ export function preactCliCssModules() {
     name: 'preact-cli-css-modules',
     enforce: 'pre',
     transform(code, id) {
-      if (!/\.(jsx?|tsx?)$/.test(id) || id.includes('node_modules')) {
+      if (!/\.(jsx?|tsx?)(\?|$)/.test(id) || id.includes('node_modules')) {
         return null;
       }
 

@@ -4,13 +4,14 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { patchCssModules } from 'vite-css-modules';
 import { resolve } from 'path';
 import { preactCliCssModules } from './vite-plugins/preact-cli-css-modules.js';
+import { preactAsyncRoutes } from './vite-plugins/preact-async-routes.js';
 
 function treatJsFilesAsJsx() {
   return {
     name: 'treat-js-files-as-jsx',
     enforce: 'pre',
     async transform(code, id) {
-      if (!/\/src\/.*\.js$/.test(id)) {
+      if (!/\/src\/.*\.js($|\?)/.test(id)) {
         return null;
       }
 
@@ -45,6 +46,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       patchCssModules({ exportMode: 'both' }),
+      preactAsyncRoutes(),
       treatJsFilesAsJsx(),
       preactCliCssModules(),
       preact(),
@@ -90,6 +92,11 @@ export default defineConfig(({ mode }) => {
       outDir: 'build',
       target: 'es2022',
       sourcemap: true,
+      rollupOptions: {
+        output: {
+          chunkFileNames: 'assets/[name].chunk.[hash].js'
+        }
+      },
       commonjsOptions: {
         include: [/node_modules/, /server\//],
         transformMixedEsModules: true

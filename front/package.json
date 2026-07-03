@@ -41,6 +41,7 @@
     "per-env": "^1.0.2",
     "prettier": "^1.17.1",
     "sirv-cli": "^3.0.1",
+    "@preact/async-loader": "^3.0.2",
     "vite": "^6.3.5",
     "vite-css-modules": "^1.16.0",
     "vite-plugin-static-copy": "^2.3.2"
