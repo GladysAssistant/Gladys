@@ -51,7 +51,8 @@ class EditPhotoBox extends Component {
   render(props) {
     const photos = props.box.photos || [];
     const fit = props.box.photo_fit || 'cover';
-    const slideshowInterval = props.box.photo_slideshow_interval ?? DEFAULT_SLIDESHOW_INTERVAL;
+    const slideshowInterval =
+      props.box.photo_slideshow_interval != null ? props.box.photo_slideshow_interval : DEFAULT_SLIDESHOW_INTERVAL;
     const showCaption = props.box.photo_show_caption !== false;
 
     return (
