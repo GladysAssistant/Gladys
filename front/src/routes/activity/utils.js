@@ -1,4 +1,10 @@
 import get from 'get-value';
+import dayjs from 'dayjs';
+import isToday from 'dayjs/plugin/isToday';
+import isYesterday from 'dayjs/plugin/isYesterday';
+
+dayjs.extend(isToday);
+dayjs.extend(isYesterday);
 
 const CATEGORY_STYLES = {
   'opening-sensor': { icon: 'unlock', color: '#3b82f6' },
@@ -132,6 +138,56 @@ const convertGladysDateToISO8601 = gladysDate => {
   return gladysDate;
 };
 
+const formatEntryTime = (createdAt, language, dictionary) => {
+  const date = dayjs(createdAt).locale(language);
+  const time = date.format('HH:mm');
+  const activityLog = dictionary.activityLog || {};
+
+  if (date.isToday()) {
+    const todayLabel = activityLog.todayPrefix || 'Today';
+    return `${todayLabel}, ${time}`;
+  }
+  if (date.isYesterday()) {
+    const yesterdayLabel = activityLog.yesterdayPrefix || 'Yesterday';
+    return `${yesterdayLabel}, ${time}`;
+  }
+  return `${date.format('dddd D MMMM')}, ${time}`;
+};
+
+const formatDayHeader = (createdAt, language, dictionary) => {
+  const date = dayjs(createdAt).locale(language);
+  const activityLog = dictionary.activityLog || {};
+
+  if (date.isToday()) {
+    return activityLog.todayPrefix || 'Today';
+  }
+  if (date.isYesterday()) {
+    return activityLog.yesterdayPrefix || 'Yesterday';
+  }
+  return date.format('dddd D MMMM YYYY');
+};
+
+const groupEntriesByDay = (entries, language, dictionary) => {
+  const groups = [];
+  let currentKey = null;
+
+  entries.forEach(entry => {
+    const key = dayjs(entry.created_at).locale(language).format('YYYY-MM-DD');
+
+    if (key !== currentKey) {
+      currentKey = key;
+      groups.push({
+        key,
+        label: formatDayHeader(entry.created_at, language, dictionary),
+        entries: []
+      });
+    }
+    groups[groups.length - 1].entries.push(entry);
+  });
+
+  return groups;
+};
+
 const groupEntriesByDate = (entries, language) => {
   const groups = [];
   let currentGroup = null;
@@ -159,6 +215,9 @@ export {
   getActivitySource,
   getEntryStyle,
   convertGladysDateToISO8601,
+  formatEntryTime,
+  formatDayHeader,
+  groupEntriesByDay,
   groupEntriesByDate,
   CATEGORY_STYLES
 };

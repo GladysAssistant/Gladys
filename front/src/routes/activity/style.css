@@ -1,197 +1,475 @@
-.activityLogContainer {
-  max-width: 720px;
+/* ── Layout ─────────────────────────────────────────────── */
+
+.page {
+  max-width: 640px;
   margin: 0 auto;
-  padding: 0.5rem 0 2rem;
+  padding: 0 0 3rem;
 }
 
-.activityLogDimmer {
-  min-height: 200px;
+.header {
+  margin-bottom: 1.75rem;
 }
 
-.activity-log-filters {
-  max-width: 720px;
-  margin: 0 auto 1.5rem;
-  padding: 1rem 1.25rem;
-  background: rgba(0, 0, 0, 0.02);
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+.title {
+  font-size: 1.625rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin: 0 0 0.4rem;
+  color: #111827;
 }
 
-.activity-log-filters-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: flex-end;
-}
-
-.activity-log-filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.activity-log-filter-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+.subtitle {
+  font-size: 0.9375rem;
+  line-height: 1.5;
   color: #6b7280;
   margin: 0;
 }
 
-.activity-log-room-select {
-  min-width: 160px;
-}
+/* ── Toolbar ────────────────────────────────────────────── */
 
-.activity-log-refresh-btn {
-  margin-left: auto;
-  align-self: flex-end;
-}
-
-.activityLogGroup {
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
   margin-bottom: 1.5rem;
 }
 
-.activityLogDateHeader {
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: capitalize;
-  color: #6b7280;
-  padding: 0.5rem 0 0.75rem;
-  letter-spacing: 0.02em;
-}
-
-.activityLogList {
-  display: flex;
-  flex-direction: column;
-}
-
-.activity-log-entry {
-  padding: 1rem 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.activity-log-entry:last-child {
-  border-bottom: none;
-}
-
-.activity-log-entry-time {
-  font-size: 0.75rem;
-  color: #9ca3af;
-  margin-bottom: 0.5rem;
-}
-
-.activity-log-entry-body {
-  display: flex;
+.segment {
+  display: inline-flex;
   align-items: center;
-  gap: 1rem;
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
 }
 
-.activity-log-entry-icon {
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+.segmentBtn {
+  border: none;
+  background: transparent;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.segmentBtn:hover {
+  color: #374151;
+}
+
+.segmentBtnActive {
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.roomSelect {
+  appearance: none;
+  background: #f3f4f6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.65rem center;
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 2rem 0.5rem 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  min-width: 0;
+  flex: 1;
+  max-width: 180px;
+}
+
+.roomSelect:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+}
+
+.refreshBtn {
+  margin-left: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--entry-color) 12%, transparent);
-  border: 1.5px solid color-mix(in srgb, var(--entry-color) 35%, transparent);
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 10px;
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
 }
 
-.activity-log-entry-icon .fe {
-  font-size: 1.25rem;
-  color: var(--entry-color);
+.refreshBtn:hover {
+  background: #e5e7eb;
+  color: #374151;
 }
 
-.activity-log-entry-content {
+.refreshBtn .fe {
+  font-size: 0.9rem;
+}
+
+/* ── Feed ───────────────────────────────────────────────── */
+
+.dimmerWrap {
+  min-height: 240px;
+  position: relative;
+}
+
+.feed {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+}
+
+.daySection {
+  /* groups entries by calendar day */
+}
+
+.dayHeader {
+  padding: 0.75rem 1.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+  background: #fafafa;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* ── Entry ──────────────────────────────────────────────── */
+
+.entry {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.entry:last-child {
+  border-bottom: none;
+}
+
+.entryTime {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #9ca3af;
+  margin-bottom: 0.625rem;
+  letter-spacing: 0.01em;
+}
+
+.entryRow {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.entryIcon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.entryIcon .fe {
+  font-size: 1.125rem;
+}
+
+.entryContent {
   flex: 1;
   min-width: 0;
 }
 
-.activity-log-entry-title {
-  font-size: 1rem;
+.entryTitle {
+  font-size: 0.9375rem;
   font-weight: 600;
-  line-height: 1.4;
-  color: #1f2937;
-  margin-bottom: 0.2rem;
+  line-height: 1.45;
+  color: #111827;
+  margin: 0 0 0.15rem;
 }
 
-.activity-log-entry-meta {
-  font-size: 0.85rem;
+.entryMeta {
+  font-size: 0.8125rem;
+  line-height: 1.4;
   color: #9ca3af;
+  margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   flex-wrap: wrap;
 }
 
-.activity-log-entry-separator {
-  opacity: 0.6;
+.entryDot {
+  opacity: 0.5;
+  font-size: 0.6rem;
 }
 
-.activityLogEmpty {
+/* ── Empty state ────────────────────────────────────────── */
+
+.empty {
   text-align: center;
-  padding: 4rem 1rem;
+  padding: 3.5rem 1.5rem;
 }
 
-.activityLogEmptyIcon {
-  width: 64px;
-  height: 64px;
+.emptyIcon {
+  width: 56px;
+  height: 56px;
   margin: 0 auto 1.25rem;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.04);
+  border-radius: 14px;
+  background: #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.activityLogEmptyIcon .fe {
-  font-size: 1.75rem;
+.emptyIcon .fe {
+  font-size: 1.5rem;
   color: #9ca3af;
 }
 
-.activityLogLoadMore {
+.emptyTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.4rem;
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin: 0;
+  line-height: 1.5;
+  max-width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Load more ──────────────────────────────────────────── */
+
+.loadMore {
+  padding: 1rem 1.25rem;
   text-align: center;
-  padding: 1.5rem 0 0.5rem;
+  border-top: 1px solid #f3f4f6;
 }
 
-/* Dark mode adjustments */
-.dark-mode .activity-log-filters {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
+.loadMoreBtn {
+  border: none;
+  background: transparent;
+  color: #3b82f6;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  transition: background 0.15s ease;
 }
 
-.dark-mode .activity-log-entry {
-  border-bottom-color: rgba(255, 255, 255, 0.08);
+.loadMoreBtn:hover {
+  background: #eff6ff;
 }
 
-.dark-mode .activity-log-entry-title {
+.loadMoreBtn:disabled {
+  color: #9ca3af;
+  cursor: default;
+  background: transparent;
+}
+
+/* ── Dark mode ──────────────────────────────────────────── */
+
+.dark-mode .title {
   color: #f3f4f6;
 }
 
-.dark-mode .activity-log-entry-meta,
-.dark-mode .activityLogDateHeader,
-.dark-mode .activity-log-filter-label {
+.dark-mode .subtitle {
   color: #9ca3af;
 }
 
-.dark-mode .activityLogEmptyIcon {
+.dark-mode .segment {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.dark-mode .segmentBtn {
+  color: #9ca3af;
+}
+
+.dark-mode .segmentBtn:hover {
+  color: #d1d5db;
+}
+
+.dark-mode .segmentBtnActive {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f9fafb;
+  box-shadow: none;
+}
+
+.dark-mode .roomSelect {
+  background-color: rgba(255, 255, 255, 0.07);
+  color: #d1d5db;
+}
+
+.dark-mode .refreshBtn {
+  background: rgba(255, 255, 255, 0.07);
+  color: #9ca3af;
+}
+
+.dark-mode .refreshBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #d1d5db;
+}
+
+.dark-mode .feed {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+.dark-mode .dayHeader {
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+  color: #6b7280;
+}
+
+.dark-mode .entry {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark-mode .entryTitle {
+  color: #f3f4f6;
+}
+
+.dark-mode .entryTime,
+.dark-mode .entryMeta {
+  color: #6b7280;
+}
+
+.dark-mode .emptyIcon {
   background: rgba(255, 255, 255, 0.06);
 }
 
+.dark-mode .emptyTitle {
+  color: #d1d5db;
+}
+
+.dark-mode .emptyText {
+  color: #6b7280;
+}
+
+.dark-mode .loadMore {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark-mode .loadMoreBtn {
+  color: #60a5fa;
+}
+
+.dark-mode .loadMoreBtn:hover {
+  background: rgba(96, 165, 250, 0.1);
+}
+
+/* ── Skeleton loading ───────────────────────────────────── */
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeletonEntry {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.skeletonTime {
+  height: 10px;
+  width: 100px;
+  margin-bottom: 0.75rem;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+}
+
+.skeletonIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+.skeletonLines {
+  flex: 1;
+}
+
+.skeletonTitle {
+  height: 14px;
+  width: 65%;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+.skeletonMeta {
+  height: 10px;
+  width: 40%;
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+.dark-mode .skeletonTime,
+.dark-mode .skeletonIcon,
+.dark-mode .skeletonTitle,
+.dark-mode .skeletonMeta {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.09) 50%, rgba(255, 255, 255, 0.05) 75%);
+  background-size: 800px 100%;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+
 @media (max-width: 576px) {
-  .activity-log-filters-row {
-    flex-direction: column;
-    align-items: stretch;
+  .page {
+    padding-bottom: 2rem;
   }
 
-  .activity-log-refresh-btn {
+  .toolbar {
+    gap: 0.5rem;
+  }
+
+  .roomSelect {
+    max-width: none;
+    flex: 1 1 100%;
+    order: 3;
+  }
+
+  .refreshBtn {
     margin-left: 0;
-    align-self: stretch;
   }
 
-  .activity-log-room-select {
-    width: 100%;
+  .entry {
+    padding: 0.9rem 1rem;
+  }
+
+  .dayHeader {
+    padding: 0.65rem 1rem 0.4rem;
   }
 }
