@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 
 const TuyaHandler = require('../../../../services/tuya/lib/index');
+const { MAX_DEVICE_PAGES } = require('../../../../services/tuya/lib/tuya.loadDevices');
 const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
 
 const gladys = {
@@ -171,6 +172,16 @@ describe('TuyaHandler.loadDevices', () => {
     } catch (e) {
       expect(e.message).to.equal('Tuya API pagination did not advance (has_more=true with empty page)');
     }
+  });
+
+  it('should stop recursing when the pagination safety cap is reached', async () => {
+    // Simulate a misbehaving upstream that always returns a full non-empty page with has_more=true.
+    tuyaHandler.connector.request = sinon.stub().resolves({ result: { list: [{ id: 1 }], has_more: true } });
+
+    const devices = await tuyaHandler.loadDevices(MAX_DEVICE_PAGES, 1);
+
+    expect(devices).to.deep.eq([{ id: 1 }]);
+    assert.callCount(tuyaHandler.connector.request, 1);
   });
 
   it('should handle malformed result.list payloads as empty pages', async () => {

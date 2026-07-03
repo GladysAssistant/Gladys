@@ -70,7 +70,7 @@ const parseLocalConfig = (device) => {
 
 const scheduleReconnect = (self, entry) => {
   const { topic } = entry;
-  if (self.persistentConnections[topic] !== entry || entry.status === 'failed') {
+  if (entry.status === 'failed') {
     return;
   }
   if (entry.retryCount >= MAX_PERSISTENT_RETRIES) {
@@ -87,9 +87,6 @@ const scheduleReconnect = (self, entry) => {
     clearTimeout(entry.retryTimer);
   }
   entry.retryTimer = setTimeout(() => {
-    if (self.persistentConnections[topic] !== entry) {
-      return;
-    }
     teardownApi(entry.api);
     // eslint-disable-next-line no-use-before-define
     openPersistentConnection(self, entry);
@@ -259,12 +256,7 @@ async function startPersistentConnections() {
   }
 
   (Array.isArray(devices) ? devices : []).forEach((device) => {
-    try {
-      this.startPersistentConnectionForDevice(device);
-    } catch (e) {
-      // never let a single device break the startup loop
-      logger.info(`[Tuya][persistent] start error: ${formatSocketError(e)}`);
-    }
+    this.startPersistentConnectionForDevice(device);
   });
 }
 

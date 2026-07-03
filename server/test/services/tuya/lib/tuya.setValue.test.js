@@ -135,6 +135,88 @@ describe('TuyaHandler.setValue', () => {
     expect(ctx.connector.request.called).to.equal(false);
   });
 
+  it('should send via the persistent connection when one is available', async () => {
+    const set = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = sinon.stub().resolves();
+      this.set = set;
+      this.disconnect = sinon.stub().resolves();
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:switch_1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+    const sendCommandViaPersistentConnection = sinon.stub().resolves(true);
+    const ctx = {
+      connector: { request: sinon.stub() },
+      gladys: {},
+      degradedDevices: {},
+      sendCommandViaPersistentConnection,
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(sendCommandViaPersistentConnection.calledOnce).to.equal(true);
+    expect(set.called).to.equal(false);
+    expect(ctx.connector.request.called).to.equal(false);
+  });
+
+  it('should fall back to a dedicated local connection when the persistent set fails', async () => {
+    const connect = sinon.stub().resolves();
+    const set = sinon.stub().resolves();
+    const disconnect = sinon.stub().resolves();
+    function TuyAPIStub() {
+      this.connect = connect;
+      this.set = set;
+      this.disconnect = disconnect;
+    }
+    const { setValue } = proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: TuyAPIStub,
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+    });
+
+    const device = {
+      params: [
+        { name: DEVICE_PARAM_NAME.IP_ADDRESS, value: '10.0.0.2' },
+        { name: DEVICE_PARAM_NAME.LOCAL_KEY, value: 'key' },
+        { name: DEVICE_PARAM_NAME.PROTOCOL_VERSION, value: '3.3' },
+        { name: DEVICE_PARAM_NAME.LOCAL_OVERRIDE, value: true },
+      ],
+    };
+    const deviceFeature = {
+      external_id: 'tuya:device:switch_1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+    const sendCommandViaPersistentConnection = sinon.stub().rejects(new Error('persistent set failed'));
+    const ctx = {
+      connector: { request: sinon.stub() },
+      gladys: {},
+      degradedDevices: {},
+      sendCommandViaPersistentConnection,
+    };
+
+    await setValue.call(ctx, device, deviceFeature, 1);
+
+    expect(sendCommandViaPersistentConnection.calledOnce).to.equal(true);
+    expect(connect.calledOnce).to.equal(true);
+    expect(set.calledOnce).to.equal(true);
+  });
+
   it('should call local tuyapi-newgen for protocol 3.5', async () => {
     const connect = sinon.stub().resolves();
     const set = sinon.stub().resolves();
