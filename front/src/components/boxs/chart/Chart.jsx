@@ -605,7 +605,9 @@ class Chartbox extends Component {
           </div>
 
           {props.box.chart_type && offset > 0 && (
-            <div class={cx(style.periodLabel, 'text-muted')}>{getPeriodLabel(interval, offset, props.user.language)}</div>
+            <div class={cx(style.periodLabel, 'text-muted')}>
+              {getPeriodLabel(interval, offset, props.user.language)}
+            </div>
           )}
 
           {props.box.chart_type && (

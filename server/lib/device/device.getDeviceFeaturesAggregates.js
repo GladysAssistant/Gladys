@@ -133,13 +133,7 @@ async function getDeviceFeaturesAggregates(
   }
 
   if (isBinary) {
-    values = await db.duckDbReadConnectionAllAsync(
-      BINARY_QUERY,
-      deviceFeature.id,
-      startDate,
-      endDate,
-      maxStates,
-    );
+    values = await db.duckDbReadConnectionAllAsync(BINARY_QUERY, deviceFeature.id, startDate, endDate, maxStates);
   } else if (groupBy) {
     // Use the grouped query when groupBy is specified
     values = await db.duckDbReadConnectionAllAsync(GROUPED_QUERY, groupBy, deviceFeature.id, startDate, endDate);
