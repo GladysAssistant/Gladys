@@ -1,5 +1,6 @@
 import { createElement } from 'preact';
-import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
+import get from 'get-value';
+import { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } from '../../../../../server/utils/constants';
 
 import { getDeviceName } from '../../../utils/device';
 
@@ -61,6 +62,20 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE]: VacuumCleanerCleanModeDeviceFeature
 };
 
+// Some feature type strings are shared across categories (e.g. AIR_CONDITIONING.MODE and FAN.MODE
+// are both 'mode'). Because ROW_TYPE_BY_FEATURE_TYPE is keyed by type only, whichever entry is
+// declared last silently wins for every category. This category-aware map takes precedence and
+// disambiguates each colliding type by its category, so routing no longer depends on declaration
+// order and stays correct when new categories reuse an existing type string.
+const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: AirConditioningModeDeviceFeature
+  },
+  [DEVICE_FEATURE_CATEGORIES.FAN]: {
+    [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
+  }
+};
+
 const DeviceRow = ({ children, ...props }) => {
   const { device, deviceFeature } = props;
   const rowName = deviceFeature.new_label || getDeviceName(device, deviceFeature);
@@ -78,7 +93,9 @@ const DeviceRow = ({ children, ...props }) => {
     );
   }
 
-  const elementType = ROW_TYPE_BY_FEATURE_TYPE[props.deviceFeature.type];
+  const elementType =
+    get(ROW_TYPE_BY_CATEGORY_AND_TYPE, `${deviceFeature.category}.${deviceFeature.type}`) ||
+    ROW_TYPE_BY_FEATURE_TYPE[props.deviceFeature.type];
 
   if (!elementType) {
     // if no related components, we display the device as a sensor

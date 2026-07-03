@@ -1,6 +1,7 @@
 const db = require('../../../models');
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
+const { getFeaturesInclude } = require('../../../utils/deviceQueryIncludes');
 
 /**
  * @description Get all lights and store them in memory.
@@ -11,13 +12,11 @@ const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
 async function init() {
   const lights = await db.Device.findAll({
     include: [
-      {
-        model: db.DeviceFeature,
-        as: 'features',
+      getFeaturesInclude({
         where: {
           category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         },
-      },
+      }),
       {
         model: db.Room,
         as: 'room',
