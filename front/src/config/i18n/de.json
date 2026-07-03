@@ -4554,6 +4554,84 @@
       "upsellFeature3": "Open-Weight-KI-Modelle in Frankreich gehostet"
     }
   },
+  "activityLog": {
+    "pageTitle": "Aktivitätsprotokoll",
+    "subtitle": "Verfolgen Sie alles, was in Ihrem vernetzten Zuhause passiert",
+    "todayPrefix": "Heute",
+    "yesterdayPrefix": "Gestern",
+    "emptyTitle": "Noch keine Aktivität",
+    "emptyDescription": "Ereignisse Ihrer Sensoren und Geräte werden hier angezeigt.",
+    "loadMore": "Mehr laden",
+    "loadingMore": "Laden...",
+    "filters": {
+      "period": "Zeitraum",
+      "period24h": "24h",
+      "period7d": "7 Tage",
+      "period30d": "30 Tage",
+      "room": "Raum",
+      "allRooms": "Alle Räume",
+      "type": "Anzeige",
+      "eventsOnly": "Ereignisse",
+      "allStates": "Alle"
+    },
+    "eventTitle": {
+      "opening-sensor": {
+        "binary": {
+          "0": "{{deviceName}} geöffnet",
+          "1": "{{deviceName}} geschlossen"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "0": "{{deviceName}} — keine Bewegung",
+          "1": "{{deviceName}} — Bewegung erkannt"
+        }
+      },
+      "presence-sensor": {
+        "push": {
+          "1": "{{deviceName}} — Anwesenheit erkannt"
+        }
+      },
+      "lock": {
+        "binary": {
+          "0": "{{deviceName}} entriegelt",
+          "1": "{{deviceName}} verriegelt"
+        }
+      },
+      "shutter": {
+        "state": {
+          "0": "{{deviceName}} gestoppt",
+          "1": "{{deviceName}} geöffnet",
+          "-1": "{{deviceName}} geschlossen"
+        }
+      },
+      "curtain": {
+        "state": {
+          "0": "{{deviceName}} gestoppt",
+          "1": "{{deviceName}} geöffnet",
+          "-1": "{{deviceName}} geschlossen"
+        }
+      },
+      "light": {
+        "binary": {
+          "0": "{{deviceName}} ausgeschaltet",
+          "1": "{{deviceName}} eingeschaltet"
+        }
+      },
+      "switch": {
+        "binary": {
+          "0": "{{deviceName}} ausgeschaltet",
+          "1": "{{deviceName}} eingeschaltet"
+        }
+      },
+      "heater": {
+        "binary": {
+          "0": "{{deviceName}} ausgeschaltet",
+          "1": "{{deviceName}} eingeschaltet"
+        }
+      }
+    }
+  },
   "header": {
     "gladysAssistant": "Gladys Assistant",
     "home": "Startseite",
@@ -4563,6 +4641,7 @@
     "calendar": "Kalender",
     "maps": "Karten",
     "scenes": "Szenen",
+    "activity": "Aktivität",
     "profile": "Profil",
     "settings": "Einstellungen",
     "needHelp": "Hilfe benötigt",

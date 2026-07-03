@@ -4554,6 +4554,84 @@
       "hideDetails": "Hide details"
     }
   },
+  "activityLog": {
+    "pageTitle": "Activity log",
+    "subtitle": "Follow everything happening in your connected home",
+    "todayPrefix": "Today",
+    "yesterdayPrefix": "Yesterday",
+    "emptyTitle": "No activity yet",
+    "emptyDescription": "Events from your sensors and devices will appear here as they happen.",
+    "loadMore": "Load more",
+    "loadingMore": "Loading...",
+    "filters": {
+      "period": "Period",
+      "period24h": "24h",
+      "period7d": "7 days",
+      "period30d": "30 days",
+      "room": "Room",
+      "allRooms": "All rooms",
+      "type": "Display",
+      "eventsOnly": "Events",
+      "allStates": "All"
+    },
+    "eventTitle": {
+      "opening-sensor": {
+        "binary": {
+          "0": "{{deviceName}} opened",
+          "1": "{{deviceName}} closed"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "0": "{{deviceName}} — no motion",
+          "1": "{{deviceName}} — motion detected"
+        }
+      },
+      "presence-sensor": {
+        "push": {
+          "1": "{{deviceName}} — presence detected"
+        }
+      },
+      "lock": {
+        "binary": {
+          "0": "{{deviceName}} unlocked",
+          "1": "{{deviceName}} locked"
+        }
+      },
+      "shutter": {
+        "state": {
+          "0": "{{deviceName}} stopped",
+          "1": "{{deviceName}} opened",
+          "-1": "{{deviceName}} closed"
+        }
+      },
+      "curtain": {
+        "state": {
+          "0": "{{deviceName}} stopped",
+          "1": "{{deviceName}} opened",
+          "-1": "{{deviceName}} closed"
+        }
+      },
+      "light": {
+        "binary": {
+          "0": "{{deviceName}} turned off",
+          "1": "{{deviceName}} turned on"
+        }
+      },
+      "switch": {
+        "binary": {
+          "0": "{{deviceName}} turned off",
+          "1": "{{deviceName}} turned on"
+        }
+      },
+      "heater": {
+        "binary": {
+          "0": "{{deviceName}} turned off",
+          "1": "{{deviceName}} turned on"
+        }
+      }
+    }
+  },
   "header": {
     "gladysAssistant": "Gladys Assistant",
     "home": "Home",
@@ -4563,6 +4641,7 @@
     "calendar": "Calendar",
     "maps": "Maps",
     "scenes": "Scenes",
+    "activity": "Activity",
     "profile": "Profile",
     "settings": "Settings",
     "needHelp": "Need help",

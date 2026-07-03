@@ -4554,6 +4554,84 @@
       "hideDetails": "Masquer les détails"
     }
   },
+  "activityLog": {
+    "pageTitle": "Journal d'activité",
+    "subtitle": "Suivez tout ce qui se passe dans votre maison connectée",
+    "todayPrefix": "Aujourd'hui",
+    "yesterdayPrefix": "Hier",
+    "emptyTitle": "Aucune activité pour le moment",
+    "emptyDescription": "Les événements de vos capteurs et appareils apparaîtront ici au fur et à mesure.",
+    "loadMore": "Charger plus",
+    "loadingMore": "Chargement...",
+    "filters": {
+      "period": "Période",
+      "period24h": "24h",
+      "period7d": "7 jours",
+      "period30d": "30 jours",
+      "room": "Pièce",
+      "allRooms": "Toutes les pièces",
+      "type": "Affichage",
+      "eventsOnly": "Événements",
+      "allStates": "Tout"
+    },
+    "eventTitle": {
+      "opening-sensor": {
+        "binary": {
+          "0": "{{deviceName}} ouverte",
+          "1": "{{deviceName}} fermée"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "0": "{{deviceName}} — aucun mouvement",
+          "1": "{{deviceName}} — mouvement détecté"
+        }
+      },
+      "presence-sensor": {
+        "push": {
+          "1": "{{deviceName}} — présence détectée"
+        }
+      },
+      "lock": {
+        "binary": {
+          "0": "{{deviceName}} déverrouillée",
+          "1": "{{deviceName}} verrouillée"
+        }
+      },
+      "shutter": {
+        "state": {
+          "0": "{{deviceName}} arrêté",
+          "1": "{{deviceName}} ouvert",
+          "-1": "{{deviceName}} fermé"
+        }
+      },
+      "curtain": {
+        "state": {
+          "0": "{{deviceName}} arrêté",
+          "1": "{{deviceName}} ouvert",
+          "-1": "{{deviceName}} fermé"
+        }
+      },
+      "light": {
+        "binary": {
+          "0": "{{deviceName}} éteinte",
+          "1": "{{deviceName}} allumée"
+        }
+      },
+      "switch": {
+        "binary": {
+          "0": "{{deviceName}} éteinte",
+          "1": "{{deviceName}} allumée"
+        }
+      },
+      "heater": {
+        "binary": {
+          "0": "{{deviceName}} éteint",
+          "1": "{{deviceName}} allumé"
+        }
+      }
+    }
+  },
   "header": {
     "gladysAssistant": "Gladys Assistant",
     "home": "Accueil",
@@ -4563,6 +4641,7 @@
     "calendar": "Calendrier",
     "maps": "Plans",
     "scenes": "Scènes",
+    "activity": "Activité",
     "profile": "Profil",
     "settings": "Paramètres",
     "needHelp": "Besoin d'aide",

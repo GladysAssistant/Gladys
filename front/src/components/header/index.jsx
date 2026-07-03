@@ -174,6 +174,16 @@ class Header extends Component {
                       <i class="fe fe-map" /> <Text id="header.maps" />
                     </Link>
                   </li>
+                  <li class="nav-item">
+                    <Link
+                      href="/dashboard/activity"
+                      class={cx('nav-link', {
+                        active: props.currentUrl === '/dashboard/activity'
+                      })}
+                    >
+                      <i class="fe fe-activity" /> <Text id="header.activity" />
+                    </Link>
+                  </li>
                   {props.user.role === USER_ROLE.ADMIN && (
                     <li class="nav-item">
                       <Link

@@ -1,0 +1,197 @@
+.activityLogContainer {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0.5rem 0 2rem;
+}
+
+.activityLogDimmer {
+  min-height: 200px;
+}
+
+.activity-log-filters {
+  max-width: 720px;
+  margin: 0 auto 1.5rem;
+  padding: 1rem 1.25rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.activity-log-filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.activity-log-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.activity-log-filter-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  margin: 0;
+}
+
+.activity-log-room-select {
+  min-width: 160px;
+}
+
+.activity-log-refresh-btn {
+  margin-left: auto;
+  align-self: flex-end;
+}
+
+.activityLogGroup {
+  margin-bottom: 1.5rem;
+}
+
+.activityLogDateHeader {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  color: #6b7280;
+  padding: 0.5rem 0 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.activityLogList {
+  display: flex;
+  flex-direction: column;
+}
+
+.activity-log-entry {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.activity-log-entry:last-child {
+  border-bottom: none;
+}
+
+.activity-log-entry-time {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-bottom: 0.5rem;
+}
+
+.activity-log-entry-body {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.activity-log-entry-icon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--entry-color) 12%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--entry-color) 35%, transparent);
+}
+
+.activity-log-entry-icon .fe {
+  font-size: 1.25rem;
+  color: var(--entry-color);
+}
+
+.activity-log-entry-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-log-entry-title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1f2937;
+  margin-bottom: 0.2rem;
+}
+
+.activity-log-entry-meta {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.activity-log-entry-separator {
+  opacity: 0.6;
+}
+
+.activityLogEmpty {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+
+.activityLogEmptyIcon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.25rem;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activityLogEmptyIcon .fe {
+  font-size: 1.75rem;
+  color: #9ca3af;
+}
+
+.activityLogLoadMore {
+  text-align: center;
+  padding: 1.5rem 0 0.5rem;
+}
+
+/* Dark mode adjustments */
+.dark-mode .activity-log-filters {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark-mode .activity-log-entry {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark-mode .activity-log-entry-title {
+  color: #f3f4f6;
+}
+
+.dark-mode .activity-log-entry-meta,
+.dark-mode .activityLogDateHeader,
+.dark-mode .activity-log-filter-label {
+  color: #9ca3af;
+}
+
+.dark-mode .activityLogEmptyIcon {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 576px) {
+  .activity-log-filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .activity-log-refresh-btn {
+    margin-left: 0;
+    align-self: stretch;
+  }
+
+  .activity-log-room-select {
+    width: 100%;
+  }
+}
