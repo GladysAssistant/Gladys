@@ -492,6 +492,61 @@ describe('Tuya persistent connection', () => {
     });
   });
 
+  describe('continuous-sensor push throttle', () => {
+    // Generic (non-strict) local mapping: switch_1 -> dps 1 and power_2 -> dps 2 via the _N fallback.
+    const buildPowerDevice = () => {
+      const device = buildDevice();
+      delete device.device_type;
+      device.features.push({
+        external_id: 'tuya:testid:power_2',
+        selector: 'tuya-testid-power-2',
+        category: 'switch',
+        type: 'power',
+        scale: 1,
+        last_value: 0,
+      });
+      return device;
+    };
+
+    const statesOf = (self, externalId) =>
+      self.gladys.event.emit
+        .getCalls()
+        .filter(
+          (call) => call.args[0] === EVENTS.DEVICE.NEW_STATE && call.args[1].device_feature_external_id === externalId,
+        )
+        .map((call) => call.args[1].state);
+
+    it('caps continuous-sensor emissions to one per interval while event-like features stay instant', () => {
+      const clock = sandbox.useFakeTimers();
+      const self = buildSelf();
+      const device = buildPowerDevice();
+      self.startPersistentConnectionForDevice(device);
+
+      self.handlePushedDps(device, { '1': true, '2': 100 });
+      self.handlePushedDps(device, { '1': false, '2': 200 });
+
+      // power_2 (dps 2) throttled on the second push, switch_1 (dps 1) always through.
+      expect(statesOf(self, 'tuya:testid:power_2')).to.deep.equal([10]);
+      expect(statesOf(self, 'tuya:testid:switch_1')).to.deep.equal([1, 0]);
+
+      clock.tick(10000);
+      self.handlePushedDps(device, { '2': 300 });
+
+      expect(statesOf(self, 'tuya:testid:power_2')).to.deep.equal([10, 30]);
+      clock.restore();
+    });
+
+    it('does not throttle when the push targets a device without a persistent entry', () => {
+      const self = buildSelf();
+      const device = buildPowerDevice();
+
+      self.handlePushedDps(device, { '2': 100 });
+      self.handlePushedDps(device, { '2': 200 });
+
+      expect(statesOf(self, 'tuya:testid:power_2')).to.deep.equal([10, 20]);
+    });
+  });
+
   it('push should emit the same states as the local poll (transform/scale applied)', () => {
     const fixtureCase = loadFixtureCases('pollLocal').find((c) => c.directoryName === 'smart-socket-basic');
     expect(fixtureCase, 'smart-socket-basic pollLocal fixture').to.not.equal(undefined);

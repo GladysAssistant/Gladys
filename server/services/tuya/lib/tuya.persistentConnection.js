@@ -7,7 +7,8 @@ const { normalizeBoolean } = require('./utils/tuya.normalize');
 const { recordLocalFailure, recordLocalSuccess } = require('./utils/tuya.degraded');
 // Reuse the poll's DPS -> feature -> state pipeline so pushed updates and the scheduled poll apply the
 // exact same transformation (scale, temperature conversion, ...).
-const { emitLocalDpsStates } = require('./tuya.poll');
+const { emitLocalDpsStates, getFeatureCode, hasDpsKey } = require('./tuya.poll');
+const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
 
 // A persistent local connection stays open and receives pushed DP updates in real time (events),
 // instead of the one-shot poll. Devices that cannot sustain the socket (battery/asleep, offline,
@@ -266,6 +267,50 @@ const getTopicFromDevice = (device) => {
   return prefix === 'tuya' && topic ? topic : null;
 };
 
+// Continuous sensors (measured temperature, power, indexes...) of a running device can push several
+// times per second (e.g. an AC sensor flapping between 23 and 24 °C), flooding the DB/websockets with
+// states the 10s poll used to naturally throttle. Cap their push-driven emissions to one per poll-ish
+// interval; event-like features (switches, doorbell, modes, target temperature) stay instantaneous.
+const CONTINUOUS_SENSOR_TYPES = new Set([
+  'decimal',
+  'integer',
+  'power',
+  'energy',
+  'voltage',
+  'current',
+  'index',
+  'index-today',
+]);
+const PUSH_CONTINUOUS_EMIT_INTERVAL_MS = 10 * 1000;
+
+const filterThrottledContinuousDps = (entry, device, dps) => {
+  if (!entry) {
+    return dps;
+  }
+  const now = Date.now();
+  entry.continuousEmitAt = entry.continuousEmitAt || {};
+  const filtered = { ...dps };
+  const deviceFeatures = Array.isArray(device.features) ? device.features : [];
+  deviceFeatures.forEach((deviceFeature) => {
+    if (!CONTINUOUS_SENSOR_TYPES.has(deviceFeature.type)) {
+      return;
+    }
+    const code = getFeatureCode(deviceFeature);
+    const dpsKey = getLocalDpsFromCode(code, device);
+    if (dpsKey === null || !hasDpsKey(filtered, dpsKey)) {
+      return;
+    }
+    const lastEmitAt = entry.continuousEmitAt[code];
+    if (lastEmitAt !== undefined && now - lastEmitAt < PUSH_CONTINUOUS_EMIT_INTERVAL_MS) {
+      delete filtered[String(dpsKey)];
+      delete filtered[dpsKey];
+      return;
+    }
+    entry.continuousEmitAt[code] = now;
+  });
+  return filtered;
+};
+
 /**
  * @description Handle a pushed DPS map from a persistent connection: emit Gladys states.
  * @param {object} device - The Gladys device the push belongs to.
@@ -286,7 +331,8 @@ function handlePushedDps(device, dps) {
     entry.lastDataAt = Date.now();
   }
 
-  const { handledCodes } = emitLocalDpsStates(this.gladys, device, dps);
+  const throttledDps = filterThrottledContinuousDps(entry, device, dps);
+  const { handledCodes } = emitLocalDpsStates(this.gladys, device, throttledDps);
   if (handledCodes.size > 0) {
     recordLocalSuccess(this.degradedDevices, topic);
   }
