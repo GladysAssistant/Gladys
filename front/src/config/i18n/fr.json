@@ -647,7 +647,7 @@
       "noDeviceFeaturesFound": "Aucune fonctionnalité d'appareil trouvée.",
       "settings": "Paramètres",
       "calculateConsumptionFromIndexDescription": "Ceci re-calculera la consommation d'énergie (en kWh) par tranche de 30 minutes à partir des fonctionnalités \"index\", depuis le début de votre installation Gladys.",
-      "calculateConsumptionFromIndexFromBeginning": "Calculer la consommation depuis l'index depuis le début",
+      "calculateConsumptionFromIndexFromBeginning": "Recalculer la consommation",
       "calculatingConsumptionFromBeginning": "Calcul de la consommation en cours...",
       "calculateConsumptionFromBeginningStarted": "Le calcul de la consommation a été lancé. Vous pouvez suivre le progrès dans les tâches en arrière-plan.",
       "calculateConsumptionFromBeginningError": "Une erreur est survenue lors du lancement du calcul de la consommation.",

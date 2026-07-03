@@ -76,4 +76,27 @@ describe('scene.send-message', () => {
     );
     assert.calledWith(message.sendToUser, 'pepper', 'Temperature in the living room is 15 °C.');
   });
+  it('should send message with value injected with encodable value', async () => {
+    const stateManager = new StateManager(event);
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const scope = {
+      0: [{ calendarEvent: { name: "d'aujourd'hui" } }],
+    };
+    await executeActions(
+      { stateManager, event, message },
+      [
+        [
+          {
+            type: ACTIONS.MESSAGE.SEND,
+            user: 'pepper',
+            text: 'Event {{0.0.calendarEvent.name}} starting.',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(message.sendToUser, 'pepper', "Event d'aujourd'hui starting.");
+  });
 });
