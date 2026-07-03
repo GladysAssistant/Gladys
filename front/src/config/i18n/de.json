@@ -4563,6 +4563,8 @@
     "emptyDescription": "Ereignisse Ihrer Sensoren und Geräte werden hier angezeigt.",
     "loadMore": "Mehr laden",
     "loadingMore": "Laden...",
+    "groupChanges": "{{count}} Änderungen",
+    "groupLastChange": "Zuletzt: {{value}}",
     "filters": {
       "period": "Zeitraum",
       "period24h": "24h",

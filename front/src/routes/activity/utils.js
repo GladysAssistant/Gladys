@@ -271,9 +271,14 @@ const convertGladysDateToISO8601 = gladysDate => {
   return gladysDate;
 };
 
+const formatEntryTimeShort = (createdAt, language) =>
+  dayjs(createdAt)
+    .locale(language)
+    .format('HH:mm');
+
 const formatEntryTime = (createdAt, language, dictionary) => {
   const date = dayjs(createdAt).locale(language);
-  const time = date.format('HH:mm');
+  const time = formatEntryTimeShort(createdAt, language);
   const activityLog = dictionary.activityLog || {};
 
   if (date.isToday()) {
@@ -285,6 +290,78 @@ const formatEntryTime = (createdAt, language, dictionary) => {
     return `${yesterdayLabel}, ${time}`;
   }
   return `${date.format('dddd D MMMM')}, ${time}`;
+};
+
+const getActivityValueLabel = (entry, dictionary) => {
+  const title = getActivityTitle(entry, dictionary);
+  const deviceName = entry.device_name;
+
+  if (title === deviceName) {
+    return '';
+  }
+
+  if (title.indexOf(`${deviceName} — `) === 0) {
+    return title.slice(deviceName.length + 3);
+  }
+
+  if (title.indexOf(`${deviceName} `) === 0) {
+    return title.slice(deviceName.length + 1);
+  }
+
+  return title;
+};
+
+const formatGroupTimeRange = (entries, language) => {
+  if (entries.length === 0) {
+    return '';
+  }
+
+  const newestTime = formatEntryTimeShort(entries[0].created_at, language);
+  const oldestTime = formatEntryTimeShort(entries[entries.length - 1].created_at, language);
+
+  if (newestTime === oldestTime) {
+    return newestTime;
+  }
+
+  return `${oldestTime}–${newestTime}`;
+};
+
+const GROUP_MIN_SIZE = 2;
+
+const groupConsecutiveEntries = (entries, minGroupSize = GROUP_MIN_SIZE) => {
+  const items = [];
+  let index = 0;
+
+  while (index < entries.length) {
+    const selector = entries[index].device_feature_selector;
+    let nextIndex = index + 1;
+
+    while (nextIndex < entries.length && entries[nextIndex].device_feature_selector === selector) {
+      nextIndex += 1;
+    }
+
+    const run = entries.slice(index, nextIndex);
+
+    if (run.length >= minGroupSize) {
+      items.push({
+        type: 'group',
+        key: `${selector}-${run[0].created_at}`,
+        entries: run
+      });
+    } else {
+      run.forEach(entry => {
+        items.push({
+          type: 'single',
+          key: `${entry.device_feature_selector}-${entry.created_at}`,
+          entry
+        });
+      });
+    }
+
+    index = nextIndex;
+  }
+
+  return items;
 };
 
 const formatDayHeader = (createdAt, language, dictionary) => {
@@ -377,12 +454,15 @@ const groupEntriesByDate = (entries, language) => {
 
 export {
   getActivityTitle,
+  getActivityValueLabel,
   getActivitySource,
   getEntryStyle,
   formatNumericValue,
   shouldFormatAsNumericValue,
   convertGladysDateToISO8601,
   formatEntryTime,
+  formatEntryTimeShort,
+  formatGroupTimeRange,
   formatDayHeader,
   formatDateInputValue,
   getCustomDateRangeISO,
@@ -390,7 +470,9 @@ export {
   getCategoriesFromGroups,
   isCategoryInGroups,
   groupEntriesByDay,
+  groupConsecutiveEntries,
   groupEntriesByDate,
   ACTIVITY_CATEGORY_GROUPS,
-  CATEGORY_STYLES
+  CATEGORY_STYLES,
+  GROUP_MIN_SIZE
 };

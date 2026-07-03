@@ -4563,6 +4563,8 @@
     "emptyDescription": "Events from your sensors and devices will appear here as they happen.",
     "loadMore": "Load more",
     "loadingMore": "Loading...",
+    "groupChanges": "{{count}} changes",
+    "groupLastChange": "Latest: {{value}}",
     "filters": {
       "period": "Period",
       "period24h": "24h",

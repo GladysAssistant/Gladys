@@ -4563,6 +4563,8 @@
     "emptyDescription": "Les événements de vos capteurs et appareils apparaîtront ici au fur et à mesure.",
     "loadMore": "Charger plus",
     "loadingMore": "Chargement...",
+    "groupChanges": "{{count}} changements",
+    "groupLastChange": "Dernier : {{value}}",
     "filters": {
       "period": "Période",
       "period24h": "24h",

@@ -306,7 +306,7 @@
 }
 
 .dayHeader {
-  padding: 0.75rem 1.25rem 0.5rem;
+  padding: 0.5rem 1rem 0.35rem;
   font-size: 0.6875rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -318,42 +318,65 @@
 
 /* ── Entry ──────────────────────────────────────────────── */
 
-.entry {
-  padding: 1rem 1.25rem;
+.entry,
+.entryGroup {
   border-bottom: 1px solid #f3f4f6;
 }
 
-.entry:last-child {
+.entry:last-child,
+.entryGroup:last-child {
   border-bottom: none;
 }
 
-.entryTime {
-  display: block;
+.entry {
+  padding: 0.5rem 1rem;
+}
+
+.entryNested {
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.entryNested:last-child {
+  border-bottom: none;
+}
+
+.entryNestedDot {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-top: 0.45rem;
+  background: currentColor;
+}
+
+.entryNestedTitle {
   font-size: 0.75rem;
   font-weight: 500;
-  color: #9ca3af;
-  margin-bottom: 0.625rem;
-  letter-spacing: 0.01em;
+  line-height: 1.35;
+  color: #374151;
+  margin: 0;
 }
 
 .entryRow {
   display: flex;
-  align-items: center;
-  gap: 0.875rem;
+  align-items: flex-start;
+  gap: 0.625rem;
 }
 
 .entryIcon {
   flex-shrink: 0;
-  width: 42px;
-  height: 42px;
-  border-radius: 11px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 1px;
 }
 
 .entryIcon .fe {
-  font-size: 1.125rem;
+  font-size: 0.9rem;
 }
 
 .entryContent {
@@ -361,28 +384,92 @@
   min-width: 0;
 }
 
+.entryMain {
+  min-width: 0;
+}
+
 .entryTitle {
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  line-height: 1.45;
+  line-height: 1.35;
   color: #111827;
-  margin: 0 0 0.15rem;
+  margin: 0;
 }
 
 .entryMeta {
-  font-size: 0.8125rem;
-  line-height: 1.4;
+  font-size: 0.75rem;
+  line-height: 1.35;
   color: #9ca3af;
-  margin: 0;
+  margin: 0.1rem 0 0;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
   flex-wrap: wrap;
+}
+
+.entryTime {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #9ca3af;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  line-height: 1.35;
+  padding-top: 1px;
 }
 
 .entryDot {
   opacity: 0.5;
-  font-size: 0.6rem;
+  font-size: 0.55rem;
+}
+
+.entryGroupHeader {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.entryGroupHeader:hover {
+  background: #fafafa;
+}
+
+.entryGroupAside {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.entryGroupChevron {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.entryGroupBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.entryGroupLatest {
+  color: #6b7280;
+}
+
+.entryGroupBody {
+  padding: 0 1rem 0.35rem 2.75rem;
+  border-top: 1px solid #f3f4f6;
+  background: #fafafa;
 }
 
 /* ── Empty state ────────────────────────────────────────── */
@@ -566,7 +653,8 @@
   color: #6b7280;
 }
 
-.dark-mode .entry {
+.dark-mode .entry,
+.dark-mode .entryGroup {
   border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
@@ -577,6 +665,32 @@
 .dark-mode .entryTime,
 .dark-mode .entryMeta {
   color: #6b7280;
+}
+
+.dark-mode .entryNestedTitle {
+  color: #d1d5db;
+}
+
+.dark-mode .entryGroupHeader:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.dark-mode .entryGroupBadge {
+  background: rgba(255, 255, 255, 0.08);
+  color: #9ca3af;
+}
+
+.dark-mode .entryGroupLatest {
+  color: #9ca3af;
+}
+
+.dark-mode .entryGroupBody {
+  background: rgba(255, 255, 255, 0.02);
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark-mode .entryNested {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
 }
 
 .dark-mode .emptyIcon {
@@ -611,30 +725,20 @@
 }
 
 .skeletonEntry {
-  padding: 1rem 1.25rem;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid #f3f4f6;
-}
-
-.skeletonTime {
-  height: 10px;
-  width: 100px;
-  margin-bottom: 0.75rem;
-  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
-  background-size: 800px 100%;
-  animation: shimmer 1.4s infinite linear;
-  border-radius: 6px;
 }
 
 .skeletonRow {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
+  gap: 0.625rem;
 }
 
 .skeletonIcon {
-  width: 42px;
-  height: 42px;
-  border-radius: 11px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   flex-shrink: 0;
   background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
   background-size: 800px 100%;
@@ -646,9 +750,8 @@
 }
 
 .skeletonTitle {
-  height: 14px;
-  width: 65%;
-  margin-bottom: 0.5rem;
+  height: 12px;
+  width: 55%;
   background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
   background-size: 800px 100%;
   animation: shimmer 1.4s infinite linear;
@@ -656,18 +759,11 @@
 }
 
 .skeletonMeta {
-  height: 10px;
-  width: 40%;
-  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
-  background-size: 800px 100%;
-  animation: shimmer 1.4s infinite linear;
-  border-radius: 6px;
+  display: none;
 }
 
-.dark-mode .skeletonTime,
 .dark-mode .skeletonIcon,
-.dark-mode .skeletonTitle,
-.dark-mode .skeletonMeta {
+.dark-mode .skeletonTitle {
   background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.09) 50%, rgba(255, 255, 255, 0.05) 75%);
   background-size: 800px 100%;
 }
@@ -732,11 +828,16 @@
     margin-left: 0;
   }
 
-  .entry {
-    padding: 0.9rem 1rem;
+  .entry,
+  .entryGroupHeader {
+    padding: 0.45rem 0.75rem;
+  }
+
+  .entryGroupBody {
+    padding-left: 2.25rem;
   }
 
   .dayHeader {
-    padding: 0.65rem 1rem 0.4rem;
+    padding: 0.45rem 0.75rem 0.3rem;
   }
 }

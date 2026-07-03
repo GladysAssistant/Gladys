@@ -1,10 +1,11 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import ActivityLogEntry from './ActivityLogEntry';
+import ActivityLogEntryGroup from './ActivityLogEntryGroup';
 import ActivityLogFilters from './ActivityLogFilters';
 import ActivityDateRangeBar from './ActivityDateRangeBar';
 import ActivityCategoryFilters from './ActivityCategoryFilters';
-import { groupEntriesByDay } from './utils';
+import { groupEntriesByDay, groupConsecutiveEntries } from './utils';
 import style from './style.css';
 
 const ActivityPage = ({
@@ -82,14 +83,12 @@ const ActivityPage = ({
               <div class="dimmer-content">
                 {loading && entries.length === 0 ? (
                   <div class={style.feed}>
-                    {[1, 2, 3, 4].map(i => (
+                    {[1, 2, 3, 4, 5, 6].map(i => (
                       <div class={style.skeletonEntry} key={i}>
-                        <div class={style.skeletonTime} />
                         <div class={style.skeletonRow}>
                           <div class={style.skeletonIcon} />
                           <div class={style.skeletonLines}>
                             <div class={style.skeletonTitle} />
-                            <div class={style.skeletonMeta} />
                           </div>
                         </div>
                       </div>
@@ -116,14 +115,23 @@ const ActivityPage = ({
                         {dayGroups.length > 1 || period === 'custom' ? (
                           <div class={style.dayHeader}>{group.label}</div>
                         ) : null}
-                        {group.entries.map((entry, index) => (
-                          <ActivityLogEntry
-                            key={`${entry.device_feature_selector}-${entry.created_at}-${index}`}
-                            entry={entry}
-                            dictionary={dictionary}
-                            language={language}
-                          />
-                        ))}
+                        {groupConsecutiveEntries(group.entries).map(item =>
+                          item.type === 'group' ? (
+                            <ActivityLogEntryGroup
+                              key={item.key}
+                              entries={item.entries}
+                              dictionary={dictionary}
+                              language={language}
+                            />
+                          ) : (
+                            <ActivityLogEntry
+                              key={item.key}
+                              entry={item.entry}
+                              dictionary={dictionary}
+                              language={language}
+                            />
+                          )
+                        )}
                       </section>
                     ))}
 
