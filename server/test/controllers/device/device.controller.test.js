@@ -89,6 +89,22 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
         });
       });
   });
+  it('should get device aggregated state with offset', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/aggregated_states')
+      .query({
+        interval: 24 * 60,
+        max_states: 100,
+        offset: 24 * 60,
+        device_features: 'test-device-feature',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.lengthOf(1);
+        expect(res.body[0].values).to.be.instanceOf(Array);
+      });
+  });
 });
 
 describe('GET /api/v1/device_feature/energy_consumption', () => {

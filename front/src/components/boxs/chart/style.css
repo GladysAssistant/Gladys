@@ -134,3 +134,26 @@
   padding-right: 1.5rem;
   text-align: justify;
 }
+
+.chartControls {
+  display: flex;
+  align-items: center;
+}
+
+.chartNavigation {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.chartNavigationButton {
+  padding: 0.15rem 0.35rem;
+  line-height: 1;
+}
+
+.periodLabel {
+  font-size: 0.75rem;
+  text-align: right;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}

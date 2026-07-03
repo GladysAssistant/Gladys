@@ -1,6 +1,8 @@
 import { Component, createRef } from 'preact';
 import { connect } from 'unistore/preact';
 import cx from 'classnames';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 
 import { Text } from 'preact-i18n';
 import style from './style.css';
@@ -11,6 +13,8 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
 import { getDeviceName } from '../../../utils/device';
 import { formatHttpError } from '../../../utils/formatErrors';
+
+dayjs.extend(localizedFormat);
 
 const ONE_HOUR_IN_MINUTES = 60;
 const TWELVE_HOURS_IN_MINUTES = 12 * 60;
@@ -94,6 +98,15 @@ const calculateVariation = (firstValue, lastValue) => {
 
 const allEqual = arr => arr.every(val => val === arr[0]);
 
+const getPeriodLabel = (interval, offset, language) => {
+  const endDate = dayjs().subtract(offset, 'minute');
+  const startDate = endDate.subtract(interval, 'minute');
+  if (interval <= ONE_DAY_IN_MINUTES) {
+    return `${startDate.locale(language).format('LLL')} - ${endDate.locale(language).format('LLL')}`;
+  }
+  return `${startDate.locale(language).format('LL')} - ${endDate.locale(language).format('LL')}`;
+};
+
 class Chartbox extends Component {
   dropdownRef = createRef();
 
@@ -112,6 +125,7 @@ class Chartbox extends Component {
     e.preventDefault();
     await this.setState({
       interval: ONE_HOUR_IN_MINUTES,
+      offset: 0,
       dropdown: false
     });
     this.getData();
@@ -120,6 +134,7 @@ class Chartbox extends Component {
     e.preventDefault();
     await this.setState({
       interval: TWELVE_HOURS_IN_MINUTES,
+      offset: 0,
       dropdown: false
     });
     this.getData();
@@ -128,6 +143,7 @@ class Chartbox extends Component {
     e.preventDefault();
     await this.setState({
       interval: ONE_DAY_IN_MINUTES,
+      offset: 0,
       dropdown: false
     });
     this.getData();
@@ -136,6 +152,7 @@ class Chartbox extends Component {
     e.preventDefault();
     await this.setState({
       interval: SEVEN_DAYS_IN_MINUTES,
+      offset: 0,
       dropdown: false
     });
     this.getData();
@@ -143,6 +160,7 @@ class Chartbox extends Component {
   switchTo30DaysView = async () => {
     await this.setState({
       interval: THIRTY_DAYS_IN_MINUTES,
+      offset: 0,
       dropdown: false
     });
     this.getData();
@@ -150,6 +168,7 @@ class Chartbox extends Component {
   switchTo3monthsView = async () => {
     await this.setState({
       interval: THREE_MONTHS_IN_MINUTES,
+      offset: 0,
       dropdown: false
     });
     this.getData();
@@ -157,8 +176,24 @@ class Chartbox extends Component {
   switchToYearlyView = async () => {
     await this.setState({
       interval: ONE_YEAR_IN_MINUTES,
+      offset: 0,
       dropdown: false
     });
+    this.getData();
+  };
+  navigateToPreviousPeriod = async () => {
+    await this.setState(prevState => ({
+      offset: prevState.offset + prevState.interval
+    }));
+    this.getData();
+  };
+  navigateToNextPeriod = async () => {
+    if (this.state.offset === 0) {
+      return;
+    }
+    await this.setState(prevState => ({
+      offset: Math.max(0, prevState.offset - prevState.interval)
+    }));
     this.getData();
   };
   handleWebsocketConnected = ({ connected }) => {
@@ -195,12 +230,17 @@ class Chartbox extends Component {
     try {
       const maxStates = 300;
 
-      const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
+      const queryParams = {
         interval: this.state.interval,
         max_states: this.props.box.group_by ? undefined : maxStates,
         group_by: this.props.box.group_by,
         device_features: deviceFeatures.join(',')
-      });
+      };
+      if (this.state.offset > 0) {
+        queryParams.offset = this.state.offset;
+      }
+
+      const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, queryParams);
 
       let emptySeries = true;
 
@@ -372,6 +412,7 @@ class Chartbox extends Component {
   };
   updateDeviceStateWebsocket = payload => {
     if (
+      this.state.offset === 0 &&
       this.state.interval === intervalByName['last-hour'] &&
       this.props.box.device_features &&
       this.props.box.device_features.includes(payload.device_feature_selector)
@@ -381,7 +422,8 @@ class Chartbox extends Component {
   };
   updateInterval = async () => {
     await this.setState({
-      interval: intervalByName[this.props.box.interval]
+      interval: intervalByName[this.props.box.interval],
+      offset: 0
     });
   };
   constructor(props) {
@@ -389,6 +431,7 @@ class Chartbox extends Component {
     this.props = props;
     this.state = {
       interval: this.props.box.interval ? intervalByName[this.props.box.interval] : ONE_HOUR_IN_MINUTES,
+      offset: 0,
       loading: true,
       initialized: false,
       height: 'small',
@@ -436,6 +479,7 @@ class Chartbox extends Component {
       variationDownIsPositive,
       lastValueRounded,
       interval,
+      offset,
       emptySeries,
       unit,
       nbFeaturesDisplayed,
@@ -454,92 +498,115 @@ class Chartbox extends Component {
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class={cx(style.subheader)}>{box.title}</div>
-            <div class={cx(style.msAuto, style.lh1)}>
+            <div class={cx(style.msAuto, style.lh1, style.chartControls)}>
               {props.box.chart_type && (
-                <div class="dropdown" ref={this.dropdownRef}>
-                  <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
-                    {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
-                    {interval === TWELVE_HOURS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastTwelveHours" />}
-                    {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
-                    {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
-                    {interval === THIRTY_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThirtyDays" />}
-                    {interval === THREE_MONTHS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThreeMonths" />}
-                    {interval === ONE_YEAR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastYear" />}
-                  </a>
-                  <div
-                    class={cx(style.dropdownMenuChart, {
-                      [style.show]: dropdown
-                    })}
+                <div class={style.chartNavigation}>
+                  <button
+                    type="button"
+                    class={cx('btn btn-sm btn-outline-secondary', style.chartNavigationButton)}
+                    onClick={this.navigateToPreviousPeriod}
+                    title={props.intl.dictionary.dashboard.boxes.chart.previousPeriod}
                   >
-                    <a
-                      class={cx(style.dropdownItemChart, {
-                        [style.active]: interval === ONE_HOUR_IN_MINUTES
-                      })}
-                      onClick={this.switchToLastHourView}
-                    >
-                      <Text id="dashboard.boxes.chart.lastHour" />
+                    <i class="fe fe-chevron-left" />
+                  </button>
+                  <div class="dropdown" ref={this.dropdownRef}>
+                    <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
+                      {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
+                      {interval === TWELVE_HOURS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastTwelveHours" />}
+                      {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
+                      {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
+                      {interval === THIRTY_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThirtyDays" />}
+                      {interval === THREE_MONTHS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThreeMonths" />}
+                      {interval === ONE_YEAR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastYear" />}
                     </a>
-                    <a
-                      class={cx(style.dropdownItemChart, {
-                        [style.active]: interval === TWELVE_HOURS_IN_MINUTES
+                    <div
+                      class={cx(style.dropdownMenuChart, {
+                        [style.show]: dropdown
                       })}
-                      onClick={this.switchToLastTwelveHourView}
                     >
-                      <Text id="dashboard.boxes.chart.lastTwelveHours" />
-                    </a>
-                    <a
-                      class={cx(style.dropdownItemChart, {
-                        [style.active]: interval === ONE_DAY_IN_MINUTES
-                      })}
-                      onClick={this.switchToOneDayView}
-                    >
-                      <Text id="dashboard.boxes.chart.lastDay" />
-                    </a>
-                    {props.box.chart_type !== 'timeline' && (
                       <a
-                        className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === SEVEN_DAYS_IN_MINUTES
+                        class={cx(style.dropdownItemChart, {
+                          [style.active]: interval === ONE_HOUR_IN_MINUTES
                         })}
-                        onClick={this.switchTo7DaysView}
+                        onClick={this.switchToLastHourView}
                       >
-                        <Text id="dashboard.boxes.chart.lastSevenDays" />
+                        <Text id="dashboard.boxes.chart.lastHour" />
                       </a>
-                    )}
-                    {props.box.chart_type !== 'timeline' && (
                       <a
-                        className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === THIRTY_DAYS_IN_MINUTES
+                        class={cx(style.dropdownItemChart, {
+                          [style.active]: interval === TWELVE_HOURS_IN_MINUTES
                         })}
-                        onClick={this.switchTo30DaysView}
+                        onClick={this.switchToLastTwelveHourView}
                       >
-                        <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                        <Text id="dashboard.boxes.chart.lastTwelveHours" />
                       </a>
-                    )}
-                    {props.box.chart_type !== 'timeline' && (
                       <a
-                        className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === THREE_MONTHS_IN_MINUTES
+                        class={cx(style.dropdownItemChart, {
+                          [style.active]: interval === ONE_DAY_IN_MINUTES
                         })}
-                        onClick={this.switchTo3monthsView}
+                        onClick={this.switchToOneDayView}
                       >
-                        <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                        <Text id="dashboard.boxes.chart.lastDay" />
                       </a>
-                    )}
-                    {props.box.chart_type !== 'timeline' && (
-                      <a
-                        className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === ONE_YEAR_IN_MINUTES
-                        })}
-                        onClick={this.switchToYearlyView}
-                      >
-                        <Text id="dashboard.boxes.chart.lastYear" />
-                      </a>
-                    )}
+                      {props.box.chart_type !== 'timeline' && (
+                        <a
+                          className={cx(style.dropdownItemChart, {
+                            [style.active]: interval === SEVEN_DAYS_IN_MINUTES
+                          })}
+                          onClick={this.switchTo7DaysView}
+                        >
+                          <Text id="dashboard.boxes.chart.lastSevenDays" />
+                        </a>
+                      )}
+                      {props.box.chart_type !== 'timeline' && (
+                        <a
+                          className={cx(style.dropdownItemChart, {
+                            [style.active]: interval === THIRTY_DAYS_IN_MINUTES
+                          })}
+                          onClick={this.switchTo30DaysView}
+                        >
+                          <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                        </a>
+                      )}
+                      {props.box.chart_type !== 'timeline' && (
+                        <a
+                          className={cx(style.dropdownItemChart, {
+                            [style.active]: interval === THREE_MONTHS_IN_MINUTES
+                          })}
+                          onClick={this.switchTo3monthsView}
+                        >
+                          <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                        </a>
+                      )}
+                      {props.box.chart_type !== 'timeline' && (
+                        <a
+                          className={cx(style.dropdownItemChart, {
+                            [style.active]: interval === ONE_YEAR_IN_MINUTES
+                          })}
+                          onClick={this.switchToYearlyView}
+                        >
+                          <Text id="dashboard.boxes.chart.lastYear" />
+                        </a>
+                      )}
+                    </div>
                   </div>
+                  <button
+                    type="button"
+                    class={cx('btn btn-sm btn-outline-secondary', style.chartNavigationButton)}
+                    onClick={this.navigateToNextPeriod}
+                    disabled={offset === 0}
+                    title={props.intl.dictionary.dashboard.boxes.chart.nextPeriod}
+                  >
+                    <i class="fe fe-chevron-right" />
+                  </button>
                 </div>
               )}
             </div>
           </div>
+
+          {props.box.chart_type && offset > 0 && (
+            <div class={cx(style.periodLabel, 'text-muted')}>{getPeriodLabel(interval, offset, props.user.language)}</div>
+          )}
 
           {props.box.chart_type && (
             <div>

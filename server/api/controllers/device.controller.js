@@ -103,6 +103,7 @@ module.exports = function DeviceController(gladys) {
       req.query.interval,
       req.query.max_states,
       req.query.group_by,
+      req.query.offset || 0,
     );
     res.json(states);
   }

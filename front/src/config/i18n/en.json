@@ -418,7 +418,9 @@
           "week": "Week",
           "month": "Month",
           "year": "Year"
-        }
+        },
+        "previousPeriod": "Previous period",
+        "nextPeriod": "Next period"
       },
       "ecowatt": {
         "title": "Ecowatt France",
