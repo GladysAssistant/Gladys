@@ -420,7 +420,9 @@
           "year": "Année"
         },
         "previousPeriod": "Période précédente",
-        "nextPeriod": "Période suivante"
+        "nextPeriod": "Période suivante",
+        "currentPeriod": "En cours",
+        "backToNow": "Revenir à maintenant"
       },
       "ecowatt": {
         "title": "Ecowatt France",

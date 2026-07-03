@@ -102,9 +102,19 @@ const getPeriodLabel = (interval, offset, language) => {
   const endDate = dayjs().subtract(offset, 'minute');
   const startDate = endDate.subtract(interval, 'minute');
   if (interval <= ONE_DAY_IN_MINUTES) {
-    return `${startDate.locale(language).format('LLL')} - ${endDate.locale(language).format('LLL')}`;
+    return `${startDate.locale(language).format('D MMM, HH:mm')} → ${endDate.locale(language).format('D MMM, HH:mm')}`;
   }
-  return `${startDate.locale(language).format('LL')} - ${endDate.locale(language).format('LL')}`;
+  return `${startDate.locale(language).format('D MMM YYYY')} → ${endDate.locale(language).format('D MMM YYYY')}`;
+};
+
+const INTERVAL_LABELS = {
+  [ONE_HOUR_IN_MINUTES]: 'dashboard.boxes.chart.lastHour',
+  [TWELVE_HOURS_IN_MINUTES]: 'dashboard.boxes.chart.lastTwelveHours',
+  [ONE_DAY_IN_MINUTES]: 'dashboard.boxes.chart.lastDay',
+  [SEVEN_DAYS_IN_MINUTES]: 'dashboard.boxes.chart.lastSevenDays',
+  [THIRTY_DAYS_IN_MINUTES]: 'dashboard.boxes.chart.lastThirtyDays',
+  [THREE_MONTHS_IN_MINUTES]: 'dashboard.boxes.chart.lastThreeMonths',
+  [ONE_YEAR_IN_MINUTES]: 'dashboard.boxes.chart.lastYear'
 };
 
 class Chartbox extends Component {
@@ -194,6 +204,13 @@ class Chartbox extends Component {
     await this.setState(prevState => ({
       offset: Math.max(0, prevState.offset - prevState.interval)
     }));
+    this.getData();
+  };
+  resetToCurrentPeriod = async () => {
+    if (this.state.offset === 0) {
+      return;
+    }
+    await this.setState({ offset: 0 });
     this.getData();
   };
   handleWebsocketConnected = ({ connected }) => {
@@ -496,119 +513,127 @@ class Chartbox extends Component {
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
-          <div class="d-flex align-items-center">
+          <div class={style.chartHeader}>
             <div class={cx(style.subheader)}>{box.title}</div>
-            <div class={cx(style.msAuto, style.lh1, style.chartControls)}>
-              {props.box.chart_type && (
-                <div class={style.chartNavigation}>
-                  <button
-                    type="button"
-                    class={cx('btn btn-sm btn-outline-secondary', style.chartNavigationButton)}
-                    onClick={this.navigateToPreviousPeriod}
-                    title={props.intl.dictionary.dashboard.boxes.chart.previousPeriod}
-                  >
-                    <i class="fe fe-chevron-left" />
-                  </button>
-                  <div class="dropdown" ref={this.dropdownRef}>
-                    <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
-                      {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
-                      {interval === TWELVE_HOURS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastTwelveHours" />}
-                      {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
-                      {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
-                      {interval === THIRTY_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThirtyDays" />}
-                      {interval === THREE_MONTHS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThreeMonths" />}
-                      {interval === ONE_YEAR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastYear" />}
-                    </a>
-                    <div
-                      class={cx(style.dropdownMenuChart, {
-                        [style.show]: dropdown
-                      })}
-                    >
-                      <a
-                        class={cx(style.dropdownItemChart, {
-                          [style.active]: interval === ONE_HOUR_IN_MINUTES
-                        })}
-                        onClick={this.switchToLastHourView}
-                      >
-                        <Text id="dashboard.boxes.chart.lastHour" />
-                      </a>
-                      <a
-                        class={cx(style.dropdownItemChart, {
-                          [style.active]: interval === TWELVE_HOURS_IN_MINUTES
-                        })}
-                        onClick={this.switchToLastTwelveHourView}
-                      >
-                        <Text id="dashboard.boxes.chart.lastTwelveHours" />
-                      </a>
-                      <a
-                        class={cx(style.dropdownItemChart, {
-                          [style.active]: interval === ONE_DAY_IN_MINUTES
-                        })}
-                        onClick={this.switchToOneDayView}
-                      >
-                        <Text id="dashboard.boxes.chart.lastDay" />
-                      </a>
-                      {props.box.chart_type !== 'timeline' && (
-                        <a
-                          className={cx(style.dropdownItemChart, {
-                            [style.active]: interval === SEVEN_DAYS_IN_MINUTES
-                          })}
-                          onClick={this.switchTo7DaysView}
-                        >
-                          <Text id="dashboard.boxes.chart.lastSevenDays" />
-                        </a>
-                      )}
-                      {props.box.chart_type !== 'timeline' && (
-                        <a
-                          className={cx(style.dropdownItemChart, {
-                            [style.active]: interval === THIRTY_DAYS_IN_MINUTES
-                          })}
-                          onClick={this.switchTo30DaysView}
-                        >
-                          <Text id="dashboard.boxes.chart.lastThirtyDays" />
-                        </a>
-                      )}
-                      {props.box.chart_type !== 'timeline' && (
-                        <a
-                          className={cx(style.dropdownItemChart, {
-                            [style.active]: interval === THREE_MONTHS_IN_MINUTES
-                          })}
-                          onClick={this.switchTo3monthsView}
-                        >
-                          <Text id="dashboard.boxes.chart.lastThreeMonths" />
-                        </a>
-                      )}
-                      {props.box.chart_type !== 'timeline' && (
-                        <a
-                          className={cx(style.dropdownItemChart, {
-                            [style.active]: interval === ONE_YEAR_IN_MINUTES
-                          })}
-                          onClick={this.switchToYearlyView}
-                        >
-                          <Text id="dashboard.boxes.chart.lastYear" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    class={cx('btn btn-sm btn-outline-secondary', style.chartNavigationButton)}
-                    onClick={this.navigateToNextPeriod}
-                    disabled={offset === 0}
-                    title={props.intl.dictionary.dashboard.boxes.chart.nextPeriod}
-                  >
-                    <i class="fe fe-chevron-right" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+            {props.box.chart_type && (
+              <div class={style.chartToolbar}>
+                <button
+                  type="button"
+                  class={style.navButton}
+                  onClick={this.navigateToPreviousPeriod}
+                  title={props.intl.dictionary.dashboard.boxes.chart.previousPeriod}
+                  aria-label={props.intl.dictionary.dashboard.boxes.chart.previousPeriod}
+                >
+                  <i class="fe fe-chevron-left" />
+                </button>
 
-          {props.box.chart_type && offset > 0 && (
-            <div class={cx(style.periodLabel, 'text-muted')}>
-              {getPeriodLabel(interval, offset, props.user.language)}
-            </div>
-          )}
+                <div class={style.toolbarBody} ref={this.dropdownRef}>
+                  <button type="button" class={style.intervalButton} onClick={this.toggleDropdown}>
+                    <Text id={INTERVAL_LABELS[interval]} />
+                    <i
+                      class={cx('fe fe-chevron-down', style.intervalChevron, { [style.intervalChevronOpen]: dropdown })}
+                    />
+                  </button>
+
+                  {offset > 0 ? (
+                    <button type="button" class={style.periodRangeButton} onClick={this.resetToCurrentPeriod}>
+                      <span class={style.periodRange}>{getPeriodLabel(interval, offset, props.user.language)}</span>
+                      <span class={style.backToNow}>
+                        <Text id="dashboard.boxes.chart.backToNow" />
+                      </span>
+                    </button>
+                  ) : (
+                    <div class={style.periodLive}>
+                      <span class={style.liveDot} />
+                      <Text id="dashboard.boxes.chart.currentPeriod" />
+                    </div>
+                  )}
+
+                  <div
+                    class={cx(style.dropdownMenuChart, {
+                      [style.dropdownMenuOpen]: dropdown
+                    })}
+                  >
+                    <a
+                      class={cx(style.dropdownItemChart, {
+                        [style.active]: interval === ONE_HOUR_IN_MINUTES
+                      })}
+                      onClick={this.switchToLastHourView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastHour" />
+                    </a>
+                    <a
+                      class={cx(style.dropdownItemChart, {
+                        [style.active]: interval === TWELVE_HOURS_IN_MINUTES
+                      })}
+                      onClick={this.switchToLastTwelveHourView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastTwelveHours" />
+                    </a>
+                    <a
+                      class={cx(style.dropdownItemChart, {
+                        [style.active]: interval === ONE_DAY_IN_MINUTES
+                      })}
+                      onClick={this.switchToOneDayView}
+                    >
+                      <Text id="dashboard.boxes.chart.lastDay" />
+                    </a>
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === SEVEN_DAYS_IN_MINUTES
+                        })}
+                        onClick={this.switchTo7DaysView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastSevenDays" />
+                      </a>
+                    )}
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === THIRTY_DAYS_IN_MINUTES
+                        })}
+                        onClick={this.switchTo30DaysView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                      </a>
+                    )}
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === THREE_MONTHS_IN_MINUTES
+                        })}
+                        onClick={this.switchTo3monthsView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                      </a>
+                    )}
+                    {props.box.chart_type !== 'timeline' && (
+                      <a
+                        className={cx(style.dropdownItemChart, {
+                          [style.active]: interval === ONE_YEAR_IN_MINUTES
+                        })}
+                        onClick={this.switchToYearlyView}
+                      >
+                        <Text id="dashboard.boxes.chart.lastYear" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class={style.navButton}
+                  onClick={this.navigateToNextPeriod}
+                  disabled={offset === 0}
+                  title={props.intl.dictionary.dashboard.boxes.chart.nextPeriod}
+                  aria-label={props.intl.dictionary.dashboard.boxes.chart.nextPeriod}
+                >
+                  <i class="fe fe-chevron-right" />
+                </button>
+              </div>
+            )}
+          </div>
 
           {props.box.chart_type && (
             <div>

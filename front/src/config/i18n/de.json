@@ -420,7 +420,9 @@
           "year": "Jahr"
         },
         "previousPeriod": "Vorheriger Zeitraum",
-        "nextPeriod": "Nächster Zeitraum"
+        "nextPeriod": "Nächster Zeitraum",
+        "currentPeriod": "Live",
+        "backToNow": "Zurück zu jetzt"
       },
       "ecowatt": {
         "title": "Ecowatt France",
