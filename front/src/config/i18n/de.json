@@ -1318,7 +1318,7 @@
         "localPollRequired": "Lokaler Modus ist aktiv und lokale Einstellungen wurden geändert. Bitte \"Lokales DPS abfragen\" erfolgreich ausführen, bevor du speicherst. Wenn der lokale Modus nicht funktioniert, schalte zurück in den Cloud-Modus.",
         "localPollSuccess": "Lokale Abfrage OK.",
         "localPollError": "Lokale Abfrage fehlgeschlagen:",
-        "localStatusDegraded": "Lokaler Modus instabil: Cloud-Fallback aktiv bis {{time}}. Klicke auf \"Lokale DPs lesen\", um es erneut zu versuchen.",
+        "localStatusDegraded": "Lokaler Modus instabil: Cloud-Fallback aktiv bis {{time}}. Klicke auf \"Lokales DPS abfragen\", um es erneut zu versuchen.",
         "productIdLabel": "Produkt-ID",
         "productKeyLabel": "Produktschlüssel",
         "createGithubIssue": "Dieses Gerät vorschlagen",

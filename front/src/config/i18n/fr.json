@@ -1451,7 +1451,7 @@
         "localPollRequired": "Le mode local est activé et les paramètres locaux ont changé. Lancez une lecture locale des DP avec succès avant de sauvegarder. Si vous n'arrivez pas à faire fonctionner le local, repassez en mode cloud.",
         "localPollSuccess": "Lecture locale OK.",
         "localPollError": "Échec de la lecture locale :",
-        "localStatusDegraded": "Mode local instable : fallback cloud actif jusqu'à {{time}}. Cliquez sur \"Lecture locale des DP\" pour relancer un test.",
+        "localStatusDegraded": "Mode local instable : repli cloud actif jusqu'à {{time}}. Cliquez sur \"Lecture locale des DP\" pour relancer un test.",
         "productIdLabel": "Identifiant produit",
         "productKeyLabel": "Clé produit",
         "createGithubIssue": "Proposer ce périphérique",
