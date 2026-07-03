@@ -531,6 +531,7 @@ const ACTIONS = {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
     CHECK_TIME: 'condition.check-time',
     IF_THEN_ELSE: 'condition.if-then-else',
+    WHILE: 'condition.while',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
@@ -575,6 +576,9 @@ const CONDITION_ACTIONS = [
   ACTIONS.HOUSE.IS_EMPTY,
   ACTIONS.HOUSE.IS_NOT_EMPTY,
 ];
+
+const SCENE_WHILE_MAX_ITERATIONS = 1000;
+const SCENE_WHILE_ITERATION_DELAY_MS = 50;
 
 const INTENTS = {
   LIGHT: {
@@ -1725,6 +1729,8 @@ module.exports.STATES = STATES;
 module.exports.CONDITIONS = CONDITIONS;
 module.exports.ACTIONS = ACTIONS;
 module.exports.CONDITION_ACTIONS = CONDITION_ACTIONS;
+module.exports.SCENE_WHILE_MAX_ITERATIONS = SCENE_WHILE_MAX_ITERATIONS;
+module.exports.SCENE_WHILE_ITERATION_DELAY_MS = SCENE_WHILE_ITERATION_DELAY_MS;
 module.exports.INTENTS = INTENTS;
 module.exports.DEVICE_FEATURE_CATEGORIES = DEVICE_FEATURE_CATEGORIES;
 module.exports.DEVICE_FEATURE_TYPES = DEVICE_FEATURE_TYPES;

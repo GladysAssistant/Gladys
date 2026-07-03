@@ -17,7 +17,7 @@ const isVariableAvailableAtThisPath = (variableSourcePath, targetPath) => {
 
   while (sourceIndex < sourceSegments.length && targetIndex < targetSegments.length) {
     // If we encounter special segments, we need to compare within the same branch
-    if (sourceSegments[sourceIndex] === 'then' || sourceSegments[sourceIndex] === 'else') {
+    if (sourceSegments[sourceIndex] === 'then' || sourceSegments[sourceIndex] === 'else' || sourceSegments[sourceIndex] === 'do') {
       // If target doesn't match the same branch, paths are not comparable
       if (sourceSegments[sourceIndex] !== targetSegments[targetIndex]) {
         return false;
@@ -51,11 +51,17 @@ const convertPathToText = (path, dictionary) => {
       if (segment === 'if') {
         return get(dictionary, 'editScene.actionsCard.conditionIfThenElse.shortIf');
       }
+      if (segment === 'while') {
+        return get(dictionary, 'editScene.actionsCard.conditionWhile.shortWhile');
+      }
       if (segment === 'then') {
         return get(dictionary, 'editScene.actionsCard.conditionIfThenElse.shortThen');
       }
       if (segment === 'else') {
         return get(dictionary, 'editScene.actionsCard.conditionIfThenElse.shortElse');
+      }
+      if (segment === 'do') {
+        return get(dictionary, 'editScene.actionsCard.conditionWhile.shortDo');
       }
       return `${Number(segment) + 1}`;
     })
