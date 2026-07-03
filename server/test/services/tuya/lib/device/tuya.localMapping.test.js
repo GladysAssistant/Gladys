@@ -51,6 +51,7 @@ describe('Tuya local mapping', () => {
             codeAliases: { foo: ['bar'] },
             dps: { bar: 7 },
           }),
+          getProductIdFromDevice: () => null,
           normalizeCode: (code) => (code ? String(code).toLowerCase() : null),
         },
         './tuya.convertFeature': { convertFeature: () => null },
@@ -84,6 +85,7 @@ describe('Tuya local mapping', () => {
         '../mappings': {
           getDeviceType: () => 'unknown',
           getLocalMapping: () => ({ strict: false, codeAliases: {}, dps: {} }),
+          getProductIdFromDevice: () => null,
           normalizeCode: (code) => (code ? String(code).toLowerCase() : null),
         },
         './tuya.convertFeature': { convertFeature: () => null },

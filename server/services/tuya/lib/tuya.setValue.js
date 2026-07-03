@@ -11,7 +11,7 @@ const { CLOUD_STRATEGY, getConfiguredCloudStrategy } = require('./utils/tuya.clo
 const { normalizeBoolean, normalizeTemperatureUnit } = require('./utils/tuya.normalize');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { getLocalDpsFromCode } = require('./device/tuya.localMapping');
-const { getDeviceType, getFeatureMapping } = require('./mappings');
+const { getDeviceType, getFeatureMapping, getProductIdFromDevice } = require('./mappings');
 const { isLocalSkipNeeded, recordLocalFailure, recordLocalSuccess } = require('./utils/tuya.degraded');
 
 const FEEDBACK_POLL_DELAY_MS = 1000;
@@ -31,12 +31,17 @@ const getTemperatureUnitFromProperties = (device) => {
   return normalizeTemperatureUnit(unitProperty && unitProperty.value);
 };
 
+// Resolve the (possibly product-variant) cloud-mapping entry of a feature code for this device.
+const resolveFeatureMappingEntry = (device, code) => {
+  const deviceType = device && device.device_type ? device.device_type : getDeviceType(device);
+  return getFeatureMapping(code, deviceType, getProductIdFromDevice(device));
+};
+
 const getFeatureWithFallbackScale = (device, deviceFeature, command) => {
   if (!deviceFeature || deviceFeature.scale !== undefined) {
     return deviceFeature;
   }
-  const deviceType = device && device.device_type ? device.device_type : getDeviceType(device);
-  const mapping = getFeatureMapping(command, deviceType);
+  const mapping = resolveFeatureMappingEntry(device, command);
   if (!mapping || mapping.scale === undefined) {
     return deviceFeature;
   }
@@ -119,7 +124,14 @@ async function setValue(device, deviceFeature, value) {
   const convertedValue = convertTemperatureForDevice(value, effectiveFeature, deviceTemperatureUnit);
   const writeCategory = writeValues[deviceFeature.category];
   const writeFn = writeCategory ? writeCategory[deviceFeature.type] : null;
-  const transformedValue = writeFn ? writeFn(convertedValue, effectiveFeature) : convertedValue;
+  // The mapping entry gives the writer per-variant metadata (e.g. the tuyaEnum mode vocabulary).
+  const mappingEntry = resolveFeatureMappingEntry(effectiveDevice, command);
+  const transformedValue = writeFn ? writeFn(convertedValue, effectiveFeature, mappingEntry) : convertedValue;
+  if (writeFn && transformedValue === undefined) {
+    // e.g. a pilot-wire mode the device vocabulary does not support (OFF on a device whose on/off
+    // is a separate switch DPS): reject instead of sending garbage to the device.
+    throw new BadParameters(`Tuya: value "${value}" is not supported for command "${command}" on device "${topic}"`);
+  }
   logger.debug(`Change value for devices ${topic}/${command} to value ${transformedValue}...`);
 
   const params = effectiveDevice.params || [];

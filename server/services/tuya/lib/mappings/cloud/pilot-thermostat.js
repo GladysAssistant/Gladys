@@ -31,18 +31,25 @@ module.exports = {
     'night_led_config',
     'ecowatt_url',
   ],
+  // These four features collide on `type` with a sibling feature (mode/running_mode share
+  // heater/pilot-wire-mode; child_lock/window_state share the binary type), so the frontend cannot
+  // resolve their category/type i18n label and falls back to feature.name. A curated (English) name is
+  // therefore provided here so they read better than the raw Tuya code.
   mode: {
     category: DEVICE_FEATURE_CATEGORIES.HEATER,
     type: DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE,
+    name: 'Mode',
     has_feedback: true,
   },
   running_mode: {
     category: DEVICE_FEATURE_CATEGORIES.HEATER,
     type: DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE,
+    name: 'Current mode',
   },
   child_lock: {
     category: DEVICE_FEATURE_CATEGORIES.CHILD_LOCK,
     type: DEVICE_FEATURE_TYPES.CHILD_LOCK.BINARY,
+    name: 'Child lock',
     has_feedback: true,
   },
   electricity_statistics: {
@@ -66,6 +73,7 @@ module.exports = {
   window_state: {
     category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
     type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    name: 'Window state',
   },
   temp_set: {
     category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
