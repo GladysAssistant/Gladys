@@ -21,6 +21,13 @@
 
 .toolbar {
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.toolbarMain {
+  display: flex;
   align-items: center;
   gap: 0.625rem;
   flex-wrap: wrap;
@@ -58,6 +65,66 @@
   background: #ffffff;
   color: #111827;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.segmentBtnIcon {
+  padding: 0.4rem 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.segmentBtnIcon .fe {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.dateRange {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.dateField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+.dateLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9ca3af;
+}
+
+.dateInput {
+  appearance: none;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 10px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.dateInput:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35);
+}
+
+.dateSeparator {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  padding-bottom: 0.45rem;
+  flex-shrink: 0;
 }
 
 .roomSelect {
@@ -299,6 +366,20 @@
   box-shadow: none;
 }
 
+.dark-mode .dateLabel {
+  color: #6b7280;
+}
+
+.dark-mode .dateInput {
+  background-color: rgba(255, 255, 255, 0.07);
+  color: #d1d5db;
+  color-scheme: dark;
+}
+
+.dark-mode .dateSeparator {
+  color: #6b7280;
+}
+
 .dark-mode .roomSelect {
   background-color: rgba(255, 255, 255, 0.07);
   color: #d1d5db;
@@ -441,8 +522,27 @@
   }
 
   .toolbar {
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .toolbarMain {
     justify-content: flex-start;
     gap: 0.5rem;
+  }
+
+  .dateRange {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .dateField {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .dateInput {
+    width: 100%;
   }
 
   .roomSelect {

@@ -2,7 +2,12 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import ActivityPage from './ActivityPage';
-import { convertGladysDateToISO8601 } from './utils';
+import {
+  convertGladysDateToISO8601,
+  formatDateInputValue,
+  getCustomDateRangeISO,
+  isCustomRangeIncludingToday
+} from './utils';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 
 const ENTRIES_PER_PAGE = 30;
@@ -16,6 +21,8 @@ const PERIOD_TO_MS = {
 class ActivityLog extends Component {
   constructor(props) {
     super(props);
+    const today = formatDateInputValue(new Date());
+
     this.state = {
       entries: [],
       rooms: [],
@@ -23,6 +30,8 @@ class ActivityLog extends Component {
       loadingMore: false,
       isLastPage: false,
       period: '24h',
+      customFrom: today,
+      customTo: today,
       roomSelector: '',
       mode: 'all',
       featureMap: {}
@@ -30,10 +39,25 @@ class ActivityLog extends Component {
   }
 
   getDateRange = () => {
-    const { period } = this.state;
+    const { period, customFrom, customTo } = this.state;
+
+    if (period === 'custom') {
+      return getCustomDateRangeISO(customFrom, customTo);
+    }
+
     const to = new Date();
     const from = new Date(to.getTime() - (PERIOD_TO_MS[period] || PERIOD_TO_MS['24h']));
     return { from: from.toISOString(), to: to.toISOString() };
+  };
+
+  shouldAcceptLiveUpdates = () => {
+    const { period, customTo } = this.state;
+
+    if (period === 'custom') {
+      return isCustomRangeIncludingToday(customTo);
+    }
+
+    return true;
   };
 
   buildQueryParams = (skip = 0) => {
@@ -117,6 +141,10 @@ class ActivityLog extends Component {
   };
 
   handleNewState = payload => {
+    if (!this.shouldAcceptLiveUpdates()) {
+      return;
+    }
+
     const { featureMap } = this.state;
     const feature = featureMap[payload.device_feature_selector];
     if (!feature) {
@@ -145,6 +173,22 @@ class ActivityLog extends Component {
 
   handlePeriodChange = period => {
     this.setState({ period }, () => this.loadEntries());
+  };
+
+  handleCustomFromChange = e => {
+    const customFrom = e.target.value;
+    const { customTo } = this.state;
+    const nextCustomTo = customTo && customTo < customFrom ? customFrom : customTo;
+
+    this.setState({ period: 'custom', customFrom, customTo: nextCustomTo }, () => this.loadEntries());
+  };
+
+  handleCustomToChange = e => {
+    const customTo = e.target.value;
+    const { customFrom } = this.state;
+    const nextCustomFrom = customFrom && customFrom > customTo ? customTo : customFrom;
+
+    this.setState({ period: 'custom', customFrom: nextCustomFrom, customTo }, () => this.loadEntries());
   };
 
   handleRoomChange = e => {
@@ -181,12 +225,16 @@ class ActivityLog extends Component {
         loadingMore={state.loadingMore}
         isLastPage={state.isLastPage}
         period={state.period}
+        customFrom={state.customFrom}
+        customTo={state.customTo}
         roomSelector={state.roomSelector}
         rooms={state.rooms}
         mode={state.mode}
         dictionary={props.intl.dictionary}
         language={props.user.language}
         onPeriodChange={this.handlePeriodChange}
+        onCustomFromChange={this.handleCustomFromChange}
+        onCustomToChange={this.handleCustomToChange}
         onRoomChange={this.handleRoomChange}
         onModeChange={this.handleModeChange}
         onRefresh={this.handleRefresh}

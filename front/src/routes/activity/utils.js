@@ -248,6 +248,36 @@ const groupEntriesByDay = (entries, language, dictionary) => {
   return groups;
 };
 
+const formatDateInputValue = date => dayjs(date).format('YYYY-MM-DD');
+
+const getCustomDateRangeISO = (customFrom, customTo) => {
+  const fromDate = customFrom || formatDateInputValue(new Date());
+  let toDate = customTo || fromDate;
+
+  if (toDate < fromDate) {
+    toDate = fromDate;
+  }
+
+  const from = dayjs(fromDate)
+    .startOf('day')
+    .toDate()
+    .toISOString();
+  const to = dayjs(toDate)
+    .endOf('day')
+    .toDate()
+    .toISOString();
+
+  return { from, to, fromDate, toDate };
+};
+
+const isCustomRangeIncludingToday = customTo => {
+  if (!customTo) {
+    return false;
+  }
+
+  return customTo >= formatDateInputValue(new Date());
+};
+
 const groupEntriesByDate = (entries, language) => {
   const groups = [];
   let currentGroup = null;
@@ -279,6 +309,9 @@ export {
   convertGladysDateToISO8601,
   formatEntryTime,
   formatDayHeader,
+  formatDateInputValue,
+  getCustomDateRangeISO,
+  isCustomRangeIncludingToday,
   groupEntriesByDay,
   groupEntriesByDate,
   CATEGORY_STYLES

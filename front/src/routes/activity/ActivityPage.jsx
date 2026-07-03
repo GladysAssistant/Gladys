@@ -11,12 +11,16 @@ const ActivityPage = ({
   loadingMore,
   isLastPage,
   period,
+  customFrom,
+  customTo,
   roomSelector,
   rooms,
   mode,
   dictionary,
   language,
   onPeriodChange,
+  onCustomFromChange,
+  onCustomToChange,
   onRoomChange,
   onModeChange,
   onRefresh,
@@ -41,10 +45,14 @@ const ActivityPage = ({
               <div class={cx('page-options', 'd-flex', style.pageOptions)}>
                 <ActivityLogFilters
                   period={period}
+                  customFrom={customFrom}
+                  customTo={customTo}
                   roomSelector={roomSelector}
                   rooms={rooms}
                   mode={mode}
                   onPeriodChange={onPeriodChange}
+                  onCustomFromChange={onCustomFromChange}
+                  onCustomToChange={onCustomToChange}
                   onRoomChange={onRoomChange}
                   onModeChange={onModeChange}
                   onRefresh={onRefresh}
@@ -88,7 +96,9 @@ const ActivityPage = ({
 
                     {dayGroups.map(group => (
                       <section key={group.key} class={style.daySection}>
-                        {dayGroups.length > 1 && <div class={style.dayHeader}>{group.label}</div>}
+                        {dayGroups.length > 1 || period === 'custom' ? (
+                          <div class={style.dayHeader}>{group.label}</div>
+                        ) : null}
                         {group.entries.map((entry, index) => (
                           <ActivityLogEntry
                             key={`${entry.device_feature_selector}-${entry.created_at}-${index}`}
