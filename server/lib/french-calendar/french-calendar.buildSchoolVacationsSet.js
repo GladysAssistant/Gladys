@@ -46,8 +46,12 @@ async function buildSchoolVacationsSet(startDate, endDate, zone) {
     const results = response.data.results || [];
 
     results.forEach((period) => {
-      let current = dayjs(period.start_date).tz('Europe/Paris').startOf('day');
-      const end = dayjs(period.end_date).tz('Europe/Paris').startOf('day');
+      let current = dayjs(period.start_date)
+        .tz('Europe/Paris')
+        .startOf('day');
+      const end = dayjs(period.end_date)
+        .tz('Europe/Paris')
+        .startOf('day');
 
       while (current.isBefore(end) || current.isSame(end, 'day')) {
         vacationsSet.add(current.format('YYYY-MM-DD'));

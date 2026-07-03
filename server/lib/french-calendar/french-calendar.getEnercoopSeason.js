@@ -11,7 +11,10 @@ dayjs.extend(timezone);
  * @returns {'summer'|'winter'} The Enercoop season.
  */
 function getEnercoopSeason(date, systemTimezone) {
-  const month = dayjs(date).tz(systemTimezone).month() + 1;
+  const month =
+    dayjs(date)
+      .tz(systemTimezone)
+      .month() + 1;
   return month >= 4 && month <= 10 ? 'summer' : 'winter';
 }
 

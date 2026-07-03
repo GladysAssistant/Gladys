@@ -14,8 +14,12 @@ dayjs.extend(timezone);
  * @returns {Promise<Set<string>>} Set of public holiday dates.
  */
 async function buildPublicHolidaysMap(startDate) {
-  const today = dayjs().tz('Europe/Paris').format('YYYY-MM-DD');
-  const fromDate = dayjs(startDate).tz('Europe/Paris').format('YYYY-MM-DD');
+  const today = dayjs()
+    .tz('Europe/Paris')
+    .format('YYYY-MM-DD');
+  const fromDate = dayjs(startDate)
+    .tz('Europe/Paris')
+    .format('YYYY-MM-DD');
 
   logger.info(`Building French public holidays set from ${fromDate} to ${today}`);
   const publicHolidaysSet = await buildPublicHolidaysSet(fromDate, today);

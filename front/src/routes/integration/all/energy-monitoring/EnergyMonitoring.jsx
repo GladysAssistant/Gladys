@@ -1290,80 +1290,82 @@ class EnergyMonitoringPage extends Component {
                   </div>
                 </div>
                 {!this.isEnercoopContract(state.newPrice.contract) && (
-                <div class="row">
-                  <div class="col-12">
-                    <div class="form-group">
-                      <label>
-                        <Text id="integration.energyMonitoring.hourSlots" />
-                      </label>
-                      <div class="mb-2 d-flex justify-content-between align-items-center">
-                        <div class="small text-muted">
-                          <Text id="integration.energyMonitoring.selectHoursHelp" />
-                        </div>
-                        <div>
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-outline-secondary mr-2"
-                            onClick={() =>
-                              this.setState({ wizardHourSlots: new Set(Array.from({ length: 24 }, (_, i) => i + 16)) })
-                            }
-                          >
-                            <Text id="integration.energyMonitoring.daytime820" />
-                          </button>
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-outline-secondary"
-                            onClick={() => this.setState({ wizardHourSlots: new Set() })}
-                          >
-                            <Text id="integration.energyMonitoring.clear" />
-                          </button>
-                        </div>
-                      </div>
-                      <div class="row">
-                        {Array.from({ length: 48 }, (_, slot) => (
-                          <div class="col-3 col-sm-2 mb-2" key={slot}>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="form-group">
+                        <label>
+                          <Text id="integration.energyMonitoring.hourSlots" />
+                        </label>
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                          <div class="small text-muted">
+                            <Text id="integration.energyMonitoring.selectHoursHelp" />
+                          </div>
+                          <div>
                             <button
                               type="button"
-                              class={cx(
-                                'btn btn-sm btn-block text-center py-2 text-nowrap',
-                                state.wizardHourSlots.has(slot) ? 'btn-primary' : 'btn-outline-secondary'
-                              )}
+                              class="btn btn-sm btn-outline-secondary mr-2"
                               onClick={() =>
-                                this.setState(({ wizardHourSlots }) => {
-                                  const next = new Set(wizardHourSlots);
-                                  if (next.has(slot)) next.delete(slot);
-                                  else next.add(slot);
-                                  return { wizardHourSlots: next };
+                                this.setState({
+                                  wizardHourSlots: new Set(Array.from({ length: 24 }, (_, i) => i + 16))
                                 })
                               }
                             >
-                              {(() => {
-                                const hour = Math.floor(slot / 2);
-                                const m = slot % 2 === 1 ? '30' : '00';
-                                const hh = hour < 10 ? `0${hour}` : `${hour}`;
-                                return <span class="text-monospace font-weight-bold">{`${hh}:${m}`}</span>;
-                              })()}
+                              <Text id="integration.energyMonitoring.daytime820" />
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-secondary"
+                              onClick={() => this.setState({ wizardHourSlots: new Set() })}
+                            >
+                              <Text id="integration.energyMonitoring.clear" />
                             </button>
                           </div>
-                        ))}
-                      </div>
-                      <div class="small text-muted mt-2">
-                        <Text id="integration.energyMonitoring.selected" />{' '}
-                        {(() => {
-                          const arr = Array.from(state.wizardHourSlots).sort((a, b) => a - b);
-                          if (!arr.length) return <Text id="integration.energyMonitoring.none" />;
-                          const toLabel = slot => {
-                            const hour = Math.floor(slot / 2);
-                            const m = slot % 2 === 1 ? '30' : '00';
-                            const hh = hour < 10 ? `0${hour}` : `${hour}`;
-                            return `${hh}:${m}`;
-                          };
-                          return arr.map(toLabel).join(', ');
-                        })()}
+                        </div>
+                        <div class="row">
+                          {Array.from({ length: 48 }, (_, slot) => (
+                            <div class="col-3 col-sm-2 mb-2" key={slot}>
+                              <button
+                                type="button"
+                                class={cx(
+                                  'btn btn-sm btn-block text-center py-2 text-nowrap',
+                                  state.wizardHourSlots.has(slot) ? 'btn-primary' : 'btn-outline-secondary'
+                                )}
+                                onClick={() =>
+                                  this.setState(({ wizardHourSlots }) => {
+                                    const next = new Set(wizardHourSlots);
+                                    if (next.has(slot)) next.delete(slot);
+                                    else next.add(slot);
+                                    return { wizardHourSlots: next };
+                                  })
+                                }
+                              >
+                                {(() => {
+                                  const hour = Math.floor(slot / 2);
+                                  const m = slot % 2 === 1 ? '30' : '00';
+                                  const hh = hour < 10 ? `0${hour}` : `${hour}`;
+                                  return <span class="text-monospace font-weight-bold">{`${hh}:${m}`}</span>;
+                                })()}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div class="small text-muted mt-2">
+                          <Text id="integration.energyMonitoring.selected" />{' '}
+                          {(() => {
+                            const arr = Array.from(state.wizardHourSlots).sort((a, b) => a - b);
+                            if (!arr.length) return <Text id="integration.energyMonitoring.none" />;
+                            const toLabel = slot => {
+                              const hour = Math.floor(slot / 2);
+                              const m = slot % 2 === 1 ? '30' : '00';
+                              const hh = hour < 10 ? `0${hour}` : `${hour}`;
+                              return `${hh}:${m}`;
+                            };
+                            return arr.map(toLabel).join(', ');
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
                 )}
                 <div class="row">
                   <div class="col-12 col-md-6">

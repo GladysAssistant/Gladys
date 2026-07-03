@@ -136,9 +136,7 @@ async function calculateCostFrom(startAt, jobId) {
           edfTempoHistoricalMap = await buildEdfTempoDayMap(this.gladys, startDateAsDayString);
         }
         if (needsPublicHolidays(energyPrices) && !publicHolidaysSet) {
-          logger.info(
-            `Device ${electricMeterFeature.device_id} has Enercoop prices, loading French public holidays`,
-          );
+          logger.info(`Device ${electricMeterFeature.device_id} has Enercoop prices, loading French public holidays`);
           const startDateAsDayString = dayjs.tz(startAt, systemTimezone).format('YYYY-MM-DD');
           publicHolidaysSet = await buildPublicHolidaysMap(startDateAsDayString);
         }

@@ -119,11 +119,15 @@ module.exports = {
     const isOffPeak = isEnercoopNuitWeekendOffPeak(context);
     const price = findEnercoopRatePrice(energyPricesAtConsumptionDate, isOffPeak);
     if (!price) {
-      throw new NotFoundError(`No ${isOffPeak ? 'off-peak' : 'peak'} price found for Enercoop Nuit & Week-end contract`);
+      throw new NotFoundError(
+        `No ${isOffPeak ? 'off-peak' : 'peak'} price found for Enercoop Nuit & Week-end contract`,
+      );
     }
     const cost = (price.price / 10000) * consumptionValue;
     logger.debug(
-      `Enercoop Nuit & Week-end: ${isOffPeak ? 'off-peak' : 'peak'} at ${context.slotLabel} on ${context.dateStr}, cost: ${cost}`,
+      `Enercoop Nuit & Week-end: ${isOffPeak ? 'off-peak' : 'peak'} at ${context.slotLabel} on ${
+        context.dateStr
+      }, cost: ${cost}`,
     );
     return cost;
   },
@@ -142,7 +146,9 @@ module.exports = {
     }
     const cost = (price.price / 10000) * consumptionValue;
     logger.debug(
-      `Enercoop 2 Saisons (${context.season}): ${isOffPeak ? 'off-peak' : 'peak'} at ${context.slotLabel} on ${context.dateStr}, cost: ${cost}`,
+      `Enercoop 2 Saisons (${context.season}): ${isOffPeak ? 'off-peak' : 'peak'} at ${context.slotLabel} on ${
+        context.dateStr
+      }, cost: ${cost}`,
     );
     return cost;
   },
