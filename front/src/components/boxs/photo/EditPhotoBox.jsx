@@ -150,7 +150,12 @@ class EditPhotoBox extends Component {
 
         <div class="form-group">
           <label class="custom-switch">
-            <input type="checkbox" class="custom-switch-input" checked={showCaption} onChange={this.updateShowCaption} />
+            <input
+              type="checkbox"
+              class="custom-switch-input"
+              checked={showCaption}
+              onChange={this.updateShowCaption}
+            />
             <span class="custom-switch-indicator" />
             <span class="custom-switch-description">
               <Text id="dashboard.boxes.photo.showCaptionLabel" />

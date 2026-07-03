@@ -50,12 +50,17 @@ const boxesSchema = Joi.array().items(
       icon: Joi.string(),
       photos: Joi.array().items(
         Joi.object().keys({
-          url: Joi.string().uri({ scheme: ['http', 'https'] }).required(),
+          url: Joi.string()
+            .uri({ scheme: ['http', 'https'] })
+            .required(),
           caption: Joi.string().allow(''),
         }),
       ),
       photo_fit: Joi.string().valid('cover', 'contain'),
-      photo_slideshow_interval: Joi.number().integer().min(0).max(3600),
+      photo_slideshow_interval: Joi.number()
+        .integer()
+        .min(0)
+        .max(3600),
       photo_show_caption: Joi.boolean(),
     }),
   ),

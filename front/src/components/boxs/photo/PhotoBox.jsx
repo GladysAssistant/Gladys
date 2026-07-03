@@ -188,10 +188,20 @@ class PhotoBox extends Component {
 
             {hasMultiple && (
               <>
-                <button type="button" class={cx(style.navButton, style.navPrev)} onClick={this.goToPrevious} aria-label="Previous">
+                <button
+                  type="button"
+                  class={cx(style.navButton, style.navPrev)}
+                  onClick={this.goToPrevious}
+                  aria-label="Previous"
+                >
                   <i class="fe fe-chevron-left" />
                 </button>
-                <button type="button" class={cx(style.navButton, style.navNext)} onClick={this.goToNext} aria-label="Next">
+                <button
+                  type="button"
+                  class={cx(style.navButton, style.navNext)}
+                  onClick={this.goToNext}
+                  aria-label="Next"
+                >
                   <i class="fe fe-chevron-right" />
                 </button>
               </>
