@@ -39,4 +39,24 @@ describe('dashboard.getPhoto', () => {
     const promise = dashboard.getPhoto('http://192.168.1.10/file.txt');
     await assert.isRejected(promise, BadParameters);
   });
+
+  it('should default to image/jpeg when content-type is missing', async () => {
+    const imageBuffer = Buffer.from('fake-image');
+    nock('http://192.168.1.10')
+      .get('/photos/no-content-type.jpg')
+      .reply(200, imageBuffer);
+
+    const image = await dashboard.getPhoto('http://192.168.1.10/photos/no-content-type.jpg');
+    expect(image).to.equal(`image/jpeg;base64,${imageBuffer.toString('base64')}`);
+  });
+
+  it('should reject images that exceed the axios size limit', async () => {
+    const imageBuffer = Buffer.alloc(5 * 1024 * 1024 + 1);
+    nock('http://192.168.1.10')
+      .get('/photos/huge.jpg')
+      .reply(200, imageBuffer, { 'Content-Type': 'image/jpeg' });
+
+    const promise = dashboard.getPhoto('http://192.168.1.10/photos/huge.jpg');
+    await assert.isRejected(promise);
+  });
 });

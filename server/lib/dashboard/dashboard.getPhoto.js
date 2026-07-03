@@ -54,10 +54,6 @@ async function getPhoto(url) {
 
   const imageBuffer = Buffer.from(response.data);
 
-  if (imageBuffer.length > MAX_IMAGE_BYTES) {
-    throw new BadParameters('Image is too big');
-  }
-
   return `${contentType};base64,${imageBuffer.toString('base64')}`;
 }
 
