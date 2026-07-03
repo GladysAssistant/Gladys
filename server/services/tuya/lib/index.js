@@ -32,6 +32,9 @@ const {
   recyclePersistentConnection,
   stopPersistentConnectionForDevice,
   stopPersistentConnections,
+  postCreate,
+  postUpdate,
+  postDelete,
 } = require('./tuya.persistentConnection');
 
 const { STATUS } = require('./utils/tuya.constants');
@@ -83,5 +86,9 @@ TuyaHandler.prototype.sendCommandViaPersistentConnection = sendCommandViaPersist
 TuyaHandler.prototype.recyclePersistentConnection = recyclePersistentConnection;
 TuyaHandler.prototype.stopPersistentConnectionForDevice = stopPersistentConnectionForDevice;
 TuyaHandler.prototype.stopPersistentConnections = stopPersistentConnections;
+// Called by the Gladys DeviceManager (device.notify) after a Tuya device is created/updated/deleted.
+TuyaHandler.prototype.postCreate = postCreate;
+TuyaHandler.prototype.postUpdate = postUpdate;
+TuyaHandler.prototype.postDelete = postDelete;
 
 module.exports = TuyaHandler;

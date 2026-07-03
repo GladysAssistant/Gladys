@@ -260,6 +260,12 @@ async function startPersistentConnections() {
   });
 }
 
+const getTopicFromDevice = (device) => {
+  const externalId = device && device.external_id;
+  const [prefix, topic] = typeof externalId === 'string' ? externalId.split(':') : [];
+  return prefix === 'tuya' && topic ? topic : null;
+};
+
 /**
  * @description Handle a pushed DPS map from a persistent connection: emit Gladys states.
  * @param {object} device - The Gladys device the push belongs to.
@@ -271,11 +277,8 @@ function handlePushedDps(device, dps) {
   if (!dps || typeof dps !== 'object') {
     return;
   }
-  const externalId = device && device.external_id;
-  const parts = typeof externalId === 'string' ? externalId.split(':') : [];
-  const prefix = parts[0];
-  const topic = parts[1];
-  if (prefix !== 'tuya' || !topic) {
+  const topic = getTopicFromDevice(device);
+  if (!topic) {
     return;
   }
   const entry = this.persistentConnections[topic];
@@ -287,6 +290,50 @@ function handlePushedDps(device, dps) {
   if (handledCodes.size > 0) {
     recordLocalSuccess(this.degradedDevices, topic);
   }
+}
+
+/**
+ * @description Called by the Gladys DeviceManager after a Tuya device is created or updated: recycle
+ * its persistent local connection so it runs against the fresh device. Pushed DPS are mapped against
+ * the device attached to the connection, so a stale one would silently drop states for features added
+ * by the update. Also covers a device switching local mode on (start) or off (stop only).
+ * @param {object} device - The created/updated Gladys device.
+ * @example
+ * this.postCreate(device);
+ */
+function postCreate(device) {
+  const topic = getTopicFromDevice(device);
+  if (!topic) {
+    return;
+  }
+  this.stopPersistentConnectionForDevice(topic);
+  this.startPersistentConnectionForDevice(device);
+}
+
+/**
+ * @description Called by the Gladys DeviceManager after a Tuya device is updated. Same behaviour as
+ * postCreate: recycle the persistent connection with the fresh device.
+ * @param {object} device - The updated Gladys device.
+ * @example
+ * this.postUpdate(device);
+ */
+function postUpdate(device) {
+  this.postCreate(device);
+}
+
+/**
+ * @description Called by the Gladys DeviceManager after a Tuya device is deleted: tear down its
+ * persistent local connection.
+ * @param {object} device - The deleted Gladys device.
+ * @example
+ * this.postDelete(device);
+ */
+function postDelete(device) {
+  const topic = getTopicFromDevice(device);
+  if (!topic) {
+    return;
+  }
+  this.stopPersistentConnectionForDevice(topic);
 }
 
 /**
@@ -403,4 +450,7 @@ module.exports = {
   recyclePersistentConnection,
   stopPersistentConnectionForDevice,
   stopPersistentConnections,
+  postCreate,
+  postUpdate,
+  postDelete,
 };
