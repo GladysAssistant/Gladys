@@ -18,6 +18,7 @@ const {
 const { convertEnergyUnit } = require('../../../utils/units');
 const contracts = require('../contracts/contracts.calculateCost');
 const { buildEdfTempoDayMap } = require('../contracts/contracts.buildEdfTempoDayMap');
+const { buildPublicHolidaysMap, needsPublicHolidays } = require('../contracts/contracts.buildPublicHolidaysMap');
 
 const isNullOrEmpty = (value) => value === null || value === undefined || value === '';
 
@@ -37,6 +38,7 @@ async function calculateCostFrom(startAt, jobId) {
   });
   logger.info(`Found ${energyDevices.length} energy devices`);
   let edfTempoHistoricalMap = null;
+  let publicHolidaysSet = null;
   await Promise.each(energyDevices, async (energyDevice, index) => {
     try {
       const energyConsumptionFeatures = [];
@@ -133,6 +135,13 @@ async function calculateCostFrom(startAt, jobId) {
             .format('YYYY-MM-DD');
           edfTempoHistoricalMap = await buildEdfTempoDayMap(this.gladys, startDateAsDayString);
         }
+        if (needsPublicHolidays(energyPrices) && !publicHolidaysSet) {
+          logger.info(
+            `Device ${electricMeterFeature.device_id} has Enercoop prices, loading French public holidays`,
+          );
+          const startDateAsDayString = dayjs.tz(startAt, systemTimezone).format('YYYY-MM-DD');
+          publicHolidaysSet = await buildPublicHolidaysMap(startDateAsDayString);
+        }
         logger.debug(`Found ${energyPrices.length} energy prices for device ${electricMeterFeature.device_id}`);
         // We get all the states of the consumption feature in the time range
         const deviceFeatureStates = await this.gladys.device.getDeviceFeatureStates(
@@ -183,7 +192,7 @@ async function calculateCostFrom(startAt, jobId) {
             createdAtRemoved30Minutes,
             valueInKwh,
             systemTimezone,
-            { edfTempoHistoricalMap },
+            { edfTempoHistoricalMap, publicHolidaysSet: publicHolidaysSet || new Set() },
           );
           deviceFeatureCostStatesToInsert.push({
             value: cost,

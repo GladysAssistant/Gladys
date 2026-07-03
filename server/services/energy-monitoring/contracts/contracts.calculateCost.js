@@ -6,6 +6,12 @@ dayjs.extend(timezone);
 const { ENERGY_CONTRACT_TYPES } = require('../../../utils/constants');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
+const {
+  getEnercoopConsumptionContext,
+  isEnercoopNuitWeekendOffPeak,
+  isEnercoop2SaisonsOffPeak,
+  findEnercoopRatePrice,
+} = require('./contracts.enercoopUtils');
 
 /**
  * @description Convert a Date to an HH:MM slot label at 30-minute granularity.
@@ -99,6 +105,44 @@ module.exports = {
       `Found price: ${price.price / 10000}${
         price.currency
       }/kWh for time slot ${label} on day ${tempoDayDayType}, cost: ${cost}`,
+    );
+    return cost;
+  },
+  [ENERGY_CONTRACT_TYPES.ENERCOOP_NUIT_WEEKEND]: async (
+    energyPricesAtConsumptionDate,
+    consumptionDate,
+    consumptionValue,
+    systemTimezone,
+    { publicHolidaysSet },
+  ) => {
+    const context = getEnercoopConsumptionContext(consumptionDate, systemTimezone, { publicHolidaysSet });
+    const isOffPeak = isEnercoopNuitWeekendOffPeak(context);
+    const price = findEnercoopRatePrice(energyPricesAtConsumptionDate, isOffPeak);
+    if (!price) {
+      throw new NotFoundError(`No ${isOffPeak ? 'off-peak' : 'peak'} price found for Enercoop Nuit & Week-end contract`);
+    }
+    const cost = (price.price / 10000) * consumptionValue;
+    logger.debug(
+      `Enercoop Nuit & Week-end: ${isOffPeak ? 'off-peak' : 'peak'} at ${context.slotLabel} on ${context.dateStr}, cost: ${cost}`,
+    );
+    return cost;
+  },
+  [ENERGY_CONTRACT_TYPES.ENERCOOP_2_SAISONS]: async (
+    energyPricesAtConsumptionDate,
+    consumptionDate,
+    consumptionValue,
+    systemTimezone,
+    { publicHolidaysSet },
+  ) => {
+    const context = getEnercoopConsumptionContext(consumptionDate, systemTimezone, { publicHolidaysSet });
+    const isOffPeak = isEnercoop2SaisonsOffPeak(context);
+    const price = findEnercoopRatePrice(energyPricesAtConsumptionDate, isOffPeak);
+    if (!price) {
+      throw new NotFoundError(`No ${isOffPeak ? 'off-peak' : 'peak'} price found for Enercoop 2 Saisons contract`);
+    }
+    const cost = (price.price / 10000) * consumptionValue;
+    logger.debug(
+      `Enercoop 2 Saisons (${context.season}): ${isOffPeak ? 'off-peak' : 'peak'} at ${context.slotLabel} on ${context.dateStr}, cost: ${cost}`,
     );
     return cost;
   },

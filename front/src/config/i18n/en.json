@@ -1888,8 +1888,20 @@
       "contractTypes": {
         "base": "base",
         "peak-off-peak": "peak/off-peak hours",
-        "edf-tempo": "EDF Tempo"
+        "edf-tempo": "EDF Tempo",
+        "enercoop-nuit-weekend": "Enercoop Night & Weekend",
+        "enercoop-2-saisons": "Enercoop 2 Seasons"
       },
+      "rateType": "Rate type",
+      "rateTypes": {
+        "peak": "peak hours",
+        "off_peak": "off-peak hours"
+      },
+      "enercoopContractHelp": "Enercoop contracts require two prices: one for peak hours and one for off-peak hours. Create two entries with the same contract name. Time slots, weekends, public holidays and seasons are calculated automatically.",
+      "schoolVacationZoneDescription": "School vacation zone (optional). Uses the official Ministry of Education API. School vacations do not affect Enercoop tariffs, but this information can be useful for consumption tracking.",
+      "schoolVacationZoneNone": "Not configured",
+      "schoolVacationZoneSuccess": "School vacation zone saved.",
+      "schoolVacationZoneError": "Error saving school vacation zone.",
       "priceTypes": {
         "consumption": "consumption",
         "subscription": "subscription"

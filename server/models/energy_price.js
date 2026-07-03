@@ -2,6 +2,7 @@ const {
   ENERGY_CONTRACT_TYPES_LIST,
   ENERGY_PRICE_TYPES_LIST,
   ENERGY_PRICE_DAY_TYPES_LIST,
+  ENERGY_RATE_TYPES_LIST,
 } = require('../utils/constants');
 const { slugify } = require('../utils/slugify');
 
@@ -66,6 +67,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.ENUM(...ENERGY_PRICE_DAY_TYPES_LIST),
       },
+      rate_type: {
+        allowNull: true,
+        type: DataTypes.ENUM(...ENERGY_RATE_TYPES_LIST),
+      },
       selector: {
         allowNull: false,
         unique: true,
@@ -88,6 +93,7 @@ module.exports = (sequelize, DataTypes) => {
         item.hour_slots,
         item.subscribed_power,
         item.day_type,
+        item.rate_type,
       ].join('-');
       item.selector = slugify(base, true);
     }
