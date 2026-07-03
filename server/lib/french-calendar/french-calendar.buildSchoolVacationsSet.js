@@ -22,6 +22,8 @@ const SCHOOL_VACATION_ZONES = ['Zone A', 'Zone B', 'Zone C', 'Corse'];
  * @param {string} endDate - End date (YYYY-MM-DD).
  * @param {string} zone - School vacation zone (e.g. "Zone A").
  * @returns {Promise<Set<string>>} Set of school vacation dates.
+ * @example
+ * await buildSchoolVacationsSet('2025-01-01', '2025-12-31', 'Zone A');
  */
 async function buildSchoolVacationsSet(startDate, endDate, zone) {
   if (!zone || !SCHOOL_VACATION_ZONES.includes(zone)) {

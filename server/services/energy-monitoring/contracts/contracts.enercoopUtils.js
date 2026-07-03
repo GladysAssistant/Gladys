@@ -9,6 +9,8 @@ dayjs.extend(timezone);
  * @param {Date} date - The date of the consumption sample.
  * @param {string} systemTimezone - The timezone of the system.
  * @returns {string} The label formatted as HH:MM (minutes are 00 or 30).
+ * @example
+ * formatDateToSlotLabel(new Date('2025-09-11T17:14:57+02:00'), 'Europe/Paris');
  */
 function formatDateToSlotLabel(date, systemTimezone) {
   const dayjsDate = dayjs(date).tz(systemTimezone);
@@ -23,6 +25,8 @@ function formatDateToSlotLabel(date, systemTimezone) {
  * @param {number} startHour - Start hour (0-23).
  * @param {number} endHour - End hour (0-24), exclusive.
  * @returns {Set<string>} Set of slot labels.
+ * @example
+ * generateSlotLabelsBetweenHours(23, 24);
  */
 function generateSlotLabelsBetweenHours(startHour, endHour) {
   const slots = new Set();
@@ -51,6 +55,8 @@ const SUMMER_WEEKDAY_OFF_PEAK_SLOTS = generateSlotLabelsBetweenHours(11, 17);
  * @param {object} options - Calendar options.
  * @param {Set<string>} options.publicHolidaysSet - Public holiday dates.
  * @returns {object} Consumption context.
+ * @example
+ * getEnercoopConsumptionContext(new Date(), 'Europe/Paris', { publicHolidaysSet: new Set() });
  */
 function getEnercoopConsumptionContext(consumptionDate, systemTimezone, { publicHolidaysSet }) {
   const localDate = dayjs(consumptionDate).tz(systemTimezone);
@@ -71,6 +77,8 @@ function getEnercoopConsumptionContext(consumptionDate, systemTimezone, { public
  * @description Check if consumption is off-peak for Enercoop Nuit & Week-end contract.
  * @param {object} context - Consumption context from getEnercoopConsumptionContext.
  * @returns {boolean} True if off-peak.
+ * @example
+ * isEnercoopNuitWeekendOffPeak({ isWeekend: true, isPublicHoliday: false, slotLabel: '10:00' });
  */
 function isEnercoopNuitWeekendOffPeak(context) {
   if (context.isPublicHoliday || context.isWeekend) {
@@ -83,6 +91,8 @@ function isEnercoopNuitWeekendOffPeak(context) {
  * @description Check if consumption is off-peak for Enercoop 2 Saisons contract.
  * @param {object} context - Consumption context from getEnercoopConsumptionContext.
  * @returns {boolean} True if off-peak.
+ * @example
+ * isEnercoop2SaisonsOffPeak({ season: 'summer', isWeekend: false, isPublicHoliday: false, slotLabel: '12:00' });
  */
 function isEnercoop2SaisonsOffPeak(context) {
   if (context.isPublicHoliday || context.isWeekend) {
@@ -99,6 +109,8 @@ function isEnercoop2SaisonsOffPeak(context) {
  * @param {Array} energyPricesAtConsumptionDate - Price rows for the date.
  * @param {boolean} isOffPeak - Whether off-peak rate applies.
  * @returns {object|undefined} Matching price row.
+ * @example
+ * findEnercoopRatePrice([{ rate_type: 'peak', price: 1500 }], false);
  */
 function findEnercoopRatePrice(energyPricesAtConsumptionDate, isOffPeak) {
   const rateType = isOffPeak ? 'off_peak' : 'peak';

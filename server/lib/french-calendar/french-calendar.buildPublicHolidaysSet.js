@@ -19,6 +19,8 @@ const publicHolidaysCache = new LRUCache({
  * @param {string} startDate - Start date (YYYY-MM-DD).
  * @param {string} endDate - End date (YYYY-MM-DD).
  * @returns {Promise<Set<string>>} Set of public holiday dates.
+ * @example
+ * await buildPublicHolidaysSet('2025-01-01', '2025-12-31');
  */
 async function buildPublicHolidaysSet(startDate, endDate) {
   const startYear = dayjs(startDate).year();

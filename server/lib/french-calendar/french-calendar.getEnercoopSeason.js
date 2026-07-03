@@ -9,6 +9,8 @@ dayjs.extend(timezone);
  * @param {Date} date - The date to evaluate.
  * @param {string} systemTimezone - The system timezone.
  * @returns {'summer'|'winter'} The Enercoop season.
+ * @example
+ * getEnercoopSeason(new Date('2025-07-15'), 'Europe/Paris');
  */
 function getEnercoopSeason(date, systemTimezone) {
   const month =

@@ -12,6 +12,8 @@ dayjs.extend(timezone);
  * @description Build a set of French public holiday dates for cost calculation.
  * @param {string} startDate - Start date (YYYY-MM-DD).
  * @returns {Promise<Set<string>>} Set of public holiday dates.
+ * @example
+ * await buildPublicHolidaysMap('2025-01-01');
  */
 async function buildPublicHolidaysMap(startDate) {
   const today = dayjs()
@@ -32,6 +34,8 @@ async function buildPublicHolidaysMap(startDate) {
  * @description Check if any energy prices require French public holiday data.
  * @param {Array} energyPrices - Energy price rows.
  * @returns {boolean} True if public holidays are needed.
+ * @example
+ * needsPublicHolidays([{ contract: 'enercoop-nuit-weekend' }]);
  */
 function needsPublicHolidays(energyPrices) {
   return energyPrices.some(
