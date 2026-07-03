@@ -430,6 +430,68 @@ describe('Tuya persistent connection', () => {
     expect(() => self.stopPersistentConnections()).to.not.throw();
   });
 
+  describe('device lifecycle hooks (postCreate / postUpdate / postDelete)', () => {
+    it('postCreate opens the persistent connection of a new local device', () => {
+      const self = buildSelf();
+      self.postCreate(buildDevice());
+
+      expect(self.persistentConnections.testid).to.not.equal(undefined);
+      expect(lastTuyapi().connect.calledOnce).to.equal(true);
+    });
+
+    it('postUpdate recycles the connection so pushes map against the fresh device', () => {
+      const self = buildSelf();
+      self.startPersistentConnectionForDevice(buildDevice());
+      const staleApi = lastTuyapi();
+      staleApi.emit('connected');
+
+      const updatedDevice = buildDevice();
+      updatedDevice.features.push({
+        external_id: 'tuya:testid:child_lock',
+        selector: 'tuya-testid-child-lock',
+        category: 'child-lock',
+        type: 'binary',
+        last_value: 0,
+      });
+      self.postUpdate(updatedDevice);
+
+      expect(staleApi.disconnect.calledOnce).to.equal(true);
+      expect(self.persistentConnections.testid.device).to.equal(updatedDevice);
+      expect(lastTuyapi()).to.not.equal(staleApi);
+    });
+
+    it('postUpdate stops the connection when the update removed the local config', () => {
+      const self = buildSelf();
+      self.startPersistentConnectionForDevice(buildDevice());
+      const staleApi = lastTuyapi();
+
+      const cloudOnlyDevice = { external_id: 'tuya:testid', params: [], features: [] };
+      self.postUpdate(cloudOnlyDevice);
+
+      expect(staleApi.disconnect.calledOnce).to.equal(true);
+      expect(self.persistentConnections.testid).to.equal(undefined);
+    });
+
+    it('postDelete tears down the persistent connection', () => {
+      const self = buildSelf();
+      self.startPersistentConnectionForDevice(buildDevice());
+      const api = lastTuyapi();
+
+      self.postDelete(buildDevice());
+
+      expect(api.disconnect.calledOnce).to.equal(true);
+      expect(self.persistentConnections.testid).to.equal(undefined);
+    });
+
+    it('lifecycle hooks ignore devices without a tuya external id', () => {
+      const self = buildSelf();
+      expect(() => self.postCreate({ external_id: 'zigbee:whatever' })).to.not.throw();
+      expect(() => self.postDelete({})).to.not.throw();
+      expect(self.persistentConnections).to.deep.equal({});
+      expect(tuyapiInstances.length).to.equal(0);
+    });
+  });
+
   it('push should emit the same states as the local poll (transform/scale applied)', () => {
     const fixtureCase = loadFixtureCases('pollLocal').find((c) => c.directoryName === 'smart-socket-basic');
     expect(fixtureCase, 'smart-socket-basic pollLocal fixture').to.not.equal(undefined);
