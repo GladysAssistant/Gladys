@@ -463,7 +463,9 @@
         "colorLowLabel": "Farbe unterhalb des unteren Schwellenwerts",
         "colorInRangeLabel": "Farbe zwischen den Schwellenwerten",
         "colorHighLabel": "Farbe oberhalb des oberen Schwellenwerts",
-        "thresholdsLegendLabel": "Schwellenwerte:"
+        "thresholdsLegendLabel": "Schwellenwerte:",
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Name auf dem Dashboard angezeigt"
       },
       "scene": {
         "editNameLabel": "Widget-Name (optional)",

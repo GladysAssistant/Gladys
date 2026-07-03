@@ -502,7 +502,9 @@
         "colorLowLabel": "Couleur en dessous du seuil bas",
         "colorInRangeLabel": "Couleur entre les seuils",
         "colorHighLabel": "Couleur au-dessus du seuil haut",
-        "thresholdsLegendLabel": "Seuils :"
+        "thresholdsLegendLabel": "Seuils :",
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Nom affiché sur le tableau de bord"
       },
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",
