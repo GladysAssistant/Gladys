@@ -131,6 +131,23 @@
   margin-bottom: 0;
 }
 
+/* Feature tags: cancel global dark-mode double-invert that keeps them flashy white */
+:global(.dark-mode) .deviceListItemFeatures :global(.tag) {
+  filter: none !important;
+  background-color: rgba(0, 0, 0, 0.22) !important;
+  border-color: rgba(0, 0, 0, 0.14) !important;
+  color: rgba(0, 0, 0, 0.62) !important;
+}
+
+:global(.dark-mode) .deviceListItemFeatures :global(.tag-addon) {
+  background-color: rgba(0, 0, 0, 0.14) !important;
+}
+
+:global(.dark-mode) .deviceListItemFeatures :global(.tag-addon) :global(.fe) {
+  filter: none !important;
+  color: rgba(0, 0, 0, 0.55) !important;
+}
+
 .deviceListItemActions {
   display: flex;
   flex-shrink: 0;
