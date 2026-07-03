@@ -221,7 +221,6 @@
 }
 
 .featureAccordionType {
-  color: #6c757d;
   font-size: 0.8125rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -409,10 +408,9 @@
 }
 
 :global(.dark-mode) .featureCatalogCardDescription,
-:global(.dark-mode) .featureAccordionType,
 :global(.dark-mode) .roomGroupHouse,
 :global(.dark-mode) .emptyState {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(0, 0, 0, 0.45);
 }
 
 @media (max-width: 576px) {

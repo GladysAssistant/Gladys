@@ -26,7 +26,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
         <i class={`fe fe-${icon} ${style.featureAccordionIcon}`} />
         <div class={style.featureAccordionTitle}>
           <span class={style.featureAccordionName}>{featureLabel}</span>
-          <span class={style.featureAccordionType}>
+          <span class={cx(style.featureAccordionType, 'text-muted')}>
             <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
           </span>
         </div>
@@ -126,16 +126,21 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
                 <label class="custom-switch" onClick={e => e.stopPropagation()}>
                   <input
                     type="checkbox"
-                    name={`read_only_${featureIndex}`}
+                    id={`read_only_${featureIndex}`}
                     checked={Boolean(feature.read_only)}
                     onChange={props.updateReadOnly}
                     class="custom-switch-input"
                   />
                   <span class="custom-switch-indicator" />
                   <span class="custom-switch-description">
-                    <Text id="integration.mqtt.feature.readOnlyButton" />
+                    <Text id="integration.mqtt.feature.readOnlyShortDescription" />
                   </span>
                 </label>
+                <p class="mt-2 mb-0">
+                  <small>
+                    <Text id="integration.mqtt.feature.readOnlyButton" />
+                  </small>
+                </p>
               </div>
             </div>
 

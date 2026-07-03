@@ -1760,6 +1760,7 @@
         "maxLabel": "Maximalwert",
         "maxPlaceholder": "Gib den maximalen Wert der Funktion ein",
         "readOnlyLabel": "Ist es ein Sensor?",
+        "readOnlyShortDescription": "Ja, es ist ein Sensor",
         "readOnlyButton": "Ja, es ist ein Sensor, der nur Daten an Gladys sendet.",
         "addButton": "Funktion hinzufügen",
         "mqttTopicToPublishExampleLabel": "MQTT-Veröffentlichungsthema",

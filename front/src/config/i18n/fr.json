@@ -1893,6 +1893,7 @@
         "maxLabel": "Valeur maximum",
         "maxPlaceholder": "Entrez la valeur maximum",
         "readOnlyLabel": "Est-ce un capteur ?",
+        "readOnlyShortDescription": "Oui, c'est un capteur",
         "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
         "addButton": "Ajouter une fonctionnalité",
         "mqttTopicToPublishExampleLabel": "Topic MQTT pour publier",
