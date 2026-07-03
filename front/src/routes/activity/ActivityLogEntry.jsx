@@ -9,13 +9,14 @@ dayjs.extend(isYesterday);
 const formatEntryTime = (createdAt, language, dictionary) => {
   const date = dayjs(createdAt).locale(language);
   const time = date.format('HH:mm');
+  const activityLog = dictionary.activityLog || {};
 
   if (date.isToday()) {
-    const todayLabel = dictionary.activityLog?.todayPrefix || 'Today';
+    const todayLabel = activityLog.todayPrefix || 'Today';
     return `${todayLabel}, ${time}`;
   }
   if (date.isYesterday()) {
-    const yesterdayLabel = dictionary.activityLog?.yesterdayPrefix || 'Yesterday';
+    const yesterdayLabel = activityLog.yesterdayPrefix || 'Yesterday';
     return `${yesterdayLabel}, ${time}`;
   }
   return `${date.format('dddd D MMMM')}, ${time}`;
