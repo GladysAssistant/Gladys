@@ -91,6 +91,34 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
   });
 });
 
+describe('GET /api/v1/device_feature/activity_log', () => {
+  const TEST_LIGHT_FEATURE_ID = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+
+  beforeEach(async () => {
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.duckDbInsertState(TEST_LIGHT_FEATURE_ID, 1, new Date('2026-07-03T11:30:00.000Z'));
+  });
+
+  it('should get activity log entries', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/activity_log')
+      .query({
+        mode: 'all',
+        from: '2026-07-03T00:00:00.000Z',
+        to: '2026-07-03T23:59:59.999Z',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.instanceOf(Array);
+        expect(res.body.length).to.be.at.least(1);
+        expect(res.body[0]).to.have.property('device_name', 'Test device');
+        expect(res.body[0]).to.have.property('device_feature_selector', 'test-device-feature');
+        expect(res.body[0]).to.have.property('value', 1);
+      });
+  });
+});
+
 describe('GET /api/v1/device_feature/energy_consumption', () => {
   beforeEach(async function BeforeEach() {
     this.timeout(10000);
