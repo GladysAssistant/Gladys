@@ -91,6 +91,45 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
   });
 });
 
+describe('GET /api/v1/device_feature/states_history', () => {
+  beforeEach(async function BeforeEach() {
+    this.timeout(10000);
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 0, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 1, created_at: new Date('2025-08-28T15:02:00.000Z') },
+    ]);
+  });
+  it('should get device states history', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/states_history')
+      .query({
+        take: 10,
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.lengthOf(2);
+        expect(res.body[0]).to.have.property('value', 1);
+        expect(res.body[0].device_feature).to.have.property('selector', 'test-device-feature');
+        expect(res.body[0].device).to.have.property('selector', 'test-device');
+        expect(res.body[0].room).to.have.property('selector', 'test-room');
+      });
+  });
+  it('should filter device states history by category', async () => {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/states_history')
+      .query({
+        categories: 'temperature-sensor',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.lengthOf(0);
+      });
+  });
+});
+
 describe('GET /api/v1/device_feature/energy_consumption', () => {
   beforeEach(async function BeforeEach() {
     this.timeout(10000);

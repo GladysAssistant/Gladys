@@ -4554,10 +4554,73 @@
       "hideDetails": "Masquer les détails"
     }
   },
+  "history": {
+    "title": "Activité",
+    "subtitle": "Suivez tout ce qui se passe dans votre maison, en temps réel.",
+    "live": "En direct",
+    "allRooms": "Toutes les pièces",
+    "searchPlaceholder": "Rechercher un appareil",
+    "loadMore": "Charger plus",
+    "newEvents": {
+      "one": "1 nouvel événement",
+      "other": "{{count}} nouveaux événements"
+    },
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "emptyTitle": "Aucune activité à afficher",
+    "emptyText": "Les événements de vos appareils apparaîtront ici en temps réel. Si cette liste reste vide, vérifiez que l'historique est activé sur les fonctionnalités de vos appareils.",
+    "error": "Une erreur est survenue lors du chargement de l'historique d'activité.",
+    "groups": {
+      "all": "Tout",
+      "openings": "Ouvertures",
+      "motion": "Mouvement & présence",
+      "buttons": "Boutons & télécommandes",
+      "lights": "Lumières & prises",
+      "climate": "Climat & environnement",
+      "security": "Sécurité",
+      "energy": "Énergie",
+      "other": "Autres"
+    },
+    "values": {
+      "motion-sensor": {
+        "0": "Fin de mouvement",
+        "1": "Mouvement détecté"
+      },
+      "presence-sensor": {
+        "0": "Absence",
+        "1": "Présence détectée"
+      },
+      "smoke-sensor": {
+        "0": "Plus de fumée détectée",
+        "1": "Fumée détectée !"
+      },
+      "leak-sensor": {
+        "0": "Plus de fuite détectée",
+        "1": "Fuite d'eau détectée !"
+      },
+      "vibration-sensor": {
+        "0": "Fin de vibration",
+        "1": "Vibration détectée"
+      },
+      "light": {
+        "0": "Éteinte",
+        "1": "Allumée"
+      },
+      "switch": {
+        "0": "Éteinte",
+        "1": "Allumée"
+      },
+      "lock": {
+        "0": "Déverrouillée",
+        "1": "Verrouillée"
+      }
+    }
+  },
   "header": {
     "gladysAssistant": "Gladys Assistant",
     "home": "Accueil",
     "chat": "Discussion",
+    "history": "Activité",
     "devices": "Appareils",
     "integrations": "Intégrations",
     "calendar": "Calendrier",
