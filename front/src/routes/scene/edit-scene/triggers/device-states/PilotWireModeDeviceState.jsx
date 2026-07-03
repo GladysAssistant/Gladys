@@ -3,6 +3,7 @@ import Select from 'react-select';
 import get from 'get-value';
 
 import { PILOT_WIRE_MODE } from '../../../../../../../server/utils/constants';
+import { getSupportedOptionValues } from '../../../../../utils/supportedOptions';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 class PilotWireModeDeviceState extends Component {
@@ -11,15 +12,20 @@ class PilotWireModeDeviceState extends Component {
   };
 
   getOptions = () => {
-    const options = Object.keys(PILOT_WIRE_MODE).map(key => {
-      const value = PILOT_WIRE_MODE[key];
-      return {
-        label: get(this.props.intl.dictionary, `deviceFeatureValue.category.heater.pilot-wire-mode.${value}`, {
-          default: value
-        }),
-        value
-      };
-    });
+    // Only offer the modes the selected feature supports (its supported_options); a feature
+    // without restrictions keeps the full PILOT_WIRE_MODE list.
+    const supportedValues = getSupportedOptionValues(this.props.selectedDeviceFeature);
+    const options = Object.keys(PILOT_WIRE_MODE)
+      .map(key => {
+        const value = PILOT_WIRE_MODE[key];
+        return {
+          label: get(this.props.intl.dictionary, `deviceFeatureValue.category.heater.pilot-wire-mode.${value}`, {
+            default: value
+          }),
+          value
+        };
+      })
+      .filter(option => supportedValues === null || supportedValues.includes(option.value));
 
     this.setState({ options });
   };
@@ -28,6 +34,12 @@ class PilotWireModeDeviceState extends Component {
     this.props.updateTriggerProperty(this.props.index, 'operator', '=');
 
     this.getOptions();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.selectedDeviceFeature !== this.props.selectedDeviceFeature) {
+      this.getOptions();
+    }
   }
 
   render({ trigger }, { options }) {

@@ -48,6 +48,48 @@
       "name": "Mode",
       "read_only": false,
       "selector": "tuya-bfc3c1dcdd95241afal8mo-mode",
+      "supported_options": [
+        {
+          "label": "Off",
+          "sort_order": 0,
+          "value": 0
+        },
+        {
+          "label": "Frost Protection",
+          "sort_order": 1,
+          "value": 1
+        },
+        {
+          "label": "Eco",
+          "sort_order": 2,
+          "value": 2
+        },
+        {
+          "label": "Comfort -1°C",
+          "sort_order": 3,
+          "value": 3
+        },
+        {
+          "label": "Comfort -2°C",
+          "sort_order": 4,
+          "value": 4
+        },
+        {
+          "label": "Comfort",
+          "sort_order": 5,
+          "value": 5
+        },
+        {
+          "label": "Programming",
+          "sort_order": 6,
+          "value": 6
+        },
+        {
+          "label": "Thermostat",
+          "sort_order": 7,
+          "value": 7
+        }
+      ],
       "type": "pilot-wire-mode"
     },
     {
@@ -59,6 +101,38 @@
       "name": "Current mode",
       "read_only": true,
       "selector": "tuya-bfc3c1dcdd95241afal8mo-running-mode",
+      "supported_options": [
+        {
+          "label": "Off",
+          "sort_order": 0,
+          "value": 0
+        },
+        {
+          "label": "Frost Protection",
+          "sort_order": 1,
+          "value": 1
+        },
+        {
+          "label": "Eco",
+          "sort_order": 2,
+          "value": 2
+        },
+        {
+          "label": "Comfort -1°C",
+          "sort_order": 3,
+          "value": 3
+        },
+        {
+          "label": "Comfort -2°C",
+          "sort_order": 4,
+          "value": 4
+        },
+        {
+          "label": "Comfort",
+          "sort_order": 5,
+          "value": 5
+        }
+      ],
       "type": "pilot-wire-mode"
     },
     {
@@ -103,8 +177,8 @@
   "name": "Thermostat Bureau Psycho",
   "online": true,
   "params": {
-    "CLOUD_STRATEGY": "shadow",
     "CLOUD_IP": "82.0.0.1",
+    "CLOUD_STRATEGY": "shadow",
     "DEVICE_ID": "bfc3c1dcdd95241afal8mo",
     "IP_ADDRESS": "10.0.0.15",
     "LOCAL_KEY": "local-key",

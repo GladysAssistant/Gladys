@@ -2,6 +2,7 @@ const logger = require('../../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { addSelector } = require('../../../../utils/addSelector');
 const { getFeatureMapping, getIgnoredCloudCodes, normalizeCode } = require('../mappings');
+const { buildPilotWireSupportedOptions } = require('./tuya.deviceMapping');
 
 /**
  * @description Transforms Tuya feature as Gladys feature.
@@ -86,6 +87,14 @@ function convertFeature(tuyaFunctions, externalId, options = {}) {
   }
   if (feature.read_only === false) {
     feature.has_feedback = true;
+  }
+  if (
+    feature.category === DEVICE_FEATURE_CATEGORIES.HEATER &&
+    feature.type === DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE
+  ) {
+    // Restrict UI mode choices to what this device really supports: the spec enum range intersected
+    // with the device vocabulary (variants may lack Off/Thermostat — writing them is rejected anyway).
+    feature.supported_options = buildPilotWireSupportedOptions(mappingEntry, valuesObject.range);
   }
 
   addSelector(feature);

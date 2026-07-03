@@ -36,6 +36,40 @@ const getPilotWireTuyaEnum = (mappingEntry) =>
     ? mappingEntry.tuyaEnum
     : TUYA_PILOT_WIRE_MODE_TO_GLADYS;
 
+// English fallback labels for pilot-wire supported options: the frontend renders its own localized
+// label from the option value, these only keep the API payload human-readable.
+const PILOT_WIRE_MODE_LABELS = {
+  [PILOT_WIRE_MODE.OFF]: 'Off',
+  [PILOT_WIRE_MODE.FROST_PROTECTION]: 'Frost Protection',
+  [PILOT_WIRE_MODE.ECO]: 'Eco',
+  [PILOT_WIRE_MODE.COMFORT_1]: 'Comfort -1°C',
+  [PILOT_WIRE_MODE.COMFORT_2]: 'Comfort -2°C',
+  [PILOT_WIRE_MODE.COMFORT]: 'Comfort',
+  [PILOT_WIRE_MODE.PROGRAMMING]: 'Programming',
+  [PILOT_WIRE_MODE.THERMOSTAT]: 'Thermostat',
+};
+
+// Build the supported_options of a pilot-wire-mode feature: the Gladys modes actually reachable on
+// this device. A curated variant vocabulary (explicit `tuyaEnum`, e.g. the eCosy) is the COMPLETE
+// truth — it exists precisely because the device specs are unreliable (the eCosy rw range omits
+// comfortable1/comfortable2 that the device honors), and it already drives what setValue accepts.
+// The default vocabulary spans every generic product, so it is narrowed by the spec enum range
+// (a status enum may expose fewer values than its rw sibling); without a usable range (e.g.
+// local-only creation) the full default vocabulary is assumed.
+const buildPilotWireSupportedOptions = (mappingEntry, range) => {
+  const hasCuratedEnum = Boolean(mappingEntry && mappingEntry.tuyaEnum && typeof mappingEntry.tuyaEnum === 'object');
+  const tuyaEnum = getPilotWireTuyaEnum(mappingEntry);
+  const tuyaValues = !hasCuratedEnum && Array.isArray(range) && range.length > 0 ? range : Object.keys(tuyaEnum);
+  const supportedValues = [
+    ...new Set(tuyaValues.map((tuyaValue) => tuyaEnum[tuyaValue]).filter((value) => value !== undefined)),
+  ].sort((a, b) => a - b);
+  return supportedValues.map((value, index) => ({
+    value,
+    label: PILOT_WIRE_MODE_LABELS[value] || String(value),
+    sort_order: index,
+  }));
+};
+
 const TUYA_AC_MODE_TO_GLADYS = {
   auto: AC_MODE.AUTO,
   cold: AC_MODE.COOLING,
@@ -357,4 +391,4 @@ const readValues = {
   },
 };
 
-module.exports = { readValues, writeValues };
+module.exports = { readValues, writeValues, buildPilotWireSupportedOptions };

@@ -149,6 +149,7 @@ class DeviceSetValue extends Component {
         <SelectPilotWireMode
           category={this.state.deviceFeature.category}
           type={this.state.deviceFeature.type}
+          deviceFeature={this.state.deviceFeature}
           updateValue={this.handleNewPureValue}
           value={this.props.action.value}
         />
