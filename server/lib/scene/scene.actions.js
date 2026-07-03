@@ -20,7 +20,14 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 
-const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES, SCENE_WHILE_MAX_ITERATIONS, SCENE_WHILE_ITERATION_DELAY_MS } = require('../../utils/constants');
+const {
+  ACTIONS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  ALARM_MODES,
+  SCENE_WHILE_MAX_ITERATIONS,
+  SCENE_WHILE_ITERATION_DELAY_MS,
+} = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
@@ -673,6 +680,8 @@ const actionsFunc = {
       action.iteration_delay_ms !== undefined ? action.iteration_delay_ms : SCENE_WHILE_ITERATION_DELAY_MS;
 
     let iteration = 0;
+    /* eslint-disable no-await-in-loop */
+    // Sequential iterations are intentional: conditions must be re-evaluated between each loop
     while (iteration < maxIterations) {
       let conditionsVerified;
       try {
@@ -696,6 +705,7 @@ const actionsFunc = {
       // Yield to the event loop between iterations to avoid blocking Gladys
       await Promise.delay(iterationDelayMs);
     }
+    /* eslint-enable no-await-in-loop */
 
     if (iteration >= maxIterations) {
       logger.warn(`While action at path ${path} reached max iterations (${maxIterations})`);

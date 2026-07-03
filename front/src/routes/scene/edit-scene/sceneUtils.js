@@ -17,7 +17,11 @@ const isVariableAvailableAtThisPath = (variableSourcePath, targetPath) => {
 
   while (sourceIndex < sourceSegments.length && targetIndex < targetSegments.length) {
     // If we encounter special segments, we need to compare within the same branch
-    if (sourceSegments[sourceIndex] === 'then' || sourceSegments[sourceIndex] === 'else' || sourceSegments[sourceIndex] === 'do') {
+    if (
+      sourceSegments[sourceIndex] === 'then' ||
+      sourceSegments[sourceIndex] === 'else' ||
+      sourceSegments[sourceIndex] === 'do'
+    ) {
       // If target doesn't match the same branch, paths are not comparable
       if (sourceSegments[sourceIndex] !== targetSegments[targetIndex]) {
         return false;

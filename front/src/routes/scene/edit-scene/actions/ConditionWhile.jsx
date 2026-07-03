@@ -99,8 +99,7 @@ class ConditionWhile extends Component {
           </div>
           <div class="text-center mt-4">
             <button onClick={this.addCondition} class="btn btn-sm btn-outline-primary">
-              <i class="fe fe-plus" />{' '}
-              <Text id="editScene.actionsCard.conditionWhile.addCondition">Add condition</Text>
+              <i class="fe fe-plus" /> <Text id="editScene.actionsCard.conditionWhile.addCondition">Add condition</Text>
             </button>
           </div>
         </div>
