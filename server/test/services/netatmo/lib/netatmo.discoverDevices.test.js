@@ -88,6 +88,62 @@ describe('Netatmo Discover devices', () => {
     expect(monitoringFeature.read_only).to.equal(true);
   });
 
+  it('should merge already created devices and flag the updatable ones', async () => {
+    netatmoHandler.status = 'connected';
+    const buildNetatmoDevice = (id, name) => ({
+      id,
+      type: 'NACamera',
+      name,
+      home: 'h1',
+      monitoring: 'on',
+      categoryAPI: 'Security',
+    });
+    netatmoHandler.loadDevices = sinon
+      .stub()
+      .returns([
+        buildNetatmoDevice('11:11', 'Cam new'),
+        buildNetatmoDevice('22:22', 'Cam unchanged'),
+        buildNetatmoDevice('33:33', 'Cam outdated'),
+      ]);
+    const buildExistingDevice = (id, featureSuffixes) => ({
+      id: `uuid-${id}`,
+      external_id: `netatmo:${id}`,
+      name: `Renamed ${id}`,
+      room_id: 'room-1',
+      created_at: '2026-01-01T00:00:00.000Z',
+      features: featureSuffixes.map((suffix) => ({ id: `feature-${suffix}`, external_id: `netatmo:${id}:${suffix}` })),
+      params: [
+        { name: 'modules_bridge_id', value: '[]' },
+        { name: 'home_id', value: 'h1' },
+      ],
+    });
+    const existingUnchanged = buildExistingDevice('22:22', ['wifi_strength', 'monitoring']);
+    const existingOutdated = buildExistingDevice('33:33', ['wifi_strength']);
+    netatmoHandler.gladys.stateManager.get = sinon.stub().callsFake((type, externalId) => {
+      if (externalId === existingUnchanged.external_id) {
+        return existingUnchanged;
+      }
+      if (externalId === existingOutdated.external_id) {
+        return existingOutdated;
+      }
+      return null;
+    });
+
+    const discoveredDevices = await netatmoHandler.discoverDevices();
+
+    expect(discoveredDevices.length).to.equal(3);
+    const newDevice = discoveredDevices.find((device) => device.external_id === 'netatmo:11:11');
+    expect(newDevice.created_at).to.equal(undefined);
+    expect(newDevice.updatable).to.equal(undefined);
+    const unchangedDevice = discoveredDevices.find((device) => device.external_id === 'netatmo:22:22');
+    expect(unchangedDevice.updatable).to.equal(false);
+    expect(unchangedDevice.name).to.equal('Renamed 22:22');
+    expect(unchangedDevice.created_at).to.equal('2026-01-01T00:00:00.000Z');
+    const outdatedDevice = discoveredDevices.find((device) => device.external_id === 'netatmo:33:33');
+    expect(outdatedDevice.updatable).to.equal(true);
+    expect(outdatedDevice.name).to.equal('Renamed 33:33');
+  });
+
   it('should throw an error if not connected', async () => {
     try {
       await netatmoHandler.discoverDevices();

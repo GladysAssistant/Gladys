@@ -1,4 +1,5 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+const { mergeDevices } = require('../../../utils/device');
 
 module.exports = function NetatmoController(netatmoHandler) {
   /**
@@ -89,9 +90,9 @@ module.exports = function NetatmoController(netatmoHandler) {
     if (!netatmoHandler.discoveredDevices || req.query.refresh === 'true') {
       devices = await netatmoHandler.discoverDevices();
     } else {
-      devices = netatmoHandler.discoveredDevices.filter((device) => {
+      devices = netatmoHandler.discoveredDevices.map((device) => {
         const existInGladys = netatmoHandler.gladys.stateManager.get('deviceByExternalId', device.external_id);
-        return existInGladys === null;
+        return mergeDevices(device, existInGladys);
       });
     }
     res.json(devices);

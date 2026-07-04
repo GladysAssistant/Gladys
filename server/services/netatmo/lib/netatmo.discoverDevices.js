@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const { mergeDevices } = require('../../../utils/device');
 const { STATUS, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');
 
 /**
@@ -50,9 +51,9 @@ async function discoverDevices() {
         deviceNetatmo: device,
       };
     });
-    const discoveredDevices = this.discoveredDevices.filter((device) => {
+    const discoveredDevices = this.discoveredDevices.map((device) => {
       const existInGladys = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
-      return existInGladys === null;
+      return mergeDevices(device, existInGladys);
     });
     if (this.status !== STATUS.RECONNECTING && this.status !== STATUS.DISCONNECTED) {
       await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });

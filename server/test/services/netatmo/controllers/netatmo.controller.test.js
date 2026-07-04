@@ -109,24 +109,40 @@ describe('Netatmo Controller', () => {
       await netatmoController['get /api/v1/service/netatmo/discover'].controller(req, res);
       expect(res.json.calledWith(devices)).to.equal(true);
     });
-    it('should return already discovered devices that are not in Gladys', async () => {
+    it('should return already discovered devices merged with the Gladys state', async () => {
       const discoveredDevices = [
-        { external_id: 'netatmo:70:ee:50:xx:xx:e0', notInGladys: true },
-        { external_id: 'netatmo:70:ee:50:xx:xx:e1', notInGladys: false },
+        { external_id: 'netatmo:70:ee:50:xx:xx:e0', features: [], params: [] },
+        {
+          external_id: 'netatmo:70:ee:50:xx:xx:e1',
+          features: [{ external_id: 'netatmo:70:ee:50:xx:xx:e1:monitoring' }],
+          params: [],
+        },
       ];
+      const existingDevice = {
+        id: 'gladys-device-id',
+        external_id: 'netatmo:70:ee:50:xx:xx:e1',
+        name: 'Renamed camera',
+        room_id: 'room-1',
+        created_at: '2026-01-01T00:00:00.000Z',
+        features: [],
+        params: [],
+      };
       NetatmoHandlerMock.discoveredDevices = discoveredDevices;
       NetatmoHandlerMock.gladys = {
         stateManager: {
-          get: sinon.stub().callsFake((type, externalId) => {
-            const device = discoveredDevices.find((d) => d.external_id === externalId);
-            return device && !device.notInGladys ? {} : null;
-          }),
+          get: sinon
+            .stub()
+            .callsFake((type, externalId) => (externalId === existingDevice.external_id ? existingDevice : null)),
         },
       };
       await netatmoController['get /api/v1/service/netatmo/discover'].controller(req, res);
 
-      const expectedDevices = discoveredDevices.filter((d) => d.notInGladys);
-      expect(res.json.calledWith(expectedDevices)).to.equal(true);
+      const returnedDevices = res.json.firstCall.args[0];
+      expect(returnedDevices).to.have.lengthOf(2);
+      expect(returnedDevices[0]).to.deep.equal(discoveredDevices[0]);
+      expect(returnedDevices[1].updatable).to.equal(true);
+      expect(returnedDevices[1].name).to.equal('Renamed camera');
+      expect(returnedDevices[1].created_at).to.equal('2026-01-01T00:00:00.000Z');
     });
   });
 });

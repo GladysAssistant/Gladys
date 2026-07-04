@@ -9,6 +9,31 @@ import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import { RequestStatus } from '../../../../../utils/consts';
 
+const getDeviceRank = device => {
+  const isCreated = !!device.created_at;
+  const isUpdatable = !!device.updatable;
+  const isSupported = !device.not_handled;
+  if (isCreated && isUpdatable) {
+    return 0;
+  }
+  if (!isCreated && isSupported) {
+    return 1;
+  }
+  if (!isCreated) {
+    return 2;
+  }
+  return 3;
+};
+
+const sortDevices = devices =>
+  [...devices].sort((a, b) => {
+    const rankDiff = getDeviceRank(a) - getDeviceRank(b);
+    if (rankDiff !== 0) {
+      return rankDiff;
+    }
+    return (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase());
+  });
+
 class DiscoverTab extends Component {
   async componentWillMount() {
     this.getDiscoveredDevices();
@@ -42,7 +67,7 @@ class DiscoverTab extends Component {
     try {
       const discoveredDevices = await this.props.httpClient.get('/api/v1/service/netatmo/discover');
       this.setState({
-        discoveredDevices,
+        discoveredDevices: sortDevices(discoveredDevices),
         loading: false,
         errorLoading: false
       });
@@ -64,7 +89,7 @@ class DiscoverTab extends Component {
     try {
       const discoveredDevices = await this.props.httpClient.get('/api/v1/service/netatmo/discover', { refresh: true });
       this.setState({
-        discoveredDevices,
+        discoveredDevices: sortDevices(discoveredDevices),
         loading: false,
         errorLoading: false
       });
@@ -120,7 +145,7 @@ class DiscoverTab extends Component {
                   discoveredDevices.map((device, index) => (
                     <NetatmoDeviceBox
                       editable={!device.created_at || device.updatable}
-                      alreadyCreatedButton={!device.created_at && !device.updatable}
+                      alreadyCreatedButton={device.created_at && !device.updatable}
                       updateButton={device.updatable}
                       saveButton={!device.created_at}
                       device={device}
