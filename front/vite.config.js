@@ -5,6 +5,7 @@ import { patchCssModules } from 'vite-css-modules';
 import { resolve } from 'path';
 import { preactCliCssModules } from './vite-plugins/preact-cli-css-modules.js';
 import { preactAsyncRoutes } from './vite-plugins/preact-async-routes.js';
+import { serverCommonjsInterop } from './vite-plugins/server-commonjs-interop.js';
 
 function treatJsFilesAsJsx() {
   return {
@@ -43,20 +44,26 @@ export default defineConfig(({ mode }) => {
     return definitions;
   }, {});
 
+  const plugins = [
+    patchCssModules({ exportMode: 'both' }),
+    preactAsyncRoutes(),
+    treatJsFilesAsJsx(),
+    preactCliCssModules(),
+    preact(),
+    viteStaticCopy({
+      targets: [
+        { src: 'src/assets', dest: 'assets' },
+        { src: 'src/manifest.json', dest: '.' }
+      ]
+    })
+  ];
+
+  if (mode !== 'production') {
+    plugins.unshift(serverCommonjsInterop());
+  }
+
   return {
-    plugins: [
-      patchCssModules({ exportMode: 'both' }),
-      preactAsyncRoutes(),
-      treatJsFilesAsJsx(),
-      preactCliCssModules(),
-      preact(),
-      viteStaticCopy({
-        targets: [
-          { src: 'src/assets', dest: 'assets' },
-          { src: 'src/manifest.json', dest: '.' }
-        ]
-      })
-    ],
+    plugins,
     resolve: {
       alias: {
         react: 'preact/compat',
