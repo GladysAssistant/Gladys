@@ -65,7 +65,7 @@ class NetatmoDeviceBox extends Component {
       });
     } catch (e) {
       let errorMessage = 'integration.netatmo.error.defaultError';
-      if (e.response.status === 409) {
+      if (e.response && e.response.status === 409) {
         errorMessage = 'integration.netatmo.error.conflictError';
       }
       this.setState({
@@ -137,17 +137,23 @@ class NetatmoDeviceBox extends Component {
 
     let categoryAPI = null;
     let apiNotConfigured = null;
+    let apiErrorCode = null;
     if (device.deviceNetatmo) {
       categoryAPI = device.deviceNetatmo.categoryAPI;
       apiNotConfigured = device.deviceNetatmo.apiNotConfigured;
+      apiErrorCode = device.deviceNetatmo.apiErrorCode !== undefined ? device.deviceNetatmo.apiErrorCode : null;
     }
     const isDeviceReachable = (device, now = new Date()) => {
+      // the API explicitly flags the module unreachable: it wins over the room heuristics
+      if (device.deviceNetatmo && device.deviceNetatmo.reachable === false) {
+        return false;
+      }
       const isRecent = (date, time) => (now - new Date(date)) / (1000 * 60) <= time;
       const hasRecentFeature = device.features.some(feature => isRecent(feature.last_value_changed, 15));
       const isNetatmoDeviceReachable =
         device.deviceNetatmo &&
         (device.deviceNetatmo.reachable ||
-          device.deviceNetatmo.room.reachable ||
+          (device.deviceNetatmo.room && device.deviceNetatmo.room.reachable) ||
           isRecent(device.deviceNetatmo.last_plug_seen * 1000, 180) ||
           isRecent(device.deviceNetatmo.last_therm_seen * 1000, 180));
       return hasRecentFeature || isNetatmoDeviceReachable;
@@ -161,7 +167,8 @@ class NetatmoDeviceBox extends Component {
       plugName,
       online,
       categoryAPI,
-      apiNotConfigured
+      apiNotConfigured,
+      apiErrorCode
     };
   };
 
@@ -186,7 +193,8 @@ class NetatmoDeviceBox extends Component {
       plugName,
       online,
       categoryAPI,
-      apiNotConfigured
+      apiNotConfigured,
+      apiErrorCode
     } = this.getDeviceProperty();
     const sidDevice = device.external_id.replace('netatmo:', '') || (device.deviceNetatmo && device.deviceNetatmo.id);
     const saveButtonCondition =
@@ -224,6 +232,13 @@ class NetatmoDeviceBox extends Component {
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">
                     <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                  </div>
+                )}
+                {apiErrorCode !== null && (
+                  <div class="alert alert-warning">
+                    <Text id={`integration.netatmo.discover.deviceError.${apiErrorCode}`}>
+                      <Text id="integration.netatmo.discover.deviceError.default" fields={{ code: apiErrorCode }} />
+                    </Text>
                   </div>
                 )}
                 <div class="form-group">
