@@ -94,7 +94,7 @@ describe('Netatmo update NATherm1 features', () => {
     delete deviceNetatmoMock.room;
     delete deviceNetatmoMock.measured;
 
-    await netatmoHandler.updateNATherm1(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(3);
     ['temperature', 'therm_measured_temperature', 'therm_setpoint_temperature', 'open_window'].forEach((suffix) => {

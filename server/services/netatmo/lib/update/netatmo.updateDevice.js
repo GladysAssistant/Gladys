@@ -14,17 +14,23 @@ async function updateDevice(deviceGladys, deviceNetatmo, externalId) {
   if (!featureExtractors) {
     return;
   }
-  try {
-    Object.entries(featureExtractors).forEach(([featureSuffix, extractValue]) => {
-      deviceGladys.features
-        .filter((feature) => feature.external_id === `${externalId}:${featureSuffix}`)
-        .forEach((feature) => {
+  Object.entries(featureExtractors).forEach(([featureSuffix, extractValue]) => {
+    deviceGladys.features
+      .filter((feature) => feature.external_id === `${externalId}:${featureSuffix}`)
+      .forEach((feature) => {
+        try {
           emitFeatureState(this.gladys, feature, extractValue(deviceNetatmo));
-        });
-    });
-  } catch (e) {
-    logger.error(`deviceGladys ${deviceNetatmo.type}: `, deviceGladys.name, 'error: ', e);
-  }
+        } catch (e) {
+          // a failing feature must not prevent the remaining features of the device from updating
+          logger.error(
+            `deviceGladys ${deviceNetatmo.type} - ${feature.external_id}: `,
+            deviceGladys.name,
+            'error: ',
+            e,
+          );
+        }
+      });
+  });
 }
 
 module.exports = {
