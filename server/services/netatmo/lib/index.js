@@ -35,9 +35,10 @@ const { getCameraBaseUrl, getCameraImage } = require('./netatmo.getCameraImage')
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
 const buildScopesConfig = require('./utils/netatmo.buildScopesConfig');
 
-const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
+const NetatmoHandler = function NetatmoHandler(gladys, serviceId, childProcess) {
   this.gladys = gladys;
   this.serviceId = serviceId;
+  this.childProcess = childProcess;
   this.configuration = {
     clientId: null,
     clientSecret: null,

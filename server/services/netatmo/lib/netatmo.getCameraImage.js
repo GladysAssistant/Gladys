@@ -1,24 +1,56 @@
 const { fetch } = require('undici');
+const fse = require('fs-extra');
+const path = require('path');
 const logger = require('../../../utils/logger');
 
 const SNAPSHOT_PATH = '/live/snapshot_720.jpg';
 const PING_PATH = '/command/ping';
 
 /**
- * @description Fetch a camera snapshot and return it as a base64 image.
+ * @description Download a camera snapshot through ffmpeg and return it as a base64 image.
+ * The re-encoding (qscale 15, same as the rtsp-camera service) keeps the image under the
+ * 150kB limit of the Gladys camera store, which the raw 720p snapshot can exceed.
+ * @param {object} childProcess - Node child_process module.
+ * @param {string} tempFolder - Gladys temp folder.
+ * @param {string} cameraId - Netatmo camera id, used in the temp file name.
  * @param {string} baseUrl - Camera base URL (VPN or local).
- * @returns {Promise<string|undefined>} Base64 image, or undefined if the snapshot is not available.
+ * @returns {Promise<string>} Base64 image.
  * @example
- * await fetchSnapshot('https://prodvpn-eu-14.netatmo.net/restricted/...');
+ * await takeSnapshot(childProcess, '/tmp/gladys', '70:ee:50:aa:bb:cc', 'https://prodvpn...');
  */
-async function fetchSnapshot(baseUrl) {
-  const response = await fetch(`${baseUrl}${SNAPSHOT_PATH}`);
-  if (!response.ok) {
-    logger.debug(`Netatmo camera snapshot failed with HTTP ${response.status} on ${baseUrl}`);
-    return undefined;
-  }
-  const buffer = Buffer.from(await response.arrayBuffer());
-  return `image/jpg;base64,${buffer.toString('base64')}`;
+async function takeSnapshot(childProcess, tempFolder, cameraId, baseUrl) {
+  const now = new Date();
+  const filePath = path.join(
+    tempFolder,
+    `netatmo-camera-${cameraId.replace(/:/g, '-')}-${now.getTime()}-${Math.round(Math.random() * 10000)}.jpg`,
+  );
+  const args = ['-i', `${baseUrl}${SNAPSHOT_PATH}`, '-f', 'image2', '-vframes', '1', '-qscale:v', '15', filePath];
+  return new Promise((resolve, reject) => {
+    childProcess.execFile(
+      'ffmpeg',
+      args,
+      {
+        timeout: 20 * 1000, // 20 second max
+      },
+      async (error) => {
+        if (error) {
+          await fse.remove(filePath);
+          return reject(error);
+        }
+        let image;
+        try {
+          image = await fse.readFile(filePath);
+        } catch (e) {
+          await fse.remove(filePath);
+          return reject(e);
+        }
+        const cameraImageBase = Buffer.from(image).toString('base64');
+        resolve(`image/jpg;base64,${cameraImageBase}`);
+        await fse.remove(filePath);
+        return null;
+      },
+    );
+  });
 }
 
 /**
@@ -72,11 +104,9 @@ async function getCameraImage(deviceNetatmo) {
   if (!baseUrl) {
     return undefined;
   }
+  const { tempFolder } = this.gladys.config;
   try {
-    const image = await fetchSnapshot(baseUrl);
-    if (image) {
-      return image;
-    }
+    return await takeSnapshot(this.childProcess, tempFolder, id, baseUrl);
   } catch (e) {
     logger.debug(`Netatmo camera ${id}: snapshot failed on ${baseUrl}: `, e.message);
   }
@@ -86,7 +116,7 @@ async function getCameraImage(deviceNetatmo) {
   // the cached local URL is stale: forget it and fall back to the VPN URL
   delete this.cameraBaseUrls[id];
   try {
-    return await fetchSnapshot(vpnUrl);
+    return await takeSnapshot(this.childProcess, tempFolder, id, vpnUrl);
   } catch (e) {
     logger.debug(`Netatmo camera ${id}: snapshot failed on VPN URL: `, e.message);
     return undefined;

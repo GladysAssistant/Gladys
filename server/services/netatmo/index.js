@@ -1,3 +1,6 @@
+const childProcess = require('child_process');
+const fse = require('fs-extra');
+
 const logger = require('../../utils/logger');
 const netatmoController = require('./api/netatmo.controller');
 
@@ -5,7 +8,7 @@ const NetatmoHandler = require('./lib');
 const { STATUS } = require('./lib/utils/netatmo.constants');
 
 module.exports = function NetatmoService(gladys, serviceId) {
-  const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+  const netatmoHandler = new NetatmoHandler(gladys, serviceId, childProcess);
 
   /**
    * @public
@@ -15,6 +18,8 @@ module.exports = function NetatmoService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Netatmo service', serviceId);
+    // make sure the tempFolder exists (camera snapshots are written there)
+    await fse.ensureDir(gladys.config.tempFolder);
     await netatmoHandler.init();
   }
 
