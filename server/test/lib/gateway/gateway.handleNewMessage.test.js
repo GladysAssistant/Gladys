@@ -266,6 +266,49 @@ describe('gateway.handleNewMessage', () => {
     });
   });
 
+  it('should handle a new gateway open api message: netatmo-webhook', async () => {
+    gateway.usersKeys = [
+      {
+        rsa_public_key: 'fingerprint',
+        ecdsa_public_key: 'fingerprint',
+        accepted: true,
+      },
+    ];
+
+    const callback = fake.returns(true);
+
+    await gateway.handleNewMessage(
+      {
+        type: 'gladys-open-api',
+        action: 'netatmo-webhook',
+        data: {
+          user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          netatmo_data: {
+            event_type: 'set_point',
+            home_id: '5abc',
+          },
+        },
+      },
+      {
+        rsaPublicKeyRaw: 'key',
+        ecdsaPublicKeyRaw: 'key',
+        local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
+      callback,
+    );
+
+    assert.calledOnceWithExactly(event.emit, EVENTS.GATEWAY.NEW_MESSAGE_NETATMO_WEBHOOK, {
+      user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      netatmo_data: {
+        event_type: 'set_point',
+        home_id: '5abc',
+      },
+    });
+    assert.calledOnceWithExactly(callback, {
+      status: 200,
+    });
+  });
+
   describe('testing GoogleHome', () => {
     const googleHomeTest = ({ intent, expectedResult }) => async () => {
       serviceManager.getService = fake.returns({

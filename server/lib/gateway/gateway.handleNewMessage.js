@@ -74,6 +74,12 @@ async function handleNewMessage(data, rawMessage, cb) {
     cb({ status: 200 });
   }
 
+  // if the message is an open API Netatmo webhook message
+  if (data.type === 'gladys-open-api' && data.action === 'netatmo-webhook') {
+    this.event.emit(EVENTS.GATEWAY.NEW_MESSAGE_NETATMO_WEBHOOK, data.data);
+    cb({ status: 200 });
+  }
+
   // if the message is an open API create device state message
   if (data.type === 'gladys-open-api' && data.action === 'create-device-state') {
     this.event.emit(EVENTS.DEVICE.NEW_STATE, data.data);
