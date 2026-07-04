@@ -105,20 +105,27 @@ describe('Netatmo Discover devices', () => {
         buildNetatmoDevice('22:22', 'Cam unchanged'),
         buildNetatmoDevice('33:33', 'Cam outdated'),
       ]);
-    const buildExistingDevice = (id, featureSuffixes) => ({
-      id: `uuid-${id}`,
-      external_id: `netatmo:${id}`,
-      name: `Renamed ${id}`,
-      room_id: 'room-1',
-      created_at: '2026-01-01T00:00:00.000Z',
-      features: featureSuffixes.map((suffix) => ({ id: `feature-${suffix}`, external_id: `netatmo:${id}:${suffix}` })),
-      params: [
-        { name: 'modules_bridge_id', value: '[]' },
-        { name: 'home_id', value: 'h1' },
-      ],
-    });
-    const existingUnchanged = buildExistingDevice('22:22', ['wifi_strength', 'monitoring']);
-    const existingOutdated = buildExistingDevice('33:33', ['wifi_strength']);
+    // build the existing devices from the real conversion so the test stays valid
+    // when new camera features are added in later PRs
+    const buildExistingDevice = (id, name, featureFilter = () => true) => {
+      const converted = netatmoHandler.convertDeviceSecurity(buildNetatmoDevice(id, name));
+      return {
+        ...converted,
+        id: `uuid-${id}`,
+        name: `Renamed ${id}`,
+        room_id: 'room-1',
+        created_at: '2026-01-01T00:00:00.000Z',
+        features: converted.features
+          .filter(featureFilter)
+          .map((feature) => ({ ...feature, id: `feature-${feature.external_id}` })),
+      };
+    };
+    const existingUnchanged = buildExistingDevice('22:22', 'Cam unchanged');
+    const existingOutdated = buildExistingDevice(
+      '33:33',
+      'Cam outdated',
+      (feature) => feature.external_id === 'netatmo:33:33:wifi_strength',
+    );
     netatmoHandler.gladys.stateManager.get = sinon.stub().callsFake((type, externalId) => {
       if (externalId === existingUnchanged.external_id) {
         return existingUnchanged;
