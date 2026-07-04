@@ -121,6 +121,86 @@ describe('MeteoFranceService', () => {
     const image = await meteoFranceService.vigilance.getMap();
     expect(image).to.equal(null);
   });
+  it('should get vigilance state for a house, caching the department', async () => {
+    let forecastCalls = 0;
+    const countingAxios = {
+      axios: {
+        default: {
+          get: (url) => {
+            if (url.includes('/forecast')) {
+              forecastCalls += 1;
+              return Promise.resolve({ data: forecastData });
+            }
+            return Promise.resolve({ data: warningDataOrange });
+          },
+        },
+      },
+    };
+    const MeteoFranceService = proxyquire('../../../services/meteofrance/index', countingAxios);
+    const meteoFranceService = MeteoFranceService(gladysWithoutApiKey, SERVICE_ID);
+    const house = { selector: 'main-house', latitude: 46.75, longitude: 4.35 };
+    const vigilance = await meteoFranceService.vigilance.getForHouse(house);
+    expect(vigilance.dept).to.equal('71');
+    expect(vigilance.color).to.equal(3);
+    expect(vigilance.text).to.equal('Orages violents attendus en soirée.');
+    expect(vigilance.alerts).to.have.lengthOf(2);
+    // Second call should reuse the cached department (no new forecast call)
+    await meteoFranceService.vigilance.getForHouse(house);
+    expect(forecastCalls).to.equal(1);
+  });
+  it('should reject getForHouse when no department is found', async () => {
+    const noDeptAxios = {
+      axios: {
+        default: {
+          get: () => Promise.resolve({ data: { position: {} } }),
+        },
+      },
+    };
+    const MeteoFranceService = proxyquire('../../../services/meteofrance/index', noDeptAxios);
+    const meteoFranceService = MeteoFranceService(gladysWithoutApiKey, SERVICE_ID);
+    const promise = meteoFranceService.vigilance.getForHouse({ selector: 'main-house', latitude: 1, longitude: 1 });
+    return assert.isRejected(promise, 'no department found');
+  });
+  it('should skip houses without coordinates and survive API failures during check', async () => {
+    const eventEmit = fake.returns(null);
+    const gladysMixedHouses = {
+      variable: {
+        getValue: () => Promise.resolve(null),
+      },
+      house: {
+        get: () =>
+          Promise.resolve([
+            { selector: 'no-gps-house', latitude: null, longitude: null },
+            { selector: 'main-house', latitude: 46.75, longitude: 4.35 },
+          ]),
+      },
+      event: {
+        emit: eventEmit,
+      },
+    };
+    const MeteoFranceService = proxyquire('../../../services/meteofrance/index', brokenAxios);
+    const meteoFranceService = MeteoFranceService(gladysMixedHouses, SERVICE_ID);
+    // Should not throw even if the API is broken
+    await meteoFranceService.vigilance.check();
+    expect(eventEmit.callCount).to.equal(0);
+  });
+  it('should start without crashing when the houses cannot be fetched', async () => {
+    const gladysBrokenHouse = {
+      variable: {
+        getValue: () => Promise.resolve(null),
+      },
+      house: {
+        get: () => Promise.reject(new Error('DB error')),
+      },
+      event: {
+        emit: () => null,
+      },
+    };
+    const MeteoFranceService = proxyquire('../../../services/meteofrance/index', workingAxios);
+    const meteoFranceService = MeteoFranceService(gladysBrokenHouse, SERVICE_ID);
+    await meteoFranceService.start();
+    await meteoFranceService.stop();
+  });
   it('should build a forecast summary for a house', async () => {
     const MeteoFranceService = proxyquire('../../../services/meteofrance/index', workingAxios);
     const meteoFranceService = MeteoFranceService(gladysWithoutApiKey, SERVICE_ID);
