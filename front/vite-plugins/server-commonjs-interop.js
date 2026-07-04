@@ -2,7 +2,10 @@ import { readFileSync } from 'fs';
 import { build } from 'esbuild';
 import { resolve } from 'path';
 
-const SERVER_ROOT = resolve(import.meta.dirname, '../../server');
+const FRONT_ROOT = resolve(import.meta.dirname, '..');
+const SERVER_ROOT = resolve(FRONT_ROOT, '../server');
+const REPO_ROOT = resolve(FRONT_ROOT, '..');
+const NODE_MODULE_PATHS = [resolve(FRONT_ROOT, 'node_modules'), resolve(SERVER_ROOT, 'node_modules')];
 
 function normalizeId(id) {
   return id.split('?')[0];
@@ -98,7 +101,9 @@ export function serverCommonjsInterop() {
         write: false,
         bundle: true,
         format: 'esm',
-        platform: 'neutral',
+        platform: 'node',
+        absWorkingDir: REPO_ROOT,
+        nodePaths: NODE_MODULE_PATHS,
         logLevel: 'silent'
       });
 
