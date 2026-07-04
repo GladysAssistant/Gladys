@@ -6,9 +6,19 @@ const METEOFRANCE_WEBSERVICE_URL = 'https://webservice.meteofrance.com';
 const METEOFRANCE_PUBLIC_TOKEN = '__Wj7dVSTjV9YGu1guveLyDq0g7S7TfTjaHBTPTpO0kj8__';
 const MAP_CACHE_TTL_MS = 15 * 60 * 1000;
 
+/**
+ * @description Météo France service, based on the Météo France mobile webservice.
+ * @param {any} gladys - Gladys instance.
+ * @param {string} serviceId - UUID of the service in DB.
+ * @returns {object} MeteoFranceService object.
+ * @example
+ * MeteoFranceService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+ */
 module.exports = function MeteoFranceService(gladys, serviceId) {
   const { default: axios } = require('axios');
-  let meteoFranceApiKey;
+  /** @type {string|null} */
+  let meteoFranceApiKey = null;
+  /** @type {{ image: string|null, timestamp: number }} */
   let mapCache = { image: null, timestamp: 0 };
 
   /**
@@ -74,6 +84,7 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
       timeout: 10000,
     });
     const contentType = response.headers['content-type'] || 'image/png';
+    // @ts-ignore: Buffer is a Node.js global, @types/node is not installed in this project
     const image = `data:${contentType};base64,${Buffer.from(response.data).toString('base64')}`;
     mapCache = { image, timestamp: Date.now() };
     return image;
@@ -102,7 +113,8 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
       const { data } = await axios.get(`${METEOFRANCE_WEBSERVICE_URL}/forecast`, options);
       return data;
     } catch (e) {
-      logger.info(`[MeteoFrance] getForecast retrying after error: ${e.message}`);
+      const message = e instanceof Error ? e.message : `${e}`;
+      logger.info(`[MeteoFrance] getForecast retrying after error: ${message}`);
       const { data } = await axios.get(`${METEOFRANCE_WEBSERVICE_URL}/forecast`, options);
       return data;
     }

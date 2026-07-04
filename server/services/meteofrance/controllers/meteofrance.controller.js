@@ -2,6 +2,7 @@ const logger = require('../../../utils/logger');
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
 // Official Météo France vigilance phenomenon ids (the warning API only returns ids)
+/** @type {Record<string, string>} */
 const PHENOMENON_NAMES = {
   1: 'Vent violent',
   2: 'Pluie-inondation',
@@ -16,11 +17,12 @@ const PHENOMENON_NAMES = {
 
 /**
  * @description Parse warning raw data and return filtered alerts array.
- * @param {object} warningData - Raw warning/full API response.
+ * @param {any} warningData - Raw warning/full API response.
  * @param {string} dept - French department number.
- * @returns {Array} Filtered alert objects.
+ * @returns {Array<object>} Filtered alert objects.
  */
 function parseAlerts(warningData, dept) {
+  /** @type {Array<{ phenomenon_id: string, phenomenon_max_color_id: number }>} */
   const items = (warningData && warningData.phenomenons_items) || [];
   return items
     .filter((p) => p.phenomenon_max_color_id >= 2)
@@ -34,12 +36,14 @@ function parseAlerts(warningData, dept) {
 
 /**
  * @description Extract the vigilance bulletin text from warning data.
- * @param {object} warningData - Raw warning/full API response.
+ * @param {any} warningData - Raw warning/full API response.
  * @returns {string} Bulletin text (empty string when not found).
  */
 function parseVigilanceText(warningData) {
+  /** @type {string[]} */
   const texts = [];
   // The bulletin structure varies: walk it and collect textual leaves under "text" keys
+  /** @type {(node: any) => void} */
   const walk = (node) => {
     if (!node) {
       return;
@@ -70,7 +74,7 @@ function parseVigilanceText(warningData) {
 
 /**
  * @description MeteoFrance service controllers.
- * @param {object} gladys - Gladys instance.
+ * @param {any} gladys - Gladys instance.
  * @param {Function} getVigilance - Vigilance fetch function.
  * @param {Function} getForecast - Forecast fetch function.
  * @param {Function} getVigilanceMap - Vigilance map fetch function (optional API key).
@@ -79,6 +83,8 @@ function parseVigilanceText(warningData) {
 module.exports = function MeteoFranceController(gladys, getVigilance, getForecast, getVigilanceMap) {
   /**
    * @api {get} /api/v1/service/meteofrance/vigilance Get vigilance alerts
+   * @param {any} req - Express request.
+   * @param {any} res - Express response.
    */
   async function getVigilanceController(req, res) {
     const { dept } = req.query;
@@ -92,6 +98,8 @@ module.exports = function MeteoFranceController(gladys, getVigilance, getForecas
 
   /**
    * @api {get} /api/v1/service/meteofrance/vigilance/map Get national vigilance map image
+   * @param {any} req - Express request.
+   * @param {any} res - Express response.
    */
   async function getVigilanceMapController(req, res) {
     const image = await getVigilanceMap();
@@ -104,6 +112,8 @@ module.exports = function MeteoFranceController(gladys, getVigilance, getForecas
 
   /**
    * @api {get} /api/v1/house/:house_selector/meteofrance/weather Get Météo France weather for a house
+   * @param {any} req - Express request.
+   * @param {any} res - Express response.
    */
   async function getHouseWeatherController(req, res) {
     const houseSelector = req.params.house_selector;
@@ -119,13 +129,15 @@ module.exports = function MeteoFranceController(gladys, getVigilance, getForecas
     try {
       forecastData = await getForecast(house.latitude, house.longitude);
     } catch (e) {
-      logger.warn(`[MeteoFrance] getForecast failed for (${house.latitude},${house.longitude}): ${e.message}`);
-      res.status(502).json({ message: 'FORECAST_API_ERROR', detail: e.message });
+      const detail = e instanceof Error ? e.message : `${e}`;
+      logger.warn(`[MeteoFrance] getForecast failed for (${house.latitude},${house.longitude}): ${detail}`);
+      res.status(502).json({ message: 'FORECAST_API_ERROR', detail });
       return;
     }
 
     // The department is derived from the house coordinates through the forecast response
     const dept = (forecastData.position && forecastData.position.dept) || null;
+    /** @type {Array<object>} */
     let alerts = [];
     let text = '';
     if (vigilanceRequested && dept) {
@@ -137,7 +149,8 @@ module.exports = function MeteoFranceController(gladys, getVigilance, getForecas
         }
         logger.info(`[MeteoFrance] vigilance alerts parsed: ${alerts.length} for dept=${dept}`);
       } catch (e) {
-        logger.warn(`[MeteoFrance] vigilance fetch failed for dept=${dept}: ${e.message}`);
+        const detail = e instanceof Error ? e.message : `${e}`;
+        logger.warn(`[MeteoFrance] vigilance fetch failed for dept=${dept}: ${detail}`);
       }
     }
 
