@@ -86,6 +86,17 @@ describe('Netatmo pollRefreshingValues', () => {
     sinon.assert.called(netatmoHandler.updateValues);
   });
 
+  it('should skip the refresh when one is already running', async () => {
+    netatmoHandler.status = 'connected';
+    netatmoHandler.loadDevices = sinon.stub().resolves(devicesMock);
+    netatmoHandler.refreshingValues = true;
+
+    await netatmoHandler.refreshNetatmoValues();
+
+    sinon.assert.notCalled(netatmoHandler.loadDevices);
+    netatmoHandler.refreshingValues = false;
+  });
+
   it('should refresh device values without device existing in Gladys', async () => {
     netatmoHandler.status = 'connected';
     netatmoHandler.loadDevices = sinon.stub().resolves(devicesMock);
