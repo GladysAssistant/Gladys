@@ -146,6 +146,7 @@ class DiscoverTab extends Component {
                     <NetatmoDeviceBox
                       editable={!device.created_at || device.updatable}
                       alreadyCreatedButton={device.created_at && !device.updatable}
+                      alreadyCreatedAfterSave
                       updateButton={device.updatable}
                       saveButton={!device.created_at}
                       device={device}

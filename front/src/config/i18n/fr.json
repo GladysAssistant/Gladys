@@ -961,6 +961,14 @@
         "roomLabel": "Pièce",
         "connectedPlugLabel": "Connecté au pont",
         "roomNetatmoApiLabel": "Pièce dans l'API Netatmo",
+        "cameraQualityLabel": "Qualité du flux live",
+        "cameraQualityNote": "Appliquée au flux live du tableau de bord à la prochaine récupération des états (~2 minutes). Baissez la qualité si le flux est lent ou se recharge en boucle.",
+        "cameraQuality": {
+          "poor": "Minimale",
+          "low": "Basse",
+          "medium": "Moyenne",
+          "high": "Haute"
+        },
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
         "saveNotAllowButton": "Sauvegarde impossible",

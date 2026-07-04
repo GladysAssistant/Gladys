@@ -828,6 +828,14 @@
         "roomLabel": "Raum",
         "connectedPlugLabel": "Mit der Brücke verbunden",
         "roomNetatmoApiLabel": "Raum in der Netatmo-API",
+        "cameraQualityLabel": "Qualität des Live-Streams",
+        "cameraQualityNote": "Wird beim nächsten Statusabruf (~2 Minuten) auf den Live-Stream des Dashboards angewendet. Verringern Sie die Qualität, wenn der Live-Stream langsam ist oder ständig puffert.",
+        "cameraQuality": {
+          "poor": "Minimal",
+          "low": "Niedrig",
+          "medium": "Mittel",
+          "high": "Hoch"
+        },
         "featuresLabel": "Funktionen",
         "saveButton": "Speichern",
         "saveNotAllowButton": "Speichern nicht möglich",

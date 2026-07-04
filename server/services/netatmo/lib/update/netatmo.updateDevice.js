@@ -36,6 +36,9 @@ async function updateDevice(deviceGladys, deviceNetatmo, externalId) {
   });
   if (CAMERA_MODULE_TYPES.includes(deviceNetatmo.type) && deviceNetatmo.reachable !== false) {
     await this.updateCameraImage(deviceGladys, deviceNetatmo, externalId);
+    // after the image refresh, so a local URL invalidated during the snapshot is
+    // re-resolved within the same poll cycle
+    await this.updateCameraLiveUrl(deviceGladys, deviceNetatmo);
   }
 }
 

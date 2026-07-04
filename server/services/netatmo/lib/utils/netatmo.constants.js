@@ -109,7 +109,14 @@ const PARAMS = {
   PLUG_ID: 'plug_id',
   PLUG_NAME: 'plug_name',
   MODULES_BRIDGE_ID: 'modules_bridge_id',
+  // read by the rtsp-camera service to start the live stream, the name must stay uppercase
+  CAMERA_URL: 'CAMERA_URL',
+  CAMERA_QUALITY: 'camera_quality',
 };
+
+// quality variants of the live stream manifest, from the lightest to the heaviest
+const CAMERA_LIVE_QUALITIES = ['poor', 'low', 'medium', 'high'];
+const DEFAULT_CAMERA_LIVE_QUALITY = 'high';
 
 module.exports = {
   GLADYS_VARIABLES,
@@ -120,6 +127,8 @@ module.exports = {
   SUPPORTED_CATEGORY_TYPE,
   SUPPORTED_MODULE_TYPE,
   PARAMS,
+  CAMERA_LIVE_QUALITIES,
+  DEFAULT_CAMERA_LIVE_QUALITY,
   RECONNECT_BACKOFF_MS,
   RECONNECT_RECURRENT_MS,
   FATAL_RETRY_WINDOW_MS,

@@ -34,6 +34,7 @@ const { setValue } = require('./netatmo.setValue');
 const { updateValues } = require('./netatmo.updateValues');
 const { updateDevice } = require('./update/netatmo.updateDevice');
 const { updateCameraImage } = require('./update/netatmo.updateCameraImage');
+const { updateCameraLiveUrl } = require('./update/netatmo.updateCameraLiveUrl');
 const { getCameraBaseUrl, getCameraImage } = require('./netatmo.getCameraImage');
 
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
@@ -100,6 +101,7 @@ NetatmoHandler.prototype.setValue = setValue;
 NetatmoHandler.prototype.updateValues = updateValues;
 NetatmoHandler.prototype.updateDevice = updateDevice;
 NetatmoHandler.prototype.updateCameraImage = updateCameraImage;
+NetatmoHandler.prototype.updateCameraLiveUrl = updateCameraLiveUrl;
 NetatmoHandler.prototype.getCameraBaseUrl = getCameraBaseUrl;
 NetatmoHandler.prototype.getCameraImage = getCameraImage;
 

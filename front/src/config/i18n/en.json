@@ -723,6 +723,14 @@
         "roomLabel": "Room",
         "connectedPlugLabel": "Connected to bridge",
         "roomNetatmoApiLabel": "Room in Netatmo API",
+        "cameraQualityLabel": "Live stream quality",
+        "cameraQualityNote": "Applied to the dashboard live stream at the next state retrieval (~2 minutes). Lower the quality if the live stream is slow or keeps buffering.",
+        "cameraQuality": {
+          "poor": "Poor",
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        },
         "featuresLabel": "Features",
         "saveButton": "Save",
         "saveNotAllowButton": "Save not possible",

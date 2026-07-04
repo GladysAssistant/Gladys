@@ -8,10 +8,15 @@ import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import BatteryLevelFeature from '../../../../components/device/view/BatteryLevelFeature';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 import {
+  CAMERA_LIVE_QUALITIES,
+  DEFAULT_CAMERA_LIVE_QUALITY,
   GITHUB_BASE_URL,
   PARAMS,
-  SUPPORTED_CATEGORY_TYPE
+  SUPPORTED_CATEGORY_TYPE,
+  SUPPORTED_MODULE_TYPE
 } from '../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
+
+const CAMERA_MODELS = [SUPPORTED_MODULE_TYPE.NACAMERA, SUPPORTED_MODULE_TYPE.NOC];
 import styles from './style.css';
 
 const createGithubUrl = device => {
@@ -48,6 +53,21 @@ class NetatmoDeviceBox extends Component {
       device: {
         ...this.state.device,
         room_id: e.target.value
+      }
+    });
+  };
+
+  updateCameraQuality = e => {
+    const params = (this.state.device.params || []).map(param =>
+      param.name === PARAMS.CAMERA_QUALITY ? { ...param, value: e.target.value } : param
+    );
+    if (!params.some(param => param.name === PARAMS.CAMERA_QUALITY)) {
+      params.push({ name: PARAMS.CAMERA_QUALITY, value: e.target.value });
+    }
+    this.setState({
+      device: {
+        ...this.state.device,
+        params
       }
     });
   };
@@ -180,6 +200,7 @@ class NetatmoDeviceBox extends Component {
       saveButton,
       updateButton,
       alreadyCreatedButton,
+      alreadyCreatedAfterSave,
       showMostRecentValueAt,
       housesWithRooms
     },
@@ -197,7 +218,9 @@ class NetatmoDeviceBox extends Component {
       apiErrorCode
     } = this.getDeviceProperty();
     const sidDevice = device.external_id.replace('netatmo:', '') || (device.deviceNetatmo && device.deviceNetatmo.id);
-    const saveButtonCondition = saveButton && !this.state.isSaving;
+    // on the discover tab, a saved device becomes "already created"; on the devices tab it stays saveable
+    const savedFromDiscovery = alreadyCreatedAfterSave && this.state.isSaving;
+    const saveButtonCondition = saveButton && !savedFromDiscovery;
     const modelImage = `/assets/integrations/devices/netatmo/netatmo-${device.model}.jpg`;
     return (
       <div class="col-md-6">
@@ -351,6 +374,36 @@ class NetatmoDeviceBox extends Component {
                   </div>
                 )}
 
+                {validModel && CAMERA_MODELS.includes(device.model) && (
+                  <div class="form-group">
+                    <label class="form-label" for={`cameraQuality_${deviceIndex}`}>
+                      <Text id="integration.netatmo.device.cameraQualityLabel" />
+                    </label>
+                    <select
+                      id={`cameraQuality_${deviceIndex}`}
+                      onChange={this.updateCameraQuality}
+                      class="form-control"
+                      disabled={!editable || !validModel}
+                    >
+                      {CAMERA_LIVE_QUALITIES.map(quality => (
+                        <option
+                          selected={
+                            quality ===
+                            ((device.params.find(param => param.name === PARAMS.CAMERA_QUALITY) || {}).value ||
+                              DEFAULT_CAMERA_LIVE_QUALITY)
+                          }
+                          value={quality}
+                        >
+                          <Text id={`integration.netatmo.device.cameraQuality.${quality}`} />
+                        </option>
+                      ))}
+                    </select>
+                    <small class="form-text text-muted">
+                      <Text id="integration.netatmo.device.cameraQualityNote" />
+                    </small>
+                  </div>
+                )}
+
                 {validModel && (
                   <div class="form-group">
                     <label class="form-label">
@@ -361,13 +414,13 @@ class NetatmoDeviceBox extends Component {
                 )}
 
                 <div class="form-group">
-                  {validModel && (alreadyCreatedButton || this.state.isSaving) && (
+                  {validModel && (alreadyCreatedButton || savedFromDiscovery) && (
                     <button class="btn btn-primary mr-2" disabled="true">
                       <Text id="integration.netatmo.discover.alreadyCreatedButton" />
                     </button>
                   )}
 
-                  {validModel && updateButton && !this.state.isSaving && (
+                  {validModel && updateButton && !savedFromDiscovery && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.netatmo.discover.updateButton" />
                     </button>

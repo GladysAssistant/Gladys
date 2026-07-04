@@ -176,6 +176,30 @@ describe('Netatmo update Security features', () => {
     sinon.assert.notCalled(netatmoHandler.gladys.device.camera.setImage);
   });
 
+  it('should refresh the camera live URL after the camera image', async () => {
+    deviceGladysMock.features.push({
+      external_id: `${externalIdMock}:camera`,
+      category: 'camera',
+      type: 'image',
+    });
+    netatmoHandler.getCameraImage = fake.resolves('image/jpg;base64,fake-image');
+    netatmoHandler.updateCameraLiveUrl = fake.resolves(null);
+
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.calledWith(netatmoHandler.updateCameraLiveUrl, deviceGladysMock, deviceNetatmoMock);
+    sinon.assert.callOrder(netatmoHandler.getCameraImage, netatmoHandler.updateCameraLiveUrl);
+  });
+
+  it('should not refresh the camera live URL when the camera is unreachable', async () => {
+    deviceNetatmoMock.reachable = false;
+    netatmoHandler.updateCameraLiveUrl = fake.resolves(null);
+
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.notCalled(netatmoHandler.updateCameraLiveUrl);
+  });
+
   it('should log and continue when setting the camera image fails', async () => {
     deviceGladysMock.features.push({
       external_id: `${externalIdMock}:camera`,
