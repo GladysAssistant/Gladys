@@ -165,6 +165,33 @@ describe('Netatmo retrieveTokens', () => {
     sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
   });
 
+  it('should stay connected when the initial values refresh fails', async () => {
+    const tokens = {
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
+      expire_in: 3600,
+    };
+    netatmoHandler.configuration.energyApi = true;
+    netatmoHandler.refreshNetatmoValues = fake.rejects(new Error('refresh failed'));
+
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(200, tokens);
+
+    const result = await netatmoHandler.retrieveTokens(body);
+
+    expect(result).to.deep.equal({ success: true });
+    expect(netatmoHandler.status).to.equal('connected');
+    sinon.assert.calledOnce(netatmoHandler.pollRefreshingValues);
+    sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
+
+    netatmoHandler.refreshNetatmoValues = fake.resolves(null);
+  });
+
   it('should throw an error when axios request fails', async () => {
     const bodyFake = { codeOAuth: 'test-code', state: 'valid-state', redirectUri: 'test-redirect-uri' };
     netatmoHandler.configuration.clientId = 'test-client-id';
