@@ -155,14 +155,15 @@ class WeatherMeteoFranceBoxComponent extends Component {
     // The Météo France API only returns metric values: convert to the user preferred units
     const isFahrenheit = get(props, 'user.temperature_unit_preference') === 'fahrenheit';
     const isUS = get(props, 'user.distance_unit_preference') === 'us';
-    const convertTemp = celsius => (isFahrenheit ? Math.round((celsius * 9) / 5 + 32) : celsius);
+    // Values stay unrounded until here: convertTemp is the single rounding point
+    const convertTemp = celsius => (isFahrenheit ? Math.round((celsius * 9) / 5 + 32) : Math.round(celsius));
     const formatRain = mm => (isUS ? `${Math.round((mm / 25.4) * 100) / 100} in` : `${mm} mm`);
     const tempUnit = isFahrenheit ? '°F' : '°C';
     const windUnit = isUS ? 'mph' : 'km/h';
     const timeFormat = isUS ? 'h:mm A' : 'HH:mm';
 
     const { current, currentIcon, hourly, daily, sun, uv, rainChance, position, vigilance } = boxData;
-    const temp = current.T && current.T.value != null ? convertTemp(Math.round(current.T.value)) : '--';
+    const temp = current.T && current.T.value != null ? convertTemp(current.T.value) : '--';
     // In hourly forecast entries, humidity is a raw number (not an object)
     const humidity = typeof current.humidity === 'number' ? Math.round(current.humidity) : null;
     // The Météo France forecast API returns wind speed in m/s

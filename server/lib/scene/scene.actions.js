@@ -585,7 +585,7 @@ const actionsFunc = {
       throw new AbortScene('SERVICE_METEOFRANCE_NOT_FOUND');
     }
     const house = await self.house.getBySelector(action.house);
-    if (!house || !house.latitude || !house.longitude) {
+    if (!house || house.latitude == null || house.longitude == null) {
       throw new AbortScene('HOUSE_HAS_NO_COORDINATES');
     }
     const vigilance = await meteoFranceService.vigilance.getForHouse(house);
@@ -609,7 +609,7 @@ const actionsFunc = {
       throw new AbortScene('SERVICE_METEOFRANCE_NOT_FOUND');
     }
     const house = await self.house.getBySelector(action.house);
-    if (!house || !house.latitude || !house.longitude) {
+    if (!house || house.latitude == null || house.longitude == null) {
       throw new AbortScene('HOUSE_HAS_NO_COORDINATES');
     }
     const forecastSummary = await meteoFranceService.forecast.getSummaryForHouse(house, action.days || 1);

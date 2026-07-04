@@ -155,7 +155,7 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
     const houses = await gladys.house.get();
     await Promise.all(
       houses
-        .filter((house) => house.latitude && house.longitude)
+        .filter((house) => house.latitude != null && house.longitude != null)
         .map(async (house) => {
           try {
             let dept = deptByHouse[house.selector];

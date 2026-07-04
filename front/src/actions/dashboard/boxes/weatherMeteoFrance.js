@@ -56,9 +56,13 @@ function createActions(store) {
         const current = upcoming.find(h => h.T && h.T.value != null) || upcoming[0] || rawForecast[0];
         const currentIcon = getMFIcon(current && current.weather ? current.weather.icon : null);
 
+        // Anchor the hourly strip on the same entry as the current conditions,
+        // so the emphasized first column matches the displayed current weather
+        const hourlySource = upcoming.slice(Math.max(0, upcoming.indexOf(current)));
+
         // Cover the next 24 hours in 8 columns (one entry every 3 hours)
-        const hourly = upcoming
-          .filter(h => upcoming.length > 0 && h.dt <= upcoming[0].dt + 24 * 3600)
+        const hourly = hourlySource
+          .filter(h => h.dt <= hourlySource[0].dt + 24 * 3600)
           .filter((h, index) => index % 3 === 0)
           .slice(0, 8)
           .map(h => {
@@ -71,7 +75,7 @@ function createActions(store) {
             }
             return {
               time: dayjs.unix(h.dt).format('HH'),
-              temp: h.T && h.T.value != null ? Math.round(h.T.value) : null,
+              temp: h.T && h.T.value != null ? h.T.value : null,
               icon: getMFIcon(h.weather ? h.weather.icon : null),
               desc: h.weather ? h.weather.desc : '',
               rain: rain !== null ? Math.round(rain * 10) / 10 : null
@@ -94,8 +98,8 @@ function createActions(store) {
           }
           return {
             dt: d.dt,
-            min: d.T && d.T.min != null ? Math.round(d.T.min) : null,
-            max: d.T && d.T.max != null ? Math.round(d.T.max) : null,
+            min: d.T && d.T.min != null ? d.T.min : null,
+            max: d.T && d.T.max != null ? d.T.max : null,
             icon: getMFIcon(weather ? weather.icon : null),
             desc: weather ? weather.desc : '',
             rain:
@@ -108,11 +112,15 @@ function createActions(store) {
         const sun = today && today.sun && today.sun.rise ? { rise: today.sun.rise, set: today.sun.set } : null;
         const uv = today && today.uv != null ? today.uv : null;
 
-        // Rain probability for the current 3h slot
+        // Rain probability for the current slot (3h entries, or 6h when only that window exists)
         const probabilities = data.forecast.probability_forecast || [];
-        const currentProba = probabilities.find(
-          p => p.dt + 3 * 3600 > nowTs && p.rain && (p.rain['3h'] != null || p.rain['6h'] != null)
-        );
+        const currentProba = probabilities.find(p => {
+          if (!p.rain || (p.rain['3h'] == null && p.rain['6h'] == null)) {
+            return false;
+          }
+          const slotDuration = p.rain['3h'] != null ? 3 * 3600 : 6 * 3600;
+          return p.dt + slotDuration > nowTs;
+        });
         let rainChance = null;
         if (currentProba) {
           rainChance = currentProba.rain['3h'] != null ? currentProba.rain['3h'] : currentProba.rain['6h'];

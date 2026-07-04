@@ -101,7 +101,9 @@ class EditWeatherMeteoFranceBoxComponent extends Component {
   };
 
   updateBoxModes = e => {
-    const modes = this.props.box.modes || {};
+    // Clone the modes object: mutating it in place would prevent
+    // componentDidUpdate from detecting the change in the widget
+    const modes = { ...(this.props.box.modes || {}) };
     modes[e.target.name] = e.target.checked;
     this.props.updateBoxConfig(this.props.x, this.props.y, { modes });
   };

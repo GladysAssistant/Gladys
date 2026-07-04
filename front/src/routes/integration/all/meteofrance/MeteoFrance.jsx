@@ -78,6 +78,7 @@ const MeteoFrancePage = ({ children, ...props }) => (
                                   'btn-loading': props.loading
                                 })}
                                 type="submit"
+                                disabled={props.loading}
                               >
                                 <Text id="integration.meteoFrance.saveButton" />
                               </button>

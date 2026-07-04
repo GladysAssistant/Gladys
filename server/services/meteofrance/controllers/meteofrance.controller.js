@@ -50,7 +50,7 @@ module.exports = function MeteoFranceController(gladys, getVigilance, getForecas
     const vigilanceRequested = `${req.query.vigilance}` === 'true';
 
     const house = await gladys.house.getBySelector(houseSelector);
-    if (!house.latitude || !house.longitude) {
+    if (house.latitude == null || house.longitude == null) {
       res.status(400).json({ message: 'HOUSE_HAS_NO_COORDINATES' });
       return;
     }
