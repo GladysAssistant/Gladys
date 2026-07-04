@@ -33,7 +33,7 @@ function buildFeatureMonitoring(name, externalId) {
  */
 function buildFeatureCamera(name, externalId) {
   return {
-    name,
+    name: `Camera - ${name}`,
     selector: `${externalId}:camera`,
     external_id: `${externalId}:camera`,
     category: DEVICE_FEATURE_CATEGORIES.CAMERA,

@@ -139,6 +139,21 @@ describe('Netatmo update Security features', () => {
     );
   });
 
+  it('should not refresh the camera image when the camera is unreachable', async () => {
+    deviceGladysMock.features.push({
+      external_id: `${externalIdMock}:camera`,
+      category: 'camera',
+      type: 'image',
+    });
+    deviceNetatmoMock.reachable = false;
+    netatmoHandler.getCameraImage = fake.resolves('image/jpg;base64,fake-image');
+
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.notCalled(netatmoHandler.getCameraImage);
+    sinon.assert.notCalled(netatmoHandler.gladys.device.camera.setImage);
+  });
+
   it('should not set an image when the camera feature is missing', async () => {
     netatmoHandler.getCameraImage = fake.resolves('image/jpg;base64,fake-image');
 

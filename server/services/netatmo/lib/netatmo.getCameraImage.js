@@ -5,6 +5,7 @@ const logger = require('../../../utils/logger');
 
 const SNAPSHOT_PATH = '/live/snapshot_720.jpg';
 const PING_PATH = '/command/ping';
+const PING_TIMEOUT_MS = 5 * 1000;
 
 /**
  * @description Download a camera snapshot through ffmpeg and return it as a base64 image.
@@ -33,21 +34,22 @@ async function takeSnapshot(childProcess, tempFolder, cameraId, baseUrl) {
         timeout: 20 * 1000, // 20 second max
       },
       async (error) => {
+        // always settle the promise before cleaning up, so a cleanup failure
+        // cannot leave the promise pending
         if (error) {
-          await fse.remove(filePath);
-          return reject(error);
+          reject(error);
+          return fse.remove(filePath);
         }
         let image;
         try {
           image = await fse.readFile(filePath);
         } catch (e) {
-          await fse.remove(filePath);
-          return reject(e);
+          reject(e);
+          return fse.remove(filePath);
         }
         const cameraImageBase = Buffer.from(image).toString('base64');
         resolve(`image/jpg;base64,${cameraImageBase}`);
-        await fse.remove(filePath);
-        return null;
+        return fse.remove(filePath);
       },
     );
   });
@@ -74,13 +76,16 @@ async function getCameraBaseUrl(deviceNetatmo) {
     return cachedUrl;
   }
   try {
-    const vpnPingResponse = await fetch(`${vpnUrl}${PING_PATH}`);
+    const vpnPingResponse = await fetch(`${vpnUrl}${PING_PATH}`, { signal: AbortSignal.timeout(PING_TIMEOUT_MS) });
     const { local_url: localUrl } = await vpnPingResponse.json();
     if (localUrl) {
       // Netatmo recommends validating the local URL by pinging it directly
-      const localPingResponse = await fetch(`${localUrl}${PING_PATH}`);
+      const localPingResponse = await fetch(`${localUrl}${PING_PATH}`, {
+        signal: AbortSignal.timeout(PING_TIMEOUT_MS),
+      });
       const localPingBody = await localPingResponse.json();
       if (localPingBody.local_url === localUrl) {
+        logger.info(`Netatmo camera ${id}: local URL resolved, snapshots will use the local network`);
         this.cameraBaseUrls[id] = localUrl;
         return localUrl;
       }
@@ -88,6 +93,7 @@ async function getCameraBaseUrl(deviceNetatmo) {
   } catch (e) {
     logger.debug(`Netatmo camera ${id}: local URL resolution failed, using VPN URL: `, e.message);
   }
+  logger.info(`Netatmo camera ${id}: snapshots will use the VPN URL`);
   return vpnUrl;
 }
 

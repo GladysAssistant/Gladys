@@ -215,6 +215,35 @@ describe('Netatmo Set Value', () => {
     ).to.equal(true);
   });
 
+  it('should handle a 403 with a non JSON body gracefully', async () => {
+    const deviceFeatureMock = deviceMock.features.filter((feature) =>
+      feature.external_id.includes('therm_setpoint_temperature'),
+    )[0];
+    const newValue = 20;
+
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/api/setroomthermpoint',
+      })
+      .reply(403, 'Forbidden');
+
+    try {
+      await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
+      expect.fail('setValue should have thrown an error');
+    } catch (e) {
+      expect(e.message).to.equal('Netatmo setValue error: HTTP 403');
+    }
+
+    expect(
+      netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.error-connected',
+        payload: { statusType: 'connected', status: 'set_devices_value_error_unknown' },
+      }),
+    ).to.equal(true);
+  });
+
   const cameraDeviceMock = {
     name: 'Camera Hall',
     external_id: 'netatmo:70:ee:50:aa:bb:cc',

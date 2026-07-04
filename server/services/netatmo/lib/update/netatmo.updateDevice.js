@@ -34,7 +34,7 @@ async function updateDevice(deviceGladys, deviceNetatmo, externalId) {
         }
       });
   });
-  if (CAMERA_MODULE_TYPES.includes(deviceNetatmo.type)) {
+  if (CAMERA_MODULE_TYPES.includes(deviceNetatmo.type) && deviceNetatmo.reachable !== false) {
     await this.updateCameraImage(deviceGladys, deviceNetatmo, externalId);
   }
 }

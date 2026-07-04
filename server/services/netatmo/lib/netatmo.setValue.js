@@ -74,7 +74,13 @@ async function setValue(device, deviceFeature, value) {
     const rawBody = await response.text();
     if (!response.ok) {
       logger.error('Netatmo error: ', response.status, rawBody);
-      if (response.status === 403 && JSON.parse(rawBody).error.code === 13) {
+      let errorCode;
+      try {
+        errorCode = JSON.parse(rawBody).error.code;
+      } catch (parseError) {
+        errorCode = undefined;
+      }
+      if (response.status === 403 && errorCode === 13) {
         await this.saveStatus({
           statusType: STATUS.ERROR.SET_DEVICES_VALUES,
           message: 'set_devices_value_fail_scope_rights',
