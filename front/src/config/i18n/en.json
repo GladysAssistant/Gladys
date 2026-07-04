@@ -740,7 +740,7 @@
         "scan": "Scan",
         "refresh": "Refresh",
         "deviceError": {
-          "6": "Device unreachable for the Netatmo API (powered off or out of range). You can still save it, its values will be reported as soon as it is reachable again.",
+          "6": "Device unreachable for the Netatmo API (powered off or out of range). You can still save it, its values will be reported as soon as it is reachable again. (code: 6)",
           "default": "The Netatmo API reports an error for this device (code {{code}})."
         }
       },

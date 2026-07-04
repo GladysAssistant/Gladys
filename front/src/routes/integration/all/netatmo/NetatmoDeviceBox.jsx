@@ -144,6 +144,10 @@ class NetatmoDeviceBox extends Component {
       apiErrorCode = device.deviceNetatmo.apiErrorCode !== undefined ? device.deviceNetatmo.apiErrorCode : null;
     }
     const isDeviceReachable = (device, now = new Date()) => {
+      // the API explicitly flags the module unreachable: it wins over the room heuristics
+      if (device.deviceNetatmo && device.deviceNetatmo.reachable === false) {
+        return false;
+      }
       const isRecent = (date, time) => (now - new Date(date)) / (1000 * 60) <= time;
       const hasRecentFeature = device.features.some(feature => isRecent(feature.last_value_changed, 15));
       const isNetatmoDeviceReachable =
