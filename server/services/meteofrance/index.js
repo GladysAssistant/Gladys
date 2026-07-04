@@ -8,6 +8,7 @@ const METEOFRANCE_API_KEY_VAR = 'METEOFRANCE_API_KEY';
 const METEOFRANCE_WEBSERVICE_URL = 'https://webservice.meteofrance.com';
 const METEOFRANCE_PUBLIC_TOKEN = '__Wj7dVSTjV9YGu1guveLyDq0g7S7TfTjaHBTPTpO0kj8__';
 const MAP_CACHE_TTL_MS = 15 * 60 * 1000;
+const DEPT_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 const VIGILANCE_POLL_INTERVAL_MS = 15 * 60 * 1000;
 
 /**
@@ -24,7 +25,7 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   let meteoFranceApiKey = null;
   /** @type {{ image: string|null, timestamp: number }} */
   let mapCache = { image: null, timestamp: 0 };
-  /** @type {Object<string, string>} */
+  /** @type {Object<string, { dept: string, timestamp: number }>} */
   const deptByHouse = {};
   /** @type {Object<string, number>} */
   const lastColorByHouse = {};
@@ -106,6 +107,27 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   }
 
   /**
+   * @description Resolve the department of a house from its coordinates, with a TTL cache
+   * so coordinate changes are picked up without a service restart.
+   * @param {any} house - House object with latitude/longitude.
+   * @returns {Promise<string|null>} Department number, or null when not found.
+   * @example
+   * const dept = await getDeptForHouse(house);
+   */
+  async function getDeptForHouse(house) {
+    const cached = deptByHouse[house.selector];
+    if (cached && Date.now() - cached.timestamp < DEPT_CACHE_TTL_MS) {
+      return cached.dept;
+    }
+    const forecast = await getForecast(house.latitude, house.longitude);
+    const dept = (forecast && forecast.position && forecast.position.dept) || null;
+    if (dept) {
+      deptByHouse[house.selector] = { dept, timestamp: Date.now() };
+    }
+    return dept;
+  }
+
+  /**
    * @description Get a human readable forecast summary for a house.
    * @param {any} house - House object with latitude/longitude.
    * @param {number} days - Number of days in the summary (1 to 5).
@@ -126,14 +148,9 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
    * const vigilance = await gladys.services.meteofrance.vigilance.getForHouse(house);
    */
   async function getHouseVigilance(house) {
-    let dept = deptByHouse[house.selector];
+    const dept = await getDeptForHouse(house);
     if (!dept) {
-      const forecast = await getForecast(house.latitude, house.longitude);
-      dept = (forecast && forecast.position && forecast.position.dept) || null;
-      if (!dept) {
-        throw new Error('MeteoFrance: no department found for this house');
-      }
-      deptByHouse[house.selector] = dept;
+      throw new Error('MeteoFrance: no department found for this house');
     }
     const warningData = await getVigilance(dept);
     return {
@@ -158,14 +175,9 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
         .filter((house) => house.latitude != null && house.longitude != null)
         .map(async (house) => {
           try {
-            let dept = deptByHouse[house.selector];
+            const dept = await getDeptForHouse(house);
             if (!dept) {
-              const forecast = await getForecast(house.latitude, house.longitude);
-              dept = (forecast && forecast.position && forecast.position.dept) || null;
-              if (!dept) {
-                return;
-              }
-              deptByHouse[house.selector] = dept;
+              return;
             }
             const warningData = await getVigilance(dept);
             const color = (warningData && warningData.color_max) || 1;
