@@ -103,6 +103,14 @@ describe('Netatmo update NATherm1 features', () => {
       });
     });
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:battery_percent`,
+      state: 60,
+    });
+    sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:rf_strength`,
+      state: 60,
+    });
+    sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
       device_feature_external_id: `${deviceGladysMock.external_id}:boiler_status`,
       state: 1,
     });
