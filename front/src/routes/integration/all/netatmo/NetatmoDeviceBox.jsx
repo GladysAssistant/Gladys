@@ -197,8 +197,7 @@ class NetatmoDeviceBox extends Component {
       apiErrorCode
     } = this.getDeviceProperty();
     const sidDevice = device.external_id.replace('netatmo:', '') || (device.deviceNetatmo && device.deviceNetatmo.id);
-    const saveButtonCondition =
-      (saveButton && !alreadyCreatedButton) || (saveButton && !this.state.isSaving && alreadyCreatedButton);
+    const saveButtonCondition = saveButton && !this.state.isSaving;
     const modelImage = `/assets/integrations/devices/netatmo/netatmo-${device.model}.jpg`;
     return (
       <div class="col-md-6">
@@ -362,13 +361,13 @@ class NetatmoDeviceBox extends Component {
                 )}
 
                 <div class="form-group">
-                  {validModel && this.state.isSaving && alreadyCreatedButton && (
+                  {validModel && (alreadyCreatedButton || this.state.isSaving) && (
                     <button class="btn btn-primary mr-2" disabled="true">
                       <Text id="integration.netatmo.discover.alreadyCreatedButton" />
                     </button>
                   )}
 
-                  {validModel && updateButton && (
+                  {validModel && updateButton && !this.state.isSaving && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.netatmo.discover.updateButton" />
                     </button>
