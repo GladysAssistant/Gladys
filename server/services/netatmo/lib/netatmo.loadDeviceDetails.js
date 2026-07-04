@@ -2,6 +2,45 @@ const { fetch } = require('undici');
 const logger = require('../../../utils/logger');
 const { API, SUPPORTED_MODULE_TYPE, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');
 
+const ENERGY_MODULE_TYPES = [SUPPORTED_MODULE_TYPE.THERMOSTAT, SUPPORTED_MODULE_TYPE.PLUG, SUPPORTED_MODULE_TYPE.NRV];
+const WEATHER_MODULE_TYPES = [
+  SUPPORTED_MODULE_TYPE.NAMAIN,
+  SUPPORTED_MODULE_TYPE.NAMODULE1,
+  SUPPORTED_MODULE_TYPE.NAMODULE2,
+  SUPPORTED_MODULE_TYPE.NAMODULE3,
+  SUPPORTED_MODULE_TYPE.NAMODULE4,
+];
+
+/**
+ * @description Resolve support flags and API category of a Netatmo module type.
+ * @param {string} model - Netatmo module type.
+ * @param {object} configuration - Netatmo service configuration.
+ * @returns {object} Module support flag, API category and configuration flag.
+ * @example
+ * getModuleCategory('NRV', this.configuration);
+ */
+function getModuleCategory(model, configuration) {
+  if (ENERGY_MODULE_TYPES.includes(model)) {
+    return {
+      moduleSupported: true,
+      categoryAPI: SUPPORTED_CATEGORY_TYPE.ENERGY,
+      apiNotConfigured: !configuration.energyApi,
+    };
+  }
+  if (WEATHER_MODULE_TYPES.includes(model)) {
+    return {
+      moduleSupported: true,
+      categoryAPI: SUPPORTED_CATEGORY_TYPE.WEATHER,
+      apiNotConfigured: !configuration.weatherApi,
+    };
+  }
+  return {
+    moduleSupported: false,
+    categoryAPI: SUPPORTED_CATEGORY_TYPE.UNKNOWN,
+    apiNotConfigured: false,
+  };
+}
+
 /**
  * @description Discover Netatmo cloud devices.
  * @param {object} homeData - House.
@@ -34,43 +73,12 @@ async function loadDeviceDetails(homeData) {
 
     const data = JSON.parse(rawBody);
     const { body, status } = data;
-    const { rooms: roomsHomestatus, modules: modulesHomestatus } = body.home;
+    const { rooms: roomsHomestatus = [], modules: modulesHomestatus, errors: errorsHomestatus = [] } = body.home;
 
     if (status === 'ok') {
       if (modulesHomestatus) {
         listDevices = modulesHomestatus.map((module) => {
-          let moduleSupported = false;
-          let apiNotConfigured = false;
-          let categoryAPI = SUPPORTED_CATEGORY_TYPE.UNKNOWN;
-          const { type: model } = module;
-          if (
-            model === SUPPORTED_MODULE_TYPE.THERMOSTAT ||
-            model === SUPPORTED_MODULE_TYPE.PLUG ||
-            model === SUPPORTED_MODULE_TYPE.NRV
-          ) {
-            if (!this.configuration.energyApi) {
-              apiNotConfigured = true;
-            } else {
-              apiNotConfigured = false;
-            }
-            moduleSupported = true;
-            categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
-          }
-          if (
-            model === SUPPORTED_MODULE_TYPE.NAMAIN ||
-            model === SUPPORTED_MODULE_TYPE.NAMODULE1 ||
-            model === SUPPORTED_MODULE_TYPE.NAMODULE2 ||
-            model === SUPPORTED_MODULE_TYPE.NAMODULE3 ||
-            model === SUPPORTED_MODULE_TYPE.NAMODULE4
-          ) {
-            if (!this.configuration.weatherApi) {
-              apiNotConfigured = true;
-            } else {
-              apiNotConfigured = false;
-            }
-            moduleSupported = true;
-            categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
-          }
+          const { moduleSupported, categoryAPI, apiNotConfigured } = getModuleCategory(module.type, this.configuration);
 
           const moduleHomeData = modulesHomeData.find((mod) => mod.id === module.id);
           const roomDevice = {
@@ -99,6 +107,46 @@ async function loadDeviceDetails(homeData) {
             not_handled: true,
           };
         });
+
+        /* Modules referenced in homesdata but absent from the homestatus "modules" array
+        (e.g. powered-off devices reported in the homestatus "errors" array) are rebuilt
+        from homesdata so they can still be discovered and saved. */
+        const unreachableModules = modulesHomeData
+          .filter((moduleHomeData) => !modulesHomestatus.some((module) => module.id === moduleHomeData.id))
+          .map((moduleHomeData) => {
+            const { moduleSupported, categoryAPI, apiNotConfigured } = getModuleCategory(
+              moduleHomeData.type,
+              this.configuration,
+            );
+            const moduleError = errorsHomestatus.find((error) => error.id === moduleHomeData.id);
+            const roomDevice = {
+              ...roomsHomeData.find((roomHomeData) => roomHomeData.id === moduleHomeData.room_id),
+              ...roomsHomestatus.find((room) => room.id === moduleHomeData.room_id),
+            };
+            const plugDevice = {
+              ...modulesHomeData.find((mod) => mod.id === moduleHomeData.bridge),
+              ...modulesHomestatus.find((modulePlug) => modulePlug.id === moduleHomeData.bridge),
+            };
+            const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
+            const deviceSupported = {
+              ...moduleHomeData,
+              home: homeId,
+              room: roomDevice,
+              plug,
+              reachable: false,
+              apiErrorCode: moduleError ? moduleError.code : undefined,
+              categoryAPI,
+              apiNotConfigured,
+            };
+            if (moduleSupported) {
+              return deviceSupported;
+            }
+            return {
+              ...deviceSupported,
+              not_handled: true,
+            };
+          });
+        listDevices = [...listDevices, ...unreachableModules];
       } else {
         listDevices = undefined;
       }

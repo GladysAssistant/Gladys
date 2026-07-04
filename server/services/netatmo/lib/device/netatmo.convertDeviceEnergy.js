@@ -25,7 +25,7 @@ function convertDeviceEnergy(netatmoDevice) {
   const { home, name, type: model, room = {}, plug = {} } = netatmoDevice;
   const id = netatmoDevice.id || netatmoDevice._id;
   const homeId = home || netatmoDevice.home_id;
-  const nameDevice = name || netatmoDevice.module_name;
+  const nameDevice = name || netatmoDevice.module_name || netatmoDevice.station_name;
   const externalId = `netatmo:${id}`;
   logger.debug(`Netatmo convert Energy device "${nameDevice}, ${model}"`);
   const features = [];
