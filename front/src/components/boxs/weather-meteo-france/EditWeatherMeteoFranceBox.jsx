@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
 import actions from '../../../actions/dashboard/boxActions';
 import { GetWeatherModes } from '../../../utils/consts';
@@ -25,21 +25,19 @@ const EditWeatherMeteoFranceBox = ({ children, ...props }) => (
     </div>
 
     <div class="form-group">
-      <label>
-        <Text id="dashboard.boxes.weatherMeteoFrance.editDeptLabel" />
-      </label>
-      <Localizer>
+      <div class="form-check">
         <input
-          type="text"
-          class="form-control"
-          placeholder={<Text id="dashboard.boxes.weatherMeteoFrance.editDeptPlaceholder" />}
-          value={props.box.dept || ''}
-          onInput={props.updateBoxDept}
-          maxLength={3}
+          type="checkbox"
+          class="form-check-input"
+          checked={props.box.vigilance}
+          onChange={props.updateBoxVigilance}
         />
-      </Localizer>
+        <label class="form-check-label">
+          <Text id="dashboard.boxes.weatherMeteoFrance.editVigilanceLabel" />
+        </label>
+      </div>
       <small class="form-text text-muted">
-        <Text id="dashboard.boxes.weatherMeteoFrance.editDeptHelp" />
+        <Text id="dashboard.boxes.weatherMeteoFrance.editVigilanceHelp" />
       </small>
     </div>
 
@@ -78,9 +76,9 @@ class EditWeatherMeteoFranceBoxComponent extends Component {
     });
   };
 
-  updateBoxDept = e => {
+  updateBoxVigilance = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      dept: e.target.value
+      vigilance: e.target.checked
     });
   };
 
@@ -111,7 +109,7 @@ class EditWeatherMeteoFranceBoxComponent extends Component {
         {...props}
         houses={houses}
         updateBoxHouse={this.updateBoxHouse}
-        updateBoxDept={this.updateBoxDept}
+        updateBoxVigilance={this.updateBoxVigilance}
         updateBoxModes={this.updateBoxModes}
       />
     );

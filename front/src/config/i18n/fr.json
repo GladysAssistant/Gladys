@@ -311,9 +311,9 @@
       },
       "weatherMeteoFrance": {
         "vigilanceTitle": "Vigilance Météo-France",
-        "editDeptLabel": "Numéro de département (pour les alertes de vigilance)",
-        "editDeptPlaceholder": "Ex : 06, 75, 69...",
-        "editDeptHelp": "Laissez vide pour désactiver les alertes de vigilance.",
+        "noVigilance": "Pas de vigilance en cours",
+        "editVigilanceLabel": "Afficher les vigilances météo en cours",
+        "editVigilanceHelp": "Le département est détecté automatiquement à partir des coordonnées GPS de la maison. Nécessite la clé API Météo-France configurée dans l'intégration.",
         "error": "Impossible de récupérer la météo Météo-France.",
         "noCoordinates": "La maison n'a pas de coordonnées GPS. Configurez-les dans les paramètres.",
         "noHouseConfigured": "Veuillez configurer une maison dans les paramètres du widget."

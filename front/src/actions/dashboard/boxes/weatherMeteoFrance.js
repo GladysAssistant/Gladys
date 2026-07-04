@@ -7,25 +7,25 @@ const BOX_KEY = 'WeatherMeteoFrance';
 const MF_ICONS = {
   1: { j: '☀️', n: '🌙' },
   2: { j: '🌤️', n: '🌤️' },
-  3: { j: '🌥️', n: '�️' },
-  4: { j: '☁️', n: '☁️' },
+  3: { j: '🌥️', n: '☁️' },
+  4: { j: '🌥️', n: '☁️' },
   5: { j: '☁️', n: '☁️' },
   6: { j: '🌫️', n: '🌫️' },
-  7: { j: '�️', n: '🌫️' },
+  7: { j: '🌫️', n: '🌫️' },
   8: { j: '🌦️', n: '🌧️' },
   9: { j: '🌧️', n: '🌧️' },
   10: { j: '🌧️', n: '🌧️' },
   11: { j: '🌦️', n: '🌦️' },
   12: { j: '⛈️', n: '⛈️' },
-  13: { j: '�️', n: '🌨️' },
+  13: { j: '🌨️', n: '🌨️' },
   14: { j: '❄️', n: '❄️' },
   15: { j: '❄️', n: '❄️' },
   16: { j: '❄️', n: '❄️' },
-  17: { j: '�️', n: '🌩️' },
+  17: { j: '🌩️', n: '🌩️' },
   18: { j: '⛈️', n: '⛈️' },
   19: { j: '⛈️', n: '⛈️' },
   20: { j: '⛈️', n: '⛈️' },
-  21: { j: '⛈️', n: '⛈️' },
+  21: { j: '⛈️', n: '⛈️' }
 };
 
 function getMFIcon(iconCode) {
@@ -46,28 +46,50 @@ function createActions(store) {
           boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
           return;
         }
-        const dept = box.dept || '';
-        const url = `/api/v1/house/${box.house}/meteofrance/weather${dept ? `?dept=${dept}` : ''}`;
+        const url = `/api/v1/house/${box.house}/meteofrance/weather${box.vigilance ? '?vigilance=true' : ''}`;
         const data = await state.httpClient.get(url);
 
+        // The API returns the full current day, including past hours: keep future entries only
+        const nowTs = Math.floor(Date.now() / 1000);
         const rawForecast = data.forecast.forecast || [];
-        const current = rawForecast.find(h => h.T && h.T.value != null) || rawForecast[0];
+        const upcoming = rawForecast.filter(h => h.dt >= nowTs - 1800);
+        const current = upcoming.find(h => h.T && h.T.value != null) || upcoming[0] || rawForecast[0];
         const currentIcon = getMFIcon(current && current.weather ? current.weather.icon : null);
 
-        const hourly = rawForecast.slice(0, 12).map(h => ({
-          time: dayjs.unix(h.dt).format('HH'),
-          temp: h.T && h.T.value != null ? Math.round(h.T.value) : null,
-          icon: getMFIcon(h.weather ? h.weather.icon : null),
-          desc: h.weather ? h.weather.desc : '',
-        }));
+        // Cover the next 24 hours in 8 columns (one entry every 3 hours)
+        const hourly = upcoming
+          .filter(h => upcoming.length > 0 && h.dt <= upcoming[0].dt + 24 * 3600)
+          .filter((h, index) => index % 3 === 0)
+          .slice(0, 8)
+          .map(h => ({
+            time: dayjs.unix(h.dt).format('HH'),
+            temp: h.T && h.T.value != null ? Math.round(h.T.value) : null,
+            icon: getMFIcon(h.weather ? h.weather.icon : null),
+            desc: h.weather ? h.weather.desc : ''
+          }));
 
-        const daily = (data.forecast.daily_forecast || []).slice(1, 6).map(d => ({
-          day: dayjs.unix(d.dt).format('ddd'),
-          min: d.T && d.T.min != null ? Math.round(d.T.min) : null,
-          max: d.T && d.T.max != null ? Math.round(d.T.max) : null,
-          icon: getMFIcon(d.weather12H ? d.weather12H.icon : null),
-          desc: d.weather12H ? d.weather12H.desc : '',
-        }));
+        const daily = (data.forecast.daily_forecast || []).slice(1, 6).map(d => {
+          let weather = d.weather12H;
+          if (!weather || !weather.icon) {
+            // weather12H can be null on some days: fall back to the hourly forecast closest to midday
+            const midday = d.dt + 12 * 3600;
+            const sameDay = rawForecast.filter(
+              h => h.dt >= d.dt && h.dt < d.dt + 24 * 3600 && h.weather && h.weather.icon
+            );
+            weather = sameDay.reduce(
+              (best, h) => (!best || Math.abs(h.dt - midday) < Math.abs(best.dt - midday) ? h : best),
+              null
+            );
+            weather = weather && weather.weather;
+          }
+          return {
+            dt: d.dt,
+            min: d.T && d.T.min != null ? Math.round(d.T.min) : null,
+            max: d.T && d.T.max != null ? Math.round(d.T.max) : null,
+            icon: getMFIcon(weather ? weather.icon : null),
+            desc: weather ? weather.desc : ''
+          };
+        });
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           current,
@@ -75,7 +97,7 @@ function createActions(store) {
           hourly,
           daily,
           position: data.forecast.position || {},
-          vigilance: data.vigilance || { alerts: [] },
+          vigilance: data.vigilance || { alerts: [] }
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
@@ -89,7 +111,7 @@ function createActions(store) {
           boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
         }
       }
-    },
+    }
   };
   return Object.assign({}, actions);
 }

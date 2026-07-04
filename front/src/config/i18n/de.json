@@ -311,9 +311,9 @@
       },
       "weatherMeteoFrance": {
         "vigilanceTitle": "Météo-France Unwetterwarnung",
-        "editDeptLabel": "Departementnummer (für Unwetterwarnungen)",
-        "editDeptPlaceholder": "z.B.: 06, 75, 69...",
-        "editDeptHelp": "Leer lassen, um Unwetterwarnungen zu deaktivieren.",
+        "noVigilance": "Keine Unwetterwarnung aktiv",
+        "editVigilanceLabel": "Aktive Unwetterwarnungen anzeigen",
+        "editVigilanceHelp": "Das Departement wird automatisch aus den GPS-Koordinaten des Hauses ermittelt. Erfordert den in der Integration konfigurierten Météo-France-API-Schlüssel.",
         "error": "Météo-France-Wetterdaten konnten nicht abgerufen werden.",
         "noCoordinates": "Das Haus hat keine GPS-Koordinaten. Konfiguriere sie in den Einstellungen.",
         "noHouseConfigured": "Bitte konfiguriere ein Haus in den Widget-Einstellungen."

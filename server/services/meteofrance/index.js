@@ -53,10 +53,29 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   }
 
   /**
+   * @description Get vigilance text bulletins from Météo-France API.
+   * @returns {Promise<object>} Resolve with vigilance text data.
+   * @example
+   * const data = await gladys.services.meteofrance.vigilance.getText();
+   */
+  async function getVigilanceText() {
+    if (!meteoFranceApiKey) {
+      throw new ServiceNotConfiguredError('MeteoFrance API Key not found');
+    }
+    const url = 'https://public-api.meteofrance.fr/public/DPVigilance/v1/textesvigilance/encours';
+    const { data } = await axios.get(url, {
+      headers: { apikey: meteoFranceApiKey },
+    });
+    return data;
+  }
+
+  /**
    * @description Get weather forecast from Météo-France mobile webservice.
    * @param {number} lat - Latitude.
    * @param {number} lon - Longitude.
    * @returns {Promise<object>} Resolve with forecast data.
+   * @example
+   * const data = await gladys.services.meteofrance.forecast.get(48.85, 2.35);
    */
   async function getForecast(lat, lon) {
     const { data } = await axios.get(`${METEOFRANCE_WEBSERVICE_URL}/forecast`, {
@@ -74,9 +93,10 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    controllers: MeteoFranceController(gladys, getVigilance, getForecast),
+    controllers: MeteoFranceController(gladys, getVigilance, getForecast, getVigilanceText),
     vigilance: {
       get: getVigilance,
+      getText: getVigilanceText,
     },
     forecast: {
       get: getForecast,

@@ -311,9 +311,9 @@
       },
       "weatherMeteoFrance": {
         "vigilanceTitle": "Météo-France Vigilance",
-        "editDeptLabel": "Department number (for vigilance alerts)",
-        "editDeptPlaceholder": "E.g.: 06, 75, 69...",
-        "editDeptHelp": "Leave empty to disable vigilance alerts.",
+        "noVigilance": "No weather alert in progress",
+        "editVigilanceLabel": "Show active weather alerts",
+        "editVigilanceHelp": "The department is automatically detected from the house GPS coordinates. Requires the Météo-France API key configured in the integration.",
         "error": "Unable to fetch Météo-France weather data.",
         "noCoordinates": "The house has no GPS coordinates. Configure them in settings.",
         "noHouseConfigured": "Please configure a house in the widget settings."
