@@ -116,6 +116,18 @@ describe('Netatmo update NATherm1 features', () => {
     });
   });
 
+  it('should fall back to battery_state when battery_percent is absent', async () => {
+    delete deviceNetatmoMock.battery_percent;
+    deviceNetatmoMock.battery_state = 'high';
+
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:battery_percent`,
+      state: 75,
+    });
+  });
+
   it('should handle errors correctly', async () => {
     deviceNetatmoMock.battery_percent = undefined;
     const error = new Error('Test error');

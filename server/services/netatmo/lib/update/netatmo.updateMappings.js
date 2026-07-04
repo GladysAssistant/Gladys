@@ -12,7 +12,7 @@ const UPDATE_MAPPINGS = {
     plug_connected_boiler: (deviceNetatmo) => deviceNetatmo.plug_connected_boiler ?? false,
   },
   [SUPPORTED_MODULE_TYPE.THERMOSTAT]: {
-    battery_percent: (deviceNetatmo) => deviceNetatmo.battery_percent,
+    battery_percent: (deviceNetatmo) => deviceNetatmo.battery_percent ?? deviceNetatmo.battery_state,
     temperature: (deviceNetatmo) => deviceNetatmo.measured?.temperature,
     therm_measured_temperature: (deviceNetatmo) => deviceNetatmo.room?.therm_measured_temperature,
     therm_setpoint_temperature: (deviceNetatmo) => deviceNetatmo.room?.therm_setpoint_temperature,
