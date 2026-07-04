@@ -89,6 +89,25 @@ describe('Netatmo update NATherm1 features', () => {
       }),
     ).to.equal(true);
   });
+
+  it('should skip room and measured features when the API data is absent', async () => {
+    delete deviceNetatmoMock.room;
+    delete deviceNetatmoMock.measured;
+
+    await netatmoHandler.updateNATherm1(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(3);
+    ['temperature', 'therm_measured_temperature', 'therm_setpoint_temperature', 'open_window'].forEach((suffix) => {
+      sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
+        device_feature_external_id: `${deviceGladysMock.external_id}:${suffix}`,
+      });
+    });
+    sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:boiler_status`,
+      state: 1,
+    });
+  });
+
   it('should handle errors correctly', async () => {
     deviceNetatmoMock.battery_percent = undefined;
     const error = new Error('Test error');
