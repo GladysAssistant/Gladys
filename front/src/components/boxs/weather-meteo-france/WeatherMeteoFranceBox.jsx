@@ -169,6 +169,13 @@ class WeatherMeteoFranceBoxComponent extends Component {
     const windSpeed =
       current.wind && current.wind.speed != null ? Math.round(current.wind.speed * (isUS ? 2.23694 : 3.6)) : null;
     const windDir = current.wind && typeof current.wind.icon === 'string' ? current.wind.icon : null;
+    // Expected rain amount for the current time slot (1h step first, then 3h)
+    let rainAmount = null;
+    if (current.rain && current.rain['1h'] != null) {
+      rainAmount = Math.round(current.rain['1h'] * 10) / 10;
+    } else if (current.rain && current.rain['3h'] != null) {
+      rainAmount = Math.round(current.rain['3h'] * 10) / 10;
+    }
     const rawPressure = current.sea_level != null ? current.sea_level : null;
     const pressure =
       rawPressure !== null
@@ -214,7 +221,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
 
           {/* Current conditions */}
           {showCurrentWeather && (
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px">
               <div style="display: flex; align-items: center; min-width: 0">
                 <div style="font-size: 52px; line-height: 1">{currentIcon}</div>
                 <div style="font-size: 16px; font-weight: 500; margin-left: 12px">{desc}</div>
@@ -255,13 +262,15 @@ class WeatherMeteoFranceBoxComponent extends Component {
                   {windSpeed !== null && (
                     <div>
                       {windSpeed} {windUnit}
-                      {windDir && <span class="text-muted"> {windDir}</span>}
+                      {windDir && <span> {windDir}</span>}
                       <i class="fe fe-wind ml-2" style="color: #467fcf" />
                     </div>
                   )}
-                  {rainChance != null && (
+                  {(rainChance != null || rainAmount !== null) && (
                     <div>
-                      {rainChance}%
+                      {rainAmount !== null && <span>{formatRain(rainAmount)}</span>}
+                      {rainAmount !== null && rainChance != null && <span class="text-muted mx-1">|</span>}
+                      {rainChance != null && <span>{rainChance}%</span>}
                       <i class="fe fe-umbrella ml-2" style="color: #467fcf" />
                     </div>
                   )}
@@ -280,7 +289,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
                 </div>
                 {uv != null && (
                   <div>
-                    <span class="text-muted mr-1">UV</span>
+                    <span class="mr-1">UV</span>
                     <span style={`font-weight: 600; color: ${getUvColor(uv)}`}>{uv}</span>
                   </div>
                 )}
