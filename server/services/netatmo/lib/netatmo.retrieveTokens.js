@@ -63,12 +63,11 @@ async function retrieveTokens(body) {
     await this.saveStatus({ statusType: STATUS.CONNECTED });
     logger.debug('Netatmo new access tokens well loaded');
     if (this.configuration.energyApi || this.configuration.weatherApi || this.configuration.securityApi) {
-      try {
-        await this.refreshNetatmoValues();
-      } catch (e) {
-        // the polling started below will retry; a failed initial refresh must not clobber the connected status
+      // fire-and-forget: the initial refresh must not delay the OAuth callback response,
+      // must not clobber the connected status, and the polling started below will retry
+      this.refreshNetatmoValues().catch((e) => {
         logger.error('Netatmo: initial devices values refresh failed after connection - Details: ', e);
-      }
+      });
       await this.pollRefreshingValues();
     }
     await this.pollRefreshingToken();
