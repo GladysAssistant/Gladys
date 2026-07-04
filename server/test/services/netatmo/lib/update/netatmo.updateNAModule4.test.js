@@ -44,7 +44,7 @@ describe('Netatmo update Smart Indoor module NAModule4 features', () => {
     deviceNetatmoMock.humidity = undefined;
     deviceNetatmoMock.rf_strength = undefined;
 
-    await netatmoHandler.updateNAModule4(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(7);
     sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -72,7 +72,7 @@ describe('Netatmo update Smart Indoor module NAModule4 features', () => {
     delete deviceNetatmoMock.dashboard_data;
     delete deviceNetatmoMock.room;
 
-    await netatmoHandler.updateNAModule4(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(5);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -121,7 +121,7 @@ describe('Netatmo update Smart Indoor module NAModule4 features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNAModule4(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+      await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);

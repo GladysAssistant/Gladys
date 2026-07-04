@@ -39,7 +39,7 @@ describe('Netatmo update NRV features', () => {
   });
 
   it('should save all values according to all cases with heating power request', async () => {
-    await netatmoHandler.updateNRV(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(6);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -87,7 +87,7 @@ describe('Netatmo update NRV features', () => {
   it('should save all values according to all cases without heating power request', async () => {
     deviceNetatmoMock.room.heating_power_request = 0;
 
-    await netatmoHandler.updateNRV(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(6);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -99,7 +99,7 @@ describe('Netatmo update NRV features', () => {
   it('should not emit heating power request when the value is absent', async () => {
     delete deviceNetatmoMock.room.heating_power_request;
 
-    await netatmoHandler.updateNRV(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(5);
     sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -118,7 +118,7 @@ describe('Netatmo update NRV features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNRV(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+      await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);

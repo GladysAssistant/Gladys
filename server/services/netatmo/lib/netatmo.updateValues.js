@@ -1,6 +1,5 @@
 const { BadParameters } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
-const { SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
 
 /**
  * @description Save values of an Netatmo device.
@@ -22,42 +21,7 @@ async function updateValues(deviceGladys, deviceNetatmo, externalId) {
     logger.info(`Netatmo device "${deviceGladys.name}" is not reachable`);
   }
 
-  switch (deviceNetatmo.type) {
-    case SUPPORTED_MODULE_TYPE.PLUG: {
-      await this.updateNAPlug(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.THERMOSTAT: {
-      await this.updateNATherm1(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NRV: {
-      await this.updateNRV(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NAMAIN: {
-      await this.updateNAMain(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NAMODULE1: {
-      await this.updateNAModule1(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NAMODULE2: {
-      await this.updateNAModule2(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NAMODULE3: {
-      await this.updateNAModule3(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    case SUPPORTED_MODULE_TYPE.NAMODULE4: {
-      await this.updateNAModule4(deviceGladys, deviceNetatmo, externalId);
-      break;
-    }
-    default:
-      break;
-  }
+  await this.updateDevice(deviceGladys, deviceNetatmo, externalId);
 }
 
 module.exports = {

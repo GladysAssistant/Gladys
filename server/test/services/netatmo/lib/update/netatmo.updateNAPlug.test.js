@@ -39,7 +39,7 @@ describe('Netatmo update NAPlug features', () => {
   });
 
   it('should update device values correctly for a plug device connected on boiler', async () => {
-    await netatmoHandler.updateNAPlug(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(deviceGladysMock.features.length);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -69,7 +69,7 @@ describe('Netatmo update NAPlug features', () => {
   it('should update device values correctly for a plug device no connected boiler', async () => {
     deviceNetatmoMock.plug_connected_boiler = undefined;
 
-    await netatmoHandler.updateNAPlug(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(deviceGladysMock.features.length);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -106,7 +106,7 @@ describe('Netatmo update NAPlug features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNAPlug(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+      await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);

@@ -39,7 +39,7 @@ describe('Netatmo update NATherm1 features', () => {
   });
 
   it('should save all values according to all cases', async () => {
-    await netatmoHandler.updateNATherm1(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(7);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -100,7 +100,7 @@ describe('Netatmo update NATherm1 features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNATherm1(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+      await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);

@@ -42,7 +42,7 @@ describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
     deviceNetatmoMock.temperature = undefined;
     deviceNetatmoMock.humidity = undefined;
     deviceNetatmoMock.rf_strength = undefined;
-    await netatmoHandler.updateNAModule1(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(5);
     sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -65,7 +65,7 @@ describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
   it('should save all values according to all cases', async () => {
     delete deviceNetatmoMock.dashboard_data;
 
-    await netatmoHandler.updateNAModule1(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(4);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -101,7 +101,7 @@ describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
   it('should emit zero values instead of falling back to dashboard data', async () => {
     deviceNetatmoMock.temperature = 0;
 
-    await netatmoHandler.updateNAModule1(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit.getCall(1), 'device.new-state', {
       device_feature_external_id: `${deviceGladysMock.external_id}:temperature`,
@@ -120,7 +120,7 @@ describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNAModule1(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+      await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);

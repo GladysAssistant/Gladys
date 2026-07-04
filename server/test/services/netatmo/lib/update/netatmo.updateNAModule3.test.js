@@ -43,7 +43,7 @@ describe('Netatmo update NAModule3 features', () => {
     deviceNetatmoMock.sum_rain_1 = undefined;
     deviceNetatmoMock.sum_rain_24 = undefined;
     deviceNetatmoMock.rf_strength = undefined;
-    await netatmoHandler.updateNAModule3(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(4);
     sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -62,7 +62,7 @@ describe('Netatmo update NAModule3 features', () => {
   it('should save all values according to all cases', async () => {
     delete deviceNetatmoMock.dashboard_data;
 
-    await netatmoHandler.updateNAModule3(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(4);
     sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -102,7 +102,7 @@ describe('Netatmo update NAModule3 features', () => {
     deviceNetatmoMock.rain = 0;
     deviceNetatmoMock.sum_rain_1 = 0;
 
-    await netatmoHandler.updateNAModule3(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit.getCall(1), 'device.new-state', {
       device_feature_external_id: `${deviceGladysMock.external_id}:rain`,
@@ -125,7 +125,7 @@ describe('Netatmo update NAModule3 features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNAModule3(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+      await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);
