@@ -20,7 +20,8 @@
     "prettier": "prettier --write '**/*.js' '**/*.jsx' '**/*.json'",
     "start:cypress": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 npm start",
     "cypress:open": "cypress open --config-file cypress/cypress.config.js",
-    "cypress:run": "cypress run --config-file cypress/cypress.config.js"
+    "cypress:run": "cypress run --config-file cypress/cypress.config.js",
+    "postinstall": "node ./cli/patch_zimmerframe.js"
   },
   "overrides": {
     "esm": "npm:esm-wallaby@3.2.35"
