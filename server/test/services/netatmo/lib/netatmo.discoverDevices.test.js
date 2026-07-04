@@ -61,6 +61,33 @@ describe('Netatmo Discover devices', () => {
     ).to.equal(true);
   });
 
+  it('should discover a Security camera device', async () => {
+    netatmoHandler.status = 'connected';
+    netatmoHandler.gladys.stateManager.get = sinon.stub().returns(null);
+    netatmoHandler.loadDevices = sinon.stub().returns([
+      {
+        id: '70:ee:50:aa:bb:cc',
+        type: 'NACamera',
+        name: 'Camera Hall',
+        home: '5e1xxxxxxxxxxxxxxxxx',
+        monitoring: 'on',
+        wifi_strength: 60,
+        categoryAPI: 'Security',
+      },
+    ]);
+
+    const discoveredDevices = await netatmoHandler.discoverDevices();
+
+    expect(discoveredDevices.length).to.equal(1);
+    expect(discoveredDevices[0].external_id).to.equal('netatmo:70:ee:50:aa:bb:cc');
+    expect(discoveredDevices[0].model).to.equal('NACamera');
+    const monitoringFeature = discoveredDevices[0].features.find(
+      (feature) => feature.external_id === 'netatmo:70:ee:50:aa:bb:cc:monitoring',
+    );
+    expect(monitoringFeature).to.not.equal(undefined);
+    expect(monitoringFeature.read_only).to.equal(true);
+  });
+
   it('should throw an error if not connected', async () => {
     try {
       await netatmoHandler.discoverDevices();

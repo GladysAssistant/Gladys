@@ -814,7 +814,8 @@
           "get_access_token_fail": "Falsche Informationen eingegeben oder Konto deaktiviert. Bitte überprüfen Sie Ihre Netatmo-Kontoinformationen und dass das Konto nicht gesperrt oder deaktiviert ist <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a>."
         },
         "weatherApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Weather\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Station zu erhalten.",
-        "energyApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Energy\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Geräte zu erhalten."
+        "energyApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Energy\" API zu aktivieren, um Zugriff auf die vollständigen Informationen Ihrer Geräte zu erhalten.",
+        "securityApiNotConfigured": "Bitte gehen Sie zum Tab \"Konfiguration\", um den Zugang zur \"Security\" API zu aktivieren, um Zugriff auf Ihre Kameras zu erhalten."
       },
       "device": {
         "title": "Netatmo-Geräte in Gladys",
@@ -847,7 +848,8 @@
         "deviceError": {
           "6": "Gerät für die Netatmo-API nicht erreichbar (ausgeschaltet oder außer Reichweite). Sie können es trotzdem speichern, die Werte werden übermittelt, sobald es wieder erreichbar ist. (Code: 6)",
           "default": "Die Netatmo-API meldet einen Fehler für dieses Gerät (Code {{code}})."
-        }
+        },
+        "cameraCommandsInfo": "Erste Version der Kameraunterstützung: nur Überwachungsstatus und WLAN, schreibgeschützt. Das Bild und die Befehle (Überwachung ein/aus) folgen in den nächsten Versionen."
       },
       "setup": {
         "title": "Netatmo-Konfiguration",
@@ -860,6 +862,8 @@
         "descriptionAdditionalInformationEnergyApi": "Sie müssen unten auf der Seite die API \"Energy\" auswählen, um auf die entsprechenden Geräte zuzugreifen. Temperaturbefehle werden auf Raumniveau ausgeführt. Daher sind beide Informationen als Funktionen für mehr Kontrolle verfügbar. Wenn Sie andere Temperatursensoren im gleichen Raum wie Ihr Thermostat haben, wird die Durchschnittstemperatur dieses Raums berücksichtigt, um den Heizungssteuerschalter auszulösen.",
         "titleAdditionalInformationWeatherApi": "Weitere Informationen über die Funktionsweise der \"Weather\"-API:",
         "descriptionAdditionalInformationWeatherApi": "Sie müssen unten auf der Seite die API \"Weather\" auswählen, um auf die entsprechenden Geräte zuzugreifen. Wenn Sie auch über Geräte verfügen, die zur API \"Energy\" gehören (Stecker, Thermostat oder Ventil), haben Sie Zugriff auf eine zusätzliche Funktionalität bei Innenhygrometergeräten, um die Durchschnittstemperatur des entsprechenden Raums zu ermitteln. Vergessen Sie also nicht, die API \"Energy\" auszuwählen, um auf diese Funktionalität zuzugreifen.",
+        "titleAdditionalInformationSecurityApi": "Weitere Informationen über die Funktionsweise der \"Security\"-API:",
+        "descriptionAdditionalInformationSecurityApi": "Sie müssen unten auf der Seite die API \"Security\" auswählen, um auf die Kameras (innen und außen) zuzugreifen. Diese erste Version ruft den Überwachungsstatus und die WLAN-Qualität Ihrer Kameras ab; das Bild und die Befehle folgen in den nächsten Versionen. Klicken Sie nach der Aktivierung auf \"Speichern und verbinden\", um die neuen Berechtigungen bei Netatmo zu autorisieren.",
         "clientIdLabel": "Kunden-ID",
         "clientIdPlaceholder": "Kunden-ID von My Apps in Netatmo Connect",
         "clientSecretLabel": "Kundengeheimnis",
@@ -867,6 +871,7 @@
         "connectionInfoLabel": "Wenn Sie diese Informationen ändern, ist ein neues Token erforderlich. Durch das Trennen der Verbindung wird auch Ihr Zugriffstoken gelöscht. Wenn Sie auf diese Schaltflächen klicken, wird daher eine neue Verbindungsanfrage an die Netatmo-API gestellt.",
         "energyApiLabel": "Aktiviere \"Energy\" API (Netatmo Stecker, Thermostat und Ventile abrufen)",
         "weatherApiLabel": "Aktiviere \"Weather\" API (Netatmo Wetterstation Geräte abrufen)",
+        "securityApiLabel": "Aktiviere \"Security\" API (Netatmo Kameras abrufen)",
         "saveLabel": "Speichern und verbinden",
         "disconnectLabel": "Trennen"
       },

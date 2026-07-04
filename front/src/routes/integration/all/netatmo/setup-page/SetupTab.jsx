@@ -48,6 +48,13 @@ class SetupTab extends Component {
       this.props.updateStateInIndex({ netatmoWeatherApi: true });
     }
   };
+  updateSecurityApi = () => {
+    if (this.props.netatmoSecurityApi === true) {
+      this.props.updateStateInIndex({ netatmoSecurityApi: false });
+    } else {
+      this.props.updateStateInIndex({ netatmoSecurityApi: true });
+    }
+  };
   toggleClientSecret = () => {
     const { showClientSecret } = this.state;
 
@@ -109,6 +116,12 @@ class SetupTab extends Component {
                   <MarkupText id="integration.netatmo.setup.titleAdditionalInformationWeatherApi" />
                 </label>
                 <MarkupText id="integration.netatmo.setup.descriptionAdditionalInformationWeatherApi" />
+              </p>
+              <p>
+                <label htmlFor="titleAdditionalInformationSecurityApi" className={`form-label ${style.highlightText}`}>
+                  <MarkupText id="integration.netatmo.setup.titleAdditionalInformationSecurityApi" />
+                </label>
+                <MarkupText id="integration.netatmo.setup.descriptionAdditionalInformationSecurityApi" />
               </p>
 
               <form>
@@ -182,6 +195,20 @@ class SetupTab extends Component {
                     />
                     <span className={`custom-switch-indicator ${style.customSwitchIndicator}`} />
                     <Text id={`integration.netatmo.setup.weatherApiLabel`} />
+                  </label>
+                </div>
+
+                <div class="form-group">
+                  <label class="netatmoSecurityApi" className="form-label">
+                    <input
+                      type="checkbox"
+                      name="netatmoSecurityApi"
+                      class="custom-switch-input"
+                      checked={props.netatmoSecurityApi}
+                      onClick={this.updateSecurityApi}
+                    />
+                    <span className={`custom-switch-indicator ${style.customSwitchIndicator}`} />
+                    <Text id={`integration.netatmo.setup.securityApiLabel`} />
                   </label>
                 </div>
 

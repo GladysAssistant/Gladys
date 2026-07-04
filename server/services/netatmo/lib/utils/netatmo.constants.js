@@ -4,6 +4,7 @@ const GLADYS_VARIABLES = {
 
   ENERGY_API: 'NETATMO_ENERGY_API',
   WEATHER_API: 'NETATMO_WEATHER_API',
+  SECURITY_API: 'NETATMO_SECURITY_API',
 
   ACCESS_TOKEN: 'NETATMO_ACCESS_TOKEN',
   REFRESH_TOKEN: 'NETATMO_REFRESH_TOKEN',
@@ -17,7 +18,11 @@ const SCOPES = {
   },
   HOME_SECURITY: {
     read_camera: 'read_camera',
+    write_camera: 'write_camera',
+    access_camera: 'access_camera',
     read_presence: 'read_presence',
+    write_presence: 'write_presence',
+    access_presence: 'access_presence',
     read_carbonmonoxidedetector: 'read_carbonmonoxidedetector',
     read_smokedetector: 'read_smokedetector',
   },
@@ -79,6 +84,7 @@ const API = {
 const SUPPORTED_CATEGORY_TYPE = {
   ENERGY: 'Energy',
   WEATHER: 'Weather',
+  SECURITY: 'Security',
   UNKNOWN: 'unknown',
 };
 
@@ -91,6 +97,8 @@ const SUPPORTED_MODULE_TYPE = {
   NAMODULE2: 'NAModule2',
   NAMODULE3: 'NAModule3',
   NAMODULE4: 'NAModule4',
+  NACAMERA: 'NACamera',
+  NOC: 'NOC',
 };
 
 const PARAMS = {

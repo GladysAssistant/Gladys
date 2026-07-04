@@ -12,6 +12,7 @@ const { saveStatus } = require('./netatmo.saveStatus');
 const { saveConfiguration } = require('./netatmo.saveConfiguration');
 const { convertDeviceEnergy } = require('./device/netatmo.convertDeviceEnergy');
 const { convertDeviceWeather } = require('./device/netatmo.convertDeviceWeather');
+const { convertDeviceSecurity } = require('./device/netatmo.convertDeviceSecurity');
 const { convertDeviceNotSupported } = require('./device/netatmo.convertDeviceNotSupported');
 const { discoverDevices } = require('./netatmo.discoverDevices');
 const { loadDevices } = require('./netatmo.loadDevices');
@@ -40,6 +41,7 @@ const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
     clientSecret: null,
     energyApi: null,
     weatherApi: null,
+    securityApi: null,
     scopes: buildScopesConfig(SCOPES),
   };
   this.configured = false;
@@ -71,6 +73,7 @@ NetatmoHandler.prototype.getConfiguration = getConfiguration;
 NetatmoHandler.prototype.saveConfiguration = saveConfiguration;
 NetatmoHandler.prototype.convertDeviceEnergy = convertDeviceEnergy;
 NetatmoHandler.prototype.convertDeviceWeather = convertDeviceWeather;
+NetatmoHandler.prototype.convertDeviceSecurity = convertDeviceSecurity;
 NetatmoHandler.prototype.convertDeviceNotSupported = convertDeviceNotSupported;
 NetatmoHandler.prototype.discoverDevices = discoverDevices;
 NetatmoHandler.prototype.loadDevices = loadDevices;

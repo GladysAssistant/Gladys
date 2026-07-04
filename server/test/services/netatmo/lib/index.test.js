@@ -14,10 +14,12 @@ describe('NetatmoHandler Constructor', () => {
       clientSecret: null,
       energyApi: null,
       weatherApi: null,
+      securityApi: null,
       scopes: {
         scopeAircare: 'read_homecoach',
         scopeEnergy: 'read_thermostat write_thermostat',
-        scopeHomeSecurity: 'read_camera read_presence read_carbonmonoxidedetector read_smokedetector',
+        scopeHomeSecurity:
+          'read_camera write_camera access_camera read_presence write_presence access_presence read_carbonmonoxidedetector read_smokedetector',
         scopeWeather: 'read_station',
       },
     });

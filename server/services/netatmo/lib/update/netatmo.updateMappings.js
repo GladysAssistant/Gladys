@@ -79,6 +79,20 @@ const UPDATE_MAPPINGS = {
     max_temp: (deviceNetatmo) => deviceNetatmo.dashboard_data?.max_temp,
     rf_strength: (deviceNetatmo) => deviceNetatmo.rf_strength ?? deviceNetatmo.dashboard_data?.rf_status,
   },
+  [SUPPORTED_MODULE_TYPE.NACAMERA]: {
+    monitoring: (deviceNetatmo) =>
+      deviceNetatmo.monitoring === undefined || deviceNetatmo.monitoring === null
+        ? undefined
+        : deviceNetatmo.monitoring === 'on',
+    wifi_strength: (deviceNetatmo) => deviceNetatmo.wifi_strength ?? deviceNetatmo.wifi_status,
+  },
+  [SUPPORTED_MODULE_TYPE.NOC]: {
+    monitoring: (deviceNetatmo) =>
+      deviceNetatmo.monitoring === undefined || deviceNetatmo.monitoring === null
+        ? undefined
+        : deviceNetatmo.monitoring === 'on',
+    wifi_strength: (deviceNetatmo) => deviceNetatmo.wifi_strength ?? deviceNetatmo.wifi_status,
+  },
 };
 
 module.exports = {

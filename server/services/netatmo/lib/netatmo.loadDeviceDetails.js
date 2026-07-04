@@ -10,6 +10,7 @@ const WEATHER_MODULE_TYPES = [
   SUPPORTED_MODULE_TYPE.NAMODULE3,
   SUPPORTED_MODULE_TYPE.NAMODULE4,
 ];
+const SECURITY_MODULE_TYPES = [SUPPORTED_MODULE_TYPE.NACAMERA, SUPPORTED_MODULE_TYPE.NOC];
 
 /**
  * @description Resolve support flags and API category of a Netatmo module type.
@@ -32,6 +33,13 @@ function getModuleCategory(model, configuration) {
       moduleSupported: true,
       categoryAPI: SUPPORTED_CATEGORY_TYPE.WEATHER,
       apiNotConfigured: !configuration.weatherApi,
+    };
+  }
+  if (SECURITY_MODULE_TYPES.includes(model)) {
+    return {
+      moduleSupported: true,
+      categoryAPI: SUPPORTED_CATEGORY_TYPE.SECURITY,
+      apiNotConfigured: !configuration.securityApi,
     };
   }
   return {

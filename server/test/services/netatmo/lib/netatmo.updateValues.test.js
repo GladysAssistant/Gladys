@@ -34,6 +34,7 @@ describe('Netatmo update features type', () => {
   it('should not update values if type not supported', async () => {
     const deviceGladys = { ...JSON.parse(JSON.stringify(devicesGladys[devicesGladys.length - 1])) };
     const deviceNetatmo = { ...JSON.parse(JSON.stringify(devicesNetatmo[devicesNetatmo.length - 1])) };
+    deviceNetatmo.type = 'NotSupportedType';
     const externalId = `netatmo:${deviceNetatmo.id}`;
 
     await netatmoHandler.updateValues(deviceGladys, deviceNetatmo, externalId);

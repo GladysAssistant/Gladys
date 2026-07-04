@@ -947,7 +947,8 @@
           "get_access_token_fail": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
         },
         "weatherApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Weather\" dans le but d'avoir accès à la totalité des informations de votre station.",
-        "energyApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Energy\" dans le but d'avoir accès à la totalité des informations de vos appareils."
+        "energyApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Energy\" dans le but d'avoir accès à la totalité des informations de vos appareils.",
+        "securityApiNotConfigured": "Veuillez vous rendre dans l'onglet \"Configuration\" pour activer l'accès à l'API \"Security\" dans le but d'avoir accès à vos caméras."
       },
       "device": {
         "title": "Appareils Netatmo dans Gladys",
@@ -980,7 +981,8 @@
         "deviceError": {
           "6": "Appareil injoignable pour l'API Netatmo (hors tension ou hors de portée). Vous pouvez tout de même l'enregistrer, ses valeurs remonteront dès qu'il sera de nouveau joignable. (code : 6)",
           "default": "L'API Netatmo signale une erreur pour cet appareil (code {{code}})."
-        }
+        },
+        "cameraCommandsInfo": "Première version du support des caméras : état de surveillance et WiFi uniquement, en lecture seule. L'image et les commandes (marche/arrêt de la surveillance) arriveront dans les prochaines versions."
       },
       "setup": {
         "title": "Configuration Netatmo",
@@ -993,6 +995,8 @@
         "descriptionAdditionalInformationEnergyApi": "Vous devez sélectionner l'API \"Energy\" en bas de page pour accéder aux appareils correspondants. Les commandes de températures sont effectuées au niveau de la pièce. Les 2 informations sont donc disponibles en fonctionnalités pour plus de contrôle. Si vous possédez d'autres capteurs de température dans la même pièce que votre Thermostat, c'est la température moyenne de cette pièce qui sera prise en compte pour déclencher le commutateur de contrôle de chauffe.",
         "titleAdditionalInformationWeatherApi": "Informations complémentaires sur le fonctionnement de l'API \"Weather\" :",
         "descriptionAdditionalInformationWeatherApi": "Vous devez sélectionner l'API \"Weather\" en bas de page pour accéder aux appareils correspondants. Si vous avez également des appareils appartenant à l'API \"Energy\" (Plug, thermostat ou vanne) vous aurez accès à une fonctionnalité supplémentaire sur les appareils hygromètres intérieurs pour obtenir la température moyenne de la pièce correspondante. N'oubliez donc pas de sélectionner l'API \"Energy\" pour accéder à cette fonctionnalité.",
+        "titleAdditionalInformationSecurityApi": "Informations complémentaires sur le fonctionnement de l'API \"Security\" :",
+        "descriptionAdditionalInformationSecurityApi": "Vous devez sélectionner l'API \"Security\" en bas de page pour accéder aux caméras (intérieures et extérieures). Cette première version récupère l'état de surveillance et la qualité du WiFi de vos caméras ; l'image et les commandes arriveront dans les prochaines versions. Après activation, cliquez sur \"Sauvegarder et connecter\" pour autoriser les nouveaux accès auprès de Netatmo.",
         "clientIdLabel": "Identifiant client",
         "clientIdPlaceholder": "client ID de My Apps dans Netatmo Connect",
         "clientSecretLabel": "Secret client",
@@ -1000,6 +1004,7 @@
         "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d'accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
         "energyApiLabel": "Activer l'API \"Energy\" (récupérer les appareils Plug, Thermostat et Vannes Netatmo)",
         "weatherApiLabel": "Activer l'API \"Weather\" (récupérer les appareils de la station météo Netatmo)",
+        "securityApiLabel": "Activer l'API \"Security\" (récupérer les caméras Netatmo)",
         "saveLabel": "Sauvegarder et connecter",
         "disconnectLabel": "Déconnecter"
       },

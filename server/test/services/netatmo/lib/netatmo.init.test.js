@@ -55,6 +55,9 @@ describe('Netatmo Init', () => {
       if (variableName === 'NETATMO_WEATHER_API') {
         return Promise.resolve('0');
       }
+      if (variableName === 'NETATMO_SECURITY_API') {
+        return Promise.resolve('0');
+      }
       if (variableName === 'NETATMO_ACCESS_TOKEN') {
         return Promise.resolve('valid_access_token');
       }

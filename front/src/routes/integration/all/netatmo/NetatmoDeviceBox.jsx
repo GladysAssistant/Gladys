@@ -241,6 +241,11 @@ class NetatmoDeviceBox extends Component {
                     </Text>
                   </div>
                 )}
+                {categoryAPI === SUPPORTED_CATEGORY_TYPE.SECURITY && !apiNotConfigured && (
+                  <div class="alert alert-info">
+                    <Text id="integration.netatmo.discover.cameraCommandsInfo" />
+                  </div>
+                )}
                 <div class="form-group">
                   <img
                     src={modelImage}
@@ -388,6 +393,9 @@ class NetatmoDeviceBox extends Component {
                         )}
                         {categoryAPI === SUPPORTED_CATEGORY_TYPE.ENERGY && (
                           <Text id="integration.netatmo.status.energyApiNotConfigured" />
+                        )}
+                        {categoryAPI === SUPPORTED_CATEGORY_TYPE.SECURITY && (
+                          <Text id="integration.netatmo.status.securityApiNotConfigured" />
                         )}
                       </label>
                       <button class={`btn btn-warning mr-2`} disabled="true">

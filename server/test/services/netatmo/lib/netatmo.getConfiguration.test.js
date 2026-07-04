@@ -25,6 +25,9 @@ const gladys = {
       if (variableName === 'NETATMO_WEATHER_API') {
         return Promise.resolve('0');
       }
+      if (variableName === 'NETATMO_SECURITY_API') {
+        return Promise.resolve('0');
+      }
       return Promise.reject(new Error('Unknown variable'));
     }),
     setValue: sinon.stub().resolves(),
@@ -50,6 +53,7 @@ describe('Netatmo getConfiguration', () => {
     expect(configuration.clientSecret).to.equal('valid_client_secret');
     expect(configuration.energyApi).to.equal(true);
     expect(configuration.weatherApi).to.equal(false);
+    expect(configuration.securityApi).to.equal(false);
   });
 
   it('should throw an error if not configured', async () => {

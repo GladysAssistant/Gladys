@@ -12,7 +12,11 @@ const { API, SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
 async function loadDevices() {
   let listDevices = [];
 
-  if (this.configuration.energyApi || (!this.configuration.energyApi && !this.configuration.weatherApi)) {
+  if (
+    this.configuration.energyApi ||
+    this.configuration.securityApi ||
+    (!this.configuration.energyApi && !this.configuration.weatherApi && !this.configuration.securityApi)
+  ) {
     try {
       const responsePage = await fetch(API.HOMESDATA, {
         method: 'GET',
@@ -50,7 +54,10 @@ async function loadDevices() {
     }
   }
 
-  if (this.configuration.energyApi || (!this.configuration.energyApi && !this.configuration.weatherApi)) {
+  if (
+    this.configuration.energyApi ||
+    (!this.configuration.energyApi && !this.configuration.weatherApi && !this.configuration.securityApi)
+  ) {
     try {
       const { plugs, thermostats } = await this.loadThermostatDetails();
       if (listDevices.length > 0) {
@@ -101,7 +108,10 @@ async function loadDevices() {
     }
   }
 
-  if (this.configuration.weatherApi || (!this.configuration.energyApi && !this.configuration.weatherApi)) {
+  if (
+    this.configuration.weatherApi ||
+    (!this.configuration.energyApi && !this.configuration.weatherApi && !this.configuration.securityApi)
+  ) {
     try {
       const { weatherStations, modulesWeatherStations } = await this.loadWeatherStationDetails();
       if (listDevices.length > 0) {

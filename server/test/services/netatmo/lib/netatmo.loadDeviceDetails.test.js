@@ -65,6 +65,7 @@ describe('Netatmo Load Device Details', () => {
     const natNAModule2Devices = devices.filter((device) => device.type === 'NAModule2');
     const natNAModule3Devices = devices.filter((device) => device.type === 'NAModule3');
     const natNAModule4Devices = devices.filter((device) => device.type === 'NAModule4');
+    const natCameraDevices = devices.filter((device) => device.type === 'NOC');
     const natNotHandledDevices = devices.filter((device) => device.not_handled);
 
     expect(natThermDevices).to.have.lengthOf(1);
@@ -75,7 +76,10 @@ describe('Netatmo Load Device Details', () => {
     expect(natNAModule2Devices).to.have.lengthOf(1);
     expect(natNAModule3Devices).to.have.lengthOf(1);
     expect(natNAModule4Devices).to.have.lengthOf(1);
-    expect(natNotHandledDevices).to.have.lengthOf(1);
+    expect(natCameraDevices).to.have.lengthOf(1);
+    expect(natCameraDevices[0].categoryAPI).to.equal('Security');
+    expect(natCameraDevices[0].apiNotConfigured).to.equal(true);
+    expect(natNotHandledDevices).to.have.lengthOf(0);
     natThermDevices.forEach((device) => {
       expect(device)
         .to.haveOwnProperty('apiNotConfigured')
@@ -170,7 +174,7 @@ describe('Netatmo Load Device Details', () => {
     expect(natNAModule2Devices).to.have.lengthOf(1);
     expect(natNAModule3Devices).to.have.lengthOf(1);
     expect(natNAModule4Devices).to.have.lengthOf(1);
-    expect(natNotHandledDevices).to.have.lengthOf(1);
+    expect(natNotHandledDevices).to.have.lengthOf(0);
     expect(devices).to.be.an('array');
   });
 
@@ -212,7 +216,7 @@ describe('Netatmo Load Device Details', () => {
     expect(natNAModule2Devices).to.have.lengthOf(1);
     expect(natNAModule3Devices).to.have.lengthOf(1);
     expect(natNAModule4Devices).to.have.lengthOf(1);
-    expect(natNotHandledDevices).to.have.lengthOf(1);
+    expect(natNotHandledDevices).to.have.lengthOf(0);
   });
 
   it('should load device details successfully but without weather station details', async () => {
@@ -318,7 +322,8 @@ describe('Netatmo Load Device Details', () => {
     expect(unreachableCamera).to.not.equal(undefined);
     expect(unreachableCamera.reachable).to.equal(false);
     expect(unreachableCamera.apiErrorCode).to.equal(undefined);
-    expect(unreachableCamera.not_handled).to.equal(true);
+    expect(unreachableCamera.categoryAPI).to.equal('Security');
+    expect(unreachableCamera.not_handled).to.equal(undefined);
     const unreachableThermostat = devices.find((device) => device.id === unreachableThermostatId);
     expect(unreachableThermostat).to.not.equal(undefined);
     expect(unreachableThermostat.reachable).to.equal(false);
@@ -326,6 +331,41 @@ describe('Netatmo Load Device Details', () => {
     expect(unreachableThermostat.not_handled).to.equal(undefined);
     expect(unreachableThermostat.plug).to.not.equal(undefined);
     expect(unreachableThermostat.plug.id).to.equal('70:ee:50:xx:xx:xx');
+  });
+
+  it('should flag unsupported module types as not handled, present or missing from homestatus', async () => {
+    netatmoHandler.configuration.energyApi = true;
+    netatmoHandler.configuration.weatherApi = true;
+    netatmoHandler.configuration.securityApi = true;
+    const homesMockFake = JSON.parse(JSON.stringify(homesMock));
+    homesMockFake.modules.push(
+      { id: '00:11:22:33:44:55', type: 'NSD', name: 'Smoke Detector', room_id: '8765432109' },
+      { id: '00:11:22:33:44:66', type: 'NIS', name: 'Indoor Siren', room_id: '8765432109' },
+    );
+    const bodyHomeStatusMockFake = JSON.parse(JSON.stringify(bodyHomeStatusMock));
+    // the smoke detector is present in homestatus, the siren is missing from it
+    bodyHomeStatusMockFake.home.modules.push({ id: '00:11:22:33:44:55', type: 'NSD' });
+
+    // Intercept specific to this test
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMockFake.id}`,
+      })
+      .reply(200, {
+        body: bodyHomeStatusMockFake,
+        status: 'ok',
+      });
+
+    const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
+
+    expect(devices).to.have.lengthOf(12);
+    const smokeDetector = devices.find((device) => device.id === '00:11:22:33:44:55');
+    expect(smokeDetector.not_handled).to.equal(true);
+    expect(smokeDetector.categoryAPI).to.equal('unknown');
+    const siren = devices.find((device) => device.id === '00:11:22:33:44:66');
+    expect(siren.not_handled).to.equal(true);
+    expect(siren.reachable).to.equal(false);
   });
 
   it('should no load device details without modules', async () => {
