@@ -43,6 +43,19 @@ describe('Netatmo Convert Energy Device', () => {
     expect(gladysDevice.params).to.be.an('array');
   });
 
+  it('should fall back to station_name when the device has no name and no module_name', () => {
+    const deviceNetatmoMock = {
+      ...JSON.parse(JSON.stringify(devicesNetatmoMock.filter((device) => device.type === 'NAPlug')[0])),
+    };
+    delete deviceNetatmoMock.name;
+    delete deviceNetatmoMock.module_name;
+    deviceNetatmoMock.station_name = 'Relais PAC Maison';
+
+    const gladysDevice = netatmoHandler.convertDeviceEnergy(deviceNetatmoMock);
+
+    expect(gladysDevice).to.have.property('name', 'Relais PAC Maison');
+  });
+
   it('should correctly convert a Netatmo Thermostat device', () => {
     const deviceGladysMock = { ...devicesGladysMock.filter((device) => device.model === 'NATherm1')[0] };
     const deviceNetatmoMock = { ...devicesNetatmoMock.filter((device) => device.type === 'NATherm1')[0] };

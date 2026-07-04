@@ -253,6 +253,81 @@ describe('Netatmo Load Device Details', () => {
     });
   });
 
+  it('should rebuild from homesdata the modules reported in homestatus errors', async () => {
+    netatmoHandler.configuration.energyApi = true;
+    netatmoHandler.configuration.weatherApi = true;
+    const unreachableModuleId = '70:ee:50:yy:yy:yy';
+    const bodyHomeStatusMockFake = JSON.parse(JSON.stringify(bodyHomeStatusMock));
+    bodyHomeStatusMockFake.home.modules = bodyHomeStatusMockFake.home.modules.filter(
+      (module) => module.id !== unreachableModuleId,
+    );
+    // real API responses report unreachable module errors at body level, next to "home"
+    bodyHomeStatusMockFake.errors = [{ code: 6, id: unreachableModuleId }];
+
+    // Intercept specific to this test
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMock.id}`,
+      })
+      .reply(200, {
+        body: bodyHomeStatusMockFake,
+        status: 'ok',
+      });
+
+    const devices = await netatmoHandler.loadDeviceDetails(homesMock);
+
+    expect(devices).to.have.lengthOf(10);
+    const unreachableDevice = devices.find((device) => device.id === unreachableModuleId);
+    expect(unreachableDevice).to.not.equal(undefined);
+    expect(unreachableDevice.name).to.equal('Relais Salon Test');
+    expect(unreachableDevice.type).to.equal('NAPlug');
+    expect(unreachableDevice.reachable).to.equal(false);
+    expect(unreachableDevice.apiErrorCode).to.equal(6);
+    expect(unreachableDevice.categoryAPI).to.equal('Energy');
+    expect(unreachableDevice.not_handled).to.equal(undefined);
+  });
+
+  it('should rebuild not handled and bridged modules missing from homestatus without error code', async () => {
+    netatmoHandler.configuration.energyApi = true;
+    netatmoHandler.configuration.weatherApi = true;
+    const unreachableCameraId = '70:ee:00:xx:xx:xx';
+    const unreachableThermostatId = '04:00:00:xx:xx:xx';
+    const bodyHomeStatusMockFake = JSON.parse(JSON.stringify(bodyHomeStatusMock));
+    bodyHomeStatusMockFake.home.modules = bodyHomeStatusMockFake.home.modules.filter(
+      (module) => module.id !== unreachableCameraId && module.id !== unreachableThermostatId,
+    );
+    bodyHomeStatusMockFake.home.rooms = undefined;
+    bodyHomeStatusMockFake.home.errors = [{ code: 6, id: unreachableThermostatId }];
+
+    // Intercept specific to this test
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: `/api/homestatus?home_id=${homesMock.id}`,
+      })
+      .reply(200, {
+        body: bodyHomeStatusMockFake,
+        status: 'ok',
+      });
+
+    const devices = await netatmoHandler.loadDeviceDetails(homesMock);
+
+    expect(devices).to.have.lengthOf(10);
+    const unreachableCamera = devices.find((device) => device.id === unreachableCameraId);
+    expect(unreachableCamera).to.not.equal(undefined);
+    expect(unreachableCamera.reachable).to.equal(false);
+    expect(unreachableCamera.apiErrorCode).to.equal(undefined);
+    expect(unreachableCamera.not_handled).to.equal(true);
+    const unreachableThermostat = devices.find((device) => device.id === unreachableThermostatId);
+    expect(unreachableThermostat).to.not.equal(undefined);
+    expect(unreachableThermostat.reachable).to.equal(false);
+    expect(unreachableThermostat.apiErrorCode).to.equal(6);
+    expect(unreachableThermostat.not_handled).to.equal(undefined);
+    expect(unreachableThermostat.plug).to.not.equal(undefined);
+    expect(unreachableThermostat.plug.id).to.equal('70:ee:50:xx:xx:xx');
+  });
+
   it('should no load device details without modules', async () => {
     const homesMockFake = { ...JSON.parse(JSON.stringify(homesMock)) };
     homesMockFake.modules = homesMockFake.modules.filter((module) => module.type !== 'NATherm1');

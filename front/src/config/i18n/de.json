@@ -843,7 +843,11 @@
         "updateButton": "Aktualisieren",
         "unmanagedModelButton": "Nicht unterstütztes Modell",
         "scan": "Scannen",
-        "refresh": "Aktualisieren"
+        "refresh": "Aktualisieren",
+        "deviceError": {
+          "6": "Gerät für die Netatmo-API nicht erreichbar (ausgeschaltet oder außer Reichweite). Sie können es trotzdem speichern, die Werte werden übermittelt, sobald es wieder erreichbar ist. (Code: 6)",
+          "default": "Die Netatmo-API meldet einen Fehler für dieses Gerät (Code {{code}})."
+        }
       },
       "setup": {
         "title": "Netatmo-Konfiguration",

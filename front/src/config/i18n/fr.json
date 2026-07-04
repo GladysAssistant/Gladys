@@ -976,7 +976,11 @@
         "updateButton": "Mettre à jour",
         "unmanagedModelButton": "Modèle non pris en charge",
         "scan": "Scanner",
-        "refresh": "Rafraîchir"
+        "refresh": "Rafraîchir",
+        "deviceError": {
+          "6": "Appareil injoignable pour l'API Netatmo (hors tension ou hors de portée). Vous pouvez tout de même l'enregistrer, ses valeurs remonteront dès qu'il sera de nouveau joignable. (code : 6)",
+          "default": "L'API Netatmo signale une erreur pour cet appareil (code {{code}})."
+        }
       },
       "setup": {
         "title": "Configuration Netatmo",
