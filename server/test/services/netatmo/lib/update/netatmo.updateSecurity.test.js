@@ -4,10 +4,16 @@ const sinon = require('sinon');
 const { fake } = sinon;
 
 const NetatmoHandler = require('../../../../../services/netatmo/lib/index');
+const logger = require('../../../../../utils/logger');
 
 const gladys = {
   event: {
     emit: fake.resolves(null),
+  },
+  device: {
+    camera: {
+      setImage: fake.resolves(null),
+    },
   },
 };
 const serviceId = 'serviceId';
@@ -17,6 +23,7 @@ const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 const buildDeviceGladysMock = (externalId) => ({
   name: 'Camera Hall',
   external_id: externalId,
+  selector: externalId,
   features: [
     {
       external_id: `${externalId}:monitoring`,
@@ -112,5 +119,60 @@ describe('Netatmo update Security features', () => {
     sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
       device_feature_external_id: `${externalIdMock}:monitoring`,
     });
+  });
+
+  it('should refresh the camera image of the device', async () => {
+    deviceGladysMock.features.push({
+      external_id: `${externalIdMock}:camera`,
+      category: 'camera',
+      type: 'image',
+    });
+    netatmoHandler.getCameraImage = fake.resolves('image/jpg;base64,fake-image');
+
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.calledWith(netatmoHandler.getCameraImage, deviceNetatmoMock);
+    sinon.assert.calledWith(
+      netatmoHandler.gladys.device.camera.setImage,
+      externalIdMock,
+      'image/jpg;base64,fake-image',
+    );
+  });
+
+  it('should not set an image when the camera feature is missing', async () => {
+    netatmoHandler.getCameraImage = fake.resolves('image/jpg;base64,fake-image');
+
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.notCalled(netatmoHandler.getCameraImage);
+    sinon.assert.notCalled(netatmoHandler.gladys.device.camera.setImage);
+  });
+
+  it('should not set an image when no image could be retrieved', async () => {
+    deviceGladysMock.features.push({
+      external_id: `${externalIdMock}:camera`,
+      category: 'camera',
+      type: 'image',
+    });
+    netatmoHandler.getCameraImage = fake.resolves(undefined);
+
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.notCalled(netatmoHandler.gladys.device.camera.setImage);
+  });
+
+  it('should log and continue when setting the camera image fails', async () => {
+    deviceGladysMock.features.push({
+      external_id: `${externalIdMock}:camera`,
+      category: 'camera',
+      type: 'image',
+    });
+    netatmoHandler.getCameraImage = fake.rejects(new Error('snapshot failed'));
+    sinon.stub(logger, 'error');
+
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.called(logger.error);
+    logger.error.restore();
   });
 });

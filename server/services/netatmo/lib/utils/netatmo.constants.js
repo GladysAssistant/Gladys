@@ -78,6 +78,7 @@ const API = {
   GET_ROOM_MEASURE: `${BASE_API}/api/getroommeasure`,
   SET_ROOM_THERMPOINT: `${BASE_API}/api/setroomthermpoint`,
   SET_THERM_MODE: `${BASE_API}/api/setthermmode`,
+  SET_STATE: `${BASE_API}/api/setstate`,
   GET_MEASURE: `${BASE_API}/api/getmeasure`,
 };
 

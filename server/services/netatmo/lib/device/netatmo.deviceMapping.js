@@ -7,6 +7,12 @@ const writeValues = {
       return valueFromDevice;
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
+    /* monitoring: 'on' / 'off' */
+    [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromGladys) => {
+      return valueFromGladys === 1 || valueFromGladys === true ? 'on' : 'off';
+    },
+  },
 };
 
 const readValues = {

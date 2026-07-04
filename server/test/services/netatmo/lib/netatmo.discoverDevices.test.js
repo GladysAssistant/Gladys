@@ -85,7 +85,7 @@ describe('Netatmo Discover devices', () => {
       (feature) => feature.external_id === 'netatmo:70:ee:50:aa:bb:cc:monitoring',
     );
     expect(monitoringFeature).to.not.equal(undefined);
-    expect(monitoringFeature.read_only).to.equal(true);
+    expect(monitoringFeature.read_only).to.equal(false);
   });
 
   it('should throw an error if not connected', async () => {

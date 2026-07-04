@@ -214,4 +214,65 @@ describe('Netatmo Set Value', () => {
       }),
     ).to.equal(true);
   });
+
+  const cameraDeviceMock = {
+    name: 'Camera Hall',
+    external_id: 'netatmo:70:ee:50:aa:bb:cc',
+    params: [{ name: 'home_id', value: '5e1xxxxxxxxxxxxxxxxx' }],
+    features: [
+      {
+        external_id: 'netatmo:70:ee:50:aa:bb:cc:monitoring',
+        category: 'switch',
+        type: 'binary',
+      },
+    ],
+  };
+
+  it('should switch the camera monitoring on', async () => {
+    const [monitoringFeature] = cameraDeviceMock.features;
+
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/api/setstate',
+      })
+      .reply(200, { status: 'ok' });
+
+    await netatmoHandler.setValue(cameraDeviceMock, monitoringFeature, 1);
+  });
+
+  it('should throw when switching the camera monitoring off fails', async () => {
+    const [monitoringFeature] = cameraDeviceMock.features;
+
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/api/setstate',
+      })
+      .reply(400, { error: { code: 21, message: 'invalid state' } });
+
+    try {
+      await netatmoHandler.setValue(cameraDeviceMock, monitoringFeature, 0);
+      expect.fail('setValue should have thrown an error');
+    } catch (e) {
+      expect(e.message).to.equal('Netatmo setValue error: HTTP 400');
+    }
+  });
+
+  it('should throw an error if no HOME_ID parameter', async () => {
+    const cameraDeviceMockFake = { ...JSON.parse(JSON.stringify(cameraDeviceMock)), params: [] };
+    const [monitoringFeature] = cameraDeviceMockFake.features;
+
+    try {
+      await netatmoHandler.setValue(cameraDeviceMockFake, monitoringFeature, 1);
+      expect.fail('should have thrown an error');
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.equal(
+        `Netatmo device external_id: "${monitoringFeature.external_id}" should contains parameter "HOME_ID"`,
+      );
+    }
+  });
 });

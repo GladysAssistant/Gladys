@@ -29,6 +29,8 @@ const { pollRefreshingValues, refreshNetatmoValues } = require('./netatmo.pollRe
 const { setValue } = require('./netatmo.setValue');
 const { updateValues } = require('./netatmo.updateValues');
 const { updateDevice } = require('./update/netatmo.updateDevice');
+const { updateCameraImage } = require('./update/netatmo.updateCameraImage');
+const { getCameraBaseUrl, getCameraImage } = require('./netatmo.getCameraImage');
 
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
 const buildScopesConfig = require('./utils/netatmo.buildScopesConfig');
@@ -57,6 +59,7 @@ const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.reconnectTimeout = undefined;
   this.reconnectAttempt = 0;
   this.firstFatalAt = null;
+  this.cameraBaseUrls = {};
 };
 
 NetatmoHandler.prototype.init = init;
@@ -89,5 +92,8 @@ NetatmoHandler.prototype.handleApiAuthError = handleApiAuthError;
 NetatmoHandler.prototype.setValue = setValue;
 NetatmoHandler.prototype.updateValues = updateValues;
 NetatmoHandler.prototype.updateDevice = updateDevice;
+NetatmoHandler.prototype.updateCameraImage = updateCameraImage;
+NetatmoHandler.prototype.getCameraBaseUrl = getCameraBaseUrl;
+NetatmoHandler.prototype.getCameraImage = getCameraImage;
 
 module.exports = NetatmoHandler;

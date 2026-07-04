@@ -731,7 +731,7 @@
       },
       "discover": {
         "title": "Your Netatmo Devices Compatible with Gladys",
-        "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently supports Thermostats and the valves associated with their Plug (API Energy), weather stations and their modules (API Weather), as well as indoor and outdoor cameras (API Security, first version: monitoring status and WiFi). If you are missing devices, please check that you have selected the correct APIs on the configuration page. The first discovery is automatic. Press 'Refresh' if you wish to retrieve new features of your devices.",
+        "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently supports Thermostats and the valves associated with their Plug (API Energy), weather stations and their modules (API Weather), as well as indoor and outdoor cameras (API Security: image, monitoring on/off and WiFi). If you are missing devices, please check that you have selected the correct APIs on the configuration page. The first discovery is automatic. Press 'Refresh' if you wish to retrieve new features of your devices.",
         "descriptionCompatibility": "For any requests to add devices and/or features, please visit the <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Feature Requests Category</a>.",
         "descriptionInformation": "State retrieval is currently done every 2 minutes (Netatmo API limitation).",
         "noDeviceFound": "No Netatmo devices were found. If you are certain that you have a Netatmo device supported by Gladys, have you completed all the steps in the documentation to register your devices on the Netatmo API?",
@@ -743,8 +743,7 @@
         "deviceError": {
           "6": "Device unreachable for the Netatmo API (powered off or out of range). You can still save it, its values will be reported as soon as it is reachable again. (code: 6)",
           "default": "The Netatmo API reports an error for this device (code {{code}})."
-        },
-        "cameraCommandsInfo": "First version of the camera support: monitoring status and WiFi only, read-only. The image and the commands (monitoring on/off) will come in the next versions."
+        }
       },
       "setup": {
         "title": "Netatmo Setup",
@@ -758,7 +757,7 @@
         "titleAdditionalInformationWeatherApi": "Additional Information on the Operation of the \"Weather\" API:",
         "descriptionAdditionalInformationWeatherApi": "You must select the \"Weather\" API at the bottom of the page to access the corresponding devices. If you also have devices belonging to the \"Energy\" API (Plug, thermostat or valve) you will have access to an additional functionality on indoor hygrometer devices to obtain the average temperature of the corresponding room. So don't forget to select the \"Energy\" API to access this functionality.",
         "titleAdditionalInformationSecurityApi": "Additional Information on the Operation of the \"Security\" API:",
-        "descriptionAdditionalInformationSecurityApi": "You must select the \"Security\" API at the bottom of the page to access the cameras (indoor and outdoor). This first version retrieves the monitoring status and the WiFi quality of your cameras; the image and the commands will come in the next versions. After enabling it, click on \"Save and connect\" to grant the new permissions to Netatmo.",
+        "descriptionAdditionalInformationSecurityApi": "You must select the \"Security\" API at the bottom of the page to access the cameras (indoor and outdoor). You can view the image of your cameras in the Camera dashboard (refreshed every 2 minutes, preferring the local network when the camera is locally reachable), switch the monitoring on/off and follow the WiFi quality. After enabling it, click on \"Save and connect\" to grant the new permissions to Netatmo.",
         "clientIdLabel": "Client ID",
         "clientIdPlaceholder": "Client ID from My Apps in Netatmo Connect",
         "clientSecretLabel": "Client Secret",

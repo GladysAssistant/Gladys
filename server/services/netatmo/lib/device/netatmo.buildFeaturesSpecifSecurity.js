@@ -1,8 +1,7 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 /**
- * @description Transforms Netatmo feature as Gladys feature. Camera monitoring status.
- * Read-only for now: switching the monitoring on/off will be unlocked with the camera commands.
+ * @description Transforms Netatmo feature as Gladys feature. Camera monitoring switch.
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
  * @returns {object} Gladys feature.
@@ -16,7 +15,7 @@ function buildFeatureMonitoring(name, externalId) {
     external_id: `${externalId}:monitoring`,
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-    read_only: true,
+    read_only: false,
     keep_history: true,
     has_feedback: false,
     min: 0,
@@ -24,6 +23,30 @@ function buildFeatureMonitoring(name, externalId) {
   };
 }
 
+/**
+ * @description Transforms Netatmo feature as Gladys feature. Camera image.
+ * @param {string} name - Name device from Netatmo.
+ * @param {string} externalId - Gladys external ID.
+ * @returns {object} Gladys feature.
+ * @example
+ * buildFeatureCamera(device_name, 'netatmo:device_id');
+ */
+function buildFeatureCamera(name, externalId) {
+  return {
+    name,
+    selector: `${externalId}:camera`,
+    external_id: `${externalId}:camera`,
+    category: DEVICE_FEATURE_CATEGORIES.CAMERA,
+    type: DEVICE_FEATURE_TYPES.CAMERA.IMAGE,
+    read_only: true,
+    keep_history: false,
+    has_feedback: false,
+    min: 0,
+    max: 0,
+  };
+}
+
 module.exports = {
   buildFeatureMonitoring,
+  buildFeatureCamera,
 };

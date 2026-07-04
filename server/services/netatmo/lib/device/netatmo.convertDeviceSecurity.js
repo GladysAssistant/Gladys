@@ -1,7 +1,7 @@
 const logger = require('../../../../utils/logger');
 const { PARAMS } = require('../utils/netatmo.constants');
 const { buildFeatureWifiStrength } = require('./netatmo.buildFeaturesCommon');
-const { buildFeatureMonitoring } = require('./netatmo.buildFeaturesSpecifSecurity');
+const { buildFeatureMonitoring, buildFeatureCamera } = require('./netatmo.buildFeaturesSpecifSecurity');
 
 /**
  * @description Transform Netatmo Security device to Gladys device.
@@ -22,6 +22,7 @@ function convertDeviceSecurity(netatmoDevice) {
 
   features.push(buildFeatureWifiStrength(nameDevice, externalId));
   features.push(buildFeatureMonitoring(nameDevice, externalId));
+  features.push(buildFeatureCamera(nameDevice, externalId));
 
   const params = [
     { name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) },

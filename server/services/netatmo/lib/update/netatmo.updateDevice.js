@@ -1,6 +1,9 @@
 const logger = require('../../../../utils/logger');
 const { emitFeatureState } = require('../utils/netatmo.emitFeatureState');
 const { UPDATE_MAPPINGS } = require('./netatmo.updateMappings');
+const { SUPPORTED_MODULE_TYPE } = require('../utils/netatmo.constants');
+
+const CAMERA_MODULE_TYPES = [SUPPORTED_MODULE_TYPE.NACAMERA, SUPPORTED_MODULE_TYPE.NOC];
 
 /**
  * @description Save values of a supported Netatmo device from its declarative mapping.
@@ -31,6 +34,9 @@ async function updateDevice(deviceGladys, deviceNetatmo, externalId) {
         }
       });
   });
+  if (CAMERA_MODULE_TYPES.includes(deviceNetatmo.type)) {
+    await this.updateCameraImage(deviceGladys, deviceNetatmo, externalId);
+  }
 }
 
 module.exports = {

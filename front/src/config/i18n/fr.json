@@ -969,7 +969,7 @@
       },
       "discover": {
         "title": "Vos appareils Netatmo compatibles avec Gladys",
-        "description": "Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant d'être ajoutés à Gladys qui supporte actuellement les Thermostats et les vannes associés à leur Plug (API Energy), les stations météo et leurs modules (API Weather), ainsi que les caméras intérieures et extérieures (API Security, première version : état de surveillance et WiFi). S'il vous manque des appareils, veuillez vérifier que vous avez bien sélectionné les bonnes API dans la page de configuration. La 1ère découverte se fait automatiquement. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
+        "description": "Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant d'être ajoutés à Gladys qui supporte actuellement les Thermostats et les vannes associés à leur Plug (API Energy), les stations météo et leurs modules (API Weather), ainsi que les caméras intérieures et extérieures (API Security : image, marche/arrêt de la surveillance et WiFi). S'il vous manque des appareils, veuillez vérifier que vous avez bien sélectionné les bonnes API dans la page de configuration. La 1ère découverte se fait automatiquement. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
         "descriptionCompatibility": "Pour toute demande d'ajout d'appareils et/ou de fonctionnalités, veuillez vous rendre sur le <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Forum Gladys Assistant - Catégorie \"Demande de fonctionnalités\"</a>.",
         "descriptionInformation": "La récupération des états se fait actuellement toutes les 2 minutes (limitation de l'API Netatmo).",
         "noDeviceFound": "Aucun appareil Netatmo n'a été trouvé. Si vous êtes certains de posséder un appareil Netatmo supporté par Gladys, avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
@@ -981,8 +981,7 @@
         "deviceError": {
           "6": "Appareil injoignable pour l'API Netatmo (hors tension ou hors de portée). Vous pouvez tout de même l'enregistrer, ses valeurs remonteront dès qu'il sera de nouveau joignable. (code : 6)",
           "default": "L'API Netatmo signale une erreur pour cet appareil (code {{code}})."
-        },
-        "cameraCommandsInfo": "Première version du support des caméras : état de surveillance et WiFi uniquement, en lecture seule. L'image et les commandes (marche/arrêt de la surveillance) arriveront dans les prochaines versions."
+        }
       },
       "setup": {
         "title": "Configuration Netatmo",
@@ -996,7 +995,7 @@
         "titleAdditionalInformationWeatherApi": "Informations complémentaires sur le fonctionnement de l'API \"Weather\" :",
         "descriptionAdditionalInformationWeatherApi": "Vous devez sélectionner l'API \"Weather\" en bas de page pour accéder aux appareils correspondants. Si vous avez également des appareils appartenant à l'API \"Energy\" (Plug, thermostat ou vanne) vous aurez accès à une fonctionnalité supplémentaire sur les appareils hygromètres intérieurs pour obtenir la température moyenne de la pièce correspondante. N'oubliez donc pas de sélectionner l'API \"Energy\" pour accéder à cette fonctionnalité.",
         "titleAdditionalInformationSecurityApi": "Informations complémentaires sur le fonctionnement de l'API \"Security\" :",
-        "descriptionAdditionalInformationSecurityApi": "Vous devez sélectionner l'API \"Security\" en bas de page pour accéder aux caméras (intérieures et extérieures). Cette première version récupère l'état de surveillance et la qualité du WiFi de vos caméras ; l'image et les commandes arriveront dans les prochaines versions. Après activation, cliquez sur \"Sauvegarder et connecter\" pour autoriser les nouveaux accès auprès de Netatmo.",
+        "descriptionAdditionalInformationSecurityApi": "Vous devez sélectionner l'API \"Security\" en bas de page pour accéder aux caméras (intérieures et extérieures). Vous pourrez visualiser l'image de vos caméras dans le tableau de bord Caméra (rafraîchie toutes les 2 minutes, en privilégiant le réseau local quand la caméra est joignable localement), activer/désactiver la surveillance et suivre la qualité du WiFi. Après activation, cliquez sur \"Sauvegarder et connecter\" pour autoriser les nouveaux accès auprès de Netatmo.",
         "clientIdLabel": "Identifiant client",
         "clientIdPlaceholder": "client ID de My Apps dans Netatmo Connect",
         "clientSecretLabel": "Secret client",

@@ -836,7 +836,7 @@
       },
       "discover": {
         "title": "Ihre mit Gladys kompatiblen Netatmo-Geräte",
-        "description": "Ihre Netatmo-Geräte müssen Ihrem Netatmo-Konto hinzugefügt werden, bevor sie zu Gladys hinzugefügt werden können, das derzeit Thermostate und die damit verbundenen Ventile ihres Steckers (API Energy), Wetterstationen und deren Module (API Weather) sowie Innen- und Außenkameras (API Security, erste Version: Überwachungsstatus und WLAN) unterstützt. Wenn Ihnen Geräte fehlen, überprüfen Sie bitte, ob Sie die richtigen APIs auf der Konfigurationsseite ausgewählt haben. Die erste Entdeckung erfolgt automatisch. Drücken Sie 'Aktualisieren', wenn Sie neue Funktionen Ihrer Geräte abrufen möchten.",
+        "description": "Ihre Netatmo-Geräte müssen Ihrem Netatmo-Konto hinzugefügt werden, bevor sie zu Gladys hinzugefügt werden können, das derzeit Thermostate und die damit verbundenen Ventile ihres Steckers (API Energy), Wetterstationen und deren Module (API Weather) sowie Innen- und Außenkameras (API Security: Bild, Überwachung ein/aus und WLAN) unterstützt. Wenn Ihnen Geräte fehlen, überprüfen Sie bitte, ob Sie die richtigen APIs auf der Konfigurationsseite ausgewählt haben. Die erste Entdeckung erfolgt automatisch. Drücken Sie 'Aktualisieren', wenn Sie neue Funktionen Ihrer Geräte abrufen möchten.",
         "descriptionCompatibility": "Für alle Anfragen zur Hinzufügung von Geräten und/oder Funktionen, besuchen Sie bitte das <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Kategorie \"Funktionsanfragen\"</a>.",
         "descriptionInformation": "Der Statusabruf erfolgt derzeit alle 2 Minuten (Einschränkung der Netatmo-API).",
         "noDeviceFound": "Keine Netatmo-Geräte gefunden. Wenn Sie sicher sind, dass Sie über ein von Gladys unterstütztes Netatmo-Gerät verfügen, um Ihre Geräte in der Netatmo-API zu registrieren?",
@@ -848,8 +848,7 @@
         "deviceError": {
           "6": "Gerät für die Netatmo-API nicht erreichbar (ausgeschaltet oder außer Reichweite). Sie können es trotzdem speichern, die Werte werden übermittelt, sobald es wieder erreichbar ist. (Code: 6)",
           "default": "Die Netatmo-API meldet einen Fehler für dieses Gerät (Code {{code}})."
-        },
-        "cameraCommandsInfo": "Erste Version der Kameraunterstützung: nur Überwachungsstatus und WLAN, schreibgeschützt. Das Bild und die Befehle (Überwachung ein/aus) folgen in den nächsten Versionen."
+        }
       },
       "setup": {
         "title": "Netatmo-Konfiguration",
@@ -863,7 +862,7 @@
         "titleAdditionalInformationWeatherApi": "Weitere Informationen über die Funktionsweise der \"Weather\"-API:",
         "descriptionAdditionalInformationWeatherApi": "Sie müssen unten auf der Seite die API \"Weather\" auswählen, um auf die entsprechenden Geräte zuzugreifen. Wenn Sie auch über Geräte verfügen, die zur API \"Energy\" gehören (Stecker, Thermostat oder Ventil), haben Sie Zugriff auf eine zusätzliche Funktionalität bei Innenhygrometergeräten, um die Durchschnittstemperatur des entsprechenden Raums zu ermitteln. Vergessen Sie also nicht, die API \"Energy\" auszuwählen, um auf diese Funktionalität zuzugreifen.",
         "titleAdditionalInformationSecurityApi": "Weitere Informationen über die Funktionsweise der \"Security\"-API:",
-        "descriptionAdditionalInformationSecurityApi": "Sie müssen unten auf der Seite die API \"Security\" auswählen, um auf die Kameras (innen und außen) zuzugreifen. Diese erste Version ruft den Überwachungsstatus und die WLAN-Qualität Ihrer Kameras ab; das Bild und die Befehle folgen in den nächsten Versionen. Klicken Sie nach der Aktivierung auf \"Speichern und verbinden\", um die neuen Berechtigungen bei Netatmo zu autorisieren.",
+        "descriptionAdditionalInformationSecurityApi": "Sie müssen unten auf der Seite die API \"Security\" auswählen, um auf die Kameras (innen und außen) zuzugreifen. Sie können das Bild Ihrer Kameras im Kamera-Dashboard ansehen (alle 2 Minuten aktualisiert, bevorzugt über das lokale Netzwerk, wenn die Kamera lokal erreichbar ist), die Überwachung ein-/ausschalten und die WLAN-Qualität verfolgen. Klicken Sie nach der Aktivierung auf \"Speichern und verbinden\", um die neuen Berechtigungen bei Netatmo zu autorisieren.",
         "clientIdLabel": "Kunden-ID",
         "clientIdPlaceholder": "Kunden-ID von My Apps in Netatmo Connect",
         "clientSecretLabel": "Kundengeheimnis",

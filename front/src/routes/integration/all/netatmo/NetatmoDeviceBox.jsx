@@ -241,11 +241,6 @@ class NetatmoDeviceBox extends Component {
                     </Text>
                   </div>
                 )}
-                {categoryAPI === SUPPORTED_CATEGORY_TYPE.SECURITY && !apiNotConfigured && (
-                  <div class="alert alert-info">
-                    <Text id="integration.netatmo.discover.cameraCommandsInfo" />
-                  </div>
-                )}
                 <div class="form-group">
                   <img
                     src={modelImage}

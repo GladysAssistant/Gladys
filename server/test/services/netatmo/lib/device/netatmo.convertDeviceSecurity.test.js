@@ -49,7 +49,7 @@ describe('Netatmo Convert Security Device', () => {
     expect(gladysDevice).to.have.property('service_id', serviceId);
     expect(gladysDevice.not_handled).to.equal(undefined);
 
-    expect(gladysDevice.features).to.have.lengthOf(2);
+    expect(gladysDevice.features).to.have.lengthOf(3);
     const wifiFeature = gladysDevice.features.find(
       (feature) => feature.external_id === `netatmo:${deviceNetatmoNACameraMock.id}:wifi_strength`,
     );
@@ -58,7 +58,13 @@ describe('Netatmo Convert Security Device', () => {
       (feature) => feature.external_id === `netatmo:${deviceNetatmoNACameraMock.id}:monitoring`,
     );
     expect(monitoringFeature).to.not.equal(undefined);
-    expect(monitoringFeature.read_only).to.equal(true);
+    expect(monitoringFeature.read_only).to.equal(false);
+    const cameraFeature = gladysDevice.features.find(
+      (feature) => feature.external_id === `netatmo:${deviceNetatmoNACameraMock.id}:camera`,
+    );
+    expect(cameraFeature).to.not.equal(undefined);
+    expect(cameraFeature.category).to.equal('camera');
+    expect(cameraFeature.keep_history).to.equal(false);
 
     const bridgeParam = gladysDevice.params.find((param) => param.name === 'modules_bridge_id');
     expect(bridgeParam).to.have.property('value', JSON.stringify(deviceNetatmoNACameraMock.modules_bridged));
@@ -75,7 +81,7 @@ describe('Netatmo Convert Security Device', () => {
     expect(gladysDevice).to.have.property('external_id', `netatmo:${deviceNetatmoNOCMock.id}`);
     expect(gladysDevice).to.have.property('model', SUPPORTED_MODULE_TYPE.NOC);
 
-    expect(gladysDevice.features).to.have.lengthOf(2);
+    expect(gladysDevice.features).to.have.lengthOf(3);
     const bridgeParam = gladysDevice.params.find((param) => param.name === 'modules_bridge_id');
     expect(bridgeParam).to.have.property('value', '[]');
     const homeParam = gladysDevice.params.find((param) => param.name === 'home_id');
