@@ -96,6 +96,17 @@ describe('Netatmo update NRV features', () => {
     });
   });
 
+  it('should not emit heating power request when the value is absent', async () => {
+    delete deviceNetatmoMock.room.heating_power_request;
+
+    await netatmoHandler.updateNRV(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(5);
+    sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:heating_power_request`,
+    });
+  });
+
   it('should handle errors correctly', async () => {
     deviceNetatmoMock.battery_percent = undefined;
     const error = new Error('Test error');

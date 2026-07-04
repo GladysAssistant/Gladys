@@ -1,6 +1,5 @@
-const { EVENTS } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
-const { readValues } = require('../device/netatmo.deviceMapping');
+const { emitFeatureState } = require('../utils/netatmo.emitFeatureState');
 
 /**
  * @description Save values of NAPlug.
@@ -14,34 +13,18 @@ async function updateNAPlug(deviceGladys, deviceNetatmo, externalId) {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:rf_strength`)
       .forEach((feature) => {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.rf_strength),
-        });
+        emitFeatureState(this.gladys, feature, deviceNetatmo.rf_strength);
       });
 
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:wifi_strength`)
       .forEach((feature) => {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](deviceNetatmo.wifi_strength),
-        });
+        emitFeatureState(this.gladys, feature, deviceNetatmo.wifi_strength);
       });
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:plug_connected_boiler`)
       .forEach((feature) => {
-        if (typeof deviceNetatmo.plug_connected_boiler !== 'undefined') {
-          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-            device_feature_external_id: feature.external_id,
-            state: readValues[feature.category][feature.type](deviceNetatmo.plug_connected_boiler),
-          });
-        } else {
-          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-            device_feature_external_id: feature.external_id,
-            state: readValues[feature.category][feature.type](false),
-          });
-        }
+        emitFeatureState(this.gladys, feature, deviceNetatmo.plug_connected_boiler ?? false);
       });
   } catch (e) {
     logger.error('deviceGladys NAPlug: ', deviceGladys.name, 'error: ', e);

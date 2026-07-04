@@ -44,7 +44,10 @@ describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
     deviceNetatmoMock.rf_strength = undefined;
     await netatmoHandler.updateNAModule1(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
-    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(deviceGladysMock.features.length);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(5);
+    sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:rf_strength`,
+    });
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit.getCall(1), 'device.new-state', {
       device_feature_external_id: `${deviceGladysMock.external_id}:temperature`,
       state: 14.2,
@@ -93,6 +96,17 @@ describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
         state: 59,
       }),
     ).to.equal(true);
+  });
+
+  it('should emit zero values instead of falling back to dashboard data', async () => {
+    deviceNetatmoMock.temperature = 0;
+
+    await netatmoHandler.updateNAModule1(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.calledWith(netatmoHandler.gladys.event.emit.getCall(1), 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:temperature`,
+      state: 0,
+    });
   });
 
   it('should handle errors correctly', async () => {

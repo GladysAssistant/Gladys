@@ -46,7 +46,10 @@ describe('Netatmo update Smart Indoor module NAModule4 features', () => {
 
     await netatmoHandler.updateNAModule4(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
-    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(deviceGladysMock.features.length);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(7);
+    sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:rf_strength`,
+    });
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit.getCall(1), 'device.new-state', {
       device_feature_external_id: `${deviceGladysMock.external_id}:temperature`,
       state: 18.1,
