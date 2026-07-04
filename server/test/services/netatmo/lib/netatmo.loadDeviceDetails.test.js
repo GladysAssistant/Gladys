@@ -261,7 +261,8 @@ describe('Netatmo Load Device Details', () => {
     bodyHomeStatusMockFake.home.modules = bodyHomeStatusMockFake.home.modules.filter(
       (module) => module.id !== unreachableModuleId,
     );
-    bodyHomeStatusMockFake.home.errors = [{ code: 6, id: unreachableModuleId }];
+    // real API responses report unreachable module errors at body level, next to "home"
+    bodyHomeStatusMockFake.errors = [{ code: 6, id: unreachableModuleId }];
 
     // Intercept specific to this test
     netatmoMock
@@ -297,6 +298,7 @@ describe('Netatmo Load Device Details', () => {
       (module) => module.id !== unreachableCameraId && module.id !== unreachableThermostatId,
     );
     bodyHomeStatusMockFake.home.rooms = undefined;
+    bodyHomeStatusMockFake.home.errors = [{ code: 6, id: unreachableThermostatId }];
 
     // Intercept specific to this test
     netatmoMock
@@ -320,6 +322,7 @@ describe('Netatmo Load Device Details', () => {
     const unreachableThermostat = devices.find((device) => device.id === unreachableThermostatId);
     expect(unreachableThermostat).to.not.equal(undefined);
     expect(unreachableThermostat.reachable).to.equal(false);
+    expect(unreachableThermostat.apiErrorCode).to.equal(6);
     expect(unreachableThermostat.not_handled).to.equal(undefined);
     expect(unreachableThermostat.plug).to.not.equal(undefined);
     expect(unreachableThermostat.plug.id).to.equal('70:ee:50:xx:xx:xx');

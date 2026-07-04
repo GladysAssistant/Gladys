@@ -137,9 +137,11 @@ class NetatmoDeviceBox extends Component {
 
     let categoryAPI = null;
     let apiNotConfigured = null;
+    let apiErrorCode = null;
     if (device.deviceNetatmo) {
       categoryAPI = device.deviceNetatmo.categoryAPI;
       apiNotConfigured = device.deviceNetatmo.apiNotConfigured;
+      apiErrorCode = device.deviceNetatmo.apiErrorCode !== undefined ? device.deviceNetatmo.apiErrorCode : null;
     }
     const isDeviceReachable = (device, now = new Date()) => {
       const isRecent = (date, time) => (now - new Date(date)) / (1000 * 60) <= time;
@@ -161,7 +163,8 @@ class NetatmoDeviceBox extends Component {
       plugName,
       online,
       categoryAPI,
-      apiNotConfigured
+      apiNotConfigured,
+      apiErrorCode
     };
   };
 
@@ -186,7 +189,8 @@ class NetatmoDeviceBox extends Component {
       plugName,
       online,
       categoryAPI,
-      apiNotConfigured
+      apiNotConfigured,
+      apiErrorCode
     } = this.getDeviceProperty();
     const sidDevice = device.external_id.replace('netatmo:', '') || (device.deviceNetatmo && device.deviceNetatmo.id);
     const saveButtonCondition =
@@ -224,6 +228,13 @@ class NetatmoDeviceBox extends Component {
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">
                     <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                  </div>
+                )}
+                {apiErrorCode !== null && (
+                  <div class="alert alert-warning">
+                    <Text id={`integration.netatmo.discover.deviceError.${apiErrorCode}`}>
+                      <Text id="integration.netatmo.discover.deviceError.default" fields={{ code: apiErrorCode }} />
+                    </Text>
                   </div>
                 )}
                 <div class="form-group">

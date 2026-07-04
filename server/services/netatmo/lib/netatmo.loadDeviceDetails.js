@@ -73,7 +73,9 @@ async function loadDeviceDetails(homeData) {
 
     const data = JSON.parse(rawBody);
     const { body, status } = data;
-    const { rooms: roomsHomestatus = [], modules: modulesHomestatus, errors: errorsHomestatus = [] } = body.home;
+    const { rooms: roomsHomestatus = [], modules: modulesHomestatus } = body.home;
+    // Depending on the API response, unreachable module errors are reported at body or home level.
+    const errorsHomestatus = body.home.errors ?? body.errors ?? [];
 
     if (status === 'ok') {
       if (modulesHomestatus) {
