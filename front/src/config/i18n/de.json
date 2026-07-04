@@ -318,6 +318,16 @@
           "dailyForecast": "Vorhersage für die nächsten 5 Tage",
           "vigilanceMap": "Vigilance-Karte Frankreich (erfordert den optionalen API-Schlüssel)"
         },
+        "moonPhases": {
+          "0": "Neumond",
+          "1": "Zunehmende Sichel",
+          "2": "Erstes Viertel",
+          "3": "Zunehmender Mond",
+          "4": "Vollmond",
+          "5": "Abnehmender Mond",
+          "6": "Letztes Viertel",
+          "7": "Abnehmende Sichel"
+        },
         "vigilanceTitle": "Météo France Unwetterwarnung",
         "noVigilance": "Keine Unwetterwarnung aktiv",
         "mapUnavailable": "Karte nicht verfügbar: Konfiguriere den API-Schlüssel in der Météo France-Integration.",

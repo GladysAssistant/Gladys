@@ -34,6 +34,35 @@ const PHENOMENA_EMOJI = {
   9: '🌊'
 };
 
+const MOON_EMOJIS = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
+
+// Official UV index scale colors (green, yellow, orange, red, violet)
+function getUvColor(uv) {
+  if (uv >= 11) {
+    return '#8557e0';
+  }
+  if (uv >= 8) {
+    return '#d63939';
+  }
+  if (uv >= 6) {
+    return '#f68f00';
+  }
+  if (uv >= 3) {
+    return '#d4a900';
+  }
+  return '#2fb344';
+}
+
+// Moon phase index (0 = new moon, 4 = full moon) from the synodic month,
+// using the new moon of January 6th 2000 18:14 UTC as reference
+function getMoonPhaseIndex() {
+  const synodicMonth = 29.53058867;
+  const knownNewMoon = Date.UTC(2000, 0, 6, 18, 14) / 86400000;
+  const daysSince = Date.now() / 86400000 - knownNewMoon;
+  const age = ((daysSince % synodicMonth) + synodicMonth) % synodicMonth;
+  return Math.round(age / (synodicMonth / 8)) % 8;
+}
+
 const VIGILANCE_STYLE = {
   2: { background: '#f7c600', color: '#212529' },
   3: { background: '#f68f00', color: '#fff' },
@@ -132,7 +161,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
     const windUnit = isUS ? 'mph' : 'km/h';
     const timeFormat = isUS ? 'h:mm A' : 'HH:mm';
 
-    const { current, currentIcon, hourly, daily, sun, rainChance, position, vigilance } = boxData;
+    const { current, currentIcon, hourly, daily, sun, uv, rainChance, position, vigilance } = boxData;
     const temp = current.T && current.T.value != null ? convertTemp(Math.round(current.T.value)) : '--';
     // In hourly forecast entries, humidity is a raw number (not an object)
     const humidity = typeof current.humidity === 'number' ? Math.round(current.humidity) : null;
@@ -162,6 +191,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
       showDateLocation || showCurrentWeather || showChips || alerts.length > 0 || vigilanceEnabled || showMap;
     const hasContentAboveDaily = hasContentAboveHourly || showHourly;
     const locationName = position && position.name ? position.name : '';
+    const moonPhase = getMoonPhaseIndex();
 
     return (
       <div class="card">
@@ -199,45 +229,59 @@ class WeatherMeteoFranceBoxComponent extends Component {
           )}
 
           {showChips && (
-            <div style="background: rgba(70, 127, 207, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; line-height: 1.9">
-              <div>
-                {humidity !== null && (
-                  <div>
-                    <i class="fe fe-droplet mr-2" style="color: #467fcf" />
-                    {humidity}%
-                  </div>
-                )}
-                {pressure !== null && (
-                  <div>
-                    <i class="fe fe-activity mr-2" style="color: #467fcf" />
-                    {pressure}
-                  </div>
-                )}
-                {sun && (
-                  <div>
-                    <i class="fe fe-sunrise mr-2" style="color: #f59f00" />
-                    {dayjs.unix(sun.rise).format(timeFormat)}
-                  </div>
-                )}
+            <div style="background: rgba(70, 127, 207, 0.08); border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 13px; line-height: 1.9">
+              <div style="display: flex; justify-content: space-between">
+                <div>
+                  {humidity !== null && (
+                    <div>
+                      <i class="fe fe-droplet mr-2" style="color: #467fcf" />
+                      {humidity}%
+                    </div>
+                  )}
+                  {pressure !== null && (
+                    <div>
+                      <i class="fe fe-activity mr-2" style="color: #467fcf" />
+                      {pressure}
+                    </div>
+                  )}
+                  {sun && (
+                    <div>
+                      <i class="fe fe-sunrise mr-2" style="color: #f59f00" />
+                      {dayjs.unix(sun.rise).format(timeFormat)}
+                    </div>
+                  )}
+                </div>
+                <div style="text-align: right">
+                  {windSpeed !== null && (
+                    <div>
+                      {windSpeed} {windUnit}
+                      {windDir && <span class="text-muted"> {windDir}</span>}
+                      <i class="fe fe-wind ml-2" style="color: #467fcf" />
+                    </div>
+                  )}
+                  {rainChance != null && (
+                    <div>
+                      {rainChance}%
+                      <i class="fe fe-umbrella ml-2" style="color: #467fcf" />
+                    </div>
+                  )}
+                  {sun && (
+                    <div>
+                      {dayjs.unix(sun.set).format(timeFormat)}
+                      <i class="fe fe-sunset ml-2" style="color: #f59f00" />
+                    </div>
+                  )}
+                </div>
               </div>
-              <div style="text-align: right">
-                {windSpeed !== null && (
+              <div style="display: flex; justify-content: space-between">
+                <div>
+                  <span class="mr-2">{MOON_EMOJIS[moonPhase]}</span>
+                  <Text id={`dashboard.boxes.weatherMeteoFrance.moonPhases.${moonPhase}`} />
+                </div>
+                {uv != null && (
                   <div>
-                    {windSpeed} {windUnit}
-                    {windDir && <span class="text-muted"> {windDir}</span>}
-                    <i class="fe fe-wind ml-2" style="color: #467fcf" />
-                  </div>
-                )}
-                {rainChance != null && (
-                  <div>
-                    {rainChance}%
-                    <i class="fe fe-umbrella ml-2" style="color: #467fcf" />
-                  </div>
-                )}
-                {sun && (
-                  <div>
-                    {dayjs.unix(sun.set).format(timeFormat)}
-                    <i class="fe fe-sunset ml-2" style="color: #f59f00" />
+                    <span class="text-muted mr-1">UV</span>
+                    <span style={`font-weight: 600; color: ${getUvColor(uv)}`}>{uv}</span>
                   </div>
                 )}
               </div>

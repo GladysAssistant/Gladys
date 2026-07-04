@@ -318,6 +318,16 @@
           "dailyForecast": "Forecast for the next 5 days",
           "vigilanceMap": "France vigilance map (requires the optional API key)"
         },
+        "moonPhases": {
+          "0": "New moon",
+          "1": "Waxing crescent",
+          "2": "First quarter",
+          "3": "Waxing gibbous",
+          "4": "Full moon",
+          "5": "Waning gibbous",
+          "6": "Last quarter",
+          "7": "Waning crescent"
+        },
         "vigilanceTitle": "Météo France Vigilance",
         "noVigilance": "No weather alert in progress",
         "mapUnavailable": "Map unavailable: configure the API key in the Météo France integration.",

@@ -103,9 +103,10 @@ function createActions(store) {
           };
         });
 
-        // Today's sunrise/sunset comes from the first daily entry
+        // Today's sunrise/sunset and UV index come from the first daily entry
         const today = (data.forecast.daily_forecast || [])[0];
         const sun = today && today.sun && today.sun.rise ? { rise: today.sun.rise, set: today.sun.set } : null;
+        const uv = today && today.uv != null ? today.uv : null;
 
         // Rain probability for the current 3h slot
         const probabilities = data.forecast.probability_forecast || [];
@@ -134,6 +135,7 @@ function createActions(store) {
           hourly,
           daily,
           sun,
+          uv,
           rainChance,
           position: data.forecast.position || {},
           vigilance: data.vigilance || { alerts: [] },

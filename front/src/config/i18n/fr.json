@@ -318,6 +318,16 @@
           "dailyForecast": "Prévisions pour les 5 prochains jours",
           "vigilanceMap": "Carte de vigilance France (nécessite la clé API optionnelle)"
         },
+        "moonPhases": {
+          "0": "Nouvelle lune",
+          "1": "Premier croissant",
+          "2": "Premier quartier",
+          "3": "Gibbeuse croissante",
+          "4": "Pleine lune",
+          "5": "Gibbeuse décroissante",
+          "6": "Dernier quartier",
+          "7": "Dernier croissant"
+        },
         "vigilanceTitle": "Vigilance Météo France",
         "noVigilance": "Pas de vigilance en cours",
         "mapUnavailable": "Carte indisponible : configurez la clé API dans l'intégration Météo France.",
