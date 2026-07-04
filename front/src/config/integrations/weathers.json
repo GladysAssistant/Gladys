@@ -8,7 +8,7 @@
   {
     "key": "meteoFrance",
     "link": "meteofrance",
-    "img": "/assets/integrations/cover/darksky.jpg",
+    "img": "/assets/integrations/cover/meteo-france.jpg",
     "whiteBackground": true,
     "cloud": true
   }

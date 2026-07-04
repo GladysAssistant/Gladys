@@ -37,7 +37,7 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   }
 
   /**
-   * @description Get vigilance warnings for a department from Météo-France mobile webservice.
+   * @description Get vigilance warnings for a department from Météo France mobile webservice.
    * @param {string} dept - French department number (e.g. "06", "75").
    * @returns {Promise<object>} Resolve with warning data (phenomena colors and bulletin text).
    * @example
@@ -80,7 +80,7 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   }
 
   /**
-   * @description Get weather forecast from Météo-France mobile webservice.
+   * @description Get weather forecast from Météo France mobile webservice.
    * @param {number} lat - Latitude.
    * @param {number} lon - Longitude.
    * @returns {Promise<object>} Resolve with forecast data.
@@ -95,7 +95,7 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
         lang: 'fr',
         token: METEOFRANCE_PUBLIC_TOKEN,
       },
-      // The Météo-France API can take ~20s on a cold cache, then answers in ~50ms
+      // The Météo France API can take ~20s on a cold cache, then answers in ~50ms
       timeout: 30000,
     };
     try {

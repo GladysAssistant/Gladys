@@ -289,7 +289,7 @@
       "energy-consumption": "Consommation Énergétique",
       "voice-assistant": "Assistant vocal",
       "link": "Lien",
-      "weather-meteo-france": "Météo-France"
+      "weather-meteo-france": "Météo France"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -318,12 +318,12 @@
           "dailyForecast": "Prévisions pour les 5 prochains jours",
           "vigilanceMap": "Carte de vigilance France (nécessite la clé API optionnelle)"
         },
-        "vigilanceTitle": "Vigilance Météo-France",
+        "vigilanceTitle": "Vigilance Météo France",
         "noVigilance": "Pas de vigilance en cours",
-        "mapUnavailable": "Carte indisponible : configurez la clé API dans l'intégration Météo-France.",
+        "mapUnavailable": "Carte indisponible : configurez la clé API dans l'intégration Météo France.",
         "editVigilanceLabel": "Afficher les vigilances météo en cours",
         "editVigilanceHelp": "Le département est détecté automatiquement à partir des coordonnées GPS de la maison.",
-        "error": "Impossible de récupérer la météo Météo-France.",
+        "error": "Impossible de récupérer la météo Météo France.",
         "noCoordinates": "La maison n'a pas de coordonnées GPS. Configurez-les dans les paramètres.",
         "noHouseConfigured": "Veuillez configurer une maison dans les paramètres du widget."
       },
@@ -1429,15 +1429,15 @@
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
     },
     "meteoFrance": {
-      "title": "Météo-France",
-      "documentation": "Vigilance Météo-France",
-      "description": "Affichez la météo et les alertes de vigilance Météo-France dans Gladys.",
-      "introduction": "Cette intégration se connecte au webservice officiel Météo-France pour obtenir les prévisions météo et les alertes de vigilance (jaune, orange, rouge).",
+      "title": "Météo France",
+      "documentation": "Documentation Météo France",
+      "description": "Affichez la météo et les alertes de vigilance Météo France dans Gladys.",
+      "introduction": "Cette intégration se connecte au webservice officiel Météo France pour obtenir les prévisions météo et les alertes de vigilance (jaune, orange, rouge).",
       "noConfiguration": "Aucune configuration n'est nécessaire : les données sont accessibles librement, sans clé API.",
       "instructionsToUse": "Ajoutez simplement le widget « Météo France » sur votre tableau de bord et sélectionnez votre maison (ses coordonnées GPS doivent être configurées). Le département utilisé pour la vigilance est détecté automatiquement.",
       "instructions": "Optionnel : pour afficher la carte de vigilance nationale dans le widget, créez un compte sur <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, souscrivez gratuitement à l'API <strong>DPVigilance</strong> et saisissez votre clé API ci-dessous.",
       "apiKeyLabel": "Clé API (optionnelle, uniquement pour la carte de vigilance) :",
-      "apiKeyPlaceholder": "Entrer la clé API Météo-France",
+      "apiKeyPlaceholder": "Entrer la clé API Météo France",
       "saveButton": "Sauvegarder",
       "saveSuccess": "Clé API sauvegardée avec succès.",
       "saveError": "Erreur lors de la sauvegarde de la clé API."

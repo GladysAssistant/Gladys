@@ -289,7 +289,7 @@
       "energy-consumption": "Energieverbrauch",
       "voice-assistant": "Sprachassistent",
       "link": "Link",
-      "weather-meteo-france": "Météo-France"
+      "weather-meteo-france": "Météo France"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -318,12 +318,12 @@
           "dailyForecast": "Vorhersage für die nächsten 5 Tage",
           "vigilanceMap": "Vigilance-Karte Frankreich (erfordert den optionalen API-Schlüssel)"
         },
-        "vigilanceTitle": "Météo-France Unwetterwarnung",
+        "vigilanceTitle": "Météo France Unwetterwarnung",
         "noVigilance": "Keine Unwetterwarnung aktiv",
-        "mapUnavailable": "Karte nicht verfügbar: Konfiguriere den API-Schlüssel in der Météo-France-Integration.",
+        "mapUnavailable": "Karte nicht verfügbar: Konfiguriere den API-Schlüssel in der Météo France-Integration.",
         "editVigilanceLabel": "Aktive Unwetterwarnungen anzeigen",
         "editVigilanceHelp": "Das Departement wird automatisch aus den GPS-Koordinaten des Hauses ermittelt.",
-        "error": "Météo-France-Wetterdaten konnten nicht abgerufen werden.",
+        "error": "Météo France-Wetterdaten konnten nicht abgerufen werden.",
         "noCoordinates": "Das Haus hat keine GPS-Koordinaten. Konfiguriere sie in den Einstellungen.",
         "noHouseConfigured": "Bitte konfiguriere ein Haus in den Widget-Einstellungen."
       },
@@ -1296,15 +1296,15 @@
       "instructionsToUse": "Um diese Integration zu verwenden, gehe zum Dashboard und erstelle eine Wetter-Box."
     },
     "meteoFrance": {
-      "title": "Météo-France",
-      "documentation": "Météo-France Vigilance",
-      "description": "Zeige Météo-France Wetter und Unwetterwarnungen in Gladys an.",
-      "introduction": "Diese Integration verbindet sich mit dem offiziellen Météo-France-Webservice, um Wettervorhersagen und Unwetterwarnungen (gelb, orange, rot) abzurufen.",
+      "title": "Météo France",
+      "documentation": "Météo France Dokumentation",
+      "description": "Zeige Météo France Wetter und Unwetterwarnungen in Gladys an.",
+      "introduction": "Diese Integration verbindet sich mit dem offiziellen Météo France-Webservice, um Wettervorhersagen und Unwetterwarnungen (gelb, orange, rot) abzurufen.",
       "noConfiguration": "Es ist keine Konfiguration erforderlich: Die Daten sind frei zugänglich, ohne API-Schlüssel.",
       "instructionsToUse": "Füge einfach das Widget „Météo France“ zu deinem Dashboard hinzu und wähle dein Haus aus (seine GPS-Koordinaten müssen konfiguriert sein). Das Departement für die Unwetterwarnungen wird automatisch erkannt.",
       "instructions": "Optional: Um die nationale Vigilance-Karte im Widget anzuzeigen, erstelle ein Konto auf <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, abonniere kostenlos die <strong>DPVigilance</strong>-API und gib unten deinen API-Schlüssel ein.",
       "apiKeyLabel": "API-Schlüssel (optional, nur für die Vigilance-Karte):",
-      "apiKeyPlaceholder": "Météo-France API-Schlüssel eingeben",
+      "apiKeyPlaceholder": "Météo France API-Schlüssel eingeben",
       "saveButton": "Sichern",
       "saveSuccess": "API-Schlüssel erfolgreich gespeichert.",
       "saveError": "Fehler beim Speichern des API-Schlüssels."

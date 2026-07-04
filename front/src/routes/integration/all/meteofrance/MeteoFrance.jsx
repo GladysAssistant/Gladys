@@ -1,5 +1,6 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import { RequestStatus } from '../../../../utils/consts';
 
 const MeteoFrancePage = ({ children, ...props }) => (
@@ -14,17 +15,17 @@ const MeteoFrancePage = ({ children, ...props }) => (
               </h3>
               <div>
                 <div class="list-group list-group-transparent mb-0">
-                  <a
-                    href="https://vigilance.meteofrance.fr"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  <DeviceConfigurationLink
+                    user={props.user}
+                    configurationKey="integrations"
+                    documentKey="meteo-france"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
                       <i class="fe fe-book-open" />
                     </span>
                     <Text id="integration.meteoFrance.documentation" />
-                  </a>
+                  </DeviceConfigurationLink>
                 </div>
               </div>
             </div>

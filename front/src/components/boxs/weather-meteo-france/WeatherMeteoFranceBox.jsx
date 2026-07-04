@@ -123,14 +123,28 @@ class WeatherMeteoFranceBoxComponent extends Component {
       );
     }
 
+    // The Météo France API only returns metric values: convert to the user preferred units
+    const isFahrenheit = get(props, 'user.temperature_unit_preference') === 'fahrenheit';
+    const isUS = get(props, 'user.distance_unit_preference') === 'us';
+    const convertTemp = celsius => (isFahrenheit ? Math.round((celsius * 9) / 5 + 32) : celsius);
+    const formatRain = mm => (isUS ? `${Math.round((mm / 25.4) * 100) / 100} in` : `${mm} mm`);
+    const tempUnit = isFahrenheit ? '°F' : '°C';
+    const windUnit = isUS ? 'mph' : 'km/h';
+    const timeFormat = isUS ? 'h:mm A' : 'HH:mm';
+
     const { current, currentIcon, hourly, daily, sun, rainChance, position, vigilance } = boxData;
-    const temp = current.T && current.T.value != null ? Math.round(current.T.value) : '--';
+    const temp = current.T && current.T.value != null ? convertTemp(Math.round(current.T.value)) : '--';
     // In hourly forecast entries, humidity is a raw number (not an object)
     const humidity = typeof current.humidity === 'number' ? Math.round(current.humidity) : null;
-    // The Météo-France forecast API returns wind speed in m/s
-    const windSpeed = current.wind && current.wind.speed != null ? Math.round(current.wind.speed * 3.6) : null;
+    // The Météo France forecast API returns wind speed in m/s
+    const windSpeed =
+      current.wind && current.wind.speed != null ? Math.round(current.wind.speed * (isUS ? 2.23694 : 3.6)) : null;
     const windDir = current.wind && typeof current.wind.icon === 'string' ? current.wind.icon : null;
-    const pressure = current.sea_level != null ? Math.round(current.sea_level) : null;
+    const rawPressure = current.sea_level != null ? current.sea_level : null;
+    const pressure =
+      rawPressure !== null
+        ? `${isUS ? `${Math.round(rawPressure * 0.02953 * 100) / 100} inHg` : `${Math.round(rawPressure)} hPa`}`
+        : null;
     const desc = current.weather ? current.weather.desc : '';
     const alerts = (vigilance && vigilance.alerts) || [];
     const vigilanceEnabled = Boolean(props.box.vigilance);
@@ -178,7 +192,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
               <div style="font-size: 36px; font-weight: 600; line-height: 1; white-space: nowrap; margin-left: 8px">
                 {temp}
                 <span class="text-muted" style="font-size: 20px; font-weight: 400">
-                  °C
+                  {tempUnit}
                 </span>
               </div>
             </div>
@@ -196,20 +210,20 @@ class WeatherMeteoFranceBoxComponent extends Component {
                 {pressure !== null && (
                   <div>
                     <i class="fe fe-activity mr-2" style="color: #467fcf" />
-                    {pressure} hPa
+                    {pressure}
                   </div>
                 )}
                 {sun && (
                   <div>
                     <i class="fe fe-sunrise mr-2" style="color: #f59f00" />
-                    {dayjs.unix(sun.rise).format('HH:mm')}
+                    {dayjs.unix(sun.rise).format(timeFormat)}
                   </div>
                 )}
               </div>
               <div style="text-align: right">
                 {windSpeed !== null && (
                   <div>
-                    {windSpeed} km/h
+                    {windSpeed} {windUnit}
                     {windDir && <span class="text-muted"> {windDir}</span>}
                     <i class="fe fe-wind ml-2" style="color: #467fcf" />
                   </div>
@@ -222,7 +236,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
                 )}
                 {sun && (
                   <div>
-                    {dayjs.unix(sun.set).format('HH:mm')}
+                    {dayjs.unix(sun.set).format(timeFormat)}
                     <i class="fe fe-sunset ml-2" style="color: #f59f00" />
                   </div>
                 )}
@@ -286,17 +300,23 @@ class WeatherMeteoFranceBoxComponent extends Component {
           {showHourly && (
             <div
               class={hasContentAboveHourly ? 'border-top' : ''}
-              style="display: flex; justify-content: space-between; padding-top: 10px; margin-bottom: 10px"
+              style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 10px; margin-bottom: 10px"
             >
-              {hourly.slice(0, 8).map(hour => (
+              {hourly.slice(0, 8).map((hour, index) => (
                 <div key={hour.time} style="text-align: center; flex: 1">
-                  <div class="text-muted" style="font-size: 10px">
+                  {/* The first column is the current time slot: emphasize it */}
+                  <div
+                    class={index === 0 ? '' : 'text-muted'}
+                    style={`font-size: ${index === 0 ? '12px' : '10px'}; font-weight: ${index === 0 ? '600' : '400'}`}
+                  >
                     {hour.time}h
                   </div>
-                  <div style="font-size: 20px; line-height: 1.5">{hour.icon}</div>
-                  <div style="font-size: 12px; font-weight: 600">{hour.temp !== null ? `${hour.temp}°` : '--'}</div>
+                  <div style={`font-size: ${index === 0 ? '30px' : '20px'}; line-height: 1.5`}>{hour.icon}</div>
+                  <div style={`font-size: ${index === 0 ? '15px' : '12px'}; font-weight: 600`}>
+                    {hour.temp !== null ? `${convertTemp(hour.temp)}°` : '--'}
+                  </div>
                   <div class="text-muted" style="font-size: 10px; white-space: nowrap">
-                    {hour.rain !== null ? `${hour.rain} mm` : ' '}
+                    {hour.rain !== null ? formatRain(hour.rain) : ' '}
                   </div>
                 </div>
               ))}
@@ -318,12 +338,14 @@ class WeatherMeteoFranceBoxComponent extends Component {
                       .format('ddd D')}
                   </div>
                   <div style="font-size: 32px; line-height: 1.5">{d.icon}</div>
-                  <div style="font-size: 16px; font-weight: 600">{d.max !== null ? `${d.max}°` : '--'}</div>
+                  <div style="font-size: 16px; font-weight: 600">
+                    {d.max !== null ? `${convertTemp(d.max)}°` : '--'}
+                  </div>
                   <div class="text-muted" style="font-size: 14px">
-                    {d.min !== null ? `${d.min}°` : '--'}
+                    {d.min !== null ? `${convertTemp(d.min)}°` : '--'}
                   </div>
                   <div class="text-muted" style="font-size: 11px; white-space: nowrap">
-                    {d.rain !== null ? `${d.rain} mm` : ' '}
+                    {d.rain !== null ? formatRain(d.rain) : ' '}
                   </div>
                 </div>
               ))}

@@ -1,7 +1,7 @@
 const logger = require('../../../utils/logger');
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
-// Official Météo-France vigilance phenomenon ids (the warning API only returns ids)
+// Official Météo France vigilance phenomenon ids (the warning API only returns ids)
 const PHENOMENON_NAMES = {
   1: 'Vent violent',
   2: 'Pluie-inondation',
@@ -103,7 +103,7 @@ module.exports = function MeteoFranceController(gladys, getVigilance, getForecas
   }
 
   /**
-   * @api {get} /api/v1/house/:house_selector/meteofrance/weather Get Météo-France weather for a house
+   * @api {get} /api/v1/house/:house_selector/meteofrance/weather Get Météo France weather for a house
    */
   async function getHouseWeatherController(req, res) {
     const houseSelector = req.params.house_selector;
