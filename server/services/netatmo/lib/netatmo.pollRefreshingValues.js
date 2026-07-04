@@ -7,6 +7,23 @@ const logger = require('../../../utils/logger');
  * @example refreshNetatmoValues();
  */
 async function refreshNetatmoValues() {
+  if (this.refreshingValues) {
+    logger.debug('Netatmo: a devices values refresh is already running, skipping this one');
+    return;
+  }
+  this.refreshingValues = true;
+  try {
+    await this.refreshNetatmoValuesNow();
+  } finally {
+    this.refreshingValues = false;
+  }
+}
+
+/**
+ * @description Poll values of Netatmo devices (single-flight body).
+ * @example refreshNetatmoValuesNow();
+ */
+async function refreshNetatmoValuesNow() {
   logger.debug('Looking for Netatmo devices values...');
   await this.saveStatus({ statusType: STATUS.GET_DEVICES_VALUES, message: null });
 
@@ -56,4 +73,5 @@ function pollRefreshingValues() {
 module.exports = {
   pollRefreshingValues,
   refreshNetatmoValues,
+  refreshNetatmoValuesNow,
 };
