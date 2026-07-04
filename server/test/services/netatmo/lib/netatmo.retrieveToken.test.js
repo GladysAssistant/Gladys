@@ -42,6 +42,9 @@ describe('Netatmo retrieveTokens', () => {
     body = { codeOAuth: 'test-code', state: 'valid-state', redirectUri: 'test-redirect-uri' };
     netatmoHandler.configuration.clientId = 'clientId-fake';
     netatmoHandler.configuration.clientSecret = 'clientSecret-fake';
+    netatmoHandler.configuration.energyApi = false;
+    netatmoHandler.configuration.weatherApi = false;
+    netatmoHandler.configuration.securityApi = false;
     netatmoHandler.stateGetAccessToken = 'valid-state';
     netatmoHandler.status = 'not_initialized';
   });
@@ -160,6 +163,31 @@ describe('Netatmo retrieveTokens', () => {
         payload: { status: 'processing token' },
       }),
     ).to.equal(true);
+    sinon.assert.calledOnce(netatmoHandler.refreshNetatmoValues);
+    sinon.assert.calledOnce(netatmoHandler.pollRefreshingValues);
+    sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
+  });
+
+  it('should retrieve tokens and launch pollRefreshingValues with only the security API', async () => {
+    const tokens = {
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
+      expire_in: 3600,
+    };
+    netatmoHandler.configuration.securityApi = true;
+
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(200, tokens);
+
+    const result = await netatmoHandler.retrieveTokens(body);
+
+    expect(result).to.deep.equal({ success: true });
+    expect(netatmoHandler.status).to.equal('connected');
     sinon.assert.calledOnce(netatmoHandler.refreshNetatmoValues);
     sinon.assert.calledOnce(netatmoHandler.pollRefreshingValues);
     sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);

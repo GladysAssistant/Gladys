@@ -37,6 +37,7 @@ describe('Netatmo Load Devices', () => {
     netatmoHandler.status = 'not_initialized';
     netatmoHandler.configuration.energyApi = false;
     netatmoHandler.configuration.weatherApi = false;
+    netatmoHandler.configuration.securityApi = false;
     netatmoHandler.accessToken = accessToken;
     netatmoHandler.loadDeviceDetails = sinon.stub().resolves(deviceDetailsMock);
     netatmoHandler.loadThermostatDetails = sinon.stub().resolves(thermostatsDetailsMock);
@@ -67,6 +68,28 @@ describe('Netatmo Load Devices', () => {
 
     expect(devices).to.be.an('array');
     expect(devices).to.not.deep.eq([]);
+  });
+
+  it('should load only homesdata devices when only the security API is configured', async () => {
+    netatmoHandler.configuration.securityApi = true;
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'GET',
+        path: '/api/homesdata',
+      })
+      .reply(200, {
+        body: bodyHomesDataMock,
+        status: 'ok',
+      });
+
+    const devices = await netatmoHandler.loadDevices();
+
+    expect(devices).to.be.an('array');
+    expect(devices).to.not.deep.eq([]);
+    sinon.assert.called(netatmoHandler.loadDeviceDetails);
+    sinon.assert.notCalled(netatmoHandler.loadThermostatDetails);
+    sinon.assert.notCalled(netatmoHandler.loadWeatherStationDetails);
   });
 
   it('should load energy devices successfully', async () => {
