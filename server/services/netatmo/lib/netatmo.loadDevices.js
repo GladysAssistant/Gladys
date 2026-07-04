@@ -61,7 +61,8 @@ async function loadDevices() {
           const plugEnergy = plugs.find((plug) => plug._id === id);
           const thermostat = thermostats.find((t) => t._id === id);
           if (plugEnergy) {
-            deviceList = { ...deviceList, ...plugEnergy };
+            // keep the room object built from homesdata/homestatus over the legacy room id string
+            deviceList = { ...deviceList, ...plugEnergy, room: deviceList.room };
           }
           if (thermostat) {
             const plugThermostat = plugs
