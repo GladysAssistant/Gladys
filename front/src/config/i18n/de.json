@@ -303,21 +303,26 @@
         "unknownError": "Wir können das Wetter für dieses Zuhause nicht abrufen. Hast du für diese Box ein Zuhause definiert?",
         "editModeLabel": "Wähle den Anzeigemodus aus:",
         "displayModes": {
-          "dateLocation": "Datum und Ort",
-          "currentWeather": "Aktuelles Wetter (Himmel und Temperatur)",
           "advancedWeather": "Luftfeuchtigkeit und Windgeschwindigkeit",
           "hourlyForecast": "Vorhersage für die nächsten 24 Stunden",
-          "dailyForecast": "Vorhersage für die nächsten 5 Tage",
-          "vigilanceMap": "Vigilance-Karte Frankreich (erfordert den optionalen API-Schlüssel)"
+          "dailyForecast": "Vorhersage für die nächsten 5 Tage"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "weatherMeteoFrance": {
+        "displayModes": {
+          "dateLocation": "Datum und Ort",
+          "currentWeather": "Aktuelles Wetter",
+          "advancedWeather": "Wetterdetails",
+          "hourlyForecast": "Vorhersage für die nächsten 24 Stunden",
+          "dailyForecast": "Vorhersage für die nächsten 5 Tage",
+          "vigilanceMap": "Vigilance-Karte Frankreich (erfordert den optionalen API-Schlüssel)"
+        },
         "vigilanceTitle": "Météo-France Unwetterwarnung",
         "noVigilance": "Keine Unwetterwarnung aktiv",
         "mapUnavailable": "Karte nicht verfügbar: Konfiguriere den API-Schlüssel in der Météo-France-Integration.",
         "editVigilanceLabel": "Aktive Unwetterwarnungen anzeigen",
-        "editVigilanceHelp": "Das Departement wird automatisch aus den GPS-Koordinaten des Hauses ermittelt. Erfordert den in der Integration konfigurierten Météo-France-API-Schlüssel.",
+        "editVigilanceHelp": "Das Departement wird automatisch aus den GPS-Koordinaten des Hauses ermittelt.",
         "error": "Météo-France-Wetterdaten konnten nicht abgerufen werden.",
         "noCoordinates": "Das Haus hat keine GPS-Koordinaten. Konfiguriere sie in den Einstellungen.",
         "noHouseConfigured": "Bitte konfiguriere ein Haus in den Widget-Einstellungen."

@@ -64,7 +64,7 @@ const EditWeatherMeteoFranceBox = ({ children, ...props }) => (
       </label>
       <div>
         {DISPLAY_MODES.map(mode => {
-          const label = `dashboard.boxes.weather.displayModes.${mode}`;
+          const label = `dashboard.boxes.weatherMeteoFrance.displayModes.${mode}`;
           const modes = props.box.modes || {};
           const checked = DEFAULT_ON_MODES.includes(mode) ? modes[mode] !== false : Boolean(modes[mode]);
           return (

@@ -303,21 +303,26 @@
         "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
         "editModeLabel": "Select display mode:",
         "displayModes": {
-          "dateLocation": "Date and location",
-          "currentWeather": "Current weather (sky and temperature)",
           "advancedWeather": "Humidity and wind speed",
           "hourlyForecast": "Forecast for the next 24 hours",
-          "dailyForecast": "Forecast for the next 5 days",
-          "vigilanceMap": "France vigilance map (requires the optional API key)"
+          "dailyForecast": "Forecast for the next 5 days"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "weatherMeteoFrance": {
+        "displayModes": {
+          "dateLocation": "Date and location",
+          "currentWeather": "Current weather",
+          "advancedWeather": "Weather details",
+          "hourlyForecast": "Forecast for the next 24 hours",
+          "dailyForecast": "Forecast for the next 5 days",
+          "vigilanceMap": "France vigilance map (requires the optional API key)"
+        },
         "vigilanceTitle": "Météo-France Vigilance",
         "noVigilance": "No weather alert in progress",
         "mapUnavailable": "Map unavailable: configure the API key in the Météo-France integration.",
         "editVigilanceLabel": "Show active weather alerts",
-        "editVigilanceHelp": "The department is automatically detected from the house GPS coordinates. Requires the Météo-France API key configured in the integration.",
+        "editVigilanceHelp": "The department is automatically detected from the house GPS coordinates.",
         "error": "Unable to fetch Météo-France weather data.",
         "noCoordinates": "The house has no GPS coordinates. Configure them in settings.",
         "noHouseConfigured": "Please configure a house in the widget settings."

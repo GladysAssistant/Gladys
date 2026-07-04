@@ -88,16 +88,24 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
    * const data = await gladys.services.meteofrance.forecast.get(48.85, 2.35);
    */
   async function getForecast(lat, lon) {
-    const { data } = await axios.get(`${METEOFRANCE_WEBSERVICE_URL}/forecast`, {
+    const options = {
       params: {
         lat,
         lon,
         lang: 'fr',
         token: METEOFRANCE_PUBLIC_TOKEN,
       },
-      timeout: 10000,
-    });
-    return data;
+      // The Météo-France API can take ~20s on a cold cache, then answers in ~50ms
+      timeout: 30000,
+    };
+    try {
+      const { data } = await axios.get(`${METEOFRANCE_WEBSERVICE_URL}/forecast`, options);
+      return data;
+    } catch (e) {
+      logger.info(`[MeteoFrance] getForecast retrying after error: ${e.message}`);
+      const { data } = await axios.get(`${METEOFRANCE_WEBSERVICE_URL}/forecast`, options);
+      return data;
+    }
   }
 
   return Object.freeze({

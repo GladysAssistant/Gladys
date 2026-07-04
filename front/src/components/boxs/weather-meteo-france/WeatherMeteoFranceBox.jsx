@@ -34,9 +34,6 @@ const PHENOMENA_EMOJI = {
   9: '🌊'
 };
 
-const CHIP_STYLE =
-  'flex: 1; display: flex; align-items: center; justify-content: center; background: rgba(70, 127, 207, 0.08); border-radius: 6px; padding: 6px 8px; font-size: 13px';
-
 const VIGILANCE_STYLE = {
   2: { background: '#f7c600', color: '#212529' },
   3: { background: '#f68f00', color: '#fff' },
@@ -126,20 +123,23 @@ class WeatherMeteoFranceBoxComponent extends Component {
       );
     }
 
-    const { current, currentIcon, hourly, daily, position, vigilance } = boxData;
+    const { current, currentIcon, hourly, daily, sun, rainChance, position, vigilance } = boxData;
     const temp = current.T && current.T.value != null ? Math.round(current.T.value) : '--';
     // In hourly forecast entries, humidity is a raw number (not an object)
     const humidity = typeof current.humidity === 'number' ? Math.round(current.humidity) : null;
     // The Météo-France forecast API returns wind speed in m/s
     const windSpeed = current.wind && current.wind.speed != null ? Math.round(current.wind.speed * 3.6) : null;
     const windDir = current.wind && typeof current.wind.icon === 'string' ? current.wind.icon : null;
+    const pressure = current.sea_level != null ? Math.round(current.sea_level) : null;
     const desc = current.weather ? current.weather.desc : '';
     const alerts = (vigilance && vigilance.alerts) || [];
     const vigilanceEnabled = Boolean(props.box.vigilance);
     // Default to visible for widgets saved before these options existed
     const showCurrentWeather = modes[CURRENT_WEATHER_MODE] !== false;
     const showDateLocation = modes[DATE_LOCATION_MODE] !== false;
-    const showChips = modes[GetWeatherModes.AdvancedWeather] && (humidity !== null || windSpeed !== null);
+    const showChips =
+      modes[GetWeatherModes.AdvancedWeather] &&
+      (humidity !== null || windSpeed !== null || pressure !== null || rainChance != null || sun);
     const showHourly = modes[GetWeatherModes.HourlyForecast] && hourly && hourly.length > 0;
     const showDaily = modes[GetWeatherModes.DailyForecast] && daily && daily.length > 0;
     const showMap = Boolean(modes[VIGILANCE_MAP_MODE]);
@@ -185,24 +185,48 @@ class WeatherMeteoFranceBoxComponent extends Component {
           )}
 
           {showChips && (
-            <div style="display: flex; gap: 8px; margin-bottom: 12px">
-              {humidity !== null && (
-                <div style={CHIP_STYLE}>
-                  <i class="fe fe-droplet mr-2" style="color: #467fcf" />
-                  {humidity}%
-                </div>
-              )}
-              {windSpeed !== null && (
-                <div style={CHIP_STYLE}>
-                  <i class="fe fe-wind mr-2" style="color: #467fcf" />
-                  {windSpeed} km/h
-                  {windDir && (
-                    <span class="text-muted ml-1" style="font-size: 12px">
-                      {windDir}
-                    </span>
-                  )}
-                </div>
-              )}
+            <div style="background: rgba(70, 127, 207, 0.08); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; line-height: 1.9">
+              <div>
+                {humidity !== null && (
+                  <div>
+                    <i class="fe fe-droplet mr-2" style="color: #467fcf" />
+                    {humidity}%
+                  </div>
+                )}
+                {pressure !== null && (
+                  <div>
+                    <i class="fe fe-activity mr-2" style="color: #467fcf" />
+                    {pressure} hPa
+                  </div>
+                )}
+                {sun && (
+                  <div>
+                    <i class="fe fe-sunrise mr-2" style="color: #f59f00" />
+                    {dayjs.unix(sun.rise).format('HH:mm')}
+                  </div>
+                )}
+              </div>
+              <div style="text-align: right">
+                {windSpeed !== null && (
+                  <div>
+                    {windSpeed} km/h
+                    {windDir && <span class="text-muted"> {windDir}</span>}
+                    <i class="fe fe-wind ml-2" style="color: #467fcf" />
+                  </div>
+                )}
+                {rainChance != null && (
+                  <div>
+                    {rainChance}%
+                    <i class="fe fe-umbrella ml-2" style="color: #467fcf" />
+                  </div>
+                )}
+                {sun && (
+                  <div>
+                    {dayjs.unix(sun.set).format('HH:mm')}
+                    <i class="fe fe-sunset ml-2" style="color: #f59f00" />
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -248,6 +272,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
               <img
                 src={boxData.vigilanceMapImage}
                 alt="Vigilance Météo-France"
+                class="meteofrance-vigilance-map"
                 style="width: 100%; border-radius: 6px; margin-bottom: 10px"
               />
             ) : (
@@ -270,6 +295,9 @@ class WeatherMeteoFranceBoxComponent extends Component {
                   </div>
                   <div style="font-size: 20px; line-height: 1.5">{hour.icon}</div>
                   <div style="font-size: 12px; font-weight: 600">{hour.temp !== null ? `${hour.temp}°` : '--'}</div>
+                  <div class="text-muted" style="font-size: 10px; white-space: nowrap">
+                    {hour.rain !== null ? `${hour.rain} mm` : ' '}
+                  </div>
                 </div>
               ))}
             </div>
@@ -293,6 +321,9 @@ class WeatherMeteoFranceBoxComponent extends Component {
                   <div style="font-size: 16px; font-weight: 600">{d.max !== null ? `${d.max}°` : '--'}</div>
                   <div class="text-muted" style="font-size: 14px">
                     {d.min !== null ? `${d.min}°` : '--'}
+                  </div>
+                  <div class="text-muted" style="font-size: 11px; white-space: nowrap">
+                    {d.rain !== null ? `${d.rain} mm` : ' '}
                   </div>
                 </div>
               ))}

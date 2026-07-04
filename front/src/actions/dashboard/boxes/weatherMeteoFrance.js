@@ -61,12 +61,22 @@ function createActions(store) {
           .filter(h => upcoming.length > 0 && h.dt <= upcoming[0].dt + 24 * 3600)
           .filter((h, index) => index % 3 === 0)
           .slice(0, 8)
-          .map(h => ({
-            time: dayjs.unix(h.dt).format('HH'),
-            temp: h.T && h.T.value != null ? Math.round(h.T.value) : null,
-            icon: getMFIcon(h.weather ? h.weather.icon : null),
-            desc: h.weather ? h.weather.desc : ''
-          }));
+          .map(h => {
+            // Rain amount key depends on the forecast step (1h first, then 3h)
+            let rain = null;
+            if (h.rain && h.rain['1h'] != null) {
+              rain = h.rain['1h'];
+            } else if (h.rain && h.rain['3h'] != null) {
+              rain = h.rain['3h'];
+            }
+            return {
+              time: dayjs.unix(h.dt).format('HH'),
+              temp: h.T && h.T.value != null ? Math.round(h.T.value) : null,
+              icon: getMFIcon(h.weather ? h.weather.icon : null),
+              desc: h.weather ? h.weather.desc : '',
+              rain: rain !== null ? Math.round(rain * 10) / 10 : null
+            };
+          });
 
         const daily = (data.forecast.daily_forecast || []).slice(1, 6).map(d => {
           let weather = d.weather12H;
@@ -87,9 +97,25 @@ function createActions(store) {
             min: d.T && d.T.min != null ? Math.round(d.T.min) : null,
             max: d.T && d.T.max != null ? Math.round(d.T.max) : null,
             icon: getMFIcon(weather ? weather.icon : null),
-            desc: weather ? weather.desc : ''
+            desc: weather ? weather.desc : '',
+            rain:
+              d.precipitation && d.precipitation['24h'] != null ? Math.round(d.precipitation['24h'] * 10) / 10 : null
           };
         });
+
+        // Today's sunrise/sunset comes from the first daily entry
+        const today = (data.forecast.daily_forecast || [])[0];
+        const sun = today && today.sun && today.sun.rise ? { rise: today.sun.rise, set: today.sun.set } : null;
+
+        // Rain probability for the current 3h slot
+        const probabilities = data.forecast.probability_forecast || [];
+        const currentProba = probabilities.find(
+          p => p.dt + 3 * 3600 > nowTs && p.rain && (p.rain['3h'] != null || p.rain['6h'] != null)
+        );
+        let rainChance = null;
+        if (currentProba) {
+          rainChance = currentProba.rain['3h'] != null ? currentProba.rain['3h'] : currentProba.rain['6h'];
+        }
 
         // The national vigilance map needs the optional API key: fetch it separately
         let vigilanceMapImage = null;
@@ -107,6 +133,8 @@ function createActions(store) {
           currentIcon,
           hourly,
           daily,
+          sun,
+          rainChance,
           position: data.forecast.position || {},
           vigilance: data.vigilance || { alerts: [] },
           vigilanceMapImage
