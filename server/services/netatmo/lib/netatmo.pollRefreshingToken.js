@@ -1,5 +1,10 @@
 const logger = require('../../../utils/logger');
-const { STATUS, RECONNECT_BACKOFF_MS, RECONNECT_RECURRENT_MS } = require('./utils/netatmo.constants');
+const {
+  STATUS,
+  RECONNECT_BACKOFF_MS,
+  RECONNECT_RECURRENT_MS,
+  ACCESS_TOKEN_REFRESH_RATIO,
+} = require('./utils/netatmo.constants');
 
 /**
  * @description Schedule the next short-retry attempt after a transient refresh failure.
@@ -67,13 +72,16 @@ async function refreshNetatmoTokens() {
 }
 
 /**
- * @description Start polling the Netatmo refresh token endpoint at the access-token expiry cadence.
+ * @description Start polling the Netatmo refresh token endpoint before the access-token expires.
  * @example
  * this.pollRefreshingToken();
  */
 function pollRefreshingToken() {
   if (this.expireInToken > 0) {
-    this.pollRefreshToken = setInterval(this.refreshNetatmoTokens.bind(this), this.expireInToken * 1000);
+    this.pollRefreshToken = setInterval(
+      this.refreshNetatmoTokens.bind(this),
+      Math.round(this.expireInToken * 1000 * ACCESS_TOKEN_REFRESH_RATIO),
+    );
   }
 }
 

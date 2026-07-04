@@ -19,6 +19,7 @@ const serviceId = 'serviceId';
 const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 netatmoHandler.pollRefreshingToken = fake.resolves(null);
 netatmoHandler.pollRefreshingValues = fake.resolves(null);
+netatmoHandler.refreshNetatmoValues = fake.resolves(null);
 
 describe('Netatmo retrieveTokens', () => {
   let body;
@@ -125,6 +126,7 @@ describe('Netatmo retrieveTokens', () => {
         payload: { status: 'processing token' },
       }),
     ).to.equal(true);
+    sinon.assert.notCalled(netatmoHandler.refreshNetatmoValues);
     sinon.assert.notCalled(netatmoHandler.pollRefreshingValues);
     sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
   });
@@ -158,6 +160,7 @@ describe('Netatmo retrieveTokens', () => {
         payload: { status: 'processing token' },
       }),
     ).to.equal(true);
+    sinon.assert.calledOnce(netatmoHandler.refreshNetatmoValues);
     sinon.assert.calledOnce(netatmoHandler.pollRefreshingValues);
     sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
   });

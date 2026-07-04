@@ -63,19 +63,12 @@ async function setValue(device, deviceFeature, value) {
           message: 'set_devices_value_error_unknown',
         });
       }
-    } else {
-      logger.debug(`Value has been changed on the device ${device.name} / ${featureName}: ${transformedValue}`);
+      throw new Error(`Netatmo setValue error: HTTP ${responseSetRoomThermpoint.status}`);
     }
+    logger.debug(`Value has been changed on the device ${device.name} / ${featureName}: ${transformedValue}`);
   } catch (e) {
-    logger.error(
-      'setValue error with status code: ',
-      e.code,
-      ' - ',
-      e.response.status,
-      'and with status message: ',
-      e.response.statusText,
-    );
-    logger.error('error details: ', e.response.data.error.code, ' - ', e.response.data.error.message);
+    logger.error(`setValue Netatmo error on device ${device.name} / ${featureName}: `, e);
+    throw e;
   }
 }
 
