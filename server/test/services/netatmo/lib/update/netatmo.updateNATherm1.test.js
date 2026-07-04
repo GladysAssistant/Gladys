@@ -103,6 +103,14 @@ describe('Netatmo update NATherm1 features', () => {
       });
     });
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:battery_percent`,
+      state: 60,
+    });
+    sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:rf_strength`,
+      state: 60,
+    });
+    sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
       device_feature_external_id: `${deviceGladysMock.external_id}:boiler_status`,
       state: 1,
     });
@@ -118,12 +126,10 @@ describe('Netatmo update NATherm1 features', () => {
     };
     sinon.stub(logger, 'error');
 
-    try {
-      await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
-    } catch (e) {
-      expect(e).to.equal(error);
-      sinon.assert.calledOnce(logger.error);
-    }
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.called(logger.error);
+    expect(logger.error.firstCall.args).to.include(error);
 
     logger.error.restore();
   });

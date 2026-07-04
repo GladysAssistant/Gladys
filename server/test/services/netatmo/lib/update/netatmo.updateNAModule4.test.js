@@ -120,12 +120,10 @@ describe('Netatmo update Smart Indoor module NAModule4 features', () => {
     };
     sinon.stub(logger, 'error');
 
-    try {
-      await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
-    } catch (e) {
-      expect(e).to.equal(error);
-      sinon.assert.calledOnce(logger.error);
-    }
+    await netatmoHandler.updateDevice(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.called(logger.error);
+    expect(logger.error.firstCall.args).to.include(error);
 
     logger.error.restore();
   });
