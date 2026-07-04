@@ -24,7 +24,11 @@ const {
   scheduleReconnectAttempt,
 } = require('./netatmo.pollRefreshingToken');
 const { handleApiAuthError } = require('./netatmo.handleApiAuthError');
-const { pollRefreshingValues, refreshNetatmoValues } = require('./netatmo.pollRefreshingValues');
+const {
+  pollRefreshingValues,
+  refreshNetatmoValues,
+  refreshNetatmoValuesNow,
+} = require('./netatmo.pollRefreshingValues');
 const { setValue } = require('./netatmo.setValue');
 const { updateValues } = require('./netatmo.updateValues');
 const { updateNAPlug } = require('./update/netatmo.updateNAPlug');
@@ -62,6 +66,7 @@ const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.reconnectTimeout = undefined;
   this.reconnectAttempt = 0;
   this.firstFatalAt = null;
+  this.refreshingValues = false;
 };
 
 NetatmoHandler.prototype.init = init;
@@ -86,6 +91,7 @@ NetatmoHandler.prototype.loadThermostatDetails = loadThermostatDetails;
 NetatmoHandler.prototype.loadWeatherStationDetails = loadWeatherStationDetails;
 NetatmoHandler.prototype.pollRefreshingValues = pollRefreshingValues;
 NetatmoHandler.prototype.refreshNetatmoValues = refreshNetatmoValues;
+NetatmoHandler.prototype.refreshNetatmoValuesNow = refreshNetatmoValuesNow;
 NetatmoHandler.prototype.pollRefreshingToken = pollRefreshingToken;
 NetatmoHandler.prototype.refreshNetatmoTokens = refreshNetatmoTokens;
 NetatmoHandler.prototype.scheduleReconnectAttempt = scheduleReconnectAttempt;
