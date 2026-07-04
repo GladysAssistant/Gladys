@@ -12,6 +12,11 @@ import {
   DASHBOARD_BOX_DATA_KEY
 } from '../../../utils/consts';
 
+// Widget-specific display modes, not part of the shared GetWeatherModes
+const CURRENT_WEATHER_MODE = 'currentWeather';
+const DATE_LOCATION_MODE = 'dateLocation';
+const VIGILANCE_MAP_MODE = 'vigilanceMap';
+
 const BOX_KEY = 'WeatherMeteoFrance';
 const BOX_DATA_KEY = `${DASHBOARD_BOX_DATA_KEY}${BOX_KEY}`;
 const BOX_STATUS_KEY = `${DASHBOARD_BOX_STATUS_KEY}${BOX_KEY}`;
@@ -51,7 +56,8 @@ class WeatherMeteoFranceBoxComponent extends Component {
   componentDidUpdate(prevProps) {
     const houseChanged = prevProps.box.house !== this.props.box.house;
     const vigilanceChanged = prevProps.box.vigilance !== this.props.box.vigilance;
-    if (houseChanged || vigilanceChanged) {
+    const mapChanged = get(prevProps, 'box.modes.vigilanceMap') !== get(this.props, 'box.modes.vigilanceMap');
+    if (houseChanged || vigilanceChanged || mapChanged) {
       this.refreshData();
     }
   }
@@ -106,7 +112,8 @@ class WeatherMeteoFranceBoxComponent extends Component {
       );
     }
 
-    if (boxStatus === 'forecast-api-error' || boxStatus === RequestStatus.Error || !boxData || !boxData.current) {
+    // When a refresh fails but we still have data from a previous call, keep displaying it
+    if (!boxData || !boxData.current) {
       return (
         <div class="card">
           <div class="card-body">
@@ -129,42 +136,55 @@ class WeatherMeteoFranceBoxComponent extends Component {
     const desc = current.weather ? current.weather.desc : '';
     const alerts = (vigilance && vigilance.alerts) || [];
     const vigilanceEnabled = Boolean(props.box.vigilance);
+    // Default to visible for widgets saved before these options existed
+    const showCurrentWeather = modes[CURRENT_WEATHER_MODE] !== false;
+    const showDateLocation = modes[DATE_LOCATION_MODE] !== false;
+    const showChips = modes[GetWeatherModes.AdvancedWeather] && (humidity !== null || windSpeed !== null);
+    const showHourly = modes[GetWeatherModes.HourlyForecast] && hourly && hourly.length > 0;
+    const showDaily = modes[GetWeatherModes.DailyForecast] && daily && daily.length > 0;
+    const showMap = Boolean(modes[VIGILANCE_MAP_MODE]);
+    // Section separators are only useful when there is content above them
+    const hasContentAboveHourly =
+      showDateLocation || showCurrentWeather || showChips || alerts.length > 0 || vigilanceEnabled || showMap;
+    const hasContentAboveDaily = hasContentAboveHourly || showHourly;
     const locationName = position && position.name ? position.name : '';
 
     return (
       <div class="card">
-        <div class="card-body">
-          <div class="text-muted" style="font-size: 12px; margin-bottom: 8px">
-            <span style="text-transform: capitalize">
-              {dayjs()
-                .locale(userLanguage)
-                .format('dddd D MMMM')}
-            </span>
-            {locationName && (
-              <span>
-                {' - '}
-                {locationName}
+        <div class="card-body" style="padding-top: 12px; padding-bottom: 12px">
+          {showDateLocation && (
+            <div class="text-muted" style="font-size: 14px; margin-bottom: 8px">
+              <span style="text-transform: capitalize">
+                {dayjs()
+                  .locale(userLanguage)
+                  .format('dddd D MMMM')}
               </span>
-            )}
-          </div>
+              {locationName && (
+                <span>
+                  {' - '}
+                  {locationName}
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Current conditions */}
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px">
-            <div style="font-size: 52px; line-height: 1">{currentIcon}</div>
-            <div style="text-align: right">
-              <div style="font-size: 36px; font-weight: 600; line-height: 1">
+          {showCurrentWeather && (
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px">
+              <div style="display: flex; align-items: center; min-width: 0">
+                <div style="font-size: 52px; line-height: 1">{currentIcon}</div>
+                <div style="font-size: 16px; font-weight: 500; margin-left: 12px">{desc}</div>
+              </div>
+              <div style="font-size: 36px; font-weight: 600; line-height: 1; white-space: nowrap; margin-left: 8px">
                 {temp}
                 <span class="text-muted" style="font-size: 20px; font-weight: 400">
                   °C
                 </span>
               </div>
-              <div class="text-muted" style="font-size: 13px; margin-top: 4px">
-                {desc}
-              </div>
             </div>
-          </div>
+          )}
 
-          {modes[GetWeatherModes.AdvancedWeather] && (humidity !== null || windSpeed !== null) && (
+          {showChips && (
             <div style="display: flex; gap: 8px; margin-bottom: 12px">
               {humidity !== null && (
                 <div style={CHIP_STYLE}>
@@ -222,10 +242,25 @@ class WeatherMeteoFranceBoxComponent extends Component {
             </div>
           )}
 
+          {/* National vigilance map (optional API key) */}
+          {showMap &&
+            (boxData.vigilanceMapImage ? (
+              <img
+                src={boxData.vigilanceMapImage}
+                alt="Vigilance Météo-France"
+                style="width: 100%; border-radius: 6px; margin-bottom: 10px"
+              />
+            ) : (
+              <div class="text-muted" style="font-size: 12px; margin-bottom: 10px">
+                <i class="fe fe-alert-circle mr-1" />
+                <Text id="dashboard.boxes.weatherMeteoFrance.mapUnavailable" />
+              </div>
+            ))}
+
           {/* Hourly forecast */}
-          {modes[GetWeatherModes.HourlyForecast] && hourly && hourly.length > 0 && (
+          {showHourly && (
             <div
-              class="border-top"
+              class={hasContentAboveHourly ? 'border-top' : ''}
               style="display: flex; justify-content: space-between; padding-top: 10px; margin-bottom: 10px"
             >
               {hourly.slice(0, 8).map(hour => (
@@ -241,20 +276,23 @@ class WeatherMeteoFranceBoxComponent extends Component {
           )}
 
           {/* Daily forecast */}
-          {modes[GetWeatherModes.DailyForecast] && daily && daily.length > 0 && (
-            <div class="border-top" style="padding-top: 8px">
+          {showDaily && (
+            <div
+              class={hasContentAboveDaily ? 'border-top' : ''}
+              style="display: flex; justify-content: space-between; padding-top: 10px"
+            >
               {daily.map(d => (
-                <div key={d.dt} style="display: flex; align-items: center; margin-bottom: 5px">
-                  <div style="flex: 1; font-size: 13px; text-transform: capitalize">
+                <div key={d.dt} style="text-align: center; flex: 1">
+                  <div class="text-muted" style="font-size: 14px; text-transform: capitalize; white-space: nowrap">
                     {dayjs
                       .unix(d.dt)
                       .locale(userLanguage)
-                      .format('dddd')}
+                      .format('ddd D')}
                   </div>
-                  <div style="font-size: 20px; width: 36px; text-align: center">{d.icon}</div>
-                  <div style="flex: 1; font-size: 13px; text-align: right; white-space: nowrap">
-                    <span class="text-muted">{d.min !== null ? `${d.min}°` : '--'} / </span>
-                    <span style="font-weight: 600">{d.max !== null ? `${d.max}°` : '--'}</span>
+                  <div style="font-size: 32px; line-height: 1.5">{d.icon}</div>
+                  <div style="font-size: 16px; font-weight: 600">{d.max !== null ? `${d.max}°` : '--'}</div>
+                  <div class="text-muted" style="font-size: 14px">
+                    {d.min !== null ? `${d.min}°` : '--'}
                   </div>
                 </div>
               ))}

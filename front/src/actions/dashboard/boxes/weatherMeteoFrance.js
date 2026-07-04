@@ -91,13 +91,25 @@ function createActions(store) {
           };
         });
 
+        // The national vigilance map needs the optional API key: fetch it separately
+        let vigilanceMapImage = null;
+        if (box.modes && box.modes.vigilanceMap) {
+          try {
+            const mapData = await state.httpClient.get('/api/v1/service/meteofrance/vigilance/map');
+            vigilanceMapImage = mapData.image;
+          } catch (mapError) {
+            // Map unavailable (no API key configured or API error): the widget shows a hint
+          }
+        }
+
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           current,
           currentIcon,
           hourly,
           daily,
           position: data.forecast.position || {},
-          vigilance: data.vigilance || { alerts: [] }
+          vigilance: data.vigilance || { alerts: [] },
+          vigilanceMapImage
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {

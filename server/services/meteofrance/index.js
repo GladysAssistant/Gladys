@@ -1,26 +1,28 @@
 const logger = require('../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 const MeteoFranceController = require('./controllers/meteofrance.controller');
 
 const METEOFRANCE_API_KEY_VAR = 'METEOFRANCE_API_KEY';
 const METEOFRANCE_WEBSERVICE_URL = 'https://webservice.meteofrance.com';
 const METEOFRANCE_PUBLIC_TOKEN = '__Wj7dVSTjV9YGu1guveLyDq0g7S7TfTjaHBTPTpO0kj8__';
+const MAP_CACHE_TTL_MS = 15 * 60 * 1000;
 
 module.exports = function MeteoFranceService(gladys, serviceId) {
   const { default: axios } = require('axios');
   let meteoFranceApiKey;
+  let mapCache = { image: null, timestamp: 0 };
 
   /**
    * @public
-   * @description This function starts the service.
+   * @description This function starts the service. Forecast and vigilance work without
+   * any configuration; the API key is optional and only unlocks the vigilance map.
    * @example
    * gladys.services.meteofrance.start();
    */
   async function start() {
     logger.info('Starting MeteoFrance service');
     meteoFranceApiKey = await gladys.variable.getValue(METEOFRANCE_API_KEY_VAR, serviceId);
-    if (!meteoFranceApiKey) {
-      throw new ServiceNotConfiguredError('MeteoFrance Service not configured');
+    if (meteoFranceApiKey) {
+      logger.info('MeteoFrance: API key configured, vigilance map available');
     }
   }
 
@@ -35,38 +37,46 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   }
 
   /**
-   * @description Get vigilance alerts from Météo-France API.
-   * @param {string} [dept] - French department number (e.g. "06", "75"). If omitted, returns all departments.
-   * @returns {Promise<object>} Resolve with vigilance data.
+   * @description Get vigilance warnings for a department from Météo-France mobile webservice.
+   * @param {string} dept - French department number (e.g. "06", "75").
+   * @returns {Promise<object>} Resolve with warning data (phenomena colors and bulletin text).
    * @example
    * const data = await gladys.services.meteofrance.vigilance.get('06');
    */
   async function getVigilance(dept) {
-    if (!meteoFranceApiKey) {
-      throw new ServiceNotConfiguredError('MeteoFrance API Key not found');
-    }
-    const url = 'https://public-api.meteofrance.fr/public/DPVigilance/v1/phenomenes_vigi_dept/encours';
-    const { data } = await axios.get(url, {
-      headers: { apikey: meteoFranceApiKey },
+    const { data } = await axios.get(`${METEOFRANCE_WEBSERVICE_URL}/v3/warning/full`, {
+      params: {
+        domain: dept,
+        token: METEOFRANCE_PUBLIC_TOKEN,
+      },
+      timeout: 10000,
     });
     return data;
   }
 
   /**
-   * @description Get vigilance text bulletins from Météo-France API.
-   * @returns {Promise<object>} Resolve with vigilance text data.
+   * @description Get the national vigilance map thumbnail (requires the optional API key).
+   * @returns {Promise<string|null>} Resolve with a data URL, or null when no API key is configured.
    * @example
-   * const data = await gladys.services.meteofrance.vigilance.getText();
+   * const image = await gladys.services.meteofrance.vigilance.getMap();
    */
-  async function getVigilanceText() {
+  async function getVigilanceMap() {
     if (!meteoFranceApiKey) {
-      throw new ServiceNotConfiguredError('MeteoFrance API Key not found');
+      return null;
     }
-    const url = 'https://public-api.meteofrance.fr/public/DPVigilance/v1/textesvigilance/encours';
-    const { data } = await axios.get(url, {
+    if (mapCache.image && Date.now() - mapCache.timestamp < MAP_CACHE_TTL_MS) {
+      return mapCache.image;
+    }
+    const url = 'https://public-api.meteofrance.fr/public/DPVigilance/v1/vignettenationale-J/encours';
+    const response = await axios.get(url, {
       headers: { apikey: meteoFranceApiKey },
+      responseType: 'arraybuffer',
+      timeout: 10000,
     });
-    return data;
+    const contentType = response.headers['content-type'] || 'image/png';
+    const image = `data:${contentType};base64,${Buffer.from(response.data).toString('base64')}`;
+    mapCache = { image, timestamp: Date.now() };
+    return image;
   }
 
   /**
@@ -93,10 +103,10 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   return Object.freeze({
     start,
     stop,
-    controllers: MeteoFranceController(gladys, getVigilance, getForecast, getVigilanceText),
+    controllers: MeteoFranceController(gladys, getVigilance, getForecast, getVigilanceMap),
     vigilance: {
       get: getVigilance,
-      getText: getVigilanceText,
+      getMap: getVigilanceMap,
     },
     forecast: {
       get: getForecast,

@@ -5,6 +5,23 @@ import BaseEditBox from '../baseEditBox';
 import actions from '../../../actions/dashboard/boxActions';
 import { GetWeatherModes } from '../../../utils/consts';
 
+// Widget-specific display modes, not part of the shared GetWeatherModes
+const CURRENT_WEATHER_MODE = 'currentWeather';
+const DATE_LOCATION_MODE = 'dateLocation';
+const VIGILANCE_MAP_MODE = 'vigilanceMap';
+
+// Modes enabled by default for widgets saved before they existed
+const DEFAULT_ON_MODES = [DATE_LOCATION_MODE, CURRENT_WEATHER_MODE];
+
+const DISPLAY_MODES = [
+  DATE_LOCATION_MODE,
+  CURRENT_WEATHER_MODE,
+  GetWeatherModes.AdvancedWeather,
+  GetWeatherModes.HourlyForecast,
+  GetWeatherModes.DailyForecast,
+  VIGILANCE_MAP_MODE
+];
+
 const EditWeatherMeteoFranceBox = ({ children, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.weather-meteo-france">
     <div class="form-group">
@@ -46,16 +63,17 @@ const EditWeatherMeteoFranceBox = ({ children, ...props }) => (
         <Text id="dashboard.boxes.weather.editModeLabel" />
       </label>
       <div>
-        {Object.keys(GetWeatherModes).map(key => {
-          const mode = GetWeatherModes[key];
+        {DISPLAY_MODES.map(mode => {
           const label = `dashboard.boxes.weather.displayModes.${mode}`;
+          const modes = props.box.modes || {};
+          const checked = DEFAULT_ON_MODES.includes(mode) ? modes[mode] !== false : Boolean(modes[mode]);
           return (
             <div class="form-check">
               <input
                 type="checkbox"
                 class="form-check-input"
                 name={mode}
-                checked={props.box.modes !== undefined && props.box.modes[mode]}
+                checked={checked}
                 onChange={props.updateBoxModes}
               />
               <label class="form-check-label">

@@ -15,7 +15,7 @@ const MeteoFrancePage = ({ children, ...props }) => (
               <div>
                 <div class="list-group list-group-transparent mb-0">
                   <a
-                    href="https://portail-api.meteofrance.fr"
+                    href="https://vigilance.meteofrance.fr"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="list-group-item list-group-item-action d-flex align-items-center"
@@ -43,6 +43,16 @@ const MeteoFrancePage = ({ children, ...props }) => (
                       <p>
                         <Text id="integration.meteoFrance.introduction" />
                       </p>
+                      <p>
+                        <i class="fe fe-check-circle text-success mr-1" />
+                        <Text id="integration.meteoFrance.noConfiguration" />
+                      </p>
+                      <p>
+                        <Text id="integration.meteoFrance.instructionsToUse" />
+                      </p>
+
+                      <hr />
+
                       <p>
                         <MarkupText id="integration.meteoFrance.instructions" />
                       </p>
@@ -82,12 +92,6 @@ const MeteoFrancePage = ({ children, ...props }) => (
                               <Text id="integration.meteoFrance.saveError" />
                             </p>
                           )}
-                        </div>
-
-                        <div class="form-group">
-                          <label>
-                            <Text id="integration.meteoFrance.instructionsToUse" />
-                          </label>
                         </div>
                       </form>
                     </div>
