@@ -21,6 +21,72 @@ function isServerModule(id) {
   return filePath.startsWith(`${SERVER_ROOT}/`) || filePath.includes('/server/');
 }
 
+function parseExportEntries(body) {
+  const names = [];
+  let depth = 0;
+  let current = '';
+
+  const addName = trimmed => {
+    if (!trimmed || trimmed.startsWith('//')) {
+      return;
+    }
+
+    const shorthand = trimmed.match(/^(\w+)$/);
+    if (shorthand) {
+      names.push(shorthand[1]);
+      return;
+    }
+
+    const explicit = trimmed.match(/^(\w+)\s*:/);
+    if (explicit) {
+      names.push(explicit[1]);
+    }
+  };
+
+  for (const char of body) {
+    if (char === '{' || char === '[' || char === '(') {
+      depth += 1;
+    } else if (char === '}' || char === ']' || char === ')') {
+      depth -= 1;
+    } else if (char === ',' && depth === 0) {
+      addName(current.trim());
+      current = '';
+      continue;
+    }
+
+    current += char;
+  }
+
+  addName(current.trim());
+  return names;
+}
+
+function getModuleExportsObjectBody(code) {
+  const assignment = code.match(/module\.exports\s*=\s*\{/);
+  if (!assignment) {
+    return null;
+  }
+
+  let depth = 1;
+  let index = assignment.index + assignment[0].length;
+
+  while (index < code.length && depth > 0) {
+    const char = code[index];
+    if (char === '{') {
+      depth += 1;
+    } else if (char === '}') {
+      depth -= 1;
+    }
+    index += 1;
+  }
+
+  if (depth !== 0) {
+    return null;
+  }
+
+  return code.slice(assignment.index + assignment[0].length, index - 1);
+}
+
 function getCjsExportNames(code) {
   const names = new Set();
 
@@ -32,24 +98,10 @@ function getCjsExportNames(code) {
     names.add(match[1]);
   }
 
-  const objectExportMatch = code.match(/module\.exports\s*=\s*\{([\s\S]*?)\n\};/);
-  if (objectExportMatch) {
-    for (const line of objectExportMatch[1].split('\n')) {
-      const trimmed = line.trim().replace(/,$/, '');
-      if (!trimmed || trimmed.startsWith('//')) {
-        continue;
-      }
-
-      const shorthand = trimmed.match(/^(\w+)$/);
-      if (shorthand) {
-        names.add(shorthand[1]);
-        continue;
-      }
-
-      const explicit = trimmed.match(/^(\w+)\s*:/);
-      if (explicit) {
-        names.add(explicit[1]);
-      }
+  const objectExportBody = getModuleExportsObjectBody(code);
+  if (objectExportBody) {
+    for (const name of parseExportEntries(objectExportBody)) {
+      names.add(name);
     }
   }
 
