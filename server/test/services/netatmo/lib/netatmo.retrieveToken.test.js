@@ -19,6 +19,7 @@ const serviceId = 'serviceId';
 const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 netatmoHandler.pollRefreshingToken = fake.resolves(null);
 netatmoHandler.pollRefreshingValues = fake.resolves(null);
+netatmoHandler.refreshNetatmoValues = fake.resolves(null);
 
 describe('Netatmo retrieveTokens', () => {
   let body;
@@ -125,6 +126,7 @@ describe('Netatmo retrieveTokens', () => {
         payload: { status: 'processing token' },
       }),
     ).to.equal(true);
+    sinon.assert.notCalled(netatmoHandler.refreshNetatmoValues);
     sinon.assert.notCalled(netatmoHandler.pollRefreshingValues);
     sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
   });
@@ -158,8 +160,36 @@ describe('Netatmo retrieveTokens', () => {
         payload: { status: 'processing token' },
       }),
     ).to.equal(true);
+    sinon.assert.calledOnce(netatmoHandler.refreshNetatmoValues);
     sinon.assert.calledOnce(netatmoHandler.pollRefreshingValues);
     sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
+  });
+
+  it('should stay connected when the initial values refresh fails', async () => {
+    const tokens = {
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
+      expire_in: 3600,
+    };
+    netatmoHandler.configuration.energyApi = true;
+    netatmoHandler.refreshNetatmoValues = fake.rejects(new Error('refresh failed'));
+
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(200, tokens);
+
+    const result = await netatmoHandler.retrieveTokens(body);
+
+    expect(result).to.deep.equal({ success: true });
+    expect(netatmoHandler.status).to.equal('connected');
+    sinon.assert.calledOnce(netatmoHandler.pollRefreshingValues);
+    sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
+
+    netatmoHandler.refreshNetatmoValues = fake.resolves(null);
   });
 
   it('should throw an error when axios request fails', async () => {

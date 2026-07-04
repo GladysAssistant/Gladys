@@ -52,6 +52,8 @@ const STATUS = {
 const RECONNECT_BACKOFF_MS = [30 * 1000, 60 * 1000, 120 * 1000, 300 * 1000];
 const RECONNECT_RECURRENT_MS = 300 * 1000;
 const FATAL_RETRY_WINDOW_MS = 24 * 60 * 60 * 1000;
+// Refresh the access token before it expires so API calls never run with a dead token.
+const ACCESS_TOKEN_REFRESH_RATIO = 0.8;
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 const BASE_API = 'https://api.netatmo.com';
@@ -112,4 +114,5 @@ module.exports = {
   RECONNECT_BACKOFF_MS,
   RECONNECT_RECURRENT_MS,
   FATAL_RETRY_WINDOW_MS,
+  ACCESS_TOKEN_REFRESH_RATIO,
 };

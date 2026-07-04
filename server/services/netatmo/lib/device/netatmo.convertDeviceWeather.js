@@ -33,7 +33,8 @@ function convertDeviceWeather(netatmoDevice) {
   logger.debug(`Netatmo convert Weather device "${nameDevice}, ${model}"`);
   const features = [];
   let params = [];
-  let roomName = 'undefined';
+  const minTempName = room.id ? `Minimum in ${room.name}` : `Minimum - ${nameDevice}`;
+  const maxTempName = room.id ? `Maximum in ${room.name}` : `Maximum - ${nameDevice}`;
   const isNotBatteryDevice = model === SUPPORTED_MODULE_TYPE.NAMAIN;
   const isBatteryDevice =
     model === SUPPORTED_MODULE_TYPE.NAMODULE1 ||
@@ -63,8 +64,7 @@ function convertDeviceWeather(netatmoDevice) {
   /* params common to all devices features */
   params.push({ name: PARAMS.HOME_ID, value: homeId });
   if (room.id) {
-    roomName = room.name;
-    params.push({ name: PARAMS.ROOM_ID, value: room.id }, { name: PARAMS.ROOM_NAME, value: roomName });
+    params.push({ name: PARAMS.ROOM_ID, value: room.id }, { name: PARAMS.ROOM_NAME, value: room.name });
   }
 
   switch (model) {
@@ -72,23 +72,13 @@ function convertDeviceWeather(netatmoDevice) {
       /* features common Netatmo */
       features.push(buildFeatureTemperature(nameDevice, externalId, 'temperature'));
       if (room.id) {
-        features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+        features.push(buildFeatureTemperature(`room ${room.name}`, externalId, 'therm_measured_temperature'));
       }
       features.push(
-        buildFeatureTemperature(
-          `Minimum in ${roomName}`,
-          externalId,
-          'min_temp',
-          DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MIN,
-        ),
+        buildFeatureTemperature(minTempName, externalId, 'min_temp', DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MIN),
       );
       features.push(
-        buildFeatureTemperature(
-          `Maximum in ${roomName}`,
-          externalId,
-          'max_temp',
-          DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MAX,
-        ),
+        buildFeatureTemperature(maxTempName, externalId, 'max_temp', DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MAX),
       );
       /* features specific Netatmo Weather */
       features.push(buildFeatureCo2(nameDevice, externalId));
@@ -102,20 +92,10 @@ function convertDeviceWeather(netatmoDevice) {
       /* features common Netatmo */
       features.push(buildFeatureTemperature(nameDevice, externalId, 'temperature'));
       features.push(
-        buildFeatureTemperature(
-          `Minimum in ${roomName}`,
-          externalId,
-          'min_temp',
-          DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MIN,
-        ),
+        buildFeatureTemperature(minTempName, externalId, 'min_temp', DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MIN),
       );
       features.push(
-        buildFeatureTemperature(
-          `Maximum in ${roomName}`,
-          externalId,
-          'max_temp',
-          DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MAX,
-        ),
+        buildFeatureTemperature(maxTempName, externalId, 'max_temp', DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MAX),
       );
       /* features specific Netatmo Weather */
       features.push(buildFeatureHumidity(nameDevice, externalId));
@@ -156,23 +136,13 @@ function convertDeviceWeather(netatmoDevice) {
       /* features common Netatmo */
       features.push(buildFeatureTemperature(nameDevice, externalId, 'temperature'));
       if (room.id) {
-        features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+        features.push(buildFeatureTemperature(`room ${room.name}`, externalId, 'therm_measured_temperature'));
       }
       features.push(
-        buildFeatureTemperature(
-          `Minimum in ${roomName}`,
-          externalId,
-          'min_temp',
-          DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MIN,
-        ),
+        buildFeatureTemperature(minTempName, externalId, 'min_temp', DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MIN),
       );
       features.push(
-        buildFeatureTemperature(
-          `Maximum in ${roomName}`,
-          externalId,
-          'max_temp',
-          DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MAX,
-        ),
+        buildFeatureTemperature(maxTempName, externalId, 'max_temp', DEVICE_FEATURE_TYPES.TEMPERATURE_SENSOR.MAX),
       );
       /* features specific Netatmo Weather */
       features.push(buildFeatureCo2(nameDevice, externalId));

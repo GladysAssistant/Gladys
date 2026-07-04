@@ -152,7 +152,12 @@ describe('Netatmo Set Value', () => {
         },
       });
 
-    await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
+    try {
+      await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
+      expect.fail('setValue should have thrown an error');
+    } catch (e) {
+      expect(e.message).to.equal('Netatmo setValue error: HTTP 400');
+    }
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(2);
     expect(
@@ -188,7 +193,12 @@ describe('Netatmo Set Value', () => {
         },
       });
 
-    await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
+    try {
+      await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
+      expect.fail('setValue should have thrown an error');
+    } catch (e) {
+      expect(e.message).to.equal('Netatmo setValue error: HTTP 403');
+    }
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(2);
     expect(
