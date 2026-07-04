@@ -223,7 +223,9 @@ class WeatherMeteoFranceBoxComponent extends Component {
           {showCurrentWeather && (
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px">
               <div style="display: flex; align-items: center; min-width: 0">
-                <div style="font-size: 52px; line-height: 1">{currentIcon}</div>
+                <div class="mf-dark-real-colors" style="font-size: 52px; line-height: 1">
+                  {currentIcon}
+                </div>
                 <div style="font-size: 16px; font-weight: 500; margin-left: 12px">{desc}</div>
               </div>
               <div style="font-size: 36px; font-weight: 600; line-height: 1; white-space: nowrap; margin-left: 8px">
@@ -253,7 +255,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
                   )}
                   {sun && (
                     <div>
-                      <i class="fe fe-sunrise mr-2" style="color: #f59f00" />
+                      <i class="fe fe-sunrise mr-2 mf-dark-real-colors" style="color: #f59f00" />
                       {dayjs.unix(sun.rise).format(timeFormat)}
                     </div>
                   )}
@@ -277,20 +279,22 @@ class WeatherMeteoFranceBoxComponent extends Component {
                   {sun && (
                     <div>
                       {dayjs.unix(sun.set).format(timeFormat)}
-                      <i class="fe fe-sunset ml-2" style="color: #f59f00" />
+                      <i class="fe fe-sunset ml-2 mf-dark-real-colors" style="color: #f59f00" />
                     </div>
                   )}
                 </div>
               </div>
               <div style="display: flex; justify-content: space-between">
                 <div>
-                  <span class="mr-2">{MOON_EMOJIS[moonPhase]}</span>
+                  <span class="mr-2 mf-dark-real-colors">{MOON_EMOJIS[moonPhase]}</span>
                   <Text id={`dashboard.boxes.weatherMeteoFrance.moonPhases.${moonPhase}`} />
                 </div>
                 {uv != null && (
                   <div>
                     <span class="mr-1">UV</span>
-                    <span style={`font-weight: 600; color: ${getUvColor(uv)}`}>{uv}</span>
+                    <span class="mf-dark-real-colors" style={`font-weight: 600; color: ${getUvColor(uv)}`}>
+                      {uv}
+                    </span>
                   </div>
                 )}
               </div>
@@ -305,6 +309,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
                 return (
                   <span
                     key={`${alert.phenomene_id}-${alert.dept}`}
+                    class="mf-dark-real-colors"
                     style={`background:${vstyle.background};color:${vstyle.color};border-radius:12px;padding:3px 10px;font-size:12px;font-weight:600;display:inline-block;margin-right:5px;margin-bottom:4px`}
                   >
                     {PHENOMENA_EMOJI[alert.phenomene_id] || '⚠️'} {alert.phenomene_nom}
@@ -364,7 +369,12 @@ class WeatherMeteoFranceBoxComponent extends Component {
                   >
                     {hour.time}h
                   </div>
-                  <div style={`font-size: ${index === 0 ? '30px' : '20px'}; line-height: 1.5`}>{hour.icon}</div>
+                  <div
+                    class="mf-dark-real-colors"
+                    style={`font-size: ${index === 0 ? '30px' : '20px'}; line-height: 1.5`}
+                  >
+                    {hour.icon}
+                  </div>
                   <div style={`font-size: ${index === 0 ? '15px' : '12px'}; font-weight: 600`}>
                     {hour.temp !== null ? `${convertTemp(hour.temp)}°` : '--'}
                   </div>
@@ -390,7 +400,9 @@ class WeatherMeteoFranceBoxComponent extends Component {
                       .locale(userLanguage)
                       .format('ddd D')}
                   </div>
-                  <div style="font-size: 32px; line-height: 1.5">{d.icon}</div>
+                  <div class="mf-dark-real-colors" style="font-size: 32px; line-height: 1.5">
+                    {d.icon}
+                  </div>
                   <div style="font-size: 16px; font-weight: 600">
                     {d.max !== null ? `${convertTemp(d.max)}°` : '--'}
                   </div>

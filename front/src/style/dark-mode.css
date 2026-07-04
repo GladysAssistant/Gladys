@@ -205,3 +205,9 @@ body.dark-mode {
 .dark-mode img.meteofrance-vigilance-map {
   filter: brightness(0.6) invert(100%) hue-rotate(180deg) !important;
 }
+
+/* Météo France widget emojis, badges and colored icons: same pre-darkening trick
+   as the vigilance map to keep real colors (yellow/orange suns, alert badges) */
+.dark-mode .mf-dark-real-colors {
+  filter: brightness(0.7) invert(100%) hue-rotate(180deg) !important;
+}
