@@ -30,7 +30,6 @@ function convertDeviceEnergy(netatmoDevice) {
   logger.debug(`Netatmo convert Energy device "${nameDevice}, ${model}"`);
   const features = [];
   let params = [];
-  let roomName = 'undefined';
   const isNotBatteryDevice = model === SUPPORTED_MODULE_TYPE.PLUG;
   const isBatteryDevice = model === SUPPORTED_MODULE_TYPE.THERMOSTAT || model === SUPPORTED_MODULE_TYPE.NRV;
 
@@ -57,15 +56,14 @@ function convertDeviceEnergy(netatmoDevice) {
   /* params common to all devices features */
   params.push({ name: PARAMS.HOME_ID, value: homeId });
   if (room.id) {
-    roomName = room.name;
-    params.push({ name: PARAMS.ROOM_ID, value: room.id }, { name: PARAMS.ROOM_NAME, value: roomName });
+    params.push({ name: PARAMS.ROOM_ID, value: room.id }, { name: PARAMS.ROOM_NAME, value: room.name });
   }
   switch (model) {
     case SUPPORTED_MODULE_TYPE.THERMOSTAT: {
       /* features common Netatmo */
       features.push(buildFeatureTemperature(nameDevice, externalId, 'temperature'));
       if (room.id) {
-        features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+        features.push(buildFeatureTemperature(`room ${room.name}`, externalId, 'therm_measured_temperature'));
       }
       /* features specific Energy */
       features.push(buildFeatureThermSetpointTemperature(nameDevice, externalId));
@@ -81,7 +79,7 @@ function convertDeviceEnergy(netatmoDevice) {
     case SUPPORTED_MODULE_TYPE.NRV: {
       /* features common Netatmo */
       if (room.id) {
-        features.push(buildFeatureTemperature(`room ${roomName}`, externalId, 'therm_measured_temperature'));
+        features.push(buildFeatureTemperature(`room ${room.name}`, externalId, 'therm_measured_temperature'));
       }
       /* features specific Energy */
       features.push(buildFeatureThermSetpointTemperature(nameDevice, externalId));

@@ -152,14 +152,14 @@ describe('Netatmo Convert Weather Device', () => {
   it('should correctly convert a Netatmo Weather Station device without modules_bridged and without room', () => {
     const deviceGladysMock = { ...devicesGladysMock.filter((device) => device.model === 'NAMain')[0] };
     const deviceNetatmoMock = { ...devicesNetatmoMock.filter((device) => device.type === 'NAMain')[0] };
-    const roomNameParam = deviceGladysMock.params.find((param) => param.name === 'room_name');
-    if (roomNameParam) {
-      deviceGladysMock.features.forEach((feature) => {
-        if (feature.category === 'temperature-sensor') {
-          feature.name = feature.name.replace(roomNameParam.value, 'undefined');
-        }
-      });
-    }
+    deviceGladysMock.features.forEach((feature) => {
+      if (feature.external_id.endsWith(':min_temp')) {
+        feature.name = `Temperature - Minimum - ${deviceGladysMock.name}`;
+      }
+      if (feature.external_id.endsWith(':max_temp')) {
+        feature.name = `Temperature - Maximum - ${deviceGladysMock.name}`;
+      }
+    });
     deviceGladysMock.features = deviceGladysMock.features.filter(
       (feature) => feature.external_id !== 'netatmo:70:ee:50:jj:jj:jj:therm_measured_temperature',
     );
@@ -194,14 +194,14 @@ describe('Netatmo Convert Weather Device', () => {
   it('should correctly convert a Netatmo Weather Station NAModule4 device without room and without plug', () => {
     const deviceGladysMock = { ...devicesGladysMock.filter((device) => device.model === 'NAModule4')[0] };
     const deviceNetatmoMock = { ...devicesNetatmoMock.filter((device) => device.type === 'NAModule4')[0] };
-    const roomNameParam = deviceGladysMock.params.find((param) => param.name === 'room_name');
-    if (roomNameParam) {
-      deviceGladysMock.features.forEach((feature) => {
-        if (feature.category === 'temperature-sensor') {
-          feature.name = feature.name.replace(roomNameParam.value, 'undefined');
-        }
-      });
-    }
+    deviceGladysMock.features.forEach((feature) => {
+      if (feature.external_id.endsWith(':min_temp')) {
+        feature.name = `Temperature - Minimum - ${deviceGladysMock.name}`;
+      }
+      if (feature.external_id.endsWith(':max_temp')) {
+        feature.name = `Temperature - Maximum - ${deviceGladysMock.name}`;
+      }
+    });
     deviceGladysMock.features = deviceGladysMock.features.filter(
       (feature) => feature.external_id !== 'netatmo:03:00:00:yy:yy:yy:therm_measured_temperature',
     );
