@@ -1,6 +1,7 @@
 const { expect, assert } = require('chai');
+const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { forecastData, warningDataGreen } = require('./meteofrance.data');
+const { forecastData, warningDataGreen, warningDataOrange } = require('./meteofrance.data');
 
 const SERVICE_ID = '35deac79-f295-4adf-8512-f2f48e1ea0f8';
 
@@ -8,11 +9,23 @@ const gladysWithoutApiKey = {
   variable: {
     getValue: () => Promise.resolve(null),
   },
+  house: {
+    get: () => Promise.resolve([]),
+  },
+  event: {
+    emit: () => null,
+  },
 };
 
 const gladysWithApiKey = {
   variable: {
     getValue: () => Promise.resolve('METEOFRANCE_API_KEY_VALUE'),
+  },
+  house: {
+    get: () => Promise.resolve([]),
+  },
+  event: {
+    emit: () => null,
   },
 };
 
@@ -60,6 +73,7 @@ describe('MeteoFranceService', () => {
   it('should stop service', async () => {
     const MeteoFranceService = proxyquire('../../../services/meteofrance/index', workingAxios);
     const meteoFranceService = MeteoFranceService(gladysWithoutApiKey, SERVICE_ID);
+    await meteoFranceService.start();
     await meteoFranceService.stop();
   });
   it('should get forecast', async () => {
@@ -106,6 +120,79 @@ describe('MeteoFranceService', () => {
     await meteoFranceService.start();
     const image = await meteoFranceService.vigilance.getMap();
     expect(image).to.equal(null);
+  });
+  it('should build a forecast summary for a house', async () => {
+    const MeteoFranceService = proxyquire('../../../services/meteofrance/index', workingAxios);
+    const meteoFranceService = MeteoFranceService(gladysWithoutApiKey, SERVICE_ID);
+    const summary = await meteoFranceService.forecast.getSummaryForHouse(
+      { selector: 'main-house', latitude: 46.75, longitude: 4.35 },
+      2,
+    );
+    expect(summary.description).to.equal('Ciel clair');
+    expect(summary.temp_min).to.equal(19);
+    expect(summary.temp_max).to.equal(30);
+    expect(summary.rain).to.equal(0);
+    expect(summary.uv).to.equal(8);
+    expect(summary.summary).to.contain('Ciel clair');
+    expect(summary.summary).to.contain('19°/30°');
+  });
+  it('should fire a scene trigger when vigilance level raises, only once', async () => {
+    let warningData = warningDataGreen;
+    const dynamicAxios = {
+      axios: {
+        default: {
+          get: (url) => {
+            if (url.includes('/forecast')) {
+              return Promise.resolve({ data: forecastData });
+            }
+            return Promise.resolve({ data: warningData });
+          },
+        },
+      },
+    };
+    const eventEmit = fake.returns(null);
+    const gladysWithHouse = {
+      variable: {
+        getValue: () => Promise.resolve(null),
+      },
+      house: {
+        get: () => Promise.resolve([{ selector: 'main-house', latitude: 46.75, longitude: 4.35 }]),
+      },
+      event: {
+        emit: eventEmit,
+      },
+    };
+    const MeteoFranceService = proxyquire('../../../services/meteofrance/index', dynamicAxios);
+    const meteoFranceService = MeteoFranceService(gladysWithHouse, SERVICE_ID);
+
+    // First check records the baseline (green), no event
+    await meteoFranceService.vigilance.check();
+    expect(eventEmit.callCount).to.equal(0);
+
+    // Vigilance turns orange: one event fired
+    warningData = warningDataOrange;
+    await meteoFranceService.vigilance.check();
+    expect(eventEmit.callCount).to.equal(1);
+    expect(eventEmit.firstCall.args[0]).to.equal('trigger.check');
+    expect(eventEmit.firstCall.args[1]).to.deep.include({
+      type: 'meteofrance.new-vigilance',
+      house: 'main-house',
+      dept: '71',
+      color: 3,
+    });
+    expect(eventEmit.firstCall.args[1].alerts).to.deep.equal([
+      { dept: '71', color: 3, phenomene_id: 3, phenomene_nom: 'Orages' },
+      { dept: '71', color: 2, phenomene_id: 6, phenomene_nom: 'Canicule' },
+    ]);
+
+    // Same level: no new event
+    await meteoFranceService.vigilance.check();
+    expect(eventEmit.callCount).to.equal(1);
+
+    // Back to green: no event either
+    warningData = warningDataGreen;
+    await meteoFranceService.vigilance.check();
+    expect(eventEmit.callCount).to.equal(1);
   });
   it('should return vigilance map as data URL with API key, using the cache', async () => {
     let calls = 0;

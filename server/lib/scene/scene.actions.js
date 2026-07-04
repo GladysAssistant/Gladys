@@ -579,6 +579,42 @@ const actionsFunc = {
       throw new AbortScene(e.message);
     }
   },
+  [ACTIONS.METEO_FRANCE.GET_VIGILANCE]: async (self, action, scope, path) => {
+    const meteoFranceService = self.service.getService('meteofrance');
+    if (meteoFranceService === null) {
+      throw new AbortScene('SERVICE_METEOFRANCE_NOT_FOUND');
+    }
+    const house = await self.house.getBySelector(action.house);
+    if (!house || !house.latitude || !house.longitude) {
+      throw new AbortScene('HOUSE_HAS_NO_COORDINATES');
+    }
+    const vigilance = await meteoFranceService.vigilance.getForHouse(house);
+    const VIGILANCE_COLOR_NAMES = {
+      1: 'Vert',
+      2: 'Jaune',
+      3: 'Orange',
+      4: 'Rouge',
+    };
+    set(scope, path, {
+      dept: vigilance.dept,
+      color: vigilance.color,
+      color_name: VIGILANCE_COLOR_NAMES[vigilance.color] || `${vigilance.color}`,
+      phenomena: vigilance.alerts.map((alert) => alert.phenomene_nom).join(', '),
+      text: vigilance.text,
+    });
+  },
+  [ACTIONS.METEO_FRANCE.GET_FORECAST]: async (self, action, scope, path) => {
+    const meteoFranceService = self.service.getService('meteofrance');
+    if (meteoFranceService === null) {
+      throw new AbortScene('SERVICE_METEOFRANCE_NOT_FOUND');
+    }
+    const house = await self.house.getBySelector(action.house);
+    if (!house || !house.latitude || !house.longitude) {
+      throw new AbortScene('HOUSE_HAS_NO_COORDINATES');
+    }
+    const forecastSummary = await meteoFranceService.forecast.getSummaryForHouse(house, action.days || 1);
+    set(scope, path, forecastSummary);
+  },
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: async (self, action) => {
     const house = await self.house.getBySelector(action.house);
     if (house.alarm_mode !== action.alarm_mode) {

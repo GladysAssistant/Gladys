@@ -2588,6 +2588,22 @@
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
     "actionsCard": {
+      "meteoFranceGetVigilance": {
+        "description": "This action gets the current Météo France vigilance for the selected house and exposes variables usable in the next actions (level, color, phenomena, bulletin).",
+        "houseLabel": "House"
+      },
+      "meteoFranceGetForecast": {
+        "description": "This action gets the Météo France forecast for the selected house and exposes variables usable in the next actions (description, temperatures, rain, UV, bulletin).",
+        "houseLabel": "House",
+        "daysLabel": "Bulletin length",
+        "daysOptions": {
+          "1": "Today only",
+          "2": "2 days",
+          "3": "3 days",
+          "4": "4 days",
+          "5": "5 days"
+        }
+      },
       "delay": {
         "label": " This block will wait the specified duration.",
         "inputPlaceholder": "Duration",
@@ -2885,12 +2901,33 @@
       },
       "ai": {
         "ask": "Ask AI"
+      },
+      "meteofrance": {
+        "get-vigilance": "Get Météo France vigilance",
+        "get-forecast": "Get weather bulletin (Météo France)"
       }
     },
     "variables": {
       "device": {
         "get-value": {
           "last_value": "Device last value"
+        }
+      },
+      "meteofrance": {
+        "get-vigilance": {
+          "color": "Vigilance level (1 to 4)",
+          "color_name": "Vigilance color (Vert, Jaune, Orange, Rouge)",
+          "phenomena": "Current phenomena",
+          "text": "Vigilance bulletin",
+          "dept": "Department"
+        },
+        "get-forecast": {
+          "description": "Sky description (today)",
+          "temp_min": "Minimum temperature (today)",
+          "temp_max": "Maximum temperature (today)",
+          "rain": "Rain in mm (today)",
+          "uv": "UV index (today)",
+          "summary": "Full weather bulletin"
         }
       },
       "calendar": {
@@ -2941,9 +2978,22 @@
       },
       "mqtt": {
         "received": "Receive message from MQTT"
+      },
+      "meteofrance": {
+        "new-vigilance": "Weather vigilance (Météo France)"
       }
     },
     "triggersCard": {
+      "meteoFranceVigilance": {
+        "description": "This trigger fires when the Météo France vigilance level of your department raises and reaches the selected level. The department is detected from the house GPS coordinates.",
+        "houseLabel": "House",
+        "levelLabel": "Minimum vigilance level",
+        "levels": {
+          "2": "Yellow or higher",
+          "3": "Orange or higher",
+          "4": "Red only"
+        }
+      },
       "newState": {
         "equal": "equal",
         "superior": "superior",

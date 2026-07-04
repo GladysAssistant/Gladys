@@ -2588,6 +2588,22 @@
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
     "actionsCard": {
+      "meteoFranceGetVigilance": {
+        "description": "Cette action récupère la vigilance Météo France en cours pour la maison sélectionnée et expose des variables utilisables dans les actions suivantes (niveau, couleur, phénomènes, bulletin).",
+        "houseLabel": "Maison"
+      },
+      "meteoFranceGetForecast": {
+        "description": "Cette action récupère les prévisions Météo France pour la maison sélectionnée et expose des variables utilisables dans les actions suivantes (description, températures, pluie, UV, bulletin).",
+        "houseLabel": "Maison",
+        "daysLabel": "Durée du bulletin",
+        "daysOptions": {
+          "1": "Aujourd'hui uniquement",
+          "2": "2 jours",
+          "3": "3 jours",
+          "4": "4 jours",
+          "5": "5 jours"
+        }
+      },
       "delay": {
         "label": " Ce bloc attendra la durée spécifiée.",
         "inputPlaceholder": "Durée",
@@ -2885,12 +2901,33 @@
       },
       "ai": {
         "ask": "Demander à l'IA"
+      },
+      "meteofrance": {
+        "get-vigilance": "Récupérer la vigilance Météo France",
+        "get-forecast": "Récupérer le bulletin météo (Météo France)"
       }
     },
     "variables": {
       "device": {
         "get-value": {
           "last_value": "Dernière valeur de l'appareil"
+        }
+      },
+      "meteofrance": {
+        "get-vigilance": {
+          "color": "Niveau de vigilance (1 à 4)",
+          "color_name": "Couleur de vigilance (Vert, Jaune, Orange, Rouge)",
+          "phenomena": "Phénomènes en cours",
+          "text": "Bulletin de vigilance",
+          "dept": "Département"
+        },
+        "get-forecast": {
+          "description": "Description du ciel (aujourd'hui)",
+          "temp_min": "Température minimale (aujourd'hui)",
+          "temp_max": "Température maximale (aujourd'hui)",
+          "rain": "Pluie en mm (aujourd'hui)",
+          "uv": "Indice UV (aujourd'hui)",
+          "summary": "Bulletin météo complet"
         }
       },
       "calendar": {
@@ -2941,9 +2978,22 @@
       },
       "mqtt": {
         "received": "Recevoir un message MQTT"
+      },
+      "meteofrance": {
+        "new-vigilance": "Vigilance météo (Météo France)"
       }
     },
     "triggersCard": {
+      "meteoFranceVigilance": {
+        "description": "Ce déclencheur s'active lorsque le niveau de vigilance Météo France de votre département augmente et atteint le niveau choisi. Le département est détecté à partir des coordonnées GPS de la maison.",
+        "houseLabel": "Maison",
+        "levelLabel": "Niveau minimum de vigilance",
+        "levels": {
+          "2": "Jaune ou plus",
+          "3": "Orange ou plus",
+          "4": "Rouge uniquement"
+        }
+      },
       "newState": {
         "equal": "égal",
         "superior": "supérieur",

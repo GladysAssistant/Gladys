@@ -2588,6 +2588,22 @@
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
     "actionsCard": {
+      "meteoFranceGetVigilance": {
+        "description": "Diese Aktion ruft die aktuelle Météo France Warnstufe für das ausgewählte Haus ab und stellt Variablen für die folgenden Aktionen bereit (Stufe, Farbe, Phänomene, Bulletin).",
+        "houseLabel": "Haus"
+      },
+      "meteoFranceGetForecast": {
+        "description": "Diese Aktion ruft die Météo France Vorhersage für das ausgewählte Haus ab und stellt Variablen für die folgenden Aktionen bereit (Beschreibung, Temperaturen, Regen, UV, Bericht).",
+        "houseLabel": "Haus",
+        "daysLabel": "Länge des Berichts",
+        "daysOptions": {
+          "1": "Nur heute",
+          "2": "2 Tage",
+          "3": "3 Tage",
+          "4": "4 Tage",
+          "5": "5 Tage"
+        }
+      },
       "delay": {
         "label": " Dieser Block wartet für die angegebene Dauer.",
         "inputPlaceholder": "Dauer",
@@ -2885,12 +2901,33 @@
       },
       "ai": {
         "ask": "Frage die KI"
+      },
+      "meteofrance": {
+        "get-vigilance": "Météo France Warnstufe abrufen",
+        "get-forecast": "Wetterbericht abrufen (Météo France)"
       }
     },
     "variables": {
       "device": {
         "get-value": {
           "last_value": "Letzter Gerätewert"
+        }
+      },
+      "meteofrance": {
+        "get-vigilance": {
+          "color": "Warnstufe (1 bis 4)",
+          "color_name": "Warnfarbe (Vert, Jaune, Orange, Rouge)",
+          "phenomena": "Aktuelle Phänomene",
+          "text": "Warnbulletin",
+          "dept": "Departement"
+        },
+        "get-forecast": {
+          "description": "Himmelsbeschreibung (heute)",
+          "temp_min": "Tiefsttemperatur (heute)",
+          "temp_max": "Höchsttemperatur (heute)",
+          "rain": "Regen in mm (heute)",
+          "uv": "UV-Index (heute)",
+          "summary": "Vollständiger Wetterbericht"
         }
       },
       "calendar": {
@@ -2941,9 +2978,22 @@
       },
       "mqtt": {
         "received": "MQTT-Message empfangen"
+      },
+      "meteofrance": {
+        "new-vigilance": "Unwetterwarnung (Météo France)"
       }
     },
     "triggersCard": {
+      "meteoFranceVigilance": {
+        "description": "Dieser Auslöser wird aktiviert, wenn die Météo France Warnstufe deines Departements steigt und die gewählte Stufe erreicht. Das Departement wird aus den GPS-Koordinaten des Hauses ermittelt.",
+        "houseLabel": "Haus",
+        "levelLabel": "Minimale Warnstufe",
+        "levels": {
+          "2": "Gelb oder höher",
+          "3": "Orange oder höher",
+          "4": "Nur Rot"
+        }
+      },
       "newState": {
         "equal": "gleich",
         "superior": "größer",

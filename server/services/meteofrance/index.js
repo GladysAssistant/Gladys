@@ -1,10 +1,14 @@
 const logger = require('../../utils/logger');
+const { EVENTS } = require('../../utils/constants');
 const MeteoFranceController = require('./controllers/meteofrance.controller');
+const { parseAlerts, parseVigilanceText } = require('./lib/vigilance.parser');
+const { buildForecastSummary } = require('./lib/forecast.formatter');
 
 const METEOFRANCE_API_KEY_VAR = 'METEOFRANCE_API_KEY';
 const METEOFRANCE_WEBSERVICE_URL = 'https://webservice.meteofrance.com';
 const METEOFRANCE_PUBLIC_TOKEN = '__Wj7dVSTjV9YGu1guveLyDq0g7S7TfTjaHBTPTpO0kj8__';
 const MAP_CACHE_TTL_MS = 15 * 60 * 1000;
+const VIGILANCE_POLL_INTERVAL_MS = 15 * 60 * 1000;
 
 /**
  * @description Météo France service, based on the Météo France mobile webservice.
@@ -20,36 +24,17 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   let meteoFranceApiKey = null;
   /** @type {{ image: string|null, timestamp: number }} */
   let mapCache = { image: null, timestamp: 0 };
-
-  /**
-   * @public
-   * @description This function starts the service. Forecast and vigilance work without
-   * any configuration; the API key is optional and only unlocks the vigilance map.
-   * @example
-   * gladys.services.meteofrance.start();
-   */
-  async function start() {
-    logger.info('Starting MeteoFrance service');
-    meteoFranceApiKey = await gladys.variable.getValue(METEOFRANCE_API_KEY_VAR, serviceId);
-    if (meteoFranceApiKey) {
-      logger.info('MeteoFrance: API key configured, vigilance map available');
-    }
-  }
-
-  /**
-   * @public
-   * @description This function stops the service.
-   * @example
-   * gladys.services.meteofrance.stop();
-   */
-  async function stop() {
-    logger.info('Stopping MeteoFrance service');
-  }
+  /** @type {Object<string, string>} */
+  const deptByHouse = {};
+  /** @type {Object<string, number>} */
+  const lastColorByHouse = {};
+  /** @type {any} */
+  let vigilancePollTimer = null;
 
   /**
    * @description Get vigilance warnings for a department from Météo France mobile webservice.
    * @param {string} dept - French department number (e.g. "06", "75").
-   * @returns {Promise<object>} Resolve with warning data (phenomena colors and bulletin text).
+   * @returns {Promise<any>} Resolve with warning data (phenomena colors and bulletin text).
    * @example
    * const data = await gladys.services.meteofrance.vigilance.get('06');
    */
@@ -94,7 +79,7 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
    * @description Get weather forecast from Météo France mobile webservice.
    * @param {number} lat - Latitude.
    * @param {number} lon - Longitude.
-   * @returns {Promise<object>} Resolve with forecast data.
+   * @returns {Promise<any>} Resolve with forecast data.
    * @example
    * const data = await gladys.services.meteofrance.forecast.get(48.85, 2.35);
    */
@@ -120,6 +105,143 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
     }
   }
 
+  /**
+   * @description Get a human readable forecast summary for a house.
+   * @param {any} house - House object with latitude/longitude.
+   * @param {number} days - Number of days in the summary (1 to 5).
+   * @returns {Promise<object>} Today values and a multi-day summary text.
+   * @example
+   * const summary = await gladys.services.meteofrance.forecast.getSummaryForHouse(house, 2);
+   */
+  async function getForecastSummaryForHouse(house, days) {
+    const data = await getForecast(house.latitude, house.longitude);
+    return buildForecastSummary(data, days);
+  }
+
+  /**
+   * @description Get the current vigilance state for a house (department auto-detected).
+   * @param {any} house - House object with latitude/longitude.
+   * @returns {Promise<{ dept: string, color: number, alerts: Array<object>, text: string }>} Vigilance state.
+   * @example
+   * const vigilance = await gladys.services.meteofrance.vigilance.getForHouse(house);
+   */
+  async function getHouseVigilance(house) {
+    let dept = deptByHouse[house.selector];
+    if (!dept) {
+      const forecast = await getForecast(house.latitude, house.longitude);
+      dept = (forecast && forecast.position && forecast.position.dept) || null;
+      if (!dept) {
+        throw new Error('MeteoFrance: no department found for this house');
+      }
+      deptByHouse[house.selector] = dept;
+    }
+    const warningData = await getVigilance(dept);
+    return {
+      dept,
+      color: (warningData && warningData.color_max) || 1,
+      alerts: parseAlerts(warningData, dept),
+      text: parseVigilanceText(warningData),
+    };
+  }
+
+  /**
+   * @description Check vigilance level for every house and fire a scene trigger when it raises.
+   * @returns {Promise<void>} Resolve when every house has been checked.
+   * @example
+   * await gladys.services.meteofrance.vigilance.check();
+   */
+  async function checkVigilance() {
+    /** @type {Array<any>} */
+    const houses = await gladys.house.get();
+    await Promise.all(
+      houses
+        .filter((house) => house.latitude && house.longitude)
+        .map(async (house) => {
+          try {
+            let dept = deptByHouse[house.selector];
+            if (!dept) {
+              const forecast = await getForecast(house.latitude, house.longitude);
+              dept = (forecast && forecast.position && forecast.position.dept) || null;
+              if (!dept) {
+                return;
+              }
+              deptByHouse[house.selector] = dept;
+            }
+            const warningData = await getVigilance(dept);
+            const color = (warningData && warningData.color_max) || 1;
+            const previousColor = lastColorByHouse[house.selector];
+            lastColorByHouse[house.selector] = color;
+            if (previousColor === undefined) {
+              // First check since service start: record the baseline without firing
+              return;
+            }
+            if (color > previousColor && color >= 2) {
+              logger.info(
+                `[MeteoFrance] Vigilance raised from ${previousColor} to ${color} for house ${house.selector} (dept=${dept})`,
+              );
+              gladys.event.emit(EVENTS.TRIGGERS.CHECK, {
+                type: EVENTS.METEO_FRANCE.NEW_VIGILANCE,
+                house: house.selector,
+                dept,
+                color,
+                alerts: parseAlerts(warningData, dept),
+              });
+            }
+          } catch (e) {
+            const message = e instanceof Error ? e.message : `${e}`;
+            logger.warn(`[MeteoFrance] vigilance check failed for house ${house.selector}: ${message}`);
+          }
+        }),
+    );
+  }
+
+  /**
+   * @description Run a vigilance check without letting errors bubble up.
+   * @returns {Promise<void>} Resolve when done.
+   * @example
+   * await safeCheckVigilance();
+   */
+  async function safeCheckVigilance() {
+    try {
+      await checkVigilance();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : `${e}`;
+      logger.warn(`[MeteoFrance] vigilance check failed: ${message}`);
+    }
+  }
+
+  /**
+   * @public
+   * @description This function starts the service. Forecast and vigilance work without
+   * any configuration; the API key is optional and only unlocks the vigilance map.
+   * @example
+   * gladys.services.meteofrance.start();
+   */
+  async function start() {
+    logger.info('Starting MeteoFrance service');
+    meteoFranceApiKey = await gladys.variable.getValue(METEOFRANCE_API_KEY_VAR, serviceId);
+    if (meteoFranceApiKey) {
+      logger.info('MeteoFrance: API key configured, vigilance map available');
+    }
+    // Poll vigilance to fire scene triggers; the first check records the baseline
+    vigilancePollTimer = setInterval(safeCheckVigilance, VIGILANCE_POLL_INTERVAL_MS);
+    safeCheckVigilance();
+  }
+
+  /**
+   * @public
+   * @description This function stops the service.
+   * @example
+   * gladys.services.meteofrance.stop();
+   */
+  async function stop() {
+    logger.info('Stopping MeteoFrance service');
+    if (vigilancePollTimer) {
+      clearInterval(vigilancePollTimer);
+      vigilancePollTimer = null;
+    }
+  }
+
   return Object.freeze({
     start,
     stop,
@@ -127,9 +249,12 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
     vigilance: {
       get: getVigilance,
       getMap: getVigilanceMap,
+      getForHouse: getHouseVigilance,
+      check: checkVigilance,
     },
     forecast: {
       get: getForecast,
+      getSummaryForHouse: getForecastSummaryForHouse,
     },
   });
 };

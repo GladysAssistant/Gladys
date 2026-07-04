@@ -11,6 +11,7 @@ import UserEnteredOrLeftArea from './triggers/UserEnteredOrLeftArea';
 import CalendarEventIsComing from './triggers/CalendarEventIsComing';
 import AlarmModeTrigger from './triggers/AlarmModeTrigger';
 import MQTTReceivedTrigger from './triggers/MQTTReceivedTrigger';
+import MeteoFranceVigilanceTrigger from './triggers/MeteoFranceVigilanceTrigger';
 
 import { EVENTS } from '../../../../../server/utils/constants';
 import GladysStartTrigger from './triggers/GladysStartTrigger';
@@ -33,7 +34,8 @@ const TRIGGER_ICON = {
   [EVENTS.ALARM.PANIC]: 'fe-alert-triangle',
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: 'fe-alert-triangle',
   [EVENTS.SYSTEM.START]: 'fe-activity',
-  [EVENTS.MQTT.RECEIVED]: 'fe-hash'
+  [EVENTS.MQTT.RECEIVED]: 'fe-hash',
+  [EVENTS.METEO_FRANCE.NEW_VIGILANCE]: 'fe-cloud-lightning'
 };
 
 const ALARM_TRIGGERS = [
@@ -169,6 +171,13 @@ const TriggerCard = ({ children, ...props }) => (
       )}
       {props.trigger.type === EVENTS.MQTT.RECEIVED && (
         <MQTTReceivedTrigger
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+        />
+      )}
+      {props.trigger.type === EVENTS.METEO_FRANCE.NEW_VIGILANCE && (
+        <MeteoFranceVigilanceTrigger
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}
