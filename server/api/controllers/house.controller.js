@@ -1,4 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
+const { Error400 } = require('../../utils/httpErrors');
+const { ERROR_MESSAGES } = require('../../utils/constants');
 
 /**
  * @apiDefine HouseParam
@@ -177,6 +179,32 @@ module.exports = function HouseController(gladys) {
     res.json(house);
   }
 
+  /**
+   * @api {get} /api/v1/house/:house_selector/sun getSunState
+   * @apiName getSunState
+   * @apiGroup House
+   * @apiDescription Get sun times, current sun position and daily elevation curve for a house.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "dawn": "2026-07-05T04:23:12.000Z",
+   *   "sunrise": "2026-07-05T04:59:43.000Z",
+   *   "solar_noon": "2026-07-05T11:55:36.000Z",
+   *   "sunset": "2026-07-05T18:51:29.000Z",
+   *   "dusk": "2026-07-05T19:28:00.000Z",
+   *   "azimuth": 131.07,
+   *   "elevation": 3.53,
+   *   "curve": [{ "time": "2026-07-05T00:00:00.000Z", "elevation": -12.53 }]
+   * }
+   */
+  async function getSunState(req, res) {
+    const house = await gladys.house.getBySelector(req.params.house_selector);
+    if (!house.latitude || !house.longitude) {
+      throw new Error400(ERROR_MESSAGES.HOUSE_HAS_NO_COORDINATES);
+    }
+    const sunState = gladys.house.getSunState(house);
+    res.json(sunState);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
@@ -185,6 +213,7 @@ module.exports = function HouseController(gladys) {
     update: asyncMiddleware(update),
     userSeen: asyncMiddleware(userSeen),
     getRooms: asyncMiddleware(getRooms),
+    getSunState: asyncMiddleware(getSunState),
     arm: asyncMiddleware(arm),
     disarm: asyncMiddleware(disarm),
     disarmWithCode: asyncMiddleware(disarmWithCode),

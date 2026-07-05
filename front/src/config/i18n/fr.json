@@ -288,7 +288,8 @@
       "gauge": "Jauge",
       "energy-consumption": "Consommation Énergétique",
       "voice-assistant": "Assistant vocal",
-      "link": "Lien"
+      "link": "Lien",
+      "sun": "Soleil"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -419,6 +420,19 @@
           "month": "Mois",
           "year": "Année"
         }
+      },
+      "sun": {
+        "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour calculer la position du soleil.",
+        "sunrise": "Lever du soleil",
+        "sunset": "Coucher du soleil",
+        "dawn": "Aube",
+        "solarNoon": "Midi solaire",
+        "dusk": "Crépuscule",
+        "azimuth": "Azimut",
+        "elevation": "Élévation",
+        "noHouse": "Veuillez sélectionner une maison dans les paramètres du widget.",
+        "noCoordinates": "Cette maison n'a pas de coordonnées. Veuillez d'abord configurer sa localisation.",
+        "error": "Une erreur est survenue lors de la récupération des données du soleil, merci de réessayer."
       },
       "ecowatt": {
         "title": "Ecowatt France",

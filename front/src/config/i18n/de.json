@@ -288,7 +288,8 @@
       "gauge": "Messanzeige",
       "energy-consumption": "Energieverbrauch",
       "voice-assistant": "Sprachassistent",
-      "link": "Link"
+      "link": "Link",
+      "sun": "Sonne"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -419,6 +420,19 @@
           "month": "Monat",
           "year": "Jahr"
         }
+      },
+      "sun": {
+        "editHouseLabel": "Wähle ein Zuhause aus. Ich werde seine Breiten- und Längengrade verwenden, um die Sonnenposition zu berechnen.",
+        "sunrise": "Sonnenaufgang",
+        "sunset": "Sonnenuntergang",
+        "dawn": "Morgendämmerung",
+        "solarNoon": "Sonnenhöchststand",
+        "dusk": "Abenddämmerung",
+        "azimuth": "Azimut",
+        "elevation": "Höhe",
+        "noHouse": "Bitte wähle ein Zuhause in den Widget-Einstellungen aus.",
+        "noCoordinates": "Dieses Zuhause hat keine Koordinaten. Bitte konfiguriere zuerst seinen Standort.",
+        "error": "Beim Abrufen der Sonnendaten ist ein Fehler aufgetreten. Bitte versuche es erneut."
       },
       "ecowatt": {
         "title": "Ecowatt France",

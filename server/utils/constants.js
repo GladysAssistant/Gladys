@@ -1573,6 +1573,7 @@ const DASHBOARD_BOX_TYPE = {
   ENERGY_CONSUMPTION: 'energy-consumption',
   VOICE_ASSISTANT: 'voice-assistant',
   LINK: 'link',
+  SUN: 'sun',
 };
 
 const ERROR_MESSAGES = {
