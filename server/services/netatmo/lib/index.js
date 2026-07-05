@@ -32,9 +32,13 @@ const {
 const { setValue } = require('./netatmo.setValue');
 const { updateValues } = require('./netatmo.updateValues');
 const { updateDevice } = require('./update/netatmo.updateDevice');
+const { registerWebhook } = require('./netatmo.registerWebhook');
+const { dropWebhook } = require('./netatmo.dropWebhook');
+const { handleWebhookEvent } = require('./netatmo.handleWebhookEvent');
 
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
 const buildScopesConfig = require('./utils/netatmo.buildScopesConfig');
+const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 
 const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.gladys = gladys;
@@ -44,6 +48,7 @@ const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
     clientSecret: null,
     energyApi: null,
     weatherApi: null,
+    webhookUrl: null,
     scopes: buildScopesConfig(SCOPES),
   };
   this.configured = false;
@@ -60,6 +65,10 @@ const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.reconnectAttempt = 0;
   this.firstFatalAt = null;
   this.refreshingValues = false;
+  this.webhookRegistered = false;
+  this.webhookRefreshTimeout = undefined;
+  // single bound reference so the gateway event listener can be reliably removed
+  this.handleWebhookEventBound = eventFunctionWrapper(this.handleWebhookEvent.bind(this));
 };
 
 NetatmoHandler.prototype.init = init;
@@ -92,5 +101,8 @@ NetatmoHandler.prototype.handleApiAuthError = handleApiAuthError;
 NetatmoHandler.prototype.setValue = setValue;
 NetatmoHandler.prototype.updateValues = updateValues;
 NetatmoHandler.prototype.updateDevice = updateDevice;
+NetatmoHandler.prototype.registerWebhook = registerWebhook;
+NetatmoHandler.prototype.dropWebhook = dropWebhook;
+NetatmoHandler.prototype.handleWebhookEvent = handleWebhookEvent;
 
 module.exports = NetatmoHandler;

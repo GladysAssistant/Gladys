@@ -16,6 +16,9 @@ describe('Netatmo Save configuration', () => {
     sinon.reset();
 
     netatmoHandler.status = 'not_initialized';
+    netatmoHandler.configuration.webhookUrl = null;
+    netatmoHandler.registerWebhook = sinon.stub().resolves(true);
+    netatmoHandler.dropWebhook = sinon.stub().resolves(true);
   });
 
   afterEach(() => {
@@ -69,5 +72,70 @@ describe('Netatmo Save configuration', () => {
       'new-client-secret',
       netatmoHandler.serviceId,
     );
+  });
+
+  it('should store the trimmed webhook URL without registering when not connected', async () => {
+    const result = await netatmoHandler.saveConfiguration({
+      webhookUrl: '  https://api.gladysgateway.com/v1/api/netatmo/my-key  ',
+    });
+
+    expect(result).to.equal(true);
+    expect(netatmoHandler.configuration.webhookUrl).to.equal('https://api.gladysgateway.com/v1/api/netatmo/my-key');
+    sinon.assert.calledWith(
+      netatmoHandler.gladys.variable.setValue,
+      'NETATMO_WEBHOOK_URL',
+      'https://api.gladysgateway.com/v1/api/netatmo/my-key',
+      netatmoHandler.serviceId,
+    );
+    sinon.assert.notCalled(netatmoHandler.registerWebhook);
+    sinon.assert.notCalled(netatmoHandler.dropWebhook);
+  });
+
+  it('should register the webhook when the URL is added while connected', async () => {
+    netatmoHandler.status = 'connected';
+
+    const result = await netatmoHandler.saveConfiguration({
+      webhookUrl: 'https://api.gladysgateway.com/v1/api/netatmo/my-key',
+    });
+
+    expect(result).to.equal(true);
+    sinon.assert.calledOnce(netatmoHandler.registerWebhook);
+    sinon.assert.notCalled(netatmoHandler.dropWebhook);
+  });
+
+  it('should drop the webhook when the URL is cleared while connected', async () => {
+    netatmoHandler.status = 'connected';
+    netatmoHandler.configuration.webhookUrl = 'https://api.gladysgateway.com/v1/api/netatmo/my-key';
+
+    const result = await netatmoHandler.saveConfiguration({ webhookUrl: '' });
+
+    expect(result).to.equal(true);
+    sinon.assert.calledOnce(netatmoHandler.dropWebhook);
+    sinon.assert.notCalled(netatmoHandler.registerWebhook);
+  });
+
+  it('should not touch the webhook when the URL is unchanged while connected', async () => {
+    netatmoHandler.status = 'connected';
+    netatmoHandler.configuration.webhookUrl = 'https://api.gladysgateway.com/v1/api/netatmo/my-key';
+
+    const result = await netatmoHandler.saveConfiguration({
+      webhookUrl: 'https://api.gladysgateway.com/v1/api/netatmo/my-key',
+    });
+
+    expect(result).to.equal(true);
+    sinon.assert.notCalled(netatmoHandler.registerWebhook);
+    sinon.assert.notCalled(netatmoHandler.dropWebhook);
+  });
+
+  it('should still save the configuration when the webhook registration rejects', async () => {
+    netatmoHandler.status = 'connected';
+    netatmoHandler.registerWebhook = sinon.stub().rejects(new Error('addwebhook error'));
+
+    const result = await netatmoHandler.saveConfiguration({
+      webhookUrl: 'https://api.gladysgateway.com/v1/api/netatmo/my-key',
+    });
+
+    expect(result).to.equal(true);
+    sinon.assert.calledOnce(netatmoHandler.registerWebhook);
   });
 });

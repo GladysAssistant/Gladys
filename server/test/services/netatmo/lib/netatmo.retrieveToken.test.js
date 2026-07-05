@@ -44,6 +44,7 @@ describe('Netatmo retrieveTokens', () => {
     netatmoHandler.configuration.clientSecret = 'clientSecret-fake';
     netatmoHandler.stateGetAccessToken = 'valid-state';
     netatmoHandler.status = 'not_initialized';
+    netatmoHandler.registerWebhook = fake.resolves(true);
   });
 
   afterEach(() => {
@@ -129,6 +130,30 @@ describe('Netatmo retrieveTokens', () => {
     sinon.assert.notCalled(netatmoHandler.refreshNetatmoValues);
     sinon.assert.notCalled(netatmoHandler.pollRefreshingValues);
     sinon.assert.calledOnce(netatmoHandler.pollRefreshingToken);
+    sinon.assert.calledOnce(netatmoHandler.registerWebhook);
+  });
+
+  it('should stay connected when the webhook registration rejects', async () => {
+    const tokens = {
+      access_token: 'access-token',
+      refresh_token: 'refresh-token',
+      expire_in: 3600,
+    };
+    netatmoHandler.registerWebhook = fake.rejects(new Error('addwebhook error'));
+
+    // Intercept the HTTP/2 call via undici
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(200, tokens);
+
+    const result = await netatmoHandler.retrieveTokens(body);
+
+    expect(result).to.deep.equal({ success: true });
+    expect(netatmoHandler.status).to.equal('connected');
+    sinon.assert.calledOnce(netatmoHandler.registerWebhook);
   });
 
   it('should retrieve tokens and launch pollRefreshingValues', async () => {

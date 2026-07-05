@@ -8,8 +8,21 @@ import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/n
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 
+const isWebhookUrlInvalid = value => {
+  const trimmedValue = (value || '').trim();
+  if (trimmedValue === '') {
+    return false;
+  }
+  try {
+    return new URL(trimmedValue).protocol !== 'https:';
+  } catch (e) {
+    return true;
+  }
+};
+
 class SetupTab extends Component {
   showClientSecretTimer = null;
+  showWebhookUrlTimer = null;
   async disconnectNetatmo(e) {
     e.preventDefault();
 
@@ -33,6 +46,9 @@ class SetupTab extends Component {
   };
   updateClientSecret = e => {
     this.props.updateStateInIndex({ netatmoClientSecret: e.target.value });
+  };
+  updateWebhookUrl = e => {
+    this.props.updateStateInIndex({ netatmoWebhookUrl: e.target.value });
   };
   updateEnergyApi = () => {
     if (this.props.netatmoEnergyApi === true) {
@@ -62,11 +78,29 @@ class SetupTab extends Component {
       this.showClientSecretTimer = setTimeout(() => this.setState({ showClientSecret: false }), 5000);
     }
   };
+  toggleWebhookUrl = () => {
+    const { showWebhookUrl } = this.state;
+
+    if (this.showWebhookUrlTimer) {
+      clearTimeout(this.showWebhookUrlTimer);
+      this.showWebhookUrlTimer = null;
+    }
+
+    this.setState({ showWebhookUrl: !showWebhookUrl });
+
+    if (!showWebhookUrl) {
+      this.showWebhookUrlTimer = setTimeout(() => this.setState({ showWebhookUrl: false }), 5000);
+    }
+  };
 
   componentWillUnmount() {
     if (this.showClientSecretTimer) {
       clearTimeout(this.showClientSecretTimer);
       this.showClientSecretTimer = null;
+    }
+    if (this.showWebhookUrlTimer) {
+      clearTimeout(this.showWebhookUrlTimer);
+      this.showWebhookUrlTimer = null;
     }
   }
 
@@ -109,6 +143,12 @@ class SetupTab extends Component {
                   <MarkupText id="integration.netatmo.setup.titleAdditionalInformationWeatherApi" />
                 </label>
                 <MarkupText id="integration.netatmo.setup.descriptionAdditionalInformationWeatherApi" />
+              </p>
+              <p>
+                <label htmlFor="titleAdditionalInformationWebhook" className={`form-label ${style.highlightText}`}>
+                  <MarkupText id="integration.netatmo.setup.titleAdditionalInformationWebhook" />
+                </label>
+                <MarkupText id="integration.netatmo.setup.descriptionAdditionalInformationWebhook" />
               </p>
 
               <form>
@@ -183,6 +223,39 @@ class SetupTab extends Component {
                     <span className={`custom-switch-indicator ${style.customSwitchIndicator}`} />
                     <Text id={`integration.netatmo.setup.weatherApiLabel`} />
                   </label>
+                </div>
+
+                <div class="form-group">
+                  <label htmlFor="netatmoWebhookUrl" className="form-label">
+                    <Text id={`integration.netatmo.setup.webhookUrlLabel`} />
+                  </label>
+                  <div class="input-icon mb-3">
+                    <Localizer>
+                      <input
+                        id="netatmoWebhookUrl"
+                        name="netatmoWebhookUrl"
+                        type={state.showWebhookUrl ? 'text' : 'password'}
+                        placeholder={<Text id="integration.netatmo.setup.webhookUrlPlaceholder" />}
+                        value={props.netatmoWebhookUrl}
+                        className="form-control"
+                        autocomplete="off"
+                        onInput={this.updateWebhookUrl}
+                      />
+                    </Localizer>
+                    <span class="input-icon-addon cursor-pointer" onClick={this.toggleWebhookUrl}>
+                      <i
+                        class={cx('fe', {
+                          'fe-eye': !state.showWebhookUrl,
+                          'fe-eye-off': state.showWebhookUrl
+                        })}
+                      />
+                    </span>
+                  </div>
+                  {isWebhookUrlInvalid(props.netatmoWebhookUrl) && (
+                    <div class="alert alert-warning">
+                      <Text id="integration.netatmo.setup.invalidWebhookUrl" />
+                    </div>
+                  )}
                 </div>
 
                 <div class="form-group">

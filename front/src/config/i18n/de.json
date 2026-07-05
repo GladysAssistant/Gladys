@@ -860,6 +860,8 @@
         "descriptionAdditionalInformationEnergyApi": "Sie müssen unten auf der Seite die API \"Energy\" auswählen, um auf die entsprechenden Geräte zuzugreifen. Temperaturbefehle werden auf Raumniveau ausgeführt. Daher sind beide Informationen als Funktionen für mehr Kontrolle verfügbar. Wenn Sie andere Temperatursensoren im gleichen Raum wie Ihr Thermostat haben, wird die Durchschnittstemperatur dieses Raums berücksichtigt, um den Heizungssteuerschalter auszulösen.",
         "titleAdditionalInformationWeatherApi": "Weitere Informationen über die Funktionsweise der \"Weather\"-API:",
         "descriptionAdditionalInformationWeatherApi": "Sie müssen unten auf der Seite die API \"Weather\" auswählen, um auf die entsprechenden Geräte zuzugreifen. Wenn Sie auch über Geräte verfügen, die zur API \"Energy\" gehören (Stecker, Thermostat oder Ventil), haben Sie Zugriff auf eine zusätzliche Funktionalität bei Innenhygrometergeräten, um die Durchschnittstemperatur des entsprechenden Raums zu ermitteln. Vergessen Sie also nicht, die API \"Energy\" auszuwählen, um auf diese Funktionalität zuzugreifen.",
+        "titleAdditionalInformationWebhook": "Zusätzliche Informationen zu Sofort-Ereignissen (Webhook über Gladys Plus):",
+        "descriptionAdditionalInformationWebhook": "Mit Gladys Plus kann Netatmo seine Ereignisse nahezu in Echtzeit an Gladys senden: Zum Beispiel wird eine über die Netatmo-App geänderte Solltemperatur oder ein Heizmodus innerhalb weniger Sekunden übernommen, statt auf die nächste Aktualisierung (alle 2 Minuten) zu warten. Öffnen Sie Ihr Gladys-Dashboard über Gladys Plus, erstellen Sie einen Schlüssel unter „Einstellungen“ → „Open API“ und fügen Sie unten die vollständige Webhook-URL ein: https://api.gladysgateway.com/v1/api/netatmo/IHR_SCHLUESSEL. Lassen Sie das Feld leer, um diese Funktion zu deaktivieren. Ereignisse, die verpasst werden, während Gladys offline ist, werden durch die regelmäßige Aktualisierung nachgeholt.",
         "clientIdLabel": "Kunden-ID",
         "clientIdPlaceholder": "Kunden-ID von My Apps in Netatmo Connect",
         "clientSecretLabel": "Kundengeheimnis",
@@ -867,6 +869,9 @@
         "connectionInfoLabel": "Wenn Sie diese Informationen ändern, ist ein neues Token erforderlich. Durch das Trennen der Verbindung wird auch Ihr Zugriffstoken gelöscht. Wenn Sie auf diese Schaltflächen klicken, wird daher eine neue Verbindungsanfrage an die Netatmo-API gestellt.",
         "energyApiLabel": "Aktiviere \"Energy\" API (Netatmo Stecker, Thermostat und Ventile abrufen)",
         "weatherApiLabel": "Aktiviere \"Weather\" API (Netatmo Wetterstation Geräte abrufen)",
+        "webhookUrlLabel": "Webhook-URL (optional, erfordert Gladys Plus)",
+        "webhookUrlPlaceholder": "https://api.gladysgateway.com/v1/api/netatmo/IHR_OPEN_API_SCHLUESSEL",
+        "invalidWebhookUrl": "Diese URL ist ungültig: Es muss eine gültige https://-URL sein.",
         "saveLabel": "Speichern und verbinden",
         "disconnectLabel": "Trennen"
       },

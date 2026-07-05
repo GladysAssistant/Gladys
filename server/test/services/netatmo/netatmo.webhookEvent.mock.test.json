@@ -1,0 +1,19 @@
+{
+  "user_id": "0cd30aef-9c4e-4a23-88e3-3547971296e5",
+  "netatmo_data": {
+    "user_id": "5abc0000000000000000000f",
+    "home_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+    "home": {
+      "id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+      "rooms": [
+        {
+          "id": "2581917225",
+          "therm_setpoint_mode": "manual",
+          "therm_setpoint_temperature": 21
+        }
+      ]
+    },
+    "event_type": "set_point",
+    "push_type": "home_event_changed"
+  }
+}

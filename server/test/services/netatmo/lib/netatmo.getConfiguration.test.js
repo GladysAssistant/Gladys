@@ -25,6 +25,9 @@ const gladys = {
       if (variableName === 'NETATMO_WEATHER_API') {
         return Promise.resolve('0');
       }
+      if (variableName === 'NETATMO_WEBHOOK_URL') {
+        return Promise.resolve('https://api.gladysgateway.com/v1/api/netatmo/my-open-api-key');
+      }
       return Promise.reject(new Error('Unknown variable'));
     }),
     setValue: sinon.stub().resolves(),
@@ -50,6 +53,7 @@ describe('Netatmo getConfiguration', () => {
     expect(configuration.clientSecret).to.equal('valid_client_secret');
     expect(configuration.energyApi).to.equal(true);
     expect(configuration.weatherApi).to.equal(false);
+    expect(configuration.webhookUrl).to.equal('https://api.gladysgateway.com/v1/api/netatmo/my-open-api-key');
   });
 
   it('should throw an error if not configured', async () => {

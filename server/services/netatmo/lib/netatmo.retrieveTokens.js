@@ -62,6 +62,10 @@ async function retrieveTokens(body) {
     this.accessToken = tokens.accessToken;
     await this.saveStatus({ statusType: STATUS.CONNECTED });
     logger.debug('Netatmo new access tokens well loaded');
+    // fire-and-forget: webhook registration is best-effort and must not delay the OAuth callback
+    this.registerWebhook().catch((e) => {
+      logger.warn('Netatmo: webhook registration failed after connection - Details: ', e);
+    });
     if (this.configuration.energyApi || this.configuration.weatherApi) {
       // fire-and-forget: the initial refresh must not delay the OAuth callback response,
       // must not clobber the connected status, and the polling started below will retry

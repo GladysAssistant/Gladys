@@ -1,14 +1,19 @@
 const logger = require('../../../utils/logger');
+const { EVENTS } = require('../../../utils/constants');
 const { STATUS } = require('./utils/netatmo.constants');
 
 /**
  * @description Disconnects service and dependencies.
  * @example
- * disconnect();
+ * await disconnect();
  */
-function disconnect() {
+async function disconnect() {
   logger.debug('Disonnecting from Netatmo...');
   this.saveStatus({ statusType: STATUS.DISCONNECTING, message: null });
+  this.gladys.event.removeListener(EVENTS.GATEWAY.NEW_MESSAGE_NETATMO_WEBHOOK, this.handleWebhookEventBound);
+  clearTimeout(this.webhookRefreshTimeout);
+  // the access token is still valid here, before tokens are cleared
+  await this.dropWebhook();
   const tokens = {
     accessToken: '',
     refreshToken: '',

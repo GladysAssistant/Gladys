@@ -8,6 +8,8 @@ const GLADYS_VARIABLES = {
   ACCESS_TOKEN: 'NETATMO_ACCESS_TOKEN',
   REFRESH_TOKEN: 'NETATMO_REFRESH_TOKEN',
   EXPIRE_IN_TOKEN: 'NETATMO_EXPIRE_IN_TOKEN',
+
+  WEBHOOK_URL: 'NETATMO_WEBHOOK_URL',
 };
 
 const SCOPES = {
@@ -74,7 +76,15 @@ const API = {
   SET_ROOM_THERMPOINT: `${BASE_API}/api/setroomthermpoint`,
   SET_THERM_MODE: `${BASE_API}/api/setthermmode`,
   GET_MEASURE: `${BASE_API}/api/getmeasure`,
+  ADD_WEBHOOK: `${BASE_API}/api/addwebhook`,
+  DROP_WEBHOOK: `${BASE_API}/api/dropwebhook`,
 };
+
+// Energy events pushed by the Netatmo webhook (setpoint/mode changes made outside Gladys).
+// Anything else (security events, future types) is ignored until supported.
+const WEBHOOK_ENERGY_EVENT_TYPES = ['set_point', 'cancel_set_point', 'therm_mode', 'schedule'];
+// Coalesce webhook event bursts (a home-wide mode change pushes one event per room) into one refresh.
+const WEBHOOK_REFRESH_DEBOUNCE_MS = 2 * 1000;
 
 const SUPPORTED_CATEGORY_TYPE = {
   ENERGY: 'Energy',
@@ -115,4 +125,6 @@ module.exports = {
   RECONNECT_RECURRENT_MS,
   FATAL_RETRY_WINDOW_MS,
   ACCESS_TOKEN_REFRESH_RATIO,
+  WEBHOOK_ENERGY_EVENT_TYPES,
+  WEBHOOK_REFRESH_DEBOUNCE_MS,
 };

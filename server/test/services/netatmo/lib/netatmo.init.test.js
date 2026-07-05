@@ -8,6 +8,8 @@ const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 const gladys = {
   event: {
     emit: fake.resolves(null),
+    on: fake.returns(null),
+    removeListener: fake.returns(null),
   },
   variable: {
     getValue: sinon.fake((variableName, serviceId) => {
@@ -25,6 +27,9 @@ const gladys = {
       }
       if (variableName === 'NETATMO_EXPIRE_IN_TOKEN') {
         return Promise.resolve(10800);
+      }
+      if (variableName === 'NETATMO_WEBHOOK_URL') {
+        return Promise.resolve(null);
       }
       return Promise.reject(new Error('Unknown variable'));
     }),
@@ -64,9 +69,13 @@ describe('Netatmo Init', () => {
       if (variableName === 'NETATMO_EXPIRE_IN_TOKEN') {
         return Promise.resolve(10800);
       }
+      if (variableName === 'NETATMO_WEBHOOK_URL') {
+        return Promise.resolve(null);
+      }
       return Promise.reject(new Error('Unknown variable'));
     });
     netatmoHandler.refreshingTokens = fake.resolves({ success: true });
+    netatmoHandler.registerWebhook = fake.resolves(true);
   });
 
   afterEach(() => {
@@ -86,6 +95,17 @@ describe('Netatmo Init', () => {
     expect(netatmoHandler.refreshingTokens.called).to.equal(true);
     expect(netatmoHandler.pollRefreshingToken.called).to.equal(true);
     expect(netatmoHandler.pollRefreshingValues.called).to.equal(true);
+    expect(netatmoHandler.registerWebhook.calledOnce).to.equal(true);
+    sinon.assert.calledWith(
+      netatmoHandler.gladys.event.removeListener,
+      'gateway.new-message-netatmo-webhook',
+      netatmoHandler.handleWebhookEventBound,
+    );
+    sinon.assert.calledWith(
+      netatmoHandler.gladys.event.on,
+      'gateway.new-message-netatmo-webhook',
+      netatmoHandler.handleWebhookEventBound,
+    );
   });
 
   it('should handle failed token refresh', async () => {
@@ -95,6 +115,16 @@ describe('Netatmo Init', () => {
 
     expect(netatmoHandler.refreshingTokens.called).to.equal(true);
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(0);
+    expect(netatmoHandler.registerWebhook.called).to.equal(false);
+  });
+
+  it('should not fail init when the webhook registration rejects', async () => {
+    netatmoHandler.registerWebhook = fake.rejects(new Error('addwebhook error'));
+
+    await netatmoHandler.init();
+
+    expect(netatmoHandler.registerWebhook.calledOnce).to.equal(true);
+    expect(netatmoHandler.pollRefreshingValues.called).to.equal(true);
   });
 
   it('should schedule auto-reconnect on transient init refresh failure (not crash)', async () => {

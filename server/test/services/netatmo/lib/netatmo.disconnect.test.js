@@ -9,6 +9,7 @@ const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 const gladys = {
   event: {
     emit: fake.resolves(null),
+    removeListener: fake.returns(null),
   },
 };
 const serviceId = 'serviceId';
@@ -28,15 +29,25 @@ describe('Netatmo Disconnect', () => {
     sinon.reset();
   });
 
-  it('should properly disconnect from Netatmo', () => {
+  it('should properly disconnect from Netatmo', async () => {
     sinon.spy(clock, 'clearInterval');
     const intervalPollRefreshTokenSpy = sinon.spy();
     const intervalPollRefreshValuesSpy = sinon.spy();
     netatmoHandler.pollRefreshToken = setInterval(intervalPollRefreshTokenSpy, 3600 * 1000);
     netatmoHandler.pollRefreshValues = setInterval(intervalPollRefreshValuesSpy, 120 * 1000);
+    netatmoHandler.setTokens = fake.resolves(true);
+    netatmoHandler.dropWebhook = fake.resolves(true);
 
-    netatmoHandler.disconnect();
+    await netatmoHandler.disconnect();
 
+    sinon.assert.calledWith(
+      netatmoHandler.gladys.event.removeListener,
+      'gateway.new-message-netatmo-webhook',
+      netatmoHandler.handleWebhookEventBound,
+    );
+    // the webhook is dropped while the access token is still valid
+    expect(netatmoHandler.dropWebhook.calledOnce).to.equal(true);
+    expect(netatmoHandler.dropWebhook.calledBefore(netatmoHandler.setTokens)).to.equal(true);
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(2);
     expect(
       netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {

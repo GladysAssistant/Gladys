@@ -14,6 +14,7 @@ describe('NetatmoHandler Constructor', () => {
       clientSecret: null,
       energyApi: null,
       weatherApi: null,
+      webhookUrl: null,
       scopes: {
         scopeAircare: 'read_homecoach',
         scopeEnergy: 'read_thermostat write_thermostat',
@@ -21,5 +22,7 @@ describe('NetatmoHandler Constructor', () => {
         scopeWeather: 'read_station',
       },
     });
+    expect(netatmoHandler.webhookRegistered).to.equal(false);
+    expect(netatmoHandler.handleWebhookEventBound).to.be.a('function');
   });
 });
