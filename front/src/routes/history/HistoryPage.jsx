@@ -83,31 +83,33 @@ const HistoryPage = ({ intl, user, ...props }) => {
       <div class="page-main">
         <div class="my-3 my-md-5">
           <div class="container">
-            <div class="page-header">
-              <h1 class="page-title">
-                <Text id="history.title" />
-                {!props.selectedDate && (
-                  <span class={style.liveIndicator}>
-                    <span class={style.liveDot} />
-                    <Text id="history.live" />
-                  </span>
-                )}
-              </h1>
-              <div class="page-subtitle">
-                <Text id="history.subtitle" />
+            <div class={cx('page-header', style.pageHeader)}>
+              <div class={style.headerText}>
+                <h1 class="page-title">
+                  <Text id="history.title" />
+                  {!props.selectedDate && (
+                    <span class={style.liveIndicator}>
+                      <span class={style.liveDot} />
+                      <Text id="history.live" />
+                    </span>
+                  )}
+                </h1>
+                <div class={style.subtitle}>
+                  <Text id="history.subtitle" />
+                </div>
               </div>
-              <div class="page-options d-flex">
+              <div class={style.headerControls}>
                 <Localizer>
                   <input
                     type="date"
-                    class={cx('form-control', 'w-auto', style.dateInput)}
+                    class={cx('form-control', style.dateInput)}
                     value={props.selectedDate || ''}
                     onChange={props.selectDate}
                     max={dayjs().format('YYYY-MM-DD')}
                     title={<Text id="history.jumpToDate" />}
                   />
                 </Localizer>
-                <select onChange={props.selectRoom} class="form-control custom-select w-auto ml-2">
+                <select onChange={props.selectRoom} class={cx('form-control', 'custom-select', style.roomSelect)}>
                   <option value="">
                     <Text id="history.allRooms" />
                   </option>
@@ -117,7 +119,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
                     </option>
                   ))}
                 </select>
-                <div class="input-icon ml-2">
+                <div class={cx('input-icon', style.searchInput)}>
                   <span class="input-icon-addon">
                     <i class="fe fe-search" />
                   </span>

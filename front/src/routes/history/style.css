@@ -31,8 +31,55 @@
   }
 }
 
+/* Page header: title + subtitle on the left, controls on the right */
+.pageHeader {
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.subtitle {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #6e7687;
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
 .dateInput {
+  width: auto;
   min-width: 150px;
+}
+
+.roomSelect {
+  width: auto;
+}
+
+@media (max-width: 767px) {
+  .headerControls {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0.75rem;
+  }
+
+  .dateInput,
+  .roomSelect {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .searchInput {
+    flex-basis: 100%;
+  }
+
+  .searchInput input {
+    width: 100%;
+  }
 }
 
 /* Banner shown when browsing a past date */
@@ -50,15 +97,19 @@
   border-radius: 4px;
 }
 
-/* Category group filter chips */
+/* Category group filter chips, sticky while scrolling the feed */
 .groupChips {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
-  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.75rem;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #f5f7fb;
 }
 
 .groupChip {
@@ -176,7 +227,7 @@
   gap: 0.75rem;
   margin-bottom: 0.6rem;
   position: sticky;
-  top: 0;
+  top: 46px; /* below the sticky filter chips */
   z-index: 10;
   padding: 0.4rem 0;
   background: #f5f7fb;
