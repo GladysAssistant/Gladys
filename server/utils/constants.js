@@ -206,6 +206,14 @@ const LIQUID_STATE = {
   HIGH: 2,
 };
 
+// Used by the SONOFF SWV in Zigbee2mqtt
+const WATER_VALVE_CURRENT_DEVICE_STATUS = {
+  NORMAL_STATE: 0,
+  WATER_SHORTAGE: 1,
+  WATER_LEAKAGE: 2,
+  WATER_SHORTAGE_AND_WATER_LEAKAGE: 3,
+};
+
 const LEVEL_MATTER_STATE = {
   LOW: 1,
   MEDIUM: 2,
@@ -682,6 +690,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VACUUM_CLEANER: 'vacuum-cleaner',
   TEXT: 'text',
   INPUT: 'input',
+  WATER_VALVE: 'water-valve',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -978,6 +987,16 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
     LIQUID_DEPTH: 'liquid-depth',
   },
+  WATER_VALVE: {
+    // Types used by the SONOFF SWV in Zigbee2mqtt
+    CURRENT_DEVICE_STATUS: 'current-device-status',
+    FLOW: 'flow',
+    AUTO_CLOSE_WHEN_WATER_SHORTAGE: 'auto-close-when-water-shortage',
+    VALVE_WORK_STATE: 'valve-work-state',
+    REAL_TIME_IRRIGATION_DURATION: 'real-time-irrigation-duration',
+    REAL_TIME_IRRIGATION_VOLUME: 'real-time-irrigation-volume',
+    DAILY_IRRIGATION_VOLUME: 'daily-irrigation-volume',
+  },
   ELECTRICAL_VEHICLE_BATTERY: {
     // Features related to the battery state and metrics of the vehicle
     BATTERY_ENERGY_REMAINING: 'battery-energy-remaining', // Remaining energy in the battery in kWh (integer - sensor)
@@ -1129,6 +1148,8 @@ const DEVICE_FEATURE_UNITS = {
   LITER: 'liter',
   MILLILITER: 'milliliter',
   CUBIC_METER: 'cubicmeter',
+  // Flow units
+  CUBIC_METER_PER_HOUR: 'cubic-meter-per-hour',
   // Currency units
   EURO: 'euro',
   DOLLAR: 'dollar',
@@ -1312,6 +1333,11 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.LITER,
     DEVICE_FEATURE_UNITS.MILLILITER,
     DEVICE_FEATURE_UNITS.CUBIC_METER,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: [
+    DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
+    DEVICE_FEATURE_UNITS.SECONDS,
+    DEVICE_FEATURE_UNITS.LITER,
   ],
   [DEVICE_FEATURE_CATEGORIES.CURRENCY]: [
     DEVICE_FEATURE_UNITS.EURO,
@@ -1719,6 +1745,7 @@ module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
+module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;

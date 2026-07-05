@@ -36,7 +36,10 @@ class DeviceSetValue extends Component {
       this.props.updateActionProperty(this.props.path, 'device_feature', null);
     }
     if (deviceFeatureChanged) {
-      if (deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
+      if (
+        deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
+        deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE
+      ) {
         this.props.updateActionProperty(this.props.path, 'value', 0);
         this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
       } else {
@@ -108,7 +111,10 @@ class DeviceSetValue extends Component {
       );
     }
 
-    if (this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
+    if (
+      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
+      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE
+    ) {
       return (
         <label class="custom-switch">
           <input

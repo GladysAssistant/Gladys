@@ -3624,6 +3624,7 @@
     "liter": "Liter (l)",
     "milliliter": "Milliliter (ml)",
     "cubicmeter": "Kubikmeter (m³)",
+    "cubic-meter-per-hour": "Kubikmeter pro Stunde (m³/h)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -3720,6 +3721,7 @@
     "liter": "l",
     "milliliter": "ml",
     "cubicmeter": "m³",
+    "cubic-meter-per-hour": "m³/h",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -4136,6 +4138,19 @@
           "unknown": "Unbekannt"
         }
       },
+      "water-valve": {
+        "current-device-status": {
+          "0": "Normal",
+          "1": "Wassermangel",
+          "2": "Wasserleck",
+          "3": "Wassermangel und Wasserleck",
+          "unknown": "Unbekannt"
+        },
+        "valve-work-state": {
+          "0": "Inaktiv",
+          "1": "Bewässerung läuft"
+        }
+      },
       "electrical-vehicle-state": {
         "door-opened": {
           "0": "Geschlossen",
@@ -4256,6 +4271,16 @@
       "liquid-state": "Flüssigkeitsstand-Status",
       "liquid-level-percent": "Flüssigkeitspegel in Prozent",
       "liquid-depth": "Flüssigkeitstiefe"
+    },
+    "water-valve": {
+      "shortCategoryName": "Wasserventil",
+      "current-device-status": "Wasserventil-Status",
+      "flow": "Wasserdurchfluss",
+      "auto-close-when-water-shortage": "Automatisches Schließen bei Wassermangel",
+      "valve-work-state": "Bewässerungsprogramm läuft",
+      "real-time-irrigation-duration": "Aktuelle Bewässerungsdauer",
+      "real-time-irrigation-volume": "Aktuelles Bewässerungsvolumen",
+      "daily-irrigation-volume": "Tägliches Bewässerungsvolumen"
     },
     "camera": {
       "shortCategoryName": "Kamera",

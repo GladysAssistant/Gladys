@@ -1,0 +1,422 @@
+{
+  "name": "SWV device",
+  "mqttDevice": {
+    "definition": {
+      "description": "Zigbee smart water valve",
+      "exposes": [
+        {
+          "name": "flow",
+          "label": "Flow",
+          "access": 1,
+          "type": "numeric",
+          "property": "flow",
+          "description": "Current water flow",
+          "unit": "m³/h"
+        },
+        {
+          "name": "battery",
+          "label": "Battery",
+          "access": 5,
+          "type": "numeric",
+          "property": "battery",
+          "description": "Remaining battery in %",
+          "category": "diagnostic",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "type": "switch",
+          "features": [
+            {
+              "name": "state",
+              "label": "State",
+              "access": 7,
+              "type": "binary",
+              "property": "state",
+              "description": "On/off state of the switch",
+              "value_on": "ON",
+              "value_off": "OFF",
+              "value_toggle": "TOGGLE"
+            }
+          ]
+        },
+        {
+          "name": "current_device_status",
+          "label": "Current device status",
+          "access": 5,
+          "type": "enum",
+          "property": "current_device_status",
+          "description": "The water valve is in normal state, water shortage or water leakage",
+          "values": ["normal_state", "water_shortage", "water_leakage", "water_shortage & water_leakage"]
+        },
+        {
+          "name": "auto_close_when_water_shortage",
+          "label": "Auto close when water shortage",
+          "access": 7,
+          "type": "binary",
+          "property": "auto_close_when_water_shortage",
+          "description": "Automatically shut down the water valve after the water shortage exceeds 30 minutes. Requires firmware version 1.0.4 or later!",
+          "value_on": "ENABLE",
+          "value_off": "DISABLE"
+        },
+        {
+          "name": "cyclic_timed_irrigation",
+          "label": "Cyclic timed irrigation",
+          "access": 7,
+          "type": "composite",
+          "property": "cyclic_timed_irrigation",
+          "description": "Smart water valve cycle timing irrigation",
+          "features": [
+            {
+              "name": "current_count",
+              "label": "Current count",
+              "access": 1,
+              "type": "numeric",
+              "property": "current_count",
+              "description": "Number of times it has been executed",
+              "unit": "times"
+            },
+            {
+              "name": "total_number",
+              "label": "Total number",
+              "access": 3,
+              "type": "numeric",
+              "property": "total_number",
+              "description": "Total times of circulating irrigation",
+              "unit": "times",
+              "value_max": 100,
+              "value_min": 0
+            },
+            {
+              "name": "irrigation_duration",
+              "label": "Irrigation duration",
+              "access": 3,
+              "type": "numeric",
+              "property": "irrigation_duration",
+              "description": "Single irrigation duration",
+              "unit": "seconds",
+              "value_max": 86400,
+              "value_min": 0
+            },
+            {
+              "name": "irrigation_interval",
+              "label": "Irrigation interval",
+              "access": 3,
+              "type": "numeric",
+              "property": "irrigation_interval",
+              "description": "Time interval between two adjacent irrigation",
+              "unit": "seconds",
+              "value_max": 86400,
+              "value_min": 0
+            }
+          ]
+        },
+        {
+          "name": "cyclic_quantitative_irrigation",
+          "label": "Cyclic quantitative irrigation",
+          "access": 7,
+          "type": "composite",
+          "property": "cyclic_quantitative_irrigation",
+          "description": "Smart water valve circulating quantitative irrigation",
+          "features": [
+            {
+              "name": "current_count",
+              "label": "Current count",
+              "access": 1,
+              "type": "numeric",
+              "property": "current_count",
+              "description": "Number of times it has been executed",
+              "unit": "times"
+            },
+            {
+              "name": "total_number",
+              "label": "Total number",
+              "access": 3,
+              "type": "numeric",
+              "property": "total_number",
+              "description": "Total times of circulating irrigation",
+              "unit": "times",
+              "value_max": 100,
+              "value_min": 0
+            },
+            {
+              "name": "irrigation_capacity",
+              "label": "Irrigation capacity",
+              "access": 3,
+              "type": "numeric",
+              "property": "irrigation_capacity",
+              "description": "Single irrigation capacity",
+              "unit": "liter",
+              "value_max": 6500,
+              "value_min": 0
+            },
+            {
+              "name": "irrigation_interval",
+              "label": "Irrigation interval",
+              "access": 3,
+              "type": "numeric",
+              "property": "irrigation_interval",
+              "description": "Time interval between two adjacent irrigation",
+              "unit": "seconds",
+              "value_max": 86400,
+              "value_min": 0
+            }
+          ]
+        },
+        {
+          "name": "real_time_irrigation_duration",
+          "label": "Real time irrigation duration",
+          "access": 1,
+          "type": "numeric",
+          "property": "real_time_irrigation_duration",
+          "description": "Duration of the last/current irrigation session",
+          "unit": "s"
+        },
+        {
+          "name": "real_time_irrigation_volume",
+          "label": "Real time irrigation volume",
+          "access": 1,
+          "type": "numeric",
+          "property": "real_time_irrigation_volume",
+          "description": "Volume of the last/current irrigation session",
+          "unit": "L"
+        },
+        {
+          "name": "irrigation_start_time",
+          "label": "Irrigation start time",
+          "access": 1,
+          "type": "numeric",
+          "property": "irrigation_start_time",
+          "description": "Start time of the last/current irrigation session (Unix timestamp)"
+        },
+        {
+          "name": "irrigation_end_time",
+          "label": "Irrigation end time",
+          "access": 1,
+          "type": "numeric",
+          "property": "irrigation_end_time",
+          "description": "End time of the last irrigation session (Unix timestamp)"
+        },
+        {
+          "name": "daily_irrigation_volume",
+          "label": "Daily irrigation volume",
+          "access": 1,
+          "type": "numeric",
+          "property": "daily_irrigation_volume",
+          "description": "Total irrigation volume today",
+          "unit": "L"
+        },
+        {
+          "name": "valve_work_state",
+          "label": "Valve work state",
+          "access": 1,
+          "type": "binary",
+          "property": "valve_work_state",
+          "description": "Current valve work state, this turns on when a Cyclic timed or quantitative irrigation program is running, and turns off when the program is complete.",
+          "value_on": "working",
+          "value_off": "idle"
+        }
+      ],
+      "model": "SWV",
+      "options": [],
+      "supports_ota": true,
+      "vendor": "SONOFF"
+    },
+    "friendly_name": "SWV device"
+  },
+  "gladysDevice": {
+    "name": "SWV device",
+    "model": "SWV",
+    "external_id": "zigbee2mqtt:SWV device",
+    "features": [
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "water-valve",
+        "type": "flow",
+        "unit": "cubic-meter-per-hour",
+        "name": "Flow",
+        "external_id": "zigbee2mqtt:SWV device:water-valve:flow:flow",
+        "selector": "zigbee2mqtt-swv-device-water-valve-flow-flow"
+      },
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "name": "Battery",
+        "external_id": "zigbee2mqtt:SWV device:battery:integer:battery",
+        "selector": "zigbee2mqtt-swv-device-battery-integer-battery"
+      },
+      {
+        "read_only": false,
+        "has_feedback": true,
+        "category": "switch",
+        "type": "binary",
+        "min": 0,
+        "max": 1,
+        "unit": null,
+        "name": "State",
+        "external_id": "zigbee2mqtt:SWV device:switch:binary:state",
+        "selector": "zigbee2mqtt-swv-device-switch-binary-state"
+      },
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 3,
+        "category": "water-valve",
+        "type": "current-device-status",
+        "unit": null,
+        "name": "Current device status",
+        "external_id": "zigbee2mqtt:SWV device:water-valve:current-device-status:current_device_status",
+        "selector": "zigbee2mqtt-swv-device-water-valve-current-device-status-current-device-status"
+      },
+      {
+        "read_only": false,
+        "has_feedback": true,
+        "category": "water-valve",
+        "type": "auto-close-when-water-shortage",
+        "min": 0,
+        "max": 1,
+        "unit": null,
+        "name": "Auto close when water shortage",
+        "external_id": "zigbee2mqtt:SWV device:water-valve:auto-close-when-water-shortage:auto_close_when_water_shortage",
+        "selector": "zigbee2mqtt-swv-device-water-valve-auto-close-when-water-shortage-auto-close-when-water-shortage"
+      },
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 86400,
+        "category": "water-valve",
+        "type": "real-time-irrigation-duration",
+        "unit": "seconds",
+        "name": "Real time irrigation duration",
+        "external_id": "zigbee2mqtt:SWV device:water-valve:real-time-irrigation-duration:real_time_irrigation_duration",
+        "selector": "zigbee2mqtt-swv-device-water-valve-real-time-irrigation-duration-real-time-irrigation-duration"
+      },
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1000000,
+        "category": "water-valve",
+        "type": "real-time-irrigation-volume",
+        "unit": "liter",
+        "name": "Real time irrigation volume",
+        "external_id": "zigbee2mqtt:SWV device:water-valve:real-time-irrigation-volume:real_time_irrigation_volume",
+        "selector": "zigbee2mqtt-swv-device-water-valve-real-time-irrigation-volume-real-time-irrigation-volume"
+      },
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1000000,
+        "category": "water-valve",
+        "type": "daily-irrigation-volume",
+        "unit": "liter",
+        "name": "Daily irrigation volume",
+        "external_id": "zigbee2mqtt:SWV device:water-valve:daily-irrigation-volume:daily_irrigation_volume",
+        "selector": "zigbee2mqtt-swv-device-water-valve-daily-irrigation-volume-daily-irrigation-volume"
+      },
+      {
+        "read_only": true,
+        "has_feedback": false,
+        "category": "water-valve",
+        "type": "valve-work-state",
+        "min": 0,
+        "max": 1,
+        "unit": null,
+        "name": "Valve work state",
+        "external_id": "zigbee2mqtt:SWV device:water-valve:valve-work-state:valve_work_state",
+        "selector": "zigbee2mqtt-swv-device-water-valve-valve-work-state-valve-work-state"
+      }
+    ],
+    "should_poll": false,
+    "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a"
+  },
+  "values": [
+    {
+      "internal": 1,
+      "external": "ON",
+      "property": "state"
+    },
+    {
+      "internal": 0,
+      "external": "OFF",
+      "property": "state"
+    },
+    {
+      "internal": 0,
+      "external": "normal_state",
+      "property": "current_device_status"
+    },
+    {
+      "internal": 1,
+      "external": "water_shortage",
+      "property": "current_device_status"
+    },
+    {
+      "internal": 2,
+      "external": "water_leakage",
+      "property": "current_device_status"
+    },
+    {
+      "internal": 3,
+      "external": "water_shortage & water_leakage",
+      "property": "current_device_status"
+    },
+    {
+      "internal": 1,
+      "external": "ENABLE",
+      "property": "auto_close_when_water_shortage"
+    },
+    {
+      "internal": 0,
+      "external": "DISABLE",
+      "property": "auto_close_when_water_shortage"
+    },
+    {
+      "internal": 1,
+      "external": "working",
+      "property": "valve_work_state"
+    },
+    {
+      "internal": 0,
+      "external": "idle",
+      "property": "valve_work_state"
+    },
+    {
+      "internal": 1.5,
+      "external": 1.5,
+      "property": "flow"
+    },
+    {
+      "internal": 100,
+      "external": 100,
+      "property": "battery"
+    },
+    {
+      "internal": 600,
+      "external": 600,
+      "property": "real_time_irrigation_duration"
+    },
+    {
+      "internal": 20,
+      "external": 20,
+      "property": "real_time_irrigation_volume"
+    },
+    {
+      "internal": 150,
+      "external": 150,
+      "property": "daily_irrigation_volume"
+    }
+  ]
+}

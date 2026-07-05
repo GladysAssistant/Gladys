@@ -15,6 +15,7 @@ import FanModeDeviceState from './device-states/FanModeDeviceState';
 import FanLabeledDeviceState from './device-states/FanLabeledDeviceState';
 import LevelSensorDeviceState from './device-states/LevelSensorDeviceState';
 import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDeviceState';
+import WaterValveDeviceState from './device-states/WaterValveDeviceState';
 
 class TurnOnLight extends Component {
   onDeviceFeatureChange = deviceFeature => {
@@ -56,11 +57,15 @@ class TurnOnLight extends Component {
     let fanLabeledDevice = false;
     let levelSensorDevice = false;
     let levelMatterSensorDevice = false;
+    let waterValveStatusDevice = false;
 
     if (selectedDeviceFeature) {
       const { category, type } = selectedDeviceFeature;
 
-      binaryDevice = type === DEVICE_FEATURE_TYPES.SWITCH.BINARY;
+      binaryDevice =
+        type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
+        type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
+        type === DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE;
       presenceDevice = category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
@@ -77,6 +82,9 @@ class TurnOnLight extends Component {
       levelMatterSensorDevice =
         category === DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR ||
         category === DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR;
+      waterValveStatusDevice =
+        category === DEVICE_FEATURE_CATEGORIES.WATER_VALVE &&
+        type === DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS;
     }
 
     const defaultDevice =
@@ -88,7 +96,8 @@ class TurnOnLight extends Component {
       !fanModeDevice &&
       !fanLabeledDevice &&
       !levelSensorDevice &&
-      !levelMatterSensorDevice;
+      !levelMatterSensorDevice &&
+      !waterValveStatusDevice;
 
     const thresholdDevice =
       selectedDeviceFeature &&
@@ -98,7 +107,8 @@ class TurnOnLight extends Component {
       !fanModeDevice &&
       !fanLabeledDevice &&
       !levelSensorDevice &&
-      !levelMatterSensorDevice;
+      !levelMatterSensorDevice &&
+      !waterValveStatusDevice;
 
     return (
       <div>
@@ -119,6 +129,7 @@ class TurnOnLight extends Component {
           {fanLabeledDevice && <FanLabeledDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {levelSensorDevice && <LevelSensorDeviceState {...props} />}
           {levelMatterSensorDevice && <LevelMatterSensorDeviceState {...props} />}
+          {waterValveStatusDevice && <WaterValveDeviceState {...props} />}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
         </div>
         {thresholdDevice && <ThresholdDeviceState {...props} />}
