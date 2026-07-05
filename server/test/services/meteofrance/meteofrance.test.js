@@ -184,6 +184,39 @@ describe('MeteoFranceService', () => {
     await meteoFranceService.vigilance.check();
     expect(eventEmit.callCount).to.equal(0);
   });
+  it('should skip houses when no department can be resolved during check', async () => {
+    let warningCalls = 0;
+    const noDeptAxios = {
+      axios: {
+        default: {
+          get: (url) => {
+            if (url.includes('/forecast')) {
+              return Promise.resolve({ data: { position: {} } });
+            }
+            warningCalls += 1;
+            return Promise.resolve({ data: warningDataGreen });
+          },
+        },
+      },
+    };
+    const eventEmit = fake.returns(null);
+    const gladysWithHouse = {
+      variable: {
+        getValue: () => Promise.resolve(null),
+      },
+      house: {
+        get: () => Promise.resolve([{ selector: 'main-house', latitude: 46.75, longitude: 4.35 }]),
+      },
+      event: {
+        emit: eventEmit,
+      },
+    };
+    const MeteoFranceService = proxyquire('../../../services/meteofrance/index', noDeptAxios);
+    const meteoFranceService = MeteoFranceService(gladysWithHouse, SERVICE_ID);
+    await meteoFranceService.vigilance.check();
+    expect(warningCalls).to.equal(0);
+    expect(eventEmit.callCount).to.equal(0);
+  });
   it('should start without crashing when the houses cannot be fetched', async () => {
     const gladysBrokenHouse = {
       variable: {
