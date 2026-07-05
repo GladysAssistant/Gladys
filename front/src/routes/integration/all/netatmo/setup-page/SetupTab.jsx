@@ -3,26 +3,15 @@ import cx from 'classnames';
 
 import style from './style.css';
 import StateConnection from './StateConnection';
+import { isWebhookKeyInvalid } from './webhookUrl';
 import { RequestStatus } from '../../../../../utils/consts';
-import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
+import { STATUS, WEBHOOK_BASE_URL } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 
-const isWebhookUrlInvalid = value => {
-  const trimmedValue = (value || '').trim();
-  if (trimmedValue === '') {
-    return false;
-  }
-  try {
-    return new URL(trimmedValue).protocol !== 'https:';
-  } catch (e) {
-    return true;
-  }
-};
-
 class SetupTab extends Component {
   showClientSecretTimer = null;
-  showWebhookUrlTimer = null;
+  showWebhookKeyTimer = null;
   async disconnectNetatmo(e) {
     e.preventDefault();
 
@@ -47,8 +36,8 @@ class SetupTab extends Component {
   updateClientSecret = e => {
     this.props.updateStateInIndex({ netatmoClientSecret: e.target.value });
   };
-  updateWebhookUrl = e => {
-    this.props.updateStateInIndex({ netatmoWebhookUrl: e.target.value });
+  updateWebhookKey = e => {
+    this.props.updateStateInIndex({ netatmoWebhookKey: e.target.value });
   };
   updateEnergyApi = () => {
     if (this.props.netatmoEnergyApi === true) {
@@ -78,18 +67,18 @@ class SetupTab extends Component {
       this.showClientSecretTimer = setTimeout(() => this.setState({ showClientSecret: false }), 5000);
     }
   };
-  toggleWebhookUrl = () => {
-    const { showWebhookUrl } = this.state;
+  toggleWebhookKey = () => {
+    const { showWebhookKey } = this.state;
 
-    if (this.showWebhookUrlTimer) {
-      clearTimeout(this.showWebhookUrlTimer);
-      this.showWebhookUrlTimer = null;
+    if (this.showWebhookKeyTimer) {
+      clearTimeout(this.showWebhookKeyTimer);
+      this.showWebhookKeyTimer = null;
     }
 
-    this.setState({ showWebhookUrl: !showWebhookUrl });
+    this.setState({ showWebhookKey: !showWebhookKey });
 
-    if (!showWebhookUrl) {
-      this.showWebhookUrlTimer = setTimeout(() => this.setState({ showWebhookUrl: false }), 5000);
+    if (!showWebhookKey) {
+      this.showWebhookKeyTimer = setTimeout(() => this.setState({ showWebhookKey: false }), 5000);
     }
   };
 
@@ -98,9 +87,9 @@ class SetupTab extends Component {
       clearTimeout(this.showClientSecretTimer);
       this.showClientSecretTimer = null;
     }
-    if (this.showWebhookUrlTimer) {
-      clearTimeout(this.showWebhookUrlTimer);
-      this.showWebhookUrlTimer = null;
+    if (this.showWebhookKeyTimer) {
+      clearTimeout(this.showWebhookKeyTimer);
+      this.showWebhookKeyTimer = null;
     }
   }
 
@@ -226,32 +215,37 @@ class SetupTab extends Component {
                 </div>
 
                 <div class="form-group">
-                  <label htmlFor="netatmoWebhookUrl" className="form-label">
-                    <Text id={`integration.netatmo.setup.webhookUrlLabel`} />
+                  <label htmlFor="netatmoWebhookKey" className="form-label">
+                    <Text id={`integration.netatmo.setup.webhookKeyLabel`} />
                   </label>
-                  <div class="input-icon mb-3">
+                  <div class="input-group mb-3">
+                    <span class="input-group-prepend">
+                      <span class="input-group-text">{WEBHOOK_BASE_URL}</span>
+                    </span>
                     <Localizer>
                       <input
-                        id="netatmoWebhookUrl"
-                        name="netatmoWebhookUrl"
-                        type={state.showWebhookUrl ? 'text' : 'password'}
-                        placeholder={<Text id="integration.netatmo.setup.webhookUrlPlaceholder" />}
-                        value={props.netatmoWebhookUrl}
+                        id="netatmoWebhookKey"
+                        name="netatmoWebhookKey"
+                        type={state.showWebhookKey ? 'text' : 'password'}
+                        placeholder={<Text id="integration.netatmo.setup.webhookKeyPlaceholder" />}
+                        value={props.netatmoWebhookKey}
                         className="form-control"
                         autocomplete="off"
-                        onInput={this.updateWebhookUrl}
+                        onInput={this.updateWebhookKey}
                       />
                     </Localizer>
-                    <span class="input-icon-addon cursor-pointer" onClick={this.toggleWebhookUrl}>
-                      <i
-                        class={cx('fe', {
-                          'fe-eye': !state.showWebhookUrl,
-                          'fe-eye-off': state.showWebhookUrl
-                        })}
-                      />
+                    <span class="input-group-append">
+                      <span class="input-group-text cursor-pointer" onClick={this.toggleWebhookKey}>
+                        <i
+                          class={cx('fe', {
+                            'fe-eye': !state.showWebhookKey,
+                            'fe-eye-off': state.showWebhookKey
+                          })}
+                        />
+                      </span>
                     </span>
                   </div>
-                  {isWebhookUrlInvalid(props.netatmoWebhookUrl) && (
+                  {isWebhookKeyInvalid(props.netatmoWebhookKey) && (
                     <div class="alert alert-warning">
                       <Text id="integration.netatmo.setup.invalidWebhookUrl" />
                     </div>

@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import SetupTab from './SetupTab';
+import { buildWebhookUrl, extractWebhookKey } from './webhookUrl';
 import NetatmoPage from '../NetatmoPage';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
@@ -121,7 +122,7 @@ class NetatmoSetupPage extends Component {
         clientSecret: this.state.netatmoClientSecret,
         energyApi: this.state.netatmoEnergyApi,
         weatherApi: this.state.netatmoWeatherApi,
-        webhookUrl: (this.state.netatmoWebhookUrl || '').trim()
+        webhookUrl: buildWebhookUrl(this.state.netatmoWebhookKey)
       });
       await this.setState({
         netatmoSaveSettingsStatus: RequestStatus.Success
@@ -179,7 +180,7 @@ class NetatmoSetupPage extends Component {
         netatmoClientSecret: configuration.clientSecret,
         netatmoEnergyApi: configuration.energyApi,
         netatmoWeatherApi: configuration.weatherApi,
-        netatmoWebhookUrl: configuration.webhookUrl,
+        netatmoWebhookKey: extractWebhookKey(configuration.webhookUrl),
         clientSecretChanges: false
       });
     }

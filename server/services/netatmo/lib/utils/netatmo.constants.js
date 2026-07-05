@@ -80,11 +80,18 @@ const API = {
   DROP_WEBHOOK: `${BASE_API}/api/dropwebhook`,
 };
 
+// Base of the Gladys Plus webhook URL; the user only provides their Open API key.
+const WEBHOOK_BASE_URL = 'https://api.gladysgateway.com/v1/api/netatmo/';
 // Energy events pushed by the Netatmo webhook (setpoint/mode changes made outside Gladys).
+// 'setpoint_event' (push_type 'display_change') is what Netatmo pushes in real life for a
+// setpoint change; the other names are the ones documented by the Home Assistant integration.
 // Anything else (security events, future types) is ignored until supported.
-const WEBHOOK_ENERGY_EVENT_TYPES = ['set_point', 'cancel_set_point', 'therm_mode', 'schedule'];
+const WEBHOOK_ENERGY_EVENT_TYPES = ['setpoint_event', 'set_point', 'cancel_set_point', 'therm_mode', 'schedule'];
 // Coalesce webhook event bursts (a home-wide mode change pushes one event per room) into one refresh.
 const WEBHOOK_REFRESH_DEBOUNCE_MS = 2 * 1000;
+// Statuses during which webhook events must be processed: the poll and the discovery
+// temporarily overwrite the connected status while the service is still fully operational.
+const WEBHOOK_ACTIVE_STATUSES = [STATUS.CONNECTED, STATUS.GET_DEVICES_VALUES, STATUS.DISCOVERING_DEVICES];
 
 const SUPPORTED_CATEGORY_TYPE = {
   ENERGY: 'Energy',
@@ -125,6 +132,8 @@ module.exports = {
   RECONNECT_RECURRENT_MS,
   FATAL_RETRY_WINDOW_MS,
   ACCESS_TOKEN_REFRESH_RATIO,
+  WEBHOOK_BASE_URL,
   WEBHOOK_ENERGY_EVENT_TYPES,
   WEBHOOK_REFRESH_DEBOUNCE_MS,
+  WEBHOOK_ACTIVE_STATUSES,
 };

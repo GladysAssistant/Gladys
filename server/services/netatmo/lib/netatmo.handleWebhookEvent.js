@@ -1,5 +1,9 @@
 const logger = require('../../../utils/logger');
-const { STATUS, WEBHOOK_ENERGY_EVENT_TYPES, WEBHOOK_REFRESH_DEBOUNCE_MS } = require('./utils/netatmo.constants');
+const {
+  WEBHOOK_ACTIVE_STATUSES,
+  WEBHOOK_ENERGY_EVENT_TYPES,
+  WEBHOOK_REFRESH_DEBOUNCE_MS,
+} = require('./utils/netatmo.constants');
 
 /**
  * @description Handle a Netatmo webhook event relayed by the Gladys Plus gateway.
@@ -14,7 +18,7 @@ async function handleWebhookEvent(data) {
     logger.warn('Netatmo: ignoring malformed webhook message');
     return;
   }
-  if (this.status !== STATUS.CONNECTED || !this.configuration.energyApi) {
+  if (!WEBHOOK_ACTIVE_STATUSES.includes(this.status) || !this.configuration.energyApi) {
     logger.debug('Netatmo: ignoring webhook event, service not connected or Energy API disabled');
     return;
   }

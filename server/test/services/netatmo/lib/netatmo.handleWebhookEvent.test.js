@@ -89,8 +89,17 @@ describe('Netatmo Handle Webhook Event', () => {
     sinon.assert.calledOnce(netatmoHandler.refreshNetatmoValues);
   });
 
+  it('should process an energy event received while a poll is running', async () => {
+    netatmoHandler.status = 'get devices values';
+
+    await netatmoHandler.handleWebhookEvent(JSON.parse(JSON.stringify(webhookEventMock)));
+
+    await clock.tickAsync(2 * 1000);
+    sinon.assert.calledOnce(netatmoHandler.refreshNetatmoValues);
+  });
+
   it('should coalesce a burst of energy events into a single refresh', async () => {
-    const eventTypes = ['set_point', 'set_point', 'therm_mode', 'schedule', 'cancel_set_point'];
+    const eventTypes = ['setpoint_event', 'set_point', 'therm_mode', 'schedule', 'cancel_set_point'];
     // eslint-disable-next-line no-restricted-syntax
     for (const eventType of eventTypes) {
       const message = JSON.parse(JSON.stringify(webhookEventMock));

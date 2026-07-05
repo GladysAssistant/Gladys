@@ -13,7 +13,7 @@
         }
       ]
     },
-    "event_type": "set_point",
-    "push_type": "home_event_changed"
+    "event_type": "setpoint_event",
+    "push_type": "display_change"
   }
 }
