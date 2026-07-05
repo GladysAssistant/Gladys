@@ -96,14 +96,38 @@ function createActions(store) {
             );
             weather = weather && weather.weather;
           }
+          // The 24h total can be missing on some days: sum the hourly rain amounts instead
+          let rain = d.precipitation && d.precipitation['24h'] != null ? d.precipitation['24h'] : null;
+          if (rain === null) {
+            let hourlyRainSum = 0;
+            let hourlyRainFound = false;
+            rawForecast.forEach(h => {
+              if (h.dt >= d.dt && h.dt < d.dt + 24 * 3600 && h.rain) {
+                let value = null;
+                if (h.rain['1h'] != null) {
+                  value = h.rain['1h'];
+                } else if (h.rain['3h'] != null) {
+                  value = h.rain['3h'];
+                } else if (h.rain['6h'] != null) {
+                  value = h.rain['6h'];
+                }
+                if (value !== null) {
+                  hourlyRainSum += value;
+                  hourlyRainFound = true;
+                }
+              }
+            });
+            if (hourlyRainFound) {
+              rain = hourlyRainSum;
+            }
+          }
           return {
             dt: d.dt,
             min: d.T && d.T.min != null ? d.T.min : null,
             max: d.T && d.T.max != null ? d.T.max : null,
             icon: getMFIcon(weather ? weather.icon : null),
             desc: weather ? weather.desc : '',
-            rain:
-              d.precipitation && d.precipitation['24h'] != null ? Math.round(d.precipitation['24h'] * 10) / 10 : null
+            rain: rain !== null ? Math.round(rain * 10) / 10 : null
           };
         });
 
