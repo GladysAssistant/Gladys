@@ -57,6 +57,10 @@ class NetatmoSetupPage extends Component {
         });
         console.error('Logs error', this.props);
       }
+      // strip the OAuth params so a page refresh does not replay the failed callback
+      setTimeout(() => {
+        route('/dashboard/integration/device/netatmo/setup', true);
+      }, 100);
     }
     if (this.props.code && this.props.state) {
       let successfulNewToken = false;
@@ -98,6 +102,12 @@ class NetatmoSetupPage extends Component {
           configured: true,
           errored: true
         });
+        // an OAuth code is single-use: strip it from the URL so a page refresh
+        // does not replay the exchange (400 invalid_grant shown as a misleading
+        // "account banned/disabled" message, and the service status clobbered)
+        setTimeout(() => {
+          route('/dashboard/integration/device/netatmo/setup', true);
+        }, 100);
       }
     }
   };
