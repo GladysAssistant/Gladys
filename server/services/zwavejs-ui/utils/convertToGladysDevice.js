@@ -101,7 +101,7 @@ const convertToGladysDevice = (serviceId, zwaveJsDevice) => {
         });
       });
     }
-    params = [{ name: PARAMS.LOCATION, value: zwaveJsDevice.loc }];
+    params = [{ name: PARAMS.LOCATION, value: zwaveJsDevice.loc ?? '' }];
   });
 
   return {
