@@ -32,15 +32,6 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
     await zwaveJSUIHandler.onNewDeviceDiscover(exampleData);
     expect(zwaveJSUIHandler.devices).to.deep.equal([
       {
-        name: 'Broadcast',
-        external_id: 'zwavejs-ui:255',
-        selector: 'zwavejs-ui:255',
-        service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
-        should_poll: false,
-        features: [],
-        params: [{ name: 'location', value: '' }],
-      },
-      {
         name: '',
         external_id: 'zwavejs-ui:1',
         selector: 'zwavejs-ui:1',
