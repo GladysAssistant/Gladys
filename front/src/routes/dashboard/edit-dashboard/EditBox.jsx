@@ -20,6 +20,7 @@ import EditEnergyConsumptionBox from '../../../components/boxs/energy-consumptio
 import EditVoiceAssistantBox from '../../../components/boxs/voice-assistant/EditVoiceAssistantBox';
 import EditLinkBox from '../../../components/boxs/link/EditLinkBox';
 import EditPhotoBox from '../../../components/boxs/photo/EditPhotoBox';
+import EditSunBox from '../../../components/boxs/sun/EditSun';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -61,6 +62,8 @@ const Box = ({ children, ...props }) => {
       return <EditLinkBox {...props} />;
     case 'photo':
       return <EditPhotoBox {...props} />;
+    case 'sun':
+      return <EditSunBox {...props} />;
     default:
       return <SelectBoxType {...props} />;
   }
