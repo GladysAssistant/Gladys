@@ -318,6 +318,33 @@
           "dailyForecast": "Forecast for the next 5 days",
           "vigilanceMap": "France vigilance map (requires the optional API key)"
         },
+        "conditions": {
+          "sunny": "Sunny",
+          "clearNight": "Clear night",
+          "partlyCloudy": "Partly cloudy",
+          "cloudy": "Cloudy",
+          "overcast": "Overcast",
+          "fog": "Fog",
+          "lightShowers": "Light showers",
+          "rain": "Rain",
+          "showers": "Showers",
+          "stormyRain": "Thundery rain",
+          "sleet": "Sleet",
+          "snow": "Snow",
+          "heavySnow": "Heavy snow",
+          "thunderstorm": "Thunderstorms"
+        },
+        "phenomena": {
+          "1": "High winds",
+          "2": "Rain-flooding",
+          "3": "Thunderstorms",
+          "4": "Floods",
+          "5": "Snow-ice",
+          "6": "Heatwave",
+          "7": "Extreme cold",
+          "8": "Avalanches",
+          "9": "Coastal flooding"
+        },
         "moonPhases": {
           "0": "New moon",
           "1": "Waxing crescent",

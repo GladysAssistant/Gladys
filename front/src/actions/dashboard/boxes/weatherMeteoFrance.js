@@ -28,11 +28,44 @@ const MF_ICONS = {
   21: { j: '⛈️', n: '⛈️' }
 };
 
+// Translation keys per icon code: the API only provides fr/en descriptions,
+// so the widget translates the current conditions itself from the icon code
+const MF_CONDITIONS = {
+  1: { j: 'sunny', n: 'clearNight' },
+  2: { j: 'partlyCloudy', n: 'partlyCloudy' },
+  3: { j: 'cloudy', n: 'cloudy' },
+  4: { j: 'cloudy', n: 'cloudy' },
+  5: { j: 'overcast', n: 'overcast' },
+  6: { j: 'fog', n: 'fog' },
+  7: { j: 'fog', n: 'fog' },
+  8: { j: 'lightShowers', n: 'lightShowers' },
+  9: { j: 'rain', n: 'rain' },
+  10: { j: 'rain', n: 'rain' },
+  11: { j: 'showers', n: 'showers' },
+  12: { j: 'stormyRain', n: 'stormyRain' },
+  13: { j: 'sleet', n: 'sleet' },
+  14: { j: 'snow', n: 'snow' },
+  15: { j: 'heavySnow', n: 'heavySnow' },
+  16: { j: 'snow', n: 'snow' },
+  17: { j: 'thunderstorm', n: 'thunderstorm' },
+  18: { j: 'thunderstorm', n: 'thunderstorm' },
+  19: { j: 'thunderstorm', n: 'thunderstorm' },
+  20: { j: 'thunderstorm', n: 'thunderstorm' },
+  21: { j: 'thunderstorm', n: 'thunderstorm' }
+};
+
 function getMFIcon(iconCode) {
   const m = iconCode && iconCode.match(/p(\d+)([jn])/);
   if (!m) return '🌡️';
   const entry = MF_ICONS[parseInt(m[1], 10)];
   return entry ? entry[m[2]] : '🌡️';
+}
+
+function getMFCondition(iconCode) {
+  const m = iconCode && iconCode.match(/p(\d+)([jn])/);
+  if (!m) return null;
+  const entry = MF_CONDITIONS[parseInt(m[1], 10)];
+  return entry ? entry[m[2]] : null;
 }
 
 function createActions(store) {
@@ -55,6 +88,7 @@ function createActions(store) {
         const upcoming = rawForecast.filter(h => h.dt >= nowTs - 1800);
         const current = upcoming.find(h => h.T && h.T.value != null) || upcoming[0] || rawForecast[0];
         const currentIcon = getMFIcon(current && current.weather ? current.weather.icon : null);
+        const currentCondition = getMFCondition(current && current.weather ? current.weather.icon : null);
 
         // Anchor the hourly strip on the same entry as the current conditions,
         // so the emphasized first column matches the displayed current weather
@@ -164,6 +198,7 @@ function createActions(store) {
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           current,
           currentIcon,
+          currentCondition,
           hourly,
           daily,
           sun,

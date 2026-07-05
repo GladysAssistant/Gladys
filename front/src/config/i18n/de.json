@@ -318,6 +318,33 @@
           "dailyForecast": "Vorhersage für die nächsten 5 Tage",
           "vigilanceMap": "Vigilance-Karte Frankreich (erfordert den optionalen API-Schlüssel)"
         },
+        "conditions": {
+          "sunny": "Sonnig",
+          "clearNight": "Klare Nacht",
+          "partlyCloudy": "Leicht bewölkt",
+          "cloudy": "Bewölkt",
+          "overcast": "Stark bewölkt",
+          "fog": "Nebel",
+          "lightShowers": "Vereinzelte Schauer",
+          "rain": "Regen",
+          "showers": "Schauer",
+          "stormyRain": "Gewittriger Regen",
+          "sleet": "Schneeregen",
+          "snow": "Schnee",
+          "heavySnow": "Starker Schneefall",
+          "thunderstorm": "Gewitter"
+        },
+        "phenomena": {
+          "1": "Sturmböen",
+          "2": "Starkregen-Überschwemmung",
+          "3": "Gewitter",
+          "4": "Hochwasser",
+          "5": "Schnee-Glätte",
+          "6": "Hitzewelle",
+          "7": "Extreme Kälte",
+          "8": "Lawinen",
+          "9": "Sturmflut"
+        },
         "moonPhases": {
           "0": "Neumond",
           "1": "Zunehmende Sichel",

@@ -318,6 +318,33 @@
           "dailyForecast": "Prévisions pour les 5 prochains jours",
           "vigilanceMap": "Carte de vigilance France (nécessite la clé API optionnelle)"
         },
+        "conditions": {
+          "sunny": "Ensoleillé",
+          "clearNight": "Ciel clair",
+          "partlyCloudy": "Peu nuageux",
+          "cloudy": "Nuageux",
+          "overcast": "Très nuageux",
+          "fog": "Brouillard",
+          "lightShowers": "Rares averses",
+          "rain": "Pluie",
+          "showers": "Averses",
+          "stormyRain": "Pluies orageuses",
+          "sleet": "Pluie et neige mêlées",
+          "snow": "Neige",
+          "heavySnow": "Fortes chutes de neige",
+          "thunderstorm": "Orages"
+        },
+        "phenomena": {
+          "1": "Vent violent",
+          "2": "Pluie-inondation",
+          "3": "Orages",
+          "4": "Crues",
+          "5": "Neige-verglas",
+          "6": "Canicule",
+          "7": "Grand froid",
+          "8": "Avalanches",
+          "9": "Vagues-submersion"
+        },
         "moonPhases": {
           "0": "Nouvelle lune",
           "1": "Premier croissant",

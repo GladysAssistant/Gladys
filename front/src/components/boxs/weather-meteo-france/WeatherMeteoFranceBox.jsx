@@ -162,7 +162,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
     const windUnit = isUS ? 'mph' : 'km/h';
     const timeFormat = isUS ? 'h:mm A' : 'HH:mm';
 
-    const { current, currentIcon, hourly, daily, sun, uv, rainChance, position, vigilance } = boxData;
+    const { current, currentIcon, currentCondition, hourly, daily, sun, uv, rainChance, position, vigilance } = boxData;
     const temp = current.T && current.T.value != null ? convertTemp(current.T.value) : '--';
     // In hourly forecast entries, humidity is a raw number (not an object)
     const humidity = typeof current.humidity === 'number' ? Math.round(current.humidity) : null;
@@ -227,7 +227,14 @@ class WeatherMeteoFranceBoxComponent extends Component {
                 <div class="mf-dark-real-colors" style="font-size: 52px; line-height: 1">
                   {currentIcon}
                 </div>
-                <div style="font-size: 16px; font-weight: 500; margin-left: 12px">{desc}</div>
+                <div style="font-size: 16px; font-weight: 500; margin-left: 12px">
+                  {/* Translated from the icon code; the French API text is only a fallback */}
+                  {currentCondition ? (
+                    <Text id={`dashboard.boxes.weatherMeteoFrance.conditions.${currentCondition}`}>{desc}</Text>
+                  ) : (
+                    desc
+                  )}
+                </div>
               </div>
               <div style="font-size: 36px; font-weight: 600; line-height: 1; white-space: nowrap; margin-left: 8px">
                 {temp}
@@ -313,7 +320,11 @@ class WeatherMeteoFranceBoxComponent extends Component {
                     class="mf-dark-real-colors"
                     style={`background:${vstyle.background};color:${vstyle.color};border-radius:12px;padding:3px 10px;font-size:12px;font-weight:600;display:inline-block;margin-right:5px;margin-bottom:4px`}
                   >
-                    {PHENOMENA_EMOJI[alert.phenomene_id] || '⚠️'} {alert.phenomene_nom}
+                    {PHENOMENA_EMOJI[alert.phenomene_id] || '⚠️'}{' '}
+                    {/* Translated from the phenomenon id; the French name is only a fallback */}
+                    <Text id={`dashboard.boxes.weatherMeteoFrance.phenomena.${alert.phenomene_id}`}>
+                      {alert.phenomene_nom}
+                    </Text>
                   </span>
                 );
               })}
