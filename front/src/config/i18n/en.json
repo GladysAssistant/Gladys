@@ -1196,6 +1196,7 @@
       },
       "device": {
         "title": "Devices in Gladys",
+        "serviceNotConfigured": "The Tuya service is not configured yet. Enter your Tuya cloud credentials on the ",
         "updates": "Check updates",
         "editButton": "Edit",
         "noDeviceFound": "No Tuya device found.",

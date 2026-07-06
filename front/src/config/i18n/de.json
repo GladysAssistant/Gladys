@@ -1301,6 +1301,7 @@
       },
       "device": {
         "title": "Meine Geräte",
+        "serviceNotConfigured": "Der Tuya-Dienst ist noch nicht konfiguriert. Hinterlege deine Tuya-Cloud-Zugangsdaten auf der ",
         "updates": "Nach Updates suchen",
         "editButton": "Bearbeiten",
         "noDeviceFound": "Du hast noch keine Tuya-Geräte hinzugefügt.",
