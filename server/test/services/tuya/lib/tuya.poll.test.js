@@ -1012,6 +1012,41 @@ describe('TuyaHandler.poll temperature conversion', () => {
     expect(stateEvent.args[1].state).to.equal(68);
   });
 
+  it('should skip the property-cache refresh for a cloud code absent from the cached shadow', async () => {
+    // Real case: the cloud reports a code (here the unit) that the persisted shadow snapshot does
+    // not contain — the refresh must skip it silently while the known codes stay updated.
+    const { poll } = proxyquire('../../../../services/tuya/lib/tuya.poll', {});
+    const request = sinon.stub().resolves({
+      result: [
+        { code: 'temp_current', value: 680 },
+        { code: 'temp_unit_convert', value: 'f' },
+      ],
+    });
+    const emit = sinon.stub();
+    const device = {
+      external_id: 'tuya:thermostat',
+      params: [{ name: 'LOCAL_OVERRIDE', value: false }],
+      properties: { properties: [{ code: 'temp_current', dp_id: 3 }] },
+      features: [
+        {
+          external_id: 'tuya:thermostat:temp_current',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          unit: 'celsius',
+          scale: 1,
+        },
+      ],
+    };
+
+    await poll.call({ connector: { request }, gladys: { event: { emit } } }, device);
+
+    const stateEvent = emit.getCalls().find((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
+    // The live unit is still honored for the conversion (680 -> 68 °F -> 20 °C)...
+    expect(stateEvent.args[1].state).to.equal(20);
+    // ...the known code was refreshed in the cache, and no entry was invented for the unknown one.
+    expect(device.properties.properties).to.deep.equal([{ code: 'temp_current', dp_id: 3, value: 680 }]);
+  });
+
   it('should keep the raw temp_current when the converted value falls out of the feature range', async () => {
     // Firmware inconsistency guard: the device advertises Fahrenheit but the
     // temp_current value is already Celsius. Converting would push it out of the
@@ -1189,5 +1224,58 @@ describe('emitLocalDpsStates temperature transform (local + push regression)', (
     const stateEvent = emit.getCalls().find((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
     expect(stateEvent).to.not.equal(undefined);
     expect(stateEvent.args[1].state).to.equal(20);
+  });
+
+  it('keeps the reading unchanged when the device and feature units already match', () => {
+    // The most common real case: a °C device feeding a °C feature — no conversion at all.
+    const emit = sinon.stub();
+    const gladysStub = { event: { emit } };
+    const device = {
+      external_id: 'tuya:therm',
+      device_type: 'pilot-thermostat',
+      features: [
+        {
+          external_id: 'tuya:therm:temp_current',
+          selector: 'tuya-therm-temp-current',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          unit: 'celsius',
+          scale: 1,
+        },
+      ],
+    };
+
+    const { handledCodes } = emitLocalDpsStates(gladysStub, device, { 116: 245 }, 'celsius');
+
+    expect(handledCodes.has('temp_current')).to.equal(true);
+    const stateEvent = emit.getCalls().find((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
+    expect(stateEvent.args[1].state).to.equal(24.5);
+  });
+
+  it('falls back to the mapping scale when the feature was created without one', () => {
+    // Real case: a device created before the scale was persisted on its features — the cloud
+    // mapping (temp_current scale=1 on pilot thermostats) must fill the gap, otherwise the raw
+    // reader default (scale 0) would emit 245 °C instead of 24.5.
+    const emit = sinon.stub();
+    const gladysStub = { event: { emit } };
+    const device = {
+      external_id: 'tuya:therm',
+      device_type: 'pilot-thermostat',
+      features: [
+        {
+          external_id: 'tuya:therm:temp_current',
+          selector: 'tuya-therm-temp-current',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          unit: 'celsius',
+        },
+      ],
+    };
+
+    const { handledCodes } = emitLocalDpsStates(gladysStub, device, { 116: 245 }, 'celsius');
+
+    expect(handledCodes.has('temp_current')).to.equal(true);
+    const stateEvent = emit.getCalls().find((call) => call.args[0] === EVENTS.DEVICE.NEW_STATE);
+    expect(stateEvent.args[1].state).to.equal(24.5);
   });
 });

@@ -187,6 +187,10 @@ describe('Tuya mappings index', () => {
   it('should get feature mapping and ignore invalid candidates', () => {
     expect(getFeatureMapping(null, DEVICE_TYPES.SMART_SOCKET)).to.equal(null);
     expect(getFeatureMapping('unknown_code', DEVICE_TYPES.SMART_SOCKET)).to.equal(null);
+    // Real case: a device_type persisted by a NEWER build (e.g. a type added by a later PR, then
+    // the user downgrades) is unknown to this build's index — the variant lookup must resolve
+    // nothing and the code falls back to the global mapping.
+    expect(getFeatureMapping('switch_1', 'type-from-a-newer-build', 'some-product-id')).to.not.equal(null);
 
     const { getFeatureMapping: getFeatureMappingStub } = proxyquire('../../../../../services/tuya/lib/mappings', {
       './cloud/global': { bad_code: { category: 'switch' } },
