@@ -40,6 +40,13 @@ function parseExportEntries(body) {
     const explicit = trimmed.match(/^(\w+)\s*:/);
     if (explicit) {
       names.push(explicit[1]);
+      return;
+    }
+
+    // Quoted keys: only those that are valid identifiers can become named exports.
+    const quoted = trimmed.match(/^['"](\w+)['"]\s*:/);
+    if (quoted) {
+      names.push(quoted[1]);
     }
   };
 
@@ -98,6 +105,12 @@ function getCjsExportNames(code) {
     names.add(match[1]);
   }
 
+  // Computed keys (module.exports['x'] = ...): only valid identifiers can
+  // become named exports, hyphenated keys stay on the default export object.
+  for (const match of code.matchAll(/(?:module\.)?exports\[['"](\w+)['"]\]\s*=/g)) {
+    names.add(match[1]);
+  }
+
   const objectExportBody = getModuleExportsObjectBody(code);
   if (objectExportBody) {
     for (const name of parseExportEntries(objectExportBody)) {
@@ -133,6 +146,20 @@ export function serverCommonjsInterop() {
   return {
     name: 'server-commonjs-interop',
     enforce: 'pre',
+    configureServer(server) {
+      // The bundled output inlines the whole require() graph: drop the whole
+      // cache when a server file changes so edits show up without a restart.
+      server.watcher.add(SERVER_ROOT);
+      server.watcher.on('change', filePath => {
+        if (isServerModule(filePath)) {
+          cache.clear();
+          const mod = server.moduleGraph.getModuleById(filePath);
+          if (mod) {
+            server.moduleGraph.invalidateModule(mod);
+          }
+        }
+      });
+    },
     async load(id) {
       if (!isServerModule(id)) {
         return null;
