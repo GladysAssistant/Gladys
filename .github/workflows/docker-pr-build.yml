@@ -142,11 +142,7 @@ jobs:
       - name: 🏗️ Build front
         working-directory: ./front
         run: |
-          npm run build-with-stats
-      - name: ↗️ Upload webpack stats artifact
-        uses: relative-ci/agent-upload-artifact-action@v2
-        with:
-          webpackStatsFile: ./front/stats.json
+          npm run build
       - name: ↗️ Upload build artifact
         uses: actions/upload-artifact@v4
         with:
