@@ -4700,6 +4700,11 @@
       "showDetails": "Details anzeigen",
       "hideDetails": "Details ausblenden"
     },
+    "modelSelector": {
+      "label": "KI-Modell",
+      "auto": "Auto",
+      "priceLegend": "€ günstig · €€ mittel · €€€ premium"
+    },
     "sidebar": {
       "title": "Wie funktioniert der Chat?",
       "intro": "Der Gladys-Chat nutzt die Gladys-Plus-Künstliche Intelligenz, damit du natürlich mit deinem vernetzten Zuhause kommunizieren kannst.",

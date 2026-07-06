@@ -1,6 +1,32 @@
 const get = require('get-value');
 const logger = require('../../utils/logger');
-const { Error403, Error429 } = require('../../utils/httpErrors');
+const { Error400, Error403, Error429 } = require('../../utils/httpErrors');
+const { resolveAiChatModel } = require('../../utils/aiChatModels');
+
+/**
+ * @description Normalize an optional model field before calling the gateway.
+ * @param {object} body - OpenAI-compatible chat request body.
+ * @returns {object} Request body with a validated model field when provided.
+ * @example
+ * normalizeAiChatRequestBody({ messages: [], model: 'auto' });
+ */
+function normalizeAiChatRequestBody(body) {
+  const requestBody = { ...body };
+  if (!Object.prototype.hasOwnProperty.call(requestBody, 'model')) {
+    return requestBody;
+  }
+
+  const resolvedModel = resolveAiChatModel(requestBody.model);
+  if (requestBody.model && resolvedModel === null) {
+    throw new Error400('INVALID_AI_MODEL');
+  }
+  if (resolvedModel) {
+    requestBody.model = resolvedModel;
+  } else {
+    delete requestBody.model;
+  }
+  return requestBody;
+}
 
 /**
  * @public
@@ -11,8 +37,9 @@ const { Error403, Error429 } = require('../../utils/httpErrors');
  * aiChat({ messages: [{ role: 'user', content: 'Hello' }] });
  */
 async function aiChat(body) {
+  const requestBody = normalizeAiChatRequestBody(body);
   try {
-    const response = await this.gladysGatewayClient.openAIAsk(body);
+    const response = await this.gladysGatewayClient.openAIAsk(requestBody);
     return response;
   } catch (e) {
     logger.debug(e);
@@ -30,4 +57,5 @@ async function aiChat(body) {
 
 module.exports = {
   aiChat,
+  normalizeAiChatRequestBody,
 };
