@@ -110,6 +110,10 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: 'build',
+      // preact-cli shipped a legacy nomodule bundle next to the modern one.
+      // Vite only emits one bundle: lower its floor so older wall-mounted
+      // tablets (Safari 13 / old Chromium webviews) keep working.
+      target: ['es2019', 'chrome79', 'edge79', 'firefox72', 'safari13'],
       sourcemap: true,
       rollupOptions: {
         output: {
