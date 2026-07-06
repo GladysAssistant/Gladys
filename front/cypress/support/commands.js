@@ -31,14 +31,24 @@ Cypress.on('window:before:load', window => {
   Object.defineProperty(window.navigator, 'language', { value: lang });
 
   // Track every WebSocket the app opens so tests can push fake messages with cy.sendWebSocket.
-  // Do NOT define an `onmessage` method here: it would shadow the native accessor and
-  // recurse forever when called on a socket whose handler was never assigned
-  // (e.g. the Vite HMR socket, which only uses addEventListener).
+  // The `onmessage` accessor stores the handler WITHOUT wiring it to native events:
+  // tests must fully control message delivery, real server pushes would race with the
+  // fake ones (e.g. a late Broadlink learn-mode error cancelling a simulated capture).
+  // Sockets using addEventListener (like the Vite HMR client) are not affected.
   window.WebSocket = class MockWebSocket extends WebSocket {
     constructor(url, protocols) {
       super(url, protocols);
 
+      this.cypressOnMessage = null;
       cypressWebSockets.push(this);
+    }
+
+    get onmessage() {
+      return this.cypressOnMessage;
+    }
+
+    set onmessage(handler) {
+      this.cypressOnMessage = handler;
     }
   };
 });
