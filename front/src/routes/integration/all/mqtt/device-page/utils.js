@@ -4,8 +4,36 @@ import {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS
 } from '../../../../../../../server/utils/constants';
+import { slugify } from '../../../../../../../server/utils/slugify';
 
 const SENSOR_CATEGORY_SUFFIX = '-sensor';
+
+export const generateMqttExternalIdSuffix = () => {
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let randomChars = '';
+  for (let i = 0; i < 4; i += 1) {
+    randomChars += characters[Math.floor(Math.random() * characters.length)];
+  }
+  return randomChars;
+};
+
+export const buildMqttExternalId = (name, suffix) => {
+  const slug = slugify(name, false);
+  if (!slug) {
+    return 'mqtt:';
+  }
+  return `mqtt:${slug}-${suffix}`;
+};
+
+export const normalizeMqttExternalId = value => {
+  if (!value.startsWith('mqtt:')) {
+    if (value.length < 5) {
+      return 'mqtt:';
+    }
+    return `mqtt:${value}`;
+  }
+  return value;
+};
 
 export const isSensorCategory = category => {
   if (
