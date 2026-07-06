@@ -7,7 +7,6 @@ const {
   buildExchangesFromMessages,
   exchangesToApiMessages,
   FETCH_MESSAGE_LIMIT,
-  EXCHANGE_LIMIT,
 } = require('../message/message.getPreviousQuestionsForUser');
 const { buildSystemPromptWithCurrentTime } = require('./gateway.forwardMessageToAiChat');
 
@@ -71,9 +70,75 @@ function dbMessageToApiMessage(message, userId) {
 }
 
 /**
+ * @description Map a stored Gladys message to a debug timeline role.
+ * @param {object} message - Stored message row.
+ * @param {string} userId - Gladys user id.
+ * @returns {string} Debug timeline role.
+ * @example
+ * getDebugMessageRole({ sender_id: 'user-1', message_type: 'chat' }, 'user-1');
+ */
+function getDebugMessageRole(message, userId) {
+  if (message.message_type === 'tool_call') {
+    return 'tool_call';
+  }
+  if (message.message_type === 'notification') {
+    return 'notification';
+  }
+  if (message.sender_id === userId) {
+    return 'user';
+  }
+  return 'assistant';
+}
+
+/**
+ * @description Format a stored message for the debug conversation history.
+ * @param {object} message - Stored message row.
+ * @param {string} userId - Gladys user id.
+ * @returns {object} Debug history entry.
+ * @example
+ * formatStoredMessageForDebug({ sender_id: 'user-1', text: 'Hi', message_type: 'chat' }, 'user-1');
+ */
+function formatStoredMessageForDebug(message, userId) {
+  const entry = {
+    created_at: message.created_at,
+    role: getDebugMessageRole(message, userId),
+    message_type: message.message_type,
+    text: message.text,
+  };
+
+  if (message.tool_name) {
+    entry.tool_name = message.tool_name;
+  }
+  if (message.tool_status) {
+    entry.tool_status = message.tool_status;
+  }
+  if (message.file) {
+    entry.has_file = true;
+  }
+
+  return entry;
+}
+
+/**
+ * @description Build the full conversation history for debug output.
+ * @param {Array<object>} chronologicalMessages - Stored messages, oldest first.
+ * @param {string} userId - Gladys user id.
+ * @returns {{messages: Array<object>, toolCalls: Array<object>}} Full history and tool calls.
+ * @example
+ * buildConversationHistoryForDebug([{ sender_id: 'user-1', text: 'Hi', message_type: 'chat' }], 'user-1');
+ */
+function buildConversationHistoryForDebug(chronologicalMessages, userId) {
+  const messages = chronologicalMessages.map((message) => formatStoredMessageForDebug(message, userId));
+  const toolCalls = messages.filter((message) => message.role === 'tool_call');
+
+  return { messages, toolCalls };
+}
+
+/**
  * @public
  * @description Build the AI chat request payload for debug/replay purposes.
- * Uses the same history rules as live AI chat.
+ * The replay payload includes all exchanges rebuilt from the last messages.
+ * Full stored history (including tool calls) is exposed under _debug.conversationHistory.
  * @param {string} userId - Gladys user id.
  * @returns {Promise<object>} OpenAI-compatible chat request body.
  * @example
@@ -91,13 +156,15 @@ async function getAiChatDebugContext(userId) {
     where: {
       [Op.or]: [{ sender_id: userId }, { receiver_id: userId }],
     },
-    attributes: ['sender_id', 'text', 'file', 'message_type', 'created_at'],
+    attributes: ['sender_id', 'text', 'file', 'message_type', 'tool_name', 'tool_status', 'created_at'],
     order: [['created_at', 'desc']],
     limit: FETCH_MESSAGE_LIMIT,
   });
 
   const plainMessages = recentMessages.map((message) => message.get({ plain: true }));
-  const exchanges = buildExchangesFromMessages(plainMessages.reverse()).slice(-EXCHANGE_LIMIT);
+  const chronologicalMessages = plainMessages.reverse();
+  const exchanges = buildExchangesFromMessages(chronologicalMessages);
+  const conversationHistory = buildConversationHistoryForDebug(chronologicalMessages, userId);
   const messagesForApi = [
     { role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName) },
     ...exchangesToApiMessages(exchanges),
@@ -113,6 +180,7 @@ async function getAiChatDebugContext(userId) {
       timezone: timezoneName,
       messageCount: recentMessages.length,
       exchangeCount: exchanges.length,
+      conversationHistory,
       note: 'Replay this payload via POST /api/v1/gateway/aichat/chat (remove the _debug field first).',
     },
   };
@@ -122,4 +190,7 @@ module.exports = {
   getAiChatDebugContext,
   dbMessageToApiMessage,
   formatFileAsImageUrl,
+  getDebugMessageRole,
+  formatStoredMessageForDebug,
+  buildConversationHistoryForDebug,
 };

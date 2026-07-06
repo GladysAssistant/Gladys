@@ -6,21 +6,23 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const messageFindAll = sinon.stub().resolves([]);
 
-const { EXCHANGE_LIMIT } = require('../../../lib/message/message.getPreviousQuestionsForUser');
-
-const { getAiChatDebugContext, dbMessageToApiMessage, formatFileAsImageUrl } = proxyquire(
-  '../../../lib/gateway/gateway.getAiChatDebugContext',
-  {
-    '../../models': {
-      Message: {
-        findAll: messageFindAll,
-      },
-    },
-    './gateway.forwardMessageToAiChat': {
-      buildSystemPromptWithCurrentTime: () => 'system prompt with time',
+const {
+  getAiChatDebugContext,
+  dbMessageToApiMessage,
+  formatFileAsImageUrl,
+  getDebugMessageRole,
+  formatStoredMessageForDebug,
+  buildConversationHistoryForDebug,
+} = proxyquire('../../../lib/gateway/gateway.getAiChatDebugContext', {
+  '../../models': {
+    Message: {
+      findAll: messageFindAll,
     },
   },
-);
+  './gateway.forwardMessageToAiChat': {
+    buildSystemPromptWithCurrentTime: () => 'system prompt with time',
+  },
+});
 
 describe('gateway.getAiChatDebugContext helpers', () => {
   it('should format stored file as data URL', () => {
@@ -68,6 +70,68 @@ describe('gateway.getAiChatDebugContext helpers', () => {
       role: 'assistant',
       content: '',
     });
+  });
+
+  it('should map stored messages to debug timeline roles', () => {
+    expect(getDebugMessageRole({ sender_id: 'user-1', message_type: 'chat' }, 'user-1')).to.equal('user');
+    expect(getDebugMessageRole({ sender_id: null, message_type: 'chat' }, 'user-1')).to.equal('assistant');
+    expect(getDebugMessageRole({ sender_id: null, message_type: 'tool_call' }, 'user-1')).to.equal('tool_call');
+    expect(getDebugMessageRole({ sender_id: null, message_type: 'notification' }, 'user-1')).to.equal('notification');
+  });
+
+  it('should format stored messages for debug history', () => {
+    expect(
+      formatStoredMessageForDebug(
+        {
+          created_at: '2026-07-06T08:00:00.000Z',
+          sender_id: null,
+          text: 'device_set_shutter({"action":"close"})',
+          message_type: 'tool_call',
+          tool_name: 'device_set_shutter',
+          tool_status: 'success',
+        },
+        'user-1',
+      ),
+    ).to.deep.equal({
+      created_at: '2026-07-06T08:00:00.000Z',
+      role: 'tool_call',
+      message_type: 'tool_call',
+      text: 'device_set_shutter({"action":"close"})',
+      tool_name: 'device_set_shutter',
+      tool_status: 'success',
+    });
+  });
+
+  it('should build conversation history with associated tool calls', () => {
+    const history = buildConversationHistoryForDebug(
+      [
+        {
+          created_at: '2026-07-06T08:00:00.000Z',
+          sender_id: 'user-1',
+          text: 'ferme tous les volets',
+          message_type: 'chat',
+        },
+        {
+          created_at: '2026-07-06T08:00:01.000Z',
+          sender_id: null,
+          text: 'device_set_shutter({"action":"close"})',
+          message_type: 'tool_call',
+          tool_name: 'device_set_shutter',
+          tool_status: 'success',
+        },
+        {
+          created_at: '2026-07-06T08:00:02.000Z',
+          sender_id: null,
+          text: 'Les volets sont en train de se fermer.',
+          message_type: 'chat',
+        },
+      ],
+      'user-1',
+    );
+
+    expect(history.messages).to.have.lengthOf(3);
+    expect(history.toolCalls).to.have.lengthOf(1);
+    expect(history.toolCalls[0].tool_name).to.equal('device_set_shutter');
   });
 });
 
@@ -166,14 +230,94 @@ describe('gateway.getAiChatDebugContext', () => {
     expect(payload.messages[0].content).to.equal('system prompt (Europe/Paris)');
   });
 
-  it('should keep only the last four exchanges like live AI chat', async () => {
+  it('should include full conversation history with tool calls in debug payload', async () => {
+    messageFindAll.resolves([
+      {
+        get: () => ({
+          sender_id: null,
+          text: 'Les volets sont en train de se fermer.',
+          file: null,
+          message_type: 'chat',
+          tool_name: null,
+          tool_status: null,
+          created_at: '2026-07-06T08:00:02.000Z',
+        }),
+      },
+      {
+        get: () => ({
+          sender_id: null,
+          text: 'device_set_shutter({"action":"close"})',
+          file: null,
+          message_type: 'tool_call',
+          tool_name: 'device_set_shutter',
+          tool_status: 'success',
+          created_at: '2026-07-06T08:00:01.000Z',
+        }),
+      },
+      {
+        get: () => ({
+          sender_id: 'user-1',
+          text: 'ferme tous les volets',
+          file: null,
+          message_type: 'chat',
+          tool_name: null,
+          tool_status: null,
+          created_at: '2026-07-06T08:00:00.000Z',
+        }),
+      },
+    ]);
+
+    const ctx = {
+      serviceManager: {
+        getService: fake.returns({
+          mcpHandler: {
+            getAllTools: fake.resolves([]),
+          },
+        }),
+      },
+      variable: {
+        getValue: fake.resolves('Europe/Paris'),
+      },
+    };
+
+    const payload = await getAiChatDebugContext.call(ctx, 'user-1');
+
+    // eslint-disable-next-line no-underscore-dangle
+    expect(payload._debug.conversationHistory.messages).to.have.lengthOf(3);
+    // eslint-disable-next-line no-underscore-dangle
+    expect(payload._debug.conversationHistory.toolCalls).to.have.lengthOf(1);
+    // eslint-disable-next-line no-underscore-dangle
+    expect(payload._debug.conversationHistory.toolCalls[0]).to.include({
+      role: 'tool_call',
+      tool_name: 'device_set_shutter',
+      tool_status: 'success',
+    });
+  });
+
+  it('should include all exchanges rebuilt from recent messages', async () => {
     const messages = [];
     for (let i = 6; i >= 1; i -= 1) {
       messages.push({
-        get: () => ({ sender_id: null, text: `answer ${i}`, file: null, message_type: 'chat' }),
+        get: () => ({
+          sender_id: null,
+          text: `answer ${i}`,
+          file: null,
+          message_type: 'chat',
+          tool_name: null,
+          tool_status: null,
+          created_at: `2026-07-06T08:00:0${i}.000Z`,
+        }),
       });
       messages.push({
-        get: () => ({ sender_id: 'user-1', text: `question ${i}`, file: null, message_type: 'chat' }),
+        get: () => ({
+          sender_id: 'user-1',
+          text: `question ${i}`,
+          file: null,
+          message_type: 'chat',
+          tool_name: null,
+          tool_status: null,
+          created_at: `2026-07-06T07:59:5${i}.000Z`,
+        }),
       });
     }
     messageFindAll.resolves(messages);
@@ -193,22 +337,9 @@ describe('gateway.getAiChatDebugContext', () => {
 
     const payload = await getAiChatDebugContext.call(ctx, 'user-1');
 
-    const conversationMessages = payload.messages.slice(1);
-    expect(conversationMessages).to.have.lengthOf(EXCHANGE_LIMIT * 2);
-    expect(conversationMessages.map((message) => message.content)).to.deep.equal([
-      'question 3',
-      'answer 3',
-      'question 4',
-      'answer 4',
-      'question 5',
-      'answer 5',
-      'question 6',
-      'answer 6',
-    ]);
     // eslint-disable-next-line no-underscore-dangle
-    expect(payload._debug.exchangeCount).to.equal(EXCHANGE_LIMIT);
-    // eslint-disable-next-line no-underscore-dangle
-    expect(payload._debug.messageCount).to.equal(12);
+    expect(payload._debug.exchangeCount).to.equal(6);
+    expect(payload.messages.slice(1)).to.have.lengthOf(12);
   });
 
   it('should throw when MCP service is not running', async () => {
