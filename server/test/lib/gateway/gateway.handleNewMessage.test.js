@@ -309,6 +309,37 @@ describe('gateway.handleNewMessage', () => {
     });
   });
 
+  it('should not emit anything for an unknown open api action', async () => {
+    gateway.usersKeys = [
+      {
+        rsa_public_key: 'fingerprint',
+        ecdsa_public_key: 'fingerprint',
+        accepted: true,
+      },
+    ];
+
+    const callback = fake.returns(true);
+
+    await gateway.handleNewMessage(
+      {
+        type: 'gladys-open-api',
+        action: 'some-future-webhook',
+        data: {
+          user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        },
+      },
+      {
+        rsaPublicKeyRaw: 'key',
+        ecdsaPublicKeyRaw: 'key',
+        local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
+      callback,
+    );
+
+    assert.notCalled(event.emit);
+    assert.notCalled(callback);
+  });
+
   describe('testing GoogleHome', () => {
     const googleHomeTest = ({ intent, expectedResult }) => async () => {
       serviceManager.getService = fake.returns({

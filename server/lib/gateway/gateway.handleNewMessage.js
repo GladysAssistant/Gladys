@@ -69,36 +69,23 @@ async function handleNewMessage(data, rawMessage, cb) {
   }
 
   // if the message is an open API message
-  if (data.type === 'gladys-open-api' && data.action === 'create-owntracks-location') {
-    this.event.emit(EVENTS.GATEWAY.NEW_MESSAGE_OWNTRACKS_LOCATION, data.data);
-    cb({ status: 200 });
-  }
-
-  // if the message is an open API Netatmo webhook message
-  if (data.type === 'gladys-open-api' && data.action === 'netatmo-webhook') {
-    this.event.emit(EVENTS.GATEWAY.NEW_MESSAGE_NETATMO_WEBHOOK, data.data);
-    cb({ status: 200 });
-  }
-
-  // if the message is an open API create device state message
-  if (data.type === 'gladys-open-api' && data.action === 'create-device-state') {
-    this.event.emit(EVENTS.DEVICE.NEW_STATE, data.data);
-    cb({ status: 200 });
-  }
-
-  // if the message is a Google Home request
-  if (data.type === 'gladys-open-api' && data.action === 'google-home-request') {
-    await this.handleGoogleHomeMessage(data, rawMessage, cb);
-  }
-
-  // if the message is a Alexa request
-  if (data.type === 'gladys-open-api' && data.action === 'alexa-request') {
-    await this.handleAlexaMessage(data, rawMessage, cb);
-  }
-
-  // if the message is a message from MCP client
-  if (data.type === 'gladys-open-api' && data.action === 'mcp-webhook') {
-    await this.handleMCPMessage(data, cb);
+  if (data.type === 'gladys-open-api') {
+    if (data.action === 'create-owntracks-location') {
+      this.event.emit(EVENTS.GATEWAY.NEW_MESSAGE_OWNTRACKS_LOCATION, data.data);
+      cb({ status: 200 });
+    } else if (data.action === 'netatmo-webhook') {
+      this.event.emit(EVENTS.GATEWAY.NEW_MESSAGE_NETATMO_WEBHOOK, data.data);
+      cb({ status: 200 });
+    } else if (data.action === 'create-device-state') {
+      this.event.emit(EVENTS.DEVICE.NEW_STATE, data.data);
+      cb({ status: 200 });
+    } else if (data.action === 'google-home-request') {
+      await this.handleGoogleHomeMessage(data, rawMessage, cb);
+    } else if (data.action === 'alexa-request') {
+      await this.handleAlexaMessage(data, rawMessage, cb);
+    } else if (data.action === 'mcp-webhook') {
+      await this.handleMCPMessage(data, cb);
+    }
   }
 }
 
