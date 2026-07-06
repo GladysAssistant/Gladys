@@ -1,4 +1,5 @@
 import { Text, Localizer } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
@@ -19,7 +20,22 @@ class DeviceTab extends Component {
   componentWillMount() {
     this.getTuyaDevices();
     this.getHouses();
+    this.getServiceStatus();
   }
+
+  getServiceStatus = async () => {
+    try {
+      const response = await this.props.httpClient.get('/api/v1/service/tuya/status');
+      // `configured` reflects the presence of the cloud credentials: status alone is ambiguous,
+      // `not_initialized` is also used after a manual cloud disconnect with credentials in place.
+      this.setState({
+        serviceNotConfigured: response && response.configured === false
+      });
+    } catch (e) {
+      // Status is informational only: never block the device list on it.
+      this.setState({ serviceNotConfigured: false });
+    }
+  };
 
   getTuyaDevices = async () => {
     this.setState({
@@ -79,7 +95,7 @@ class DeviceTab extends Component {
     this.getTuyaDevices();
   };
 
-  render({}, { orderDir, search, getTuyaStatus, tuyaDevices, housesWithRooms }) {
+  render({}, { orderDir, search, getTuyaStatus, tuyaDevices, housesWithRooms, serviceNotConfigured }) {
     return (
       <div class="card">
         <div class="card-header">
@@ -99,6 +115,14 @@ class DeviceTab extends Component {
           </div>
         </div>
         <div class="card-body">
+          {serviceNotConfigured && (
+            <p class="alert alert-warning">
+              <Text id="integration.tuya.device.serviceNotConfigured" />
+              <Link href="/dashboard/integration/device/tuya/setup">
+                <Text id="integration.tuya.status.setupPageLink" />
+              </Link>
+            </p>
+          )}
           <div
             class={cx('dimmer', {
               active: getTuyaStatus === RequestStatus.Getting
