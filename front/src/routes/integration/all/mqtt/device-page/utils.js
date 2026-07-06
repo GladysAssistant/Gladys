@@ -514,8 +514,36 @@ export const getFeatureDefaultValues = (category, type) => {
     );
   }
 
-  if (type === DEVICE_FEATURE_TYPES.BATTERY.INTEGER) {
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY && type === DEVICE_FEATURE_TYPES.BATTERY.INTEGER) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, unit: DEVICE_FEATURE_UNITS.PERCENT }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR) {
+    return { ...defaults, min: 0, max: 1000000, read_only: true };
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {
+    return applyDefaultUnit(
+      { ...defaults, min: 0, max: 5000, read_only: true, unit: DEVICE_FEATURE_UNITS.PPM },
+      category,
+      type
+    );
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR) {
+    return applyDefaultUnit(
+      { ...defaults, min: 0, max: 100000, read_only: true, unit: DEVICE_FEATURE_UNITS.LUX },
+      category,
+      type
+    );
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR) {
+    return applyDefaultUnit(
+      { ...defaults, min: -40, max: 120, read_only: true, unit: DEVICE_FEATURE_UNITS.CELSIUS },
+      category,
+      type
+    );
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR) {
@@ -565,7 +593,11 @@ export const getCatalogPreviewLabelKey = (category, type) => {
     [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR, 'integer')]:
       'deviceFeatureValue.category.no2-matter-index-sensor.integer.medium',
     [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.RISK, 'integer')]:
-      'deviceFeatureValue.category.risk.integer.low-risk'
+      'deviceFeatureValue.category.risk.integer.low-risk',
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE,
+      DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED
+    )]: 'deviceFeatureValue.category.electrical-vehicle-charge.plugged.1'
   };
 
   return labeledPreviewKeys[key] || null;
@@ -638,6 +670,10 @@ export const getFeaturePreviewValue = (category, type) => {
     return 72;
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR) {
+    return 65;
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR) {
     return 42;
   }
@@ -678,10 +714,6 @@ export const getFeaturePreviewValue = (category, type) => {
     return 1.25;
   }
 
-  if (category === DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR) {
-    return 38.5;
-  }
-
   if (category === DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_BATTERY) {
     if (type === DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_RANGE_ESTIMATE) {
       return 670;
@@ -705,6 +737,9 @@ export const getFeaturePreviewValue = (category, type) => {
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE) {
+    if (type === DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED) {
+      return 1;
+    }
     if (type === DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.CHARGE_CURRENT) {
       return 16;
     }
