@@ -111,8 +111,6 @@ jobs:
           sudo apt update
           sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
       - name: 📦 Install NPM packages
-        env:
-          INSTALL_SERVICES_SILENT_FAIL: 'true'
         run: |
           npm ci && npm run install-server:dev
       - name: ✅ Cypress run
