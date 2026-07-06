@@ -35,16 +35,26 @@ describe('aiChatModels utils', () => {
     expect(resolveAiChatModel('not-a-model')).to.equal(null);
   });
 
-  it('should list all allowed models with vision metadata', () => {
+  it('should list all allowed models with vision and price metadata', () => {
     const models = getAiChatModelsList();
     expect(models.length).to.be.greaterThan(0);
     expect(models.find((model) => model.id === DEFAULT_TEXT_MODEL)).to.deep.equal({
       id: DEFAULT_TEXT_MODEL,
       vision: true,
+      priceTier: 1,
+      priceLabel: '€',
     });
     expect(models.find((model) => model.id === 'gpt-oss-120b')).to.deep.equal({
       id: 'gpt-oss-120b',
       vision: false,
+      priceTier: 1,
+      priceLabel: '€',
+    });
+    expect(models.find((model) => model.id === 'qwen3.5-397b-a17b')).to.deep.equal({
+      id: 'qwen3.5-397b-a17b',
+      vision: true,
+      priceTier: 3,
+      priceLabel: '€€€',
     });
   });
 });

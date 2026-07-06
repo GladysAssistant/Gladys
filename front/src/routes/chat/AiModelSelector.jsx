@@ -38,6 +38,14 @@ class AiModelSelector extends Component {
     }
   };
 
+  formatModelLabel = model => {
+    const parts = [model.id, model.priceLabel];
+    if (model.vision) {
+      parts.push('vision');
+    }
+    return parts.join(' · ');
+  };
+
   render({ value }, { models, loading, loadError }) {
     return (
       <div class={style.modelSelectorWrap}>
@@ -56,11 +64,15 @@ class AiModelSelector extends Component {
           </option>
           {models.map(model => (
             <option key={model.id} value={model.id}>
-              {model.id}
-              {model.vision ? ' · vision' : ''}
+              {this.formatModelLabel(model)}
             </option>
           ))}
         </select>
+        {!loading && !loadError && models.length > 0 && (
+          <span class={style.modelPriceLegend} title="Scaleway serverless pricing">
+            <Text id="chat.modelSelector.priceLegend" />
+          </span>
+        )}
       </div>
     );
   }

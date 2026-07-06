@@ -335,6 +335,13 @@
 .modelSelector {
   max-width: 100%;
   font-size: 13px;
+  flex: 1;
+}
+
+.modelPriceLegend {
+  font-size: 12px;
+  color: #9aa7b5;
+  white-space: nowrap;
 }
 
 .composerInputWrap {

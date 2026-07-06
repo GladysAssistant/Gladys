@@ -4602,7 +4602,8 @@
     },
     "modelSelector": {
       "label": "AI model",
-      "auto": "Auto"
+      "auto": "Auto",
+      "priceLegend": "€ cheap · €€ mid · €€€ premium"
     }
   },
   "history": {

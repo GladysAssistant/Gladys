@@ -10,6 +10,8 @@ describe('gateway.getAiChatModels', () => {
     expect(result.models.find((model) => model.id === DEFAULT_TEXT_MODEL)).to.deep.equal({
       id: DEFAULT_TEXT_MODEL,
       vision: true,
+      priceTier: 1,
+      priceLabel: '€',
     });
   });
 });

@@ -4602,7 +4602,8 @@
     },
     "modelSelector": {
       "label": "Modèle IA",
-      "auto": "Auto"
+      "auto": "Auto",
+      "priceLegend": "€ économique · €€ moyen · €€€ premium"
     }
   },
   "history": {

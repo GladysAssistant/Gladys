@@ -4590,7 +4590,8 @@
     },
     "modelSelector": {
       "label": "KI-Modell",
-      "auto": "Auto"
+      "auto": "Auto",
+      "priceLegend": "€ günstig · €€ mittel · €€€ premium"
     },
     "sidebar": {
       "title": "Wie funktioniert der Chat?",
