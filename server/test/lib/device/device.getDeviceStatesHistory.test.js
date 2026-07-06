@@ -47,6 +47,7 @@ describe('Device.getDeviceStatesHistory', function Describe() {
       value: 1,
       created_at: new Date('2025-08-28T15:02:00.000Z'),
       device_feature: {
+        id: LIGHT_BINARY_FEATURE_ID,
         name: 'Test device feature',
         selector: 'test-device-feature',
         category: 'light',
@@ -98,6 +99,26 @@ describe('Device.getDeviceStatesHistory', function Describe() {
     });
     expect(secondPage).to.have.lengthOf(1);
     expect(secondPage[0].value).to.equal(0);
+  });
+
+  it('should not skip states sharing the same created_at when paginating', async () => {
+    // Two states of different features at the exact same timestamp
+    const sharedDate = new Date('2025-08-28T16:00:00.000Z');
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.duckDbBatchInsertState(LIGHT_BINARY_FEATURE_ID, [{ value: 1, created_at: sharedDate }]);
+    await db.duckDbBatchInsertState(TEMPERATURE_FEATURE_ID, [{ value: 21.5, created_at: sharedDate }]);
+
+    const firstPage = await deviceInstance.getDeviceStatesHistory({ take: 1 });
+    expect(firstPage).to.have.lengthOf(1);
+
+    const secondPage = await deviceInstance.getDeviceStatesHistory({
+      take: 1,
+      before: new Date(firstPage[0].created_at).toISOString(),
+      before_id: firstPage[0].device_feature.id,
+    });
+    expect(secondPage).to.have.lengthOf(1);
+    // The second state at the same timestamp must be returned, not skipped
+    expect(secondPage[0].device_feature.id).to.not.equal(firstPage[0].device_feature.id);
   });
 
   it('should reject on invalid before date', async () => {

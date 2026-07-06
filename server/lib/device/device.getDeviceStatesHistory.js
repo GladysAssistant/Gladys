@@ -8,6 +8,8 @@ const MAX_TAKE = 500;
  * @description Get the history of device states across all devices, most recent first.
  * @param {object} [options] - Options of the query.
  * @param {string} [options.before] - Only return states created strictly before this date (pagination cursor).
+ * @param {string} [options.before_id] - Device feature id of the last returned state, used as a tiebreaker
+ * to paginate deterministically when several states share the same created_at.
  * @param {number} [options.take] - Max number of states to return.
  * @param {string} [options.categories] - Comma-separated list of device feature categories to filter on.
  * @param {string} [options.room_id] - Only return states of devices in this room.
@@ -22,6 +24,7 @@ async function getDeviceStatesHistory(options = {}) {
   if (Number.isNaN(before.getTime())) {
     throw new BadParameters(`Invalid "before" date: ${options.before}`);
   }
+  const beforeId = options.before_id || null;
 
   const deviceFeatures = await db.DeviceFeature.findAll({
     attributes: ['id', 'name', 'selector', 'category', 'type', 'unit'],
@@ -70,15 +73,29 @@ async function getDeviceStatesHistory(options = {}) {
     return [];
   }
 
+  // Keyset pagination on the compound key (created_at, device_feature_id). Ordering
+  // and filtering on both columns guarantees that states sharing the same created_at
+  // are never skipped when a page boundary falls in the middle of that timestamp.
+  const queryParams = [];
+  let cursorClause;
+  if (beforeId) {
+    cursorClause =
+      '(created_at < CAST(? AS TIMESTAMPTZ) OR (created_at = CAST(? AS TIMESTAMPTZ) AND device_feature_id < CAST(? AS UUID)))';
+    queryParams.push(before.toISOString(), before.toISOString(), beforeId);
+  } else {
+    cursorClause = 'created_at < CAST(? AS TIMESTAMPTZ)';
+    queryParams.push(before.toISOString());
+  }
+  queryParams.push(...filteredFeatureIds, take);
+
   const query = `
     SELECT device_feature_id, value, created_at
     FROM t_device_feature_state
-    WHERE created_at < CAST(? AS TIMESTAMPTZ)
+    WHERE ${cursorClause}
     AND device_feature_id IN (${filteredFeatureIds.map(() => '?').join(',')})
-    ORDER BY created_at DESC
+    ORDER BY created_at DESC, device_feature_id DESC
     LIMIT ?
   `;
-  const queryParams = [before.toISOString(), ...filteredFeatureIds, take];
 
   const rows = await db.duckDbReadConnectionAllAsync(query, ...queryParams);
 
@@ -90,6 +107,7 @@ async function getDeviceStatesHistory(options = {}) {
         value: row.value,
         created_at: row.created_at,
         device_feature: {
+          id: feature.id,
           name: feature.name,
           selector: feature.selector,
           category: feature.category,

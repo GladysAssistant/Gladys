@@ -142,7 +142,7 @@ class Header extends Component {
                         active: props.currentUrl === '/dashboard/history'
                       })}
                     >
-                      <i class="fe fe-activity" /> <Text id="header.history" />
+                      <i class="fe fe-clock" /> <Text id="header.history" />
                     </Link>
                   </li>
                   <li class="nav-item">

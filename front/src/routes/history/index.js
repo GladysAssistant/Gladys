@@ -30,6 +30,7 @@ class History extends Component {
         device.features.forEach(feature => {
           featuresBySelector.set(feature.selector, {
             device_feature: {
+              id: feature.id,
               name: feature.name,
               selector: feature.selector,
               category: feature.category,
@@ -81,7 +82,13 @@ class History extends Component {
     try {
       const params = this.buildQueryParams();
       if (!reset && this.state.events.length > 0) {
-        params.before = this.state.events[this.state.events.length - 1].created_at;
+        const lastEvent = this.state.events[this.state.events.length - 1];
+        params.before = lastEvent.created_at;
+        // Compound cursor: pass the last feature id so the server can break
+        // created_at ties deterministically and never skip a state.
+        if (lastEvent.device_feature && lastEvent.device_feature.id) {
+          params.before_id = lastEvent.device_feature.id;
+        }
       } else if (this.state.selectedDate) {
         // Jump to the end of the selected day, in the user's timezone
         params.before = dayjs(this.state.selectedDate)
@@ -89,13 +96,26 @@ class History extends Component {
           .toISOString();
       }
       const newEvents = await this.props.httpClient.get('/api/v1/device_feature/states_history', params);
-      this.setState(prevState => ({
-        events: reset ? newEvents : prevState.events.concat(newEvents),
-        hasMore: newEvents.length === PAGE_SIZE,
-        loading: false,
-        initialized: true,
-        pendingLiveEvents: reset ? [] : prevState.pendingLiveEvents
-      }));
+      this.setState(prevState => {
+        let events;
+        if (reset) {
+          events = newEvents;
+        } else {
+          events = prevState.events.concat(newEvents);
+          // Keep the array bounded during infinite scroll: drop the newest events
+          // already scrolled past (array head) and keep the window being browsed.
+          if (events.length > MAX_EVENTS_IN_MEMORY) {
+            events = events.slice(events.length - MAX_EVENTS_IN_MEMORY);
+          }
+        }
+        return {
+          events,
+          hasMore: newEvents.length === PAGE_SIZE,
+          loading: false,
+          initialized: true,
+          pendingLiveEvents: reset ? [] : prevState.pendingLiveEvents
+        };
+      });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false, error: true, initialized: true });
