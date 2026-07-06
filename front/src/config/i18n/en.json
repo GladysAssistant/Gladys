@@ -463,7 +463,9 @@
         "colorLowLabel": "Color below the low threshold",
         "colorInRangeLabel": "Color between the thresholds",
         "colorHighLabel": "Color above the high threshold",
-        "thresholdsLegendLabel": "Thresholds:"
+        "thresholdsLegendLabel": "Thresholds:",
+        "editNameLabel": "Widget name (optional)",
+        "editNamePlaceholder": "Name displayed on the dashboard"
       },
       "energyConsumption": {
         "editName": "Widget Name (optional)",
@@ -1232,7 +1234,7 @@
       "discover": {
         "title": "Devices detected on your Tuya cloud account",
         "description": "Tuya devices are automatically discovered. Your Tuya devices need to be added to your Tuya cloud account before.",
-        "localDiscoveryInfo": "<strong class=\"h5 d-block\">Cloud Scan</strong>Refreshes the cloud list. Make sure your devices are set as <strong>controllable</strong> in Tuya, otherwise they stay <strong>read-only</strong>. The cloud trial is limited to <strong>10 controllable devices</strong>; additional devices may only provide <strong>state updates</strong>.<br /><br /><strong class=\"h5 d-block\">Auto local scan</strong>Runs a scan on your local network (UDP broadcast, same subnet as Gladys). If a device is not found, fill in its <strong>local IP</strong> and <strong>protocol version</strong> (or leave empty if unknown), then use \"<strong>Poll local DPS</strong>\" to validate local communication.<br /><br />Use <strong>Save</strong> to create a device and <strong>Update</strong> to apply changes or switch the device to local mode.",
+        "localDiscoveryInfo": "<strong class=\"h5 d-block\">Cloud Scan</strong> Refreshes the cloud list. Make sure your devices are set as <strong>controllable</strong> in Tuya, otherwise they stay <strong>read-only</strong>. The cloud trial is limited to <strong>10 controllable devices</strong>; additional devices may only provide <strong>state updates</strong>.<br /><br /><strong class=\"h5 d-block\">Auto local scan</strong> Runs a scan on your local network (UDP broadcast, same subnet as Gladys). If a device is not found, fill in its <strong>local IP</strong> and <strong>protocol version</strong> (or leave empty if unknown), then use \"<strong>Poll local DPS</strong>\" to validate local communication.<br /><br />Use <strong>Save</strong> to create a device and <strong>Update</strong> to apply changes or switch the device to local mode.",
         "scanCloudInProgress": "Scan in progress... retrieving cloud devices. This can take a while.",
         "scanLocalInProgressConnected": "Scan in progress... retrieving local information for devices. This can take a while.",
         "scanLocalInProgressDisconnected": "Scan in progress... retrieving local devices. This can take a while.",
@@ -4007,6 +4009,50 @@
           "5": "Comfort"
         }
       },
+      "shutter": {
+        "state": {
+          "-1": "Closed",
+          "0": "Stopped",
+          "1": "Open"
+        }
+      },
+      "curtain": {
+        "state": {
+          "-1": "Closed",
+          "0": "Stopped",
+          "1": "Open"
+        }
+      },
+      "lock": {
+        "state": {
+          "0": "Unlocked",
+          "1": "Locked",
+          "2": "Activity",
+          "3": "Error"
+        }
+      },
+      "air-conditioning": {
+        "mode": {
+          "0": "Auto",
+          "1": "Cooling",
+          "2": "Heating",
+          "3": "Drying",
+          "4": "Fan"
+        }
+      },
+      "siren": {
+        "lmh_volume": {
+          "0": "Low",
+          "1": "Medium",
+          "2": "High"
+        }
+      },
+      "music": {
+        "playback_state": {
+          "0": "Paused",
+          "1": "Playing"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "No value received",
@@ -4394,6 +4440,7 @@
       "binary": "Switch",
       "power": "Power",
       "energy": "Energy",
+      "export-index": "Export index",
       "index": "Index",
       "index-today": "Index today",
       "index-yesterday": "Index yesterday",
@@ -4645,10 +4692,76 @@
       "hideDetails": "Hide details"
     }
   },
+  "history": {
+    "title": "Activity",
+    "subtitle": "Follow everything happening in your home, in real time.",
+    "live": "Live",
+    "jumpToDate": "Jump to a date",
+    "browsingPast": "You are browsing the history of {{date}}.",
+    "backToLive": "Back to live",
+    "allRooms": "All rooms",
+    "searchPlaceholder": "Search a device",
+    "loadMore": "Load more",
+    "newEvents": {
+      "one": "1 new event",
+      "other": "{{count}} new events"
+    },
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "emptyTitle": "No activity to show",
+    "emptyText": "Device events will appear here in real time as they happen. If this list stays empty, check that history is enabled on your device features.",
+    "error": "There was an error loading the activity history.",
+    "groups": {
+      "all": "All",
+      "openings": "Openings",
+      "motion": "Motion & presence",
+      "buttons": "Buttons & remotes",
+      "lights": "Lights & switches",
+      "climate": "Climate & environment",
+      "security": "Safety",
+      "energy": "Energy",
+      "other": "Other"
+    },
+    "values": {
+      "motion-sensor": {
+        "0": "No more motion",
+        "1": "Motion detected"
+      },
+      "presence-sensor": {
+        "0": "Absence",
+        "1": "Presence detected"
+      },
+      "smoke-sensor": {
+        "0": "No more smoke detected",
+        "1": "Smoke detected!"
+      },
+      "leak-sensor": {
+        "0": "No more leak detected",
+        "1": "Water leak detected!"
+      },
+      "vibration-sensor": {
+        "0": "No more vibration",
+        "1": "Vibration detected"
+      },
+      "light": {
+        "0": "Turned off",
+        "1": "Turned on"
+      },
+      "switch": {
+        "0": "Turned off",
+        "1": "Turned on"
+      },
+      "lock": {
+        "0": "Unlocked",
+        "1": "Locked"
+      }
+    }
+  },
   "header": {
     "gladysAssistant": "Gladys Assistant",
     "home": "Home",
     "chat": "Chat",
+    "history": "Activity",
     "devices": "Devices",
     "integrations": "Integrations",
     "calendar": "Calendar",

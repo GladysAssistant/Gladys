@@ -463,7 +463,9 @@
         "colorLowLabel": "Farbe unterhalb des unteren Schwellenwerts",
         "colorInRangeLabel": "Farbe zwischen den Schwellenwerten",
         "colorHighLabel": "Farbe oberhalb des oberen Schwellenwerts",
-        "thresholdsLegendLabel": "Schwellenwerte:"
+        "thresholdsLegendLabel": "Schwellenwerte:",
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Name auf dem Dashboard angezeigt"
       },
       "scene": {
         "editNameLabel": "Widget-Name (optional)",
@@ -4007,6 +4009,50 @@
           "5": "Komfort"
         }
       },
+      "shutter": {
+        "state": {
+          "-1": "Geschlossen",
+          "0": "Gestoppt",
+          "1": "Geöffnet"
+        }
+      },
+      "curtain": {
+        "state": {
+          "-1": "Geschlossen",
+          "0": "Gestoppt",
+          "1": "Geöffnet"
+        }
+      },
+      "lock": {
+        "state": {
+          "0": "Entriegelt",
+          "1": "Verriegelt",
+          "2": "Aktivität",
+          "3": "Fehler"
+        }
+      },
+      "air-conditioning": {
+        "mode": {
+          "0": "Automatisch",
+          "1": "Kühlen",
+          "2": "Heizen",
+          "3": "Entfeuchten",
+          "4": "Lüften"
+        }
+      },
+      "siren": {
+        "lmh_volume": {
+          "0": "Niedrig",
+          "1": "Mittel",
+          "2": "Hoch"
+        }
+      },
+      "music": {
+        "playback_state": {
+          "0": "Pausiert",
+          "1": "Wird abgespielt"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Kein Wert empfangen",
@@ -4394,6 +4440,7 @@
       "binary": "Schalter",
       "power": "Leistung",
       "energy": "Energie",
+      "export-index": "Einspeiseindex",
       "index": "Index",
       "index-today": "Index heute",
       "index-yesterday": "Index gestern",
@@ -4645,10 +4692,76 @@
       "upsellFeature3": "Open-Weight-KI-Modelle in Frankreich gehostet"
     }
   },
+  "history": {
+    "title": "Aktivität",
+    "subtitle": "Verfolgen Sie alles, was in Ihrem Zuhause passiert – in Echtzeit.",
+    "live": "Live",
+    "jumpToDate": "Zu einem Datum springen",
+    "browsingPast": "Sie sehen den Verlauf vom {{date}}.",
+    "backToLive": "Zurück zu Live",
+    "allRooms": "Alle Räume",
+    "searchPlaceholder": "Gerät suchen",
+    "loadMore": "Mehr laden",
+    "newEvents": {
+      "one": "1 neues Ereignis",
+      "other": "{{count}} neue Ereignisse"
+    },
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "emptyTitle": "Keine Aktivität vorhanden",
+    "emptyText": "Ereignisse Ihrer Geräte erscheinen hier in Echtzeit. Wenn diese Liste leer bleibt, prüfen Sie, ob der Verlauf für Ihre Gerätefunktionen aktiviert ist.",
+    "error": "Beim Laden des Aktivitätsverlaufs ist ein Fehler aufgetreten.",
+    "groups": {
+      "all": "Alle",
+      "openings": "Öffnungen",
+      "motion": "Bewegung & Anwesenheit",
+      "buttons": "Tasten & Fernbedienungen",
+      "lights": "Lichter & Steckdosen",
+      "climate": "Klima & Umgebung",
+      "security": "Sicherheit",
+      "energy": "Energie",
+      "other": "Sonstiges"
+    },
+    "values": {
+      "motion-sensor": {
+        "0": "Keine Bewegung mehr",
+        "1": "Bewegung erkannt"
+      },
+      "presence-sensor": {
+        "0": "Abwesend",
+        "1": "Anwesenheit erkannt"
+      },
+      "smoke-sensor": {
+        "0": "Kein Rauch mehr erkannt",
+        "1": "Rauch erkannt!"
+      },
+      "leak-sensor": {
+        "0": "Kein Leck mehr erkannt",
+        "1": "Wasserleck erkannt!"
+      },
+      "vibration-sensor": {
+        "0": "Keine Vibration mehr",
+        "1": "Vibration erkannt"
+      },
+      "light": {
+        "0": "Ausgeschaltet",
+        "1": "Eingeschaltet"
+      },
+      "switch": {
+        "0": "Ausgeschaltet",
+        "1": "Eingeschaltet"
+      },
+      "lock": {
+        "0": "Entriegelt",
+        "1": "Verriegelt"
+      }
+    }
+  },
   "header": {
     "gladysAssistant": "Gladys Assistant",
     "home": "Startseite",
     "chat": "Chat",
+    "history": "Aktivität",
     "devices": "Geräte",
     "integrations": "Integrationen",
     "calendar": "Kalender",

@@ -1,0 +1,631 @@
+{
+  "id": "smart-meter-device-id",
+  "name": "Production solaire",
+  "selector": "tuya-bf8a5bf8acc4540a41rere",
+  "product_name": "Smart Meter",
+  "model": "Smart Meter",
+  "external_id": "tuya:bf8a5bf8acc4540a41rere",
+  "service_id": "966ff9b2-7d5d-4c88-aa54-80c406d5743d",
+  "product_id": "bbcg1hrkrj5rifsd",
+  "product_key": null,
+  "online": true,
+  "protocol_version": "3.3",
+  "local_key": "local-key",
+  "ip": "10.0.0.20",
+  "cloud_ip": "82.0.0.10",
+  "local_override": true,
+  "specifications": {},
+  "properties": {
+    "properties": [
+      {
+        "code": "power_a",
+        "dp_id": 101,
+        "type": "value",
+        "value": 706
+      },
+      {
+        "code": "direction_a",
+        "dp_id": 102,
+        "type": "enum",
+        "value": "FORWARD"
+      },
+      {
+        "code": "tbd",
+        "dp_id": 103,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "direction_b",
+        "dp_id": 104,
+        "type": "enum",
+        "value": "REVERSE"
+      },
+      {
+        "code": "power_b",
+        "dp_id": 105,
+        "type": "value",
+        "value": 0
+      },
+      {
+        "code": "energy_forword_a",
+        "dp_id": 106,
+        "type": "value",
+        "value": 149241
+      },
+      {
+        "code": "energy_reverse_a",
+        "dp_id": 107,
+        "type": "value",
+        "value": 43222
+      },
+      {
+        "code": "energy_forword_b",
+        "dp_id": 108,
+        "type": "value",
+        "value": 0
+      },
+      {
+        "code": "energy_reserse_b",
+        "dp_id": 109,
+        "type": "value",
+        "value": 0
+      },
+      {
+        "code": "power_factor",
+        "dp_id": 110,
+        "type": "value",
+        "value": 73
+      },
+      {
+        "code": "freq",
+        "dp_id": 111,
+        "type": "value",
+        "value": 4927
+      },
+      {
+        "code": "voltage_a",
+        "dp_id": 112,
+        "type": "value",
+        "value": 2352
+      },
+      {
+        "code": "current_a",
+        "dp_id": 113,
+        "type": "value",
+        "value": 410
+      },
+      {
+        "code": "current_b",
+        "dp_id": 114,
+        "type": "value",
+        "value": 0
+      },
+      {
+        "code": "total_power",
+        "dp_id": 115,
+        "type": "value",
+        "value": 706
+      },
+      {
+        "code": "voltage_coef",
+        "dp_id": 116,
+        "type": "value",
+        "value": 1000
+      },
+      {
+        "code": "current_a_calibration",
+        "dp_id": 117,
+        "type": "value",
+        "value": 1000
+      },
+      {
+        "code": "power_a_calibration",
+        "dp_id": 118,
+        "type": "value",
+        "value": 1000
+      },
+      {
+        "code": "energy_a_calibration_fwd",
+        "dp_id": 119,
+        "type": "value",
+        "value": 1000
+      },
+      {
+        "code": "coef_a_reset",
+        "dp_id": 120,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "power_factor_b",
+        "dp_id": 121,
+        "type": "value",
+        "value": 100
+      },
+      {
+        "code": "freq_calibration",
+        "dp_id": 122,
+        "type": "value",
+        "value": 1000
+      },
+      {
+        "code": "current_b_calibration",
+        "dp_id": 123,
+        "type": "value",
+        "value": 1000
+      },
+      {
+        "code": "power_b_calibration",
+        "dp_id": 124,
+        "type": "value",
+        "value": 1000
+      },
+      {
+        "code": "energy_b_calibration_fwd",
+        "dp_id": 125,
+        "type": "value",
+        "value": 1000
+      },
+      {
+        "code": "coef_b_reset",
+        "dp_id": 126,
+        "type": "bool",
+        "value": false
+      },
+      {
+        "code": "energy_a_calibration_rev",
+        "dp_id": 127,
+        "type": "value",
+        "value": 1000
+      },
+      {
+        "code": "energy_b_calibration_rev",
+        "dp_id": 128,
+        "type": "value",
+        "value": 1000
+      },
+      {
+        "code": "report_rate_control",
+        "dp_id": 129,
+        "type": "value",
+        "value": 10
+      },
+      {
+        "code": "forward_energy_total",
+        "dp_id": 130,
+        "type": "value",
+        "value": 149241
+      },
+      {
+        "code": "reverse_energy_total",
+        "dp_id": 131,
+        "type": "value",
+        "value": 43222
+      }
+    ]
+  },
+  "thing_model": {
+    "modelId": "flu1ic",
+    "services": [
+      {
+        "actions": [],
+        "code": "",
+        "description": "",
+        "events": [],
+        "name": "默认服务",
+        "properties": [
+          {
+            "accessMode": "ro",
+            "code": "power_a",
+            "name": "Power_a",
+            "typeSpec": {
+              "type": "value",
+              "max": 600000,
+              "min": 0,
+              "scale": 1,
+              "step": 1,
+              "unit": "W"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "direction_a",
+            "name": "Current_Flow_A",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["FORWARD", "REVERSE"]
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "tbd",
+            "name": "TBD",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "direction_b",
+            "name": "Current_FLow_B",
+            "typeSpec": {
+              "type": "enum",
+              "range": ["FORWARD", "REVERSE"]
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "power_b",
+            "name": "Power_b",
+            "typeSpec": {
+              "type": "value",
+              "max": 600000,
+              "min": 0,
+              "scale": 1,
+              "step": 1,
+              "unit": "W"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "energy_forword_a",
+            "name": "Forward Energy-A",
+            "typeSpec": {
+              "type": "value",
+              "max": 99999999,
+              "min": 0,
+              "scale": 2,
+              "step": 1,
+              "unit": "KWH"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "energy_reverse_a",
+            "name": "Reverse Energy-A",
+            "typeSpec": {
+              "type": "value",
+              "max": 99999999,
+              "min": 0,
+              "scale": 2,
+              "step": 1,
+              "unit": "KWH"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "energy_forword_b",
+            "name": "Forward Energy-B",
+            "typeSpec": {
+              "type": "value",
+              "max": 99999999,
+              "min": 0,
+              "scale": 2,
+              "step": 1,
+              "unit": "KWH"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "energy_reserse_b",
+            "name": "Reverse Energy-B",
+            "typeSpec": {
+              "type": "value",
+              "max": 99999999,
+              "min": 0,
+              "scale": 2,
+              "step": 1,
+              "unit": "KWH"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "power_factor",
+            "name": "Power_factor",
+            "typeSpec": {
+              "type": "value",
+              "max": 100,
+              "min": 0,
+              "scale": 2,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "freq",
+            "name": "AC_Freq",
+            "typeSpec": {
+              "type": "value",
+              "max": 10000,
+              "min": 0,
+              "scale": 2,
+              "step": 1,
+              "unit": "Hz"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "voltage_a",
+            "name": "Voltage",
+            "typeSpec": {
+              "type": "value",
+              "max": 28000,
+              "min": 0,
+              "scale": 1,
+              "step": 1,
+              "unit": "V"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "current_a",
+            "name": "Current_a",
+            "typeSpec": {
+              "type": "value",
+              "max": 1000000,
+              "min": 0,
+              "scale": 0,
+              "step": 1,
+              "unit": "mA"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "current_b",
+            "name": "Current_b",
+            "typeSpec": {
+              "type": "value",
+              "max": 1000000,
+              "min": 0,
+              "scale": 0,
+              "step": 1,
+              "unit": "mA"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "total_power",
+            "name": " Total_Power",
+            "typeSpec": {
+              "type": "value",
+              "max": 99999999,
+              "min": -99999999,
+              "scale": 1,
+              "step": 1,
+              "unit": "W"
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "voltage_coef",
+            "name": "电压校准",
+            "typeSpec": {
+              "type": "value",
+              "max": 1200,
+              "min": 800,
+              "scale": 3,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "current_a_calibration",
+            "name": "current_a_calibration",
+            "typeSpec": {
+              "type": "value",
+              "max": 1200,
+              "min": 800,
+              "scale": 3,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "power_a_calibration",
+            "name": "power_a_calibration",
+            "typeSpec": {
+              "type": "value",
+              "max": 1200,
+              "min": 800,
+              "scale": 3,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "energy_a_calibration_fwd",
+            "name": "energy_a_calibration_fwd",
+            "typeSpec": {
+              "type": "value",
+              "max": 1200,
+              "min": 800,
+              "scale": 3,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "wr",
+            "code": "coef_a_reset",
+            "name": "coef_a_reset",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "power_factor_b",
+            "name": "Power_factor_b",
+            "typeSpec": {
+              "type": "value",
+              "max": 100,
+              "min": 0,
+              "scale": 2,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "freq_calibration",
+            "name": "频率校准",
+            "typeSpec": {
+              "type": "value",
+              "max": 1200,
+              "min": 800,
+              "scale": 3,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "current_b_calibration",
+            "name": "current_b_calibration",
+            "typeSpec": {
+              "type": "value",
+              "max": 1200,
+              "min": 800,
+              "scale": 3,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "power_b_calibration",
+            "name": "power_b_calibration",
+            "typeSpec": {
+              "type": "value",
+              "max": 1200,
+              "min": 800,
+              "scale": 3,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "energy_b_calibration_fwd",
+            "name": "energy_b_calibration_fwd",
+            "typeSpec": {
+              "type": "value",
+              "max": 1200,
+              "min": 800,
+              "scale": 3,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "wr",
+            "code": "coef_b_reset",
+            "name": "coef_b_reset",
+            "typeSpec": {
+              "type": "bool"
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "energy_a_calibration_rev",
+            "name": "energy_a_calibration_rev",
+            "typeSpec": {
+              "type": "value",
+              "max": 1200,
+              "min": 800,
+              "scale": 3,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "energy_b_calibration_rev",
+            "name": "energy_b_calibration_rev",
+            "typeSpec": {
+              "type": "value",
+              "max": 1200,
+              "min": 800,
+              "scale": 3,
+              "step": 1,
+              "unit": ""
+            }
+          },
+          {
+            "accessMode": "rw",
+            "code": "report_rate_control",
+            "name": "上报频率",
+            "typeSpec": {
+              "type": "value",
+              "max": 60,
+              "min": 3,
+              "scale": 0,
+              "step": 1,
+              "unit": "s"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "forward_energy_total",
+            "name": "forward_energy_total",
+            "typeSpec": {
+              "type": "value",
+              "max": 99999999,
+              "min": 0,
+              "scale": 2,
+              "step": 1,
+              "unit": "KWH"
+            }
+          },
+          {
+            "accessMode": "ro",
+            "code": "reverse_energy_total",
+            "name": "reverse_energy_total",
+            "typeSpec": {
+              "type": "value",
+              "max": 99999999,
+              "min": 0,
+              "scale": 2,
+              "step": 1,
+              "unit": "KWH"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "features": [],
+  "params": [
+    {
+      "name": "DEVICE_ID",
+      "value": "bf8a5bf8acc4540a41rere"
+    },
+    {
+      "name": "LOCAL_KEY",
+      "value": "***"
+    },
+    {
+      "name": "CLOUD_IP",
+      "value": "62.x.x.x"
+    },
+    {
+      "name": "LOCAL_OVERRIDE",
+      "value": true
+    },
+    {
+      "name": "PRODUCT_ID",
+      "value": "bbcg1hrkrj5rifsd"
+    }
+  ],
+  "local_poll": {
+    "status": null,
+    "error": null,
+    "protocol": null,
+    "dps": null
+  }
+}
