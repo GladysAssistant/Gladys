@@ -53,7 +53,8 @@ export default defineConfig(({ mode }) => {
     preact(),
     viteStaticCopy({
       targets: [
-        { src: 'src/assets', dest: 'assets' },
+        // Copy static asset contents into build/assets/ (not build/assets/assets/).
+        { src: 'src/assets/**/*', dest: 'assets' },
         { src: 'src/manifest.json', dest: '.' }
       ]
     })
