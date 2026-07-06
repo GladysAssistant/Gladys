@@ -144,6 +144,23 @@ describe('gateway.forwardMessageToAiChat', () => {
     expect(aiChat.getCall(0).args[0]).to.not.have.property('model');
   });
 
+  it('should ignore invalid selected model and fallback to auto', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.resolves({
+      choices: [{ message: { content: 'OK' } }],
+    });
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+
+    await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message: { text: 'Turn on the light', model: 'not-a-valid-model' },
+      previousQuestions: [],
+      context: {},
+    });
+
+    expect(aiChat.getCall(0).args[0]).to.not.have.property('model');
+  });
+
   it('should execute tool calls locally and return final assistant answer', async () => {
     const toolCb = fake.resolves({
       content: [{ type: 'text', text: 'tool-result: done' }],
