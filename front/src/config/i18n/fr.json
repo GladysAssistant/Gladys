@@ -4599,6 +4599,10 @@
       "statusError": "Erreur",
       "showDetails": "Afficher les détails",
       "hideDetails": "Masquer les détails"
+    },
+    "modelSelector": {
+      "label": "Modèle IA",
+      "auto": "Auto"
     }
   },
   "history": {

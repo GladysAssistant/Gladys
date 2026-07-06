@@ -318,6 +318,25 @@
   flex-shrink: 0;
 }
 
+.modelSelectorWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.modelSelectorLabel {
+  margin: 0;
+  font-size: 13px;
+  color: #6c7a89;
+  white-space: nowrap;
+}
+
+.modelSelector {
+  max-width: 100%;
+  font-size: 13px;
+}
+
 .composerInputWrap {
   position: relative;
 }

@@ -110,6 +110,40 @@ describe('gateway.forwardMessageToAiChat', () => {
     expect(systemMessage.content).to.include('Current date and time (America/Toronto):');
   });
 
+  it('should forward a selected model to the AI gateway', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.resolves({
+      choices: [{ message: { content: 'OK' } }],
+    });
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+
+    await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message: { text: 'Turn on the light', model: 'gpt-oss-120b' },
+      previousQuestions: [],
+      context: {},
+    });
+
+    expect(aiChat.getCall(0).args[0].model).to.equal('gpt-oss-120b');
+  });
+
+  it('should omit model from the AI gateway request when auto is selected', async () => {
+    const { forwardMessageToAiChat } = getModule({ tools: [] });
+    const aiChat = fake.resolves({
+      choices: [{ message: { content: 'OK' } }],
+    });
+    const reply = fake.resolves(null);
+    const replyByIntent = fake.resolves(null);
+
+    await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
+      message: { text: 'Turn on the light' },
+      previousQuestions: [],
+      context: {},
+    });
+
+    expect(aiChat.getCall(0).args[0]).to.not.have.property('model');
+  });
+
   it('should execute tool calls locally and return final assistant answer', async () => {
     const toolCb = fake.resolves({
       content: [{ type: 'text', text: 'tool-result: done' }],

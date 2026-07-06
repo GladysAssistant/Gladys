@@ -4599,6 +4599,10 @@
       "statusError": "Error",
       "showDetails": "Show details",
       "hideDetails": "Hide details"
+    },
+    "modelSelector": {
+      "label": "AI model",
+      "auto": "Auto"
     }
   },
   "history": {

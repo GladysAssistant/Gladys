@@ -10,6 +10,7 @@ const { Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
 const { exchangesToApiMessages } = require('../message/message.getPreviousQuestionsForUser');
+const { resolveAiChatModel } = require('../../utils/aiChatModels');
 
 const MAX_TOOL_CALL_ITERATIONS = 5;
 const MAX_TOOL_RESULT_CHARS = 4000;
@@ -405,15 +406,23 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     let lastSceneCreateErrorText = null;
     let sceneCreateSuccessCount = 0;
     let toolIterations = 0;
+    const selectedModel = resolveAiChatModel(message?.model);
+    if (message?.model && selectedModel === null) {
+      logger.warn(`[AI_CHAT] Ignoring invalid model=${message.model}`);
+    }
     // eslint-disable-next-line no-restricted-syntax
     for (let iteration = 0; iteration < MAX_TOOL_CALL_ITERATIONS; iteration += 1) {
       logger.debug(`[AI_CHAT] API call iteration=${iteration + 1}/${MAX_TOOL_CALL_ITERATIONS}`);
-      // eslint-disable-next-line no-await-in-loop
-      const apiResponse = await this.aiChat({
+      const aiChatRequest = {
         messages: messagesForApi,
         tools: toolsForApi,
         tool_choice: 'auto',
-      });
+      };
+      if (selectedModel) {
+        aiChatRequest.model = selectedModel;
+      }
+      // eslint-disable-next-line no-await-in-loop
+      const apiResponse = await this.aiChat(aiChatRequest);
 
       assistantMessage = extractAssistantMessage(apiResponse);
       const toolCalls = assistantMessage?.tool_calls ?? [];

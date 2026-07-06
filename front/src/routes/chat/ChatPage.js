@@ -1,16 +1,17 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { connect } from 'unistore/preact';
 import actions from '../../actions/message';
 import { RequestStatus } from '../../utils/consts';
 import ChatItems from './ChatItems';
 import EmptyChat from './EmptyChat';
 import ChatSidebar from './ChatSidebar';
+import AiModelSelector from './AiModelSelector';
 import style from './style.css';
 
 const IntegrationPage = connect(
-  'user,messages,currentMessageTextInput,gladysIsTyping,MessageGetStatus',
+  'user,messages,currentMessageTextInput,gladysIsTyping,MessageGetStatus,httpClient',
   actions
 )(
   ({
@@ -21,10 +22,25 @@ const IntegrationPage = connect(
     updateMessageTextInput,
     onKeyPress,
     sendMessage,
-    gladysIsTyping
+    gladysIsTyping,
+    httpClient
   }) => {
     const textareaRef = useRef(null);
+    const [selectedModel, setSelectedModel] = useState('auto');
+    const [gladysPlusConfigured, setGladysPlusConfigured] = useState(null);
     const hasMessageToSend = Boolean(currentMessageTextInput && currentMessageTextInput.trim().length > 0);
+
+    useEffect(() => {
+      const fetchGatewayStatus = async () => {
+        try {
+          const gatewayStatus = await httpClient.get('/api/v1/gateway/status');
+          setGladysPlusConfigured(gatewayStatus.configured === true);
+        } catch (e) {
+          setGladysPlusConfigured(false);
+        }
+      };
+      fetchGatewayStatus();
+    }, [httpClient]);
 
     const resizeComposerInput = () => {
       if (!textareaRef.current) {
@@ -45,6 +61,19 @@ const IntegrationPage = connect(
     const onComposerInput = e => {
       updateMessageTextInput(e);
       resizeComposerInput();
+    };
+
+    const handleSendMessage = () => {
+      sendMessage(selectedModel);
+    };
+
+    const handleKeyPress = e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage(selectedModel);
+        return;
+      }
+      onKeyPress(e);
     };
 
     useEffect(() => {
@@ -75,6 +104,9 @@ const IntegrationPage = connect(
                           )}
                         </div>
                         <div class={cx('card-footer', style.chatComposer)}>
+                          {gladysPlusConfigured === true && (
+                            <AiModelSelector value={selectedModel} onChange={setSelectedModel} />
+                          )}
                           <div class={style.composerInputWrap}>
                             <Localizer>
                               <textarea
@@ -84,7 +116,7 @@ const IntegrationPage = connect(
                                 placeholder={<Text id="chat.messagePlaceholder" />}
                                 value={currentMessageTextInput}
                                 onInput={onComposerInput}
-                                onKeyPress={onKeyPress}
+                                onKeyPress={handleKeyPress}
                               />
                             </Localizer>
                             <button
@@ -93,7 +125,7 @@ const IntegrationPage = connect(
                                 [style.sendButtonActive]: hasMessageToSend,
                                 [style.sendButtonIdle]: !hasMessageToSend
                               })}
-                              onClick={sendMessage}
+                              onClick={handleSendMessage}
                               disabled={!hasMessageToSend}
                             >
                               <i class="fe fe-send" />
