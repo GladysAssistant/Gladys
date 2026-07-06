@@ -273,6 +273,19 @@ describe('Broadlink edit remote - learn all', () => {
     });
 
     it('Cancel capture mode', () => {
+      const serverUrl = Cypress.env('serverUrl');
+      // The learn-all countdown can re-trigger a learn POST at any time:
+      // keep it stubbed so a real server error does not re-render the panel.
+      cy.intercept(
+        {
+          method: 'POST',
+          url: `${serverUrl}/api/v1/service/broadlink/learn`
+        },
+        { learn: true }
+      );
+
+      // Let pending re-renders settle, then re-query so the click targets an attached node.
+      cy.contains('button', 'integration.broadlink.setup.cancelLearnModeButton').should('be.visible');
       cy.contains('button', 'integration.broadlink.setup.cancelLearnModeButton').click();
 
       cy.contains('button', 'integration.broadlink.setup.testLabel').should('not.be.disabled');
