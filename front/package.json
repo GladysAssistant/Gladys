@@ -18,7 +18,8 @@
     "compare-translations": "comparejson -e ./src/config/i18n/*.json && node ./cli/check_translations.js",
     "prettier-check": "prettier --check '**/*.js' '**/*.jsx' '**/*.json'",
     "prettier": "prettier --write '**/*.js' '**/*.jsx' '**/*.json'",
-    "start:cypress": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 npm start",
+    "start:cypress": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 npm run build && sirv build --port 1444 --cors --single",
+    "start:cypress:dev": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 npm start",
     "cypress:open": "cypress open --config-file cypress/cypress.config.js",
     "cypress:run": "cypress run --config-file cypress/cypress.config.js"
   },

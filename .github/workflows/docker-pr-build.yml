@@ -119,6 +119,8 @@ jobs:
           install: false
           start: npm run start:cypress
           wait-on: 'http://localhost:1444'
+          # The front is now built (Vite) before being served: leave enough time
+          wait-on-timeout: 300
           config-file: ./front/cypress/cypress.config.js
           project: ./front
           command: npm run cypress:run
