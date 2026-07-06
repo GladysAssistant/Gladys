@@ -3,7 +3,7 @@ import cx from 'classnames';
 import get from 'get-value';
 import dayjs from 'dayjs';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../server/utils/constants';
+import { DEVICE_FEATURE_TYPES } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import { getGroupOfCategory } from './categoryGroups';
 import style from './style.css';
@@ -22,15 +22,7 @@ const EventValue = ({ event, intl }) => {
   const value = event.value;
   const dictionary = get(intl, 'dictionary', { default: {} });
 
-  // Button clicks have their own translations ("Simple click", "Double click"...)
-  if (category === DEVICE_FEATURE_CATEGORIES.BUTTON && type === DEVICE_FEATURE_TYPES.BUTTON.CLICK) {
-    const buttonText = get(dictionary, `deviceFeatureValue.category.button.click.${value}`);
-    if (buttonText) {
-      return <Text id={`deviceFeatureValue.category.button.click.${value}`} />;
-    }
-    return <Text id="deviceFeatureValue.category.button.click.unknown" fields={{ value }} />;
-  }
-
+  // Binary/push sensors: "Opened"/"Closed", "Motion detected"...
   if (BINARY_TYPES.includes(type)) {
     const binaryValue = value ? 1 : 0;
     // History-specific wording first ("Motion detected"...)
@@ -44,6 +36,20 @@ const EventValue = ({ event, intl }) => {
       return <Text id={`deviceFeatureValue.category.${category}.binary`} plural={binaryValue} />;
     }
     return <Text id="deviceFeatureValue.type.binary" plural={binaryValue} />;
+  }
+
+  // Enumerated/state values, translated with the same convention as the rest of the
+  // app: deviceFeatureValue.category.<category>.<type>.<value>. This covers button
+  // clicks, shutter/curtain/lock states, fan/AC/heater modes, vacuum states, etc.,
+  // so we display the action name ("Open", "Double click") instead of the raw integer.
+  const valueMap = get(dictionary, `deviceFeatureValue.category.${category}.${type}`);
+  if (valueMap && typeof valueMap === 'object') {
+    if (valueMap[`${value}`] !== undefined) {
+      return <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`} />;
+    }
+    if (valueMap.unknown !== undefined) {
+      return <Text id={`deviceFeatureValue.category.${category}.${type}.unknown`} fields={{ value }} />;
+    }
   }
 
   return (

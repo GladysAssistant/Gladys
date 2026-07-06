@@ -3916,6 +3916,28 @@
           "5": "Comfort"
         }
       },
+      "shutter": {
+        "state": {
+          "-1": "Closed",
+          "0": "Stopped",
+          "1": "Open"
+        }
+      },
+      "curtain": {
+        "state": {
+          "-1": "Closed",
+          "0": "Stopped",
+          "1": "Open"
+        }
+      },
+      "lock": {
+        "state": {
+          "0": "Unlocked",
+          "1": "Locked",
+          "2": "Activity",
+          "3": "Error"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "No value received",
