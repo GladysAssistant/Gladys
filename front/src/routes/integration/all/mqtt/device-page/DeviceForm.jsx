@@ -72,11 +72,7 @@ class MqttDeviceForm extends Component {
           <label class="form-label" for="room">
             <Text id="integration.mqtt.device.roomLabel" />
           </label>
-          <select
-            onChange={this.updateRoom}
-            class={cx('form-control', { 'is-invalid': roomErrored })}
-            id="room"
-          >
+          <select onChange={this.updateRoom} class={cx('form-control', { 'is-invalid': roomErrored })} id="room">
             <option value="">
               <Text id="global.emptySelectOption" />
             </option>

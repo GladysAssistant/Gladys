@@ -66,41 +66,41 @@ const FeatureTab = ({ children, ...props }) => (
               {props.validationErrors &&
                 props.validationErrors.errorItems &&
                 props.validationErrors.errorItems.length > 0 && (
-                <ul class={style.validationErrorList}>
-                  {props.validationErrors.errorItems.map((item, index) => {
-                    const fieldLabel = getValidationFieldLabel(props.intl, item.field);
-                    const message = getValidationFieldMessage(
-                      props.intl,
-                      item.field,
-                      item.property && item.property.message
-                    );
+                  <ul class={style.validationErrorList}>
+                    {props.validationErrors.errorItems.map((item, index) => {
+                      const fieldLabel = getValidationFieldLabel(props.intl, item.field);
+                      const message = getValidationFieldMessage(
+                        props.intl,
+                        item.field,
+                        item.property && item.property.message
+                      );
 
-                    if (item.scope === 'device') {
+                      if (item.scope === 'device') {
+                        return (
+                          <li key={`device-${item.field}-${index}`}>
+                            <Text
+                              id="integration.mqtt.device.validationErrorDevice"
+                              fields={{ field: fieldLabel, message }}
+                            />
+                          </li>
+                        );
+                      }
+
                       return (
-                        <li key={`device-${item.field}-${index}`}>
+                        <li key={`feature-${item.featureIndex}-${item.field}-${index}`}>
                           <Text
-                            id="integration.mqtt.device.validationErrorDevice"
-                            fields={{ field: fieldLabel, message }}
+                            id="integration.mqtt.device.validationErrorFeature"
+                            fields={{
+                              featureName: getFeatureDisplayName(props.intl, item.feature),
+                              field: fieldLabel,
+                              message
+                            }}
                           />
                         </li>
                       );
-                    }
-
-                    return (
-                      <li key={`feature-${item.featureIndex}-${item.field}-${index}`}>
-                        <Text
-                          id="integration.mqtt.device.validationErrorFeature"
-                          fields={{
-                            featureName: getFeatureDisplayName(props.intl, item.feature),
-                            field: fieldLabel,
-                            message
-                          }}
-                        />
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
+                    })}
+                  </ul>
+                )}
             </div>
           )}
           {props.saveStatus === RequestStatus.ConflictError && (

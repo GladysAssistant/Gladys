@@ -205,7 +205,8 @@ class MqttDeviceSetupPage extends Component {
         name: { $set: value }
       });
 
-      const stateUpdate = { device, validationErrors };
+      let nextValidationErrors = validationErrors;
+      const stateUpdate = { device, validationErrors: nextValidationErrors };
 
       if (!this.state.device.created_at && !this.state.deviceExternalIdCustomized) {
         const slug = slugify(value, false);
@@ -229,6 +230,8 @@ class MqttDeviceSetupPage extends Component {
           });
           stateUpdate.device = device;
         }
+        nextValidationErrors = clearMqttDeviceValidationError(nextValidationErrors, 'external_id');
+        stateUpdate.validationErrors = nextValidationErrors;
       }
 
       this.setState(stateUpdate);
@@ -318,7 +321,8 @@ class MqttDeviceSetupPage extends Component {
         }
       });
 
-      const stateUpdate = { device, validationErrors };
+      let nextValidationErrors = validationErrors;
+      const stateUpdate = { device, validationErrors: nextValidationErrors };
 
       if (!this.state.customizedFeatureExternalIds[feature.id]) {
         const slug = slugify(value, false);
@@ -353,6 +357,8 @@ class MqttDeviceSetupPage extends Component {
           stateUpdate.featureExternalIdSuffixes = featureExternalIdSuffixes;
         }
         stateUpdate.device = device;
+        nextValidationErrors = clearMqttDeviceValidationError(nextValidationErrors, 'external_id', featureIndex);
+        stateUpdate.validationErrors = nextValidationErrors;
       }
 
       this.setState(stateUpdate);

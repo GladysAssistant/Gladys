@@ -1,9 +1,6 @@
 import cx from 'classnames';
 import { Text } from 'preact-i18n';
-import {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES
-} from '../../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../../server/utils/constants';
 import DeviceRow from '../../../../../../components/boxs/device-in-room/DeviceRow';
 import BatteryLevelFeature from '../../../../../../components/boxs/device-in-room/device-features/sensor-value/BatteryLevelFeature';
 import SignalQualityDeviceValue from '../../../../../../components/boxs/device-in-room/device-features/sensor-value/SignalQualityDeviceValue';
