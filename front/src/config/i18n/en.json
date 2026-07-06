@@ -1571,6 +1571,11 @@
         "closeButton": "Close catalog",
         "previewLabel": "Dashboard preview",
         "cameraPreviewNotice": "This feature is displayed in the Camera dashboard widget, not in the device list.",
+        "previewValues": {
+          "cube": {
+            "mode": "Rotation (Xiaomi Cube gesture)"
+          }
+        },
         "noResults": "No features match your search.",
         "noFeaturesYet": "No features added yet. Use the button below to browse the catalog.",
         "sensorBadge": "Sensor",

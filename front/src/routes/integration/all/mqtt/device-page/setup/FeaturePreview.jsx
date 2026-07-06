@@ -1,9 +1,11 @@
 import cx from 'classnames';
+import { Text } from 'preact-i18n';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
 import DeviceRow from '../../../../../../components/boxs/device-in-room/DeviceRow';
 import CameraFeaturePreview from './CameraFeaturePreview';
 import style from '../style.css';
 import {
+  getCatalogPreviewLabelKey,
   getFeatureDefaultValues,
   getFeaturePreviewValue,
   getFeaturePreviewStringValue,
@@ -15,6 +17,27 @@ const FeaturePreview = ({ category, type, label, intl, user }) => {
     return (
       <div class={cx(style.featurePreview, style.cameraFeaturePreviewWrapper, 'dark-mode-no-invert')}>
         <CameraFeaturePreview label={label} />
+      </div>
+    );
+  }
+
+  const previewLabelKey = getCatalogPreviewLabelKey(category, type);
+
+  if (previewLabelKey) {
+    return (
+      <div class={cx(style.featurePreview, 'dark-mode-no-invert')}>
+        <div class="table-responsive">
+          <table class="table card-table table-vcenter table-sm mb-0">
+            <tbody>
+              <tr>
+                <td>{label}</td>
+                <td class="text-right">
+                  <Text id={previewLabelKey} />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   }
