@@ -407,6 +407,40 @@ const applyDefaultUnit = (defaults, category, type) => {
   return { ...defaults, unit };
 };
 
+const TELEVISION_CONTINUOUS_CONTROL_TYPES = new Set([
+  DEVICE_FEATURE_TYPES.TELEVISION.BINARY,
+  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
+  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL
+]);
+
+export const isCatalogPushButtonFeature = (category, type) => {
+  if (category === DEVICE_FEATURE_CATEGORIES.BUTTON && type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
+    return true;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.TELEVISION) {
+    return !TELEVISION_CONTINUOUS_CONTROL_TYPES.has(type);
+  }
+
+  return false;
+};
+
+export const getCatalogPreviewMode = (category, type) => {
+  if (isCatalogPushButtonFeature(category, type)) {
+    return 'push-button';
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.LOCK && type === DEVICE_FEATURE_TYPES.LOCK.INTEGER) {
+    return 'lock-battery';
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.SIGNAL) {
+    return 'signal-quality';
+  }
+
+  return 'device-row';
+};
+
 export const getFeatureDefaultValues = (category, type) => {
   const defaults = {
     read_only: isSensorCategory(category),
@@ -424,6 +458,14 @@ export const getFeatureDefaultValues = (category, type) => {
       category,
       type
     );
+  }
+
+  if (isCatalogPushButtonFeature(category, type)) {
+    return { ...defaults, min: 1, max: 1, read_only: false, keep_history: false };
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.SIGNAL) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: true }, category, type);
   }
 
   if (type === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
@@ -696,6 +738,14 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR) {
     return 1;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.SIGNAL) {
+    return 85;
+  }
+
+  if (isCatalogPushButtonFeature(category, type)) {
+    return null;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.CURRENCY) {

@@ -422,6 +422,10 @@
   font-size: 0.875rem;
 }
 
+.catalogPushButton {
+  pointer-events: none;
+}
+
 /* Dark mode: avoid inverted pure-black panels from hardcoded white backgrounds */
 :global(.dark-mode) .cameraFeaturePreviewNotice {
   color: rgba(255, 255, 255, 0.55);

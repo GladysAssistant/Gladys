@@ -1,11 +1,19 @@
 import cx from 'classnames';
 import { Text } from 'preact-i18n';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES
+} from '../../../../../../../../server/utils/constants';
 import DeviceRow from '../../../../../../components/boxs/device-in-room/DeviceRow';
+import BatteryLevelFeature from '../../../../../../components/boxs/device-in-room/device-features/sensor-value/BatteryLevelFeature';
+import SignalQualityDeviceValue from '../../../../../../components/boxs/device-in-room/device-features/sensor-value/SignalQualityDeviceValue';
 import CameraFeaturePreview from './CameraFeaturePreview';
+import PushButtonFeaturePreview from './PushButtonFeaturePreview';
+import SensorRowFeaturePreview from './SensorRowFeaturePreview';
 import style from '../style.css';
 import {
   getCatalogPreviewLabelKey,
+  getCatalogPreviewMode,
   getFeatureDefaultValues,
   getFeaturePreviewValue,
   getFeaturePreviewStringValue,
@@ -42,6 +50,7 @@ const FeaturePreview = ({ category, type, label, intl, user }) => {
     );
   }
 
+  const previewMode = getCatalogPreviewMode(category, type);
   const defaults = getFeatureDefaultValues(category, type);
   const previewValue = getFeaturePreviewValue(category, type);
   const previewStringValue = getFeaturePreviewStringValue(category, type);
@@ -69,18 +78,35 @@ const FeaturePreview = ({ category, type, label, intl, user }) => {
       <div class="table-responsive">
         <table class="table card-table table-vcenter table-sm mb-0">
           <tbody>
-            <DeviceRow
-              user={user}
-              x={0}
-              y={0}
-              device={mockDevice}
-              deviceFeature={mockFeature}
-              roomIndex={0}
-              deviceFeatureIndex={0}
-              updateValue={() => {}}
-              updateValueWithDebounce={() => {}}
-              intl={intl}
-            />
+            {previewMode === 'push-button' && <PushButtonFeaturePreview label={label} />}
+            {previewMode === 'lock-battery' && (
+              <SensorRowFeaturePreview
+                label={label}
+                category={DEVICE_FEATURE_CATEGORIES.BATTERY}
+                type={DEVICE_FEATURE_TYPES.BATTERY.INTEGER}
+              >
+                <BatteryLevelFeature deviceFeature={{ last_value: 78 }} />
+              </SensorRowFeaturePreview>
+            )}
+            {previewMode === 'signal-quality' && (
+              <SensorRowFeaturePreview label={label} category={category} type={type}>
+                <SignalQualityDeviceValue deviceFeature={mockFeature} />
+              </SensorRowFeaturePreview>
+            )}
+            {previewMode === 'device-row' && (
+              <DeviceRow
+                user={user}
+                x={0}
+                y={0}
+                device={mockDevice}
+                deviceFeature={mockFeature}
+                roomIndex={0}
+                deviceFeatureIndex={0}
+                updateValue={() => {}}
+                updateValueWithDebounce={() => {}}
+                intl={intl}
+              />
+            )}
           </tbody>
         </table>
       </div>
