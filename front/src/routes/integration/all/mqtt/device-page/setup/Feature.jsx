@@ -366,7 +366,10 @@ class MqttFeatureBoxComponent extends Component {
       this.setState({ isExpanded: true });
     }
 
-    const featureErrors = nextProps.validationErrors?.featureFields?.[this.props.featureIndex];
+    const featureErrors =
+      nextProps.validationErrors &&
+      nextProps.validationErrors.featureFields &&
+      nextProps.validationErrors.featureFields[this.props.featureIndex];
     if (featureErrors) {
       const showAdvancedSettings =
         this.state.showAdvancedSettings || Boolean(featureErrors.min || featureErrors.max);

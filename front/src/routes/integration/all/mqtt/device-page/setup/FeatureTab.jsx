@@ -17,10 +17,10 @@ const getValidationFieldMessage = (intl, field, fallbackMessage) =>
   get(intl.dictionary, `integration.mqtt.device.validationErrors.${field}`, fallbackMessage);
 
 const getFeatureDisplayName = (intl, feature) => {
-  if (feature?.name) {
+  if (feature && feature.name) {
     return feature.name;
   }
-  if (feature?.category && feature?.type) {
+  if (feature && feature.category && feature.type) {
     return get(intl.dictionary, `deviceFeatureCategory.${feature.category}.${feature.type}`, feature.type);
   }
   return '';
@@ -63,14 +63,16 @@ const FeatureTab = ({ children, ...props }) => (
               <strong>
                 <Text id="integration.mqtt.device.validationErrorTitle" />
               </strong>
-              {props.validationErrors?.errorItems?.length > 0 && (
+              {props.validationErrors &&
+                props.validationErrors.errorItems &&
+                props.validationErrors.errorItems.length > 0 && (
                 <ul class={style.validationErrorList}>
                   {props.validationErrors.errorItems.map((item, index) => {
                     const fieldLabel = getValidationFieldLabel(props.intl, item.field);
                     const message = getValidationFieldMessage(
                       props.intl,
                       item.field,
-                      item.property?.message
+                      item.property && item.property.message
                     );
 
                     if (item.scope === 'device') {

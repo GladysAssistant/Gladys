@@ -1053,7 +1053,7 @@ export const parseMqttDeviceValidationErrors = (properties, device) => {
   const featureFields = {};
   const errorItems = [];
 
-  const features = device?.features || [];
+  const features = (device && device.features) || [];
   const errors = (properties || []).filter(property => property && property.attribute && property.attribute !== 'selector');
 
   if (errors.length === 0) {
@@ -1142,7 +1142,7 @@ export const parseMqttDeviceValidationErrors = (properties, device) => {
 
   const seenErrorKeys = new Set();
   const dedupedErrorItems = errorItems.filter(item => {
-    const key = `${item.scope}-${item.featureIndex ?? 'device'}-${item.field}`;
+    const key = `${item.scope}-${item.featureIndex !== undefined && item.featureIndex !== null ? item.featureIndex : 'device'}-${item.field}`;
     if (seenErrorKeys.has(key)) {
       return false;
     }
@@ -1154,11 +1154,16 @@ export const parseMqttDeviceValidationErrors = (properties, device) => {
 };
 
 export const isDeviceFieldErrored = (validationErrors, field) => {
-  return Boolean(validationErrors?.deviceFields?.[field]);
+  return Boolean(validationErrors && validationErrors.deviceFields && validationErrors.deviceFields[field]);
 };
 
 export const isFeatureFieldErrored = (validationErrors, featureIndex, field) => {
-  return Boolean(validationErrors?.featureFields?.[featureIndex]?.[field]);
+  return Boolean(
+    validationErrors &&
+      validationErrors.featureFields &&
+      validationErrors.featureFields[featureIndex] &&
+      validationErrors.featureFields[featureIndex][field]
+  );
 };
 
 export const clearMqttDeviceValidationError = (validationErrors, field, featureIndex) => {
