@@ -9,6 +9,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../.
 const { Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
+const { exchangesToApiMessages } = require('../message/message.getPreviousQuestionsForUser');
 
 const MAX_TOOL_CALL_ITERATIONS = 5;
 const MAX_TOOL_RESULT_CHARS = 4000;
@@ -384,24 +385,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 
     // Build a compact conversation for the model.
     const messagesForApi = [{ role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName) }];
-
-    (previousQuestions ?? []).forEach((exchange) => {
-      if (!exchange) {
-        return;
-      }
-      if (exchange.question) {
-        messagesForApi.push({
-          role: 'user',
-          content: exchange.question,
-        });
-      }
-      if (exchange.answer) {
-        messagesForApi.push({
-          role: 'assistant',
-          content: exchange.answer,
-        });
-      }
-    });
+    messagesForApi.push(...exchangesToApiMessages(previousQuestions));
 
     const userContent = [];
     if (message.text) {
