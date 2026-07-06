@@ -375,11 +375,69 @@ class MqttDeviceSetupPage extends Component {
     });
   }
 
+  buildClientValidationErrors(device) {
+    const properties = [];
+
+    if (!device.name || device.name.trim() === '') {
+      properties.push({
+        message: 'name required',
+        attribute: 'name',
+        value: device.name || null,
+        type: 'notNull Violation'
+      });
+    }
+
+    if (!device.external_id || device.external_id === 'mqtt:') {
+      properties.push({
+        message: 'external_id required',
+        attribute: 'external_id',
+        value: device.external_id || null,
+        type: 'notNull Violation'
+      });
+    }
+
+    (device.features || []).forEach(feature => {
+      if (!feature.name || feature.name.trim() === '') {
+        properties.push({
+          message: 'name required',
+          attribute: 'name',
+          value: feature.name || null,
+          type: 'notNull Violation'
+        });
+      }
+
+      if (!feature.external_id || feature.external_id === 'mqtt:') {
+        properties.push({
+          message: 'external_id required',
+          attribute: 'external_id',
+          value: feature.external_id || null,
+          type: 'notNull Violation'
+        });
+      }
+    });
+
+    return properties;
+  }
+
   async saveDevice() {
     this.setState({
       loading: true,
       validationErrors: null
     });
+
+    const clientValidationErrors = this.buildClientValidationErrors(this.state.device);
+    if (clientValidationErrors.length > 0) {
+      const validationErrors = parseMqttDeviceValidationErrors(clientValidationErrors, this.state.device);
+      await this.setState({
+        saveStatus: RequestStatus.ValidationError,
+        validationErrors,
+        expandedFeatureIndices: validationErrors.expandedFeatureIndices,
+        loading: false
+      });
+      window.scrollTo(0, 0);
+      return;
+    }
+
     try {
       // If we are creating a device, we check that the device doesn't already exist
       if (!this.state.device.id) {
@@ -520,6 +578,7 @@ class MqttDeviceSetupPage extends Component {
         name: '',
         should_poll: false,
         external_id: 'mqtt:',
+        selector: 'mqtt:',
         service_id: this.props.currentIntegration.id,
         features: [],
         params: []

@@ -1048,13 +1048,25 @@ const assignFeatureError = (featureFields, featureIndex, field, property) => {
   featureFields[featureIndex][field] = property;
 };
 
+const normalizeValidationProperty = property => {
+  if (property.attribute === 'selector') {
+    return {
+      ...property,
+      attribute: 'name'
+    };
+  }
+  return property;
+};
+
 export const parseMqttDeviceValidationErrors = (properties, device) => {
   const deviceFields = {};
   const featureFields = {};
   const errorItems = [];
 
   const features = (device && device.features) || [];
-  const errors = (properties || []).filter(property => property && property.attribute && property.attribute !== 'selector');
+  const errors = (properties || [])
+    .filter(property => property && property.attribute)
+    .map(normalizeValidationProperty);
 
   if (errors.length === 0) {
     return { deviceFields, featureFields, errorItems, expandedFeatureIndices: [] };
