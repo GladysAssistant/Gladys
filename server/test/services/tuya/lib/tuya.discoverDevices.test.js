@@ -434,7 +434,11 @@ describe('TuyaHandler.discoverDevices', () => {
           .onCall(1)
           .resolves({
             result: {
-              functions: [{ name: 'mode', code: 'mode', type: 'Enum', values: '{"range":["Standby","Comfort"]}' }],
+              functions: [
+                { name: 'mode', code: 'mode', type: 'Enum', values: '{"range":["Standby","Comfort"]}' },
+                // A feature without supported_options (binary): the comparison must skip it.
+                { name: 'child_lock', code: 'child_lock', type: 'Boolean', values: '{}' },
+              ],
               status: [],
               category: 'qn',
             },
@@ -450,7 +454,8 @@ describe('TuyaHandler.discoverDevices', () => {
 
     primePilotConnector();
     const [discovered] = await tuyaHandler.discoverDevices();
-    expect(discovered.features[0].supported_options.map((option) => option.value)).to.deep.equal([0, 5]);
+    const discoveredMode = discovered.features.find((feature) => feature.external_id.endsWith(':mode'));
+    expect(discoveredMode.supported_options.map((option) => option.value)).to.deep.equal([0, 5]);
 
     // Same device already in Gladys but with stale options: the discover must offer the update.
     const staleExisting = JSON.parse(JSON.stringify(discovered));
@@ -462,10 +467,20 @@ describe('TuyaHandler.discoverDevices', () => {
 
     // Identical options (order-insensitive): the device stays "already created".
     const freshExisting = JSON.parse(JSON.stringify(discovered));
-    freshExisting.features[0].supported_options = [...freshExisting.features[0].supported_options].reverse();
+    const freshMode = freshExisting.features.find((feature) => feature.external_id.endsWith(':mode'));
+    freshMode.supported_options = [...freshMode.supported_options].reverse();
     gladys.stateManager.get = fake.returns(freshExisting);
     primePilotConnector();
     const [unchanged] = await tuyaHandler.discoverDevices();
     expect(unchanged.updatable).to.equal(false);
+
+    // The mode feature is brand new on the discovered side (a mapping upgrade added it): flagging
+    // the device is mergeDevices' job, the supported-options comparison simply skips it.
+    const withoutMode = JSON.parse(JSON.stringify(discovered));
+    withoutMode.features = withoutMode.features.filter((feature) => !feature.external_id.endsWith(':mode'));
+    gladys.stateManager.get = fake.returns(withoutMode);
+    primePilotConnector();
+    const [withNewFeature] = await tuyaHandler.discoverDevices();
+    expect(withNewFeature.updatable).to.equal(true);
   });
 });

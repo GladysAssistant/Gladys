@@ -24,7 +24,7 @@ const haveSupportedOptionsChanged = (newDevice, existingDevice) => {
     }
     const existingFeature = existingByExternalId[feature.external_id];
     if (!existingFeature) {
-      // A brand new feature already flags the device as updatable.
+      // A brand new feature is mergeDevices' job: it already flags the device as updatable.
       return false;
     }
     const existingValues = (Array.isArray(existingFeature.supported_options) ? existingFeature.supported_options : [])
@@ -94,7 +94,7 @@ async function discoverDevices() {
       const existing = normalizeExistingDevice(this.gladys.stateManager.get('deviceByExternalId', device.external_id));
       const deviceWithLocalParams = applyExistingLocalParams(device, existing);
       const merged = mergeDevices(deviceWithLocalParams, existing);
-      if (!merged.updatable && haveSupportedOptionsChanged(deviceWithLocalParams, existing)) {
+      if (haveSupportedOptionsChanged(deviceWithLocalParams, existing)) {
         merged.updatable = true;
       }
       return merged;
