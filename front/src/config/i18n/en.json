@@ -3918,6 +3918,50 @@
           "5": "Comfort"
         }
       },
+      "shutter": {
+        "state": {
+          "-1": "Closed",
+          "0": "Stopped",
+          "1": "Open"
+        }
+      },
+      "curtain": {
+        "state": {
+          "-1": "Closed",
+          "0": "Stopped",
+          "1": "Open"
+        }
+      },
+      "lock": {
+        "state": {
+          "0": "Unlocked",
+          "1": "Locked",
+          "2": "Activity",
+          "3": "Error"
+        }
+      },
+      "air-conditioning": {
+        "mode": {
+          "0": "Auto",
+          "1": "Cooling",
+          "2": "Heating",
+          "3": "Drying",
+          "4": "Fan"
+        }
+      },
+      "siren": {
+        "lmh_volume": {
+          "0": "Low",
+          "1": "Medium",
+          "2": "High"
+        }
+      },
+      "music": {
+        "playback_state": {
+          "0": "Paused",
+          "1": "Playing"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "No value received",
@@ -4557,10 +4601,76 @@
       "hideDetails": "Hide details"
     }
   },
+  "history": {
+    "title": "Activity",
+    "subtitle": "Follow everything happening in your home, in real time.",
+    "live": "Live",
+    "jumpToDate": "Jump to a date",
+    "browsingPast": "You are browsing the history of {{date}}.",
+    "backToLive": "Back to live",
+    "allRooms": "All rooms",
+    "searchPlaceholder": "Search a device",
+    "loadMore": "Load more",
+    "newEvents": {
+      "one": "1 new event",
+      "other": "{{count}} new events"
+    },
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "emptyTitle": "No activity to show",
+    "emptyText": "Device events will appear here in real time as they happen. If this list stays empty, check that history is enabled on your device features.",
+    "error": "There was an error loading the activity history.",
+    "groups": {
+      "all": "All",
+      "openings": "Openings",
+      "motion": "Motion & presence",
+      "buttons": "Buttons & remotes",
+      "lights": "Lights & switches",
+      "climate": "Climate & environment",
+      "security": "Safety",
+      "energy": "Energy",
+      "other": "Other"
+    },
+    "values": {
+      "motion-sensor": {
+        "0": "No more motion",
+        "1": "Motion detected"
+      },
+      "presence-sensor": {
+        "0": "Absence",
+        "1": "Presence detected"
+      },
+      "smoke-sensor": {
+        "0": "No more smoke detected",
+        "1": "Smoke detected!"
+      },
+      "leak-sensor": {
+        "0": "No more leak detected",
+        "1": "Water leak detected!"
+      },
+      "vibration-sensor": {
+        "0": "No more vibration",
+        "1": "Vibration detected"
+      },
+      "light": {
+        "0": "Turned off",
+        "1": "Turned on"
+      },
+      "switch": {
+        "0": "Turned off",
+        "1": "Turned on"
+      },
+      "lock": {
+        "0": "Unlocked",
+        "1": "Locked"
+      }
+    }
+  },
   "header": {
     "gladysAssistant": "Gladys Assistant",
     "home": "Home",
     "chat": "Chat",
+    "history": "Activity",
     "devices": "Devices",
     "integrations": "Integrations",
     "calendar": "Calendar",
