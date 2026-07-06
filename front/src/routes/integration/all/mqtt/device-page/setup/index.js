@@ -9,6 +9,14 @@ import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
 import { slugify } from '../../../../../../../../server/utils/slugify';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
+import {
+  getFeatureDefaultValues,
+  buildMqttExternalId,
+  generateMqttExternalIdSuffix,
+  normalizeMqttExternalId,
+  parseMqttDeviceValidationErrors,
+  clearMqttDeviceValidationError
+} from '../utils';
 
 import {
   DEVICE_FEATURE_CATEGORIES,
@@ -17,53 +25,31 @@ import {
 } from '../../../../../../../../server/utils/constants';
 
 class MqttDeviceSetupPage extends Component {
-  selectFeature(selectedFeatureOption) {
-    if (selectedFeatureOption && selectedFeatureOption.value) {
-      this.setState({
-        selectedFeature: selectedFeatureOption.value,
-        selectedFeatureOption
-      });
-    } else {
-      this.setState({
-        selectedFeature: null,
-        selectedFeatureOption: null
-      });
-    }
+  toggleFeatureCatalog() {
+    this.setState({
+      showFeatureCatalog: !this.state.showFeatureCatalog
+    });
   }
 
-  addFeature() {
-    const featureData = this.state.selectedFeature.split('|');
-
-    let defaultValues = {};
-
-    if (featureData[1] === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
-      defaultValues.min = 0;
-      defaultValues.max = 1;
+  selectAndAddFeature(selectedFeatureOption) {
+    if (!selectedFeatureOption || !selectedFeatureOption.value) {
+      return;
     }
 
-    if (featureData[1] === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
-      defaultValues.min = 0;
-      defaultValues.max = 0;
-      defaultValues.keep_history = false;
-    }
-
-    if (featureData[1] === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
-      defaultValues.min = 1;
-      defaultValues.max = 1;
-      defaultValues.read_only = false;
-    }
+    const featureData = selectedFeatureOption.value.split('|');
+    const category = featureData[0];
+    const type = featureData[1];
+    const defaultValues = getFeatureDefaultValues(category, type);
+    const newFeatureIndex = this.state.device.features.length;
 
     const device = update(this.state.device, {
       features: {
         $push: [
           {
             id: uuid.v4(),
-            category: featureData[0],
+            category,
             external_id: 'mqtt:',
-            type: featureData[1],
-            read_only: true,
-            has_feedback: false,
-            keep_history: true,
+            type,
             ...defaultValues
           }
         ]
@@ -71,12 +57,15 @@ class MqttDeviceSetupPage extends Component {
     });
 
     this.setState({
-      device
+      device,
+      showFeatureCatalog: false,
+      expandedFeatureIndices: [newFeatureIndex]
     });
   }
 
   deleteFeature(featureIndex) {
     let device = this.state.device;
+    const featureId = device.features[featureIndex].id;
 
     // Remove params if needed
     const paramsToDelete = [];
@@ -97,8 +86,15 @@ class MqttDeviceSetupPage extends Component {
       }
     });
 
+    const customizedFeatureExternalIds = { ...this.state.customizedFeatureExternalIds };
+    const featureExternalIdSuffixes = { ...this.state.featureExternalIdSuffixes };
+    delete customizedFeatureExternalIds[featureId];
+    delete featureExternalIdSuffixes[featureId];
+
     this.setState({
-      device
+      device,
+      customizedFeatureExternalIds,
+      featureExternalIdSuffixes
     });
   }
 
@@ -178,36 +174,79 @@ class MqttDeviceSetupPage extends Component {
     }
 
     this.setState({
-      device: deviceUpdate
+      device: deviceUpdate,
+      customizedFeatureExternalIds: {
+        ...this.state.customizedFeatureExternalIds,
+        [consumptionFeatureId]: true,
+        [costFeatureId]: true
+      }
     });
   }
 
   updateDeviceProperty(deviceIndex, property, value) {
-    let device;
-    if (property === 'external_id' && !value.startsWith('mqtt:')) {
-      if (value.length < 5) {
-        value = 'mqtt:';
-      } else {
-        value = `mqtt:${value}`;
-      }
+    const validationErrors = clearMqttDeviceValidationError(this.state.validationErrors, property);
+
+    if (property === 'external_id') {
+      value = normalizeMqttExternalId(value);
+      const device = update(this.state.device, {
+        external_id: { $set: value },
+        selector: { $set: value }
+      });
+      this.setState({
+        device,
+        deviceExternalIdCustomized: true,
+        validationErrors
+      });
+      return;
     }
 
-    device = update(this.state.device, {
+    if (property === 'name') {
+      let device = update(this.state.device, {
+        name: { $set: value }
+      });
+
+      let nextValidationErrors = validationErrors;
+      const stateUpdate = { device, validationErrors: nextValidationErrors };
+
+      if (!this.state.device.created_at && !this.state.deviceExternalIdCustomized) {
+        const slug = slugify(value, false);
+        if (!slug) {
+          device = update(device, {
+            external_id: { $set: 'mqtt:' },
+            selector: { $set: 'mqtt:' }
+          });
+          stateUpdate.device = device;
+          stateUpdate.deviceExternalIdSuffix = null;
+        } else {
+          let suffix = this.state.deviceExternalIdSuffix;
+          if (!suffix) {
+            suffix = generateMqttExternalIdSuffix();
+            stateUpdate.deviceExternalIdSuffix = suffix;
+          }
+          const externalId = buildMqttExternalId(value, suffix);
+          device = update(device, {
+            external_id: { $set: externalId },
+            selector: { $set: externalId }
+          });
+          stateUpdate.device = device;
+        }
+        nextValidationErrors = clearMqttDeviceValidationError(nextValidationErrors, 'external_id');
+        stateUpdate.validationErrors = nextValidationErrors;
+      }
+
+      this.setState(stateUpdate);
+      return;
+    }
+
+    const device = update(this.state.device, {
       [property]: {
         $set: value
       }
     });
 
-    if (property === 'external_id') {
-      device = update(device, {
-        selector: {
-          $set: value
-        }
-      });
-    }
-
     this.setState({
-      device
+      device,
+      validationErrors
     });
   }
 
@@ -245,16 +284,88 @@ class MqttDeviceSetupPage extends Component {
 
   updateFeatureProperty(e, property, featureIndex) {
     let value = e.target.value;
-    let device;
-    if (property === 'external_id' && !value.startsWith('mqtt:')) {
-      if (value.length < 5) {
-        value = 'mqtt:';
-      } else {
-        value = `mqtt:${value}`;
-      }
+    const feature = this.state.device.features[featureIndex];
+    const validationErrors = clearMqttDeviceValidationError(this.state.validationErrors, property, featureIndex);
+
+    if (property === 'read_only' || property === 'keep_history') {
+      value = Boolean(e.target.checked);
     }
 
-    device = update(this.state.device, {
+    if (property === 'external_id') {
+      value = normalizeMqttExternalId(value);
+      const device = update(this.state.device, {
+        features: {
+          [featureIndex]: {
+            external_id: { $set: value },
+            selector: { $set: value }
+          }
+        }
+      });
+      this.setState({
+        device,
+        customizedFeatureExternalIds: {
+          ...this.state.customizedFeatureExternalIds,
+          [feature.id]: true
+        },
+        validationErrors
+      });
+      return;
+    }
+
+    if (property === 'name') {
+      let device = update(this.state.device, {
+        features: {
+          [featureIndex]: {
+            name: { $set: value }
+          }
+        }
+      });
+
+      let nextValidationErrors = validationErrors;
+      const stateUpdate = { device, validationErrors: nextValidationErrors };
+
+      if (!this.state.customizedFeatureExternalIds[feature.id]) {
+        const slug = slugify(value, false);
+        const featureExternalIdSuffixes = { ...this.state.featureExternalIdSuffixes };
+
+        if (!slug) {
+          delete featureExternalIdSuffixes[feature.id];
+          device = update(device, {
+            features: {
+              [featureIndex]: {
+                external_id: { $set: 'mqtt:' },
+                selector: { $set: 'mqtt:' }
+              }
+            }
+          });
+          stateUpdate.featureExternalIdSuffixes = featureExternalIdSuffixes;
+        } else {
+          let suffix = featureExternalIdSuffixes[feature.id];
+          if (!suffix) {
+            suffix = generateMqttExternalIdSuffix();
+            featureExternalIdSuffixes[feature.id] = suffix;
+          }
+          const externalId = buildMqttExternalId(value, suffix);
+          device = update(device, {
+            features: {
+              [featureIndex]: {
+                external_id: { $set: externalId },
+                selector: { $set: externalId }
+              }
+            }
+          });
+          stateUpdate.featureExternalIdSuffixes = featureExternalIdSuffixes;
+        }
+        stateUpdate.device = device;
+        nextValidationErrors = clearMqttDeviceValidationError(nextValidationErrors, 'external_id', featureIndex);
+        stateUpdate.validationErrors = nextValidationErrors;
+      }
+
+      this.setState(stateUpdate);
+      return;
+    }
+
+    const device = update(this.state.device, {
       features: {
         [featureIndex]: {
           [property]: {
@@ -264,27 +375,75 @@ class MqttDeviceSetupPage extends Component {
       }
     });
 
-    if (property === 'external_id') {
-      device = update(device, {
-        features: {
-          [featureIndex]: {
-            selector: {
-              $set: value
-            }
-          }
-        }
+    this.setState({
+      device,
+      validationErrors
+    });
+  }
+
+  buildClientValidationErrors(device) {
+    const properties = [];
+
+    if (!device.name || device.name.trim() === '') {
+      properties.push({
+        message: 'name required',
+        attribute: 'name',
+        value: device.name || null,
+        type: 'notNull Violation'
       });
     }
 
-    this.setState({
-      device
+    if (!device.external_id || device.external_id === 'mqtt:') {
+      properties.push({
+        message: 'external_id required',
+        attribute: 'external_id',
+        value: device.external_id || null,
+        type: 'notNull Violation'
+      });
+    }
+
+    (device.features || []).forEach(feature => {
+      if (!feature.name || feature.name.trim() === '') {
+        properties.push({
+          message: 'name required',
+          attribute: 'name',
+          value: feature.name || null,
+          type: 'notNull Violation'
+        });
+      }
+
+      if (!feature.external_id || feature.external_id === 'mqtt:') {
+        properties.push({
+          message: 'external_id required',
+          attribute: 'external_id',
+          value: feature.external_id || null,
+          type: 'notNull Violation'
+        });
+      }
     });
+
+    return properties;
   }
 
   async saveDevice() {
     this.setState({
-      loading: true
+      loading: true,
+      validationErrors: null
     });
+
+    const clientValidationErrors = this.buildClientValidationErrors(this.state.device);
+    if (clientValidationErrors.length > 0) {
+      const validationErrors = parseMqttDeviceValidationErrors(clientValidationErrors, this.state.device);
+      await this.setState({
+        saveStatus: RequestStatus.ValidationError,
+        validationErrors,
+        expandedFeatureIndices: validationErrors.expandedFeatureIndices,
+        loading: false
+      });
+      window.scrollTo(0, 0);
+      return;
+    }
+
     try {
       // If we are creating a device, we check that the device doesn't already exist
       if (!this.state.device.id) {
@@ -339,9 +498,11 @@ class MqttDeviceSetupPage extends Component {
       }
       if (status === 422) {
         const properties = get(e, 'response.data.properties', []);
+        const validationErrors = parseMqttDeviceValidationErrors(properties, this.state.device);
         await this.setState({
           saveStatus: RequestStatus.ValidationError,
-          erroredAttributes: properties.map(p => p.attribute).filter(a => a !== 'selector'),
+          validationErrors,
+          expandedFeatureIndices: validationErrors.expandedFeatureIndices,
           loading: false
         });
       } else {
@@ -372,7 +533,9 @@ class MqttDeviceSetupPage extends Component {
           ) {
             categoryFeatureTypeOptions.push({
               value: `${categoryValue}|${typeValue}`,
-              label: get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`)
+              label: get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`),
+              category: categoryValue,
+              type: typeValue
             });
           }
         });
@@ -389,11 +552,18 @@ class MqttDeviceSetupPage extends Component {
     super(props);
 
     this.state = {
-      loading: true
+      loading: true,
+      showFeatureCatalog: false,
+      expandedFeatureIndices: [],
+      deviceExternalIdCustomized: false,
+      deviceExternalIdSuffix: null,
+      customizedFeatureExternalIds: {},
+      featureExternalIdSuffixes: {},
+      validationErrors: null
     };
 
-    this.selectFeature = this.selectFeature.bind(this);
-    this.addFeature = this.addFeature.bind(this);
+    this.toggleFeatureCatalog = this.toggleFeatureCatalog.bind(this);
+    this.selectAndAddFeature = this.selectAndAddFeature.bind(this);
     this.deleteFeature = this.deleteFeature.bind(this);
     this.updateDeviceProperty = this.updateDeviceProperty.bind(this);
     this.updateFeatureProperty = this.updateFeatureProperty.bind(this);
@@ -414,6 +584,7 @@ class MqttDeviceSetupPage extends Component {
         name: '',
         should_poll: false,
         external_id: 'mqtt:',
+        selector: 'mqtt:',
         service_id: this.props.currentIntegration.id,
         features: [],
         params: []
@@ -430,9 +601,18 @@ class MqttDeviceSetupPage extends Component {
       }
     }
 
+    const customizedFeatureExternalIds = {};
+    if (device && device.features) {
+      device.features.forEach(feature => {
+        customizedFeatureExternalIds[feature.id] = true;
+      });
+    }
+
     this.setState({
       device,
-      loading: false
+      loading: false,
+      deviceExternalIdCustomized: Boolean(device && device.created_at),
+      customizedFeatureExternalIds
     });
   }
 
@@ -442,8 +622,8 @@ class MqttDeviceSetupPage extends Component {
         <FeatureTab
           {...props}
           {...state}
-          selectFeature={this.selectFeature}
-          addFeature={this.addFeature}
+          toggleFeatureCatalog={this.toggleFeatureCatalog}
+          selectAndAddFeature={this.selectAndAddFeature}
           deleteFeature={this.deleteFeature}
           updateDeviceProperty={this.updateDeviceProperty}
           updateFeatureProperty={this.updateFeatureProperty}
