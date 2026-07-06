@@ -463,7 +463,9 @@
         "colorLowLabel": "Color below the low threshold",
         "colorInRangeLabel": "Color between the thresholds",
         "colorHighLabel": "Color above the high threshold",
-        "thresholdsLegendLabel": "Thresholds:"
+        "thresholdsLegendLabel": "Thresholds:",
+        "editNameLabel": "Widget name (optional)",
+        "editNamePlaceholder": "Name displayed on the dashboard"
       },
       "energyConsumption": {
         "editName": "Widget Name (optional)",
