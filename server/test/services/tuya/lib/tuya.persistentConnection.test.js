@@ -514,6 +514,26 @@ describe('Tuya persistent connection', () => {
     expect(logged.length).to.be.below(250);
   });
 
+  it('logs a generic message when the socket error carries no message', () => {
+    const loggerStub = { info: sandbox.stub(), debug: sandbox.stub(), warn: sandbox.stub(), error: sandbox.stub() };
+    const pcWithLogger = proxyquire('../../../../services/tuya/lib/tuya.persistentConnection', {
+      tuyapi: FakeTuyapi,
+      '@demirdeniz/tuyapi-newgen': FakeTuyapiNewGen,
+      '../../../utils/logger': loggerStub,
+    });
+    const self = buildSelf();
+    Object.assign(self, pcWithLogger);
+    self.startPersistentConnectionForDevice(buildDevice());
+
+    lastTuyapi().emit('error', {});
+
+    const logged = loggerStub.info
+      .getCalls()
+      .map((call) => call.args[0])
+      .find((message) => typeof message === 'string' && message.includes('socket error'));
+    expect(logged).to.include('persistent socket error');
+  });
+
   describe('device lifecycle hooks (postCreate / postUpdate / postDelete)', () => {
     it('postCreate opens the persistent connection of a new local device', () => {
       const self = buildSelf();
@@ -618,6 +638,19 @@ describe('Tuya persistent connection', () => {
 
       expect(statesOf(self, 'tuya:testid:power_2')).to.deep.equal([10, 30]);
       clock.restore();
+    });
+
+    it('leaves the push untouched when the continuous sensor is absent from the payload', () => {
+      const self = buildSelf();
+      const device = buildPowerDevice();
+      self.startPersistentConnectionForDevice(device);
+
+      self.handlePushedDps(device, { '1': true });
+      self.handlePushedDps(device, { '1': false });
+
+      // switch_1 (event-like) flows through untouched; power_2 has nothing to throttle.
+      expect(statesOf(self, 'tuya:testid:switch_1')).to.deep.equal([1, 0]);
+      expect(statesOf(self, 'tuya:testid:power_2')).to.deep.equal([]);
     });
 
     it('does not throttle when the push targets a device without a persistent entry', () => {
