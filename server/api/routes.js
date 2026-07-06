@@ -383,6 +383,10 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.getOpenAIQuota,
     },
+    'get /api/v1/gateway/aichat/models': {
+      authenticated: true,
+      controller: gatewayController.getAiChatModels,
+    },
     'post /api/v1/gateway/stt': {
       authenticated: true,
       audioRawBody: true,
