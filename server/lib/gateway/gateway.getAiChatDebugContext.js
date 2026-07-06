@@ -7,6 +7,7 @@ const {
   buildExchangesFromMessages,
   exchangesToApiMessages,
   FETCH_MESSAGE_LIMIT,
+  EXCHANGE_LIMIT,
 } = require('../message/message.getPreviousQuestionsForUser');
 const { buildSystemPromptWithCurrentTime } = require('./gateway.forwardMessageToAiChat');
 
@@ -96,7 +97,7 @@ async function getAiChatDebugContext(userId) {
   });
 
   const plainMessages = recentMessages.map((message) => message.get({ plain: true }));
-  const exchanges = buildExchangesFromMessages(plainMessages.reverse());
+  const exchanges = buildExchangesFromMessages(plainMessages.reverse()).slice(-EXCHANGE_LIMIT);
   const messagesForApi = [
     { role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName) },
     ...exchangesToApiMessages(exchanges),

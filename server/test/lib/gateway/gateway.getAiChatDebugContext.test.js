@@ -6,6 +6,8 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const messageFindAll = sinon.stub().resolves([]);
 
+const { EXCHANGE_LIMIT } = require('../../../lib/message/message.getPreviousQuestionsForUser');
+
 const { getAiChatDebugContext, dbMessageToApiMessage, formatFileAsImageUrl } = proxyquire(
   '../../../lib/gateway/gateway.getAiChatDebugContext',
   {
@@ -162,6 +164,51 @@ describe('gateway.getAiChatDebugContext', () => {
     const payload = await getDebugContext.call(ctx, 'user-1');
 
     expect(payload.messages[0].content).to.equal('system prompt (Europe/Paris)');
+  });
+
+  it('should keep only the last four exchanges like live AI chat', async () => {
+    const messages = [];
+    for (let i = 6; i >= 1; i -= 1) {
+      messages.push({
+        get: () => ({ sender_id: null, text: `answer ${i}`, file: null, message_type: 'chat' }),
+      });
+      messages.push({
+        get: () => ({ sender_id: 'user-1', text: `question ${i}`, file: null, message_type: 'chat' }),
+      });
+    }
+    messageFindAll.resolves(messages);
+
+    const ctx = {
+      serviceManager: {
+        getService: fake.returns({
+          mcpHandler: {
+            getAllTools: fake.resolves([]),
+          },
+        }),
+      },
+      variable: {
+        getValue: fake.resolves('Europe/Paris'),
+      },
+    };
+
+    const payload = await getAiChatDebugContext.call(ctx, 'user-1');
+
+    const conversationMessages = payload.messages.slice(1);
+    expect(conversationMessages).to.have.lengthOf(EXCHANGE_LIMIT * 2);
+    expect(conversationMessages.map((message) => message.content)).to.deep.equal([
+      'question 3',
+      'answer 3',
+      'question 4',
+      'answer 4',
+      'question 5',
+      'answer 5',
+      'question 6',
+      'answer 6',
+    ]);
+    // eslint-disable-next-line no-underscore-dangle
+    expect(payload._debug.exchangeCount).to.equal(EXCHANGE_LIMIT);
+    // eslint-disable-next-line no-underscore-dangle
+    expect(payload._debug.messageCount).to.equal(12);
   });
 
   it('should throw when MCP service is not running', async () => {
