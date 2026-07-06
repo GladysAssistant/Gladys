@@ -1,10 +1,8 @@
 import { resolve, relative } from 'path';
-import { createRequire } from 'module';
 import { fileURLToPath } from 'url';
 
-const require = createRequire(import.meta.url);
-
 const PLUGIN_QUERY = '?preact-async-route';
+const ASYNC_LOADER_MODULE = '@preact/async-loader/async.js';
 const ROUTE_ENTRY_PATTERN = /\/src\/routes\/(?:[^/]+\.(?:jsx?|tsx?)|[^/]+\/index\.(?:jsx?|tsx?))$/;
 
 const cleanFilename = name => name.replace(/(^\/routes\/|(\/index)?\.[jt]sx?$)/g, '');
@@ -22,8 +20,6 @@ export function getRouteChunkName(filePath, srcRoot) {
  * Route entry files under src/routes/ are wrapped so their code loads on demand.
  */
 export function preactAsyncRoutes({ srcRoot = resolve(fileURLToPath(new URL('.', import.meta.url)), '../src') } = {}) {
-  const asyncLoaderPath = require.resolve('@preact/async-loader/async.js');
-
   return {
     name: 'preact-async-routes',
     enforce: 'pre',
@@ -47,7 +43,7 @@ export function preactAsyncRoutes({ srcRoot = resolve(fileURLToPath(new URL('.',
 
       const [filePath] = id.split('?');
 
-      if (!ROUTE_ENTRY_PATTERN.test(filePath) || id.includes(PLUGIN_QUERY)) {
+      if (!ROUTE_ENTRY_PATTERN.test(filePath)) {
         return null;
       }
 
@@ -60,10 +56,10 @@ export function preactAsyncRoutes({ srcRoot = resolve(fileURLToPath(new URL('.',
 
       return {
         code: `
-import async from ${JSON.stringify(asyncLoaderPath)};
+import async from ${JSON.stringify(ASYNC_LOADER_MODULE)};
 
 function load(cb) {
-  import(/* webpackChunkName: "${chunkName}" */ ${JSON.stringify(moduleRequest)}).then(mod => {
+  import(${JSON.stringify(moduleRequest)}).then(mod => {
     cb(mod);
   });
 }

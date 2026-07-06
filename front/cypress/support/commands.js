@@ -30,18 +30,15 @@ Cypress.on('window:before:load', window => {
   const lang = Cypress.env('language');
   Object.defineProperty(window.navigator, 'language', { value: lang });
 
+  // Track every WebSocket the app opens so tests can push fake messages with cy.sendWebSocket.
+  // Do NOT define an `onmessage` method here: it would shadow the native accessor and
+  // recurse forever when called on a socket whose handler was never assigned
+  // (e.g. the Vite HMR socket, which only uses addEventListener).
   window.WebSocket = class MockWebSocket extends WebSocket {
-    constructor(props) {
-      super(props);
+    constructor(url, protocols) {
+      super(url, protocols);
 
       cypressWebSockets.push(this);
-    }
-
-    onmessage(event) {
-      return new Cypress.Promise(resolve => {
-        this.onmessage(event);
-        resolve(event);
-      });
     }
   };
 });
@@ -181,8 +178,11 @@ Cypress.Commands.overwrite('request', (originalFn, options) => {
 });
 
 Cypress.Commands.add('sendWebSocket', payload => {
+  // Only target the Gladys websocket: the Vite dev server also opens a websocket
+  // (HMR) on the front origin, which must never receive fake Gladys messages.
+  const websocketUrl = Cypress.env('websocketUrl');
   cypressWebSockets
-    .filter(ws => typeof ws.onmessage === 'function')
+    .filter(ws => ws.url && ws.url.startsWith(websocketUrl) && typeof ws.onmessage === 'function')
     .forEach(ws => ws.onmessage({ data: JSON.stringify(payload) }));
 });
 

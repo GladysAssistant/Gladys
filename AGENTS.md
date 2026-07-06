@@ -30,7 +30,7 @@ Every PR to `master` triggers the workflow `.github/workflows/docker-pr-build.ym
 | **Front test** | Always | `prettier-check`, `eslint`, `compare-translations` |
 | **Server test** | Always | `prettier-check`, `eslint`, `npm run coverage` + Codecov upload |
 | **Cypress run** | Always | E2E tests (signup, dashboard, integrations…) |
-| **Front build** | Non-draft PRs only | `npm run build-with-stats` |
+| **Front build** | Non-draft PRs only | `npm run build` (Vite) |
 | **Docker build** | Non-draft PRs only | AMD64 Docker image build |
 
 Draft PRs skip the front build and Docker jobs. Mark a PR as "Ready for review" only after the build checks pass locally.
