@@ -200,6 +200,20 @@
   border-color: #467fcf;
 }
 
+.featureAccordionError {
+  border-color: #cd201f;
+}
+
+.featureAccordionError .featureAccordionHeader {
+  background-color: rgba(205, 32, 31, 0.05);
+}
+
+.validationErrorList {
+  margin-bottom: 0;
+  margin-top: 0.75rem;
+  padding-left: 1.25rem;
+}
+
 .featureAccordionHeader {
   align-items: center;
   background: transparent;

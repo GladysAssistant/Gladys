@@ -13,7 +13,9 @@ import {
   getFeatureDefaultValues,
   buildMqttExternalId,
   generateMqttExternalIdSuffix,
-  normalizeMqttExternalId
+  normalizeMqttExternalId,
+  parseMqttDeviceValidationErrors,
+  clearMqttDeviceValidationError
 } from '../utils';
 
 import {
@@ -182,6 +184,8 @@ class MqttDeviceSetupPage extends Component {
   }
 
   updateDeviceProperty(deviceIndex, property, value) {
+    const validationErrors = clearMqttDeviceValidationError(this.state.validationErrors, property);
+
     if (property === 'external_id') {
       value = normalizeMqttExternalId(value);
       const device = update(this.state.device, {
@@ -190,7 +194,8 @@ class MqttDeviceSetupPage extends Component {
       });
       this.setState({
         device,
-        deviceExternalIdCustomized: true
+        deviceExternalIdCustomized: true,
+        validationErrors
       });
       return;
     }
@@ -200,7 +205,7 @@ class MqttDeviceSetupPage extends Component {
         name: { $set: value }
       });
 
-      const stateUpdate = { device };
+      const stateUpdate = { device, validationErrors };
 
       if (!this.state.device.created_at && !this.state.deviceExternalIdCustomized) {
         const slug = slugify(value, false);
@@ -237,7 +242,8 @@ class MqttDeviceSetupPage extends Component {
     });
 
     this.setState({
-      device
+      device,
+      validationErrors
     });
   }
 
@@ -276,6 +282,7 @@ class MqttDeviceSetupPage extends Component {
   updateFeatureProperty(e, property, featureIndex) {
     let value = e.target.value;
     const feature = this.state.device.features[featureIndex];
+    const validationErrors = clearMqttDeviceValidationError(this.state.validationErrors, property, featureIndex);
 
     if (property === 'read_only' || property === 'keep_history') {
       value = Boolean(e.target.checked);
@@ -296,7 +303,8 @@ class MqttDeviceSetupPage extends Component {
         customizedFeatureExternalIds: {
           ...this.state.customizedFeatureExternalIds,
           [feature.id]: true
-        }
+        },
+        validationErrors
       });
       return;
     }
@@ -310,7 +318,7 @@ class MqttDeviceSetupPage extends Component {
         }
       });
 
-      const stateUpdate = { device };
+      const stateUpdate = { device, validationErrors };
 
       if (!this.state.customizedFeatureExternalIds[feature.id]) {
         const slug = slugify(value, false);
@@ -362,13 +370,15 @@ class MqttDeviceSetupPage extends Component {
     });
 
     this.setState({
-      device
+      device,
+      validationErrors
     });
   }
 
   async saveDevice() {
     this.setState({
-      loading: true
+      loading: true,
+      validationErrors: null
     });
     try {
       // If we are creating a device, we check that the device doesn't already exist
@@ -424,9 +434,11 @@ class MqttDeviceSetupPage extends Component {
       }
       if (status === 422) {
         const properties = get(e, 'response.data.properties', []);
+        const validationErrors = parseMqttDeviceValidationErrors(properties, this.state.device);
         await this.setState({
           saveStatus: RequestStatus.ValidationError,
-          erroredAttributes: properties.map(p => p.attribute).filter(a => a !== 'selector'),
+          validationErrors,
+          expandedFeatureIndices: validationErrors.expandedFeatureIndices,
           loading: false
         });
       } else {
@@ -482,7 +494,8 @@ class MqttDeviceSetupPage extends Component {
       deviceExternalIdCustomized: false,
       deviceExternalIdSuffix: null,
       customizedFeatureExternalIds: {},
-      featureExternalIdSuffixes: {}
+      featureExternalIdSuffixes: {},
+      validationErrors: null
     };
 
     this.toggleFeatureCatalog = this.toggleFeatureCatalog.bind(this);

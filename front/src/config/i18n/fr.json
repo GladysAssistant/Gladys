@@ -1788,11 +1788,26 @@
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
         "validationError": "Erreur de validation : L'appareil n'a pas été correctement rempli.",
+        "validationErrorTitle": "Impossible d'enregistrer l'appareil. Corrigez les champs signalés en rouge :",
+        "validationErrorDevice": "Appareil — {{field}} : {{message}}",
+        "validationErrorFeature": "« {{featureName}} » — {{field}} : {{message}}",
+        "validationFieldLabels": {
+          "name": "Nom",
+          "external_id": "ID externe",
+          "min": "Valeur minimum",
+          "max": "Valeur maximum",
+          "unit": "Unité",
+          "room_id": "Pièce",
+          "category": "Catégorie",
+          "type": "Type"
+        },
         "validationErrors": {
-          "name": "Le champ \"Nom\" est obligatoire",
-          "min": "Le champ \"Valeur minimum\" est obligatoire et doit être une valeur entière",
-          "max": "Le champ \"Valeur maximum\" est obligatoire et doit être une valeur entière",
-          "external_id": "Le champ \"ID Externe\" est obligatoire et doit être unique à travers tous les appareils"
+          "name": "Le champ est obligatoire",
+          "min": "Le champ est obligatoire et doit être un nombre",
+          "max": "Le champ est obligatoire et doit être un nombre",
+          "external_id": "Le champ est obligatoire et doit être unique",
+          "unit": "L'unité sélectionnée n'est pas valide pour cette fonctionnalité",
+          "room_id": "La pièce sélectionnée n'est pas valide"
         },
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes sont uniques ?",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",

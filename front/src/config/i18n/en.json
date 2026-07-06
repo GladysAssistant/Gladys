@@ -1550,11 +1550,26 @@
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
         "validationError": "Validation error : The device is not correctly filled.",
+        "validationErrorTitle": "Unable to save the device. Please fix the fields highlighted in red:",
+        "validationErrorDevice": "Device — {{field}}: {{message}}",
+        "validationErrorFeature": "\"{{featureName}}\" — {{field}}: {{message}}",
+        "validationFieldLabels": {
+          "name": "Name",
+          "external_id": "External ID",
+          "min": "Minimum value",
+          "max": "Maximum value",
+          "unit": "Unit",
+          "room_id": "Room",
+          "category": "Category",
+          "type": "Type"
+        },
         "validationErrors": {
-          "name": "The name field is required",
-          "min": "The minimum field is required and must be an integer",
-          "max": "The maximum field is required and must be an integer",
-          "external_id": "The external ID field is required and must be unique across all devices"
+          "name": "This field is required",
+          "min": "This field is required and must be a number",
+          "max": "This field is required and must be a number",
+          "external_id": "This field is required and must be unique",
+          "unit": "The selected unit is not valid for this feature",
+          "room_id": "The selected room is not valid"
         },
         "saveConflictError": "Conflict: Are you sure all external IDs are unique?",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",

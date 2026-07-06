@@ -1655,11 +1655,26 @@
         "backToList": "Zurück zur Geräteliste",
         "saveError": "Fehler beim Sichern oder Löschen des Geräts",
         "validationError": "Validierungsfehler: Das Gerät ist nicht korrekt ausgefüllt.",
+        "validationErrorTitle": "Das Gerät konnte nicht gespeichert werden. Bitte korrigieren Sie die rot markierten Felder:",
+        "validationErrorDevice": "Gerät — {{field}}: {{message}}",
+        "validationErrorFeature": "„{{featureName}}“ — {{field}}: {{message}}",
+        "validationFieldLabels": {
+          "name": "Name",
+          "external_id": "Externe ID",
+          "min": "Mindestwert",
+          "max": "Maximalwert",
+          "unit": "Einheit",
+          "room_id": "Raum",
+          "category": "Kategorie",
+          "type": "Typ"
+        },
         "validationErrors": {
-          "name": "Das Feld \"Name\" ist erforderlich",
-          "min": "Das Minimalfeld ist erforderlich und muss eine ganze Zahl sein",
-          "max": "Das Maximalfeld ist erforderlich und muss eine ganze Zahl sein",
-          "external_id": "Das externe ID-Feld ist erforderlich und muss über alle Geräte hinweg eindeutig sein"
+          "name": "Dieses Feld ist erforderlich",
+          "min": "Dieses Feld ist erforderlich und muss eine Zahl sein",
+          "max": "Dieses Feld ist erforderlich und muss eine Zahl sein",
+          "external_id": "Dieses Feld ist erforderlich und muss eindeutig sein",
+          "unit": "Die gewählte Einheit ist für diese Funktion ungültig",
+          "room_id": "Der gewählte Raum ist ungültig"
         },
         "saveConflictError": "Konflikt: Sind alle externen IDs wirklich eindeutig?",
         "mostRecentValueAt": "Zuletzt empfangener Wert {{mostRecentValueAt}}.",

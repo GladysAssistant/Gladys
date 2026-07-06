@@ -1,6 +1,7 @@
 import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
+import get from 'get-value';
 
 import Feature from './Feature';
 import FeatureCatalog from './FeatureCatalog';
@@ -8,6 +9,22 @@ import { RequestStatus } from '../../../../../../utils/consts';
 
 import MqttDeviceForm from '../DeviceForm';
 import style from '../style.css';
+
+const getValidationFieldLabel = (intl, field) =>
+  get(intl.dictionary, `integration.mqtt.device.validationFieldLabels.${field}`, field);
+
+const getValidationFieldMessage = (intl, field, fallbackMessage) =>
+  get(intl.dictionary, `integration.mqtt.device.validationErrors.${field}`, fallbackMessage);
+
+const getFeatureDisplayName = (intl, feature) => {
+  if (feature?.name) {
+    return feature.name;
+  }
+  if (feature?.category && feature?.type) {
+    return get(intl.dictionary, `deviceFeatureCategory.${feature.category}.${feature.type}`, feature.type);
+  }
+  return '';
+};
 
 const FeatureTab = ({ children, ...props }) => (
   <div class="card">
@@ -42,17 +59,45 @@ const FeatureTab = ({ children, ...props }) => (
             </div>
           )}
           {props.saveStatus === RequestStatus.ValidationError && (
-            <div class="alert alert-danger">
-              <Text id="integration.mqtt.device.validationError" />
-              {props.erroredAttributes.length > 0 && (
-                <p>
-                  {props.erroredAttributes.map(attribute => (
-                    <>
-                      <br />
-                      - <Text id={`integration.mqtt.device.validationErrors.${attribute}`} />
-                    </>
-                  ))}
-                </p>
+            <div class="alert alert-danger" role="alert">
+              <strong>
+                <Text id="integration.mqtt.device.validationErrorTitle" />
+              </strong>
+              {props.validationErrors?.errorItems?.length > 0 && (
+                <ul class={style.validationErrorList}>
+                  {props.validationErrors.errorItems.map((item, index) => {
+                    const fieldLabel = getValidationFieldLabel(props.intl, item.field);
+                    const message = getValidationFieldMessage(
+                      props.intl,
+                      item.field,
+                      item.property?.message
+                    );
+
+                    if (item.scope === 'device') {
+                      return (
+                        <li key={`device-${item.field}-${index}`}>
+                          <Text
+                            id="integration.mqtt.device.validationErrorDevice"
+                            fields={{ field: fieldLabel, message }}
+                          />
+                        </li>
+                      );
+                    }
+
+                    return (
+                      <li key={`feature-${item.featureIndex}-${item.field}-${index}`}>
+                        <Text
+                          id="integration.mqtt.device.validationErrorFeature"
+                          fields={{
+                            featureName: getFeatureDisplayName(props.intl, item.feature),
+                            field: fieldLabel,
+                            message
+                          }}
+                        />
+                      </li>
+                    );
+                  })}
+                </ul>
               )}
             </div>
           )}

@@ -11,16 +11,27 @@ import {
 import { ENERGY_INDEX_FEATURE_TYPES } from '../../../../../../../../server/services/energy-monitoring/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
 import { getDeviceParam } from '../../../../../../utils/device';
-import { featureNeedsMinMax } from '../utils';
+import { featureNeedsMinMax, isFeatureFieldErrored } from '../utils';
 import style from '../style.css';
 
-const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
+const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...props }) => {
   const icon = get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`, 'radio');
   const featureLabel = feature.name || <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />;
   const showMinMax = featureNeedsMinMax(feature.category, feature.type);
+  const nameErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'name');
+  const externalIdErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'external_id');
+  const unitErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'unit');
+  const minErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'min');
+  const maxErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'max');
+  const hasFieldError = nameErrored || externalIdErrored || unitErrored || minErrored || maxErrored;
 
   return (
-    <div class={cx(style.featureAccordion, { [style.featureAccordionExpanded]: props.isExpanded })}>
+    <div
+      class={cx(style.featureAccordion, {
+        [style.featureAccordionExpanded]: props.isExpanded,
+        [style.featureAccordionError]: hasFieldError
+      })}
+    >
       <button type="button" class={style.featureAccordionHeader} onClick={props.toggleExpanded}>
         <i class={cx('fe', props.isExpanded ? 'fe-chevron-down' : 'fe-chevron-right')} />
         <i class={`fe fe-${icon} ${style.featureAccordionIcon}`} />
@@ -65,10 +76,15 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
                     type="text"
                     value={feature.name}
                     onInput={props.updateName}
-                    class="form-control"
+                    class={cx('form-control', { 'is-invalid': nameErrored })}
                     placeholder={<Text id="integration.mqtt.feature.namePlaceholder" />}
                   />
                 </Localizer>
+                {nameErrored && (
+                  <div class="invalid-feedback d-block">
+                    <Text id="integration.mqtt.device.validationErrors.name" />
+                  </div>
+                )}
               </div>
             </div>
             <div class="col-md-6">
@@ -82,10 +98,15 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
                     type="text"
                     value={feature.external_id}
                     onInput={props.updateExternalId}
-                    class="form-control"
+                    class={cx('form-control', { 'is-invalid': externalIdErrored })}
                     placeholder={<Text id="integration.mqtt.feature.externalIdPlaceholder" />}
                   />
                 </Localizer>
+                {externalIdErrored && (
+                  <div class="invalid-feedback d-block">
+                    <Text id="integration.mqtt.device.validationErrors.external_id" />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -102,7 +123,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
                       id={`unit_${featureIndex}`}
                       value={feature.unit || ''}
                       onChange={props.updateUnit}
-                      class="form-control"
+                      class={cx('form-control', { 'is-invalid': unitErrored })}
                     >
                       <option value="">
                         <Text id="global.emptySelectOption" />
@@ -114,6 +135,11 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
                       ))}
                     </select>
                   </Localizer>
+                  {unitErrored && (
+                    <div class="invalid-feedback d-block">
+                      <Text id="integration.mqtt.device.validationErrors.unit" />
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -193,10 +219,15 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
                           type="number"
                           value={feature.min}
                           onInput={props.updateMin}
-                          class="form-control"
+                          class={cx('form-control', { 'is-invalid': minErrored })}
                           placeholder={<Text id="integration.mqtt.feature.minPlaceholder" />}
                         />
                       </Localizer>
+                      {minErrored && (
+                        <div class="invalid-feedback d-block">
+                          <Text id="integration.mqtt.device.validationErrors.min" />
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -210,10 +241,15 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
                           type="number"
                           value={feature.max}
                           onInput={props.updateMax}
-                          class="form-control"
+                          class={cx('form-control', { 'is-invalid': maxErrored })}
                           placeholder={<Text id="integration.mqtt.feature.maxPlaceholder" />}
                         />
                       </Localizer>
+                      {maxErrored && (
+                        <div class="invalid-feedback d-block">
+                          <Text id="integration.mqtt.device.validationErrors.max" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -328,6 +364,13 @@ class MqttFeatureBoxComponent extends Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.initiallyExpanded && !this.props.initiallyExpanded) {
       this.setState({ isExpanded: true });
+    }
+
+    const featureErrors = nextProps.validationErrors?.featureFields?.[this.props.featureIndex];
+    if (featureErrors) {
+      const showAdvancedSettings =
+        this.state.showAdvancedSettings || Boolean(featureErrors.min || featureErrors.max);
+      this.setState({ isExpanded: true, showAdvancedSettings });
     }
   }
 

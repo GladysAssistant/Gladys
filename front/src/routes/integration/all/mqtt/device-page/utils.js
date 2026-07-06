@@ -1015,3 +1015,192 @@ export const featureNeedsMinMax = (category, type) => {
   }
   return true;
 };
+
+const DEVICE_LEVEL_FIELDS = new Set(['name', 'external_id', 'room_id', 'service_id', 'should_poll', 'poll_frequency']);
+
+const valuesMatch = (left, right) => {
+  if (left === right) {
+    return true;
+  }
+  if ((left === '' || left == null) && (right === '' || right == null)) {
+    return true;
+  }
+  if (left != null && right != null) {
+    return String(left) === String(right);
+  }
+  return false;
+};
+
+const findFeatureIndexMatchingAllErrors = (features, errors) => {
+  return features.findIndex(feature => errors.every(error => valuesMatch(feature[error.attribute], error.value)));
+};
+
+const deviceMatchesAllErrors = (device, errors) => {
+  return errors.every(
+    error => DEVICE_LEVEL_FIELDS.has(error.attribute) && valuesMatch(device[error.attribute], error.value)
+  );
+};
+
+const assignFeatureError = (featureFields, featureIndex, field, property) => {
+  if (!featureFields[featureIndex]) {
+    featureFields[featureIndex] = {};
+  }
+  featureFields[featureIndex][field] = property;
+};
+
+export const parseMqttDeviceValidationErrors = (properties, device) => {
+  const deviceFields = {};
+  const featureFields = {};
+  const errorItems = [];
+
+  const features = device?.features || [];
+  const errors = (properties || []).filter(property => property && property.attribute && property.attribute !== 'selector');
+
+  if (errors.length === 0) {
+    return { deviceFields, featureFields, errorItems, expandedFeatureIndices: [] };
+  }
+
+  const matchingFeatureIndex = findFeatureIndexMatchingAllErrors(features, errors);
+  if (matchingFeatureIndex !== -1) {
+    errors.forEach(error => {
+      const { attribute: field } = error;
+      assignFeatureError(featureFields, matchingFeatureIndex, field, error);
+      errorItems.push({
+        scope: 'feature',
+        featureIndex: matchingFeatureIndex,
+        field,
+        property: error,
+        feature: features[matchingFeatureIndex]
+      });
+    });
+  } else if (device && deviceMatchesAllErrors(device, errors)) {
+    errors.forEach(error => {
+      const { attribute: field } = error;
+      deviceFields[field] = error;
+      errorItems.push({ scope: 'device', field, property: error });
+    });
+  } else {
+    errors.forEach(error => {
+      const { attribute: field, value } = error;
+      let assigned = false;
+
+      if (DEVICE_LEVEL_FIELDS.has(field) && valuesMatch(device[field], value)) {
+        deviceFields[field] = error;
+        errorItems.push({ scope: 'device', field, property: error });
+        assigned = true;
+      }
+
+      if (!assigned) {
+        const matchingIndices = features
+          .map((feature, index) => (valuesMatch(feature[field], value) ? index : -1))
+          .filter(index => index !== -1);
+
+        if (matchingIndices.length > 0) {
+          matchingIndices.forEach(index => {
+            assignFeatureError(featureFields, index, field, error);
+            errorItems.push({
+              scope: 'feature',
+              featureIndex: index,
+              field,
+              property: error,
+              feature: features[index]
+            });
+          });
+          assigned = true;
+        }
+      }
+
+      if (!assigned && DEVICE_LEVEL_FIELDS.has(field) && (device[field] == null || device[field] === '')) {
+        deviceFields[field] = error;
+        errorItems.push({ scope: 'device', field, property: error });
+        assigned = true;
+      }
+
+      if (!assigned) {
+        features.forEach((feature, index) => {
+          const featureValue = feature[field];
+          const isEmpty = featureValue == null || featureValue === '';
+          const isInvalidNumber =
+            (field === 'min' || field === 'max') && (featureValue === '' || Number.isNaN(Number(featureValue)));
+
+          if (isEmpty || isInvalidNumber) {
+            assignFeatureError(featureFields, index, field, error);
+            errorItems.push({
+              scope: 'feature',
+              featureIndex: index,
+              field,
+              property: error,
+              feature
+            });
+          }
+        });
+      }
+    });
+  }
+
+  const expandedFeatureIndices = [...new Set(errorItems.filter(item => item.scope === 'feature').map(item => item.featureIndex))];
+
+  const seenErrorKeys = new Set();
+  const dedupedErrorItems = errorItems.filter(item => {
+    const key = `${item.scope}-${item.featureIndex ?? 'device'}-${item.field}`;
+    if (seenErrorKeys.has(key)) {
+      return false;
+    }
+    seenErrorKeys.add(key);
+    return true;
+  });
+
+  return { deviceFields, featureFields, errorItems: dedupedErrorItems, expandedFeatureIndices };
+};
+
+export const isDeviceFieldErrored = (validationErrors, field) => {
+  return Boolean(validationErrors?.deviceFields?.[field]);
+};
+
+export const isFeatureFieldErrored = (validationErrors, featureIndex, field) => {
+  return Boolean(validationErrors?.featureFields?.[featureIndex]?.[field]);
+};
+
+export const clearMqttDeviceValidationError = (validationErrors, field, featureIndex) => {
+  if (!validationErrors) {
+    return null;
+  }
+
+  const nextValidationErrors = {
+    deviceFields: { ...validationErrors.deviceFields },
+    featureFields: { ...validationErrors.featureFields },
+    errorItems: [...validationErrors.errorItems],
+    expandedFeatureIndices: [...validationErrors.expandedFeatureIndices]
+  };
+
+  if (featureIndex === undefined) {
+    delete nextValidationErrors.deviceFields[field];
+  } else if (nextValidationErrors.featureFields[featureIndex]) {
+    const featureFieldErrors = { ...nextValidationErrors.featureFields[featureIndex] };
+    delete featureFieldErrors[field];
+    if (Object.keys(featureFieldErrors).length === 0) {
+      delete nextValidationErrors.featureFields[featureIndex];
+    } else {
+      nextValidationErrors.featureFields[featureIndex] = featureFieldErrors;
+    }
+  }
+
+  nextValidationErrors.errorItems = nextValidationErrors.errorItems.filter(item => {
+    if (item.field !== field) {
+      return true;
+    }
+    if (featureIndex === undefined) {
+      return item.scope !== 'device';
+    }
+    return item.scope !== 'feature' || item.featureIndex !== featureIndex;
+  });
+
+  if (
+    Object.keys(nextValidationErrors.deviceFields).length === 0 &&
+    Object.keys(nextValidationErrors.featureFields).length === 0
+  ) {
+    return null;
+  }
+
+  return nextValidationErrors;
+};
