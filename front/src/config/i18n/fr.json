@@ -1434,6 +1434,7 @@
       },
       "device": {
         "title": "Appareils Tuya dans Gladys",
+        "serviceNotConfigured": "Le service Tuya n'est pas encore configuré. Renseignez vos identifiants cloud Tuya sur la ",
         "updates": "Vérifier les mises à jour",
         "editButton": "Éditer",
         "noDeviceFound": "Aucun appareil Tuya trouvé.",
@@ -1455,7 +1456,7 @@
         "productIdLabel": "Identifiant produit",
         "productKeyLabel": "Clé produit",
         "createGithubIssue": "Proposer ce périphérique",
-        "createGithubIssuePartial": "Proposer nouvelles fonctions",
+        "createGithubIssuePartial": "Proposer des fonctionnalités",
         "githubIssueLocalPrepInfo": "Pour inclure toutes les informations locales dans l'issue, vous pouvez d'abord lancer un <strong>Scan local auto</strong> depuis la page de découverte pour enrichir tous les appareils avec leurs données locales.<br />Ensuite, passez en mode local sur l'appareil si nécessaire, renseignez l'IP et le protocole, puis lancez une <strong>Lecture locale des DP</strong> avec succès avant de cliquer sur le bouton de proposition.",
         "githubIssueInfo": "Un rapport sera envoyé avec les informations du périphérique. Les données sensibles (clé locale et IP) sont masquées.",
         "githubIssuePayloadCopied": "Les détails ont été copiés dans le presse-papiers. Collez-les dans le corps de l'issue GitHub.",
