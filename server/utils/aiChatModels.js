@@ -28,7 +28,6 @@ const ALLOWED_SCALEWAY_MODELS = {
   // Premium vision — complex multimodal requests
   'qwen3.5-397b-a17b': { vision: true, priceTier: AI_CHAT_MODEL_PRICE_TIER.HIGH },
   // Text — richer reasoning for ambiguous or multi-step commands
-  'gpt-oss-120b': { vision: false, priceTier: AI_CHAT_MODEL_PRICE_TIER.LOW },
   'llama-3.3-70b-instruct': { vision: false, priceTier: AI_CHAT_MODEL_PRICE_TIER.MEDIUM },
   'qwen3-235b-a22b-instruct-2507': { vision: false, priceTier: AI_CHAT_MODEL_PRICE_TIER.HIGH },
 };

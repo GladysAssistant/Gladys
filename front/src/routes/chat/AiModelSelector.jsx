@@ -38,13 +38,7 @@ class AiModelSelector extends Component {
     }
   };
 
-  formatModelLabel = model => {
-    const parts = [model.id, model.priceLabel];
-    if (model.vision) {
-      parts.push('vision');
-    }
-    return parts.join(' · ');
-  };
+  formatModelLabel = model => `${model.id} · ${model.priceLabel}`;
 
   render({ value }, { models, loading, loadError }) {
     return (

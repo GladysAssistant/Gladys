@@ -83,9 +83,8 @@ const IntegrationPage = connect(
     return (
       <div class={cx('page', style.chatPage)}>
         <div class={cx('page-main', style.chatPageMain)}>
-          <div class={cx('my-3 my-md-5', style.chatPageContent)}>
+          <div class={style.chatPageContent}>
             <div class={cx('container', style.chatPageContainer)}>
-              <div class="page-header" />
               <div class={cx('row', style.chatLayout)}>
                 <div class={cx('col-lg-8', style.chatMainColumn)}>
                   <div class={cx('card', style.chatCard)}>

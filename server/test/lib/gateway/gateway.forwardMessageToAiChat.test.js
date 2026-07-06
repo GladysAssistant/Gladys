@@ -119,12 +119,12 @@ describe('gateway.forwardMessageToAiChat', () => {
     const replyByIntent = fake.resolves(null);
 
     await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
-      message: { text: 'Turn on the light', model: 'gpt-oss-120b' },
+      message: { text: 'Turn on the light', model: 'llama-3.3-70b-instruct' },
       previousQuestions: [],
       context: {},
     });
 
-    expect(aiChat.getCall(0).args[0].model).to.equal('gpt-oss-120b');
+    expect(aiChat.getCall(0).args[0].model).to.equal('llama-3.3-70b-instruct');
   });
 
   it('should omit model from the AI gateway request when auto is selected', async () => {
