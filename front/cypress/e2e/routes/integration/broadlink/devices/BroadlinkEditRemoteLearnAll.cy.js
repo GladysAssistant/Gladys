@@ -155,12 +155,28 @@ describe('Broadlink edit remote - learn all', () => {
     { from: 'temperature', payload: 'temperature-1' }
   ].forEach((feature, index) => {
     it(`Learn button: ${feature.from} (${index})`, () => {
+      const serverUrl = Cypress.env('serverUrl');
+
       cy.get('.tag-secondary')
         .should('be.length', 1)
         .first()
         .i18n(`deviceFeatureCategory.light.${feature.from}`);
 
       cy.contains('div', 'integration.broadlink.setup.learningModeInProgress').should('exist');
+
+      if (!feature.to) {
+        // Learning the last code leaves learn-all mode and fires a learn/cancel
+        // request. Stub it before it happens and wait for it below: against the
+        // real server it resolves seconds later and its setLearning(false) side
+        // effect would land in a later test.
+        cy.intercept(
+          {
+            method: 'POST',
+            url: `${serverUrl}/api/v1/service/broadlink/learn/cancel`
+          },
+          {}
+        ).as('cancelLearnMode');
+      }
 
       // Handle WebSocket message
       cy.sendWebSocket({
@@ -169,7 +185,6 @@ describe('Broadlink edit remote - learn all', () => {
       });
 
       if (feature.to) {
-        const serverUrl = Cypress.env('serverUrl');
         cy.intercept(
           {
             method: 'POST',
@@ -188,6 +203,8 @@ describe('Broadlink edit remote - learn all', () => {
           .i18n(`deviceFeatureCategory.light.${feature.to}`);
       } else {
         cy.get('.tag-secondary').should('not.exist');
+
+        cy.wait('@cancelLearnMode');
       }
     });
   });
@@ -284,9 +301,21 @@ describe('Broadlink edit remote - learn all', () => {
         { learn: true }
       );
 
+      // Stub the cancel request so it resolves instantly instead of waiting
+      // for the real server to give up on the fake peripheral.
+      cy.intercept(
+        {
+          method: 'POST',
+          url: `${serverUrl}/api/v1/service/broadlink/learn/cancel`
+        },
+        {}
+      ).as('cancelLearnMode');
+
       // Let pending re-renders settle, then re-query so the click targets an attached node.
       cy.contains('button', 'integration.broadlink.setup.cancelLearnModeButton').should('be.visible');
       cy.contains('button', 'integration.broadlink.setup.cancelLearnModeButton').click();
+
+      cy.wait('@cancelLearnMode');
 
       cy.contains('button', 'integration.broadlink.setup.testLabel').should('not.be.disabled');
       cy.contains('button', 'integration.broadlink.setup.deleteLabel').should('not.be.disabled');
