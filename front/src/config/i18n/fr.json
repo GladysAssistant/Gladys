@@ -1808,6 +1808,7 @@
         "openButton": "Ajouter une fonctionnalité",
         "closeButton": "Fermer le catalogue",
         "previewLabel": "Aperçu tableau de bord",
+        "cameraPreviewNotice": "Cette fonctionnalité s'affiche dans le widget Caméra du tableau de bord, et non dans la liste des appareils.",
         "noResults": "Aucune fonctionnalité ne correspond à votre recherche.",
         "noFeaturesYet": "Aucune fonctionnalité ajoutée. Utilisez le bouton ci-dessous pour parcourir le catalogue.",
         "sensorBadge": "Capteur",

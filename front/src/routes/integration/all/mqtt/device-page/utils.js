@@ -2,7 +2,8 @@ import get from 'get-value';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS
+  DEVICE_FEATURE_UNITS,
+  DEVICE_FEATURE_UNITS_BY_CATEGORY
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 
@@ -95,6 +96,97 @@ export const groupDevicesByRoom = (devices, houses) => {
   return sortedGroups;
 };
 
+const flattenUnit = unit => (Array.isArray(unit) ? unit[0] : unit);
+
+const PREFERRED_DEFAULT_UNIT_BY_CATEGORY = {
+  [DEVICE_FEATURE_CATEGORIES.DATA]: DEVICE_FEATURE_UNITS.MEGABYTE,
+  [DEVICE_FEATURE_CATEGORIES.DATARATE]: DEVICE_FEATURE_UNITS.MEGABITS_PER_SECOND,
+  [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: DEVICE_FEATURE_UNITS.M,
+  [DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR]: DEVICE_FEATURE_UNITS.CM,
+  [DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR]: DEVICE_FEATURE_UNITS.CELSIUS,
+  [DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR]: DEVICE_FEATURE_UNITS.WATT,
+  [DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
+  [DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR]: DEVICE_FEATURE_UNITS.LITER,
+  [DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR]: DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR,
+  [DEVICE_FEATURE_CATEGORIES.NOISE_SENSOR]: DEVICE_FEATURE_UNITS.DECIBEL,
+  [DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR]: DEVICE_FEATURE_UNITS.DEGREE,
+  [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR,
+  [DEVICE_FEATURE_CATEGORIES.SURFACE]: DEVICE_FEATURE_UNITS.SQUARE_METER
+};
+
+const ENERGY_SENSOR_TYPE_UNITS = {
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER]: DEVICE_FEATURE_UNITS.WATT,
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE]: DEVICE_FEATURE_UNITS.VOLT,
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT]: DEVICE_FEATURE_UNITS.AMPERE,
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX_TODAY]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX_YESTERDAY]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST]: DEVICE_FEATURE_UNITS.EURO,
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST]: DEVICE_FEATURE_UNITS.EURO
+};
+
+const ENERGY_PRODUCTION_SENSOR_TYPE_UNITS = {
+  [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.DAILY_PRODUCTION]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.DAILY_PRODUCTION_REVENUE]: DEVICE_FEATURE_UNITS.EURO,
+  [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION_REVENUE]: DEVICE_FEATURE_UNITS.EURO
+};
+
+export const getDefaultUnitForFeature = (category, type) => {
+  if (
+    type === DEVICE_FEATURE_TYPES.SENSOR.BINARY ||
+    type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
+    type === DEVICE_FEATURE_TYPES.BUTTON.PUSH ||
+    type === DEVICE_FEATURE_TYPES.TEXT.TEXT
+  ) {
+    return undefined;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR) {
+    const energyUnit = ENERGY_SENSOR_TYPE_UNITS[type];
+    if (energyUnit) {
+      return energyUnit;
+    }
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR) {
+    const productionUnit = ENERGY_PRODUCTION_SENSOR_TYPE_UNITS[type];
+    if (productionUnit) {
+      return productionUnit;
+    }
+  }
+
+  const preferredUnit = PREFERRED_DEFAULT_UNIT_BY_CATEGORY[category];
+  if (preferredUnit) {
+    return preferredUnit;
+  }
+
+  const units = DEVICE_FEATURE_UNITS_BY_CATEGORY[category];
+  if (units && units.length > 0) {
+    return flattenUnit(units[0]);
+  }
+
+  return undefined;
+};
+
+const applyDefaultUnit = (defaults, category, type) => {
+  if (defaults.unit) {
+    return defaults;
+  }
+
+  const unit = getDefaultUnitForFeature(category, type);
+  if (!unit) {
+    return defaults;
+  }
+
+  return { ...defaults, unit };
+};
+
 export const getFeatureDefaultValues = (category, type) => {
   const defaults = {
     read_only: isSensorCategory(category),
@@ -103,15 +195,19 @@ export const getFeatureDefaultValues = (category, type) => {
   };
 
   if (type === DEVICE_FEATURE_TYPES.SWITCH.BINARY || type === DEVICE_FEATURE_TYPES.LIGHT.BINARY) {
-    return { ...defaults, min: 0, max: 1, read_only: false };
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: false }, category, type);
   }
 
   if (type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
-    return { ...defaults, min: 1, max: 1, read_only: false, keep_history: false };
+    return applyDefaultUnit(
+      { ...defaults, min: 1, max: 1, read_only: false, keep_history: false },
+      category,
+      type
+    );
   }
 
   if (type === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
-    return { ...defaults, min: 0, max: 0, keep_history: false };
+    return applyDefaultUnit({ ...defaults, min: 0, max: 0, keep_history: false }, category, type);
   }
 
   if (
@@ -123,7 +219,7 @@ export const getFeatureDefaultValues = (category, type) => {
     type === DEVICE_FEATURE_TYPES.CURTAIN.POSITION ||
     type === DEVICE_FEATURE_TYPES.TELEVISION.VOLUME
   ) {
-    return { ...defaults, min: 0, max: 100, read_only: false };
+    return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }
 
   if (
@@ -131,48 +227,64 @@ export const getFeatureDefaultValues = (category, type) => {
     type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE ||
     type === DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.TARGET_TEMPERATURE
   ) {
-    return {
-      ...defaults,
-      min: 5,
-      max: 35,
-      read_only: false,
-      unit: DEVICE_FEATURE_UNITS.CELSIUS
-    };
+    return applyDefaultUnit(
+      {
+        ...defaults,
+        min: 5,
+        max: 35,
+        read_only: false,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS
+      },
+      category,
+      type
+    );
   }
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE) {
-    return { ...defaults, min: 153, max: 500, read_only: false };
+    return applyDefaultUnit({ ...defaults, min: 153, max: 500, read_only: false }, category, type);
   }
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.COLOR || type === DEVICE_FEATURE_TYPES.LIGHT.HUE) {
-    return { ...defaults, min: 0, max: 360, read_only: false };
+    return applyDefaultUnit({ ...defaults, min: 0, max: 360, read_only: false }, category, type);
   }
 
   if (type === DEVICE_FEATURE_TYPES.BATTERY.INTEGER) {
-    return { ...defaults, min: 0, max: 100, unit: DEVICE_FEATURE_UNITS.PERCENT };
+    return applyDefaultUnit({ ...defaults, min: 0, max: 100, unit: DEVICE_FEATURE_UNITS.PERCENT }, category, type);
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR) {
-    return { ...defaults, min: -40, max: 80, unit: DEVICE_FEATURE_UNITS.CELSIUS };
+    return applyDefaultUnit(
+      { ...defaults, min: -40, max: 80, unit: DEVICE_FEATURE_UNITS.CELSIUS },
+      category,
+      type
+    );
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR) {
-    return { ...defaults, min: 0, max: 100, unit: DEVICE_FEATURE_UNITS.PERCENT };
+    return applyDefaultUnit(
+      { ...defaults, min: 0, max: 100, unit: DEVICE_FEATURE_UNITS.PERCENT },
+      category,
+      type
+    );
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR) {
-    return { ...defaults, min: 0, max: 100000 };
+    return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.CURRENCY) {
-    return { ...defaults, min: 0, max: 1000000000, unit: DEVICE_FEATURE_UNITS.EURO };
+    return applyDefaultUnit(
+      { ...defaults, min: 0, max: 1000000000, unit: DEVICE_FEATURE_UNITS.EURO },
+      category,
+      type
+    );
   }
 
   if (!isSensorCategory(category)) {
-    return { ...defaults, min: 0, max: 100, read_only: false };
+    return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }
 
-  return { ...defaults, min: 0, max: 100 };
+  return applyDefaultUnit({ ...defaults, min: 0, max: 100 }, category, type);
 };
 
 export const getFeaturePreviewValue = (category, type) => {
@@ -203,6 +315,65 @@ export const getFeaturePreviewValue = (category, type) => {
   }
   if (category === DEVICE_FEATURE_CATEGORIES.CURRENCY) {
     return 1250.75;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.DATA) {
+    return 512;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.DATARATE) {
+    return 25.6;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR) {
+    return 1.25;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR) {
+    return 38.5;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE) {
+      return 230;
+    }
+    if (type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT) {
+      return 1.2;
+    }
+    if (
+      type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY ||
+      type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX ||
+      type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION ||
+      type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION
+    ) {
+      return 12.4;
+    }
+    if (
+      type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST ||
+      type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST
+    ) {
+      return 3.85;
+    }
+    return 245;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR) {
+    if (
+      type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.DAILY_PRODUCTION_REVENUE ||
+      type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION_REVENUE
+    ) {
+      return 4.2;
+    }
+    return 8.6;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR) {
+    return 320;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR) {
+    return 1013;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.NOISE_SENSOR) {
+    return 42;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR) {
+    return 45;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR) {
+    return 52;
   }
   if (type === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
     return null;

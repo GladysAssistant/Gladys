@@ -1,5 +1,7 @@
 import cx from 'classnames';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import DeviceRow from '../../../../../../components/boxs/device-in-room/DeviceRow';
+import CameraFeaturePreview from './CameraFeaturePreview';
 import style from '../style.css';
 import {
   getFeatureDefaultValues,
@@ -9,6 +11,14 @@ import {
 } from '../utils';
 
 const FeaturePreview = ({ category, type, label, intl, user }) => {
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA) {
+    return (
+      <div class={cx(style.featurePreview, style.cameraFeaturePreviewWrapper, 'dark-mode-no-invert')}>
+        <CameraFeaturePreview label={label} />
+      </div>
+    );
+  }
+
   const defaults = getFeatureDefaultValues(category, type);
   const previewValue = getFeaturePreviewValue(category, type);
   const previewStringValue = getFeaturePreviewStringValue(category, type);

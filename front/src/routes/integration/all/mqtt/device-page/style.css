@@ -391,7 +391,42 @@
   pointer-events: none;
 }
 
+.cameraFeaturePreviewWrapper {
+  padding: 0.5rem;
+}
+
+.cameraFeaturePreview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cameraFeaturePreviewNotice {
+  color: #6c757d;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.cameraFeaturePreviewCard {
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+.cameraFeaturePreviewCard .card-img-top {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.cameraFeaturePreviewCard .card-title {
+  font-size: 0.875rem;
+}
+
 /* Dark mode: avoid inverted pure-black panels from hardcoded white backgrounds */
+:global(.dark-mode) .cameraFeaturePreviewNotice {
+  color: rgba(255, 255, 255, 0.55);
+}
+
 :global(.dark-mode) .roomGroupHeader,
 :global(.dark-mode) .featureCatalogHeader,
 :global(.dark-mode) .featureAccordionBody,

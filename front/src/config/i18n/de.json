@@ -1675,6 +1675,7 @@
         "openButton": "Funktion hinzufügen",
         "closeButton": "Katalog schließen",
         "previewLabel": "Dashboard-Vorschau",
+        "cameraPreviewNotice": "Diese Funktion wird im Kamera-Dashboard-Widget angezeigt, nicht in der Geräteliste.",
         "noResults": "Keine Funktionen entsprechen Ihrer Suche.",
         "noFeaturesYet": "Noch keine Funktionen hinzugefügt. Verwenden Sie die Schaltfläche unten, um den Katalog zu durchsuchen.",
         "sensorBadge": "Sensor",
