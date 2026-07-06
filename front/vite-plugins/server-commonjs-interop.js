@@ -123,8 +123,9 @@ function appendNamedExports(code, exportNames) {
 
 /**
  * Vite dev serves files as native ESM, but the front imports many CommonJS modules
- * from ../server. Rollup handles those during production builds via commonjsOptions,
- * so this plugin only rewrites server modules for the dev server (Cypress, npm run dev).
+ * from ../server with named exports. Rollup's commonjs plugin alone leaves bare npm
+ * imports (e.g. dayjs) in production bundles when server/node_modules is absent.
+ * This plugin pre-bundles each server module with esbuild for dev and production.
  */
 export function serverCommonjsInterop() {
   const cache = new Map();

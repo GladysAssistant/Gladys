@@ -45,6 +45,7 @@ export default defineConfig(({ mode }) => {
   }, {});
 
   const plugins = [
+    serverCommonjsInterop(),
     patchCssModules({ exportMode: 'both' }),
     preactAsyncRoutes(),
     treatJsFilesAsJsx(),
@@ -57,10 +58,6 @@ export default defineConfig(({ mode }) => {
       ]
     })
   ];
-
-  if (mode !== 'production') {
-    plugins.unshift(serverCommonjsInterop());
-  }
 
   return {
     plugins,
