@@ -1,5 +1,5 @@
 import cx from 'classnames';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
 import DeviceRow from '../../../../../../components/boxs/device-in-room/DeviceRow';
 import CameraFeaturePreview from './CameraFeaturePreview';
 import style from '../style.css';
