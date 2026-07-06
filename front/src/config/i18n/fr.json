@@ -3938,6 +3938,28 @@
           "3": "Erreur"
         }
       },
+      "air-conditioning": {
+        "mode": {
+          "0": "Auto",
+          "1": "Refroidissement",
+          "2": "Chauffage",
+          "3": "Déshumidification",
+          "4": "Ventilation"
+        }
+      },
+      "siren": {
+        "lmh_volume": {
+          "0": "Faible",
+          "1": "Moyen",
+          "2": "Fort"
+        }
+      },
+      "music": {
+        "playback_state": {
+          "0": "En pause",
+          "1": "En lecture"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
