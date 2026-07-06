@@ -366,7 +366,6 @@
 .chatPageMain,
 .chatPageContent,
 .chatPageContainer,
-.chatLayout,
 .chatMainColumn {
   flex: 1;
   min-height: 0;
@@ -383,31 +382,13 @@
   height: 100%;
 }
 
-.chatLayout {
-  position: relative;
-  margin: 0;
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-}
-
-.chatLayout > .chatMainColumn,
-.chatLayout > .desktopSidebarColumn {
-  min-height: 0;
-}
-
 .chatMainColumn {
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
   padding: 0;
-  max-width: 100%;
-}
-
-.desktopSidebarColumn {
-  min-height: 0;
-  overflow-y: auto;
+  width: 100%;
 }
 
 .chatComposer {
@@ -533,10 +514,6 @@
 }
 
 @media (max-width: 768px) {
-  .desktopSidebarColumn {
-    display: none;
-  }
-
   .chatPageContainer {
     max-width: 100%;
     padding-left: 8px;
