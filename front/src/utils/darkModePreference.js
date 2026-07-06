@@ -1,7 +1,11 @@
 const DARK_MODE_PREFERENCE_KEY = 'dark-mode-preference';
 const LEGACY_DARK_MODE_KEY = 'dark-mode';
 
-const VALID_PREFERENCES = ['light', 'dark', 'system'];
+const DARK_MODE_PREFERENCE_LIGHT = 'light';
+const DARK_MODE_PREFERENCE_DARK = 'dark';
+const DARK_MODE_PREFERENCE_SYSTEM = 'system';
+
+const VALID_PREFERENCES = [DARK_MODE_PREFERENCE_LIGHT, DARK_MODE_PREFERENCE_DARK, DARK_MODE_PREFERENCE_SYSTEM];
 
 function systemPrefersDarkMode() {
   try {
@@ -17,7 +21,7 @@ function migrateLegacyDarkModePreference() {
     return null;
   }
 
-  const migratedPreference = legacyValue === 'true' ? 'dark' : 'light';
+  const migratedPreference = legacyValue === 'true' ? DARK_MODE_PREFERENCE_DARK : DARK_MODE_PREFERENCE_LIGHT;
   localStorage.setItem(DARK_MODE_PREFERENCE_KEY, migratedPreference);
   localStorage.removeItem(LEGACY_DARK_MODE_KEY);
   return migratedPreference;
@@ -36,19 +40,21 @@ function getDarkModePreference() {
     }
   } catch (e) {}
 
-  return 'system';
+  return DARK_MODE_PREFERENCE_SYSTEM;
 }
 
 function setDarkModePreference(preference) {
-  localStorage.setItem(DARK_MODE_PREFERENCE_KEY, preference);
-  localStorage.removeItem(LEGACY_DARK_MODE_KEY);
+  try {
+    localStorage.setItem(DARK_MODE_PREFERENCE_KEY, preference);
+    localStorage.removeItem(LEGACY_DARK_MODE_KEY);
+  } catch (e) {}
 }
 
 function isDarkModeEnabled(preference = getDarkModePreference()) {
-  if (preference === 'dark') {
+  if (preference === DARK_MODE_PREFERENCE_DARK) {
     return true;
   }
-  if (preference === 'light') {
+  if (preference === DARK_MODE_PREFERENCE_LIGHT) {
     return false;
   }
   return systemPrefersDarkMode();
@@ -65,7 +71,10 @@ function applyDarkModeToDom(darkMode) {
 }
 
 export {
+  DARK_MODE_PREFERENCE_DARK,
   DARK_MODE_PREFERENCE_KEY,
+  DARK_MODE_PREFERENCE_LIGHT,
+  DARK_MODE_PREFERENCE_SYSTEM,
   LEGACY_DARK_MODE_KEY,
   VALID_PREFERENCES,
   applyDarkModeToDom,

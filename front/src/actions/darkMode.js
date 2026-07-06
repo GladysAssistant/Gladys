@@ -1,5 +1,8 @@
 import {
   applyDarkModeToDom,
+  DARK_MODE_PREFERENCE_DARK,
+  DARK_MODE_PREFERENCE_LIGHT,
+  DARK_MODE_PREFERENCE_SYSTEM,
   getDarkModePreference,
   setDarkModePreference,
   systemPrefersDarkMode
@@ -17,7 +20,7 @@ function createActionsDarkMode(store) {
       const currentDarkMode = store.getState().darkMode;
       const newDarkMode = !currentDarkMode;
 
-      setDarkModePreference(newDarkMode ? 'dark' : 'light');
+      setDarkModePreference(newDarkMode ? DARK_MODE_PREFERENCE_DARK : DARK_MODE_PREFERENCE_LIGHT);
       applyDarkModeToDom(newDarkMode);
 
       return { darkMode: newDarkMode };
@@ -27,7 +30,7 @@ function createActionsDarkMode(store) {
      * Set dark mode to a specific value
      */
     setDarkMode(state, darkMode) {
-      setDarkModePreference(darkMode ? 'dark' : 'light');
+      setDarkModePreference(darkMode ? DARK_MODE_PREFERENCE_DARK : DARK_MODE_PREFERENCE_LIGHT);
       applyDarkModeToDom(darkMode);
 
       return { darkMode };
@@ -38,7 +41,7 @@ function createActionsDarkMode(store) {
      * Only applies when the user has not set an explicit preference.
      */
     updateDarkModeFromSystem() {
-      if (getDarkModePreference() !== 'system') {
+      if (getDarkModePreference() !== DARK_MODE_PREFERENCE_SYSTEM) {
         return null;
       }
 
