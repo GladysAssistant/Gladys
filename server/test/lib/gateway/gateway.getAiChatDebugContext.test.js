@@ -102,6 +102,27 @@ describe('gateway.getAiChatDebugContext helpers', () => {
     });
   });
 
+  it('should flag attached files in debug history without embedding them', () => {
+    expect(
+      formatStoredMessageForDebug(
+        {
+          created_at: '2026-07-06T08:00:00.000Z',
+          sender_id: 'user-1',
+          text: 'photo',
+          message_type: 'chat',
+          file: 'image/jpeg;base64,abc',
+        },
+        'user-1',
+      ),
+    ).to.deep.equal({
+      created_at: '2026-07-06T08:00:00.000Z',
+      role: 'user',
+      message_type: 'chat',
+      text: 'photo',
+      has_file: true,
+    });
+  });
+
   it('should build conversation history with associated tool calls', () => {
     const history = buildConversationHistoryForDebug(
       [
