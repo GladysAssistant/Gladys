@@ -1691,7 +1691,8 @@
           "thermostat": "Stellen Sie Heizungssollwerte ein und lesen Sie sie aus.",
           "button": "Aktionen bei Tastendruck auslösen.",
           "text": "Textwerte anzeigen oder senden.",
-          "battery": "Überwachen Sie den Batteriestand Ihrer Geräte."
+          "battery": "Überwachen Sie den Batteriestand Ihrer Geräte.",
+          "currency": "Zeigen Sie Währungs- oder Kryptowährungswerte an."
         },
         "descriptions": {
           "light": {
@@ -1732,6 +1733,9 @@
           },
           "battery": {
             "integer": "Zeigt den Batteriestand als Prozentsatz an."
+          },
+          "currency": {
+            "decimal": "Zeigt einen Geldbetrag mit seiner Währungseinheit an."
           }
         },
         "keywords": {

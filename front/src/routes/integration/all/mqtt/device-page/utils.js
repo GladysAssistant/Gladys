@@ -8,7 +8,12 @@ import {
 const SENSOR_CATEGORY_SUFFIX = '-sensor';
 
 export const isSensorCategory = category => {
-  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY || category === DEVICE_FEATURE_CATEGORIES.BATTERY_LOW) {
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.BATTERY ||
+    category === DEVICE_FEATURE_CATEGORIES.BATTERY_LOW ||
+    category === DEVICE_FEATURE_CATEGORIES.CURRENCY ||
+    category === DEVICE_FEATURE_CATEGORIES.TEXT
+  ) {
     return true;
   }
   return category.endsWith(SENSOR_CATEGORY_SUFFIX) || category === DEVICE_FEATURE_CATEGORIES.SIGNAL;
@@ -131,6 +136,10 @@ export const getFeatureDefaultValues = (category, type) => {
     return { ...defaults, min: 0, max: 100000 };
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.CURRENCY) {
+    return { ...defaults, min: 0, max: 1000000000, unit: DEVICE_FEATURE_UNITS.EURO };
+  }
+
   if (!isSensorCategory(category)) {
     return { ...defaults, min: 0, max: 100, read_only: false };
   }
@@ -163,6 +172,9 @@ export const getFeaturePreviewValue = (category, type) => {
   }
   if (category === DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR) {
     return 1;
+  }
+  if (category === DEVICE_FEATURE_CATEGORIES.CURRENCY) {
+    return 1250.75;
   }
   if (type === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
     return null;

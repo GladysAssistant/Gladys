@@ -1824,7 +1824,8 @@
           "thermostat": "Définissez et lisez les consignes de chauffage.",
           "button": "Déclenchez des actions à l'appui d'un bouton.",
           "text": "Affichez ou envoyez des valeurs texte.",
-          "battery": "Surveillez le niveau de batterie de vos appareils."
+          "battery": "Surveillez le niveau de batterie de vos appareils.",
+          "currency": "Affichez des valeurs monétaires ou de cryptomonnaies."
         },
         "descriptions": {
           "light": {
@@ -1865,6 +1866,9 @@
           },
           "battery": {
             "integer": "Affiche le niveau de batterie en pourcentage."
+          },
+          "currency": {
+            "decimal": "Affiche une valeur monétaire avec son unité."
           }
         },
         "keywords": {

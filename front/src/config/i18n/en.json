@@ -1586,7 +1586,8 @@
           "thermostat": "Set and read heating setpoints.",
           "button": "Trigger actions on button press.",
           "text": "Display or send text values.",
-          "battery": "Monitor battery level of your devices."
+          "battery": "Monitor battery level of your devices.",
+          "currency": "Display currency or cryptocurrency values."
         },
         "descriptions": {
           "light": {
@@ -1627,6 +1628,9 @@
           },
           "battery": {
             "integer": "Shows the battery level as a percentage."
+          },
+          "currency": {
+            "decimal": "Displays a monetary value with its currency unit."
           }
         },
         "keywords": {
