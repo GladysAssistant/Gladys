@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { buildForecastSummary } = require('../../../services/meteofrance/lib/forecast.formatter');
+const { buildForecastSummary } = require('../../../services/meteo/lib/forecast.formatter');
 
 describe('MeteoFrance forecast formatter', () => {
   it('should fall back to hourly weather when weather12H is missing and mention rain', () => {

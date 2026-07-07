@@ -49,7 +49,7 @@ describe('scene.meteoFranceGetForecast', () => {
     );
     expect(getSummaryForHouse.firstCall.args[1]).to.equal(1);
   });
-  it('should abort when the meteofrance service is not found', async () => {
+  it('should abort when the meteo service is not found', async () => {
     const house = {
       getBySelector: fake.resolves({ selector: 'main-house', latitude: 46.75, longitude: 4.35 }),
     };

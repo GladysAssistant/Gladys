@@ -360,7 +360,7 @@
         "mapUnavailable": "Map unavailable: configure the API key in the Météo France integration.",
         "editVigilanceLabel": "Show active weather alerts",
         "editVigilanceHelp": "The department is automatically detected from the house GPS coordinates.",
-        "error": "Unable to fetch Météo France weather data.",
+        "error": "Unable to fetch weather data.",
         "noCoordinates": "The house has no GPS coordinates. Configure them in settings.",
         "noHouseConfigured": "Please configure a house in the widget settings."
       },
@@ -1227,19 +1227,26 @@
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
-    "meteoFrance": {
-      "title": "Météo France",
-      "documentation": "Météo France documentation",
-      "description": "Display Météo France weather and vigilance alerts in Gladys.",
-      "introduction": "This integration connects to the official Météo France webservice to get weather forecasts and vigilance alerts (yellow, orange, red).",
-      "noConfiguration": "No configuration is required: the data is freely accessible, without any API key.",
-      "instructionsToUse": "Simply add the \"Météo France\" widget to your dashboard and select your house (its GPS coordinates must be configured). The department used for vigilance alerts is detected automatically.",
-      "instructions": "Optional: to display the national vigilance map in the widget, create an account on <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, subscribe for free to the <strong>DPVigilance</strong> API and enter your API key below.",
-      "apiKeyLabel": "API key (optional, only for the vigilance map):",
-      "apiKeyPlaceholder": "Enter Météo France API key",
+    "meteo": {
+      "title": "Weather",
+      "documentation": "Weather documentation",
+      "description": "Display the weather, forecast and Météo France vigilance alerts in Gladys, from Météo France or OpenWeather.",
+      "introduction": "This integration provides weather to Gladys from the source of your choice: the official Météo France webservice (France only, with vigilance alerts) or the OpenWeather API (worldwide coverage, API key required).",
+      "instructionsToUse": "Simply add the \"Météo France\" widget on your dashboard and select your house (its GPS coordinates must be configured).",
+      "sourceLabel": "Forecast source:",
+      "sourceMeteoFrance": "Météo France",
+      "sourceOpenWeather": "OpenWeather",
+      "meteoFranceNoConfiguration": "No configuration is needed: Météo France data is freely accessible, without any API key.",
+      "meteoFranceInstructions": "Optional: to display the national vigilance map in the widget, create an account on <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, subscribe for free to the <strong>DPVigilance</strong> API and enter your API key below.",
+      "meteoFranceApiKeyLabel": "Météo France API key (optional, only for the vigilance map):",
+      "meteoFranceApiKeyPlaceholder": "Enter the Météo France API key",
+      "openWeatherInstructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
+      "openWeatherApiKeyLabel": "OpenWeather API key (required):",
+      "openWeatherApiKeyPlaceholder": "Enter the OpenWeather API key",
       "saveButton": "Save",
-      "saveSuccess": "API key saved successfully.",
-      "saveError": "Error while saving the API key."
+      "saveSuccess": "Settings saved successfully.",
+      "saveError": "Error while saving the settings.",
+      "openWeatherIntroduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys."
     },
     "tuya": {
       "title": "Tuya",

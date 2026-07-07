@@ -79,7 +79,7 @@ function createActions(store) {
           boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
           return;
         }
-        const url = `/api/v1/house/${box.house}/meteofrance/weather${box.vigilance ? '?vigilance=true' : ''}`;
+        const url = `/api/v1/house/${box.house}/meteo/weather${box.vigilance ? '?vigilance=true' : ''}`;
         const data = await state.httpClient.get(url);
 
         // The API returns the full current day, including past hours: keep future entries only
@@ -94,10 +94,19 @@ function createActions(store) {
         // so the emphasized first column matches the displayed current weather
         const hourlySource = upcoming.slice(Math.max(0, upcoming.indexOf(current)));
 
-        // Cover the next 24 hours in 8 columns (one entry every 3 hours)
+        // Cover the next 24 hours in 8 columns (one entry every 3 hours).
+        // Météo France entries are hourly (keep 1 out of 3); OpenWeather entries
+        // are already 3-hourly (keep them all): detect the step from the data.
+        let stepSeconds = 3600;
+        if (hourlySource.length > 2) {
+          stepSeconds = hourlySource[2].dt - hourlySource[1].dt;
+        } else if (hourlySource.length > 1) {
+          stepSeconds = hourlySource[1].dt - hourlySource[0].dt;
+        }
+        const columnSkip = stepSeconds >= 3 * 3600 ? 1 : 3;
         const hourly = hourlySource
           .filter(h => h.dt <= hourlySource[0].dt + 24 * 3600)
-          .filter((h, index) => index % 3 === 0)
+          .filter((h, index) => index % columnSkip === 0)
           .slice(0, 8)
           .map(h => {
             // Rain amount key depends on the forecast step (1h first, then 3h)
@@ -184,11 +193,12 @@ function createActions(store) {
           rainChance = currentProba.rain['3h'] != null ? currentProba.rain['3h'] : currentProba.rain['6h'];
         }
 
-        // The national vigilance map needs the optional API key: fetch it separately
+        // The national vigilance map is a Météo France feature and needs the
+        // optional API key: fetch it separately, never with the OpenWeather source
         let vigilanceMapImage = null;
-        if (box.modes && box.modes.vigilanceMap) {
+        if (box.modes && box.modes.vigilanceMap && data.source !== 'openweather') {
           try {
-            const mapData = await state.httpClient.get('/api/v1/service/meteofrance/vigilance/map');
+            const mapData = await state.httpClient.get('/api/v1/service/meteo/vigilance/map');
             vigilanceMapImage = mapData.image;
           } catch (mapError) {
             // Map unavailable (no API key configured or API error): the widget shows a hint
@@ -196,6 +206,8 @@ function createActions(store) {
         }
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+          source: data.source,
+          houseName: (data.house && data.house.name) || null,
           current,
           currentIcon,
           currentCondition,

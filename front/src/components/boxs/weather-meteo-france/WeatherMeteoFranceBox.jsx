@@ -183,8 +183,14 @@ class WeatherMeteoFranceBoxComponent extends Component {
         ? `${isUS ? `${Math.round(rawPressure * 0.02953 * 100) / 100} inHg` : `${Math.round(rawPressure)} hPa`}`
         : null;
     const desc = current.weather ? current.weather.desc : '';
-    const alerts = (vigilance && vigilance.alerts) || [];
-    const vigilanceEnabled = Boolean(props.box.vigilance);
+    // Vigilance and its national map are Météo France features: with the
+    // OpenWeather source the widget only shows OpenWeather data
+    const isMeteoFranceSource = boxData.source !== 'openweather';
+    const alerts = (isMeteoFranceSource && vigilance && vigilance.alerts) || [];
+    // No French department (house outside France): vigilance does not apply,
+    // so the reassuring "no vigilance" message would be misleading
+    const vigilanceEnabled =
+      isMeteoFranceSource && Boolean(props.box.vigilance) && Boolean(vigilance && vigilance.dept);
     // Default to visible for widgets saved before these options existed
     const showCurrentWeather = modes[CURRENT_WEATHER_MODE] !== false;
     const showDateLocation = modes[DATE_LOCATION_MODE] !== false;
@@ -193,7 +199,7 @@ class WeatherMeteoFranceBoxComponent extends Component {
       (humidity !== null || windSpeed !== null || pressure !== null || rainChance != null || sun);
     const showHourly = modes[GetWeatherModes.HourlyForecast] && hourly && hourly.length > 0;
     const showDaily = modes[GetWeatherModes.DailyForecast] && daily && daily.length > 0;
-    const showMap = Boolean(modes[VIGILANCE_MAP_MODE]);
+    const showMap = isMeteoFranceSource && Boolean(modes[VIGILANCE_MAP_MODE]);
     // Section separators are only useful when there is content above them
     const hasContentAboveHourly =
       showDateLocation || showCurrentWeather || showChips || alerts.length > 0 || vigilanceEnabled || showMap;
@@ -205,18 +211,24 @@ class WeatherMeteoFranceBoxComponent extends Component {
       <div class="card">
         <div class="card-body" style="padding-top: 12px; padding-bottom: 12px">
           {showDateLocation && (
-            <div class="text-muted" style="font-size: 14px; margin-bottom: 8px">
-              <span style="text-transform: capitalize">
-                {dayjs()
-                  .locale(userLanguage)
-                  .format('dddd D MMMM')}
-              </span>
-              {locationName && (
-                <span>
-                  {' - '}
-                  {locationName}
+            <div
+              class="text-muted"
+              style="font-size: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: baseline"
+            >
+              <span style="min-width: 0">
+                <span style="text-transform: capitalize">
+                  {dayjs()
+                    .locale(userLanguage)
+                    .format('dddd D MMMM')}
                 </span>
-              )}
+                {boxData.houseName && (
+                  <span>
+                    {' - '}
+                    {boxData.houseName}
+                  </span>
+                )}
+              </span>
+              {locationName && <span style="margin-left: 8px; white-space: nowrap">{locationName}</span>}
             </div>
           )}
 

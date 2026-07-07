@@ -41,29 +41,31 @@ const EditWeatherMeteoFranceBox = ({ children, ...props }) => (
       </select>
     </div>
 
-    <div class="form-group">
-      <div class="form-check">
-        <input
-          type="checkbox"
-          class="form-check-input"
-          checked={props.box.vigilance}
-          onChange={props.updateBoxVigilance}
-        />
-        <label class="form-check-label">
-          <Text id="dashboard.boxes.weatherMeteoFrance.editVigilanceLabel" />
-        </label>
+    {props.isMeteoFranceSource && (
+      <div class="form-group">
+        <div class="form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            checked={props.box.vigilance}
+            onChange={props.updateBoxVigilance}
+          />
+          <label class="form-check-label">
+            <Text id="dashboard.boxes.weatherMeteoFrance.editVigilanceLabel" />
+          </label>
+        </div>
+        <small class="form-text text-muted">
+          <Text id="dashboard.boxes.weatherMeteoFrance.editVigilanceHelp" />
+        </small>
       </div>
-      <small class="form-text text-muted">
-        <Text id="dashboard.boxes.weatherMeteoFrance.editVigilanceHelp" />
-      </small>
-    </div>
+    )}
 
     <div class="form-group">
       <label>
         <Text id="dashboard.boxes.weather.editModeLabel" />
       </label>
       <div>
-        {DISPLAY_MODES.map(mode => {
+        {DISPLAY_MODES.filter(mode => props.isMeteoFranceSource || mode !== VIGILANCE_MAP_MODE).map(mode => {
           const label = `dashboard.boxes.weatherMeteoFrance.displayModes.${mode}`;
           const modes = props.box.modes || {};
           const checked = DEFAULT_ON_MODES.includes(mode) ? modes[mode] !== false : Boolean(modes[mode]);
@@ -119,15 +121,27 @@ class EditWeatherMeteoFranceBoxComponent extends Component {
     }
   };
 
+  getMeteoSource = async () => {
+    // Vigilance options only make sense with the Météo France source
+    try {
+      const variable = await this.props.httpClient.get('/api/v1/service/meteo/variable/METEO_SOURCE');
+      this.setState({ meteoSource: variable.value || 'meteofrance' });
+    } catch (e) {
+      this.setState({ meteoSource: 'meteofrance' });
+    }
+  };
+
   componentDidMount() {
     this.getHouses();
+    this.getMeteoSource();
   }
 
-  render(props, { houses }) {
+  render(props, { houses, meteoSource }) {
     return (
       <EditWeatherMeteoFranceBox
         {...props}
         houses={houses}
+        isMeteoFranceSource={meteoSource !== 'openweather'}
         updateBoxHouse={this.updateBoxHouse}
         updateBoxVigilance={this.updateBoxVigilance}
         updateBoxModes={this.updateBoxModes}

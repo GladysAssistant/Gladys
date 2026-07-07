@@ -6,8 +6,8 @@
     "cloud": true
   },
   {
-    "key": "meteoFrance",
-    "link": "meteofrance",
+    "key": "meteo",
+    "link": "meteo",
     "img": "/assets/integrations/cover/meteo-france.jpg",
     "whiteBackground": true,
     "cloud": true
