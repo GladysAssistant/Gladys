@@ -14,6 +14,7 @@ async function getTTSApiUrl({ text }) {
   const gradiumEndpoint = await this.gladys.variable.getValue('GRADIUM_ENDPOINT', this.serviceId);
   const gradiumApiKey = await this.gladys.variable.getValue('GRADIUM_API_KEY', this.serviceId);
   const gradiumVoiceId = await this.gladys.variable.getValue('GRADIUM_VOICE_ID', this.serviceId);
+  let uuid;
 
   try {
     const response = await this.gladys.http.request(
@@ -32,7 +33,7 @@ async function getTTSApiUrl({ text }) {
       'arraybuffer',
     );
 
-    const uuid = randomUUID();
+    uuid = randomUUID();
 
     // save as file with an uuid as name
     const dockerBased = await this.gladys.system.isDocker();
@@ -62,7 +63,9 @@ async function getTTSApiUrl({ text }) {
   } catch (e) {
     logger.warn('Gradium TTS request failed', e.message);
 
-    await fs.unlink(`${this.basePath}/${uuid}.ogg`);
+    if (uuid) {
+      await fs.unlink(`${this.basePath}/${uuid}.ogg`).catch(() => {});
+    }
 
     return '';
   }
