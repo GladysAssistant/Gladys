@@ -50,6 +50,7 @@ const boxesSchema = Joi.array().items(
       icon: Joi.string(),
       dept: Joi.string().allow(''),
       vigilance: Joi.boolean(),
+      source: Joi.string(),
     }),
   ),
 );

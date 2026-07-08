@@ -41,6 +41,20 @@ const EditWeatherMeteoFranceBox = ({ children, ...props }) => (
       </select>
     </div>
 
+    <div class="form-group">
+      <label>
+        <Text id="dashboard.boxes.weatherMeteoFrance.sourceLabel" />
+      </label>
+      <select onChange={props.updateBoxSource} class="form-control">
+        <option selected={props.isMeteoFranceSource} value="meteofrance">
+          <Text id="dashboard.boxes.weatherMeteoFrance.sourceMeteoFrance" />
+        </option>
+        <option selected={!props.isMeteoFranceSource} value="openweather">
+          <Text id="dashboard.boxes.weatherMeteoFrance.sourceOpenWeather" />
+        </option>
+      </select>
+    </div>
+
     {props.isMeteoFranceSource && (
       <div class="form-group">
         <div class="form-check">
@@ -102,6 +116,12 @@ class EditWeatherMeteoFranceBoxComponent extends Component {
     });
   };
 
+  updateBoxSource = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      source: e.target.value
+    });
+  };
+
   updateBoxModes = e => {
     // Clone the modes object: mutating it in place would prevent
     // componentDidUpdate from detecting the change in the widget
@@ -121,30 +141,22 @@ class EditWeatherMeteoFranceBoxComponent extends Component {
     }
   };
 
-  getMeteoSource = async () => {
-    // Vigilance options only make sense with the Météo France source
-    try {
-      const variable = await this.props.httpClient.get('/api/v1/service/meteo/variable/METEO_SOURCE');
-      this.setState({ meteoSource: variable.value || 'meteofrance' });
-    } catch (e) {
-      this.setState({ meteoSource: 'meteofrance' });
-    }
-  };
-
   componentDidMount() {
     this.getHouses();
-    this.getMeteoSource();
   }
 
-  render(props, { houses, meteoSource }) {
+  render(props, { houses }) {
+    // Vigilance options only make sense with the Météo France source
+    const isMeteoFranceSource = (props.box.source || 'meteofrance') !== 'openweather';
     return (
       <EditWeatherMeteoFranceBox
         {...props}
         houses={houses}
-        isMeteoFranceSource={meteoSource !== 'openweather'}
+        isMeteoFranceSource={isMeteoFranceSource}
         updateBoxHouse={this.updateBoxHouse}
         updateBoxVigilance={this.updateBoxVigilance}
         updateBoxModes={this.updateBoxModes}
+        updateBoxSource={this.updateBoxSource}
       />
     );
   }

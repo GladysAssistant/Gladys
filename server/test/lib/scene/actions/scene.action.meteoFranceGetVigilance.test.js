@@ -43,7 +43,7 @@ describe('scene.meteoFranceGetVigilance', () => {
       text: 'Orages violents attendus en soirée.',
     });
   });
-  it('should abort when the meteo service is not found', async () => {
+  it('should abort when the meteofrance service is not found', async () => {
     const house = {
       getBySelector: fake.resolves({ selector: 'main-house', latitude: 46.75, longitude: 4.35 }),
     };

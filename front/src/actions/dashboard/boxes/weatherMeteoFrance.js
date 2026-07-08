@@ -25,7 +25,10 @@ const MF_ICONS = {
   18: { j: '⛈️', n: '⛈️' },
   19: { j: '⛈️', n: '⛈️' },
   20: { j: '⛈️', n: '⛈️' },
-  21: { j: '⛈️', n: '⛈️' }
+  21: { j: '⛈️', n: '⛈️' },
+  // 26 confirmed from the API's own "desc" field ("Risque d'orages"); 22-25 are
+  // undocumented and left out on purpose rather than guessing their meaning
+  26: { j: '⛈️', n: '⛈️' }
 };
 
 // Translation keys per icon code: the API only provides fr/en descriptions,
@@ -51,21 +54,48 @@ const MF_CONDITIONS = {
   18: { j: 'thunderstorm', n: 'thunderstorm' },
   19: { j: 'thunderstorm', n: 'thunderstorm' },
   20: { j: 'thunderstorm', n: 'thunderstorm' },
-  21: { j: 'thunderstorm', n: 'thunderstorm' }
+  21: { j: 'thunderstorm', n: 'thunderstorm' },
+  26: { j: 'thunderstorm', n: 'thunderstorm' }
 };
 
-function getMFIcon(iconCode) {
-  const m = iconCode && iconCode.match(/p(\d+)([jn])/);
-  if (!m) return '🌡️';
-  const entry = MF_ICONS[parseInt(m[1], 10)];
-  return entry ? entry[m[2]] : '🌡️';
+// Keyword fallback for icon codes not in MF_ICONS (undocumented codes like p22-p25):
+// guess a reasonable icon from the API's own French description instead of a meaningless
+// placeholder. Order matters: more specific keywords (orage) are checked before generic ones.
+const DESC_KEYWORD_ICONS = [
+  { keywords: ['orage'], j: '⛈️', n: '⛈️' },
+  { keywords: ['neige', 'verglas'], j: '❄️', n: '❄️' },
+  { keywords: ['pluie', 'averse', 'bruine'], j: '🌧️', n: '🌧️' },
+  { keywords: ['brouillard', 'brume'], j: '🌫️', n: '🌫️' },
+  { keywords: ['nuage', 'nuageux', 'voilé', 'couvert'], j: '☁️', n: '☁️' }
+];
+
+function guessIconFromDesc(desc, period) {
+  const normalizedDesc = (desc || '').toLowerCase();
+  const match = DESC_KEYWORD_ICONS.find(entry => entry.keywords.some(keyword => normalizedDesc.includes(keyword)));
+  if (match) {
+    return match[period];
+  }
+  // No recognizable keyword: default to a clear-sky icon rather than the meaningless thermometer
+  return period === 'n' ? '🌙' : '☀️';
 }
 
-function getMFCondition(iconCode) {
-  const m = iconCode && iconCode.match(/p(\d+)([jn])/);
-  if (!m) return null;
+function getMFIcon(weather) {
+  const iconCode = weather ? weather.icon : null;
+  const m = iconCode && iconCode.match(/p(\d+)(bis)?([jn])/);
+  if (!m) return '🌡️';
+  // A "bis" suffix denotes a distinct condition from its base code (e.g. p14 = "Neige"
+  // but p14bis = "Averses"), not a variant of it: never look it up in MF_ICONS.
+  const entry = m[2] ? null : MF_ICONS[parseInt(m[1], 10)];
+  return entry ? entry[m[3]] : guessIconFromDesc(weather && weather.desc, m[3]);
+}
+
+function getMFCondition(weather) {
+  const iconCode = weather ? weather.icon : null;
+  const m = iconCode && iconCode.match(/p(\d+)(bis)?([jn])/);
+  if (!m || m[2]) return null;
   const entry = MF_CONDITIONS[parseInt(m[1], 10)];
-  return entry ? entry[m[2]] : null;
+  // Unknown code: return null so the caller falls back to the API's own French description
+  return entry ? entry[m[3]] : null;
 }
 
 function createActions(store) {
@@ -79,7 +109,10 @@ function createActions(store) {
           boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
           return;
         }
-        const url = `/api/v1/house/${box.house}/meteo/weather${box.vigilance ? '?vigilance=true' : ''}`;
+        const isMeteoFranceSource = (box.source || 'meteofrance') !== 'openweather';
+        const url = isMeteoFranceSource
+          ? `/api/v1/house/${box.house}/meteofrance/weather${box.vigilance ? '?vigilance=true' : ''}`
+          : `/api/v1/house/${box.house}/weather-widget/openweather`;
         const data = await state.httpClient.get(url);
 
         // The API returns the full current day, including past hours: keep future entries only
@@ -87,8 +120,8 @@ function createActions(store) {
         const rawForecast = data.forecast.forecast || [];
         const upcoming = rawForecast.filter(h => h.dt >= nowTs - 1800);
         const current = upcoming.find(h => h.T && h.T.value != null) || upcoming[0] || rawForecast[0];
-        const currentIcon = getMFIcon(current && current.weather ? current.weather.icon : null);
-        const currentCondition = getMFCondition(current && current.weather ? current.weather.icon : null);
+        const currentIcon = getMFIcon(current ? current.weather : null);
+        const currentCondition = getMFCondition(current ? current.weather : null);
 
         // Anchor the hourly strip on the same entry as the current conditions,
         // so the emphasized first column matches the displayed current weather
@@ -119,7 +152,7 @@ function createActions(store) {
             return {
               time: dayjs.unix(h.dt).format('HH'),
               temp: h.T && h.T.value != null ? h.T.value : null,
-              icon: getMFIcon(h.weather ? h.weather.icon : null),
+              icon: getMFIcon(h.weather),
               desc: h.weather ? h.weather.desc : '',
               rain: rain !== null ? Math.round(rain * 10) / 10 : null
             };
@@ -168,7 +201,7 @@ function createActions(store) {
             dt: d.dt,
             min: d.T && d.T.min != null ? d.T.min : null,
             max: d.T && d.T.max != null ? d.T.max : null,
-            icon: getMFIcon(weather ? weather.icon : null),
+            icon: getMFIcon(weather),
             desc: weather ? weather.desc : '',
             rain: rain !== null ? Math.round(rain * 10) / 10 : null
           };
@@ -196,9 +229,9 @@ function createActions(store) {
         // The national vigilance map is a Météo France feature and needs the
         // optional API key: fetch it separately, never with the OpenWeather source
         let vigilanceMapImage = null;
-        if (box.modes && box.modes.vigilanceMap && data.source !== 'openweather') {
+        if (box.modes && box.modes.vigilanceMap && isMeteoFranceSource) {
           try {
-            const mapData = await state.httpClient.get('/api/v1/service/meteo/vigilance/map');
+            const mapData = await state.httpClient.get('/api/v1/service/meteofrance/vigilance/map');
             vigilanceMapImage = mapData.image;
           } catch (mapError) {
             // Map unavailable (no API key configured or API error): the widget shows a hint

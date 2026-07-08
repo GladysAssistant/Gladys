@@ -580,15 +580,15 @@ const actionsFunc = {
     }
   },
   [ACTIONS.METEO_FRANCE.GET_VIGILANCE]: async (self, action, scope, path) => {
-    const meteoService = self.service.getService('meteo');
-    if (meteoService === null) {
-      throw new AbortScene('SERVICE_METEO_NOT_FOUND');
+    const meteoFranceService = self.service.getService('meteofrance');
+    if (meteoFranceService === null) {
+      throw new AbortScene('SERVICE_METEOFRANCE_NOT_FOUND');
     }
     const house = await self.house.getBySelector(action.house);
     if (!house || house.latitude == null || house.longitude == null) {
       throw new AbortScene('HOUSE_HAS_NO_COORDINATES');
     }
-    const vigilance = await meteoService.vigilance.getForHouse(house);
+    const vigilance = await meteoFranceService.vigilance.getForHouse(house);
     const VIGILANCE_COLOR_NAMES = {
       1: 'Vert',
       2: 'Jaune',
@@ -604,15 +604,15 @@ const actionsFunc = {
     });
   },
   [ACTIONS.METEO_FRANCE.GET_FORECAST]: async (self, action, scope, path) => {
-    const meteoService = self.service.getService('meteo');
-    if (meteoService === null) {
-      throw new AbortScene('SERVICE_METEO_NOT_FOUND');
+    const meteoFranceService = self.service.getService('meteofrance');
+    if (meteoFranceService === null) {
+      throw new AbortScene('SERVICE_METEOFRANCE_NOT_FOUND');
     }
     const house = await self.house.getBySelector(action.house);
     if (!house || house.latitude == null || house.longitude == null) {
       throw new AbortScene('HOUSE_HAS_NO_COORDINATES');
     }
-    const forecastSummary = await meteoService.forecast.getSummaryForHouse(house, action.days || 1);
+    const forecastSummary = await meteoFranceService.forecast.getSummaryForHouse(house, action.days || 1);
     set(scope, path, forecastSummary);
   },
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: async (self, action) => {

@@ -310,6 +310,9 @@
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
       "weatherMeteoFrance": {
+        "sourceLabel": "Source des prévisions",
+        "sourceMeteoFrance": "Météo France",
+        "sourceOpenWeather": "OpenWeather",
         "displayModes": {
           "dateLocation": "Date et lieu",
           "currentWeather": "Météo actuelle",
@@ -1465,26 +1468,19 @@
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
     },
-    "meteo": {
-      "title": "Météo",
-      "documentation": "Documentation Météo",
-      "description": "Affichez la météo, les prévisions et les alertes de vigilance dans Gladys, via Météo France ou OpenWeather.",
-      "introduction": "Cette intégration fournit la météo à Gladys à partir de la source de votre choix : le webservice officiel Météo France (France uniquement, avec les alertes de vigilance) ou l'API OpenWeather (couverture mondiale, clé API requise).",
-      "instructionsToUse": "Ajoutez simplement le widget « Météo France » sur votre tableau de bord et sélectionnez votre maison (ses coordonnées GPS doivent être configurées).",
-      "sourceLabel": "Source des prévisions :",
-      "sourceMeteoFrance": "Météo France",
-      "sourceOpenWeather": "OpenWeather",
-      "meteoFranceNoConfiguration": "Aucune configuration n'est nécessaire : les données Météo France sont accessibles librement, sans clé API.",
-      "meteoFranceInstructions": "Optionnel : pour afficher la carte de vigilance nationale dans le widget, créez un compte sur <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, souscrivez gratuitement à l'API <strong>DPVigilance</strong> et saisissez votre clé API ci-dessous.",
-      "meteoFranceApiKeyLabel": "Clé API Météo France (optionnelle, uniquement pour la carte de vigilance) :",
-      "meteoFranceApiKeyPlaceholder": "Entrer la clé API Météo France",
-      "openWeatherInstructions": "Vous devez d'abord créer un compte sur le site Web de l'API d'OpenWeather : <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
-      "openWeatherApiKeyLabel": "Clé API OpenWeather (obligatoire) :",
-      "openWeatherApiKeyPlaceholder": "Entrer la clé API OpenWeather",
+    "meteoFrance": {
+      "title": "Météo France",
+      "documentation": "Documentation Météo France",
+      "description": "Affichez la météo et les alertes de vigilance Météo France dans Gladys.",
+      "introduction": "Cette intégration se connecte au webservice officiel Météo France pour obtenir les prévisions météo et les alertes de vigilance (jaune, orange, rouge).",
+      "noConfiguration": "Aucune configuration n'est nécessaire : les données sont accessibles librement, sans clé API.",
+      "instructionsToUse": "Ajoutez simplement le widget « Météo France » sur votre tableau de bord et sélectionnez votre maison (ses coordonnées GPS doivent être configurées). Le département utilisé pour la vigilance est détecté automatiquement.",
+      "instructions": "Optionnel : pour afficher la carte de vigilance nationale dans le widget, créez un compte sur <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, souscrivez gratuitement à l'API <strong>DPVigilance</strong> et saisissez votre clé API ci-dessous.",
+      "apiKeyLabel": "Clé API (optionnelle, uniquement pour la carte de vigilance) :",
+      "apiKeyPlaceholder": "Entrer la clé API Météo France",
       "saveButton": "Sauvegarder",
-      "saveSuccess": "Paramètres sauvegardés avec succès.",
-      "saveError": "Erreur lors de la sauvegarde des paramètres.",
-      "openWeatherIntroduction": "Cette intégration vous aide à intégrer l'API OpenWeather pour obtenir la météo dans Gladys."
+      "saveSuccess": "Clé API sauvegardée avec succès.",
+      "saveError": "Erreur lors de la sauvegarde de la clé API."
     },
     "tuya": {
       "title": "Tuya",

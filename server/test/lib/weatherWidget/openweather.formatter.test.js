@@ -3,8 +3,8 @@ const {
   formatOpenWeatherAsMeteoFrance,
   convertIcon,
   degreesToCardinal,
-} = require('../../../services/meteo/lib/openweather.formatter');
-const { owDay1, owCurrentData, owForecastData } = require('./meteo.data');
+} = require('../../../lib/weatherWidget/openweather.formatter');
+const { owDay1, owCurrentData, owForecastData } = require('./weatherWidget.data');
 
 describe('openweather.formatter', () => {
   describe('convertIcon', () => {

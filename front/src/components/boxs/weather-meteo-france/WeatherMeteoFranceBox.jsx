@@ -81,9 +81,10 @@ class WeatherMeteoFranceBoxComponent extends Component {
 
   componentDidUpdate(prevProps) {
     const houseChanged = prevProps.box.house !== this.props.box.house;
+    const sourceChanged = prevProps.box.source !== this.props.box.source;
     const vigilanceChanged = prevProps.box.vigilance !== this.props.box.vigilance;
     const mapChanged = get(prevProps, 'box.modes.vigilanceMap') !== get(this.props, 'box.modes.vigilanceMap');
-    if (houseChanged || vigilanceChanged || mapChanged) {
+    if (houseChanged || sourceChanged || vigilanceChanged || mapChanged) {
       this.refreshData();
     }
   }
@@ -186,11 +187,13 @@ class WeatherMeteoFranceBoxComponent extends Component {
     // Vigilance and its national map are Météo France features: with the
     // OpenWeather source the widget only shows OpenWeather data
     const isMeteoFranceSource = boxData.source !== 'openweather';
-    const alerts = (isMeteoFranceSource && vigilance && vigilance.alerts) || [];
+    // Gate on props.box.vigilance too: right after unchecking the option, boxData still
+    // holds the previous response's alerts until the pending refresh call resolves
+    const vigilanceRequested = isMeteoFranceSource && Boolean(props.box.vigilance);
+    const alerts = (vigilanceRequested && vigilance && vigilance.alerts) || [];
     // No French department (house outside France): vigilance does not apply,
     // so the reassuring "no vigilance" message would be misleading
-    const vigilanceEnabled =
-      isMeteoFranceSource && Boolean(props.box.vigilance) && Boolean(vigilance && vigilance.dept);
+    const vigilanceEnabled = vigilanceRequested && Boolean(vigilance && vigilance.dept);
     // Default to visible for widgets saved before these options existed
     const showCurrentWeather = modes[CURRENT_WEATHER_MODE] !== false;
     const showDateLocation = modes[DATE_LOCATION_MODE] !== false;
