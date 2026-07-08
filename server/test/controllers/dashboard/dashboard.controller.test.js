@@ -167,17 +167,20 @@ describe('GET /api/v1/dashboard/photo/proxy', () => {
   });
 
   it('should proxy an external photo', async () => {
-    const imageBuffer = Buffer.from('fake-image');
+    const inputBuffer = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      'base64',
+    );
     nock('http://192.168.1.10')
       .get('/photos/vacation.jpg')
-      .reply(200, imageBuffer, { 'Content-Type': 'image/jpeg' });
+      .reply(200, inputBuffer, { 'Content-Type': 'image/png' });
 
     await authenticatedRequest
       .get('/api/v1/dashboard/photo/proxy')
       .query({ url: 'http://192.168.1.10/photos/vacation.jpg' })
       .expect(200)
       .then((res) => {
-        expect(res.text).to.equal(`image/jpeg;base64,${imageBuffer.toString('base64')}`);
+        expect(res.text).to.match(/^image\/jpeg;base64,/);
       });
   });
 });

@@ -1,8 +1,12 @@
 const axios = require('axios');
 const { BadParameters } = require('../../utils/coreErrors');
+const { resizeImageBuffer } = require('../../utils/resizeImage');
 
 const REQUEST_TIMEOUT_MS = 15_000;
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_SOURCE_IMAGE_BYTES = 25 * 1024 * 1024;
+const DASHBOARD_PHOTO_MAX_WIDTH = 800;
+const DASHBOARD_PHOTO_MAX_HEIGHT = 400;
+const DASHBOARD_PHOTO_JPEG_QUALITY = 80;
 const ALLOWED_CONTENT_TYPES = new Set([
   'image/jpeg',
   'image/png',
@@ -10,13 +14,14 @@ const ALLOWED_CONTENT_TYPES = new Set([
   'image/webp',
   'image/avif',
   'image/bmp',
+  'application/octet-stream',
 ]);
 
 /**
- * @description Fetch an external image and return it as a data URI.
+ * @description Fetch an external image, resize it for the dashboard widget, and return a JPEG data URI.
  * The request is made by the Gladys server so local NAS URLs remain reachable remotely via Gladys Plus.
  * @param {string} url - HTTP or HTTPS image URL.
- * @returns {Promise<string>} Image as a data URI (e.g. image/jpeg;base64,...).
+ * @returns {Promise<string>} Image as a JPEG data URI (image/jpeg;base64,...).
  * @example
  * dashboard.getPhoto('http://192.168.1.10/photos/vacation.jpg');
  */
@@ -38,8 +43,8 @@ async function getPhoto(url) {
     method: 'get',
     responseType: 'arraybuffer',
     timeout: REQUEST_TIMEOUT_MS,
-    maxContentLength: MAX_IMAGE_BYTES,
-    maxBodyLength: MAX_IMAGE_BYTES,
+    maxContentLength: MAX_SOURCE_IMAGE_BYTES,
+    maxBodyLength: MAX_SOURCE_IMAGE_BYTES,
     validateStatus: (status) => status >= 200 && status < 300,
   });
 
@@ -54,7 +59,15 @@ async function getPhoto(url) {
 
   const imageBuffer = Buffer.from(response.data);
 
-  return `${contentType};base64,${imageBuffer.toString('base64')}`;
+  try {
+    return await resizeImageBuffer(imageBuffer, {
+      maxWidth: DASHBOARD_PHOTO_MAX_WIDTH,
+      maxHeight: DASHBOARD_PHOTO_MAX_HEIGHT,
+      quality: DASHBOARD_PHOTO_JPEG_QUALITY,
+    });
+  } catch (e) {
+    throw new BadParameters('URL does not point to a supported image');
+  }
 }
 
 module.exports = {
