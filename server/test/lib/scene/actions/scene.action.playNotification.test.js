@@ -47,7 +47,7 @@ describe('scene.play-notification', () => {
             type: ACTIONS.MUSIC.PLAY_NOTIFICATION,
             device: 'my-device',
             text: 'Temperature in the living room is {{0.0.last_value}} °C.',
-            tts: 'gateway'
+            tts: 'gateway',
           },
         ],
       ],

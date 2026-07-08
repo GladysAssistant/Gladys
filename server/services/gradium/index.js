@@ -14,9 +14,10 @@ module.exports = function GradiumService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Gradium service');
+    const gradiumEndpoint = await gladys.variable.getValue('GRADIUM_ENDPOINT', serviceId);
     const gradiumApiKey = await gladys.variable.getValue('GRADIUM_API_KEY', serviceId);
     const gradiumVoiceId = await gladys.variable.getValue('GRADIUM_VOICE_ID', serviceId);
-    if (!gradiumApiKey || !gradiumVoiceId) {
+    if (!gradiumEndpoint || !gradiumApiKey || !gradiumVoiceId) {
       throw new ServiceNotConfiguredError('Gradium Service not correctly configured');
     }
   }

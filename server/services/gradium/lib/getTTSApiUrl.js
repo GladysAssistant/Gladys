@@ -11,12 +11,14 @@ const logger = require('../../../utils/logger');
  * getTTSApiUrl({ text: 'Blabla' })
  */
 async function getTTSApiUrl({ text }) {
+  const gradiumEndpoint = await this.gladys.variable.getValue('GRADIUM_ENDPOINT', this.serviceId);
   const gradiumApiKey = await this.gladys.variable.getValue('GRADIUM_API_KEY', this.serviceId);
   const gradiumVoiceId = await this.gladys.variable.getValue('GRADIUM_VOICE_ID', this.serviceId);
+
   try {
     const response = await this.gladys.http.request(
       'post',
-      `https://eu.api.gradium.ai/api/post/speech/tts`,
+      `https://${gradiumEndpoint}.api.gradium.ai/api/post/speech/tts`,
       {
         text,
         voice_id: gradiumVoiceId,
@@ -58,7 +60,9 @@ async function getTTSApiUrl({ text }) {
       process.env.NODE_ENV === 'production' ? '' : `:${process.env.PORT || 1443}`
     }/api/v1/service/gradium/speech-file/${uuid}.ogg`;
   } catch (e) {
-    logger.warn(e);
+    logger.warn('Gradium TTS request failed', e.message);
+
+    await fs.unlink(`${this.basePath}/${uuid}.ogg`);
 
     return '';
   }
