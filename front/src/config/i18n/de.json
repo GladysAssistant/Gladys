@@ -1722,11 +1722,15 @@
             "binary": "Ein einfacher Ein/Aus-Schalter zur Steuerung einer Lampe.",
             "brightness": "Ein Schieberegler zur Einstellung der Helligkeit von 0% bis 100%.",
             "color": "Ein Farbwähler zur Einstellung der Lichtfarbe.",
+            "hue": "Ein Schieberegler zur Einstellung des Farbtons von 0° bis 360°.",
+            "saturation": "Ein Schieberegler zur Einstellung der Sättigung von 0% bis 100%.",
             "temperature": "Ein Schieberegler zur Einstellung der Farbtemperatur (warmes bis kühles Weiß)."
           },
           "switch": {
             "binary": "Ein einfacher Ein/Aus-Schalter für jedes Gerät.",
-            "dimmer": "Ein Schieberegler zur Steuerung der Intensität eines Geräts."
+            "dimmer": "Ein Schieberegler zur Steuerung der Intensität eines Geräts.",
+            "burglar": "Ein Ein/Aus-Schalter zum Aktivieren oder Deaktivieren der Kindersicherung (Diebstahlschutz) einer Smart-Steckdose.",
+            "energy": "Zeigt den kumulierten Energieverbrauch in kWh an."
           },
           "temperature-sensor": {
             "decimal": "Zeigt die aktuelle Temperatur mit ihrer Einheit an."
@@ -4286,7 +4290,7 @@
       "current": "Schalter: Strom",
       "binary": "Schalter: ein/aus",
       "dimmer": "Schalter: Dimmer",
-      "burglar": "Schalter: Einbruch",
+      "burglar": "Kindersicherung (Diebstahlschutz)",
       "power": "Leistungsverbrauch",
       "energy": "Energieverbrauch",
       "target-current": "Sollstrom"
@@ -4590,11 +4594,11 @@
     },
     "voc-matter-index-sensor": {
       "shortCategoryName": "VOC Index",
-      "integer": "VOC Index (ganze Zahl)"
+      "integer": "VOC Index"
     },
     "no2-matter-index-sensor": {
       "shortCategoryName": "NO₂-Index",
-      "integer": "NO₂-Index (ganze Zahl)"
+      "integer": "NO₂-Index"
     },
     "shutter": {
       "shortCategoryName": "Jalousie",
@@ -4624,7 +4628,7 @@
     },
     "ph-sensor": {
       "shortCategoryName": "pH-Sensor",
-      "decimal": "pH (Dezimal)"
+      "decimal": "pH"
     },
     "orp-sensor": {
       "shortCategoryName": "ORP-Sensor (Redox)",
@@ -4660,7 +4664,7 @@
     },
     "angle-sensor": {
       "shortCategoryName": "Winkelsensor",
-      "integer": "Winkel (ganze Zahl)"
+      "integer": "Winkel"
     },
     "risk": {
       "shortCategoryName": "Risiko",

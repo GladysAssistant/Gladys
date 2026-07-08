@@ -1617,11 +1617,15 @@
             "binary": "A simple on/off switch to control a light.",
             "brightness": "A slider to adjust light brightness from 0% to 100%.",
             "color": "A color picker to set the light color.",
+            "hue": "A slider to adjust the light hue from 0° to 360°.",
+            "saturation": "A slider to adjust the light saturation from 0% to 100%.",
             "temperature": "A slider to adjust the color temperature (warm to cool white)."
           },
           "switch": {
             "binary": "A simple on/off switch for any appliance.",
-            "dimmer": "A slider to control the intensity of a device."
+            "dimmer": "A slider to control the intensity of a device.",
+            "burglar": "An on/off switch to enable or disable the child lock (anti-theft) on a smart plug.",
+            "energy": "Displays cumulative energy consumption in kWh."
           },
           "temperature-sensor": {
             "decimal": "Displays the current temperature with its unit."
@@ -4286,7 +4290,7 @@
       "current": "Switch Current",
       "binary": "Switch (On/Off)",
       "dimmer": "Switch Dimmer",
-      "burglar": "Switch Burglar",
+      "burglar": "Child lock (anti-theft)",
       "power": "Power consumption",
       "energy": "Energy consumption",
       "target-current": "Target current"
@@ -4590,11 +4594,11 @@
     },
     "voc-matter-index-sensor": {
       "shortCategoryName": "VOC Index",
-      "integer": "VOC Index (integer)"
+      "integer": "VOC Index"
     },
     "no2-matter-index-sensor": {
       "shortCategoryName": "NO₂ Index",
-      "integer": "NO₂ Index (integer)"
+      "integer": "NO₂ Index"
     },
     "shutter": {
       "shortCategoryName": "Shutter",
@@ -4624,7 +4628,7 @@
     },
     "ph-sensor": {
       "shortCategoryName": "pH Sensor",
-      "decimal": "pH (Decimal)"
+      "decimal": "pH"
     },
     "orp-sensor": {
       "shortCategoryName": "ORP Sensor (Redox)",
@@ -4660,7 +4664,7 @@
     },
     "angle-sensor": {
       "shortCategoryName": "Angle sensor",
-      "integer": "Angle (integer)"
+      "integer": "Angle"
     },
     "risk": {
       "shortCategoryName": "Risk",

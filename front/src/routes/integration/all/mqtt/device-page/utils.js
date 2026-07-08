@@ -45,18 +45,29 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING ||
     category === DEVICE_FEATURE_CATEGORIES.DATA ||
     category === DEVICE_FEATURE_CATEGORIES.DATARATE ||
-    category === DEVICE_FEATURE_CATEGORIES.DURATION
+    category === DEVICE_FEATURE_CATEGORIES.DURATION ||
+    category === DEVICE_FEATURE_CATEGORIES.TAMPER ||
+    category === DEVICE_FEATURE_CATEGORIES.INPUT
   ) {
     return true;
   }
   return category.endsWith(SENSOR_CATEGORY_SUFFIX) || category === DEVICE_FEATURE_CATEGORIES.SIGNAL;
 };
 
+export const normalizeForSearch = value =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
 const categoryTypeKey = (category, type) => `${category}|${type}`;
 
 const CATEGORIES_WITHOUT_UNIT = new Set([
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'integer'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'decimal'),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.FAN, DEVICE_FEATURE_TYPES.FAN.SPEED),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.UV_SENSOR, 'integer'),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PH_SENSOR, 'decimal'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CUBE, DEVICE_FEATURE_TYPES.CUBE.MODE),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.BINARY),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.VTIC),
@@ -129,7 +140,22 @@ const FEATURE_UNIT_BY_CATEGORY_TYPE = {
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.LUX,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
-  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.UV_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.UV_INDEX,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.LIGHT,
+    DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.SHUTTER,
+    DEVICE_FEATURE_TYPES.SHUTTER.POSITION
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.CURTAIN,
+    DEVICE_FEATURE_TYPES.CURTAIN.POSITION
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.SWITCH,
+    DEVICE_FEATURE_TYPES.SWITCH.ENERGY
+  )]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   [categoryTypeKey(
     DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
     'decimal'
@@ -277,6 +303,13 @@ const PREFERRED_DEFAULT_UNIT_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.SURFACE]: DEVICE_FEATURE_UNITS.SQUARE_METER
 };
 
+const SWITCH_TYPE_UNITS = {
+  [DEVICE_FEATURE_TYPES.SWITCH.POWER]: DEVICE_FEATURE_UNITS.WATT,
+  [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: DEVICE_FEATURE_UNITS.VOLT,
+  [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: DEVICE_FEATURE_UNITS.AMPERE
+};
+
 const ENERGY_SENSOR_TYPE_UNITS = {
   [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER]: DEVICE_FEATURE_UNITS.WATT,
   [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
@@ -361,6 +394,13 @@ export const getDefaultUnitForFeature = (category, type) => {
     }
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.SWITCH) {
+    const switchUnit = SWITCH_TYPE_UNITS[type];
+    if (switchUnit) {
+      return switchUnit;
+    }
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR) {
     const energyUnit = ENERGY_SENSOR_TYPE_UNITS[type];
     if (energyUnit) {
@@ -414,6 +454,11 @@ const TELEVISION_CONTINUOUS_CONTROL_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL
 ]);
 
+const MUSIC_CONTINUOUS_CONTROL_TYPES = new Set([
+  DEVICE_FEATURE_TYPES.MUSIC.VOLUME,
+  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE
+]);
+
 export const isCatalogPushButtonFeature = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.BUTTON && type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
     return true;
@@ -421,6 +466,10 @@ export const isCatalogPushButtonFeature = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.TELEVISION) {
     return !TELEVISION_CONTINUOUS_CONTROL_TYPES.has(type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
+    return !MUSIC_CONTINUOUS_CONTROL_TYPES.has(type);
   }
 
   return false;
@@ -449,12 +498,35 @@ export const getFeatureDefaultValues = (category, type) => {
     has_feedback: false
   };
 
-  if (type === DEVICE_FEATURE_TYPES.SWITCH.BINARY || type === DEVICE_FEATURE_TYPES.LIGHT.BINARY) {
+  if (type === DEVICE_FEATURE_TYPES.LIGHT.BINARY && category === DEVICE_FEATURE_CATEGORIES.LIGHT) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: false }, category, type);
   }
 
+  if (type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: isSensorCategory(category) }, category, type);
+  }
+
   if (type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
-    return applyDefaultUnit({ ...defaults, min: 1, max: 1, read_only: false, keep_history: false }, category, type);
+    const readOnly = isSensorCategory(category);
+    return applyDefaultUnit(
+      {
+        ...defaults,
+        min: readOnly ? 0 : 1,
+        max: 1,
+        read_only: readOnly,
+        keep_history: readOnly ? defaults.keep_history : false
+      },
+      category,
+      type
+    );
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC && type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC && type === DEVICE_FEATURE_TYPES.MUSIC.VOLUME) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }
 
   if (isCatalogPushButtonFeature(category, type)) {
@@ -503,8 +575,13 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 153, max: 500, read_only: false }, category, type);
   }
 
-  if (type === DEVICE_FEATURE_TYPES.LIGHT.COLOR || type === DEVICE_FEATURE_TYPES.LIGHT.HUE) {
-    return applyDefaultUnit({ ...defaults, min: 0, max: 360, read_only: false }, category, type);
+  if (
+    type === DEVICE_FEATURE_TYPES.LIGHT.COLOR ||
+    type === DEVICE_FEATURE_TYPES.LIGHT.HUE ||
+    type === DEVICE_FEATURE_TYPES.LIGHT.SATURATION
+  ) {
+    const max = type === DEVICE_FEATURE_TYPES.LIGHT.SATURATION ? 100 : 360;
+    return applyDefaultUnit({ ...defaults, min: 0, max, read_only: false }, category, type);
   }
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.POWER) {
@@ -677,6 +754,14 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE) {
     return 300;
+  }
+
+  if (type === DEVICE_FEATURE_TYPES.LIGHT.HUE) {
+    return 180;
+  }
+
+  if (type === DEVICE_FEATURE_TYPES.LIGHT.SATURATION) {
+    return 75;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.CUBE) {
@@ -963,23 +1048,19 @@ export const filterFeatureCatalogOptions = (options, search, dictionary) => {
     return options;
   }
 
-  const normalizedSearch = search.trim().toLowerCase();
+  const normalizedSearch = normalizeForSearch(search.trim());
 
   return options
     .map(group => {
       const filteredOptions = group.options.filter(option => {
-        const label = option.label.toLowerCase();
-        const categoryLabel = group.label.toLowerCase();
-        const description = get(
-          dictionary,
-          `integration.mqtt.featureCatalog.descriptions.${option.category}.${option.type}`,
-          ''
-        ).toLowerCase();
-        const keywords = get(
-          dictionary,
-          `integration.mqtt.featureCatalog.keywords.${option.category}.${option.type}`,
-          ''
-        ).toLowerCase();
+        const label = normalizeForSearch(option.label);
+        const categoryLabel = normalizeForSearch(group.label);
+        const description = normalizeForSearch(
+          get(dictionary, `integration.mqtt.featureCatalog.descriptions.${option.category}.${option.type}`, '')
+        );
+        const keywords = normalizeForSearch(
+          get(dictionary, `integration.mqtt.featureCatalog.keywords.${option.category}.${option.type}`, '')
+        );
 
         return (
           label.includes(normalizedSearch) ||

@@ -1855,11 +1855,15 @@
             "binary": "Un simple interrupteur marche/arrêt pour contrôler une lumière.",
             "brightness": "Un curseur pour régler la luminosité de 0% à 100%.",
             "color": "Un sélecteur de couleur pour définir la teinte de la lumière.",
+            "hue": "Un curseur pour régler la teinte de la lumière de 0° à 360°.",
+            "saturation": "Un curseur pour régler la saturation de la lumière de 0% à 100%.",
             "temperature": "Un curseur pour ajuster la température de couleur (blanc chaud à froid)."
           },
           "switch": {
             "binary": "Un simple interrupteur marche/arrêt pour tout appareil.",
-            "dimmer": "Un curseur pour contrôler l'intensité d'un appareil."
+            "dimmer": "Un curseur pour contrôler l'intensité d'un appareil.",
+            "burglar": "Un interrupteur marche/arrêt pour activer ou désactiver la sécurité enfant (antivol) d'une prise connectée.",
+            "energy": "Affiche la consommation d'énergie cumulée en kWh."
           },
           "temperature-sensor": {
             "decimal": "Affiche la température actuelle avec son unité."
@@ -4286,7 +4290,7 @@
       "current": "Intensité consommée",
       "binary": "Commutateur",
       "dimmer": "Variateur",
-      "burglar": "Antivol",
+      "burglar": "Sécurité enfant (antivol)",
       "power": "Puissance consommée",
       "energy": "Energie consommée",
       "target-current": "Intensité de consigne"
@@ -4590,11 +4594,11 @@
     },
     "voc-matter-index-sensor": {
       "shortCategoryName": "Indice COV",
-      "integer": "Indice COV (entier)"
+      "integer": "Indice COV"
     },
     "no2-matter-index-sensor": {
       "shortCategoryName": "Indice NO₂",
-      "integer": "Indice NO₂ (entier)"
+      "integer": "Indice NO₂"
     },
     "shutter": {
       "shortCategoryName": "Volet",
@@ -4624,7 +4628,7 @@
     },
     "ph-sensor": {
       "shortCategoryName": "Capteur de pH",
-      "decimal": "pH (Décimale)"
+      "decimal": "pH"
     },
     "orp-sensor": {
       "shortCategoryName": "Capteur Redox / ORP",
@@ -4660,7 +4664,7 @@
     },
     "angle-sensor": {
       "shortCategoryName": "Angle",
-      "integer": "Angle (entier)"
+      "integer": "Angle"
     },
     "risk": {
       "shortCategoryName": "Risque",
