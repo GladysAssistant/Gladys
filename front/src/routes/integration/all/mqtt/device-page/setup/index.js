@@ -15,7 +15,8 @@ import {
   generateMqttExternalIdSuffix,
   normalizeMqttExternalId,
   parseMqttDeviceValidationErrors,
-  clearMqttDeviceValidationError
+  clearMqttDeviceValidationError,
+  isMqttCatalogFeatureVisible
 } from '../utils';
 
 import {
@@ -529,7 +530,8 @@ class MqttDeviceSetupPage extends Component {
           const typeValue = type;
           if (
             get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`) &&
-            typeValue !== 'shortCategoryName'
+            typeValue !== 'shortCategoryName' &&
+            isMqttCatalogFeatureVisible(categoryValue, typeValue)
           ) {
             categoryFeatureTypeOptions.push({
               value: `${categoryValue}|${typeValue}`,
@@ -545,7 +547,9 @@ class MqttDeviceSetupPage extends Component {
         });
       }
     });
-    this.setState({ deviceFeaturesOptions });
+    this.setState({
+      deviceFeaturesOptions: deviceFeaturesOptions.filter(group => group.options.length > 0)
+    });
   };
 
   constructor(props) {

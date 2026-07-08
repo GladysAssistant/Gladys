@@ -62,6 +62,13 @@ export const normalizeForSearch = value =>
 
 const categoryTypeKey = (category, type) => `${category}|${type}`;
 
+const MQTT_CATALOG_EXCLUDED_FEATURES = new Set([
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR)
+]);
+
+export const isMqttCatalogFeatureVisible = (category, type) =>
+  !MQTT_CATALOG_EXCLUDED_FEATURES.has(categoryTypeKey(category, type));
+
 const CATEGORIES_WITHOUT_UNIT = new Set([
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'integer'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'decimal'),

@@ -1862,7 +1862,6 @@
           "switch": {
             "binary": "Un simple interrupteur marche/arrêt pour tout appareil.",
             "dimmer": "Un curseur pour contrôler l'intensité d'un appareil.",
-            "burglar": "Un actionneur marche/arrêt pour ce type de fonctionnalité hérité. Pour la sécurité enfant d'une prise connectée (verrouillage du bouton physique), utilisez plutôt la catégorie Sécurité enfant.",
             "energy": "Affiche la consommation d'énergie cumulée en kWh."
           },
           "temperature-sensor": {
