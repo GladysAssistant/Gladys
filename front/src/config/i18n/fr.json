@@ -1862,7 +1862,7 @@
           "switch": {
             "binary": "Un simple interrupteur marche/arrêt pour tout appareil.",
             "dimmer": "Un curseur pour contrôler l'intensité d'un appareil.",
-            "burglar": "Un interrupteur marche/arrêt pour activer ou désactiver la sécurité enfant (antivol) d'une prise connectée.",
+            "burglar": "Un actionneur marche/arrêt pour ce type de fonctionnalité hérité. Pour la sécurité enfant d'une prise connectée (verrouillage du bouton physique), utilisez plutôt la catégorie Sécurité enfant.",
             "energy": "Affiche la consommation d'énergie cumulée en kWh."
           },
           "temperature-sensor": {
@@ -4290,7 +4290,7 @@
       "current": "Intensité consommée",
       "binary": "Commutateur",
       "dimmer": "Variateur",
-      "burglar": "Sécurité enfant (antivol)",
+      "burglar": "Antivol",
       "power": "Puissance consommée",
       "energy": "Energie consommée",
       "target-current": "Intensité de consigne"

@@ -1624,7 +1624,7 @@
           "switch": {
             "binary": "A simple on/off switch for any appliance.",
             "dimmer": "A slider to control the intensity of a device.",
-            "burglar": "An on/off switch to enable or disable the child lock (anti-theft) on a smart plug.",
+            "burglar": "An on/off actuator for this legacy switch feature type. For a smart plug child lock (physical button lock), use the Child lock category instead.",
             "energy": "Displays cumulative energy consumption in kWh."
           },
           "temperature-sensor": {
@@ -4290,7 +4290,7 @@
       "current": "Switch Current",
       "binary": "Switch (On/Off)",
       "dimmer": "Switch Dimmer",
-      "burglar": "Child lock (anti-theft)",
+      "burglar": "Switch Burglar",
       "power": "Power consumption",
       "energy": "Energy consumption",
       "target-current": "Target current"

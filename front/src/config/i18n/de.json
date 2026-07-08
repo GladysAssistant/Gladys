@@ -1729,7 +1729,7 @@
           "switch": {
             "binary": "Ein einfacher Ein/Aus-Schalter für jedes Gerät.",
             "dimmer": "Ein Schieberegler zur Steuerung der Intensität eines Geräts.",
-            "burglar": "Ein Ein/Aus-Schalter zum Aktivieren oder Deaktivieren der Kindersicherung (Diebstahlschutz) einer Smart-Steckdose.",
+            "burglar": "Ein Ein/Aus-Aktor für diesen älteren Schaltertyp. Für die Kindersicherung einer Smart-Steckdose (physische Tastensperre) verwenden Sie stattdessen die Kategorie Kindersicherung.",
             "energy": "Zeigt den kumulierten Energieverbrauch in kWh an."
           },
           "temperature-sensor": {
@@ -4290,7 +4290,7 @@
       "current": "Schalter: Strom",
       "binary": "Schalter: ein/aus",
       "dimmer": "Schalter: Dimmer",
-      "burglar": "Kindersicherung (Diebstahlschutz)",
+      "burglar": "Schalter: Einbruch",
       "power": "Leistungsverbrauch",
       "energy": "Energieverbrauch",
       "target-current": "Sollstrom"
