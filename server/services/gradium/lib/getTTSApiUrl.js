@@ -16,6 +16,11 @@ async function getTTSApiUrl({ text }) {
   const gradiumVoiceId = await this.gladys.variable.getValue('GRADIUM_VOICE_ID', this.serviceId);
   let filePath;
 
+  if (['eu', 'us'].indexOf(gradiumEndpoint) === -1) {
+    logger.warn(`Gradium TTS request failed: invalid endpoint ${gradiumEndpoint}`);
+    return '';
+  }
+
   try {
     const response = await this.gladys.http.request(
       'post',

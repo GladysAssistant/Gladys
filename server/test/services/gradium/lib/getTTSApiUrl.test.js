@@ -69,7 +69,7 @@ describe('getTTSApiUrl', () => {
       },
     };
 
-    context.gladys.variable.getValue.withArgs('GRADIUM_ENDPOINT', context.serviceId).resolves('my-endpoint');
+    context.gladys.variable.getValue.withArgs('GRADIUM_ENDPOINT', context.serviceId).resolves('eu');
     context.gladys.variable.getValue.withArgs('GRADIUM_API_KEY', context.serviceId).resolves('my-api-key');
     context.gladys.variable.getValue.withArgs('GRADIUM_VOICE_ID', context.serviceId).resolves('my-voice-id');
 
@@ -78,7 +78,7 @@ describe('getTTSApiUrl', () => {
     expect(context.gladys.http.request.callCount).to.equal(1);
     expect(context.gladys.http.request.firstCall.args).to.deep.equal([
       'post',
-      'https://my-endpoint.api.gradium.ai/api/post/speech/tts',
+      'https://eu.api.gradium.ai/api/post/speech/tts',
       {
         text: 'Bonjour Gladys',
         voice_id: 'my-voice-id',
@@ -127,7 +127,7 @@ describe('getTTSApiUrl', () => {
       },
     };
 
-    context.gladys.variable.getValue.withArgs('GRADIUM_ENDPOINT', context.serviceId).resolves('my-endpoint');
+    context.gladys.variable.getValue.withArgs('GRADIUM_ENDPOINT', context.serviceId).resolves('eu');
     context.gladys.variable.getValue.withArgs('GRADIUM_API_KEY', context.serviceId).resolves('my-api-key');
     context.gladys.variable.getValue.withArgs('GRADIUM_VOICE_ID', context.serviceId).resolves('my-voice-id');
 
@@ -169,7 +169,7 @@ describe('getTTSApiUrl', () => {
       },
     };
 
-    context.gladys.variable.getValue.withArgs('GRADIUM_ENDPOINT', context.serviceId).resolves('my-endpoint');
+    context.gladys.variable.getValue.withArgs('GRADIUM_ENDPOINT', context.serviceId).resolves('eu');
     context.gladys.variable.getValue.withArgs('GRADIUM_API_KEY', context.serviceId).resolves('my-api-key');
     context.gladys.variable.getValue.withArgs('GRADIUM_VOICE_ID', context.serviceId).resolves('my-voice-id');
 
@@ -181,5 +181,43 @@ describe('getTTSApiUrl', () => {
     expect(warn.firstCall.args[1]).to.equal('disk full');
     expect(rm.callCount).to.equal(1);
     expect(rm.firstCall.args[0]).to.equal('medias/gradium/07f16117-8556-4b50-b9f0-e190d08f8d92.ogg');
+  });
+
+  it('should return empty string when endpoint is invalid', async () => {
+    const context = {
+      serviceId: 'f2660e4d-fc4e-4cb6-af0e-f281d00f00aa',
+      basePath: 'medias/gradium',
+      gladys: {
+        variable: {
+          getValue: stub(),
+        },
+        http: {
+          request: stub().resolves({
+            data: Buffer.from('audio-content'),
+          }),
+        },
+        system: {
+          isDocker: stub().resolves(false),
+          getInfos: stub().resolves({
+            network_interfaces: {
+              en0: [{ family: 'IPv4', internal: false, address: '10.0.0.3' }],
+            },
+          }),
+        },
+      },
+    };
+
+    context.gladys.variable.getValue.withArgs('GRADIUM_ENDPOINT', context.serviceId).resolves('my-endpoint');
+    context.gladys.variable.getValue.withArgs('GRADIUM_API_KEY', context.serviceId).resolves('my-api-key');
+    context.gladys.variable.getValue.withArgs('GRADIUM_VOICE_ID', context.serviceId).resolves('my-voice-id');
+
+    const result = await getTTSApiUrl.call(context, { text: 'Bonjour Gladys' });
+
+    expect(result).to.equal('');
+    expect(warn.callCount).to.equal(1);
+    expect(warn.firstCall.args[0]).to.equal('Gradium TTS request failed: invalid endpoint my-endpoint');
+    expect(context.gladys.http.request.callCount).to.equal(0);
+    expect(writeFile.callCount).to.equal(0);
+    expect(rm.callCount).to.equal(0);
   });
 });
