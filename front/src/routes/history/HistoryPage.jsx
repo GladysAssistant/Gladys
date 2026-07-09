@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { useMemo } from 'preact/hooks';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import dayjs from 'dayjs';
@@ -75,7 +76,9 @@ class LoadMoreSentinel extends Component {
 }
 
 const HistoryPage = ({ intl, user, ...props }) => {
-  const timeline = buildTimeline(props.events);
+  // Rebuild the timeline only when the events change, not on every render
+  // (e.g. expanding/collapsing a group), since it walks the whole events list.
+  const timeline = useMemo(() => buildTimeline(props.events), [props.events]);
   const language = user && user.language;
 
   return (
