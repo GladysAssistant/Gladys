@@ -105,6 +105,8 @@ describe('MeteoFranceController', () => {
     );
     expect(getVigilance.callCount).to.equal(0);
     expect(res.json.firstCall.lastArg).to.deep.equal({
+      source: 'meteofrance',
+      house: { selector: 'main-house', latitude: 46.75, longitude: 4.35 },
       forecast: forecastData,
       vigilance: { alerts: [], dept: '71', text: '' },
     });
@@ -119,6 +121,8 @@ describe('MeteoFranceController', () => {
     );
     expect(getVigilance.firstCall.lastArg).to.equal('71');
     expect(res.json.firstCall.lastArg).to.deep.equal({
+      source: 'meteofrance',
+      house: { selector: 'main-house', latitude: 46.75, longitude: 4.35 },
       forecast: forecastData,
       vigilance: {
         alerts: [
@@ -142,6 +146,8 @@ describe('MeteoFranceController', () => {
       res,
     );
     expect(res.json.firstCall.lastArg).to.deep.equal({
+      source: 'meteofrance',
+      house: { selector: 'main-house', latitude: 46.75, longitude: 4.35 },
       forecast: forecastData,
       vigilance: { alerts: [], dept: '71', text: '' },
     });

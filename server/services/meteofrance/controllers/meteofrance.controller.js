@@ -85,6 +85,8 @@ module.exports = function MeteoFranceController(gladys, getVigilance, getForecas
     }
 
     res.json({
+      source: 'meteofrance',
+      house,
       forecast: forecastData,
       vigilance: { alerts, dept, text },
     });
