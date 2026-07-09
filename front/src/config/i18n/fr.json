@@ -2648,6 +2648,15 @@
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
+      "sendVigilanceMap": {
+        "userLabel": "Utilisateur",
+        "dayLabel": "Carte à envoyer",
+        "dayToday": "Aujourd'hui (J)",
+        "dayTomorrow": "Lendemain (J+1)",
+        "textLabel": "Message (optionnel)",
+        "textPlaceholder": "Texte du message",
+        "explanationText": "La carte nécessite la clé API optionnelle configurée dans l'intégration Météo France."
+      },
       "askAi": {
         "description": "Cette action enverra un message à l'IA via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
         "userLabel": "Gladys répondra à",
@@ -2924,7 +2933,8 @@
       },
       "meteofrance": {
         "get-vigilance": "Récupérer la vigilance Météo France",
-        "get-forecast": "Récupérer le bulletin météo (Météo France)"
+        "get-forecast": "Récupérer le bulletin météo (Météo France)",
+        "send-vigilance-map": "Envoyer la carte de vigilance Météo France"
       }
     },
     "variables": {

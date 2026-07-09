@@ -2648,6 +2648,15 @@
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
+      "sendVigilanceMap": {
+        "userLabel": "User",
+        "dayLabel": "Map to send",
+        "dayToday": "Today (J)",
+        "dayTomorrow": "Tomorrow (J+1)",
+        "textLabel": "Message (optional)",
+        "textPlaceholder": "Message text",
+        "explanationText": "The map requires the optional API key configured in the Météo France integration."
+      },
       "askAi": {
         "description": "This action will send a message to the AI via Gladys Plus and will reply to you with a message. If you attach a camera image, the AI will be able to see what is on the image and even take action accordingly.",
         "userLabel": "Gladys will respond to",
@@ -2924,7 +2933,8 @@
       },
       "meteofrance": {
         "get-vigilance": "Get Météo France vigilance",
-        "get-forecast": "Get weather bulletin (Météo France)"
+        "get-forecast": "Get weather bulletin (Météo France)",
+        "send-vigilance-map": "Send Météo France vigilance map"
       }
     },
     "variables": {

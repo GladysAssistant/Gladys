@@ -2648,6 +2648,15 @@
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
+      "sendVigilanceMap": {
+        "userLabel": "Benutzer",
+        "dayLabel": "Zu sendende Karte",
+        "dayToday": "Heute (J)",
+        "dayTomorrow": "Morgen (J+1)",
+        "textLabel": "Nachricht (optional)",
+        "textPlaceholder": "Nachrichtentext",
+        "explanationText": "Die Karte erfordert den optionalen API-Schlüssel, der in der Météo France-Integration konfiguriert ist."
+      },
       "askAi": {
         "description": "Diese Aktion sendet eine Nachricht an die KI über Gladys Plus und antwortet Ihnen mit einer Nachricht. Wenn Sie ein Kamerabild anhängen, kann die KI sehen, was auf dem Bild ist, und sogar entsprechend handeln.",
         "userLabel": "Gladys wird antworten an",
@@ -2924,7 +2933,8 @@
       },
       "meteofrance": {
         "get-vigilance": "Météo France Warnstufe abrufen",
-        "get-forecast": "Wetterbericht abrufen (Météo France)"
+        "get-forecast": "Wetterbericht abrufen (Météo France)",
+        "send-vigilance-map": "Météo France Vigilance-Karte senden"
       }
     },
     "variables": {

@@ -556,6 +556,7 @@ const ACTIONS = {
   METEO_FRANCE: {
     GET_VIGILANCE: 'meteofrance.get-vigilance',
     GET_FORECAST: 'meteofrance.get-forecast',
+    SEND_VIGILANCE_MAP: 'meteofrance.send-vigilance-map',
   },
   MQTT: {
     SEND: 'mqtt.send',

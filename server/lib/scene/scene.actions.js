@@ -630,6 +630,25 @@ const actionsFunc = {
     const forecastSummary = await meteoFranceService.forecast.getSummaryForHouse(house, action.days || 1);
     set(scope, path, forecastSummary);
   },
+  [ACTIONS.METEO_FRANCE.SEND_VIGILANCE_MAP]: async (self, action, scope) => {
+    const meteoFranceService = self.service.getService('meteofrance');
+    if (meteoFranceService === null) {
+      throw new AbortScene('SERVICE_METEOFRANCE_NOT_FOUND');
+    }
+    const day = action.day === 'J1' ? 'J1' : 'J';
+    const image = await meteoFranceService.vigilance.getMap(day);
+    if (!image) {
+      throw new AbortScene('VIGILANCE_MAP_NOT_AVAILABLE');
+    }
+    const textWithVariables = action.text
+      ? Handlebars.compile(action.text, {
+          noEscape: true,
+        })(scope)
+      : '';
+    // The map service returns a full data URL (data:image/png;base64,...) for <img> use in the
+    // dashboard; message.sendToUser (like camera images) expects it without the "data:" prefix.
+    await self.message.sendToUser(action.user, textWithVariables, image.replace(/^data:/, ''));
+  },
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: async (self, action) => {
     const house = await self.house.getBySelector(action.house);
     if (house.alarm_mode !== action.alarm_mode) {
