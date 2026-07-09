@@ -154,7 +154,9 @@ function createActions(store) {
               temp: h.T && h.T.value != null ? h.T.value : null,
               icon: getMFIcon(h.weather),
               desc: h.weather ? h.weather.desc : '',
-              rain: rain !== null ? Math.round(rain * 10) / 10 : null
+              rain: rain !== null ? Math.round(rain * 10) / 10 : null,
+              // Wind speed comes in m/s, same as the current conditions block
+              wind: h.wind && h.wind.speed != null ? h.wind.speed : null
             };
           });
 
@@ -197,13 +199,21 @@ function createActions(store) {
               rain = hourlyRainSum;
             }
           }
+          // Daily wind: the strongest hourly gust of the day, more useful than an average
+          let wind = null;
+          rawForecast.forEach(h => {
+            if (h.dt >= d.dt && h.dt < d.dt + 24 * 3600 && h.wind && h.wind.speed != null) {
+              wind = wind === null ? h.wind.speed : Math.max(wind, h.wind.speed);
+            }
+          });
           return {
             dt: d.dt,
             min: d.T && d.T.min != null ? d.T.min : null,
             max: d.T && d.T.max != null ? d.T.max : null,
             icon: getMFIcon(weather),
             desc: weather ? weather.desc : '',
-            rain: rain !== null ? Math.round(rain * 10) / 10 : null
+            rain: rain !== null ? Math.round(rain * 10) / 10 : null,
+            wind
           };
         });
 

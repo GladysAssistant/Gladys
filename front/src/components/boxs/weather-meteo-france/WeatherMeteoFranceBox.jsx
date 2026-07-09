@@ -159,11 +159,17 @@ class WeatherMeteoFranceBoxComponent extends Component {
     // Values stay unrounded until here: convertTemp is the single rounding point
     const convertTemp = celsius => (isFahrenheit ? Math.round((celsius * 9) / 5 + 32) : Math.round(celsius));
     const formatRain = mm => (isUS ? `${Math.round((mm / 25.4) * 100) / 100} in` : `${mm} mm`);
+    // Wind speed is always in m/s at the source, same conversion as the current conditions block
+    const formatWind = ms => `${Math.round(ms * (isUS ? 2.23694 : 3.6))} ${isUS ? 'mph' : 'km/h'}`;
     const tempUnit = isFahrenheit ? '°F' : '°C';
     const windUnit = isUS ? 'mph' : 'km/h';
     const timeFormat = isUS ? 'h:mm A' : 'HH:mm';
 
     const { current, currentIcon, currentCondition, hourly, daily, sun, uv, rainChance, position, vigilance } = boxData;
+    // OpenWeather never provides rain amounts (see buildForecastEntry): skip the row entirely
+    // rather than showing an empty line before the wind speed
+    const hasHourlyRain = Boolean(hourly && hourly.some(h => h.rain !== null));
+    const hasDailyRain = Boolean(daily && daily.some(d => d.rain !== null));
     const temp = current.T && current.T.value != null ? convertTemp(current.T.value) : '--';
     // In hourly forecast entries, humidity is a raw number (not an object)
     const humidity = typeof current.humidity === 'number' ? Math.round(current.humidity) : null;
@@ -392,21 +398,26 @@ class WeatherMeteoFranceBoxComponent extends Component {
                   {/* The first column is the current time slot: emphasize it */}
                   <div
                     class={index === 0 ? '' : 'text-muted'}
-                    style={`font-size: ${index === 0 ? '12px' : '10px'}; font-weight: ${index === 0 ? '600' : '400'}`}
+                    style={`font-size: ${index === 0 ? '12px' : '10px'}; font-weight: ${index === 0 ? '600' : '400'}; margin-bottom: 3px`}
                   >
                     {hour.time}h
                   </div>
                   <div
                     class="mf-dark-real-colors"
-                    style={`font-size: ${index === 0 ? '30px' : '20px'}; line-height: 1.5`}
+                    style={`font-size: ${index === 0 ? '30px' : '20px'}; line-height: 1.5; margin-bottom: 3px`}
                   >
                     {hour.icon}
                   </div>
-                  <div style={`font-size: ${index === 0 ? '15px' : '12px'}; font-weight: 600`}>
+                  <div style={`font-size: ${index === 0 ? '15px' : '12px'}; font-weight: 600; margin-bottom: 4px`}>
                     {hour.temp !== null ? `${convertTemp(hour.temp)}°` : '--'}
                   </div>
+                  {hasHourlyRain && (
+                    <div class="text-muted" style="font-size: 10px; white-space: nowrap; margin-bottom: 3px">
+                      {hour.rain !== null ? formatRain(hour.rain) : ' '}
+                    </div>
+                  )}
                   <div class="text-muted" style="font-size: 10px; white-space: nowrap">
-                    {hour.rain !== null ? formatRain(hour.rain) : ' '}
+                    {hour.wind !== null ? formatWind(hour.wind) : ' '}
                   </div>
                 </div>
               ))}
@@ -421,23 +432,28 @@ class WeatherMeteoFranceBoxComponent extends Component {
             >
               {daily.map(d => (
                 <div key={d.dt} style="text-align: center; flex: 1">
-                  <div class="text-muted" style="font-size: 14px; text-transform: capitalize; white-space: nowrap">
+                  <div class="text-muted" style="font-size: 14px; text-transform: capitalize; white-space: nowrap; margin-bottom: 3px">
                     {dayjs
                       .unix(d.dt)
                       .locale(userLanguage)
                       .format('ddd D')}
                   </div>
-                  <div class="mf-dark-real-colors" style="font-size: 32px; line-height: 1.5">
+                  <div class="mf-dark-real-colors" style="font-size: 32px; line-height: 1.5; margin-bottom: 3px">
                     {d.icon}
                   </div>
-                  <div style="font-size: 16px; font-weight: 600">
+                  <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px">
                     {d.max !== null ? `${convertTemp(d.max)}°` : '--'}
                   </div>
-                  <div class="text-muted" style="font-size: 14px">
+                  <div class="text-muted" style="font-size: 14px; margin-bottom: 4px">
                     {d.min !== null ? `${convertTemp(d.min)}°` : '--'}
                   </div>
+                  {hasDailyRain && (
+                    <div class="text-muted" style="font-size: 11px; white-space: nowrap; margin-bottom: 3px">
+                      {d.rain !== null ? formatRain(d.rain) : ' '}
+                    </div>
+                  )}
                   <div class="text-muted" style="font-size: 11px; white-space: nowrap">
-                    {d.rain !== null ? formatRain(d.rain) : ' '}
+                    {d.wind !== null ? formatWind(d.wind) : ' '}
                   </div>
                 </div>
               ))}
