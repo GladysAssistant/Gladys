@@ -59,8 +59,21 @@ describe('MeteoFranceController', () => {
       fake.resolves('data:image/png;base64,QUJD'),
     );
     const res = buildRes();
-    await controller['get /api/v1/service/meteofrance/vigilance/map'].controller({}, res);
+    await controller['get /api/v1/service/meteofrance/vigilance/map'].controller({ query: {} }, res);
     expect(res.json.firstCall.lastArg).to.deep.equal({ image: 'data:image/png;base64,QUJD' });
+  });
+  it('should request the J1 vigilance map when asked', async () => {
+    const getVigilanceMap = fake.resolves('data:image/png;base64,SjE=');
+    const controller = MeteoFranceController(
+      gladys,
+      fake.resolves(warningDataGreen),
+      fake.resolves(forecastData),
+      getVigilanceMap,
+    );
+    const res = buildRes();
+    await controller['get /api/v1/service/meteofrance/vigilance/map'].controller({ query: { day: 'J1' } }, res);
+    expect(getVigilanceMap.firstCall.lastArg).to.equal('J1');
+    expect(res.json.firstCall.lastArg).to.deep.equal({ image: 'data:image/png;base64,SjE=' });
   });
   it('should return 400 when the house has no coordinates', async () => {
     const gladysNoCoordinates = {

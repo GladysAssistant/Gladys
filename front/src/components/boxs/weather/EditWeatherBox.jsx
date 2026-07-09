@@ -9,6 +9,7 @@ import { GetWeatherModes } from '../../../utils/consts';
 const CURRENT_WEATHER_MODE = 'currentWeather';
 const DATE_LOCATION_MODE = 'dateLocation';
 const VIGILANCE_MAP_MODE = 'vigilanceMap';
+const VIGILANCE_MAP_J1_MODE = 'vigilanceMapJ1';
 
 // Modes enabled by default for widgets saved before they existed
 const DEFAULT_ON_MODES = [DATE_LOCATION_MODE, CURRENT_WEATHER_MODE];
@@ -19,7 +20,8 @@ const DISPLAY_MODES = [
   GetWeatherModes.AdvancedWeather,
   GetWeatherModes.HourlyForecast,
   GetWeatherModes.DailyForecast,
-  VIGILANCE_MAP_MODE
+  VIGILANCE_MAP_MODE,
+  VIGILANCE_MAP_J1_MODE
 ];
 
 const EditWeatherBox = ({ children, ...props }) => (
@@ -79,7 +81,9 @@ const EditWeatherBox = ({ children, ...props }) => (
         <Text id="dashboard.boxes.weather.editModeLabel" />
       </label>
       <div>
-        {DISPLAY_MODES.filter(mode => props.isMeteoFranceSource || mode !== VIGILANCE_MAP_MODE).map(mode => {
+        {DISPLAY_MODES.filter(
+          mode => props.isMeteoFranceSource || (mode !== VIGILANCE_MAP_MODE && mode !== VIGILANCE_MAP_J1_MODE)
+        ).map(mode => {
           const label = `dashboard.boxes.weatherMeteoFrance.displayModes.${mode}`;
           const modes = props.box.modes || {};
           const checked = DEFAULT_ON_MODES.includes(mode) ? modes[mode] !== false : Boolean(modes[mode]);

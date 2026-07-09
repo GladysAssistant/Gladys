@@ -307,7 +307,8 @@
           "advancedWeather": "Wetterdetails",
           "hourlyForecast": "Vorhersage für die nächsten 24 Stunden",
           "dailyForecast": "Vorhersage für die nächsten 5 Tage",
-          "vigilanceMap": "Vigilance-Karte Frankreich (erfordert den optionalen API-Schlüssel)"
+          "vigilanceMap": "Vigilance-Karte Frankreich – heute (erfordert den optionalen API-Schlüssel)",
+          "vigilanceMapJ1": "Vigilance-Karte Frankreich – morgen (J+1)"
         },
         "conditions": {
           "sunny": "Sonnig",
@@ -349,6 +350,7 @@
         "vigilanceTitle": "Météo France Unwetterwarnung",
         "noVigilance": "Keine Unwetterwarnung aktiv",
         "mapUnavailable": "Karte nicht verfügbar: Konfiguriere den API-Schlüssel in der Météo France-Integration.",
+        "mapJ1Label": "Morgen",
         "editVigilanceLabel": "Aktive Unwetterwarnungen anzeigen",
         "editVigilanceHelp": "Das Departement wird automatisch aus den GPS-Koordinaten des Hauses ermittelt.",
         "error": "Wetterdaten konnten nicht abgerufen werden.",

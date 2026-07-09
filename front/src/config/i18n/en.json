@@ -307,7 +307,8 @@
           "advancedWeather": "Weather details",
           "hourlyForecast": "Forecast for the next 24 hours",
           "dailyForecast": "Forecast for the next 5 days",
-          "vigilanceMap": "France vigilance map (requires the optional API key)"
+          "vigilanceMap": "France vigilance map – today (requires the optional API key)",
+          "vigilanceMapJ1": "France vigilance map – tomorrow (J+1)"
         },
         "conditions": {
           "sunny": "Sunny",
@@ -349,6 +350,7 @@
         "vigilanceTitle": "Météo France Vigilance",
         "noVigilance": "No weather alert in progress",
         "mapUnavailable": "Map unavailable: configure the API key in the Météo France integration.",
+        "mapJ1Label": "Tomorrow",
         "editVigilanceLabel": "Show active weather alerts",
         "editVigilanceHelp": "The department is automatically detected from the house GPS coordinates.",
         "error": "Unable to fetch weather data.",

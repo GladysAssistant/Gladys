@@ -16,6 +16,7 @@ import {
 const CURRENT_WEATHER_MODE = 'currentWeather';
 const DATE_LOCATION_MODE = 'dateLocation';
 const VIGILANCE_MAP_MODE = 'vigilanceMap';
+const VIGILANCE_MAP_J1_MODE = 'vigilanceMapJ1';
 
 const BOX_KEY = 'Weather';
 const BOX_DATA_KEY = `${DASHBOARD_BOX_DATA_KEY}${BOX_KEY}`;
@@ -84,7 +85,8 @@ class WeatherBoxComponent extends Component {
     const sourceChanged = prevProps.box.source !== this.props.box.source;
     const vigilanceChanged = prevProps.box.vigilance !== this.props.box.vigilance;
     const mapChanged = get(prevProps, 'box.modes.vigilanceMap') !== get(this.props, 'box.modes.vigilanceMap');
-    if (houseChanged || sourceChanged || vigilanceChanged || mapChanged) {
+    const mapJ1Changed = get(prevProps, 'box.modes.vigilanceMapJ1') !== get(this.props, 'box.modes.vigilanceMapJ1');
+    if (houseChanged || sourceChanged || vigilanceChanged || mapChanged || mapJ1Changed) {
       this.refreshData();
     }
   }
@@ -209,6 +211,7 @@ class WeatherBoxComponent extends Component {
     const showHourly = modes[GetWeatherModes.HourlyForecast] && hourly && hourly.length > 0;
     const showDaily = modes[GetWeatherModes.DailyForecast] && daily && daily.length > 0;
     const showMap = isMeteoFranceSource && Boolean(modes[VIGILANCE_MAP_MODE]);
+    const showMapJ1 = isMeteoFranceSource && Boolean(modes[VIGILANCE_MAP_J1_MODE]);
     // Section separators are only useful when there is content above them
     const hasContentAboveHourly =
       showDateLocation || showCurrentWeather || showChips || alerts.length > 0 || vigilanceEnabled || showMap;
@@ -380,6 +383,27 @@ class WeatherBoxComponent extends Component {
                 class="meteofrance-vigilance-map"
                 style="width: 100%; border-radius: 6px; margin-bottom: 10px"
               />
+            ) : (
+              <div class="text-muted" style="font-size: 12px; margin-bottom: 10px">
+                <i class="fe fe-alert-circle mr-1" />
+                <Text id="dashboard.boxes.weatherMeteoFrance.mapUnavailable" />
+              </div>
+            ))}
+
+          {/* Next day national vigilance map (optional API key) */}
+          {showMapJ1 &&
+            (boxData.vigilanceMapImageJ1 ? (
+              <div style="margin-bottom: 10px">
+                <div class="text-muted" style="font-size: 12px; margin-bottom: 4px">
+                  <Text id="dashboard.boxes.weatherMeteoFrance.mapJ1Label" />
+                </div>
+                <img
+                  src={boxData.vigilanceMapImageJ1}
+                  alt="Vigilance Météo-France J+1"
+                  class="meteofrance-vigilance-map"
+                  style="width: 100%; border-radius: 6px"
+                />
+              </div>
             ) : (
               <div class="text-muted" style="font-size: 12px; margin-bottom: 10px">
                 <i class="fe fe-alert-circle mr-1" />

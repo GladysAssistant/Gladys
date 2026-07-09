@@ -23,8 +23,11 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   const { default: axios } = require('axios');
   /** @type {string|null} */
   let meteoFranceApiKey = null;
-  /** @type {{ image: string|null, timestamp: number }} */
-  let mapCache = { image: null, timestamp: 0 };
+  /** @type {Object<string, { image: string|null, timestamp: number }>} */
+  const mapCacheByDay = {
+    J: { image: null, timestamp: 0 },
+    J1: { image: null, timestamp: 0 },
+  };
   /** @type {Object<string, { dept: string, timestamp: number }>} */
   const deptByHouse = {};
   /** @type {Object<string, number>} */
@@ -51,19 +54,21 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   }
 
   /**
-   * @description Get the national vigilance map thumbnail (requires the optional API key).
+   * @description Get a national vigilance map thumbnail (requires the optional API key).
+   * @param {'J'|'J1'} [day] - 'J' for today (default), 'J1' for tomorrow's map.
    * @returns {Promise<string|null>} Resolve with a data URL, or null when no API key is configured.
    * @example
-   * const image = await gladys.services.meteofrance.vigilance.getMap();
+   * const image = await gladys.services.meteofrance.vigilance.getMap('J1');
    */
-  async function getVigilanceMap() {
+  async function getVigilanceMap(day = 'J') {
     if (!meteoFranceApiKey) {
       return null;
     }
-    if (mapCache.image && Date.now() - mapCache.timestamp < MAP_CACHE_TTL_MS) {
-      return mapCache.image;
+    const cache = mapCacheByDay[day];
+    if (cache.image && Date.now() - cache.timestamp < MAP_CACHE_TTL_MS) {
+      return cache.image;
     }
-    const url = 'https://public-api.meteofrance.fr/public/DPVigilance/v1/vignettenationale-J/encours';
+    const url = `https://public-api.meteofrance.fr/public/DPVigilance/v1/vignettenationale-${day}/encours`;
     const response = await axios.get(url, {
       headers: { apikey: meteoFranceApiKey },
       responseType: 'arraybuffer',
@@ -72,7 +77,7 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
     const contentType = response.headers['content-type'] || 'image/png';
     // @ts-ignore: Buffer is a Node.js global, @types/node is not installed in this project
     const image = `data:${contentType};base64,${Buffer.from(response.data).toString('base64')}`;
-    mapCache = { image, timestamp: Date.now() };
+    mapCacheByDay[day] = { image, timestamp: Date.now() };
     return image;
   }
 

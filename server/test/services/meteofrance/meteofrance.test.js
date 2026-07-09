@@ -332,4 +332,29 @@ describe('MeteoFranceService', () => {
     expect(imageAgain).to.equal(image);
     expect(calls).to.equal(1);
   });
+  it('should return the J1 vigilance map from a separate cache', async () => {
+    const calledUrls = [];
+    const countingAxios = {
+      axios: {
+        default: {
+          get: (url) => {
+            calledUrls.push(url);
+            return Promise.resolve({
+              data: Buffer.from('fake-png-content'),
+              headers: { 'content-type': 'image/png' },
+            });
+          },
+        },
+      },
+    };
+    const MeteoFranceService = proxyquire('../../../services/meteofrance/index', countingAxios);
+    const meteoFranceService = MeteoFranceService(gladysWithApiKey, SERVICE_ID);
+    await meteoFranceService.start();
+    await meteoFranceService.vigilance.getMap('J');
+    await meteoFranceService.vigilance.getMap('J1');
+    // Second call for J1 should be served from its own cache (not J's)
+    await meteoFranceService.vigilance.getMap('J1');
+    expect(calledUrls.filter((url) => url.includes('vignettenationale-J/')).length).to.equal(1);
+    expect(calledUrls.filter((url) => url.includes('vignettenationale-J1/')).length).to.equal(1);
+  });
 });

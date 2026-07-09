@@ -307,7 +307,8 @@
           "advancedWeather": "Détails météo",
           "hourlyForecast": "Prévisions pour les 24 prochaines heures",
           "dailyForecast": "Prévisions pour les 5 prochains jours",
-          "vigilanceMap": "Carte de vigilance France (nécessite la clé API optionnelle)"
+          "vigilanceMap": "Carte de vigilance France – jour J (nécessite la clé API optionnelle)",
+          "vigilanceMapJ1": "Carte de vigilance France – lendemain (J+1)"
         },
         "conditions": {
           "sunny": "Ensoleillé",
@@ -349,6 +350,7 @@
         "vigilanceTitle": "Vigilance Météo France",
         "noVigilance": "Pas de vigilance en cours",
         "mapUnavailable": "Carte indisponible : configurez la clé API dans l'intégration Météo France.",
+        "mapJ1Label": "Demain",
         "editVigilanceLabel": "Afficher les vigilances météo en cours",
         "editVigilanceHelp": "Le département est détecté automatiquement à partir des coordonnées GPS de la maison.",
         "error": "Impossible de récupérer les données météo.",

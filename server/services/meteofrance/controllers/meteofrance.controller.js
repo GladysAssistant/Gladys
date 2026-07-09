@@ -32,7 +32,8 @@ module.exports = function MeteoFranceController(gladys, getVigilance, getForecas
    * @param {any} res - Express response.
    */
   async function getVigilanceMapController(req, res) {
-    const image = await getVigilanceMap();
+    const day = req.query && req.query.day === 'J1' ? 'J1' : 'J';
+    const image = await getVigilanceMap(day);
     if (!image) {
       res.status(404).json({ message: 'NO_API_KEY' });
       return;

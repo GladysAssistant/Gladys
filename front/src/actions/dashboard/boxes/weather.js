@@ -247,6 +247,15 @@ function createActions(store) {
             // Map unavailable (no API key configured or API error): the widget shows a hint
           }
         }
+        let vigilanceMapImageJ1 = null;
+        if (box.modes && box.modes.vigilanceMapJ1 && isMeteoFranceSource) {
+          try {
+            const mapDataJ1 = await state.httpClient.get('/api/v1/service/meteofrance/vigilance/map?day=J1');
+            vigilanceMapImageJ1 = mapDataJ1.image;
+          } catch (mapError) {
+            // Map unavailable (no API key configured or API error): the widget shows a hint
+          }
+        }
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           source: data.source,
@@ -261,7 +270,8 @@ function createActions(store) {
           rainChance,
           position: data.forecast.position || {},
           vigilance: data.vigilance || { alerts: [] },
-          vigilanceMapImage
+          vigilanceMapImage,
+          vigilanceMapImageJ1
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
