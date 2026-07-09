@@ -2506,6 +2506,36 @@
       "generateButton": "Generieren",
       "keyNameLabel": "Schlüssel:",
       "registeredLabel": "Registriert am:"
+    },
+    "gradium": {
+      "title": "Gradium",
+      "description": "Verwende den Text-zu-Sprache-Dienst von Gradium.",
+      "documentation": "Gradium-Dokumentation",
+      "accountTab": "Konto",
+      "accountIntroduction": "Richte dein Gradium-Konto ein, um auf den Text-zu-Sprache-Dienst zuzugreifen.",
+      "endpointLabel": "Serverregion",
+      "endpointInfo": "Wähle die Region der Gradium-Server aus, auf denen du dein Konto erstellt hast.",
+      "endpoint": {
+        "eu": "Europa",
+        "us": "Vereinigte Staaten"
+      },
+      "apiKey": "API-Schlüssel",
+      "apiKeyInfo": "Gib deinen Gradium-API-Schlüssel ein, um den Text-zu-Sprache-Dienst zu nutzen.",
+      "buttonSave": "Speichern",
+      "configurationError": "Beim Speichern der Gradium-Konfiguration ist ein Fehler aufgetreten.",
+      "configurationSuccess": "Gradium-Konfiguration erfolgreich gespeichert.",
+      "voiceTab": "Stimme",
+      "voiceIntroduction": "Wähle eine Stimme für die Text-zu-Sprache-Funktion.",
+      "language": {
+        "en": "Englisch 🇬🇧",
+        "fr": "Französisch 🇫🇷",
+        "de": "Deutsch 🇩🇪",
+        "es": "Spanisch 🇪🇸",
+        "pt": "Portugiesisch 🇵🇹"
+      },
+      "voiceUseIt": "Auswählen",
+      "voiceUsed": "Ausgewählt",
+      "voiceDescriptionLabel": "Stimmenbeschreibung"
     }
   },
   "editScene": {
@@ -2763,6 +2793,11 @@
         "description": "Diese Aktion lässt Gladys auf dem ausgewählten Lautsprecher sprechen.",
         "deviceLabel": "Lautsprecher",
         "volumeLabel": "Volumen",
+        "voiceLabel": "Stimme",
+        "ttsService": {
+          "gplus": "Gladys Plus",
+          "gradium": "Gradium"
+        },
         "textLabel": "Nachricht zum Sprechen auf dem Lautsprecher",
         "variablesExplanation": "Um eine Variable einzufügen, gib \"{{\" ein. Hinweis: Du musst vor diesem Block eine Variable in einer \"Letzten Zustand abrufen\"-Aktion definiert haben."
       }
