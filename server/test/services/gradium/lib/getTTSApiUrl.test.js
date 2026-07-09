@@ -5,7 +5,7 @@ const proxyquire = require('proxyquire').noCallThru();
 describe('getTTSApiUrl', () => {
   let mkdir;
   let writeFile;
-  let unlink;
+  let rm;
   let randomUUID;
   let warn;
   let getTTSApiUrl;
@@ -15,7 +15,7 @@ describe('getTTSApiUrl', () => {
   beforeEach(() => {
     mkdir = stub().resolves();
     writeFile = stub().resolves();
-    unlink = stub().resolves();
+    rm = stub().resolves();
     randomUUID = stub().returns('07f16117-8556-4b50-b9f0-e190d08f8d92');
     warn = stub();
 
@@ -23,7 +23,7 @@ describe('getTTSApiUrl', () => {
       'fs/promises': {
         mkdir,
         writeFile,
-        unlink,
+        rm,
       },
       crypto: {
         randomUUID,
@@ -179,7 +179,7 @@ describe('getTTSApiUrl', () => {
     expect(warn.callCount).to.equal(1);
     expect(warn.firstCall.args[0]).to.equal('Gradium TTS request failed');
     expect(warn.firstCall.args[1]).to.equal('disk full');
-    expect(unlink.callCount).to.equal(1);
-    expect(unlink.firstCall.args[0]).to.equal('medias/gradium/07f16117-8556-4b50-b9f0-e190d08f8d92.ogg');
+    expect(rm.callCount).to.equal(1);
+    expect(rm.firstCall.args[0]).to.equal('medias/gradium/07f16117-8556-4b50-b9f0-e190d08f8d92.ogg');
   });
 });

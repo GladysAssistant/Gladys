@@ -44,13 +44,23 @@ class VoicePage extends Component {
 
   updateVoice = async event => {
     const voiceId = event.currentTarget.getAttribute('data-voice-id');
-    await this.props.httpClient.post('/api/v1/service/gradium/variable/GRADIUM_VOICE_ID', {
-      value: voiceId
-    });
-
     this.setState({
-      gradiumVoiceId: voiceId
+      gradiumSaveSettingsStatus: RequestStatus.Getting
     });
+    try {
+      await this.props.httpClient.post('/api/v1/service/gradium/variable/GRADIUM_VOICE_ID', {
+        value: voiceId
+      });
+
+      this.setState({
+        gradiumVoiceId: voiceId,
+        gradiumSaveSettingsStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      this.setState({
+        gradiumSaveSettingsStatus: RequestStatus.Error
+      });
+    }
   };
 
   sortVoices = (a, b) => {
@@ -96,6 +106,7 @@ class VoicePage extends Component {
           gradiumVoices={state.gradiumVoices}
           gradiumVoiceId={state.gradiumVoiceId}
           gradiumGetSettingsStatus={state.gradiumGetSettingsStatus}
+          gradiumSaveSettingsStatus={state.gradiumSaveSettingsStatus}
           languageFilter={state.languageFilter}
           updateVoice={this.updateVoice}
           sortVoices={this.sortVoices}

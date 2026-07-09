@@ -25,7 +25,7 @@ class VoiceBox extends Component {
     });
   }
 
-  render({ key, voiceSelected, updateVoice }, { voice }) {
+  render({ voiceSelected, updateVoice }, { voice }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -47,10 +47,10 @@ class VoiceBox extends Component {
             <div class="dimmer-content">
               <div class="card-body">
                 <div class="form-group">
-                  <label class="form-label" for={`name_${key}`}>
+                  <label class="form-label">
                     <Text id="integration.gradium.voiceDescriptionLabel" />
                   </label>
-                  <Text id={`name_${key}`}>{voice.description}</Text>
+                  <Text id={`name_${voice.id}`}>{voice.description}</Text>
                 </div>
               </div>
             </div>
