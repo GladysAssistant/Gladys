@@ -1,5 +1,4 @@
 import WeatherBox from '../../components/boxs/weather/WeatherBox';
-import WeatherMeteoFranceBox from '../../components/boxs/weather-meteo-france/WeatherMeteoFranceBox';
 import RoomTemperatureBox from '../../components/boxs/room-temperature/RoomTemperature';
 import RoomHumidityBox from '../../components/boxs/room-humidity/RoomHumidity';
 import CameraBox from '../../components/boxs/camera/Camera';
@@ -22,8 +21,6 @@ const Box = ({ children, ...props }) => {
   switch (props.box.type) {
     case 'weather':
       return <WeatherBox {...props} />;
-    case 'weather-meteo-france':
-      return <WeatherMeteoFranceBox {...props} />;
     case 'user-presence':
       return <AtHomeBox {...props} />;
     case 'camera':

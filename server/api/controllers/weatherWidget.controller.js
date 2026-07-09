@@ -5,7 +5,7 @@ const { formatOpenWeatherAsMeteoFrance } = require('../../lib/weatherWidget/open
 
 /**
  * @description Weather widget controller: converts the OpenWeather forecast to the
- * Météo France widget format, so the "weather-meteo-france" widget can display either
+ * Météo France widget format, so the "weather" widget can display either
  * source through the same rendering, picked per-widget instead of per-integration.
  * @param {any} gladys - Gladys instance.
  * @returns {object} Controller functions.

@@ -288,26 +288,14 @@
       "gauge": "Gauge",
       "energy-consumption": "Energy Consumption",
       "voice-assistant": "Voice assistant",
-      "link": "Link",
-      "weather-meteo-france": "Météo France"
+      "link": "Link"
     },
     "boxes": {
       "column": "Column {{index}}",
       "deleteButton": "Delete",
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
-        "houseHasNoCoordinates": "Your house has no coordinates defined. Go to Gladys parameters to define the position of your house.",
-        "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
-        "requestToThirdPartyFailed": "The request to OpenWeather API failed. Is your Gladys instance connected to the internet? Please go to the OpenWeather configuration panel to troubleshoot this problem.",
-        "clickHere": "Click here to access the OpenWeather configuration panel.",
-        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
-        "editModeLabel": "Select display mode:",
-        "displayModes": {
-          "advancedWeather": "Humidity and wind speed",
-          "hourlyForecast": "Forecast for the next 24 hours",
-          "dailyForecast": "Forecast for the next 5 days"
-        },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "editModeLabel": "Select display mode:"
       },
       "weatherMeteoFrance": {
         "sourceLabel": "Forecast source",

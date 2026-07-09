@@ -288,26 +288,14 @@
       "gauge": "Messanzeige",
       "energy-consumption": "Energieverbrauch",
       "voice-assistant": "Sprachassistent",
-      "link": "Link",
-      "weather-meteo-france": "Météo France"
+      "link": "Link"
     },
     "boxes": {
       "column": "Spalte {{index}}",
       "deleteButton": "Löschen",
       "weather": {
         "editHouseLabel": "Wähle ein Zuhause aus. Ich werde seine Breiten- und Längengrade verwenden, um das Wetter abzurufen.",
-        "houseHasNoCoordinates": "Dein Zuhause hat keine definierten Koordinaten. Gehe zu den Gladys-Parametern, um die Position deines Zuhause zu definieren.",
-        "serviceNotConfigured": "Der OpenWeather-Dienst ist nicht konfiguriert. Gehe zum Tab \"Integrationen\" und konfiguriere den OpenWeather-Dienst.",
-        "requestToThirdPartyFailed": "Die Anfrage an die OpenWeather-API ist fehlgeschlagen. Ist dein Gladys mit dem Internet verbunden? Gehe zum OpenWeather-Konfigurationspanel, um das Problem zu beheben.",
-        "clickHere": "Klicke hier, um zum OpenWeather-Konfigurationspanel zu gelangen.",
-        "unknownError": "Wir können das Wetter für dieses Zuhause nicht abrufen. Hast du für diese Box ein Zuhause definiert?",
-        "editModeLabel": "Wähle den Anzeigemodus aus:",
-        "displayModes": {
-          "advancedWeather": "Luftfeuchtigkeit und Windgeschwindigkeit",
-          "hourlyForecast": "Vorhersage für die nächsten 24 Stunden",
-          "dailyForecast": "Vorhersage für die nächsten 5 Tage"
-        },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "editModeLabel": "Wähle den Anzeigemodus aus:"
       },
       "weatherMeteoFrance": {
         "sourceLabel": "Quelle der Vorhersage",

@@ -1580,7 +1580,6 @@ const DASHBOARD_BOX_TYPE = {
   ENERGY_CONSUMPTION: 'energy-consumption',
   VOICE_ASSISTANT: 'voice-assistant',
   LINK: 'link',
-  WEATHER_METEO_FRANCE: 'weather-meteo-france',
 };
 
 const ERROR_MESSAGES = {
