@@ -72,8 +72,23 @@ function parseVigilanceText(warningData) {
   return texts.join('\n');
 }
 
+/**
+ * @description Extract the short official vigilance summary (e.g. "Épisode caniculaire sévère et
+ * durable en cours."), as opposed to the full multi-paragraph bulletin from parseVigilanceText.
+ * @param {any} warningData - Raw warning/full API response.
+ * @returns {string} Summary text (empty string when not found).
+ * @example
+ * const summary = parseVigilanceSummary(warningData);
+ */
+function parseVigilanceSummary(warningData) {
+  const comments = warningData && warningData.comments;
+  const lines = (comments && comments.text) || [];
+  return Array.isArray(lines) ? lines.join(' ').trim() : '';
+}
+
 module.exports = {
   PHENOMENON_NAMES,
   parseAlerts,
   parseVigilanceText,
+  parseVigilanceSummary,
 };

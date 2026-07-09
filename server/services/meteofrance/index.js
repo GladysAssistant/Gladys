@@ -1,7 +1,7 @@
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
 const MeteoFranceController = require('./controllers/meteofrance.controller');
-const { parseAlerts, parseVigilanceText } = require('./lib/vigilance.parser');
+const { parseAlerts, parseVigilanceText, parseVigilanceSummary } = require('./lib/vigilance.parser');
 const { buildForecastSummary } = require('./lib/forecast.formatter');
 
 const METEOFRANCE_API_KEY_VAR = 'METEOFRANCE_API_KEY';
@@ -119,8 +119,15 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
     if (cached && Date.now() - cached.timestamp < DEPT_CACHE_TTL_MS) {
       return cached.dept;
     }
-    const forecast = await getForecast(house.latitude, house.longitude);
-    const dept = (forecast && forecast.position && forecast.position.dept) || null;
+    let forecast = await getForecast(house.latitude, house.longitude);
+    let dept = (forecast && forecast.position && forecast.position.dept) || null;
+    if (!dept) {
+      // The Météo France API can answer successfully without a department on a cold cache
+      // (see getForecast's ~20s cold cache comment): retry once before giving up.
+      logger.info(`[MeteoFrance] no department in forecast response for house ${house.selector}, retrying`);
+      forecast = await getForecast(house.latitude, house.longitude);
+      dept = (forecast && forecast.position && forecast.position.dept) || null;
+    }
     if (dept) {
       deptByHouse[house.selector] = { dept, timestamp: Date.now() };
     }
@@ -153,11 +160,14 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
       throw new Error('MeteoFrance: no department found for this house');
     }
     const warningData = await getVigilance(dept);
+    // Prefer the short official summary (a sentence, fit for SMS/notifications);
+    // fall back to the full multi-paragraph bulletin when no summary is available.
+    const text = parseVigilanceSummary(warningData) || parseVigilanceText(warningData);
     return {
       dept,
       color: (warningData && warningData.color_max) || 1,
       alerts: parseAlerts(warningData, dept),
-      text: parseVigilanceText(warningData),
+      text,
     };
   }
 
@@ -177,6 +187,7 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
           try {
             const dept = await getDeptForHouse(house);
             if (!dept) {
+              logger.warn(`[MeteoFrance] no department found for house ${house.selector}, skipping vigilance check`);
               return;
             }
             const warningData = await getVigilance(dept);
