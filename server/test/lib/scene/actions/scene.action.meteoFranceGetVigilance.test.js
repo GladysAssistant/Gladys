@@ -24,7 +24,8 @@ describe('scene.meteoFranceGetVigilance', () => {
             { dept: '71', color: 3, phenomene_id: 3, phenomene_nom: 'Orages' },
             { dept: '71', color: 2, phenomene_id: 6, phenomene_nom: 'Canicule' },
           ],
-          text: 'Orages violents attendus en soirée.',
+          text: 'Épisode caniculaire sévère et durable en cours.',
+          bulletin: 'Orages violents attendus en soirée.',
         }),
       },
     };
@@ -40,7 +41,8 @@ describe('scene.meteoFranceGetVigilance', () => {
       color: 3,
       color_name: 'Orange',
       phenomena: 'Orages, Canicule',
-      text: 'Orages violents attendus en soirée.',
+      text: 'Épisode caniculaire sévère et durable en cours.',
+      bulletin: 'Orages violents attendus en soirée.',
     });
   });
   it('should abort when the meteofrance service is not found', async () => {

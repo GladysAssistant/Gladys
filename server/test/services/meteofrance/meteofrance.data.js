@@ -75,8 +75,17 @@ const warningDataOrange = {
   text_avalanche: null,
 };
 
+const warningDataOrangeWithComment = {
+  ...warningDataOrange,
+  comments: {
+    title: 'Commentaire carte',
+    text: ['Épisode orageux sévère et durable en cours.'],
+  },
+};
+
 module.exports = {
   forecastData,
   warningDataGreen,
   warningDataOrange,
+  warningDataOrangeWithComment,
 };

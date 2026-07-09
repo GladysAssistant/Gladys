@@ -6,7 +6,7 @@ import get from 'get-value';
 import { RequestStatus } from '../../../../utils/consts';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
-const VARIABLE_NAMES = ['color', 'color_name', 'phenomena', 'text', 'dept'];
+const VARIABLE_NAMES = ['color', 'color_name', 'phenomena', 'text', 'bulletin', 'dept'];
 
 class MeteoFranceGetVigilanceParams extends Component {
   getHouses = async () => {

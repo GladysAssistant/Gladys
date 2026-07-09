@@ -1,7 +1,7 @@
 const { expect, assert } = require('chai');
 const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { forecastData, warningDataGreen, warningDataOrange } = require('./meteofrance.data');
+const { forecastData, warningDataGreen, warningDataOrange, warningDataOrangeWithComment } = require('./meteofrance.data');
 
 const SERVICE_ID = '35deac79-f295-4adf-8512-f2f48e1ea0f8';
 
@@ -143,10 +143,31 @@ describe('MeteoFranceService', () => {
     expect(vigilance.dept).to.equal('71');
     expect(vigilance.color).to.equal(3);
     expect(vigilance.text).to.equal('Orages violents attendus en soirée.');
+    expect(vigilance.bulletin).to.equal('Orages violents attendus en soirée.');
     expect(vigilance.alerts).to.have.lengthOf(2);
     // Second call should reuse the cached department (no new forecast call)
     await meteoFranceService.vigilance.getForHouse(house);
     expect(forecastCalls).to.equal(1);
+  });
+  it('should expose the short summary as text and the full bulletin separately when both are available', async () => {
+    const commentAxios = {
+      axios: {
+        default: {
+          get: (url) => {
+            if (url.includes('/forecast')) {
+              return Promise.resolve({ data: forecastData });
+            }
+            return Promise.resolve({ data: warningDataOrangeWithComment });
+          },
+        },
+      },
+    };
+    const MeteoFranceService = proxyquire('../../../services/meteofrance/index', commentAxios);
+    const meteoFranceService = MeteoFranceService(gladysWithoutApiKey, SERVICE_ID);
+    const house = { selector: 'main-house', latitude: 46.75, longitude: 4.35 };
+    const vigilance = await meteoFranceService.vigilance.getForHouse(house);
+    expect(vigilance.text).to.equal('Épisode orageux sévère et durable en cours.');
+    expect(vigilance.bulletin).to.equal('Orages violents attendus en soirée.');
   });
   it('should reject getForHouse when no department is found', async () => {
     const noDeptAxios = {

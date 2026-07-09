@@ -31,9 +31,11 @@ const executeActionsFactory = require('./scene.executeActions');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-// Free Mobile (and most SMS gateways) reject/truncate messages beyond a few hundred characters;
-// the raw vigilance bulletin text can be much longer, so it is capped before being exposed to scenes.
+// Free Mobile (and most SMS gateways) reject/truncate messages beyond a few hundred characters,
+// so the short summary exposed as "text" is capped. The full bulletin ("bulletin") is meant for
+// channels with a much higher limit (e.g. Telegram's ~4096 chars) and only needs a safety cap.
 const VIGILANCE_TEXT_MAX_LENGTH = 1000;
+const VIGILANCE_BULLETIN_MAX_LENGTH = 4000;
 
 const { evaluate } = create({
   addDependencies,
@@ -603,12 +605,17 @@ const actionsFunc = {
       vigilance.text && vigilance.text.length > VIGILANCE_TEXT_MAX_LENGTH
         ? `${vigilance.text.slice(0, VIGILANCE_TEXT_MAX_LENGTH - 1)}…`
         : vigilance.text;
+    const bulletin =
+      vigilance.bulletin && vigilance.bulletin.length > VIGILANCE_BULLETIN_MAX_LENGTH
+        ? `${vigilance.bulletin.slice(0, VIGILANCE_BULLETIN_MAX_LENGTH - 1)}…`
+        : vigilance.bulletin;
     set(scope, path, {
       dept: vigilance.dept,
       color: vigilance.color,
       color_name: VIGILANCE_COLOR_NAMES[vigilance.color] || `${vigilance.color}`,
       phenomena: vigilance.alerts.map((alert) => alert.phenomene_nom).join(', '),
       text,
+      bulletin,
     });
   },
   [ACTIONS.METEO_FRANCE.GET_FORECAST]: async (self, action, scope, path) => {

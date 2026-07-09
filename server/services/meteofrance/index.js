@@ -155,7 +155,8 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
   /**
    * @description Get the current vigilance state for a house (department auto-detected).
    * @param {any} house - House object with latitude/longitude.
-   * @returns {Promise<{ dept: string, color: number, alerts: Array<object>, text: string }>} Vigilance state.
+   * @returns {Promise<{ dept: string, color: number, alerts: Array<object>, text: string, bulletin: string }>}
+   *   Vigilance state.
    * @example
    * const vigilance = await gladys.services.meteofrance.vigilance.getForHouse(house);
    */
@@ -165,14 +166,16 @@ module.exports = function MeteoFranceService(gladys, serviceId) {
       throw new Error('MeteoFrance: no department found for this house');
     }
     const warningData = await getVigilance(dept);
-    // Prefer the short official summary (a sentence, fit for SMS/notifications);
-    // fall back to the full multi-paragraph bulletin when no summary is available.
-    const text = parseVigilanceSummary(warningData) || parseVigilanceText(warningData);
+    const bulletin = parseVigilanceText(warningData);
+    // Short official summary (a sentence, fit for SMS/notifications); falls back
+    // to the full bulletin when no summary is available.
+    const text = parseVigilanceSummary(warningData) || bulletin;
     return {
       dept,
       color: (warningData && warningData.color_max) || 1,
       alerts: parseAlerts(warningData, dept),
       text,
+      bulletin,
     };
   }
 

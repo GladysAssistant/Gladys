@@ -2938,7 +2938,8 @@
           "color": "Niveau de vigilance (1 à 4)",
           "color_name": "Couleur de vigilance (Vert, Jaune, Orange, Rouge)",
           "phenomena": "Phénomènes en cours",
-          "text": "Bulletin de vigilance",
+          "text": "Résumé court de la vigilance",
+          "bulletin": "Bulletin de vigilance complet",
           "dept": "Département"
         },
         "get-forecast": {

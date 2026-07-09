@@ -2938,7 +2938,8 @@
           "color": "Warnstufe (1 bis 4)",
           "color_name": "Warnfarbe (Vert, Jaune, Orange, Rouge)",
           "phenomena": "Aktuelle Phänomene",
-          "text": "Warnbulletin",
+          "text": "Kurze Zusammenfassung der Warnung",
+          "bulletin": "Vollständiges Warnbulletin",
           "dept": "Departement"
         },
         "get-forecast": {
