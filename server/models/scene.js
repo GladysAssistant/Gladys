@@ -47,6 +47,8 @@ const actionSchema = Joi.object()
       .integer()
       .min(1)
       .max(5),
+    // Météo France vigilance map day ('J' = today, 'J1' = tomorrow)
+    day: Joi.string().valid('J', 'J1'),
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
     edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
     edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
