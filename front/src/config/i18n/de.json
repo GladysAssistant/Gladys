@@ -4780,6 +4780,14 @@
       "lock": {
         "0": "Entriegelt",
         "1": "Verriegelt"
+      },
+      "signal": {
+        "0": "Kein Signal",
+        "1": "Sehr schwaches Signal",
+        "2": "Schwaches Signal",
+        "3": "Mittleres Signal",
+        "4": "Gutes Signal",
+        "5": "Ausgezeichnetes Signal"
       }
     }
   },

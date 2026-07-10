@@ -40,7 +40,9 @@ class History extends Component {
               selector: feature.selector,
               category: feature.category,
               type: feature.type,
-              unit: feature.unit
+              unit: feature.unit,
+              min: feature.min,
+              max: feature.max
             },
             device: {
               name: device.name,
@@ -57,6 +59,7 @@ class History extends Component {
         });
       });
       this.featuresBySelector = featuresBySelector;
+      this.setState({ featuresLoaded: true });
     } catch (e) {
       console.error(e);
     }
@@ -278,7 +281,8 @@ class History extends Component {
       loading: true,
       initialized: false,
       hasMore: false,
-      error: false
+      error: false,
+      featuresLoaded: false
     };
     this.featuresBySelector = null;
     this.liveEventBuffer = [];
@@ -315,6 +319,7 @@ class History extends Component {
         loadMore={this.loadMore}
         toggleExpand={this.toggleExpand}
         showPendingLiveEvents={this.showPendingLiveEvents}
+        featuresBySelector={this.featuresBySelector}
       />
     );
   }

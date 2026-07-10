@@ -3,8 +3,15 @@ import cx from 'classnames';
 import get from 'get-value';
 import dayjs from 'dayjs';
 
-import { DEVICE_FEATURE_TYPES } from '../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../server/utils/constants';
+import SvgIcon from '../../components/icons/SvgIcon';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
+import {
+  DEFAULT_SIGNAL_MAX,
+  DEFAULT_SIGNAL_MIN,
+  getSignalQualityIcon,
+  getSignalQualityLevel
+} from '../../utils/signalQuality';
 import { getGroupOfCategory } from './categoryGroups';
 import style from './style.css';
 
@@ -17,10 +24,31 @@ const roundValue = value => {
   return Math.round(value * 100) / 100;
 };
 
-const EventValue = ({ event, intl }) => {
+const getSignalFeatureBounds = (event, featuresBySelector) => {
+  const featureMeta = featuresBySelector && featuresBySelector.get(event.device_feature.selector);
+  const min = event.device_feature.min ?? get(featureMeta, 'device_feature.min', { default: DEFAULT_SIGNAL_MIN });
+  const max = event.device_feature.max ?? get(featureMeta, 'device_feature.max', { default: DEFAULT_SIGNAL_MAX });
+  return { min, max };
+};
+
+const EventValue = ({ event, intl, featuresBySelector }) => {
   const { category, type, unit } = event.device_feature;
   const value = event.value;
   const dictionary = get(intl, 'dictionary', { default: {} });
+
+  if (category === DEVICE_FEATURE_CATEGORIES.SIGNAL) {
+    const { min, max } = getSignalFeatureBounds(event, featuresBySelector);
+    const level = getSignalQualityLevel(value, min, max);
+    if (level == null) {
+      return <Text id="dashboard.boxes.devicesInRoom.noValue" />;
+    }
+    return (
+      <span class={style.signalQualityValue}>
+        <SvgIcon icon={getSignalQualityIcon(level)} />
+        <Text id={`history.values.signal.${level}`} />
+      </span>
+    );
+  }
 
   // Binary/push sensors: "Opened"/"Closed", "Motion detected"...
   if (BINARY_TYPES.includes(type)) {
@@ -65,7 +93,7 @@ const EventValue = ({ event, intl }) => {
   );
 };
 
-const EventLine = ({ eventGroup, intl, toggleExpand, expanded }) => {
+const EventLine = ({ eventGroup, intl, toggleExpand, expanded, featuresBySelector }) => {
   const event = eventGroup.events[0];
   const { category, type } = event.device_feature;
   const group = getGroupOfCategory(category);
@@ -81,7 +109,7 @@ const EventLine = ({ eventGroup, intl, toggleExpand, expanded }) => {
         <div class={style.eventText}>
           <span class={style.eventDeviceName}>{event.device.name}</span>
           <span class={cx(style.eventValue, style[`eventValue-${group.colorClass}`])}>
-            <EventValue event={event} intl={intl} />
+            <EventValue event={event} intl={intl} featuresBySelector={featuresBySelector} />
           </span>
           {count > 1 && (
             <button type="button" class={cx('btn', style.eventCountBadge)} onClick={toggleExpand}>
@@ -104,7 +132,7 @@ const EventLine = ({ eventGroup, intl, toggleExpand, expanded }) => {
               <div class={style.eventOccurrence}>
                 <span class={style.eventOccurrenceTime}>{dayjs(oneEvent.created_at).format('HH:mm:ss')}</span>
                 <span>
-                  <EventValue event={oneEvent} intl={intl} />
+                  <EventValue event={oneEvent} intl={intl} featuresBySelector={featuresBySelector} />
                 </span>
               </div>
             ))}
