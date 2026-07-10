@@ -277,6 +277,19 @@ describe('POST /api/v1/device/purge_all_sqlite_state', () => {
       });
   });
 });
+describe('POST /api/v1/device/purge_orphaned_duckdb_states', () => {
+  it('should purge orphaned duckdb states', async () => {
+    await authenticatedRequest
+      .post('/api/v1/device/purge_orphaned_duckdb_states')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          success: true,
+        });
+      });
+  });
+});
 describe('POST /api/v1/device/migrate_from_sqlite_to_duckdb', () => {
   it('should migrate to duckdb', async () => {
     await authenticatedRequest

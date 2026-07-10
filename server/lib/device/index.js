@@ -39,6 +39,7 @@ const { checkBatteries } = require('./device.checkBatteries');
 const { migrateFromSQLiteToDuckDb } = require('./device.migrateFromSQLiteToDuckDb');
 const { getDuckDbMigrationState } = require('./device.getDuckDbMigrationState');
 const { purgeAllSqliteStates } = require('./device.purgeAllSqliteStates');
+const { purgeOrphanedDuckDbStates } = require('./device.purgeOrphanedDuckDbStates');
 const { updateFeature } = require('./device.updateFeature');
 const { saveMultipleHistoricalStates } = require('./device.saveMultipleHistoricalStates');
 const { getOldestStateFromDeviceFeatures } = require('./device.getOldestStateFromDeviceFeatures');
@@ -88,6 +89,11 @@ const DeviceManager = function DeviceManager(
     this.purgeAllSqliteStates.bind(this),
   );
 
+  this.purgeOrphanedDuckDbStates = this.job.wrapper(
+    JOB_TYPES.DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES,
+    this.purgeOrphanedDuckDbStates.bind(this),
+  );
+
   this.devicesByPollFrequency = {};
 
   this.migrateFromSQLiteToDuckDb = this.job.wrapper(
@@ -113,6 +119,10 @@ const DeviceManager = function DeviceManager(
   this.eventManager.on(
     EVENTS.DEVICE.PURGE_ALL_SQLITE_STATES,
     eventFunctionWrapper(this.purgeAllSqliteStates.bind(this)),
+  );
+  this.eventManager.on(
+    EVENTS.DEVICE.PURGE_ORPHANED_DUCKDB_STATES,
+    eventFunctionWrapper(this.purgeOrphanedDuckDbStates.bind(this)),
   );
 };
 
@@ -145,6 +155,7 @@ DeviceManager.prototype.checkBatteries = checkBatteries;
 DeviceManager.prototype.migrateFromSQLiteToDuckDb = migrateFromSQLiteToDuckDb;
 DeviceManager.prototype.getDuckDbMigrationState = getDuckDbMigrationState;
 DeviceManager.prototype.purgeAllSqliteStates = purgeAllSqliteStates;
+DeviceManager.prototype.purgeOrphanedDuckDbStates = purgeOrphanedDuckDbStates;
 DeviceManager.prototype.updateFeature = updateFeature;
 DeviceManager.prototype.saveMultipleHistoricalStates = saveMultipleHistoricalStates;
 DeviceManager.prototype.getOldestStateFromDeviceFeatures = getOldestStateFromDeviceFeatures;

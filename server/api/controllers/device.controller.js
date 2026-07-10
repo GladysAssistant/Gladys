@@ -141,6 +141,16 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/device/purge_orphaned_duckdb_states purgeOrphanedDuckDbStates
+   * @apiName purgeOrphanedDuckDbStates
+   * @apiGroup Device
+   */
+  async function purgeOrphanedDuckDbStates(req, res) {
+    gladys.event.emit(EVENTS.DEVICE.PURGE_ORPHANED_DUCKDB_STATES);
+    res.json({ success: true });
+  }
+
+  /**
    * @api {post} /api/v1/device/migrate_from_sqlite_to_duckdb migrateFromSQLiteToDuckDb
    * @apiName migrateFromSQLiteToDuckDb
    * @apiGroup Device
@@ -183,6 +193,7 @@ module.exports = function DeviceController(gladys) {
     getDeviceStatesHistory: asyncMiddleware(getDeviceStatesHistory),
     getConsumptionByDates: asyncMiddleware(getConsumptionByDates),
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
+    purgeOrphanedDuckDbStates: asyncMiddleware(purgeOrphanedDuckDbStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),
     migrateFromSQLiteToDuckDb: asyncMiddleware(migrateFromSQLiteToDuckDb),
     updateDeviceFeature: asyncMiddleware(updateDeviceFeature),
