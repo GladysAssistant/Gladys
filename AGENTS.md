@@ -17,7 +17,7 @@ From the repo root: `npm start` (runs `run-p start-server:dev start-front:dev`).
 
 - **Harmless startup errors:** on `npm start` you'll see smart-home device discovery errors (e.g. `SonosDiscoveryError: No players found`) because no physical devices exist in the VM/network. These are expected and do not affect the app.
 - **Service dependencies:** the server has ~38 integration services under `server/services/*`, each with its own `package.json`. `cd server && npm install` runs a `postinstall` (`cli/install_service_dependencies.js`) that installs deps for every service. Set `INSTALL_SERVICES_SILENT_FAIL=true` so a single flaky service install does not abort the whole install.
-- **Native modules** (`sqlite3`, `bcrypt`, `sharp`, `duckdb`, USB/bluetooth services) compile from source; they need build tools (`gcc/g++/make/python3`) and `libudev-dev` on the system.
+- **Native modules** (`sqlite3`, `bcrypt`, `sharp`, USB/bluetooth services) compile from source; they need build tools (`gcc/g++/make/python3`) and `libudev-dev` on the system. DuckDB (`@duckdb/node-api`) ships prebuilt platform binaries and does not compile from source.
 
 ## Pull Request requirements (CI)
 
