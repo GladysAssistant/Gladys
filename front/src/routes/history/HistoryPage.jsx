@@ -25,6 +25,10 @@ const buildTimeline = events => {
     }
     if (currentEventGroup && currentEventGroup.selector === event.device_feature.selector) {
       currentEventGroup.events.push(event);
+      // Key the group on its oldest event: a live event prepended to the group
+      // must not change the key, or the expanded/collapsed state (stored by key)
+      // would be lost and the group would collapse on every incoming state.
+      currentEventGroup.key = `${event.device_feature.selector}-${event.created_at}`;
     } else {
       currentEventGroup = {
         key: `${event.device_feature.selector}-${event.created_at}`,
