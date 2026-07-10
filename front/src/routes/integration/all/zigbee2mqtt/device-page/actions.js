@@ -4,20 +4,22 @@ import uuid from 'uuid';
 import debounce from 'debounce';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
-import getZ2mUrl from '../utils/getZ2mUrl';
+import getZ2mUrl, { shouldShowZ2mUrlWarning } from '../utils/getZ2mUrl';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const houseActions = createActionsHouse(store);
   const actions = {
     async getZ2mUrl(state) {
-      store.setState({ z2mUrl: undefined });
+      store.setState({ z2mUrl: undefined, showZ2mUrlWarning: false });
       try {
         const configuration = await state.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
-        const z2mUrl = getZ2mUrl(configuration, state.session.gatewayClient !== undefined);
-        if (z2mUrl) {
-          store.setState({ z2mUrl });
-        }
+        const hasGatewayClient = state.session.gatewayClient !== undefined;
+        const z2mUrl = getZ2mUrl(configuration, hasGatewayClient);
+        store.setState({
+          z2mUrl,
+          showZ2mUrlWarning: shouldShowZ2mUrlWarning(configuration, hasGatewayClient, z2mUrl)
+        });
       } catch (e) {
         // z2mUrl stays undefined, link won't be shown
       }
