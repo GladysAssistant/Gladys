@@ -83,6 +83,10 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 1444,
       strictPort: true,
+      // preact-cli exposed the dev server on the network (0.0.0.0): keep that
+      // behavior so the dev front stays reachable from another device (tablet,
+      // phone) or through WSL2 port forwarding. Vite only binds localhost by default.
+      host: true,
       fs: {
         allow: ['..']
       },
