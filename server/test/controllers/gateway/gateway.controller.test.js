@@ -165,6 +165,24 @@ describe('GET /api/v1/gateway/aichat/debug-context', () => {
   });
 });
 
+describe('GET /api/v1/gateway/aichat/models', () => {
+  it('should return AI chat models list', async () => {
+    const response = await authenticatedRequest
+      .get('/api/v1/gateway/aichat/models')
+      .expect('Content-Type', /json/)
+      .expect(200);
+
+    expect(response.body).to.have.property('models');
+    expect(response.body.models).to.be.an('array');
+    expect(response.body.models.find((model) => model.id === 'llama-3.3-70b-instruct')).to.deep.equal({
+      id: 'llama-3.3-70b-instruct',
+      priceLabel: '€€',
+      priceTier: 2,
+      vision: false,
+    });
+  });
+});
+
 describe('POST /api/v1/gateway/stt', () => {
   it('should return stt response', async () => {
     nock(config.gladysGatewayServerUrl)

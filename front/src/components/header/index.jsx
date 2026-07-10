@@ -137,6 +137,16 @@ class Header extends Component {
                   </li>
                   <li class="nav-item">
                     <Link
+                      href="/dashboard/history"
+                      class={cx('nav-link', {
+                        active: props.currentUrl === '/dashboard/history'
+                      })}
+                    >
+                      <i class="fe fe-clock" /> <Text id="header.history" />
+                    </Link>
+                  </li>
+                  <li class="nav-item">
+                    <Link
                       href="/dashboard/chat"
                       class={cx('nav-link', {
                         active: props.currentUrl === '/dashboard/chat'
