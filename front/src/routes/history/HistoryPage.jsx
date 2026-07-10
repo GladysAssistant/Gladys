@@ -241,7 +241,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
                   </div>
                 ))}
 
-                {props.hasMore && !props.loading && <LoadMoreSentinel onVisible={props.loadMore} />}
+                {props.hasMore && !props.loading && <LoadMoreSentinel onVisible={props.autoLoadMore} />}
                 {props.hasMore && (
                   <div class={style.loadMoreContainer}>
                     <button

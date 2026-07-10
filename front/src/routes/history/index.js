@@ -14,6 +14,12 @@ const MAX_EVENTS_IN_MEMORY = 1000;
 // states per second; without batching, each one would run a full setState +
 // timeline rebuild and freeze the page.
 const LIVE_FLUSH_INTERVAL_MS = 1000;
+// When a filter matches a very chatty device feature, a whole page of states is
+// grouped into a single timeline row, so the page never fills the viewport, the
+// infinite-scroll sentinel never leaves it, and each response would immediately
+// trigger the next fetch, forever. Only allow this many sentinel-triggered loads
+// without a user scroll in between; past that, the "load more" button takes over.
+const MAX_AUTO_LOADS_WITHOUT_SCROLL = 3;
 
 class History extends Component {
   getRooms = async () => {
@@ -137,9 +143,25 @@ class History extends Component {
   refreshEvents = () => this.getEvents({ reset: true });
 
   loadMore = () => {
+    // Explicit user action: re-arm the auto-load budget.
+    this.autoLoadsWithoutScroll = 0;
     if (!this.state.loading && this.state.hasMore) {
       this.getEvents();
     }
+  };
+
+  autoLoadMore = () => {
+    if (this.autoLoadsWithoutScroll >= MAX_AUTO_LOADS_WITHOUT_SCROLL) {
+      return;
+    }
+    if (!this.state.loading && this.state.hasMore) {
+      this.autoLoadsWithoutScroll += 1;
+      this.getEvents();
+    }
+  };
+
+  onUserScroll = () => {
+    this.autoLoadsWithoutScroll = 0;
   };
 
   selectGroup = groupId => {
@@ -287,6 +309,7 @@ class History extends Component {
     this.featuresBySelector = null;
     this.liveEventBuffer = [];
     this.liveFlushTimeout = null;
+    this.autoLoadsWithoutScroll = 0;
     this.debouncedRefreshEvents = debounce(this.refreshEvents.bind(this), 300);
   }
 
@@ -295,10 +318,12 @@ class History extends Component {
     this.getRooms();
     this.getDevices();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.onNewState);
+    window.addEventListener('scroll', this.onUserScroll, { passive: true });
   }
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.onNewState);
+    window.removeEventListener('scroll', this.onUserScroll);
     if (this.liveFlushTimeout) {
       clearTimeout(this.liveFlushTimeout);
       this.liveFlushTimeout = null;
@@ -317,6 +342,7 @@ class History extends Component {
         backToLive={this.backToLive}
         search={this.search}
         loadMore={this.loadMore}
+        autoLoadMore={this.autoLoadMore}
         toggleExpand={this.toggleExpand}
         showPendingLiveEvents={this.showPendingLiveEvents}
         featuresBySelector={this.featuresBySelector}
