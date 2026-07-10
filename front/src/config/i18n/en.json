@@ -4731,6 +4731,7 @@
     "allRooms": "All rooms",
     "searchPlaceholder": "Search a device",
     "loadMore": "Load more",
+    "searchingOlder": "Searching activity — {{date}}…",
     "newEvents": {
       "one": "1 new event",
       "other": "{{count}} new events"

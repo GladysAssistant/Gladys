@@ -205,7 +205,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
             >
               <div class="loader" />
               <div class="dimmer-content">
-                {props.initialized && timeline.length === 0 && !props.error && (
+                {props.initialized && timeline.length === 0 && !props.error && !props.loading && (
                   <div class="card">
                     <div class={cx('card-body', style.emptyState)}>
                       <div class={style.emptyStateIcon}>
@@ -244,6 +244,20 @@ const HistoryPage = ({ intl, user, ...props }) => {
                     </div>
                   </div>
                 ))}
+
+                {props.loading && props.searchedUntil && (
+                  <div class={style.searchingOlder}>
+                    <span class={cx('loader', style.searchingOlderLoader)} />
+                    <Text
+                      id="history.searchingOlder"
+                      fields={{
+                        date: dayjs(props.searchedUntil)
+                          .locale(language || 'en')
+                          .format('MMMM YYYY')
+                      }}
+                    />
+                  </div>
+                )}
 
                 {props.hasMore && !props.loading && <LoadMoreSentinel onVisible={props.autoLoadMore} />}
                 {props.hasMore && (
