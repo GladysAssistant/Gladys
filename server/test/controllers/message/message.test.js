@@ -20,6 +20,37 @@ describe('POST /api/v1/message', () => {
         });
       });
   });
+
+  it('should send message with an allowed AI model', async () => {
+    await authenticatedRequest
+      .post('/api/v1/message')
+      .send({
+        text: 'What time is it?',
+        model: 'llama-3.3-70b-instruct',
+      })
+      .expect('Content-Type', /json/)
+      .expect(201)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          text: 'What time is it?',
+          source: 'api_client',
+          source_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          language: 'en',
+          created_at: res.body.created_at,
+        });
+      });
+  });
+
+  it('should reject message with an invalid AI model', async () => {
+    await authenticatedRequest
+      .post('/api/v1/message')
+      .send({
+        text: 'What time is it?',
+        model: 'not-a-real-model',
+      })
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
 });
 
 describe('GET /api/v1/message', () => {

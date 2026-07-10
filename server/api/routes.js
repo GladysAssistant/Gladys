@@ -241,6 +241,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDeviceFeaturesAggregated,
     },
+    'get /api/v1/device_feature/states_history': {
+      authenticated: true,
+      controller: deviceController.getDeviceStatesHistory,
+    },
     'get /api/v1/device_feature/energy_consumption': {
       authenticated: true,
       controller: deviceController.getConsumptionByDates,
@@ -378,6 +382,10 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: gatewayController.getOpenAIQuota,
+    },
+    'get /api/v1/gateway/aichat/models': {
+      authenticated: true,
+      controller: gatewayController.getAiChatModels,
     },
     'post /api/v1/gateway/stt': {
       authenticated: true,
