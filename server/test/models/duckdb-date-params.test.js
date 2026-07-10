@@ -4,9 +4,13 @@ const db = require('../../models');
 
 describe('DuckDB Date parameter binding', () => {
   afterEach(async () => {
-    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
-    // Restore the default session timezone on the write connection
-    await db.duckDbWriteConnectionAllAsync('RESET timezone;');
+    try {
+      await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    } finally {
+      // Restore the default session timezone on the write connection, even if the
+      // cleanup DELETE fails, so the timezone does not leak into other test suites.
+      await db.duckDbWriteConnectionAllAsync('RESET timezone;');
+    }
   });
 
   it('should bind JS Date params as naive TIMESTAMP, like the legacy duckdb package', async () => {
