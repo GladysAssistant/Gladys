@@ -10,7 +10,9 @@ const event = new EventEmitter();
 const job = new Job(event);
 
 const LIGHT_BINARY_FEATURE_ID = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+const LIGHT_BRIGHTNESS_FEATURE_ID = 'ce9dc798-b09f-4e51-8c16-311cdebf97cd';
 const TEMPERATURE_FEATURE_ID = 'bb1af3b9-f87d-4d9c-b5be-958cd9d28900';
+const ONE_HOUR_IN_MS = 60 * 60 * 1000;
 const TEST_ROOM_ID = '2398c689-8b47-43cc-ad32-e98d9be098b5';
 
 describe('Device.getDeviceStatesHistory', function Describe() {
@@ -102,16 +104,40 @@ describe('Device.getDeviceStatesHistory', function Describe() {
       { where: { id: LIGHT_BINARY_FEATURE_ID } },
     );
     const querySpy = spy(db, 'duckDbReadConnectionAllAsync');
-    const states = await deviceInstance.getDeviceStatesHistory({
-      categories: 'light',
-      take: 2,
-      before: new Date('2026-01-01T00:00:00.000Z').toISOString(),
-    });
-    expect(states).to.have.lengthOf(2);
-    expect(states[0].value).to.equal(1);
-    expect(states[0].created_at).to.deep.equal(new Date('2025-08-28T15:02:00.000Z'));
-    expect(querySpy.callCount).to.equal(1);
-    querySpy.restore();
+    try {
+      const states = await deviceInstance.getDeviceStatesHistory({
+        categories: 'light',
+        take: 2,
+        before: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+      });
+      expect(states).to.have.lengthOf(2);
+      expect(states[0].value).to.equal(1);
+      expect(states[0].created_at).to.deep.equal(new Date('2025-08-28T15:02:00.000Z'));
+      expect(querySpy.callCount).to.equal(1);
+    } finally {
+      querySpy.restore();
+    }
+  });
+
+  it('should fall back to before when filtered features have no last_value_changed', async () => {
+    await db.DeviceFeature.update(
+      { last_value_changed: null },
+      { where: { id: [LIGHT_BINARY_FEATURE_ID, LIGHT_BRIGHTNESS_FEATURE_ID] } },
+    );
+    const before = new Date('2026-01-01T00:00:00.000Z');
+    const querySpy = spy(db, 'duckDbReadConnectionAllAsync');
+    try {
+      const states = await deviceInstance.getDeviceStatesHistory({
+        categories: 'light',
+        take: 2,
+        before: before.toISOString(),
+      });
+      expect(states).to.have.lengthOf(2);
+      const firstWindowLowerBound = new Date(querySpy.firstCall.args[1]);
+      expect(firstWindowLowerBound.toISOString()).to.equal(new Date(before.getTime() - ONE_HOUR_IN_MS).toISOString());
+    } finally {
+      querySpy.restore();
+    }
   });
 
   it('should filter by categories', async () => {
