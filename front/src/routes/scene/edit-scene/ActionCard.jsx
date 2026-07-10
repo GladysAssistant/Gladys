@@ -35,6 +35,9 @@ import EdfTempoCondition from './actions/EdfTempoCondition';
 import AskAI from './actions/AskAI';
 import SendSms from './actions/SendSms';
 import ConditionIfElseThen from './actions/ConditionIfElseThen';
+import MeteoFranceGetVigilanceParams from './actions/MeteoFranceGetVigilanceParams';
+import MeteoFranceGetForecastParams from './actions/MeteoFranceGetForecastParams';
+import SendVigilanceMapParams from './actions/SendVigilanceMapParams';
 
 const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
@@ -68,7 +71,10 @@ const ACTION_ICON = {
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.AI.ASK]: 'fe fe-cpu',
-  [ACTIONS.SMS.SEND]: 'fe fe-message-circle'
+  [ACTIONS.SMS.SEND]: 'fe fe-message-circle',
+  [ACTIONS.METEO_FRANCE.GET_VIGILANCE]: 'fe fe-cloud-lightning',
+  [ACTIONS.METEO_FRANCE.GET_FORECAST]: 'fe fe-sun',
+  [ACTIONS.METEO_FRANCE.SEND_VIGILANCE_MAP]: 'fe fe-map'
 };
 
 const ACTION_COMPONENTS = {
@@ -104,7 +110,10 @@ const ACTION_COMPONENTS = {
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
   [ACTIONS.AI.ASK]: AskAI,
   [ACTIONS.SMS.SEND]: SendSms,
-  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen
+  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen,
+  [ACTIONS.METEO_FRANCE.GET_VIGILANCE]: MeteoFranceGetVigilanceParams,
+  [ACTIONS.METEO_FRANCE.GET_FORECAST]: MeteoFranceGetForecastParams,
+  [ACTIONS.METEO_FRANCE.SEND_VIGILANCE_MAP]: SendVigilanceMapParams
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
@@ -163,12 +172,18 @@ const ActionCard = ({ children, ...props }) => {
           props.action.type === ACTIONS.MQTT.SEND ||
           props.action.type === ACTIONS.ZIGBEE2MQTT.SEND ||
           props.action.type === ACTIONS.LIGHT.BLINK ||
-          props.action.type === ACTIONS.SMS.SEND,
+          props.action.type === ACTIONS.SMS.SEND ||
+          props.action.type === ACTIONS.METEO_FRANCE.GET_VIGILANCE ||
+          props.action.type === ACTIONS.METEO_FRANCE.GET_FORECAST ||
+          props.action.type === ACTIONS.METEO_FRANCE.SEND_VIGILANCE_MAP,
         'col-lg-4':
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
           props.action.type !== ACTIONS.MESSAGE.SEND &&
           props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING &&
-          props.action.type !== ACTIONS.SMS.SEND
+          props.action.type !== ACTIONS.SMS.SEND &&
+          props.action.type !== ACTIONS.METEO_FRANCE.GET_VIGILANCE &&
+          props.action.type !== ACTIONS.METEO_FRANCE.GET_FORECAST &&
+          props.action.type !== ACTIONS.METEO_FRANCE.SEND_VIGILANCE_MAP
       })}
     >
       <div

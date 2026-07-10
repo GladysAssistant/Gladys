@@ -295,18 +295,67 @@
       "deleteButton": "Delete",
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
-        "houseHasNoCoordinates": "Your house has no coordinates defined. Go to Gladys parameters to define the position of your house.",
-        "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
-        "requestToThirdPartyFailed": "The request to OpenWeather API failed. Is your Gladys instance connected to the internet? Please go to the OpenWeather configuration panel to troubleshoot this problem.",
-        "clickHere": "Click here to access the OpenWeather configuration panel.",
-        "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
-        "editModeLabel": "Select display mode:",
+        "editModeLabel": "Select display mode:"
+      },
+      "weatherMeteoFrance": {
+        "sourceLabel": "Forecast source",
+        "sourceMeteoFrance": "Météo France",
+        "sourceOpenWeather": "OpenWeather",
         "displayModes": {
-          "advancedWeather": "Humidity and wind speed",
+          "dateLocation": "Date and location",
+          "currentWeather": "Current weather",
+          "advancedWeather": "Weather details",
           "hourlyForecast": "Forecast for the next 24 hours",
-          "dailyForecast": "Forecast for the next 5 days"
+          "dailyForecast": "Forecast for the next 5 days",
+          "vigilanceMap": "France vigilance map – today (requires the optional API key)",
+          "vigilanceMapJ1": "France vigilance map – tomorrow (J+1)"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "conditions": {
+          "sunny": "Sunny",
+          "clearNight": "Clear night",
+          "partlyCloudy": "Partly cloudy",
+          "cloudy": "Cloudy",
+          "overcast": "Overcast",
+          "fog": "Fog",
+          "lightShowers": "Light showers",
+          "rain": "Rain",
+          "showers": "Showers",
+          "stormyRain": "Thundery rain",
+          "sleet": "Sleet",
+          "snow": "Snow",
+          "heavySnow": "Heavy snow",
+          "thunderstorm": "Thunderstorms"
+        },
+        "phenomena": {
+          "1": "High winds",
+          "2": "Rain-flooding",
+          "3": "Thunderstorms",
+          "4": "Floods",
+          "5": "Snow-ice",
+          "6": "Heatwave",
+          "7": "Extreme cold",
+          "8": "Avalanches",
+          "9": "Coastal flooding"
+        },
+        "moonPhases": {
+          "0": "New moon",
+          "1": "Waxing crescent",
+          "2": "First quarter",
+          "3": "Waxing gibbous",
+          "4": "Full moon",
+          "5": "Waning gibbous",
+          "6": "Last quarter",
+          "7": "Waning crescent"
+        },
+        "vigilanceTitle": "Météo France Vigilance",
+        "noVigilance": "No weather alert in progress",
+        "mapUnavailable": "Map unavailable: configure the API key in the Météo France integration.",
+        "mapJ1Label": "Tomorrow",
+        "editVigilanceLabel": "Show active weather alerts",
+        "editVigilanceHelp": "The department is automatically detected from the house GPS coordinates.",
+        "error": "Unable to fetch weather data.",
+        "noCoordinates": "The house has no GPS coordinates. Configure them in settings.",
+        "noHouseConfigured": "Please configure a house in the widget settings."
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -1170,6 +1219,20 @@
       "apiKeyPlaceholder": "Enter OpenWeather API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+    },
+    "meteoFrance": {
+      "title": "Météo France",
+      "documentation": "Météo France documentation",
+      "description": "Display Météo France weather and vigilance alerts in Gladys.",
+      "introduction": "This integration connects to the official Météo France webservice to get weather forecasts and vigilance alerts (yellow, orange, red).",
+      "noConfiguration": "No configuration is required: the data is freely accessible, without any API key.",
+      "instructionsToUse": "Simply add the \"Météo France\" widget to your dashboard and select your house (its GPS coordinates must be configured). The department used for vigilance alerts is detected automatically.",
+      "instructions": "Optional: to display the national vigilance map in the widget, create an account on <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, subscribe for free to the <strong>DPVigilance</strong> API and enter your API key below.",
+      "apiKeyLabel": "API key (optional, only for the vigilance map):",
+      "apiKeyPlaceholder": "Enter Météo France API key",
+      "saveButton": "Save",
+      "saveSuccess": "API key saved successfully.",
+      "saveError": "Error while saving the API key."
     },
     "tuya": {
       "title": "Tuya",
@@ -2545,6 +2608,22 @@
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
     "actionsCard": {
+      "meteoFranceGetVigilance": {
+        "description": "This action gets the current Météo France vigilance for the selected house and exposes variables usable in the next actions (level, color, phenomena, bulletin).",
+        "houseLabel": "House"
+      },
+      "meteoFranceGetForecast": {
+        "description": "This action gets the Météo France forecast for the selected house and exposes variables usable in the next actions (description, temperatures, rain, UV, bulletin).",
+        "houseLabel": "House",
+        "daysLabel": "Bulletin length",
+        "daysOptions": {
+          "1": "Today only",
+          "2": "2 days",
+          "3": "3 days",
+          "4": "4 days",
+          "5": "5 days"
+        }
+      },
       "delay": {
         "label": " This block will wait the specified duration.",
         "inputPlaceholder": "Duration",
@@ -2568,6 +2647,15 @@
         "textLabel": "Message",
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+      },
+      "sendVigilanceMap": {
+        "userLabel": "User",
+        "dayLabel": "Map to send",
+        "dayToday": "Today (J)",
+        "dayTomorrow": "Tomorrow (J+1)",
+        "textLabel": "Message (optional)",
+        "textPlaceholder": "Message text",
+        "explanationText": "The map requires the optional API key configured in the Météo France integration."
       },
       "askAi": {
         "description": "This action will send a message to the AI via Gladys Plus and will reply to you with a message. If you attach a camera image, the AI will be able to see what is on the image and even take action accordingly.",
@@ -2842,12 +2930,35 @@
       },
       "ai": {
         "ask": "Ask AI"
+      },
+      "meteofrance": {
+        "get-vigilance": "Get Météo France vigilance",
+        "get-forecast": "Get weather bulletin (Météo France)",
+        "send-vigilance-map": "Send Météo France vigilance map"
       }
     },
     "variables": {
       "device": {
         "get-value": {
           "last_value": "Device last value"
+        }
+      },
+      "meteofrance": {
+        "get-vigilance": {
+          "color": "Vigilance level (1 to 4)",
+          "color_name": "Vigilance color (Vert, Jaune, Orange, Rouge)",
+          "phenomena": "Current phenomena",
+          "text": "Short vigilance summary",
+          "bulletin": "Full vigilance bulletin",
+          "dept": "Department"
+        },
+        "get-forecast": {
+          "description": "Sky description (today)",
+          "temp_min": "Minimum temperature (today)",
+          "temp_max": "Maximum temperature (today)",
+          "rain": "Rain in mm (today)",
+          "uv": "UV index (today)",
+          "summary": "Full weather bulletin"
         }
       },
       "calendar": {
@@ -2898,9 +3009,22 @@
       },
       "mqtt": {
         "received": "Receive message from MQTT"
+      },
+      "meteofrance": {
+        "new-vigilance": "Weather vigilance (Météo France)"
       }
     },
     "triggersCard": {
+      "meteoFranceVigilance": {
+        "description": "This trigger fires when the Météo France vigilance level of your department raises and reaches the selected level. The department is detected from the house GPS coordinates.",
+        "houseLabel": "House",
+        "levelLabel": "Minimum vigilance level",
+        "levels": {
+          "2": "Yellow or higher",
+          "3": "Orange or higher",
+          "4": "Red only"
+        }
+      },
       "newState": {
         "equal": "equal",
         "superior": "superior",

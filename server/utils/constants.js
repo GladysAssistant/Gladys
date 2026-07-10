@@ -399,6 +399,9 @@ const EVENTS = {
     NEW_FOR_OPEN_AI: 'message.new-for-open-ai',
     PURGE_OLD_MESSAGES: 'message.purge-old-messages',
   },
+  METEO_FRANCE: {
+    NEW_VIGILANCE: 'meteofrance.new-vigilance',
+  },
   SYSTEM: {
     UPGRADE_CONTAINERS: 'system.upgrade-containers',
     CHECK_UPGRADE: 'system.check-upgrade',
@@ -549,6 +552,11 @@ const ACTIONS = {
   },
   EDF_TEMPO: {
     CONDITION: 'edf-tempo.condition',
+  },
+  METEO_FRANCE: {
+    GET_VIGILANCE: 'meteofrance.get-vigilance',
+    GET_FORECAST: 'meteofrance.get-forecast',
+    SEND_VIGILANCE_MAP: 'meteofrance.send-vigilance-map',
   },
   MQTT: {
     SEND: 'mqtt.send',

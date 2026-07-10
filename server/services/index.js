@@ -4,6 +4,7 @@ module.exports.caldav = require('./caldav');
 module.exports.callmebot = require('./callmebot');
 module.exports.enedis = require('./enedis');
 module.exports.openweather = require('./openweather');
+module.exports.meteofrance = require('./meteofrance');
 module.exports.ecowatt = require('./ecowatt');
 module.exports['energy-monitoring'] = require('./energy-monitoring');
 module.exports['edf-tempo'] = require('./edf-tempo');

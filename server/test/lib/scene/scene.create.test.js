@@ -51,6 +51,25 @@ describe('SceneManager', () => {
     });
     expect(scene).to.have.property('selector', 'my-custom-selector');
   });
+  it('should create one scene with a Météo France send-vigilance-map action', async () => {
+    const scene = await sceneManager.create({
+      name: 'Vigilance map',
+      icon: 'bell',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.METEO_FRANCE.SEND_VIGILANCE_MAP,
+            user: 'william',
+            day: 'J1',
+            text: 'Carte de vigilance',
+          },
+        ],
+      ],
+      tags: [],
+    });
+    expect(scene).to.have.property('selector');
+  });
   it('should return validation error, invalid actions', async () => {
     const promise = sceneManager.create({
       name: 'My living room',

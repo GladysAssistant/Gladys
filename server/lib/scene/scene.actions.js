@@ -31,6 +31,12 @@ const executeActionsFactory = require('./scene.executeActions');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// Free Mobile (and most SMS gateways) reject/truncate messages beyond a few hundred characters,
+// so the short summary exposed as "text" is capped. The full bulletin ("bulletin") is meant for
+// channels with a much higher limit (e.g. Telegram's ~4096 chars) and only needs a safety cap.
+const VIGILANCE_TEXT_MAX_LENGTH = 1000;
+const VIGILANCE_BULLETIN_MAX_LENGTH = 4000;
+
 const { evaluate } = create({
   addDependencies,
   divideDependencies,
@@ -578,6 +584,70 @@ const actionsFunc = {
     } catch (e) {
       throw new AbortScene(e.message);
     }
+  },
+  [ACTIONS.METEO_FRANCE.GET_VIGILANCE]: async (self, action, scope, path) => {
+    const meteoFranceService = self.service.getService('meteofrance');
+    if (meteoFranceService === null) {
+      throw new AbortScene('SERVICE_METEOFRANCE_NOT_FOUND');
+    }
+    const house = await self.house.getBySelector(action.house);
+    if (!house || house.latitude == null || house.longitude == null) {
+      throw new AbortScene('HOUSE_HAS_NO_COORDINATES');
+    }
+    const vigilance = await meteoFranceService.vigilance.getForHouse(house);
+    const VIGILANCE_COLOR_NAMES = {
+      1: 'Vert',
+      2: 'Jaune',
+      3: 'Orange',
+      4: 'Rouge',
+    };
+    const text =
+      vigilance.text && vigilance.text.length > VIGILANCE_TEXT_MAX_LENGTH
+        ? `${vigilance.text.slice(0, VIGILANCE_TEXT_MAX_LENGTH - 1)}…`
+        : vigilance.text;
+    const bulletin =
+      vigilance.bulletin && vigilance.bulletin.length > VIGILANCE_BULLETIN_MAX_LENGTH
+        ? `${vigilance.bulletin.slice(0, VIGILANCE_BULLETIN_MAX_LENGTH - 1)}…`
+        : vigilance.bulletin;
+    set(scope, path, {
+      dept: vigilance.dept,
+      color: vigilance.color,
+      color_name: VIGILANCE_COLOR_NAMES[vigilance.color] || `${vigilance.color}`,
+      phenomena: vigilance.alerts.map((alert) => alert.phenomene_nom).join(', '),
+      text,
+      bulletin,
+    });
+  },
+  [ACTIONS.METEO_FRANCE.GET_FORECAST]: async (self, action, scope, path) => {
+    const meteoFranceService = self.service.getService('meteofrance');
+    if (meteoFranceService === null) {
+      throw new AbortScene('SERVICE_METEOFRANCE_NOT_FOUND');
+    }
+    const house = await self.house.getBySelector(action.house);
+    if (!house || house.latitude == null || house.longitude == null) {
+      throw new AbortScene('HOUSE_HAS_NO_COORDINATES');
+    }
+    const forecastSummary = await meteoFranceService.forecast.getSummaryForHouse(house, action.days || 1);
+    set(scope, path, forecastSummary);
+  },
+  [ACTIONS.METEO_FRANCE.SEND_VIGILANCE_MAP]: async (self, action, scope) => {
+    const meteoFranceService = self.service.getService('meteofrance');
+    if (meteoFranceService === null) {
+      throw new AbortScene('SERVICE_METEOFRANCE_NOT_FOUND');
+    }
+    const day = action.day === 'J1' ? 'J1' : 'J';
+    const image = await meteoFranceService.vigilance.getMap(day);
+    if (!image) {
+      throw new AbortScene('VIGILANCE_MAP_NOT_AVAILABLE');
+    }
+    const textWithVariables = action.text
+      ? Handlebars.compile(action.text, {
+          noEscape: true,
+        })(scope)
+      : '';
+    // The map service returns a full data URL (data:image/png;base64,...) for <img> use in the
+    // dashboard; message.sendToUser (like camera images) expects it without the "data:" prefix.
+    await self.message.sendToUser(action.user, textWithVariables, image.replace(/^data:/, ''));
   },
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: async (self, action) => {
     const house = await self.house.getBySelector(action.house);

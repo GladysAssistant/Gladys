@@ -295,18 +295,67 @@
       "deleteButton": "Löschen",
       "weather": {
         "editHouseLabel": "Wähle ein Zuhause aus. Ich werde seine Breiten- und Längengrade verwenden, um das Wetter abzurufen.",
-        "houseHasNoCoordinates": "Dein Zuhause hat keine definierten Koordinaten. Gehe zu den Gladys-Parametern, um die Position deines Zuhause zu definieren.",
-        "serviceNotConfigured": "Der OpenWeather-Dienst ist nicht konfiguriert. Gehe zum Tab \"Integrationen\" und konfiguriere den OpenWeather-Dienst.",
-        "requestToThirdPartyFailed": "Die Anfrage an die OpenWeather-API ist fehlgeschlagen. Ist dein Gladys mit dem Internet verbunden? Gehe zum OpenWeather-Konfigurationspanel, um das Problem zu beheben.",
-        "clickHere": "Klicke hier, um zum OpenWeather-Konfigurationspanel zu gelangen.",
-        "unknownError": "Wir können das Wetter für dieses Zuhause nicht abrufen. Hast du für diese Box ein Zuhause definiert?",
-        "editModeLabel": "Wähle den Anzeigemodus aus:",
+        "editModeLabel": "Wähle den Anzeigemodus aus:"
+      },
+      "weatherMeteoFrance": {
+        "sourceLabel": "Quelle der Vorhersage",
+        "sourceMeteoFrance": "Météo France",
+        "sourceOpenWeather": "OpenWeather",
         "displayModes": {
-          "advancedWeather": "Luftfeuchtigkeit und Windgeschwindigkeit",
+          "dateLocation": "Datum und Ort",
+          "currentWeather": "Aktuelles Wetter",
+          "advancedWeather": "Wetterdetails",
           "hourlyForecast": "Vorhersage für die nächsten 24 Stunden",
-          "dailyForecast": "Vorhersage für die nächsten 5 Tage"
+          "dailyForecast": "Vorhersage für die nächsten 5 Tage",
+          "vigilanceMap": "Vigilance-Karte Frankreich – heute (erfordert den optionalen API-Schlüssel)",
+          "vigilanceMapJ1": "Vigilance-Karte Frankreich – morgen (J+1)"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "conditions": {
+          "sunny": "Sonnig",
+          "clearNight": "Klare Nacht",
+          "partlyCloudy": "Leicht bewölkt",
+          "cloudy": "Bewölkt",
+          "overcast": "Stark bewölkt",
+          "fog": "Nebel",
+          "lightShowers": "Vereinzelte Schauer",
+          "rain": "Regen",
+          "showers": "Schauer",
+          "stormyRain": "Gewittriger Regen",
+          "sleet": "Schneeregen",
+          "snow": "Schnee",
+          "heavySnow": "Starker Schneefall",
+          "thunderstorm": "Gewitter"
+        },
+        "phenomena": {
+          "1": "Sturmböen",
+          "2": "Starkregen-Überschwemmung",
+          "3": "Gewitter",
+          "4": "Hochwasser",
+          "5": "Schnee-Glätte",
+          "6": "Hitzewelle",
+          "7": "Extreme Kälte",
+          "8": "Lawinen",
+          "9": "Sturmflut"
+        },
+        "moonPhases": {
+          "0": "Neumond",
+          "1": "Zunehmende Sichel",
+          "2": "Erstes Viertel",
+          "3": "Zunehmender Mond",
+          "4": "Vollmond",
+          "5": "Abnehmender Mond",
+          "6": "Letztes Viertel",
+          "7": "Abnehmende Sichel"
+        },
+        "vigilanceTitle": "Météo France Unwetterwarnung",
+        "noVigilance": "Keine Unwetterwarnung aktiv",
+        "mapUnavailable": "Karte nicht verfügbar: Konfiguriere den API-Schlüssel in der Météo France-Integration.",
+        "mapJ1Label": "Morgen",
+        "editVigilanceLabel": "Aktive Unwetterwarnungen anzeigen",
+        "editVigilanceHelp": "Das Departement wird automatisch aus den GPS-Koordinaten des Hauses ermittelt.",
+        "error": "Wetterdaten konnten nicht abgerufen werden.",
+        "noCoordinates": "Das Haus hat keine GPS-Koordinaten. Konfiguriere sie in den Einstellungen.",
+        "noHouseConfigured": "Bitte konfiguriere ein Haus in den Widget-Einstellungen."
       },
       "devicesInRoom": {
         "editRoomLabel": "Wähle den Raum aus, den du hier anzeigen möchtest.",
@@ -1275,6 +1324,20 @@
       "apiKeyPlaceholder": "OpenWeather-API-Schlüssel eingeben",
       "saveButton": "Sichern",
       "instructionsToUse": "Um diese Integration zu verwenden, gehe zum Dashboard und erstelle eine Wetter-Box."
+    },
+    "meteoFrance": {
+      "title": "Météo France",
+      "documentation": "Météo France Dokumentation",
+      "description": "Zeige Météo France Wetter und Unwetterwarnungen in Gladys an.",
+      "introduction": "Diese Integration verbindet sich mit dem offiziellen Météo France-Webservice, um Wettervorhersagen und Unwetterwarnungen (gelb, orange, rot) abzurufen.",
+      "noConfiguration": "Es ist keine Konfiguration erforderlich: Die Daten sind frei zugänglich, ohne API-Schlüssel.",
+      "instructionsToUse": "Füge einfach das Widget „Météo France“ zu deinem Dashboard hinzu und wähle dein Haus aus (seine GPS-Koordinaten müssen konfiguriert sein). Das Departement für die Unwetterwarnungen wird automatisch erkannt.",
+      "instructions": "Optional: Um die nationale Vigilance-Karte im Widget anzuzeigen, erstelle ein Konto auf <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, abonniere kostenlos die <strong>DPVigilance</strong>-API und gib unten deinen API-Schlüssel ein.",
+      "apiKeyLabel": "API-Schlüssel (optional, nur für die Vigilance-Karte):",
+      "apiKeyPlaceholder": "Météo France API-Schlüssel eingeben",
+      "saveButton": "Sichern",
+      "saveSuccess": "API-Schlüssel erfolgreich gespeichert.",
+      "saveError": "Fehler beim Speichern des API-Schlüssels."
     },
     "tuya": {
       "title": "Tuya",
@@ -2545,6 +2608,22 @@
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
     "actionsCard": {
+      "meteoFranceGetVigilance": {
+        "description": "Diese Aktion ruft die aktuelle Météo France Warnstufe für das ausgewählte Haus ab und stellt Variablen für die folgenden Aktionen bereit (Stufe, Farbe, Phänomene, Bulletin).",
+        "houseLabel": "Haus"
+      },
+      "meteoFranceGetForecast": {
+        "description": "Diese Aktion ruft die Météo France Vorhersage für das ausgewählte Haus ab und stellt Variablen für die folgenden Aktionen bereit (Beschreibung, Temperaturen, Regen, UV, Bericht).",
+        "houseLabel": "Haus",
+        "daysLabel": "Länge des Berichts",
+        "daysOptions": {
+          "1": "Nur heute",
+          "2": "2 Tage",
+          "3": "3 Tage",
+          "4": "4 Tage",
+          "5": "5 Tage"
+        }
+      },
       "delay": {
         "label": " Dieser Block wartet für die angegebene Dauer.",
         "inputPlaceholder": "Dauer",
@@ -2568,6 +2647,15 @@
         "textLabel": "Nachricht",
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+      },
+      "sendVigilanceMap": {
+        "userLabel": "Benutzer",
+        "dayLabel": "Zu sendende Karte",
+        "dayToday": "Heute (J)",
+        "dayTomorrow": "Morgen (J+1)",
+        "textLabel": "Nachricht (optional)",
+        "textPlaceholder": "Nachrichtentext",
+        "explanationText": "Die Karte erfordert den optionalen API-Schlüssel, der in der Météo France-Integration konfiguriert ist."
       },
       "askAi": {
         "description": "Diese Aktion sendet eine Nachricht an die KI über Gladys Plus und antwortet Ihnen mit einer Nachricht. Wenn Sie ein Kamerabild anhängen, kann die KI sehen, was auf dem Bild ist, und sogar entsprechend handeln.",
@@ -2842,12 +2930,35 @@
       },
       "ai": {
         "ask": "Frage die KI"
+      },
+      "meteofrance": {
+        "get-vigilance": "Météo France Warnstufe abrufen",
+        "get-forecast": "Wetterbericht abrufen (Météo France)",
+        "send-vigilance-map": "Météo France Vigilance-Karte senden"
       }
     },
     "variables": {
       "device": {
         "get-value": {
           "last_value": "Letzter Gerätewert"
+        }
+      },
+      "meteofrance": {
+        "get-vigilance": {
+          "color": "Warnstufe (1 bis 4)",
+          "color_name": "Warnfarbe (Vert, Jaune, Orange, Rouge)",
+          "phenomena": "Aktuelle Phänomene",
+          "text": "Kurze Zusammenfassung der Warnung",
+          "bulletin": "Vollständiges Warnbulletin",
+          "dept": "Departement"
+        },
+        "get-forecast": {
+          "description": "Himmelsbeschreibung (heute)",
+          "temp_min": "Tiefsttemperatur (heute)",
+          "temp_max": "Höchsttemperatur (heute)",
+          "rain": "Regen in mm (heute)",
+          "uv": "UV-Index (heute)",
+          "summary": "Vollständiger Wetterbericht"
         }
       },
       "calendar": {
@@ -2898,9 +3009,22 @@
       },
       "mqtt": {
         "received": "MQTT-Message empfangen"
+      },
+      "meteofrance": {
+        "new-vigilance": "Unwetterwarnung (Météo France)"
       }
     },
     "triggersCard": {
+      "meteoFranceVigilance": {
+        "description": "Dieser Auslöser wird aktiviert, wenn die Météo France Warnstufe deines Departements steigt und die gewählte Stufe erreicht. Das Departement wird aus den GPS-Koordinaten des Hauses ermittelt.",
+        "houseLabel": "Haus",
+        "levelLabel": "Minimale Warnstufe",
+        "levels": {
+          "2": "Gelb oder höher",
+          "3": "Orange oder höher",
+          "4": "Nur Rot"
+        }
+      },
       "newState": {
         "equal": "gleich",
         "superior": "größer",

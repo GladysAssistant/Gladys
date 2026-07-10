@@ -295,18 +295,67 @@
       "deleteButton": "Supprimer",
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
-        "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
-        "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
-        "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échoué. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
-        "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
-        "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
-        "editModeLabel": "Mode d'affichage :",
+        "editModeLabel": "Mode d'affichage :"
+      },
+      "weatherMeteoFrance": {
+        "sourceLabel": "Source des prévisions",
+        "sourceMeteoFrance": "Météo France",
+        "sourceOpenWeather": "OpenWeather",
         "displayModes": {
-          "advancedWeather": "Humidité et vitesse du vent",
+          "dateLocation": "Date et lieu",
+          "currentWeather": "Météo actuelle",
+          "advancedWeather": "Détails météo",
           "hourlyForecast": "Prévisions pour les 24 prochaines heures",
-          "dailyForecast": "Prévisions pour les 5 prochains jours"
+          "dailyForecast": "Prévisions pour les 5 prochains jours",
+          "vigilanceMap": "Carte de vigilance France – jour J (nécessite la clé API optionnelle)",
+          "vigilanceMapJ1": "Carte de vigilance France – lendemain (J+1)"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "conditions": {
+          "sunny": "Ensoleillé",
+          "clearNight": "Ciel clair",
+          "partlyCloudy": "Peu nuageux",
+          "cloudy": "Nuageux",
+          "overcast": "Très nuageux",
+          "fog": "Brouillard",
+          "lightShowers": "Rares averses",
+          "rain": "Pluie",
+          "showers": "Averses",
+          "stormyRain": "Pluies orageuses",
+          "sleet": "Pluie et neige mêlées",
+          "snow": "Neige",
+          "heavySnow": "Fortes chutes de neige",
+          "thunderstorm": "Orages"
+        },
+        "phenomena": {
+          "1": "Vent violent",
+          "2": "Pluie-inondation",
+          "3": "Orages",
+          "4": "Crues",
+          "5": "Neige-verglas",
+          "6": "Canicule",
+          "7": "Grand froid",
+          "8": "Avalanches",
+          "9": "Vagues-submersion"
+        },
+        "moonPhases": {
+          "0": "Nouvelle lune",
+          "1": "Premier croissant",
+          "2": "Premier quartier",
+          "3": "Gibbeuse croissante",
+          "4": "Pleine lune",
+          "5": "Gibbeuse décroissante",
+          "6": "Dernier quartier",
+          "7": "Dernier croissant"
+        },
+        "vigilanceTitle": "Vigilance Météo France",
+        "noVigilance": "Pas de vigilance en cours",
+        "mapUnavailable": "Carte indisponible : configurez la clé API dans l'intégration Météo France.",
+        "mapJ1Label": "Demain",
+        "editVigilanceLabel": "Afficher les vigilances météo en cours",
+        "editVigilanceHelp": "Le département est détecté automatiquement à partir des coordonnées GPS de la maison.",
+        "error": "Impossible de récupérer les données météo.",
+        "noCoordinates": "La maison n'a pas de coordonnées GPS. Configurez-les dans les paramètres.",
+        "noHouseConfigured": "Veuillez configurer une maison dans les paramètres du widget."
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -1408,6 +1457,20 @@
       "apiKeyPlaceholder": "Entrer la clé API OpenWeather",
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
+    },
+    "meteoFrance": {
+      "title": "Météo France",
+      "documentation": "Documentation Météo France",
+      "description": "Affichez la météo et les alertes de vigilance Météo France dans Gladys.",
+      "introduction": "Cette intégration se connecte au webservice officiel Météo France pour obtenir les prévisions météo et les alertes de vigilance (jaune, orange, rouge).",
+      "noConfiguration": "Aucune configuration n'est nécessaire : les données sont accessibles librement, sans clé API.",
+      "instructionsToUse": "Ajoutez simplement le widget « Météo France » sur votre tableau de bord et sélectionnez votre maison (ses coordonnées GPS doivent être configurées). Le département utilisé pour la vigilance est détecté automatiquement.",
+      "instructions": "Optionnel : pour afficher la carte de vigilance nationale dans le widget, créez un compte sur <a href=\"https://portail-api.meteofrance.fr\" target=\"_blank\" rel=\"noopener noreferrer\">portail-api.meteofrance.fr</a>, souscrivez gratuitement à l'API <strong>DPVigilance</strong> et saisissez votre clé API ci-dessous.",
+      "apiKeyLabel": "Clé API (optionnelle, uniquement pour la carte de vigilance) :",
+      "apiKeyPlaceholder": "Entrer la clé API Météo France",
+      "saveButton": "Sauvegarder",
+      "saveSuccess": "Clé API sauvegardée avec succès.",
+      "saveError": "Erreur lors de la sauvegarde de la clé API."
     },
     "tuya": {
       "title": "Tuya",
@@ -2545,6 +2608,22 @@
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
     "actionsCard": {
+      "meteoFranceGetVigilance": {
+        "description": "Cette action récupère la vigilance Météo France en cours pour la maison sélectionnée et expose des variables utilisables dans les actions suivantes (niveau, couleur, phénomènes, bulletin).",
+        "houseLabel": "Maison"
+      },
+      "meteoFranceGetForecast": {
+        "description": "Cette action récupère les prévisions Météo France pour la maison sélectionnée et expose des variables utilisables dans les actions suivantes (description, températures, pluie, UV, bulletin).",
+        "houseLabel": "Maison",
+        "daysLabel": "Durée du bulletin",
+        "daysOptions": {
+          "1": "Aujourd'hui uniquement",
+          "2": "2 jours",
+          "3": "3 jours",
+          "4": "4 jours",
+          "5": "5 jours"
+        }
+      },
       "delay": {
         "label": " Ce bloc attendra la durée spécifiée.",
         "inputPlaceholder": "Durée",
@@ -2568,6 +2647,15 @@
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
+      "sendVigilanceMap": {
+        "userLabel": "Utilisateur",
+        "dayLabel": "Carte à envoyer",
+        "dayToday": "Aujourd'hui (J)",
+        "dayTomorrow": "Lendemain (J+1)",
+        "textLabel": "Message (optionnel)",
+        "textPlaceholder": "Texte du message",
+        "explanationText": "La carte nécessite la clé API optionnelle configurée dans l'intégration Météo France."
       },
       "askAi": {
         "description": "Cette action enverra un message à l'IA via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
@@ -2842,12 +2930,35 @@
       },
       "ai": {
         "ask": "Demander à l'IA"
+      },
+      "meteofrance": {
+        "get-vigilance": "Récupérer la vigilance Météo France",
+        "get-forecast": "Récupérer le bulletin météo (Météo France)",
+        "send-vigilance-map": "Envoyer la carte de vigilance Météo France"
       }
     },
     "variables": {
       "device": {
         "get-value": {
           "last_value": "Dernière valeur de l'appareil"
+        }
+      },
+      "meteofrance": {
+        "get-vigilance": {
+          "color": "Niveau de vigilance (1 à 4)",
+          "color_name": "Couleur de vigilance (Vert, Jaune, Orange, Rouge)",
+          "phenomena": "Phénomènes en cours",
+          "text": "Résumé court de la vigilance",
+          "bulletin": "Bulletin de vigilance complet",
+          "dept": "Département"
+        },
+        "get-forecast": {
+          "description": "Description du ciel (aujourd'hui)",
+          "temp_min": "Température minimale (aujourd'hui)",
+          "temp_max": "Température maximale (aujourd'hui)",
+          "rain": "Pluie en mm (aujourd'hui)",
+          "uv": "Indice UV (aujourd'hui)",
+          "summary": "Bulletin météo complet"
         }
       },
       "calendar": {
@@ -2898,9 +3009,22 @@
       },
       "mqtt": {
         "received": "Recevoir un message MQTT"
+      },
+      "meteofrance": {
+        "new-vigilance": "Vigilance météo (Météo France)"
       }
     },
     "triggersCard": {
+      "meteoFranceVigilance": {
+        "description": "Ce déclencheur s'active lorsque le niveau de vigilance Météo France de votre département augmente et atteint le niveau choisi. Le département est détecté à partir des coordonnées GPS de la maison.",
+        "houseLabel": "Maison",
+        "levelLabel": "Niveau minimum de vigilance",
+        "levels": {
+          "2": "Jaune ou plus",
+          "3": "Orange ou plus",
+          "4": "Rouge uniquement"
+        }
+      },
       "newState": {
         "equal": "égal",
         "superior": "supérieur",

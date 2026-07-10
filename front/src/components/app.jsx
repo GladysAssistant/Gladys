@@ -80,6 +80,7 @@ import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
 import CalDAVSharePage from '../routes/integration/all/caldav/share-page';
 import OpenWeatherPage from '../routes/integration/all/openweather';
+import MeteoFrancePage from '../routes/integration/all/meteofrance';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import TPLinkDevicePage from '../routes/integration/all/tp-link/device-page';
@@ -275,6 +276,7 @@ const AppRouter = connect(
         <CalDAVSyncPage path="/dashboard/integration/calendar/caldav/sync" />
         <CalDAVSharePage path="/dashboard/integration/calendar/caldav/share" />
         <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
+        <MeteoFrancePage path="/dashboard/integration/weather/meteofrance" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
