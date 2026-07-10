@@ -422,7 +422,9 @@ class WeatherBoxComponent extends Component {
                   {/* The first column is the current time slot: emphasize it */}
                   <div
                     class={index === 0 ? '' : 'text-muted'}
-                    style={`font-size: ${index === 0 ? '12px' : '10px'}; font-weight: ${index === 0 ? '600' : '400'}; margin-bottom: 3px`}
+                    style={`font-size: ${index === 0 ? '12px' : '10px'}; font-weight: ${
+                      index === 0 ? '600' : '400'
+                    }; margin-bottom: 3px`}
                   >
                     {hour.time}h
                   </div>
@@ -456,7 +458,10 @@ class WeatherBoxComponent extends Component {
             >
               {daily.map(d => (
                 <div key={d.dt} style="text-align: center; flex: 1">
-                  <div class="text-muted" style="font-size: 14px; text-transform: capitalize; white-space: nowrap; margin-bottom: 3px">
+                  <div
+                    class="text-muted"
+                    style="font-size: 14px; text-transform: capitalize; white-space: nowrap; margin-bottom: 3px"
+                  >
                     {dayjs
                       .unix(d.dt)
                       .locale(userLanguage)

@@ -1,6 +1,7 @@
 // OpenWeather icon codes mapped to the closest Météo France icon codes,
 // so the rest of the pipeline (widget, forecast summary) works with a single format.
 // Docs: https://openweathermap.org/weather-conditions
+/** @type {Object<string, string>} */
 const OW_ICON_TO_MF = {
   '01': 'p1', // clear sky
   '02': 'p2', // few clouds
@@ -121,7 +122,9 @@ function formatOpenWeatherAsMeteoFrance(current, forecast) {
 
   const dailyForecast = dayKeys.map((dayKey, dayIndex) => {
     const slots = slotsByDay[dayKey];
+    /** @type {number|null} */
     let min = null;
+    /** @type {number|null} */
     let max = null;
     slots.forEach((point) => {
       const temp = point.main && point.main.temp != null ? point.main.temp : null;

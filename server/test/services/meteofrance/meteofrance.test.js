@@ -1,7 +1,12 @@
 const { expect, assert } = require('chai');
 const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { forecastData, warningDataGreen, warningDataOrange, warningDataOrangeWithComment } = require('./meteofrance.data');
+const {
+  forecastData,
+  warningDataGreen,
+  warningDataOrange,
+  warningDataOrangeWithComment,
+} = require('./meteofrance.data');
 
 const SERVICE_ID = '35deac79-f295-4adf-8512-f2f48e1ea0f8';
 
