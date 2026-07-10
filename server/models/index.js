@@ -159,7 +159,20 @@ const initializeDuckDb = async () => {
 
 const ensureDuckDbInitialized = () => {
   if (duckDbInitPromise === null) {
-    duckDbInitPromise = initializeDuckDb();
+    const initPromise = (async () => {
+      try {
+        await initializeDuckDb();
+      } catch (initError) {
+        // Clear the cached promise on failure so a later call can retry after a
+        // transient error, instead of staying stuck on the rejected promise. Only
+        // reset if no other initialization has started in the meantime.
+        if (duckDbInitPromise === initPromise) {
+          duckDbInitPromise = null;
+        }
+        throw initError;
+      }
+    })();
+    duckDbInitPromise = initPromise;
   }
   return duckDbInitPromise;
 };
@@ -220,8 +233,12 @@ const duckDbReadConnectionAllAsync = (query, ...params) =>
 // times and before initialization has completed.
 const duckDbClose = async () => {
   if (duckDbInitPromise !== null) {
-    // Make sure a pending initialization is settled before closing.
-    await duckDbInitPromise.catch(() => {});
+    // Make sure a pending initialization is settled before closing (ignore its error).
+    try {
+      await duckDbInitPromise;
+    } catch (initError) {
+      // The initialization already reported its own error; nothing to close if it failed.
+    }
   }
   if (duckDbReadConnection) {
     duckDbReadConnection.disconnectSync();
