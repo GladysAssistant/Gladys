@@ -40,6 +40,35 @@ const JobList = ({ children, ...props }) => (
                       <RelativeTime datetime={job.created_at} language={props.user.language} futureDisabled />
                     </small>
                   </div>
+                  {job.data && job.data.device_name && job.data.device_feature_name && (
+                    <div class="text-muted small">
+                      <Text
+                        id="jobsSettings.jobData.target"
+                        fields={{ device: job.data.device_name, feature: job.data.device_feature_name }}
+                      />
+                    </div>
+                  )}
+                  {job.data &&
+                    (job.data.duckdb_states_count !== undefined || job.data.sqlite_states_count !== undefined) && (
+                      <div class="text-muted small">
+                        <Text
+                          id="jobsSettings.jobData.statesCounts"
+                          fields={{
+                            duckdb: (job.data.duckdb_states_count || 0).toLocaleString(props.user.language),
+                            sqlite: (job.data.sqlite_states_count || 0).toLocaleString(props.user.language),
+                            aggregates: (job.data.aggregates_count || 0).toLocaleString(props.user.language)
+                          }}
+                        />
+                      </div>
+                    )}
+                  {job.data && job.data.orphaned_states_count !== undefined && (
+                    <div class="text-muted small">
+                      <Text
+                        id="jobsSettings.jobData.orphanedStates"
+                        fields={{ count: job.data.orphaned_states_count.toLocaleString(props.user.language) }}
+                      />
+                    </div>
+                  )}
                   {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
                     <div class={style.errorDiv}>
                       <pre class={style.errorDirectDiv}>

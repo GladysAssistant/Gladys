@@ -31,7 +31,9 @@ async function purgeOrphanedDuckDbStates(jobId) {
     await db.duckDbWriteConnectionAllAsync(`DELETE FROM t_device_feature_state${whereClause}`, ...featureIds);
   }
 
-  await this.job.updateProgress(jobId, 100);
+  await this.job.updateProgress(jobId, 100, {
+    orphaned_states_count: numberOfOrphanedDuckDbStatesToDelete,
+  });
 
   return {
     numberOfOrphanedDuckDbStatesToDelete,

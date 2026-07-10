@@ -44,6 +44,26 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
       ` & ${numberOfDeviceFeatureStateAggregateToDelete} aggregates to delete.`,
   );
 
+  // Attach structured facts to the job so the front can display them (translated
+  // front-side) while the purge runs and after it finishes.
+  const deviceFeature = await db.DeviceFeature.findOne({
+    where: { id: deviceFeatureId },
+    attributes: ['name'],
+    include: [
+      {
+        model: db.Device,
+        as: 'device',
+        attributes: ['name'],
+      },
+    ],
+  });
+  await this.job.updateProgress(jobId, 0, {
+    ...(deviceFeature ? { device_name: deviceFeature.device.name, device_feature_name: deviceFeature.name } : {}),
+    duckdb_states_count: numberOfDuckDbStatesToDelete,
+    sqlite_states_count: numberOfSqliteStatesToDelete,
+    aggregates_count: numberOfDeviceFeatureStateAggregateToDelete,
+  });
+
   const numberOfIterationsStates = Math.ceil(
     numberOfSqliteStatesToDelete / this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
   );

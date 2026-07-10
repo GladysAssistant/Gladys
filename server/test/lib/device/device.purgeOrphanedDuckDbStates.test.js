@@ -5,6 +5,7 @@ const Device = require('../../../lib/device');
 const db = require('../../../models');
 const StateManager = require('../../../lib/state');
 const Job = require('../../../lib/job');
+const { JOB_TYPES } = require('../../../utils/constants');
 
 const event = new EventEmitter();
 
@@ -45,6 +46,14 @@ describe('device.purgeOrphanedDuckDbStates', async function Describe() {
       EXISTING_FEATURE_ID,
     );
     expect(existingStates).to.have.lengthOf(2);
+    // The job carries the purged count (displayed and translated by the front)
+    const jobRecord = await db.Job.findOne({
+      where: { type: JOB_TYPES.DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES },
+      order: [['created_at', 'DESC']],
+    });
+    expect(jobRecord.data).to.deep.equal({
+      orphaned_states_count: 3,
+    });
   });
   it('should do nothing when there is no orphaned state', async () => {
     const stateManager = new StateManager(event);

@@ -26,6 +26,12 @@ async function purgeAllSqliteStates(jobId) {
       `Purging All SQLite states: ${numberOfDeviceFeatureStateToDelete} states & ${numberOfDeviceFeatureStateAggregateToDelete} aggregates to delete.`,
     );
 
+    // Attach structured facts to the job so the front can display them
+    await this.job.updateProgress(jobId, 0, {
+      sqlite_states_count: numberOfDeviceFeatureStateToDelete,
+      aggregates_count: numberOfDeviceFeatureStateAggregateToDelete,
+    });
+
     const numberOfIterationsStates = Math.ceil(
       numberOfDeviceFeatureStateToDelete / this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
     );

@@ -4,6 +4,21 @@ const { JOB_TYPES_LIST, JOB_STATUS_LIST, JOB_ERROR_TYPES_LIST } = require('../ut
 const dataSchema = Joi.object().keys({
   error: Joi.string(),
   error_type: Joi.string().valid(...JOB_ERROR_TYPES_LIST),
+  // Structured facts attached by jobs and translated by the front (never store sentences)
+  device_name: Joi.string(),
+  device_feature_name: Joi.string(),
+  duckdb_states_count: Joi.number()
+    .integer()
+    .min(0),
+  sqlite_states_count: Joi.number()
+    .integer()
+    .min(0),
+  aggregates_count: Joi.number()
+    .integer()
+    .min(0),
+  orphaned_states_count: Joi.number()
+    .integer()
+    .min(0),
 });
 
 module.exports = (sequelize, DataTypes) => {

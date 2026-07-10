@@ -6,6 +6,7 @@ const Device = require('../../../lib/device');
 const db = require('../../../models');
 const StateManager = require('../../../lib/state');
 const Job = require('../../../lib/job');
+const { JOB_TYPES } = require('../../../utils/constants');
 
 const event = new EventEmitter();
 
@@ -80,6 +81,18 @@ describe('device.purgeStatesByFeatureId', async function Describe() {
       },
     });
     expect(statesAggregates).to.have.lengthOf(0);
+    // The job carries structured facts (displayed and translated by the front)
+    const jobRecord = await db.Job.findOne({
+      where: { type: JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE },
+      order: [['created_at', 'DESC']],
+    });
+    expect(jobRecord.data).to.deep.equal({
+      device_name: 'Test device',
+      device_feature_name: 'Test device feature',
+      duckdb_states_count: 110,
+      sqlite_states_count: 5,
+      aggregates_count: 3,
+    });
   });
   it('should do nothing on a feature without any state', async () => {
     const stateManager = new StateManager(event);
