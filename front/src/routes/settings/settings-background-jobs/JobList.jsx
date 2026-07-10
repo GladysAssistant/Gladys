@@ -1,3 +1,4 @@
+import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import { JOB_STATUS, JOB_ERROR_TYPES } from '../../../../../server/utils/constants';
@@ -25,6 +26,48 @@ const formatJobDuration = durationMs => {
   const restMinutes = totalMinutes % 60;
   return `${hours} h ${String(restMinutes).padStart(2, '0')} min`;
 };
+
+// Displays the duration of a job: final duration for a finished job, live elapsed
+// time (ticking every second, only after the first second) for a running one.
+class JobDuration extends Component {
+  startTickingIfNeeded = () => {
+    if (this.props.inProgress && !this.interval) {
+      this.interval = setInterval(() => this.forceUpdate(), 1000);
+    }
+    if (!this.props.inProgress && this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  };
+
+  componentDidMount() {
+    this.startTickingIfNeeded();
+  }
+
+  componentDidUpdate() {
+    this.startTickingIfNeeded();
+  }
+
+  componentWillUnmount() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  }
+
+  render({ start, end, inProgress }) {
+    const durationMs = (inProgress ? Date.now() : new Date(end).getTime()) - new Date(start).getTime();
+    const formatted = formatJobDuration(durationMs);
+    if (!formatted || (inProgress && durationMs < 1000)) {
+      return null;
+    }
+    return (
+      <div class="text-muted small">
+        <Text id="jobsSettings.jobData.duration" fields={{ duration: formatted }} />
+      </div>
+    );
+  }
+}
 
 const JobList = ({ children, ...props }) => (
   <div class="card">
@@ -91,17 +134,11 @@ const JobList = ({ children, ...props }) => (
                       />
                     </div>
                   )}
-                  {job.status !== JOB_STATUS.IN_PROGRESS &&
-                    formatJobDuration(new Date(job.updated_at) - new Date(job.created_at)) && (
-                      <div class="text-muted small">
-                        <Text
-                          id="jobsSettings.jobData.duration"
-                          fields={{
-                            duration: formatJobDuration(new Date(job.updated_at) - new Date(job.created_at))
-                          }}
-                        />
-                      </div>
-                    )}
+                  <JobDuration
+                    start={job.created_at}
+                    end={job.updated_at}
+                    inProgress={job.status === JOB_STATUS.IN_PROGRESS}
+                  />
                   {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
                     <div class={style.errorDiv}>
                       <pre class={style.errorDirectDiv}>
