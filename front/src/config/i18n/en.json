@@ -4780,6 +4780,14 @@
       "lock": {
         "0": "Unlocked",
         "1": "Locked"
+      },
+      "signal": {
+        "0": "No signal",
+        "1": "Very weak signal",
+        "2": "Weak signal",
+        "3": "Fair signal",
+        "4": "Good signal",
+        "5": "Excellent signal"
       }
     }
   },

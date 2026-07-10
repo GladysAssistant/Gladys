@@ -4780,6 +4780,14 @@
       "lock": {
         "0": "Déverrouillée",
         "1": "Verrouillée"
+      },
+      "signal": {
+        "0": "Pas de signal",
+        "1": "Signal très faible",
+        "2": "Signal faible",
+        "3": "Signal moyen",
+        "4": "Bon signal",
+        "5": "Excellent signal"
       }
     }
   },
