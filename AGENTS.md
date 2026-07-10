@@ -19,6 +19,13 @@ From the repo root: `npm start` (runs `run-p start-server:dev start-front:dev`).
 - **Service dependencies:** the server has ~38 integration services under `server/services/*`, each with its own `package.json`. `cd server && npm install` runs a `postinstall` (`cli/install_service_dependencies.js`) that installs deps for every service. Set `INSTALL_SERVICES_SILENT_FAIL=true` so a single flaky service install does not abort the whole install.
 - **Native modules** (`sqlite3`, `bcrypt`, `sharp`, `duckdb`, USB/bluetooth services) compile from source; they need build tools (`gcc/g++/make/python3`) and `libudev-dev` on the system.
 
+## Git workflow (agents)
+
+All changes made by agents must follow this workflow:
+
+1. **Never commit directly to `master`.** Create a feature branch for every change (no matter how small) and open a pull request targeting `master`.
+2. **Write PR titles and descriptions in English**, even when the conversation with the user is in another language. This keeps the project history accessible to all contributors and matches the existing CI, templates, and documentation.
+
 ## Pull Request requirements (CI)
 
 Every PR to `master` triggers the workflow `.github/workflows/docker-pr-build.yml`. **Run the relevant checks locally before every push** — most first-time CI failures come from skipping them.
