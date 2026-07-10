@@ -4,7 +4,7 @@ import uuid from 'uuid';
 import debounce from 'debounce';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
-import config from '../../../../../config';
+import getZ2mUrl from '../utils/getZ2mUrl';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -14,14 +14,9 @@ function createActions(store) {
       store.setState({ z2mUrl: undefined });
       try {
         const configuration = await state.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
-        if (configuration.Z2M_MQTT_MODE === 'local') {
-          if (configuration.Z2M_TCP_PORT && state.session.gatewayClient === undefined) {
-            const url = new URL(config.localApiUrl);
-            const z2mUrl = `${url.protocol}//${url.hostname}:${configuration.Z2M_TCP_PORT}`;
-            store.setState({ z2mUrl });
-          }
-        } else if (configuration.Z2M_MQTT_MODE === 'external' && configuration.Z2M_FRONTEND_URL) {
-          store.setState({ z2mUrl: configuration.Z2M_FRONTEND_URL });
+        const z2mUrl = getZ2mUrl(configuration, state.session.gatewayClient !== undefined);
+        if (z2mUrl) {
+          store.setState({ z2mUrl });
         }
       } catch (e) {
         // z2mUrl stays undefined, link won't be shown

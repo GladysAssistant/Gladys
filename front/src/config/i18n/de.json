@@ -988,6 +988,7 @@
             "usbDongleNamePlaceholder": "Modell des Zigbee-Dongles",
             "z2mTcpPortLabel": "Geben Sie den vom Zigbee2Mqtt-Webanwendungsport freigegebenen TCP-Port ein",
             "z2mTcpPortDescription": "Wenn leer gelassen, wird ein zufälliger Port verwendet.",
+            "z2mFrontendUrlDescription": "Optional. Wird für den Link zur Zigbee2mqtt-Oberfläche verwendet. Wenn leer, werden Gladys-Hostname und TCP-Port verwendet.",
             "summary": {
               "title": "Konfiguration",
               "usbPort": "USB-Port",

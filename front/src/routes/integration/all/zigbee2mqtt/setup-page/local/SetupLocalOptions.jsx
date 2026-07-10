@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text, MarkupText } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../../../utils/consts';
@@ -25,16 +25,20 @@ class SetupLocalOptions extends Component {
     this.setState({ z2mTcpPort });
   };
 
+  updateZ2mFrontendUrl = e => {
+    this.setState({ z2mFrontendUrl: e.target.value });
+  };
+
   saveConfiguration = () => {
-    const { z2mDriverPath, z2mDongleName, z2mTcpPort, mqttMode } = this.state;
-    this.props.saveConfiguration({ z2mDriverPath, z2mDongleName, z2mTcpPort, mqttMode });
+    const { z2mDriverPath, z2mDongleName, z2mTcpPort, z2mFrontendUrl, mqttMode } = this.state;
+    this.props.saveConfiguration({ z2mDriverPath, z2mDongleName, z2mTcpPort, z2mFrontendUrl, mqttMode });
   };
 
   resetConfiguration = () => {
     const { configuration } = this.props;
-    const { z2mDriverPath, z2mDongleName, z2mTcpPort } = configuration;
+    const { z2mDriverPath, z2mDongleName, z2mTcpPort, z2mFrontendUrl } = configuration;
 
-    this.setState({ z2mDriverPath, z2mDongleName, z2mTcpPort, z2mDongleConfigKey: null });
+    this.setState({ z2mDriverPath, z2mDongleName, z2mTcpPort, z2mFrontendUrl, z2mDongleConfigKey: null });
     this.props.resetConfiguration();
   };
 
@@ -118,7 +122,7 @@ class SetupLocalOptions extends Component {
     super(props);
 
     const { configuration } = props;
-    const { z2mDriverPath, z2mDongleName, z2mTcpPort } = configuration;
+    const { z2mDriverPath, z2mDongleName, z2mTcpPort, z2mFrontendUrl } = configuration;
 
     this.state = {
       z2mDriverPath,
@@ -129,6 +133,7 @@ class SetupLocalOptions extends Component {
       zigbeeAdapters: [],
       loadZigbeeAdaptersStatus: RequestStatus.Getting,
       z2mTcpPort,
+      z2mFrontendUrl,
       mqttMode: MQTT_MODE.LOCAL
     };
   }
@@ -140,7 +145,16 @@ class SetupLocalOptions extends Component {
 
   render(
     { disabled },
-    { z2mDriverPath, usbPorts, loadUsbPortsStatus, z2mDongleName, zigbeeAdapters, loadZigbeeAdaptersStatus, z2mTcpPort }
+    {
+      z2mDriverPath,
+      usbPorts,
+      loadUsbPortsStatus,
+      z2mDongleName,
+      zigbeeAdapters,
+      loadZigbeeAdaptersStatus,
+      z2mTcpPort,
+      z2mFrontendUrl
+    }
   ) {
     const emberFirmwareTooOld = this.isEmberFirmwareTooOld();
     return (
@@ -227,6 +241,28 @@ class SetupLocalOptions extends Component {
           </div>
           <small class="form-text text-muted">
             <Text id="integration.zigbee2mqtt.setup.modes.local.z2mTcpPortDescription" />
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="z2mFrontendUrl" class="form-label">
+            <Text id="integration.zigbee2mqtt.setup.z2mFrontendUrlLabel" />
+          </label>
+          <div class="row">
+            <div class="col col-sm-11" data-cy="z2m-setup-local-frontend-url-field">
+              <Localizer>
+                <input
+                  id="z2mFrontendUrl"
+                  name="z2mFrontendUrl"
+                  placeholder={<Text id="integration.zigbee2mqtt.setup.z2mFrontendUrlPlaceholder" />}
+                  value={z2mFrontendUrl || ''}
+                  class="form-control"
+                  onInput={this.updateZ2mFrontendUrl}
+                />
+              </Localizer>
+            </div>
+          </div>
+          <small class="form-text text-muted">
+            <Text id="integration.zigbee2mqtt.setup.modes.local.z2mFrontendUrlDescription" />
           </small>
         </div>
         <SubmitConfiguration

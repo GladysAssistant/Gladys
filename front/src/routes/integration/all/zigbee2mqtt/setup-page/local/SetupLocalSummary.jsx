@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 
 const SetupLocalSummary = ({ configuration, enableEditionMode, disabled }) => {
-  const { z2mDriverPath, z2mDongleName, z2mTcpPort } = configuration;
+  const { z2mDriverPath, z2mDongleName, z2mTcpPort, z2mFrontendUrl } = configuration;
   return (
     <div class="form-inline" data-cy="z2m-setup-local-summary">
       <div class="form-group">
@@ -36,6 +36,16 @@ const SetupLocalSummary = ({ configuration, enableEditionMode, disabled }) => {
                     {z2mTcpPort}
                   </td>
                 </tr>
+                {z2mFrontendUrl && (
+                  <tr>
+                    <td class="pr-4">
+                      <Text id="integration.zigbee2mqtt.setup.z2mFrontendUrlLabel" />
+                    </td>
+                    <td class="text-muted" data-cy="z2m-setup-local-frontend-url-summary">
+                      {z2mFrontendUrl}
+                    </td>
+                  </tr>
+                )}
               </table>
             </small>
           </div>
