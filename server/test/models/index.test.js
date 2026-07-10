@@ -25,7 +25,7 @@ const buildMockDuckDbApi = ({ disconnectError, closeError } = {}) => {
     create: sinon.stub().resolves(instance),
   };
   return {
-    api: { DuckDBInstance, DuckDBTimestampTZValue: class DuckDBTimestampTZValue {} },
+    api: { DuckDBInstance, DuckDBTimestampValue: class DuckDBTimestampValue {} },
     connection,
     instance,
   };
@@ -167,7 +167,7 @@ describe('models/index', () => {
       create.resolves(instance); // later attempts succeed
       const api = {
         DuckDBInstance: { create },
-        DuckDBTimestampTZValue: class DuckDBTimestampTZValue {},
+        DuckDBTimestampValue: class DuckDBTimestampValue {},
       };
 
       const mockLogger = {

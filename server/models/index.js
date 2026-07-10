@@ -1,6 +1,6 @@
 const os = require('os');
 const Sequelize = require('sequelize');
-const { DuckDBInstance, DuckDBTimestampTZValue } = require('@duckdb/node-api');
+const { DuckDBInstance, DuckDBTimestampValue } = require('@duckdb/node-api');
 const Umzug = require('umzug');
 const Promise = require('bluebird');
 const chunk = require('lodash.chunk');
@@ -179,12 +179,16 @@ const ensureDuckDbInitialized = () => {
 
 // Convert a legacy positional parameter (plain JS value, as accepted by the old
 // `duckdb` package) into a value the Neo API can bind. Only `Date` needs special
-// handling: the new API cannot infer a type for a raw JS Date, so we wrap it into
-// a DuckDB TIMESTAMPTZ value (microseconds since the Unix epoch). Every other type
-// (string, number, boolean, bigint, null) is bound as-is.
+// handling: the new API cannot infer a type for a raw JS Date. The old package
+// bound a JS Date as a NAIVE TIMESTAMP (epoch microseconds, no timezone), which
+// DuckDB then casts to TIMESTAMPTZ using the session timezone when compared with
+// a TIMESTAMPTZ column. We reproduce that exact binding — using TIMESTAMPTZ here
+// instead would shift query boundaries by the timezone offset for installations
+// with a non-UTC timezone configured. Every other type (string, number, boolean,
+// bigint, null) is bound as-is.
 const toDuckDbParam = (param) => {
   if (param instanceof Date) {
-    return new DuckDBTimestampTZValue(BigInt(param.getTime()) * 1000n);
+    return new DuckDBTimestampValue(BigInt(param.getTime()) * 1000n);
   }
   return param;
 };
