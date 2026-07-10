@@ -68,6 +68,32 @@ describe('Device.getDeviceStatesHistory', function Describe() {
     expect(states[2].value).to.equal(0);
   });
 
+  it('should return recent states from a narrow time window without a full scan', async () => {
+    // States close to "now" are answered by the first (narrowest) time window: the
+    // query stops as soon as it has a full page instead of widening to a full scan.
+    const now = Date.now();
+    await db.duckDbBatchInsertState(LIGHT_BINARY_FEATURE_ID, [
+      { value: 1, created_at: new Date(now - 60 * 1000) },
+      { value: 0, created_at: new Date(now - 30 * 1000) },
+    ]);
+    const states = await deviceInstance.getDeviceStatesHistory({ take: 2 });
+    expect(states).to.have.lengthOf(2);
+    // Most recent first, and the older 2025 states are not returned since the page
+    // is already full with more recent states.
+    expect(states[0].value).to.equal(0);
+    expect(states[1].value).to.equal(1);
+  });
+
+  it('should widen the time window until it finds older states', async () => {
+    // Nothing is recent here (all states are months old), so the query has to widen
+    // its time window all the way to the unbounded one to return them.
+    const states = await deviceInstance.getDeviceStatesHistory({ take: 2 });
+    expect(states).to.have.lengthOf(2);
+    expect(states[0].value).to.equal(1);
+    expect(states[0].created_at).to.deep.equal(new Date('2025-08-28T15:02:00.000Z'));
+    expect(states[1].created_at).to.deep.equal(new Date('2025-08-28T15:01:00.000Z'));
+  });
+
   it('should filter by categories', async () => {
     const states = await deviceInstance.getDeviceStatesHistory({ categories: 'temperature-sensor,humidity-sensor' });
     expect(states).to.have.lengthOf(1);
