@@ -3208,7 +3208,8 @@
       "target": "Ziel: {{device}} › {{feature}}",
       "statesCounts": "Zustände: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} Aggregate",
       "orphanedStates": "Verwaiste Zustände: {{count}}",
-      "duration": "Dauer: {{duration}}"
+      "duration": "Dauer: {{duration}}",
+      "statesComputing": "Zustände: Zählung läuft…"
     },
     "jobTypes": {
       "monthly-device-state-aggregate": "Monatliche Sensorenaggregation",
