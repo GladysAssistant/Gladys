@@ -92,6 +92,7 @@ describe('device.purgeStatesByFeatureId', async function Describe() {
       duckdb_states_count: 110,
       sqlite_states_count: 5,
       aggregates_count: 3,
+      step: 'deleting_aggregates',
     });
   });
   it('should do nothing on a feature without any state', async () => {

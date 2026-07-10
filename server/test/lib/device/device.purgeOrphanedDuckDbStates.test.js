@@ -53,6 +53,7 @@ describe('device.purgeOrphanedDuckDbStates', async function Describe() {
     });
     expect(jobRecord.data).to.deep.equal({
       orphaned_states_count: 3,
+      step: 'deleting_states',
     });
   });
   it('should do nothing when there is no orphaned state', async () => {

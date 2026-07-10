@@ -3206,10 +3206,16 @@
     "next": "Suivant",
     "jobData": {
       "target": "Cible : {{device}} › {{feature}}",
-      "statesCounts": "États : {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agrégats",
+      "statesCounts": "États à supprimer : {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agrégats",
+      "statesCountsDone": "États supprimés : {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agrégats",
+      "steps": {
+        "waiting_database": "En attente de la base de données…",
+        "counting": "Calcul du nombre d'états…",
+        "deleting_states": "Suppression des états…",
+        "deleting_aggregates": "Suppression des agrégats…"
+      },
       "orphanedStates": "États orphelins : {{count}}",
-      "duration": "Durée : {{duration}}",
-      "statesComputing": "États : calcul en cours…"
+      "duration": "Durée : {{duration}}"
     },
     "jobTypes": {
       "monthly-device-state-aggregate": "Agrégation donnée capteur mensuelle",

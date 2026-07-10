@@ -113,19 +113,20 @@ const JobList = ({ children, ...props }) => (
                       />
                     </div>
                   )}
-                  {job.status === JOB_STATUS.IN_PROGRESS &&
-                    job.data &&
-                    job.data.device_feature_name &&
-                    job.data.duckdb_states_count === undefined && (
-                      <div class="text-muted small">
-                        <Text id="jobsSettings.jobData.statesComputing" />
-                      </div>
-                    )}
+                  {job.status === JOB_STATUS.IN_PROGRESS && job.data && job.data.step && (
+                    <div class="text-muted small">
+                      <Text id={`jobsSettings.jobData.steps.${job.data.step}`} />
+                    </div>
+                  )}
                   {job.data &&
                     (job.data.duckdb_states_count !== undefined || job.data.sqlite_states_count !== undefined) && (
                       <div class="text-muted small">
                         <Text
-                          id="jobsSettings.jobData.statesCounts"
+                          id={
+                            job.status === JOB_STATUS.SUCCESS
+                              ? 'jobsSettings.jobData.statesCountsDone'
+                              : 'jobsSettings.jobData.statesCounts'
+                          }
                           fields={{
                             duckdb: (job.data.duckdb_states_count || 0).toLocaleString(props.user.language),
                             sqlite: (job.data.sqlite_states_count || 0).toLocaleString(props.user.language),

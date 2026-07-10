@@ -5,6 +5,7 @@ const dataSchema = Joi.object().keys({
   error: Joi.string(),
   error_type: Joi.string().valid(...JOB_ERROR_TYPES_LIST),
   // Structured facts attached by jobs and translated by the front (never store sentences)
+  step: Joi.string().valid('waiting_database', 'counting', 'deleting_states', 'deleting_aggregates'),
   device_name: Joi.string(),
   device_feature_name: Joi.string(),
   duckdb_states_count: Joi.number()

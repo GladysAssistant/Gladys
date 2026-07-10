@@ -27,12 +27,16 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
       },
     ],
   });
-  if (deviceFeature) {
-    await this.job.updateProgress(jobId, 0, {
-      device_name: deviceFeature.device.name,
-      device_feature_name: deviceFeature.name,
-    });
-  }
+  await this.job.updateProgress(jobId, 0, {
+    ...(deviceFeature ? { device_name: deviceFeature.device.name, device_feature_name: deviceFeature.name } : {}),
+    step: 'waiting_database',
+  });
+
+  // The DuckDB connections process statements in order: when this probe
+  // resolves, our turn on the read connection has arrived and the real
+  // queries below run immediately.
+  await db.duckDbReadConnectionAllAsync('SELECT 1');
+  await this.job.updateProgress(jobId, 0, { step: 'counting' });
 
   // Since the DuckDB migration, device states live in DuckDB.
   const [{ count: duckDbCount }] = await db.duckDbReadConnectionAllAsync(
@@ -70,7 +74,12 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
     duckdb_states_count: numberOfDuckDbStatesToDelete,
     sqlite_states_count: numberOfSqliteStatesToDelete,
     aggregates_count: numberOfDeviceFeatureStateAggregateToDelete,
+    step: 'waiting_database',
   });
+  // Same probe on the write connection: deletes may have to wait behind
+  // another purge already deleting.
+  await db.duckDbWriteConnectionAllAsync('SELECT 1');
+  await this.job.updateProgress(jobId, 0, { step: 'deleting_states' });
 
   // The DuckDB table has no id column, so states cannot be deleted in LIMIT-ed
   // chunks like in SQLite. Delete them in created_at slices instead: it reports
@@ -156,6 +165,10 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
     await updateProgressIfNeeded();
     await Promise.delay(this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH);
   });
+
+  if (iteratorAggregates.length > 0) {
+    await this.job.updateProgress(jobId, currentProgressPercent, { step: 'deleting_aggregates' });
+  }
 
   await Promise.each(iteratorAggregates, async () => {
     await db.sequelize.query(

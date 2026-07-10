@@ -10,6 +10,12 @@ const logger = require('../../utils/logger');
  * await device.purgeOrphanedDuckDbStates();
  */
 async function purgeOrphanedDuckDbStates(jobId) {
+  await this.job.updateProgress(jobId, 0, { step: 'waiting_database' });
+  // The DuckDB connections process statements in order: when this probe
+  // resolves, our turn on the read connection has arrived.
+  await db.duckDbReadConnectionAllAsync('SELECT 1');
+  await this.job.updateProgress(jobId, 0, { step: 'counting' });
+
   const deviceFeatures = await db.DeviceFeature.findAll({ attributes: ['id'], raw: true });
   const featureIds = deviceFeatures.map((deviceFeature) => deviceFeature.id);
 
@@ -27,13 +33,20 @@ async function purgeOrphanedDuckDbStates(jobId) {
 
   logger.info(`Purging orphaned DuckDB states: ${numberOfOrphanedDuckDbStatesToDelete} states to delete.`);
 
+  await this.job.updateProgress(jobId, 0, {
+    orphaned_states_count: numberOfOrphanedDuckDbStatesToDelete,
+    step: 'waiting_database',
+  });
+  // Same probe on the write connection: the delete may have to wait behind
+  // another purge already deleting.
+  await db.duckDbWriteConnectionAllAsync('SELECT 1');
+  await this.job.updateProgress(jobId, 0, { step: 'deleting_states' });
+
   if (numberOfOrphanedDuckDbStatesToDelete > 0) {
     await db.duckDbWriteConnectionAllAsync(`DELETE FROM t_device_feature_state${whereClause}`, ...featureIds);
   }
 
-  await this.job.updateProgress(jobId, 100, {
-    orphaned_states_count: numberOfOrphanedDuckDbStatesToDelete,
-  });
+  await this.job.updateProgress(jobId, 100);
 
   return {
     numberOfOrphanedDuckDbStatesToDelete,
