@@ -3207,7 +3207,8 @@
     "jobData": {
       "target": "Target: {{device}} › {{feature}}",
       "statesCounts": "States: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
-      "orphanedStates": "Orphaned states: {{count}}"
+      "orphanedStates": "Orphaned states: {{count}}",
+      "duration": "Duration: {{duration}}"
     },
     "jobTypes": {
       "monthly-device-state-aggregate": "Monthly sensors aggregation",

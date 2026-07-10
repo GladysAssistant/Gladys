@@ -4,6 +4,28 @@ import { JOB_STATUS, JOB_ERROR_TYPES } from '../../../../../server/utils/constan
 import RelativeTime from '../../../components/device/RelativeTime';
 import style from './style.css';
 
+// Format a duration with an adaptive unit: "247 ms", "12 s", "3 min 05 s", "2 h 04 min"
+const formatJobDuration = durationMs => {
+  if (!Number.isFinite(durationMs) || durationMs < 0) {
+    return null;
+  }
+  if (durationMs < 1000) {
+    return `${Math.round(durationMs)} ms`;
+  }
+  const totalSeconds = Math.round(durationMs / 1000);
+  if (totalSeconds < 60) {
+    return `${totalSeconds} s`;
+  }
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const restSeconds = totalSeconds % 60;
+  if (totalMinutes < 60) {
+    return `${totalMinutes} min ${String(restSeconds).padStart(2, '0')} s`;
+  }
+  const hours = Math.floor(totalMinutes / 60);
+  const restMinutes = totalMinutes % 60;
+  return `${hours} h ${String(restMinutes).padStart(2, '0')} min`;
+};
+
 const JobList = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
@@ -69,6 +91,17 @@ const JobList = ({ children, ...props }) => (
                       />
                     </div>
                   )}
+                  {job.status !== JOB_STATUS.IN_PROGRESS &&
+                    formatJobDuration(new Date(job.updated_at) - new Date(job.created_at)) && (
+                      <div class="text-muted small">
+                        <Text
+                          id="jobsSettings.jobData.duration"
+                          fields={{
+                            duration: formatJobDuration(new Date(job.updated_at) - new Date(job.created_at))
+                          }}
+                        />
+                      </div>
+                    )}
                   {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
                     <div class={style.errorDiv}>
                       <pre class={style.errorDirectDiv}>
