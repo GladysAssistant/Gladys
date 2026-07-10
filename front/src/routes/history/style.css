@@ -505,3 +505,9 @@
     padding: 0.25rem 0.75rem;
   }
 }
+
+/* Dark mode: sticky bands must use the same pre-invert bg as .page (see dark-mode.css) */
+:global(.dark-mode) .groupChips,
+:global(.dark-mode) .dayHeader {
+  background: #e1e8f7 !important;
+}
