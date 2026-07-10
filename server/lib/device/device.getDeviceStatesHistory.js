@@ -4,6 +4,27 @@ const { BadParameters } = require('../../utils/coreErrors');
 const DEFAULT_TAKE = 100;
 const MAX_TAKE = 500;
 
+const ONE_HOUR_IN_MS = 60 * 60 * 1000;
+const ONE_DAY_IN_MS = 24 * ONE_HOUR_IN_MS;
+// Progressively widening lower time bounds (relative to the `before` cursor) tried
+// until a full page is collected. Without a lower bound, `ORDER BY created_at DESC
+// LIMIT n` forces DuckDB to run a Top-N over every row that passes the filter (the
+// whole table on the unfiltered "All" view), which is why the request took tens of
+// seconds on large databases. Adding `created_at >= ?` lets DuckDB skip old row
+// groups thanks to its per-row-group min/max metadata (zone maps): states are
+// stored time-contiguously (live inserts are appended in order, and the SQLite ->
+// DuckDB migration inserts each feature's history contiguously), so a recent window
+// only has to scan the most recent row groups. The final `null` window removes the
+// lower bound so older states are still returned when recent windows are sparse.
+const PROGRESSIVE_WINDOWS_IN_MS = [
+  ONE_HOUR_IN_MS,
+  ONE_DAY_IN_MS,
+  7 * ONE_DAY_IN_MS,
+  30 * ONE_DAY_IN_MS,
+  365 * ONE_DAY_IN_MS,
+  null,
+];
+
 /**
  * @description Get the history of device states across all devices, most recent first.
  * @param {object} [options] - Options of the query.
@@ -76,28 +97,50 @@ async function getDeviceStatesHistory(options = {}) {
   // Keyset pagination on the compound key (created_at, device_feature_id). Ordering
   // and filtering on both columns guarantees that states sharing the same created_at
   // are never skipped when a page boundary falls in the middle of that timestamp.
-  const queryParams = [];
+  const cursorParams = [];
   let cursorClause;
   if (beforeId) {
     cursorClause =
       '(created_at < CAST(? AS TIMESTAMPTZ) OR (created_at = CAST(? AS TIMESTAMPTZ) AND device_feature_id < CAST(? AS UUID)))';
-    queryParams.push(before.toISOString(), before.toISOString(), beforeId);
+    cursorParams.push(before.toISOString(), before.toISOString(), beforeId);
   } else {
     cursorClause = 'created_at < CAST(? AS TIMESTAMPTZ)';
-    queryParams.push(before.toISOString());
+    cursorParams.push(before.toISOString());
   }
-  queryParams.push(...filteredFeatureIds, take);
 
-  const query = `
-    SELECT device_feature_id, value, created_at
-    FROM t_device_feature_state
-    WHERE ${cursorClause}
-    AND device_feature_id IN (${filteredFeatureIds.map(() => '?').join(',')})
-    ORDER BY created_at DESC, device_feature_id DESC
-    LIMIT ?
-  `;
+  const featureIdPlaceholders = filteredFeatureIds.map(() => '?').join(',');
 
-  const rows = await db.duckDbReadConnectionAllAsync(query, ...queryParams);
+  // Query progressively wider time windows and stop as soon as we have a full page.
+  // A recent window is answered almost instantly thanks to zone map pruning; the
+  // wider windows (up to the unbounded one) only run when recent states are scarce.
+  let rows = [];
+  for (let i = 0; i < PROGRESSIVE_WINDOWS_IN_MS.length; i += 1) {
+    const windowInMs = PROGRESSIVE_WINDOWS_IN_MS[i];
+    const queryParams = [];
+    let lowerBoundClause = '';
+    if (windowInMs !== null) {
+      lowerBoundClause = 'created_at >= CAST(? AS TIMESTAMPTZ) AND ';
+      queryParams.push(new Date(before.getTime() - windowInMs).toISOString());
+    }
+    queryParams.push(...cursorParams, ...filteredFeatureIds, take);
+
+    const query = `
+      SELECT device_feature_id, value, created_at
+      FROM t_device_feature_state
+      WHERE ${lowerBoundClause}${cursorClause}
+      AND device_feature_id IN (${featureIdPlaceholders})
+      ORDER BY created_at DESC, device_feature_id DESC
+      LIMIT ?
+    `;
+
+    // eslint-disable-next-line no-await-in-loop
+    rows = await db.duckDbReadConnectionAllAsync(query, ...queryParams);
+    // A full page is, by construction, the most recent `take` states before the
+    // cursor: any state inside the window is more recent than any state below it.
+    if (rows.length >= take) {
+      break;
+    }
+  }
 
   return rows
     .filter((row) => featuresById.has(row.device_feature_id))
