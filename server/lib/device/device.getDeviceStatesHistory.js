@@ -6,12 +6,12 @@ const MAX_TAKE = 500;
 
 const ONE_HOUR_IN_MS = 60 * 60 * 1000;
 const ONE_DAY_IN_MS = 24 * ONE_HOUR_IN_MS;
-// Progressively widening lower time bounds (relative to the `before` cursor) tried
-// until a full page is collected. Without a lower bound, `ORDER BY created_at DESC
-// LIMIT n` forces DuckDB to run a Top-N over every row that passes the filter (the
-// whole table on the unfiltered "All" view), which is why the request took tens of
-// seconds on large databases. Adding `created_at >= ?` lets DuckDB skip old row
-// groups thanks to its per-row-group min/max metadata (zone maps): states are
+// Progressively widening lower time bounds (relative to the window reference, see
+// below) tried until a full page is collected. Without a lower bound, `ORDER BY
+// created_at DESC LIMIT n` forces DuckDB to run a Top-N over every row that passes
+// the filter (the whole table on the unfiltered "All" view), which is why the
+// request took tens of seconds on large databases. Adding `created_at >= ?` lets
+// DuckDB skip old row groups thanks to its per-row-group min/max metadata (zone maps): states are
 // stored time-contiguously (live inserts are appended in order, and the SQLite ->
 // DuckDB migration inserts each feature's history contiguously), so a recent window
 // only has to scan the most recent row groups. The final `null` window removes the
@@ -48,7 +48,7 @@ async function getDeviceStatesHistory(options = {}) {
   const beforeId = options.before_id || null;
 
   const deviceFeatures = await db.DeviceFeature.findAll({
-    attributes: ['id', 'name', 'selector', 'category', 'type', 'unit'],
+    attributes: ['id', 'name', 'selector', 'category', 'type', 'unit', 'last_value_changed'],
     include: [
       {
         model: db.Device,
@@ -76,6 +76,7 @@ async function getDeviceStatesHistory(options = {}) {
   // Always constrain the query to the list of matching feature ids: it both
   // applies the filters and excludes states of deleted device features
   // (which would otherwise consume rows of the LIMIT).
+  let maxLastValueChanged = null;
   const filteredFeatureIds = Array.from(featuresById.values())
     .filter((feature) => {
       if (categories && !categories.includes(feature.category)) {
@@ -89,10 +90,24 @@ async function getDeviceStatesHistory(options = {}) {
       }
       return true;
     })
-    .map((feature) => feature.id);
+    .map((feature) => {
+      if (feature.last_value_changed) {
+        const lastValueChanged = new Date(feature.last_value_changed);
+        if (!maxLastValueChanged || lastValueChanged > maxLastValueChanged) {
+          maxLastValueChanged = lastValueChanged;
+        }
+      }
+      return feature.id;
+    });
   if (filteredFeatureIds.length === 0) {
     return [];
   }
+
+  // Anchor progressive windows on the most recent activity among filtered features
+  // instead of always starting from `before` (usually "now"). Stale devices that
+  // have not reported since months ago would otherwise exhaust every narrow window
+  // before the unbounded fallback query runs.
+  const windowReference = maxLastValueChanged && maxLastValueChanged < before ? maxLastValueChanged : before;
 
   // Keyset pagination on the compound key (created_at, device_feature_id). Ordering
   // and filtering on both columns guarantees that states sharing the same created_at
@@ -120,7 +135,7 @@ async function getDeviceStatesHistory(options = {}) {
     let lowerBoundClause = '';
     if (windowInMs !== null) {
       lowerBoundClause = 'created_at >= CAST(? AS TIMESTAMPTZ) AND ';
-      queryParams.push(new Date(before.getTime() - windowInMs).toISOString());
+      queryParams.push(new Date(windowReference.getTime() - windowInMs).toISOString());
     }
     queryParams.push(...cursorParams, ...filteredFeatureIds, take);
 

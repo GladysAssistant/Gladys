@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
 const { expect, assert } = require('chai');
-const { fake } = require('sinon');
+const { fake, spy } = require('sinon');
 
 const db = require('../../../models');
 const Device = require('../../../lib/device');
@@ -86,12 +86,32 @@ describe('Device.getDeviceStatesHistory', function Describe() {
 
   it('should widen the time window until it finds older states', async () => {
     // Nothing is recent here (all states are months old), so the query has to widen
-    // its time window all the way to the unbounded one to return them.
+    // its time window all the way to the unbounded one to return them. Unfiltered
+    // queries still anchor on the most recently active feature (temperature sensors
+    // in the test DB have last_value_changed set to "now"), so this case still widens.
     const states = await deviceInstance.getDeviceStatesHistory({ take: 2 });
     expect(states).to.have.lengthOf(2);
     expect(states[0].value).to.equal(1);
     expect(states[0].created_at).to.deep.equal(new Date('2025-08-28T15:02:00.000Z'));
     expect(states[1].created_at).to.deep.equal(new Date('2025-08-28T15:01:00.000Z'));
+  });
+
+  it('should anchor progressive windows on last_value_changed when filtered devices are stale', async () => {
+    await db.DeviceFeature.update(
+      { last_value_changed: new Date('2025-08-28T15:02:00.000Z') },
+      { where: { id: LIGHT_BINARY_FEATURE_ID } },
+    );
+    const querySpy = spy(db, 'duckDbReadConnectionAllAsync');
+    const states = await deviceInstance.getDeviceStatesHistory({
+      categories: 'light',
+      take: 2,
+      before: new Date('2026-01-01T00:00:00.000Z').toISOString(),
+    });
+    expect(states).to.have.lengthOf(2);
+    expect(states[0].value).to.equal(1);
+    expect(states[0].created_at).to.deep.equal(new Date('2025-08-28T15:02:00.000Z'));
+    expect(querySpy.callCount).to.equal(1);
+    querySpy.restore();
   });
 
   it('should filter by categories', async () => {
