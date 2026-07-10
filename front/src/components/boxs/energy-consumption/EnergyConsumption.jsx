@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent, { DEFAULT_COLORS } from '../chart/ApexChartComponent';
 import { formatHttpError } from '../../../utils/formatErrors';
-import dayjs from 'dayjs';
+import { formatInSystemTimezone } from '../../../utils/systemTimezone';
 
 import fr from 'date-fns/locale/fr';
 
@@ -388,23 +388,28 @@ class EnergyConsumption extends Component {
 
   tooltipXFormatter = value => {
     const { selectedPeriod } = this.state;
+    const { user, systemTimezone } = this.props;
     // Format date based on period - show date only, not datetime
     if (selectedPeriod === PERIODS.DAY) {
       // For day view, show hour only
-      return dayjs(value)
-        .locale(this.props.user.language)
-        .format('HH:mm');
+      return formatInSystemTimezone(value, 'HH:mm', user.language, systemTimezone);
     } else if (selectedPeriod === PERIODS.MONTH) {
       // For month view, show day
-      return dayjs(value)
-        .locale(this.props.user.language)
-        .format('DD MMM YYYY');
+      return formatInSystemTimezone(value, 'DD MMM YYYY', user.language, systemTimezone);
     } else {
       // For year view, show month
-      return dayjs(value)
-        .locale(this.props.user.language)
-        .format('MMM YYYY');
+      return formatInSystemTimezone(value, 'MMM YYYY', user.language, systemTimezone);
     }
+  };
+
+  getXAxisDateFormat = () => {
+    const { selectedPeriod } = this.state;
+    if (selectedPeriod === PERIODS.DAY) {
+      return 'HH:mm';
+    } else if (selectedPeriod === PERIODS.MONTH) {
+      return 'DD MMM YYYY';
+    }
+    return 'MMM YYYY';
   };
 
   getDatePickerView = () => {
@@ -592,6 +597,7 @@ class EnergyConsumption extends Component {
                         y_axis_formatter={this.yAxisFormatter}
                         tooltip_y_formatter={this.tooltipYFormatter}
                         tooltip_x_formatter={this.tooltipXFormatter}
+                        xAxisDateFormat={this.getXAxisDateFormat()}
                         dictionary={props.intl.dictionary}
                         disable_zoom={true}
                       />
@@ -607,4 +613,7 @@ class EnergyConsumption extends Component {
   }
 }
 
-export default connect('user,session,httpClient,houses,devices,deviceFeatures', {})(withIntlAsProp(EnergyConsumption));
+export default connect(
+  'user,session,httpClient,houses,devices,deviceFeatures,systemTimezone',
+  {}
+)(withIntlAsProp(EnergyConsumption));

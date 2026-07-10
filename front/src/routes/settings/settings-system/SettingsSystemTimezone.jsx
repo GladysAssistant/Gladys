@@ -29,6 +29,7 @@ class SettingsSystemTimezone extends Component {
       await this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.TIMEZONE}`, {
         value: option.value
       });
+      this.props.setSystemTimezone(option.value);
     } catch (e) {
       console.error(e);
     }
@@ -64,4 +65,6 @@ class SettingsSystemTimezone extends Component {
   }
 }
 
-export default connect('httpClient', null)(SettingsSystemTimezone);
+export default connect('httpClient', {
+  setSystemTimezone: (state, timezone) => ({ systemTimezone: timezone })
+})(SettingsSystemTimezone);
