@@ -9,6 +9,11 @@ import { ALL_GROUPS } from './categoryGroups';
 
 const PAGE_SIZE = 80;
 const MAX_EVENTS_IN_MEMORY = 1000;
+// Live states are buffered and flushed at this interval instead of triggering a
+// render per websocket message. A chatty installation can emit hundreds of
+// states per second; without batching, each one would run a full setState +
+// timeline rebuild and freeze the page.
+const LIVE_FLUSH_INTERVAL_MS = 1000;
 
 class History extends Component {
   getRooms = async () => {
@@ -79,6 +84,10 @@ class History extends Component {
 
   getEvents = async ({ reset = false } = {}) => {
     this.setState({ loading: true, error: false });
+    if (reset) {
+      // Drop any live states buffered under the previous filter/date context.
+      this.liveEventBuffer = [];
+    }
     try {
       const params = this.buildQueryParams();
       if (!reset && this.state.events.length > 0) {
@@ -207,19 +216,44 @@ class History extends Component {
     if (!this.matchCurrentFilters(event)) {
       return;
     }
+    // Buffer the event (newest first) and schedule a flush instead of calling
+    // setState on every websocket message. This keeps the page responsive even
+    // when hundreds of states are received per second.
+    this.liveEventBuffer.unshift(event);
+    if (this.liveEventBuffer.length > MAX_EVENTS_IN_MEMORY) {
+      this.liveEventBuffer.length = MAX_EVENTS_IN_MEMORY;
+    }
+    this.scheduleLiveFlush();
+  };
+
+  scheduleLiveFlush = () => {
+    if (this.liveFlushTimeout) {
+      return;
+    }
+    this.liveFlushTimeout = setTimeout(this.flushLiveEvents, LIVE_FLUSH_INTERVAL_MS);
+  };
+
+  flushLiveEvents = () => {
+    this.liveFlushTimeout = null;
+    if (this.liveEventBuffer.length === 0) {
+      return;
+    }
+    const buffered = this.liveEventBuffer;
+    this.liveEventBuffer = [];
     // When the user scrolled down in the feed, don't insert live events
     // at the top (it would move the content under their eyes). Store them
     // and display a "new events" button instead.
     const userIsAtTop = window.scrollY < 150;
-    if (userIsAtTop) {
-      this.setState(prevState => ({
-        events: [event, ...prevState.events].slice(0, MAX_EVENTS_IN_MEMORY)
-      }));
-    } else {
-      this.setState(prevState => ({
-        pendingLiveEvents: [event, ...prevState.pendingLiveEvents].slice(0, MAX_EVENTS_IN_MEMORY)
-      }));
-    }
+    this.setState(prevState => {
+      if (userIsAtTop) {
+        return {
+          events: [...buffered, ...prevState.events].slice(0, MAX_EVENTS_IN_MEMORY)
+        };
+      }
+      return {
+        pendingLiveEvents: [...buffered, ...prevState.pendingLiveEvents].slice(0, MAX_EVENTS_IN_MEMORY)
+      };
+    });
   };
 
   showPendingLiveEvents = () => {
@@ -247,6 +281,8 @@ class History extends Component {
       error: false
     };
     this.featuresBySelector = null;
+    this.liveEventBuffer = [];
+    this.liveFlushTimeout = null;
     this.debouncedRefreshEvents = debounce(this.refreshEvents.bind(this), 300);
   }
 
@@ -259,6 +295,10 @@ class History extends Component {
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.onNewState);
+    if (this.liveFlushTimeout) {
+      clearTimeout(this.liveFlushTimeout);
+      this.liveFlushTimeout = null;
+    }
   }
 
   render(props, state) {
