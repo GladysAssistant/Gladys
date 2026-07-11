@@ -9,8 +9,7 @@ class SettingsSystemDuckDbMigration extends Component {
     super(props);
     this.state = {
       confirmRestartingMigration: false,
-      confirmPurgingSQlite: false,
-      confirmPurgingOrphans: false
+      confirmPurgingSQlite: false
     };
   }
 
@@ -68,28 +67,6 @@ class SettingsSystemDuckDbMigration extends Component {
     });
   };
 
-  purgeOrphanedDuckDbStates = async () => {
-    this.setState({
-      loading: true,
-      confirmPurgingOrphans: false
-    });
-    try {
-      await this.props.httpClient.post('/api/v1/device/purge_orphaned_duckdb_states');
-      route('/dashboard/settings/jobs');
-    } catch (e) {
-      console.error(e);
-    }
-    this.setState({
-      loading: false
-    });
-  };
-
-  togglePurgeOrphansConfirmation = () => {
-    this.setState(prevState => {
-      return { ...prevState, confirmPurgingOrphans: !prevState.confirmPurgingOrphans };
-    });
-  };
-
   togglePurgeConfirmation = () => {
     this.setState(prevState => {
       return { ...prevState, confirmPurgingSQlite: !prevState.confirmPurgingSQlite };
@@ -106,7 +83,7 @@ class SettingsSystemDuckDbMigration extends Component {
     this.getDuckDbMigrationState();
   }
 
-  render({}, { loading, migrationState, confirmRestartingMigration, confirmPurgingSQlite, confirmPurgingOrphans }) {
+  render({}, { loading, migrationState, confirmRestartingMigration, confirmPurgingSQlite }) {
     return (
       <div class="card">
         <h4 class="card-header">
@@ -201,28 +178,6 @@ class SettingsSystemDuckDbMigration extends Component {
               </p>
               <p>
                 <Text id="systemSettings.purgeSQliteDescription" />
-              </p>
-              <h5>
-                <Text id="systemSettings.purgeOrphanedDuckDbTitle" />
-              </h5>
-              <p>
-                {!confirmPurgingOrphans ? (
-                  <button onClick={this.togglePurgeOrphansConfirmation} class="btn btn-danger">
-                    <Text id="systemSettings.purgeOrphanedDuckDbTitle" />
-                  </button>
-                ) : (
-                  <span>
-                    <button onClick={this.purgeOrphanedDuckDbStates} class="btn btn-primary mr-2">
-                      <Text id="systemSettings.confirm" />
-                    </button>
-                    <button onClick={this.togglePurgeOrphansConfirmation} class="btn btn-danger">
-                      <Text id="systemSettings.cancel" />
-                    </button>
-                  </span>
-                )}
-              </p>
-              <p>
-                <Text id="systemSettings.purgeOrphanedDuckDbDescription" />
               </p>
             </div>
           </div>

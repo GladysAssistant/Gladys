@@ -209,10 +209,6 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.purgeAllSqliteStates,
     },
-    'post /api/v1/device/purge_orphaned_duckdb_states': {
-      authenticated: true,
-      controller: deviceController.purgeOrphanedDuckDbStates,
-    },
     'post /api/v1/device/migrate_from_sqlite_to_duckdb': {
       authenticated: true,
       controller: deviceController.migrateFromSQLiteToDuckDb,
