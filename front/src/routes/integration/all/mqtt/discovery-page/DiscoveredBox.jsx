@@ -7,11 +7,11 @@ import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures
 
 class DiscoveredBox extends Component {
   updateName = e => {
-    this.props.updateDeviceField(this.props.deviceIndex, 'name', e.target.value);
+    this.props.updateDeviceField(this.props.device.external_id, 'name', e.target.value);
   };
 
   updateRoom = e => {
-    this.props.updateDeviceField(this.props.deviceIndex, 'room_id', e.target.value);
+    this.props.updateDeviceField(this.props.device.external_id, 'room_id', e.target.value);
   };
 
   saveDevice = async () => {
@@ -19,7 +19,7 @@ class DiscoveredBox extends Component {
       loading: true
     });
     try {
-      await this.props.saveDevice(this.props.deviceIndex);
+      await this.props.saveDevice(this.props.device.external_id);
       this.setState({
         saveError: null
       });

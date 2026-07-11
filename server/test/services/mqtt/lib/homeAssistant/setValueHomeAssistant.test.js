@@ -14,7 +14,9 @@ describe('mqttHandler.setValueHomeAssistant', () => {
 
   beforeEach(() => {
     mqttHandler = new MqttHandler({}, MockedMqttClient, SERVICE_ID);
-    mqttHandler.publish = fake.returns(null);
+    mqttHandler.mqttClient = {
+      publish: fake.yields(null),
+    };
   });
 
   afterEach(() => {
@@ -34,9 +36,27 @@ describe('mqttHandler.setValueHomeAssistant', () => {
       },
     ]);
     await mqttHandler.setValueHomeAssistant(device, { external_id: 'homeassistant:my-device:switch:relay' }, 1);
-    assert.calledWith(mqttHandler.publish, 'my-device/set', 'ON');
+    assert.calledWith(mqttHandler.mqttClient.publish, 'my-device/set', 'ON');
     await mqttHandler.setValueHomeAssistant(device, { external_id: 'homeassistant:my-device:switch:relay' }, 0);
-    assert.calledWith(mqttHandler.publish, 'my-device/set', 'OFF');
+    assert.calledWith(mqttHandler.mqttClient.publish, 'my-device/set', 'OFF');
+  });
+
+  it('should reject when the publication fails', async () => {
+    mqttHandler.mqttClient = {
+      publish: fake.yields(new Error('PUBLISH_FAILED')),
+    };
+    const device = buildDevice([
+      {
+        name: 'ha_discovery_config:switch:relay',
+        value: JSON.stringify({ command_topic: 'my-device/set' }),
+      },
+    ]);
+    try {
+      await mqttHandler.setValueHomeAssistant(device, { external_id: 'homeassistant:my-device:switch:relay' }, 1);
+      expect.fail('should have thrown');
+    } catch (e) {
+      expect(e.message).to.equal('PUBLISH_FAILED');
+    }
   });
 
   it('should throw when no entity configuration matches', async () => {
@@ -90,7 +110,7 @@ describe('mqttHandler.setValueHomeAssistant', () => {
     ]);
     await mqttHandler.setValueHomeAssistant(device, { external_id: 'homeassistant:my-device:light:main:state' }, 1);
     // The most specific entity ("light:main:state") is picked, so this is its "state" property
-    assert.calledWith(mqttHandler.publish, 'main-state/set', 'ON');
+    assert.calledWith(mqttHandler.mqttClient.publish, 'main-state/set', 'ON');
   });
 
   describe('buildHomeAssistantCommand', () => {

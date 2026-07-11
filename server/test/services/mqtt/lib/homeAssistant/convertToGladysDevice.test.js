@@ -57,10 +57,9 @@ describe('mqttHandler.homeAssistant.convertToGladysDevice', () => {
     });
   });
 
-  it('should use the identifier as name and null model when no device info', () => {
+  it('should use the identifier as name and null model when no device info nor entities', () => {
     const device = convertToGladysDevice(SERVICE_ID, {
       identifier: 'my-device',
-      entities: {},
     });
     expect(device.name).to.equal('my-device');
     expect(device.model).to.equal(null);
@@ -252,21 +251,40 @@ describe('mqttHandler.homeAssistant.convertToGladysDevice', () => {
       expect(features[1]).to.deep.include({
         external_id: 'homeassistant:my-device:light:main:brightness',
         type: 'brightness',
+        has_feedback: false,
         min: 0,
         max: 100,
       });
       expect(features[2]).to.deep.include({
         external_id: 'homeassistant:my-device:light:main:color_temp',
         type: 'temperature',
+        has_feedback: false,
         min: 150,
         max: 450,
       });
       expect(features[3]).to.deep.include({
         external_id: 'homeassistant:my-device:light:main:color',
         type: 'color',
+        has_feedback: false,
         min: 0,
         max: 16777215,
       });
+    });
+
+    it('should set has_feedback on sub-features when state topics exist', () => {
+      const features = convertEntityToFeatures('homeassistant:my-device', 'light:main', {
+        command_topic: 'my-device/set',
+        brightness_command_topic: 'my-device/brightness/set',
+        brightness_state_topic: 'my-device/brightness',
+        color_temp_command_topic: 'my-device/color_temp/set',
+        color_temp_state_topic: 'my-device/color_temp',
+        rgb_command_topic: 'my-device/rgb/set',
+        rgb_state_topic: 'my-device/rgb',
+      });
+      expect(features).to.have.lengthOf(4);
+      expect(features[1]).to.deep.include({ type: 'brightness', has_feedback: true });
+      expect(features[2]).to.deep.include({ type: 'temperature', has_feedback: true });
+      expect(features[3]).to.deep.include({ type: 'color', has_feedback: true });
     });
 
     it('should convert a json schema light with default bounds', () => {
@@ -278,9 +296,9 @@ describe('mqttHandler.homeAssistant.convertToGladysDevice', () => {
         supported_color_modes: ['color_temp', 'rgb'],
       });
       expect(features).to.have.lengthOf(4);
-      expect(features[1]).to.deep.include({ type: 'brightness', min: 0, max: 255 });
-      expect(features[2]).to.deep.include({ type: 'temperature', min: 153, max: 500 });
-      expect(features[3]).to.deep.include({ type: 'color' });
+      expect(features[1]).to.deep.include({ type: 'brightness', has_feedback: true, min: 0, max: 255 });
+      expect(features[2]).to.deep.include({ type: 'temperature', has_feedback: true, min: 153, max: 500 });
+      expect(features[3]).to.deep.include({ type: 'color', has_feedback: true });
     });
 
     it('should convert a json schema light without brightness and colors', () => {

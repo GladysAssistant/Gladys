@@ -44,7 +44,13 @@ function createActions(store) {
         mqttDiscoveryError: null
       });
     },
-    updateDeviceField(state, index, field, value) {
+    updateDeviceField(state, externalId, field, value) {
+      // The list can be re-ordered by live websocket updates, so devices
+      // are resolved by external_id instead of their index
+      const index = state.mqttDiscoveredDevices.findIndex(d => d.external_id === externalId);
+      if (index === -1) {
+        return;
+      }
       const mqttDiscoveredDevices = update(state.mqttDiscoveredDevices, {
         [index]: {
           [field]: {
@@ -56,8 +62,11 @@ function createActions(store) {
         mqttDiscoveredDevices
       });
     },
-    async saveDevice(state, index) {
-      const device = state.mqttDiscoveredDevices[index];
+    async saveDevice(state, externalId) {
+      const device = state.mqttDiscoveredDevices.find(d => d.external_id === externalId);
+      if (!device) {
+        return;
+      }
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
       const mqttDiscoveredDevices = state.mqttDiscoveredDevices.filter(d => d.external_id !== savedDevice.external_id);
       store.setState({

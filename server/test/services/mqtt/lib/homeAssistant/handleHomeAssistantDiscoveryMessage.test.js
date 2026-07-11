@@ -212,6 +212,30 @@ describe('mqttHandler.handleHomeAssistantDiscoveryMessage', () => {
     expect(mqttHandler.haEntitiesByTopic).to.deep.equal({});
   });
 
+  it('should emit an update when a device-based discovery is replaced by an unsupported-only payload', () => {
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/device/my-device/config',
+      JSON.stringify({
+        dev: { ids: ['0x1234'] },
+        cmps: { relay: { p: 'switch', cmd_t: 'my-device/set' } },
+      }),
+    );
+    clock.tick(600);
+    gladys.event.emit = fake.returns(null);
+
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/device/my-device/config',
+      JSON.stringify({
+        dev: { ids: ['0x1234'] },
+        cmps: { unsupported: { p: 'vacuum' } },
+      }),
+    );
+    expect(mqttHandler.haDiscoveredDevices).to.deep.equal({});
+    expect(mqttHandler.haEntitiesByTopic).to.deep.equal({});
+    clock.tick(600);
+    assert.calledOnce(gladys.event.emit);
+  });
+
   describe('getDeviceIdentifier', () => {
     it('should use the first identifier of an array', () => {
       expect(getDeviceIdentifier({ device: { identifiers: ['0x1234', 'other'] } }, 'node', 'object')).to.equal(
@@ -236,6 +260,15 @@ describe('mqttHandler.handleHomeAssistantDiscoveryMessage', () => {
       expect(getDeviceIdentifier({ device: { identifiers: 'my device/1' } }, undefined, 'object')).to.equal(
         'my-device-1',
       );
+    });
+    it('should fallback when identifiers is an empty array', () => {
+      expect(getDeviceIdentifier({ device: { identifiers: [] } }, 'node', 'object')).to.equal('node');
+    });
+    it('should fallback when identifiers is an empty string', () => {
+      expect(getDeviceIdentifier({ device: { identifiers: '' } }, 'node', 'object')).to.equal('node');
+    });
+    it('should fallback when connections are malformed', () => {
+      expect(getDeviceIdentifier({ device: { connections: [null] } }, undefined, 'object')).to.equal('object');
     });
   });
 });

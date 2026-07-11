@@ -20,11 +20,15 @@ const DISCOVERY_TOPIC_REGEX = new RegExp(
 function getDeviceIdentifier(config, nodeId, objectId) {
   const device = config.device || {};
   let identifier;
-  if (device.identifiers) {
-    identifier = Array.isArray(device.identifiers) ? device.identifiers[0] : device.identifiers;
-  } else if (Array.isArray(device.connections) && device.connections.length > 0) {
+  if (Array.isArray(device.identifiers)) {
+    [identifier] = device.identifiers;
+  } else if (typeof device.identifiers === 'string') {
+    identifier = device.identifiers;
+  } else if (Array.isArray(device.connections) && Array.isArray(device.connections[0])) {
     identifier = device.connections[0].join('-');
-  } else {
+  }
+  // Fallback on the discovery topic parts when the payload has no valid device identity
+  if (identifier === undefined || identifier === null || identifier === '') {
     identifier = nodeId || objectId;
   }
   // Sanitize the identifier so it can safely be used in external ids & selectors
@@ -183,6 +187,10 @@ function handleHomeAssistantDiscoveryMessage(topic, message) {
 
   if (entityKeys.length === 0) {
     delete this.haEntitiesByTopic[topic];
+    if (previouslyRegistered) {
+      // The previous entities of this topic were removed and not replaced
+      this.emitHomeAssistantDiscoveredDevices();
+    }
     return;
   }
 

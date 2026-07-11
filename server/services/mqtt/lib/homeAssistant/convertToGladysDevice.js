@@ -177,6 +177,7 @@ function convertLight(externalIdBase, name, config) {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
         read_only: false,
+        has_feedback: isJsonSchema ? config.state_topic !== undefined : config.brightness_state_topic !== undefined,
         min: 0,
         max: config.brightness_scale || 255,
       }),
@@ -194,6 +195,7 @@ function convertLight(externalIdBase, name, config) {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
         read_only: false,
+        has_feedback: isJsonSchema ? config.state_topic !== undefined : config.color_temp_state_topic !== undefined,
         min: config.min_mireds || 153,
         max: config.max_mireds || 500,
       }),
@@ -211,6 +213,7 @@ function convertLight(externalIdBase, name, config) {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
         read_only: false,
+        has_feedback: isJsonSchema ? config.state_topic !== undefined : config.rgb_state_topic !== undefined,
         min: 0,
         max: 16777215,
       }),
@@ -376,7 +379,7 @@ function convertEntityToFeatures(deviceExternalId, entityKey, config) {
  * });
  */
 function convertToGladysDevice(serviceId, discoveredDevice) {
-  const { identifier, info = {}, entities } = discoveredDevice;
+  const { identifier, info = {}, entities = {} } = discoveredDevice;
   const externalId = `${HOME_ASSISTANT.EXTERNAL_ID_PREFIX}:${identifier}`;
 
   const features = [];

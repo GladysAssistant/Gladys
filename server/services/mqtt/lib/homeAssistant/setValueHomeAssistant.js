@@ -173,7 +173,15 @@ async function setValueHomeAssistant(device, deviceFeature, value) {
   }
 
   logger.debug(`MQTT Home Assistant: publishing "${payload}" on ${topic}`);
-  this.publish(topic, payload);
+  return new Promise((resolve, reject) => {
+    this.mqttClient.publish(topic, payload, undefined, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
 }
 
 module.exports = {
