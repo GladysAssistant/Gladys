@@ -32,18 +32,27 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
     step: 'waiting_database',
   });
 
-  // The DuckDB connections process statements in order: when this probe
-  // resolves, our turn on the read connection has arrived and the real
-  // queries below run immediately.
-  await db.duckDbReadConnectionAllAsync('SELECT 1');
-  await this.job.updateProgress(jobId, 0, { step: 'counting' });
-
-  // Since the DuckDB migration, device states live in DuckDB.
-  const [{ count: duckDbCount }] = await db.duckDbReadConnectionAllAsync(
-    `SELECT COUNT(*) AS count FROM t_device_feature_state WHERE device_feature_id = ?`,
+  // The DuckDB connection is FIFO: submit the probe and the real query in the
+  // same tick, so no other job can slip between them — when the probe resolves,
+  // the count below is actually running, not merely queued behind another job.
+  // Since the DuckDB migration, device states live in DuckDB. The explicit UUID
+  // cast is on the parameter: without it, comparing a VARCHAR parameter against
+  // the UUID column can cost a per-row cast over the whole table.
+  const waitStartedAt = Date.now();
+  const probePromise = db.duckDbReadConnectionAllAsync('SELECT 1');
+  const countPromise = db.duckDbReadConnectionAllAsync(
+    `SELECT COUNT(*) AS count FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID)`,
     deviceFeatureId,
   );
+  await probePromise;
+  const countStartedAt = Date.now();
+  await this.job.updateProgress(jobId, 0, { step: 'counting' });
+  const [{ count: duckDbCount }] = await countPromise;
   const numberOfDuckDbStatesToDelete = Number(duckDbCount);
+  logger.info(
+    `Purging "${deviceFeatureId}": waited ${countStartedAt - waitStartedAt}ms for the read connection,` +
+      ` counted ${numberOfDuckDbStatesToDelete} DuckDB states in ${Date.now() - countStartedAt}ms.`,
+  );
 
   // States may also remain in SQLite on installations that have not run the
   // DuckDB migration yet: purge them too, or the migration would re-import
@@ -87,20 +96,24 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   // slices so live state inserts are not blocked for the whole purge.
   let sliceUpperBounds = [];
   if (numberOfDuckDbStatesToDelete > 0) {
-    const numberOfSlices = Math.min(
-      this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES,
-      Math.ceil(numberOfDuckDbStatesToDelete / this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH),
-    );
-    const [{ min_date: minDate, max_date: maxDate }] = await db.duckDbReadConnectionAllAsync(
-      `SELECT MIN(created_at) AS min_date, MAX(created_at) AS max_date
-       FROM t_device_feature_state WHERE device_feature_id = ?`,
-      deviceFeatureId,
-    );
-    const stepInMs = (new Date(maxDate).getTime() - new Date(minDate).getTime()) / numberOfSlices;
-    sliceUpperBounds = [...Array(numberOfSlices)].map((value, i) => {
-      // The last slice has no upper bound so it catches every remaining state
-      return i === numberOfSlices - 1 ? null : new Date(new Date(minDate).getTime() + (i + 1) * stepInMs);
-    });
+    // Every DELETE statement is a transaction rewriting row groups: slicing a
+    // small purge is pure overhead. Only big purges (where progress reporting
+    // and releasing the write connection matter) are sliced.
+    if (numberOfDuckDbStatesToDelete <= this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD) {
+      sliceUpperBounds = [null];
+    } else {
+      const numberOfSlices = this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES;
+      const [{ min_date: minDate, max_date: maxDate }] = await db.duckDbReadConnectionAllAsync(
+        `SELECT MIN(created_at) AS min_date, MAX(created_at) AS max_date
+         FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID)`,
+        deviceFeatureId,
+      );
+      const stepInMs = (new Date(maxDate).getTime() - new Date(minDate).getTime()) / numberOfSlices;
+      sliceUpperBounds = [...Array(numberOfSlices)].map((value, i) => {
+        // The last slice has no upper bound so it catches every remaining state
+        return i === numberOfSlices - 1 ? null : new Date(new Date(minDate).getTime() + (i + 1) * stepInMs);
+      });
+    }
   }
 
   const numberOfIterationsStates = Math.ceil(
@@ -131,12 +144,12 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   await Promise.each(sliceUpperBounds, async (sliceUpperBound) => {
     if (sliceUpperBound === null) {
       await db.duckDbWriteConnectionAllAsync(
-        'DELETE FROM t_device_feature_state WHERE device_feature_id = ?',
+        'DELETE FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID)',
         deviceFeatureId,
       );
     } else {
       await db.duckDbWriteConnectionAllAsync(
-        'DELETE FROM t_device_feature_state WHERE device_feature_id = ? AND created_at < CAST(? AS TIMESTAMPTZ)',
+        'DELETE FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID) AND created_at < CAST(? AS TIMESTAMPTZ)',
         deviceFeatureId,
         sliceUpperBound.toISOString(),
       );

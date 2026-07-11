@@ -59,6 +59,9 @@ describe('device.purgeStatesByFeatureId', async function Describe() {
     const device = new Device(event, {}, stateManager, service, {}, {}, job);
     device.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH = 1;
     device.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 1;
+    // Below this threshold the delete is a single statement: lower it so this
+    // test exercises the time-sliced path
+    device.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD = 10;
     const res = await device.purgeStatesByFeatureId(DEVICE_FEATURE_ID);
     expect(res).to.deep.equal({
       numberOfDeviceFeatureStateToDelete: 115,
@@ -94,6 +97,25 @@ describe('device.purgeStatesByFeatureId', async function Describe() {
       aggregates_count: 3,
       step: 'deleting_aggregates',
     });
+  });
+  it('should purge a small feature with a single delete statement', async () => {
+    const stateManager = new StateManager(event);
+    const service = {};
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
+    const TEMPERATURE_FEATURE_ID = 'bb1af3b9-f87d-4d9c-b5be-958cd9d28900';
+    await db.duckDbBatchInsertState(TEMPERATURE_FEATURE_ID, [
+      { value: 20, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 21, created_at: new Date('2025-08-28T15:01:00.000Z') },
+    ]);
+    // Default threshold: 2 states stay far below it, single-statement path
+    const res = await device.purgeStatesByFeatureId(TEMPERATURE_FEATURE_ID);
+    expect(res.numberOfDeviceFeatureStateToDelete).to.equal(2);
+    const states = await db.duckDbReadConnectionAllAsync(
+      'SELECT * FROM t_device_feature_state WHERE device_feature_id = ?',
+      TEMPERATURE_FEATURE_ID,
+    );
+    expect(states).to.have.lengthOf(0);
   });
   it('should do nothing on a feature without any state', async () => {
     const stateManager = new StateManager(event);

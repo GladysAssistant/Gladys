@@ -70,7 +70,8 @@ const DeviceManager = function DeviceManager(
   this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH = 1000;
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
-  this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES = 20;
+  this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES = 10;
+  this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD = 1000000;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);

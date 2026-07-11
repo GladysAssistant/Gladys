@@ -11,10 +11,6 @@ const logger = require('../../utils/logger');
  */
 async function purgeOrphanedDuckDbStates(jobId) {
   await this.job.updateProgress(jobId, 0, { step: 'waiting_database' });
-  // The DuckDB connections process statements in order: when this probe
-  // resolves, our turn on the read connection has arrived.
-  await db.duckDbReadConnectionAllAsync('SELECT 1');
-  await this.job.updateProgress(jobId, 0, { step: 'counting' });
 
   const deviceFeatures = await db.DeviceFeature.findAll({ attributes: ['id'], raw: true });
   const featureIds = deviceFeatures.map((deviceFeature) => deviceFeature.id);
@@ -22,16 +18,30 @@ async function purgeOrphanedDuckDbStates(jobId) {
   // With no feature left, every state is orphaned
   let whereClause = '';
   if (featureIds.length > 0) {
-    whereClause = ` WHERE device_feature_id NOT IN (${featureIds.map(() => '?').join(',')})`;
+    // The cast is on the parameters: without it, comparing VARCHAR parameters
+    // against the UUID column can cost a per-row cast over the whole table.
+    whereClause = ` WHERE device_feature_id NOT IN (${featureIds.map(() => 'CAST(? AS UUID)').join(',')})`;
   }
 
-  const [{ count }] = await db.duckDbReadConnectionAllAsync(
+  // The DuckDB connection is FIFO: submit the probe and the real query in the
+  // same tick, so the probe resolving means the count is actually running,
+  // not merely queued behind another job.
+  const waitStartedAt = Date.now();
+  const probePromise = db.duckDbReadConnectionAllAsync('SELECT 1');
+  const countPromise = db.duckDbReadConnectionAllAsync(
     `SELECT COUNT(*) AS count FROM t_device_feature_state${whereClause}`,
     ...featureIds,
   );
+  await probePromise;
+  const countStartedAt = Date.now();
+  await this.job.updateProgress(jobId, 0, { step: 'counting' });
+  const [{ count }] = await countPromise;
   const numberOfOrphanedDuckDbStatesToDelete = Number(count);
 
-  logger.info(`Purging orphaned DuckDB states: ${numberOfOrphanedDuckDbStatesToDelete} states to delete.`);
+  logger.info(
+    `Purging orphaned DuckDB states: waited ${countStartedAt - waitStartedAt}ms for the read connection,` +
+      ` counted ${numberOfOrphanedDuckDbStatesToDelete} orphaned states in ${Date.now() - countStartedAt}ms.`,
+  );
 
   await this.job.updateProgress(jobId, 0, {
     orphaned_states_count: numberOfOrphanedDuckDbStatesToDelete,
