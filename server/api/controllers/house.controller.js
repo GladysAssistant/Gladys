@@ -198,7 +198,8 @@ module.exports = function HouseController(gladys) {
    */
   async function getSunState(req, res) {
     const house = await gladys.house.getBySelector(req.params.house_selector);
-    if (!house.latitude || !house.longitude) {
+    const { latitude, longitude } = house;
+    if (latitude === null || latitude === undefined || longitude === null || longitude === undefined) {
       throw new Error400(ERROR_MESSAGES.HOUSE_HAS_NO_COORDINATES);
     }
     const sunState = gladys.house.getSunState(house);

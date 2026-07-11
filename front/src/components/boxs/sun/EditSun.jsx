@@ -11,12 +11,12 @@ const EditSunBox = ({ ...props }) => (
         <Text id="dashboard.boxes.sun.editHouseLabel" />
       </label>
       <select onChange={props.updateBoxHouse} class="form-control">
-        <option>
+        <option value="">
           <Text id="global.emptySelectOption" />
         </option>
         {props.houses &&
           props.houses.map(house => (
-            <option selected={house.selector === props.box.house} value={house.selector}>
+            <option key={house.selector} selected={house.selector === props.box.house} value={house.selector}>
               {house.name}
             </option>
           ))}
