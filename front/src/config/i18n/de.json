@@ -3291,8 +3291,6 @@
     "restartMigrationTitle": "Migration neu starten",
     "confirm": "Bestätigen",
     "cancel": "Abbrechen",
-    "purgeOrphanedDuckDbTitle": "Verwaiste DuckDB-Zustände löschen",
-    "purgeOrphanedDuckDbDescription": "Löscht Zustände, die zu keiner vorhandenen Gerätefunktion mehr gehören (Überbleibsel gelöschter Geräte oder Funktionen). Dieser Vorgang kann bei großen Datenbanken einige Zeit dauern.",
     "purgeSQliteTitle": "SQLite-Zustände löschen",
     "purgeSQliteDescription": "Sobald alle Zustände aus SQLite gelöscht wurden, müssen Sie auf der rechten Registerkarte eine \"Datenbankbereinigung\" durchführen, um Speicherplatz freizugeben. Dieser Schritt kann einige Zeit in Anspruch nehmen.",
     "downloadLogsTitle": "Logs herunterladen",

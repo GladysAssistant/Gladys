@@ -3291,8 +3291,6 @@
     "restartMigrationTitle": "Restart Migration",
     "confirm": "Confirm",
     "cancel": "Cancel",
-    "purgeOrphanedDuckDbTitle": "Purge orphaned DuckDB states",
-    "purgeOrphanedDuckDbDescription": "Deletes states which no longer belong to any existing device feature (leftovers of deleted devices or features). This task can take some time on large databases.",
     "purgeSQliteTitle": "Purge SQLite states",
     "purgeSQliteDescription": "Once all states are deleted from SQLite, you will need to perform a \"database cleanup\" on the tab to the right to free up disk space. This step may take some time.",
     "downloadLogsTitle": "Download logs",
