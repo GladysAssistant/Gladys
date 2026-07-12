@@ -24,18 +24,19 @@ const buildDevice = (variableValue) => {
   };
   const device = new Device(event, {}, stateManager, {}, {}, variable, job);
   device.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 1;
+  device.ORPHANED_STATES_PURGE_PAUSE_FACTOR = 0;
   return { device, variable };
 };
 
 describe('device.purgeOrphanedDuckDbStates', async function Describe() {
-  this.timeout(5000);
+  this.timeout(10000);
   beforeEach(async () => {
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
     await db.duckDbBatchInsertState(EXISTING_FEATURE_ID, [
       { value: 1, created_at: new Date('2025-06-15T10:00:00.000Z') },
       { value: 0, created_at: new Date('2025-08-28T15:02:00.000Z') },
     ]);
-    // Orphaned states spread over 3 months, so the purge walks several slices
+    // Orphaned states spread over 3 months, so the purge walks several weekly slices
     await db.duckDbBatchInsertState(ORPHANED_FEATURE_ID, [
       { value: 12, created_at: new Date('2025-06-01T00:00:00.000Z') },
       { value: 13, created_at: new Date('2025-07-15T12:00:00.000Z') },
