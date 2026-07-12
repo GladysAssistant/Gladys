@@ -94,6 +94,20 @@ class MapComponent extends Component {
     // If dark mode state has changed, reinitialize the map
     if (prevProps.darkMode !== this.props.darkMode) {
       this.initMap();
+      return;
+    }
+    // If the house location was changed from outside the map (address search),
+    // move the pin and center the view on it. A click on the map already moved
+    // the marker to these exact coordinates, so it is skipped here.
+    const { latitude, longitude } = this.props.house;
+    const locationChanged = prevProps.house.latitude !== latitude || prevProps.house.longitude !== longitude;
+    if (locationChanged && latitude && longitude) {
+      const markerPosition = this.houseMarker && this.houseMarker.getLatLng();
+      const markerAlreadyThere = markerPosition && markerPosition.lat === latitude && markerPosition.lng === longitude;
+      if (!markerAlreadyThere) {
+        this.setPinMap(latitude, longitude);
+        this.leafletMap.setView([latitude, longitude], 16);
+      }
     }
   }
 
