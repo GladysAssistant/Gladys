@@ -4,6 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { fake, assert } = sinon;
 
 const System = require('../../../lib/system');
+const { getLocalIp } = require('../../../lib/system/system.getInfos');
 const Job = require('../../../lib/job');
 
 const sequelize = {
@@ -48,6 +49,7 @@ describe('system.getInfos', () => {
     expect(infos).to.have.property('freemem');
     expect(infos).to.have.property('cpus');
     expect(infos).to.have.property('network_interfaces');
+    expect(infos).to.have.property('local_ip');
     expect(infos).to.have.property('nodejs_version');
     expect(infos).to.have.property('gladys_version');
     expect(infos).to.have.property('latest_gladys_version', undefined);
@@ -108,5 +110,44 @@ describe('system.getInfos', () => {
     expect(infos).to.not.have.property('docker_image');
     expect(infos).to.not.have.property('docker_image_pinned');
     expect(infos).to.not.have.property('recommended_docker_image');
+  });
+});
+
+describe('system.getLocalIp', () => {
+  it('should prioritize wired connection over wireless', () => {
+    const networkInterfaces = {
+      lo: [
+        { address: '127.0.0.1', family: 'IPv4', internal: true },
+        { address: '::1', family: 'IPv6', internal: true },
+      ],
+      wlan0: [{ address: '192.168.1.51', family: 4, internal: false }],
+      eth0: [
+        { address: 'fe80::1', family: 'IPv6', internal: false },
+        { address: '192.168.1.50', family: 'IPv4', internal: false },
+      ],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.50');
+  });
+
+  it('should return the wireless address when no wired interface exists', () => {
+    const networkInterfaces = {
+      wlp2s0: [{ address: '192.168.1.51', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.51');
+  });
+
+  it('should ignore virtual docker interfaces', () => {
+    const networkInterfaces = {
+      docker0: [{ address: '172.17.0.1', family: 'IPv4', internal: false }],
+      'br-12345': [{ address: '172.18.0.1', family: 'IPv4', internal: false }],
+      vethabc123: [{ address: '169.254.0.1', family: 'IPv4', internal: false }],
+      enp3s0: [{ address: '192.168.1.50', family: 'IPv4', internal: false }],
+    };
+    expect(getLocalIp(networkInterfaces)).to.equal('192.168.1.50');
+  });
+
+  it('should return null when no external IPv4 exists', () => {
+    expect(getLocalIp({})).to.equal(null);
+    expect(getLocalIp({ lo: [{ address: '127.0.0.1', family: 'IPv4', internal: true }] })).to.equal(null);
   });
 });

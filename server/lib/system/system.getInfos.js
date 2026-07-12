@@ -129,12 +129,49 @@ function readCpuTemperature() {
 }
 
 /**
+ * @description Extract the local IPv4 address from network interfaces, wired connection first.
+ * @param {any} networkInterfaces - Result of os.networkInterfaces().
+ * @returns {string|null} The local IPv4 address, or null if unavailable.
+ * @example
+ * getLocalIp(os.networkInterfaces());
+ */
+function getLocalIp(networkInterfaces) {
+  /** @type {Array<{ priority: number, address: string }>} */
+  const candidates = [];
+  Object.keys(networkInterfaces).forEach((name) => {
+    const lowerName = name.toLowerCase();
+    const isVirtualInterface =
+      lowerName.startsWith('docker') || lowerName.startsWith('veth') || lowerName.startsWith('br-');
+    if (isVirtualInterface) {
+      return;
+    }
+    const isWired = lowerName.startsWith('eth') || lowerName.startsWith('en');
+    const isWireless = lowerName.startsWith('wl') || lowerName.startsWith('ww');
+    let priority = 1;
+    if (isWired) {
+      priority = 0;
+    } else if (isWireless) {
+      priority = 2;
+    }
+    (networkInterfaces[name] || []).forEach((/** @type {any} */ networkInterface) => {
+      const isIpV4 = networkInterface.family === 'IPv4' || networkInterface.family === 4;
+      if (!networkInterface.internal && isIpV4) {
+        candidates.push({ priority, address: networkInterface.address });
+      }
+    });
+  });
+  candidates.sort((a, b) => a.priority - b.priority);
+  return candidates.length > 0 ? candidates[0].address : null;
+}
+
+/**
  * @description Return system informations.
  * @returns {Promise} Resolve with all system metrics.
  * @example
  * system.getInfos();
  */
 async function getInfos() {
+  const networkInterfaces = os.networkInterfaces();
   const infos = {
     hostname: os.hostname(),
     type: os.type(),
@@ -146,7 +183,8 @@ async function getInfos() {
     totalmem: os.totalmem(),
     freemem: os.freemem(),
     cpus: os.cpus(),
-    network_interfaces: os.networkInterfaces(),
+    network_interfaces: networkInterfaces,
+    local_ip: getLocalIp(networkInterfaces),
     nodejs_version: process.version,
     gladys_version: this.gladysVersion,
     latest_gladys_version: this.latestGladysVersion,
@@ -175,6 +213,7 @@ async function getInfos() {
 
 module.exports = {
   getInfos,
+  getLocalIp,
   readCpuTemperature,
   parseThermalValue,
 };
