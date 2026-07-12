@@ -25,6 +25,7 @@ const buildDevice = (variableValue) => {
   const device = new Device(event, {}, stateManager, {}, {}, variable, job);
   device.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 1;
   device.ORPHANED_STATES_PURGE_PAUSE_FACTOR = 0;
+  device.ORPHANED_STATES_PURGE_MIN_PAUSE_IN_MS = 1;
   return { device, variable };
 };
 

@@ -71,8 +71,10 @@ const DeviceManager = function DeviceManager(
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
   // The orphaned-states purge sleeps this many times the duration of each
-  // slice, so it only ever uses a fraction of the CPU/disk/write connection
+  // slice (at least the minimum below), so it only ever uses a fraction of
+  // the CPU/disk/write connection
   this.ORPHANED_STATES_PURGE_PAUSE_FACTOR = 5;
+  this.ORPHANED_STATES_PURGE_MIN_PAUSE_IN_MS = 1000;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);
