@@ -82,7 +82,7 @@ async function purgeOrphanedDuckDbStates(jobId) {
       const pauseInMs = Math.min(
         Math.max(
           sliceDurationInMs * this.ORPHANED_STATES_PURGE_PAUSE_FACTOR,
-          this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH,
+          this.ORPHANED_STATES_PURGE_MIN_PAUSE_IN_MS,
         ),
         60 * 1000,
       );
