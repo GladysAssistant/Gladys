@@ -3624,6 +3624,7 @@
     "liter": "Liter (l)",
     "milliliter": "Milliliter (ml)",
     "cubicmeter": "Cubic meter (m³)",
+    "cubic-meter-per-hour": "Cubic meter per hour (m³/h)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -3720,6 +3721,7 @@
     "liter": "l",
     "milliliter": "ml",
     "cubicmeter": "m³",
+    "cubic-meter-per-hour": "m³/h",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -4136,6 +4138,19 @@
           "unknown": "Unknown"
         }
       },
+      "water-valve": {
+        "current-device-status": {
+          "0": "Normal",
+          "1": "Water shortage",
+          "2": "Water leakage",
+          "3": "Water shortage & leakage",
+          "unknown": "Unknown"
+        },
+        "valve-work-state": {
+          "0": "Idle",
+          "1": "Irrigation running"
+        }
+      },
       "electrical-vehicle-state": {
         "door-opened": {
           "0": "Closed",
@@ -4256,6 +4271,16 @@
       "liquid-state": "Liquid level state",
       "liquid-level-percent": "Liquid level percent",
       "liquid-depth": "Liquid depth"
+    },
+    "water-valve": {
+      "shortCategoryName": "Water valve",
+      "current-device-status": "Water valve status",
+      "flow": "Water flow",
+      "auto-close-when-water-shortage": "Auto close on water shortage",
+      "valve-work-state": "Valve work state",
+      "real-time-irrigation-duration": "Current irrigation duration",
+      "real-time-irrigation-volume": "Current irrigation volume",
+      "daily-irrigation-volume": "Daily irrigation volume"
     },
     "camera": {
       "shortCategoryName": "Camera",

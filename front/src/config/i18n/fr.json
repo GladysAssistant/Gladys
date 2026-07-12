@@ -3624,6 +3624,7 @@
     "liter": "Litre (l)",
     "milliliter": "Millilitre (ml)",
     "cubicmeter": "Mètre cube (m³)",
+    "cubic-meter-per-hour": "Mètre cube par heure (m³/h)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -3720,6 +3721,7 @@
     "liter": "l",
     "milliliter": "ml",
     "cubicmeter": "m³",
+    "cubic-meter-per-hour": "m³/h",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -4136,6 +4138,19 @@
           "unknown": "Inconnu"
         }
       },
+      "water-valve": {
+        "current-device-status": {
+          "0": "Normal",
+          "1": "Manque d'eau",
+          "2": "Fuite d'eau",
+          "3": "Manque et fuite d'eau",
+          "unknown": "Inconnu"
+        },
+        "valve-work-state": {
+          "0": "Au repos",
+          "1": "Irrigation en cours"
+        }
+      },
       "electrical-vehicle-state": {
         "door-opened": {
           "0": "Fermée(s)",
@@ -4256,6 +4271,16 @@
       "liquid-state": "État du niveau",
       "liquid-level-percent": "Niveau du liquide (Pourcentage)",
       "liquid-depth": "Profondeur du liquide"
+    },
+    "water-valve": {
+      "shortCategoryName": "Vanne d'eau",
+      "current-device-status": "État de la vanne d'eau",
+      "flow": "Débit d'eau",
+      "auto-close-when-water-shortage": "Fermeture auto si manque d'eau",
+      "valve-work-state": "Programme d'irrigation en cours",
+      "real-time-irrigation-duration": "Durée d'irrigation en cours",
+      "real-time-irrigation-volume": "Volume d'irrigation en cours",
+      "daily-irrigation-volume": "Volume d'irrigation quotidien"
     },
     "camera": {
       "shortCategoryName": "Caméra",
