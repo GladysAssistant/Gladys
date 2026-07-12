@@ -158,6 +158,12 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
     await Promise.delay(this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH);
   });
 
+  if (numberOfDuckDbStatesToDelete > 0) {
+    // Flush the WAL and release the delete-tracking memory accumulated by the
+    // deletes, so the space is reusable right away
+    await db.duckDbWriteConnectionAllAsync('CHECKPOINT');
+  }
+
   await Promise.each(iterator, async () => {
     await db.sequelize.query(
       `
