@@ -95,6 +95,10 @@ async function purgeOrphanedDuckDbStates(jobId) {
     });
   }
 
+  // Flush the WAL and release the delete-tracking memory accumulated by the
+  // mass deletes, so the space is reusable right away
+  await db.duckDbWriteConnectionAllAsync('CHECKPOINT');
+
   logger.info(`purge-orphaned-duckdb-states: done, purged ${numberOfOrphanedDuckDbStatesToDelete} orphaned states.`);
   await this.variable.setValue(SYSTEM_VARIABLE_NAMES.DUCKDB_ORPHANED_STATES_PURGED, 'true');
 
