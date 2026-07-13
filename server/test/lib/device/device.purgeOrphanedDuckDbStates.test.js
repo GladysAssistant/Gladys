@@ -91,4 +91,38 @@ describe('device.purgeOrphanedDuckDbStates', async function Describe() {
     });
     assert.calledWith(variable.setValue, SYSTEM_VARIABLE_NAMES.DUCKDB_ORPHANED_STATES_PURGED, 'true');
   });
+  it('should not delete states written after the purge started (feature created mid-purge)', async () => {
+    // A feature created while the purge runs is not in the feature snapshot: its
+    // states are only protected by the purge start date cutoff
+    const FEATURE_CREATED_MID_PURGE_ID = '11111111-2222-3333-4444-555555555555';
+    await db.duckDbBatchInsertState(FEATURE_CREATED_MID_PURGE_ID, [
+      { value: 1, created_at: new Date(Date.now() + 60 * 60 * 1000) },
+    ]);
+    const { device } = buildDevice(null);
+    const res = await device.purgeOrphanedDuckDbStates();
+    expect(res).to.deep.equal({
+      numberOfOrphanedDuckDbStatesToDelete: 3,
+    });
+    const statesOfNewFeature = await db.duckDbReadConnectionAllAsync(
+      'SELECT * FROM t_device_feature_state WHERE device_feature_id = ?',
+      FEATURE_CREATED_MID_PURGE_ID,
+    );
+    expect(statesOfNewFeature).to.have.lengthOf(1);
+  });
+  it('should purge every state when no device feature exists', async () => {
+    // With no feature left, the NOT IN clause disappears: everything is orphaned.
+    // The SQLite test database is re-seeded before each test, so deleting the
+    // features here does not leak into other suites.
+    await db.DeviceFeatureState.destroy({ where: {} });
+    await db.DeviceFeatureStateAggregate.destroy({ where: {} });
+    await db.DeviceFeature.destroy({ where: {} });
+    const { device, variable } = buildDevice(null);
+    const res = await device.purgeOrphanedDuckDbStates();
+    expect(res).to.deep.equal({
+      numberOfOrphanedDuckDbStatesToDelete: 5,
+    });
+    const remainingStates = await db.duckDbReadConnectionAllAsync('SELECT * FROM t_device_feature_state');
+    expect(remainingStates).to.have.lengthOf(0);
+    assert.calledWith(variable.setValue, SYSTEM_VARIABLE_NAMES.DUCKDB_ORPHANED_STATES_PURGED, 'true');
+  });
 });

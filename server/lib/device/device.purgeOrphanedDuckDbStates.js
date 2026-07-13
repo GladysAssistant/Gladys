@@ -27,6 +27,12 @@ async function purgeOrphanedDuckDbStates(jobId) {
     return null;
   }
 
+  // Everything written after this date is out of scope: the feature list is
+  // snapshotted below, so states written while the purge runs may belong to a
+  // feature created after the snapshot and must never match the stale NOT IN
+  // list. Future deletions are handled by the per-feature purge anyway.
+  const purgeStartDate = new Date();
+
   const deviceFeatures = await db.DeviceFeature.findAll({ attributes: ['id'], raw: true });
   const featureIds = deviceFeatures.map((deviceFeature) => deviceFeature.id);
 
@@ -46,7 +52,9 @@ async function purgeOrphanedDuckDbStates(jobId) {
   let numberOfOrphanedDuckDbStatesToDelete = 0;
   if (minDate !== null) {
     const startTime = new Date(minDate).getTime();
-    const endTime = new Date(maxDate).getTime();
+    // Clamped to the purge start date so no slice can ever reach beyond the
+    // cutoff, even with future-dated states (skewed device clocks)
+    const endTime = Math.min(new Date(maxDate).getTime(), purgeStartDate.getTime());
     const numberOfSlices = Math.max(1, Math.ceil((endTime - startTime) / ONE_WEEK_IN_MS));
     logger.info(`purge-orphaned-duckdb-states: starting, ${numberOfSlices} weekly slices to walk.`);
 
@@ -54,18 +62,16 @@ async function purgeOrphanedDuckDbStates(jobId) {
 
     await Promise.each([...Array(numberOfSlices)], async (value, i) => {
       const sliceStart = new Date(startTime + i * ONE_WEEK_IN_MS);
-      // The last slice has no upper bound, so states written while the purge
-      // was running are covered too
+      // Every slice is bounded above — the last one by the purge start date, so
+      // states written while the purge runs are never evaluated against the
+      // stale feature snapshot
       const isLastSlice = i === numberOfSlices - 1;
-      const upperBoundClause = isLastSlice ? '' : ' AND created_at < CAST(? AS TIMESTAMPTZ)';
-      const queryParams = [sliceStart.toISOString()];
-      if (!isLastSlice) {
-        queryParams.push(new Date(startTime + (i + 1) * ONE_WEEK_IN_MS).toISOString());
-      }
+      const sliceUpperBound = isLastSlice ? purgeStartDate : new Date(startTime + (i + 1) * ONE_WEEK_IN_MS);
       const sliceStartedAt = Date.now();
       const result = await db.duckDbWriteConnectionAllAsync(
-        `DELETE FROM t_device_feature_state WHERE created_at >= CAST(? AS TIMESTAMPTZ)${upperBoundClause}${orphanedClause}`,
-        ...queryParams,
+        `DELETE FROM t_device_feature_state WHERE created_at >= CAST(? AS TIMESTAMPTZ) AND created_at < CAST(? AS TIMESTAMPTZ)${orphanedClause}`,
+        sliceStart.toISOString(),
+        sliceUpperBound.toISOString(),
         ...featureIds,
       );
       const sliceDurationInMs = Date.now() - sliceStartedAt;
