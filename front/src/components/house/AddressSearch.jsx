@@ -103,6 +103,7 @@ class AddressSearch extends Component {
             {results.map(result => (
               <button
                 type="button"
+                key={result.id}
                 class="list-group-item list-group-item-action text-left"
                 onClick={this.selectResult(result)}
               >
