@@ -44,6 +44,11 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
     `SELECT COUNT(*) AS count FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID)`,
     deviceFeatureId,
   );
+  // If the probe rejects, the queued count rejects for the same reason before
+  // being awaited: pre-attach a no-op handler so it does not surface as an
+  // unhandled rejection (the await below still receives the error).
+  // eslint-disable-next-line promise/prefer-await-to-then
+  countPromise.catch(() => {});
   await probePromise;
   const countStartedAt = Date.now();
   await this.job.updateProgress(jobId, 0, { step: 'counting' });
