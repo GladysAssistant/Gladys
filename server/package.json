@@ -36,7 +36,13 @@
   "nodemonConfig": {
     "ignore": [
       "test/*",
-      "persist/*"
+      "persist/*",
+      "matter/*",
+      "gladys-backups/*",
+      "*.db",
+      "*.db-wal",
+      "*.db-shm",
+      "*.duckdb"
     ]
   },
   "nyc": {
