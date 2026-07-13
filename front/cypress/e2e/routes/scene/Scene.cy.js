@@ -133,6 +133,13 @@ describe('Scene view', () => {
         }
       ]
     ).as('loadDevices');
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/device`
+      },
+      []
+    ).as('loadAllDevices');
 
     const sceneUrl = Cypress.env('sceneUrl');
     expect(sceneUrl).to.exist; // Ensure the scene URL is available
@@ -155,6 +162,7 @@ describe('Scene view', () => {
     });
 
     cy.wait('@loadDevices');
+    cy.wait('@loadAllDevices');
     // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(100);
 

@@ -6,6 +6,7 @@ import { Text } from 'preact-i18n';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
+import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
 
 class PlayNotification extends Component {
   getOptions = async () => {
@@ -67,6 +68,13 @@ class PlayNotification extends Component {
   render(props, { selectedDeviceFeatureOption, devicesOptions }) {
     return (
       <div>
+        <GladysPlusUpsell
+          compact
+          icon="fe-volume-2"
+          utmCampaign="scene_action_tts"
+          titleKey="gladysPlusUpsell.tts.title"
+          descriptionKey="gladysPlusUpsell.tts.compactDescription"
+        />
         <p>
           <Text id="editScene.actionsCard.playNotification.description" />
         </p>
@@ -128,9 +136,6 @@ class PlayNotification extends Component {
             />
           </div>
         </div>
-        <p class="small">
-          <Text id="editScene.actionsCard.playNotification.needGladysPlus" />
-        </p>
       </div>
     );
   }

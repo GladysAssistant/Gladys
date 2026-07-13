@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
@@ -27,6 +27,11 @@ const DeviceTab = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
+      {props.showZ2mUrlWarning && (
+        <div class="alert alert-info mb-4">
+          <MarkupText id="integration.zigbee2mqtt.noZ2mUrlMessage" />
+        </div>
+      )}
       <CheckStatus />
 
       <div

@@ -122,6 +122,51 @@ describe('Netatmo saveStatus', () => {
     expect(intervalPollRefreshTokenSpy.notCalled).to.equal(true);
     expect(intervalPollRefreshValuesSpy.notCalled).to.equal(true);
   });
+  it('should update the status to RECONNECTING and emit the event without clearing timers', () => {
+    sinon.spy(clock, 'clearInterval');
+    netatmoHandler.pollRefreshToken = setInterval(() => {}, 3600);
+    netatmoHandler.pollRefreshValues = setInterval(() => {}, 120);
+
+    netatmoHandler.saveStatus({ statusType: STATUS.RECONNECTING, message: null });
+
+    expect(netatmoHandler.status).to.equal('reconnecting');
+    expect(netatmoHandler.configured).to.equal(true);
+    expect(netatmoHandler.connected).to.equal(false);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(1);
+    sinon.assert.calledWith(netatmoHandler.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: 'netatmo.status',
+      payload: { status: 'reconnecting' },
+    });
+    assert.notCalled(clock.clearInterval);
+
+    clearInterval(netatmoHandler.pollRefreshToken);
+    clearInterval(netatmoHandler.pollRefreshValues);
+  });
+
+  it('should clear the reconnect timeout when transitioning to DISCONNECTED', () => {
+    const clearTimeoutSpy = sinon.spy(clock, 'clearTimeout');
+    const timeoutHandle = setTimeout(() => {}, 100000);
+    netatmoHandler.reconnectTimeout = timeoutHandle;
+    netatmoHandler.reconnectAttempt = 2;
+
+    netatmoHandler.saveStatus({ statusType: STATUS.DISCONNECTED, message: null });
+
+    sinon.assert.calledWith(clearTimeoutSpy, timeoutHandle);
+    expect(netatmoHandler.reconnectAttempt).to.equal(0);
+  });
+
+  it('should clear the reconnect timeout when transitioning to NOT_INITIALIZED', () => {
+    const clearTimeoutSpy = sinon.spy(clock, 'clearTimeout');
+    const timeoutHandle = setTimeout(() => {}, 100000);
+    netatmoHandler.reconnectTimeout = timeoutHandle;
+    netatmoHandler.reconnectAttempt = 3;
+
+    netatmoHandler.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null });
+
+    sinon.assert.calledWith(clearTimeoutSpy, timeoutHandle);
+    expect(netatmoHandler.reconnectAttempt).to.equal(0);
+  });
+
   it('should update the status to DISCOVERING_DEVICES and emit the event', () => {
     netatmoHandler.saveStatus({ statusType: STATUS.DISCOVERING_DEVICES, message: null });
 

@@ -48,7 +48,7 @@ class ChooseTriggerType extends Component {
         value: trigger,
         label: get(props.intl.dictionary, `editScene.triggers.${trigger}`, { default: trigger })
       };
-    });
+    }).sort((a, b) => a.label.localeCompare(b.label));
 
     this.state = {
       options,

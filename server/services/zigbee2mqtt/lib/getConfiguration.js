@@ -12,6 +12,7 @@ async function getConfiguration() {
   logger.debug('Zigbee2mqtt: loading stored configuration...');
 
   // Load z2m parameters
+  const z2mFrontendUrl = await this.gladys.variable.getValue(CONFIGURATION.Z2M_FRONTEND_URL, this.serviceId);
   const z2mDriverPath = await this.gladys.variable.getValue(CONFIGURATION.Z2M_DRIVER_PATH, this.serviceId);
   const z2mDongleName = await this.gladys.variable.getValue(CONFIGURATION.ZIGBEE_DONGLE_NAME, this.serviceId);
   const z2mTcpPort = await this.gladys.variable.getValue(CONFIGURATION.Z2M_TCP_PORT, this.serviceId);
@@ -31,6 +32,7 @@ async function getConfiguration() {
   const timezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
 
   return {
+    z2mFrontendUrl,
     z2mDriverPath,
     z2mDongleName,
     z2mTcpPort,

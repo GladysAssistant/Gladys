@@ -2,3 +2,87 @@
   max-width: 300px;
   overflow-x: scroll;
 }
+
+.pricingPage h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.pricingHero {
+  background: linear-gradient(135deg, #f8f9fb 0%, #eef3fa 100%);
+  border: none;
+}
+
+.pricingLead {
+  font-size: 1.15rem;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  color: #4a5773;
+}
+
+.featureCard {
+  border: 1px solid #e9ecef;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.featureIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #eef3fa;
+  color: #467fcf;
+  font-size: 1.4rem;
+}
+
+.planCard {
+  position: relative;
+  border: 1px solid #e9ecef;
+}
+
+.planCardHighlight {
+  border: 2px solid #467fcf;
+  box-shadow: 0 6px 18px rgba(70, 127, 207, 0.12);
+}
+
+.planBadgeContainer {
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.planBadge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #467fcf;
+  color: #fff;
+  padding: 0.25rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.planPrice {
+  display: flex;
+  align-items: baseline;
+}
+
+.planPriceAmount {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2c3650;
+}
+
+.planFeatureList li {
+  line-height: 1.6;
+}

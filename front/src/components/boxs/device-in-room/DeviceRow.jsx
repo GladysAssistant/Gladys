@@ -1,5 +1,6 @@
 import { createElement } from 'preact';
-import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
+import get from 'get-value';
+import { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } from '../../../../../server/utils/constants';
 
 import { getDeviceName } from '../../../utils/device';
 
@@ -12,15 +13,22 @@ import NumberDeviceFeature from './device-features/NumberDeviceFeature';
 import CoverDeviceFeature from './device-features/CoverDeviceFeature';
 import SetpointDeviceFeature from './device-features/SetpointDeviceFeature';
 import AirConditioningModeDeviceFeature from './device-features/AirConditioningModeDeviceFeature';
+import FanModeDeviceFeature from './device-features/FanModeDeviceFeature';
+import FanLabeledSelectDeviceFeature from './device-features/FanLabeledSelectDeviceFeature';
 import PilotWireModeDeviceFeature from './device-features/PilotWireModeDeviceFeature';
 import LMHVolumeDeviceFeature from './device-features/LMHVolumeDeviceFeature';
 import PushDeviceFeature from './device-features/PushDeviceFeature';
+import VacuumCleanerDockDeviceFeature from './device-features/VacuumCleanerDockDeviceFeature';
+import VacuumCleanerModeDeviceFeature from './device-features/VacuumCleanerModeDeviceFeature';
+import VacuumCleanerCleanModeDeviceFeature from './device-features/VacuumCleanerCleanModeDeviceFeature';
 
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: ColorDeviceFeature,
   [DEVICE_FEATURE_TYPES.SWITCH.DIMMER]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.LIGHT.HUE]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.LIGHT.SATURATION]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE]: LightTemperatureDeviceFeature,
   [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL]: NumberDeviceFeature,
   [DEVICE_FEATURE_TYPES.TELEVISION.VOLUME]: MultiLevelDeviceFeature,
@@ -31,6 +39,12 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: SetpointDeviceFeature,
   [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: AirConditioningModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: SetpointDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.PERCENT]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.SPEED]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING]: FanLabeledSelectDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.WIND_SETTING]: FanLabeledSelectDeviceFeature,
+  [DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION]: FanLabeledSelectDeviceFeature,
   [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: PilotWireModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.LOCK.BINARY]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.SIREN.LMH_VOLUME]: LMHVolumeDeviceFeature,
@@ -44,7 +58,24 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.CLIMATE_ON]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.TARGET_TEMPERATURE]: SetpointDeviceFeature,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_COMMAND.ALARM]: BinaryDeviceFeature,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_COMMAND.LOCK]: BinaryDeviceFeature
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_COMMAND.LOCK]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK]: VacuumCleanerDockDeviceFeature,
+  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE]: VacuumCleanerModeDeviceFeature,
+  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE]: VacuumCleanerCleanModeDeviceFeature
+};
+
+// Some feature type strings are shared across categories (e.g. AIR_CONDITIONING.MODE and FAN.MODE
+// are both 'mode'). Because ROW_TYPE_BY_FEATURE_TYPE is keyed by type only, whichever entry is
+// declared last silently wins for every category. This category-aware map takes precedence and
+// disambiguates each colliding type by its category, so routing no longer depends on declaration
+// order and stays correct when new categories reuse an existing type string.
+const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: AirConditioningModeDeviceFeature
+  },
+  [DEVICE_FEATURE_CATEGORIES.FAN]: {
+    [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
+  }
 };
 
 const DeviceRow = ({ children, ...props }) => {
@@ -64,7 +95,9 @@ const DeviceRow = ({ children, ...props }) => {
     );
   }
 
-  const elementType = ROW_TYPE_BY_FEATURE_TYPE[props.deviceFeature.type];
+  const elementType =
+    get(ROW_TYPE_BY_CATEGORY_AND_TYPE, `${deviceFeature.category}.${deviceFeature.type}`) ||
+    ROW_TYPE_BY_FEATURE_TYPE[props.deviceFeature.type];
 
   if (!elementType) {
     // if no related components, we display the device as a sensor

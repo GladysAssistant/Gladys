@@ -132,4 +132,18 @@ describe('Netatmo pollRefreshingValues', () => {
       payload: { status: 'connected' },
     });
   });
+
+  it('should preserve RECONNECTING status after loadDevices triggered handleApiAuthError', async () => {
+    netatmoHandler.status = 'connected';
+    netatmoHandler.loadDevices = sinon.stub().callsFake(async () => {
+      netatmoHandler.status = 'reconnecting';
+      return [];
+    });
+
+    await netatmoHandler.refreshNetatmoValues();
+
+    restoreClock();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(netatmoHandler.status).to.equal('reconnecting');
+  });
 });

@@ -332,6 +332,51 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
     assert.notCalled(gateway.gladysGatewayClient.alexaReportState);
   });
 
+  it('should not forward shutter state when position is exposed', async () => {
+    stateManager.get = (key) => {
+      const stateFeature = {
+        name: 'Shutter state',
+        selector: 'my-shutter-state',
+        category: 'shutter',
+        type: 'state',
+        read_only: false,
+        last_value: 1,
+        device_id: 'shutter-device-id',
+      };
+      const positionFeature = {
+        name: 'Shutter position',
+        selector: 'my-shutter-position',
+        category: 'shutter',
+        type: 'position',
+        read_only: false,
+        last_value: 50,
+        min: 0,
+        max: 100,
+        device_id: 'shutter-device-id',
+      };
+
+      if (key === 'deviceFeature') {
+        return stateFeature;
+      }
+
+      return {
+        id: 'shutter-device-id',
+        name: 'Shutter',
+        selector: 'my-shutter',
+        features: [stateFeature, positionFeature],
+      };
+    };
+
+    await gateway.forwardDeviceStateToAlexa({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'my-shutter-state',
+    });
+
+    clock.tick(200);
+
+    assert.notCalled(gateway.gladysGatewayClient.alexaReportState);
+  });
+
   it('should not forward, alexa not connected', async () => {
     stateManager.get = (key) => {
       const feature = {

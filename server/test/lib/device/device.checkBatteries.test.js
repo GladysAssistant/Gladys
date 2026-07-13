@@ -20,7 +20,7 @@ describe('Device check batteries', () => {
   let brain;
   before(async () => {
     brain = new Brain();
-    await brain.train();
+    await brain.load();
   });
   it('should do nothing if is not enabled', async () => {
     const stateManager = new StateManager(event);

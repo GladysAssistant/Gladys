@@ -10,6 +10,7 @@ const { getContainers } = require('./system.getContainers');
 const { getContainerMounts } = require('./system.getContainerMounts');
 const { inspectContainer } = require('./system.inspectContainer');
 const { getContainerLogs } = require('./system.getContainerLogs');
+const { getGladysLogs } = require('./system.getGladysLogs');
 const { getGladysContainerId } = require('./system.getGladysContainerId');
 const { getInfos } = require('./system.getInfos');
 const { getDiskSpace } = require('./system.getDiskSpace');
@@ -50,6 +51,7 @@ const System = function System(sequelize, event, config, job, variable, user, me
   // on timezone change, reset DuckDB timezone
   this.event.on(EVENTS.SYSTEM.TIMEZONE_CHANGED, eventFunctionWrapper(this.setDuckDbTimezone.bind(this)));
   this.networkMode = null;
+  this.gladysLogsCache = null;
 };
 
 System.prototype.init = init;
@@ -59,6 +61,7 @@ System.prototype.getContainers = getContainers;
 System.prototype.getContainerMounts = getContainerMounts;
 System.prototype.inspectContainer = inspectContainer;
 System.prototype.getContainerLogs = getContainerLogs;
+System.prototype.getGladysLogs = getGladysLogs;
 System.prototype.getGladysBasePath = getGladysBasePath;
 System.prototype.getGladysContainerId = getGladysContainerId;
 System.prototype.getInfos = getInfos;

@@ -2,6 +2,7 @@ const {
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
@@ -20,6 +21,7 @@ const MatterHandler = require('../../../../services/matter/lib');
 const { VARIABLES } = require('../../../../services/matter/utils/constants');
 const {
   convertMeasurementUnitToDeviceFeatureUnits,
+  matterExternalIdToSelector,
 } = require('../../../../services/matter/utils/convertToGladysDevice');
 
 describe('Matter.init', () => {
@@ -40,6 +42,9 @@ describe('Matter.init', () => {
         location: '',
       }),
       default: {},
+      vars: {
+        set: fake.returns(null),
+      },
     };
 
     storageService = {
@@ -93,6 +98,7 @@ describe('Matter.init', () => {
         measuredValue: {},
       },
       commands: {},
+      getMeasuredValueAttribute: fake.resolves(2150),
       addMeasuredValueAttributeListener: fake.returns(null),
     });
 
@@ -136,6 +142,7 @@ describe('Matter.init', () => {
       },
       getMinLevelAttribute: fake.resolves(0),
       getMaxLevelAttribute: fake.resolves(100),
+      addCurrentLevelAttributeListener: fake.returns(null),
     });
 
     // Relative humidity measurement
@@ -156,6 +163,7 @@ describe('Matter.init', () => {
       name: 'Thermostat',
       endpointId: 1,
       attributes: {
+        localTemperature: {},
         occupiedHeatingSetpoint: {},
         occupiedCoolingSetpoint: {},
       },
@@ -164,6 +172,8 @@ describe('Matter.init', () => {
         cooling: true,
       },
       commands: {},
+      getLocalTemperatureAttribute: fake.resolves(2150),
+      addLocalTemperatureAttributeListener: fake.returns(null),
       addOccupiedHeatingSetpointAttributeListener: fake.returns(null),
       addOccupiedCoolingSetpointAttributeListener: fake.returns(null),
     });
@@ -202,6 +212,18 @@ describe('Matter.init', () => {
     clusterClients.set(TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id, {
       id: TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id,
       name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement',
+      endpointId: 1,
+      attributes: {
+        levelValue: {},
+      },
+      commands: {},
+      addLevelValueAttributeListener: fake.returns(null),
+    });
+
+    // NO2 concentration measurement
+    clusterClients.set(NitrogenDioxideConcentrationMeasurement.Complete.id, {
+      id: NitrogenDioxideConcentrationMeasurement.Complete.id,
+      name: 'NitrogenDioxideConcentrationMeasurement',
       endpointId: 1,
       attributes: {
         levelValue: {},
@@ -289,18 +311,22 @@ describe('Matter.init', () => {
         },
       ]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([
           {
             id: 'device-1',
             name: 'Test Device',
             number: 1,
-            clusterClients,
-            childEndpoints: [
+            getAllClusterClients: () => Array.from(clusterClients.values()),
+            getClusterClientById: (id) => clusterClients.get(id),
+            getChildEndpoints: () => [
               {
                 id: 'child-endpoint-1',
                 name: 'Child Endpoint',
                 number: 2,
-                clusterClients,
+                getAllClusterClients: () => Array.from(clusterClients.values()),
+                getClusterClientById: (id) => clusterClients.get(id),
+                getChildEndpoints: () => [],
               },
             ],
           },
@@ -335,6 +361,9 @@ describe('Matter.init', () => {
       variable: {
         getValue: fake.resolves(null),
       },
+      event: {
+        emit: fake.returns(null),
+      },
     };
 
     matterHandler = new MatterHandler(gladys, MatterMain, ProjectChipMatter, 'service-1');
@@ -346,16 +375,11 @@ describe('Matter.init', () => {
 
   it('should initialize matter service successfully', async () => {
     await matterHandler.init();
+    // Wait for background refreshDevices() to complete
+    await matterHandler.refreshDevicesPromise;
     expect(matterHandler.devices).to.have.lengthOf(2);
-    // Device selector should be a slug of the name with 4 random characters at the end
-    expect(matterHandler.devices[0].selector).to.satisfy(
-      (selector) => selector.startsWith('matter-test-device-') && selector.length === 'matter-test-device-'.length + 4,
-    );
-    // Feature selector should be a slug of the name with 4 random characters at the end
-    expect(matterHandler.devices[0].features[0].selector).to.satisfy(
-      (selector) =>
-        selector.startsWith('matter-test-device-onoff-') && selector.length === 'matter-test-device-onoff-'.length + 4,
-    );
+    expect(matterHandler.devices[0].selector).to.equal(matterExternalIdToSelector('matter:12345:1'));
+    expect(matterHandler.devices[0].features[0].selector).to.equal(matterExternalIdToSelector('matter:12345:1:6'));
     expect(matterHandler.devices).to.deep.equal([
       {
         name: 'Test Vendor (Test Product) 1',
@@ -469,6 +493,18 @@ describe('Matter.init', () => {
             max: 100,
           },
           {
+            name: 'Thermostat - 1 (Local temperature)',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            read_only: true,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:513:local-temperature',
+            selector: matterHandler.devices[0].features[9].selector,
+            min: -100,
+            max: 200,
+          },
+          {
             name: 'Thermostat - 1 (Heating)',
             category: 'thermostat',
             type: 'target-temperature',
@@ -476,7 +512,7 @@ describe('Matter.init', () => {
             has_feedback: true,
             unit: 'celsius',
             external_id: 'matter:12345:1:513:heating',
-            selector: matterHandler.devices[0].features[9].selector,
+            selector: matterHandler.devices[0].features[10].selector,
             min: -100,
             max: 200,
           },
@@ -488,7 +524,7 @@ describe('Matter.init', () => {
             has_feedback: true,
             unit: 'celsius',
             external_id: 'matter:12345:1:513:cooling',
-            selector: matterHandler.devices[0].features[10].selector,
+            selector: matterHandler.devices[0].features[11].selector,
             min: -100,
             max: 200,
           },
@@ -500,7 +536,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'Pm25ConcentrationMeasurement - 1',
             read_only: true,
-            selector: matterHandler.devices[0].features[11].selector,
+            selector: matterHandler.devices[0].features[12].selector,
             type: 'decimal',
             unit: 'microgram-per-cubic-meter',
           },
@@ -512,7 +548,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'Pm10ConcentrationMeasurement - 1',
             read_only: true,
-            selector: matterHandler.devices[0].features[12].selector,
+            selector: matterHandler.devices[0].features[13].selector,
             type: 'decimal',
             unit: 'microgram-per-cubic-meter',
           },
@@ -524,7 +560,18 @@ describe('Matter.init', () => {
             min: 0,
             name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement - 1',
             read_only: true,
-            selector: matterHandler.devices[0].features[13].selector,
+            selector: matterHandler.devices[0].features[14].selector,
+            type: 'integer',
+          },
+          {
+            category: 'no2-matter-index-sensor',
+            external_id: 'matter:12345:1:1043',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'NitrogenDioxideConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[0].features[15].selector,
             type: 'integer',
           },
           {
@@ -535,7 +582,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'FormaldehydeConcentrationMeasurement - 1',
             read_only: true,
-            selector: matterHandler.devices[0].features[14].selector,
+            selector: matterHandler.devices[0].features[16].selector,
             type: 'decimal',
             unit: 'microgram-per-cubic-meter',
           },
@@ -547,7 +594,7 @@ describe('Matter.init', () => {
             min: -1000000,
             name: 'ElectricalPowerMeasurement - 1 (Power)',
             read_only: true,
-            selector: matterHandler.devices[0].features[15].selector,
+            selector: matterHandler.devices[0].features[17].selector,
             type: 'power',
             unit: 'watt',
           },
@@ -559,7 +606,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'ElectricalPowerMeasurement - 1 (Voltage)',
             read_only: true,
-            selector: matterHandler.devices[0].features[16].selector,
+            selector: matterHandler.devices[0].features[18].selector,
             type: 'voltage',
             unit: 'volt',
           },
@@ -571,7 +618,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'ElectricalPowerMeasurement - 1 (Current)',
             read_only: true,
-            selector: matterHandler.devices[0].features[17].selector,
+            selector: matterHandler.devices[0].features[19].selector,
             type: 'current',
             unit: 'ampere',
           },
@@ -583,7 +630,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'ElectricalEnergyMeasurement - 1 (Energy)',
             read_only: true,
-            selector: matterHandler.devices[0].features[18].selector,
+            selector: matterHandler.devices[0].features[20].selector,
             type: 'index',
             unit: 'kilowatt-hour',
           },
@@ -595,7 +642,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'HepaFilterMonitoring - 1',
             read_only: true,
-            selector: matterHandler.devices[0].features[19].selector,
+            selector: matterHandler.devices[0].features[21].selector,
             type: 'filter-life-remaining',
             unit: 'percent',
           },
@@ -714,6 +761,18 @@ describe('Matter.init', () => {
             max: 100,
           },
           {
+            name: 'Thermostat - 1 (Local temperature)',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            read_only: true,
+            has_feedback: true,
+            unit: 'celsius',
+            external_id: 'matter:12345:1:child_endpoint:2:513:local-temperature',
+            selector: matterHandler.devices[1].features[9].selector,
+            min: -100,
+            max: 200,
+          },
+          {
             name: 'Thermostat - 1 (Heating)',
             category: 'thermostat',
             type: 'target-temperature',
@@ -721,7 +780,7 @@ describe('Matter.init', () => {
             has_feedback: true,
             unit: 'celsius',
             external_id: 'matter:12345:1:child_endpoint:2:513:heating',
-            selector: matterHandler.devices[1].features[9].selector,
+            selector: matterHandler.devices[1].features[10].selector,
             min: -100,
             max: 200,
           },
@@ -733,7 +792,7 @@ describe('Matter.init', () => {
             has_feedback: true,
             unit: 'celsius',
             external_id: 'matter:12345:1:child_endpoint:2:513:cooling',
-            selector: matterHandler.devices[1].features[10].selector,
+            selector: matterHandler.devices[1].features[11].selector,
             min: -100,
             max: 200,
           },
@@ -745,7 +804,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'Pm25ConcentrationMeasurement - 1',
             read_only: true,
-            selector: matterHandler.devices[1].features[11].selector,
+            selector: matterHandler.devices[1].features[12].selector,
             type: 'decimal',
             unit: 'microgram-per-cubic-meter',
           },
@@ -757,7 +816,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'Pm10ConcentrationMeasurement - 1',
             read_only: true,
-            selector: matterHandler.devices[1].features[12].selector,
+            selector: matterHandler.devices[1].features[13].selector,
             type: 'decimal',
             unit: 'microgram-per-cubic-meter',
           },
@@ -769,7 +828,18 @@ describe('Matter.init', () => {
             min: 0,
             name: 'TotalVolatileOrganicCompoundsConcentrationMeasurement - 1',
             read_only: true,
-            selector: matterHandler.devices[1].features[13].selector,
+            selector: matterHandler.devices[1].features[14].selector,
+            type: 'integer',
+          },
+          {
+            category: 'no2-matter-index-sensor',
+            external_id: 'matter:12345:1:child_endpoint:2:1043',
+            has_feedback: true,
+            max: 100,
+            min: 0,
+            name: 'NitrogenDioxideConcentrationMeasurement - 1',
+            read_only: true,
+            selector: matterHandler.devices[1].features[15].selector,
             type: 'integer',
           },
           {
@@ -780,7 +850,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'FormaldehydeConcentrationMeasurement - 1',
             read_only: true,
-            selector: matterHandler.devices[1].features[14].selector,
+            selector: matterHandler.devices[1].features[16].selector,
             type: 'decimal',
             unit: 'microgram-per-cubic-meter',
           },
@@ -792,7 +862,7 @@ describe('Matter.init', () => {
             min: -1000000,
             name: 'ElectricalPowerMeasurement - 1 (Power)',
             read_only: true,
-            selector: matterHandler.devices[1].features[15].selector,
+            selector: matterHandler.devices[1].features[17].selector,
             type: 'power',
             unit: 'watt',
           },
@@ -804,7 +874,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'ElectricalPowerMeasurement - 1 (Voltage)',
             read_only: true,
-            selector: matterHandler.devices[1].features[16].selector,
+            selector: matterHandler.devices[1].features[18].selector,
             type: 'voltage',
             unit: 'volt',
           },
@@ -816,7 +886,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'ElectricalPowerMeasurement - 1 (Current)',
             read_only: true,
-            selector: matterHandler.devices[1].features[17].selector,
+            selector: matterHandler.devices[1].features[19].selector,
             type: 'current',
             unit: 'ampere',
           },
@@ -828,7 +898,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'ElectricalEnergyMeasurement - 1 (Energy)',
             read_only: true,
-            selector: matterHandler.devices[1].features[18].selector,
+            selector: matterHandler.devices[1].features[20].selector,
             type: 'index',
             unit: 'kilowatt-hour',
           },
@@ -840,7 +910,7 @@ describe('Matter.init', () => {
             min: 0,
             name: 'HepaFilterMonitoring - 1',
             read_only: true,
-            selector: matterHandler.devices[1].features[19].selector,
+            selector: matterHandler.devices[1].features[21].selector,
             type: 'filter-life-remaining',
             unit: 'percent',
           },
@@ -856,6 +926,7 @@ describe('Matter.init', () => {
       start: fake.resolves(null),
       getCommissionedNodesDetails: fake.returns([]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([]),
       }),
     };
@@ -872,6 +943,7 @@ describe('Matter.init', () => {
       start: fake.resolves(null),
       getCommissionedNodesDetails: fake.returns([]),
       getNode: fake.resolves({
+        isConnected: true,
         getDevices: fake.returns([]),
       }),
     };
@@ -890,6 +962,14 @@ describe('Matter.init', () => {
     assert.called(matterHandler.restoreBackup);
     expect(matterHandler.devices).to.have.lengthOf(0);
     expect(matterHandler.nodesMap.size).to.equal(0);
+  });
+
+  it('should log error when refreshDevices fails in background', async () => {
+    const error = new Error('Test error');
+    matterHandler.refreshDevices = fake.rejects(error);
+    await matterHandler.init();
+    // Wait for background promise to complete - error should be caught and logged, not thrown
+    await matterHandler.refreshDevicesPromise;
   });
 
   it('should return PPM for 0', () => {

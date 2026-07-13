@@ -1,5 +1,4 @@
 const { expect, assert } = require('chai');
-const { fake, assert: assertSinon } = require('sinon');
 const EventEmitter = require('events');
 const SceneManager = require('../../../lib/scene');
 const { ACTIONS, EVENTS } = require('../../../utils/constants');
@@ -21,8 +20,6 @@ describe('scene.duplicate', () => {
   };
 
   beforeEach(() => {
-    brain.addNamedEntity = fake.returns(null);
-    brain.removeNamedEntity = fake.returns(null);
     sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {}, {}, {}, scheduler, brain);
   });
 
@@ -52,7 +49,6 @@ describe('scene.duplicate', () => {
         time: '12:00',
       },
     ]);
-    assertSinon.calledOnce(brain.addNamedEntity);
   });
 
   it('should return not found', async () => {

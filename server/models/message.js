@@ -41,6 +41,25 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      message_type: {
+        allowNull: false,
+        type: DataTypes.STRING,
+        defaultValue: 'chat',
+        validate: {
+          isIn: [['chat', 'tool_call', 'notification']],
+        },
+      },
+      tool_name: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
+      tool_status: {
+        allowNull: true,
+        type: DataTypes.STRING,
+        validate: {
+          isIn: [['success', 'error']],
+        },
+      },
     },
     {
       validate: {

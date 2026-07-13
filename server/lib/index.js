@@ -61,7 +61,7 @@ function Gladys(params = {}) {
   const stateManager = new StateManager(event);
   const session = new Session(params.jwtSecret, cache);
   const house = new House(event, stateManager, session);
-  const room = new Room(brain);
+  const room = new Room();
   const service = new Service(services, stateManager);
   const message = new MessageHandler(event, brain, service, stateManager, variable);
   const user = new User(session, stateManager, variable);
@@ -86,6 +86,7 @@ function Gladys(params = {}) {
     scheduler,
     message,
     brain,
+    device,
   );
   const scene = new Scene(
     stateManager,
@@ -101,6 +102,8 @@ function Gladys(params = {}) {
     brain,
     service,
   );
+  gateway.scene = scene;
+  gateway.energyPrice = energyPrice;
 
   const gladys = {
     version: '0.1.0', // todo, read package.json

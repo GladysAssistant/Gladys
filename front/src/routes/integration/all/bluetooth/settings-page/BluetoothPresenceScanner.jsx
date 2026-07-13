@@ -42,8 +42,8 @@ class BluetoothPresenceScanner extends Component {
               onClick={this.toggleStatus}
               disabled={disabled}
             />
-            <span class="custom-switch-indicator" />
-            <span class="custom-switch-description">
+            <span class="custom-switch-indicator flex-shrink-0" />
+            <span class="custom-switch-description ml-2">
               <Text id="integration.bluetooth.setup.presenceScannerStatusLabel" />
             </span>
           </label>
@@ -53,7 +53,7 @@ class BluetoothPresenceScanner extends Component {
           <label class="form-label">
             <Text id="integration.bluetooth.setup.presenceScannerFrequencyLabel" />
           </label>
-          <div class="input-group col-sm-3">
+          <div class="input-group flex-nowrap" style={{ maxWidth: '160px' }}>
             <input
               type="number"
               disabled={!enabled || disabled}

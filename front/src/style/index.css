@@ -399,15 +399,71 @@ body {
   line-height: 22px;
 }
 
+.gauge-slider {
+  width: 100%;
+  max-width: 500px;
+  height: 30px;
+}
+
+.gauge-slider-thumb {
+  font-size: 0.9em;
+  text-align: center;
+  background-color: #fafafa;
+  cursor: pointer;
+  border: 1px solid gray;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.gauge-slider-thumb.active {
+  border: 1px solid #467fcf;
+}
+
+.gauge-slider-track {
+  position: relative;
+}
+
+.gauge-slider .gauge-slider-track {
+  top: 10px;
+  height: 10px;
+}
+
+.gauge-slider .gauge-slider-thumb {
+  top: 3px;
+  width: 60px;
+  height: 24px;
+  line-height: 22px;
+}
+
+.gauge-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gauge-thresholds-legend {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.gauge-chart {
+  touch-action: pan-y;
+}
+
+.gauge-chart .apexcharts-canvas,
+.gauge-chart .apexcharts-svg {
+  pointer-events: none;
+}
+
 .rti--tag button:focus {
   outline: none !important;
 }
 
-.row-cards > [class*="col"] {
+.row-cards > [class*='col'] {
   display: flex;
 }
 
-.row-cards > [class*="col"] > .card {
+.row-cards > [class*='col'] > .card {
   width: 100%;
   flex: 1;
 }
@@ -443,8 +499,8 @@ body {
 }
 
 .favorite-star--active svg {
-  fill: #FFA000;
-  stroke: #FFA000;
+  fill: #ffa000;
+  stroke: #ffa000;
 }
 
 .integration-tag {

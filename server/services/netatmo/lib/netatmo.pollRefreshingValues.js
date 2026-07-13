@@ -34,7 +34,9 @@ async function refreshNetatmoValues() {
     },
     { concurrency: 2 },
   );
-  await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
+  if (this.status !== STATUS.RECONNECTING && this.status !== STATUS.DISCONNECTED) {
+    await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
+  }
 }
 
 /**

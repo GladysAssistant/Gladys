@@ -43,6 +43,15 @@ describe('gateway.init', () => {
       if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
         return 'Europe/Paris';
       }
+      if (name === SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_ENABLED) {
+        return '0';
+      }
+      if (name === SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_DAY) {
+        return '0';
+      }
+      if (name === SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_HOUR) {
+        return '18';
+      }
       return JSON.stringify(userKeys);
     };
     variable.setValue = fake.resolves(null);
@@ -73,7 +82,7 @@ describe('gateway.init', () => {
   });
 
   it('check constructor event subscription', () => {
-    assert.callCount(event.on, 10);
+    assert.callCount(event.on, 11);
   });
 
   it('check init well connected', async () => {
@@ -100,6 +109,26 @@ describe('gateway.init', () => {
 
     expect(gateway.connected).to.equal(false);
     expect(gateway.usersKeys).to.deep.equal(userKeys);
+    expect(gateway.backupSchedule).to.deep.contains({
+      rule: { tz: 'Europe/Paris', hour: 2, minute: 0, second: 0 },
+    });
+  });
+
+  it('should continue init when user keys sync fails', async () => {
+    gateway.getUsersKeys = fake.rejects(new Error('sync failed'));
+
+    await gateway.init();
+
+    expect(gateway.connected).to.equal(true);
+    expect(gateway.usersKeys).to.deep.equal(userKeys);
+  });
+
+  it('should continue init when weekly digest scheduling fails', async () => {
+    gateway.scheduleWeeklyDigest = fake.rejects(new Error('scheduling failed'));
+
+    await gateway.init();
+
+    expect(gateway.connected).to.equal(true);
     expect(gateway.backupSchedule).to.deep.contains({
       rule: { tz: 'Europe/Paris', hour: 2, minute: 0, second: 0 },
     });

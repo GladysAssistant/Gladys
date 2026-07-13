@@ -10,6 +10,7 @@ import config from '../../../../config';
 
 import EnedisPage from './EnedisPage';
 import { buildUsagePointDevicePayload } from './usagePointDeviceBuilder';
+import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
 
 const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notOnGladysGateway }) => (
   <div class="card">
@@ -39,6 +40,17 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
               </a>
             </p>
           )}
+          <GladysPlusUpsell
+            icon="fe-zap"
+            utmCampaign="integration_enedis"
+            titleKey="gladysPlusUpsell.enedis.title"
+            descriptionKey="gladysPlusUpsell.enedis.description"
+            featureKeys={[
+              'gladysPlusUpsell.enedis.feature1',
+              'gladysPlusUpsell.enedis.feature2',
+              'gladysPlusUpsell.enedis.feature3'
+            ]}
+          />
           {usagePointsIds && (
             <p class="alert alert-success">
               <Text id="integration.enedis.welcome.connectedToUsagePointds" />

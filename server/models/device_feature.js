@@ -133,6 +133,11 @@ module.exports = (sequelize, DataTypes) => {
       sourceKey: 'id',
       as: 'energy_children',
     });
+    deviceFeature.hasMany(models.DeviceFeatureSupportedOption, {
+      foreignKey: 'device_feature_id',
+      sourceKey: 'id',
+      as: 'supported_options',
+    });
   };
 
   return deviceFeature;

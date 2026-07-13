@@ -13,16 +13,28 @@ const {
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
+  FanControl,
+  RvcOperationalState,
+  RvcRunMode,
+  RvcCleanMode,
+  PowerSource,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');
+const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
+const {
+  convertMatterOperationalStateToGladys,
+  convertMatterRunModeToGladys,
+  convertMatterCleanModeToGladys,
+} = require('../utils/vacuumCleanerStateMapping');
 
 /**
  * @description Listen to state changes of a device.
@@ -32,8 +44,8 @@ const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
  * @example matter.listenToStateChange(nodeId, device);
  */
 async function listenToStateChange(nodeId, devicePath, device) {
-  // Get the OnOff cluster from clusterClients map
-  const onOff = device.clusterClients.get(OnOff.Complete.id);
+  // Get the OnOff cluster
+  const onOff = device.getClusterClientById(OnOff.Complete.id);
 
   // We only add the listener if it's not already added
   if (onOff && !this.stateChangeListeners.has(onOff)) {
@@ -49,7 +61,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const booleanState = device.clusterClients.get(BooleanState.Complete.id);
+  const booleanState = device.getClusterClientById(BooleanState.Complete.id);
   if (booleanState && !this.stateChangeListeners.has(booleanState)) {
     logger.debug(`Matter: Adding state change listener for BooleanState cluster ${booleanState.name}`);
     this.stateChangeListeners.add(booleanState);
@@ -62,7 +74,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const switchCluster = device.clusterClients.get(Switch.Complete.id);
+  const switchCluster = device.getClusterClientById(Switch.Complete.id);
   if (switchCluster && !this.stateChangeListeners.has(switchCluster)) {
     logger.debug(`Matter: Adding state change listener for Switch cluster ${switchCluster.name}`);
     this.stateChangeListeners.add(switchCluster);
@@ -104,7 +116,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     }
   }
 
-  const occupancy = device.clusterClients.get(OccupancySensing.Complete.id);
+  const occupancy = device.getClusterClientById(OccupancySensing.Complete.id);
   if (occupancy && !this.stateChangeListeners.has(occupancy)) {
     logger.debug(`Matter: Adding state change listener for OccupancySensing cluster ${occupancy.name}`);
     this.stateChangeListeners.add(occupancy);
@@ -118,7 +130,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const illuminance = device.clusterClients.get(IlluminanceMeasurement.Complete.id);
+  const illuminance = device.getClusterClientById(IlluminanceMeasurement.Complete.id);
   if (illuminance && !this.stateChangeListeners.has(illuminance)) {
     logger.debug(`Matter: Adding state change listener for IlluminanceMeasurement cluster ${illuminance.name}`);
     this.stateChangeListeners.add(illuminance);
@@ -133,21 +145,23 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const temperatureSensor = device.clusterClients.get(TemperatureMeasurement.Complete.id);
+  const temperatureSensor = device.getClusterClientById(TemperatureMeasurement.Complete.id);
   if (temperatureSensor && !this.stateChangeListeners.has(temperatureSensor)) {
     logger.debug(`Matter: Adding state change listener for TemperatureMeasurement cluster ${temperatureSensor.name}`);
     this.stateChangeListeners.add(temperatureSensor);
-    // Subscribe to TemperatureMeasurement attribute changes
+    const temperatureMeasurementExternalId = `matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`;
     temperatureSensor.addMeasuredValueAttributeListener((value) => {
       logger.debug(`Matter: Temperature attribute changed to ${value}`);
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: `matter:${nodeId}:${devicePath}:${TemperatureMeasurement.Complete.id}`,
-        state: value / 100,
-      });
+      if (value !== null && value !== undefined) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: temperatureMeasurementExternalId,
+          state: value / 100,
+        });
+      }
     });
   }
 
-  const windowCover = device.clusterClients.get(WindowCovering.Complete.id);
+  const windowCover = device.getClusterClientById(WindowCovering.Complete.id);
 
   if (windowCover && !this.stateChangeListeners.has(windowCover)) {
     logger.debug(`Matter: Adding state change listener for WindowCovering cluster ${windowCover.name}`);
@@ -162,7 +176,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const levelControl = device.clusterClients.get(LevelControl.Complete.id);
+  const levelControl = device.getClusterClientById(LevelControl.Complete.id);
   if (levelControl && !this.stateChangeListeners.has(levelControl)) {
     logger.debug(`Matter: Adding state change listener for LevelControl cluster ${levelControl.name}`);
     this.stateChangeListeners.add(levelControl);
@@ -176,7 +190,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const colorControl = device.clusterClients.get(ColorControl.Complete.id);
+  const colorControl = device.getClusterClientById(ColorControl.Complete.id);
   if (colorControl && !this.stateChangeListeners.has(colorControl)) {
     logger.debug(`Matter: Adding state change listener for ColorControl cluster ${colorControl.name}`);
     this.stateChangeListeners.add(colorControl);
@@ -220,7 +234,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     }
   }
 
-  const relativeHumidityMeasurement = device.clusterClients.get(RelativeHumidityMeasurement.Complete.id);
+  const relativeHumidityMeasurement = device.getClusterClientById(RelativeHumidityMeasurement.Complete.id);
   if (relativeHumidityMeasurement && !this.stateChangeListeners.has(relativeHumidityMeasurement)) {
     logger.debug(
       `Matter: Adding state change listener for RelativeHumidityMeasurement cluster ${relativeHumidityMeasurement.name}`,
@@ -236,7 +250,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const pm25ConcentrationMeasurement = device.clusterClients.get(Pm25ConcentrationMeasurement.Complete.id);
+  const pm25ConcentrationMeasurement = device.getClusterClientById(Pm25ConcentrationMeasurement.Complete.id);
   if (pm25ConcentrationMeasurement && !this.stateChangeListeners.has(pm25ConcentrationMeasurement)) {
     logger.debug(
       `Matter: Adding state change listener for Pm25ConcentrationMeasurement cluster ${pm25ConcentrationMeasurement.name}`,
@@ -252,7 +266,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const pm10ConcentrationMeasurement = device.clusterClients.get(Pm10ConcentrationMeasurement.Complete.id);
+  const pm10ConcentrationMeasurement = device.getClusterClientById(Pm10ConcentrationMeasurement.Complete.id);
   if (pm10ConcentrationMeasurement && !this.stateChangeListeners.has(pm10ConcentrationMeasurement)) {
     logger.debug(
       `Matter: Adding state change listener for Pm10ConcentrationMeasurement cluster ${pm10ConcentrationMeasurement.name}`,
@@ -268,7 +282,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const totalVolatileOrganicCompoundsConcentrationMeasurement = device.clusterClients.get(
+  const totalVolatileOrganicCompoundsConcentrationMeasurement = device.getClusterClientById(
     TotalVolatileOrganicCompoundsConcentrationMeasurement.Complete.id,
   );
   if (
@@ -289,7 +303,27 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const formaldehydeConcentrationMeasurement = device.clusterClients.get(
+  const nitrogenDioxideConcentrationMeasurement = device.getClusterClientById(
+    NitrogenDioxideConcentrationMeasurement.Complete.id,
+  );
+  if (
+    nitrogenDioxideConcentrationMeasurement &&
+    !this.stateChangeListeners.has(nitrogenDioxideConcentrationMeasurement)
+  ) {
+    logger.debug(
+      `Matter: Adding state change listener for NitrogenDioxideConcentrationMeasurement cluster ${nitrogenDioxideConcentrationMeasurement.name}`,
+    );
+    this.stateChangeListeners.add(nitrogenDioxideConcentrationMeasurement);
+    nitrogenDioxideConcentrationMeasurement.addLevelValueAttributeListener((value) => {
+      logger.debug(`Matter: NitrogenDioxideConcentrationMeasurement attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${NitrogenDioxideConcentrationMeasurement.Complete.id}`,
+        state: value,
+      });
+    });
+  }
+
+  const formaldehydeConcentrationMeasurement = device.getClusterClientById(
     FormaldehydeConcentrationMeasurement.Complete.id,
   );
   if (formaldehydeConcentrationMeasurement && !this.stateChangeListeners.has(formaldehydeConcentrationMeasurement)) {
@@ -307,10 +341,20 @@ async function listenToStateChange(nodeId, devicePath, device) {
     });
   }
 
-  const thermostat = device.clusterClients.get(Thermostat.Complete.id);
+  const thermostat = device.getClusterClientById(Thermostat.Complete.id);
   if (thermostat && !this.stateChangeListeners.has(thermostat)) {
     logger.debug(`Matter: Adding state change listener for Thermostat cluster ${thermostat.name}`);
     this.stateChangeListeners.add(thermostat);
+    const localTemperatureExternalId = `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:local-temperature`;
+    thermostat.addLocalTemperatureAttributeListener((value) => {
+      logger.debug(`Matter: Thermostat localTemperature attribute changed to ${value}`);
+      if (value !== null && value !== undefined) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: localTemperatureExternalId,
+          state: value / 100,
+        });
+      }
+    });
     // Subscribe to thermostat attribute changes
     if (thermostat.supportedFeatures.heating) {
       thermostat.addOccupiedHeatingSetpointAttributeListener((value) => {
@@ -332,7 +376,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     }
   }
 
-  const electricalPowerMeasurement = device.clusterClients.get(ElectricalPowerMeasurement.Complete.id);
+  const electricalPowerMeasurement = device.getClusterClientById(ElectricalPowerMeasurement.Complete.id);
   if (electricalPowerMeasurement && !this.stateChangeListeners.has(electricalPowerMeasurement)) {
     logger.debug(
       `Matter: Adding state change listener for ElectricalPowerMeasurement cluster ${electricalPowerMeasurement.name}`,
@@ -374,7 +418,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     }
   }
 
-  const electricalEnergyMeasurement = device.clusterClients.get(ElectricalEnergyMeasurement.Complete.id);
+  const electricalEnergyMeasurement = device.getClusterClientById(ElectricalEnergyMeasurement.Complete.id);
   if (electricalEnergyMeasurement && !this.stateChangeListeners.has(electricalEnergyMeasurement)) {
     logger.debug(
       `Matter: Adding state change listener for ElectricalEnergyMeasurement cluster ${electricalEnergyMeasurement.name}`,
@@ -395,7 +439,7 @@ async function listenToStateChange(nodeId, devicePath, device) {
     }
   }
 
-  const hepaFilterMonitoring = device.clusterClients.get(HepaFilterMonitoring.Complete.id);
+  const hepaFilterMonitoring = device.getClusterClientById(HepaFilterMonitoring.Complete.id);
   if (hepaFilterMonitoring && !this.stateChangeListeners.has(hepaFilterMonitoring)) {
     logger.debug(`Matter: Adding state change listener for HepaFilterMonitoring cluster ${hepaFilterMonitoring.name}`);
     this.stateChangeListeners.add(hepaFilterMonitoring);
@@ -408,6 +452,182 @@ async function listenToStateChange(nodeId, devicePath, device) {
       });
     });
   }
+
+  const fanControl = device.getClusterClientById(FanControl.Complete.id);
+  if (fanControl && !this.stateChangeListeners.has(fanControl)) {
+    logger.debug(`Matter: Adding state change listener for FanControl cluster ${fanControl.name}`);
+    this.stateChangeListeners.add(fanControl);
+    const fanBaseExternalId = `matter:${nodeId}:${devicePath}:${FanControl.Complete.id}`;
+
+    fanControl.addFanModeAttributeListener((value) => {
+      logger.debug(`Matter: FanControl FanMode attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `${fanBaseExternalId}:mode`,
+        state: matterFanModeToGladys(value),
+      });
+    });
+
+    fanControl.addPercentSettingAttributeListener((value) => {
+      logger.debug(`Matter: FanControl PercentSetting attribute changed to ${value}`);
+      if (value !== null) {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${fanBaseExternalId}:percent`,
+          state: value,
+        });
+      }
+    });
+
+    fanControl.addPercentCurrentAttributeListener((value) => {
+      logger.debug(`Matter: FanControl PercentCurrent attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `${fanBaseExternalId}:percent-current`,
+        state: value,
+      });
+    });
+
+    if (fanControl.supportedFeatures.multiSpeed) {
+      fanControl.addSpeedSettingAttributeListener((value) => {
+        logger.debug(`Matter: FanControl SpeedSetting attribute changed to ${value}`);
+        if (value !== null) {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `${fanBaseExternalId}:speed`,
+            state: value,
+          });
+        }
+      });
+
+      fanControl.addSpeedCurrentAttributeListener((value) => {
+        logger.debug(`Matter: FanControl SpeedCurrent attribute changed to ${value}`);
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${fanBaseExternalId}:speed-current`,
+          state: value,
+        });
+      });
+    }
+
+    if (fanControl.supportedFeatures.rocking) {
+      fanControl.addRockSettingAttributeListener((value) => {
+        logger.debug(`Matter: FanControl RockSetting attribute changed to ${JSON.stringify(value)}`);
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${fanBaseExternalId}:rock`,
+          state: matterAttributeToNumber(value, FanControl.Complete.attributes.rockSetting.schema),
+        });
+      });
+    }
+
+    if (fanControl.supportedFeatures.wind) {
+      fanControl.addWindSettingAttributeListener((value) => {
+        logger.debug(`Matter: FanControl WindSetting attribute changed to ${JSON.stringify(value)}`);
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${fanBaseExternalId}:wind`,
+          state: matterAttributeToNumber(value, FanControl.Complete.attributes.windSetting.schema),
+        });
+      });
+    }
+
+    if (fanControl.supportedFeatures.airflowDirection) {
+      fanControl.addAirflowDirectionAttributeListener((value) => {
+        logger.debug(`Matter: FanControl AirflowDirection attribute changed to ${value}`);
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${fanBaseExternalId}:airflow-direction`,
+          state: value,
+        });
+      });
+    }
+  }
+
+  const rvcOperationalState = device.getClusterClientById(RvcOperationalState.Complete.id);
+  if (rvcOperationalState && !this.stateChangeListeners.has(rvcOperationalState)) {
+    logger.debug(`Matter: Adding state change listener for RvcOperationalState cluster ${rvcOperationalState.name}`);
+    this.stateChangeListeners.add(rvcOperationalState);
+    // Subscribe to RvcOperationalState attribute changes
+    rvcOperationalState.addOperationalStateAttributeListener((value) => {
+      logger.debug(`Matter: RvcOperationalState attribute changed to ${value}`);
+      // Convert Matter state to Gladys standard state
+      const gladysState = convertMatterOperationalStateToGladys(value);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${RvcOperationalState.Complete.id}:state`,
+        state: gladysState,
+      });
+    });
+  }
+
+  const rvcRunMode = device.getClusterClientById(RvcRunMode.Complete.id);
+  if (rvcRunMode && !this.stateChangeListeners.has(rvcRunMode)) {
+    logger.debug(`Matter: Adding state change listener for RvcRunMode cluster ${rvcRunMode.name}`);
+    this.stateChangeListeners.add(rvcRunMode);
+
+    // Read and store supportedModes for this cluster
+    const externalId = `matter:${nodeId}:${devicePath}:${RvcRunMode.Complete.id}`;
+    try {
+      if (rvcRunMode.attributes && rvcRunMode.attributes.supportedModes) {
+        const supportedModes = await rvcRunMode.attributes.supportedModes.get();
+        logger.info(`Matter: RvcRunMode supportedModes: ${JSON.stringify(supportedModes)}`);
+        this.supportedModesMap.set(externalId, { supportedModes, clusterType: 'RvcRunMode' });
+      }
+    } catch (err) {
+      logger.warn(`Matter: Failed to read RvcRunMode supportedModes: ${err.message}`);
+    }
+
+    // Subscribe to RvcRunMode attribute changes
+    rvcRunMode.addCurrentModeAttributeListener((value) => {
+      logger.debug(`Matter: RvcRunMode currentMode attribute changed to ${value}`);
+      // Convert Matter mode to Gladys standard mode using stored supportedModes or fallback
+      const gladysMode = convertMatterRunModeToGladys(value, this.supportedModesMap.get(externalId));
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: externalId,
+        state: gladysMode,
+      });
+    });
+  }
+
+  const rvcCleanMode = device.getClusterClientById(RvcCleanMode.Complete.id);
+  if (rvcCleanMode && !this.stateChangeListeners.has(rvcCleanMode)) {
+    logger.debug(`Matter: Adding state change listener for RvcCleanMode cluster ${rvcCleanMode.name}`);
+    this.stateChangeListeners.add(rvcCleanMode);
+
+    // Read and store supportedModes for this cluster
+    const cleanModeExternalId = `matter:${nodeId}:${devicePath}:${RvcCleanMode.Complete.id}`;
+    try {
+      if (rvcCleanMode.attributes && rvcCleanMode.attributes.supportedModes) {
+        const supportedModes = await rvcCleanMode.attributes.supportedModes.get();
+        logger.info(`Matter: RvcCleanMode supportedModes: ${JSON.stringify(supportedModes)}`);
+        this.supportedModesMap.set(cleanModeExternalId, { supportedModes, clusterType: 'RvcCleanMode' });
+      }
+    } catch (err) {
+      logger.warn(`Matter: Failed to read RvcCleanMode supportedModes: ${err.message}`);
+    }
+
+    // Subscribe to RvcCleanMode attribute changes
+    rvcCleanMode.addCurrentModeAttributeListener((value) => {
+      logger.debug(`Matter: RvcCleanMode currentMode attribute changed to ${value}`);
+      // Convert Matter clean mode to Gladys standard clean mode using stored supportedModes or fallback
+      const gladysMode = convertMatterCleanModeToGladys(value, this.supportedModesMap.get(cleanModeExternalId));
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: cleanModeExternalId,
+        state: gladysMode,
+      });
+    });
+  }
+
+  const powerSource = device.getClusterClientById(PowerSource.Complete.id);
+  if (powerSource && !this.stateChangeListeners.has(powerSource)) {
+    logger.debug(`Matter: Adding state change listener for PowerSource cluster ${powerSource.name}`);
+    this.stateChangeListeners.add(powerSource);
+    // Subscribe to PowerSource battery percentage attribute changes
+    if (powerSource.addBatPercentRemainingAttributeListener) {
+      powerSource.addBatPercentRemainingAttributeListener((value) => {
+        logger.debug(`Matter: PowerSource batPercentRemaining attribute changed to ${value}`);
+        // Value is in half-percent units (0-200), convert to percent (0-100)
+        const batteryPercent = value !== null ? Math.round(value / 2) : null;
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${PowerSource.Complete.id}:battery`,
+          state: batteryPercent,
+        });
+      });
+    }
+  }
+  await this.readInitialDeviceStates(nodeId, devicePath, device);
 }
 
 module.exports = {

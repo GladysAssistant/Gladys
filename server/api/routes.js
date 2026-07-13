@@ -241,6 +241,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDeviceFeaturesAggregated,
     },
+    'get /api/v1/device_feature/states_history': {
+      authenticated: true,
+      controller: deviceController.getDeviceStatesHistory,
+    },
     'get /api/v1/device_feature/energy_consumption': {
       authenticated: true,
       controller: deviceController.getConsumptionByDates,
@@ -365,14 +369,52 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.getInstanceKeysFingerprint,
     },
-    'post /api/v1/gateway/openai/ask': {
+    'post /api/v1/gateway/aichat/chat': {
       authenticated: true,
-      controller: gatewayController.openAIAsk,
+      controller: gatewayController.aiChat,
+    },
+    'get /api/v1/gateway/aichat/debug-context': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.getAiChatDebugContext,
+    },
+    'get /api/v1/gateway/aichat/quota': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.getOpenAIQuota,
+    },
+    'get /api/v1/gateway/aichat/models': {
+      authenticated: true,
+      controller: gatewayController.getAiChatModels,
+    },
+    'post /api/v1/gateway/stt': {
+      authenticated: true,
+      audioRawBody: true,
+      controller: gatewayController.stt,
+    },
+    'post /api/v1/gateway/voice': {
+      authenticated: true,
+      audioRawBody: true,
+      controller: gatewayController.processVoice,
+    },
+    'post /api/v1/gateway/tts': {
+      authenticated: true,
+      controller: gatewayController.getTtsUrl,
     },
     'post /api/v1/gateway/refresh-latest-gladys-version': {
       authenticated: true,
       admin: true,
       controller: gatewayController.refreshLatestGladysVersion,
+    },
+    'post /api/v1/gateway/weekly-digest/send': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.sendWeeklyDigest,
+    },
+    'post /api/v1/gateway/weekly-digest/reschedule': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.rescheduleWeeklyDigest,
     },
     // room
     'get /api/v1/room': {
@@ -590,6 +632,11 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: systemController.localBackupRestore,
+    },
+    'get /api/v1/system/logs': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.getGladysLogs,
     },
     // user
     'post /api/v1/user': {

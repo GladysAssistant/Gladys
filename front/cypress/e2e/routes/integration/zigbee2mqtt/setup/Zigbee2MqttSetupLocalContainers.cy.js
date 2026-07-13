@@ -1,4 +1,14 @@
 describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
+  const SELECTED_DONGLE_NAME = "CircuitSetup's CC2652P2 USB Coordinator";
+
+  const selectDongle = () => {
+    cy.get('[data-cy=z2m-setup-local-dongle-field]')
+      .children()
+      .as('dongleField');
+    cy.get('@dongleField').click();
+    cy.get('@dongleField').type(`CircuitSetup{enter}`);
+  };
+
   before(() => {
     cy.login();
 
@@ -89,11 +99,7 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.get('[data-cy=z2m-setup-save]').should('not.be.disabled');
 
     // Select a dongle name
-    cy.get('[data-cy=z2m-setup-local-dongle-field]')
-      .children()
-      .as('dongleField');
-    cy.get('@dongleField').click();
-    cy.get('@dongleField').type('{downArrow}{enter}');
+    selectDongle();
   });
 
   it('Check confirm configuration', () => {
@@ -137,7 +143,7 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
       .its('request.body')
       .should('deep.eq', {
         ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
-        ZIGBEE_DONGLE_NAME: "CircuitSetup's CC2652P2 USB Coordinator",
+        ZIGBEE_DONGLE_NAME: SELECTED_DONGLE_NAME,
         Z2M_TCP_PORT: '12345',
         Z2M_MQTT_MODE: 'local'
       });
@@ -151,12 +157,7 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.get('[data-cy=z2m-setup-save-error]').should('exist');
 
     // Select a dongle name
-    cy.get('[data-cy=z2m-setup-local-dongle-field]')
-      .children()
-      .as('dongleField');
-
-    cy.get('@dongleField').click();
-    cy.get('@dongleField').type('{downArrow}{enter}');
+    selectDongle();
 
     // Enter TCP port
     cy.get('[data-cy=z2m-setup-local-tcp-field]').clear();
@@ -171,7 +172,7 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
         statusCode: 200,
         body: {
           ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
-          ZIGBEE_DONGLE_NAME: "CircuitSetup's CC2652P2 USB Coordinator",
+          ZIGBEE_DONGLE_NAME: SELECTED_DONGLE_NAME,
           Z2M_TCP_PORT: '12000'
         }
       }
@@ -183,7 +184,7 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
       .its('request.body')
       .should('deep.eq', {
         ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
-        ZIGBEE_DONGLE_NAME: "CircuitSetup's CC2652P2 USB Coordinator",
+        ZIGBEE_DONGLE_NAME: SELECTED_DONGLE_NAME,
         Z2M_TCP_PORT: null,
         Z2M_MQTT_MODE: 'local'
       });
@@ -193,7 +194,7 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
 
     // Check summary
     cy.get('[data-cy=z2m-setup-local-usb-summary]').should('have.text', '/dev/ttyUSB0');
-    cy.get('[data-cy=z2m-setup-local-dongle-summary]').should('have.text', "CircuitSetup's CC2652P2 USB Coordinator");
+    cy.get('[data-cy=z2m-setup-local-dongle-summary]').should('have.text', SELECTED_DONGLE_NAME);
     cy.get('[data-cy=z2m-setup-local-tcp-summary]').should('have.text', '12000');
 
     cy.sendWebSocket({

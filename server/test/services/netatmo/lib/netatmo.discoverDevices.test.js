@@ -100,4 +100,30 @@ describe('Netatmo Discover devices', () => {
     expect(netatmoHandler.status).to.equal('connected');
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(2);
   });
+
+  it('should preserve RECONNECTING status after loadDevices triggered handleApiAuthError (no devices)', async () => {
+    netatmoHandler.status = 'connected';
+    netatmoHandler.loadDevices = sinon.stub().callsFake(async () => {
+      netatmoHandler.status = 'reconnecting';
+      return [];
+    });
+
+    const discoveredDevices = await netatmoHandler.discoverDevices();
+
+    expect(discoveredDevices).to.deep.equal([]);
+    expect(netatmoHandler.status).to.equal('reconnecting');
+  });
+
+  it('should preserve RECONNECTING status after loadDevices triggered handleApiAuthError (devices)', async () => {
+    netatmoHandler.status = 'connected';
+    netatmoHandler.gladys.stateManager.get = sinon.stub().returns(null);
+    netatmoHandler.loadDevices = sinon.stub().callsFake(async () => {
+      netatmoHandler.status = 'reconnecting';
+      return devicesMock;
+    });
+
+    await netatmoHandler.discoverDevices();
+
+    expect(netatmoHandler.status).to.equal('reconnecting');
+  });
 });

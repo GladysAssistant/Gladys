@@ -63,10 +63,12 @@ class ChooseActionType extends Component {
   };
   render(props, { currentAction }) {
     const actionListFiltered = props.action && props.action.filter ? props.action.filter : ACTION_LIST;
-    const options = actionListFiltered.map(action => ({
-      value: action,
-      label: props[`editScene.actions.${action}`]
-    }));
+    const options = actionListFiltered
+      .map(action => ({
+        value: action,
+        label: props[`editScene.actions.${action}`] || action
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
 
     return (
       <div>

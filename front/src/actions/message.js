@@ -58,6 +58,11 @@ function createActions(store) {
       });
       actions.scrollToBottom();
     },
+    setGladysTypingStatus(state, payload) {
+      store.setState({
+        gladysIsTyping: Boolean(payload && payload.thinking)
+      });
+    },
     pushMessage(state, message) {
       store.setState({
         gladysIsTyping: true
@@ -77,12 +82,13 @@ function createActions(store) {
       }, randomWait);
     },
     onKeyPress(state, e) {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
         actions.sendMessage(state);
       }
     },
-    async sendMessage(state) {
-      if (!state.currentMessageTextInput || state.currentMessageTextInput.length === 0) {
+    async sendMessage(state, aiChatModel = 'auto') {
+      if (!state.currentMessageTextInput || state.currentMessageTextInput.trim().length === 0) {
         return;
       }
       store.setState({
@@ -96,6 +102,13 @@ function createActions(store) {
           created_at: new Date(),
           id
         };
+        const messagePayload = {
+          text: messageText,
+          id
+        };
+        if (aiChatModel && aiChatModel !== 'auto') {
+          messagePayload.model = aiChatModel;
+        }
         // we first push the message
         const newState = update(state, {
           messages: {
@@ -111,7 +124,7 @@ function createActions(store) {
         newState.messages = sortMessages(newState.messages);
         store.setState(newState);
         // then we send the message
-        await state.httpClient.post('/api/v1/message', newMessage);
+        await state.httpClient.post('/api/v1/message', messagePayload);
         // then we remove the message loading
         const finalState = update(state, {
           messages: {

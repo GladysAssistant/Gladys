@@ -14,6 +14,7 @@ const CONFIGURATION = {
   GLADYS_MQTT_PASSWORD_KEY: 'GLADYS_MQTT_PASSWORD',
   DOCKER_MQTT_VERSION: 'DOCKER_MQTT_VERSION', // Variable to identify last version of MQTT docker file is installed
   DOCKER_Z2M_VERSION: 'DOCKER_Z2M_VERSION', // Variable to identify last version of Z2M docker file is installed
+  Z2M_FRONTEND_URL: 'Z2M_FRONTEND_URL',
 };
 
 const MQTT_MODE = {
@@ -29,6 +30,7 @@ const SETUP_VARIABLES = [
   CONFIGURATION.GLADYS_MQTT_USERNAME_KEY,
   CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY,
   CONFIGURATION.Z2M_MQTT_MODE,
+  CONFIGURATION.Z2M_FRONTEND_URL,
 ];
 
 const DEFAULT = {
@@ -36,7 +38,7 @@ const DEFAULT = {
     'zigbee2mqtt/#', // Default zigbee2mqtt topic
   ],
   DOCKER_MQTT_VERSION: '4', // Last version of MQTT docker file
-  DOCKER_Z2M_VERSION: '9', // Last version of Z2M docker file,
+  DOCKER_Z2M_VERSION: '10', // Last version of Z2M docker file,
   CONFIGURATION_PATH: 'zigbee2mqtt/z2m/configuration.yaml',
   CONFIGURATION_CONTENT: {
     homeassistant: false,
