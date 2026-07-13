@@ -144,7 +144,7 @@ Aucune modification de `device.setValue.js` ni de `device.notify.js` : `register
 
 Pas de page « à part » dans les Paramètres : une intégration externe se présente et s'utilise **exactement comme une intégration interne**, avec juste un badge « externe ». Un seul type géré en phase 1 : les intégrations de type **« Appareils »** (catégorie `device` du catalogue).
 
-**Dans le catalogue d'intégrations** (`front/src/routes/integration/index.js`) : aujourd'hui la liste vient de JSON statiques (`front/src/config/integrations/devices.json`). On y fusionne les intégrations externes du **store** (`GET /api/v1/external_integration/store`, cf. B.9) — mêmes cartes (nom, image de couverture issue du manifeste ou placeholder), plus un **badge « externe »**, et pour celles installées le badge de statut temps réel (`STATUS_CHANGED`) et le flag « mise à jour disponible ». Cliquer sur une intégration non installée ouvre un écran d'installation : description, avertissement clair (code tiers non audité, accès réseau sortant complet), bouton « Installer » (admin, un clic). Un bouton admin « Installer depuis une image Docker » (mode dev) reste disponible pour les intégrations hors store.
+**Dans le catalogue d'intégrations** (`front/src/routes/integration/index.js`) : aujourd'hui la liste vient de JSON statiques (`front/src/config/integrations/devices.json`). On y fusionne les intégrations externes du **store** (`GET /api/v1/external_integration/store`, cf. B.9) — mêmes cartes (nom, cover re-hébergée par l'indexeur — `cover_url` — ou placeholder), plus un **badge « externe »**, et pour celles installées le badge de statut temps réel (`STATUS_CHANGED`) et le flag « mise à jour disponible ». Cliquer sur une intégration non installée ouvre un écran d'installation : description, avertissement clair (code tiers non audité, accès réseau sortant complet), bouton « Installer » (admin, un clic). Un bouton admin « Installer depuis une image Docker » (mode dev) reste disponible pour les intégrations hors store.
 
 **Une page générique unique** `front/src/routes/integration/all/external-integration/` sert toutes les intégrations externes, sur le modèle exact des pages internes (sidebar `Zigbee2mqttPage`-like, routes dynamiques dans `front/src/components/app.jsx`), avec les 3 écrans :
 
@@ -168,7 +168,7 @@ Modèles de code : `front/src/routes/integration/all/zigbee2mqtt/` (structure 3 
 Le même manifeste est dupliqué dans l'image Docker (LABEL `io.gladysassistant.manifest`, le template le fait automatiquement au build) : le fichier du **repo** fait foi pour le store (c'est lui que le robot scrape) ; le **LABEL** ne sert qu'à l'install « dev » par nom d'image, sans repo GitHub. À l'installation depuis le store, c'est la version de l'index qui est enregistrée dans `t_service.manifest`.
 
 **L'indexeur** — nouveau repo public `GladysAssistant/integration-store` (hors monorepo) :
-- GitHub Action **planifiée toutes les heures** (+ déclenchable manuellement) : recherche GitHub par topic → fetch du `gladys-assistant-integration.json` de chaque repo (raw.githubusercontent) → **validation par script uniquement** (JSON Schema du manifeste, image bien formée, `manifest_version` supporté) → construction de `index.json` enrichi des métadonnées GitHub (stars, date de dernier commit — ranking gratuit sans télémétrie centralisée) → publication sur **GitHub Pages** (statique, CDN). Formats `index.json`/`rejected.json` spécifiés en C.6.
+- GitHub Action **planifiée toutes les heures** (+ déclenchable manuellement) : recherche GitHub par topic → fetch du `gladys-assistant-integration.json` de chaque repo (raw.githubusercontent) → **validation par script uniquement** (JSON Schema du manifeste, référence d'image bien formée, `manifest_version` supporté, cover téléchargée/validée/re-hébergée cf. C.1) → construction de `index.json` enrichi des métadonnées GitHub (stars, date de dernier commit — ranking gratuit sans télémétrie centralisée) → publication sur **GitHub Pages** (statique, CDN). Formats `index.json`/`rejected.json` spécifiés en C.6.
 - Les manifestes invalides sont listés dans un `rejected.json` public avec la raison → un dev diagnostique seul pourquoi son intégration n'apparaît pas, sans ouvrir de ticket.
 - Le code de validation est public : les règles d'admission sont vérifiables par tous, et n'importe qui peut re-générer l'index (fork de l'Action) — le store lui-même est forkable, donc pas de point de contrôle.
 - **Aucune modération en v1** (choix assumé) : pas de blocklist, pas de retrait manuel. La défense, c'est la sandbox (B.2) + l'avertissement à l'installation. Une blocklist resterait ajoutable plus tard côté indexeur sans toucher au client.
@@ -192,7 +192,7 @@ Le même manifeste est dupliqué dans l'image Docker (LABEL `io.gladysassistant.
 - Contrôleurs : supertest ; API-hôte appelée avec un JWT d'intégration généré en seed (pas `authenticatedRequest`, qui est un token utilisateur). **Tests d'isolation tenant obligatoires** (token de A ≠ devices de B, préfixe `external_id` rejeté, access token utilisateur refusé sur l'API-hôte — mauvaise audience).
 - Middleware : 401 (token absent/signature invalide/mauvaise audience/`token_version` obsolète/service non externe). WS : auth OK/KO, commande + ack + timeout (étendre `server/test/websockets/`).
 - Store côté serveur : fetch d'index mocké (nock ou fake), cache local (hit/miss/expiration/index indisponible), filtre de compatibilité de version, détection de mise à jour, install par `store_slug` inconnu → 404, et test anti-collision de routes (`GET .../store` renvoie le catalogue, pas le handler `:selector`, cf. C.5).
-- Indexeur (repo `integration-store`, CI propre hors monorepo) : validation de manifestes valides/invalides, génération `index.json`/`rejected.json` déterministe sur fixtures.
+- Indexeur (repo `integration-store`, CI propre hors monorepo) : validation de manifestes valides/invalides (dont bornes name/description), validation de covers (format/dimensions/poids, warning + placeholder si KO), génération `index.json`/`rejected.json` déterministe sur fixtures.
 - SDK/PoC : suite Mocha propre dans `integration-sdk/node`, hors CI serveur.
 
 ### B.12 Risques assumés (v1)
@@ -262,15 +262,17 @@ Exemple complet (celui du PoC) :
 |---|---|---|---|
 | `manifest_version` | integer | oui | `1` ; rejet si supérieur à la version supportée |
 | `type` | string | oui | `"device"` (seule valeur en v1) |
-| `name` | string | oui | 1–50 caractères |
-| `description` | objet `{lang: string}` | oui | clé `en` obligatoire, autres langues optionnelles |
+| `name` | string | oui | 3–30 caractères (affiché comme titre de la carte du catalogue ; les intégrations internes font 3–23) |
+| `description` | objet `{lang: string}` | oui | clé `en` obligatoire, autres langues optionnelles ; chaque valeur **10–100 caractères** (affichée sur la carte ; les descriptions internes font 23–63, une phrase courte) |
 | `version` | string | oui | semver strict ; doit être bumpé pour déclencher « mise à jour disponible » |
 | `docker_image` | string | oui | référence d'image valide, registre public, tag **ou digest** |
 | `gladys_version` | string | oui | range semver (syntaxe npm) ; sert au filtre de compatibilité |
-| `cover_image` | string | non | URL `https` (affichée dans le catalogue) |
+| `cover_image` | string | non | URL `https` d'une image **JPEG ou PNG**, **800×534 px exactement** (le format unique des covers internes, ratio 3:2), **≤ 150 Ko** (les covers internes font 13–85 Ko). Validée puis **re-hébergée par l'indexeur** (voir ci-dessous) |
 | `config_schema` | array | non | liste **plate** de champs (voir ci-dessous) |
 
 Pas de champ `permissions` en v1 : l'accès réseau sortant est ouvert et l'écran d'installation le dit — on ne spécifie pas ce qu'on ne sait pas appliquer (cf. B.12). Le champ pourra apparaître dans une future `manifest_version` quand une restriction réelle existera.
+
+**Cover re-hébergée par l'indexeur** : à chaque crawl, l'indexeur télécharge la `cover_image`, la valide (magic bytes JPEG/PNG, 800×534, ≤ 150 Ko) et publie une copie sur GitHub Pages ; c'est **cette URL-là** que l'index référence (`cover_url`, cf. C.6). Trois bénéfices : pas de lien mort dans le catalogue, pas de fuite d'IP des utilisateurs vers un serveur tiers à chaque affichage du catalogue, et poids/format garantis. Une cover absente ou invalide ne rejette pas l'intégration : elle est indexée avec un placeholder, et un avertissement (`level: "warning"`) est publié dans `rejected.json`.
 
 **`config_schema`** : volontairement une liste plate de champs, pas du JSON Schema complet — le rendu du formulaire reste déterministe et sans surprise (principe « UI déclarative »). Champs par entrée : `key` (unique, `[a-z0-9_]`), `type` (`string` | `number` | `boolean` | `select` | `secret`), `label` (multi-langue, `en` obligatoire), `description` (multi-langue, optionnel), `required` (défaut `false`), `default`, `min`/`max` (number), `options` (select : `[{ value, label }]`). Les valeurs sont stockées dans `t_variable` scoppées par `service_id` ; les `secret` ne sont **jamais renvoyés au front** (cf. C.5), mais sont fournis à l'intégration.
 
@@ -390,16 +392,18 @@ Routes `/api/v1/external_integration`, auth utilisateur Gladys standard ; **admi
       "store_slug": "john/gladys-open-meteo-demo",
       "repo_url": "https://github.com/john/gladys-open-meteo-demo",
       "manifest": { "...": "manifeste complet validé (C.1)" },
+      "cover_url": "https://<pages-du-store>/covers/john--gladys-open-meteo-demo.jpg",
       "github": { "stars": 12, "pushed_at": "2026-07-10T12:00:00.000Z", "owner_avatar_url": "https://..." }
     }
   ]
 }
 ```
 
-**`rejected.json`** (diagnostic public en self-service) :
+**`rejected.json`** (diagnostic public en self-service ; `level: "error"` = non indexée, `level: "warning"` = indexée avec dégradation, ex. cover remplacée par un placeholder) :
 ```json
 [
-  { "store_slug": "jane/my-integration", "reason": "manifest.version: must be valid semver", "checked_at": "2026-07-13T08:00:00.000Z" }
+  { "store_slug": "jane/my-integration", "level": "error", "reason": "manifest.version: must be valid semver", "checked_at": "2026-07-13T08:00:00.000Z" },
+  { "store_slug": "bob/gladys-foo", "level": "warning", "reason": "cover_image: expected 800x534, got 1200x800 — placeholder used", "checked_at": "2026-07-13T08:00:00.000Z" }
 ]
 ```
 
