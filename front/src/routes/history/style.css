@@ -98,22 +98,85 @@
 }
 
 /* Category group filter chips, sticky while scrolling the feed */
+.groupChipsWrapper {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin-bottom: 0.75rem;
+  background: #f5f7fb;
+}
+
 .groupChips {
   display: flex;
   gap: 0.5rem;
   overflow-x: auto;
   padding: 0.5rem 0;
-  margin-bottom: 0.75rem;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: #f5f7fb;
+  -ms-overflow-style: none;
 }
 
 .groupChips::-webkit-scrollbar {
   display: none;
+}
+
+/* Reveal a thin scrollbar on hover/focus for mouse users (e.g. Windows) */
+.groupChips:hover,
+.groupChips:focus-within {
+  scrollbar-width: thin;
+}
+
+.groupChips:hover::-webkit-scrollbar,
+.groupChips:focus-within::-webkit-scrollbar {
+  display: block;
+  height: 4px;
+}
+
+.groupChips:hover::-webkit-scrollbar-thumb,
+.groupChips:focus-within::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.groupChipsScrollBtn {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  color: #495057;
+  background: #fff;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 40, 100, 0.12);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.groupChipsScrollBtn:hover {
+  color: #467fcf;
+  border-color: #467fcf;
+}
+
+.groupChipsScrollBtnLeft {
+  left: 0;
+}
+
+.groupChipsScrollBtnRight {
+  right: 0;
+}
+
+.groupChipsWrapper:has(.groupChipsScrollBtnLeft) .groupChips {
+  padding-left: 2rem;
+}
+
+.groupChipsWrapper:has(.groupChipsScrollBtnRight) .groupChips {
+  padding-right: 2rem;
 }
 
 .groupChip {
@@ -507,7 +570,7 @@
 }
 
 /* Dark mode: sticky bands must use the same pre-invert bg as .page (see dark-mode.css) */
-:global(.dark-mode) .groupChips,
+:global(.dark-mode) .groupChipsWrapper,
 :global(.dark-mode) .dayHeader {
   background: #e1e8f7 !important;
 }
