@@ -71,7 +71,7 @@ Toutes nullables/défaut pour les services internes existants. `name`/`selector`
 
 - **Statuts** : réutiliser `SERVICE_STATUS` existant en y ajoutant **une seule valeur : `DEGRADED`**. Projection de la machine à états RFC : Installée→`ENABLED`, Démarrage→`LOADING`, En fonctionnement→`RUNNING`, Dégradée→`DEGRADED`, En panne→`ERROR`, Arrêtée→`STOPPED`.
 - **Logs : ni table, ni push.** L'intégration écrit sur stdout/stderr ; Gladys consulte les logs à la demande via l'API Docker (`system.getContainerLogs(container_id)` existant, équivalent `docker logs`).
-- **Constantes** (`server/utils/constants.js`) : `SERVICE_STATUS.DEGRADED`, `SERVICE_TYPES`, `EVENTS.EXTERNAL_INTEGRATION.*`, `WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.*` (front : `STATUS_CHANGED`, `DISCOVERED_DEVICES_UPDATED` ; intégration : `COMMAND`, `COMMAND_RESULT`, `SCAN_REQUEST`, `DEVICE_CREATED`, `DEVICE_UPDATED`, `DEVICE_DELETED`, `HEARTBEAT`, `CONFIG_UPDATED`), `AUTHENTICATION.INTEGRATION_REQUEST`.
+- **Constantes** (`server/utils/constants.js`) : `SERVICE_STATUS.DEGRADED`, `SERVICE_TYPES`, `EVENTS.EXTERNAL_INTEGRATION.*`, `WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.*` (front : `STATUS_CHANGED`, `DISCOVERED_DEVICES_UPDATED` ; intégration : `DEVICE_SET_VALUE`, `DEVICE_POLL`, `COMMAND_RESULT`, `SCAN_REQUEST`, `DEVICE_CREATED`, `DEVICE_UPDATED`, `DEVICE_DELETED`, `HEARTBEAT`, `CONFIG_UPDATED`), `AUTHENTICATION.INTEGRATION_REQUEST`.
 - **Appareils découverts : pas de table.** La liste des appareils découverts publiée par chaque intégration est tenue **en mémoire** dans le superviseur (comme le font les handlers des services internes, ex. philips-hue), perdue au redémarrage et republiée par l'intégration à sa connexion.
 
 ### B.2 Superviseur — `server/lib/external-integration/`
@@ -123,13 +123,13 @@ Ne **pas** exposer ces routes via le gateway Gladys Plus (`setupGateway`).
 Étendre `server/api/websockets/index.js` (même WSS, nouveau `case` dans le switch) : message `AUTHENTICATION.INTEGRATION_REQUEST { token }` → validation du JWT d'intégration (signature + audience + `token_version`, cf. B.3) → `gladys.externalIntegration.integrationConnected(service, ws)`. Heartbeat : `ws.ping()` toutes les 20 s + flag `isAlive` sur `pong` + message applicatif `HEARTBEAT` (maj `last_heartbeat`) ; 2 pings manqués → DEGRADED. Reconnexion gérée par le SDK (backoff), une reconnexion remplace l'ancienne entrée.
 
 **Protocole complet (types et payloads) spécifié en C.4.** Messages descendants (core→intégration) :
-- `COMMAND { message_id, ... }` avec ack `COMMAND_RESULT` (voir B.6) ;
+- des **commandes spécifiques** (un type par action, pas de type générique) : `DEVICE_SET_VALUE`, `DEVICE_POLL` — chacune porte un `message_id` et attend un ack `COMMAND_RESULT` (voir B.6) ;
 - `SCAN_REQUEST` : demande de (re)découverte déclenchée depuis l'onglet Découverte de l'UI — l'intégration répond en republiant via `POST /discovered_device` ;
 - `DEVICE_CREATED` / `DEVICE_UPDATED` / `DEVICE_DELETED { device }` : relayés par les hooks `postCreate`/`postUpdate`/`postDelete` du proxy-service — le core les appelle déjà sur le service propriétaire à chaque geste utilisateur (vérifié : `server/lib/device/device.notify.js`). L'intégration sait ainsi immédiatement quels appareils suivre ou abandonner, sans polling.
 
 ### B.6 Routing des commandes
 
-Aucune modification de `device.setValue.js` ni de `device.notify.js` : `registerProxyService.js` pose dans le stateManager, sous le nom du `t_service` de l'intégration, un objet gelé `{ device: { setValue, postCreate, postUpdate, postDelete } }` — `setValue` route les commandes, les trois hooks relaient les notifications de cycle de vie (B.5). `sendCommand` → WS + ack (timeout 5 s → throw, ex. nouvelle `ExternalIntegrationUnavailableError` dans `utils/coreErrors.js`) ; intégration déconnectée → throw immédiat. Retour d'état réel via `POST /state` (documenter `has_feedback: true` pour les features actionnables).
+Aucune modification de `device.setValue.js` ni de `device.notify.js` : `registerProxyService.js` pose dans le stateManager, sous le nom du `t_service` de l'intégration, un objet gelé `{ device: { setValue, poll, postCreate, postUpdate, postDelete } }` — `setValue` envoie `DEVICE_SET_VALUE`, `poll` envoie `DEVICE_POLL` (appelé par le scheduler core pour les devices à `poll_frequency`, comme pour les services internes), les trois hooks relaient les notifications de cycle de vie (B.5). `sendCommand(type, payload)` → WS + ack (timeout 5 s → throw, ex. nouvelle `ExternalIntegrationUnavailableError` dans `utils/coreErrors.js`) ; intégration déconnectée → throw immédiat. Retour d'état réel via `POST /state` (documenter `has_feedback: true` pour les features actionnables).
 
 ### B.7 API de gestion (admin)
 
@@ -183,8 +183,8 @@ Le même manifeste est dupliqué dans l'image Docker (LABEL `io.gladysassistant.
 ### B.10 SDK Node.js + PoC
 
 - Dossier racine `integration-sdk/` du monorepo en phase 1 (`node/` = futur paquet npm `@gladysassistant/integration-sdk`, `examples/demo/` = PoC) ; extraction en repos dédiés en phase 3, dont un **template de repo publiable** (`gladys-assistant-integration.json` pré-rempli, Dockerfile, workflow GitHub de build/push d'image : créer le repo depuis le template + le taguer suffit à être dans le store). Package.json propre, hors lint/coverage serveur.
-- SDK : classe `GladysIntegration` — lit les env vars, client REST (fetch), WS avec auth + reconnexion + pings, helpers `publishDiscoveredDevices(devices)`, `getDevices()` (devices créés par l'utilisateur), `publishState`, `onCommand` (ack auto), `onScanRequest`, `onDeviceCreated/Updated/Deleted`, `getConfig` + `onConfigUpdated` (rechargement à chaud quand l'utilisateur sauvegarde l'écran Configuration). Pas de helper de logs : l'intégration loggue sur stdout/stderr, récupérés par `docker logs`.
-- **PoC `gladys-integration-demo`** (testable sans matériel, couvre tout le cycle y compris les 3 écrans) : publie deux appareils découverts — un capteur température Open-Meteo (API publique sans clé) et un interrupteur virtuel. L'utilisateur les crée depuis l'écran Découverte ; l'intégration publie alors la température toutes les 10 min et répond aux commandes de l'interrupteur (reçoit `onCommand`, republie l'état). Son manifeste embarque un `config_schema` (latitude/longitude + intervalle de rafraîchissement) pour exercer le formulaire généré de l'écran Configuration et `onConfigUpdated`. Dockerfile `node:22-alpine`, `USER node`, compatible rootfs read-only. Manifeste dans le LABEL.
+- SDK : classe `GladysIntegration` — lit les env vars, client REST (fetch), WS avec auth + reconnexion + pings, helpers `publishDiscoveredDevices(devices)`, `getDevices()` (devices créés par l'utilisateur), `publishState`, `onSetValue` + `onPoll` (ack auto), `onScanRequest`, `onDeviceCreated/Updated/Deleted`, `getConfig` + `onConfigUpdated` (rechargement à chaud quand l'utilisateur sauvegarde l'écran Configuration). Pas de helper de logs : l'intégration loggue sur stdout/stderr, récupérés par `docker logs`.
+- **PoC `gladys-integration-demo`** (testable sans matériel, couvre tout le cycle y compris les 3 écrans) : publie deux appareils découverts — un capteur température Open-Meteo (API publique sans clé) et un interrupteur virtuel. L'utilisateur les crée depuis l'écran Découverte ; l'intégration publie alors la température toutes les 10 min et répond aux commandes de l'interrupteur (reçoit `onSetValue`, republie l'état). Son manifeste embarque un `config_schema` (latitude/longitude + intervalle de rafraîchissement) pour exercer le formulaire généré de l'écran Configuration et `onConfigUpdated`. Dockerfile `node:22-alpine`, `USER node`, compatible rootfs read-only. Manifeste dans le LABEL.
 
 ### B.11 Tests (patch coverage 100 % exigé en CI)
 
@@ -343,12 +343,15 @@ Connexion : même hôte/port que l'API-hôte (`ws://<gateway>:<port>/`, même se
 |---|---|---|
 | intégration → core | `authenticate.integration-request` | `{ "token": "<JWT>" }` — **premier message obligatoire** |
 | core → intégration | `authentication.connected` | `{}` (réutilisé tel quel ; échec = close code `4000` `INVALID_ACCESS_TOKEN`) |
-| core → intégration | `external-integration.command` | `{ "message_id": "uuid", "action": "device.set-value", "device": { "external_id", "selector", "params" }, "device_feature": { "external_id", "category", "type" }, "value": 1 }` |
-| intégration → core | `external-integration.command-result` | `{ "message_id": "uuid", "success": true }` ou `{ "message_id": "uuid", "success": false, "error": "..." }` — attendu sous **5 s**, sinon la commande échoue côté core |
+| core → intégration | `external-integration.device.set-value` | `{ "message_id": "uuid", "device": { "external_id", "selector", "params" }, "device_feature": { "external_id", "category", "type" }, "value": 1 }` |
+| core → intégration | `external-integration.device.poll` | `{ "message_id": "uuid", "device": { "external_id", "selector", "params" } }` — demande de relève pour un device à `poll_frequency` ; les états remontent par `POST /state` |
+| intégration → core | `external-integration.command-result` | `{ "message_id": "uuid", "success": true }` ou `{ "message_id": "uuid", "success": false, "error": "..." }` — ack de **toute** commande porteuse d'un `message_id`, attendu sous **5 s**, sinon la commande échoue côté core |
 | core → intégration | `external-integration.scan-request` | `{}` — l'intégration répond en republiant `POST /discovered_device` |
 | core → intégration | `external-integration.device-created` / `.device-updated` / `.device-deleted` | `{ "device": <device standard> }` (relais des hooks `postCreate`/`postUpdate`/`postDelete`) |
 | core → intégration | `external-integration.config-updated` | `{ "config": { ... } }` — nouvelles valeurs complètes (pas besoin de re-fetch) |
 | intégration → core | `external-integration.heartbeat` | `{}` — applicatif, optionnel si la lib WS répond aux pings protocole |
+
+Convention de nommage des commandes : **un type spécifique par action**, `external-integration.<domaine>.<action>` — pas de type générique avec champ `action`. Les commandes futures (phase 2 : `camera.get-image`, `camera.start-streaming`… selon les types d'intégrations ajoutés) suivront ce schéma, chacune avec `message_id` + ack `command-result` ; une intégration ignore silencieusement un type qu'elle ne connaît pas.
 
 Santé : le core envoie un **ping WebSocket protocolaire** toutes les 20 s ; toute lib WS standard y répond automatiquement (pong). 2 pongs manqués ou socket fermée → statut `DEGRADED`. Une reconnexion remplace l'ancienne connexion enregistrée.
 
