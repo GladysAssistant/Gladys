@@ -4733,6 +4733,7 @@
     "scrollLeft": "Scroll filters left",
     "scrollRight": "Scroll filters right",
     "loadMore": "Load more",
+    "searchingOlder": "Searching activity — {{date}}…",
     "newEvents": {
       "one": "1 new event",
       "other": "{{count}} new events"

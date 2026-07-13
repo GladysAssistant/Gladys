@@ -9,6 +9,12 @@ import { ALL_GROUPS } from './categoryGroups';
 
 const PAGE_SIZE = 80;
 const MAX_EVENTS_IN_MEMORY = 1000;
+// Progressive background search: each request is bounded to a time window
+// ([since, before)) so the server always answers fast; results are displayed as
+// they arrive and the search keeps widening in the background (newest window
+// first, geometric growth) until the page is full or history is exhausted
+// (final unbounded request).
+const SEARCH_WINDOWS_MONTHS = [1, 2, 4, 8, 16, 32];
 // Live states are buffered and flushed at this interval instead of triggering a
 // render per websocket message. A chatty installation can emit hundreds of
 // states per second; without batching, each one would run a full setState +
@@ -92,51 +98,100 @@ class History extends Component {
   };
 
   getEvents = async ({ reset = false } = {}) => {
-    this.setState({ loading: true, error: false });
+    // Any new search (filter change, pagination) invalidates the windows still
+    // being probed in the background by the previous one.
+    this.searchGeneration += 1;
+    const generation = this.searchGeneration;
+    this.setState({ loading: true, error: false, searchedUntil: null });
     if (reset) {
       // Drop any live states buffered under the previous filter/date context.
       this.liveEventBuffer = [];
     }
     try {
-      const params = this.buildQueryParams();
+      const baseParams = this.buildQueryParams();
+      let before;
+      let beforeId = null;
       if (!reset && this.state.events.length > 0) {
         const lastEvent = this.state.events[this.state.events.length - 1];
-        params.before = lastEvent.created_at;
+        before = new Date(lastEvent.created_at);
         // Compound cursor: pass the last feature id so the server can break
         // created_at ties deterministically and never skip a state.
         if (lastEvent.device_feature && lastEvent.device_feature.id) {
-          params.before_id = lastEvent.device_feature.id;
+          beforeId = lastEvent.device_feature.id;
         }
       } else if (this.state.selectedDate) {
         // Jump to the end of the selected day, in the user's timezone
-        params.before = dayjs(this.state.selectedDate)
+        before = dayjs(this.state.selectedDate)
           .endOf('day')
-          .toISOString();
+          .toDate();
+      } else {
+        before = new Date();
       }
-      const newEvents = await this.props.httpClient.get('/api/v1/device_feature/states_history', params);
-      this.setState(prevState => {
-        let events;
-        if (reset) {
-          events = newEvents;
-        } else {
-          events = prevState.events.concat(newEvents);
+
+      // Probe [since, before) windows from the cursor backwards, widening
+      // geometrically, and render each batch as soon as it arrives. The final
+      // iteration has no lower bound: it is the only potentially slow request,
+      // and it only runs when every bounded window was too sparse.
+      let collected = 0;
+      let windowUpper = before;
+      let windowUpperId = beforeId;
+      let exhausted = false;
+      let firstBatch = reset;
+      for (let i = 0; i <= SEARCH_WINDOWS_MONTHS.length && collected < PAGE_SIZE && !exhausted; i += 1) {
+        const isFinalUnbounded = i === SEARCH_WINDOWS_MONTHS.length;
+        const since = isFinalUnbounded
+          ? null
+          : dayjs(before)
+              .subtract(SEARCH_WINDOWS_MONTHS[i], 'month')
+              .toDate();
+        const params = { ...baseParams, take: PAGE_SIZE - collected, before: windowUpper.toISOString() };
+        if (windowUpperId) {
+          params.before_id = windowUpperId;
+        }
+        if (since) {
+          params.since = since.toISOString();
+        }
+        // eslint-disable-next-line no-await-in-loop
+        const newEvents = await this.props.httpClient.get('/api/v1/device_feature/states_history', params);
+        if (generation !== this.searchGeneration) {
+          return;
+        }
+        collected += newEvents.length;
+        if (isFinalUnbounded) {
+          exhausted = newEvents.length < params.take;
+        }
+        const resetEvents = firstBatch;
+        firstBatch = false;
+        this.setState(prevState => {
+          let events = resetEvents ? newEvents : prevState.events.concat(newEvents);
           // Keep the array bounded during infinite scroll: drop the newest events
           // already scrolled past (array head) and keep the window being browsed.
           if (events.length > MAX_EVENTS_IN_MEMORY) {
             events = events.slice(events.length - MAX_EVENTS_IN_MEMORY);
           }
+          return {
+            events,
+            initialized: true,
+            searchedUntil: since,
+            pendingLiveEvents: resetEvents ? [] : prevState.pendingLiveEvents
+          };
+        });
+        // The next window continues strictly below this one: states exactly on
+        // the boundary were already returned by this window (since is inclusive).
+        if (since) {
+          windowUpper = since;
+          windowUpperId = null;
         }
-        return {
-          events,
-          hasMore: newEvents.length === PAGE_SIZE,
-          loading: false,
-          initialized: true,
-          pendingLiveEvents: reset ? [] : prevState.pendingLiveEvents
-        };
-      });
+      }
+      if (generation !== this.searchGeneration) {
+        return;
+      }
+      this.setState({ loading: false, initialized: true, hasMore: !exhausted, searchedUntil: null });
     } catch (e) {
       console.error(e);
-      this.setState({ loading: false, error: true, initialized: true });
+      if (generation === this.searchGeneration) {
+        this.setState({ loading: false, error: true, initialized: true, searchedUntil: null });
+      }
     }
   };
 
@@ -304,12 +359,14 @@ class History extends Component {
       initialized: false,
       hasMore: false,
       error: false,
-      featuresLoaded: false
+      featuresLoaded: false,
+      searchedUntil: null
     };
     this.featuresBySelector = null;
     this.liveEventBuffer = [];
     this.liveFlushTimeout = null;
     this.autoLoadsWithoutScroll = 0;
+    this.searchGeneration = 0;
     this.debouncedRefreshEvents = debounce(this.refreshEvents.bind(this), 300);
   }
 

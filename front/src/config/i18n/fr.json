@@ -4733,6 +4733,7 @@
     "scrollLeft": "Faire défiler les filtres vers la gauche",
     "scrollRight": "Faire défiler les filtres vers la droite",
     "loadMore": "Charger plus",
+    "searchingOlder": "Recherche d'activités — {{date}}…",
     "newEvents": {
       "one": "1 nouvel événement",
       "other": "{{count}} nouveaux événements"
