@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import EventLine from './EventLine';
+import GroupChipsScroll from './GroupChipsScroll';
 import { ALL_GROUPS } from './categoryGroups';
 import style from './style.css';
 
@@ -143,7 +144,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
               </div>
             </div>
 
-            <div class={style.groupChips}>
+            <GroupChipsScroll>
               <button
                 type="button"
                 class={cx(style.groupChip, {
@@ -166,7 +167,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
                   <Text id={`history.groups.${group.id}`} />
                 </button>
               ))}
-            </div>
+            </GroupChipsScroll>
 
             {props.selectedDate && (
               <div class={style.pastBanner}>

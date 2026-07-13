@@ -4730,6 +4730,8 @@
     "backToLive": "Revenir au direct",
     "allRooms": "Toutes les pièces",
     "searchPlaceholder": "Rechercher un appareil",
+    "scrollLeft": "Faire défiler les filtres vers la gauche",
+    "scrollRight": "Faire défiler les filtres vers la droite",
     "loadMore": "Charger plus",
     "newEvents": {
       "one": "1 nouvel événement",
