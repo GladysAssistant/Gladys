@@ -9,7 +9,9 @@ const LinkBox = ({ box }) => {
   const url = get(box, 'url', '');
   const icon = get(box, 'icon', DEFAULT_ICON);
 
-  if (!url) {
+  const isSafeUrl = /^(https?:|\/)/i.test(url);
+
+  if (!url || !isSafeUrl) {
     return (
       <div class="card">
         <div class="card-body text-muted text-center">
