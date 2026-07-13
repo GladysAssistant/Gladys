@@ -43,7 +43,7 @@ Décisions de cadrage validées avec le mainteneur :
 |---|---|---|
 | **1** | API-hôte + WS, superviseur, auth, API admin, **store décentralisé** (indexeur + catalogue + install 1 clic + mises à jour), front au niveau des intégrations internes : entrée dans le catalogue (badge « externe ») + page générique à 3 écrans Appareils / Découverte / Configuration (formulaire généré depuis le `config_schema`), SDK Node + template + PoC. Install « dev » par image Docker conservée. | N'importe quel dev tague son repo → son intégration apparaît dans le catalogue de toutes les Gladys sans aucune approbation → un utilisateur l'installe en un clic, ses appareils découverts sont créés depuis l'UI, actionnables, configurables via formulaire généré ; l'intégration survit à un kill (redémarrage auto), passe « En panne » avec logs après échecs répétés. |
 | **2** | Découverte médiée (mDNS/USB par le core), widgets de config avancés, autres types d'intégrations que « Appareils » (communication, météo…). | Une intégration détecte son matériel sans config manuelle. |
-| **3** | Écosystème : SDK/template extraits en repos dédiés, doc publique API-hôte, ranking/stats du store, durcissement supply-chain (épinglage par digest, signature d'images ?). | Écosystème auto-suffisant, sans intervention du mainteneur. |
+| **3** | Écosystème : doc publique API-hôte, SDKs communautaires d'autres langages, ranking/stats du store, durcissement supply-chain (épinglage par digest, signature d'images ?). | Écosystème auto-suffisant, sans intervention du mainteneur. |
 
 ## B. Plan détaillé — Phase 1
 
@@ -191,11 +191,14 @@ Le même manifeste est dupliqué dans l'image Docker (LABEL `io.gladysassistant.
 
 **Résilience, en résumé** : GitHub Pages statique en façade (pas de rate limit, CDN), cache local en second rideau, runtime totalement découplé du store en dernier ressort. Le pire scénario (GitHub entièrement down) suspend la découverte de nouvelles intégrations, jamais le fonctionnement de l'existant.
 
-### B.10 SDK Node.js + PoC
+### B.10 SDK JS + PoC : repo dédié `GladysAssistant/integration-sdk-js`
 
-- Dossier racine `integration-sdk/` du monorepo en phase 1 (`node/` = futur paquet npm `@gladysassistant/integration-sdk`, `examples/demo/` = PoC) ; extraction en repos dédiés en phase 3, dont un **template de repo publiable** (`gladys-assistant-integration.json` pré-rempli, Dockerfile, workflow GitHub de build/push d'image **multi-arch `linux/amd64` + `linux/arm64` via buildx** — cf. B.12.7 : créer le repo depuis le template + le taguer suffit à être dans le store, Raspberry Pi inclus). Package.json propre, hors lint/coverage serveur.
-- SDK : classe `GladysIntegration` — lit les env vars, client REST (fetch), WS avec auth + reconnexion + pings, helpers `publishDiscoveredDevices(devices)`, `getDevices()` (devices créés par l'utilisateur), `publishState`, `onSetValue` + `onPoll` (ack auto), `onScanRequest`, `onDeviceCreated/Updated/Deleted`, `getConfig` + `onConfigUpdated` (rechargement à chaud quand l'utilisateur sauvegarde l'écran Configuration). Pas de helper de logs : l'intégration loggue sur stdout/stderr, récupérés par `docker logs`.
-- **PoC `gladys-integration-demo`** (testable sans matériel, couvre tout le cycle y compris les 3 écrans) : publie deux appareils découverts — un capteur température Open-Meteo (API publique sans clé) et un interrupteur virtuel. L'utilisateur les crée depuis l'écran Découverte ; l'intégration publie alors la température toutes les 10 min et répond aux commandes de l'interrupteur (reçoit `onSetValue`, republie l'état). Son manifeste embarque un `config_schema` (latitude/longitude + intervalle de rafraîchissement) pour exercer le formulaire généré de l'écran Configuration et `onConfigUpdated`. Dockerfile `node:22-alpine`, `USER node`, compatible rootfs read-only. Manifeste dans le LABEL.
+**Repo dédié dès la phase 1** (pas un dossier du monorepo) : versioning npm indépendant du rythme de release Gladys, CI propre, et c'est le repo que les devs tiers clonent — ils n'ont pas à toucher au monorepo. Il ne dépend **que des contrats C.2–C.4** (aucun import du code Gladys).
+
+- **Paquet npm `@gladysassistant/integration-sdk`** : Node ≥ 20, une seule dépendance runtime (`ws`), typings TypeScript fournis (`.d.ts`), CommonJS + ESM. **API publique complète spécifiée en C.8.**
+- **`examples/demo/` = le PoC `gladys-integration-demo`** (testable sans matériel, couvre tout le cycle y compris les 3 écrans) : publie deux appareils découverts — un capteur température Open-Meteo (API publique sans clé) et un interrupteur virtuel. L'utilisateur les crée depuis l'écran Découverte ; l'intégration publie alors la température toutes les 10 min et répond aux commandes de l'interrupteur (reçoit `onSetValue`, republie l'état). Son manifeste embarque un `config_schema` (latitude/longitude + intervalle de rafraîchissement) pour exercer le formulaire généré de l'écran Configuration et `onConfigUpdated`. Dockerfile `node:22-alpine`, `USER node`, compatible rootfs read-only, build **multi-arch `linux/amd64` + `linux/arm64` via buildx** (cf. B.12.7). Manifeste dans le repo + LABEL.
+- **Template** : au moment du e2e, la demo est publiée comme repo public autonome (topic + image sur registre) et marquée **« Template repository » GitHub** — « Use this template » + éditer le manifeste + taguer = être dans le store. Pas de 4ᵉ repo à maintenir : la demo *est* le template.
+- Pas de helper de logs : l'intégration loggue sur stdout/stderr, récupérés par `docker logs`.
 
 ### B.11 Tests (patch coverage 100 % exigé en CI)
 
@@ -204,7 +207,7 @@ Le même manifeste est dupliqué dans l'image Docker (LABEL `io.gladysassistant.
 - Middleware : 401 (token absent/signature invalide/mauvaise audience/`token_version` obsolète/service non externe). WS : auth OK/KO, commande + ack + timeout (étendre `server/test/websockets/`).
 - Store côté serveur : fetch d'index mocké (nock ou fake), cache local (hit/miss/expiration/index indisponible), filtre de compatibilité de version, détection de mise à jour, install par `store_slug` inconnu → 404, install par `repo_url` (fetch GitHub mocké : succès, repo introuvable → 404, manifeste absent/invalide → 422), et test anti-collision de routes (`GET .../store` renvoie le catalogue, pas le handler `:selector`, cf. C.5).
 - Indexeur (repo `integration-store`, CI propre hors monorepo) : validation de manifestes valides/invalides (dont bornes name/description), validation de covers (format/dimensions/poids, warning + placeholder si KO), génération `index.json`/`rejected.json` déterministe sur fixtures.
-- SDK/PoC : suite Mocha propre dans `integration-sdk/node`, hors CI serveur.
+- SDK/PoC (repo `integration-sdk-js`, CI propre) : tests contre un faux serveur local (endpoints C.3 mockés + WSS de test) — auth, resync à la reconnexion, ack auto (résout/throw/absent), backoff, `publishState` batch, `externalId()`.
 
 ### B.12 Risques assumés (v1)
 
@@ -496,6 +499,81 @@ Justification champ par champ :
 
 Recréation de conteneur (update, régénération de token, changement de descripteur) = destroy + create avec les mêmes `Binds` : `/data` est la seule mémoire persistante du conteneur, tout le reste est jetable par design.
 
+### C.8 SDK JS : API publique de `@gladysassistant/integration-sdk`
+
+Exemple complet (la demo tient en ~40 lignes) :
+
+```js
+const { GladysIntegration } = require('@gladysassistant/integration-sdk');
+
+// Toutes les options sont lues depuis les env vars du conteneur (C.7) par défaut ;
+// on peut les surcharger pour le dev hors Docker.
+const gladys = new GladysIntegration();
+
+gladys.onScanRequest(async () => {
+  await gladys.publishDiscoveredDevices([
+    {
+      name: 'Interrupteur virtuel',
+      external_id: gladys.externalId('switch'),
+      features: [
+        {
+          name: 'On/Off',
+          external_id: gladys.externalId('switch:binary'),
+          category: 'switch',
+          type: 'binary',
+          min: 0,
+          max: 1,
+          read_only: false,
+          has_feedback: true,
+          keep_history: true
+        }
+      ]
+    }
+  ]);
+});
+
+gladys.onSetValue(async (device, feature, value) => {
+  // résoudre = ack success:true ; throw = ack success:false + message
+  await gladys.publishState(feature.external_id, value);
+});
+
+gladys.onConfigUpdated(async (config) => {
+  console.log('Nouvelle config', config); // stdout → docker logs
+});
+
+await gladys.connect(); // résout une fois authentifié
+```
+
+**Constructeur** — `new GladysIntegration(options?)` : `hostApiUrl` (défaut `GLADYS_HOST_API_URL`), `token` (défaut `GLADYS_INTEGRATION_TOKEN`), `selector` (défaut `GLADYS_INTEGRATION_SELECTOR`). Throw immédiat si une valeur manque (ni option ni env var).
+
+**Méthodes** (toutes retournent des Promises ; les erreurs HTTP sont levées en `GladysApiError { status, code, message }`) :
+
+| Méthode | Contrat |
+|---|---|
+| `connect()` | ouvre le WS, s'authentifie (`authenticate.integration-request`), **resynchronise** (`GET /device` + `GET /config`, cf. C.4 fiabilité), puis résout. Reconnexion automatique à vie avec backoff `min(1s·2^n, 60s)` ; chaque reconnexion refait auth + resync |
+| `disconnect()` | ferme proprement (plus de reconnexion) |
+| `externalId(suffix)` | helper → `` `ext:${selector}:${suffix}` `` (la seule façon documentée de construire un `external_id`) |
+| `publishDiscoveredDevices(devices)` | `POST /discovered_device` (liste complète, remplace la précédente) |
+| `getDevices()` | `GET /device` → devices créés par l'utilisateur ; met aussi à jour `gladys.devices` |
+| `publishState(featureExternalId, value)` | `POST /state` — `value` number, ou `{ text }`, ou `{ state, created_at }` pour un état passé |
+| `publishStates(states)` | batch `POST /state` (max 100, cf. C.3) |
+| `getConfig()` / `setConfig(partialConfig)` | `GET` / `POST /config` ; `getConfig` met aussi à jour `gladys.config` |
+| `getStatus()` | `GET /status` |
+
+**Handlers** (enregistrement avant `connect()` ; **ack automatique** pour les commandes : le handler résout → `command-result success:true`, il throw → `success:false` avec `error.message`, handler absent → `success:false "not implemented"`) :
+
+| Handler | Signature du callback |
+|---|---|
+| `onSetValue(cb)` | `(device, deviceFeature, value) => Promise` |
+| `onPoll(cb)` | `(device) => Promise` (répondre en publiant les états via `publishState`) |
+| `onScanRequest(cb)` | `() => Promise` (répondre via `publishDiscoveredDevices`) |
+| `onDeviceCreated(cb)` / `onDeviceUpdated(cb)` / `onDeviceDeleted(cb)` | `(device) => Promise` |
+| `onConfigUpdated(cb)` | `(config) => Promise` (valeurs complètes, cf. C.4) |
+
+**État local tenu par le SDK** (rafraîchi à chaque (re)connexion et par les événements `device-created/updated/deleted` et `config-updated`) : `gladys.devices` (array), `gladys.config` (objet), `gladys.connected` (boolean). Cycle de vie observable : `gladys.on('connected')`, `gladys.on('disconnected')` (la classe étend `EventEmitter`) — utile pour suspendre un polling quand Gladys est injoignable.
+
+**Garanties de comportement** : répond aux pings WS protocolaires (natif lib `ws`) ; ne loggue rien par défaut (stdout appartient à l'intégration) sauf `DEBUG=gladys-integration-sdk` ; aucun état persisté sur disque par le SDK (tout se resynchronise, `/data` reste à la main de l'intégration) ; un type de message inconnu est ignoré silencieusement (compatibilité ascendante, cf. C.4).
+
 ## Ordre d'implémentation (jalons = commits d'une seule PR)
 
 Une **seule PR de bout en bout** sur le monorepo — c'est elle que le mainteneur teste (checkout d'une branche, un build, tout le parcours). Les jalons ci-dessous sont l'**ordre de travail interne** : chacun correspond à un commit (ou groupe de commits) cohérent avec ses tests verts, ce qui permet une review commit par commit et un bisect facile, sans éparpiller la feature en morceaux non testables.
@@ -505,18 +583,19 @@ Une **seule PR de bout en bout** sur le monorepo — c'est elle que le mainteneu
 3. **Jalon 3 — WS + commandes + santé** : extension WebsocketManager, connected/disconnected, `sendCommand` + ack/timeout, proxy-service (setValue + postCreate/postUpdate/postDelete), scan request, heartbeat, checkHealth + backoff + DEGRADED/FAILED. → machine à états complète, `setValue` atteint le conteneur, l'intégration est notifiée des créations/suppressions.
 4. **Jalon 4 — Store côté serveur** : migration `store_slug`, lib `store/` (fetch + cache + compatibilité + updates), endpoints `GET .../store`, `POST .../store/refresh`, install par `store_slug`, `POST .../:selector/update` + tests. En parallèle (hors monorepo) : repo `GladysAssistant/integration-store` (Action d'indexation, JSON Schema du manifeste, GitHub Pages). → le catalogue est alimenté par l'index, install/update en un clic par API.
 5. **Jalon 5 — Front** : intégrations externes du store dans le catalogue (badge « externe », écran d'installation avec avertissement, statut temps réel, mise à jour disponible, install dev), page générique 3 écrans Appareils/Découverte/Configuration (formulaire généré depuis `config_schema`), logs, i18n.
-6. **Jalon 6 — SDK + template + PoC + doc** : `integration-sdk/node`, template de repo publiable (manifeste + workflow de build d'image prêt), exemple demo, doc API-hôte + doc « publier son intégration », parcours e2e documenté.
+Le SDK, le PoC et le template ne sont **pas** des jalons du monorepo : ils constituent le chantier `integration-sdk-js` (B.10, C.8), mené en parallèle dans son propre repo.
 
 ## Répartition par repo (exécution en parallèle)
 
-Deux chantiers indépendants, un par repo — le contrat entre les deux est `index.json`/`manifest.schema.json` (C.1, C.6), donc ils peuvent avancer en parallèle avec des fixtures :
+Trois chantiers indépendants, un par repo — les contrats qui les découplent sont tous en section C (`manifest.schema.json`, `index.json`, API-hôte, protocole WS), donc ils peuvent avancer en parallèle avec des fixtures/mocks :
 
 | Chantier | Repo | Périmètre (sections) | Consignes d'exécution |
 |---|---|---|---|
-| **Stack Gladys** | `GladysAssistant/Gladys` (monorepo) | B.1–B.8, B.10, B.11 (hors indexeur), C.2–C.5, C.7 — serveur, front, SDK, PoC, template | **Une seule PR de bout en bout, testable par le mainteneur**, structurée en **un commit (ou groupe de commits) par jalon** (1 → 6, tests verts à chaque jalon — la review se fait commit par commit) ; PR ouverte en draft dès le jalon 1 pour faire tourner la CI en continu ; embarque une **copie vendorée** du `manifest.schema.json` |
+| **Stack Gladys** | `GladysAssistant/Gladys` (monorepo) | B.1–B.9 (côté Gladys), B.11, C.2–C.5, C.7 — serveur + front | **Une seule PR de bout en bout, testable par le mainteneur**, structurée en **un commit (ou groupe de commits) par jalon** (1 → 5, tests verts à chaque jalon — la review se fait commit par commit) ; PR ouverte en draft dès le jalon 1 pour faire tourner la CI en continu ; embarque une **copie vendorée** du `manifest.schema.json` |
 | **Indexeur du store** | `GladysAssistant/integration-store` (nouveau) | B.9 (indexeur), B.11 (tests indexeur), C.1, C.6 | **Propriétaire canonique du `manifest.schema.json`** (publié sur Pages à côté de l'index) ; Action planifiée + tests sur fixtures, CI propre |
+| **SDK JS + PoC** | `GladysAssistant/integration-sdk-js` (nouveau) | B.10, C.8 (+ consomme C.2–C.4 et C.7) | Paquet npm `@gladysassistant/integration-sdk` + `examples/demo` ; **ne dépend que des contrats C, aucun import du monorepo** ; testable contre un faux serveur (mocks des endpoints C.3 + WS C.4) ; doc « publier son intégration » dans le README |
 
-Hors code (étapes manuelles, après les deux chantiers) : activer GitHub Pages sur `integration-store`, et publier l'intégration demo **comme le ferait un dev tiers** (repo public + topic + image poussée sur un registre public) pour dérouler le parcours e2e de la section Vérification.
+Hors code (étapes manuelles, après les chantiers) : activer GitHub Pages sur `integration-store`, publier la demo **comme le ferait un dev tiers** (repo public autonome + topic + image multi-arch sur un registre) et la marquer « Template repository » (elle sert de template officiel, cf. B.10), puis dérouler le parcours e2e de la section Vérification.
 
 ## Fichiers critiques existants
 
