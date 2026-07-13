@@ -10,6 +10,7 @@ const mqttHandler = {
   saveConfiguration: fake.returns(true),
   installContainer: fake.returns(true),
   setDebugMode: fake.returns(null),
+  getHomeAssistantDiscoveredDevices: fake.returns([]),
 };
 
 describe('POST /api/v1/service/mqtt/connect', () => {
@@ -145,6 +146,30 @@ describe('POST /api/v1/service/mqtt/config/docker', () => {
     await controller['post /api/v1/service/mqtt/config/docker'].controller(req, res);
     assert.calledOnce(mqttHandler.installContainer);
     assert.calledOnce(res.json);
+  });
+});
+
+describe('GET /api/v1/service/mqtt/discovery', () => {
+  let controller;
+
+  beforeEach(() => {
+    controller = MqttController(mqttHandler);
+    sinon.reset();
+  });
+
+  it('should return Home Assistant discovered devices', async () => {
+    const req = {
+      query: {
+        filter_existing: 'true',
+      },
+    };
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/mqtt/discovery'].controller(req, res);
+    assert.calledWith(mqttHandler.getHomeAssistantDiscoveredDevices, req.query);
+    assert.calledWith(res.json, []);
   });
 });
 

@@ -14,6 +14,9 @@ const gladys = {
   system: {
     isDocker: fake.resolves(false),
   },
+  device: {
+    get: fake.resolves([]),
+  },
 };
 
 const MqttHandler = require('../../../services/mqtt/lib');
@@ -34,7 +37,7 @@ describe('MqttHandler', () => {
   it('should have binded topics', async () => {
     await mqttHandler.init();
 
-    expect(Object.keys(mqttHandler.topicBinds)).deep.eq(['gladys/master/#']);
+    expect(Object.keys(mqttHandler.topicBinds)).deep.eq(['gladys/master/#', 'homeassistant/#']);
 
     assert.callCount(gladys.variable.getValue, 3);
     assert.calledOnce(MockedMqttClient.internalConnect);

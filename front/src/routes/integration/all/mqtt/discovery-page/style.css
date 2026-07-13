@@ -1,0 +1,8 @@
+.emptyStateDivBox {
+  margin-top: 60px;
+  margin-bottom: 60px;
+}
+
+.mqttDiscoveryListBody {
+  min-height: 200px;
+}

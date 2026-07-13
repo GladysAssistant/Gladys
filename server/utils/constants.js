@@ -1482,6 +1482,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ERROR: 'mqtt.error',
     INSTALLATION_STATUS: 'mqtt.install-status',
     DEBUG_NEW_MQTT_MESSAGE: 'mqtt.debug.new-mqtt-message',
+    HA_DISCOVERY_DEVICES_UPDATED: 'mqtt.ha-discovery.devices-updated',
   },
   ZWAVEJS_UI: {
     CONNECTED: 'zwavejs-ui.connected',
