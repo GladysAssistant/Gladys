@@ -26,8 +26,8 @@ Décisions de cadrage validées avec le mainteneur :
 ```
 
 - **Superviseur** (`server/lib/external-integration/`) : cycle de vie complet — `Installée → Démarrage → En fonctionnement → Dégradée → En panne → Arrêtée` — persisté en DB et poussé au front en temps réel.
-- **API-hôte REST** (`/api/integration/v1/*`) : seule surface intégration→core, délègue aux libs existantes (`gladys.device.create`, `saveState`, `gladys.variable`), isolation « tenant » stricte par clé API.
-- **WS intégrations** : extension du `WebsocketManager` existant, auth par api_key ; canal core→intégration (commandes device, ping/pong, config).
+- **API-hôte REST** (`/api/integration/v1/*`) : seule surface intégration→core, délègue aux libs existantes (`saveState`, `gladys.variable`), isolation « tenant » stricte par clé API. **L'intégration ne crée ni ne supprime jamais de device** : elle publie des *appareils découverts*, et c'est l'utilisateur qui crée/modifie/supprime depuis l'interface (même pattern que les intégrations internes avec leur onglet « Découverte »).
+- **WS intégrations** : extension du `WebsocketManager` existant, auth par api_key ; canal core→intégration (commandes device, demandes de scan, notifications de cycle de vie des devices, ping/pong, config).
 - **Manifeste** : JSON embarqué dans l'image Docker (LABEL `io.gladysassistant.manifest`) : nom, version, versions Gladys compatibles, permissions (hôtes réseau, périphériques), schéma de config (phase 2). Champ `manifest_version: 1` figé dès la v1.
 - **Pont device** : chaque intégration externe a une ligne `t_service` ; ses devices y sont rattachés et un *proxy service* dans le stateManager rend `device.setValue` fonctionnel **sans modifier le core device**.
 
@@ -35,7 +35,7 @@ Décisions de cadrage validées avec le mainteneur :
 
 | Phase | Contenu | Livrable observable |
 |---|---|---|
-| **1** | API-hôte + WS, superviseur, auth, API admin, page front minimale, SDK Node + PoC. Install « dev » par image Docker. | Un admin colle un nom d'image → l'intégration démarre, crée des devices actionnables, survit à un kill (redémarrage auto), passe « En panne » avec logs après échecs répétés. |
+| **1** | API-hôte + WS, superviseur, auth, API admin, page front minimale (gestion + onglet Découverte générique), SDK Node + PoC. Install « dev » par image Docker. | Un admin colle un nom d'image → l'intégration démarre, publie ses appareils découverts, l'utilisateur les crée depuis l'UI et les actionne ; l'intégration survit à un kill (redémarrage auto), passe « En panne » avec logs après échecs répétés. |
 | **2** | Config déclarative : validation `config_schema` (JSON Schema/ajv), formulaires générés côté front, push `CONFIG_UPDATED` par WS. Découverte médiée (mDNS/USB par le core). | Configuration via formulaire généré, sans YAML. |
 | **3** | Store intégré : registre distant, catalogue, écran de permissions + avertissement code tiers, mises à jour de version. | Installation en un clic depuis le catalogue. |
 | **4** | Publication ouverte : pipeline de publication, SDK/template extraits en repos dédiés, doc publique API-hôte. | N'importe quel dev publie sans review. |
@@ -48,7 +48,8 @@ Décisions de cadrage validées avec le mainteneur :
 - **Migration** `server/migrations/<timestamp>-create-external-integration.js` (up/down).
 - **Rattachement `t_service`** : une ligne `t_service` par intégration (vérifié : `device.setValue.js:15` résout le handler par `device.service.name` dans le stateManager, et `t_device.service_id` est obligatoire — tout le pipeline device existant fonctionne alors sans modification). `service.load.js` n'écrase pas ces lignes (upsert filtré sur les services fichiers).
 - **Logs : pas de table.** Logs Docker via `system.getContainerLogs` existant + ring buffer mémoire (~200 entrées) dans le superviseur.
-- **Constantes** (`server/utils/constants.js`) : `EXTERNAL_INTEGRATION_STATUS` (+ `_LIST`), `EVENTS.EXTERNAL_INTEGRATION.*`, `WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.*` (front : `STATUS_CHANGED`, `NEW_LOG` ; intégration : `COMMAND`, `COMMAND_RESULT`, `HEARTBEAT`, `CONFIG_UPDATED`), `AUTHENTICATION.INTEGRATION_REQUEST`.
+- **Constantes** (`server/utils/constants.js`) : `EXTERNAL_INTEGRATION_STATUS` (+ `_LIST`), `EVENTS.EXTERNAL_INTEGRATION.*`, `WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.*` (front : `STATUS_CHANGED`, `NEW_LOG`, `DISCOVERED_DEVICES_UPDATED` ; intégration : `COMMAND`, `COMMAND_RESULT`, `SCAN_REQUEST`, `DEVICE_CREATED`, `DEVICE_UPDATED`, `DEVICE_DELETED`, `HEARTBEAT`, `CONFIG_UPDATED`), `AUTHENTICATION.INTEGRATION_REQUEST`.
+- **Appareils découverts : pas de table.** La liste des appareils découverts publiée par chaque intégration est tenue **en mémoire** dans le superviseur (comme le font les handlers des services internes, ex. philips-hue), perdue au redémarrage et republiée par l'intégration à sa connexion.
 
 ### B.2 Superviseur — `server/lib/external-integration/`
 
@@ -71,10 +72,12 @@ Fichiers principaux : `index.js` (constructeur : maps connexions WS, commandes e
 
 Préfixe hors `/api/v1/` utilisateur, versionné par URL. Contrôleur `server/api/controllers/integrationHost.controller.js`, routes dans `server/api/routes.js` :
 
+**L'API-hôte ne permet ni création ni suppression de device.** L'intégration publie ses appareils découverts ; la création/modification/suppression reste un geste utilisateur dans l'UI (via le `POST /api/v1/device` standard, comme pour les intégrations internes).
+
 | Endpoint | Mapping |
 |---|---|
-| `POST /device` | `gladys.device.create` (upsert par `external_id` — déjà géré) |
-| `GET /device`, `DELETE /device/:selector` | filtré/ownership par `service_id` |
+| `POST /discovered_device` (batch, remplace la liste) | stocké en mémoire par le superviseur (`external_id` préfixés `ext:<selector>:` forcés) ; push front `DISCOVERED_DEVICES_UPDATED` ; le superviseur marque ceux déjà créés en DB (match `external_id`) |
+| `GET /device` | **lecture seule** : les devices de l'intégration réellement créés par l'utilisateur (`service_id` forcé) — permet à l'intégration de savoir quoi piloter/poller au démarrage |
 | `POST /state` (batch) | `EVENTS.DEVICE.NEW_STATE` (chemin des services natifs) ; rate-limit simple (anti-spam SQLite/DuckDB) |
 | `GET/POST /config` | `gladys.variable.getValue/setValue(key, service_id)` (config + secrets en DB core) |
 | `POST /logs` | logger + ring buffer + push front |
@@ -84,25 +87,34 @@ Ne **pas** exposer ces routes via le gateway Gladys Plus (`setupGateway`).
 
 ### B.5 WebSocket intégrations
 
-Étendre `server/api/websockets/index.js` (même WSS, nouveau `case` dans le switch) : message `AUTHENTICATION.INTEGRATION_REQUEST { apiKey }` → validation scope `external-integration` → `gladys.externalIntegration.integrationConnected(integration, ws)`. Heartbeat : `ws.ping()` toutes les 20 s + flag `isAlive` sur `pong` + message applicatif `HEARTBEAT` (maj `last_heartbeat`) ; 2 pings manqués → DEGRADED. Descendant : `COMMAND { message_id, ... }` avec ack `COMMAND_RESULT`. Reconnexion gérée par le SDK (backoff), une reconnexion remplace l'ancienne entrée.
+Étendre `server/api/websockets/index.js` (même WSS, nouveau `case` dans le switch) : message `AUTHENTICATION.INTEGRATION_REQUEST { apiKey }` → validation scope `external-integration` → `gladys.externalIntegration.integrationConnected(integration, ws)`. Heartbeat : `ws.ping()` toutes les 20 s + flag `isAlive` sur `pong` + message applicatif `HEARTBEAT` (maj `last_heartbeat`) ; 2 pings manqués → DEGRADED. Reconnexion gérée par le SDK (backoff), une reconnexion remplace l'ancienne entrée.
+
+Messages descendants (core→intégration) :
+- `COMMAND { message_id, ... }` avec ack `COMMAND_RESULT` (voir B.6) ;
+- `SCAN_REQUEST` : demande de (re)découverte déclenchée depuis l'onglet Découverte de l'UI — l'intégration répond en republiant via `POST /discovered_device` ;
+- `DEVICE_CREATED` / `DEVICE_UPDATED` / `DEVICE_DELETED { device }` : relayés par les hooks `postCreate`/`postUpdate`/`postDelete` du proxy-service — le core les appelle déjà sur le service propriétaire à chaque geste utilisateur (vérifié : `server/lib/device/device.notify.js`). L'intégration sait ainsi immédiatement quels appareils suivre ou abandonner, sans polling.
 
 ### B.6 Routing des commandes
 
-Aucune modification de `device.setValue.js` : `registerProxyService.js` pose dans le stateManager, sous le nom du `t_service` de l'intégration, un objet gelé `{ device: { setValue: (...) => sendCommand(...) } }`. `sendCommand` → WS + ack (timeout 5 s → throw, ex. nouvelle `ExternalIntegrationUnavailableError` dans `utils/coreErrors.js`) ; intégration déconnectée → throw immédiat. Retour d'état réel via `POST /state` (documenter `has_feedback: true` pour les features actionnables).
+Aucune modification de `device.setValue.js` ni de `device.notify.js` : `registerProxyService.js` pose dans le stateManager, sous le nom du `t_service` de l'intégration, un objet gelé `{ device: { setValue, postCreate, postUpdate, postDelete } }` — `setValue` route les commandes, les trois hooks relaient les notifications de cycle de vie (B.5). `sendCommand` → WS + ack (timeout 5 s → throw, ex. nouvelle `ExternalIntegrationUnavailableError` dans `utils/coreErrors.js`) ; intégration déconnectée → throw immédiat. Retour d'état réel via `POST /state` (documenter `has_feedback: true` pour les features actionnables).
 
 ### B.7 API de gestion (admin)
 
 `server/api/controllers/externalIntegration.controller.js`, routes `authenticated + admin` : `POST /api/v1/external_integration` (`{ docker_image, manifest? }`, manifest inline = mode dev), `GET` liste/détail/logs, `POST .../start|stop|restart`, `DELETE` (`?delete_devices=true`).
 
+Pour l'onglet Découverte (auth utilisateur standard, non admin) : `GET /api/v1/external_integration/:selector/discovered_device` (liste mémoire du superviseur, avec le flag « déjà créé ») et `POST .../scan` (envoie `SCAN_REQUEST` à l'intégration). La création du device se fait ensuite par le `POST /api/v1/device` existant, comme pour les intégrations internes.
+
 ### B.8 Front minimal
 
 Dans **Paramètres** (le catalogue d'intégrations viendra avec le store en phase 3) : `front/src/routes/settings/settings-external-integrations/` (page liste + badge d'état temps réel via WS `STATUS_CHANGED`, actions start/stop/restart/désinstaller, modal logs, formulaire « installer depuis une image Docker » avec avertissement code non audité). Route dans `front/src/components/app.jsx`, entrée dans le menu settings. Modèles : `front/src/routes/integration/all/mcp/` (appels API) et `settings-system` (structure). i18n dans **toutes** les langues (`front/src/config/i18n/*.json`, check `compare-translations`).
 
+S'y ajoute un **onglet « Découverte » générique** par intégration (même UX que les onglets Découverte des intégrations internes, ex. Philips Hue) : liste des appareils découverts (nom, features, badge « déjà créé »), bouton « Scanner » (`POST .../scan`), bouton « Créer » par appareil qui appelle le `POST /api/v1/device` standard, rafraîchissement temps réel via `DISCOVERED_DEVICES_UPDATED`. Un seul composant générique sert toutes les intégrations externes — cohérent avec le principe « UI déclarative » de la RFC. La modification/suppression passe ensuite par les écrans device existants.
+
 ### B.9 SDK Node.js + PoC
 
 - Dossier racine `integration-sdk/` du monorepo en phase 1 (`node/` = futur paquet npm `@gladysassistant/integration-sdk`, `examples/demo/` = PoC) ; extraction en repos dédiés en phase 4. Package.json propre, hors lint/coverage serveur.
-- SDK : classe `GladysIntegration` — lit les env vars, client REST (fetch), WS avec auth + reconnexion + pings, helpers `declareDevice`, `publishState`, `onCommand` (ack auto), `getConfig/setConfig`, `log`.
-- **PoC `gladys-integration-demo`** (testable sans matériel, couvre les deux sens) : température Open-Meteo (API publique sans clé) publiée toutes les 10 min + interrupteur virtuel (reçoit `onCommand`, republie l'état). Dockerfile `node:22-alpine`, `USER node`, compatible rootfs read-only. Manifeste dans le LABEL.
+- SDK : classe `GladysIntegration` — lit les env vars, client REST (fetch), WS avec auth + reconnexion + pings, helpers `publishDiscoveredDevices(devices)`, `getDevices()` (devices créés par l'utilisateur), `publishState`, `onCommand` (ack auto), `onScanRequest`, `onDeviceCreated/Updated/Deleted`, `getConfig/setConfig`, `log`.
+- **PoC `gladys-integration-demo`** (testable sans matériel, couvre tout le cycle) : publie deux appareils découverts — un capteur température Open-Meteo (API publique sans clé) et un interrupteur virtuel. L'utilisateur les crée depuis l'onglet Découverte ; l'intégration publie alors la température toutes les 10 min et répond aux commandes de l'interrupteur (reçoit `onCommand`, republie l'état). Dockerfile `node:22-alpine`, `USER node`, compatible rootfs read-only. Manifeste dans le LABEL.
 
 ### B.10 Tests (patch coverage 100 % exigé en CI)
 
@@ -121,15 +133,15 @@ Dans **Paramètres** (le catalogue d'intégrations viendra avec le store en phas
 ## Ordre d'implémentation (jalons PR-ables)
 
 1. **PR 1 — Socle superviseur** : constantes, migration + modèle, `system.createNetwork|inspectNetwork|getImageLabels`, lib `external-integration` (sans WS/commandes), câblage `lib/index.js`, API admin + tests. → on installe/démarre/arrête un conteneur verrouillé via l'API.
-2. **PR 2 — API-hôte** : `session.getApiKeySession`, middleware, flag `externalIntegrationAuth`, contrôleur `/api/integration/v1/*` + tests d'isolation. → une intégration crée des devices et publie des états.
-3. **PR 3 — WS + commandes + santé** : extension WebsocketManager, connected/disconnected, `sendCommand` + ack/timeout, proxy-service, heartbeat, checkHealth + backoff + DEGRADED/FAILED. → machine à états complète, `setValue` atteint le conteneur.
-4. **PR 4 — Front** : page settings, temps réel, logs, install dev, i18n.
+2. **PR 2 — API-hôte** : `session.getApiKeySession`, middleware, flag `externalIntegrationAuth`, contrôleur `/api/integration/v1/*` (discovered_device, device en lecture, state, config, logs) + tests d'isolation. → une intégration publie ses appareils découverts et des états.
+3. **PR 3 — WS + commandes + santé** : extension WebsocketManager, connected/disconnected, `sendCommand` + ack/timeout, proxy-service (setValue + postCreate/postUpdate/postDelete), scan request, heartbeat, checkHealth + backoff + DEGRADED/FAILED. → machine à états complète, `setValue` atteint le conteneur, l'intégration est notifiée des créations/suppressions.
+4. **PR 4 — Front** : page settings, onglet Découverte générique, temps réel, logs, install dev, i18n.
 5. **PR 5 — SDK + PoC + doc** : `integration-sdk/node`, exemple demo, doc API-hôte, parcours e2e documenté.
 
 ## Fichiers critiques existants
 
 - `server/lib/system/index.js` (+ `system.createContainer.js`, `system.getContainerLogs.js`) — socle Docker à étendre
-- `server/lib/device/device.setValue.js` — contrat de dispatch respecté via le proxy-service
+- `server/lib/device/device.setValue.js` + `device.notify.js` — contrats de dispatch et de notification respectés via le proxy-service
 - `server/api/websockets/index.js` — extension auth api_key
 - `server/api/routes.js` + `server/api/setupRoutes.js` — nouveau flag d'auth et routes
 - `server/lib/index.js` — injection du superviseur dans l'objet gladys
@@ -140,5 +152,5 @@ Dans **Paramètres** (le catalogue d'intégrations viendra avec le store en phas
 ## Vérification
 
 1. `cd server && npm test` (patch coverage 100 %), `npm run compare-translations` côté front, lint des deux workspaces.
-2. **Parcours e2e manuel** (environnement avec socket Docker) : build de l'image `gladys-integration-demo` → installation via la page settings → statut passe `Démarrage → En fonctionnement` en temps réel → devices demo visibles dans le dashboard → actionner l'interrupteur virtuel (commande reçue dans les logs du conteneur, état republié) → `docker kill` du conteneur → statut `Dégradée` puis redémarrage auto → forcer 5 crashs → statut `En panne` avec logs visibles et bouton redémarrer → désinstallation propre (conteneur supprimé, clé révoquée).
+2. **Parcours e2e manuel** (environnement avec socket Docker) : build de l'image `gladys-integration-demo` → installation via la page settings → statut passe `Démarrage → En fonctionnement` en temps réel → les appareils demo apparaissent dans l'onglet Découverte → création depuis l'UI → l'intégration reçoit `DEVICE_CREATED` et publie ses états, devices visibles dans le dashboard → actionner l'interrupteur virtuel (commande reçue dans les logs du conteneur, état republié) → `docker kill` du conteneur → statut `Dégradée` puis redémarrage auto → forcer 5 crashs → statut `En panne` avec logs visibles et bouton redémarrer → désinstallation propre (conteneur supprimé, clé révoquée).
 3. Test d'isolation manuel : appeler l'API-hôte avec la clé d'une intégration sur les devices d'une autre → 403/404.
