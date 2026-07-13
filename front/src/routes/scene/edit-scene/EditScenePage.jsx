@@ -57,7 +57,10 @@ const EditScenePage = ({ children, ...props }) => (
                 )}
 
                 {!props.askDeleteScene && (
-                  <div class="text-right d-flex flex-wrap justify-content-end align-items-center" style={{ gap: '6px' }}>
+                  <div
+                    class="text-right d-flex flex-wrap justify-content-end align-items-center"
+                    style={{ gap: '6px' }}
+                  >
                     {/* View toggle */}
                     <div class={style.viewToggle}>
                       <button
@@ -177,66 +180,67 @@ const EditScenePage = ({ children, ...props }) => (
             )}
           </div>
 
-          {!props.canvasView && props.scene.actions.map((parallelActions, index) => (
-            <div>
-              <div class="row">
-                <ActionGroup
-                  moveCard={props.moveCard}
-                  moveCardGroup={props.moveCardGroup}
-                  addAction={props.addAction}
-                  deleteActionGroup={props.deleteActionGroup}
-                  actions={parallelActions}
-                  allActions={props.scene.actions}
-                  deleteAction={props.deleteAction}
-                  updateSelectedNewAction={props.updateSelectedNewAction}
-                  updateActionProperty={props.updateActionProperty}
-                  highLightedActions={props.highLightedActions}
-                  sceneParamsData={props.sceneParamsData}
-                  scene={props.scene}
-                  index={index}
-                  path={`${index}`}
-                  saving={props.saving}
-                  actionsGroupsBefore={update(props.scene.actions, {
-                    $splice: [[index, props.scene.actions.length - index]]
-                  })}
-                  firstActionGroup={index === 0}
-                  lastActionGroup={index === props.scene.actions.length - 1}
-                  variables={props.variables}
-                  triggersVariables={props.triggersVariables}
-                  setVariables={props.setVariables}
-                  comment={(props.scene.actionsComments || [])[index] || ''}
-                  updateComment={comment => props.updateActionGroupComment(index, comment)}
-                />
+          {!props.canvasView &&
+            props.scene.actions.map((parallelActions, index) => (
+              <div>
+                <div class="row">
+                  <ActionGroup
+                    moveCard={props.moveCard}
+                    moveCardGroup={props.moveCardGroup}
+                    addAction={props.addAction}
+                    deleteActionGroup={props.deleteActionGroup}
+                    actions={parallelActions}
+                    allActions={props.scene.actions}
+                    deleteAction={props.deleteAction}
+                    updateSelectedNewAction={props.updateSelectedNewAction}
+                    updateActionProperty={props.updateActionProperty}
+                    highLightedActions={props.highLightedActions}
+                    sceneParamsData={props.sceneParamsData}
+                    scene={props.scene}
+                    index={index}
+                    path={`${index}`}
+                    saving={props.saving}
+                    actionsGroupsBefore={update(props.scene.actions, {
+                      $splice: [[index, props.scene.actions.length - index]]
+                    })}
+                    firstActionGroup={index === 0}
+                    lastActionGroup={index === props.scene.actions.length - 1}
+                    variables={props.variables}
+                    triggersVariables={props.triggersVariables}
+                    setVariables={props.setVariables}
+                    comment={(props.scene.actionsComments || [])[index] || ''}
+                    updateComment={comment => props.updateActionGroupComment(index, comment)}
+                  />
+                </div>
+
+                {index + 1 < props.scene.actions.length && (
+                  <div class="row mb-4">
+                    <div class="col-lg-12">
+                      <div class="text-center">
+                        <button
+                          onClick={() => props.addActionGroupAfter(index)}
+                          class="btn btn-sm btn-outline-secondary"
+                          disabled={props.saving}
+                        >
+                          <i class="fe fe-plus-circle" />{' '}
+                          <Text id="editScene.addActionGroupButton">Add action group</Text>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {index + 1 < props.scene.actions.length && (
+                  <div class={cx('row mb-4', style.arrowDown)}>
+                    <div class="col-lg-12">
+                      <div class="text-center">
+                        <i class="fe fe-arrow-down" />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {index + 1 < props.scene.actions.length && (
-                <div class="row mb-4">
-                  <div class="col-lg-12">
-                    <div class="text-center">
-                      <button
-                        onClick={() => props.addActionGroupAfter(index)}
-                        class="btn btn-sm btn-outline-secondary"
-                        disabled={props.saving}
-                      >
-                        <i class="fe fe-plus-circle" />{' '}
-                        <Text id="editScene.addActionGroupButton">Add action group</Text>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {index + 1 < props.scene.actions.length && (
-                <div class={cx('row mb-4', style.arrowDown)}>
-                  <div class="col-lg-12">
-                    <div class="text-center">
-                      <i class="fe fe-arrow-down" />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+            ))}
           {!props.canvasView && <EditActions {...props} />}
         </div>
         <AutoScrollMobile position="bottom" box_type={props.actionsGroupTypes} />

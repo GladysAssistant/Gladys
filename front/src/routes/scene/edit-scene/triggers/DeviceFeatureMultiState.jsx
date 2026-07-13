@@ -3,7 +3,11 @@ import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import Select, { components } from 'react-select';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, BUTTON_STATUS } from '../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  BUTTON_STATUS
+} from '../../../../../../server/utils/constants';
 
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
@@ -13,12 +17,7 @@ import get from 'get-value';
 // seul le hover standard est conservé.
 const CheckboxOption = props => (
   <components.Option {...props}>
-    <input
-      type="checkbox"
-      checked={props.isSelected}
-      readOnly
-      style={{ marginRight: '8px', pointerEvents: 'none' }}
-    />
+    <input type="checkbox" checked={props.isSelected} readOnly style={{ marginRight: '8px', pointerEvents: 'none' }} />
     {props.label}
   </components.Option>
 );
@@ -31,9 +30,7 @@ const SummaryValueContainer = ({ children, getValue, selectProps, ...rest }) => 
   return (
     <components.ValueContainer {...rest} getValue={getValue} selectProps={selectProps}>
       <span style={{ color: count === 0 ? '#aaa' : 'inherit' }}>
-        {count === 0
-          ? selectProps.placeholder
-          : `${count} sélectionné${count > 1 ? 's' : ''}`}
+        {count === 0 ? selectProps.placeholder : `${count} sélectionné${count > 1 ? 's' : ''}`}
       </span>
       {/* children contient l'input caché nécessaire au focus/clic/fermeture */}
       {children[children.length - 1]}
@@ -46,8 +43,8 @@ const MULTI_STYLES = {
   option: (base, { isFocused }) => ({
     ...base,
     backgroundColor: isFocused ? '#deebff' : 'transparent',
-    color: 'inherit',
-  }),
+    color: 'inherit'
+  })
 };
 
 const MULTI_COMPONENTS = { Option: CheckboxOption, ValueContainer: SummaryValueContainer };
@@ -61,7 +58,7 @@ class DeviceFeatureMultiState extends Component {
       this.props.updateTriggerProperty(this.props.index, 'device_feature', deviceFeature.selector);
       const label = device
         ? `${device.name} › ${deviceFeature.name || deviceFeature.selector}`
-        : (deviceFeature.name || deviceFeature.selector);
+        : deviceFeature.name || deviceFeature.selector;
       this.props.updateTriggerProperty(this.props.index, 'device_feature_label', label);
       if (deviceFeature.selector !== this.props.trigger.device_feature) {
         this.props.updateTriggerProperty(this.props.index, 'values', []);
@@ -84,7 +81,11 @@ class DeviceFeatureMultiState extends Component {
 
   removeValue = idx => {
     const current = this.props.trigger.values || [];
-    this.props.updateTriggerProperty(this.props.index, 'values', current.filter((_, i) => i !== idx));
+    this.props.updateTriggerProperty(
+      this.props.index,
+      'values',
+      current.filter((_, i) => i !== idx)
+    );
   };
 
   updateValue = (idx, rawValue) => {
@@ -116,8 +117,10 @@ class DeviceFeatureMultiState extends Component {
     Object.keys(BUTTON_STATUS).map(key => {
       const value = BUTTON_STATUS[key];
       return {
-        label: get(this.props.intl.dictionary, `deviceFeatureValue.category.button.click.${value}`, { default: String(value) }),
-        value,
+        label: get(this.props.intl.dictionary, `deviceFeatureValue.category.button.click.${value}`, {
+          default: String(value)
+        }),
+        value
       };
     });
 
@@ -126,13 +129,9 @@ class DeviceFeatureMultiState extends Component {
   }
 
   render(props, { selectedDeviceFeature }) {
-    const isButtonDevice =
-      selectedDeviceFeature &&
-      selectedDeviceFeature.category === DEVICE_FEATURE_CATEGORIES.BUTTON;
+    const isButtonDevice = selectedDeviceFeature && selectedDeviceFeature.category === DEVICE_FEATURE_CATEGORIES.BUTTON;
 
-    const isBinaryDevice =
-      selectedDeviceFeature &&
-      selectedDeviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY;
+    const isBinaryDevice = selectedDeviceFeature && selectedDeviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY;
 
     const values = props.trigger.values || [];
     const buttonOptions = isButtonDevice ? this.getButtonOptions() : [];

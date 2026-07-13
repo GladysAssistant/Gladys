@@ -7,7 +7,7 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   Panel,
-  MarkerType,
+  MarkerType
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -27,7 +27,7 @@ import {
   getTriggerIcon,
   isConditionAction,
   isIfThenElse,
-  isCalendarCondition,
+  isCalendarCondition
 } from './sceneToGraph';
 import { graphToScene } from './graphToScene';
 import NodeSelector from './NodeSelector';
@@ -37,20 +37,20 @@ import style from './canvasStyle.css';
 const nodeTypes = {
   [NODE_TYPES.TRIGGER]: TriggerNode,
   [NODE_TYPES.ACTION]: ActionNode,
-  [NODE_TYPES.CONDITION]: ConditionNode,
+  [NODE_TYPES.CONDITION]: ConditionNode
 };
 
 const NODE_COLORS = {
   [NODE_TYPES.TRIGGER]: '#10b981',
   [NODE_TYPES.ACTION]: '#3b82f6',
-  [NODE_TYPES.CONDITION]: '#f59e0b',
+  [NODE_TYPES.CONDITION]: '#f59e0b'
 };
 
 const defaultEdgeOptions = {
   type: 'smoothstep',
   animated: false,
   markerEnd: { type: MarkerType.ArrowClosed, color: '#94a3b8' },
-  style: { stroke: '#94a3b8', strokeWidth: 2 },
+  style: { stroke: '#94a3b8', strokeWidth: 2 }
 };
 
 // Lit les positions de nœuds sauvegardées en localStorage pour une scène donnée.
@@ -64,15 +64,7 @@ function loadSavedPositions(key) {
   }
 }
 
-const SceneCanvas = ({
-  scene,
-  saveScene,
-  saving,
-  variables,
-  triggersVariables,
-  setVariables,
-  setVariablesTrigger,
-}) => {
+const SceneCanvas = ({ scene, saveScene, saving, variables, triggersVariables, setVariables, setVariablesTrigger }) => {
   // Stable key per scene — used to persist node positions in localStorage
   const positionsKey = scene.selector ? `gladys-canvas-pos-${scene.selector}` : null;
 
@@ -80,9 +72,7 @@ const SceneCanvas = ({
     const graph = sceneToGraph(scene);
     const saved = loadSavedPositions(positionsKey);
     if (Object.keys(saved).length > 0) {
-      graph.nodes = graph.nodes.map(n =>
-        saved[n.id] ? { ...n, position: saved[n.id] } : n
-      );
+      graph.nodes = graph.nodes.map(n => (saved[n.id] ? { ...n, position: saved[n.id] } : n));
     }
     return graph;
   }, []);
@@ -121,9 +111,15 @@ const SceneCanvas = ({
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
   const handleApplyRef = useRef(null); // mis à jour à chaque render (voir plus bas)
-  useEffect(() => { selectedNodeIdRef.current = selectedNodeId; }, [selectedNodeId]);
-  useEffect(() => { nodesRef.current = nodes; }, [nodes]);
-  useEffect(() => { edgesRef.current = edges; }, [edges]);
+  useEffect(() => {
+    selectedNodeIdRef.current = selectedNodeId;
+  }, [selectedNodeId]);
+  useEffect(() => {
+    nodesRef.current = nodes;
+  }, [nodes]);
+  useEffect(() => {
+    edgesRef.current = edges;
+  }, [edges]);
 
   // ── Historique Ctrl+Z / Ctrl+Y ────────────────────────────────────────
   const undoStackRef = useRef([]);
@@ -131,7 +127,7 @@ const SceneCanvas = ({
   const pushHistory = useCallback(() => {
     undoStackRef.current.push({
       nodes: JSON.parse(JSON.stringify(nodesRef.current)),
-      edges: JSON.parse(JSON.stringify(edgesRef.current)),
+      edges: JSON.parse(JSON.stringify(edgesRef.current))
     });
     if (undoStackRef.current.length > 50) undoStackRef.current.shift();
     redoStackRef.current = [];
@@ -139,15 +135,21 @@ const SceneCanvas = ({
 
   // Wrappers onNodesChange / onEdgesChange : capture un snapshot avant toute
   // suppression déclenchée par la touche Delete sur des nœuds/arêtes sélectionnés.
-  const onNodesChange = useCallback(changes => {
-    if (changes.some(c => c.type === 'remove')) pushHistory();
-    onNodesChangeBase(changes);
-  }, [onNodesChangeBase, pushHistory]);
+  const onNodesChange = useCallback(
+    changes => {
+      if (changes.some(c => c.type === 'remove')) pushHistory();
+      onNodesChangeBase(changes);
+    },
+    [onNodesChangeBase, pushHistory]
+  );
 
-  const onEdgesChange = useCallback(changes => {
-    if (changes.some(c => c.type === 'remove')) pushHistory();
-    onEdgesChangeBase(changes);
-  }, [onEdgesChangeBase, pushHistory]);
+  const onEdgesChange = useCallback(
+    changes => {
+      if (changes.some(c => c.type === 'remove')) pushHistory();
+      onEdgesChangeBase(changes);
+    },
+    [onEdgesChangeBase, pushHistory]
+  );
 
   // Capture un snapshot au début d'un drag pour annuler le déplacement.
   const onNodeDragStart = useCallback(() => {
@@ -159,12 +161,7 @@ const SceneCanvas = ({
     const handleKeyDown = e => {
       // Don't intercept shortcuts when the user is typing in a form field
       const tag = e.target.tagName;
-      if (
-        tag === 'INPUT' ||
-        tag === 'TEXTAREA' ||
-        tag === 'SELECT' ||
-        e.target.isContentEditable
-      ) return;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.target.isContentEditable) return;
 
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
@@ -177,7 +174,7 @@ const SceneCanvas = ({
         if (undoStackRef.current.length === 0) return;
         redoStackRef.current.push({
           nodes: JSON.parse(JSON.stringify(nodesRef.current)),
-          edges: JSON.parse(JSON.stringify(edgesRef.current)),
+          edges: JSON.parse(JSON.stringify(edgesRef.current))
         });
         const snapshot = undoStackRef.current.pop();
         setNodes(snapshot.nodes);
@@ -191,7 +188,7 @@ const SceneCanvas = ({
         if (redoStackRef.current.length === 0) return;
         undoStackRef.current.push({
           nodes: JSON.parse(JSON.stringify(nodesRef.current)),
-          edges: JSON.parse(JSON.stringify(edgesRef.current)),
+          edges: JSON.parse(JSON.stringify(edgesRef.current))
         });
         const snapshot = redoStackRef.current.pop();
         setNodes(snapshot.nodes);
@@ -202,14 +199,11 @@ const SceneCanvas = ({
 
       if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
         const selected = nodesRef.current.filter(n => n.selected);
-        const srcNodes = selected.length > 0
-          ? selected
-          : nodesRef.current.filter(n => n.id === selectedNodeIdRef.current);
+        const srcNodes =
+          selected.length > 0 ? selected : nodesRef.current.filter(n => n.id === selectedNodeIdRef.current);
         if (srcNodes.length === 0) return;
         const selectedIds = new Set(srcNodes.map(n => n.id));
-        const srcEdges = edgesRef.current.filter(
-          ed => selectedIds.has(ed.source) && selectedIds.has(ed.target)
-        );
+        const srcEdges = edgesRef.current.filter(ed => selectedIds.has(ed.source) && selectedIds.has(ed.target));
         clipboardRef.current = { nodes: srcNodes, edges: srcEdges };
       }
 
@@ -217,7 +211,7 @@ const SceneCanvas = ({
         e.preventDefault();
         undoStackRef.current.push({
           nodes: JSON.parse(JSON.stringify(nodesRef.current)),
-          edges: JSON.parse(JSON.stringify(edgesRef.current)),
+          edges: JSON.parse(JSON.stringify(edgesRef.current))
         });
         if (undoStackRef.current.length > 50) undoStackRef.current.shift();
         redoStackRef.current = [];
@@ -231,14 +225,14 @@ const SceneCanvas = ({
             id,
             selected: true,
             position: { x: src.position.x + 40, y: src.position.y + 40 },
-            data: JSON.parse(JSON.stringify(src.data)),
+            data: JSON.parse(JSON.stringify(src.data))
           };
         });
         const newEdges = srcEdges.map(ed => ({
           ...ed,
           id: `e-${uuidv4()}`,
           source: idMap[ed.source],
-          target: idMap[ed.target],
+          target: idMap[ed.target]
         }));
         setNodes(nds => [...nds.map(n => ({ ...n, selected: false })), ...newNodes]);
         setEdges(eds => [...eds.map(e => ({ ...e, selected: false })), ...newEdges]);
@@ -260,7 +254,9 @@ const SceneCanvas = ({
     clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       const positions = {};
-      nodes.forEach(n => { positions[n.id] = n.position; });
+      nodes.forEach(n => {
+        positions[n.id] = n.position;
+      });
       try {
         localStorage.setItem(positionsKey, JSON.stringify(positions));
       } catch {}
@@ -279,15 +275,13 @@ const SceneCanvas = ({
       const newEds = eds.map(e => {
         const sourceNode = nodes.find(n => n.id === e.source);
         if (!sourceNode || !isCalendarCondition(sourceNode.data && sourceNode.data.action)) return e;
-        const targetColor = sourceNode.data.action.stop_scene_if_event_found === true
-          ? '#ef4444'
-          : '#10b981';
+        const targetColor = sourceNode.data.action.stop_scene_if_event_found === true ? '#ef4444' : '#10b981';
         if (e.style && e.style.stroke === targetColor) return e;
         changed = true;
         return {
           ...e,
           style: { ...e.style, stroke: targetColor, strokeWidth: 2 },
-          markerEnd: { type: MarkerType.ArrowClosed, color: targetColor },
+          markerEnd: { type: MarkerType.ArrowClosed, color: targetColor }
         };
       });
       return changed ? newEds : eds;
@@ -304,9 +298,15 @@ const SceneCanvas = ({
     params => {
       let handleOverride = {};
       if (params.sourceHandle === 'then') {
-        handleOverride = { style: { stroke: '#10b981', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' } };
+        handleOverride = {
+          style: { stroke: '#10b981', strokeWidth: 2 },
+          markerEnd: { type: MarkerType.ArrowClosed, color: '#10b981' }
+        };
       } else if (params.sourceHandle === 'else') {
-        handleOverride = { style: { stroke: '#ef4444', strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: '#ef4444' } };
+        handleOverride = {
+          style: { stroke: '#ef4444', strokeWidth: 2 },
+          markerEnd: { type: MarkerType.ArrowClosed, color: '#ef4444' }
+        };
       } else {
         const sourceNode = nodes.find(n => n.id === params.source);
         if (sourceNode && sourceNode.type === NODE_TYPES.CONDITION && !isIfThenElse(sourceNode.data.action)) {
@@ -314,11 +314,19 @@ const SceneCanvas = ({
           if (isCalendarCondition(sourceNode.data.action)) {
             condColor = sourceNode.data.action.stop_scene_if_event_found === true ? '#ef4444' : '#10b981';
           }
-          handleOverride = { style: { stroke: condColor, strokeWidth: 2 }, markerEnd: { type: MarkerType.ArrowClosed, color: condColor } };
+          handleOverride = {
+            style: { stroke: condColor, strokeWidth: 2 },
+            markerEnd: { type: MarkerType.ArrowClosed, color: condColor }
+          };
         }
       }
       pushHistory();
-      setEdges(eds => addEdge({ ...params, ...defaultEdgeOptions, ...handleOverride }, eds.map(e => ({ ...e, selected: false }))));
+      setEdges(eds =>
+        addEdge(
+          { ...params, ...defaultEdgeOptions, ...handleOverride },
+          eds.map(e => ({ ...e, selected: false }))
+        )
+      );
       setNodes(nds => nds.map(n => ({ ...n, selected: false })));
       setSelectedNodeId(null);
     },
@@ -328,15 +336,18 @@ const SceneCanvas = ({
   // Ctrl/Meta/Shift + clic : désélectionne (ferme le panneau de config).
   // Clic simple : sélectionne le nœud et force la désélection de tous les autres
   // pour éviter qu'une multi-sélection antérieure ne reste active.
-  const onNodeClick = useCallback((e, node) => {
-    if (e.ctrlKey || e.metaKey || e.shiftKey) {
-      setSelectedNodeId(null);
-    } else {
-      setSelectedNodeId(node.id);
-      setNodes(nds => nds.map(n => (n.id === node.id ? n : { ...n, selected: false })));
-    }
-    setSelectorOpen(false);
-  }, [setNodes]);
+  const onNodeClick = useCallback(
+    (e, node) => {
+      if (e.ctrlKey || e.metaKey || e.shiftKey) {
+        setSelectedNodeId(null);
+      } else {
+        setSelectedNodeId(node.id);
+        setNodes(nds => nds.map(n => (n.id === node.id ? n : { ...n, selected: false })));
+      }
+      setSelectorOpen(false);
+    },
+    [setNodes]
+  );
 
   // Clic sur le fond du canvas : ferme le panneau de configuration.
   const onPaneClick = useCallback(() => {
@@ -377,8 +388,8 @@ const SceneCanvas = ({
             id,
             type: NODE_TYPES.TRIGGER,
             position,
-            data: { trigger, label: getTriggerLabel(trigger), icon: getTriggerIcon(trigger) },
-          },
+            data: { trigger, label: getTriggerLabel(trigger), icon: getTriggerIcon(trigger) }
+          }
         ]);
       } else {
         const action = { type: actionType };
@@ -388,8 +399,8 @@ const SceneCanvas = ({
             id,
             type: isConditionAction(action) ? NODE_TYPES.CONDITION : NODE_TYPES.ACTION,
             position,
-            data: { action, label: getActionLabel(action), icon: getActionIcon(action) },
-          },
+            data: { action, label: getActionLabel(action), icon: getActionIcon(action) }
+          }
         ]);
       }
     },
@@ -421,7 +432,9 @@ const SceneCanvas = ({
     setNodes(freshGraph.nodes);
     setEdges(freshGraph.edges);
     if (positionsKey) {
-      try { localStorage.removeItem(positionsKey); } catch {}
+      try {
+        localStorage.removeItem(positionsKey);
+      } catch {}
     }
   }, [nodes, edges, scene, setNodes, setEdges, positionsKey, pushHistory]);
   // ─────────────────────────────────────────────────────────────────────
@@ -462,14 +475,11 @@ const SceneCanvas = ({
       if (hasMoved.current && canvasRef.current && reactFlowInstance) {
         const rect = canvasRef.current.getBoundingClientRect();
         const inCanvas =
-          e.clientX >= rect.left &&
-          e.clientX <= rect.right &&
-          e.clientY >= rect.top &&
-          e.clientY <= rect.bottom;
+          e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
         if (inCanvas) {
           const position = reactFlowInstance.screenToFlowPosition({
             x: e.clientX,
-            y: e.clientY,
+            y: e.clientY
           });
           createNode(draggingNode, position);
           setSelectorOpen(false);
@@ -496,13 +506,16 @@ const SceneCanvas = ({
   // Convertit le graphe courant en scène Gladys et déclenche la sauvegarde API.
   // Utilise les refs (nodesRef, edgesRef) plutôt que les états directement pour
   // être sûr de travailler avec les valeurs les plus récentes depuis le listener keydown.
-  const handleApply = useCallback((debug = false) => {
-    const issues = checkGraphIssues(nodesRef.current, edgesRef.current);
-    setGraphWarnings(issues);
-    if (issues.some(w => w.blocking)) return;
-    const updatedScene = graphToScene(nodesRef.current, edgesRef.current, scene);
-    saveScene(updatedScene, debug);
-  }, [scene, saveScene]);
+  const handleApply = useCallback(
+    (debug = false) => {
+      const issues = checkGraphIssues(nodesRef.current, edgesRef.current);
+      setGraphWarnings(issues);
+      if (issues.some(w => w.blocking)) return;
+      const updatedScene = graphToScene(nodesRef.current, edgesRef.current, scene);
+      saveScene(updatedScene, debug);
+    },
+    [scene, saveScene]
+  );
 
   // Mise à jour du ref à chaque render : le listener keydown (enregistré une seule fois)
   // appelle toujours la version la plus récente de handleApply via ce ref.
@@ -542,22 +555,25 @@ const SceneCanvas = ({
             <div style={{ display: 'flex', gap: '6px' }}>
               <button
                 class={`btn btn-sm btn-outline-primary ${style.panelBtn}`}
-                onClick={() => { setSelectorOpen(v => !v); setSelectedNodeId(null); }}
+                onClick={() => {
+                  setSelectorOpen(v => !v);
+                  setSelectedNodeId(null);
+                }}
               >
                 <i class="fe fe-plus mr-1" />
                 <Text id="editScene.canvas.addBlock">Ajouter un bloc</Text>
               </button>
-              <button
-                class={`btn btn-sm btn-outline-secondary ${style.panelBtn}`}
-                onClick={handleAutoLayout}
-              >
+              <button class={`btn btn-sm btn-outline-secondary ${style.panelBtn}`} onClick={handleAutoLayout}>
                 <i class="fe fe-grid mr-1" />
                 <Text id="editScene.canvas.autoLayout">Réorganiser</Text>
               </button>
               <button
                 class={`btn btn-sm btn-primary ${style.panelBtn}`}
                 onClick={() => handleApply()}
-                onContextMenu={e => { e.preventDefault(); handleApply(true); }}
+                onContextMenu={e => {
+                  e.preventDefault();
+                  handleApply(true);
+                }}
                 disabled={saving}
               >
                 {saving ? <i class="fe fe-loader mr-1" /> : <i class="fe fe-check mr-1" />}
@@ -570,13 +586,37 @@ const SceneCanvas = ({
             <Panel position="bottom-left">
               <div class={style.graphWarnings}>
                 {graphWarnings.map((w, i) => (
-                  <div key={i} class={`${style.graphWarning} ${w.type === 'cycle' || w.type === 'incoherence' || w.type === 'convergence' ? style.graphWarningDanger : style.graphWarningInfo}`}>
-                    <i class={`fe ${w.type === 'cycle' ? 'fe-alert-triangle' : w.type === 'incoherence' ? 'fe-alert-octagon' : w.type === 'convergence' ? 'fe-git-merge' : 'fe-copy'} mr-2`} style={{ flexShrink: 0 }} />
+                  <div
+                    key={i}
+                    class={`${style.graphWarning} ${
+                      w.type === 'cycle' || w.type === 'incoherence' || w.type === 'convergence'
+                        ? style.graphWarningDanger
+                        : style.graphWarningInfo
+                    }`}
+                  >
+                    <i
+                      class={`fe ${
+                        w.type === 'cycle'
+                          ? 'fe-alert-triangle'
+                          : w.type === 'incoherence'
+                          ? 'fe-alert-octagon'
+                          : w.type === 'convergence'
+                          ? 'fe-git-merge'
+                          : 'fe-copy'
+                      } mr-2`}
+                      style={{ flexShrink: 0 }}
+                    />
                     <span>
                       {w.type === 'cycle' && <Text id="editScene.canvas.warningCycle" fields={{ label: w.label }} />}
-                      {w.type === 'convergence' && <Text id="editScene.canvas.warningConvergence" fields={{ label: w.label }} />}
-                      {w.type === 'duplication' && <Text id="editScene.canvas.warningDuplication" fields={{ label: w.label }} />}
-                      {w.type === 'incoherence' && <Text id="editScene.canvas.warningIncoherence" fields={{ label: w.label }} />}
+                      {w.type === 'convergence' && (
+                        <Text id="editScene.canvas.warningConvergence" fields={{ label: w.label }} />
+                      )}
+                      {w.type === 'duplication' && (
+                        <Text id="editScene.canvas.warningDuplication" fields={{ label: w.label }} />
+                      )}
+                      {w.type === 'incoherence' && (
+                        <Text id="editScene.canvas.warningIncoherence" fields={{ label: w.label }} />
+                      )}
                     </span>
                     {!w.blocking && (
                       <button
@@ -626,7 +666,7 @@ const SceneCanvas = ({
           class={style.dragGhost}
           style={{
             transform: `translate(${ghostPos.x + 12}px, ${ghostPos.y + 12}px)`,
-            borderColor: NODE_COLORS[draggingNode.nodeType] || '#3b82f6',
+            borderColor: NODE_COLORS[draggingNode.nodeType] || '#3b82f6'
           }}
         >
           <i class={`fe ${draggingNode.icon}`} />

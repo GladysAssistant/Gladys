@@ -18,6 +18,13 @@ describe('Contracts.buildEdfTempoDayMap', () => {
     };
 
     // Create a constructor wrapper that captures the cache instance
+    /**
+     * @description Wrap LRUCache to capture the instance created by the service.
+     * @param {object} options - Options forwarded to the real LRUCache constructor.
+     * @returns {object} The real LRUCache instance.
+     * @example
+     * const cache = new LRUCacheWrapper({ max: 10 });
+     */
     function LRUCacheWrapper(options) {
       // When called with 'new', create real LRUCache and capture it
       const instance = new LRUCache(options);

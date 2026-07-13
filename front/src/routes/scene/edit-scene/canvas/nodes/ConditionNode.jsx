@@ -17,8 +17,17 @@ const ConditionNode = ({ data, selected }) => {
   const calendarHandleLabel = calendarStop ? 'Non' : 'Oui';
   const summary = getActionSummary(data.action);
   return (
-    <div class={`${style.node} ${style.conditionNode} ${selected ? style.nodeSelected : ''} ${data.hasError ? style.nodeError : ''}`} title={(data.action && data.action.comment) || undefined}>
-      {selected && <span class={style.selectedBadge}><i class="fe fe-check" /></span>}
+    <div
+      class={`${style.node} ${style.conditionNode} ${selected ? style.nodeSelected : ''} ${
+        data.hasError ? style.nodeError : ''
+      }`}
+      title={(data.action && data.action.comment) || undefined}
+    >
+      {selected && (
+        <span class={style.selectedBadge}>
+          <i class="fe fe-check" />
+        </span>
+      )}
       <Handle type="target" position={Position.Top} id="input" style={{ top: -16 }} />
       <div class={style.nodeHeader}>
         <i class={`fe ${data.icon} ${style.nodeHeaderIcon}`} />
@@ -27,60 +36,36 @@ const ConditionNode = ({ data, selected }) => {
       {summary && (
         <div class={style.nodeBody}>
           {[].concat(summary).map((line, i) => (
-            <span key={i} class={i === 0 ? style.nodeSummary : style.nodeSummary2}>{line}</span>
+            <span key={i} class={i === 0 ? style.nodeSummary : style.nodeSummary2}>
+              {line}
+            </span>
           ))}
         </div>
       )}
       {branching ? (
         <>
           {/* then (20%) — arête verte dans graphToScene/SceneCanvas */}
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            id="then"
-            style={{ left: '20%', bottom: -16 }}
-          />
+          <Handle type="source" position={Position.Bottom} id="then" style={{ left: '20%', bottom: -16 }} />
           <span class={style.conditionHandleLabelThen}>Oui</span>
 
           {/* after (50%) — continuation du flux principal après la condition */}
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            id="after"
-            style={{ left: '50%', bottom: -16 }}
-          />
+          <Handle type="source" position={Position.Bottom} id="after" style={{ left: '50%', bottom: -16 }} />
           <span class={style.conditionHandleLabelAfter}>Suite</span>
 
           {/* else (80%) — arête rouge dans graphToScene/SceneCanvas */}
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            id="else"
-            style={{ left: '80%', bottom: -16 }}
-          />
+          <Handle type="source" position={Position.Bottom} id="else" style={{ left: '80%', bottom: -16 }} />
           <span class={style.conditionHandleLabelElse}>Non</span>
         </>
       ) : calendarCond ? (
         <>
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            style={{ background: calendarHandleColor, bottom: -16 }}
-          />
-          <span
-            class={style.conditionHandleLabelYes}
-            style={{ color: calendarStop ? '#991b1b' : '#065f46' }}
-          >
+          <Handle type="source" position={Position.Bottom} style={{ background: calendarHandleColor, bottom: -16 }} />
+          <span class={style.conditionHandleLabelYes} style={{ color: calendarStop ? '#991b1b' : '#065f46' }}>
             {calendarHandleLabel}
           </span>
         </>
       ) : (
         <>
-          <Handle
-            type="source"
-            position={Position.Bottom}
-            style={{ background: '#10b981', bottom: -16 }}
-          />
+          <Handle type="source" position={Position.Bottom} style={{ background: '#10b981', bottom: -16 }} />
           <span class={style.conditionHandleLabelYes}>Oui</span>
         </>
       )}

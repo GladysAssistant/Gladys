@@ -47,7 +47,9 @@ async function restoreLocalBackup(archiveFilePath) {
     const items = await fse.readdir(restoreDir);
     const sqliteFile = items.find((i) => i.endsWith('.db'));
     const parquetFolder = items.find((i) => {
-      if (i === sqliteFile) return false;
+      if (i === sqliteFile) {
+        return false;
+      }
       return fse.statSync(path.join(restoreDir, i)).isDirectory();
     });
 
@@ -66,8 +68,11 @@ async function restoreLocalBackup(archiveFilePath) {
       get('SELECT id FROM t_user LIMIT 1')
         .then((row) => {
           checkDb.close();
-          if (!row) reject(new Error('NO_USER_FOUND_IN_NEW_DB'));
-          else resolve();
+          if (!row) {
+            reject(new Error('NO_USER_FOUND_IN_NEW_DB'));
+          } else {
+            resolve();
+          }
         })
         .catch((err) => {
           checkDb.close();
@@ -89,8 +94,11 @@ async function restoreLocalBackup(archiveFilePath) {
       bkp.step(-1, (err) => {
         bkp.finish();
         backupDb.close();
-        if (err) reject(err);
-        else resolve();
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
       });
     });
     logger.info('Local restore: SQLite restored');
@@ -102,9 +110,7 @@ async function restoreLocalBackup(archiveFilePath) {
       const schemaFilePath = path.join(duckDbBackupFolderPath, 'schema.sql');
       if (await fse.pathExists(schemaFilePath)) {
         let schema = await fse.readFile(schemaFilePath, 'utf-8');
-        schema = schema
-          .replace('CREATE SCHEMA information_schema;', '')
-          .replace('CREATE SCHEMA pg_catalog;', '');
+        schema = schema.replace('CREATE SCHEMA information_schema;', '').replace('CREATE SCHEMA pg_catalog;', '');
         await fse.writeFile(schemaFilePath, schema);
       }
 

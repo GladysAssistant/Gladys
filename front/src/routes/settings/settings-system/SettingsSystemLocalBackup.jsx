@@ -15,12 +15,12 @@ class SettingsSystemLocalBackup extends Component {
     restoreStarted: false,
     restoreConfirm: false,
     selectedFile: null,
-    uploadPercent: 0,
+    uploadPercent: 0
   };
 
   // ── Backup ────────────────────────────────────────────────────────────────
 
-  startLocalBackup = async (e) => {
+  startLocalBackup = async e => {
     e.preventDefault();
     this.setState({ backupInProgress: true, backupError: false, backupSuccess: false });
     try {
@@ -29,14 +29,12 @@ class SettingsSystemLocalBackup extends Component {
         url: '/api/v1/system/backup/local',
         method: 'get',
         responseType: 'blob',
-        headers: this.props.httpClient.getAxiosHeaders(),
+        headers: this.props.httpClient.getAxiosHeaders()
       });
 
       const contentDisposition = response.headers['content-disposition'] || '';
       const match = contentDisposition.match(/filename="?([^";\n]+)"?/);
-      const fileName = match
-        ? match[1]
-        : `gladys-local-backup-${new Date().toISOString().slice(0, 10)}.tar.gz`;
+      const fileName = match ? match[1] : `gladys-local-backup-${new Date().toISOString().slice(0, 10)}.tar.gz`;
 
       const url = URL.createObjectURL(new Blob([response.data], { type: 'application/gzip' }));
       const link = document.createElement('a');
@@ -56,24 +54,24 @@ class SettingsSystemLocalBackup extends Component {
 
   // ── Restore ───────────────────────────────────────────────────────────────
 
-  onFileSelected = (e) => {
+  onFileSelected = e => {
     const file = e.target.files && e.target.files[0];
     if (file) {
       this.setState({ selectedFile: file, restoreError: false, restoreStarted: false });
     }
   };
 
-  askRestoreConfirm = (e) => {
+  askRestoreConfirm = e => {
     e.preventDefault();
     this.setState({ restoreConfirm: true });
   };
 
-  cancelRestore = (e) => {
+  cancelRestore = e => {
     e.preventDefault();
     this.setState({ restoreConfirm: false });
   };
 
-  confirmRestore = async (e) => {
+  confirmRestore = async e => {
     e.preventDefault();
     const { selectedFile } = this.state;
     if (!selectedFile) return;
@@ -87,14 +85,14 @@ class SettingsSystemLocalBackup extends Component {
         data: selectedFile,
         headers: {
           ...this.props.httpClient.getAxiosHeaders(),
-          'Content-Type': 'application/gzip',
+          'Content-Type': 'application/gzip'
         },
-        onUploadProgress: (evt) => {
+        onUploadProgress: evt => {
           if (evt.total) {
             const pct = Math.round((evt.loaded * 100) / evt.total);
             this.setState({ uploadPercent: pct });
           }
-        },
+        }
       });
       this.setState({ restoreInProgress: false, restoreStarted: true, selectedFile: null });
       if (this.fileInputRef.current) this.fileInputRef.current.value = '';
@@ -117,8 +115,8 @@ class SettingsSystemLocalBackup extends Component {
       restoreStarted,
       restoreConfirm,
       selectedFile,
-      uploadPercent,
-    },
+      uploadPercent
+    }
   ) {
     return (
       <div class="card">
@@ -126,7 +124,6 @@ class SettingsSystemLocalBackup extends Component {
           <Text id="systemSettings.localBackupTitle" />
         </h4>
         <div class="card-body">
-
           {/* ── Backup section ── */}
           <h5>
             <Text id="systemSettings.localBackupSectionTitle" />

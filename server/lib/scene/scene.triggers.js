@@ -89,9 +89,11 @@ const triggersFunc = {
     }
     const values = trigger.values || [];
     const op = trigger.operator || '=';
-    const matches = values.some(v => compare(op, event.last_value, v));
+    const matches = values.some((v) => compare(op, event.last_value, v));
 
-    const triggerDurationKey = `device.multi-state.${sceneSelector}.${trigger.device_feature}:${JSON.stringify(values)}`;
+    const triggerDurationKey = `device.multi-state.${sceneSelector}.${trigger.device_feature}:${JSON.stringify(
+      values,
+    )}`;
 
     // Annule le timer si la condition n'est plus valide
     if (!matches && self.checkTriggersDurationTimer.get(triggerDurationKey)) {

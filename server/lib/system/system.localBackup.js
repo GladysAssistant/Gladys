@@ -13,6 +13,8 @@ const BACKUP_NAME_BASE = 'gladys-local-backup';
  * @param {string} storagePath - Absolute path to the source SQLite file.
  * @param {string} destPath - Absolute path for the destination backup file.
  * @returns {Promise<void>}
+ * @example
+ * await sqliteBackup('/var/lib/gladysassistant/gladys-production.db', '/tmp/backup.db');
  */
 function sqliteBackup(storagePath, destPath) {
   return new Promise((resolve, reject) => {
@@ -31,8 +33,11 @@ function sqliteBackup(storagePath, destPath) {
           logger.warn(`Local backup: SQLite source db close warning: ${closeErr.message}`);
         }
       });
-      if (err) reject(err);
-      else resolve();
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
     });
   });
 }
@@ -49,7 +54,9 @@ function sqliteBackup(storagePath, destPath) {
 async function createLocalBackup() {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, '0');
-  const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+  const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(
+    now.getMinutes(),
+  )}-${pad(now.getSeconds())}`;
 
   const tempDir = path.join(this.config.tempFolder, 'local-backup', date);
   const sqliteBackupFileName = `${BACKUP_NAME_BASE}-${date}.db`;
@@ -75,9 +82,7 @@ async function createLocalBackup() {
       logger.info(`Local backup: Exporting DuckDB to ${duckDbBackupFolderPath}`);
       const backupInstance = db.duckDbCreateBackupInstance();
       try {
-        await backupInstance.allAsync(
-          `EXPORT DATABASE '${duckDbBackupFolderPath}' (FORMAT PARQUET, COMPRESSION GZIP)`,
-        );
+        await backupInstance.allAsync(`EXPORT DATABASE '${duckDbBackupFolderPath}' (FORMAT PARQUET, COMPRESSION GZIP)`);
         duckDbIncluded = true;
       } finally {
         await backupInstance.close().catch((e) => {

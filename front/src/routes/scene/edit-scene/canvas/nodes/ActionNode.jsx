@@ -7,8 +7,17 @@ import style from '../canvasStyle.css';
 const ActionNode = ({ data, selected }) => {
   const summary = getActionSummary(data.action);
   return (
-    <div class={`${style.node} ${style.actionNode} ${selected ? style.nodeSelected : ''} ${data.hasError ? style.nodeError : ''}`} title={(data.action && data.action.comment) || undefined}>
-      {selected && <span class={style.selectedBadge}><i class="fe fe-check" /></span>}
+    <div
+      class={`${style.node} ${style.actionNode} ${selected ? style.nodeSelected : ''} ${
+        data.hasError ? style.nodeError : ''
+      }`}
+      title={(data.action && data.action.comment) || undefined}
+    >
+      {selected && (
+        <span class={style.selectedBadge}>
+          <i class="fe fe-check" />
+        </span>
+      )}
       <Handle type="target" position={Position.Top} id="input" style={{ top: -16 }} />
       <div class={style.nodeHeader}>
         <i class={`fe ${data.icon} ${style.nodeHeaderIcon}`} />
@@ -18,7 +27,9 @@ const ActionNode = ({ data, selected }) => {
         <div class={style.nodeBody}>
           {/* [].concat normalise : getActionSummary retourne une chaîne ou un tableau */}
           {[].concat(summary).map((line, i) => (
-            <span key={i} class={i === 0 ? style.nodeSummary : style.nodeSummary2}>{line}</span>
+            <span key={i} class={i === 0 ? style.nodeSummary : style.nodeSummary2}>
+              {line}
+            </span>
           ))}
         </div>
       )}

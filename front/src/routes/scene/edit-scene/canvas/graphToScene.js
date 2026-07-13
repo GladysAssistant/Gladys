@@ -27,9 +27,7 @@ function cleanAction(action) {
 // originalScene est utilisé comme base pour préserver les champs non-graph de la scène
 // (name, icon, selector, triggers…) — seuls triggers et actions sont reconstruits.
 export function graphToScene(nodes, edges, originalScene) {
-  const triggerNodes = nodes
-    .filter(n => n.type === NODE_TYPES.TRIGGER)
-    .sort((a, b) => a.position.x - b.position.x);
+  const triggerNodes = nodes.filter(n => n.type === NODE_TYPES.TRIGGER).sort((a, b) => a.position.x - b.position.x);
 
   // Tables d'adjacence construites depuis les arêtes.
   // outgoing conserve le sourceHandle pour distinguer then/else/after des arêtes normales.
@@ -54,19 +52,21 @@ export function graphToScene(nodes, edges, originalScene) {
   const elseTargets = {}; // conditionNodeId -> [targetId, ...]  (étape 0 de la branche "Non")
   const branchNodeIds = new Set();
 
-  nodes.filter(n => n.type === NODE_TYPES.CONDITION).forEach(condNode => {
-    thenTargets[condNode.id] = [];
-    elseTargets[condNode.id] = [];
-    (outgoing[condNode.id] || []).forEach(({ target, sourceHandle }) => {
-      if (sourceHandle === 'then') {
-        thenTargets[condNode.id].push(target);
-        branchNodeIds.add(target);
-      } else if (sourceHandle === 'else') {
-        elseTargets[condNode.id].push(target);
-        branchNodeIds.add(target);
-      }
+  nodes
+    .filter(n => n.type === NODE_TYPES.CONDITION)
+    .forEach(condNode => {
+      thenTargets[condNode.id] = [];
+      elseTargets[condNode.id] = [];
+      (outgoing[condNode.id] || []).forEach(({ target, sourceHandle }) => {
+        if (sourceHandle === 'then') {
+          thenTargets[condNode.id].push(target);
+          branchNodeIds.add(target);
+        } else if (sourceHandle === 'else') {
+          elseTargets[condNode.id].push(target);
+          branchNodeIds.add(target);
+        }
+      });
     });
-  });
 
   // Extension transitive : les successeurs (step 1, step 2…) d'un nœud de branche
   // sont aussi des nœuds de branche. On suit uniquement les arêtes sans sourceHandle
@@ -90,9 +90,7 @@ export function graphToScene(nodes, edges, originalScene) {
   }
 
   // Nœuds du flux principal : tout sauf les déclencheurs et les nœuds de branche.
-  const mainActionNodes = nodes.filter(
-    n => n.type !== NODE_TYPES.TRIGGER && !branchNodeIds.has(n.id)
-  );
+  const mainActionNodes = nodes.filter(n => n.type !== NODE_TYPES.TRIGGER && !branchNodeIds.has(n.id));
 
   // Attribution des niveaux par DFS "chemin le plus long" depuis les déclencheurs.
   // On utilise le chemin le plus long (et non le plus court) pour que deux chemins
@@ -130,12 +128,9 @@ export function graphToScene(nodes, edges, originalScene) {
   // sont ordonnés par leur topologie interne (connexions entre eux uniquement) :
   //  - sans fil entre eux → même niveau → actions parallèles
   //  - A → B (fil entre orphelins) → niveaux distincts → actions séquentielles
-  const maxExistingLevel =
-    Object.values(levels).length > 0 ? Math.max(...Object.values(levels)) : -1;
+  const maxExistingLevel = Object.values(levels).length > 0 ? Math.max(...Object.values(levels)) : -1;
   {
-    const orphanSet = new Set(
-      mainActionNodes.filter(n => levels[n.id] === undefined).map(n => n.id)
-    );
+    const orphanSet = new Set(mainActionNodes.filter(n => levels[n.id] === undefined).map(n => n.id));
     if (orphanSet.size > 0) {
       const orphanLevels = {};
       // DFS longest-path dans le sous-graphe des orphelins.
@@ -155,7 +150,9 @@ export function graphToScene(nodes, edges, originalScene) {
         if (!hasOrphanParent) orphanPropagate(id, 0);
       });
       const base = maxExistingLevel + 1;
-      orphanSet.forEach(id => { levels[id] = base + (orphanLevels[id] || 0); });
+      orphanSet.forEach(id => {
+        levels[id] = base + (orphanLevels[id] || 0);
+      });
     }
   }
 
@@ -167,7 +164,9 @@ export function graphToScene(nodes, edges, originalScene) {
   const buildBranchGroup = step0Ids => {
     if (!step0Ids || step0Ids.length === 0) return [[]];
     const stepOf = {};
-    step0Ids.forEach(id => { stepOf[id] = 0; });
+    step0Ids.forEach(id => {
+      stepOf[id] = 0;
+    });
     let current = [...step0Ids];
     while (current.length > 0) {
       const next = [];
@@ -190,25 +189,24 @@ export function graphToScene(nodes, edges, originalScene) {
         .map(id => nodes.find(n => n.id === id))
         .filter(Boolean)
         .sort((a, b) => a.position.x - b.position.x);
-      result.push(stepNodes.map(n => {
-        const action = cleanAction({ ...n.data.action });
-        // Un IF_THEN_ELSE imbriqué dans une branche doit reconstruire ses propres branches.
-        if (n.type === NODE_TYPES.CONDITION && isIfThenElse(n.data.action)) {
-          action.then = buildBranchGroup(thenTargets[n.id] || []);
-          action.else = buildBranchGroup(elseTargets[n.id] || []);
-        }
-        return action;
-      }));
+      result.push(
+        stepNodes.map(n => {
+          const action = cleanAction({ ...n.data.action });
+          // Un IF_THEN_ELSE imbriqué dans une branche doit reconstruire ses propres branches.
+          if (n.type === NODE_TYPES.CONDITION && isIfThenElse(n.data.action)) {
+            action.then = buildBranchGroup(thenTargets[n.id] || []);
+            action.else = buildBranchGroup(elseTargets[n.id] || []);
+          }
+          return action;
+        })
+      );
     }
     return result;
   };
 
   // Construction des groupes d'actions triés par niveau puis par position X.
   // Chaque niveau correspond à un groupe d'actions parallèles dans la scène Gladys.
-  const maxLevel =
-    mainActionNodes.length > 0
-      ? Math.max(...mainActionNodes.map(n => levels[n.id] || 0))
-      : -1;
+  const maxLevel = mainActionNodes.length > 0 ? Math.max(...mainActionNodes.map(n => levels[n.id] || 0)) : -1;
 
   const actionGroups = [];
   for (let level = 0; level <= maxLevel; level++) {
@@ -233,6 +231,6 @@ export function graphToScene(nodes, edges, originalScene) {
   return {
     ...originalScene,
     triggers: triggerNodes.map(n => n.data.trigger),
-    actions: actionGroups,
+    actions: actionGroups
   };
 }

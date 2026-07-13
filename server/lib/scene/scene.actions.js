@@ -339,7 +339,9 @@ const actionsFunc = {
     const conditionVerified = values.some((v) => compare('=', deviceFeature.last_value, v));
     if (!conditionVerified) {
       logger.debug(
-        `Device check-multi condition not verified. Feature: "${action.device_feature}", last_value: "${deviceFeature.last_value}", values: [${values.join(', ')}]`,
+        `Device check-multi condition not verified. Feature: "${action.device_feature}", last_value: "${
+          deviceFeature.last_value
+        }", values: [${values.join(', ')}]`,
       );
       throw new AbortScene('CONDITION_NOT_VERIFIED');
     }

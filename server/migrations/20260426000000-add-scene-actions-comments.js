@@ -5,7 +5,5 @@ module.exports = {
       allowNull: true,
     });
   },
-  down: async queryInterface => {
-    await queryInterface.removeColumn('t_scene', 'actions_comments');
-  },
+  down: async () => {},
 };

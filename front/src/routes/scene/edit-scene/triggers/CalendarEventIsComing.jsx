@@ -239,14 +239,18 @@ class CalendarEventIsComing extends Component {
                     'form-control',
                     style.calendarEventIsComingMarginInputMargin,
                     trigger.calendar_event_name_comparator === 'regex' && regexError ? 'is-invalid' : '',
-                    trigger.calendar_event_name_comparator === 'regex' && !regexError && trigger.calendar_event_name ? 'is-valid' : '',
+                    trigger.calendar_event_name_comparator === 'regex' && !regexError && trigger.calendar_event_name
+                      ? 'is-valid'
+                      : ''
                   )}
                   onChange={this.handleNameChange}
                   value={trigger.calendar_event_name}
                   placeholder={
-                    trigger.calendar_event_name_comparator === 'regex'
-                      ? <Text id="editScene.triggersCard.calendarEventIsComing.regexPlaceholder" />
-                      : <Text id="editScene.triggersCard.calendarEventIsComing.namePlaceholder" />
+                    trigger.calendar_event_name_comparator === 'regex' ? (
+                      <Text id="editScene.triggersCard.calendarEventIsComing.regexPlaceholder" />
+                    ) : (
+                      <Text id="editScene.triggersCard.calendarEventIsComing.namePlaceholder" />
+                    )
                   }
                 />
               </Localizer>

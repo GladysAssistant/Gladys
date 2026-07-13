@@ -2547,12 +2547,17 @@
     "actionsCommentPlaceholder": "Kommentar zu diesem Block hinzufügen...",
     "canvas": {
       "addBlock": "Block hinzufügen",
-      "autoLayout": "Neu anordnen",
+      "autoLayout": "Auto-Layout",
       "applyGraph": "Graph anwenden",
       "nodeType": "Typ",
       "deleteNode": "Löschen",
-      "canvasViewTitle": "Grafische Ansicht",
-      "listViewTitle": "Listenansicht"
+      "canvasViewTitle": "Graphenansicht",
+      "listViewTitle": "Listenansicht",
+      "commentPlaceholder": "Kommentar beim Hover anzeigen...",
+      "warningCycle": "Schleife erkannt: Block \"{{label}}\" ist an einer Zirkelreferenz beteiligt (z. B. A → B → A). Das Speichern ist blockiert, bis der Zyklus entfernt wird.",
+      "warningConvergence": "Konvergenz erkannt: Block \"{{label}}\" erhält Verbindungen von verschiedenen Ebenen (z. B. A → C und A → B → C). Entfernen Sie eine Verbindung oder strukturieren Sie mit einem Wenn/Dann/Sonst um.",
+      "warningDuplication": "Block \"{{label}}\": die Ja- und Nein-Ausgänge laufen auf dieselben Blöcke zusammen, die in jedem Zweig dupliziert wurden.",
+      "warningIncoherence": "Block \"{{label}}\": Blöcke, die mit dem Weiter-Ausgang verbunden sind, befinden sich auch in einem Ja/Nein-Zweig — sie werden im Hauptfluss ignoriert."
     },
     "actionsCard": {
       "delay": {
@@ -2632,9 +2637,6 @@
       },
       "deviceCheckValue": {
         "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle Status des ausgewählten Geräts die Bedingung erfüllt."
-      },
-      "deviceCheckMultiValue": {
-        "description": "Die Szene wird nur fortgesetzt, wenn der aktuelle Status des Geräts einem der ausgewählten Werte entspricht."
       },
       "deviceSetValue": {
         "description": "Diese Aktion ermöglicht es, ein Gerät zu steuern.",
@@ -3049,20 +3051,6 @@
         "messagePlaceholder": "Gib die erwartete Message ein",
         "messageDescription": "Gib die erwartete Message ein oder lasse das Feld leer, um die Szene unabhängig von der Message auszuführen"
       }
-    },
-    "canvas": {
-      "addBlock": "Block hinzufügen",
-      "autoLayout": "Auto-Layout",
-      "applyGraph": "Graph anwenden",
-      "nodeType": "Typ",
-      "deleteNode": "Löschen",
-      "canvasViewTitle": "Graphenansicht",
-      "listViewTitle": "Listenansicht",
-      "commentPlaceholder": "Kommentar beim Hover anzeigen...",
-      "warningCycle": "Schleife erkannt: Block \"{{label}}\" ist an einer Zirkelreferenz beteiligt (z. B. A → B → A). Das Speichern ist blockiert, bis der Zyklus entfernt wird.",
-      "warningConvergence": "Konvergenz erkannt: Block \"{{label}}\" erhält Verbindungen von verschiedenen Ebenen (z. B. A → C und A → B → C). Entfernen Sie eine Verbindung oder strukturieren Sie mit einem Wenn/Dann/Sonst um.",
-      "warningDuplication": "Block \"{{label}}\": die Ja- und Nein-Ausgänge laufen auf dieselben Blöcke zusammen, die in jedem Zweig dupliziert wurden.",
-      "warningIncoherence": "Block \"{{label}}\": Blöcke, die mit dem Weiter-Ausgang verbunden sind, befinden sich auch in einem Ja/Nein-Zweig — sie werden im Hauptfluss ignoriert."
     }
   },
   "profile": {
@@ -3348,7 +3336,23 @@
     "downloadLogsProgress": "Lade {{downloaded}} von {{total}} herunter...",
     "downloadLogsError": "Logs konnten nicht heruntergeladen werden. Stelle sicher, dass Gladys in Docker läuft und versuche es erneut.",
     "cpuTemperature": "CPU-Temp.",
-    "cpuTemperatureValue": "{{value}} °C"
+    "cpuTemperatureValue": "{{value}} °C",
+    "localBackupTitle": "Lokale Sicherung & Wiederherstellung",
+    "localBackupSectionTitle": "Sichern",
+    "localBackupDescription": "Laden Sie ein vollständiges Archiv Ihrer Gladys-Datenbank herunter (SQLite + DuckDB). Bewahren Sie diese Datei an einem sicheren Ort auf: Sie ermöglicht es Ihnen, Ihr System bei einer Neuinstallation vollständig wiederherzustellen.",
+    "localBackupButton": "Sicherung herunterladen",
+    "localBackupInProgress": "Sicherung läuft...",
+    "localBackupSuccess": "Sicherung erfolgreich heruntergeladen.",
+    "localBackupError": "Beim Erstellen der Sicherung ist ein Fehler aufgetreten. Bitte prüfen Sie die Logs für weitere Details.",
+    "localRestoreSectionTitle": "Wiederherstellen",
+    "localRestoreDescription": "Wählen Sie ein zuvor erstelltes Sicherungsarchiv (.tar.gz) aus, um Ihre Konfiguration vollständig wiederherzustellen. Gladys wird nach Abschluss der Wiederherstellung automatisch neu gestartet.",
+    "localRestoreButton": "Diese Sicherung wiederherstellen",
+    "localRestoreUploading": "Datei wird hochgeladen, bitte warten...",
+    "localRestoreStarted": "Wiederherstellung gestartet. Gladys wird in wenigen Augenblicken neu gestartet. Laden Sie die Seite nach dem Neustart neu.",
+    "localRestoreError": "Bei der Wiederherstellung ist ein Fehler aufgetreten. Stellen Sie sicher, dass die Datei eine gültige Gladys-Sicherung ist, und prüfen Sie die Logs.",
+    "localRestoreConfirmWarning": "Achtung: Dadurch wird Ihre gesamte aktuelle Konfiguration durch die Sicherung ersetzt. Diese Aktion kann nicht rückgängig gemacht werden. Sind Sie sicher?",
+    "localRestoreConfirmYes": "Ja, wiederherstellen",
+    "localRestoreConfirmNo": "Abbrechen"
   },
   "newArea": {
     "createNewZoneButton": "Neue Zone erstellen",
@@ -3935,7 +3939,6 @@
     "category": {
       "button": {
         "click": {
-          "unknown": "{{value}} (unbekannter Wert)",
           "1": "Einfacher Klick",
           "2": "Doppelter Klick",
           "3": "Langer Klick (drücken)",
@@ -4039,7 +4042,8 @@
           "101": "Taste 4 einfacher Klick",
           "102": "Taste 4 doppelter Klick",
           "103": "Taste 4 langer Klick",
-          "104": "Taste 4 dreifacher Klick"
+          "104": "Taste 4 dreifacher Klick",
+          "unknown": "{{value}} (unbekannter Wert)"
         }
       },
       "fan": {
@@ -4085,16 +4089,16 @@
       },
       "shutter": {
         "state": {
-          "-1": "Geschlossen",
           "0": "Gestoppt",
-          "1": "Geöffnet"
+          "1": "Geöffnet",
+          "-1": "Geschlossen"
         }
       },
       "curtain": {
         "state": {
-          "-1": "Geschlossen",
           "0": "Gestoppt",
-          "1": "Geöffnet"
+          "1": "Geöffnet",
+          "-1": "Geschlossen"
         }
       },
       "lock": {
@@ -4230,14 +4234,14 @@
       },
       "vacuum-cleaner": {
         "state": {
-          "unknown": "{{value}} (unbekannt)",
           "0": "Gestoppt",
           "1": "Läuft",
           "2": "Pausiert",
           "3": "Fehler",
           "4": "Kehrt zur Ladestation zurück",
           "5": "Lädt",
-          "6": "Angedockt"
+          "6": "Angedockt",
+          "unknown": "{{value}} (unbekannt)"
         }
       }
     }

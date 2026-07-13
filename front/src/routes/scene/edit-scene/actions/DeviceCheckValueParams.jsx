@@ -18,7 +18,7 @@ class DeviceCheckValueParams extends Component {
       this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
       const label = device
         ? `${device.name} › ${deviceFeature.name || deviceFeature.selector}`
-        : (deviceFeature.name || deviceFeature.selector);
+        : deviceFeature.name || deviceFeature.selector;
       this.props.updateActionProperty(this.props.path, 'device_feature_label', label);
       this.props.updateActionProperty(this.props.path, 'device_feature_category', deviceFeature.category);
       this.props.updateActionProperty(this.props.path, 'device_feature_type', deviceFeature.type);
@@ -55,13 +55,11 @@ class DeviceCheckValueParams extends Component {
     if (selectedDeviceFeature) {
       const { category, type } = selectedDeviceFeature;
       binaryDevice =
-        type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
-        category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
+        type === DEVICE_FEATURE_TYPES.SWITCH.BINARY || category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
       levelSensorDevice =
-        category === DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR &&
-        type === DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE;
+        category === DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR && type === DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE;
       levelMatterSensorDevice = category === DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR;
     }
 

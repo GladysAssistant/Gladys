@@ -77,7 +77,7 @@ async function findCurrentlyRunningEvent(calendars, calendarEventNameComparator,
   if (calendarEventNameComparator === 'regex') {
     try {
       const re = new RegExp(calendarEventName, 'i');
-      eventsMatching = eventsMatching.filter(e => re.test(e.get({ plain: true }).name));
+      eventsMatching = eventsMatching.filter((e) => re.test(e.get({ plain: true }).name));
     } catch (err) {
       eventsMatching = [];
     }

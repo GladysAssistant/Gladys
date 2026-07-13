@@ -61,7 +61,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
 
             {props.updateComment !== undefined && (
               <button type="button" class="btn btn-outline-info" onClick={props.onStartEditingComment}>
-                <i class="fe fe-info"  tooltip={<Text id="editScene.actionsCommentTooltip" />} />
+                <i class="fe fe-info" tooltip={<Text id="editScene.actionsCommentTooltip" />} />
               </button>
             )}
 
@@ -82,14 +82,18 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
             <div class="dimmer-content">
               {props.editingComment ? (
                 <Localizer>
-                  <textarea class="form-control mb-3 mr-4" rows="2" value={props.localComment} placeholder={<Text id="editScene.actionsCommentPlaceholder" />} onInput={props.onCommentInput} onBlur={props.onCommentBlur} autoFocus />
+                  <textarea
+                    class="form-control mb-3 mr-4"
+                    rows="2"
+                    value={props.localComment}
+                    placeholder={<Text id="editScene.actionsCommentPlaceholder" />}
+                    onInput={props.onCommentInput}
+                    onBlur={props.onCommentBlur}
+                    autoFocus
+                  />
                 </Localizer>
               ) : (
-                props.comment && (
-                  <div class="alert alert-secondary mb-3 cursor-pointer">
-                    {props.comment}
-                  </div>
-                )
+                props.comment && <div class="alert alert-secondary mb-3 cursor-pointer">{props.comment}</div>
               )}
               {props.actions && props.actions.length > 0 && (
                 <div class="alert alert-info">

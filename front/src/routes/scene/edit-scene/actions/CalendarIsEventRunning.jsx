@@ -239,14 +239,18 @@ class CheckTime extends Component {
                     'form-control',
                     style.calendarEventIsComingMarginInputMargin,
                     action.calendar_event_name_comparator === 'regex' && regexError ? 'is-invalid' : '',
-                    action.calendar_event_name_comparator === 'regex' && !regexError && action.calendar_event_name ? 'is-valid' : '',
+                    action.calendar_event_name_comparator === 'regex' && !regexError && action.calendar_event_name
+                      ? 'is-valid'
+                      : ''
                   )}
                   onChange={this.handleNameChange}
                   value={action.calendar_event_name}
                   placeholder={
-                    action.calendar_event_name_comparator === 'regex'
-                      ? <Text id="editScene.triggersCard.calendarEventIsComing.regexPlaceholder" />
-                      : <Text id="editScene.actionsCard.calendarEventIsRunning.namePlaceholder" />
+                    action.calendar_event_name_comparator === 'regex' ? (
+                      <Text id="editScene.triggersCard.calendarEventIsComing.regexPlaceholder" />
+                    ) : (
+                      <Text id="editScene.actionsCard.calendarEventIsRunning.namePlaceholder" />
+                    )
                   }
                 />
               </Localizer>

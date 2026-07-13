@@ -113,7 +113,9 @@ async function checkCalendarTriggers() {
       // Filtrage regex post-requête (la syntaxe regex n'est pas supportée nativement par SQLite)
       if (trigger.calendar_event_name_comparator === 'regex') {
         try {
-          if (!new RegExp(trigger.calendar_event_name, 'i').test(eventRaw.name)) return;
+          if (!new RegExp(trigger.calendar_event_name, 'i').test(eventRaw.name)) {
+            return;
+          }
         } catch (e) {
           return; // expression invalide — on ignore cet événement
         }

@@ -383,9 +383,8 @@ class MatterDevices extends Component {
 
       if (orderDir === 'asc') {
         return nameA.localeCompare(nameB);
-      } else {
-        return nameB.localeCompare(nameA);
       }
+      return nameB.localeCompare(nameA);
     });
 
     return (

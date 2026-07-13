@@ -68,11 +68,14 @@ describe('Device.newStateEvent', () => {
     const newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'hue:binary:1');
     expect(newDeviceFeature).to.have.property('last_value_string', 'my-text');
     // Verify that EVENTS.TRIGGERS.CHECK was emitted for scene triggers
-    assert.calledOnce(triggersCheckListener);
+    // (once for device.new-state, once for device.multi-state)
+    assert.calledTwice(triggersCheckListener);
     expect(triggersCheckListener.firstCall.args[0]).to.have.property('type', 'device.new-state');
     expect(triggersCheckListener.firstCall.args[0]).to.have.property('device_feature', 'test-device-feature');
     expect(triggersCheckListener.firstCall.args[0]).to.have.property('previous_value', 'old-text');
     expect(triggersCheckListener.firstCall.args[0]).to.have.property('last_value', 'my-text');
+    expect(triggersCheckListener.secondCall.args[0]).to.have.property('type', 'device.multi-state');
+    expect(triggersCheckListener.secondCall.args[0]).to.have.property('last_value', 'my-text');
     event.removeListener('trigger.check', triggersCheckListener);
   });
   it('should save new string state in text feature', async () => {
@@ -105,11 +108,14 @@ describe('Device.newStateEvent', () => {
     const newDeviceFeature = stateManager.get('deviceFeatureByExternalId', 'text:feature');
     expect(newDeviceFeature).to.have.property('last_value_string', 'SS');
     // Verify that EVENTS.TRIGGERS.CHECK was emitted for scene triggers (text feature like Shelly Button)
-    assert.calledOnce(triggersCheckListener);
+    // (once for device.new-state, once for device.multi-state)
+    assert.calledTwice(triggersCheckListener);
     expect(triggersCheckListener.firstCall.args[0]).to.have.property('type', 'device.new-state');
     expect(triggersCheckListener.firstCall.args[0]).to.have.property('device_feature', 'test-device-feature');
     expect(triggersCheckListener.firstCall.args[0]).to.have.property('previous_value', 'S');
     expect(triggersCheckListener.firstCall.args[0]).to.have.property('last_value', 'SS');
+    expect(triggersCheckListener.secondCall.args[0]).to.have.property('type', 'device.multi-state');
+    expect(triggersCheckListener.secondCall.args[0]).to.have.property('last_value', 'SS');
     event.removeListener('trigger.check', triggersCheckListener);
   });
   it('should save new historical state', async () => {

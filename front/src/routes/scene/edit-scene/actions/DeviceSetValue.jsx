@@ -32,7 +32,9 @@ class DeviceSetValue extends Component {
     const deviceFeatureChanged = this.props.action.device_feature !== deviceFeature.selector;
     if (deviceFeature) {
       this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
-      const label = device ? `${device.name} › ${deviceFeature.name || deviceFeature.selector}` : (deviceFeature.name || deviceFeature.selector);
+      const label = device
+        ? `${device.name} › ${deviceFeature.name || deviceFeature.selector}`
+        : deviceFeature.name || deviceFeature.selector;
       this.props.updateActionProperty(this.props.path, 'device_feature_label', label);
       this.props.updateActionProperty(this.props.path, 'device_feature_type', deviceFeature.type);
       this.props.updateActionProperty(this.props.path, 'device_feature_category', deviceFeature.category);
@@ -90,12 +92,15 @@ class DeviceSetValue extends Component {
       const ref = match[1]; // e.g. "0.0.last_value"
       const lastDot = ref.lastIndexOf('.');
       if (lastDot === -1) continue;
-      const varPath = ref.substring(0, lastDot);   // "0.0"
-      const varName = ref.substring(lastDot + 1);   // "last_value"
+      const varPath = ref.substring(0, lastDot); // "0.0"
+      const varName = ref.substring(lastDot + 1); // "last_value"
       const options = variables[varPath];
       if (options) {
         const found = options.find(o => o.name === varName);
-        if (found) { parts.push(found.label); continue; }
+        if (found) {
+          parts.push(found.label);
+          continue;
+        }
       }
       parts.push(ref);
     }

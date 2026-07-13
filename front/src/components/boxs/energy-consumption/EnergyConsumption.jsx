@@ -399,12 +399,11 @@ class EnergyConsumption extends Component {
       return dayjs(value)
         .locale(this.props.user.language)
         .format('DD MMM YYYY');
-    } else {
-      // For year view, show month
-      return dayjs(value)
-        .locale(this.props.user.language)
-        .format('MMM YYYY');
     }
+    // For year view, show month
+    return dayjs(value)
+      .locale(this.props.user.language)
+      .format('MMM YYYY');
   };
 
   getDatePickerView = () => {

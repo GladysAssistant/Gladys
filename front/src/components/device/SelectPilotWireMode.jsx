@@ -35,9 +35,8 @@ class SelectPilotWireMode extends Component {
         }),
         value
       };
-    } else {
-      return;
     }
+    return;
   };
 
   componentDidMount() {

@@ -379,11 +379,7 @@ class EditScene extends Component {
       });
 
       const currentComments = prevState.scene.actionsComments || [];
-      const newComments = [
-        ...currentComments.slice(0, index + 1),
-        null,
-        ...currentComments.slice(index + 1)
-      ];
+      const newComments = [...currentComments.slice(0, index + 1), null, ...currentComments.slice(index + 1)];
 
       return {
         variables: newVariables,
@@ -1164,6 +1160,7 @@ class EditScene extends Component {
       }
       const sceneToSave = { ...updatedScene, actions };
       if (debugMode) {
+        // eslint-disable-next-line no-console
         console.log('Canvas save payload:', JSON.stringify(sceneToSave, null, 2));
       }
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
@@ -1197,7 +1194,7 @@ class EditScene extends Component {
       scene: null,
       variables: {},
       triggersVariables: [],
-      canvasView: false,
+      canvasView: false
     };
   }
 
@@ -1216,7 +1213,10 @@ class EditScene extends Component {
     document.removeEventListener('click', this.closeEdition, true);
   }
 
-  render(props, { saving, error, errorMessage, variables, scene, triggersVariables, tags, askDeleteScene, canvasView }) {
+  render(
+    props,
+    { saving, error, errorMessage, variables, scene, triggersVariables, tags, askDeleteScene, canvasView }
+  ) {
     const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
     return (
       scene && (

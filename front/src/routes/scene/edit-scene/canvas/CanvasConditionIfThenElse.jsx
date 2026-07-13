@@ -21,7 +21,7 @@ const CONDITION_LABELS = {
   [ACTIONS.HOUSE.IS_EMPTY]: 'Maison vide',
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'Maison occupée',
   [ACTIONS.DEVICE.CHECK_VALUE]: 'Condition sur état',
-  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: 'Condition sur états multiples',
+  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: 'Condition sur états multiples'
 };
 
 const CONDITION_ICONS = {
@@ -34,7 +34,7 @@ const CONDITION_ICONS = {
   [ACTIONS.HOUSE.IS_EMPTY]: 'fe-home',
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe-home',
   [ACTIONS.DEVICE.CHECK_VALUE]: 'fe-check-circle',
-  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: 'fe-check-circle',
+  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: 'fe-check-circle'
 };
 
 const CONDITION_COMPONENTS = {
@@ -47,7 +47,7 @@ const CONDITION_COMPONENTS = {
   [ACTIONS.HOUSE.IS_EMPTY]: HouseEmptyOrNotCondition,
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: HouseEmptyOrNotCondition,
   [ACTIONS.DEVICE.CHECK_VALUE]: DeviceCheckValueParams,
-  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: DeviceCheckMultiValueParams,
+  [ACTIONS.DEVICE.CHECK_MULTI_VALUE]: DeviceCheckMultiValueParams
 };
 
 const CanvasConditionIfThenElse = ({
@@ -57,7 +57,7 @@ const CanvasConditionIfThenElse = ({
   variables,
   triggersVariables,
   actionsGroupsBefore,
-  allActions,
+  allActions
 }) => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const conditions = action.if || [];
@@ -126,11 +126,7 @@ const CanvasConditionIfThenElse = ({
         return (
           // Pas de overflow:hidden : évite le clipping des time pickers et des menus
           // déroulants (React Select) qui se positionnent en dehors du flux normal.
-          <div
-            key={index}
-            class="mb-2"
-            style={{ border: '1px solid #fcd34d', borderRadius: '6px' }}
-          >
+          <div key={index} class="mb-2" style={{ border: '1px solid #fcd34d', borderRadius: '6px' }}>
             {/* ── Condition header ─────────────────────────────── */}
             {/* borderRadius uniquement sur les coins supérieurs : le parent n'ayant
                 plus overflow:hidden, le body qui suit arrondit lui-même ses coins. */}
@@ -139,10 +135,7 @@ const CanvasConditionIfThenElse = ({
               style={{ padding: '6px 10px', background: '#fef3c7', cursor: 'pointer', borderRadius: '5px 5px 0 0' }}
               onClick={() => setExpandedIndex(isExpanded ? null : index)}
             >
-              <div
-                class="d-flex align-items-center"
-                style={{ gap: '6px', overflow: 'hidden', flex: 1 }}
-              >
+              <div class="d-flex align-items-center" style={{ gap: '6px', overflow: 'hidden', flex: 1 }}>
                 <i
                   class={`fe ${CONDITION_ICONS[condition.type] || 'fe-circle'}`}
                   style={{ color: '#92400e', fontSize: '13px', flexShrink: 0 }}
@@ -154,7 +147,7 @@ const CanvasConditionIfThenElse = ({
                     color: '#92400e',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    whiteSpace: 'nowrap'
                   }}
                 >
                   {CONDITION_LABELS[condition.type] || 'Type à choisir…'}
@@ -172,7 +165,7 @@ const CanvasConditionIfThenElse = ({
                     padding: '0 2px',
                     cursor: 'pointer',
                     color: '#dc2626',
-                    lineHeight: 1,
+                    lineHeight: 1
                   }}
                   onClick={e => {
                     e.stopPropagation();

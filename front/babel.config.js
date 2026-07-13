@@ -5,10 +5,7 @@ module.exports = {
     {
       // reactflow UMD build uses optional chaining and nullish coalescing
       test: /node_modules\/reactflow\//,
-      plugins: [
-        '@babel/plugin-transform-optional-chaining',
-        '@babel/plugin-transform-nullish-coalescing-operator',
-      ],
-    },
-  ],
+      plugins: ['@babel/plugin-transform-optional-chaining', '@babel/plugin-transform-nullish-coalescing-operator']
+    }
+  ]
 };

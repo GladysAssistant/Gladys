@@ -73,7 +73,7 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       events: {
         mounted: addYAxisStyles,
         updated: addYAxisStyles,
-        zoomed: function(chartContext) {
+        zoomed(chartContext) {
           limitZoom(chartContext);
         }
       }
@@ -131,7 +131,7 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
         minWidth: 50,
         maxWidth: 100,
         margin: 5,
-        formatter: function(value) {
+        formatter(value) {
           const nbLines = 3;
           if (value.length > 15) {
             let [deviceName, featureName] = value.split(' (');

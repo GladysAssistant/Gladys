@@ -1,7 +1,14 @@
 import { useCallback, useEffect, useRef } from 'preact/hooks';
 import { Text, Localizer } from 'preact-i18n';
 import { ACTIONS, EVENTS } from '../../../../../../server/utils/constants';
-import { NODE_TYPES, getActionLabel, getActionIcon, getTriggerLabel, getTriggerIcon, isConditionAction } from './sceneToGraph';
+import {
+  NODE_TYPES,
+  getActionLabel,
+  getActionIcon,
+  getTriggerLabel,
+  getTriggerIcon,
+  isConditionAction
+} from './sceneToGraph';
 import style from './canvasStyle.css';
 
 // ── Action parameter components ──────────────────────────────────────
@@ -84,7 +91,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
   [ACTIONS.AI.ASK]: AskAI,
   [ACTIONS.SMS.SEND]: SendSms,
-  [ACTIONS.CONDITION.IF_THEN_ELSE]: CanvasConditionIfThenElse,
+  [ACTIONS.CONDITION.IF_THEN_ELSE]: CanvasConditionIfThenElse
 };
 
 const BASE_DOC_URL = 'https://gladysassistant.com/docs/scenes/';
@@ -126,7 +133,7 @@ const DOC_URLS = {
   [EVENTS.HOUSE.NO_LONGER_EMPTY]: 'house-no-longer-empty',
   [EVENTS.AREA.USER_ENTERED]: 'zone',
   [EVENTS.AREA.USER_LEFT]: 'zone',
-  [EVENTS.CALENDAR.EVENT_IS_COMING]: 'calendar-event-is-coming-trigger',
+  [EVENTS.CALENDAR.EVENT_IS_COMING]: 'calendar-event-is-coming-trigger'
 };
 
 const ALARM_TRIGGERS = [
@@ -135,13 +142,13 @@ const ALARM_TRIGGERS = [
   EVENTS.ALARM.DISARM,
   EVENTS.ALARM.PARTIAL_ARM,
   EVENTS.ALARM.PANIC,
-  EVENTS.ALARM.TOO_MANY_CODES_TESTS,
+  EVENTS.ALARM.TOO_MANY_CODES_TESTS
 ];
 
 const PANEL_HEADER_COLOR = {
   [NODE_TYPES.TRIGGER]: '#10b981',
   [NODE_TYPES.ACTION]: '#3b82f6',
-  [NODE_TYPES.CONDITION]: '#f59e0b',
+  [NODE_TYPES.CONDITION]: '#f59e0b'
 };
 
 /**
@@ -189,7 +196,7 @@ const NodeConfigPanel = ({
   setVariables,
   setVariablesTrigger,
   onDelete,
-  onClose,
+  onClose
 }) => {
   const isTrigger = selectedNode.type === NODE_TYPES.TRIGGER;
   const headerColor = PANEL_HEADER_COLOR[selectedNode.type] || '#64748b';
@@ -201,7 +208,7 @@ const NodeConfigPanel = ({
   useEffect(() => {
     if (!commentRef.current) return;
     commentRef.current.style.height = 'auto';
-    commentRef.current.style.height = commentRef.current.scrollHeight + 'px';
+    commentRef.current.style.height = `${commentRef.current.scrollHeight}px`;
   }, [commentValue, selectedNode.id]);
   // Chemin de l'action dans la structure JSON de la scène (ex : "1.2" = groupe 1, action 2).
   // Renseigné par sceneToGraph dans node.data.path ; fallback "0.0" pour les nœuds créés
@@ -224,7 +231,7 @@ const NodeConfigPanel = ({
         nds.map(n => {
           if (n.id !== selectedNode.id) return n;
           let newAction;
-          const prefix = nodePath + '.';
+          const prefix = `${nodePath}.`;
           if (callPath.startsWith(prefix)) {
             // Mise à jour imbriquée : on descend dans l'objet action
             const subPath = callPath.slice(prefix.length);
@@ -242,8 +249,8 @@ const NodeConfigPanel = ({
               ...n.data,
               action: newAction,
               label: getActionLabel(newAction),
-              icon: getActionIcon(newAction),
-            },
+              icon: getActionIcon(newAction)
+            }
           };
         })
       );
@@ -265,8 +272,8 @@ const NodeConfigPanel = ({
               ...n.data,
               trigger: newTrigger,
               label: getTriggerLabel(newTrigger),
-              icon: getTriggerIcon(newTrigger),
-            },
+              icon: getTriggerIcon(newTrigger)
+            }
           };
         })
       );
@@ -293,13 +300,17 @@ const NodeConfigPanel = ({
   // avant de l'utiliser, mais d'autres (CalendarIsEventRunning) l'appellent sans garde.
   // On les rend optionnels ici plutôt que de modifier tous les composants existants.
   const handleSetVariables = useCallback(
-    (path, vars) => { if (setVariables) setVariables(path, vars); },
+    (path, vars) => {
+      if (setVariables) setVariables(path, vars);
+    },
     [setVariables]
   );
 
   // Même protection pour setVariablesTrigger (déclencheurs).
   const handleSetVariablesTrigger = useCallback(
-    (idx, vars) => { if (setVariablesTrigger) setVariablesTrigger(idx, vars); },
+    (idx, vars) => {
+      if (setVariablesTrigger) setVariablesTrigger(idx, vars);
+    },
     [setVariablesTrigger]
   );
 
@@ -345,7 +356,7 @@ const NodeConfigPanel = ({
       index: idx,
       updateTriggerProperty,
       variables: variables || {},
-      setVariablesTrigger: handleSetVariablesTrigger,
+      setVariablesTrigger: handleSetVariablesTrigger
     };
 
     if (!trigger.type) {
@@ -400,16 +411,14 @@ const NodeConfigPanel = ({
             onInput={e => {
               updateComment(e.target.value);
               e.target.style.height = 'auto';
-              e.target.style.height = e.target.scrollHeight + 'px';
+              e.target.style.height = `${e.target.scrollHeight}px`;
             }}
             rows={1}
           />
         </Localizer>
       </div>
 
-      <div class={style.configPanelBody}>
-        {isTrigger ? renderTriggerConfig() : renderActionConfig()}
-      </div>
+      <div class={style.configPanelBody}>{isTrigger ? renderTriggerConfig() : renderActionConfig()}</div>
 
       <div class={style.configPanelFooter}>
         {(() => {
