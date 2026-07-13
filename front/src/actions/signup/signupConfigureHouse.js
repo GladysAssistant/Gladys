@@ -73,6 +73,28 @@ function createActions(store) {
         signupHouseLeafletMap: leafletMap
       });
     },
+    selectHouseLocation(state, latitude, longitude) {
+      const leafletMap = state.signupHouseLeafletMap;
+      if (!leafletMap) {
+        return;
+      }
+      let marker = state.signupNewHouseMarker;
+      if (marker) {
+        marker.setLatLng(leaflet.latLng(latitude, longitude));
+      } else {
+        marker = leaflet
+          .marker([latitude, longitude], {
+            icon
+          })
+          .addTo(leafletMap);
+      }
+      leafletMap.setView([latitude, longitude], 16);
+      store.setState({
+        signupNewHouseMarker: marker,
+        signupNewHouseLatitude: latitude,
+        signupNewHouseLongitude: longitude
+      });
+    },
     onKeyPressRoomInput(state, e) {
       if (e.keyCode === 13) {
         actions.addRoom(state);
