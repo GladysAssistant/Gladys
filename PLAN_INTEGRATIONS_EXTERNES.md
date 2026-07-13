@@ -102,7 +102,7 @@ Fichiers principaux : `index.js` (constructeur : maps connexions WS, commandes e
 
 ### B.4 API-hôte REST — `/api/integration/v1/`
 
-Préfixe hors `/api/v1/` utilisateur, versionné par URL. Contrôleur `server/api/controllers/integrationHost.controller.js`, routes dans `server/api/routes.js` :
+Préfixe hors `/api/v1/` utilisateur, versionné par URL. Contrôleur `server/api/controllers/integrationHost.controller.js`, routes dans `server/api/routes.js`. **Contrats détaillés (corps de requêtes/réponses) en C.2–C.3.**
 
 **L'API-hôte ne permet ni création ni suppression de device.** L'intégration publie ses appareils découverts ; la création/modification/suppression reste un geste utilisateur dans l'UI (via le `POST /api/v1/device` standard, comme pour les intégrations internes).
 
@@ -122,7 +122,7 @@ Ne **pas** exposer ces routes via le gateway Gladys Plus (`setupGateway`).
 
 Étendre `server/api/websockets/index.js` (même WSS, nouveau `case` dans le switch) : message `AUTHENTICATION.INTEGRATION_REQUEST { token }` → validation du JWT d'intégration (signature + audience + `token_version`, cf. B.3) → `gladys.externalIntegration.integrationConnected(service, ws)`. Heartbeat : `ws.ping()` toutes les 20 s + flag `isAlive` sur `pong` + message applicatif `HEARTBEAT` (maj `last_heartbeat`) ; 2 pings manqués → DEGRADED. Reconnexion gérée par le SDK (backoff), une reconnexion remplace l'ancienne entrée.
 
-Messages descendants (core→intégration) :
+**Protocole complet (types et payloads) spécifié en C.4.** Messages descendants (core→intégration) :
 - `COMMAND { message_id, ... }` avec ack `COMMAND_RESULT` (voir B.6) ;
 - `SCAN_REQUEST` : demande de (re)découverte déclenchée depuis l'onglet Découverte de l'UI — l'intégration répond en republiant via `POST /discovered_device` ;
 - `DEVICE_CREATED` / `DEVICE_UPDATED` / `DEVICE_DELETED { device }` : relayés par les hooks `postCreate`/`postUpdate`/`postDelete` du proxy-service — le core les appelle déjà sur le service propriétaire à chaque geste utilisateur (vérifié : `server/lib/device/device.notify.js`). L'intégration sait ainsi immédiatement quels appareils suivre ou abandonner, sans polling.
@@ -133,12 +133,12 @@ Aucune modification de `device.setValue.js` ni de `device.notify.js` : `register
 
 ### B.7 API de gestion (admin)
 
-`server/api/controllers/externalIntegration.controller.js`, opérant sur les lignes `t_service` de type `external` (pas de nouvelle table) :
+`server/api/controllers/externalIntegration.controller.js`, opérant sur les lignes `t_service` de type `external` (pas de nouvelle table). **Contrats détaillés en C.5.**
 
 - **Admin** : `POST /api/v1/external_integration` (`{ store_slug }` = install depuis le store, le serveur résout image + manifeste depuis son cache d'index ; ou `{ docker_image, manifest? }` = mode dev), `POST .../:selector/update` (nouvelle version du store : pull + recréation du conteneur), `POST .../start|stop|restart`, `GET .../logs`, `DELETE` (`?delete_devices=true`).
 - **Utilisateur standard** : `GET /api/v1/external_integration` (liste + statut, alimente le catalogue d'intégrations du front, cf. B.8), `GET .../:selector` (détail : manifeste, `config_schema`, statut) et `GET /api/v1/external_integration/store` (catalogue du store depuis le cache d'index serveur, filtré par compatibilité de version Gladys, avec recherche + flags « installée » / « mise à jour disponible » ; `POST .../store/refresh` pour re-télécharger l'index à la demande).
 - **Écran Découverte** : `GET /api/v1/external_integration/:selector/discovered_device` (liste mémoire du superviseur, avec le flag « déjà créé ») et `POST .../scan` (envoie `SCAN_REQUEST` à l'intégration). La création du device se fait ensuite par le `POST /api/v1/device` existant, comme pour les intégrations internes.
-- **Écran Configuration** : `GET/POST /api/v1/external_integration/:selector/config` — valide le payload contre le `config_schema` du manifeste (ajv, déjà en dépendance serveur), persiste via `gladys.variable.setValue(key, service_id)` (les champs `secret: true` ne sont jamais renvoyés en clair par le `GET`), puis pousse `CONFIG_UPDATED` à l'intégration par WS pour qu'elle recharge sa config sans redémarrage.
+- **Écran Configuration** : `GET/POST /api/v1/external_integration/:selector/config` — valide le payload contre le `config_schema` du manifeste (format plat spécifié en C.1), persiste via `gladys.variable.setValue(key, service_id)` (les champs `secret: true` ne sont jamais renvoyés en clair par le `GET`), puis pousse `CONFIG_UPDATED` à l'intégration par WS pour qu'elle recharge sa config sans redémarrage.
 
 ### B.8 Front : au même niveau que les intégrations internes
 
@@ -168,7 +168,7 @@ Modèles de code : `front/src/routes/integration/all/zigbee2mqtt/` (structure 3 
 Le même manifeste est dupliqué dans l'image Docker (LABEL `io.gladysassistant.manifest`, le template le fait automatiquement au build) : le fichier du **repo** fait foi pour le store (c'est lui que le robot scrape) ; le **LABEL** ne sert qu'à l'install « dev » par nom d'image, sans repo GitHub. À l'installation depuis le store, c'est la version de l'index qui est enregistrée dans `t_service.manifest`.
 
 **L'indexeur** — nouveau repo public `GladysAssistant/integration-store` (hors monorepo) :
-- GitHub Action **planifiée toutes les heures** (+ déclenchable manuellement) : recherche GitHub par topic → fetch du `gladys-assistant-integration.json` de chaque repo (raw.githubusercontent) → **validation par script uniquement** (JSON Schema du manifeste, image bien formée, `manifest_version` supporté) → construction de `index.json` enrichi des métadonnées GitHub (stars, date de dernier commit — ranking gratuit sans télémétrie centralisée) → publication sur **GitHub Pages** (statique, CDN).
+- GitHub Action **planifiée toutes les heures** (+ déclenchable manuellement) : recherche GitHub par topic → fetch du `gladys-assistant-integration.json` de chaque repo (raw.githubusercontent) → **validation par script uniquement** (JSON Schema du manifeste, image bien formée, `manifest_version` supporté) → construction de `index.json` enrichi des métadonnées GitHub (stars, date de dernier commit — ranking gratuit sans télémétrie centralisée) → publication sur **GitHub Pages** (statique, CDN). Formats `index.json`/`rejected.json` spécifiés en C.6.
 - Les manifestes invalides sont listés dans un `rejected.json` public avec la raison → un dev diagnostique seul pourquoi son intégration n'apparaît pas, sans ouvrir de ticket.
 - Le code de validation est public : les règles d'admission sont vérifiables par tous, et n'importe qui peut re-générer l'index (fork de l'Action) — le store lui-même est forkable, donc pas de point de contrôle.
 - **Aucune modération en v1** (choix assumé) : pas de blocklist, pas de retrait manuel. La défense, c'est la sandbox (B.2) + l'affichage des permissions à l'installation. Une blocklist resterait ajoutable plus tard côté indexeur sans toucher au client.
@@ -203,6 +203,201 @@ Le même manifeste est dupliqué dans l'image Docker (LABEL `io.gladysassistant.
 4. **Backup/restore** : `container_id` obsolète après restore → réconciliation par label au boot ; `/data` du conteneur hors backup DB (documenter : persister l'important via `/config`).
 5. **Aucune modération du store** (choix v1) : un malware avéré reste listé tant que son auteur ne retire pas le topic. Défenses réelles : sandbox stricte (B.2), permissions affichées avant install, métadonnées GitHub visibles (stars, âge du repo). Une blocklist côté indexeur reste ajoutable plus tard sans toucher au client.
 6. **Supply-chain images** (registre libre + tags mutables) : un manifeste peut référencer l'image de n'importe qui, et un tag peut être réécrit après indexation. V1 : assumé et documenté (le template recommande GHCR du même repo et l'épinglage par digest, sans l'imposer) ; durcissement (digest obligatoire, signature) en phase 3.
+
+## C. Spécification des interfaces (contrats v1)
+
+Conventions générales, alignées sur l'existant :
+- **REST** : JSON exclusivement ; erreurs au format standard Gladys `{ "status": <code HTTP>, "code": "NOT_FOUND" | "UNAUTHORIZED" | "FORBIDDEN" | "BAD_REQUEST" | "UNPROCESSABLE_ENTITY" | ..., "message": "..." }` (produit par `errorMiddleware`).
+- **WebSocket** : enveloppe existante `{ "type": "<namespace.kebab-case>", "payload": { ... } }` (`formatWebsocketMessage`).
+- **Dates** : ISO 8601 UTC. **Identifiants externes** : tout `external_id` d'une intégration est préfixé `ext:<selector>:` (le serveur rejette le reste).
+
+### C.1 Le manifeste `gladys-assistant-integration.json`
+
+Exemple complet (celui du PoC) :
+
+```json
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Open-Meteo Demo",
+  "description": {
+    "en": "Weather sensor and virtual switch demo integration.",
+    "fr": "Intégration démo : capteur météo et interrupteur virtuel."
+  },
+  "version": "1.2.0",
+  "docker_image": "ghcr.io/john/gladys-open-meteo-demo:1.2.0",
+  "gladys_version": ">=4.62.0",
+  "cover_image": "https://raw.githubusercontent.com/john/gladys-open-meteo-demo/main/cover.jpg",
+  "permissions": {
+    "network_hosts": ["api.open-meteo.com"]
+  },
+  "config_schema": [
+    {
+      "key": "latitude",
+      "type": "number",
+      "label": { "en": "Latitude", "fr": "Latitude" },
+      "required": true,
+      "default": 48.85,
+      "min": -90,
+      "max": 90
+    },
+    {
+      "key": "api_key",
+      "type": "secret",
+      "label": { "en": "API key", "fr": "Clé d'API" },
+      "required": false
+    },
+    {
+      "key": "unit",
+      "type": "select",
+      "label": { "en": "Unit", "fr": "Unité" },
+      "default": "celsius",
+      "options": [
+        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
+        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+      ]
+    }
+  ]
+}
+```
+
+| Champ | Type | Obligatoire | Règles de validation (indexeur **et** serveur) |
+|---|---|---|---|
+| `manifest_version` | integer | oui | `1` ; rejet si supérieur à la version supportée |
+| `type` | string | oui | `"device"` (seule valeur en v1) |
+| `name` | string | oui | 1–50 caractères |
+| `description` | objet `{lang: string}` | oui | clé `en` obligatoire, autres langues optionnelles |
+| `version` | string | oui | semver strict ; doit être bumpé pour déclencher « mise à jour disponible » |
+| `docker_image` | string | oui | référence d'image valide, registre public, tag **ou digest** |
+| `gladys_version` | string | oui | range semver (syntaxe npm) ; sert au filtre de compatibilité |
+| `cover_image` | string | non | URL `https` (affichée dans le catalogue) |
+| `permissions.network_hosts` | array de string | non | hostnames — **déclaratif en v1** (transparence à l'install, non appliqué techniquement, cf. B.12) |
+| `config_schema` | array | non | liste **plate** de champs (voir ci-dessous) |
+
+**`config_schema`** : volontairement une liste plate de champs, pas du JSON Schema complet — le rendu du formulaire reste déterministe et sans surprise (principe « UI déclarative »). Champs par entrée : `key` (unique, `[a-z0-9_]`), `type` (`string` | `number` | `boolean` | `select` | `secret`), `label` (multi-langue, `en` obligatoire), `description` (multi-langue, optionnel), `required` (défaut `false`), `default`, `min`/`max` (number), `options` (select : `[{ value, label }]`). Les valeurs sont stockées dans `t_variable` scoppées par `service_id` ; les `secret` ne sont **jamais renvoyés au front** (cf. C.5), mais sont fournis à l'intégration.
+
+### C.2 API-hôte : conventions d'accès
+
+- Base : `GLADYS_HOST_API_URL` (env injectée, ex. `http://172.18.0.1:80`) + préfixe **`/api/integration/v1`**.
+- Auth : header **`Authorization: Bearer <GLADYS_INTEGRATION_TOKEN>`** (JWT injecté en env, cf. B.3). Absent/invalide/mauvaise audience/`token_version` obsolète → `401 UNAUTHORIZED`.
+
+### C.3 API-hôte : endpoints
+
+**`GET /api/integration/v1/status`** → `200`
+```json
+{ "gladys_version": "4.62.0", "service": { "id": "uuid", "selector": "ext-open-meteo-demo", "status": "RUNNING", "version": "1.2.0" } }
+```
+
+**`POST /api/integration/v1/heartbeat`** — corps `{}` → `200 { "success": true }` (fallback HTTP du heartbeat WS).
+
+**`POST /api/integration/v1/discovered_device`** — publie la liste **complète** des appareils découverts (remplace la précédente). Objet device = format standard Gladys, sans `service_id` ni `selector` (forcés côté serveur) :
+```json
+{
+  "devices": [
+    {
+      "name": "Météo Paris",
+      "external_id": "ext:open-meteo-demo:paris",
+      "features": [
+        {
+          "name": "Température",
+          "external_id": "ext:open-meteo-demo:paris:temperature",
+          "category": "temperature-sensor",
+          "type": "decimal",
+          "unit": "celsius",
+          "min": -50,
+          "max": 60,
+          "read_only": true,
+          "has_feedback": false,
+          "keep_history": true
+        }
+      ],
+      "params": [{ "name": "CITY", "value": "paris" }]
+    }
+  ]
+}
+```
+→ `200 { "success": true, "count": 1 }`. Règles : `external_id` préfixés (device **et** features), `category`/`type`/`unit` dans les listes standard de Gladys (`DEVICE_FEATURE_CATEGORIES`/`TYPES`/`UNITS`), max 200 devices, `400` sinon.
+
+**`GET /api/integration/v1/device`** → `200 [ <device> ]` — les devices de l'intégration **réellement créés par l'utilisateur** (format standard complet : `id`, `selector`, `features` avec leurs `selector`/`last_value`, `params`).
+
+**`POST /api/integration/v1/state`** — batch d'états, mappé sur `EVENTS.DEVICE.NEW_STATE` (mêmes champs que `device.newStateEvent`) :
+```json
+{
+  "states": [
+    { "device_feature_external_id": "ext:open-meteo-demo:paris:temperature", "state": 21.5 },
+    { "device_feature_external_id": "ext:open-meteo-demo:cam:text", "text": "hello" },
+    { "device_feature_external_id": "ext:open-meteo-demo:paris:temperature", "state": 19.2, "created_at": "2026-07-12T10:00:00.000Z" }
+  ]
+}
+```
+→ `200 { "success": true }`. `state` numérique **ou** `text` string ; `created_at` optionnel pour un état passé. Max 100 états/requête + rate-limit (anti-spam DB). Un `device_feature_external_id` inconnu est ignoré silencieusement (comportement standard de `newStateEvent` : l'utilisateur n'a pas créé ce device).
+
+**`GET /api/integration/v1/config`** → `200 { "config": { "latitude": 48.85, "unit": "celsius", "api_key": "s3cr3t" } }` — toutes les valeurs, secrets inclus (c'est l'intégration, pas le front).
+
+**`POST /api/integration/v1/config`** — corps `{ "config": { "<key>": <value> } }`, merge partiel → `200 { "success": true }`. Les clés présentes dans le `config_schema` sont validées contre lui ; les clés hors schéma sont un **stockage interne libre** de l'intégration (état d'appairage, tokens tiers…), jamais affichées dans l'UI.
+
+### C.4 WebSocket intégration : protocole
+
+Connexion : même hôte/port que l'API-hôte (`ws://<gateway>:<port>/`, même serveur HTTP). Non authentifié après 5 s → connexion terminée (comportement existant).
+
+| Sens | `type` | `payload` |
+|---|---|---|
+| intégration → core | `authenticate.integration-request` | `{ "token": "<JWT>" }` — **premier message obligatoire** |
+| core → intégration | `authentication.connected` | `{}` (réutilisé tel quel ; échec = close code `4000` `INVALID_ACCESS_TOKEN`) |
+| core → intégration | `external-integration.command` | `{ "message_id": "uuid", "action": "device.set-value", "device": { "external_id", "selector", "params" }, "device_feature": { "external_id", "category", "type" }, "value": 1 }` |
+| intégration → core | `external-integration.command-result` | `{ "message_id": "uuid", "success": true }` ou `{ "message_id": "uuid", "success": false, "error": "..." }` — attendu sous **5 s**, sinon la commande échoue côté core |
+| core → intégration | `external-integration.scan-request` | `{}` — l'intégration répond en republiant `POST /discovered_device` |
+| core → intégration | `external-integration.device-created` / `.device-updated` / `.device-deleted` | `{ "device": <device standard> }` (relais des hooks `postCreate`/`postUpdate`/`postDelete`) |
+| core → intégration | `external-integration.config-updated` | `{ "config": { ... } }` — nouvelles valeurs complètes (pas besoin de re-fetch) |
+| intégration → core | `external-integration.heartbeat` | `{}` — applicatif, optionnel si la lib WS répond aux pings protocole |
+
+Santé : le core envoie un **ping WebSocket protocolaire** toutes les 20 s ; toute lib WS standard y répond automatiquement (pong). 2 pongs manqués ou socket fermée → statut `DEGRADED`. Une reconnexion remplace l'ancienne connexion enregistrée.
+
+Messages core → front (UI temps réel, sur le WS utilisateur existant) : `external-integration.status-changed` `{ "selector", "status" }` et `external-integration.discovered-devices-updated` `{ "selector" }`.
+
+### C.5 API de gestion (front ↔ serveur)
+
+Routes `/api/v1/external_integration`, auth utilisateur Gladys standard ; **admin** requis pour tout ce qui modifie.
+
+| Méthode & route | Corps → Réponse |
+|---|---|
+| `GET /api/v1/external_integration` | → `[ { "id", "name", "selector", "status", "version", "docker_image", "store_slug", "manifest", "update_available" } ]` |
+| `GET .../:selector` | → détail (mêmes champs) |
+| `GET /api/v1/external_integration/store` | → `{ "refreshed_at", "integrations": [ { "store_slug", "manifest": <manifeste>, "github": { "stars", "pushed_at" }, "installed": false, "update_available": false, "compatible": true } ] }` (filtré par `gladys_version`) |
+| `POST .../store/refresh` *(admin)* | `{}` → index re-téléchargé, même réponse que `GET .../store` |
+| `POST /api/v1/external_integration` *(admin)* | `{ "store_slug": "john/gladys-open-meteo-demo" }` **ou** `{ "docker_image": "...", "manifest": {...} }` (mode dev) → `201` détail |
+| `POST .../:selector/start` / `stop` / `restart` / `update` *(admin)* | `{}` → `200` détail (statut à jour) |
+| `GET .../:selector/logs?lines=200` *(admin)* | → `{ "logs": "<stdout/stderr bruts via docker logs>" }` |
+| `GET .../:selector/discovered_device` | → `[ { ...device découvert, "created": false } ]` (flag = un device avec ce `external_id` existe déjà) |
+| `POST .../:selector/scan` | `{}` → `200 { "success": true }` (relaie `scan-request` ; `400` si intégration déconnectée) |
+| `GET .../:selector/config` | → `{ "config": { "latitude": 48.85, "api_key": null }, "configured_secrets": ["api_key"] }` — les `secret` sont toujours `null`, le flag dit s'ils sont renseignés |
+| `POST .../:selector/config` *(admin)* | `{ "config": {...} }` validé contre le `config_schema` (`422` sinon) → `200` + push `config-updated` à l'intégration ; un `secret` à `null` = inchangé |
+| `DELETE .../:selector?delete_devices=true` *(admin)* | → `200 { "success": true }` |
+
+### C.6 Formats publiés par l'indexeur
+
+**`index.json`** (GitHub Pages, consommé par toutes les Gladys) :
+```json
+{
+  "index_format": 1,
+  "generated_at": "2026-07-13T08:00:00.000Z",
+  "integrations": [
+    {
+      "store_slug": "john/gladys-open-meteo-demo",
+      "repo_url": "https://github.com/john/gladys-open-meteo-demo",
+      "manifest": { "...": "manifeste complet validé (C.1)" },
+      "github": { "stars": 12, "pushed_at": "2026-07-10T12:00:00.000Z", "owner_avatar_url": "https://..." }
+    }
+  ]
+}
+```
+
+**`rejected.json`** (diagnostic public en self-service) :
+```json
+[
+  { "store_slug": "jane/my-integration", "reason": "manifest.version: must be valid semver", "checked_at": "2026-07-13T08:00:00.000Z" }
+]
+```
 
 ## Ordre d'implémentation (jalons PR-ables)
 
