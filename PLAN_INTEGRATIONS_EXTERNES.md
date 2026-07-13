@@ -191,7 +191,7 @@ Le même manifeste est dupliqué dans l'image Docker (LABEL `io.gladysassistant.
 - Superviseur : `server/test/lib/external-integration/` (un fichier par fonction), Docker mocké via `server/test/lib/system/DockerodeMock.test.js` à étendre (createNetwork, getImage().inspect avec Labels) ou fakes sinon de `gladys.system.*`.
 - Contrôleurs : supertest ; API-hôte appelée avec un JWT d'intégration généré en seed (pas `authenticatedRequest`, qui est un token utilisateur). **Tests d'isolation tenant obligatoires** (token de A ≠ devices de B, préfixe `external_id` rejeté, access token utilisateur refusé sur l'API-hôte — mauvaise audience).
 - Middleware : 401 (token absent/signature invalide/mauvaise audience/`token_version` obsolète/service non externe). WS : auth OK/KO, commande + ack + timeout (étendre `server/test/websockets/`).
-- Store côté serveur : fetch d'index mocké (nock ou fake), cache local (hit/miss/expiration/index indisponible), filtre de compatibilité de version, détection de mise à jour, install par `store_slug` inconnu → 404.
+- Store côté serveur : fetch d'index mocké (nock ou fake), cache local (hit/miss/expiration/index indisponible), filtre de compatibilité de version, détection de mise à jour, install par `store_slug` inconnu → 404, et test anti-collision de routes (`GET .../store` renvoie le catalogue, pas le handler `:selector`, cf. C.5).
 - Indexeur (repo `integration-store`, CI propre hors monorepo) : validation de manifestes valides/invalides, génération `index.json`/`rejected.json` déterministe sur fixtures.
 - SDK/PoC : suite Mocha propre dans `integration-sdk/node`, hors CI serveur.
 
@@ -360,6 +360,8 @@ Messages core → front (UI temps réel, sur le WS utilisateur existant) : `exte
 ### C.5 API de gestion (front ↔ serveur)
 
 Routes `/api/v1/external_integration`, auth utilisateur Gladys standard ; **admin** requis pour tout ce qui modifie.
+
+⚠️ **Collision `store` vs `:selector`** : les routes sont enregistrées dans Express dans l'ordre de déclaration de l'objet `routes.js` (`setupRoutes.js` itère `Object.keys`). Les routes littérales `store` et `store/refresh` doivent donc être déclarées **avant** `:selector` — précédent existant dans le code : `get /api/v1/device/duckdb_migration_state` déclaré avant `get /api/v1/device/:device_selector`. Double protection : les selectors d'intégrations sont préfixés `ext-` (B.1), `store` ne peut donc jamais être un selector valide ; et un test dédié vérifie que `GET .../store` renvoie le catalogue (pas le handler détail), pour casser la CI si quelqu'un réordonne les routes.
 
 | Méthode & route | Corps → Réponse |
 |---|---|
