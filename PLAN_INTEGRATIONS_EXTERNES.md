@@ -496,14 +496,16 @@ Justification champ par champ :
 
 Recréation de conteneur (update, régénération de token, changement de descripteur) = destroy + create avec les mêmes `Binds` : `/data` est la seule mémoire persistante du conteneur, tout le reste est jetable par design.
 
-## Ordre d'implémentation (jalons PR-ables)
+## Ordre d'implémentation (jalons = commits d'une seule PR)
 
-1. **PR 1 — Socle superviseur** : constantes (`SERVICE_TYPES`, `SERVICE_STATUS.DEGRADED`), migration `addColumn` sur `t_service` + modèle, `system.createNetwork|inspectNetwork|getImageLabels`, lib `external-integration` (sans WS/commandes), câblage `lib/index.js`, API admin + tests. → on installe/démarre/arrête un conteneur verrouillé via l'API.
-2. **PR 2 — API-hôte** : `utils/integrationToken.js` (génération/validation JWT), middleware, flag `externalIntegrationAuth`, contrôleur `/api/integration/v1/*` (discovered_device, device en lecture, state, config) + tests d'isolation. → une intégration publie ses appareils découverts et des états.
-3. **PR 3 — WS + commandes + santé** : extension WebsocketManager, connected/disconnected, `sendCommand` + ack/timeout, proxy-service (setValue + postCreate/postUpdate/postDelete), scan request, heartbeat, checkHealth + backoff + DEGRADED/FAILED. → machine à états complète, `setValue` atteint le conteneur, l'intégration est notifiée des créations/suppressions.
-4. **PR 4 — Store côté serveur** : migration `store_slug`, lib `store/` (fetch + cache + compatibilité + updates), endpoints `GET .../store`, `POST .../store/refresh`, install par `store_slug`, `POST .../:selector/update` + tests. En parallèle (hors monorepo) : repo `GladysAssistant/integration-store` (Action d'indexation, JSON Schema du manifeste, GitHub Pages). → le catalogue est alimenté par l'index, install/update en un clic par API.
-5. **PR 5 — Front** : intégrations externes du store dans le catalogue (badge « externe », écran d'installation avec avertissement, statut temps réel, mise à jour disponible, install dev), page générique 3 écrans Appareils/Découverte/Configuration (formulaire généré depuis `config_schema`), logs, i18n.
-6. **PR 6 — SDK + template + PoC + doc** : `integration-sdk/node`, template de repo publiable (manifeste + workflow de build d'image prêt), exemple demo, doc API-hôte + doc « publier son intégration », parcours e2e documenté.
+Une **seule PR de bout en bout** sur le monorepo — c'est elle que le mainteneur teste (checkout d'une branche, un build, tout le parcours). Les jalons ci-dessous sont l'**ordre de travail interne** : chacun correspond à un commit (ou groupe de commits) cohérent avec ses tests verts, ce qui permet une review commit par commit et un bisect facile, sans éparpiller la feature en morceaux non testables.
+
+1. **Jalon 1 — Socle superviseur** : constantes (`SERVICE_TYPES`, `SERVICE_STATUS.DEGRADED`), migration `addColumn` sur `t_service` + modèle, `system.createNetwork|inspectNetwork|getImageLabels`, lib `external-integration` (sans WS/commandes), câblage `lib/index.js`, API admin + tests. → on installe/démarre/arrête un conteneur verrouillé via l'API.
+2. **Jalon 2 — API-hôte** : `utils/integrationToken.js` (génération/validation JWT), middleware, flag `externalIntegrationAuth`, contrôleur `/api/integration/v1/*` (discovered_device, device en lecture, state, config) + tests d'isolation. → une intégration publie ses appareils découverts et des états.
+3. **Jalon 3 — WS + commandes + santé** : extension WebsocketManager, connected/disconnected, `sendCommand` + ack/timeout, proxy-service (setValue + postCreate/postUpdate/postDelete), scan request, heartbeat, checkHealth + backoff + DEGRADED/FAILED. → machine à états complète, `setValue` atteint le conteneur, l'intégration est notifiée des créations/suppressions.
+4. **Jalon 4 — Store côté serveur** : migration `store_slug`, lib `store/` (fetch + cache + compatibilité + updates), endpoints `GET .../store`, `POST .../store/refresh`, install par `store_slug`, `POST .../:selector/update` + tests. En parallèle (hors monorepo) : repo `GladysAssistant/integration-store` (Action d'indexation, JSON Schema du manifeste, GitHub Pages). → le catalogue est alimenté par l'index, install/update en un clic par API.
+5. **Jalon 5 — Front** : intégrations externes du store dans le catalogue (badge « externe », écran d'installation avec avertissement, statut temps réel, mise à jour disponible, install dev), page générique 3 écrans Appareils/Découverte/Configuration (formulaire généré depuis `config_schema`), logs, i18n.
+6. **Jalon 6 — SDK + template + PoC + doc** : `integration-sdk/node`, template de repo publiable (manifeste + workflow de build d'image prêt), exemple demo, doc API-hôte + doc « publier son intégration », parcours e2e documenté.
 
 ## Répartition par repo (exécution en parallèle)
 
@@ -511,7 +513,7 @@ Deux chantiers indépendants, un par repo — le contrat entre les deux est `ind
 
 | Chantier | Repo | Périmètre (sections) | Consignes d'exécution |
 |---|---|---|---|
-| **Stack Gladys** | `GladysAssistant/Gladys` (monorepo) | B.1–B.8, B.10, B.11 (hors indexeur), C.2–C.5, C.7 — serveur, front, SDK, PoC, template | **Une PR par jalon** (PR 1 → 6, chacune verte avant la suivante — pas de méga-PR : patch coverage 100 % et review impossibles sinon) ; embarque une **copie vendorée** du `manifest.schema.json` |
+| **Stack Gladys** | `GladysAssistant/Gladys` (monorepo) | B.1–B.8, B.10, B.11 (hors indexeur), C.2–C.5, C.7 — serveur, front, SDK, PoC, template | **Une seule PR de bout en bout, testable par le mainteneur**, structurée en **un commit (ou groupe de commits) par jalon** (1 → 6, tests verts à chaque jalon — la review se fait commit par commit) ; PR ouverte en draft dès le jalon 1 pour faire tourner la CI en continu ; embarque une **copie vendorée** du `manifest.schema.json` |
 | **Indexeur du store** | `GladysAssistant/integration-store` (nouveau) | B.9 (indexeur), B.11 (tests indexeur), C.1, C.6 | **Propriétaire canonique du `manifest.schema.json`** (publié sur Pages à côté de l'index) ; Action planifiée + tests sur fixtures, CI propre |
 
 Hors code (étapes manuelles, après les deux chantiers) : activer GitHub Pages sur `integration-store`, et publier l'intégration demo **comme le ferait un dev tiers** (repo public + topic + image poussée sur un registre public) pour dérouler le parcours e2e de la section Vérification.
