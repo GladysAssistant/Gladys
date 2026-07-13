@@ -90,11 +90,11 @@ Fichiers principaux : `index.js` (constructeur : maps connexions WS, commandes e
 
 **Conteneur verrouillé** : rootfs read-only, zéro capability, pas d'escalade, 256 Mo / 0,5 CPU / 100 pids, un seul bind `/data` (via `system.getGladysBasePath()`), tmpfs `/tmp` noexec, bridge dédié, restart géré par le superviseur (pas par Docker), label de réconciliation, logs bornés. **Descripteur `createContainer` complet, justification champ par champ et contrat des variables d'environnement (`GLADYS_HOST_API_URL`, `GLADYS_INTEGRATION_TOKEN`, `GLADYS_INTEGRATION_SELECTOR`, `TZ`) : spécifiés en C.7.**
 
-**Ajouts à `server/lib/system/`** : `system.createNetwork.js` (bridge `gladys-integrations`, `enable_icc=false` pour isoler les intégrations entre elles), `system.inspectNetwork.js` (IP gateway pour `GLADYS_HOST_API_URL`), `system.getImageLabels.js` (lecture du manifeste).
+**Ajouts à `server/lib/system/`** : `system.createNetwork.js` (bridge `gladys-integrations`, `enable_icc=false` pour isoler les intégrations entre elles, **subnet épinglé par IPAM** : `172.30.0.0/24`, gateway `172.30.0.1` — cf. C.7), `system.inspectNetwork.js` (lecture de la gateway effective pour `GLADYS_HOST_API_URL`), `system.getImageLabels.js` (lecture du manifeste).
 
 **Réseau : compatible avec le Gladys de production en `--network=host`, sans toucher au `docker run` existant.**
 - Le bridge est créé **à chaud** au premier démarrage du superviseur (`dockerode.createNetwork`, idempotent via `listNetworks`) — créer un réseau Docker a posteriori ne demande aucun redémarrage.
-- Un conteneur en `--network=host` **ne peut pas** rejoindre un autre réseau (refus Docker) — mais il n'en a pas besoin : Gladys en host écoute sur toutes les interfaces de l'hôte, y compris celle du bridge (`br-xxxx`). Depuis un conteneur d'intégration, la **gateway du bridge** (ex. `172.18.0.1`) est l'hôte → `GLADYS_HOST_API_URL = http://<gateway>:<SERVER_PORT>`, gateway lue via `inspectNetwork` (`IPAM.Config[0].Gateway`). Pas de NAT, pas de port à publier.
+- Un conteneur en `--network=host` **ne peut pas** rejoindre un autre réseau (refus Docker) — mais il n'en a pas besoin : Gladys en host écoute sur toutes les interfaces de l'hôte, y compris celle du bridge (`br-xxxx`). Depuis un conteneur d'intégration, la **gateway du bridge** est l'hôte → `GLADYS_HOST_API_URL = http://<gateway>:<SERVER_PORT>`. Le subnet étant épinglé à la création du réseau (`172.30.0.0/24`), la gateway est **déterministe : `172.30.0.1`** sur la quasi-totalité des installs ; si ce subnet est déjà occupé sur la machine (rare), repli sur l'auto-assignation Docker, et la gateway effective est lue via `inspectNetwork` (`IPAM.Config[0].Gateway`). Pas de NAT, pas de port à publier.
 - Cas Gladys en **bridge** (installs non standard) : l'attachement a posteriori fonctionne, lui (`network.connect(getGladysContainerId())`, à chaud), et les intégrations joignent Gladys par le DNS embarqué du bridge custom. Distinction des deux cas via le `getNetworkMode()` existant. Design plus permissif que les services actuels (node-red/z2m/matterbridge exigent le mode host).
 - `enable_icc=false` ne bloque que le trafic conteneur↔conteneur sur le bridge (l'isolation voulue entre intégrations) ; conteneur→gateway (Gladys) et conteneur→internet (NAT) passent normalement. À documenter : un pare-feu host strict (ufw) filtre le trafic bridge→hôte (chaîne INPUT).
 
@@ -438,7 +438,7 @@ Descripteur `createContainer` complet (généré par `buildContainerDescriptor.j
     "io.gladysassistant.external-integration": "ext-john-gladys-open-meteo-demo"
   },
   "Env": [
-    "GLADYS_HOST_API_URL=http://172.18.0.1:80",
+    "GLADYS_HOST_API_URL=http://172.30.0.1:80",
     "GLADYS_INTEGRATION_TOKEN=<JWT>",
     "GLADYS_INTEGRATION_SELECTOR=ext-john-gladys-open-meteo-demo",
     "TZ=Europe/Paris"
@@ -489,7 +489,7 @@ Justification champ par champ :
 
 | Variable | Exemple | Rôle |
 |---|---|---|
-| `GLADYS_HOST_API_URL` | `http://172.18.0.1:80` | base de l'API-hôte (C.2), sans slash final ; l'URL WS s'en déduit (`http→ws`, même hôte/port). Gateway du bridge en mode host, alias DNS `gladys` si Gladys est en bridge (B.2 réseau) |
+| `GLADYS_HOST_API_URL` | `http://172.30.0.1:80` | base de l'API-hôte (C.2), sans slash final ; l'URL WS s'en déduit (`http→ws`, même hôte/port). **Valeur nominale : `http://172.30.0.1:80`** — gateway du bridge épinglée par IPAM + `SERVER_PORT` (80 sur l'install standard). Cas dégradés : subnet occupé → gateway auto-assignée lue via `inspectNetwork` ; Gladys en bridge → alias DNS `http://gladys:<port>` (B.2 réseau). **L'intégration doit toujours lire la variable**, jamais coder l'URL en dur — c'est la variable qui fait contrat, sa valeur n'est prévisible que pour le débogage |
 | `GLADYS_INTEGRATION_TOKEN` | JWT | auth REST (`Authorization: Bearer`) et WS (`authenticate.integration-request`) ; régénéré à **chaque recréation** du conteneur (`token_version++`, B.3) |
 | `GLADYS_INTEGRATION_SELECTOR` | `ext-john-gladys-open-meteo-demo` | selector de l'intégration, pour construire les `external_id` (`ext:<selector>:...`) |
 | `TZ` | `Europe/Paris` | timezone configurée dans Gladys (variable système `TIMEZONE`), pour des logs et des crons cohérents |
