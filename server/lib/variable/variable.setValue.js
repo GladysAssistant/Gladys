@@ -46,6 +46,12 @@ async function setValue(key, value, serviceId = null, userId = null) {
     this.event.emit(EVENTS.GATEWAY.USER_KEYS_CHANGED);
   }
 
+  // if the variable updated is the mDNS hostname, we send an event
+  // so the mDNS advertisement is restarted with the new name
+  if (key === SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME) {
+    this.event.emit(EVENTS.SYSTEM.MDNS_HOSTNAME_CHANGED);
+  }
+
   return createdOrUpdatedVariable;
 }
 

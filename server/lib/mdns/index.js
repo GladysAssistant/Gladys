@@ -1,76 +1,32 @@
-const { Bonjour } = require('bonjour-service');
+const { EVENTS } = require('../../utils/constants');
+const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
-const logger = require('../../utils/logger');
+const { DEFAULT_MDNS_HOSTNAME, MDNS_SERVICE_NAME, HTTP_SERVICE_TYPE } = require('./mdns.constants');
+const { start } = require('./mdns.start');
+const { stop } = require('./mdns.stop');
+const { restart } = require('./mdns.restart');
+const { getRecords } = require('./mdns.getRecords');
+const { handleQuery } = require('./mdns.handleQuery');
 
-const MDNS_HOST = 'gladysassistant.local';
-const MDNS_SERVICE_NAME = 'Gladys Assistant';
-
-/** @type {any} */
-let bonjourInstance = null;
-
-/**
- * @description Advertise Gladys on the local network with mDNS, as http://gladysassistant.local.
- * @param {number} port - Port of the Gladys web server.
- * @returns {any} The bonjour instance, or null if mDNS is unavailable.
- * @example
- * advertise(80);
- */
-function advertise(port) {
-  try {
-    bonjourInstance = new Bonjour(undefined, (/** @type {any} */ error) => {
-      logger.warn('mDNS: network error while advertising Gladys');
-      logger.warn(error);
-    });
-    // probe: false = Gladys owns this name, announce it without checking for
-    // conflicts first. Otherwise, a restart after a crash (no mDNS goodbye sent)
-    // would detect its own stale records as a conflict and fail to advertise.
-    const service = bonjourInstance.publish({
-      name: MDNS_SERVICE_NAME,
-      host: MDNS_HOST,
-      type: 'http',
-      port,
-      probe: false,
-    });
-    service.on('error', (/** @type {any} */ error) => {
-      logger.warn('mDNS: error while advertising Gladys');
-      logger.warn(error);
-    });
-    logger.info(`mDNS: advertising Gladys as http://${MDNS_HOST}:${port}`);
-    return bonjourInstance;
-  } catch (e) {
-    logger.warn('mDNS: unable to advertise Gladys on the local network');
-    logger.warn(e);
-    bonjourInstance = null;
-    return null;
-  }
-}
-
-/**
- * @description Stop advertising Gladys on the local network (sends mDNS goodbye packets).
- * @returns {Promise} Resolve when the mDNS instance is destroyed.
- * @example
- * await stop();
- */
-async function stop() {
-  if (bonjourInstance === null) {
-    return;
-  }
-  const instance = bonjourInstance;
-  bonjourInstance = null;
-  try {
-    await new Promise((resolve) => {
-      instance.unpublishAll(() => resolve(null));
-    });
-    instance.destroy();
-    logger.info('mDNS: stopped advertising Gladys');
-  } catch (e) {
-    logger.warn(e);
-  }
-}
-
-module.exports = {
-  advertise,
-  stop,
-  MDNS_HOST,
-  MDNS_SERVICE_NAME,
+const Mdns = function Mdns(variable, event) {
+  this.variable = variable;
+  this.event = event;
+  /** @type {any} */
+  this.mdns = null;
+  /** @type {number|null} */
+  this.port = null;
+  this.hostname = DEFAULT_MDNS_HOSTNAME;
+  this.fqdn = `${DEFAULT_MDNS_HOSTNAME}.local`;
+  this.instanceFqdn = `${MDNS_SERVICE_NAME}.${HTTP_SERVICE_TYPE}`;
+  /** @type {any} */
+  this.announceTimeout = null;
+  this.event.on(EVENTS.SYSTEM.MDNS_HOSTNAME_CHANGED, eventFunctionWrapper(this.restart.bind(this)));
 };
+
+Mdns.prototype.start = start;
+Mdns.prototype.stop = stop;
+Mdns.prototype.restart = restart;
+Mdns.prototype.getRecords = getRecords;
+Mdns.prototype.handleQuery = handleQuery;
+
+module.exports = Mdns;

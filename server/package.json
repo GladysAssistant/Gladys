@@ -84,7 +84,6 @@
     "axios": "^1.7.9",
     "bcrypt": "^5.1.0",
     "bluebird": "^3.7.2",
-    "bonjour-service": "^1.4.3",
     "bottleneck": "^2.19.5",
     "compression": "^1.7.4",
     "cross-env": "^7.0.3",

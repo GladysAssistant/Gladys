@@ -50,6 +50,7 @@ describe('system.getInfos', () => {
     expect(infos).to.have.property('cpus');
     expect(infos).to.have.property('network_interfaces');
     expect(infos).to.have.property('local_ip');
+    expect(infos).to.have.property('server_port');
     expect(infos).to.have.property('nodejs_version');
     expect(infos).to.have.property('gladys_version');
     expect(infos).to.have.property('latest_gladys_version', undefined);

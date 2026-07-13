@@ -185,6 +185,7 @@ async function getInfos() {
     cpus: os.cpus(),
     network_interfaces: networkInterfaces,
     local_ip: getLocalIp(networkInterfaces),
+    server_port: parseInt(process.env.SERVER_PORT, 10) || 1443,
     nodejs_version: process.version,
     gladys_version: this.gladysVersion,
     latest_gladys_version: this.latestGladysVersion,

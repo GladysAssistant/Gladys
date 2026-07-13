@@ -5,12 +5,14 @@ if (process.env.NODE_ENV === 'development') {
 const Gladys = require('./lib');
 const db = require('./models');
 const { start } = require('./api');
-const mdns = require('./lib/mdns');
 
 const SERVER_PORT = parseInt(process.env.SERVER_PORT, 10) || 1443;
 const SERVE_FRONT = process.env.NODE_ENV === 'production' ? true : process.env.SERVE_FRONT === 'true';
 
 const logger = require('./utils/logger');
+
+/** @type {any} */
+let gladysInstance = null;
 
 process.on('unhandledRejection', (error, promise) => {
   logger.error('unhandledRejection catched:', promise);
@@ -52,7 +54,8 @@ const shutdown = async (signal) => {
     process.exit();
   }, 10 * 1000);
   logger.info('Closing database connections.');
-  await Promise.all([closeSQLite(), closeDuckDB(), mdns.stop()]);
+  const stopMdns = gladysInstance ? gladysInstance.mdns.stop() : Promise.resolve();
+  await Promise.all([closeSQLite(), closeDuckDB(), stopMdns]);
   process.exit();
 };
 
@@ -64,6 +67,7 @@ process.on('SIGINT', () => shutdown('SIGINT'));
   const gladys = Gladys({
     jwtSecret: process.env.JWT_SECRET,
   });
+  gladysInstance = gladys;
 
   // start Gladys
   await gladys.start();
@@ -73,6 +77,6 @@ process.on('SIGINT', () => shutdown('SIGINT'));
     serveFront: SERVE_FRONT,
   });
 
-  // advertise Gladys on the local network (http://gladysassistant.local)
-  mdns.advertise(SERVER_PORT);
+  // advertise Gladys on the local network (http://<hostname>.local)
+  await gladys.mdns.start(SERVER_PORT);
 })();

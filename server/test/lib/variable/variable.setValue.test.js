@@ -71,4 +71,12 @@ describe('variable.setValue', () => {
     await customVariable.setValue(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_USERS_KEYS, 'TIMEZONE');
     assert.calledWith(event.emit, EVENTS.GATEWAY.USER_KEYS_CHANGED);
   });
+  it('should create mDNS hostname variable and emit event', async () => {
+    const event = {
+      emit: fake.returns(),
+    };
+    const customVariable = new Variable(event);
+    await customVariable.setValue(SYSTEM_VARIABLE_NAMES.MDNS_HOSTNAME, 'gladys2');
+    assert.calledWith(event.emit, EVENTS.SYSTEM.MDNS_HOSTNAME_CHANGED);
+  });
 });
