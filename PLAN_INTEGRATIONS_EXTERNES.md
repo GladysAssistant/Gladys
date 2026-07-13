@@ -88,7 +88,7 @@ Fichiers principaux : `index.js` (constructeur : maps connexions WS, commandes e
 - Conteneur exité (constaté par `checkHealth`) → restart avec backoff ; `failure_count` incrémenté à chaque restart superviseur, **remis à zéro après 60 s de `RUNNING` stable** (sans reset, 5 crashs répartis sur six mois mettraient l'intégration en panne) ; `failure_count ≥ 5` → `ERROR` (plus de restart auto, action admin requise).
 - `STOPPED` : uniquement par action utilisateur (stop) ; ignoré au boot par `startAll`.
 
-**Conteneur verrouillé** (descripteur dockerode) : `ReadonlyRootfs: true`, `CapDrop: ['ALL']`, `SecurityOpt: ['no-new-privileges']`, `Memory`/`MemorySwap` 256 Mo, `NanoCpus` 0,5, `PidsLimit: 100`, bind unique `<basePath>/external-integrations/<selector>:/data` (via `system.getGladysBasePath()`), `Tmpfs /tmp noexec`, `NetworkMode: 'gladys-integrations'`, `RestartPolicy: no` (c'est le superviseur qui redémarre), label `io.gladysassistant.external-integration`. Env : `GLADYS_HOST_API_URL`, `GLADYS_INTEGRATION_TOKEN` (JWT, régénéré à chaque recréation du conteneur), `GLADYS_INTEGRATION_SELECTOR`.
+**Conteneur verrouillé** : rootfs read-only, zéro capability, pas d'escalade, 256 Mo / 0,5 CPU / 100 pids, un seul bind `/data` (via `system.getGladysBasePath()`), tmpfs `/tmp` noexec, bridge dédié, restart géré par le superviseur (pas par Docker), label de réconciliation, logs bornés. **Descripteur `createContainer` complet, justification champ par champ et contrat des variables d'environnement (`GLADYS_HOST_API_URL`, `GLADYS_INTEGRATION_TOKEN`, `GLADYS_INTEGRATION_SELECTOR`, `TZ`) : spécifiés en C.7.**
 
 **Ajouts à `server/lib/system/`** : `system.createNetwork.js` (bridge `gladys-integrations`, `enable_icc=false` pour isoler les intégrations entre elles), `system.inspectNetwork.js` (IP gateway pour `GLADYS_HOST_API_URL`), `system.getImageLabels.js` (lecture du manifeste).
 
@@ -425,6 +425,76 @@ Routes `/api/v1/external_integration`, auth utilisateur Gladys standard ; **admi
   { "store_slug": "bob/gladys-foo", "level": "warning", "reason": "cover_image: expected 800x534, got 1200x800 — placeholder used", "checked_at": "2026-07-13T08:00:00.000Z" }
 ]
 ```
+
+### C.7 Le conteneur d'intégration : descripteur Docker et environnement
+
+Descripteur `createContainer` complet (généré par `buildContainerDescriptor.js`, même format que les descripteurs des services internes, ex. `server/services/zigbee2mqtt/docker/*.json`) :
+
+```json
+{
+  "name": "gladys-ext-john-gladys-open-meteo-demo",
+  "Image": "ghcr.io/john/gladys-open-meteo-demo:1.2.0",
+  "Labels": {
+    "io.gladysassistant.external-integration": "ext-john-gladys-open-meteo-demo"
+  },
+  "Env": [
+    "GLADYS_HOST_API_URL=http://172.18.0.1:80",
+    "GLADYS_INTEGRATION_TOKEN=<JWT>",
+    "GLADYS_INTEGRATION_SELECTOR=ext-john-gladys-open-meteo-demo",
+    "TZ=Europe/Paris"
+  ],
+  "HostConfig": {
+    "NetworkMode": "gladys-integrations",
+    "RestartPolicy": { "Name": "no" },
+    "ReadonlyRootfs": true,
+    "CapDrop": ["ALL"],
+    "SecurityOpt": ["no-new-privileges"],
+    "Memory": 268435456,
+    "MemorySwap": 268435456,
+    "NanoCpus": 500000000,
+    "PidsLimit": 100,
+    "Binds": ["/var/lib/gladysassistant/external-integrations/ext-john-gladys-open-meteo-demo:/data"],
+    "Tmpfs": { "/tmp": "rw,noexec,nosuid,size=64m" },
+    "LogConfig": { "Type": "json-file", "Config": { "max-size": "10m", "max-file": "2" } }
+  },
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}
+```
+
+Justification champ par champ :
+
+| Champ | Valeur | Pourquoi |
+|---|---|---|
+| `name` | `gladys-<selector>` | retrouvable/déboguable en `docker ps` ; unicité garantie par le selector |
+| `Labels` | selector en valeur | **clé de réconciliation** au boot et après backup/restore (B.2) ; permet aussi de retrouver les conteneurs orphelins d'intégrations désinstallées |
+| `NetworkMode` | `gladys-integrations` | bridge dédié, `enable_icc=false` (B.2 réseau) |
+| `RestartPolicy` | `no` | c'est le **superviseur** qui redémarre (backoff + machine à états) ; une policy Docker `always` le court-circuiterait |
+| `ReadonlyRootfs` | `true` | seuls `/data` et `/tmp` sont inscriptibles |
+| `CapDrop` | `ALL` | aucune capability Linux |
+| `SecurityOpt` | `no-new-privileges` | pas d'escalade via binaires setuid |
+| `Memory`/`MemorySwap` | 256 Mo (mêmes valeurs) | swap = memory ⇒ **pas de swap** ; OOM kill → restart supervisé |
+| `NanoCpus` | `500000000` (0,5 CPU) | une intégration ne peut pas affamer Gladys sur Raspberry Pi |
+| `PidsLimit` | 100 | anti fork-bomb |
+| `Binds` | un seul : `<basePath>/external-integrations/<selector>:/data` | persistance locale de l'intégration ; survit aux recréations de conteneur, supprimé à la désinstallation |
+| `Tmpfs /tmp` | `noexec,nosuid,64m` | scratch en RAM, pas d'exécution de binaires droppés |
+| `LogConfig` | json-file 10 Mo × 2 | borne le disque (les logs sont lus via `docker logs`, cf. B.2) ; mêmes valeurs que le `docker run` de Gladys |
+| `User` | *(non forcé)* | l'image choisit son user ; le template met `USER node` — forcer un uid arbitraire casserait des images légitimes |
+
+**Ce qui n'est jamais accordé** (différences volontaires avec les conteneurs des services internes type z2m) : pas de `Devices` (`/dev`), pas de `Privileged`, pas de montage de la socket Docker, pas de `NetworkMode: host`, pas de ports publiés (`ExposedPorts`/`PortBindings` vides — le canal entrant, c'est le WS sortant de l'intégration).
+
+**Variables d'environnement injectées** (contrat complet — rien d'autre n'est passé) :
+
+| Variable | Exemple | Rôle |
+|---|---|---|
+| `GLADYS_HOST_API_URL` | `http://172.18.0.1:80` | base de l'API-hôte (C.2), sans slash final ; l'URL WS s'en déduit (`http→ws`, même hôte/port). Gateway du bridge en mode host, alias DNS `gladys` si Gladys est en bridge (B.2 réseau) |
+| `GLADYS_INTEGRATION_TOKEN` | JWT | auth REST (`Authorization: Bearer`) et WS (`authenticate.integration-request`) ; régénéré à **chaque recréation** du conteneur (`token_version++`, B.3) |
+| `GLADYS_INTEGRATION_SELECTOR` | `ext-john-gladys-open-meteo-demo` | selector de l'intégration, pour construire les `external_id` (`ext:<selector>:...`) |
+| `TZ` | `Europe/Paris` | timezone configurée dans Gladys (variable système `TIMEZONE`), pour des logs et des crons cohérents |
+
+Recréation de conteneur (update, régénération de token, changement de descripteur) = destroy + create avec les mêmes `Binds` : `/data` est la seule mémoire persistante du conteneur, tout le reste est jetable par design.
 
 ## Ordre d'implémentation (jalons PR-ables)
 
