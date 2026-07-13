@@ -82,7 +82,13 @@ Fichiers principaux : `index.js` (constructeur : maps connexions WS, commandes e
 
 **Conteneur verrouillé** (descripteur dockerode) : `ReadonlyRootfs: true`, `CapDrop: ['ALL']`, `SecurityOpt: ['no-new-privileges']`, `Memory`/`MemorySwap` 256 Mo, `NanoCpus` 0,5, `PidsLimit: 100`, bind unique `<basePath>/external-integrations/<selector>:/data` (via `system.getGladysBasePath()`), `Tmpfs /tmp noexec`, `NetworkMode: 'gladys-integrations'`, `RestartPolicy: no` (c'est le superviseur qui redémarre), label `io.gladysassistant.external-integration`. Env : `GLADYS_HOST_API_URL`, `GLADYS_INTEGRATION_TOKEN` (JWT, régénéré à chaque recréation du conteneur), `GLADYS_INTEGRATION_SELECTOR`.
 
-**Ajouts à `server/lib/system/`** : `system.createNetwork.js` (bridge `gladys-integrations`, `enable_icc=false` pour isoler les intégrations entre elles), `system.inspectNetwork.js` (IP gateway pour `GLADYS_HOST_API_URL`), `system.getImageLabels.js` (lecture du manifeste). Gérer via `getNetworkMode()` les deux cas host/bridge du conteneur Gladys.
+**Ajouts à `server/lib/system/`** : `system.createNetwork.js` (bridge `gladys-integrations`, `enable_icc=false` pour isoler les intégrations entre elles), `system.inspectNetwork.js` (IP gateway pour `GLADYS_HOST_API_URL`), `system.getImageLabels.js` (lecture du manifeste).
+
+**Réseau : compatible avec le Gladys de production en `--network=host`, sans toucher au `docker run` existant.**
+- Le bridge est créé **à chaud** au premier démarrage du superviseur (`dockerode.createNetwork`, idempotent via `listNetworks`) — créer un réseau Docker a posteriori ne demande aucun redémarrage.
+- Un conteneur en `--network=host` **ne peut pas** rejoindre un autre réseau (refus Docker) — mais il n'en a pas besoin : Gladys en host écoute sur toutes les interfaces de l'hôte, y compris celle du bridge (`br-xxxx`). Depuis un conteneur d'intégration, la **gateway du bridge** (ex. `172.18.0.1`) est l'hôte → `GLADYS_HOST_API_URL = http://<gateway>:<SERVER_PORT>`, gateway lue via `inspectNetwork` (`IPAM.Config[0].Gateway`). Pas de NAT, pas de port à publier.
+- Cas Gladys en **bridge** (installs non standard) : l'attachement a posteriori fonctionne, lui (`network.connect(getGladysContainerId())`, à chaud), et les intégrations joignent Gladys par le DNS embarqué du bridge custom. Distinction des deux cas via le `getNetworkMode()` existant. Design plus permissif que les services actuels (node-red/z2m/matterbridge exigent le mode host).
+- `enable_icc=false` ne bloque que le trafic conteneur↔conteneur sur le bridge (l'isolation voulue entre intégrations) ; conteneur→gateway (Gladys) et conteneur→internet (NAT) passent normalement. À documenter : un pare-feu host strict (ufw) filtre le trafic bridge→hôte (chaîne INPUT).
 
 ### B.3 Auth des intégrations : JWT stateless, hors `t_session`
 
