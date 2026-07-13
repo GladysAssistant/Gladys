@@ -144,9 +144,9 @@ describe('Sign-up', () => {
       cy.get('@houseNameInput').clear();
       cy.get('@houseNameInput').type(house.name);
 
-      // Room
+      // Room (inputs[1] is the address search field)
       house.rooms.forEach(room => {
-        cy.wrap(inputs[1]).as('roomInput');
+        cy.wrap(inputs[2]).as('roomInput');
         cy.get('@roomInput').clear();
         cy.get('@roomInput').type(room.name);
       });
