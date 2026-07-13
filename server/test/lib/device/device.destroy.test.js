@@ -12,6 +12,9 @@ const event = new EventEmitter();
 const job = new Job(event);
 
 describe('Device.destroy', () => {
+  beforeEach(async () => {
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+  });
   it('should destroy device and states', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
@@ -43,6 +46,7 @@ describe('Device.destroy', () => {
         selector: 'test-device',
       },
     ];
+    // SQLite leftovers (installation which has not run the DuckDB migration yet)
     await db.DeviceFeatureState.create({
       value: 10,
       device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
@@ -56,8 +60,14 @@ describe('Device.destroy', () => {
       type: 'daily',
       device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
     });
+    // States living in DuckDB (the normal case since the migration) must be
+    // counted by the guard too
+    await db.duckDbBatchInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', [
+      { value: 1, created_at: new Date() },
+      { value: 0, created_at: new Date() },
+    ]);
     const promise = device.destroy('test-device');
-    await assert.isRejected(promise, '3 states in DB. Too much states!');
+    await assert.isRejected(promise, '5 states in DB. Too much states!');
     sinonAssert.calledWith(
       eventFake.emit,
       EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
@@ -83,6 +93,25 @@ describe('Device.destroy', () => {
       EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
       '3b5b4870-145d-4584-bf0e-d97fdcf908b5',
     );
+  });
+  it('should destroy a device without features', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    await db.Device.create({
+      id: 'a2b9ba3a-72b1-4a3e-89e5-4a4e5f0b0d3e',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Device without features',
+      selector: 'device-without-features',
+      external_id: 'device-without-features',
+    });
+    await device.destroy('device-without-features');
+    const deletedDevice = await db.Device.findOne({
+      where: {
+        selector: 'device-without-features',
+      },
+    });
+    expect(deletedDevice).to.equal(null);
   });
   it('should return device not found', async () => {
     const stateManager = new StateManager(event);
