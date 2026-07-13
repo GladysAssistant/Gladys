@@ -11,6 +11,7 @@ Décisions de cadrage validées avec le mainteneur :
 - **Pas de création de device par l'intégration** : elle publie des appareils découverts, l'utilisateur crée/modifie/supprime depuis l'interface (pattern des intégrations internes).
 - **Modèle de données fusionné** : pas de table dédiée — une intégration externe **est** une ligne `t_service` (colonne `type`), pour éviter toute double identité à synchroniser.
 - **Auth par JWT d'intégration stateless** : non lié à un user, hors `t_session` (réservée aux sessions utilisateur), régénéré à chaque recréation du conteneur.
+- **Front au même niveau que les intégrations internes** : présence dans le catalogue d'intégrations avec un simple badge « externe », puis une page générique à 3 écrans — Appareils / Découverte / Configuration (formulaire défini en JSON par l'intégration). Un seul type d'intégration en v1 : « Appareils ».
 
 ## A. Architecture d'ensemble
 
@@ -31,15 +32,15 @@ Décisions de cadrage validées avec le mainteneur :
 - **Superviseur** (`server/lib/external-integration/`) : cycle de vie complet — `Installée → Démarrage → En fonctionnement → Dégradée → En panne → Arrêtée` — persisté en DB et poussé au front en temps réel.
 - **API-hôte REST** (`/api/integration/v1/*`) : seule surface intégration→core, délègue aux libs existantes (`saveState`, `gladys.variable`), isolation « tenant » stricte par JWT d'intégration. **L'intégration ne crée ni ne supprime jamais de device** : elle publie des *appareils découverts*, et c'est l'utilisateur qui crée/modifie/supprime depuis l'interface (même pattern que les intégrations internes avec leur onglet « Découverte »).
 - **WS intégrations** : extension du `WebsocketManager` existant, auth par JWT d'intégration ; canal core→intégration (commandes device, demandes de scan, notifications de cycle de vie des devices, ping/pong, config).
-- **Manifeste** : JSON embarqué dans l'image Docker (LABEL `io.gladysassistant.manifest`) : nom, version, versions Gladys compatibles, permissions (hôtes réseau, périphériques), schéma de config (phase 2). Champ `manifest_version: 1` figé dès la v1.
+- **Manifeste** : JSON embarqué dans l'image Docker (LABEL `io.gladysassistant.manifest`) : nom, version, versions Gladys compatibles, permissions (hôtes réseau, périphériques), **`config_schema`** (décrit le formulaire de l'écran Configuration, cf. B.8). Champ `manifest_version: 1` figé dès la v1.
 - **Une intégration externe est un service** : ligne `t_service` avec `type: 'external'`, devices rattachés normalement, et un *proxy service* dans le stateManager (start/stop/setValue) qui l'insère dans le cycle de vie existant **sans modifier le core device ni le core service**.
 
 ### Phases livrables
 
 | Phase | Contenu | Livrable observable |
 |---|---|---|
-| **1** | API-hôte + WS, superviseur, auth, API admin, page front minimale (gestion + onglet Découverte générique), SDK Node + PoC. Install « dev » par image Docker. | Un admin colle un nom d'image → l'intégration démarre, publie ses appareils découverts, l'utilisateur les crée depuis l'UI et les actionne ; l'intégration survit à un kill (redémarrage auto), passe « En panne » avec logs après échecs répétés. |
-| **2** | Config déclarative : validation `config_schema` (JSON Schema/ajv), formulaires générés côté front, push `CONFIG_UPDATED` par WS. Découverte médiée (mDNS/USB par le core). | Configuration via formulaire généré, sans YAML. |
+| **1** | API-hôte + WS, superviseur, auth, API admin, front au niveau des intégrations internes : entrée dans le catalogue d'intégrations (badge « externe ») + page générique à 3 écrans Appareils / Découverte / Configuration (formulaire généré depuis le `config_schema`), SDK Node + PoC. Install « dev » par image Docker. | Un admin colle un nom d'image → l'intégration apparaît dans le catalogue, démarre, publie ses appareils découverts, l'utilisateur les crée depuis l'UI, les actionne et la configure via un formulaire généré ; l'intégration survit à un kill (redémarrage auto), passe « En panne » avec logs après échecs répétés. |
+| **2** | Découverte médiée (mDNS/USB par le core), widgets de config avancés, autres types d'intégrations que « Appareils » (communication, météo…). | Une intégration détecte son matériel sans config manuelle. |
 | **3** | Store intégré : registre distant, catalogue, écran de permissions + avertissement code tiers, mises à jour de version. | Installation en un clic depuis le catalogue. |
 | **4** | Publication ouverte : pipeline de publication, SDK/template extraits en repos dédiés, doc publique API-hôte. | N'importe quel dev publie sans review. |
 
@@ -124,21 +125,34 @@ Aucune modification de `device.setValue.js` ni de `device.notify.js` : `register
 
 ### B.7 API de gestion (admin)
 
-`server/api/controllers/externalIntegration.controller.js`, routes `authenticated + admin` : `POST /api/v1/external_integration` (`{ docker_image, manifest? }`, manifest inline = mode dev), `GET` liste/détail/logs, `POST .../start|stop|restart`, `DELETE` (`?delete_devices=true`). Ces endpoints opèrent sur les lignes `t_service` de type `external` (pas de nouvelle table) ; la liste peut à terme converger avec la page settings-service existante.
+`server/api/controllers/externalIntegration.controller.js`, opérant sur les lignes `t_service` de type `external` (pas de nouvelle table) :
 
-Pour l'onglet Découverte (auth utilisateur standard, non admin) : `GET /api/v1/external_integration/:selector/discovered_device` (liste mémoire du superviseur, avec le flag « déjà créé ») et `POST .../scan` (envoie `SCAN_REQUEST` à l'intégration). La création du device se fait ensuite par le `POST /api/v1/device` existant, comme pour les intégrations internes.
+- **Admin** : `POST /api/v1/external_integration` (`{ docker_image, manifest? }`, manifest inline = mode dev), `POST .../start|stop|restart`, `GET .../logs`, `DELETE` (`?delete_devices=true`).
+- **Utilisateur standard** : `GET /api/v1/external_integration` (liste + statut, alimente le catalogue d'intégrations du front, cf. B.8) et `GET .../:selector` (détail : manifeste, `config_schema`, statut).
+- **Écran Découverte** : `GET /api/v1/external_integration/:selector/discovered_device` (liste mémoire du superviseur, avec le flag « déjà créé ») et `POST .../scan` (envoie `SCAN_REQUEST` à l'intégration). La création du device se fait ensuite par le `POST /api/v1/device` existant, comme pour les intégrations internes.
+- **Écran Configuration** : `GET/POST /api/v1/external_integration/:selector/config` — valide le payload contre le `config_schema` du manifeste (ajv, déjà en dépendance serveur), persiste via `gladys.variable.setValue(key, service_id)` (les champs `secret: true` ne sont jamais renvoyés en clair par le `GET`), puis pousse `CONFIG_UPDATED` à l'intégration par WS pour qu'elle recharge sa config sans redémarrage.
 
-### B.8 Front minimal
+### B.8 Front : au même niveau que les intégrations internes
 
-Dans **Paramètres** (le catalogue d'intégrations viendra avec le store en phase 3) : `front/src/routes/settings/settings-external-integrations/` (page liste + badge d'état temps réel via WS `STATUS_CHANGED`, actions start/stop/restart/désinstaller, modal logs, formulaire « installer depuis une image Docker » avec avertissement code non audité). Route dans `front/src/components/app.jsx`, entrée dans le menu settings. Modèles : `front/src/routes/integration/all/mcp/` (appels API) et `settings-system` (structure). i18n dans **toutes** les langues (`front/src/config/i18n/*.json`, check `compare-translations`).
+Pas de page « à part » dans les Paramètres : une intégration externe se présente et s'utilise **exactement comme une intégration interne**, avec juste un badge « externe ». Un seul type géré en phase 1 : les intégrations de type **« Appareils »** (catégorie `device` du catalogue).
 
-S'y ajoute un **onglet « Découverte » générique** par intégration (même UX que les onglets Découverte des intégrations internes, ex. Philips Hue) : liste des appareils découverts (nom, features, badge « déjà créé »), bouton « Scanner » (`POST .../scan`), bouton « Créer » par appareil qui appelle le `POST /api/v1/device` standard, rafraîchissement temps réel via `DISCOVERED_DEVICES_UPDATED`. Un seul composant générique sert toutes les intégrations externes — cohérent avec le principe « UI déclarative » de la RFC. La modification/suppression passe ensuite par les écrans device existants.
+**Dans le catalogue d'intégrations** (`front/src/routes/integration/index.js`) : aujourd'hui la liste vient de JSON statiques (`front/src/config/integrations/devices.json`). On y fusionne les intégrations externes retournées par `GET /api/v1/external_integration` — mêmes cartes (nom, image de couverture issue du manifeste ou placeholder), plus un **badge « externe »** et le badge de statut temps réel (`STATUS_CHANGED`). En phase 1 (pas de store), la liste montre les intégrations externes **installées** + un bouton admin « Installer une intégration externe (image Docker) » avec avertissement code non audité ; en phase 3, le store alimentera cette même liste avec les intégrations installables en un clic.
+
+**Une page générique unique** `front/src/routes/integration/all/external-integration/` sert toutes les intégrations externes, sur le modèle exact des pages internes (sidebar `Zigbee2mqttPage`-like, routes dynamiques dans `front/src/components/app.jsx`), avec les 3 écrans :
+
+| Écran | Route | Contenu |
+|---|---|---|
+| **Appareils** | `/dashboard/integration/device/external/:selector` | Les appareils déjà créés de l'intégration (mêmes cartes/édition que les device-pages internes, filtrées par le `t_service` de l'intégration) |
+| **Découverte** | `.../discover` | Appareils découverts (nom, features, badge « déjà créé »), bouton « Scanner » (`POST .../scan`), bouton « Créer » par appareil (`POST /api/v1/device` standard), temps réel via `DISCOVERED_DEVICES_UPDATED` |
+| **Configuration** | `.../config` | **Formulaire généré depuis le `config_schema` JSON du manifeste** (UI déclarative de la RFC : champs texte/nombre/booléen/select/secret en v1, aucun code injecté), sauvegarde via `POST .../config`. S'y ajoutent le bloc de supervision : statut, actions start/stop/restart, modal logs, désinstaller (admin) |
+
+Modèles de code : `front/src/routes/integration/all/zigbee2mqtt/` (structure 3 onglets device/discover/setup) et `front/src/routes/integration/all/mcp/` (appels API). i18n dans **toutes** les langues (`front/src/config/i18n/*.json`, check `compare-translations`) — les libellés des champs de config viennent du manifeste (avec clés multi-langues optionnelles), pas des fichiers i18n de Gladys.
 
 ### B.9 SDK Node.js + PoC
 
 - Dossier racine `integration-sdk/` du monorepo en phase 1 (`node/` = futur paquet npm `@gladysassistant/integration-sdk`, `examples/demo/` = PoC) ; extraction en repos dédiés en phase 4. Package.json propre, hors lint/coverage serveur.
-- SDK : classe `GladysIntegration` — lit les env vars, client REST (fetch), WS avec auth + reconnexion + pings, helpers `publishDiscoveredDevices(devices)`, `getDevices()` (devices créés par l'utilisateur), `publishState`, `onCommand` (ack auto), `onScanRequest`, `onDeviceCreated/Updated/Deleted`, `getConfig/setConfig`. Pas de helper de logs : l'intégration loggue sur stdout/stderr, récupérés par `docker logs`.
-- **PoC `gladys-integration-demo`** (testable sans matériel, couvre tout le cycle) : publie deux appareils découverts — un capteur température Open-Meteo (API publique sans clé) et un interrupteur virtuel. L'utilisateur les crée depuis l'onglet Découverte ; l'intégration publie alors la température toutes les 10 min et répond aux commandes de l'interrupteur (reçoit `onCommand`, republie l'état). Dockerfile `node:22-alpine`, `USER node`, compatible rootfs read-only. Manifeste dans le LABEL.
+- SDK : classe `GladysIntegration` — lit les env vars, client REST (fetch), WS avec auth + reconnexion + pings, helpers `publishDiscoveredDevices(devices)`, `getDevices()` (devices créés par l'utilisateur), `publishState`, `onCommand` (ack auto), `onScanRequest`, `onDeviceCreated/Updated/Deleted`, `getConfig` + `onConfigUpdated` (rechargement à chaud quand l'utilisateur sauvegarde l'écran Configuration). Pas de helper de logs : l'intégration loggue sur stdout/stderr, récupérés par `docker logs`.
+- **PoC `gladys-integration-demo`** (testable sans matériel, couvre tout le cycle y compris les 3 écrans) : publie deux appareils découverts — un capteur température Open-Meteo (API publique sans clé) et un interrupteur virtuel. L'utilisateur les crée depuis l'écran Découverte ; l'intégration publie alors la température toutes les 10 min et répond aux commandes de l'interrupteur (reçoit `onCommand`, republie l'état). Son manifeste embarque un `config_schema` (latitude/longitude + intervalle de rafraîchissement) pour exercer le formulaire généré de l'écran Configuration et `onConfigUpdated`. Dockerfile `node:22-alpine`, `USER node`, compatible rootfs read-only. Manifeste dans le LABEL.
 
 ### B.10 Tests (patch coverage 100 % exigé en CI)
 
@@ -159,7 +173,7 @@ S'y ajoute un **onglet « Découverte » générique** par intégration (même U
 1. **PR 1 — Socle superviseur** : constantes (`SERVICE_TYPES`, `SERVICE_STATUS.DEGRADED`), migration `addColumn` sur `t_service` + modèle, `system.createNetwork|inspectNetwork|getImageLabels`, lib `external-integration` (sans WS/commandes), câblage `lib/index.js`, API admin + tests. → on installe/démarre/arrête un conteneur verrouillé via l'API.
 2. **PR 2 — API-hôte** : `utils/integrationToken.js` (génération/validation JWT), middleware, flag `externalIntegrationAuth`, contrôleur `/api/integration/v1/*` (discovered_device, device en lecture, state, config) + tests d'isolation. → une intégration publie ses appareils découverts et des états.
 3. **PR 3 — WS + commandes + santé** : extension WebsocketManager, connected/disconnected, `sendCommand` + ack/timeout, proxy-service (setValue + postCreate/postUpdate/postDelete), scan request, heartbeat, checkHealth + backoff + DEGRADED/FAILED. → machine à états complète, `setValue` atteint le conteneur, l'intégration est notifiée des créations/suppressions.
-4. **PR 4 — Front** : page settings, onglet Découverte générique, temps réel, logs, install dev, i18n.
+4. **PR 4 — Front** : intégrations externes dans le catalogue (badge « externe », statut temps réel, install dev), page générique 3 écrans Appareils/Découverte/Configuration (formulaire généré depuis `config_schema`), logs, i18n.
 5. **PR 5 — SDK + PoC + doc** : `integration-sdk/node`, exemple demo, doc API-hôte, parcours e2e documenté.
 
 ## Fichiers critiques existants
@@ -173,10 +187,11 @@ S'y ajoute un **onglet « Découverte » générique** par intégration (même U
 - `server/utils/accessToken.js` — modèle pour `utils/integrationToken.js` (JWT audience `integration`)
 - `server/models/service.js` — colonnes à ajouter
 - `server/services/zigbee2mqtt/docker/*.json` — format de descripteur de conteneur de référence
-- `front/src/routes/integration/all/mcp/` — modèle de page front
+- `front/src/routes/integration/index.js` + `front/src/config/integrations/devices.json` — catalogue d'intégrations à fusionner avec la liste dynamique
+- `front/src/routes/integration/all/zigbee2mqtt/` — modèle de page 3 onglets (device/discover/setup) ; `front/src/routes/integration/all/mcp/` — modèle d'appels API
 
 ## Vérification
 
 1. `cd server && npm test` (patch coverage 100 %), `npm run compare-translations` côté front, lint des deux workspaces.
-2. **Parcours e2e manuel** (environnement avec socket Docker) : build de l'image `gladys-integration-demo` → installation via la page settings → statut passe `Démarrage → En fonctionnement` en temps réel → les appareils demo apparaissent dans l'onglet Découverte → création depuis l'UI → l'intégration reçoit `DEVICE_CREATED` et publie ses états, devices visibles dans le dashboard → actionner l'interrupteur virtuel (commande reçue dans les logs du conteneur, état republié) → `docker kill` du conteneur → statut `Dégradée` puis redémarrage auto → forcer 5 crashs → statut `En panne` avec logs visibles et bouton redémarrer → désinstallation propre (conteneur supprimé, ligne `t_service` détruite, ancien JWT refusé).
+2. **Parcours e2e manuel** (environnement avec socket Docker) : build de l'image `gladys-integration-demo` → installation depuis le catalogue d'intégrations (bouton admin « image Docker ») → la carte apparaît dans la liste avec le badge « externe », statut `Démarrage → En fonctionnement` en temps réel → écran Configuration : formulaire latitude/longitude généré depuis le `config_schema`, sauvegarde → l'intégration reçoit `CONFIG_UPDATED` → les appareils demo apparaissent dans l'écran Découverte → création depuis l'UI → l'intégration reçoit `DEVICE_CREATED` et publie ses états, devices visibles dans l'écran Appareils et le dashboard → actionner l'interrupteur virtuel (commande reçue dans les logs du conteneur, état republié) → `docker kill` du conteneur → statut `Dégradée` puis redémarrage auto → forcer 5 crashs → statut `En panne` avec logs visibles et bouton redémarrer → désinstallation propre (conteneur supprimé, ligne `t_service` détruite, ancien JWT refusé).
 3. Test d'isolation manuel : appeler l'API-hôte avec le token d'une intégration sur les devices d'une autre → 403/404 ; avec un access token utilisateur → 401 (mauvaise audience) ; avec un token d'ancienne `token_version` après recréation du conteneur → 401.
