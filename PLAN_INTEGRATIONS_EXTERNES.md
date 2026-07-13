@@ -505,6 +505,17 @@ Recréation de conteneur (update, régénération de token, changement de descri
 5. **PR 5 — Front** : intégrations externes du store dans le catalogue (badge « externe », écran d'installation avec avertissement, statut temps réel, mise à jour disponible, install dev), page générique 3 écrans Appareils/Découverte/Configuration (formulaire généré depuis `config_schema`), logs, i18n.
 6. **PR 6 — SDK + template + PoC + doc** : `integration-sdk/node`, template de repo publiable (manifeste + workflow de build d'image prêt), exemple demo, doc API-hôte + doc « publier son intégration », parcours e2e documenté.
 
+## Répartition par repo (exécution en parallèle)
+
+Deux chantiers indépendants, un par repo — le contrat entre les deux est `index.json`/`manifest.schema.json` (C.1, C.6), donc ils peuvent avancer en parallèle avec des fixtures :
+
+| Chantier | Repo | Périmètre (sections) | Consignes d'exécution |
+|---|---|---|---|
+| **Stack Gladys** | `GladysAssistant/Gladys` (monorepo) | B.1–B.8, B.10, B.11 (hors indexeur), C.2–C.5, C.7 — serveur, front, SDK, PoC, template | **Une PR par jalon** (PR 1 → 6, chacune verte avant la suivante — pas de méga-PR : patch coverage 100 % et review impossibles sinon) ; embarque une **copie vendorée** du `manifest.schema.json` |
+| **Indexeur du store** | `GladysAssistant/integration-store` (nouveau) | B.9 (indexeur), B.11 (tests indexeur), C.1, C.6 | **Propriétaire canonique du `manifest.schema.json`** (publié sur Pages à côté de l'index) ; Action planifiée + tests sur fixtures, CI propre |
+
+Hors code (étapes manuelles, après les deux chantiers) : activer GitHub Pages sur `integration-store`, et publier l'intégration demo **comme le ferait un dev tiers** (repo public + topic + image poussée sur un registre public) pour dérouler le parcours e2e de la section Vérification.
+
 ## Fichiers critiques existants
 
 - `server/lib/system/index.js` (+ `system.createContainer.js`, `system.getContainerLogs.js`) — socle Docker à étendre
