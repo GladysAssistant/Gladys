@@ -27,6 +27,7 @@ const services = require('../services');
 const Weather = require('./weather');
 const { EVENTS } = require('../utils/constants');
 const EnergyPrice = require('./energy-price');
+const TTS = require('./tts');
 
 /**
  * @description Start a new Gladys instance.
@@ -88,6 +89,7 @@ function Gladys(params = {}) {
     brain,
     device,
   );
+  const tts = new TTS(service, gateway);
   const scene = new Scene(
     stateManager,
     event,
@@ -101,6 +103,7 @@ function Gladys(params = {}) {
     scheduler,
     brain,
     service,
+    tts,
   );
   gateway.scene = scene;
   gateway.energyPrice = energyPrice;
@@ -132,6 +135,7 @@ function Gladys(params = {}) {
     variable,
     weather,
     energyPrice,
+    tts,
     start: async () => {
       // set wal mode
       await db.sequelize.query('PRAGMA journal_mode=WAL;');

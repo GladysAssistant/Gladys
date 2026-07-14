@@ -2509,6 +2509,36 @@
       "generateButton": "Generate",
       "keyNameLabel": "Key:",
       "registeredLabel": "Registered on:"
+    },
+    "gradium": {
+      "title": "Gradium",
+      "description": "Use Gradium's text-to-speech service.",
+      "documentation": "Gradium Documentation",
+      "accountTab": "Account",
+      "accountIntroduction": "Set up your Gradium account to access the text-to-speech service.",
+      "endpointLabel": "Server Region",
+      "endpointInfo": "Select the region of the Gradium servers where you created your account.",
+      "endpoint": {
+        "eu": "Europe",
+        "us": "United States"
+      },
+      "apiKey": "API Key",
+      "apiKeyInfo": "Enter your Gradium API key to use the text-to-speech service.",
+      "buttonSave": "Save",
+      "configurationError": "An error occurred while saving the Gradium configuration.",
+      "configurationSuccess": "Gradium configuration saved successfully.",
+      "voiceTab": "Voice",
+      "voiceIntroduction": "Choose a voice for text-to-speech.",
+      "language": {
+        "en": "English 🇬🇧",
+        "fr": "French 🇫🇷",
+        "de": "German 🇩🇪",
+        "es": "Spanish 🇪🇸",
+        "pt": "Portuguese 🇵🇹"
+      },
+      "voiceUseIt": "Select",
+      "voiceUsed": "Selected",
+      "voiceDescriptionLabel": "Voice description"
     }
   },
   "editScene": {
@@ -2766,6 +2796,11 @@
         "description": "This action will make Gladys speak on the selected speaker.",
         "deviceLabel": "Speaker",
         "volumeLabel": "Volume",
+        "voiceLabel": "Voice",
+        "ttsService": {
+          "gplus": "Gladys Plus",
+          "gradium": "Gradium"
+        },
         "textLabel": "Message to speak on the speaker",
         "variablesExplanation": "To inject a variable, type '{{ '. Note: You must have defined a variable beforehand in a 'Retrieve Last State' action placed before this message block."
       }

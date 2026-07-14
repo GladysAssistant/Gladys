@@ -74,6 +74,7 @@ const actionSchema = Joi.object()
       .integer()
       .max(100)
       .min(0),
+    tts: Joi.string(),
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),

@@ -629,8 +629,10 @@ const actionsFunc = {
     );
     // replace variable in text
     const messageWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
-    // Get TTS URL
-    const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
+
+    // Get TTS url
+    const url = await self.tts.getTTSApiUrl({ service: action.tts, text: messageWithVariables });
+
     // Play TTS Notification on device
     await self.device.setValue(device, deviceFeature, url, { volume: action.volume });
   },

@@ -2509,6 +2509,36 @@
       "generateButton": "Générer",
       "keyNameLabel": "Clé :",
       "registeredLabel": "Enregistré le :"
+    },
+    "gradium": {
+      "title": "Gradium",
+      "description": "Utilisez la synthèse vocale de Gradium.",
+      "documentation": "Documentation Gradium",
+      "accountTab": "Compte",
+      "accountIntroduction": "Paramétrez votre compte Gradium pour accéder au service de synthèse vocale.",
+      "endpointLabel": "Région des serveurs",
+      "endpointInfo": "Sélectionnez la région des serveurs Gradium sur lesquels vous avez créé votre compte.",
+      "endpoint": {
+        "eu": "Europe",
+        "us": "États-Unis"
+      },
+      "apiKey": "Clé API",
+      "apiKeyInfo": "Entrez votre clé API Gradium pour utiliser le service de synthèse vocale.",
+      "buttonSave": "Sauvegarder",
+      "configurationError": "Une erreur est survenue lors de la sauvegarde de la configuration Gradium.",
+      "configurationSuccess": "La configuration Gradium a été sauvegardée avec succès.",
+      "voiceTab": "Voix",
+      "voiceIntroduction": "Choisissez une voix pour la synthèse vocale.",
+      "language": {
+        "en": "Anglais 🇬🇧",
+        "fr": "Français 🇫🇷",
+        "de": "Allemand 🇩🇪",
+        "es": "Espagnol 🇪🇸",
+        "pt": "Portugais 🇵🇹"
+      },
+      "voiceUseIt": "Sélectionner",
+      "voiceUsed": "Sélectionnée",
+      "voiceDescriptionLabel": "Description de la voix"
     }
   },
   "editScene": {
@@ -2766,6 +2796,11 @@
         "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
         "deviceLabel": "Enceinte",
         "volumeLabel": "Volume",
+        "voiceLabel": "Voix",
+        "ttsService": {
+          "gplus": "Gladys Plus",
+          "gradium": "Gradium"
+        },
         "textLabel": "Message à dire sur l'enceinte",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       }
