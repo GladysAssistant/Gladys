@@ -558,7 +558,8 @@
     "tags": {
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
-      "local": "Lokal"
+      "local": "Lokal",
+      "external": "Community"
     },
     "root": {
       "title": "Integrationen",
@@ -581,6 +582,114 @@
         "health": "Gesundheit",
         "weather": "Wetter",
         "navigation": "Navigation"
+      }
+    },
+    "externalIntegration": {
+      "updateAvailable": "Update verfügbar",
+      "deviceTab": "Geräte",
+      "discoverTab": "Entdecken",
+      "configTab": "Konfiguration",
+      "status": {
+        "UNKNOWN": "Unbekannt",
+        "ENABLED": "Aktiviert",
+        "DISABLED": "Deaktiviert",
+        "LOADING": "Wird geladen",
+        "RUNNING": "Läuft",
+        "DEGRADED": "Beeinträchtigt",
+        "STOPPED": "Gestoppt",
+        "ERROR": "Fehler"
+      },
+      "config": {
+        "title": "Konfiguration",
+        "loadError": "Beim Laden der Konfiguration ist ein Fehler aufgetreten.",
+        "noConfig": "Diese Integration hat keine Konfigurationsoptionen.",
+        "secretConfiguredPlaceholder": "Konfiguriert. Leer lassen, um den aktuellen Wert zu behalten.",
+        "saveSuccess": "Konfiguration erfolgreich gespeichert.",
+        "saveError": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
+        "saveButton": "Konfiguration speichern"
+      },
+      "supervision": {
+        "title": "Überwachung",
+        "actionError": "Beim Ausführen dieser Aktion ist ein Fehler aufgetreten.",
+        "uninstallError": "Beim Deinstallieren dieser Integration ist ein Fehler aufgetreten.",
+        "updateAvailableText": "Eine neue Version dieser Integration ist verfügbar.",
+        "statusLabel": "Status",
+        "versionLabel": "Version",
+        "dockerImageLabel": "Docker-Image",
+        "repoLabel": "Repository",
+        "startButton": "Starten",
+        "stopButton": "Stoppen",
+        "restartButton": "Neu starten",
+        "updateButton": "Aktualisieren",
+        "logsButton": "Logs",
+        "uninstallButton": "Deinstallieren",
+        "uninstallWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt. Von dieser Integration erstellte Geräte bleiben in Gladys, bis du sie löschst.",
+        "confirmUninstallButton": "Ja, deinstallieren",
+        "cancelUninstallButton": "Abbrechen",
+        "logsTitle": "Logs",
+        "logsError": "Beim Laden der Logs ist ein Fehler aufgetreten.",
+        "logsEmpty": "Keine Logs verfügbar.",
+        "logsRefreshButton": "Aktualisieren",
+        "logsCloseButton": "Schließen"
+      },
+      "device": {
+        "title": "Geräte",
+        "refreshButton": "Aktualisieren",
+        "loadError": "Beim Laden der Geräte ist ein Fehler aufgetreten.",
+        "noDevices": "Noch keine Geräte erstellt. Gehe zum Tab \"Entdecken\", um Geräte zu finden.",
+        "saveError": "Beim Speichern dieses Geräts ist ein Fehler aufgetreten.",
+        "deleteError": "Beim Löschen dieses Geräts ist ein Fehler aufgetreten.",
+        "nameLabel": "Name",
+        "namePlaceholder": "Gerätename",
+        "roomLabel": "Raum",
+        "featuresLabel": "Funktionen",
+        "saveButton": "Speichern",
+        "deleteButton": "Löschen"
+      },
+      "discover": {
+        "title": "Entdeckte Geräte",
+        "scanButton": "Scannen",
+        "scanning": "Scannen...",
+        "scanError": "Beim Starten des Scans ist ein Fehler aufgetreten.",
+        "scanErrorDisconnected": "Der Scan konnte nicht gestartet werden: Die Integration ist nicht verbunden. Prüfe im Tab \"Konfiguration\", ob sie läuft.",
+        "loadError": "Beim Laden der entdeckten Geräte ist ein Fehler aufgetreten.",
+        "noDevices": "Noch keine Geräte entdeckt. Klicke auf \"Scannen\", um nach Geräten zu suchen.",
+        "alreadyCreatedBadge": "Bereits hinzugefügt",
+        "createError": "Beim Hinzufügen dieses Geräts ist ein Fehler aufgetreten.",
+        "featuresLabel": "Funktionen",
+        "createButton": "Zu Gladys hinzufügen"
+      },
+      "install": {
+        "backToCatalog": "Zurück zu den Integrationen",
+        "notFound": "Diese Integration wurde nicht im Store gefunden.",
+        "starsLabel": "Sterne",
+        "lastPushLabel": "Letzte Aktualisierung:",
+        "warningTitle": "Community-Integration",
+        "warningText": "Diese Integration wird von der Community entwickelt und nicht vom Gladys-Assistant-Team gepflegt. Sie läuft in einem isolierten Docker-Container, du solltest jedoch nur Integrationen von Entwicklern installieren, denen du vertraust.",
+        "notCompatible": "Diese Integration ist nicht mit deiner Gladys-Installation kompatibel.",
+        "installError": "Beim Installieren dieser Integration ist ein Fehler aufgetreten.",
+        "alreadyInstalled": "Diese Integration ist bereits installiert.",
+        "goToIntegrationButton": "Zur Integration",
+        "installing": "Wird installiert...",
+        "installButton": "Installieren"
+      },
+      "installFromGithub": {
+        "cardTitle": "Von GitHub installieren",
+        "cardDescription": "Installiere eine Community-Integration aus einem GitHub-Repository.",
+        "modalTitle": "Eine Integration von GitHub installieren",
+        "repoUrlLabel": "GitHub-Repository-URL",
+        "repoUrlPlaceholder": "https://github.com/owner/repository",
+        "installButton": "Installieren",
+        "devModeLink": "Entwicklermodus: von einem Docker-Image installieren",
+        "devModeDescription": "Installiere eine Integration direkt aus einem Docker-Image, mit optionalem Manifest. Nur für Integrationsentwickler.",
+        "dockerImageLabel": "Docker-Image",
+        "dockerImagePlaceholder": "z. B. meinuser/meine-integration:latest",
+        "manifestLabel": "Manifest (JSON, optional)",
+        "manifestPlaceholder": "{ \"name\": \"Meine Integration\", ... }",
+        "errorUnknown": "Beim Installieren dieser Integration ist ein Fehler aufgetreten.",
+        "errorNotFound": "Repository nicht gefunden, oder es enthält keine gültige Gladys-Integration.",
+        "errorInvalidManifest": "Das Manifest der Integration ist ungültig.",
+        "manifestInvalidJson": "Das Manifest ist kein gültiges JSON."
       }
     },
     "telegram": {

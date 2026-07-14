@@ -2,6 +2,7 @@ import { Text, MarkupText } from 'preact-i18n';
 import IntegrationMenu, { IntegrationMenuMobile } from './IntegrationMenu';
 import IntegrationCategory, { IntegrationListItem } from './IntegrationCategory';
 import IntegrationPageHeader from './IntegrationPageHeader';
+import InstallFromGithubCard from './all/external-integration/install-from-github/InstallFromGithubCard';
 import style from './style.css';
 
 const IntegrationPage = ({
@@ -13,7 +14,8 @@ const IntegrationPage = ({
   changeOrderDir,
   search,
   integrationCategories,
-  toggleFavorite
+  toggleFavorite,
+  showInstallFromGithub
 }) => (
   <div class="page">
     <div class="page-main">
@@ -48,6 +50,7 @@ const IntegrationPage = ({
                       toggleFavorite={toggleFavorite}
                     />
                   ))}
+                  {showInstallFromGithub && <InstallFromGithubCard list />}
                 </div>
                 <div class={style.desktopGrid}>
                   <div class="row row-cards">
@@ -58,6 +61,7 @@ const IntegrationPage = ({
                         toggleFavorite={toggleFavorite}
                       />
                     ))}
+                    {showInstallFromGithub && <InstallFromGithubCard />}
                   </div>
                 </div>
                 {integrations.length === 0 && (

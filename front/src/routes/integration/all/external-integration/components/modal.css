@@ -1,0 +1,32 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+}
+
+.modalDialog {
+  width: 100%;
+  max-width: 540px;
+  margin: auto 0;
+}
+
+.modalDialogLarge {
+  max-width: 800px;
+}
+
+.modalLogs {
+  max-height: 50vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 0;
+}

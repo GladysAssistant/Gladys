@@ -4,9 +4,10 @@ import { connect } from 'unistore/preact';
 
 import IntegrationPage from './IntegrationPage';
 import withIntlAsProp from '../../utils/withIntlAsProp';
-import { USER_ROLE } from '../../../../server/utils/constants';
+import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
+import { getLocalizedText } from './all/external-integration/utils';
 
 const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
 const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
@@ -26,6 +27,53 @@ class Integration extends Component {
 
   componentWillMount() {
     this.loadFavorites();
+    this.loadExternalIntegrations();
+  }
+
+  componentDidMount() {
+    if (this.props.session && this.props.session.dispatcher) {
+      this.props.session.dispatcher.addListener(
+        WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
+        this.onExternalIntegrationStatusChanged
+      );
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.session && this.props.session.dispatcher) {
+      this.props.session.dispatcher.removeListener(
+        WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
+        this.onExternalIntegrationStatusChanged
+      );
+    }
+  }
+
+  onExternalIntegrationStatusChanged = payload => {
+    const { externalInstalled } = this.state;
+    if (!payload || !externalInstalled) {
+      return;
+    }
+    const updated = externalInstalled.map(integration =>
+      integration.selector === payload.selector ? { ...integration, status: payload.status } : integration
+    );
+    this.setState({ externalInstalled: updated });
+    this.getIntegrations();
+  };
+
+  async loadExternalIntegrations() {
+    const { user = {}, httpClient } = this.props;
+    if (!httpClient || user.role !== USER_ROLE.ADMIN) {
+      return;
+    }
+    const [externalInstalled, externalStoreResponse] = await Promise.all([
+      httpClient.get('/api/v1/external_integration').catch(() => []),
+      httpClient.get('/api/v1/external_integration/store').catch(() => null)
+    ]);
+    await this.setState({
+      externalInstalled,
+      externalStore: externalStoreResponse ? externalStoreResponse.integrations : []
+    });
+    this.getIntegrations();
   }
 
   async loadFavorites() {
@@ -51,6 +99,71 @@ class Integration extends Component {
     if (prevUserId !== currentUserId || prevCategory !== currentCategory) {
       this.getIntegrations();
     }
+    if (prevUserId !== currentUserId) {
+      this.loadExternalIntegrations();
+    }
+  }
+
+  buildExternalIntegrationCards() {
+    const { user = {}, category } = this.props;
+    if (user.role !== USER_ROLE.ADMIN || (category && category !== 'device')) {
+      return [];
+    }
+    const language = user.language || 'en';
+    const installed = this.state.externalInstalled || [];
+    const store = this.state.externalStore || [];
+
+    const storeBySlug = new Map();
+    store.forEach(storeIntegration => {
+      if (storeIntegration.store_slug) {
+        storeBySlug.set(storeIntegration.store_slug, storeIntegration);
+      }
+    });
+    const installedSlugs = new Set(installed.filter(i => i.store_slug).map(i => i.store_slug));
+
+    const externalCards = [];
+
+    // Installed external integrations
+    installed.forEach(integration => {
+      const manifest = integration.manifest || {};
+      const storeIntegration = integration.store_slug ? storeBySlug.get(integration.store_slug) : null;
+      externalCards.push({
+        key: `external-${integration.selector}`,
+        external: true,
+        externalInstalled: true,
+        type: 'device',
+        name: manifest.name || integration.name || integration.selector,
+        description: getLocalizedText(manifest.description, language),
+        url: `/dashboard/integration/device/external/${integration.selector}`,
+        img: storeIntegration ? storeIntegration.cover_url : null,
+        status: integration.status,
+        updateAvailable: integration.update_available
+      });
+    });
+
+    // External integrations available in the store, not installed locally
+    store.forEach(storeIntegration => {
+      if (storeIntegration.store_slug && installedSlugs.has(storeIntegration.store_slug)) {
+        return;
+      }
+      const manifest = storeIntegration.manifest || {};
+      const isInstalled = storeIntegration.installed && storeIntegration.installed_selector;
+      externalCards.push({
+        key: `external-store-${storeIntegration.store_slug}`,
+        external: true,
+        externalInstalled: !!isInstalled,
+        type: 'device',
+        name: manifest.name || storeIntegration.store_slug,
+        description: getLocalizedText(manifest.description, language),
+        url: isInstalled
+          ? `/dashboard/integration/device/external/${storeIntegration.installed_selector}`
+          : `/dashboard/integration/device/external-install/${storeIntegration.store_slug}`,
+        img: storeIntegration.cover_url,
+        updateAvailable: isInstalled ? storeIntegration.update_available : false
+      });
+    });
+
+    return externalCards;
   }
 
   async getIntegrations() {
@@ -105,6 +218,13 @@ class Integration extends Component {
       }).toLowerCase()}`;
       return { ...integration, name, description, url };
     });
+
+    // Merge external integrations (community integrations running in isolated Docker containers)
+    if (category !== 'favorites') {
+      const externalCards = this.buildExternalIntegrationCards();
+      selectedIntegrations = selectedIntegrations.concat(externalCards);
+      totalSize += externalCards.length;
+    }
 
     // Filter
     if (searchKeyword && searchKeyword.length > 0) {
@@ -169,10 +289,13 @@ class Integration extends Component {
   };
 
   render(props, state) {
+    const user = props.user || {};
+    const showInstallFromGithub = user.role === USER_ROLE.ADMIN && props.category === 'device';
     // Combine props and state for the IntegrationPage
     const combinedProps = {
       ...props,
       ...state,
+      showInstallFromGithub,
       search: this.search,
       changeOrderDir: this.changeOrderDir,
       toggleFavorite: this.toggleFavorite
@@ -182,4 +305,4 @@ class Integration extends Component {
   }
 }
 
-export default connect('user,httpClient', {})(withIntlAsProp(Integration));
+export default connect('user,session,httpClient', {})(withIntlAsProp(Integration));

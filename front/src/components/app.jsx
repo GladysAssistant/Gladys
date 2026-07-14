@@ -192,6 +192,12 @@ import CallMeBotPage from '../routes/integration/all/callmebot/setup-page';
 // Energy Monitoring integration
 import EnergyMonitoringIntegration from '../routes/integration/all/energy-monitoring/index';
 
+// External integrations (community integrations running in isolated Docker containers)
+import ExternalIntegrationDevicePage from '../routes/integration/all/external-integration/device-page';
+import ExternalIntegrationDiscoverPage from '../routes/integration/all/external-integration/discover-page';
+import ExternalIntegrationConfigPage from '../routes/integration/all/external-integration/config-page';
+import ExternalIntegrationInstallPage from '../routes/integration/all/external-integration/install-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -371,6 +377,11 @@ const AppRouter = connect(
         <LANManagerDevicePage path="/dashboard/integration/device/lan-manager" />
         <LANManagerDiscoverPage path="/dashboard/integration/device/lan-manager/discover" />
         <LANManagerSettingsPage path="/dashboard/integration/device/lan-manager/config" />
+
+        <ExternalIntegrationDevicePage path="/dashboard/integration/device/external/:selector" />
+        <ExternalIntegrationDiscoverPage path="/dashboard/integration/device/external/:selector/discover" />
+        <ExternalIntegrationConfigPage path="/dashboard/integration/device/external/:selector/config" />
+        <ExternalIntegrationInstallPage path="/dashboard/integration/device/external-install/:owner/:repo" />
 
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />

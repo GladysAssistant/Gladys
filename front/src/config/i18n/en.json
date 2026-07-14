@@ -558,7 +558,8 @@
     "tags": {
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
-      "local": "Local"
+      "local": "Local",
+      "external": "Community"
     },
     "root": {
       "title": "Integrations",
@@ -581,6 +582,114 @@
         "health": "Health",
         "weather": "Weather",
         "navigation": "Navigation"
+      }
+    },
+    "externalIntegration": {
+      "updateAvailable": "Update available",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "configTab": "Configuration",
+      "status": {
+        "UNKNOWN": "Unknown",
+        "ENABLED": "Enabled",
+        "DISABLED": "Disabled",
+        "LOADING": "Loading",
+        "RUNNING": "Running",
+        "DEGRADED": "Degraded",
+        "STOPPED": "Stopped",
+        "ERROR": "Error"
+      },
+      "config": {
+        "title": "Configuration",
+        "loadError": "There was an error loading the configuration.",
+        "noConfig": "This integration has no configuration options.",
+        "secretConfiguredPlaceholder": "Configured. Leave empty to keep the current value.",
+        "saveSuccess": "Configuration saved successfully.",
+        "saveError": "There was an error saving the configuration.",
+        "saveButton": "Save configuration"
+      },
+      "supervision": {
+        "title": "Supervision",
+        "actionError": "There was an error executing this action.",
+        "uninstallError": "There was an error uninstalling this integration.",
+        "updateAvailableText": "A new version of this integration is available.",
+        "statusLabel": "Status",
+        "versionLabel": "Version",
+        "dockerImageLabel": "Docker image",
+        "repoLabel": "Repository",
+        "startButton": "Start",
+        "stopButton": "Stop",
+        "restartButton": "Restart",
+        "updateButton": "Update",
+        "logsButton": "Logs",
+        "uninstallButton": "Uninstall",
+        "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
+        "confirmUninstallButton": "Yes, uninstall",
+        "cancelUninstallButton": "Cancel",
+        "logsTitle": "Logs",
+        "logsError": "There was an error loading the logs.",
+        "logsEmpty": "No logs available.",
+        "logsRefreshButton": "Refresh",
+        "logsCloseButton": "Close"
+      },
+      "device": {
+        "title": "Devices",
+        "refreshButton": "Refresh",
+        "loadError": "There was an error loading the devices.",
+        "noDevices": "No devices created yet. Go to the \"Discover\" tab to find devices.",
+        "saveError": "There was an error saving this device.",
+        "deleteError": "There was an error deleting this device.",
+        "nameLabel": "Name",
+        "namePlaceholder": "Device name",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "deleteButton": "Delete"
+      },
+      "discover": {
+        "title": "Discovered devices",
+        "scanButton": "Scan",
+        "scanning": "Scanning...",
+        "scanError": "There was an error launching the scan.",
+        "scanErrorDisconnected": "Unable to launch the scan: the integration is not connected. Check that it is running in the \"Configuration\" tab.",
+        "loadError": "There was an error loading the discovered devices.",
+        "noDevices": "No devices discovered yet. Press \"Scan\" to search for devices.",
+        "alreadyCreatedBadge": "Already added",
+        "createError": "There was an error adding this device.",
+        "featuresLabel": "Features",
+        "createButton": "Add to Gladys"
+      },
+      "install": {
+        "backToCatalog": "Back to integrations",
+        "notFound": "This integration was not found in the store.",
+        "starsLabel": "stars",
+        "lastPushLabel": "Last update:",
+        "warningTitle": "Community integration",
+        "warningText": "This integration is developed by the community and is not maintained by the Gladys Assistant team. It runs in an isolated Docker container, but you should only install integrations from developers you trust.",
+        "notCompatible": "This integration is not compatible with your Gladys installation.",
+        "installError": "There was an error installing this integration.",
+        "alreadyInstalled": "This integration is already installed.",
+        "goToIntegrationButton": "Go to the integration",
+        "installing": "Installing...",
+        "installButton": "Install"
+      },
+      "installFromGithub": {
+        "cardTitle": "Install from GitHub",
+        "cardDescription": "Install a community integration from a GitHub repository.",
+        "modalTitle": "Install an integration from GitHub",
+        "repoUrlLabel": "GitHub repository URL",
+        "repoUrlPlaceholder": "https://github.com/owner/repository",
+        "installButton": "Install",
+        "devModeLink": "Developer mode: install from a Docker image",
+        "devModeDescription": "Install an integration directly from a Docker image, with an optional manifest. Only for integration developers.",
+        "dockerImageLabel": "Docker image",
+        "dockerImagePlaceholder": "e.g. myuser/my-integration:latest",
+        "manifestLabel": "Manifest (JSON, optional)",
+        "manifestPlaceholder": "{ \"name\": \"My integration\", ... }",
+        "errorUnknown": "There was an error installing this integration.",
+        "errorNotFound": "Repository not found, or it does not contain a valid Gladys integration.",
+        "errorInvalidManifest": "The integration manifest is invalid.",
+        "manifestInvalidJson": "The manifest is not valid JSON."
       }
     },
     "telegram": {

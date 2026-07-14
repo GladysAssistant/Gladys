@@ -558,7 +558,8 @@
     "tags": {
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
-      "local": "Local"
+      "local": "Local",
+      "external": "Communauté"
     },
     "root": {
       "title": "Intégrations",
@@ -581,6 +582,114 @@
         "health": "Santé",
         "weather": "Météo",
         "navigation": "Navigation"
+      }
+    },
+    "externalIntegration": {
+      "updateAvailable": "Mise à jour disponible",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte",
+      "configTab": "Configuration",
+      "status": {
+        "UNKNOWN": "Inconnu",
+        "ENABLED": "Activée",
+        "DISABLED": "Désactivée",
+        "LOADING": "Chargement",
+        "RUNNING": "En cours d'exécution",
+        "DEGRADED": "Dégradée",
+        "STOPPED": "Arrêtée",
+        "ERROR": "Erreur"
+      },
+      "config": {
+        "title": "Configuration",
+        "loadError": "Une erreur s'est produite lors du chargement de la configuration.",
+        "noConfig": "Cette intégration n'a pas d'options de configuration.",
+        "secretConfiguredPlaceholder": "Configuré. Laissez vide pour conserver la valeur actuelle.",
+        "saveSuccess": "Configuration enregistrée avec succès.",
+        "saveError": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
+        "saveButton": "Enregistrer la configuration"
+      },
+      "supervision": {
+        "title": "Supervision",
+        "actionError": "Une erreur s'est produite lors de l'exécution de cette action.",
+        "uninstallError": "Une erreur s'est produite lors de la désinstallation de cette intégration.",
+        "updateAvailableText": "Une nouvelle version de cette intégration est disponible.",
+        "statusLabel": "Statut",
+        "versionLabel": "Version",
+        "dockerImageLabel": "Image Docker",
+        "repoLabel": "Dépôt",
+        "startButton": "Démarrer",
+        "stopButton": "Arrêter",
+        "restartButton": "Redémarrer",
+        "updateButton": "Mettre à jour",
+        "logsButton": "Journaux",
+        "uninstallButton": "Désinstaller",
+        "uninstallWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés. Les appareils créés par cette intégration resteront dans Gladys jusqu’à ce que vous les supprimiez.",
+        "confirmUninstallButton": "Oui, désinstaller",
+        "cancelUninstallButton": "Annuler",
+        "logsTitle": "Journaux",
+        "logsError": "Une erreur s'est produite lors du chargement des journaux.",
+        "logsEmpty": "Aucun journal disponible.",
+        "logsRefreshButton": "Rafraîchir",
+        "logsCloseButton": "Fermer"
+      },
+      "device": {
+        "title": "Appareils",
+        "refreshButton": "Rafraîchir",
+        "loadError": "Une erreur s'est produite lors du chargement des appareils.",
+        "noDevices": "Aucun appareil créé pour le moment. Rendez-vous dans l’onglet « Découverte » pour trouver des appareils.",
+        "saveError": "Une erreur s'est produite lors de l'enregistrement de cet appareil.",
+        "deleteError": "Une erreur s'est produite lors de la suppression de cet appareil.",
+        "nameLabel": "Nom",
+        "namePlaceholder": "Nom de l'appareil",
+        "roomLabel": "Pièce",
+        "featuresLabel": "Fonctionnalités",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer"
+      },
+      "discover": {
+        "title": "Appareils découverts",
+        "scanButton": "Scanner",
+        "scanning": "Scan en cours...",
+        "scanError": "Une erreur s'est produite lors du lancement du scan.",
+        "scanErrorDisconnected": "Impossible de lancer le scan : l'intégration n'est pas connectée. Vérifiez qu'elle est bien démarrée dans l'onglet « Configuration ».",
+        "loadError": "Une erreur s'est produite lors du chargement des appareils découverts.",
+        "noDevices": "Aucun appareil découvert pour le moment. Cliquez sur « Scanner » pour rechercher des appareils.",
+        "alreadyCreatedBadge": "Déjà ajouté",
+        "createError": "Une erreur s'est produite lors de l'ajout de cet appareil.",
+        "featuresLabel": "Fonctionnalités",
+        "createButton": "Ajouter à Gladys"
+      },
+      "install": {
+        "backToCatalog": "Retour aux intégrations",
+        "notFound": "Cette intégration n'a pas été trouvée dans le store.",
+        "starsLabel": "étoiles",
+        "lastPushLabel": "Dernière mise à jour :",
+        "warningTitle": "Intégration communautaire",
+        "warningText": "Cette intégration est développée par la communauté et n'est pas maintenue par l'équipe Gladys Assistant. Elle s'exécute dans un conteneur Docker isolé, mais vous ne devriez installer que des intégrations provenant de développeurs de confiance.",
+        "notCompatible": "Cette intégration n'est pas compatible avec votre installation de Gladys.",
+        "installError": "Une erreur s'est produite lors de l'installation de cette intégration.",
+        "alreadyInstalled": "Cette intégration est déjà installée.",
+        "goToIntegrationButton": "Accéder à l'intégration",
+        "installing": "Installation...",
+        "installButton": "Installer"
+      },
+      "installFromGithub": {
+        "cardTitle": "Installer depuis GitHub",
+        "cardDescription": "Installez une intégration communautaire depuis un dépôt GitHub.",
+        "modalTitle": "Installer une intégration depuis GitHub",
+        "repoUrlLabel": "URL du dépôt GitHub",
+        "repoUrlPlaceholder": "https://github.com/owner/repository",
+        "installButton": "Installer",
+        "devModeLink": "Mode développeur : installer depuis une image Docker",
+        "devModeDescription": "Installez une intégration directement depuis une image Docker, avec un manifeste optionnel. Réservé aux développeurs d’intégrations.",
+        "dockerImageLabel": "Image Docker",
+        "dockerImagePlaceholder": "ex. monuser/mon-integration:latest",
+        "manifestLabel": "Manifeste (JSON, optionnel)",
+        "manifestPlaceholder": "{ \"name\": \"Mon intégration\", ... }",
+        "errorUnknown": "Une erreur s'est produite lors de l'installation de cette intégration.",
+        "errorNotFound": "Dépôt introuvable, ou il ne contient pas d'intégration Gladys valide.",
+        "errorInvalidManifest": "Le manifeste de l'intégration est invalide.",
+        "manifestInvalidJson": "Le manifeste n'est pas un JSON valide."
       }
     },
     "energyMonitoring": {

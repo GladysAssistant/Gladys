@@ -1,5 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import ScrollToTopLink from '../../components/router/ScrollToTopLink';
+import StatusBadge from './all/external-integration/components/StatusBadge';
 import style from './style.css';
 
 const getImgClass = integration =>
@@ -8,12 +9,27 @@ const getImgClass = integration =>
   }`.trim();
 
 const IntegrationTags = ({ integration }) => {
-  if (!integration.gladysPlus && !integration.cloud && !integration.local) {
+  if (!integration.gladysPlus && !integration.cloud && !integration.local && !integration.external) {
     return null;
   }
 
   return (
     <div class="integration-tags mt-2">
+      {integration.external && (
+        <span class="badge badge-secondary integration-tag">
+          <i class="fe fe-package mr-1" />
+          <Text id="integration.tags.external" />
+        </span>
+      )}
+      {integration.external && integration.status && (
+        <StatusBadge status={integration.status} className="integration-tag" />
+      )}
+      {integration.external && integration.updateAvailable && (
+        <span class="badge badge-primary integration-tag">
+          <i class="fe fe-arrow-up-circle mr-1" />
+          <Text id="integration.externalIntegration.updateAvailable" />
+        </span>
+      )}
       {integration.local && (
         <span class="badge badge-success integration-tag">
           <i class="fe fe-home mr-1" />
@@ -60,32 +76,50 @@ const FavoriteButton = ({ integration, toggleFavorite }) => {
   );
 };
 
+const IntegrationName = ({ integration }) =>
+  integration.external ? <span>{integration.name}</span> : <Text id={`integration.${integration.key}.title`} />;
+
+const IntegrationDescription = ({ integration }) =>
+  integration.external ? (
+    <span>{integration.description}</span>
+  ) : (
+    <Text id={`integration.${integration.key}.description`} />
+  );
+
 export const IntegrationListItem = ({ integration, toggleFavorite }) => (
   <div class={`list-group-item ${style.integrationListItem}`}>
     <div class={style.integrationListRow}>
       <ScrollToTopLink href={integration.url}>
-        <Localizer>
-          <img
-            class={`${style.integrationListImg} ${integration.invertInDarkMode ? 'keep-dark' : ''} ${
-              integration.whiteBackground ? 'white-bg' : ''
-            }`}
-            src={integration.img}
-            alt={<Text id={`integration.${integration.key}.title`} />}
-          />
-        </Localizer>
+        {integration.external && !integration.img ? (
+          <span class={style.externalListImgPlaceholder}>
+            <i class="fe fe-package" />
+          </span>
+        ) : (
+          <Localizer>
+            <img
+              class={`${style.integrationListImg} ${integration.invertInDarkMode ? 'keep-dark' : ''} ${
+                integration.whiteBackground ? 'white-bg' : ''
+              }`}
+              src={integration.img}
+              alt={integration.external ? integration.name : <Text id={`integration.${integration.key}.title`} />}
+            />
+          </Localizer>
+        )}
       </ScrollToTopLink>
       <ScrollToTopLink href={integration.url} class={style.integrationListContent}>
         <div class="font-weight-bold">
-          <Text id={`integration.${integration.key}.title`} />
+          <IntegrationName integration={integration} />
         </div>
         <div class={`text-muted small ${style.integrationListDescription}`}>
-          <Text id={`integration.${integration.key}.description`} />
+          <IntegrationDescription integration={integration} />
         </div>
         <IntegrationTags integration={integration} />
       </ScrollToTopLink>
-      <div class={style.integrationListFavorite}>
-        <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />
-      </div>
+      {!integration.external && (
+        <div class={style.integrationListFavorite}>
+          <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />
+        </div>
+      )}
     </div>
   </div>
 );
@@ -95,24 +129,30 @@ const IntegrationCategory = ({ integration, toggleFavorite }) => (
     <div class="card">
       <div class="card-img-container">
         <ScrollToTopLink href={integration.url}>
-          <Localizer>
-            <img
-              class={getImgClass(integration)}
-              src={integration.img}
-              alt={<Text id={`integration.${integration.key}.title`} />}
-            />
-          </Localizer>
+          {integration.external && !integration.img ? (
+            <div class={style.externalCoverPlaceholder}>
+              <i class="fe fe-package" />
+            </div>
+          ) : (
+            <Localizer>
+              <img
+                class={getImgClass(integration)}
+                src={integration.img}
+                alt={integration.external ? integration.name : <Text id={`integration.${integration.key}.title`} />}
+              />
+            </Localizer>
+          )}
         </ScrollToTopLink>
       </div>
       <div class="card-body d-flex flex-column">
         <h4 class="d-flex align-items-center">
           <ScrollToTopLink href={integration.url} class="flex-fill">
-            <Text id={`integration.${integration.key}.title`} />
+            <IntegrationName integration={integration} />
           </ScrollToTopLink>
-          <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />
+          {!integration.external && <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />}
         </h4>
         <div class="text-muted">
-          <Text id={`integration.${integration.key}.description`} />
+          <IntegrationDescription integration={integration} />
         </div>
         <IntegrationTags integration={integration} />
       </div>
