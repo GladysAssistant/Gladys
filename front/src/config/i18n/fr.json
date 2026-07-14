@@ -502,7 +502,9 @@
         "colorLowLabel": "Couleur en dessous du seuil bas",
         "colorInRangeLabel": "Couleur entre les seuils",
         "colorHighLabel": "Couleur au-dessus du seuil haut",
-        "thresholdsLegendLabel": "Seuils :"
+        "thresholdsLegendLabel": "Seuils :",
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Nom affiché sur le tableau de bord"
       },
       "energyConsumption": {
         "editName": "Nom du widget (optionnel)",
@@ -1788,15 +1790,129 @@
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
         "validationError": "Erreur de validation : L'appareil n'a pas été correctement rempli.",
+        "validationErrorTitle": "Impossible d'enregistrer l'appareil. Corrigez les champs signalés en rouge :",
+        "validationErrorDevice": "Appareil — {{field}} : {{message}}",
+        "validationErrorFeature": "« {{featureName}} » — {{field}} : {{message}}",
+        "validationFieldLabels": {
+          "name": "Nom",
+          "external_id": "ID externe",
+          "min": "Valeur minimum",
+          "max": "Valeur maximum",
+          "unit": "Unité",
+          "room_id": "Pièce",
+          "category": "Catégorie",
+          "type": "Type"
+        },
         "validationErrors": {
-          "name": "Le champ \"Nom\" est obligatoire",
-          "min": "Le champ \"Valeur minimum\" est obligatoire et doit être une valeur entière",
-          "max": "Le champ \"Valeur maximum\" est obligatoire et doit être une valeur entière",
-          "external_id": "Le champ \"ID Externe\" est obligatoire et doit être unique à travers tous les appareils"
+          "name": "Le champ est obligatoire",
+          "min": "Le champ est obligatoire et doit être un nombre",
+          "max": "Le champ est obligatoire et doit être un nombre",
+          "external_id": "Le champ est obligatoire et doit être unique",
+          "unit": "L'unité sélectionnée n'est pas valide pour cette fonctionnalité",
+          "room_id": "La pièce sélectionnée n'est pas valide"
         },
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes sont uniques ?",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
-        "noValueReceived": "Aucune valeur reçue."
+        "noValueReceived": "Aucune valeur reçue.",
+        "searchPlaceholder": "Rechercher un appareil...",
+        "unassignedRoom": "Sans pièce",
+        "featureCount": "{{count}} fonctionnalité(s)"
+      },
+      "featureCatalog": {
+        "title": "Catalogue des fonctionnalités",
+        "subtitle": "Parcourez les fonctionnalités disponibles et visualisez leur rendu sur le tableau de bord.",
+        "searchPlaceholder": "Rechercher une fonctionnalité (ex : température, variateur, interrupteur...)",
+        "openButton": "Ajouter une fonctionnalité",
+        "closeButton": "Fermer le catalogue",
+        "previewLabel": "Aperçu tableau de bord",
+        "cameraPreviewNotice": "Cette fonctionnalité s'affiche dans le widget Caméra du tableau de bord, et non dans la liste des appareils.",
+        "previewValues": {
+          "cube": {
+            "mode": "Rotation (geste Xiaomi Cube)"
+          }
+        },
+        "noResults": "Aucune fonctionnalité ne correspond à votre recherche.",
+        "noFeaturesYet": "Aucune fonctionnalité ajoutée. Utilisez le bouton ci-dessous pour parcourir le catalogue.",
+        "sensorBadge": "Capteur",
+        "actuatorBadge": "Actionneur",
+        "historyBadge": "Historisé",
+        "fallbackDescription": "Une fonctionnalité Gladys contrôlable ou consultable via MQTT.",
+        "categoryDescriptions": {
+          "light": "Contrôlez les lumières : marche/arrêt, luminosité, couleur et température de couleur.",
+          "switch": "Contrôlez les interrupteurs, variateurs et mesures de puissance.",
+          "temperature-sensor": "Lisez les valeurs de température de vos capteurs.",
+          "humidity-sensor": "Lisez les niveaux d'humidité de vos capteurs.",
+          "motion-sensor": "Détectez les mouvements dans une pièce ou une zone.",
+          "energy-sensor": "Surveillez la consommation d'énergie, la puissance et l'index électrique.",
+          "shutter": "Contrôlez les volets roulants et stores.",
+          "curtain": "Contrôlez les rideaux et leur position.",
+          "thermostat": "Définissez et lisez les consignes de chauffage.",
+          "button": "Déclenchez des actions à l'appui d'un bouton.",
+          "text": "Affichez ou envoyez des valeurs texte.",
+          "battery": "Surveillez le niveau de batterie de vos appareils.",
+          "currency": "Affichez des valeurs monétaires ou de cryptomonnaies."
+        },
+        "descriptions": {
+          "light": {
+            "binary": "Un simple interrupteur marche/arrêt pour contrôler une lumière.",
+            "brightness": "Un curseur pour régler la luminosité de 0% à 100%.",
+            "color": "Un sélecteur de couleur pour définir la teinte de la lumière.",
+            "hue": "Un curseur pour régler la teinte de la lumière de 0° à 360°.",
+            "saturation": "Un curseur pour régler la saturation de la lumière de 0% à 100%.",
+            "temperature": "Un curseur pour ajuster la température de couleur (blanc chaud à froid)."
+          },
+          "switch": {
+            "binary": "Un simple interrupteur marche/arrêt pour tout appareil.",
+            "dimmer": "Un curseur pour contrôler l'intensité d'un appareil.",
+            "energy": "Affiche la consommation d'énergie cumulée en kWh."
+          },
+          "temperature-sensor": {
+            "decimal": "Affiche la température actuelle avec son unité."
+          },
+          "humidity-sensor": {
+            "decimal": "Affiche le pourcentage d'humidité actuel."
+          },
+          "motion-sensor": {
+            "binary": "Indique si un mouvement est actuellement détecté."
+          },
+          "energy-sensor": {
+            "power": "Affiche la puissance instantanée en watts.",
+            "index": "Affiche l'index cumulé d'énergie (compteur kWh)."
+          },
+          "shutter": {
+            "state": "Ouvrez ou fermez un volet avec les boutons haut/bas.",
+            "position": "Réglez la position du volet avec un curseur (0% = fermé)."
+          },
+          "thermostat": {
+            "target-temperature": "Définissez la température de consigne avec les boutons +/-."
+          },
+          "button": {
+            "push": "Un bouton pour déclencher une action dans Gladys ou via MQTT."
+          },
+          "text": {
+            "text": "Affiche une valeur texte, utile pour des messages ou données personnalisés."
+          },
+          "battery": {
+            "integer": "Affiche le niveau de batterie en pourcentage."
+          },
+          "currency": {
+            "decimal": "Affiche une valeur monétaire avec son unité."
+          }
+        },
+        "keywords": {
+          "light": {
+            "brightness": "variateur curseur slider lampe",
+            "binary": "marche arrêt interrupteur lampe",
+            "temperature": "blanc chaud froid kelvin température couleur"
+          },
+          "switch": {
+            "dimmer": "variateur curseur slider",
+            "binary": "marche arrêt interrupteur prise"
+          },
+          "temperature-sensor": {
+            "decimal": "temp thermomètre climat"
+          }
+        }
       },
       "feature": {
         "nameLabel": "Nom",
@@ -1809,6 +1925,7 @@
         "maxLabel": "Valeur maximum",
         "maxPlaceholder": "Entrez la valeur maximum",
         "readOnlyLabel": "Est-ce un capteur ?",
+        "readOnlyShortDescription": "Oui, c'est un capteur",
         "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
         "addButton": "Ajouter une fonctionnalité",
         "mqttTopicToPublishExampleLabel": "Topic MQTT pour publier",
@@ -3100,6 +3217,7 @@
       "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT",
       "migrate-sqlite-to-duckdb": "Migration vers DuckDb",
       "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite",
+      "device-state-purge-orphaned-duckdb-states": "Purge des états DuckDB orphelins",
       "service-matter-backup": "Sauvegarde Matter",
       "energy-monitoring-cost-calculation-thirty-minutes": "Calcul du coût énergétique (30 minutes)",
       "energy-monitoring-cost-calculation-yesterday": "Calcul du coût énergétique (depuis hier)",
@@ -3922,6 +4040,50 @@
           "7": "Thermostat"
         }
       },
+      "shutter": {
+        "state": {
+          "-1": "Fermé",
+          "0": "Arrêté",
+          "1": "Ouvert"
+        }
+      },
+      "curtain": {
+        "state": {
+          "-1": "Fermé",
+          "0": "Arrêté",
+          "1": "Ouvert"
+        }
+      },
+      "lock": {
+        "state": {
+          "0": "Déverrouillée",
+          "1": "Verrouillée",
+          "2": "Activité",
+          "3": "Erreur"
+        }
+      },
+      "air-conditioning": {
+        "mode": {
+          "0": "Auto",
+          "1": "Refroidissement",
+          "2": "Chauffage",
+          "3": "Déshumidification",
+          "4": "Ventilation"
+        }
+      },
+      "siren": {
+        "lmh_volume": {
+          "0": "Faible",
+          "1": "Moyen",
+          "2": "Fort"
+        }
+      },
+      "music": {
+        "playback_state": {
+          "0": "En pause",
+          "1": "En lecture"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
@@ -4438,11 +4600,11 @@
     },
     "voc-matter-index-sensor": {
       "shortCategoryName": "Indice COV",
-      "integer": "Indice COV (entier)"
+      "integer": "Indice COV"
     },
     "no2-matter-index-sensor": {
       "shortCategoryName": "Indice NO₂",
-      "integer": "Indice NO₂ (entier)"
+      "integer": "Indice NO₂"
     },
     "shutter": {
       "shortCategoryName": "Volet",
@@ -4472,7 +4634,7 @@
     },
     "ph-sensor": {
       "shortCategoryName": "Capteur de pH",
-      "decimal": "pH (Décimale)"
+      "decimal": "pH"
     },
     "orp-sensor": {
       "shortCategoryName": "Capteur Redox / ORP",
@@ -4508,7 +4670,7 @@
     },
     "angle-sensor": {
       "shortCategoryName": "Angle",
-      "integer": "Angle (entier)"
+      "integer": "Angle"
     },
     "risk": {
       "shortCategoryName": "Risque",
@@ -4559,12 +4721,94 @@
       "statusError": "Erreur",
       "showDetails": "Afficher les détails",
       "hideDetails": "Masquer les détails"
+    },
+    "modelSelector": {
+      "label": "Modèle IA",
+      "auto": "Auto",
+      "priceLegend": "€ économique · €€ moyen · €€€ premium"
+    }
+  },
+  "history": {
+    "title": "Activité",
+    "subtitle": "Suivez tout ce qui se passe dans votre maison, en temps réel.",
+    "live": "En direct",
+    "jumpToDate": "Aller à une date",
+    "browsingPast": "Vous consultez l'historique du {{date}}.",
+    "backToLive": "Revenir au direct",
+    "allRooms": "Toutes les pièces",
+    "searchPlaceholder": "Rechercher un appareil",
+    "scrollLeft": "Faire défiler les filtres vers la gauche",
+    "scrollRight": "Faire défiler les filtres vers la droite",
+    "loadMore": "Charger plus",
+    "searchingOlder": "Recherche d'activités — {{date}}…",
+    "newEvents": {
+      "one": "1 nouvel événement",
+      "other": "{{count}} nouveaux événements"
+    },
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "emptyTitle": "Aucune activité à afficher",
+    "emptyText": "Les événements de vos appareils apparaîtront ici en temps réel. Si cette liste reste vide, vérifiez que l'historique est activé sur les fonctionnalités de vos appareils.",
+    "error": "Une erreur est survenue lors du chargement de l'historique d'activité.",
+    "groups": {
+      "all": "Tout",
+      "openings": "Ouvertures",
+      "motion": "Mouvement & présence",
+      "buttons": "Boutons & télécommandes",
+      "lights": "Lumières & prises",
+      "climate": "Climat & environnement",
+      "security": "Sécurité",
+      "energy": "Énergie",
+      "other": "Autres"
+    },
+    "values": {
+      "motion-sensor": {
+        "0": "Fin de mouvement",
+        "1": "Mouvement détecté"
+      },
+      "presence-sensor": {
+        "0": "Absence",
+        "1": "Présence détectée"
+      },
+      "smoke-sensor": {
+        "0": "Plus de fumée détectée",
+        "1": "Fumée détectée !"
+      },
+      "leak-sensor": {
+        "0": "Plus de fuite détectée",
+        "1": "Fuite d'eau détectée !"
+      },
+      "vibration-sensor": {
+        "0": "Fin de vibration",
+        "1": "Vibration détectée"
+      },
+      "light": {
+        "0": "Éteinte",
+        "1": "Allumée"
+      },
+      "switch": {
+        "0": "Éteinte",
+        "1": "Allumée"
+      },
+      "lock": {
+        "0": "Déverrouillée",
+        "1": "Verrouillée"
+      },
+      "signal": {
+        "0": "Pas de signal",
+        "1": "Signal très faible",
+        "2": "Signal faible",
+        "3": "Signal moyen",
+        "4": "Bon signal",
+        "5": "Excellent signal"
+      }
     }
   },
   "header": {
     "gladysAssistant": "Gladys Assistant",
     "home": "Accueil",
     "chat": "Discussion",
+    "history": "Activité",
     "devices": "Appareils",
     "integrations": "Intégrations",
     "calendar": "Calendrier",

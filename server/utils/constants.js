@@ -288,6 +288,7 @@ const SYSTEM_VARIABLE_NAMES = {
   AI_WEEKLY_DIGEST_DAY: 'AI_WEEKLY_DIGEST_DAY',
   AI_WEEKLY_DIGEST_HOUR: 'AI_WEEKLY_DIGEST_HOUR',
   DUCKDB_MIGRATED: 'DUCKDB_MIGRATED',
+  DUCKDB_ORPHANED_STATES_PURGED: 'DUCKDB_ORPHANED_STATES_PURGED',
   GLADYS_VERSION: 'GLADYS_VERSION',
 };
 
@@ -318,6 +319,7 @@ const EVENTS = {
     CHECK_BATTERIES: 'device.check-batteries',
     MIGRATE_FROM_SQLITE_TO_DUCKDB: 'device.migrate-from-sqlite-to-duckdb',
     PURGE_ALL_SQLITE_STATES: 'device.purge-all-sqlite-states',
+    PURGE_ORPHANED_DUCKDB_STATES: 'device.purge-orphaned-duckdb-states',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -1605,6 +1607,7 @@ const JOB_TYPES = {
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
   DEVICE_STATES_PURGE: 'device-state-purge',
   DEVICE_STATES_PURGE_ALL_SQLITE_STATES: 'device-state-purge-all-sqlite-states',
+  DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES: 'device-state-purge-orphaned-duckdb-states',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
