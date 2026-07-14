@@ -1,8 +1,9 @@
 const { expect } = require('chai');
 const { fake } = require('sinon');
 
-const { Error403, Error429 } = require('../../../utils/httpErrors');
-const { aiChat } = require('../../../lib/gateway/gateway.aiChat');
+const { Error400, Error403, Error429 } = require('../../../utils/httpErrors');
+const { aiChat, normalizeAiChatRequestBody } = require('../../../lib/gateway/gateway.aiChat');
+const { DEFAULT_TEXT_MODEL } = require('../../../utils/aiChatModels');
 
 describe('gateway.aiChat unit', () => {
   it('should return gateway response on success', async () => {
@@ -13,6 +14,32 @@ describe('gateway.aiChat unit', () => {
     };
     const result = await aiChat.call(ctx, { messages: [] });
     expect(result).to.deep.equal({ choices: [] });
+  });
+
+  it('should omit model when auto is selected', async () => {
+    const openAIAsk = fake.resolves({ choices: [] });
+    const ctx = {
+      gladysGatewayClient: {
+        openAIAsk,
+      },
+    };
+    await aiChat.call(ctx, { messages: [], model: 'auto' });
+    expect(openAIAsk.calledOnceWith({ messages: [] })).to.equal(true);
+  });
+
+  it('should forward a valid model to the gateway', async () => {
+    const openAIAsk = fake.resolves({ choices: [] });
+    const ctx = {
+      gladysGatewayClient: {
+        openAIAsk,
+      },
+    };
+    await aiChat.call(ctx, { messages: [], model: DEFAULT_TEXT_MODEL });
+    expect(openAIAsk.calledOnceWith({ messages: [], model: DEFAULT_TEXT_MODEL })).to.equal(true);
+  });
+
+  it('should reject invalid models', () => {
+    expect(() => normalizeAiChatRequestBody({ messages: [], model: 'unknown-model' })).to.throw(Error400);
   });
 
   it('should map 403 and 429 errors to typed http errors', async () => {

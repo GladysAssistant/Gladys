@@ -7,6 +7,7 @@ import { Session } from './Session';
 import { DemoSession } from './DemoSession';
 import { GatewaySession } from './GatewaySession';
 import { GatewayHttpClient } from './GatewayHttpClient';
+import { isDarkModeEnabled } from './darkModePreference';
 
 function getDefaultState() {
   const session = config.gatewayMode ? new GatewaySession() : config.demoMode ? new DemoSession() : new Session();
@@ -34,9 +35,7 @@ function getDefaultState() {
   // Check for dark mode preference
   let darkMode = false;
   try {
-    const savedMode = localStorage.getItem('dark-mode');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
-    darkMode = savedMode !== null ? savedMode === 'true' : systemPrefersDark.matches;
+    darkMode = isDarkModeEnabled();
   } catch (e) {}
 
   const state = {
