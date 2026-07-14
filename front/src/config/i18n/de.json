@@ -463,7 +463,9 @@
         "colorLowLabel": "Farbe unterhalb des unteren Schwellenwerts",
         "colorInRangeLabel": "Farbe zwischen den Schwellenwerten",
         "colorHighLabel": "Farbe oberhalb des oberen Schwellenwerts",
-        "thresholdsLegendLabel": "Schwellenwerte:"
+        "thresholdsLegendLabel": "Schwellenwerte:",
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Name auf dem Dashboard angezeigt"
       },
       "scene": {
         "editNameLabel": "Widget-Name (optional)",
@@ -1655,15 +1657,129 @@
         "backToList": "Zurück zur Geräteliste",
         "saveError": "Fehler beim Sichern oder Löschen des Geräts",
         "validationError": "Validierungsfehler: Das Gerät ist nicht korrekt ausgefüllt.",
+        "validationErrorTitle": "Das Gerät konnte nicht gespeichert werden. Bitte korrigieren Sie die rot markierten Felder:",
+        "validationErrorDevice": "Gerät — {{field}}: {{message}}",
+        "validationErrorFeature": "„{{featureName}}“ — {{field}}: {{message}}",
+        "validationFieldLabels": {
+          "name": "Name",
+          "external_id": "Externe ID",
+          "min": "Mindestwert",
+          "max": "Maximalwert",
+          "unit": "Einheit",
+          "room_id": "Raum",
+          "category": "Kategorie",
+          "type": "Typ"
+        },
         "validationErrors": {
-          "name": "Das Feld \"Name\" ist erforderlich",
-          "min": "Das Minimalfeld ist erforderlich und muss eine ganze Zahl sein",
-          "max": "Das Maximalfeld ist erforderlich und muss eine ganze Zahl sein",
-          "external_id": "Das externe ID-Feld ist erforderlich und muss über alle Geräte hinweg eindeutig sein"
+          "name": "Dieses Feld ist erforderlich",
+          "min": "Dieses Feld ist erforderlich und muss eine Zahl sein",
+          "max": "Dieses Feld ist erforderlich und muss eine Zahl sein",
+          "external_id": "Dieses Feld ist erforderlich und muss eindeutig sein",
+          "unit": "Die gewählte Einheit ist für diese Funktion ungültig",
+          "room_id": "Der gewählte Raum ist ungültig"
         },
         "saveConflictError": "Konflikt: Sind alle externen IDs wirklich eindeutig?",
         "mostRecentValueAt": "Zuletzt empfangener Wert {{mostRecentValueAt}}.",
-        "noValueReceived": "Kein Wert empfangen."
+        "noValueReceived": "Kein Wert empfangen.",
+        "searchPlaceholder": "Geräte suchen...",
+        "unassignedRoom": "Kein Raum zugewiesen",
+        "featureCount": "{{count}} Funktion(en)"
+      },
+      "featureCatalog": {
+        "title": "Funktionskatalog",
+        "subtitle": "Durchsuchen Sie verfügbare Funktionen und sehen Sie, wie sie auf Ihrem Dashboard erscheinen.",
+        "searchPlaceholder": "Funktionen suchen (z. B. Temperatur, Dimmer, Schalter...)",
+        "openButton": "Funktion hinzufügen",
+        "closeButton": "Katalog schließen",
+        "previewLabel": "Dashboard-Vorschau",
+        "cameraPreviewNotice": "Diese Funktion wird im Kamera-Dashboard-Widget angezeigt, nicht in der Geräteliste.",
+        "previewValues": {
+          "cube": {
+            "mode": "Rotation (Xiaomi Cube Geste)"
+          }
+        },
+        "noResults": "Keine Funktionen entsprechen Ihrer Suche.",
+        "noFeaturesYet": "Noch keine Funktionen hinzugefügt. Verwenden Sie die Schaltfläche unten, um den Katalog zu durchsuchen.",
+        "sensorBadge": "Sensor",
+        "actuatorBadge": "Aktor",
+        "historyBadge": "Protokolliert",
+        "fallbackDescription": "Eine Gladys-Funktion, die über MQTT gesteuert oder überwacht werden kann.",
+        "categoryDescriptions": {
+          "light": "Steuern Sie Lichter: Ein/Aus, Helligkeit, Farbe und Farbtemperatur.",
+          "switch": "Steuern Sie Schalter, Dimmer und Leistungsmessungen.",
+          "temperature-sensor": "Lesen Sie Temperaturwerte von Ihren Sensoren.",
+          "humidity-sensor": "Lesen Sie Luftfeuchtigkeitswerte von Ihren Sensoren.",
+          "motion-sensor": "Erkennen Sie Bewegungen in einem Raum oder Bereich.",
+          "energy-sensor": "Überwachen Sie Energieverbrauch, Leistung und Stromzählerstand.",
+          "shutter": "Steuern Sie Rollläden und Jalousien.",
+          "curtain": "Steuern Sie Vorhänge und deren Position.",
+          "thermostat": "Stellen Sie Heizungssollwerte ein und lesen Sie sie aus.",
+          "button": "Aktionen bei Tastendruck auslösen.",
+          "text": "Textwerte anzeigen oder senden.",
+          "battery": "Überwachen Sie den Batteriestand Ihrer Geräte.",
+          "currency": "Zeigen Sie Währungs- oder Kryptowährungswerte an."
+        },
+        "descriptions": {
+          "light": {
+            "binary": "Ein einfacher Ein/Aus-Schalter zur Steuerung einer Lampe.",
+            "brightness": "Ein Schieberegler zur Einstellung der Helligkeit von 0% bis 100%.",
+            "color": "Ein Farbwähler zur Einstellung der Lichtfarbe.",
+            "hue": "Ein Schieberegler zur Einstellung des Farbtons von 0° bis 360°.",
+            "saturation": "Ein Schieberegler zur Einstellung der Sättigung von 0% bis 100%.",
+            "temperature": "Ein Schieberegler zur Einstellung der Farbtemperatur (warmes bis kühles Weiß)."
+          },
+          "switch": {
+            "binary": "Ein einfacher Ein/Aus-Schalter für jedes Gerät.",
+            "dimmer": "Ein Schieberegler zur Steuerung der Intensität eines Geräts.",
+            "energy": "Zeigt den kumulierten Energieverbrauch in kWh an."
+          },
+          "temperature-sensor": {
+            "decimal": "Zeigt die aktuelle Temperatur mit ihrer Einheit an."
+          },
+          "humidity-sensor": {
+            "decimal": "Zeigt den aktuellen Luftfeuchtigkeitsprozentsatz an."
+          },
+          "motion-sensor": {
+            "binary": "Zeigt an, ob derzeit eine Bewegung erkannt wird."
+          },
+          "energy-sensor": {
+            "power": "Zeigt den momentanen Stromverbrauch in Watt an.",
+            "index": "Zeigt den kumulierten Energiezählerstand (kWh-Zähler) an."
+          },
+          "shutter": {
+            "state": "Öffnen oder schließen Sie einen Rollladen mit Auf/Ab-Steuerung.",
+            "position": "Stellen Sie die Rollladenposition mit einem Schieberegler ein (0% = geschlossen)."
+          },
+          "thermostat": {
+            "target-temperature": "Stellen Sie die Solltemperatur mit +/- Tasten ein."
+          },
+          "button": {
+            "push": "Eine Taste zum Auslösen einer Aktion in Gladys oder über MQTT."
+          },
+          "text": {
+            "text": "Zeigt einen Textwert an, nützlich für benutzerdefinierte Nachrichten oder Daten."
+          },
+          "battery": {
+            "integer": "Zeigt den Batteriestand als Prozentsatz an."
+          },
+          "currency": {
+            "decimal": "Zeigt einen Geldbetrag mit seiner Währungseinheit an."
+          }
+        },
+        "keywords": {
+          "light": {
+            "brightness": "dimmer schieberegler lampe",
+            "binary": "ein aus schalter lampe",
+            "temperature": "warm kalt weiß kelvin farbtemperatur"
+          },
+          "switch": {
+            "dimmer": "dimmer schieberegler",
+            "binary": "ein aus schalter steckdose"
+          },
+          "temperature-sensor": {
+            "decimal": "temp thermometer klima"
+          }
+        }
       },
       "feature": {
         "nameLabel": "Name",
@@ -1676,6 +1792,7 @@
         "maxLabel": "Maximalwert",
         "maxPlaceholder": "Gib den maximalen Wert der Funktion ein",
         "readOnlyLabel": "Ist es ein Sensor?",
+        "readOnlyShortDescription": "Ja, es ist ein Sensor",
         "readOnlyButton": "Ja, es ist ein Sensor, der nur Daten an Gladys sendet.",
         "addButton": "Funktion hinzufügen",
         "mqttTopicToPublishExampleLabel": "MQTT-Veröffentlichungsthema",
@@ -3100,6 +3217,7 @@
       "service-zigbee2mqtt-backup": "Zigbee2MQTT-Backup",
       "migrate-sqlite-to-duckdb": "DuckDB migration",
       "device-state-purge-all-sqlite-states": "Bereinigung aller SQLite-Berichte",
+      "device-state-purge-orphaned-duckdb-states": "Löschen verwaister DuckDB-Zustände",
       "service-matter-backup": "Matter backup",
       "energy-monitoring-cost-calculation-thirty-minutes": "Energiekostenberechnung (30 Minuten)",
       "energy-monitoring-cost-calculation-yesterday": "Energiekostenberechnung (von gestern)",
@@ -3918,6 +4036,50 @@
           "5": "Komfort"
         }
       },
+      "shutter": {
+        "state": {
+          "-1": "Geschlossen",
+          "0": "Gestoppt",
+          "1": "Geöffnet"
+        }
+      },
+      "curtain": {
+        "state": {
+          "-1": "Geschlossen",
+          "0": "Gestoppt",
+          "1": "Geöffnet"
+        }
+      },
+      "lock": {
+        "state": {
+          "0": "Entriegelt",
+          "1": "Verriegelt",
+          "2": "Aktivität",
+          "3": "Fehler"
+        }
+      },
+      "air-conditioning": {
+        "mode": {
+          "0": "Automatisch",
+          "1": "Kühlen",
+          "2": "Heizen",
+          "3": "Entfeuchten",
+          "4": "Lüften"
+        }
+      },
+      "siren": {
+        "lmh_volume": {
+          "0": "Niedrig",
+          "1": "Mittel",
+          "2": "Hoch"
+        }
+      },
+      "music": {
+        "playback_state": {
+          "0": "Pausiert",
+          "1": "Wird abgespielt"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Kein Wert empfangen",
@@ -4434,11 +4596,11 @@
     },
     "voc-matter-index-sensor": {
       "shortCategoryName": "VOC Index",
-      "integer": "VOC Index (ganze Zahl)"
+      "integer": "VOC Index"
     },
     "no2-matter-index-sensor": {
       "shortCategoryName": "NO₂-Index",
-      "integer": "NO₂-Index (ganze Zahl)"
+      "integer": "NO₂-Index"
     },
     "shutter": {
       "shortCategoryName": "Jalousie",
@@ -4468,7 +4630,7 @@
     },
     "ph-sensor": {
       "shortCategoryName": "pH-Sensor",
-      "decimal": "pH (Dezimal)"
+      "decimal": "pH"
     },
     "orp-sensor": {
       "shortCategoryName": "ORP-Sensor (Redox)",
@@ -4504,7 +4666,7 @@
     },
     "angle-sensor": {
       "shortCategoryName": "Winkelsensor",
-      "integer": "Winkel (ganze Zahl)"
+      "integer": "Winkel"
     },
     "risk": {
       "shortCategoryName": "Risiko",
@@ -4544,6 +4706,11 @@
       "showDetails": "Details anzeigen",
       "hideDetails": "Details ausblenden"
     },
+    "modelSelector": {
+      "label": "KI-Modell",
+      "auto": "Auto",
+      "priceLegend": "€ günstig · €€ mittel · €€€ premium"
+    },
     "sidebar": {
       "title": "Wie funktioniert der Chat?",
       "intro": "Der Gladys-Chat nutzt die Gladys-Plus-Künstliche Intelligenz, damit du natürlich mit deinem vernetzten Zuhause kommunizieren kannst.",
@@ -4557,10 +4724,87 @@
       "upsellFeature3": "Open-Weight-KI-Modelle in Frankreich gehostet"
     }
   },
+  "history": {
+    "title": "Aktivität",
+    "subtitle": "Verfolgen Sie alles, was in Ihrem Zuhause passiert – in Echtzeit.",
+    "live": "Live",
+    "jumpToDate": "Zu einem Datum springen",
+    "browsingPast": "Sie sehen den Verlauf vom {{date}}.",
+    "backToLive": "Zurück zu Live",
+    "allRooms": "Alle Räume",
+    "searchPlaceholder": "Gerät suchen",
+    "scrollLeft": "Filter nach links scrollen",
+    "scrollRight": "Filter nach rechts scrollen",
+    "loadMore": "Mehr laden",
+    "searchingOlder": "Suche nach Aktivitäten — {{date}}…",
+    "newEvents": {
+      "one": "1 neues Ereignis",
+      "other": "{{count}} neue Ereignisse"
+    },
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "emptyTitle": "Keine Aktivität vorhanden",
+    "emptyText": "Ereignisse Ihrer Geräte erscheinen hier in Echtzeit. Wenn diese Liste leer bleibt, prüfen Sie, ob der Verlauf für Ihre Gerätefunktionen aktiviert ist.",
+    "error": "Beim Laden des Aktivitätsverlaufs ist ein Fehler aufgetreten.",
+    "groups": {
+      "all": "Alle",
+      "openings": "Öffnungen",
+      "motion": "Bewegung & Anwesenheit",
+      "buttons": "Tasten & Fernbedienungen",
+      "lights": "Lichter & Steckdosen",
+      "climate": "Klima & Umgebung",
+      "security": "Sicherheit",
+      "energy": "Energie",
+      "other": "Sonstiges"
+    },
+    "values": {
+      "motion-sensor": {
+        "0": "Keine Bewegung mehr",
+        "1": "Bewegung erkannt"
+      },
+      "presence-sensor": {
+        "0": "Abwesend",
+        "1": "Anwesenheit erkannt"
+      },
+      "smoke-sensor": {
+        "0": "Kein Rauch mehr erkannt",
+        "1": "Rauch erkannt!"
+      },
+      "leak-sensor": {
+        "0": "Kein Leck mehr erkannt",
+        "1": "Wasserleck erkannt!"
+      },
+      "vibration-sensor": {
+        "0": "Keine Vibration mehr",
+        "1": "Vibration erkannt"
+      },
+      "light": {
+        "0": "Ausgeschaltet",
+        "1": "Eingeschaltet"
+      },
+      "switch": {
+        "0": "Ausgeschaltet",
+        "1": "Eingeschaltet"
+      },
+      "lock": {
+        "0": "Entriegelt",
+        "1": "Verriegelt"
+      },
+      "signal": {
+        "0": "Kein Signal",
+        "1": "Sehr schwaches Signal",
+        "2": "Schwaches Signal",
+        "3": "Mittleres Signal",
+        "4": "Gutes Signal",
+        "5": "Ausgezeichnetes Signal"
+      }
+    }
+  },
   "header": {
     "gladysAssistant": "Gladys Assistant",
     "home": "Startseite",
     "chat": "Chat",
+    "history": "Aktivität",
     "devices": "Geräte",
     "integrations": "Integrationen",
     "calendar": "Kalender",

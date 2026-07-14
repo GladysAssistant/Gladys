@@ -32,7 +32,9 @@ async function destroy(selector) {
   // Deleting a device cascade delete its device features and device feature states
   // This is a blocking operation that takes a lot of time
   // So if the device has too much states, we don't allow the user to delete the device
-  // and ask him to come back later
+  // and ask him to come back later.
+  // States live in DuckDB since the migration; the SQLite tables below only hold
+  // leftovers of installations that have not run the migration yet.
   const deviceStatesCount = await db.sequelize.query(
     `
       SELECT COUNT(s.id) as count
@@ -59,7 +61,17 @@ async function destroy(selector) {
     },
   );
 
-  const totalNumberOfStates = deviceStatesCount[0].count + deviceStatesCount[1].count;
+  let duckDbStatesCount = 0;
+  if (device.features.length > 0) {
+    const placeholders = device.features.map(() => '?').join(',');
+    const [{ count }] = await db.duckDbReadConnectionAllAsync(
+      `SELECT COUNT(*) AS count FROM t_device_feature_state WHERE device_feature_id IN (${placeholders})`,
+      ...device.features.map((feature) => feature.id),
+    );
+    duckDbStatesCount = Number(count);
+  }
+
+  const totalNumberOfStates = deviceStatesCount[0].count + deviceStatesCount[1].count + duckDbStatesCount;
   logger.info(`Deleting device ${selector}, device has ${totalNumberOfStates} states in DB`);
   if (totalNumberOfStates > this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE) {
     logger.info(`Deleting device ${selector}, device has too much states. Cleaning states first.`);
