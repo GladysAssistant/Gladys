@@ -88,7 +88,7 @@ async function sendWeeklyDigest({ force = false } = {}) {
           return;
         }
 
-        await this.message.sendToUser(admin.selector, digestText);
+        await this.message.sendToUser(admin.selector, digestText, null, { messageType: 'notification' });
         sent += 1;
       } catch (e) {
         if (e instanceof Error429) {

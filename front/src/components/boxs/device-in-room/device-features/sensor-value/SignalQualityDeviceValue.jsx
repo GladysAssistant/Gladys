@@ -1,5 +1,6 @@
 import { Text } from 'preact-i18n';
 import SvgIcon from '../../../../icons/SvgIcon';
+import { getSignalQualityIcon, getSignalQualityLevel } from '../../../../../utils/signalQuality';
 
 const SignalQualityDeviceValue = ({ deviceFeature }) => {
   const { last_value: lastValue, min, max } = deviceFeature;
@@ -8,10 +9,10 @@ const SignalQualityDeviceValue = ({ deviceFeature }) => {
     return <Text id="dashboard.boxes.devicesInRoom.noValue" />;
   }
 
-  const ratio = Math.round(((lastValue - min) * 5) / (max - min));
+  const level = getSignalQualityLevel(lastValue, min, max);
   return (
     <div class="d-flex flex-row-reverse">
-      <SvgIcon icon={`tabler-antenna-bars-${ratio || 'off'}`} />
+      <SvgIcon icon={getSignalQualityIcon(level)} />
     </div>
   );
 };

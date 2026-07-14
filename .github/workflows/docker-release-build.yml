@@ -184,3 +184,10 @@ jobs:
           docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTAMD64
           docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTAMD64 ${{ env.DOCKERHUB_REPO }}:v4-amd64
           docker push ${{ env.DOCKERHUB_REPO }}:v4-amd64
+  publish-gladys-plus:
+    name: Publish Gladys Plus front
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Cloudflare Pages deploy hook
+        run: curl -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}"
