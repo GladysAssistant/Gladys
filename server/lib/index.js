@@ -168,14 +168,14 @@ function Gladys(params = {}) {
         await brain.load();
       }
 
+      // init the external integration supervisor before service.startAll, so
+      // the proxy services are registered and startAll starts internal and
+      // external integrations through the same path
+      if (!params.disableExternalIntegration) {
+        await externalIntegration.init();
+      }
       if (!params.disableService) {
         await service.load(gladys);
-        // init the external integration supervisor before startAll, so the
-        // proxy services are registered and startAll starts internal and
-        // external integrations through the same path
-        if (!params.disableExternalIntegration) {
-          await externalIntegration.init();
-        }
         await service.startAll();
       }
       if (!params.disableSceneLoading) {

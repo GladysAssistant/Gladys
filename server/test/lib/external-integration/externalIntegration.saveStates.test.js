@@ -81,6 +81,10 @@ describe('externalIntegration.saveStates', () => {
       [{ device_feature_external_id: `ext:${service.selector}:x`, state: 1, created_at: 'not-a-date' }],
       'ISO 8601',
     );
+    expectBadParameters(
+      [{ device_feature_external_id: `ext:${service.selector}:x`, state: 1, created_at: new Date() }],
+      'ISO 8601',
+    );
   });
 
   it('should rate limit to 300 states per minute per integration', () => {

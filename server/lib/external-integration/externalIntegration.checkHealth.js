@@ -39,14 +39,16 @@ async function checkHealth() {
     if (!service.container_id) {
       return;
     }
-    let containerRunning = false;
+    let containerInspect;
     try {
-      const containerInspect = await this.system.inspectContainer(service.container_id);
-      containerRunning = get(containerInspect, 'State.Running') === true;
+      containerInspect = await this.system.inspectContainer(service.container_id);
     } catch (e) {
+      // a transient inspection failure is not a crashed container:
+      // skip and let the next health-check cycle retry
       logger.debug(`Unable to inspect container of integration ${service.selector}`, e);
+      return;
     }
-    if (!containerRunning) {
+    if (get(containerInspect, 'State.Running') !== true) {
       await this.scheduleRestart(service);
       return;
     }

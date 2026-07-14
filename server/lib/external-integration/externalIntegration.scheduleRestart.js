@@ -15,8 +15,10 @@ const { MAX_FAILURE_COUNT, RESTART_BACKOFF_BASE_MS, RESTART_BACKOFF_MAX_MS } = r
  * await gladys.externalIntegration.scheduleRestart(service);
  */
 async function scheduleRestart(service) {
-  const failureCount = service.failure_count + 1;
-  await db.Service.update({ failure_count: failureCount }, { where: { id: service.id } });
+  // atomic increment: concurrent crash signals must not clobber each other
+  await db.Service.update({ failure_count: db.sequelize.literal('failure_count + 1') }, { where: { id: service.id } });
+  const updatedService = await db.Service.findOne({ where: { id: service.id }, attributes: ['failure_count'] });
+  const failureCount = updatedService.failure_count;
   if (failureCount >= MAX_FAILURE_COUNT) {
     logger.warn(`External integration ${service.selector} crashed ${failureCount} times, giving up`);
     await this.saveStatus(service, SERVICE_STATUS.ERROR);
@@ -25,6 +27,10 @@ async function scheduleRestart(service) {
   await this.saveStatus(service, SERVICE_STATUS.DEGRADED);
   const delay = Math.min(RESTART_BACKOFF_BASE_MS * 2 ** (failureCount - 1), RESTART_BACKOFF_MAX_MS);
   logger.info(`External integration ${service.selector}: restart scheduled in ${delay / 1000}s`);
+  // cancel a possibly pending restart before scheduling its replacement
+  if (this.restartTimers.has(service.id)) {
+    clearTimeout(this.restartTimers.get(service.id));
+  }
   const restartTimer = setTimeout(() => {
     this.restartTimers.delete(service.id);
     this.start(service.selector, { resetFailureCount: false }).catch((e) => {

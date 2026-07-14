@@ -48,7 +48,7 @@ class Integration extends Component {
     }
   }
 
-  onExternalIntegrationStatusChanged = payload => {
+  onExternalIntegrationStatusChanged = async payload => {
     const { externalInstalled } = this.state;
     if (!payload || !externalInstalled) {
       return;
@@ -56,7 +56,7 @@ class Integration extends Component {
     const updated = externalInstalled.map(integration =>
       integration.selector === payload.selector ? { ...integration, status: payload.status } : integration
     );
-    this.setState({ externalInstalled: updated });
+    await this.setState({ externalInstalled: updated });
     this.getIntegrations();
   };
 

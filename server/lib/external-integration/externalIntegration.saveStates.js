@@ -20,7 +20,9 @@ function saveStates(service, states) {
   if (states.length > MAX_STATES_PER_REQUEST) {
     throw new BadParameters(`states: max ${MAX_STATES_PER_REQUEST} states per request`);
   }
-  // sliding one-minute window rate limit, in memory per integration
+  // fixed one-minute window rate limit, in memory per integration
+  // (a burst straddling the window boundary can reach ~2x the limit,
+  // acceptable for this anti-spam purpose)
   const now = Date.now();
   let rateLimit = this.stateRateLimits.get(service.id);
   if (!rateLimit || now >= rateLimit.resetAt) {
@@ -50,8 +52,11 @@ function saveStates(service, states) {
     if (!hasNumericState && !hasText) {
       throw new BadParameters(`states[${index}]: must have a numeric "state" or a string "text"`);
     }
-    if (state.created_at !== undefined && Number.isNaN(Date.parse(state.created_at))) {
-      throw new BadParameters(`states[${index}].created_at: must be an ISO 8601 date`);
+    if (
+      state.created_at !== undefined &&
+      (typeof state.created_at !== 'string' || Number.isNaN(Date.parse(state.created_at)))
+    ) {
+      throw new BadParameters(`states[${index}].created_at: must be an ISO 8601 date string`);
     }
   });
   states.forEach((state) => {

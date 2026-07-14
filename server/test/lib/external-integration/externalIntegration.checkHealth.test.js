@@ -27,16 +27,18 @@ describe('externalIntegration.checkHealth', () => {
     expect(externalIntegration.scheduleRestart.firstCall.args[0]).to.have.property('id', service.id);
   });
 
-  it('should schedule a restart when the container cannot be inspected', async () => {
+  it('should not restart on a transient inspection failure', async () => {
+    // a transient Docker socket error is not a crashed container:
+    // skip and let the next cycle retry
     await seedExternalService({ status: SERVICE_STATUS.RUNNING });
     const { externalIntegration } = buildSupervisor({
       system: {
-        inspectContainer: fake.rejects(new Error('404')),
+        inspectContainer: fake.rejects(new Error('socket hang up')),
       },
     });
     externalIntegration.scheduleRestart = fake.resolves(null);
     await externalIntegration.checkHealth();
-    sinonAssert.calledOnce(externalIntegration.scheduleRestart);
+    sinonAssert.notCalled(externalIntegration.scheduleRestart);
   });
 
   it('should not check STOPPED or ERROR integrations', async () => {

@@ -11,11 +11,16 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 class ExternalIntegrationConfigPage extends Component {
   loadData = async () => {
     this.setState({ loadStatus: RequestStatus.Getting });
+    const { selector } = this.props;
     try {
       const [integration, configResponse] = await Promise.all([
-        this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`),
-        this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}/config`)
+        this.props.httpClient.get(`/api/v1/external_integration/${selector}`),
+        this.props.httpClient.get(`/api/v1/external_integration/${selector}/config`)
       ]);
+      if (selector !== this.props.selector) {
+        // a newer request has started since, discard this stale result
+        return;
+      }
       const configValues = this.buildConfigValues(integration, configResponse);
       this.setState({
         integration,
@@ -26,7 +31,17 @@ class ExternalIntegrationConfigPage extends Component {
       });
     } catch (e) {
       console.error(e);
-      this.setState({ loadStatus: RequestStatus.Error });
+      if (selector !== this.props.selector) {
+        return;
+      }
+      // never keep the data of a previous integration displayed and savable
+      this.setState({
+        loadStatus: RequestStatus.Error,
+        integration: null,
+        configValues: {},
+        configuredSecrets: [],
+        touchedSecrets: {}
+      });
     }
   };
 
@@ -67,11 +82,16 @@ class ExternalIntegrationConfigPage extends Component {
         // A secret set to null means "unchanged" on the server side
         config[field.key] = touchedSecrets[field.key] ? value : null;
       } else if (field.type === 'number') {
-        config[field.key] = value === '' || value === undefined || value === null ? null : Number(value);
+        // empty or malformed numeric inputs are simply not sent
+        // (the server merge is partial, absent keys stay unchanged)
+        const numericValue = value === '' || value === undefined || value === null ? NaN : Number(value);
+        if (!Number.isNaN(numericValue)) {
+          config[field.key] = numericValue;
+        }
       } else if (field.type === 'boolean') {
         config[field.key] = !!value;
-      } else {
-        config[field.key] = value === undefined ? null : value;
+      } else if (value !== undefined && value !== null) {
+        config[field.key] = value;
       }
     });
     try {

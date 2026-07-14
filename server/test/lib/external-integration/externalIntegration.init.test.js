@@ -69,13 +69,14 @@ describe('externalIntegration.init', () => {
     externalIntegration.refreshIndex = fake.rejects(new Error('offline'));
     externalIntegration.checkHealth = fake.resolves(null);
     await externalIntegration.init();
+    // no initial refresh: the first fetch is lazy, the boot never touches the network
+    expect(externalIntegration.refreshIndex.callCount).to.equal(0);
     await clock.tickAsync(12 * 60 * 60 * 1000 + 1000);
     clock.restore();
     await new Promise((resolve) => {
       setTimeout(resolve, 50);
     });
-    // initial refresh + periodic refresh
-    expect(externalIntegration.refreshIndex.callCount).to.be.at.least(2);
+    expect(externalIntegration.refreshIndex.callCount).to.be.at.least(1);
     expect(externalIntegration.checkHealth.callCount).to.be.at.least(1);
     clearInterval(externalIntegration.checkHealthInterval);
     clearInterval(externalIntegration.storeRefreshInterval);

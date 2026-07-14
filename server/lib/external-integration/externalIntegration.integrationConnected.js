@@ -25,6 +25,10 @@ async function integrationConnected(service, ws) {
       logger.debug(e);
     }
   }
+  // a re-authentication on the same socket must not stack ping loops
+  if (ws.integrationPingInterval) {
+    clearInterval(ws.integrationPingInterval);
+  }
   this.connections.set(service.id, ws);
   let missedPings = 0;
   ws.isAliveIntegration = true;

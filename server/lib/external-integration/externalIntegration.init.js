@@ -27,10 +27,9 @@ async function init() {
   const plainServices = services.map((service) => service.get({ plain: true }));
   plainServices.forEach((service) => this.registerProxyService(service));
 
-  // store index: initial refresh (non blocking, the boot must not depend on
-  // the network) + periodic refresh every 12h. Works even without Docker:
-  // the catalog stays browsable.
-  this.refreshIndex().catch((e) => logger.debug('Unable to fetch the integration store index', e));
+  // store index: periodic refresh every 12h; the first fetch is lazy (first
+  // catalog access, see getIndex) so the boot never depends on the network.
+  // Works even without Docker: the catalog stays browsable.
   this.storeRefreshInterval = setInterval(() => {
     this.refreshIndex().catch((e) => logger.debug('Unable to refresh the integration store index', e));
   }, STORE_INDEX_TTL_MS);

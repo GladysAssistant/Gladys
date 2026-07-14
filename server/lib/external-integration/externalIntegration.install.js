@@ -60,17 +60,27 @@ async function install({ dockerImage, manifest, storeSlug = null }) {
   if (existingSelector !== null) {
     throw new ConflictError('EXTERNAL_INTEGRATION_ALREADY_INSTALLED');
   }
-  const createdService = await db.Service.create({
-    name: selector,
-    selector,
-    version: finalManifest.version,
-    has_message_feature: false,
-    status: SERVICE_STATUS.ENABLED,
-    type: SERVICE_TYPES.EXTERNAL,
-    docker_image: image,
-    manifest: finalManifest,
-    store_slug: storeSlug,
-  });
+  let createdService;
+  try {
+    createdService = await db.Service.create({
+      name: selector,
+      selector,
+      version: finalManifest.version,
+      has_message_feature: false,
+      status: SERVICE_STATUS.ENABLED,
+      type: SERVICE_TYPES.EXTERNAL,
+      docker_image: image,
+      manifest: finalManifest,
+      store_slug: storeSlug,
+    });
+  } catch (e) {
+    // two concurrent installs can race between the findOne pre-check and
+    // the create: translate the unique constraint on the selector
+    if (e.name === 'SequelizeUniqueConstraintError') {
+      throw new ConflictError('EXTERNAL_INTEGRATION_ALREADY_INSTALLED');
+    }
+    throw e;
+  }
   const service = createdService.get({ plain: true });
   this.registerProxyService(service);
   try {

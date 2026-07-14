@@ -50,7 +50,7 @@ class DiscoveredBox extends Component {
                   </label>
                   <DeviceFeatures features={device.features} />
                 </div>
-                <button onClick={this.createDevice} class="btn btn-success" disabled={device.created}>
+                <button onClick={this.createDevice} class="btn btn-success" disabled={device.created || loading}>
                   <Text id="integration.externalIntegration.discover.createButton" />
                 </button>
               </div>

@@ -45,7 +45,7 @@ class ConfigField extends Component {
               <Text id="global.emptySelectOption" />
             </option>
             {(field.options || []).map(option => (
-              <option value={option.value} selected={`${value}` === `${option.value}`}>
+              <option key={option.value} value={option.value} selected={`${value}` === `${option.value}`}>
                 {getLocalizedText(option.label, language) || option.value}
               </option>
             ))}

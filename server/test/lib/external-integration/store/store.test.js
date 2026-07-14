@@ -164,6 +164,22 @@ describe('externalIntegration store', () => {
       expect(incompatibleEntry).to.include({ installed: false, compatible: false });
     });
 
+    it('should treat a malformed gladys_version range as incompatible', async () => {
+      const { externalIntegration } = buildSupervisor();
+      externalIntegration.storeIndex = {
+        index_format: 1,
+        integrations: [
+          {
+            store_slug: 'mallory/gladys-broken-range',
+            manifest: { ...TEST_MANIFEST, gladys_version: 'not-a-range' },
+          },
+        ],
+      };
+      externalIntegration.storeIndexFetchedAt = Date.now();
+      const catalog = await externalIntegration.getCatalog();
+      expect(catalog.integrations[0]).to.have.property('compatible', false);
+    });
+
     it('should filter with the search keyword', async () => {
       const { externalIntegration } = buildSupervisor();
       externalIntegration.storeIndex = TEST_INDEX;

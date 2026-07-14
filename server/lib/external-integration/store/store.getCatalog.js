@@ -22,6 +22,12 @@ async function getCatalog({ search, refresh = false } = {}) {
   const gladysVersion = coercedVersion ? coercedVersion.version : null;
   let integrations = ((index && index.integrations) || []).map((entry) => {
     const installedService = installedBySlug.get(entry.store_slug);
+    // the index is external data: a malformed range must not abort the catalog
+    const gladysVersionRange = semver.validRange(entry.manifest.gladys_version);
+    let compatible = false;
+    if (gladysVersionRange !== null) {
+      compatible = gladysVersion === null ? true : semver.satisfies(gladysVersion, gladysVersionRange);
+    }
     return {
       store_slug: entry.store_slug,
       repo_url: entry.repo_url,
@@ -31,7 +37,7 @@ async function getCatalog({ search, refresh = false } = {}) {
       installed: installedService !== undefined,
       installed_selector: installedService ? installedService.selector : null,
       update_available: installedService ? installedService.update_available : false,
-      compatible: gladysVersion === null ? true : semver.satisfies(gladysVersion, entry.manifest.gladys_version),
+      compatible,
     };
   });
   if (search) {
