@@ -16,6 +16,7 @@ const {
   ConflictError,
   ForbiddenError,
   TooManyRequests,
+  ExternalIntegrationUnavailableError,
 } = require('../../utils/coreErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
@@ -64,6 +65,8 @@ module.exports = function errorMiddleware(error, req, res, next) {
     responseError = new Error403(error.message);
   } else if (error instanceof TooManyRequests) {
     responseError = new Error429({ time_before_next: error.timeBeforeNext });
+  } else if (error instanceof ExternalIntegrationUnavailableError) {
+    responseError = new Error400(error.message);
   } else {
     logger.warn(error);
     responseError = new Error500(error);

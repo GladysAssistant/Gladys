@@ -15,6 +15,8 @@ const MessageController = require('./controllers/message.controller');
 const RoomController = require('./controllers/room.controller');
 const SessionController = require('./controllers/session.controller');
 const ServiceController = require('./controllers/service.controller');
+const ExternalIntegrationController = require('./controllers/externalIntegration.controller');
+const IntegrationHostController = require('./controllers/integrationHost.controller');
 const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
@@ -47,6 +49,8 @@ function getRoutes(gladys) {
   const variableController = VariableController(gladys);
   const sessionController = SessionController(gladys);
   const serviceController = ServiceController(gladys);
+  const externalIntegrationController = ExternalIntegrationController(gladys);
+  const integrationHostController = IntegrationHostController(gladys);
   const sceneController = SceneController(gladys);
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
@@ -467,6 +471,117 @@ function getRoutes(gladys) {
     'get /api/v1/service': {
       authenticated: true,
       controller: serviceController.getAll,
+    },
+    // external integrations (admin API)
+    // ⚠️ the literal `store` routes must be declared BEFORE `:selector`
+    // (setupRoutes registers routes in declaration order). Selectors are
+    // prefixed `ext-` so `store` can never be a valid selector anyway.
+    'get /api/v1/external_integration': {
+      authenticated: true,
+      controller: externalIntegrationController.getAll,
+    },
+    'get /api/v1/external_integration/store': {
+      authenticated: true,
+      controller: externalIntegrationController.getStore,
+    },
+    'post /api/v1/external_integration/store/refresh': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.refreshStore,
+    },
+    'post /api/v1/external_integration': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.install,
+    },
+    'get /api/v1/external_integration/:selector': {
+      authenticated: true,
+      controller: externalIntegrationController.getBySelector,
+    },
+    'post /api/v1/external_integration/:selector/start': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.start,
+    },
+    'post /api/v1/external_integration/:selector/stop': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.stop,
+    },
+    'post /api/v1/external_integration/:selector/restart': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.restart,
+    },
+    'post /api/v1/external_integration/:selector/update': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.update,
+    },
+    'get /api/v1/external_integration/:selector/logs': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.getLogs,
+    },
+    'get /api/v1/external_integration/:selector/discovered_device': {
+      authenticated: true,
+      controller: externalIntegrationController.getDiscoveredDevices,
+    },
+    'post /api/v1/external_integration/:selector/scan': {
+      authenticated: true,
+      controller: externalIntegrationController.scan,
+    },
+    'get /api/v1/external_integration/:selector/config': {
+      authenticated: true,
+      controller: externalIntegrationController.getConfig,
+    },
+    'post /api/v1/external_integration/:selector/config': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.saveConfig,
+    },
+    'delete /api/v1/external_integration/:selector': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.destroy,
+    },
+    // host API of external integrations (integration -> core). Only surface
+    // integration -> core, authenticated by integration JWT, strict tenant
+    // isolation. Never exposed through the Gladys Plus gateway.
+    'get /api/integration/v1/status': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getStatus,
+    },
+    'post /api/integration/v1/heartbeat': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.heartbeat,
+    },
+    'post /api/integration/v1/discovered_device': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishDiscoveredDevices,
+    },
+    'get /api/integration/v1/device': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getDevices,
+    },
+    'post /api/integration/v1/state': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishStates,
+    },
+    'get /api/integration/v1/config': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getConfig,
+    },
+    'post /api/integration/v1/config': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.saveConfig,
     },
     // user
     'get /api/v1/user': {

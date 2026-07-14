@@ -263,8 +263,14 @@ const SERVICE_STATUS = {
   DISABLED: 'DISABLED',
   LOADING: 'LOADING',
   RUNNING: 'RUNNING',
+  DEGRADED: 'DEGRADED',
   STOPPED: 'STOPPED',
   ERROR: 'ERROR',
+};
+
+const SERVICE_TYPES = {
+  INTERNAL: 'internal',
+  EXTERNAL: 'external',
 };
 
 const SYSTEM_VARIABLE_NAMES = {
@@ -430,6 +436,10 @@ const EVENTS = {
   },
   MQTT: {
     RECEIVED: 'mqtt.received',
+  },
+  EXTERNAL_INTEGRATION: {
+    STATUS_CHANGED: 'external-integration.status-changed',
+    DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
   },
 };
 
@@ -1452,6 +1462,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
+    INTEGRATION_REQUEST: 'authenticate.integration-request',
     CONNECTED: 'authentication.connected',
   },
   GATEWAY: {
@@ -1542,6 +1553,19 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   MATTERBRIDGE: {
     STATUS_CHANGE: 'matterbridge.status-change',
+  },
+  EXTERNAL_INTEGRATION: {
+    STATUS_CHANGED: 'external-integration.status-changed',
+    DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
+    DEVICE_SET_VALUE: 'external-integration.device.set-value',
+    DEVICE_POLL: 'external-integration.device.poll',
+    COMMAND_RESULT: 'external-integration.command-result',
+    SCAN_REQUEST: 'external-integration.scan-request',
+    DEVICE_CREATED: 'external-integration.device-created',
+    DEVICE_UPDATED: 'external-integration.device-updated',
+    DEVICE_DELETED: 'external-integration.device-deleted',
+    HEARTBEAT: 'external-integration.heartbeat',
+    CONFIG_UPDATED: 'external-integration.config-updated',
   },
 };
 
@@ -1758,6 +1782,9 @@ module.exports.DEVICE_FEATURE_UNITS_BY_CATEGORY = DEVICE_FEATURE_UNITS_BY_CATEGO
 
 module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
+
+module.exports.SERVICE_TYPES = SERVICE_TYPES;
+module.exports.SERVICE_TYPES_LIST = createList(SERVICE_TYPES);
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
 

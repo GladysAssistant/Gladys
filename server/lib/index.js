@@ -27,6 +27,7 @@ const services = require('../services');
 const Weather = require('./weather');
 const { EVENTS } = require('../utils/constants');
 const EnergyPrice = require('./energy-price');
+const ExternalIntegration = require('./external-integration');
 
 /**
  * @description Start a new Gladys instance.
@@ -43,6 +44,7 @@ const EnergyPrice = require('./energy-price');
  * @param {boolean} [params.disableJobInit] - If true, disable the pruning of background jobs.
  * @param {boolean} [params.disableDuckDbMigration] - If true, disable the DuckDB migration.
  * @param {boolean} [params.disableGladysUpgradedCheck] - If true, disable the check if Gladys is upgraded.
+ * @param {boolean} [params.disableExternalIntegration] - If true, disable the external integration supervisor.
  * @returns {object} Return gladys object.
  * @example
  * const gladys = Gladys();
@@ -73,6 +75,15 @@ function Gladys(params = {}) {
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
   const energyPrice = new EnergyPrice(stateManager);
+  const externalIntegration = new ExternalIntegration(
+    event,
+    system,
+    service,
+    stateManager,
+    device,
+    variable,
+    params.jwtSecret,
+  );
   const gateway = new Gateway(
     variable,
     event,
@@ -132,6 +143,7 @@ function Gladys(params = {}) {
     variable,
     weather,
     energyPrice,
+    externalIntegration,
     start: async () => {
       // set wal mode
       await db.sequelize.query('PRAGMA journal_mode=WAL;');
@@ -158,6 +170,12 @@ function Gladys(params = {}) {
 
       if (!params.disableService) {
         await service.load(gladys);
+        // init the external integration supervisor before startAll, so the
+        // proxy services are registered and startAll starts internal and
+        // external integrations through the same path
+        if (!params.disableExternalIntegration) {
+          await externalIntegration.init();
+        }
         await service.startAll();
       }
       if (!params.disableSceneLoading) {

@@ -7,6 +7,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     // Get Netatmo service
     const service = await db.Service.findOne({
+      attributes: ['id', 'selector'],
       where: {
         name: 'netatmo',
       },

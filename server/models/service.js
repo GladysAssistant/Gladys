@@ -1,4 +1,4 @@
-const { SERVICE_STATUS, SERVICE_STATUS_LIST } = require('../utils/constants');
+const { SERVICE_STATUS, SERVICE_STATUS_LIST, SERVICE_TYPES, SERVICE_TYPES_LIST } = require('../utils/constants');
 
 module.exports = (sequelize, DataTypes) => {
   const service = sequelize.define(
@@ -39,6 +39,41 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.ENUM(SERVICE_STATUS_LIST),
         defaultValue: SERVICE_STATUS.UNKNOWN,
+      },
+      type: {
+        allowNull: false,
+        type: DataTypes.ENUM(SERVICE_TYPES_LIST),
+        defaultValue: SERVICE_TYPES.INTERNAL,
+      },
+      docker_image: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
+      manifest: {
+        allowNull: true,
+        type: DataTypes.JSON,
+      },
+      container_id: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
+      failure_count: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      last_heartbeat: {
+        allowNull: true,
+        type: DataTypes.DATE,
+      },
+      token_version: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      store_slug: {
+        allowNull: true,
+        type: DataTypes.STRING,
       },
     },
     {},

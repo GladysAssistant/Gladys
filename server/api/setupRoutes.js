@@ -7,6 +7,7 @@ const CorsMiddleware = require('./middlewares/corsMiddleware');
 
 // Simple middleware
 const adminMiddleware = require('./middlewares/adminMiddleware');
+const ExternalIntegrationAuthMiddleware = require('./middlewares/externalIntegrationAuthMiddleware');
 const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
 const audioRawBodyMiddleware = require('./middlewares/audioRawBodyMiddleware');
 
@@ -28,6 +29,7 @@ function setupRoutes(gladys) {
   const isInstanceConfiguredMiddleware = IsInstanceConfiguredMiddleware(gladys);
   const resetPasswordAuthMiddleware = AuthMiddleware('reset-password:write', gladys);
   const alarmMiddleware = AuthMiddleware('alarm:write', gladys);
+  const externalIntegrationAuthMiddleware = ExternalIntegrationAuthMiddleware(gladys);
 
   // enable cross origin requests
   router.use(CorsMiddleware);
@@ -66,6 +68,10 @@ function setupRoutes(gladys) {
     // if the route need authentication for alarm
     if (routes[routeKey].alarmAuth) {
       routerParams.push(alarmMiddleware);
+    }
+    // if the route is part of the external integration host API
+    if (routes[routeKey].externalIntegrationAuth) {
+      routerParams.push(externalIntegrationAuthMiddleware);
     }
     if (routes[routeKey].audioRawBody) {
       routerParams.push(audioRawBodyMiddleware);

@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$comment": "Vendored copy of the canonical manifest schema owned by GladysAssistant/integration-store. externalIntegration.validateManifest.js enforces the exact same rules.",
+  "title": "gladys-assistant-integration.json",
+  "type": "object",
+  "required": ["manifest_version", "type", "name", "description", "version", "docker_image", "gladys_version"],
+  "properties": {
+    "manifest_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "type": {
+      "type": "string",
+      "enum": ["device"]
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 30
+    },
+    "description": {
+      "type": "object",
+      "required": ["en"],
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 100
+      },
+      "propertyNames": {
+        "pattern": "^[a-z]{2}$"
+      }
+    },
+    "version": {
+      "type": "string",
+      "description": "Strict semver"
+    },
+    "docker_image": {
+      "type": "string",
+      "description": "Valid image reference on a public registry, tag or digest"
+    },
+    "gladys_version": {
+      "type": "string",
+      "description": "Semver range (npm syntax)"
+    },
+    "cover_image": {
+      "type": "string",
+      "pattern": "^https://",
+      "description": "https URL of a JPEG/PNG image, exactly 800x534px, <= 150KB (validated and re-hosted by the indexer)"
+    },
+    "config_schema": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["key", "type", "label"],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9_]+$"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["string", "number", "boolean", "select", "secret"]
+          },
+          "label": {
+            "type": "object",
+            "required": ["en"],
+            "additionalProperties": { "type": "string" }
+          },
+          "description": {
+            "type": "object",
+            "required": ["en"],
+            "additionalProperties": { "type": "string" }
+          },
+          "required": { "type": "boolean" },
+          "min": { "type": "number" },
+          "max": { "type": "number" },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["value", "label"],
+              "properties": {
+                "value": { "type": "string" },
+                "label": {
+                  "type": "object",
+                  "required": ["en"],
+                  "additionalProperties": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
