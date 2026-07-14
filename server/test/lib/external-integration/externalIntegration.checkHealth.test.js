@@ -130,6 +130,19 @@ describe('externalIntegration.scheduleRestart', () => {
     sinonAssert.notCalled(externalIntegration.start);
   });
 
+  it('should cancel a pending restart before scheduling its replacement', async () => {
+    const clock = sinon.useFakeTimers();
+    const service = await seedExternalService({ status: SERVICE_STATUS.RUNNING, failure_count: 0 });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.start = fake.resolves(null);
+    await externalIntegration.scheduleRestart(service);
+    await externalIntegration.scheduleRestart({ ...service, failure_count: 1 });
+    // both backoffs elapsed: only the replacement restart fires
+    await clock.tickAsync(31 * 1000);
+    clock.restore();
+    sinonAssert.calledOnce(externalIntegration.start);
+  });
+
   it('should survive a failing supervised restart', async () => {
     const clock = sinon.useFakeTimers();
     const service = await seedExternalService({ status: SERVICE_STATUS.RUNNING, failure_count: 0 });

@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 const { assert: sinonAssert, fake } = require('sinon');
 
 const db = require('../../../models');
@@ -97,6 +98,35 @@ describe('externalIntegration.install', () => {
       throw new Error('should have thrown');
     } catch (e) {
       expect(e).to.be.instanceOf(ConflictError);
+    }
+  });
+
+  it('should translate a unique-constraint race on create to a conflict', async () => {
+    // two concurrent installs can pass the findOne pre-check and race on create
+    const { externalIntegration } = buildSupervisor();
+    const uniqueConstraintError = new Error('SQLITE_CONSTRAINT');
+    uniqueConstraintError.name = 'SequelizeUniqueConstraintError';
+    const createStub = sinon.stub(db.Service, 'create').rejects(uniqueConstraintError);
+    try {
+      await externalIntegration.install({ manifest: TEST_MANIFEST });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(ConflictError);
+    } finally {
+      createStub.restore();
+    }
+  });
+
+  it('should rethrow other create failures', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const createStub = sinon.stub(db.Service, 'create').rejects(new Error('DISK_FULL'));
+    try {
+      await externalIntegration.install({ manifest: TEST_MANIFEST });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e.message).to.equal('DISK_FULL');
+    } finally {
+      createStub.restore();
     }
   });
 

@@ -32,6 +32,19 @@ describe('externalIntegration.integrationConnected', () => {
     clearInterval(ws.integrationPingInterval);
   });
 
+  it('should not stack ping loops when the same socket re-authenticates', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration } = buildSupervisor();
+    const ws = buildFakeWs();
+    await externalIntegration.integrationConnected(service, ws);
+    const firstPingInterval = ws.integrationPingInterval;
+    await externalIntegration.integrationConnected(service, ws);
+    expect(ws.integrationPingInterval).to.not.equal(firstPingInterval);
+    sinonAssert.notCalled(ws.terminate);
+    externalIntegration.clearTimers(service.id);
+    clearInterval(ws.integrationPingInterval);
+  });
+
   it('should replace a previous connection that cannot be terminated', async () => {
     const service = await seedExternalService();
     const { externalIntegration } = buildSupervisor();
