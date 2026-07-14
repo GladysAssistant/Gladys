@@ -3324,6 +3324,7 @@
       "service-zigbee2mqtt-backup": "Zigbee2MQTT-Backup",
       "migrate-sqlite-to-duckdb": "DuckDB migration",
       "device-state-purge-all-sqlite-states": "Bereinigung aller SQLite-Berichte",
+      "device-state-purge-orphaned-duckdb-states": "Löschen verwaister DuckDB-Zustände",
       "service-matter-backup": "Matter backup",
       "energy-monitoring-cost-calculation-thirty-minutes": "Energiekostenberechnung (30 Minuten)",
       "energy-monitoring-cost-calculation-yesterday": "Energiekostenberechnung (von gestern)",

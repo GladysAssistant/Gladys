@@ -21,8 +21,10 @@ describe('Device.init', () => {
     const job = new Job(event);
     const device = new Device(event, {}, stateManager, service, {}, {}, job, brain);
     device.migrateFromSQLiteToDuckDb = fake.returns(null);
+    device.purgeOrphanedDuckDbStates = fake.returns(null);
 
     await device.init();
     assert.called(device.migrateFromSQLiteToDuckDb);
+    assert.called(device.purgeOrphanedDuckDbStates);
   });
 });
