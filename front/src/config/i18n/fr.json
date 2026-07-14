@@ -3217,6 +3217,7 @@
       "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT",
       "migrate-sqlite-to-duckdb": "Migration vers DuckDb",
       "device-state-purge-all-sqlite-states": "Purge de tous les états SQLite",
+      "device-state-purge-orphaned-duckdb-states": "Purge des états DuckDB orphelins",
       "service-matter-backup": "Sauvegarde Matter",
       "energy-monitoring-cost-calculation-thirty-minutes": "Calcul du coût énergétique (30 minutes)",
       "energy-monitoring-cost-calculation-yesterday": "Calcul du coût énergétique (depuis hier)",
@@ -4732,7 +4733,10 @@
     "backToLive": "Revenir au direct",
     "allRooms": "Toutes les pièces",
     "searchPlaceholder": "Rechercher un appareil",
+    "scrollLeft": "Faire défiler les filtres vers la gauche",
+    "scrollRight": "Faire défiler les filtres vers la droite",
     "loadMore": "Charger plus",
+    "searchingOlder": "Recherche d'activités — {{date}}…",
     "newEvents": {
       "one": "1 nouvel événement",
       "other": "{{count}} nouveaux événements"

@@ -26,11 +26,51 @@ const PROGRESSIVE_WINDOWS_IN_MS = [
 ];
 
 /**
+ * @description Decorate raw DuckDB state rows with device/feature/room metadata.
+ * @param {Array} rows - Raw rows (device_feature_id, value, created_at).
+ * @param {Map} featuresById - Plain device features indexed by id.
+ * @returns {Array} States with device/feature/room metadata, deleted features filtered out.
+ * @example
+ * const states = mapRowsToStates(rows, featuresById);
+ */
+const mapRowsToStates = (rows, featuresById) =>
+  rows
+    .filter((row) => featuresById.has(row.device_feature_id))
+    .map((row) => {
+      const feature = featuresById.get(row.device_feature_id);
+      return {
+        value: row.value,
+        created_at: row.created_at,
+        device_feature: {
+          id: feature.id,
+          name: feature.name,
+          selector: feature.selector,
+          category: feature.category,
+          type: feature.type,
+          unit: feature.unit,
+        },
+        device: {
+          name: feature.device.name,
+          selector: feature.device.selector,
+        },
+        room: feature.device.room
+          ? {
+              name: feature.device.room.name,
+              selector: feature.device.room.selector,
+            }
+          : null,
+      };
+    });
+
+/**
  * @description Get the history of device states across all devices, most recent first.
  * @param {object} [options] - Options of the query.
  * @param {string} [options.before] - Only return states created strictly before this date (pagination cursor).
  * @param {string} [options.before_id] - Device feature id of the last returned state, used as a tiebreaker
  * to paginate deterministically when several states share the same created_at.
+ * @param {string} [options.since] - Only return states created at or after this date. When set, the query is
+ * a single bounded probe: it returns what the [since, before) window contains, even fewer than `take`,
+ * and never widens — the caller drives the progressive widening and can render partial results.
  * @param {number} [options.take] - Max number of states to return.
  * @param {string} [options.categories] - Comma-separated list of device feature categories to filter on.
  * @param {string} [options.room_id] - Only return states of devices in this room.
@@ -46,6 +86,10 @@ async function getDeviceStatesHistory(options = {}) {
     throw new BadParameters(`Invalid "before" date: ${options.before}`);
   }
   const beforeId = options.before_id || null;
+  const since = options.since ? new Date(options.since) : null;
+  if (since && Number.isNaN(since.getTime())) {
+    throw new BadParameters(`Invalid "since" date: ${options.since}`);
+  }
 
   const deviceFeatures = await db.DeviceFeature.findAll({
     attributes: ['id', 'name', 'selector', 'category', 'type', 'unit', 'last_value_changed'],
@@ -125,6 +169,24 @@ async function getDeviceStatesHistory(options = {}) {
 
   const featureIdPlaceholders = filteredFeatureIds.map(() => '?').join(',');
 
+  if (since) {
+    // Caller-driven bounded probe: a single [since, before) query returning what
+    // the window contains, even below `take`, without widening. The caller
+    // (Activity feed) probes windows newest-first and renders partial results
+    // as they arrive, so no request ever has to pay an unbounded scan upfront.
+    const queryParams = [since.toISOString(), ...cursorParams, ...filteredFeatureIds, take];
+    const query = `
+      SELECT device_feature_id, value, created_at
+      FROM t_device_feature_state
+      WHERE created_at >= CAST(? AS TIMESTAMPTZ) AND ${cursorClause}
+      AND device_feature_id IN (${featureIdPlaceholders})
+      ORDER BY created_at DESC, device_feature_id DESC
+      LIMIT ?
+    `;
+    const rows = await db.duckDbReadConnectionAllAsync(query, ...queryParams);
+    return mapRowsToStates(rows, featuresById);
+  }
+
   // Query progressively wider time windows and stop as soon as we have a full page.
   // A recent window is answered almost instantly thanks to zone map pruning; the
   // wider windows (up to the unbounded one) only run when recent states are scarce.
@@ -157,33 +219,7 @@ async function getDeviceStatesHistory(options = {}) {
     }
   }
 
-  return rows
-    .filter((row) => featuresById.has(row.device_feature_id))
-    .map((row) => {
-      const feature = featuresById.get(row.device_feature_id);
-      return {
-        value: row.value,
-        created_at: row.created_at,
-        device_feature: {
-          id: feature.id,
-          name: feature.name,
-          selector: feature.selector,
-          category: feature.category,
-          type: feature.type,
-          unit: feature.unit,
-        },
-        device: {
-          name: feature.device.name,
-          selector: feature.device.selector,
-        },
-        room: feature.device.room
-          ? {
-              name: feature.device.room.name,
-              selector: feature.device.room.selector,
-            }
-          : null,
-      };
-    });
+  return mapRowsToStates(rows, featuresById);
 }
 
 module.exports = {
