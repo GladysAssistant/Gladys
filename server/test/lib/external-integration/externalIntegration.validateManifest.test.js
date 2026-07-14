@@ -70,12 +70,50 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept regional language codes', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      description: { en: 'A valid description here.', 'pt-BR': 'Uma descrição válida aqui.' },
+    };
+    expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
+  });
+
+  it('should reject unknown manifest fields', () => {
+    expect422({ ...TEST_MANIFEST, homepage: 'https://example.com' }, 'homepage: unknown field');
+  });
+
   it('should reject an invalid semver version', () => {
     expect422({ ...TEST_MANIFEST, version: 'not-semver' }, 'version: must be valid semver');
+    // strict semver: the normalized form must be the exact input
+    expect422({ ...TEST_MANIFEST, version: 'v1.2.0' }, 'version: must be valid semver');
   });
 
   it('should reject an invalid docker image reference', () => {
     expect422({ ...TEST_MANIFEST, docker_image: 'Invalid Image!!' }, 'docker_image: must be a valid image reference');
+    // an image longer than 255 characters is rejected
+    expect422({ ...TEST_MANIFEST, docker_image: `ghcr.io/${'a'.repeat(250)}/demo:1.0.0` }, 'docker_image');
+  });
+
+  it('should reject a missing docker image', () => {
+    const { docker_image: dockerImage, ...manifestWithoutImage } = TEST_MANIFEST;
+    expect422(manifestWithoutImage, 'docker_image: must be a valid image reference');
+  });
+
+  it('should reject a malformed select option entry', () => {
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'select', label: { en: 'L' }, options: [null] }] },
+      'config_schema[0].options[0]: must be an object',
+    );
+  });
+
+  it('should reject an image without explicit tag or digest', () => {
+    // an implicit `latest` would make update detection meaningless (same rule as the indexer)
+    expect422({ ...TEST_MANIFEST, docker_image: 'ghcr.io/john/demo' }, 'explicit tag or digest');
+  });
+
+  it('should accept OCI image names with double underscores and repeated dashes', () => {
+    const manifest = { ...TEST_MANIFEST, docker_image: 'ghcr.io/my-org/my__weird---image:1.0.0' };
+    expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
   });
 
   it('should accept a docker image pinned by digest', () => {
@@ -145,6 +183,101 @@ describe('externalIntegration.validateManifest', () => {
         ],
       },
       'config_schema[0].min: must be a number',
+    );
+    // same strict rules as the indexer schema
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'string', label: { en: 'Label' }, custom: true }],
+      },
+      'config_schema[0].custom: unknown field',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'string', label: { en: 'Label' }, min: 0 }],
+      },
+      'config_schema[0].min: only allowed on number fields',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'string', label: { en: 'Label' }, options: [] }],
+      },
+      'config_schema[0].options: only allowed on select fields',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'number', label: { en: 'Label' }, min: 10, max: 5 }],
+      },
+      'config_schema[0].min: must be lower than or equal to max',
+    );
+  });
+
+  it('should reject defaults not matching their field type', () => {
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'string', label: { en: 'L' }, default: 1 }] },
+      'config_schema[0].default: must be a string',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'number', label: { en: 'L' }, default: 'x' }] },
+      'config_schema[0].default: must be a number',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'boolean', label: { en: 'L' }, default: 'yes' }] },
+      'config_schema[0].default: must be a boolean',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [
+          {
+            key: 'k',
+            type: 'select',
+            label: { en: 'L' },
+            default: 'z',
+            options: [{ value: 'a', label: { en: 'A' } }],
+          },
+        ],
+      },
+      'config_schema[0].default: must be one of the select options',
+    );
+    // a secret default would end up published in the store index
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'secret', label: { en: 'L' }, default: 's3cr3t' }] },
+      'config_schema[0].default: not allowed for secret fields',
+    );
+  });
+
+  it('should reject unknown fields and empty values in select options', () => {
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [
+          {
+            key: 'k',
+            type: 'select',
+            label: { en: 'L' },
+            options: [{ value: '', label: { en: 'A' }, icon: 'x' }],
+          },
+        ],
+      },
+      'config_schema[0].options[0].value: must be a non-empty string',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [
+          {
+            key: 'k',
+            type: 'select',
+            label: { en: 'L' },
+            options: [{ value: 'a', label: { en: 'A' }, icon: 'x' }],
+          },
+        ],
+      },
+      'config_schema[0].options[0].icon: unknown field',
     );
   });
 });

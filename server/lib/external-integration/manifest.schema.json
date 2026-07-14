@@ -1,96 +1,182 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$comment": "Vendored copy of the canonical manifest schema owned by GladysAssistant/integration-store. externalIntegration.validateManifest.js enforces the exact same rules.",
-  "title": "gladys-assistant-integration.json",
+  "$id": "https://gladysassistant.github.io/integration-store/manifest.schema.json",
+  "$comment": "Vendored copy of the canonical schema owned by GladysAssistant/integration-store (schemas/manifest.schema.json, also published on the store GitHub Pages). externalIntegration.validateManifest.js enforces the exact same rules; update both together.",
+  "title": "Gladys Assistant external integration manifest",
+  "description": "Schema of the `gladys-assistant-integration.json` file placed at the root of an integration repository (manifest_version 1). This file is the canonical source: the store indexer and the Gladys server both validate manifests against it. Some rules cannot be expressed in JSON Schema and are enforced by code: `version` must be strict semver, `gladys_version` must be a valid semver range (npm syntax), `docker_image` must be a well-formed image reference with an explicit tag or digest, `config_schema` keys must be unique and defaults must match their field type.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["manifest_version", "type", "name", "description", "version", "docker_image", "gladys_version"],
   "properties": {
     "manifest_version": {
       "type": "integer",
-      "const": 1
+      "const": 1,
+      "description": "Version of the manifest format. Only 1 is supported: a manifest with a higher version is rejected by indexers and servers that do not support it."
     },
     "type": {
       "type": "string",
-      "enum": ["device"]
+      "enum": ["device"],
+      "description": "Integration type. Only \"device\" integrations exist in v1."
     },
     "name": {
       "type": "string",
       "minLength": 3,
-      "maxLength": 30
+      "maxLength": 30,
+      "description": "Display name, used as the title of the catalog card."
     },
     "description": {
       "type": "object",
+      "description": "Short multi-language description displayed on the catalog card. The `en` key is mandatory, other languages are optional.",
       "required": ["en"],
+      "propertyNames": {
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+      },
       "additionalProperties": {
         "type": "string",
         "minLength": 10,
         "maxLength": 100
-      },
-      "propertyNames": {
-        "pattern": "^[a-z]{2}$"
       }
     },
     "version": {
       "type": "string",
-      "description": "Strict semver"
+      "minLength": 1,
+      "description": "Version of the integration. Must be strict semver (e.g. \"1.2.0\"); bumping it is what triggers the \"update available\" flag in Gladys."
     },
     "docker_image": {
       "type": "string",
-      "description": "Valid image reference on a public registry, tag or digest"
+      "minLength": 1,
+      "description": "Docker image reference on any public registry, with an explicit tag or digest (e.g. \"ghcr.io/john/gladys-open-meteo-demo:1.2.0\")."
     },
     "gladys_version": {
       "type": "string",
-      "description": "Semver range (npm syntax)"
+      "minLength": 1,
+      "description": "Range of compatible Gladys versions, npm semver range syntax (e.g. \">=4.62.0\"). Used by Gladys to filter the catalog."
     },
     "cover_image": {
       "type": "string",
       "pattern": "^https://",
-      "description": "https URL of a JPEG/PNG image, exactly 800x534px, <= 150KB (validated and re-hosted by the indexer)"
+      "description": "HTTPS URL of a JPEG or PNG cover image, exactly 800x534 pixels, 150 KB max. Validated then re-hosted by the indexer; a missing or invalid cover does not reject the integration (a placeholder is used and a warning is published)."
     },
     "config_schema": {
       "type": "array",
+      "description": "Flat list of configuration fields, rendered as a generated form by the Gladys UI (declarative UI: no code injection).",
       "items": {
-        "type": "object",
-        "required": ["key", "type", "label"],
-        "properties": {
-          "key": {
-            "type": "string",
-            "pattern": "^[a-z0-9_]+$"
-          },
-          "type": {
-            "type": "string",
-            "enum": ["string", "number", "boolean", "select", "secret"]
-          },
-          "label": {
+        "$ref": "#/definitions/configField"
+      }
+    }
+  },
+  "definitions": {
+    "multiLanguageText": {
+      "type": "object",
+      "required": ["en"],
+      "propertyNames": {
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "configField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "type", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "description": "Unique key of the field, stored in Gladys variables scoped to the integration."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "select", "secret"],
+          "description": "Field widget type. `secret` values are never sent back to the frontend."
+        },
+        "label": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "description": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "required": {
+          "type": "boolean",
+          "default": false
+        },
+        "default": {
+          "description": "Default value. Must match the field type (code-enforced); not allowed for `secret` fields."
+        },
+        "min": {
+          "type": "number",
+          "description": "Minimum value, `number` fields only."
+        },
+        "max": {
+          "type": "number",
+          "description": "Maximum value, `number` fields only."
+        },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Choices of a `select` field.",
+          "items": {
             "type": "object",
-            "required": ["en"],
-            "additionalProperties": { "type": "string" }
-          },
-          "description": {
-            "type": "object",
-            "required": ["en"],
-            "additionalProperties": { "type": "string" }
-          },
-          "required": { "type": "boolean" },
-          "min": { "type": "number" },
-          "max": { "type": "number" },
-          "options": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "required": ["value", "label"],
-              "properties": {
-                "value": { "type": "string" },
-                "label": {
-                  "type": "object",
-                  "required": ["en"],
-                  "additionalProperties": { "type": "string" }
-                }
+            "additionalProperties": false,
+            "required": ["value", "label"],
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1
+              },
+              "label": {
+                "$ref": "#/definitions/multiLanguageText"
               }
             }
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "select"
+              }
+            }
+          },
+          "then": {
+            "required": ["options"]
+          },
+          "else": {
+            "not": {
+              "required": ["options"]
+            }
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": {
+                "type": {
+                  "const": "number"
+                }
+              }
+            }
+          },
+          "then": {
+            "allOf": [
+              {
+                "not": {
+                  "required": ["min"]
+                }
+              },
+              {
+                "not": {
+                  "required": ["max"]
+                }
+              }
+            ]
+          }
+        }
+      ]
     }
   }
 }

@@ -3,12 +3,61 @@ const semver = require('semver');
 const { Error422 } = require('../../utils/httpErrors');
 const { SUPPORTED_MANIFEST_VERSION } = require('./constants');
 
+// These rules are the exact mirror of the canonical manifest schema owned by
+// GladysAssistant/integration-store (vendored copy in manifest.schema.json):
+// a manifest accepted by the indexer must always install here, and vice versa.
 const MANIFEST_TYPES = ['device'];
+const MANIFEST_FIELDS = [
+  'manifest_version',
+  'type',
+  'name',
+  'description',
+  'version',
+  'docker_image',
+  'gladys_version',
+  'cover_image',
+  'config_schema',
+];
 const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'secret'];
-const LANGUAGE_KEY_REGEX = /^[a-z]{2}$/;
+const CONFIG_FIELD_FIELDS = ['key', 'type', 'label', 'description', 'required', 'default', 'min', 'max', 'options'];
+const OPTION_FIELDS = ['value', 'label'];
+const LANGUAGE_KEY_REGEX = /^[a-z]{2}(-[A-Z]{2})?$/;
 const CONFIG_KEY_REGEX = /^[a-z0-9_]+$/;
-// host[:port]/path/name[:tag|@sha256:digest], all lowercase except tag
-const DOCKER_IMAGE_REGEX = /^(?:[a-z0-9]+(?:[.-][a-z0-9]+)*(?::[0-9]+)?\/)?[a-z0-9]+(?:[._-][a-z0-9]+)*(?:\/[a-z0-9]+(?:[._-][a-z0-9]+)*)*(?::[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}|@sha256:[a-f0-9]{64})?$/;
+
+// Grammar from the OCI distribution reference specification, restricted to a
+// well-formed name with an EXPLICIT tag or digest (same as the indexer — an
+// implicit `latest` would make update detection meaningless).
+const DOMAIN_COMPONENT = '(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])';
+const DOMAIN = `${DOMAIN_COMPONENT}(?:\\.${DOMAIN_COMPONENT})*(?::[0-9]+)?`;
+const PATH_COMPONENT = '[a-z0-9]+(?:(?:\\.|_|__|-+)[a-z0-9]+)*';
+const NAME = `(?:${DOMAIN}/)?${PATH_COMPONENT}(?:/${PATH_COMPONENT})*`;
+const TAG = '[\\w][\\w.-]{0,127}';
+const DIGEST = '[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-fA-F0-9]{32,}';
+const DOCKER_IMAGE_REGEX = new RegExp(`^(${NAME})(?::(${TAG}))?(?:@(${DIGEST}))?$`);
+const DOCKER_IMAGE_NAME_MAX_LENGTH = 255;
+
+/**
+ * @description Check a Docker image reference: well-formed OCI reference with
+ * an explicit tag or digest.
+ * @param {string} reference - The image reference.
+ * @returns {boolean} True when the reference is acceptable.
+ * @example
+ * isValidDockerImageReference('ghcr.io/john/demo:1.2.0');
+ */
+function isValidDockerImageReference(reference) {
+  if (typeof reference !== 'string') {
+    return false;
+  }
+  const match = DOCKER_IMAGE_REGEX.exec(reference);
+  if (!match) {
+    return false;
+  }
+  const [, name, tag, digest] = match;
+  if (name.length > DOCKER_IMAGE_NAME_MAX_LENGTH) {
+    return false;
+  }
+  return tag !== undefined || digest !== undefined;
+}
 
 /**
  * @description Validate a multi-language text object ({ en: '...', fr: '...' }).
@@ -41,6 +90,45 @@ function validateMultiLanguageText(value, path, errors, minLength = 1, maxLength
 }
 
 /**
+ * @description Validate the `default` value of a config field against its type.
+ * A secret has no meaningful default: it would end up published in the store.
+ * @param {object} field - The config field.
+ * @param {string} path - The path of the field, for error messages.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateConfigFieldDefault({ key: 'latitude', type: 'number', default: 48.85 }, 'config_schema[0]', errors);
+ */
+function validateConfigFieldDefault(field, path, errors) {
+  if (field.default === undefined) {
+    return;
+  }
+  switch (field.type) {
+    case 'string':
+      if (typeof field.default !== 'string') {
+        errors.push(`${path}.default: must be a string`);
+      }
+      break;
+    case 'number':
+      if (typeof field.default !== 'number') {
+        errors.push(`${path}.default: must be a number`);
+      }
+      break;
+    case 'boolean':
+      if (typeof field.default !== 'boolean') {
+        errors.push(`${path}.default: must be a boolean`);
+      }
+      break;
+    case 'select':
+      if (!Array.isArray(field.options) || !field.options.some((option) => option.value === field.default)) {
+        errors.push(`${path}.default: must be one of the select options`);
+      }
+      break;
+    default:
+      errors.push(`${path}.default: not allowed for secret fields`);
+  }
+}
+
+/**
  * @description Validate one entry of the config_schema flat list.
  * @param {object} field - The field to validate.
  * @param {number} index - Index of the field in the list.
@@ -55,6 +143,11 @@ function validateConfigField(field, index, seenKeys, errors) {
     errors.push(`${path}: must be an object`);
     return;
   }
+  Object.keys(field).forEach((key) => {
+    if (!CONFIG_FIELD_FIELDS.includes(key)) {
+      errors.push(`${path}.${key}: unknown field`);
+    }
+  });
   if (typeof field.key !== 'string' || !CONFIG_KEY_REGEX.test(field.key)) {
     errors.push(`${path}.key: must be a non-empty string matching [a-z0-9_]`);
   } else if (seenKeys.has(field.key)) {
@@ -72,31 +165,50 @@ function validateConfigField(field, index, seenKeys, errors) {
   if (field.required !== undefined && typeof field.required !== 'boolean') {
     errors.push(`${path}.required: must be a boolean`);
   }
-  if (field.min !== undefined && typeof field.min !== 'number') {
-    errors.push(`${path}.min: must be a number`);
-  }
-  if (field.max !== undefined && typeof field.max !== 'number') {
-    errors.push(`${path}.max: must be a number`);
+  validateConfigFieldDefault(field, path, errors);
+  if (field.type === 'number') {
+    if (field.min !== undefined && typeof field.min !== 'number') {
+      errors.push(`${path}.min: must be a number`);
+    }
+    if (field.max !== undefined && typeof field.max !== 'number') {
+      errors.push(`${path}.max: must be a number`);
+    }
+    if (typeof field.min === 'number' && typeof field.max === 'number' && field.min > field.max) {
+      errors.push(`${path}.min: must be lower than or equal to max`);
+    }
+  } else if (field.min !== undefined || field.max !== undefined) {
+    errors.push(`${path}.min: only allowed on number fields`);
   }
   if (field.type === 'select') {
     if (!Array.isArray(field.options) || field.options.length === 0) {
       errors.push(`${path}.options: select fields must have a non-empty options list`);
     } else {
       field.options.forEach((option, optionIndex) => {
-        if (option === null || typeof option !== 'object' || typeof option.value !== 'string') {
-          errors.push(`${path}.options[${optionIndex}].value: must be a string`);
-        } else {
-          validateMultiLanguageText(option.label, `${path}.options[${optionIndex}].label`, errors);
+        if (option === null || typeof option !== 'object' || Array.isArray(option)) {
+          errors.push(`${path}.options[${optionIndex}]: must be an object`);
+          return;
         }
+        Object.keys(option).forEach((key) => {
+          if (!OPTION_FIELDS.includes(key)) {
+            errors.push(`${path}.options[${optionIndex}].${key}: unknown field`);
+          }
+        });
+        if (typeof option.value !== 'string' || option.value.length === 0) {
+          errors.push(`${path}.options[${optionIndex}].value: must be a non-empty string`);
+        }
+        validateMultiLanguageText(option.label, `${path}.options[${optionIndex}].label`, errors);
       });
     }
+  } else if (field.options !== undefined) {
+    errors.push(`${path}.options: only allowed on select fields`);
   }
 }
 
 /**
  * @description Validate an external integration manifest against the vendored
- * manifest schema rules (same rules as the store indexer, see manifest.schema.json).
- * Throws an Error422 listing every problem if the manifest is invalid.
+ * manifest schema rules (exact same rules as the store indexer, see
+ * manifest.schema.json). Throws an Error422 listing every problem if the
+ * manifest is invalid.
  * @param {object} manifest - The manifest to validate.
  * @returns {object} The validated manifest.
  * @example
@@ -116,6 +228,11 @@ function validateManifest(manifest) {
   } else if (manifest.manifest_version < 1) {
     errors.push('manifest_version: must be >= 1');
   }
+  Object.keys(manifest).forEach((key) => {
+    if (!MANIFEST_FIELDS.includes(key)) {
+      errors.push(`${key}: unknown field`);
+    }
+  });
   if (!MANIFEST_TYPES.includes(manifest.type)) {
     errors.push(`type: must be one of ${MANIFEST_TYPES.join(', ')}`);
   }
@@ -123,11 +240,11 @@ function validateManifest(manifest) {
     errors.push('name: must be a string of 3-30 characters');
   }
   validateMultiLanguageText(manifest.description, 'description', errors, 10, 100);
-  if (typeof manifest.version !== 'string' || semver.valid(manifest.version) === null) {
+  if (typeof manifest.version !== 'string' || semver.valid(manifest.version) !== manifest.version) {
     errors.push('version: must be valid semver');
   }
-  if (typeof manifest.docker_image !== 'string' || !DOCKER_IMAGE_REGEX.test(manifest.docker_image)) {
-    errors.push('docker_image: must be a valid image reference');
+  if (!isValidDockerImageReference(manifest.docker_image)) {
+    errors.push('docker_image: must be a valid image reference with an explicit tag or digest');
   }
   if (typeof manifest.gladys_version !== 'string' || semver.validRange(manifest.gladys_version) === null) {
     errors.push('gladys_version: must be a valid semver range');
