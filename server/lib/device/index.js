@@ -39,6 +39,7 @@ const { checkBatteries } = require('./device.checkBatteries');
 const { migrateFromSQLiteToDuckDb } = require('./device.migrateFromSQLiteToDuckDb');
 const { getDuckDbMigrationState } = require('./device.getDuckDbMigrationState');
 const { purgeAllSqliteStates } = require('./device.purgeAllSqliteStates');
+const { purgeOrphanedDuckDbStates } = require('./device.purgeOrphanedDuckDbStates');
 const { updateFeature } = require('./device.updateFeature');
 const { saveMultipleHistoricalStates } = require('./device.saveMultipleHistoricalStates');
 const { getOldestStateFromDeviceFeatures } = require('./device.getOldestStateFromDeviceFeatures');
@@ -69,6 +70,11 @@ const DeviceManager = function DeviceManager(
   this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH = 1000;
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
+  // The orphaned-states purge sleeps this many times the duration of each
+  // slice (at least the minimum below), so it only ever uses a fraction of
+  // the CPU/disk/write connection
+  this.ORPHANED_STATES_PURGE_PAUSE_FACTOR = 5;
+  this.ORPHANED_STATES_PURGE_MIN_PAUSE_IN_MS = 1000;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);
@@ -86,6 +92,11 @@ const DeviceManager = function DeviceManager(
   this.purgeAllSqliteStates = this.job.wrapper(
     JOB_TYPES.DEVICE_STATES_PURGE_ALL_SQLITE_STATES,
     this.purgeAllSqliteStates.bind(this),
+  );
+
+  this.purgeOrphanedDuckDbStates = this.job.wrapper(
+    JOB_TYPES.DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES,
+    this.purgeOrphanedDuckDbStates.bind(this),
   );
 
   this.devicesByPollFrequency = {};
@@ -113,6 +124,10 @@ const DeviceManager = function DeviceManager(
   this.eventManager.on(
     EVENTS.DEVICE.PURGE_ALL_SQLITE_STATES,
     eventFunctionWrapper(this.purgeAllSqliteStates.bind(this)),
+  );
+  this.eventManager.on(
+    EVENTS.DEVICE.PURGE_ORPHANED_DUCKDB_STATES,
+    eventFunctionWrapper(this.purgeOrphanedDuckDbStates.bind(this)),
   );
 };
 
@@ -145,6 +160,7 @@ DeviceManager.prototype.checkBatteries = checkBatteries;
 DeviceManager.prototype.migrateFromSQLiteToDuckDb = migrateFromSQLiteToDuckDb;
 DeviceManager.prototype.getDuckDbMigrationState = getDuckDbMigrationState;
 DeviceManager.prototype.purgeAllSqliteStates = purgeAllSqliteStates;
+DeviceManager.prototype.purgeOrphanedDuckDbStates = purgeOrphanedDuckDbStates;
 DeviceManager.prototype.updateFeature = updateFeature;
 DeviceManager.prototype.saveMultipleHistoricalStates = saveMultipleHistoricalStates;
 DeviceManager.prototype.getOldestStateFromDeviceFeatures = getOldestStateFromDeviceFeatures;

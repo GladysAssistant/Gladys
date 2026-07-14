@@ -97,7 +97,7 @@ async function backup(jobId) {
     logger.info(`Gateway backup : Backing up DuckDB into a Parquet folder ${duckDbBackupFolderPath}`);
     // DuckDB backup to parquet file using a dedicated connection
     // This connection will be closed after export to release memory
-    const backupInstance = db.duckDbCreateBackupInstance();
+    const backupInstance = await db.duckDbCreateBackupInstance();
     try {
       await backupInstance.allAsync(
         ` EXPORT DATABASE '${duckDbBackupFolderPath}' (

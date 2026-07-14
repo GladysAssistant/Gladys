@@ -14,11 +14,23 @@ const logger = require('../../utils/logger');
 async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   logger.info(`Purging states of device feature ${deviceFeatureId}`);
 
-  const numberOfDeviceFeatureStateToDelete = await db.DeviceFeatureState.count({
+  // Since the DuckDB migration, device states live in DuckDB.
+  const [{ count: duckDbCount }] = await db.duckDbReadConnectionAllAsync(
+    `SELECT COUNT(*) AS count FROM t_device_feature_state WHERE device_feature_id = ?`,
+    deviceFeatureId,
+  );
+  const numberOfDuckDbStatesToDelete = Number(duckDbCount);
+
+  // States may also remain in SQLite on installations that have not run the
+  // DuckDB migration yet: purge them too, or the migration would re-import
+  // states of a feature that was already purged.
+  const numberOfSqliteStatesToDelete = await db.DeviceFeatureState.count({
     where: {
       device_feature_id: deviceFeatureId,
     },
   });
+
+  const numberOfDeviceFeatureStateToDelete = numberOfDuckDbStatesToDelete + numberOfSqliteStatesToDelete;
 
   const numberOfDeviceFeatureStateAggregateToDelete = await db.DeviceFeatureStateAggregate.count({
     where: {
@@ -27,11 +39,13 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   });
 
   logger.info(
-    `Purging "${deviceFeatureId}": ${numberOfDeviceFeatureStateToDelete} states & ${numberOfDeviceFeatureStateAggregateToDelete} aggregates to delete.`,
+    `Purging "${deviceFeatureId}": ${numberOfDeviceFeatureStateToDelete} states` +
+      ` (${numberOfDuckDbStatesToDelete} DuckDB + ${numberOfSqliteStatesToDelete} SQLite)` +
+      ` & ${numberOfDeviceFeatureStateAggregateToDelete} aggregates to delete.`,
   );
 
   const numberOfIterationsStates = Math.ceil(
-    numberOfDeviceFeatureStateToDelete / this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
+    numberOfSqliteStatesToDelete / this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
   );
   const iterator = [...Array(numberOfIterationsStates)];
 
@@ -40,7 +54,8 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   );
   const iteratorAggregates = [...Array(numberOfIterationsStatesAggregates)];
 
-  const total = numberOfIterationsStates + numberOfIterationsStatesAggregates;
+  // 1 step for the DuckDB delete + the SQLite batches
+  const total = 1 + numberOfIterationsStates + numberOfIterationsStatesAggregates;
   let currentBatch = 0;
   let currentProgressPercent = 0;
 
@@ -54,6 +69,17 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
       await this.job.updateProgress(jobId, currentProgressPercent);
     }
   };
+
+  // The DuckDB table has no id column, so states cannot be deleted in
+  // LIMIT-ed chunks like in SQLite: delete them in a single statement,
+  // like device.destroy does.
+  if (numberOfDuckDbStatesToDelete > 0) {
+    await db.duckDbWriteConnectionAllAsync(
+      'DELETE FROM t_device_feature_state WHERE device_feature_id = ?',
+      deviceFeatureId,
+    );
+  }
+  await updateProgressIfNeeded();
 
   await Promise.each(iterator, async () => {
     await db.sequelize.query(
