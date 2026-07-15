@@ -290,7 +290,9 @@ class Integration extends Component {
 
   render(props, state) {
     const user = props.user || {};
-    const showInstallFromGithub = user.role === USER_ROLE.ADMIN && props.category === 'device';
+    // Manual install of a community (external) integration is available to
+    // admins whatever the category being displayed, so it is always reachable.
+    const showInstallFromGithub = user.role === USER_ROLE.ADMIN;
     // Combine props and state for the IntegrationPage
     const combinedProps = {
       ...props,

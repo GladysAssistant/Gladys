@@ -198,7 +198,18 @@ class InstallFromGithubCard extends Component {
     );
   }
 
-  render({ list }, state) {
+  render({ list, button }, state) {
+    if (button) {
+      return (
+        <>
+          <button type="button" onClick={this.openModal} class="btn btn-primary">
+            <i class="fe fe-github mr-2" />
+            <Text id="integration.externalIntegration.installFromGithub.cardTitle" />
+          </button>
+          {state.modalOpen && this.renderModal(state)}
+        </>
+      );
+    }
     if (list) {
       return (
         <div class="list-group-item">
