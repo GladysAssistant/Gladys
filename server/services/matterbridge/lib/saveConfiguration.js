@@ -22,6 +22,7 @@ async function saveConfiguration(config) {
   const keyValueMap = {
     [CONFIGURATION.DOCKER_MATTERBRIDGE_VERSION]: config.dockerMatterbridgeVersion,
     [CONFIGURATION.MATTERBRIDGE_PORT]: CONFIGURATION.MATTERBRIDGE_PORT_VALUE,
+    [CONFIGURATION.MATTERBRIDGE_CONTAINER_NAME]: config.matterbridgeContainerName,
   };
 
   const variableKeys = Object.keys(keyValueMap);

@@ -1,7 +1,6 @@
 const logger = require('../../../utils/logger');
 const { DEFAULT } = require('./constants');
-
-const matterbridgeContainerDescriptor = require('../docker/gladys-matterbridge-container.json');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 
 /**
  * @description Checks if version is the latest for this service, if not, it removes existing containers.
@@ -16,10 +15,7 @@ async function checkForContainerUpdates(config) {
   if (config.dockerMatterbridgeVersion !== DEFAULT.DOCKER_MATTERBRIDGE_VERSION) {
     logger.info(`Matterbridge: update #${DEFAULT.DOCKER_MATTERBRIDGE_VERSION} of the container required...`);
 
-    const containers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [matterbridgeContainerDescriptor.name] },
-    });
+    const containers = await getContainersByExactName(this.gladys.system, config.matterbridgeContainerName);
 
     if (containers.length !== 0) {
       logger.debug('Matterbridge: Removing current installed Matterbridge container...');
