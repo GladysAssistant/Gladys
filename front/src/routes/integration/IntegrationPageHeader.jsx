@@ -76,7 +76,7 @@ const IntegrationPageHeader = ({
           </div>
         </div>
         {showInstallFromGithub && (
-          <div class={style.mobileInstall}>
+          <div class="mt-4">
             <InstallFromGithubCard button block />
           </div>
         )}
