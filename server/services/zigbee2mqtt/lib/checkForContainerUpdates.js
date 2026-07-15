@@ -1,8 +1,6 @@
 const logger = require('../../../utils/logger');
 const { DEFAULT } = require('./constants');
-
-const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
-const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 
 /**
  * @description Checks if version is the latest for this service, if not, it removes existing containers.
@@ -17,10 +15,7 @@ async function checkForContainerUpdates(config) {
   if (config.dockerMqttVersion !== DEFAULT.DOCKER_MQTT_VERSION) {
     logger.info(`MQTT container: update #${DEFAULT.DOCKER_MQTT_VERSION} of the container required...`);
 
-    const containers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [mqttContainerDescriptor.name] },
-    });
+    const containers = await getContainersByExactName(this.gladys.system, config.mqttContainerName);
 
     if (containers.length !== 0) {
       logger.debug('Removing current installed MQTT container...');
@@ -39,10 +34,7 @@ async function checkForContainerUpdates(config) {
   if (config.dockerZ2mVersion !== DEFAULT.DOCKER_Z2M_VERSION) {
     logger.info(`Z2M container: update #${DEFAULT.DOCKER_Z2M_VERSION} of the container required...`);
 
-    const containers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [z2mContainerDescriptor.name] },
-    });
+    const containers = await getContainersByExactName(this.gladys.system, config.z2mContainerName);
 
     if (containers.length !== 0) {
       logger.debug('Removing current installed Z2M container...');

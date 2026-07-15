@@ -15,6 +15,8 @@ const CONFIGURATION = {
   DOCKER_MQTT_VERSION: 'DOCKER_MQTT_VERSION', // Variable to identify last version of MQTT docker file is installed
   DOCKER_Z2M_VERSION: 'DOCKER_Z2M_VERSION', // Variable to identify last version of Z2M docker file is installed
   Z2M_FRONTEND_URL: 'Z2M_FRONTEND_URL',
+  MQTT_CONTAINER_NAME: 'Z2M_MQTT_CONTAINER_NAME', // Persisted name of the MQTT container we own
+  Z2M_CONTAINER_NAME: 'Z2M_CONTAINER_NAME', // Persisted name of the zigbee2mqtt container we own
 };
 
 const MQTT_MODE = {

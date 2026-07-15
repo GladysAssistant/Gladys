@@ -40,6 +40,8 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
     const config = {
       dockerMqttVersion: 'BAD_REVISION',
       dockerZ2mVersion: 'BAD_REVISION',
+      mqttContainerName: 'gladys-z2m-mqtt',
+      z2mContainerName: 'gladys-z2m-zigbee2mqtt',
     };
     // EXECUTE
     await zigbee2mqttManager.checkForContainerUpdates(config);
@@ -58,44 +60,83 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
     expect(config).deep.equal({
       dockerMqttVersion: DEFAULT.DOCKER_MQTT_VERSION,
       dockerZ2mVersion: DEFAULT.DOCKER_Z2M_VERSION,
+      mqttContainerName: 'gladys-z2m-mqtt',
+      z2mContainerName: 'gladys-z2m-zigbee2mqtt',
     });
   });
 
-  it('not updated, found both containers -> it should remove containers and update config', async () => {
-    // PREPARE
-    gladys.system.getContainers = fake.resolves([{ id: 'container-id' }]);
+  it('not updated, found both containers -> it should remove only our exact-name containers and update config', async () => {
+    // PREPARE - each lookup returns the container matching exactly the queried name
+    gladys.system.getContainers = fake(async ({ filters }) => [
+      { id: `id-${filters.name[0]}`, name: `/${filters.name[0]}` },
+    ]);
     const config = {
       dockerMqttVersion: 'BAD_REVISION',
       dockerZ2mVersion: 'BAD_REVISION',
+      mqttContainerName: 'gladys-z2m-mqtt',
+      z2mContainerName: 'gladys-z2m-zigbee2mqtt',
     };
     // EXECUTE
     await zigbee2mqttManager.checkForContainerUpdates(config);
     // ASSERT
     assert.calledTwice(gladys.system.getContainers);
-    assert.calledWithExactly(gladys.system.getContainers, {
-      all: true,
-      filters: { name: ['gladys-z2m-mqtt'] },
-    });
-    assert.calledWithExactly(gladys.system.getContainers, {
-      all: true,
-      filters: { name: ['gladys-z2m-zigbee2mqtt'] },
-    });
-
     assert.calledTwice(gladys.system.removeContainer);
-    assert.calledWithExactly(gladys.system.removeContainer, 'container-id', { force: true });
+    assert.calledWithExactly(gladys.system.removeContainer, 'id-gladys-z2m-mqtt', { force: true });
+    assert.calledWithExactly(gladys.system.removeContainer, 'id-gladys-z2m-zigbee2mqtt', { force: true });
 
     expect(config).deep.equal({
       dockerMqttVersion: DEFAULT.DOCKER_MQTT_VERSION,
       dockerZ2mVersion: DEFAULT.DOCKER_Z2M_VERSION,
+      mqttContainerName: 'gladys-z2m-mqtt',
+      z2mContainerName: 'gladys-z2m-zigbee2mqtt',
     });
+  });
+
+  it('a user container matching only as substring must be ignored (never removed)', async () => {
+    // PREPARE - Docker filters match by substring, only the exact name is ours
+    gladys.system.getContainers = fake.resolves([{ id: 'user-container', name: '/gladys-z2m-mqtt-old' }]);
+    const config = {
+      dockerMqttVersion: 'BAD_REVISION',
+      dockerZ2mVersion: 'BAD_REVISION',
+      mqttContainerName: 'gladys-z2m-mqtt',
+      z2mContainerName: 'gladys-z2m-zigbee2mqtt',
+    };
+    // EXECUTE
+    await zigbee2mqttManager.checkForContainerUpdates(config);
+    // ASSERT - the substring container is never removed
+    assert.notCalled(gladys.system.removeContainer);
+  });
+
+  it('should remove the resolved (suffixed) container on a version bump', async () => {
+    // PREPARE - names were resolved to suffixed values because of a foreign homonym
+    gladys.system.getContainers = fake(async ({ filters }) => [
+      { id: `id-${filters.name[0]}`, name: `/${filters.name[0]}` },
+    ]);
+    const config = {
+      dockerMqttVersion: 'BAD_REVISION',
+      dockerZ2mVersion: 'BAD_REVISION',
+      mqttContainerName: 'gladys-z2m-mqtt-ab12cd3',
+      z2mContainerName: 'gladys-z2m-zigbee2mqtt-ef45gh6',
+    };
+    // EXECUTE
+    await zigbee2mqttManager.checkForContainerUpdates(config);
+    // ASSERT - only the resolved names are looked up and removed
+    assert.calledWithExactly(gladys.system.getContainers, {
+      all: true,
+      filters: { name: ['gladys-z2m-mqtt-ab12cd3'] },
+    });
+    assert.calledWithExactly(gladys.system.removeContainer, 'id-gladys-z2m-mqtt-ab12cd3', { force: true });
+    assert.calledWithExactly(gladys.system.removeContainer, 'id-gladys-z2m-zigbee2mqtt-ef45gh6', { force: true });
   });
 
   it('already updated -> it should do nothing', async () => {
     // PREPARE
-    gladys.system.getContainers = fake.resolves([{ id: 'container-id' }]);
+    gladys.system.getContainers = fake.resolves([{ id: 'container-id', name: '/gladys-z2m-mqtt' }]);
     const config = {
       dockerMqttVersion: DEFAULT.DOCKER_MQTT_VERSION,
       dockerZ2mVersion: DEFAULT.DOCKER_Z2M_VERSION,
+      mqttContainerName: 'gladys-z2m-mqtt',
+      z2mContainerName: 'gladys-z2m-zigbee2mqtt',
     };
     // EXECUTE
     await zigbee2mqttManager.checkForContainerUpdates(config);
@@ -106,6 +147,8 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
     expect(config).deep.equal({
       dockerMqttVersion: DEFAULT.DOCKER_MQTT_VERSION,
       dockerZ2mVersion: DEFAULT.DOCKER_Z2M_VERSION,
+      mqttContainerName: 'gladys-z2m-mqtt',
+      z2mContainerName: 'gladys-z2m-zigbee2mqtt',
     });
   });
 });
