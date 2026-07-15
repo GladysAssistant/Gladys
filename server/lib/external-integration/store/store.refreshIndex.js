@@ -15,7 +15,7 @@ const {
  * @description Download the store index (a static index.json rebuilt by a
  * fully automatic indexer crawling the `gladys-assistant-integration` GitHub
  * topic) and persist it in the local cache: the catalog stays available
- * offline or if GitHub Pages is down, and installed integrations never
+ * offline or if the store storage is down, and installed integrations never
  * depend on the index to work. Also refreshes the manifests of integrations
  * installed by repo_url that are absent from the index (not crawled yet),
  * for update detection.

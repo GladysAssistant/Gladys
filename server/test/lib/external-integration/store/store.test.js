@@ -6,8 +6,8 @@ const { NotFoundError, BadParameters, ConflictError } = require('../../../../uti
 const { Error422 } = require('../../../../utils/httpErrors');
 const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('../testUtils.test');
 
-const INDEX_URL_ORIGIN = 'https://gladysassistant.github.io';
-const INDEX_URL_PATH = '/integration-store/index.json';
+const INDEX_URL_ORIGIN = 'https://integration-store-storage.gladysassistant.com';
+const INDEX_URL_PATH = '/index.json';
 
 const TEST_INDEX = {
   index_format: 1,
@@ -17,7 +17,7 @@ const TEST_INDEX = {
       store_slug: 'john/gladys-open-meteo-demo',
       repo_url: 'https://github.com/john/gladys-open-meteo-demo',
       manifest: TEST_MANIFEST,
-      cover_url: 'https://gladysassistant.github.io/integration-store/covers/john--gladys-open-meteo-demo.jpg',
+      cover_url: 'https://integration-store-storage.gladysassistant.com/covers/john--gladys-open-meteo-demo.jpg',
       github: { stars: 12, pushed_at: '2026-07-10T12:00:00.000Z' },
     },
     {

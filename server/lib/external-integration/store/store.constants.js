@@ -1,7 +1,8 @@
-// Static index published on GitHub Pages by the public indexer
-// (GladysAssistant/integration-store). Overridable by env variable, useful
-// for tests and to point to an alternative index.
-const DEFAULT_STORE_INDEX_URL = 'https://gladysassistant.github.io/integration-store/index.json';
+// Static index rebuilt hourly by the public indexer
+// (GladysAssistant/integration-store) and served from the store storage.
+// Overridable by env variable, useful for tests and to point to an
+// alternative index (e.g. a self-hosted fork).
+const DEFAULT_STORE_INDEX_URL = 'https://integration-store-storage.gladysassistant.com/index.json';
 // Local persistent cache of the index (t_variable), so the catalog stays
 // available offline.
 const STORE_INDEX_CACHE_VARIABLE = 'EXTERNAL_INTEGRATION_STORE_INDEX_CACHE';

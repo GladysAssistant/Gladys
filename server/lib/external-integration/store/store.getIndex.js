@@ -4,8 +4,8 @@ const { STORE_INDEX_CACHE_VARIABLE, STORE_INDEX_TTL_MS } = require('./store.cons
 /**
  * @description Get the store index: in-memory copy if fresh (< 12h),
  * otherwise refreshed from the network, with fallback on the local
- * persistent cache when the network or GitHub Pages is unavailable. Can
- * return null when no index was ever fetched: the worst case (GitHub fully
+ * persistent cache when the network or the store storage is unavailable. Can
+ * return null when no index was ever fetched: the worst case (store fully
  * down) suspends the discovery of new integrations, never the operation of
  * installed ones.
  * @param {object} [options] - Options.
