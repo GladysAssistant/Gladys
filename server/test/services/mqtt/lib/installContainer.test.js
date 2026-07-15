@@ -74,7 +74,7 @@ describe('mqttHandler.installContainer', () => {
       system: {
         pull: fake.resolves(false),
         createContainer: fake.resolves(false),
-        getContainers: fake.resolves([{ state: 'running' }]),
+        getContainers: fake.resolves([{ name: '/eclipse-mosquitto', state: 'running' }]),
         exec: fake.resolves(true),
         restartContainer: fake.resolves(true),
         getNetworkMode: fake.resolves('host'),
@@ -116,7 +116,7 @@ describe('mqttHandler.installContainer', () => {
       system: {
         pull: fake.resolves(false),
         createContainer: fake.resolves(false),
-        getContainers: fake.resolves([{ state: 'running' }]),
+        getContainers: fake.resolves([{ name: '/eclipse-mosquitto', state: 'running' }]),
         exec: fake.resolves(true),
         restartContainer: fake.resolves(true),
         getNetworkMode: fake.resolves('host'),

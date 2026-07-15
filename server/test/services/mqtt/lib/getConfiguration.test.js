@@ -96,6 +96,7 @@ describe('mqttHandler.getConfiguration', () => {
         isDocker: fake.resolves(true),
         getContainers: fake.resolves([
           {
+            name: '/eclipse-mosquitto',
             image: 'eclipse-mosquitto:any-tag',
           },
         ]),
@@ -139,6 +140,7 @@ describe('mqttHandler.getConfiguration', () => {
         isDocker: fake.resolves(true),
         getContainers: fake.resolves([
           {
+            name: '/eclipse-mosquitto',
             image: 'eclipse-mosquitto:any-tag',
           },
         ]),
@@ -165,6 +167,26 @@ describe('mqttHandler.getConfiguration', () => {
     assert.calledOnce(gladys.system.isDocker);
     assert.calledOnce(gladys.system.getContainers);
     assert.calledOnce(gladys.system.getNetworkMode);
+  });
+
+  it('should not report a broker available when only a substring container exists', async () => {
+    const gladys = {
+      variable: {
+        getValue: fake.resolves(null),
+      },
+      system: {
+        isDocker: fake.resolves(true),
+        // A user container 'eclipse-mosquitto-custom' matches the Docker substring
+        // filter but is not our broker.
+        getContainers: fake.resolves([{ name: '/eclipse-mosquitto-custom', image: 'eclipse-mosquitto:2.0.15' }]),
+        getNetworkMode: fake.resolves('host'),
+      },
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    const config = await mqttHandler.getConfiguration();
+
+    expect(config.brokerContainerAvailable).to.equal(false);
   });
 
   it('no config on Docker', async () => {

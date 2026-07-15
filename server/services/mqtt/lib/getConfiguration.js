@@ -1,5 +1,6 @@
 const { CONFIGURATION } = require('./constants');
 const logger = require('../../../utils/logger');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 const containerDescriptor = require('../docker/eclipse-mosquitto-container.json');
 
 /**
@@ -26,12 +27,7 @@ async function getConfiguration() {
       // In case the docker socket is not available
       // It's ok, we don't crash
       networkModeValid = await this.checkDockerNetwork();
-      const dockerImages = await this.gladys.system.getContainers({
-        all: true,
-        filters: {
-          name: [containerDescriptor.name],
-        },
-      });
+      const dockerImages = await getContainersByExactName(this.gladys.system, containerDescriptor.name);
       brokerContainerAvailable = dockerImages.length > 0;
     } catch (e) {
       logger.debug(e);

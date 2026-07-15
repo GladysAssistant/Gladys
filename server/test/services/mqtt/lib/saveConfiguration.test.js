@@ -118,6 +118,37 @@ describe('mqttHandler.saveConfiguration', () => {
     }
   });
 
+  it('should ignore a user container matching only as a substring (throws NotFound)', async () => {
+    const gladys = {
+      variable: {
+        destroy: fake.resolves('value'),
+        setValue: fake.resolves('value'),
+        getValue: fake.resolves(true),
+      },
+      system: {
+        // A user container 'eclipse-mosquitto-custom' matches the Docker substring
+        // filter but must not be adopted as our broker.
+        getContainers: fake.resolves([{ name: '/eclipse-mosquitto-custom', state: 'running' }]),
+        exec: fake.resolves(true),
+        restartContainer: fake.resolves(true),
+      },
+    };
+
+    const config = {
+      mqttUrl: 'mqttUrl',
+      useEmbeddedBroker: true,
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    try {
+      await mqttHandler.saveConfiguration(config);
+      assert.fail('Should have fail');
+    } catch (e) {
+      expect(e).to.be.instanceOf(NotFoundError);
+      assert.notCalled(gladys.system.restartContainer);
+    }
+  });
+
   it('should saveConfiguration: init docker container no present (no user)', async () => {
     const gladys = {
       variable: {
@@ -128,6 +159,7 @@ describe('mqttHandler.saveConfiguration', () => {
       system: {
         getContainers: fake.resolves([
           {
+            name: '/eclipse-mosquitto',
             image: 'another-image',
           },
         ]),
@@ -175,6 +207,7 @@ describe('mqttHandler.saveConfiguration', () => {
       system: {
         getContainers: fake.resolves([
           {
+            name: '/eclipse-mosquitto',
             image: DEFAULT.MQTT_IMAGE,
           },
         ]),
@@ -222,6 +255,7 @@ describe('mqttHandler.saveConfiguration', () => {
       system: {
         getContainers: fake.resolves([
           {
+            name: '/eclipse-mosquitto',
             image: DEFAULT.MQTT_IMAGE,
             state: 'running',
           },
@@ -270,6 +304,7 @@ describe('mqttHandler.saveConfiguration', () => {
       system: {
         getContainers: fake.resolves([
           {
+            name: '/eclipse-mosquitto',
             image: DEFAULT.MQTT_IMAGE,
             state: 'running',
           },
