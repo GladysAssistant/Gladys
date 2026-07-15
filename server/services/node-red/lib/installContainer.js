@@ -6,6 +6,7 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const containerDescriptor = require('../docker/gladys-node-red-container.json');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { DEFAULT } = require('./constants');
 const { getNodeRedDockerImage, resolveNodeRedMajorVersion } = require('./nodeRedVersion');
@@ -38,10 +39,7 @@ async function installContainer(config = {}) {
 
   const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
 
-  let dockerContainers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [containerDescriptor.name] },
-  });
+  let dockerContainers = await getContainersByExactName(this.gladys.system, config.nodeRedContainerName);
   let [container] = dockerContainers;
 
   const majorVersion = resolveNodeRedMajorVersion(config);
@@ -59,6 +57,7 @@ async function installContainer(config = {}) {
 
       logger.info(`Creation of container...`);
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+      containerDescriptorToMutate.name = config.nodeRedContainerName;
       containerDescriptorToMutate.Image = nodeRedDockerImage;
 
       const configFilepath = path.join(basePathOnHost, path.dirname(DEFAULT.CONFIGURATION_PATH));
@@ -83,10 +82,7 @@ async function installContainer(config = {}) {
   const configChanged = await this.configureContainer(config);
 
   try {
-    dockerContainers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [containerDescriptor.name] },
-    });
+    dockerContainers = await getContainersByExactName(this.gladys.system, config.nodeRedContainerName);
     [container] = dockerContainers;
 
     // Check if we need to restart the container (container is not running / config changed)

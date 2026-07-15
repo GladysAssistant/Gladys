@@ -20,6 +20,7 @@ const NodeRedManager = proxiquire('../../../../services/node-red/lib', {
 
 const container = {
   id: 'docker-test',
+  name: '/gladys-node-red',
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -55,6 +56,8 @@ describe('NodeRed disconnect', () => {
     nodeRedManager.gladysConnected = true;
     nodeRedManager.nodeRedRunning = true;
     nodeRedManager.nodeRedExist = true;
+    // Container name resolved and persisted at init
+    nodeRedManager.getConfiguration = fake.resolves({ nodeRedContainerName: 'gladys-node-red' });
   });
 
   afterEach(() => {
@@ -74,6 +77,33 @@ describe('NodeRed disconnect', () => {
     expect(nodeRedManager.gladysConnected).to.equal(false);
     expect(nodeRedManager.nodeRedRunning).to.equal(false);
     expect(nodeRedManager.nodeRedExist).to.equal(true);
+  });
+
+  it('should not touch any container when the name was never persisted', async () => {
+    nodeRedManager.getConfiguration = fake.resolves({ nodeRedContainerName: undefined });
+
+    await nodeRedManager.disconnect();
+
+    // A foreign homonym container must never be looked up, stopped or removed
+    assert.notCalled(gladys.system.getContainers);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    // Config folder cleanup and flags still run
+    expect(nodeRedManager.nodeRedRunning).to.equal(false);
+    expect(nodeRedManager.gladysConnected).to.equal(false);
+  });
+
+  it('should not crash when the persisted container is already gone', async () => {
+    // Name is persisted but the container no longer exists
+    gladys.system.getContainers = fake.resolves([]);
+
+    await nodeRedManager.disconnect();
+
+    assert.called(gladys.system.getContainers);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
+    });
   });
 
   it('stop container failed', async () => {

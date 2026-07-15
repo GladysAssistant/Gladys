@@ -42,6 +42,7 @@ describe('NodeRed init', () => {
 
     nodeRedManager.getConfiguration = sinon.stub();
     nodeRedManager.saveConfiguration = sinon.stub();
+    nodeRedManager.allocateContainerNames = sinon.stub();
     nodeRedManager.checkForContainerUpdates = sinon.stub();
     nodeRedManager.installContainer = sinon.stub();
 

@@ -2,8 +2,8 @@ const path = require('path');
 const fs = require('fs/promises');
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 
-const nodeRedContainerDescriptor = require('../docker/gladys-node-red-container.json');
 const { DEFAULT } = require('./constants');
 
 /**
@@ -16,13 +16,15 @@ async function disconnect() {
 
   // Stop NodeRed container
   try {
-    const dockerContainer = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [nodeRedContainerDescriptor.name] },
-    });
-    [container] = dockerContainer;
-    await this.gladys.system.stopContainer(container.id);
-    await this.gladys.system.removeContainer(container.id);
+    // Only tear down the container we own (name resolved and persisted at init).
+    // If no name was ever persisted, we never created a container: nothing to stop.
+    const { nodeRedContainerName } = await this.getConfiguration();
+    if (nodeRedContainerName) {
+      const dockerContainer = await getContainersByExactName(this.gladys.system, nodeRedContainerName);
+      [container] = dockerContainer;
+      await this.gladys.system.stopContainer(container.id);
+      await this.gladys.system.removeContainer(container.id);
+    }
 
     const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
 
@@ -33,7 +35,7 @@ async function disconnect() {
     this.nodeRedRunning = false;
     this.gladysConnected = false;
   } catch (e) {
-    logger.warn(`Node-RED: failed to stop container ${container.id}:`, e);
+    logger.warn(`Node-RED: failed to stop container ${container ? container.id : ''}:`, e);
   }
 
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {

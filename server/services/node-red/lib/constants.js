@@ -7,6 +7,7 @@ const CONFIGURATION = {
   NODE_RED_PORT: 'NODE_RED_PORT',
 
   DOCKER_NODE_RED_VERSION: 'DOCKER_NODE_RED_VERSION',
+  NODE_RED_CONTAINER_NAME: 'NODE_RED_CONTAINER_NAME', // Persisted name of the Node-RED container we own
 };
 
 const NODE_RED_MAJOR_VERSIONS = ['3', '4', '5'];

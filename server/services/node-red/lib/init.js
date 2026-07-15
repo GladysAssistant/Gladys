@@ -53,6 +53,9 @@ async function init() {
     });
   }
 
+  // Resolve and persist the container name BEFORE any Docker operation
+  await this.allocateContainerNames(configuration);
+
   await this.saveConfiguration(configuration);
 
   logger.debug('Node-RED: installing and starting required docker containers...');
