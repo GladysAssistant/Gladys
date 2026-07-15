@@ -5,6 +5,7 @@ const { fake } = sinon;
 
 const proxyquire = require('proxyquire').noCallThru();
 
+const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const DockerodeMock = require('./DockerodeMock.test');
 
 const System = proxyquire('../../../lib/system', {
@@ -85,6 +86,15 @@ describe('system.getGladysBasePath', () => {
     expect(result).to.deep.equal({
       basePathOnHost: '/var/lib/dir_on_host',
       basePathOnContainer: '/var/lib/dummy_directory',
+    });
+  });
+  it('should return the local path as host path when Gladys is not containerized', async () => {
+    process.env.SQLITE_FILE_PATH = '/home/user/.gladysassistant/gladys.db';
+    system.getGladysContainerId = fake.rejects(new PlatformNotCompatible('DOCKER_CONTAINER_ID_NOT_AVAILABLE'));
+    const result = await system.getGladysBasePath();
+    expect(result).to.deep.equal({
+      basePathOnHost: '/home/user/.gladysassistant',
+      basePathOnContainer: '/home/user/.gladysassistant',
     });
   });
 });

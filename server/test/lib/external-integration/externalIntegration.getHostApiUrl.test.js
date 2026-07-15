@@ -39,4 +39,14 @@ describe('externalIntegration.getHostApiUrl', () => {
     const url = await externalIntegration.getHostApiUrl();
     expect(url).to.equal(`http://gladys:${process.env.SERVER_PORT || '80'}`);
   });
+
+  it('should use host.docker.internal when Gladys runs as a host process', async () => {
+    const { externalIntegration } = buildSupervisor({
+      system: {
+        getNetworkMode: fake.resolves('host-process'),
+      },
+    });
+    const url = await externalIntegration.getHostApiUrl();
+    expect(url).to.equal(`http://host.docker.internal:${process.env.SERVER_PORT || '80'}`);
+  });
 });

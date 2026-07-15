@@ -1,4 +1,5 @@
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { NETWORK_MODE_HOST_PROCESS } = require('../system/system.getNetworkMode');
 const { EXTERNAL_INTEGRATION_LABEL, INTEGRATIONS_NETWORK_NAME } = require('./constants');
 
 // 256MB of RAM, MemorySwap = Memory means no swap: OOM kill -> supervised restart
@@ -23,7 +24,12 @@ const PIDS_LIMIT = 100;
 async function buildContainerDescriptor(service, integrationToken) {
   const { basePathOnHost } = await this.system.getGladysBasePath();
   const hostApiUrl = await this.getHostApiUrl();
+  const networkMode = await this.system.getNetworkMode();
   const timezone = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE)) || 'UTC';
+  // When Gladys runs as a host process, the integration reaches its API
+  // through `host.docker.internal`. Docker Desktop resolves it out of the
+  // box; on Linux it must be mapped explicitly to the host gateway.
+  const extraHosts = networkMode === NETWORK_MODE_HOST_PROCESS ? { ExtraHosts: ['host.docker.internal:host-gateway'] } : {};
   return {
     name: `gladys-${service.selector}`,
     Image: service.docker_image,
@@ -39,6 +45,7 @@ async function buildContainerDescriptor(service, integrationToken) {
     ],
     HostConfig: {
       NetworkMode: INTEGRATIONS_NETWORK_NAME,
+      ...extraHosts,
       // the supervisor restarts the container (backoff + state machine),
       // a Docker `always` policy would bypass it
       RestartPolicy: { Name: 'no' },

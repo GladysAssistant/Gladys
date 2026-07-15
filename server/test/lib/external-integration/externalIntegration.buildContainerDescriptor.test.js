@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { fake } = require('sinon');
 
 const { buildSupervisor, seedExternalService } = require('./testUtils.test');
 const { generateIntegrationToken } = require('../../../utils/integrationToken');
@@ -48,5 +49,24 @@ describe('externalIntegration.buildContainerDescriptor', () => {
     const service = await seedExternalService();
     const descriptor = await externalIntegration.buildContainerDescriptor(service, 'token');
     expect(descriptor.Env).to.include('TZ=UTC');
+  });
+
+  it('should map host.docker.internal to the host gateway in host-process mode', async () => {
+    const { externalIntegration } = buildSupervisor({
+      system: {
+        getNetworkMode: fake.resolves('host-process'),
+      },
+    });
+    const service = await seedExternalService();
+    const descriptor = await externalIntegration.buildContainerDescriptor(service, 'token');
+    expect(descriptor.HostConfig.ExtraHosts).to.deep.equal(['host.docker.internal:host-gateway']);
+    expect(descriptor.Env).to.include(`GLADYS_HOST_API_URL=http://host.docker.internal:${process.env.SERVER_PORT || '80'}`);
+  });
+
+  it('should not add ExtraHosts when Gladys runs in a container', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const service = await seedExternalService();
+    const descriptor = await externalIntegration.buildContainerDescriptor(service, 'token');
+    expect(descriptor.HostConfig).to.not.have.property('ExtraHosts');
   });
 });

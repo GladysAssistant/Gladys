@@ -42,4 +42,16 @@ describe('externalIntegration.ensureNetwork', () => {
     });
     await externalIntegration.ensureNetwork();
   });
+
+  it('should not attach any container in host-process mode', async () => {
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getNetworkMode: fake.resolves('host-process'),
+      },
+    });
+    await externalIntegration.ensureNetwork();
+    sinonAssert.calledOnce(system.createNetwork);
+    sinonAssert.notCalled(system.connectToNetwork);
+    sinonAssert.notCalled(system.getGladysContainerId);
+  });
 });
