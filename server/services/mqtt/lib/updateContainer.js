@@ -1,7 +1,6 @@
 const logger = require('../../../utils/logger');
 const { CONFIGURATION, DEFAULT } = require('./constants');
 const { getContainersByExactName } = require('../../../utils/dockerContainers');
-const containerParams = require('../docker/eclipse-mosquitto-container.json');
 
 /**
  * @description Updates MQTT container configuration according to required changes.
@@ -17,7 +16,8 @@ async function updateContainer(configuration) {
   const { brokerContainerAvailable, mosquittoVersion } = configuration;
   if (brokerContainerAvailable && mosquittoVersion !== DEFAULT.MOSQUITTO_VERSION) {
     logger.info(`MQTT: update #${DEFAULT.MOSQUITTO_VERSION} of mosquitto container required...`);
-    const dockerContainers = await getContainersByExactName(this.gladys.system, containerParams.name);
+    const brokerContainerName = await this.getBrokerContainerName();
+    const dockerContainers = await getContainersByExactName(this.gladys.system, brokerContainerName);
 
     // Remove old container
     if (dockerContainers.length !== 0) {

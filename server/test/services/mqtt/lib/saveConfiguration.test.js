@@ -41,6 +41,7 @@ describe('mqttHandler.saveConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     await mqttHandler.saveConfiguration(config);
 
     assert.callCount(gladys.variable.setValue, 4);
@@ -69,6 +70,7 @@ describe('mqttHandler.saveConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     await mqttHandler.saveConfiguration(config);
 
     assert.callCount(gladys.variable.destroy, 3);
@@ -98,6 +100,7 @@ describe('mqttHandler.saveConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     try {
       await mqttHandler.saveConfiguration(config);
       assert.fail('Should have fail');
@@ -140,6 +143,7 @@ describe('mqttHandler.saveConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     try {
       await mqttHandler.saveConfiguration(config);
       assert.fail('Should have fail');
@@ -174,6 +178,7 @@ describe('mqttHandler.saveConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     await mqttHandler.saveConfiguration(config);
 
     assert.callCount(gladys.variable.destroy, 2);
@@ -222,6 +227,7 @@ describe('mqttHandler.saveConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     await mqttHandler.saveConfiguration(config);
 
     assert.callCount(gladys.variable.destroy, 2);
@@ -271,6 +277,7 @@ describe('mqttHandler.saveConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     await mqttHandler.saveConfiguration(config);
 
     assert.callCount(gladys.variable.destroy, 2);
@@ -321,6 +328,7 @@ describe('mqttHandler.saveConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     await mqttHandler.saveConfiguration(config);
 
     assert.callCount(gladys.variable.destroy, 1);

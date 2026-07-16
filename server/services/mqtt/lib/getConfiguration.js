@@ -1,7 +1,6 @@
 const { CONFIGURATION } = require('./constants');
 const logger = require('../../../utils/logger');
 const { getContainersByExactName } = require('../../../utils/dockerContainers');
-const containerDescriptor = require('../docker/eclipse-mosquitto-container.json');
 
 /**
  * @description Get MQTT configuration.
@@ -15,6 +14,7 @@ async function getConfiguration() {
   const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.MQTT_PASSWORD_KEY, this.serviceId);
 
   let brokerContainerAvailable = false;
+  let brokerContainerName;
   const dockerBased = await this.gladys.system.isDocker();
 
   let useEmbeddedBroker = false;
@@ -27,7 +27,9 @@ async function getConfiguration() {
       // In case the docker socket is not available
       // It's ok, we don't crash
       networkModeValid = await this.checkDockerNetwork();
-      const dockerImages = await getContainersByExactName(this.gladys.system, containerDescriptor.name);
+      // Resolve (and persist) the name of the broker container we own, then look for it
+      brokerContainerName = await this.getBrokerContainerName();
+      const dockerImages = await getContainersByExactName(this.gladys.system, brokerContainerName);
       brokerContainerAvailable = dockerImages.length > 0;
     } catch (e) {
       logger.debug(e);

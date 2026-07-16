@@ -36,6 +36,7 @@ describe('mqttHandler.updateContainer', () => {
 
   beforeEach(() => {
     mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
   });
 
   afterEach(() => {

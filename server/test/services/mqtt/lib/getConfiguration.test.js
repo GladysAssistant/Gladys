@@ -22,6 +22,7 @@ describe('mqttHandler.getConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     const config = await mqttHandler.getConfiguration();
 
     const expectedConfig = {
@@ -61,6 +62,7 @@ describe('mqttHandler.getConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     const config = await mqttHandler.getConfiguration();
 
     const expectedConfig = {
@@ -105,6 +107,7 @@ describe('mqttHandler.getConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     const config = await mqttHandler.getConfiguration();
 
     const expectedConfig = {
@@ -149,6 +152,7 @@ describe('mqttHandler.getConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     const config = await mqttHandler.getConfiguration();
 
     const expectedConfig = {
@@ -184,6 +188,7 @@ describe('mqttHandler.getConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     const config = await mqttHandler.getConfiguration();
 
     expect(config.brokerContainerAvailable).to.equal(false);
@@ -202,6 +207,7 @@ describe('mqttHandler.getConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     const config = await mqttHandler.getConfiguration();
 
     const expectedConfig = {
@@ -235,6 +241,7 @@ describe('mqttHandler.getConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     const config = await mqttHandler.getConfiguration();
 
     const expectedConfig = {
@@ -268,6 +275,7 @@ describe('mqttHandler.getConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     const config = await mqttHandler.getConfiguration();
 
     const expectedConfig = {
@@ -300,6 +308,7 @@ describe('mqttHandler.getConfiguration', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     const config = await mqttHandler.getConfiguration();
 
     const expectedConfig = {

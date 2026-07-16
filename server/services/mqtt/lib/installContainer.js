@@ -34,6 +34,8 @@ async function installContainer(saveConfiguration = true) {
 
     logger.info(`Creating container...`);
     const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+    // Resolve (and persist) the name we own; never overwrite a foreign homonym container
+    containerDescriptorToMutate.name = await this.getBrokerContainerName();
     // get the volume where Gladys container is mounted
     const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
     containerDescriptorToMutate.HostConfig.Binds = [`${basePathOnHost}/mosquitto:/mosquitto/config`];
