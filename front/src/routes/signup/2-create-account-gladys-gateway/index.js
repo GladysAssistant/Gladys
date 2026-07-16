@@ -5,7 +5,6 @@ import { Link } from 'preact-router/match';
 import get from 'get-value';
 import actions from '../../../actions/gateway';
 import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
-import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
 import RestoreBackup from './RestoreBackup';
 import SetRestoreKey from './SetRestoreKey';
 import RestoreInProgress from './RestoreInProgress';
@@ -16,16 +15,11 @@ class CreateAccountGladysGateway extends Component {
     step: 1,
     backupKey: ''
   };
-  login = async e => {
-    e.preventDefault();
-    await this.props.tempSignupForRestore(this.props.user.language);
-    await this.props.login(e);
-  };
   saveBackupKey = async () => {
     await this.setState({ loading: true, error: false });
     try {
-      await this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_KEY}`, {
-        value: this.state.backupKey
+      await this.props.httpClient.post('/api/v1/gateway/backup-key', {
+        backup_key: this.state.backupKey
       });
       await this.props.getBackups();
       this.setState({ loading: false, step: 3 });
@@ -62,7 +56,12 @@ class CreateAccountGladysGateway extends Component {
       }
     } catch (e) {
       const status = get(e, 'response.status');
-      if (status === 401) {
+      // Once the backup is restored and Gladys has restarted, the instance is
+      // configured again so this route requires authentication: any 4xx here
+      // means the restore is finished. Note that without a session, the 401
+      // is surfaced as a 400 (the http client fails to refresh a non-existent
+      // access token).
+      if (status >= 400 && status < 500) {
         window.location = '/dashboard';
       } else {
         setTimeout(() => this.getRestoreStatus(), 1000);
@@ -104,7 +103,7 @@ class CreateAccountGladysGateway extends Component {
                     <Text id="global.backButton" />
                   </Link>
 
-                  <GatewayLoginForm {...this.props} external_forgot_password login={this.login} />
+                  <GatewayLoginForm {...this.props} external_forgot_password />
                 </div>
               )}
               {step === 2 && (
