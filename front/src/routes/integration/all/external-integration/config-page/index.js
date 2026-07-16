@@ -125,28 +125,6 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  getLogs = async () => {
-    this.setState({ logsStatus: RequestStatus.Getting });
-    try {
-      const { logs } = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}/logs`, {
-        lines: 200
-      });
-      this.setState({ logs, logsStatus: RequestStatus.Success });
-    } catch (e) {
-      console.error(e);
-      this.setState({ logsStatus: RequestStatus.Error });
-    }
-  };
-
-  openLogs = () => {
-    this.setState({ showLogsModal: true, logs: null });
-    this.getLogs();
-  };
-
-  closeLogs = () => {
-    this.setState({ showLogsModal: false });
-  };
-
   askUninstall = () => {
     this.setState({ askingUninstall: true });
   };
@@ -204,9 +182,6 @@ class ExternalIntegrationConfigPage extends Component {
           updateConfigValue={this.updateConfigValue}
           saveConfig={this.saveConfig}
           executeAction={this.executeAction}
-          openLogs={this.openLogs}
-          closeLogs={this.closeLogs}
-          getLogs={this.getLogs}
           askUninstall={this.askUninstall}
           cancelUninstall={this.cancelUninstall}
           uninstall={this.uninstall}

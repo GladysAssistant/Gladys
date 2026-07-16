@@ -1,4 +1,5 @@
 import { Text } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import StatusBadge from '../components/StatusBadge';
@@ -12,7 +13,6 @@ const SupervisionCard = ({
   uninstallStatus,
   askingUninstall,
   executeAction,
-  openLogs,
   onAskUninstall,
   onCancelUninstall,
   onUninstall
@@ -113,10 +113,13 @@ const SupervisionCard = ({
                   <Text id="integration.externalIntegration.supervision.updateButton" />
                 </button>
               )}
-              <button class="btn btn-secondary" onClick={openLogs}>
+              <Link
+                href={`/dashboard/integration/device/external/${integration.selector}/logs`}
+                class="btn btn-secondary"
+              >
                 <i class="fe fe-file-text mr-1" />
                 <Text id="integration.externalIntegration.supervision.logsButton" />
-              </button>
+              </Link>
               {!askingUninstall && (
                 <button class="btn btn-danger" onClick={onAskUninstall}>
                   <i class="fe fe-trash-2 mr-1" />

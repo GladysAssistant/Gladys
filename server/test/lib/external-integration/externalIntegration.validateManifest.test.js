@@ -215,6 +215,40 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept a placeholder on string, number and secret fields', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      config_schema: [
+        { key: 'k', type: 'string', label: { en: 'L' }, placeholder: { en: 'e.g. Paris', fr: 'ex. Paris' } },
+        { key: 'n', type: 'number', label: { en: 'L' }, placeholder: { en: 'e.g. 48.85' } },
+        { key: 's', type: 'secret', label: { en: 'L' }, placeholder: { en: 'e.g. sk-...' } },
+      ],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+  });
+
+  it('should reject invalid placeholders', () => {
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'boolean', label: { en: 'L' }, placeholder: { en: 'x' } }],
+      },
+      'config_schema[0].placeholder: only allowed on string, number, secret fields',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'string', label: { en: 'L' }, placeholder: 'not object' }],
+      },
+      'config_schema[0].placeholder: must be an object',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'string', label: { en: 'L' }, placeholder: { fr: 'x' } }] },
+      'config_schema[0].placeholder.en',
+    );
+  });
+
   it('should reject defaults not matching their field type', () => {
     expect422(
       { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'string', label: { en: 'L' }, default: 1 }] },

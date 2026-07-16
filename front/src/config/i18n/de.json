@@ -559,7 +559,8 @@
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
       "local": "Lokal",
-      "external": "Community"
+      "external": "Community",
+      "native": "Nativ"
     },
     "root": {
       "title": "Integrationen",
@@ -589,6 +590,7 @@
       "deviceTab": "Geräte",
       "discoverTab": "Entdecken",
       "configTab": "Konfiguration",
+      "logsTab": "Protokolle",
       "status": {
         "UNKNOWN": "Unbekannt",
         "ENABLED": "Aktiviert",
@@ -625,12 +627,7 @@
         "uninstallButton": "Deinstallieren",
         "uninstallWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt. Von dieser Integration erstellte Geräte bleiben in Gladys, bis du sie löschst.",
         "confirmUninstallButton": "Ja, deinstallieren",
-        "cancelUninstallButton": "Abbrechen",
-        "logsTitle": "Logs",
-        "logsError": "Beim Laden der Logs ist ein Fehler aufgetreten.",
-        "logsEmpty": "Keine Logs verfügbar.",
-        "logsRefreshButton": "Aktualisieren",
-        "logsCloseButton": "Schließen"
+        "cancelUninstallButton": "Abbrechen"
       },
       "device": {
         "title": "Geräte",
@@ -690,6 +687,12 @@
         "errorNotFound": "Repository nicht gefunden, oder es enthält keine gültige Gladys-Integration.",
         "errorInvalidManifest": "Das Manifest der Integration ist ungültig.",
         "manifestInvalidJson": "Das Manifest ist kein gültiges JSON."
+      },
+      "logs": {
+        "title": "Protokolle",
+        "refreshButton": "Aktualisieren",
+        "error": "Beim Laden der Protokolle ist ein Fehler aufgetreten.",
+        "empty": "Keine Protokolle verfügbar."
       }
     },
     "telegram": {

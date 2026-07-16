@@ -98,6 +98,10 @@
         "description": {
           "$ref": "#/definitions/multiLanguageText"
         },
+        "placeholder": {
+          "$ref": "#/definitions/multiLanguageText",
+          "description": "Input placeholder, `string`, `number` and `secret` fields only."
+        },
         "required": {
           "type": "boolean",
           "default": false
@@ -174,6 +178,22 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": {
+                "type": {
+                  "enum": ["string", "number", "secret"]
+                }
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": ["placeholder"]
+            }
           }
         }
       ]

@@ -196,6 +196,7 @@ import EnergyMonitoringIntegration from '../routes/integration/all/energy-monito
 import ExternalIntegrationDevicePage from '../routes/integration/all/external-integration/device-page';
 import ExternalIntegrationDiscoverPage from '../routes/integration/all/external-integration/discover-page';
 import ExternalIntegrationConfigPage from '../routes/integration/all/external-integration/config-page';
+import ExternalIntegrationLogsPage from '../routes/integration/all/external-integration/logs-page';
 import ExternalIntegrationInstallPage from '../routes/integration/all/external-integration/install-page';
 
 const defaultState = getDefaultState();
@@ -381,6 +382,7 @@ const AppRouter = connect(
         <ExternalIntegrationDevicePage path="/dashboard/integration/device/external/:selector" />
         <ExternalIntegrationDiscoverPage path="/dashboard/integration/device/external/:selector/discover" />
         <ExternalIntegrationConfigPage path="/dashboard/integration/device/external/:selector/config" />
+        <ExternalIntegrationLogsPage path="/dashboard/integration/device/external/:selector/logs" />
         <ExternalIntegrationInstallPage path="/dashboard/integration/device/external-install/:owner/:repo" />
 
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />

@@ -8,49 +8,49 @@ const getImgClass = integration =>
     integration.whiteBackground ? 'white-bg' : ''
   }`.trim();
 
-const IntegrationTags = ({ integration }) => {
-  if (!integration.gladysPlus && !integration.cloud && !integration.local && !integration.external) {
-    return null;
-  }
-
-  return (
-    <div class="integration-tags mt-2">
-      {integration.external && (
-        <span class="badge badge-secondary integration-tag">
-          <i class="fe fe-package mr-1" />
-          <Text id="integration.tags.external" />
-        </span>
-      )}
-      {integration.external && integration.status && (
-        <StatusBadge status={integration.status} className="integration-tag" />
-      )}
-      {integration.external && integration.updateAvailable && (
-        <span class="badge badge-primary integration-tag">
-          <i class="fe fe-arrow-up-circle mr-1" />
-          <Text id="integration.externalIntegration.updateAvailable" />
-        </span>
-      )}
-      {integration.local && (
-        <span class="badge badge-success integration-tag">
-          <i class="fe fe-home mr-1" />
-          <Text id="integration.tags.local" />
-        </span>
-      )}
-      {integration.cloud && (
-        <span class="badge badge-warning integration-tag">
-          <i class="fe fe-cloud mr-1" />
-          <Text id="integration.tags.cloud" />
-        </span>
-      )}
-      {integration.gladysPlus && (
-        <span class="badge badge-info integration-tag">
-          <i class="fe fe-plus mr-1" />
-          <Text id="integration.tags.gladysPlus" />
-        </span>
-      )}
-    </div>
-  );
-};
+const IntegrationTags = ({ integration }) => (
+  <div class="integration-tags mt-2">
+    {!integration.external && (
+      <span class="badge badge-dark integration-tag">
+        <i class="fe fe-check-circle mr-1" />
+        <Text id="integration.tags.native" />
+      </span>
+    )}
+    {integration.external && (
+      <span class="badge badge-secondary integration-tag">
+        <i class="fe fe-package mr-1" />
+        <Text id="integration.tags.external" />
+      </span>
+    )}
+    {integration.external && integration.status && (
+      <StatusBadge status={integration.status} className="integration-tag" />
+    )}
+    {integration.external && integration.updateAvailable && (
+      <span class="badge badge-primary integration-tag">
+        <i class="fe fe-arrow-up-circle mr-1" />
+        <Text id="integration.externalIntegration.updateAvailable" />
+      </span>
+    )}
+    {integration.local && (
+      <span class="badge badge-success integration-tag">
+        <i class="fe fe-home mr-1" />
+        <Text id="integration.tags.local" />
+      </span>
+    )}
+    {integration.cloud && (
+      <span class="badge badge-warning integration-tag">
+        <i class="fe fe-cloud mr-1" />
+        <Text id="integration.tags.cloud" />
+      </span>
+    )}
+    {integration.gladysPlus && (
+      <span class="badge badge-info integration-tag">
+        <i class="fe fe-plus mr-1" />
+        <Text id="integration.tags.gladysPlus" />
+      </span>
+    )}
+  </div>
+);
 
 const FavoriteButton = ({ integration, toggleFavorite }) => {
   const isFavorite = !!integration.isFavorite;

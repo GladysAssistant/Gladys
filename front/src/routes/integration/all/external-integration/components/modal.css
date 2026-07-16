@@ -23,10 +23,3 @@
   max-width: 800px;
 }
 
-.modalLogs {
-  max-height: 50vh;
-  overflow: auto;
-  white-space: pre-wrap;
-  word-break: break-word;
-  margin-bottom: 0;
-}

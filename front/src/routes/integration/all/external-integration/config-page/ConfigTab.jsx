@@ -4,7 +4,6 @@ import get from 'get-value';
 
 import ConfigSchemaForm from './ConfigSchemaForm';
 import SupervisionCard from './SupervisionCard';
-import LogsModal from './LogsModal';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const ConfigTab = props => {
@@ -63,19 +62,9 @@ const ConfigTab = props => {
           uninstallStatus={props.uninstallStatus}
           askingUninstall={props.askingUninstall}
           executeAction={props.executeAction}
-          openLogs={props.openLogs}
           onAskUninstall={props.askUninstall}
           onCancelUninstall={props.cancelUninstall}
           onUninstall={props.uninstall}
-        />
-      )}
-
-      {props.showLogsModal && (
-        <LogsModal
-          logs={props.logs}
-          logsStatus={props.logsStatus}
-          getLogs={props.getLogs}
-          closeLogs={props.closeLogs}
         />
       )}
     </div>

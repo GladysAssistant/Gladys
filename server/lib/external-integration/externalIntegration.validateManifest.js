@@ -19,7 +19,20 @@ const MANIFEST_FIELDS = [
   'config_schema',
 ];
 const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'secret'];
-const CONFIG_FIELD_FIELDS = ['key', 'type', 'label', 'description', 'required', 'default', 'min', 'max', 'options'];
+const CONFIG_FIELD_FIELDS = [
+  'key',
+  'type',
+  'label',
+  'description',
+  'placeholder',
+  'required',
+  'default',
+  'min',
+  'max',
+  'options',
+];
+// boolean has no input to hint, select shows its options
+const PLACEHOLDER_FIELD_TYPES = ['string', 'number', 'secret'];
 const OPTION_FIELDS = ['value', 'label'];
 const LANGUAGE_KEY_REGEX = /^[a-z]{2}(-[A-Z]{2})?$/;
 const CONFIG_KEY_REGEX = /^[a-z0-9_]+$/;
@@ -161,6 +174,13 @@ function validateConfigField(field, index, seenKeys, errors) {
   validateMultiLanguageText(field.label, `${path}.label`, errors);
   if (field.description !== undefined) {
     validateMultiLanguageText(field.description, `${path}.description`, errors);
+  }
+  if (field.placeholder !== undefined) {
+    if (!PLACEHOLDER_FIELD_TYPES.includes(field.type)) {
+      errors.push(`${path}.placeholder: only allowed on ${PLACEHOLDER_FIELD_TYPES.join(', ')} fields`);
+    } else {
+      validateMultiLanguageText(field.placeholder, `${path}.placeholder`, errors);
+    }
   }
   if (field.required !== undefined && typeof field.required !== 'boolean') {
     errors.push(`${path}.required: must be a boolean`);

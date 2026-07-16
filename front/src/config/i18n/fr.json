@@ -559,7 +559,8 @@
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
       "local": "Local",
-      "external": "Communauté"
+      "external": "Communauté",
+      "native": "Natif"
     },
     "root": {
       "title": "Intégrations",
@@ -589,6 +590,7 @@
       "deviceTab": "Appareils",
       "discoverTab": "Découverte",
       "configTab": "Configuration",
+      "logsTab": "Journaux",
       "status": {
         "UNKNOWN": "Inconnu",
         "ENABLED": "Activée",
@@ -625,12 +627,7 @@
         "uninstallButton": "Désinstaller",
         "uninstallWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés. Les appareils créés par cette intégration resteront dans Gladys jusqu’à ce que vous les supprimiez.",
         "confirmUninstallButton": "Oui, désinstaller",
-        "cancelUninstallButton": "Annuler",
-        "logsTitle": "Journaux",
-        "logsError": "Une erreur s'est produite lors du chargement des journaux.",
-        "logsEmpty": "Aucun journal disponible.",
-        "logsRefreshButton": "Rafraîchir",
-        "logsCloseButton": "Fermer"
+        "cancelUninstallButton": "Annuler"
       },
       "device": {
         "title": "Appareils",
@@ -690,6 +687,12 @@
         "errorNotFound": "Dépôt introuvable, ou il ne contient pas d'intégration Gladys valide.",
         "errorInvalidManifest": "Le manifeste de l'intégration est invalide.",
         "manifestInvalidJson": "Le manifeste n'est pas un JSON valide."
+      },
+      "logs": {
+        "title": "Journaux",
+        "refreshButton": "Rafraîchir",
+        "error": "Une erreur s'est produite lors du chargement des journaux.",
+        "empty": "Aucun journal disponible."
       }
     },
     "energyMonitoring": {

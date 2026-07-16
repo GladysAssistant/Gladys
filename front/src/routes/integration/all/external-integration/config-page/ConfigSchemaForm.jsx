@@ -17,6 +17,7 @@ class ConfigField extends Component {
   render({ field, language, values, configuredSecrets, touchedSecrets }) {
     const label = getLocalizedText(field.label, language) || field.key;
     const description = getLocalizedText(field.description, language);
+    const placeholder = getLocalizedText(field.placeholder, language) || '';
     const value = values[field.key];
     const fieldId = `config_${field.key}`;
 
@@ -59,6 +60,7 @@ class ConfigField extends Component {
             value={value === undefined || value === null ? '' : value}
             min={field.min}
             max={field.max}
+            placeholder={placeholder}
             onInput={this.onInput}
             required={field.required}
           />
@@ -75,7 +77,7 @@ class ConfigField extends Component {
                 configuredSecrets.includes(field.key) && !touchedSecrets[field.key] ? (
                   <Text id="integration.externalIntegration.config.secretConfiguredPlaceholder" />
                 ) : (
-                  ''
+                  placeholder
                 )
               }
               onInput={this.onInput}
@@ -88,6 +90,7 @@ class ConfigField extends Component {
             type="text"
             class="form-control"
             value={value === undefined || value === null ? '' : value}
+            placeholder={placeholder}
             onInput={this.onInput}
             required={field.required}
           />

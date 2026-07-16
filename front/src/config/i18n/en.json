@@ -559,7 +559,8 @@
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
       "local": "Local",
-      "external": "Community"
+      "external": "Community",
+      "native": "Native"
     },
     "root": {
       "title": "Integrations",
@@ -589,6 +590,7 @@
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "configTab": "Configuration",
+      "logsTab": "Logs",
       "status": {
         "UNKNOWN": "Unknown",
         "ENABLED": "Enabled",
@@ -625,12 +627,7 @@
         "uninstallButton": "Uninstall",
         "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
         "confirmUninstallButton": "Yes, uninstall",
-        "cancelUninstallButton": "Cancel",
-        "logsTitle": "Logs",
-        "logsError": "There was an error loading the logs.",
-        "logsEmpty": "No logs available.",
-        "logsRefreshButton": "Refresh",
-        "logsCloseButton": "Close"
+        "cancelUninstallButton": "Cancel"
       },
       "device": {
         "title": "Devices",
@@ -690,6 +687,12 @@
         "errorNotFound": "Repository not found, or it does not contain a valid Gladys integration.",
         "errorInvalidManifest": "The integration manifest is invalid.",
         "manifestInvalidJson": "The manifest is not valid JSON."
+      },
+      "logs": {
+        "title": "Logs",
+        "refreshButton": "Refresh",
+        "error": "An error occurred while loading the logs.",
+        "empty": "No logs available."
       }
     },
     "telegram": {
