@@ -22,8 +22,12 @@ async function disconnect() {
     if (matterbridgeContainerName) {
       const dockerContainer = await getContainersByExactName(this.gladys.system, matterbridgeContainerName);
       [container] = dockerContainer;
-      await this.gladys.system.stopContainer(container.id);
-      await this.gladys.system.removeContainer(container.id);
+      // The name is persisted but the container may have been removed manually: only tear
+      // it down when it actually exists, so the config cleanup below always runs.
+      if (container) {
+        await this.gladys.system.stopContainer(container.id);
+        await this.gladys.system.removeContainer(container.id);
+      }
     }
 
     const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
