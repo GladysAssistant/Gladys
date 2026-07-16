@@ -48,6 +48,7 @@ describe('mqttHandler.installContainer', () => {
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
     mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
+    mqttHandler.getBrokerPort = fake.resolves(1883);
     mqttHandler.configureContainer = fake.resolves(null);
 
     try {
@@ -92,6 +93,7 @@ describe('mqttHandler.installContainer', () => {
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
     mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
+    mqttHandler.getBrokerPort = fake.resolves(1883);
     mqttHandler.configureContainer = fake.resolves(null);
 
     await mqttHandler.installContainer();
@@ -135,6 +137,7 @@ describe('mqttHandler.installContainer', () => {
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
     mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
+    mqttHandler.getBrokerPort = fake.resolves(1883);
     mqttHandler.configureContainer = fake.resolves(null);
 
     await mqttHandler.installContainer(false);

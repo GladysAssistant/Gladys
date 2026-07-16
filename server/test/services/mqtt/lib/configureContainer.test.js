@@ -50,25 +50,43 @@ describe('mqttHandler.configureContainer', () => {
     assert.notCalled(fsMock.writeFile);
   });
 
-  it('should write default port', async () => {
+  it('should append the listener line when the config has none', async () => {
     const mqttHandler = new MqttHandler(gladys, mqttClient, serviceId);
     await mqttHandler.configureContainer();
 
     assert.calledOnceWithExactly(fsMock.mkdir, '/var/lib/gladysassistant/mosquitto', { recursive: true });
-    assert.calledOnceWithExactly(
-      fsMock.access,
-      '/var/lib/gladysassistant/mosquitto/mosquitto.conf',
-      // eslint-disable-next-line no-bitwise
-      constants.R_OK | constants.W_OK,
-    );
     assert.calledOnceWithExactly(fsMock.readFile, '/var/lib/gladysassistant/mosquitto/mosquitto.conf');
     assert.calledOnceWithExactly(
-      fsMock.appendFile,
+      fsMock.writeFile,
       '/var/lib/gladysassistant/mosquitto/mosquitto.conf',
-      `${os.EOL}listener 1883`,
+      `read${os.EOL}listener 1883`,
     );
     assert.calledOnceWithExactly(fsMock.open, '/var/lib/gladysassistant/mosquitto/mosquitto.passwd', 'w');
+    assert.notCalled(fsMock.appendFile);
+  });
+
+  it('should replace the listener line when the resolved port differs', async () => {
+    fsMock.readFile = fake.resolves(`allow_anonymous false${os.EOL}listener 1883`);
+
+    const mqttHandler = new MqttHandler(gladys, mqttClient, serviceId);
+    await mqttHandler.configureContainer(1885);
+
+    assert.calledOnceWithExactly(
+      fsMock.writeFile,
+      '/var/lib/gladysassistant/mosquitto/mosquitto.conf',
+      `allow_anonymous false${os.EOL}listener 1885`,
+    );
+    assert.notCalled(fsMock.appendFile);
+  });
+
+  it('should not rewrite the config when the listener already matches the resolved port', async () => {
+    fsMock.readFile = fake.resolves(`allow_anonymous false${os.EOL}listener 1885`);
+
+    const mqttHandler = new MqttHandler(gladys, mqttClient, serviceId);
+    await mqttHandler.configureContainer(1885);
+
     assert.notCalled(fsMock.writeFile);
+    assert.notCalled(fsMock.appendFile);
   });
 
   it('should create default configuration file', async () => {

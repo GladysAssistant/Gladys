@@ -18,6 +18,7 @@ async function installContainer(saveConfiguration = true) {
   logger.info('MQTT broker is being installed as Docker container...');
 
   let container;
+  let brokerPort = DEFAULT.MOSQUITTO_DEFAULT_PORT;
   try {
     logger.info(`Check Gladys network...`);
     const networkModeValid = await this.checkDockerNetwork();
@@ -28,14 +29,22 @@ async function installContainer(saveConfiguration = true) {
     logger.info(`Pulling ${containerDescriptor.Image} image...`);
     await this.gladys.system.pull(containerDescriptor.Image);
 
+    // Resolve (and persist) the host port; a busy default port (1883) relocates the broker
+    brokerPort = await this.getBrokerPort();
+
     // Prepare broker env
     logger.info(`Preparing broker environment...`);
-    await this.configureContainer();
+    await this.configureContainer(brokerPort);
 
     logger.info(`Creating container...`);
     const containerDescriptorToMutate = cloneDeep(containerDescriptor);
     // Resolve (and persist) the name we own; never overwrite a foreign homonym container
     containerDescriptorToMutate.name = await this.getBrokerContainerName();
+    // Bind the resolved port (kept coherent even though host network mode ignores it)
+    containerDescriptorToMutate.ExposedPorts = { [`${brokerPort}/tcp`]: {} };
+    containerDescriptorToMutate.HostConfig.PortBindings = {
+      [`${brokerPort}/tcp`]: [{ HostPort: `${brokerPort}` }],
+    };
     // get the volume where Gladys container is mounted
     const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
     containerDescriptorToMutate.HostConfig.Binds = [`${basePathOnHost}/mosquitto:/mosquitto/config`];
@@ -65,7 +74,7 @@ async function installContainer(saveConfiguration = true) {
     logger.info('MQTT saving configuration');
 
     await this.saveConfiguration({
-      mqttUrl: 'mqtt://localhost',
+      mqttUrl: `mqtt://localhost:${brokerPort}`,
       mqttUsername: 'gladys',
       mqttPassword: generate(20, { number: true, lowercase: true, uppercase: true }),
       useEmbeddedBroker: true,
