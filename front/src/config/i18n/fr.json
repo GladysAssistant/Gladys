@@ -3920,7 +3920,7 @@
     "connected": "Connecté",
     "ping": "{{time}} ms ping",
     "disk": "Disque",
-    "localIp": "IP",
+    "localIp": "IP Hôte",
     "uptime": " Démarré",
     "gladysVersion": "Version",
     "gladysVersionValue": "Gladys {{version}}",
