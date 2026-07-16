@@ -1,10 +1,12 @@
 const { expect } = require('chai');
+const path = require('path');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { DEFAULT } = require('../../../../services/matterbridge/lib/constants');
 
 const fsMock = {
   rm: fake.resolves(true),
@@ -93,6 +95,9 @@ describe('Matterbridge disconnect', () => {
     assert.notCalled(gladys.system.stopContainer);
     assert.notCalled(gladys.system.removeContainer);
     // The config cleanup and flag reset must still run even though no container was stopped
+    assert.calledOnceWithExactly(fsMock.rm, path.join(TEMP_GLADYS_FOLDER, DEFAULT.CONFIGURATION_PATH), {
+      recursive: true,
+    });
     expect(matterbridgeManager.matterbridgeRunning).to.equal(false);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.MATTERBRIDGE.STATUS_CHANGE,
