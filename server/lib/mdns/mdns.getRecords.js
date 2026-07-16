@@ -1,7 +1,7 @@
 const os = require('os');
 
 const { getLocalIp } = require('../system/system.getInfos');
-const { HTTP_SERVICE_TYPE } = require('./mdns.constants');
+const { HTTP_SERVICE_TYPE, GLADYS_MDNS_PRODUCT } = require('./mdns.constants');
 
 /**
  * @description Build the mDNS records advertising Gladys (service discovery + hostname).
@@ -41,7 +41,8 @@ function getRecords(ttl) {
       type: 'TXT',
       ttl,
       flush,
-      data: [],
+      // marker allowing a discovery tool to tell a Gladys instance apart from any other _http._tcp service
+      data: [`product=${GLADYS_MDNS_PRODUCT}`, `name=${this.hostname}`],
     },
     {
       name: this.fqdn,

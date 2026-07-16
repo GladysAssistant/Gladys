@@ -111,6 +111,13 @@ describe('mdns', () => {
     expect(additionals.map((record) => record.type)).to.deep.equal(['SRV', 'TXT', 'A']);
   });
 
+  it('should tag the TXT record so a discovery tool can recognize a Gladys instance', async () => {
+    await mdns.start(1443);
+    const { answers } = mdnsFake.respond.firstCall.args[0];
+    const txtRecord = answers.find((record) => record.type === 'TXT');
+    expect(txtRecord.data).to.deep.equal(['product=gladys', 'name=gladysassistant']);
+  });
+
   it('should not answer queries about other names', async () => {
     await mdns.start(1443);
     const queryHandler = getQueryHandler();
