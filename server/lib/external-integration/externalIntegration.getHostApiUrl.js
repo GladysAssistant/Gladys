@@ -19,7 +19,9 @@ const { INTEGRATIONS_NETWORK_NAME, INTEGRATIONS_NETWORK_GATEWAY } = require('./c
  * const hostApiUrl = await gladys.externalIntegration.getHostApiUrl();
  */
 async function getHostApiUrl() {
-  const serverPort = process.env.SERVER_PORT || '80';
+  // same resolution as server/index.js so the URL always targets the port
+  // the server actually listens on (1443 by default, e.g. `npm start` dev)
+  const serverPort = parseInt(process.env.SERVER_PORT, 10) || 1443;
   const networkMode = await this.system.getNetworkMode();
   if (networkMode === NETWORK_MODE_HOST_PROCESS) {
     return `http://host.docker.internal:${serverPort}`;

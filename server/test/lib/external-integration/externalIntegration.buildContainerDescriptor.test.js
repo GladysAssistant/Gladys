@@ -18,7 +18,7 @@ describe('externalIntegration.buildContainerDescriptor', () => {
         'io.gladysassistant.external-integration': 'ext-dev-open-meteo-demo',
       },
       Env: [
-        `GLADYS_HOST_API_URL=http://172.30.0.1:${process.env.SERVER_PORT || '80'}`,
+        `GLADYS_HOST_API_URL=http://172.30.0.1:${parseInt(process.env.SERVER_PORT, 10) || 1443}`,
         `GLADYS_INTEGRATION_TOKEN=${token}`,
         'GLADYS_INTEGRATION_SELECTOR=ext-dev-open-meteo-demo',
         'TZ=Europe/Paris',
@@ -61,7 +61,7 @@ describe('externalIntegration.buildContainerDescriptor', () => {
     const descriptor = await externalIntegration.buildContainerDescriptor(service, 'token');
     expect(descriptor.HostConfig.ExtraHosts).to.deep.equal(['host.docker.internal:host-gateway']);
     expect(descriptor.Env).to.include(
-      `GLADYS_HOST_API_URL=http://host.docker.internal:${process.env.SERVER_PORT || '80'}`,
+      `GLADYS_HOST_API_URL=http://host.docker.internal:${parseInt(process.env.SERVER_PORT, 10) || 1443}`,
     );
   });
 
