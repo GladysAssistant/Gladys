@@ -97,4 +97,13 @@ describe('system.getGladysBasePath', () => {
       basePathOnContainer: '/home/user/.gladysassistant',
     });
   });
+  it('should rethrow unexpected errors of getGladysContainerId', async () => {
+    system.getGladysContainerId = fake.rejects(new Error('UNEXPECTED'));
+    try {
+      await system.getGladysBasePath();
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e.message).to.equal('UNEXPECTED');
+    }
+  });
 });
