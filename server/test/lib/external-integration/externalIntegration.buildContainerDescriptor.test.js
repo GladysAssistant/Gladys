@@ -60,7 +60,9 @@ describe('externalIntegration.buildContainerDescriptor', () => {
     const service = await seedExternalService();
     const descriptor = await externalIntegration.buildContainerDescriptor(service, 'token');
     expect(descriptor.HostConfig.ExtraHosts).to.deep.equal(['host.docker.internal:host-gateway']);
-    expect(descriptor.Env).to.include(`GLADYS_HOST_API_URL=http://host.docker.internal:${process.env.SERVER_PORT || '80'}`);
+    expect(descriptor.Env).to.include(
+      `GLADYS_HOST_API_URL=http://host.docker.internal:${process.env.SERVER_PORT || '80'}`,
+    );
   });
 
   it('should not add ExtraHosts when Gladys runs in a container', async () => {

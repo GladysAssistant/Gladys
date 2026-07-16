@@ -202,11 +202,7 @@ class InstallFromGithubCard extends Component {
     if (button) {
       return (
         <>
-          <button
-            type="button"
-            onClick={this.openModal}
-            class={cx('btn btn-primary', { 'btn-block': block })}
-          >
+          <button type="button" onClick={this.openModal} class={cx('btn btn-primary', { 'btn-block': block })}>
             <i class="fe fe-github mr-2" />
             <Text id="integration.externalIntegration.installFromGithub.cardTitle" />
           </button>

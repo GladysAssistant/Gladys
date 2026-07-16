@@ -29,7 +29,8 @@ async function buildContainerDescriptor(service, integrationToken) {
   // When Gladys runs as a host process, the integration reaches its API
   // through `host.docker.internal`. Docker Desktop resolves it out of the
   // box; on Linux it must be mapped explicitly to the host gateway.
-  const extraHosts = networkMode === NETWORK_MODE_HOST_PROCESS ? { ExtraHosts: ['host.docker.internal:host-gateway'] } : {};
+  const extraHosts =
+    networkMode === NETWORK_MODE_HOST_PROCESS ? { ExtraHosts: ['host.docker.internal:host-gateway'] } : {};
   return {
     name: `gladys-${service.selector}`,
     Image: service.docker_image,
