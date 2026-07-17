@@ -155,17 +155,28 @@
       "backupKeyLabel": "Backup-Schlüssel",
       "backupKeyPlaceholder": "Gib deinen Backup-Schlüssel ein",
       "cancelButton": "Abbrechen",
-      "saveButton": "Backup-Schlüssel speichern"
+      "saveButton": "Backup-Schlüssel speichern",
+      "error": "Der Backup-Schlüssel konnte nicht gespeichert werden. Bitte überprüfe, ob deine Instanz mit dem Internet verbunden ist, und versuche es erneut."
     },
     "restoreBackupInProgress": {
       "title": "Wiederherstellung läuft …",
       "description": "Am Ende des Wiederherstellungsprozesses wird Gladys automatisch neu gestartet.",
       "errored": "Backup-Wiederherstellung fehlgeschlagen. Möglicherweise ist der Wiederherstellungsschlüssel ungültig.",
-      "updateRestoreKeyButton": "Wiederherstellungsschlüssel aktualisieren"
+      "erroredHelp": "Wenn du dein Backup nicht wiederherstellen kannst, kannst du jetzt ein lokales Konto erstellen, Gladys Plus später in den Einstellungen verbinden und dein Backup dann wiederherstellen.",
+      "updateRestoreKeyButton": "Wiederherstellungsschlüssel aktualisieren",
+      "createLocalAccountButton": "Lokales Konto erstellen"
     },
     "gatewayBackup": {
       "title": "Wähle ein Backup aus",
-      "description": "Wähle in der Liste das Backup aus, das du wiederherstellen möchtest."
+      "description": "Wähle in der Liste das Backup aus, das du wiederherstellen möchtest.",
+      "changeKeyButton": "Backup-Schlüssel ändern",
+      "refreshButton": "Aktualisieren",
+      "noBackupsFound": "Auf diesem Gladys-Plus-Konto wurden keine Backups gefunden.",
+      "error": "Deine Backups konnten nicht abgerufen werden. Bitte überprüfe, ob deine Instanz mit dem Internet verbunden ist, und versuche es erneut."
+    },
+    "restoreLocalAccountAlternative": {
+      "text": "Du kannst auch jetzt ein lokales Konto erstellen, Gladys Plus später in den Einstellungen verbinden und dein Backup dann wiederherstellen.",
+      "linkText": "Lokales Konto erstellen"
     },
     "preferences": {
       "title": "Deine Einstellungen",
