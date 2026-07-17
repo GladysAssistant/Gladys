@@ -4839,14 +4839,13 @@
   "gatewayLinkUser": {
     "title": "Configurer Gladys Plus",
     "label": "Sélectionnez votre utilisateur Gladys",
-    "description": "Avant de sélectionner votre utilisateur ici, vérifiez que celui-ci soit bien accepté localement sur votre instance Gladys (dans \"Paramètres\" => \"Gladys Plus\" => \"Utilisateurs\").",
+    "description": "Sélectionnez l'utilisateur Gladys auquel lier votre compte Gladys Plus. Cet utilisateur doit être accepté localement sur votre instance : dans les paramètres de votre instance, onglet \"Gladys Plus\", section \"Utilisateurs\".",
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
-    "noInstanceFoundHelp": "Cela peut arriver si vous ne vous êtes jamais connecté à votre compte Gladys Plus dans votre instance locale, ou si votre 2FA a été réinitialisée. Dans les deux cas, rendez-vous dans votre instance Gladys locale, dans \"Paramètres\" => \"Gladys Plus\", et connectez-vous à votre compte. Besoin d'aide ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
+    "noInstanceFoundHelp": "Cela peut arriver si vous ne vous êtes jamais connecté à votre compte Gladys Plus dans votre instance locale, ou si votre 2FA a été réinitialisée. Dans les deux cas, ouvrez votre instance Gladys locale, allez dans les paramètres, onglet \"Gladys Plus\", et connectez-vous à votre compte. Besoin d'aide ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
     "errorNotAcceptedLocally": "L'utilisateur n'a pas été accepté localement dans l'instance Gladys. Veuillez l'accepter dans les paramètres de votre instance.",
     "saveButton": "Sauvegarder",
-    "manageBilling": "Pour gérer votre facturation, cliquez ",
-    "here": "ici",
+    "manageBillingLink": "Gérer mon abonnement et mes factures",
     "logoutButton": "Se déconnecter"
   },
   "editDeviceForm": {

@@ -4839,14 +4839,13 @@
   "gatewayLinkUser": {
     "title": "Configure Gladys Plus",
     "label": "Select you Gladys user",
-    "description": "Before selecting your user here, please make sure that this user is accepted locally in your Gladys instance (In \"Settings\" => \"Gladys Plus\" => \"Users\").",
+    "description": "Select the Gladys user you want to link your Gladys Plus account to. This user must be accepted locally on your instance: in your instance settings, \"Gladys Plus\" tab, \"Users\" section.",
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
-    "noInstanceFoundHelp": "This can happen if you never connected to your Gladys Plus account in your local instance, or if your 2FA was reset. In both cases, go to your local Gladys instance, in \"Settings\" => \"Gladys Plus\", and log in to your account. Need help? Contact us at <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
+    "noInstanceFoundHelp": "This can happen if you never connected to your Gladys Plus account in your local instance, or if your 2FA was reset. In both cases, open your local Gladys instance, go to the settings, \"Gladys Plus\" tab, and log in to your account. Need help? Contact us at <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
     "errorNotAcceptedLocally": "The user was not accepted locally in the Gladys instance. Please accept it in your instance settings.",
     "saveButton": "Save",
-    "manageBilling": "To manage your billing, click ",
-    "here": "here",
+    "manageBillingLink": "Manage my subscription and invoices",
     "logoutButton": "Log out"
   },
   "editDeviceForm": {
