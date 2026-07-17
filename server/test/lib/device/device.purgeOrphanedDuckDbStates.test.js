@@ -90,6 +90,15 @@ describe('device.purgeOrphanedDuckDbStates', async function Describe() {
       numberOfOrphanedDuckDbStatesToDelete: 0,
     });
     assert.calledWith(variable.setValue, SYSTEM_VARIABLE_NAMES.DUCKDB_ORPHANED_STATES_PURGED, 'true');
+    // Even with nothing to purge, the job reports "0 orphaned states" instead of a blank entry
+    const jobRecord = await db.Job.findOne({
+      where: { type: JOB_TYPES.DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES },
+      order: [['created_at', 'DESC']],
+    });
+    expect(jobRecord.data).to.deep.equal({
+      orphaned_states_count: 0,
+      step: 'deleting_states',
+    });
   });
   it('should not delete states written after the purge started (feature created mid-purge)', async () => {
     // A feature created while the purge runs is not in the feature snapshot: its

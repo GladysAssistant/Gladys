@@ -49,7 +49,11 @@ async function purgeOrphanedDuckDbStates(jobId) {
     'SELECT MIN(created_at) AS min_date, MAX(created_at) AS max_date FROM t_device_feature_state',
   );
 
+  // Attached before the empty-table check, so a run finding nothing still
+  // reports "0 orphaned states" instead of a blank entry
   let numberOfOrphanedDuckDbStatesToDelete = 0;
+  await this.job.updateProgress(jobId, 0, { step: 'deleting_states', orphaned_states_count: 0 });
+
   if (minDate !== null) {
     const startTime = new Date(minDate).getTime();
     // Clamped to the purge start date so no slice can ever reach beyond the
@@ -57,8 +61,6 @@ async function purgeOrphanedDuckDbStates(jobId) {
     const endTime = Math.min(new Date(maxDate).getTime(), purgeStartDate.getTime());
     const numberOfSlices = Math.max(1, Math.ceil((endTime - startTime) / ONE_WEEK_IN_MS));
     logger.info(`purge-orphaned-duckdb-states: starting, ${numberOfSlices} weekly slices to walk.`);
-
-    await this.job.updateProgress(jobId, 0, { step: 'deleting_states', orphaned_states_count: 0 });
 
     await Promise.each([...Array(numberOfSlices)], async (value, i) => {
       const sliceStart = new Date(startTime + i * ONE_WEEK_IN_MS);
