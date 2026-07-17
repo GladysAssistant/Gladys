@@ -47,6 +47,26 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/gateway/configure-two-factor
+   * @apiName ConfigureTwoFactor
+   * @apiGroup Gateway
+   */
+  async function configureTwoFactor(req, res) {
+    const result = await gladys.gateway.configureTwoFactor(req.body.access_token);
+    res.json(result);
+  }
+
+  /**
+   * @api {post} /api/v1/gateway/enable-two-factor
+   * @apiName EnableTwoFactor
+   * @apiGroup Gateway
+   */
+  async function enableTwoFactor(req, res) {
+    const result = await gladys.gateway.enableTwoFactor(req.body.access_token, req.body.two_factor_code);
+    res.json(result);
+  }
+
+  /**
    * @api {get} /api/v1/gateway/key
    * @apiName getUsersKeys
    * @apiGroup Gateway
@@ -242,6 +262,8 @@ module.exports = function GatewayController(gladys) {
     login: asyncMiddleware(login),
     logout: asyncMiddleware(logout),
     loginTwoFactor: asyncMiddleware(loginTwoFactor),
+    configureTwoFactor: asyncMiddleware(configureTwoFactor),
+    enableTwoFactor: asyncMiddleware(enableTwoFactor),
     getUsersKeys: asyncMiddleware(getUsersKeys),
     saveUsersKeys: asyncMiddleware(saveUsersKeys),
     getBackups: asyncMiddleware(getBackups),

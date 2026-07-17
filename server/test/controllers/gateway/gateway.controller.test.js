@@ -82,6 +82,66 @@ describe('POST /api/v1/gateway/logout', () => {
   });
 });
 
+describe('POST /api/v1/gateway/configure-two-factor', () => {
+  it('should return the otpauth url to configure two factor', async () => {
+    nock(config.gladysGatewayServerUrl)
+      .post('/users/two-factor-configure')
+      .reply(200, {
+        otpauth_url: 'otpauth://totp/Gladys%20Gateway?secret=THISISMYSECRET',
+      });
+    await authenticatedRequest
+      .post('/api/v1/gateway/configure-two-factor')
+      .send({ access_token: 'my-access-token' })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          otpauth_url: 'otpauth://totp/Gladys%20Gateway?secret=THISISMYSECRET',
+        });
+      });
+  });
+  it('should return 403 when the gateway refuses the access token', async () => {
+    nock(config.gladysGatewayServerUrl)
+      .post('/users/two-factor-configure')
+      .reply(401, {});
+    await authenticatedRequest
+      .post('/api/v1/gateway/configure-two-factor')
+      .send({ access_token: 'my-access-token' })
+      .expect('Content-Type', /json/)
+      .expect(403);
+  });
+});
+
+describe('POST /api/v1/gateway/enable-two-factor', () => {
+  it('should enable two factor', async () => {
+    nock(config.gladysGatewayServerUrl)
+      .post('/users/two-factor-enable', (body) => body.two_factor_code === '123456')
+      .reply(200, {
+        two_factor_enabled: true,
+      });
+    await authenticatedRequest
+      .post('/api/v1/gateway/enable-two-factor')
+      .send({ access_token: 'my-access-token', two_factor_code: '123456' })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          two_factor_enabled: true,
+        });
+      });
+  });
+  it('should return 403 when the two factor code is invalid', async () => {
+    nock(config.gladysGatewayServerUrl)
+      .post('/users/two-factor-enable')
+      .reply(422, {});
+    await authenticatedRequest
+      .post('/api/v1/gateway/enable-two-factor')
+      .send({ access_token: 'my-access-token', two_factor_code: '000000' })
+      .expect('Content-Type', /json/)
+      .expect(403);
+  });
+});
+
 describe('GET /api/v1/gateway/instance/key', () => {
   it('should get instance keys', async () => {
     await authenticatedRequest

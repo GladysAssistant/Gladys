@@ -113,6 +113,7 @@ function createActions(store) {
         console.error(e);
         const error = get(e, 'response.data.error');
         const errorMessage = get(e, 'response.data.error_message');
+        const status = get(e, 'response.status');
         // if user was previously linked to another instance, we reset the user id
         if (error === 'LINKED_USER_NOT_FOUND') {
           await state.session.gatewayClient.updateUserIdInGladys(null);
@@ -124,6 +125,10 @@ function createActions(store) {
         } else if (errorMessage === 'NO_INSTANCE_FOUND') {
           store.setState({
             gatewayLoginStatus: RequestStatus.GatewayNoInstanceFound
+          });
+        } else if (status >= 400 && status < 500) {
+          store.setState({
+            gatewayLoginStatus: LoginStatus.WrongTwoFactorCodeError
           });
         } else {
           store.setState({

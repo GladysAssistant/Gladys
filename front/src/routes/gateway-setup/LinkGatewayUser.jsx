@@ -46,7 +46,12 @@ const SignupLayout = ({ children, ...props }) => (
                   <div class="dimmer-content">
                     {props.usersGetStatus === RequestStatus.GatewayNoInstanceFound && (
                       <div class="alert alert-danger">
-                        <Text id="gatewayLinkUser.noInstanceFound" />
+                        <p>
+                          <Text id="gatewayLinkUser.noInstanceFound" />
+                        </p>
+                        <p class="mb-0">
+                          <MarkupText id="gatewayLinkUser.noInstanceFoundHelp" />
+                        </p>
                       </div>
                     )}
                     {props.error && (
@@ -95,6 +100,11 @@ const SignupLayout = ({ children, ...props }) => (
               <MarkupText id="gatewayLinkUser.manageBilling" />{' '}
               <a href="#" onClick={props.openStripeBilling}>
                 <Text id="gatewayLinkUser.here" />
+              </a>
+            </div>
+            <div class="text-center mt-2">
+              <a href="#" onClick={props.logout}>
+                <Text id="gatewayLinkUser.logoutButton" />
               </a>
             </div>
           </div>

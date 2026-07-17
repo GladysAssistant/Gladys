@@ -3556,7 +3556,19 @@
     "twoFactorCodeLabel": "Code 2FA",
     "twoFactorCodePlaceholder": "Code à 6 chiffres",
     "loginTwoFactorButtonText": "Finaliser la connexion",
-    "invalidTwoFactorCode": "Le code 2FA n'est pas valide."
+    "invalidTwoFactorCode": "Le code 2FA n'est pas valide. Réessayez avec un nouveau code généré par votre application.",
+    "lostTwoFactor": "Vous avez perdu votre 2FA ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> et nous la réinitialiserons.",
+    "twoFactorEnabledSuccess": "La 2FA a bien été activée ! Entrez un nouveau code généré par votre application pour finaliser la connexion."
+  },
+  "gatewayConfigureTwoFactor": {
+    "cardTitle": "Configurer l'authentification à deux facteurs (2FA)",
+    "twoFactorNotConfigured": "L'authentification à deux facteurs (2FA) n'est pas encore configurée sur votre compte Gladys Plus. Elle est indispensable pour connecter votre instance.",
+    "scanInstructions": "Scannez ce QR code avec une application 2FA (Authy, Google Authenticator...), ou copiez le secret manuellement dans votre application.",
+    "secretLabel": "Secret",
+    "copy": "Copier",
+    "confirmCodeLabel": "Entrez le code affiché dans votre application",
+    "enableButton": "Activer la 2FA",
+    "invalidCode": "Le code 2FA n'est pas valide. Réessayez avec un nouveau code généré par votre application."
   },
   "gatewayBackup": {
     "title": "Sauvegardes",
@@ -4818,11 +4830,13 @@
     "label": "Sélectionnez votre utilisateur Gladys",
     "description": "Avant de sélectionner votre utilisateur ici, vérifiez que celui-ci soit bien accepté localement sur votre instance Gladys (dans \"Paramètres\" => \"Gladys Plus\" => \"Utilisateurs\").",
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
+    "noInstanceFoundHelp": "Cela peut arriver si vous ne vous êtes jamais connecté à votre compte Gladys Plus dans votre instance locale, ou si votre 2FA a été réinitialisée. Dans les deux cas, rendez-vous dans votre instance Gladys locale, dans \"Paramètres\" => \"Gladys Plus\", et connectez-vous à votre compte. Besoin d'aide ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
     "errorNotAcceptedLocally": "L'utilisateur n'a pas été accepté localement dans l'instance Gladys. Veuillez l'accepter dans les paramètres de votre instance.",
     "saveButton": "Sauvegarder",
     "manageBilling": "Pour gérer votre facturation, cliquez ",
-    "here": "ici"
+    "here": "ici",
+    "logoutButton": "Se déconnecter"
   },
   "editDeviceForm": {
     "noName": "Pas de nom",

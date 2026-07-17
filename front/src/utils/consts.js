@@ -4,6 +4,7 @@ export const LoginStatus = {
   Processing: 'Processing',
   WrongCredentialsError: 'WrongCredentialsError',
   WrongEmailError: 'WrongEmailError',
+  WrongTwoFactorCodeError: 'WrongTwoFactorCodeError',
   LoginSuccess: 'LoginSuccess',
   UnknownError: 'UnknownError'
 };
