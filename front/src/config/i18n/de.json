@@ -665,6 +665,7 @@
         "lastPushLabel": "Letzte Aktualisierung:",
         "warningTitle": "Community-Integration",
         "warningText": "Diese Integration wird von der Community entwickelt und nicht vom Gladys-Assistant-Team gepflegt. Sie läuft in einem isolierten Docker-Container, du solltest jedoch nur Integrationen von Entwicklern installieren, denen du vertraust.",
+        "communicationWarningText": "Diese Integration ist ein Nachrichtenkanal: Sobald dein Konto verknüpft ist, kann sie in deinem Namen Nachrichten senden und empfangen (Szenen auslösen, dein Zuhause über das Gladys-Gehirn steuern).",
         "notCompatible": "Diese Integration ist nicht mit deiner Gladys-Installation kompatibel.",
         "installError": "Beim Installieren dieser Integration ist ein Fehler aufgetreten.",
         "alreadyInstalled": "Diese Integration ist bereits installiert.",
@@ -695,6 +696,16 @@
         "refreshButton": "Aktualisieren",
         "error": "Beim Laden der Protokolle ist ein Fehler aufgetreten.",
         "empty": "Keine Protokolle verfügbar."
+      },
+      "link": {
+        "title": "Mein Konto verknüpfen",
+        "notLinkedText": "Dein Konto ist nicht mit diesem Nachrichtenkanal verknüpft. Generiere einen Code und sende ihn an den Bot im externen Kanal, um dein Konto zu verknüpfen.",
+        "linkedText": "Dein Konto ist verknüpft mit:",
+        "generateCodeButton": "Verknüpfungscode generieren",
+        "codeText": "Sende diesen Code an den Bot:",
+        "codeExpiryText": "Dieser Code ist einmalig verwendbar und läuft in 15 Minuten ab.",
+        "unlinkButton": "Konto trennen",
+        "error": "Beim Verknüpfen des Kontos ist ein Fehler aufgetreten."
       }
     },
     "telegram": {

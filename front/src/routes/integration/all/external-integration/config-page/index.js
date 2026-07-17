@@ -29,6 +29,9 @@ class ExternalIntegrationConfigPage extends Component {
         touchedSecrets: {},
         loadStatus: RequestStatus.Success
       });
+      if (get(integration, 'manifest.type') === 'communication') {
+        await this.loadContact();
+      }
     } catch (e) {
       console.error(e);
       if (selector !== this.props.selector) {
@@ -112,6 +115,41 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  loadContact = async () => {
+    try {
+      const contact = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}/contact`);
+      this.setState({ contact });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  generateLinkCode = async () => {
+    this.setState({ linkStatus: RequestStatus.Getting });
+    try {
+      const { code } = await this.props.httpClient.post(
+        `/api/v1/external_integration/${this.props.selector}/link_code`,
+        {}
+      );
+      this.setState({ linkCode: code, linkStatus: RequestStatus.Success });
+    } catch (e) {
+      console.error(e);
+      this.setState({ linkStatus: RequestStatus.Error });
+    }
+  };
+
+  unlinkContact = async () => {
+    this.setState({ linkStatus: RequestStatus.Getting });
+    try {
+      await this.props.httpClient.delete(`/api/v1/external_integration/${this.props.selector}/contact`);
+      this.setState({ linkCode: null, linkStatus: RequestStatus.Success });
+      await this.loadContact();
+    } catch (e) {
+      console.error(e);
+      this.setState({ linkStatus: RequestStatus.Error });
+    }
+  };
+
   executeAction = async action => {
     this.setState({ actionStatus: RequestStatus.Getting, actionError: null });
     try {
@@ -185,6 +223,8 @@ class ExternalIntegrationConfigPage extends Component {
           askUninstall={this.askUninstall}
           cancelUninstall={this.cancelUninstall}
           uninstall={this.uninstall}
+          generateLinkCode={this.generateLinkCode}
+          unlinkContact={this.unlinkContact}
         />
       </ExternalIntegrationPage>
     );

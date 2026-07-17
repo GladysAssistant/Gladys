@@ -1,18 +1,21 @@
-const { assert, fake, stub } = require('sinon');
+const { assert, fake } = require('sinon');
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
 const EventEmitter = require('events');
 const MessageHandler = require('../../../lib/message');
 const StateManager = require('../../../lib/state');
 
+// the outbound channels are enumerated from the stateManager: every service
+// exposing message.sendToUser is called, whatever its name
+const buildServiceManager = (stateManager) => ({
+  getService: (name) => stateManager.get('service', name),
+});
+
 describe('message.sendToUser', () => {
   it('should send message to user', async () => {
     const event = new EventEmitter();
     const stateManager = new StateManager();
-    const service = {
-      getService: () => null,
-    };
-    const messageHandler = new MessageHandler(event, {}, service, stateManager);
+    const messageHandler = new MessageHandler(event, {}, buildServiceManager(stateManager), stateManager);
     stateManager.setState('user', 'test-user', {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
     });
@@ -20,117 +23,65 @@ describe('message.sendToUser', () => {
     expect(message).to.have.property('id');
     expect(message).to.have.property('text', 'coucou');
   });
+
   it('should persist notification message type', async () => {
     const event = new EventEmitter();
     const stateManager = new StateManager();
-    const service = {
-      getService: () => null,
-    };
-    const messageHandler = new MessageHandler(event, {}, service, stateManager);
+    const messageHandler = new MessageHandler(event, {}, buildServiceManager(stateManager), stateManager);
     stateManager.setState('user', 'test-user', {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
     });
     const message = await messageHandler.sendToUser('test-user', 'digest', null, { messageType: 'notification' });
     expect(message).to.have.property('message_type', 'notification');
   });
-  it('should send message to and send telegram message', async () => {
+
+  it('should forward the message to every service exposing message.sendToUser', async () => {
     const event = new EventEmitter();
     const stateManager = new StateManager();
-    const send = fake.resolves(true);
-    const service = {
-      getService: stub()
-        .onFirstCall()
-        .returns({
-          message: {
-            send,
-          },
-        })
-        .onSecondCall()
-        .returns(false),
-    };
-    const messageHandler = new MessageHandler(event, {}, service, stateManager);
-    stateManager.setState('user', 'test-user', {
+    const telegramSendToUser = fake.resolves(true);
+    const externalSendToUser = fake.resolves(true);
+    stateManager.setState('service', 'telegram', { message: { sendToUser: telegramSendToUser } });
+    stateManager.setState('service', 'ext-john-gladys-signal', { message: { sendToUser: externalSendToUser } });
+    // services without the outbound interface are simply skipped
+    stateManager.setState('service', 'philips-hue', { device: {} });
+    stateManager.setState('service', 'broken', null);
+    const messageHandler = new MessageHandler(event, {}, buildServiceManager(stateManager), stateManager);
+    const user = {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       telegram_user_id: 'one-id',
-    });
+    };
+    stateManager.setState('user', 'test-user', user);
     const message = await messageHandler.sendToUser('test-user', 'coucou');
-    expect(message).to.have.property('id');
     expect(message).to.have.property('text', 'coucou');
-    assert.calledOnce(send);
+    assert.calledOnce(telegramSendToUser);
+    assert.calledWith(telegramSendToUser, user);
+    assert.calledOnce(externalSendToUser);
+    expect(externalSendToUser.firstCall.args[1]).to.have.property('text', 'coucou');
   });
-  it('should send message and send callmebot message', async () => {
+
+  it('should not fail when a channel fails, and still try the others', async () => {
     const event = new EventEmitter();
     const stateManager = new StateManager();
-    const send = fake.resolves(true);
-    const service = {
-      getService: stub()
-        .onFirstCall()
-        .returns(null)
-        .onSecondCall()
-        .returns(null)
-        .onThirdCall()
-        .returns({
-          message: {
-            send,
-          },
-        }),
-    };
-    const variable = {};
-    const messageHandler = new MessageHandler(event, {}, service, stateManager, variable);
+    const failingSendToUser = fake.rejects(new Error('CHANNEL_DOWN'));
+    const workingSendToUser = fake.resolves(true);
+    stateManager.setState('service', 'a-failing-channel', { message: { sendToUser: failingSendToUser } });
+    stateManager.setState('service', 'z-working-channel', { message: { sendToUser: workingSendToUser } });
+    const messageHandler = new MessageHandler(event, {}, buildServiceManager(stateManager), stateManager);
     stateManager.setState('user', 'test-user', {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
     });
     const message = await messageHandler.sendToUser('test-user', 'coucou');
-    expect(message).to.have.property('id');
     expect(message).to.have.property('text', 'coucou');
-    assert.calledOnce(send);
+    assert.calledOnce(failingSendToUser);
+    assert.calledOnce(workingSendToUser);
   });
-  it('should send message and send nextcloud talk message', async () => {
-    const event = new EventEmitter();
-    const stateManager = new StateManager();
-    const send = fake.resolves(true);
-    const service = {
-      getService: stub()
-        .onFirstCall()
-        .returns(false)
-        .onSecondCall()
-        .returns({
-          message: {
-            send,
-          },
-        }),
-    };
-    const variable = {
-      getValue: fake.resolves('a1z2e3'),
-    };
-    const messageHandler = new MessageHandler(event, {}, service, stateManager, variable);
-    stateManager.setState('user', 'test-user', {
-      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
-      nextcloud_talk_token: 'a1z2e3',
-    });
-    const message = await messageHandler.sendToUser('test-user', 'coucou');
-    expect(message).to.have.property('id');
-    expect(message).to.have.property('text', 'coucou');
-    assert.calledOnce(send);
-  });
+
   it('should throw error, user not found', async () => {
     const event = new EventEmitter();
     const stateManager = new StateManager();
-    let send;
-    const service = {
-      getService: () => {
-        send = fake.resolves(true);
-        return {
-          message: {
-            send,
-          },
-        };
-      },
-    };
-    const messageHandler = new MessageHandler(event, {}, service, stateManager);
+    const messageHandler = new MessageHandler(event, {}, buildServiceManager(stateManager), stateManager);
     stateManager.setState('user', 'test-user', {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
-      telegram_user_id: 'one-id',
     });
     const promise = messageHandler.sendToUser('user-not-found', 'coucou');
     return assertChai.isRejected(promise);

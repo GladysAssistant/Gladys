@@ -1568,6 +1568,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DEVICE_DELETED: 'external-integration.device-deleted',
     HEARTBEAT: 'external-integration.heartbeat',
     CONFIG_UPDATED: 'external-integration.config-updated',
+    MESSAGE_SEND: 'external-integration.message.send',
   },
 };
 

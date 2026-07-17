@@ -665,6 +665,7 @@
         "lastPushLabel": "Dernière mise à jour :",
         "warningTitle": "Intégration communautaire",
         "warningText": "Cette intégration est développée par la communauté et n'est pas maintenue par l'équipe Gladys Assistant. Elle s'exécute dans un conteneur Docker isolé, mais vous ne devriez installer que des intégrations provenant de développeurs de confiance.",
+        "communicationWarningText": "Cette intégration est un canal de messagerie : une fois votre compte lié, elle pourra envoyer et recevoir des messages en votre nom (déclencher des scènes, contrôler votre maison via le cerveau de Gladys).",
         "notCompatible": "Cette intégration n'est pas compatible avec votre installation de Gladys.",
         "installError": "Une erreur s'est produite lors de l'installation de cette intégration.",
         "alreadyInstalled": "Cette intégration est déjà installée.",
@@ -695,6 +696,16 @@
         "refreshButton": "Rafraîchir",
         "error": "Une erreur s'est produite lors du chargement des journaux.",
         "empty": "Aucun journal disponible."
+      },
+      "link": {
+        "title": "Lier mon compte",
+        "notLinkedText": "Votre compte n'est pas lié à ce canal de messagerie. Générez un code, puis envoyez-le au bot dans le canal externe pour lier votre compte.",
+        "linkedText": "Votre compte est lié à :",
+        "generateCodeButton": "Générer un code de liaison",
+        "codeText": "Envoyez ce code au bot :",
+        "codeExpiryText": "Ce code est à usage unique et expire dans 15 minutes.",
+        "unlinkButton": "Délier mon compte",
+        "error": "Une erreur s'est produite lors de la liaison du compte."
       }
     },
     "energyMonitoring": {

@@ -66,7 +66,7 @@ async function install({ dockerImage, manifest, storeSlug = null }) {
       name: selector,
       selector,
       version: finalManifest.version,
-      has_message_feature: false,
+      has_message_feature: finalManifest.type === 'communication',
       status: SERVICE_STATUS.ENABLED,
       type: SERVICE_TYPES.EXTERNAL,
       docker_image: image,

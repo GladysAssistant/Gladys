@@ -83,6 +83,7 @@ function Gladys(params = {}) {
     device,
     variable,
     params.jwtSecret,
+    cache,
   );
   const gateway = new Gateway(
     variable,

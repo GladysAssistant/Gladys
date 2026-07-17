@@ -4,12 +4,14 @@ import get from 'get-value';
 
 import ConfigSchemaForm from './ConfigSchemaForm';
 import SupervisionCard from './SupervisionCard';
+import LinkAccountCard from './LinkAccountCard';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const ConfigTab = props => {
   const { integration, loadStatus, user } = props;
   const schema = get(integration, 'manifest.config_schema') || [];
   const language = (user && user.language) || 'en';
+  const isCommunication = get(integration, 'manifest.type') === 'communication';
 
   return (
     <div>
@@ -53,6 +55,16 @@ const ConfigTab = props => {
           </div>
         </div>
       </div>
+
+      {isCommunication && (
+        <LinkAccountCard
+          contact={props.contact}
+          linkCode={props.linkCode}
+          linkStatus={props.linkStatus}
+          onGenerateCode={props.generateLinkCode}
+          onUnlink={props.unlinkContact}
+        />
+      )}
 
       {integration && (
         <SupervisionCard

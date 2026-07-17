@@ -25,6 +25,11 @@ describe('externalIntegration.validateManifest', () => {
     expect(validated).to.deep.equal(TEST_MANIFEST);
   });
 
+  it('should accept a communication manifest', () => {
+    const manifest = { ...TEST_MANIFEST, type: 'communication' };
+    expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
+  });
+
   it('should accept a manifest without optional fields', () => {
     const { cover_image: coverImage, config_schema: configSchema, ...minimalManifest } = TEST_MANIFEST;
     const validated = externalIntegration.validateManifest(minimalManifest);

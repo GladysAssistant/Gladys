@@ -106,7 +106,10 @@ class Integration extends Component {
 
   buildExternalIntegrationCards() {
     const { user = {}, category } = this.props;
-    if (user.role !== USER_ROLE.ADMIN || (category && category !== 'device')) {
+    // external integrations live in the category matching their manifest
+    // type: "device" or "communication"
+    const EXTERNAL_CATEGORIES = ['device', 'communication'];
+    if (user.role !== USER_ROLE.ADMIN || (category && !EXTERNAL_CATEGORIES.includes(category))) {
       return [];
     }
     const language = user.language || 'en';
@@ -131,7 +134,7 @@ class Integration extends Component {
         key: `external-${integration.selector}`,
         external: true,
         externalInstalled: true,
-        type: 'device',
+        type: manifest.type === 'communication' ? 'communication' : 'device',
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: `/dashboard/integration/device/external/${integration.selector}`,
@@ -152,7 +155,7 @@ class Integration extends Component {
         key: `external-store-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
-        type: 'device',
+        type: manifest.type === 'communication' ? 'communication' : 'device',
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled
@@ -163,6 +166,9 @@ class Integration extends Component {
       });
     });
 
+    if (category) {
+      return externalCards.filter(card => card.type === category);
+    }
     return externalCards;
   }
 

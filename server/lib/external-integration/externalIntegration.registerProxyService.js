@@ -15,6 +15,33 @@ const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
  * gladys.externalIntegration.registerProxyService(service);
  */
 function registerProxyService(service) {
+  // communication integrations expose the generic outbound channel
+  // interface: message.send (reply path, by contact id) and
+  // message.sendToUser (forwardToChannels loop — the proxy resolves the
+  // linked contact itself and no-ops when the user is not linked)
+  const isCommunication = service.manifest && service.manifest.type === 'communication';
+  const messageCapability = isCommunication
+    ? {
+        message: Object.freeze({
+          send: async (contactId, message) => {
+            await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MESSAGE_SEND, {
+              contact_id: contactId,
+              message: { text: message.text, file: message.file || null },
+            });
+          },
+          sendToUser: async (user, message) => {
+            const contact = await this.getContactForUser(service, user.id);
+            if (!contact) {
+              return;
+            }
+            await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MESSAGE_SEND, {
+              contact_id: contact.contact_id,
+              message: { text: message.text, file: message.file || null },
+            });
+          },
+        }),
+      }
+    : {};
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -22,6 +49,7 @@ function registerProxyService(service) {
     stop: async () => {
       await this.stop(service.selector);
     },
+    ...messageCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {

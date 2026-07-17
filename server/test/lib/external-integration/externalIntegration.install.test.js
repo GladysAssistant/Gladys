@@ -6,7 +6,7 @@ const db = require('../../../models');
 const { BadParameters, ConflictError, PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { Error422 } = require('../../../utils/httpErrors');
 const { SERVICE_TYPES } = require('../../../utils/constants');
-const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('./testUtils.test');
+const { buildSupervisor, seedExternalService, TEST_MANIFEST, TEST_COMMUNICATION_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.install', () => {
   it('should install an integration in dev mode with an inline manifest', async () => {
@@ -182,6 +182,14 @@ describe('externalIntegration.install', () => {
     } catch (e) {
       expect(e).to.be.instanceOf(Error422);
     }
+  });
+
+  it('should flag communication integrations with has_message_feature', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const integration = await externalIntegration.install({ manifest: TEST_COMMUNICATION_MANIFEST });
+    expect(integration.has_message_feature).to.equal(true);
+    const serviceInDb = await db.Service.findOne({ where: { selector: integration.selector } });
+    expect(serviceInDb.has_message_feature).to.equal(true);
   });
 
   it('should set the integration in ERROR when the container cannot be created', async () => {

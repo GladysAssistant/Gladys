@@ -665,6 +665,7 @@
         "lastPushLabel": "Last update:",
         "warningTitle": "Community integration",
         "warningText": "This integration is developed by the community and is not maintained by the Gladys Assistant team. It runs in an isolated Docker container, but you should only install integrations from developers you trust.",
+        "communicationWarningText": "This integration is a messaging channel: once your account is linked, it will be able to send and receive messages on your behalf (trigger scenes, control your home through the Gladys brain).",
         "notCompatible": "This integration is not compatible with your Gladys installation.",
         "installError": "There was an error installing this integration.",
         "alreadyInstalled": "This integration is already installed.",
@@ -695,6 +696,16 @@
         "refreshButton": "Refresh",
         "error": "An error occurred while loading the logs.",
         "empty": "No logs available."
+      },
+      "link": {
+        "title": "Link my account",
+        "notLinkedText": "Your account is not linked to this messaging channel. Generate a code, then send it to the bot in the external channel to link your account.",
+        "linkedText": "Your account is linked to:",
+        "generateCodeButton": "Generate a link code",
+        "codeText": "Send this code to the bot:",
+        "codeExpiryText": "This code is single use and expires in 15 minutes.",
+        "unlinkButton": "Unlink my account",
+        "error": "An error occurred while linking the account."
       }
     },
     "telegram": {

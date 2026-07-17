@@ -3,6 +3,7 @@ const { fake } = require('sinon');
 const ExternalIntegration = require('../../../lib/external-integration');
 const StateManager = require('../../../lib/state');
 const Variable = require('../../../lib/variable');
+const { Cache } = require('../../../utils/cache');
 const db = require('../../../models');
 const { SERVICE_STATUS, SERVICE_TYPES } = require('../../../utils/constants');
 
@@ -59,6 +60,21 @@ const TEST_MANIFEST = {
   ],
 };
 
+// Communication-type fixture: a messaging channel (Telegram-like bot), no
+// device screens, the user links their account with a short code.
+const TEST_COMMUNICATION_MANIFEST = {
+  manifest_version: 1,
+  type: 'communication',
+  name: 'Signal Bridge Demo',
+  description: {
+    en: 'Signal messaging channel demo integration.',
+    fr: 'Intégration démo : canal de messagerie Signal.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-signal-bridge:1.0.0',
+  gladys_version: '>=4.62.0',
+};
+
 /**
  * @description Build a fake system manager for supervisor tests.
  * @param {object} [overrides] - Fakes to override.
@@ -107,6 +123,7 @@ function buildSupervisor({ system: systemOverrides } = {}) {
   const device = { destroy: fake.resolves(null) };
   const variable = new Variable(event);
   const serviceManager = {};
+  const cache = new Cache();
   const externalIntegration = new ExternalIntegration(
     event,
     system,
@@ -115,9 +132,10 @@ function buildSupervisor({ system: systemOverrides } = {}) {
     device,
     variable,
     TEST_JWT_SECRET,
+    cache,
   );
   externalIntegration.available = true;
-  return { externalIntegration, event, system, stateManager, device, variable };
+  return { externalIntegration, event, system, stateManager, device, variable, cache };
 }
 
 /**
@@ -147,6 +165,7 @@ async function seedExternalService(overrides = {}) {
 module.exports = {
   TEST_JWT_SECRET,
   TEST_MANIFEST,
+  TEST_COMMUNICATION_MANIFEST,
   buildFakeSystem,
   buildSupervisor,
   seedExternalService,

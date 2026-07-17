@@ -287,6 +287,56 @@ describe('External integration admin API', () => {
     });
   });
 
+  describe('communication: link_code and contact (per-user)', () => {
+    it('should generate a code, show and revoke the own link of the current user', async () => {
+      const service = await seedExternalService({
+        manifest: { ...TEST_MANIFEST, type: 'communication', config_schema: undefined },
+        has_message_feature: true,
+      });
+      const codeRes = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/link_code`)
+        .send({})
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(codeRes.body.code).to.be.a('string');
+      expect(codeRes.body.expires_at).to.be.a('string');
+      // not linked yet
+      const beforeRes = await authenticatedRequest
+        .get(`/api/v1/external_integration/${service.selector}/contact`)
+        .expect(200);
+      expect(beforeRes.body).to.deep.equal({ linked: false, contact_id: null, contact_name: null, linked_at: null });
+      // the integration links the contact with the code
+      await gladys.externalIntegration.linkContact(service, {
+        code: codeRes.body.code,
+        contact_id: 'signal-12345',
+        contact_name: 'John on Signal',
+      });
+      const afterRes = await authenticatedRequest
+        .get(`/api/v1/external_integration/${service.selector}/contact`)
+        .expect(200);
+      expect(afterRes.body.linked).to.equal(true);
+      expect(afterRes.body.contact_id).to.equal('signal-12345');
+      // revocation by the user
+      await authenticatedRequest
+        .delete(`/api/v1/external_integration/${service.selector}/contact`)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.deep.equal({ success: true });
+        });
+      const revokedRes = await authenticatedRequest
+        .get(`/api/v1/external_integration/${service.selector}/contact`)
+        .expect(200);
+      expect(revokedRes.body.linked).to.equal(false);
+    });
+
+    it('should return 404 on an unknown integration', async () => {
+      await authenticatedRequest
+        .post('/api/v1/external_integration/ext-unknown/link_code')
+        .send({})
+        .expect(404);
+    });
+  });
+
   describe('DELETE /api/v1/external_integration/:selector', () => {
     it('should uninstall the integration', async () => {
       const service = await seedExternalService({ container_id: null });

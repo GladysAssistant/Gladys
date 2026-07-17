@@ -127,6 +127,13 @@ class ExternalIntegrationInstallPage extends Component {
                               <Text id="integration.externalIntegration.install.warningText" />
                             </div>
 
+                            {manifest.type === 'communication' && (
+                              <div class="alert alert-warning">
+                                <i class="fe fe-message-circle mr-1" />
+                                <Text id="integration.externalIntegration.install.communicationWarningText" />
+                              </div>
+                            )}
+
                             {storeIntegration.compatible === false && (
                               <div class="alert alert-danger">
                                 <Text id="integration.externalIntegration.install.notCompatible" />
