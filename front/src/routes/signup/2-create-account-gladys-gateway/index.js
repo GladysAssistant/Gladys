@@ -8,6 +8,7 @@ import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
 import RestoreBackup from './RestoreBackup';
 import SetRestoreKey from './SetRestoreKey';
 import RestoreInProgress from './RestoreInProgress';
+import LocalAccountAlternative from './LocalAccountAlternative';
 import linkState from 'linkstate';
 
 class CreateAccountGladysGateway extends Component {
@@ -108,6 +109,9 @@ class CreateAccountGladysGateway extends Component {
               )}
               {step === 2 && (
                 <div class="col col-login mx-auto">
+                  <Link href="/signup" class="btn btn-secondary btn-sm mb-4 mt-6">
+                    <Text id="global.backButton" />
+                  </Link>
                   <SetRestoreKey
                     {...this.props}
                     backupKey={backupKey}
@@ -116,11 +120,24 @@ class CreateAccountGladysGateway extends Component {
                     updateBackupKey={linkState(this, 'backupKey')}
                     saveBackupKey={this.saveBackupKey}
                   />
+                  <div class="mt-4">
+                    <LocalAccountAlternative />
+                  </div>
                 </div>
               )}
               {step === 3 && !this.props.gatewayRestoreInProgress && (
                 <div class="col-md-6 mx-auto">
-                  <RestoreBackup {...this.props} restoreBackup={this.restoreBackup} />
+                  <Link href="/signup" class="btn btn-secondary btn-sm mb-4 mt-6">
+                    <Text id="global.backButton" />
+                  </Link>
+                  <RestoreBackup
+                    {...this.props}
+                    restoreBackup={this.restoreBackup}
+                    changeStepToUpdateRestoreKey={this.changeStepToUpdateRestoreKey}
+                  />
+                  <div class="mt-4">
+                    <LocalAccountAlternative />
+                  </div>
                 </div>
               )}
               {step === 4 && (
@@ -140,6 +157,6 @@ class CreateAccountGladysGateway extends Component {
 }
 
 export default connect(
-  'user,session,httpClient,gatewayBackups,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
+  'user,session,httpClient,gatewayBackups,gatewayGetBackupsStatus,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
   actions
 )(CreateAccountGladysGateway);
