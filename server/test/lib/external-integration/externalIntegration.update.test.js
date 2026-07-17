@@ -73,6 +73,16 @@ describe('externalIntegration.update', () => {
     externalIntegration.clearTimers(service.id);
   });
 
+  it('should keep updating when the old sub-containers cannot be removed', async () => {
+    const service = await seedExternalService({ store_slug: null });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.removeSubContainers = fake.rejects(new Error('CANNOT_REMOVE_SUB_CONTAINERS'));
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.2.0');
+    sinonAssert.calledOnce(externalIntegration.removeSubContainers);
+    externalIntegration.clearTimers(service.id);
+  });
+
   it('should throw an explicit error when the new image cannot be pulled', async () => {
     const service = await seedExternalService();
     const { externalIntegration } = buildSupervisor({
