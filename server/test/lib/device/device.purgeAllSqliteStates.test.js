@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
-const { fake } = require('sinon');
+const { fake, assert: sinonAssert, match } = require('sinon');
 const uuid = require('uuid');
 
 const db = require('../../../models');
@@ -61,5 +61,38 @@ describe('Device', () => {
     });
     // should not start a new purge when a purge is running
     expect(emptyRes).to.equal(null);
+    // The job carries the structured facts displayed by the jobs page
+    sinonAssert.calledWith(job.updateProgress, '632c6d92-a79a-4a38-bf5b-a2024721c101', 0, { step: 'counting' });
+    sinonAssert.calledWith(job.updateProgress, '632c6d92-a79a-4a38-bf5b-a2024721c101', 0, {
+      sqlite_states_count: 110,
+      aggregates_count: 3,
+      step: 'deleting_states',
+    });
+    sinonAssert.calledWith(job.updateProgress, '632c6d92-a79a-4a38-bf5b-a2024721c101', match.number, {
+      step: 'deleting_aggregates',
+    });
+  });
+  it('should not report the deleting_aggregates step when there is no aggregate to delete', async () => {
+    await db.DeviceFeatureStateAggregate.destroy({ where: {} });
+    const variable = {
+      getValue: fake.resolves(30),
+    };
+    const stateManager = new StateManager(event);
+    const job = {
+      updateProgress: fake.resolves(null),
+      wrapper: (type, func) => func,
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const devicePurged = await device.purgeAllSqliteStates('632c6d92-a79a-4a38-bf5b-a2024721c101');
+    expect(devicePurged).to.deep.equal({
+      numberOfDeviceFeatureStateAggregateToDelete: 0,
+      numberOfDeviceFeatureStateToDelete: 110,
+    });
+    sinonAssert.neverCalledWith(
+      job.updateProgress,
+      '632c6d92-a79a-4a38-bf5b-a2024721c101',
+      match.number,
+      match({ step: 'deleting_aggregates' }),
+    );
   });
 });

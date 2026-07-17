@@ -2,6 +2,7 @@ const express = require('express');
 
 // Middlewares with dependences
 const AuthMiddleware = require('./middlewares/authMiddleware');
+const AuthenticatedOrNotConfiguredMiddleware = require('./middlewares/authenticatedOrNotConfigured');
 const IsInstanceConfiguredMiddleware = require('./middlewares/isInstanceConfigured');
 const CorsMiddleware = require('./middlewares/corsMiddleware');
 
@@ -25,6 +26,7 @@ function setupRoutes(gladys) {
   const router = express.Router();
   const routes = getRoutes(gladys);
   const authMiddleware = AuthMiddleware('dashboard:write', gladys);
+  const authenticatedOrNotConfiguredMiddleware = AuthenticatedOrNotConfiguredMiddleware('dashboard:write', gladys);
   const isInstanceConfiguredMiddleware = IsInstanceConfiguredMiddleware(gladys);
   const resetPasswordAuthMiddleware = AuthMiddleware('reset-password:write', gladys);
   const alarmMiddleware = AuthMiddleware('alarm:write', gladys);
@@ -47,9 +49,14 @@ function setupRoutes(gladys) {
     if (routes[routeKey].authenticated && routes[routeKey].scope) {
       routerParams.push(AuthMiddleware(routes[routeKey].scope, gladys));
     }
-    // if the route is marked as admin
-    if (routes[routeKey].admin) {
+    // if the route is marked as admin (the admin check of "authenticatedOrNotConfigured"
+    // routes is handled by their dedicated middleware below)
+    if (routes[routeKey].admin && !routes[routeKey].authenticatedOrNotConfigured) {
       routerParams.push(adminMiddleware);
+    }
+    // if the route requires an authenticated admin user only once the instance is configured
+    if (routes[routeKey].authenticatedOrNotConfigured) {
+      routerParams.push(authenticatedOrNotConfiguredMiddleware);
     }
     // if the route need rate limit
     if (routes[routeKey].rateLimit) {

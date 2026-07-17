@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { bytesFormatter } from '../../../utils/bytesFormat';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 dayjs.extend(relativeTime);
 
@@ -31,7 +32,7 @@ class GatewayBackupRow extends Component {
             .locale(props.user.language)
             .fromNow()}
         </td>
-        <td>{bytesFormatter(props.backup.size)}</td>
+        <td>{bytesFormatter(props.backup.size, props.user.language, this.props.intl.dictionary)}</td>
         <td class="text-right">
           {!confirmBackup && (
             <button class="btn btn-success" onClick={this.askForConfirmation}>
@@ -54,4 +55,4 @@ class GatewayBackupRow extends Component {
   }
 }
 
-export default GatewayBackupRow;
+export default withIntlAsProp(GatewayBackupRow);
