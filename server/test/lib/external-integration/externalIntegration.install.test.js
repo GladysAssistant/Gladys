@@ -6,7 +6,12 @@ const db = require('../../../models');
 const { BadParameters, ConflictError, PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { Error422 } = require('../../../utils/httpErrors');
 const { SERVICE_TYPES } = require('../../../utils/constants');
-const { buildSupervisor, seedExternalService, TEST_MANIFEST, TEST_COMMUNICATION_MANIFEST } = require('./testUtils.test');
+const {
+  buildSupervisor,
+  seedExternalService,
+  TEST_MANIFEST,
+  TEST_COMMUNICATION_MANIFEST,
+} = require('./testUtils.test');
 
 describe('externalIntegration.install', () => {
   it('should install an integration in dev mode with an inline manifest', async () => {

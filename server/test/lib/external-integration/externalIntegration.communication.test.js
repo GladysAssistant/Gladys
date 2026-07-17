@@ -31,9 +31,9 @@ describe('externalIntegration.createLinkCode / linkContact', () => {
     expect(contact.contact_id).to.equal('signal-12345');
     expect(contact.contact_name).to.equal('John on Signal');
     // single use: the code died with the first attempt
-    await expect(
-      externalIntegration.linkContact(service, { code, contact_id: 'signal-6789' }),
-    ).to.be.rejectedWith(NotFoundError);
+    await expect(externalIntegration.linkContact(service, { code, contact_id: 'signal-6789' })).to.be.rejectedWith(
+      NotFoundError,
+    );
   });
 
   it('should reject a malformed link request', async () => {
@@ -49,16 +49,14 @@ describe('externalIntegration.createLinkCode / linkContact', () => {
   it('should reject an unknown or expired code', async () => {
     const { externalIntegration, cache } = buildSupervisor();
     const service = await seedCommunicationService();
-    await expect(
-      externalIntegration.linkContact(service, { code: 'UNKNOWN1', contact_id: 'x' }),
-    ).to.be.rejectedWith(NotFoundError);
+    await expect(externalIntegration.linkContact(service, { code: 'UNKNOWN1', contact_id: 'x' })).to.be.rejectedWith(
+      NotFoundError,
+    );
     const { code } = await externalIntegration.createLinkCode(service.selector, JOHN_USER_ID);
     // force the expiry
     const cacheKey = `external-integration-link-code:${service.id}:${code}`;
     cache.set(cacheKey, { userId: JOHN_USER_ID, expiresAt: Date.now() - 1000 });
-    await expect(externalIntegration.linkContact(service, { code, contact_id: 'x' })).to.be.rejectedWith(
-      NotFoundError,
-    );
+    await expect(externalIntegration.linkContact(service, { code, contact_id: 'x' })).to.be.rejectedWith(NotFoundError);
   });
 
   it('should reject a code bound to a deleted user', async () => {
@@ -67,9 +65,7 @@ describe('externalIntegration.createLinkCode / linkContact', () => {
     const { code } = await externalIntegration.createLinkCode(service.selector, JOHN_USER_ID);
     const cacheKey = `external-integration-link-code:${service.id}:${code}`;
     cache.set(cacheKey, { userId: 'e2c85162-9d92-4d24-a778-98b4d2ec7568', expiresAt: Date.now() + 10000 });
-    await expect(externalIntegration.linkContact(service, { code, contact_id: 'x' })).to.be.rejectedWith(
-      NotFoundError,
-    );
+    await expect(externalIntegration.linkContact(service, { code, contact_id: 'x' })).to.be.rejectedWith(NotFoundError);
   });
 });
 
