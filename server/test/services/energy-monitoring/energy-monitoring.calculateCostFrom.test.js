@@ -1,10 +1,11 @@
-const { fake } = require('sinon');
+const { fake, stub } = require('sinon');
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const historicalTempoData = require('./data/tempo_mock');
+const logger = require('../../../utils/logger');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -452,7 +453,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     ]);
     const energyMonitoring = new EnergyMonitoring(gladys, '43732e67-6669-4a95-83d6-38c50b835387');
     const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, '43732e67-6669-4a95-83d6-38c50b835387');
+    await energyMonitoring.calculateCostFrom(date, undefined, '43732e67-6669-4a95-83d6-38c50b835387');
     const deviceFeatureState = await device.getDeviceFeatureStates(
       'power-plug-consumption-cost-2',
       new Date('2025-01-01T00:00:00.000Z'),
@@ -489,7 +490,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     });
     const energyMonitoring = new EnergyMonitoring(gladys, 'edb7b8c6-77a7-43b7-8a2f-67a723ddd0b1');
     const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, 'edb7b8c6-77a7-43b7-8a2f-67a723ddd0b1');
+    await energyMonitoring.calculateCostFrom(date, undefined, 'edb7b8c6-77a7-43b7-8a2f-67a723ddd0b1');
     // No assertion needed; executing the branch covers the logger line.
   });
   it('should handle device with no daily consumption feature (logs missing daily feature)', async () => {
@@ -503,7 +504,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     });
     const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
     const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    await energyMonitoring.calculateCostFrom(date, undefined, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
     // The code path logs the absence of a daily consumption feature.
   });
   it('should handle case where no energy price is found for the device at the given date (logs and returns)', async () => {
@@ -573,7 +574,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     ]);
     const energyMonitoring = new EnergyMonitoring(gladys, 'a3e1fcb2-9c74-4bb1-8fc7-9eaa2b2f2d12');
     const date = new Date('2025-08-28T00:00:00.000Z');
-    await energyMonitoring.calculateCostFrom(date, 'a3e1fcb2-9c74-4bb1-8fc7-9eaa2b2f2d12');
+    await energyMonitoring.calculateCostFrom(date, undefined, 'a3e1fcb2-9c74-4bb1-8fc7-9eaa2b2f2d12');
     // This executes the branch where no energy price is found for the state timestamp.
   });
   it('should catch and log an error during processing', async () => {
@@ -585,7 +586,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     try {
       const energyMonitoring = new EnergyMonitoring(gladys, '6f6e3a7a-d826-4a99-8fdb-4f6a9a16a8a3');
       const date = new Date('2025-08-28T00:00:00.000Z');
-      await energyMonitoring.calculateCostFrom(date, '6f6e3a7a-d826-4a99-8fdb-4f6a9a16a8a3');
+      await energyMonitoring.calculateCostFrom(date, undefined, '6f6e3a7a-d826-4a99-8fdb-4f6a9a16a8a3');
     } finally {
       // Restore original function to avoid side effects on other tests
       gladys.device.energySensorManager.getRootElectricMeterDevice = original;
@@ -652,7 +653,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
       const date = new Date('2025-08-28T00:00:00.000Z');
 
       // This should not throw - it should skip the broken feature and log a warning
-      await energyMonitoring.calculateCostFrom(date, 'a1b2c3d4-e5f6-7890-abcd-000000000004');
+      await energyMonitoring.calculateCostFrom(date, undefined, 'a1b2c3d4-e5f6-7890-abcd-000000000004');
 
       // Verify that no cost states were created for the broken feature
       const costStates = await device.getDeviceFeatureStates(
@@ -664,6 +665,92 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     } finally {
       // Restore original function
       gladys.device.energySensorManager.getRootElectricMeterDevice = original;
+    }
+  });
+
+  it('should skip cost feature when selector is not in the provided whitelist', async () => {
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.BASE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      // 0,18€/kwh stored as integer with 4 decimals
+      price: 1800,
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+      {
+        value: 20,
+        created_at: new Date('2025-08-28T15:01:00.000Z'),
+      },
+    ]);
+    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    // Whitelist excludes 'power-plug-consumption-cost', so nothing should be calculated
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'), ['non-matching-selector']);
+    const costStates = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      new Date('2025-01-01T00:00:00.000Z'),
+      new Date('2025-12-01T00:00:00.000Z'),
+    );
+    expect(costStates).to.have.lengthOf(0);
+  });
+
+  it('should skip a state when no energy price matches its date', async () => {
+    // Insert consumption states but do NOT create any energy price.
+    // This forces energyPricesForDate to be empty inside the per-state loop.
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+      {
+        value: 20,
+        created_at: new Date('2025-08-28T15:01:00.000Z'),
+      },
+    ]);
+    const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+    await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+    const costStates = await device.getDeviceFeatureStates(
+      'power-plug-consumption-cost',
+      new Date('2025-01-01T00:00:00.000Z'),
+      new Date('2025-12-01T00:00:00.000Z'),
+    );
+    expect(costStates).to.have.lengthOf(0);
+  });
+
+  it('should catch and log when saving cost states fails for a feature', async () => {
+    await energyPrice.create({
+      electric_meter_device_id: electricalMeterDevice.id,
+      contract: ENERGY_CONTRACT_TYPES.BASE,
+      price_type: ENERGY_PRICE_TYPES.CONSUMPTION,
+      currency: 'euro',
+      start_date: '2025-01-01',
+      // 0,18€/kwh stored as integer with 4 decimals
+      price: 1800,
+    });
+    await db.duckDbBatchInsertState('17488546-e1b8-4cb9-bd75-e20526a94a99', [
+      {
+        value: 10,
+        created_at: new Date('2025-08-28T15:00:00.000Z'),
+      },
+      {
+        value: 20,
+        created_at: new Date('2025-08-28T15:01:00.000Z'),
+      },
+    ]);
+    const errorStub = stub(logger, 'error');
+    const saveMultipleStub = stub(device, 'saveMultipleHistoricalStates').rejects(new Error('boom'));
+    try {
+      const energyMonitoring = new EnergyMonitoring(gladys, 'b8c55219-0dc2-4a32-8d3d-6a7b2d4a1c22');
+      await energyMonitoring.calculateCostFrom(new Date('2025-08-28T00:00:00.000Z'));
+      expect(errorStub.called).to.equal(true);
+    } finally {
+      saveMultipleStub.restore();
+      errorStub.restore();
     }
   });
 });
