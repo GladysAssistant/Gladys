@@ -342,6 +342,16 @@ function getRoutes(gladys) {
       rateLimit: true,
       controller: gatewayController.loginTwoFactor,
     },
+    'post /api/v1/gateway/configure-two-factor': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.configureTwoFactor,
+    },
+    'post /api/v1/gateway/enable-two-factor': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.enableTwoFactor,
+    },
     'get /api/v1/gateway/key': {
       authenticated: true,
       admin: true,
