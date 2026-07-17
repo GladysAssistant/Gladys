@@ -432,27 +432,6 @@ function createActions(store) {
       script.onload = () => {
         store.setState({ stripeLoaded: true });
       };
-    },
-    async tempSignupForRestore(state, language) {
-      await state.session.init();
-      if (state.session.isConnected()) {
-        return null;
-      }
-      const user = await state.httpClient.post(`/api/v1/signup`, {
-        firstname: 'temp-user',
-        lastname: 'temp-user',
-        password: 'temp-password',
-        role: 'admin',
-        email: 'temp-user@test.fr',
-        language,
-        birthdate: new Date()
-      });
-      store.setState({
-        user,
-        createLocalAccountStatus: RequestStatus.Success
-      });
-      await state.session.saveUser(user);
-      await state.session.init();
     }
   };
   return actions;

@@ -69,6 +69,19 @@ module.exports = function GatewayController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/gateway/backup-key
+   * @apiName saveBackupKey
+   * @apiGroup Gateway
+   * @apiParam {String} backup_key The backup encryption key.
+   */
+  async function saveBackupKey(req, res) {
+    await gladys.gateway.saveBackupKey(req.body.backup_key);
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
    * @api {get} /api/v1/gateway/backup
    * @apiName getBackups
    * @apiGroup Gateway
@@ -244,6 +257,7 @@ module.exports = function GatewayController(gladys) {
     loginTwoFactor: asyncMiddleware(loginTwoFactor),
     getUsersKeys: asyncMiddleware(getUsersKeys),
     saveUsersKeys: asyncMiddleware(saveUsersKeys),
+    saveBackupKey: asyncMiddleware(saveBackupKey),
     getBackups: asyncMiddleware(getBackups),
     createBackup: asyncMiddleware(createBackup),
     restoreBackup: asyncMiddleware(restoreBackup),

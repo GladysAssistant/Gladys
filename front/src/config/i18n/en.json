@@ -155,17 +155,28 @@
       "backupKeyLabel": "Backup key",
       "backupKeyPlaceholder": "Enter your backup key",
       "cancelButton": "Cancel",
-      "saveButton": "Save backup key"
+      "saveButton": "Save backup key",
+      "error": "Unable to save the backup key. Please check that your instance is connected to the internet and try again."
     },
     "restoreBackupInProgress": {
       "title": "Restore in progress...",
       "description": "At the end of the restore process, Gladys will restart automatically.",
       "errored": "Backup restore failed, maybe the restore key is not valid",
-      "updateRestoreKeyButton": "Update restore key"
+      "erroredHelp": "If you can't restore your backup, you can create a local account now, connect Gladys Plus later in the settings, and restore your backup at that moment.",
+      "updateRestoreKeyButton": "Update restore key",
+      "createLocalAccountButton": "Create a local account"
     },
     "gatewayBackup": {
       "title": "Choose a backup",
-      "description": "Choose the backup you want to restore in this list."
+      "description": "Choose the backup you want to restore in this list.",
+      "changeKeyButton": "Change backup key",
+      "refreshButton": "Refresh",
+      "noBackupsFound": "No backups were found on this Gladys Plus account.",
+      "error": "Unable to retrieve your backups. Please check that your instance is connected to the internet and try again."
+    },
+    "restoreLocalAccountAlternative": {
+      "text": "You can also create a local account now, connect Gladys Plus later in the settings, and restore your backup at that moment.",
+      "linkText": "Create a local account"
     },
     "preferences": {
       "title": "Your preferences",

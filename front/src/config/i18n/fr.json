@@ -155,17 +155,28 @@
       "backupKeyLabel": "Clé de restauration",
       "backupKeyPlaceholder": "Saisissez votre clé de restauration",
       "cancelButton": "Annuler",
-      "saveButton": "Enregistrer"
+      "saveButton": "Enregistrer",
+      "error": "Impossible d'enregistrer la clé de restauration. Vérifiez que votre instance est bien connectée à Internet et réessayez."
     },
     "restoreBackupInProgress": {
       "title": "Restauration en cours...",
       "description": "À la fin du processus de restauration, Gladys redémarrera automatiquement.",
       "errored": "La restauration a échoué, la clé de restauration n'est peut-être pas valide",
-      "updateRestoreKeyButton": "Mettre à jour la clé de restauration"
+      "erroredHelp": "Si vous n'arrivez pas à restaurer votre sauvegarde, vous pouvez créer un compte local dès maintenant, connecter Gladys Plus plus tard dans les paramètres, et restaurer votre sauvegarde à ce moment-là.",
+      "updateRestoreKeyButton": "Mettre à jour la clé de restauration",
+      "createLocalAccountButton": "Créer un compte local"
     },
     "gatewayBackup": {
       "title": "Sélectionnez votre sauvegarde",
-      "description": "Sélectionnez dans la liste la sauvegarde que vous souhaitez restaurer."
+      "description": "Sélectionnez dans la liste la sauvegarde que vous souhaitez restaurer.",
+      "changeKeyButton": "Modifier la clé de restauration",
+      "refreshButton": "Actualiser",
+      "noBackupsFound": "Aucune sauvegarde n'a été trouvée sur ce compte Gladys Plus.",
+      "error": "Impossible de récupérer vos sauvegardes. Vérifiez que votre instance est bien connectée à Internet et réessayez."
+    },
+    "restoreLocalAccountAlternative": {
+      "text": "Vous pouvez aussi créer un compte local dès maintenant, connecter Gladys Plus plus tard dans les paramètres, et restaurer votre sauvegarde à ce moment-là.",
+      "linkText": "Créer un compte local"
     },
     "preferences": {
       "title": "Vos préférences",
