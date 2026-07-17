@@ -3215,6 +3215,19 @@
     "jobStatus": "Status",
     "previous": "Previous",
     "next": "Next",
+    "jobData": {
+      "target": "Target: {{device}} › {{feature}}",
+      "statesCounts": "States to delete: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
+      "statesCountsDone": "States deleted: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
+      "steps": {
+        "waiting_database": "Waiting for the database…",
+        "counting": "Counting states…",
+        "deleting_states": "Deleting states…",
+        "deleting_aggregates": "Deleting aggregates…"
+      },
+      "orphanedStates": "Orphaned states: {{count}}",
+      "duration": "Duration: {{duration}}"
+    },
     "jobTypes": {
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",

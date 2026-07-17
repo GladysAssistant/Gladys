@@ -58,6 +58,8 @@ async function purgeOrphanedDuckDbStates(jobId) {
     const numberOfSlices = Math.max(1, Math.ceil((endTime - startTime) / ONE_WEEK_IN_MS));
     logger.info(`purge-orphaned-duckdb-states: starting, ${numberOfSlices} weekly slices to walk.`);
 
+    await this.job.updateProgress(jobId, 0, { step: 'deleting_states', orphaned_states_count: 0 });
+
     await Promise.each([...Array(numberOfSlices)], async (value, i) => {
       const sliceStart = new Date(startTime + i * ONE_WEEK_IN_MS);
       // Every slice is bounded above — the last one by the purge start date, so
@@ -73,11 +75,13 @@ async function purgeOrphanedDuckDbStates(jobId) {
         ...featureIds,
       );
       const sliceDurationInMs = Date.now() - sliceStartedAt;
-      // DuckDB returns the number of deleted rows
-      if (result && result[0] && result[0].Count !== undefined) {
-        numberOfOrphanedDuckDbStatesToDelete += Number(result[0].Count);
-      }
-      await this.job.updateProgress(jobId, Math.round(((i + 1) * 100) / numberOfSlices));
+      // DuckDB returns the number of deleted rows: accumulate it so the job
+      // shows a live counter of purged states
+      const deletedInSlice = result && result[0] && result[0].Count !== undefined ? Number(result[0].Count) : 0;
+      numberOfOrphanedDuckDbStatesToDelete += deletedInSlice;
+      await this.job.updateProgress(jobId, Math.round(((i + 1) * 100) / numberOfSlices), {
+        orphaned_states_count: numberOfOrphanedDuckDbStatesToDelete,
+      });
       // Duty cycle: sleep several times the duration the slice took, so the
       // purge only ever uses a fraction of the CPU, the disk and the DuckDB
       // write connection, and Gladys stays responsive.
@@ -90,7 +94,7 @@ async function purgeOrphanedDuckDbStates(jobId) {
       );
       logger.info(
         `purge-orphaned-duckdb-states: slice ${i + 1}/${numberOfSlices} (from ${sliceStart.toISOString()}):` +
-          ` deleted ${result && result[0] && result[0].Count !== undefined ? Number(result[0].Count) : 0} states` +
+          ` deleted ${deletedInSlice} states` +
           ` in ${sliceDurationInMs}ms, pausing ${pauseInMs}ms.`,
       );
       await Promise.delay(pauseInMs);

@@ -49,6 +49,15 @@ describe('Job', () => {
       const promise = job.finish('JOB_DOESNT_EXIST', JOB_STATUS.SUCCESS, {});
       return chaiAssert.isRejected(promise, 'Job not found');
     });
+    it('should merge finish data with existing job data', async () => {
+      const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
+      await job.updateProgress(newJob.id, 10, { duckdb_states_count: 42 });
+      const updatedJob = await job.finish(newJob.id, JOB_STATUS.FAILED, { error: 'something failed' });
+      expect(updatedJob.data).to.deep.equal({
+        duckdb_states_count: 42,
+        error: 'something failed',
+      });
+    });
   });
   describe('job.updateProgress', () => {
     const job = new Job(event);
@@ -69,6 +78,33 @@ describe('Job', () => {
       const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
       const promise = job.updateProgress(newJob.id, -1);
       return chaiAssert.isRejected(promise, 'Validation error: Validation min on progress failed');
+    });
+    it('should attach then merge structured data through dataPatch', async () => {
+      const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
+      const firstUpdate = await job.updateProgress(newJob.id, 10, {
+        device_name: 'Test device',
+        duckdb_states_count: 100,
+      });
+      expect(firstUpdate.data).to.deep.equal({
+        device_name: 'Test device',
+        duckdb_states_count: 100,
+      });
+      // A later patch merges with (and can override) the existing data
+      const secondUpdate = await job.updateProgress(newJob.id, 50, { duckdb_states_count: 200 });
+      expect(secondUpdate.data).to.deep.equal({
+        device_name: 'Test device',
+        duckdb_states_count: 200,
+      });
+      expect(secondUpdate).to.have.property('progress', 50);
+    });
+    it('should not update job data, invalid dataPatch key', async () => {
+      const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
+      const promise = job.updateProgress(newJob.id, 10, { not_a_valid_key: true });
+      return chaiAssert.isRejected(promise, '"not_a_valid_key" is not allowed');
+    });
+    it('should not update progress, job doesnt exist', async () => {
+      const promise = job.updateProgress('JOB_DOESNT_EXIST', 10, { duckdb_states_count: 1 });
+      return chaiAssert.isRejected(promise, 'Job not found');
     });
   });
   describe('job.get', () => {
