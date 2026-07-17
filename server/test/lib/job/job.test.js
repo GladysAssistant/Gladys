@@ -50,7 +50,7 @@ describe('Job', () => {
       return chaiAssert.isRejected(promise, 'Job not found');
     });
     it('should merge finish data with existing job data', async () => {
-      const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
+      const newJob = await job.start(JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE);
       await job.updateProgress(newJob.id, 10, { duckdb_states_count: 42 });
       const updatedJob = await job.finish(newJob.id, JOB_STATUS.FAILED, { error: 'something failed' });
       expect(updatedJob.data).to.deep.equal({
@@ -80,7 +80,7 @@ describe('Job', () => {
       return chaiAssert.isRejected(promise, 'Validation error: Validation min on progress failed');
     });
     it('should attach then merge structured data through dataPatch', async () => {
-      const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
+      const newJob = await job.start(JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE);
       const firstUpdate = await job.updateProgress(newJob.id, 10, {
         device_name: 'Test device',
         duckdb_states_count: 100,
@@ -101,6 +101,18 @@ describe('Job', () => {
       const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
       const promise = job.updateProgress(newJob.id, 10, { not_a_valid_key: true });
       return chaiAssert.isRejected(promise, '"not_a_valid_key" is not allowed');
+    });
+    it('should not update job data, dataPatch key owned by another job type', async () => {
+      // duckdb_states_count belongs to the purge jobs schema, not to the backup one
+      const newJob = await job.start(JOB_TYPES.GLADYS_GATEWAY_BACKUP);
+      const promise = job.updateProgress(newJob.id, 10, { duckdb_states_count: 42 });
+      return chaiAssert.isRejected(promise, '"duckdb_states_count" is not allowed');
+    });
+    it('should not update job data, step owned by another purge type', async () => {
+      // "counting" is a step of the per-feature purge, not of the orphaned purge
+      const newJob = await job.start(JOB_TYPES.DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES);
+      const promise = job.updateProgress(newJob.id, 10, { step: 'counting' });
+      return chaiAssert.isRejected(promise, '"step" must be [deleting_states]');
     });
     it('should not update progress, job doesnt exist', async () => {
       const promise = job.updateProgress('JOB_DOESNT_EXIST', 10, { duckdb_states_count: 1 });

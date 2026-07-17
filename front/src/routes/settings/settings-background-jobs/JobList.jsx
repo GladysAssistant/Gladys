@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import { JOB_STATUS, JOB_ERROR_TYPES } from '../../../../../server/utils/constants';
 import RelativeTime from '../../../components/device/RelativeTime';
+import JobData from './JobData';
 import style from './style.css';
 
 // Format a duration with an adaptive unit: "247 ms", "12 s", "3 min 05 s", "2 h 04 min"
@@ -105,44 +106,7 @@ const JobList = ({ children, ...props }) => (
                       <RelativeTime datetime={job.created_at} language={props.user.language} futureDisabled />
                     </small>
                   </div>
-                  {job.data && job.data.device_name && job.data.device_feature_name && (
-                    <div class="text-muted small">
-                      <Text
-                        id="jobsSettings.jobData.target"
-                        fields={{ device: job.data.device_name, feature: job.data.device_feature_name }}
-                      />
-                    </div>
-                  )}
-                  {job.status === JOB_STATUS.IN_PROGRESS && job.data && job.data.step && (
-                    <div class="text-muted small">
-                      <Text id={`jobsSettings.jobData.steps.${job.data.step}`} />
-                    </div>
-                  )}
-                  {job.data &&
-                    (job.data.duckdb_states_count !== undefined || job.data.sqlite_states_count !== undefined) && (
-                      <div class="text-muted small">
-                        <Text
-                          id={
-                            job.status === JOB_STATUS.SUCCESS
-                              ? 'jobsSettings.jobData.statesCountsDone'
-                              : 'jobsSettings.jobData.statesCounts'
-                          }
-                          fields={{
-                            duckdb: (job.data.duckdb_states_count || 0).toLocaleString(props.user.language),
-                            sqlite: (job.data.sqlite_states_count || 0).toLocaleString(props.user.language),
-                            aggregates: (job.data.aggregates_count || 0).toLocaleString(props.user.language)
-                          }}
-                        />
-                      </div>
-                    )}
-                  {job.data && job.data.orphaned_states_count !== undefined && (
-                    <div class="text-muted small">
-                      <Text
-                        id="jobsSettings.jobData.orphanedStates"
-                        fields={{ count: job.data.orphaned_states_count.toLocaleString(props.user.language) }}
-                      />
-                    </div>
-                  )}
+                  <JobData job={job} user={props.user} />
                   <JobDuration
                     start={job.created_at}
                     end={job.updated_at}
