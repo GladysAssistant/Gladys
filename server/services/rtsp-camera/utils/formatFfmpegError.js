@@ -3,7 +3,7 @@ const MAX_REASON_LENGTH = 400;
 /**
  * @description Build a concise ffmpeg failure reason from stderr / error message.
  * @param {Error} error - Error thrown by child_process.
- * @param {string} [stderr] - stderr output from ffmpeg.
+ * @param {string} [stderr] - Stderr output from ffmpeg.
  * @returns {string} Concise human-readable failure reason.
  * @example
  * formatFfmpegError(error, stderr);

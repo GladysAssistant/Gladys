@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const fse = require('fs-extra');
 const assertChai = require('chai').assert;
 const { fake, assert } = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const RtspCameraService = require('../../../services/rtsp-camera');
 
@@ -256,7 +257,6 @@ describe('RtspCameraManager commands', () => {
     return assertChai.isRejected(promise, 'ffmpeg failed: Connection timed out');
   });
   it('should log a concise warn when poll fails', async () => {
-    const proxyquire = require('proxyquire').noCallThru();
     const warn = fake();
     const { poll } = proxyquire('../../../services/rtsp-camera/lib/poll', {
       '../../../utils/logger': {
@@ -273,7 +273,6 @@ describe('RtspCameraManager commands', () => {
     assert.calledWith(warn, 'Unable to poll camera "my-camera": ffmpeg failed (signal=SIGABRT): Library not loaded');
   });
   it('should log non-Error rejection reasons when poll fails', async () => {
-    const proxyquire = require('proxyquire').noCallThru();
     const warn = fake();
     const { poll } = proxyquire('../../../services/rtsp-camera/lib/poll', {
       '../../../utils/logger': {
