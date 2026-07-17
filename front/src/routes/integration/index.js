@@ -135,7 +135,7 @@ class Integration extends Component {
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: `/dashboard/integration/device/external/${integration.selector}`,
-        img: storeIntegration ? storeIntegration.cover_url : null,
+        img: (storeIntegration && storeIntegration.cover_url) || manifest.cover_image || null,
         status: integration.status,
         updateAvailable: integration.update_available
       });
@@ -158,7 +158,7 @@ class Integration extends Component {
         url: isInstalled
           ? `/dashboard/integration/device/external/${storeIntegration.installed_selector}`
           : `/dashboard/integration/device/external-install/${storeIntegration.store_slug}`,
-        img: storeIntegration.cover_url,
+        img: storeIntegration.cover_url || manifest.cover_image || null,
         updateAvailable: isInstalled ? storeIntegration.update_available : false
       });
     });

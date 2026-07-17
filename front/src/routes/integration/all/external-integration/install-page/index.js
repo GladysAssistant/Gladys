@@ -83,8 +83,12 @@ class ExternalIntegrationInstallPage extends Component {
                       )}
                       {storeIntegration && (
                         <div class="card">
-                          {storeIntegration.cover_url ? (
-                            <img class="card-img-top" src={storeIntegration.cover_url} alt={manifest.name} />
+                          {storeIntegration.cover_url || manifest.cover_image ? (
+                            <img
+                              class="card-img-top"
+                              src={storeIntegration.cover_url || manifest.cover_image}
+                              alt={manifest.name}
+                            />
                           ) : (
                             <div class={style.coverPlaceholder}>
                               <i class="fe fe-package" />
