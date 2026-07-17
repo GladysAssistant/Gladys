@@ -16,9 +16,14 @@ describe('externalIntegration.setGrantedDevices', () => {
       Error422,
     );
     await expect(externalIntegration.setGrantedDevices('ext-dev-open-meteo-demo', [1])).to.be.rejectedWith(Error422);
-    await expect(
-      externalIntegration.setGrantedDevices('ext-dev-open-meteo-demo', ['video']),
-    ).to.be.rejectedWith(Error422, 'not requested');
+    try {
+      await externalIntegration.setGrantedDevices('ext-dev-open-meteo-demo', ['video']);
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      // Error422 carries its detail in `properties`
+      expect(e.properties).to.include('not requested');
+    }
   });
 
   it('should persist the grants, recreate the affected sub-containers and notify the integration', async () => {
