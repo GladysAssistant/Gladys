@@ -80,6 +80,7 @@ const Gateway = function Gateway(
   this.scene = null;
   this.connected = false;
   this.restoreInProgress = false;
+  this.restoreErrored = false;
   this.usersKeys = [];
   this.googleHomeConnected = false;
   this.alexaConnected = false;

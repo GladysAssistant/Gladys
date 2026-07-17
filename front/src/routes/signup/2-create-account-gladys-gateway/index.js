@@ -34,26 +34,31 @@ class CreateAccountGladysGateway extends Component {
       gatewayRestoreErrored: false
     });
     try {
-      this.props.httpClient.post('/api/v1/gateway/backup/restore', {
+      // The POST must be awaited before polling the restore status, otherwise
+      // the first poll can reach the server before the restore has started and
+      // be misread as a finished restore.
+      await this.props.httpClient.post('/api/v1/gateway/backup/restore', {
         file_url: fileUrl
       });
       this.getRestoreStatus();
     } catch (e) {
-      await this.setState({ restoreFailed: true });
+      await this.setState({ gatewayRestoreErrored: true });
     }
   };
   getRestoreStatus = async () => {
     try {
       const restoreStatus = await this.props.httpClient.get('/api/v1/gateway/backup/restore/status');
 
-      if (restoreStatus.restore_in_progress) {
-        setTimeout(() => this.getRestoreStatus(), 1000);
-      } else if (restoreStatus.restore_errored) {
+      if (restoreStatus.restore_errored) {
         this.setState({
           gatewayRestoreErrored: true
         });
       } else {
-        window.location = '/dashboard';
+        // A successful restore keeps "restore_in_progress" true until Gladys
+        // shuts down, so we keep polling: the end of the restore is detected
+        // below, when the restarted instance answers with a 4xx because it
+        // became configured.
+        setTimeout(() => this.getRestoreStatus(), 1000);
       }
     } catch (e) {
       const status = get(e, 'response.status');

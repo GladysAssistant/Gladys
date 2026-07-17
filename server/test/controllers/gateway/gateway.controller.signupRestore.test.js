@@ -51,7 +51,8 @@ describe('Gladys Plus restore routes when instance is not configured', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.have.property('restore_in_progress');
+        expect(res.body).to.have.property('restore_in_progress', false);
+        expect(res.body).to.have.property('restore_errored', false);
       });
   });
 });
