@@ -395,7 +395,9 @@ function validateSubContainer(entry, index, seenNames, errors) {
       entry.shm_mb < SUB_CONTAINER_SHM_MIN_MB ||
       entry.shm_mb > SUB_CONTAINER_SHM_MAX_MB)
   ) {
-    errors.push(`${path}.shm_mb: must be an integer between ${SUB_CONTAINER_SHM_MIN_MB} and ${SUB_CONTAINER_SHM_MAX_MB}`);
+    errors.push(
+      `${path}.shm_mb: must be an integer between ${SUB_CONTAINER_SHM_MIN_MB} and ${SUB_CONTAINER_SHM_MAX_MB}`,
+    );
   }
   if (entry.command !== undefined) {
     if (!Array.isArray(entry.command) || entry.command.some((part) => typeof part !== 'string')) {

@@ -337,7 +337,10 @@ describe('externalIntegration.validateManifest', () => {
       },
       'duplicate name "dup"',
     );
-    expect422({ ...TEST_MANIFEST, containers: [{ name: 'mqtt', docker_image: 'no-tag' }] }, 'containers[0].docker_image');
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ name: 'mqtt', docker_image: 'no-tag' }] },
+      'containers[0].docker_image',
+    );
     expect422(
       { ...TEST_MANIFEST, containers: [{ name: 'mqtt', docker_image: 'img:1.0.0', unknown: true }] },
       'containers[0].unknown: unknown field',
@@ -383,13 +386,19 @@ describe('externalIntegration.validateManifest', () => {
       { ...TEST_MANIFEST, containers: [{ ...base, ports: [port, port, port, port] }] },
       'containers[0].ports: must be an array of at most 3',
     );
-    expect422({ ...TEST_MANIFEST, containers: [{ ...base, ports: [null] }] }, 'containers[0].ports[0]: must be an object');
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [null] }] },
+      'containers[0].ports[0]: must be an object',
+    );
     expect422(
       { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ container_port: 0, label: { en: 'UI' } }] }] },
       'containers[0].ports[0].container_port',
     );
     expect422(
-      { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ container_port: 80, protocol: 'sctp', label: { en: 'UI' } }] }] },
+      {
+        ...TEST_MANIFEST,
+        containers: [{ ...base, ports: [{ container_port: 80, protocol: 'sctp', label: { en: 'UI' } }] }],
+      },
       'containers[0].ports[0].protocol',
     );
     expect422(
@@ -398,7 +407,10 @@ describe('externalIntegration.validateManifest', () => {
     );
     // the host port is never declared: chosen by Gladys
     expect422(
-      { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ container_port: 80, host_port: 8080, label: { en: 'UI' } }] }] },
+      {
+        ...TEST_MANIFEST,
+        containers: [{ ...base, ports: [{ container_port: 80, host_port: 8080, label: { en: 'UI' } }] }],
+      },
       'containers[0].ports[0].host_port: unknown field',
     );
   });

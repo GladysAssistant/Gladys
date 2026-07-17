@@ -304,9 +304,7 @@ describe('externalIntegration.controlSubContainer', () => {
   it('should reject an unknown action or an undeclared container', async () => {
     const { externalIntegration } = buildSupervisor();
     const service = await seedMultiContainerService();
-    await expect(externalIntegration.controlSubContainer(service, 'mqtt', 'destroy')).to.be.rejectedWith(
-      BadParameters,
-    );
+    await expect(externalIntegration.controlSubContainer(service, 'mqtt', 'destroy')).to.be.rejectedWith(BadParameters);
     await expect(externalIntegration.controlSubContainer(service, 'unknown', 'start')).to.be.rejectedWith(
       NotFoundError,
     );

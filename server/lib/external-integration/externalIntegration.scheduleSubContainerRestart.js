@@ -37,9 +37,7 @@ async function scheduleSubContainerRestart(service, entry) {
     return;
   }
   const delay = Math.min(RESTART_BACKOFF_BASE_MS * 2 ** (failureCount - 1), RESTART_BACKOFF_MAX_MS);
-  logger.info(
-    `Sub-container ${entry.name} of integration ${service.selector}: restart scheduled in ${delay / 1000}s`,
-  );
+  logger.info(`Sub-container ${entry.name} of integration ${service.selector}: restart scheduled in ${delay / 1000}s`);
   const timerKey = `${service.id}:${entry.name}`;
   if (this.restartTimers.has(timerKey)) {
     clearTimeout(this.restartTimers.get(timerKey));

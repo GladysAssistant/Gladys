@@ -74,9 +74,7 @@ describe('externalIntegration.uninstall', () => {
       });
       await externalIntegration.uninstall(service.selector);
       expect(system.removeNetwork.calledWith('gladys-int-ext-dev-open-meteo-demo')).to.equal(true);
-      expect(rm.firstCall.args[0]).to.equal(
-        '/var/lib/gladysassistant/external-integrations/ext-dev-open-meteo-demo',
-      );
+      expect(rm.firstCall.args[0]).to.equal('/var/lib/gladysassistant/external-integrations/ext-dev-open-meteo-demo');
       expect(rm.firstCall.args[1]).to.deep.equal({ recursive: true, force: true });
     } finally {
       fs.promises.rm = originalRm;

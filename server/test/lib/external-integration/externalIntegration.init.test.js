@@ -111,8 +111,14 @@ describe('externalIntegration.init', () => {
           },
         ]),
         getNetworks: fake.resolves([
-          { Name: 'gladys-int-ext-gone-integration', Labels: { 'io.gladysassistant.external-integration': 'ext-gone-integration' } },
-          { Name: `gladys-int-${service.selector}`, Labels: { 'io.gladysassistant.external-integration': service.selector } },
+          {
+            Name: 'gladys-int-ext-gone-integration',
+            Labels: { 'io.gladysassistant.external-integration': 'ext-gone-integration' },
+          },
+          {
+            Name: `gladys-int-${service.selector}`,
+            Labels: { 'io.gladysassistant.external-integration': service.selector },
+          },
         ]),
       },
     });

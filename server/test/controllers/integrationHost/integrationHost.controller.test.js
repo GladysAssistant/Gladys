@@ -315,7 +315,9 @@ describe('Integration host API', () => {
       service = await seedExternalService({ manifest: CONTAINERS_MANIFEST, granted_devices: ['coral-usb'] });
       token = generateIntegrationToken(service.id, 1, 'secret');
       gladys.externalIntegration.available = true;
-      stubSystem('detectHardwareClasses', () => Promise.resolve([{ class: 'coral-usb', detected: true, paths: ['/dev/bus/usb'] }]));
+      stubSystem('detectHardwareClasses', () =>
+        Promise.resolve([{ class: 'coral-usb', detected: true, paths: ['/dev/bus/usb'] }]),
+      );
       stubSystem('getContainers', () => Promise.resolve([]));
       stubSystem('createContainer', () => Promise.resolve({ id: 'sub-1' }));
       stubSystem('removeContainer', () => Promise.resolve(true));
@@ -341,9 +343,7 @@ describe('Integration host API', () => {
       expect(res.body.containers.map((container) => container.name)).to.deep.equal(['mqtt', 'frigate']);
       expect(res.body.containers[0].desired).to.equal('stopped');
       expect(res.body.containers[1].desired).to.equal('running');
-      expect(res.body.containers[1].devices).to.deep.equal([
-        { class: 'coral-usb', granted: true, available: true },
-      ]);
+      expect(res.body.containers[1].devices).to.deep.equal([{ class: 'coral-usb', granted: true, available: true }]);
     });
 
     it('should start, stop and restart a declared sub-container', async () => {

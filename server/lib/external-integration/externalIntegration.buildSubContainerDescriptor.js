@@ -50,7 +50,8 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
   // sub-container cannot write outside the folder of its integration; the
   // main container sees these volumes under /data/containers/<name>/...
   const binds = (entry.volumes || []).map(
-    (volume) => `${basePathOnHost}/external-integrations/${service.selector}/containers/${entry.name}${volume}:${volume}`,
+    (volume) =>
+      `${basePathOnHost}/external-integrations/${service.selector}/containers/${entry.name}${volume}:${volume}`,
   );
   const assignments = await this.assignHostPorts(service);
   const exposedPorts = {};

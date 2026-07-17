@@ -51,7 +51,10 @@ describe('externalIntegration.checkSubContainersHealth', () => {
     await externalIntegration.checkSubContainersHealth(service);
     assert.notCalled(externalIntegration.scheduleSubContainerRestart);
     // pending restart
-    externalIntegration.restartTimers.set(`${service.id}:frigate`, setTimeout(() => {}, 100000));
+    externalIntegration.restartTimers.set(
+      `${service.id}:frigate`,
+      setTimeout(() => {}, 100000),
+    );
     await externalIntegration.checkSubContainersHealth(service);
     assert.notCalled(externalIntegration.scheduleSubContainerRestart);
     externalIntegration.clearTimers(service.id);

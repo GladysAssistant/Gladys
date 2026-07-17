@@ -368,9 +368,7 @@ describe('External integration admin API', () => {
         },
       });
       stubInstance(gladys.system, 'detectHardwareClasses', fake.resolves([]));
-      const res = await authenticatedRequest
-        .get(`/api/v1/external_integration/${service.selector}`)
-        .expect(200);
+      const res = await authenticatedRequest.get(`/api/v1/external_integration/${service.selector}`).expect(200);
       expect(res.body.containers).to.deep.equal([
         {
           name: 'frigate',
