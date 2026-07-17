@@ -22,11 +22,13 @@ const GatewayPage = ({ children, ...props }) => (
           <p>
             <Text id="signup.gatewayBackup.description" />
           </p>
-          {props.gatewayGetBackupsStatus === RequestStatus.Success && props.gatewayBackups.length === 0 && (
-            <div class="alert alert-warning mb-0">
-              <Text id="signup.gatewayBackup.noBackupsFound" />
-            </div>
-          )}
+          {props.gatewayGetBackupsStatus === RequestStatus.Success &&
+            props.gatewayBackups &&
+            props.gatewayBackups.length === 0 && (
+              <div class="alert alert-warning mb-0">
+                <Text id="signup.gatewayBackup.noBackupsFound" />
+              </div>
+            )}
           {props.gatewayGetBackupsStatus === RequestStatus.Error && (
             <div class="alert alert-danger mb-0">
               <Text id="signup.gatewayBackup.error" />
@@ -51,7 +53,12 @@ const GatewayPage = ({ children, ...props }) => (
               </thead>
               <tbody>
                 {props.gatewayBackups.map(backup => (
-                  <RestoreBackupRow backup={backup} user={props.user} restoreBackup={props.restoreBackup} />
+                  <RestoreBackupRow
+                    key={backup.id}
+                    backup={backup}
+                    user={props.user}
+                    restoreBackup={props.restoreBackup}
+                  />
                 ))}
               </tbody>
             </table>

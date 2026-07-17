@@ -17,7 +17,7 @@ class CreateAccountGladysGateway extends Component {
     backupKey: ''
   };
   saveBackupKey = async () => {
-    await this.setState({ loading: true, error: false });
+    this.setState({ loading: true, error: false });
     try {
       await this.props.httpClient.post('/api/v1/gateway/backup-key', {
         backup_key: this.state.backupKey
@@ -29,7 +29,7 @@ class CreateAccountGladysGateway extends Component {
     }
   };
   restoreBackup = async fileUrl => {
-    await this.setState({
+    this.setState({
       step: 4,
       gatewayRestoreErrored: false
     });
@@ -42,7 +42,7 @@ class CreateAccountGladysGateway extends Component {
       });
       this.getRestoreStatus();
     } catch (e) {
-      await this.setState({ gatewayRestoreErrored: true });
+      this.setState({ gatewayRestoreErrored: true });
     }
   };
   getRestoreStatus = async () => {

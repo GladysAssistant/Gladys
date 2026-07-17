@@ -30,9 +30,9 @@ const GatewayPage = ({ children, ...props }) => (
           <p>
             <Text id="signup.restoreBackupInProgress.erroredHelp" />
           </p>
-          <div class="btn btn-primary btn-block" onClick={props.changeStepToUpdateRestoreKey}>
+          <button class="btn btn-primary btn-block" onClick={props.changeStepToUpdateRestoreKey}>
             <Text id="signup.restoreBackupInProgress.updateRestoreKeyButton" />
-          </div>
+          </button>
           <Link href="/signup/create-account-local" class="btn btn-secondary btn-block">
             <Text id="signup.restoreBackupInProgress.createLocalAccountButton" />
           </Link>
