@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
@@ -107,11 +107,23 @@ const SupervisionCard = ({
                 <i class="fe fe-rotate-cw mr-1" />
                 <Text id="integration.externalIntegration.supervision.restartButton" />
               </button>
-              {integration.update_available && (
+              {integration.update_available ? (
                 <button class="btn btn-primary" onClick={() => executeAction('update')} disabled={actionInProgress}>
                   <i class="fe fe-arrow-up-circle mr-1" />
                   <Text id="integration.externalIntegration.supervision.updateButton" />
                 </button>
+              ) : (
+                <Localizer>
+                  <button
+                    class="btn btn-outline-secondary"
+                    onClick={() => executeAction('update')}
+                    disabled={actionInProgress}
+                    title={<Text id="integration.externalIntegration.supervision.forceUpdateTitle" />}
+                  >
+                    <i class="fe fe-download-cloud mr-1" />
+                    <Text id="integration.externalIntegration.supervision.forceUpdateButton" />
+                  </button>
+                </Localizer>
               )}
               <Link
                 href={`/dashboard/integration/device/external/${integration.selector}/logs`}

@@ -623,6 +623,8 @@
         "stopButton": "Stop",
         "restartButton": "Restart",
         "updateButton": "Update",
+        "forceUpdateButton": "Force update",
+        "forceUpdateTitle": "Re-pulls the Docker image and recreates the container, even without a new version",
         "logsButton": "Logs",
         "uninstallButton": "Uninstall",
         "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",

@@ -623,6 +623,8 @@
         "stopButton": "Arrêter",
         "restartButton": "Redémarrer",
         "updateButton": "Mettre à jour",
+        "forceUpdateButton": "Forcer la mise à jour",
+        "forceUpdateTitle": "Re-télécharge l'image Docker et recrée le conteneur, même sans nouvelle version",
         "logsButton": "Journaux",
         "uninstallButton": "Désinstaller",
         "uninstallWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés. Les appareils créés par cette intégration resteront dans Gladys jusqu’à ce que vous les supprimiez.",
