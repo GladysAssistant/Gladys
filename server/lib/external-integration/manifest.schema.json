@@ -63,6 +63,14 @@
       "items": {
         "$ref": "#/definitions/configField"
       }
+    },
+    "containers": {
+      "type": "array",
+      "maxItems": 5,
+      "description": "Authorization contract of the additional sub-containers (multi-container integrations, e.g. Frigate + Mosquitto): everything that can run — images, limits, published ports, hardware access — shown to the user on the install screen. The lifecycle is then driven by the integration through the /container host API, only within these bounds.",
+      "items": {
+        "$ref": "#/definitions/subContainer"
+      }
     }
   },
   "definitions": {
@@ -197,6 +205,112 @@
           }
         }
       ]
+    },
+    "subContainer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "docker_image"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]{2,20}$",
+          "description": "Unique name of the sub-container: DNS alias on the private network of the integration, suffix of the container name and identifier in the /container host API."
+        },
+        "docker_image": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Docker image reference, same rules as the main image (public registry, explicit tag or digest, multi-arch recommended)."
+        },
+        "start": {
+          "type": "string",
+          "enum": ["auto", "manual"],
+          "default": "auto",
+          "description": "`auto`: created and started by the supervisor before the main container. `manual`: nothing starts until the integration calls POST /container/:name/start (e.g. generate a password file in /data first)."
+        },
+        "env": {
+          "type": "object",
+          "description": "Static string environment variables. GLADYS_* keys are forbidden (code-enforced). The manifest is public: never a secret here — runtime credentials go through /data files or the env of POST /container/:name/start.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "maxItems": 5,
+          "description": "Absolute container paths. Each one is mounted from a sub-folder derived from the integration data folder by the supervisor — the manifest never chooses a host path.",
+          "items": {
+            "type": "string",
+            "pattern": "^/"
+          }
+        },
+        "ports": {
+          "type": "array",
+          "maxItems": 3,
+          "description": "Published ports. The host port is chosen by Gladys (free, persisted across recreations), never declared. Publishing a port exposes a third-party interface on the LAN: it is shown on the install screen.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["container_port", "label"],
+            "properties": {
+              "container_port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "protocol": {
+                "type": "string",
+                "enum": ["tcp", "udp"],
+                "default": "tcp"
+              },
+              "label": {
+                "$ref": "#/definitions/multiLanguageText",
+                "description": "Names the \"Open\" link in the Gladys UI."
+              }
+            }
+          }
+        },
+        "devices": {
+          "type": "array",
+          "description": "Requested hardware access classes — never a free /dev path. Requesting is not obtaining: each class is granted or refused by the user in the UI; the effective mount is requested ∩ granted ∩ present.",
+          "items": {
+            "type": "string",
+            "enum": ["coral-usb", "coral-pcie", "gpu", "video"]
+          }
+        },
+        "read_only": {
+          "type": "boolean",
+          "default": true,
+          "description": "Read-only root filesystem. Opt-out possible: some upstream images (e.g. Frigate) do not run with a read-only rootfs."
+        },
+        "memory_mb": {
+          "type": "integer",
+          "minimum": 32,
+          "maximum": 4096,
+          "default": 256,
+          "description": "Memory limit in MB, shown on the install screen."
+        },
+        "cpu": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 2,
+          "default": 0.5,
+          "description": "CPU limit, shown on the install screen."
+        },
+        "shm_mb": {
+          "type": "integer",
+          "minimum": 64,
+          "maximum": 512,
+          "default": 64,
+          "description": "/dev/shm size in MB, useful for video processing."
+        },
+        "command": {
+          "type": "array",
+          "description": "Optional override of the image CMD.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     }
   }
 }

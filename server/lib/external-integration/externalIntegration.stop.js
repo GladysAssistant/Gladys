@@ -34,6 +34,12 @@ async function stop(selector) {
       }
     }
   }
+  // everything stops: main container first, then the sub-containers
+  try {
+    await this.stopSubContainers(service);
+  } catch (e) {
+    logger.warn(`Unable to stop sub-containers of integration ${selector}`, e);
+  }
   await this.saveStatus(service, SERVICE_STATUS.STOPPED);
   return this.getBySelector(selector);
 }

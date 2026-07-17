@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { fake } = require('sinon');
+const { fake, assert: sinonAssert } = require('sinon');
 
 const db = require('../../../models');
 const { buildSupervisor, seedExternalService } = require('./testUtils.test');
@@ -90,6 +90,38 @@ describe('externalIntegration.init', () => {
     await clock.tickAsync(31 * 1000);
     clock.restore();
     expect(externalIntegration.checkHealth.callCount).to.be.at.least(1);
+    clearInterval(externalIntegration.checkHealthInterval);
+    clearInterval(externalIntegration.storeRefreshInterval);
+  });
+
+  it('should destroy orphan containers and private networks at boot', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getContainers: fake.resolves([
+          {
+            id: 'orphan-1',
+            name: '/gladys-ext-gone-integration-mqtt',
+            labels: { 'io.gladysassistant.external-integration': 'ext-gone-integration' },
+          },
+          {
+            id: 'legit-1',
+            name: `/gladys-${service.selector}`,
+            labels: { 'io.gladysassistant.external-integration': service.selector },
+          },
+        ]),
+        getNetworks: fake.resolves([
+          { Name: 'gladys-int-ext-gone-integration', Labels: { 'io.gladysassistant.external-integration': 'ext-gone-integration' } },
+          { Name: `gladys-int-${service.selector}`, Labels: { 'io.gladysassistant.external-integration': service.selector } },
+        ]),
+      },
+    });
+    externalIntegration.refreshIndex = fake.rejects(new Error('offline'));
+    await externalIntegration.init();
+    sinonAssert.calledWith(system.removeContainer, 'orphan-1', { force: true });
+    sinonAssert.neverCalledWith(system.removeContainer, 'legit-1');
+    sinonAssert.calledWith(system.removeNetwork, 'gladys-int-ext-gone-integration');
+    sinonAssert.neverCalledWith(system.removeNetwork, `gladys-int-${service.selector}`);
     clearInterval(externalIntegration.checkHealthInterval);
     clearInterval(externalIntegration.storeRefreshInterval);
   });

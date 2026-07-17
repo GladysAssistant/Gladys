@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { assert: sinonAssert, fake } = require('sinon');
 
 const db = require('../../../models');
-const { buildSupervisor, seedExternalService } = require('./testUtils.test');
+const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.createIntegrationContainer', () => {
   it('should rotate the token and save the new container id', async () => {
@@ -26,5 +26,19 @@ describe('externalIntegration.createIntegrationContainer', () => {
     const container = await externalIntegration.createIntegrationContainer(service);
     expect(container).to.have.property('id', 'container-1');
     sinonAssert.calledOnce(system.createContainer);
+  });
+
+  it('should connect the main container to the private network of a multi-container integration', async () => {
+    const service = await seedExternalService({ container_id: null, manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration, system } = buildSupervisor();
+    await externalIntegration.createIntegrationContainer(service);
+    sinonAssert.calledWith(system.connectToNetwork, 'gladys-int-ext-dev-open-meteo-demo', 'container-1');
+  });
+
+  it('should not touch the private network without declared sub-containers', async () => {
+    const service = await seedExternalService({ container_id: null });
+    const { externalIntegration, system } = buildSupervisor();
+    await externalIntegration.createIntegrationContainer(service);
+    sinonAssert.notCalled(system.connectToNetwork);
   });
 });

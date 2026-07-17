@@ -14,6 +14,42 @@ const INTEGRATIONS_NETWORK_NAME = 'gladys-integrations';
 // listens) is deterministic on almost all installs.
 const INTEGRATIONS_NETWORK_SUBNET = '172.30.0.0/24';
 const INTEGRATIONS_NETWORK_GATEWAY = '172.30.0.1';
+// Private bridge network of a multi-container integration (icc stays
+// enabled inside: the main container must reach its sub-containers, e.g.
+// Frigate -> Mosquitto). DNS alias of each sub-container = its `name`.
+const PRIVATE_NETWORK_PREFIX = 'gladys-int-';
+// Docker label carrying the sub-container `name` (the main container has
+// only the reconciliation label).
+const SUB_CONTAINER_LABEL = 'io.gladysassistant.container';
+// Bounds of the `containers` manifest field (same rules as the indexer).
+const MAX_SUB_CONTAINERS = 5;
+const MAX_SUB_CONTAINER_VOLUMES = 5;
+const MAX_SUB_CONTAINER_PORTS = 3;
+const SUB_CONTAINER_NAME_REGEX = /^[a-z0-9-]{2,20}$/;
+const SUB_CONTAINER_MEMORY_MIN_MB = 32;
+const SUB_CONTAINER_MEMORY_MAX_MB = 4096;
+const SUB_CONTAINER_MEMORY_DEFAULT_MB = 256;
+const SUB_CONTAINER_CPU_MIN = 0.1;
+const SUB_CONTAINER_CPU_MAX = 2;
+const SUB_CONTAINER_CPU_DEFAULT = 0.5;
+const SUB_CONTAINER_SHM_MIN_MB = 64;
+const SUB_CONTAINER_SHM_MAX_MB = 512;
+const SUB_CONTAINER_SHM_DEFAULT_MB = 64;
+const SUB_CONTAINER_START_MODES = ['auto', 'manual'];
+// Named hardware access classes (curated list, never a free /dev path).
+// `path`: the class is a fixed path relative to /dev; `prefix`: every /dev
+// entry starting with the prefix belongs to the class (e.g. /dev/video0...).
+const HARDWARE_CLASSES = {
+  'coral-usb': { path: 'bus/usb' },
+  'coral-pcie': { prefix: 'apex_' },
+  gpu: { path: 'dri' },
+  video: { prefix: 'video' },
+};
+// Per-integration variables (scoped by service_id) holding the
+// sub-container runtime state that must survive container recreations.
+const SUB_CONTAINER_PORTS_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINER_PORTS';
+const SUB_CONTAINER_DESIRED_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_DESIRED';
+const SUB_CONTAINER_ENV_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_ENV';
 // Selector prefix, avoiding any collision with a future native service
 // (service.load looks up services by name).
 const SELECTOR_PREFIX = 'ext-';
@@ -49,6 +85,26 @@ module.exports = {
   EXTERNAL_INTEGRATION_LABEL,
   MANIFEST_IMAGE_LABEL,
   MANIFEST_FILE_NAME,
+  PRIVATE_NETWORK_PREFIX,
+  SUB_CONTAINER_LABEL,
+  MAX_SUB_CONTAINERS,
+  MAX_SUB_CONTAINER_VOLUMES,
+  MAX_SUB_CONTAINER_PORTS,
+  SUB_CONTAINER_NAME_REGEX,
+  SUB_CONTAINER_MEMORY_MIN_MB,
+  SUB_CONTAINER_MEMORY_MAX_MB,
+  SUB_CONTAINER_MEMORY_DEFAULT_MB,
+  SUB_CONTAINER_CPU_MIN,
+  SUB_CONTAINER_CPU_MAX,
+  SUB_CONTAINER_CPU_DEFAULT,
+  SUB_CONTAINER_SHM_MIN_MB,
+  SUB_CONTAINER_SHM_MAX_MB,
+  SUB_CONTAINER_SHM_DEFAULT_MB,
+  SUB_CONTAINER_START_MODES,
+  HARDWARE_CLASSES,
+  SUB_CONTAINER_PORTS_VARIABLE,
+  SUB_CONTAINER_DESIRED_VARIABLE,
+  SUB_CONTAINER_ENV_VARIABLE,
   INTEGRATIONS_NETWORK_NAME,
   INTEGRATIONS_NETWORK_SUBNET,
   INTEGRATIONS_NETWORK_GATEWAY,

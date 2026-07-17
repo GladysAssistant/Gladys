@@ -4,7 +4,7 @@ const { assert: sinonAssert, fake } = require('sinon');
 
 const db = require('../../../models');
 const { SERVICE_STATUS } = require('../../../utils/constants');
-const { buildSupervisor, seedExternalService } = require('./testUtils.test');
+const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.checkHealth', () => {
   it('should do nothing when Docker is not available', async () => {
@@ -170,5 +170,14 @@ describe('externalIntegration.scheduleRestart', () => {
     await clock.tickAsync(2 * 1000);
     clock.restore();
     sinonAssert.calledOnce(externalIntegration.start);
+  });
+
+  it('should check the sub-containers of a running integration', async () => {
+    await seedExternalService({ status: SERVICE_STATUS.RUNNING, manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.connections.set('any', {});
+    externalIntegration.checkSubContainersHealth = fake.resolves(null);
+    await externalIntegration.checkHealth();
+    sinonAssert.calledOnce(externalIntegration.checkSubContainersHealth);
   });
 });

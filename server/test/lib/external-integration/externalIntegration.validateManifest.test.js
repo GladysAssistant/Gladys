@@ -284,6 +284,152 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept a valid containers declaration', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      containers: [
+        {
+          name: 'mqtt',
+          docker_image: 'eclipse-mosquitto:2.0.18',
+          start: 'manual',
+          volumes: ['/mosquitto/config', '/mosquitto/data'],
+          memory_mb: 128,
+        },
+        {
+          name: 'frigate',
+          docker_image: 'ghcr.io/blakeblackshear/frigate:0.14.1',
+          read_only: false,
+          memory_mb: 1024,
+          shm_mb: 128,
+          cpu: 1,
+          env: { LIBVA_DRIVER_NAME: 'i965' },
+          command: ['python3', '-m', 'frigate'],
+          ports: [{ container_port: 5000, protocol: 'tcp', label: { en: 'Frigate UI' } }],
+          devices: ['coral-usb', 'gpu'],
+        },
+      ],
+    };
+    expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
+  });
+
+  it('should reject an invalid containers list', () => {
+    expect422({ ...TEST_MANIFEST, containers: {} }, 'containers: must be an array');
+    const entry = { name: 'ok', docker_image: 'img:1.0.0' };
+    expect422(
+      { ...TEST_MANIFEST, containers: [entry, entry, entry, entry, entry, entry] },
+      'containers: must be an array of at most 5 entries',
+    );
+    expect422({ ...TEST_MANIFEST, containers: [null] }, 'containers[0]: must be an object');
+  });
+
+  it('should reject invalid sub-container names and images', () => {
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ name: 'BAD NAME', docker_image: 'img:1.0.0' }] },
+      'containers[0].name',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        containers: [
+          { name: 'dup', docker_image: 'img:1.0.0' },
+          { name: 'dup', docker_image: 'img:1.0.0' },
+        ],
+      },
+      'duplicate name "dup"',
+    );
+    expect422({ ...TEST_MANIFEST, containers: [{ name: 'mqtt', docker_image: 'no-tag' }] }, 'containers[0].docker_image');
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ name: 'mqtt', docker_image: 'img:1.0.0', unknown: true }] },
+      'containers[0].unknown: unknown field',
+    );
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ name: 'mqtt', docker_image: 'img:1.0.0', start: 'always' }] },
+      'containers[0].start',
+    );
+  });
+
+  it('should reject invalid sub-container env declarations', () => {
+    const base = { name: 'mqtt', docker_image: 'img:1.0.0' };
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, env: [] }] }, 'containers[0].env: must be an object');
+    // the manifest is public: GLADYS_* is reserved, checked case-insensitively
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, env: { gladys_token: 'x' } }] },
+      'containers[0].env.gladys_token: GLADYS_* keys are reserved',
+    );
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, env: { KEY: 1 } }] }, 'containers[0].env.KEY');
+  });
+
+  it('should reject invalid sub-container volumes', () => {
+    const base = { name: 'mqtt', docker_image: 'img:1.0.0' };
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, volumes: {} }] }, 'containers[0].volumes');
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, volumes: ['/a', '/b', '/c', '/d', '/e', '/f'] }] },
+      'containers[0].volumes: must be an array of at most 5',
+    );
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, volumes: ['relative'] }] }, 'containers[0].volumes[0]');
+    // a .. segment could escape the integration folder on the host
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, volumes: ['/config/../../etc'] }] },
+      'containers[0].volumes[0]: must be an absolute container path without ..',
+    );
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, volumes: [42] }] }, 'containers[0].volumes[0]');
+  });
+
+  it('should reject invalid sub-container ports', () => {
+    const base = { name: 'ui', docker_image: 'img:1.0.0' };
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, ports: {} }] }, 'containers[0].ports');
+    const port = { container_port: 80, label: { en: 'UI' } };
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [port, port, port, port] }] },
+      'containers[0].ports: must be an array of at most 3',
+    );
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, ports: [null] }] }, 'containers[0].ports[0]: must be an object');
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ container_port: 0, label: { en: 'UI' } }] }] },
+      'containers[0].ports[0].container_port',
+    );
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ container_port: 80, protocol: 'sctp', label: { en: 'UI' } }] }] },
+      'containers[0].ports[0].protocol',
+    );
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ container_port: 80, label: { fr: 'UI' } }] }] },
+      'containers[0].ports[0].label.en',
+    );
+    // the host port is never declared: chosen by Gladys
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ container_port: 80, host_port: 8080, label: { en: 'UI' } }] }] },
+      'containers[0].ports[0].host_port: unknown field',
+    );
+  });
+
+  it('should reject invalid sub-container hardware classes', () => {
+    const base = { name: 'frigate', docker_image: 'img:1.0.0' };
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, devices: {} }] }, 'containers[0].devices');
+    // never a free /dev path
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, devices: ['/dev/sda'] }] },
+      'containers[0].devices[0]: must be one of coral-usb, coral-pcie, gpu, video',
+    );
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, devices: ['gpu', 'gpu'] }] },
+      'containers[0].devices[1]: duplicate class "gpu"',
+    );
+  });
+
+  it('should reject out-of-bounds sub-container limits', () => {
+    const base = { name: 'mqtt', docker_image: 'img:1.0.0' };
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, read_only: 'yes' }] }, 'containers[0].read_only');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, memory_mb: 16 }] }, 'containers[0].memory_mb');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, memory_mb: 8192 }] }, 'containers[0].memory_mb');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, cpu: 4 }] }, 'containers[0].cpu');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, cpu: '1' }] }, 'containers[0].cpu');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, shm_mb: 32 }] }, 'containers[0].shm_mb');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, shm_mb: 1024 }] }, 'containers[0].shm_mb');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, command: 'mosquitto' }] }, 'containers[0].command');
+    expect422({ ...TEST_MANIFEST, containers: [{ ...base, command: [1] }] }, 'containers[0].command');
+  });
+
   it('should reject unknown fields and empty values in select options', () => {
     expect422(
       {

@@ -1,3 +1,5 @@
+const Promise = require('bluebird');
+
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { BadParameters, ConflictError, PlatformNotCompatible } = require('../../utils/coreErrors');
@@ -15,11 +17,14 @@ const { MANIFEST_IMAGE_LABEL } = require('./constants');
  * @param {string} [options.dockerImage] - Docker image (dev install).
  * @param {object} [options.manifest] - The integration manifest.
  * @param {string} [options.storeSlug] - Store slug (`owner/repo`).
+ * @param {Array} [options.grantedDevices] - Hardware classes granted by the
+ * user on the install screen (subset of the classes requested by the
+ * manifest sub-containers).
  * @returns {Promise<object>} Resolve with the installed integration.
  * @example
  * await gladys.externalIntegration.install({ dockerImage: 'my-image:1.0.0', manifest });
  */
-async function install({ dockerImage, manifest, storeSlug = null }) {
+async function install({ dockerImage, manifest, storeSlug = null, grantedDevices } = {}) {
   if (!this.available) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
@@ -55,6 +60,31 @@ async function install({ dockerImage, manifest, storeSlug = null }) {
     }
   }
   this.validateManifest(finalManifest);
+  if (grantedDevices !== undefined) {
+    if (!Array.isArray(grantedDevices) || grantedDevices.some((hardwareClass) => typeof hardwareClass !== 'string')) {
+      throw new Error422('granted_devices: must be an array of hardware classes');
+    }
+    const requestedClasses = new Set();
+    (finalManifest.containers || []).forEach((entry) => {
+      (entry.devices || []).forEach((hardwareClass) => requestedClasses.add(hardwareClass));
+    });
+    const unknownClasses = grantedDevices.filter((hardwareClass) => !requestedClasses.has(hardwareClass));
+    if (unknownClasses.length > 0) {
+      throw new Error422(`granted_devices: ${unknownClasses.join(', ')} not requested by the manifest`);
+    }
+  }
+  // install = pull of every image (main + sub-containers), so a start
+  // never depends on the network
+  await Promise.each(finalManifest.containers || [], async (entry) => {
+    try {
+      await this.system.pull(entry.docker_image);
+    } catch (e) {
+      logger.warn(`Unable to pull image ${entry.docker_image}`, e);
+      throw new BadParameters(
+        `UNABLE_TO_PULL_IMAGE: image may not exist or may not be available for your architecture`,
+      );
+    }
+  });
   const selector = await this.buildSelector({ storeSlug, manifestName: finalManifest.name });
   const existingSelector = await db.Service.findOne({ where: { selector } });
   if (existingSelector !== null) {
@@ -72,6 +102,7 @@ async function install({ dockerImage, manifest, storeSlug = null }) {
       docker_image: image,
       manifest: finalManifest,
       store_slug: storeSlug,
+      granted_devices: grantedDevices === undefined ? null : grantedDevices,
     });
   } catch (e) {
     // two concurrent installs can race between the findOne pre-check and

@@ -19,6 +19,7 @@ async function getContainers(options = { all: true }) {
       image: container.Image,
       state: container.State,
       id: container.Id,
+      labels: container.Labels,
       networkMode: get(container, 'HostConfig.NetworkMode'),
       devices: get(container, 'HostConfig.Devices'),
       created_at: container.Created,

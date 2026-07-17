@@ -100,6 +100,59 @@ module.exports = function IntegrationHostController(gladys) {
     res.json({ success: true });
   }
 
+  /**
+   * @api {get} /api/integration/v1/container getContainers
+   * @apiName getContainers
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The declared sub-containers, their Docker status, the
+   * desired state, the assigned host ports and, per requested hardware
+   * class, the granted/available flags.
+   */
+  async function getContainers(req, res) {
+    const containers = await gladys.externalIntegration.getSubContainersState(req.externalIntegrationService);
+    res.json({ containers });
+  }
+
+  /**
+   * @api {post} /api/integration/v1/container/:name/start startContainer
+   * @apiName startContainer
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Creates the container if needed then starts it (desired
+   * state "running"). The optional env is merged over the manifest env;
+   * when it differs from the existing container, the container is recreated
+   * first (the /data volumes persist).
+   */
+  async function startContainer(req, res) {
+    await gladys.externalIntegration.controlSubContainer(req.externalIntegrationService, req.params.name, 'start', {
+      env: req.body.env,
+    });
+    res.json({ success: true });
+  }
+
+  /**
+   * @api {post} /api/integration/v1/container/:name/stop stopContainer
+   * @apiName stopContainer
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Stops the container and takes it out of the desired
+   * state: the supervisor will not restart it.
+   */
+  async function stopContainer(req, res) {
+    await gladys.externalIntegration.controlSubContainer(req.externalIntegrationService, req.params.name, 'stop');
+    res.json({ success: true });
+  }
+
+  /**
+   * @api {post} /api/integration/v1/container/:name/restart restartContainer
+   * @apiName restartContainer
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Typical use: the integration rewrote a config file of
+   * the sub-container through /data and restarts it to apply.
+   */
+  async function restartContainer(req, res) {
+    await gladys.externalIntegration.controlSubContainer(req.externalIntegrationService, req.params.name, 'restart');
+    res.json({ success: true });
+  }
+
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
     heartbeat: asyncMiddleware(heartbeat),
@@ -108,5 +161,9 @@ module.exports = function IntegrationHostController(gladys) {
     publishStates: asyncMiddleware(publishStates),
     getConfig: asyncMiddleware(getConfig),
     saveConfig: asyncMiddleware(saveConfig),
+    getContainers: asyncMiddleware(getContainers),
+    startContainer: asyncMiddleware(startContainer),
+    stopContainer: asyncMiddleware(stopContainer),
+    restartContainer: asyncMiddleware(restartContainer),
   });
 };

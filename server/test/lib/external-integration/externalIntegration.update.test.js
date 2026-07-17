@@ -1,10 +1,11 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
 const { assert: sinonAssert, fake } = require('sinon');
 
 const db = require('../../../models');
 const { BadParameters, PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { SERVICE_STATUS } = require('../../../utils/constants');
-const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('./testUtils.test');
+const { buildSupervisor, seedExternalService, TEST_MANIFEST, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.update', () => {
   it('should update from the store index and rotate the token', async () => {
@@ -99,6 +100,33 @@ describe('externalIntegration.update', () => {
       throw new Error('should have thrown');
     } catch (e) {
       expect(e).to.be.instanceOf(PlatformNotCompatible);
+    }
+  });
+
+  it('should pull the sub-container images and remove the old sub-containers, keeping the network', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration, system } = buildSupervisor({
+      system: { getContainers: fake.resolves([{ id: 'sub-1' }]) },
+    });
+    await externalIntegration.update(service.selector);
+    sinonAssert.calledWith(system.pull, 'eclipse-mosquitto:2.0.18');
+    sinonAssert.calledWith(system.pull, 'ghcr.io/blakeblackshear/frigate:0.14.1');
+    sinonAssert.calledWith(system.removeContainer, 'sub-1', { force: true });
+    sinonAssert.notCalled(system.removeNetwork);
+  });
+
+  it('should translate a failing sub-container image pull on update', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const pullStub = sinon.stub();
+    pullStub.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('NO_MATCHING_MANIFEST'));
+    pullStub.resolves(true);
+    const { externalIntegration } = buildSupervisor({ system: { pull: pullStub } });
+    try {
+      await externalIntegration.update(service.selector);
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
     }
   });
 });

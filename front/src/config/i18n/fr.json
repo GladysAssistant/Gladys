@@ -627,6 +627,10 @@
         "forceUpdateTitle": "Re-télécharge l'image Docker et recrée le conteneur, même sans nouvelle version",
         "logsButton": "Journaux",
         "uninstallButton": "Désinstaller",
+        "containersTitle": "Conteneurs additionnels",
+        "containerRunning": "En fonctionnement",
+        "containerStopped": "Arrêté",
+        "openButton": "Ouvrir",
         "uninstallWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés. Les appareils créés par cette intégration resteront dans Gladys jusqu’à ce que vous les supprimiez.",
         "confirmUninstallButton": "Oui, désinstaller",
         "cancelUninstallButton": "Annuler"
@@ -694,7 +698,32 @@
         "title": "Journaux",
         "refreshButton": "Rafraîchir",
         "error": "Une erreur s'est produite lors du chargement des journaux.",
-        "empty": "Aucun journal disponible."
+        "empty": "Aucun journal disponible.",
+        "containerSelectLabel": "Conteneur",
+        "mainContainerOption": "Conteneur principal"
+      },
+      "subContainers": {
+        "title": "Conteneurs additionnels",
+        "description": "Cette intégration exécute les conteneurs suivants sur votre machine. Les ports listés seront accessibles depuis votre réseau local.",
+        "nameLabel": "Nom",
+        "imageLabel": "Image",
+        "limitsLabel": "Limites",
+        "portsLabel": "Ports exposés"
+      },
+      "hardware": {
+        "title": "Matériel",
+        "installDescription": "Cette intégration demande l'accès à du matériel de votre machine. Vous pouvez accorder ou refuser chaque accès, et le modifier à tout moment après l'installation.",
+        "configDescription": "Accès matériel accordés à cette intégration. Modifier un accès recrée les conteneurs concernés et notifie l'intégration.",
+        "detected": "Détecté",
+        "notDetected": "Non détecté",
+        "saveButton": "Enregistrer le matériel",
+        "saveError": "Une erreur s'est produite lors de l'enregistrement des accès matériel.",
+        "classes": {
+          "coral-usb": "Coral USB (tout le bus USB)",
+          "coral-pcie": "Coral PCIe",
+          "gpu": "GPU (accélération graphique)",
+          "video": "Caméras (périphériques vidéo)"
+        }
       }
     },
     "energyMonitoring": {

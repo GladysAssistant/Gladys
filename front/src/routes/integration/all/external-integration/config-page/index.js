@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import ConfigTab from './ConfigTab';
+import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
@@ -27,8 +28,10 @@ class ExternalIntegrationConfigPage extends Component {
         configValues,
         configuredSecrets: configResponse.configured_secrets || [],
         touchedSecrets: {},
+        grantedDevices: integration.granted_devices || [],
         loadStatus: RequestStatus.Success
       });
+      await this.loadHardwareDetection(integration);
     } catch (e) {
       console.error(e);
       if (selector !== this.props.selector) {
@@ -112,6 +115,51 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  loadHardwareDetection = async integration => {
+    const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
+    if (requestedClasses.length === 0) {
+      return;
+    }
+    try {
+      const { classes = [] } = await this.props.httpClient.get('/api/v1/external_integration/hardware');
+      const detectedClasses = {};
+      classes.forEach(hardwareClass => {
+        detectedClasses[hardwareClass.class] = hardwareClass.detected;
+      });
+      this.setState({ detectedClasses });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  toggleHardwareClass = hardwareClass => {
+    const { grantedDevices = [] } = this.state;
+    this.setState({
+      grantedDevices: grantedDevices.includes(hardwareClass)
+        ? grantedDevices.filter(grantedClass => grantedClass !== hardwareClass)
+        : grantedDevices.concat([hardwareClass]),
+      hardwareStatus: null
+    });
+  };
+
+  saveHardware = async () => {
+    this.setState({ hardwareStatus: RequestStatus.Getting });
+    try {
+      const integration = await this.props.httpClient.post(
+        `/api/v1/external_integration/${this.props.selector}/hardware`,
+        { granted_devices: this.state.grantedDevices || [] }
+      );
+      this.setState({
+        integration,
+        grantedDevices: integration.granted_devices || [],
+        hardwareStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({ hardwareStatus: RequestStatus.Error });
+    }
+  };
+
   executeAction = async action => {
     this.setState({ actionStatus: RequestStatus.Getting, actionError: null });
     try {
@@ -185,6 +233,8 @@ class ExternalIntegrationConfigPage extends Component {
           askUninstall={this.askUninstall}
           cancelUninstall={this.cancelUninstall}
           uninstall={this.uninstall}
+          toggleHardwareClass={this.toggleHardwareClass}
+          saveHardware={this.saveHardware}
         />
       </ExternalIntegrationPage>
     );

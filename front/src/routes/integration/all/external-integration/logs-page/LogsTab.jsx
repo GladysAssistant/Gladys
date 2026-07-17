@@ -1,16 +1,33 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 
-const LogsTab = ({ logs, logsStatus, getLogs }) => (
+const LogsTab = ({ logs, logsStatus, getLogs, subContainers = [], selectedContainer, selectContainer }) => (
   <div class="card">
     <div class="card-header">
       <h1 class="card-title">
         <Text id="integration.externalIntegration.logs.title" />
       </h1>
       <div class="card-options">
+        {subContainers.length > 0 && (
+          <Localizer>
+            <select
+              class="form-control form-control-sm custom-select w-auto mr-2"
+              value={selectedContainer}
+              onChange={selectContainer}
+              aria-label={<Text id="integration.externalIntegration.logs.containerSelectLabel" />}
+            >
+              <option value="main">
+                <Text id="integration.externalIntegration.logs.mainContainerOption" />
+              </option>
+              {subContainers.map(name => (
+                <option value={name}>{name}</option>
+              ))}
+            </select>
+          </Localizer>
+        )}
         <button
           class="btn btn-outline-primary btn-sm"
           onClick={getLogs}

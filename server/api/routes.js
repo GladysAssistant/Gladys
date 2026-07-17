@@ -484,6 +484,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: externalIntegrationController.getStore,
     },
+    'get /api/v1/external_integration/hardware': {
+      authenticated: true,
+      controller: externalIntegrationController.getHardware,
+    },
     'post /api/v1/external_integration/store/refresh': {
       authenticated: true,
       admin: true,
@@ -517,6 +521,11 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: externalIntegrationController.update,
+    },
+    'post /api/v1/external_integration/:selector/hardware': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.setHardware,
     },
     'get /api/v1/external_integration/:selector/logs': {
       authenticated: true,
@@ -582,6 +591,26 @@ function getRoutes(gladys) {
       authenticated: false,
       externalIntegrationAuth: true,
       controller: integrationHostController.saveConfig,
+    },
+    'get /api/integration/v1/container': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getContainers,
+    },
+    'post /api/integration/v1/container/:name/start': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.startContainer,
+    },
+    'post /api/integration/v1/container/:name/stop': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.stopContainer,
+    },
+    'post /api/integration/v1/container/:name/restart': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.restartContainer,
     },
     // user
     'get /api/v1/user': {

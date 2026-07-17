@@ -10,17 +10,31 @@ const MAX_LOG_LINES = 5000;
  * the Docker API (equivalent to `docker logs`) — no log table, no log push.
  * @param {string} selector - The selector of the external integration.
  * @param {number} [lines] - Number of log lines to return.
+ * @param {string} [containerName] - Sub-container name (default: the main
+ * container); 404 if not declared in the manifest.
  * @returns {Promise<string>} Resolve with the raw logs.
  * @example
- * const logs = await gladys.externalIntegration.getLogs('ext-dev-my-integration', 200);
+ * const logs = await gladys.externalIntegration.getLogs('ext-dev-my-integration', 200, 'mqtt');
  */
-async function getLogs(selector, lines = DEFAULT_LOG_LINES) {
+async function getLogs(selector, lines = DEFAULT_LOG_LINES, containerName = undefined) {
   const service = await this.getBySelector(selector);
-  if (!service.container_id) {
+  let containerId = service.container_id;
+  if (containerName) {
+    const entry = this.getManifestContainers(service).find((declared) => declared.name === containerName);
+    if (!entry) {
+      throw new NotFoundError('SUB_CONTAINER_NOT_FOUND');
+    }
+    const container = await this.findSubContainer(service, containerName);
+    if (!container) {
+      throw new NotFoundError('EXTERNAL_INTEGRATION_HAS_NO_CONTAINER');
+    }
+    containerId = container.id;
+  }
+  if (!containerId) {
     throw new NotFoundError('EXTERNAL_INTEGRATION_HAS_NO_CONTAINER');
   }
   const safeLines = Math.min(MAX_LOG_LINES, Math.max(1, parseInt(lines, 10) || DEFAULT_LOG_LINES));
-  const rawLogs = await this.system.getContainerLogs(service.container_id, {
+  const rawLogs = await this.system.getContainerLogs(containerId, {
     follow: false,
     tail: safeLines,
   });
