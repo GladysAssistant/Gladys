@@ -143,9 +143,9 @@ function createActions(store) {
         });
       }
     },
-    copyTwoFactorSecret(state) {
+    async copyTwoFactorSecret(state) {
       try {
-        navigator.clipboard.writeText(state.gatewayConfigureTwoFactorSecret);
+        await navigator.clipboard.writeText(state.gatewayConfigureTwoFactorSecret);
       } catch (e) {
         console.error(e);
       }

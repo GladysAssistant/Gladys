@@ -11,7 +11,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
 });
 
-describe('gateway.configureTwoFactor', () => {
+describe('gateway.enableTwoFactor', () => {
   const variable = {};
 
   let gateway;
@@ -53,20 +53,20 @@ describe('gateway.configureTwoFactor', () => {
     sinon.reset();
   });
 
-  it('should return the otpauth url to configure two factor', async () => {
-    const result = await gateway.configureTwoFactor('access-token');
-    assert.calledWith(gateway.gladysGatewayClient.configureTwoFactor, 'access-token');
+  it('should enable two factor', async () => {
+    const result = await gateway.enableTwoFactor('access-token', '123456');
+    assert.calledWith(gateway.gladysGatewayClient.enableTwoFactor, 'access-token', '123456');
     expect(result).to.deep.equal({
-      otpauth_url: 'otpauth://totp/Gladys%20Gateway?secret=THISISMYSECRET',
+      two_factor_enabled: true,
     });
   });
 
-  it('should throw 403 error when the gateway refuses the access token', async () => {
+  it('should throw 403 error when the two factor code is invalid', async () => {
     const error = new Error();
-    error.response = { status: 401 };
-    gateway.gladysGatewayClient.configureTwoFactor = fake.rejects(error);
+    error.response = { status: 422 };
+    gateway.gladysGatewayClient.enableTwoFactor = fake.rejects(error);
     try {
-      await gateway.configureTwoFactor('access-token');
+      await gateway.enableTwoFactor('access-token', '123456');
       assert.fail();
     } catch (e) {
       expect(e).instanceOf(Error403);
@@ -74,9 +74,9 @@ describe('gateway.configureTwoFactor', () => {
   });
 
   it('should throw 500 error when the gateway is not reachable', async () => {
-    gateway.gladysGatewayClient.configureTwoFactor = fake.rejects(new Error());
+    gateway.gladysGatewayClient.enableTwoFactor = fake.rejects(new Error());
     try {
-      await gateway.configureTwoFactor('access-token');
+      await gateway.enableTwoFactor('access-token', '123456');
       assert.fail();
     } catch (e) {
       expect(e).instanceOf(Error500);

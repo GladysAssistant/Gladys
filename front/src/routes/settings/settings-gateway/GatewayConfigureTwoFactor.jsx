@@ -78,7 +78,7 @@ const GatewayConfigureTwoFactor = ({ children, ...props }) => (
           </div>
           <div class="form-footer">
             <button
-              onClick={props.enableTwoFactor}
+              type="submit"
               class="btn btn-primary btn-block"
               disabled={props.gatewayLoginStatus === RequestStatus.Getting}
             >
