@@ -3,6 +3,7 @@ const sinon = require('sinon');
 
 const { fake, assert } = sinon;
 
+const db = require('../../../models');
 const { NotFoundError, BadParameters } = require('../../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { buildSupervisor, seedExternalService, TEST_COMMUNICATION_MANIFEST } = require('./testUtils.test');
@@ -169,6 +170,21 @@ describe('externalIntegration.handleIncomingMessage', () => {
     await expect(
       externalIntegration.handleIncomingMessage(service, { contact_id: 'unknown-contact', text: 'hello' }),
     ).to.be.rejectedWith(NotFoundError);
+    assert.notCalled(event.emit);
+  });
+
+  it('should return 404 for a contact linked to a deleted user', async () => {
+    const { externalIntegration, event, variable } = buildSupervisor();
+    const service = await seedCommunicationService();
+    await variable.setValue(CONTACT_VARIABLE, JSON.stringify({ contact_id: 'signal-12345' }), service.id, JOHN_USER_ID);
+    const findOneStub = sinon.stub(db.User, 'findOne').resolves(null);
+    try {
+      await expect(
+        externalIntegration.handleIncomingMessage(service, { contact_id: 'signal-12345', text: 'hello' }),
+      ).to.be.rejectedWith(NotFoundError);
+    } finally {
+      findOneStub.restore();
+    }
     assert.notCalled(event.emit);
   });
 
