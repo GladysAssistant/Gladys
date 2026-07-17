@@ -37,6 +37,10 @@ async function buildContainerDescriptor(service, integrationToken) {
     Labels: {
       // reconciliation key at boot and after backup/restore
       [EXTERNAL_INTEGRATION_LABEL]: service.selector,
+      // updates are driven by the supervisor (explicit admin gesture, token
+      // rotation, DB consistency): Watchtower must never recreate this
+      // container behind Gladys' back
+      'com.centurylinklabs.watchtower.enable': 'false',
     },
     Env: [
       `GLADYS_HOST_API_URL=${hostApiUrl}`,

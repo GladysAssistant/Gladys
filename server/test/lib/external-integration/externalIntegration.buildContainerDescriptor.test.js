@@ -16,6 +16,7 @@ describe('externalIntegration.buildContainerDescriptor', () => {
       Image: 'ghcr.io/john/gladys-open-meteo-demo:1.2.0',
       Labels: {
         'io.gladysassistant.external-integration': 'ext-dev-open-meteo-demo',
+        'com.centurylinklabs.watchtower.enable': 'false',
       },
       Env: [
         `GLADYS_HOST_API_URL=http://172.30.0.1:${parseInt(process.env.SERVER_PORT, 10) || 1443}`,
