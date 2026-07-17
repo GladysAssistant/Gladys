@@ -1,8 +1,9 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
-const { assert, fake, stub } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const logger = require('../../../utils/logger');
+
+const { assert, fake, stub } = sinon;
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 const adminId = 'd1d73559-a987-44eb-9453-3cbf5bcb5a2f';
