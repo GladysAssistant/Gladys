@@ -637,10 +637,32 @@ const actionsFunc = {
   [ACTIONS.SMS.SEND]: async (self, action, scope) => {
     const freeMobileService = self.service.getService('free-mobile');
 
-    if (freeMobileService) {
-      const textWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
-      freeMobileService.sms.send(textWithVariables);
+    if (!freeMobileService) {
+      return;
     }
+
+    const textWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
+    const message = { text: textWithVariables };
+
+    // If a specific user is targeted, only send the SMS to this user
+    if (action.user && action.user !== 'all') {
+      const user = self.stateManager.get('user', action.user);
+      if (user) {
+        await freeMobileService.message.send(user.id, message);
+      }
+      return;
+    }
+
+    // Otherwise, send the SMS to every user who configured Free Mobile
+    const configuredVariables = await self.variable.getVariables(
+      'FREE_MOBILE_USERNAME',
+      freeMobileService.message.serviceId,
+    );
+    await Promise.each(configuredVariables, async (variable) => {
+      if (variable.user_id) {
+        await freeMobileService.message.send(variable.user_id, message);
+      }
+    });
   },
   [ACTIONS.CONDITION.IF_THEN_ELSE]: async (self, action, scope, path) => {
     const { if: ifActions, then: thenActions, else: elseActions } = action;

@@ -854,6 +854,7 @@
       "description": "Envoyer des sms depuis Gladys grâce à Free Mobile.",
       "documentation": "Documentation Free Mobile",
       "introduction": "Ce plugin vous permet d'envoyer des sms à votre portable Free via le service de notification proposé par Free. Entrez votre identifiant client et la clé d'identification ci-dessous que vous retrouverez sur le site <a href=\"https://mobile.free.fr\"> FreeMobile</a>.",
+      "userConfigInfo": "Cette configuration est personnelle : chaque utilisateur peut renseigner ses propres identifiants Free Mobile pour recevoir des SMS. Dans vos scènes, vous pourrez alors choisir à quel utilisateur envoyer un SMS.",
       "username": "Identifiant client Free Mobile",
       "key": "Clé d'identification au service",
       "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
@@ -2578,6 +2579,8 @@
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "smsSend": {
+        "userLabel": "Destinataire du SMS",
+        "allUsersOption": "Tous les utilisateurs",
         "textLabel": "Message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"

@@ -1,10 +1,48 @@
 const logger = require('../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
+const MessageHandler = require('./lib');
 
 module.exports = function FreeMobileService(gladys, serviceId) {
   const axios = require('axios');
-  let username;
-  let accessToken;
+  const messageHandler = new MessageHandler(gladys, axios, serviceId);
+
+  /**
+   * @description Migrate the legacy global Free Mobile configuration (stored without
+   * a user) to a per-user configuration attached to the admin user.
+   * @example
+   * await migrateGlobalConfiguration();
+   */
+  async function migrateGlobalConfiguration() {
+    const globalUsername = await gladys.variable.getValue('FREE_MOBILE_USERNAME', serviceId);
+    const globalAccessToken = await gladys.variable.getValue('FREE_MOBILE_ACCESS_TOKEN', serviceId);
+
+    // Nothing to migrate
+    if (!globalUsername && !globalAccessToken) {
+      return;
+    }
+
+    const admins = await gladys.user.getByRole('admin');
+    if (admins.length === 0) {
+      logger.warn('Free Mobile: no admin user found, cannot migrate global configuration');
+      return;
+    }
+    const [admin] = admins;
+
+    logger.info(`Free Mobile: migrating global configuration to admin user ${admin.selector}`);
+
+    // Only migrate the values if the admin doesn't already have a per-user configuration
+    const adminUsername = await gladys.variable.getValue('FREE_MOBILE_USERNAME', serviceId, admin.id);
+    if (!adminUsername && globalUsername) {
+      await gladys.variable.setValue('FREE_MOBILE_USERNAME', globalUsername, serviceId, admin.id);
+    }
+    const adminAccessToken = await gladys.variable.getValue('FREE_MOBILE_ACCESS_TOKEN', serviceId, admin.id);
+    if (!adminAccessToken && globalAccessToken) {
+      await gladys.variable.setValue('FREE_MOBILE_ACCESS_TOKEN', globalAccessToken, serviceId, admin.id);
+    }
+
+    // Remove the legacy global variables
+    await gladys.variable.destroy('FREE_MOBILE_USERNAME', serviceId);
+    await gladys.variable.destroy('FREE_MOBILE_ACCESS_TOKEN', serviceId);
+  }
 
   /**
    * @public
@@ -14,39 +52,7 @@ module.exports = function FreeMobileService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Free Mobile service');
-    username = await gladys.variable.getValue('FREE_MOBILE_USERNAME', serviceId);
-    accessToken = await gladys.variable.getValue('FREE_MOBILE_ACCESS_TOKEN', serviceId);
-
-    if (!username || username.length === 0) {
-      throw new ServiceNotConfiguredError('No FreeMobile username found. Not starting Free Mobile service');
-    }
-
-    if (!accessToken || accessToken.length === 0) {
-      throw new ServiceNotConfiguredError('No FreeMobile access_token found. Not starting Free Mobile service');
-    }
-  }
-
-  /**
-   * @description Send a sms.
-   * @param {string} message - The message to send.
-   * @example
-   * gladys.services.free-mobile.sms.send('hello')
-   */
-  async function send(message) {
-    const url = 'https://smsapi.free-mobile.fr/sendmsg';
-
-    const params = {
-      user: username,
-      pass: accessToken,
-      msg: message,
-    };
-
-    try {
-      const response = await axios.get(url, { params });
-      logger.debug('SMS successfully sent:', response.data);
-    } catch (e) {
-      logger.error('Error sending SMS:', e);
-    }
+    await migrateGlobalConfiguration();
   }
 
   /**
@@ -59,11 +65,22 @@ module.exports = function FreeMobileService(gladys, serviceId) {
     logger.info('Stopping Free Mobile service');
   }
 
+  /**
+   * @public
+   * @description This function returns if the Free Mobile service is used.
+   * @returns {Promise<boolean>} Returns true if the Free Mobile service is used.
+   * @example
+   * const used = await gladys.services.free-mobile.isUsed();
+   */
+  async function isUsed() {
+    const usernames = await gladys.variable.getVariables('FREE_MOBILE_USERNAME', serviceId);
+    return usernames.some((variable) => variable.user_id && variable.value);
+  }
+
   return Object.freeze({
     start,
     stop,
-    sms: {
-      send,
-    },
+    message: messageHandler,
+    isUsed,
   });
 };
