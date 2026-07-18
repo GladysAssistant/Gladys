@@ -44,7 +44,7 @@ Décisions de cadrage validées avec le mainteneur :
 | Phase | Contenu | Livrable observable |
 |---|---|---|
 | **1** | API-hôte + WS, superviseur, auth, API admin, **store décentralisé** (indexeur + catalogue + install 1 clic + mises à jour), front au niveau des intégrations internes : entrée dans le catalogue (badge « externe ») + page générique à 3 écrans Appareils / Découverte / Configuration (formulaire généré depuis le `config_schema`), SDK Node (repo dédié), template/PoC (repo dédié), **documentation publique sur le site** (interne vs externe + guide développeur). Install « dev » par image Docker conservée. | N'importe quel dev tague son repo → son intégration apparaît dans le catalogue de toutes les Gladys sans aucune approbation → un utilisateur l'installe en un clic, ses appareils découverts sont créés depuis l'UI, actionnables, configurables via formulaire généré ; l'intégration survit à un kill (redémarrage auto), passe « En panne » avec logs après échecs répétés. |
-| **2** | Découverte médiée (mDNS/USB par le core), widgets de config avancés, autres types d'intégrations que « Appareils » — en premier lieu le type « communication » pour sortir Telegram & co du core (design complet en B.15), puis météo…. | Une intégration détecte son matériel sans config manuelle ; un canal de messagerie s'installe depuis le store. |
+| **2** | Découverte réseau médiée (broadcast/mDNS/SSDP capturés par le core — design complet en B.16), widgets de config avancés, autres types d'intégrations que « Appareils » — en premier lieu le type « communication » pour sortir Telegram & co du core (design complet en B.15), puis météo…. | Une intégration détecte son matériel sans config manuelle ; un canal de messagerie s'installe depuis le store. |
 | **3** | Écosystème : SDKs communautaires d'autres langages, ranking/stats du store, durcissement supply-chain (épinglage par digest, signature d'images ?). | Écosystème auto-suffisant, sans intervention du mainteneur. |
 
 ## B. Plan détaillé — Phase 1
@@ -100,7 +100,7 @@ Fichiers principaux : `index.js` (constructeur : maps connexions WS, commandes e
 - Un conteneur en `--network=host` **ne peut pas** rejoindre un autre réseau (refus Docker) — mais il n'en a pas besoin : Gladys en host écoute sur toutes les interfaces de l'hôte, y compris celle du bridge (`br-xxxx`). Depuis un conteneur d'intégration, la **gateway du bridge** est l'hôte → `GLADYS_HOST_API_URL = http://<gateway>:<SERVER_PORT>`. Le subnet étant épinglé à la création du réseau (`172.30.0.0/24`), la gateway est **déterministe : `172.30.0.1`** sur la quasi-totalité des installs ; si ce subnet est déjà occupé sur la machine (rare), repli sur l'auto-assignation Docker, et la gateway effective est lue via `inspectNetwork` (`IPAM.Config[0].Gateway`). Pas de NAT, pas de port à publier.
 - Cas Gladys en **bridge** (installs non standard) : l'attachement a posteriori fonctionne, lui (`network.connect(getGladysContainerId())`, à chaud), et les intégrations joignent Gladys par le DNS embarqué du bridge custom. Distinction des deux cas via le `getNetworkMode()` existant. Design plus permissif que les services actuels (node-red/z2m/matterbridge exigent le mode host).
 - `enable_icc=false` ne bloque que le trafic conteneur↔conteneur sur le bridge (l'isolation voulue entre intégrations) ; conteneur→gateway (Gladys) et conteneur→internet (NAT) passent normalement. À documenter : un pare-feu host strict (ufw) filtre le trafic bridge→hôte (chaîne INPUT).
-- **Limite bridge assumée : pas de broadcast/multicast LAN entrant.** Les paquets broadcast, mDNS ou SSDP émis sur le LAN ne traversent pas le bridge NAT — vérifié sur un cas réel : le scan local Tuya (`tuya.localScan.js`) écoute des broadcasts UDP (ports 6666/6667/7000) et ne fonctionnerait pas dans un conteneur bridge (le core s'en sort uniquement parce qu'il est en `network=host`). L'**unicast** LAN sortant, lui, traverse le NAT : joindre une IP connue (obtenue d'un cloud, saisie en config) ou une API cloud fonctionne. La **découverte médiée** (le core, en host, scanne le LAN et relaie les résultats aux intégrations) est l'objet de la phase 2 — à documenter honnêtement d'ici là (B.12).
+- **Limite bridge assumée : pas de broadcast/multicast LAN entrant.** Les paquets broadcast, mDNS ou SSDP émis sur le LAN ne traversent pas le bridge NAT — vérifié sur un cas réel : le scan local Tuya (`tuya.localScan.js`) écoute des broadcasts UDP (ports 6666/6667/7000) et ne fonctionnerait pas dans un conteneur bridge (le core s'en sort uniquement parce qu'il est en `network=host`). L'**unicast** LAN sortant, lui, traverse le NAT : joindre une IP connue (obtenue d'un cloud, saisie en config) ou une API cloud fonctionne. La **découverte médiée** (le core, en host, capture et relaie — design complet en B.16) est l'objet de la phase 2 — à documenter honnêtement d'ici là (B.12).
 
 **Sous-conteneurs (intégrations multi-conteneurs, ex. Frigate + Mosquitto).** Une intégration qui a besoin d'autres conteneurs ne reçoit jamais la socket Docker ni une API de création libre. Le modèle est en deux temps :
 - le **manifeste déclare** (champ `containers`, C.1) tout ce qui peut tourner — images, volumes, limites, ports publiés, accès matériel. C'est le **contrat d'autorisation** : affiché sur l'écran d'installation (et visible dans le catalogue), c'est ce que l'utilisateur approuve ;
@@ -288,6 +288,29 @@ Objectif : que Telegram, Nextcloud Talk, CallMeBot — et demain Matrix, Signal,
 **3. Risque spécifique, à traiter à la hauteur du danger** : un message entrant a l'**autorité de l'utilisateur lié** (déclencher des scènes, ouvrir des portes via le cerveau…). La liaison par code est donc le consentement critique : code à usage unique, TTL court, généré seulement par l'utilisateur depuis l'UI, révocable ; et l'écran d'installation d'une intégration `communication` avertit spécifiquement (« cette intégration pourra envoyer et recevoir des messages en votre nom »). Même modèle de confiance que le bot Telegram actuel — mais avec du code non audité : à écrire noir sur blanc dans la doc utilisateur (B.12).
 
 **Ce que la v1 doit anticiper (et anticipe déjà)** : `type` extensible dans le manifeste et le filtre catalogue ; page générique branchée par type ; convention WS `<domaine>.<action>` ; proxy-service extensible par capacité (`device.*` aujourd'hui, `message.*` demain) ; variables scoppées `(service_id, user_id)` disponibles. Seul travail v1 : ne pas fermer ces portes. Phase 3 : dépréciation des services communication du core au profit d'équivalents externes maintenus par la communauté.
+
+### B.16 Découverte réseau médiée (design, phase 2)
+
+Problème (établi en B.2) : les conteneurs bridge ne reçoivent **jamais** les broadcasts, mDNS ou SSDP du LAN — seul le core, en `network=host`, les voit. Cas de validation concret : le scan local Tuya (`tuya.localScan.js`) écoute des broadcasts UDP sur les ports 6666/6667/7000 puis parse/déchiffre les paquets avec la lib tuyapi. Principe du design : **le core capture (position réseau), l'intégration interprète (connaissance du protocole)** — le core ne parse jamais rien.
+
+**Déclaration dans le manifeste** (même philosophie que `containers`/`devices` : demander = montrer à l'utilisateur) — champ optionnel `network_discovery`, liste de captures **curatées** :
+
+```json
+"network_discovery": [
+  { "type": "udp-broadcast", "ports": [6666, 6667, 7000] },
+  { "type": "mdns", "service": "_hue._tcp" }
+]
+```
+
+Types v1 du champ (extensibles par version de schéma) : `udp-broadcast` (écoute passive sur les ports déclarés, max 5 ports), `mdns` (browse d'un type de service déclaré), `ssdp` (M-SEARCH sur un `st` déclaré). Affiché sur l'écran d'installation (« cette intégration pourra écouter les annonces réseau UDP ports 6666–6667 ») ; jamais de capture arbitraire (pas de pcap, pas de port non déclaré).
+
+**API-hôte (phase 2)** — scan à la demande, synchrone et borné :
+- `POST /api/integration/v1/network_discovery/scan` `{ "type": "udp-broadcast", "timeout_seconds": 10 }` (1–30 s, `403` si le type/les ports ne sont pas déclarés dans le manifeste) → `200` avec les résultats **bruts** : `udp-broadcast` → `[ { "source_ip", "source_port", "payload_base64" } ]` ; `mdns` → `[ { "name", "host", "addresses", "port", "txt" } ]` ; `ssdp` → en-têtes bruts par répondeur.
+- L'intégration parse elle-même (Tuya : `MessageParser` sur les `payload_base64`, exactement le code de `localScan` actuel), puis joint les appareils en **unicast** (qui traverse le NAT, déjà possible en v1) et publie ses `discovered_device`.
+
+Côté core : `server/lib/external-integration/networkDiscovery/` — sockets ouvertes seulement pendant un scan (coût borné par le timeout), un scan concurrent par intégration, réutilise la position `network=host` (et le savoir-faire lan-manager pour un éventuel type `ip-scan` ultérieur).
+
+**Ce que la v1 doit anticiper (et anticipe déjà)** : champ de manifeste additif (un manifeste avec `network_discovery` est simplement refusé par une Gladys trop vieille via `gladys_version`), API-hôte versionnée, écran d'installation déjà structuré en « demandes » approuvées (conteneurs, matériel — les captures s'y rangeront). En attendant : Tuya externe = cloud + poll local unicast (IPs obtenues du cloud), sans scan LAN — documenté honnêtement (B.2, B.12).
 
 ## C. Spécification des interfaces (contrats v1)
 
