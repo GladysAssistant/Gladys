@@ -3,11 +3,12 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import StatusBadge from '../components/StatusBadge';
-import { getGithubRepoUrl } from '../utils';
+import { getGithubRepoUrl, getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const SupervisionCard = ({
   integration,
+  language,
   actionStatus,
   actionError,
   uninstallStatus,
@@ -59,6 +60,25 @@ const SupervisionCard = ({
               <dd class="col-7 col-sm-8">
                 <StatusBadge status={integration.status} />
               </dd>
+              {integration.connection_status && [
+                <dt class="col-5 col-sm-4">
+                  <Text id="integration.externalIntegration.connection.label" />
+                </dt>,
+                <dd class="col-7 col-sm-8">
+                  <span class={cx('badge', integration.connection_status.connected ? 'badge-success' : 'badge-danger')}>
+                    {integration.connection_status.connected ? (
+                      <Text id="integration.externalIntegration.connection.connectedBadge" />
+                    ) : (
+                      <Text id="integration.externalIntegration.connection.disconnectedBadge" />
+                    )}
+                  </span>
+                  {integration.connection_status.message && (
+                    <div class="text-muted small">
+                      {getLocalizedText(integration.connection_status.message, language)}
+                    </div>
+                  )}
+                </dd>
+              ]}
               {integration.version && [
                 <dt class="col-5 col-sm-4">
                   <Text id="integration.externalIntegration.supervision.versionLabel" />

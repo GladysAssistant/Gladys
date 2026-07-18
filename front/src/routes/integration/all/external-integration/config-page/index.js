@@ -112,6 +112,29 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  connectOAuth = async field => {
+    this.setState({ oauthStatus: RequestStatus.Getting });
+    const { selector } = this.props;
+    const redirectUri = `${window.location.origin}/dashboard/integration/device/external/${selector}/oauth-callback`;
+    try {
+      const { authorize_url: authorizeUrl } = await this.props.httpClient.post(
+        `/api/v1/external_integration/${selector}/oauth/authorize_url`,
+        {
+          key: field.key,
+          redirect_uri: redirectUri
+        }
+      );
+      // the callback popup is a new tab: it recovers the oauth2 key
+      // through localStorage (shared across same-origin tabs)
+      localStorage.setItem(`externalIntegrationOAuthKey:${selector}`, field.key);
+      window.open(authorizeUrl, '_blank', 'noopener');
+      this.setState({ oauthStatus: RequestStatus.Success });
+    } catch (e) {
+      console.error(e);
+      this.setState({ oauthStatus: RequestStatus.Error });
+    }
+  };
+
   executeAction = async action => {
     this.setState({ actionStatus: RequestStatus.Getting, actionError: null });
     try {
@@ -152,10 +175,24 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  onConnectionStatusUpdated = payload => {
+    if (payload && this.state.integration && payload.selector === this.props.selector) {
+      this.setState({
+        integration: Object.assign({}, this.state.integration, {
+          connection_status: { connected: payload.connected, message: payload.message }
+        })
+      });
+    }
+  };
+
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
       this.onStatusChanged
+    );
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
+      this.onConnectionStatusUpdated
     );
     this.loadData();
   }
@@ -171,6 +208,10 @@ class ExternalIntegrationConfigPage extends Component {
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
       this.onStatusChanged
     );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
+      this.onConnectionStatusUpdated
+    );
   }
 
   render(props, state) {
@@ -181,6 +222,7 @@ class ExternalIntegrationConfigPage extends Component {
           user={props.user}
           updateConfigValue={this.updateConfigValue}
           saveConfig={this.saveConfig}
+          connectOAuth={this.connectOAuth}
           executeAction={this.executeAction}
           askUninstall={this.askUninstall}
           cancelUninstall={this.cancelUninstall}

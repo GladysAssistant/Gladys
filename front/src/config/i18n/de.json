@@ -608,7 +608,23 @@
         "secretConfiguredPlaceholder": "Konfiguriert. Leer lassen, um den aktuellen Wert zu behalten.",
         "saveSuccess": "Konfiguration erfolgreich gespeichert.",
         "saveError": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
-        "saveButton": "Konfiguration speichern"
+        "saveButton": "Konfiguration speichern",
+        "oauthConnectButton": "Verbinden",
+        "oauthConnectError": "Fehler beim Starten der Verbindung. Prüfen Sie, ob die Integration läuft."
+      },
+      "connection": {
+        "label": "Verbindung",
+        "connectedBadge": "Verbunden",
+        "disconnectedBadge": "Getrennt"
+      },
+      "oauthCallback": {
+        "title": "Kontoverbindung",
+        "relayingText": "Verbindung mit der Integration wird abgeschlossen...",
+        "successText": "Konto erfolgreich verbunden.",
+        "errorText": "Die Integration hat die Verbindung abgelehnt. Bitte erneut versuchen.",
+        "missingParamsText": "Dieser Seite fehlen die Verbindungsparameter. Starten Sie die Verbindung erneut über den Konfigurationsbildschirm.",
+        "closeText": "Sie können dieses Fenster schließen.",
+        "backToConfigButton": "Zurück zur Konfiguration"
       },
       "supervision": {
         "title": "Überwachung",

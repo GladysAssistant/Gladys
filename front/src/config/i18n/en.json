@@ -608,7 +608,23 @@
         "secretConfiguredPlaceholder": "Configured. Leave empty to keep the current value.",
         "saveSuccess": "Configuration saved successfully.",
         "saveError": "There was an error saving the configuration.",
-        "saveButton": "Save configuration"
+        "saveButton": "Save configuration",
+        "oauthConnectButton": "Connect",
+        "oauthConnectError": "There was an error starting the connection. Check that the integration is running."
+      },
+      "connection": {
+        "label": "Connection",
+        "connectedBadge": "Connected",
+        "disconnectedBadge": "Disconnected"
+      },
+      "oauthCallback": {
+        "title": "Account connection",
+        "relayingText": "Finalizing the connection with the integration...",
+        "successText": "Account connected successfully.",
+        "errorText": "The integration refused the connection. Please try again.",
+        "missingParamsText": "This page is missing its connection parameters. Restart the connection from the Configuration screen.",
+        "closeText": "You can close this window.",
+        "backToConfigButton": "Back to configuration"
       },
       "supervision": {
         "title": "Supervision",

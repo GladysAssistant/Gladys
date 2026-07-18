@@ -608,7 +608,23 @@
         "secretConfiguredPlaceholder": "Configuré. Laissez vide pour conserver la valeur actuelle.",
         "saveSuccess": "Configuration enregistrée avec succès.",
         "saveError": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
-        "saveButton": "Enregistrer la configuration"
+        "saveButton": "Enregistrer la configuration",
+        "oauthConnectButton": "Connecter",
+        "oauthConnectError": "Erreur au lancement de la connexion. Vérifiez que l'intégration est démarrée."
+      },
+      "connection": {
+        "label": "Connexion",
+        "connectedBadge": "Connecté",
+        "disconnectedBadge": "Déconnecté"
+      },
+      "oauthCallback": {
+        "title": "Connexion du compte",
+        "relayingText": "Finalisation de la connexion avec l'intégration...",
+        "successText": "Compte connecté avec succès.",
+        "errorText": "L'intégration a refusé la connexion. Réessayez.",
+        "missingParamsText": "Il manque des paramètres de connexion à cette page. Relancez la connexion depuis l'écran Configuration.",
+        "closeText": "Vous pouvez fermer cette fenêtre.",
+        "backToConfigButton": "Retour à la configuration"
       },
       "supervision": {
         "title": "Supervision",

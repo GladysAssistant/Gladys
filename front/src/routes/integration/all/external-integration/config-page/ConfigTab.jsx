@@ -47,6 +47,9 @@ const ConfigTab = props => {
                   saveConfigStatus={props.saveConfigStatus}
                   updateConfigValue={props.updateConfigValue}
                   saveConfig={props.saveConfig}
+                  connectionStatus={get(integration, 'connection_status')}
+                  oauthStatus={props.oauthStatus}
+                  connectOAuth={props.connectOAuth}
                 />
               )}
             </div>
@@ -57,6 +60,7 @@ const ConfigTab = props => {
       {integration && (
         <SupervisionCard
           integration={integration}
+          language={language}
           actionStatus={props.actionStatus}
           actionError={props.actionError}
           uninstallStatus={props.uninstallStatus}
