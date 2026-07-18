@@ -27,19 +27,27 @@ module.exports = function FreeMobileService(gladys, serviceId) {
     }
     const [admin] = admins;
 
-    logger.info(`Free Mobile: migrating global configuration to admin user ${admin.selector}`);
-
-    // Only migrate the values if the admin doesn't already have a per-user configuration
     const adminUsername = await gladys.variable.getValue('FREE_MOBILE_USERNAME', serviceId, admin.id);
-    if (!adminUsername && globalUsername) {
-      await gladys.variable.setValue('FREE_MOBILE_USERNAME', globalUsername, serviceId, admin.id);
-    }
     const adminAccessToken = await gladys.variable.getValue('FREE_MOBILE_ACCESS_TOKEN', serviceId, admin.id);
-    if (!adminAccessToken && globalAccessToken) {
+
+    if (!adminUsername && !adminAccessToken) {
+      // The admin has no per-user configuration yet: copy the legacy pair only if it is complete,
+      // to avoid creating a mismatched username/token pair
+      if (!globalUsername || !globalAccessToken) {
+        logger.warn('Free Mobile: legacy global configuration is incomplete, keeping it as-is');
+        return;
+      }
+      logger.info(`Free Mobile: migrating global configuration to admin user ${admin.selector}`);
+      await gladys.variable.setValue('FREE_MOBILE_USERNAME', globalUsername, serviceId, admin.id);
       await gladys.variable.setValue('FREE_MOBILE_ACCESS_TOKEN', globalAccessToken, serviceId, admin.id);
+    } else if (!adminUsername || !adminAccessToken) {
+      // The admin has a partial per-user configuration: don't mix it with legacy values,
+      // and keep the legacy variables so they remain recoverable
+      logger.warn('Free Mobile: admin user has a partial configuration, keeping the legacy global configuration');
+      return;
     }
 
-    // Remove the legacy global variables
+    // The admin now has a complete pair: remove the legacy global variables
     await gladys.variable.destroy('FREE_MOBILE_USERNAME', serviceId);
     await gladys.variable.destroy('FREE_MOBILE_ACCESS_TOKEN', serviceId);
   }
@@ -73,8 +81,14 @@ module.exports = function FreeMobileService(gladys, serviceId) {
    * const used = await gladys.services.free-mobile.isUsed();
    */
   async function isUsed() {
-    const usernames = await gladys.variable.getVariables('FREE_MOBILE_USERNAME', serviceId);
-    return usernames.some((variable) => variable.user_id && variable.value);
+    const [usernames, accessTokens] = await Promise.all([
+      gladys.variable.getVariables('FREE_MOBILE_USERNAME', serviceId),
+      gladys.variable.getVariables('FREE_MOBILE_ACCESS_TOKEN', serviceId),
+    ]);
+    const usersWithToken = new Set(
+      accessTokens.filter((variable) => variable.user_id && variable.value).map((variable) => variable.user_id),
+    );
+    return usernames.some((variable) => variable.user_id && variable.value && usersWithToken.has(variable.user_id));
   }
 
   return Object.freeze({

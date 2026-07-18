@@ -2580,7 +2580,7 @@
       },
       "smsSend": {
         "userLabel": "Empfänger der SMS",
-        "allUsersOption": "Alle Benutzer",
+        "allUsersOption": "Alle Free-Mobile-Benutzer",
         "textLabel": "Nachricht",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"

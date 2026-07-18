@@ -1,3 +1,4 @@
+const sinon = require('sinon');
 const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
 
@@ -92,6 +93,106 @@ describe('scene.send-sms', () => {
     assert.calledWith(variable.getVariables, 'FREE_MOBILE_USERNAME', serviceId);
     assert.calledWith(freeMobileService.message.send, 'user-1', { text: 'Alarm triggered' });
     assert.calledWith(freeMobileService.message.send, 'user-2', { text: 'Alarm triggered' });
+  });
+
+  it('should not send SMS if the specific user is unknown', async () => {
+    const stateManager = new StateManager(event);
+    const freeMobileService = {
+      message: {
+        serviceId,
+        send: fake.resolves(null),
+      },
+    };
+    const service = {
+      getService: fake.returns(freeMobileService),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, service },
+      [
+        [
+          {
+            type: ACTIONS.SMS.SEND,
+            user: 'unknown-user',
+            text: 'Alarm triggered',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.notCalled(freeMobileService.message.send);
+  });
+
+  it('should ignore configured variables without user_id when sending to all users', async () => {
+    const stateManager = new StateManager(event);
+    const freeMobileService = {
+      message: {
+        serviceId,
+        send: fake.resolves(null),
+      },
+    };
+    const service = {
+      getService: fake.returns(freeMobileService),
+    };
+    const variable = {
+      getVariables: fake.resolves([
+        { user_id: null, value: 'legacyGlobalUser' },
+        { user_id: 'user-1', value: 'user1' },
+      ]),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, service, variable },
+      [
+        [
+          {
+            type: ACTIONS.SMS.SEND,
+            user: 'all',
+            text: 'Alarm triggered',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledOnceWithExactly(freeMobileService.message.send, 'user-1', { text: 'Alarm triggered' });
+  });
+
+  it('should keep sending to remaining users when one send fails', async () => {
+    const stateManager = new StateManager(event);
+    const send = sinon.stub();
+    send.withArgs('user-1').rejects(new Error('Free Mobile API error'));
+    send.resolves(null);
+    const freeMobileService = {
+      message: {
+        serviceId,
+        send,
+      },
+    };
+    const service = {
+      getService: fake.returns(freeMobileService),
+    };
+    const variable = {
+      getVariables: fake.resolves([
+        { user_id: 'user-1', value: 'user1' },
+        { user_id: 'user-2', value: 'user2' },
+      ]),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, service, variable },
+      [
+        [
+          {
+            type: ACTIONS.SMS.SEND,
+            user: 'all',
+            text: 'Alarm triggered',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(send, 'user-1', { text: 'Alarm triggered' });
+    assert.calledWith(send, 'user-2', { text: 'Alarm triggered' });
   });
 
   it('should do nothing if free-mobile service is not available', async () => {

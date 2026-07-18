@@ -26,11 +26,15 @@ class SendSms extends Component {
           value: user.selector
         });
       });
-      let selectedOption = userOptions[0];
+      let selectedOption;
       if (this.props.action.user) {
-        selectedOption = userOptions.find(option => option.value === this.props.action.user) || userOptions[0];
-      } else {
-        this.props.updateActionProperty(this.props.path, 'user', ALL_USERS_VALUE);
+        selectedOption = userOptions.find(option => option.value === this.props.action.user);
+      }
+      if (!selectedOption) {
+        // No user selected yet, or the selected user no longer exists: fall back to "all users"
+        // and persist the fallback so an invalid user id is never kept in the scene
+        selectedOption = userOptions[0];
+        this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
       }
       this.setState({ userOptions, selectedOption });
     } catch (e) {
@@ -48,11 +52,12 @@ class SendSms extends Component {
     }
   };
   refreshSelectedOptions = nextProps => {
-    let selectedOption = '';
-    if (nextProps.action.user && this.state.userOptions) {
-      const userOption = this.state.userOptions.find(option => option.value === nextProps.action.user);
-      if (userOption) {
-        selectedOption = userOption;
+    let selectedOption = null;
+    if (this.state.userOptions && this.state.userOptions.length > 0) {
+      selectedOption = this.state.userOptions.find(option => option.value === nextProps.action.user);
+      if (!selectedOption) {
+        // Unknown user: fall back to "all users" instead of a blank select
+        [selectedOption] = this.state.userOptions;
       }
     }
     this.setState({ selectedOption });

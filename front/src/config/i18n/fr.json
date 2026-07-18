@@ -2580,7 +2580,7 @@
       },
       "smsSend": {
         "userLabel": "Destinataire du SMS",
-        "allUsersOption": "Tous les utilisateurs",
+        "allUsersOption": "Tous les utilisateurs Free Mobile",
         "textLabel": "Message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"

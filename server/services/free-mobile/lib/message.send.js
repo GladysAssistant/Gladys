@@ -1,6 +1,7 @@
 const logger = require('../../../utils/logger');
 
 const FREE_MOBILE_SEND_URL = 'https://smsapi.free-mobile.fr/sendmsg';
+const FREE_MOBILE_TIMEOUT = 10 * 1000;
 
 /**
  * @description Send an SMS through Free Mobile for a given user.
@@ -30,10 +31,12 @@ async function send(userId, message) {
   };
 
   try {
-    const response = await this.axios.get(FREE_MOBILE_SEND_URL, { params });
+    const response = await this.axios.get(FREE_MOBILE_SEND_URL, { params, timeout: FREE_MOBILE_TIMEOUT });
     logger.debug('SMS successfully sent:', response.data);
   } catch (e) {
-    logger.error('Error sending SMS:', e);
+    // Don't log the raw error: the Axios config contains the Free Mobile access token
+    const status = e.response ? e.response.status : null;
+    logger.error(`Error sending SMS: ${e.message}${status ? ` (HTTP ${status})` : ''}`);
     throw e;
   }
 }

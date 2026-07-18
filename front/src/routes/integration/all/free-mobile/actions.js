@@ -29,6 +29,9 @@ const actions = store => ({
         );
         username = usernameResponse.value || '';
       } catch (e) {
+        if (!e.response || e.response.status !== 404) {
+          throw e;
+        }
         // variable not set yet
       }
       try {
@@ -40,6 +43,9 @@ const actions = store => ({
         );
         accessToken = accessTokenResponse.value || '';
       } catch (e) {
+        if (!e.response || e.response.status !== 404) {
+          throw e;
+        }
         // variable not set yet
       }
       store.setState({

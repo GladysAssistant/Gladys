@@ -660,7 +660,12 @@ const actionsFunc = {
     );
     await Promise.each(configuredVariables, async (variable) => {
       if (variable.user_id) {
-        await freeMobileService.message.send(variable.user_id, message);
+        try {
+          await freeMobileService.message.send(variable.user_id, message);
+        } catch (e) {
+          // A failure for one recipient should not prevent sending to the others
+          logger.error(`Failed to send SMS to user ${variable.user_id}: ${e.message}`);
+        }
       }
     });
   },

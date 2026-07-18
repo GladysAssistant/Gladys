@@ -2580,7 +2580,7 @@
       },
       "smsSend": {
         "userLabel": "Recipient of the SMS",
-        "allUsersOption": "All users",
+        "allUsersOption": "All Free Mobile users",
         "textLabel": "Message",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
