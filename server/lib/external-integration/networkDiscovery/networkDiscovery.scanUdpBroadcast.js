@@ -16,10 +16,19 @@ const logger = require('../../../utils/logger');
  */
 async function scanUdpBroadcast({ ports, timeoutMs }) {
   const results = [];
-  const sockets = ports.map((port) => {
+  // a scan never throws: an unbindable port (already taken without
+  // address reuse, firewall...) simply captures nothing
+  const onSocketError = (e) => {
+    logger.debug('External integration network discovery: UDP capture error', e);
+  };
+  const captures = ports.map((port) => {
     // reuseAddr: the core (or another integration scan) may already be
     // bound on the same announcement port
     const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
+    const capture = { socket, bound: false };
+    socket.on('listening', () => {
+      capture.bound = true;
+    });
     socket.on('message', (payload, remoteInfo) => {
       results.push({
         source_ip: remoteInfo.address,
@@ -27,25 +36,16 @@ async function scanUdpBroadcast({ ports, timeoutMs }) {
         payload_base64: payload.toString('base64'),
       });
     });
-    socket.on('error', (e) => {
-      // a port already bound without reuse, or a firewall refusal: the
-      // capture goes on with the other ports, a scan never throws
-      logger.debug(`External integration network discovery: UDP capture error on port ${port}`, e);
-    });
+    socket.on('error', onSocketError);
     socket.bind(port);
-    return socket;
+    return capture;
   });
   await new Promise((resolve) => {
-    const timer = setTimeout(resolve, timeoutMs);
-    if (timer.unref) {
-      timer.unref();
-    }
+    setTimeout(resolve, timeoutMs);
   });
-  sockets.forEach((socket) => {
-    try {
-      socket.close();
-    } catch (e) {
-      logger.debug(e);
+  captures.forEach((capture) => {
+    if (capture.bound) {
+      capture.socket.close();
     }
   });
   return results;

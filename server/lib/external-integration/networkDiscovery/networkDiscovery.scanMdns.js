@@ -61,13 +61,10 @@ async function scanMdns({ service, timeoutMs, mdnsOptions }) {
   await new Promise((resolve) => {
     setTimeout(resolve, timeoutMs);
   });
+  // multicast-dns destroy is safe even when the underlying socket
+  // failed to bind (it just closes it and calls back)
   await new Promise((resolve) => {
-    try {
-      mdns.destroy(resolve);
-    } catch (e) {
-      logger.debug(e);
-      resolve();
-    }
+    mdns.destroy(resolve);
   });
   return [...instances.values()].map((instance) => ({
     ...instance,

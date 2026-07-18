@@ -156,9 +156,16 @@ describe('externalIntegration.scanUdpBroadcast', () => {
 
   it('should survive an unbindable port and return nothing', async () => {
     const { externalIntegration } = buildSupervisor();
-    // port 1 requires root privileges outside containers; on failure the
-    // socket emits an error and the scan simply returns no result
-    const results = await externalIntegration.scanUdpBroadcast({ ports: [1], timeoutMs: 200 });
+    // a port already bound WITHOUT address reuse cannot be joined even
+    // with reuseAddr: the capture socket errors and the scan simply
+    // returns no result
+    const holder = dgram.createSocket({ type: 'udp4', reuseAddr: false });
+    const holderPort = await new Promise((resolve, reject) => {
+      holder.on('error', reject);
+      holder.bind(0, () => resolve(holder.address().port));
+    });
+    const results = await externalIntegration.scanUdpBroadcast({ ports: [holderPort], timeoutMs: 200 });
+    holder.close();
     expect(results).to.deep.equal([]);
   });
 });

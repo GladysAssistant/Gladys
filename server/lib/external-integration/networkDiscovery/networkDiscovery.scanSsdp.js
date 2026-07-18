@@ -52,11 +52,9 @@ async function scanSsdp({ st, timeoutMs, address = SSDP_MULTICAST_ADDRESS, port 
   await new Promise((resolve) => {
     setTimeout(resolve, timeoutMs);
   });
-  try {
-    socket.close();
-  } catch (e) {
-    logger.debug(e);
-  }
+  // the socket is always implicitly bound by the send, even when the
+  // M-SEARCH itself failed: close never throws here
+  socket.close();
   return results;
 }
 
