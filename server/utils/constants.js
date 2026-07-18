@@ -571,6 +571,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SIGNAL: 'signal',
   SIREN: 'siren',
   SISMIC_SENSOR: 'sismic-sensor',
+  SOLAR_BATTERY: 'solar-battery',
   SMOKE_SENSOR: 'smoke-sensor',
   SOIL_MOISTURE_SENSOR: 'soil-moisture-sensor',
   SURFACE: 'surface',
@@ -745,6 +746,11 @@ const DEVICE_FEATURE_TYPES = {
     DAILY_PRODUCTION_REVENUE: 'daily-production-revenue',
     THIRTY_MINUTES_PRODUCTION: 'thirty-minutes-production',
     THIRTY_MINUTES_PRODUCTION_REVENUE: 'thirty-minutes-production-revenue',
+  },
+  SOLAR_BATTERY: {
+    BATTERY_LEVEL: 'battery-level',
+    BATTERY_INPUT_POWER: 'battery-input-power',
+    BATTERY_OUTPUT_POWER: 'battery-output-power',
   },
   TELEINFORMATION: {
     BINARY: 'binary',
@@ -1114,6 +1120,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.EURO,
     DEVICE_FEATURE_UNITS.DOLLAR,
   ],
+  [DEVICE_FEATURE_CATEGORIES.SOLAR_BATTERY]: [DEVICE_FEATURE_UNITS.WATT, DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_BATTERY]: [
     DEVICE_FEATURE_UNITS.CELSIUS,
     DEVICE_FEATURE_UNITS.FAHRENHEIT,

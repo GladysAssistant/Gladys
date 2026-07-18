@@ -3841,6 +3841,12 @@
       "thirty-minutes-production": "Produktion 30 Minuten",
       "thirty-minutes-production-revenue": "Ertrag 30 Minuten"
     },
+    "solar-battery": {
+      "shortCategoryName": "Solarbatterie",
+      "battery-level": "Batteriestand",
+      "battery-input-power": "Batterie-Eingangsleistung",
+      "battery-output-power": "Batterie-Ausgangsleistung"
+    },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",
       "binary": "Schalter",
