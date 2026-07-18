@@ -299,7 +299,8 @@
       "gauge": "Gauge",
       "energy-consumption": "Energy Consumption",
       "voice-assistant": "Voice assistant",
-      "link": "Link"
+      "link": "Link",
+      "sun": "Sun"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -430,6 +431,19 @@
           "month": "Month",
           "year": "Year"
         }
+      },
+      "sun": {
+        "editHouseLabel": "Select a house. I will use its latitude/longitude to compute the sun position.",
+        "sunrise": "Sunrise",
+        "sunset": "Sunset",
+        "dawn": "Dawn",
+        "solarNoon": "Solar noon",
+        "dusk": "Dusk",
+        "azimuth": "Azimuth",
+        "elevation": "Elevation",
+        "noHouse": "Please select a house in the box settings.",
+        "noCoordinates": "This house has no coordinates. Please configure the house location first.",
+        "error": "An error occurred while getting the sun data. Please retry."
       },
       "ecowatt": {
         "title": "Ecowatt France",
