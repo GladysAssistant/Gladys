@@ -18,7 +18,7 @@ const MANIFEST_FIELDS = [
   'cover_image',
   'config_schema',
 ];
-const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'secret'];
+const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'secret', 'oauth2'];
 const CONFIG_FIELD_FIELDS = [
   'key',
   'type',
@@ -137,7 +137,9 @@ function validateConfigFieldDefault(field, path, errors) {
       }
       break;
     default:
-      errors.push(`${path}.default: not allowed for secret fields`);
+      // secret: it would end up published in the store ;
+      // oauth2: the value is the Connect flow, tokens live off-schema
+      errors.push(`${path}.default: not allowed for ${field.type} fields`);
   }
 }
 

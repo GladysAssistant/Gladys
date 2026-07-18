@@ -141,6 +141,30 @@ describe('Integration host API', () => {
     });
   });
 
+  describe('POST /api/integration/v1/connection_status', () => {
+    it('should store the application-level status and expose it in memory', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/connection_status')
+        .send({ connected: false, message: { en: 'Token expired, please reconnect.' } })
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.deep.equal({ success: true });
+        });
+      expect(gladys.externalIntegration.getConnectionStatus(service.id)).to.deep.equal({
+        connected: false,
+        message: { en: 'Token expired, please reconnect.' },
+      });
+      gladys.externalIntegration.connectionStatuses.clear();
+    });
+
+    it('should refuse a malformed status', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/connection_status')
+        .send({ connected: 'yes' })
+        .expect(400);
+    });
+  });
+
   describe('POST /api/integration/v1/discovered_device', () => {
     it('should publish the discovered devices', async () => {
       const res = await integrationRequest(token)

@@ -39,6 +39,20 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {post} /api/integration/v1/connection_status saveConnectionStatus
+   * @apiName saveConnectionStatus
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Application-level connection status of the integration
+   * ("connected to Netatmo", "token expired"...), kept in memory, shown in
+   * the Configuration screen and pushed to the frontend. Distinct from the
+   * container state machine.
+   */
+  async function saveConnectionStatus(req, res) {
+    gladys.externalIntegration.setConnectionStatus(req.externalIntegrationService, req.body);
+    res.json({ success: true });
+  }
+
+  /**
    * @api {post} /api/integration/v1/discovered_device publishDiscoveredDevices
    * @apiName publishDiscoveredDevices
    * @apiGroup IntegrationHostApi
@@ -103,6 +117,7 @@ module.exports = function IntegrationHostController(gladys) {
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
     heartbeat: asyncMiddleware(heartbeat),
+    saveConnectionStatus: asyncMiddleware(saveConnectionStatus),
     publishDiscoveredDevices: asyncMiddleware(publishDiscoveredDevices),
     getDevices: asyncMiddleware(getDevices),
     publishStates: asyncMiddleware(publishStates),

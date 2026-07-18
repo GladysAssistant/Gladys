@@ -18,6 +18,16 @@ describe('externalIntegration.validateConfigValue', () => {
       expect(e.properties).to.include('unknown field type');
     }
   });
+
+  it('should reject a direct value on an oauth2 field', () => {
+    try {
+      validateConfigValue({ key: 'netatmo_account', type: 'oauth2' }, 'anything');
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.include('oauth2 fields cannot be set directly');
+    }
+  });
 });
 
 describe('externalIntegration config', () => {
@@ -167,6 +177,60 @@ describe('externalIntegration config', () => {
       } catch (e) {
         expect(e).to.be.instanceOf(BadParameters);
       }
+    });
+  });
+
+  describe('oauth2 config fields', () => {
+    let oauthService;
+
+    beforeEach(async () => {
+      oauthService = await seedExternalService({
+        name: 'ext-dev-netatmo-demo',
+        selector: 'ext-dev-netatmo-demo',
+        manifest: {
+          ...service.manifest,
+          config_schema: [
+            ...service.manifest.config_schema,
+            { key: 'netatmo_account', type: 'oauth2', label: { en: 'Netatmo account' } },
+          ],
+        },
+      });
+    });
+
+    it('should always return null for an oauth2 key, even with a stored value', async () => {
+      // a value stored under the oauth2 key (should not happen) stays hidden
+      await variable.setValue('NETATMO_ACCOUNT', JSON.stringify('leaked'), oauthService.id);
+      const result = await externalIntegration.getConfigForFront(oauthService.selector);
+      expect(result.config).to.have.property('netatmo_account', null);
+      expect(result.configured_secrets).to.deep.equal([]);
+    });
+
+    it('should refuse an oauth2 key from the frontend', async () => {
+      try {
+        await externalIntegration.saveConfigFromFront(oauthService.selector, { netatmo_account: 'value' });
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+        expect(e.properties).to.include('oauth2 fields cannot be set directly');
+      }
+    });
+
+    it('should refuse the oauth2 key itself but accept off-schema token keys from the integration', async () => {
+      try {
+        await externalIntegration.setIntegrationConfig(oauthService, { netatmo_account: 'value' });
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+      }
+      // tokens are stored off-schema, never displayed in the UI
+      await externalIntegration.setIntegrationConfig(oauthService, {
+        netatmo_access_token: 'token',
+        netatmo_refresh_token: 'refresh',
+      });
+      const config = await externalIntegration.getIntegrationConfig(oauthService);
+      expect(config).to.deep.equal({ netatmo_access_token: 'token', netatmo_refresh_token: 'refresh' });
+      const front = await externalIntegration.getConfigForFront(oauthService.selector);
+      expect(front.config).to.not.have.property('netatmo_access_token');
     });
   });
 });

@@ -282,6 +282,27 @@ describe('externalIntegration.validateManifest', () => {
       { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'secret', label: { en: 'L' }, default: 's3cr3t' }] },
       'config_schema[0].default: not allowed for secret fields',
     );
+    // the value of an oauth2 field is the Connect flow, tokens live off-schema
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'oauth2', label: { en: 'L' }, default: 'x' }] },
+      'config_schema[0].default: not allowed for oauth2 fields',
+    );
+  });
+
+  it('should accept an oauth2 config field without placeholder', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      config_schema: [{ key: 'netatmo_account', type: 'oauth2', label: { en: 'Netatmo account' } }],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'oauth2', label: { en: 'L' }, placeholder: { en: 'x' } }],
+      },
+      'config_schema[0].placeholder: only allowed on',
+    );
   });
 
   it('should reject unknown fields and empty values in select options', () => {

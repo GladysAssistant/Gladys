@@ -4,6 +4,7 @@ const { fake } = require('sinon');
 const db = require('../../../models');
 const { authenticatedRequest, request: unAuthenticatedRequest } = require('../request.test');
 const { SERVICE_STATUS, SERVICE_TYPES } = require('../../../utils/constants');
+const { Error422 } = require('../../../utils/httpErrors');
 
 const TEST_MANIFEST = {
   manifest_version: 1,
@@ -94,6 +95,96 @@ describe('External integration admin API', () => {
 
     it('should return 404 on unknown selector', async () => {
       await authenticatedRequest.get('/api/v1/external_integration/ext-unknown').expect(404);
+    });
+
+    it('should expose the application-level connection status in the detail', async () => {
+      const service = await seedExternalService();
+      const withoutStatus = await authenticatedRequest.get(`/api/v1/external_integration/${service.selector}`);
+      expect(withoutStatus.body).to.have.property('connection_status', null);
+      gladys.externalIntegration.setConnectionStatus(service, {
+        connected: false,
+        message: { en: 'Token expired' },
+      });
+      const res = await authenticatedRequest.get(`/api/v1/external_integration/${service.selector}`).expect(200);
+      expect(res.body.connection_status).to.deep.equal({ connected: false, message: { en: 'Token expired' } });
+      gladys.externalIntegration.connectionStatuses.clear();
+    });
+  });
+
+  describe('POST /api/v1/external_integration/:selector/oauth/authorize_url', () => {
+    const OAUTH_MANIFEST = {
+      ...TEST_MANIFEST,
+      config_schema: [...TEST_MANIFEST.config_schema, { key: 'account', type: 'oauth2', label: { en: 'Account' } }],
+    };
+
+    it('should relay and return the authorize URL of the integration', async () => {
+      const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
+      stubInstance(
+        gladys.externalIntegration,
+        'sendCommand',
+        fake.resolves({ success: true, data: { authorize_url: 'https://provider/authorize' } }),
+      );
+      const res = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/authorize_url`)
+        .send({ key: 'account', redirect_uri: 'https://my-gladys/oauth-callback' })
+        .expect(200);
+      expect(res.body).to.deep.equal({ authorize_url: 'https://provider/authorize' });
+    });
+
+    it('should return 400 when the integration is disconnected', async () => {
+      const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/authorize_url`)
+        .send({ key: 'account', redirect_uri: 'https://my-gladys/oauth-callback' })
+        .expect(400);
+    });
+
+    it('should return 400 when the field is not oauth2', async () => {
+      const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/authorize_url`)
+        .send({ key: 'latitude', redirect_uri: 'https://my-gladys/oauth-callback' })
+        .expect(400);
+    });
+  });
+
+  describe('POST /api/v1/external_integration/:selector/oauth/callback', () => {
+    const OAUTH_MANIFEST = {
+      ...TEST_MANIFEST,
+      config_schema: [...TEST_MANIFEST.config_schema, { key: 'account', type: 'oauth2', label: { en: 'Account' } }],
+    };
+    const CALLBACK_BODY = {
+      key: 'account',
+      code: 'auth-code',
+      state: 'anti-csrf',
+      redirect_uri: 'https://my-gladys/oauth-callback',
+    };
+
+    it('should relay the provider redirect to the integration', async () => {
+      const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
+      stubInstance(gladys.externalIntegration, 'sendCommand', fake.resolves({ success: true }));
+      const res = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/callback`)
+        .send(CALLBACK_BODY)
+        .expect(200);
+      expect(res.body).to.deep.equal({ success: true });
+    });
+
+    it('should return 422 with the message when the integration refuses the exchange', async () => {
+      const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
+      stubInstance(gladys.externalIntegration, 'relayOAuthCallback', fake.rejects(new Error422('invalid state')));
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/callback`)
+        .send(CALLBACK_BODY)
+        .expect(422);
+    });
+
+    it('should return 400 when the integration is disconnected', async () => {
+      const service = await seedExternalService({ manifest: OAUTH_MANIFEST });
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/oauth/callback`)
+        .send(CALLBACK_BODY)
+        .expect(400);
     });
   });
 

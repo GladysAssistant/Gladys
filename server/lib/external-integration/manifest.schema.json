@@ -89,8 +89,8 @@
         },
         "type": {
           "type": "string",
-          "enum": ["string", "number", "boolean", "select", "secret"],
-          "description": "Field widget type. `secret` values are never sent back to the frontend."
+          "enum": ["string", "number", "boolean", "select", "secret", "oauth2"],
+          "description": "Field widget type. `secret` values are never sent back to the frontend; `oauth2` renders a Connect button (relayed OAuth2 authorization-code flow, tokens stored off-schema by the integration)."
         },
         "label": {
           "$ref": "#/definitions/multiLanguageText"
@@ -107,7 +107,7 @@
           "default": false
         },
         "default": {
-          "description": "Default value. Must match the field type (code-enforced); not allowed for `secret` fields."
+          "description": "Default value. Must match the field type (code-enforced); not allowed for `secret` and `oauth2` fields."
         },
         "min": {
           "type": "number",

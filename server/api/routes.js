@@ -540,6 +540,16 @@ function getRoutes(gladys) {
       admin: true,
       controller: externalIntegrationController.saveConfig,
     },
+    'post /api/v1/external_integration/:selector/oauth/authorize_url': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.getOAuthAuthorizeUrl,
+    },
+    'post /api/v1/external_integration/:selector/oauth/callback': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.oauthCallback,
+    },
     'delete /api/v1/external_integration/:selector': {
       authenticated: true,
       admin: true,
@@ -557,6 +567,11 @@ function getRoutes(gladys) {
       authenticated: false,
       externalIntegrationAuth: true,
       controller: integrationHostController.heartbeat,
+    },
+    'post /api/integration/v1/connection_status': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.saveConnectionStatus,
     },
     'post /api/integration/v1/discovered_device': {
       authenticated: false,
