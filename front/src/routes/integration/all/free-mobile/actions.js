@@ -18,14 +18,39 @@ const actions = store => ({
       freeMobileGetSettingsStatus: RequestStatus.Getting
     });
     try {
-      const username = await state.httpClient.get('/api/v1/service/free-mobile/variable/FREE_MOBILE_USERNAME');
+      let username = '';
+      let accessToken = '';
+      try {
+        const usernameResponse = await state.httpClient.get(
+          '/api/v1/service/free-mobile/variable/FREE_MOBILE_USERNAME',
+          {
+            userRelated: true
+          }
+        );
+        username = usernameResponse.value || '';
+      } catch (e) {
+        if (!e.response || e.response.status !== 404) {
+          throw e;
+        }
+        // variable not set yet
+      }
+      try {
+        const accessTokenResponse = await state.httpClient.get(
+          '/api/v1/service/free-mobile/variable/FREE_MOBILE_ACCESS_TOKEN',
+          {
+            userRelated: true
+          }
+        );
+        accessToken = accessTokenResponse.value || '';
+      } catch (e) {
+        if (!e.response || e.response.status !== 404) {
+          throw e;
+        }
+        // variable not set yet
+      }
       store.setState({
-        freeMobileUsername: username.value
-      });
-
-      const accessToken = await state.httpClient.get('/api/v1/service/free-mobile/variable/FREE_MOBILE_ACCESS_TOKEN');
-      store.setState({
-        freeMobileAccessToken: accessToken.value,
+        freeMobileUsername: username,
+        freeMobileAccessToken: accessToken,
         freeMobileGetSettingsStatus: RequestStatus.Success
       });
     } catch (e) {
@@ -41,19 +66,21 @@ const actions = store => ({
       freeMobileSaveSettingsStatus: RequestStatus.Getting
     });
     try {
+      const username = (state.freeMobileUsername || '').trim();
+      const accessToken = (state.freeMobileAccessToken || '').trim();
       store.setState({
-        freeMobileUsername: state.freeMobileUsername.trim(),
-        freeMobileAccessToken: state.freeMobileAccessToken.trim()
+        freeMobileUsername: username,
+        freeMobileAccessToken: accessToken
       });
       await state.httpClient.post('/api/v1/service/free-mobile/variable/FREE_MOBILE_USERNAME', {
-        value: state.freeMobileUsername.trim()
+        value: username,
+        userRelated: true
       });
       await state.httpClient.post('/api/v1/service/free-mobile/variable/FREE_MOBILE_ACCESS_TOKEN', {
-        value: state.freeMobileAccessToken.trim()
+        value: accessToken,
+        userRelated: true
       });
 
-      // start service
-      await state.httpClient.post('/api/v1/service/free-mobile/start');
       store.setState({
         freeMobileSaveSettingsStatus: RequestStatus.Success
       });

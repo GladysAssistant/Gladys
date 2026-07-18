@@ -48,6 +48,9 @@ const FreeMobilePage = ({ children, ...props }) => (
                       <p>
                         <MarkupText id="integration.free-mobile.introduction" />
                       </p>
+                      <p class="alert alert-info">
+                        <Text id="integration.free-mobile.userConfigInfo" />
+                      </p>
                       {props.freeMobileSaveSettingsStatus === RequestStatus.Error && (
                         <div class="alert alert-danger">
                           <Text id="integration.free-mobile.configurationError" />

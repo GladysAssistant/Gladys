@@ -627,6 +627,7 @@
       "description": "Send SMS from Gladys using Free Mobile.",
       "documentation": "Free Mobile Documentation",
       "introduction": "This plugin allows you to send SMS to your Free cell phone via the notification service provided by Free. Enter your customer ID and the identification key below, which you can find on the <a href=\"https://mobile.free.fr\"> FreeMobile</a> website.",
+      "userConfigInfo": "This configuration is personal: each user can enter their own Free Mobile credentials to receive SMS. In your scenes, you can then choose which user to send an SMS to.",
       "username": "Free Mobile Customer ID",
       "key": "Identification key for the service",
       "configurationError": "We could not save this configuration.",
@@ -2589,6 +2590,8 @@
         "explanationText": "To insert a variable, type '{{'. Be careful, you must have defined a variable beforehand in a 'Retrieve the last state' action placed before this message block."
       },
       "smsSend": {
+        "userLabel": "Recipient of the SMS",
+        "allUsersOption": "All Free Mobile users",
         "textLabel": "Message",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
