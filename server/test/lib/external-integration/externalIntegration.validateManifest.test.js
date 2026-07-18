@@ -305,6 +305,72 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept a valid network_discovery capture list', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      network_discovery: [
+        { type: 'udp-broadcast', ports: [6666, 6667, 7000] },
+        { type: 'mdns', service: '_hue._tcp' },
+        { type: 'ssdp', st: 'urn:dial-multiscreen-org:service:dial:1' },
+      ],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+  });
+
+  it('should reject a malformed network_discovery list', () => {
+    expect422({ ...TEST_MANIFEST, network_discovery: 'all' }, 'network_discovery: must be a list');
+    expect422({ ...TEST_MANIFEST, network_discovery: [] }, 'network_discovery: must be a list');
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: Array(6).fill({ type: 'mdns', service: '_hue._tcp' }) },
+      'network_discovery: must be a list of 1-5 capture requests',
+    );
+    expect422({ ...TEST_MANIFEST, network_discovery: ['udp'] }, 'network_discovery[0]: must be an object');
+    expect422({ ...TEST_MANIFEST, network_discovery: [{ type: 'pcap' }] }, 'network_discovery[0].type: must be one of');
+  });
+
+  it('should reject invalid udp-broadcast capture requests', () => {
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast' }] },
+      'network_discovery[0].ports: must be a list of 1-5 ports',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast', ports: [1, 2, 3, 4, 5, 6] }] },
+      'network_discovery[0].ports: must be a list of 1-5 ports',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast', ports: [0] }] },
+      'network_discovery[0].ports[0]: must be an integer between 1 and 65535',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast', ports: [6666, 6666] }] },
+      'network_discovery[0].ports[1]: duplicate port 6666',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast', ports: [6666], service: '_hue._tcp' }] },
+      'network_discovery[0].service: unknown field for type udp-broadcast',
+    );
+  });
+
+  it('should reject invalid mdns and ssdp capture requests', () => {
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'mdns', service: 'not a service' }] },
+      'network_discovery[0].service: must be a DNS-SD service type',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'mdns' }] },
+      'network_discovery[0].service: must be a DNS-SD service type',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'ssdp', st: '' }] },
+      'network_discovery[0].st: must be a string of 1-200 characters',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'ssdp', st: 's'.repeat(201) }] },
+      'network_discovery[0].st: must be a string of 1-200 characters',
+    );
+  });
+
   it('should reject unknown fields and empty values in select options', () => {
     expect422(
       {

@@ -39,6 +39,10 @@ const { setConnectionStatus } = require('./externalIntegration.setConnectionStat
 const { getConnectionStatus } = require('./externalIntegration.getConnectionStatus');
 const { getOAuthAuthorizeUrl } = require('./externalIntegration.getOAuthAuthorizeUrl');
 const { relayOAuthCallback } = require('./externalIntegration.relayOAuthCallback');
+const { runNetworkDiscoveryScan } = require('./networkDiscovery/networkDiscovery.runScan');
+const { scanUdpBroadcast } = require('./networkDiscovery/networkDiscovery.scanUdpBroadcast');
+const { scanMdns } = require('./networkDiscovery/networkDiscovery.scanMdns');
+const { scanSsdp } = require('./networkDiscovery/networkDiscovery.scanSsdp');
 const { requestScan } = require('./externalIntegration.requestScan');
 const { checkHealth } = require('./externalIntegration.checkHealth');
 const { scheduleRestart } = require('./externalIntegration.scheduleRestart');
@@ -90,6 +94,9 @@ const ExternalIntegration = function ExternalIntegration(
   // serviceId -> { connected, message } application-level connection status
   // published by the integration (POST /connection_status), in memory only
   this.connectionStatuses = new Map();
+  // serviceIds with a mediated network discovery scan in progress
+  // (one scan at a time per integration)
+  this.networkDiscoveryScans = new Set();
   // supervision timers
   this.startupTimers = new Map();
   this.restartTimers = new Map();
@@ -149,6 +156,10 @@ ExternalIntegration.prototype.setConnectionStatus = setConnectionStatus;
 ExternalIntegration.prototype.getConnectionStatus = getConnectionStatus;
 ExternalIntegration.prototype.getOAuthAuthorizeUrl = getOAuthAuthorizeUrl;
 ExternalIntegration.prototype.relayOAuthCallback = relayOAuthCallback;
+ExternalIntegration.prototype.runNetworkDiscoveryScan = runNetworkDiscoveryScan;
+ExternalIntegration.prototype.scanUdpBroadcast = scanUdpBroadcast;
+ExternalIntegration.prototype.scanMdns = scanMdns;
+ExternalIntegration.prototype.scanSsdp = scanSsdp;
 ExternalIntegration.prototype.requestScan = requestScan;
 ExternalIntegration.prototype.checkHealth = checkHealth;
 ExternalIntegration.prototype.scheduleRestart = scheduleRestart;

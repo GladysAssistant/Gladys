@@ -573,6 +573,11 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.saveConnectionStatus,
     },
+    'post /api/integration/v1/network_discovery/scan': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.networkDiscoveryScan,
+    },
     'post /api/integration/v1/discovered_device': {
       authenticated: false,
       externalIntegrationAuth: true,

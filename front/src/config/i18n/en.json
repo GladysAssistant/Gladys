@@ -686,7 +686,14 @@
         "alreadyInstalled": "This integration is already installed.",
         "goToIntegrationButton": "Go to the integration",
         "installing": "Installing...",
-        "installButton": "Install"
+        "installButton": "Install",
+        "networkDiscoveryTitle": "Network discovery requests",
+        "networkDiscoveryText": "This integration asks Gladys to capture the following network announcements on its behalf. It will never be able to capture anything else."
+      },
+      "networkDiscovery": {
+        "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
+        "mdnsText": "Browse mDNS services of type {service}",
+        "ssdpText": "SSDP search for {st}"
       },
       "installFromGithub": {
         "cardTitle": "Install from GitHub",

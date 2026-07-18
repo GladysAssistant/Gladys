@@ -90,6 +90,22 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {post} /api/integration/v1/network_discovery/scan networkDiscoveryScan
+   * @apiName networkDiscoveryScan
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Mediated network discovery: the core captures from its
+   * network=host position (bridge containers never receive LAN
+   * broadcasts/mDNS/SSDP) and returns the RAW results — the integration
+   * interprets them itself. Bounded to the capture requests declared in
+   * the manifest (403 otherwise), 1-30s, one scan at a time per
+   * integration.
+   */
+  async function networkDiscoveryScan(req, res) {
+    const results = await gladys.externalIntegration.runNetworkDiscoveryScan(req.externalIntegrationService, req.body);
+    res.json(results);
+  }
+
+  /**
    * @api {get} /api/integration/v1/config getConfig
    * @apiName getConfig
    * @apiGroup IntegrationHostApi
@@ -118,6 +134,7 @@ module.exports = function IntegrationHostController(gladys) {
     getStatus: asyncMiddleware(getStatus),
     heartbeat: asyncMiddleware(heartbeat),
     saveConnectionStatus: asyncMiddleware(saveConnectionStatus),
+    networkDiscoveryScan: asyncMiddleware(networkDiscoveryScan),
     publishDiscoveredDevices: asyncMiddleware(publishDiscoveredDevices),
     getDevices: asyncMiddleware(getDevices),
     publishStates: asyncMiddleware(publishStates),

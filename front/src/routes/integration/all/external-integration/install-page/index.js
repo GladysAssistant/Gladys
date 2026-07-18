@@ -6,6 +6,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 
+import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
 import { getLocalizedText, getGithubRepoUrl } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
@@ -126,6 +127,8 @@ class ExternalIntegrationInstallPage extends Component {
                               </h4>
                               <Text id="integration.externalIntegration.install.warningText" />
                             </div>
+
+                            <NetworkDiscoverySummary networkDiscovery={manifest.network_discovery} />
 
                             {storeIntegration.compatible === false && (
                               <div class="alert alert-danger">

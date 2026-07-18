@@ -1,7 +1,12 @@
 const semver = require('semver');
 
 const { Error422 } = require('../../utils/httpErrors');
-const { SUPPORTED_MANIFEST_VERSION } = require('./constants');
+const {
+  SUPPORTED_MANIFEST_VERSION,
+  NETWORK_DISCOVERY_TYPES,
+  MAX_NETWORK_DISCOVERY_ENTRIES,
+  MAX_UDP_BROADCAST_PORTS,
+} = require('./constants');
 
 // These rules are the exact mirror of the canonical manifest schema owned by
 // GladysAssistant/integration-store (vendored copy in manifest.schema.json):
@@ -17,7 +22,19 @@ const MANIFEST_FIELDS = [
   'gladys_version',
   'cover_image',
   'config_schema',
+  'network_discovery',
 ];
+// per capture type: the required specific field + its rules. The entries
+// are an authorization contract (same philosophy as hardware requests):
+// shown on the install screen, no arbitrary capture ever.
+const NETWORK_DISCOVERY_FIELDS = {
+  'udp-broadcast': ['type', 'ports'],
+  mdns: ['type', 'service'],
+  ssdp: ['type', 'st'],
+};
+// standard DNS-SD service type, e.g. _hue._tcp
+const MDNS_SERVICE_REGEX = /^_[a-z0-9-]+\._(tcp|udp)$/;
+const SSDP_ST_MAX_LENGTH = 200;
 const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'secret', 'oauth2'];
 const CONFIG_FIELD_FIELDS = [
   'key',
@@ -227,6 +244,54 @@ function validateConfigField(field, index, seenKeys, errors) {
 }
 
 /**
+ * @description Validate one entry of the network_discovery capture list.
+ * @param {object} entry - The capture request to validate.
+ * @param {number} index - Index of the entry in the list.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateNetworkDiscoveryEntry({ type: 'udp-broadcast', ports: [6666] }, 0, errors);
+ */
+function validateNetworkDiscoveryEntry(entry, index, errors) {
+  const path = `network_discovery[${index}]`;
+  if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  if (!NETWORK_DISCOVERY_TYPES.includes(entry.type)) {
+    errors.push(`${path}.type: must be one of ${NETWORK_DISCOVERY_TYPES.join(', ')}`);
+    return;
+  }
+  const allowedFields = NETWORK_DISCOVERY_FIELDS[entry.type];
+  Object.keys(entry).forEach((key) => {
+    if (!allowedFields.includes(key)) {
+      errors.push(`${path}.${key}: unknown field for type ${entry.type}`);
+    }
+  });
+  if (entry.type === 'udp-broadcast') {
+    if (!Array.isArray(entry.ports) || entry.ports.length === 0 || entry.ports.length > MAX_UDP_BROADCAST_PORTS) {
+      errors.push(`${path}.ports: must be a list of 1-${MAX_UDP_BROADCAST_PORTS} ports`);
+    } else {
+      const seenPorts = new Set();
+      entry.ports.forEach((port, portIndex) => {
+        if (!Number.isInteger(port) || port < 1 || port > 65535) {
+          errors.push(`${path}.ports[${portIndex}]: must be an integer between 1 and 65535`);
+        } else if (seenPorts.has(port)) {
+          errors.push(`${path}.ports[${portIndex}]: duplicate port ${port}`);
+        } else {
+          seenPorts.add(port);
+        }
+      });
+    }
+  } else if (entry.type === 'mdns') {
+    if (typeof entry.service !== 'string' || !MDNS_SERVICE_REGEX.test(entry.service)) {
+      errors.push(`${path}.service: must be a DNS-SD service type (e.g. _hue._tcp)`);
+    }
+  } else if (typeof entry.st !== 'string' || entry.st.length === 0 || entry.st.length > SSDP_ST_MAX_LENGTH) {
+    errors.push(`${path}.st: must be a string of 1-${SSDP_ST_MAX_LENGTH} characters`);
+  }
+}
+
+/**
  * @description Validate an external integration manifest against the vendored
  * manifest schema rules (exact same rules as the store indexer, see
  * manifest.schema.json). Throws an Error422 listing every problem if the
@@ -282,6 +347,17 @@ function validateManifest(manifest) {
     } else {
       const seenKeys = new Set();
       manifest.config_schema.forEach((field, index) => validateConfigField(field, index, seenKeys, errors));
+    }
+  }
+  if (manifest.network_discovery !== undefined) {
+    if (
+      !Array.isArray(manifest.network_discovery) ||
+      manifest.network_discovery.length === 0 ||
+      manifest.network_discovery.length > MAX_NETWORK_DISCOVERY_ENTRIES
+    ) {
+      errors.push(`network_discovery: must be a list of 1-${MAX_NETWORK_DISCOVERY_ENTRIES} capture requests`);
+    } else {
+      manifest.network_discovery.forEach((entry, index) => validateNetworkDiscoveryEntry(entry, index, errors));
     }
   }
   if (errors.length > 0) {

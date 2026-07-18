@@ -686,7 +686,14 @@
         "alreadyInstalled": "Cette intégration est déjà installée.",
         "goToIntegrationButton": "Accéder à l'intégration",
         "installing": "Installation...",
-        "installButton": "Installer"
+        "installButton": "Installer",
+        "networkDiscoveryTitle": "Demandes de découverte réseau",
+        "networkDiscoveryText": "Cette intégration demande à Gladys de capturer pour elle les annonces réseau suivantes. Elle ne pourra jamais rien capturer d'autre."
+      },
+      "networkDiscovery": {
+        "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
+        "mdnsText": "Rechercher les services mDNS de type {service}",
+        "ssdpText": "Recherche SSDP de {st}"
       },
       "installFromGithub": {
         "cardTitle": "Installer depuis GitHub",

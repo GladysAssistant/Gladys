@@ -63,6 +63,15 @@
       "items": {
         "$ref": "#/definitions/configField"
       }
+    },
+    "network_discovery": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "description": "Curated network capture requests (mediated discovery): the Gladys core, running in network=host, captures on behalf of the integration, which interprets the raw results itself. Shown on the install screen as an authorization contract; no arbitrary capture.",
+      "items": {
+        "$ref": "#/definitions/networkDiscoveryEntry"
+      }
     }
   },
   "definitions": {
@@ -193,6 +202,109 @@
           "then": {
             "not": {
               "required": ["placeholder"]
+            }
+          }
+        }
+      ]
+    },
+    "networkDiscoveryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["udp-broadcast", "mdns", "ssdp"],
+          "description": "Capture type: passive listen on declared UDP broadcast ports, mDNS browse of a declared service type, or SSDP M-SEARCH on a declared st."
+        },
+        "ports": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "uniqueItems": true,
+          "description": "UDP broadcast ports to listen on, `udp-broadcast` type only."
+        },
+        "service": {
+          "type": "string",
+          "pattern": "^_[a-z0-9-]+\\._(tcp|udp)$",
+          "description": "DNS-SD service type to browse (e.g. \"_hue._tcp\"), `mdns` type only."
+        },
+        "st": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "SSDP search target for the M-SEARCH, `ssdp` type only."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "udp-broadcast"
+              }
+            }
+          },
+          "then": {
+            "required": ["ports"],
+            "not": {
+              "anyOf": [
+                {
+                  "required": ["service"]
+                },
+                {
+                  "required": ["st"]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mdns"
+              }
+            }
+          },
+          "then": {
+            "required": ["service"],
+            "not": {
+              "anyOf": [
+                {
+                  "required": ["ports"]
+                },
+                {
+                  "required": ["st"]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ssdp"
+              }
+            }
+          },
+          "then": {
+            "required": ["st"],
+            "not": {
+              "anyOf": [
+                {
+                  "required": ["ports"]
+                },
+                {
+                  "required": ["service"]
+                }
+              ]
             }
           }
         }
