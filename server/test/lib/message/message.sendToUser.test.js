@@ -86,4 +86,21 @@ describe('message.sendToUser', () => {
     const promise = messageHandler.sendToUser('user-not-found', 'coucou');
     return assertChai.isRejected(promise);
   });
+  it('should not fail when the last channel fails after the others succeeded', async () => {
+    const event = new EventEmitter();
+    const stateManager = new StateManager();
+    const workingSendToUser = fake.resolves(true);
+    const failingSendToUser = fake.rejects(new Error('Failed to send message: Apikey Correct'));
+    stateManager.setState('service', 'a-working-channel', { message: { sendToUser: workingSendToUser } });
+    stateManager.setState('service', 'z-failing-channel', { message: { sendToUser: failingSendToUser } });
+    const messageHandler = new MessageHandler(event, {}, buildServiceManager(stateManager), stateManager);
+    stateManager.setState('user', 'test-user', {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+    });
+    const message = await messageHandler.sendToUser('test-user', 'coucou');
+    expect(message).to.have.property('id');
+    expect(message).to.have.property('text', 'coucou');
+    assert.calledOnce(workingSendToUser);
+    assert.calledOnce(failingSendToUser);
+  });
 });

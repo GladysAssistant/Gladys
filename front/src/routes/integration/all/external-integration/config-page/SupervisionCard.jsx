@@ -6,6 +6,40 @@ import StatusBadge from '../components/StatusBadge';
 import { getGithubRepoUrl, getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 
+const SubContainerRow = ({ container, language }) => (
+  <tr>
+    <td>{container.name}</td>
+    <td>
+      {container.status === 'running' ? (
+        <span class="badge badge-success">
+          <Text id="integration.externalIntegration.supervision.containerRunning" />
+        </span>
+      ) : (
+        <span class="badge badge-secondary">
+          <Text id="integration.externalIntegration.supervision.containerStopped" />
+        </span>
+      )}
+    </td>
+    <td>
+      {(container.ports || [])
+        .filter(port => port.host_port)
+        .map(port => (
+          <a
+            class="btn btn-sm btn-outline-primary mr-1"
+            href={`${window.location.protocol}//${window.location.hostname}:${port.host_port}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            disabled={container.status !== 'running'}
+          >
+            <i class="fe fe-external-link mr-1" />
+            <Text id="integration.externalIntegration.supervision.openButton" />{' '}
+            {getLocalizedText(port.label, language) || port.container_port}
+          </a>
+        ))}
+    </td>
+  </tr>
+);
+
 const SupervisionCard = ({
   integration,
   language,
@@ -20,6 +54,7 @@ const SupervisionCard = ({
 }) => {
   const repoUrl = getGithubRepoUrl(integration.store_slug);
   const actionInProgress = actionStatus === RequestStatus.Getting;
+  const subContainers = integration.containers || [];
   return (
     <div class="card">
       <div class="card-header">
@@ -111,6 +146,23 @@ const SupervisionCard = ({
                 </dd>
               ]}
             </dl>
+
+            {subContainers.length > 0 && (
+              <div class="mb-4">
+                <h4>
+                  <Text id="integration.externalIntegration.supervision.containersTitle" />
+                </h4>
+                <div class="table-responsive">
+                  <table class="table table-sm card-table">
+                    <tbody>
+                      {subContainers.map(container => (
+                        <SubContainerRow container={container} language={language} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
             <div class="btn-list">
               <button

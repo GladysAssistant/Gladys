@@ -33,11 +33,51 @@ module.exports = function ExternalIntegrationController(gladys) {
    */
   async function getBySelector(req, res) {
     const integration = await gladys.externalIntegration.getBySelector(req.params.selector);
+    const containers = await gladys.externalIntegration.getSubContainersState(integration);
     res.json({
       ...integration,
       update_available: gladys.externalIntegration.isUpdateAvailable(integration),
       connection_status: gladys.externalIntegration.getConnectionStatus(integration.id),
       started_at: await gladys.externalIntegration.getContainerStartedAt(integration),
+      containers,
+    });
+  }
+
+  /**
+   * @api {get} /api/v1/external_integration/hardware getHardware
+   * @apiName getHardware
+   * @apiGroup ExternalIntegration
+   * @apiDescription Best-effort detection of the hardware access classes on
+   * the host; feeds the switches of the install screen.
+   * @apiSuccessExample {json} Success-Example
+   * { "classes": [{ "class": "coral-usb", "detected": true }] }
+   */
+  async function getHardware(req, res) {
+    const detectedClasses = await gladys.system.detectHardwareClasses();
+    res.json({
+      classes: detectedClasses.map(({ class: hardwareClass, detected }) => ({ class: hardwareClass, detected })),
+    });
+  }
+
+  /**
+   * @api {post} /api/v1/external_integration/:selector/hardware setHardware
+   * @apiName setHardware
+   * @apiGroup ExternalIntegration
+   * @apiDescription Complete list of granted hardware classes (replaces the
+   * previous one; classes not requested by the manifest -> 422). The
+   * affected sub-containers are recreated and the integration is notified
+   * (hardware-updated).
+   */
+  async function setHardware(req, res) {
+    const integration = await gladys.externalIntegration.setGrantedDevices(
+      req.params.selector,
+      req.body.granted_devices,
+    );
+    const containers = await gladys.externalIntegration.getSubContainersState(integration);
+    res.json({
+      ...integration,
+      update_available: gladys.externalIntegration.isUpdateAvailable(integration),
+      containers,
     });
   }
 
@@ -50,14 +90,20 @@ module.exports = function ExternalIntegrationController(gladys) {
    * { docker_image, manifest } (dev mode, without a repo).
    */
   async function install(req, res) {
-    const { store_slug: storeSlug, repo_url: repoUrl, docker_image: dockerImage, manifest } = req.body;
+    const {
+      store_slug: storeSlug,
+      repo_url: repoUrl,
+      docker_image: dockerImage,
+      manifest,
+      granted_devices: grantedDevices,
+    } = req.body;
     let integration;
     if (storeSlug) {
-      integration = await gladys.externalIntegration.installFromStore(storeSlug);
+      integration = await gladys.externalIntegration.installFromStore(storeSlug, { grantedDevices });
     } else if (repoUrl) {
-      integration = await gladys.externalIntegration.installFromRepoUrl(repoUrl);
+      integration = await gladys.externalIntegration.installFromRepoUrl(repoUrl, { grantedDevices });
     } else if (dockerImage) {
-      integration = await gladys.externalIntegration.install({ dockerImage, manifest });
+      integration = await gladys.externalIntegration.install({ dockerImage, manifest, grantedDevices });
     } else {
       throw new BadParameters('store_slug, repo_url or docker_image is required');
     }
@@ -226,7 +272,7 @@ module.exports = function ExternalIntegrationController(gladys) {
    * @apiGroup ExternalIntegration
    */
   async function getLogs(req, res) {
-    const logs = await gladys.externalIntegration.getLogs(req.params.selector, req.query.lines);
+    const logs = await gladys.externalIntegration.getLogs(req.params.selector, req.query.lines, req.query.container);
     res.json({ logs });
   }
 
@@ -288,6 +334,8 @@ module.exports = function ExternalIntegrationController(gladys) {
   return Object.freeze({
     getAll: asyncMiddleware(getAll),
     getBySelector: asyncMiddleware(getBySelector),
+    getHardware: asyncMiddleware(getHardware),
+    setHardware: asyncMiddleware(setHardware),
     getStore: asyncMiddleware(getStore),
     refreshStore: asyncMiddleware(refreshStore),
     install: asyncMiddleware(install),

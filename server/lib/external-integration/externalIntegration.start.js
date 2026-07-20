@@ -31,6 +31,13 @@ async function start(selector, { resetFailureCount = true } = {}) {
   }
   await this.saveStatus(service, SERVICE_STATUS.LOADING);
   await this.ensureNetwork();
+  // the desired sub-containers start before the main container (zero code
+  // for the `start: "auto"` case; `"manual"` entries wait for the API)
+  try {
+    await this.ensureSubContainers(service);
+  } catch (e) {
+    logger.warn(`Unable to start sub-containers of integration ${selector}`, e);
+  }
   let started = false;
   if (service.container_id) {
     try {

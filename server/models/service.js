@@ -75,6 +75,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.STRING,
       },
+      granted_devices: {
+        allowNull: true,
+        type: DataTypes.JSON,
+      },
     },
     {},
   );

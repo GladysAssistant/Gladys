@@ -443,6 +443,7 @@ const EVENTS = {
     STATUS_CHANGED: 'external-integration.status-changed',
     DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
     CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
+    DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
   },
 };
 
@@ -1571,9 +1572,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     HEARTBEAT: 'external-integration.heartbeat',
     CONFIG_UPDATED: 'external-integration.config-updated',
     MESSAGE_SEND: 'external-integration.message.send',
+    HARDWARE_UPDATED: 'external-integration.hardware-updated',
     OAUTH_GET_AUTHORIZE_URL: 'external-integration.oauth.get-authorize-url',
     OAUTH_CALLBACK: 'external-integration.oauth.callback',
     ACTION_RUN: 'external-integration.action.run',
+    CAMERA_GET_IMAGE: 'external-integration.camera.get-image',
+    DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
   },
 };
 

@@ -6,14 +6,19 @@ import ConfigSchemaForm from './ConfigSchemaForm';
 import ActionsCard from './ActionsCard';
 import SupervisionCard from './SupervisionCard';
 import LinkAccountCard from './LinkAccountCard';
+import HardwareCard from './HardwareCard';
+import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const ConfigTab = props => {
   const { integration, loadStatus, user } = props;
   const schema = get(integration, 'manifest.config_schema') || [];
   const actions = get(integration, 'manifest.actions') || [];
+  const transports = get(integration, 'manifest.transports') || [];
+  const hasDualTransports = transports.includes('local') && transports.includes('cloud');
   const language = (user && user.language) || 'en';
   const isCommunication = get(integration, 'manifest.type') === 'communication';
+  const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
 
   return (
     <div>
@@ -36,6 +41,31 @@ const ConfigTab = props => {
           >
             <div class="loader" />
             <div class="dimmer-content">
+              {hasDualTransports && loadStatus === RequestStatus.Success && (
+                <div class="form-group">
+                  <label class="custom-switch">
+                    <input
+                      type="checkbox"
+                      class="custom-switch-input"
+                      checked={get(props, 'configValues.GLADYS_PREFER_LOCAL') !== false}
+                      onClick={props.togglePreferLocal}
+                      disabled={props.preferLocalStatus === RequestStatus.Getting}
+                    />
+                    <span class="custom-switch-indicator" />
+                    <span class="custom-switch-description">
+                      <Text id="integration.externalIntegration.transport.preferLocalLabel" />
+                    </span>
+                  </label>
+                  <small class="form-text text-muted">
+                    <Text id="integration.externalIntegration.transport.preferLocalDescription" />
+                  </small>
+                  {props.preferLocalStatus === RequestStatus.Error && (
+                    <div class="alert alert-danger mt-2">
+                      <Text id="integration.externalIntegration.config.saveError" />
+                    </div>
+                  )}
+                </div>
+              )}
               {loadStatus === RequestStatus.Success && schema.length === 0 && (
                 <div class="text-muted">
                   <Text id="integration.externalIntegration.config.noConfig" />
@@ -94,6 +124,17 @@ const ConfigTab = props => {
           onAskUninstall={props.askUninstall}
           onCancelUninstall={props.cancelUninstall}
           onUninstall={props.uninstall}
+        />
+      )}
+
+      {integration && requestedClasses.length > 0 && (
+        <HardwareCard
+          requestedClasses={requestedClasses}
+          detectedClasses={props.detectedClasses || {}}
+          grantedDevices={props.grantedDevices || []}
+          hardwareStatus={props.hardwareStatus}
+          onToggle={props.toggleHardwareClass}
+          onSave={props.saveHardware}
         />
       )}
     </div>

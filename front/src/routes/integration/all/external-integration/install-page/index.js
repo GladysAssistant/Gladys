@@ -6,8 +6,10 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 
+import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses } from '../utils';
+import SubContainersSummary from '../components/SubContainersSummary';
+import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
-import { getLocalizedText, getGithubRepoUrl } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 
@@ -28,10 +30,45 @@ class ExternalIntegrationInstallPage extends Component {
           : null,
         loadStatus: storeIntegration ? RequestStatus.Success : RequestStatus.Error
       });
+      if (storeIntegration) {
+        await this.loadHardware(storeIntegration);
+      }
     } catch (e) {
       console.error(e);
       this.setState({ loadStatus: RequestStatus.Error });
     }
+  };
+
+  loadHardware = async storeIntegration => {
+    const requestedClasses = getRequestedHardwareClasses(get(storeIntegration, 'manifest.containers') || []);
+    if (requestedClasses.length === 0) {
+      this.setState({ detectedClasses: {}, grantedDevices: [] });
+      return;
+    }
+    let detectedClasses = {};
+    try {
+      const { classes = [] } = await this.props.httpClient.get('/api/v1/external_integration/hardware');
+      classes.forEach(hardwareClass => {
+        detectedClasses[hardwareClass.class] = hardwareClass.detected;
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    // pre-checked when detected: the user can refuse a present class or
+    // grant an absent one (hardware plugged later)
+    this.setState({
+      detectedClasses,
+      grantedDevices: requestedClasses.filter(hardwareClass => detectedClasses[hardwareClass])
+    });
+  };
+
+  toggleHardwareClass = hardwareClass => {
+    const { grantedDevices = [] } = this.state;
+    this.setState({
+      grantedDevices: grantedDevices.includes(hardwareClass)
+        ? grantedDevices.filter(grantedClass => grantedClass !== hardwareClass)
+        : grantedDevices.concat([hardwareClass])
+    });
   };
 
   // two instances of the same integration (a dev build next to the prod
@@ -54,9 +91,14 @@ class ExternalIntegrationInstallPage extends Component {
     this.setState({ installStatus: RequestStatus.Getting });
     try {
       const storeSlug = `${this.props.owner}/${this.props.repo}`;
-      const installed = await this.props.httpClient.post('/api/v1/external_integration', {
-        store_slug: storeSlug
-      });
+      const body = { store_slug: storeSlug };
+      const requestedClasses = getRequestedHardwareClasses(
+        get(this.state.storeIntegration, 'manifest.containers') || []
+      );
+      if (requestedClasses.length > 0) {
+        body.granted_devices = this.state.grantedDevices || [];
+      }
+      const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
       route(`/dashboard/integration/device/external/${installed.selector}`);
     } catch (e) {
       console.error(e);
@@ -74,13 +116,18 @@ class ExternalIntegrationInstallPage extends Component {
     }
   }
 
-  render(props, { storeIntegration, loadStatus, installStatus, duplicateOfInstalled }) {
+  render(
+    props,
+    { storeIntegration, loadStatus, installStatus, detectedClasses = {}, grantedDevices = [], duplicateOfInstalled }
+  ) {
     const language = get(props, 'user.language') || 'en';
     const manifest = (storeIntegration && storeIntegration.manifest) || {};
     const github = (storeIntegration && storeIntegration.github) || {};
     const docs = (storeIntegration && storeIntegration.docs) || {};
     const docsUrl = docs[language] || docs.en;
     const installing = installStatus === RequestStatus.Getting;
+    const containers = manifest.containers || [];
+    const requestedClasses = getRequestedHardwareClasses(containers);
     return (
       <div class="page">
         <div class="page-main">
@@ -163,6 +210,28 @@ class ExternalIntegrationInstallPage extends Component {
                               <div class="alert alert-warning">
                                 <i class="fe fe-message-circle mr-1" />
                                 <Text id="integration.externalIntegration.install.communicationWarningText" />
+                              </div>
+                            )}
+
+                            {containers.length > 0 && (
+                              <SubContainersSummary containers={containers} language={language} />
+                            )}
+
+                            {requestedClasses.length > 0 && (
+                              <div class="mb-4">
+                                <h4>
+                                  <Text id="integration.externalIntegration.hardware.title" />
+                                </h4>
+                                <p class="text-muted small">
+                                  <Text id="integration.externalIntegration.hardware.installDescription" />
+                                </p>
+                                <HardwareSwitches
+                                  requestedClasses={requestedClasses}
+                                  detectedClasses={detectedClasses}
+                                  granted={grantedDevices}
+                                  onToggle={this.toggleHardwareClass}
+                                  disabled={installing}
+                                />
                               </div>
                             )}
 

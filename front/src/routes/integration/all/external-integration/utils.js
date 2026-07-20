@@ -30,3 +30,24 @@ export const EXTERNAL_INTEGRATION_STATUS_BADGES = {
 };
 
 export const getGithubRepoUrl = storeSlug => (storeSlug ? `https://github.com/${storeSlug}` : null);
+
+// Union of the hardware classes requested by the sub-container declarations
+// of a manifest, in declaration order.
+export const getRequestedHardwareClasses = containers => {
+  const requestedClasses = [];
+  (containers || []).forEach(container => {
+    (container.devices || []).forEach(hardwareClass => {
+      if (!requestedClasses.includes(hardwareClass)) {
+        requestedClasses.push(hardwareClass);
+      }
+    });
+  });
+  return requestedClasses;
+};
+
+// Effective transport of a device, reported by the integration through the
+// reserved GLADYS_TRANSPORT param (local | cloud | unreachable), or null.
+export const getDeviceTransport = device => {
+  const transportParam = ((device && device.params) || []).find(param => param.name === 'GLADYS_TRANSPORT');
+  return transportParam ? transportParam.value : null;
+};

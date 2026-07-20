@@ -319,14 +319,20 @@ function getRoutes(gladys) {
       controller: httpController.request,
     },
     // gateway
+    // Routes marked as "authenticatedOrNotConfigured" are accessible without
+    // authentication as long as no user exists on the instance, so the signup
+    // flow can restore a Gladys Plus backup without creating a local account.
+    // The "admin" flag is kept on those routes because it is also used by
+    // setupGateway to protect API calls done through the Gladys Plus tunnel.
     'get /api/v1/gateway/status': {
-      authenticated: true,
+      authenticatedOrNotConfigured: true,
       admin: true,
       controller: gatewayController.getStatus,
     },
     'post /api/v1/gateway/login': {
-      authenticated: true,
+      authenticatedOrNotConfigured: true,
       admin: true,
+      rateLimit: true,
       controller: gatewayController.login,
     },
     'post /api/v1/gateway/logout': {
@@ -335,9 +341,20 @@ function getRoutes(gladys) {
       controller: gatewayController.logout,
     },
     'post /api/v1/gateway/login-two-factor': {
+      authenticatedOrNotConfigured: true,
+      admin: true,
+      rateLimit: true,
+      controller: gatewayController.loginTwoFactor,
+    },
+    'post /api/v1/gateway/configure-two-factor': {
       authenticated: true,
       admin: true,
-      controller: gatewayController.loginTwoFactor,
+      controller: gatewayController.configureTwoFactor,
+    },
+    'post /api/v1/gateway/enable-two-factor': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.enableTwoFactor,
     },
     'get /api/v1/gateway/key': {
       authenticated: true,
@@ -349,9 +366,15 @@ function getRoutes(gladys) {
       controller: gatewayController.saveUsersKeys,
     },
     'get /api/v1/gateway/backup': {
-      authenticated: true,
+      authenticatedOrNotConfigured: true,
       admin: true,
       controller: gatewayController.getBackups,
+    },
+    'post /api/v1/gateway/backup-key': {
+      authenticatedOrNotConfigured: true,
+      admin: true,
+      rateLimit: true,
+      controller: gatewayController.saveBackupKey,
     },
     'post /api/v1/gateway/backup': {
       authenticated: true,
@@ -359,12 +382,12 @@ function getRoutes(gladys) {
       controller: gatewayController.createBackup,
     },
     'post /api/v1/gateway/backup/restore': {
-      authenticated: true,
+      authenticatedOrNotConfigured: true,
       admin: true,
       controller: gatewayController.restoreBackup,
     },
     'get /api/v1/gateway/backup/restore/status': {
-      authenticated: true,
+      authenticatedOrNotConfigured: true,
       admin: true,
       controller: gatewayController.getRestoreStatus,
     },
@@ -484,6 +507,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: externalIntegrationController.getStore,
     },
+    'get /api/v1/external_integration/hardware': {
+      authenticated: true,
+      controller: externalIntegrationController.getHardware,
+    },
     'post /api/v1/external_integration/store/refresh': {
       authenticated: true,
       admin: true,
@@ -517,6 +544,11 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: externalIntegrationController.update,
+    },
+    'post /api/v1/external_integration/:selector/hardware': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.setHardware,
     },
     'get /api/v1/external_integration/:selector/logs': {
       authenticated: true,
@@ -597,6 +629,16 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.networkDiscoveryScan,
     },
+    'post /api/integration/v1/camera/image': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.saveCameraImage,
+    },
+    'post /api/integration/v1/device/transport': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.setDeviceTransports,
+    },
     'post /api/integration/v1/discovered_device': {
       authenticated: false,
       externalIntegrationAuth: true,
@@ -636,6 +678,26 @@ function getRoutes(gladys) {
       authenticated: false,
       externalIntegrationAuth: true,
       controller: integrationHostController.getContacts,
+    },
+    'get /api/integration/v1/container': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getContainers,
+    },
+    'post /api/integration/v1/container/:name/start': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.startContainer,
+    },
+    'post /api/integration/v1/container/:name/stop': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.stopContainer,
+    },
+    'post /api/integration/v1/container/:name/restart': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.restartContainer,
     },
     // user
     'get /api/v1/user': {

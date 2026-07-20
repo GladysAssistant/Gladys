@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import ConfigTab from './ConfigTab';
+import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
@@ -27,11 +28,13 @@ class ExternalIntegrationConfigPage extends Component {
         configValues,
         configuredSecrets: configResponse.configured_secrets || [],
         touchedSecrets: {},
+        grantedDevices: integration.granted_devices || [],
         loadStatus: RequestStatus.Success
       });
       if (get(integration, 'manifest.type') === 'communication') {
         await this.loadContact();
       }
+      await this.loadHardwareDetection(integration);
     } catch (e) {
       console.error(e);
       if (selector !== this.props.selector) {
@@ -124,6 +127,23 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  loadHardwareDetection = async integration => {
+    const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
+    if (requestedClasses.length === 0) {
+      return;
+    }
+    try {
+      const { classes = [] } = await this.props.httpClient.get('/api/v1/external_integration/hardware');
+      const detectedClasses = {};
+      classes.forEach(hardwareClass => {
+        detectedClasses[hardwareClass.class] = hardwareClass.detected;
+      });
+      this.setState({ detectedClasses });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   generateLinkCode = async () => {
     this.setState({ linkStatus: RequestStatus.Getting });
     try {
@@ -147,6 +167,34 @@ class ExternalIntegrationConfigPage extends Component {
     } catch (e) {
       console.error(e);
       this.setState({ linkStatus: RequestStatus.Error });
+    }
+  };
+
+  toggleHardwareClass = hardwareClass => {
+    const { grantedDevices = [] } = this.state;
+    this.setState({
+      grantedDevices: grantedDevices.includes(hardwareClass)
+        ? grantedDevices.filter(grantedClass => grantedClass !== hardwareClass)
+        : grantedDevices.concat([hardwareClass]),
+      hardwareStatus: null
+    });
+  };
+
+  saveHardware = async () => {
+    this.setState({ hardwareStatus: RequestStatus.Getting });
+    try {
+      const integration = await this.props.httpClient.post(
+        `/api/v1/external_integration/${this.props.selector}/hardware`,
+        { granted_devices: this.state.grantedDevices || [] }
+      );
+      this.setState({
+        integration,
+        grantedDevices: integration.granted_devices || [],
+        hardwareStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({ hardwareStatus: RequestStatus.Error });
     }
   };
 
@@ -194,6 +242,28 @@ class ExternalIntegrationConfigPage extends Component {
         actionStates: Object.assign({}, this.state.actionStates, {
           [action.key]: { status: RequestStatus.Error, message }
         })
+      });
+    }
+  };
+
+  togglePreferLocal = async e => {
+    const preferLocal = e.target.checked;
+    // optimistic update, saved immediately (standard core toggle, outside
+    // the manifest config_schema)
+    this.setState({
+      configValues: Object.assign({}, this.state.configValues, { GLADYS_PREFER_LOCAL: preferLocal }),
+      preferLocalStatus: RequestStatus.Getting
+    });
+    try {
+      await this.props.httpClient.post(`/api/v1/external_integration/${this.props.selector}/config`, {
+        config: { GLADYS_PREFER_LOCAL: preferLocal }
+      });
+      this.setState({ preferLocalStatus: RequestStatus.Success });
+    } catch (err) {
+      console.error(err);
+      this.setState({
+        configValues: Object.assign({}, this.state.configValues, { GLADYS_PREFER_LOCAL: !preferLocal }),
+        preferLocalStatus: RequestStatus.Error
       });
     }
   };
@@ -309,6 +379,7 @@ class ExternalIntegrationConfigPage extends Component {
           updateConfigValue={this.updateConfigValue}
           saveConfig={this.saveConfig}
           connectOAuth={this.connectOAuth}
+          togglePreferLocal={this.togglePreferLocal}
           updateActionFieldValue={this.updateActionFieldValue}
           runAction={this.runAction}
           executeAction={this.executeAction}
@@ -317,6 +388,8 @@ class ExternalIntegrationConfigPage extends Component {
           uninstall={this.uninstall}
           generateLinkCode={this.generateLinkCode}
           unlinkContact={this.unlinkContact}
+          toggleHardwareClass={this.toggleHardwareClass}
+          saveHardware={this.saveHardware}
         />
       </ExternalIntegrationPage>
     );

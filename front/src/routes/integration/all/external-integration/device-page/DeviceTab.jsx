@@ -2,57 +2,85 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import DeviceBox from './DeviceBox';
+import TransportBadge from '../components/TransportBadge';
+import { getDeviceTransport } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 
-const DeviceTab = ({ devices, houses, getDevicesStatus, getDevices, updateDeviceField, saveDevice, deleteDevice }) => (
-  <div class="card">
-    <div class="card-header">
-      <h1 class="card-title">
-        <Text id="integration.externalIntegration.device.title" />
-      </h1>
-      <div class="page-options d-flex">
-        <button class="btn btn-outline-primary btn-sm" onClick={getDevices}>
-          <i class="fe fe-refresh-cw mr-1" />
-          <Text id="integration.externalIntegration.device.refreshButton" />
-        </button>
-      </div>
-    </div>
-    <div class="card-body">
-      {getDevicesStatus === RequestStatus.Error && (
-        <div class="alert alert-danger">
-          <Text id="integration.externalIntegration.device.loadError" />
+// global summary of the per-device transports ("12 local · 3 cloud ·
+// 1 unreachable"), only counting devices that report one
+const getTransportCounts = devices => {
+  const counts = {};
+  (devices || []).forEach(device => {
+    const transport = getDeviceTransport(device);
+    if (transport) {
+      counts[transport] = (counts[transport] || 0) + 1;
+    }
+  });
+  return counts;
+};
+
+const DeviceTab = ({ devices, houses, getDevicesStatus, getDevices, updateDeviceField, saveDevice, deleteDevice }) => {
+  const transportCounts = getTransportCounts(devices);
+  const reportedTransports = ['local', 'cloud', 'unreachable'].filter(transport => transportCounts[transport]);
+  return (
+    <div class="card">
+      <div class="card-header">
+        <h1 class="card-title">
+          <Text id="integration.externalIntegration.device.title" />
+        </h1>
+        <div class="page-options d-flex">
+          <button class="btn btn-outline-primary btn-sm" onClick={getDevices}>
+            <i class="fe fe-refresh-cw mr-1" />
+            <Text id="integration.externalIntegration.device.refreshButton" />
+          </button>
         </div>
-      )}
-      <div
-        class={cx('dimmer', {
-          active: getDevicesStatus === RequestStatus.Getting
-        })}
-      >
-        <div class="loader" />
-        <div class="dimmer-content">
-          <div class="row">
-            {devices &&
-              devices.map((device, index) => (
-                <DeviceBox
-                  key={device.id || device.external_id}
-                  device={device}
-                  deviceIndex={index}
-                  houses={houses}
-                  updateDeviceField={updateDeviceField}
-                  saveDevice={saveDevice}
-                  deleteDevice={deleteDevice}
-                />
-              ))}
+      </div>
+      <div class="card-body">
+        {reportedTransports.length > 0 && (
+          <div class="mb-4">
+            {reportedTransports.map(transport => (
+              <span class="mr-3">
+                {transportCounts[transport]} <TransportBadge transport={transport} />
+              </span>
+            ))}
           </div>
-          {devices && devices.length === 0 && (
-            <div class="text-center text-muted py-5">
-              <Text id="integration.externalIntegration.device.noDevices" />
+        )}
+        {getDevicesStatus === RequestStatus.Error && (
+          <div class="alert alert-danger">
+            <Text id="integration.externalIntegration.device.loadError" />
+          </div>
+        )}
+        <div
+          class={cx('dimmer', {
+            active: getDevicesStatus === RequestStatus.Getting
+          })}
+        >
+          <div class="loader" />
+          <div class="dimmer-content">
+            <div class="row">
+              {devices &&
+                devices.map((device, index) => (
+                  <DeviceBox
+                    key={device.id || device.external_id}
+                    device={device}
+                    deviceIndex={index}
+                    houses={houses}
+                    updateDeviceField={updateDeviceField}
+                    saveDevice={saveDevice}
+                    deleteDevice={deleteDevice}
+                  />
+                ))}
             </div>
-          )}
+            {devices && devices.length === 0 && (
+              <div class="text-center text-muted py-5">
+                <Text id="integration.externalIntegration.device.noDevices" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default DeviceTab;

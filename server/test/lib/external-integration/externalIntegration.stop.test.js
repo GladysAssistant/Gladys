@@ -3,7 +3,7 @@ const { assert: sinonAssert, fake } = require('sinon');
 
 const { SERVICE_STATUS } = require('../../../utils/constants');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
-const { buildSupervisor, seedExternalService } = require('./testUtils.test');
+const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.stop', () => {
   it('should stop the container, close the connection and set STOPPED', async () => {
@@ -58,5 +58,22 @@ describe('externalIntegration.stop', () => {
     const integration = await externalIntegration.stop(service.selector);
     expect(integration.status).to.equal(SERVICE_STATUS.STOPPED);
     sinonAssert.notCalled(system.stopContainer);
+  });
+
+  it('should stop the sub-containers after the main container', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.stopSubContainers = fake.resolves(null);
+    const integration = await externalIntegration.stop(service.selector);
+    expect(integration.status).to.equal(SERVICE_STATUS.STOPPED);
+    sinonAssert.calledOnce(externalIntegration.stopSubContainers);
+  });
+
+  it('should set STOPPED even when the sub-containers cannot be stopped', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.stopSubContainers = fake.rejects(new Error('CANNOT_STOP'));
+    const integration = await externalIntegration.stop(service.selector);
+    expect(integration.status).to.equal(SERVICE_STATUS.STOPPED);
   });
 });

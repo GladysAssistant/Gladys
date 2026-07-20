@@ -115,11 +115,9 @@ export const IntegrationListItem = ({ integration, toggleFavorite }) => (
         </div>
         <IntegrationTags integration={integration} />
       </ScrollToTopLink>
-      {!integration.external && (
-        <div class={style.integrationListFavorite}>
-          <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />
-        </div>
-      )}
+      <div class={style.integrationListFavorite}>
+        <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />
+      </div>
     </div>
   </div>
 );
@@ -149,7 +147,7 @@ const IntegrationCategory = ({ integration, toggleFavorite }) => (
           <ScrollToTopLink href={integration.url} class="flex-fill">
             <IntegrationName integration={integration} />
           </ScrollToTopLink>
-          {!integration.external && <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />}
+          <FavoriteButton integration={integration} toggleFavorite={toggleFavorite} />
         </h4>
         <div class="text-muted">
           <IntegrationDescription integration={integration} />

@@ -502,4 +502,94 @@ describe('External integration admin API', () => {
       expect(serviceInDb).to.equal(null);
     });
   });
+
+  describe('GET /api/v1/external_integration/hardware', () => {
+    it('should return the detected classes, not the :selector handler (route order)', async () => {
+      stubInstance(
+        gladys.system,
+        'detectHardwareClasses',
+        fake.resolves([
+          { class: 'coral-usb', detected: true, paths: ['/dev/bus/usb'] },
+          { class: 'gpu', detected: false, paths: [] },
+        ]),
+      );
+      const res = await authenticatedRequest
+        .get('/api/v1/external_integration/hardware')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      // the paths never reach the frontend
+      expect(res.body).to.deep.equal({
+        classes: [
+          { class: 'coral-usb', detected: true },
+          { class: 'gpu', detected: false },
+        ],
+      });
+    });
+  });
+
+  describe('POST /api/v1/external_integration/:selector/hardware', () => {
+    it('should persist the granted classes and return the detail', async () => {
+      const service = await seedExternalService({
+        manifest: {
+          ...TEST_MANIFEST,
+          containers: [{ name: 'frigate', docker_image: 'img:1.0.0', devices: ['coral-usb'] }],
+        },
+      });
+      stubInstance(gladys.system, 'detectHardwareClasses', fake.resolves([]));
+      const res = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/hardware`)
+        .send({ granted_devices: ['coral-usb'] })
+        .expect(200);
+      expect(res.body.granted_devices).to.deep.equal(['coral-usb']);
+      expect(res.body.containers).to.have.lengthOf(1);
+      const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
+      expect(serviceInDb.granted_devices).to.deep.equal(['coral-usb']);
+    });
+
+    it('should return 422 on classes not requested by the manifest', async () => {
+      const service = await seedExternalService();
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/hardware`)
+        .send({ granted_devices: ['coral-usb'] })
+        .expect(422);
+    });
+  });
+
+  describe('multi-container detail and logs', () => {
+    it('should include the sub-containers state in the detail', async () => {
+      const service = await seedExternalService({
+        manifest: {
+          ...TEST_MANIFEST,
+          containers: [
+            {
+              name: 'frigate',
+              docker_image: 'img:1.0.0',
+              ports: [{ container_port: 5000, label: { en: 'Frigate UI' } }],
+            },
+          ],
+        },
+      });
+      stubInstance(gladys.system, 'detectHardwareClasses', fake.resolves([]));
+      const res = await authenticatedRequest.get(`/api/v1/external_integration/${service.selector}`).expect(200);
+      expect(res.body.containers).to.deep.equal([
+        {
+          name: 'frigate',
+          status: 'stopped',
+          desired: 'running',
+          started_at: null,
+          ports: [{ container_port: 5000, protocol: 'tcp', host_port: null, label: { en: 'Frigate UI' } }],
+          devices: [],
+        },
+      ]);
+    });
+
+    it('should relay the container query param of the logs endpoint', async () => {
+      const service = await seedExternalService();
+      stubInstance(gladys.externalIntegration, 'getLogs', fake.resolves('mqtt logs'));
+      await authenticatedRequest
+        .get(`/api/v1/external_integration/${service.selector}/logs?lines=50&container=mqtt`)
+        .expect(200);
+      expect(gladys.externalIntegration.getLogs.calledWith(service.selector, '50', 'mqtt')).to.equal(true);
+    });
+  });
 });

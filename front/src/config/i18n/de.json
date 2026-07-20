@@ -155,17 +155,28 @@
       "backupKeyLabel": "Backup-Schlüssel",
       "backupKeyPlaceholder": "Gib deinen Backup-Schlüssel ein",
       "cancelButton": "Abbrechen",
-      "saveButton": "Backup-Schlüssel speichern"
+      "saveButton": "Backup-Schlüssel speichern",
+      "error": "Der Backup-Schlüssel konnte nicht gespeichert werden. Bitte überprüfe, ob deine Instanz mit dem Internet verbunden ist, und versuche es erneut."
     },
     "restoreBackupInProgress": {
       "title": "Wiederherstellung läuft …",
       "description": "Am Ende des Wiederherstellungsprozesses wird Gladys automatisch neu gestartet.",
       "errored": "Backup-Wiederherstellung fehlgeschlagen. Möglicherweise ist der Wiederherstellungsschlüssel ungültig.",
-      "updateRestoreKeyButton": "Wiederherstellungsschlüssel aktualisieren"
+      "erroredHelp": "Wenn du dein Backup nicht wiederherstellen kannst, kannst du jetzt ein lokales Konto erstellen, Gladys Plus später in den Einstellungen verbinden und dein Backup dann wiederherstellen.",
+      "updateRestoreKeyButton": "Wiederherstellungsschlüssel aktualisieren",
+      "createLocalAccountButton": "Lokales Konto erstellen"
     },
     "gatewayBackup": {
       "title": "Wähle ein Backup aus",
-      "description": "Wähle in der Liste das Backup aus, das du wiederherstellen möchtest."
+      "description": "Wähle in der Liste das Backup aus, das du wiederherstellen möchtest.",
+      "changeKeyButton": "Backup-Schlüssel ändern",
+      "refreshButton": "Aktualisieren",
+      "noBackupsFound": "Auf diesem Gladys-Plus-Konto wurden keine Backups gefunden.",
+      "error": "Deine Backups konnten nicht abgerufen werden. Bitte überprüfe, ob deine Instanz mit dem Internet verbunden ist, und versuche es erneut."
+    },
+    "restoreLocalAccountAlternative": {
+      "text": "Du kannst auch jetzt ein lokales Konto erstellen, Gladys Plus später in den Einstellungen verbinden und dein Backup dann wiederherstellen.",
+      "linkText": "Lokales Konto erstellen"
     },
     "preferences": {
       "title": "Deine Einstellungen",
@@ -622,6 +633,16 @@
         "connectedBadge": "Verbunden",
         "disconnectedBadge": "Getrennt"
       },
+      "transport": {
+        "localBadge": "Lokal",
+        "cloudBadge": "Cloud",
+        "unreachableBadge": "Nicht erreichbar",
+        "localTooltip": "Dieses Gerät antwortet über das lokale Netzwerk (LAN)",
+        "cloudTooltip": "Dieses Gerät antwortet über die Hersteller-Cloud",
+        "unreachableTooltip": "Dieses Gerät antwortet derzeit nicht",
+        "preferLocalLabel": "Lokale (LAN) Verbindung bevorzugen, wenn verfügbar",
+        "preferLocalDescription": "Die Integration wendet diese Präferenz an, wenn möglich; das Abzeichen jedes Geräts zeigt den tatsächlich verwendeten Transport."
+      },
       "oauthCallback": {
         "title": "Kontoverbindung",
         "relayingText": "Verbindung mit der Integration wird abgeschlossen...",
@@ -648,6 +669,10 @@
         "forceUpdateTitle": "Lädt das Docker-Image neu herunter und erstellt den Container neu, auch ohne neue Version",
         "logsButton": "Logs",
         "uninstallButton": "Deinstallieren",
+        "containersTitle": "Zusätzliche Container",
+        "containerRunning": "In Betrieb",
+        "containerStopped": "Gestoppt",
+        "openButton": "Öffnen",
         "uninstallWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt. Von dieser Integration erstellte Geräte bleiben in Gladys, bis du sie löschst.",
         "confirmUninstallButton": "Ja, deinstallieren",
         "cancelUninstallButton": "Abbrechen",
@@ -729,7 +754,9 @@
         "title": "Protokolle",
         "refreshButton": "Aktualisieren",
         "error": "Beim Laden der Protokolle ist ein Fehler aufgetreten.",
-        "empty": "Keine Protokolle verfügbar."
+        "empty": "Keine Protokolle verfügbar.",
+        "containerSelectLabel": "Container",
+        "mainContainerOption": "Haupt-Container"
       },
       "link": {
         "title": "Mein Konto verknüpfen",
@@ -740,6 +767,29 @@
         "codeExpiryText": "Dieser Code ist einmalig verwendbar und läuft in 15 Minuten ab.",
         "unlinkButton": "Konto trennen",
         "error": "Beim Verknüpfen des Kontos ist ein Fehler aufgetreten."
+      },
+      "subContainers": {
+        "title": "Zusätzliche Container",
+        "description": "Diese Integration führt die folgenden Container auf deinem Gerät aus. Die aufgeführten Ports sind aus deinem lokalen Netzwerk erreichbar.",
+        "nameLabel": "Name",
+        "imageLabel": "Image",
+        "limitsLabel": "Limits",
+        "portsLabel": "Veröffentlichte Ports"
+      },
+      "hardware": {
+        "title": "Hardware",
+        "installDescription": "Diese Integration fordert Zugriff auf Hardware deines Geräts an. Du kannst jeden Zugriff gewähren oder ablehnen und dies jederzeit nach der Installation ändern.",
+        "configDescription": "Dieser Integration gewährte Hardware-Zugriffe. Eine Änderung erstellt die betroffenen Container neu und benachrichtigt die Integration.",
+        "detected": "Erkannt",
+        "notDetected": "Nicht erkannt",
+        "saveButton": "Hardware speichern",
+        "saveError": "Beim Speichern der Hardware-Zugriffe ist ein Fehler aufgetreten.",
+        "classes": {
+          "coral-usb": "Coral USB (gesamter USB-Bus)",
+          "coral-pcie": "Coral PCIe",
+          "gpu": "GPU (Grafikbeschleunigung)",
+          "video": "Kameras (Videogeräte)"
+        }
       }
     },
     "telegram": {
@@ -3363,6 +3413,19 @@
     "jobStatus": "Status",
     "previous": "Vorherige",
     "next": "Nächste",
+    "jobData": {
+      "target": "Ziel: {{device}} › {{feature}}",
+      "statesCounts": "Zu löschende Zustände: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} Aggregate",
+      "statesCountsDone": "Gelöschte Zustände: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} Aggregate",
+      "steps": {
+        "waiting_database": "Warten auf die Datenbank…",
+        "counting": "Zählen der Zustände…",
+        "deleting_states": "Löschen der Zustände…",
+        "deleting_aggregates": "Löschen der Aggregate…"
+      },
+      "orphanedStates": "Verwaiste Zustände: {{count}}",
+      "duration": "Dauer: {{duration}}"
+    },
     "jobTypes": {
       "monthly-device-state-aggregate": "Monatliche Sensorenaggregation",
       "daily-device-state-aggregate": "Tägliche Sensorenaggregation",
@@ -3715,7 +3778,19 @@
     "twoFactorCodeLabel": "Zwei-Faktor-Code",
     "twoFactorCodePlaceholder": "6-stelliger Code",
     "loginTwoFactorButtonText": "Login abschließen",
-    "invalidTwoFactorCode": "Der Zwei-Faktor-Code ist ungültig."
+    "invalidTwoFactorCode": "Der Zwei-Faktor-Code ist ungültig. Versuche es erneut mit einem neuen Code aus deiner App.",
+    "lostTwoFactor": "Hast du den Zugriff auf deine Zwei-Faktor-App verloren? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> und wir setzen sie zurück.",
+    "twoFactorEnabledSuccess": "Die Zwei-Faktor-Authentifizierung ist jetzt aktiviert! Gib einen neuen Code aus deiner App ein, um den Login abzuschließen."
+  },
+  "gatewayConfigureTwoFactor": {
+    "cardTitle": "Zwei-Faktor-Authentifizierung (2FA) konfigurieren",
+    "twoFactorNotConfigured": "Die Zwei-Faktor-Authentifizierung (2FA) ist auf deinem Gladys-Plus-Account noch nicht konfiguriert. Sie ist erforderlich, um deine Instanz zu verbinden.",
+    "scanInstructions": "Scanne diesen QR-Code mit einer Zwei-Faktor-App (Authy, Google Authenticator...) oder kopiere das Secret manuell in deine App.",
+    "secretLabel": "Secret",
+    "copy": "Kopieren",
+    "confirmCodeLabel": "Gib den in deiner App angezeigten Code ein",
+    "enableButton": "2FA aktivieren",
+    "invalidCode": "Der Zwei-Faktor-Code ist ungültig. Versuche es erneut mit einem neuen Code aus deiner App."
   },
   "gatewayBackup": {
     "title": "Backups",
@@ -4975,13 +5050,14 @@
   "gatewayLinkUser": {
     "title": "Gladys Plus konfigurieren",
     "label": "Wähle deinen Gladys-Benutzer aus",
-    "description": "Stelle sicher, dass dieser Benutzer lokal in deiner Gladys-Instanz akzeptiert ist (\"Einstellungen\" -> \"Gladys Plus\" -> \"Benutzer\"), bevor du ihn hier auswählst.",
+    "description": "Wähle den Gladys-Benutzer aus, mit dem du deinen Gladys-Plus-Account verknüpfen möchtest. Dieser Benutzer muss lokal auf deiner Instanz akzeptiert sein: in den Einstellungen deiner Instanz, Tab \"Gladys Plus\", Bereich \"Benutzer\".",
     "noInstanceFound": "Deine Gladys-Instanz ist nicht mit dem Gladys Gateway verbunden. Hast du dich in deiner Gladys-Installation mit deinem Gladys-Plus-Account verbunden?",
+    "noInstanceFoundHelp": "Das kann passieren, wenn du dich in deiner lokalen Instanz nie mit deinem Gladys-Plus-Account verbunden hast, oder wenn deine 2FA zurückgesetzt wurde. Öffne in beiden Fällen deine lokale Gladys-Instanz, gehe in die Einstellungen, Tab \"Gladys Plus\", und melde dich mit deinem Account an. Brauchst du Hilfe? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Ein Fehler ist aufgetreten. Ist dein Benutzer lokal in deiner Gladys-Instanz akzeptiert?",
     "errorNotAcceptedLocally": "Der Benutzer wurde lokal in der Gladys-Instanz nicht akzeptiert. Bitte akzeptiere ihn in den Einstellungen deiner Instanz.",
     "saveButton": "Speichern",
-    "manageBilling": "Um deine Abrechnung zu verwalten, klicke ",
-    "here": "hier"
+    "manageBillingLink": "Mein Abo und meine Rechnungen verwalten",
+    "logoutButton": "Abmelden"
   },
   "editDeviceForm": {
     "noName": "Kein Name",

@@ -64,6 +64,25 @@ async function init() {
         await db.Service.update({ container_id: null }, { where: { id: service.id } });
       }
     });
+    // orphans (crash mid-operation): containers and private networks labeled
+    // with a selector that is not installed anymore are destroyed — no ghost
+    // container possible, sub-containers included (same label)
+    const installedSelectors = new Set(plainServices.map((service) => service.selector));
+    const orphanContainers = containers.filter(
+      (container) =>
+        container.labels &&
+        container.labels[EXTERNAL_INTEGRATION_LABEL] &&
+        !installedSelectors.has(container.labels[EXTERNAL_INTEGRATION_LABEL]),
+    );
+    await Promise.each(orphanContainers, (orphan) => this.system.removeContainer(orphan.id, { force: true }));
+    const networks = await this.system.getNetworks({ filters: { label: [EXTERNAL_INTEGRATION_LABEL] } });
+    const orphanNetworks = networks.filter(
+      (network) =>
+        network.Labels &&
+        network.Labels[EXTERNAL_INTEGRATION_LABEL] &&
+        !installedSelectors.has(network.Labels[EXTERNAL_INTEGRATION_LABEL]),
+    );
+    await Promise.each(orphanNetworks, (network) => this.system.removeNetwork(network.Name));
   } catch (e) {
     logger.warn('Unable to reconcile external integration containers', e);
   }

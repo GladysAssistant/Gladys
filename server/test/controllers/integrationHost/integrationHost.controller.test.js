@@ -195,6 +195,45 @@ describe('Integration host API', () => {
     });
   });
 
+  describe('POST /api/integration/v1/camera/image', () => {
+    it('should relay the image to the camera path of the integration', async () => {
+      gladys.externalIntegration.saveCameraImage = async () => ({ success: true });
+      try {
+        const res = await integrationRequest(token)
+          .post('/api/integration/v1/camera/image')
+          .send({ device_external_id: `ext:${service.selector}:cam`, image: 'image/jpg;base64,/9j/4AAQ' })
+          .expect(200);
+        expect(res.body).to.deep.equal({ success: true });
+      } finally {
+        delete gladys.externalIntegration.saveCameraImage;
+      }
+    });
+
+    it('should return 404 for a camera the integration does not own', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/camera/image')
+        .send({ device_external_id: `ext:${service.selector}:unknown-cam`, image: 'image/jpg;base64,x' })
+        .expect(404);
+    });
+  });
+
+  describe('POST /api/integration/v1/device/transport', () => {
+    it('should accept a transport batch', async () => {
+      const res = await integrationRequest(token)
+        .post('/api/integration/v1/device/transport')
+        .send({ transports: [{ device_external_id: `ext:${service.selector}:ghost`, transport: 'local' }] })
+        .expect(200);
+      expect(res.body).to.deep.equal({ success: true });
+    });
+
+    it('should refuse an invalid transport value', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/device/transport')
+        .send({ transports: [{ device_external_id: `ext:${service.selector}:plug`, transport: 'satellite' }] })
+        .expect(400);
+    });
+  });
+
   describe('POST /api/integration/v1/discovered_device', () => {
     it('should publish the discovered devices', async () => {
       const res = await integrationRequest(token)
@@ -417,6 +456,109 @@ describe('Integration host API', () => {
         .get('/api/integration/v1/contact')
         .expect(200);
       expect(contactsRes.body).to.deep.equal([]);
+    });
+  });
+
+  describe('/api/integration/v1/container', () => {
+    const CONTAINERS_MANIFEST = {
+      ...TEST_MANIFEST,
+      containers: [
+        { name: 'mqtt', docker_image: 'eclipse-mosquitto:2.0.18', start: 'manual' },
+        {
+          name: 'frigate',
+          docker_image: 'ghcr.io/blakeblackshear/frigate:0.14.1',
+          ports: [{ container_port: 5000, label: { en: 'Frigate UI' } }],
+          devices: ['coral-usb'],
+        },
+      ],
+    };
+    const stubbedProps = [];
+    const stubSystem = (key, value) => {
+      gladys.system[key] = value;
+      stubbedProps.push(key);
+    };
+
+    beforeEach(async () => {
+      await db.Service.destroy({ where: { id: service.id } });
+      service = await seedExternalService({ manifest: CONTAINERS_MANIFEST, granted_devices: ['coral-usb'] });
+      token = generateIntegrationToken(service.id, 1, 'secret');
+      gladys.externalIntegration.available = true;
+      stubSystem('detectHardwareClasses', () =>
+        Promise.resolve([{ class: 'coral-usb', detected: true, paths: ['/dev/bus/usb'] }]),
+      );
+      stubSystem('getContainers', () => Promise.resolve([]));
+      stubSystem('createContainer', () => Promise.resolve({ id: 'sub-1' }));
+      stubSystem('removeContainer', () => Promise.resolve(true));
+      stubSystem('restartContainer', () => Promise.resolve(true));
+      stubSystem('stopContainer', () => Promise.resolve(true));
+      stubSystem('createNetwork', () => Promise.resolve(true));
+      stubSystem('getGladysBasePath', () => Promise.resolve({ basePathOnHost: '/var/lib/gladysassistant' }));
+    });
+
+    afterEach(() => {
+      gladys.externalIntegration.available = false;
+      stubbedProps.forEach((key) => {
+        delete gladys.system[key];
+      });
+      stubbedProps.length = 0;
+    });
+
+    it('should list the declared sub-containers with grants and ports', async () => {
+      const res = await integrationRequest(token)
+        .get('/api/integration/v1/container')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(res.body.containers.map((container) => container.name)).to.deep.equal(['mqtt', 'frigate']);
+      expect(res.body.containers[0].desired).to.equal('stopped');
+      expect(res.body.containers[1].desired).to.equal('running');
+      expect(res.body.containers[1].devices).to.deep.equal([{ class: 'coral-usb', granted: true, available: true }]);
+    });
+
+    it('should start, stop and restart a declared sub-container', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/container/mqtt/start')
+        .send({ env: { MQTT_PASSWORD: 's3cr3t' } })
+        .expect(200);
+      await integrationRequest(token)
+        .post('/api/integration/v1/container/mqtt/stop')
+        .send({})
+        .expect(200);
+      await integrationRequest(token)
+        .post('/api/integration/v1/container/mqtt/restart')
+        .send({})
+        .expect(200);
+    });
+
+    it('should return 400 on a reserved env key', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/container/mqtt/start')
+        .send({ env: { GLADYS_INTEGRATION_TOKEN: 'stolen' } })
+        .expect(400);
+    });
+
+    it('should return 404 on an undeclared container', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/container/unknown/start')
+        .send({})
+        .expect(404);
+    });
+
+    it('should not let an integration drive the containers of another one', async () => {
+      // the other integration declares no `mqtt` container: its token sees a 404
+      const otherService = await seedExternalService({
+        name: 'ext-dev-other',
+        selector: 'ext-dev-other',
+        manifest: TEST_MANIFEST,
+      });
+      const otherToken = generateIntegrationToken(otherService.id, 1, 'secret');
+      await integrationRequest(otherToken)
+        .post('/api/integration/v1/container/mqtt/start')
+        .send({})
+        .expect(404);
+      const res = await integrationRequest(otherToken)
+        .get('/api/integration/v1/container')
+        .expect(200);
+      expect(res.body.containers).to.deep.equal([]);
     });
   });
 });

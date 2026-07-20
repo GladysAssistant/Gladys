@@ -5,6 +5,7 @@ import update from 'immutability-helper';
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import DeviceTab from './DeviceTab';
 import { RequestStatus } from '../../../../../utils/consts';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 class ExternalIntegrationDevicePage extends Component {
   getIntegration = async () => {
@@ -73,7 +74,33 @@ class ExternalIntegrationDevicePage extends Component {
     this.getHouses();
   };
 
+  onDeviceTransportUpdated = payload => {
+    if (!payload || payload.selector !== this.props.selector || !this.state.devices) {
+      return;
+    }
+    // patch the GLADYS_TRANSPORT param of the concerned devices in place:
+    // the badges update without refetching the list
+    const transportByExternalId = {};
+    (payload.transports || []).forEach(entry => {
+      transportByExternalId[entry.device_external_id] = entry.transport;
+    });
+    const devices = this.state.devices.map(device => {
+      const transport = transportByExternalId[device.external_id];
+      if (!transport) {
+        return device;
+      }
+      const params = (device.params || []).filter(param => param.name !== 'GLADYS_TRANSPORT');
+      params.push({ name: 'GLADYS_TRANSPORT', value: transport });
+      return { ...device, params };
+    });
+    this.setState({ devices });
+  };
+
   componentWillMount() {
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_TRANSPORT_UPDATED,
+      this.onDeviceTransportUpdated
+    );
     this.loadData();
   }
 
@@ -81,6 +108,13 @@ class ExternalIntegrationDevicePage extends Component {
     if (prevProps.selector !== this.props.selector) {
       this.loadData();
     }
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_TRANSPORT_UPDATED,
+      this.onDeviceTransportUpdated
+    );
   }
 
   render(props, state) {
@@ -98,4 +132,4 @@ class ExternalIntegrationDevicePage extends Component {
   }
 }
 
-export default connect('user,httpClient')(ExternalIntegrationDevicePage);
+export default connect('user,session,httpClient')(ExternalIntegrationDevicePage);

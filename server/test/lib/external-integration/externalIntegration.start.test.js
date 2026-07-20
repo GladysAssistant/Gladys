@@ -5,7 +5,7 @@ const { assert: sinonAssert, fake } = require('sinon');
 const db = require('../../../models');
 const { PlatformNotCompatible, NotFoundError } = require('../../../utils/coreErrors');
 const { SERVICE_STATUS } = require('../../../utils/constants');
-const { buildSupervisor, seedExternalService } = require('./testUtils.test');
+const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.start', () => {
   let clock;
@@ -153,5 +153,24 @@ describe('externalIntegration.start', () => {
     }
     const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
     expect(serviceInDb.status).to.equal(SERVICE_STATUS.ERROR);
+  });
+
+  it('should start the desired sub-containers before the main container', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.ensureSubContainers = fake.resolves(null);
+    await externalIntegration.start(service.selector);
+    sinonAssert.calledOnce(externalIntegration.ensureSubContainers);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should still start the main container when the sub-containers fail', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration, system } = buildSupervisor();
+    externalIntegration.ensureSubContainers = fake.rejects(new Error('CANNOT_START_SUB'));
+    const integration = await externalIntegration.start(service.selector);
+    expect(integration.status).to.equal(SERVICE_STATUS.LOADING);
+    sinonAssert.calledWith(system.restartContainer, 'container-1');
+    externalIntegration.clearTimers(service.id);
   });
 });
