@@ -5,6 +5,7 @@ const {
   MATTER_SYSTEM_MODE,
   matterSystemModeToGladysAcMode,
   gladysAcModeToMatterSystemMode,
+  getAcModeSupportedOptions,
 } = require('../../../../services/matter/utils/thermostatMatterMapping');
 
 describe('Matter thermostatMatterMapping', () => {
@@ -34,5 +35,32 @@ describe('Matter thermostatMatterMapping', () => {
 
   it('should throw for an unsupported Gladys AC mode', () => {
     expect(() => gladysAcModeToMatterSystemMode(99)).to.throw('Unsupported air conditioning mode: 99');
+  });
+
+  it('should build supported options for a full-featured air conditioner', () => {
+    expect(getAcModeSupportedOptions({ heating: true, cooling: true, autoMode: true })).to.deep.equal([
+      { value: AC_MODE.AUTO, label: 'Auto' },
+      { value: AC_MODE.COOLING, label: 'Cool' },
+      { value: AC_MODE.HEATING, label: 'Heat' },
+      { value: AC_MODE.DRYING, label: 'Dry' },
+      { value: AC_MODE.FAN, label: 'Fan' },
+    ]);
+  });
+
+  it('should build supported options for a cooling-only device', () => {
+    expect(getAcModeSupportedOptions({ cooling: true })).to.deep.equal([
+      { value: AC_MODE.COOLING, label: 'Cool' },
+      { value: AC_MODE.DRYING, label: 'Dry' },
+      { value: AC_MODE.FAN, label: 'Fan' },
+    ]);
+  });
+
+  it('should build supported options without auto mode', () => {
+    expect(getAcModeSupportedOptions({ heating: true, cooling: true })).to.deep.equal([
+      { value: AC_MODE.COOLING, label: 'Cool' },
+      { value: AC_MODE.HEATING, label: 'Heat' },
+      { value: AC_MODE.DRYING, label: 'Dry' },
+      { value: AC_MODE.FAN, label: 'Fan' },
+    ]);
   });
 });

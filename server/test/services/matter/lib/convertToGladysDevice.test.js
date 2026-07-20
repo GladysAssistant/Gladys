@@ -418,8 +418,49 @@ describe('Matter.convertToGladysDevice', () => {
       read_only: false,
       has_feedback: true,
       external_id: 'matter:12345:1:child_endpoint:4:513:mode',
+      min: AC_MODE.COOLING,
+      max: AC_MODE.FAN,
+      supported_options: [
+        { value: AC_MODE.COOLING, label: 'Cool' },
+        { value: AC_MODE.HEATING, label: 'Heat' },
+        { value: AC_MODE.DRYING, label: 'Dry' },
+        { value: AC_MODE.FAN, label: 'Fan' },
+      ],
+    });
+  });
+
+  it('should include auto in the mode supported options when auto mode is supported', async () => {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      name: 'Thermostat',
+      endpointId: 4,
+      supportedFeatures: {
+        heating: true,
+        cooling: true,
+        autoMode: true,
+      },
+    };
+
+    const device = {
+      name: 'Air Conditioner',
+      number: 4,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:4');
+
+    const modeFeature = gladysDevice.features.find((feature) => feature.type === 'mode');
+    expect(modeFeature).to.deep.include({
       min: AC_MODE.AUTO,
       max: AC_MODE.FAN,
+      supported_options: [
+        { value: AC_MODE.AUTO, label: 'Auto' },
+        { value: AC_MODE.COOLING, label: 'Cool' },
+        { value: AC_MODE.HEATING, label: 'Heat' },
+        { value: AC_MODE.DRYING, label: 'Dry' },
+        { value: AC_MODE.FAN, label: 'Fan' },
+      ],
     });
   });
 

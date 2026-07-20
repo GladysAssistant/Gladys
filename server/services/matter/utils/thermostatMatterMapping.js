@@ -32,6 +32,14 @@ const GLADYS_AC_MODE_TO_MATTER = {
   [AC_MODE.FAN]: MATTER_SYSTEM_MODE.FAN_ONLY,
 };
 
+const GLADYS_AC_MODE_LABELS = {
+  [AC_MODE.AUTO]: 'Auto',
+  [AC_MODE.COOLING]: 'Cool',
+  [AC_MODE.HEATING]: 'Heat',
+  [AC_MODE.DRYING]: 'Dry',
+  [AC_MODE.FAN]: 'Fan',
+};
+
 /**
  * @description Convert Matter Thermostat SystemMode attribute value to Gladys AC mode.
  * Returns null when the mode has no Gladys equivalent (e.g. Off, which is handled
@@ -62,8 +70,35 @@ function gladysAcModeToMatterSystemMode(gladysAcMode) {
   throw new Error(`Unsupported air conditioning mode: ${gladysAcMode}`);
 }
 
+/**
+ * @description Build the supported_options list of the air conditioning mode feature
+ * from the Thermostat cluster supported features.
+ * The Matter Thermostat cluster has no capability flag for the Dry and FanOnly
+ * system modes, so they are always exposed on cooling devices.
+ * @param {object} supportedFeatures - Thermostat cluster supported features (heating/cooling/autoMode).
+ * @returns {Array} Supported options ({ value, label }) sorted by Gladys AC_MODE value.
+ * @example
+ * const supportedOptions = getAcModeSupportedOptions({ heating: true, cooling: true, autoMode: true });
+ */
+function getAcModeSupportedOptions(supportedFeatures) {
+  const modes = [];
+  if (supportedFeatures.autoMode) {
+    modes.push(AC_MODE.AUTO);
+  }
+  modes.push(AC_MODE.COOLING);
+  if (supportedFeatures.heating) {
+    modes.push(AC_MODE.HEATING);
+  }
+  modes.push(AC_MODE.DRYING, AC_MODE.FAN);
+  return modes.map((mode) => ({
+    value: mode,
+    label: GLADYS_AC_MODE_LABELS[mode],
+  }));
+}
+
 module.exports = {
   MATTER_SYSTEM_MODE,
   matterSystemModeToGladysAcMode,
   gladysAcModeToMatterSystemMode,
+  getAcModeSupportedOptions,
 };

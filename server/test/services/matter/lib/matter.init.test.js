@@ -537,8 +537,14 @@ describe('Matter.init', () => {
             has_feedback: true,
             external_id: 'matter:12345:1:513:mode',
             selector: matterHandler.devices[0].features[12].selector,
-            min: 0,
+            min: 1,
             max: 4,
+            supported_options: [
+              { value: 1, label: 'Cool' },
+              { value: 2, label: 'Heat' },
+              { value: 3, label: 'Dry' },
+              { value: 4, label: 'Fan' },
+            ],
           },
           {
             category: 'pm25-sensor',
@@ -816,8 +822,14 @@ describe('Matter.init', () => {
             has_feedback: true,
             external_id: 'matter:12345:1:child_endpoint:2:513:mode',
             selector: matterHandler.devices[1].features[12].selector,
-            min: 0,
+            min: 1,
             max: 4,
+            supported_options: [
+              { value: 1, label: 'Cool' },
+              { value: 2, label: 'Heat' },
+              { value: 3, label: 'Dry' },
+              { value: 4, label: 'Fan' },
+            ],
           },
           {
             category: 'pm25-sensor',
