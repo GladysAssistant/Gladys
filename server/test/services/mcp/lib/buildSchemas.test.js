@@ -12,6 +12,7 @@ const {
 const {
   isSensorFeature,
   isSwitchableFeature,
+  isLightControlFeature,
   isShutterFeature,
   isHistoryFeature,
   isWritableSensorFeature,
@@ -118,6 +119,7 @@ describe('build schemas', () => {
       getAllResources,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -259,6 +261,7 @@ describe('build schemas', () => {
       getAllResources,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -367,6 +370,7 @@ describe('build schemas', () => {
       getAllResources,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -481,6 +485,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -952,6 +957,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1027,6 +1033,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1140,6 +1147,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1238,6 +1246,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1297,6 +1306,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1340,6 +1350,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1450,6 +1461,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1522,6 +1534,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1586,6 +1599,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1685,6 +1699,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1757,6 +1772,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1836,6 +1852,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1887,6 +1904,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -1954,6 +1972,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -2005,6 +2024,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -2072,6 +2092,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -2179,6 +2200,7 @@ describe('build schemas', () => {
       getAllResources,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -2240,6 +2262,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -2334,6 +2357,7 @@ describe('build schemas', () => {
       getAllTools,
       isSensorFeature,
       isSwitchableFeature,
+      isLightControlFeature,
       isShutterFeature,
       isHistoryFeature,
       isWritableSensorFeature,
@@ -2389,6 +2413,440 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
     expect(partialResult.content[0].text).to.eq(
       'device.set-shutter: open command sent for State Only Shutter; could not dispatch for State Only Shutter (missing position feature)',
+    );
+  });
+
+  it('should expose light control features in home schema and device.set-light tool', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+    const rgbLightDevice = {
+      selector: 'device-light-rgb',
+      name: 'Living Room Light',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 1,
+          selector: 'device-light-rgb-binary',
+          name: 'On/Off',
+          category: 'light',
+          type: 'binary',
+          last_value: 1,
+        },
+        {
+          id: 2,
+          selector: 'device-light-rgb-brightness',
+          name: 'Brightness',
+          category: 'light',
+          type: 'brightness',
+          min: 0,
+          max: 254,
+          last_value: 254,
+        },
+        {
+          id: 3,
+          selector: 'device-light-rgb-color',
+          name: 'Color',
+          category: 'light',
+          type: 'color',
+          min: 0,
+          max: 16777215,
+          last_value: 255,
+        },
+        {
+          id: 4,
+          selector: 'device-light-rgb-temperature',
+          name: 'Color temperature',
+          category: 'light',
+          type: 'temperature',
+          min: 153,
+          max: 500,
+          last_value: 250,
+        },
+      ],
+    };
+    const colorStripDevice = {
+      selector: 'device-color-strip',
+      name: 'Color Strip',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 5,
+          selector: 'device-color-strip-color',
+          name: 'Color',
+          category: 'light',
+          type: 'color',
+          min: 0,
+          max: 16777215,
+          last_value: 65280,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllResources,
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+      })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([rgbLightDevice, colorStripDevice]),
+          getBySelector: stub().callsFake(async (selector) => {
+            return [rgbLightDevice, colorStripDevice].find((d) => d.selector === selector);
+          }),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(0) },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const resources = await mcpHandler.getAllResources();
+    const homeSchema = JSON.parse((await resources[0].cb({ href: 'schema://home' })).contents[0].text);
+
+    // Light control features are merged with the existing binary feature of the device.
+    expect(homeSchema.salon.devices['device-light-rgb'].features).to.deep.equal([
+      {
+        name: 'On/Off',
+        selector: 'device-light-rgb-binary',
+        category: 'light',
+        type: 'binary',
+        access: ['write', 'read'],
+      },
+      {
+        name: 'Brightness',
+        selector: 'device-light-rgb-brightness',
+        category: 'light',
+        type: 'brightness',
+        access: ['write', 'read'],
+      },
+      {
+        name: 'Color',
+        selector: 'device-light-rgb-color',
+        category: 'light',
+        type: 'color',
+        access: ['write', 'read'],
+      },
+      {
+        name: 'Color temperature',
+        selector: 'device-light-rgb-temperature',
+        category: 'light',
+        type: 'temperature',
+        access: ['write', 'read'],
+      },
+    ]);
+
+    // Device without binary feature is added as a standalone entry.
+    expect(homeSchema.salon.devices['device-color-strip']).to.deep.equal({
+      name: 'Color Strip',
+      selector: 'device-color-strip',
+      features: [
+        {
+          name: 'Color',
+          selector: 'device-color-strip-color',
+          category: 'light',
+          type: 'color',
+          access: ['write', 'read'],
+        },
+      ],
+    });
+
+    const tools = await mcpHandler.getAllTools();
+    const setLightTool = tools.find((tool) => tool.intent === 'device.set-light');
+    const getStateTool = tools.find((tool) => tool.intent === 'device.get-state');
+
+    expect(setLightTool).to.not.equal(undefined);
+
+    const setLightApiTool = mcpToolsToChatApiFormat(tools).find((tool) => tool.function.name === 'device_set_light');
+    expect(setLightApiTool.function.parameters.properties).to.have.all.keys(
+      'brightness',
+      'color',
+      'temperature',
+      'device',
+      'room',
+    );
+
+    const brightnessResult = await setLightTool.cb({ brightness: 30, device: 'Living Room Light' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[1].type).to.eq('brightness');
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(76); // 30% of 0-254
+    expect(brightnessResult.content[0].text).to.eq(
+      'device.set-light: brightness 30% command sent for Living Room Light',
+    );
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const colorResult = await setLightTool.cb({ color: '#0000FF', device: 'Living Room Light' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[1].type).to.eq('color');
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(255);
+    expect(colorResult.content[0].text).to.eq('device.set-light: color #0000FF command sent for Living Room Light');
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const temperatureResult = await setLightTool.cb({ temperature: 4000, device: 'Living Room Light' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[1].type).to.eq('temperature');
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(250); // 4000K = 250 mired
+    expect(temperatureResult.content[0].text).to.eq(
+      'device.set-light: temperature 4000K command sent for Living Room Light',
+    );
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const combinedResult = await setLightTool.cb({
+      brightness: 100,
+      color: '00FF00',
+      temperature: 2700,
+      device: 'Living Room Light',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(3);
+    const setValues = mcpHandler.gladys.device.setValue.getCalls().map((call) => [call.args[1].type, call.args[2]]);
+    expect(setValues).to.deep.equal([
+      ['brightness', 254],
+      ['color', 65280],
+      ['temperature', 370], // 2700K = 370 mired
+    ]);
+    expect(combinedResult.content[0].text).to.eq(
+      'device.set-light: brightness 100% and color 00FF00 and temperature 2700K command sent for Living Room Light',
+    );
+
+    const stateResult = await getStateTool.cb({ room: 'Salon', device_type: 'light' });
+    expect(stateResult.content[0].text).to.eq('toonmockdata');
+    const states = mcpHandler.toon.lastCall.args[0];
+    const stateFeatureNames = states.map((state) => state.feature);
+    expect(stateFeatureNames).to.include.members(['On/Off', 'Brightness', 'Color', 'Color temperature']);
+  });
+
+  it('should cover device.set-light error and filtering branches', async () => {
+    const rooms = [
+      { id: 'room-1', name: 'Salon', selector: 'salon' },
+      { id: 'room-2', name: 'Chambre', selector: 'chambre' },
+      { id: 'room-3', name: 'Cuisine', selector: 'cuisine' },
+    ];
+    const lightDevices = [
+      {
+        selector: 'device-light-salon',
+        name: 'Salon Light',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 1,
+            selector: 's-brightness',
+            name: 'Brightness',
+            category: 'light',
+            type: 'brightness',
+            min: 0,
+            max: 100,
+          },
+          { id: 2, selector: 's-color', name: 'Color', category: 'light', type: 'color', min: 0, max: 16777215 },
+          {
+            id: 3,
+            selector: 's-temperature',
+            name: 'Temperature',
+            category: 'light',
+            type: 'temperature',
+            min: 153,
+            max: 500,
+          },
+        ],
+      },
+      {
+        selector: 'device-light-chambre',
+        name: 'Bedroom Light',
+        room: { selector: 'chambre', name: 'Chambre' },
+        features: [
+          {
+            id: 4,
+            selector: 'c-brightness',
+            name: 'Brightness',
+            category: 'light',
+            type: 'brightness',
+            min: 0,
+            max: 100,
+          },
+        ],
+      },
+    ];
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().returns({ value: 0 }),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(lightDevices),
+          getBySelector: stub().resolves(lightDevices[0]),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(10) },
+      toon: stub().returns('ok'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const setLightTool = tools.find((tool) => tool.intent === 'device.set-light');
+
+    const missingValuesResult = await setLightTool.cb({ device: 'Salon Light' });
+    expect(missingValuesResult.content[0].text).to.eq('device.set-light: brightness, color or temperature is required');
+
+    const missingTargetResult = await setLightTool.cb({ brightness: 50 });
+    expect(missingTargetResult.content[0].text).to.eq('device.set-light: device or room is required');
+
+    const unknownDeviceResult = await setLightTool.cb({ brightness: 50, device: 'Unknown Light' });
+    expect(unknownDeviceResult.content[0].text).to.eq('device.set-light: no device found');
+
+    const noDeviceInRoomResult = await setLightTool.cb({ brightness: 50, room: 'Cuisine' });
+    expect(noDeviceInRoomResult.content[0].text).to.eq('device.set-light: no device found');
+
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+
+    const roomResult = await setLightTool.cb({ brightness: 50, room: 'Chambre' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[0].name).to.eq('Bedroom Light');
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(50);
+    expect(roomResult.content[0].text).to.eq('device.set-light: brightness 50% command sent for Bedroom Light');
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const roomAndDeviceResult = await setLightTool.cb({ color: '#FF0000', room: 'Salon', device: 'Salon Light' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[0].name).to.eq('Salon Light');
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(16711680);
+    expect(roomAndDeviceResult.content[0].text).to.eq('device.set-light: color #FF0000 command sent for Salon Light');
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    // 10000K = 100 mired, clamped to feature min (153 mired).
+    const coolClampResult = await setLightTool.cb({ temperature: 10000, device: 'Salon Light' });
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(153);
+    expect(coolClampResult.content[0].text).to.eq('device.set-light: temperature 10000K command sent for Salon Light');
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    // 1000K = 1000 mired, clamped to feature max (500 mired).
+    const warmClampResult = await setLightTool.cb({ temperature: 1000, device: 'Salon Light' });
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(500);
+    expect(warmClampResult.content[0].text).to.eq('device.set-light: temperature 1000K command sent for Salon Light');
+  });
+
+  it('should report when device.set-light cannot dispatch a matching feature', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+    const brightnessOnlyLight = {
+      selector: 'device-light-brightness-only',
+      name: 'Brightness Only Light',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 1,
+          selector: 'b-brightness',
+          name: 'Brightness',
+          category: 'light',
+          type: 'brightness',
+          min: 0,
+          max: 100,
+        },
+      ],
+    };
+    const colorOnlyLight = {
+      selector: 'device-light-color-only',
+      name: 'Color Only Light',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        { id: 2, selector: 'c-color', name: 'Color', category: 'light', type: 'color', min: 0, max: 16777215 },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().returns({ value: 0 }),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([brightnessOnlyLight, colorOnlyLight]),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(10) },
+      toon: stub().returns('ok'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const setLightTool = tools.find((tool) => tool.intent === 'device.set-light');
+
+    const missingColorResult = await setLightTool.cb({ color: '#123456', device: 'Brightness Only Light' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+    expect(missingColorResult.content[0].text).to.eq(
+      'device.set-light: no command sent, no matching feature on Brightness Only Light (missing color feature)',
+    );
+
+    const missingBrightnessAndTemperatureResult = await setLightTool.cb({
+      brightness: 20,
+      temperature: 3000,
+      device: 'Color Only Light',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(0);
+    expect(missingBrightnessAndTemperatureResult.content[0].text).to.eq(
+      'device.set-light: no command sent, no matching feature on Color Only Light (missing brightness and temperature feature)',
+    );
+
+    const partialResult = await setLightTool.cb({
+      brightness: 20,
+      color: '#FF0000',
+      device: 'Brightness Only Light',
+    });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(partialResult.content[0].text).to.eq(
+      'device.set-light: brightness 20% command sent for Brightness Only Light; could not dispatch for Brightness Only Light (missing color feature)',
     );
   });
 });
