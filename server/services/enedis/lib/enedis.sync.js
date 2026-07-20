@@ -15,6 +15,9 @@ const BATCH_TYPES = {
   DAILY_CONSUMPTION: 'DailyConsumption',
 };
 
+const getEarliestDate = (dates) =>
+  dates.reduce((earliest, date) => (earliest && earliest < date ? earliest : date), null);
+
 /**
  * @description Get one batch of enedis data, then call the next one.
  * @param {object} gladys - Gladys object reference.
@@ -24,7 +27,7 @@ const BATCH_TYPES = {
  * @param {number} enedisSyncBatchSize - Number of items to get in one call.
  * @param {string} after - Get data after this date.
  * @param {Function} onProgress - Callback function to report progress.
- * @returns {Promise<object>} - Resolve with last date.
+ * @returns {Promise<object>} - Resolve with synced date range.
  * @example await recursiveBatchCall('usage-point');
  */
 async function recursiveBatchCall(
@@ -66,10 +69,12 @@ async function recursiveBatchCall(
     await onProgress();
   }
 
+  const firstDateSync = data.length > 0 ? data[0].created_at : null;
+
   // If there was still some data to get
   if (data.length === enedisSyncBatchSize) {
     const lastEntry = data[data.length - 1];
-    return recursiveBatchCall(
+    const nextBatchResult = await recursiveBatchCall(
       gladys,
       batchType,
       externalId,
@@ -78,11 +83,21 @@ async function recursiveBatchCall(
       lastEntry.created_at,
       onProgress,
     );
+    return {
+      firstDateSync: firstDateSync || nextBatchResult.firstDateSync,
+      lastDateSync: nextBatchResult.lastDateSync,
+    };
   }
   if (data.length === 0) {
-    return after;
+    return {
+      firstDateSync: null,
+      lastDateSync: after,
+    };
   }
-  return data[data.length - 1].created_at;
+  return {
+    firstDateSync,
+    lastDateSync: data[data.length - 1].created_at,
+  };
 }
 
 /**
@@ -176,6 +191,8 @@ async function sync(fromStart = false, jobId = null) {
       }
     };
 
+    const energyMonitoringService = this.gladys.service && this.gladys.service.getService('energy-monitoring');
+
     // Foreach usage point
     return Promise.mapSeries(usagePoints, async (usagePoint) => {
       const response = {
@@ -197,7 +214,7 @@ async function sync(fromStart = false, jobId = null) {
         logger.debug(`Enedis: Usage point last sync was ${lastDateSynced}, syncing from ${syncFromDate}`);
 
         // syncing all batches
-        const lastDateSync = await recursiveBatchCall(
+        const syncRange = await recursiveBatchCall(
           this.gladys,
           BATCH_TYPES.DAILY_CONSUMPTION,
           usagePointFeatureDailyConsumption.external_id,
@@ -207,6 +224,7 @@ async function sync(fromStart = false, jobId = null) {
           () => updateProgress(progressPerBatch),
         );
 
+        const { firstDateSync, lastDateSync } = syncRange;
         logger.debug(`Enedis: Saving new last data sync = ${lastDateSync}`);
 
         // save last date synced in DB
@@ -215,6 +233,7 @@ async function sync(fromStart = false, jobId = null) {
         response.dailyConsumptionSync = {
           syncFromDate,
           lastDateSynced,
+          firstDateSync,
           lastDateSync,
           usagePointExternalId: usagePointFeatureDailyConsumption.external_id,
         };
@@ -236,7 +255,7 @@ async function sync(fromStart = false, jobId = null) {
         );
 
         // syncing all batches
-        const lastDateSync = await recursiveBatchCall(
+        const syncRange = await recursiveBatchCall(
           this.gladys,
           BATCH_TYPES.CONSUMPTION_LOAD_CURVE,
           usagePointFeatureConsumptionLoadCurve.external_id,
@@ -246,6 +265,7 @@ async function sync(fromStart = false, jobId = null) {
           () => updateProgress(progressPerBatch),
         );
 
+        const { firstDateSync, lastDateSync } = syncRange;
         logger.debug(`Enedis: Saving new last data sync = ${lastDateSync}`);
 
         // save last date synced in DB
@@ -254,9 +274,23 @@ async function sync(fromStart = false, jobId = null) {
         response.consumptionLoadCurveSync = {
           syncFromDate,
           lastDateSynced,
+          firstDateSync,
           lastDateSync,
           usagePointExternalId: usagePointFeatureConsumptionLoadCurve.external_id,
         };
+      }
+
+      const syncedDates = [
+        response.dailyConsumptionSync && response.dailyConsumptionSync.firstDateSync,
+        response.consumptionLoadCurveSync && response.consumptionLoadCurveSync.firstDateSync,
+      ].filter(Boolean);
+
+      if (syncedDates.length > 0 && energyMonitoringService && energyMonitoringService.device) {
+        const earliestSyncDate = getEarliestDate(syncedDates);
+        logger.debug(`Enedis: Recalculating cost from ${earliestSyncDate} after sync`);
+        await energyMonitoringService.device.calculateCostFrom(new Date(earliestSyncDate), jobId);
+      } else if (syncedDates.length > 0) {
+        logger.warn('Enedis: energy-monitoring service unavailable, skipping cost recalculation after sync');
       }
 
       return response;

@@ -179,6 +179,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
         consumptionLoadCurveSync: {
           syncFromDate: '2022-05-13',
           lastDateSynced: '2022-05-20',
+          firstDateSync: '2022-08-02',
           lastDateSync: '2022-08-11',
           usagePointExternalId: 'enedis:16401220101758',
         },
@@ -234,6 +235,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
         consumptionLoadCurveSync: {
           syncFromDate: undefined,
           lastDateSynced: '2022-05-20',
+          firstDateSync: '2022-08-02',
           lastDateSync: '2022-08-11',
           usagePointExternalId: 'enedis:16401220101758',
         },

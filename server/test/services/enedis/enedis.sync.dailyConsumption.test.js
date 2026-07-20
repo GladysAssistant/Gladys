@@ -177,6 +177,7 @@ describe('enedis.sync.dailySync', () => {
         dailyConsumptionSync: {
           syncFromDate: '2022-05-13',
           lastDateSynced: '2022-05-20',
+          firstDateSync: '2022-08-02',
           lastDateSync: '2022-08-11',
           usagePointExternalId: 'enedis:16401220101758',
         },
@@ -231,12 +232,114 @@ describe('enedis.sync.dailySync', () => {
         dailyConsumptionSync: {
           syncFromDate: undefined,
           lastDateSynced: '2022-05-20',
+          firstDateSync: '2022-08-02',
           lastDateSync: '2022-08-11',
           usagePointExternalId: 'enedis:16401220101758',
         },
         consumptionLoadCurveSync: null,
       },
     ]);
+  });
+  it('should recalculate cost from earliest synced daily consumption date after sync', async () => {
+    const dailyConsumptionStub = stub();
+    dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    const calculateCostFrom = fake.resolves(null);
+    const gladys = {
+      device: {
+        get: fake.resolves([
+          {
+            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
+            external_id: 'enedis:16401220101758',
+            features: [
+              {
+                external_id: 'enedis:16401220101758',
+                category: 'energy-sensor',
+                type: 'daily-consumption',
+              },
+            ],
+          },
+        ]),
+        setParam: fake.resolves(null),
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+      gateway: {
+        enedisGetDailyConsumption: dailyConsumptionStub,
+      },
+      service: {
+        getService: fake.returns({
+          device: {
+            calculateCostFrom,
+          },
+        }),
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
+    };
+    const enedisService = new Enedis(gladys);
+    enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
+    const jobId = 'test-job-id';
+
+    await enedisService.sync(false, jobId);
+
+    assert.calledOnce(calculateCostFrom);
+    assert.calledWith(calculateCostFrom, new Date('2022-08-02T00:00:00.000Z'), jobId);
+  });
+  it('should not recalculate cost when enedis daily sync returns no new data', async () => {
+    const calculateCostFrom = fake.resolves(null);
+    const gladys = {
+      device: {
+        get: fake.resolves([
+          {
+            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
+            external_id: 'enedis:16401220101758',
+            features: [
+              {
+                external_id: 'enedis:16401220101758',
+                category: 'energy-sensor',
+                type: 'daily-consumption',
+              },
+            ],
+            params: [
+              {
+                name: 'LAST_DATE_SYNCED',
+                value: '2022-05-20',
+              },
+            ],
+          },
+        ]),
+        setParam: fake.resolves(null),
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+      gateway: {
+        enedisGetDailyConsumption: fake.resolves([]),
+      },
+      service: {
+        getService: fake.returns({
+          device: {
+            calculateCostFrom,
+          },
+        }),
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
+    };
+    const enedisService = new Enedis(gladys);
+    enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
+
+    await enedisService.sync();
+
+    assert.notCalled(calculateCostFrom);
   });
   it('should sync with 1 page = 100', async () => {
     const dailyConsumptionStub = stub();
