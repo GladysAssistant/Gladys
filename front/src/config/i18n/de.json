@@ -3841,11 +3841,25 @@
       "thirty-minutes-production": "Produktion 30 Minuten",
       "thirty-minutes-production-revenue": "Ertrag 30 Minuten"
     },
-    "solar-battery": {
-      "shortCategoryName": "Solarbatterie",
+    "battery-storage": {
+      "shortCategoryName": "Batteriespeicher",
       "battery-level": "Batteriestand",
-      "battery-input-power": "Batterie-Eingangsleistung",
-      "battery-output-power": "Batterie-Ausgangsleistung"
+      "charge-power": "Ladeleistung",
+      "discharge-power": "Entladeleistung",
+      "solar-input-power": "Solar-Eingangsleistung",
+      "output-power": "Ausgangsleistung",
+      "grid-input-power": "Netzbezugsleistung",
+      "grid-output-power": "Netzeinspeiseleistung",
+      "grid-power": "Netzleistung",
+      "off-grid-power": "Inselnetzleistung",
+      "charge-energy": "Geladene Energie",
+      "discharge-energy": "Entladene Energie",
+      "solar-energy": "Solarenergie",
+      "output-energy": "Abgegebene Energie",
+      "grid-input-energy": "Netzbezugsenergie",
+      "grid-output-energy": "Netzeinspeiseenergie",
+      "off-grid-energy": "Inselnetzenergie",
+      "battery-energy-remaining": "Verbleibende Batterieenergie"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",

@@ -571,7 +571,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SIGNAL: 'signal',
   SIREN: 'siren',
   SISMIC_SENSOR: 'sismic-sensor',
-  SOLAR_BATTERY: 'solar-battery',
+  BATTERY_STORAGE: 'battery-storage',
   SMOKE_SENSOR: 'smoke-sensor',
   SOIL_MOISTURE_SENSOR: 'soil-moisture-sensor',
   SURFACE: 'surface',
@@ -747,10 +747,24 @@ const DEVICE_FEATURE_TYPES = {
     THIRTY_MINUTES_PRODUCTION: 'thirty-minutes-production',
     THIRTY_MINUTES_PRODUCTION_REVENUE: 'thirty-minutes-production-revenue',
   },
-  SOLAR_BATTERY: {
-    BATTERY_LEVEL: 'battery-level',
-    BATTERY_INPUT_POWER: 'battery-input-power',
-    BATTERY_OUTPUT_POWER: 'battery-output-power',
+  BATTERY_STORAGE: {
+    BATTERY_LEVEL: 'battery-level', // state of charge, % (0..100)
+    CHARGE_POWER: 'charge-power', // power INTO the battery, W/kW (>=0)
+    DISCHARGE_POWER: 'discharge-power', // power OUT of the battery, W/kW (>=0)
+    SOLAR_INPUT_POWER: 'solar-input-power', // PV input power, W/kW (>=0)
+    OUTPUT_POWER: 'output-power', // total power delivered to home/load (PV-direct + discharge), W/kW (>=0)
+    GRID_INPUT_POWER: 'grid-input-power', // power imported from the grid, W/kW (>=0)
+    GRID_OUTPUT_POWER: 'grid-output-power', // power exported to the grid, W/kW (>=0)
+    GRID_POWER: 'grid-power', // signed grid exchange (import +, export -), W/kW
+    OFF_GRID_POWER: 'off-grid-power', // off-grid / backup output power, W/kW (>=0)
+    CHARGE_ENERGY: 'charge-energy', // cumulative energy charged, kWh
+    DISCHARGE_ENERGY: 'discharge-energy', // cumulative energy discharged, kWh
+    SOLAR_ENERGY: 'solar-energy', // cumulative solar energy harvested, kWh
+    OUTPUT_ENERGY: 'output-energy', // cumulative energy delivered to home, kWh
+    GRID_INPUT_ENERGY: 'grid-input-energy', // cumulative grid import energy, kWh
+    GRID_OUTPUT_ENERGY: 'grid-output-energy', // cumulative grid export energy, kWh
+    OFF_GRID_ENERGY: 'off-grid-energy', // cumulative off-grid output energy, kWh
+    BATTERY_ENERGY_REMAINING: 'battery-energy-remaining', // currently available stored energy (instantaneous), kWh
   },
   TELEINFORMATION: {
     BINARY: 'binary',
@@ -1120,7 +1134,13 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.EURO,
     DEVICE_FEATURE_UNITS.DOLLAR,
   ],
-  [DEVICE_FEATURE_CATEGORIES.SOLAR_BATTERY]: [DEVICE_FEATURE_UNITS.WATT, DEVICE_FEATURE_UNITS.PERCENT],
+  [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: [
+    DEVICE_FEATURE_UNITS.PERCENT,
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.WATT_HOUR,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  ],
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_BATTERY]: [
     DEVICE_FEATURE_UNITS.CELSIUS,
     DEVICE_FEATURE_UNITS.FAHRENHEIT,
@@ -1247,6 +1267,63 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.SQUARE_METER,
     DEVICE_FEATURE_UNITS.SQUARE_KILOMETER,
   ],
+};
+
+// Device feature categories whose features report a read-only measurement (a sensor value)
+// rather than an actuator state. Manually created features (e.g. via the MQTT UI) belonging
+// to one of these categories should default to `read_only: true`.
+// Every category whose value ends with `-sensor` is detected automatically; this list only
+// needs the sensor-like categories that do not follow that naming convention.
+const ADDITIONAL_SENSOR_DEVICE_FEATURE_CATEGORIES = [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE];
+
+/**
+ * @description Tells whether a device feature category is a sensor (read-only measurement) category.
+ * @param {string} category - A device feature category (one of DEVICE_FEATURE_CATEGORIES values).
+ * @returns {boolean} True if the category holds sensor (read-only) measurements.
+ * @example
+ * isSensorCategory(DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE); // true
+ */
+const isSensorCategory = (category) =>
+  typeof category === 'string' &&
+  (category.endsWith('-sensor') || ADDITIONAL_SENSOR_DEVICE_FEATURE_CATEGORIES.includes(category));
+
+// Per-(category, type) default unit used when a feature is created without an explicit unit
+// (e.g. manually via the MQTT UI). Without this, code that falls back to the first unit of the
+// category would mislabel some features (e.g. `battery-level` would default to watt).
+// Each entry maps a category to a resolver that returns the default unit for a given type.
+const DEFAULT_DEVICE_FEATURE_UNIT_RESOLVER_BY_CATEGORY = {
+  [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: (type) => {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      // State of charge, in percent
+      return DEVICE_FEATURE_UNITS.PERCENT;
+    }
+    if (typeof type === 'string' && type.endsWith('-power')) {
+      // Instantaneous power, in watt
+      return DEVICE_FEATURE_UNITS.WATT;
+    }
+    // Cumulative or stored energy (*-energy and battery-energy-remaining), in kilowatt-hour
+    return DEVICE_FEATURE_UNITS.KILOWATT_HOUR;
+  },
+};
+
+/**
+ * @description Returns the default unit to use for a manually created feature of a given
+ * category and type, or undefined when the category has no per-type default.
+ * @param {string} category - A device feature category (one of DEVICE_FEATURE_CATEGORIES values).
+ * @param {string} type - A device feature type (one of DEVICE_FEATURE_TYPES values).
+ * @returns {(string|undefined)} The default unit, or undefined if none applies.
+ * @example
+ * getDefaultDeviceFeatureUnit(
+ *   DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE,
+ *   DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL,
+ * ); // 'percent'
+ */
+const getDefaultDeviceFeatureUnit = (category, type) => {
+  const resolver = DEFAULT_DEVICE_FEATURE_UNIT_RESOLVER_BY_CATEGORY[category];
+  if (!resolver) {
+    return undefined;
+  }
+  return resolver(type);
 };
 
 const MEASUREMENT_UNITS = {
@@ -1591,6 +1668,9 @@ module.exports.DEVICE_FEATURE_UNITS = DEVICE_FEATURE_UNITS;
 module.exports.DEVICE_FEATURE_UNITS_LIST = DEVICE_FEATURE_UNITS_LIST;
 
 module.exports.DEVICE_FEATURE_UNITS_BY_CATEGORY = DEVICE_FEATURE_UNITS_BY_CATEGORY;
+
+module.exports.isSensorCategory = isSensorCategory;
+module.exports.getDefaultDeviceFeatureUnit = getDefaultDeviceFeatureUnit;
 
 module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
