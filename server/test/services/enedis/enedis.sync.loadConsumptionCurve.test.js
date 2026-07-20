@@ -4,8 +4,8 @@ const Enedis = require('../../../services/enedis/lib');
 
 const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
-const getConsumptionLoadCurveArray = (size) => {
-  const date = new Date('2022-08-01');
+const getConsumptionLoadCurveArray = (size, startAt = '2022-08-01') => {
+  const date = new Date(startAt);
   const arr = [];
   for (let i = 0; i < size; i += 1) {
     date.setDate(date.getDate() + 1);
@@ -56,7 +56,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
   it('should sync with 2 pages', async () => {
     const consumptionLoadCurveStub = stub();
     consumptionLoadCurveStub.onCall(0).resolves(getConsumptionLoadCurveArray(100));
-    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10));
+    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -93,7 +93,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
   it('should not do anything, feature not found', async () => {
     const consumptionLoadCurveStub = stub();
     consumptionLoadCurveStub.onCall(0).resolves(getConsumptionLoadCurveArray(100));
-    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10));
+    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -129,7 +129,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
   it('should sync from one week ago', async () => {
     const consumptionLoadCurveStub = stub();
     consumptionLoadCurveStub.onCall(0).resolves(getConsumptionLoadCurveArray(100));
-    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10));
+    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -172,7 +172,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
           syncFromDate: '2022-05-13',
           lastDateSynced: '2022-05-20',
           firstDateSync: '2022-08-02',
-          lastDateSync: '2022-08-11',
+          lastDateSync: '2022-11-19',
           usagePointExternalId: 'enedis:16401220101758',
         },
         dailyConsumptionSync: null,
@@ -182,7 +182,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
   it('should sync from start', async () => {
     const consumptionLoadCurveStub = stub();
     consumptionLoadCurveStub.onCall(0).resolves(getConsumptionLoadCurveArray(100));
-    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10));
+    consumptionLoadCurveStub.onCall(1).resolves(getConsumptionLoadCurveArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -226,7 +226,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
           syncFromDate: undefined,
           lastDateSynced: '2022-05-20',
           firstDateSync: '2022-08-02',
-          lastDateSync: '2022-08-11',
+          lastDateSync: '2022-11-19',
           usagePointExternalId: 'enedis:16401220101758',
         },
       },

@@ -2,8 +2,8 @@ const { fake, assert, stub } = require('sinon');
 const { expect } = require('chai');
 const Enedis = require('../../../services/enedis/lib');
 
-const getDailyConsumptionArray = (size) => {
-  const date = new Date('2022-08-01');
+const getDailyConsumptionArray = (size, startAt = '2022-08-01') => {
+  const date = new Date(startAt);
   const arr = [];
   for (let i = 0; i < size; i += 1) {
     date.setDate(date.getDate() + 1);
@@ -54,7 +54,7 @@ describe('enedis.sync.dailySync', () => {
   it('should sync with 2 pages', async () => {
     const dailyConsumptionStub = stub();
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -91,7 +91,7 @@ describe('enedis.sync.dailySync', () => {
   it('should not do anything, feature not found', async () => {
     const dailyConsumptionStub = stub();
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -127,7 +127,7 @@ describe('enedis.sync.dailySync', () => {
   it('should sync from one week ago', async () => {
     const dailyConsumptionStub = stub();
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -170,7 +170,7 @@ describe('enedis.sync.dailySync', () => {
           syncFromDate: '2022-05-13',
           lastDateSynced: '2022-05-20',
           firstDateSync: '2022-08-02',
-          lastDateSync: '2022-08-11',
+          lastDateSync: '2022-11-19',
           usagePointExternalId: 'enedis:16401220101758',
         },
         consumptionLoadCurveSync: null,
@@ -180,7 +180,7 @@ describe('enedis.sync.dailySync', () => {
   it('should sync from start', async () => {
     const dailyConsumptionStub = stub();
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -223,7 +223,7 @@ describe('enedis.sync.dailySync', () => {
           syncFromDate: undefined,
           lastDateSynced: '2022-05-20',
           firstDateSync: '2022-08-02',
-          lastDateSync: '2022-08-11',
+          lastDateSync: '2022-11-19',
           usagePointExternalId: 'enedis:16401220101758',
         },
         consumptionLoadCurveSync: null,
@@ -233,7 +233,7 @@ describe('enedis.sync.dailySync', () => {
   it('should await state persistence before recalculating cost from earliest synced date', async () => {
     const dailyConsumptionStub = stub();
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10, '2022-11-09'));
     let persistedStateCount = 0;
     const saveHistoricalState = fake(async () => {
       await Promise.resolve();
@@ -373,7 +373,7 @@ describe('enedis.sync.dailySync', () => {
     const dailyConsumptionStub = stub();
     // Simulate 2 batches for daily consumption
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(4));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(4, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
