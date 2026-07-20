@@ -22,9 +22,7 @@ import {
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
-  getDefaultDeviceFeatureUnit,
-  isSensorCategory
+  DEVICE_FEATURE_UNITS
 } from '../../../../../../../../server/utils/constants';
 
 class MqttDeviceSetupPage extends Component {
@@ -44,18 +42,6 @@ class MqttDeviceSetupPage extends Component {
     const type = featureData[1];
     const defaultValues = getFeatureDefaultValues(category, type);
     const newFeatureIndex = this.state.device.features.length;
-
-    // Sensor categories report a read-only measurement: default their features to read_only
-    if (isSensorCategory(featureData[0])) {
-      defaultValues.read_only = true;
-    }
-
-    // Pre-select a sensible per-type default unit when the category provides one
-    // (e.g. battery-level -> percent, *-power -> watt, *-energy -> kilowatt-hour)
-    const defaultUnit = getDefaultDeviceFeatureUnit(featureData[0], featureData[1]);
-    if (defaultUnit) {
-      defaultValues.unit = defaultUnit;
-    }
 
     const device = update(this.state.device, {
       features: {

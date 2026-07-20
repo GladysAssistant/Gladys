@@ -47,7 +47,8 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.DATARATE ||
     category === DEVICE_FEATURE_CATEGORIES.DURATION ||
     category === DEVICE_FEATURE_CATEGORIES.TAMPER ||
-    category === DEVICE_FEATURE_CATEGORIES.INPUT
+    category === DEVICE_FEATURE_CATEGORIES.INPUT ||
+    category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE
   ) {
     return true;
   }
@@ -427,6 +428,18 @@ export const getDefaultUnitForFeature = (category, type) => {
     if (teleinformationUnit) {
       return teleinformationUnit;
     }
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    // State of charge in percent, instantaneous powers in watt, and every
+    // cumulative/stored energy (*-energy and battery-energy-remaining) in kWh.
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return DEVICE_FEATURE_UNITS.PERCENT;
+    }
+    if (typeof type === 'string' && type.endsWith('-power')) {
+      return DEVICE_FEATURE_UNITS.WATT;
+    }
+    return DEVICE_FEATURE_UNITS.KILOWATT_HOUR;
   }
 
   const preferredUnit = PREFERRED_DEFAULT_UNIT_BY_CATEGORY[category];
@@ -930,6 +943,19 @@ export const getFeaturePreviewValue = (category, type) => {
       return 2.4;
     }
     return 1;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return 54;
+    }
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_ENERGY_REMAINING) {
+      return 4.2;
+    }
+    if (typeof type === 'string' && type.endsWith('-energy')) {
+      return 128.5;
+    }
+    return 320;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR) {
