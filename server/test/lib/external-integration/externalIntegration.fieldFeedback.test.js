@@ -237,6 +237,23 @@ describe('externalIntegration params upsert on re-publish', () => {
     expect(paramsInDb[0].value).to.equal('192.168.1.10');
   });
 
+  it('should ignore malformed published params', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration, stateManager } = buildSupervisor();
+    const createdDevice = await seedCreatedDevice(service, stateManager);
+    // params are the free storage of the integration: junk entries are
+    // simply skipped, well-formed ones are still upserted
+    await externalIntegration.upsertDeviceParams(createdDevice, [
+      null,
+      'junk',
+      { value: 'no-name' },
+      { name: 'ip', value: '192.168.1.42' },
+    ]);
+    const paramsInDb = await db.DeviceParam.findAll({ where: { device_id: createdDevice.id }, raw: true });
+    expect(paramsInDb).to.have.lengthOf(1);
+    expect(paramsInDb[0].value).to.equal('192.168.1.42');
+  });
+
   it('should ignore devices created by another integration', async () => {
     const service = await seedExternalService();
     const { externalIntegration, stateManager } = buildSupervisor();
