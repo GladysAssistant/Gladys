@@ -16,6 +16,7 @@ const {
   convertToGladysDevice,
   matterExternalIdToSelector,
 } = require('../../../../services/matter/utils/convertToGladysDevice');
+const { AC_MODE } = require('../../../../utils/constants');
 
 describe('Matter.convertToGladysDevice', () => {
   const serviceId = 'service-1';
@@ -385,7 +386,7 @@ describe('Matter.convertToGladysDevice', () => {
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:4');
 
-    expect(gladysDevice.features).to.have.lengthOf(3);
+    expect(gladysDevice.features).to.have.lengthOf(4);
     expect(gladysDevice.features[0]).to.deep.equal({
       name: 'Thermostat - 4 (Local temperature)',
       selector: gladysDevice.features[0].selector,
@@ -410,5 +411,38 @@ describe('Matter.convertToGladysDevice', () => {
       type: 'target-temperature',
       external_id: 'matter:12345:1:child_endpoint:4:513:cooling',
     });
+    expect(gladysDevice.features[3]).to.deep.include({
+      name: 'Thermostat - 4 (Mode)',
+      category: 'air-conditioning',
+      type: 'mode',
+      read_only: false,
+      has_feedback: true,
+      external_id: 'matter:12345:1:child_endpoint:4:513:mode',
+      min: AC_MODE.AUTO,
+      max: AC_MODE.FAN,
+    });
+  });
+
+  it('should not create air conditioning mode feature when cooling is not supported', async () => {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      name: 'Thermostat',
+      endpointId: 4,
+      supportedFeatures: {
+        heating: true,
+      },
+    };
+
+    const device = {
+      name: 'Radiator',
+      number: 4,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:4');
+
+    const modeFeatures = gladysDevice.features.filter((feature) => feature.type === 'mode');
+    expect(modeFeatures).to.have.lengthOf(0);
   });
 });

@@ -29,7 +29,7 @@ const {
 } = require('@matter/main/clusters');
 
 const MatterHandler = require('../../../../services/matter/lib');
-const { EVENTS, STATE, FAN_MODE } = require('../../../../utils/constants');
+const { EVENTS, STATE, FAN_MODE, AC_MODE } = require('../../../../utils/constants');
 
 describe('Matter.readInitialDeviceStates', () => {
   let matterHandler;
@@ -119,6 +119,8 @@ describe('Matter.readInitialDeviceStates', () => {
         supportedFeatures: { heating: true, cooling: true },
         getOccupiedHeatingSetpointAttribute: fake.resolves(2000),
         getOccupiedCoolingSetpointAttribute: fake.resolves(2400),
+        // Matter SystemMode Cool = 3
+        getSystemModeAttribute: fake.resolves(3),
       },
       [ElectricalPowerMeasurement.Complete.id]: {
         getActivePowerAttribute: fake.resolves(5000),
@@ -228,10 +230,30 @@ describe('Matter.readInitialDeviceStates', () => {
       state: 6,
     });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:mode`,
+      state: AC_MODE.COOLING,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `matter:${nodeId}:${devicePath}:${PowerSource.Complete.id}:battery`,
       state: 50,
     });
     expect(gladys.event.emit.callCount).to.be.greaterThan(20);
+  });
+
+  it('should skip thermostat system mode when it has no Gladys equivalent', async () => {
+    const thermostat = {
+      supportedFeatures: { cooling: true },
+      getOccupiedCoolingSetpointAttribute: fake.resolves(undefined),
+      // Matter SystemMode Off = 0
+      getSystemModeAttribute: fake.resolves(0),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === Thermostat.Complete.id ? thermostat : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(gladys.event.emit);
   });
 
   it('should skip null electrical measurements and undefined vacuum modes', async () => {

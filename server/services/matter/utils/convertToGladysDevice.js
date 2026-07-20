@@ -31,6 +31,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
+  AC_MODE,
   FAN_MODE,
   FAN_AIRFLOW_DIRECTION,
   FAN_ROCK_SETTING,
@@ -303,6 +304,18 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:cooling`,
             min: -100,
             max: 200,
+          });
+          // Air conditioners expose their operating mode (auto/cool/heat/dry/fan)
+          // through the Thermostat cluster SystemMode attribute
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Mode)`,
+            category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+            type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+            read_only: false,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:mode`,
+            min: AC_MODE.AUTO,
+            max: AC_MODE.FAN,
           });
         }
       } else if (clusterIndex === Pm25ConcentrationMeasurement.Complete.id) {

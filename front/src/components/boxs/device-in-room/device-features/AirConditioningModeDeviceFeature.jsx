@@ -9,6 +9,11 @@ const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
   const { deviceFeature } = props;
   const { category, type, last_value: lastValue } = deviceFeature;
 
+  // Only display extra modes when the feature range covers them,
+  // so integrations exposing only auto/cool/heat keep a 3-button widget
+  const showDrying = deviceFeature.max >= AC_MODE.DRYING;
+  const showFan = deviceFeature.max >= AC_MODE.FAN;
+
   function updateValue(value) {
     props.updateValueWithDebounce(deviceFeature, value);
   }
@@ -23,6 +28,14 @@ const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
 
   function heating() {
     updateValue(AC_MODE.HEATING);
+  }
+
+  function drying() {
+    updateValue(AC_MODE.DRYING);
+  }
+
+  function fan() {
+    updateValue(AC_MODE.FAN);
   }
 
   return (
@@ -59,6 +72,26 @@ const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
             >
               <Text id={`deviceFeatureAction.category.${category}.${type}.heating`} plural={AC_MODE.HEATING} />
             </button>
+            {showDrying && (
+              <button
+                class={cx('btn btn-sm', 'btn-secondary', {
+                  active: lastValue === AC_MODE.DRYING
+                })}
+                onClick={drying}
+              >
+                <Text id={`deviceFeatureAction.category.${category}.${type}.drying`} plural={AC_MODE.HEATING} />
+              </button>
+            )}
+            {showFan && (
+              <button
+                class={cx('btn btn-sm', 'btn-secondary', {
+                  active: lastValue === AC_MODE.FAN
+                })}
+                onClick={fan}
+              >
+                <Text id={`deviceFeatureAction.category.${category}.${type}.fan`} plural={AC_MODE.HEATING} />
+              </button>
+            )}
           </div>
         </div>
       </td>
