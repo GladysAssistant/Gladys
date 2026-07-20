@@ -36,9 +36,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetConsumptionLoadCurve: fake.resolves(getConsumptionLoadCurveArray(4)),
@@ -52,7 +50,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
     enedisService.syncDelayBetweenCallsInMs = 0;
     enedisService.enedisSyncBatchSize = 100;
     await enedisService.sync();
-    assert.callCount(gladys.event.emit, 4);
+    assert.callCount(gladys.device.saveHistoricalState, 4);
     assert.calledOnce(gladys.device.setParam);
   });
   it('should sync with 2 pages', async () => {
@@ -75,9 +73,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
@@ -91,7 +87,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
     enedisService.syncDelayBetweenCallsInMs = 0;
     enedisService.enedisSyncBatchSize = 100;
     await enedisService.sync();
-    assert.callCount(gladys.event.emit, 110);
+    assert.callCount(gladys.device.saveHistoricalState, 110);
     assert.calledOnce(gladys.device.setParam);
   });
   it('should not do anything, feature not found', async () => {
@@ -109,9 +105,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
@@ -158,9 +152,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
@@ -213,9 +205,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
@@ -242,6 +232,73 @@ describe('enedis.sync.loadConsumptionCurve', () => {
       },
     ]);
   });
+  it('should recalculate cost once from the earliest date across all usage points', async () => {
+    const calculateCostFromDate = fake.resolves(null);
+    const gladys = {
+      device: {
+        get: fake.resolves([
+          {
+            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
+            external_id: 'enedis:16401220101758',
+            features: [
+              {
+                external_id: 'enedis:16401220101758',
+                category: 'energy-sensor',
+                type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+              },
+            ],
+          },
+          {
+            id: '15cabd5e-4c2f-4b55-80af-228c74b11ec5',
+            external_id: 'enedis:26401220101758',
+            features: [
+              {
+                external_id: 'enedis:26401220101758',
+                category: 'energy-sensor',
+                type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+              },
+            ],
+          },
+        ]),
+        setParam: fake.resolves(null),
+        saveHistoricalState: fake.resolves(null),
+      },
+      gateway: {
+        enedisGetDailyConsumption: fake.resolves([
+          {
+            value: 12,
+            created_at: '2022-08-03',
+          },
+        ]),
+        enedisGetConsumptionLoadCurve: fake.resolves([
+          {
+            value: 500,
+            created_at: '2022-08-01T00:30:00.000Z',
+          },
+        ]),
+      },
+      service: {
+        getService: fake.returns({
+          device: {
+            calculateCostFromDate,
+          },
+        }),
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
+    };
+    const enedisService = new Enedis(gladys);
+    enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
+
+    await enedisService.sync();
+
+    assert.calledOnce(calculateCostFromDate);
+    assert.calledWithExactly(calculateCostFromDate, '2022-08-01T00:30:00.000Z');
+    assert.callCount(gladys.device.saveHistoricalState, 2);
+  });
   it('should sync with 1 page = 100', async () => {
     const consumptionLoadCurveStub = stub();
     consumptionLoadCurveStub.onCall(0).resolves(getConsumptionLoadCurveArray(100));
@@ -262,9 +319,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetConsumptionLoadCurve: consumptionLoadCurveStub,
@@ -278,7 +333,7 @@ describe('enedis.sync.loadConsumptionCurve', () => {
     enedisService.syncDelayBetweenCallsInMs = 0;
     enedisService.enedisSyncBatchSize = 100;
     await enedisService.sync();
-    assert.callCount(gladys.event.emit, 100);
+    assert.callCount(gladys.device.saveHistoricalState, 100);
     assert.calledOnce(gladys.device.setParam);
   });
 });

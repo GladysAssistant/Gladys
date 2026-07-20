@@ -4,7 +4,7 @@ const dayjs = require('dayjs');
 const logger = require('../../../utils/logger');
 const { getDeviceFeature, getDeviceParam } = require('../../../utils/device');
 const { getUsagePointIdFromExternalId } = require('../utils/parser');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } = require('../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const { queueWrapper } = require('../utils/queueWrapper');
 
 const LAST_DATE_SYNCED = 'LAST_DATE_SYNCED';
@@ -22,7 +22,7 @@ const getEarliestDate = (dates) =>
  * @description Get one batch of enedis data, then call the next one.
  * @param {object} gladys - Gladys object reference.
  * @param {string} batchType - Batch type ConsumptionLoadCurve or DailyConsumption or DailyConsumptionMaxPower.
- * @param {string} externalId - Enedis usage point external id.
+ * @param {object} deviceFeature - Enedis device feature to update.
  * @param {number} syncDelayBetweenCallsInMs - Delay between calls in ms.
  * @param {number} enedisSyncBatchSize - Number of items to get in one call.
  * @param {string} after - Get data after this date.
@@ -33,12 +33,13 @@ const getEarliestDate = (dates) =>
 async function recursiveBatchCall(
   gladys,
   batchType,
-  externalId,
+  deviceFeature,
   syncDelayBetweenCallsInMs,
   enedisSyncBatchSize,
   after = '2000-01-01',
   onProgress = null,
 ) {
+  const { external_id: externalId } = deviceFeature;
   const usagePointId = getUsagePointIdFromExternalId(externalId);
   logger.info(`Enedis: Syncing ${usagePointId} after ${after}`);
   const data = await gladys.gateway[`enedisGet${batchType}`]({
@@ -55,11 +56,7 @@ async function recursiveBatchCall(
       // Convert to energy in kWh: kWh = (W / 1000) * 0.5
       valueToInsert = (value.value / 1000) * 0.5;
     }
-    gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: externalId,
-      state: valueToInsert,
-      created_at: new Date(value.created_at),
-    });
+    await gladys.device.saveHistoricalState(deviceFeature, valueToInsert, new Date(value.created_at));
     await Promise.delay(syncDelayBetweenCallsInMs / 10);
   });
   await Promise.delay(syncDelayBetweenCallsInMs);
@@ -77,7 +74,7 @@ async function recursiveBatchCall(
     const nextBatchResult = await recursiveBatchCall(
       gladys,
       batchType,
-      externalId,
+      deviceFeature,
       syncDelayBetweenCallsInMs,
       enedisSyncBatchSize,
       lastEntry.created_at,
@@ -191,10 +188,8 @@ async function sync(fromStart = false, jobId = null) {
       }
     };
 
-    const energyMonitoringService = this.gladys.service && this.gladys.service.getService('energy-monitoring');
-
     // Foreach usage point
-    return Promise.mapSeries(usagePoints, async (usagePoint) => {
+    const syncResponses = await Promise.mapSeries(usagePoints, async (usagePoint) => {
       const response = {
         dailyConsumptionSync: null,
         consumptionLoadCurveSync: null,
@@ -217,7 +212,7 @@ async function sync(fromStart = false, jobId = null) {
         const syncRange = await recursiveBatchCall(
           this.gladys,
           BATCH_TYPES.DAILY_CONSUMPTION,
-          usagePointFeatureDailyConsumption.external_id,
+          usagePointFeatureDailyConsumption,
           this.syncDelayBetweenCallsInMs,
           this.enedisSyncBatchSize,
           syncFromDate,
@@ -258,7 +253,7 @@ async function sync(fromStart = false, jobId = null) {
         const syncRange = await recursiveBatchCall(
           this.gladys,
           BATCH_TYPES.CONSUMPTION_LOAD_CURVE,
-          usagePointFeatureConsumptionLoadCurve.external_id,
+          usagePointFeatureConsumptionLoadCurve,
           this.syncDelayBetweenCallsInMs,
           this.enedisSyncBatchSize,
           syncFromDate,
@@ -280,21 +275,28 @@ async function sync(fromStart = false, jobId = null) {
         };
       }
 
-      const syncedDates = [
-        response.dailyConsumptionSync && response.dailyConsumptionSync.firstDateSync,
-        response.consumptionLoadCurveSync && response.consumptionLoadCurveSync.firstDateSync,
-      ].filter(Boolean);
-
-      if (syncedDates.length > 0 && energyMonitoringService && energyMonitoringService.device) {
-        const earliestSyncDate = getEarliestDate(syncedDates);
-        logger.debug(`Enedis: Recalculating cost from ${earliestSyncDate} after sync`);
-        await energyMonitoringService.device.calculateCostFrom(new Date(earliestSyncDate), jobId);
-      } else if (syncedDates.length > 0) {
-        logger.warn('Enedis: energy-monitoring service unavailable, skipping cost recalculation after sync');
-      }
-
       return response;
     });
+
+    const syncedDates = syncResponses
+      .flatMap((response) => [
+        response.dailyConsumptionSync && response.dailyConsumptionSync.firstDateSync,
+        response.consumptionLoadCurveSync && response.consumptionLoadCurveSync.firstDateSync,
+      ])
+      .filter(Boolean);
+
+    if (syncedDates.length > 0) {
+      const energyMonitoringService = this.gladys.service && this.gladys.service.getService('energy-monitoring');
+      if (energyMonitoringService && energyMonitoringService.device) {
+        const earliestSyncDate = getEarliestDate(syncedDates);
+        logger.debug(`Enedis: Recalculating cost from ${earliestSyncDate} after sync`);
+        await energyMonitoringService.device.calculateCostFromDate(earliestSyncDate);
+      } else {
+        logger.warn('Enedis: energy-monitoring service unavailable, skipping cost recalculation after sync');
+      }
+    }
+
+    return syncResponses;
   });
 }
 
