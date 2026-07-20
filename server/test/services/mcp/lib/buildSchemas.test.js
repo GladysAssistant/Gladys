@@ -2480,6 +2480,23 @@ describe('build schemas', () => {
         },
       ],
     };
+    const noRoomLightDevice = {
+      selector: 'device-light-no-room',
+      name: 'No Room Light',
+      room: null,
+      features: [
+        {
+          id: 6,
+          selector: 'device-light-no-room-brightness',
+          name: 'Brightness',
+          category: 'light',
+          type: 'brightness',
+          min: 0,
+          max: 100,
+          last_value: 100,
+        },
+      ],
+    };
 
     const mcpHandler = {
       serviceId: 'test',
@@ -2504,9 +2521,9 @@ describe('build schemas', () => {
         area: { get: stub().resolves([]) },
         scene: { get: stub().resolves([]), create: stub().resolves({}) },
         device: {
-          get: stub().resolves([rgbLightDevice, colorStripDevice]),
+          get: stub().resolves([rgbLightDevice, colorStripDevice, noRoomLightDevice]),
           getBySelector: stub().callsFake(async (selector) => {
-            return [rgbLightDevice, colorStripDevice].find((d) => d.selector === selector);
+            return [rgbLightDevice, colorStripDevice, noRoomLightDevice].find((d) => d.selector === selector);
           }),
           setValue: stub().resolves(),
           getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
@@ -2552,6 +2569,9 @@ describe('build schemas', () => {
         access: ['write', 'read'],
       },
     ]);
+
+    // Device without room is listed under the "no-room" entry.
+    expect(homeSchema['no-room'].devices).to.have.property('device-light-no-room');
 
     // Device without binary feature is added as a standalone entry.
     expect(homeSchema.salon.devices['device-color-strip']).to.deep.equal({
@@ -2627,6 +2647,14 @@ describe('build schemas', () => {
     expect(combinedResult.content[0].text).to.eq(
       'device.set-light: brightness 100% and color 00FF00 and temperature 2700K command sent for Living Room Light',
     );
+
+    mcpHandler.gladys.device.setValue.resetHistory();
+
+    const noRoomResult = await setLightTool.cb({ brightness: 10, room: 'No room' });
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[0].name).to.eq('No Room Light');
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq(10);
+    expect(noRoomResult.content[0].text).to.eq('device.set-light: brightness 10% command sent for No Room Light');
 
     const stateResult = await getStateTool.cb({ room: 'Salon', device_type: 'light' });
     expect(stateResult.content[0].text).to.eq('toonmockdata');
