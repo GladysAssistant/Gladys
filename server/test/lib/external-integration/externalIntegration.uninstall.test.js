@@ -53,6 +53,22 @@ describe('externalIntegration.uninstall', () => {
     expect(serviceInDb).to.equal(null);
   });
 
+  it('should clear the camera rate-limit entries of the integration only', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.cameraImageRateLimits.set(`ext:${service.selector}:camera-1`, {
+      count: 3,
+      resetAt: Date.now() + 60 * 1000,
+    });
+    externalIntegration.cameraImageRateLimits.set('ext:ext-dev-other-integration:camera-1', {
+      count: 1,
+      resetAt: Date.now() + 60 * 1000,
+    });
+    await externalIntegration.uninstall(service.selector);
+    expect(externalIntegration.cameraImageRateLimits.has(`ext:${service.selector}:camera-1`)).to.equal(false);
+    expect(externalIntegration.cameraImageRateLimits.has('ext:ext-dev-other-integration:camera-1')).to.equal(true);
+  });
+
   it('should throw on unknown integration', async () => {
     const { externalIntegration } = buildSupervisor();
     try {
