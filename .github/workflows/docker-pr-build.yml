@@ -166,10 +166,15 @@ jobs:
         uses: actions/checkout@v3
       - name: 🏷️ Compute image tag from branch name
         id: image_tag
+        # github.head_ref is attacker-controlled (any branch name), so we pass it
+        # through the environment instead of interpolating it into the shell to
+        # avoid script injection.
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           # Docker tags only allow [a-zA-Z0-9_.-] and must be 128 chars max,
           # so we sanitize the branch name (e.g. "feature/foo" -> "feature-foo").
-          BRANCH_TAG=$(echo "${{ github.head_ref }}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g' | cut -c1-128)
+          BRANCH_TAG=$(echo "$HEAD_REF" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g' | cut -c1-128)
           # A Docker repository name must be lowercase, so we lowercase the
           # owner/repo part as well (e.g. "GladysAssistant/Gladys").
           REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
