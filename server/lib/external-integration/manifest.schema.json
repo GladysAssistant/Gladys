@@ -63,6 +63,24 @@
       "items": {
         "$ref": "#/definitions/configField"
       }
+    },
+    "network_discovery": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "description": "Curated network capture requests (mediated discovery): the Gladys core, running in network=host, captures on behalf of the integration, which interprets the raw results itself. Shown on the install screen as an authorization contract; no arbitrary capture.",
+      "items": {
+        "$ref": "#/definitions/networkDiscoveryEntry"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "description": "On-demand operations rendered as buttons in the Configuration screen (connection test, identify, protocol detection...). Each action is relayed to the integration over WebSocket and acked within its own declared timeout.",
+      "items": {
+        "$ref": "#/definitions/action"
+      }
     }
   },
   "definitions": {
@@ -89,8 +107,8 @@
         },
         "type": {
           "type": "string",
-          "enum": ["string", "number", "boolean", "select", "secret"],
-          "description": "Field widget type. `secret` values are never sent back to the frontend."
+          "enum": ["string", "number", "boolean", "select", "multi_select", "secret", "oauth2"],
+          "description": "Field widget type. `secret` values are never sent back to the frontend; `oauth2` renders a Connect button (relayed OAuth2 authorization-code flow, tokens stored off-schema by the integration); `multi_select` renders checkboxes and stores an array of option values."
         },
         "label": {
           "$ref": "#/definitions/multiLanguageText"
@@ -107,7 +125,7 @@
           "default": false
         },
         "default": {
-          "description": "Default value. Must match the field type (code-enforced); not allowed for `secret` fields."
+          "description": "Default value. Must match the field type (code-enforced); not allowed for `secret` and `oauth2` fields."
         },
         "min": {
           "type": "number",
@@ -120,7 +138,7 @@
         "options": {
           "type": "array",
           "minItems": 1,
-          "description": "Choices of a `select` field.",
+          "description": "Choices of a `select` or `multi_select` field.",
           "items": {
             "type": "object",
             "additionalProperties": false,
@@ -135,6 +153,11 @@
               }
             }
           }
+        },
+        "display": {
+          "type": "string",
+          "enum": ["dropdown", "radio"],
+          "description": "Rendering of a `select` field: dropdown (default) or radio buttons."
         }
       },
       "allOf": [
@@ -142,7 +165,7 @@
           "if": {
             "properties": {
               "type": {
-                "const": "select"
+                "enum": ["select", "multi_select"]
               }
             }
           },
@@ -195,8 +218,159 @@
               "required": ["placeholder"]
             }
           }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": {
+                "type": {
+                  "const": "select"
+                }
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": ["display"]
+            }
+          }
         }
       ]
+    },
+    "networkDiscoveryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["udp-broadcast", "mdns", "ssdp"],
+          "description": "Capture type: passive listen on declared UDP broadcast ports, mDNS browse of a declared service type, or SSDP M-SEARCH on a declared st."
+        },
+        "ports": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "uniqueItems": true,
+          "description": "UDP broadcast ports to listen on, `udp-broadcast` type only."
+        },
+        "service": {
+          "type": "string",
+          "pattern": "^_[a-z0-9-]+\\._(tcp|udp)$",
+          "description": "DNS-SD service type to browse (e.g. \"_hue._tcp\"), `mdns` type only."
+        },
+        "st": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "SSDP search target for the M-SEARCH, `ssdp` type only."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "udp-broadcast"
+              }
+            }
+          },
+          "then": {
+            "required": ["ports"],
+            "not": {
+              "anyOf": [
+                {
+                  "required": ["service"]
+                },
+                {
+                  "required": ["st"]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mdns"
+              }
+            }
+          },
+          "then": {
+            "required": ["service"],
+            "not": {
+              "anyOf": [
+                {
+                  "required": ["ports"]
+                },
+                {
+                  "required": ["st"]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ssdp"
+              }
+            }
+          },
+          "then": {
+            "required": ["st"],
+            "not": {
+              "anyOf": [
+                {
+                  "required": ["ports"]
+                },
+                {
+                  "required": ["service"]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "description": "Unique key of the action."
+        },
+        "label": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "description": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 120,
+          "default": 30,
+          "description": "Ack delay granted to the action (exception to the 5s command rule: these operations can be long)."
+        },
+        "fields": {
+          "type": "array",
+          "description": "Optional flat form shown before running the action, same format as config_schema entries.",
+          "items": {
+            "$ref": "#/definitions/configField"
+          }
+        }
+      }
     }
   }
 }

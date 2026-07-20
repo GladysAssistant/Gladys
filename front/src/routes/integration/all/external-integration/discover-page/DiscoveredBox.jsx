@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
@@ -50,9 +50,23 @@ class DiscoveredBox extends Component {
                   </label>
                   <DeviceFeatures features={device.features} />
                 </div>
-                <button onClick={this.createDevice} class="btn btn-success" disabled={device.created || loading}>
-                  <Text id="integration.externalIntegration.discover.createButton" />
-                </button>
+                {device.created && device.structure_changed ? (
+                  <Localizer>
+                    <button
+                      onClick={this.createDevice}
+                      class="btn btn-warning"
+                      disabled={loading}
+                      title={<Text id="integration.externalIntegration.discover.updateTitle" />}
+                    >
+                      <i class="fe fe-refresh-cw mr-1" />
+                      <Text id="integration.externalIntegration.discover.updateButton" />
+                    </button>
+                  </Localizer>
+                ) : (
+                  <button onClick={this.createDevice} class="btn btn-success" disabled={device.created || loading}>
+                    <Text id="integration.externalIntegration.discover.createButton" />
+                  </button>
+                )}
               </div>
             </div>
           </div>

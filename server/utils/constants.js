@@ -442,6 +442,7 @@ const EVENTS = {
   EXTERNAL_INTEGRATION: {
     STATUS_CHANGED: 'external-integration.status-changed',
     DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
+    CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
   },
 };
 
@@ -1559,6 +1560,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   EXTERNAL_INTEGRATION: {
     STATUS_CHANGED: 'external-integration.status-changed',
     DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
+    CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
     DEVICE_SET_VALUE: 'external-integration.device.set-value',
     DEVICE_POLL: 'external-integration.device.poll',
     COMMAND_RESULT: 'external-integration.command-result',
@@ -1569,6 +1571,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     HEARTBEAT: 'external-integration.heartbeat',
     CONFIG_UPDATED: 'external-integration.config-updated',
     MESSAGE_SEND: 'external-integration.message.send',
+    OAUTH_GET_AUTHORIZE_URL: 'external-integration.oauth.get-authorize-url',
+    OAUTH_CALLBACK: 'external-integration.oauth.callback',
+    ACTION_RUN: 'external-integration.action.run',
   },
 };
 

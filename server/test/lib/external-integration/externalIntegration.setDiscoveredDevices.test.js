@@ -37,7 +37,7 @@ describe('externalIntegration.setDiscoveredDevices', () => {
   });
 
   it('should store the discovered devices and notify the frontend', async () => {
-    const count = externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector)]);
+    const count = await externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector)]);
     expect(count).to.equal(1);
     sinonAssert.calledWith(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DISCOVERED_DEVICES_UPDATED,
@@ -50,8 +50,8 @@ describe('externalIntegration.setDiscoveredDevices', () => {
   });
 
   it('should replace the previous list', async () => {
-    externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector, 'one')]);
-    externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector, 'two')]);
+    await externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector, 'one')]);
+    await externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector, 'two')]);
     const devices = await externalIntegration.getDiscoveredDevices(service.selector);
     expect(devices).to.have.lengthOf(1);
     expect(devices[0].external_id).to.equal(`ext:${service.selector}:two`);
@@ -59,15 +59,15 @@ describe('externalIntegration.setDiscoveredDevices', () => {
 
   it('should flag devices already created by the user', async () => {
     const device = buildDiscoveredDevice(service.selector);
-    stateManager.setState('deviceByExternalId', device.external_id, { id: 'device-id' });
-    externalIntegration.setDiscoveredDevices(service, [device]);
+    stateManager.setState('deviceByExternalId', device.external_id, { id: 'device-id', features: device.features });
+    await externalIntegration.setDiscoveredDevices(service, [device]);
     const devices = await externalIntegration.getDiscoveredDevices(service.selector);
     expect(devices[0]).to.have.property('created', true);
   });
 
-  const expectBadParameters = (devices, messagePart) => {
+  const expectBadParameters = async (devices, messagePart) => {
     try {
-      externalIntegration.setDiscoveredDevices(service, devices);
+      await externalIntegration.setDiscoveredDevices(service, devices);
       throw new Error('should have thrown');
     } catch (e) {
       expect(e).to.be.instanceOf(BadParameters);
@@ -75,51 +75,51 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     }
   };
 
-  it('should reject a non-array payload', () => {
-    expectBadParameters(null, 'must be an array');
+  it('should reject a non-array payload', async () => {
+    await expectBadParameters(null, 'must be an array');
   });
 
-  it('should reject more than 200 devices', () => {
+  it('should reject more than 200 devices', async () => {
     const devices = Array.from({ length: 201 }, (unused, i) => buildDiscoveredDevice(service.selector, `d${i}`));
-    expectBadParameters(devices, 'max 200 devices');
+    await expectBadParameters(devices, 'max 200 devices');
   });
 
-  it('should reject a device external_id with the wrong prefix', () => {
+  it('should reject a device external_id with the wrong prefix', async () => {
     const device = { ...buildDiscoveredDevice(service.selector), external_id: 'ext:other-integration:paris' };
-    expectBadParameters([device], `must start with "ext:${service.selector}:"`);
+    await expectBadParameters([device], `must start with "ext:${service.selector}:"`);
   });
 
-  it('should reject a feature external_id with the wrong prefix', () => {
+  it('should reject a feature external_id with the wrong prefix', async () => {
     const device = buildDiscoveredDevice(service.selector);
     device.features[0].external_id = 'ext:other-integration:paris:temperature';
-    expectBadParameters([device], 'features[0].external_id');
+    await expectBadParameters([device], 'features[0].external_id');
   });
 
-  it('should reject unknown category/type/unit', () => {
+  it('should reject unknown category/type/unit', async () => {
     const wrongCategory = buildDiscoveredDevice(service.selector);
     wrongCategory.features[0].category = 'not-a-category';
-    expectBadParameters([wrongCategory], 'unknown category');
+    await expectBadParameters([wrongCategory], 'unknown category');
     const wrongType = buildDiscoveredDevice(service.selector);
     wrongType.features[0].type = 'not-a-type';
-    expectBadParameters([wrongType], 'unknown type');
+    await expectBadParameters([wrongType], 'unknown type');
     const wrongUnit = buildDiscoveredDevice(service.selector);
     wrongUnit.features[0].unit = 'not-a-unit';
-    expectBadParameters([wrongUnit], 'unknown unit');
+    await expectBadParameters([wrongUnit], 'unknown unit');
   });
 
-  it('should reject an invalid poll_frequency', () => {
+  it('should reject an invalid poll_frequency', async () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 12345 };
-    expectBadParameters([device], 'poll_frequency');
+    await expectBadParameters([device], 'poll_frequency');
   });
 
-  it('should reject malformed devices', () => {
-    expectBadParameters([null], 'devices[0]: must be an object');
-    expectBadParameters([{ external_id: `ext:${service.selector}:x` }], 'devices[0].name');
-    expectBadParameters(
+  it('should reject malformed devices', async () => {
+    await expectBadParameters([null], 'devices[0]: must be an object');
+    await expectBadParameters([{ external_id: `ext:${service.selector}:x` }], 'devices[0].name');
+    await expectBadParameters(
       [{ name: 'No features', external_id: `ext:${service.selector}:x` }],
       'devices[0].features: must be an array',
     );
-    expectBadParameters(
+    await expectBadParameters(
       [{ name: 'Bad feature', external_id: `ext:${service.selector}:x`, features: [null] }],
       'features[0]: must be an object',
     );
@@ -127,7 +127,7 @@ describe('externalIntegration.setDiscoveredDevices', () => {
 
   it('should accept a valid poll_frequency', async () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 60000 };
-    const count = externalIntegration.setDiscoveredDevices(service, [device]);
+    const count = await externalIntegration.setDiscoveredDevices(service, [device]);
     expect(count).to.equal(1);
   });
 });

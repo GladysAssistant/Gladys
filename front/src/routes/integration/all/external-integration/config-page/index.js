@@ -150,6 +150,77 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  updateActionFieldValue = (actionKey, field, value) => {
+    const actionFieldValues = Object.assign({}, this.state.actionFieldValues);
+    actionFieldValues[actionKey] = Object.assign({}, actionFieldValues[actionKey], { [field.key]: value });
+    this.setState({ actionFieldValues });
+  };
+
+  runAction = async action => {
+    const actionStates = Object.assign({}, this.state.actionStates, {
+      [action.key]: { status: RequestStatus.Getting }
+    });
+    this.setState({ actionStates });
+    const rawValues = (this.state.actionFieldValues || {})[action.key] || {};
+    const fields = {};
+    (action.fields || []).forEach(field => {
+      const value = rawValues[field.key];
+      if (field.type === 'number') {
+        const numericValue = value === '' || value === undefined || value === null ? NaN : Number(value);
+        if (!Number.isNaN(numericValue)) {
+          fields[field.key] = numericValue;
+        }
+      } else if (field.type === 'boolean') {
+        fields[field.key] = !!value;
+      } else if (value !== undefined && value !== null) {
+        fields[field.key] = value;
+      }
+    });
+    try {
+      const result = await this.props.httpClient.post(
+        `/api/v1/external_integration/${this.props.selector}/action/${action.key}`,
+        { fields }
+      );
+      this.setState({
+        actionStates: Object.assign({}, this.state.actionStates, {
+          [action.key]: { status: RequestStatus.Success, message: result.message }
+        })
+      });
+    } catch (e) {
+      console.error(e);
+      // an explicit refusal of the integration is a 422 carrying its message
+      const message = get(e, 'response.data.properties');
+      this.setState({
+        actionStates: Object.assign({}, this.state.actionStates, {
+          [action.key]: { status: RequestStatus.Error, message }
+        })
+      });
+    }
+  };
+
+  connectOAuth = async field => {
+    this.setState({ oauthStatus: RequestStatus.Getting });
+    const { selector } = this.props;
+    const redirectUri = `${window.location.origin}/dashboard/integration/device/external/${selector}/oauth-callback`;
+    try {
+      const { authorize_url: authorizeUrl } = await this.props.httpClient.post(
+        `/api/v1/external_integration/${selector}/oauth/authorize_url`,
+        {
+          key: field.key,
+          redirect_uri: redirectUri
+        }
+      );
+      // the callback popup is a new tab: it recovers the oauth2 key
+      // through localStorage (shared across same-origin tabs)
+      localStorage.setItem(`externalIntegrationOAuthKey:${selector}`, field.key);
+      window.open(authorizeUrl, '_blank', 'noopener');
+      this.setState({ oauthStatus: RequestStatus.Success });
+    } catch (e) {
+      console.error(e);
+      this.setState({ oauthStatus: RequestStatus.Error });
+    }
+  };
+
   executeAction = async action => {
     this.setState({ actionStatus: RequestStatus.Getting, actionError: null });
     try {
@@ -190,10 +261,24 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  onConnectionStatusUpdated = payload => {
+    if (payload && this.state.integration && payload.selector === this.props.selector) {
+      this.setState({
+        integration: Object.assign({}, this.state.integration, {
+          connection_status: { connected: payload.connected, message: payload.message }
+        })
+      });
+    }
+  };
+
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
       this.onStatusChanged
+    );
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
+      this.onConnectionStatusUpdated
     );
     this.loadData();
   }
@@ -209,6 +294,10 @@ class ExternalIntegrationConfigPage extends Component {
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
       this.onStatusChanged
     );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
+      this.onConnectionStatusUpdated
+    );
   }
 
   render(props, state) {
@@ -219,6 +308,9 @@ class ExternalIntegrationConfigPage extends Component {
           user={props.user}
           updateConfigValue={this.updateConfigValue}
           saveConfig={this.saveConfig}
+          connectOAuth={this.connectOAuth}
+          updateActionFieldValue={this.updateActionFieldValue}
+          runAction={this.runAction}
           executeAction={this.executeAction}
           askUninstall={this.askUninstall}
           cancelUninstall={this.cancelUninstall}
