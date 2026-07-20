@@ -698,6 +698,17 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000000, unit: DEVICE_FEATURE_UNITS.EURO }, category, type);
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100 }, category, type);
+    }
+    if (typeof type === 'string' && type.endsWith('-power')) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
+    }
+    // *-energy and battery-energy-remaining
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
+  }
+
   if (!isSensorCategory(category)) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }

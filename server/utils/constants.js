@@ -853,19 +853,8 @@ const DEVICE_FEATURE_TYPES = {
     BATTERY_LEVEL: 'battery-level', // state of charge, % (0..100)
     CHARGE_POWER: 'charge-power', // power INTO the battery, W/kW (>=0)
     DISCHARGE_POWER: 'discharge-power', // power OUT of the battery, W/kW (>=0)
-    SOLAR_INPUT_POWER: 'solar-input-power', // PV input power, W/kW (>=0)
-    OUTPUT_POWER: 'output-power', // total power delivered to home/load (PV-direct + discharge), W/kW (>=0)
-    GRID_INPUT_POWER: 'grid-input-power', // power imported from the grid, W/kW (>=0)
-    GRID_OUTPUT_POWER: 'grid-output-power', // power exported to the grid, W/kW (>=0)
-    GRID_POWER: 'grid-power', // signed grid exchange (import +, export -), W/kW
-    OFF_GRID_POWER: 'off-grid-power', // off-grid / backup output power, W/kW (>=0)
     CHARGE_ENERGY: 'charge-energy', // cumulative energy charged, kWh
     DISCHARGE_ENERGY: 'discharge-energy', // cumulative energy discharged, kWh
-    SOLAR_ENERGY: 'solar-energy', // cumulative solar energy harvested, kWh
-    OUTPUT_ENERGY: 'output-energy', // cumulative energy delivered to home, kWh
-    GRID_INPUT_ENERGY: 'grid-input-energy', // cumulative grid import energy, kWh
-    GRID_OUTPUT_ENERGY: 'grid-output-energy', // cumulative grid export energy, kWh
-    OFF_GRID_ENERGY: 'off-grid-energy', // cumulative off-grid output energy, kWh
     BATTERY_ENERGY_REMAINING: 'battery-energy-remaining', // currently available stored energy (instantaneous), kWh
   },
   TELEINFORMATION: {
