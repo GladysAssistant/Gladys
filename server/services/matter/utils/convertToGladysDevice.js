@@ -25,6 +25,8 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
+  MediaPlayback,
+  KeypadInput,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
@@ -81,6 +83,21 @@ function convertMeasurementUnitToDeviceFeatureUnits(measurementUnit) {
     }
   }
   return DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER;
+}
+
+/**
+ * @description Read an optional Matter attribute, with a default value as fallback.
+ * @param {Function} readAttribute - Async function reading the attribute.
+ * @param {number} defaultValue - Value to use when the attribute is unavailable.
+ * @example const minLevel = await readAttributeWithDefault(() => clusterClient.getMinLevelAttribute(), 0);
+ * @returns {Promise<number>} The attribute value or the default value.
+ */
+async function readAttributeWithDefault(readAttribute, defaultValue) {
+  try {
+    return (await readAttribute()) ?? defaultValue;
+  } catch (error) {
+    return defaultValue;
+  }
 }
 
 /**
@@ -225,23 +242,37 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           min: 0,
           max: 1,
         });
-      } else if (
-        clusterIndex === LevelControl.Complete.id &&
-        clusterClient.supportedFeatures &&
-        clusterClient.supportedFeatures.lighting
-      ) {
-        const minLevel = await clusterClient.getMinLevelAttribute();
-        const maxLevel = await clusterClient.getMaxLevelAttribute();
-        gladysDevice.features.push({
-          ...commonNewFeature,
-          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-          type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-          read_only: false,
-          has_feedback: true,
-          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
-          min: minLevel,
-          max: maxLevel,
-        });
+      } else if (clusterIndex === LevelControl.Complete.id) {
+        if (clusterClient.supportedFeatures && clusterClient.supportedFeatures.lighting) {
+          const minLevel = await clusterClient.getMinLevelAttribute();
+          const maxLevel = await clusterClient.getMaxLevelAttribute();
+          gladysDevice.features.push({
+            ...commonNewFeature,
+            category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+            type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+            read_only: false,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+            min: minLevel,
+            max: maxLevel,
+          });
+        } else {
+          // A LevelControl cluster without the lighting feature is exposed by media
+          // devices (TV, set-top boxes, speakers...) to control the volume.
+          // MinLevel/MaxLevel attributes are optional here, so fallback to Matter defaults.
+          const minLevel = await readAttributeWithDefault(() => clusterClient.getMinLevelAttribute(), 0);
+          const maxLevel = await readAttributeWithDefault(() => clusterClient.getMaxLevelAttribute(), 254);
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Volume)`,
+            category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+            type: DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
+            read_only: false,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+            min: minLevel,
+            max: maxLevel,
+          });
+        }
       } else if (clusterIndex === ColorControl.Complete.id) {
         if (clusterClient.supportedFeatures.hueSaturation) {
           gladysDevice.features.push({
@@ -640,6 +671,47 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             max: 100,
           });
         }
+      } else if (clusterIndex === MediaPlayback.Complete.id) {
+        const mediaPlaybackFeatures = [
+          { suffix: 'play', label: 'Play', type: DEVICE_FEATURE_TYPES.TELEVISION.PLAY },
+          { suffix: 'pause', label: 'Pause', type: DEVICE_FEATURE_TYPES.TELEVISION.PAUSE },
+          { suffix: 'stop', label: 'Stop', type: DEVICE_FEATURE_TYPES.TELEVISION.STOP },
+          { suffix: 'previous', label: 'Previous', type: DEVICE_FEATURE_TYPES.TELEVISION.PREVIOUS },
+          { suffix: 'next', label: 'Next', type: DEVICE_FEATURE_TYPES.TELEVISION.NEXT },
+        ];
+        mediaPlaybackFeatures.forEach((mediaPlaybackFeature) => {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (${mediaPlaybackFeature.label})`,
+            category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+            type: mediaPlaybackFeature.type,
+            read_only: false,
+            has_feedback: false,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:${mediaPlaybackFeature.suffix}`,
+            min: 0,
+            max: 1,
+          });
+        });
+      } else if (clusterIndex === KeypadInput.Complete.id) {
+        const keypadInputFeatures = [
+          { suffix: 'up', label: 'Up', type: DEVICE_FEATURE_TYPES.TELEVISION.UP },
+          { suffix: 'down', label: 'Down', type: DEVICE_FEATURE_TYPES.TELEVISION.DOWN },
+          { suffix: 'left', label: 'Left', type: DEVICE_FEATURE_TYPES.TELEVISION.LEFT },
+          { suffix: 'right', label: 'Right', type: DEVICE_FEATURE_TYPES.TELEVISION.RIGHT },
+          { suffix: 'enter', label: 'Ok', type: DEVICE_FEATURE_TYPES.TELEVISION.ENTER },
+          { suffix: 'return', label: 'Back', type: DEVICE_FEATURE_TYPES.TELEVISION.RETURN },
+        ];
+        keypadInputFeatures.forEach((keypadInputFeature) => {
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (${keypadInputFeature.label})`,
+            category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+            type: keypadInputFeature.type,
+            read_only: false,
+            has_feedback: false,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:${keypadInputFeature.suffix}`,
+            min: 0,
+            max: 1,
+          });
+        });
       }
     });
   }

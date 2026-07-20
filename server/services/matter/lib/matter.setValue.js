@@ -8,6 +8,8 @@ const {
   RvcOperationalState,
   RvcRunMode,
   RvcCleanMode,
+  MediaPlayback,
+  KeypadInput,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
@@ -19,6 +21,25 @@ const {
   gladysWindSettingToMatter,
 } = require('../utils/fanMatterMapping');
 const { convertGladysRunModeToMatter, convertGladysCleanModeToMatter } = require('../utils/vacuumCleanerStateMapping');
+
+// Matter MediaPlayback cluster commands by Gladys television feature type
+const MEDIA_PLAYBACK_COMMAND_BY_FEATURE_TYPE = {
+  [DEVICE_FEATURE_TYPES.TELEVISION.PLAY]: 'play',
+  [DEVICE_FEATURE_TYPES.TELEVISION.PAUSE]: 'pause',
+  [DEVICE_FEATURE_TYPES.TELEVISION.STOP]: 'stop',
+  [DEVICE_FEATURE_TYPES.TELEVISION.PREVIOUS]: 'previous',
+  [DEVICE_FEATURE_TYPES.TELEVISION.NEXT]: 'next',
+};
+
+// Matter KeypadInput cluster CEC key codes by Gladys television feature type
+const KEYPAD_INPUT_KEY_CODE_BY_FEATURE_TYPE = {
+  [DEVICE_FEATURE_TYPES.TELEVISION.UP]: KeypadInput.CecKeyCode.Up,
+  [DEVICE_FEATURE_TYPES.TELEVISION.DOWN]: KeypadInput.CecKeyCode.Down,
+  [DEVICE_FEATURE_TYPES.TELEVISION.LEFT]: KeypadInput.CecKeyCode.Left,
+  [DEVICE_FEATURE_TYPES.TELEVISION.RIGHT]: KeypadInput.CecKeyCode.Right,
+  [DEVICE_FEATURE_TYPES.TELEVISION.ENTER]: KeypadInput.CecKeyCode.Select,
+  [DEVICE_FEATURE_TYPES.TELEVISION.RETURN]: KeypadInput.CecKeyCode.Exit,
+};
 
 /**
  * @description Find a device recursively through child endpoints.
@@ -234,6 +255,39 @@ async function setValue(gladysDevice, gladysFeature, value) {
         break;
       default:
         throw new Error(`Unsupported FanControl feature suffix: ${fanFeatureSuffix}`);
+    }
+  }
+
+  // Handle television/media devices (Matter MediaPlayback, LevelControl & KeypadInput clusters)
+  if (gladysFeature.category === DEVICE_FEATURE_CATEGORIES.TELEVISION) {
+    const mediaPlaybackCommand = MEDIA_PLAYBACK_COMMAND_BY_FEATURE_TYPE[gladysFeature.type];
+    const keypadInputKeyCode = KEYPAD_INPUT_KEY_CODE_BY_FEATURE_TYPE[gladysFeature.type];
+    if (gladysFeature.type === DEVICE_FEATURE_TYPES.TELEVISION.VOLUME) {
+      const levelControl = targetDevice.getClusterClientById(LevelControl.Complete.id);
+      if (!levelControl) {
+        throw new Error('Device does not support LevelControl cluster');
+      }
+      await levelControl.moveToLevel({
+        level: value,
+        transitionTime: null,
+        optionsMask: {
+          coupleColorTempToLevel: false,
+          executeIfOff: true,
+        },
+        optionsOverride: {},
+      });
+    } else if (mediaPlaybackCommand !== undefined && value === 1) {
+      const mediaPlayback = targetDevice.getClusterClientById(MediaPlayback.Complete.id);
+      if (!mediaPlayback) {
+        throw new Error('Device does not support MediaPlayback cluster');
+      }
+      await mediaPlayback[mediaPlaybackCommand]();
+    } else if (keypadInputKeyCode !== undefined && value === 1) {
+      const keypadInput = targetDevice.getClusterClientById(KeypadInput.Complete.id);
+      if (!keypadInput) {
+        throw new Error('Device does not support KeypadInput cluster');
+      }
+      await keypadInput.sendKey({ keyCode: keypadInputKeyCode });
     }
   }
 

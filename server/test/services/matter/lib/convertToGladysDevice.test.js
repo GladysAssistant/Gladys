@@ -9,6 +9,9 @@ const {
   RvcCleanMode,
   PowerSource,
   Thermostat,
+  LevelControl,
+  MediaPlayback,
+  KeypadInput,
   CarbonDioxideConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
@@ -422,6 +425,194 @@ describe('Matter.convertToGladysDevice', () => {
       category: 'co2-sensor',
       min: 0,
       max: 10000,
+    });
+  });
+
+  it('should create a light brightness feature for LevelControl cluster with lighting feature', async () => {
+    const clusterClient = {
+      id: LevelControl.Complete.id,
+      name: 'LevelControl',
+      endpointId: 3,
+      supportedFeatures: {
+        lighting: true,
+      },
+      getMinLevelAttribute: async () => 1,
+      getMaxLevelAttribute: async () => 254,
+    };
+
+    const device = {
+      name: 'Light Device',
+      number: 3,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '3');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'LevelControl - 3',
+      selector: gladysDevice.features[0].selector,
+      category: 'light',
+      type: 'brightness',
+      read_only: false,
+      has_feedback: true,
+      external_id: `matter:12345:3:${LevelControl.Complete.id}`,
+      min: 1,
+      max: 254,
+    });
+  });
+
+  it('should create a television volume feature for LevelControl cluster without lighting feature', async () => {
+    const clusterClient = {
+      id: LevelControl.Complete.id,
+      name: 'LevelControl',
+      endpointId: 5,
+      supportedFeatures: {
+        lighting: false,
+      },
+      getMinLevelAttribute: async () => 0,
+      getMaxLevelAttribute: async () => 100,
+    };
+
+    const device = {
+      name: 'Media Device',
+      number: 5,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '5');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'LevelControl - 5 (Volume)',
+      selector: gladysDevice.features[0].selector,
+      category: 'television',
+      type: 'volume',
+      read_only: false,
+      has_feedback: true,
+      external_id: `matter:12345:5:${LevelControl.Complete.id}`,
+      min: 0,
+      max: 100,
+    });
+  });
+
+  it('should fallback to default volume min/max when LevelControl attributes are unavailable', async () => {
+    const clusterClient = {
+      id: LevelControl.Complete.id,
+      name: 'LevelControl',
+      endpointId: 5,
+      supportedFeatures: {},
+      getMinLevelAttribute: async () => {
+        throw new Error('Attribute not available');
+      },
+      getMaxLevelAttribute: async () => null,
+    };
+
+    const device = {
+      name: 'Media Device',
+      number: 5,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '5');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0].min).to.equal(0);
+    expect(gladysDevice.features[0].max).to.equal(254);
+  });
+
+  it('should create television playback features for MediaPlayback cluster', async () => {
+    const clusterClient = {
+      id: MediaPlayback.Complete.id,
+      name: 'MediaPlayback',
+      endpointId: 6,
+    };
+
+    const device = {
+      name: 'Media Device',
+      number: 6,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '6');
+
+    expect(gladysDevice.features).to.have.lengthOf(5);
+    const baseExternalId = `matter:12345:6:${MediaPlayback.Complete.id}`;
+    expect(gladysDevice.features.map((feature) => feature.external_id)).to.deep.equal([
+      `${baseExternalId}:play`,
+      `${baseExternalId}:pause`,
+      `${baseExternalId}:stop`,
+      `${baseExternalId}:previous`,
+      `${baseExternalId}:next`,
+    ]);
+    expect(gladysDevice.features.map((feature) => feature.type)).to.deep.equal([
+      'play',
+      'pause',
+      'stop',
+      'previous',
+      'next',
+    ]);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'MediaPlayback - 6 (Play)',
+      selector: gladysDevice.features[0].selector,
+      category: 'television',
+      type: 'play',
+      read_only: false,
+      has_feedback: false,
+      external_id: `${baseExternalId}:play`,
+      min: 0,
+      max: 1,
+    });
+  });
+
+  it('should create television keypad features for KeypadInput cluster', async () => {
+    const clusterClient = {
+      id: KeypadInput.Complete.id,
+      name: 'KeypadInput',
+      endpointId: 7,
+    };
+
+    const device = {
+      name: 'Media Device',
+      number: 7,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '7');
+
+    expect(gladysDevice.features).to.have.lengthOf(6);
+    const baseExternalId = `matter:12345:7:${KeypadInput.Complete.id}`;
+    expect(gladysDevice.features.map((feature) => feature.external_id)).to.deep.equal([
+      `${baseExternalId}:up`,
+      `${baseExternalId}:down`,
+      `${baseExternalId}:left`,
+      `${baseExternalId}:right`,
+      `${baseExternalId}:enter`,
+      `${baseExternalId}:return`,
+    ]);
+    expect(gladysDevice.features.map((feature) => feature.type)).to.deep.equal([
+      'up',
+      'down',
+      'left',
+      'right',
+      'enter',
+      'return',
+    ]);
+    expect(gladysDevice.features[4]).to.deep.equal({
+      name: 'KeypadInput - 7 (Ok)',
+      selector: gladysDevice.features[4].selector,
+      category: 'television',
+      type: 'enter',
+      read_only: false,
+      has_feedback: false,
+      external_id: `${baseExternalId}:enter`,
+      min: 0,
+      max: 1,
     });
   });
 

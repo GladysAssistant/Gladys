@@ -4,7 +4,7 @@ const { assert: chaiAssert } = require('chai');
 const { fake, assert } = sinon;
 
 // eslint-disable-next-line import/no-unresolved
-const { FanControl } = require('@matter/main/clusters');
+const { FanControl, LevelControl, MediaPlayback, KeypadInput } = require('@matter/main/clusters');
 
 const MatterHandler = require('../../../../services/matter/lib');
 const {
@@ -1138,5 +1138,202 @@ describe('Matter.setValue', () => {
 
     const promise = matterHandler.setValue(gladysDevice, gladysFeature, value);
     await chaiAssert.isRejected(promise, 'Device does not support RvcCleanMode cluster');
+  });
+
+  describe('television features', () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const setNodeWithClusterClients = (clusterClients) => {
+      matterHandler.nodesMap.set(12345n, {
+        isConnected: true,
+        getDevices: fake.returns([
+          {
+            number: 1,
+            getClusterClientById: (id) => clusterClients.get(id),
+            getChildEndpoints: () => [],
+          },
+        ]),
+      });
+    };
+
+    const mediaPlaybackTestCases = [
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.PLAY, command: 'play' },
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.PAUSE, command: 'pause' },
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.STOP, command: 'stop' },
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.PREVIOUS, command: 'previous' },
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.NEXT, command: 'next' },
+    ];
+
+    mediaPlaybackTestCases.forEach((testCase) => {
+      it(`should call MediaPlayback ${testCase.command} command`, async () => {
+        const gladysFeature = {
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: testCase.type,
+        };
+        const mediaPlayback = {
+          play: fake.resolves(null),
+          pause: fake.resolves(null),
+          stop: fake.resolves(null),
+          previous: fake.resolves(null),
+          next: fake.resolves(null),
+        };
+        const clusterClients = new Map();
+        clusterClients.set(MediaPlayback.Complete.id, mediaPlayback);
+        setNodeWithClusterClients(clusterClients);
+
+        await matterHandler.setValue(gladysDevice, gladysFeature, 1);
+
+        assert.calledOnce(mediaPlayback[testCase.command]);
+        mediaPlaybackTestCases
+          .filter((otherTestCase) => otherTestCase.command !== testCase.command)
+          .forEach((otherTestCase) => {
+            assert.notCalled(mediaPlayback[otherTestCase.command]);
+          });
+      });
+    });
+
+    it('should not call MediaPlayback command when value is not 1', async () => {
+      const gladysFeature = {
+        category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+        type: DEVICE_FEATURE_TYPES.TELEVISION.PLAY,
+      };
+      const mediaPlayback = {
+        play: fake.resolves(null),
+      };
+      const clusterClients = new Map();
+      clusterClients.set(MediaPlayback.Complete.id, mediaPlayback);
+      setNodeWithClusterClients(clusterClients);
+
+      await matterHandler.setValue(gladysDevice, gladysFeature, 0);
+
+      assert.notCalled(mediaPlayback.play);
+    });
+
+    it('should throw error when MediaPlayback cluster is not available', async () => {
+      const gladysFeature = {
+        category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+        type: DEVICE_FEATURE_TYPES.TELEVISION.PLAY,
+      };
+      setNodeWithClusterClients(new Map());
+
+      const promise = matterHandler.setValue(gladysDevice, gladysFeature, 1);
+      await chaiAssert.isRejected(promise, 'Device does not support MediaPlayback cluster');
+    });
+
+    it('should set the volume with the LevelControl cluster', async () => {
+      const gladysFeature = {
+        category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+        type: DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
+      };
+      const levelControl = {
+        moveToLevel: fake.resolves(null),
+      };
+      const clusterClients = new Map();
+      clusterClients.set(LevelControl.Complete.id, levelControl);
+      setNodeWithClusterClients(clusterClients);
+
+      await matterHandler.setValue(gladysDevice, gladysFeature, 42);
+
+      assert.calledOnceWithExactly(levelControl.moveToLevel, {
+        level: 42,
+        transitionTime: null,
+        optionsMask: {
+          coupleColorTempToLevel: false,
+          executeIfOff: true,
+        },
+        optionsOverride: {},
+      });
+    });
+
+    it('should throw error when LevelControl cluster is not available for volume', async () => {
+      const gladysFeature = {
+        category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+        type: DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
+      };
+      setNodeWithClusterClients(new Map());
+
+      const promise = matterHandler.setValue(gladysDevice, gladysFeature, 42);
+      await chaiAssert.isRejected(promise, 'Device does not support LevelControl cluster');
+    });
+
+    const keypadInputTestCases = [
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.UP, keyCode: KeypadInput.CecKeyCode.Up },
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.DOWN, keyCode: KeypadInput.CecKeyCode.Down },
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.LEFT, keyCode: KeypadInput.CecKeyCode.Left },
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.RIGHT, keyCode: KeypadInput.CecKeyCode.Right },
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.ENTER, keyCode: KeypadInput.CecKeyCode.Select },
+      { type: DEVICE_FEATURE_TYPES.TELEVISION.RETURN, keyCode: KeypadInput.CecKeyCode.Exit },
+    ];
+
+    keypadInputTestCases.forEach((testCase) => {
+      it(`should send KeypadInput key for ${testCase.type} feature`, async () => {
+        const gladysFeature = {
+          category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+          type: testCase.type,
+        };
+        const keypadInput = {
+          sendKey: fake.resolves(null),
+        };
+        const clusterClients = new Map();
+        clusterClients.set(KeypadInput.Complete.id, keypadInput);
+        setNodeWithClusterClients(clusterClients);
+
+        await matterHandler.setValue(gladysDevice, gladysFeature, 1);
+
+        assert.calledOnceWithExactly(keypadInput.sendKey, { keyCode: testCase.keyCode });
+      });
+    });
+
+    it('should not send KeypadInput key when value is not 1', async () => {
+      const gladysFeature = {
+        category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+        type: DEVICE_FEATURE_TYPES.TELEVISION.UP,
+      };
+      const keypadInput = {
+        sendKey: fake.resolves(null),
+      };
+      const clusterClients = new Map();
+      clusterClients.set(KeypadInput.Complete.id, keypadInput);
+      setNodeWithClusterClients(clusterClients);
+
+      await matterHandler.setValue(gladysDevice, gladysFeature, 0);
+
+      assert.notCalled(keypadInput.sendKey);
+    });
+
+    it('should throw error when KeypadInput cluster is not available', async () => {
+      const gladysFeature = {
+        category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+        type: DEVICE_FEATURE_TYPES.TELEVISION.UP,
+      };
+      setNodeWithClusterClients(new Map());
+
+      const promise = matterHandler.setValue(gladysDevice, gladysFeature, 1);
+      await chaiAssert.isRejected(promise, 'Device does not support KeypadInput cluster');
+    });
+
+    it('should do nothing for an unsupported television feature type', async () => {
+      const gladysFeature = {
+        category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+        type: DEVICE_FEATURE_TYPES.TELEVISION.SOURCE,
+      };
+      const getClusterClientById = fake.returns(undefined);
+      matterHandler.nodesMap.set(12345n, {
+        isConnected: true,
+        getDevices: fake.returns([
+          {
+            number: 1,
+            getClusterClientById,
+            getChildEndpoints: () => [],
+          },
+        ]),
+      });
+
+      await matterHandler.setValue(gladysDevice, gladysFeature, 1);
+
+      assert.notCalled(getClusterClientById);
+    });
   });
 });
