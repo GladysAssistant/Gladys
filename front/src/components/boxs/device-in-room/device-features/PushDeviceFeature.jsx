@@ -1,6 +1,8 @@
 import { Component } from 'preact';
 import cx from 'classnames';
+import get from 'get-value';
 import { Text } from 'preact-i18n';
+import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import style from './style.css';
 
 class PushDeviceComponent extends Component {
@@ -19,10 +21,12 @@ class PushDeviceComponent extends Component {
   };
 
   render(props, { loading }) {
+    const { category, type } = props.deviceFeature;
+    const icon = get(DeviceFeatureCategoriesIcon, `${category}.${type}`, { default: 'circle' });
     return (
       <tr>
         <td>
-          <i class="fe fe-circle" />
+          <i class={`fe fe-${icon}`} />
         </td>
         <td>{props.rowName}</td>
         <td class="text-right">
@@ -33,7 +37,7 @@ class PushDeviceComponent extends Component {
               'btn-loading': loading
             })}
           >
-            <i class="fe fe-circle" /> <Text id="dashboard.boxes.devicesInRoom.pushButton" />
+            <i class={`fe fe-${icon}`} /> <Text id="dashboard.boxes.devicesInRoom.pushButton" />
           </button>
         </td>
       </tr>
