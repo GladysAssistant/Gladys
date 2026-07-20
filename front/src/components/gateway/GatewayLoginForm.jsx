@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus, LoginStatus } from '../../utils/consts';
 
@@ -31,6 +31,16 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 {props.gatewayLoginError}
               </div>
             </>
+          )}
+          {props.gatewayLoginStatus === LoginStatus.WrongTwoFactorCodeError && (
+            <div class="alert alert-danger" role="alert">
+              <Text id="gatewayLogin.invalidTwoFactorCode" />
+            </div>
+          )}
+          {props.gatewayLoginStep2 && props.gatewayTwoFactorJustEnabled && (
+            <div class="alert alert-success" role="alert">
+              <Text id="gatewayLogin.twoFactorEnabledSuccess" />
+            </div>
           )}
           {props.gatewayLoginStatus === RequestStatus.UserNotAcceptedLocally && (
             <div class="alert alert-danger" role="alert">
@@ -105,6 +115,9 @@ const GatewayLoginForm = ({ children, ...props }) => (
                   placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
                   value={props.gatewayLoginTwoFactorCode}
                   onInput={props.updateLoginTwoFactorCode}
+                  inputmode="numeric"
+                  autocomplete="one-time-code"
+                  maxlength="6"
                   autofocus
                 />
               </Localizer>
@@ -112,6 +125,9 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 {' '}
                 <Text id="gatewayLogin.invalidTwoFactorCode" />
               </div>
+              <p class="text-muted small mt-2 mb-0">
+                <MarkupText id="gatewayLogin.lostTwoFactor" />
+              </p>
             </div>
           )}
           <div class="form-footer">

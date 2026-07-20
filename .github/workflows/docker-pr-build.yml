@@ -157,9 +157,32 @@ jobs:
     needs: build-front
     name: Docker magic !
     runs-on: ubuntu-22.04
+    # Needed to push the image to the GitHub Container Registry (ghcr.io)
+    # and to comment on the pull request.
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
+      - name: 🏷️ Compute image tag from branch name
+        id: image_tag
+        # github.head_ref is attacker-controlled (any branch name), so we pass it
+        # through the environment instead of interpolating it into the shell to
+        # avoid script injection.
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          # Docker tags only allow [a-zA-Z0-9_.-] and must be 128 chars max,
+          # so we sanitize the branch name (e.g. "feature/foo" -> "feature-foo").
+          BRANCH_TAG=$(echo "$HEAD_REF" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g' | cut -c1-128)
+          # A Docker repository name must be lowercase, so we lowercase the
+          # owner/repo part as well (e.g. "GladysAssistant/Gladys").
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/${REPO}-preview:${BRANCH_TAG}"
+          echo "tag=${BRANCH_TAG}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
       - name: 💽 Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: 🐳 Set up Docker Buildx
@@ -172,10 +195,58 @@ jobs:
         with:
           name: static
           path: static
-      - name: 🐳 Build AMD64 images
+      # Pushing to ghcr.io only works for pull requests opened from a branch of
+      # this repository: pull requests coming from forks only get a read-only
+      # GITHUB_TOKEN and cannot push packages nor comment.
+      - name: 🔑 Login to GitHub Container Registry
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: 🐳 Build AMD64 image and push it to ghcr.io
         uses: docker/build-push-action@v3
         with:
           context: .
           file: ./docker/Dockerfile.buildx
           platforms: linux/amd64
-          push: false
+          push: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+          tags: ${{ steps.image_tag.outputs.image }}
+      - name: 💬 Comment the image on the pull request
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: docker-preview-image
+          message: |
+            🐳 **A Docker image has been built for this branch and pushed to the GitHub Container Registry.**
+
+            You can test this pull request (AMD64 only) by pulling the image below:
+
+            ```
+            ${{ steps.image_tag.outputs.image }}
+            ```
+
+            For example, run it with:
+
+            ```bash
+            sudo docker run -d \
+              --log-driver json-file \
+              --log-opt max-size=10m \
+              --cgroupns=host \
+              --restart=always \
+              --privileged \
+              --network=host \
+              --name gladys-${{ steps.image_tag.outputs.tag }} \
+              -e NODE_ENV=production \
+              -e SERVER_PORT=80 \
+              -e TZ=Europe/Paris \
+              -e SQLITE_FILE_PATH=/var/lib/gladysassistant/gladys-production.db \
+              -v /var/run/docker.sock:/var/run/docker.sock \
+              -v /var/lib/gladysassistant:/var/lib/gladysassistant \
+              -v /dev:/dev \
+              -v /run/udev:/run/udev:ro \
+              ${{ steps.image_tag.outputs.image }}
+            ```
+
+            This comment and the image are automatically updated on every new commit pushed to this pull request.

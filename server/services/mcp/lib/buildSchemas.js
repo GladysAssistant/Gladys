@@ -1,5 +1,12 @@
 const z = require('zod/v4');
-const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
+const {
+  SYSTEM_VARIABLE_NAMES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  COVER_STATE,
+} = require('../../../utils/constants');
+const { normalize } = require('../../../utils/device');
+const { hexToInt, kelvinToMired } = require('../../../utils/colors');
 const {
   createSceneCreateInputSchema,
   formatSceneCreateZodIssue,
@@ -140,6 +147,37 @@ async function getAllResources() {
     homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
   });
 
+  const lightControlDevices = allDevices
+    .filter((device) => {
+      return device.features.some((feature) => this.isLightControlFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => this.isLightControlFeature(feature)),
+    }));
+
+  lightControlDevices.forEach((device) => {
+    const d = {
+      name: device.name,
+      selector: device.selector,
+      features: device.features.map((feature) => ({
+        name: feature.name,
+        selector: feature.selector,
+        category: feature.category,
+        type: feature.type,
+        access: ['write', 'read'],
+      })),
+    };
+
+    if (homeSchema[device.room?.selector || noRoom.selector].devices[device.selector]?.name) {
+      homeSchema[device.room?.selector || noRoom.selector].devices[device.selector].features.push(...d.features);
+
+      return;
+    }
+
+    homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
+  });
+
   const shutterDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isShutterFeature(feature));
@@ -242,6 +280,24 @@ async function getAllTools(userId) {
   const availableSwitchableFeatureCategories = [
     ...new Set(
       switchableDevices
+        .map((device) => {
+          return device.features.map((feature) => feature.category);
+        })
+        .flat(),
+    ),
+  ];
+  const lightControlDevices = allDevices
+    .filter((device) => {
+      return device.features.some((feature) => this.isLightControlFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      name: device.name,
+      features: device.features.filter((feature) => this.isLightControlFeature(feature)),
+    }));
+  const availableLightControlFeatureCategories = [
+    ...new Set(
+      lightControlDevices
         .map((device) => {
           return device.features.map((feature) => feature.category);
         })
@@ -424,6 +480,7 @@ async function getAllTools(userId) {
               ...new Set([
                 ...availableSensorFeatureCategories,
                 ...availableSwitchableFeatureCategories,
+                ...availableLightControlFeatureCategories,
                 ...availableShutterFeatureCategories,
               ]),
             ])
@@ -434,7 +491,7 @@ async function getAllTools(userId) {
       cb: async ({ room, device_type: deviceType }) => {
         const states = [];
 
-        let selectedDevices = [...sensorDevices, ...switchableDevices, ...shutterDevices];
+        let selectedDevices = [...sensorDevices, ...switchableDevices, ...lightControlDevices, ...shutterDevices];
 
         if (room && room !== '') {
           const { selector } = this.findBySimilarity(rooms, room);
@@ -841,6 +898,183 @@ async function getAllTools(userId) {
             {
               type: 'text',
               text: `device.set-shutter: ${successMessage}`,
+            },
+          ],
+        };
+      },
+    });
+  }
+
+  if (lightControlDevices.length > 0) {
+    tools.push({
+      intent: 'device.set-light',
+      config: {
+        title: 'Set light brightness, color and color temperature',
+        description:
+          'Set the brightness, the color and/or the white color temperature of lights. ' +
+          'Provide at least one of brightness (percent 0-100), color (hex RGB, for example #0000FF for blue) ' +
+          'or temperature (Kelvin, for example 2700 for warm white, 4000 for neutral white, 6500 for cool white). ' +
+          'Select the light by device name, or by room to target every light of the room. ' +
+          'This tool does not turn lights on or off, use device_turn_on_off for that.',
+        inputSchema: {
+          brightness: z
+            .number()
+            .min(0)
+            .max(100)
+            .optional()
+            .describe('Brightness as a percentage, from 0 to 100.'),
+          color: z
+            .string()
+            .regex(/^#?[0-9a-fA-F]{6}$/)
+            .optional()
+            .describe("Color as a 6 digit hexadecimal RGB value, for example '#FF0000' for red."),
+          temperature: z
+            .number()
+            .min(1000)
+            .max(10000)
+            .optional()
+            .describe(
+              'White color temperature in Kelvin, for example 2700 for warm white, 4000 for neutral white, 6500 for cool white.',
+            ),
+          device: z
+            .enum([...new Set(lightControlDevices.map(({ name }) => name))])
+            .describe('Light device name to control.')
+            .optional(),
+          room: z
+            .enum(rooms.map(({ name }) => name))
+            .describe('Room name, to control all lights of the room when device is not specified.')
+            .optional(),
+        },
+      },
+      cb: async ({ brightness, color, temperature, device, room }) => {
+        if (brightness === undefined && color === undefined && temperature === undefined) {
+          return {
+            content: [{ type: 'text', text: 'device.set-light: brightness, color or temperature is required' }],
+          };
+        }
+
+        if (!device && !room) {
+          return {
+            content: [{ type: 'text', text: 'device.set-light: device or room is required' }],
+          };
+        }
+
+        let selectedDevices = lightControlDevices;
+
+        if (room && room !== '') {
+          const { selector } = this.findBySimilarity(rooms, room);
+          selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
+        }
+
+        if (device) {
+          const selectedDevice = this.findBySimilarity(selectedDevices, device);
+          if (selectedDevice?.name) {
+            selectedDevices = [selectedDevice];
+          } else {
+            return {
+              content: [{ type: 'text', text: 'device.set-light: no device found' }],
+            };
+          }
+        }
+
+        if (selectedDevices.length === 0) {
+          return {
+            content: [{ type: 'text', text: 'device.set-light: no device found' }],
+          };
+        }
+
+        const dispatchResults = [];
+
+        await Promise.all(
+          selectedDevices.map(async (d) => {
+            const sent = [];
+            const missing = [];
+
+            if (brightness !== undefined) {
+              const brightnessFeature = d.features.find((f) => f.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS);
+              if (brightnessFeature) {
+                const value = Math.round(normalize(brightness, 0, 100, brightnessFeature.min, brightnessFeature.max));
+                await this.gladys.device.setValue(d, brightnessFeature, value);
+                sent.push(`brightness ${brightness}%`);
+              } else {
+                missing.push('brightness');
+              }
+            }
+
+            if (color !== undefined) {
+              const colorFeature = d.features.find((f) => f.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR);
+              if (colorFeature) {
+                await this.gladys.device.setValue(d, colorFeature, hexToInt(color));
+                sent.push(`color ${color}`);
+              } else {
+                missing.push('color');
+              }
+            }
+
+            if (temperature !== undefined) {
+              const temperatureFeature = d.features.find((f) => f.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE);
+              if (temperatureFeature) {
+                // Color temperature features are stored in mired (min = coolest, max = warmest).
+                let value = Math.round(kelvinToMired(temperature));
+                if (value > temperatureFeature.max) {
+                  value = temperatureFeature.max;
+                }
+                if (value < temperatureFeature.min) {
+                  value = temperatureFeature.min;
+                }
+                await this.gladys.device.setValue(d, temperatureFeature, value);
+                sent.push(`temperature ${temperature}K`);
+              } else {
+                missing.push('temperature');
+              }
+            }
+
+            dispatchResults.push({ device: d.name, sent, missing });
+          }),
+        );
+
+        const successfulDevices = dispatchResults.filter((result) => result.sent.length > 0);
+        const devicesWithMissingFeatures = dispatchResults.filter((result) => result.missing.length > 0);
+
+        if (successfulDevices.length === 0) {
+          const missingByDevice = devicesWithMissingFeatures
+            .map((result) => `${result.device} (missing ${result.missing.join(' and ')} feature)`)
+            .join('; ');
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.set-light: no command sent, no matching feature on ${missingByDevice}`,
+              },
+            ],
+          };
+        }
+
+        const successMessage = successfulDevices
+          .map((result) => `${result.sent.join(' and ')} command sent for ${result.device}`)
+          .join('; ');
+
+        if (devicesWithMissingFeatures.length > 0) {
+          const partialFailures = devicesWithMissingFeatures
+            .map((result) => `${result.device} (missing ${result.missing.join(' and ')} feature)`)
+            .join('; ');
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.set-light: ${successMessage}; could not dispatch for ${partialFailures}`,
+              },
+            ],
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `device.set-light: ${successMessage}`,
             },
           ],
         };
