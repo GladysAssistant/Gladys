@@ -38,10 +38,10 @@ Every PR to `master` triggers the workflow `.github/workflows/docker-pr-build.ym
 | **Front test** | Always | `prettier-check`, `eslint`, `compare-translations` |
 | **Server test** | Always | `prettier-check`, `eslint`, `npm run coverage` + Codecov upload |
 | **Cypress run** | Always | E2E tests (signup, dashboard, integrations…) |
-| **Front build** | Always (agent PRs are not draft) | `npm run build` (Vite) |
-| **Docker build** | Always (agent PRs are not draft) | AMD64 Docker image build |
+| **Front build** | When the PR is ready for review (`draft: false`) | `npm run build` (Vite) |
+| **Docker build** | When the PR is ready for review (`draft: false`) | AMD64 Docker image build |
 
-Agent PRs are opened as ready for review, so the front build and Docker jobs run in CI. Run the build checks locally before opening the PR.
+When the PR is ready for review (`draft: false`), the front build and Docker jobs run in CI. Agent PRs should be opened that way, so run the build checks locally before opening the PR.
 
 ### Mandatory checklist before push
 
