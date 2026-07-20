@@ -8,8 +8,8 @@
   },
   "scripts": {
     "postinstall": "node ./cli/install_service_dependencies.js",
-    "test": "cross-env NODE_ENV=test ./node_modules/mocha/bin/mocha --recursive ./test/bootstrap.test.js \"./test/**/*.test.js\" --exit",
-    "test-service": "cross-env SQLITE_FILE_PATH=/tmp/gladys-test.db NODE_ENV=test ./node_modules/mocha/bin/mocha --recursive ./test/bootstrap.test.js \"./test/services/$npm_config_service/*.test.js\" \"./test/services/$npm_config_service/**/*.test.js\" --exit",
+    "test": "cross-env NODE_ENV=test SQLITE_FILE_PATH=./gladys-test.db ./node_modules/mocha/bin/mocha --require ./test/setup-env.js --recursive ./test/bootstrap.test.js \"./test/**/*.test.js\" --exit",
+    "test-service": "cross-env NODE_ENV=test SQLITE_FILE_PATH=/tmp/gladys-test.db ./node_modules/mocha/bin/mocha --require ./test/setup-env.js --recursive ./test/bootstrap.test.js \"./test/services/$npm_config_service/*.test.js\" \"./test/services/$npm_config_service/**/*.test.js\" --exit",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov > coverage.lcov",
     "prettier-check": "prettier --check '**/*.js' '**/*.json'",
     "prettier": "prettier --write '**/*.js' '**/*.json'",
@@ -46,7 +46,7 @@
     ]
   },
   "devDependencies": {
-    "@matter/main": "^0.13.0",
+    "@matter/main": "^0.17.6",
     "apidoc": "^1.0.3",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
@@ -75,10 +75,10 @@
     "undici": "^7.5.0"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^4.19.1",
+    "@duckdb/node-api": "1.4.4-r.4",
+    "@gladysassistant/gladys-gateway-js": "^4.21.0",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
-    "@nlpjs/similarity": "^4.26.1",
     "async-retry": "^1.3.3",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.0",
@@ -88,7 +88,6 @@
     "cross-env": "^7.0.3",
     "dayjs": "^1.11.6",
     "dockerode": "^3.3.4",
-    "duckdb": "^1.4.4",
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
     "form-data": "^2.3.3",
@@ -102,7 +101,6 @@
     "lodash.intersection": "^4.4.0",
     "lru-cache": "^11.2.2",
     "mathjs": "^11.8.0",
-    "node-nlp": "^4.26.1",
     "node-schedule": "^2.1.0",
     "path-to-regexp": "^6.2.1",
     "pify": "^5.0.0",
@@ -112,6 +110,7 @@
     "sequelize": "^6.26.0",
     "sequelize-cli": "^6.5.2",
     "set-value": "^4.1.0",
+    "sharp": "^0.33.2",
     "sqlite3": "^5.1.2",
     "suncalc": "^1.9.0",
     "tracer": "^1.1.6",

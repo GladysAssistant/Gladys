@@ -6,6 +6,32 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import { checkAndConvertUnit } from '../../../../../server/utils/units';
+import { getDeviceName } from '../../../utils/device';
+
+const DEFAULT_GAUGE_COLOR_LOW = '#316cbe';
+const DEFAULT_GAUGE_COLOR_IN_RANGE = '#00b894';
+const DEFAULT_GAUGE_COLOR_HIGH = '#d63031';
+
+const getZoneColor = (value, box) => {
+  if (!box.gauge_use_custom_value) {
+    return null;
+  }
+  const colorLow = box.gauge_color_low || DEFAULT_GAUGE_COLOR_LOW;
+  const colorInRange = box.gauge_color_in_range || DEFAULT_GAUGE_COLOR_IN_RANGE;
+  const colorHigh = box.gauge_color_high || DEFAULT_GAUGE_COLOR_HIGH;
+  const min = typeof box.gauge_min === 'number' ? box.gauge_min : null;
+  const max = typeof box.gauge_max === 'number' ? box.gauge_max : null;
+  if (min === null || max === null) {
+    return colorInRange;
+  }
+  if (value < min) {
+    return colorLow;
+  }
+  if (value > max) {
+    return colorHigh;
+  }
+  return colorInRange;
+};
 
 class GaugeBox extends Component {
   state = {
@@ -38,7 +64,7 @@ class GaugeBox extends Component {
       const deviceFeature = device.features.find(f => f.selector === this.props.box.device_feature);
 
       this.setState({
-        boxName: device.name,
+        device,
         deviceFeature,
         noDeviceFeatureSelector: false
       });
@@ -83,8 +109,8 @@ class GaugeBox extends Component {
     // Update the chart series with the new percentage
     this.chart.updateSeries([percentage]);
 
-    // Update the value formatter to show the actual value with unit if available
-    this.chart.updateOptions({
+    const zoneColor = getZoneColor(value, this.props.box);
+    const updatedOptions = {
       plotOptions: {
         radialBar: {
           dataLabels: {
@@ -94,7 +120,24 @@ class GaugeBox extends Component {
           }
         }
       }
-    });
+    };
+    if (zoneColor) {
+      updatedOptions.colors = [zoneColor];
+      updatedOptions.fill = { type: 'solid', colors: [zoneColor] };
+    } else {
+      updatedOptions.fill = {
+        type: 'gradient',
+        gradient: {
+          shade: 'dark',
+          shadeIntensity: 0.15,
+          inverseColors: false,
+          opacityFrom: 1,
+          opacityTo: 1,
+          stops: [0, 50, 65, 91]
+        }
+      };
+    }
+    this.chart.updateOptions(updatedOptions);
   };
 
   formatValueWithUnit = (value, unit) => {
@@ -120,6 +163,16 @@ class GaugeBox extends Component {
 
     // Return the value with the unit
     return `${formattedValue} ${unitTranslation || displayUnit}`;
+  };
+
+  getDisplayLabel = (device, deviceFeature) => {
+    if (this.props.box.name) {
+      return this.props.box.name;
+    }
+    if (device && deviceFeature) {
+      return getDeviceName(device, deviceFeature);
+    }
+    return device ? device.name : 'Value';
   };
 
   handleWebsocketConnected = ({ connected }) => {
@@ -154,10 +207,30 @@ class GaugeBox extends Component {
     if (prevProps.box.device_feature !== this.props.box.device_feature) {
       this.getDevice();
     }
-    if (
+    // The selected feature identity changed (unit/range/label all differ):
+    // the chart must be fully rebuilt, updateChartValue would not refresh the label.
+    const deviceFeatureIdentityChanged =
       this.state.deviceFeature &&
-      (!prevState.deviceFeature || prevState.deviceFeature.last_value !== this.state.deviceFeature.last_value)
-    ) {
+      (!prevState.deviceFeature ||
+        prevState.deviceFeature.selector !== this.state.deviceFeature.selector ||
+        prevState.deviceFeature.unit !== this.state.deviceFeature.unit ||
+        prevState.deviceFeature.min !== this.state.deviceFeature.min ||
+        prevState.deviceFeature.max !== this.state.deviceFeature.max);
+    const valueChanged =
+      this.state.deviceFeature &&
+      (!prevState.deviceFeature || prevState.deviceFeature.last_value !== this.state.deviceFeature.last_value);
+    const gaugeStyleChanged =
+      this.state.deviceFeature &&
+      (prevProps.box.gauge_use_custom_value !== this.props.box.gauge_use_custom_value ||
+        prevProps.box.gauge_min !== this.props.box.gauge_min ||
+        prevProps.box.gauge_max !== this.props.box.gauge_max ||
+        prevProps.box.gauge_color_low !== this.props.box.gauge_color_low ||
+        prevProps.box.gauge_color_in_range !== this.props.box.gauge_color_in_range ||
+        prevProps.box.gauge_color_high !== this.props.box.gauge_color_high);
+    const displayLabelChanged = prevProps.box.name !== this.props.box.name;
+    if (deviceFeatureIdentityChanged || displayLabelChanged) {
+      this.initChart();
+    } else if (valueChanged || gaugeStyleChanged) {
       // Only initialize the chart if it doesn't exist yet
       if (!this.chart) {
         this.initChart();
@@ -168,7 +241,7 @@ class GaugeBox extends Component {
   }
 
   initChart() {
-    const { deviceFeature, boxName } = this.state;
+    const { device, deviceFeature } = this.state;
     if (!deviceFeature || !this.chartElement) return;
 
     if (deviceFeature.last_value === null) {
@@ -194,6 +267,8 @@ class GaugeBox extends Component {
     if (this.chart) {
       this.chart.destroy();
     }
+
+    const zoneColor = getZoneColor(value, this.props.box);
 
     // Configure chart options
     const options = {
@@ -225,21 +300,24 @@ class GaugeBox extends Component {
           }
         }
       },
-      fill: {
-        type: 'gradient',
-        gradient: {
-          shade: 'dark',
-          shadeIntensity: 0.15,
-          inverseColors: false,
-          opacityFrom: 1,
-          opacityTo: 1,
-          stops: [0, 50, 65, 91]
-        }
-      },
+      fill: zoneColor
+        ? { type: 'solid', colors: [zoneColor] }
+        : {
+            type: 'gradient',
+            gradient: {
+              shade: 'dark',
+              shadeIntensity: 0.15,
+              inverseColors: false,
+              opacityFrom: 1,
+              opacityTo: 1,
+              stops: [0, 50, 65, 91]
+            }
+          },
+      colors: zoneColor ? [zoneColor] : undefined,
       stroke: {
         dashArray: 4
       },
-      labels: [boxName || 'Value']
+      labels: [this.getDisplayLabel(device, deviceFeature)]
     };
 
     // Create and render the chart
@@ -247,10 +325,48 @@ class GaugeBox extends Component {
     this.chart.render();
   }
 
+  renderThresholdsLegend() {
+    const { box } = this.props;
+    const { deviceFeature } = this.state;
+    if (!box.gauge_use_custom_value || !deviceFeature) {
+      return null;
+    }
+    const min = typeof box.gauge_min === 'number' ? box.gauge_min : null;
+    const max = typeof box.gauge_max === 'number' ? box.gauge_max : null;
+    if (min === null || max === null) {
+      return null;
+    }
+    const colorLow = box.gauge_color_low || DEFAULT_GAUGE_COLOR_LOW;
+    const colorInRange = box.gauge_color_in_range || DEFAULT_GAUGE_COLOR_IN_RANGE;
+    const colorHigh = box.gauge_color_high || DEFAULT_GAUGE_COLOR_HIGH;
+    const minLabel = this.formatValueWithUnit(min, deviceFeature.unit);
+    const maxLabel = this.formatValueWithUnit(max, deviceFeature.unit);
+    return (
+      <div class="card-body py-2 px-3 d-flex flex-wrap justify-content-center align-items-center gauge-thresholds-legend">
+        <small class="text-muted mr-2">
+          <Text id="dashboard.boxes.gauge.thresholdsLegendLabel" />
+        </small>
+        <small class="d-inline-flex align-items-center mr-3">
+          <span class="d-inline-block mr-1 gauge-legend-dot" style={{ backgroundColor: colorLow }} />
+          {`< ${minLabel}`}
+        </small>
+        <small class="d-inline-flex align-items-center mr-3">
+          <span class="d-inline-block mr-1 gauge-legend-dot" style={{ backgroundColor: colorInRange }} />
+          {`${minLabel} – ${maxLabel}`}
+        </small>
+        <small class="d-inline-flex align-items-center">
+          <span class="d-inline-block mr-1 gauge-legend-dot" style={{ backgroundColor: colorHigh }} />
+          {`> ${maxLabel}`}
+        </small>
+      </div>
+    );
+  }
+
   render(props, { deviceFeature, error, noDeviceFeatureSelector, noDeviceFeatureLastValue }) {
     return (
       <div class="card">
         {deviceFeature && <div ref={el => (this.chartElement = el)} class="gauge-chart" />}
+        {this.renderThresholdsLegend()}
         {error && (
           <div class="card-body">
             <div class="alert alert-danger">

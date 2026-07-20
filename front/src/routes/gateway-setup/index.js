@@ -19,6 +19,24 @@ class LinkGatewayUser extends Component {
       `${this.props.session.gladysGatewayApiUrl}/accounts/stripe_customer_portal/${this.state.setupState.stripe_portal_key}`
     );
   };
+  logout = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    try {
+      // We try to revoke the session, but this call goes through the local Gladys
+      // instance: it can fail when the instance is disconnected, which is precisely
+      // the case where the user is stuck on this page. We log out locally anyway.
+      const user = this.props.session.getUser();
+      if (user && user.session_id) {
+        await this.props.httpClient.post(`/api/v1/session/${user.session_id}/revoke`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    this.props.session.reset();
+    window.location = '/login';
+  };
   selectUser = e => {
     this.setState({
       selectedUser: e.target.value
@@ -28,8 +46,12 @@ class LinkGatewayUser extends Component {
     this.setState({ savingUserLoading: true });
     try {
       await this.props.session.gatewayClient.updateUserIdInGladys(this.state.selectedUser);
-      await this.props.httpClient.get('/api/v1/me');
-      // hard redirect, to reload websocket connection
+      // Hard redirect to /dashboard to force a fresh websocket session against the
+      // gateway. The previous session was opened at login time with no local_user_id
+      // (or a stale one), so any call to a local Gladys API right now would fail with
+      // GATEWAY_USER_NOT_LINKED. If the user has not been accepted locally yet,
+      // checkSession / checkIfGladysUserIsLinkedToExistingUser will detect it after
+      // the reload and show the proper "errorNotAcceptedLocally" message.
       window.location = '/dashboard';
     } catch (e) {
       console.error(e);
@@ -85,6 +107,7 @@ class LinkGatewayUser extends Component {
         saveUser={this.saveUser}
         loading={loading}
         openStripeBilling={this.openStripeBilling}
+        logout={this.logout}
       />
     );
   }

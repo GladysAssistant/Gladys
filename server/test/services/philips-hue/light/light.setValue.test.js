@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
-const { MockedPhilipsHueClient, fakes } = require('../mocks.test');
+const { MockedPhilipsHueClient, fakes, hueApi } = require('../mocks.test');
 
 const { fake, assert } = sinon;
 
@@ -192,6 +192,95 @@ describe('PhilipsHueService', () => {
       expect.fail();
     } catch (e) {
       expect(e.message).eq('HUE_API_NOT_FOUND');
+    }
+  });
+  it('should sync bridge and retry when light is not found in cache', async () => {
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    await philipsHueService.device.init();
+
+    const bridgeHueApi = philipsHueService.device.hueApisBySerialNumber.get('1234');
+    const lightNotFoundError = new Error('Light with id:5 was not found on this bridge');
+    const setLightStateStub = sinon.stub();
+    setLightStateStub.onFirstCall().rejects(lightNotFoundError);
+    setLightStateStub.onSecondCall().resolves(null);
+    bridgeHueApi.lights.setLightState = setLightStateStub;
+    hueApi.syncWithBridge.resetHistory();
+
+    await philipsHueService.device.setValue(
+      {
+        external_id: 'light:1234:5',
+        features: [
+          {
+            category: 'light',
+            type: 'binary',
+          },
+        ],
+      },
+      {
+        category: 'light',
+        type: 'binary',
+      },
+      1,
+    );
+
+    assert.calledTwice(setLightStateStub);
+    assert.calledOnce(hueApi.syncWithBridge);
+  });
+  it('should not call setLightState when feature type is not handled', async () => {
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    await philipsHueService.device.init();
+
+    const bridgeHueApi = philipsHueService.device.hueApisBySerialNumber.get('1234');
+    const setLightStateStub = sinon.stub().resolves(null);
+    bridgeHueApi.lights.setLightState = setLightStateStub;
+
+    await philipsHueService.device.setValue(
+      {
+        external_id: 'light:1234:1',
+        features: [
+          {
+            category: 'light',
+            type: 'unknown',
+          },
+        ],
+      },
+      {
+        category: 'light',
+        type: 'unknown',
+      },
+      1,
+    );
+
+    assert.notCalled(setLightStateStub);
+  });
+  it('should rethrow error when setLightState fails for another reason', async () => {
+    const philipsHueService = PhilipsHueService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    await philipsHueService.device.init();
+
+    const bridgeHueApi = philipsHueService.device.hueApisBySerialNumber.get('1234');
+    const bridgeError = new Error('Bridge unreachable');
+    bridgeHueApi.lights.setLightState = sinon.stub().rejects(bridgeError);
+
+    try {
+      await philipsHueService.device.setValue(
+        {
+          external_id: 'light:1234:5',
+          features: [
+            {
+              category: 'light',
+              type: 'binary',
+            },
+          ],
+        },
+        {
+          category: 'light',
+          type: 'binary',
+        },
+        1,
+      );
+      expect.fail();
+    } catch (e) {
+      expect(e.message).eq('Bridge unreachable');
     }
   });
 });

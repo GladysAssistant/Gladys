@@ -7,6 +7,7 @@ const { disconnect } = require('./disconnect');
 const { isEnabled } = require('./isEnabled');
 const { status } = require('./status');
 const { configureContainer } = require('./configureContainer');
+const { updateMajorVersion } = require('./updateMajorVersion');
 
 /**
  * @description Add ability to connect to Node-RED.
@@ -38,5 +39,6 @@ NodeRedManager.prototype.disconnect = disconnect;
 NodeRedManager.prototype.isEnabled = isEnabled;
 NodeRedManager.prototype.status = status;
 NodeRedManager.prototype.configureContainer = configureContainer;
+NodeRedManager.prototype.updateMajorVersion = updateMajorVersion;
 
 module.exports = NodeRedManager;

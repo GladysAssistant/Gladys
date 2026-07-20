@@ -1,17 +1,37 @@
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { NotFoundError } = require('../../utils/coreErrors');
+const logger = require('../../utils/logger');
 const db = require('../../models');
+
+/**
+ * @description Forward a message to an external service without blocking other channels on failure.
+ * @param {string} serviceName - Name of the messaging service for logging.
+ * @param {Function} sendFn - Async function that sends the message.
+ * @returns {Promise} Resolve when send succeeds or fails (errors are logged).
+ * @example
+ * await forwardToService('telegram', () => telegramService.message.send(userId, message));
+ */
+async function forwardToService(serviceName, sendFn) {
+  try {
+    await sendFn();
+  } catch (e) {
+    logger.error(`Error while forwarding message to ${serviceName}:`, e);
+  }
+}
 
 /**
  * @description Send a message to a user.
  * @param {string} userSelector - The selector of the user.
  * @param {string} text - The answer to send.
  * @param {string} [file] - An optional file sent with the message.
+ * @param {object} [options] - Extra message options.
+ * @param {string} [options.messageType='chat'] - Message display type.
  * @returns {Promise} Resolve with created message.
  * @example
- * reply(originalMessage, 'thanks!');
+ * sendToUser('tony', 'Bonjour, voici votre bilan.', null, { messageType: 'notification' });
  */
-async function sendToUser(userSelector, text, file = null) {
+async function sendToUser(userSelector, text, file = null, options = {}) {
+  const { messageType = 'chat' } = options;
   const user = this.state.get('user', userSelector);
   if (user === null) {
     throw new NotFoundError(`User ${userSelector} not found`);
@@ -22,6 +42,7 @@ async function sendToUser(userSelector, text, file = null) {
     file,
     sender_id: null, // message sent by gladys
     receiver_id: user.id,
+    message_type: messageType,
   };
   const messageCreated = (await db.Message.create(messageToInsert)).get({ plain: true });
   // send the message through websocket
@@ -35,7 +56,7 @@ async function sendToUser(userSelector, text, file = null) {
   // if the service exist and the user had telegram configured
   if (telegramService && user.telegram_user_id) {
     // we forward the message to Telegram
-    await telegramService.message.send(user.telegram_user_id, messageCreated);
+    await forwardToService('telegram', () => telegramService.message.send(user.telegram_user_id, messageCreated));
   }
   // We send the message to the nextcloud talk service
   const nextcloudTalkService = this.service.getService('nextcloud-talk');
@@ -49,7 +70,9 @@ async function sendToUser(userSelector, text, file = null) {
     // if the user had nextcloud talk configured
     if (nextcloudTalkToken) {
       // we forward the message to Nextcloud Talk
-      await nextcloudTalkService.message.send(nextcloudTalkToken, messageCreated);
+      await forwardToService('nextcloud-talk', () =>
+        nextcloudTalkService.message.send(nextcloudTalkToken, messageCreated),
+      );
     }
   }
   // We send the message to the callmebot service
@@ -57,11 +80,12 @@ async function sendToUser(userSelector, text, file = null) {
   // if the service exist
   if (callmebotService) {
     // we forward the message to CallMeBot
-    await callmebotService.message.send(user.id, messageCreated);
+    await forwardToService('callmebot', () => callmebotService.message.send(user.id, messageCreated));
   }
   return messageCreated;
 }
 
 module.exports = {
   sendToUser,
+  forwardToService,
 };

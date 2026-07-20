@@ -1,22 +1,16 @@
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
-const { assert, fake } = require('sinon');
 
 const Room = require('../../../lib/room');
 
 describe('room.create', () => {
-  const brain = {
-    addNamedEntity: fake.returns(null),
-    removeNamedEntity: fake.returns(null),
-  };
-  const room = new Room(brain);
+  const room = new Room();
   it('should create a room', async () => {
     const newRoom = await room.create('test-house', {
       name: 'My test room',
     });
     expect(newRoom).to.have.property('name', 'My test room');
     expect(newRoom).to.have.property('selector', 'my-test-room');
-    assert.calledOnce(brain.addNamedEntity);
   });
   it('should not create a room (empty name)', async () => {
     const promise = room.create('test-house', {
@@ -39,19 +33,13 @@ describe('room.create', () => {
 });
 
 describe('room.update', () => {
-  const brain = {
-    addNamedEntity: fake.returns(null),
-    removeNamedEntity: fake.returns(null),
-  };
-  const room = new Room(brain);
+  const room = new Room();
   it('should update a room', async () => {
     const newRoom = await room.update('test-room', {
       name: 'New name',
     });
     expect(newRoom).to.have.property('name', 'New name');
     expect(newRoom).to.have.property('selector', 'test-room');
-    assert.calledOnce(brain.removeNamedEntity);
-    assert.calledOnce(brain.addNamedEntity);
   });
   it('should return room not found', async () => {
     const promise = room.update('room-does-not-exist', {
@@ -62,14 +50,9 @@ describe('room.update', () => {
 });
 
 describe('room.destroy', () => {
-  const brain = {
-    addNamedEntity: fake.returns(null),
-    removeNamedEntity: fake.returns(null),
-  };
-  const room = new Room(brain);
+  const room = new Room();
   it('should destroy a room', async () => {
     await room.destroy('test-room');
-    assert.calledOnce(brain.removeNamedEntity);
   });
   it('should return room not found', async () => {
     const promise = room.destroy('room-does-not-exist');
@@ -78,11 +61,7 @@ describe('room.destroy', () => {
 });
 
 describe('room.getBySelector', () => {
-  const brain = {
-    addNamedEntity: fake.returns(null),
-    removeNamedEntity: fake.returns(null),
-  };
-  const room = new Room(brain);
+  const room = new Room();
   it('should get a room by selector', async () => {
     const roomFound = await room.getBySelector('test-room');
     expect(roomFound).to.deep.equal({
@@ -122,11 +101,7 @@ describe('room.getBySelector', () => {
 });
 
 describe('room.getAll', () => {
-  const brain = {
-    addNamedEntity: fake.returns(null),
-    removeNamedEntity: fake.returns(null),
-  };
-  const room = new Room(brain);
+  const room = new Room();
   it('should get all rooms', async () => {
     const rooms = await room.getAll();
     expect(rooms).to.be.instanceOf(Array);
@@ -137,11 +112,7 @@ describe('room.getAll', () => {
 });
 
 describe('room.get', () => {
-  const brain = {
-    addNamedEntity: fake.returns(null),
-    removeNamedEntity: fake.returns(null),
-  };
-  const room = new Room(brain);
+  const room = new Room();
   it('should get rooms with expanded devices + features', async () => {
     const rooms = await room.get({
       expand: ['devices'],

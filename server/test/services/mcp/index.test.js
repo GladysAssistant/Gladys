@@ -14,8 +14,22 @@ describe('MCPService', () => {
       scene: {
         get: async () => [],
       },
+      user: {
+        get: async () => [],
+      },
+      house: {
+        get: async () => [],
+      },
+      calendar: {
+        get: async () => [],
+      },
+      area: {
+        get: async () => [],
+      },
       device: {
         get: async () => [],
+        getBySelector: async () => null,
+        getDeviceFeaturesAggregates: async () => [],
       },
       event: {
         on: () => {},

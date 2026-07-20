@@ -1,3 +1,11 @@
+const { COVER_STATE } = require('../../../utils/constants');
+
+const coverStateLabels = {
+  [COVER_STATE.OPEN]: 'open',
+  [COVER_STATE.CLOSE]: 'closed',
+  [COVER_STATE.STOP]: 'stopped',
+};
+
 /**
  * @description Format feature value for llm.
  * @param {object} feature - Feature to format.
@@ -17,6 +25,12 @@ function formatValue(feature) {
     case 'air-conditioning':
       return {
         value: feature.last_value === 0 ? 'off' : 'on',
+        unit: null,
+      };
+    case 'shutter:state':
+    case 'curtain:state':
+      return {
+        value: coverStateLabels[feature.last_value] ?? feature.last_value,
         unit: null,
       };
     default:

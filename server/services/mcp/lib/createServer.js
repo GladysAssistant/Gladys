@@ -1,4 +1,5 @@
 const { EVENTS } = require('../../../utils/constants');
+const { toolNameFromIntent } = require('./mcpToolsToChatApiFormat');
 
 /**
  * @description Create MCP server.
@@ -34,7 +35,7 @@ async function createServer() {
     return this.server.registerResource(name, uri, config, cb);
   });
   (await this.getAllTools()).map(({ intent, config, cb }) => {
-    return this.server.registerTool(intent.replace('.', '_'), config, cb);
+    return this.server.registerTool(toolNameFromIntent(intent), config, cb);
   });
 }
 

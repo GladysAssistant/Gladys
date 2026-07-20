@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 
 const { convertFeature } = require('../../../../../../services/tuya/lib/device/tuya.convertFeature');
+const { DEVICE_TYPES } = require('../../../../../../services/tuya/lib/mappings');
 
 describe('Tuya convert feature', () => {
   it('should return undefined when code not exist', () => {
@@ -25,9 +26,9 @@ describe('Tuya convert feature', () => {
       has_feedback: false,
       max: 1000,
       min: 100,
-      name: 'name',
+      name: 'switch_1',
       read_only: false,
-      selector: 'externalId:switch_1',
+      selector: 'externalid-switch-1',
       type: 'binary',
     });
   });
@@ -49,10 +50,108 @@ describe('Tuya convert feature', () => {
       has_feedback: false,
       max: 1,
       min: 0,
-      name: 'name',
+      name: 'switch_1',
       read_only: false,
-      selector: 'externalId:switch_1',
+      selector: 'externalid-switch-1',
       type: 'binary',
     });
+  });
+
+  it('should ignore cloud codes flagged in mapping', () => {
+    const result = convertFeature(
+      {
+        code: 'countdown',
+        type: 'Integer',
+        name: 'countdown',
+        readOnly: true,
+        values: '{}',
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_SOCKET,
+      },
+    );
+
+    expect(result).to.equal(undefined);
+  });
+
+  it('should support object values payload', () => {
+    const result = convertFeature(
+      {
+        code: 'switch_1',
+        type: 'Boolean',
+        name: 'name',
+        readOnly: false,
+        values: { min: 2, max: 8 },
+      },
+      'externalId',
+    );
+
+    expect(result).to.deep.eq({
+      category: 'switch',
+      external_id: 'externalId:switch_1',
+      has_feedback: false,
+      max: 8,
+      min: 2,
+      name: 'switch_1',
+      read_only: false,
+      selector: 'externalid-switch-1',
+      type: 'binary',
+    });
+  });
+
+  it('should use the curated mapping name and keep the Tuya code (typo) as key', () => {
+    const result = convertFeature(
+      {
+        code: 'energy_forword_a',
+        type: 'Integer',
+        name: 'Forward Energy-A',
+        readOnly: true,
+        values: {},
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_METER,
+      },
+    );
+
+    expect(result.name).to.equal('Forward energy A');
+    expect(result.external_id).to.equal('externalId:energy_forword_a');
+  });
+
+  it('should fall back to the Tuya code as name when the mapping has no name', () => {
+    const result = convertFeature(
+      {
+        code: 'switch_1',
+        type: 'Boolean',
+        name: 'Switch one',
+        readOnly: false,
+        values: {},
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_SOCKET,
+      },
+    );
+
+    expect(result.name).to.equal('switch_1');
+  });
+
+  it('should keep scale from values payload', () => {
+    const result = convertFeature(
+      {
+        code: 'cur_power',
+        type: 'Integer',
+        name: 'power',
+        readOnly: true,
+        values: { min: 0, max: 99999, scale: 1 },
+      },
+      'externalId',
+      {
+        deviceType: DEVICE_TYPES.SMART_SOCKET,
+      },
+    );
+
+    expect(result.scale).to.equal(1);
   });
 });

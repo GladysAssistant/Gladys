@@ -136,7 +136,10 @@ class MatterSettingsPage extends Component {
       loadingNodes: true,
       decommissioningNodes: {},
       collapsedDevices: {},
-      visibleKeys: {}
+      visibleKeys: {},
+      showConfirmReset: false,
+      resetting: false,
+      resetError: null
     };
   }
 
@@ -319,6 +322,29 @@ class MatterSettingsPage extends Component {
     window.URL.revokeObjectURL(url);
   };
 
+  showConfirmReset = () => {
+    this.setState({ showConfirmReset: true });
+  };
+
+  cancelReset = () => {
+    this.setState({ showConfirmReset: false });
+  };
+
+  confirmReset = async () => {
+    this.setState({ showConfirmReset: false, resetting: true, resetError: null });
+    try {
+      await this.props.httpClient.post('/api/v1/service/matter/reset');
+      this.setState({
+        resetting: false,
+        matterEnabled: false,
+        nodes: []
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({ resetting: false, resetError: true });
+    }
+  };
+
   render() {
     const {
       matterEnabled,
@@ -330,7 +356,10 @@ class MatterSettingsPage extends Component {
       decommissioningNodes,
       collapsedDevices,
       visibleKeys,
-      hasIpv6
+      hasIpv6,
+      showConfirmReset,
+      resetting,
+      resetError
     } = this.state;
 
     return (
@@ -391,8 +420,11 @@ class MatterSettingsPage extends Component {
                         <Text id="integration.matter.settings.nodesTitle" />
                       </h4>
                       {nodes && nodes.length > 0 && (
-                        <button onClick={this.downloadNodesJson} class="btn btn-secondary btn-sm">
-                          <i class="fe fe-download me-2" /> <Text id="integration.matter.settings.downloadNodesJson" />
+                        <button onClick={this.downloadNodesJson} class="btn btn-secondary btn-sm flex-shrink-0 ml-2">
+                          <i class="fe fe-download" />
+                          <span class="d-none d-sm-inline-block ml-2">
+                            <Text id="integration.matter.settings.downloadNodesJson" />
+                          </span>
                         </button>
                       )}
                     </div>
@@ -411,27 +443,25 @@ class MatterSettingsPage extends Component {
                                 {decommissioningNodes[node.node_id] && <div class="loader" />}
                                 <div class="dimmer-content">
                                   <div class="card-header">
-                                    <div class="d-flex justify-content-between align-items-center w-100">
-                                      <div>
+                                    <div class="d-flex justify-content-between align-items-start w-100">
+                                      <div style="min-width: 0;">
                                         <h5 class="mb-0">
                                           {node.node_information.vendor_name} - {node.node_information.product_name}
                                         </h5>
-                                        <small class="text-muted">
+                                        <small class="text-muted" style="overflow-wrap: break-word;">
                                           Node ID: {node.node_id} | Vendor ID: {node.node_information.vendor_id} |
                                           Product ID: {node.node_information.product_id}
                                         </small>
                                       </div>
-                                      <div class="ms-auto">
-                                        <button
-                                          onClick={() => this.decommissionNode(node.node_id)}
-                                          class={cx('btn btn-danger btn-sm', {
-                                            loading: decommissioningNodes[node.node_id]
-                                          })}
-                                          disabled={decommissioningNodes[node.node_id]}
-                                        >
-                                          <Text id="integration.matter.settings.decommissionButton" />
-                                        </button>
-                                      </div>
+                                      <button
+                                        onClick={() => this.decommissionNode(node.node_id)}
+                                        class={cx('btn btn-danger btn-sm flex-shrink-0 ml-2', {
+                                          loading: decommissioningNodes[node.node_id]
+                                        })}
+                                        disabled={decommissioningNodes[node.node_id]}
+                                      >
+                                        <Text id="integration.matter.settings.decommissionButton" />
+                                      </button>
                                     </div>
                                   </div>
                                   <div class="card-body">
@@ -463,6 +493,47 @@ class MatterSettingsPage extends Component {
                     <button onClick={this.disableMatter} class="btn btn-danger" disabled={saving}>
                       <Text id="integration.matter.settings.disableButton" />
                     </button>
+                  </div>
+
+                  <div class="mt-5">
+                    <h4>
+                      <Text id="integration.matter.settings.reset.title" />
+                    </h4>
+                    <p class="text-muted">
+                      <Text id="integration.matter.settings.reset.description" />
+                    </p>
+
+                    {resetError && (
+                      <div class="alert alert-danger">
+                        <Text id="integration.matter.settings.reset.error" />
+                      </div>
+                    )}
+
+                    {!showConfirmReset && (
+                      <button
+                        class="btn btn-outline-danger"
+                        onClick={this.showConfirmReset}
+                        disabled={saving || resetting}
+                      >
+                        <Text id="integration.matter.settings.reset.button" />
+                      </button>
+                    )}
+
+                    {showConfirmReset && (
+                      <div class="d-flex flex-column align-items-start" style="row-gap: 1em">
+                        <div class="alert alert-danger mb-0">
+                          <Text id="integration.matter.settings.reset.confirmMessage" />
+                        </div>
+                        <div>
+                          <button class="btn btn-danger" onClick={this.confirmReset} disabled={resetting}>
+                            <Text id="integration.matter.settings.reset.confirmButton" />
+                          </button>
+                          <button class="btn ml-2" onClick={this.cancelReset} disabled={resetting}>
+                            <Text id="integration.matter.settings.reset.cancelButton" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               )}

@@ -140,11 +140,59 @@ const AccountTab = ({ children, ...props }) => (
               <Text id="integration.caldav.synchronizationSuccess" />
             </p>
           )}
+          {props.caldavLog && (
+            <div class="alert alert-secondary">
+              <div class="d-flex justify-content-between align-items-center">
+                <button
+                  type="button"
+                  class="btn btn-link p-0 text-start"
+                  onClick={props.toggleCaldavLog}
+                  aria-expanded={!props.caldavLogVisibility}
+                  aria-controls="caldav-log-content"
+                >
+                  <i
+                    class={cx('fe me-2', {
+                      'fe-chevron-right': props.caldavLogVisibility,
+                      'fe-chevron-down': !props.caldavLogVisibility
+                    })}
+                  />
+                  <Text id="integration.caldav.logTitle" />
+                </button>
+                {window.isSecureContext && (
+                  <button type="button" class="btn p-0" onClick={() => navigator.clipboard.writeText(props.caldavLog)}>
+                    <i class="fe fe-copy me-1" />
+                  </button>
+                )}
+              </div>
+              {!props.caldavLogVisibility && (
+                <pre id="caldav-log-content" class="mb-0 mt-2" style="white-space: pre-wrap; word-break: break-all;">
+                  {props.caldavLog}
+                </pre>
+              )}
+            </div>
+          )}
           <div class="form-group">
             <div className={style.successMessage}>
               <Text id={`integration.caldav.synchronizationInfo`} />
             </div>
-            <span class="input-group-append">
+            <div class="d-sm-none">
+              <div class="row mb-2">
+                <div class="col-6 pr-1">
+                  <button className={cx('btn btn-primary btn-block', style.button)} onClick={props.saveCaldavSettings}>
+                    <Text id={`integration.caldav.buttonSave`} />
+                  </button>
+                </div>
+                <div class="col-6 pl-1">
+                  <button className={cx('btn btn-danger btn-block', style.button)} onClick={props.cleanUp}>
+                    <Text id={`integration.caldav.buttonCleanUp`} />
+                  </button>
+                </div>
+              </div>
+              <button class="btn btn-success btn-block" onClick={props.startSync}>
+                <Text id={`integration.caldav.buttonSync`} />
+              </button>
+            </div>
+            <span class="input-group-append d-none d-sm-flex">
               <button className={cx('btn btn-primary', style.button)} onClick={props.saveCaldavSettings}>
                 <Text id={`integration.caldav.buttonSave`} />
               </button>

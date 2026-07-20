@@ -156,6 +156,7 @@
   },
   "gladysDevice": {
     "name": "0xe0798dfffedeae2b",
+    "ieee_address": "0xe0798dfffedeae2b",
     "model": "ZSS-ZK-THL",
     "external_id": "zigbee2mqtt:0xe0798dfffedeae2b",
     "features": [

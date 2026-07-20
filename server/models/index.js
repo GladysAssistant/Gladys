@@ -1,11 +1,10 @@
 const os = require('os');
 const Sequelize = require('sequelize');
-const duckdb = require('duckdb');
+const { DuckDBInstance, DuckDBTimestampValue } = require('@duckdb/node-api');
 const Umzug = require('umzug');
 const Promise = require('bluebird');
 const chunk = require('lodash.chunk');
 const path = require('path');
-const util = require('util');
 const getConfig = require('../utils/getConfig');
 const logger = require('../utils/logger');
 const { formatDateInUTC } = require('../utils/date');
@@ -35,6 +34,7 @@ const DashboardModel = require('./dashboard');
 const DeviceFeatureStateModel = require('./device_feature_state');
 const DeviceFeatureAggregateModel = require('./device_feature_state_aggregate');
 const DeviceFeatureModel = require('./device_feature');
+const DeviceFeatureSupportedOptionModel = require('./device_feature_supported_option');
 const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
 const EnergyPriceModel = require('./energy_price');
@@ -61,6 +61,7 @@ const models = {
   DeviceFeatureState: DeviceFeatureStateModel(sequelize, Sequelize),
   DeviceFeatureStateAggregate: DeviceFeatureAggregateModel(sequelize, Sequelize),
   DeviceFeature: DeviceFeatureModel(sequelize, Sequelize),
+  DeviceFeatureSupportedOption: DeviceFeatureSupportedOptionModel(sequelize, Sequelize),
   DeviceParam: DeviceParamModel(sequelize, Sequelize),
   Device: DeviceModel(sequelize, Sequelize),
   EnergyPrice: EnergyPriceModel(sequelize, Sequelize),
@@ -95,18 +96,164 @@ const totalMemoryBytes = os.totalmem();
 const defaultMemoryLimitBytes = Math.floor(totalMemoryBytes * 0.3);
 const defaultMemoryLimitMB = Math.floor(defaultMemoryLimitBytes / (1024 * 1024));
 const duckDbMemoryLimit = process.env.DUCKDB_MEMORY_LIMIT || `${defaultMemoryLimitMB}MB`;
-const duckDb = new duckdb.Database(duckDbFilePath, {
-  memory_limit: duckDbMemoryLimit,
-});
-logger.info(
-  `DuckDB initialized with memory_limit=${duckDbMemoryLimit} (system RAM: ${Math.floor(
-    totalMemoryBytes / (1024 * 1024),
-  )}MB)`,
-);
-const duckDbWriteConnection = duckDb.connect();
-const duckDbReadConnection = duckDb.connect();
-const duckDbWriteConnectionAllAsync = util.promisify(duckDbWriteConnection.all).bind(duckDbWriteConnection);
-const duckDbReadConnectionAllAsync = util.promisify(duckDbReadConnection.all).bind(duckDbReadConnection);
+
+// The DuckDB Node "Neo" API (@duckdb/node-api) replaces the deprecated `duckdb`
+// package. It is fully asynchronous: the database instance and its connections
+// have to be created with `await`. We open them lazily and cache the resulting
+// promise so that every query waits for the same one-time initialization.
+// This keeps the on-disk file format unchanged (same DuckDB engine version), so
+// existing `.duckdb` files stay fully compatible.
+let duckDbInstance;
+let duckDbWriteConnection;
+let duckDbReadConnection;
+let duckDbWriteQueue;
+let duckDbReadQueue;
+let duckDbInitPromise = null;
+
+// Serialize statement execution per connection. The Neo API can raise a
+// "Failed to execute prepared statement" error when several statements run
+// concurrently on the same connection, so — like the old `duckdb` package did
+// internally — we queue statements and run them one at a time. The read and write
+// connections keep their own independent queue, so reads and writes still run in
+// parallel with each other.
+const createSerialQueue = () => {
+  // `tail` always resolves (never rejects) once the previously queued task has
+  // settled, so a failing task never blocks the ones queued after it.
+  let tail = Promise.resolve();
+  return (task) => {
+    const previous = tail;
+    let release;
+    tail = new Promise((resolve) => {
+      release = resolve;
+    });
+    const run = async () => {
+      try {
+        await previous;
+      } catch (previousError) {
+        // Ignore the previous task's failure: it is already reported to its own caller.
+      }
+      try {
+        return await task();
+      } finally {
+        release();
+      }
+    };
+    return run();
+  };
+};
+
+const initializeDuckDb = async () => {
+  duckDbInstance = await DuckDBInstance.create(duckDbFilePath, {
+    memory_limit: duckDbMemoryLimit,
+  });
+  duckDbWriteConnection = await duckDbInstance.connect();
+  duckDbReadConnection = await duckDbInstance.connect();
+  duckDbWriteQueue = createSerialQueue();
+  duckDbReadQueue = createSerialQueue();
+  logger.info(
+    `DuckDB initialized with memory_limit=${duckDbMemoryLimit} (system RAM: ${Math.floor(
+      totalMemoryBytes / (1024 * 1024),
+    )}MB)`,
+  );
+};
+
+const ensureDuckDbInitialized = () => {
+  if (duckDbInitPromise === null) {
+    const initPromise = (async () => {
+      try {
+        await initializeDuckDb();
+      } catch (initError) {
+        // Clear the cached promise on failure so a later call can retry after a
+        // transient error, instead of staying stuck on the rejected promise. Only
+        // reset if no other initialization has started in the meantime.
+        if (duckDbInitPromise === initPromise) {
+          duckDbInitPromise = null;
+        }
+        throw initError;
+      }
+    })();
+    duckDbInitPromise = initPromise;
+  }
+  return duckDbInitPromise;
+};
+
+// Convert a legacy positional parameter (plain JS value, as accepted by the old
+// `duckdb` package) into a value the Neo API can bind. Only `Date` needs special
+// handling: the new API cannot infer a type for a raw JS Date. The old package
+// bound a JS Date as a NAIVE TIMESTAMP (epoch microseconds, no timezone), which
+// DuckDB then casts to TIMESTAMPTZ using the session timezone when compared with
+// a TIMESTAMPTZ column. We reproduce that exact binding — using TIMESTAMPTZ here
+// instead would shift query boundaries by the timezone offset for installations
+// with a non-UTC timezone configured. Every other type (string, number, boolean,
+// bigint, null) is bound as-is.
+const toDuckDbParam = (param) => {
+  if (param instanceof Date) {
+    return new DuckDBTimestampValue(BigInt(param.getTime()) * 1000n);
+  }
+  return param;
+};
+
+// The old `duckdb` package accepted parameters either as a variadic list
+// (`all(sql, p1, p2)`) or as a single array (`all(sql, [p1, p2])`, typically used
+// together with `$1`/`$2` numbered placeholders). The Neo API only takes an array,
+// so we normalize both calling conventions to a single array of parameters.
+const normalizeParams = (params) => {
+  if (params.length === 1 && Array.isArray(params[0])) {
+    return params[0];
+  }
+  return params;
+};
+
+// Run a query on the given connection and return plain JS row objects, matching
+// the exact shape returned by the old `duckdb` package (Date for TIMESTAMPTZ,
+// string for UUID, number for DOUBLE, BigInt for BIGINT/COUNT...). Using
+// `getRowObjectsJS()` guarantees that the values keep their legacy JS types so
+// that no downstream code needs to change.
+const runDuckDbQuery = async (getConnection, getQueue, query, params) => {
+  await ensureDuckDbInitialized();
+  const mappedParams = normalizeParams(params).map(toDuckDbParam);
+  return getQueue()(async () => {
+    const reader = await getConnection().runAndReadAll(query, mappedParams);
+    return reader.getRowObjectsJS();
+  });
+};
+
+const duckDbWriteConnectionAllAsync = (query, ...params) =>
+  runDuckDbQuery(
+    () => duckDbWriteConnection,
+    () => duckDbWriteQueue,
+    query,
+    params,
+  );
+const duckDbReadConnectionAllAsync = (query, ...params) =>
+  runDuckDbQuery(
+    () => duckDbReadConnection,
+    () => duckDbReadQueue,
+    query,
+    params,
+  );
+
+// Close all DuckDB connections and the database instance. Safe to call multiple
+// times and before initialization has completed.
+const duckDbClose = async () => {
+  if (duckDbInitPromise !== null) {
+    // Make sure a pending initialization is settled before closing (ignore its error).
+    try {
+      await duckDbInitPromise;
+    } catch (initError) {
+      // The initialization already reported its own error; nothing to close if it failed.
+    }
+  }
+  if (duckDbReadConnection) {
+    duckDbReadConnection.disconnectSync();
+  }
+  if (duckDbWriteConnection) {
+    duckDbWriteConnection.disconnectSync();
+  }
+  if (duckDbInstance) {
+    duckDbInstance.closeSync();
+  }
+};
 
 const duckDbCreateTableIfNotExist = async () => {
   logger.info(`DuckDB - Creating database table if not exist`);
@@ -175,36 +322,35 @@ const duckDbSetTimezone = async (timezone) => {
  * @description Create a separate DuckDB database instance for backup operations.
  * This opens the same database file but as a separate instance with its own buffer pool.
  * Closing this instance will release all memory used during the backup export.
- * @returns {object} Object with allAsync and close methods.
+ * @returns {Promise<object>} Object with allAsync and close methods.
  * @example
- * const backupDb = duckDbCreateBackupInstance();
+ * const backupDb = await duckDbCreateBackupInstance();
  * await backupDb.allAsync('EXPORT DATABASE ...');
  * await backupDb.close();
  */
-const duckDbCreateBackupInstance = () => {
+const duckDbCreateBackupInstance = async () => {
   // Create a new database instance pointing to the same file
   // This instance has its own buffer pool that will be released when closed
-  const backupDatabase = new duckdb.Database(duckDbFilePath, {
+  const backupDatabase = await DuckDBInstance.create(duckDbFilePath, {
     memory_limit: duckDbMemoryLimit,
     access_mode: 'READ_ONLY',
   });
-  const connection = backupDatabase.connect();
-  const allAsync = util.promisify(connection.all).bind(connection);
-  const close = () => {
-    return new Promise((resolve, reject) => {
-      connection.close((connErr) => {
-        if (connErr) {
-          logger.warn(`Error closing backup connection: ${connErr.message}`);
-        }
-        backupDatabase.close((dbErr) => {
-          if (dbErr) {
-            reject(dbErr);
-          } else {
-            resolve();
-          }
-        });
-      });
+  const connection = await backupDatabase.connect();
+  const queue = createSerialQueue();
+  const allAsync = (query, ...params) => {
+    const mappedParams = normalizeParams(params).map(toDuckDbParam);
+    return queue(async () => {
+      const reader = await connection.runAndReadAll(query, mappedParams);
+      return reader.getRowObjectsJS();
     });
+  };
+  const close = async () => {
+    try {
+      connection.disconnectSync();
+    } catch (connErr) {
+      logger.warn(`Error closing backup connection: ${connErr.message}`);
+    }
+    backupDatabase.closeSync();
   };
   return { allAsync, close };
 };
@@ -213,11 +359,20 @@ const db = {
   ...models,
   sequelize,
   umzug,
-  duckDb,
-  duckDbWriteConnection,
-  duckDbReadConnection,
+  // The DuckDB instance and connections are created asynchronously and lazily,
+  // so they are exposed through getters that always return the current value.
+  get duckDb() {
+    return duckDbInstance;
+  },
+  get duckDbWriteConnection() {
+    return duckDbWriteConnection;
+  },
+  get duckDbReadConnection() {
+    return duckDbReadConnection;
+  },
   duckDbWriteConnectionAllAsync,
   duckDbReadConnectionAllAsync,
+  duckDbClose,
   duckDbCreateTableIfNotExist,
   duckDbInsertState,
   duckDbUpdateState,
@@ -226,5 +381,11 @@ const db = {
   duckDbSetTimezone,
   duckDbCreateBackupInstance,
 };
+
+// Start opening the DuckDB database right away so it is ready as soon as possible.
+// Queries still await the same initialization promise, so this only warms it up.
+ensureDuckDbInitialized().catch((e) => {
+  logger.error(`DuckDB initialization failed: ${e.message}`);
+});
 
 module.exports = db;

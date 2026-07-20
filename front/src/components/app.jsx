@@ -46,6 +46,7 @@ import NewDashboard from '../routes/dashboard/new-dashboard';
 import EditDashboard from '../routes/dashboard/edit-dashboard';
 
 import IntegrationPage from '../routes/integration';
+import HistoryPage from '../routes/history';
 import ChatPage from '../routes/chat';
 import MapPage from '../routes/map';
 import MapNewAreaPage from '../routes/map/NewArea';
@@ -135,7 +136,7 @@ import NukiSetupPage from '../routes/integration/all/nuki/setup-page';
 import NukiMqttDiscoverPage from '../routes/integration/all/nuki/discover-mqtt';
 import NukiHttpDiscoverPage from '../routes/integration/all/nuki/discover-http';
 
-// OpenAI integration
+// AI integration
 import OpenAIPage from '../routes/integration/all/openai/index';
 
 // Tuya integration
@@ -380,6 +381,7 @@ const AppRouter = connect(
         <EnedisGatewayUsagePoints path="/dashboard/integration/device/enedis/usage-points" />
         <EnedisGateway path="/dashboard/integration/device/enedis/redirect" />
 
+        <SafeAsyncRoute path="/dashboard/history" component={HistoryPage} />
         <SafeAsyncRoute path="/dashboard/chat" component={ChatPage} />
         <SafeAsyncRoute path="/dashboard/maps" component={MapPage} />
         <MapNewAreaPage path="/dashboard/maps/area/new" />

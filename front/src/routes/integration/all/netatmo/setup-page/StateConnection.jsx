@@ -24,6 +24,11 @@ const StateConnection = props => (
             <Text id="integration.netatmo.status.connect" />
           </p>
         )) ||
+        (props.connectNetatmoStatus === STATUS.RECONNECTING && (
+          <p class="text-center alert alert-warning">
+            <Text id="integration.netatmo.status.reconnecting" />
+          </p>
+        )) ||
         (props.connectNetatmoStatus === STATUS.DISCONNECTED && (
           <p class="text-center alert alert-danger">
             <Text id="integration.netatmo.status.disconnect" />

@@ -1,3 +1,511 @@
 .emptyDiv {
   min-height: 200px;
 }
+
+.emptyState {
+  color: #6c757d;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.backLink {
+  align-items: center;
+  color: #6c757d;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 0.875rem;
+  gap: 0.35rem;
+  margin-right: 1rem;
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: #467fcf;
+  text-decoration: none;
+}
+
+.cardTitleWithBack {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Device list grouped by room */
+.roomGroup {
+  margin-bottom: 1.5rem;
+}
+
+.roomGroup:last-child {
+  margin-bottom: 0;
+}
+
+.roomGroupHeader {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.roomGroupName {
+  font-weight: 600;
+}
+
+.roomGroupHouse {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.roomGroupHouse::before {
+  content: '·';
+  margin-right: 0.5rem;
+}
+
+.deviceList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.deviceListItem {
+  align-items: start;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  display: grid;
+  gap: 0.5rem 0.75rem;
+  grid-template-areas:
+    'main actions'
+    'features features';
+  grid-template-columns: 1fr auto;
+  padding: 0.75rem 1rem;
+  transition: background-color 0.15s ease;
+}
+
+.deviceListItem:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.deviceListItemLoading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.deviceListItemMain {
+  grid-area: main;
+  min-width: 0;
+}
+
+.deviceListItemLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.deviceListItemLink:hover {
+  color: #467fcf;
+  text-decoration: none;
+}
+
+.deviceListItemName {
+  display: block;
+  font-weight: 600;
+}
+
+.deviceListItemMeta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.deviceListItemFeatures {
+  grid-area: features;
+}
+
+.deviceListItemFeatures .device-features {
+  margin-bottom: 0;
+}
+
+/* Feature tags: cancel global dark-mode double-invert that keeps them flashy white */
+:global(.dark-mode) .deviceListItemFeatures :global(.tag) {
+  filter: none !important;
+  background-color: rgba(0, 0, 0, 0.22) !important;
+  border-color: rgba(0, 0, 0, 0.14) !important;
+  color: rgba(0, 0, 0, 0.62) !important;
+}
+
+:global(.dark-mode) .deviceListItemFeatures :global(.tag-addon) {
+  background-color: rgba(0, 0, 0, 0.14) !important;
+}
+
+:global(.dark-mode) .deviceListItemFeatures :global(.tag-addon) :global(.fe) {
+  filter: none !important;
+  color: rgba(0, 0, 0, 0.55) !important;
+}
+
+.deviceListItemActions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 0.5rem;
+  grid-area: actions;
+}
+
+.deviceListItemAlert {
+  grid-column: 1 / -1;
+}
+
+/* Device edit page */
+.deviceEditSection {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+.featuresSection {
+  margin-top: 0.5rem;
+}
+
+.featuresSectionHeader {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.addFeatureSection {
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+}
+
+/* Feature accordion */
+.featureAccordionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.featureAccordion {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.featureAccordionExpanded {
+  border-color: #467fcf;
+}
+
+.featureAccordionError {
+  border-color: #cd201f;
+}
+
+.featureAccordionError .featureAccordionHeader {
+  background-color: rgba(205, 32, 31, 0.05);
+}
+
+.validationErrorList {
+  margin-bottom: 0;
+  margin-top: 0.75rem;
+  padding-left: 1.25rem;
+}
+
+.featureAccordionHeader {
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  transition: background-color 0.15s ease;
+  width: 100%;
+}
+
+.featureAccordionHeader:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.featureAccordionIcon {
+  color: #467fcf;
+  flex-shrink: 0;
+}
+
+.featureAccordionTitle {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.featureAccordionName {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featureAccordionType {
+  font-size: 0.8125rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featureAccordionBadges {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.featureAccordionBody {
+  background: rgba(0, 0, 0, 0.02);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 1rem;
+}
+
+.featureAdvancedSection {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+/* Feature catalog */
+.featureCatalog {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.featureCatalogHeader {
+  background: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 1rem;
+}
+
+.featureCatalogContent {
+  max-height: 480px;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.featureCatalogCategory {
+  margin-bottom: 1rem;
+}
+
+.featureCatalogCategory:last-child {
+  margin-bottom: 0;
+}
+
+.featureCatalogCategoryHeader {
+  align-items: center;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font-weight: 600;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem 0;
+  width: 100%;
+}
+
+.featureCatalogCategoryHeader:hover {
+  color: #467fcf;
+}
+
+.featureCatalogGrid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.featureCatalogCard {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.featureCatalogCard:hover {
+  border-color: #467fcf;
+  box-shadow: 0 2px 8px rgba(70, 127, 207, 0.15);
+}
+
+.featureCatalogCardHeader {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.featureCatalogCardHeader .fe {
+  color: #467fcf;
+  flex-shrink: 0;
+}
+
+.featureCatalogCardTitle {
+  font-weight: 600;
+}
+
+.featureCatalogCardDescription {
+  color: #6c757d;
+  flex: 1;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  margin-bottom: 0.75rem;
+}
+
+.featureCatalogCardPreview {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 0.5rem;
+}
+
+.featureCatalogPreviewLabel {
+  color: #adb5bd;
+  display: block;
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+}
+
+.featurePreview {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.featurePreview .table {
+  margin-bottom: 0;
+}
+
+.featurePreview .custom-switch-input,
+.featurePreview input,
+.featurePreview button,
+.featurePreview select {
+  pointer-events: none;
+}
+
+.cameraFeaturePreviewWrapper {
+  padding: 0.5rem;
+}
+
+.cameraFeaturePreview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cameraFeaturePreviewNotice {
+  color: #6c757d;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.cameraFeaturePreviewCard {
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+.cameraFeaturePreviewCard .card-img-top {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.cameraFeaturePreviewCard .card-title {
+  font-size: 0.875rem;
+}
+
+.catalogPushButton {
+  pointer-events: none;
+}
+
+/* Dark mode: avoid inverted pure-black panels from hardcoded white backgrounds */
+:global(.dark-mode) .cameraFeaturePreviewNotice {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+:global(.dark-mode) .roomGroupHeader,
+:global(.dark-mode) .featureCatalogHeader,
+:global(.dark-mode) .featureAccordionBody,
+:global(.dark-mode) .featureAdvancedSection,
+:global(.dark-mode) .featurePreview {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+:global(.dark-mode) .deviceListItem:hover,
+:global(.dark-mode) .featureAccordionHeader:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+:global(.dark-mode) .deviceListItem,
+:global(.dark-mode) .featureAccordion,
+:global(.dark-mode) .featureCatalog,
+:global(.dark-mode) .featureCatalogCard,
+:global(.dark-mode) .deviceEditSection,
+:global(.dark-mode) .featureCatalogCardPreview,
+:global(.dark-mode) .featureAccordionBody,
+:global(.dark-mode) .featureAdvancedSection {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+:global(.dark-mode) .backLink {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+:global(.dark-mode) .backLink:hover {
+  color: #9ec5fe;
+}
+
+:global(.dark-mode) .featureCatalogCardDescription,
+:global(.dark-mode) .roomGroupHouse,
+:global(.dark-mode) .emptyState {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+@media (max-width: 576px) {
+  .deviceListItem {
+    grid-template-areas:
+      'main'
+      'features'
+      'actions';
+    grid-template-columns: 1fr;
+  }
+
+  .deviceListItemActions {
+    width: 100%;
+  }
+
+  .deviceListItemActions .btn {
+    flex: 1;
+  }
+
+  .featureAccordionBadges {
+    display: none;
+  }
+
+  .featureCatalogGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .backLink {
+    margin-right: 0.5rem;
+  }
+}

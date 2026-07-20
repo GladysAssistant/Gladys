@@ -4,6 +4,12 @@ const get = require('get-value');
 
 const { fake } = sinon;
 const AlexaHandler = require('../../../../services/alexa/lib');
+const {
+  BLIND_MODES,
+  BLIND_MODE_CONTROLLER_INSTANCE,
+  BLIND_RANGE_CONTROLLER_INSTANCE,
+} = require('../../../../services/alexa/lib/alexa.constants');
+const { COVER_STATE } = require('../../../../utils/constants');
 
 const serviceId = 'd1e45425-fe25-4968-ac0f-bc695d5202d9';
 
@@ -238,5 +244,149 @@ describe('alexa.onReportState', () => {
     expect(() => {
       alexaHandler.onReportState(body);
     }).to.throw('Device "device-1" not found');
+  });
+
+  it('Should return current state of shutter mode feature', async () => {
+    const gladys = {
+      stateManager: {
+        get: fake.returns({
+          name: 'Living Room Shutter',
+          selector: 'device-shutter',
+          features: [
+            {
+              read_only: false,
+              category: 'shutter',
+              type: 'state',
+              last_value: COVER_STATE.OPEN,
+            },
+          ],
+        }),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa',
+          name: 'ReportState',
+          payloadVersion: '3',
+          messageId: 'message-id',
+          correlationToken: 'correlation-token',
+        },
+        endpoint: { endpointId: 'device-shutter' },
+        payload: {},
+      },
+    };
+
+    const result = alexaHandler.onReportState(body);
+    expect(result.context.properties[0]).to.deep.equal({
+      namespace: 'Alexa.ModeController',
+      instance: BLIND_MODE_CONTROLLER_INSTANCE,
+      name: 'mode',
+      value: BLIND_MODES.UP,
+      timeOfSample: get(result, 'context.properties.0.timeOfSample'),
+      uncertaintyInMilliseconds: 0,
+    });
+  });
+
+  it('Should return current state of shutter position feature', async () => {
+    const gladys = {
+      stateManager: {
+        get: fake.returns({
+          name: 'Living Room Shutter',
+          selector: 'device-shutter',
+          features: [
+            {
+              read_only: false,
+              category: 'shutter',
+              type: 'position',
+              min: 0,
+              max: 100,
+              last_value: 75,
+            },
+          ],
+        }),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa',
+          name: 'ReportState',
+          payloadVersion: '3',
+          messageId: 'message-id',
+          correlationToken: 'correlation-token',
+        },
+        endpoint: { endpointId: 'device-shutter' },
+        payload: {},
+      },
+    };
+
+    const result = alexaHandler.onReportState(body);
+    expect(result.context.properties[0]).to.deep.equal({
+      namespace: 'Alexa.RangeController',
+      instance: BLIND_RANGE_CONTROLLER_INSTANCE,
+      name: 'rangeValue',
+      value: 75,
+      timeOfSample: get(result, 'context.properties.0.timeOfSample'),
+      uncertaintyInMilliseconds: 0,
+    });
+  });
+
+  it('Should return current state of curtain features', async () => {
+    const gladys = {
+      stateManager: {
+        get: fake.returns({
+          name: 'Living Room Curtain',
+          selector: 'device-curtain',
+          features: [
+            {
+              read_only: false,
+              category: 'curtain',
+              type: 'state',
+              last_value: COVER_STATE.CLOSE,
+            },
+            {
+              read_only: false,
+              category: 'curtain',
+              type: 'position',
+              min: 0,
+              max: 100,
+              last_value: 25,
+            },
+          ],
+        }),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa',
+          name: 'ReportState',
+          payloadVersion: '3',
+          messageId: 'message-id',
+          correlationToken: 'correlation-token',
+        },
+        endpoint: { endpointId: 'device-curtain' },
+        payload: {},
+      },
+    };
+
+    const result = alexaHandler.onReportState(body);
+    expect(result.context.properties).to.deep.equal([
+      {
+        namespace: 'Alexa.RangeController',
+        instance: BLIND_RANGE_CONTROLLER_INSTANCE,
+        name: 'rangeValue',
+        value: 25,
+        timeOfSample: get(result, 'context.properties.0.timeOfSample'),
+        uncertaintyInMilliseconds: 0,
+      },
+    ]);
   });
 });

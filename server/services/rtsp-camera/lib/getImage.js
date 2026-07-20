@@ -3,6 +3,7 @@ const path = require('path');
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const { DEVICE_ROTATION } = require('../../../utils/constants');
+const { formatFfmpegError } = require('../utils/formatFfmpegError');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
@@ -76,9 +77,13 @@ async function getImage(device) {
       },
       async (error, stdout, stderr) => {
         if (error) {
-          logger.warn(error);
+          const message = formatFfmpegError(error, stderr);
+          // Keep full stderr for deep debugging without dumping the Error object
+          if (stderr) {
+            logger.debug(`Camera ${device.selector || device.id} ffmpeg stderr: ${stderr}`);
+          }
           await fse.remove(filePath);
-          return reject(error);
+          return reject(new Error(message));
         }
         logger.debug('Camera image saved to disk. Reading disk.');
         let image;

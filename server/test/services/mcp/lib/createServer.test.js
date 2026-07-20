@@ -70,7 +70,7 @@ describe('Create server', () => {
 
     expect(mcpServerInstance.registerTool.callCount).to.eq(1);
     expect(mcpServerInstance.registerTool.firstCall.args).to.deep.equal([
-      'device_turn-on-off',
+      'device_turn_on_off',
       { description: 'Turn on/off device' },
       tools[0].cb,
     ]);
@@ -142,7 +142,7 @@ describe('Create server', () => {
 
     expect(mcpServerInstance.registerTool.callCount).to.eq(1);
     expect(mcpServerInstance.registerTool.firstCall.args).to.deep.equal([
-      'device_turn-on-off',
+      'device_turn_on_off',
       { description: 'Turn on/off device' },
       tools[0].cb,
     ]);

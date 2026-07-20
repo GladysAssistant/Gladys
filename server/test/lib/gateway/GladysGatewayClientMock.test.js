@@ -21,6 +21,12 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
       });
     },
     loginInstance: fake.resolves({}),
+    configureTwoFactor: fake.resolves({
+      otpauth_url: 'otpauth://totp/Gladys%20Gateway?secret=THISISMYSECRET',
+    }),
+    enableTwoFactor: fake.resolves({
+      two_factor_enabled: true,
+    }),
     createInstance: fake.resolves({
       instance: {
         id: '25239392-debf-40c9-9363-fc8d3b9ebbbe',
@@ -103,7 +109,19 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
       { created_at: '2025-01-03', day_type: 'red' },
     ]),
     ttsGetToken: fake.resolves({ url: 'http://test.com' }),
-    openAIAsk: fake.resolves({ answer: 'this is the answer' }),
+    stt: fake.resolves({ text: 'hello world' }),
+    openAIGetQuota: fake.resolves({
+      text: {
+        remaining: 100,
+        max: 100,
+        reset_in_seconds: 0,
+      },
+      image: {
+        remaining: 100,
+        max: 100,
+        reset_in_seconds: 0,
+      },
+    }),
   };
 };
 

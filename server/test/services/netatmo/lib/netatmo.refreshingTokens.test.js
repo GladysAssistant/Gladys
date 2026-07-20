@@ -44,6 +44,7 @@ describe('Netatmo Refreshing Tokens', () => {
     netatmoHandler.accessToken = 'valid_access_token';
     netatmoHandler.refreshToken = 'valid_refresh_token';
     netatmoHandler.status = 'not_initialized';
+    netatmoHandler.firstFatalAt = null;
   });
 
   afterEach(() => {
@@ -105,7 +106,6 @@ describe('Netatmo Refreshing Tokens', () => {
       expire_in: 3600,
     };
 
-    // Intercept the HTTP/2 call via undici
     netatmoMock
       .intercept({
         method: 'POST',
@@ -146,66 +146,177 @@ describe('Netatmo Refreshing Tokens', () => {
     sinon.assert.calledWith(netatmoHandler.gladys.variable.setValue, 'NETATMO_EXPIRE_IN_TOKEN', 3600, serviceId);
   });
 
-  it('should handle an error during token refresh', async () => {
-    // Intercept the HTTP/2 call via undici
+  it('should NOT send an Authorization header on /oauth2/token', async () => {
+    let receivedHeaders;
     netatmoMock
       .intercept({
         method: 'POST',
         path: '/oauth2/token',
       })
-      .reply(400, { error: 'invalid_request' });
+      .reply(200, (opts) => {
+        receivedHeaders = opts.headers;
+        return { access_token: 'a', refresh_token: 'b', expire_in: 3600 };
+      });
+
+    await netatmoHandler.refreshingTokens();
+    const headerKeys = Object.keys(receivedHeaders || {}).map((k) => k.toLowerCase());
+    expect(headerKeys).to.not.include('authorization');
+  });
+
+  it('should keep tokens and mark RECONNECTING on first fatal HTTP error (400) within grace window', async () => {
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(400, { error: 'invalid_grant' });
 
     try {
       await netatmoHandler.refreshingTokens();
       expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(Error);
-      expect(e.message).to.include('HTTP error 400 - {"error":"invalid_request"}');
-      expect(netatmoHandler.status).to.equal('disconnected');
-      expect(netatmoHandler.gladys.event.emit.callCount).to.equal(3);
-      expect(
-        netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
-          payload: { status: 'processing token' },
-        }),
-      ).to.equal(true);
-      expect(
-        netatmoHandler.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.error-processing-token',
-          payload: { statusType: 'processing token', status: 'refresh_token_fail' },
-        }),
-      ).to.equal(true);
-      expect(
-        netatmoHandler.gladys.event.emit.getCall(2).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
-          payload: { status: 'disconnected' },
-        }),
-      ).to.equal(true);
+      expect(e.transient).to.equal(true);
+      expect(e.status).to.equal(400);
+      expect(netatmoHandler.status).to.equal('reconnecting');
+      expect(netatmoHandler.accessToken).to.equal('valid_access_token');
+      expect(netatmoHandler.refreshToken).to.equal('valid_refresh_token');
+      expect(netatmoHandler.firstFatalAt).to.be.a('number');
+      sinon.assert.neverCalledWith(netatmoHandler.gladys.variable.setValue, 'NETATMO_ACCESS_TOKEN', '', serviceId);
     }
   });
 
-  it('should handle errors without a response object', async () => {
-    netatmoHandler.configuration.clientId = 'test-client-id';
-    netatmoHandler.configuration.clientSecret = 'test-client-secret';
-    netatmoHandler.configuration.scopes = { scopeEnergy: 'scope' };
-    netatmoHandler.refreshToken = 'refresh-token';
+  it('should clear tokens after the fatal grace window has elapsed', async () => {
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(400, { error: 'invalid_grant' });
 
-    // Intercept the HTTP/2 call via undici
+    netatmoHandler.firstFatalAt = Date.now() - 25 * 60 * 60 * 1000;
+
+    try {
+      await netatmoHandler.refreshingTokens();
+      expect.fail('should have thrown an error');
+    } catch (e) {
+      expect(e.transient).to.equal(undefined);
+      expect(e.message).to.include('HTTP error 400');
+      expect(netatmoHandler.status).to.equal('disconnected');
+      expect(netatmoHandler.firstFatalAt).to.equal(null);
+      sinon.assert.calledWith(netatmoHandler.gladys.variable.setValue, 'NETATMO_ACCESS_TOKEN', '', serviceId);
+      sinon.assert.calledWith(netatmoHandler.gladys.variable.setValue, 'NETATMO_REFRESH_TOKEN', '', serviceId);
+    }
+  });
+
+  it('should keep tokens on first fatal HTTP error (401) within grace window', async () => {
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(401, { error: 'invalid_client' });
+
+    try {
+      await netatmoHandler.refreshingTokens();
+      expect.fail('should have thrown an error');
+    } catch (e) {
+      expect(e.transient).to.equal(true);
+      expect(netatmoHandler.status).to.equal('reconnecting');
+      expect(netatmoHandler.accessToken).to.equal('valid_access_token');
+    }
+  });
+
+  it('should reset firstFatalAt on successful refresh', async () => {
+    netatmoHandler.firstFatalAt = Date.now() - 1000;
+    const tokens = {
+      access_token: 'new-access-token',
+      refresh_token: 'new-refresh-token',
+      expire_in: 3600,
+    };
+    netatmoMock.intercept({ method: 'POST', path: '/oauth2/token' }).reply(200, tokens);
+
+    await netatmoHandler.refreshingTokens();
+    expect(netatmoHandler.firstFatalAt).to.equal(null);
+  });
+
+  it('should keep tokens and mark RECONNECTING on transient HTTP error (500)', async () => {
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(500, { error: 'server_error' });
+
+    try {
+      await netatmoHandler.refreshingTokens();
+      expect.fail('should have thrown an error');
+    } catch (e) {
+      expect(e.transient).to.equal(true);
+      expect(e.status).to.equal(500);
+      expect(netatmoHandler.status).to.equal('reconnecting');
+      expect(netatmoHandler.accessToken).to.equal('valid_access_token');
+      expect(netatmoHandler.refreshToken).to.equal('valid_refresh_token');
+      sinon.assert.neverCalledWith(netatmoHandler.gladys.variable.setValue, 'NETATMO_ACCESS_TOKEN', '', serviceId);
+    }
+  });
+
+  it('should keep tokens and mark RECONNECTING on transient HTTP error (429)', async () => {
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(429, { error: 'too_many_requests' });
+
+    try {
+      await netatmoHandler.refreshingTokens();
+      expect.fail('should have thrown an error');
+    } catch (e) {
+      expect(e.transient).to.equal(true);
+      expect(e.status).to.equal(429);
+      expect(netatmoHandler.status).to.equal('reconnecting');
+      expect(netatmoHandler.accessToken).to.equal('valid_access_token');
+      expect(netatmoHandler.refreshToken).to.equal('valid_refresh_token');
+    }
+  });
+
+  it('should keep tokens and mark RECONNECTING on network error', async () => {
     netatmoMock
       .intercept({
         method: 'POST',
         path: '/oauth2/token',
       })
       .replyWithError('Network error');
+
+    try {
+      await netatmoHandler.refreshingTokens();
+      expect.fail('should have thrown an error');
+    } catch (e) {
+      expect(e.transient).to.equal(true);
+      expect(e.message).to.include('Transient network error');
+      expect(netatmoHandler.status).to.equal('reconnecting');
+      expect(netatmoHandler.accessToken).to.equal('valid_access_token');
+      expect(netatmoHandler.refreshToken).to.equal('valid_refresh_token');
+    }
+  });
+
+  it('should clear tokens if response body cannot be parsed as JSON', async () => {
+    netatmoMock
+      .intercept({
+        method: 'POST',
+        path: '/oauth2/token',
+      })
+      .reply(200, 'not-a-json');
+
     try {
       await netatmoHandler.refreshingTokens();
       expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
       expect(e.message).to.include('NETATMO: Service is not connected with error');
-      expect(e.response).to.equal(undefined);
       expect(netatmoHandler.status).to.equal('disconnected');
-      expect(netatmoHandler.gladys.event.emit.callCount).to.equal(3);
+      sinon.assert.calledWith(netatmoHandler.gladys.variable.setValue, 'NETATMO_ACCESS_TOKEN', '', serviceId);
     }
   });
 });

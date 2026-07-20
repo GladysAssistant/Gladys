@@ -3,8 +3,7 @@ import { connect } from 'unistore/preact';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { RequestStatus } from '../../../../../utils/consts';
-import config from '../../../../../config';
-import { MQTT_MODE } from './constants';
+import getZ2mUrl from '../utils/getZ2mUrl';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import SetupTab from './SetupTab';
 
@@ -15,10 +14,13 @@ const VARIABLE_MAP = {
   Z2M_MQTT_MODE: 'mqttMode',
   Z2M_MQTT_URL: 'mqttUrl',
   GLADYS_MQTT_USERNAME: 'mqttUsername',
-  GLADYS_MQTT_PASSWORD: 'mqttPassword'
+  GLADYS_MQTT_PASSWORD: 'mqttPassword',
+  Z2M_FRONTEND_URL: 'z2mFrontendUrl'
 };
 
 class Zigbee2mqttSetupPage extends Component {
+  resolveZ2mUrl = configuration => getZ2mUrl(configuration, this.props.session.gatewayClient !== undefined);
+
   handleZ2MStatus = zigbee2mqttStatus => {
     this.setState({ zigbee2mqttStatus });
   };
@@ -43,13 +45,9 @@ class Zigbee2mqttSetupPage extends Component {
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({
         configuration,
+        z2mUrl: this.resolveZ2mUrl(configuration),
         loadZigbee2mqttConfig: RequestStatus.Success
       });
-      if (this.props.session.gatewayClient === undefined && configuration.mqttMode === MQTT_MODE.LOCAL) {
-        const url = new URL(config.localApiUrl);
-        const z2mUrl = `${url.protocol}//${url.hostname}:${configuration.z2mTcpPort || '8080'}`;
-        this.setState({ z2mUrl });
-      }
     } catch (e) {
       console.error('Failed to load Zigbee2Mqtt service config', e);
       this.setState({ loadZigbee2mqttConfig: RequestStatus.Error });
@@ -68,6 +66,7 @@ class Zigbee2mqttSetupPage extends Component {
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({
         configuration,
+        z2mUrl: this.resolveZ2mUrl(configuration),
         setupZigee2mqttStatus: RequestStatus.Success
       });
     } catch (e) {
@@ -92,10 +91,34 @@ class Zigbee2mqttSetupPage extends Component {
       this.setState({
         toggleZigee2mqttStatus: RequestStatus.Success
       });
+      if (enable) {
+        await this.loadZ2MConfig();
+      }
     } catch (e) {
       console.error(e);
       this.setState({
         toggleZigee2mqttStatus: RequestStatus.Error
+      });
+    }
+  };
+
+  resetZ2M = async () => {
+    this.setState({
+      resetZigbee2mqttStatus: RequestStatus.Getting
+    });
+    try {
+      await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/reset');
+      this.setState({
+        resetZigbee2mqttStatus: RequestStatus.Success,
+        configuration: {},
+        z2mUrl: null
+      });
+      await this.loadZ2MStatus();
+      await this.loadZ2MConfig();
+    } catch (e) {
+      console.error(e);
+      this.setState({
+        resetZigbee2mqttStatus: RequestStatus.Error
       });
     }
   };
@@ -126,7 +149,13 @@ class Zigbee2mqttSetupPage extends Component {
   render(props, state) {
     return (
       <Zigbee2mqttPage user={props.user}>
-        <SetupTab {...props} {...state} saveConfiguration={this.saveConfiguration} toggleZ2M={this.toggleZ2M} />
+        <SetupTab
+          {...props}
+          {...state}
+          saveConfiguration={this.saveConfiguration}
+          toggleZ2M={this.toggleZ2M}
+          resetZ2M={this.resetZ2M}
+        />
       </Zigbee2mqttPage>
     );
   }

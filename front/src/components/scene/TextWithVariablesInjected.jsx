@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import Tagify from '@yaireo/tagify';
 import '@yaireo/tagify/dist/tagify.css';
+import './TextWithVariablesInjected.css';
 import get from 'get-value';
 
 import withIntlAsProp from '../../utils/withIntlAsProp';
