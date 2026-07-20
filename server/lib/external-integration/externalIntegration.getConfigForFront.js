@@ -22,6 +22,10 @@ async function getConfigForFront(selector) {
       if (hasValue) {
         configuredSecrets.push(field.key);
       }
+    } else if (field.type === 'oauth2') {
+      // nothing is ever stored under an oauth2 key (tokens live off-schema):
+      // the front renders a Connect button, fed by connection_status
+      config[field.key] = null;
     } else {
       config[field.key] = hasValue ? fullConfig[field.key] : null;
     }

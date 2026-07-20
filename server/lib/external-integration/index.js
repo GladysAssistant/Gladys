@@ -21,6 +21,7 @@ const { isUpdateAvailable } = require('./externalIntegration.isUpdateAvailable')
 const { update } = require('./externalIntegration.update');
 const { validateToken } = require('./externalIntegration.validateToken');
 const { setDiscoveredDevices } = require('./externalIntegration.setDiscoveredDevices');
+const { upsertDeviceParams } = require('./externalIntegration.upsertDeviceParams');
 const { getDiscoveredDevices } = require('./externalIntegration.getDiscoveredDevices');
 const { saveStates } = require('./externalIntegration.saveStates');
 const { getDevices } = require('./externalIntegration.getDevices');
@@ -35,6 +36,16 @@ const { integrationDisconnected } = require('./externalIntegration.integrationDi
 const { sendCommand } = require('./externalIntegration.sendCommand');
 const { sendMessage } = require('./externalIntegration.sendMessage');
 const { handleCommandResult } = require('./externalIntegration.handleCommandResult');
+const { setConnectionStatus } = require('./externalIntegration.setConnectionStatus');
+const { getConnectionStatus } = require('./externalIntegration.getConnectionStatus');
+const { getOAuthAuthorizeUrl } = require('./externalIntegration.getOAuthAuthorizeUrl');
+const { relayOAuthCallback } = require('./externalIntegration.relayOAuthCallback');
+const { runAction } = require('./externalIntegration.runAction');
+const { getContainerStartedAt } = require('./externalIntegration.getContainerStartedAt');
+const { runNetworkDiscoveryScan } = require('./networkDiscovery/networkDiscovery.runScan');
+const { scanUdpBroadcast } = require('./networkDiscovery/networkDiscovery.scanUdpBroadcast');
+const { scanMdns } = require('./networkDiscovery/networkDiscovery.scanMdns');
+const { scanSsdp } = require('./networkDiscovery/networkDiscovery.scanSsdp');
 const { requestScan } = require('./externalIntegration.requestScan');
 const { checkHealth } = require('./externalIntegration.checkHealth');
 const { scheduleRestart } = require('./externalIntegration.scheduleRestart');
@@ -101,6 +112,12 @@ const ExternalIntegration = function ExternalIntegration(
   this.pendingCommands = new Map();
   // serviceId -> in-memory list of discovered devices published by the integration
   this.discoveredDevices = new Map();
+  // serviceId -> { connected, message } application-level connection status
+  // published by the integration (POST /connection_status), in memory only
+  this.connectionStatuses = new Map();
+  // serviceIds with a mediated network discovery scan in progress
+  // (one scan at a time per integration)
+  this.networkDiscoveryScans = new Set();
   // supervision timers
   this.startupTimers = new Map();
   this.restartTimers = new Map();
@@ -142,6 +159,7 @@ ExternalIntegration.prototype.isUpdateAvailable = isUpdateAvailable;
 ExternalIntegration.prototype.update = update;
 ExternalIntegration.prototype.validateToken = validateToken;
 ExternalIntegration.prototype.setDiscoveredDevices = setDiscoveredDevices;
+ExternalIntegration.prototype.upsertDeviceParams = upsertDeviceParams;
 ExternalIntegration.prototype.getDiscoveredDevices = getDiscoveredDevices;
 ExternalIntegration.prototype.saveStates = saveStates;
 ExternalIntegration.prototype.getDevices = getDevices;
@@ -156,6 +174,16 @@ ExternalIntegration.prototype.integrationDisconnected = integrationDisconnected;
 ExternalIntegration.prototype.sendCommand = sendCommand;
 ExternalIntegration.prototype.sendMessage = sendMessage;
 ExternalIntegration.prototype.handleCommandResult = handleCommandResult;
+ExternalIntegration.prototype.setConnectionStatus = setConnectionStatus;
+ExternalIntegration.prototype.getConnectionStatus = getConnectionStatus;
+ExternalIntegration.prototype.getOAuthAuthorizeUrl = getOAuthAuthorizeUrl;
+ExternalIntegration.prototype.relayOAuthCallback = relayOAuthCallback;
+ExternalIntegration.prototype.runAction = runAction;
+ExternalIntegration.prototype.getContainerStartedAt = getContainerStartedAt;
+ExternalIntegration.prototype.runNetworkDiscoveryScan = runNetworkDiscoveryScan;
+ExternalIntegration.prototype.scanUdpBroadcast = scanUdpBroadcast;
+ExternalIntegration.prototype.scanMdns = scanMdns;
+ExternalIntegration.prototype.scanSsdp = scanSsdp;
 ExternalIntegration.prototype.requestScan = requestScan;
 ExternalIntegration.prototype.checkHealth = checkHealth;
 ExternalIntegration.prototype.scheduleRestart = scheduleRestart;

@@ -39,6 +39,20 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {post} /api/integration/v1/connection_status saveConnectionStatus
+   * @apiName saveConnectionStatus
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Application-level connection status of the integration
+   * ("connected to Netatmo", "token expired"...), kept in memory, shown in
+   * the Configuration screen and pushed to the frontend. Distinct from the
+   * container state machine.
+   */
+  async function saveConnectionStatus(req, res) {
+    gladys.externalIntegration.setConnectionStatus(req.externalIntegrationService, req.body);
+    res.json({ success: true });
+  }
+
+  /**
    * @api {post} /api/integration/v1/discovered_device publishDiscoveredDevices
    * @apiName publishDiscoveredDevices
    * @apiGroup IntegrationHostApi
@@ -47,7 +61,10 @@ module.exports = function IntegrationHostController(gladys) {
    * creation stays a user gesture in the UI.
    */
   async function publishDiscoveredDevices(req, res) {
-    const count = gladys.externalIntegration.setDiscoveredDevices(req.externalIntegrationService, req.body.devices);
+    const count = await gladys.externalIntegration.setDiscoveredDevices(
+      req.externalIntegrationService,
+      req.body.devices,
+    );
     res.json({ success: true, count });
   }
 
@@ -73,6 +90,22 @@ module.exports = function IntegrationHostController(gladys) {
   async function publishStates(req, res) {
     gladys.externalIntegration.saveStates(req.externalIntegrationService, req.body.states);
     res.json({ success: true });
+  }
+
+  /**
+   * @api {post} /api/integration/v1/network_discovery/scan networkDiscoveryScan
+   * @apiName networkDiscoveryScan
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Mediated network discovery: the core captures from its
+   * network=host position (bridge containers never receive LAN
+   * broadcasts/mDNS/SSDP) and returns the RAW results — the integration
+   * interprets them itself. Bounded to the capture requests declared in
+   * the manifest (403 otherwise), 1-30s, one scan at a time per
+   * integration.
+   */
+  async function networkDiscoveryScan(req, res) {
+    const results = await gladys.externalIntegration.runNetworkDiscoveryScan(req.externalIntegrationService, req.body);
+    res.json(results);
   }
 
   /**
@@ -156,6 +189,8 @@ module.exports = function IntegrationHostController(gladys) {
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
     heartbeat: asyncMiddleware(heartbeat),
+    saveConnectionStatus: asyncMiddleware(saveConnectionStatus),
+    networkDiscoveryScan: asyncMiddleware(networkDiscoveryScan),
     publishDiscoveredDevices: asyncMiddleware(publishDiscoveredDevices),
     getDevices: asyncMiddleware(getDevices),
     publishStates: asyncMiddleware(publishStates),

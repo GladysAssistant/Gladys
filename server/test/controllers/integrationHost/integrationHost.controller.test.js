@@ -141,6 +141,60 @@ describe('Integration host API', () => {
     });
   });
 
+  describe('POST /api/integration/v1/connection_status', () => {
+    it('should store the application-level status and expose it in memory', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/connection_status')
+        .send({ connected: false, message: { en: 'Token expired, please reconnect.' } })
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.deep.equal({ success: true });
+        });
+      expect(gladys.externalIntegration.getConnectionStatus(service.id)).to.deep.equal({
+        connected: false,
+        message: { en: 'Token expired, please reconnect.' },
+      });
+      gladys.externalIntegration.connectionStatuses.clear();
+    });
+
+    it('should refuse a malformed status', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/connection_status')
+        .send({ connected: 'yes' })
+        .expect(400);
+    });
+  });
+
+  describe('POST /api/integration/v1/network_discovery/scan', () => {
+    it('should run a declared capture and return the raw results', async () => {
+      const discoveryService = await seedExternalService({
+        name: 'ext-dev-tuya-demo',
+        selector: 'ext-dev-tuya-demo',
+        manifest: { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast', ports: [6666] }] },
+      });
+      const discoveryToken = generateIntegrationToken(discoveryService.id, 1, 'secret');
+      gladys.externalIntegration.scanUdpBroadcast = async () => [
+        { source_ip: '192.168.1.20', source_port: 6666, payload_base64: 'dHV5YQ==' },
+      ];
+      try {
+        const res = await integrationRequest(discoveryToken)
+          .post('/api/integration/v1/network_discovery/scan')
+          .send({ type: 'udp-broadcast', timeout_seconds: 1 })
+          .expect(200);
+        expect(res.body).to.deep.equal([{ source_ip: '192.168.1.20', source_port: 6666, payload_base64: 'dHV5YQ==' }]);
+      } finally {
+        delete gladys.externalIntegration.scanUdpBroadcast;
+      }
+    });
+
+    it('should refuse a capture type not declared in the manifest', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/network_discovery/scan')
+        .send({ type: 'udp-broadcast', timeout_seconds: 1 })
+        .expect(403);
+    });
+  });
+
   describe('POST /api/integration/v1/discovered_device', () => {
     it('should publish the discovered devices', async () => {
       const res = await integrationRequest(token)

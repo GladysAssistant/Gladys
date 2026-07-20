@@ -1,4 +1,9 @@
-const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const db = require('../../models');
+const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
+
+// scheduled polls only make sense against a live integration: outside
+// these statuses they become silent no-ops (see below)
+const POLLABLE_STATUSES = [SERVICE_STATUS.RUNNING, SERVICE_STATUS.DEGRADED];
 
 /**
  * @description Register the proxy service of an external integration in the
@@ -39,6 +44,15 @@ function registerProxyService(service) {
         });
       },
       poll: async (device) => {
+        // a poll scheduled while the integration is voluntarily stopped or
+        // broken is a SILENT no-op: no throw, no log repeated every N
+        // seconds for a state already known and displayed. setValue, on
+        // the other hand, always throws: the user acting on a device must
+        // see the error.
+        const serviceInDb = await db.Service.findOne({ where: { id: service.id }, attributes: ['status'] });
+        if (serviceInDb === null || !POLLABLE_STATUSES.includes(serviceInDb.status)) {
+          return;
+        }
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_POLL, {
           device: {
             external_id: device.external_id,
