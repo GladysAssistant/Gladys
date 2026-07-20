@@ -608,7 +608,28 @@
         "secretConfiguredPlaceholder": "Configured. Leave empty to keep the current value.",
         "saveSuccess": "Configuration saved successfully.",
         "saveError": "There was an error saving the configuration.",
-        "saveButton": "Save configuration"
+        "saveButton": "Save configuration",
+        "oauthConnectButton": "Connect",
+        "oauthConnectError": "There was an error starting the connection. Check that the integration is running."
+      },
+      "actions": {
+        "title": "Actions",
+        "runButton": "Run",
+        "error": "The action failed. Check that the integration is running."
+      },
+      "connection": {
+        "label": "Connection",
+        "connectedBadge": "Connected",
+        "disconnectedBadge": "Disconnected"
+      },
+      "oauthCallback": {
+        "title": "Account connection",
+        "relayingText": "Finalizing the connection with the integration...",
+        "successText": "Account connected successfully.",
+        "errorText": "The integration refused the connection. Please try again.",
+        "missingParamsText": "This page is missing its connection parameters. Restart the connection from the Configuration screen.",
+        "closeText": "You can close this window.",
+        "backToConfigButton": "Back to configuration"
       },
       "supervision": {
         "title": "Supervision",
@@ -629,7 +650,8 @@
         "uninstallButton": "Uninstall",
         "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
         "confirmUninstallButton": "Yes, uninstall",
-        "cancelUninstallButton": "Cancel"
+        "cancelUninstallButton": "Cancel",
+        "startedAtLabel": "Running since"
       },
       "device": {
         "title": "Devices",
@@ -656,7 +678,9 @@
         "alreadyCreatedBadge": "Already added",
         "createError": "There was an error adding this device.",
         "featuresLabel": "Features",
-        "createButton": "Add to Gladys"
+        "createButton": "Add to Gladys",
+        "updateButton": "Update",
+        "updateTitle": "The integration re-published this device with a different structure: apply the new definition"
       },
       "install": {
         "backToCatalog": "Back to integrations",
@@ -670,7 +694,17 @@
         "alreadyInstalled": "This integration is already installed.",
         "goToIntegrationButton": "Go to the integration",
         "installing": "Installing...",
-        "installButton": "Install"
+        "installButton": "Install",
+        "networkDiscoveryTitle": "Network discovery requests",
+        "networkDiscoveryText": "This integration asks Gladys to capture the following network announcements on its behalf. It will never be able to capture anything else.",
+        "documentationLink": "Documentation",
+        "duplicateWarningTitle": "Another instance is already installed",
+        "duplicateWarningText": "\"{name}\" looks like another instance of this integration. Two instances may fight over the same cloud account or the same devices — consider stopping the existing one during your tests. Installing anyway is supported (e.g. a dev build next to the production one)."
+      },
+      "networkDiscovery": {
+        "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
+        "mdnsText": "Browse mDNS services of type {service}",
+        "ssdpText": "SSDP search for {st}"
       },
       "installFromGithub": {
         "cardTitle": "Install from GitHub",

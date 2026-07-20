@@ -204,7 +204,7 @@ describe('externalIntegration.validateManifest', () => {
         ...TEST_MANIFEST,
         config_schema: [{ key: 'k', type: 'string', label: { en: 'Label' }, options: [] }],
       },
-      'config_schema[0].options: only allowed on select fields',
+      'config_schema[0].options: only allowed on select and multi_select fields',
     );
     expect422(
       {
@@ -281,6 +281,225 @@ describe('externalIntegration.validateManifest', () => {
     expect422(
       { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'secret', label: { en: 'L' }, default: 's3cr3t' }] },
       'config_schema[0].default: not allowed for secret fields',
+    );
+    // the value of an oauth2 field is the Connect flow, tokens live off-schema
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'oauth2', label: { en: 'L' }, default: 'x' }] },
+      'config_schema[0].default: not allowed for oauth2 fields',
+    );
+  });
+
+  it('should accept an oauth2 config field without placeholder', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      config_schema: [{ key: 'netatmo_account', type: 'oauth2', label: { en: 'Netatmo account' } }],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'oauth2', label: { en: 'L' }, placeholder: { en: 'x' } }],
+      },
+      'config_schema[0].placeholder: only allowed on',
+    );
+  });
+
+  it('should accept a valid network_discovery capture list', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      network_discovery: [
+        { type: 'udp-broadcast', ports: [6666, 6667, 7000] },
+        { type: 'mdns', service: '_hue._tcp' },
+        { type: 'ssdp', st: 'urn:dial-multiscreen-org:service:dial:1' },
+      ],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+  });
+
+  it('should reject a malformed network_discovery list', () => {
+    expect422({ ...TEST_MANIFEST, network_discovery: 'all' }, 'network_discovery: must be a list');
+    expect422({ ...TEST_MANIFEST, network_discovery: [] }, 'network_discovery: must be a list');
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: Array(6).fill({ type: 'mdns', service: '_hue._tcp' }) },
+      'network_discovery: must be a list of 1-5 capture requests',
+    );
+    expect422({ ...TEST_MANIFEST, network_discovery: ['udp'] }, 'network_discovery[0]: must be an object');
+    expect422({ ...TEST_MANIFEST, network_discovery: [{ type: 'pcap' }] }, 'network_discovery[0].type: must be one of');
+  });
+
+  it('should reject invalid udp-broadcast capture requests', () => {
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast' }] },
+      'network_discovery[0].ports: must be a list of 1-5 ports',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast', ports: [1, 2, 3, 4, 5, 6] }] },
+      'network_discovery[0].ports: must be a list of 1-5 ports',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast', ports: [0] }] },
+      'network_discovery[0].ports[0]: must be an integer between 1 and 65535',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast', ports: [6666, 6666] }] },
+      'network_discovery[0].ports[1]: duplicate port 6666',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-broadcast', ports: [6666], service: '_hue._tcp' }] },
+      'network_discovery[0].service: unknown field for type udp-broadcast',
+    );
+  });
+
+  it('should reject invalid mdns and ssdp capture requests', () => {
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'mdns', service: 'not a service' }] },
+      'network_discovery[0].service: must be a DNS-SD service type',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'mdns' }] },
+      'network_discovery[0].service: must be a DNS-SD service type',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'ssdp', st: '' }] },
+      'network_discovery[0].st: must be a string of 1-200 characters',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'ssdp', st: 's'.repeat(201) }] },
+      'network_discovery[0].st: must be a string of 1-200 characters',
+    );
+  });
+
+  it('should accept multi_select fields and radio selects', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      config_schema: [
+        {
+          key: 'rooms',
+          type: 'multi_select',
+          label: { en: 'Rooms' },
+          default: ['living', 'kitchen'],
+          options: [
+            { value: 'living', label: { en: 'Living room' } },
+            { value: 'kitchen', label: { en: 'Kitchen' } },
+          ],
+        },
+        {
+          key: 'mode',
+          type: 'select',
+          label: { en: 'Mode' },
+          display: 'radio',
+          options: [
+            { value: 'auto', label: { en: 'Auto' } },
+            { value: 'manual', label: { en: 'Manual' } },
+          ],
+        },
+      ],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+  });
+
+  it('should reject invalid multi_select and display usages', () => {
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'multi_select', label: { en: 'L' } }] },
+      'config_schema[0].options: multi_select fields must have a non-empty options list',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [
+          {
+            key: 'k',
+            type: 'multi_select',
+            label: { en: 'L' },
+            default: ['nope'],
+            options: [{ value: 'a', label: { en: 'A' } }],
+          },
+        ],
+      },
+      'config_schema[0].default: must be an array of the multi_select option values',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'string', label: { en: 'L' }, display: 'radio' }] },
+      'config_schema[0].display: only allowed on select fields',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [
+          {
+            key: 'k',
+            type: 'select',
+            label: { en: 'L' },
+            display: 'carousel',
+            options: [{ value: 'a', label: { en: 'A' } }],
+          },
+        ],
+      },
+      'config_schema[0].display: must be one of dropdown, radio',
+    );
+  });
+
+  it('should accept a valid actions list', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      actions: [
+        {
+          key: 'detect_protocol',
+          label: { en: 'Detect protocol version', fr: 'Détecter la version de protocole' },
+          description: { en: 'Tries each protocol version against the device.' },
+          timeout_seconds: 30,
+          fields: [{ key: 'ip', type: 'string', label: { en: 'Device IP' }, required: true }],
+        },
+        { key: 'test_connection', label: { en: 'Test connection' } },
+      ],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+  });
+
+  it('should reject a malformed actions list', () => {
+    expect422({ ...TEST_MANIFEST, actions: 'all' }, 'actions: must be a list of 1-10 actions');
+    expect422({ ...TEST_MANIFEST, actions: [] }, 'actions: must be a list of 1-10 actions');
+    expect422(
+      { ...TEST_MANIFEST, actions: Array(11).fill({ key: 'a', label: { en: 'A' } }) },
+      'actions: must be a list of 1-10 actions',
+    );
+    expect422({ ...TEST_MANIFEST, actions: ['run'] }, 'actions[0]: must be an object');
+    expect422({ ...TEST_MANIFEST, actions: [{ key: 'Bad Key', label: { en: 'A' } }] }, 'actions[0].key');
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        actions: [
+          { key: 'a', label: { en: 'A' } },
+          { key: 'a', label: { en: 'A again' } },
+        ],
+      },
+      'actions[1].key: duplicate key "a"',
+    );
+    expect422({ ...TEST_MANIFEST, actions: [{ key: 'a', label: { fr: 'Sans anglais' } }] }, 'actions[0].label.en');
+    expect422(
+      { ...TEST_MANIFEST, actions: [{ key: 'a', label: { en: 'A' }, unknown_field: true }] },
+      'actions[0].unknown_field: unknown field',
+    );
+    expect422(
+      { ...TEST_MANIFEST, actions: [{ key: 'a', label: { en: 'A' }, timeout_seconds: 4 }] },
+      'actions[0].timeout_seconds: must be an integer between 5 and 120',
+    );
+    expect422(
+      { ...TEST_MANIFEST, actions: [{ key: 'a', label: { en: 'A' }, timeout_seconds: 121 }] },
+      'actions[0].timeout_seconds: must be an integer between 5 and 120',
+    );
+    expect422(
+      { ...TEST_MANIFEST, actions: [{ key: 'a', label: { en: 'A' }, fields: 'ip' }] },
+      'actions[0].fields: must be an array',
+    );
+    // the mini form reuses the config_schema engine, errors included
+    expect422(
+      { ...TEST_MANIFEST, actions: [{ key: 'a', label: { en: 'A' }, fields: [{ key: 'ip', type: 'unknown-type' }] }] },
+      'actions[0].fields[0].type',
     );
   });
 

@@ -50,8 +50,12 @@ class ExternalIntegrationDiscoverPage extends Component {
 
   createDevice = async index => {
     const discoveredDevice = this.state.discoveredDevices[index];
+    // the same standard POST creates the device or, when it already exists
+    // (same external_id), applies the re-published definition (the
+    // "Update" gesture of the Discovery screen)
     const device = { ...discoveredDevice };
     delete device.created;
+    delete device.structure_changed;
     await this.props.httpClient.post('/api/v1/device', device);
     await this.getDiscoveredDevices();
   };

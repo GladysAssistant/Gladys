@@ -14,14 +14,16 @@ const { MAX_DISCOVERED_DEVICES } = require('./constants');
  * integration (replaces the previous one). The list is kept in memory only
  * (like internal service handlers do), lost on restart and republished by the
  * integration on connection. The integration never creates devices itself:
- * the user creates them from the Discovery screen.
+ * the user creates them from the Discovery screen — but the params of the
+ * devices ALREADY created are silently upserted on re-publish (they are the
+ * technical data of the integration, see upsertDeviceParams).
  * @param {object} service - The external integration service.
  * @param {Array} devices - The complete list of discovered devices.
- * @returns {number} The number of discovered devices.
+ * @returns {Promise<number>} Resolve with the number of discovered devices.
  * @example
- * gladys.externalIntegration.setDiscoveredDevices(service, devices);
+ * await gladys.externalIntegration.setDiscoveredDevices(service, devices);
  */
-function setDiscoveredDevices(service, devices) {
+async function setDiscoveredDevices(service, devices) {
   if (!Array.isArray(devices)) {
     throw new BadParameters('devices: must be an array');
   }
@@ -74,6 +76,14 @@ function setDiscoveredDevices(service, devices) {
     };
   });
   this.discoveredDevices.set(service.id, normalizedDevices);
+  await Promise.all(
+    normalizedDevices.map(async (device) => {
+      const createdDevice = this.stateManager.get('deviceByExternalId', device.external_id);
+      if (createdDevice && createdDevice.service_id === service.id) {
+        await this.upsertDeviceParams(createdDevice, device.params);
+      }
+    }),
+  );
   this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DISCOVERED_DEVICES_UPDATED,
     payload: { selector: service.selector },

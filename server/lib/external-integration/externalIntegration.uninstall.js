@@ -40,6 +40,7 @@ async function uninstall(selector) {
   this.stateManager.deleteState('service', service.name);
   this.stateManager.deleteState('serviceById', service.id);
   this.discoveredDevices.delete(service.id);
+  this.connectionStatuses.delete(service.id);
   this.startedAt.delete(service.id);
   this.stateRateLimits.delete(service.id);
 }

@@ -8,16 +8,19 @@ const { COMMAND_TIMEOUT_MS } = require('./constants');
 /**
  * @description Send a command to an integration over WebSocket and wait for
  * its ack (command-result). Every command carries a message_id; no ack
- * within 5s means the command fails. A disconnected integration throws
- * immediately.
+ * within 5s (or the per-command timeout: manifest actions declare their
+ * own, see runAction) means the command fails. A disconnected integration
+ * throws immediately.
  * @param {object} service - The external integration service.
  * @param {string} type - The websocket message type of the command.
  * @param {object} payload - The payload of the command.
+ * @param {object} [options] - Command options.
+ * @param {number} [options.timeoutMs] - Ack timeout override.
  * @returns {Promise<object>} Resolve with the command result payload.
  * @example
  * await gladys.externalIntegration.sendCommand(service, 'external-integration.device.set-value', { value: 1 });
  */
-async function sendCommand(service, type, payload) {
+async function sendCommand(service, type, payload, { timeoutMs = COMMAND_TIMEOUT_MS } = {}) {
   const ws = this.connections.get(service.id);
   if (!ws || ws.readyState !== WebSocket.OPEN) {
     throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_NOT_CONNECTED');
@@ -27,7 +30,7 @@ async function sendCommand(service, type, payload) {
     const timer = setTimeout(() => {
       this.pendingCommands.delete(messageId);
       reject(new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_COMMAND_TIMEOUT'));
-    }, COMMAND_TIMEOUT_MS);
+    }, timeoutMs);
     if (timer.unref) {
       timer.unref();
     }

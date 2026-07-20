@@ -608,7 +608,28 @@
         "secretConfiguredPlaceholder": "Konfiguriert. Leer lassen, um den aktuellen Wert zu behalten.",
         "saveSuccess": "Konfiguration erfolgreich gespeichert.",
         "saveError": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
-        "saveButton": "Konfiguration speichern"
+        "saveButton": "Konfiguration speichern",
+        "oauthConnectButton": "Verbinden",
+        "oauthConnectError": "Fehler beim Starten der Verbindung. Prüfen Sie, ob die Integration läuft."
+      },
+      "actions": {
+        "title": "Aktionen",
+        "runButton": "Ausführen",
+        "error": "Die Aktion ist fehlgeschlagen. Prüfen Sie, ob die Integration läuft."
+      },
+      "connection": {
+        "label": "Verbindung",
+        "connectedBadge": "Verbunden",
+        "disconnectedBadge": "Getrennt"
+      },
+      "oauthCallback": {
+        "title": "Kontoverbindung",
+        "relayingText": "Verbindung mit der Integration wird abgeschlossen...",
+        "successText": "Konto erfolgreich verbunden.",
+        "errorText": "Die Integration hat die Verbindung abgelehnt. Bitte erneut versuchen.",
+        "missingParamsText": "Dieser Seite fehlen die Verbindungsparameter. Starten Sie die Verbindung erneut über den Konfigurationsbildschirm.",
+        "closeText": "Sie können dieses Fenster schließen.",
+        "backToConfigButton": "Zurück zur Konfiguration"
       },
       "supervision": {
         "title": "Überwachung",
@@ -629,7 +650,8 @@
         "uninstallButton": "Deinstallieren",
         "uninstallWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt. Von dieser Integration erstellte Geräte bleiben in Gladys, bis du sie löschst.",
         "confirmUninstallButton": "Ja, deinstallieren",
-        "cancelUninstallButton": "Abbrechen"
+        "cancelUninstallButton": "Abbrechen",
+        "startedAtLabel": "In Betrieb seit"
       },
       "device": {
         "title": "Geräte",
@@ -656,7 +678,9 @@
         "alreadyCreatedBadge": "Bereits hinzugefügt",
         "createError": "Beim Hinzufügen dieses Geräts ist ein Fehler aufgetreten.",
         "featuresLabel": "Funktionen",
-        "createButton": "Zu Gladys hinzufügen"
+        "createButton": "Zu Gladys hinzufügen",
+        "updateButton": "Aktualisieren",
+        "updateTitle": "Die Integration hat dieses Gerät mit einer anderen Struktur erneut veröffentlicht: neue Definition anwenden"
       },
       "install": {
         "backToCatalog": "Zurück zu den Integrationen",
@@ -670,7 +694,17 @@
         "alreadyInstalled": "Diese Integration ist bereits installiert.",
         "goToIntegrationButton": "Zur Integration",
         "installing": "Wird installiert...",
-        "installButton": "Installieren"
+        "installButton": "Installieren",
+        "networkDiscoveryTitle": "Anfragen zur Netzwerkerkennung",
+        "networkDiscoveryText": "Diese Integration bittet Gladys, die folgenden Netzwerkankündigungen für sie zu erfassen. Sie kann niemals etwas anderes erfassen.",
+        "documentationLink": "Dokumentation",
+        "duplicateWarningTitle": "Eine andere Instanz ist bereits installiert",
+        "duplicateWarningText": "„{name}“ scheint eine weitere Instanz dieser Integration zu sein. Zwei Instanzen können sich um dasselbe Cloud-Konto oder dieselben Geräte streiten — stoppen Sie die bestehende Instanz während Ihrer Tests. Die Installation ist dennoch möglich (z. B. eine Dev-Version neben der Produktion)."
+      },
+      "networkDiscovery": {
+        "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
+        "mdnsText": "mDNS-Dienste vom Typ {service} suchen",
+        "ssdpText": "SSDP-Suche nach {st}"
       },
       "installFromGithub": {
         "cardTitle": "Von GitHub installieren",

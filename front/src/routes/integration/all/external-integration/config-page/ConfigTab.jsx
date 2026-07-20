@@ -3,12 +3,14 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import ConfigSchemaForm from './ConfigSchemaForm';
+import ActionsCard from './ActionsCard';
 import SupervisionCard from './SupervisionCard';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const ConfigTab = props => {
   const { integration, loadStatus, user } = props;
   const schema = get(integration, 'manifest.config_schema') || [];
+  const actions = get(integration, 'manifest.actions') || [];
   const language = (user && user.language) || 'en';
 
   return (
@@ -47,6 +49,9 @@ const ConfigTab = props => {
                   saveConfigStatus={props.saveConfigStatus}
                   updateConfigValue={props.updateConfigValue}
                   saveConfig={props.saveConfig}
+                  connectionStatus={get(integration, 'connection_status')}
+                  oauthStatus={props.oauthStatus}
+                  connectOAuth={props.connectOAuth}
                 />
               )}
             </div>
@@ -54,9 +59,21 @@ const ConfigTab = props => {
         </div>
       </div>
 
+      {integration && actions.length > 0 && (
+        <ActionsCard
+          actions={actions}
+          language={language}
+          actionStates={props.actionStates || {}}
+          actionFieldValues={props.actionFieldValues || {}}
+          updateActionFieldValue={props.updateActionFieldValue}
+          runAction={props.runAction}
+        />
+      )}
+
       {integration && (
         <SupervisionCard
           integration={integration}
+          language={language}
           actionStatus={props.actionStatus}
           actionError={props.actionError}
           uninstallStatus={props.uninstallStatus}

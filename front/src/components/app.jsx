@@ -198,6 +198,7 @@ import ExternalIntegrationDiscoverPage from '../routes/integration/all/external-
 import ExternalIntegrationConfigPage from '../routes/integration/all/external-integration/config-page';
 import ExternalIntegrationLogsPage from '../routes/integration/all/external-integration/logs-page';
 import ExternalIntegrationInstallPage from '../routes/integration/all/external-integration/install-page';
+import ExternalIntegrationOAuthCallbackPage from '../routes/integration/all/external-integration/oauth-callback-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -384,6 +385,7 @@ const AppRouter = connect(
         <ExternalIntegrationConfigPage path="/dashboard/integration/device/external/:selector/config" />
         <ExternalIntegrationLogsPage path="/dashboard/integration/device/external/:selector/logs" />
         <ExternalIntegrationInstallPage path="/dashboard/integration/device/external-install/:owner/:repo" />
+        <ExternalIntegrationOAuthCallbackPage path="/dashboard/integration/device/external/:selector/oauth-callback" />
 
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
