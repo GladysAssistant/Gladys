@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { assert: sinonAssert, fake } = require('sinon');
 
 const { NotFoundError } = require('../../../utils/coreErrors');
-const { buildSupervisor, seedExternalService } = require('./testUtils.test');
+const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.getLogs', () => {
   it('should return the container logs', async () => {
@@ -34,6 +34,38 @@ describe('externalIntegration.getLogs', () => {
       throw new Error('should have thrown');
     } catch (e) {
       expect(e).to.be.instanceOf(NotFoundError);
+    }
+  });
+
+  it('should read the logs of a declared sub-container', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getContainers: fake.resolves([{ id: 'mqtt-1' }]),
+        getContainerLogs: fake.resolves(Buffer.from('mqtt logs')),
+      },
+    });
+    const logs = await externalIntegration.getLogs(service.selector, 50, 'mqtt');
+    expect(logs).to.equal('mqtt logs');
+    expect(system.getContainerLogs.firstCall.args[0]).to.equal('mqtt-1');
+  });
+
+  it('should throw on an undeclared or never-created sub-container', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    try {
+      await externalIntegration.getLogs(service.selector, 50, 'unknown');
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(NotFoundError);
+      expect(e.message).to.equal('SUB_CONTAINER_NOT_FOUND');
+    }
+    try {
+      await externalIntegration.getLogs(service.selector, 50, 'mqtt');
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(NotFoundError);
+      expect(e.message).to.equal('EXTERNAL_INTEGRATION_HAS_NO_CONTAINER');
     }
   });
 });

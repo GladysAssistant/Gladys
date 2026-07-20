@@ -6,7 +6,7 @@ const db = require('../../../models');
 const { BadParameters, ConflictError, PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { Error422 } = require('../../../utils/httpErrors');
 const { SERVICE_TYPES } = require('../../../utils/constants');
-const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('./testUtils.test');
+const { buildSupervisor, seedExternalService, TEST_MANIFEST, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.install', () => {
   it('should install an integration in dev mode with an inline manifest', async () => {
@@ -194,5 +194,48 @@ describe('externalIntegration.install', () => {
     expect(integration).to.have.property('status', 'ERROR');
     const serviceInDb = await db.Service.findOne({ where: { selector: integration.selector } });
     expect(serviceInDb.status).to.equal('ERROR');
+  });
+
+  it('should pull every sub-container image and persist the granted classes', async () => {
+    const { externalIntegration, system } = buildSupervisor();
+    const integration = await externalIntegration.install({
+      manifest: TEST_CONTAINERS_MANIFEST,
+      grantedDevices: ['coral-usb'],
+    });
+    sinonAssert.calledWith(system.pull, 'eclipse-mosquitto:2.0.18');
+    sinonAssert.calledWith(system.pull, 'ghcr.io/blakeblackshear/frigate:0.14.1');
+    const serviceInDb = await db.Service.findOne({ where: { selector: integration.selector } });
+    expect(serviceInDb.granted_devices).to.deep.equal(['coral-usb']);
+  });
+
+  it('should reject granted classes that are invalid or not requested by the manifest', async () => {
+    const { externalIntegration } = buildSupervisor();
+    try {
+      await externalIntegration.install({ manifest: TEST_CONTAINERS_MANIFEST, grantedDevices: 'coral-usb' });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+    }
+    try {
+      await externalIntegration.install({ manifest: TEST_CONTAINERS_MANIFEST, grantedDevices: ['video'] });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.include('not requested');
+    }
+  });
+
+  it('should translate a failing sub-container image pull', async () => {
+    const pull = sinon.stub();
+    pull.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('NO_MATCHING_MANIFEST'));
+    pull.resolves(true);
+    const { externalIntegration } = buildSupervisor({ system: { pull } });
+    try {
+      await externalIntegration.install({ manifest: TEST_CONTAINERS_MANIFEST });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
+    }
   });
 });

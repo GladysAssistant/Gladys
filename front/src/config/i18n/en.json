@@ -648,6 +648,10 @@
         "forceUpdateTitle": "Re-pulls the Docker image and recreates the container, even without a new version",
         "logsButton": "Logs",
         "uninstallButton": "Uninstall",
+        "containersTitle": "Additional containers",
+        "containerRunning": "Running",
+        "containerStopped": "Stopped",
+        "openButton": "Open",
         "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
         "confirmUninstallButton": "Yes, uninstall",
         "cancelUninstallButton": "Cancel",
@@ -728,7 +732,32 @@
         "title": "Logs",
         "refreshButton": "Refresh",
         "error": "An error occurred while loading the logs.",
-        "empty": "No logs available."
+        "empty": "No logs available.",
+        "containerSelectLabel": "Container",
+        "mainContainerOption": "Main container"
+      },
+      "subContainers": {
+        "title": "Additional containers",
+        "description": "This integration runs the following containers on your machine. The listed ports will be reachable from your local network.",
+        "nameLabel": "Name",
+        "imageLabel": "Image",
+        "limitsLabel": "Limits",
+        "portsLabel": "Exposed ports"
+      },
+      "hardware": {
+        "title": "Hardware",
+        "installDescription": "This integration requests access to hardware on your machine. You can grant or refuse each access, and change it at any time after the install.",
+        "configDescription": "Hardware access granted to this integration. Changing an access recreates the affected containers and notifies the integration.",
+        "detected": "Detected",
+        "notDetected": "Not detected",
+        "saveButton": "Save hardware",
+        "saveError": "An error occurred while saving the hardware access.",
+        "classes": {
+          "coral-usb": "Coral USB (whole USB bus)",
+          "coral-pcie": "Coral PCIe",
+          "gpu": "GPU (graphics acceleration)",
+          "video": "Cameras (video devices)"
+        }
       }
     },
     "telegram": {

@@ -52,6 +52,9 @@ async function checkHealth() {
       await this.scheduleRestart(service);
       return;
     }
+    // sub-containers "supposed to run" that exited are restarted with the
+    // same backoff and the same failure_count as the main container
+    await this.checkSubContainersHealth(service);
     // container alive but silent integration: DEGRADED
     if (service.status === SERVICE_STATUS.RUNNING && !this.connections.has(service.id)) {
       const lastHeartbeat = service.last_heartbeat ? new Date(service.last_heartbeat).getTime() : 0;

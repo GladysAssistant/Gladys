@@ -14,6 +14,13 @@ function clearTimers(serviceId) {
     clearTimeout(this.restartTimers.get(serviceId));
     this.restartTimers.delete(serviceId);
   }
+  // sub-container restart timers are keyed `<serviceId>:<name>`
+  this.restartTimers.forEach((timer, key) => {
+    if (typeof key === 'string' && key.startsWith(`${serviceId}:`)) {
+      clearTimeout(timer);
+      this.restartTimers.delete(key);
+    }
+  });
   if (this.stableRunningTimers.has(serviceId)) {
     clearTimeout(this.stableRunningTimers.get(serviceId));
     this.stableRunningTimers.delete(serviceId);

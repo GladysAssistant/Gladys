@@ -1,3 +1,5 @@
+const Promise = require('bluebird');
+
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { BadParameters, PlatformNotCompatible } = require('../../utils/coreErrors');
@@ -43,12 +45,30 @@ async function update(selector) {
     logger.warn(`Unable to pull image ${image}`, e);
     throw new BadParameters(`UNABLE_TO_PULL_IMAGE: image may not exist or may not be available for your architecture`);
   }
+  await Promise.each((manifest && manifest.containers) || [], async (entry) => {
+    try {
+      await this.system.pull(entry.docker_image);
+    } catch (e) {
+      logger.warn(`Unable to pull image ${entry.docker_image}`, e);
+      throw new BadParameters(
+        `UNABLE_TO_PULL_IMAGE: image may not exist or may not be available for your architecture`,
+      );
+    }
+  });
   if (service.container_id) {
     try {
       await this.system.stopContainer(service.container_id);
     } catch (e) {
       logger.debug(e);
     }
+  }
+  // update = recreation of the whole group according to the new manifest:
+  // the sub-containers of the OLD manifest are removed (the private network
+  // and the /data volumes stay), the new ones are recreated at start
+  try {
+    await this.removeSubContainers(service, { removeNetwork: false });
+  } catch (e) {
+    logger.warn(`Unable to remove sub-containers of integration ${selector} before update`, e);
   }
   await db.Service.update({ version: manifest.version, manifest, docker_image: image }, { where: { id: service.id } });
   service = await this.getBySelector(selector);

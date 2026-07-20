@@ -5,6 +5,8 @@ import get from 'get-value';
 import ConfigSchemaForm from './ConfigSchemaForm';
 import ActionsCard from './ActionsCard';
 import SupervisionCard from './SupervisionCard';
+import HardwareCard from './HardwareCard';
+import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const ConfigTab = props => {
@@ -12,6 +14,7 @@ const ConfigTab = props => {
   const schema = get(integration, 'manifest.config_schema') || [];
   const actions = get(integration, 'manifest.actions') || [];
   const language = (user && user.language) || 'en';
+  const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
 
   return (
     <div>
@@ -82,6 +85,17 @@ const ConfigTab = props => {
           onAskUninstall={props.askUninstall}
           onCancelUninstall={props.cancelUninstall}
           onUninstall={props.uninstall}
+        />
+      )}
+
+      {integration && requestedClasses.length > 0 && (
+        <HardwareCard
+          requestedClasses={requestedClasses}
+          detectedClasses={props.detectedClasses || {}}
+          grantedDevices={props.grantedDevices || []}
+          hardwareStatus={props.hardwareStatus}
+          onToggle={props.toggleHardwareClass}
+          onSave={props.saveHardware}
         />
       )}
     </div>

@@ -59,6 +59,42 @@ const TEST_MANIFEST = {
   ],
 };
 
+// Frigate-like fixture: one manual sub-container (Mosquitto pattern: the
+// password file is generated in /data before the first start) and one auto
+// sub-container with volumes, a published port and hardware classes.
+const TEST_CONTAINERS_MANIFEST = {
+  ...TEST_MANIFEST,
+  containers: [
+    {
+      name: 'mqtt',
+      docker_image: 'eclipse-mosquitto:2.0.18',
+      start: 'manual',
+      volumes: ['/mosquitto/config', '/mosquitto/data'],
+      memory_mb: 128,
+    },
+    {
+      name: 'frigate',
+      docker_image: 'ghcr.io/blakeblackshear/frigate:0.14.1',
+      volumes: ['/config'],
+      read_only: false,
+      memory_mb: 1024,
+      shm_mb: 128,
+      cpu: 1,
+      env: { LIBVA_DRIVER_NAME: 'i965' },
+      command: ['python3', '-u', '-m', 'frigate'],
+      ports: [{ container_port: 5000, label: { en: 'Frigate UI', fr: 'Interface Frigate' } }],
+      devices: ['coral-usb', 'gpu'],
+    },
+  ],
+};
+
+const TEST_DETECTED_CLASSES = [
+  { class: 'coral-usb', detected: true, paths: ['/dev/bus/usb'] },
+  { class: 'coral-pcie', detected: false, paths: [] },
+  { class: 'gpu', detected: true, paths: ['/dev/dri'] },
+  { class: 'video', detected: false, paths: [] },
+];
+
 /**
  * @description Build a fake system manager for supervisor tests.
  * @param {object} [overrides] - Fakes to override.
@@ -79,6 +115,8 @@ function buildFakeSystem(overrides = {}) {
     getContainers: fake.resolves([]),
     getContainerLogs: fake.resolves(Buffer.from('log line')),
     createNetwork: fake.resolves(true),
+    removeNetwork: fake.resolves(true),
+    getNetworks: fake.resolves([]),
     connectToNetwork: fake.resolves(true),
     inspectNetwork: fake.resolves({ IPAM: { Config: [{ Gateway: '172.30.0.1' }] } }),
     getNetworkMode: fake.resolves('host'),
@@ -88,6 +126,7 @@ function buildFakeSystem(overrides = {}) {
     }),
     getGladysContainerId: fake.resolves('gladys-container-id'),
     getImageLabels: fake.resolves({}),
+    detectHardwareClasses: fake.resolves(TEST_DETECTED_CLASSES),
     ...overrides,
   };
 }
@@ -147,6 +186,8 @@ async function seedExternalService(overrides = {}) {
 module.exports = {
   TEST_JWT_SECRET,
   TEST_MANIFEST,
+  TEST_CONTAINERS_MANIFEST,
+  TEST_DETECTED_CLASSES,
   buildFakeSystem,
   buildSupervisor,
   seedExternalService,

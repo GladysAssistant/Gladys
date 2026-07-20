@@ -3,6 +3,18 @@ const semver = require('semver');
 const { Error422 } = require('../../utils/httpErrors');
 const {
   SUPPORTED_MANIFEST_VERSION,
+  MAX_SUB_CONTAINERS,
+  MAX_SUB_CONTAINER_VOLUMES,
+  MAX_SUB_CONTAINER_PORTS,
+  SUB_CONTAINER_NAME_REGEX,
+  SUB_CONTAINER_MEMORY_MIN_MB,
+  SUB_CONTAINER_MEMORY_MAX_MB,
+  SUB_CONTAINER_CPU_MIN,
+  SUB_CONTAINER_CPU_MAX,
+  SUB_CONTAINER_SHM_MIN_MB,
+  SUB_CONTAINER_SHM_MAX_MB,
+  SUB_CONTAINER_START_MODES,
+  HARDWARE_CLASSES,
   NETWORK_DISCOVERY_TYPES,
   MAX_NETWORK_DISCOVERY_ENTRIES,
   MAX_UDP_BROADCAST_PORTS,
@@ -25,9 +37,26 @@ const MANIFEST_FIELDS = [
   'gladys_version',
   'cover_image',
   'config_schema',
+  'containers',
   'network_discovery',
   'actions',
 ];
+const SUB_CONTAINER_FIELDS = [
+  'name',
+  'docker_image',
+  'start',
+  'env',
+  'volumes',
+  'ports',
+  'devices',
+  'read_only',
+  'memory_mb',
+  'cpu',
+  'shm_mb',
+  'command',
+];
+const PORT_FIELDS = ['container_port', 'protocol', 'label'];
+const PORT_PROTOCOLS = ['tcp', 'udp'];
 const ACTION_FIELDS = ['key', 'label', 'description', 'timeout_seconds', 'fields'];
 // per capture type: the required specific field + its rules. The entries
 // are an authorization contract (same philosophy as hardware requests):
@@ -375,6 +404,157 @@ function validateNetworkDiscoveryEntry(entry, index, errors) {
 }
 
 /**
+ * @description Validate one `ports` entry of a sub-container declaration.
+ * The host port is never declared: it is chosen by Gladys (free, persisted).
+ * @param {object} port - The port entry.
+ * @param {string} path - The path of the entry, for error messages.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateSubContainerPort({ container_port: 5000, label: { en: 'UI' } }, 'containers[0].ports[0]', errors);
+ */
+function validateSubContainerPort(port, path, errors) {
+  if (port === null || typeof port !== 'object' || Array.isArray(port)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  Object.keys(port).forEach((key) => {
+    if (!PORT_FIELDS.includes(key)) {
+      errors.push(`${path}.${key}: unknown field`);
+    }
+  });
+  if (!Number.isInteger(port.container_port) || port.container_port < 1 || port.container_port > 65535) {
+    errors.push(`${path}.container_port: must be an integer between 1 and 65535`);
+  }
+  if (port.protocol !== undefined && !PORT_PROTOCOLS.includes(port.protocol)) {
+    errors.push(`${path}.protocol: must be one of ${PORT_PROTOCOLS.join(', ')}`);
+  }
+  validateMultiLanguageText(port.label, `${path}.label`, errors);
+}
+
+/**
+ * @description Validate one entry of the `containers` list: the
+ * authorization contract of the sub-containers (everything shown on the
+ * install screen; the /container API can only drive what is declared here).
+ * @param {object} entry - The sub-container declaration.
+ * @param {number} index - Index of the entry in the list.
+ * @param {Set} seenNames - Names already seen, to detect duplicates.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateSubContainer({ name: 'mqtt', docker_image: 'eclipse-mosquitto:2.0.18' }, 0, seenNames, errors);
+ */
+function validateSubContainer(entry, index, seenNames, errors) {
+  const path = `containers[${index}]`;
+  if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  Object.keys(entry).forEach((key) => {
+    if (!SUB_CONTAINER_FIELDS.includes(key)) {
+      errors.push(`${path}.${key}: unknown field`);
+    }
+  });
+  if (typeof entry.name !== 'string' || !SUB_CONTAINER_NAME_REGEX.test(entry.name)) {
+    errors.push(`${path}.name: must be a string matching [a-z0-9-]{2,20}`);
+  } else if (seenNames.has(entry.name)) {
+    errors.push(`${path}.name: duplicate name "${entry.name}"`);
+  } else {
+    seenNames.add(entry.name);
+  }
+  if (!isValidDockerImageReference(entry.docker_image)) {
+    errors.push(`${path}.docker_image: must be a valid image reference with an explicit tag or digest`);
+  }
+  if (entry.start !== undefined && !SUB_CONTAINER_START_MODES.includes(entry.start)) {
+    errors.push(`${path}.start: must be one of ${SUB_CONTAINER_START_MODES.join(', ')}`);
+  }
+  if (entry.env !== undefined) {
+    if (entry.env === null || typeof entry.env !== 'object' || Array.isArray(entry.env)) {
+      errors.push(`${path}.env: must be an object mapping keys to strings`);
+    } else {
+      Object.keys(entry.env).forEach((key) => {
+        // the manifest is public: GLADYS_* is reserved (no token, no identity)
+        if (key.toUpperCase().startsWith('GLADYS_')) {
+          errors.push(`${path}.env.${key}: GLADYS_* keys are reserved`);
+        }
+        if (typeof entry.env[key] !== 'string') {
+          errors.push(`${path}.env.${key}: must be a string`);
+        }
+      });
+    }
+  }
+  if (entry.volumes !== undefined) {
+    if (!Array.isArray(entry.volumes) || entry.volumes.length > MAX_SUB_CONTAINER_VOLUMES) {
+      errors.push(`${path}.volumes: must be an array of at most ${MAX_SUB_CONTAINER_VOLUMES} container paths`);
+    } else {
+      entry.volumes.forEach((volume, volumeIndex) => {
+        // the host path is derived from the volume path by the supervisor:
+        // absolute, and no `..` segment that could escape the integration folder
+        const hasTraversal = typeof volume === 'string' && volume.split('/').includes('..');
+        if (typeof volume !== 'string' || !volume.startsWith('/') || hasTraversal) {
+          errors.push(`${path}.volumes[${volumeIndex}]: must be an absolute container path without ..`);
+        }
+      });
+    }
+  }
+  if (entry.ports !== undefined) {
+    if (!Array.isArray(entry.ports) || entry.ports.length > MAX_SUB_CONTAINER_PORTS) {
+      errors.push(`${path}.ports: must be an array of at most ${MAX_SUB_CONTAINER_PORTS} entries`);
+    } else {
+      entry.ports.forEach((port, portIndex) => validateSubContainerPort(port, `${path}.ports[${portIndex}]`, errors));
+    }
+  }
+  if (entry.devices !== undefined) {
+    if (!Array.isArray(entry.devices)) {
+      errors.push(`${path}.devices: must be an array of hardware classes`);
+    } else {
+      const seenClasses = new Set();
+      entry.devices.forEach((hardwareClass, classIndex) => {
+        if (!Object.keys(HARDWARE_CLASSES).includes(hardwareClass)) {
+          errors.push(`${path}.devices[${classIndex}]: must be one of ${Object.keys(HARDWARE_CLASSES).join(', ')}`);
+        } else if (seenClasses.has(hardwareClass)) {
+          errors.push(`${path}.devices[${classIndex}]: duplicate class "${hardwareClass}"`);
+        } else {
+          seenClasses.add(hardwareClass);
+        }
+      });
+    }
+  }
+  if (entry.read_only !== undefined && typeof entry.read_only !== 'boolean') {
+    errors.push(`${path}.read_only: must be a boolean`);
+  }
+  if (
+    entry.memory_mb !== undefined &&
+    (!Number.isInteger(entry.memory_mb) ||
+      entry.memory_mb < SUB_CONTAINER_MEMORY_MIN_MB ||
+      entry.memory_mb > SUB_CONTAINER_MEMORY_MAX_MB)
+  ) {
+    errors.push(
+      `${path}.memory_mb: must be an integer between ${SUB_CONTAINER_MEMORY_MIN_MB} and ${SUB_CONTAINER_MEMORY_MAX_MB}`,
+    );
+  }
+  if (
+    entry.cpu !== undefined &&
+    (typeof entry.cpu !== 'number' || entry.cpu < SUB_CONTAINER_CPU_MIN || entry.cpu > SUB_CONTAINER_CPU_MAX)
+  ) {
+    errors.push(`${path}.cpu: must be a number between ${SUB_CONTAINER_CPU_MIN} and ${SUB_CONTAINER_CPU_MAX}`);
+  }
+  if (
+    entry.shm_mb !== undefined &&
+    (!Number.isInteger(entry.shm_mb) ||
+      entry.shm_mb < SUB_CONTAINER_SHM_MIN_MB ||
+      entry.shm_mb > SUB_CONTAINER_SHM_MAX_MB)
+  ) {
+    errors.push(
+      `${path}.shm_mb: must be an integer between ${SUB_CONTAINER_SHM_MIN_MB} and ${SUB_CONTAINER_SHM_MAX_MB}`,
+    );
+  }
+  if (entry.command !== undefined) {
+    if (!Array.isArray(entry.command) || entry.command.some((part) => typeof part !== 'string')) {
+      errors.push(`${path}.command: must be an array of strings`);
+    }
+  }
+}
+
+/**
  * @description Validate an external integration manifest against the vendored
  * manifest schema rules (exact same rules as the store indexer, see
  * manifest.schema.json). Throws an Error422 listing every problem if the
@@ -430,6 +610,14 @@ function validateManifest(manifest) {
     } else {
       const seenKeys = new Set();
       manifest.config_schema.forEach((field, index) => validateConfigField(field, index, seenKeys, errors));
+    }
+  }
+  if (manifest.containers !== undefined) {
+    if (!Array.isArray(manifest.containers) || manifest.containers.length > MAX_SUB_CONTAINERS) {
+      errors.push(`containers: must be an array of at most ${MAX_SUB_CONTAINERS} entries`);
+    } else {
+      const seenNames = new Set();
+      manifest.containers.forEach((entry, index) => validateSubContainer(entry, index, seenNames, errors));
     }
   }
   if (manifest.network_discovery !== undefined) {
