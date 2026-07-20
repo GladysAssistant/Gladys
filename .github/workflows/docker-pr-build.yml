@@ -250,3 +250,5 @@ jobs:
             ```
 
             This comment and the image are automatically updated on every new commit pushed to this pull request.
+
+            Need an **ARM64** image (Raspberry Pi, Apple Silicon, …)? Comment `/build-arm64` on this pull request.
