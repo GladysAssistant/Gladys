@@ -129,6 +129,13 @@ class Integration extends Component {
 
     const externalCards = [];
 
+    // a communication integration has no device screens: its card lands
+    // straight on the configuration screen
+    const getInstalledUrl = (selector, manifest) =>
+      manifest.type === 'communication'
+        ? `/dashboard/integration/device/external/${selector}/config`
+        : `/dashboard/integration/device/external/${selector}`;
+
     // Installed external integrations
     installed.forEach(integration => {
       const manifest = integration.manifest || {};
@@ -142,7 +149,7 @@ class Integration extends Component {
         type: manifest.type === 'communication' ? 'communication' : 'device',
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
-        url: `/dashboard/integration/device/external/${integration.selector}`,
+        url: getInstalledUrl(integration.selector, manifest),
         img: (storeIntegration && storeIntegration.cover_url) || manifest.cover_image || null,
         status: integration.status,
         updateAvailable: integration.update_available
@@ -164,7 +171,7 @@ class Integration extends Component {
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled
-          ? `/dashboard/integration/device/external/${storeIntegration.installed_selector}`
+          ? getInstalledUrl(storeIntegration.installed_selector, manifest)
           : `/dashboard/integration/device/external-install/${storeIntegration.store_slug}`,
         img: storeIntegration.cover_url || manifest.cover_image || null,
         updateAvailable: isInstalled ? storeIntegration.update_available : false

@@ -99,7 +99,13 @@ class ExternalIntegrationInstallPage extends Component {
         body.granted_devices = this.state.grantedDevices || [];
       }
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      route(`/dashboard/integration/device/external/${installed.selector}`);
+      // a communication integration has no device screens: land on the
+      // configuration screen (link code, channel settings) after install
+      if (get(installed, 'manifest.type') === 'communication') {
+        route(`/dashboard/integration/device/external/${installed.selector}/config`);
+      } else {
+        route(`/dashboard/integration/device/external/${installed.selector}`);
+      }
     } catch (e) {
       console.error(e);
       this.setState({ installStatus: RequestStatus.Error });
