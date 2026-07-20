@@ -1,6 +1,7 @@
 const { fake, assert, stub } = require('sinon');
 const { expect } = require('chai');
 const Enedis = require('../../../services/enedis/lib');
+const logger = require('../../../utils/logger');
 
 const getDailyConsumptionArray = (size, startAt = '2022-08-01') => {
   const date = new Date(startAt);
@@ -331,6 +332,56 @@ describe('enedis.sync.dailySync', () => {
     await enedisService.sync();
 
     assert.notCalled(calculateCostFromDate);
+  });
+  it('should warn and skip recalculation when energy monitoring is unavailable', async () => {
+    const calculateCostFromDate = fake.resolves(null);
+    const warnStub = stub(logger, 'warn');
+    const gladys = {
+      device: {
+        get: fake.resolves([
+          {
+            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
+            external_id: 'enedis:16401220101758',
+            features: [
+              {
+                external_id: 'enedis:16401220101758',
+                category: 'energy-sensor',
+                type: 'daily-consumption',
+              },
+            ],
+          },
+        ]),
+        setParam: fake.resolves(null),
+        saveHistoricalState: fake.resolves(null),
+      },
+      gateway: {
+        enedisGetDailyConsumption: fake.resolves(getDailyConsumptionArray(1)),
+      },
+      service: {
+        getService: fake.returns({
+          calculateCostFromDate,
+        }),
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
+    };
+    const enedisService = new Enedis(gladys);
+    enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
+
+    try {
+      await enedisService.sync();
+
+      assert.calledOnceWithExactly(
+        warnStub,
+        'Enedis: energy-monitoring service unavailable, skipping cost recalculation after sync',
+      );
+      assert.notCalled(calculateCostFromDate);
+    } finally {
+      warnStub.restore();
+    }
   });
   it('should sync with 1 page = 100', async () => {
     const dailyConsumptionStub = stub();

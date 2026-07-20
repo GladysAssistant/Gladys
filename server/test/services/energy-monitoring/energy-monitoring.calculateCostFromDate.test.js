@@ -34,6 +34,15 @@ describe('EnergyMonitoring.calculateCostFromDate', () => {
     assert.calledWithExactly(calculateCostFrom, new Date('2026-07-19T00:30:00.000Z'));
   });
 
+  it('should preserve the instant from a Date object', async () => {
+    const date = new Date('2026-07-19T00:30:00.000Z');
+
+    await energyMonitoring.calculateCostFromDate(date);
+
+    assert.calledOnce(calculateCostFrom);
+    assert.calledWithExactly(calculateCostFrom, date);
+  });
+
   it('should serialize calculations', async () => {
     let releaseFirstCalculation;
     const firstCalculationStarted = new Promise((resolve) => {
