@@ -23,6 +23,10 @@ describe('install_service_dependencies', () => {
     }));
   });
 
+  afterEach(() => {
+    delete process.env.INSTALL_SERVICES_SILENT_FAIL;
+  });
+
   it('should install dependencies for each service with concurrency of 4', async () => {
     await installServiceDependencies();
 
@@ -37,13 +41,11 @@ describe('install_service_dependencies', () => {
 
     await installServiceDependencies();
 
-    delete process.env.INSTALL_SERVICES_SILENT_FAIL;
     expect(execStub.callCount).to.equal(2);
   });
 
   it('should throw when silent fail is disabled', async () => {
     execStub.onFirstCall().rejects(new Error('install failed'));
-    delete process.env.INSTALL_SERVICES_SILENT_FAIL;
 
     let error;
     try {

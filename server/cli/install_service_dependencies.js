@@ -26,7 +26,7 @@ async function installServiceDependencies() {
     async (directory) => {
       logger.info(`Installing dependencies in folder ${directory}`);
       try {
-        await exec(`cd ${directory} && npm install --unsafe-perm`);
+        await exec(`cd "${directory}" && npm install --unsafe-perm`);
       } catch (e) {
         logger.warn(e);
 
@@ -42,7 +42,8 @@ async function installServiceDependencies() {
 
 /* istanbul ignore next */
 if (require.main === module) {
-  installServiceDependencies().catch(() => {
+  installServiceDependencies().catch((err) => {
+    logger.error('Failed to install service dependencies:', err);
     process.exit(1);
   });
 }
