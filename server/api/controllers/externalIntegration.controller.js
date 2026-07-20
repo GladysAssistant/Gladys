@@ -277,6 +277,49 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/external_integration/:selector/link_code createLinkCode
+   * @apiName createLinkCode
+   * @apiGroup ExternalIntegration
+   * @apiDescription Generate a short link code for the current user
+   * ("Link my account" on a communication integration page). Single use,
+   * 15 minutes TTL; the user sends it to the bot in the external channel.
+   */
+  async function createLinkCode(req, res) {
+    const result = await gladys.externalIntegration.createLinkCode(req.params.selector, req.user.id);
+    res.json(result);
+  }
+
+  /**
+   * @api {get} /api/v1/external_integration/:selector/contact getOwnContact
+   * @apiName getOwnContact
+   * @apiGroup ExternalIntegration
+   * @apiDescription The link state of the CURRENT user on this
+   * communication integration (each user only sees their own account).
+   */
+  async function getOwnContact(req, res) {
+    const integration = await gladys.externalIntegration.getBySelector(req.params.selector);
+    const contact = await gladys.externalIntegration.getContactForUser(integration, req.user.id);
+    res.json({
+      linked: contact !== null,
+      contact_id: contact ? contact.contact_id : null,
+      contact_name: contact ? contact.contact_name : null,
+      linked_at: contact ? contact.linked_at : null,
+    });
+  }
+
+  /**
+   * @api {delete} /api/v1/external_integration/:selector/contact unlinkOwnContact
+   * @apiName unlinkOwnContact
+   * @apiGroup ExternalIntegration
+   * @apiDescription Revoke the link of the CURRENT user (each user unlinks
+   * their own account).
+   */
+  async function unlinkOwnContact(req, res) {
+    await gladys.externalIntegration.unlinkContact(req.params.selector, req.user.id);
+    res.json({ success: true });
+  }
+
+  /**
    * @api {delete} /api/v1/external_integration/:selector destroy
    * @apiName destroy
    * @apiGroup ExternalIntegration
@@ -308,6 +351,9 @@ module.exports = function ExternalIntegrationController(gladys) {
     stop: asyncMiddleware(stop),
     restart: asyncMiddleware(restart),
     getLogs: asyncMiddleware(getLogs),
+    createLinkCode: asyncMiddleware(createLinkCode),
+    getOwnContact: asyncMiddleware(getOwnContact),
+    unlinkOwnContact: asyncMiddleware(unlinkOwnContact),
     destroy: asyncMiddleware(destroy),
   });
 };

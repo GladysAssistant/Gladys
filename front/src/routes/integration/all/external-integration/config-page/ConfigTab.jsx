@@ -5,6 +5,7 @@ import get from 'get-value';
 import ConfigSchemaForm from './ConfigSchemaForm';
 import ActionsCard from './ActionsCard';
 import SupervisionCard from './SupervisionCard';
+import LinkAccountCard from './LinkAccountCard';
 import HardwareCard from './HardwareCard';
 import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -16,6 +17,7 @@ const ConfigTab = props => {
   const transports = get(integration, 'manifest.transports') || [];
   const hasDualTransports = transports.includes('local') && transports.includes('cloud');
   const language = (user && user.language) || 'en';
+  const isCommunication = get(integration, 'manifest.type') === 'communication';
   const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
 
   return (
@@ -88,6 +90,16 @@ const ConfigTab = props => {
           </div>
         </div>
       </div>
+
+      {isCommunication && (
+        <LinkAccountCard
+          contact={props.contact}
+          linkCode={props.linkCode}
+          linkStatus={props.linkStatus}
+          onGenerateCode={props.generateLinkCode}
+          onUnlink={props.unlinkContact}
+        />
+      )}
 
       {integration && actions.length > 0 && (
         <ActionsCard

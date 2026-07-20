@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import { route } from 'preact-router';
 import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
@@ -11,6 +12,12 @@ class ExternalIntegrationDiscoverPage extends Component {
   getIntegration = async () => {
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
+      // a communication integration has no device screens: direct URL
+      // access lands on the configuration screen instead
+      if (get(integration, 'manifest.type') === 'communication') {
+        route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
+        return;
+      }
       this.setState({ integration });
     } catch (e) {
       console.error(e);

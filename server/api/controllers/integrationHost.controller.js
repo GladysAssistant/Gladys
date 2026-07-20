@@ -165,6 +165,44 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {post} /api/integration/v1/message publishMessage
+   * @apiName publishMessage
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Incoming message of a communication integration. The
+   * contact must have linked their Gladys account (link code): unknown
+   * contact -> 404, so the integration can answer "account not linked, code
+   * required" in the channel.
+   */
+  async function publishMessage(req, res) {
+    const result = await gladys.externalIntegration.handleIncomingMessage(req.externalIntegrationService, req.body);
+    res.json(result);
+  }
+
+  /**
+   * @api {post} /api/integration/v1/contact/link linkContact
+   * @apiName linkContact
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Link an external contact to the Gladys user who
+   * generated the code from the UI (single use, 15 minutes TTL).
+   */
+  async function linkContact(req, res) {
+    const result = await gladys.externalIntegration.linkContact(req.externalIntegrationService, req.body);
+    res.json(result);
+  }
+
+  /**
+   * @api {get} /api/integration/v1/contact getContacts
+   * @apiName getContacts
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The contacts linked to this integration, with the
+   * linked Gladys user.
+   */
+  async function getContacts(req, res) {
+    const contacts = await gladys.externalIntegration.getLinkedContacts(req.externalIntegrationService);
+    res.json(contacts);
+  }
+
+  /**
    * @api {get} /api/integration/v1/container getContainers
    * @apiName getContainers
    * @apiGroup IntegrationHostApi
@@ -229,6 +267,9 @@ module.exports = function IntegrationHostController(gladys) {
     publishStates: asyncMiddleware(publishStates),
     getConfig: asyncMiddleware(getConfig),
     saveConfig: asyncMiddleware(saveConfig),
+    publishMessage: asyncMiddleware(publishMessage),
+    linkContact: asyncMiddleware(linkContact),
+    getContacts: asyncMiddleware(getContacts),
     getContainers: asyncMiddleware(getContainers),
     startContainer: asyncMiddleware(startContainer),
     stopContainer: asyncMiddleware(stopContainer),

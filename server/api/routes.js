@@ -555,6 +555,20 @@ function getRoutes(gladys) {
       admin: true,
       controller: externalIntegrationController.getLogs,
     },
+    // communication integrations: each user links/unlinks their OWN account
+    // (no admin flag on purpose)
+    'post /api/v1/external_integration/:selector/link_code': {
+      authenticated: true,
+      controller: externalIntegrationController.createLinkCode,
+    },
+    'get /api/v1/external_integration/:selector/contact': {
+      authenticated: true,
+      controller: externalIntegrationController.getOwnContact,
+    },
+    'delete /api/v1/external_integration/:selector/contact': {
+      authenticated: true,
+      controller: externalIntegrationController.unlinkOwnContact,
+    },
     'get /api/v1/external_integration/:selector/discovered_device': {
       authenticated: true,
       controller: externalIntegrationController.getDiscoveredDevices,
@@ -649,6 +663,21 @@ function getRoutes(gladys) {
       authenticated: false,
       externalIntegrationAuth: true,
       controller: integrationHostController.saveConfig,
+    },
+    'post /api/integration/v1/message': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishMessage,
+    },
+    'post /api/integration/v1/contact/link': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.linkContact,
+    },
+    'get /api/integration/v1/contact': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getContacts,
     },
     'get /api/integration/v1/container': {
       authenticated: false,

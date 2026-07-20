@@ -51,6 +51,12 @@ const { scanSsdp } = require('./networkDiscovery/networkDiscovery.scanSsdp');
 const { requestScan } = require('./externalIntegration.requestScan');
 const { checkHealth } = require('./externalIntegration.checkHealth');
 const { scheduleRestart } = require('./externalIntegration.scheduleRestart');
+const { createLinkCode } = require('./externalIntegration.createLinkCode');
+const { linkContact } = require('./externalIntegration.linkContact');
+const { unlinkContact } = require('./externalIntegration.unlinkContact');
+const { getContactForUser } = require('./externalIntegration.getContactForUser');
+const { getLinkedContacts } = require('./externalIntegration.getLinkedContacts');
+const { handleIncomingMessage } = require('./externalIntegration.handleIncomingMessage');
 const { getManifestContainers } = require('./externalIntegration.getManifestContainers');
 const { ensurePrivateNetwork } = require('./externalIntegration.ensurePrivateNetwork');
 const { assignHostPorts } = require('./externalIntegration.assignHostPorts');
@@ -88,6 +94,7 @@ const { installFromRepoUrl } = require('./store/store.installFromRepoUrl');
  * @param {object} device - Device manager.
  * @param {object} variable - Variable manager.
  * @param {string} jwtSecret - Secret to sign integration JWTs.
+ * @param {object} cache - In-memory cache (contact link codes).
  * @example
  * const externalIntegration = new ExternalIntegration(event, system, service, stateManager, device, variable, 's');
  */
@@ -99,6 +106,7 @@ const ExternalIntegration = function ExternalIntegration(
   device,
   variable,
   jwtSecret,
+  cache,
 ) {
   this.event = event;
   this.system = system;
@@ -107,6 +115,7 @@ const ExternalIntegration = function ExternalIntegration(
   this.device = device;
   this.variable = variable;
   this.jwtSecret = jwtSecret;
+  this.cache = cache;
   this.available = false;
   // serviceId -> WebSocket connection of the integration
   this.connections = new Map();
@@ -193,6 +202,12 @@ ExternalIntegration.prototype.scanSsdp = scanSsdp;
 ExternalIntegration.prototype.requestScan = requestScan;
 ExternalIntegration.prototype.checkHealth = checkHealth;
 ExternalIntegration.prototype.scheduleRestart = scheduleRestart;
+ExternalIntegration.prototype.createLinkCode = createLinkCode;
+ExternalIntegration.prototype.linkContact = linkContact;
+ExternalIntegration.prototype.unlinkContact = unlinkContact;
+ExternalIntegration.prototype.getContactForUser = getContactForUser;
+ExternalIntegration.prototype.getLinkedContacts = getLinkedContacts;
+ExternalIntegration.prototype.handleIncomingMessage = handleIncomingMessage;
 ExternalIntegration.prototype.getManifestContainers = getManifestContainers;
 ExternalIntegration.prototype.ensurePrivateNetwork = ensurePrivateNetwork;
 ExternalIntegration.prototype.assignHostPorts = assignHostPorts;

@@ -15,8 +15,8 @@
     },
     "type": {
       "type": "string",
-      "enum": ["device"],
-      "description": "Integration type. Only \"device\" integrations exist in v1."
+      "enum": ["device", "communication"],
+      "description": "Integration type. \"device\" integrations expose devices through the Devices/Discovery/Configuration screens; \"communication\" integrations are messaging channels (Telegram-like bots): no device screens, the user links their account from the Gladys UI and the integration exchanges messages through the host API."
     },
     "name": {
       "type": "string",

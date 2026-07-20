@@ -1571,6 +1571,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DEVICE_DELETED: 'external-integration.device-deleted',
     HEARTBEAT: 'external-integration.heartbeat',
     CONFIG_UPDATED: 'external-integration.config-updated',
+    MESSAGE_SEND: 'external-integration.message.send',
     HARDWARE_UPDATED: 'external-integration.hardware-updated',
     OAUTH_GET_AUTHORIZE_URL: 'external-integration.oauth.get-authorize-url',
     OAUTH_CALLBACK: 'external-integration.oauth.callback',

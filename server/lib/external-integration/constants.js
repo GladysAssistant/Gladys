@@ -88,6 +88,14 @@ const ACTION_DEFAULT_TIMEOUT_SECONDS = 30;
 const MAX_DISCOVERED_DEVICES = 200;
 const MAX_STATES_PER_REQUEST = 100;
 const MAX_STATES_PER_MINUTE = 300;
+// Communication integrations: user <-> contact link. The link itself is a
+// variable scoped (service_id, user_id) — no migration needed; the short
+// link codes live in the in-memory cache with a 15 minutes TTL.
+const CONTACT_VARIABLE = 'EXTERNAL_INTEGRATION_CONTACT';
+const LINK_CODE_CACHE_PREFIX = 'external-integration-link-code';
+const LINK_CODE_TTL_MS = 15 * 60 * 1000;
+const LINK_CODE_LENGTH = 8;
+const MAX_MESSAGE_TEXT_LENGTH = 4096;
 // Mediated network discovery (B.16): the core captures from its
 // network=host position, the integration interprets. Curated capture
 // types only — never arbitrary capture.
@@ -167,6 +175,11 @@ module.exports = {
   MAX_DISCOVERED_DEVICES,
   MAX_STATES_PER_REQUEST,
   MAX_STATES_PER_MINUTE,
+  CONTACT_VARIABLE,
+  LINK_CODE_CACHE_PREFIX,
+  LINK_CODE_TTL_MS,
+  LINK_CODE_LENGTH,
+  MAX_MESSAGE_TEXT_LENGTH,
   NETWORK_DISCOVERY_TYPES,
   MAX_NETWORK_DISCOVERY_ENTRIES,
   MAX_UDP_BROADCAST_PORTS,
