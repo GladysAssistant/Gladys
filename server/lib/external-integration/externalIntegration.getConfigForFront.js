@@ -1,9 +1,14 @@
+const { PREFER_LOCAL_CONFIG_KEY } = require('./constants');
+const { hasDualTransports } = require('./externalIntegration.getIntegrationConfig');
+
 /**
  * @description Get the config of an integration for the frontend
  * Configuration screen: only the keys declared in the config_schema are
  * returned (keys outside the schema are internal storage of the
  * integration), and `secret` values are never sent back in clear — they are
  * always null, with a `configured_secrets` flag saying if they are set.
+ * When the manifest declares both transports, the reserved
+ * GLADYS_PREFER_LOCAL preference is included too (the standard toggle).
  * @param {string} selector - The selector of the external integration.
  * @returns {Promise<object>} Resolve with { config, configured_secrets }.
  * @example
@@ -13,6 +18,7 @@ async function getConfigForFront(selector) {
   const service = await this.getBySelector(selector);
   const configSchema = (service.manifest && service.manifest.config_schema) || [];
   const fullConfig = await this.getIntegrationConfig(service);
+  const preferLocal = hasDualTransports(service.manifest) ? fullConfig[PREFER_LOCAL_CONFIG_KEY] : undefined;
   const config = {};
   const configuredSecrets = [];
   configSchema.forEach((field) => {
@@ -30,6 +36,9 @@ async function getConfigForFront(selector) {
       config[field.key] = hasValue ? fullConfig[field.key] : null;
     }
   });
+  if (preferLocal !== undefined) {
+    config[PREFER_LOCAL_CONFIG_KEY] = preferLocal;
+  }
   return {
     config,
     configured_secrets: configuredSecrets,

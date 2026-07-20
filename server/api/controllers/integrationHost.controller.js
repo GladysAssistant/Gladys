@@ -109,6 +109,37 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {post} /api/integration/v1/camera/image saveCameraImage
+   * @apiName saveCameraImage
+   * @apiGroup IntegrationHostApi
+   * @apiDescription New image of a camera device of the integration
+   * (image/jpg;base64,..., 150 KB max, 12 images/minute per device),
+   * mapped on gladys.device.camera.setImage — the dashboard camera widget
+   * updates in real time. Images never go through POST /state.
+   */
+  async function saveCameraImage(req, res) {
+    const result = await gladys.externalIntegration.saveCameraImage(req.externalIntegrationService, req.body);
+    res.json(result);
+  }
+
+  /**
+   * @api {post} /api/integration/v1/device/transport setDeviceTransports
+   * @apiName setDeviceTransports
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Lightweight batch update of the GLADYS_TRANSPORT param
+   * (local | cloud | unreachable) without re-publishing the discovered
+   * list; the device badges of the UI update in real time. Unknown
+   * device_external_ids are silently ignored.
+   */
+  async function setDeviceTransports(req, res) {
+    const result = await gladys.externalIntegration.setDeviceTransports(
+      req.externalIntegrationService,
+      req.body.transports,
+    );
+    res.json(result);
+  }
+
+  /**
    * @api {get} /api/integration/v1/config getConfig
    * @apiName getConfig
    * @apiGroup IntegrationHostApi
@@ -191,6 +222,8 @@ module.exports = function IntegrationHostController(gladys) {
     heartbeat: asyncMiddleware(heartbeat),
     saveConnectionStatus: asyncMiddleware(saveConnectionStatus),
     networkDiscoveryScan: asyncMiddleware(networkDiscoveryScan),
+    saveCameraImage: asyncMiddleware(saveCameraImage),
+    setDeviceTransports: asyncMiddleware(setDeviceTransports),
     publishDiscoveredDevices: asyncMiddleware(publishDiscoveredDevices),
     getDevices: asyncMiddleware(getDevices),
     publishStates: asyncMiddleware(publishStates),

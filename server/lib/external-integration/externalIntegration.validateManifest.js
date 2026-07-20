@@ -21,6 +21,7 @@ const {
   MAX_ACTIONS,
   ACTION_MIN_TIMEOUT_SECONDS,
   ACTION_MAX_TIMEOUT_SECONDS,
+  MANIFEST_TRANSPORTS,
 } = require('./constants');
 
 // These rules are the exact mirror of the canonical manifest schema owned by
@@ -40,6 +41,7 @@ const MANIFEST_FIELDS = [
   'containers',
   'network_discovery',
   'actions',
+  'transports',
 ];
 const SUB_CONTAINER_FIELDS = [
   'name',
@@ -637,6 +639,16 @@ function validateManifest(manifest) {
     } else {
       const seenActionKeys = new Set();
       manifest.actions.forEach((action, index) => validateAction(action, index, seenActionKeys, errors));
+    }
+  }
+  if (manifest.transports !== undefined) {
+    if (
+      !Array.isArray(manifest.transports) ||
+      manifest.transports.length === 0 ||
+      !manifest.transports.every((transport) => MANIFEST_TRANSPORTS.includes(transport)) ||
+      new Set(manifest.transports).size !== manifest.transports.length
+    ) {
+      errors.push(`transports: must be a non-empty subset of ${MANIFEST_TRANSPORTS.join(', ')}`);
     }
   }
   if (errors.length > 0) {

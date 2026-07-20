@@ -1,5 +1,7 @@
 const db = require('../../models');
+const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
+const { CAMERA_GET_IMAGE_TIMEOUT_MS } = require('./constants');
 
 // scheduled polls only make sense against a live integration: outside
 // these statuses they become silent no-ops (see below)
@@ -60,6 +62,28 @@ function registerProxyService(service) {
             params: device.params,
           },
         });
+      },
+      getImage: async (device) => {
+        // camera.getLiveImage path (dashboard live view, "show me the
+        // camera" chat intent): ask the integration for a FRESH image.
+        // An ffmpeg capture can be slow: 15s ack deadline, not 5s.
+        const result = await this.sendCommand(
+          service,
+          WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CAMERA_GET_IMAGE,
+          {
+            device: {
+              external_id: device.external_id,
+              selector: device.selector,
+              params: device.params,
+            },
+          },
+          { timeoutMs: CAMERA_GET_IMAGE_TIMEOUT_MS },
+        );
+        const image = result && result.data && result.data.image;
+        if (typeof image !== 'string' || image.length === 0) {
+          throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_CAMERA_IMAGE');
+        }
+        return image;
       },
       postCreate: async (device) => {
         this.sendMessage(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_CREATED, { device });

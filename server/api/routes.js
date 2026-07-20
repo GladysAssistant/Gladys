@@ -592,6 +592,16 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.networkDiscoveryScan,
     },
+    'post /api/integration/v1/camera/image': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.saveCameraImage,
+    },
+    'post /api/integration/v1/device/transport': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.setDeviceTransports,
+    },
     'post /api/integration/v1/discovered_device': {
       authenticated: false,
       externalIntegrationAuth: true,

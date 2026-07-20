@@ -3,6 +3,8 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import TransportBadge from '../components/TransportBadge';
+import { getDeviceTransport } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 
 class DeviceBox extends Component {
@@ -42,7 +44,14 @@ class DeviceBox extends Component {
     return (
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header">{device.name}</div>
+          <div class="card-header">
+            {device.name}
+            {getDeviceTransport(device) && (
+              <div class="page-options d-flex">
+                <TransportBadge transport={getDeviceTransport(device)} />
+              </div>
+            )}
+          </div>
           <div
             class={cx('dimmer', {
               active: loading

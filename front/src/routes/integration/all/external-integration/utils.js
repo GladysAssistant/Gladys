@@ -44,3 +44,10 @@ export const getRequestedHardwareClasses = containers => {
   });
   return requestedClasses;
 };
+
+// Effective transport of a device, reported by the integration through the
+// reserved GLADYS_TRANSPORT param (local | cloud | unreachable), or null.
+export const getDeviceTransport = device => {
+  const transportParam = ((device && device.params) || []).find(param => param.name === 'GLADYS_TRANSPORT');
+  return transportParam ? transportParam.value : null;
+};

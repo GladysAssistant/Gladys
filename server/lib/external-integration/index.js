@@ -22,6 +22,8 @@ const { update } = require('./externalIntegration.update');
 const { validateToken } = require('./externalIntegration.validateToken');
 const { setDiscoveredDevices } = require('./externalIntegration.setDiscoveredDevices');
 const { upsertDeviceParams } = require('./externalIntegration.upsertDeviceParams');
+const { saveCameraImage } = require('./externalIntegration.saveCameraImage');
+const { setDeviceTransports } = require('./externalIntegration.setDeviceTransports');
 const { getDiscoveredDevices } = require('./externalIntegration.getDiscoveredDevices');
 const { saveStates } = require('./externalIntegration.saveStates');
 const { getDevices } = require('./externalIntegration.getDevices');
@@ -127,6 +129,8 @@ const ExternalIntegration = function ExternalIntegration(
   this.missedPings = new Map();
   // serviceId -> { count, resetAt } sliding rate limit on POST /state
   this.stateRateLimits = new Map();
+  // deviceExternalId -> { count, resetAt } rate limit on POST /camera/image
+  this.cameraImageRateLimits = new Map();
   this.checkHealthInterval = null;
   // store index cache (see store/ sub-folder)
   this.storeIndex = null;
@@ -160,6 +164,8 @@ ExternalIntegration.prototype.update = update;
 ExternalIntegration.prototype.validateToken = validateToken;
 ExternalIntegration.prototype.setDiscoveredDevices = setDiscoveredDevices;
 ExternalIntegration.prototype.upsertDeviceParams = upsertDeviceParams;
+ExternalIntegration.prototype.saveCameraImage = saveCameraImage;
+ExternalIntegration.prototype.setDeviceTransports = setDeviceTransports;
 ExternalIntegration.prototype.getDiscoveredDevices = getDiscoveredDevices;
 ExternalIntegration.prototype.saveStates = saveStates;
 ExternalIntegration.prototype.getDevices = getDevices;

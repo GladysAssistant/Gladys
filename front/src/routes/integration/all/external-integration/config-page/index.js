@@ -208,6 +208,28 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  togglePreferLocal = async e => {
+    const preferLocal = e.target.checked;
+    // optimistic update, saved immediately (standard core toggle, outside
+    // the manifest config_schema)
+    this.setState({
+      configValues: Object.assign({}, this.state.configValues, { GLADYS_PREFER_LOCAL: preferLocal }),
+      preferLocalStatus: RequestStatus.Getting
+    });
+    try {
+      await this.props.httpClient.post(`/api/v1/external_integration/${this.props.selector}/config`, {
+        config: { GLADYS_PREFER_LOCAL: preferLocal }
+      });
+      this.setState({ preferLocalStatus: RequestStatus.Success });
+    } catch (err) {
+      console.error(err);
+      this.setState({
+        configValues: Object.assign({}, this.state.configValues, { GLADYS_PREFER_LOCAL: !preferLocal }),
+        preferLocalStatus: RequestStatus.Error
+      });
+    }
+  };
+
   connectOAuth = async field => {
     this.setState({ oauthStatus: RequestStatus.Getting });
     const { selector } = this.props;
@@ -319,6 +341,7 @@ class ExternalIntegrationConfigPage extends Component {
           updateConfigValue={this.updateConfigValue}
           saveConfig={this.saveConfig}
           connectOAuth={this.connectOAuth}
+          togglePreferLocal={this.togglePreferLocal}
           updateActionFieldValue={this.updateActionFieldValue}
           runAction={this.runAction}
           executeAction={this.executeAction}

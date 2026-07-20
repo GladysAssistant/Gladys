@@ -195,6 +195,45 @@ describe('Integration host API', () => {
     });
   });
 
+  describe('POST /api/integration/v1/camera/image', () => {
+    it('should relay the image to the camera path of the integration', async () => {
+      gladys.externalIntegration.saveCameraImage = async () => ({ success: true });
+      try {
+        const res = await integrationRequest(token)
+          .post('/api/integration/v1/camera/image')
+          .send({ device_external_id: `ext:${service.selector}:cam`, image: 'image/jpg;base64,/9j/4AAQ' })
+          .expect(200);
+        expect(res.body).to.deep.equal({ success: true });
+      } finally {
+        delete gladys.externalIntegration.saveCameraImage;
+      }
+    });
+
+    it('should return 404 for a camera the integration does not own', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/camera/image')
+        .send({ device_external_id: `ext:${service.selector}:unknown-cam`, image: 'image/jpg;base64,x' })
+        .expect(404);
+    });
+  });
+
+  describe('POST /api/integration/v1/device/transport', () => {
+    it('should accept a transport batch', async () => {
+      const res = await integrationRequest(token)
+        .post('/api/integration/v1/device/transport')
+        .send({ transports: [{ device_external_id: `ext:${service.selector}:ghost`, transport: 'local' }] })
+        .expect(200);
+      expect(res.body).to.deep.equal({ success: true });
+    });
+
+    it('should refuse an invalid transport value', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/device/transport')
+        .send({ transports: [{ device_external_id: `ext:${service.selector}:plug`, transport: 'satellite' }] })
+        .expect(400);
+    });
+  });
+
   describe('POST /api/integration/v1/discovered_device', () => {
     it('should publish the discovered devices', async () => {
       const res = await integrationRequest(token)

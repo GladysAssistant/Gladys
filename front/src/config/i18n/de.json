@@ -622,6 +622,16 @@
         "connectedBadge": "Verbunden",
         "disconnectedBadge": "Getrennt"
       },
+      "transport": {
+        "localBadge": "Lokal",
+        "cloudBadge": "Cloud",
+        "unreachableBadge": "Nicht erreichbar",
+        "localTooltip": "Dieses Gerät antwortet über das lokale Netzwerk (LAN)",
+        "cloudTooltip": "Dieses Gerät antwortet über die Hersteller-Cloud",
+        "unreachableTooltip": "Dieses Gerät antwortet derzeit nicht",
+        "preferLocalLabel": "Lokale (LAN) Verbindung bevorzugen, wenn verfügbar",
+        "preferLocalDescription": "Die Integration wendet diese Präferenz an, wenn möglich; das Abzeichen jedes Geräts zeigt den tatsächlich verwendeten Transport."
+      },
       "oauthCallback": {
         "title": "Kontoverbindung",
         "relayingText": "Verbindung mit der Integration wird abgeschlossen...",

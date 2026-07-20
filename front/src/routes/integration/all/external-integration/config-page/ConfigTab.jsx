@@ -13,6 +13,8 @@ const ConfigTab = props => {
   const { integration, loadStatus, user } = props;
   const schema = get(integration, 'manifest.config_schema') || [];
   const actions = get(integration, 'manifest.actions') || [];
+  const transports = get(integration, 'manifest.transports') || [];
+  const hasDualTransports = transports.includes('local') && transports.includes('cloud');
   const language = (user && user.language) || 'en';
   const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
 
@@ -37,6 +39,31 @@ const ConfigTab = props => {
           >
             <div class="loader" />
             <div class="dimmer-content">
+              {hasDualTransports && loadStatus === RequestStatus.Success && (
+                <div class="form-group">
+                  <label class="custom-switch">
+                    <input
+                      type="checkbox"
+                      class="custom-switch-input"
+                      checked={get(props, 'configValues.GLADYS_PREFER_LOCAL') !== false}
+                      onClick={props.togglePreferLocal}
+                      disabled={props.preferLocalStatus === RequestStatus.Getting}
+                    />
+                    <span class="custom-switch-indicator" />
+                    <span class="custom-switch-description">
+                      <Text id="integration.externalIntegration.transport.preferLocalLabel" />
+                    </span>
+                  </label>
+                  <small class="form-text text-muted">
+                    <Text id="integration.externalIntegration.transport.preferLocalDescription" />
+                  </small>
+                  {props.preferLocalStatus === RequestStatus.Error && (
+                    <div class="alert alert-danger mt-2">
+                      <Text id="integration.externalIntegration.config.saveError" />
+                    </div>
+                  )}
+                </div>
+              )}
               {loadStatus === RequestStatus.Success && schema.length === 0 && (
                 <div class="text-muted">
                   <Text id="integration.externalIntegration.config.noConfig" />

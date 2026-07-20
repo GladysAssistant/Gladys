@@ -661,6 +661,21 @@ describe('externalIntegration.validateManifest', () => {
     expect422({ ...TEST_MANIFEST, containers: [{ ...base, command: [1] }] }, 'containers[0].command');
   });
 
+  it('should accept a valid transports declaration', () => {
+    ['local', 'cloud'].forEach((transport) => {
+      const manifest = { ...TEST_MANIFEST, transports: [transport] };
+      expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+    });
+    const dualManifest = { ...TEST_MANIFEST, transports: ['local', 'cloud'] };
+    expect(externalIntegration.validateManifest(dualManifest)).to.deep.equal(dualManifest);
+  });
+
+  it('should reject an invalid transports declaration', () => {
+    [[], ['satellite'], ['local', 'local'], 'local'].forEach((transports) => {
+      expect422({ ...TEST_MANIFEST, transports }, 'transports: must be a non-empty subset of local, cloud');
+    });
+  });
+
   it('should reject unknown fields and empty values in select options', () => {
     expect422(
       {

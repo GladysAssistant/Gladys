@@ -2,6 +2,8 @@ const { Error422 } = require('../../utils/httpErrors');
 const { BadParameters } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
+const { hasDualTransports } = require('./externalIntegration.getIntegrationConfig');
+const { PREFER_LOCAL_CONFIG_KEY } = require('./constants');
 
 /**
  * @description Save the config coming from the frontend Configuration screen
@@ -23,6 +25,15 @@ async function saveConfigFromFront(selector, config) {
   const configSchema = (service.manifest && service.manifest.config_schema) || [];
   const valuesToSave = {};
   Object.keys(config).forEach((key) => {
+    // the standard "prefer local" toggle is a reserved key outside the
+    // schema, only meaningful when the manifest declares both transports
+    if (key === PREFER_LOCAL_CONFIG_KEY && hasDualTransports(service.manifest)) {
+      if (typeof config[key] !== 'boolean') {
+        throw new Error422(`config.${key}: must be a boolean`);
+      }
+      valuesToSave[key] = config[key];
+      return;
+    }
     const field = configSchema.find((schemaField) => schemaField.key === key);
     if (!field) {
       throw new Error422(`config.${key}: unknown config key`);

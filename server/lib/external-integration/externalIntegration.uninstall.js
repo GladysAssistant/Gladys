@@ -61,6 +61,10 @@ async function uninstall(selector) {
   this.connectionStatuses.delete(service.id);
   this.startedAt.delete(service.id);
   this.stateRateLimits.delete(service.id);
+  const externalIdPrefix = `ext:${service.selector}:`;
+  [...this.cameraImageRateLimits.keys()]
+    .filter((externalId) => externalId.startsWith(externalIdPrefix))
+    .forEach((externalId) => this.cameraImageRateLimits.delete(externalId));
 }
 
 module.exports = {

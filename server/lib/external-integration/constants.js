@@ -97,6 +97,28 @@ const MAX_UDP_BROADCAST_PORTS = 5;
 const NETWORK_DISCOVERY_MIN_TIMEOUT_SECONDS = 1;
 const NETWORK_DISCOVERY_MAX_TIMEOUT_SECONDS = 30;
 const NETWORK_DISCOVERY_DEFAULT_TIMEOUT_SECONDS = 10;
+// Camera images: pushed through POST /camera/image (core's 150 KB bound),
+// never through POST /state (dedicated saveStringState path, no state
+// history). Continuous video streaming is out of the v1 scope.
+const MAX_CAMERA_IMAGES_PER_MINUTE = 12;
+// mirror of the core bound (camera.setImage MAX_SIZE_IMAGE)
+const MAX_CAMERA_IMAGE_SIZE = 150 * 1024;
+// on-demand fresh image (dashboard live view): an ffmpeg capture can be
+// slow, this is the second exception to the 5s ack rule
+const CAMERA_GET_IMAGE_TIMEOUT_MS = 15 * 1000;
+// Reserved GLADYS_* params namespace in discovered devices: only the
+// semantics defined by the spec are accepted. GLADYS_TRANSPORT is the
+// effective transport of the device (cloud/local badge in the UI) —
+// purely declarative, zero routing semantics in the core.
+const RESERVED_PARAM_PREFIX = 'GLADYS_';
+const TRANSPORT_PARAM = 'GLADYS_TRANSPORT';
+const DEVICE_TRANSPORTS = ['local', 'cloud', 'unreachable'];
+const MAX_TRANSPORTS_PER_REQUEST = 100;
+// Manifest transports field + the standard "prefer local" user preference,
+// stored as a reserved config key (readable by the integration, never
+// writable by it).
+const MANIFEST_TRANSPORTS = ['local', 'cloud'];
+const PREFER_LOCAL_CONFIG_KEY = 'GLADYS_PREFER_LOCAL';
 
 module.exports = {
   EXTERNAL_INTEGRATION_LABEL,
@@ -151,4 +173,13 @@ module.exports = {
   NETWORK_DISCOVERY_MIN_TIMEOUT_SECONDS,
   NETWORK_DISCOVERY_MAX_TIMEOUT_SECONDS,
   NETWORK_DISCOVERY_DEFAULT_TIMEOUT_SECONDS,
+  MAX_CAMERA_IMAGES_PER_MINUTE,
+  MAX_CAMERA_IMAGE_SIZE,
+  CAMERA_GET_IMAGE_TIMEOUT_MS,
+  RESERVED_PARAM_PREFIX,
+  TRANSPORT_PARAM,
+  DEVICE_TRANSPORTS,
+  MAX_TRANSPORTS_PER_REQUEST,
+  MANIFEST_TRANSPORTS,
+  PREFER_LOCAL_CONFIG_KEY,
 };

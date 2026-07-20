@@ -1,4 +1,5 @@
 const { BadParameters } = require('../../utils/coreErrors');
+const { RESERVED_PARAM_PREFIX } = require('./constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
 
 const CONFIG_KEY_REGEX = /^[a-z0-9_]+$/;
@@ -24,6 +25,12 @@ async function setIntegrationConfig(service, config) {
   keys.forEach((key) => {
     if (!CONFIG_KEY_REGEX.test(key)) {
       throw new BadParameters(`config.${key}: keys must match [a-z0-9_]`);
+    }
+    // gladys_* would be uppercased into the reserved GLADYS_* namespace
+    // (user preferences like GLADYS_PREFER_LOCAL): read-only for the
+    // integration
+    if (key.toUpperCase().startsWith(RESERVED_PARAM_PREFIX)) {
+      throw new BadParameters(`config.${key}: ${RESERVED_PARAM_PREFIX}* keys are reserved`);
     }
     const field = configSchema.find((schemaField) => schemaField.key === key);
     if (field) {
