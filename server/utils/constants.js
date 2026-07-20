@@ -1572,6 +1572,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CONFIG_UPDATED: 'external-integration.config-updated',
     OAUTH_GET_AUTHORIZE_URL: 'external-integration.oauth.get-authorize-url',
     OAUTH_CALLBACK: 'external-integration.oauth.callback',
+    ACTION_RUN: 'external-integration.action.run',
   },
 };
 

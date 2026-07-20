@@ -16,16 +16,38 @@ class ExternalIntegrationInstallPage extends Component {
     this.setState({ loadStatus: RequestStatus.Getting });
     try {
       const storeSlug = `${this.props.owner}/${this.props.repo}`;
-      const { integrations = [] } = await this.props.httpClient.get('/api/v1/external_integration/store');
+      const [{ integrations = [] }, installedIntegrations] = await Promise.all([
+        this.props.httpClient.get('/api/v1/external_integration/store'),
+        this.props.httpClient.get('/api/v1/external_integration')
+      ]);
       const storeIntegration = integrations.find(integration => integration.store_slug === storeSlug);
       this.setState({
         storeIntegration,
+        duplicateOfInstalled: storeIntegration
+          ? this.findDuplicateOfInstalled(storeIntegration, installedIntegrations)
+          : null,
         loadStatus: storeIntegration ? RequestStatus.Success : RequestStatus.Error
       });
     } catch (e) {
       console.error(e);
       this.setState({ loadStatus: RequestStatus.Error });
     }
+  };
+
+  // two instances of the same integration (a dev build next to the prod
+  // one) may fight over the same cloud account or devices: warn, but let
+  // the user install anyway — it is a supported workflow
+  findDuplicateOfInstalled = (storeIntegration, installedIntegrations) => {
+    const manifest = storeIntegration.manifest || {};
+    const imageWithoutTag = reference => (reference || '').split('@')[0].split(':')[0];
+    return (
+      (installedIntegrations || []).find(
+        installed =>
+          (manifest.docker_image &&
+            imageWithoutTag(installed.docker_image) === imageWithoutTag(manifest.docker_image)) ||
+          (manifest.name && get(installed, 'manifest.name') === manifest.name)
+      ) || null
+    );
   };
 
   install = async () => {
@@ -52,10 +74,12 @@ class ExternalIntegrationInstallPage extends Component {
     }
   }
 
-  render(props, { storeIntegration, loadStatus, installStatus }) {
+  render(props, { storeIntegration, loadStatus, installStatus, duplicateOfInstalled }) {
     const language = get(props, 'user.language') || 'en';
     const manifest = (storeIntegration && storeIntegration.manifest) || {};
     const github = (storeIntegration && storeIntegration.github) || {};
+    const docs = (storeIntegration && storeIntegration.docs) || {};
+    const docsUrl = docs[language] || docs.en;
     const installing = installStatus === RequestStatus.Getting;
     return (
       <div class="page">
@@ -113,10 +137,17 @@ class ExternalIntegrationInstallPage extends Component {
                                 href={storeIntegration.repo_url || getGithubRepoUrl(storeIntegration.store_slug)}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                class="mr-4"
                               >
                                 <i class="fe fe-github mr-1" />
                                 {storeIntegration.store_slug}
                               </a>
+                              {docsUrl && (
+                                <a href={docsUrl} target="_blank" rel="noopener noreferrer">
+                                  <i class="fe fe-book-open mr-1" />
+                                  <Text id="integration.externalIntegration.install.documentationLink" />
+                                </a>
+                              )}
                             </div>
                             <p>{getLocalizedText(manifest.description, language)}</p>
 
@@ -129,6 +160,19 @@ class ExternalIntegrationInstallPage extends Component {
                             </div>
 
                             <NetworkDiscoverySummary networkDiscovery={manifest.network_discovery} />
+
+                            {duplicateOfInstalled && (
+                              <div class="alert alert-warning">
+                                <h4 class="alert-title">
+                                  <i class="fe fe-copy mr-1" />
+                                  <Text id="integration.externalIntegration.install.duplicateWarningTitle" />
+                                </h4>
+                                <Text
+                                  id="integration.externalIntegration.install.duplicateWarningText"
+                                  fields={{ name: duplicateOfInstalled.name }}
+                                />
+                              </div>
+                            )}
 
                             {storeIntegration.compatible === false && (
                               <div class="alert alert-danger">

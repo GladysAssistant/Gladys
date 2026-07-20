@@ -19,6 +19,25 @@ describe('externalIntegration.validateConfigValue', () => {
     }
   });
 
+  it('should validate multi_select values as arrays of unique option values', () => {
+    const field = {
+      key: 'rooms',
+      type: 'multi_select',
+      options: [{ value: 'living' }, { value: 'kitchen' }],
+    };
+    expect(validateConfigValue(field, ['living', 'kitchen'])).to.deep.equal(['living', 'kitchen']);
+    expect(validateConfigValue(field, [])).to.deep.equal([]);
+    ['living', ['nope'], ['living', 'living'], 42].forEach((value) => {
+      try {
+        validateConfigValue(field, value);
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+        expect(e.properties).to.include('must be an array of unique values');
+      }
+    });
+  });
+
   it('should reject a direct value on an oauth2 field', () => {
     try {
       validateConfigValue({ key: 'netatmo_account', type: 'oauth2' }, 'anything');

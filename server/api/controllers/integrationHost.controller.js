@@ -61,7 +61,10 @@ module.exports = function IntegrationHostController(gladys) {
    * creation stays a user gesture in the UI.
    */
   async function publishDiscoveredDevices(req, res) {
-    const count = gladys.externalIntegration.setDiscoveredDevices(req.externalIntegrationService, req.body.devices);
+    const count = await gladys.externalIntegration.setDiscoveredDevices(
+      req.externalIntegrationService,
+      req.body.devices,
+    );
     res.json({ success: true, count });
   }
 

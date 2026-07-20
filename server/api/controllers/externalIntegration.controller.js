@@ -37,6 +37,7 @@ module.exports = function ExternalIntegrationController(gladys) {
       ...integration,
       update_available: gladys.externalIntegration.isUpdateAvailable(integration),
       connection_status: gladys.externalIntegration.getConnectionStatus(integration.id),
+      started_at: await gladys.externalIntegration.getContainerStartedAt(integration),
     });
   }
 
@@ -175,6 +176,21 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/external_integration/:selector/action/:key runAction
+   * @apiName runAction
+   * @apiGroup ExternalIntegration
+   * @apiDescription Run an action declared in the manifest: the form values
+   * are validated against the action fields (422 otherwise), relayed over
+   * WebSocket and acked within the timeout declared by the action. 404 on
+   * an undeclared key, 400 when the integration is disconnected, 422 with
+   * the integration message on an explicit failure.
+   */
+  async function runAction(req, res) {
+    const result = await gladys.externalIntegration.runAction(req.params.selector, req.params.key, req.body.fields);
+    res.json(result);
+  }
+
+  /**
    * @api {post} /api/v1/external_integration/:selector/start start
    * @apiName start
    * @apiGroup ExternalIntegration
@@ -239,6 +255,7 @@ module.exports = function ExternalIntegrationController(gladys) {
     saveConfig: asyncMiddleware(saveConfig),
     getOAuthAuthorizeUrl: asyncMiddleware(getOAuthAuthorizeUrl),
     oauthCallback: asyncMiddleware(oauthCallback),
+    runAction: asyncMiddleware(runAction),
     start: asyncMiddleware(start),
     stop: asyncMiddleware(stop),
     restart: asyncMiddleware(restart),

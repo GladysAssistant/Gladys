@@ -6,6 +6,9 @@ const {
   NETWORK_DISCOVERY_TYPES,
   MAX_NETWORK_DISCOVERY_ENTRIES,
   MAX_UDP_BROADCAST_PORTS,
+  MAX_ACTIONS,
+  ACTION_MIN_TIMEOUT_SECONDS,
+  ACTION_MAX_TIMEOUT_SECONDS,
 } = require('./constants');
 
 // These rules are the exact mirror of the canonical manifest schema owned by
@@ -23,7 +26,9 @@ const MANIFEST_FIELDS = [
   'cover_image',
   'config_schema',
   'network_discovery',
+  'actions',
 ];
+const ACTION_FIELDS = ['key', 'label', 'description', 'timeout_seconds', 'fields'];
 // per capture type: the required specific field + its rules. The entries
 // are an authorization contract (same philosophy as hardware requests):
 // shown on the install screen, no arbitrary capture ever.
@@ -35,7 +40,9 @@ const NETWORK_DISCOVERY_FIELDS = {
 // standard DNS-SD service type, e.g. _hue._tcp
 const MDNS_SERVICE_REGEX = /^_[a-z0-9-]+\._(tcp|udp)$/;
 const SSDP_ST_MAX_LENGTH = 200;
-const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'secret', 'oauth2'];
+const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'secret', 'oauth2'];
+const OPTION_FIELD_TYPES = ['select', 'multi_select'];
+const SELECT_DISPLAYS = ['dropdown', 'radio'];
 const CONFIG_FIELD_FIELDS = [
   'key',
   'type',
@@ -47,6 +54,7 @@ const CONFIG_FIELD_FIELDS = [
   'min',
   'max',
   'options',
+  'display',
 ];
 // boolean has no input to hint, select shows its options
 const PLACEHOLDER_FIELD_TYPES = ['string', 'number', 'secret'];
@@ -153,6 +161,13 @@ function validateConfigFieldDefault(field, path, errors) {
         errors.push(`${path}.default: must be one of the select options`);
       }
       break;
+    case 'multi_select': {
+      const validValues = (Array.isArray(field.options) ? field.options : []).map((option) => option.value);
+      if (!Array.isArray(field.default) || !field.default.every((value) => validValues.includes(value))) {
+        errors.push(`${path}.default: must be an array of the multi_select option values`);
+      }
+      break;
+    }
     default:
       // secret: it would end up published in the store ;
       // oauth2: the value is the Connect flow, tokens live off-schema
@@ -166,11 +181,13 @@ function validateConfigFieldDefault(field, path, errors) {
  * @param {number} index - Index of the field in the list.
  * @param {Set} seenKeys - Keys already seen, to detect duplicates.
  * @param {Array} errors - The array of errors to push to.
+ * @param {string} [basePath] - Path prefix for error messages (the action
+ * mini forms reuse the same format under another path).
  * @example
  * validateConfigField({ key: 'latitude', type: 'number', label: { en: 'Latitude' } }, 0, seenKeys, errors);
  */
-function validateConfigField(field, index, seenKeys, errors) {
-  const path = `config_schema[${index}]`;
+function validateConfigField(field, index, seenKeys, errors, basePath = 'config_schema') {
+  const path = `${basePath}[${index}]`;
   if (field === null || typeof field !== 'object' || Array.isArray(field)) {
     errors.push(`${path}: must be an object`);
     return;
@@ -218,9 +235,16 @@ function validateConfigField(field, index, seenKeys, errors) {
   } else if (field.min !== undefined || field.max !== undefined) {
     errors.push(`${path}.min: only allowed on number fields`);
   }
-  if (field.type === 'select') {
+  if (field.display !== undefined) {
+    if (field.type !== 'select') {
+      errors.push(`${path}.display: only allowed on select fields`);
+    } else if (!SELECT_DISPLAYS.includes(field.display)) {
+      errors.push(`${path}.display: must be one of ${SELECT_DISPLAYS.join(', ')}`);
+    }
+  }
+  if (OPTION_FIELD_TYPES.includes(field.type)) {
     if (!Array.isArray(field.options) || field.options.length === 0) {
-      errors.push(`${path}.options: select fields must have a non-empty options list`);
+      errors.push(`${path}.options: ${field.type} fields must have a non-empty options list`);
     } else {
       field.options.forEach((option, optionIndex) => {
         if (option === null || typeof option !== 'object' || Array.isArray(option)) {
@@ -239,7 +263,66 @@ function validateConfigField(field, index, seenKeys, errors) {
       });
     }
   } else if (field.options !== undefined) {
-    errors.push(`${path}.options: only allowed on select fields`);
+    errors.push(`${path}.options: only allowed on select and multi_select fields`);
+  }
+}
+
+/**
+ * @description Validate one entry of the manifest actions list: an
+ * on-demand operation rendered as a button in the Configuration screen,
+ * with an optional flat form reusing the config_schema field format and a
+ * per-action ack timeout (these operations can be long).
+ * @param {object} action - The action to validate.
+ * @param {number} index - Index of the action in the list.
+ * @param {Set} seenKeys - Action keys already seen, to detect duplicates.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateAction({ key: 'detect_protocol', label: { en: 'Detect' } }, 0, seenKeys, errors);
+ */
+function validateAction(action, index, seenKeys, errors) {
+  const path = `actions[${index}]`;
+  if (action === null || typeof action !== 'object' || Array.isArray(action)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  Object.keys(action).forEach((key) => {
+    if (!ACTION_FIELDS.includes(key)) {
+      errors.push(`${path}.${key}: unknown field`);
+    }
+  });
+  if (typeof action.key !== 'string' || !CONFIG_KEY_REGEX.test(action.key)) {
+    errors.push(`${path}.key: must be a non-empty string matching [a-z0-9_]`);
+  } else if (seenKeys.has(action.key)) {
+    errors.push(`${path}.key: duplicate key "${action.key}"`);
+  } else {
+    seenKeys.add(action.key);
+  }
+  validateMultiLanguageText(action.label, `${path}.label`, errors);
+  if (action.description !== undefined) {
+    validateMultiLanguageText(action.description, `${path}.description`, errors);
+  }
+  if (action.timeout_seconds !== undefined) {
+    if (
+      !Number.isInteger(action.timeout_seconds) ||
+      action.timeout_seconds < ACTION_MIN_TIMEOUT_SECONDS ||
+      action.timeout_seconds > ACTION_MAX_TIMEOUT_SECONDS
+    ) {
+      errors.push(
+        `${path}.timeout_seconds: must be an integer between ${ACTION_MIN_TIMEOUT_SECONDS} and ${ACTION_MAX_TIMEOUT_SECONDS}`,
+      );
+    }
+  }
+  if (action.fields !== undefined) {
+    if (!Array.isArray(action.fields)) {
+      errors.push(`${path}.fields: must be an array`);
+    } else {
+      // same format and rules as the config_schema (the mini form is
+      // rendered by the same engine); keys unique within the action
+      const seenFieldKeys = new Set();
+      action.fields.forEach((field, fieldIndex) => {
+        validateConfigField(field, fieldIndex, seenFieldKeys, errors, `${path}.fields`);
+      });
+    }
   }
 }
 
@@ -358,6 +441,14 @@ function validateManifest(manifest) {
       errors.push(`network_discovery: must be a list of 1-${MAX_NETWORK_DISCOVERY_ENTRIES} capture requests`);
     } else {
       manifest.network_discovery.forEach((entry, index) => validateNetworkDiscoveryEntry(entry, index, errors));
+    }
+  }
+  if (manifest.actions !== undefined) {
+    if (!Array.isArray(manifest.actions) || manifest.actions.length === 0 || manifest.actions.length > MAX_ACTIONS) {
+      errors.push(`actions: must be a list of 1-${MAX_ACTIONS} actions`);
+    } else {
+      const seenActionKeys = new Set();
+      manifest.actions.forEach((action, index) => validateAction(action, index, seenActionKeys, errors));
     }
   }
   if (errors.length > 0) {

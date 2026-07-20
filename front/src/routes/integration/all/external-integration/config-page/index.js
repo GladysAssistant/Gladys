@@ -112,6 +112,54 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  updateActionFieldValue = (actionKey, field, value) => {
+    const actionFieldValues = Object.assign({}, this.state.actionFieldValues);
+    actionFieldValues[actionKey] = Object.assign({}, actionFieldValues[actionKey], { [field.key]: value });
+    this.setState({ actionFieldValues });
+  };
+
+  runAction = async action => {
+    const actionStates = Object.assign({}, this.state.actionStates, {
+      [action.key]: { status: RequestStatus.Getting }
+    });
+    this.setState({ actionStates });
+    const rawValues = (this.state.actionFieldValues || {})[action.key] || {};
+    const fields = {};
+    (action.fields || []).forEach(field => {
+      const value = rawValues[field.key];
+      if (field.type === 'number') {
+        const numericValue = value === '' || value === undefined || value === null ? NaN : Number(value);
+        if (!Number.isNaN(numericValue)) {
+          fields[field.key] = numericValue;
+        }
+      } else if (field.type === 'boolean') {
+        fields[field.key] = !!value;
+      } else if (value !== undefined && value !== null) {
+        fields[field.key] = value;
+      }
+    });
+    try {
+      const result = await this.props.httpClient.post(
+        `/api/v1/external_integration/${this.props.selector}/action/${action.key}`,
+        { fields }
+      );
+      this.setState({
+        actionStates: Object.assign({}, this.state.actionStates, {
+          [action.key]: { status: RequestStatus.Success, message: result.message }
+        })
+      });
+    } catch (e) {
+      console.error(e);
+      // an explicit refusal of the integration is a 422 carrying its message
+      const message = get(e, 'response.data.properties');
+      this.setState({
+        actionStates: Object.assign({}, this.state.actionStates, {
+          [action.key]: { status: RequestStatus.Error, message }
+        })
+      });
+    }
+  };
+
   connectOAuth = async field => {
     this.setState({ oauthStatus: RequestStatus.Getting });
     const { selector } = this.props;
@@ -223,6 +271,8 @@ class ExternalIntegrationConfigPage extends Component {
           updateConfigValue={this.updateConfigValue}
           saveConfig={this.saveConfig}
           connectOAuth={this.connectOAuth}
+          updateActionFieldValue={this.updateActionFieldValue}
+          runAction={this.runAction}
           executeAction={this.executeAction}
           askUninstall={this.askUninstall}
           cancelUninstall={this.cancelUninstall}

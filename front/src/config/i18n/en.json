@@ -612,6 +612,11 @@
         "oauthConnectButton": "Connect",
         "oauthConnectError": "There was an error starting the connection. Check that the integration is running."
       },
+      "actions": {
+        "title": "Actions",
+        "runButton": "Run",
+        "error": "The action failed. Check that the integration is running."
+      },
       "connection": {
         "label": "Connection",
         "connectedBadge": "Connected",
@@ -645,7 +650,8 @@
         "uninstallButton": "Uninstall",
         "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
         "confirmUninstallButton": "Yes, uninstall",
-        "cancelUninstallButton": "Cancel"
+        "cancelUninstallButton": "Cancel",
+        "startedAtLabel": "Running since"
       },
       "device": {
         "title": "Devices",
@@ -672,7 +678,9 @@
         "alreadyCreatedBadge": "Already added",
         "createError": "There was an error adding this device.",
         "featuresLabel": "Features",
-        "createButton": "Add to Gladys"
+        "createButton": "Add to Gladys",
+        "updateButton": "Update",
+        "updateTitle": "The integration re-published this device with a different structure: apply the new definition"
       },
       "install": {
         "backToCatalog": "Back to integrations",
@@ -688,7 +696,10 @@
         "installing": "Installing...",
         "installButton": "Install",
         "networkDiscoveryTitle": "Network discovery requests",
-        "networkDiscoveryText": "This integration asks Gladys to capture the following network announcements on its behalf. It will never be able to capture anything else."
+        "networkDiscoveryText": "This integration asks Gladys to capture the following network announcements on its behalf. It will never be able to capture anything else.",
+        "documentationLink": "Documentation",
+        "duplicateWarningTitle": "Another instance is already installed",
+        "duplicateWarningText": "\"{name}\" looks like another instance of this integration. Two instances may fight over the same cloud account or the same devices — consider stopping the existing one during your tests. Installing anyway is supported (e.g. a dev build next to the production one)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",

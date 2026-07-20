@@ -14,6 +14,15 @@ class ConfigField extends Component {
     this.props.updateConfigValue(this.props.field, e.target.checked);
   };
 
+  onMultiSelectToggle = e => {
+    const { field, values } = this.props;
+    const currentValues = Array.isArray(values[field.key]) ? values[field.key] : [];
+    const newValues = e.target.checked
+      ? [...currentValues, e.target.value]
+      : currentValues.filter(value => value !== e.target.value);
+    this.props.updateConfigValue(field, newValues);
+  };
+
   onOAuthConnect = e => {
     e.preventDefault();
     this.props.connectOAuth(this.props.field);
@@ -86,7 +95,7 @@ class ConfigField extends Component {
           {label}
           {field.required && <span class="form-required">*</span>}
         </label>
-        {field.type === 'select' && (
+        {field.type === 'select' && field.display !== 'radio' && (
           <select id={fieldId} class="form-control" onChange={this.onInput}>
             <option value="" selected={value === undefined || value === null || value === ''}>
               <Text id="global.emptySelectOption" />
@@ -97,6 +106,39 @@ class ConfigField extends Component {
               </option>
             ))}
           </select>
+        )}
+        {field.type === 'select' && field.display === 'radio' && (
+          <div>
+            {(field.options || []).map(option => (
+              <label key={option.value} class="custom-control custom-radio">
+                <input
+                  type="radio"
+                  class="custom-control-input"
+                  name={fieldId}
+                  value={option.value}
+                  checked={value === option.value}
+                  onChange={this.onInput}
+                />
+                <span class="custom-control-label">{getLocalizedText(option.label, language) || option.value}</span>
+              </label>
+            ))}
+          </div>
+        )}
+        {field.type === 'multi_select' && (
+          <div>
+            {(field.options || []).map(option => (
+              <label key={option.value} class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="custom-control-input"
+                  value={option.value}
+                  checked={Array.isArray(value) && value.includes(option.value)}
+                  onChange={this.onMultiSelectToggle}
+                />
+                <span class="custom-control-label">{getLocalizedText(option.label, language) || option.value}</span>
+              </label>
+            ))}
+          </div>
         )}
         {field.type === 'number' && (
           <input
@@ -130,7 +172,8 @@ class ConfigField extends Component {
             />
           </Localizer>
         )}
-        {(field.type === 'string' || !['boolean', 'select', 'number', 'secret', 'oauth2'].includes(field.type)) && (
+        {(field.type === 'string' ||
+          !['boolean', 'select', 'multi_select', 'number', 'secret', 'oauth2'].includes(field.type)) && (
           <input
             id={fieldId}
             type="text"
@@ -146,6 +189,8 @@ class ConfigField extends Component {
     );
   }
 }
+
+export { ConfigField };
 
 const ConfigSchemaForm = ({
   schema,

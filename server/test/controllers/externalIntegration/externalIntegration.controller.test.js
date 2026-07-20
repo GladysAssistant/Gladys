@@ -97,6 +97,17 @@ describe('External integration admin API', () => {
       await authenticatedRequest.get('/api/v1/external_integration/ext-unknown').expect(404);
     });
 
+    it('should expose the container start date in the detail', async () => {
+      const service = await seedExternalService();
+      stubInstance(
+        gladys.externalIntegration,
+        'getContainerStartedAt',
+        fake.resolves('2026-07-20T08:00:00.000000000Z'),
+      );
+      const res = await authenticatedRequest.get(`/api/v1/external_integration/${service.selector}`).expect(200);
+      expect(res.body).to.have.property('started_at', '2026-07-20T08:00:00.000000000Z');
+    });
+
     it('should expose the application-level connection status in the detail', async () => {
       const service = await seedExternalService();
       const withoutStatus = await authenticatedRequest.get(`/api/v1/external_integration/${service.selector}`);
@@ -108,6 +119,56 @@ describe('External integration admin API', () => {
       const res = await authenticatedRequest.get(`/api/v1/external_integration/${service.selector}`).expect(200);
       expect(res.body.connection_status).to.deep.equal({ connected: false, message: { en: 'Token expired' } });
       gladys.externalIntegration.connectionStatuses.clear();
+    });
+  });
+
+  describe('POST /api/v1/external_integration/:selector/action/:key', () => {
+    const ACTIONS_MANIFEST = {
+      ...TEST_MANIFEST,
+      actions: [
+        {
+          key: 'detect_protocol',
+          label: { en: 'Detect protocol version' },
+          timeout_seconds: 15,
+          fields: [{ key: 'ip', type: 'string', label: { en: 'Device IP' }, required: true }],
+        },
+      ],
+    };
+
+    it('should run the action and return the integration message', async () => {
+      const service = await seedExternalService({ manifest: ACTIONS_MANIFEST });
+      stubInstance(
+        gladys.externalIntegration,
+        'sendCommand',
+        fake.resolves({ success: true, data: { message: { en: 'Protocol 3.3' } } }),
+      );
+      const res = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/action/detect_protocol`)
+        .send({ fields: { ip: '192.168.1.42' } })
+        .expect(200);
+      expect(res.body).to.deep.equal({ success: true, message: { en: 'Protocol 3.3' } });
+      // the ack delay is the one declared by the action, not the 5s rule
+      expect(gladys.externalIntegration.sendCommand.firstCall.args[3]).to.deep.equal({ timeoutMs: 15000 });
+    });
+
+    it('should return 404 on an undeclared action', async () => {
+      const service = await seedExternalService({ manifest: ACTIONS_MANIFEST });
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/action/reboot_the_world`)
+        .send({})
+        .expect(404);
+    });
+
+    it('should return 422 on invalid fields and 400 when disconnected', async () => {
+      const service = await seedExternalService({ manifest: ACTIONS_MANIFEST });
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/action/detect_protocol`)
+        .send({ fields: { ip: 42 } })
+        .expect(422);
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/action/detect_protocol`)
+        .send({ fields: { ip: '192.168.1.42' } })
+        .expect(400);
     });
   });
 

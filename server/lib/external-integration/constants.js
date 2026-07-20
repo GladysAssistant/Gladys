@@ -38,8 +38,16 @@ const RESTART_BACKOFF_MAX_MS = 15 * 60 * 1000;
 // WebSocket protocol ping interval; 2 missed pongs -> DEGRADED.
 const WEBSOCKET_PING_INTERVAL_MS = 20 * 1000;
 const MAX_MISSED_PINGS = 2;
-// Commands sent to the integration must be acked within this delay.
+// Commands sent to the integration must be acked within this delay
+// (manifest actions override it with their declared timeout_seconds).
 const COMMAND_TIMEOUT_MS = 5 * 1000;
+// Manifest actions: on-demand operations rendered as buttons in the
+// Configuration screen. Their ack delay is per-action (they can be long:
+// protocol detection, re-pairing...), bounded 5-120s.
+const MAX_ACTIONS = 10;
+const ACTION_MIN_TIMEOUT_SECONDS = 5;
+const ACTION_MAX_TIMEOUT_SECONDS = 120;
+const ACTION_DEFAULT_TIMEOUT_SECONDS = 30;
 // Host API limits.
 const MAX_DISCOVERED_DEVICES = 200;
 const MAX_STATES_PER_REQUEST = 100;
@@ -74,6 +82,10 @@ module.exports = {
   WEBSOCKET_PING_INTERVAL_MS,
   MAX_MISSED_PINGS,
   COMMAND_TIMEOUT_MS,
+  MAX_ACTIONS,
+  ACTION_MIN_TIMEOUT_SECONDS,
+  ACTION_MAX_TIMEOUT_SECONDS,
+  ACTION_DEFAULT_TIMEOUT_SECONDS,
   MAX_DISCOVERED_DEVICES,
   MAX_STATES_PER_REQUEST,
   MAX_STATES_PER_MINUTE,

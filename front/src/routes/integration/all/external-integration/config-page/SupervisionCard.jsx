@@ -79,6 +79,12 @@ const SupervisionCard = ({
                   )}
                 </dd>
               ]}
+              {integration.started_at && [
+                <dt class="col-5 col-sm-4">
+                  <Text id="integration.externalIntegration.supervision.startedAtLabel" />
+                </dt>,
+                <dd class="col-7 col-sm-8">{new Date(integration.started_at).toLocaleString(language)}</dd>
+              ]}
               {integration.version && [
                 <dt class="col-5 col-sm-4">
                   <Text id="integration.externalIntegration.supervision.versionLabel" />

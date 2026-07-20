@@ -550,6 +550,11 @@ function getRoutes(gladys) {
       admin: true,
       controller: externalIntegrationController.oauthCallback,
     },
+    'post /api/v1/external_integration/:selector/action/:key': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.runAction,
+    },
     'delete /api/v1/external_integration/:selector': {
       authenticated: true,
       admin: true,
