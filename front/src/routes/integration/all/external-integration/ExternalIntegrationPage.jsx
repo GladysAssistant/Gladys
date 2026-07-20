@@ -2,6 +2,22 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import get from 'get-value';
 
+// last known display name per integration: each tab reloads the integration
+// on mount, and showing the raw selector while it loads made the title
+// flash on every tab switch
+const NAME_CACHE = new Map();
+
+const getDisplayName = (selector, integration) => {
+  const name = get(integration, 'manifest.name');
+  if (name) {
+    NAME_CACHE.set(selector, name);
+    return name;
+  }
+  // non-breaking space: the title keeps its height on the very first
+  // load instead of showing the raw selector
+  return NAME_CACHE.get(selector) || '\u00A0';
+};
+
 const ExternalIntegrationPage = ({ selector, integration, children }) => (
   <div class="page">
     <div class="page-main">
@@ -9,7 +25,7 @@ const ExternalIntegrationPage = ({ selector, integration, children }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
-              <h3 class="page-title mb-5">{get(integration, 'manifest.name') || selector}</h3>
+              <h3 class="page-title mb-5">{getDisplayName(selector, integration)}</h3>
               <div>
                 <div class="list-group list-group-transparent mb-0">
                   <Link
