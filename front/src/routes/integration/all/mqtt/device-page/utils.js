@@ -429,6 +429,27 @@ export const getDefaultUnitForFeature = (category, type) => {
     }
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.GRID_SENSOR) {
+    // Instantaneous powers (including the signed grid power) in watt,
+    // cumulative meter indexes in kWh.
+    if (typeof type === 'string' && (type.endsWith('-power') || type === 'power')) {
+      return DEVICE_FEATURE_UNITS.WATT;
+    }
+    if (typeof type === 'string' && (type.endsWith('-index') || type === 'index')) {
+      return DEVICE_FEATURE_UNITS.KILOWATT_HOUR;
+    }
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR) {
+    // Instantaneous powers in watt, cumulative meter indexes in kWh.
+    if (typeof type === 'string' && (type.endsWith('-power') || type === 'power')) {
+      return DEVICE_FEATURE_UNITS.WATT;
+    }
+    if (typeof type === 'string' && (type.endsWith('-index') || type === 'index')) {
+      return DEVICE_FEATURE_UNITS.KILOWATT_HOUR;
+    }
+  }
+
   const preferredUnit = PREFERRED_DEFAULT_UNIT_BY_CATEGORY[category];
   if (preferredUnit) {
     return preferredUnit;
@@ -504,6 +525,26 @@ export const getFeatureDefaultValues = (category, type) => {
     keep_history: true,
     has_feedback: false
   };
+
+  // Category-specific blocks first: some of their types ('power', 'index')
+  // also exist in other categories matched below by type only.
+  if (category === DEVICE_FEATURE_CATEGORIES.GRID_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.GRID_SENSOR.POWER) {
+      // Signed grid exchange: import positive, export negative.
+      return applyDefaultUnit({ ...defaults, min: -100000, max: 100000 }, category, type);
+    }
+    if (typeof type === 'string' && type.endsWith('-power')) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
+    }
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR) {
+    if (typeof type === 'string' && (type.endsWith('-power') || type === 'power')) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
+    }
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
+  }
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.BINARY && category === DEVICE_FEATURE_CATEGORIES.LIGHT) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: false }, category, type);
@@ -722,6 +763,37 @@ export const getCatalogPreviewLabelKey = (category, type) => {
 };
 
 export const getFeaturePreviewValue = (category, type) => {
+  // Category-specific blocks first: some of their types ('power', 'index')
+  // also exist in other categories matched below by type only.
+  if (category === DEVICE_FEATURE_CATEGORIES.GRID_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.GRID_SENSOR.INPUT_POWER) {
+      return 752;
+    }
+    if (type === DEVICE_FEATURE_TYPES.GRID_SENSOR.OUTPUT_POWER) {
+      return 0;
+    }
+    if (type === DEVICE_FEATURE_TYPES.GRID_SENSOR.POWER) {
+      return -850;
+    }
+    if (type === DEVICE_FEATURE_TYPES.GRID_SENSOR.INPUT_INDEX) {
+      return 1072.8;
+    }
+    return 42.5;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.HOME_OUTPUT_SENSOR.POWER) {
+      return 311;
+    }
+    if (type === DEVICE_FEATURE_TYPES.HOME_OUTPUT_SENSOR.INDEX) {
+      return 764.6;
+    }
+    if (type === DEVICE_FEATURE_TYPES.HOME_OUTPUT_SENSOR.OFF_GRID_POWER) {
+      return 0;
+    }
+    return 12.3;
+  }
+
   if (
     type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE ||
     type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE ||
