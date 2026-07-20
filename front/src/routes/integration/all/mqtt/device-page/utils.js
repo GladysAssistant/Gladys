@@ -684,9 +684,6 @@ export const getFeatureDefaultValues = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR) {
     if (type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.POWER) {
-      return 850;
-    }
-    if (type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.POWER) {
       return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
     }
     // Cumulative production indexes and revenues
