@@ -170,7 +170,10 @@ jobs:
           # Docker tags only allow [a-zA-Z0-9_.-] and must be 128 chars max,
           # so we sanitize the branch name (e.g. "feature/foo" -> "feature-foo").
           BRANCH_TAG=$(echo "${{ github.head_ref }}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g' | cut -c1-128)
-          IMAGE="ghcr.io/${{ github.repository }}-preview:${BRANCH_TAG}"
+          # A Docker repository name must be lowercase, so we lowercase the
+          # owner/repo part as well (e.g. "GladysAssistant/Gladys").
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/${REPO}-preview:${BRANCH_TAG}"
           echo "tag=${BRANCH_TAG}" >> "$GITHUB_OUTPUT"
           echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
       - name: 💽 Set up QEMU
