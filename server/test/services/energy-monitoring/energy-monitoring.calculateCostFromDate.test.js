@@ -1,4 +1,4 @@
-const { assert, fake } = require('sinon');
+const { assert, fake, stub } = require('sinon');
 
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 
@@ -7,7 +7,7 @@ describe('EnergyMonitoring.calculateCostFromDate', () => {
   let energyMonitoring;
 
   beforeEach(() => {
-    calculateCostFrom = fake.resolves(null);
+    calculateCostFrom = stub().resolves(null);
     const gladys = {
       variable: {
         getValue: fake.resolves('Europe/Paris'),
