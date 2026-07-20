@@ -106,7 +106,7 @@ class Integration extends Component {
 
   buildExternalIntegrationCards() {
     const { user = {}, category } = this.props;
-    if (user.role !== USER_ROLE.ADMIN || (category && category !== 'device')) {
+    if (user.role !== USER_ROLE.ADMIN || (category && category !== 'device' && category !== 'favorites')) {
       return [];
     }
     const language = user.language || 'en';
@@ -128,7 +128,9 @@ class Integration extends Component {
       const manifest = integration.manifest || {};
       const storeIntegration = integration.store_slug ? storeBySlug.get(integration.store_slug) : null;
       externalCards.push({
-        key: `external-${integration.selector}`,
+        // the store_slug keeps the favorite when a store integration goes
+        // from "available" to "installed" (the card key is the favorite key)
+        key: `external-${integration.store_slug || integration.selector}`,
         external: true,
         externalInstalled: true,
         type: 'device',
@@ -149,7 +151,7 @@ class Integration extends Component {
       const manifest = storeIntegration.manifest || {};
       const isInstalled = storeIntegration.installed && storeIntegration.installed_selector;
       externalCards.push({
-        key: `external-store-${storeIntegration.store_slug}`,
+        key: `external-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
         type: 'device',
@@ -201,12 +203,6 @@ class Integration extends Component {
       isFavorite: favorites.includes(integration.key)
     }));
 
-    // If we are in favorites view, only display favorites
-    if (category === 'favorites') {
-      selectedIntegrations = selectedIntegrations.filter(integration => integration.isFavorite);
-      totalSize = selectedIntegrations.length;
-    }
-
     // Translate with i18n
     selectedIntegrations = selectedIntegrations.map(integration => {
       const name = get(intl.dictionary, `integration.${integration.key}.title`, { default: integration.key });
@@ -219,11 +215,20 @@ class Integration extends Component {
       return { ...integration, name, description, url };
     });
 
-    // Merge external integrations (community integrations running in isolated Docker containers)
-    if (category !== 'favorites') {
-      const externalCards = this.buildExternalIntegrationCards();
-      selectedIntegrations = selectedIntegrations.concat(externalCards);
-      totalSize += externalCards.length;
+    // Merge external integrations (community integrations running in isolated
+    // Docker containers), after the i18n pass (their name comes from the
+    // manifest) and before the favorites filter so they can be favorites too
+    const externalCards = this.buildExternalIntegrationCards().map(card => ({
+      ...card,
+      isFavorite: favorites.includes(card.key)
+    }));
+    selectedIntegrations = selectedIntegrations.concat(externalCards);
+    totalSize += externalCards.length;
+
+    // If we are in favorites view, only display favorites
+    if (category === 'favorites') {
+      selectedIntegrations = selectedIntegrations.filter(integration => integration.isFavorite);
+      totalSize = selectedIntegrations.length;
     }
 
     // Filter
