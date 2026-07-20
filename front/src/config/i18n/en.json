@@ -4511,6 +4511,7 @@
       "thirty-minutes-consumption-cost": "30 Minutes Cost"
     },
     "energy-production-sensor": {
+      "power": "Production power",
       "shortCategoryName": "Energy production sensor",
       "index": "Index",
       "daily-production": "Daily Production",

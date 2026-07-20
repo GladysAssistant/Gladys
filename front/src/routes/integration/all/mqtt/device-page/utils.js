@@ -332,6 +332,7 @@ const ENERGY_SENSOR_TYPE_UNITS = {
 };
 
 const ENERGY_PRODUCTION_SENSOR_TYPE_UNITS = {
+  [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.POWER]: DEVICE_FEATURE_UNITS.WATT,
   [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.DAILY_PRODUCTION]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.DAILY_PRODUCTION_REVENUE]: DEVICE_FEATURE_UNITS.EURO,
@@ -681,6 +682,17 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.POWER) {
+      return 850;
+    }
+    if (type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.POWER) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
+    }
+    // Cumulative production indexes and revenues
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.CURRENCY) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000000, unit: DEVICE_FEATURE_UNITS.EURO }, category, type);
   }
@@ -957,6 +969,9 @@ export const getFeaturePreviewValue = (category, type) => {
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR) {
+    if (type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.POWER) {
+      return 850;
+    }
     if (
       type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.DAILY_PRODUCTION_REVENUE ||
       type === DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION_REVENUE
