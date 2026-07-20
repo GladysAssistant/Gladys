@@ -17,6 +17,7 @@ const {
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
   NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
+  CarbonDioxideConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
@@ -115,6 +116,9 @@ describe('Matter.readInitialDeviceStates', () => {
       [FormaldehydeConcentrationMeasurement.Complete.id]: {
         getMeasuredValueAttribute: fake.resolves(5),
       },
+      [CarbonDioxideConcentrationMeasurement.Complete.id]: {
+        getMeasuredValueAttribute: fake.resolves(650),
+      },
       [Thermostat.Complete.id]: {
         supportedFeatures: { heating: true, cooling: true },
         getOccupiedHeatingSetpointAttribute: fake.resolves(2000),
@@ -192,6 +196,10 @@ describe('Matter.readInitialDeviceStates', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `matter:${nodeId}:${devicePath}:${LevelControl.Complete.id}`,
       state: 128,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:${nodeId}:${devicePath}:${CarbonDioxideConcentrationMeasurement.Complete.id}`,
+      state: 650,
     });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:power`,

@@ -14,6 +14,7 @@ const {
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
   NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
+  CarbonDioxideConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
@@ -189,6 +190,14 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
   if (formaldehydeConcentrationMeasurement) {
     const value = await safeReadAttribute(() => formaldehydeConcentrationMeasurement.getMeasuredValueAttribute());
     emitState(`matter:${nodeId}:${devicePath}:${FormaldehydeConcentrationMeasurement.Complete.id}`, value);
+  }
+
+  const carbonDioxideConcentrationMeasurement = device.getClusterClientById(
+    CarbonDioxideConcentrationMeasurement.Complete.id,
+  );
+  if (carbonDioxideConcentrationMeasurement) {
+    const value = await safeReadAttribute(() => carbonDioxideConcentrationMeasurement.getMeasuredValueAttribute());
+    emitState(`matter:${nodeId}:${devicePath}:${CarbonDioxideConcentrationMeasurement.Complete.id}`, value);
   }
 
   const thermostat = device.getClusterClientById(Thermostat.Complete.id);

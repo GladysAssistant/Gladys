@@ -25,6 +25,7 @@ All changes made by agents must follow this workflow:
 
 1. **Never commit directly to `master`.** Create a feature branch for every change (no matter how small) and open a pull request targeting `master`.
 2. **Write PR titles and descriptions in English**, even when the conversation with the user is in another language. This keeps the project history accessible to all contributors and matches the existing CI, templates, and documentation.
+3. **Create pull requests as ready for review (not draft).** When opening a PR, set `draft: false`. Do not create draft PRs.
 
 ## Pull Request requirements (CI)
 
@@ -37,10 +38,10 @@ Every PR to `master` triggers the workflow `.github/workflows/docker-pr-build.ym
 | **Front test** | Always | `prettier-check`, `eslint`, `compare-translations` |
 | **Server test** | Always | `prettier-check`, `eslint`, `npm run coverage` + Codecov upload |
 | **Cypress run** | Always | E2E tests (signup, dashboard, integrations…) |
-| **Front build** | Non-draft PRs only | `npm run build` (Vite) |
-| **Docker build** | Non-draft PRs only | AMD64 Docker image build |
+| **Front build** | When the PR is ready for review (`draft: false`) | `npm run build` (Vite) |
+| **Docker build** | When the PR is ready for review (`draft: false`) | AMD64 Docker image build |
 
-Draft PRs skip the front build and Docker jobs. Mark a PR as "Ready for review" only after the build checks pass locally.
+When the PR is ready for review (`draft: false`), the front build and Docker jobs run in CI. Agent PRs should be opened that way, so run the build checks locally before opening the PR.
 
 ### Mandatory checklist before push
 
@@ -73,7 +74,7 @@ cd front
 npm run prettier && npm run prettier-check
 npm run eslint
 npm run compare-translations   # required if i18n or device constants changed
-npm run build                  # required before marking PR as ready for review
+npm run build                  # required before opening the PR
 ```
 
 - The front has **no unit-test script**. CI validates the front via eslint, `compare-translations`, build, and Cypress.
@@ -91,7 +92,7 @@ npm run cypress:run   # starts server + front, then runs E2E specs in front/cypr
 - **Codecov patch coverage:** CI uploads the coverage report to Codecov, which measures only the lines changed in your PR. Any new server line not hit by a test fails the `codecov/patch` status. Run `npm run coverage` locally and confirm your tests exercise every branch and path you added before pushing.
 - **Server tests:** Changes to `server/lib/`, `server/api/`, `server/controllers/`, or `server/services/` almost always need corresponding tests. Look at neighboring files in `server/test/` for patterns (Mocha + Chai + Sinon).
 - **Cypress:** UI changes to signup, dashboard, scenes, or integration pages can break E2E specs under `front/cypress/e2e/`.
-- **Front build:** Only runs on non-draft PRs. A webpack/build error will block merge when the PR is marked ready.
+- **Front build:** Agent PRs are created as ready for review, so this job runs in CI. Run `npm run build` locally before opening the PR to catch errors early.
 
 ### Lint / test / build commands (reference)
 

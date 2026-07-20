@@ -15,6 +15,7 @@ const {
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
   NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
+  CarbonDioxideConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
@@ -359,6 +360,23 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1067',
       state: 100,
+    });
+  });
+  it('should listen to state change (CarbonDioxideConcentrationMeasurement)', async () => {
+    const clusterClient = {
+      id: CarbonDioxideConcentrationMeasurement.Complete.id,
+      addMeasuredValueAttributeListener: (callback) => {
+        callback(650);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${CarbonDioxideConcentrationMeasurement.Complete.id}`,
+      state: 650,
     });
   });
   it('should listen to state change (Thermostat heating)', async () => {

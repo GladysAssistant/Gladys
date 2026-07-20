@@ -9,6 +9,7 @@ const {
   RvcCleanMode,
   PowerSource,
   Thermostat,
+  CarbonDioxideConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -364,6 +365,65 @@ describe('Matter.convertToGladysDevice', () => {
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '2');
 
     expect(gladysDevice.features).to.have.lengthOf(0);
+  });
+
+  it('should create a CO2 sensor feature for CarbonDioxideConcentrationMeasurement cluster', async () => {
+    const clusterClient = {
+      id: CarbonDioxideConcentrationMeasurement.Complete.id,
+      name: 'CarbonDioxideConcentrationMeasurement',
+      endpointId: 1,
+      getMinMeasuredValueAttribute: async () => 400,
+      getMaxMeasuredValueAttribute: async () => 5000,
+    };
+
+    const device = {
+      name: 'CO2 Sensor',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'CarbonDioxideConcentrationMeasurement - 1',
+      selector: gladysDevice.features[0].selector,
+      category: 'co2-sensor',
+      type: 'decimal',
+      read_only: true,
+      has_feedback: true,
+      unit: 'ppm',
+      external_id: `matter:12345:1:${CarbonDioxideConcentrationMeasurement.Complete.id}`,
+      min: 400,
+      max: 5000,
+    });
+  });
+
+  it('should use fallback CO2 sensor bounds when Matter values are missing', async () => {
+    const clusterClient = {
+      id: CarbonDioxideConcentrationMeasurement.Complete.id,
+      name: 'CarbonDioxideConcentrationMeasurement',
+      endpointId: 1,
+      getMinMeasuredValueAttribute: async () => null,
+      getMaxMeasuredValueAttribute: async () => null,
+    };
+
+    const device = {
+      name: 'CO2 Sensor',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.include({
+      category: 'co2-sensor',
+      min: 0,
+      max: 10000,
+    });
   });
 
   it('should create thermostat local temperature and setpoint features for Thermostat cluster', async () => {
