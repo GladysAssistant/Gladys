@@ -63,4 +63,15 @@ describe('Matter thermostatMatterMapping', () => {
       { value: AC_MODE.FAN, label: 'Fan' },
     ]);
   });
+
+  it('should build supported options for a heating-only device', () => {
+    expect(getAcModeSupportedOptions({ heating: true, autoMode: true })).to.deep.equal([
+      { value: AC_MODE.AUTO, label: 'Auto' },
+      { value: AC_MODE.HEATING, label: 'Heat' },
+    ]);
+  });
+
+  it('should return no options when cooling and heating are disabled', () => {
+    expect(getAcModeSupportedOptions({})).to.deep.equal([]);
+  });
 });

@@ -264,6 +264,21 @@ describe('Matter.readInitialDeviceStates', () => {
     assert.notCalled(gladys.event.emit);
   });
 
+  it('should skip thermostat system mode when attribute read fails', async () => {
+    const thermostat = {
+      supportedFeatures: { cooling: true },
+      getOccupiedCoolingSetpointAttribute: fake.resolves(undefined),
+      getSystemModeAttribute: fake.rejects(new Error('read failed')),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === Thermostat.Complete.id ? thermostat : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(gladys.event.emit);
+  });
+
   it('should skip null electrical measurements and undefined vacuum modes', async () => {
     const clusterClients = {
       [ElectricalPowerMeasurement.Complete.id]: {

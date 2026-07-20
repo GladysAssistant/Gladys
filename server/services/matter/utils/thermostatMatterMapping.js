@@ -85,15 +85,20 @@ function getAcModeSupportedOptions(supportedFeatures) {
   if (supportedFeatures.autoMode) {
     modes.push(AC_MODE.AUTO);
   }
-  modes.push(AC_MODE.COOLING);
+  if (supportedFeatures.cooling) {
+    modes.push(AC_MODE.COOLING);
+    // Dry and FanOnly have no Matter capability flag; expose them on cooling devices
+    modes.push(AC_MODE.DRYING, AC_MODE.FAN);
+  }
   if (supportedFeatures.heating) {
     modes.push(AC_MODE.HEATING);
   }
-  modes.push(AC_MODE.DRYING, AC_MODE.FAN);
-  return modes.map((mode) => ({
-    value: mode,
-    label: GLADYS_AC_MODE_LABELS[mode],
-  }));
+  return modes
+    .sort((a, b) => a - b)
+    .map((mode) => ({
+      value: mode,
+      label: GLADYS_AC_MODE_LABELS[mode],
+    }));
 }
 
 module.exports = {
