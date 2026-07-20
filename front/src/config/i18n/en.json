@@ -4519,6 +4519,21 @@
       "thirty-minutes-production": "30 Minutes Production",
       "thirty-minutes-production-revenue": "30 Minutes Revenue"
     },
+    "grid-sensor": {
+      "shortCategoryName": "Grid sensor",
+      "input-power": "Grid import power",
+      "output-power": "Grid export power",
+      "power": "Grid power (signed)",
+      "input-index": "Grid import index",
+      "output-index": "Grid export index"
+    },
+    "home-output-sensor": {
+      "shortCategoryName": "Home output sensor",
+      "power": "Home output power",
+      "index": "Home output index",
+      "off-grid-power": "Off-grid output power",
+      "off-grid-index": "Off-grid output index"
+    },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",
       "binary": "Switch",

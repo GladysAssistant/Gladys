@@ -4519,6 +4519,21 @@
       "thirty-minutes-production": "Production 30 minutes",
       "thirty-minutes-production-revenue": "Revenu 30 minutes"
     },
+    "grid-sensor": {
+      "shortCategoryName": "Capteur réseau",
+      "input-power": "Puissance import réseau",
+      "output-power": "Puissance export réseau",
+      "power": "Puissance réseau (signée)",
+      "input-index": "Index import réseau",
+      "output-index": "Index export réseau"
+    },
+    "home-output-sensor": {
+      "shortCategoryName": "Capteur de sortie maison",
+      "power": "Puissance vers la maison",
+      "index": "Index sortie maison",
+      "off-grid-power": "Puissance sortie secours",
+      "off-grid-index": "Index sortie secours"
+    },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",
       "binary": "Relais",

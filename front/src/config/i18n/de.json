@@ -4519,6 +4519,21 @@
       "thirty-minutes-production": "Produktion 30 Minuten",
       "thirty-minutes-production-revenue": "Ertrag 30 Minuten"
     },
+    "grid-sensor": {
+      "shortCategoryName": "Netzsensor",
+      "input-power": "Netzbezugsleistung",
+      "output-power": "Netzeinspeiseleistung",
+      "power": "Netzleistung (vorzeichenbehaftet)",
+      "input-index": "Netzbezugszähler",
+      "output-index": "Netzeinspeisezähler"
+    },
+    "home-output-sensor": {
+      "shortCategoryName": "Hausausgangssensor",
+      "power": "Leistung zum Haus",
+      "index": "Zähler Hausausgang",
+      "off-grid-power": "Notstrom-Ausgangsleistung",
+      "off-grid-index": "Notstrom-Zähler"
+    },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",
       "binary": "Schalter",
