@@ -432,7 +432,7 @@ export const getDefaultUnitForFeature = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
     // State of charge in percent, instantaneous powers in watt, and every
-    // cumulative/stored energy (*-energy and battery-energy-remaining) in kWh.
+    // cumulative index (*-index) or stored energy (battery-energy-remaining) in kWh.
     if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
       return DEVICE_FEATURE_UNITS.PERCENT;
     }
@@ -705,7 +705,7 @@ export const getFeatureDefaultValues = (category, type) => {
     if (typeof type === 'string' && type.endsWith('-power')) {
       return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
     }
-    // *-energy and battery-energy-remaining
+    // *-index counters and battery-energy-remaining
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
   }
 
@@ -963,7 +963,7 @@ export const getFeaturePreviewValue = (category, type) => {
     if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_ENERGY_REMAINING) {
       return 4.2;
     }
-    if (typeof type === 'string' && type.endsWith('-energy')) {
+    if (typeof type === 'string' && type.endsWith('-index')) {
       return 128.5;
     }
     return 320;

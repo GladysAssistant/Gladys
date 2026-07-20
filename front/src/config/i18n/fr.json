@@ -4523,8 +4523,8 @@
       "battery-level": "Niveau de batterie",
       "charge-power": "Puissance de charge",
       "discharge-power": "Puissance de décharge",
-      "charge-energy": "Énergie chargée",
-      "discharge-energy": "Énergie déchargée",
+      "charge-index": "Index de charge",
+      "discharge-index": "Index de décharge",
       "battery-energy-remaining": "Énergie restante en batterie"
     },
     "teleinformation": {

@@ -853,8 +853,8 @@ const DEVICE_FEATURE_TYPES = {
     BATTERY_LEVEL: 'battery-level', // state of charge, % (0..100)
     CHARGE_POWER: 'charge-power', // power INTO the battery, W/kW (>=0)
     DISCHARGE_POWER: 'discharge-power', // power OUT of the battery, W/kW (>=0)
-    CHARGE_ENERGY: 'charge-energy', // cumulative energy charged, kWh
-    DISCHARGE_ENERGY: 'discharge-energy', // cumulative energy discharged, kWh
+    CHARGE_INDEX: 'charge-index', // cumulative charged-energy meter index, kWh
+    DISCHARGE_INDEX: 'discharge-index', // cumulative discharged-energy meter index, kWh
     BATTERY_ENERGY_REMAINING: 'battery-energy-remaining', // currently available stored energy (instantaneous), kWh
   },
   TELEINFORMATION: {

@@ -4523,8 +4523,8 @@
       "battery-level": "Battery level",
       "charge-power": "Charge power",
       "discharge-power": "Discharge power",
-      "charge-energy": "Charge energy",
-      "discharge-energy": "Discharge energy",
+      "charge-index": "Charge index",
+      "discharge-index": "Discharge index",
       "battery-energy-remaining": "Battery energy remaining"
     },
     "teleinformation": {

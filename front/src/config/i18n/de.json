@@ -4523,8 +4523,8 @@
       "battery-level": "Batteriestand",
       "charge-power": "Ladeleistung",
       "discharge-power": "Entladeleistung",
-      "charge-energy": "Geladene Energie",
-      "discharge-energy": "Entladene Energie",
+      "charge-index": "Lade-Index",
+      "discharge-index": "Entlade-Index",
       "battery-energy-remaining": "Verbleibende Batterieenergie"
     },
     "teleinformation": {
