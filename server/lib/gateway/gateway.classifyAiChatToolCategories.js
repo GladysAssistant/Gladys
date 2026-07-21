@@ -23,9 +23,6 @@ Include every category that could be needed to fully answer the request. When un
  * truncateForRouter('abcdef', 3);
  */
 function truncateForRouter(str, limitChars) {
-  if (!str) {
-    return '';
-  }
   if (str.length <= limitChars) {
     return str;
   }

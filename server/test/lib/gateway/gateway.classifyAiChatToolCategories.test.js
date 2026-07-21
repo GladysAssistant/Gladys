@@ -49,6 +49,10 @@ describe('gateway.classifyAiChatToolCategories', () => {
       expect(parseToolCategoriesResponse('{"categories": [scenes]}')).to.equal(null);
     });
 
+    it('should return null when categories is not an array', () => {
+      expect(parseToolCategoriesResponse('{"categories": "scenes"}')).to.equal(null);
+    });
+
     it('should return null on empty or missing response', () => {
       expect(parseToolCategoriesResponse('')).to.equal(null);
       expect(parseToolCategoriesResponse(null)).to.equal(null);
