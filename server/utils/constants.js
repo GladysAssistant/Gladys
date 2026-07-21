@@ -180,6 +180,33 @@ const FAN_WIND_SETTING = {
   SLEEP_AND_NATURAL: 3,
 };
 
+const AC_FAN_SPEED = {
+  AUTO: 0,
+  LOW: 1,
+  LOW_MID: 2,
+  MID: 3,
+  MID_HIGH: 4,
+  HIGH: 5,
+  MUTE: 6,
+  TURBO: 7,
+};
+
+const AC_SWING_HORIZONTAL = {
+  OFF: 0,
+  SAME: 1,
+  OPPOSITE: 2,
+};
+
+const AC_SWING_VERTICAL = {
+  OFF: 0,
+  SWING: 1,
+  POSITION_1: 2,
+  POSITION_2: 3,
+  POSITION_3: 4,
+  POSITION_4: 5,
+  POSITION_5: 6,
+};
+
 const PILOT_WIRE_MODE = {
   OFF: 0,
   FROST_PROTECTION: 1,
@@ -769,6 +796,9 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     MODE: 'mode',
     TARGET_TEMPERATURE: 'target-temperature',
+    FAN_SPEED: 'fan-speed',
+    SWING_HORIZONTAL: 'swing-horizontal',
+    SWING_VERTICAL: 'swing-vertical',
   },
   FAN: {
     MODE: 'mode',
@@ -1717,6 +1747,9 @@ module.exports.FAN_AIRFLOW_DIRECTION = FAN_AIRFLOW_DIRECTION;
 module.exports.FAN_ROCK_SETTING = FAN_ROCK_SETTING;
 module.exports.FAN_WIND_SETTING = FAN_WIND_SETTING;
 module.exports.getFanFeatureOptions = getFanFeatureOptions;
+module.exports.AC_FAN_SPEED = AC_FAN_SPEED;
+module.exports.AC_SWING_HORIZONTAL = AC_SWING_HORIZONTAL;
+module.exports.AC_SWING_VERTICAL = AC_SWING_VERTICAL;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;

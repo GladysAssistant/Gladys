@@ -4,7 +4,6 @@ export const LoginStatus = {
   Processing: 'Processing',
   WrongCredentialsError: 'WrongCredentialsError',
   WrongEmailError: 'WrongEmailError',
-  WrongTwoFactorCodeError: 'WrongTwoFactorCodeError',
   LoginSuccess: 'LoginSuccess',
   UnknownError: 'UnknownError'
 };
@@ -176,7 +175,10 @@ export const DeviceFeatureCategoriesIcon = {
   [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
     [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY]: 'power',
     [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: 'settings',
-    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: 'thermometer'
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: 'thermometer',
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.FAN_SPEED]: 'wind',
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_HORIZONTAL]: 'refresh-cw',
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_VERTICAL]: 'refresh-cw'
   },
   [DEVICE_FEATURE_CATEGORIES.HEATER]: {
     [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: 'thermometer'
