@@ -129,15 +129,18 @@ describe('EnergyMonitoring.init', () => {
   describe('Scheduled job execution', () => {
     let calculateCostEveryThirtyMinutes;
     let calculateConsumptionFromIndexThirtyMinutes;
+    let calculateProductionFromIndexThirtyMinutes;
     let calculateCostFromYesterday;
 
     beforeEach(() => {
       calculateCostEveryThirtyMinutes = fake.returns(null);
       calculateConsumptionFromIndexThirtyMinutes = fake.returns(null);
+      calculateProductionFromIndexThirtyMinutes = fake.returns(null);
       calculateCostFromYesterday = fake.returns(null);
 
       energyMonitoring.calculateCostEveryThirtyMinutes = calculateCostEveryThirtyMinutes;
       energyMonitoring.calculateConsumptionFromIndexThirtyMinutes = calculateConsumptionFromIndexThirtyMinutes;
+      energyMonitoring.calculateProductionFromIndexThirtyMinutes = calculateProductionFromIndexThirtyMinutes;
       energyMonitoring.calculateCostFromYesterday = calculateCostFromYesterday;
     });
 
@@ -150,8 +153,9 @@ describe('EnergyMonitoring.init', () => {
       // Execute the job
       await jobFunction();
 
-      // Verify both calculations were called
+      // Verify all calculations were called
       assert.calledOnce(calculateConsumptionFromIndexThirtyMinutes);
+      assert.calledOnce(calculateProductionFromIndexThirtyMinutes);
       assert.calledOnce(calculateCostEveryThirtyMinutes);
     });
 
@@ -164,15 +168,18 @@ describe('EnergyMonitoring.init', () => {
       // Execute the job (it will use current time)
       await jobFunction();
 
-      // Verify both calculations were called
+      // Verify all calculations were called
       assert.calledOnce(calculateConsumptionFromIndexThirtyMinutes);
+      assert.calledOnce(calculateProductionFromIndexThirtyMinutes);
       assert.calledOnce(calculateCostEveryThirtyMinutes);
 
-      // Verify both functions receive the now timestamp
+      // Verify all functions receive the now timestamp
       const consumptionCallArgs = calculateConsumptionFromIndexThirtyMinutes.getCall(0).args;
+      const productionCallArgs = calculateProductionFromIndexThirtyMinutes.getCall(0).args;
       const costCallArgs = calculateCostEveryThirtyMinutes.getCall(0).args;
 
       expect(consumptionCallArgs[0]).to.be.instanceOf(Date);
+      expect(productionCallArgs[0]).to.be.instanceOf(Date);
       expect(costCallArgs[0]).to.be.instanceOf(Date);
     });
 

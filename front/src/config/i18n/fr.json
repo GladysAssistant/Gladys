@@ -3246,6 +3246,8 @@
       "energy-monitoring-cost-calculation-beginning": "Calcul du coût énergétique (depuis le début)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Calcul de la consommation énergétique depuis l'index (30 minutes)",
       "energy-monitoring-consumption-from-index-beginning": "Calcul de la consommation énergétique depuis l'index (depuis le début)",
+      "energy-monitoring-production-from-index-thirty-minutes": "Calcul de la production énergétique depuis l'index (30 minutes)",
+      "energy-monitoring-production-from-index-beginning": "Calcul de la production énergétique depuis l'index (depuis le début)",
       "service-enedis-sync": "Synchronisation des données Enedis",
       "ai-weekly-digest": "Résumé hebdomadaire IA"
     },

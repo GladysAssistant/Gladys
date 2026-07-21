@@ -13,6 +13,13 @@ const {
 const {
   calculateConsumptionFromIndexThirtyMinutes: ccConsumptionFromIndexThirtyMinutes,
 } = require('./energy-monitoring.calculateConsumptionFromIndexThirtyMinutes');
+const { calculateProductionFromIndex } = require('./energy-monitoring.calculateProductionFromIndex');
+const {
+  calculateProductionFromIndexFromBeginning: cpFromIndexFromBeginning,
+} = require('./energy-monitoring.calculateProductionFromIndexFromBeginning');
+const {
+  calculateProductionFromIndexThirtyMinutes: cpProductionFromIndexThirtyMinutes,
+} = require('./energy-monitoring.calculateProductionFromIndexThirtyMinutes');
 
 const { JOB_TYPES } = require('../../../utils/constants');
 
@@ -44,6 +51,14 @@ const EnergyMonitoringHandler = function EnergyMonitoringHandler(gladys, service
     JOB_TYPES.ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING,
     this.calculateConsumptionFromIndexFromBeginning.bind(this),
   );
+  this.calculateProductionFromIndexThirtyMinutes = this.gladys.job.wrapper(
+    JOB_TYPES.ENERGY_MONITORING_PRODUCTION_FROM_INDEX_THIRTY_MINUTES,
+    this.calculateProductionFromIndexThirtyMinutes.bind(this),
+  );
+  this.calculateProductionFromIndexFromBeginning = this.gladys.job.wrapper(
+    JOB_TYPES.ENERGY_MONITORING_PRODUCTION_FROM_INDEX_BEGINNING,
+    this.calculateProductionFromIndexFromBeginning.bind(this),
+  );
 };
 
 EnergyMonitoringHandler.prototype.init = init;
@@ -55,5 +70,8 @@ EnergyMonitoringHandler.prototype.getContracts = getContracts;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndex = calculateConsumptionFromIndex;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndexFromBeginning = ccFromIndexFromBeginning;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndexThirtyMinutes = ccConsumptionFromIndexThirtyMinutes;
+EnergyMonitoringHandler.prototype.calculateProductionFromIndex = calculateProductionFromIndex;
+EnergyMonitoringHandler.prototype.calculateProductionFromIndexFromBeginning = cpFromIndexFromBeginning;
+EnergyMonitoringHandler.prototype.calculateProductionFromIndexThirtyMinutes = cpProductionFromIndexThirtyMinutes;
 
 module.exports = EnergyMonitoringHandler;
