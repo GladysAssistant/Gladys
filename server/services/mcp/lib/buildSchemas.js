@@ -4,6 +4,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   COVER_STATE,
+  AI_CHAT_TOOL_CATEGORIES,
 } = require('../../../utils/constants');
 const { normalize } = require('../../../utils/device');
 const { hexToInt, kelvinToMired } = require('../../../utils/colors');
@@ -380,6 +381,7 @@ async function getAllTools(userId) {
       config: {
         title: 'Get image from camera',
         description: 'Get image from camera in specific room.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           room: z.enum(rooms.map(({ name }) => name)).describe('Room to get image from.'),
         },
@@ -403,6 +405,7 @@ async function getAllTools(userId) {
       config: {
         title: 'Create scene',
         description: SCENE_CREATE_TOOL_DESCRIPTION,
+        categories: [AI_CHAT_TOOL_CATEGORIES.SCENES],
         inputSchema: sceneCreateInputSchema.shape,
       },
       cb: async (scene) => {
@@ -444,6 +447,11 @@ async function getAllTools(userId) {
       config: {
         title: 'Start scene',
         description: 'Start a home automation scene.',
+        categories: [
+          AI_CHAT_TOOL_CATEGORIES.SCENES,
+          AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
+          AI_CHAT_TOOL_CATEGORIES.OTHER,
+        ],
         inputSchema: {
           scene: z.enum(scenes.map(({ name }) => name)).describe('Scene name to start.'),
         },
@@ -470,6 +478,12 @@ async function getAllTools(userId) {
       config: {
         title: 'Get states from devices',
         description: 'Get last state of specific device type or in a specific room.',
+        categories: [
+          AI_CHAT_TOOL_CATEGORIES.SCENES,
+          AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
+          AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY,
+          AI_CHAT_TOOL_CATEGORIES.OTHER,
+        ],
         inputSchema: {
           room: z
             .enum(rooms.map(({ name }) => name))
@@ -544,6 +558,7 @@ async function getAllTools(userId) {
         description:
           'Turn a device on or off. Requires either `device` (exact device name from the enum), or both `room` and `device_category` together. Never call with only `action`. For requests covering multiple rooms (for example "all lights"), call once per room with room and device_category, or use device_get_state with device_type light then turn off each device by name.',
         requireDeviceTargeting: true,
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           action: z.enum(['on', 'off']).describe('Action to perform on the device.'),
           device: z
@@ -649,6 +664,7 @@ async function getAllTools(userId) {
       config: {
         title: 'Get device history',
         description: 'Get history states of specific device.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           room: z
             .enum(rooms.map(({ name }) => name))
@@ -759,6 +775,7 @@ async function getAllTools(userId) {
         title: 'Control shutters and curtains',
         description:
           'Open, close, stop or set the position of shutters and curtains. Use action for open/close/stop commands, or position (0-100) to set a percentage. Select the device by name, or by room and device category.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           action: z
             .enum(['open', 'close', 'stop'])
@@ -916,6 +933,7 @@ async function getAllTools(userId) {
           'or temperature (Kelvin, for example 2700 for warm white, 4000 for neutral white, 6500 for cool white). ' +
           'Select the light by device name, or by room to target every light of the room. ' +
           'This tool does not turn lights on or off, use device_turn_on_off for that.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           brightness: z
             .number()
@@ -1089,6 +1107,11 @@ async function getAllTools(userId) {
         title: 'Set sensor state',
         description:
           'Write a value to an MQTT virtual sensor (read-only sensor feature, for example after reading a value from a camera image). Use numeric values for numeric sensors and strings for text sensors such as license plates. Only MQTT virtual devices are supported.',
+        categories: [
+          AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
+          AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY,
+          AI_CHAT_TOOL_CATEGORIES.OTHER,
+        ],
         inputSchema: {
           device: z
             .enum([...new Set(writableSensorDevices.map(({ name }) => name))])
@@ -1188,6 +1211,7 @@ async function getAllTools(userId) {
         title: 'Fetch web page',
         description:
           'Fetch a public web page and return its readable text content. Use this to read information from websites such as opening hours, schedules, or public announcements. Only HTTP/HTTPS public URLs are allowed.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.WEB_AND_TIME, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           url: z.url().describe('Full public URL of the page to fetch (http or https).'),
         },
@@ -1211,6 +1235,11 @@ async function getAllTools(userId) {
         title: 'Compare times',
         description:
           'Compare times deterministically. Use operator in_ranges to check whether the current time (or reference_time) falls within one or more HH:mm ranges. Use before/after/same to compare two times. Prefer this tool over mental time reasoning for schedules and opening hours.',
+        categories: [
+          AI_CHAT_TOOL_CATEGORIES.WEB_AND_TIME,
+          AI_CHAT_TOOL_CATEGORIES.SCENES,
+          AI_CHAT_TOOL_CATEGORIES.OTHER,
+        ],
         inputSchema: {
           operator: z
             .enum(['in_ranges', 'before', 'after', 'same'])
