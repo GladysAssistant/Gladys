@@ -1165,6 +1165,28 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       expect(request.messages[0].content).to.include(scenesPromptMock);
     });
 
+    it('should not call the router when there is no tool to filter', async () => {
+      const { forwardMessageToAiChat } = getModule({ tools: [] });
+      const aiChat = fake.resolves({
+        choices: [{ message: { content: 'Bonjour !' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['other']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({ tools: [], aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Bonjour' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      assert.notCalled(classifyAiChatToolCategories);
+      assert.calledOnce(aiChat);
+    });
+
     it('should still execute a tool excluded by routing if the model calls it', async () => {
       const tools = buildRoutedTools();
       const { forwardMessageToAiChat } = getModule({ tools });

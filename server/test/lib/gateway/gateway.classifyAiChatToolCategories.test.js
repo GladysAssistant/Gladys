@@ -1,6 +1,8 @@
 const { fake, assert } = require('sinon');
 const { expect } = require('chai');
 
+const { DEFAULT_TEXT_MODEL } = require('../../../utils/aiChatModels');
+
 const {
   classifyAiChatToolCategories,
   parseToolCategoriesResponse,
@@ -136,7 +138,7 @@ describe('gateway.classifyAiChatToolCategories', () => {
       assert.calledOnce(aiChat);
       const request = aiChat.getCall(0).args[0];
       expect(request).to.not.have.property('tools');
-      expect(request).to.not.have.property('model');
+      expect(request.model).to.equal(DEFAULT_TEXT_MODEL);
       expect(request.messages[0].role).to.equal('system');
       expect(request.messages[1].content).to.include('Create a scene that turns off the lights at 23:00');
     });

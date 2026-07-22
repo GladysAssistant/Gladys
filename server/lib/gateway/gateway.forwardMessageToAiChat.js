@@ -387,10 +387,13 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     // main tool-calling request only carries the relevant tools. This keeps the
     // context small and focused (the scene_create schema is very large) and
     // improves tool selection accuracy. On any router failure, all tools are sent.
-    const toolCategories = await this.classifyAiChatToolCategories({
-      messageText: message?.text,
-      previousQuestions,
-    });
+    const toolCategories =
+      mcpTools.length > 0
+        ? await this.classifyAiChatToolCategories({
+            messageText: message?.text,
+            previousQuestions,
+          })
+        : null;
     const selectedMcpTools = filterMcpToolsByCategories(mcpTools, toolCategories);
 
     const toolsForApi = mcpToolsToChatApiFormat(selectedMcpTools);
