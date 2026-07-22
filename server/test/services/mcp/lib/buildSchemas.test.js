@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { stub, fake } = require('sinon');
 const nock = require('nock');
 const dns = require('dns');
-const { SYSTEM_VARIABLE_NAMES, COVER_STATE } = require('../../../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, COVER_STATE, AI_CHAT_TOOL_CATEGORIES } = require('../../../../utils/constants');
 const {
   getAllResources,
   getAllTools,
@@ -572,6 +572,32 @@ describe('build schemas', () => {
     };
 
     const tools = await mcpHandler.getAllTools();
+
+    // AI chat router categories: exact mapping for every exposed tool.
+    const categoriesByIntent = Object.fromEntries(tools.map((tool) => [tool.intent, tool.config.categories]));
+    expect(categoriesByIntent).to.deep.equal({
+      'camera.get-image': [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
+      'scene.create': [AI_CHAT_TOOL_CATEGORIES.SCENES],
+      'scene.start': [
+        AI_CHAT_TOOL_CATEGORIES.SCENES,
+        AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
+        AI_CHAT_TOOL_CATEGORIES.OTHER,
+      ],
+      'device.get-state': [
+        AI_CHAT_TOOL_CATEGORIES.SCENES,
+        AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
+        AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY,
+        AI_CHAT_TOOL_CATEGORIES.OTHER,
+      ],
+      'device.turn-on-off': [AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL, AI_CHAT_TOOL_CATEGORIES.OTHER],
+      'device.get-history': [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
+      'web.fetch': [AI_CHAT_TOOL_CATEGORIES.WEB_AND_TIME, AI_CHAT_TOOL_CATEGORIES.OTHER],
+      'time.compare-times': [
+        AI_CHAT_TOOL_CATEGORIES.WEB_AND_TIME,
+        AI_CHAT_TOOL_CATEGORIES.SCENES,
+        AI_CHAT_TOOL_CATEGORIES.OTHER,
+      ],
+    });
 
     // Tool: camera.get-image
     expect(tools[0].intent).to.eq('camera.get-image');
