@@ -430,10 +430,7 @@ export const getDefaultUnitForFeature = (category, type) => {
     }
   }
 
-  if (
-    category === DEVICE_FEATURE_CATEGORIES.GRID_SENSOR ||
-    category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR
-  ) {
+  if (category === DEVICE_FEATURE_CATEGORIES.GRID_SENSOR || category === DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR) {
     // Instantaneous powers (including the signed grid power) in watt,
     // cumulative meter indexes in kWh.
     if (typeof type === 'string' && (type.endsWith('-power') || type === 'power')) {
