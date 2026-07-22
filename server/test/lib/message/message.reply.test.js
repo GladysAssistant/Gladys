@@ -110,6 +110,25 @@ describe('message.reply', () => {
     assert.calledWith(nextCloudTalkService.message.send, 'next-cloud-talk-token');
     assert.calledWith(callmebotService.message.send, '0cd30aef-9c4e-4a23-88e3-3547971296e5');
   });
+  it('should continue sending AI reply to other services when one service fails', async () => {
+    telegramService.message.send = fake.rejects(new Error('telegram down'));
+    await messageHandler.reply(
+      {
+        language: 'en',
+        source: 'AI',
+        source_user_id: 'XXXX',
+        user: {
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          language: 'en',
+        },
+      },
+      'hey!',
+      {},
+    );
+    assert.calledOnce(telegramService.message.send);
+    assert.calledWith(nextCloudTalkService.message.send, 'next-cloud-talk-token');
+    assert.calledWith(callmebotService.message.send, '0cd30aef-9c4e-4a23-88e3-3547971296e5');
+  });
   it('should fail to reply', async () => {
     variable.getValue = fake.rejects(new Error('cannot get'));
     await messageHandler.reply(

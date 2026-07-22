@@ -12,8 +12,8 @@
     "arm64"
   ],
   "dependencies": {
-    "@matter/main": "^0.17.4",
-    "@project-chip/matter.js": "^0.17.4",
+    "@matter/main": "^0.17.6",
+    "@project-chip/matter.js": "^0.17.6",
     "bluebird": "^3.7.2",
     "fs-extra": "^11.3.0"
   }

@@ -15,6 +15,7 @@ const {
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
   NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
+  CarbonDioxideConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
@@ -336,6 +337,24 @@ async function listenToStateChange(nodeId, devicePath, device) {
       logger.debug(`Matter: FormaldehydeConcentrationMeasurement attribute changed to ${value}`);
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${FormaldehydeConcentrationMeasurement.Complete.id}`,
+        state: value,
+      });
+    });
+  }
+
+  const carbonDioxideConcentrationMeasurement = device.getClusterClientById(
+    CarbonDioxideConcentrationMeasurement.Complete.id,
+  );
+  if (carbonDioxideConcentrationMeasurement && !this.stateChangeListeners.has(carbonDioxideConcentrationMeasurement)) {
+    logger.debug(
+      `Matter: Adding state change listener for CarbonDioxideConcentrationMeasurement cluster ${carbonDioxideConcentrationMeasurement.name}`,
+    );
+    this.stateChangeListeners.add(carbonDioxideConcentrationMeasurement);
+    // Subscribe to CarbonDioxideConcentrationMeasurement attribute changes
+    carbonDioxideConcentrationMeasurement.addMeasuredValueAttributeListener((value) => {
+      logger.debug(`Matter: CarbonDioxideConcentrationMeasurement attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${CarbonDioxideConcentrationMeasurement.Complete.id}`,
         state: value,
       });
     });

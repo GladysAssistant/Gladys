@@ -241,6 +241,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getDeviceFeaturesAggregated,
     },
+    'get /api/v1/device_feature/states_history': {
+      authenticated: true,
+      controller: deviceController.getDeviceStatesHistory,
+    },
     'get /api/v1/device_feature/energy_consumption': {
       authenticated: true,
       controller: deviceController.getConsumptionByDates,
@@ -311,14 +315,20 @@ function getRoutes(gladys) {
       controller: httpController.request,
     },
     // gateway
+    // Routes marked as "authenticatedOrNotConfigured" are accessible without
+    // authentication as long as no user exists on the instance, so the signup
+    // flow can restore a Gladys Plus backup without creating a local account.
+    // The "admin" flag is kept on those routes because it is also used by
+    // setupGateway to protect API calls done through the Gladys Plus tunnel.
     'get /api/v1/gateway/status': {
-      authenticated: true,
+      authenticatedOrNotConfigured: true,
       admin: true,
       controller: gatewayController.getStatus,
     },
     'post /api/v1/gateway/login': {
-      authenticated: true,
+      authenticatedOrNotConfigured: true,
       admin: true,
+      rateLimit: true,
       controller: gatewayController.login,
     },
     'post /api/v1/gateway/logout': {
@@ -327,9 +337,20 @@ function getRoutes(gladys) {
       controller: gatewayController.logout,
     },
     'post /api/v1/gateway/login-two-factor': {
+      authenticatedOrNotConfigured: true,
+      admin: true,
+      rateLimit: true,
+      controller: gatewayController.loginTwoFactor,
+    },
+    'post /api/v1/gateway/configure-two-factor': {
       authenticated: true,
       admin: true,
-      controller: gatewayController.loginTwoFactor,
+      controller: gatewayController.configureTwoFactor,
+    },
+    'post /api/v1/gateway/enable-two-factor': {
+      authenticated: true,
+      admin: true,
+      controller: gatewayController.enableTwoFactor,
     },
     'get /api/v1/gateway/key': {
       authenticated: true,
@@ -341,9 +362,15 @@ function getRoutes(gladys) {
       controller: gatewayController.saveUsersKeys,
     },
     'get /api/v1/gateway/backup': {
-      authenticated: true,
+      authenticatedOrNotConfigured: true,
       admin: true,
       controller: gatewayController.getBackups,
+    },
+    'post /api/v1/gateway/backup-key': {
+      authenticatedOrNotConfigured: true,
+      admin: true,
+      rateLimit: true,
+      controller: gatewayController.saveBackupKey,
     },
     'post /api/v1/gateway/backup': {
       authenticated: true,
@@ -351,12 +378,12 @@ function getRoutes(gladys) {
       controller: gatewayController.createBackup,
     },
     'post /api/v1/gateway/backup/restore': {
-      authenticated: true,
+      authenticatedOrNotConfigured: true,
       admin: true,
       controller: gatewayController.restoreBackup,
     },
     'get /api/v1/gateway/backup/restore/status': {
-      authenticated: true,
+      authenticatedOrNotConfigured: true,
       admin: true,
       controller: gatewayController.getRestoreStatus,
     },
@@ -378,6 +405,10 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: gatewayController.getOpenAIQuota,
+    },
+    'get /api/v1/gateway/aichat/models': {
+      authenticated: true,
+      controller: gatewayController.getAiChatModels,
     },
     'post /api/v1/gateway/stt': {
       authenticated: true,

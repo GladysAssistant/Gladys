@@ -1,6 +1,7 @@
 const logger = require('../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const db = require('../../models');
+const { forwardToService } = require('./message.sendToUser');
 
 const TOOL_CALL_EXTERNAL_SOURCES = new Set(['telegram', 'nextcloud-talk', 'callmebot']);
 
@@ -87,7 +88,7 @@ async function reply(originalMessage, text, context, file = null, options = {}) 
       // if the service exist and the user had telegram configured
       if (telegramService && user.telegram_user_id) {
         // we forward the message to Telegram
-        await telegramService.message.send(user.telegram_user_id, externalMessage);
+        await forwardToService('telegram', () => telegramService.message.send(user.telegram_user_id, externalMessage));
       }
       // We send the message to the nextcloud talk service
       const nextcloudTalkService = this.service.getService('nextcloud-talk');
@@ -101,7 +102,9 @@ async function reply(originalMessage, text, context, file = null, options = {}) 
         // if the user had nextcloud talk configured
         if (nextcloudTalkToken) {
           // we forward the message to Nextcloud Talk
-          await nextcloudTalkService.message.send(nextcloudTalkToken, externalMessage);
+          await forwardToService('nextcloud-talk', () =>
+            nextcloudTalkService.message.send(nextcloudTalkToken, externalMessage),
+          );
         }
       }
       // We send the message to the callmebot service
@@ -109,7 +112,7 @@ async function reply(originalMessage, text, context, file = null, options = {}) 
       // if the service exist
       if (callmebotService) {
         // we forward the message to CallMeBot
-        await callmebotService.message.send(user.id, externalMessage);
+        await forwardToService('callmebot', () => callmebotService.message.send(user.id, externalMessage));
       }
     } else {
       // then, we get the service sending the original message

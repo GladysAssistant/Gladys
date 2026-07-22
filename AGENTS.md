@@ -5,7 +5,7 @@
 Gladys Assistant is a privacy-first smart home platform. The repo has two dev services:
 
 - **server** (`/server`): Node.js + Express REST/WebSocket API on **port 1443**, using SQLite + DuckDB for storage. Started with `nodemon` (hot reload).
-- **front** (`/front`): Preact SPA (via `preact-cli`) on **port 1444**, proxying the API at `http://localhost:1443`.
+- **front** (`/front`): Preact SPA (via **Vite**) on **port 1444**, API at `http://localhost:1443`.
 
 The root `package.json` orchestrates both via `npm-run-all`.
 
@@ -15,10 +15,17 @@ From the repo root: `npm start` (runs `run-p start-server:dev start-front:dev`).
 
 ### Non-obvious caveats
 
-- **Front build/dev requires the legacy OpenSSL provider.** All front `build`/`watch`/`start` scripts already set `NODE_OPTIONS=--openssl-legacy-provider` (old webpack in `preact-cli`). Run front commands via the npm scripts, not raw `preact` calls.
 - **Harmless startup errors:** on `npm start` you'll see smart-home device discovery errors (e.g. `SonosDiscoveryError: No players found`) because no physical devices exist in the VM/network. These are expected and do not affect the app.
 - **Service dependencies:** the server has ~38 integration services under `server/services/*`, each with its own `package.json`. `cd server && npm install` runs a `postinstall` (`cli/install_service_dependencies.js`) that installs deps for every service. Set `INSTALL_SERVICES_SILENT_FAIL=true` so a single flaky service install does not abort the whole install.
-- **Native modules** (`sqlite3`, `bcrypt`, `sharp`, `duckdb`, USB/bluetooth services) compile from source; they need build tools (`gcc/g++/make/python3`) and `libudev-dev` on the system.
+- **Native modules** (`sqlite3`, `bcrypt`, `sharp`, USB/bluetooth services) compile from source; they need build tools (`gcc/g++/make/python3`) and `libudev-dev` on the system. DuckDB (`@duckdb/node-api`) ships prebuilt platform binaries and does not compile from source.
+
+## Git workflow (agents)
+
+All changes made by agents must follow this workflow:
+
+1. **Never commit directly to `master`.** Create a feature branch for every change (no matter how small) and open a pull request targeting `master`.
+2. **Write PR titles and descriptions in English**, even when the conversation with the user is in another language. This keeps the project history accessible to all contributors and matches the existing CI, templates, and documentation.
+3. **Create pull requests as ready for review (not draft).** When opening a PR, set `draft: false`. Do not create draft PRs.
 
 ## Pull Request requirements (CI)
 
@@ -31,10 +38,10 @@ Every PR to `master` triggers the workflow `.github/workflows/docker-pr-build.ym
 | **Front test** | Always | `prettier-check`, `eslint`, `compare-translations` |
 | **Server test** | Always | `prettier-check`, `eslint`, `npm run coverage` + Codecov upload |
 | **Cypress run** | Always | E2E tests (signup, dashboard, integrations…) |
-| **Front build** | Non-draft PRs only | `npm run build-with-stats` |
-| **Docker build** | Non-draft PRs only | AMD64 Docker image build |
+| **Front build** | When the PR is ready for review (`draft: false`) | `npm run build` (Vite) |
+| **Docker build** | When the PR is ready for review (`draft: false`) | AMD64 Docker image build |
 
-Draft PRs skip the front build and Docker jobs. Mark a PR as "Ready for review" only after the build checks pass locally.
+When the PR is ready for review (`draft: false`), the front build and Docker jobs run in CI. Agent PRs should be opened that way, so run the build checks locally before opening the PR.
 
 ### Mandatory checklist before push
 
@@ -67,7 +74,7 @@ cd front
 npm run prettier && npm run prettier-check
 npm run eslint
 npm run compare-translations   # required if i18n or device constants changed
-npm run build                  # required before marking PR as ready for review
+npm run build                  # required before opening the PR
 ```
 
 - The front has **no unit-test script**. CI validates the front via eslint, `compare-translations`, build, and Cypress.
@@ -85,7 +92,7 @@ npm run cypress:run   # starts server + front, then runs E2E specs in front/cypr
 - **Codecov patch coverage:** CI uploads the coverage report to Codecov, which measures only the lines changed in your PR. Any new server line not hit by a test fails the `codecov/patch` status. Run `npm run coverage` locally and confirm your tests exercise every branch and path you added before pushing.
 - **Server tests:** Changes to `server/lib/`, `server/api/`, `server/controllers/`, or `server/services/` almost always need corresponding tests. Look at neighboring files in `server/test/` for patterns (Mocha + Chai + Sinon).
 - **Cypress:** UI changes to signup, dashboard, scenes, or integration pages can break E2E specs under `front/cypress/e2e/`.
-- **Front build:** Only runs on non-draft PRs. A webpack/build error will block merge when the PR is marked ready.
+- **Front build:** Agent PRs are created as ready for review, so this job runs in CI. Run `npm run build` locally before opening the PR to catch errors early.
 
 ### Lint / test / build commands (reference)
 
