@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 
 const NodeRedManager = require('../../../../services/node-red/lib');
+const { CONFIGURATION } = require('../../../../services/node-red/lib/constants');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 const NAME = 'gladys-node-red';
@@ -17,8 +18,11 @@ describe('NodeRed allocateContainerNames', () => {
       system: {
         getContainers: fake.resolves([]),
       },
+      variable: {
+        setValue: fake.resolves(null),
+      },
     };
-    nodeRedManager = new NodeRedManager(gladys, null, serviceId);
+    nodeRedManager = new NodeRedManager(gladys, serviceId);
   });
 
   afterEach(() => {
@@ -29,6 +33,8 @@ describe('NodeRed allocateContainerNames', () => {
     const config = {};
     await nodeRedManager.allocateContainerNames(config);
     expect(config.nodeRedContainerName).to.equal(NAME);
+    // The resolved name is persisted immediately, before any container is created
+    assert.calledOnceWithExactly(gladys.variable.setValue, CONFIGURATION.NODE_RED_CONTAINER_NAME, NAME, serviceId);
   });
 
   it('should adopt a legacy healthy container (image proves it is ours)', async () => {
@@ -62,5 +68,22 @@ describe('NodeRed allocateContainerNames', () => {
     await nodeRedManager.allocateContainerNames(config);
     expect(config.nodeRedContainerName).to.equal('gladys-node-red-persisted');
     assert.notCalled(gladys.system.getContainers);
+    assert.notCalled(gladys.variable.setValue);
+  });
+
+  it('should reject and persist nothing when the Docker lookup fails', async () => {
+    gladys.system.getContainers = fake.rejects(new Error('docker socket unavailable'));
+    const config = {};
+
+    let error;
+    try {
+      await nodeRedManager.allocateContainerNames(config);
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.an('error');
+    expect(config.nodeRedContainerName).to.equal(undefined);
+    assert.notCalled(gladys.variable.setValue);
   });
 });

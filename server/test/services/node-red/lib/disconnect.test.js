@@ -1,10 +1,12 @@
 const { expect } = require('chai');
+const path = require('path');
 const sinon = require('sinon');
 const proxiquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { DEFAULT } = require('../../../../services/node-red/lib/constants');
 
 const fsMock = {
   rm: fake.resolves(true),
@@ -101,6 +103,13 @@ describe('NodeRed disconnect', () => {
 
     assert.called(gladys.system.getContainers);
     assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    // The config cleanup and flag reset must still run even though no container was stopped
+    assert.calledOnceWithExactly(fsMock.rm, path.dirname(path.join(TEMP_GLADYS_FOLDER, DEFAULT.CONFIGURATION_PATH)), {
+      recursive: true,
+    });
+    expect(nodeRedManager.nodeRedRunning).to.equal(false);
+    expect(nodeRedManager.gladysConnected).to.equal(false);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
     });

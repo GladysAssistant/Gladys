@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { resolveContainerName } = require('../../../utils/dockerContainers');
+const { CONFIGURATION } = require('./constants');
 
 const containerDescriptor = require('../docker/gladys-node-red-container.json');
 
@@ -21,6 +22,14 @@ async function allocateContainerNames(config) {
       containerDescriptor.name,
       IMAGE_MARKER,
       'Node-RED',
+    );
+    // Persist the resolved name immediately, before any container is created: a crash
+    // between creation and saveConfiguration would otherwise orphan a suffixed container
+    // (the retry would allocate a brand-new name instead of reusing this one).
+    await this.gladys.variable.setValue(
+      CONFIGURATION.NODE_RED_CONTAINER_NAME,
+      config.nodeRedContainerName,
+      this.serviceId,
     );
     logger.info(`Node-RED: using "${config.nodeRedContainerName}" as container name`);
   }

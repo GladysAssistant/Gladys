@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
+const { CONFIGURATION } = require('../../../../services/zigbee2mqtt/lib/constants');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
@@ -22,6 +23,9 @@ describe('zigbee2mqtt allocateContainerNames', () => {
       system: {
         getContainers: fake.resolves([]),
       },
+      variable: {
+        setValue: fake.resolves(null),
+      },
     };
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
   });
@@ -35,6 +39,9 @@ describe('zigbee2mqtt allocateContainerNames', () => {
     await zigbee2mqttManager.allocateContainerNames(config);
     expect(config.mqttContainerName).to.equal(MQTT_NAME);
     expect(config.z2mContainerName).to.equal(Z2M_NAME);
+    // Both resolved names are persisted immediately, before any container is created
+    assert.calledWith(gladys.variable.setValue, CONFIGURATION.MQTT_CONTAINER_NAME, MQTT_NAME, serviceId);
+    assert.calledWith(gladys.variable.setValue, CONFIGURATION.Z2M_CONTAINER_NAME, Z2M_NAME, serviceId);
   });
 
   it('should adopt legacy healthy containers (image proves they are ours)', async () => {
@@ -89,5 +96,22 @@ describe('zigbee2mqtt allocateContainerNames', () => {
     expect(config.mqttContainerName).to.equal('gladys-z2m-mqtt-persisted');
     expect(config.z2mContainerName).to.equal('gladys-z2m-zigbee2mqtt-persisted');
     assert.notCalled(gladys.system.getContainers);
+    assert.notCalled(gladys.variable.setValue);
+  });
+
+  it('should reject and persist nothing when the Docker lookup fails', async () => {
+    gladys.system.getContainers = fake.rejects(new Error('docker socket unavailable'));
+    const config = {};
+
+    let error;
+    try {
+      await zigbee2mqttManager.allocateContainerNames(config);
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.an('error');
+    expect(config.mqttContainerName).to.equal(undefined);
+    assert.notCalled(gladys.variable.setValue);
   });
 });
