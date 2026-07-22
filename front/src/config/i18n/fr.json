@@ -3888,12 +3888,12 @@
           "turbo": "Turbo"
         },
         "swing-horizontal": {
-          "off": "Off",
+          "off": "Arrêt",
           "same": "Même sens",
           "opposite": "Sens opposé"
         },
         "swing-vertical": {
-          "off": "Off",
+          "off": "Arrêt",
           "swing": "Balayage",
           "position-1": "Position 1 (Haut)",
           "position-2": "Position 2",
