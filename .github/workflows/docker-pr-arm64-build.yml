@@ -1,0 +1,217 @@
+name: On-demand ARM64 Docker build
+run-name: ARM64 Docker build for PR #${{ github.event.issue.number }}
+
+# Triggered by commenting `/build-arm64` on a pull request.
+# issue_comment workflows always run from the default branch, so this file
+# must be merged to master before the command works.
+on:
+  issue_comment:
+    types: [created]
+  # Allow manual testing / re-runs without leaving a comment.
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull request number to build'
+        required: true
+        type: string
+
+concurrency:
+  group: docker-pr-arm64-${{ github.event.issue.number || inputs.pr_number }}
+  cancel-in-progress: true
+
+jobs:
+  build-arm64:
+    name: Docker ARM64 build
+    runs-on: ubuntu-22.04
+    # Restrict who can trigger expensive ARM64 builds (QEMU emulation).
+    # workflow_dispatch is already limited to users with Actions write access.
+    if: >
+      (github.event_name == 'workflow_dispatch') ||
+      (
+        github.event.issue.pull_request &&
+        contains(github.event.comment.body, '/build-arm64') &&
+        (
+          github.event.comment.author_association == 'OWNER' ||
+          github.event.comment.author_association == 'MEMBER' ||
+          github.event.comment.author_association == 'COLLABORATOR'
+        )
+      )
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: write
+    steps:
+      - name: 🔎 Resolve pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.issue.number || inputs.pr_number }}
+        run: |
+          set -euo pipefail
+          PR_JSON=$(gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}")
+          HEAD_REF=$(echo "$PR_JSON" | jq -r .head.ref)
+          HEAD_SHA=$(echo "$PR_JSON" | jq -r .head.sha)
+          HEAD_REPO=$(echo "$PR_JSON" | jq -r .head.repo.full_name)
+          BASE_REPO=$(echo "$PR_JSON" | jq -r .base.repo.full_name)
+          DRAFT=$(echo "$PR_JSON" | jq -r .draft)
+
+          # Pass branch names through the environment (never interpolate into the
+          # shell from Actions expressions) to avoid script injection.
+          {
+            echo "number=${PR_NUMBER}"
+            echo "head_ref=${HEAD_REF}"
+            echo "head_sha=${HEAD_SHA}"
+            echo "head_repo=${HEAD_REPO}"
+            echo "base_repo=${BASE_REPO}"
+            echo "draft=${DRAFT}"
+          } >> "$GITHUB_OUTPUT"
+
+          if [ "$HEAD_REPO" != "$BASE_REPO" ]; then
+            echo "::error::ARM64 builds are only supported for pull requests from this repository (not forks), for security reasons."
+            exit 1
+          fi
+
+      - name: 🚀 Acknowledge request
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket'
+            });
+
+      - name: 💬 Comment that the build started
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: docker-preview-image-arm64
+          number: ${{ steps.pr.outputs.number }}
+          message: |
+            🐳 **ARM64 Docker build requested** (`/build-arm64`)
+
+            Building `linux/arm64/v8` for commit `${{ steps.pr.outputs.head_sha }}`…
+
+            Track progress: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+      - name: ⬇️ Checkout pull request head
+        uses: actions/checkout@v3
+        with:
+          # Checkout the PR commit by SHA (immutable), not the branch name.
+          ref: ${{ steps.pr.outputs.head_sha }}
+
+      - name: 🏷️ Compute image tag from branch name
+        id: image_tag
+        env:
+          HEAD_REF: ${{ steps.pr.outputs.head_ref }}
+        run: |
+          # Docker tags only allow [a-zA-Z0-9_.-] and must be 128 chars max.
+          # Keep room for the "-arm64" suffix (6 chars).
+          BRANCH_TAG=$(echo "$HEAD_REF" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9._-]+/-/g' | cut -c1-122)
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/${REPO}-preview:${BRANCH_TAG}-arm64"
+          echo "tag=${BRANCH_TAG}-arm64" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}" >> "$GITHUB_OUTPUT"
+
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: 'front/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: 📦 Install NPM front packages
+        working-directory: ./front
+        run: |
+          npm ci
+
+      - name: 🏗️ Build front
+        working-directory: ./front
+        run: |
+          npm run build
+
+      - name: 📂 Prepare static front for Docker context
+        run: |
+          mkdir -p static
+          cp -r front/build/* static/
+
+      - name: 💽 Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: 🐳 Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          version: latest
+
+      - name: 🔑 Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🐳 Build ARM64 image and push it to ghcr.io
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: ./docker/Dockerfile.buildx
+          platforms: linux/arm64/v8
+          push: true
+          tags: ${{ steps.image_tag.outputs.image }}
+
+      - name: 💬 Comment the ARM64 image on the pull request
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: docker-preview-image-arm64
+          number: ${{ steps.pr.outputs.number }}
+          message: |
+            🐳 **An ARM64 Docker image has been built for this pull request and pushed to the GitHub Container Registry.**
+
+            Requested via `/build-arm64` for commit `${{ steps.pr.outputs.head_sha }}`.
+
+            You can test this pull request on ARM64 (e.g. Raspberry Pi, Apple Silicon) by pulling:
+
+            ```
+            ${{ steps.image_tag.outputs.image }}
+            ```
+
+            For example, run it with:
+
+            ```bash
+            sudo docker run -d \
+              --log-driver json-file \
+              --log-opt max-size=10m \
+              --cgroupns=host \
+              --restart=always \
+              --privileged \
+              --network=host \
+              --name gladys-${{ steps.image_tag.outputs.tag }} \
+              -e NODE_ENV=production \
+              -e SERVER_PORT=80 \
+              -e TZ=Europe/Paris \
+              -e SQLITE_FILE_PATH=/var/lib/gladysassistant/gladys-production.db \
+              -v /var/run/docker.sock:/var/run/docker.sock \
+              -v /var/lib/gladysassistant:/var/lib/gladysassistant \
+              -v /dev:/dev \
+              -v /run/udev:/run/udev:ro \
+              ${{ steps.image_tag.outputs.image }}
+            ```
+
+            Comment `/build-arm64` again to rebuild after new commits.
+
+      - name: 💬 Comment on failure
+        if: failure()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: docker-preview-image-arm64
+          number: ${{ steps.pr.outputs.number }}
+          message: |
+            ❌ **ARM64 Docker build failed** (`/build-arm64`)
+
+            The build for commit `${{ steps.pr.outputs.head_sha }}` did not succeed.
+
+            See logs: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Comment `/build-arm64` again to retry.
