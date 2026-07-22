@@ -1,5 +1,5 @@
 const logger = require('../../utils/logger');
-const { AI_CHAT_TOOL_CATEGORIES, AI_CHAT_TOOL_CATEGORIES_LIST } = require('../../utils/constants');
+const { AI_CHAT_TOOL_CATEGORIES, AI_CHAT_TOOL_CATEGORIES_LIST, AI_CHAT_PURPOSES } = require('../../utils/constants');
 const { DEFAULT_TEXT_MODEL } = require('../../utils/aiChatModels');
 
 const MAX_ROUTER_HISTORY_EXCHANGES = 3;
@@ -141,15 +141,18 @@ async function classifyAiChatToolCategories({ messageText, previousQuestions }) 
     return null;
   }
   try {
-    // The router always uses the fast default model, never the (potentially
-    // large and slow) model selected for the main request: classification is
-    // a simple task and must stay low-latency.
+    // The router always uses a fast model, never the (potentially large and
+    // slow) model selected for the main request: classification is a simple
+    // task and must stay low-latency. The purpose field lets the gateway pick
+    // the best fast model itself; the explicit model is a fallback for
+    // gateways that do not handle purpose yet.
     const apiResponse = await this.aiChat({
       messages: [
         { role: 'system', content: ROUTER_SYSTEM_PROMPT },
         { role: 'user', content: buildRouterUserContent(messageText, previousQuestions) },
       ],
       model: DEFAULT_TEXT_MODEL,
+      purpose: AI_CHAT_PURPOSES.INTENT_CLASSIFICATION,
     });
     const responseText = apiResponse?.choices?.[0]?.message?.content ?? apiResponse?.message?.content ?? null;
     const categories = parseToolCategoriesResponse(responseText);

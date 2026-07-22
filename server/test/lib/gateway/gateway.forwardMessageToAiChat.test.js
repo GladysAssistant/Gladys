@@ -1115,6 +1115,8 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       const request = aiChat.getCall(0).args[0];
       expect(request.tools.map((tool) => tool.function.name)).to.deep.equal(['device_turn_on_off']);
       expect(request.messages[0].content).to.not.include(scenesPromptMock);
+      expect(request.purpose).to.equal('chat');
+      expect(request.categories).to.deep.equal(['device_control']);
     });
 
     it('should send scene tools and scene rules when the request is classified as scenes', async () => {
@@ -1163,6 +1165,8 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       const request = aiChat.getCall(0).args[0];
       expect(request.tools.map((tool) => tool.function.name)).to.deep.equal(['scene_create', 'device_turn_on_off']);
       expect(request.messages[0].content).to.include(scenesPromptMock);
+      expect(request.purpose).to.equal('chat');
+      expect(request).to.not.have.property('categories');
     });
 
     it('should not call the router when there is no tool to filter', async () => {

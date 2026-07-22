@@ -5,7 +5,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 
 const logger = require('../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES, AI_CHAT_PURPOSES } = require('../../utils/constants');
 const { Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
@@ -444,7 +444,13 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
         messages: messagesForApi,
         tools: toolsForApi,
         tool_choice: 'auto',
+        purpose: AI_CHAT_PURPOSES.CHAT,
       };
+      if (toolCategories) {
+        // Let the gateway adapt model/reasoning settings to the classified
+        // intent (for example enable thinking only for scene creation).
+        aiChatRequest.categories = toolCategories;
+      }
       if (selectedModel) {
         aiChatRequest.model = selectedModel;
       }
