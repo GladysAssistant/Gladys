@@ -28,12 +28,15 @@ describe('mqttHandler.isBrokerPortAvailable', () => {
     const server = await listenOnFreePort();
     const { port } = server.address();
 
-    const available = await mqttHandler.isBrokerPortAvailable(port);
+    try {
+      const available = await mqttHandler.isBrokerPortAvailable(port);
 
-    expect(available).to.equal(false);
-    await new Promise((resolve) => {
-      server.close(resolve);
-    });
+      expect(available).to.equal(false);
+    } finally {
+      await new Promise((resolve) => {
+        server.close(resolve);
+      });
+    }
   });
 
   it('should return true when the port is free', async () => {

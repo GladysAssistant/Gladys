@@ -1,5 +1,4 @@
 const fs = require('fs/promises');
-const { constants } = require('fs');
 const os = require('os');
 
 const logger = require('../../../utils/logger');
@@ -31,23 +30,34 @@ async function configureContainer(port = DEFAULT.MOSQUITTO_DEFAULT_PORT) {
   // Create configuration path (if not exists)
   await fs.mkdir(MOSQUITTO_DIRECTORY, { recursive: true });
 
-  // Check if config file not already exists
+  // Read the existing configuration, if any. Only a missing file (ENOENT) falls back to the
+  // default configuration; any other I/O error is surfaced instead of silently overwriting an
+  // existing (possibly customized) configuration.
+  let configContent = null;
   try {
-    // eslint-disable-next-line no-bitwise
-    await fs.access(MOSQUITTO_CONFIG_FILE_PATH, constants.R_OK | constants.W_OK);
+    configContent = (await fs.readFile(MOSQUITTO_CONFIG_FILE_PATH)).toString();
+  } catch (e) {
+    if (e.code !== 'ENOENT') {
+      throw e;
+    }
+  }
+
+  if (configContent === null) {
+    logger.info('Writting default eclipse-mosquitto configuration...');
+    await fs.writeFile(MOSQUITTO_CONFIG_FILE_PATH, configContentLines.join(os.EOL));
+  } else {
     logger.info('eclipse-mosquitto configuration file already exists.');
 
-    // Ensure the listener line matches the resolved port (existing installs keep 1883)
-    const configContent = (await fs.readFile(MOSQUITTO_CONFIG_FILE_PATH)).toString();
-    if (!configContent.includes(listenerLine)) {
-      const updatedContent = LISTENER_LINE_REGEXP.test(configContent)
+    // Match the actual (uncommented) listener directive, not a substring, so a commented or
+    // differently-numbered line is correctly rewritten to the resolved port (existing installs
+    // keep 1883). Append the directive only when none is present.
+    const currentListener = configContent.match(LISTENER_LINE_REGEXP)?.[0];
+    if (currentListener !== listenerLine) {
+      const updatedContent = currentListener
         ? configContent.replace(LISTENER_LINE_REGEXP, listenerLine)
         : `${configContent}${os.EOL}${listenerLine}`;
       await fs.writeFile(MOSQUITTO_CONFIG_FILE_PATH, updatedContent);
     }
-  } catch (e) {
-    logger.info('Writting default eclipse-mosquitto configuration...');
-    await fs.writeFile(MOSQUITTO_CONFIG_FILE_PATH, configContentLines.join(os.EOL));
   }
 
   // Create empty password file if not already exists
