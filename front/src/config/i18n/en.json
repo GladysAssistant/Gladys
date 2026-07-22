@@ -155,17 +155,28 @@
       "backupKeyLabel": "Backup key",
       "backupKeyPlaceholder": "Enter your backup key",
       "cancelButton": "Cancel",
-      "saveButton": "Save backup key"
+      "saveButton": "Save backup key",
+      "error": "Unable to save the backup key. Please check that your instance is connected to the internet and try again."
     },
     "restoreBackupInProgress": {
       "title": "Restore in progress...",
       "description": "At the end of the restore process, Gladys will restart automatically.",
       "errored": "Backup restore failed, maybe the restore key is not valid",
-      "updateRestoreKeyButton": "Update restore key"
+      "erroredHelp": "If you can't restore your backup, you can create a local account now, connect Gladys Plus later in the settings, and restore your backup at that moment.",
+      "updateRestoreKeyButton": "Update restore key",
+      "createLocalAccountButton": "Create a local account"
     },
     "gatewayBackup": {
       "title": "Choose a backup",
-      "description": "Choose the backup you want to restore in this list."
+      "description": "Choose the backup you want to restore in this list.",
+      "changeKeyButton": "Change backup key",
+      "refreshButton": "Refresh",
+      "noBackupsFound": "No backups were found on this Gladys Plus account.",
+      "error": "Unable to retrieve your backups. Please check that your instance is connected to the internet and try again."
+    },
+    "restoreLocalAccountAlternative": {
+      "text": "You can also create a local account now, connect Gladys Plus later in the settings, and restore your backup at that moment.",
+      "linkText": "Create a local account"
     },
     "preferences": {
       "title": "Your preferences",
@@ -463,7 +474,9 @@
         "colorLowLabel": "Color below the low threshold",
         "colorInRangeLabel": "Color between the thresholds",
         "colorHighLabel": "Color above the high threshold",
-        "thresholdsLegendLabel": "Thresholds:"
+        "thresholdsLegendLabel": "Thresholds:",
+        "editNameLabel": "Widget name (optional)",
+        "editNamePlaceholder": "Name displayed on the dashboard"
       },
       "energyConsumption": {
         "editName": "Widget Name (optional)",
@@ -1552,15 +1565,129 @@
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
         "validationError": "Validation error : The device is not correctly filled.",
+        "validationErrorTitle": "Unable to save the device. Please fix the fields highlighted in red:",
+        "validationErrorDevice": "Device — {{field}}: {{message}}",
+        "validationErrorFeature": "\"{{featureName}}\" — {{field}}: {{message}}",
+        "validationFieldLabels": {
+          "name": "Name",
+          "external_id": "External ID",
+          "min": "Minimum value",
+          "max": "Maximum value",
+          "unit": "Unit",
+          "room_id": "Room",
+          "category": "Category",
+          "type": "Type"
+        },
         "validationErrors": {
-          "name": "The name field is required",
-          "min": "The minimum field is required and must be an integer",
-          "max": "The maximum field is required and must be an integer",
-          "external_id": "The external ID field is required and must be unique across all devices"
+          "name": "This field is required",
+          "min": "This field is required and must be a number",
+          "max": "This field is required and must be a number",
+          "external_id": "This field is required and must be unique",
+          "unit": "The selected unit is not valid for this feature",
+          "room_id": "The selected room is not valid"
         },
         "saveConflictError": "Conflict: Are you sure all external IDs are unique?",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
-        "noValueReceived": "No value received."
+        "noValueReceived": "No value received.",
+        "searchPlaceholder": "Search devices...",
+        "unassignedRoom": "No room assigned",
+        "featureCount": "{{count}} feature(s)"
+      },
+      "featureCatalog": {
+        "title": "Feature catalog",
+        "subtitle": "Browse available features and see how they will appear on your dashboard.",
+        "searchPlaceholder": "Search features (e.g. temperature, dimmer, switch...)",
+        "openButton": "Add a feature",
+        "closeButton": "Close catalog",
+        "previewLabel": "Dashboard preview",
+        "cameraPreviewNotice": "This feature is displayed in the Camera dashboard widget, not in the device list.",
+        "previewValues": {
+          "cube": {
+            "mode": "Rotation (Xiaomi Cube gesture)"
+          }
+        },
+        "noResults": "No features match your search.",
+        "noFeaturesYet": "No features added yet. Use the button below to browse the catalog.",
+        "sensorBadge": "Sensor",
+        "actuatorBadge": "Actuator",
+        "historyBadge": "Logged",
+        "fallbackDescription": "A Gladys feature that can be controlled or monitored via MQTT.",
+        "categoryDescriptions": {
+          "light": "Control lights: on/off, brightness, color and color temperature.",
+          "switch": "Control switches, dimmers and power measurements.",
+          "temperature-sensor": "Read temperature values from your sensors.",
+          "humidity-sensor": "Read humidity levels from your sensors.",
+          "motion-sensor": "Detect motion in a room or area.",
+          "energy-sensor": "Monitor energy consumption, power and electricity index.",
+          "shutter": "Control shutters and blinds.",
+          "curtain": "Control curtains and their position.",
+          "thermostat": "Set and read heating setpoints.",
+          "button": "Trigger actions on button press.",
+          "text": "Display or send text values.",
+          "battery": "Monitor battery level of your devices.",
+          "currency": "Display currency or cryptocurrency values."
+        },
+        "descriptions": {
+          "light": {
+            "binary": "A simple on/off switch to control a light.",
+            "brightness": "A slider to adjust light brightness from 0% to 100%.",
+            "color": "A color picker to set the light color.",
+            "hue": "A slider to adjust the light hue from 0° to 360°.",
+            "saturation": "A slider to adjust the light saturation from 0% to 100%.",
+            "temperature": "A slider to adjust the color temperature (warm to cool white)."
+          },
+          "switch": {
+            "binary": "A simple on/off switch for any appliance.",
+            "dimmer": "A slider to control the intensity of a device.",
+            "energy": "Displays cumulative energy consumption in kWh."
+          },
+          "temperature-sensor": {
+            "decimal": "Displays the current temperature with its unit."
+          },
+          "humidity-sensor": {
+            "decimal": "Displays the current humidity percentage."
+          },
+          "motion-sensor": {
+            "binary": "Shows whether motion is currently detected."
+          },
+          "energy-sensor": {
+            "power": "Displays instantaneous power consumption in watts.",
+            "index": "Displays the cumulative energy index (kWh meter)."
+          },
+          "shutter": {
+            "state": "Open or close a shutter with up/down controls.",
+            "position": "Set the shutter position with a slider (0% = closed)."
+          },
+          "thermostat": {
+            "target-temperature": "Set the target temperature with +/- buttons."
+          },
+          "button": {
+            "push": "A button to trigger an action in Gladys or via MQTT."
+          },
+          "text": {
+            "text": "Displays a text value, useful for custom messages or data."
+          },
+          "battery": {
+            "integer": "Shows the battery level as a percentage."
+          },
+          "currency": {
+            "decimal": "Displays a monetary value with its currency unit."
+          }
+        },
+        "keywords": {
+          "light": {
+            "brightness": "dimmer slider variator lamp",
+            "binary": "on off switch lamp",
+            "temperature": "warm cool white kelvin color temperature"
+          },
+          "switch": {
+            "dimmer": "dimmer slider variator",
+            "binary": "on off switch plug outlet"
+          },
+          "temperature-sensor": {
+            "decimal": "temp thermometer climate"
+          }
+        }
       },
       "feature": {
         "nameLabel": "Name",
@@ -1573,6 +1700,7 @@
         "maxLabel": "Maximum value",
         "maxPlaceholder": "Enter feature maximum value",
         "readOnlyLabel": "Is it a sensor?",
+        "readOnlyShortDescription": "Yes, it's a sensor",
         "readOnlyButton": "Yes, it's a sensor sending data to Gladys only.",
         "addButton": "Add feature",
         "mqttTopicToPublishExampleLabel": "MQTT Topic to publish",
@@ -3091,6 +3219,19 @@
     "jobStatus": "Status",
     "previous": "Previous",
     "next": "Next",
+    "jobData": {
+      "target": "Target: {{device}} › {{feature}}",
+      "statesCounts": "States to delete: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
+      "statesCountsDone": "States deleted: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
+      "steps": {
+        "waiting_database": "Waiting for the database…",
+        "counting": "Counting states…",
+        "deleting_states": "Deleting states…",
+        "deleting_aggregates": "Deleting aggregates…"
+      },
+      "orphanedStates": "Orphaned states: {{count}}",
+      "duration": "Duration: {{duration}}"
+    },
     "jobTypes": {
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
@@ -3102,6 +3243,7 @@
       "service-zigbee2mqtt-backup": "Zigbee2MQTT backup",
       "migrate-sqlite-to-duckdb": "DuckDB migration",
       "device-state-purge-all-sqlite-states": "Purge all SQLite states",
+      "device-state-purge-orphaned-duckdb-states": "Purge orphaned DuckDB states",
       "service-matter-backup": "Matter backup",
       "energy-monitoring-cost-calculation-thirty-minutes": "Energy cost calculation (30 minutes)",
       "energy-monitoring-cost-calculation-yesterday": "Energy cost calculation (from yesterday)",
@@ -3442,7 +3584,19 @@
     "twoFactorCodeLabel": "Two Factor code",
     "twoFactorCodePlaceholder": "6 digits code",
     "loginTwoFactorButtonText": "Finalize Login",
-    "invalidTwoFactorCode": "Two Factor code is invalid."
+    "invalidTwoFactorCode": "Two Factor code is invalid. Try again with a new code generated by your app.",
+    "lostTwoFactor": "Lost access to your two-factor app? Contact us at <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a> and we will reset it.",
+    "twoFactorEnabledSuccess": "Two-factor authentication is now enabled! Enter a new code generated by your app to finalize the login."
+  },
+  "gatewayConfigureTwoFactor": {
+    "cardTitle": "Configure two-factor authentication (2FA)",
+    "twoFactorNotConfigured": "Two-factor authentication (2FA) is not configured yet on your Gladys Plus account. It is required to connect your instance.",
+    "scanInstructions": "Scan this QR code with a two-factor app (Authy, Google Authenticator...), or copy the secret manually in your app.",
+    "secretLabel": "Secret",
+    "copy": "Copy",
+    "confirmCodeLabel": "Enter the code displayed in your app",
+    "enableButton": "Enable 2FA",
+    "invalidCode": "Two Factor code is invalid. Try again with a new code generated by your app."
   },
   "gatewayBackup": {
     "title": "Backups",
@@ -3918,6 +4072,50 @@
           "3": "Comfort -1°C",
           "4": "Comfort -2°C",
           "5": "Comfort"
+        }
+      },
+      "shutter": {
+        "state": {
+          "-1": "Closed",
+          "0": "Stopped",
+          "1": "Open"
+        }
+      },
+      "curtain": {
+        "state": {
+          "-1": "Closed",
+          "0": "Stopped",
+          "1": "Open"
+        }
+      },
+      "lock": {
+        "state": {
+          "0": "Unlocked",
+          "1": "Locked",
+          "2": "Activity",
+          "3": "Error"
+        }
+      },
+      "air-conditioning": {
+        "mode": {
+          "0": "Auto",
+          "1": "Cooling",
+          "2": "Heating",
+          "3": "Drying",
+          "4": "Fan"
+        }
+      },
+      "siren": {
+        "lmh_volume": {
+          "0": "Low",
+          "1": "Medium",
+          "2": "High"
+        }
+      },
+      "music": {
+        "playback_state": {
+          "0": "Paused",
+          "1": "Playing"
         }
       },
       "opening-sensor": {
@@ -4436,11 +4634,11 @@
     },
     "voc-matter-index-sensor": {
       "shortCategoryName": "VOC Index",
-      "integer": "VOC Index (integer)"
+      "integer": "VOC Index"
     },
     "no2-matter-index-sensor": {
       "shortCategoryName": "NO₂ Index",
-      "integer": "NO₂ Index (integer)"
+      "integer": "NO₂ Index"
     },
     "shutter": {
       "shortCategoryName": "Shutter",
@@ -4470,7 +4668,7 @@
     },
     "ph-sensor": {
       "shortCategoryName": "pH Sensor",
-      "decimal": "pH (Decimal)"
+      "decimal": "pH"
     },
     "orp-sensor": {
       "shortCategoryName": "ORP Sensor (Redox)",
@@ -4506,7 +4704,7 @@
     },
     "angle-sensor": {
       "shortCategoryName": "Angle sensor",
-      "integer": "Angle (integer)"
+      "integer": "Angle"
     },
     "risk": {
       "shortCategoryName": "Risk",
@@ -4557,12 +4755,94 @@
       "statusError": "Error",
       "showDetails": "Show details",
       "hideDetails": "Hide details"
+    },
+    "modelSelector": {
+      "label": "AI model",
+      "auto": "Auto",
+      "priceLegend": "€ cheap · €€ mid · €€€ premium"
+    }
+  },
+  "history": {
+    "title": "Activity",
+    "subtitle": "Follow everything happening in your home, in real time.",
+    "live": "Live",
+    "jumpToDate": "Jump to a date",
+    "browsingPast": "You are browsing the history of {{date}}.",
+    "backToLive": "Back to live",
+    "allRooms": "All rooms",
+    "searchPlaceholder": "Search a device",
+    "scrollLeft": "Scroll filters left",
+    "scrollRight": "Scroll filters right",
+    "loadMore": "Load more",
+    "searchingOlder": "Searching activity — {{date}}…",
+    "newEvents": {
+      "one": "1 new event",
+      "other": "{{count}} new events"
+    },
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "emptyTitle": "No activity to show",
+    "emptyText": "Device events will appear here in real time as they happen. If this list stays empty, check that history is enabled on your device features.",
+    "error": "There was an error loading the activity history.",
+    "groups": {
+      "all": "All",
+      "openings": "Openings",
+      "motion": "Motion & presence",
+      "buttons": "Buttons & remotes",
+      "lights": "Lights & switches",
+      "climate": "Climate & environment",
+      "security": "Safety",
+      "energy": "Energy",
+      "other": "Other"
+    },
+    "values": {
+      "motion-sensor": {
+        "0": "No more motion",
+        "1": "Motion detected"
+      },
+      "presence-sensor": {
+        "0": "Absence",
+        "1": "Presence detected"
+      },
+      "smoke-sensor": {
+        "0": "No more smoke detected",
+        "1": "Smoke detected!"
+      },
+      "leak-sensor": {
+        "0": "No more leak detected",
+        "1": "Water leak detected!"
+      },
+      "vibration-sensor": {
+        "0": "No more vibration",
+        "1": "Vibration detected"
+      },
+      "light": {
+        "0": "Turned off",
+        "1": "Turned on"
+      },
+      "switch": {
+        "0": "Turned off",
+        "1": "Turned on"
+      },
+      "lock": {
+        "0": "Unlocked",
+        "1": "Locked"
+      },
+      "signal": {
+        "0": "No signal",
+        "1": "Very weak signal",
+        "2": "Weak signal",
+        "3": "Fair signal",
+        "4": "Good signal",
+        "5": "Excellent signal"
+      }
     }
   },
   "header": {
     "gladysAssistant": "Gladys Assistant",
     "home": "Home",
     "chat": "Chat",
+    "history": "Activity",
     "devices": "Devices",
     "integrations": "Integrations",
     "calendar": "Calendar",
@@ -4576,13 +4856,14 @@
   "gatewayLinkUser": {
     "title": "Configure Gladys Plus",
     "label": "Select you Gladys user",
-    "description": "Before selecting your user here, please make sure that this user is accepted locally in your Gladys instance (In \"Settings\" => \"Gladys Plus\" => \"Users\").",
+    "description": "Select the Gladys user you want to link your Gladys Plus account to. This user must be accepted locally on your instance: in your instance settings, \"Gladys Plus\" tab, \"Users\" section.",
     "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
+    "noInstanceFoundHelp": "This can happen if you never connected to your Gladys Plus account in your local instance, or if your 2FA was reset. In both cases, open your local Gladys instance, go to the settings, \"Gladys Plus\" tab, and log in to your account. Need help? Contact us at <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
     "errorNotAcceptedLocally": "The user was not accepted locally in the Gladys instance. Please accept it in your instance settings.",
     "saveButton": "Save",
-    "manageBilling": "To manage your billing, click ",
-    "here": "here"
+    "manageBillingLink": "Manage my subscription and invoices",
+    "logoutButton": "Log out"
   },
   "editDeviceForm": {
     "noName": "No name",

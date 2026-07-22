@@ -3,8 +3,7 @@ import { connect } from 'unistore/preact';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { RequestStatus } from '../../../../../utils/consts';
-import config from '../../../../../config';
-import { MQTT_MODE } from './constants';
+import getZ2mUrl from '../utils/getZ2mUrl';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import SetupTab from './SetupTab';
 
@@ -20,16 +19,7 @@ const VARIABLE_MAP = {
 };
 
 class Zigbee2mqttSetupPage extends Component {
-  getZ2mUrl = configuration => {
-    if (configuration.mqttMode === MQTT_MODE.LOCAL && this.props.session.gatewayClient === undefined) {
-      const url = new URL(config.localApiUrl);
-      return `${url.protocol}//${url.hostname}:${configuration.z2mTcpPort || '8080'}`;
-    }
-    if (configuration.mqttMode === MQTT_MODE.EXTERNAL) {
-      return configuration.z2mFrontendUrl || null;
-    }
-    return null;
-  };
+  resolveZ2mUrl = configuration => getZ2mUrl(configuration, this.props.session.gatewayClient !== undefined);
 
   handleZ2MStatus = zigbee2mqttStatus => {
     this.setState({ zigbee2mqttStatus });
@@ -55,7 +45,7 @@ class Zigbee2mqttSetupPage extends Component {
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({
         configuration,
-        z2mUrl: this.getZ2mUrl(configuration),
+        z2mUrl: this.resolveZ2mUrl(configuration),
         loadZigbee2mqttConfig: RequestStatus.Success
       });
     } catch (e) {
@@ -76,7 +66,7 @@ class Zigbee2mqttSetupPage extends Component {
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({
         configuration,
-        z2mUrl: this.getZ2mUrl(configuration),
+        z2mUrl: this.resolveZ2mUrl(configuration),
         setupZigee2mqttStatus: RequestStatus.Success
       });
     } catch (e) {

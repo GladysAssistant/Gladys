@@ -3,6 +3,7 @@ import { Text } from 'preact-i18n';
 
 import SettingsLayout from '../SettingsLayout';
 import GatewayLoginForm from '../../../components/gateway/GatewayLoginForm';
+import GatewayConfigureTwoFactor from './GatewayConfigureTwoFactor';
 import GatewayPricing from './GatewayPricing';
 import GatewayConfigured from './GatewayConfigured';
 import GatewayBackupKey from './GatewayBackupKey';
@@ -22,7 +23,11 @@ const GatewayPage = ({ children, ...props }) => (
         </div>
         <div class="row mt-4">
           <div class="col-md-6 offset-md-3">
-            <GatewayLoginForm {...props} external_forgot_password />
+            {props.displayGatewayConfigureTwoFactor ? (
+              <GatewayConfigureTwoFactor {...props} />
+            ) : (
+              <GatewayLoginForm {...props} external_forgot_password />
+            )}
           </div>
         </div>
       </div>

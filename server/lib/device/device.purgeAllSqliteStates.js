@@ -19,12 +19,21 @@ async function purgeAllSqliteStates(jobId) {
   this.purgeAllSQliteStatesInProgress = true;
 
   try {
+    await this.job.updateProgress(jobId, 0, { step: 'counting' });
+
     const numberOfDeviceFeatureStateToDelete = await db.DeviceFeatureState.count();
     const numberOfDeviceFeatureStateAggregateToDelete = await db.DeviceFeatureStateAggregate.count();
 
     logger.info(
       `Purging All SQLite states: ${numberOfDeviceFeatureStateToDelete} states & ${numberOfDeviceFeatureStateAggregateToDelete} aggregates to delete.`,
     );
+
+    // Attach structured facts to the job so the front can display them
+    await this.job.updateProgress(jobId, 0, {
+      sqlite_states_count: numberOfDeviceFeatureStateToDelete,
+      aggregates_count: numberOfDeviceFeatureStateAggregateToDelete,
+      step: 'deleting_states',
+    });
 
     const numberOfIterationsStates = Math.ceil(
       numberOfDeviceFeatureStateToDelete / this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
@@ -69,6 +78,10 @@ async function purgeAllSqliteStates(jobId) {
       await updateProgressIfNeeded();
       await Promise.delay(this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH);
     });
+
+    if (iteratorAggregates.length > 0) {
+      await this.job.updateProgress(jobId, currentProgressPercent, { step: 'deleting_aggregates' });
+    }
 
     await Promise.each(iteratorAggregates, async () => {
       await db.sequelize.query(

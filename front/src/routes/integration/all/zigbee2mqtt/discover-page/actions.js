@@ -1,24 +1,22 @@
 import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
-import config from '../../../../../config';
+import getZ2mUrl, { shouldShowZ2mUrlWarning } from '../utils/getZ2mUrl';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const houseActions = createActionsHouse(store);
   const actions = {
     async getZ2mUrl(state) {
+      store.setState({ z2mUrl: undefined, showZ2mUrlWarning: false });
       try {
         const configuration = await state.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
-        if (configuration.Z2M_MQTT_MODE === 'local') {
-          if (configuration.Z2M_TCP_PORT && state.session.gatewayClient === undefined) {
-            const url = new URL(config.localApiUrl);
-            const z2mUrl = `${url.protocol}//${url.hostname}:${configuration.Z2M_TCP_PORT}`;
-            store.setState({ z2mUrl });
-          }
-        } else if (configuration.Z2M_MQTT_MODE === 'external' && configuration.Z2M_FRONTEND_URL) {
-          store.setState({ z2mUrl: configuration.Z2M_FRONTEND_URL });
-        }
+        const hasGatewayClient = state.session.gatewayClient !== undefined;
+        const z2mUrl = getZ2mUrl(configuration, hasGatewayClient);
+        store.setState({
+          z2mUrl,
+          showZ2mUrlWarning: shouldShowZ2mUrlWarning(configuration, hasGatewayClient, z2mUrl)
+        });
       } catch (e) {
         // z2mUrl stays undefined, link won't be shown
       }
