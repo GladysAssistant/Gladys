@@ -94,6 +94,8 @@ const ConfigureTwoFactorForm = ({ children, ...props }) => (
                           placeholder={<Text id="gatewayTwoFactorAuth.enterCode" />}
                           value={props.twoFactorCode}
                           onInput={props.updateTwoFactorCode}
+                          inputmode="numeric"
+                          autocomplete="one-time-code"
                         />
                       </Localizer>
                     </div>

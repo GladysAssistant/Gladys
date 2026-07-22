@@ -70,6 +70,8 @@ const DeviceManager = function DeviceManager(
   this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH = 1000;
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
+  this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES = 10;
+  this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD = 1000000;
   // The orphaned-states purge sleeps this many times the duration of each
   // slice (at least the minimum below), so it only ever uses a fraction of
   // the CPU/disk/write connection

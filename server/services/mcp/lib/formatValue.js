@@ -1,4 +1,5 @@
 const { COVER_STATE } = require('../../../utils/constants');
+const { intToHex } = require('../../../utils/colors');
 
 const coverStateLabels = {
   [COVER_STATE.OPEN]: 'open',
@@ -25,6 +26,11 @@ function formatValue(feature) {
     case 'air-conditioning':
       return {
         value: feature.last_value === 0 ? 'off' : 'on',
+        unit: null,
+      };
+    case 'light:color':
+      return {
+        value: feature.last_value === null ? null : `#${intToHex(feature.last_value)}`,
         unit: null,
       };
     case 'shutter:state':
