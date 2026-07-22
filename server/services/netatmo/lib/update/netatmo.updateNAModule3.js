@@ -1,6 +1,5 @@
-const { EVENTS } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
-const { readValues } = require('../device/netatmo.deviceMapping');
+const { emitFeatureState } = require('../utils/netatmo.emitFeatureState');
 
 /**
  * @description Save values of Smart Rain Gauge Module NAModule3.
@@ -15,46 +14,27 @@ async function updateNAModule3(deviceGladys, deviceNetatmo, externalId) {
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:battery_percent`)
       .forEach((feature) => {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `${externalId}:battery_percent`,
-          state: readValues[feature.category][feature.type](deviceNetatmo.battery_percent),
-        });
+        emitFeatureState(this.gladys, feature, deviceNetatmo.battery_percent);
       });
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:rain`)
       .forEach((feature) => {
-        const valueDeviceNetatmo = deviceNetatmo.rain || (dashboardData && dashboardData.Rain);
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
-        });
+        emitFeatureState(this.gladys, feature, deviceNetatmo.rain ?? dashboardData?.Rain);
       });
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:sum_rain_1`)
       .forEach((feature) => {
-        const valueDeviceNetatmo = deviceNetatmo.sum_rain_1 || (dashboardData && dashboardData.sum_rain_1);
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
-        });
+        emitFeatureState(this.gladys, feature, deviceNetatmo.sum_rain_1 ?? dashboardData?.sum_rain_1);
       });
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:sum_rain_24`)
       .forEach((feature) => {
-        const valueDeviceNetatmo = deviceNetatmo.sum_rain_24 || (dashboardData && dashboardData.sum_rain_24);
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
-        });
+        emitFeatureState(this.gladys, feature, deviceNetatmo.sum_rain_24 ?? dashboardData?.sum_rain_24);
       });
     deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:rf_strength`)
       .forEach((feature) => {
-        const valueDeviceNetatmo = deviceNetatmo.rf_strength || (dashboardData && dashboardData.rf_status);
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](valueDeviceNetatmo),
-        });
+        emitFeatureState(this.gladys, feature, deviceNetatmo.rf_strength ?? dashboardData?.rf_status);
       });
   } catch (e) {
     logger.error('deviceGladys NAModule3: ', deviceGladys.name, 'error: ', e);

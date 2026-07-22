@@ -45,7 +45,10 @@ describe('Netatmo update NAModule3 features', () => {
     deviceNetatmoMock.rf_strength = undefined;
     await netatmoHandler.updateNAModule3(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
-    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(deviceGladysMock.features.length);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(4);
+    sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:rf_strength`,
+    });
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit.getCall(1), 'device.new-state', {
       device_feature_external_id: `${deviceGladysMock.external_id}:rain`,
       state: 0.101,
@@ -61,7 +64,10 @@ describe('Netatmo update NAModule3 features', () => {
 
     await netatmoHandler.updateNAModule3(deviceGladysMock, deviceNetatmoMock, externalIdMock);
 
-    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(5);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(4);
+    sinon.assert.neverCalledWithMatch(netatmoHandler.gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:sum_rain_24`,
+    });
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
       device_feature_external_id: `${deviceGladysMock.external_id}:battery_percent`,
       state: 52,
@@ -85,12 +91,29 @@ describe('Netatmo update NAModule3 features', () => {
       }),
     ).to.equal(true);
     expect(
-      netatmoHandler.gladys.event.emit.getCall(4).calledWith(EVENTS.DEVICE.NEW_STATE, {
+      netatmoHandler.gladys.event.emit.getCall(3).calledWith(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: 'netatmo:05:00:00:yy:yy:yy:rf_strength',
         state: 96,
       }),
     ).to.equal(true);
   });
+
+  it('should emit zero values instead of falling back to dashboard data', async () => {
+    deviceNetatmoMock.rain = 0;
+    deviceNetatmoMock.sum_rain_1 = 0;
+
+    await netatmoHandler.updateNAModule3(deviceGladysMock, deviceNetatmoMock, externalIdMock);
+
+    sinon.assert.calledWith(netatmoHandler.gladys.event.emit.getCall(1), 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:rain`,
+      state: 0,
+    });
+    sinon.assert.calledWith(netatmoHandler.gladys.event.emit.getCall(2), 'device.new-state', {
+      device_feature_external_id: `${deviceGladysMock.external_id}:sum_rain_1`,
+      state: 0,
+    });
+  });
+
   it('should handle errors correctly', async () => {
     deviceNetatmoMock.battery_percent = undefined;
     const error = new Error('Test error');
