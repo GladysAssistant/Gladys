@@ -4,6 +4,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 
 const MatterbridgeManager = require('../../../../services/matterbridge/lib');
+const { CONFIGURATION } = require('../../../../services/matterbridge/lib/constants');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 const NAME = 'gladys-matterbridge';
@@ -17,6 +18,9 @@ describe('Matterbridge allocateContainerNames', () => {
       system: {
         getContainers: fake.resolves([]),
       },
+      variable: {
+        setValue: fake.resolves(null),
+      },
     };
     matterbridgeManager = new MatterbridgeManager(gladys, serviceId);
   });
@@ -29,6 +33,8 @@ describe('Matterbridge allocateContainerNames', () => {
     const config = {};
     await matterbridgeManager.allocateContainerNames(config);
     expect(config.matterbridgeContainerName).to.equal(NAME);
+    // The resolved name is persisted immediately, before any container is created
+    assert.calledOnceWithExactly(gladys.variable.setValue, CONFIGURATION.MATTERBRIDGE_CONTAINER_NAME, NAME, serviceId);
   });
 
   it('should adopt a legacy healthy container (image proves it is ours)', async () => {
@@ -64,5 +70,22 @@ describe('Matterbridge allocateContainerNames', () => {
     await matterbridgeManager.allocateContainerNames(config);
     expect(config.matterbridgeContainerName).to.equal('gladys-matterbridge-persisted');
     assert.notCalled(gladys.system.getContainers);
+    assert.notCalled(gladys.variable.setValue);
+  });
+
+  it('should reject and persist nothing when the Docker lookup fails', async () => {
+    gladys.system.getContainers = fake.rejects(new Error('docker socket unavailable'));
+    const config = {};
+
+    let error;
+    try {
+      await matterbridgeManager.allocateContainerNames(config);
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.an('error');
+    expect(config.matterbridgeContainerName).to.equal(undefined);
+    assert.notCalled(gladys.variable.setValue);
   });
 });

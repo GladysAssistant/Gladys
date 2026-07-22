@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { resolveContainerName } = require('../../../utils/dockerContainers');
+const { CONFIGURATION } = require('./constants');
 
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
@@ -25,6 +26,9 @@ async function allocateContainerNames(config) {
       MQTT_IMAGE_MARKER,
       'Zigbee2mqtt MQTT',
     );
+    // Persist immediately, before any container is created, so a crash before
+    // saveConfiguration cannot orphan a suffixed container on the next retry.
+    await this.gladys.variable.setValue(CONFIGURATION.MQTT_CONTAINER_NAME, config.mqttContainerName, this.serviceId);
     logger.info(`Zigbee2mqtt: using "${config.mqttContainerName}" as MQTT container name`);
   }
   if (!config.z2mContainerName) {
@@ -34,6 +38,9 @@ async function allocateContainerNames(config) {
       Z2M_IMAGE_MARKER,
       'Zigbee2mqtt',
     );
+    // Persist immediately, before any container is created, so a crash before
+    // saveConfiguration cannot orphan a suffixed container on the next retry.
+    await this.gladys.variable.setValue(CONFIGURATION.Z2M_CONTAINER_NAME, config.z2mContainerName, this.serviceId);
     logger.info(`Zigbee2mqtt: using "${config.z2mContainerName}" as Zigbee2mqtt container name`);
   }
 }
