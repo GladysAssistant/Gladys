@@ -79,6 +79,21 @@ describe('formatValue', () => {
     });
   });
 
+  it('should format light:color as hexadecimal color', () => {
+    expect(formatValue({ category: 'light', type: 'color', last_value: 255 })).to.deep.equal({
+      value: '#0000ff',
+      unit: null,
+    });
+    expect(formatValue({ category: 'light', type: 'color', last_value: 16711680 })).to.deep.equal({
+      value: '#ff0000',
+      unit: null,
+    });
+    expect(formatValue({ category: 'light', type: 'color', last_value: null })).to.deep.equal({
+      value: null,
+      unit: null,
+    });
+  });
+
   it('should format default case with value and unit', () => {
     const feature = {
       category: 'temperature-sensor',
