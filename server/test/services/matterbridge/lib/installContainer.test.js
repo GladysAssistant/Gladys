@@ -9,13 +9,17 @@ const MatterbridgeManager = require('../../../../services/matterbridge/lib');
 const container = {
   id: 'docker-test',
   state: 'running',
+  name: '/gladys-matterbridge',
 };
 
-const config = {};
+const config = {
+  matterbridgeContainerName: 'gladys-matterbridge',
+};
 
 const containerStopped = {
   id: 'docker-test',
   state: 'stopped',
+  name: '/gladys-matterbridge',
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -103,7 +107,7 @@ describe('Matterbridge installContainer', () => {
     this.timeout(6000);
 
     try {
-      await matterbridgeManager.installContainer();
+      await matterbridgeManager.installContainer(config);
       assert.fail();
     } catch (e) {
       expect(e.message).to.equal('Error');
@@ -134,7 +138,7 @@ describe('Matterbridge installContainer', () => {
     gladys.system.restartContainer = fake.rejects('Error');
 
     try {
-      await matterbridgeManager.installContainer();
+      await matterbridgeManager.installContainer(config);
       assert.fail();
     } catch (e) {
       expect(e.message).to.equal('Error');

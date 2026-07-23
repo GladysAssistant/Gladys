@@ -48,6 +48,7 @@ describe('zigbee2mqtt init', () => {
 
     zigbee2mqttManager.getConfiguration = sinon.stub();
     zigbee2mqttManager.saveConfiguration = sinon.stub();
+    zigbee2mqttManager.allocateContainerNames = sinon.stub();
     zigbee2mqttManager.checkForContainerUpdates = sinon.stub();
     zigbee2mqttManager.installMqttContainer = sinon.stub();
     zigbee2mqttManager.installZ2mContainer = sinon.stub();

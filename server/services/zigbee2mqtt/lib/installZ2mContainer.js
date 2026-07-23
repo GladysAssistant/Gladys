@@ -2,6 +2,7 @@ const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
 
 const logger = require('../../../utils/logger');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 
 const containerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
 
@@ -18,10 +19,7 @@ async function installZ2mContainer(config, setupMode = false) {
   const { z2mDriverPath } = config;
   let creationNeeded = false;
 
-  let dockerContainers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [containerDescriptor.name] },
-  });
+  let dockerContainers = await getContainersByExactName(this.gladys.system, config.z2mContainerName);
   let [container] = dockerContainers;
 
   /*
@@ -53,6 +51,7 @@ async function installZ2mContainer(config, setupMode = false) {
 
       logger.info(`Configuration of Device ${z2mDriverPath}`);
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+      containerDescriptorToMutate.name = config.z2mContainerName;
       containerDescriptorToMutate.HostConfig.Binds.push(`${containerPath}:/app/data`);
       containerDescriptorToMutate.HostConfig.Devices[0].PathOnHost = z2mDriverPath;
 
@@ -73,10 +72,7 @@ async function installZ2mContainer(config, setupMode = false) {
   const { configChanged, adapterChanged } = await this.configureContainer(basePathOnContainer, config, setupMode);
 
   try {
-    dockerContainers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [containerDescriptor.name] },
-    });
+    dockerContainers = await getContainersByExactName(this.gladys.system, config.z2mContainerName);
     [container] = dockerContainers;
 
     // If adapter type changed, remove and recreate container for clean state and fresh logs
@@ -86,14 +82,12 @@ async function installZ2mContainer(config, setupMode = false) {
       await this.gladys.system.removeContainer(container.id);
 
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+      containerDescriptorToMutate.name = config.z2mContainerName;
       containerDescriptorToMutate.HostConfig.Binds.push(`${containerPath}:/app/data`);
       containerDescriptorToMutate.HostConfig.Devices[0].PathOnHost = z2mDriverPath;
       await this.gladys.system.createContainer(containerDescriptorToMutate);
 
-      dockerContainers = await this.gladys.system.getContainers({
-        all: true,
-        filters: { name: [containerDescriptor.name] },
-      });
+      dockerContainers = await getContainersByExactName(this.gladys.system, config.z2mContainerName);
       [container] = dockerContainers;
     }
 

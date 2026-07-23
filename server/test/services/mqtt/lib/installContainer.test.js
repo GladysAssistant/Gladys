@@ -47,6 +47,7 @@ describe('mqttHandler.installContainer', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     mqttHandler.configureContainer = fake.resolves(null);
 
     try {
@@ -77,7 +78,7 @@ describe('mqttHandler.installContainer', () => {
       system: {
         pull: fake.resolves(false),
         createContainer: fake.resolves(false),
-        getContainers: fake.resolves([{ state: 'running' }]),
+        getContainers: fake.resolves([{ name: '/eclipse-mosquitto', state: 'running' }]),
         exec: fake.resolves(true),
         restartContainer: fake.resolves(true),
         getNetworkMode: fake.resolves('host'),
@@ -93,6 +94,7 @@ describe('mqttHandler.installContainer', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     mqttHandler.configureContainer = fake.resolves(null);
 
     await mqttHandler.installContainer();
@@ -119,7 +121,7 @@ describe('mqttHandler.installContainer', () => {
       system: {
         pull: fake.resolves(false),
         createContainer: fake.resolves(false),
-        getContainers: fake.resolves([{ state: 'running' }]),
+        getContainers: fake.resolves([{ name: '/eclipse-mosquitto', state: 'running' }]),
         exec: fake.resolves(true),
         restartContainer: fake.resolves(true),
         getNetworkMode: fake.resolves('host'),
@@ -135,6 +137,7 @@ describe('mqttHandler.installContainer', () => {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
     mqttHandler.configureContainer = fake.resolves(null);
 
     await mqttHandler.installContainer(false);

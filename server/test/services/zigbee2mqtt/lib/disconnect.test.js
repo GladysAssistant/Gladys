@@ -36,7 +36,8 @@ describe('zigbee2mqtt disconnect', () => {
         emit: fake.resolves(null),
       },
       system: {
-        getContainers: fake.resolves([container]),
+        // Return a container whose exact name matches whatever is queried
+        getContainers: fake(async ({ filters }) => [{ ...container, name: `/${filters.name[0]}` }]),
         stopContainer: fake.resolves(true),
         removeContainer: fake.resolves(true),
       },
@@ -45,6 +46,11 @@ describe('zigbee2mqtt disconnect', () => {
     zigbee2MqttManager = new Zigbee2mqttManager(gladys, mqtt, serviceId);
     zigbee2MqttManager.dockerBased = true;
     zigbee2MqttManager.networkModeValid = true;
+    // Container names resolved and persisted at init
+    zigbee2MqttManager.getConfiguration = fake.resolves({
+      mqttContainerName: 'gladys-z2m-mqtt',
+      z2mContainerName: 'gladys-z2m-zigbee2mqtt',
+    });
   });
 
   afterEach(() => {
@@ -107,6 +113,31 @@ describe('zigbee2mqtt disconnect', () => {
     assert.calledOnce(mqtt.removeAllListeners);
 
     expect(zigbee2MqttManager.mqttClient).to.equal(null);
+  });
+
+  it('should not touch any container when names were never persisted', async () => {
+    // PREPARE - nothing was ever installed, so no name is persisted
+    zigbee2MqttManager.getConfiguration = fake.resolves({
+      mqttContainerName: undefined,
+      z2mContainerName: undefined,
+    });
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT - a foreign homonym container must never be looked up, stopped or removed
+    assert.notCalled(gladys.system.getContainers);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+  });
+
+  it('should look up but not stop anything when the persisted containers are already gone', async () => {
+    // Names are persisted, but the containers no longer exist
+    gladys.system.getContainers = fake.resolves([]);
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    assert.calledTwice(gladys.system.getContainers);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
   });
 
   it('clear backup interval', async () => {
