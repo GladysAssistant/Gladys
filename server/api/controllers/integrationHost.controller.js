@@ -177,7 +177,9 @@ module.exports = function IntegrationHostController(gladys) {
    * @apiDescription Incoming message of a communication integration. The
    * contact must have linked their Gladys account (link code): unknown
    * contact -> 404, so the integration can answer "account not linked, code
-   * required" in the channel.
+   * required" in the channel. A send-only notification channel
+   * (messaging.receive false) gets a 403: it never reaches the brain — the
+   * guarantee is enforced server-side, not only by the manifest.
    */
   async function publishMessage(req, res) {
     const result = await gladys.externalIntegration.handleIncomingMessage(req.externalIntegrationService, req.body);

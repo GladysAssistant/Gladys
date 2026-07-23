@@ -569,6 +569,20 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: externalIntegrationController.unlinkOwnContact,
     },
+    // send-only channels (messaging.receive false): each user fills their
+    // OWN "My account" block (contact_schema values, no admin flag either)
+    'get /api/v1/external_integration/:selector/contact_profile': {
+      authenticated: true,
+      controller: externalIntegrationController.getOwnContactProfile,
+    },
+    'post /api/v1/external_integration/:selector/contact_profile': {
+      authenticated: true,
+      controller: externalIntegrationController.saveOwnContactProfile,
+    },
+    'delete /api/v1/external_integration/:selector/contact_profile': {
+      authenticated: true,
+      controller: externalIntegrationController.deleteOwnContactProfile,
+    },
     'get /api/v1/external_integration/:selector/discovered_device': {
       authenticated: true,
       controller: externalIntegrationController.getDiscoveredDevices,

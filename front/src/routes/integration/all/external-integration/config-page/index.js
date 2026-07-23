@@ -31,7 +31,14 @@ class ExternalIntegrationConfigPage extends Component {
         loadStatus: RequestStatus.Success
       });
       if (get(integration, 'manifest.type') === 'communication') {
-        await this.loadContact();
+        // chat channels (receive true, the default) link by code;
+        // send-only notification channels load the "My account" values
+        if (get(integration, 'manifest.messaging.receive') !== false) {
+          await this.loadContact();
+        }
+        if ((get(integration, 'manifest.contact_schema') || []).length > 0) {
+          await this.loadContactProfile();
+        }
       }
       await this.loadGatewayStatus(integration);
       await this.loadDynamicOptions(integration);
@@ -125,6 +132,85 @@ class ExternalIntegrationConfigPage extends Component {
       this.setState({ contact });
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  loadContactProfile = async () => {
+    try {
+      const contactProfile = await this.props.httpClient.get(
+        `/api/v1/external_integration/${this.props.selector}/contact_profile`
+      );
+      this.setState({
+        contactProfile,
+        contactProfileValues: Object.assign({}, contactProfile.values),
+        contactProfileTouchedSecrets: {}
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  updateContactProfileValue = (field, value) => {
+    const contactProfileValues = Object.assign({}, this.state.contactProfileValues, { [field.key]: value });
+    const newState = { contactProfileValues, contactProfileStatus: null };
+    if (field.type === 'secret') {
+      newState.contactProfileTouchedSecrets = Object.assign({}, this.state.contactProfileTouchedSecrets, {
+        [field.key]: true
+      });
+    }
+    this.setState(newState);
+  };
+
+  saveContactProfile = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState({ contactProfileStatus: RequestStatus.Getting });
+    const { integration, contactProfileValues = {}, contactProfileTouchedSecrets = {} } = this.state;
+    const contactSchema = get(integration, 'manifest.contact_schema') || [];
+    const values = {};
+    contactSchema.forEach(field => {
+      const value = contactProfileValues[field.key];
+      if (field.type === 'secret') {
+        // a secret set to null means "unchanged" on the server side
+        values[field.key] = contactProfileTouchedSecrets[field.key] ? value : null;
+      } else if (field.type === 'number') {
+        const numericValue = value === '' || value === undefined || value === null ? NaN : Number(value);
+        if (!Number.isNaN(numericValue)) {
+          values[field.key] = numericValue;
+        }
+      } else if (field.type === 'boolean') {
+        values[field.key] = !!value;
+      } else if (value !== undefined && value !== null) {
+        values[field.key] = value;
+      }
+    });
+    try {
+      const contactProfile = await this.props.httpClient.post(
+        `/api/v1/external_integration/${this.props.selector}/contact_profile`,
+        { values }
+      );
+      this.setState({
+        contactProfile,
+        contactProfileValues: Object.assign({}, contactProfile.values),
+        contactProfileTouchedSecrets: {},
+        contactProfileStatus: RequestStatus.Success
+      });
+    } catch (err) {
+      console.error(err);
+      this.setState({ contactProfileStatus: RequestStatus.Error });
+    }
+  };
+
+  clearContactProfile = async () => {
+    this.setState({ contactProfileStatus: RequestStatus.Getting });
+    try {
+      await this.props.httpClient.delete(`/api/v1/external_integration/${this.props.selector}/contact_profile`);
+      this.setState({ contactProfileStatus: null });
+      await this.loadContactProfile();
+    } catch (e) {
+      console.error(e);
+      this.setState({ contactProfileStatus: RequestStatus.Error });
     }
   };
 
@@ -419,6 +505,9 @@ class ExternalIntegrationConfigPage extends Component {
           unlinkContact={this.unlinkContact}
           updateOpenApiKey={this.updateOpenApiKey}
           saveOpenApiKey={this.saveOpenApiKey}
+          updateContactProfileValue={this.updateContactProfileValue}
+          saveContactProfile={this.saveContactProfile}
+          clearContactProfile={this.clearContactProfile}
           toggleHardwareClass={this.toggleHardwareClass}
           saveHardware={this.saveHardware}
         />

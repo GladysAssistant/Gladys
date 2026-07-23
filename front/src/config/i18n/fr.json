@@ -735,7 +735,8 @@
         "duplicateWarningTitle": "Une autre instance est déjà installée",
         "duplicateWarningText": "« {name} » semble être une autre instance de cette intégration. Deux instances peuvent se disputer le même compte cloud ou les mêmes appareils — pensez à arrêter l'instance existante pendant vos tests. Installer quand même est un usage supporté (ex. une version dev à côté de la prod).",
         "webhooksTitle": "Webhooks Internet (Gladys Plus)",
-        "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API)."
+        "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
+        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -812,6 +813,14 @@
         "saveKeyError": "Une erreur est survenue lors de l'enregistrement de la clé Open API.",
         "notAvailableText": "Les webhooks ne sont pas encore actifs : enregistrez votre clé Open API pour les activer.",
         "urlsText": "URLs de webhook (l'intégration les enregistre automatiquement quand c'est possible ; certains services demandent de les coller dans la console du fabricant). Ces URLs contiennent votre clé : ne les partagez qu'avec le service tiers."
+      },
+      "contactProfile": {
+        "title": "Mon compte",
+        "description": "Ce canal envoie des messages avec vos identifiants personnels. Chaque utilisateur saisit ses propres valeurs ; laissez vide pour ne rien recevoir. Effacer vos valeurs arrête les messages.",
+        "saveButton": "Enregistrer",
+        "clearButton": "Effacer mes valeurs",
+        "saveError": "Une erreur est survenue lors de l'enregistrement de vos valeurs.",
+        "saveSuccess": "Vos valeurs ont été enregistrées."
       }
     },
     "energyMonitoring": {

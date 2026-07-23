@@ -322,6 +322,47 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/external_integration/:selector/contact_profile getOwnContactProfile
+   * @apiName getOwnContactProfile
+   * @apiGroup ExternalIntegration
+   * @apiDescription The "My account" values of the CURRENT user on a
+   * send-only communication integration (contact_schema): secrets are never
+   * echoed back, only the configured flags.
+   */
+  async function getOwnContactProfile(req, res) {
+    const integration = await gladys.externalIntegration.getBySelector(req.params.selector);
+    const profile = await gladys.externalIntegration.getContactProfileForFront(integration, req.user.id);
+    res.json(profile);
+  }
+
+  /**
+   * @api {post} /api/v1/external_integration/:selector/contact_profile saveOwnContactProfile
+   * @apiName saveOwnContactProfile
+   * @apiGroup ExternalIntegration
+   * @apiDescription Save the "My account" values of the CURRENT user
+   * (partial merge validated against the contact_schema; a secret set to
+   * null means unchanged).
+   */
+  async function saveOwnContactProfile(req, res) {
+    const integration = await gladys.externalIntegration.getBySelector(req.params.selector);
+    const profile = await gladys.externalIntegration.saveContactProfile(integration, req.user.id, req.body.values);
+    res.json(profile);
+  }
+
+  /**
+   * @api {delete} /api/v1/external_integration/:selector/contact_profile deleteOwnContactProfile
+   * @apiName deleteOwnContactProfile
+   * @apiGroup ExternalIntegration
+   * @apiDescription Delete the "My account" values of the CURRENT user: the
+   * revocation gesture of a notification channel. Idempotent.
+   */
+  async function deleteOwnContactProfile(req, res) {
+    const integration = await gladys.externalIntegration.getBySelector(req.params.selector);
+    await gladys.externalIntegration.deleteContactProfile(integration, req.user.id);
+    res.json({ success: true });
+  }
+
+  /**
    * @api {delete} /api/v1/external_integration/:selector destroy
    * @apiName destroy
    * @apiGroup ExternalIntegration
@@ -356,6 +397,9 @@ module.exports = function ExternalIntegrationController(gladys) {
     createLinkCode: asyncMiddleware(createLinkCode),
     getOwnContact: asyncMiddleware(getOwnContact),
     unlinkOwnContact: asyncMiddleware(unlinkOwnContact),
+    getOwnContactProfile: asyncMiddleware(getOwnContactProfile),
+    saveOwnContactProfile: asyncMiddleware(saveOwnContactProfile),
+    deleteOwnContactProfile: asyncMiddleware(deleteOwnContactProfile),
     destroy: asyncMiddleware(destroy),
   });
 };

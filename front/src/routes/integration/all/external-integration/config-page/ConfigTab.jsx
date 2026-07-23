@@ -5,6 +5,7 @@ import get from 'get-value';
 import ConfigSchemaForm from './ConfigSchemaForm';
 import ActionsCard from './ActionsCard';
 import LinkAccountCard from './LinkAccountCard';
+import ContactProfileCard from './ContactProfileCard';
 import WebhooksCard from './WebhooksCard';
 import HardwareCard from './HardwareCard';
 import { getRequestedHardwareClasses } from '../utils';
@@ -19,6 +20,10 @@ const ConfigTab = props => {
   const hasDualTransports = transports.includes('local') && transports.includes('cloud');
   const language = (user && user.language) || 'en';
   const isCommunication = get(integration, 'manifest.type') === 'communication';
+  // chat channels (receive true, the default) link by code; send-only
+  // notification channels expose the per-user "My account" block instead
+  const isReceivingChannel = isCommunication && get(integration, 'manifest.messaging.receive') !== false;
+  const contactSchema = get(integration, 'manifest.contact_schema') || [];
   const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
   // permanent link to the mandatory re-hosted docs (store installs): it
   // is while configuring that the user needs them most (create the
@@ -106,13 +111,28 @@ const ConfigTab = props => {
         </div>
       </div>
 
-      {isCommunication && (
+      {isReceivingChannel && (
         <LinkAccountCard
           contact={props.contact}
           linkCode={props.linkCode}
           linkStatus={props.linkStatus}
           onGenerateCode={props.generateLinkCode}
           onUnlink={props.unlinkContact}
+        />
+      )}
+
+      {integration && contactSchema.length > 0 && (
+        <ContactProfileCard
+          contactSchema={contactSchema}
+          language={language}
+          profile={props.contactProfile}
+          values={props.contactProfileValues}
+          configuredSecrets={get(props, 'contactProfile.configured_secrets')}
+          touchedSecrets={props.contactProfileTouchedSecrets}
+          profileStatus={props.contactProfileStatus}
+          updateValue={props.updateContactProfileValue}
+          onSave={props.saveContactProfile}
+          onClear={props.clearContactProfile}
         />
       )}
 

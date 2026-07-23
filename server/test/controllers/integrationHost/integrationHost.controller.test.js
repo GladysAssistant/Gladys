@@ -475,6 +475,32 @@ describe('Integration host API', () => {
     });
   });
 
+  describe('notification channel (messaging.receive false)', () => {
+    it('should answer 403 on POST /message and POST /contact/link: server-side guarantee', async () => {
+      const notificationService = await seedExternalService({
+        name: 'ext-dev-free-mobile',
+        selector: 'ext-dev-free-mobile',
+        manifest: {
+          ...TEST_MANIFEST,
+          type: 'communication',
+          config_schema: undefined,
+          messaging: { receive: false },
+          contact_schema: [{ key: 'username', type: 'string', label: { en: 'Username' } }],
+        },
+        has_message_feature: true,
+      });
+      const notificationToken = generateIntegrationToken(notificationService.id, 1, 'secret');
+      await integrationRequest(notificationToken)
+        .post('/api/integration/v1/message')
+        .send({ contact_id: 'x', text: 'hello' })
+        .expect(403);
+      await integrationRequest(notificationToken)
+        .post('/api/integration/v1/contact/link')
+        .send({ code: 'ABCD2345', contact_id: 'x' })
+        .expect(403);
+    });
+  });
+
   describe('GET /api/integration/v1/webhook', () => {
     it('should return the declared webhooks with their availability', async () => {
       const webhooksService = await seedExternalService({

@@ -3,7 +3,8 @@ const { v4: uuidv4 } = require('uuid');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
-const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
+const { NotFoundError, BadParameters, ForbiddenError } = require('../../utils/coreErrors');
+const { isSendOnlyChannel } = require('./externalIntegration.getContactProfile');
 const { CONTACT_VARIABLE, MAX_MESSAGE_TEXT_LENGTH } = require('./constants');
 
 /**
@@ -25,6 +26,11 @@ const { CONTACT_VARIABLE, MAX_MESSAGE_TEXT_LENGTH } = require('./constants');
  * await gladys.externalIntegration.handleIncomingMessage(service, { contact_id: '12345', text: 'Turn on the light' });
  */
 async function handleIncomingMessage(service, { contact_id: contactId, text, created_at: createdAt } = {}) {
+  // a notification channel (messaging.receive false) never reaches the
+  // brain: the guarantee is enforced server-side, not only by the manifest
+  if (isSendOnlyChannel(service.manifest)) {
+    throw new ForbiddenError('MESSAGING_RECEIVE_NOT_ALLOWED');
+  }
   if (typeof contactId !== 'string' || contactId.length === 0) {
     throw new BadParameters('contact_id: must be a non-empty string');
   }

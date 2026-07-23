@@ -1,5 +1,6 @@
 const db = require('../../models');
-const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
+const { NotFoundError, BadParameters, ForbiddenError } = require('../../utils/coreErrors');
+const { isSendOnlyChannel } = require('./externalIntegration.getContactProfile');
 const { CONTACT_VARIABLE, LINK_CODE_CACHE_PREFIX } = require('./constants');
 
 /**
@@ -18,6 +19,10 @@ const { CONTACT_VARIABLE, LINK_CODE_CACHE_PREFIX } = require('./constants');
  * await gladys.externalIntegration.linkContact(service, { code: 'AB23CD45', contact_id: '12345' });
  */
 async function linkContact(service, { code, contact_id: contactId, contact_name: contactName } = {}) {
+  // mirror of createLinkCode: no code-based link on a send-only channel
+  if (isSendOnlyChannel(service.manifest)) {
+    throw new ForbiddenError('LINK_CODE_NOT_AVAILABLE');
+  }
   if (typeof code !== 'string' || code.length === 0) {
     throw new BadParameters('code: must be a non-empty string');
   }

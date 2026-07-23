@@ -109,8 +109,73 @@
       "items": {
         "$ref": "#/definitions/webhook"
       }
+    },
+    "messaging": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receive"],
+      "description": "Communication type only. receive true (the default without this field): bidirectional chat channel — inbound messages carry the authority of the code-linked user, POST /message and the link endpoints are open. receive false: send-only notification channel (the Free Mobile family) — POST /message and code-based linking answer 403, the per-user identity comes from contact_schema instead.",
+      "properties": {
+        "receive": {
+          "type": "boolean"
+        }
+      }
+    },
+    "contact_schema": {
+      "type": "array",
+      "description": "Send-only communication channels only (messaging.receive false): per-user identity form rendered by the core as a \"My account\" block on the Configuration screen (every user fills their OWN values, stored per user). Same flat format as config_schema; oauth2 fields are not allowed (the OAuth relay is integration-scoped, never per user).",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/definitions/configField"
+          },
+          {
+            "properties": {
+              "type": {
+                "not": {
+                  "const": "oauth2"
+                }
+              }
+            }
+          }
+        ]
+      }
     }
   },
+  "allOf": [
+    {
+      "$comment": "messaging only makes sense on communication integrations",
+      "if": {
+        "required": ["messaging"]
+      },
+      "then": {
+        "properties": {
+          "type": {
+            "const": "communication"
+          }
+        }
+      }
+    },
+    {
+      "$comment": "contact_schema only makes sense on send-only channels",
+      "if": {
+        "required": ["contact_schema"]
+      },
+      "then": {
+        "required": ["messaging"],
+        "properties": {
+          "messaging": {
+            "required": ["receive"],
+            "properties": {
+              "receive": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
   "definitions": {
     "multiLanguageText": {
       "type": "object",

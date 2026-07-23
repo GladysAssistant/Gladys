@@ -92,6 +92,12 @@ const MAX_STATES_PER_MINUTE = 300;
 // variable scoped (service_id, user_id) — no migration needed; the short
 // link codes live in the in-memory cache with a 15 minutes TTL.
 const CONTACT_VARIABLE = 'EXTERNAL_INTEGRATION_CONTACT';
+// Send-only communication channels (messaging.receive false — the Free
+// Mobile family): no inbound path, so the code-based link is impossible by
+// construction. The per-user identity comes from the manifest
+// contact_schema instead, filled by each user in the "My account" block
+// and stored as one JSON object per (service_id, user_id).
+const CONTACT_PROFILE_VARIABLE = 'EXTERNAL_INTEGRATION_CONTACT_PROFILE';
 const LINK_CODE_CACHE_PREFIX = 'external-integration-link-code';
 const LINK_CODE_TTL_MS = 15 * 60 * 1000;
 const LINK_CODE_LENGTH = 8;
@@ -213,6 +219,7 @@ module.exports = {
   MAX_STATES_PER_REQUEST,
   MAX_STATES_PER_MINUTE,
   CONTACT_VARIABLE,
+  CONTACT_PROFILE_VARIABLE,
   LINK_CODE_CACHE_PREFIX,
   LINK_CODE_TTL_MS,
   LINK_CODE_LENGTH,

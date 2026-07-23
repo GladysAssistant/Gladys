@@ -1,6 +1,7 @@
 const db = require('../../models');
 const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
+const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
 const { CAMERA_GET_IMAGE_TIMEOUT_MS } = require('./constants');
 
 // scheduled polls only make sense against a live integration: outside
@@ -23,28 +24,48 @@ const POLLABLE_STATUSES = [SERVICE_STATUS.RUNNING, SERVICE_STATUS.DEGRADED];
  */
 function registerProxyService(service) {
   // communication integrations expose the generic outbound channel
-  // interface: message.send (reply path, by contact id) and
+  // interface: message.send (reply path, by contact id — receiving chat
+  // channels only, a notification channel never talks to the brain) and
   // message.sendToUser (forwardToChannels loop — the proxy resolves the
-  // linked contact itself and no-ops when the user is not linked)
+  // identity itself and no-ops when the user is not linked/configured).
+  // The message.send WS payload carries the RESOLVED identity in `contact`:
+  // { id } for a code-linked chat channel, the target user's contact_schema
+  // values for a send-only one (the Free Mobile family).
   const isCommunication = service.manifest && service.manifest.type === 'communication';
+  const receiving = isReceivingChannel(service.manifest);
+  const relayMessage = async (contact, message) => {
+    await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MESSAGE_SEND, {
+      contact,
+      message: { text: message.text, file: message.file || null },
+    });
+  };
+  const replyCapability = receiving
+    ? {
+        send: async (contactId, message) => {
+          await relayMessage({ id: contactId }, message);
+        },
+      }
+    : {};
   const messageCapability = isCommunication
     ? {
         message: Object.freeze({
-          send: async (contactId, message) => {
-            await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MESSAGE_SEND, {
-              contact_id: contactId,
-              message: { text: message.text, file: message.file || null },
-            });
-          },
+          ...replyCapability,
           sendToUser: async (user, message) => {
-            const contact = await this.getContactForUser(service, user.id);
-            if (!contact) {
+            if (receiving) {
+              const contact = await this.getContactForUser(service, user.id);
+              if (!contact) {
+                return;
+              }
+              await relayMessage({ id: contact.contact_id }, message);
               return;
             }
-            await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MESSAGE_SEND, {
-              contact_id: contact.contact_id,
-              message: { text: message.text, file: message.file || null },
-            });
+            // send-only channel: the identity is the user's "My account"
+            // values; an unconfigured user is a silent no-op
+            const profile = await this.getContactProfile(service, user.id);
+            if (!profile || Object.keys(profile).length === 0) {
+              return;
+            }
+            await relayMessage(profile, message);
           },
         }),
       }

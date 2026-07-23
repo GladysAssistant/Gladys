@@ -45,7 +45,13 @@ const MANIFEST_FIELDS = [
   'actions',
   'transports',
   'webhooks',
+  'messaging',
+  'contact_schema',
 ];
+// communication type only: chat channels (receive true, the default —
+// inbound + outbound, code-based link) vs notification channels (receive
+// false — send only, per-user identity through contact_schema)
+const MESSAGING_FIELDS = ['receive'];
 const SUB_CONTAINER_FIELDS = [
   'name',
   'docker_image',
@@ -747,6 +753,46 @@ function validateManifest(manifest) {
     } else {
       const seenActionKeys = new Set();
       manifest.actions.forEach((action, index) => validateAction(action, index, seenActionKeys, errors));
+    }
+  }
+  if (manifest.messaging !== undefined) {
+    if (manifest.type !== 'communication') {
+      errors.push('messaging: only allowed on communication integrations');
+    } else if (
+      manifest.messaging === null ||
+      typeof manifest.messaging !== 'object' ||
+      Array.isArray(manifest.messaging)
+    ) {
+      errors.push('messaging: must be an object');
+    } else {
+      Object.keys(manifest.messaging).forEach((key) => {
+        if (!MESSAGING_FIELDS.includes(key)) {
+          errors.push(`messaging.${key}: unknown field`);
+        }
+      });
+      if (typeof manifest.messaging.receive !== 'boolean') {
+        errors.push('messaging.receive: must be a boolean');
+      }
+    }
+  }
+  if (manifest.contact_schema !== undefined) {
+    // the per-user identity form only makes sense on a send-only channel:
+    // a chat channel identity comes from the code-based link instead
+    const sendOnlyChannel =
+      manifest.type === 'communication' && manifest.messaging && manifest.messaging.receive === false;
+    if (!sendOnlyChannel) {
+      errors.push('contact_schema: only allowed on send-only communication integrations (messaging.receive false)');
+    } else if (!Array.isArray(manifest.contact_schema)) {
+      errors.push('contact_schema: must be an array');
+    } else {
+      const seenContactKeys = new Set();
+      manifest.contact_schema.forEach((field, index) => {
+        validateConfigField(field, index, seenContactKeys, errors, 'contact_schema');
+        if (field && field.type === 'oauth2') {
+          // the OAuth relay is integration-scoped, never per user
+          errors.push(`contact_schema[${index}].type: oauth2 is not allowed in the per-user contact schema`);
+        }
+      });
     }
   }
   if (manifest.webhooks !== undefined) {

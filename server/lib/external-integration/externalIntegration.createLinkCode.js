@@ -1,5 +1,7 @@
 const crypto = require('crypto');
 
+const { ForbiddenError } = require('../../utils/coreErrors');
+const { isSendOnlyChannel } = require('./externalIntegration.getContactProfile');
 const { LINK_CODE_CACHE_PREFIX, LINK_CODE_TTL_MS, LINK_CODE_LENGTH } = require('./constants');
 
 // unambiguous alphabet (no 0/O, 1/I/L): the user types this code in a chat
@@ -20,6 +22,12 @@ const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
  */
 async function createLinkCode(selector, userId) {
   const service = await this.getBySelector(selector);
+  // code-based linking is the consent of a RECEIVING channel (proof of
+  // control of the external account); a send-only notification channel has
+  // no inbound path so no link — its identity is the contact_schema
+  if (isSendOnlyChannel(service.manifest)) {
+    throw new ForbiddenError('LINK_CODE_NOT_AVAILABLE');
+  }
   let code = '';
   for (let i = 0; i < LINK_CODE_LENGTH; i += 1) {
     code += CODE_ALPHABET[crypto.randomInt(CODE_ALPHABET.length)];

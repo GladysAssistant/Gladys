@@ -75,6 +75,25 @@ const TEST_COMMUNICATION_MANIFEST = {
   gladys_version: '>=4.62.0',
 };
 
+// Notification-channel fixture (the Free Mobile family): send only, no
+// inbound path — the per-user identity comes from the contact_schema
+// ("My account" block), never from a code-based link.
+const TEST_NOTIFICATION_MANIFEST = {
+  ...TEST_COMMUNICATION_MANIFEST,
+  name: 'Free Mobile SMS Demo',
+  description: {
+    en: 'Free Mobile SMS notification channel demo.',
+    fr: 'Intégration démo : notifications SMS Free Mobile.',
+  },
+  messaging: { receive: false },
+  contact_schema: [
+    // presentational intro block: skipped by the front view of the profile
+    { key: 'intro', type: 'section', label: { en: 'Free Mobile account' } },
+    { key: 'username', type: 'string', label: { en: 'Free Mobile username', fr: 'Identifiant Free Mobile' } },
+    { key: 'access_token', type: 'secret', label: { en: 'SMS API access token' } },
+  ],
+};
+
 // Netatmo-like fixture: inbound webhooks relayed by the Gladys Plus
 // gateway — one fire-and-forget event stream (default mode) and one sync
 // challenge/response registration callback.
@@ -216,6 +235,7 @@ module.exports = {
   TEST_JWT_SECRET,
   TEST_MANIFEST,
   TEST_COMMUNICATION_MANIFEST,
+  TEST_NOTIFICATION_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_DETECTED_CLASSES,

@@ -217,13 +217,14 @@ describe('externalIntegration.registerProxyService (communication)', () => {
     const proxyService = stateManager.get('service', service.name);
     expect(proxyService.message).to.have.property('send');
     expect(proxyService.message).to.have.property('sendToUser');
-    // reply path: by contact id
+    // reply path: by contact id — the payload carries the RESOLVED
+    // identity under `contact` ({ id } for a code-linked chat channel)
     await proxyService.message.send('signal-12345', { text: 'hello', file: 'file-content' });
     assert.calledWith(
       externalIntegration.sendCommand,
       service,
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MESSAGE_SEND,
-      { contact_id: 'signal-12345', message: { text: 'hello', file: 'file-content' } },
+      { contact: { id: 'signal-12345' }, message: { text: 'hello', file: 'file-content' } },
     );
     // sendToUser path: no-op when the user is not linked
     await proxyService.message.sendToUser({ id: JOHN_USER_ID }, { text: 'hello' });
@@ -233,7 +234,7 @@ describe('externalIntegration.registerProxyService (communication)', () => {
     await proxyService.message.sendToUser({ id: JOHN_USER_ID }, { text: 'hello' });
     expect(externalIntegration.sendCommand.callCount).to.equal(2);
     expect(externalIntegration.sendCommand.secondCall.args[2]).to.deep.equal({
-      contact_id: 'signal-12345',
+      contact: { id: 'signal-12345' },
       message: { text: 'hello', file: null },
     });
   });

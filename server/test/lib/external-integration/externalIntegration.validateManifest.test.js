@@ -815,6 +815,63 @@ describe('externalIntegration.validateManifest', () => {
     });
   });
 
+  it('should accept the messaging declaration and its contact_schema on send-only channels', () => {
+    const chatManifest = { ...TEST_MANIFEST, type: 'communication', messaging: { receive: true } };
+    expect(externalIntegration.validateManifest(chatManifest)).to.deep.equal(chatManifest);
+    const notificationManifest = {
+      ...TEST_MANIFEST,
+      type: 'communication',
+      config_schema: undefined,
+      messaging: { receive: false },
+      contact_schema: [
+        { key: 'username', type: 'string', label: { en: 'Username' }, required: true },
+        { key: 'access_token', type: 'secret', label: { en: 'Access token' } },
+      ],
+    };
+    expect(externalIntegration.validateManifest(notificationManifest)).to.deep.equal(notificationManifest);
+  });
+
+  it('should reject a malformed messaging declaration', () => {
+    expect422({ ...TEST_MANIFEST, messaging: { receive: true } }, 'messaging: only allowed on communication');
+    expect422({ ...TEST_MANIFEST, type: 'communication', messaging: 'yes' }, 'messaging: must be an object');
+    expect422(
+      { ...TEST_MANIFEST, type: 'communication', messaging: { receive: 'no' } },
+      'messaging.receive: must be a boolean',
+    );
+    expect422(
+      { ...TEST_MANIFEST, type: 'communication', messaging: { receive: true, channels: 3 } },
+      'messaging.channels: unknown field',
+    );
+  });
+
+  it('should reject contact_schema outside send-only channels and invalid entries', () => {
+    const contactSchema = [{ key: 'username', type: 'string', label: { en: 'Username' } }];
+    // a chat channel identity comes from the code-based link
+    expect422({ ...TEST_MANIFEST, contact_schema: contactSchema }, 'contact_schema: only allowed on send-only');
+    expect422(
+      { ...TEST_MANIFEST, type: 'communication', messaging: { receive: true }, contact_schema: contactSchema },
+      'contact_schema: only allowed on send-only',
+    );
+    const base = { ...TEST_MANIFEST, type: 'communication', messaging: { receive: false } };
+    expect422({ ...base, contact_schema: 'username' }, 'contact_schema: must be an array');
+    expect422({ ...base, contact_schema: [{ key: 'x', type: 'unknown', label: { en: 'X' } }] }, 'contact_schema[0]');
+    expect422(
+      {
+        ...base,
+        contact_schema: [
+          { key: 'dup', type: 'string', label: { en: 'X' } },
+          { key: 'dup', type: 'string', label: { en: 'X' } },
+        ],
+      },
+      'contact_schema[1].key: duplicate key "dup"',
+    );
+    // the OAuth relay is integration-scoped, never per user
+    expect422(
+      { ...base, contact_schema: [{ key: 'account', type: 'oauth2', label: { en: 'Account' } }] },
+      'contact_schema[0].type: oauth2 is not allowed in the per-user contact schema',
+    );
+  });
+
   it('should accept a valid webhooks declaration', () => {
     const manifest = {
       ...TEST_MANIFEST,

@@ -521,6 +521,71 @@ describe('External integration admin API', () => {
     });
   });
 
+  describe('notification channel: contact_profile (per-user "My account")', () => {
+    const seedNotificationService = () =>
+      seedExternalService({
+        name: 'ext-dev-free-mobile',
+        selector: 'ext-dev-free-mobile',
+        manifest: {
+          ...TEST_MANIFEST,
+          type: 'communication',
+          config_schema: undefined,
+          messaging: { receive: false },
+          contact_schema: [
+            { key: 'username', type: 'string', label: { en: 'Username' } },
+            { key: 'access_token', type: 'secret', label: { en: 'Access token' } },
+          ],
+        },
+        has_message_feature: true,
+      });
+
+    it('should save, read (secrets masked) and delete the own values of the current user', async () => {
+      const service = await seedNotificationService();
+      const emptyRes = await authenticatedRequest
+        .get(`/api/v1/external_integration/${service.selector}/contact_profile`)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(emptyRes.body).to.deep.equal({
+        values: { username: null, access_token: null },
+        configured_secrets: [],
+        configured: false,
+      });
+      const savedRes = await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/contact_profile`)
+        .send({ values: { username: '0612345678', access_token: 'secret-token' } })
+        .expect(200);
+      expect(savedRes.body).to.deep.equal({
+        values: { username: '0612345678', access_token: null },
+        configured_secrets: ['access_token'],
+        configured: true,
+      });
+      // revocation gesture
+      await authenticatedRequest
+        .delete(`/api/v1/external_integration/${service.selector}/contact_profile`)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.deep.equal({ success: true });
+        });
+      const revokedRes = await authenticatedRequest
+        .get(`/api/v1/external_integration/${service.selector}/contact_profile`)
+        .expect(200);
+      expect(revokedRes.body.configured).to.equal(false);
+    });
+
+    it('should refuse invalid values and code-based linking on a send-only channel', async () => {
+      const service = await seedNotificationService();
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/contact_profile`)
+        .send({ values: { unknown_key: 'x' } })
+        .expect(422);
+      // the link-by-code gesture is impossible by construction
+      await authenticatedRequest
+        .post(`/api/v1/external_integration/${service.selector}/link_code`)
+        .send({})
+        .expect(403);
+    });
+  });
+
   describe('DELETE /api/v1/external_integration/:selector', () => {
     it('should uninstall the integration', async () => {
       const service = await seedExternalService({ container_id: null });

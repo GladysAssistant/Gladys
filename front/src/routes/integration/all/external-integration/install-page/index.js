@@ -213,10 +213,17 @@ class ExternalIntegrationInstallPage extends Component {
                               <Text id="integration.externalIntegration.install.warningText" />
                             </div>
 
-                            {manifest.type === 'communication' && (
+                            {manifest.type === 'communication' && get(manifest, 'messaging.receive') !== false && (
                               <div class="alert alert-warning">
                                 <i class="fe fe-message-circle mr-1" />
                                 <Text id="integration.externalIntegration.install.communicationWarningText" />
+                              </div>
+                            )}
+
+                            {manifest.type === 'communication' && get(manifest, 'messaging.receive') === false && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-bell mr-1" />
+                                <Text id="integration.externalIntegration.install.notificationWarningText" />
                               </div>
                             )}
 

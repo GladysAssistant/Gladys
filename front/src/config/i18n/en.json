@@ -735,7 +735,8 @@
         "duplicateWarningTitle": "Another instance is already installed",
         "duplicateWarningText": "\"{name}\" looks like another instance of this integration. Two instances may fight over the same cloud account or the same devices — consider stopping the existing one during your tests. Installing anyway is supported (e.g. a dev build next to the production one).",
         "webhooksTitle": "Internet webhooks (Gladys Plus)",
-        "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key)."
+        "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key).",
+        "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
@@ -812,6 +813,14 @@
         "saveKeyError": "There was an error saving the Open API key.",
         "notAvailableText": "Webhooks are not active yet: save your Open API key to activate them.",
         "urlsText": "Webhook URLs (the integration registers them automatically when possible; some services require pasting them in the vendor console). These URLs contain your key: share them only with the third-party service."
+      },
+      "contactProfile": {
+        "title": "My account",
+        "description": "This channel sends messages using your personal credentials. Each user fills in their own values; leave empty to not receive anything. Deleting your values stops the messages.",
+        "saveButton": "Save",
+        "clearButton": "Delete my values",
+        "saveError": "There was an error saving your account values.",
+        "saveSuccess": "Your account values were saved."
       }
     },
     "telegram": {
