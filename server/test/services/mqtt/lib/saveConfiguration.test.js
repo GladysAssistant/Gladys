@@ -5,6 +5,7 @@ const { expect } = require('chai');
 const { assert, fake } = sinon;
 const { MockedMqttClient } = require('../mocks.test');
 const { CONFIGURATION, DEFAULT } = require('../../../../services/mqtt/lib/constants');
+const { SERVICE_STATUS } = require('../../../../utils/constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 
 const saveConfiguration = proxyquire('../../../../services/mqtt/lib/saveConfiguration', {
@@ -27,6 +28,9 @@ describe('mqttHandler.saveConfiguration', () => {
 
   it('should saveConfiguration: save all', async () => {
     const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(null),
+      },
       variable: {
         setValue: fake.resolves('value'),
         getValue: fake.resolves(true),
@@ -57,6 +61,9 @@ describe('mqttHandler.saveConfiguration', () => {
 
   it('should saveConfiguration: destroy all', async () => {
     const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(null),
+      },
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
@@ -80,6 +87,9 @@ describe('mqttHandler.saveConfiguration', () => {
 
   it('should saveConfiguration: init docker but no container', async () => {
     const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(null),
+      },
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
@@ -120,6 +130,9 @@ describe('mqttHandler.saveConfiguration', () => {
 
   it('should saveConfiguration: init docker container no present (no user)', async () => {
     const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(null),
+      },
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
@@ -167,6 +180,9 @@ describe('mqttHandler.saveConfiguration', () => {
 
   it('should saveConfiguration: init docker container not running (no user)', async () => {
     const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(null),
+      },
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
@@ -214,6 +230,9 @@ describe('mqttHandler.saveConfiguration', () => {
 
   it('should saveConfiguration: init docker container is running (no user)', async () => {
     const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(null),
+      },
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
@@ -262,6 +281,9 @@ describe('mqttHandler.saveConfiguration', () => {
 
   it('should saveConfiguration: init docker container is running (with user no old)', async () => {
     const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(null),
+      },
       variable: {
         destroy: fake.resolves('value'),
         setValue: fake.resolves('value'),
@@ -308,5 +330,66 @@ describe('mqttHandler.saveConfiguration', () => {
     assert.calledOnce(gladys.system.getContainers);
     assert.calledOnce(gladys.system.exec);
     assert.calledOnce(gladys.system.restartContainer);
+  });
+
+  it('should saveConfiguration: reset service status when service was manually stopped', async () => {
+    const serviceInDb = {
+      status: SERVICE_STATUS.STOPPED,
+      set: fake.returns(null),
+      save: fake.resolves(null),
+    };
+    const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(serviceInDb),
+      },
+      variable: {
+        setValue: fake.resolves('value'),
+        getValue: fake.resolves(true),
+      },
+    };
+
+    const config = {
+      mqttUrl: 'mqttUrl',
+      mqttUsername: 'mqttUsername',
+      mqttPassword: 'mqttPassword',
+      useEmbeddedBroker: false,
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    await mqttHandler.saveConfiguration(config);
+
+    assert.calledWith(gladys.service.getLocalServiceByName, 'mqtt');
+    assert.calledWith(serviceInDb.set, { status: SERVICE_STATUS.RUNNING });
+    assert.calledOnce(serviceInDb.save);
+  });
+
+  it('should saveConfiguration: not touch service status when service is not stopped', async () => {
+    const serviceInDb = {
+      status: SERVICE_STATUS.RUNNING,
+      set: fake.returns(null),
+      save: fake.resolves(null),
+    };
+    const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(serviceInDb),
+      },
+      variable: {
+        setValue: fake.resolves('value'),
+        getValue: fake.resolves(true),
+      },
+    };
+
+    const config = {
+      mqttUrl: 'mqttUrl',
+      mqttUsername: 'mqttUsername',
+      mqttPassword: 'mqttPassword',
+      useEmbeddedBroker: false,
+    };
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    await mqttHandler.saveConfiguration(config);
+
+    assert.notCalled(serviceInDb.set);
+    assert.notCalled(serviceInDb.save);
   });
 });
