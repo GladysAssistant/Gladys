@@ -1,10 +1,20 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
+import get from 'get-value';
 
 import DiscoveredBox from './DiscoveredBox';
 import { RequestStatus } from '../../../../../utils/consts';
 
-const DiscoverTab = ({ discoveredDevices, getDiscoveredDevicesStatus, scanStatus, scanError, scan, createDevice }) => (
+const DiscoverTab = ({
+  selector,
+  integration,
+  discoveredDevices,
+  getDiscoveredDevicesStatus,
+  scanStatus,
+  scanError,
+  scan,
+  createDevice
+}) => (
   <div class="card">
     <div class="card-header">
       <h1 class="card-title">
@@ -53,6 +63,14 @@ const DiscoverTab = ({ discoveredDevices, getDiscoveredDevicesStatus, scanStatus
           {discoveredDevices && discoveredDevices.length === 0 && (
             <div class="text-center text-muted py-5">
               <Text id="integration.externalIntegration.discover.noDevices" />
+              {(get(integration, 'manifest.config_schema') || []).length > 0 && (
+                <div class="mt-2">
+                  <MarkupText
+                    id="integration.externalIntegration.discover.noDevicesConfigureFirst"
+                    fields={{ configUrl: `/dashboard/integration/device/external/${selector}/config` }}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

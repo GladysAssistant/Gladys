@@ -1,5 +1,6 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
+import get from 'get-value';
 
 import DeviceBox from './DeviceBox';
 import TransportBadge from '../components/TransportBadge';
@@ -20,6 +21,8 @@ const getTransportCounts = devices => {
 };
 
 const DeviceTab = ({
+  selector,
+  integration,
   devices,
   houses,
   language,
@@ -29,6 +32,9 @@ const DeviceTab = ({
   saveDevice,
   deleteDevice
 }) => {
+  // first-run guidance: an integration with settings probably needs them
+  // filled before anything shows up here
+  const hasConfigSchema = (get(integration, 'manifest.config_schema') || []).length > 0;
   const transportCounts = getTransportCounts(devices);
   const reportedTransports = ['local', 'cloud', 'unreachable'].filter(transport => transportCounts[transport]);
   const degradedCount = (devices || []).filter(isDeviceTransportDegraded).length;
@@ -98,6 +104,14 @@ const DeviceTab = ({
             {devices && devices.length === 0 && (
               <div class="text-center text-muted py-5">
                 <Text id="integration.externalIntegration.device.noDevices" />
+                {hasConfigSchema && (
+                  <div class="mt-2">
+                    <MarkupText
+                      id="integration.externalIntegration.device.noDevicesConfigureFirst"
+                      fields={{ configUrl: `/dashboard/integration/device/external/${selector}/config` }}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>

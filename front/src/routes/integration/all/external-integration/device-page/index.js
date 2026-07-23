@@ -138,6 +138,7 @@ class ExternalIntegrationDevicePage extends Component {
       <ExternalIntegrationPage selector={props.selector} integration={state.integration}>
         <DeviceTab
           {...state}
+          selector={props.selector}
           language={(props.user && props.user.language) || 'en'}
           getDevices={this.getDevices}
           updateDeviceField={this.updateDeviceField}

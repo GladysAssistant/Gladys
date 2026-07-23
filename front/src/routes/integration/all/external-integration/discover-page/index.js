@@ -99,7 +99,7 @@ class ExternalIntegrationDiscoverPage extends Component {
   render(props, state) {
     return (
       <ExternalIntegrationPage selector={props.selector} integration={state.integration}>
-        <DiscoverTab {...state} scan={this.scan} createDevice={this.createDevice} />
+        <DiscoverTab {...state} selector={props.selector} scan={this.scan} createDevice={this.createDevice} />
       </ExternalIntegrationPage>
     );
   }
