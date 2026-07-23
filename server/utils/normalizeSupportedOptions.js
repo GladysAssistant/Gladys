@@ -1,6 +1,8 @@
 const Joi = require('joi');
 const { BadParameters } = require('./coreErrors');
 
+// Devices loaded from the API carry the full DeviceFeatureSupportedOption rows,
+// so DB metadata fields must be stripped when the device is saved again
 const supportedOptionSchema = Joi.object({
   id: Joi.string()
     .uuid()
@@ -15,6 +17,9 @@ const supportedOptionSchema = Joi.object({
   sort_order: Joi.number()
     .integer()
     .optional(),
+  device_feature_id: Joi.any().strip(),
+  created_at: Joi.any().strip(),
+  updated_at: Joi.any().strip(),
 });
 
 const supportedOptionsSchema = Joi.array()
