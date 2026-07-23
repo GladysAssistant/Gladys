@@ -31,6 +31,12 @@ const IntegrationTags = ({ integration }) => (
         <Text id="integration.externalIntegration.updateAvailable" />
       </span>
     )}
+    {integration.deprecated && (
+      <span class="badge badge-danger integration-tag">
+        <i class="fe fe-alert-triangle mr-1" />
+        <Text id="integration.tags.deprecated" />
+      </span>
+    )}
     {integration.local && (
       <span class="badge badge-success integration-tag">
         <i class="fe fe-home mr-1" />

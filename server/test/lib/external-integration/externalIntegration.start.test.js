@@ -5,7 +5,8 @@ const { assert: sinonAssert, fake } = require('sinon');
 const db = require('../../../models');
 const { PlatformNotCompatible, NotFoundError } = require('../../../utils/coreErrors');
 const { SERVICE_STATUS } = require('../../../utils/constants');
-const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
+const { generateIntegrationToken } = require('../../../utils/integrationToken');
+const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST, TEST_JWT_SECRET } = require('./testUtils.test');
 
 describe('externalIntegration.start', () => {
   let clock;
@@ -25,6 +26,54 @@ describe('externalIntegration.start', () => {
     sinonAssert.calledWith(system.restartContainer, 'container-1');
     sinonAssert.notCalled(system.createContainer);
     expect(externalIntegration.startupTimers.has(service.id)).to.equal(true);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should recreate the container when it holds a stale integration token', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        // token signed with the JWT secret of a previous boot (before the
+        // secret was persisted): restarting the container would only loop
+        // on "authentication refused (close code 4000)"
+        inspectContainer: fake.resolves({
+          State: { Running: true },
+          Config: { Env: [`GLADYS_INTEGRATION_TOKEN=stale-token`] },
+        }),
+      },
+    });
+    await externalIntegration.start(service.selector);
+    sinonAssert.calledOnce(system.createContainer);
+    const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
+    expect(serviceInDb.token_version).to.equal(2);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should recreate the container when its env holds no integration token at all', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        inspectContainer: fake.resolves({ State: { Running: true }, Config: { Env: ['OTHER=1'] } }),
+      },
+    });
+    await externalIntegration.start(service.selector);
+    sinonAssert.calledOnce(system.createContainer);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should recreate the container when it belongs to another service or token version', async () => {
+    const service = await seedExternalService();
+    const otherServiceToken = generateIntegrationToken('e2c85162-9d92-4d24-a778-98b4d2ec7568', 1, TEST_JWT_SECRET);
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        inspectContainer: fake.resolves({
+          State: { Running: true },
+          Config: { Env: [`GLADYS_INTEGRATION_TOKEN=${otherServiceToken}`] },
+        }),
+      },
+    });
+    await externalIntegration.start(service.selector);
+    sinonAssert.calledOnce(system.createContainer);
     externalIntegration.clearTimers(service.id);
   });
 

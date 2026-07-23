@@ -2,8 +2,13 @@ const Promise = require('bluebird');
 
 const db = require('../../models');
 const logger = require('../../utils/logger');
+const { generateJwtSecret } = require('../../utils/jwtSecret');
 const { SERVICE_TYPES } = require('../../utils/constants');
-const { EXTERNAL_INTEGRATION_LABEL, CHECK_HEALTH_INTERVAL_MS } = require('./constants');
+const {
+  EXTERNAL_INTEGRATION_LABEL,
+  CHECK_HEALTH_INTERVAL_MS,
+  INTEGRATION_JWT_SECRET_VARIABLE,
+} = require('./constants');
 const { STORE_INDEX_TTL_MS } = require('./store/store.constants');
 
 /**
@@ -18,6 +23,19 @@ const { STORE_INDEX_TTL_MS } = require('./store/store.constants');
  * await gladys.externalIntegration.init();
  */
 async function init() {
+  // integration JWTs must survive Gladys restarts: without a JWT_SECRET
+  // env var the process-level secret is regenerated at every boot, and the
+  // tokens baked in the container envs became invalid ("authentication
+  // refused (close code 4000)" loops). The supervisor signs with its own
+  // secret, generated once and persisted in a variable — it also survives
+  // a backup restore, together with the containers it validates.
+  const persistedJwtSecret = await this.variable.getValue(INTEGRATION_JWT_SECRET_VARIABLE);
+  if (persistedJwtSecret) {
+    this.jwtSecret = persistedJwtSecret;
+  } else {
+    this.jwtSecret = generateJwtSecret();
+    await this.variable.setValue(INTEGRATION_JWT_SECRET_VARIABLE, this.jwtSecret);
+  }
   const services = await db.Service.findAll({
     where: {
       type: SERVICE_TYPES.EXTERNAL,

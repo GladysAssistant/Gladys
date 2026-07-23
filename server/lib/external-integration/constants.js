@@ -50,6 +50,12 @@ const HARDWARE_CLASSES = {
 const SUB_CONTAINER_PORTS_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINER_PORTS';
 const SUB_CONTAINER_DESIRED_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_DESIRED';
 const SUB_CONTAINER_ENV_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_ENV';
+// The secret signing the integration JWTs, generated once and persisted:
+// without a JWT_SECRET env var the process-level secret is regenerated at
+// every boot, which used to invalidate every token baked in the container
+// envs ("authentication refused (close code 4000)" loops after each
+// restart of Gladys).
+const INTEGRATION_JWT_SECRET_VARIABLE = 'EXTERNAL_INTEGRATION_JWT_SECRET';
 // Selector prefix, avoiding any collision with a future native service
 // (service.load looks up services by name).
 const SELECTOR_PREFIX = 'ext-';
@@ -198,6 +204,7 @@ module.exports = {
   INTEGRATIONS_NETWORK_NAME,
   INTEGRATIONS_NETWORK_SUBNET,
   INTEGRATIONS_NETWORK_GATEWAY,
+  INTEGRATION_JWT_SECRET_VARIABLE,
   SELECTOR_PREFIX,
   DEV_SELECTOR_PREFIX,
   SUPPORTED_MANIFEST_VERSION,

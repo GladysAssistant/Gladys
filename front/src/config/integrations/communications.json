@@ -2,7 +2,8 @@
   {
     "key": "telegram",
     "img": "/assets/integrations/cover/telegram.jpg",
-    "cloud": true
+    "cloud": true,
+    "deprecated": true
   },
   {
     "key": "nextcloudTalk",

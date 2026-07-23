@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
 
 const MELCloudPage = ({ children, user }) => (
   <div class="page">
@@ -62,7 +63,10 @@ const MELCloudPage = ({ children, user }) => (
               </div>
             </div>
 
-            <div class="col-lg-9">{children}</div>
+            <div class="col-lg-9">
+              <DeprecationWarning />
+              {children}
+            </div>
           </div>
         </div>
       </div>

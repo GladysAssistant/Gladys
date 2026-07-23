@@ -5,6 +5,7 @@ const StateManager = require('../../../lib/state');
 const Variable = require('../../../lib/variable');
 const { Cache } = require('../../../utils/cache');
 const db = require('../../../models');
+const { generateIntegrationToken } = require('../../../utils/integrationToken');
 const { SERVICE_STATUS, SERVICE_TYPES } = require('../../../utils/constants');
 
 const TEST_JWT_SECRET = 'secret';
@@ -157,7 +158,22 @@ function buildFakeSystem(overrides = {}) {
     removeContainer: fake.resolves(true),
     stopContainer: fake.resolves(true),
     restartContainer: fake.resolves(true),
-    inspectContainer: fake.resolves({ State: { Running: true } }),
+    // simulates a healthy container holding a CURRENT integration token
+    // (the happy path of verifyContainerToken); tests exercising a stale
+    // token override inspectContainer
+    inspectContainer: fake(async (containerId) => {
+      const serviceInDb = await db.Service.findOne({ where: { container_id: containerId } });
+      const env = serviceInDb
+        ? [
+            `GLADYS_INTEGRATION_TOKEN=${generateIntegrationToken(
+              serviceInDb.id,
+              serviceInDb.token_version,
+              TEST_JWT_SECRET,
+            )}`,
+          ]
+        : [];
+      return { State: { Running: true }, Config: { Env: env } };
+    }),
     getContainers: fake.resolves([]),
     getContainerLogs: fake.resolves(Buffer.from('log line')),
     createNetwork: fake.resolves(true),

@@ -26,6 +26,28 @@ describe('externalIntegration.init', () => {
     clearInterval(externalIntegration.storeRefreshInterval);
   });
 
+  it('should generate the integration JWT secret once and reuse it across restarts', async () => {
+    const { externalIntegration, variable } = buildSupervisor();
+    externalIntegration.refreshIndex = fake.rejects(new Error('offline'));
+    // remove the seeded secret: the very first boot generates one
+    await variable.destroy('EXTERNAL_INTEGRATION_JWT_SECRET');
+    await externalIntegration.init();
+    // the process-level secret is replaced by the persisted one: tokens
+    // baked in the container envs survive a Gladys restart
+    const storedSecret = await variable.getValue('EXTERNAL_INTEGRATION_JWT_SECRET');
+    expect(storedSecret).to.be.a('string');
+    expect(externalIntegration.jwtSecret).to.equal(storedSecret);
+    clearInterval(externalIntegration.checkHealthInterval);
+    clearInterval(externalIntegration.storeRefreshInterval);
+    // a second boot reuses the same secret instead of regenerating one
+    const { externalIntegration: rebootedSupervisor } = buildSupervisor();
+    rebootedSupervisor.refreshIndex = fake.rejects(new Error('offline'));
+    await rebootedSupervisor.init();
+    expect(rebootedSupervisor.jwtSecret).to.equal(storedSecret);
+    clearInterval(rebootedSupervisor.checkHealthInterval);
+    clearInterval(rebootedSupervisor.storeRefreshInterval);
+  });
+
   it('should clear an obsolete container_id when the container is gone', async () => {
     const service = await seedExternalService({ container_id: 'gone-container' });
     const { externalIntegration } = buildSupervisor();

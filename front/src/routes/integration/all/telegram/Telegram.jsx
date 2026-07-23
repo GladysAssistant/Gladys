@@ -3,6 +3,7 @@ import { RequestStatus } from '../../../../utils/consts';
 import { USER_ROLE } from '../../../../../../server/utils/constants';
 import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
 
 const TelegramPage = ({ children, ...props }) => (
   <div class="page">
@@ -32,6 +33,7 @@ const TelegramPage = ({ children, ...props }) => (
             </div>
 
             <div class="col-lg-9">
+              <DeprecationWarning />
               <div class="card">
                 <div class="card-header">
                   <h1 class="card-title">

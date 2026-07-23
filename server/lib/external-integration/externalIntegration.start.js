@@ -40,11 +40,20 @@ async function start(selector, { resetFailureCount = true } = {}) {
   }
   let started = false;
   if (service.container_id) {
-    try {
-      await this.system.restartContainer(service.container_id);
-      started = true;
-    } catch (e) {
-      logger.info(`Container of integration ${selector} not found or not startable, recreating it`, e);
+    // the container keeps the integration JWT it was created with: with a
+    // stale token (JWT secret regenerated before it was persisted, token
+    // rotation) a restart can only loop on "authentication refused
+    // (close code 4000)" — recreate the container with a fresh token instead
+    const containerTokenValid = await this.verifyContainerToken(service);
+    if (containerTokenValid) {
+      try {
+        await this.system.restartContainer(service.container_id);
+        started = true;
+      } catch (e) {
+        logger.info(`Container of integration ${selector} not found or not startable, recreating it`, e);
+      }
+    } else {
+      logger.info(`Container of integration ${selector} holds a stale integration token, recreating it`);
     }
   }
   if (!started) {
