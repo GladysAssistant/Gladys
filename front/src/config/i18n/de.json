@@ -2641,13 +2641,13 @@
         "computedExplanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
       "onlyContinueIf": {
-        "variableLabel": "Variable",
+        "variableLabel": "Gerät oder Variable",
         "operatorLabel": "Operator",
         "valueLabel": "Wert",
         "removeLabel": "Entfernen",
         "orText": "ODER",
         "orButton": "+ ODER",
-        "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+        "explanationText": "Wähle aus, was du vergleichen möchtest: den aktuellen Wert eines Geräts (kein vorheriger Block nötig) oder eine Szenenvariable aus einem vorherigen Block. Gib im Wertfeld entweder einen festen Wert oder eine Berechnung auf Basis einer Szenenvariable ein. Um eine Variable in den Text einzufügen, gib \"{{\" ein."
       },
       "conditionIfThenElse": {
         "conditions": "Bedingungen",
