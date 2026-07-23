@@ -16,7 +16,9 @@ function convertDevice(unit) {
     features: getGladysDeviceFeatures(externalId, unit),
     external_id: externalId,
     selector: externalId,
-    model: unit.model || null,
+    // The API does not expose an AC model name; the connected Wi-Fi interface
+    // type (e.g. "fourthGenWifi") is the only hardware descriptor available.
+    model: unit.connectedInterfaceType || null,
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
     should_poll: true,
     params: [

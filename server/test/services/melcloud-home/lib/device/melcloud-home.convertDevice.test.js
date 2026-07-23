@@ -8,6 +8,7 @@ describe('MELCloudHome convertDevice', () => {
       id: 'unit-id',
       givenDisplayName: 'Salon',
       buildingId: 'building-id',
+      connectedInterfaceType: 'fourthGenWifi',
       capabilities: { minTempHeat: 10, maxTempCoolDry: 31 },
       settings: [{ name: 'Power', value: 'True' }],
     });
@@ -16,6 +17,7 @@ describe('MELCloudHome convertDevice', () => {
       name: 'Salon',
       external_id: 'melcloud-home:unit-id',
       selector: 'melcloud-home:unit-id',
+      model: 'fourthGenWifi',
       should_poll: true,
     });
     expect(device.features).to.have.lengthOf(4);
