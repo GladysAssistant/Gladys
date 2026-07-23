@@ -1571,6 +1571,7 @@ const DASHBOARD_BOX_TYPE = {
   CLOCK: 'clock',
   SCENE: 'scene',
   MUSIC: 'music',
+  TELEVISION: 'television',
   GAUGE: 'gauge',
   ENERGY_CONSUMPTION: 'energy-consumption',
   VOICE_ASSISTANT: 'voice-assistant',
