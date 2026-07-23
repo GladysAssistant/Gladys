@@ -22,7 +22,7 @@ async function listenToCustomMqttTopicIfNeeded(device) {
     const mqttTopic = deviceCustomTopicParam.value;
     // If the topic is empty, we don't listen to it: an empty topic
     // would match all MQTT messages received
-    if (!mqttTopic || !mqttTopic.length) {
+    if (!mqttTopic) {
       logger.debug(
         `listenToCustomMqttTopicIfNeeded: Custom topic is empty for feature ${deviceFeatureId} of device ${device.selector}. Not listening.`,
       );
