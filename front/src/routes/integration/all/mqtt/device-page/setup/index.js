@@ -460,7 +460,8 @@ class MqttDeviceSetupPage extends Component {
           // If we are here, it's ok, it means the device does not exist yet
         }
       }
-      // Remove params if there are params that exist with a feature that doesn't exist
+      // Remove params if there are params that exist with a feature that doesn't exist,
+      // or params with an empty value (an empty custom topic would match all MQTT messages)
       const paramsToDelete = [];
 
       this.state.device.params.forEach((param, paramIndex) => {
@@ -471,8 +472,8 @@ class MqttDeviceSetupPage extends Component {
           // We verify that the feature exist
           const featureId = param.name.split(':')[1];
           const feature = this.state.device.features.find(f => f.id === featureId);
-          if (!feature) {
-            // If the feature doesn't exist, we delete the param
+          if (!feature || !param.value) {
+            // If the feature doesn't exist or the param was emptied, we delete the param
             paramsToDelete.push(paramIndex);
           }
         }
