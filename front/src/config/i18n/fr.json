@@ -3874,7 +3874,9 @@
         "mode": {
           "auto": "Auto",
           "cooling": "Clim.",
-          "heating": "Chauffage"
+          "heating": "Chauffage",
+          "drying": "Déshu.",
+          "fan": "Ventil."
         }
       },
       "heater": {
