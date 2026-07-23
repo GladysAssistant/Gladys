@@ -1324,15 +1324,12 @@ async function getAllTools(userId) {
           };
         }
 
-        const results = await this.gladys.device.energySensorManager.getConsumptionByDates(
-          [selectedFeature.selector],
-          {
-            from,
-            to,
-            group_by: groupBy || 'day',
-            display_mode: displayMode,
-          },
-        );
+        const results = await this.gladys.device.energySensorManager.getConsumptionByDates([selectedFeature.selector], {
+          from,
+          to,
+          group_by: groupBy || 'day',
+          display_mode: displayMode,
+        });
 
         const deviceResult = results.find((result) => !result.deviceFeature?.is_subscription);
         const subscriptionResult = results.find((result) => result.deviceFeature?.is_subscription);
