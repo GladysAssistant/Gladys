@@ -95,6 +95,84 @@ describe('scene.triggers.deviceNewState', () => {
       });
     });
   });
+  it('should execute scene and expose trigger device & feature in triggerEvent scope', async () => {
+    const stateManager = new StateManager();
+    stateManager.setState('deviceFeature', 'door-sensor-1', {
+      name: 'Door state',
+      device_id: 'device-1',
+      last_value: 0,
+    });
+    stateManager.setState('deviceById', 'device-1', {
+      name: 'Garage door',
+      selector: 'garage-door',
+    });
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const house = {
+      get: fake.resolves([]),
+    };
+    const scheduler = {
+      scheduleJob: (date, callback) => {
+        return {
+          callback,
+          date,
+          cancel: () => {},
+        };
+      },
+    };
+    const sceneManagerWithMessage = new SceneManager(
+      stateManager,
+      event,
+      device,
+      message,
+      {},
+      house,
+      {},
+      {},
+      {},
+      scheduler,
+      brain,
+      service,
+    );
+    await sceneManagerWithMessage.addScene({
+      selector: 'my-scene-trigger-variables',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.MESSAGE.SEND,
+            user: 'pepper',
+            text: '{{triggerEvent.device.name}} ({{triggerEvent.deviceFeature.name}}) = {{triggerEvent.last_value}}',
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'door-sensor-1',
+          value: 1,
+          operator: '=',
+        },
+      ],
+    });
+    sceneManagerWithMessage.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'door-sensor-1',
+      previous_value: 0,
+      last_value: 1,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManagerWithMessage.queue.start(() => {
+        try {
+          assert.calledOnceWithExactly(message.sendToUser, 'pepper', 'Garage door (Door state) = 1');
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
   it('should not execute scene, scene not active', async () => {
     await sceneManager.addScene({
       selector: 'my-scene',
