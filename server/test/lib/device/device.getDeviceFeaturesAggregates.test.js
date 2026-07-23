@@ -261,6 +261,52 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 365 * 24 * 60, 100);
     expect(values).to.have.lengthOf(100);
   });
+  it('should return states for a previous period with offset', async () => {
+    await insertStates(72 * 60);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const { values: currentValues } = await device.getDeviceFeaturesAggregates(
+      'test-device-feature',
+      24 * 60,
+      100,
+      null,
+      0,
+    );
+    const { values: previousValues } = await device.getDeviceFeaturesAggregates(
+      'test-device-feature',
+      24 * 60,
+      100,
+      null,
+      24 * 60,
+    );
+    expect(currentValues).to.have.lengthOf(100);
+    expect(previousValues).to.have.lengthOf(100);
+    expect(new Date(previousValues[previousValues.length - 1].created_at).getTime()).to.be.below(
+      new Date(currentValues[0].created_at).getTime(),
+    );
+  });
+  it('should return error when offset is negative', async () => {
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const promise = device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100, null, -60);
+    return assert.isRejected(promise, 'Invalid offset parameter');
+  });
   it('should return error, device feature doesnt exist', async () => {
     const variable = {
       getValue: fake.resolves(null),

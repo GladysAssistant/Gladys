@@ -11,6 +11,7 @@ const NON_BINARY_QUERY = `
             t_device_feature_state
         WHERE device_feature_id = ?
         AND created_at > ?
+        AND created_at <= ?
     )
     SELECT
         MIN(created_at) AS created_at,
@@ -40,6 +41,7 @@ const GROUPED_QUERY = `
   WHERE
     device_feature_id = ?
     AND created_at > ?
+    AND created_at <= ?
   GROUP BY
     grouped_date
   ORDER BY
@@ -57,6 +59,7 @@ WITH value_changes AS (
     WHERE
         device_feature_id = ?
         AND created_at > ?
+        AND created_at <= ?
 ),
 state_transitions AS (
     SELECT
@@ -85,11 +88,18 @@ LIMIT ?
  * @param {number} intervalInMinutes - Interval.
  * @param {number} [maxStates] - Number of elements to return max.
  * @param {string} [groupBy] - Group results by time period ('hour', 'day', 'week', 'month', 'year').
+ * @param {number} [offsetInMinutes] - Offset in minutes from now for the end of the interval.
  * @returns {Promise<object>} - Resolve with an array of data.
  * @example
  * device.getDeviceFeaturesAggregates('test-devivce');
  */
-async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxStates = 100, groupBy = null) {
+async function getDeviceFeaturesAggregates(
+  selector,
+  intervalInMinutes,
+  maxStates = 100,
+  groupBy = null,
+  offsetInMinutes = 0,
+) {
   const deviceFeature = this.stateManager.get('deviceFeature', selector);
   if (deviceFeature === null) {
     throw new NotFoundError('DeviceFeature not found');
@@ -98,9 +108,15 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
 
   const isBinary = ['binary', 'push'].includes(deviceFeature.type);
 
-  // Get the interval date, and offset in UTC
-  const intervalDate = new Date(Date.now() - intervalInMinutes * 60 * 1000);
-  intervalDate.setMinutes(intervalDate.getMinutes() - intervalDate.getTimezoneOffset());
+  if (offsetInMinutes < 0) {
+    throw new BadParameters('Invalid offset parameter. Must be a positive number.');
+  }
+
+  const endDate = new Date(Date.now() - offsetInMinutes * 60 * 1000);
+  endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset());
+
+  const startDate = new Date(Date.now() - (offsetInMinutes + intervalInMinutes) * 60 * 1000);
+  startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset());
 
   let values;
 
@@ -111,10 +127,10 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   }
 
   if (isBinary) {
-    values = await db.duckDbReadConnectionAllAsync(BINARY_QUERY, deviceFeature.id, intervalDate, maxStates);
+    values = await db.duckDbReadConnectionAllAsync(BINARY_QUERY, deviceFeature.id, startDate, endDate, maxStates);
   } else if (groupBy) {
     // Use the grouped query when groupBy is specified
-    values = await db.duckDbReadConnectionAllAsync(GROUPED_QUERY, groupBy, deviceFeature.id, intervalDate);
+    values = await db.duckDbReadConnectionAllAsync(GROUPED_QUERY, groupBy, deviceFeature.id, startDate, endDate);
 
     // Rename grouped_date to created_at for consistency with the existing API
     values = values.map((value) => ({
@@ -124,7 +140,7 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
     }));
   } else {
     // Use the original non-binary query when no groupBy is specified
-    values = await db.duckDbReadConnectionAllAsync(NON_BINARY_QUERY, maxStates, deviceFeature.id, intervalDate);
+    values = await db.duckDbReadConnectionAllAsync(NON_BINARY_QUERY, maxStates, deviceFeature.id, startDate, endDate);
     // Convert BigInt count_value to regular JavaScript Number
     values = values.map((value) => ({
       ...value,

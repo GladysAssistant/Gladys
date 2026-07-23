@@ -34,7 +34,8 @@
 .dropdownMenuChart {
   position: absolute;
   cursor: pointer;
-  top: 100%;
+  top: calc(100% + 0.35rem);
+  left: 50%;
   z-index: 1000;
   display: none;
   min-width: 11rem;
@@ -47,13 +48,17 @@
   background-color: #fff;
   background-clip: padding-box;
   border: 1px solid rgba(101, 109, 119, 0.16);
-  border-radius: 4px;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.12);
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  margin: 0 !important;
+  transform: translateX(-50%);
+}
+
+.dropdownMenuOpen {
+  display: block;
 }
 
 .dropdownItemChart {
@@ -80,14 +85,6 @@
   color: inherit;
   text-decoration: none;
   background-color: rgba(101, 109, 119, 0.06);
-}
-
-.show {
-  display: block;
-  position: absolute;
-  inset: 0px auto auto 0px;
-  margin: 0px;
-  transform: translate3d(-90px, 17px, 0px);
 }
 
 .dropdownItemChart.active,
@@ -133,4 +130,138 @@
   padding-left: 1.5rem;
   padding-right: 1.5rem;
   text-align: justify;
+}
+
+.chartHeader {
+  margin-bottom: 0.75rem;
+}
+
+.chartToolbar {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  margin-top: 0.65rem;
+  background: rgba(101, 109, 119, 0.05);
+  border: 1px solid rgba(101, 109, 119, 0.12);
+  border-radius: 10px;
+  overflow: visible;
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: #656d77;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navButton:hover:not(:disabled) {
+  background: rgba(32, 107, 196, 0.08);
+  color: #206bc4;
+}
+
+.navButton:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.toolbarBody {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.45rem 0.75rem;
+  min-width: 0;
+  border-left: 1px solid rgba(101, 109, 119, 0.1);
+  border-right: 1px solid rgba(101, 109, 119, 0.1);
+}
+
+.intervalButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: transparent;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #232e3c;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1.2;
+}
+
+.intervalButton:hover {
+  color: #206bc4;
+}
+
+.intervalChevron {
+  font-size: 0.75rem;
+  color: #656d77;
+  transition: transform 0.15s ease;
+}
+
+.intervalChevronOpen {
+  transform: rotate(180deg);
+}
+
+.periodLive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #656d77;
+  line-height: 1.2;
+}
+
+.liveDot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: #2fb344;
+  box-shadow: 0 0 0 2px rgba(47, 179, 68, 0.2);
+  flex-shrink: 0;
+}
+
+.periodRangeButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.periodRangeButton:hover .backToNow {
+  color: #206bc4;
+}
+
+.periodRange {
+  font-size: 0.6875rem;
+  color: #656d77;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.backToNow {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: #206bc4;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
 }
