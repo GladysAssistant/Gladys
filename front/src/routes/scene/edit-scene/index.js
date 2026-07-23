@@ -726,6 +726,24 @@ class EditScene extends Component {
       return newState;
     });
   };
+  addTriggersAfter = (index, triggersConfig) => {
+    if (!triggersConfig || triggersConfig.length === 0) {
+      return;
+    }
+    this.setState(prevState => {
+      const newState = update(prevState, {
+        scene: {
+          triggers: {
+            $splice: [[index + 1, 0, ...triggersConfig]]
+          }
+        },
+        triggersVariables: {
+          $splice: [[index + 1, 0, ...triggersConfig.map(() => [])]]
+        }
+      });
+      return newState;
+    });
+  };
   deleteTrigger = index => {
     this.setState(prevState => {
       const newState = update(prevState, {
@@ -1160,6 +1178,7 @@ class EditScene extends Component {
               deleteActionGroup={this.deleteActionGroup}
               deleteAction={this.deleteAction}
               addTrigger={this.addTrigger}
+              addTriggersAfter={this.addTriggersAfter}
               deleteTrigger={this.deleteTrigger}
               saving={saving}
               error={error}
