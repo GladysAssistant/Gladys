@@ -1,17 +1,23 @@
 const dgram = require('dgram');
+const os = require('os');
 const { expect } = require('chai');
-const { fake } = require('sinon');
+const { fake, stub } = require('sinon');
 const multicastDns = require('multicast-dns');
 
-const { BadParameters, ForbiddenError, ConflictError } = require('../../../utils/coreErrors');
+const { BadParameters, ForbiddenError, ConflictError, TooManyRequests } = require('../../../utils/coreErrors');
+const {
+  getBroadcastAddresses,
+} = require('../../../lib/external-integration/networkDiscovery/networkDiscovery.scanUdpActiveBroadcast');
 const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('./testUtils.test');
 
-// manifest of an integration declaring the three curated capture types
-// (the udp-broadcast one is the Tuya local scan case)
+// manifest of an integration declaring the four curated capture types
+// (udp-broadcast is the Tuya local scan case, udp-active-broadcast the
+// TP-Link Kasa query/response case)
 const TEST_DISCOVERY_MANIFEST = {
   ...TEST_MANIFEST,
   network_discovery: [
     { type: 'udp-broadcast', ports: [6666, 6667] },
+    { type: 'udp-active-broadcast', ports: [9999] },
     { type: 'mdns', service: '_hue._tcp' },
     { type: 'ssdp', st: 'urn:dial-multiscreen-org:service:dial:1' },
   ],
@@ -129,6 +135,183 @@ describe('externalIntegration.runNetworkDiscoveryScan', () => {
       st: 'urn:dial-multiscreen-org:service:dial:1',
       timeoutMs: 1000,
     });
+  });
+
+  it('should reject malformed active scan requests', async () => {
+    const service = await seedDiscoveryService();
+    const { externalIntegration } = buildSupervisor();
+    const invalidBodies = [
+      { type: 'udp-active-broadcast', payload_base64: 'a2FzYQ==' },
+      { type: 'udp-active-broadcast', port: '9999', payload_base64: 'a2FzYQ==' },
+      { type: 'udp-active-broadcast', port: 9999 },
+      { type: 'udp-active-broadcast', port: 9999, payload_base64: '' },
+      // decoded payload over the 512 bytes emission bound
+      { type: 'udp-active-broadcast', port: 9999, payload_base64: Buffer.alloc(513).toString('base64') },
+    ];
+    await Promise.all(
+      invalidBodies.map(async (body) => {
+        try {
+          await externalIntegration.runNetworkDiscoveryScan(service, body);
+          throw new Error('should have thrown');
+        } catch (e) {
+          expect(e).to.be.instanceOf(BadParameters);
+        }
+      }),
+    );
+  });
+
+  it('should refuse an active scan on an undeclared port', async () => {
+    const service = await seedDiscoveryService();
+    const { externalIntegration } = buildSupervisor();
+    try {
+      // never a port the user did not approve: no port sweep by proxy
+      await externalIntegration.runNetworkDiscoveryScan(service, {
+        type: 'udp-active-broadcast',
+        port: 1234,
+        payload_base64: 'a2FzYQ==',
+      });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(ForbiddenError);
+      expect(e.message).to.include('port 1234 is not declared');
+    }
+  });
+
+  it('should dispatch an active scan and rate limit it to one per 10 seconds', async () => {
+    const service = await seedDiscoveryService();
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.scanUdpActiveBroadcast = fake.resolves([{ source_ip: '192.168.1.30' }]);
+    const body = { type: 'udp-active-broadcast', port: 9999, payload_base64: 'a2FzYQ==', timeout_seconds: 2 };
+    const results = await externalIntegration.runNetworkDiscoveryScan(service, body);
+    expect(results).to.deep.equal([{ source_ip: '192.168.1.30' }]);
+    expect(externalIntegration.scanUdpActiveBroadcast.firstCall.args[0]).to.deep.equal({
+      port: 9999,
+      payload: Buffer.from('kasa'),
+      timeoutMs: 2000,
+    });
+    try {
+      await externalIntegration.runNetworkDiscoveryScan(service, body);
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(TooManyRequests);
+      expect(e.timeBeforeNext).to.be.a('number');
+    }
+    // once the interval has elapsed, a new scan is accepted
+    externalIntegration.networkDiscoveryActiveScanTimes.set(service.id, Date.now() - 11000);
+    await externalIntegration.runNetworkDiscoveryScan(service, body);
+  });
+});
+
+describe('externalIntegration.scanUdpActiveBroadcast', () => {
+  it('should broadcast the payload and collect the raw unicast replies', async () => {
+    const { externalIntegration } = buildSupervisor();
+    // fake Kasa device on localhost: answers unicast to the emitter
+    const responder = dgram.createSocket('udp4');
+    responder.on('message', (message, remoteInfo) => {
+      expect(message.toString('utf8')).to.equal('kasa-discovery-query');
+      responder.send(Buffer.from('kasa-reply'), remoteInfo.port, remoteInfo.address);
+    });
+    await new Promise((resolve) => {
+      responder.bind(0, '127.0.0.1', resolve);
+    });
+    const results = await externalIntegration.scanUdpActiveBroadcast({
+      port: responder.address().port,
+      payload: Buffer.from('kasa-discovery-query'),
+      timeoutMs: 700,
+      addresses: ['127.0.0.1'],
+    });
+    responder.close();
+    expect(results).to.have.lengthOf(1);
+    expect(results[0].source_ip).to.equal('127.0.0.1');
+    expect(results[0].source_port).to.be.a('number');
+    expect(Buffer.from(results[0].payload_base64, 'base64').toString('utf8')).to.equal('kasa-reply');
+  });
+
+  it('should return nothing when nobody answers', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const port = await getFreeUdpPort();
+    const results = await externalIntegration.scanUdpActiveBroadcast({
+      port,
+      payload: Buffer.from('kasa-discovery-query'),
+      timeoutMs: 200,
+      addresses: ['127.0.0.1'],
+    });
+    expect(results).to.deep.equal([]);
+  });
+
+  it('should return nothing when the broadcast cannot be sent', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const results = await externalIntegration.scanUdpActiveBroadcast({
+      port: 9999,
+      payload: Buffer.from('kasa-discovery-query'),
+      timeoutMs: 200,
+      addresses: ['not-a-resolvable-host.gladys.invalid'],
+    });
+    expect(results).to.deep.equal([]);
+  });
+
+  it('should survive a synchronous send error', async () => {
+    const { externalIntegration } = buildSupervisor();
+    // sending to port 0 throws synchronously: logged, never thrown
+    const results = await externalIntegration.scanUdpActiveBroadcast({
+      port: 0,
+      payload: Buffer.from('kasa-discovery-query'),
+      timeoutMs: 200,
+      addresses: ['127.0.0.1'],
+    });
+    expect(results).to.deep.equal([]);
+  });
+
+  it('should return nothing when the socket cannot be bound', async () => {
+    const { externalIntegration } = buildSupervisor();
+    // TEST-NET-3 address, never assigned locally: the bind errors and the
+    // scan simply collects nothing
+    const results = await externalIntegration.scanUdpActiveBroadcast({
+      port: 9999,
+      payload: Buffer.from('kasa-discovery-query'),
+      timeoutMs: 200,
+      addresses: ['127.0.0.1'],
+      bindAddress: '203.0.113.1',
+    });
+    expect(results).to.deep.equal([]);
+  });
+
+  it('should compute the broadcast addresses, skipping Docker interfaces', () => {
+    const networkInterfacesStub = stub(os, 'networkInterfaces').returns({
+      lo: [{ family: 'IPv4', internal: true, address: '127.0.0.1', netmask: '255.0.0.0' }],
+      eth0: [
+        { family: 'IPv4', internal: false, address: '192.168.1.42', netmask: '255.255.255.0' },
+        { family: 'IPv6', internal: false, address: 'fe80::1', netmask: 'ffff:ffff:ffff:ffff::' },
+      ],
+      wlan0: [{ family: 'IPv4', internal: false, address: '10.0.0.5', netmask: '255.255.0.0' }],
+      docker0: [{ family: 'IPv4', internal: false, address: '172.17.0.1', netmask: '255.255.0.0' }],
+      'br-1a2b3c': [{ family: 'IPv4', internal: false, address: '172.30.0.1', netmask: '255.255.255.0' }],
+    });
+    try {
+      const addresses = getBroadcastAddresses();
+      expect(addresses).to.deep.equal(['255.255.255.255', '192.168.1.255', '10.0.255.255']);
+    } finally {
+      networkInterfacesStub.restore();
+    }
+  });
+
+  it('should emit on the computed broadcast addresses by default', async () => {
+    const { externalIntegration } = buildSupervisor();
+    // only internal interfaces: the scan falls back to the limited
+    // broadcast alone; an unroutable send is logged, never thrown
+    const networkInterfacesStub = stub(os, 'networkInterfaces').returns({
+      lo: [{ family: 'IPv4', internal: true, address: '127.0.0.1', netmask: '255.0.0.0' }],
+    });
+    try {
+      const results = await externalIntegration.scanUdpActiveBroadcast({
+        port: 9999,
+        payload: Buffer.from('kasa-discovery-query'),
+        timeoutMs: 200,
+      });
+      expect(results).to.deep.equal([]);
+    } finally {
+      networkInterfacesStub.restore();
+    }
   });
 });
 

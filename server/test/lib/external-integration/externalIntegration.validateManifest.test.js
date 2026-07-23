@@ -315,12 +315,25 @@ describe('externalIntegration.validateManifest', () => {
       ...TEST_MANIFEST,
       network_discovery: [
         { type: 'udp-broadcast', ports: [6666, 6667, 7000] },
+        // the active query/response case (TP-Link Kasa)
+        { type: 'udp-active-broadcast', ports: [9999, 20002] },
         { type: 'mdns', service: '_hue._tcp' },
         { type: 'ssdp', st: 'urn:dial-multiscreen-org:service:dial:1' },
       ],
     };
     const validated = externalIntegration.validateManifest(manifest);
     expect(validated).to.deep.equal(manifest);
+  });
+
+  it('should bound the active broadcast capture like the passive one', () => {
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-active-broadcast' }] },
+      'network_discovery[0].ports: must be a list of 1-5 ports',
+    );
+    expect422(
+      { ...TEST_MANIFEST, network_discovery: [{ type: 'udp-active-broadcast', ports: [9999], st: 'x' }] },
+      'network_discovery[0].st: unknown field for type udp-active-broadcast',
+    );
   });
 
   it('should reject a malformed network_discovery list', () => {

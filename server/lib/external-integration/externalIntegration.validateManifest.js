@@ -65,6 +65,7 @@ const ACTION_FIELDS = ['key', 'label', 'description', 'timeout_seconds', 'fields
 // shown on the install screen, no arbitrary capture ever.
 const NETWORK_DISCOVERY_FIELDS = {
   'udp-broadcast': ['type', 'ports'],
+  'udp-active-broadcast': ['type', 'ports'],
   mdns: ['type', 'service'],
   ssdp: ['type', 'st'],
 };
@@ -401,7 +402,7 @@ function validateNetworkDiscoveryEntry(entry, index, errors) {
       errors.push(`${path}.${key}: unknown field for type ${entry.type}`);
     }
   });
-  if (entry.type === 'udp-broadcast') {
+  if (entry.type === 'udp-broadcast' || entry.type === 'udp-active-broadcast') {
     if (!Array.isArray(entry.ports) || entry.ports.length === 0 || entry.ports.length > MAX_UDP_BROADCAST_PORTS) {
       errors.push(`${path}.ports: must be a list of 1-${MAX_UDP_BROADCAST_PORTS} ports`);
     } else {

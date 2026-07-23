@@ -96,12 +96,16 @@ module.exports = function IntegrationHostController(gladys) {
    * @api {post} /api/integration/v1/network_discovery/scan networkDiscoveryScan
    * @apiName networkDiscoveryScan
    * @apiGroup IntegrationHostApi
-   * @apiDescription Mediated network discovery: the core captures from its
+   * @apiDescription Mediated network discovery: the core captures — and,
+   * for the udp-active-broadcast type, emits the integration-forged
+   * payload as a broadcast and collects the unicast replies — from its
    * network=host position (bridge containers never receive LAN
-   * broadcasts/mDNS/SSDP) and returns the RAW results — the integration
-   * interprets them itself. Bounded to the capture requests declared in
-   * the manifest (403 otherwise), 1-30s, one scan at a time per
-   * integration.
+   * broadcasts/mDNS/SSDP, and their own broadcasts never reach the LAN)
+   * and returns the RAW results — the integration interprets them itself.
+   * Bounded to the capture requests declared in the manifest (403
+   * otherwise), 1-30s, one scan at a time per integration; the active
+   * emission is broadcast-only, on a declared port, payload 512 bytes
+   * max, 1 scan per 10 seconds per integration (429 otherwise).
    */
   async function networkDiscoveryScan(req, res) {
     const results = await gladys.externalIntegration.runNetworkDiscoveryScan(req.externalIntegrationService, req.body);

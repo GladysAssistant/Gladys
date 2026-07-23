@@ -47,6 +47,7 @@ const { runAction } = require('./externalIntegration.runAction');
 const { getContainerStartedAt } = require('./externalIntegration.getContainerStartedAt');
 const { runNetworkDiscoveryScan } = require('./networkDiscovery/networkDiscovery.runScan');
 const { scanUdpBroadcast } = require('./networkDiscovery/networkDiscovery.scanUdpBroadcast');
+const { scanUdpActiveBroadcast } = require('./networkDiscovery/networkDiscovery.scanUdpActiveBroadcast');
 const { scanMdns } = require('./networkDiscovery/networkDiscovery.scanMdns');
 const { scanSsdp } = require('./networkDiscovery/networkDiscovery.scanSsdp');
 const { requestScan } = require('./externalIntegration.requestScan');
@@ -130,6 +131,8 @@ const ExternalIntegration = function ExternalIntegration(
   // serviceIds with a mediated network discovery scan in progress
   // (one scan at a time per integration)
   this.networkDiscoveryScans = new Set();
+  // serviceId -> timestamp of the last active broadcast scan (1/10s)
+  this.networkDiscoveryActiveScanTimes = new Map();
   // supervision timers
   this.startupTimers = new Map();
   this.restartTimers = new Map();
@@ -199,6 +202,7 @@ ExternalIntegration.prototype.runAction = runAction;
 ExternalIntegration.prototype.getContainerStartedAt = getContainerStartedAt;
 ExternalIntegration.prototype.runNetworkDiscoveryScan = runNetworkDiscoveryScan;
 ExternalIntegration.prototype.scanUdpBroadcast = scanUdpBroadcast;
+ExternalIntegration.prototype.scanUdpActiveBroadcast = scanUdpActiveBroadcast;
 ExternalIntegration.prototype.scanMdns = scanMdns;
 ExternalIntegration.prototype.scanSsdp = scanSsdp;
 ExternalIntegration.prototype.requestScan = requestScan;

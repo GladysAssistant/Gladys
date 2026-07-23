@@ -96,15 +96,24 @@ const LINK_CODE_CACHE_PREFIX = 'external-integration-link-code';
 const LINK_CODE_TTL_MS = 15 * 60 * 1000;
 const LINK_CODE_LENGTH = 8;
 const MAX_MESSAGE_TEXT_LENGTH = 4096;
-// Mediated network discovery (B.16): the core captures from its
-// network=host position, the integration interprets. Curated capture
-// types only — never arbitrary capture.
-const NETWORK_DISCOVERY_TYPES = ['udp-broadcast', 'mdns', 'ssdp'];
+// Mediated network discovery (B.16): the core captures and emits from
+// its network=host position, the integration interprets and forges (it
+// knows the protocol, the core never parses nor builds a payload).
+// Curated capture types only — never arbitrary capture.
+const NETWORK_DISCOVERY_TYPES = ['udp-broadcast', 'udp-active-broadcast', 'mdns', 'ssdp'];
 const MAX_NETWORK_DISCOVERY_ENTRIES = 5;
 const MAX_UDP_BROADCAST_PORTS = 5;
 const NETWORK_DISCOVERY_MIN_TIMEOUT_SECONDS = 1;
 const NETWORK_DISCOVERY_MAX_TIMEOUT_SECONDS = 30;
 const NETWORK_DISCOVERY_DEFAULT_TIMEOUT_SECONDS = 10;
+// Active scan (query/response protocols, the TP-Link Kasa case: the
+// integration forges the request, the core broadcasts it and relays the
+// unicast replies). Emission guardrails — the core sends a packet forged
+// by a third party, the primitive must stay uninteresting to hijack:
+// broadcast only (never a chosen unicast target), declared ports only,
+// small payload, one scan per 10 seconds per integration.
+const MAX_ACTIVE_BROADCAST_PAYLOAD_BYTES = 512;
+const ACTIVE_BROADCAST_MIN_INTERVAL_MS = 10 * 1000;
 // Camera images: pushed through POST /camera/image (core's 150 KB bound),
 // never through POST /state (dedicated saveStringState path, no state
 // history). Continuous video streaming is out of the v1 scope.
@@ -192,6 +201,8 @@ module.exports = {
   NETWORK_DISCOVERY_TYPES,
   MAX_NETWORK_DISCOVERY_ENTRIES,
   MAX_UDP_BROADCAST_PORTS,
+  MAX_ACTIVE_BROADCAST_PAYLOAD_BYTES,
+  ACTIVE_BROADCAST_MIN_INTERVAL_MS,
   NETWORK_DISCOVERY_MIN_TIMEOUT_SECONDS,
   NETWORK_DISCOVERY_MAX_TIMEOUT_SECONDS,
   NETWORK_DISCOVERY_DEFAULT_TIMEOUT_SECONDS,

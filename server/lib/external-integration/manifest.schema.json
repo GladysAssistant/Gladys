@@ -396,8 +396,8 @@
       "properties": {
         "type": {
           "type": "string",
-          "enum": ["udp-broadcast", "mdns", "ssdp"],
-          "description": "Capture type: passive listen on declared UDP broadcast ports, mDNS browse of a declared service type, or SSDP M-SEARCH on a declared st."
+          "enum": ["udp-broadcast", "udp-active-broadcast", "mdns", "ssdp"],
+          "description": "Capture type: passive listen on declared UDP broadcast ports, active query/response broadcast on declared UDP ports (the integration provides the payload at scan time, the core broadcasts it and relays the raw unicast replies — the TP-Link Kasa case), mDNS browse of a declared service type, or SSDP M-SEARCH on a declared st."
         },
         "ports": {
           "type": "array",
@@ -409,7 +409,7 @@
             "maximum": 65535
           },
           "uniqueItems": true,
-          "description": "UDP broadcast ports to listen on, `udp-broadcast` type only."
+          "description": "UDP broadcast ports, `udp-broadcast` (listen) and `udp-active-broadcast` (emit) types only."
         },
         "service": {
           "type": "string",
@@ -428,7 +428,7 @@
           "if": {
             "properties": {
               "type": {
-                "const": "udp-broadcast"
+                "enum": ["udp-broadcast", "udp-active-broadcast"]
               }
             }
           },

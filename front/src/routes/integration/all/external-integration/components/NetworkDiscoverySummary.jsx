@@ -26,6 +26,12 @@ const NetworkDiscoverySummary = ({ networkDiscovery }) => {
                 fields={{ ports: (capture.ports || []).join(', ') }}
               />
             )}
+            {capture.type === 'udp-active-broadcast' && (
+              <Text
+                id="integration.externalIntegration.networkDiscovery.udpActiveBroadcastText"
+                fields={{ ports: (capture.ports || []).join(', ') }}
+              />
+            )}
             {capture.type === 'mdns' && (
               <Text
                 id="integration.externalIntegration.networkDiscovery.mdnsText"

@@ -61,6 +61,7 @@ async function uninstall(selector) {
   this.connectionStatuses.delete(service.id);
   this.startedAt.delete(service.id);
   this.stateRateLimits.delete(service.id);
+  this.networkDiscoveryActiveScanTimes.delete(service.id);
   const externalIdPrefix = `ext:${service.selector}:`;
   [...this.cameraImageRateLimits.keys()]
     .filter((externalId) => externalId.startsWith(externalIdPrefix))

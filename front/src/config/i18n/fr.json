@@ -736,6 +736,7 @@
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
+        "udpActiveBroadcastText": "Émettre une requête de découverte en broadcast UDP sur les ports {ports} et recueillir les réponses",
         "mdnsText": "Rechercher les services mDNS de type {service}",
         "ssdpText": "Recherche SSDP de {st}"
       },
