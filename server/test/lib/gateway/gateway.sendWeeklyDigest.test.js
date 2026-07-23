@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { fake, assert } = require('sinon');
 
 const { Error429 } = require('../../../utils/httpErrors');
-const { USER_ROLE } = require('../../../utils/constants');
+const { USER_ROLE, AI_CHAT_PURPOSES } = require('../../../utils/constants');
 const {
   sendWeeklyDigest,
   isSystemVariableEnabled,
@@ -65,6 +65,7 @@ describe('gateway.sendWeeklyDigest', () => {
     expect(result).to.deep.equal({ sent: 1 });
     assert.calledOnceWithExactly(gateway.user.getByRole, USER_ROLE.ADMIN);
     assert.calledOnce(gateway.aiChat);
+    expect(gateway.aiChat.getCall(0).args[0].purpose).to.equal(AI_CHAT_PURPOSES.WEEKLY_DIGEST);
     assert.calledOnceWithExactly(gateway.message.sendToUser, 'tony', 'Bonjour, voici votre bilan.', null, {
       messageType: 'notification',
     });
