@@ -143,6 +143,69 @@ describe('externalIntegration store', () => {
     });
   });
 
+  describe('getDocsMarkdown', () => {
+    const buildSupervisorWithIndex = () => {
+      const built = buildSupervisor();
+      built.externalIntegration.storeIndex = TEST_INDEX;
+      built.externalIntegration.storeIndexFetchedAt = Date.now();
+      return built;
+    };
+
+    it('should download the doc in the requested language', async () => {
+      nock(INDEX_URL_ORIGIN)
+        .get('/docs/john--gladys-open-meteo-demo/fr.md')
+        .reply(200, '# Bonjour');
+      const { externalIntegration } = buildSupervisorWithIndex();
+      const docs = await externalIntegration.getDocsMarkdown('john/gladys-open-meteo-demo', 'fr');
+      expect(docs).to.deep.equal({
+        store_slug: 'john/gladys-open-meteo-demo',
+        url: `${INDEX_URL_ORIGIN}/docs/john--gladys-open-meteo-demo/fr.md`,
+        content: '# Bonjour',
+      });
+    });
+
+    it('should fall back on the English doc for a language without doc', async () => {
+      nock(INDEX_URL_ORIGIN)
+        .get('/docs/john--gladys-open-meteo-demo/en.md')
+        .reply(200, '# Hello');
+      const { externalIntegration } = buildSupervisorWithIndex();
+      const docs = await externalIntegration.getDocsMarkdown('john/gladys-open-meteo-demo', 'de');
+      expect(docs.url).to.equal(`${INDEX_URL_ORIGIN}/docs/john--gladys-open-meteo-demo/en.md`);
+      expect(docs.content).to.equal('# Hello');
+    });
+
+    it('should keep a JSON-looking doc as raw text', async () => {
+      nock(INDEX_URL_ORIGIN)
+        .get('/docs/john--gladys-open-meteo-demo/en.md')
+        .reply(200, '{"not":"markdown"}');
+      const { externalIntegration } = buildSupervisorWithIndex();
+      const docs = await externalIntegration.getDocsMarkdown('john/gladys-open-meteo-demo');
+      expect(docs.content).to.equal('{"not":"markdown"}');
+    });
+
+    it('should throw a NotFoundError for an integration without docs', async () => {
+      const { externalIntegration } = buildSupervisorWithIndex();
+      try {
+        await externalIntegration.getDocsMarkdown('jane/gladys-incompatible', 'fr');
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(NotFoundError);
+        expect(e.message).to.equal('DOCS_NOT_FOUND');
+      }
+    });
+
+    it('should throw a NotFoundError for an unknown integration', async () => {
+      const { externalIntegration } = buildSupervisorWithIndex();
+      try {
+        await externalIntegration.getDocsMarkdown('nobody/gladys-unknown', 'fr');
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(NotFoundError);
+        expect(e.message).to.equal('DOCS_NOT_FOUND');
+      }
+    });
+  });
+
   describe('getCatalog', () => {
     it('should flag installed, update_available and compatible', async () => {
       await seedExternalService({

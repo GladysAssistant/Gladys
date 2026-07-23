@@ -614,6 +614,11 @@
         "STOPPED": "Stopped",
         "ERROR": "Error"
       },
+      "docs": {
+        "modalTitle": "Documentation",
+        "loadError": "There was an error loading the documentation.",
+        "openRawLink": "Open in a new tab"
+      },
       "config": {
         "title": "Configuration",
         "docsLink": "Documentation",

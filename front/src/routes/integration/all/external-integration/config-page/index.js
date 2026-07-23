@@ -495,6 +495,7 @@ class ExternalIntegrationConfigPage extends Component {
         <ConfigTab
           {...state}
           user={props.user}
+          httpClient={props.httpClient}
           updateConfigValue={this.updateConfigValue}
           saveConfig={this.saveConfig}
           connectOAuth={this.connectOAuth}

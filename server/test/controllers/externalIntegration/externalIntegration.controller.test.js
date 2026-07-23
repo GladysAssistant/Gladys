@@ -327,6 +327,34 @@ describe('External integration admin API', () => {
     });
   });
 
+  describe('GET /api/v1/external_integration/store/docs', () => {
+    it('should return the documentation markdown', async () => {
+      stubInstance(
+        gladys.externalIntegration,
+        'getDocsMarkdown',
+        fake.resolves({
+          store_slug: 'john/gladys-open-meteo-demo',
+          url: 'https://integration-store-storage.gladysassistant.com/docs/john--gladys-open-meteo-demo/fr.md',
+          content: '# Bonjour',
+        }),
+      );
+      const res = await authenticatedRequest
+        .get('/api/v1/external_integration/store/docs')
+        .query({ store_slug: 'john/gladys-open-meteo-demo', lang: 'fr' })
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(res.body.content).to.equal('# Bonjour');
+      expect(gladys.externalIntegration.getDocsMarkdown.lastCall.args).to.deep.equal([
+        'john/gladys-open-meteo-demo',
+        'fr',
+      ]);
+    });
+
+    it('should return 400 without store_slug', async () => {
+      await authenticatedRequest.get('/api/v1/external_integration/store/docs').expect(400);
+    });
+  });
+
   describe('POST /api/v1/external_integration', () => {
     it('should install in dev mode by docker image', async () => {
       gladys.externalIntegration.available = true;

@@ -3,6 +3,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import ConfigSchemaForm from './ConfigSchemaForm';
+import DocsLink from '../components/DocsLink';
 import ActionsCard from './ActionsCard';
 import LinkAccountCard from './LinkAccountCard';
 import ContactProfileCard from './ContactProfileCard';
@@ -40,10 +41,14 @@ const ConfigTab = props => {
           </h1>
           {docsUrl && (
             <div class="card-options">
-              <a href={docsUrl} target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">
-                <i class="fe fe-book-open mr-1" />
-                <Text id="integration.externalIntegration.config.docsLink" />
-              </a>
+              <DocsLink
+                docsUrl={docsUrl}
+                storeSlug={integration.store_slug}
+                lang={language}
+                httpClient={props.httpClient}
+                labelId="integration.externalIntegration.config.docsLink"
+                linkClass="btn btn-outline-secondary btn-sm"
+              />
             </div>
           )}
         </div>

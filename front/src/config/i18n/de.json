@@ -614,6 +614,11 @@
         "STOPPED": "Gestoppt",
         "ERROR": "Fehler"
       },
+      "docs": {
+        "modalTitle": "Dokumentation",
+        "loadError": "Beim Laden der Dokumentation ist ein Fehler aufgetreten.",
+        "openRawLink": "In neuem Tab öffnen"
+      },
       "config": {
         "title": "Konfiguration",
         "docsLink": "Dokumentation",

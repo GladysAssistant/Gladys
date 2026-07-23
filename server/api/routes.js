@@ -511,6 +511,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: externalIntegrationController.getHardware,
     },
+    'get /api/v1/external_integration/store/docs': {
+      authenticated: true,
+      controller: externalIntegrationController.getStoreDocs,
+    },
     'post /api/v1/external_integration/store/refresh': {
       authenticated: true,
       admin: true,

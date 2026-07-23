@@ -136,6 +136,23 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/external_integration/store/docs getStoreDocs
+   * @apiName getStoreDocs
+   * @apiGroup ExternalIntegration
+   * @apiDescription The re-hosted documentation markdown of a store
+   * integration, resolved from the index cache (404 when the integration
+   * has no doc), so the frontend renders it instead of linking to a raw
+   * .md file.
+   */
+  async function getStoreDocs(req, res) {
+    if (!req.query.store_slug) {
+      throw new BadParameters('store_slug is required');
+    }
+    const docs = await gladys.externalIntegration.getDocsMarkdown(req.query.store_slug, req.query.lang);
+    res.json(docs);
+  }
+
+  /**
    * @api {post} /api/v1/external_integration/:selector/update update
    * @apiName update
    * @apiGroup ExternalIntegration
@@ -381,6 +398,7 @@ module.exports = function ExternalIntegrationController(gladys) {
     setHardware: asyncMiddleware(setHardware),
     getStore: asyncMiddleware(getStore),
     refreshStore: asyncMiddleware(refreshStore),
+    getStoreDocs: asyncMiddleware(getStoreDocs),
     install: asyncMiddleware(install),
     update: asyncMiddleware(update),
     getDiscoveredDevices: asyncMiddleware(getDiscoveredDevices),

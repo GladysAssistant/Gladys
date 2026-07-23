@@ -11,6 +11,7 @@ import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
 import WebhooksSummary from '../components/WebhooksSummary';
+import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 
@@ -199,10 +200,13 @@ class ExternalIntegrationInstallPage extends Component {
                                 {storeIntegration.store_slug}
                               </a>
                               {docsUrl && (
-                                <a href={docsUrl} target="_blank" rel="noopener noreferrer">
-                                  <i class="fe fe-book-open mr-1" />
-                                  <Text id="integration.externalIntegration.install.documentationLink" />
-                                </a>
+                                <DocsLink
+                                  docsUrl={docsUrl}
+                                  storeSlug={storeIntegration.store_slug}
+                                  lang={language}
+                                  httpClient={this.props.httpClient}
+                                  labelId="integration.externalIntegration.install.documentationLink"
+                                />
                               )}
                             </div>
                             <p>{getLocalizedText(manifest.description, language)}</p>
