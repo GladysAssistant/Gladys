@@ -305,6 +305,22 @@ function createSceneCreateInputSchema(
         then: z.array(z.array(sceneActionSchema)),
         else: z.array(z.array(sceneActionSchema)),
       }),
+      actionSchemaByType(ACTIONS.CONDITION.WHILE, {
+        while: z.array(sceneActionSchema).min(1),
+        do: z.array(z.array(sceneActionSchema)),
+        max_iterations: z
+          .number()
+          .int()
+          .min(1)
+          .max(10000)
+          .optional(),
+        iteration_delay_ms: z
+          .number()
+          .int()
+          .min(0)
+          .max(60000)
+          .optional(),
+      }),
     ]),
   );
 

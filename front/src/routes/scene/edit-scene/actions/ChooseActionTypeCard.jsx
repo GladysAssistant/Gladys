@@ -18,6 +18,7 @@ const ACTION_LIST = [
   ACTIONS.MESSAGE.SEND_CAMERA,
   ACTIONS.DEVICE.GET_VALUE,
   ACTIONS.CONDITION.IF_THEN_ELSE,
+  ACTIONS.CONDITION.WHILE,
   ACTIONS.CONDITION.ONLY_CONTINUE_IF,
   ACTIONS.USER.SET_SEEN_AT_HOME,
   ACTIONS.USER.SET_OUT_OF_HOME,
@@ -71,8 +72,11 @@ class ChooseActionType extends Component {
       <div>
         <div class="form-group">
           <label class="form-label">
-            {props.path.includes('if') && <Text id="editScene.selectConditionType" />}
-            {!props.path.includes('if') && <Text id="editScene.selectActionType" />}
+            {props.path.includes('if') || props.path.includes('while') ? (
+              <Text id="editScene.selectConditionType" />
+            ) : (
+              <Text id="editScene.selectActionType" />
+            )}
           </label>
           <Select
             class="choose-scene-action-type"

@@ -69,6 +69,12 @@ const initializeSceneVariables = (actions, parentPath = '') => {
           variables = { ...variables, ...elseVariables };
         }
       }
+      if (action && action.type === ACTIONS.CONDITION.WHILE) {
+        if (Array.isArray(action.do)) {
+          const doVariables = initializeSceneVariables(action.do, `${currentPath}.do`);
+          variables = { ...variables, ...doVariables };
+        }
+      }
     });
   });
 
@@ -239,6 +245,13 @@ class EditScene extends Component {
             updates = deepMergeUpdates(updates, elseUpdates);
           }
         }
+        if (action && action.type === ACTIONS.CONDITION.WHILE) {
+          if (Array.isArray(action.do)) {
+            const doPath = path ? `${path}.${groupIndex}.${actionIndex}.do` : `${groupIndex}.${actionIndex}.do`;
+            const doUpdates = this.checkAndAddEmptyGroups(action.do, doPath, currentState);
+            updates = deepMergeUpdates(updates, doUpdates);
+          }
+        }
       });
     });
 
@@ -341,7 +354,7 @@ class EditScene extends Component {
                 });
               }
 
-              // Check for nested actions in if/then/else blocks
+              // Check for nested actions in if/then/else and while/do blocks
               if (action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
                 // Process 'if' branch if it exists
                 if (Array.isArray(action.if)) {
@@ -356,6 +369,15 @@ class EditScene extends Component {
                 // Process 'else' branch if it exists
                 if (Array.isArray(action.else)) {
                   processActions(action.else);
+                }
+              }
+              if (action.type === ACTIONS.CONDITION.WHILE) {
+                if (Array.isArray(action.while)) {
+                  processActions([action.while]);
+                }
+
+                if (Array.isArray(action.do)) {
+                  processActions(action.do);
                 }
               }
             });
@@ -451,8 +473,8 @@ class EditScene extends Component {
 
       // Build the nested structure up to the second-to-last segment
       pathSegments.forEach((segment, index) => {
-        // Special handling for 'then' and 'else' segments
-        if (segment === 'then' || segment === 'else') {
+        // Special handling for 'then', 'else' and 'do' segments
+        if (segment === 'then' || segment === 'else' || segment === 'do') {
           actionsPath[segment] = {};
           actionsPath = actionsPath[segment];
           return;
@@ -464,7 +486,7 @@ class EditScene extends Component {
         } else if (index < pathSegments.length - 1) {
           // Not the last segment - continue building the path
           const nextSegment = pathSegments[index + 1];
-          if (nextSegment === 'then' || nextSegment === 'else') {
+          if (nextSegment === 'then' || nextSegment === 'else' || nextSegment === 'do') {
             // If next segment is then/else, current segment needs numeric index
             actionsPath[parseInt(segment, 10)] = {};
             actionsPath = actionsPath[parseInt(segment, 10)];
@@ -524,7 +546,7 @@ class EditScene extends Component {
 
       // Check if we need to remove an empty action group
       // Only if we are not in a "if" action
-      if (!path.includes('if')) {
+      if (!path.includes('if') && !path.includes('while')) {
         const parentPath = path
           .split('.')
           .slice(0, -1)
@@ -538,7 +560,7 @@ class EditScene extends Component {
         // Navigate to the correct action group based on the path
         for (let i = 0; i < parentSegments.length; i++) {
           const segment = parentSegments[i];
-          if (segment === 'then' || segment === 'else') {
+          if (segment === 'then' || segment === 'else' || segment === 'do') {
             actionGroup = actionGroup[segment];
           } else {
             actionGroup = actionGroup[parseInt(segment, 10)];
@@ -573,7 +595,7 @@ class EditScene extends Component {
           // Navigate to the container
           for (let i = 0; i < parentSegments.length - 1; i++) {
             const segment = parentSegments[i];
-            if (segment === 'then' || segment === 'else') {
+            if (segment === 'then' || segment === 'else' || segment === 'do') {
               container = container[segment];
             } else {
               container = container[parseInt(segment, 10)];
@@ -592,7 +614,7 @@ class EditScene extends Component {
             // Build the path to the container
             for (let i = 0; i < parentSegments.length - 1; i++) {
               const segment = parentSegments[i];
-              if (segment === 'then' || segment === 'else') {
+              if (segment === 'then' || segment === 'else' || segment === 'do') {
                 currentNested[segment] = {};
                 currentNested = currentNested[segment];
               } else {
@@ -1075,7 +1097,7 @@ class EditScene extends Component {
     const currentLevel = parentPath.split('.').length;
 
     // Add the current level if not already in the list
-    if (!parentPath.endsWith('then') && !parentPath.endsWith('else')) {
+    if (!parentPath.endsWith('then') && !parentPath.endsWith('else') && !parentPath.endsWith('do')) {
       const groupType = `ACTION_GROUP_TYPE_LEVEL_${currentLevel}`;
       if (!types.includes(groupType)) {
         types.push(groupType);
@@ -1108,6 +1130,12 @@ class EditScene extends Component {
             if (Array.isArray(action.else)) {
               const elseTypes = this.generateActionGroupTypes(action.else, `${actionPath}.else`);
               types = [...types, ...elseTypes];
+            }
+          }
+          if (action && action.type === ACTIONS.CONDITION.WHILE) {
+            if (Array.isArray(action.do)) {
+              const doTypes = this.generateActionGroupTypes(action.do, `${actionPath}.do`);
+              types = [...types, ...doTypes];
             }
           }
         });

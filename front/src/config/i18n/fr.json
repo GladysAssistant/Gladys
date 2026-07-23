@@ -2666,6 +2666,21 @@
           "other": "{{count}} actions"
         }
       },
+      "conditionWhile": {
+        "conditions": "Conditions",
+        "conditionDescription": "Tant que toutes les conditions sont réalisées, les actions du bloc ci-dessous seront exécutées en boucle, jusqu'à ce que les conditions ne soient plus remplies.",
+        "noCondition": "Aucune condition ajoutée. Cliquez sur le bouton '+' pour ajouter une condition à ce bloc",
+        "addCondition": "Ajouter une condition",
+        "while": "Tant que",
+        "do": "Faire...",
+        "shortWhile": "T",
+        "shortDo": "F",
+        "actionCount": {
+          "zero": "Aucune action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
+      },
       "checkTime": {
         "description": "La scène continuera si l'heure actuelle est comprise entre les bornes spécifiées, aux jours spécifiés. Si une condition est vide, elle ne sera pas prise en compte.",
         "beforeLabel": "Avant",
@@ -2818,7 +2833,8 @@
       "condition": {
         "only-continue-if": "Condition sur variables",
         "check-time": "Condition temporelle",
-        "if-then-else": "Condition \"Si... Alors... Sinon...\""
+        "if-then-else": "Condition \"Si... Alors... Sinon...\"",
+        "while": "Condition \"Tant que...\""
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",

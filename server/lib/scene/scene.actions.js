@@ -20,7 +20,14 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 
-const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
+const {
+  ACTIONS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  ALARM_MODES,
+  SCENE_WHILE_MAX_ITERATIONS,
+  SCENE_WHILE_ITERATION_DELAY_MS,
+} = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
@@ -663,6 +670,45 @@ const actionsFunc = {
       await executeActions(self, thenActions, scope, `${path}.then`);
     } else {
       await executeActions(self, elseActions, scope, `${path}.else`);
+    }
+  },
+  [ACTIONS.CONDITION.WHILE]: async (self, action, scope, path) => {
+    const { while: whileActions, do: doActions } = action;
+    const { executeActions } = executeActionsFactory(actionsFunc);
+    const maxIterations = action.max_iterations || SCENE_WHILE_MAX_ITERATIONS;
+    const iterationDelayMs =
+      action.iteration_delay_ms !== undefined ? action.iteration_delay_ms : SCENE_WHILE_ITERATION_DELAY_MS;
+
+    let iteration = 0;
+    /* eslint-disable no-await-in-loop */
+    // Sequential iterations are intentional: conditions must be re-evaluated between each loop
+    while (iteration < maxIterations) {
+      let conditionsVerified;
+      try {
+        await executeActions(self, [whileActions], scope, `${path}.while`, { throwUnknownError: true });
+        conditionsVerified = true;
+      } catch (e) {
+        if (e instanceof AbortScene) {
+          conditionsVerified = false;
+        } else {
+          throw e;
+        }
+      }
+
+      if (!conditionsVerified) {
+        break;
+      }
+
+      await executeActions(self, doActions, scope, `${path}.do`);
+      iteration += 1;
+
+      // Yield to the event loop between iterations to avoid blocking Gladys
+      await Promise.delay(iterationDelayMs);
+    }
+    /* eslint-enable no-await-in-loop */
+
+    if (iteration >= maxIterations) {
+      logger.warn(`While action at path ${path} reached max iterations (${maxIterations})`);
     }
   },
 };

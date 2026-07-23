@@ -35,6 +35,7 @@ import EdfTempoCondition from './actions/EdfTempoCondition';
 import AskAI from './actions/AskAI';
 import SendSms from './actions/SendSms';
 import ConditionIfElseThen from './actions/ConditionIfElseThen';
+import ConditionWhile from './actions/ConditionWhile';
 
 const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
@@ -48,6 +49,7 @@ const ACTION_ICON = {
   [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square',
   [ACTIONS.MESSAGE.SEND_CAMERA]: 'fe fe-message-square',
   [ACTIONS.CONDITION.IF_THEN_ELSE]: 'fe fe-shuffle',
+  [ACTIONS.CONDITION.WHILE]: 'fe fe-repeat',
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',
   [ACTIONS.DEVICE.GET_VALUE]: 'fe fe-refresh-cw',
   [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
@@ -104,19 +106,24 @@ const ACTION_COMPONENTS = {
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
   [ACTIONS.AI.ASK]: AskAI,
   [ACTIONS.SMS.SEND]: SendSms,
-  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen
+  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen,
+  [ACTIONS.CONDITION.WHILE]: ConditionWhile
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
 const CONDITION_CARD_TYPE = 'CONDITION_CARD_TYPE';
 const ACTION_CARD_IF_THEN_ELSE_TYPE = 'ACTION_CARD_IF_THEN_ELSE_TYPE';
+const ACTION_CARD_WHILE_TYPE = 'ACTION_CARD_WHILE_TYPE';
 
 const getDragAndDropType = (actionType, path) => {
-  if (path.includes('if')) {
+  if (path.includes('if') || path.includes('while')) {
     return CONDITION_CARD_TYPE;
   }
   if (actionType === ACTIONS.CONDITION.IF_THEN_ELSE) {
     return ACTION_CARD_IF_THEN_ELSE_TYPE;
+  }
+  if (actionType === ACTIONS.CONDITION.WHILE) {
+    return ACTION_CARD_WHILE_TYPE;
   }
   return ACTION_CARD_TYPE;
 };
@@ -156,7 +163,8 @@ const ActionCard = ({ children, ...props }) => {
       class={cx({
         'col-lg-12':
           props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF ||
-          props.action.type === ACTIONS.CONDITION.IF_THEN_ELSE,
+          props.action.type === ACTIONS.CONDITION.IF_THEN_ELSE ||
+          props.action.type === ACTIONS.CONDITION.WHILE,
         'col-lg-6':
           props.action.type === ACTIONS.MESSAGE.SEND ||
           props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
@@ -183,8 +191,12 @@ const ActionCard = ({ children, ...props }) => {
           {props.action.type === null && <i class="fe fe-plus-circle" />}
           <div class="card-title">
             <i class={cx(props.action.icon, 'mr-4')} /> <Text id={`editScene.actions.${props.action.type}`} />
-            {props.action.type === null && props.path.includes('if') && <Text id="editScene.newCondition" />}
-            {props.action.type === null && !props.path.includes('if') && <Text id="editScene.newAction" />}
+            {props.action.type === null && (props.path.includes('if') || props.path.includes('while')) && (
+              <Text id="editScene.newCondition" />
+            )}
+            {props.action.type === null && !props.path.includes('if') && !props.path.includes('while') && (
+              <Text id="editScene.newAction" />
+            )}
           </div>
           {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (
             <div class="card-status bg-blue" />

@@ -2666,6 +2666,21 @@
           "other": "{{count}} Aktionen"
         }
       },
+      "conditionWhile": {
+        "conditions": "Bedingungen",
+        "conditionDescription": "Solange alle Bedingungen erfüllt sind, werden die Aktionen im Block unten wiederholt ausgeführt, bis die Bedingungen nicht mehr erfüllt sind.",
+        "noCondition": "Es wurde noch keine Bedingung hinzugefügt. Klicken Sie auf die '+'-Schaltfläche, um diesem Block eine Bedingung hinzuzufügen",
+        "addCondition": "Bedingung hinzufügen",
+        "while": "Solange",
+        "do": "Ausführen...",
+        "shortWhile": "S",
+        "shortDo": "A",
+        "actionCount": {
+          "zero": "Keine Aktionen",
+          "one": "1 Aktion",
+          "other": "{{count}} Aktionen"
+        }
+      },
       "checkTime": {
         "description": "Die Szene wird nur fortgesetzt, wenn die aktuelle Uhrzeit außerhalb der ausgewählten Tage liegt. Wenn ein Feld leer gelassen wird, wird es nicht berücksichtigt.",
         "beforeLabel": "Vor",
@@ -2818,7 +2833,8 @@
       "condition": {
         "only-continue-if": "Nur fortsetzen, wenn",
         "check-time": "Zeitbedingung",
-        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\""
+        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\"",
+        "while": "Bedingung: \"Solange...\""
       },
       "user": {
         "set-seen-at-home": "Benutzer zu Hause gesehen",
