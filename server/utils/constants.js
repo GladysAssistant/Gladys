@@ -1538,6 +1538,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS: 'melcloud.status',
     DISCOVER: 'melcloud.discover',
   },
+  MELCLOUD_HOME: {
+    STATUS: 'melcloud-home.status',
+    DISCOVER: 'melcloud-home.discover',
+  },
   NODERED: {
     STATUS_CHANGE: 'nodered.status-change',
     MQTT_ERROR: 'nodered.mqtt-error',

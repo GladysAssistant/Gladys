@@ -26,6 +26,7 @@ module.exports.matter = require('./matter');
 module.exports['nextcloud-talk'] = require('./nextcloud-talk');
 module.exports.tuya = require('./tuya');
 module.exports.melcloud = require('./melcloud');
+module.exports['melcloud-home'] = require('./melcloud-home');
 module.exports['node-red'] = require('./node-red');
 module.exports.matterbridge = require('./matterbridge');
 module.exports.netatmo = require('./netatmo');

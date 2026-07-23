@@ -1531,6 +1531,62 @@
         "conflictError": "Current device is already in Gladys."
       }
     },
+    "melcloudHome": {
+      "title": "MELCloud Home",
+      "description": "Control your MELCloud Home air conditioners (works with the cloud)",
+      "deviceTab": "Devices",
+      "discoverTab": "MELCloud Home discover",
+      "setupTab": "Setup",
+      "documentation": "MELCloud Home documentation",
+      "discoverDeviceDescr": "Automatically scan MELCloud Home devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed or available",
+      "status": {
+        "notConnected": "Gladys failed to connect to the MELCloud Home cloud account, please go to ",
+        "setupPageLink": "MELCloud Home configuration page.",
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "updates": "Check updates",
+        "editButton": "Edit",
+        "noDeviceFound": "No MELCloud Home device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your MELCloud Home cloud account",
+        "description": "MELCloud Home devices are automatically discovered. Your devices need to be added to your MELCloud Home cloud account before.",
+        "error": "Error discovering MELCloud Home devices. Please verify your credentials on Setup.",
+        "noDeviceFound": "No MELCloud Home device discovered.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "MELCloud Home configuration",
+        "description": "You can connect Gladys to your MELCloud Home account to control the related devices.",
+        "username": "Email",
+        "usernamePlaceholder": "Enter your MELCloud Home account email address",
+        "password": "Password",
+        "passwordPlaceholder": "Enter your MELCloud Home account password",
+        "saveLabel": "Save configuration",
+        "error": "An error occurred while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your MELCloud Home cloud account...",
+        "connected": "Connected to the MELCloud Home cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
+      }
+    },
     "mqtt": {
       "title": "MQTT Virtual Devices",
       "description": "Create virtual devices controllable via MQTT.",
@@ -3922,7 +3978,6 @@
     "category": {
       "button": {
         "click": {
-          "unknown": "{{value}} (unknown value)",
           "1": "Simple click",
           "2": "Double click",
           "3": "Long click press",
@@ -4026,7 +4081,8 @@
           "101": "Button 4 single click",
           "102": "Button 4 double click",
           "103": "Button 4 long click",
-          "104": "Button 4 triple click"
+          "104": "Button 4 triple click",
+          "unknown": "{{value}} (unknown value)"
         }
       },
       "fan": {
@@ -4072,16 +4128,16 @@
       },
       "shutter": {
         "state": {
-          "-1": "Closed",
           "0": "Stopped",
-          "1": "Open"
+          "1": "Open",
+          "-1": "Closed"
         }
       },
       "curtain": {
         "state": {
-          "-1": "Closed",
           "0": "Stopped",
-          "1": "Open"
+          "1": "Open",
+          "-1": "Closed"
         }
       },
       "lock": {
@@ -4217,14 +4273,14 @@
       },
       "vacuum-cleaner": {
         "state": {
-          "unknown": "{{value}} (unknown)",
           "0": "Stopped",
           "1": "Running",
           "2": "Paused",
           "3": "Error",
           "4": "Returning to Dock",
           "5": "Charging",
-          "6": "Docked"
+          "6": "Docked",
+          "unknown": "{{value}} (unknown)"
         }
       }
     }

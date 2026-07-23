@@ -1769,6 +1769,62 @@
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
+    "melcloudHome": {
+      "title": "MELCloud Home",
+      "description": "Contrôler vos climatisations MELCloud Home",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte MELCloud Home",
+      "setupTab": "Configuration",
+      "documentation": "Documentation MELCloud Home",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils MELCloud Home",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "updateButton": "Mettre à jour",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte MELCloud Home, plus d'informations sur la ",
+        "setupPageLink": "page de configuration MELCloud Home.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
+      },
+      "device": {
+        "title": "Appareils MELCloud Home dans Gladys",
+        "updates": "Vérifier les mises à jour",
+        "editButton": "Éditer",
+        "noDeviceFound": "Aucun appareil MELCloud Home trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre compte cloud MELCloud Home",
+        "description": "Les appareils MELCloud Home sont automatiquement découverts. Vos appareils doivent être ajoutés à votre compte cloud MELCloud Home avant.",
+        "error": "Erreur de découverte des appareils MELCloud Home. Veuillez vérifier vos informations d'identification lors de l'installation.",
+        "noDeviceFound": "Aucun appareil MELCloud Home n'a été découvert.",
+        "scan": "Scanner"
+      },
+      "setup": {
+        "title": "Configuration MELCloud Home",
+        "description": "Vous pouvez connecter Gladys à votre compte cloud MELCloud Home pour commander les appareils associés.",
+        "username": "Email",
+        "usernamePlaceholder": "Entrez l'email du compte MELCloud Home",
+        "password": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe du compte MELCloud Home",
+        "saveLabel": "Enregistrer la configuration",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud MELCloud Home...",
+        "connected": "Connexion réussie au compte cloud MELCloud Home !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "mqtt": {
       "title": "Appareils virtuels MQTT",
       "description": "Créez des appareils virtuels contrôlables via MQTT.",
@@ -3922,7 +3978,6 @@
     "category": {
       "button": {
         "click": {
-          "unknown": "{{value}} (valeur inconnue)",
           "1": "Clic simple",
           "2": "Clic double",
           "3": "Pression clic long",
@@ -4026,7 +4081,8 @@
           "101": "Bouton 4 clic simple",
           "102": "Bouton 4 clic double",
           "103": "Bouton 4 clic long",
-          "104": "Bouton 4 clic triple"
+          "104": "Bouton 4 clic triple",
+          "unknown": "{{value}} (valeur inconnue)"
         }
       },
       "fan": {
@@ -4072,16 +4128,16 @@
       },
       "shutter": {
         "state": {
-          "-1": "Fermé",
           "0": "Arrêté",
-          "1": "Ouvert"
+          "1": "Ouvert",
+          "-1": "Fermé"
         }
       },
       "curtain": {
         "state": {
-          "-1": "Fermé",
           "0": "Arrêté",
-          "1": "Ouvert"
+          "1": "Ouvert",
+          "-1": "Fermé"
         }
       },
       "lock": {
@@ -4217,14 +4273,14 @@
       },
       "vacuum-cleaner": {
         "state": {
-          "unknown": "{{value}} (inconnu)",
           "0": "Arrêté",
           "1": "En cours",
           "2": "En pause",
           "3": "Erreur",
           "4": "Retour à la base",
           "5": "En charge",
-          "6": "Sur la base"
+          "6": "Sur la base",
+          "unknown": "{{value}} (inconnu)"
         }
       }
     }

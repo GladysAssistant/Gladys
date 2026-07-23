@@ -178,6 +178,12 @@ import MELCloudEditPage from '../routes/integration/all/melcloud/edit-page';
 import MELCloudSetupPage from '../routes/integration/all/melcloud/setup-page';
 import MELCloudDiscoverPage from '../routes/integration/all/melcloud/discover-page';
 
+// MELCloud Home integration
+import MELCloudHomePage from '../routes/integration/all/melcloud-home/device-page';
+import MELCloudHomeEditPage from '../routes/integration/all/melcloud-home/edit-page';
+import MELCloudHomeSetupPage from '../routes/integration/all/melcloud-home/setup-page';
+import MELCloudHomeDiscoverPage from '../routes/integration/all/melcloud-home/discover-page';
+
 // NodeRed integration
 import NodeRedPage from '../routes/integration/all/node-red/setup-page';
 
@@ -351,6 +357,11 @@ const AppRouter = connect(
         <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />
         <MELCloudDiscoverPage path="/dashboard/integration/device/melcloud/discover" />
         <MELCloudSetupPage path="/dashboard/integration/device/melcloud/setup" />
+
+        <MELCloudHomePage path="/dashboard/integration/device/melcloud-home" />
+        <MELCloudHomeEditPage path="/dashboard/integration/device/melcloud-home/edit/:deviceSelector" />
+        <MELCloudHomeDiscoverPage path="/dashboard/integration/device/melcloud-home/discover" />
+        <MELCloudHomeSetupPage path="/dashboard/integration/device/melcloud-home/setup" />
 
         <NukiPage path="/dashboard/integration/device/nuki" />
         <NukiSetupPage path="/dashboard/integration/device/nuki/setup" />

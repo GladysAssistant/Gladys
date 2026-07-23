@@ -101,6 +101,13 @@
     "cloud": true
   },
   {
+    "key": "melcloudHome",
+    "link": "melcloud-home",
+    "img": "/assets/integrations/cover/melcloud-home.jpg",
+    "whiteBackground": true,
+    "cloud": true
+  },
+  {
     "key": "nodeRed",
     "link": "node-red",
     "img": "/assets/integrations/cover/node-red.jpg",
