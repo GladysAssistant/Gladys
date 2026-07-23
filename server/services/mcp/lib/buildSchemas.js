@@ -1259,6 +1259,12 @@ async function getAllTools(userId) {
             return null;
           }
           const [year, month, day] = value.split('-').map(Number);
+          // Reject calendar-invalid dates (2026-02-30, 2026-13-01) that the
+          // Date constructor would silently roll over to another day.
+          const date = new Date(year, month - 1, day);
+          if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+            return null;
+          }
           return { year, month, day };
         };
 
@@ -1269,7 +1275,7 @@ async function getAllTools(userId) {
             content: [
               {
                 type: 'text',
-                text: 'device.get-energy-consumption: start_date and end_date are required in YYYY-MM-DD format',
+                text: 'device.get-energy-consumption: start_date and end_date must be valid dates in YYYY-MM-DD format',
               },
             ],
           };

@@ -1323,7 +1323,18 @@ describe('build schemas', () => {
       unit: 'kwh',
     });
     expect(invalidDateResult.content[0].text).to.eq(
-      'device.get-energy-consumption: start_date and end_date are required in YYYY-MM-DD format',
+      'device.get-energy-consumption: start_date and end_date must be valid dates in YYYY-MM-DD format',
+    );
+
+    // Calendar-invalid date that would roll over in the Date constructor.
+    const rolledOverDateResult = await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-02-30',
+      end_date: '2026-03-02',
+      unit: 'kwh',
+    });
+    expect(rolledOverDateResult.content[0].text).to.eq(
+      'device.get-energy-consumption: start_date and end_date must be valid dates in YYYY-MM-DD format',
     );
 
     const reversedDatesResult = await energyTool.cb({
