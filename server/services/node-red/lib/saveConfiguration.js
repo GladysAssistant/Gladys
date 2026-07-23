@@ -24,6 +24,7 @@ async function saveConfiguration(config) {
     [CONFIGURATION.NODE_RED_PASSWORD]: config.nodeRedPassword,
     [CONFIGURATION.DOCKER_NODE_RED_VERSION]: config.dockerNodeRedVersion,
     [CONFIGURATION.NODE_RED_PORT]: CONFIGURATION.NODE_RED_PORT_VALUE,
+    [CONFIGURATION.NODE_RED_CONTAINER_NAME]: config.nodeRedContainerName,
   };
 
   const variableKeys = Object.keys(keyValueMap);

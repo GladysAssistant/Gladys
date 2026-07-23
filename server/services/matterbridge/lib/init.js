@@ -28,6 +28,9 @@ async function init() {
   // Load stored configuration
   const configuration = await this.getConfiguration();
 
+  // Resolve and persist the container name BEFORE any Docker operation
+  await this.allocateContainerNames(configuration);
+
   logger.debug('Matterbridge: installing and starting required docker containers...');
   await this.checkForContainerUpdates(configuration);
   await this.installContainer(configuration);

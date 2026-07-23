@@ -6,6 +6,7 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const containerDescriptor = require('../docker/gladys-matterbridge-container.json');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const { DEFAULT } = require('./constants');
 
@@ -37,10 +38,7 @@ async function installContainer(config) {
 
   const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
 
-  let dockerContainers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [containerDescriptor.name] },
-  });
+  let dockerContainers = await getContainersByExactName(this.gladys.system, config.matterbridgeContainerName);
   let [container] = dockerContainers;
 
   if (dockerContainers.length === 0) {
@@ -55,6 +53,7 @@ async function installContainer(config) {
 
       logger.info(`Creation of container...`);
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+      containerDescriptorToMutate.name = config.matterbridgeContainerName;
 
       const matterbridgePath = path.join(basePathOnHost, DEFAULT.CONFIGURATION_PATH);
 
@@ -82,10 +81,7 @@ async function installContainer(config) {
   await this.configureContainer(config);
 
   try {
-    dockerContainers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [containerDescriptor.name] },
-    });
+    dockerContainers = await getContainersByExactName(this.gladys.system, config.matterbridgeContainerName);
     [container] = dockerContainers;
 
     // Check if we need to restart the container (container is not running)

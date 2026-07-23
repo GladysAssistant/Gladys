@@ -1,6 +1,6 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 const os = require('os');
-const { constants } = require('fs');
 const proxiquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
@@ -20,7 +20,6 @@ describe('mqttHandler.configureContainer', () => {
 
   beforeEach(() => {
     fsMock.mkdir = fake.resolves(true);
-    fsMock.access = fake.resolves(true);
     fsMock.readFile = fake.resolves('read');
     fsMock.appendFile = fake.resolves(true);
     fsMock.writeFile = fake.resolves('write');
@@ -38,53 +37,61 @@ describe('mqttHandler.configureContainer', () => {
     await mqttHandler.configureContainer();
 
     assert.calledOnceWithExactly(fsMock.mkdir, '/var/lib/gladysassistant/mosquitto', { recursive: true });
-    assert.calledOnceWithExactly(
-      fsMock.access,
-      '/var/lib/gladysassistant/mosquitto/mosquitto.conf',
-      // eslint-disable-next-line no-bitwise
-      constants.R_OK | constants.W_OK,
-    );
     assert.calledOnceWithExactly(fsMock.readFile, '/var/lib/gladysassistant/mosquitto/mosquitto.conf');
     assert.calledOnceWithExactly(fsMock.open, '/var/lib/gladysassistant/mosquitto/mosquitto.passwd', 'w');
     assert.notCalled(fsMock.appendFile);
     assert.notCalled(fsMock.writeFile);
   });
 
-  it('should write default port', async () => {
+  it('should append the listener line when the config has none', async () => {
     const mqttHandler = new MqttHandler(gladys, mqttClient, serviceId);
     await mqttHandler.configureContainer();
 
     assert.calledOnceWithExactly(fsMock.mkdir, '/var/lib/gladysassistant/mosquitto', { recursive: true });
-    assert.calledOnceWithExactly(
-      fsMock.access,
-      '/var/lib/gladysassistant/mosquitto/mosquitto.conf',
-      // eslint-disable-next-line no-bitwise
-      constants.R_OK | constants.W_OK,
-    );
     assert.calledOnceWithExactly(fsMock.readFile, '/var/lib/gladysassistant/mosquitto/mosquitto.conf');
     assert.calledOnceWithExactly(
-      fsMock.appendFile,
+      fsMock.writeFile,
       '/var/lib/gladysassistant/mosquitto/mosquitto.conf',
-      `${os.EOL}listener 1883`,
+      `read${os.EOL}listener 1883`,
     );
     assert.calledOnceWithExactly(fsMock.open, '/var/lib/gladysassistant/mosquitto/mosquitto.passwd', 'w');
-    assert.notCalled(fsMock.writeFile);
+    assert.notCalled(fsMock.appendFile);
   });
 
-  it('should create default configuration file', async () => {
-    fsMock.access = fake.rejects();
+  it('should replace the listener line when the resolved port differs', async () => {
+    fsMock.readFile = fake.resolves(`allow_anonymous false${os.EOL}listener 1883`);
+
+    const mqttHandler = new MqttHandler(gladys, mqttClient, serviceId);
+    await mqttHandler.configureContainer(1885);
+
+    assert.calledOnceWithExactly(
+      fsMock.writeFile,
+      '/var/lib/gladysassistant/mosquitto/mosquitto.conf',
+      `allow_anonymous false${os.EOL}listener 1885`,
+    );
+    assert.notCalled(fsMock.appendFile);
+  });
+
+  it('should not rewrite the config when the listener already matches the resolved port', async () => {
+    fsMock.readFile = fake.resolves(`allow_anonymous false${os.EOL}listener 1885`);
+
+    const mqttHandler = new MqttHandler(gladys, mqttClient, serviceId);
+    await mqttHandler.configureContainer(1885);
+
+    assert.notCalled(fsMock.writeFile);
+    assert.notCalled(fsMock.appendFile);
+  });
+
+  it('should create default configuration file when none exists (ENOENT)', async () => {
+    const notFound = new Error('no such file');
+    notFound.code = 'ENOENT';
+    fsMock.readFile = fake.rejects(notFound);
 
     const mqttHandler = new MqttHandler(gladys, mqttClient, serviceId);
     await mqttHandler.configureContainer();
 
     assert.calledOnceWithExactly(fsMock.mkdir, '/var/lib/gladysassistant/mosquitto', { recursive: true });
-    assert.calledOnceWithExactly(
-      fsMock.access,
-      '/var/lib/gladysassistant/mosquitto/mosquitto.conf',
-      // eslint-disable-next-line no-bitwise
-      constants.R_OK | constants.W_OK,
-    );
-    assert.notCalled(fsMock.readFile);
+    assert.calledOnceWithExactly(fsMock.readFile, '/var/lib/gladysassistant/mosquitto/mosquitto.conf');
     assert.notCalled(fsMock.appendFile);
     assert.calledOnceWithExactly(
       fsMock.writeFile,
@@ -92,5 +99,23 @@ describe('mqttHandler.configureContainer', () => {
       `allow_anonymous false${os.EOL}connection_messages false${os.EOL}password_file /mosquitto/config/mosquitto.passwd${os.EOL}listener 1883`,
     );
     assert.calledOnceWithExactly(fsMock.open, '/var/lib/gladysassistant/mosquitto/mosquitto.passwd', 'w');
+  });
+
+  it('should not overwrite the configuration when reading it fails with a non-ENOENT error', async () => {
+    const ioError = new Error('I/O error');
+    ioError.code = 'EIO';
+    fsMock.readFile = fake.rejects(ioError);
+
+    const mqttHandler = new MqttHandler(gladys, mqttClient, serviceId);
+    let thrown;
+    try {
+      await mqttHandler.configureContainer();
+    } catch (e) {
+      thrown = e;
+    }
+
+    expect(thrown).to.equal(ioError);
+    assert.notCalled(fsMock.writeFile);
+    assert.notCalled(fsMock.appendFile);
   });
 });

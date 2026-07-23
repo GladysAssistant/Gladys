@@ -33,6 +33,7 @@ describe('Matterbridge init', () => {
 
     matterbridgeManager.getConfiguration = sinon.stub();
     matterbridgeManager.saveConfiguration = sinon.stub();
+    matterbridgeManager.allocateContainerNames = sinon.stub();
     matterbridgeManager.checkForContainerUpdates = sinon.stub();
     matterbridgeManager.installContainer = sinon.stub();
 

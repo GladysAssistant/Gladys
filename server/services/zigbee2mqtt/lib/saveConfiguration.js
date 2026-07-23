@@ -22,6 +22,8 @@ async function saveConfiguration(config) {
     [CONFIGURATION.DOCKER_Z2M_VERSION]: config.dockerZ2mVersion,
     [CONFIGURATION.Z2M_MQTT_MODE]: config.mqttMode,
     [CONFIGURATION.Z2M_FRONTEND_URL]: config.z2mFrontendUrl,
+    [CONFIGURATION.MQTT_CONTAINER_NAME]: config.mqttContainerName,
+    [CONFIGURATION.Z2M_CONTAINER_NAME]: config.z2mContainerName,
   };
 
   const variableKeys = Object.keys(keyValueMap);

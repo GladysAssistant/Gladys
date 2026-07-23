@@ -1,11 +1,24 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import { RequestStatus } from '../../../../../utils/consts';
 import cx from 'classnames';
+
+const DEFAULT_MQTT_PORT = 1883;
 
 class SetupForm extends Component {
   showPasswordTimer = null;
   copyTimer = null;
+
+  // Extract the host port from the embedded broker URL (mqtt://localhost:1885).
+  // Returns the port only when the broker was relocated away from the default 1883.
+  getRelocatedBrokerPort = mqttUrl => {
+    if (!mqttUrl) {
+      return null;
+    }
+    const match = /:(\d+)\s*$/.exec(mqttUrl);
+    const port = match ? Number(match[1]) : DEFAULT_MQTT_PORT;
+    return port !== DEFAULT_MQTT_PORT ? port : null;
+  };
 
   updateUrl = e => {
     this.props.updateConfiguration({ mqttUrl: e.target.value });
@@ -114,6 +127,14 @@ class SetupForm extends Component {
             {this.renderCopyButton('mqttUrl', props.mqttUrl, 'mqtt-setup-url-copy-button')}
           </div>
           {this.renderCopiedFeedback('mqttUrl')}
+          {props.useEmbeddedBroker && this.getRelocatedBrokerPort(props.mqttUrl) && (
+            <small class="form-text text-warning" data-cy="mqtt-setup-broker-port-relocated">
+              <MarkupText
+                id="integration.mqtt.setup.brokerPortRelocated"
+                fields={{ port: this.getRelocatedBrokerPort(props.mqttUrl) }}
+              />
+            </small>
+          )}
         </div>
 
         <div class="form-group">

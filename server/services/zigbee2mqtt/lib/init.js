@@ -101,6 +101,9 @@ async function init(setupMode = false) {
     // We force set the mqttMode to local for existing instances
     configuration.mqttMode = MQTT_MODE.LOCAL;
 
+    // Resolve and persist the container names BEFORE any Docker operation
+    await this.allocateContainerNames(configuration);
+
     await this.checkForContainerUpdates(configuration);
     await this.installMqttContainer(configuration);
     await this.installZ2mContainer(configuration, setupMode);

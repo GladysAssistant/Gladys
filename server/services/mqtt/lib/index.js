@@ -9,6 +9,9 @@ const { subscribe } = require('./subscribe');
 const { unsubscribe } = require('./unsubscribe');
 const { status } = require('./status');
 const { getConfiguration } = require('./getConfiguration');
+const { getBrokerContainerName } = require('./getBrokerContainerName');
+const { getBrokerPort } = require('./getBrokerPort');
+const { isBrokerPortAvailable } = require('./isBrokerPortAvailable');
 const { saveConfiguration } = require('./saveConfiguration');
 const { installContainer } = require('./installContainer');
 const { listenToCustomMqttTopicIfNeeded } = require('./listenToCustomMqttTopicIfNeeded');
@@ -42,6 +45,9 @@ const MqttHandler = function MqttHandler(gladys, mqttLibrary, serviceId) {
 };
 
 MqttHandler.prototype.init = init;
+MqttHandler.prototype.getBrokerContainerName = getBrokerContainerName;
+MqttHandler.prototype.getBrokerPort = getBrokerPort;
+MqttHandler.prototype.isBrokerPortAvailable = isBrokerPortAvailable;
 MqttHandler.prototype.connect = connect;
 MqttHandler.prototype.disconnect = disconnect;
 MqttHandler.prototype.handleNewMessage = handleNewMessage;

@@ -29,11 +29,12 @@ describe('NodeRed saveConfiguration', () => {
       nodeRedUsername: 'nodeRedUsername',
       nodeRedPassword: 'nodeRedPassword',
       dockerNodeRedVersion: 'dockerNodeRedVersion',
+      nodeRedContainerName: 'gladys-node-red',
     };
 
     await nodeRedManager.saveConfiguration(config);
 
-    assert.callCount(gladys.variable.setValue, 4);
+    assert.callCount(gladys.variable.setValue, 5);
     assert.calledWithExactly(gladys.variable.setValue, 'NODE_RED_USERNAME', config.nodeRedUsername, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'NODE_RED_PASSWORD', config.nodeRedPassword, serviceId);
     assert.calledWithExactly(
@@ -43,6 +44,12 @@ describe('NodeRed saveConfiguration', () => {
       serviceId,
     );
     assert.calledWithExactly(gladys.variable.setValue, 'NODE_RED_PORT', '1881', serviceId);
+    assert.calledWithExactly(
+      gladys.variable.setValue,
+      'NODE_RED_CONTAINER_NAME',
+      config.nodeRedContainerName,
+      serviceId,
+    );
   });
 
   it('should destroy all variables', async () => {
@@ -50,9 +57,10 @@ describe('NodeRed saveConfiguration', () => {
 
     await nodeRedManager.saveConfiguration(config);
 
-    assert.callCount(gladys.variable.destroy, 3);
+    assert.callCount(gladys.variable.destroy, 4);
     assert.calledWithExactly(gladys.variable.destroy, 'NODE_RED_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'NODE_RED_PASSWORD', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_NODE_RED_VERSION', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'NODE_RED_CONTAINER_NAME', serviceId);
   });
 });
