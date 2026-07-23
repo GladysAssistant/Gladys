@@ -1,5 +1,6 @@
 const { promisify } = require('util');
 const { CONFIGURATION, DEFAULT } = require('./constants');
+const { SERVICE_STATUS } = require('../../../utils/constants');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const { getContainersByExactName } = require('../../../utils/dockerContainers');
 
@@ -73,7 +74,18 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
     );
   }
 
-  return this.connect({ mqttUrl, mqttUsername, mqttPassword, useEmbeddedBroker });
+  await this.connect({ mqttUrl, mqttUsername, mqttPassword, useEmbeddedBroker });
+
+  // Saving the configuration is an explicit request to have the service running:
+  // clear a previous "manually stopped" status, otherwise the service would
+  // still be skipped at next startup (see service.startAll).
+  const serviceInDb = await this.gladys.service.getLocalServiceByName('mqtt');
+  if (serviceInDb && serviceInDb.status === SERVICE_STATUS.STOPPED) {
+    serviceInDb.set({ status: SERVICE_STATUS.RUNNING });
+    await serviceInDb.save();
+  }
+
+  return null;
 }
 
 module.exports = {

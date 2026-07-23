@@ -19,6 +19,15 @@ async function listenToCustomMqttTopicIfNeeded(device) {
       );
       return;
     }
+    const mqttTopic = deviceCustomTopicParam.value;
+    // If the topic is empty, we don't listen to it: an empty topic
+    // would match all MQTT messages received
+    if (!mqttTopic) {
+      logger.debug(
+        `listenToCustomMqttTopicIfNeeded: Custom topic is empty for feature ${deviceFeatureId} of device ${device.selector}. Not listening.`,
+      );
+      return;
+    }
     // If the feature exists, we add custom listener
     logger.debug(`Adding custom listener for device ${device.selector}, feature = ${deviceFeatureId}`);
     const deviceCustomObjectPathParam = device.params.find((p) =>
@@ -28,7 +37,6 @@ async function listenToCustomMqttTopicIfNeeded(device) {
     if (deviceCustomObjectPathParam) {
       objectPath = deviceCustomObjectPathParam.value;
     }
-    const mqttTopic = deviceCustomTopicParam.value;
     // Add listener to list of custom listeners
     this.deviceFeatureCustomMqttTopics.push({
       topic: mqttTopic,
@@ -37,7 +45,7 @@ async function listenToCustomMqttTopicIfNeeded(device) {
       object_path: objectPath,
     });
     // Listen to MQTT topic
-    if (this.mqttClient && mqttTopic && mqttTopic.length) {
+    if (this.mqttClient) {
       logger.info(`Subscribing to MQTT topic ${mqttTopic}`);
       this.mqttClient.subscribe(mqttTopic);
     }

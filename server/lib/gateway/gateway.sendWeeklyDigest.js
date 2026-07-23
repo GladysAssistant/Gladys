@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const logger = require('../../utils/logger');
-const { SYSTEM_VARIABLE_NAMES, USER_ROLE } = require('../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, USER_ROLE, AI_CHAT_PURPOSES } = require('../../utils/constants');
 const { Error429 } = require('../../utils/httpErrors');
 const { extractAssistantMessage } = require('./gateway.forwardMessageToAiChat');
 
@@ -80,6 +80,7 @@ async function sendWeeklyDigest({ force = false } = {}) {
             },
           ],
           max_tokens: 800,
+          purpose: AI_CHAT_PURPOSES.WEEKLY_DIGEST,
         });
 
         const digestText = extractAssistantText(apiResponse);

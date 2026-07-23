@@ -72,6 +72,9 @@ describe('mqttHandler.installContainer', () => {
       event: {
         emit: fake.resolves(true),
       },
+      service: {
+        getLocalServiceByName: fake.resolves(null),
+      },
       system: {
         pull: fake.resolves(false),
         createContainer: fake.resolves(false),
