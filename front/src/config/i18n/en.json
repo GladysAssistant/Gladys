@@ -296,6 +296,7 @@
       "clock": "Clock",
       "scene": "Scene",
       "music": "Music",
+      "television": "Media player",
       "gauge": "Gauge",
       "energy-consumption": "Energy Consumption",
       "voice-assistant": "Voice assistant",
@@ -533,6 +534,11 @@
       },
       "music": {
         "selectDeviceLabel": "Select device to control"
+      },
+      "television": {
+        "selectDeviceLabel": "Select device to control",
+        "remoteToggle": "Remote control",
+        "returnButton": "Back"
       },
       "voice-assistant": {
         "speak": "Speak",

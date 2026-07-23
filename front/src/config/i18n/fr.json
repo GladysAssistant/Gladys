@@ -296,6 +296,7 @@
       "clock": "Horloge",
       "scene": "Scène",
       "music": "Musique",
+      "television": "Lecteur média",
       "gauge": "Jauge",
       "energy-consumption": "Consommation Énergétique",
       "voice-assistant": "Assistant vocal",
@@ -501,6 +502,11 @@
       },
       "music": {
         "selectDeviceLabel": "Sélectionner l'appareil à contrôler"
+      },
+      "television": {
+        "selectDeviceLabel": "Sélectionner l'appareil à contrôler",
+        "remoteToggle": "Télécommande",
+        "returnButton": "Retour"
       },
       "gauge": {
         "description": "Ce widget affichera une jauge avec la valeur de la fonctionnalité sélectionnée entre sa valeur minimale et maximale.",
