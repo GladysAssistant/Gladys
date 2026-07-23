@@ -22,6 +22,10 @@ async function getConfigForFront(selector) {
   const config = {};
   const configuredSecrets = [];
   configSchema.forEach((field) => {
+    if (field.type === 'section') {
+      // purely presentational intro block: no value to expose
+      return;
+    }
     const hasValue = Object.prototype.hasOwnProperty.call(fullConfig, field.key);
     if (field.type === 'secret') {
       config[field.key] = null;

@@ -615,6 +615,7 @@
       },
       "config": {
         "title": "Konfiguration",
+        "docsLink": "Dokumentation",
         "loadError": "Beim Laden der Konfiguration ist ein Fehler aufgetreten.",
         "noConfig": "Diese Integration hat keine Konfigurationsoptionen.",
         "secretConfiguredPlaceholder": "Konfiguriert. Leer lassen, um den aktuellen Wert zu behalten.",

@@ -97,6 +97,26 @@ describe('External integration admin API', () => {
       await authenticatedRequest.get('/api/v1/external_integration/ext-unknown').expect(404);
     });
 
+    it('should expose the re-hosted docs urls in the detail', async () => {
+      const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo' });
+      const docs = {
+        en: 'https://integration-store-storage.gladysassistant.com/docs/john--gladys-open-meteo-demo/en.md',
+        fr: 'https://integration-store-storage.gladysassistant.com/docs/john--gladys-open-meteo-demo/fr.md',
+      };
+      gladys.externalIntegration.storeIndex = {
+        integrations: [{ store_slug: 'john/gladys-open-meteo-demo', manifest: TEST_MANIFEST, docs }],
+      };
+      const res = await authenticatedRequest.get(`/api/v1/external_integration/${service.selector}`).expect(200);
+      expect(res.body.docs).to.deep.equal(docs);
+      // a dev install has no store entry, hence no re-hosted docs
+      const devService = await seedExternalService({
+        name: 'ext-dev-no-docs',
+        selector: 'ext-dev-no-docs',
+      });
+      const devRes = await authenticatedRequest.get(`/api/v1/external_integration/${devService.selector}`).expect(200);
+      expect(devRes.body.docs).to.equal(null);
+    });
+
     it('should expose the container start date in the detail', async () => {
       const service = await seedExternalService();
       stubInstance(

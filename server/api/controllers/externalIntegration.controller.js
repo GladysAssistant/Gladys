@@ -39,6 +39,7 @@ module.exports = function ExternalIntegrationController(gladys) {
       update_available: gladys.externalIntegration.isUpdateAvailable(integration),
       connection_status: gladys.externalIntegration.getConnectionStatus(integration.id),
       started_at: await gladys.externalIntegration.getContainerStartedAt(integration),
+      docs: gladys.externalIntegration.getDocsUrls(integration),
       containers,
     });
   }

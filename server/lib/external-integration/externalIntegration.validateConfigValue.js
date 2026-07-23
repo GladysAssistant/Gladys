@@ -55,6 +55,10 @@ function validateConfigValue(field, value) {
       // the value of an oauth2 field is the Connect flow itself: the tokens
       // are stored by the integration under keys outside the schema
       throw new Error422(`config.${key}: oauth2 fields cannot be set directly`);
+    case 'section':
+      // purely presentational intro block: no stored value, its key is
+      // never accepted in a config payload
+      throw new Error422(`config.${key}: section fields have no value`);
     default:
       throw new Error422(`config.${key}: unknown field type ${type}`);
   }

@@ -18,6 +18,11 @@ const ConfigTab = props => {
   const language = (user && user.language) || 'en';
   const isCommunication = get(integration, 'manifest.type') === 'communication';
   const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
+  // permanent link to the mandatory re-hosted docs (store installs): it
+  // is while configuring that the user needs them most (create the
+  // vendor developer account, get credentials...)
+  const docs = get(integration, 'docs') || {};
+  const docsUrl = docs[language] || docs.en;
 
   return (
     <div>
@@ -26,6 +31,14 @@ const ConfigTab = props => {
           <h1 class="card-title">
             <Text id="integration.externalIntegration.config.title" />
           </h1>
+          {docsUrl && (
+            <div class="card-options">
+              <a href={docsUrl} target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">
+                <i class="fe fe-book-open mr-1" />
+                <Text id="integration.externalIntegration.config.docsLink" />
+              </a>
+            </div>
+          )}
         </div>
         <div class="card-body">
           {loadStatus === RequestStatus.Error && (

@@ -72,8 +72,14 @@ const NETWORK_DISCOVERY_FIELDS = {
 // standard DNS-SD service type, e.g. _hue._tcp
 const MDNS_SERVICE_REGEX = /^_[a-z0-9-]+\._(tcp|udp)$/;
 const SSDP_ST_MAX_LENGTH = 200;
-const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'secret', 'oauth2'];
+const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'secret', 'oauth2', 'section'];
 const OPTION_FIELD_TYPES = ['select', 'multi_select'];
+// `section` intro blocks: purely presentational chapters splitting the
+// generated form (title + plain text + typed https links) — the
+// declarative answer to onboarding guidance, zero rich content rendered
+const SECTION_DESCRIPTION_MAX_LENGTH = 1000;
+const MAX_SECTION_LINKS = 5;
+const SECTION_LINK_FIELDS = ['url', 'label'];
 const SELECT_DISPLAYS = ['dropdown', 'radio'];
 // Dynamic options of a select/multi_select: a reserved enum defined by the
 // core — never a URL nor an expression, nothing arbitrary enters the
@@ -93,6 +99,7 @@ const CONFIG_FIELD_FIELDS = [
   'options',
   'source',
   'display',
+  'links',
 ];
 // boolean has no input to hint, select shows its options
 const PLACEHOLDER_FIELD_TYPES = ['string', 'number', 'secret'];
@@ -213,7 +220,8 @@ function validateConfigFieldDefault(field, path, errors) {
     }
     default:
       // secret: it would end up published in the store ;
-      // oauth2: the value is the Connect flow, tokens live off-schema
+      // oauth2: the value is the Connect flow, tokens live off-schema ;
+      // section: purely presentational, no value at all
       errors.push(`${path}.default: not allowed for ${field.type} fields`);
   }
 }
@@ -252,7 +260,13 @@ function validateConfigField(field, index, seenKeys, errors, basePath = 'config_
   }
   validateMultiLanguageText(field.label, `${path}.label`, errors);
   if (field.description !== undefined) {
-    validateMultiLanguageText(field.description, `${path}.description`, errors);
+    if (field.type === 'section') {
+      // plain text only, bounded: the long walkthrough belongs to the
+      // mandatory repo documentation
+      validateMultiLanguageText(field.description, `${path}.description`, errors, 1, SECTION_DESCRIPTION_MAX_LENGTH);
+    } else {
+      validateMultiLanguageText(field.description, `${path}.description`, errors);
+    }
   }
   if (field.placeholder !== undefined) {
     if (!PLACEHOLDER_FIELD_TYPES.includes(field.type)) {
@@ -261,10 +275,41 @@ function validateConfigField(field, index, seenKeys, errors, basePath = 'config_
       validateMultiLanguageText(field.placeholder, `${path}.placeholder`, errors);
     }
   }
-  if (field.required !== undefined && typeof field.required !== 'boolean') {
-    errors.push(`${path}.required: must be a boolean`);
+  if (field.required !== undefined) {
+    if (field.type === 'section') {
+      // purely presentational: a section holds no value to require
+      errors.push(`${path}.required: not allowed on section fields`);
+    } else if (typeof field.required !== 'boolean') {
+      errors.push(`${path}.required: must be a boolean`);
+    }
   }
   validateConfigFieldDefault(field, path, errors);
+  if (field.links !== undefined) {
+    if (field.type !== 'section') {
+      errors.push(`${path}.links: only allowed on section fields`);
+    } else if (!Array.isArray(field.links) || field.links.length === 0 || field.links.length > MAX_SECTION_LINKS) {
+      errors.push(`${path}.links: must be a list of 1-${MAX_SECTION_LINKS} links`);
+    } else {
+      field.links.forEach((link, linkIndex) => {
+        const linkPath = `${path}.links[${linkIndex}]`;
+        if (link === null || typeof link !== 'object' || Array.isArray(link)) {
+          errors.push(`${linkPath}: must be an object`);
+          return;
+        }
+        Object.keys(link).forEach((key) => {
+          if (!SECTION_LINK_FIELDS.includes(key)) {
+            errors.push(`${linkPath}.${key}: unknown field`);
+          }
+        });
+        // third-party non-moderated content: https only, and the front
+        // displays the target domain next to the label
+        if (typeof link.url !== 'string' || !link.url.startsWith('https://')) {
+          errors.push(`${linkPath}.url: must be an https URL`);
+        }
+        validateMultiLanguageText(link.label, `${linkPath}.label`, errors);
+      });
+    }
+  }
   if (field.type === 'number') {
     if (field.min !== undefined && typeof field.min !== 'number') {
       errors.push(`${path}.min: must be a number`);

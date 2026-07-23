@@ -31,6 +31,10 @@ export const EXTERNAL_INTEGRATION_STATUS_BADGES = {
 
 export const getGithubRepoUrl = storeSlug => (storeSlug ? `https://github.com/${storeSlug}` : null);
 
+// Domain of an https URL, displayed next to section links (third-party
+// non-moderated content: the user sees where they click).
+export const getUrlDomain = url => (url || '').split('/')[2] || '';
+
 // Union of the hardware classes requested by the sub-container declarations
 // of a manifest, in declaration order.
 export const getRequestedHardwareClasses = containers => {

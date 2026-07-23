@@ -19,6 +19,10 @@ const TEST_INDEX = {
       manifest: TEST_MANIFEST,
       cover_url: 'https://integration-store-storage.gladysassistant.com/covers/john--gladys-open-meteo-demo.jpg',
       github: { stars: 12, pushed_at: '2026-07-10T12:00:00.000Z' },
+      docs: {
+        en: 'https://integration-store-storage.gladysassistant.com/docs/john--gladys-open-meteo-demo/en.md',
+        fr: 'https://integration-store-storage.gladysassistant.com/docs/john--gladys-open-meteo-demo/fr.md',
+      },
     },
     {
       store_slug: 'jane/gladys-incompatible',
@@ -160,8 +164,12 @@ describe('externalIntegration store', () => {
         update_available: true,
         compatible: true,
       });
+      // the re-hosted docs urls flow through: the install screen and the
+      // permanent Documentation link of the Configuration screen use them
+      expect(demoEntry.docs).to.deep.equal(TEST_INDEX.integrations[0].docs);
       const incompatibleEntry = catalog.integrations.find((entry) => entry.store_slug === 'jane/gladys-incompatible');
       expect(incompatibleEntry).to.include({ installed: false, compatible: false });
+      expect(incompatibleEntry.docs).to.equal(null);
     });
 
     it('should treat a malformed gladys_version range as incompatible', async () => {

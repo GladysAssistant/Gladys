@@ -199,6 +199,51 @@ describe('externalIntegration config', () => {
     });
   });
 
+  describe('section config fields', () => {
+    let sectionService;
+
+    beforeEach(async () => {
+      sectionService = await seedExternalService({
+        name: 'ext-dev-netatmo-section',
+        selector: 'ext-dev-netatmo-section',
+        manifest: {
+          ...service.manifest,
+          config_schema: [
+            {
+              key: 'intro',
+              type: 'section',
+              label: { en: 'Getting started' },
+              links: [{ url: 'https://dev.netatmo.com', label: { en: 'Netatmo dev portal' } }],
+            },
+            ...service.manifest.config_schema,
+          ],
+        },
+      });
+    });
+
+    it('should never expose a section key in the front config', async () => {
+      const result = await externalIntegration.getConfigForFront(sectionService.selector);
+      expect(result.config).to.not.have.property('intro');
+    });
+
+    it('should refuse a section key in a config payload, front and integration alike', async () => {
+      try {
+        await externalIntegration.saveConfigFromFront(sectionService.selector, { intro: 'value' });
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+        expect(e.properties).to.include('section fields have no value');
+      }
+      try {
+        await externalIntegration.setIntegrationConfig(sectionService, { intro: 'value' });
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+        expect(e.properties).to.include('section fields have no value');
+      }
+    });
+  });
+
   describe('oauth2 config fields', () => {
     let oauthService;
 

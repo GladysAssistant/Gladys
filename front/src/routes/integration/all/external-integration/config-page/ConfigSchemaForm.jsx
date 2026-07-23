@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-import { getLocalizedText } from '../utils';
+import { getLocalizedText, getUrlDomain } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 
 class ConfigField extends Component {
@@ -47,6 +47,27 @@ class ConfigField extends Component {
     // core-defined source ("devices": the already-created devices of the
     // integration, label = device name, value = external_id)
     const options = field.source ? (dynamicOptions && dynamicOptions[field.source]) || [] : field.options || [];
+
+    if (field.type === 'section') {
+      // purely presentational intro block splitting the form: title,
+      // plain text and typed links opened in a new tab with the target
+      // domain displayed (no value, no input)
+      return (
+        <div class="form-group mt-4">
+          <h4 class="mb-1">{label}</h4>
+          {description && <p class="text-muted small mb-2">{description}</p>}
+          {(field.links || []).map(link => (
+            <div>
+              <a href={link.url} target="_blank" rel="noopener noreferrer">
+                <i class="fe fe-external-link mr-1" />
+                {getLocalizedText(link.label, language) || link.url}
+              </a>{' '}
+              <span class="text-muted small">({getUrlDomain(link.url)})</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
 
     if (field.type === 'oauth2') {
       // the whole OAuth2 flow is relayed: the integration builds the

@@ -34,6 +34,7 @@ async function getCatalog({ search, refresh = false } = {}) {
       manifest: entry.manifest,
       cover_url: entry.cover_url,
       github: entry.github,
+      docs: entry.docs || null,
       installed: installedService !== undefined,
       installed_selector: installedService ? installedService.selector : null,
       update_available: installedService ? installedService.update_available : false,

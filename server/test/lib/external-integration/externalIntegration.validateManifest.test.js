@@ -511,6 +511,76 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept section intro blocks in the config_schema and in action fields', () => {
+    const section = {
+      key: 'intro',
+      type: 'section',
+      label: { en: 'Getting started', fr: 'Pour commencer' },
+      description: { en: 'Create a developer account to get your API key.' },
+      links: [{ url: 'https://open-meteo.com/en/docs', label: { en: 'Open-Meteo docs' } }],
+    };
+    const manifest = {
+      ...TEST_MANIFEST,
+      config_schema: [section, ...TEST_MANIFEST.config_schema],
+      actions: [{ key: 'pair', label: { en: 'Pair' }, fields: [{ ...section, key: 'pair_intro' }] }],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+  });
+
+  it('should reject value semantics and malformed links on section fields', () => {
+    const section = { key: 'intro', type: 'section', label: { en: 'Intro' } };
+    // purely presentational: nothing value-related is allowed
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, required: true }] },
+      'config_schema[0].required: not allowed on section fields',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, default: 'x' }] },
+      'config_schema[0].default: not allowed for section fields',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, placeholder: { en: 'x' } }] },
+      'config_schema[0].placeholder: only allowed on string, number, secret fields',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, description: { en: 'x'.repeat(1001) } }] },
+      'config_schema[0].description.en: must be a string of 1-1000 characters',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'string', label: { en: 'L' }, links: [] }] },
+      'config_schema[0].links: only allowed on section fields',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, links: [] }] },
+      'config_schema[0].links: must be a list of 1-5 links',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ ...section, links: Array(6).fill({ url: 'https://a.com', label: { en: 'A' } }) }],
+      },
+      'config_schema[0].links: must be a list of 1-5 links',
+    );
+    expect422({ ...TEST_MANIFEST, config_schema: [{ ...section, links: ['x'] }] }, 'links[0]: must be an object');
+    // third-party content: https only, the front shows the target domain
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, links: [{ url: 'http://a.com', label: { en: 'A' } }] }] },
+      'links[0].url: must be an https URL',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ ...section, links: [{ url: 'https://a.com', label: { en: 'A' }, icon: 'x' }] }],
+      },
+      'links[0].icon: unknown field',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, links: [{ url: 'https://a.com', label: { fr: 'A' } }] }] },
+      'links[0].label.en: english translation is required',
+    );
+  });
+
   it('should accept a valid actions list', () => {
     const manifest = {
       ...TEST_MANIFEST,
