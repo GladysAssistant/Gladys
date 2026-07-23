@@ -117,4 +117,27 @@ describe('resizeImage', () => {
     expect(result).to.equal(`data:image/jpeg;base64,${outputBuffer.toString('base64')}`);
     expect(sharpMock.calledOnce).to.equal(true);
   });
+
+  it('should resize an image buffer and return a JPEG data URI', async () => {
+    const inputBuffer = Buffer.from('source-image');
+    const outputBuffer = Buffer.from('resized-image-data');
+    const sharpMock = createSharpMock(outputBuffer);
+
+    const { resizeImageBuffer } = proxyquire('../../utils/resizeImage', {
+      sharp: sharpMock,
+    });
+
+    const result = await resizeImageBuffer(inputBuffer, {
+      maxWidth: 800,
+      maxHeight: 400,
+      quality: 80,
+    });
+
+    expect(result).to.equal(`image/jpeg;base64,${outputBuffer.toString('base64')}`);
+    expect(sharpMock.instance.resize.firstCall.args).to.deep.equal([
+      800,
+      400,
+      { fit: 'inside', withoutEnlargement: true },
+    ]);
+  });
 });

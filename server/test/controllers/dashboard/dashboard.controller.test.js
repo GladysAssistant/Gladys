@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const nock = require('nock');
 const { authenticatedRequest } = require('../request.test');
 const { DASHBOARD_VISIBILITY } = require('../../../utils/constants');
 
@@ -24,6 +25,34 @@ describe('POST /api/v1/dashboard', () => {
       .then((res) => {
         expect(res.body).to.have.property('name', 'my dashboard');
         expect(res.body).to.have.property('type', 'main');
+      });
+  });
+
+  it('should create dashboard with photo box', async () => {
+    await authenticatedRequest
+      .post('/api/v1/dashboard')
+      .send({
+        name: 'photo dashboard',
+        type: 'main',
+        position: 0,
+        visibility: DASHBOARD_VISIBILITY.PRIVATE,
+        boxes: [
+          [
+            {
+              type: 'photo',
+              photos: [{ url: 'https://example.com/photo.jpg', caption: 'Vacances' }],
+              photo_fit: 'cover',
+              photo_slideshow_interval: 10,
+              photo_show_caption: true,
+            },
+          ],
+        ],
+      })
+      .expect('Content-Type', /json/)
+      .expect(201)
+      .then((res) => {
+        expect(res.body).to.have.property('name', 'photo dashboard');
+        expect(res.body.boxes[0][0]).to.have.property('type', 'photo');
       });
   });
 });
@@ -128,6 +157,30 @@ describe('DELETE /api/v1/dashboard/:dashboard_selector', () => {
         expect(res.body).to.deep.equal({
           success: true,
         });
+      });
+  });
+});
+
+describe('GET /api/v1/dashboard/photo/proxy', () => {
+  afterEach(() => {
+    nock.cleanAll();
+  });
+
+  it('should proxy an external photo', async () => {
+    const inputBuffer = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      'base64',
+    );
+    nock('http://192.168.1.10')
+      .get('/photos/vacation.jpg')
+      .reply(200, inputBuffer, { 'Content-Type': 'image/png' });
+
+    await authenticatedRequest
+      .get('/api/v1/dashboard/photo/proxy')
+      .query({ url: 'http://192.168.1.10/photos/vacation.jpg' })
+      .expect(200)
+      .then((res) => {
+        expect(res.text).to.match(/^image\/jpeg;base64,/);
       });
   });
 });

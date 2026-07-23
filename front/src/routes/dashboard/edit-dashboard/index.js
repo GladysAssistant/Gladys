@@ -183,15 +183,20 @@ class EditDashboard extends Component {
   };
 
   updateNewSelectedBox = (x, y, type) => {
+    const defaultBoxData = { type: { $set: type } };
+
+    if (type === 'photo') {
+      defaultBoxData.photos = { $set: [{ url: '', caption: '' }] };
+      defaultBoxData.photo_fit = { $set: 'cover' };
+      defaultBoxData.photo_slideshow_interval = { $set: 10 };
+      defaultBoxData.photo_show_caption = { $set: true };
+    }
+
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
           [x]: {
-            [y]: {
-              type: {
-                $set: type
-              }
-            }
+            [y]: defaultBoxData
           }
         }
       }

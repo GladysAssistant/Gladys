@@ -48,6 +48,20 @@ const boxesSchema = Joi.array().items(
       show_subscription_prices: Joi.boolean(),
       url: Joi.string().uri({ scheme: ['http', 'https'] }),
       icon: Joi.string(),
+      photos: Joi.array().items(
+        Joi.object().keys({
+          url: Joi.string()
+            .uri({ scheme: ['http', 'https'] })
+            .required(),
+          caption: Joi.string().allow(''),
+        }),
+      ),
+      photo_fit: Joi.string().valid('cover', 'contain'),
+      photo_slideshow_interval: Joi.number()
+        .integer()
+        .min(0)
+        .max(3600),
+      photo_show_caption: Joi.boolean(),
     }),
   ),
 );
