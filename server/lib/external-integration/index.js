@@ -60,6 +60,9 @@ const { unlinkContact } = require('./externalIntegration.unlinkContact');
 const { getContactForUser } = require('./externalIntegration.getContactForUser');
 const { getLinkedContacts } = require('./externalIntegration.getLinkedContacts');
 const { handleIncomingMessage } = require('./externalIntegration.handleIncomingMessage');
+const { getWebhooks } = require('./externalIntegration.getWebhooks');
+const { handleGatewayWebhook } = require('./externalIntegration.handleGatewayWebhook');
+const { notifyWebhookAvailability } = require('./externalIntegration.notifyWebhookAvailability');
 const { getManifestContainers } = require('./externalIntegration.getManifestContainers');
 const { ensurePrivateNetwork } = require('./externalIntegration.ensurePrivateNetwork');
 const { assignHostPorts } = require('./externalIntegration.assignHostPorts');
@@ -84,6 +87,8 @@ const { getCatalog } = require('./store/store.getCatalog');
 const { fetchManifestFromRepo } = require('./store/store.fetchManifestFromRepo');
 const { installFromStore } = require('./store/store.installFromStore');
 const { installFromRepoUrl } = require('./store/store.installFromRepoUrl');
+const { EVENTS } = require('../../utils/constants');
+const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
 /**
  * @description External integration supervisor: complete lifecycle of the
@@ -152,6 +157,14 @@ const ExternalIntegration = function ExternalIntegration(
   this.storeRefreshInterval = null;
   // storeSlug -> manifest fetched directly from the repo (repo_url installs absent from the index)
   this.repoManifests = new Map();
+  // third-party webhooks relayed by the Gladys Plus gateway (B.17): routed
+  // to the declared integration; availability recomputed when Plus is
+  // linked/unlinked
+  this.event.on(
+    EVENTS.GATEWAY.NEW_MESSAGE_EXTERNAL_INTEGRATION_WEBHOOK,
+    eventFunctionWrapper(this.handleGatewayWebhook.bind(this)),
+  );
+  this.event.on(EVENTS.GATEWAY.LINK_STATUS_CHANGED, eventFunctionWrapper(this.notifyWebhookAvailability.bind(this)));
 };
 
 ExternalIntegration.prototype.init = init;
@@ -216,6 +229,9 @@ ExternalIntegration.prototype.unlinkContact = unlinkContact;
 ExternalIntegration.prototype.getContactForUser = getContactForUser;
 ExternalIntegration.prototype.getLinkedContacts = getLinkedContacts;
 ExternalIntegration.prototype.handleIncomingMessage = handleIncomingMessage;
+ExternalIntegration.prototype.getWebhooks = getWebhooks;
+ExternalIntegration.prototype.handleGatewayWebhook = handleGatewayWebhook;
+ExternalIntegration.prototype.notifyWebhookAvailability = notifyWebhookAvailability;
 ExternalIntegration.prototype.getManifestContainers = getManifestContainers;
 ExternalIntegration.prototype.ensurePrivateNetwork = ensurePrivateNetwork;
 ExternalIntegration.prototype.assignHostPorts = assignHostPorts;

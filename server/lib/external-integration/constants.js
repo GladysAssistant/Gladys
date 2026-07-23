@@ -145,6 +145,25 @@ const MAX_TRANSPORT_MESSAGE_LENGTH = 200;
 // writable by it).
 const MANIFEST_TRANSPORTS = ['local', 'cloud'];
 const PREFER_LOCAL_CONFIG_KEY = 'GLADYS_PREFER_LOCAL';
+// Inbound webhooks via Gladys Plus (B.17): the gateway relays third-party
+// webhook calls to the instance under a single integration-agnostic action;
+// the supervisor routes them to the declared integration. Two modes exist
+// on the field: fire_and_forget (the third party only wants an ack, the
+// Netatmo class) and sync (the caller waits for the integration's response
+// — challenge/response registrations). The user-pasted Open API key is a
+// reserved config secret; the core builds the full webhook URLs.
+const MAX_WEBHOOKS = 3;
+const WEBHOOK_MODES = ['fire_and_forget', 'sync'];
+const WEBHOOK_DEFAULT_MODE = 'fire_and_forget';
+const OPEN_API_KEY_CONFIG_KEY = 'GLADYS_OPEN_API_KEY';
+// bounded both ways: mirror of the gateway inbound bound, and the cap of
+// the sync response body relayed back to the third party
+const MAX_WEBHOOK_BODY_BYTES = 256 * 1024;
+const MAX_WEBHOOK_RESPONSE_BODY_BYTES = 64 * 1024;
+// a sync response can express client errors but never a server identity
+// (5xx would let the integration make Gladys Plus look broken)
+const WEBHOOK_RESPONSE_MIN_STATUS = 200;
+const WEBHOOK_RESPONSE_MAX_STATUS = 499;
 
 module.exports = {
   EXTERNAL_INTEGRATION_LABEL,
@@ -218,4 +237,12 @@ module.exports = {
   MAX_TRANSPORT_MESSAGE_LENGTH,
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
+  MAX_WEBHOOKS,
+  WEBHOOK_MODES,
+  WEBHOOK_DEFAULT_MODE,
+  OPEN_API_KEY_CONFIG_KEY,
+  MAX_WEBHOOK_BODY_BYTES,
+  MAX_WEBHOOK_RESPONSE_BODY_BYTES,
+  WEBHOOK_RESPONSE_MIN_STATUS,
+  WEBHOOK_RESPONSE_MAX_STATUS,
 };

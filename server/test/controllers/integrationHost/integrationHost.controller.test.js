@@ -475,6 +475,36 @@ describe('Integration host API', () => {
     });
   });
 
+  describe('GET /api/integration/v1/webhook', () => {
+    it('should return the declared webhooks with their availability', async () => {
+      const webhooksService = await seedExternalService({
+        name: 'ext-dev-netatmo-demo',
+        selector: 'ext-dev-netatmo-demo',
+        manifest: {
+          ...TEST_MANIFEST,
+          webhooks: [{ key: 'events', label: { en: 'Netatmo events' } }],
+        },
+      });
+      const webhooksToken = generateIntegrationToken(webhooksService.id, 1, 'secret');
+      const res = await integrationRequest(webhooksToken)
+        .get('/api/integration/v1/webhook')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      // no Gladys Plus nor Open API key in tests: degraded to poll only
+      expect(res.body).to.deep.equal({
+        available: false,
+        webhooks: [{ key: 'events', mode: 'fire_and_forget', url: null }],
+      });
+    });
+
+    it('should return an empty list without any declared webhook', async () => {
+      const res = await integrationRequest(token)
+        .get('/api/integration/v1/webhook')
+        .expect(200);
+      expect(res.body).to.deep.equal({ available: false, webhooks: [] });
+    });
+  });
+
   describe('/api/integration/v1/container', () => {
     const CONTAINERS_MANIFEST = {
       ...TEST_MANIFEST,

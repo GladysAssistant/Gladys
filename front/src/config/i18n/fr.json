@@ -733,7 +733,9 @@
         "networkDiscoveryText": "Cette intégration demande à Gladys de capturer pour elle les annonces réseau suivantes. Elle ne pourra jamais rien capturer d'autre.",
         "documentationLink": "Documentation",
         "duplicateWarningTitle": "Une autre instance est déjà installée",
-        "duplicateWarningText": "« {name} » semble être une autre instance de cette intégration. Deux instances peuvent se disputer le même compte cloud ou les mêmes appareils — pensez à arrêter l'instance existante pendant vos tests. Installer quand même est un usage supporté (ex. une version dev à côté de la prod)."
+        "duplicateWarningText": "« {name} » semble être une autre instance de cette intégration. Deux instances peuvent se disputer le même compte cloud ou les mêmes appareils — pensez à arrêter l'instance existante pendant vos tests. Installer quand même est un usage supporté (ex. une version dev à côté de la prod).",
+        "webhooksTitle": "Webhooks Internet (Gladys Plus)",
+        "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -799,6 +801,17 @@
           "gpu": "GPU (accélération graphique)",
           "video": "Caméras (périphériques vidéo)"
         }
+      },
+      "webhooks": {
+        "title": "Webhooks Gladys Plus",
+        "plusRequiredText": "Cette intégration peut recevoir des événements depuis Internet via Gladys Plus. Liez votre compte Gladys Plus dans les Réglages pour activer les webhooks ; sans cela, l'intégration fonctionne uniquement en mode interrogation périodique.",
+        "explanationText": "Créez une clé Open API dans Gladys Plus (Réglages → Open API), puis collez-la ici. Gladys construit les URLs de webhook et l'intégration les enregistre auprès du service tiers.",
+        "openApiKeyLabel": "Clé Open API Gladys Plus",
+        "openApiKeyPlaceholder": "Collez votre clé Open API",
+        "saveKeyButton": "Enregistrer",
+        "saveKeyError": "Une erreur est survenue lors de l'enregistrement de la clé Open API.",
+        "notAvailableText": "Les webhooks ne sont pas encore actifs : enregistrez votre clé Open API pour les activer.",
+        "urlsText": "URLs de webhook (l'intégration les enregistre automatiquement quand c'est possible ; certains services demandent de les coller dans la console du fabricant). Ces URLs contiennent votre clé : ne les partagez qu'avec le service tiers."
       }
     },
     "energyMonitoring": {

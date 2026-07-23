@@ -679,6 +679,11 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.getContacts,
     },
+    'get /api/integration/v1/webhook': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getWebhooks,
+    },
     'get /api/integration/v1/container': {
       authenticated: false,
       externalIntegrationAuth: true,

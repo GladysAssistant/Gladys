@@ -815,6 +815,44 @@ describe('externalIntegration.validateManifest', () => {
     });
   });
 
+  it('should accept a valid webhooks declaration', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      webhooks: [
+        { key: 'events', label: { en: 'Netatmo events' } },
+        { key: 'callback', label: { en: 'Subscription callback', fr: "Rappel d'abonnement" }, mode: 'sync' },
+        { key: 'status', label: { en: 'Status' }, mode: 'fire_and_forget' },
+      ],
+    };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should reject a malformed webhooks declaration', () => {
+    const webhook = { key: 'events', label: { en: 'Events' } };
+    expect422({ ...TEST_MANIFEST, webhooks: [] }, 'webhooks: must be a list of 1-3 webhooks');
+    expect422({ ...TEST_MANIFEST, webhooks: 'events' }, 'webhooks: must be a list of 1-3 webhooks');
+    expect422(
+      { ...TEST_MANIFEST, webhooks: [webhook, webhook, webhook, webhook] },
+      'webhooks: must be a list of 1-3 webhooks',
+    );
+    expect422({ ...TEST_MANIFEST, webhooks: ['events'] }, 'webhooks[0]: must be an object');
+    expect422({ ...TEST_MANIFEST, webhooks: [{ ...webhook, url: 'https://x' }] }, 'webhooks[0].url: unknown field');
+    expect422(
+      { ...TEST_MANIFEST, webhooks: [{ label: { en: 'Events' } }] },
+      'webhooks[0].key: must be a non-empty string matching [a-z0-9_]',
+    );
+    expect422(
+      { ...TEST_MANIFEST, webhooks: [{ key: 'BAD-KEY', label: { en: 'Events' } }] },
+      'webhooks[0].key: must be a non-empty string matching [a-z0-9_]',
+    );
+    expect422({ ...TEST_MANIFEST, webhooks: [webhook, webhook] }, 'webhooks[1].key: duplicate key "events"');
+    expect422({ ...TEST_MANIFEST, webhooks: [{ key: 'events' }] }, 'webhooks[0].label: must be an object');
+    expect422(
+      { ...TEST_MANIFEST, webhooks: [{ ...webhook, mode: 'async' }] },
+      'webhooks[0].mode: must be one of fire_and_forget, sync',
+    );
+  });
+
   it('should reject unknown fields and empty values in select options', () => {
     expect422(
       {

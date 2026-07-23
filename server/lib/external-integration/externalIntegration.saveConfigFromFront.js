@@ -3,7 +3,8 @@ const { BadParameters } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
 const { hasDualTransports } = require('./externalIntegration.getIntegrationConfig');
-const { PREFER_LOCAL_CONFIG_KEY } = require('./constants');
+const { hasWebhooks } = require('./externalIntegration.getWebhooks');
+const { PREFER_LOCAL_CONFIG_KEY, OPEN_API_KEY_CONFIG_KEY } = require('./constants');
 
 /**
  * @description Save the config coming from the frontend Configuration screen
@@ -34,6 +35,20 @@ async function saveConfigFromFront(selector, config) {
       valuesToSave[key] = config[key];
       return;
     }
+    // the Gladys Plus Open API key feeding the webhook relay is a reserved
+    // secret outside the schema too, only meaningful when the manifest
+    // declares webhooks (user-pasted; writable from the front only)
+    if (key === OPEN_API_KEY_CONFIG_KEY && hasWebhooks(service.manifest)) {
+      if (config[key] === null) {
+        // secret semantics: null means unchanged
+        return;
+      }
+      if (typeof config[key] !== 'string' || config[key].length === 0) {
+        throw new Error422(`config.${key}: must be a non-empty string`);
+      }
+      valuesToSave[key] = config[key];
+      return;
+    }
     const field = configSchema.find((schemaField) => schemaField.key === key);
     if (!field) {
       throw new Error422(`config.${key}: unknown config key`);
@@ -56,6 +71,15 @@ async function saveConfigFromFront(selector, config) {
   // never echoed for a POST /config of the integration itself)
   const fullConfig = await this.getIntegrationConfig(service);
   this.sendMessage(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONFIG_UPDATED, { config: fullConfig });
+  if (Object.prototype.hasOwnProperty.call(valuesToSave, OPEN_API_KEY_CONFIG_KEY)) {
+    // the webhook URLs contain the key: a new key means new URLs, the
+    // integration re-registers them at the third party
+    this.sendMessage(
+      service,
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEBHOOK_UPDATED,
+      await this.getWebhooks(service),
+    );
+  }
   return this.getConfigForFront(selector);
 }
 

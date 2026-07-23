@@ -40,6 +40,7 @@ module.exports = function ExternalIntegrationController(gladys) {
       connection_status: gladys.externalIntegration.getConnectionStatus(integration.id),
       started_at: await gladys.externalIntegration.getContainerStartedAt(integration),
       docs: gladys.externalIntegration.getDocsUrls(integration),
+      webhooks: await gladys.externalIntegration.getWebhooks(integration),
       containers,
     });
   }

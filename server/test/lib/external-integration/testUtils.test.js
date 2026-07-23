@@ -75,6 +75,17 @@ const TEST_COMMUNICATION_MANIFEST = {
   gladys_version: '>=4.62.0',
 };
 
+// Netatmo-like fixture: inbound webhooks relayed by the Gladys Plus
+// gateway — one fire-and-forget event stream (default mode) and one sync
+// challenge/response registration callback.
+const TEST_WEBHOOKS_MANIFEST = {
+  ...TEST_MANIFEST,
+  webhooks: [
+    { key: 'events', label: { en: 'Netatmo events' } },
+    { key: 'callback', label: { en: 'Subscription callback' }, mode: 'sync' },
+  ],
+};
+
 // Frigate-like fixture: one manual sub-container (Mosquitto pattern: the
 // password file is generated in /data before the first start) and one auto
 // sub-container with volumes, a published port and hardware classes.
@@ -205,6 +216,7 @@ module.exports = {
   TEST_JWT_SECRET,
   TEST_MANIFEST,
   TEST_COMMUNICATION_MANIFEST,
+  TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_DETECTED_CLASSES,
   buildFakeSystem,

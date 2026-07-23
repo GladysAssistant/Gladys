@@ -100,6 +100,15 @@
         "enum": ["local", "cloud"]
       },
       "description": "Channels the integration knows how to use. When both are declared, Gladys renders the standard core-translated \"Prefer local (LAN) connection\" toggle, stored as the reserved GLADYS_PREFER_LOCAL config key (boolean, default true) — readable by the integration, never writable by it. The preference is a wish; the per-device reality is reported through the GLADYS_TRANSPORT param."
+    },
+    "webhooks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "description": "Inbound webhooks relayed by the generic Gladys Plus gateway route (shown on the install screen). fire_and_forget (default): the third party only wants an ack — immediate 200, asynchronous lossy relay (a webhook is a trigger, the poll stays the source of truth). sync: the integration's response (status/content_type/body) is relayed back to the caller (challenge/response registration providers).",
+      "items": {
+        "$ref": "#/definitions/webhook"
+      }
     }
   },
   "definitions": {
@@ -569,6 +578,27 @@
           "items": {
             "$ref": "#/definitions/configField"
           }
+        }
+      }
+    },
+    "webhook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "description": "Unique key of the webhook, last segment of the relayed URL."
+        },
+        "label": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["fire_and_forget", "sync"],
+          "default": "fire_and_forget",
+          "description": "fire_and_forget: immediate 200 to the caller, asynchronous relay without ack. sync: the integration's response is relayed back to the caller."
         }
       }
     }

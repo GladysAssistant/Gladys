@@ -10,6 +10,7 @@ import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses } from 
 import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
+import WebhooksSummary from '../components/WebhooksSummary';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 
@@ -242,6 +243,8 @@ class ExternalIntegrationInstallPage extends Component {
                             )}
 
                             <NetworkDiscoverySummary networkDiscovery={manifest.network_discovery} />
+
+                            <WebhooksSummary webhooks={manifest.webhooks} language={language} />
 
                             {duplicateOfInstalled && (
                               <div class="alert alert-warning">

@@ -1,5 +1,6 @@
-const { PREFER_LOCAL_CONFIG_KEY } = require('./constants');
+const { PREFER_LOCAL_CONFIG_KEY, OPEN_API_KEY_CONFIG_KEY } = require('./constants');
 const { hasDualTransports } = require('./externalIntegration.getIntegrationConfig');
+const { hasWebhooks } = require('./externalIntegration.getWebhooks');
 
 /**
  * @description Get the config of an integration for the frontend
@@ -42,6 +43,14 @@ async function getConfigForFront(selector) {
   });
   if (preferLocal !== undefined) {
     config[PREFER_LOCAL_CONFIG_KEY] = preferLocal;
+  }
+  if (hasWebhooks(service.manifest)) {
+    // the Gladys Plus Open API key is a reserved secret outside the
+    // schema: never echoed back, only the "configured" flag
+    config[OPEN_API_KEY_CONFIG_KEY] = null;
+    if (Object.prototype.hasOwnProperty.call(fullConfig, OPEN_API_KEY_CONFIG_KEY)) {
+      configuredSecrets.push(OPEN_API_KEY_CONFIG_KEY);
+    }
   }
   return {
     config,

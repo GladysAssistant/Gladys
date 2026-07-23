@@ -33,6 +33,7 @@ class ExternalIntegrationConfigPage extends Component {
       if (get(integration, 'manifest.type') === 'communication') {
         await this.loadContact();
       }
+      await this.loadGatewayStatus(integration);
       await this.loadDynamicOptions(integration);
       await this.loadHardwareDetection(integration);
     } catch (e) {
@@ -124,6 +125,45 @@ class ExternalIntegrationConfigPage extends Component {
       this.setState({ contact });
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  loadGatewayStatus = async integration => {
+    // the webhooks block needs to know whether Gladys Plus is linked:
+    // without it, an explanatory message replaces the key input
+    if ((get(integration, 'manifest.webhooks') || []).length === 0) {
+      return;
+    }
+    try {
+      const gatewayStatus = await this.props.httpClient.get('/api/v1/gateway/status');
+      this.setState({ gatewayStatus });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  updateOpenApiKey = e => {
+    this.setState({ openApiKeyValue: e.target.value, openApiKeyStatus: null });
+  };
+
+  saveOpenApiKey = async () => {
+    this.setState({ openApiKeyStatus: RequestStatus.Getting });
+    try {
+      const configResponse = await this.props.httpClient.post(
+        `/api/v1/external_integration/${this.props.selector}/config`,
+        { config: { GLADYS_OPEN_API_KEY: this.state.openApiKeyValue } }
+      );
+      // the webhook URLs contain the key: refresh the detail to get them
+      const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
+      this.setState({
+        integration,
+        configuredSecrets: configResponse.configured_secrets || [],
+        openApiKeyValue: '',
+        openApiKeyStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      console.error(e);
+      this.setState({ openApiKeyStatus: RequestStatus.Error });
     }
   };
 
@@ -377,6 +417,8 @@ class ExternalIntegrationConfigPage extends Component {
           runAction={this.runAction}
           generateLinkCode={this.generateLinkCode}
           unlinkContact={this.unlinkContact}
+          updateOpenApiKey={this.updateOpenApiKey}
+          saveOpenApiKey={this.saveOpenApiKey}
           toggleHardwareClass={this.toggleHardwareClass}
           saveHardware={this.saveHardware}
         />

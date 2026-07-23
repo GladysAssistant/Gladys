@@ -733,7 +733,9 @@
         "networkDiscoveryText": "Diese Integration bittet Gladys, die folgenden Netzwerkankündigungen für sie zu erfassen. Sie kann niemals etwas anderes erfassen.",
         "documentationLink": "Dokumentation",
         "duplicateWarningTitle": "Eine andere Instanz ist bereits installiert",
-        "duplicateWarningText": "„{name}“ scheint eine weitere Instanz dieser Integration zu sein. Zwei Instanzen können sich um dasselbe Cloud-Konto oder dieselben Geräte streiten — stoppen Sie die bestehende Instanz während Ihrer Tests. Die Installation ist dennoch möglich (z. B. eine Dev-Version neben der Produktion)."
+        "duplicateWarningText": "„{name}“ scheint eine weitere Instanz dieser Integration zu sein. Zwei Instanzen können sich um dasselbe Cloud-Konto oder dieselben Geräte streiten — stoppen Sie die bestehende Instanz während Ihrer Tests. Die Installation ist dennoch möglich (z. B. eine Dev-Version neben der Produktion).",
+        "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
+        "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
@@ -799,6 +801,17 @@
           "gpu": "GPU (Grafikbeschleunigung)",
           "video": "Kameras (Videogeräte)"
         }
+      },
+      "webhooks": {
+        "title": "Gladys-Plus-Webhooks",
+        "plusRequiredText": "Diese Integration kann Ereignisse aus dem Internet über Gladys Plus empfangen. Verknüpfen Sie Ihr Gladys-Plus-Konto in den Einstellungen, um Webhooks zu aktivieren; andernfalls arbeitet die Integration nur im Abfragemodus.",
+        "explanationText": "Erstellen Sie einen Open-API-Schlüssel in Gladys Plus (Einstellungen → Open API) und fügen Sie ihn hier ein. Gladys erstellt die Webhook-URLs und die Integration registriert sie beim Drittanbieterdienst.",
+        "openApiKeyLabel": "Gladys-Plus-Open-API-Schlüssel",
+        "openApiKeyPlaceholder": "Fügen Sie Ihren Open-API-Schlüssel ein",
+        "saveKeyButton": "Speichern",
+        "saveKeyError": "Beim Speichern des Open-API-Schlüssels ist ein Fehler aufgetreten.",
+        "notAvailableText": "Die Webhooks sind noch nicht aktiv: Speichern Sie Ihren Open-API-Schlüssel, um sie zu aktivieren.",
+        "urlsText": "Webhook-URLs (die Integration registriert sie automatisch, wenn möglich; manche Dienste verlangen das Einfügen in die Anbieterkonsole). Diese URLs enthalten Ihren Schlüssel: Teilen Sie sie nur mit dem Drittanbieterdienst."
       }
     },
     "telegram": {

@@ -5,6 +5,7 @@ import get from 'get-value';
 import ConfigSchemaForm from './ConfigSchemaForm';
 import ActionsCard from './ActionsCard';
 import LinkAccountCard from './LinkAccountCard';
+import WebhooksCard from './WebhooksCard';
 import HardwareCard from './HardwareCard';
 import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -13,6 +14,7 @@ const ConfigTab = props => {
   const { integration, loadStatus, user } = props;
   const schema = get(integration, 'manifest.config_schema') || [];
   const actions = get(integration, 'manifest.actions') || [];
+  const manifestWebhooks = get(integration, 'manifest.webhooks') || [];
   const transports = get(integration, 'manifest.transports') || [];
   const hasDualTransports = transports.includes('local') && transports.includes('cloud');
   const language = (user && user.language) || 'en';
@@ -111,6 +113,20 @@ const ConfigTab = props => {
           linkStatus={props.linkStatus}
           onGenerateCode={props.generateLinkCode}
           onUnlink={props.unlinkContact}
+        />
+      )}
+
+      {integration && manifestWebhooks.length > 0 && (
+        <WebhooksCard
+          manifestWebhooks={manifestWebhooks}
+          webhooks={get(integration, 'webhooks')}
+          gatewayStatus={props.gatewayStatus}
+          keyConfigured={(props.configuredSecrets || []).includes('GLADYS_OPEN_API_KEY')}
+          openApiKeyValue={props.openApiKeyValue}
+          openApiKeyStatus={props.openApiKeyStatus}
+          language={language}
+          onOpenApiKeyInput={props.updateOpenApiKey}
+          onSaveOpenApiKey={props.saveOpenApiKey}
         />
       )}
 

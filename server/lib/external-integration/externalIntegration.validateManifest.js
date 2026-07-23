@@ -22,6 +22,8 @@ const {
   ACTION_MIN_TIMEOUT_SECONDS,
   ACTION_MAX_TIMEOUT_SECONDS,
   MANIFEST_TRANSPORTS,
+  MAX_WEBHOOKS,
+  WEBHOOK_MODES,
 } = require('./constants');
 
 // These rules are the exact mirror of the canonical manifest schema owned by
@@ -42,6 +44,7 @@ const MANIFEST_FIELDS = [
   'network_discovery',
   'actions',
   'transports',
+  'webhooks',
 ];
 const SUB_CONTAINER_FIELDS = [
   'name',
@@ -60,6 +63,9 @@ const SUB_CONTAINER_FIELDS = [
 const PORT_FIELDS = ['container_port', 'protocol', 'label'];
 const PORT_PROTOCOLS = ['tcp', 'udp'];
 const ACTION_FIELDS = ['key', 'label', 'description', 'timeout_seconds', 'fields'];
+// inbound webhooks via Gladys Plus (B.17): shown on the install screen
+// ("will be able to receive events from the Internet via Gladys Plus")
+const WEBHOOK_FIELDS = ['key', 'label', 'mode'];
 // per capture type: the required specific field + its rules. The entries
 // are an authorization contract (same philosophy as hardware requests):
 // shown on the install screen, no arbitrary capture ever.
@@ -424,6 +430,42 @@ function validateAction(action, index, seenKeys, errors) {
 }
 
 /**
+ * @description Validate one entry of the manifest webhooks list: an inbound
+ * webhook relayed by Gladys Plus. `fire_and_forget` (default) answers the
+ * third party immediately and relays asynchronously; `sync` relays the
+ * integration's own response to the caller (challenge/response providers).
+ * @param {object} webhook - The webhook to validate.
+ * @param {number} index - Index of the webhook in the list.
+ * @param {Set} seenKeys - Webhook keys already seen, to detect duplicates.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateWebhook({ key: 'events', label: { en: 'Netatmo events' } }, 0, seenKeys, errors);
+ */
+function validateWebhook(webhook, index, seenKeys, errors) {
+  const path = `webhooks[${index}]`;
+  if (webhook === null || typeof webhook !== 'object' || Array.isArray(webhook)) {
+    errors.push(`${path}: must be an object`);
+    return;
+  }
+  Object.keys(webhook).forEach((key) => {
+    if (!WEBHOOK_FIELDS.includes(key)) {
+      errors.push(`${path}.${key}: unknown field`);
+    }
+  });
+  if (typeof webhook.key !== 'string' || !CONFIG_KEY_REGEX.test(webhook.key)) {
+    errors.push(`${path}.key: must be a non-empty string matching [a-z0-9_]`);
+  } else if (seenKeys.has(webhook.key)) {
+    errors.push(`${path}.key: duplicate key "${webhook.key}"`);
+  } else {
+    seenKeys.add(webhook.key);
+  }
+  validateMultiLanguageText(webhook.label, `${path}.label`, errors);
+  if (webhook.mode !== undefined && !WEBHOOK_MODES.includes(webhook.mode)) {
+    errors.push(`${path}.mode: must be one of ${WEBHOOK_MODES.join(', ')}`);
+  }
+}
+
+/**
  * @description Validate one entry of the network_discovery capture list.
  * @param {object} entry - The capture request to validate.
  * @param {number} index - Index of the entry in the list.
@@ -705,6 +747,16 @@ function validateManifest(manifest) {
     } else {
       const seenActionKeys = new Set();
       manifest.actions.forEach((action, index) => validateAction(action, index, seenActionKeys, errors));
+    }
+  }
+  if (manifest.webhooks !== undefined) {
+    const invalidWebhooksList =
+      !Array.isArray(manifest.webhooks) || manifest.webhooks.length === 0 || manifest.webhooks.length > MAX_WEBHOOKS;
+    if (invalidWebhooksList) {
+      errors.push(`webhooks: must be a list of 1-${MAX_WEBHOOKS} webhooks`);
+    } else {
+      const seenWebhookKeys = new Set();
+      manifest.webhooks.forEach((webhook, index) => validateWebhook(webhook, index, seenWebhookKeys, errors));
     }
   }
   if (manifest.transports !== undefined) {

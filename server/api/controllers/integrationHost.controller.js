@@ -209,6 +209,30 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {get} /api/integration/v1/webhook getWebhooks
+   * @apiName getWebhooks
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The declared inbound webhooks (Gladys Plus relay) with
+   * their availability and ready-to-register URLs. `available: false`
+   * (Gladys Plus not linked, or Open API key not pasted yet) -> the
+   * integration degrades to poll only. A webhook is a trigger, not a data
+   * source: refresh through the vendor API on reception, never apply the
+   * payload as a state. The webhook-updated WebSocket event signals
+   * availability changes; resync at every reconnection.
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "available": true,
+   *   "webhooks": [
+   *     { "key": "events", "mode": "fire_and_forget", "url": "https://api.gladysgateway.com/v1/api/external-integration/xxx/ext-netatmo/events" }
+   *   ]
+   * }
+   */
+  async function getWebhooks(req, res) {
+    const webhooks = await gladys.externalIntegration.getWebhooks(req.externalIntegrationService);
+    res.json(webhooks);
+  }
+
+  /**
    * @api {get} /api/integration/v1/container getContainers
    * @apiName getContainers
    * @apiGroup IntegrationHostApi
@@ -276,6 +300,7 @@ module.exports = function IntegrationHostController(gladys) {
     publishMessage: asyncMiddleware(publishMessage),
     linkContact: asyncMiddleware(linkContact),
     getContacts: asyncMiddleware(getContacts),
+    getWebhooks: asyncMiddleware(getWebhooks),
     getContainers: asyncMiddleware(getContainers),
     startContainer: asyncMiddleware(startContainer),
     stopContainer: asyncMiddleware(stopContainer),

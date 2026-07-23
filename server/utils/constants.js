@@ -331,6 +331,8 @@ const EVENTS = {
     RESTORE_BACKUP: 'gateway.restore-backup',
     NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
     NEW_MESSAGE_OWNTRACKS_LOCATION: 'gateway.new-message-owntracks-location',
+    NEW_MESSAGE_EXTERNAL_INTEGRATION_WEBHOOK: 'gateway.new-message-external-integration-webhook',
+    LINK_STATUS_CHANGED: 'gateway.link-status-changed',
     USER_KEYS_CHANGED: 'gateway.user-keys-changed',
     SEND_WEEKLY_DIGEST: 'gateway.send-weekly-digest',
   },
@@ -1578,6 +1580,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ACTION_RUN: 'external-integration.action.run',
     CAMERA_GET_IMAGE: 'external-integration.camera.get-image',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
+    WEBHOOK_RECEIVED: 'external-integration.webhook.received',
+    WEBHOOK_REQUEST: 'external-integration.webhook.request',
+    WEBHOOK_UPDATED: 'external-integration.webhook-updated',
   },
 };
 

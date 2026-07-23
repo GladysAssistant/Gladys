@@ -733,7 +733,9 @@
         "networkDiscoveryText": "This integration asks Gladys to capture the following network announcements on its behalf. It will never be able to capture anything else.",
         "documentationLink": "Documentation",
         "duplicateWarningTitle": "Another instance is already installed",
-        "duplicateWarningText": "\"{name}\" looks like another instance of this integration. Two instances may fight over the same cloud account or the same devices — consider stopping the existing one during your tests. Installing anyway is supported (e.g. a dev build next to the production one)."
+        "duplicateWarningText": "\"{name}\" looks like another instance of this integration. Two instances may fight over the same cloud account or the same devices — consider stopping the existing one during your tests. Installing anyway is supported (e.g. a dev build next to the production one).",
+        "webhooksTitle": "Internet webhooks (Gladys Plus)",
+        "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
@@ -799,6 +801,17 @@
           "gpu": "GPU (graphics acceleration)",
           "video": "Cameras (video devices)"
         }
+      },
+      "webhooks": {
+        "title": "Gladys Plus webhooks",
+        "plusRequiredText": "This integration can receive events from the Internet through Gladys Plus. Link your Gladys Plus account in Settings to enable webhooks; without it, the integration works in polling mode only.",
+        "explanationText": "Create an Open API key in Gladys Plus (Settings → Open API), then paste it here. Gladys builds the webhook URLs and the integration registers them with the third-party service.",
+        "openApiKeyLabel": "Gladys Plus Open API key",
+        "openApiKeyPlaceholder": "Paste your Open API key",
+        "saveKeyButton": "Save",
+        "saveKeyError": "There was an error saving the Open API key.",
+        "notAvailableText": "Webhooks are not active yet: save your Open API key to activate them.",
+        "urlsText": "Webhook URLs (the integration registers them automatically when possible; some services require pasting them in the vendor console). These URLs contain your key: share them only with the third-party service."
       }
     },
     "telegram": {

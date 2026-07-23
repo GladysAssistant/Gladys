@@ -97,6 +97,18 @@ describe('External integration admin API', () => {
       await authenticatedRequest.get('/api/v1/external_integration/ext-unknown').expect(404);
     });
 
+    it('should expose the webhooks with their availability in the detail', async () => {
+      const service = await seedExternalService({
+        manifest: { ...TEST_MANIFEST, webhooks: [{ key: 'events', label: { en: 'Netatmo events' } }] },
+      });
+      const res = await authenticatedRequest.get(`/api/v1/external_integration/${service.selector}`).expect(200);
+      // no Gladys Plus nor Open API key in tests: unavailable, null URLs
+      expect(res.body.webhooks).to.deep.equal({
+        available: false,
+        webhooks: [{ key: 'events', mode: 'fire_and_forget', url: null }],
+      });
+    });
+
     it('should expose the re-hosted docs urls in the detail', async () => {
       const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo' });
       const docs = {
