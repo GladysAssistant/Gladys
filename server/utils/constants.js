@@ -637,8 +637,10 @@ const DEVICE_FEATURE_CATEGORIES = {
   ENERGY_SENSOR: 'energy-sensor',
   ENERGY_PRODUCTION_SENSOR: 'energy-production-sensor',
   FAN: 'fan',
+  GRID_SENSOR: 'grid-sensor',
   HEATER: 'heater',
   HEPA_FILTER_MONITORING: 'hepa-filter-monitoring',
+  HOME_OUTPUT_SENSOR: 'home-output-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
   LEAK_SENSOR: 'leak-sensor',
   LIGHT: 'light',
@@ -842,11 +844,25 @@ const DEVICE_FEATURE_TYPES = {
     THIRTY_MINUTES_CONSUMPTION_COST: 'thirty-minutes-consumption-cost',
   },
   ENERGY_PRODUCTION_SENSOR: {
+    POWER: 'power', // instantaneous production power, in W (>= 0)
     INDEX: 'index',
     DAILY_PRODUCTION: 'daily-production',
     DAILY_PRODUCTION_REVENUE: 'daily-production-revenue',
     THIRTY_MINUTES_PRODUCTION: 'thirty-minutes-production',
     THIRTY_MINUTES_PRODUCTION_REVENUE: 'thirty-minutes-production-revenue',
+  },
+  GRID_SENSOR: {
+    INPUT_POWER: 'input-power', // instantaneous power imported from the grid, W (>= 0)
+    OUTPUT_POWER: 'output-power', // instantaneous power exported to the grid, W (>= 0)
+    POWER: 'power', // signed grid exchange when the device reports a single value (import > 0, export < 0), W
+    INPUT_INDEX: 'input-index', // cumulative imported-energy meter index, kWh (>= 0)
+    OUTPUT_INDEX: 'output-index', // cumulative exported-energy meter index, kWh (>= 0)
+  },
+  HOME_OUTPUT_SENSOR: {
+    POWER: 'power', // instantaneous power delivered to the home, W (>= 0)
+    INDEX: 'index', // cumulative delivered-energy meter index, kWh (>= 0)
+    OFF_GRID_POWER: 'off-grid-power', // instantaneous power on the backup/off-grid output, W (>= 0)
+    OFF_GRID_INDEX: 'off-grid-index', // cumulative backup-output energy meter index, kWh (>= 0)
   },
   TELEINFORMATION: {
     BINARY: 'binary',
@@ -1263,6 +1279,25 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
     DEVICE_FEATURE_UNITS.EURO,
     DEVICE_FEATURE_UNITS.DOLLAR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR]: [
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.WATT_HOUR,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.EURO,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.GRID_SENSOR]: [
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.WATT_HOUR,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR]: [
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.WATT_HOUR,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   ],
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_BATTERY]: [
     DEVICE_FEATURE_UNITS.CELSIUS,
