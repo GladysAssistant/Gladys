@@ -4520,6 +4520,15 @@
       "thirty-minutes-production": "Production 30 minutes",
       "thirty-minutes-production-revenue": "Revenu 30 minutes"
     },
+    "battery-storage": {
+      "shortCategoryName": "Batterie de stockage",
+      "battery-level": "Niveau de batterie",
+      "charge-power": "Puissance de charge",
+      "discharge-power": "Puissance de décharge",
+      "charge-index": "Index de charge",
+      "discharge-index": "Index de décharge",
+      "battery-energy-remaining": "Énergie restante en batterie"
+    },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",
       "binary": "Relais",
