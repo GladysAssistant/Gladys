@@ -26,6 +26,7 @@ async function init() {
 
         // Add to queue
         await this.calculateConsumptionFromIndexThirtyMinutes(now);
+        await this.calculateProductionFromIndexThirtyMinutes(now);
         await this.calculateCostEveryThirtyMinutes(now);
       },
     );

@@ -1616,6 +1616,8 @@ const JOB_TYPES = {
   ENERGY_MONITORING_COST_CALCULATION_BEGINNING: 'energy-monitoring-cost-calculation-beginning',
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_THIRTY_MINUTES: 'energy-monitoring-consumption-from-index-thirty-minutes',
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING: 'energy-monitoring-consumption-from-index-beginning',
+  ENERGY_MONITORING_PRODUCTION_FROM_INDEX_THIRTY_MINUTES: 'energy-monitoring-production-from-index-thirty-minutes',
+  ENERGY_MONITORING_PRODUCTION_FROM_INDEX_BEGINNING: 'energy-monitoring-production-from-index-beginning',
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
 };
