@@ -1053,6 +1053,353 @@ describe('build schemas', () => {
     expect(turnOnResult.content[0].text).to.eq('device.turn-on command sent for Light Without Room');
   });
 
+  it('should expose device.get-energy-consumption for energy monitoring devices', async () => {
+    const rooms = [{ id: 'room-1', name: 'Salon', selector: 'salon' }];
+
+    const devices = [
+      {
+        selector: 'prise-onduleur',
+        name: 'Prise onduleur',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 'feature-consumption',
+            selector: 'prise-onduleur-thirty-minutes-consumption',
+            name: 'Consommation',
+            category: 'energy-sensor',
+            type: 'thirty-minutes-consumption',
+            unit: 'watt-hour',
+            keep_history: true,
+          },
+          {
+            id: 'feature-cost',
+            selector: 'prise-onduleur-thirty-minutes-consumption-cost',
+            name: 'Coût',
+            category: 'energy-sensor',
+            type: 'thirty-minutes-consumption-cost',
+            unit: 'euro',
+            energy_parent_id: 'feature-consumption',
+            keep_history: true,
+          },
+        ],
+      },
+      {
+        selector: 'prise-tele',
+        name: 'Prise télé',
+        room: { selector: 'salon', name: 'Salon' },
+        features: [
+          {
+            id: 'feature-tele-consumption',
+            selector: 'prise-tele-thirty-minutes-consumption',
+            name: 'Consommation',
+            category: 'energy-sensor',
+            type: 'thirty-minutes-consumption',
+            unit: 'watt-hour',
+            keep_history: true,
+          },
+        ],
+      },
+    ];
+
+    const getConsumptionByDates = stub().resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [{ created_at: '2026-07-12T00:00:00.000Z', value: 0.05, sum_value: 2.345678, count_value: 48 }],
+      },
+    ]);
+
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+      })),
+      findBySimilarity,
+      gladys: {
+        room: {
+          getAll: stub().resolves(rooms),
+        },
+        user: {
+          get: stub().resolves([{ id: 'user-1', name: 'John', selector: 'john' }]),
+        },
+        house: {
+          get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]),
+        },
+        calendar: {
+          get: stub().resolves([]),
+        },
+        area: {
+          get: stub().resolves([]),
+        },
+        scene: {
+          get: stub().resolves([]),
+          create: stub(),
+        },
+        device: {
+          get: stub().resolves(devices),
+          getBySelector: stub().callsFake((selector) => {
+            return Promise.resolve(devices.find((d) => d.selector === selector));
+          }),
+          setValue: stub().resolves(),
+          energySensorManager: {
+            getConsumptionByDates,
+          },
+          camera: {
+            getImagesInRoom: stub().resolves([]),
+          },
+        },
+        event: {
+          emit: fake(),
+        },
+      },
+      levenshtein: {
+        distance: stub().returns(4),
+      },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const energyTool = tools.find((tool) => tool.intent === 'device.get-energy-consumption');
+
+    expect(energyTool).to.not.eq(undefined);
+    expect(energyTool.config.categories).to.deep.equal([
+      AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY,
+      AI_CHAT_TOOL_CATEGORIES.OTHER,
+    ]);
+
+    // Consumption in kWh for a single day: uses the consumption feature.
+    const kwhResult = await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-07-12',
+      end_date: '2026-07-12',
+      unit: 'kwh',
+    });
+    expect(getConsumptionByDates.callCount).to.eq(1);
+    expect(getConsumptionByDates.firstCall.args[0]).to.deep.equal(['prise-onduleur-thirty-minutes-consumption']);
+    expect(getConsumptionByDates.firstCall.args[1]).to.deep.equal({
+      from: new Date(2026, 6, 12),
+      to: new Date(2026, 6, 13),
+      group_by: 'day',
+      display_mode: 'kwh',
+    });
+    expect(kwhResult.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.lastCall.args[0]).to.deep.equal({
+      device: 'Prise onduleur',
+      feature: 'Consommation',
+      unit: 'kWh',
+      start_date: '2026-07-12',
+      end_date: '2026-07-12',
+      group_by: 'day',
+      total: 2.346,
+      values: [{ date: '2026-07-12T00:00:00.000Z', value: 2.346 }],
+    });
+
+    // Cost in currency for a full month: uses the cost feature and includes the
+    // home subscription as a separate entry.
+    getConsumptionByDates.resetHistory();
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Abonnement',
+          currency_unit: 'euro',
+          is_subscription: true,
+        },
+        values: [
+          { created_at: '2026-06-01T00:00:00.000Z', value: 0.42, sum_value: 0.42 },
+          { created_at: '2026-06-02T00:00:00.000Z', value: 0.42, sum_value: 0.42 },
+        ],
+      },
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Coût',
+          selector: 'prise-onduleur-thirty-minutes-consumption-cost',
+          currency_unit: 'euro',
+        },
+        values: [
+          { created_at: '2026-06-01T00:00:00.000Z', value: 0.1, sum_value: 1.234567 },
+          { created_at: '2026-06-02T00:00:00.000Z', value: 0.1, sum_value: 2.1 },
+        ],
+      },
+    ]);
+
+    const currencyResult = await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-06-01',
+      end_date: '2026-06-30',
+      unit: 'currency',
+    });
+    expect(getConsumptionByDates.callCount).to.eq(1);
+    expect(getConsumptionByDates.firstCall.args[0]).to.deep.equal(['prise-onduleur-thirty-minutes-consumption-cost']);
+    expect(getConsumptionByDates.firstCall.args[1]).to.deep.equal({
+      from: new Date(2026, 5, 1),
+      to: new Date(2026, 6, 1),
+      group_by: 'day',
+      display_mode: 'currency',
+    });
+    expect(currencyResult.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.lastCall.args[0]).to.deep.equal({
+      device: 'Prise onduleur',
+      feature: 'Coût',
+      unit: 'euro',
+      start_date: '2026-06-01',
+      end_date: '2026-06-30',
+      group_by: 'day',
+      total: 3.33,
+      values: [
+        { date: '2026-06-01T00:00:00.000Z', value: 1.23 },
+        { date: '2026-06-02T00:00:00.000Z', value: 2.1 },
+      ],
+      home_subscription: {
+        name: 'Abonnement',
+        total: 0.84,
+      },
+    });
+
+    // Cost on a device without cost tracking configured.
+    getConsumptionByDates.resetHistory();
+    const noCostResult = await energyTool.cb({
+      device: 'Prise télé',
+      start_date: '2026-06-01',
+      end_date: '2026-06-30',
+      unit: 'currency',
+    });
+    expect(getConsumptionByDates.callCount).to.eq(0);
+    expect(noCostResult.content[0].text).to.contain('no consumption cost tracking configured on Prise télé');
+
+    // Empty period: adds an explicit note.
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise télé' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-tele-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [],
+      },
+    ]);
+    const emptyResult = await energyTool.cb({
+      device: 'Prise télé',
+      start_date: '2026-07-12',
+      end_date: '2026-07-12',
+      unit: 'kwh',
+    });
+    expect(emptyResult.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.toon.lastCall.args[0].total).to.eq(0);
+    expect(mcpHandler.toon.lastCall.args[0].note).to.eq(
+      'No consumption data recorded for this device over this period.',
+    );
+
+    // Unknown device.
+    const unknownDeviceResult = await energyTool.cb({
+      device: 'Unknown device',
+      start_date: '2026-07-12',
+      end_date: '2026-07-12',
+      unit: 'kwh',
+    });
+    expect(unknownDeviceResult.content[0].text).to.eq(
+      'device.get-energy-consumption: no energy monitoring device found matching "Unknown device"',
+    );
+
+    // Invalid dates.
+    const invalidDateResult = await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '12/07/2026',
+      end_date: '2026-07-12',
+      unit: 'kwh',
+    });
+    expect(invalidDateResult.content[0].text).to.eq(
+      'device.get-energy-consumption: start_date and end_date are required in YYYY-MM-DD format',
+    );
+
+    const reversedDatesResult = await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-07-12',
+      end_date: '2026-07-10',
+      unit: 'kwh',
+    });
+    expect(reversedDatesResult.content[0].text).to.eq(
+      'device.get-energy-consumption: start_date must be before or equal to end_date',
+    );
+  });
+
+  it('should not expose device.get-energy-consumption without energy monitoring devices', async () => {
+    const mcpHandler = {
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      gladys: {
+        room: {
+          getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]),
+        },
+        user: {
+          get: stub().resolves([]),
+        },
+        house: {
+          get: stub().resolves([]),
+        },
+        calendar: {
+          get: stub().resolves([]),
+        },
+        area: {
+          get: stub().resolves([]),
+        },
+        scene: {
+          get: stub().resolves([]),
+          create: stub(),
+        },
+        device: {
+          get: stub().resolves([
+            {
+              selector: 'device-temp-1',
+              name: 'Temperature Sensor',
+              room: { selector: 'salon', name: 'Salon' },
+              features: [
+                {
+                  id: 1,
+                  selector: 'device-temp-1-temp',
+                  name: 'Temperature',
+                  category: 'temperature-sensor',
+                  type: 'decimal',
+                },
+              ],
+            },
+          ]),
+        },
+        event: {
+          emit: fake(),
+        },
+      },
+      levenshtein: {
+        distance: stub().returns(4),
+      },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    expect(tools.find((tool) => tool.intent === 'device.get-energy-consumption')).to.eq(undefined);
+  });
+
   it('should return detailed scene.create errors for SequelizeValidationError and unknown errors', async () => {
     const mcpHandler = {
       serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',

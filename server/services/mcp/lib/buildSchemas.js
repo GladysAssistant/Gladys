@@ -375,6 +375,20 @@ async function getAllTools(userId) {
       features: device.features.filter((feature) => this.isWritableSensorFeature(feature, device)),
     }));
 
+  const isEnergyMonitoringFeature = (feature) =>
+    feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+    [
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+    ].includes(feature.type);
+  const energyMonitoringDevices = allDevices
+    .filter((device) => device.features.some(isEnergyMonitoringFeature))
+    .map((device) => ({
+      ...device,
+      name: device.name,
+      features: device.features.filter(isEnergyMonitoringFeature),
+    }));
+
   const tools = [
     {
       intent: 'camera.get-image',
@@ -1197,6 +1211,166 @@ async function getAllTools(userId) {
             {
               type: 'text',
               text: `sensor.set-state: set ${selectedDevice.name} / ${selectedFeature.name} to ${parsedValue}`,
+            },
+          ],
+        };
+      },
+    });
+  }
+
+  if (energyMonitoringDevices.length > 0) {
+    tools.push({
+      intent: 'device.get-energy-consumption',
+      config: {
+        title: 'Get energy consumption and cost over a period',
+        description:
+          'Get the electricity consumption (in kWh) or the consumption cost (in the home currency, for example euros) ' +
+          'of an energy monitoring device over a date range. ' +
+          'Dates are inclusive: for a single day use the same start_date and end_date, ' +
+          'for a full month use the first and last day of the month. ' +
+          'The result contains the total over the period and the detail per group_by period. ' +
+          'In currency mode, a separate home_subscription entry may be present: it is the fixed subscription cost ' +
+          'of the whole home electricity contract, and is not part of the device consumption cost.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
+        inputSchema: {
+          device: z
+            .enum([...new Set(energyMonitoringDevices.map(({ name }) => name))])
+            .describe('Energy monitoring device name.'),
+          start_date: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/)
+            .describe('Start date of the period in YYYY-MM-DD format, inclusive.'),
+          end_date: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/)
+            .describe('End date of the period in YYYY-MM-DD format, inclusive.'),
+          unit: z
+            .enum(['kwh', 'currency'])
+            .describe('Use kwh to get the consumption in kWh, currency to get the cost in the home currency.'),
+          group_by: z
+            .enum(['hour', 'day', 'week', 'month', 'year'])
+            .optional()
+            .describe('Aggregation of the returned detail values. Defaults to day.'),
+        },
+      },
+      cb: async ({ device, start_date: startDate, end_date: endDate, unit, group_by: groupBy }) => {
+        const parseDateInput = (value) => {
+          if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return null;
+          }
+          const [year, month, day] = value.split('-').map(Number);
+          return { year, month, day };
+        };
+
+        const parsedStart = parseDateInput(startDate);
+        const parsedEnd = parseDateInput(endDate);
+        if (!parsedStart || !parsedEnd) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: 'device.get-energy-consumption: start_date and end_date are required in YYYY-MM-DD format',
+              },
+            ],
+          };
+        }
+
+        const selectedDevice = this.findBySimilarity(energyMonitoringDevices, device);
+        if (!selectedDevice?.name) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.get-energy-consumption: no energy monitoring device found matching "${device}"`,
+              },
+            ],
+          };
+        }
+
+        const consumptionFeature = selectedDevice.features.find(
+          (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+        );
+        const costFeature = selectedDevice.features.find(
+          (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+        );
+        const displayMode = unit === 'currency' ? 'currency' : 'kwh';
+        // In kwh mode a cost feature also works: getConsumptionByDates hot-swaps it
+        // with its parent consumption feature through energy_parent_id.
+        const selectedFeature = displayMode === 'currency' ? costFeature : consumptionFeature || costFeature;
+        if (!selectedFeature) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `device.get-energy-consumption: no consumption cost tracking configured on ${selectedDevice.name}. ` +
+                  'An energy contract with prices must be configured in the energy monitoring settings.',
+              },
+            ],
+          };
+        }
+
+        // Same date boundaries as the energy dashboard: local midnight, end exclusive.
+        const from = new Date(parsedStart.year, parsedStart.month - 1, parsedStart.day);
+        const to = new Date(parsedEnd.year, parsedEnd.month - 1, parsedEnd.day + 1);
+        if (!(from < to)) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: 'device.get-energy-consumption: start_date must be before or equal to end_date',
+              },
+            ],
+          };
+        }
+
+        const results = await this.gladys.device.energySensorManager.getConsumptionByDates(
+          [selectedFeature.selector],
+          {
+            from,
+            to,
+            group_by: groupBy || 'day',
+            display_mode: displayMode,
+          },
+        );
+
+        const deviceResult = results.find((result) => !result.deviceFeature?.is_subscription);
+        const subscriptionResult = results.find((result) => result.deviceFeature?.is_subscription);
+
+        const decimalPlaces = displayMode === 'currency' ? 2 : 3;
+        const roundValue = (value) => Number(value.toFixed(decimalPlaces));
+        const deviceValues = deviceResult?.values ?? [];
+
+        const response = {
+          device: selectedDevice.name,
+          feature: selectedFeature.name,
+          unit: displayMode === 'currency' ? deviceResult?.deviceFeature?.currency_unit || 'currency' : 'kWh',
+          start_date: startDate,
+          end_date: endDate,
+          group_by: groupBy || 'day',
+          total: roundValue(deviceValues.reduce((acc, value) => acc + value.sum_value, 0)),
+          values: deviceValues.map((value) => ({
+            date: value.created_at,
+            value: roundValue(value.sum_value),
+          })),
+        };
+
+        if (subscriptionResult) {
+          response.home_subscription = {
+            name: subscriptionResult.deviceFeature.name,
+            total: roundValue(subscriptionResult.values.reduce((acc, value) => acc + value.sum_value, 0)),
+          };
+        }
+
+        if (deviceValues.length === 0) {
+          response.note = 'No consumption data recorded for this device over this period.';
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: this.toon(response),
             },
           ],
         };

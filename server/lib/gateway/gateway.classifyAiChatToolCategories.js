@@ -7,7 +7,7 @@ const MAX_ROUTER_HISTORY_CHARS = 200;
 const ROUTER_SYSTEM_PROMPT = `You are an intent router for a smart home assistant. Classify the user's last message into one or more of these categories:
 - "scenes": create, modify or configure a home automation scene/routine/automation, anything that should happen automatically later, on a schedule or on an event (for example "every day at 8am...", "when the door opens...", "create a scene...").
 - "device_control": act on the home right now: turn devices on or off, change light brightness/color/temperature, open or close shutters, start an existing scene, write a value to a sensor.
-- "device_query": read information from the home: current device states, temperatures, sensor values, device history, camera images.
+- "device_query": read information from the home: current device states, temperatures, sensor values, device history, energy consumption (kWh) or energy cost over a period, camera images.
 - "web_and_time": fetch a public web page, or compare times, schedules or opening hours.
 - "other": greetings, general questions or anything that does not fit the categories above.
 
