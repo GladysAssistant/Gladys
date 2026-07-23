@@ -242,6 +242,45 @@ describe('Matter.readInitialDeviceStates', () => {
     expect(gladys.event.emit.callCount).to.be.greaterThan(20);
   });
 
+  it('should read initial electrical measurements delivered as BigInt', async () => {
+    const nodeId = 1234n;
+    const devicePath = '1';
+    const clusterClients = {
+      [ElectricalPowerMeasurement.Complete.id]: {
+        getActivePowerAttribute: fake.resolves(5000n),
+        getVoltageAttribute: fake.resolves(230000n),
+        getActiveCurrentAttribute: fake.resolves(1000n),
+      },
+      [ElectricalEnergyMeasurement.Complete.id]: {
+        // 4500000000 mWh = 4500 kWh, above INT32_MAX so matter.js delivers a BigInt
+        getCumulativeEnergyImportedAttribute: fake.resolves({ energy: 4500000000n }),
+      },
+    };
+
+    const device = {
+      getClusterClientById: (id) => clusterClients[id] || null,
+    };
+
+    await matterHandler.readInitialDeviceStates(nodeId, devicePath, device);
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:power`,
+      state: 5,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:voltage`,
+      state: 230,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:current`,
+      state: 1,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalEnergyMeasurement.Complete.id}:energy`,
+      state: 4500,
+    });
+  });
+
   it('should skip null electrical measurements and undefined vacuum modes', async () => {
     const clusterClients = {
       [ElectricalPowerMeasurement.Complete.id]: {
