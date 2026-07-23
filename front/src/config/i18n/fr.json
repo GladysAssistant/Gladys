@@ -644,8 +644,20 @@
       "contractTypes": {
         "base": "base",
         "peak-off-peak": "heures pleines/creuses",
-        "edf-tempo": "EDF Tempo"
+        "edf-tempo": "EDF Tempo",
+        "enercoop-nuit-weekend": "Enercoop Nuit & Week-end",
+        "enercoop-2-saisons": "Enercoop 2 Saisons"
       },
+      "rateType": "Type de tarif",
+      "rateTypes": {
+        "peak": "heures pleines",
+        "off_peak": "heures creuses"
+      },
+      "enercoopContractHelp": "Les contrats Enercoop nécessitent deux tarifs : un pour les heures pleines et un pour les heures creuses. Créez deux entrées avec le même nom de contrat. Les créneaux horaires, week-ends, jours fériés et saisons sont calculés automatiquement.",
+      "schoolVacationZoneDescription": "Zone de vacances scolaires (optionnel). Utilise l'API officielle du Ministère de l'Éducation. Les vacances scolaires n'affectent pas les tarifs Enercoop, mais cette information peut être utile pour le suivi de consommation.",
+      "schoolVacationZoneNone": "Non configurée",
+      "schoolVacationZoneSuccess": "Zone de vacances scolaires enregistrée.",
+      "schoolVacationZoneError": "Erreur lors de l'enregistrement de la zone de vacances scolaires.",
       "priceTypes": {
         "consumption": "consommation",
         "subscription": "abonnement"

@@ -746,8 +746,20 @@
       "contractTypes": {
         "base": "Basis",
         "peak-off-peak": "Haupt-/Nebenzeiten",
-        "edf-tempo": "EDF Tempo"
+        "edf-tempo": "EDF Tempo",
+        "enercoop-nuit-weekend": "Enercoop Nacht & Wochenende",
+        "enercoop-2-saisons": "Enercoop 2 Jahreszeiten"
       },
+      "rateType": "Tarifart",
+      "rateTypes": {
+        "peak": "Hauptzeit",
+        "off_peak": "Nebenzeit"
+      },
+      "enercoopContractHelp": "Enercoop-Verträge benötigen zwei Tarife: einen für Haupt- und einen für Nebenzeiten. Erstellen Sie zwei Einträge mit demselben Vertragsnamen. Zeitfenster, Wochenenden, Feiertage und Jahreszeiten werden automatisch berechnet.",
+      "schoolVacationZoneDescription": "Schulferienzone (optional). Nutzt die offizielle API des Bildungsministeriums. Schulferien beeinflussen die Enercoop-Tarife nicht, können aber für die Verbrauchsverfolgung nützlich sein.",
+      "schoolVacationZoneNone": "Nicht konfiguriert",
+      "schoolVacationZoneSuccess": "Schulferienzone gespeichert.",
+      "schoolVacationZoneError": "Fehler beim Speichern der Schulferienzone.",
       "priceTypes": {
         "consumption": "Verbrauch",
         "subscription": "Abonnement"

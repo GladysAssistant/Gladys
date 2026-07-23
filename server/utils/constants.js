@@ -288,6 +288,7 @@ const SYSTEM_VARIABLE_NAMES = {
   DUCKDB_MIGRATED: 'DUCKDB_MIGRATED',
   DUCKDB_ORPHANED_STATES_PURGED: 'DUCKDB_ORPHANED_STATES_PURGED',
   GLADYS_VERSION: 'GLADYS_VERSION',
+  ENERGY_SCHOOL_VACATION_ZONE: 'ENERGY_SCHOOL_VACATION_ZONE',
 };
 
 const EVENTS = {
@@ -1655,6 +1656,15 @@ const ENERGY_CONTRACT_TYPES = {
   PEAK_OFF_PEAK: 'peak-off-peak',
   // EDF Tempo
   EDF_TEMPO: 'edf-tempo',
+  // Enercoop Flexibilité Nuit & Week-end (23h-6h + week-end + jours fériés)
+  ENERCOOP_NUIT_WEEKEND: 'enercoop-nuit-weekend',
+  // Enercoop Flexibilité 2 Saisons (créneaux variables été/hiver + week-end + jours fériés)
+  ENERCOOP_2_SAISONS: 'enercoop-2-saisons',
+};
+
+const ENERGY_RATE_TYPES = {
+  PEAK: 'peak',
+  OFF_PEAK: 'off_peak',
 };
 
 const ENERGY_PRICE_TYPES = {
@@ -1702,6 +1712,7 @@ const JOB_STATUS_LIST = createList(JOB_STATUS);
 const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 const ALARM_MODES_LIST = createList(ALARM_MODES);
 const ENERGY_CONTRACT_TYPES_LIST = createList(ENERGY_CONTRACT_TYPES);
+const ENERGY_RATE_TYPES_LIST = createList(ENERGY_RATE_TYPES);
 const ENERGY_PRICE_TYPES_LIST = createList(ENERGY_PRICE_TYPES);
 const ENERGY_PRICE_DAY_TYPES_LIST = createList(ENERGY_PRICE_DAY_TYPES);
 
@@ -1797,6 +1808,8 @@ module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;
 
 module.exports.ENERGY_CONTRACT_TYPES = ENERGY_CONTRACT_TYPES;
 module.exports.ENERGY_CONTRACT_TYPES_LIST = ENERGY_CONTRACT_TYPES_LIST;
+module.exports.ENERGY_RATE_TYPES = ENERGY_RATE_TYPES;
+module.exports.ENERGY_RATE_TYPES_LIST = ENERGY_RATE_TYPES_LIST;
 module.exports.ENERGY_PRICE_TYPES = ENERGY_PRICE_TYPES;
 module.exports.ENERGY_PRICE_TYPES_LIST = ENERGY_PRICE_TYPES_LIST;
 module.exports.ENERGY_PRICE_DAY_TYPES = ENERGY_PRICE_DAY_TYPES;
