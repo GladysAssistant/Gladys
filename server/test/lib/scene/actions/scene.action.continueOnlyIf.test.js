@@ -338,6 +338,120 @@ describe('scene.continue-only-if', () => {
     );
     return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
   });
+  it('should finish scene, device feature instantaneous value condition is verified', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'temperature-sensor',
+      type: 'decimal',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                device_feature: 'my-device-feature',
+                operator: '=',
+                value: 15,
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+  });
+  it('should abort scene, device feature instantaneous value condition is not verified', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'temperature-sensor',
+      type: 'decimal',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                device_feature: 'my-device-feature',
+                operator: '>',
+                value: 20,
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
+  });
+  it('should finish scene, text device feature instantaneous value condition is verified', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'text',
+      type: 'text',
+      last_value: null,
+      last_value_string: 'hello',
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                device_feature: 'my-device-feature',
+                operator: '=',
+                value: 'hello',
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+  });
+  it('should abort scene, device feature in condition does not exist', async () => {
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                device_feature: 'device-feature-that-does-not-exist',
+                operator: '=',
+                value: 15,
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'DEVICE_FEATURE_NOT_FOUND');
+  });
   it('should finish scene, condition is verified', async () => {
     const http = {
       request: fake.resolves({ result: [18], error: null }),

@@ -2641,13 +2641,13 @@
         "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "onlyContinueIf": {
-        "variableLabel": "Variable",
+        "variableLabel": "Device or variable",
         "operatorLabel": "Operator",
         "valueLabel": "Value",
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR",
-        "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+        "explanationText": "Choose what you want to compare: the instantaneous value of a device (no prior block needed), or a scene variable defined in a previous block. In the value field, enter either a raw value or a calculation based on a scene variable. To inject a variable in the text, press '{{'."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",

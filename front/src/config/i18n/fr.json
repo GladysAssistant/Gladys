@@ -2641,13 +2641,13 @@
         "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc."
       },
       "onlyContinueIf": {
-        "variableLabel": "Variable",
+        "variableLabel": "Appareil ou variable",
         "operatorLabel": "Opérateur",
         "valueLabel": "Valeur",
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU",
-        "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
+        "explanationText": "Choisissez ce que vous voulez comparer : la valeur instantanée d'un appareil (aucun bloc préalable nécessaire), ou une variable de scène définie dans un bloc précédent. Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
