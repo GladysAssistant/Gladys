@@ -6,7 +6,7 @@ const { assert, fake } = sinon;
 const { MockedMqttClient } = require('../mocks.test');
 const { CONFIGURATION, DEFAULT } = require('../../../../services/mqtt/lib/constants');
 const { SERVICE_STATUS } = require('../../../../utils/constants');
-const { NotFoundError } = require('../../../../utils/coreErrors');
+const { NotFoundError, ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const saveConfiguration = proxyquire('../../../../services/mqtt/lib/saveConfiguration', {
   util: {
@@ -391,5 +391,37 @@ describe('mqttHandler.saveConfiguration', () => {
 
     assert.notCalled(serviceInDb.set);
     assert.notCalled(serviceInDb.save);
+  });
+
+  it('should saveConfiguration: not touch service status when connection fails', async () => {
+    const serviceInDb = {
+      status: SERVICE_STATUS.STOPPED,
+      set: fake.returns(null),
+      save: fake.resolves(null),
+    };
+    const gladys = {
+      service: {
+        getLocalServiceByName: fake.resolves(serviceInDb),
+      },
+      variable: {
+        destroy: fake.resolves('value'),
+        setValue: fake.resolves('value'),
+        getValue: fake.resolves(true),
+      },
+    };
+
+    // No mqttUrl: connect fails with ServiceNotConfiguredError
+    const config = {};
+
+    const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    try {
+      await mqttHandler.saveConfiguration(config);
+      assert.fail('Should have fail');
+    } catch (e) {
+      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
+      assert.notCalled(gladys.service.getLocalServiceByName);
+      assert.notCalled(serviceInDb.set);
+      assert.notCalled(serviceInDb.save);
+    }
   });
 });
