@@ -13,6 +13,7 @@ const EZSP_DONGLE_NAMES = [
 module.exports = {
   up: async () => {
     const service = await db.Service.findOne({
+      attributes: ['id', 'selector'],
       where: { name: 'zigbee2mqtt' },
     });
     if (service === null) {
@@ -37,6 +38,7 @@ module.exports = {
   },
   down: async () => {
     const service = await db.Service.findOne({
+      attributes: ['id', 'selector'],
       where: { name: 'zigbee2mqtt' },
     });
     if (service === null) {

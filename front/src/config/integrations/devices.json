@@ -91,14 +91,16 @@
     "link": "tuya",
     "img": "/assets/integrations/cover/tuya.jpg",
     "invertInDarkMode": true,
-    "cloud": true
+    "cloud": true,
+    "deprecated": true
   },
   {
     "key": "melcloud",
     "link": "melcloud",
     "img": "/assets/integrations/cover/melcloud.jpg",
     "whiteBackground": true,
-    "cloud": true
+    "cloud": true,
+    "deprecated": true
   },
   {
     "key": "nodeRed",
@@ -118,7 +120,8 @@
     "key": "netatmo",
     "link": "netatmo",
     "img": "/assets/integrations/cover/netatmo.jpg",
-    "cloud": true
+    "cloud": true,
+    "deprecated": true
   },
   {
     "key": "sonos",

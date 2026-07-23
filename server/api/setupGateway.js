@@ -14,7 +14,8 @@ const { NotFoundError, ForbiddenError } = require('../utils/coreErrors');
  */
 function setupGateway(gladys, routes) {
   // we build an array of regexes foreach available route
-  const routesKeys = Object.keys(routes);
+  // the external integration host API is never exposed through the gateway
+  const routesKeys = Object.keys(routes).filter((routeKey) => !routes[routeKey].externalIntegrationAuth);
   const regexes = routesKeys.map((routeKey) => {
     const method = routeKey.split(' ')[0];
     const path = routeKey.split(' ')[1];

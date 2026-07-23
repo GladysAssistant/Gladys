@@ -27,6 +27,7 @@
     "esm": "npm:esm-wallaby@3.2.35"
   },
   "devDependencies": {
+    "@preact/async-loader": "^3.0.2",
     "@preact/preset-vite": "^2.10.2",
     "compare-json": "^0.4.0",
     "cross-env": "^5.2.0",
@@ -42,7 +43,6 @@
     "per-env": "^1.0.2",
     "prettier": "^1.17.1",
     "sirv-cli": "^3.0.1",
-    "@preact/async-loader": "^3.0.2",
     "vite": "^6.3.5",
     "vite-css-modules": "^1.16.0",
     "vite-plugin-static-copy": "^2.3.2"
@@ -59,6 +59,7 @@
     "date-fns": "^2.22.1",
     "dayjs": "^1.10.6",
     "debounce": "^1.2.1",
+    "dompurify": "^3.4.12",
     "dotenv": "^6.2.0",
     "eslint-plugin-i18n-json": "^4.0.0",
     "get-value": "^3.0.1",
@@ -67,6 +68,7 @@
     "js-confetti": "^0.11.0",
     "leaflet": "^1.7.1",
     "linkstate": "^1.1.1",
+    "marked": "^18.0.7",
     "p-limit": "^4.0.0",
     "preact": "^10.7.2",
     "preact-async-route": "^2.2.1",

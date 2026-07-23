@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const logger = require('../../utils/logger');
 const db = require('../../models');
+const { SERVICE_TYPES } = require('../../utils/constants');
 
 /**
  * @public
@@ -22,6 +23,12 @@ async function getUsage(podId = null) {
 
   await Promise.mapSeries(services, async (serviceInDB) => {
     try {
+      // an installed external integration is a used integration:
+      // no isUsed hook to call through the proxy service
+      if (serviceInDB.type === SERVICE_TYPES.EXTERNAL) {
+        serviceUsage[serviceInDB.name] = true;
+        return;
+      }
       const service = this.getService(serviceInDB.name);
       if (service && service.isUsed) {
         const isServiceUsed = await service.isUsed();

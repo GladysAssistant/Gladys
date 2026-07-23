@@ -15,6 +15,7 @@ module.exports = {
       return;
     }
     const netatmoService = await db.Service.findOne({
+      attributes: ['id', 'selector'],
       where: {
         name: 'netatmo',
       },

@@ -1,6 +1,7 @@
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
+const { EVENTS } = require('../../../utils/constants');
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 
 const { fake, assert } = sinon;
@@ -52,5 +53,7 @@ describe('gateway.disconnect', () => {
 
     assert.calledOnceWithExactly(gateway.gladysGatewayClient.disconnect);
     assert.callCount(variable.destroy, 7);
+    // Plus is now unlinked: external integration webhooks recompute
+    assert.calledWith(gateway.event.emit, EVENTS.GATEWAY.LINK_STATUS_CHANGED);
   });
 });

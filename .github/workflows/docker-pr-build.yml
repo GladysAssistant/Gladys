@@ -3,7 +3,9 @@ run-name: Pull request tests ${{ github.head_ref }}
 
 on:
   pull_request:
-    branches: [master]
+    # claude/** lets stacked pull requests (based on a feature branch
+    # instead of master) run the same CI as regular pull requests
+    branches: [master, 'claude/**']
     types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:

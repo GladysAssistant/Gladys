@@ -263,8 +263,14 @@ const SERVICE_STATUS = {
   DISABLED: 'DISABLED',
   LOADING: 'LOADING',
   RUNNING: 'RUNNING',
+  DEGRADED: 'DEGRADED',
   STOPPED: 'STOPPED',
   ERROR: 'ERROR',
+};
+
+const SERVICE_TYPES = {
+  INTERNAL: 'internal',
+  EXTERNAL: 'external',
 };
 
 const SYSTEM_VARIABLE_NAMES = {
@@ -325,6 +331,8 @@ const EVENTS = {
     RESTORE_BACKUP: 'gateway.restore-backup',
     NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
     NEW_MESSAGE_OWNTRACKS_LOCATION: 'gateway.new-message-owntracks-location',
+    NEW_MESSAGE_EXTERNAL_INTEGRATION_WEBHOOK: 'gateway.new-message-external-integration-webhook',
+    LINK_STATUS_CHANGED: 'gateway.link-status-changed',
     USER_KEYS_CHANGED: 'gateway.user-keys-changed',
     SEND_WEEKLY_DIGEST: 'gateway.send-weekly-digest',
   },
@@ -432,6 +440,12 @@ const EVENTS = {
   },
   MQTT: {
     RECEIVED: 'mqtt.received',
+  },
+  EXTERNAL_INTEGRATION: {
+    STATUS_CHANGED: 'external-integration.status-changed',
+    DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
+    CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
+    DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
   },
 };
 
@@ -1454,6 +1468,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
+    INTEGRATION_REQUEST: 'authenticate.integration-request',
     CONNECTED: 'authentication.connected',
   },
   GATEWAY: {
@@ -1544,6 +1559,30 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   MATTERBRIDGE: {
     STATUS_CHANGE: 'matterbridge.status-change',
+  },
+  EXTERNAL_INTEGRATION: {
+    STATUS_CHANGED: 'external-integration.status-changed',
+    DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
+    CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
+    DEVICE_SET_VALUE: 'external-integration.device.set-value',
+    DEVICE_POLL: 'external-integration.device.poll',
+    COMMAND_RESULT: 'external-integration.command-result',
+    SCAN_REQUEST: 'external-integration.scan-request',
+    DEVICE_CREATED: 'external-integration.device-created',
+    DEVICE_UPDATED: 'external-integration.device-updated',
+    DEVICE_DELETED: 'external-integration.device-deleted',
+    HEARTBEAT: 'external-integration.heartbeat',
+    CONFIG_UPDATED: 'external-integration.config-updated',
+    MESSAGE_SEND: 'external-integration.message.send',
+    HARDWARE_UPDATED: 'external-integration.hardware-updated',
+    OAUTH_GET_AUTHORIZE_URL: 'external-integration.oauth.get-authorize-url',
+    OAUTH_CALLBACK: 'external-integration.oauth.callback',
+    ACTION_RUN: 'external-integration.action.run',
+    CAMERA_GET_IMAGE: 'external-integration.camera.get-image',
+    DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
+    WEBHOOK_RECEIVED: 'external-integration.webhook.received',
+    WEBHOOK_REQUEST: 'external-integration.webhook.request',
+    WEBHOOK_UPDATED: 'external-integration.webhook-updated',
   },
 };
 
@@ -1779,6 +1818,9 @@ module.exports.DEVICE_FEATURE_UNITS_BY_CATEGORY = DEVICE_FEATURE_UNITS_BY_CATEGO
 
 module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
+
+module.exports.SERVICE_TYPES = SERVICE_TYPES;
+module.exports.SERVICE_TYPES_LIST = createList(SERVICE_TYPES);
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
 

@@ -35,6 +35,7 @@ module.exports = {
         },
         {
           model: db.Service,
+          attributes: ['id', 'name', 'selector'],
           as: 'service',
           where: {
             name: 'broadlink',

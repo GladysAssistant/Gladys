@@ -3,6 +3,7 @@ const { linkUser } = require('./message.linkUser');
 const { getCustomLink } = require('./message.getCustomLink');
 const { newMessage } = require('./message.new');
 const { send } = require('./message.send');
+const { sendToUser } = require('./message.sendToUser');
 const { disconnect } = require('./message.disconnect');
 
 /**
@@ -26,5 +27,6 @@ MessageHandler.prototype.getCustomLink = getCustomLink;
 MessageHandler.prototype.linkUser = linkUser;
 MessageHandler.prototype.newMessage = newMessage;
 MessageHandler.prototype.send = send;
+MessageHandler.prototype.sendToUser = sendToUser;
 
 module.exports = MessageHandler;

@@ -266,6 +266,48 @@ describe('gateway.handleNewMessage', () => {
     });
   });
 
+  it('should relay a new gateway open api message: external-integration-webhook', async () => {
+    const callback = fake.returns(true);
+
+    await gateway.handleNewMessage(
+      {
+        type: 'gladys-open-api',
+        action: 'external-integration-webhook',
+        data: {
+          selector: 'ext-netatmo',
+          webhook_key: 'events',
+          method: 'POST',
+          query: {},
+          body: '{"push_type":"webhook_activation"}',
+          content_type: 'application/json',
+        },
+      },
+      {
+        rsaPublicKeyRaw: 'key',
+        ecdsaPublicKeyRaw: 'key',
+        local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      },
+      callback,
+    );
+
+    // the supervisor answers through the callback itself: the gateway
+    // branch only relays the event, it never acks on its own
+    assert.calledOnceWithExactly(
+      event.emit,
+      EVENTS.GATEWAY.NEW_MESSAGE_EXTERNAL_INTEGRATION_WEBHOOK,
+      {
+        selector: 'ext-netatmo',
+        webhook_key: 'events',
+        method: 'POST',
+        query: {},
+        body: '{"push_type":"webhook_activation"}',
+        content_type: 'application/json',
+      },
+      callback,
+    );
+    assert.notCalled(callback);
+  });
+
   describe('testing GoogleHome', () => {
     const googleHomeTest = ({ intent, expectedResult }) => async () => {
       serviceManager.getService = fake.returns({

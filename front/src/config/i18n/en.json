@@ -569,7 +569,10 @@
     "tags": {
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
-      "local": "Local"
+      "local": "Local",
+      "external": "Community",
+      "native": "Native",
+      "deprecated": "Soon deprecated"
     },
     "root": {
       "title": "Integrations",
@@ -580,7 +583,7 @@
       "noSearchResultsSuggestion": "Try <a href=\"/dashboard/integration/device/matter\">Matter</a> for Matter/Thread compatible devices, or <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> to connect Somfy, Shelly, Daikin and many other devices.",
       "gatewayBanner": {
         "title": "Can't find your device?",
-        "description": "Many devices can be connected via <a href=\"/dashboard/integration/device/matter\">Matter</a> (universal protocol) or <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin…). Once connected, they can be controlled in Gladys like any other device."
+        "description": "Many devices can be connected via <a href=\"/dashboard/integration/device/matter\">Matter</a> (universal protocol). Your device can also be supported by a community <b>external integration</b>: anyone can create one and publish it in the store, it then appears in this list. See the <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">external integrations documentation</a>."
       },
       "menu": {
         "all": "All integrations",
@@ -592,6 +595,240 @@
         "health": "Health",
         "weather": "Weather",
         "navigation": "Navigation"
+      }
+    },
+    "externalIntegration": {
+      "updateAvailable": "Update available",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "configTab": "Configuration",
+      "supervisionTab": "Supervision",
+      "logsTab": "Logs",
+      "status": {
+        "UNKNOWN": "Unknown",
+        "ENABLED": "Enabled",
+        "DISABLED": "Disabled",
+        "LOADING": "Loading",
+        "RUNNING": "Running",
+        "DEGRADED": "Degraded",
+        "STOPPED": "Stopped",
+        "ERROR": "Error"
+      },
+      "docs": {
+        "modalTitle": "Documentation",
+        "loadError": "There was an error loading the documentation.",
+        "openRawLink": "Open in a new tab"
+      },
+      "config": {
+        "title": "Configuration",
+        "docsLink": "Documentation",
+        "loadError": "There was an error loading the configuration.",
+        "noConfig": "This integration has no configuration options.",
+        "secretConfiguredPlaceholder": "Configured. Leave empty to keep the current value.",
+        "saveSuccess": "Configuration saved successfully.",
+        "saveError": "There was an error saving the configuration.",
+        "saveButton": "Save configuration",
+        "oauthConnectButton": "Connect",
+        "oauthConnectError": "There was an error starting the connection. Check that the integration is running."
+      },
+      "actions": {
+        "title": "Actions",
+        "runButton": "Run",
+        "error": "The action failed. Check that the integration is running."
+      },
+      "connection": {
+        "label": "Connection",
+        "connectedBadge": "Connected",
+        "disconnectedBadge": "Disconnected"
+      },
+      "transport": {
+        "localBadge": "Local",
+        "cloudBadge": "Cloud",
+        "unreachableBadge": "Unreachable",
+        "localTooltip": "This device answers through the local network (LAN)",
+        "cloudTooltip": "This device answers through the vendor cloud",
+        "unreachableTooltip": "This device does not answer at the moment",
+        "degradedBadge": "Degraded",
+        "degradedTooltip": "This device works, but not in its nominal mode",
+        "preferLocalLabel": "Prefer the local (LAN) connection when available",
+        "preferLocalDescription": "The integration applies this preference when it can; the badge of each device shows the transport really in use."
+      },
+      "oauthCallback": {
+        "title": "Account connection",
+        "relayingText": "Finalizing the connection with the integration...",
+        "successText": "Account connected successfully.",
+        "errorText": "The integration refused the connection. Please try again.",
+        "missingParamsText": "This page is missing its connection parameters. Restart the connection from the Configuration screen.",
+        "closeText": "You can close this window.",
+        "backToConfigButton": "Back to configuration"
+      },
+      "supervision": {
+        "title": "Supervision",
+        "loadError": "There was an error loading the integration.",
+        "actionError": "There was an error executing this action.",
+        "uninstallError": "There was an error uninstalling this integration.",
+        "updateAvailableText": "A new version of this integration is available.",
+        "statusLabel": "Status",
+        "versionLabel": "Version",
+        "dockerImageLabel": "Docker image",
+        "repoLabel": "Repository",
+        "startButton": "Start",
+        "stopButton": "Stop",
+        "restartButton": "Restart",
+        "updateButton": "Update",
+        "forceUpdateButton": "Force update",
+        "forceUpdateTitle": "Re-pulls the Docker image and recreates the container, even without a new version",
+        "logsButton": "Logs",
+        "uninstallButton": "Uninstall",
+        "containersTitle": "Additional containers",
+        "containerRunning": "Running",
+        "containerStopped": "Stopped",
+        "openButton": "Open",
+        "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
+        "confirmUninstallButton": "Yes, uninstall",
+        "cancelUninstallButton": "Cancel",
+        "startedAtLabel": "Running since"
+      },
+      "device": {
+        "title": "Devices",
+        "refreshButton": "Refresh",
+        "loadError": "There was an error loading the devices.",
+        "noDevices": "No devices created yet. Go to the \"Discover\" tab to find devices.",
+        "noDevicesConfigureFirst": "If you just installed this integration, start by filling in the <a href=\"{{configUrl}}\">Configuration</a> tab, then launch a discovery.",
+        "saveError": "There was an error saving this device.",
+        "deleteError": "There was an error deleting this device.",
+        "nameLabel": "Name",
+        "namePlaceholder": "Device name",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "deleteButton": "Delete"
+      },
+      "deviceParams": {
+        "title": "Technical parameters"
+      },
+      "discover": {
+        "title": "Discovered devices",
+        "scanButton": "Scan",
+        "scanning": "Scanning...",
+        "scanError": "There was an error launching the scan.",
+        "scanErrorDisconnected": "Unable to launch the scan: the integration is not connected. Check that it is running in the \"Configuration\" tab.",
+        "loadError": "There was an error loading the discovered devices.",
+        "noDevices": "No devices discovered yet. Press \"Scan\" to search for devices.",
+        "noDevicesConfigureFirst": "Nothing found? Make sure the integration is configured in the <a href=\"{{configUrl}}\">Configuration</a> tab, then run a new scan.",
+        "alreadyCreatedBadge": "Already added",
+        "createError": "There was an error adding this device.",
+        "featuresLabel": "Features",
+        "createButton": "Add to Gladys",
+        "updateButton": "Update",
+        "updateTitle": "The integration re-published this device with a different structure: apply the new definition"
+      },
+      "install": {
+        "backToCatalog": "Back to integrations",
+        "notFound": "This integration was not found in the store.",
+        "starsLabel": "stars",
+        "lastPushLabel": "Last update:",
+        "warningTitle": "Community integration",
+        "warningText": "This integration is developed by the community and is not maintained by the Gladys Assistant team. It runs in an isolated Docker container, but you should only install integrations from developers you trust.",
+        "communicationWarningText": "This integration is a messaging channel: once your account is linked, it will be able to send and receive messages on your behalf (trigger scenes, control your home through the Gladys brain).",
+        "notCompatible": "This integration is not compatible with your Gladys installation.",
+        "installError": "There was an error installing this integration.",
+        "alreadyInstalled": "This integration is already installed.",
+        "goToIntegrationButton": "Go to the integration",
+        "installing": "Installing...",
+        "installButton": "Install",
+        "networkDiscoveryTitle": "Network discovery requests",
+        "networkDiscoveryText": "This integration asks Gladys to capture the following network announcements on its behalf. It will never be able to capture anything else.",
+        "documentationLink": "Documentation",
+        "duplicateWarningTitle": "Another instance is already installed",
+        "duplicateWarningText": "\"{name}\" looks like another instance of this integration. Two instances may fight over the same cloud account or the same devices — consider stopping the existing one during your tests. Installing anyway is supported (e.g. a dev build next to the production one).",
+        "webhooksTitle": "Internet webhooks (Gladys Plus)",
+        "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key).",
+        "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee)."
+      },
+      "networkDiscovery": {
+        "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
+        "udpActiveBroadcastText": "Send a discovery request as a UDP broadcast on ports {ports} and collect the replies",
+        "mdnsText": "Browse mDNS services of type {service}",
+        "ssdpText": "SSDP search for {st}"
+      },
+      "installFromGithub": {
+        "cardTitle": "Install from GitHub",
+        "cardDescription": "Install a community integration from a GitHub repository.",
+        "modalTitle": "Install an integration from GitHub",
+        "repoUrlLabel": "GitHub repository URL",
+        "repoUrlPlaceholder": "https://github.com/owner/repository",
+        "installButton": "Install",
+        "devModeLink": "Developer mode: install from a Docker image",
+        "devModeDescription": "Install an integration directly from a Docker image, with an optional manifest. Only for integration developers.",
+        "dockerImageLabel": "Docker image",
+        "dockerImagePlaceholder": "e.g. myuser/my-integration:latest",
+        "manifestLabel": "Manifest (JSON, optional)",
+        "manifestPlaceholder": "{ \"name\": \"My integration\", ... }",
+        "errorUnknown": "There was an error installing this integration.",
+        "errorNotFound": "Repository not found, or it does not contain a valid Gladys integration.",
+        "errorInvalidManifest": "The integration manifest is invalid.",
+        "manifestInvalidJson": "The manifest is not valid JSON."
+      },
+      "logs": {
+        "title": "Logs",
+        "refreshButton": "Refresh",
+        "error": "An error occurred while loading the logs.",
+        "empty": "No logs available.",
+        "containerSelectLabel": "Container",
+        "mainContainerOption": "Main container"
+      },
+      "link": {
+        "title": "Link my account",
+        "notLinkedText": "Your account is not linked to this messaging channel. Generate a code, then send it to the bot in the external channel to link your account.",
+        "linkedText": "Your account is linked to:",
+        "generateCodeButton": "Generate a link code",
+        "codeText": "Send this code to the bot:",
+        "codeExpiryText": "This code is single use and expires in 15 minutes.",
+        "unlinkButton": "Unlink my account",
+        "error": "An error occurred while linking the account."
+      },
+      "subContainers": {
+        "title": "Additional containers",
+        "description": "This integration runs the following containers on your machine. The listed ports will be reachable from your local network.",
+        "nameLabel": "Name",
+        "imageLabel": "Image",
+        "limitsLabel": "Limits",
+        "portsLabel": "Exposed ports"
+      },
+      "hardware": {
+        "title": "Hardware",
+        "installDescription": "This integration requests access to hardware on your machine. You can grant or refuse each access, and change it at any time after the install.",
+        "configDescription": "Hardware access granted to this integration. Changing an access recreates the affected containers and notifies the integration.",
+        "detected": "Detected",
+        "notDetected": "Not detected",
+        "saveButton": "Save hardware",
+        "saveError": "An error occurred while saving the hardware access.",
+        "classes": {
+          "coral-usb": "Coral USB (whole USB bus)",
+          "coral-pcie": "Coral PCIe",
+          "gpu": "GPU (graphics acceleration)",
+          "video": "Cameras (video devices)"
+        }
+      },
+      "webhooks": {
+        "title": "Gladys Plus webhooks",
+        "plusRequiredText": "This integration can receive events from the Internet through Gladys Plus. Link your Gladys Plus account in Settings to enable webhooks; without it, the integration works in polling mode only.",
+        "explanationText": "Create an Open API key in Gladys Plus (Settings → Open API), then paste it here. Gladys builds the webhook URLs and the integration registers them with the third-party service.",
+        "openApiKeyLabel": "Gladys Plus Open API key",
+        "openApiKeyPlaceholder": "Paste your Open API key",
+        "saveKeyButton": "Save",
+        "saveKeyError": "There was an error saving the Open API key.",
+        "notAvailableText": "Webhooks are not active yet: save your Open API key to activate them.",
+        "urlsText": "Webhook URLs (the integration registers them automatically when possible; some services require pasting them in the vendor console). These URLs contain your key: share them only with the third-party service."
+      },
+      "contactProfile": {
+        "title": "My account",
+        "description": "This channel sends messages using your personal credentials. Each user fills in their own values; leave empty to not receive anything. Deleting your values stops the messages.",
+        "saveButton": "Save",
+        "clearButton": "Delete my values",
+        "saveError": "There was an error saving your account values.",
+        "saveSuccess": "Your account values were saved."
       }
     },
     "telegram": {
@@ -2520,7 +2757,8 @@
       "generateButton": "Generate",
       "keyNameLabel": "Key:",
       "registeredLabel": "Registered on:"
-    }
+    },
+    "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now."
   },
   "editScene": {
     "settings": "Settings",

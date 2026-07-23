@@ -5,6 +5,7 @@ const logger = require('../utils/logger');
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const service = await db.Service.findOne({
+      attributes: ['id', 'selector'],
       where: {
         name: 'rtsp-camera',
       },

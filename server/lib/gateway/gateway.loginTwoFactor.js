@@ -1,4 +1,4 @@
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, EVENTS } = require('../../utils/constants');
 const { generateBackupKey } = require('../../utils/backupKey');
 /**
  * @description Login step 2 to the Gateway.
@@ -45,6 +45,9 @@ async function loginTwoFactor(twoFactorToken, twoFactorCode) {
   }
   // then, we init Gladys.
   await this.init();
+  // Gladys Plus is now linked: features depending on the link recompute
+  // their availability (e.g. external integration webhooks)
+  this.event.emit(EVENTS.GATEWAY.LINK_STATUS_CHANGED);
 }
 
 module.exports = {

@@ -1,6 +1,7 @@
 import get from 'get-value';
 import { Text } from 'preact-i18n';
 import CardFilter from '../../components/layout/CardFilter';
+import InstallFromGithubCard from './all/external-integration/install-from-github/InstallFromGithubCard';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import style from './style.css';
 
@@ -11,7 +12,8 @@ const IntegrationPageHeader = ({
   search,
   searchKeyword,
   integrationsLength,
-  totalSize
+  totalSize,
+  showInstallFromGithub
 }) => {
   const showResultCount = searchKeyword.length > 0 || integrationsLength !== totalSize;
   const searchPlaceholder = get(intl.dictionary, 'integration.root.searchPlaceholder', {
@@ -28,7 +30,12 @@ const IntegrationPageHeader = ({
           <div class="page-subtitle">
             <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
           </div>
-          <div class="page-options d-flex">
+          <div class="page-options d-flex align-items-center">
+            {showInstallFromGithub && (
+              <div class="mr-3">
+                <InstallFromGithubCard button />
+              </div>
+            )}
             <CardFilter
               changeOrderDir={changeOrderDir}
               orderValue={orderDir}
@@ -68,6 +75,11 @@ const IntegrationPageHeader = ({
             />
           </div>
         </div>
+        {showInstallFromGithub && (
+          <div class="mt-4">
+            <InstallFromGithubCard button block />
+          </div>
+        )}
         {showResultCount && (
           <div class={style.mobileResultCount}>
             <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
