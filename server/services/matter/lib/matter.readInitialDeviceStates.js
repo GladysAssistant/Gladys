@@ -28,6 +28,7 @@ const {
 
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
+const { matterSystemModeToGladysAcMode } = require('../utils/thermostatMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE } = require('../../../utils/constants');
 const {
@@ -215,6 +216,14 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
       const value = await safeReadAttribute(() => thermostat.getOccupiedCoolingSetpointAttribute());
       if (value !== undefined) {
         emitState(`matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:cooling`, value / 100);
+      }
+      const systemMode = await safeReadAttribute(() => thermostat.getSystemModeAttribute());
+      if (systemMode !== undefined) {
+        // SystemMode values without a Gladys equivalent (e.g. Off) resolve to null and are skipped
+        emitState(
+          `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:mode`,
+          matterSystemModeToGladysAcMode(systemMode),
+        );
       }
     }
   }

@@ -29,6 +29,7 @@ const {
 
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
+const { matterSystemModeToGladysAcMode } = require('../utils/thermostatMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
 const {
@@ -391,6 +392,18 @@ async function listenToStateChange(nodeId, devicePath, device) {
           device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:cooling`,
           state: value / 100,
         });
+      });
+      thermostat.addSystemModeAttributeListener((value) => {
+        logger.debug(`Matter: Thermostat systemMode attribute changed to ${value}`);
+        const gladysAcMode = matterSystemModeToGladysAcMode(value);
+        // SystemMode values without a Gladys equivalent (e.g. Off) are ignored,
+        // on/off is handled by the OnOff cluster
+        if (gladysAcMode !== null) {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: `matter:${nodeId}:${devicePath}:${Thermostat.Complete.id}:mode`,
+            state: gladysAcMode,
+          });
+        }
       });
     }
   }
