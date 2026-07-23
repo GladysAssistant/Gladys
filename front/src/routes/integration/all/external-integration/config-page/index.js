@@ -33,6 +33,7 @@ class ExternalIntegrationConfigPage extends Component {
       if (get(integration, 'manifest.type') === 'communication') {
         await this.loadContact();
       }
+      await this.loadDynamicOptions(integration);
       await this.loadHardwareDetection(integration);
     } catch (e) {
       console.error(e);
@@ -121,6 +122,31 @@ class ExternalIntegrationConfigPage extends Component {
     try {
       const contact = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}/contact`);
       this.setState({ contact });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  loadDynamicOptions = async integration => {
+    // a select/multi_select of the config_schema (or of an action mini
+    // form) can use the core-defined source "devices": its options are
+    // the already-created devices of the integration (label = device
+    // name, value = external_id), naturally scoped to its t_service
+    const actionFields = (get(integration, 'manifest.actions') || []).reduce(
+      (fields, action) => fields.concat(action.fields || []),
+      []
+    );
+    const allFields = (get(integration, 'manifest.config_schema') || []).concat(actionFields);
+    if (!allFields.some(field => field.source === 'devices')) {
+      return;
+    }
+    try {
+      const devices = await this.props.httpClient.get(`/api/v1/service/${this.props.selector}/device`);
+      this.setState({
+        dynamicOptions: {
+          devices: devices.map(device => ({ value: device.external_id, label: device.name }))
+        }
+      });
     } catch (e) {
       console.error(e);
     }

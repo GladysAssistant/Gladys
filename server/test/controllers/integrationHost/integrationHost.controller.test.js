@@ -232,6 +232,22 @@ describe('Integration host API', () => {
         .send({ transports: [{ device_external_id: `ext:${service.selector}:plug`, transport: 'satellite' }] })
         .expect(400);
     });
+
+    it('should refuse a degraded reason without english', async () => {
+      await integrationRequest(token)
+        .post('/api/integration/v1/device/transport')
+        .send({
+          transports: [
+            {
+              device_external_id: `ext:${service.selector}:plug`,
+              transport: 'cloud',
+              degraded: true,
+              message: { fr: 'Session locale refusée' },
+            },
+          ],
+        })
+        .expect(400);
+    });
   });
 
   describe('POST /api/integration/v1/discovered_device', () => {

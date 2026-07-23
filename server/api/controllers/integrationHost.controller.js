@@ -126,10 +126,12 @@ module.exports = function IntegrationHostController(gladys) {
    * @api {post} /api/integration/v1/device/transport setDeviceTransports
    * @apiName setDeviceTransports
    * @apiGroup IntegrationHostApi
-   * @apiDescription Lightweight batch update of the GLADYS_TRANSPORT param
-   * (local | cloud | unreachable) without re-publishing the discovered
-   * list; the device badges of the UI update in real time. Unknown
-   * device_external_ids are silently ignored.
+   * @apiDescription Lightweight batch update of the GLADYS_TRANSPORT* params
+   * (local | cloud | unreachable, plus the optional degraded state:
+   * `degraded` boolean + multi-language `message` reason — an entry
+   * without `degraded` clears the degraded params) without re-publishing
+   * the discovered list; the device badges of the UI update in real time.
+   * Unknown device_external_ids are silently ignored.
    */
   async function setDeviceTransports(req, res) {
     const result = await gladys.externalIntegration.setDeviceTransports(

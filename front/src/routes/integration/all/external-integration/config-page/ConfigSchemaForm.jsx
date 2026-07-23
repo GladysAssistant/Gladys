@@ -28,12 +28,25 @@ class ConfigField extends Component {
     this.props.connectOAuth(this.props.field);
   };
 
-  render({ field, language, values, configuredSecrets, touchedSecrets, connectionStatus, oauthStatus }) {
+  render({
+    field,
+    language,
+    values,
+    configuredSecrets,
+    touchedSecrets,
+    connectionStatus,
+    oauthStatus,
+    dynamicOptions
+  }) {
     const label = getLocalizedText(field.label, language) || field.key;
     const description = getLocalizedText(field.description, language);
     const placeholder = getLocalizedText(field.placeholder, language) || '';
     const value = values[field.key];
     const fieldId = `config_${field.key}`;
+    // a select/multi_select can replace its static options with a
+    // core-defined source ("devices": the already-created devices of the
+    // integration, label = device name, value = external_id)
+    const options = field.source ? (dynamicOptions && dynamicOptions[field.source]) || [] : field.options || [];
 
     if (field.type === 'oauth2') {
       // the whole OAuth2 flow is relayed: the integration builds the
@@ -100,7 +113,7 @@ class ConfigField extends Component {
             <option value="" selected={value === undefined || value === null || value === ''}>
               <Text id="global.emptySelectOption" />
             </option>
-            {(field.options || []).map(option => (
+            {options.map(option => (
               <option key={option.value} value={option.value} selected={`${value}` === `${option.value}`}>
                 {getLocalizedText(option.label, language) || option.value}
               </option>
@@ -109,7 +122,7 @@ class ConfigField extends Component {
         )}
         {field.type === 'select' && field.display === 'radio' && (
           <div>
-            {(field.options || []).map(option => (
+            {options.map(option => (
               <label key={option.value} class="custom-control custom-radio">
                 <input
                   type="radio"
@@ -126,7 +139,7 @@ class ConfigField extends Component {
         )}
         {field.type === 'multi_select' && (
           <div>
-            {(field.options || []).map(option => (
+            {options.map(option => (
               <label key={option.value} class="custom-control custom-checkbox">
                 <input
                   type="checkbox"
@@ -203,7 +216,8 @@ const ConfigSchemaForm = ({
   saveConfig,
   connectionStatus,
   oauthStatus,
-  connectOAuth
+  connectOAuth,
+  dynamicOptions
 }) => (
   <form onSubmit={saveConfig}>
     {saveConfigStatus === RequestStatus.Success && (
@@ -228,6 +242,7 @@ const ConfigSchemaForm = ({
         connectionStatus={connectionStatus}
         oauthStatus={oauthStatus}
         connectOAuth={connectOAuth}
+        dynamicOptions={dynamicOptions}
       />
     ))}
     <div class="form-footer">

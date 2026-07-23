@@ -173,6 +173,11 @@
             }
           }
         },
+        "source": {
+          "type": "string",
+          "enum": ["devices"],
+          "description": "Dynamic options of a `select` or `multi_select` field, provided by the core — a reserved enum, never a URL nor an expression. Mutually exclusive with `options`; `default` is not allowed with a source (code-enforced). \"devices\": the Gladys UI populates the options with the already-created devices of the integration (label = device name, value = external_id)."
+        },
         "display": {
           "type": "string",
           "enum": ["dropdown", "radio"],
@@ -189,12 +194,34 @@
             }
           },
           "then": {
-            "required": ["options"]
+            "oneOf": [
+              {
+                "required": ["options"],
+                "not": {
+                  "required": ["source"]
+                }
+              },
+              {
+                "required": ["source"],
+                "not": {
+                  "required": ["options"]
+                }
+              }
+            ]
           },
           "else": {
-            "not": {
-              "required": ["options"]
-            }
+            "allOf": [
+              {
+                "not": {
+                  "required": ["options"]
+                }
+              },
+              {
+                "not": {
+                  "required": ["source"]
+                }
+              }
+            ]
           }
         },
         {

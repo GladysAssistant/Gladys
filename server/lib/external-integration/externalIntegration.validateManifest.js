@@ -74,6 +74,11 @@ const SSDP_ST_MAX_LENGTH = 200;
 const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'secret', 'oauth2'];
 const OPTION_FIELD_TYPES = ['select', 'multi_select'];
 const SELECT_DISPLAYS = ['dropdown', 'radio'];
+// Dynamic options of a select/multi_select: a reserved enum defined by the
+// core — never a URL nor an expression, nothing arbitrary enters the
+// rendering. "devices": the UI populates the options with the
+// already-created devices of the integration (value = external_id).
+const SELECT_SOURCES = ['devices'];
 const CONFIG_FIELD_FIELDS = [
   'key',
   'type',
@@ -85,6 +90,7 @@ const CONFIG_FIELD_FIELDS = [
   'min',
   'max',
   'options',
+  'source',
   'display',
 ];
 // boolean has no input to hint, select shows its options
@@ -169,6 +175,11 @@ function validateMultiLanguageText(value, path, errors, minLength = 1, maxLength
  */
 function validateConfigFieldDefault(field, path, errors) {
   if (field.default === undefined) {
+    return;
+  }
+  if (field.source !== undefined && OPTION_FIELD_TYPES.includes(field.type)) {
+    // the dynamic values are unknown at validation time
+    errors.push(`${path}.default: not allowed with a dynamic source`);
     return;
   }
   switch (field.type) {
@@ -273,7 +284,16 @@ function validateConfigField(field, index, seenKeys, errors, basePath = 'config_
       errors.push(`${path}.display: must be one of ${SELECT_DISPLAYS.join(', ')}`);
     }
   }
-  if (OPTION_FIELD_TYPES.includes(field.type)) {
+  if (field.source !== undefined) {
+    if (!OPTION_FIELD_TYPES.includes(field.type)) {
+      errors.push(`${path}.source: only allowed on select and multi_select fields`);
+    } else if (!SELECT_SOURCES.includes(field.source)) {
+      errors.push(`${path}.source: must be one of ${SELECT_SOURCES.join(', ')}`);
+    }
+    if (field.options !== undefined) {
+      errors.push(`${path}.options: mutually exclusive with source`);
+    }
+  } else if (OPTION_FIELD_TYPES.includes(field.type)) {
     if (!Array.isArray(field.options) || field.options.length === 0) {
       errors.push(`${path}.options: ${field.type} fields must have a non-empty options list`);
     } else {

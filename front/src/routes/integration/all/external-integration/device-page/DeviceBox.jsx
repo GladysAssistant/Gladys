@@ -5,7 +5,7 @@ import cx from 'classnames';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import DeviceParams from '../components/DeviceParams';
 import TransportBadge from '../components/TransportBadge';
-import { getDeviceTransport } from '../utils';
+import { getDeviceTransport, getDeviceTransportMessage, isDeviceTransportDegraded } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 
 class DeviceBox extends Component {
@@ -41,7 +41,7 @@ class DeviceBox extends Component {
     this.setState({ loading: false });
   };
 
-  render({ device, deviceIndex, houses = [] }, { loading, saveError, deleteError }) {
+  render({ device, deviceIndex, houses = [], language }, { loading, saveError, deleteError }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -49,7 +49,11 @@ class DeviceBox extends Component {
             {device.name}
             {getDeviceTransport(device) && (
               <div class="page-options d-flex">
-                <TransportBadge transport={getDeviceTransport(device)} />
+                <TransportBadge
+                  transport={getDeviceTransport(device)}
+                  degraded={isDeviceTransportDegraded(device)}
+                  message={getDeviceTransportMessage(device, language)}
+                />
               </div>
             )}
           </div>

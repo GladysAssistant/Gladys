@@ -641,6 +641,8 @@
         "localTooltip": "This device answers through the local network (LAN)",
         "cloudTooltip": "This device answers through the vendor cloud",
         "unreachableTooltip": "This device does not answer at the moment",
+        "degradedBadge": "Degraded",
+        "degradedTooltip": "This device works, but not in its nominal mode",
         "preferLocalLabel": "Prefer the local (LAN) connection when available",
         "preferLocalDescription": "The integration applies this preference when it can; the badge of each device shows the transport really in use."
       },

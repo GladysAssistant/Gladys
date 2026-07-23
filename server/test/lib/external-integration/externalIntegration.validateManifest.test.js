@@ -447,6 +447,57 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept select and multi_select fields with the devices dynamic source', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      config_schema: [{ key: 'main_device', type: 'select', label: { en: 'Device' }, source: 'devices' }],
+      actions: [
+        {
+          key: 'detect_protocol',
+          label: { en: 'Detect protocol' },
+          fields: [{ key: 'targets', type: 'multi_select', label: { en: 'Devices' }, source: 'devices' }],
+        },
+      ],
+    };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated).to.deep.equal(manifest);
+  });
+
+  it('should reject invalid dynamic source usages', () => {
+    // unknown source: the enum is reserved and defined by the core
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'select', label: { en: 'L' }, source: 'rooms' }] },
+      'config_schema[0].source: must be one of devices',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'string', label: { en: 'L' }, source: 'devices' }] },
+      'config_schema[0].source: only allowed on select and multi_select fields',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [
+          {
+            key: 'k',
+            type: 'select',
+            label: { en: 'L' },
+            source: 'devices',
+            options: [{ value: 'a', label: { en: 'A' } }],
+          },
+        ],
+      },
+      'config_schema[0].options: mutually exclusive with source',
+    );
+    // the dynamic values are unknown at validation time
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'select', label: { en: 'L' }, source: 'devices', default: 'a' }],
+      },
+      'config_schema[0].default: not allowed with a dynamic source',
+    );
+  });
+
   it('should accept a valid actions list', () => {
     const manifest = {
       ...TEST_MANIFEST,

@@ -51,3 +51,26 @@ export const getDeviceTransport = device => {
   const transportParam = ((device && device.params) || []).find(param => param.name === 'GLADYS_TRANSPORT');
   return transportParam ? transportParam.value : null;
 };
+
+// Degraded transport state, orthogonal to the transport value ("which
+// channel is used" vs "is it the nominal state"): the device works, but
+// not in its nominal mode — e.g. local detected but sessions refused,
+// falling back to cloud. Rendered as an orange dot on the transport badge.
+export const isDeviceTransportDegraded = device => {
+  const degradedParam = ((device && device.params) || []).find(param => param.name === 'GLADYS_TRANSPORT_DEGRADED');
+  return degradedParam ? degradedParam.value === 'true' : false;
+};
+
+// The reason of the degraded state (GLADYS_TRANSPORT_MESSAGE, a
+// multi-language object serialized as JSON), localized, or null.
+export const getDeviceTransportMessage = (device, language) => {
+  const messageParam = ((device && device.params) || []).find(param => param.name === 'GLADYS_TRANSPORT_MESSAGE');
+  if (!messageParam) {
+    return null;
+  }
+  try {
+    return getLocalizedText(JSON.parse(messageParam.value), language) || null;
+  } catch (e) {
+    return null;
+  }
+};

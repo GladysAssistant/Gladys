@@ -220,9 +220,92 @@ describe('externalIntegration.setDeviceTransports', () => {
       type: WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_TRANSPORT_UPDATED,
       payload: {
         selector: service.selector,
-        transports: [{ device_external_id: createdDevice.external_id, transport: 'local' }],
+        transports: [
+          { device_external_id: createdDevice.external_id, transport: 'local', degraded: false, message: null },
+        ],
       },
     });
+  });
+
+  it('should set then clear the degraded transport state', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration, stateManager, event } = buildSupervisor();
+    const createdDevice = await seedTransportDevice(service, stateManager);
+    const message = { en: 'Local session refused, falling back to cloud', fr: 'Session locale refusée, bascule cloud' };
+    await externalIntegration.setDeviceTransports(service, [
+      { device_external_id: createdDevice.external_id, transport: 'cloud', degraded: true, message },
+    ]);
+    let paramsInDb = await db.DeviceParam.findAll({
+      where: { device_id: createdDevice.id },
+      raw: true,
+      order: [['name', 'ASC']],
+    });
+    expect(paramsInDb.map((param) => ({ name: param.name, value: param.value }))).to.deep.equal([
+      { name: 'GLADYS_TRANSPORT', value: 'cloud' },
+      { name: 'GLADYS_TRANSPORT_DEGRADED', value: 'true' },
+      { name: 'GLADYS_TRANSPORT_MESSAGE', value: JSON.stringify(message) },
+    ]);
+    sinonAssert.calledWith(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_TRANSPORT_UPDATED,
+      payload: {
+        selector: service.selector,
+        transports: [{ device_external_id: createdDevice.external_id, transport: 'cloud', degraded: true, message }],
+      },
+    });
+    // an entry without degraded clears the degraded params: explicit
+    // return to nominal, no phantom orange state
+    await externalIntegration.setDeviceTransports(service, [
+      { device_external_id: createdDevice.external_id, transport: 'local' },
+    ]);
+    paramsInDb = await db.DeviceParam.findAll({ where: { device_id: createdDevice.id }, raw: true });
+    expect(paramsInDb).to.have.lengthOf(1);
+    expect(paramsInDb[0]).to.include({ name: 'GLADYS_TRANSPORT', value: 'local' });
+    expect(createdDevice.params).to.have.lengthOf(1);
+    expect(createdDevice.params[0]).to.include({ name: 'GLADYS_TRANSPORT', value: 'local' });
+  });
+
+  it('should clear a stale reason when a degraded entry has no message', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration, stateManager } = buildSupervisor();
+    const createdDevice = await seedTransportDevice(service, stateManager);
+    await externalIntegration.setDeviceTransports(service, [
+      { device_external_id: createdDevice.external_id, transport: 'cloud', degraded: true, message: { en: 'Stale' } },
+    ]);
+    await externalIntegration.setDeviceTransports(service, [
+      { device_external_id: createdDevice.external_id, transport: 'cloud', degraded: true },
+    ]);
+    const paramsInDb = await db.DeviceParam.findAll({
+      where: { device_id: createdDevice.id },
+      raw: true,
+      order: [['name', 'ASC']],
+    });
+    expect(paramsInDb.map((param) => ({ name: param.name, value: param.value }))).to.deep.equal([
+      { name: 'GLADYS_TRANSPORT', value: 'cloud' },
+      { name: 'GLADYS_TRANSPORT_DEGRADED', value: 'true' },
+    ]);
+  });
+
+  it('should refuse malformed degraded entries', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration } = buildSupervisor();
+    const invalidBatches = [
+      [{ device_external_id: 'ext:x:plug', transport: 'cloud', degraded: 'yes' }],
+      [{ device_external_id: 'ext:x:plug', transport: 'cloud', degraded: true, message: 'plain string' }],
+      // english is required (the front language fallback relies on it)
+      [{ device_external_id: 'ext:x:plug', transport: 'cloud', degraded: true, message: { fr: 'Bascule cloud' } }],
+      [{ device_external_id: 'ext:x:plug', transport: 'cloud', degraded: true, message: { en: 'x'.repeat(201) } }],
+      [{ device_external_id: 'ext:x:plug', transport: 'cloud', degraded: true, message: { en: 'Ok', fr: 42 } }],
+    ];
+    await Promise.all(
+      invalidBatches.map(async (batch) => {
+        try {
+          await externalIntegration.setDeviceTransports(service, batch);
+          throw new Error('should have thrown');
+        } catch (e) {
+          expect(e).to.be.instanceOf(BadParameters);
+        }
+      }),
+    );
   });
 
   it('should not push anything when no device matched', async () => {
@@ -284,6 +367,19 @@ describe('externalIntegration reserved GLADYS_* params in discovery', () => {
     expect(count).to.equal(1);
   });
 
+  it('should accept the degraded reserved params', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration } = buildSupervisor();
+    const count = await externalIntegration.setDiscoveredDevices(service, [
+      buildDevice(service, [
+        { name: 'GLADYS_TRANSPORT', value: 'cloud' },
+        { name: 'GLADYS_TRANSPORT_DEGRADED', value: 'true' },
+        { name: 'GLADYS_TRANSPORT_MESSAGE', value: JSON.stringify({ en: 'Local session refused' }) },
+      ]),
+    ]);
+    expect(count).to.equal(1);
+  });
+
   it('should refuse undefined GLADYS_* params and invalid transports', async () => {
     const service = await seedExternalService();
     const { externalIntegration } = buildSupervisor();
@@ -291,6 +387,10 @@ describe('externalIntegration reserved GLADYS_* params in discovery', () => {
       [{ name: 'GLADYS_CUSTOM', value: 'x' }],
       [{ name: 'gladys_transport', value: 'local' }],
       [{ name: 'GLADYS_TRANSPORT', value: 'satellite' }],
+      // 'true' or absent: a degraded param with another value is a bug
+      [{ name: 'GLADYS_TRANSPORT_DEGRADED', value: 'false' }],
+      [{ name: 'GLADYS_TRANSPORT_MESSAGE', value: 'not-json' }],
+      [{ name: 'GLADYS_TRANSPORT_MESSAGE', value: JSON.stringify({ fr: 'Bascule cloud' }) }],
     ];
     await Promise.all(
       invalidParamsLists.map(async (params) => {

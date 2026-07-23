@@ -7,7 +7,15 @@ const {
   DEVICE_FEATURE_UNITS_LIST,
   DEVICE_POLL_FREQUENCIES_LIST,
 } = require('../../utils/constants');
-const { MAX_DISCOVERED_DEVICES, RESERVED_PARAM_PREFIX, TRANSPORT_PARAM, DEVICE_TRANSPORTS } = require('./constants');
+const {
+  MAX_DISCOVERED_DEVICES,
+  RESERVED_PARAM_PREFIX,
+  TRANSPORT_PARAM,
+  TRANSPORT_DEGRADED_PARAM,
+  TRANSPORT_MESSAGE_PARAM,
+  DEVICE_TRANSPORTS,
+} = require('./constants');
+const { validateTransportMessage } = require('./externalIntegration.setDeviceTransports');
 
 /**
  * @description Store the complete list of discovered devices published by an
@@ -70,17 +78,31 @@ async function setDiscoveredDevices(service, devices) {
     params.forEach((param, paramIndex) => {
       // the GLADYS_* params namespace is reserved to the semantics defined
       // by the spec; today: GLADYS_TRANSPORT, the effective transport of
-      // the device (cloud/local badge in the UI)
+      // the device (cloud/local badge in the UI), and the degraded state
+      // GLADYS_TRANSPORT_DEGRADED / GLADYS_TRANSPORT_MESSAGE (orange dot)
       const paramName = param && typeof param.name === 'string' ? param.name : null;
       if (paramName === null || !paramName.toUpperCase().startsWith(RESERVED_PARAM_PREFIX)) {
         return;
       }
       const paramPath = `devices[${index}].params[${paramIndex}]`;
-      if (paramName !== TRANSPORT_PARAM) {
+      if (paramName === TRANSPORT_PARAM) {
+        if (!DEVICE_TRANSPORTS.includes(param.value)) {
+          throw new BadParameters(`${paramPath}.value: must be one of ${DEVICE_TRANSPORTS.join(', ')}`);
+        }
+      } else if (paramName === TRANSPORT_DEGRADED_PARAM) {
+        if (param.value !== 'true') {
+          throw new BadParameters(`${paramPath}.value: must be the string "true" (omit the param when nominal)`);
+        }
+      } else if (paramName === TRANSPORT_MESSAGE_PARAM) {
+        let parsedMessage;
+        try {
+          parsedMessage = JSON.parse(param.value);
+        } catch (e) {
+          throw new BadParameters(`${paramPath}.value: must be a multi-language object serialized as JSON`);
+        }
+        validateTransportMessage(parsedMessage, `${paramPath}.value`);
+      } else {
         throw new BadParameters(`${paramPath}.name: ${RESERVED_PARAM_PREFIX}* names are reserved (${paramName})`);
-      }
-      if (!DEVICE_TRANSPORTS.includes(param.value)) {
-        throw new BadParameters(`${paramPath}.value: must be one of ${DEVICE_TRANSPORTS.join(', ')}`);
       }
     });
     return {

@@ -9,7 +9,15 @@ import { RequestStatus } from '../../../../../utils/consts';
 // detection, re-pairing...): a button per action, an optional mini form
 // rendered by the same engine as the config_schema, and the result
 // message of the integration shown under the button.
-const ActionsCard = ({ actions, language, actionStates, actionFieldValues, updateActionFieldValue, runAction }) => (
+const ActionsCard = ({
+  actions,
+  language,
+  actionStates,
+  actionFieldValues,
+  updateActionFieldValue,
+  runAction,
+  dynamicOptions
+}) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
@@ -34,6 +42,7 @@ const ActionsCard = ({ actions, language, actionStates, actionFieldValues, updat
                 configuredSecrets={[]}
                 touchedSecrets={{}}
                 updateConfigValue={(updatedField, value) => updateActionFieldValue(action.key, updatedField, value)}
+                dynamicOptions={dynamicOptions}
               />
             ))}
             <button

@@ -83,6 +83,7 @@ const ConfigTab = props => {
                   connectionStatus={get(integration, 'connection_status')}
                   oauthStatus={props.oauthStatus}
                   connectOAuth={props.connectOAuth}
+                  dynamicOptions={props.dynamicOptions}
                 />
               )}
             </div>
@@ -108,6 +109,7 @@ const ConfigTab = props => {
           actionFieldValues={props.actionFieldValues || {}}
           updateActionFieldValue={props.updateActionFieldValue}
           runAction={props.runAction}
+          dynamicOptions={props.dynamicOptions}
         />
       )}
 

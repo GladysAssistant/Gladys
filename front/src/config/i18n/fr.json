@@ -641,6 +641,8 @@
         "localTooltip": "Cet appareil répond via le réseau local (LAN)",
         "cloudTooltip": "Cet appareil répond via le cloud du fabricant",
         "unreachableTooltip": "Cet appareil ne répond pas pour le moment",
+        "degradedBadge": "Dégradé",
+        "degradedTooltip": "Cet appareil fonctionne, mais pas en mode nominal",
         "preferLocalLabel": "Privilégier la connexion locale (LAN) quand elle est disponible",
         "preferLocalDescription": "L'intégration applique cette préférence quand elle le peut ; le macaron de chaque appareil indique le transport réellement utilisé."
       },

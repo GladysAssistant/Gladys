@@ -122,6 +122,15 @@ const RESERVED_PARAM_PREFIX = 'GLADYS_';
 const TRANSPORT_PARAM = 'GLADYS_TRANSPORT';
 const DEVICE_TRANSPORTS = ['local', 'cloud', 'unreachable'];
 const MAX_TRANSPORTS_PER_REQUEST = 100;
+// Degraded transport state, orthogonal to the transport enum ("which
+// channel is used right now" and "is it the nominal state" are two
+// different informations — e.g. local detected but sessions refused,
+// falling back to cloud): GLADYS_TRANSPORT_DEGRADED = "true" (absent
+// otherwise) + GLADYS_TRANSPORT_MESSAGE = the reason, a multi-language
+// object serialized as JSON (en required, 200 chars max per language).
+const TRANSPORT_DEGRADED_PARAM = 'GLADYS_TRANSPORT_DEGRADED';
+const TRANSPORT_MESSAGE_PARAM = 'GLADYS_TRANSPORT_MESSAGE';
+const MAX_TRANSPORT_MESSAGE_LENGTH = 200;
 // Manifest transports field + the standard "prefer local" user preference,
 // stored as a reserved config key (readable by the integration, never
 // writable by it).
@@ -193,6 +202,9 @@ module.exports = {
   TRANSPORT_PARAM,
   DEVICE_TRANSPORTS,
   MAX_TRANSPORTS_PER_REQUEST,
+  TRANSPORT_DEGRADED_PARAM,
+  TRANSPORT_MESSAGE_PARAM,
+  MAX_TRANSPORT_MESSAGE_LENGTH,
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
 };

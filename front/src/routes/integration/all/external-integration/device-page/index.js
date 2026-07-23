@@ -86,19 +86,27 @@ class ExternalIntegrationDevicePage extends Component {
     if (!payload || payload.selector !== this.props.selector || !this.state.devices) {
       return;
     }
-    // patch the GLADYS_TRANSPORT param of the concerned devices in place:
-    // the badges update without refetching the list
-    const transportByExternalId = {};
+    // patch the GLADYS_TRANSPORT* params of the concerned devices in
+    // place: the badges (and the degraded orange dot) update without
+    // refetching the list
+    const TRANSPORT_PARAM_NAMES = ['GLADYS_TRANSPORT', 'GLADYS_TRANSPORT_DEGRADED', 'GLADYS_TRANSPORT_MESSAGE'];
+    const entryByExternalId = {};
     (payload.transports || []).forEach(entry => {
-      transportByExternalId[entry.device_external_id] = entry.transport;
+      entryByExternalId[entry.device_external_id] = entry;
     });
     const devices = this.state.devices.map(device => {
-      const transport = transportByExternalId[device.external_id];
-      if (!transport) {
+      const entry = entryByExternalId[device.external_id];
+      if (!entry) {
         return device;
       }
-      const params = (device.params || []).filter(param => param.name !== 'GLADYS_TRANSPORT');
-      params.push({ name: 'GLADYS_TRANSPORT', value: transport });
+      const params = (device.params || []).filter(param => !TRANSPORT_PARAM_NAMES.includes(param.name));
+      params.push({ name: 'GLADYS_TRANSPORT', value: entry.transport });
+      if (entry.degraded) {
+        params.push({ name: 'GLADYS_TRANSPORT_DEGRADED', value: 'true' });
+        if (entry.message) {
+          params.push({ name: 'GLADYS_TRANSPORT_MESSAGE', value: JSON.stringify(entry.message) });
+        }
+      }
       return { ...device, params };
     });
     this.setState({ devices });
@@ -130,6 +138,7 @@ class ExternalIntegrationDevicePage extends Component {
       <ExternalIntegrationPage selector={props.selector} integration={state.integration}>
         <DeviceTab
           {...state}
+          language={(props.user && props.user.language) || 'en'}
           getDevices={this.getDevices}
           updateDeviceField={this.updateDeviceField}
           saveDevice={this.saveDevice}
