@@ -3,6 +3,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import DeviceParams from '../components/DeviceParams';
 import TransportBadge from '../components/TransportBadge';
 import { getDeviceTransport } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -112,6 +113,8 @@ class DeviceBox extends Component {
                   </label>
                   <DeviceFeatures features={device.features} />
                 </div>
+
+                <DeviceParams device={device} />
 
                 <div class="d-flex">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2 flex-fill">

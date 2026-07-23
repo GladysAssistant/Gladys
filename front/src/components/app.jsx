@@ -196,6 +196,7 @@ import EnergyMonitoringIntegration from '../routes/integration/all/energy-monito
 import ExternalIntegrationDevicePage from '../routes/integration/all/external-integration/device-page';
 import ExternalIntegrationDiscoverPage from '../routes/integration/all/external-integration/discover-page';
 import ExternalIntegrationConfigPage from '../routes/integration/all/external-integration/config-page';
+import ExternalIntegrationSupervisionPage from '../routes/integration/all/external-integration/supervision-page';
 import ExternalIntegrationLogsPage from '../routes/integration/all/external-integration/logs-page';
 import ExternalIntegrationInstallPage from '../routes/integration/all/external-integration/install-page';
 import ExternalIntegrationOAuthCallbackPage from '../routes/integration/all/external-integration/oauth-callback-page';
@@ -383,6 +384,7 @@ const AppRouter = connect(
         <ExternalIntegrationDevicePage path="/dashboard/integration/device/external/:selector" />
         <ExternalIntegrationDiscoverPage path="/dashboard/integration/device/external/:selector/discover" />
         <ExternalIntegrationConfigPage path="/dashboard/integration/device/external/:selector/config" />
+        <ExternalIntegrationSupervisionPage path="/dashboard/integration/device/external/:selector/supervision" />
         <ExternalIntegrationLogsPage path="/dashboard/integration/device/external/:selector/logs" />
         <ExternalIntegrationInstallPage path="/dashboard/integration/device/external-install/:owner/:repo" />
         <ExternalIntegrationOAuthCallbackPage path="/dashboard/integration/device/external/:selector/oauth-callback" />

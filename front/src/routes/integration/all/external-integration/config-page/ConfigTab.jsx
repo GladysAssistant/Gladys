@@ -4,7 +4,6 @@ import get from 'get-value';
 
 import ConfigSchemaForm from './ConfigSchemaForm';
 import ActionsCard from './ActionsCard';
-import SupervisionCard from './SupervisionCard';
 import LinkAccountCard from './LinkAccountCard';
 import HardwareCard from './HardwareCard';
 import { getRequestedHardwareClasses } from '../utils';
@@ -109,21 +108,6 @@ const ConfigTab = props => {
           actionFieldValues={props.actionFieldValues || {}}
           updateActionFieldValue={props.updateActionFieldValue}
           runAction={props.runAction}
-        />
-      )}
-
-      {integration && (
-        <SupervisionCard
-          integration={integration}
-          language={language}
-          actionStatus={props.actionStatus}
-          actionError={props.actionError}
-          uninstallStatus={props.uninstallStatus}
-          askingUninstall={props.askingUninstall}
-          executeAction={props.executeAction}
-          onAskUninstall={props.askUninstall}
-          onCancelUninstall={props.cancelUninstall}
-          onUninstall={props.uninstall}
         />
       )}
 

@@ -70,6 +70,17 @@ const ExternalIntegrationPage = ({ selector, integration, children }) => {
                     </Link>
 
                     <Link
+                      href={`/dashboard/integration/device/external/${selector}/supervision`}
+                      activeClassName="active"
+                      class="list-group-item list-group-item-action d-flex align-items-center"
+                    >
+                      <span class="icon mr-3">
+                        <i class="fe fe-activity" />
+                      </span>
+                      <Text id="integration.externalIntegration.supervisionTab" />
+                    </Link>
+
+                    <Link
                       href={`/dashboard/integration/device/external/${selector}/logs`}
                       activeClassName="active"
                       class="list-group-item list-group-item-action d-flex align-items-center"

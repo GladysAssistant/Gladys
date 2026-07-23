@@ -1,6 +1,5 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { route } from 'preact-router';
 import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
@@ -291,38 +290,6 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  executeAction = async action => {
-    this.setState({ actionStatus: RequestStatus.Getting, actionError: null });
-    try {
-      const integration = await this.props.httpClient.post(
-        `/api/v1/external_integration/${this.props.selector}/${action}`
-      );
-      this.setState({ integration, actionStatus: RequestStatus.Success });
-    } catch (e) {
-      console.error(e);
-      this.setState({ actionStatus: RequestStatus.Error, actionError: action });
-    }
-  };
-
-  askUninstall = () => {
-    this.setState({ askingUninstall: true });
-  };
-
-  cancelUninstall = () => {
-    this.setState({ askingUninstall: false });
-  };
-
-  uninstall = async () => {
-    this.setState({ uninstallStatus: RequestStatus.Getting });
-    try {
-      await this.props.httpClient.delete(`/api/v1/external_integration/${this.props.selector}`);
-      route('/dashboard/integration/device');
-    } catch (e) {
-      console.error(e);
-      this.setState({ uninstallStatus: RequestStatus.Error });
-    }
-  };
-
   onStatusChanged = payload => {
     if (payload && this.state.integration && payload.selector === this.props.selector) {
       this.setState({
@@ -382,10 +349,6 @@ class ExternalIntegrationConfigPage extends Component {
           togglePreferLocal={this.togglePreferLocal}
           updateActionFieldValue={this.updateActionFieldValue}
           runAction={this.runAction}
-          executeAction={this.executeAction}
-          askUninstall={this.askUninstall}
-          cancelUninstall={this.cancelUninstall}
-          uninstall={this.uninstall}
           generateLinkCode={this.generateLinkCode}
           unlinkContact={this.unlinkContact}
           toggleHardwareClass={this.toggleHardwareClass}

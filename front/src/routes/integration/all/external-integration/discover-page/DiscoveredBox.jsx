@@ -3,6 +3,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import DeviceParams from '../components/DeviceParams';
 import { RequestStatus } from '../../../../../utils/consts';
 
 class DiscoveredBox extends Component {
@@ -50,6 +51,7 @@ class DiscoveredBox extends Component {
                   </label>
                   <DeviceFeatures features={device.features} />
                 </div>
+                <DeviceParams device={device} />
                 {device.created && device.structure_changed ? (
                   <Localizer>
                     <button

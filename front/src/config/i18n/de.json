@@ -601,6 +601,7 @@
       "deviceTab": "Geräte",
       "discoverTab": "Entdecken",
       "configTab": "Konfiguration",
+      "supervisionTab": "Überwachung",
       "logsTab": "Protokolle",
       "status": {
         "UNKNOWN": "Unbekannt",
@@ -654,6 +655,7 @@
       },
       "supervision": {
         "title": "Überwachung",
+        "loadError": "Beim Laden der Integration ist ein Fehler aufgetreten.",
         "actionError": "Beim Ausführen dieser Aktion ist ein Fehler aufgetreten.",
         "uninstallError": "Beim Deinstallieren dieser Integration ist ein Fehler aufgetreten.",
         "updateAvailableText": "Eine neue Version dieser Integration ist verfügbar.",
@@ -691,6 +693,9 @@
         "featuresLabel": "Funktionen",
         "saveButton": "Speichern",
         "deleteButton": "Löschen"
+      },
+      "deviceParams": {
+        "title": "Technische Parameter"
       },
       "discover": {
         "title": "Entdeckte Geräte",

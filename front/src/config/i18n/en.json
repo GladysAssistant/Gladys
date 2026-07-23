@@ -601,6 +601,7 @@
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "configTab": "Configuration",
+      "supervisionTab": "Supervision",
       "logsTab": "Logs",
       "status": {
         "UNKNOWN": "Unknown",
@@ -654,6 +655,7 @@
       },
       "supervision": {
         "title": "Supervision",
+        "loadError": "There was an error loading the integration.",
         "actionError": "There was an error executing this action.",
         "uninstallError": "There was an error uninstalling this integration.",
         "updateAvailableText": "A new version of this integration is available.",
@@ -691,6 +693,9 @@
         "featuresLabel": "Features",
         "saveButton": "Save",
         "deleteButton": "Delete"
+      },
+      "deviceParams": {
+        "title": "Technical parameters"
       },
       "discover": {
         "title": "Discovered devices",

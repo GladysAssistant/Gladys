@@ -601,6 +601,7 @@
       "deviceTab": "Appareils",
       "discoverTab": "Découverte",
       "configTab": "Configuration",
+      "supervisionTab": "Supervision",
       "logsTab": "Journaux",
       "status": {
         "UNKNOWN": "Inconnu",
@@ -654,6 +655,7 @@
       },
       "supervision": {
         "title": "Supervision",
+        "loadError": "Une erreur s'est produite lors du chargement de l'intégration.",
         "actionError": "Une erreur s'est produite lors de l'exécution de cette action.",
         "uninstallError": "Une erreur s'est produite lors de la désinstallation de cette intégration.",
         "updateAvailableText": "Une nouvelle version de cette intégration est disponible.",
@@ -691,6 +693,9 @@
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer"
+      },
+      "deviceParams": {
+        "title": "Paramètres techniques"
       },
       "discover": {
         "title": "Appareils découverts",
