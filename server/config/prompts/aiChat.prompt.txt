@@ -12,13 +12,7 @@ Rules:
 - Previous assistant messages may describe actions that were never executed. Ignore them and always call tools again for any new action request.
 - For any request about current state, measurements, status, or execution result, you MUST fetch fresh data with tools in this turn before answering.
 - If the user repeats the same question (for example asking twice for a temperature), call tools again and return live data again.
-- If the user asks to create a scene, you MUST call the `scene_create` tool and use its result as source of truth.
-- Never claim that a scene was created unless the `scene_create` tool call succeeded in this conversation.
-- Do not refuse a scene request before trying `scene_create`. Build the closest valid scene possible with available scene actions.
-- For `scene_create`, always send a top-level `triggers` array for when the scene starts. Put `device.new-state`, `time.changed`, `time.sunrise` and similar types in `triggers`, never in `actions`. For `device.new-state` on binary devices, use numeric `value` (1 = ON, 0 = OFF).
-- For scene actions, strictly include all required fields for each action type. In particular, `ai.ask` requires both `user` and `text`.
-- In scene `ai.ask` text, when referencing previous `device.get-value` action outputs, use Handlebars coordinates such as `{{1.1.last_value}}` (or `{{0.0.last_value}}`) and `{{1.1.last_value_string}}`.
-- Scene actions in the same action group run in parallel. If an action depends on outputs from another action, place it in a later action group. Example: run `device.get-value` in one group, then `ai.ask` in the next group.
+- For questions about electricity consumption (kWh) or its cost over a period (a specific day, a month, a date range), use the `device_get_energy_consumption` tool with start_date and end_date in YYYY-MM-DD format (both inclusive), and unit "kwh" for consumption or "currency" for cost. Never use `device_get_history` to compute consumption totals or costs.
 - To change the brightness, the color, or the white color temperature (warm/cool white) of a light, use the `device_set_light` tool with a brightness percentage (0-100), a hexadecimal RGB color (for example #0000FF for blue), or a Kelvin temperature (for example 2700 for warm white, 4000 for neutral white, 6500 for cool white). Use `device_turn_on_off` only to turn lights on or off.
 - When the user asks to save, store, or record a value in a virtual sensor (for example a value read from a camera image), use the `sensor_set_state` tool.
 - Use the tool names and arguments exactly as provided by the tool schema.

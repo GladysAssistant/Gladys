@@ -6,11 +6,14 @@ const { mcpToolsToChatApiFormat } = require('../../services/mcp/lib/mcpToolsToCh
 const {
   buildExchangesFromMessages,
   exchangesToApiMessages,
-  FETCH_MESSAGE_LIMIT,
 } = require('../message/message.getPreviousQuestionsForUser');
 const { buildSystemPromptWithCurrentTime } = require('./gateway.forwardMessageToAiChat');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
+
+// Number of most recent messages to include in the AI chat debug context.
+// Larger than the live chat fetch limit so the debug payload shows more history.
+const DEBUG_MESSAGE_LIMIT = 200;
 
 /**
  * @description Return MCP handler from service manager.
@@ -158,7 +161,7 @@ async function getAiChatDebugContext(userId) {
     },
     attributes: ['sender_id', 'text', 'file', 'message_type', 'tool_name', 'tool_status', 'created_at'],
     order: [['created_at', 'desc']],
-    limit: FETCH_MESSAGE_LIMIT,
+    limit: DEBUG_MESSAGE_LIMIT,
   });
 
   const plainMessages = recentMessages.map((message) => message.get({ plain: true }));
@@ -187,6 +190,7 @@ async function getAiChatDebugContext(userId) {
 }
 
 module.exports = {
+  DEBUG_MESSAGE_LIMIT,
   getAiChatDebugContext,
   dbMessageToApiMessage,
   formatFileAsImageUrl,
