@@ -3875,7 +3875,9 @@
         "mode": {
           "auto": "Auto",
           "cooling": "Cool",
-          "heating": "Heat"
+          "heating": "Heat",
+          "drying": "Dry",
+          "fan": "Fan"
         }
       },
       "heater": {

@@ -208,7 +208,7 @@ describe('gateway.getAiChatDebugContext', () => {
     expect(payload._debug.exchangeCount).to.equal(1);
 
     assert.calledOnce(messageFindAll);
-    expect(messageFindAll.firstCall.args[0].limit).to.equal(30);
+    expect(messageFindAll.firstCall.args[0].limit).to.equal(200);
   });
 
   it('should default timezone when not configured', async () => {

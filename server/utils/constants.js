@@ -1670,6 +1670,23 @@ const ENERGY_PRICE_DAY_TYPES = {
   WHITE: 'white',
 };
 
+const AI_CHAT_TOOL_CATEGORIES = {
+  SCENES: 'scenes',
+  DEVICE_CONTROL: 'device_control',
+  DEVICE_QUERY: 'device_query',
+  WEB_AND_TIME: 'web_and_time',
+  OTHER: 'other',
+};
+
+// Explicit purpose of each AI request, sent to the Gladys Gateway so the
+// backend can pick the right model and reasoning settings per request type
+// without inspecting message content.
+const AI_CHAT_PURPOSES = {
+  CHAT: 'chat',
+  INTENT_CLASSIFICATION: 'intent-classification',
+  WEEKLY_DIGEST: 'weekly-digest',
+};
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -1703,6 +1720,7 @@ const JOB_TYPES_LIST = createList(JOB_TYPES);
 const JOB_STATUS_LIST = createList(JOB_STATUS);
 const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 const ALARM_MODES_LIST = createList(ALARM_MODES);
+const AI_CHAT_TOOL_CATEGORIES_LIST = createList(AI_CHAT_TOOL_CATEGORIES);
 const ENERGY_CONTRACT_TYPES_LIST = createList(ENERGY_CONTRACT_TYPES);
 const ENERGY_PRICE_TYPES_LIST = createList(ENERGY_PRICE_TYPES);
 const ENERGY_PRICE_DAY_TYPES_LIST = createList(ENERGY_PRICE_DAY_TYPES);
@@ -1793,6 +1811,10 @@ module.exports.DEFAULT_VALUE_TEMPERATURE = DEFAULT_VALUE_TEMPERATURE;
 
 module.exports.ALARM_MODES = ALARM_MODES;
 module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
+
+module.exports.AI_CHAT_TOOL_CATEGORIES = AI_CHAT_TOOL_CATEGORIES;
+module.exports.AI_CHAT_TOOL_CATEGORIES_LIST = AI_CHAT_TOOL_CATEGORIES_LIST;
+module.exports.AI_CHAT_PURPOSES = AI_CHAT_PURPOSES;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
 module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;

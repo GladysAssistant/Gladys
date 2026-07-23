@@ -3875,7 +3875,9 @@
         "mode": {
           "auto": "Automatisch",
           "cooling": "Kühlen",
-          "heating": "Heizen"
+          "heating": "Heizen",
+          "drying": "Entfeuchten",
+          "fan": "Lüften"
         }
       },
       "heater": {
