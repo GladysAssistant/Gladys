@@ -2870,6 +2870,20 @@
       },
       "askAi": {
         "answer": "AI Antwort"
+      },
+      "trigger": {
+        "device": {
+          "name": "Name des auslösenden Geräts"
+        },
+        "deviceFeature": {
+          "name": "Name der auslösenden Gerätefunktion",
+          "last_value": "Aktueller Wert des Auslösers",
+          "previous_value": "Vorheriger Wert des Auslösers"
+        },
+        "mqtt": {
+          "topic": "Empfangenes MQTT-Topic",
+          "message": "Empfangene MQTT-Nachricht"
+        }
       }
     },
     "triggers": {

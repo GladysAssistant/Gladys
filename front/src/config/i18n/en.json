@@ -2870,6 +2870,20 @@
       },
       "askAi": {
         "answer": "AI answer"
+      },
+      "trigger": {
+        "device": {
+          "name": "Triggering device name"
+        },
+        "deviceFeature": {
+          "name": "Triggering device feature name",
+          "last_value": "Triggering device current value",
+          "previous_value": "Triggering device previous value"
+        },
+        "mqtt": {
+          "topic": "Received MQTT topic",
+          "message": "Received MQTT message"
+        }
       }
     },
     "triggers": {
