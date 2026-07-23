@@ -8,7 +8,7 @@ module.exports = function MCPService(gladys, serviceId) {
   // eslint-disable-next-line import/no-unresolved, import/extensions
   const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
   // eslint-disable-next-line import/no-unresolved
-  const { encode } = require('@toon-format/toon');
+  const { encodeGeneric: encode } = require('@blackwell-systems/gcf');
   const levenshtein = require('fastest-levenshtein');
 
   const mcp = {
