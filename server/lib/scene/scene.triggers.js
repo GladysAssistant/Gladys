@@ -7,6 +7,9 @@ const { compare } = require('../../utils/compare');
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
   event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0);
 
+const matchSunPositionEvent = (self, sceneSelector, event, trigger) =>
+  event.house.selector === trigger.house && event.altitude === trigger.altitude && event.azimuth === trigger.azimuth;
+
 const triggersFunc = {
   [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {
     // we check that we are talking about the same device feature
@@ -86,6 +89,7 @@ const triggersFunc = {
   [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => event.key === trigger.key,
   [EVENTS.TIME.SUNRISE]: matchSunEvent,
   [EVENTS.TIME.SUNSET]: matchSunEvent,
+  [EVENTS.TIME.SUN_POSITION]: matchSunPositionEvent,
   [EVENTS.USER_PRESENCE.BACK_HOME]: (self, sceneSelector, event, trigger) =>
     event.house === trigger.house && event.user === trigger.user,
   [EVENTS.USER_PRESENCE.LEFT_HOME]: (self, sceneSelector, event, trigger) =>

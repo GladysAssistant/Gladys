@@ -2879,7 +2879,8 @@
       "time": {
         "changed": "Zeitabhängiger Auslöser",
         "sunrise": "Jeder Sonnenaufgang",
-        "sunset": "Jeder Sonnenuntergang"
+        "sunset": "Jeder Sonnenuntergang",
+        "sun-position": "Sonne bei bestimmter Höhe und Azimut"
       },
       "user": {
         "back-home": "Benutzer ist zurück zu Hause",
@@ -2966,6 +2967,11 @@
         "before": "Vor",
         "after": "Nach",
         "minutes": "Minuten"
+      },
+      "sunPositionTrigger": {
+        "altitudeLabel": "Höhe (°)",
+        "azimuthLabel": "Azimut (°)",
+        "description": "Löst die Szene aus, wenn die Sonne die angegebene Höhe und den angegebenen Azimut erreicht. Der Azimut wird im Uhrzeigersinn von Norden gemessen (0° = Norden, 90° = Osten, 180° = Süden, 270° = Westen)."
       },
       "userPresence": {
         "backAtHomeDescription": "Dies wird ausgelöst, wenn der ausgewählte Benutzer wieder im ausgewählten Zuhause ist.",
