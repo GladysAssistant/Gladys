@@ -234,21 +234,21 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
     if (activePower !== undefined) {
       emitState(
         `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:power`,
-        activePower !== null ? activePower / 1000 : null,
+        activePower !== null ? Number(activePower) / 1000 : null,
       );
     }
     const voltage = await safeReadAttribute(() => electricalPowerMeasurement.getVoltageAttribute());
     if (voltage !== undefined) {
       emitState(
         `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:voltage`,
-        voltage !== null ? voltage / 1000 : null,
+        voltage !== null ? Number(voltage) / 1000 : null,
       );
     }
     const activeCurrent = await safeReadAttribute(() => electricalPowerMeasurement.getActiveCurrentAttribute());
     if (activeCurrent !== undefined) {
       emitState(
         `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:current`,
-        activeCurrent !== null ? activeCurrent / 1000 : null,
+        activeCurrent !== null ? Number(activeCurrent) / 1000 : null,
       );
     }
   }
@@ -259,7 +259,7 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
     if (value !== undefined) {
       emitState(
         `matter:${nodeId}:${devicePath}:${ElectricalEnergyMeasurement.Complete.id}:energy`,
-        value && value.energy !== null ? value.energy / 1000000 : null,
+        value && value.energy !== null ? Number(value.energy) / 1000000 : null,
       );
     }
   }

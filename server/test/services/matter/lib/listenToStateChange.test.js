@@ -670,6 +670,90 @@ describe('Matter.listenToStateChange', () => {
       state: 1500,
     });
   });
+  it('should listen to state change (ElectricalPowerMeasurement - ActivePower as BigInt)', async () => {
+    const clusterClient = {
+      id: ElectricalPowerMeasurement.Complete.id,
+      addActivePowerAttributeListener: (callback) => {
+        callback(1500000n); // 1500000 mW = 1500 W
+      },
+      addVoltageAttributeListener: () => {},
+      addActiveCurrentAttributeListener: () => {},
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:144:power',
+      state: 1500,
+    });
+  });
+  it('should listen to state change (ElectricalPowerMeasurement - Voltage as BigInt)', async () => {
+    const clusterClient = {
+      id: ElectricalPowerMeasurement.Complete.id,
+      supportedFeatures: {
+        voltage: true,
+      },
+      addActivePowerAttributeListener: () => {},
+      addVoltageAttributeListener: (callback) => {
+        callback(230000n); // 230000 mV = 230 V
+      },
+      addActiveCurrentAttributeListener: () => {},
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:144:voltage',
+      state: 230,
+    });
+  });
+  it('should listen to state change (ElectricalPowerMeasurement - ActiveCurrent as BigInt)', async () => {
+    const clusterClient = {
+      id: ElectricalPowerMeasurement.Complete.id,
+      supportedFeatures: {
+        current: true,
+      },
+      addActivePowerAttributeListener: () => {},
+      addVoltageAttributeListener: () => {},
+      addActiveCurrentAttributeListener: (callback) => {
+        callback(6500n); // 6500 mA = 6.5 A
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:144:current',
+      state: 6.5,
+    });
+  });
+  it('should listen to state change (ElectricalEnergyMeasurement - CumulativeEnergy as BigInt)', async () => {
+    const clusterClient = {
+      id: ElectricalEnergyMeasurement.Complete.id,
+      supportedFeatures: {
+        cumulativeEnergy: true,
+      },
+      addCumulativeEnergyImportedAttributeListener: (callback) => {
+        // 4500000000 mWh = 4500 kWh, above INT32_MAX so matter.js delivers a BigInt
+        callback({ energy: 4500000000n });
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:145:energy',
+      state: 4500,
+    });
+  });
   it('should listen to state change (HepaFilterMonitoring)', async () => {
     const clusterClient = {
       id: HepaFilterMonitoring.Complete.id,

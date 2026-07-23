@@ -417,8 +417,8 @@ async function listenToStateChange(nodeId, devicePath, device) {
     // Subscribe to ActivePower attribute changes
     electricalPowerMeasurement.addActivePowerAttributeListener((value) => {
       logger.debug(`Matter: ElectricalPowerMeasurement ActivePower attribute changed to ${value}`);
-      // Value is in milliwatts, convert to watts
-      const powerInWatts = value !== null ? value / 1000 : null;
+      // Value is in milliwatts (int64, may be a BigInt), convert to watts
+      const powerInWatts = value !== null ? Number(value) / 1000 : null;
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:power`,
         state: powerInWatts,
@@ -428,8 +428,8 @@ async function listenToStateChange(nodeId, devicePath, device) {
     if (electricalPowerMeasurement.addVoltageAttributeListener) {
       electricalPowerMeasurement.addVoltageAttributeListener((value) => {
         logger.debug(`Matter: ElectricalPowerMeasurement Voltage attribute changed to ${value}`);
-        // Value is in millivolts, convert to volts
-        const voltageInVolts = value !== null ? value / 1000 : null;
+        // Value is in millivolts (int64, may be a BigInt), convert to volts
+        const voltageInVolts = value !== null ? Number(value) / 1000 : null;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:voltage`,
           state: voltageInVolts,
@@ -440,8 +440,8 @@ async function listenToStateChange(nodeId, devicePath, device) {
     if (electricalPowerMeasurement.addActiveCurrentAttributeListener) {
       electricalPowerMeasurement.addActiveCurrentAttributeListener((value) => {
         logger.debug(`Matter: ElectricalPowerMeasurement ActiveCurrent attribute changed to ${value}`);
-        // Value is in milliamps, convert to amps
-        const currentInAmps = value !== null ? value / 1000 : null;
+        // Value is in milliamps (int64, may be a BigInt), convert to amps
+        const currentInAmps = value !== null ? Number(value) / 1000 : null;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:current`,
           state: currentInAmps,
@@ -460,8 +460,9 @@ async function listenToStateChange(nodeId, devicePath, device) {
     if (electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener) {
       electricalEnergyMeasurement.addCumulativeEnergyImportedAttributeListener((value) => {
         logger.debug(`Matter: ElectricalEnergyMeasurement CumulativeEnergyImported attribute changed to`, value);
-        // Value is an object with energy field in milliwatt-hours, convert to kilowatt-hours
-        const energyInKwh = value && value.energy !== null ? value.energy / 1000000 : null;
+        // Value is an object with energy field in milliwatt-hours (int64, may be a BigInt),
+        // convert to kilowatt-hours
+        const energyInKwh = value && value.energy !== null ? Number(value.energy) / 1000000 : null;
         const externalId = `matter:${nodeId}:${devicePath}:${ElectricalEnergyMeasurement.Complete.id}:energy`;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: externalId,
