@@ -4,6 +4,8 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import style from './style.css';
 import { MAX_LENGTH_TAG } from './constant';
+import { computeRunningInfo } from './runningInfo';
+import RunningStatus from './RunningStatus';
 
 class SceneCard extends Component {
   getSceneUrl = () => {
@@ -31,7 +33,13 @@ class SceneCard extends Component {
     return `/dashboard/scene/${this.props.scene.selector}`;
   };
 
+  getRunningInfo = props => computeRunningInfo(props.runningScenes, props.scene.selector, props.now);
+
   startScene = async () => {
+    // Prevent launching a new instance while the scene is already running
+    if (this.getRunningInfo(this.props)) {
+      return;
+    }
     try {
       await this.setState({ saving: true });
       await this.props.httpClient.post(`/api/v1/scene/${this.props.scene.selector}/start`);
@@ -50,6 +58,7 @@ class SceneCard extends Component {
   };
 
   getMobileView = (props, { saving }) => {
+    const runningInfo = this.getRunningInfo(props);
     return (
       <div class="list-group-item">
         <div class="row align-items-center">
@@ -82,11 +91,13 @@ class SceneCard extends Component {
             <button
               onClick={this.startScene}
               type="button"
-              class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
+              class={cx('btn', 'btn-sm', style.btnLoading, {
+                'btn-outline-success': !runningInfo,
+                'btn-success': runningInfo,
                 'btn-loading': saving
               })}
             >
-              <i class="fe fe-play" />
+              {runningInfo ? <RunningStatus runningInfo={runningInfo} /> : <i class="fe fe-play" />}
             </button>
           </div>
         </div>
@@ -95,6 +106,7 @@ class SceneCard extends Component {
   };
 
   getDesktopView = (props, { saving }) => {
+    const runningInfo = this.getRunningInfo(props);
     return (
       <div class="col-lg-3 p-2">
         <div
@@ -142,9 +154,22 @@ class SceneCard extends Component {
                       <i class="fe fe-edit" />
                       <Text id="scene.editButton" />
                     </Link>
-                    <button onClick={this.startScene} type="button" class="btn btn-outline-success btn-sm">
-                      <i class="fe fe-play" />
-                      <Text id="scene.startButton" />
+                    <button
+                      onClick={this.startScene}
+                      type="button"
+                      class={cx('btn', 'btn-sm', {
+                        'btn-outline-success': !runningInfo,
+                        'btn-success': runningInfo
+                      })}
+                    >
+                      {runningInfo ? (
+                        <RunningStatus runningInfo={runningInfo} />
+                      ) : (
+                        <>
+                          <i class="fe fe-play" />
+                          <Text id="scene.startButton" />
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>

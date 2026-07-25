@@ -11,6 +11,7 @@ const { destroy } = require('./scene.destroy');
 const { execute } = require('./scene.execute');
 const { get } = require('./scene.get');
 const { getBySelector } = require('./scene.getBySelector');
+const { getRunning } = require('./scene.getRunning');
 const { executeSingleAction } = require('./scene.executeSingleAction');
 const { update } = require('./scene.update');
 const { dailyUpdate } = require('./scene.dailyUpdate');
@@ -48,6 +49,8 @@ const SceneManager = function SceneManager(
   this.gateway = gateway;
   this.service = service;
   this.scenes = {};
+  // in-memory registry of scene executions currently running, keyed by executionId
+  this.runningScenes = new Map();
   this.timezone = DEFAULT_TIMEZONE;
   // @ts-ignore
   this.queue = queue({
@@ -82,6 +85,7 @@ SceneManager.prototype.get = get;
 SceneManager.prototype.init = init;
 SceneManager.prototype.dailyUpdate = dailyUpdate;
 SceneManager.prototype.getBySelector = getBySelector;
+SceneManager.prototype.getRunning = getRunning;
 SceneManager.prototype.execute = execute;
 SceneManager.prototype.executeSingleAction = executeSingleAction;
 SceneManager.prototype.update = update;

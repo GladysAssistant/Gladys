@@ -1478,6 +1478,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SCENE: {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
+    STARTED: 'scene.started',
+    STOPPED: 'scene.stopped',
   },
   SYSTEM: {
     VACUUM_FINISHED: 'system.vacuum-finished',

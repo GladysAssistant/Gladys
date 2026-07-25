@@ -78,3 +78,32 @@
   right: -10px;
   top: 4px;
 }
+
+.runningStatus {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.runningDot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: runningPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes runningPulse {
+  0% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
