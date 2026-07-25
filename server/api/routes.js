@@ -863,6 +863,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: sceneController.get,
     },
+    'get /api/v1/scene/running': {
+      authenticated: true,
+      controller: sceneController.getRunning,
+    },
     'get /api/v1/scene/:scene_selector': {
       authenticated: true,
       controller: sceneController.getBySelector,

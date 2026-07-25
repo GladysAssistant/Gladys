@@ -68,6 +68,18 @@ describe('GET /api/v1/scene', () => {
   });
 });
 
+describe('GET /api/v1/scene/running', () => {
+  it('should return an empty list when no scene is running', async () => {
+    await authenticatedRequest
+      .get('/api/v1/scene/running')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal([]);
+      });
+  });
+});
+
 describe('PATCH /api/v1/scene/:scene_selector', () => {
   it('should update scene', async () => {
     await authenticatedRequest

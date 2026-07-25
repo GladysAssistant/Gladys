@@ -3,9 +3,14 @@ import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import cx from 'classnames';
 import style from './style.css';
+import RunningStatus from '../../../routes/scene/RunningStatus';
 
 class SceneRow extends Component {
   startScene = async () => {
+    // Prevent launching a new instance while the scene is already running
+    if (this.props.runningInfo) {
+      return;
+    }
     try {
       await this.setState({ loading: true });
       await this.props.httpClient.post(`/api/v1/scene/${this.props.sceneSelector}/start`);
@@ -26,13 +31,21 @@ class SceneRow extends Component {
           <button
             onClick={this.startScene}
             type="button"
-            class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
+            class={cx('btn', 'btn-sm', style.btnLoading, {
+              'btn-outline-success': !props.runningInfo,
+              'btn-success': props.runningInfo,
               'btn-loading': loading
             })}
             disabled={loading}
           >
-            <i class="fe fe-play" />
-            <Text id="scene.startButton" />
+            {props.runningInfo ? (
+              <RunningStatus runningInfo={props.runningInfo} />
+            ) : (
+              <>
+                <i class="fe fe-play" />
+                <Text id="scene.startButton" />
+              </>
+            )}
           </button>
         </td>
       </tr>

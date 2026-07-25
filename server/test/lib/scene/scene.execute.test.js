@@ -2,7 +2,7 @@
 const { assert, fake, createSandbox } = require('sinon');
 const EventEmitter = require('events');
 const { expect } = require('chai');
-const { ACTIONS } = require('../../../utils/constants');
+const { ACTIONS, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
 
@@ -128,6 +128,62 @@ describe('scene.execute', () => {
   });
   it('scene does not exist', async () => {
     return sceneManager.execute('thisscenedoesnotexist');
+  });
+  it('should register the scene while running and clean up when finished', async () => {
+    const scene = {
+      selector: 'my-scene',
+      name: 'My scene',
+      icon: 'zap',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.TIME.DELAY,
+            value: 50,
+            unit: 'milliseconds',
+          },
+        ],
+      ],
+    };
+    await sceneManager.addScene(scene);
+
+    // Resolves as soon as the scene execution starts
+    const started = new Promise((resolve) => {
+      const listener = (message) => {
+        if (message.type === WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED) {
+          event.removeListener(EVENTS.WEBSOCKET.SEND_ALL, listener);
+          resolve(message);
+        }
+      };
+      event.on(EVENTS.WEBSOCKET.SEND_ALL, listener);
+    });
+    // Resolves as soon as the scene execution is finished
+    const stopped = new Promise((resolve) => {
+      const listener = (message) => {
+        if (message.type === WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED) {
+          event.removeListener(EVENTS.WEBSOCKET.SEND_ALL, listener);
+          resolve(message);
+        }
+      };
+      event.on(EVENTS.WEBSOCKET.SEND_ALL, listener);
+    });
+
+    sceneManager.execute('my-scene');
+
+    const startedMessage = await started;
+    expect(startedMessage.payload).to.have.property('executionId');
+    expect(startedMessage.payload).to.have.property('sceneSelector', 'my-scene');
+
+    // While the delay is running, the scene should be listed
+    const running = sceneManager.getRunning();
+    expect(running).to.have.lengthOf(1);
+    expect(running[0]).to.include({ sceneSelector: 'my-scene', name: 'My scene', icon: 'zap' });
+    expect(running[0]).to.have.property('executionId', startedMessage.payload.executionId);
+    expect(running[0]).to.have.property('startedAt');
+
+    const stoppedMessage = await stopped;
+    expect(stoppedMessage.payload).to.have.property('executionId', startedMessage.payload.executionId);
+    expect(sceneManager.getRunning()).to.have.lengthOf(0);
   });
   it('should execute chained scenes', async () => {
     const executeSpy = sandbox.spy(sceneManager, 'execute');

@@ -47,6 +47,16 @@ module.exports = function SceneController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/scene/running get running
+   * @apiName getRunning
+   * @apiGroup Scene
+   */
+  async function getRunning(req, res) {
+    const runningScenes = gladys.scene.getRunning();
+    res.json(runningScenes);
+  }
+
+  /**
    * @api {get} /api/v1/scene/:scene_selector get by selector
    * @apiName getBySelector
    * @apiGroup Scene
@@ -107,6 +117,7 @@ module.exports = function SceneController(gladys) {
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
     get: asyncMiddleware(get),
+    getRunning: asyncMiddleware(getRunning),
     getBySelector: asyncMiddleware(getBySelector),
     update: asyncMiddleware(update),
     start: asyncMiddleware(start),

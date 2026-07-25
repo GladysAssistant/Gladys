@@ -8,8 +8,9 @@ import get from 'get-value'; // Import get-value package
 import { RequestStatus } from '../../../utils/consts';
 import { getDragAndDropBackend } from '../../../utils/dragAndDropBackend';
 import EditScenePage from './EditScenePage';
+import { computeRunningInfo } from '../runningInfo';
 
-import { ACTIONS } from '../../../../../server/utils/constants';
+import { ACTIONS, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
 const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MESSAGE.SEND]: ['text'],
@@ -113,12 +114,52 @@ class EditScene extends Component {
     }
   };
   startScene = async () => {
+    // Prevent launching a new instance while the scene is already running
+    if (computeRunningInfo(this.state.runningScenes, this.props.scene_selector, this.state.now)) {
+      return;
+    }
     this.setState({ saving: true });
     try {
       await this.props.httpClient.post(`/api/v1/scene/${this.props.scene_selector}/start`);
       this.setState({ saving: false });
     } catch (e) {
       this.setState({ saving: false });
+    }
+  };
+  getRunningScenes = async () => {
+    try {
+      const runningScenes = await this.props.httpClient.get('/api/v1/scene/running');
+      this.setState({ runningScenes });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  onSceneStarted = payload => {
+    if (payload.sceneSelector !== this.props.scene_selector) {
+      return;
+    }
+    this.setState(prevState => {
+      const alreadyKnown = prevState.runningScenes.some(scene => scene.executionId === payload.executionId);
+      if (alreadyKnown) {
+        return null;
+      }
+      return { runningScenes: [...prevState.runningScenes, payload] };
+    });
+  };
+  onSceneStopped = payload => {
+    this.setState(prevState => ({
+      runningScenes: prevState.runningScenes.filter(scene => scene.executionId !== payload.executionId)
+    }));
+  };
+  // Keep a 1s ticker running only while this scene is executing, so the
+  // running badge can display a live elapsed time.
+  refreshTicker = () => {
+    const hasRunning = this.state.runningScenes.length > 0;
+    if (hasRunning && !this.ticker) {
+      this.ticker = setInterval(() => this.setState({ now: Date.now() }), 1000);
+    } else if (!hasRunning && this.ticker) {
+      clearInterval(this.ticker);
+      this.ticker = null;
     }
   };
   switchActiveScene = async () => {
@@ -1130,28 +1171,49 @@ class EditScene extends Component {
     this.state = {
       scene: null,
       variables: {},
-      triggersVariables: []
+      triggersVariables: [],
+      runningScenes: [],
+      now: Date.now()
     };
+    this.ticker = null;
   }
 
   componentDidMount() {
     this.getSceneBySelector();
     this.getTags();
+    this.getRunningScenes();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
       this.highlighCurrentlyExecutedAction(payload)
     );
     this.props.session.dispatcher.addListener('scene.finished-executing-action', payload =>
       this.removeHighlighAction(payload)
     );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
+  }
+
+  componentDidUpdate() {
+    // Start/stop the ticker based on the applied state.
+    this.refreshTicker();
   }
 
   componentWillUnmount() {
     document.removeEventListener('click', this.closeEdition, true);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED, this.onSceneStarted);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED, this.onSceneStopped);
+    if (this.ticker) {
+      clearInterval(this.ticker);
+      this.ticker = null;
+    }
   }
 
-  render(props, { saving, error, errorMessage, variables, scene, triggersVariables, tags, askDeleteScene }) {
+  render(
+    props,
+    { saving, error, errorMessage, variables, scene, triggersVariables, tags, askDeleteScene, runningScenes, now }
+  ) {
     const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
     const { backend, options } = getDragAndDropBackend();
+    const runningInfo = computeRunningInfo(runningScenes, props.scene_selector, now);
     return (
       scene && (
         <div>
@@ -1159,6 +1221,7 @@ class EditScene extends Component {
             <EditScenePage
               {...props}
               scene={scene}
+              runningInfo={runningInfo}
               tags={tags}
               actionsGroupTypes={actionsGroupTypes}
               updateActionProperty={this.updateActionProperty}
