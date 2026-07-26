@@ -10,7 +10,12 @@ const {
 } = require('../../../utils/constants');
 const { normalize } = require('../../../utils/device');
 const { fahrenheitToCelsius } = require('../../../utils/units');
-const { coverStateMapping } = require('./deviceMappings');
+const {
+  coverStateMapping,
+  gasDetectedThresholds,
+  aqiToAirQuality,
+  clampToCharacteristic,
+} = require('./deviceMappings');
 
 const sleep = promisify(setTimeout);
 
@@ -37,7 +42,8 @@ function buildService(device, features, categoryMapping, subtype) {
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`:
       case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`:
       case `${DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
-      case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
+      case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
+      case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
         const characteristic = service.getCharacteristic(
           Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
         );
@@ -178,6 +184,63 @@ function buildService(device, features, categoryMapping, subtype) {
           }
 
           callback(undefined, currentTemp);
+        });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+      case `${DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
+        const lightLevelCharacteristic = service.getCharacteristic(
+          Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
+        );
+
+        lightLevelCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          callback(
+            undefined,
+            clampToCharacteristic(
+              this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
+              lightLevelCharacteristic.props,
+            ),
+          );
+        });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+      case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
+      case `${DEVICE_FEATURE_CATEGORIES.CO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+      case `${DEVICE_FEATURE_CATEGORIES.CO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
+        const [levelName, detectedName] = categoryMapping.capabilities[feature.type].characteristics;
+        const threshold = gasDetectedThresholds[feature.category];
+
+        const levelCharacteristic = service.getCharacteristic(Characteristic[levelName]);
+        levelCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          callback(
+            undefined,
+            clampToCharacteristic(
+              this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
+              levelCharacteristic.props,
+            ),
+          );
+        });
+
+        // HomeKit requires the "detected" characteristic, Gladys only exposes a concentration,
+        // so the alarm is derived from a fixed threshold.
+        const detectedCharacteristic = service.getCharacteristic(Characteristic[detectedName]);
+        detectedCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          const concentration = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+          callback(undefined, concentration >= threshold ? 1 : 0);
+        });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR}:${DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI}`: {
+        const airQualityCharacteristic = service.getCharacteristic(
+          Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
+        );
+
+        airQualityCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          callback(
+            undefined,
+            aqiToAirQuality(this.gladys.stateManager.get('deviceFeature', feature.selector).last_value),
+          );
         });
         break;
       }

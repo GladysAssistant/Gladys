@@ -28,11 +28,20 @@ describe('Send state to HomeKit', () => {
         CurrentPosition: 'CURRENTPOSITION',
         PositionState: 'POSITIONSTATE',
         TargetPosition: 'TARGETPOSITION',
+        CurrentAmbientLightLevel: 'CURRENTAMBIENTLIGHTLEVEL',
+        CarbonMonoxideDetected: 'CARBONMONOXIDEDETECTED',
+        CarbonDioxideLevel: 'CARBONDIOXIDELEVEL',
+        CarbonDioxideDetected: 'CARBONDIOXIDEDETECTED',
+        AirQuality: 'AIRQUALITY',
       },
       Service: {
         ContactSensor: 'CONTACTSENSOR',
         MotionSensor: 'MOTIONSENSOR',
         WindowCovering: 'WINDOWCOVERING',
+        LightSensor: 'LIGHTSENSOR',
+        CarbonMonoxideSensor: 'CARBONMONOXIDESENSOR',
+        CarbonDioxideSensor: 'CARBONDIOXIDESENSOR',
+        AirQualitySensor: 'AIRQUALITYSENSOR',
       },
     },
     notifyTimeouts: {},
@@ -367,6 +376,126 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0][1]).eql(60);
     expect(updateCharacteristic.args[1][0]).eql('TARGETPOSITION');
     expect(updateCharacteristic.args[1][1]).eql(60);
+  });
+
+  it('should notify light sensor', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({
+      props: {
+        minValue: 0.0001,
+        maxValue: 100000,
+      },
+    });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 250,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Light sensor',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.LUX,
+      min: 0,
+      max: 100000,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['CURRENTAMBIENTLIGHTLEVEL', 250]);
+  });
+
+  it('should notify carbon monoxide sensor', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'CO sensor',
+      category: DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['CARBONMONOXIDEDETECTED', 1]);
+  });
+
+  it('should notify carbon dioxide sensor level and alarm', async () => {
+    const updateCharacteristic = stub();
+    updateCharacteristic.returns({ updateCharacteristic });
+    const getCharacteristic = stub().returns({
+      props: {
+        minValue: 0,
+        maxValue: 100000,
+      },
+    });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 900,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'CO2 sensor',
+      category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+      unit: DEVICE_FEATURE_UNITS.PPM,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.callCount).eq(2);
+    expect(updateCharacteristic.args[0]).eql(['CARBONDIOXIDELEVEL', 900]);
+    // below the 1000 ppm threshold, no alarm
+    expect(updateCharacteristic.args[1]).eql(['CARBONDIOXIDEDETECTED', 0]);
+  });
+
+  it('should notify air quality sensor', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 160,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Air quality sensor',
+      category: DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['AIRQUALITY', 4]);
   });
 
   it('should do nothing wrong device category & type', async () => {
