@@ -99,6 +99,14 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.SIREN]: {
+    service: 'Switch',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SIREN.BINARY]: {
+        characteristics: ['On'],
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: {
     service: 'TemperatureSensor',
     capabilities: {

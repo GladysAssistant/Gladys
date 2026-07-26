@@ -262,6 +262,71 @@ describe('Build service', () => {
     });
   });
 
+  it('should build siren service', async () => {
+    homekitHandler.gladys.stateManager.get = stub().returns({
+      id: '8c1a2b3d-4e5f-4a6b-8c9d-0e1f2a3b4c5d',
+      name: 'Alarme',
+      category: DEVICE_FEATURE_CATEGORIES.SIREN,
+      type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+      last_value: 0,
+    });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: {
+        perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+      },
+    });
+    const Switch = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        On: 'ON',
+      },
+      CharacteristicEventTypes: stub(),
+      Perms: {
+        PAIRED_READ: 'PAIRED_READ',
+        PAIRED_WRITE: 'PAIRED_WRITE',
+      },
+      Service: {
+        Switch,
+      },
+    };
+    const device = {
+      name: 'Sirène',
+      selector: 'sirene',
+    };
+    const features = [
+      {
+        id: '8c1a2b3d-4e5f-4a6b-8c9d-0e1f2a3b4c5d',
+        name: 'Alarme',
+        selector: 'sirene-alarme',
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+      },
+    ];
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.SIREN]);
+    await on.args[0][1](cb);
+    await on.args[1][1](1, cb);
+
+    expect(Switch.args[0][0]).to.equal('Sirène');
+    expect(on.callCount).to.equal(2);
+    expect(getCharacteristic.args[0][0]).to.equal('ON');
+    expect(cb.args[0][1]).to.equal(0);
+    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: 1,
+      device: device.selector,
+      device_feature: features[0].selector,
+    });
+  });
+
   it('should build current temperature service', async () => {
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'temp-celsius').returns({
       id: '26df6983-5127-4122-874a-b6ed0590badc',
