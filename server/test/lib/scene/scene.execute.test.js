@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-restricted-syntax -- needs createSandbox to build per-test sandboxes
-const { assert, fake, createSandbox } = require('sinon');
+const { assert, fake, createSandbox, match } = require('sinon');
 const EventEmitter = require('events');
 const { expect } = require('chai');
 const { ACTIONS, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
@@ -219,12 +219,12 @@ describe('scene.execute', () => {
       sceneManager.queue.start(() => {
         try {
           assert.calledTwice(executeSpy);
-          assert.calledWith(executeSpy.firstCall, 'my-scene', {
-            alreadyExecutedScenes: new Set(['my-scene']),
-          });
-          assert.calledWith(executeSpy.secondCall, 'second-scene', {
-            alreadyExecutedScenes: new Set(['my-scene', 'second-scene']),
-          });
+          assert.calledWith(executeSpy.firstCall, 'my-scene', match({ alreadyExecutedScenes: new Set(['my-scene']) }));
+          assert.calledWith(
+            executeSpy.secondCall,
+            'second-scene',
+            match({ alreadyExecutedScenes: new Set(['my-scene', 'second-scene']) }),
+          );
           resolve();
         } catch (e) {
           reject(e);
@@ -267,12 +267,12 @@ describe('scene.execute', () => {
       sceneManager.queue.start(() => {
         try {
           assert.calledTwice(executeSpy);
-          assert.calledWith(executeSpy.firstCall, 'my-scene', {
-            alreadyExecutedScenes: new Set(['my-scene']),
-          });
-          assert.calledWith(executeSpy.secondCall, 'second-scene', {
-            alreadyExecutedScenes: new Set(['my-scene', 'second-scene']),
-          });
+          assert.calledWith(executeSpy.firstCall, 'my-scene', match({ alreadyExecutedScenes: new Set(['my-scene']) }));
+          assert.calledWith(
+            executeSpy.secondCall,
+            'second-scene',
+            match({ alreadyExecutedScenes: new Set(['my-scene', 'second-scene']) }),
+          );
           resolve();
         } catch (e) {
           reject(e);

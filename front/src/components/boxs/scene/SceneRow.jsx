@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import cx from 'classnames';
 import style from './style.css';
-import RunningStatus from '../../../routes/scene/RunningStatus';
+import RunningStopButton from '../../../routes/scene/RunningStopButton';
 
 class SceneRow extends Component {
   startScene = async () => {
@@ -20,6 +20,14 @@ class SceneRow extends Component {
     setTimeout(() => this.setState({ loading: false }), 500);
   };
 
+  stopScene = async () => {
+    try {
+      await this.props.httpClient.post(`/api/v1/scene/${this.props.sceneSelector}/stop`);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   render({ children, ...props }, { loading }) {
     return (
       <tr>
@@ -28,25 +36,21 @@ class SceneRow extends Component {
         </td>
         <td>{props.name}</td>
         <td className="text-right">
-          <button
-            onClick={this.startScene}
-            type="button"
-            class={cx('btn', 'btn-sm', style.btnLoading, {
-              'btn-outline-success': !props.runningInfo,
-              'btn-success': props.runningInfo,
-              'btn-loading': loading
-            })}
-            disabled={loading}
-          >
-            {props.runningInfo ? (
-              <RunningStatus runningInfo={props.runningInfo} />
-            ) : (
-              <>
-                <i class="fe fe-play" />
-                <Text id="scene.startButton" />
-              </>
-            )}
-          </button>
+          {props.runningInfo ? (
+            <RunningStopButton runningInfo={props.runningInfo} onStop={this.stopScene} small />
+          ) : (
+            <button
+              onClick={this.startScene}
+              type="button"
+              class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
+                'btn-loading': loading
+              })}
+              disabled={loading}
+            >
+              <i class="fe fe-play" />
+              <Text id="scene.startButton" />
+            </button>
+          )}
         </td>
       </tr>
     );

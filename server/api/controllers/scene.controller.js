@@ -94,6 +94,26 @@ module.exports = function SceneController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/scene/execution/:execution_id/stop stop execution
+   * @apiName stopExecution
+   * @apiGroup Scene
+   */
+  async function stopExecution(req, res) {
+    const stopped = gladys.scene.stop(req.params.execution_id);
+    res.json({ success: stopped });
+  }
+
+  /**
+   * @api {post} /api/v1/scene/:scene_selector/stop stop
+   * @apiName stop
+   * @apiGroup Scene
+   */
+  async function stop(req, res) {
+    const stopped = gladys.scene.stopBySelector(req.params.scene_selector);
+    res.json({ success: stopped > 0, stopped });
+  }
+
+  /**
    * @api {post} /api/v1/scene/:scene_selector/duplicate duplicate
    * @apiName duplicate
    * @apiGroup Scene
@@ -121,6 +141,8 @@ module.exports = function SceneController(gladys) {
     getBySelector: asyncMiddleware(getBySelector),
     update: asyncMiddleware(update),
     start: asyncMiddleware(start),
+    stop: asyncMiddleware(stop),
+    stopExecution: asyncMiddleware(stopExecution),
     duplicate: asyncMiddleware(duplicate),
     getTag: asyncMiddleware(getTag),
   });

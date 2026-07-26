@@ -885,6 +885,14 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: sceneController.start,
     },
+    'post /api/v1/scene/execution/:execution_id/stop': {
+      authenticated: true,
+      controller: sceneController.stopExecution,
+    },
+    'post /api/v1/scene/:scene_selector/stop': {
+      authenticated: true,
+      controller: sceneController.stop,
+    },
     'post /api/v1/scene/:scene_selector/duplicate': {
       authenticated: true,
       controller: sceneController.duplicate,

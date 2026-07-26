@@ -126,6 +126,13 @@ class EditScene extends Component {
       this.setState({ saving: false });
     }
   };
+  stopScene = async () => {
+    try {
+      await this.props.httpClient.post(`/api/v1/scene/${this.props.scene_selector}/stop`);
+    } catch (e) {
+      console.error(e);
+    }
+  };
   getRunningScenes = async () => {
     try {
       const runningScenes = await this.props.httpClient.get('/api/v1/scene/running');
@@ -1222,6 +1229,7 @@ class EditScene extends Component {
               {...props}
               scene={scene}
               runningInfo={runningInfo}
+              stopScene={this.stopScene}
               tags={tags}
               actionsGroupTypes={actionsGroupTypes}
               updateActionProperty={this.updateActionProperty}
