@@ -3632,7 +3632,8 @@
     "searchPlaceholder": "Szene suchen",
     "filterTagsName": "Nach Tags filtern",
     "unselectTags": "Alle Tags abwählen",
-    "running": "Läuft"
+    "running": "Läuft",
+    "stopButton": "Stoppen"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",

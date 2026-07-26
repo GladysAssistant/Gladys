@@ -3632,7 +3632,8 @@
     "searchPlaceholder": "Chercher une scène",
     "filterTagsName": "Filtrer par tags",
     "unselectTags": "Désélectionner tous les tags",
-    "running": "En cours"
+    "running": "En cours",
+    "stopButton": "Arrêter"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",

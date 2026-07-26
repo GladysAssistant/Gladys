@@ -32,6 +32,7 @@ function execute(sceneSelector, scope = {}) {
       if (!scene) {
         return;
       }
+      // Serializable description of the execution (sent over websocket)
       const runningScene = {
         executionId,
         sceneSelector,
@@ -39,8 +40,13 @@ function execute(sceneSelector, scope = {}) {
         icon: scene.icon,
         startedAt: new Date(),
       };
-      // register this execution so it can be listed while running
-      this.runningScenes.set(executionId, runningScene);
+      // Controller used to abort this execution (e.g. a manual "stop").
+      // The signal is passed through the scope so abortable actions (like
+      // the "delay" action) can react to it.
+      const abortController = new AbortController();
+      scope.abortSignal = abortController.signal;
+      // register this execution so it can be listed and stopped while running
+      this.runningScenes.set(executionId, { ...runningScene, abortController });
       this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED,
         payload: runningScene,

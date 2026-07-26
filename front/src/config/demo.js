@@ -1201,6 +1201,7 @@ const data = {
       description: "Tony's wake up scene"
     }
   ],
+  'get /api/v1/scene/running': [],
   'get /api/v1/user': [
     {
       id: 'd84ced32-d937-4cf6-a32e-105ffb584226',

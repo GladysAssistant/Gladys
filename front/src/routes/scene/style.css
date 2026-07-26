@@ -79,31 +79,62 @@
   top: 4px;
 }
 
-.runningStatus {
+/* Both labels share the same grid cell so the button width stays constant
+   (sized on the widest label) and does not jump when swapping on hover. */
+.swap {
+  display: inline-grid;
+  align-items: center;
+}
+
+.swap > * {
+  grid-area: 1 / 1;
+}
+
+.runningContent,
+.stopContent {
   display: inline-flex;
   align-items: center;
-  vertical-align: middle;
+  justify-content: center;
   white-space: nowrap;
 }
 
-.runningDot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 5px;
-  border-radius: 50%;
-  background-color: currentColor;
-  animation: runningPulse 1.4s ease-in-out infinite;
+/* Explicit colors (text + icon) so the surrounding context — e.g. the scene
+   list card `.card-footer` which sets a grey color — cannot leak in. */
+.runningStopButton .runningContent {
+  color: #5eba00;
 }
 
-@keyframes runningPulse {
-  0% {
-    opacity: 0.35;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.35;
-  }
+.runningStopButton .stopContent {
+  visibility: hidden;
+  color: #cd201f;
+}
+
+/* Outlined square (like the previous fe-square) but drawn with a currentColor
+   border, so it always matches the "Arrêter" text color exactly. */
+.stopIcon {
+  display: inline-block;
+  width: 0.85em;
+  height: 0.85em;
+  margin-right: 0.4em;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+/* Doubled class to beat `.btn-outline-success:hover` (which would fill green) */
+.runningStopButton.runningStopButton:hover,
+.runningStopButton.runningStopButton:focus {
+  color: #cd201f;
+  background-color: transparent;
+  border-color: #cd201f;
+}
+
+.runningStopButton:hover .runningContent,
+.runningStopButton:focus .runningContent {
+  visibility: hidden;
+}
+
+.runningStopButton:hover .stopContent,
+.runningStopButton:focus .stopContent {
+  visibility: visible;
 }
