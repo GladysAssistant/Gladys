@@ -8,6 +8,7 @@ const {
   ACTIONS,
   ACTIONS_STATUS,
   DEVICE_FEATURE_UNITS,
+  LOCK,
 } = require('../../../../utils/constants');
 
 describe('Build service', () => {
@@ -1041,6 +1042,226 @@ describe('Build service', () => {
     expect(cb.args[2][1]).to.equal(8);
     // no unit declared, the value is taken as µg/m³ and only clamped
     expect(cb.args[3][1]).to.equal(1000);
+  });
+
+  it('should build lock service', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'serrure-button').returns({
+      id: 'b3f4e0f5-8f5e-4b0e-9d3a-3f7c8b1d2e4a',
+      name: 'Verrouillage',
+      category: DEVICE_FEATURE_CATEGORIES.LOCK,
+      type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
+      last_value: 0,
+    });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'serrure-state').returns({
+      id: 'd4a1c2b3-7e6f-4a5b-8c9d-0e1f2a3b4c5d',
+      name: 'État',
+      category: DEVICE_FEATURE_CATEGORIES.LOCK,
+      type: DEVICE_FEATURE_TYPES.LOCK.STATE,
+      last_value: LOCK.STATE.ACTIVITY,
+    });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const updateCharacteristic = stub();
+    const getCharacteristic = stub().returns({ on });
+    const LockMechanism = stub().returns({
+      getCharacteristic,
+      updateCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        LockCurrentState: 'LOCKCURRENTSTATE',
+        LockTargetState: 'LOCKTARGETSTATE',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        LockMechanism,
+      },
+    };
+    const device = {
+      name: 'Serrure',
+      selector: 'serrure',
+    };
+    const features = [
+      {
+        id: 'b3f4e0f5-8f5e-4b0e-9d3a-3f7c8b1d2e4a',
+        name: 'Verrouillage',
+        selector: 'serrure-button',
+        category: DEVICE_FEATURE_CATEGORIES.LOCK,
+        type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
+      },
+      {
+        id: 'd4a1c2b3-7e6f-4a5b-8c9d-0e1f2a3b4c5d',
+        name: 'État',
+        selector: 'serrure-state',
+        category: DEVICE_FEATURE_CATEGORIES.LOCK,
+        type: DEVICE_FEATURE_TYPES.LOCK.STATE,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.LOCK]);
+    await on.args[0][1](cb);
+    await on.args[1][1](1, cb);
+    await on.args[2][1](cb);
+
+    expect(LockMechanism.args[0][0]).to.equal('Serrure');
+    expect(on.callCount).to.equal(3);
+    expect(getCharacteristic.args[0][0]).to.equal('LOCKTARGETSTATE');
+    expect(getCharacteristic.args[1][0]).to.equal('LOCKCURRENTSTATE');
+    expect(cb.args[0][1]).to.equal(0);
+    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: LOCK.ACTION.LOCK,
+      device: device.selector,
+      device_feature: features[0].selector,
+    });
+    // the state feature is the source of truth, no optimistic update of the current state
+    expect(updateCharacteristic.callCount).to.equal(0);
+    // a lock in motion has no HomeKit equivalent, it's reported as unknown
+    expect(cb.args[2][1]).to.equal(3);
+  });
+
+  it('should build lock service without state feature', async () => {
+    const buttonState = {
+      id: 'b3f4e0f5-8f5e-4b0e-9d3a-3f7c8b1d2e4a',
+      name: 'Verrouillage',
+      category: DEVICE_FEATURE_CATEGORIES.LOCK,
+      type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
+      last_value: 1,
+    };
+    homekitHandler.gladys.stateManager.get = stub().returns(buttonState);
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const updateCharacteristic = stub();
+    const getCharacteristic = stub().returns({ on });
+    const LockMechanism = stub().returns({
+      getCharacteristic,
+      updateCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        LockCurrentState: 'LOCKCURRENTSTATE',
+        LockTargetState: 'LOCKTARGETSTATE',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        LockMechanism,
+      },
+    };
+    const device = {
+      name: 'Serrure',
+      selector: 'serrure',
+    };
+    const features = [
+      {
+        id: 'b3f4e0f5-8f5e-4b0e-9d3a-3f7c8b1d2e4a',
+        name: 'Verrouillage',
+        selector: 'serrure-button',
+        category: DEVICE_FEATURE_CATEGORIES.LOCK,
+        type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.LOCK]);
+    await on.args[0][1](cb);
+    await on.args[1][1](0, cb);
+    await on.args[2][1](cb);
+
+    expect(on.callCount).to.equal(3);
+    expect(getCharacteristic.args[0][0]).to.equal('LOCKTARGETSTATE');
+    expect(getCharacteristic.args[1][0]).to.equal('LOCKCURRENTSTATE');
+    expect(cb.args[0][1]).to.equal(1);
+    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: LOCK.ACTION.UNLOCK,
+      device: device.selector,
+      device_feature: features[0].selector,
+    });
+    // no state feature, so the command optimistically drives the current state
+    expect(updateCharacteristic.args[0]).to.eql(['LOCKCURRENTSTATE', 0]);
+    expect(cb.args[2][1]).to.equal(1);
+
+    // and the other way round: locking again drives it back to secured
+    buttonState.last_value = 0;
+    await on.args[1][1](1, cb);
+    await on.args[0][1](cb);
+    await on.args[2][1](cb);
+
+    expect(updateCharacteristic.args[1]).to.eql(['LOCKCURRENTSTATE', 1]);
+    expect(cb.args[4][1]).to.equal(0);
+    expect(cb.args[5][1]).to.equal(0);
+  });
+
+  it('should build lock service without command feature', async () => {
+    const lockState = { last_value: LOCK.STATE.LOCKED };
+    homekitHandler.gladys.stateManager.get = stub().returns(lockState);
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const updateCharacteristic = stub();
+    const setProps = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      setProps,
+      props: { perms: ['PAIRED_READ', 'PAIRED_WRITE', 'EVENTS'] },
+    });
+    const LockMechanism = stub().returns({
+      getCharacteristic,
+      updateCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        LockCurrentState: 'LOCKCURRENTSTATE',
+        LockTargetState: 'LOCKTARGETSTATE',
+      },
+      CharacteristicEventTypes: stub(),
+      Perms: { PAIRED_READ: 'PAIRED_READ', PAIRED_WRITE: 'PAIRED_WRITE' },
+      Service: {
+        LockMechanism,
+      },
+    };
+    const device = {
+      name: 'Serrure',
+      selector: 'serrure',
+    };
+    const features = [
+      {
+        id: 'd4a1c2b3-7e6f-4a5b-8c9d-0e1f2a3b4c5d',
+        name: 'État',
+        selector: 'serrure-state',
+        category: DEVICE_FEATURE_CATEGORIES.LOCK,
+        type: DEVICE_FEATURE_TYPES.LOCK.STATE,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.LOCK]);
+    await on.args[0][1](cb);
+    await on.args[1][1](cb);
+    // HomeKit still requires a target state on a lock Gladys can only read
+    lockState.last_value = LOCK.STATE.UNLOCKED;
+    await on.args[1][1](cb);
+
+    expect(on.callCount).to.equal(2);
+    expect(getCharacteristic.args[0][0]).to.equal('LOCKCURRENTSTATE');
+    // nothing to write to, so the Home app must show a read-only accessory rather than accept a
+    // lock command that silently does nothing
+    expect(setProps.args[0][0].perms).to.not.include('PAIRED_WRITE');
+    expect(getCharacteristic.args[1][0]).to.equal('LOCKTARGETSTATE');
+    expect(cb.args[0][1]).to.equal(1);
+    expect(cb.args[1][1]).to.equal(1);
+    expect(cb.args[2][1]).to.equal(0);
+    // nothing to command, so no action is ever emitted
+    expect(homekitHandler.gladys.event.emit.callCount).to.equal(0);
   });
 
   it('should build shutter/curtain service', async () => {

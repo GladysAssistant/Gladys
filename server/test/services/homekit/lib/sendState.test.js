@@ -6,6 +6,7 @@ const {
   DEVICE_FEATURE_TYPES,
   EVENTS,
   DEVICE_FEATURE_UNITS,
+  LOCK,
 } = require('../../../../utils/constants');
 
 describe('Send state to HomeKit', () => {
@@ -28,6 +29,8 @@ describe('Send state to HomeKit', () => {
         CurrentPosition: 'CURRENTPOSITION',
         PositionState: 'POSITIONSTATE',
         TargetPosition: 'TARGETPOSITION',
+        LockCurrentState: 'LOCKCURRENTSTATE',
+        LockTargetState: 'LOCKTARGETSTATE',
         CurrentAmbientLightLevel: 'CURRENTAMBIENTLIGHTLEVEL',
         CarbonMonoxideDetected: 'CARBONMONOXIDEDETECTED',
         CarbonMonoxideLevel: 'CARBONMONOXIDELEVEL',
@@ -41,6 +44,7 @@ describe('Send state to HomeKit', () => {
         ContactSensor: 'CONTACTSENSOR',
         MotionSensor: 'MOTIONSENSOR',
         WindowCovering: 'WINDOWCOVERING',
+        LockMechanism: 'LOCKMECHANISM',
         LightSensor: 'LIGHTSENSOR',
         CarbonMonoxideSensor: 'CARBONMONOXIDESENSOR',
         CarbonDioxideSensor: 'CARBONDIOXIDESENSOR',
@@ -618,6 +622,62 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['PM25DENSITY', 42]);
     expect(updateCharacteristic.args[1]).eql(['PM25DENSITY', 50]);
     expect(updateCharacteristic.args[2]).eql(['PM10DENSITY', 8]);
+  });
+
+  it('should notify lock target state', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Lock button',
+      category: DEVICE_FEATURE_CATEGORIES.LOCK,
+      type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+    await homekitHandler.sendState(accessory, feature, { ...event, last_value: 0 });
+
+    expect(updateCharacteristic.args[0]).eql(['LOCKTARGETSTATE', 1]);
+    // with no state feature the command is also what HomeKit reads as the current position
+    expect(updateCharacteristic.args[1]).eql(['LOCKCURRENTSTATE', 1]);
+    expect(updateCharacteristic.args[2]).eql(['LOCKTARGETSTATE', 0]);
+    expect(updateCharacteristic.args[3]).eql(['LOCKCURRENTSTATE', 0]);
+  });
+
+  it('should notify lock current state', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: LOCK.STATE.ERROR,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Lock state',
+      category: DEVICE_FEATURE_CATEGORIES.LOCK,
+      type: DEVICE_FEATURE_TYPES.LOCK.STATE,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    // a Gladys lock error is reported as jammed to HomeKit
+    expect(updateCharacteristic.args[0]).eql(['LOCKCURRENTSTATE', 2]);
   });
 
   it('should do nothing wrong device category & type', async () => {

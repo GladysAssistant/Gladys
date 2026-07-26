@@ -5,6 +5,7 @@ const { fahrenheitToCelsius } = require('../../../utils/units');
 const {
   mappings,
   coverStateMapping,
+  lockStateMapping,
   gasDetectedThresholds,
   aqiToAirQuality,
   clampToCharacteristic,
@@ -147,6 +148,28 @@ function sendState(hkAccessory, feature, event) {
         .updateCharacteristic(
           Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
           aqiToAirQuality(event.last_value),
+        );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.LOCK}:${DEVICE_FEATURE_TYPES.LOCK.BINARY}`: {
+      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const [targetStateName, currentStateName] = mappings[feature.category].capabilities[feature.type].characteristics;
+      const lockState = event.last_value ? 1 : 0;
+
+      service.updateCharacteristic(Characteristic[targetStateName], lockState);
+      // On a lock with no state feature, the command is also what HomeKit reads as the current
+      // position. Updating only the target would leave the Home app showing the old one.
+      if (!service.testCharacteristic || service.testCharacteristic(Characteristic[currentStateName])) {
+        service.updateCharacteristic(Characteristic[currentStateName], lockState);
+      }
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.LOCK}:${DEVICE_FEATURE_TYPES.LOCK.STATE}`: {
+      hkAccessory
+        .getService(Service[mappings[feature.category].service])
+        .updateCharacteristic(
+          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+          lockStateMapping[event.last_value],
         );
       break;
     }
