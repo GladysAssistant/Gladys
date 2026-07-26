@@ -6,6 +6,9 @@ const {
   DEVICE_FEATURE_TYPES,
   EVENTS,
   DEVICE_FEATURE_UNITS,
+  FAN_MODE,
+  FAN_ROCK_SETTING,
+  FAN_AIRFLOW_DIRECTION,
 } = require('../../../../utils/constants');
 
 describe('Send state to HomeKit', () => {
@@ -28,6 +31,10 @@ describe('Send state to HomeKit', () => {
         CurrentPosition: 'CURRENTPOSITION',
         PositionState: 'POSITIONSTATE',
         TargetPosition: 'TARGETPOSITION',
+        Active: 'ACTIVE',
+        RotationSpeed: 'ROTATIONSPEED',
+        SwingMode: 'SWINGMODE',
+        RotationDirection: 'ROTATIONDIRECTION',
         CurrentAmbientLightLevel: 'CURRENTAMBIENTLIGHTLEVEL',
         CarbonMonoxideDetected: 'CARBONMONOXIDEDETECTED',
         CarbonMonoxideLevel: 'CARBONMONOXIDELEVEL',
@@ -41,6 +48,7 @@ describe('Send state to HomeKit', () => {
         ContactSensor: 'CONTACTSENSOR',
         MotionSensor: 'MOTIONSENSOR',
         WindowCovering: 'WINDOWCOVERING',
+        Fanv2: 'FANV2',
         LightSensor: 'LIGHTSENSOR',
         CarbonMonoxideSensor: 'CARBONMONOXIDESENSOR',
         CarbonDioxideSensor: 'CARBONDIOXIDESENSOR',
@@ -618,6 +626,83 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['PM25DENSITY', 42]);
     expect(updateCharacteristic.args[1]).eql(['PM25DENSITY', 50]);
     expect(updateCharacteristic.args[2]).eql(['PM10DENSITY', 8]);
+  });
+
+  it('should notify fan mode, speed, oscillation and direction', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({
+      props: {
+        minValue: 0,
+        maxValue: 100,
+      },
+    });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const baseFeature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Fan',
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+    };
+
+    await homekitHandler.sendState(
+      accessory,
+      { ...baseFeature, type: DEVICE_FEATURE_TYPES.FAN.MODE },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: FAN_MODE.HIGH },
+    );
+    await homekitHandler.sendState(
+      accessory,
+      { ...baseFeature, type: DEVICE_FEATURE_TYPES.FAN.SPEED, min: 0, max: 10 },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 5 },
+    );
+    await homekitHandler.sendState(
+      accessory,
+      { ...baseFeature, type: DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: FAN_ROCK_SETTING.UP_DOWN },
+    );
+    await homekitHandler.sendState(
+      accessory,
+      { ...baseFeature, type: DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: FAN_AIRFLOW_DIRECTION.FORWARD },
+    );
+
+    expect(updateCharacteristic.args[0]).eql(['ACTIVE', 1]);
+    expect(updateCharacteristic.args[1]).eql(['ROTATIONSPEED', 50]);
+    expect(updateCharacteristic.args[2]).eql(['SWINGMODE', 1]);
+    expect(updateCharacteristic.args[3]).eql(['ROTATIONDIRECTION', 0]);
+
+    // and the opposite value of each
+    await homekitHandler.sendState(
+      accessory,
+      { ...baseFeature, type: DEVICE_FEATURE_TYPES.FAN.MODE },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: FAN_MODE.OFF },
+    );
+    await homekitHandler.sendState(
+      accessory,
+      { ...baseFeature, type: DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: FAN_ROCK_SETTING.OFF },
+    );
+    await homekitHandler.sendState(
+      accessory,
+      { ...baseFeature, type: DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: FAN_AIRFLOW_DIRECTION.REVERSE },
+    );
+
+    expect(updateCharacteristic.args[4]).eql(['ACTIVE', 0]);
+    expect(updateCharacteristic.args[5]).eql(['SWINGMODE', 0]);
+    expect(updateCharacteristic.args[6]).eql(['ROTATIONDIRECTION', 1]);
+
+    // a fan exposing a percentage rather than a raw speed
+    await homekitHandler.sendState(
+      accessory,
+      { ...baseFeature, type: DEVICE_FEATURE_TYPES.FAN.PERCENT, min: 0, max: 100 },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 30 },
+    );
+
+    expect(updateCharacteristic.args[7]).eql(['ROTATIONSPEED', 30]);
   });
 
   it('should do nothing wrong device category & type', async () => {
