@@ -19,6 +19,7 @@ const {
   gladysWindSettingToMatter,
 } = require('../utils/fanMatterMapping');
 const { convertGladysRunModeToMatter, convertGladysCleanModeToMatter } = require('../utils/vacuumCleanerStateMapping');
+const { gladysAcModeToMatterSystemMode } = require('../utils/thermostatMatterMapping');
 
 /**
  * @description Find a device recursively through child endpoints.
@@ -201,6 +202,20 @@ async function setValue(gladysDevice, gladysFeature, value) {
   ) {
     const thermostat = targetDevice.getClusterClientById(Thermostat.Complete.id);
     await thermostat.setOccupiedCoolingSetpointAttribute(value * 100);
+  }
+
+  // Handle air conditioning mode (Matter Thermostat cluster SystemMode attribute)
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE
+  ) {
+    const thermostat = targetDevice.getClusterClientById(Thermostat.Complete.id);
+    if (!thermostat) {
+      throw new Error('Device does not support Thermostat cluster');
+    }
+    const matterSystemMode = gladysAcModeToMatterSystemMode(Number(value));
+    logger.debug(`Matter: Setting Thermostat systemMode to ${matterSystemMode} (Gladys value: ${value})`);
+    await thermostat.setSystemModeAttribute(matterSystemMode);
   }
 
   // Handle fan control (Matter FanControl cluster)

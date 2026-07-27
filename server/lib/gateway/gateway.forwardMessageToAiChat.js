@@ -5,12 +5,13 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 
 const logger = require('../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES, AI_CHAT_PURPOSES } = require('../../utils/constants');
 const { Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
 const { exchangesToApiMessages } = require('../message/message.getPreviousQuestionsForUser');
 const { resolveAiChatModel } = require('../../utils/aiChatModels');
+const { filterMcpToolsByCategories } = require('./gateway.classifyAiChatToolCategories');
 
 const MAX_TOOL_CALL_ITERATIONS = 5;
 const MAX_TOOL_RESULT_CHARS = 4000;
@@ -23,20 +24,27 @@ dayjs.extend(timezone);
 const DEFAULT_TIMEZONE = 'Europe/Paris';
 const promptPath = path.join(__dirname, '../../config/prompts/aiChat.prompt.txt');
 const SYSTEM_PROMPT = fs.readFileSync(promptPath, 'utf8');
+const scenesPromptPath = path.join(__dirname, '../../config/prompts/aiChatScenes.prompt.txt');
+const SCENES_SYSTEM_PROMPT = fs.readFileSync(scenesPromptPath, 'utf8');
 
 /**
  * @description Build the system prompt with the current date and time.
+ * Scene creation rules are only included when the scene_create tool is part
+ * of the request, to keep the context focused on the current intent.
  * @param {string} timezoneName - IANA timezone used by the Gladys instance.
  * @param {Date} [now] - Reference date, mainly for tests.
+ * @param {object} [options] - Prompt options.
+ * @param {boolean} [options.includeSceneRules] - Include scene creation rules.
  * @returns {string} System prompt with current datetime context.
  * @example
  * buildSystemPromptWithCurrentTime('Europe/Paris', new Date('2026-06-15T10:30:00Z'));
  */
-function buildSystemPromptWithCurrentTime(timezoneName, now = new Date()) {
+function buildSystemPromptWithCurrentTime(timezoneName, now = new Date(), { includeSceneRules = true } = {}) {
   const formattedNow = dayjs(now)
     .tz(timezoneName)
     .format('dddd YYYY-MM-DD HH:mm');
-  return `${SYSTEM_PROMPT}\n\nCurrent date and time (${timezoneName}): ${formattedNow}`;
+  const basePrompt = includeSceneRules ? `${SYSTEM_PROMPT}\n${SCENES_SYSTEM_PROMPT}` : SYSTEM_PROMPT;
+  return `${basePrompt}\n\nCurrent date and time (${timezoneName}): ${formattedNow}`;
 }
 
 /**
@@ -374,10 +382,27 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     const mcpHandler = getMcpHandler(this.serviceManager);
 
     const mcpTools = await mcpHandler.getAllTools(userId);
-    const toolsForApi = mcpToolsToChatApiFormat(mcpTools);
+
+    // Two-stage routing: a first fast model call classifies the request, so the
+    // main tool-calling request only carries the relevant tools. This keeps the
+    // context small and focused (the scene_create schema is very large) and
+    // improves tool selection accuracy. On any router failure, all tools are sent.
+    const toolCategories =
+      mcpTools.length > 0
+        ? await this.classifyAiChatToolCategories({
+            messageText: message?.text,
+            previousQuestions,
+          })
+        : null;
+    const selectedMcpTools = filterMcpToolsByCategories(mcpTools, toolCategories);
+
+    const toolsForApi = mcpToolsToChatApiFormat(selectedMcpTools);
     const toolCallbacksByName = new Map(mcpTools.map((t) => [toolNameFromIntent(t.intent), t.cb]));
+    const includeSceneRules = selectedMcpTools.some((tool) => tool.intent === 'scene.create');
     logger.debug(
-      `[AI_CHAT] Tools available (${toolsForApi.length}): ${toolsForApi.map((tool) => tool.function.name).join(', ')}`,
+      `[AI_CHAT] Tools selected (${toolsForApi.length}/${mcpTools.length}): ${toolsForApi
+        .map((tool) => tool.function.name)
+        .join(', ')}`,
     );
 
     const configuredTimezone = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
@@ -385,7 +410,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     logger.debug(`[AI_CHAT] Using timezone=${timezoneName}`);
 
     // Build a compact conversation for the model.
-    const messagesForApi = [{ role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName) }];
+    const messagesForApi = [
+      { role: 'system', content: buildSystemPromptWithCurrentTime(timezoneName, new Date(), { includeSceneRules }) },
+    ];
     messagesForApi.push(...exchangesToApiMessages(previousQuestions));
 
     const userContent = [];
@@ -417,7 +444,13 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
         messages: messagesForApi,
         tools: toolsForApi,
         tool_choice: 'auto',
+        purpose: AI_CHAT_PURPOSES.CHAT,
       };
+      if (toolCategories) {
+        // Let the gateway adapt model/reasoning settings to the classified
+        // intent (for example enable thinking only for scene creation).
+        aiChatRequest.categories = toolCategories;
+      }
       if (selectedModel) {
         aiChatRequest.model = selectedModel;
       }
