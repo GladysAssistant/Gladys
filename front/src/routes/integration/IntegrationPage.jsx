@@ -14,7 +14,11 @@ const IntegrationPage = ({
   search,
   integrationCategories,
   toggleFavorite,
-  showInstallFromGithub
+  showInstallFromGithub,
+  showStoreRefresh,
+  refreshStore,
+  refreshStoreStatus,
+  refreshStoreStale
 }) => (
   <div class="page">
     <div class="page-main">
@@ -29,6 +33,10 @@ const IntegrationPage = ({
               integrationsLength={integrations.length}
               totalSize={totalSize}
               showInstallFromGithub={showInstallFromGithub}
+              showStoreRefresh={showStoreRefresh}
+              refreshStore={refreshStore}
+              refreshStoreStatus={refreshStoreStatus}
+              refreshStoreStale={refreshStoreStale}
             />
             <IntegrationMenuMobile integrationCategories={integrationCategories} />
             <div class="alert alert-info mb-4">

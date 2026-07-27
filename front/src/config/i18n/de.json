@@ -583,6 +583,13 @@
       "noIntegrations": "Keine Integrationen gefunden",
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
+      "refreshStore": {
+        "button": "Katalog aktualisieren",
+        "tooltip": "Lade die Liste der Community-Integrationen erneut herunter. Gladys speichert sie im Cache und aktualisiert sie alle 30 Minuten.",
+        "success": "Katalog ist aktuell.",
+        "stale": "Gladys konnte den Store nicht erreichen: Dies ist weiterhin der zwischengespeicherte Katalog.",
+        "error": "Der Katalog konnte nicht aktualisiert werden. Überprüfe deine Internetverbindung."
+      },
       "gatewayBanner": {
         "title": "Dein Gerät ist nicht in der Liste?",
         "description": "Viele Geräte können über <a href=\"/dashboard/integration/device/matter\">Matter</a> (Universalprotokoll) verbunden werden. Dein Gerät kann auch von einer externen <b>Community-Integration</b> unterstützt werden: Jeder kann eine erstellen und im Store veröffentlichen, sie erscheint dann in dieser Liste. Siehe die <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation zu externen Integrationen</a>."

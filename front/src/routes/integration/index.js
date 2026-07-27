@@ -8,6 +8,7 @@ import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/con
 import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
 import { getLocalizedText } from './all/external-integration/utils';
+import { RequestStatus } from '../../utils/consts';
 
 const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
 const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
@@ -71,10 +72,44 @@ class Integration extends Component {
     ]);
     await this.setState({
       externalInstalled,
-      externalStore: externalStoreResponse ? externalStoreResponse.integrations : []
+      externalStore: externalStoreResponse ? externalStoreResponse.integrations : [],
+      externalStoreRefreshedAt: externalStoreResponse ? externalStoreResponse.refreshed_at : null
     });
     this.getIntegrations();
   }
+
+  // the server caches the store index, so a integration published since the
+  // last refresh is invisible until the next periodic one: this forces the
+  // re-download instead of making the user wait (or restart Gladys)
+  refreshStore = async () => {
+    const { user = {}, httpClient } = this.props;
+    if (!httpClient || user.role !== USER_ROLE.ADMIN) {
+      return;
+    }
+    const previousRefreshedAt = this.state.externalStoreRefreshedAt;
+    await this.setState({ refreshStoreStatus: RequestStatus.Getting, refreshStoreStale: false });
+    try {
+      const [externalInstalled, externalStoreResponse] = await Promise.all([
+        httpClient.get('/api/v1/external_integration'),
+        httpClient.post('/api/v1/external_integration/store/refresh')
+      ]);
+      const refreshedAt = externalStoreResponse ? externalStoreResponse.refreshed_at : null;
+      // the server never fails on an unreachable store: it answers with the
+      // cached catalog, and only bumps refreshed_at on a successful download.
+      // A timestamp that did not move means we are still looking at the cache
+      await this.setState({
+        externalInstalled,
+        externalStore: externalStoreResponse ? externalStoreResponse.integrations : [],
+        externalStoreRefreshedAt: refreshedAt,
+        refreshStoreStale: !refreshedAt || refreshedAt === previousRefreshedAt,
+        refreshStoreStatus: RequestStatus.Success
+      });
+      this.getIntegrations();
+    } catch (e) {
+      console.error(e);
+      await this.setState({ refreshStoreStatus: RequestStatus.Error });
+    }
+  };
 
   async loadFavorites() {
     try {
@@ -315,14 +350,19 @@ class Integration extends Component {
     // Manual install of a community (external) integration is available to
     // admins whatever the category being displayed, so it is always reachable.
     const showInstallFromGithub = user.role === USER_ROLE.ADMIN;
+    // the store catalog is only loaded for admins (and its refresh route is
+    // admin-only), so only they get the refresh control
+    const showStoreRefresh = user.role === USER_ROLE.ADMIN;
     // Combine props and state for the IntegrationPage
     const combinedProps = {
       ...props,
       ...state,
       showInstallFromGithub,
+      showStoreRefresh,
       search: this.search,
       changeOrderDir: this.changeOrderDir,
-      toggleFavorite: this.toggleFavorite
+      toggleFavorite: this.toggleFavorite,
+      refreshStore: this.refreshStore
     };
 
     return <IntegrationPage {...combinedProps} />;
