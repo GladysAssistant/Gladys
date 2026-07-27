@@ -252,8 +252,10 @@
     "closeDefineTabletMode": "Fermer",
     "tabletMode": {
       "description": "Le mode tablette sert à la fonctionnalité alarme. Si vous armez l'alarme, toutes les tablettes de la maison seront verrouillées et afficheront un clavier virtuel pour désactiver l'alarme.",
+      "currentBrowserOnly": "<strong>Ce réglage s'applique uniquement à cet appareil.</strong> En enregistrant, vous déclarez que le navigateur que vous utilisez en ce moment est une tablette. Chaque appareil se configure séparément : n'activez le mode tablette que sur les appareils que vous acceptez de voir verrouillés quand l'alarme est armée.",
       "fullScreenForce": "Si vous voulez forcer une tablette à rester en mode plein écran, vous pouvez ajouter <code>?fullscreen=force</code> à l'URL.",
-      "houseLabel": "Maison",
+      "houseLabel": "Maison de cette tablette",
+      "howToDisable": "Pour désactiver le mode tablette sur un appareil, ouvrez ce menu depuis cet appareil et sélectionnez « Mode tablette désactivé ».",
       "tabletModeDisabled": "Mode tablette désactivé"
     },
     "duckDbMigrationInProgress": "Votre instance Gladys est en train de migrer sa base de données à DuckDb, un nouveau système de base de données plus performant pour les données time-series. Cette tâche peut prendre un certain temps, et pendant ce temps vos graphiques ne seront pas tous disponibles. Progression de la migration = {{progress}}%",
