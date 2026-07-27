@@ -7,6 +7,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses } from '../utils';
+import { getBackToCatalogUrl } from '../../../catalog-url';
 import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
@@ -146,7 +147,7 @@ class ExternalIntegrationInstallPage extends Component {
               <div class="row justify-content-center">
                 <div class="col-lg-8">
                   <div class="mb-4">
-                    <Link href="/dashboard/integration/device" class="btn btn-secondary btn-sm">
+                    <Link href={getBackToCatalogUrl()} class="btn btn-secondary btn-sm">
                       <i class="fe fe-arrow-left mr-1" />
                       <Text id="integration.externalIntegration.install.backToCatalog" />
                     </Link>
