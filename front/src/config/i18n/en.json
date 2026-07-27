@@ -586,7 +586,7 @@
       "refreshStore": {
         "hint": "An integration missing from the list?",
         "button": "Refresh catalog",
-        "refreshing": "Refreshing\u2026",
+        "refreshing": "Refreshing…",
         "tooltip": "Re-download the list of community integrations. Gladys keeps it in cache and refreshes it every 30 minutes.",
         "success": "Catalog up to date.",
         "stale": "Gladys could not reach the store: this is still the cached catalog.",

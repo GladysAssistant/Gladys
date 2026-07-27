@@ -72,8 +72,7 @@ class Integration extends Component {
     ]);
     await this.setState({
       externalInstalled,
-      externalStore: externalStoreResponse ? externalStoreResponse.integrations : [],
-      externalStoreRefreshedAt: externalStoreResponse ? externalStoreResponse.refreshed_at : null
+      externalStore: externalStoreResponse ? externalStoreResponse.integrations : []
     });
     this.getIntegrations();
   }
@@ -86,22 +85,19 @@ class Integration extends Component {
     if (!httpClient || user.role !== USER_ROLE.ADMIN) {
       return;
     }
-    const previousRefreshedAt = this.state.externalStoreRefreshedAt;
     await this.setState({ refreshStoreStatus: RequestStatus.Getting, refreshStoreStale: false });
     try {
       const [externalInstalled, externalStoreResponse] = await Promise.all([
         httpClient.get('/api/v1/external_integration'),
         httpClient.post('/api/v1/external_integration/store/refresh')
       ]);
-      const refreshedAt = externalStoreResponse ? externalStoreResponse.refreshed_at : null;
-      // the server never fails on an unreachable store: it answers with the
-      // cached catalog, and only bumps refreshed_at on a successful download.
-      // A timestamp that did not move means we are still looking at the cache
+      // an unreachable store is not an error: the server answers with its
+      // cached catalog and says so with refreshed: false, so we warn instead
+      // of claiming the catalog is up to date
       await this.setState({
         externalInstalled,
         externalStore: externalStoreResponse ? externalStoreResponse.integrations : [],
-        externalStoreRefreshedAt: refreshedAt,
-        refreshStoreStale: !refreshedAt || refreshedAt === previousRefreshedAt,
+        refreshStoreStale: !externalStoreResponse || externalStoreResponse.refreshed !== true,
         refreshStoreStatus: RequestStatus.Success
       });
       this.getIntegrations();

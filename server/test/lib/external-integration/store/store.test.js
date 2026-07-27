@@ -5,6 +5,7 @@ const { fake } = require('sinon');
 const { NotFoundError, BadParameters, ConflictError } = require('../../../../utils/coreErrors');
 const { Error422 } = require('../../../../utils/httpErrors');
 const { buildSupervisor, seedExternalService, TEST_MANIFEST } = require('../testUtils.test');
+const { STORE_INDEX_TTL_MS } = require('../../../../lib/external-integration/store/store.constants');
 
 const INDEX_URL_ORIGIN = 'https://integration-store-storage.gladysassistant.com';
 const INDEX_URL_PATH = '/index.json';
@@ -96,6 +97,25 @@ describe('externalIntegration store', () => {
       externalIntegration.storeIndexFetchedAt = Date.now();
       const index = await externalIntegration.getIndex();
       expect(index).to.equal(TEST_INDEX);
+    });
+
+    it('should serve the memory copy right below the TTL, and re-download right above it', async () => {
+      const { externalIntegration } = buildSupervisor();
+      const refreshedIndex = { ...TEST_INDEX, generated_at: '2026-07-14T08:00:00.000Z' };
+      externalIntegration.storeIndex = TEST_INDEX;
+      externalIntegration.refreshIndex = fake(async () => {
+        externalIntegration.storeIndex = refreshedIndex;
+        externalIntegration.storeIndexFetchedAt = Date.now();
+        return refreshedIndex;
+      });
+
+      externalIntegration.storeIndexFetchedAt = Date.now() - (STORE_INDEX_TTL_MS - 60 * 1000);
+      expect(await externalIntegration.getIndex()).to.equal(TEST_INDEX);
+      expect(externalIntegration.refreshIndex.called).to.equal(false);
+
+      externalIntegration.storeIndexFetchedAt = Date.now() - (STORE_INDEX_TTL_MS + 60 * 1000);
+      expect(await externalIntegration.getIndex()).to.equal(refreshedIndex);
+      expect(externalIntegration.refreshIndex.called).to.equal(true);
     });
 
     it('should fall back on the stale memory copy when the network fails', async () => {
@@ -268,6 +288,41 @@ describe('externalIntegration store', () => {
       const catalog = await externalIntegration.getCatalog();
       expect(catalog.integrations).to.deep.equal([]);
       expect(catalog.refreshed_at).to.equal(null);
+    });
+  });
+
+  describe('refreshCatalog', () => {
+    it('should report refreshed: true when the index was downloaded', async () => {
+      const { externalIntegration } = buildSupervisor();
+      externalIntegration.refreshIndex = fake(async () => {
+        externalIntegration.storeIndex = TEST_INDEX;
+        externalIntegration.storeIndexFetchedAt = Date.now();
+        return TEST_INDEX;
+      });
+      const catalog = await externalIntegration.refreshCatalog();
+      expect(catalog.refreshed).to.equal(true);
+      expect(catalog.integrations).to.have.lengthOf(2);
+    });
+
+    it('should report refreshed: false when the store is unreachable', async () => {
+      // the call does not fail: the cached catalog comes back, so without
+      // this flag the UI would announce a catalog that was never downloaded
+      const { externalIntegration } = buildSupervisor();
+      externalIntegration.storeIndex = TEST_INDEX;
+      externalIntegration.storeIndexFetchedAt = 12345;
+      externalIntegration.refreshIndex = fake.rejects(new Error('ENOTFOUND'));
+      const catalog = await externalIntegration.refreshCatalog();
+      expect(catalog.refreshed).to.equal(false);
+      expect(catalog.integrations).to.have.lengthOf(2);
+      expect(catalog.refreshed_at).to.equal(new Date(12345).toISOString());
+    });
+
+    it('should report refreshed: false when no index could ever be fetched', async () => {
+      const { externalIntegration } = buildSupervisor();
+      externalIntegration.refreshIndex = fake.rejects(new Error('ENOTFOUND'));
+      const catalog = await externalIntegration.refreshCatalog();
+      expect(catalog.refreshed).to.equal(false);
+      expect(catalog.integrations).to.deep.equal([]);
     });
   });
 

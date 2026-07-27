@@ -44,7 +44,9 @@ const StoreRefreshFooter = ({ onRefresh, status, stale }) => {
         </button>
       </Localizer>
       {messageId && (
-        <div class={cx('small mt-1', colorClass)}>
+        // the outcome lands well after the click, so it has to be announced:
+        // alert for a failure, status for the quieter outcomes
+        <div role={status === RequestStatus.Error ? 'alert' : 'status'} class={cx('small mt-1', colorClass)}>
           <Text id={messageId} />
         </div>
       )}

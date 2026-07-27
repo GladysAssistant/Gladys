@@ -586,7 +586,7 @@
       "refreshStore": {
         "hint": "Fehlt eine Integration in der Liste?",
         "button": "Katalog aktualisieren",
-        "refreshing": "Wird aktualisiert\u2026",
+        "refreshing": "Wird aktualisiert…",
         "tooltip": "Lade die Liste der Community-Integrationen erneut herunter. Gladys speichert sie im Cache und aktualisiert sie alle 30 Minuten.",
         "success": "Katalog ist aktuell.",
         "stale": "Gladys konnte den Store nicht erreichen: Dies ist weiterhin der zwischengespeicherte Katalog.",
