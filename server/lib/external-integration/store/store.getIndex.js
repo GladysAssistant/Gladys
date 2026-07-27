@@ -2,7 +2,7 @@ const logger = require('../../../utils/logger');
 const { STORE_INDEX_CACHE_VARIABLE, STORE_INDEX_TTL_MS } = require('./store.constants');
 
 /**
- * @description Get the store index: in-memory copy if fresh (< 12h),
+ * @description Get the store index: in-memory copy if fresh (< 30 min),
  * otherwise refreshed from the network, with fallback on the local
  * persistent cache when the network or the store storage is unavailable. Can
  * return null when no index was ever fetched: the worst case (store fully

@@ -128,10 +128,13 @@ module.exports = function ExternalIntegrationController(gladys) {
    * @api {post} /api/v1/external_integration/store/refresh refreshStore
    * @apiName refreshStore
    * @apiGroup ExternalIntegration
-   * @apiDescription Re-download the store index on demand.
+   * @apiDescription Re-download the store index on demand. An unreachable
+   * store is not an error: the cached catalog is returned with
+   * `refreshed: false`, so the caller can say so instead of claiming the
+   * catalog is up to date.
    */
   async function refreshStore(req, res) {
-    const catalog = await gladys.externalIntegration.getCatalog({ refresh: true });
+    const catalog = await gladys.externalIntegration.refreshCatalog();
     res.json(catalog);
   }
 

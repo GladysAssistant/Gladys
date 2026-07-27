@@ -45,7 +45,7 @@ async function init() {
   const plainServices = services.map((service) => service.get({ plain: true }));
   plainServices.forEach((service) => this.registerProxyService(service));
 
-  // store index: periodic refresh every 12h; the first fetch is lazy (first
+  // store index: periodic refresh every 30 min; the first fetch is lazy (first
   // catalog access, see getIndex) so the boot never depends on the network.
   // Works even without Docker: the catalog stays browsable.
   this.storeRefreshInterval = setInterval(() => {
