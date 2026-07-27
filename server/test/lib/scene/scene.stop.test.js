@@ -113,6 +113,34 @@ describe('scene.stop', () => {
     expect(sceneManager.getRunning()).to.have.lengthOf(0);
   });
 
+  it('should stop a scene while it is actively waiting in a delay (abort listener)', async () => {
+    const scene = {
+      selector: 'my-scene',
+      name: 'My scene',
+      icon: 'zap',
+      triggers: [],
+      actions: [[{ type: ACTIONS.TIME.DELAY, value: 60, unit: 'minutes' }]],
+    };
+    await sceneManager.addScene(scene);
+
+    const started = waitForWebsocket(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED);
+    sceneManager.execute('my-scene');
+    const { executionId } = (await started).payload;
+
+    // Let the delay action actually start waiting (so it registers its abort
+    // listener) before stopping — this exercises the listener path, not the
+    // "already aborted" guard in executeAction.
+    await new Promise((resolve) => {
+      setTimeout(resolve, 30);
+    });
+
+    const stopped = waitForWebsocket(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED);
+    expect(sceneManager.stop(executionId)).to.equal(true);
+
+    await stopped;
+    expect(sceneManager.getRunning()).to.have.lengthOf(0);
+  });
+
   it('should only stop executions matching the selector, leaving the others running', async () => {
     const sceneToStop = {
       selector: 'scene-to-stop',
