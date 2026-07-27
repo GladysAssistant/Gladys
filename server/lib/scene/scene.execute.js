@@ -17,7 +17,8 @@ const { executeActions } = executeActionsFactory(actionsFunc);
  */
 function execute(sceneSelector, scope = {}) {
   try {
-    if (!this.scenes[sceneSelector]) {
+    const scene = this.scenes[sceneSelector];
+    if (!scene) {
       throw new Error(`Scene with selector ${sceneSelector} not found.`);
     }
 
@@ -27,11 +28,6 @@ function execute(sceneSelector, scope = {}) {
     const executionId = uuid.v4();
 
     this.queue.push(async () => {
-      const scene = this.scenes[sceneSelector];
-      // if the scene was deleted while queued, do nothing
-      if (!scene) {
-        return;
-      }
       // Serializable description of the execution (sent over websocket)
       const runningScene = {
         executionId,
