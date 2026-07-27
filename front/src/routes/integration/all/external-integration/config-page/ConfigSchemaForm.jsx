@@ -239,45 +239,52 @@ const ConfigSchemaForm = ({
   oauthStatus,
   connectOAuth,
   dynamicOptions
-}) => (
-  <form onSubmit={saveConfig}>
-    {saveConfigStatus === RequestStatus.Success && (
-      <div class="alert alert-success">
-        <Text id="integration.externalIntegration.config.saveSuccess" />
-      </div>
-    )}
-    {saveConfigStatus === RequestStatus.Error && (
-      <div class="alert alert-danger">
-        <Text id="integration.externalIntegration.config.saveError" />
-      </div>
-    )}
-    {schema.map(field => (
-      <ConfigField
-        key={field.key}
-        field={field}
-        language={language}
-        values={values}
-        configuredSecrets={configuredSecrets}
-        touchedSecrets={touchedSecrets}
-        updateConfigValue={updateConfigValue}
-        connectionStatus={connectionStatus}
-        oauthStatus={oauthStatus}
-        connectOAuth={connectOAuth}
-        dynamicOptions={dynamicOptions}
-      />
-    ))}
-    <div class="form-footer">
-      <button
-        type="submit"
-        class={cx('btn btn-success', {
-          'btn-loading': saveConfigStatus === RequestStatus.Getting
-        })}
-        disabled={saveConfigStatus === RequestStatus.Getting}
-      >
-        <Text id="integration.externalIntegration.config.saveButton" />
-      </button>
-    </div>
-  </form>
-);
+}) => {
+  // sections are presentational and oauth2 has its own Connect button: a
+  // schema made only of those has nothing to save, hide the save button
+  const hasSavableField = schema.some(field => field.type !== 'section' && field.type !== 'oauth2');
+  return (
+    <form onSubmit={saveConfig}>
+      {saveConfigStatus === RequestStatus.Success && (
+        <div class="alert alert-success">
+          <Text id="integration.externalIntegration.config.saveSuccess" />
+        </div>
+      )}
+      {saveConfigStatus === RequestStatus.Error && (
+        <div class="alert alert-danger">
+          <Text id="integration.externalIntegration.config.saveError" />
+        </div>
+      )}
+      {schema.map(field => (
+        <ConfigField
+          key={field.key}
+          field={field}
+          language={language}
+          values={values}
+          configuredSecrets={configuredSecrets}
+          touchedSecrets={touchedSecrets}
+          updateConfigValue={updateConfigValue}
+          connectionStatus={connectionStatus}
+          oauthStatus={oauthStatus}
+          connectOAuth={connectOAuth}
+          dynamicOptions={dynamicOptions}
+        />
+      ))}
+      {hasSavableField && (
+        <div class="form-footer">
+          <button
+            type="submit"
+            class={cx('btn btn-success', {
+              'btn-loading': saveConfigStatus === RequestStatus.Getting
+            })}
+            disabled={saveConfigStatus === RequestStatus.Getting}
+          >
+            <Text id="integration.externalIntegration.config.saveButton" />
+          </button>
+        </div>
+      )}
+    </form>
+  );
+};
 
 export default ConfigSchemaForm;
