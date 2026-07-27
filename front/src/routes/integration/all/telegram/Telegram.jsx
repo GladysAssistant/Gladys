@@ -98,6 +98,45 @@ const TelegramPage = ({ children, ...props }) => (
                           </p>
                         </div>
                       )}
+                      {props.telegramDisableStatus === RequestStatus.Success && (
+                        <div class="alert alert-success">
+                          <Text id="integration.telegram.disable.success" />
+                        </div>
+                      )}
+                      {props.user && props.user.role === USER_ROLE.ADMIN && props.telegramApiKey && (
+                        <div>
+                          <hr />
+                          <h4>
+                            <Text id="integration.telegram.disable.title" />
+                          </h4>
+                          {props.telegramDisableStatus === RequestStatus.Error && (
+                            <div class="alert alert-danger">
+                              <Text id="integration.telegram.disable.error" />
+                            </div>
+                          )}
+                          <p>
+                            <Text id="integration.telegram.disable.description" />
+                          </p>
+                          {!props.telegramDisableConfirmation && (
+                            <button class="btn btn-danger" onClick={props.showTelegramDisableConfirmation}>
+                              <Text id="integration.telegram.disable.button" />
+                            </button>
+                          )}
+                          {props.telegramDisableConfirmation && (
+                            <div class="alert alert-danger">
+                              <p>
+                                <Text id="integration.telegram.disable.confirmation" />
+                              </p>
+                              <button class="btn btn-danger mr-2" onClick={props.disableTelegram}>
+                                <Text id="integration.telegram.disable.confirmButton" />
+                              </button>
+                              <button class="btn btn-secondary" onClick={props.hideTelegramDisableConfirmation}>
+                                <Text id="integration.telegram.disable.cancelButton" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

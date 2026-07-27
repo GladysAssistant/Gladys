@@ -842,7 +842,17 @@
       "note": "This link is unique to your account, do not send it to other users.",
       "configurationError": "We were not able to configure your account. Are you sure this token is valid?",
       "apiKey": "Telegram Bot API Key",
-      "saveButton": "Save"
+      "saveButton": "Save",
+      "disable": {
+        "title": "Disable the Telegram integration",
+        "description": "This integration is deprecated in favor of the new external Telegram integration. Disabling the integration stops the Telegram bot, deletes the stored API key and unlinks all users from their Telegram account. You will then be able to install the new Telegram integration.",
+        "button": "Disable the Telegram integration",
+        "confirmation": "Are you sure you want to disable the Telegram integration? The API key will be permanently deleted and users will have to link their Telegram account again.",
+        "confirmButton": "Yes, disable",
+        "cancelButton": "Cancel",
+        "success": "The Telegram integration was disabled, the API key has been deleted.",
+        "error": "We were not able to disable the Telegram integration. Please try again."
+      }
     },
     "nextcloudTalk": {
       "title": "Nextcloud Talk",
