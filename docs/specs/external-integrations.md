@@ -634,6 +634,7 @@ Règles de fiabilité du protocole :
 - **Pas de file d'attente** : les messages core→intégration (`device-created/updated/deleted`, `config-updated`, `scan-request`) émis pendant une déconnexion sont **perdus**. Contrat : à chaque (re)connexion, l'intégration refait `GET /device` et `GET /config` pour resynchroniser son état — le SDK le fait automatiquement.
 - **Pas d'écho de config** : `config-updated` n'est poussé que pour les changements venant du front ; un `POST /config` de l'intégration elle-même ne déclenche jamais de `config-updated` en retour (sinon boucle).
 - **`command-result` avec `success: false`** : traité côté core exactement comme un timeout — throw (`ExternalIntegrationUnavailableError` ou message d'erreur relayé), erreur visible dans l'UI device.
+- **Au plus une fois, jamais de ré-émission** : le core n'a **aucun mécanisme de retry** — chaque commande est émise une seule fois ; timeout, `success: false` ou intégration déconnectée → throw, l'erreur remonte à l'utilisateur, qui décide de refaire son geste. Un ack perdu ne peut donc jamais provoquer de double exécution initiée par le core, et les intégrations n'ont **pas de déduplication par `message_id` à implémenter** (un `message_id` déjà vu peut être ignoré par prudence, mais ce n'est pas requis par le protocole).
 
 Santé : le core envoie un **ping WebSocket protocolaire** toutes les 20 s ; toute lib WS standard y répond automatiquement (pong). 2 pongs manqués ou socket fermée → statut `DEGRADED`. Une reconnexion remplace l'ancienne connexion enregistrée.
 
