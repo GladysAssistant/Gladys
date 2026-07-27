@@ -24,6 +24,8 @@ describe('Telegram.message.disable', () => {
     };
     messageHandler = new MessageHandler(gladys, TelegramApiMock, SERVICE_ID);
     await messageHandler.connect('test');
+    // the mock is shared between test files, we only count the calls of this test
+    TelegramApiMock.prototype.stopPolling.resetHistory();
   });
 
   afterEach(() => {
@@ -33,6 +35,7 @@ describe('Telegram.message.disable', () => {
   it('should stop the bot, delete the API key and unlink every user', async () => {
     await messageHandler.disable();
 
+    assert.calledOnce(TelegramApiMock.prototype.stopPolling);
     expect(messageHandler.bot).to.equal(null);
     assert.calledWith(gladys.variable.destroy, 'TELEGRAM_API_KEY', SERVICE_ID);
     assert.calledTwice(gladys.user.update);
@@ -45,6 +48,8 @@ describe('Telegram.message.disable', () => {
     await messageHandler.disable();
     await messageHandler.disable();
 
+    // the bot is only stopped once, the second call has nothing to stop
+    assert.calledOnce(TelegramApiMock.prototype.stopPolling);
     expect(messageHandler.bot).to.equal(null);
     assert.calledTwice(gladys.variable.destroy);
     assert.callCount(gladys.user.update, USERS.length * 2);
