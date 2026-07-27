@@ -583,6 +583,15 @@
       "noIntegrations": "No integration found",
       "noSearchResults": "No integration matching \"{{searchKeyword}}\" was found.",
       "noSearchResultsSuggestion": "Try <a href=\"/dashboard/integration/device/matter\">Matter</a> for Matter/Thread compatible devices, or <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> to connect Somfy, Shelly, Daikin and many other devices.",
+      "refreshStore": {
+        "hint": "An integration missing from the list?",
+        "button": "Refresh catalog",
+        "refreshing": "Refreshing…",
+        "tooltip": "Re-download the list of community integrations. Gladys keeps it in cache and refreshes it every 30 minutes.",
+        "success": "Catalog up to date.",
+        "stale": "Gladys could not reach the store: this is still the cached catalog.",
+        "error": "The catalog could not be refreshed. Check your internet connection."
+      },
       "gatewayBanner": {
         "title": "Can't find your device?",
         "description": "Many devices can be connected via <a href=\"/dashboard/integration/device/matter\">Matter</a> (universal protocol). Your device can also be supported by a community <b>external integration</b>: anyone can create one and publish it in the store, it then appears in this list. See the <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">external integrations documentation</a>."
@@ -842,7 +851,17 @@
       "note": "This link is unique to your account, do not send it to other users.",
       "configurationError": "We were not able to configure your account. Are you sure this token is valid?",
       "apiKey": "Telegram Bot API Key",
-      "saveButton": "Save"
+      "saveButton": "Save",
+      "disable": {
+        "title": "Disable the Telegram integration",
+        "description": "This integration is deprecated in favor of the new external Telegram integration. Disabling the integration stops the Telegram bot, deletes the stored API key and unlinks all users from their Telegram account. You will then be able to install the new Telegram integration.",
+        "button": "Disable the Telegram integration",
+        "confirmation": "Are you sure you want to disable the Telegram integration? The API key will be permanently deleted and users will have to link their Telegram account again.",
+        "confirmButton": "Yes, disable",
+        "cancelButton": "Cancel",
+        "success": "The Telegram integration was disabled, the API key has been deleted.",
+        "error": "We were not able to disable the Telegram integration. Please try again."
+      }
     },
     "nextcloudTalk": {
       "title": "Nextcloud Talk",

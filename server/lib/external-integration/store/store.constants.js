@@ -6,8 +6,10 @@ const DEFAULT_STORE_INDEX_URL = 'https://integration-store-storage.gladysassista
 // Local persistent cache of the index (t_variable), so the catalog stays
 // available offline.
 const STORE_INDEX_CACHE_VARIABLE = 'EXTERNAL_INTEGRATION_STORE_INDEX_CACHE';
-// The index is refreshed every 12 hours.
-const STORE_INDEX_TTL_MS = 12 * 60 * 60 * 1000;
+// The index is refreshed every 30 minutes: the public indexer rebuilds it
+// hourly, so a shorter TTL keeps the catalog close to the upstream index
+// without hammering the store storage.
+const STORE_INDEX_TTL_MS = 30 * 60 * 1000;
 const SUPPORTED_INDEX_FORMAT = 1;
 const STORE_HTTP_TIMEOUT_MS = 30 * 1000;
 // Documentation files are re-hosted markdown: 1 MB is far above any

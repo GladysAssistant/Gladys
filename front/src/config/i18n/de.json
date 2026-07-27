@@ -583,6 +583,15 @@
       "noIntegrations": "Keine Integrationen gefunden",
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
+      "refreshStore": {
+        "hint": "Fehlt eine Integration in der Liste?",
+        "button": "Katalog aktualisieren",
+        "refreshing": "Wird aktualisiert…",
+        "tooltip": "Lade die Liste der Community-Integrationen erneut herunter. Gladys speichert sie im Cache und aktualisiert sie alle 30 Minuten.",
+        "success": "Katalog ist aktuell.",
+        "stale": "Gladys konnte den Store nicht erreichen: Dies ist weiterhin der zwischengespeicherte Katalog.",
+        "error": "Der Katalog konnte nicht aktualisiert werden. Überprüfe deine Internetverbindung."
+      },
       "gatewayBanner": {
         "title": "Dein Gerät ist nicht in der Liste?",
         "description": "Viele Geräte können über <a href=\"/dashboard/integration/device/matter\">Matter</a> (Universalprotokoll) verbunden werden. Dein Gerät kann auch von einer externen <b>Community-Integration</b> unterstützt werden: Jeder kann eine erstellen und im Store veröffentlichen, sie erscheint dann in dieser Liste. Siehe die <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation zu externen Integrationen</a>."
@@ -842,7 +851,17 @@
       "note": "Dieser Link ist spezifisch für dein Account. Sende ihn nicht an andere Benutzer.",
       "configurationError": "Dein Account konnte nicht konfiguriert werden. Bist du sicher, dass dieser API-Schlüssel gültig ist?",
       "apiKey": "API-Schlüssel für den Telegram Bot",
-      "saveButton": "Sichern"
+      "saveButton": "Sichern",
+      "disable": {
+        "title": "Telegram-Integration deaktivieren",
+        "description": "Diese Integration ist zugunsten der neuen externen Telegram-Integration veraltet. Beim Deaktivieren wird der Telegram-Bot gestoppt, der gespeicherte API-Schlüssel gelöscht und die Verknüpfung aller Benutzer mit ihrem Telegram-Konto aufgehoben. Danach kannst du die neue Telegram-Integration installieren.",
+        "button": "Telegram-Integration deaktivieren",
+        "confirmation": "Bist du sicher, dass du die Telegram-Integration deaktivieren möchtest? Der API-Schlüssel wird endgültig gelöscht und die Benutzer müssen ihr Telegram-Konto erneut verknüpfen.",
+        "confirmButton": "Ja, deaktivieren",
+        "cancelButton": "Abbrechen",
+        "success": "Die Telegram-Integration wurde deaktiviert, der API-Schlüssel wurde gelöscht.",
+        "error": "Die Telegram-Integration konnte nicht deaktiviert werden. Bitte versuche es erneut."
+      }
     },
     "nextcloudTalk": {
       "title": "Nextcloud Talk",

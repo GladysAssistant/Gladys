@@ -323,7 +323,21 @@ describe('External integration admin API', () => {
         .expect('Content-Type', /json/)
         .expect(200);
       expect(res.body.integrations).to.deep.equal([]);
+      expect(res.body.refreshed).to.equal(true);
       expect(gladys.externalIntegration.refreshIndex.called).to.equal(true);
+    });
+
+    it('should answer refreshed: false when the store could not be reached', async () => {
+      // getIndex swallows the failure and serves the cache, so the response
+      // is a 200 either way: only this flag tells the two apart
+      gladys.externalIntegration.storeIndex = { index_format: 1, integrations: [] };
+      gladys.externalIntegration.storeIndexFetchedAt = 12345;
+      stubInstance(gladys.externalIntegration, 'refreshIndex', fake.rejects(new Error('ENOTFOUND')));
+      const res = await authenticatedRequest
+        .post('/api/v1/external_integration/store/refresh')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(res.body.refreshed).to.equal(false);
     });
   });
 

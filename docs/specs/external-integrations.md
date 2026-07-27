@@ -213,7 +213,7 @@ Le même manifeste est dupliqué dans l'image Docker (LABEL `io.gladysassistant.
 - **Aucune modération en v1** (choix assumé) : pas de blocklist, pas de retrait manuel. La défense, c'est la sandbox (B.2) + l'avertissement à l'installation. Une blocklist resterait ajoutable plus tard côté indexeur sans toucher au client.
 
 **Côté Gladys** — sous-dossier `store/` du superviseur (`store.getIndex.js`, `store.refreshIndex.js`, `store.checkForUpdates.js`) :
-- télécharge `index.json` (URL par défaut surchargeable par variable — utile pour les tests et pour pointer un index alternatif), **cache local persistant** (fichier ou `t_variable`) rafraîchi toutes les 12 h : le catalogue reste consultable hors ligne ou si GitHub Pages est indisponible, et les intégrations installées ne dépendent jamais de l'index pour fonctionner ;
+- télécharge `index.json` (URL par défaut surchargeable par variable — utile pour les tests et pour pointer un index alternatif), **cache local persistant** (fichier ou `t_variable`) rafraîchi toutes les 30 min (l'indexeur reconstruit `index.json` toutes les heures) : le catalogue reste consultable hors ligne ou si GitHub Pages est indisponible, et les intégrations installées ne dépendent jamais de l'index pour fonctionner ;
 - filtre par compatibilité de version Gladys avant d'exposer au front ;
 - compare `index.version` vs `t_service.version` (lien par `store_slug`) → flag « mise à jour disponible », l'update est un geste admin explicite (pas d'auto-update en v1) ;
 - pour les intégrations installées par `repo_url` (cf. C.5) absentes de l'index, le refresh re-télécharge directement le manifeste de leur repo — même mécanique de détection de mise à jour, sans dépendre du crawl.

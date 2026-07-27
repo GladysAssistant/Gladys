@@ -10,6 +10,7 @@ import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
 import { getLocalizedText } from './all/external-integration/utils';
 import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog } from './catalog-url';
+import { RequestStatus } from '../../utils/consts';
 
 const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
 const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
@@ -88,6 +89,36 @@ class Integration extends Component {
     });
     this.getIntegrations();
   }
+
+  // the server caches the store index, so a integration published since the
+  // last refresh is invisible until the next periodic one: this forces the
+  // re-download instead of making the user wait (or restart Gladys)
+  refreshStore = async () => {
+    const { user = {}, httpClient } = this.props;
+    if (!httpClient || user.role !== USER_ROLE.ADMIN) {
+      return;
+    }
+    await this.setState({ refreshStoreStatus: RequestStatus.Getting, refreshStoreStale: false });
+    try {
+      const [externalInstalled, externalStoreResponse] = await Promise.all([
+        httpClient.get('/api/v1/external_integration'),
+        httpClient.post('/api/v1/external_integration/store/refresh')
+      ]);
+      // an unreachable store is not an error: the server answers with its
+      // cached catalog and says so with refreshed: false, so we warn instead
+      // of claiming the catalog is up to date
+      await this.setState({
+        externalInstalled,
+        externalStore: externalStoreResponse ? externalStoreResponse.integrations : [],
+        refreshStoreStale: !externalStoreResponse || externalStoreResponse.refreshed !== true,
+        refreshStoreStatus: RequestStatus.Success
+      });
+      this.getIntegrations();
+    } catch (e) {
+      console.error(e);
+      await this.setState({ refreshStoreStatus: RequestStatus.Error });
+    }
+  };
 
   async loadFavorites() {
     try {
@@ -339,14 +370,19 @@ class Integration extends Component {
     // Manual install of a community (external) integration is available to
     // admins whatever the category being displayed, so it is always reachable.
     const showInstallFromGithub = user.role === USER_ROLE.ADMIN;
+    // the store catalog is only loaded for admins (and its refresh route is
+    // admin-only), so only they get the refresh control
+    const showStoreRefresh = user.role === USER_ROLE.ADMIN;
     // Combine props and state for the IntegrationPage
     const combinedProps = {
       ...props,
       ...state,
       showInstallFromGithub,
+      showStoreRefresh,
       search: this.search,
       changeOrderDir: this.changeOrderDir,
-      toggleFavorite: this.toggleFavorite
+      toggleFavorite: this.toggleFavorite,
+      refreshStore: this.refreshStore
     };
 
     return <IntegrationPage {...combinedProps} />;

@@ -2,6 +2,7 @@ import { Text, MarkupText } from 'preact-i18n';
 import IntegrationMenu, { IntegrationMenuMobile } from './IntegrationMenu';
 import IntegrationCategory, { IntegrationListItem } from './IntegrationCategory';
 import IntegrationPageHeader from './IntegrationPageHeader';
+import StoreRefreshFooter from './all/external-integration/store-refresh/StoreRefreshFooter';
 import style from './style.css';
 
 const IntegrationPage = ({
@@ -14,7 +15,11 @@ const IntegrationPage = ({
   search,
   integrationCategories,
   toggleFavorite,
-  showInstallFromGithub
+  showInstallFromGithub,
+  showStoreRefresh,
+  refreshStore,
+  refreshStoreStatus,
+  refreshStoreStale
 }) => (
   <div class="page">
     <div class="page-main">
@@ -75,6 +80,9 @@ const IntegrationPage = ({
                       <Text id="integration.root.noIntegrations" />
                     )}
                   </div>
+                )}
+                {showStoreRefresh && (
+                  <StoreRefreshFooter onRefresh={refreshStore} status={refreshStoreStatus} stale={refreshStoreStale} />
                 )}
               </div>
             </div>

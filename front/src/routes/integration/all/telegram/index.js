@@ -12,12 +12,13 @@ class TelegramIntegration extends Component {
   render(props, {}) {
     const loading =
       props.telegramGetApiKeyStatus === RequestStatus.Getting ||
-      props.telegramSaveApiKeyStatus === RequestStatus.Getting;
+      props.telegramSaveApiKeyStatus === RequestStatus.Getting ||
+      props.telegramDisableStatus === RequestStatus.Getting;
     return <TelegramPage {...props} loading={loading} />;
   }
 }
 
 export default connect(
-  'user,telegramApiKey,telegramCustomLink,telegramGetApiKeyStatus,telegramSaveApiKeyStatus',
+  'user,telegramApiKey,telegramCustomLink,telegramGetApiKeyStatus,telegramSaveApiKeyStatus,telegramDisableConfirmation,telegramDisableStatus',
   actions
 )(TelegramIntegration);
