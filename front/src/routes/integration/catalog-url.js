@@ -2,6 +2,7 @@ import { categories } from '../../config/integrations';
 
 const CATALOG_BASE_URL = '/dashboard/integration';
 const DEFAULT_ORDER_DIR = 'asc';
+const ORDER_DIRS = ['asc', 'desc'];
 
 // the catalog is displayed for every category, plus "all" and "favorites":
 // only those paths are accepted as a "back to the catalog" target
@@ -19,7 +20,7 @@ const buildFilterParams = ({ searchKeyword, orderDir }) => {
     urlParams.set('search', searchKeyword);
   }
   // the ascending order is the default one, no need to carry it around
-  if (orderDir && orderDir !== DEFAULT_ORDER_DIR) {
+  if (ORDER_DIRS.includes(orderDir) && orderDir !== DEFAULT_ORDER_DIR) {
     urlParams.set('order_dir', orderDir);
   }
   return urlParams;
@@ -38,9 +39,12 @@ export const getCatalogUrl = ({ category, searchKeyword, orderDir }) =>
 
 export const getCatalogFilters = (queryString = window.location.search) => {
   const urlParams = new URLSearchParams(queryString);
+  const orderDir = urlParams.get('order_dir');
   return {
     searchKeyword: urlParams.get('search') || '',
-    orderDir: urlParams.get('order_dir') || DEFAULT_ORDER_DIR
+    // a hand-written URL could carry anything: an unknown direction would
+    // leave the catalog unsorted and the sort selector out of sync
+    orderDir: ORDER_DIRS.includes(orderDir) ? orderDir : DEFAULT_ORDER_DIR
   };
 };
 

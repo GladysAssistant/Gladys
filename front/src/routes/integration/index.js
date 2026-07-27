@@ -30,8 +30,10 @@ class Integration extends Component {
     this.getIntegrationsDebounced = debounce(this.getIntegrations, 300);
   }
 
-  updateURL() {
-    const { searchKeyword, orderDir } = this.state;
+  // the filters are given explicitly by the handlers: setState() only schedules
+  // a render, the new value is not readable in the state right away
+  updateURL(filters = this.state) {
+    const { searchKeyword, orderDir } = filters;
     // replace and not push: filtering should not fill the browser history
     route(getCatalogUrl({ category: this.props.category, searchKeyword, orderDir }), true);
   }
@@ -319,18 +321,16 @@ class Integration extends Component {
   };
 
   search = async e => {
-    await this.setState({
-      searchKeyword: e.target.value
-    });
-    this.updateURL();
+    const searchKeyword = e.target.value;
+    await this.setState({ searchKeyword });
+    this.updateURL({ searchKeyword, orderDir: this.state.orderDir });
     await this.getIntegrationsDebounced();
   };
 
   changeOrderDir = async e => {
-    await this.setState({
-      orderDir: e.target.value
-    });
-    this.updateURL();
+    const orderDir = e.target.value;
+    await this.setState({ orderDir });
+    this.updateURL({ searchKeyword: this.state.searchKeyword, orderDir });
     await this.getIntegrations();
   };
 
