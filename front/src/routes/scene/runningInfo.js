@@ -19,6 +19,24 @@ export const computeRunningInfo = (runningScenes, sceneSelector, now) => {
 };
 
 /**
+ * @description Merge a freshly fetched list of running scenes with the entries
+ * already present in the state, deduplicating by executionId. This avoids a
+ * late-resolving fetch overwriting updates already applied by websocket events
+ * (scene.started / scene.stopped) received while the fetch was in flight.
+ * @param {Array} fetched - The list returned by GET /api/v1/scene/running.
+ * @param {Array} current - The running scenes currently in the state.
+ * @returns {Array} The merged list (fetched entries win on conflict).
+ * @example
+ * mergeRunningScenes(fetched, prevState.runningScenes);
+ */
+export const mergeRunningScenes = (fetched, current) => {
+  const byExecutionId = new Map();
+  (current || []).forEach(runningScene => byExecutionId.set(runningScene.executionId, runningScene));
+  (fetched || []).forEach(runningScene => byExecutionId.set(runningScene.executionId, runningScene));
+  return Array.from(byExecutionId.values());
+};
+
+/**
  * @description Format an elapsed duration in milliseconds as `h:mm:ss` or `m:ss`.
  * @param {number} elapsedMs - The elapsed duration in milliseconds.
  * @returns {string} The formatted duration.

@@ -20,6 +20,12 @@ describe('scene.stop', () => {
     sceneManager = new SceneManager(stateManager, event, device, {}, {}, {}, {}, {}, {}, {}, brain);
   });
 
+  afterEach(() => {
+    // Abort any execution still running so its long delay timer does not keep
+    // the Node process alive between tests.
+    sceneManager.runningScenes.forEach((runningScene) => runningScene.abortController.abort());
+  });
+
   // Wait until `count` websocket messages of a given type have been received
   const waitForWebsocketCount = (type, count) =>
     new Promise((resolve) => {
@@ -128,10 +134,11 @@ describe('scene.stop', () => {
     const { executionId } = (await started).payload;
 
     // Let the delay action actually start waiting (so it registers its abort
-    // listener) before stopping — this exercises the listener path, not the
-    // "already aborted" guard in executeAction.
+    // listener) before stopping — this exercises the listener path. A single
+    // macrotask (setImmediate) runs after the microtask chain that reaches the
+    // delay's `await`, so the listener is guaranteed to be registered.
     await new Promise((resolve) => {
-      setTimeout(resolve, 30);
+      setImmediate(resolve);
     });
 
     const stopped = waitForWebsocket(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED);
