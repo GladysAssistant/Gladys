@@ -2,7 +2,6 @@ import get from 'get-value';
 import { Text } from 'preact-i18n';
 import CardFilter from '../../components/layout/CardFilter';
 import InstallFromGithubCard from './all/external-integration/install-from-github/InstallFromGithubCard';
-import StoreRefreshButton, { StoreRefreshFeedback } from './all/external-integration/store-refresh/StoreRefreshButton';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import style from './style.css';
 
@@ -14,11 +13,7 @@ const IntegrationPageHeader = ({
   searchKeyword,
   integrationsLength,
   totalSize,
-  showInstallFromGithub,
-  showStoreRefresh,
-  refreshStore,
-  refreshStoreStatus,
-  refreshStoreStale
+  showInstallFromGithub
 }) => {
   const showResultCount = searchKeyword.length > 0 || integrationsLength !== totalSize;
   const searchPlaceholder = get(intl.dictionary, 'integration.root.searchPlaceholder', {
@@ -36,11 +31,6 @@ const IntegrationPageHeader = ({
             <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
           </div>
           <div class="page-options d-flex align-items-center">
-            {showStoreRefresh && (
-              <div class="mr-3">
-                <StoreRefreshButton onRefresh={refreshStore} status={refreshStoreStatus} />
-              </div>
-            )}
             {showInstallFromGithub && (
               <div class="mr-3">
                 <InstallFromGithubCard button />
@@ -55,9 +45,6 @@ const IntegrationPageHeader = ({
             />
           </div>
         </div>
-        {showStoreRefresh && (
-          <StoreRefreshFeedback status={refreshStoreStatus} stale={refreshStoreStale} wrapperClass="text-right mb-3" />
-        )}
       </div>
 
       <div class={style.headerMobile}>
@@ -91,12 +78,6 @@ const IntegrationPageHeader = ({
         {showInstallFromGithub && (
           <div class="mt-4">
             <InstallFromGithubCard button block />
-          </div>
-        )}
-        {showStoreRefresh && (
-          <div class="mt-3">
-            <StoreRefreshButton onRefresh={refreshStore} status={refreshStoreStatus} />
-            <StoreRefreshFeedback status={refreshStoreStatus} stale={refreshStoreStale} wrapperClass="mt-1" />
           </div>
         )}
         {showResultCount && (

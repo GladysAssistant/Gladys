@@ -584,7 +584,9 @@
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
       "refreshStore": {
+        "hint": "Fehlt eine Integration in der Liste?",
         "button": "Katalog aktualisieren",
+        "refreshing": "Wird aktualisiert\u2026",
         "tooltip": "Lade die Liste der Community-Integrationen erneut herunter. Gladys speichert sie im Cache und aktualisiert sie alle 30 Minuten.",
         "success": "Katalog ist aktuell.",
         "stale": "Gladys konnte den Store nicht erreichen: Dies ist weiterhin der zwischengespeicherte Katalog.",
