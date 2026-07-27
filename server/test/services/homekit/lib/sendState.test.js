@@ -216,6 +216,43 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0][1]).eql(320);
   });
 
+  it('should clamp light temperature above HomeKit ColorTemperature max', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({
+      props: {
+        minValue: 140,
+        maxValue: 500,
+      },
+    });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({
+        updateCharacteristic,
+        getCharacteristic,
+      }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 525,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Bande LED chambre Color Temperature',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+      min: 150,
+      max: 500,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0][0]).eql('COLORTEMPERATURE');
+    expect(updateCharacteristic.args[0][1]).eql(500);
+  });
+
   it('should notify sensor temperature Kelvin', async () => {
     const updateCharacteristic = stub().returns();
     const accessory = {

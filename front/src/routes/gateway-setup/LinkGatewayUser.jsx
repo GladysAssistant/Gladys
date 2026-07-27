@@ -46,7 +46,12 @@ const SignupLayout = ({ children, ...props }) => (
                   <div class="dimmer-content">
                     {props.usersGetStatus === RequestStatus.GatewayNoInstanceFound && (
                       <div class="alert alert-danger">
-                        <Text id="gatewayLinkUser.noInstanceFound" />
+                        <p>
+                          <Text id="gatewayLinkUser.noInstanceFound" />
+                        </p>
+                        <p class="mb-0">
+                          <MarkupText id="gatewayLinkUser.noInstanceFoundHelp" />
+                        </p>
                       </div>
                     )}
                     {props.error && (
@@ -64,37 +69,44 @@ const SignupLayout = ({ children, ...props }) => (
                         <Text id="httpErrors.unknownError" />
                       </div>
                     )}
-                    <p>
-                      <Text id="gatewayLinkUser.description" />
-                    </p>
-                    <div class="form-group">
-                      <label>
-                        <Text id="gatewayLinkUser.label" />
-                      </label>
-                      <select class="form-control" onChange={props.selectUser}>
-                        <option>
-                          <Text id="global.emptySelectOption" />
-                        </option>
-                        {props.users && props.users.map(user => <option value={user.id}>{user.firstname}</option>)}
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <button
-                        onClick={props.saveUser}
-                        disabled={props.usersGetStatus !== RequestStatus.Success}
-                        class="btn btn-success"
-                      >
-                        <Text id="gatewayLinkUser.saveButton" />
-                      </button>
-                    </div>
+                    {props.usersGetStatus !== RequestStatus.GatewayNoInstanceFound && (
+                      <>
+                        <p>
+                          <Text id="gatewayLinkUser.description" />
+                        </p>
+                        <div class="form-group">
+                          <label>
+                            <Text id="gatewayLinkUser.label" />
+                          </label>
+                          <select class="form-control" onChange={props.selectUser}>
+                            <option>
+                              <Text id="global.emptySelectOption" />
+                            </option>
+                            {props.users && props.users.map(user => <option value={user.id}>{user.firstname}</option>)}
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <button
+                            onClick={props.saveUser}
+                            disabled={props.usersGetStatus !== RequestStatus.Success}
+                            class="btn btn-success"
+                          >
+                            <Text id="gatewayLinkUser.saveButton" />
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
-            <div class="text-center">
-              <MarkupText id="gatewayLinkUser.manageBilling" />{' '}
+            <div class="text-center mt-3 small">
               <a href="#" onClick={props.openStripeBilling}>
-                <Text id="gatewayLinkUser.here" />
+                <Text id="gatewayLinkUser.manageBillingLink" />
+              </a>
+              <span class="mx-2">·</span>
+              <a href="#" onClick={props.logout}>
+                <Text id="gatewayLinkUser.logoutButton" />
               </a>
             </div>
           </div>

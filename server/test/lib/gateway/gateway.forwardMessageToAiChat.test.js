@@ -8,6 +8,7 @@ const z = require('../../../services/mcp/node_modules/zod/v4');
 
 const resizeImageMock = fake.resolves('data:image/jpeg;base64,resized-image-data');
 const promptMock = 'You are Gladys AI.';
+const scenesPromptMock = 'Scene creation rules mock.';
 
 /**
  * @description Load module under test with mocked dependencies.
@@ -22,7 +23,7 @@ function getModule({ tools = [], prompt = promptMock } = {}) {
   return proxyquire('../../../lib/gateway/gateway.forwardMessageToAiChat', {
     '../../utils/resizeImage': { resizeImage: resizeImageMock },
     fs: {
-      readFileSync: fake.returns(prompt),
+      readFileSync: fake((filePath) => (String(filePath).includes('aiChatScenes') ? scenesPromptMock : prompt)),
     },
   });
 }
@@ -36,6 +37,7 @@ function getModule({ tools = [], prompt = promptMock } = {}) {
  * @param {Function} options.replyByIntent - Message replyByIntent mock.
  * @param {Function} [options.eventEmit] - Event emitter mock.
  * @param {string} [options.timezone] - Timezone returned by variable.getValue.
+ * @param {Function} [options.classifyAiChatToolCategories] - Tool categories classifier mock.
  * @returns {object} Bound context object.
  * @example
  * const ctx = buildContext({ tools: [], aiChat: fake(), reply: fake(), replyByIntent: fake() });
@@ -47,11 +49,13 @@ function buildContext({
   replyByIntent,
   eventEmit = fake.returns(null),
   timezone = 'Europe/Paris',
+  classifyAiChatToolCategories = fake.resolves(null),
 }) {
   return {
     event: {
       emit: eventEmit,
     },
+    classifyAiChatToolCategories,
     variable: {
       getValue: stub().callsFake((name) => {
         if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
@@ -1058,5 +1062,176 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
     expect(result).to.deep.equal({ answer: '', imagesSent: 0 });
     assert.notCalled(reply);
     assert.notCalled(replyByIntent);
+  });
+
+  describe('two-stage tool routing', () => {
+    const buildRoutedTools = () => [
+      {
+        intent: 'scene.create',
+        config: {
+          title: 'Create scene',
+          description: 'Create a scene',
+          categories: ['scenes'],
+          inputSchema: { name: z.string() },
+        },
+        cb: fake.resolves({ content: [{ type: 'text', text: 'scene created' }] }),
+      },
+      {
+        intent: 'device.turn-on-off',
+        config: {
+          title: 'Turn devices on/off',
+          description: 'Turn on or off devices',
+          categories: ['device_control', 'other'],
+          inputSchema: { action: z.enum(['on', 'off']) },
+        },
+        cb: fake.resolves({ content: [{ type: 'text', text: 'done' }] }),
+      },
+    ];
+
+    it('should only send tools of the classified categories and omit scene rules', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = fake.resolves({
+        choices: [{ message: { content: 'OK' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_control']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Éteins la lumière du salon' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      assert.calledOnce(classifyAiChatToolCategories);
+      assert.calledWithMatch(classifyAiChatToolCategories, {
+        messageText: 'Éteins la lumière du salon',
+        previousQuestions: [],
+      });
+      const request = aiChat.getCall(0).args[0];
+      expect(request.tools.map((tool) => tool.function.name)).to.deep.equal(['device_turn_on_off']);
+      expect(request.messages[0].content).to.not.include(scenesPromptMock);
+      expect(request.purpose).to.equal('chat');
+      expect(request.categories).to.deep.equal(['device_control']);
+    });
+
+    it('should send scene tools and scene rules when the request is classified as scenes', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = fake.resolves({
+        choices: [{ message: { content: 'OK' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['scenes']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Crée une scène qui éteint tout à 23h' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      const request = aiChat.getCall(0).args[0];
+      expect(request.tools.map((tool) => tool.function.name)).to.deep.equal(['scene_create']);
+      expect(request.messages[0].content).to.include(scenesPromptMock);
+    });
+
+    it('should fall back to all tools and scene rules when classification returns null', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = fake.resolves({
+        choices: [{ message: { content: 'OK' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(null);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Bonjour Gladys' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      const request = aiChat.getCall(0).args[0];
+      expect(request.tools.map((tool) => tool.function.name)).to.deep.equal(['scene_create', 'device_turn_on_off']);
+      expect(request.messages[0].content).to.include(scenesPromptMock);
+      expect(request.purpose).to.equal('chat');
+      expect(request).to.not.have.property('categories');
+    });
+
+    it('should not call the router when there is no tool to filter', async () => {
+      const { forwardMessageToAiChat } = getModule({ tools: [] });
+      const aiChat = fake.resolves({
+        choices: [{ message: { content: 'Bonjour !' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['other']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({ tools: [], aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Bonjour' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      assert.notCalled(classifyAiChatToolCategories);
+      assert.calledOnce(aiChat);
+    });
+
+    it('should still execute a tool excluded by routing if the model calls it', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_1',
+                  function: {
+                    name: 'device_turn_on_off',
+                    arguments: '{"action":"off"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: 'Fait.' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['scenes']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Crée une scène et éteins la lumière' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: 'Fait.', imagesSent: 0 });
+      const toolMessage = aiChat.getCall(1).args[0].messages.find((m) => m.role === 'tool');
+      expect(toolMessage.content).to.equal('done');
+    });
   });
 });

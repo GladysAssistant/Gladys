@@ -13,4 +13,7 @@ class Login extends Component {
   }
 }
 
-export default connect('gatewayLoginStep2,gatewayLoginStatus,gatewayLoginError', actions)(Login);
+export default connect(
+  'gatewayLoginStep2,gatewayLoginStatus,gatewayLoginError,gatewayTwoFactorJustEnabled',
+  actions
+)(Login);

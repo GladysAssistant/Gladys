@@ -372,4 +372,17 @@ describe('normalize', () => {
 
     expect(newValue).to.equal(180);
   });
+
+  it('should clamp values above the source max to the target max', async () => {
+    // HomeKit ColorTemperature max is 500 mireds; devices can report higher
+    expect(normalize(525, 150, 500, 140, 500)).to.equal(500);
+  });
+
+  it('should clamp values below the source min to the target min', async () => {
+    expect(normalize(100, 150, 500, 140, 500)).to.equal(140);
+  });
+
+  it('should return target min when source min equals source max', async () => {
+    expect(normalize(42, 10, 10, 140, 500)).to.equal(140);
+  });
 });

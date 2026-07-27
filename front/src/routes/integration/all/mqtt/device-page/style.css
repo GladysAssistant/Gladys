@@ -69,12 +69,15 @@
 }
 
 .deviceListItem {
-  align-items: center;
+  align-items: start;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  display: grid;
+  gap: 0.5rem 0.75rem;
+  grid-template-areas:
+    'main actions'
+    'features features';
+  grid-template-columns: 1fr auto;
   padding: 0.75rem 1rem;
   transition: background-color 0.15s ease;
 }
@@ -89,7 +92,7 @@
 }
 
 .deviceListItemMain {
-  flex: 1 1 200px;
+  grid-area: main;
   min-width: 0;
 }
 
@@ -118,13 +121,7 @@
 }
 
 .deviceListItemFeatures {
-  flex: 1 1 100%;
-}
-
-@media (min-width: 768px) {
-  .deviceListItemFeatures {
-    flex: 1 1 200px;
-  }
+  grid-area: features;
 }
 
 .deviceListItemFeatures .device-features {
@@ -152,11 +149,11 @@
   display: flex;
   flex-shrink: 0;
   gap: 0.5rem;
-  margin-left: auto;
+  grid-area: actions;
 }
 
 .deviceListItemAlert {
-  flex: 1 1 100%;
+  grid-column: 1 / -1;
 }
 
 /* Device edit page */
@@ -485,12 +482,14 @@
 
 @media (max-width: 576px) {
   .deviceListItem {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-areas:
+      'main'
+      'features'
+      'actions';
+    grid-template-columns: 1fr;
   }
 
   .deviceListItemActions {
-    margin-left: 0;
     width: 100%;
   }
 

@@ -29,21 +29,57 @@ class TurnOnLight extends Component {
     }
   };
 
+  getForDurationUnit = trigger => trigger.unit || 'minute';
+
+  getForDurationMultiplier = unit => (unit === 'second' ? 1000 : 60 * 1000);
+
+  getForDurationDisplayValue = trigger => {
+    if (!Number.isInteger(trigger.for_duration)) {
+      return trigger.for_duration;
+    }
+
+    return trigger.for_duration / this.getForDurationMultiplier(this.getForDurationUnit(trigger));
+  };
+
   onForDurationChange = e => {
     e.preventDefault();
     if (e.target.value) {
-      this.props.updateTriggerProperty(this.props.index, 'for_duration', Number(e.target.value) * 60 * 1000);
+      const unit = this.getForDurationUnit(this.props.trigger);
+      this.props.updateTriggerProperty(
+        this.props.index,
+        'for_duration',
+        Number(e.target.value) * this.getForDurationMultiplier(unit)
+      );
     } else {
       this.props.updateTriggerProperty(this.props.index, 'for_duration', '');
     }
+  };
+
+  onForDurationUnitChange = e => {
+    e.preventDefault();
+    const newUnit = e.target.value;
+    const currentUnit = this.getForDurationUnit(this.props.trigger);
+
+    if (newUnit !== currentUnit && Number.isInteger(this.props.trigger.for_duration)) {
+      const displayValue = this.getForDurationDisplayValue(this.props.trigger);
+      this.props.updateTriggerProperty(
+        this.props.index,
+        'for_duration',
+        displayValue * this.getForDurationMultiplier(newUnit)
+      );
+    }
+
+    this.props.updateTriggerProperty(this.props.index, 'unit', newUnit);
   };
 
   enableOrDisableForDuration = e => {
     e.preventDefault();
     if (e.target.checked) {
       this.props.updateTriggerProperty(this.props.index, 'for_duration', 60 * 1000);
+      this.props.updateTriggerProperty(this.props.index, 'unit', 'minute');
     } else {
       this.props.updateTriggerProperty(this.props.index, 'for_duration', undefined);
+      this.props.updateTriggerProperty(this.props.index, 'unit', undefined);
     }
   };
 
@@ -147,19 +183,22 @@ class TurnOnLight extends Component {
                       type="number"
                       class="form-control"
                       placeholder={<Text id="editScene.triggersCard.newState.valuePlaceholder" />}
-                      value={
-                        Number.isInteger(props.trigger.for_duration)
-                          ? props.trigger.for_duration / 60 / 1000
-                          : props.trigger.for_duration
-                      }
+                      value={this.getForDurationDisplayValue(props.trigger)}
                       onChange={this.onForDurationChange}
                     />
                   </Localizer>
-                  <span class="input-group-append" id="basic-addon2">
-                    <span class="input-group-text">
-                      <Text id="deviceFeatureUnitShort.minutes" />
-                    </span>
-                  </span>
+                  <select
+                    class="custom-select"
+                    value={this.getForDurationUnit(props.trigger)}
+                    onChange={this.onForDurationUnitChange}
+                  >
+                    <option value="second">
+                      <Text id="editScene.triggersCard.scheduledTrigger.units.second" />
+                    </option>
+                    <option value="minute">
+                      <Text id="editScene.triggersCard.scheduledTrigger.units.minute" />
+                    </option>
+                  </select>
                 </div>
               </div>
             </div>
