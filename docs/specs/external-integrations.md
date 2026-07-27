@@ -1,5 +1,7 @@
 # Intégrations externes dans Gladys Assistant
 
+> **Spécification vivante — source de vérité.** Ce document spécifie le comportement des intégrations externes et les contrats qui lient le monorepo aux repos de l'écosystème (section C : manifeste, API-hôte, protocole WS, formats du store). La phase 1 est implémentée ; les sections B.15–B.17 sont des designs de phase 2 non encore implémentés. **Règle : toute PR qui change un comportement ou un contrat des intégrations externes modifie ce fichier dans le même diff** — la spec d'abord, le code ensuite. Les retours terrain (portages pilotes, forum) s'instruisent ici avant d'être codés.
+
 ## Contexte
 
 RFC communautaire (topic 10343) : ouvrir Gladys aux intégrations développées et publiées par n'importe qui, installables en un clic, sans review du mainteneur — sans sacrifier la stabilité. Quatre exigences non négociables : (1) une intégration qui plante ne fait jamais planter Gladys, (2) aucun état zombie (état toujours visible et actionnable dans l'UI), (3) UI cohérente sans code injecté par les intégrations, (4) zéro manipulation technique pour l'utilisateur.
@@ -43,11 +45,11 @@ Décisions de cadrage validées avec le mainteneur :
 
 | Phase | Contenu | Livrable observable |
 |---|---|---|
-| **1** | API-hôte + WS, superviseur, auth, API admin, **store décentralisé** (indexeur + catalogue + install 1 clic + mises à jour), front au niveau des intégrations internes : entrée dans le catalogue (badge « externe ») + page générique à 3 écrans Appareils / Découverte / Configuration (formulaire généré depuis le `config_schema`), SDK Node (repo dédié), template/PoC (repo dédié), **documentation publique sur le site** (interne vs externe + guide développeur). Install « dev » par image Docker conservée. | N'importe quel dev tague son repo → son intégration apparaît dans le catalogue de toutes les Gladys sans aucune approbation → un utilisateur l'installe en un clic, ses appareils découverts sont créés depuis l'UI, actionnables, configurables via formulaire généré ; l'intégration survit à un kill (redémarrage auto), passe « En panne » avec logs après échecs répétés. |
+| **1** *(livrée)* | API-hôte + WS, superviseur, auth, API admin, **store décentralisé** (indexeur + catalogue + install 1 clic + mises à jour), front au niveau des intégrations internes : entrée dans le catalogue (badge « externe ») + page générique à 3 écrans Appareils / Découverte / Configuration (formulaire généré depuis le `config_schema`), SDK Node (repo dédié), template/PoC (repo dédié), **documentation publique sur le site** (interne vs externe + guide développeur). Install « dev » par image Docker conservée. | N'importe quel dev tague son repo → son intégration apparaît dans le catalogue de toutes les Gladys sans aucune approbation → un utilisateur l'installe en un clic, ses appareils découverts sont créés depuis l'UI, actionnables, configurables via formulaire généré ; l'intégration survit à un kill (redémarrage auto), passe « En panne » avec logs après échecs répétés. |
 | **2** | Découverte réseau médiée (écoute passive **et scan actif** broadcast/mDNS/SSDP par le core — design complet en B.16), webhooks entrants via Gladys Plus (relais générique gateway → intégration, design complet en B.17), widgets de config avancés, actions à portée appareil (`scope: "device"`, bouton sur la fiche de l'appareil — en v1 le select `source: "devices"` couvre le besoin, cf. C.1), autres types d'intégrations que « Appareils » — en premier lieu le type « communication » pour sortir Telegram & co du core (design complet en B.15), puis météo…. | Une intégration détecte son matériel sans config manuelle ; un canal de messagerie s'installe depuis le store. |
 | **3** | Écosystème : SDKs communautaires d'autres langages, ranking/stats du store, durcissement supply-chain (épinglage par digest, signature d'images ?). | Écosystème auto-suffisant, sans intervention du mainteneur. |
 
-## B. Plan détaillé — Phase 1
+## B. Design détaillé
 
 ### B.1 Modèle de données : tout dans `t_service`
 
@@ -342,7 +344,7 @@ Problème : des services tiers poussent leurs événements par webhook (Netatmo 
 
 Deux modes, car les deux existent sur le terrain : **`fire_and_forget`** (défaut) — le tiers pousse et n'attend qu'un accusé (la classe Netatmo) ; **`sync`** — l'appelant attend la **réponse de l'intégration** (challenge/réponse à l'enregistrement type Strava/Microsoft Graph, retours applicatifs).
 
-**Côté cloud (chantier `GladysAssistant/gladys-gateway`, hors des 5 chantiers v1 — porté par le mainteneur, la spec définit le contrat)** : une route générique `GET|POST /v1/api/external-integration/:open_api_key/:selector/:webhook_key` qui relaie `{ selector, webhook_key, method, query, body brut, content_type }` (body ≤ 256 Ko) sous l'action unique `external-integration-webhook`, attend l'ack de l'instance avec un **timeout dur** (10 s) et répond ce que l'ack contient ; **timeout ou instance injoignable → `200` corps vide, toujours** — c'est le fix durable de la leçon Netatmo (5 échecs consécutifs = webhook banni par le tiers, observé en vrai ; PR #2627 note que la gateway actuelle laisse la requête échouer). La gateway relaie, point : zéro connaissance des intégrations.
+**Côté cloud (repo `GladysAssistant/gladys-gateway`, hors de l'écosystème listé en fin de spec — porté par le mainteneur, la spec définit le contrat)** : une route générique `GET|POST /v1/api/external-integration/:open_api_key/:selector/:webhook_key` qui relaie `{ selector, webhook_key, method, query, body brut, content_type }` (body ≤ 256 Ko) sous l'action unique `external-integration-webhook`, attend l'ack de l'instance avec un **timeout dur** (10 s) et répond ce que l'ack contient ; **timeout ou instance injoignable → `200` corps vide, toujours** — c'est le fix durable de la leçon Netatmo (5 échecs consécutifs = webhook banni par le tiers, observé en vrai ; PR #2627 note que la gateway actuelle laisse la requête échouer). La gateway relaie, point : zéro connaissance des intégrations.
 
 **Côté instance** : une branche `external-integration-webhook` dans `gateway.handleNewMessage.js` → le superviseur vérifie selector + `webhook_key` déclaré (inconnu → ack `200` vide, silencieux — pas de fuite de validité), puis selon le mode :
 - `fire_and_forget` : ack `{ status: 200 }` **immédiat**, relais asynchrone par le WS intégration — `external-integration.webhook.received` `{ "webhook_key", "method", "query", "body", "content_type" }`, sans `message_id` ni ack ; intégration déconnectée/arrêtée → perdu sans erreur (voir doctrine ci-dessous) ;
@@ -866,45 +868,17 @@ await gladys.connect(); // résout une fois authentifié
 
 **Garanties de comportement** : répond aux pings WS protocolaires (natif lib `ws`) ; ne loggue rien par défaut (stdout appartient à l'intégration) sauf `DEBUG=gladys-integration-sdk` ; aucun état persisté sur disque par le SDK (tout se resynchronise, `/data` reste à la main de l'intégration) ; un type de message inconnu est ignoré silencieusement (compatibilité ascendante, cf. C.4).
 
-## Ordre d'implémentation (jalons = commits d'une seule PR)
+## Écosystème de repos
 
-Une **seule PR de bout en bout** sur le monorepo — c'est elle que le mainteneur teste (checkout d'une branche, un build, tout le parcours). Les jalons ci-dessous sont l'**ordre de travail interne** : chacun correspond à un commit (ou groupe de commits) cohérent avec ses tests verts, ce qui permet une review commit par commit et un bisect facile, sans éparpiller la feature en morceaux non testables.
+Les contrats de la section C découplent cinq repos ; le `manifest.schema.json` a un **propriétaire canonique : `GladysAssistant/integration-store`** (publié sur Pages à côté de l'index), le monorepo en embarque une copie vendorée.
 
-1. **Jalon 1 — Socle superviseur** : constantes (`SERVICE_TYPES`, `SERVICE_STATUS.DEGRADED`), migration `addColumn` sur `t_service` + modèle, `system.createNetwork|inspectNetwork|getImageLabels`, lib `external-integration` (sans WS/commandes), câblage `lib/index.js`, API admin + tests. → on installe/démarre/arrête un conteneur verrouillé via l'API.
-2. **Jalon 2 — API-hôte** : `utils/integrationToken.js` (génération/validation JWT), middleware, flag `externalIntegrationAuth`, contrôleur `/api/integration/v1/*` (discovered_device, device en lecture, state, camera/image, device/transport, config) + tests d'isolation. → une intégration publie ses appareils découverts, des états et des images caméra.
-3. **Jalon 3 — WS + commandes + santé** : extension WebsocketManager, connected/disconnected, `sendCommand` + ack/timeout (`command-result` avec `data`), proxy-service (setValue + postCreate/postUpdate/postDelete), scan request, relais OAuth (`oauth.get-authorize-url`/`oauth.callback`), actions (`action.run`, timeout par action) et caméra (`camera.get-image`, timeout 15 s, proxy-service `getImage`), `connection_status`, upsert des `params` au re-publish, `poll` no-op hors RUNNING/DEGRADED, heartbeat, checkHealth + backoff + DEGRADED/FAILED. → machine à états complète, `setValue` atteint le conteneur, l'intégration est notifiée des créations/suppressions.
-4. **Jalon 4 — Store côté serveur** : migration `store_slug`, lib `store/` (fetch + cache + compatibilité + updates), endpoints `GET .../store`, `POST .../store/refresh`, install par `store_slug`, `POST .../:selector/update` + tests. En parallèle (hors monorepo) : repo `GladysAssistant/integration-store` (Action d'indexation, JSON Schema du manifeste, GitHub Pages). → le catalogue est alimenté par l'index, install/update en un clic par API.
-5. **Jalon 5 — Front** : intégrations externes du store dans le catalogue (badge « externe », écran d'installation avec avertissement, statut temps réel, mise à jour disponible, install dev), page générique 3 écrans Appareils/Découverte/Configuration (formulaire généré depuis `config_schema`, dont le champ `oauth2` + route de callback, section Actions, statut de connexion applicatif, heure de démarrage, bouton « Mettre à jour » en Découverte, avertissement double instance, macarons de transport avec point orange « dégradé » + interrupteur « Privilégier la connexion locale », selects à source dynamique `devices`, blocs `section` + lien Documentation permanent), logs, i18n.
-6. **Jalon 6 — Sous-conteneurs** : validation du champ `containers` (dont ports et classes matérielles), réseau privé par intégration, état désiré/santé/réconciliation dans le superviseur, assignation des ports hôte, `system.detectHardwareClasses()` + octrois (`granted_devices`, `GET .../hardware`, `POST .../:selector/hardware`, push `hardware-updated`), endpoints `/container` (liste/start/stop/restart), front (ports + interrupteurs matériel sur l'écran d'installation, états + sélecteur de logs + liens « Ouvrir » + section Matériel dans le bloc de supervision) + tests sur fixture type Frigate + Mosquitto. → une intégration multi-conteneurs s'installe, expose son UI, accède au Coral **que l'utilisateur a explicitement accordé**, et se désinstalle sans rien laisser derrière elle.
-Le SDK, le template/PoC et la documentation du site ne sont **pas** des jalons du monorepo : ce sont les chantiers `integration-sdk-js` (B.10, C.8), `integration-template-js` (B.11) et `v4-website` (B.12), menés en parallèle dans leurs propres repos.
-
-## Répartition par repo (exécution en parallèle)
-
-Cinq chantiers indépendants, un par repo — les contrats qui les découplent sont tous en section C (`manifest.schema.json`, `index.json`, API-hôte, protocole WS), donc ils peuvent avancer en parallèle avec des fixtures/mocks :
-
-| Chantier | Repo | Périmètre (sections) | Consignes d'exécution |
-|---|---|---|---|
-| **Stack Gladys** | `GladysAssistant/Gladys` (monorepo) | B.1–B.9 (côté Gladys), B.13, C.2–C.5, C.7 — serveur + front | **Une seule PR de bout en bout, testable par le mainteneur**, structurée en **un commit (ou groupe de commits) par jalon** (1 → 6, tests verts à chaque jalon — la review se fait commit par commit) ; PR ouverte en draft dès le jalon 1 pour faire tourner la CI en continu ; embarque une **copie vendorée** du `manifest.schema.json` |
-| **Indexeur du store** | `GladysAssistant/integration-store` (nouveau) | B.9 (indexeur), B.13 (tests indexeur), C.1, C.6 | **Propriétaire canonique du `manifest.schema.json`** (publié sur Pages à côté de l'index) ; Action planifiée + tests sur fixtures, CI propre |
-| **SDK JS** | `GladysAssistant/integration-sdk-js` (nouveau) | B.10, C.8 (+ consomme C.2–C.4 et C.7) | Paquet npm `@gladysassistant/integration-sdk`, bibliothèque seule ; **ne dépend que des contrats C, aucun import du monorepo** ; testable contre un faux serveur (mocks des endpoints C.3 + WS C.4) |
-| **Template/PoC** | `GladysAssistant/integration-template-js` (nouveau) | B.11, C.1, C.7 (+ consomme C.8) | Intégration demo complète (Open-Meteo + interrupteur virtuel), manifeste + cover conformes, Dockerfile + workflow buildx multi-arch ; dépend du SDK (via git pendant le développement parallèle, npm ensuite) ; c'est lui qui déroule le parcours e2e |
-| **Documentation** | `GladysAssistant/v4-website` (existant) | B.12 (contenu transposé des sections B/C) | Doc utilisateur « interne vs externe » + doc développeur (tutoriel + référence), **fr + en**, dans la structure existante du site (auditer l'arborescence avant d'écrire) ; chantier purement doc, aucun code — peut démarrer dès que la spec est gelée |
-
-Hors code (étapes manuelles, après les chantiers) : activer GitHub Pages sur `integration-store`, publier le paquet npm du SDK, marquer `integration-template-js` « Template repository », pousser son image multi-arch sur un registre public et lui ajouter le topic `gladys-assistant-integration` **comme le ferait un dev tiers** (c'est le test du chemin zéro approbation), déployer la doc du site, puis dérouler le parcours e2e de la section Vérification.
-
-## Fichiers critiques existants
-
-- `server/lib/system/index.js` (+ `system.createContainer.js`, `system.getContainerLogs.js`) — socle Docker à étendre
-- `server/lib/device/device.setValue.js` + `device.notify.js` — contrats de dispatch et de notification respectés via le proxy-service
-- `server/api/websockets/index.js` — extension auth JWT d'intégration
-- `server/api/routes.js` + `server/api/setupRoutes.js` — nouveau flag d'auth et routes
-- `server/lib/index.js` — injection du superviseur (avec `jwtSecret`) dans l'objet gladys
-- `server/lib/service/service.load.js` / `service.startAll.js` — cycle de vie réutilisé tel quel (vérifié compatible avec les lignes `t_service` externes)
-- `server/utils/accessToken.js` — modèle pour `utils/integrationToken.js` (JWT audience `integration`)
-- `server/models/service.js` — colonnes à ajouter
-- `server/services/zigbee2mqtt/docker/*.json` — format de descripteur de conteneur de référence
-- `front/src/routes/integration/index.js` + `front/src/config/integrations/devices.json` — catalogue d'intégrations à fusionner avec la liste dynamique
-- `front/src/routes/integration/all/zigbee2mqtt/` — modèle de page 3 onglets (device/discover/setup) ; `front/src/routes/integration/all/mcp/` — modèle d'appels API
+| Repo | Rôle | Sections |
+|---|---|---|
+| `GladysAssistant/Gladys` (monorepo) | Superviseur, API-hôte, WS, store côté serveur, front — **et cette spec** | B.1–B.9, B.13, C.2–C.5, C.7 |
+| `GladysAssistant/integration-store` | Indexeur (GitHub Action) + `index.json` sur Pages ; schéma canonique du manifeste | B.9, C.1, C.6 |
+| `GladysAssistant/integration-sdk-js` | Paquet npm `@gladysassistant/integration-sdk` — ne dépend que des contrats C, aucun import du monorepo | B.10, C.8 |
+| `GladysAssistant/integration-template-js` | Template repository officiel + PoC du parcours e2e (publié dans le store comme le ferait un dev tiers) | B.11, C.1, C.7 |
+| `GladysAssistant/v4-website` | Documentation publique fr + en (transposition des sections B/C — la spec reste la source de vérité) | B.12 |
 
 ## Vérification
 
