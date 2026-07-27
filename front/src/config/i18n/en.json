@@ -254,8 +254,10 @@
     "closeDefineTabletMode": "Close",
     "tabletMode": {
       "description": "Tablet mode is used for the alarm functionality. If you arm the alarm, all house tablets will be locked and display a virtual keyboard to deactivate the alarm.",
+      "currentBrowserOnly": "<strong>This setting only applies to this device.</strong> By saving, you declare that the browser you are currently using is a tablet. Each device is configured separately: only enable tablet mode on the devices you are happy to see locked when the alarm is armed.",
       "fullScreenForce": "If you want to force a tablet to stay in full-screen mode, you can add <code>?fullscreen=force</code> to the URL.",
-      "houseLabel": "House",
+      "houseLabel": "House of this tablet",
+      "howToDisable": "To turn tablet mode off on a device, open this menu from that device and select \"Tablet mode disabled\".",
       "tabletModeDisabled": "Tablet Mode Disabled"
     },
     "duckDbMigrationInProgress": "Your Gladys instance is migrating its database to DuckDB, a new, more powerful database system for time-series data. This task may take some time, during which time not all your charts will be available. Migration progress = {{progress}}%.",

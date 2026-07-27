@@ -96,6 +96,9 @@ class SetTabletMode extends Component {
                 <p>
                   <Text id="dashboard.tabletMode.description" />
                 </p>
+                <div class="alert alert-info">
+                  <MarkupText id="dashboard.tabletMode.currentBrowserOnly" />
+                </div>
                 <div className="form-group">
                   <div className="form-label">
                     <Text id="dashboard.tabletMode.houseLabel" />
@@ -112,6 +115,9 @@ class SetTabletMode extends Component {
                       ))}
                   </select>
                 </div>
+                <p>
+                  <Text id="dashboard.tabletMode.howToDisable" />
+                </p>
                 <p>
                   <MarkupText id="dashboard.tabletMode.fullScreenForce" />
                 </p>
