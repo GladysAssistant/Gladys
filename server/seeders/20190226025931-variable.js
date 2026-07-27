@@ -29,6 +29,16 @@ module.exports = {
           updated_at: '2019-02-12 07:49:07.556 +00:00',
         },
         {
+          // stable secret signing the external integration JWTs: the host
+          // API tests forge their tokens with the same 'secret'
+          id: '9f8d0be5-6d5b-4959-b380-e29a1ee71d5c',
+          name: 'EXTERNAL_INTEGRATION_JWT_SECRET',
+          service_id: null,
+          value: 'secret',
+          created_at: '2019-02-12 07:49:07.556 +00:00',
+          updated_at: '2019-02-12 07:49:07.556 +00:00',
+        },
+        {
           id: '0930c1ac-0f5d-4a65-8ef4-ea92ebdd36b6',
           name: 'USER_SECURE_VARIABLE',
           service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',

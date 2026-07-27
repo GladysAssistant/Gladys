@@ -1,0 +1,7 @@
+.logs {
+  max-height: 65vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-bottom: 0;
+}

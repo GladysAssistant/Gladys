@@ -569,7 +569,10 @@
     "tags": {
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
-      "local": "Local"
+      "local": "Local",
+      "external": "Communauté",
+      "native": "Natif",
+      "deprecated": "Bientôt dépréciée"
     },
     "root": {
       "title": "Intégrations",
@@ -580,7 +583,7 @@
       "noSearchResultsSuggestion": "Essayez <a href=\"/dashboard/integration/device/matter\">Matter</a> pour les appareils compatibles Matter/Thread, ou <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> pour connecter des appareils Somfy, Shelly, Daikin et bien d'autres.",
       "gatewayBanner": {
         "title": "Votre appareil n'est pas dans la liste ?",
-        "description": "De nombreux appareils peuvent être connectés via <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocole universel) ou <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin…). Une fois connectés, ils sont contrôlables dans Gladys comme n'importe quel autre appareil."
+        "description": "De nombreux appareils peuvent être connectés via <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocole universel). Votre appareil peut aussi être pris en charge par une <b>intégration externe</b> de la communauté : chacun peut en créer une et la publier dans le store, elle apparaît alors dans cette liste. Consultez la <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">documentation des intégrations externes</a>."
       },
       "menu": {
         "all": "Toutes les intégrations",
@@ -592,6 +595,240 @@
         "health": "Santé",
         "weather": "Météo",
         "navigation": "Navigation"
+      }
+    },
+    "externalIntegration": {
+      "updateAvailable": "Mise à jour disponible",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte",
+      "configTab": "Configuration",
+      "supervisionTab": "Supervision",
+      "logsTab": "Journaux",
+      "status": {
+        "UNKNOWN": "Inconnu",
+        "ENABLED": "Activée",
+        "DISABLED": "Désactivée",
+        "LOADING": "Chargement",
+        "RUNNING": "En cours d'exécution",
+        "DEGRADED": "Dégradée",
+        "STOPPED": "Arrêtée",
+        "ERROR": "Erreur"
+      },
+      "docs": {
+        "modalTitle": "Documentation",
+        "loadError": "Une erreur s'est produite lors du chargement de la documentation.",
+        "openRawLink": "Ouvrir dans un nouvel onglet"
+      },
+      "config": {
+        "title": "Configuration",
+        "docsLink": "Documentation",
+        "loadError": "Une erreur s'est produite lors du chargement de la configuration.",
+        "noConfig": "Cette intégration n'a pas d'options de configuration.",
+        "secretConfiguredPlaceholder": "Configuré. Laissez vide pour conserver la valeur actuelle.",
+        "saveSuccess": "Configuration enregistrée avec succès.",
+        "saveError": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
+        "saveButton": "Enregistrer la configuration",
+        "oauthConnectButton": "Connecter",
+        "oauthConnectError": "Erreur au lancement de la connexion. Vérifiez que l'intégration est démarrée."
+      },
+      "actions": {
+        "title": "Actions",
+        "runButton": "Exécuter",
+        "error": "L'action a échoué. Vérifiez que l'intégration est démarrée."
+      },
+      "connection": {
+        "label": "Connexion",
+        "connectedBadge": "Connecté",
+        "disconnectedBadge": "Déconnecté"
+      },
+      "transport": {
+        "localBadge": "Local",
+        "cloudBadge": "Cloud",
+        "unreachableBadge": "Injoignable",
+        "localTooltip": "Cet appareil répond via le réseau local (LAN)",
+        "cloudTooltip": "Cet appareil répond via le cloud du fabricant",
+        "unreachableTooltip": "Cet appareil ne répond pas pour le moment",
+        "degradedBadge": "Dégradé",
+        "degradedTooltip": "Cet appareil fonctionne, mais pas en mode nominal",
+        "preferLocalLabel": "Privilégier la connexion locale (LAN) quand elle est disponible",
+        "preferLocalDescription": "L'intégration applique cette préférence quand elle le peut ; le macaron de chaque appareil indique le transport réellement utilisé."
+      },
+      "oauthCallback": {
+        "title": "Connexion du compte",
+        "relayingText": "Finalisation de la connexion avec l'intégration...",
+        "successText": "Compte connecté avec succès.",
+        "errorText": "L'intégration a refusé la connexion. Réessayez.",
+        "missingParamsText": "Il manque des paramètres de connexion à cette page. Relancez la connexion depuis l'écran Configuration.",
+        "closeText": "Vous pouvez fermer cette fenêtre.",
+        "backToConfigButton": "Retour à la configuration"
+      },
+      "supervision": {
+        "title": "Supervision",
+        "loadError": "Une erreur s'est produite lors du chargement de l'intégration.",
+        "actionError": "Une erreur s'est produite lors de l'exécution de cette action.",
+        "uninstallError": "Une erreur s'est produite lors de la désinstallation de cette intégration.",
+        "updateAvailableText": "Une nouvelle version de cette intégration est disponible.",
+        "statusLabel": "Statut",
+        "versionLabel": "Version",
+        "dockerImageLabel": "Image Docker",
+        "repoLabel": "Dépôt",
+        "startButton": "Démarrer",
+        "stopButton": "Arrêter",
+        "restartButton": "Redémarrer",
+        "updateButton": "Mettre à jour",
+        "forceUpdateButton": "Forcer la mise à jour",
+        "forceUpdateTitle": "Re-télécharge l'image Docker et recrée le conteneur, même sans nouvelle version",
+        "logsButton": "Journaux",
+        "uninstallButton": "Désinstaller",
+        "containersTitle": "Conteneurs additionnels",
+        "containerRunning": "En fonctionnement",
+        "containerStopped": "Arrêté",
+        "openButton": "Ouvrir",
+        "uninstallWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés. Les appareils créés par cette intégration resteront dans Gladys jusqu’à ce que vous les supprimiez.",
+        "confirmUninstallButton": "Oui, désinstaller",
+        "cancelUninstallButton": "Annuler",
+        "startedAtLabel": "En fonctionnement depuis"
+      },
+      "device": {
+        "title": "Appareils",
+        "refreshButton": "Rafraîchir",
+        "loadError": "Une erreur s'est produite lors du chargement des appareils.",
+        "noDevices": "Aucun appareil créé pour le moment. Rendez-vous dans l’onglet « Découverte » pour trouver des appareils.",
+        "noDevicesConfigureFirst": "Si vous venez d'installer cette intégration, commencez par renseigner l'onglet <a href=\"{{configUrl}}\">Configuration</a>, puis lancez une découverte.",
+        "saveError": "Une erreur s'est produite lors de l'enregistrement de cet appareil.",
+        "deleteError": "Une erreur s'est produite lors de la suppression de cet appareil.",
+        "nameLabel": "Nom",
+        "namePlaceholder": "Nom de l'appareil",
+        "roomLabel": "Pièce",
+        "featuresLabel": "Fonctionnalités",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer"
+      },
+      "deviceParams": {
+        "title": "Paramètres techniques"
+      },
+      "discover": {
+        "title": "Appareils découverts",
+        "scanButton": "Scanner",
+        "scanning": "Scan en cours...",
+        "scanError": "Une erreur s'est produite lors du lancement du scan.",
+        "scanErrorDisconnected": "Impossible de lancer le scan : l'intégration n'est pas connectée. Vérifiez qu'elle est bien démarrée dans l'onglet « Configuration ».",
+        "loadError": "Une erreur s'est produite lors du chargement des appareils découverts.",
+        "noDevices": "Aucun appareil découvert pour le moment. Cliquez sur « Scanner » pour rechercher des appareils.",
+        "noDevicesConfigureFirst": "Rien trouvé ? Vérifiez que l'intégration est bien configurée dans l'onglet <a href=\"{{configUrl}}\">Configuration</a>, puis relancez un scan.",
+        "alreadyCreatedBadge": "Déjà ajouté",
+        "createError": "Une erreur s'est produite lors de l'ajout de cet appareil.",
+        "featuresLabel": "Fonctionnalités",
+        "createButton": "Ajouter à Gladys",
+        "updateButton": "Mettre à jour",
+        "updateTitle": "L'intégration a re-publié cet appareil avec une structure différente : appliquer la nouvelle définition"
+      },
+      "install": {
+        "backToCatalog": "Retour aux intégrations",
+        "notFound": "Cette intégration n'a pas été trouvée dans le store.",
+        "starsLabel": "étoiles",
+        "lastPushLabel": "Dernière mise à jour :",
+        "warningTitle": "Intégration communautaire",
+        "warningText": "Cette intégration est développée par la communauté et n'est pas maintenue par l'équipe Gladys Assistant. Elle s'exécute dans un conteneur Docker isolé, mais vous ne devriez installer que des intégrations provenant de développeurs de confiance.",
+        "communicationWarningText": "Cette intégration est un canal de messagerie : une fois votre compte lié, elle pourra envoyer et recevoir des messages en votre nom (déclencher des scènes, contrôler votre maison via le cerveau de Gladys).",
+        "notCompatible": "Cette intégration n'est pas compatible avec votre installation de Gladys.",
+        "installError": "Une erreur s'est produite lors de l'installation de cette intégration.",
+        "alreadyInstalled": "Cette intégration est déjà installée.",
+        "goToIntegrationButton": "Accéder à l'intégration",
+        "installing": "Installation...",
+        "installButton": "Installer",
+        "networkDiscoveryTitle": "Demandes de découverte réseau",
+        "networkDiscoveryText": "Cette intégration demande à Gladys de capturer pour elle les annonces réseau suivantes. Elle ne pourra jamais rien capturer d'autre.",
+        "documentationLink": "Documentation",
+        "duplicateWarningTitle": "Une autre instance est déjà installée",
+        "duplicateWarningText": "« {name} » semble être une autre instance de cette intégration. Deux instances peuvent se disputer le même compte cloud ou les mêmes appareils — pensez à arrêter l'instance existante pendant vos tests. Installer quand même est un usage supporté (ex. une version dev à côté de la prod).",
+        "webhooksTitle": "Webhooks Internet (Gladys Plus)",
+        "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
+        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur)."
+      },
+      "networkDiscovery": {
+        "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
+        "udpActiveBroadcastText": "Émettre une requête de découverte en broadcast UDP sur les ports {ports} et recueillir les réponses",
+        "mdnsText": "Rechercher les services mDNS de type {service}",
+        "ssdpText": "Recherche SSDP de {st}"
+      },
+      "installFromGithub": {
+        "cardTitle": "Installer depuis GitHub",
+        "cardDescription": "Installez une intégration communautaire depuis un dépôt GitHub.",
+        "modalTitle": "Installer une intégration depuis GitHub",
+        "repoUrlLabel": "URL du dépôt GitHub",
+        "repoUrlPlaceholder": "https://github.com/owner/repository",
+        "installButton": "Installer",
+        "devModeLink": "Mode développeur : installer depuis une image Docker",
+        "devModeDescription": "Installez une intégration directement depuis une image Docker, avec un manifeste optionnel. Réservé aux développeurs d’intégrations.",
+        "dockerImageLabel": "Image Docker",
+        "dockerImagePlaceholder": "ex. monuser/mon-integration:latest",
+        "manifestLabel": "Manifeste (JSON, optionnel)",
+        "manifestPlaceholder": "{ \"name\": \"Mon intégration\", ... }",
+        "errorUnknown": "Une erreur s'est produite lors de l'installation de cette intégration.",
+        "errorNotFound": "Dépôt introuvable, ou il ne contient pas d'intégration Gladys valide.",
+        "errorInvalidManifest": "Le manifeste de l'intégration est invalide.",
+        "manifestInvalidJson": "Le manifeste n'est pas un JSON valide."
+      },
+      "logs": {
+        "title": "Journaux",
+        "refreshButton": "Rafraîchir",
+        "error": "Une erreur s'est produite lors du chargement des journaux.",
+        "empty": "Aucun journal disponible.",
+        "containerSelectLabel": "Conteneur",
+        "mainContainerOption": "Conteneur principal"
+      },
+      "link": {
+        "title": "Lier mon compte",
+        "notLinkedText": "Votre compte n'est pas lié à ce canal de messagerie. Générez un code, puis envoyez-le au bot dans le canal externe pour lier votre compte.",
+        "linkedText": "Votre compte est lié à :",
+        "generateCodeButton": "Générer un code de liaison",
+        "codeText": "Envoyez ce code au bot :",
+        "codeExpiryText": "Ce code est à usage unique et expire dans 15 minutes.",
+        "unlinkButton": "Délier mon compte",
+        "error": "Une erreur s'est produite lors de la liaison du compte."
+      },
+      "subContainers": {
+        "title": "Conteneurs additionnels",
+        "description": "Cette intégration exécute les conteneurs suivants sur votre machine. Les ports listés seront accessibles depuis votre réseau local.",
+        "nameLabel": "Nom",
+        "imageLabel": "Image",
+        "limitsLabel": "Limites",
+        "portsLabel": "Ports exposés"
+      },
+      "hardware": {
+        "title": "Matériel",
+        "installDescription": "Cette intégration demande l'accès à du matériel de votre machine. Vous pouvez accorder ou refuser chaque accès, et le modifier à tout moment après l'installation.",
+        "configDescription": "Accès matériel accordés à cette intégration. Modifier un accès recrée les conteneurs concernés et notifie l'intégration.",
+        "detected": "Détecté",
+        "notDetected": "Non détecté",
+        "saveButton": "Enregistrer le matériel",
+        "saveError": "Une erreur s'est produite lors de l'enregistrement des accès matériel.",
+        "classes": {
+          "coral-usb": "Coral USB (tout le bus USB)",
+          "coral-pcie": "Coral PCIe",
+          "gpu": "GPU (accélération graphique)",
+          "video": "Caméras (périphériques vidéo)"
+        }
+      },
+      "webhooks": {
+        "title": "Webhooks Gladys Plus",
+        "plusRequiredText": "Cette intégration peut recevoir des événements depuis Internet via Gladys Plus. Liez votre compte Gladys Plus dans les Réglages pour activer les webhooks ; sans cela, l'intégration fonctionne uniquement en mode interrogation périodique.",
+        "explanationText": "Créez une clé Open API dans Gladys Plus (Réglages → Open API), puis collez-la ici. Gladys construit les URLs de webhook et l'intégration les enregistre auprès du service tiers.",
+        "openApiKeyLabel": "Clé Open API Gladys Plus",
+        "openApiKeyPlaceholder": "Collez votre clé Open API",
+        "saveKeyButton": "Enregistrer",
+        "saveKeyError": "Une erreur est survenue lors de l'enregistrement de la clé Open API.",
+        "notAvailableText": "Les webhooks ne sont pas encore actifs : enregistrez votre clé Open API pour les activer.",
+        "urlsText": "URLs de webhook (l'intégration les enregistre automatiquement quand c'est possible ; certains services demandent de les coller dans la console du fabricant). Ces URLs contiennent votre clé : ne les partagez qu'avec le service tiers."
+      },
+      "contactProfile": {
+        "title": "Mon compte",
+        "description": "Ce canal envoie des messages avec vos identifiants personnels. Chaque utilisateur saisit ses propres valeurs ; laissez vide pour ne rien recevoir. Effacer vos valeurs arrête les messages.",
+        "saveButton": "Enregistrer",
+        "clearButton": "Effacer mes valeurs",
+        "saveError": "Une erreur est survenue lors de l'enregistrement de vos valeurs.",
+        "saveSuccess": "Vos valeurs ont été enregistrées."
       }
     },
     "energyMonitoring": {
@@ -2520,7 +2757,8 @@
       "generateButton": "Générer",
       "keyNameLabel": "Clé :",
       "registeredLabel": "Enregistré le :"
-    }
+    },
+    "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment."
   },
   "editScene": {
     "settings": "Configuration",

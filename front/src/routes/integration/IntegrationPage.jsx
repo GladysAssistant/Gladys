@@ -13,7 +13,8 @@ const IntegrationPage = ({
   changeOrderDir,
   search,
   integrationCategories,
-  toggleFavorite
+  toggleFavorite,
+  showInstallFromGithub
 }) => (
   <div class="page">
     <div class="page-main">
@@ -27,6 +28,7 @@ const IntegrationPage = ({
               searchKeyword={searchKeyword || ''}
               integrationsLength={integrations.length}
               totalSize={totalSize}
+              showInstallFromGithub={showInstallFromGithub}
             />
             <IntegrationMenuMobile integrationCategories={integrationCategories} />
             <div class="alert alert-info mb-4">
