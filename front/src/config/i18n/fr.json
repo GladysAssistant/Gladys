@@ -1080,7 +1080,17 @@
       "note": "Ce lien est unique à votre compte, ne l'envoyez pas à d'autres utilisateurs.",
       "configurationError": "Nous n'avons pas pu configurer votre compte. Êtes-vous sûr que ce token (jeton) est valide?",
       "apiKey": "Clé API du Bot Telegram",
-      "saveButton": "Sauvegarder"
+      "saveButton": "Sauvegarder",
+      "disable": {
+        "title": "Désactiver l'intégration Telegram",
+        "description": "Cette intégration est dépréciée au profit de la nouvelle intégration Telegram externe. Désactiver l'intégration arrête le bot Telegram, supprime la clé API enregistrée et déconnecte tous les utilisateurs de leur compte Telegram. Vous pourrez ensuite installer la nouvelle intégration Telegram.",
+        "button": "Désactiver l'intégration Telegram",
+        "confirmation": "Êtes-vous sûr de vouloir désactiver l'intégration Telegram ? La clé API sera définitivement supprimée et les utilisateurs devront à nouveau lier leur compte Telegram.",
+        "confirmButton": "Oui, désactiver",
+        "cancelButton": "Annuler",
+        "success": "L'intégration Telegram a bien été désactivée, la clé API a été supprimée.",
+        "error": "Nous n'avons pas pu désactiver l'intégration Telegram. Merci de réessayer."
+      }
     },
     "nextcloudTalk": {
       "title": "Nextcloud Talk",
