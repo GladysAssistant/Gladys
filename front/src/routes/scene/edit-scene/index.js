@@ -8,7 +8,7 @@ import get from 'get-value'; // Import get-value package
 import { RequestStatus } from '../../../utils/consts';
 import { getDragAndDropBackend } from '../../../utils/dragAndDropBackend';
 import EditScenePage from './EditScenePage';
-import { computeRunningInfo } from '../runningInfo';
+import { computeRunningInfo, mergeRunningScenes } from '../runningInfo';
 
 import { ACTIONS, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
@@ -136,7 +136,12 @@ class EditScene extends Component {
   getRunningScenes = async () => {
     try {
       const runningScenes = await this.props.httpClient.get('/api/v1/scene/running');
-      this.setState({ runningScenes });
+      // This page only displays the edited scene, so keep only its executions
+      // (this also scopes the ticker to the edited scene).
+      const forThisScene = runningScenes.filter(
+        runningScene => runningScene.sceneSelector === this.props.scene_selector
+      );
+      this.setState(prevState => ({ runningScenes: mergeRunningScenes(forThisScene, prevState.runningScenes) }));
     } catch (e) {
       console.error(e);
     }

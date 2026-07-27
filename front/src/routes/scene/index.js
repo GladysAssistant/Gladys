@@ -4,6 +4,7 @@ import { route } from 'preact-router';
 import debounce from 'debounce';
 import update from 'immutability-helper';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
+import { mergeRunningScenes } from './runningInfo';
 import ScenePage from './ScenePage';
 
 class Scene extends Component {
@@ -52,7 +53,8 @@ class Scene extends Component {
   getRunningScenes = async () => {
     try {
       const runningScenes = await this.props.httpClient.get('/api/v1/scene/running');
-      this.setState({ runningScenes });
+      // Merge with any websocket-driven updates received while fetching
+      this.setState(prevState => ({ runningScenes: mergeRunningScenes(runningScenes, prevState.runningScenes) }));
     } catch (e) {
       console.error(e);
     }

@@ -4,7 +4,7 @@ import { RequestStatus } from '../../../utils/consts';
 import SceneRow from './SceneRow';
 import cx from 'classnames';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
-import { computeRunningInfo } from '../../../routes/scene/runningInfo';
+import { computeRunningInfo, mergeRunningScenes } from '../../../routes/scene/runningInfo';
 
 class SceneBoxComponent extends Component {
   refreshData = () => {
@@ -31,7 +31,8 @@ class SceneBoxComponent extends Component {
   getRunningScenes = async () => {
     try {
       const runningScenes = await this.props.httpClient.get('/api/v1/scene/running');
-      this.setState({ runningScenes });
+      // Merge with any websocket-driven updates received while fetching
+      this.setState(prevState => ({ runningScenes: mergeRunningScenes(runningScenes, prevState.runningScenes) }));
     } catch (e) {
       console.error(e);
     }
@@ -122,6 +123,7 @@ class SceneBoxComponent extends Component {
                   {scenes &&
                     scenes.map(scene => (
                       <SceneRow
+                        key={scene.selector}
                         boxStatus={status}
                         name={scene.name}
                         icon={scene.icon}

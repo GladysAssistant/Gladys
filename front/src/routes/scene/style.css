@@ -116,7 +116,7 @@
   width: 0.85em;
   height: 0.85em;
   margin-right: 0.4em;
-  border: 1.5px solid currentColor;
+  border: 1.5px solid currentcolor;
   border-radius: 2px;
   box-sizing: border-box;
 }
