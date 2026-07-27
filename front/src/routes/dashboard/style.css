@@ -81,7 +81,8 @@
   grid-template-rows: 0fr;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, grid-template-rows 0.3s ease;
+  /* Visibility is not interpolable: delay it so the panel stays visible while collapsing */
+  transition: opacity 0.3s ease, grid-template-rows 0.3s ease, visibility 0s linear 0.3s;
   padding: 0rem;
 }
 
@@ -95,4 +96,6 @@
   visibility: visible;
   opacity: 1;
   grid-template-rows: 1fr;
+  /* Opening stays immediate */
+  transition-delay: 0s, 0s, 0s;
 }
