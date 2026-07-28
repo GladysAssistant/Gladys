@@ -58,10 +58,18 @@ export function loadMarkdownRenderer() {
     return Promise.resolve(renderer);
   }
   if (!loadingPromise) {
-    loadingPromise = Promise.all([import('marked'), import('dompurify')]).then(([markedModule, dompurifyModule]) => {
-      renderer = buildRenderer(markedModule.Marked, dompurifyModule.default);
-      return renderer;
-    });
+    loadingPromise = Promise.all([import('marked'), import('dompurify')])
+      .then(([markedModule, dompurifyModule]) => {
+        renderer = buildRenderer(markedModule.Marked, dompurifyModule.default);
+        return renderer;
+      })
+      .catch(e => {
+        // a chunk that failed to download (offline, deploy in progress) must
+        // not disable the markdown for the whole session: forget the failed
+        // attempt so the next message retries
+        loadingPromise = null;
+        throw e;
+      });
   }
   return loadingPromise;
 }
