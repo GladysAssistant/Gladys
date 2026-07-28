@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import get from 'get-value';
 import { connect } from 'unistore/preact';
+import { route } from 'preact-router';
 
 import IntegrationPage from './IntegrationPage';
 import withIntlAsProp from '../../utils/withIntlAsProp';
@@ -8,6 +9,7 @@ import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/con
 import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
 import { getLocalizedText } from './all/external-integration/utils';
+import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog } from './catalog-url';
 import { RequestStatus } from '../../utils/consts';
 
 const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
@@ -16,14 +18,25 @@ const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
 class Integration extends Component {
   constructor(props) {
     super(props);
+    // the filters are read back from the URL: landing here from a "back to
+    // integrations" link or with the browser back button restores the view
+    const { searchKeyword, orderDir } = getCatalogFilters();
     this.state = {
       integrations: [],
       integrationCategories: [],
       totalSize: 0,
-      searchKeyword: '',
-      orderDir: 'asc'
+      searchKeyword,
+      orderDir
     };
     this.getIntegrationsDebounced = debounce(this.getIntegrations, 300);
+  }
+
+  // the filters are given explicitly by the handlers: setState() only schedules
+  // a render, the new value is not readable in the state right away
+  updateURL(filters = this.state) {
+    const { searchKeyword, orderDir } = filters;
+    // replace and not push: filtering should not fill the browser history
+    route(getCatalogUrl({ category: this.props.category, searchKeyword, orderDir }), true);
   }
 
   componentWillMount() {
@@ -130,6 +143,11 @@ class Integration extends Component {
     if (prevUserId !== currentUserId || prevCategory !== currentCategory) {
       this.getIntegrations();
     }
+    if (prevCategory !== currentCategory) {
+      // the category links carry no filter: keep the ones already applied in
+      // the URL of the newly displayed category
+      this.updateURL();
+    }
     if (prevUserId !== currentUserId) {
       this.loadExternalIntegrations();
     }
@@ -203,7 +221,13 @@ class Integration extends Component {
         description: getLocalizedText(manifest.description, language),
         url: isInstalled
           ? getInstalledUrl(storeIntegration.installed_selector, manifest)
-          : `/dashboard/integration/device/external-install/${storeIntegration.store_slug}`,
+          : // the install page has a "back to integrations" link: it needs to
+            // know which catalog, with which filters, the user comes from
+            getUrlFromCatalog(`/dashboard/integration/device/external-install/${storeIntegration.store_slug}`, {
+              category,
+              searchKeyword: this.state.searchKeyword,
+              orderDir: this.state.orderDir
+            }),
         img: storeIntegration.cover_url || manifest.cover_image || null,
         updateAvailable: isInstalled ? storeIntegration.update_available : false
       });
@@ -328,16 +352,16 @@ class Integration extends Component {
   };
 
   search = async e => {
-    await this.setState({
-      searchKeyword: e.target.value
-    });
+    const searchKeyword = e.target.value;
+    await this.setState({ searchKeyword });
+    this.updateURL({ searchKeyword, orderDir: this.state.orderDir });
     await this.getIntegrationsDebounced();
   };
 
   changeOrderDir = async e => {
-    await this.setState({
-      orderDir: e.target.value
-    });
+    const orderDir = e.target.value;
+    await this.setState({ orderDir });
+    this.updateURL({ searchKeyword: this.state.searchKeyword, orderDir });
     await this.getIntegrations();
   };
 
