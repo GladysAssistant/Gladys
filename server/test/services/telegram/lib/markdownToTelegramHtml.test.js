@@ -120,7 +120,7 @@ describe('Telegram.markdownToTelegramHtml', () => {
   });
 
   it('should remove the placeholder characters coming from the input', () => {
-    const withPlaceholderChars = `a${String.fromCharCode(0)}0${String.fromCharCode(1)}b`;
+    const withPlaceholderChars = `a${String.fromCharCode(0xe000)}0${String.fromCharCode(0xe001)}b`;
     expect(markdownToTelegramHtml(withPlaceholderChars)).to.equal('a0b');
   });
 

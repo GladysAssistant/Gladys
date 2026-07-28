@@ -5,9 +5,11 @@
 // to something readable in plain text instead of leaking its syntax.
 // See https://core.telegram.org/bots/api#html-style
 
-const PLACEHOLDER_START = '\u0000';
-const PLACEHOLDER_END = '\u0001';
-const PLACEHOLDER_REGEX = /\u0000(\d+)\u0001/g;
+// Private Use Area characters: they never appear in a real message, and
+// unlike control characters they are allowed in a regular expression by lint
+const PLACEHOLDER_START = '\uE000';
+const PLACEHOLDER_END = '\uE001';
+const PLACEHOLDER_REGEX = /\uE000(\d+)\uE001/g;
 
 const FENCED_CODE_REGEX = /```([a-zA-Z0-9_+#-]*)[ \t]*\n?([\s\S]*?)```/g;
 const INLINE_CODE_REGEX = /`([^`\n]+)`/g;
