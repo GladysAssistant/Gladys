@@ -1,0 +1,671 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gladysassistant.github.io/integration-store/manifest.schema.json",
+  "$comment": "Vendored copy of the canonical schema owned by GladysAssistant/integration-store (schemas/manifest.schema.json, also published on the store GitHub Pages). externalIntegration.validateManifest.js enforces the exact same rules; update both together.",
+  "title": "Gladys Assistant external integration manifest",
+  "description": "Schema of the `gladys-assistant-integration.json` file placed at the root of an integration repository (manifest_version 1). This file is the canonical source: the store indexer and the Gladys server both validate manifests against it. Some rules cannot be expressed in JSON Schema and are enforced by code: `version` must be strict semver, `gladys_version` must be a valid semver range (npm syntax), `docker_image` must be a well-formed image reference with an explicit tag or digest, `config_schema` keys must be unique and defaults must match their field type.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "type", "name", "description", "version", "docker_image", "gladys_version"],
+  "properties": {
+    "manifest_version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Version of the manifest format. Only 1 is supported: a manifest with a higher version is rejected by indexers and servers that do not support it."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["device", "communication"],
+      "description": "Integration type. \"device\" integrations expose devices through the Devices/Discovery/Configuration screens; \"communication\" integrations are messaging channels (Telegram-like bots): no device screens, the user links their account from the Gladys UI and the integration exchanges messages through the host API."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 30,
+      "description": "Display name, used as the title of the catalog card."
+    },
+    "description": {
+      "type": "object",
+      "description": "Short multi-language description displayed on the catalog card. The `en` key is mandatory, other languages are optional.",
+      "required": ["en"],
+      "propertyNames": {
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 10,
+        "maxLength": 100
+      }
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Version of the integration. Must be strict semver (e.g. \"1.2.0\"); bumping it is what triggers the \"update available\" flag in Gladys."
+    },
+    "docker_image": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Docker image reference on any public registry, with an explicit tag or digest (e.g. \"ghcr.io/john/gladys-open-meteo-demo:1.2.0\")."
+    },
+    "gladys_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Range of compatible Gladys versions, npm semver range syntax (e.g. \">=4.62.0\"). Used by Gladys to filter the catalog."
+    },
+    "cover_image": {
+      "type": "string",
+      "pattern": "^https://",
+      "description": "HTTPS URL of a JPEG or PNG cover image, exactly 800x534 pixels, 150 KB max. Validated then re-hosted by the indexer; a missing or invalid cover does not reject the integration (a placeholder is used and a warning is published)."
+    },
+    "config_schema": {
+      "type": "array",
+      "description": "Flat list of configuration fields, rendered as a generated form by the Gladys UI (declarative UI: no code injection).",
+      "items": {
+        "$ref": "#/definitions/configField"
+      }
+    },
+    "containers": {
+      "type": "array",
+      "maxItems": 5,
+      "description": "Authorization contract of the additional sub-containers (multi-container integrations, e.g. Frigate + Mosquitto): everything that can run — images, limits, published ports, hardware access — shown to the user on the install screen. The lifecycle is then driven by the integration through the /container host API, only within these bounds.",
+      "items": {
+        "$ref": "#/definitions/subContainer"
+      }
+    },
+    "network_discovery": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "description": "Curated network capture requests (mediated discovery): the Gladys core, running in network=host, captures on behalf of the integration, which interprets the raw results itself. Shown on the install screen as an authorization contract; no arbitrary capture.",
+      "items": {
+        "$ref": "#/definitions/networkDiscoveryEntry"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "description": "On-demand operations rendered as buttons in the Configuration screen (connection test, identify, protocol detection...). Each action is relayed to the integration over WebSocket and acked within its own declared timeout.",
+      "items": {
+        "$ref": "#/definitions/action"
+      }
+    },
+    "transports": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["local", "cloud"]
+      },
+      "description": "Channels the integration knows how to use. When both are declared, Gladys renders the standard core-translated \"Prefer local (LAN) connection\" toggle, stored as the reserved GLADYS_PREFER_LOCAL config key (boolean, default true) — readable by the integration, never writable by it. The preference is a wish; the per-device reality is reported through the GLADYS_TRANSPORT param."
+    },
+    "webhooks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "description": "Inbound webhooks relayed by the generic Gladys Plus gateway route (shown on the install screen). fire_and_forget (default): the third party only wants an ack — immediate 200, asynchronous lossy relay (a webhook is a trigger, the poll stays the source of truth). sync: the integration's response (status/content_type/body) is relayed back to the caller (challenge/response registration providers).",
+      "items": {
+        "$ref": "#/definitions/webhook"
+      }
+    },
+    "messaging": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["receive"],
+      "description": "Communication type only. receive true (the default without this field): bidirectional chat channel — inbound messages carry the authority of the code-linked user, POST /message and the link endpoints are open. receive false: send-only notification channel (the Free Mobile family) — POST /message and code-based linking answer 403, the per-user identity comes from contact_schema instead.",
+      "properties": {
+        "receive": {
+          "type": "boolean"
+        }
+      }
+    },
+    "contact_schema": {
+      "type": "array",
+      "description": "Send-only communication channels only (messaging.receive false): per-user identity form rendered by the core as a \"My account\" block on the Configuration screen (every user fills their OWN values, stored per user). Same flat format as config_schema; oauth2 fields are not allowed (the OAuth relay is integration-scoped, never per user).",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/definitions/configField"
+          },
+          {
+            "properties": {
+              "type": {
+                "not": {
+                  "const": "oauth2"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "$comment": "messaging only makes sense on communication integrations",
+      "if": {
+        "required": ["messaging"]
+      },
+      "then": {
+        "properties": {
+          "type": {
+            "const": "communication"
+          }
+        }
+      }
+    },
+    {
+      "$comment": "contact_schema only makes sense on send-only channels",
+      "if": {
+        "required": ["contact_schema"]
+      },
+      "then": {
+        "required": ["messaging"],
+        "properties": {
+          "messaging": {
+            "required": ["receive"],
+            "properties": {
+              "receive": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "multiLanguageText": {
+      "type": "object",
+      "required": ["en"],
+      "propertyNames": {
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "configField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "type", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "description": "Unique key of the field, stored in Gladys variables scoped to the integration."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "select", "multi_select", "secret", "oauth2", "section"],
+          "description": "Field widget type. `secret` values are never sent back to the frontend; `oauth2` renders a Connect button (relayed OAuth2 authorization-code flow, tokens stored off-schema by the integration); `multi_select` renders checkboxes and stores an array of option values; `section` is a purely presentational intro block (title + plain-text description + typed https links) splitting the form — no stored value, its key is never accepted in a config payload."
+        },
+        "label": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "description": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "placeholder": {
+          "$ref": "#/definitions/multiLanguageText",
+          "description": "Input placeholder, `string`, `number` and `secret` fields only."
+        },
+        "required": {
+          "type": "boolean",
+          "default": false
+        },
+        "default": {
+          "description": "Default value. Must match the field type (code-enforced); not allowed for `secret` and `oauth2` fields."
+        },
+        "min": {
+          "type": "number",
+          "description": "Minimum value, `number` fields only."
+        },
+        "max": {
+          "type": "number",
+          "description": "Maximum value, `number` fields only."
+        },
+        "options": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Choices of a `select` or `multi_select` field.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "label"],
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1
+              },
+              "label": {
+                "$ref": "#/definitions/multiLanguageText"
+              }
+            }
+          }
+        },
+        "source": {
+          "type": "string",
+          "enum": ["devices"],
+          "description": "Dynamic options of a `select` or `multi_select` field, provided by the core — a reserved enum, never a URL nor an expression. Mutually exclusive with `options`; `default` is not allowed with a source (code-enforced). \"devices\": the Gladys UI populates the options with the already-created devices of the integration (label = device name, value = external_id)."
+        },
+        "display": {
+          "type": "string",
+          "enum": ["dropdown", "radio"],
+          "description": "Rendering of a `select` field: dropdown (default) or radio buttons."
+        },
+        "links": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "description": "Typed links of a `section` field, opened in a new tab with the target domain displayed next to the label (third-party non-moderated content: the user sees where they click). Https only.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["url", "label"],
+            "properties": {
+              "url": {
+                "type": "string",
+                "pattern": "^https://"
+              },
+              "label": {
+                "$ref": "#/definitions/multiLanguageText"
+              }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "section"
+              }
+            }
+          },
+          "then": {
+            "allOf": [
+              {
+                "not": {
+                  "required": ["required"]
+                }
+              },
+              {
+                "not": {
+                  "required": ["default"]
+                }
+              }
+            ]
+          },
+          "else": {
+            "not": {
+              "required": ["links"]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["select", "multi_select"]
+              }
+            }
+          },
+          "then": {
+            "oneOf": [
+              {
+                "required": ["options"],
+                "not": {
+                  "required": ["source"]
+                }
+              },
+              {
+                "required": ["source"],
+                "not": {
+                  "required": ["options"]
+                }
+              }
+            ]
+          },
+          "else": {
+            "allOf": [
+              {
+                "not": {
+                  "required": ["options"]
+                }
+              },
+              {
+                "not": {
+                  "required": ["source"]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": {
+                "type": {
+                  "const": "number"
+                }
+              }
+            }
+          },
+          "then": {
+            "allOf": [
+              {
+                "not": {
+                  "required": ["min"]
+                }
+              },
+              {
+                "not": {
+                  "required": ["max"]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": {
+                "type": {
+                  "enum": ["string", "number", "secret"]
+                }
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": ["placeholder"]
+            }
+          }
+        },
+        {
+          "if": {
+            "not": {
+              "properties": {
+                "type": {
+                  "const": "select"
+                }
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": ["display"]
+            }
+          }
+        }
+      ]
+    },
+    "subContainer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "docker_image"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]{2,20}$",
+          "description": "Unique name of the sub-container: DNS alias on the private network of the integration, suffix of the container name and identifier in the /container host API."
+        },
+        "docker_image": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Docker image reference, same rules as the main image (public registry, explicit tag or digest, multi-arch recommended)."
+        },
+        "start": {
+          "type": "string",
+          "enum": ["auto", "manual"],
+          "default": "auto",
+          "description": "`auto`: created and started by the supervisor before the main container. `manual`: nothing starts until the integration calls POST /container/:name/start (e.g. generate a password file in /data first)."
+        },
+        "env": {
+          "type": "object",
+          "description": "Static string environment variables. GLADYS_* keys are forbidden (code-enforced). The manifest is public: never a secret here — runtime credentials go through /data files or the env of POST /container/:name/start.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "maxItems": 5,
+          "description": "Absolute container paths. Each one is mounted from a sub-folder derived from the integration data folder by the supervisor — the manifest never chooses a host path.",
+          "items": {
+            "type": "string",
+            "pattern": "^/"
+          }
+        },
+        "ports": {
+          "type": "array",
+          "maxItems": 3,
+          "description": "Published ports. The host port is chosen by Gladys (free, persisted across recreations), never declared. Publishing a port exposes a third-party interface on the LAN: it is shown on the install screen.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["container_port", "label"],
+            "properties": {
+              "container_port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "protocol": {
+                "type": "string",
+                "enum": ["tcp", "udp"],
+                "default": "tcp"
+              },
+              "label": {
+                "$ref": "#/definitions/multiLanguageText",
+                "description": "Names the \"Open\" link in the Gladys UI."
+              }
+            }
+          }
+        },
+        "devices": {
+          "type": "array",
+          "description": "Requested hardware access classes — never a free /dev path. Requesting is not obtaining: each class is granted or refused by the user in the UI; the effective mount is requested ∩ granted ∩ present.",
+          "items": {
+            "type": "string",
+            "enum": ["coral-usb", "coral-pcie", "gpu", "video"]
+          }
+        },
+        "read_only": {
+          "type": "boolean",
+          "default": true,
+          "description": "Read-only root filesystem. Opt-out possible: some upstream images (e.g. Frigate) do not run with a read-only rootfs."
+        },
+        "memory_mb": {
+          "type": "integer",
+          "minimum": 32,
+          "maximum": 4096,
+          "default": 256,
+          "description": "Memory limit in MB, shown on the install screen."
+        },
+        "cpu": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 2,
+          "default": 0.5,
+          "description": "CPU limit, shown on the install screen."
+        },
+        "shm_mb": {
+          "type": "integer",
+          "minimum": 64,
+          "maximum": 512,
+          "default": 64,
+          "description": "/dev/shm size in MB, useful for video processing."
+        },
+        "command": {
+          "type": "array",
+          "description": "Optional override of the image CMD.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "networkDiscoveryEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["udp-broadcast", "udp-active-broadcast", "mdns", "ssdp"],
+          "description": "Capture type: passive listen on declared UDP broadcast ports, active query/response broadcast on declared UDP ports (the integration provides the payload at scan time, the core broadcasts it and relays the raw unicast replies — the TP-Link Kasa case), mDNS browse of a declared service type, or SSDP M-SEARCH on a declared st."
+        },
+        "ports": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535
+          },
+          "uniqueItems": true,
+          "description": "UDP broadcast ports, `udp-broadcast` (listen) and `udp-active-broadcast` (emit) types only."
+        },
+        "service": {
+          "type": "string",
+          "pattern": "^_[a-z0-9-]+\\._(tcp|udp)$",
+          "description": "DNS-SD service type to browse (e.g. \"_hue._tcp\"), `mdns` type only."
+        },
+        "st": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "SSDP search target for the M-SEARCH, `ssdp` type only."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": ["udp-broadcast", "udp-active-broadcast"]
+              }
+            }
+          },
+          "then": {
+            "required": ["ports"],
+            "not": {
+              "anyOf": [
+                {
+                  "required": ["service"]
+                },
+                {
+                  "required": ["st"]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "mdns"
+              }
+            }
+          },
+          "then": {
+            "required": ["service"],
+            "not": {
+              "anyOf": [
+                {
+                  "required": ["ports"]
+                },
+                {
+                  "required": ["st"]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "ssdp"
+              }
+            }
+          },
+          "then": {
+            "required": ["st"],
+            "not": {
+              "anyOf": [
+                {
+                  "required": ["ports"]
+                },
+                {
+                  "required": ["service"]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "description": "Unique key of the action."
+        },
+        "label": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "description": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 120,
+          "default": 30,
+          "description": "Ack delay granted to the action (exception to the 5s command rule: these operations can be long)."
+        },
+        "fields": {
+          "type": "array",
+          "description": "Optional flat form shown before running the action, same format as config_schema entries.",
+          "items": {
+            "$ref": "#/definitions/configField"
+          }
+        }
+      }
+    },
+    "webhook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label"],
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "description": "Unique key of the webhook, last segment of the relayed URL."
+        },
+        "label": {
+          "$ref": "#/definitions/multiLanguageText"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["fire_and_forget", "sync"],
+          "default": "fire_and_forget",
+          "description": "fire_and_forget: immediate 200 to the caller, asynchronous relay without ack. sync: the integration's response is relayed back to the caller."
+        }
+      }
+    }
+  }
+}

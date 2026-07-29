@@ -3,7 +3,7 @@ const { fake, assert } = require('sinon');
 const { expect } = require('chai');
 const MockExpressRequest = require('mock-express-request');
 
-const { ConflictError } = require('../../utils/coreErrors');
+const { ConflictError, ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const errorMiddleware = require('../../api/middlewares/errorMiddleware');
 
 const send = fake.returns(null);
@@ -28,6 +28,19 @@ describe('errorMiddleware', () => {
       throw new Error('next should not be calld');
     });
     assert.calledWith(res.status, 409);
+    assert.calledOnce(send);
+  });
+  it('should return 400 on external integration unavailable', async () => {
+    // @ts-ignore
+    const req = new MockExpressRequest({
+      method: 'POST',
+    });
+    const error = new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_NOT_CONNECTED');
+
+    errorMiddleware(error, req, res, () => {
+      throw new Error('next should not be called');
+    });
+    assert.calledWith(res.status, 400);
     assert.calledOnce(send);
   });
   it('should return 500 server error', async () => {

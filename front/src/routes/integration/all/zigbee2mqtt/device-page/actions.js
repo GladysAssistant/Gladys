@@ -111,6 +111,7 @@ function createActions(store) {
       const device = state.zigbee2mqttDevices[index];
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
       savedDevice.model = device.model;
+      savedDevice.ieee_address = device.ieee_address;
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
         $splice: [[index, 1, savedDevice]]
       });

@@ -94,6 +94,15 @@ async function handleNewMessage(data, rawMessage, cb) {
   if (data.type === 'gladys-open-api' && data.action === 'mcp-webhook') {
     await this.handleMCPMessage(data, cb);
   }
+
+  // if the message is a third-party webhook relayed by the generic
+  // external-integration route of the gateway: the supervisor routes it to
+  // the declared integration and always answers something (the gateway
+  // itself falls back to an empty 200 on timeout — third parties ban
+  // webhooks that fail repeatedly)
+  if (data.type === 'gladys-open-api' && data.action === 'external-integration-webhook') {
+    this.event.emit(EVENTS.GATEWAY.NEW_MESSAGE_EXTERNAL_INTEGRATION_WEBHOOK, data.data, cb);
+  }
 }
 
 module.exports = {
