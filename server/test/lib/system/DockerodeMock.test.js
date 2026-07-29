@@ -79,13 +79,25 @@ Docker.prototype.getNetwork = (networkName) => {
   const network = networks.find((n) => n.Name === networkName);
 
   if (network) {
-    return Promise.resolve(network);
+    return network;
   }
 
-  return Promise.reject(new Error('Network not found'));
+  throw new Error('Network not found');
 };
 
+Docker.prototype.listNetworks = fake.resolves(networks);
+
 Docker.prototype.createNetwork = fake.resolves(true);
+
+Docker.prototype.getImage = fake.returns({
+  inspect: fake.resolves({
+    Config: {
+      Labels: {
+        'io.gladysassistant.manifest': '{"manifest_version":1}',
+      },
+    },
+  }),
+});
 
 Docker.prototype.pull = (repoTag) => {
   if (repoTag.endsWith('latest')) {
