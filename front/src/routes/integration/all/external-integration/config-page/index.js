@@ -659,7 +659,11 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   connectOAuth = async field => {
-    this.setState({ oauthStatus: RequestStatus.Getting, oauthInvalidState: false, oauthInvalidUrl: false });
+    this.setState({ oauthStatus: RequestStatus.Getting,
+      oauthDisconnectStatus: null,
+      oauthInvalidState: false,
+      oauthInvalidUrl: false
+     });
     const { selector } = this.props;
     const callbackPath = getOAuthCallbackPath(selector);
     // an account_link provider never comes back to Gladys: the user approves it
@@ -712,6 +716,22 @@ class ExternalIntegrationConfigPage extends Component {
         oauthInvalidState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE',
         oauthInvalidUrl: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_URL'
       });
+    }
+  };
+
+  disconnectOAuth = async field => {
+    // a status of its own: the connect error tells the user to check that the
+    // integration is running, which says nothing here — the disconnect is done
+    // by the core and works with the integration stopped
+    this.setState({ oauthDisconnectStatus: RequestStatus.Getting, oauthStatus: null });
+    try {
+      await this.props.httpClient.post(`/api/v1/external_integration/${this.props.selector}/oauth/disconnect`, {
+        key: field.key
+      });
+      this.setState({ oauthDisconnectStatus: RequestStatus.Success });
+    } catch (e) {
+      console.error(e);
+      this.setState({ oauthDisconnectStatus: RequestStatus.Error });
     }
   };
 
@@ -779,6 +799,7 @@ class ExternalIntegrationConfigPage extends Component {
           saveConfig={this.saveConfig}
           connectOAuth={this.connectOAuth}
           toggleOAuthUseInstanceRedirect={this.toggleOAuthUseInstanceRedirect}
+          disconnectOAuth={this.disconnectOAuth}
           togglePreferLocal={this.togglePreferLocal}
           updateActionFieldValue={this.updateActionFieldValue}
           runAction={this.runAction}

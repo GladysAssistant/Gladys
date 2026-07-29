@@ -43,9 +43,13 @@ const ActionsCard = ({
         const running = actionState.status === RequestStatus.Getting;
         const description = getLocalizedText(action.description, language);
         const touchedSecrets = getActionTouchedSecrets(action);
+        const label = getLocalizedText(action.label, language) || action.key;
+        const hasFields = (action.fields || []).length > 0;
         return (
           <div class={cx({ 'mb-5': index < actions.length - 1 })}>
-            <h4>{getLocalizedText(action.label, language) || action.key}</h4>
+            {/* the button carries the action label; a mini form still needs a
+                title above its inputs, otherwise they read as unlabelled */}
+            {hasFields && <h4>{label}</h4>}
             {description && <p class={cx('text-muted small', integrationText.integrationText)}>{description}</p>}
             {(action.fields || []).map(field => (
               <ConfigField
@@ -69,7 +73,7 @@ const ActionsCard = ({
               onClick={() => runAction(action)}
             >
               <i class="fe fe-play mr-1" />
-              <Text id="integration.externalIntegration.actions.runButton" />
+              {label}
             </button>
             {/* the result is a scroll container (its length is whatever the
                 integration decided to return): tabIndex makes it focusable,
