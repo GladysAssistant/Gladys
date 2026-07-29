@@ -1025,11 +1025,15 @@
         "oauthRedirectUriInstanceDescription": "Eligió usar la dirección de su instancia: declare esta URL exacta en su aplicación de desarrollador. El proveedor volverá directamente a su Gladys, sin pasar por la página de redirección de Gladys.",
         "oauthRedirectUriCopied": "¡Copiado!",
         "oauthUseInstanceRedirectLabel": "Usar en su lugar la dirección de mi instancia (ya accedo a Gladys mediante HTTPS)",
+        "oauthDisconnectButton": "Desconectar",
+        "oauthDisconnectConfirmText": "Los tokens de acceso guardados por la integración se olvidarán y se cerrará la sesión. Los ajustes de arriba se conservan y podrá vincular una cuenta de nuevo en cualquier momento.",
+        "oauthDisconnectConfirmButton": "Sí, desconectar",
+        "oauthDisconnectCancelButton": "Cancelar",
+        "oauthDisconnectError": "Se produjo un error al desconectar la cuenta.",
         "oauthConnectError": "Ocurrió un error al iniciar la conexión. Verifique que la integración esté en ejecución."
       },
       "actions": {
         "title": "Acciones",
-        "runButton": "Ejecutar",
         "error": "La acción falló. Verifique que la integración esté en ejecución.",
         "resultRegionLabel": "Resultado de la acción"
       },

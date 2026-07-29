@@ -67,6 +67,10 @@ const HARDWARE_CLASSES = {
 const SUB_CONTAINER_PORTS_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINER_PORTS';
 const SUB_CONTAINER_DESIRED_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_DESIRED';
 const SUB_CONTAINER_ENV_VARIABLE = 'EXTERNAL_INTEGRATION_CONTAINERS_ENV';
+// The service-scoped variables the core writes for its own needs, next to the
+// config of the integration (same service_id, no user_id): never the
+// integration's to lose, e.g. when an account is disconnected.
+const CORE_SERVICE_VARIABLES = [SUB_CONTAINER_PORTS_VARIABLE, SUB_CONTAINER_DESIRED_VARIABLE, SUB_CONTAINER_ENV_VARIABLE];
 // The secret signing the integration JWTs, generated once and persisted:
 // without a JWT_SECRET env var the process-level secret is regenerated at
 // every boot, which used to invalidate every token baked in the container
@@ -647,6 +651,7 @@ module.exports = {
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
   ACCOUNT_FIELD_TYPES,
+  CORE_SERVICE_VARIABLES,
   DYNAMIC_SOURCES,
   MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,

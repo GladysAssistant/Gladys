@@ -1025,11 +1025,15 @@
         "oauthRedirectUriInstanceDescription": "Sie haben die Adresse Ihrer Instanz gewählt: tragen Sie genau diese URL in Ihrer Entwickler-Anwendung ein. Der Dienst kommt dann direkt zu Ihrem Gladys zurück, ohne den Umweg über die Gladys-Weiterleitungsseite.",
         "oauthRedirectUriCopied": "Kopiert!",
         "oauthUseInstanceRedirectLabel": "Stattdessen die Adresse meiner Instanz verwenden (ich erreiche Gladys bereits per HTTPS)",
+        "oauthDisconnectButton": "Trennen",
+        "oauthDisconnectConfirmText": "Die von der Integration gespeicherten Zugriffstoken werden gelöscht und sie meldet sich ab. Die obigen Einstellungen bleiben erhalten, und Sie können jederzeit wieder ein Konto verknüpfen.",
+        "oauthDisconnectConfirmButton": "Ja, trennen",
+        "oauthDisconnectCancelButton": "Abbrechen",
+        "oauthDisconnectError": "Beim Trennen des Kontos ist ein Fehler aufgetreten.",
         "oauthConnectError": "Fehler beim Starten der Verbindung. Prüfen Sie, ob die Integration läuft."
       },
       "actions": {
         "title": "Aktionen",
-        "runButton": "Ausführen",
         "error": "Die Aktion ist fehlgeschlagen. Prüfen Sie, ob die Integration läuft.",
         "resultRegionLabel": "Ergebnis der Aktion"
       },
