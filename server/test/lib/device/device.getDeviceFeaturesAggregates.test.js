@@ -366,4 +366,25 @@ describe('Device.getDeviceFeaturesAggregates binary feature', function Describe(
       expect(values[i].value).to.not.equal(values[i - 1].value);
     }
   });
+
+  it('should return the current unit of the device feature', async () => {
+    await insertStates(120);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+        selector: 'test-device-feature',
+        unit: 'lux',
+      }),
+    };
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const { deviceFeature } = await deviceInstance.getDeviceFeaturesAggregates('test-device-feature', 60, 100);
+    expect(deviceFeature).to.deep.equal({
+      name: 'my-feature',
+      unit: 'lux',
+    });
+  });
 });
