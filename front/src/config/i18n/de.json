@@ -640,6 +640,7 @@
         "saveError": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
         "saveButton": "Konfiguration speichern",
         "oauthConnectButton": "Verbinden",
+        "oauthDisconnectButton": "Trennen",
         "oauthConnectError": "Fehler beim Starten der Verbindung. Prüfen Sie, ob die Integration läuft."
       },
       "actions": {

@@ -28,6 +28,11 @@ class ConfigField extends Component {
     this.props.connectOAuth(this.props.field);
   };
 
+  onOAuthDisconnect = e => {
+    e.preventDefault();
+    this.props.disconnectOAuth(this.props.field);
+  };
+
   render({
     field,
     language,
@@ -74,24 +79,10 @@ class ConfigField extends Component {
       // authorize URL, the tokens never transit through the frontend
       return (
         <div class="form-group">
-          <label class="form-label">{label}</label>
-          {oauthStatus === RequestStatus.Error && (
-            <div class="alert alert-danger">
-              <Text id="integration.externalIntegration.config.oauthConnectError" />
-            </div>
-          )}
-          <div>
-            <button
-              type="button"
-              class={cx('btn btn-primary', {
-                'btn-loading': oauthStatus === RequestStatus.Getting
-              })}
-              disabled={oauthStatus === RequestStatus.Getting}
-              onClick={this.onOAuthConnect}
-            >
-              <i class="fe fe-link mr-1" />
-              <Text id="integration.externalIntegration.config.oauthConnectButton" />
-            </button>
+          {/* the status belongs next to the account it qualifies, not next to
+              the button, which is an action and not a state */}
+          <label class="form-label d-flex align-items-center">
+            {label}
             {connectionStatus && (
               <span class={cx('badge ml-2', connectionStatus.connected ? 'badge-success' : 'badge-danger')}>
                 {connectionStatus.connected ? (
@@ -101,11 +92,44 @@ class ConfigField extends Component {
                 )}
               </span>
             )}
+          </label>
+          {/* the description explains what the button does: it belongs ABOVE it */}
+          {description && <small class="form-text text-muted mb-2">{description}</small>}
+          {oauthStatus === RequestStatus.Error && (
+            <div class="alert alert-danger">
+              <Text id="integration.externalIntegration.config.oauthConnectError" />
+            </div>
+          )}
+          <div>
+            {connectionStatus && connectionStatus.connected ? (
+              <button
+                type="button"
+                class={cx('btn btn-danger', {
+                  'btn-loading': oauthStatus === RequestStatus.Getting
+                })}
+                disabled={oauthStatus === RequestStatus.Getting}
+                onClick={this.onOAuthDisconnect}
+              >
+                <i class="fe fe-link-2 mr-1" />
+                <Text id="integration.externalIntegration.config.oauthDisconnectButton" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                class={cx('btn btn-primary', {
+                  'btn-loading': oauthStatus === RequestStatus.Getting
+                })}
+                disabled={oauthStatus === RequestStatus.Getting}
+                onClick={this.onOAuthConnect}
+              >
+                <i class="fe fe-link mr-1" />
+                <Text id="integration.externalIntegration.config.oauthConnectButton" />
+              </button>
+            )}
           </div>
           {connectionStatus && connectionStatus.message && (
             <small class="form-text text-muted">{getLocalizedText(connectionStatus.message, language)}</small>
           )}
-          {description && <small class="form-text text-muted">{description}</small>}
         </div>
       );
     }
@@ -238,6 +262,7 @@ const ConfigSchemaForm = ({
   connectionStatus,
   oauthStatus,
   connectOAuth,
+  disconnectOAuth,
   dynamicOptions
 }) => {
   // sections are presentational and oauth2 has its own Connect button: a
@@ -267,6 +292,7 @@ const ConfigSchemaForm = ({
           connectionStatus={connectionStatus}
           oauthStatus={oauthStatus}
           connectOAuth={connectOAuth}
+          disconnectOAuth={disconnectOAuth}
           dynamicOptions={dynamicOptions}
         />
       ))}
