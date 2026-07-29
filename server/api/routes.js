@@ -614,6 +614,11 @@ function getRoutes(gladys) {
       admin: true,
       controller: externalIntegrationController.oauthCallback,
     },
+    'post /api/v1/external_integration/:selector/oauth/disconnect': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.oauthDisconnect,
+    },
     'post /api/v1/external_integration/:selector/action/:key': {
       authenticated: true,
       admin: true,

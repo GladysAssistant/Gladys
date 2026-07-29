@@ -1,24 +1,9 @@
-import { Text, Localizer, MarkupText } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import get from 'get-value';
 
 import DeviceBox from './DeviceBox';
-import TransportBadge from '../components/TransportBadge';
-import { getDeviceTransport, isDeviceTransportDegraded } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
-
-// global summary of the per-device transports ("12 local · 3 cloud ·
-// 1 unreachable · 1 degraded"), only counting devices that report one
-const getTransportCounts = devices => {
-  const counts = {};
-  (devices || []).forEach(device => {
-    const transport = getDeviceTransport(device);
-    if (transport) {
-      counts[transport] = (counts[transport] || 0) + 1;
-    }
-  });
-  return counts;
-};
 
 const DeviceTab = ({
   selector,
@@ -35,9 +20,6 @@ const DeviceTab = ({
   // first-run guidance: an integration with settings probably needs them
   // filled before anything shows up here
   const hasConfigSchema = (get(integration, 'manifest.config_schema') || []).length > 0;
-  const transportCounts = getTransportCounts(devices);
-  const reportedTransports = ['local', 'cloud', 'unreachable'].filter(transport => transportCounts[transport]);
-  const degradedCount = (devices || []).filter(isDeviceTransportDegraded).length;
   return (
     <div class="card">
       <div class="card-header">
@@ -52,28 +34,6 @@ const DeviceTab = ({
         </div>
       </div>
       <div class="card-body">
-        {(reportedTransports.length > 0 || degradedCount > 0) && (
-          <div class="mb-4">
-            {reportedTransports.map(transport => (
-              <span class="mr-3">
-                {transportCounts[transport]} <TransportBadge transport={transport} />
-              </span>
-            ))}
-            {degradedCount > 0 && (
-              <span class="mr-3">
-                {degradedCount}{' '}
-                <Localizer>
-                  <span
-                    class="badge badge-warning"
-                    title={<Text id="integration.externalIntegration.transport.degradedTooltip" />}
-                  >
-                    <Text id="integration.externalIntegration.transport.degradedBadge" />
-                  </span>
-                </Localizer>
-              </span>
-            )}
-          </div>
-        )}
         {getDevicesStatus === RequestStatus.Error && (
           <div class="alert alert-danger">
             <Text id="integration.externalIntegration.device.loadError" />

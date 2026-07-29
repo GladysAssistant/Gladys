@@ -640,6 +640,7 @@
         "saveError": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
         "saveButton": "Enregistrer la configuration",
         "oauthConnectButton": "Connecter",
+        "oauthDisconnectButton": "Déconnecter",
         "oauthConnectError": "Erreur au lancement de la connexion. Vérifiez que l'intégration est démarrée."
       },
       "actions": {

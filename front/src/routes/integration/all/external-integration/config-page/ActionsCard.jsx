@@ -29,9 +29,9 @@ const ActionsCard = ({
         const actionState = actionStates[action.key] || {};
         const running = actionState.status === RequestStatus.Getting;
         const description = getLocalizedText(action.description, language);
+        const label = getLocalizedText(action.label, language) || action.key;
         return (
           <div class={cx({ 'mb-5': index < actions.length - 1 })}>
-            <h4>{getLocalizedText(action.label, language) || action.key}</h4>
             {description && <p class="text-muted small">{description}</p>}
             {(action.fields || []).map(field => (
               <ConfigField
@@ -54,7 +54,7 @@ const ActionsCard = ({
               onClick={() => runAction(action)}
             >
               <i class="fe fe-play mr-1" />
-              <Text id="integration.externalIntegration.actions.runButton" />
+              {label}
             </button>
             {actionState.status === RequestStatus.Success && actionState.message && (
               <div class="alert alert-success mt-3 mb-0">{getLocalizedText(actionState.message, language)}</div>
