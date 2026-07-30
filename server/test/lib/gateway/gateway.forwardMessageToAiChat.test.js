@@ -1285,11 +1285,11 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       expect(aiChat.getCall(1).args[0].tool_choice).to.equal('required');
     });
 
-    it('should keep tool_choice=auto for scenes and unclassified requests', async () => {
+    it('should keep tool_choice=auto for other and unclassified requests', async () => {
       const tools = buildRoutedTools();
       const { forwardMessageToAiChat } = getModule({ tools });
-      const scenesAiChat = fake.resolves({
-        choices: [{ message: { content: 'OK scenes' } }],
+      const otherAiChat = fake.resolves({
+        choices: [{ message: { content: 'OK other' } }],
       });
       const nullAiChat = fake.resolves({
         choices: [{ message: { content: 'OK null' } }],
@@ -1300,13 +1300,13 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       await forwardMessageToAiChat.call(
         buildContext({
           tools,
-          aiChat: scenesAiChat,
+          aiChat: otherAiChat,
           reply,
           replyByIntent,
-          classifyAiChatToolCategories: fake.resolves(['scenes']),
+          classifyAiChatToolCategories: fake.resolves(['other']),
         }),
         {
-          message: { text: 'Crée une scène' },
+          message: { text: "Quelle est la durée de cuisson d'un œuf ?" },
           previousQuestions: [],
           context: {},
         },
@@ -1326,14 +1326,33 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
         },
       );
 
-      expect(scenesAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
+      expect(otherAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
       expect(nullAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
     });
 
     it('should send scene tools and scene rules when the request is classified as scenes', async () => {
       const tools = buildRoutedTools();
       const { forwardMessageToAiChat } = getModule({ tools });
-      const aiChat = fake.resolves({
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_scene',
+                  function: {
+                    name: 'scene_create',
+                    arguments: '{}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
         choices: [{ message: { content: 'OK' } }],
       });
       const classifyAiChatToolCategories = fake.resolves(['scenes']);
@@ -1352,7 +1371,8 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       const request = aiChat.getCall(0).args[0];
       expect(request.tools.map((tool) => tool.function.name)).to.deep.equal(['scene_create']);
       expect(request.messages[0].content).to.include(scenesPromptMock);
-      expect(request.tool_choice).to.equal('auto');
+      expect(request.tool_choice).to.equal('required');
+      expect(aiChat.getCall(1).args[0].tool_choice).to.equal('auto');
     });
 
     it('should fall back to all tools and scene rules when classification returns null', async () => {
@@ -1451,11 +1471,12 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
 });
 
 describe('gateway.forwardMessageToAiChat tool choice helpers', () => {
-  it('shouldForceToolChoice should detect device query and control categories', () => {
+  it('shouldForceToolChoice should force all tool-needing categories except pure other', () => {
     const { shouldForceToolChoice } = getModule();
     expect(shouldForceToolChoice(['device_query'])).to.equal(true);
     expect(shouldForceToolChoice(['device_control', 'other'])).to.equal(true);
-    expect(shouldForceToolChoice(['scenes'])).to.equal(false);
+    expect(shouldForceToolChoice(['scenes'])).to.equal(true);
+    expect(shouldForceToolChoice(['web_and_time'])).to.equal(true);
     expect(shouldForceToolChoice(['other'])).to.equal(false);
     expect(shouldForceToolChoice(null)).to.equal(false);
     expect(shouldForceToolChoice([])).to.equal(false);

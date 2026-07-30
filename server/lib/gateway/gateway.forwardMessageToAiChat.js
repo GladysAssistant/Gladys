@@ -24,10 +24,13 @@ const MAX_TOOL_RESULT_CHARS = 4000;
 const MAX_FALLBACK_ANSWER_CHARS = 2000;
 const MAX_NESTED_VALUE_CHARS = 2000;
 
-// Categories where answering without a tool call risks hallucinating home state or actions.
+// Only pure "other" chat (general knowledge, greetings) may answer without tools.
+// Home actions, state queries, scenes and web/time lookups must call tools first.
 const FORCE_TOOL_CHOICE_CATEGORIES = new Set([
   AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY,
   AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
+  AI_CHAT_TOOL_CATEGORIES.SCENES,
+  AI_CHAT_TOOL_CATEGORIES.WEB_AND_TIME,
 ]);
 
 const FORCE_TOOL_RETRY_MESSAGE =
@@ -63,7 +66,8 @@ function buildSystemPromptWithCurrentTime(timezoneName, now = new Date(), { incl
 }
 
 /**
- * @description Whether device query/control intents should force at least one tool call.
+ * @description Whether the classified intent should force at least one tool call.
+ * Forced for home/device/scene/web intents; not for pure "other" chat or unknown routing.
  * @param {Array<string>|null|undefined} toolCategories - Categories selected by the intent router.
  * @returns {boolean} True when tool use must be required on the first model turn.
  * @example
@@ -78,7 +82,7 @@ function shouldForceToolChoice(toolCategories) {
 
 /**
  * @description Resolve OpenAI-compatible tool_choice for the current AI chat iteration.
- * Force tools only before any tool has run for device_query/device_control intents.
+ * Force tools only before any tool has run when the intent requires tool use.
  * After tools have executed, switch back to auto so the model can produce a final answer.
  * @param {object} options - Resolution options.
  * @param {boolean} options.forceToolUse - Whether the intent requires a tool call.
