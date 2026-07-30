@@ -54,6 +54,11 @@ async function scan(state, peripheralUuid = undefined) {
       const scanStop = () => {
         this.bluetooth.removeListener('discover', onDiscover);
 
+        if (this.scanTimer) {
+          clearTimeout(this.scanTimer);
+          this.scanTimer = undefined;
+        }
+
         if (peripheralUuid) {
           if (peripherals[peripheralUuid]) {
             resolve(peripherals[peripheralUuid]);
@@ -68,13 +73,15 @@ async function scan(state, peripheralUuid = undefined) {
       this.bluetooth.on('discover', onDiscover);
       this.bluetooth.once('scanStop', scanStop);
 
-      if (!this.scanning) {
-        this.bluetooth.startScanning([], true);
-      }
-
+      // Timer is set before scanning starts, so it is always cleared by the
+      // "scanStop" event, even if scanning stops immediately.
       this.scanTimer = setTimeout(() => {
         this.bluetooth.stopScanning();
       }, TIMERS.SCAN);
+
+      if (!this.scanning) {
+        this.bluetooth.startScanning([], true);
+      }
     });
   }
 
