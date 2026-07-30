@@ -28,7 +28,7 @@ describe('aiChatModels utils', () => {
 
   it('should resolve allowed models', () => {
     expect(resolveAiChatModel(DEFAULT_TEXT_MODEL)).to.equal(DEFAULT_TEXT_MODEL);
-    expect(resolveAiChatModel('llama-3.3-70b-instruct')).to.equal('llama-3.3-70b-instruct');
+    expect(resolveAiChatModel('glm-5.2')).to.equal('glm-5.2');
   });
 
   it('should return null for invalid models', () => {
@@ -44,11 +44,17 @@ describe('aiChatModels utils', () => {
       priceTier: 1,
       priceLabel: '€',
     });
-    expect(models.find((model) => model.id === 'llama-3.3-70b-instruct')).to.deep.equal({
-      id: 'llama-3.3-70b-instruct',
-      vision: false,
+    expect(models.find((model) => model.id === 'qwen3.6-35b-a3b')).to.deep.equal({
+      id: 'qwen3.6-35b-a3b',
+      vision: true,
       priceTier: 2,
       priceLabel: '€€',
+    });
+    expect(models.find((model) => model.id === 'glm-5.2')).to.deep.equal({
+      id: 'glm-5.2',
+      vision: false,
+      priceTier: 3,
+      priceLabel: '€€€',
     });
     expect(models.find((model) => model.id === 'qwen3.5-397b-a17b')).to.deep.equal({
       id: 'qwen3.5-397b-a17b',

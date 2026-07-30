@@ -234,10 +234,10 @@ describe('GET /api/v1/gateway/aichat/models', () => {
 
     expect(response.body).to.have.property('models');
     expect(response.body.models).to.be.an('array');
-    expect(response.body.models.find((model) => model.id === 'llama-3.3-70b-instruct')).to.deep.equal({
-      id: 'llama-3.3-70b-instruct',
-      priceLabel: '€€',
-      priceTier: 2,
+    expect(response.body.models.find((model) => model.id === 'glm-5.2')).to.deep.equal({
+      id: 'glm-5.2',
+      priceLabel: '€€€',
+      priceTier: 3,
       vision: false,
     });
   });
