@@ -1091,7 +1091,26 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
     it('should only send tools of the classified categories and omit scene rules', async () => {
       const tools = buildRoutedTools();
       const { forwardMessageToAiChat } = getModule({ tools });
-      const aiChat = fake.resolves({
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_1',
+                  function: {
+                    name: 'device_turn_on_off',
+                    arguments: '{"action":"off"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
         choices: [{ message: { content: 'OK' } }],
       });
       const classifyAiChatToolCategories = fake.resolves(['device_control']);
@@ -1117,6 +1136,198 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       expect(request.messages[0].content).to.not.include(scenesPromptMock);
       expect(request.purpose).to.equal('chat');
       expect(request.categories).to.deep.equal(['device_control']);
+      expect(request.tool_choice).to.equal('required');
+      expect(aiChat.getCall(1).args[0].tool_choice).to.equal('auto');
+    });
+
+    it('should force tool_choice=required for device_query then switch to auto after tools', async () => {
+      const tools = [
+        {
+          intent: 'device.get-state',
+          config: {
+            title: 'Get states',
+            description: 'Get device states',
+            categories: ['device_query', 'other'],
+            inputSchema: { room: z.enum(['Salon']).optional() },
+          },
+          cb: fake.resolves({ content: [{ type: 'text', text: 'Salon temperature: 25.3°C' }] }),
+        },
+      ];
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_temp',
+                  function: {
+                    name: 'device_get_state',
+                    arguments: '{"device_type":"temperature-sensor","room":"Salon"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: 'La température dans le salon est de 25,3 °C.' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_query']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Et la température ?' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: 'La température dans le salon est de 25,3 °C.', imagesSent: 0 });
+      expect(aiChat.getCall(0).args[0].tool_choice).to.equal('required');
+      expect(aiChat.getCall(1).args[0].tool_choice).to.equal('auto');
+      assert.calledWith(
+        reply,
+        match.has('text', 'Et la température ?'),
+        'device_get_state({"device_type":"temperature-sensor","room":"Salon"})',
+        {},
+        null,
+        match({ messageType: 'tool_call', toolName: 'device_get_state', toolStatus: 'success' }),
+      );
+    });
+
+    it('should retry once when forced tool use returns no tool_calls', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat, FORCE_TOOL_RETRY_MESSAGE } = getModule({ tools });
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [{ message: { content: 'La température est de 25,3 °C.' } }],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_retry',
+                  function: {
+                    name: 'device_turn_on_off',
+                    arguments: '{"action":"off"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(2).resolves({
+        choices: [{ message: { content: 'Fait après retry.' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_control']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Éteins la lumière' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: 'Fait après retry.', imagesSent: 0 });
+      expect(aiChat.callCount).to.equal(3);
+      expect(aiChat.getCall(0).args[0].tool_choice).to.equal('required');
+      expect(aiChat.getCall(1).args[0].tool_choice).to.equal('required');
+      // messagesForApi is mutated in place after the call, so assert presence rather than last element.
+      expect(
+        aiChat
+          .getCall(1)
+          .args[0].messages.some((message) => message.role === 'user' && message.content === FORCE_TOOL_RETRY_MESSAGE),
+      ).to.equal(true);
+      expect(aiChat.getCall(2).args[0].tool_choice).to.equal('auto');
+    });
+
+    it('should accept the answer after a failed forced-tool retry', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [{ message: { content: 'Il fait 22 °C.' } }],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: 'Il fait toujours 22 °C.' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_query']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Quelle température ?' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: 'Il fait toujours 22 °C.', imagesSent: 0 });
+      expect(aiChat.callCount).to.equal(2);
+      expect(aiChat.getCall(0).args[0].tool_choice).to.equal('required');
+      expect(aiChat.getCall(1).args[0].tool_choice).to.equal('required');
+    });
+
+    it('should keep tool_choice=auto for scenes and unclassified requests', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const scenesAiChat = fake.resolves({
+        choices: [{ message: { content: 'OK scenes' } }],
+      });
+      const nullAiChat = fake.resolves({
+        choices: [{ message: { content: 'OK null' } }],
+      });
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({
+          tools,
+          aiChat: scenesAiChat,
+          reply,
+          replyByIntent,
+          classifyAiChatToolCategories: fake.resolves(['scenes']),
+        }),
+        {
+          message: { text: 'Crée une scène' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+      await forwardMessageToAiChat.call(
+        buildContext({
+          tools,
+          aiChat: nullAiChat,
+          reply,
+          replyByIntent,
+          classifyAiChatToolCategories: fake.resolves(null),
+        }),
+        {
+          message: { text: 'Bonjour' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(scenesAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
+      expect(nullAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
     });
 
     it('should send scene tools and scene rules when the request is classified as scenes', async () => {
@@ -1141,6 +1352,7 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       const request = aiChat.getCall(0).args[0];
       expect(request.tools.map((tool) => tool.function.name)).to.deep.equal(['scene_create']);
       expect(request.messages[0].content).to.include(scenesPromptMock);
+      expect(request.tool_choice).to.equal('auto');
     });
 
     it('should fall back to all tools and scene rules when classification returns null', async () => {
@@ -1167,6 +1379,7 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       expect(request.messages[0].content).to.include(scenesPromptMock);
       expect(request.purpose).to.equal('chat');
       expect(request).to.not.have.property('categories');
+      expect(request.tool_choice).to.equal('auto');
     });
 
     it('should not call the router when there is no tool to filter', async () => {
@@ -1189,6 +1402,7 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
 
       assert.notCalled(classifyAiChatToolCategories);
       assert.calledOnce(aiChat);
+      expect(aiChat.getCall(0).args[0].tool_choice).to.equal('auto');
     });
 
     it('should still execute a tool excluded by routing if the model calls it', async () => {
@@ -1233,5 +1447,31 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       const toolMessage = aiChat.getCall(1).args[0].messages.find((m) => m.role === 'tool');
       expect(toolMessage.content).to.equal('done');
     });
+  });
+});
+
+describe('gateway.forwardMessageToAiChat tool choice helpers', () => {
+  it('shouldForceToolChoice should detect device query and control categories', () => {
+    const { shouldForceToolChoice } = getModule();
+    expect(shouldForceToolChoice(['device_query'])).to.equal(true);
+    expect(shouldForceToolChoice(['device_control', 'other'])).to.equal(true);
+    expect(shouldForceToolChoice(['scenes'])).to.equal(false);
+    expect(shouldForceToolChoice(['other'])).to.equal(false);
+    expect(shouldForceToolChoice(null)).to.equal(false);
+    expect(shouldForceToolChoice([])).to.equal(false);
+  });
+
+  it('resolveToolChoice should require tools only before the first tool iteration', () => {
+    const { resolveToolChoice } = getModule();
+    expect(resolveToolChoice({ forceToolUse: true, hasTools: true, hasCompletedToolIteration: false })).to.equal(
+      'required',
+    );
+    expect(resolveToolChoice({ forceToolUse: true, hasTools: true, hasCompletedToolIteration: true })).to.equal('auto');
+    expect(resolveToolChoice({ forceToolUse: true, hasTools: false, hasCompletedToolIteration: false })).to.equal(
+      'auto',
+    );
+    expect(resolveToolChoice({ forceToolUse: false, hasTools: true, hasCompletedToolIteration: false })).to.equal(
+      'auto',
+    );
   });
 });
