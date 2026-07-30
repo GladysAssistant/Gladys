@@ -1643,6 +1643,7 @@ describe('gateway.forwardMessageToAiChat tool choice helpers', () => {
     expect(looksLikeRawDataAnswer('{"state": {"value": 850, "timestamp": "2026-07-30T20:38:00.000Z"}}')).to.equal(true);
     expect(looksLikeRawDataAnswer('[{"room": "Salon", "value": 25.3}]')).to.equal(true);
     expect(looksLikeRawDataAnswer('```json\n{"value": 850}\n```')).to.equal(true);
+    expect(looksLikeRawDataAnswer('```json5\n{"value": 850}\n```')).to.equal(true);
     expect(looksLikeRawDataAnswer('```\n{"value": 850}\n```')).to.equal(true);
     expect(looksLikeRawDataAnswer('  {"value": 850}  ')).to.equal(true);
     expect(looksLikeRawDataAnswer('Le taux de CO2 est de 850 ppm.')).to.equal(false);
@@ -1650,6 +1651,7 @@ describe('gateway.forwardMessageToAiChat tool choice helpers', () => {
     expect(looksLikeRawDataAnswer('850')).to.equal(false);
     expect(looksLikeRawDataAnswer('{invalid json')).to.equal(false);
     expect(looksLikeRawDataAnswer('')).to.equal(false);
+    expect(looksLikeRawDataAnswer(123)).to.equal(false);
     expect(looksLikeRawDataAnswer(null)).to.equal(false);
     expect(looksLikeRawDataAnswer(undefined)).to.equal(false);
   });

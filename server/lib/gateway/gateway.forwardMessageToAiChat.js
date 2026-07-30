@@ -418,7 +418,7 @@ function looksLikeRawDataAnswer(text) {
     return false;
   }
   let candidate = text.trim();
-  const fenced = candidate.match(/^```[a-z]*\s*([\s\S]*?)\s*```$/i);
+  const fenced = candidate.match(/^```[^\n`]*\n([\s\S]*?)\s*```$/);
   if (fenced) {
     candidate = fenced[1].trim();
   }
