@@ -1285,11 +1285,14 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       expect(aiChat.getCall(1).args[0].tool_choice).to.equal('required');
     });
 
-    it('should keep tool_choice=auto for other and unclassified requests', async () => {
+    it('should keep tool_choice=auto for other, web_and_time and unclassified requests', async () => {
       const tools = buildRoutedTools();
       const { forwardMessageToAiChat } = getModule({ tools });
       const otherAiChat = fake.resolves({
         choices: [{ message: { content: 'OK other' } }],
+      });
+      const webAndTimeAiChat = fake.resolves({
+        choices: [{ message: { content: 'Il est 20:38.' } }],
       });
       const nullAiChat = fake.resolves({
         choices: [{ message: { content: 'OK null' } }],
@@ -1314,6 +1317,20 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       await forwardMessageToAiChat.call(
         buildContext({
           tools,
+          aiChat: webAndTimeAiChat,
+          reply,
+          replyByIntent,
+          classifyAiChatToolCategories: fake.resolves(['web_and_time']),
+        }),
+        {
+          message: { text: 'Quelle heure est-il ?' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+      await forwardMessageToAiChat.call(
+        buildContext({
+          tools,
           aiChat: nullAiChat,
           reply,
           replyByIntent,
@@ -1327,6 +1344,7 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       );
 
       expect(otherAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
+      expect(webAndTimeAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
       expect(nullAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
     });
 
@@ -1471,12 +1489,12 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
 });
 
 describe('gateway.forwardMessageToAiChat tool choice helpers', () => {
-  it('shouldForceToolChoice should force all tool-needing categories except pure other', () => {
+  it('shouldForceToolChoice should force home intents but not web/time or pure other', () => {
     const { shouldForceToolChoice } = getModule();
     expect(shouldForceToolChoice(['device_query'])).to.equal(true);
     expect(shouldForceToolChoice(['device_control', 'other'])).to.equal(true);
     expect(shouldForceToolChoice(['scenes'])).to.equal(true);
-    expect(shouldForceToolChoice(['web_and_time'])).to.equal(true);
+    expect(shouldForceToolChoice(['web_and_time'])).to.equal(false);
     expect(shouldForceToolChoice(['other'])).to.equal(false);
     expect(shouldForceToolChoice(null)).to.equal(false);
     expect(shouldForceToolChoice([])).to.equal(false);
