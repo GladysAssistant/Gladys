@@ -1285,6 +1285,130 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
       expect(aiChat.getCall(1).args[0].tool_choice).to.equal('required');
     });
 
+    it('should retry once with a reformulation request when the final answer is raw JSON after a tool call', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat, RAW_DATA_ANSWER_RETRY_MESSAGE } = getModule({ tools });
+      const rawJsonAnswer = '{"state": {"value": 850, "timestamp": "2026-07-30T20:38:00.000Z"}}';
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_co2',
+                  function: {
+                    name: 'device_turn_on_off',
+                    arguments: '{"action":"off"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: rawJsonAnswer } }],
+      });
+      aiChat.onCall(2).resolves({
+        choices: [{ message: { content: 'Le taux de CO2 est de 850 ppm.' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_control']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Quel est le niveau de CO2 ?' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: 'Le taux de CO2 est de 850 ppm.', imagesSent: 0 });
+      expect(aiChat.callCount).to.equal(3);
+      const retryMessages = aiChat.getCall(2).args[0].messages;
+      expect(
+        retryMessages.some((message) => message.role === 'assistant' && message.content === rawJsonAnswer),
+      ).to.equal(true);
+      expect(
+        retryMessages.some((message) => message.role === 'user' && message.content === RAW_DATA_ANSWER_RETRY_MESSAGE),
+      ).to.equal(true);
+      expect(aiChat.getCall(2).args[0].tool_choice).to.equal('auto');
+    });
+
+    it('should accept the raw JSON answer after a failed reformulation retry', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const rawJsonAnswer = '{"state": {"value": 850}}';
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_co2',
+                  function: {
+                    name: 'device_turn_on_off',
+                    arguments: '{"action":"off"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: rawJsonAnswer } }],
+      });
+      aiChat.onCall(2).resolves({
+        choices: [{ message: { content: rawJsonAnswer } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_control']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Quel est le niveau de CO2 ?' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: rawJsonAnswer, imagesSent: 0 });
+      expect(aiChat.callCount).to.equal(3);
+    });
+
+    it('should not retry a JSON answer when no tool result exists in the conversation', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const rawJsonAnswer = '{"example": "value"}';
+      const aiChat = fake.resolves({
+        choices: [{ message: { content: rawJsonAnswer } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['other']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Donne-moi un exemple de JSON' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: rawJsonAnswer, imagesSent: 0 });
+      expect(aiChat.callCount).to.equal(1);
+    });
+
     it('should keep tool_choice=auto for other, web_and_time and unclassified requests', async () => {
       const tools = buildRoutedTools();
       const { forwardMessageToAiChat } = getModule({ tools });
@@ -1512,5 +1636,21 @@ describe('gateway.forwardMessageToAiChat tool choice helpers', () => {
     expect(resolveToolChoice({ forceToolUse: false, hasTools: true, hasCompletedToolIteration: false })).to.equal(
       'auto',
     );
+  });
+
+  it('looksLikeRawDataAnswer should only match answers that are entirely raw JSON data', () => {
+    const { looksLikeRawDataAnswer } = getModule();
+    expect(looksLikeRawDataAnswer('{"state": {"value": 850, "timestamp": "2026-07-30T20:38:00.000Z"}}')).to.equal(true);
+    expect(looksLikeRawDataAnswer('[{"room": "Salon", "value": 25.3}]')).to.equal(true);
+    expect(looksLikeRawDataAnswer('```json\n{"value": 850}\n```')).to.equal(true);
+    expect(looksLikeRawDataAnswer('```\n{"value": 850}\n```')).to.equal(true);
+    expect(looksLikeRawDataAnswer('  {"value": 850}  ')).to.equal(true);
+    expect(looksLikeRawDataAnswer('Le taux de CO2 est de 850 ppm.')).to.equal(false);
+    expect(looksLikeRawDataAnswer('Voici la valeur : {"value": 850}')).to.equal(false);
+    expect(looksLikeRawDataAnswer('850')).to.equal(false);
+    expect(looksLikeRawDataAnswer('{invalid json')).to.equal(false);
+    expect(looksLikeRawDataAnswer('')).to.equal(false);
+    expect(looksLikeRawDataAnswer(null)).to.equal(false);
+    expect(looksLikeRawDataAnswer(undefined)).to.equal(false);
   });
 });
