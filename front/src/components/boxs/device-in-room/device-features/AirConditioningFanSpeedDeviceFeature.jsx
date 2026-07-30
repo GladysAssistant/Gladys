@@ -1,9 +1,9 @@
 import get from 'get-value';
-import { Text } from 'preact-i18n';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import { getSupportedOptionValues } from '../../../../utils/supportedOptions';
+import { resolveFeatureOptions } from '../../../../utils/supportedOptions';
 import { AC_FAN_SPEED } from '../../../../../../server/utils/constants';
+import AdaptiveOptionControl from './AdaptiveOptionControl';
 
 const FAN_SPEED_OPTIONS = [
   { value: AC_FAN_SPEED.AUTO, i18nKey: 'auto' },
@@ -23,15 +23,9 @@ const AirConditioningFanSpeedDeviceFeature = props => {
   const lastValue = rawValue != null && !Number.isNaN(Number(rawValue)) ? Number(rawValue) : rawValue;
 
   // Only offer the speeds this AC supports (its supported_options); a feature without restrictions
-  // keeps the full list.
-  const supportedValues = getSupportedOptionValues(deviceFeature);
-  const fanSpeedOptions = FAN_SPEED_OPTIONS.filter(
-    option => supportedValues === null || supportedValues.includes(option.value)
-  );
-
-  const updateValue = e => {
-    props.updateValueWithDebounce(deviceFeature, Number(e.currentTarget.value));
-  };
+  // keeps the full list. The control shows buttons when they fit on one line, a dropdown otherwise.
+  const options = resolveFeatureOptions(deviceFeature, FAN_SPEED_OPTIONS);
+  const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
 
   return (
     <tr>
@@ -39,20 +33,13 @@ const AirConditioningFanSpeedDeviceFeature = props => {
         <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`, { default: 'wind' })}`} />
       </td>
       <td>{props.rowName}</td>
-
-      <td class="py-0">
-        <div class="justify-content-end">
-          <div class="form-group mb-0">
-            <select value={lastValue} onChange={updateValue} class="form-control form-control-sm">
-              {fanSpeedOptions.map(option => (
-                <option value={option.value} key={option.value}>
-                  <Text id={`deviceFeatureAction.category.${category}.${type}.${option.i18nKey}`} />
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </td>
+      <AdaptiveOptionControl
+        options={options}
+        value={lastValue}
+        category={category}
+        type={type}
+        updateValue={updateValue}
+      />
     </tr>
   );
 };

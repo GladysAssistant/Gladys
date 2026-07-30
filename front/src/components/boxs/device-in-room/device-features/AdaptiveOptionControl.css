@@ -1,0 +1,7 @@
+.probe {
+  position: absolute;
+  left: -99999px;
+  top: 0;
+  visibility: hidden;
+  white-space: nowrap;
+}

@@ -1,9 +1,9 @@
 import get from 'get-value';
-import { Text } from 'preact-i18n';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import { getSupportedOptionValues } from '../../../../utils/supportedOptions';
+import { resolveFeatureOptions } from '../../../../utils/supportedOptions';
 import { AC_SWING_HORIZONTAL, AC_SWING_VERTICAL, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import AdaptiveOptionControl from './AdaptiveOptionControl';
 
 const SWING_HORIZONTAL_OPTIONS = [
   { value: AC_SWING_HORIZONTAL.OFF, i18nKey: 'off' },
@@ -26,17 +26,13 @@ const AirConditioningSwingDeviceFeature = props => {
   const { category, type } = deviceFeature;
   const rawValue = deviceFeature.last_value;
   const lastValue = rawValue != null && !Number.isNaN(Number(rawValue)) ? Number(rawValue) : rawValue;
-  // Only offer the swing positions this AC supports (its supported_options); a feature without
-  // restrictions keeps the full list.
-  const supportedValues = getSupportedOptionValues(deviceFeature);
-  const options = (type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_HORIZONTAL
-    ? SWING_HORIZONTAL_OPTIONS
-    : SWING_VERTICAL_OPTIONS
-  ).filter(option => supportedValues === null || supportedValues.includes(option.value));
 
-  const updateValue = e => {
-    props.updateValueWithDebounce(deviceFeature, Number(e.currentTarget.value));
-  };
+  // Only offer the swing positions this AC supports (its supported_options); a feature without
+  // restrictions keeps the full list. Buttons when they fit on one line, a dropdown otherwise.
+  const staticOptions =
+    type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_HORIZONTAL ? SWING_HORIZONTAL_OPTIONS : SWING_VERTICAL_OPTIONS;
+  const options = resolveFeatureOptions(deviceFeature, staticOptions);
+  const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
 
   return (
     <tr>
@@ -44,20 +40,13 @@ const AirConditioningSwingDeviceFeature = props => {
         <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`, { default: 'refresh-cw' })}`} />
       </td>
       <td>{props.rowName}</td>
-
-      <td class="py-0">
-        <div class="justify-content-end">
-          <div class="form-group mb-0">
-            <select value={lastValue} onChange={updateValue} class="form-control form-control-sm">
-              {options.map(option => (
-                <option value={option.value} key={option.value}>
-                  <Text id={`deviceFeatureAction.category.${category}.${type}.${option.i18nKey}`} />
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </td>
+      <AdaptiveOptionControl
+        options={options}
+        value={lastValue}
+        category={category}
+        type={type}
+        updateValue={updateValue}
+      />
     </tr>
   );
 };

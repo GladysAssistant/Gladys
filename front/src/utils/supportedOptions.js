@@ -1,22 +1,30 @@
 /**
- * Values a device feature actually supports, from its supported_options (see Gladys core #2567:
- * integrations fill the t_device_feature_supported_option table at device creation/update).
- * Returns null when the feature declares no restriction, so callers keep their full option list.
+ * Resolve the list of options to display for a device feature.
+ *
+ * When the feature declares supported_options (see Gladys core #2567: integrations fill the
+ * t_device_feature_supported_option table at device creation/update), those drive the list:
+ * they are ordered by their sort_order and keep their label as a fallback, while the matching
+ * static option still provides the i18n key so the UI stays translated. When the feature has
+ * no supported_options, the full static list is returned unchanged.
+ *
  * @param {Object} deviceFeature - The device feature (with its supported_options, when any).
- * @returns {Array<number>|null} The supported values, or null when unrestricted.
+ * @param {Array<{ value: number, i18nKey: string }>} staticOptions - The full option catalog.
+ * @returns {Array<{ value: number, i18nKey: (string|undefined), label: (string|undefined) }>} Options to display.
  * @example
- * const supportedValues = getSupportedOptionValues(deviceFeature);
- * const options = ALL_OPTIONS.filter(o => supportedValues === null || supportedValues.includes(o.value));
+ * const options = resolveFeatureOptions(deviceFeature, MODE_OPTIONS);
  */
-function getSupportedOptionValues(deviceFeature) {
-  if (
-    !deviceFeature ||
-    !Array.isArray(deviceFeature.supported_options) ||
-    deviceFeature.supported_options.length === 0
-  ) {
-    return null;
+function resolveFeatureOptions(deviceFeature, staticOptions) {
+  const supportedOptions =
+    deviceFeature && Array.isArray(deviceFeature.supported_options) ? deviceFeature.supported_options : null;
+
+  if (!supportedOptions || supportedOptions.length === 0) {
+    return staticOptions.map(option => ({ value: option.value, i18nKey: option.i18nKey }));
   }
-  return deviceFeature.supported_options.map(option => option.value);
+
+  const i18nKeyByValue = new Map(staticOptions.map(option => [option.value, option.i18nKey]));
+  return [...supportedOptions]
+    .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+    .map(option => ({ value: option.value, i18nKey: i18nKeyByValue.get(option.value), label: option.label }));
 }
 
-export { getSupportedOptionValues };
+export { resolveFeatureOptions };

@@ -3874,8 +3874,8 @@
           "auto": "Auto",
           "cooling": "Clim.",
           "heating": "Chauffage",
-          "drying": "Déshumidification",
-          "fan": "Ventilation"
+          "drying": "Déshu.",
+          "fan": "Ventil."
         },
         "fan-speed": {
           "auto": "Auto",

@@ -3875,7 +3875,7 @@
           "cooling": "Kühlen",
           "heating": "Heizen",
           "drying": "Entfeuchten",
-          "fan": "Lüfter"
+          "fan": "Lüften"
         },
         "fan-speed": {
           "auto": "Automatisch",
