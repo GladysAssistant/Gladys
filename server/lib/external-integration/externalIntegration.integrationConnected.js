@@ -30,6 +30,13 @@ async function integrationConnected(service, ws) {
     clearInterval(ws.integrationPingInterval);
   }
   this.connections.set(service.id, ws);
+  // release the messages waiting for this connection (a notification sent
+  // while the container was still booting)
+  const waiters = this.connectionWaiters.get(service.id);
+  if (waiters) {
+    this.connectionWaiters.delete(service.id);
+    waiters.forEach((waiter) => waiter(true));
+  }
   let missedPings = 0;
   ws.isAliveIntegration = true;
   ws.on('pong', () => {
