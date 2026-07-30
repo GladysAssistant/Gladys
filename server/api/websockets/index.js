@@ -113,10 +113,14 @@ function userDisconnected(user, client) {
 function init() {
   this.wss.on('connection', (ws) => {
     let user;
+    let integrationService;
     let authenticated = false;
     ws.on('close', () => {
       if (user) {
         this.userDisconnected(user, ws);
+      }
+      if (integrationService) {
+        this.gladys.externalIntegration.integrationDisconnected(integrationService, ws).catch((e) => logger.warn(e));
       }
     });
     ws.on('message', async (data) => {
@@ -137,6 +141,29 @@ function init() {
             this.userConnected(user, ws);
           } catch (e) {
             ws.close(4000, ERROR_MESSAGES.INVALID_ACCESS_TOKEN);
+          }
+          break;
+        case WEBSOCKET_MESSAGE_TYPES.AUTHENTICATION.INTEGRATION_REQUEST:
+          try {
+            // we validate the integration JWT (signature + audience + token_version)
+            const service = await this.gladys.externalIntegration.validateToken(parsedMessage.payload.token);
+            integrationService = service;
+            authenticated = true;
+            await this.gladys.externalIntegration.integrationConnected(service, ws);
+            ws.send(formatWebsocketMessage(WEBSOCKET_MESSAGE_TYPES.AUTHENTICATION.CONNECTED, {}));
+          } catch (e) {
+            logger.debug(`Cannot authenticate external integration in websocket`, e);
+            ws.close(4000, ERROR_MESSAGES.INVALID_ACCESS_TOKEN);
+          }
+          break;
+        case WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.COMMAND_RESULT:
+          if (integrationService) {
+            this.gladys.externalIntegration.handleCommandResult(integrationService, parsedMessage.payload);
+          }
+          break;
+        case WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.HEARTBEAT:
+          if (integrationService) {
+            await this.gladys.externalIntegration.handleHeartbeat(integrationService);
           }
           break;
         default:

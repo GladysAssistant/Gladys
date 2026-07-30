@@ -204,6 +204,16 @@ class Chartbox extends Component {
 
       let emptySeries = true;
 
+      // The unit of a device feature can change after the box was configured (device re-created,
+      // integration updated...), and the "units" saved in the box config is only a snapshot taken
+      // when the feature was added. So we use the unit returned by the API as the source of truth,
+      // and only fallback on the box config when the feature has no unit.
+      // Note: "unit" (singular) is the legacy attribute, kept for boxes saved before "units" existed.
+      const unitsByFeature = data.map((oneFeature, index) => {
+        const unitFromBoxConfig = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
+        return get(oneFeature, 'deviceFeature.unit') || unitFromBoxConfig;
+      });
+
       let series = [];
 
       if (this.props.box.chart_type === 'timeline') {
@@ -248,7 +258,7 @@ class Chartbox extends Component {
         series.push(serie0);
       } else {
         series = data.map((oneFeature, index) => {
-          const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
+          const oneUnit = unitsByFeature[index];
           // Convert unit display format if necessary (using 0 as a dummy value since we only need the unit)
           const userUnitPreference = this.props.user.distance_unit_preference;
           const { unit: displayUnit } = checkAndConvertUnit(0, oneUnit, userUnitPreference);
@@ -282,16 +292,14 @@ class Chartbox extends Component {
       };
 
       if (data.length > 0 && this.props.box.chart_type !== 'timeline') {
-        // Before now, there was a "unit" attribute in this box instead of "units",
-        // so we need to support "unit" as some users may already have the box with that param
-        const unit = this.props.box.units ? this.props.box.units[0] : this.props.box.unit;
+        const unit = unitsByFeature[0];
 
         // Convert distance units if necessary
         const userUnitPreference = this.props.user.distance_unit_preference;
         let displayUnit = unit;
 
         // We check if all deviceFeatures selected are in the same unit
-        const allUnitsAreSame = this.props.box.units ? allEqual(this.props.box.units) : false;
+        const allUnitsAreSame = this.props.box.units ? allEqual(unitsByFeature) : false;
 
         // If all deviceFeatures selected are in the same unit
         // We do a average of all values

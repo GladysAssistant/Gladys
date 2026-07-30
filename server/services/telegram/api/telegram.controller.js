@@ -13,10 +13,27 @@ module.exports = function TelegramController(messageHandler) {
     });
   }
 
+  /**
+   * @api {post} /api/v1/service/telegram/disable Disable the Telegram integration
+   * @apiName disable
+   * @apiGroup Telegram
+   */
+  async function disable(req, res) {
+    await messageHandler.disable();
+    res.json({
+      success: true,
+    });
+  }
+
   return {
     'get /api/v1/service/telegram/link': {
       authenticated: true,
       controller: asyncMiddleware(getCustomLink),
+    },
+    'post /api/v1/service/telegram/disable': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(disable),
     },
   };
 };
