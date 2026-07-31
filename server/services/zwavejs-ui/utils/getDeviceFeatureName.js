@@ -13,8 +13,13 @@ function getDeviceFeatureName(exposed, zwaveNodeValue) {
 
   let name = `${zwaveNodeValue.id}${exposed.name !== '' ? `:${exposed.name}` : ''}`;
 
-  if (propertyKey && propertyKeyName !== propertyKey && propertyKeyName && name.includes(propertyKey)) {
-    name = name.replace(propertyKey, propertyKeyName);
+  // The propertyKey is always the trailing segment of the id, so the replacement is
+  // anchored there. A plain string replace would match the first occurrence instead,
+  // which can collide with digits earlier in the id (e.g. propertyKey "1" wrongly
+  // matching the "1" in node id "16").
+  const propertyKeyStr = propertyKey !== null && propertyKey !== undefined ? String(propertyKey) : '';
+  if (propertyKeyStr && propertyKeyName !== propertyKey && propertyKeyName && name.endsWith(propertyKeyStr)) {
+    name = `${name.slice(0, name.length - propertyKeyStr.length)}${propertyKeyName}`;
   }
 
   return name;
