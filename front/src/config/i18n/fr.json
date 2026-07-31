@@ -268,7 +268,7 @@
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
     "editDashboardVisibility": "Visibilité",
-    "editDashboardVisibilityDescription": "Les tableaux de bord publics seront visible par tous les membres de l'installation Gladys.",
+    "editDashboardVisibilityDescription": "Les tableaux de bord publics seront visibles par tous les membres de l'installation Gladys.",
     "editDashboardVisibilityNotEditableNotCreator": "Vous ne pouvez pas éditer le partage car vous n'êtes pas le créateur de ce tableau de bord.",
     "visibilities": {
       "private": "privé",
