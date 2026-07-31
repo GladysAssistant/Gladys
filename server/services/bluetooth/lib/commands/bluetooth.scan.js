@@ -51,13 +51,17 @@ async function scan(state, peripheralUuid = undefined) {
         }
       };
 
-      const scanStop = () => {
-        this.bluetooth.removeListener('discover', onDiscover);
-
+      const clearScanTimer = () => {
         if (this.scanTimer) {
           clearTimeout(this.scanTimer);
           this.scanTimer = undefined;
         }
+      };
+
+      const scanStop = () => {
+        this.bluetooth.removeListener('discover', onDiscover);
+
+        clearScanTimer();
 
         if (peripheralUuid) {
           if (peripherals[peripheralUuid]) {
@@ -79,8 +83,18 @@ async function scan(state, peripheralUuid = undefined) {
         this.bluetooth.stopScanning();
       }, TIMERS.SCAN);
 
-      if (!this.scanning) {
-        this.bluetooth.startScanning([], true);
+      try {
+        if (!this.scanning) {
+          this.bluetooth.startScanning([], true);
+        }
+      } catch (e) {
+        // Scan never started: release listeners, timer and counter.
+        this.bluetooth.removeListener('discover', onDiscover);
+        this.bluetooth.removeListener('scanStop', scanStop);
+        clearScanTimer();
+        this.scanCounter -= 1;
+
+        reject(e);
       }
     });
   }
