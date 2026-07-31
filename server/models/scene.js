@@ -57,14 +57,19 @@ const actionSchema = Joi.object()
         .required(),
       otherwise: Joi.forbidden(),
     }),
-    conditions: Joi.array().items({
-      variable: Joi.string().required(),
-      operator: Joi.string()
-        .valid('=', '!=', '>', '>=', '<', '<=')
-        .required(),
-      value: Joi.alternatives().try(Joi.number(), Joi.string()),
-      evaluate_value: Joi.string(),
-    }),
+    conditions: Joi.array().items(
+      Joi.object()
+        .keys({
+          variable: Joi.string(),
+          device_feature: Joi.string(),
+          operator: Joi.string()
+            .valid('=', '!=', '>', '>=', '<', '<=')
+            .required(),
+          value: Joi.alternatives().try(Joi.number(), Joi.string()),
+          evaluate_value: Joi.string(),
+        })
+        .xor('variable', 'device_feature'),
+    ),
     alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
     topic: Joi.string(),
     message: Joi.string().allow(''),

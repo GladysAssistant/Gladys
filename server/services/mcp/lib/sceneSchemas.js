@@ -79,8 +79,15 @@ const sceneConditionSchema = z
   .object({
     variable: z
       .string()
+      .optional()
       .describe(
-        'Scope path to compare, for example "0.0.last_value" after a device.get-value action in action group 0.',
+        'Scope path to compare, for example "0.0.last_value" after a device.get-value action in action group 0. Exactly one of "variable" or "device_feature" is required.',
+      ),
+    device_feature: z
+      .string()
+      .optional()
+      .describe(
+        'Device feature selector whose instantaneous value is compared at execution time, without needing a prior "device.get-value" action. Exactly one of "variable" or "device_feature" is required.',
       ),
     operator: comparisonOperatorSchema,
     value: z
@@ -92,7 +99,10 @@ const sceneConditionSchema = z
       .optional()
       .describe('Optional Handlebars expression evaluated to a value before comparison.'),
   })
-  .strict();
+  .strict()
+  .refine((condition) => (condition.variable === undefined) !== (condition.device_feature === undefined), {
+    message: 'Exactly one of "variable" or "device_feature" must be provided',
+  });
 
 const actionSchemaByType = (type, specificShape) =>
   z

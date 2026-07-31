@@ -335,15 +335,27 @@ const actionsFunc = {
         throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
       }
 
-      // removing brackets
-      const variableWithoutBrackets = condition.variable.replace(/\[|\]/g, '');
-      const conditionVerified = compare(condition.operator, get(scope, variableWithoutBrackets), value);
+      let currentValue;
+      if (condition.device_feature) {
+        // The condition compares the instantaneous value of a device feature
+        const deviceFeature = self.stateManager.get('deviceFeature', condition.device_feature);
+        if (!deviceFeature) {
+          throw new AbortScene('DEVICE_FEATURE_NOT_FOUND');
+        }
+        currentValue =
+          deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT
+            ? deviceFeature.last_value_string
+            : deviceFeature.last_value;
+      } else {
+        // removing brackets
+        const variableWithoutBrackets = condition.variable.replace(/\[|\]/g, '');
+        currentValue = get(scope, variableWithoutBrackets);
+      }
+      const conditionVerified = compare(condition.operator, currentValue, value);
       if (conditionVerified) {
         oneConditionVerified = true;
       } else {
-        logger.debug(
-          `Condition not verified. Condition: "${get(scope, variableWithoutBrackets)} ${condition.operator} ${value}"`,
-        );
+        logger.debug(`Condition not verified. Condition: "${currentValue} ${condition.operator} ${value}"`);
       }
     });
     if (oneConditionVerified === false) {

@@ -9,11 +9,23 @@ import style from './Condition.css';
 
 class Condition extends Component {
   handleChange = selectedOption => {
-    const newCondition = update(this.props.condition, {
-      variable: {
-        $set: selectedOption && selectedOption.value ? selectedOption.value : null
-      }
+    // A condition compares either a device feature (instantaneous value) or a scene variable
+    let newCondition = update(this.props.condition, {
+      $unset: ['variable', 'device_feature']
     });
+    if (selectedOption && selectedOption.value) {
+      newCondition = update(newCondition, {
+        [selectedOption.isDeviceFeature ? 'device_feature' : 'variable']: {
+          $set: selectedOption.value
+        }
+      });
+    } else {
+      newCondition = update(newCondition, {
+        variable: {
+          $set: null
+        }
+      });
+    }
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
@@ -78,7 +90,11 @@ class Condition extends Component {
     let selectedOption = null;
 
     this.props.variableOptions.forEach(variableOption => {
-      const foundOption = variableOption.options.find(option => this.props.condition.variable === option.value);
+      const foundOption = variableOption.options.find(option =>
+        option.isDeviceFeature
+          ? this.props.condition.device_feature === option.value
+          : this.props.condition.variable === option.value
+      );
       if (foundOption) {
         selectedOption = foundOption;
       }
