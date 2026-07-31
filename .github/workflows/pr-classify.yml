@@ -1,0 +1,111 @@
+name: PR Type Classification
+
+# pull_request_target (not pull_request) so that secrets are available for PRs
+# coming from forks. SECURITY: this workflow must NEVER check out or execute
+# code from the PR head. It only reads PR metadata and the diff through the
+# GitHub API, and it does not check out anything at all.
+on:
+  pull_request_target:
+    # "opened" only: no re-classification during the PR lifetime, and a manual
+    # label fix is never overwritten on synchronize.
+    types: [opened]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for an existing type label
+        id: check
+        env:
+          LABELS_JSON: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: |
+          if echo "$LABELS_JSON" | jq -e 'map(select(startswith("type:"))) | length > 0' > /dev/null; then
+            echo "PR already has a type label, skipping classification."
+            echo "has_type=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_type=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Label dependency-bot PRs as chore
+        if: |
+          steps.check.outputs.has_type == 'false' &&
+          (startsWith(github.event.pull_request.user.login, 'dependabot') ||
+           startsWith(github.event.pull_request.user.login, 'renovate'))
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr edit "$PR_NUMBER" --add-label "type:chore"
+
+      - name: Classify PR type with Claude
+        if: |
+          steps.check.outputs.has_type == 'false' &&
+          !startsWith(github.event.pull_request.user.login, 'dependabot') &&
+          !startsWith(github.event.pull_request.user.login, 'renovate')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          # PR title/body are untrusted input: passed through env vars only,
+          # never interpolated into the script.
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -uo pipefail
+
+          fail_soft() {
+            echo "::warning::PR type classification failed: $1. No label was applied."
+            exit 1
+          }
+
+          # PR data is fetched through the GitHub API: no checkout of the fork,
+          # no execution of untrusted code.
+          FILES=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename') \
+            || fail_soft "could not fetch the list of changed files"
+          DIFF=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER" -H "Accept: application/vnd.github.diff" | head -c 20000) \
+            || fail_soft "could not fetch the PR diff"
+
+          REQUEST=$(jq -n \
+            --arg title "$PR_TITLE" \
+            --arg body "$PR_BODY" \
+            --arg files "$FILES" \
+            --arg diff "$DIFF" \
+            '{
+              model: "claude-haiku-4-5-20251001",
+              max_tokens: 64,
+              messages: [{
+                role: "user",
+                content: ("You are classifying a GitHub pull request of the Gladys Assistant home automation project.\n\nClassify the pull request as exactly one of these three types:\n- \"feature\": a new user-visible feature\n- \"fix\": a bug fix\n- \"chore\": dependencies, CI, refactoring, documentation - anything invisible in the user-facing changelog\n\nAnswer with strict JSON only, without any other text, in this exact format:\n{\"type\": \"feature\" | \"fix\" | \"chore\"}\n\nPR title:\n" + $title + "\n\nPR description:\n" + $body + "\n\nChanged files:\n" + $files + "\n\nDiff (truncated to 20000 characters):\n" + $diff)
+              }]
+            }') || fail_soft "could not build the API request"
+
+          RESPONSE=$(curl -sS --fail \
+            --max-time 120 \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: $ANTHROPIC_API_KEY" \
+            -H "anthropic-version: 2023-06-01" \
+            -H "content-type: application/json" \
+            -d "$REQUEST") || fail_soft "Anthropic API call failed"
+
+          TEXT=$(echo "$RESPONSE" | jq -r '.content[0].text // empty') \
+            || fail_soft "could not read the API response"
+          [ -n "$TEXT" ] || fail_soft "empty model response"
+
+          # Defensive parsing: strip potential markdown fences before parsing.
+          CLEANED=$(echo "$TEXT" | sed -e 's/^[[:space:]]*```[a-zA-Z]*//' -e 's/```[[:space:]]*$//')
+          TYPE=$(echo "$CLEANED" | jq -r '.type // empty' 2> /dev/null) \
+            || fail_soft "model response is not valid JSON"
+
+          case "$TYPE" in
+            feature | fix | chore) ;;
+            *) fail_soft "unexpected type value: '$TYPE'" ;;
+          esac
+
+          gh pr edit "$PR_NUMBER" --add-label "type:$TYPE" \
+            || fail_soft "could not apply the label type:$TYPE"
+          echo "Applied label type:$TYPE"
