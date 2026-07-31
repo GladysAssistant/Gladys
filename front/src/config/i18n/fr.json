@@ -4442,7 +4442,7 @@
           "1": "Manque d'eau",
           "2": "Fuite d'eau",
           "3": "Manque et fuite d'eau",
-          "unknown": "Inconnu"
+          "unknown": "{{value}} (inconnu)"
         },
         "valve-work-state": {
           "0": "Au repos",

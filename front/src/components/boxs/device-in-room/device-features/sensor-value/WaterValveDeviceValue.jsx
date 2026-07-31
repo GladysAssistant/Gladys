@@ -1,21 +1,24 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import { DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
-import RawDeviceValue from './RawDeviceValue';
+import { WATER_VALVE_CURRENT_DEVICE_STATUS } from '../../../../../../../server/utils/constants';
 
 const WaterValveDeviceValue = props => {
-  const { type, last_value: lastValue = null } = props.deviceFeature;
+  const { last_value: lastValue = null } = props.deviceFeature;
   const valued = lastValue !== null;
-
-  if (type !== DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS) {
-    return <RawDeviceValue {...props} />;
-  }
+  const leakage =
+    lastValue === WATER_VALVE_CURRENT_DEVICE_STATUS.WATER_LEAKAGE ||
+    lastValue === WATER_VALVE_CURRENT_DEVICE_STATUS.WATER_SHORTAGE_AND_WATER_LEAKAGE;
+  const shortage = lastValue === WATER_VALVE_CURRENT_DEVICE_STATUS.WATER_SHORTAGE;
+  const normal = lastValue === WATER_VALVE_CURRENT_DEVICE_STATUS.NORMAL_STATE;
 
   return (
     <span
       class={cx('badge', {
-        'bg-primary': valued,
+        'bg-danger': leakage,
+        'bg-warning': shortage,
+        'bg-success': normal,
+        'bg-primary': valued && !leakage && !shortage && !normal,
         'bg-secondary': !valued
       })}
     >

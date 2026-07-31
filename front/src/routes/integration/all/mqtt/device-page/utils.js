@@ -63,7 +63,12 @@ export const normalizeForSearch = value =>
 const categoryTypeKey = (category, type) => `${category}|${type}`;
 
 const MQTT_CATALOG_EXCLUDED_FEATURES = new Set([
-  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR)
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR),
+  // Water valve types are only exposed by Zigbee2mqtt for now: the MQTT catalog defaults
+  // (min/max and unit) are not accurate for them yet.
+  ...Object.values(DEVICE_FEATURE_TYPES.WATER_VALVE).map(type =>
+    categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_VALVE, type)
+  )
 ]);
 
 export const isMqttCatalogFeatureVisible = (category, type) =>

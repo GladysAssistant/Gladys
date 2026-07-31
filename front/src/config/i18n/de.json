@@ -4442,7 +4442,7 @@
           "1": "Wassermangel",
           "2": "Wasserleck",
           "3": "Wassermangel und Wasserleck",
-          "unknown": "Unbekannt"
+          "unknown": "{{value}} (unbekannt)"
         },
         "valve-work-state": {
           "0": "Inaktiv",

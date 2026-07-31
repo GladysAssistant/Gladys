@@ -4442,7 +4442,7 @@
           "1": "Water shortage",
           "2": "Water leakage",
           "3": "Water shortage & leakage",
-          "unknown": "Unknown"
+          "unknown": "{{value}} (unknown)"
         },
         "valve-work-state": {
           "0": "Idle",
