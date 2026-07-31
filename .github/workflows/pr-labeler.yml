@@ -1,7 +1,14 @@
 name: PR Area Labeler
 
 on:
-  - pull_request_target
+  pull_request_target:
+  # Manual backfill for existing PRs
+  workflow_dispatch:
+    inputs:
+      pr_numbers:
+        description: 'PR number(s) to label, one per line. Leave empty to label all open PRs.'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -11,7 +18,29 @@ jobs:
   labeler:
     runs-on: ubuntu-latest
     steps:
+      - name: Resolve PR numbers (manual runs only)
+        id: prs
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          INPUT_PRS: ${{ inputs.pr_numbers }}
+        run: |
+          if [ -n "$INPUT_PRS" ]; then
+            PRS="$INPUT_PRS"
+          else
+            PRS=$(gh pr list --state open --limit 1000 --json number --jq '.[].number')
+          fi
+          {
+            echo "numbers<<PRS_EOF"
+            echo "$PRS"
+            echo "PRS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - uses: actions/labeler@v5
         with:
           # Never remove labels that were added manually
           sync-labels: false
+          # Empty on pull_request_target events: the PR is detected from the
+          # workflow context
+          pr-number: ${{ steps.prs.outputs.numbers }}
