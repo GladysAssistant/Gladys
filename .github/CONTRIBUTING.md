@@ -47,6 +47,20 @@ Then, follow our guide:
 
 ---
 
+## 🏷️ Labels & Forum Link
+
+Most labels are applied automatically, you don't need to set them yourself:
+
+- `type:feature` / `type:fix` / `type:chore` — set automatically when the PR is opened (you can pre-set one manually, it won't be overwritten)
+- `area:*` (server, front, integration, ai, infra) — set automatically from the files changed
+- `risk:high` / `needs:human-review` — set by the automated review
+
+Labels for contributors: look for [`good first issue`](https://github.com/gladysassistant/Gladys/labels/good%20first%20issue) and [`help wanted`](https://github.com/gladysassistant/Gladys/labels/help%20wanted) to find issues to work on.
+
+If your PR implements a forum request, add a line `Forum: https://community.gladysassistant.com/t/...` in the PR description (see the PR template): the release pipeline uses it to notify the forum topic when the feature ships.
+
+---
+
 ## 📜 Licensing
 
 All contributions to Gladys are submitted under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).  
