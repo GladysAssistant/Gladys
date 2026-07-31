@@ -42,7 +42,7 @@ jobs:
           elif [ -n "$INPUT_PRS" ]; then
             PRS="$INPUT_PRS"
           else
-            PRS=$(gh pr list --state open --limit 1000 --json number --jq '.[].number')
+            PRS=$(gh api --paginate "repos/$GH_REPO/pulls?state=open&per_page=100" --jq '.[].number')
           fi
           {
             echo "numbers<<PRS_EOF"
@@ -88,9 +88,11 @@ jobs:
               continue
             fi
 
+            # Exact logins only: a user named e.g. "dependabot-fan" must not
+            # be treated as a trusted dependency bot
             LOGIN=$(echo "$PR_DATA" | jq -r '.user.login // empty')
             case "$LOGIN" in
-              dependabot* | renovate*)
+              'dependabot[bot]' | 'renovate[bot]')
                 gh pr edit "$PR" --add-label "type:chore" \
                   || { warn "$PR" "could not apply type:chore"; continue; }
                 echo "PR #$PR: dependency-bot author, applied type:chore."
@@ -104,8 +106,12 @@ jobs:
               || { warn "$PR" "could not fetch the list of changed files"; continue; }
             DIFF=$(gh api "repos/$GH_REPO/pulls/$PR" -H "Accept: application/vnd.github.diff") \
               || { warn "$PR" "could not fetch the PR diff"; continue; }
-            # Truncate in bash: piping into `head -c` would kill gh with
-            # SIGPIPE on large diffs and fail the step under pipefail
+            # Bound every free-form field so a huge PR can never overflow the
+            # model context. Truncate in bash: piping into `head -c` would
+            # kill gh with SIGPIPE on large payloads and fail the step under
+            # pipefail
+            [ ${#PR_BODY} -le 5000 ] || PR_BODY="${PR_BODY:0:5000}"$'\n[description truncated]'
+            [ ${#FILES} -le 10000 ] || FILES="${FILES:0:10000}"$'\n[file list truncated]'
             DIFF=${DIFF:0:20000}
 
             # Scaleway Generative APIs (serverless, OpenAI-compatible). The
