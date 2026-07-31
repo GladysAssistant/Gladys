@@ -30,6 +30,7 @@
           - 'server/lib/gateway/gateway.getAiChatDebugContext.js'
           - 'server/lib/gateway/gateway.getAiChatModels.js'
           - 'server/lib/gateway/gateway.getOpenAIQuota.js'
+          - 'server/utils/aiChatModels.js'
 
 'area:database':
   - changed-files:
