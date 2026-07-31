@@ -54,7 +54,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
+          SCALEWAY_API_KEY: ${{ secrets.SCALEWAY_API_KEY }}
           PR_NUMBERS: ${{ steps.prs.outputs.numbers }}
         run: |
           set -uo pipefail
@@ -142,7 +142,7 @@ jobs:
             RESPONSE=$(curl -sS --fail \
               --max-time 120 \
               https://api.scaleway.ai/v1/chat/completions \
-              -H "Authorization: Bearer $SCW_SECRET_KEY" \
+              -H "Authorization: Bearer $SCALEWAY_API_KEY" \
               -H "content-type: application/json" \
               -d "$REQUEST") || { warn "$PR" "Scaleway API call failed"; continue; }
 
