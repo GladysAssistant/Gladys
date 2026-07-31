@@ -4134,7 +4134,9 @@
           "cooling": "Kühlen",
           "heating": "Heizen",
           "drying": "Entfeuchten",
-          "fan": "Lüften"
+          "fan": "Lüften",
+          "off": "Aus",
+          "energy_heat": "Energiesparheizen"
         }
       },
       "heater": {
@@ -4486,6 +4488,14 @@
           "4": "Kehrt zur Ladestation zurück",
           "5": "Lädt",
           "6": "Angedockt"
+        }
+      },
+      "thermostat": {
+        "operating-state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Inaktiv",
+          "1": "Heizt",
+          "2": "Kühlt"
         }
       }
     }
@@ -4917,7 +4927,8 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Thermostat: Temperatur"
+      "target-temperature": "Thermostat: Temperatur",
+      "operating-state": "Thermostat: Betriebszustand"
     },
     "airquality-sensor": {
       "shortCategoryName": "Luftqualität",

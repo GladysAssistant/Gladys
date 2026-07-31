@@ -10,7 +10,9 @@ const AC_MODE_TRANSLATION_KEYS = {
   [AC_MODE.COOLING]: 'cooling',
   [AC_MODE.HEATING]: 'heating',
   [AC_MODE.DRYING]: 'drying',
-  [AC_MODE.FAN]: 'fan'
+  [AC_MODE.FAN]: 'fan',
+  [AC_MODE.OFF]: 'off',
+  [AC_MODE.ENERGY_HEAT]: 'energy_heat'
 };
 
 const AirConditioningModeDeviceFeature = ({ children, ...props }) => {

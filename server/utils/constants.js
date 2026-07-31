@@ -145,6 +145,8 @@ const AC_MODE = {
   HEATING: 2,
   DRYING: 3,
   FAN: 4,
+  OFF: 5,
+  ENERGY_HEAT: 6,
 };
 
 const FAN_MODE = {
@@ -211,6 +213,12 @@ const LEVEL_MATTER_STATE = {
   MEDIUM: 2,
   HIGH: 3,
   CRITICAL: 4,
+};
+
+const THERMOSTAT_OPERATING_STATE = {
+  IDLE: 0,
+  HEATING: 1,
+  COOLING: 2,
 };
 
 const VACUUM_CLEANER_STATE = {
@@ -969,6 +977,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   THERMOSTAT: {
     TARGET_TEMPERATURE: 'target-temperature',
+    OPERATING_STATE: 'operating-state',
   },
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
@@ -1769,6 +1778,7 @@ module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
+module.exports.THERMOSTAT_OPERATING_STATE = THERMOSTAT_OPERATING_STATE;
 module.exports.FAN_MODE = FAN_MODE;
 module.exports.FAN_AIRFLOW_DIRECTION = FAN_AIRFLOW_DIRECTION;
 module.exports.FAN_ROCK_SETTING = FAN_ROCK_SETTING;

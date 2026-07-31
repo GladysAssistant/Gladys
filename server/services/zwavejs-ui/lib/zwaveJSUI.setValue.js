@@ -98,16 +98,19 @@ async function setValue(gladysDevice, gladysFeature, value) {
   } else {
     // API writeValue
     // https://zwave-js.github.io/zwave-js-ui/#/guide/mqtt?id=writevalue
+    const valueId = {
+      nodeId: nodeFeature.node_id,
+      commandClass: nodeFeature.command_class,
+      endpoint: nodeFeature.endpoint,
+      property: action.name,
+    };
+    // propertyKey is only required for properties with multiple instances
+    // (e.g. Thermostat Setpoint: one "setpoint" property per setpoint type).
+    if (action.propertyKey !== null && action.propertyKey !== undefined) {
+      valueId.propertyKey = action.propertyKey;
+    }
     const mqttPayload = {
-      args: [
-        {
-          nodeId: nodeFeature.node_id,
-          commandClass: nodeFeature.command_class,
-          endpoint: nodeFeature.endpoint,
-          property: action.name,
-        },
-        action.value,
-      ],
+      args: [valueId, action.value],
     };
     this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set', JSON.stringify(mqttPayload));
   }

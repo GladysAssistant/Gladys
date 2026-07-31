@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 
 const ZwaveJSUIHandler = require('../../../../services/zwavejs-ui/lib');
-const { STATE, BUTTON_STATUS } = require('../../../../utils/constants');
+const { STATE, BUTTON_STATUS, AC_MODE, THERMOSTAT_OPERATING_STATE } = require('../../../../utils/constants');
 
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -1729,6 +1729,145 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     assert.calledWith(gladys.event.emit, 'device.new-state', {
       device_feature_external_id: 'zwavejs-ui:6:0:meter:value:electric_a_consumed',
       state: 1,
+    });
+  });
+
+  const thermostatDevice = {
+    external_id: 'zwavejs-ui:16',
+    features: [
+      { external_id: 'zwavejs-ui:16:1:thermostat_mode:mode' },
+      { external_id: 'zwavejs-ui:16:1:thermostat_operating_state:state' },
+      { external_id: 'zwavejs-ui:16:1:thermostat_setpoint:setpoint:heating' },
+      { external_id: 'zwavejs-ui:16:1:thermostat_setpoint:setpoint:cooling' },
+      { external_id: 'zwavejs-ui:16:1:thermostat_setpoint:setpoint:energy_save_heating' },
+    ],
+  };
+  const thermostatZwaveJSDevice = {
+    id: 16,
+    deviceClass: {
+      basic: 4,
+      generic: 8,
+      specific: 6,
+    },
+  };
+
+  [
+    { newValue: 0, expectedState: AC_MODE.OFF },
+    { newValue: 1, expectedState: AC_MODE.HEATING },
+    { newValue: 2, expectedState: AC_MODE.COOLING },
+    { newValue: 11, expectedState: AC_MODE.ENERGY_HEAT },
+  ].forEach(({ newValue, expectedState }) => {
+    it(`should save a new thermostat mode value (${newValue} -> ${expectedState})`, async () => {
+      const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+      zwaveJSUIHandler.devices = [thermostatDevice];
+      zwaveJSUIHandler.zwaveJSDevices = [thermostatZwaveJSDevice];
+
+      await zwaveJSUIHandler.onNodeValueUpdated({
+        data: [
+          { id: 16 },
+          {
+            commandClassName: 'Thermostat Mode',
+            commandClass: 64,
+            property: 'mode',
+            propertyName: 'mode',
+            endpoint: 1,
+            prevValue: null,
+            newValue,
+          },
+        ],
+      });
+      assert.calledWith(gladys.event.emit, 'device.new-state', {
+        device_feature_external_id: 'zwavejs-ui:16:1:thermostat_mode:mode',
+        state: expectedState,
+      });
+    });
+  });
+
+  it('should not fail on unsupported thermostat mode value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [thermostatDevice];
+    zwaveJSUIHandler.zwaveJSDevices = [thermostatZwaveJSDevice];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 16 },
+        {
+          commandClassName: 'Thermostat Mode',
+          commandClass: 64,
+          property: 'mode',
+          propertyName: 'mode',
+          endpoint: 1,
+          prevValue: 0,
+          newValue: 99,
+        },
+      ],
+    });
+    assert.notCalled(gladys.event.emit);
+  });
+
+  [
+    { newValue: 0, expectedState: THERMOSTAT_OPERATING_STATE.IDLE },
+    { newValue: 1, expectedState: THERMOSTAT_OPERATING_STATE.HEATING },
+    { newValue: 2, expectedState: THERMOSTAT_OPERATING_STATE.COOLING },
+  ].forEach(({ newValue, expectedState }) => {
+    it(`should save a new thermostat operating state value (${newValue} -> ${expectedState})`, async () => {
+      const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+      zwaveJSUIHandler.devices = [thermostatDevice];
+      zwaveJSUIHandler.zwaveJSDevices = [thermostatZwaveJSDevice];
+
+      await zwaveJSUIHandler.onNodeValueUpdated({
+        data: [
+          { id: 16 },
+          {
+            commandClassName: 'Thermostat Operating State',
+            commandClass: 66,
+            property: 'state',
+            propertyName: 'state',
+            endpoint: 1,
+            prevValue: null,
+            newValue,
+          },
+        ],
+      });
+      assert.calledWith(gladys.event.emit, 'device.new-state', {
+        device_feature_external_id: 'zwavejs-ui:16:1:thermostat_operating_state:state',
+        state: expectedState,
+      });
+    });
+  });
+
+  [
+    { propertyKeyName: 'Heating', externalId: 'zwavejs-ui:16:1:thermostat_setpoint:setpoint:heating' },
+    { propertyKeyName: 'Cooling', externalId: 'zwavejs-ui:16:1:thermostat_setpoint:setpoint:cooling' },
+    {
+      propertyKeyName: 'Energy Save Heating',
+      externalId: 'zwavejs-ui:16:1:thermostat_setpoint:setpoint:energy_save_heating',
+    },
+  ].forEach(({ propertyKeyName, externalId }) => {
+    it(`should save a new thermostat setpoint value (${propertyKeyName})`, async () => {
+      const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+      zwaveJSUIHandler.devices = [thermostatDevice];
+      zwaveJSUIHandler.zwaveJSDevices = [thermostatZwaveJSDevice];
+
+      await zwaveJSUIHandler.onNodeValueUpdated({
+        data: [
+          { id: 16 },
+          {
+            commandClassName: 'Thermostat Setpoint',
+            commandClass: 67,
+            property: 'setpoint',
+            propertyName: 'setpoint',
+            propertyKeyName,
+            endpoint: 1,
+            prevValue: 18,
+            newValue: 19.5,
+          },
+        ],
+      });
+      assert.calledWith(gladys.event.emit, 'device.new-state', {
+        device_feature_external_id: externalId,
+        state: 19.5,
+      });
     });
   });
 });

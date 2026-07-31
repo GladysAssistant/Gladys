@@ -4134,7 +4134,9 @@
           "cooling": "Cool",
           "heating": "Heat",
           "drying": "Dry",
-          "fan": "Fan"
+          "fan": "Fan",
+          "off": "Off",
+          "energy_heat": "Energy Heat"
         }
       },
       "heater": {
@@ -4486,6 +4488,14 @@
           "4": "Returning to Dock",
           "5": "Charging",
           "6": "Docked"
+        }
+      },
+      "thermostat": {
+        "operating-state": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Idle",
+          "1": "Heating",
+          "2": "Cooling"
         }
       }
     }
@@ -4917,7 +4927,8 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Thermostat Temperature"
+      "target-temperature": "Thermostat Temperature",
+      "operating-state": "Thermostat Operating State"
     },
     "airquality-sensor": {
       "shortCategoryName": "Air Quality",
