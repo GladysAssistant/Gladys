@@ -41,7 +41,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: gh pr edit "$PR_NUMBER" --add-label "type:chore"
 
-      - name: Classify PR type with Claude
+      - name: Classify PR type with Scaleway Generative APIs
         if: |
           steps.check.outputs.has_type == 'false' &&
           !startsWith(github.event.pull_request.user.login, 'dependabot') &&
@@ -49,7 +49,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           # PR title/body are untrusted input: passed through env vars only,
           # never interpolated into the script.
@@ -70,14 +70,30 @@ jobs:
           DIFF=$(gh api "repos/$GH_REPO/pulls/$PR_NUMBER" -H "Accept: application/vnd.github.diff" | head -c 20000) \
             || fail_soft "could not fetch the PR diff"
 
+          # Scaleway Generative APIs (serverless, OpenAI-compatible). The
+          # json_schema response format constrains the model output to one of
+          # the three allowed types; defensive parsing below is kept as backup.
           REQUEST=$(jq -n \
             --arg title "$PR_TITLE" \
             --arg body "$PR_BODY" \
             --arg files "$FILES" \
             --arg diff "$DIFF" \
             '{
-              model: "claude-haiku-4-5-20251001",
+              model: "mistral-small-3.2-24b-instruct-2506",
               max_tokens: 64,
+              temperature: 0,
+              response_format: {
+                type: "json_schema",
+                json_schema: {
+                  name: "pr_type",
+                  schema: {
+                    type: "object",
+                    properties: {type: {type: "string", enum: ["feature", "fix", "chore"]}},
+                    required: ["type"],
+                    additionalProperties: false
+                  }
+                }
+              },
               messages: [{
                 role: "user",
                 content: ("You are classifying a GitHub pull request of the Gladys Assistant home automation project.\n\nClassify the pull request as exactly one of these three types:\n- \"feature\": a new user-visible feature\n- \"fix\": a bug fix\n- \"chore\": dependencies, CI, refactoring, documentation - anything invisible in the user-facing changelog\n\nAnswer with strict JSON only, without any other text, in this exact format:\n{\"type\": \"feature\" | \"fix\" | \"chore\"}\n\nPR title:\n" + $title + "\n\nPR description:\n" + $body + "\n\nChanged files:\n" + $files + "\n\nDiff (truncated to 20000 characters):\n" + $diff)
@@ -86,13 +102,12 @@ jobs:
 
           RESPONSE=$(curl -sS --fail \
             --max-time 120 \
-            https://api.anthropic.com/v1/messages \
-            -H "x-api-key: $ANTHROPIC_API_KEY" \
-            -H "anthropic-version: 2023-06-01" \
+            https://api.scaleway.ai/v1/chat/completions \
+            -H "Authorization: Bearer $SCW_SECRET_KEY" \
             -H "content-type: application/json" \
-            -d "$REQUEST") || fail_soft "Anthropic API call failed"
+            -d "$REQUEST") || fail_soft "Scaleway API call failed"
 
-          TEXT=$(echo "$RESPONSE" | jq -r '.content[0].text // empty') \
+          TEXT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty') \
             || fail_soft "could not read the API response"
           [ -n "$TEXT" ] || fail_soft "empty model response"
 
