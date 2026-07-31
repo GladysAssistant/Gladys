@@ -31,6 +31,13 @@
           - 'server/lib/gateway/gateway.getAiChatModels.js'
           - 'server/lib/gateway/gateway.getOpenAIQuota.js'
 
+'area:database':
+  - changed-files:
+      - any-glob-to-any-file:
+          # DB migrations run on every user install at upgrade: review carefully
+          - 'server/migrations/**'
+          - 'server/models/**'
+
 'area:infra':
   - changed-files:
       - any-glob-to-any-file:
