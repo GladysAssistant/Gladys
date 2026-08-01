@@ -1,5 +1,5 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
-const { BadParameters } = require('../../utils/coreErrors');
+const { BadParameters, NotFoundError } = require('../../utils/coreErrors');
 const { USER_ROLE } = require('../../utils/constants');
 
 // Manifest type of the integrations a non-admin user can act on: they link
@@ -19,11 +19,26 @@ function isAdmin(req) {
 }
 
 /**
+ * @description True when the integration is a communication integration, the
+ * only family a non-admin user has access to.
+ * @param {object} integration - The external integration.
+ * @returns {boolean} True for a communication integration.
+ * @example
+ * if (isCommunicationIntegration(integration)) { ... }
+ */
+function isCommunicationIntegration(integration) {
+  return Boolean(integration.manifest) && integration.manifest.type === COMMUNICATION_TYPE;
+}
+
+/**
  * @description Public view of an external integration, for a non-admin user.
  * A non-admin only needs to link their own account on a communication
- * integration: they get the display data of the manifest, never the
- * operational fields (docker image, container, webhook URLs which embed the
- * Gladys Plus Open API key...).
+ * integration: they get the display data (status + manifest, which is the
+ * public description published by the store), never the runtime fields of
+ * the install — the resolved `docker_image`, the containers state, and above
+ * all the webhook URLs, which embed the Gladys Plus Open API key. Note that
+ * the manifest itself carries the image reference published by the developer
+ * (`manifest.docker_image`): it is public store data, not an instance secret.
  * @param {object} integration - The external integration.
  * @returns {object} The reduced integration.
  * @example
@@ -66,11 +81,7 @@ module.exports = function ExternalIntegrationController(gladys) {
   async function getAll(req, res) {
     const integrations = await gladys.externalIntegration.get();
     if (!isAdmin(req)) {
-      res.json(
-        integrations
-          .filter((integration) => integration.manifest && integration.manifest.type === COMMUNICATION_TYPE)
-          .map(toNonAdminView),
-      );
+      res.json(integrations.filter(isCommunicationIntegration).map(toNonAdminView));
       return;
     }
     res.json(integrations);
@@ -83,11 +94,18 @@ module.exports = function ExternalIntegrationController(gladys) {
    * @apiDescription A non-admin user gets the reduced view (manifest and
    * status only): the account linking screen needs nothing more, and the
    * operational fields must not leak (the webhook URLs embed the Gladys
-   * Plus Open API key).
+   * Plus Open API key). A device integration answers the very same `404`
+   * as an unknown selector, the same rule as the list: probing selectors
+   * must not reveal an install a non-admin has no business seeing.
    */
   async function getBySelector(req, res) {
     const integration = await gladys.externalIntegration.getBySelector(req.params.selector);
     if (!isAdmin(req)) {
+      if (!isCommunicationIntegration(integration)) {
+        // the exact error of an unknown selector: a non-admin cannot tell
+        // "it exists but it is not for you" from "it does not exist"
+        throw new NotFoundError('EXTERNAL_INTEGRATION_NOT_FOUND');
+      }
       res.json(toNonAdminView(integration));
       return;
     }

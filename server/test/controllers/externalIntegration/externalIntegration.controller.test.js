@@ -775,9 +775,27 @@ describe('External integration admin API', () => {
       expect(res.body).to.not.have.property('docker_image');
     });
 
+    it('should refuse the detail of a device integration, as an unknown selector', async () => {
+      // probing selectors must not reveal an install a non-admin has no
+      // business seeing: same 404 as a selector that does not exist
+      const service = await seedExternalService();
+      const res = await nonAdminRequest.get(`/api/v1/external_integration/${service.selector}`).expect(404);
+      const unknownRes = await nonAdminRequest.get('/api/v1/external_integration/ext-unknown').expect(404);
+      expect(res.body).to.deep.equal(unknownRes.body);
+    });
+
     it('should refuse the shared configuration of the integration', async () => {
       const service = await seedCommunicationService();
       await nonAdminRequest.get(`/api/v1/external_integration/${service.selector}/config`).expect(403);
+    });
+
+    it('should refuse the store, the hardware detection and the device discovery', async () => {
+      const service = await seedCommunicationService();
+      await nonAdminRequest.get('/api/v1/external_integration/store').expect(403);
+      await nonAdminRequest.get('/api/v1/external_integration/store/docs?store_slug=john/demo').expect(403);
+      await nonAdminRequest.get('/api/v1/external_integration/hardware').expect(403);
+      await nonAdminRequest.get(`/api/v1/external_integration/${service.selector}/discovered_device`).expect(403);
+      await nonAdminRequest.post(`/api/v1/external_integration/${service.selector}/scan`).expect(403);
     });
 
     it('should still allow linking their own account', async () => {

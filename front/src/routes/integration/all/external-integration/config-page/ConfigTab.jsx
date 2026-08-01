@@ -40,7 +40,13 @@ const ConfigTab = props => {
 
   return (
     <div>
-      {(isAdmin || loadStatus === RequestStatus.Error) && (
+      {!isAdmin && loadStatus === RequestStatus.Error && (
+        <div class="alert alert-danger">
+          <Text id="integration.externalIntegration.config.loadError" />
+        </div>
+      )}
+
+      {isAdmin && (
         <div class="card">
           <div class="card-header">
             <h1 class="card-title">

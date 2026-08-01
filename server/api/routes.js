@@ -508,14 +508,17 @@ function getRoutes(gladys) {
     },
     'get /api/v1/external_integration/store': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.getStore,
     },
     'get /api/v1/external_integration/hardware': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.getHardware,
     },
     'get /api/v1/external_integration/store/docs': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.getStoreDocs,
     },
     'post /api/v1/external_integration/store/refresh': {
@@ -592,10 +595,12 @@ function getRoutes(gladys) {
     },
     'get /api/v1/external_integration/:selector/discovered_device': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.getDiscoveredDevices,
     },
     'post /api/v1/external_integration/:selector/scan': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.scan,
     },
     'get /api/v1/external_integration/:selector/config': {
