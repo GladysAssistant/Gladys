@@ -193,8 +193,8 @@ const AC_FAN_SPEED = {
 
 const AC_SWING_HORIZONTAL = {
   OFF: 0,
-  SAME: 1,
-  OPPOSITE: 2,
+  SWING: 1,
+  SWING_OPPOSITE: 2,
 };
 
 const AC_SWING_VERTICAL = {

@@ -7,8 +7,8 @@ import AdaptiveOptionControl from './AdaptiveOptionControl';
 
 const SWING_HORIZONTAL_OPTIONS = [
   { value: AC_SWING_HORIZONTAL.OFF, i18nKey: 'off' },
-  { value: AC_SWING_HORIZONTAL.SAME, i18nKey: 'same' },
-  { value: AC_SWING_HORIZONTAL.OPPOSITE, i18nKey: 'opposite' }
+  { value: AC_SWING_HORIZONTAL.SWING, i18nKey: 'swing' },
+  { value: AC_SWING_HORIZONTAL.SWING_OPPOSITE, i18nKey: 'swing-opposite' }
 ];
 
 const SWING_VERTICAL_OPTIONS = [

@@ -4190,8 +4190,8 @@
         },
         "swing-horizontal": {
           "off": "Aus",
-          "same": "Gleiche Richtung",
-          "opposite": "Entgegengesetzt"
+          "swing": "Schwenk",
+          "swing-opposite": "Gegenläufiger Schwenk"
         },
         "swing-vertical": {
           "off": "Aus",

@@ -4190,8 +4190,8 @@
         },
         "swing-horizontal": {
           "off": "Arrêt",
-          "same": "Même sens",
-          "opposite": "Sens opposé"
+          "swing": "Balancement",
+          "swing-opposite": "Balancement inversé"
         },
         "swing-vertical": {
           "off": "Arrêt",
