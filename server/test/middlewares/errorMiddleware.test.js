@@ -43,6 +43,70 @@ describe('errorMiddleware', () => {
     assert.calledWith(res.status, 400);
     assert.calledOnce(send);
   });
+  it('should return 422 with the context of the rejected field', async () => {
+    // @ts-ignore
+    const req = new MockExpressRequest({
+      method: 'POST',
+    });
+    const error = new Error('Validation failed');
+    error.name = 'SequelizeValidationError';
+    error.errors = [
+      {
+        message: 't_device_feature.min cannot be null',
+        path: 'min',
+        value: null,
+        type: 'notNull Violation',
+      },
+    ];
+    // @ts-ignore
+    error.gladysContext = 'Feature "Temperature"';
+
+    errorMiddleware(error, req, res, () => {
+      throw new Error('next should not be called');
+    });
+    assert.calledWith(res.status, 422);
+    const errorSent = send.getCall(0).args[0];
+    expect(errorSent.properties).to.deep.equal([
+      {
+        message: 't_device_feature.min cannot be null',
+        attribute: 'min',
+        value: null,
+        type: 'notNull Violation',
+        context: 'Feature "Temperature"',
+      },
+    ]);
+  });
+  it('should return 409 with the context of the conflicting field', async () => {
+    // @ts-ignore
+    const req = new MockExpressRequest({
+      method: 'POST',
+    });
+    const error = new Error('Unique constraint failed');
+    error.name = 'SequelizeUniqueConstraintError';
+    error.errors = [
+      {
+        message: 'external_id must be unique',
+        path: 'external_id',
+        value: 'ext:my-integration:1',
+        type: 'unique violation',
+      },
+    ];
+    // @ts-ignore
+    error.gladysContext = 'Feature "Temperature"';
+
+    errorMiddleware(error, req, res, () => {
+      throw new Error('next should not be called');
+    });
+    assert.calledWith(res.status, 409);
+    const errorSent = send.getCall(0).args[0];
+    expect(errorSent.error).to.deep.equal({
+      message: 'external_id must be unique',
+      attribute: 'external_id',
+      value: 'ext:my-integration:1',
+      type: 'unique violation',
+      context: 'Feature "Temperature"',
+    });
+  });
   it('should return 500 server error', async () => {
     // @ts-ignore
     const req = new MockExpressRequest({

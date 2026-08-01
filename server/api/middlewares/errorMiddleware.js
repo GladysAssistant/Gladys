@@ -36,6 +36,8 @@ module.exports = function errorMiddleware(error, req, res, next) {
         attribute: err.path,
         value: err.value,
         type: err.type,
+        // where the rejected field comes from (ex: the feature of a device)
+        context: error.gladysContext,
       });
     });
     responseError = new Error422(errorsArray);
@@ -45,6 +47,7 @@ module.exports = function errorMiddleware(error, req, res, next) {
       attribute: error.errors[0].path,
       value: error.errors[0].value,
       type: error.errors[0].type,
+      context: error.gladysContext,
     };
     responseError = new Error409(errorToReturn);
   } else if (error instanceof BadParameters) {
