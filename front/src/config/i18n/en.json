@@ -763,6 +763,9 @@
             "poll_frequency": "Poll frequency",
             "value": "Value"
           },
+          "contextTypes": {
+            "device_feature": "Feature \"{{name}}\""
+          },
           "fieldErrorTypes": {
             "notNullViolation": "required field not provided by the integration",
             "uniqueViolation": "value already used by another device or feature"

@@ -763,6 +763,9 @@
             "poll_frequency": "Fréquence d'interrogation",
             "value": "Valeur"
           },
+          "contextTypes": {
+            "device_feature": "Fonctionnalité « {{name}} »"
+          },
           "fieldErrorTypes": {
             "notNullViolation": "champ obligatoire non renseigné par l'intégration",
             "uniqueViolation": "valeur déjà utilisée par un autre appareil ou une autre fonctionnalité"

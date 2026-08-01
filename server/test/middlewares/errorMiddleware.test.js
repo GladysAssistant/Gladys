@@ -59,7 +59,7 @@ describe('errorMiddleware', () => {
       },
     ];
     // @ts-ignore
-    error.gladysContext = 'Feature "Temperature"';
+    error.gladysContext = { type: 'device_feature', name: 'Temperature' };
 
     errorMiddleware(error, req, res, () => {
       throw new Error('next should not be called');
@@ -72,7 +72,7 @@ describe('errorMiddleware', () => {
         attribute: 'min',
         value: null,
         type: 'notNull Violation',
-        context: 'Feature "Temperature"',
+        context: { type: 'device_feature', name: 'Temperature' },
       },
     ]);
   });
@@ -92,7 +92,7 @@ describe('errorMiddleware', () => {
       },
     ];
     // @ts-ignore
-    error.gladysContext = 'Feature "Temperature"';
+    error.gladysContext = { type: 'device_feature', name: 'Temperature' };
 
     errorMiddleware(error, req, res, () => {
       throw new Error('next should not be called');
@@ -104,8 +104,45 @@ describe('errorMiddleware', () => {
       attribute: 'external_id',
       value: 'ext:my-integration:1',
       type: 'unique violation',
-      context: 'Feature "Temperature"',
+      context: { type: 'device_feature', name: 'Temperature' },
     });
+  });
+  it('should omit the context key when the error carries none', async () => {
+    // @ts-ignore
+    const req = new MockExpressRequest({
+      method: 'POST',
+    });
+    const validationError = new Error('Validation failed');
+    validationError.name = 'SequelizeValidationError';
+    validationError.errors = [
+      {
+        message: 't_device.name cannot be null',
+        path: 'name',
+        value: null,
+        type: 'notNull Violation',
+      },
+    ];
+
+    errorMiddleware(validationError, req, res, () => {
+      throw new Error('next should not be called');
+    });
+    expect(send.getCall(0).args[0].properties[0]).to.not.have.property('context');
+
+    const conflictError = new Error('Unique constraint failed');
+    conflictError.name = 'SequelizeUniqueConstraintError';
+    conflictError.errors = [
+      {
+        message: 'selector must be unique',
+        path: 'selector',
+        value: 'living-room',
+        type: 'unique violation',
+      },
+    ];
+
+    errorMiddleware(conflictError, req, res, () => {
+      throw new Error('next should not be called');
+    });
+    expect(send.getCall(1).args[0].error).to.not.have.property('context');
   });
   it('should return 500 server error', async () => {
     // @ts-ignore

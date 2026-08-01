@@ -164,12 +164,14 @@ const toValidationError = property => {
   if (!property || typeof property !== 'object' || !property.attribute) {
     return null;
   }
+  // the API tags the offending entity ({ type: 'device_feature', name })
+  // when the rejected field belongs to a feature and not to the device itself.
+  // The wording is ours: the API only names the entity, never the sentence.
+  const context = property.context && property.context.name ? property.context : null;
   return {
     attribute: property.attribute,
     message: property.message || null,
-    // the API prefixes the offending feature ("Feature "Temperature"") when the
-    // rejected field belongs to a feature and not to the device itself
-    context: property.context || null,
+    context,
     typeKey: VALIDATION_TYPE_KEYS[property.type] || null
   };
 };

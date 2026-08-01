@@ -763,6 +763,9 @@
             "poll_frequency": "Abfrageintervall",
             "value": "Wert"
           },
+          "contextTypes": {
+            "device_feature": "Funktion \u201e{{name}}\u201c"
+          },
           "fieldErrorTypes": {
             "notNullViolation": "Pflichtfeld wurde von der Integration nicht gesetzt",
             "uniqueViolation": "Wert wird bereits von einem anderen Gerät oder einer anderen Funktion verwendet"

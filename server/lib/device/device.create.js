@@ -172,8 +172,10 @@ async function create(device) {
       } catch (e) {
         // A device can publish dozens of features: "min cannot be null" alone is
         // not actionable. We tag the error with the identity of the rejected
-        // feature, so the API (and the Discovery screen) can name it.
-        e.gladysContext = `Feature "${feature.name || feature.external_id}"`;
+        // feature, so the API (and the Discovery screen) can name it. The
+        // context stays structured: the wording is the frontend's job, it must
+        // be translated like the rest of the UI.
+        e.gladysContext = { type: 'device_feature', name: feature.name || feature.external_id || null };
         throw e;
       }
     });

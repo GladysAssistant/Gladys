@@ -17,8 +17,22 @@ const DeviceCreateErrorAlert = ({ errorMessage, errorDetail, validationErrors, i
           <Text id={`${PREFIX}.rejectedFieldsTitle`} />
           <ul class="mt-1 mb-0">
             {validationErrors.map(validationError => (
-              <li key={`${validationError.context || ''}-${validationError.attribute}-${validationError.message}`}>
-                {validationError.context && <span>{validationError.context} — </span>}
+              <li
+                key={`${validationError.context ? validationError.context.name : ''}-${validationError.attribute}-${
+                  validationError.message
+                }`}
+              >
+                {validationError.context && (
+                  <span>
+                    <Text
+                      id={`${PREFIX}.contextTypes.${validationError.context.type}`}
+                      fields={{ name: validationError.context.name }}
+                    >
+                      {validationError.context.name}
+                    </Text>
+                    {' — '}
+                  </span>
+                )}
                 <strong>
                   <Text id={`${PREFIX}.fieldLabels.${validationError.attribute}`}>{validationError.attribute}</Text>
                 </strong>
