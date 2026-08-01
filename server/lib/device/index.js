@@ -45,6 +45,7 @@ const { saveMultipleHistoricalStates } = require('./device.saveMultipleHistorica
 const { getOldestStateFromDeviceFeatures } = require('./device.getOldestStateFromDeviceFeatures');
 const { destroyParam } = require('./device.destroyParam');
 const { destroyStatesFrom } = require('./device.destroyStatesFrom');
+const { migrate } = require('./device.migrate');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -108,6 +109,8 @@ const DeviceManager = function DeviceManager(
     this.migrateFromSQLiteToDuckDb.bind(this),
   );
 
+  this.migrate = this.job.wrapper(JOB_TYPES.DEVICE_MIGRATE, this.migrate.bind(this));
+
   // listen to events
   this.eventManager.on(EVENTS.DEVICE.NEW_STATE, this.newStateEvent.bind(this));
   this.eventManager.on(EVENTS.DEVICE.NEW, eventFunctionWrapper(this.create.bind(this)));
@@ -168,5 +171,6 @@ DeviceManager.prototype.saveMultipleHistoricalStates = saveMultipleHistoricalSta
 DeviceManager.prototype.getOldestStateFromDeviceFeatures = getOldestStateFromDeviceFeatures;
 DeviceManager.prototype.destroyParam = destroyParam;
 DeviceManager.prototype.destroyStatesFrom = destroyStatesFrom;
+DeviceManager.prototype.migrate = migrate;
 
 module.exports = DeviceManager;

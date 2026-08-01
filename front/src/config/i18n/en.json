@@ -66,7 +66,25 @@
     "searchPlaceHolder": "Search devices",
     "noRoom": "No room",
     "noFeatures": "No features",
-    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>."
+    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>.",
+    "migrate": {
+      "button": "Migrate",
+      "modalTitle": "Migrate \"{{name}}\"",
+      "description": "Migrate this device to a device of another integration: its <b>state history</b>, the <b>scenes</b> and the <b>dashboards</b> referencing it will be moved to the destination device, then <b>this device will be deleted</b>. If both devices recorded states during the same period, only the history older than the destination's first state is moved, so nothing is counted twice.",
+      "destinationLabel": "Destination device",
+      "featuresTitle": "Feature matching",
+      "doNotMigrate": "Do not migrate",
+      "typeMismatchWarning": "This feature has a different type than the source feature: its history may not make sense once migrated.",
+      "unmappedWarning": "Some features are not matched: their history will be deleted, and the scenes and dashboards using them will not be updated.",
+      "noDestinationAvailable": "No device from another integration was found. Create the destination device in its new integration first, then come back here to migrate.",
+      "loadError": "Unable to load the list of devices. Please try again.",
+      "migrateError": "The migration failed. No device was deleted, you can safely try again.",
+      "networkError": "The connection was lost while the migration was running: it may still be running in background. Check the <a href=\"/dashboard/settings/jobs\">jobs page</a> and refresh the device list before trying again.",
+      "successText": "Migration complete! <b>{{states}}</b> historical states were moved, <b>{{scenes}}</b> scene(s) and <b>{{dashboards}}</b> dashboard(s) were updated. The old device has been deleted.",
+      "confirmButton": "Migrate and delete the old device",
+      "cancelButton": "Cancel",
+      "closeButton": "Close"
+    }
   },
   "login": {
     "title": "Gladys Assistant",

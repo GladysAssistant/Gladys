@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
 
 const PhilipsHuePage = ({ children, user }) => (
   <div class="page">
@@ -51,7 +52,10 @@ const PhilipsHuePage = ({ children, user }) => (
               </div>
             </div>
 
-            <div class="col-lg-9">{children}</div>
+            <div class="col-lg-9">
+              <DeprecationWarning />
+              {children}
+            </div>
           </div>
         </div>
       </div>

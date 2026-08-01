@@ -43,6 +43,7 @@ const DeviceTab = ({ children, ...props }) => (
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
+                  getPhilipsHueDevices={props.getPhilipsHueDevices}
                 />
               ))}
             {props.philipsHueDevices && props.philipsHueDevices.length === 0 && (

@@ -26,7 +26,8 @@
     "key": "philipsHue",
     "link": "philips-hue",
     "img": "/assets/integrations/cover/philips-hue.jpg",
-    "local": true
+    "local": true,
+    "deprecated": true
   },
   {
     "key": "tasmota",
@@ -38,7 +39,8 @@
     "link": "tp-link",
     "img": "/assets/integrations/cover/tp-link.jpg",
     "invertInDarkMode": true,
-    "local": true
+    "local": true,
+    "deprecated": true
   },
   {
     "key": "bluetooth",
