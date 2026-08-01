@@ -5,7 +5,7 @@ const WebSocket = require('ws');
 const path = require('path');
 const errorMiddleware = require('./middlewares/errorMiddleware');
 const notFoundMiddleware = require('./middlewares/notFoundMiddleware');
-const jsonBodyMiddleware = require('./middlewares/jsonBodyMiddleware');
+const { jsonBodyMiddleware } = require('./middlewares/jsonBodyMiddleware');
 const WebsocketManager = require('./websockets');
 const logger = require('../utils/logger');
 const { setupRoutes } = require('./setupRoutes');
@@ -27,8 +27,8 @@ function start(gladys, port, options) {
   // compress all response
   app.use(compression());
 
-  // parse json (bigger bound on the host API of external integrations,
-  // which is batch by construction)
+  // parse json (the host API of external integrations is parsed per route,
+  // behind its authentication, with a bigger bound)
   app.use(jsonBodyMiddleware);
 
   if (options.serveFront) {

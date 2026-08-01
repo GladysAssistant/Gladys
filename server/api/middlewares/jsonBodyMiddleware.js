@@ -22,8 +22,11 @@ const defaultJsonBodyParser = express.json({ limit: DEFAULT_JSON_BODY_LIMIT });
 const hostApiJsonBodyParser = express.json({ limit: HOST_API_JSON_BODY_LIMIT });
 
 /**
- * @description Parse the JSON body, with a bigger bound on the host API of
- * external integrations than on the routes serving the frontend.
+ * @description Parse the JSON body of the routes serving the frontend. The
+ * host API of external integrations is deliberately left out: its bigger
+ * bound is mounted per route, behind the integration authentication (see
+ * integrationHostJsonBodyMiddleware), so that an unauthenticated caller
+ * never gets the core to buffer anything on those paths.
  * @param {object} req - Express request.
  * @param {object} res - Express response.
  * @param {Function} next - Express next middleware.
@@ -33,9 +36,28 @@ const hostApiJsonBodyParser = express.json({ limit: HOST_API_JSON_BODY_LIMIT });
  */
 function jsonBodyMiddleware(req, res, next) {
   if (req.path.startsWith(HOST_API_PREFIX)) {
-    return hostApiJsonBodyParser(req, res, next);
+    return next();
   }
   return defaultJsonBodyParser(req, res, next);
 }
 
-module.exports = jsonBodyMiddleware;
+/**
+ * @description Parse the JSON body of the host API of external integrations,
+ * with the bigger bound its batch endpoints need. Mounted after the
+ * integration authentication: an unauthenticated request gets its 401
+ * without a single byte of body being read.
+ * @param {object} req - Express request.
+ * @param {object} res - Express response.
+ * @param {Function} next - Express next middleware.
+ * @returns {any} The result of the JSON body parser.
+ * @example
+ * router.post(path, externalIntegrationAuthMiddleware, integrationHostJsonBodyMiddleware, controller);
+ */
+function integrationHostJsonBodyMiddleware(req, res, next) {
+  return hostApiJsonBodyParser(req, res, next);
+}
+
+module.exports = {
+  jsonBodyMiddleware,
+  integrationHostJsonBodyMiddleware,
+};

@@ -315,6 +315,14 @@ describe('Integration host API', () => {
         .expect(200);
       expect(res.body).to.deep.equal({ success: true, count: 40 });
     });
+
+    it('should answer 413 over the host API body bound', async () => {
+      const res = await integrationRequest(token)
+        .post('/api/integration/v1/discovered_device')
+        .send({ padding: 'x'.repeat(5 * 1024 * 1024) })
+        .expect(413);
+      expect(res.body).to.have.property('code', 'PAYLOAD_TOO_LARGE');
+    });
   });
 
   describe('GET /api/integration/v1/device', () => {

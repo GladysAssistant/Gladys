@@ -14,9 +14,9 @@ describe('jsonBodyMiddleware', () => {
       .expect(413);
   });
 
-  it('should accept a body over 100 kB on the host API of external integrations', async () => {
-    // the body is parsed (no 413), the request then dies on authentication:
-    // the batch endpoints of the host API get a 5 MB bound
+  it('should not read the body of an unauthenticated host API request', async () => {
+    // the bigger bound of the host API is mounted behind the integration
+    // authentication: the request dies on the 401 without being buffered
     // @ts-ignore
     await request(TEST_BACKEND_APP)
       .post('/api/integration/v1/discovered_device')
