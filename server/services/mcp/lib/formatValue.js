@@ -23,11 +23,14 @@ const ONE_DAY_IN_MS = 24 * ONE_HOUR_IN_MS;
  * formatAge({ last_value_changed: new Date() }, Date.now());
  */
 function formatAge(feature, now) {
-  if (!feature.last_value_changed) {
+  const { last_value_changed: lastValueChanged } = feature;
+
+  // Only an absent value means "unknown": 0 is the Unix epoch, a valid date.
+  if (lastValueChanged === null || lastValueChanged === undefined) {
     return null;
   }
 
-  const lastValueChangedTimestamp = new Date(feature.last_value_changed).getTime();
+  const lastValueChangedTimestamp = new Date(lastValueChanged).getTime();
   if (Number.isNaN(lastValueChangedTimestamp)) {
     return null;
   }

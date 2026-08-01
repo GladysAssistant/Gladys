@@ -174,6 +174,19 @@ describe('formatValue', () => {
     ).to.eq(null);
   });
 
+  it('should treat a Unix epoch timestamp as a date, not as a missing value', () => {
+    const feature = {
+      category: 'humidity-sensor',
+      type: 'decimal',
+      last_value: 52,
+      unit: '%',
+      last_value_changed: 0,
+    };
+
+    expect(formatValue(feature, 0).age).to.eq('0min');
+    expect(formatValue(feature, new Date('1970-01-03T00:00:00.000Z').getTime()).age).to.eq('2d');
+  });
+
   it('should keep the age of a stale sensor that stopped reporting', () => {
     const now = new Date('2026-07-12T12:00:00.000Z').getTime();
     const feature = {
