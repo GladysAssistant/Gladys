@@ -15,13 +15,17 @@ describe('jsonBodyMiddleware', () => {
   });
 
   it('should not read the body of an unauthenticated host API request', async () => {
-    // the bigger bound of the host API is mounted behind the integration
-    // authentication: the request dies on the 401 without being buffered
+    // over the 5 MB bound of the host API on purpose: the request is
+    // answered 401 rather than 413, which is only possible if the parser is
+    // mounted behind the integration authentication and the body is never
+    // read. A payload under the bound would pass either way and would not
+    // catch a regression putting the parser back in front of the auth.
+    const overHostApiBound = { padding: 'x'.repeat(6 * 1024 * 1024) };
     // @ts-ignore
     await request(TEST_BACKEND_APP)
       .post('/api/integration/v1/discovered_device')
       .set('Accept', 'application/json')
-      .send(bigBody)
+      .send(overHostApiBound)
       .expect(401);
   });
 });
