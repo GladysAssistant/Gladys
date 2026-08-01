@@ -1,4 +1,5 @@
 const { triggersFunc } = require('./scene.triggers');
+const { buildTriggerEventScope } = require('./scene.buildTriggerEventScope');
 const logger = require('../../utils/logger');
 
 /**
@@ -36,7 +37,7 @@ function checkTrigger(event) {
           // if yes, we execute the scene
           if (conditionVerified) {
             this.execute(sceneSelector, {
-              triggerEvent: event,
+              triggerEvent: buildTriggerEventScope(event, this.stateManager),
             });
           }
         }
