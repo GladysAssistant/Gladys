@@ -99,10 +99,11 @@ async function backup(jobId) {
     // This connection will be closed after export to release memory
     const backupInstance = await db.duckDbCreateBackupInstance();
     try {
+      // ZSTD compresses better than GZIP and needs less memory during the export
       await backupInstance.allAsync(
         ` EXPORT DATABASE '${duckDbBackupFolderPath}' (
             FORMAT PARQUET,
-            COMPRESSION GZIP
+            COMPRESSION ZSTD
         )`,
       );
     } finally {
