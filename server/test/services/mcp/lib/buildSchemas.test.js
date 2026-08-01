@@ -1323,20 +1323,75 @@ describe('build schemas', () => {
       unit: 'kwh',
     });
     expect(invalidDateResult.content[0].text).to.eq(
-      'device.get-energy-consumption: start_date and end_date must be valid dates in YYYY-MM-DD format',
+      'device.get-energy-consumption: start_date and end_date must be in YYYY-MM-DD format, ' +
+        'with a month between 01 and 12 and a day between 01 and 31',
     );
 
-    // Calendar-invalid date that would roll over in the Date constructor.
-    const rolledOverDateResult = await energyTool.cb({
+    // Out-of-range month and day are still rejected.
+    const invalidMonthResult = await energyTool.cb({
       device: 'Prise onduleur',
-      start_date: '2026-02-30',
-      end_date: '2026-03-02',
+      start_date: '2026-13-01',
+      end_date: '2026-13-31',
       unit: 'kwh',
     });
-    expect(rolledOverDateResult.content[0].text).to.eq(
-      'device.get-energy-consumption: start_date and end_date must be valid dates in YYYY-MM-DD format',
-    );
+    expect(invalidMonthResult.content[0].text).to.contain('must be in YYYY-MM-DD format');
+    const invalidDayResult = await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-07-00',
+      end_date: '2026-07-32',
+      unit: 'kwh',
+    });
+    expect(invalidDayResult.content[0].text).to.contain('must be in YYYY-MM-DD format');
 
+    // February 29th on a non-leap year: the model means "end of February", the day
+    // is clamped to the last day of the month instead of failing the whole call.
+    getConsumptionByDates.resetHistory();
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [{ created_at: '2026-02-01T00:00:00.000Z', value: 12, sum_value: 12 }],
+      },
+    ]);
+    const clampedFebruaryResult = await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-02-01',
+      end_date: '2026-02-29',
+      unit: 'kwh',
+      group_by: 'month',
+    });
+    expect(getConsumptionByDates.callCount).to.eq(1);
+    expect(getConsumptionByDates.firstCall.args[1]).to.deep.equal({
+      from: new Date(2026, 1, 1),
+      to: new Date(2026, 2, 1),
+      group_by: 'month',
+      display_mode: 'kwh',
+    });
+    expect(clampedFebruaryResult.content[0].text).to.eq('toonmockdata');
+    // The effective period is echoed back, not the out-of-range input.
+    expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('2026-02-01');
+    expect(mcpHandler.toon.lastCall.args[0].end_date).to.eq('2026-02-28');
+
+    // Same clamping on a leap year keeps February 29th, and on a 30-day month.
+    getConsumptionByDates.resetHistory();
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2024-02-29',
+      end_date: '2024-04-31',
+      unit: 'kwh',
+    });
+    expect(getConsumptionByDates.firstCall.args[1]).to.deep.include({
+      from: new Date(2024, 1, 29),
+      to: new Date(2024, 4, 1),
+    });
+    expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('2024-02-29');
+    expect(mcpHandler.toon.lastCall.args[0].end_date).to.eq('2024-04-30');
+
+    getConsumptionByDates.resetHistory();
     const reversedDatesResult = await energyTool.cb({
       device: 'Prise onduleur',
       start_date: '2026-07-12',
