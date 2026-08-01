@@ -3539,11 +3539,18 @@
       "target": "Cible : {{device}} › {{feature}}",
       "statesCounts": "États à supprimer : {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agrégats",
       "statesCountsDone": "États supprimés : {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agrégats",
+      "migrationTarget": "Migration : {{source}} › {{destination}}",
       "steps": {
         "waiting_database": "En attente de la base de données…",
         "counting": "Calcul du nombre d'états…",
         "deleting_states": "Suppression des états…",
-        "deleting_aggregates": "Suppression des agrégats…"
+        "deleting_aggregates": "Suppression des agrégats…",
+        "moving_states": "Déplacement de l'historique d'états…",
+        "cleaning_sqlite": "Nettoyage des reliquats SQLite…",
+        "updating_references": "Mise à jour des références…",
+        "rewriting_scenes": "Réécriture des scènes…",
+        "rewriting_dashboards": "Réécriture des tableaux de bord…",
+        "deleting_source_device": "Suppression de l'ancien appareil…"
       },
       "orphanedStates": "États orphelins : {{count}}",
       "duration": "Durée : {{duration}}"

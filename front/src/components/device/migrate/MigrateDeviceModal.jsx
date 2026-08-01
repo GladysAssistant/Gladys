@@ -80,7 +80,9 @@ class MigrateDeviceModal extends Component {
   };
 
   // A source feature is auto-matched when exactly one unused destination
-  // feature has the same category and type
+  // feature has the same category, type and unit (values are moved without
+  // conversion, so a sole °F candidate must not be silently pre-selected
+  // for a °C source — the user can still pick it manually, with a warning)
   computeAutoMapping = destinationDevice => {
     const featuresMapping = {};
     const usedSelectors = new Set();
@@ -89,6 +91,7 @@ class MigrateDeviceModal extends Component {
         feature =>
           feature.category === sourceFeature.category &&
           feature.type === sourceFeature.type &&
+          (feature.unit || null) === (sourceFeature.unit || null) &&
           !usedSelectors.has(feature.selector)
       );
       if (candidates.length === 1) {
@@ -110,9 +113,12 @@ class MigrateDeviceModal extends Component {
   };
 
   migrate = async () => {
-    if (this.state.migrating) {
+    // Instance-level latch: setState is asynchronous, so two rapid clicks
+    // could both pass a state-based guard before the button disables
+    if (this.migrationInFlight) {
       return;
     }
+    this.migrationInFlight = true;
     this.setState({ migrating: true, migrateError: false, networkError: false });
     try {
       const report = await this.props.httpClient.post(`/api/v1/device/${this.props.device.selector}/migrate`, {
@@ -129,6 +135,8 @@ class MigrateDeviceModal extends Component {
       } else {
         this.setState({ migrateError: true, migrating: false });
       }
+    } finally {
+      this.migrationInFlight = false;
     }
   };
 

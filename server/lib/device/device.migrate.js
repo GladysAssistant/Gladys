@@ -370,16 +370,20 @@ async function executeMigration(selector, options, jobId) {
  * });
  */
 async function migrate(selector, options, jobId) {
-  // A migration deletes history: a concurrent run on the same source (e.g. a
-  // client-timeout retry) must be rejected, the job wrapper does not serialize.
-  if (this.migrationsInProgress.has(selector)) {
-    throw new ConflictError(`A migration is already in progress for device ${selector}`);
+  // A migration deletes history: a concurrent run touching the same source
+  // (e.g. a client-timeout retry) or the same destination (its feature
+  // snapshot would go stale mid-run) must be rejected — the job wrapper does
+  // not serialize anything.
+  const selectorsToLock = [selector, options.destination_device_selector].filter(Boolean);
+  const conflictingSelector = selectorsToLock.find((deviceSelector) => this.migrationsInProgress.has(deviceSelector));
+  if (conflictingSelector) {
+    throw new ConflictError(`A migration is already in progress for device ${conflictingSelector}`);
   }
-  this.migrationsInProgress.add(selector);
+  selectorsToLock.forEach((deviceSelector) => this.migrationsInProgress.add(deviceSelector));
   try {
     return await executeMigration.call(this, selector, options, jobId);
   } finally {
-    this.migrationsInProgress.delete(selector);
+    selectorsToLock.forEach((deviceSelector) => this.migrationsInProgress.delete(deviceSelector));
   }
 }
 

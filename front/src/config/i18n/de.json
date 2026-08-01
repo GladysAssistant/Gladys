@@ -3539,11 +3539,18 @@
       "target": "Ziel: {{device}} › {{feature}}",
       "statesCounts": "Zu löschende Zustände: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} Aggregate",
       "statesCountsDone": "Gelöschte Zustände: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} Aggregate",
+      "migrationTarget": "Migration: {{source}} › {{destination}}",
       "steps": {
         "waiting_database": "Warten auf die Datenbank…",
         "counting": "Zählen der Zustände…",
         "deleting_states": "Löschen der Zustände…",
-        "deleting_aggregates": "Löschen der Aggregate…"
+        "deleting_aggregates": "Löschen der Aggregate…",
+        "moving_states": "Verschieben des Zustandsverlaufs…",
+        "cleaning_sqlite": "Aufräumen der SQLite-Überreste…",
+        "updating_references": "Aktualisieren der Verweise…",
+        "rewriting_scenes": "Umschreiben der Szenen…",
+        "rewriting_dashboards": "Umschreiben der Dashboards…",
+        "deleting_source_device": "Löschen des alten Geräts…"
       },
       "orphanedStates": "Verwaiste Zustände: {{count}}",
       "duration": "Dauer: {{duration}}"

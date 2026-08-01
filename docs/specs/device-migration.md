@@ -33,7 +33,7 @@ Scoping decisions validated with the maintainer:
 ### B.1 Automatic feature matching (frontend)
 
 Matching is computed client-side in the migration modal (both devices' features are already loaded; no dedicated endpoint):
-- A source feature is **auto-matched** to a destination feature when exactly **one unused** destination feature has the same `(category, type)` pair. Matching is re-evaluated as the user edits: a destination feature already picked (manually or automatically) for another source feature is not proposed twice.
+- A source feature is **auto-matched** to a destination feature when exactly **one unused** destination feature has the same `(category, type, unit)` triple (null units compare equal). Unit equality is required for the *automatic* match only — values are moved without conversion, so a sole °F candidate must never be silently pre-selected for a °C source; the user can still map it manually and gets the unit warning. Matching is re-evaluated as the user edits: a destination feature already picked (manually or automatically) for another source feature is not proposed twice.
 - When zero or several candidates exist, the source feature starts **unmapped** and the user picks manually.
 - The manual dropdown lists **all** destination features (minus already-used ones), same-`type` candidates first; picking a feature with a different `type` shows a non-blocking warning (the history values may not be meaningful in the destination's unit).
 - The server does **not** re-derive the matching; it validates and applies the explicit mapping it receives (B.2).
@@ -42,7 +42,7 @@ Matching is computed client-side in the migration modal (both devices' features 
 
 `post /api/v1/device/:device_selector/migrate` (authenticated **and admin-only**: a migration deletes a device with its history and rewrites the dashboards of every user, which makes it an instance-wide operation like the other `admin: true` routes; the integration pages carrying the Migrate button are admin-only in the frontend anyway. Declared **before** `get /api/v1/device/:device_selector` following the existing literal-before-`:selector` precedent).
 
-**Concurrency**: two migrations of the same source device must never run at the same time (a client-timeout retry could otherwise start a second run while the first is still deleting history). The device manager keeps an in-memory set of in-flight source selectors; a second call for the same selector is rejected with a `409 Conflict` and no job side effects beyond the failed job row. In-memory is sufficient: Gladys is single-process.
+**Concurrency**: two migrations touching the same device must never run at the same time — same source (a client-timeout retry could otherwise start a second run while the first is still deleting history) or same destination (each run works from a snapshot of the destination features; a concurrent run would make it stale). The device manager keeps an in-memory set of in-flight selectors covering **both endpoints** of every running migration; a call touching a locked selector is rejected with a `409 Conflict` and no job side effects beyond the failed job row. In-memory is sufficient: Gladys is single-process.
 
 Request body:
 
@@ -87,6 +87,10 @@ Only scenes/dashboards that actually changed are saved. Rewritten scenes go thro
 ### B.4 Orchestration (`server/lib/device/device.migrate.js`)
 
 `DeviceManager.migrate(sourceSelector, { destination_device_selector, features_mapping })`, wrapped as a job (`JOB_TYPES.DEVICE_MIGRATE = 'device-migrate'`) for progress/visibility in the jobs page, **and** awaited by the controller (the HTTP response carries the final report). The device manager gets `sceneManager` by post-construction assignment in `server/lib/index.js` (existing precedent: `gateway.scene = scene`); dashboards have no RAM cache and are rewritten straight through `db.Dashboard` (deliberately bypassing the per-user scoping of `dashboard.update`: a migration is a whole-instance operation).
+
+The job's structured progress (`device_name`, `destination_device_name`, `step`) is **rendered by the jobs page**: `JobData.jsx` registers a `DEVICE_MIGRATE` renderer (same pattern as the purge jobs) and every step key has a `jobsSettings.jobData.steps.*` translation — the error/timeout copy sends users there, so the page must show more than a bare percentage.
+
+Known trade-off: each per-feature DuckDB `UPDATE` runs as a single statement on the serial write queue, so a feature with years of history briefly stalls live state inserts (same behavior as the other one-shot data moves). Acceptable for a one-off admin gesture; slicing by `created_at` ranges (purge-style) is the hardening lever if field feedback asks for it.
 
 Ordered steps (order is a contract — history first, then references, deletion last, so a failure leaves a re-runnable state):
 1. Load + validate (B.2).

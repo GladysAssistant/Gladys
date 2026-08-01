@@ -325,6 +325,16 @@ describe('Device.migrate', () => {
     await assert.isRejected(promise, 'A migration is already in progress for device migration-source');
   });
 
+  it('should reject a concurrent migration towards the same destination device', async () => {
+    // Another migration is running towards this destination: its feature
+    // snapshot would go stale if a second one started
+    deviceManager.migrationsInProgress.add('migration-destination');
+    const promise = deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+    });
+    await assert.isRejected(promise, 'A migration is already in progress for device migration-destination');
+  });
+
   it('should reject when the source device does not exist', async () => {
     const promise = deviceManager.migrate('does-not-exist', {
       destination_device_selector: 'migration-destination',
