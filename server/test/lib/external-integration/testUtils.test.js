@@ -95,9 +95,8 @@ const TEST_NOTIFICATION_MANIFEST = {
   ],
 };
 
-// Weather-provider fixture (B.18): answers the core's weather requests
-// over WebSocket and keeps the full device surface (a vigilance-level
-// sensor gives scene triggers for free).
+// Weather-provider fixture (B.18): a dedicated provider API — answers the
+// core's weather requests over WebSocket, no device screens.
 const TEST_WEATHER_MANIFEST = {
   manifest_version: 1,
   type: 'weather',

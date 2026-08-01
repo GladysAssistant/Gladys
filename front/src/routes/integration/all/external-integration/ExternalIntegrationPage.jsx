@@ -19,9 +19,10 @@ const getDisplayName = (selector, integration) => {
 };
 
 const ExternalIntegrationPage = ({ selector, integration, children }) => {
-  // communication integrations have no device screens: the generic page
+  // communication and weather integrations have no device screens (they are
+  // dedicated provider APIs, not device controllers): the generic page
   // branches by type and only shows Configuration and Logs
-  const isCommunication = get(integration, 'manifest.type') === 'communication';
+  const hasDeviceScreens = !['communication', 'weather'].includes(get(integration, 'manifest.type'));
   return (
     <div class="page">
       <div class="page-main">
@@ -32,7 +33,7 @@ const ExternalIntegrationPage = ({ selector, integration, children }) => {
                 <h3 class="page-title mb-5">{getDisplayName(selector, integration)}</h3>
                 <div>
                   <div class="list-group list-group-transparent mb-0">
-                    {!isCommunication && (
+                    {hasDeviceScreens && (
                       <Link
                         href={`/dashboard/integration/device/external/${selector}`}
                         activeClassName="active"
@@ -45,7 +46,7 @@ const ExternalIntegrationPage = ({ selector, integration, children }) => {
                       </Link>
                     )}
 
-                    {!isCommunication && (
+                    {hasDeviceScreens && (
                       <Link
                         href={`/dashboard/integration/device/external/${selector}/discover`}
                         activeClassName="active"

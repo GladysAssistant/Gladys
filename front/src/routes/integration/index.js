@@ -179,10 +179,10 @@ class Integration extends Component {
 
     const externalCards = [];
 
-    // a communication integration has no device screens: its card lands
-    // straight on the configuration screen
+    // communication and weather integrations have no device screens: their
+    // card lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
-      manifest.type === 'communication'
+      ['communication', 'weather'].includes(manifest.type)
         ? `/dashboard/integration/device/external/${selector}/config`
         : `/dashboard/integration/device/external/${selector}`;
 

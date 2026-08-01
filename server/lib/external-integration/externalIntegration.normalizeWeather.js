@@ -71,6 +71,61 @@ function copyOptionalNumbers(source, target, fields) {
 }
 
 /**
+ * @description Copy the optional date fields of an entry.
+ * @param {object} source - The raw entry sent by the integration.
+ * @param {object} target - The normalized entry.
+ * @param {Array<string>} fields - The optional date field names.
+ * @example
+ * copyOptionalDates(payload, current, ['sunrise', 'sunset']);
+ */
+function copyOptionalDates(source, target, fields) {
+  fields.forEach((field) => {
+    const date = toValidDate(source[field]);
+    if (date !== null) {
+      target[field] = date;
+    }
+  });
+}
+
+// The optional field whitelists of the pivot weather format (B.18), from
+// the generalization analysis of the market providers (OpenWeather One
+// Call, Météo France, Open-Meteo) and of the Home Assistant weather
+// entity model (the broadest abstraction in the field, ~40 providers).
+const CURRENT_OPTIONAL_NUMBERS = [
+  'apparent_temperature',
+  'humidity',
+  'pressure',
+  'dew_point',
+  'wind_speed',
+  'wind_direction',
+  'wind_gust',
+  'visibility',
+  'cloud_cover',
+  'uv_index',
+];
+const HOUR_OPTIONAL_NUMBERS = [
+  'apparent_temperature',
+  'humidity',
+  'pressure',
+  'wind_speed',
+  'wind_direction',
+  'wind_gust',
+  'cloud_cover',
+  'precipitation',
+  'precipitation_probability',
+  'uv_index',
+];
+const DAY_OPTIONAL_NUMBERS = [
+  'humidity',
+  'wind_speed',
+  'wind_direction',
+  'wind_gust',
+  'precipitation',
+  'precipitation_probability',
+  'uv_index',
+];
+
+/**
  * @description Normalize and bound the weather payload returned by a
  * "weather" external integration (B.18). The payload comes from unaudited
  * code: every field is whitelisted (anything unknown is dropped), numbers
@@ -102,13 +157,8 @@ function normalizeWeather(payload, units) {
     weather: toCondition(payload.weather),
     units: pivotUnits,
   };
-  copyOptionalNumbers(payload, weather, ['humidity', 'pressure', 'wind_speed', 'wind_direction', 'uv_index']);
-  ['sunrise', 'sunset'].forEach((field) => {
-    const date = toValidDate(payload[field]);
-    if (date !== null) {
-      weather[field] = date;
-    }
-  });
+  copyOptionalNumbers(payload, weather, CURRENT_OPTIONAL_NUMBERS);
+  copyOptionalDates(payload, weather, ['sunrise', 'sunset']);
   if (Array.isArray(payload.hours)) {
     weather.hours = [];
     payload.hours.slice(0, MAX_WEATHER_HOURS).forEach((rawHour) => {
@@ -126,13 +176,7 @@ function normalizeWeather(payload, units) {
         weather: toCondition(rawHour.weather),
         units: pivotUnits,
       };
-      copyOptionalNumbers(rawHour, hour, [
-        'humidity',
-        'pressure',
-        'wind_speed',
-        'wind_direction',
-        'precipitation_probability',
-      ]);
+      copyOptionalNumbers(rawHour, hour, HOUR_OPTIONAL_NUMBERS);
       weather.hours.push(hour);
     });
   }
@@ -156,7 +200,8 @@ function normalizeWeather(payload, units) {
       if (rawDay.weather !== undefined) {
         day.weather = toCondition(rawDay.weather);
       }
-      copyOptionalNumbers(rawDay, day, ['precipitation_probability']);
+      copyOptionalNumbers(rawDay, day, DAY_OPTIONAL_NUMBERS);
+      copyOptionalDates(rawDay, day, ['sunrise', 'sunset']);
       weather.days.push(day);
     });
   }
@@ -180,12 +225,7 @@ function normalizeWeather(payload, units) {
       if (typeof rawAlert.description === 'string' && rawAlert.description.trim().length > 0) {
         alert.description = rawAlert.description.trim().substring(0, MAX_WEATHER_ALERT_DESCRIPTION_LENGTH);
       }
-      ['start', 'end'].forEach((field) => {
-        const date = toValidDate(rawAlert[field]);
-        if (date !== null) {
-          alert[field] = date;
-        }
-      });
+      copyOptionalDates(rawAlert, alert, ['start', 'end']);
       weather.alerts.push(alert);
     });
   }
