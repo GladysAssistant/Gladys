@@ -66,7 +66,7 @@
     "searchPlaceHolder": "Chercher un appareil",
     "noRoom": "Sans pièce",
     "noFeatures": "Aucune fonctionnalité",
-    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil.",
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes ou quelques heures (selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil.",
     "migrate": {
       "button": "Migrer",
       "modalTitle": "Migrer « {{name}} »",
@@ -75,12 +75,13 @@
       "featuresTitle": "Correspondance des fonctionnalités",
       "doNotMigrate": "Ne pas migrer",
       "typeMismatchWarning": "Cette fonctionnalité a un type différent de la fonctionnalité source : son historique risque de ne plus avoir de sens une fois migré.",
+      "unitMismatchWarning": "Cette fonctionnalité a une unité différente de la fonctionnalité source : les valeurs sont déplacées sans conversion, les graphiques risquent de devenir incohérents.",
       "unmappedWarning": "Certaines fonctionnalités n'ont pas de correspondance : leur historique sera supprimé, et les scènes et tableaux de bord qui les utilisent ne seront pas mis à jour.",
       "noDestinationAvailable": "Aucun appareil d'une autre intégration n'a été trouvé. Créez d'abord l'appareil de destination dans sa nouvelle intégration, puis revenez ici pour migrer.",
       "loadError": "Impossible de charger la liste des appareils. Veuillez réessayer.",
-      "migrateError": "La migration a échoué. Aucun appareil n'a été supprimé, vous pouvez réessayer sans risque.",
+      "migrateError": "La migration a échoué. L'ancien appareil n'a pas été supprimé, mais une partie de l'historique a pu être déjà déplacée vers la destination. Vérifiez la page des tâches et votre liste d'appareils, puis réessayez : une nouvelle tentative ne migre que ce qu'il reste à migrer.",
       "networkError": "La connexion a été perdue pendant la migration : elle est peut-être toujours en cours en arrière-plan. Vérifiez la <a href=\"/dashboard/settings/jobs\">page des tâches</a> et rafraîchissez la liste des appareils avant de réessayer.",
-      "successText": "Migration terminée ! <b>{{states}}</b> états historiques ont été déplacés, <b>{{scenes}}</b> scène(s) et <b>{{dashboards}}</b> tableau(x) de bord ont été mis à jour. L'ancien appareil a été supprimé.",
+      "successText": "Migration terminée ! <b>{{states}}</b> états historiques ont été déplacés, <b>{{scenes}}</b> scène(s) et <b>{{dashboards}}</b> tableaux de bord ont été mis à jour. L'ancien appareil a été supprimé.",
       "confirmButton": "Migrer et supprimer l'ancien appareil",
       "cancelButton": "Annuler",
       "closeButton": "Fermer"
@@ -3548,6 +3549,7 @@
       "duration": "Durée : {{duration}}"
     },
     "jobTypes": {
+      "device-migrate": "Migration d'appareil",
       "monthly-device-state-aggregate": "Agrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Agrégation donnée capteur journalière",
       "hourly-device-state-aggregate": "Agrégation donnée capteur horaire",

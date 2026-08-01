@@ -231,6 +231,7 @@ function getRoutes(gladys) {
     },
     'post /api/v1/device/:device_selector/migrate': {
       authenticated: true,
+      admin: true,
       controller: deviceController.migrate,
     },
     'post /api/v1/device/:device_selector/:feature_category/:feature_type/value': {

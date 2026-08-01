@@ -23,6 +23,7 @@ Scoping decisions validated with the maintainer:
 | Dashboards (`t_dashboard.boxes`, selector strings) | **Rewritten** with the same replacement maps (field list in B.3). Selector replacement never changes array positions, so the positional companions (`device_feature_names`, `units`, `colors`) stay aligned by construction. |
 | Room | **Inherited only if the destination has none**: if `destination.room_id` is null and the source has a room, the destination moves into the source's room (keeps `devices-in-room` boxes and room-scoped features working). If the destination already has a room, it keeps it. |
 | `energy_parent_id` links (other features pointing at a source feature) | **Re-pointed** to the mapped destination feature. Links to unmapped source features are nulled by the existing FK `ON DELETE SET NULL`. |
+| Energy price contracts (`t_energy_price.electric_meter_device_id`, device FK, `ON DELETE SET NULL`) | **Re-pointed** to the destination device, unconditionally: without it, deleting the source meter would silently detach the contracts and cost charts would lose their meter. |
 | `last_value` / `last_value_string` / `last_value_changed` | **Copied only if fresher**: for each mapped pair, if the destination's `last_value_changed` is null or older than the source's, the source's three fields are copied so dashboards show a current value until the new integration publishes one. Otherwise untouched. |
 | Device params, `external_id`, selectors, names | **Never touched.** The destination device keeps its identity entirely; the migration moves data *about* the device, not the device definition. |
 | Source device | **Deleted** at the end via the standard `device.destroy` path (service `postDelete` hooks, cache eviction, poll deregistration, `EVENTS.DEVICE.DELETE` all fire normally). |
@@ -39,7 +40,9 @@ Matching is computed client-side in the migration modal (both devices' features 
 
 ### B.2 API contract
 
-`post /api/v1/device/:device_selector/migrate` (authenticated, non-admin like the other device routes; declared **before** `get /api/v1/device/:device_selector` follows the existing literal-before-`:selector` precedent).
+`post /api/v1/device/:device_selector/migrate` (authenticated **and admin-only**: a migration deletes a device with its history and rewrites the dashboards of every user, which makes it an instance-wide operation like the other `admin: true` routes; the integration pages carrying the Migrate button are admin-only in the frontend anyway. Declared **before** `get /api/v1/device/:device_selector` following the existing literal-before-`:selector` precedent).
+
+**Concurrency**: two migrations of the same source device must never run at the same time (a client-timeout retry could otherwise start a second run while the first is still deleting history). The device manager keeps an in-memory set of in-flight source selectors; a second call for the same selector is rejected with a `409 Conflict` and no job side effects beyond the failed job row. In-memory is sufficient: Gladys is single-process.
 
 Request body:
 
@@ -92,21 +95,23 @@ Ordered steps (order is a contract — history first, then references, deletion 
 4. One `CHECKPOINT` after all DuckDB writes (flushes the WAL, releases delete-tracking memory — same rationale as the purge).
 5. **SQLite leftovers**: single `DELETE` per source feature on `t_device_feature_state` and `t_device_feature_state_aggregate` (no batching: one-off migration gesture, indexed column; this also guarantees step 9 passes the destroy count check).
 6. **`last_value` copy** (freshness rule of section A) + **`energy_parent_id` re-point** for mapped pairs; refresh the affected feature rows in the state manager caches.
-7. **Room inheritance** (rule of section A); on change, refresh the destination device in caches and `notify(EVENTS.DEVICE.UPDATE)`.
+7. **`t_energy_price.electric_meter_device_id` re-point** (section A) then **room inheritance** (rule of section A); on room change, refresh the destination device in caches and `notify(EVENTS.DEVICE.UPDATE)`.
 8. **Rewrite scenes then dashboards** (B.3).
 9. **Destroy the source device** via `this.destroy(source.selector)` — standard semantics (hooks, caches, poll, notify).
 
-Failure modes: any throw before step 9 leaves both devices in place; the migration is re-runnable (already-moved rows simply stay on the destination; the cutoff rule makes re-running convergent). The job records the failure (`JOB_STATUS.FAILED` + error string) like every wrapped job. If the HTTP client times out mid-run, the server-side run continues; the result is visible in the jobs page and the device list reflects the outcome.
+Failure modes: any throw before step 9 leaves both devices in place; the migration is re-runnable (already-moved rows simply stay on the destination; the cutoff rule makes re-running convergent). The job records the failure (`JOB_STATUS.FAILED` + error string) like every wrapped job. If the HTTP client times out mid-run, the server-side run continues; the result is visible in the jobs page and the device list reflects the outcome (the in-flight guard of B.2 rejects a retry started while the first run is still going).
+
+**Atomicity — a deliberate non-goal.** DuckDB cannot join a SQLite transaction, so a migration can never be fully atomic; wrapping only the SQLite writes in a transaction would buy little (the irreversible part is the DuckDB history move) while forcing the scene rewrites out of the scene manager path that keeps the RAM cache in sync — a rollback would desynchronize RAM from DB. Instead the design leans on ordering and convergence: the only data irreversibly gone before the final destroy is history the user explicitly chose to drop (unmapped features) or overlap duplicates; every SQLite rewrite (scenes, dashboards, FKs, room) is idempotent; re-running after a mid-run failure converges to the same final state. The failure copy in the frontend reflects this honestly (some history may already have been moved; re-running only moves what remains).
 
 ### B.5 Frontend
 
 - **Shared components** in `front/src/components/device/migrate/`: `MigrateDeviceButton.jsx` (small button, `connect('httpClient')`-self-contained so it drops into both integration architectures) opening `MigrateDeviceModal.jsx`.
 - **Mounted on the device boxes** of the five deprecated integrations: `netatmo/NetatmoDeviceBox.jsx`, `melcloud/MELCloudDeviceBox.jsx`, `tuya` device box, `philips-hue/device-page/Device.jsx`, `tp-link/device-page/Device.jsx` — **only** on already-created devices (not on discovery items).
-- **Modal flow**: (1) pick the destination device — the modal loads `get /api/v1/device` and filters out the source device and its whole service, with a text filter; (2) feature mapping table pre-filled by the auto-matching (B.1), one row per source feature, each row a dropdown of remaining destination features plus "do not migrate"; unmapped rows and `type` mismatches show a warning; (3) recap ("history, scenes and dashboards will be migrated; the old device will be deleted") → confirm → spinner → success screen with the report counts, then the integration's device list refreshes. Network failure shows a "migration may still be running, check the jobs page" message (B.4).
+- **Modal flow**: (1) pick the destination device — the modal loads `get /api/v1/device` and filters out the source device and its whole service, with a text filter; (2) feature mapping table pre-filled by the auto-matching (B.1), one row per source feature, each row a dropdown of remaining destination features plus "do not migrate"; unmapped rows, `type` mismatches and `unit` mismatches (values are moved without conversion) show a warning; the confirm button is disabled while a migration is in flight (no double-submit); (3) recap ("history, scenes and dashboards will be migrated; the old device will be deleted") → confirm → spinner → success screen with the report counts, then the integration's device list refreshes. Network failure shows a "migration may still be running, check the jobs page" message (B.4).
 - **Catalog**: `deprecated: true` added to `philipsHue` and `tpLink` in `front/src/config/integrations/devices.json`; `DeprecationWarning` mounted in `PhilipsHuePage.jsx` and `TpLinkPage.jsx` (first child of the `col-lg-9` column, existing pattern).
 - **i18n**: new keys under `device.migrate.*` in `en.json`, `fr.json`, `de.json` (the three files stay line-parallel; `compare-translations` enforces key parity).
 
 ## Verification
 
 - Server unit tests (`server/test/lib/device/device.migrate.test.js` + controller test): cutoff semantics (destination with/without existing states), unmapped features, empty mapping, validation errors, scene rewriting incl. nested `if/then/else` and RAM resync, dashboard rewriting incl. positional-array preservation, room inheritance both ways, `energy_parent_id` re-point, `last_value` freshness rule, source deletion, report counts. 100% patch coverage (CI contract).
-- Front: eslint + `compare-translations` + build; Cypress specs on integration pages must stay green.
+- Front: `npm run prettier` + `npm run prettier-check` + eslint + `compare-translations` + build; Cypress specs on integration pages must stay green.

@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 const cloneDeep = require('lodash.clonedeep');
 const db = require('../../models');
 const logger = require('../../utils/logger');
-const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
+const { NotFoundError, BadParameters, ConflictError } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 
@@ -96,12 +96,9 @@ function rewriteItems(items, featureReplacements, deviceReplacements) {
  * @param {string} [jobId] - Id of the job (injected by the job wrapper).
  * @returns {Promise<object>} Resolve with the migration report.
  * @example
- * await device.migrate('old-device', {
- *   destination_device_selector: 'new-device',
- *   features_mapping: { 'old-device-temperature': 'new-device-temperature' },
- * });
+ * await executeMigration.call(deviceManager, 'old-device', { destination_device_selector: 'new-device' });
  */
-async function migrate(selector, options, jobId) {
+async function executeMigration(selector, options, jobId) {
   const destinationSelector = options.destination_device_selector;
   if (!destinationSelector) {
     throw new BadParameters('destination_device_selector is required');
@@ -261,6 +258,14 @@ async function migrate(selector, options, jobId) {
     }
   });
 
+  // Energy price contracts reference their meter by device FK (SET NULL on
+  // delete): re-point them, or destroying the source would silently detach
+  // the meter from the contracts and cost charts would lose their data.
+  await db.EnergyPrice.update(
+    { electric_meter_device_id: destination.id },
+    { where: { electric_meter_device_id: source.id } },
+  );
+
   // The destination inherits the source's room only when it has none.
   const roomInherited = destination.room_id === null && source.room_id !== null;
   if (roomInherited) {
@@ -347,6 +352,35 @@ async function migrate(selector, options, jobId) {
     scenes_updated: scenesUpdated,
     dashboards_updated: dashboardsUpdated,
   };
+}
+
+/**
+ * @description Migrate a device to another device, rejecting concurrent runs on the same source.
+ * See executeMigration above for the actual behavior, and docs/specs/device-migration.md for the contract.
+ * @param {string} selector - Selector of the source device.
+ * @param {object} options - Migration options.
+ * @param {string} options.destination_device_selector - Selector of the destination device.
+ * @param {object} [options.features_mapping] - Map of source feature selector to destination feature selector.
+ * @param {string} [jobId] - Id of the job (injected by the job wrapper).
+ * @returns {Promise<object>} Resolve with the migration report.
+ * @example
+ * await device.migrate('old-device', {
+ *   destination_device_selector: 'new-device',
+ *   features_mapping: { 'old-device-temperature': 'new-device-temperature' },
+ * });
+ */
+async function migrate(selector, options, jobId) {
+  // A migration deletes history: a concurrent run on the same source (e.g. a
+  // client-timeout retry) must be rejected, the job wrapper does not serialize.
+  if (this.migrationsInProgress.has(selector)) {
+    throw new ConflictError(`A migration is already in progress for device ${selector}`);
+  }
+  this.migrationsInProgress.add(selector);
+  try {
+    return await executeMigration.call(this, selector, options, jobId);
+  } finally {
+    this.migrationsInProgress.delete(selector);
+  }
 }
 
 module.exports = {

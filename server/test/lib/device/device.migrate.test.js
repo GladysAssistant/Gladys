@@ -96,6 +96,7 @@ describe('Device.migrate', () => {
   });
 
   afterEach(async () => {
+    await db.EnergyPrice.destroy({ where: { selector: 'migration-energy-price' } });
     await db.Scene.destroy({ where: { selector: ['migration-scene', 'migration-scene-untouched'] } });
     await db.Dashboard.destroy({ where: { selector: 'migration-dashboard' } });
     await db.Device.destroy({ where: { selector: ['migration-source', 'migration-destination', 'migration-child'] } });
@@ -128,6 +129,17 @@ describe('Device.migrate', () => {
         energy_parent_id: sourceTempFeature.id,
       }),
     );
+    // Energy price contract using the source device as electric meter
+    const energyPrice = await db.EnergyPrice.create({
+      name: 'Migration energy price',
+      selector: 'migration-energy-price',
+      start_date: '2024-01-01',
+      contract: 'base',
+      price_type: 'consumption',
+      price: 2000,
+      currency: 'EUR',
+      electric_meter_device_id: sourceDevice.id,
+    });
     const scene = await db.Scene.create({
       name: 'Migration scene',
       selector: 'migration-scene',
@@ -204,6 +216,9 @@ describe('Device.migrate', () => {
     // Energy child re-pointed to the destination feature
     const refreshedChild = await db.DeviceFeature.findOne({ where: { id: childFeature.id } });
     expect(refreshedChild.energy_parent_id).to.equal(destinationTempFeature.id);
+    // Energy price contract re-pointed to the destination device
+    const refreshedEnergyPrice = await db.EnergyPrice.findOne({ where: { id: energyPrice.id } });
+    expect(refreshedEnergyPrice.electric_meter_device_id).to.equal(destinationDevice.id);
     // Scene rewritten through the scene manager (RAM resync path)
     sinonAssert.calledOnceWithExactly(sceneManagerFake.update, 'migration-scene', {
       actions: [
@@ -243,6 +258,8 @@ describe('Device.migrate', () => {
       { last_value: 25, last_value_changed: new Date('2025-01-01T00:00:00.000Z') },
       { where: { id: destinationTempFeature.id } },
     );
+    // The source binary feature has no last_value_changed: nothing must be copied
+    await db.DeviceFeature.update({ last_value: 1 }, { where: { selector: 'migration-destination-binary' } });
     await db.duckDbBatchInsertState(sourceTempFeature.id, [
       { value: 20, created_at: new Date('2024-01-01T00:00:00.000Z') },
       { value: 21, created_at: new Date('2024-03-01T00:00:00.000Z') },
@@ -255,7 +272,10 @@ describe('Device.migrate', () => {
 
     const result = await deviceManager.migrate('migration-source', {
       destination_device_selector: 'migration-destination',
-      features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+      features_mapping: {
+        'migration-source-temp': 'migration-destination-temp',
+        'migration-source-binary': 'migration-destination-binary',
+      },
     });
 
     // Only the state older than 2024-02-01 moved; overlap states deleted
@@ -265,6 +285,9 @@ describe('Device.migrate', () => {
     // Destination is fresher: last value not overwritten
     const refreshedFeature = await db.DeviceFeature.findOne({ where: { id: destinationTempFeature.id } });
     expect(refreshedFeature.last_value).to.equal(25);
+    // Source binary has no last_value_changed: destination binary untouched
+    const refreshedBinary = await db.DeviceFeature.findOne({ where: { selector: 'migration-destination-binary' } });
+    expect(refreshedBinary.last_value).to.equal(1);
     // Destination already had a room: kept
     const refreshedDestination = await db.Device.findOne({ where: { id: destinationDevice.id } });
     expect(refreshedDestination.room_id).to.equal(SEEDED_ROOM_ID);
@@ -283,11 +306,23 @@ describe('Device.migrate', () => {
       dashboards_updated: [],
     });
     expect(await db.Device.findOne({ where: { selector: 'migration-source' } })).to.equal(null);
+    // The in-flight guard must be released after a successful run
+    expect(deviceManager.migrationsInProgress.size).to.equal(0);
   });
 
   it('should reject when destination_device_selector is missing', async () => {
     const promise = deviceManager.migrate('migration-source', {});
     await assert.isRejected(promise, 'destination_device_selector is required');
+    // The in-flight guard must be released even after a failed run
+    expect(deviceManager.migrationsInProgress.size).to.equal(0);
+  });
+
+  it('should reject a concurrent migration of the same source device', async () => {
+    deviceManager.migrationsInProgress.add('migration-source');
+    const promise = deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+    });
+    await assert.isRejected(promise, 'A migration is already in progress for device migration-source');
   });
 
   it('should reject when the source device does not exist', async () => {

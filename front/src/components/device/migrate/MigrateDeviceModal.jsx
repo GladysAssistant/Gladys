@@ -43,6 +43,11 @@ class MigrateDeviceModal extends Component {
   };
 
   close = () => {
+    // Covers all close paths (X, Escape, overlay, Cancel): while a migration
+    // is in flight, dismissing the modal would leave the request running blind
+    if (this.state.migrating) {
+      return;
+    }
     // Once the migration succeeded, closing the modal must refresh the device list
     if (this.state.report && this.props.onMigrated) {
       this.props.onMigrated();
@@ -105,6 +110,9 @@ class MigrateDeviceModal extends Component {
   };
 
   migrate = async () => {
+    if (this.state.migrating) {
+      return;
+    }
     this.setState({ migrating: true, migrateError: false, networkError: false });
     try {
       const report = await this.props.httpClient.post(`/api/v1/device/${this.props.device.selector}/migrate`, {
@@ -148,6 +156,10 @@ class MigrateDeviceModal extends Component {
     ];
     const selectedFeature = destinationDevice.features.find(feature => feature.selector === selectedSelector);
     const typeMismatch = selectedFeature && selectedFeature.type !== sourceFeature.type;
+    // History is moved as raw numbers with no conversion: a different unit
+    // (e.g. celsius vs fahrenheit) corrupts charts even when the type matches
+    const unitMismatch =
+      selectedFeature && !typeMismatch && (selectedFeature.unit || null) !== (sourceFeature.unit || null);
     return (
       <div class="form-group">
         <label class="form-label">{this.getFeatureLabel(sourceFeature)}</label>
@@ -164,6 +176,11 @@ class MigrateDeviceModal extends Component {
         {typeMismatch && (
           <small class="text-warning">
             <Text id="device.migrate.typeMismatchWarning" />
+          </small>
+        )}
+        {unitMismatch && (
+          <small class="text-warning">
+            <Text id="device.migrate.unitMismatchWarning" />
           </small>
         )}
       </div>
@@ -275,7 +292,11 @@ class MigrateDeviceModal extends Component {
                         </div>
                       )}
                       <div class="form-group mb-0">
-                        <button class="btn btn-primary mr-2" onClick={this.migrate} disabled={!destinationDevice}>
+                        <button
+                          class="btn btn-primary mr-2"
+                          onClick={this.migrate}
+                          disabled={!destinationDevice || migrating}
+                        >
                           <Text id="device.migrate.confirmButton" />
                         </button>
                         <button class="btn btn-secondary" onClick={this.close}>

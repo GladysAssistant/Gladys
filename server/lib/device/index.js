@@ -110,6 +110,9 @@ const DeviceManager = function DeviceManager(
   );
 
   this.migrate = this.job.wrapper(JOB_TYPES.DEVICE_MIGRATE, this.migrate.bind(this));
+  // Selectors of devices with a migration in flight, to reject concurrent
+  // migrations of the same source (e.g. a client-timeout retry)
+  this.migrationsInProgress = new Set();
 
   // listen to events
   this.eventManager.on(EVENTS.DEVICE.NEW_STATE, this.newStateEvent.bind(this));
