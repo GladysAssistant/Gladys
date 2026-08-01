@@ -11,18 +11,19 @@ function getDeviceFeatureName(exposed, zwaveNodeValue) {
   // For example: "6-50-1-65537" will be replaced by "6-50-1-Electric_kWh_Consumed"
   const { propertyKey, propertyKeyName } = zwaveNodeValue;
 
-  let name = `${zwaveNodeValue.id}${exposed.name !== '' ? `:${exposed.name}` : ''}`;
+  let baseName = `${zwaveNodeValue.id}`;
 
   // The propertyKey is always the trailing segment of the id, so the replacement is
-  // anchored there. A plain string replace would match the first occurrence instead,
-  // which can collide with digits earlier in the id (e.g. propertyKey "1" wrongly
-  // matching the "1" in node id "16").
+  // anchored there, before the exposed feature name (if any) gets appended. A plain
+  // string replace would match the first occurrence instead, which can collide with
+  // digits earlier in the id (e.g. propertyKey "1" wrongly matching the "1" in node
+  // id "16").
   const propertyKeyStr = propertyKey !== null && propertyKey !== undefined ? String(propertyKey) : '';
-  if (propertyKeyStr && propertyKeyName !== propertyKey && propertyKeyName && name.endsWith(propertyKeyStr)) {
-    name = `${name.slice(0, name.length - propertyKeyStr.length)}${propertyKeyName}`;
+  if (propertyKeyStr && propertyKeyName !== propertyKey && propertyKeyName && baseName.endsWith(propertyKeyStr)) {
+    baseName = `${baseName.slice(0, baseName.length - propertyKeyStr.length)}${propertyKeyName}`;
   }
 
-  return name;
+  return `${baseName}${exposed.name !== '' ? `:${exposed.name}` : ''}`;
 }
 
 module.exports = {

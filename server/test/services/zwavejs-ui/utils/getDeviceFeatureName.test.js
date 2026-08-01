@@ -77,6 +77,21 @@ describe('zwaveJSUIHandler.getDeviceFeatureName', () => {
     expect(name).equals('16-67-1-setpoint-Energy Save Heating');
   });
 
+  it('should still replace the propertyKey when an exposed feature name is also appended', () => {
+    // Regression test: the replacement must happen on the raw id before the
+    // ":${exposed.name}" suffix is appended, otherwise the id never ends with
+    // the propertyKey anymore and the replacement silently never fires.
+    const name = getDeviceFeatureName(
+      { name: 'target' },
+      {
+        id: '16-67-1-setpoint-1',
+        propertyKey: 1,
+        propertyKeyName: 'Heating',
+      },
+    );
+    expect(name).equals('16-67-1-setpoint-Heating:target');
+  });
+
   it('should not replace anything when propertyKey and propertyKeyName are equal', () => {
     const name = getDeviceFeatureName(
       { name: '' },

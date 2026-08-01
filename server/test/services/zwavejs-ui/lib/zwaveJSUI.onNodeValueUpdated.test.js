@@ -1836,6 +1836,28 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     });
   });
 
+  it('should not fail on unsupported thermostat operating state value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [thermostatDevice];
+    zwaveJSUIHandler.zwaveJSDevices = [thermostatZwaveJSDevice];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 16 },
+        {
+          commandClassName: 'Thermostat Operating State',
+          commandClass: 66,
+          property: 'state',
+          propertyName: 'state',
+          endpoint: 1,
+          prevValue: 0,
+          newValue: 99,
+        },
+      ],
+    });
+    assert.notCalled(gladys.event.emit);
+  });
+
   [
     { propertyKeyName: 'Heating', externalId: 'zwavejs-ui:16:1:thermostat_setpoint:setpoint:heating' },
     { propertyKeyName: 'Cooling', externalId: 'zwavejs-ui:16:1:thermostat_setpoint:setpoint:cooling' },

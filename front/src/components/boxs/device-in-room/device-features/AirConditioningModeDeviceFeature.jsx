@@ -24,8 +24,16 @@ const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
     modes = [...supportedOptions].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
   } else {
     // Legacy features without supported_options: auto/cool/heat, plus
-    // dry/fan when the feature range covers them
-    modes = [AC_MODE.AUTO, AC_MODE.COOLING, AC_MODE.HEATING, AC_MODE.DRYING, AC_MODE.FAN]
+    // dry/fan/off/energy heat when the feature range covers them
+    modes = [
+      AC_MODE.AUTO,
+      AC_MODE.COOLING,
+      AC_MODE.HEATING,
+      AC_MODE.DRYING,
+      AC_MODE.FAN,
+      AC_MODE.OFF,
+      AC_MODE.ENERGY_HEAT
+    ]
       .filter(mode => mode <= AC_MODE.HEATING || mode <= deviceFeature.max)
       .map(mode => ({ value: mode }));
   }
