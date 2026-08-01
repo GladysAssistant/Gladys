@@ -91,16 +91,23 @@ describe('externalIntegration.waitForConnection', () => {
 
 describe('externalIntegration message relay at boot', () => {
   it('should send the message once the integration has authenticated', async () => {
-    const { externalIntegration, stateManager, variable } = buildSupervisor();
+    const { externalIntegration, stateManager } = buildSupervisor();
     const service = await seedCommunicationService();
-    await variable.setValue(CONTACT_VARIABLE, JSON.stringify({ contact_id: 'signal-12345' }), service.id, JOHN_USER_ID);
     externalIntegration.registerProxyService(service);
     const proxyService = stateManager.get('service', service.name);
     const timer = openStartupWindow(externalIntegration, service);
     externalIntegration.sendCommand = fake.resolves({ success: true });
+    // the contact lookup is stubbed so the relay reaches waitForConnection in
+    // one microtask: the test deterministically exercises the wait path, not
+    // the already-connected fast path
+    externalIntegration.getContactForUser = fake.resolves({ contact_id: 'signal-12345' });
     // the "Gladys just upgraded" notification, forwarded while the
     // container is still booting
     const sending = proxyService.message.sendToUser({ id: JOHN_USER_ID }, { text: 'Gladys just upgraded' });
+    await Promise.resolve();
+    // the message is genuinely waiting: one registered waiter, nothing sent
+    expect(externalIntegration.connectionWaiters.get(service.id).size).to.equal(1);
+    assert.notCalled(externalIntegration.sendCommand);
     const ws = buildFakeWs();
     await externalIntegration.integrationConnected(service, ws);
     await sending;

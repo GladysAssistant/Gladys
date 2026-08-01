@@ -1,4 +1,3 @@
-const logger = require('../utils/logger');
 const { generateJwtSecret } = require('../utils/jwtSecret');
 const { Cache } = require('../utils/cache');
 const getConfig = require('../utils/getConfig');
@@ -207,15 +206,9 @@ function Gladys(params = {}) {
         // server is listening — which happens after this boot sequence
         // resolves. Blocking here would make the notification wait for a
         // connection that cannot happen yet (and the server wait for the
-        // notification).
-        const notifyGladysUpgraded = async () => {
-          try {
-            await system.checkIfGladysUpgraded(gateway);
-          } catch (e) {
-            logger.error(e);
-          }
-        };
-        notifyGladysUpgraded();
+        // notification). checkIfGladysUpgraded catches its own errors and
+        // never rejects, so the promise can safely float.
+        system.checkIfGladysUpgraded(gateway);
       }
 
       event.emit(EVENTS.TRIGGERS.CHECK, {
