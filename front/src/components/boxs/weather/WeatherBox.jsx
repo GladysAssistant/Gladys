@@ -26,6 +26,16 @@ const padding = {
 
 const BOX_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
 
+// CAP-style severities of the generic weather format, mapped to the
+// Météo France vigilance color language (minor = blue, moderate = yellow,
+// severe = orange, extreme = red)
+const ALERT_SEVERITY_COLORS = {
+  minor: '#45aaf2',
+  moderate: '#f1c40f',
+  severe: '#fd9644',
+  extreme: '#e74c3c'
+};
+
 const WeatherBox = ({ children, ...props }) => (
   <div class="card">
     {props.boxStatus === GetWeatherStatus.HouseHasNoCoordinates && (
@@ -93,7 +103,7 @@ const WeatherBox = ({ children, ...props }) => (
             <i class="fe fe-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.requestToThirdPartyFailed" />{' '}
-              <Link href="/dashboard/integration/weather/openweather">
+              <Link href="/dashboard/integration/weather">
                 <Text id="dashboard.boxes.weather.clickHere" />
               </Link>
             </span>
@@ -111,6 +121,29 @@ const WeatherBox = ({ children, ...props }) => (
         >
           {`${props.datetimeBeautiful} - ${props.houseName}`}
         </div>
+        {props.alerts && props.alerts.length > 0 && (
+          <div
+            style={{
+              marginTop: '0.25em',
+              marginBottom: '0.25em'
+            }}
+          >
+            {props.alerts.map(alert => (
+              <span
+                class="badge"
+                style={{
+                  backgroundColor: ALERT_SEVERITY_COLORS[alert.severity],
+                  color: 'white',
+                  marginRight: '0.25em'
+                }}
+                title={alert.description || alert.event}
+              >
+                <i class="fe fe-alert-triangle mr-1" />
+                {alert.event}
+              </span>
+            ))}
+          </div>
+        )}
         <div class="row">
           <div class="col-9">
             <div
@@ -188,6 +221,42 @@ const WeatherBox = ({ children, ...props }) => (
             </span>
           </div>
         )}
+        {props.display_mode[GetWeatherModes.AdvancedWeather] &&
+          (props.sunrise || props.sunset || props.uvIndex !== undefined) && (
+            <div className="col-12 p-0" style={{ marginTop: '0.25em' }}>
+              {props.sunrise && (
+                <span>
+                  <i
+                    class="fe fe-sunrise"
+                    style={{
+                      paddingRight: '5px'
+                    }}
+                  />
+                  {props.sunrise}
+                </span>
+              )}
+              {props.sunset && (
+                <span
+                  style={{
+                    marginLeft: '1em'
+                  }}
+                >
+                  <i
+                    class="fe fe-sunset"
+                    style={{
+                      paddingRight: '5px'
+                    }}
+                  />
+                  {props.sunset}
+                </span>
+              )}
+              {props.uvIndex !== undefined && (
+                <span className="float-right">
+                  <Text id="dashboard.boxes.weather.uv" /> {props.uvIndex}
+                </span>
+              )}
+            </div>
+          )}
         {props.display_mode[GetWeatherModes.HourlyForecast] && (
           <div>
             <div
@@ -252,6 +321,11 @@ class WeatherBoxComponent extends Component {
 
     const weather = get(weatherObject, 'weather');
     const weatherIcon = get(weatherObject, 'weatherIcon');
+    // optional fields of the generic weather format
+    const alerts = get(weatherObject, 'alerts');
+    const sunrise = get(weatherObject, 'sunrise_beautiful');
+    const sunset = get(weatherObject, 'sunset_beautiful');
+    const uvIndex = get(weatherObject, 'uv_index');
 
     let humidity, wind, hoursDisplay, daysDisplay;
     if (displayMode[GetWeatherModes.AdvancedWeather]) {
@@ -296,7 +370,7 @@ class WeatherBoxComponent extends Component {
                   .format('dddd')}
               </div>
               <div className="col-3">
-                <i className={cx('fe', day.weatherIcon)} style={{ fontSize: '20px' }} />
+                {day.weatherIcon && <i className={cx('fe', day.weatherIcon)} style={{ fontSize: '20px' }} />}
               </div>
               <div className="col-4" style={{ textAlign: 'right' }}>
                 <Text
@@ -324,6 +398,10 @@ class WeatherBoxComponent extends Component {
         days_display={daysDisplay}
         humidity={humidity}
         wind={wind}
+        alerts={alerts}
+        sunrise={sunrise}
+        sunset={sunset}
+        uvIndex={uvIndex}
         display_mode={displayMode}
       />
     );

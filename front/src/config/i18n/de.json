@@ -309,9 +309,9 @@
       "weather": {
         "editHouseLabel": "Wähle ein Zuhause aus. Ich werde seine Breiten- und Längengrade verwenden, um das Wetter abzurufen.",
         "houseHasNoCoordinates": "Dein Zuhause hat keine definierten Koordinaten. Gehe zu den Gladys-Parametern, um die Position deines Zuhause zu definieren.",
-        "serviceNotConfigured": "Der OpenWeather-Dienst ist nicht konfiguriert. Gehe zum Tab \"Integrationen\" und konfiguriere den OpenWeather-Dienst.",
-        "requestToThirdPartyFailed": "Die Anfrage an die OpenWeather-API ist fehlgeschlagen. Ist dein Gladys mit dem Internet verbunden? Gehe zum OpenWeather-Konfigurationspanel, um das Problem zu beheben.",
-        "clickHere": "Klicke hier, um zum OpenWeather-Konfigurationspanel zu gelangen.",
+        "serviceNotConfigured": "Es ist kein Wetterdienst konfiguriert. Gehe zum Tab \"Integrationen\" und konfiguriere eine Wetter-Integration (OpenWeather oder eine Wetter-Integration aus dem Store).",
+        "requestToThirdPartyFailed": "Die Anfrage an den Wetteranbieter ist fehlgeschlagen. Ist dein Gladys mit dem Internet verbunden? Gehe zum Panel der Wetter-Integrationen, um das Problem zu beheben.",
+        "clickHere": "Klicke hier, um zu den Wetter-Integrationen zu gelangen.",
         "unknownError": "Wir können das Wetter für dieses Zuhause nicht abrufen. Hast du für diese Box ein Zuhause definiert?",
         "editModeLabel": "Wähle den Anzeigemodus aus:",
         "displayModes": {
@@ -319,7 +319,8 @@
           "hourlyForecast": "Vorhersage für die nächsten 24 Stunden",
           "dailyForecast": "Vorhersage für die nächsten 5 Tage"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "minMaxDegreeValue": "{{min}}°/{{max}}°",
+        "uv": "UV"
       },
       "devicesInRoom": {
         "editRoomLabel": "Wähle den Raum aus, den du hier anzeigen möchtest.",
@@ -764,7 +765,7 @@
             "value": "Wert"
           },
           "contextTypes": {
-            "device_feature": "Funktion \u201e{{name}}\u201c"
+            "device_feature": "Funktion „{{name}}“"
           },
           "fieldErrorTypes": {
             "notNullViolation": "Pflichtfeld wurde von der Integration nicht gesetzt",
@@ -797,7 +798,8 @@
         "duplicateWarningText": "„{name}“ scheint eine weitere Instanz dieser Integration zu sein. Zwei Instanzen können sich um dasselbe Cloud-Konto oder dieselben Geräte streiten — stoppen Sie die bestehende Instanz während Ihrer Tests. Die Installation ist dennoch möglich (z. B. eine Dev-Version neben der Produktion).",
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
-        "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie)."
+        "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
+        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",

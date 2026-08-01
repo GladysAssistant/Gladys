@@ -234,6 +234,13 @@ class ExternalIntegrationInstallPage extends Component {
                               </div>
                             )}
 
+                            {manifest.type === 'weather' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-cloud mr-1" />
+                                <Text id="integration.externalIntegration.install.weatherInfoText" />
+                              </div>
+                            )}
+
                             {containers.length > 0 && (
                               <SubContainersSummary containers={containers} language={language} />
                             )}

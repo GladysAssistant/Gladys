@@ -135,6 +135,37 @@ const MAX_CAMERA_IMAGE_SIZE = 150 * 1024;
 // on-demand fresh image (dashboard live view): an ffmpeg capture can be
 // slow, this is the second exception to the 5s ack rule
 const CAMERA_GET_IMAGE_TIMEOUT_MS = 15 * 1000;
+// Weather providers (B.18): weather.get triggers a fresh third-party API
+// call from the integration, same exception to the 5s ack rule as the
+// camera image.
+const WEATHER_GET_TIMEOUT_MS = 15 * 1000;
+// Bounds of the normalized pivot weather format (B.18): the payload comes
+// from unaudited code, everything is whitelisted, coerced and capped
+// before entering the core.
+const MAX_WEATHER_HOURS = 24;
+const MAX_WEATHER_DAYS = 8;
+const MAX_WEATHER_ALERTS = 10;
+const MAX_WEATHER_ALERT_EVENT_LENGTH = 100;
+const MAX_WEATHER_ALERT_DESCRIPTION_LENGTH = 2000;
+// The generic condition enum of the pivot format; anything else is
+// coerced to 'unknown' (the frontend renders a neutral icon).
+const WEATHER_CONDITIONS = [
+  'clear',
+  'cloud',
+  'fog',
+  'drizzle',
+  'rain',
+  'sleet',
+  'snow',
+  'thunderstorm',
+  'wind',
+  'night',
+  'unknown',
+];
+// CAP-style severities (Common Alerting Protocol) — generic, never one
+// provider's scale (Météo France vigilance: yellow -> moderate,
+// orange -> severe, red -> extreme).
+const WEATHER_ALERT_SEVERITIES = ['minor', 'moderate', 'severe', 'extreme'];
 // Reserved GLADYS_* params namespace in discovered devices: only the
 // semantics defined by the spec are accepted. GLADYS_TRANSPORT is the
 // effective transport of the device (cloud/local badge in the UI) —
@@ -242,6 +273,14 @@ module.exports = {
   MAX_CAMERA_IMAGES_PER_MINUTE,
   MAX_CAMERA_IMAGE_SIZE,
   CAMERA_GET_IMAGE_TIMEOUT_MS,
+  WEATHER_GET_TIMEOUT_MS,
+  MAX_WEATHER_HOURS,
+  MAX_WEATHER_DAYS,
+  MAX_WEATHER_ALERTS,
+  MAX_WEATHER_ALERT_EVENT_LENGTH,
+  MAX_WEATHER_ALERT_DESCRIPTION_LENGTH,
+  WEATHER_CONDITIONS,
+  WEATHER_ALERT_SEVERITIES,
   RESERVED_PARAM_PREFIX,
   TRANSPORT_PARAM,
   DEVICE_TRANSPORTS,

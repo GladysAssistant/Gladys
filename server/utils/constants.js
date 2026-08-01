@@ -1595,6 +1595,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     OAUTH_CALLBACK: 'external-integration.oauth.callback',
     ACTION_RUN: 'external-integration.action.run',
     CAMERA_GET_IMAGE: 'external-integration.camera.get-image',
+    WEATHER_GET: 'external-integration.weather.get',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
     WEBHOOK_REQUEST: 'external-integration.webhook.request',

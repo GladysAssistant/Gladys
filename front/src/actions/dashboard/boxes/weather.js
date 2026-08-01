@@ -9,6 +9,8 @@ const BOX_KEY = 'Weather';
 const WEATHER_ICONS = {
   snow: 'fe-cloud-snow',
   rain: 'fe-cloud-rain',
+  drizzle: 'fe-cloud-drizzle',
+  thunderstorm: 'fe-cloud-lightning',
   clear: 'fe-sun',
   cloud: 'fe-cloud',
   fog: 'fe-cloud',
@@ -31,16 +33,30 @@ function createActions(store) {
           .locale(state.user.language)
           .format('D MMM');
         weather.weatherIcon = translateWeatherToFeIcon(weather.weather);
+        // optional fields of the generic weather format: only present when
+        // the provider supplies them
+        if (weather.sunrise) {
+          weather.sunrise_beautiful = dayjs(weather.sunrise).format('HH:mm');
+        }
+        if (weather.sunset) {
+          weather.sunset_beautiful = dayjs(weather.sunset).format('HH:mm');
+        }
 
-        weather.hours.map(hour => {
-          hour.weatherIcon = translateWeatherToFeIcon(hour.weather);
-          hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
-        });
-        weather.days.shift();
-        weather.days.map(day => {
-          day.weather_icon = translateWeatherToFeIcon(day.weather);
-          day.datetime_beautiful = dayjs(day.datetime).format('dddd');
-        });
+        if (weather.hours) {
+          weather.hours.map(hour => {
+            hour.weatherIcon = translateWeatherToFeIcon(hour.weather);
+            hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
+          });
+        }
+        if (weather.days) {
+          weather.days.shift();
+          weather.days.map(day => {
+            // the per-day condition is optional in the generic weather
+            // format (openweather does not provide it): no icon without it
+            day.weatherIcon = day.weather ? translateWeatherToFeIcon(day.weather) : null;
+            day.datetime_beautiful = dayjs(day.datetime).format('dddd');
+          });
+        }
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           weather

@@ -2,7 +2,8 @@ const db = require('../../models');
 const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
-const { CAMERA_GET_IMAGE_TIMEOUT_MS } = require('./constants');
+const { normalizeWeather } = require('./externalIntegration.normalizeWeather');
+const { CAMERA_GET_IMAGE_TIMEOUT_MS, WEATHER_GET_TIMEOUT_MS } = require('./constants');
 
 // scheduled polls only make sense against a live integration: outside
 // these statuses they become silent no-ops (see below)
@@ -70,6 +71,36 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // weather integrations expose the generic provider interface
+  // weather.get(options) — the same interface the internal openweather
+  // service implements, duck-typed by lib/weather's provider loop (B.18).
+  // The returned payload is normalized and bounded before entering the
+  // core: unaudited code never hands raw data to the widget or the chat.
+  const isWeather = service.manifest && service.manifest.type === 'weather';
+  const weatherCapability = isWeather
+    ? {
+        weather: Object.freeze({
+          get: async (options) => {
+            // a fresh third-party API call can be slow: 15s ack deadline
+            const result = await this.sendCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEATHER_GET,
+              {
+                options: {
+                  latitude: options.latitude,
+                  longitude: options.longitude,
+                  language: options.language,
+                  units: options.units,
+                },
+              },
+              { timeoutMs: WEATHER_GET_TIMEOUT_MS },
+            );
+            const payload = result && result.data && result.data.weather;
+            return normalizeWeather(payload, options.units);
+          },
+        }),
+      }
+    : {};
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -78,6 +109,7 @@ function registerProxyService(service) {
       await this.stop(service.selector);
     },
     ...messageCapability,
+    ...weatherCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {

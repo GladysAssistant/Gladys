@@ -116,6 +116,9 @@ const houses = {
 
 const service = {
   getService: () => openWeather,
+  stateManager: {
+    getAllKeys: () => ['openweather'],
+  },
 };
 
 describe('weather.command', () => {
