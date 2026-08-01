@@ -1,10 +1,6 @@
-const { expect } = require('chai');
-const Promise = require('bluebird');
+const { fake, assert } = require('sinon');
 
 const Gladys = require('../../lib');
-// system.init reads the version from the repository root package.json
-const packageJson = require('../../../package.json');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 describe('gladys.start', () => {
   it('should fire the upgrade check without blocking the boot sequence', async function test() {
@@ -23,14 +19,16 @@ describe('gladys.start', () => {
       disableExternalIntegration: true,
       disableDuckDbMigration: true,
     });
-    // the check compares the stored version with the running one: seeding the
-    // current version makes the voluntarily unawaited check a deterministic
-    // no-op (the notification path itself is tested with the System unit)
-    const currentVersion = `v${packageJson.version}`;
-    await gladys.variable.setValue(SYSTEM_VARIABLE_NAMES.GLADYS_VERSION, currentVersion);
+    // the check is stubbed with a promise that only resolves once the test
+    // releases it: if start() awaited the check, it would hang and time out —
+    // resolving while the check is still pending proves the boot never waits
+    let releaseCheck;
+    const pendingCheck = new Promise((resolve) => {
+      releaseCheck = resolve;
+    });
+    gladys.system.checkIfGladysUpgraded = fake.returns(pendingCheck);
     await gladys.start();
-    // let the floating check finish before other tests touch the database
-    await Promise.delay(100);
-    expect(await gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.GLADYS_VERSION)).to.equal(currentVersion);
+    assert.calledOnceWithExactly(gladys.system.checkIfGladysUpgraded, gladys.gateway);
+    releaseCheck();
   });
 });
