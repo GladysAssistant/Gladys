@@ -19,9 +19,17 @@ const AirConditioningModeDeviceFeature = props => {
   const rawValue = deviceFeature.last_value;
   const lastValue = rawValue != null && !Number.isNaN(Number(rawValue)) ? Number(rawValue) : rawValue;
 
-  // Only offer the modes this AC supports (its supported_options); a feature without restrictions
-  // keeps the full list. The control shows buttons when they fit on one line, a dropdown otherwise.
-  const options = resolveFeatureOptions(deviceFeature, MODE_OPTIONS);
+  // Only offer the modes this AC supports. When the feature declares supported_options, they drive
+  // the list. Otherwise (legacy features that never got supported_options), keep the historical
+  // fallback: auto/cool/heat always, plus dry/fan only when the feature range (max) covers them —
+  // so a cooling-only unit is not offered inactive dry/fan buttons after this update.
+  const hasSupportedOptions =
+    Array.isArray(deviceFeature.supported_options) && deviceFeature.supported_options.length > 0;
+  const options = hasSupportedOptions
+    ? resolveFeatureOptions(deviceFeature, MODE_OPTIONS)
+    : MODE_OPTIONS.filter(
+        option => option.value <= AC_MODE.HEATING || option.value <= deviceFeature.max
+      ).map(option => ({ value: option.value, i18nKey: option.i18nKey }));
   const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
 
   return (
