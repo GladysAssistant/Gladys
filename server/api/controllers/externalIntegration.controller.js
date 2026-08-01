@@ -244,6 +244,19 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/external_integration/:selector/oauth/disconnect oauthDisconnect
+   * @apiName oauthDisconnect
+   * @apiGroup ExternalIntegration
+   * @apiDescription Forget the credentials an integration stored off-schema for
+   * an oauth2 field and push the emptied config so it drops its session. The
+   * settings declared in the config_schema are kept.
+   */
+  async function oauthDisconnect(req, res) {
+    const result = await gladys.externalIntegration.disconnectOAuth(req.params.selector, req.body);
+    res.json(result);
+  }
+
+  /**
    * @api {post} /api/v1/external_integration/:selector/action/:key runAction
    * @apiName runAction
    * @apiGroup ExternalIntegration
@@ -409,6 +422,7 @@ module.exports = function ExternalIntegrationController(gladys) {
     getConfig: asyncMiddleware(getConfig),
     saveConfig: asyncMiddleware(saveConfig),
     getOAuthAuthorizeUrl: asyncMiddleware(getOAuthAuthorizeUrl),
+    oauthDisconnect: asyncMiddleware(oauthDisconnect),
     oauthCallback: asyncMiddleware(oauthCallback),
     runAction: asyncMiddleware(runAction),
     start: asyncMiddleware(start),

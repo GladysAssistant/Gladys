@@ -640,6 +640,7 @@
         "saveError": "There was an error saving the configuration.",
         "saveButton": "Save configuration",
         "oauthConnectButton": "Connect",
+        "oauthDisconnectButton": "Disconnect",
         "oauthConnectError": "There was an error starting the connection. Check that the integration is running."
       },
       "actions": {

@@ -434,7 +434,24 @@ class ExternalIntegrationConfigPage extends Component {
       // the callback popup is a new tab: it recovers the oauth2 key
       // through localStorage (shared across same-origin tabs)
       localStorage.setItem(`externalIntegrationOAuthKey:${selector}`, field.key);
-      window.open(authorizeUrl, '_blank', 'noopener');
+      // noreferrer, not just noopener: the Gladys URL (often a private LAN
+      // address) has no business leaking to the provider, and some providers
+      // reject an authorize URL opened with a cross-site Referer.
+      window.open(authorizeUrl, '_blank', 'noopener,noreferrer');
+      this.setState({ oauthStatus: RequestStatus.Success });
+    } catch (e) {
+      console.error(e);
+      this.setState({ oauthStatus: RequestStatus.Error });
+    }
+  };
+
+  disconnectOAuth = async field => {
+    this.setState({ oauthStatus: RequestStatus.Getting });
+    const { selector } = this.props;
+    try {
+      await this.props.httpClient.post(`/api/v1/external_integration/${selector}/oauth/disconnect`, {
+        key: field.key
+      });
       this.setState({ oauthStatus: RequestStatus.Success });
     } catch (e) {
       console.error(e);
@@ -499,6 +516,7 @@ class ExternalIntegrationConfigPage extends Component {
           updateConfigValue={this.updateConfigValue}
           saveConfig={this.saveConfig}
           connectOAuth={this.connectOAuth}
+          disconnectOAuth={this.disconnectOAuth}
           togglePreferLocal={this.togglePreferLocal}
           updateActionFieldValue={this.updateActionFieldValue}
           runAction={this.runAction}
