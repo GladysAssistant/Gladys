@@ -66,7 +66,26 @@
     "searchPlaceHolder": "Search devices",
     "noRoom": "No room",
     "noFeatures": "No features",
-    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>."
+    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>.",
+    "migrate": {
+      "button": "Migrate",
+      "modalTitle": "Migrate \"{{name}}\"",
+      "description": "Migrate this device to a device of another integration: its <b>state history</b>, the <b>scenes</b> and the <b>dashboards</b> referencing it will be moved to the destination device, then <b>this device will be deleted</b>. If both devices recorded states during the same period, only the history older than the destination's first state is moved, so nothing is counted twice.",
+      "destinationLabel": "Destination device",
+      "featuresTitle": "Feature matching",
+      "doNotMigrate": "Do not migrate",
+      "typeMismatchWarning": "This feature has a different type than the source feature: its history may not make sense once migrated.",
+      "unitMismatchWarning": "This feature has a different unit than the source feature: values are moved without conversion, so charts may become inconsistent.",
+      "unmappedWarning": "Some features are not matched: their history will be deleted, and the scenes and dashboards using them will not be updated.",
+      "noDestinationAvailable": "No device from another integration was found. Create the destination device in its new integration first, then come back here to migrate.",
+      "loadError": "Unable to load the list of devices. Please try again.",
+      "migrateError": "The migration failed. The old device was not deleted, but some history may already have been moved to the destination. Check the jobs page and your device list, then try again: re-running only moves what remains to migrate.",
+      "networkError": "The connection was lost while the migration was running: it may still be running in background. Check the <a href=\"/dashboard/settings/jobs\">jobs page</a> and refresh the device list before trying again.",
+      "successText": "Migration complete! <b>{{states}}</b> historical states were moved, <b>{{scenes}}</b> scene(s) and <b>{{dashboards}}</b> dashboard(s) were updated. The old device has been deleted.",
+      "confirmButton": "Migrate and delete the old device",
+      "cancelButton": "Cancel",
+      "closeButton": "Close"
+    }
   },
   "login": {
     "title": "Gladys Assistant",
@@ -728,7 +747,49 @@
         "noDevices": "No devices discovered yet. Press \"Scan\" to search for devices.",
         "noDevicesConfigureFirst": "Nothing found? Make sure the integration is configured in the <a href=\"{{configUrl}}\">Configuration</a> tab, then run a new scan.",
         "alreadyCreatedBadge": "Already added",
-        "createError": "There was an error adding this device.",
+        "error": {
+          "networkError": "Gladys did not answer the add request. Check that the Gladys server is running and reachable, then try again.",
+          "badRequestError": "Gladys rejected this device: the data published by the integration is incorrect.",
+          "forbiddenError": "You are not allowed to add this device. Log out, log back in, then try again.",
+          "notFoundError": "The requested resource was not found on the server. Run a new scan, then try again.",
+          "conflictError": "This device conflicts with a device already present in Gladys.",
+          "externalIdConflictError": "A device or a feature with the same external id already exists in Gladys. The integration is probably publishing the same id twice, or this device was already added by another integration.",
+          "selectorConflictError": "Another device already uses the same internal id, usually because it has the same name. Rename the existing device, then try again.",
+          "validationError": "The integration published an incomplete or invalid device: Gladys refused to save it.",
+          "serverError": "An internal error happened in Gladys while adding this device.",
+          "unexpectedError": "An unexpected error happened while adding this device.",
+          "rejectedFieldsTitle": "Rejected fields:",
+          "technicalDetail": "Technical detail:",
+          "apiFullResponse": "Full API response:",
+          "reportHint": "Copy this detail if you ask for help on the forum or report the problem to the integration developer.",
+          "fieldLabels": {
+            "name": "Name",
+            "external_id": "External id",
+            "selector": "Internal id",
+            "model": "Model",
+            "category": "Category",
+            "type": "Type",
+            "unit": "Unit",
+            "min": "Minimum value",
+            "max": "Maximum value",
+            "read_only": "Read only",
+            "keep_history": "Keep history",
+            "has_feedback": "Has feedback",
+            "room_id": "Room",
+            "service_id": "Service",
+            "device_id": "Device",
+            "should_poll": "Polling",
+            "poll_frequency": "Poll frequency",
+            "value": "Value"
+          },
+          "contextTypes": {
+            "device_feature": "Feature \"{{name}}\""
+          },
+          "fieldErrorTypes": {
+            "notNullViolation": "required field not provided by the integration",
+            "uniqueViolation": "value already used by another device or feature"
+          }
+        },
         "featuresLabel": "Features",
         "createButton": "Add to Gladys",
         "updateButton": "Update",
@@ -3478,16 +3539,24 @@
       "target": "Target: {{device}} › {{feature}}",
       "statesCounts": "States to delete: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
       "statesCountsDone": "States deleted: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
+      "migrationTarget": "Migration: {{source}} › {{destination}}",
       "steps": {
         "waiting_database": "Waiting for the database…",
         "counting": "Counting states…",
         "deleting_states": "Deleting states…",
-        "deleting_aggregates": "Deleting aggregates…"
+        "deleting_aggregates": "Deleting aggregates…",
+        "moving_states": "Moving state history…",
+        "cleaning_sqlite": "Cleaning SQLite leftovers…",
+        "updating_references": "Updating references…",
+        "rewriting_scenes": "Rewriting scenes…",
+        "rewriting_dashboards": "Rewriting dashboards…",
+        "deleting_source_device": "Deleting the old device…"
       },
       "orphanedStates": "Orphaned states: {{count}}",
       "duration": "Duration: {{duration}}"
     },
     "jobTypes": {
+      "device-migrate": "Device migration",
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
       "hourly-device-state-aggregate": "Hourly sensors aggregation",
@@ -3920,6 +3989,7 @@
     "liter": "Liter (l)",
     "milliliter": "Milliliter (ml)",
     "cubicmeter": "Cubic meter (m³)",
+    "cubic-meter-per-hour": "Cubic meter per hour (m³/h)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -4016,6 +4086,7 @@
     "liter": "l",
     "milliliter": "ml",
     "cubicmeter": "m³",
+    "cubic-meter-per-hour": "m³/h",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -4434,6 +4505,19 @@
           "unknown": "Unknown"
         }
       },
+      "water-valve": {
+        "current-device-status": {
+          "0": "Normal",
+          "1": "Water shortage",
+          "2": "Water leakage",
+          "3": "Water shortage & leakage",
+          "unknown": "{{value}} (unknown)"
+        },
+        "valve-work-state": {
+          "0": "Idle",
+          "1": "Irrigation running"
+        }
+      },
       "electrical-vehicle-state": {
         "door-opened": {
           "0": "Closed",
@@ -4554,6 +4638,16 @@
       "liquid-state": "Liquid level state",
       "liquid-level-percent": "Liquid level percent",
       "liquid-depth": "Liquid depth"
+    },
+    "water-valve": {
+      "shortCategoryName": "Water valve",
+      "current-device-status": "Water valve status",
+      "flow": "Water flow",
+      "auto-close-when-water-shortage": "Auto close on water shortage",
+      "valve-work-state": "Valve work state",
+      "real-time-irrigation-duration": "Current irrigation duration",
+      "real-time-irrigation-volume": "Current irrigation volume",
+      "daily-irrigation-volume": "Daily irrigation volume"
     },
     "camera": {
       "shortCategoryName": "Camera",
@@ -4778,6 +4872,15 @@
       "daily-production-revenue": "Daily Revenue",
       "thirty-minutes-production": "30 Minutes Production",
       "thirty-minutes-production-revenue": "30 Minutes Revenue"
+    },
+    "battery-storage": {
+      "shortCategoryName": "Battery storage",
+      "battery-level": "Battery level",
+      "charge-power": "Charge power",
+      "discharge-power": "Discharge power",
+      "charge-index": "Charge index",
+      "discharge-index": "Discharge index",
+      "battery-energy-remaining": "Battery energy remaining"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",

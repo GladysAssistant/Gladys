@@ -259,6 +259,75 @@ describe('Camera.streaming', () => {
     await rtspCameraManager.stopStreaming('my-camera');
     fakeAssert.called(rtspCameraManager.onNewCameraFile);
   });
+  it('should start an HLS camera at the live edge (live_start_index)', async () => {
+    const spawnedArgs = [];
+    const childProcessMockRecordingArgs = {
+      spawn: (command, args, options) => {
+        spawnedArgs.push(args);
+        // The input URL also ends with index.m3u8: write the OUTPUT index
+        // (always the last ffmpeg argument), not the first match.
+        setTimeout(() => {
+          fse.writeFileSync(args[args.length - 1], 'hello');
+        }, 10);
+        return {
+          kill: fake.returns(null),
+          stdout: { on: (type, cb) => cb('log') },
+          stderr: { on: (type, cb) => cb('log') },
+          on: (type, cb) => {},
+        };
+      },
+    };
+    const gladysWithHlsCamera = {
+      config: {
+        tempFolder: '/tmp/gladys',
+      },
+      device: {
+        getBySelector: fake.resolves({
+          id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+          selector: 'my-camera',
+          params: [
+            {
+              name: 'CAMERA_URL',
+              value: 'http://192.168.1.10/token/live/files/high/index.m3u8',
+            },
+          ],
+        }),
+      },
+    };
+    rtspCameraManager = new RtspCameraManager(
+      gladysWithHlsCamera,
+      childProcessMockRecordingArgs,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    rtspCameraManager.onNewCameraFile = fake.resolves(null);
+    await rtspCameraManager.startStreaming('my-camera', false, 1);
+    await rtspCameraManager.stopStreaming('my-camera');
+    const args = spawnedArgs[0];
+    // Input options placed before '-i'
+    expect(args.indexOf('-live_start_index')).to.equal(0);
+    expect(args[1]).to.equal('-1');
+    expect(args.indexOf('-i')).to.equal(2);
+  });
+  it('should not pass live_start_index to a non-HLS camera', async () => {
+    const spawnedArgs = [];
+    const childProcessMockRecordingArgs = {
+      spawn: (command, args, options) => {
+        spawnedArgs.push(args);
+        return childProcessMock.spawn(command, args, options);
+      },
+    };
+    rtspCameraManager = new RtspCameraManager(
+      gladys,
+      childProcessMockRecordingArgs,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    rtspCameraManager.onNewCameraFile = fake.resolves(null);
+    await rtspCameraManager.startStreaming('my-camera', false, 1);
+    await rtspCameraManager.stopStreaming('my-camera');
+    const args = spawnedArgs[0];
+    expect(args).to.not.include('-live_start_index');
+    expect(args.indexOf('-i')).to.equal(0);
+  });
   it('should ping and get 404', async () => {
     const promise = rtspCameraManager.liveActivePing('lalalallala');
     await assert.isRejected(promise, NotFoundError);

@@ -66,7 +66,26 @@
     "searchPlaceHolder": "Chercher un appareil",
     "noRoom": "Sans pièce",
     "noFeatures": "Aucune fonctionnalité",
-    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil."
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes ou quelques heures (selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil.",
+    "migrate": {
+      "button": "Migrer",
+      "modalTitle": "Migrer « {{name}} »",
+      "description": "Migrez cet appareil vers un appareil d'une autre intégration : son <b>historique d'états</b>, les <b>scènes</b> et les <b>tableaux de bord</b> qui l'utilisent seront déplacés vers l'appareil de destination, puis <b>cet appareil sera supprimé</b>. Si les deux appareils ont enregistré des états sur la même période, seul l'historique antérieur au premier état de la destination est déplacé, afin de ne rien compter en double.",
+      "destinationLabel": "Appareil de destination",
+      "featuresTitle": "Correspondance des fonctionnalités",
+      "doNotMigrate": "Ne pas migrer",
+      "typeMismatchWarning": "Cette fonctionnalité a un type différent de la fonctionnalité source : son historique risque de ne plus avoir de sens une fois migré.",
+      "unitMismatchWarning": "Cette fonctionnalité a une unité différente de la fonctionnalité source : les valeurs sont déplacées sans conversion, les graphiques risquent de devenir incohérents.",
+      "unmappedWarning": "Certaines fonctionnalités n'ont pas de correspondance : leur historique sera supprimé, et les scènes et tableaux de bord qui les utilisent ne seront pas mis à jour.",
+      "noDestinationAvailable": "Aucun appareil d'une autre intégration n'a été trouvé. Créez d'abord l'appareil de destination dans sa nouvelle intégration, puis revenez ici pour migrer.",
+      "loadError": "Impossible de charger la liste des appareils. Veuillez réessayer.",
+      "migrateError": "La migration a échoué. L'ancien appareil n'a pas été supprimé, mais une partie de l'historique a pu être déjà déplacée vers la destination. Vérifiez la page des tâches et votre liste d'appareils, puis réessayez : une nouvelle tentative ne migre que ce qu'il reste à migrer.",
+      "networkError": "La connexion a été perdue pendant la migration : elle est peut-être toujours en cours en arrière-plan. Vérifiez la <a href=\"/dashboard/settings/jobs\">page des tâches</a> et rafraîchissez la liste des appareils avant de réessayer.",
+      "successText": "Migration terminée ! <b>{{states}}</b> états historiques ont été déplacés, <b>{{scenes}}</b> scène(s) et <b>{{dashboards}}</b> tableaux de bord ont été mis à jour. L'ancien appareil a été supprimé.",
+      "confirmButton": "Migrer et supprimer l'ancien appareil",
+      "cancelButton": "Annuler",
+      "closeButton": "Fermer"
+    }
   },
   "login": {
     "title": "Gladys Assistant",
@@ -268,7 +287,7 @@
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
     "editDashboardVisibility": "Visibilité",
-    "editDashboardVisibilityDescription": "Les tableaux de bords publics seront visible par tous les membres de l'installation Gladys.",
+    "editDashboardVisibilityDescription": "Les tableaux de bord publics seront visibles par tous les membres de l'installation Gladys.",
     "editDashboardVisibilityNotEditableNotCreator": "Vous ne pouvez pas éditer le partage car vous n'êtes pas le créateur de ce tableau de bord.",
     "visibilities": {
       "private": "privé",
@@ -276,7 +295,7 @@
     },
     "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
-    "editDashboardMyDashboards": "Mes tableaux de bords",
+    "editDashboardMyDashboards": "Mes tableaux de bord",
     "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
     "reorderDashboardButton": "Re-ordonner",
     "stopReorderingDashboardButton": "Arrêter de réordonner",
@@ -728,7 +747,49 @@
         "noDevices": "Aucun appareil découvert pour le moment. Cliquez sur « Scanner » pour rechercher des appareils.",
         "noDevicesConfigureFirst": "Rien trouvé ? Vérifiez que l'intégration est bien configurée dans l'onglet <a href=\"{{configUrl}}\">Configuration</a>, puis relancez un scan.",
         "alreadyCreatedBadge": "Déjà ajouté",
-        "createError": "Une erreur s'est produite lors de l'ajout de cet appareil.",
+        "error": {
+          "networkError": "Gladys n'a pas répondu à la demande d'ajout. Vérifiez que le serveur Gladys est bien démarré et accessible, puis réessayez.",
+          "badRequestError": "Gladys a refusé cet appareil : les données publiées par l'intégration sont incorrectes.",
+          "forbiddenError": "Vous n'avez pas les droits nécessaires pour ajouter cet appareil. Déconnectez-vous, reconnectez-vous, puis réessayez.",
+          "notFoundError": "La ressource demandée est introuvable côté serveur. Relancez un scan puis réessayez.",
+          "conflictError": "Cet appareil entre en conflit avec un appareil déjà présent dans Gladys.",
+          "externalIdConflictError": "Un appareil ou une fonctionnalité portant le même identifiant externe existe déjà dans Gladys. L'intégration publie probablement deux fois le même identifiant, ou cet appareil a déjà été ajouté par une autre intégration.",
+          "selectorConflictError": "Un autre appareil utilise déjà le même identifiant interne, en général parce qu'il porte le même nom. Renommez l'appareil existant puis réessayez.",
+          "validationError": "L'intégration a publié un appareil incomplet ou invalide : Gladys a refusé de l'enregistrer.",
+          "serverError": "Une erreur interne s'est produite dans Gladys pendant l'ajout de cet appareil.",
+          "unexpectedError": "Une erreur inattendue s'est produite lors de l'ajout de cet appareil.",
+          "rejectedFieldsTitle": "Champs refusés :",
+          "technicalDetail": "Détail technique :",
+          "apiFullResponse": "Réponse complète de l'API :",
+          "reportHint": "Copiez ce détail si vous demandez de l'aide sur le forum ou signalez le problème au développeur de l'intégration.",
+          "fieldLabels": {
+            "name": "Nom",
+            "external_id": "Identifiant externe",
+            "selector": "Identifiant interne",
+            "model": "Modèle",
+            "category": "Catégorie",
+            "type": "Type",
+            "unit": "Unité",
+            "min": "Valeur minimum",
+            "max": "Valeur maximum",
+            "read_only": "Lecture seule",
+            "keep_history": "Historisation",
+            "has_feedback": "Retour d'état",
+            "room_id": "Pièce",
+            "service_id": "Service",
+            "device_id": "Appareil",
+            "should_poll": "Interrogation périodique",
+            "poll_frequency": "Fréquence d'interrogation",
+            "value": "Valeur"
+          },
+          "contextTypes": {
+            "device_feature": "Fonctionnalité « {{name}} »"
+          },
+          "fieldErrorTypes": {
+            "notNullViolation": "champ obligatoire non renseigné par l'intégration",
+            "uniqueViolation": "valeur déjà utilisée par un autre appareil ou une autre fonctionnalité"
+          }
+        },
         "featuresLabel": "Fonctionnalités",
         "createButton": "Ajouter à Gladys",
         "updateButton": "Mettre à jour",
@@ -3478,16 +3539,24 @@
       "target": "Cible : {{device}} › {{feature}}",
       "statesCounts": "États à supprimer : {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agrégats",
       "statesCountsDone": "États supprimés : {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agrégats",
+      "migrationTarget": "Migration : {{source}} › {{destination}}",
       "steps": {
         "waiting_database": "En attente de la base de données…",
         "counting": "Calcul du nombre d'états…",
         "deleting_states": "Suppression des états…",
-        "deleting_aggregates": "Suppression des agrégats…"
+        "deleting_aggregates": "Suppression des agrégats…",
+        "moving_states": "Déplacement de l'historique d'états…",
+        "cleaning_sqlite": "Nettoyage des reliquats SQLite…",
+        "updating_references": "Mise à jour des références…",
+        "rewriting_scenes": "Réécriture des scènes…",
+        "rewriting_dashboards": "Réécriture des tableaux de bord…",
+        "deleting_source_device": "Suppression de l'ancien appareil…"
       },
       "orphanedStates": "États orphelins : {{count}}",
       "duration": "Durée : {{duration}}"
     },
     "jobTypes": {
+      "device-migrate": "Migration d'appareil",
       "monthly-device-state-aggregate": "Agrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Agrégation donnée capteur journalière",
       "hourly-device-state-aggregate": "Agrégation donnée capteur horaire",
@@ -3920,6 +3989,7 @@
     "liter": "Litre (l)",
     "milliliter": "Millilitre (ml)",
     "cubicmeter": "Mètre cube (m³)",
+    "cubic-meter-per-hour": "Mètre cube par heure (m³/h)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -4016,6 +4086,7 @@
     "liter": "l",
     "milliliter": "ml",
     "cubicmeter": "m³",
+    "cubic-meter-per-hour": "m³/h",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -4434,6 +4505,19 @@
           "unknown": "Inconnu"
         }
       },
+      "water-valve": {
+        "current-device-status": {
+          "0": "Normal",
+          "1": "Manque d'eau",
+          "2": "Fuite d'eau",
+          "3": "Manque et fuite d'eau",
+          "unknown": "{{value}} (inconnu)"
+        },
+        "valve-work-state": {
+          "0": "Au repos",
+          "1": "Irrigation en cours"
+        }
+      },
       "electrical-vehicle-state": {
         "door-opened": {
           "0": "Fermée(s)",
@@ -4554,6 +4638,16 @@
       "liquid-state": "État du niveau",
       "liquid-level-percent": "Niveau du liquide (Pourcentage)",
       "liquid-depth": "Profondeur du liquide"
+    },
+    "water-valve": {
+      "shortCategoryName": "Vanne d'eau",
+      "current-device-status": "État de la vanne d'eau",
+      "flow": "Débit d'eau",
+      "auto-close-when-water-shortage": "Fermeture auto si manque d'eau",
+      "valve-work-state": "Programme d'irrigation en cours",
+      "real-time-irrigation-duration": "Durée d'irrigation en cours",
+      "real-time-irrigation-volume": "Volume d'irrigation en cours",
+      "daily-irrigation-volume": "Volume d'irrigation quotidien"
     },
     "camera": {
       "shortCategoryName": "Caméra",
@@ -4778,6 +4872,15 @@
       "daily-production-revenue": "Revenu journalier",
       "thirty-minutes-production": "Production 30 minutes",
       "thirty-minutes-production-revenue": "Revenu 30 minutes"
+    },
+    "battery-storage": {
+      "shortCategoryName": "Batterie de stockage",
+      "battery-level": "Niveau de batterie",
+      "charge-power": "Puissance de charge",
+      "discharge-power": "Puissance de décharge",
+      "charge-index": "Index de charge",
+      "discharge-index": "Index de décharge",
+      "battery-energy-remaining": "Énergie restante en batterie"
     },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",
