@@ -555,6 +555,24 @@ async function getAllTools(userId) {
           }),
         );
 
+        // An empty list is an ambiguous signal for the model, which tends to fill the
+        // gap with a plausible value. Say explicitly that nothing is configured.
+        if (states.length === 0) {
+          const typeLabel = deviceType && deviceType.length > 0 ? ` of type "${deviceType}"` : '';
+          const roomLabel = room && room !== '' ? ` in room "${room}"` : '';
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `device.get-state: no device${typeLabel} is configured${roomLabel}. ` +
+                  'No measurement exists for this query, do not report any value.',
+              },
+            ],
+          };
+        }
+
         return {
           content: [
             {
