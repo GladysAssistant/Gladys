@@ -47,7 +47,8 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.DATARATE ||
     category === DEVICE_FEATURE_CATEGORIES.DURATION ||
     category === DEVICE_FEATURE_CATEGORIES.TAMPER ||
-    category === DEVICE_FEATURE_CATEGORIES.INPUT
+    category === DEVICE_FEATURE_CATEGORIES.INPUT ||
+    category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE
   ) {
     return true;
   }
@@ -429,6 +430,18 @@ export const getDefaultUnitForFeature = (category, type) => {
     }
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    // State of charge in percent, instantaneous powers in watt, and every
+    // cumulative index (*-index) or stored energy (battery-energy-remaining) in kWh.
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return DEVICE_FEATURE_UNITS.PERCENT;
+    }
+    if (typeof type === 'string' && type.endsWith('-power')) {
+      return DEVICE_FEATURE_UNITS.WATT;
+    }
+    return DEVICE_FEATURE_UNITS.KILOWATT_HOUR;
+  }
+
   const preferredUnit = PREFERRED_DEFAULT_UNIT_BY_CATEGORY[category];
   if (preferredUnit) {
     return preferredUnit;
@@ -685,6 +698,17 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000000, unit: DEVICE_FEATURE_UNITS.EURO }, category, type);
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100 }, category, type);
+    }
+    if (typeof type === 'string' && type.endsWith('-power')) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
+    }
+    // *-index counters and battery-energy-remaining
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
+  }
+
   if (!isSensorCategory(category)) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }
@@ -930,6 +954,19 @@ export const getFeaturePreviewValue = (category, type) => {
       return 2.4;
     }
     return 1;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return 54;
+    }
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_ENERGY_REMAINING) {
+      return 4.2;
+    }
+    if (typeof type === 'string' && type.endsWith('-index')) {
+      return 128.5;
+    }
+    return 320;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR) {

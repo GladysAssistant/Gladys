@@ -148,26 +148,36 @@ async function create(device) {
 
     // Save features first without energy_parent_id, then resolve parent links in a second pass
     const newFeatures = await Promise.map(featuresToSave, async (feature) => {
-      // if the device feature already exist
-      const matchedFeature = matchFeatureInList(feature, deviceToReturn.features);
-      if (matchedFeature) {
-        const deviceFeature = await db.DeviceFeature.findOne({
-          where: {
-            id: matchedFeature.id,
-          },
-        });
-        const featureToUpdate = { ...feature };
-        delete featureToUpdate.selector;
-        await deviceFeature.update(featureToUpdate, { transaction });
-        if (deviceFeature.keep_history === false) {
-          deviceFeaturesIdsToPurge.push(deviceFeature.id);
+      try {
+        // if the device feature already exist
+        const matchedFeature = matchFeatureInList(feature, deviceToReturn.features);
+        if (matchedFeature) {
+          const deviceFeature = await db.DeviceFeature.findOne({
+            where: {
+              id: matchedFeature.id,
+            },
+          });
+          const featureToUpdate = { ...feature };
+          delete featureToUpdate.selector;
+          await deviceFeature.update(featureToUpdate, { transaction });
+          if (deviceFeature.keep_history === false) {
+            deviceFeaturesIdsToPurge.push(deviceFeature.id);
+          }
+          return deviceFeature.get({ plain: true });
         }
-        return deviceFeature.get({ plain: true });
+        // if not, we create it
+        feature.device_id = deviceToReturn.id;
+        const featureCreated = await db.DeviceFeature.create(feature, { transaction });
+        return featureCreated.get({ plain: true });
+      } catch (e) {
+        // A device can publish dozens of features: "min cannot be null" alone is
+        // not actionable. We tag the error with the identity of the rejected
+        // feature, so the API (and the Discovery screen) can name it. The
+        // context stays structured: the wording is the frontend's job, it must
+        // be translated like the rest of the UI.
+        e.gladysContext = { type: 'device_feature', name: feature.name || feature.external_id || null };
+        throw e;
       }
-      // if not, we create it
-      feature.device_id = deviceToReturn.id;
-      const featureCreated = await db.DeviceFeature.create(feature, { transaction });
-      return featureCreated.get({ plain: true });
     });
 
     await Promise.map(newFeatures, async (savedFeature) => {

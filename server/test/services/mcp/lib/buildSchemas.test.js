@@ -3261,4 +3261,83 @@ describe('build schemas', () => {
       'device.set-light: brightness 20% command sent for Brightness Only Light; could not dispatch for Brightness Only Light (missing color feature)',
     );
   });
+
+  it('should tell device.get-state that no device is configured instead of returning an empty list', async () => {
+    const rooms = [
+      { id: 'room-1', name: 'Salon', selector: 'salon' },
+      { id: 'room-2', name: 'Cuisine', selector: 'cuisine' },
+    ];
+
+    // The humidity sensor lives in the living room, the kitchen has none.
+    const humiditySensor = {
+      selector: 'capteur-salon',
+      name: 'Capteur salon',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 'feature-humidity',
+          selector: 'capteur-salon-humidity',
+          name: 'Humidité',
+          category: 'humidity-sensor',
+          type: 'decimal',
+          unit: '%',
+          last_value: 52,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+        age: '2min',
+      })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([humiditySensor]),
+          getBySelector: stub().resolves(humiditySensor),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(10) },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const getStateTool = tools.find((tool) => tool.intent === 'device.get-state');
+
+    const noSensorInRoom = await getStateTool.cb({ room: 'Cuisine', device_type: 'humidity-sensor' });
+    expect(noSensorInRoom.content[0].text).to.eq(
+      'device.get-state: no device of type "humidity-sensor" is configured in room "Cuisine". ' +
+        'No measurement exists for this query, do not report any value.',
+    );
+
+    const noSensorAtAll = await getStateTool.cb({ room: undefined, device_type: 'co2-sensor' });
+    expect(noSensorAtAll.content[0].text).to.eq(
+      'device.get-state: no device of type "co2-sensor" is configured. ' +
+        'No measurement exists for this query, do not report any value.',
+    );
+
+    // A room that does have the sensor still returns the regular payload.
+    const withSensor = await getStateTool.cb({ room: 'Salon', device_type: 'humidity-sensor' });
+    expect(withSensor.content[0].text).to.eq('toonmockdata');
+  });
 });

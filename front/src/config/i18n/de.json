@@ -728,7 +728,49 @@
         "noDevices": "Noch keine Geräte entdeckt. Klicke auf \"Scannen\", um nach Geräten zu suchen.",
         "noDevicesConfigureFirst": "Nichts gefunden? Stelle sicher, dass die Integration im Tab <a href=\"{{configUrl}}\">Konfiguration</a> konfiguriert ist, und starte dann einen neuen Scan.",
         "alreadyCreatedBadge": "Bereits hinzugefügt",
-        "createError": "Beim Hinzufügen dieses Geräts ist ein Fehler aufgetreten.",
+        "error": {
+          "networkError": "Gladys hat auf die Hinzufügen-Anfrage nicht geantwortet. Prüfe, ob der Gladys-Server läuft und erreichbar ist, und versuche es erneut.",
+          "badRequestError": "Gladys hat dieses Gerät abgelehnt: Die von der Integration veröffentlichten Daten sind fehlerhaft.",
+          "forbiddenError": "Du hast nicht die nötigen Rechte, um dieses Gerät hinzuzufügen. Melde dich ab, wieder an und versuche es erneut.",
+          "notFoundError": "Die angeforderte Ressource wurde auf dem Server nicht gefunden. Starte einen neuen Scan und versuche es erneut.",
+          "conflictError": "Dieses Gerät steht im Konflikt mit einem bereits in Gladys vorhandenen Gerät.",
+          "externalIdConflictError": "Ein Gerät oder eine Funktion mit derselben externen ID existiert bereits in Gladys. Die Integration veröffentlicht wahrscheinlich dieselbe ID zweimal, oder dieses Gerät wurde bereits von einer anderen Integration hinzugefügt.",
+          "selectorConflictError": "Ein anderes Gerät verwendet bereits dieselbe interne ID, meist weil es denselben Namen trägt. Benenne das vorhandene Gerät um und versuche es erneut.",
+          "validationError": "Die Integration hat ein unvollständiges oder ungültiges Gerät veröffentlicht: Gladys hat das Speichern abgelehnt.",
+          "serverError": "Beim Hinzufügen dieses Geräts ist in Gladys ein interner Fehler aufgetreten.",
+          "unexpectedError": "Beim Hinzufügen dieses Geräts ist ein unerwarteter Fehler aufgetreten.",
+          "rejectedFieldsTitle": "Abgelehnte Felder:",
+          "technicalDetail": "Technisches Detail:",
+          "apiFullResponse": "Vollständige API-Antwort:",
+          "reportHint": "Kopiere dieses Detail, wenn du im Forum um Hilfe bittest oder das Problem dem Entwickler der Integration meldest.",
+          "fieldLabels": {
+            "name": "Name",
+            "external_id": "Externe ID",
+            "selector": "Interne ID",
+            "model": "Modell",
+            "category": "Kategorie",
+            "type": "Typ",
+            "unit": "Einheit",
+            "min": "Minimalwert",
+            "max": "Maximalwert",
+            "read_only": "Nur lesen",
+            "keep_history": "Verlauf speichern",
+            "has_feedback": "Statusrückmeldung",
+            "room_id": "Raum",
+            "service_id": "Dienst",
+            "device_id": "Gerät",
+            "should_poll": "Abfrage",
+            "poll_frequency": "Abfrageintervall",
+            "value": "Wert"
+          },
+          "contextTypes": {
+            "device_feature": "Funktion \u201e{{name}}\u201c"
+          },
+          "fieldErrorTypes": {
+            "notNullViolation": "Pflichtfeld wurde von der Integration nicht gesetzt",
+            "uniqueViolation": "Wert wird bereits von einem anderen Gerät oder einer anderen Funktion verwendet"
+          }
+        },
         "featuresLabel": "Funktionen",
         "createButton": "Zu Gladys hinzufügen",
         "updateButton": "Aktualisieren",
@@ -4805,6 +4847,15 @@
       "daily-production-revenue": "Tagesertrag",
       "thirty-minutes-production": "Produktion 30 Minuten",
       "thirty-minutes-production-revenue": "Ertrag 30 Minuten"
+    },
+    "battery-storage": {
+      "shortCategoryName": "Batteriespeicher",
+      "battery-level": "Batteriestand",
+      "charge-power": "Ladeleistung",
+      "discharge-power": "Entladeleistung",
+      "charge-index": "Lade-Index",
+      "discharge-index": "Entlade-Index",
+      "battery-energy-remaining": "Verbleibende Batterieenergie"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",
