@@ -205,7 +205,15 @@ function Gladys(params = {}) {
       gateway.init();
 
       if (!params.disableGladysUpgradedCheck) {
-        await system.checkIfGladysUpgraded(gateway);
+        // Voluntarily not awaited: the upgrade notification is forwarded to
+        // the outbound channels of the user, and an external integration
+        // container can only authenticate on the WebSocket once the HTTP
+        // server is listening — which happens after this boot sequence
+        // resolves. Blocking here would make the notification wait for a
+        // connection that cannot happen yet (and the server wait for the
+        // notification). checkIfGladysUpgraded catches its own errors and
+        // never rejects, so the promise can safely float.
+        system.checkIfGladysUpgraded(gateway);
       }
 
       event.emit(EVENTS.TRIGGERS.CHECK, {
