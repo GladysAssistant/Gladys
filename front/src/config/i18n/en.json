@@ -4779,6 +4779,15 @@
       "thirty-minutes-production": "30 Minutes Production",
       "thirty-minutes-production-revenue": "30 Minutes Revenue"
     },
+    "battery-storage": {
+      "shortCategoryName": "Battery storage",
+      "battery-level": "Battery level",
+      "charge-power": "Charge power",
+      "discharge-power": "Discharge power",
+      "charge-index": "Charge index",
+      "discharge-index": "Discharge index",
+      "battery-energy-remaining": "Battery energy remaining"
+    },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",
       "binary": "Switch",
