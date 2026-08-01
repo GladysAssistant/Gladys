@@ -4,6 +4,7 @@ const {
   Error403,
   Error404,
   Error409,
+  Error413,
   Error422,
   Error500,
   Error429,
@@ -47,6 +48,13 @@ module.exports = function errorMiddleware(error, req, res, next) {
       type: error.errors[0].type,
     };
     responseError = new Error409(errorToReturn);
+  } else if (error && error.type === 'entity.too.large') {
+    // body-parser rejected the request before any controller ran. Without
+    // this branch it came back as an opaque 500: the caller (typically an
+    // external integration publishing a big batch) could not tell that the
+    // problem was the size of its payload.
+    logger.warn(`Payload too large on ${req.method} ${req.path}: ${error.length} bytes (limit ${error.limit})`);
+    responseError = new Error413(`Payload too large: ${error.limit} bytes max on this route`);
   } else if (error instanceof BadParameters) {
     responseError = new Error400(error.message);
   } else if (error instanceof PasswordNotMatchingError) {

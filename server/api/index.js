@@ -5,6 +5,7 @@ const WebSocket = require('ws');
 const path = require('path');
 const errorMiddleware = require('./middlewares/errorMiddleware');
 const notFoundMiddleware = require('./middlewares/notFoundMiddleware');
+const jsonBodyMiddleware = require('./middlewares/jsonBodyMiddleware');
 const WebsocketManager = require('./websockets');
 const logger = require('../utils/logger');
 const { setupRoutes } = require('./setupRoutes');
@@ -26,8 +27,9 @@ function start(gladys, port, options) {
   // compress all response
   app.use(compression());
 
-  // parse json
-  app.use(express.json());
+  // parse json (bigger bound on the host API of external integrations,
+  // which is batch by construction)
+  app.use(jsonBodyMiddleware);
 
   if (options.serveFront) {
     // serving static app

@@ -288,6 +288,33 @@ describe('Integration host API', () => {
         })
         .expect(400);
     });
+
+    it('should publish a big batch of devices with many features', async () => {
+      // the list is published in one shot (a second call REPLACES the first
+      // one), so a fleet of feature-heavy devices — a Shelly Pro 3EM exposes
+      // 24 features — must not hit the frontend's 100 kB body bound
+      const devices = Array.from({ length: 40 }, (unusedValue, deviceIndex) => ({
+        name: `Shelly Pro 3EM ${deviceIndex}`,
+        external_id: `ext:${service.selector}:shelly-${deviceIndex}`,
+        features: Array.from({ length: 24 }, (unusedFeatureValue, featureIndex) => ({
+          name: `Puissance phase ${featureIndex}`,
+          external_id: `ext:${service.selector}:shelly-${deviceIndex}:power-${featureIndex}`,
+          category: 'switch',
+          type: 'power',
+          unit: 'watt',
+          min: 0,
+          max: 10000,
+          read_only: true,
+          has_feedback: false,
+          keep_history: true,
+        })),
+      }));
+      const res = await integrationRequest(token)
+        .post('/api/integration/v1/discovered_device')
+        .send({ devices })
+        .expect(200);
+      expect(res.body).to.deep.equal({ success: true, count: 40 });
+    });
   });
 
   describe('GET /api/integration/v1/device', () => {
