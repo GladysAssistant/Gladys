@@ -116,6 +116,11 @@ function Gladys(params = {}) {
   );
   gateway.scene = scene;
   gateway.energyPrice = energyPrice;
+  // The device migration (device.migrate) rewrites scenes: the scene manager
+  // is created after the device manager, so it is attached post-construction
+  // (same pattern as gateway.scene above). Dashboards have no RAM cache and
+  // are rewritten straight through the DB model.
+  device.sceneManager = scene;
 
   const gladys = {
     version: '0.1.0', // todo, read package.json

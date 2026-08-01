@@ -1673,6 +1673,7 @@ const JOB_TYPES = {
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING: 'energy-monitoring-consumption-from-index-beginning',
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
+  DEVICE_MIGRATE: 'device-migrate',
 };
 
 const JOB_STATUS = {
