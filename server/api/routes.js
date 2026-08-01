@@ -500,7 +500,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: serviceController.getAll,
     },
-    // external integrations (admin API)
+    // external integrations (admin API, except the routes explicitly open to
+    // every user: the list and the detail — in their reduced view — plus the
+    // per-user account linking below, so a non-admin can link their own
+    // account on a communication integration)
     // ⚠️ the literal `store` routes must be declared BEFORE `:selector`
     // (setupRoutes registers routes in declaration order). Selectors are
     // prefixed `ext-` so `store` can never be a valid selector anyway.
@@ -510,14 +513,17 @@ function getRoutes(gladys) {
     },
     'get /api/v1/external_integration/store': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.getStore,
     },
     'get /api/v1/external_integration/hardware': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.getHardware,
     },
     'get /api/v1/external_integration/store/docs': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.getStoreDocs,
     },
     'post /api/v1/external_integration/store/refresh': {
@@ -594,14 +600,17 @@ function getRoutes(gladys) {
     },
     'get /api/v1/external_integration/:selector/discovered_device': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.getDiscoveredDevices,
     },
     'post /api/v1/external_integration/:selector/scan': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.scan,
     },
     'get /api/v1/external_integration/:selector/config': {
       authenticated: true,
+      admin: true,
       controller: externalIntegrationController.getConfig,
     },
     'post /api/v1/external_integration/:selector/config': {
