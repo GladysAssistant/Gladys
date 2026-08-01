@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
+  DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE,
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES
 } from '../../../../../../../../server/utils/constants';
@@ -24,6 +25,9 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
   const minErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'min');
   const maxErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'max');
   const hasFieldError = nameErrored || externalIdErrored || unitErrored || minErrored || maxErrored;
+  const availableUnits =
+    get(DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE, `${feature.category}.${feature.type}`) ||
+    DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category];
 
   return (
     <div
@@ -112,7 +116,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
           </div>
 
           <div class="row">
-            {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category] && (
+            {availableUnits && availableUnits.length > 0 && (
               <div class="col-md-4">
                 <div class="form-group">
                   <label class="form-label" for={`unit_${featureIndex}`}>
@@ -128,7 +132,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
                       <option value="">
                         <Text id="global.emptySelectOption" />
                       </option>
-                      {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category].map(unit => (
+                      {availableUnits.map(unit => (
                         <option value={unit}>
                           <Text id={`deviceFeatureUnit.${unit}`}>{unit}</Text>
                         </option>

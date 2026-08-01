@@ -17,6 +17,7 @@ import TextDeviceValue from './TextDeviceValue';
 import NoRecentValueBadge from './NoRecentValueBadge';
 import TemperatureSensorDeviceValue from './TemperatureSensorDeviceValue';
 import LevelSensorDeviceValue from './LevelSensorDeviceValue';
+import WaterValveDeviceValue from './WaterValveDeviceValue';
 import PressureSensorDeviceValue from './PressureSensorDeviceValue';
 import FanSensorDeviceValue from './FanSensorDeviceValue';
 import VacuumCleanerStateDeviceValue from './VacuumCleanerStateDeviceValue';
@@ -41,6 +42,8 @@ const DISPLAY_BY_FEATURE_CATEGORY = {
 const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE]: LevelSensorDeviceValue,
+  [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: WaterValveDeviceValue,
+  [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.DOOR_OPENED]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED]: BinaryDeviceValue,
