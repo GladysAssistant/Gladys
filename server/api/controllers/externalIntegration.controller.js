@@ -1,5 +1,44 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { BadParameters } = require('../../utils/coreErrors');
+const { USER_ROLE } = require('../../utils/constants');
+
+// Manifest type of the integrations a non-admin user can act on: they link
+// their own account on a communication integration, exactly like on the
+// native Telegram/Nextcloud Talk services.
+const COMMUNICATION_TYPE = 'communication';
+
+/**
+ * @description True when the request is made by an admin user.
+ * @param {object} req - The Express request.
+ * @returns {boolean} True when the user is an admin.
+ * @example
+ * if (isAdmin(req)) { ... }
+ */
+function isAdmin(req) {
+  return Boolean(req.user && req.user.role === USER_ROLE.ADMIN);
+}
+
+/**
+ * @description Public view of an external integration, for a non-admin user.
+ * A non-admin only needs to link their own account on a communication
+ * integration: they get the display data of the manifest, never the
+ * operational fields (docker image, container, webhook URLs which embed the
+ * Gladys Plus Open API key...).
+ * @param {object} integration - The external integration.
+ * @returns {object} The reduced integration.
+ * @example
+ * res.json(toNonAdminView(integration));
+ */
+function toNonAdminView(integration) {
+  return {
+    id: integration.id,
+    name: integration.name,
+    selector: integration.selector,
+    status: integration.status,
+    store_slug: integration.store_slug,
+    manifest: integration.manifest,
+  };
+}
 
 module.exports = function ExternalIntegrationController(gladys) {
   /**
@@ -20,9 +59,20 @@ module.exports = function ExternalIntegrationController(gladys) {
    *     "update_available": false
    *   }
    * ]
+   * @apiDescription A non-admin user only gets the installed communication
+   * integrations, in their reduced view: that is what the frontend catalog
+   * displays to them, so they can link their own account.
    */
   async function getAll(req, res) {
     const integrations = await gladys.externalIntegration.get();
+    if (!isAdmin(req)) {
+      res.json(
+        integrations
+          .filter((integration) => integration.manifest && integration.manifest.type === COMMUNICATION_TYPE)
+          .map(toNonAdminView),
+      );
+      return;
+    }
     res.json(integrations);
   }
 
@@ -30,9 +80,17 @@ module.exports = function ExternalIntegrationController(gladys) {
    * @api {get} /api/v1/external_integration/:selector getBySelector
    * @apiName getBySelector
    * @apiGroup ExternalIntegration
+   * @apiDescription A non-admin user gets the reduced view (manifest and
+   * status only): the account linking screen needs nothing more, and the
+   * operational fields must not leak (the webhook URLs embed the Gladys
+   * Plus Open API key).
    */
   async function getBySelector(req, res) {
     const integration = await gladys.externalIntegration.getBySelector(req.params.selector);
+    if (!isAdmin(req)) {
+      res.json(toNonAdminView(integration));
+      return;
+    }
     const containers = await gladys.externalIntegration.getSubContainersState(integration);
     res.json({
       ...integration,
