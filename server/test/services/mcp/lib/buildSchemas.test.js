@@ -1391,6 +1391,26 @@ describe('build schemas', () => {
     expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('2024-02-29');
     expect(mcpHandler.toon.lastCall.args[0].end_date).to.eq('2024-04-30');
 
+    // Years below 0100 keep their century: new Date(year, ...) would map them to
+    // 1900-1999 and query a period two millennia away from the one asked for.
+    getConsumptionByDates.resetHistory();
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '0000-02-29',
+      end_date: '0000-03-01',
+      unit: 'kwh',
+    });
+    const expectedYearZeroFrom = new Date(2000, 0, 1);
+    expectedYearZeroFrom.setFullYear(0, 1, 29);
+    const expectedYearZeroTo = new Date(2000, 0, 1);
+    expectedYearZeroTo.setFullYear(0, 2, 2);
+    expect(getConsumptionByDates.firstCall.args[1]).to.deep.include({
+      from: expectedYearZeroFrom,
+      to: expectedYearZeroTo,
+    });
+    expect(getConsumptionByDates.firstCall.args[1].from.getFullYear()).to.eq(0);
+    expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('0000-02-29');
+
     getConsumptionByDates.resetHistory();
     const reversedDatesResult = await energyTool.cb({
       device: 'Prise onduleur',

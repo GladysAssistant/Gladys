@@ -1297,6 +1297,16 @@ async function getAllTools(userId) {
         const formatDateInput = ({ year, month, day }) =>
           `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
+        // new Date(year, ...) maps years 0 to 99 to 1900 to 1999, so a 4-digit year
+        // below 0100 would query a period two millennia away from the one asked for.
+        // Setting the year explicitly keeps it, and still rolls the day over the
+        // month boundary as the exclusive end date needs.
+        const createLocalDate = ({ year, month, day }) => {
+          const date = new Date(2000, 0, 1);
+          date.setFullYear(year, month - 1, day);
+          return date;
+        };
+
         const parsedStart = parseDateInput(startDate);
         const parsedEnd = parseDateInput(endDate);
         if (!parsedStart || !parsedEnd) {
@@ -1348,8 +1358,8 @@ async function getAllTools(userId) {
         }
 
         // Same date boundaries as the energy dashboard: local midnight, end exclusive.
-        const from = new Date(parsedStart.year, parsedStart.month - 1, parsedStart.day);
-        const to = new Date(parsedEnd.year, parsedEnd.month - 1, parsedEnd.day + 1);
+        const from = createLocalDate(parsedStart);
+        const to = createLocalDate({ ...parsedEnd, day: parsedEnd.day + 1 });
         if (!(from < to)) {
           return {
             content: [
