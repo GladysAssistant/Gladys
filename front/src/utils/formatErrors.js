@@ -224,13 +224,24 @@ const getDiscoveredDeviceCreateError = error => {
   const status = get(error, 'response.status');
   const data = get(error, 'response.data');
 
-  // the request never reached Gladys (server down, network cut, timeout)
   if (!status) {
+    // axios sets `request` as soon as the call left the browser: no status and
+    // a request means the answer never came back (server down, network cut,
+    // timeout). Without it, the rejection is a client-side exception, which
+    // would be a lie to report as a network problem.
+    if (get(error, 'request')) {
+      return {
+        errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.networkError`,
+        errorDetail: get(error, 'message') || null,
+        validationErrors: [],
+        isKnownError: true
+      };
+    }
     return {
-      errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.networkError`,
-      errorDetail: get(error, 'message') || null,
+      errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.unexpectedError`,
+      errorDetail: getUnknownErrorDetail(error),
       validationErrors: [],
-      isKnownError: true
+      isKnownError: false
     };
   }
 

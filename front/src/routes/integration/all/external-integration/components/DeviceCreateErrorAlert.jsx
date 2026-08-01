@@ -10,16 +10,18 @@ const DeviceCreateErrorAlert = ({ errorMessage, errorDetail, validationErrors, i
   const hasValidationErrors = validationErrors && validationErrors.length > 0;
 
   return (
-    <div class="alert alert-danger">
+    <div class="alert alert-danger" role="alert">
       <Text id={errorMessage} />
       {hasValidationErrors && (
         <div class="mt-2">
           <Text id={`${PREFIX}.rejectedFieldsTitle`} />
           <ul class="mt-1 mb-0">
-            {validationErrors.map(validationError => (
+            {/* the index keeps the key unique: two features sharing a name can
+                have the very same field rejected for the very same reason */}
+            {validationErrors.map((validationError, index) => (
               <li
-                key={`${validationError.context ? validationError.context.name : ''}-${validationError.attribute}-${
-                  validationError.message
+                key={`${index}-${validationError.context ? validationError.context.name : ''}-${
+                  validationError.attribute
                 }`}
               >
                 {validationError.context && (
