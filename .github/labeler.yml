@@ -1,11 +1,15 @@
 # Configuration for actions/labeler@v5 (area labels).
-# A PR can receive several area labels: a change in server/services/** gets
-# both area:integration and area:server, which is expected.
+# A PR can receive several area labels.
 
 'area:server':
   - changed-files:
-      - any-glob-to-any-file:
+      # At least one changed file in server/** outside the integrations code:
+      # a PR only touching an integration gets area:integration, not
+      # area:server
+      - all-globs-to-any-file:
           - 'server/**'
+          - '!server/services/**'
+          - '!server/test/services/**'
 
 'area:front':
   - changed-files:
@@ -16,6 +20,7 @@
   - changed-files:
       - any-glob-to-any-file:
           - 'server/services/**'
+          - 'server/test/services/**'
 
 'area:ai':
   - changed-files:

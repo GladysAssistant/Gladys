@@ -4,21 +4,22 @@ import cx from 'classnames';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import DeviceParams from '../components/DeviceParams';
-import { RequestStatus } from '../../../../../utils/consts';
+import DeviceCreateErrorAlert from '../components/DeviceCreateErrorAlert';
+import { getDiscoveredDeviceCreateError } from '../../../../../utils/formatErrors';
 
 class DiscoveredBox extends Component {
   createDevice = async () => {
-    this.setState({ loading: true, createError: null });
+    this.setState({ loading: true, errorMessage: null, errorDetail: null, validationErrors: [], isKnownError: true });
     try {
       await this.props.createDevice(this.props.deviceIndex);
     } catch (e) {
       console.error(e);
-      this.setState({ createError: RequestStatus.Error });
+      this.setState(getDiscoveredDeviceCreateError(e));
     }
     this.setState({ loading: false });
   };
 
-  render({ device }, { loading, createError }) {
+  render({ device }, { loading, errorMessage, errorDetail, validationErrors, isKnownError }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -40,11 +41,12 @@ class DiscoveredBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
-                {createError && (
-                  <div class="alert alert-danger">
-                    <Text id="integration.externalIntegration.discover.createError" />
-                  </div>
-                )}
+                <DeviceCreateErrorAlert
+                  errorMessage={errorMessage}
+                  errorDetail={errorDetail}
+                  validationErrors={validationErrors}
+                  isKnownError={isKnownError}
+                />
                 <div class="form-group">
                   <label class="form-label">
                     <Text id="integration.externalIntegration.discover.featuresLabel" />
