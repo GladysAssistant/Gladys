@@ -254,8 +254,10 @@
     "closeDefineTabletMode": "Schließen",
     "tabletMode": {
       "description": "Der Tablet-Modus wird für die Alarmfunktion verwendet. Wenn du den Alarm scharf schaltest, werden alle Tablets in deinem Zuhause gesperrt und zeigen eine Bildschirmtastatur an, um den Alarm zu deaktivieren.",
+      "currentBrowserOnly": "<strong>Diese Einstellung gilt nur für dieses Gerät.</strong> Mit dem Speichern legst du fest, dass der Browser, den du gerade verwendest, ein Tablet ist. Jedes Gerät wird separat konfiguriert: Aktiviere den Tablet-Modus nur auf Geräten, die bei scharf geschaltetem Alarm gesperrt werden dürfen.",
       "fullScreenForce": "Wenn du ein Tablet dazu zwingen möchtest, im Vollbildmodus zu bleiben, füge der URL <code>?fullscreen=force</code> hinzu.",
-      "houseLabel": "Zuhause",
+      "houseLabel": "Zuhause dieses Tablets",
+      "howToDisable": "Um den Tablet-Modus auf einem Gerät zu deaktivieren, öffne dieses Menü auf dem betreffenden Gerät und wähle „Tablet-Modus deaktiviert“.",
       "tabletModeDisabled": "Tablet-Modus deaktiviert"
     },
     "duckDbMigrationInProgress": "Ihre Instanz Gladys ist dabei, ihre Datenbank auf DuckDB umzustellen, ein neues, leistungsfähigeres Datenbanksystem für Zeitseriendaten. Diese Aufgabe kann einige Zeit in Anspruch nehmen, und während dieser Zeit werden nicht alle Ihre Grafiken verfügbar sein. Fortschritt der Migration = {{progress}}%",
@@ -569,7 +571,10 @@
     "tags": {
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
-      "local": "Lokal"
+      "local": "Lokal",
+      "external": "Community",
+      "native": "Nativ",
+      "deprecated": "Bald veraltet"
     },
     "root": {
       "title": "Integrationen",
@@ -578,9 +583,18 @@
       "noIntegrations": "Keine Integrationen gefunden",
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
+      "refreshStore": {
+        "hint": "Fehlt eine Integration in der Liste?",
+        "button": "Katalog aktualisieren",
+        "refreshing": "Wird aktualisiert…",
+        "tooltip": "Lade die Liste der Community-Integrationen erneut herunter. Gladys speichert sie im Cache und aktualisiert sie alle 30 Minuten.",
+        "success": "Katalog ist aktuell.",
+        "stale": "Gladys konnte den Store nicht erreichen: Dies ist weiterhin der zwischengespeicherte Katalog.",
+        "error": "Der Katalog konnte nicht aktualisiert werden. Überprüfe deine Internetverbindung."
+      },
       "gatewayBanner": {
         "title": "Dein Gerät ist nicht in der Liste?",
-        "description": "Viele Geräte können über <a href=\"/dashboard/integration/device/matter\">Matter</a> (Universalprotokoll) oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin …) verbunden werden. Nach der Verbindung lassen sie sich in Gladys wie jedes andere Gerät steuern."
+        "description": "Viele Geräte können über <a href=\"/dashboard/integration/device/matter\">Matter</a> (Universalprotokoll) verbunden werden. Dein Gerät kann auch von einer externen <b>Community-Integration</b> unterstützt werden: Jeder kann eine erstellen und im Store veröffentlichen, sie erscheint dann in dieser Liste. Siehe die <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation zu externen Integrationen</a>."
       },
       "menu": {
         "all": "Alle Integrationen",
@@ -594,6 +608,282 @@
         "navigation": "Navigation"
       }
     },
+    "externalIntegration": {
+      "updateAvailable": "Update verfügbar",
+      "deviceTab": "Geräte",
+      "discoverTab": "Entdecken",
+      "configTab": "Konfiguration",
+      "supervisionTab": "Überwachung",
+      "logsTab": "Protokolle",
+      "status": {
+        "UNKNOWN": "Unbekannt",
+        "ENABLED": "Aktiviert",
+        "DISABLED": "Deaktiviert",
+        "LOADING": "Wird geladen",
+        "RUNNING": "Läuft",
+        "DEGRADED": "Beeinträchtigt",
+        "STOPPED": "Gestoppt",
+        "ERROR": "Fehler"
+      },
+      "docs": {
+        "modalTitle": "Dokumentation",
+        "loadError": "Beim Laden der Dokumentation ist ein Fehler aufgetreten.",
+        "openRawLink": "In neuem Tab öffnen"
+      },
+      "config": {
+        "title": "Konfiguration",
+        "docsLink": "Dokumentation",
+        "loadError": "Beim Laden der Konfiguration ist ein Fehler aufgetreten.",
+        "noConfig": "Diese Integration hat keine Konfigurationsoptionen.",
+        "secretConfiguredPlaceholder": "Konfiguriert. Leer lassen, um den aktuellen Wert zu behalten.",
+        "saveSuccess": "Konfiguration erfolgreich gespeichert.",
+        "saveError": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
+        "saveButton": "Konfiguration speichern",
+        "oauthConnectButton": "Verbinden",
+        "oauthConnectError": "Fehler beim Starten der Verbindung. Prüfen Sie, ob die Integration läuft."
+      },
+      "actions": {
+        "title": "Aktionen",
+        "runButton": "Ausführen",
+        "error": "Die Aktion ist fehlgeschlagen. Prüfen Sie, ob die Integration läuft."
+      },
+      "connection": {
+        "label": "Verbindung",
+        "connectedBadge": "Verbunden",
+        "disconnectedBadge": "Getrennt"
+      },
+      "transport": {
+        "localBadge": "Lokal",
+        "cloudBadge": "Cloud",
+        "unreachableBadge": "Nicht erreichbar",
+        "localTooltip": "Dieses Gerät antwortet über das lokale Netzwerk (LAN)",
+        "cloudTooltip": "Dieses Gerät antwortet über die Hersteller-Cloud",
+        "unreachableTooltip": "Dieses Gerät antwortet derzeit nicht",
+        "degradedBadge": "Beeinträchtigt",
+        "degradedTooltip": "Dieses Gerät funktioniert, aber nicht im Normalmodus",
+        "preferLocalLabel": "Lokale (LAN) Verbindung bevorzugen, wenn verfügbar",
+        "preferLocalDescription": "Die Integration wendet diese Präferenz an, wenn möglich; das Abzeichen jedes Geräts zeigt den tatsächlich verwendeten Transport."
+      },
+      "oauthCallback": {
+        "title": "Kontoverbindung",
+        "relayingText": "Verbindung mit der Integration wird abgeschlossen...",
+        "successText": "Konto erfolgreich verbunden.",
+        "errorText": "Die Integration hat die Verbindung abgelehnt. Bitte erneut versuchen.",
+        "missingParamsText": "Dieser Seite fehlen die Verbindungsparameter. Starten Sie die Verbindung erneut über den Konfigurationsbildschirm.",
+        "closeText": "Sie können dieses Fenster schließen.",
+        "backToConfigButton": "Zurück zur Konfiguration"
+      },
+      "supervision": {
+        "title": "Überwachung",
+        "loadError": "Beim Laden der Integration ist ein Fehler aufgetreten.",
+        "actionError": "Beim Ausführen dieser Aktion ist ein Fehler aufgetreten.",
+        "uninstallError": "Beim Deinstallieren dieser Integration ist ein Fehler aufgetreten.",
+        "updateAvailableText": "Eine neue Version dieser Integration ist verfügbar.",
+        "statusLabel": "Status",
+        "versionLabel": "Version",
+        "dockerImageLabel": "Docker-Image",
+        "repoLabel": "Repository",
+        "startButton": "Starten",
+        "stopButton": "Stoppen",
+        "restartButton": "Neu starten",
+        "updateButton": "Aktualisieren",
+        "forceUpdateButton": "Update erzwingen",
+        "forceUpdateTitle": "Lädt das Docker-Image neu herunter und erstellt den Container neu, auch ohne neue Version",
+        "logsButton": "Logs",
+        "uninstallButton": "Deinstallieren",
+        "containersTitle": "Zusätzliche Container",
+        "containerRunning": "In Betrieb",
+        "containerStopped": "Gestoppt",
+        "openButton": "Öffnen",
+        "uninstallWarning": "Bist du sicher, dass du diese Integration deinstallieren möchtest? Ihr Container und ihre Konfiguration werden entfernt. Von dieser Integration erstellte Geräte bleiben in Gladys, bis du sie löschst.",
+        "confirmUninstallButton": "Ja, deinstallieren",
+        "cancelUninstallButton": "Abbrechen",
+        "startedAtLabel": "In Betrieb seit"
+      },
+      "device": {
+        "title": "Geräte",
+        "refreshButton": "Aktualisieren",
+        "loadError": "Beim Laden der Geräte ist ein Fehler aufgetreten.",
+        "noDevices": "Noch keine Geräte erstellt. Gehe zum Tab \"Entdecken\", um Geräte zu finden.",
+        "noDevicesConfigureFirst": "Wenn du diese Integration gerade installiert hast, fülle zuerst den Tab <a href=\"{{configUrl}}\">Konfiguration</a> aus und starte dann eine Erkennung.",
+        "saveError": "Beim Speichern dieses Geräts ist ein Fehler aufgetreten.",
+        "deleteError": "Beim Löschen dieses Geräts ist ein Fehler aufgetreten.",
+        "nameLabel": "Name",
+        "namePlaceholder": "Gerätename",
+        "roomLabel": "Raum",
+        "featuresLabel": "Funktionen",
+        "saveButton": "Speichern",
+        "deleteButton": "Löschen"
+      },
+      "deviceParams": {
+        "title": "Technische Parameter"
+      },
+      "discover": {
+        "title": "Entdeckte Geräte",
+        "scanButton": "Scannen",
+        "scanning": "Scannen...",
+        "scanError": "Beim Starten des Scans ist ein Fehler aufgetreten.",
+        "scanErrorDisconnected": "Der Scan konnte nicht gestartet werden: Die Integration ist nicht verbunden. Prüfe im Tab \"Konfiguration\", ob sie läuft.",
+        "loadError": "Beim Laden der entdeckten Geräte ist ein Fehler aufgetreten.",
+        "noDevices": "Noch keine Geräte entdeckt. Klicke auf \"Scannen\", um nach Geräten zu suchen.",
+        "noDevicesConfigureFirst": "Nichts gefunden? Stelle sicher, dass die Integration im Tab <a href=\"{{configUrl}}\">Konfiguration</a> konfiguriert ist, und starte dann einen neuen Scan.",
+        "alreadyCreatedBadge": "Bereits hinzugefügt",
+        "error": {
+          "networkError": "Gladys hat auf die Hinzufügen-Anfrage nicht geantwortet. Prüfe, ob der Gladys-Server läuft und erreichbar ist, und versuche es erneut.",
+          "badRequestError": "Gladys hat dieses Gerät abgelehnt: Die von der Integration veröffentlichten Daten sind fehlerhaft.",
+          "forbiddenError": "Du hast nicht die nötigen Rechte, um dieses Gerät hinzuzufügen. Melde dich ab, wieder an und versuche es erneut.",
+          "notFoundError": "Die angeforderte Ressource wurde auf dem Server nicht gefunden. Starte einen neuen Scan und versuche es erneut.",
+          "conflictError": "Dieses Gerät steht im Konflikt mit einem bereits in Gladys vorhandenen Gerät.",
+          "externalIdConflictError": "Ein Gerät oder eine Funktion mit derselben externen ID existiert bereits in Gladys. Die Integration veröffentlicht wahrscheinlich dieselbe ID zweimal, oder dieses Gerät wurde bereits von einer anderen Integration hinzugefügt.",
+          "selectorConflictError": "Ein anderes Gerät verwendet bereits dieselbe interne ID, meist weil es denselben Namen trägt. Benenne das vorhandene Gerät um und versuche es erneut.",
+          "validationError": "Die Integration hat ein unvollständiges oder ungültiges Gerät veröffentlicht: Gladys hat das Speichern abgelehnt.",
+          "serverError": "Beim Hinzufügen dieses Geräts ist in Gladys ein interner Fehler aufgetreten.",
+          "unexpectedError": "Beim Hinzufügen dieses Geräts ist ein unerwarteter Fehler aufgetreten.",
+          "rejectedFieldsTitle": "Abgelehnte Felder:",
+          "technicalDetail": "Technisches Detail:",
+          "apiFullResponse": "Vollständige API-Antwort:",
+          "reportHint": "Kopiere dieses Detail, wenn du im Forum um Hilfe bittest oder das Problem dem Entwickler der Integration meldest.",
+          "fieldLabels": {
+            "name": "Name",
+            "external_id": "Externe ID",
+            "selector": "Interne ID",
+            "model": "Modell",
+            "category": "Kategorie",
+            "type": "Typ",
+            "unit": "Einheit",
+            "min": "Minimalwert",
+            "max": "Maximalwert",
+            "read_only": "Nur lesen",
+            "keep_history": "Verlauf speichern",
+            "has_feedback": "Statusrückmeldung",
+            "room_id": "Raum",
+            "service_id": "Dienst",
+            "device_id": "Gerät",
+            "should_poll": "Abfrage",
+            "poll_frequency": "Abfrageintervall",
+            "value": "Wert"
+          },
+          "contextTypes": {
+            "device_feature": "Funktion \u201e{{name}}\u201c"
+          },
+          "fieldErrorTypes": {
+            "notNullViolation": "Pflichtfeld wurde von der Integration nicht gesetzt",
+            "uniqueViolation": "Wert wird bereits von einem anderen Gerät oder einer anderen Funktion verwendet"
+          }
+        },
+        "featuresLabel": "Funktionen",
+        "createButton": "Zu Gladys hinzufügen",
+        "updateButton": "Aktualisieren",
+        "updateTitle": "Die Integration hat dieses Gerät mit einer anderen Struktur erneut veröffentlicht: neue Definition anwenden"
+      },
+      "install": {
+        "backToCatalog": "Zurück zu den Integrationen",
+        "notFound": "Diese Integration wurde nicht im Store gefunden.",
+        "starsLabel": "Sterne",
+        "lastPushLabel": "Letzte Aktualisierung:",
+        "warningTitle": "Community-Integration",
+        "warningText": "Diese Integration wird von der Community entwickelt und nicht vom Gladys-Assistant-Team gepflegt. Sie läuft in einem isolierten Docker-Container, du solltest jedoch nur Integrationen von Entwicklern installieren, denen du vertraust.",
+        "communicationWarningText": "Diese Integration ist ein Nachrichtenkanal: Sobald dein Konto verknüpft ist, kann sie in deinem Namen Nachrichten senden und empfangen (Szenen auslösen, dein Zuhause über das Gladys-Gehirn steuern).",
+        "notCompatible": "Diese Integration ist nicht mit deiner Gladys-Installation kompatibel.",
+        "installError": "Beim Installieren dieser Integration ist ein Fehler aufgetreten.",
+        "alreadyInstalled": "Diese Integration ist bereits installiert.",
+        "goToIntegrationButton": "Zur Integration",
+        "installing": "Wird installiert...",
+        "installButton": "Installieren",
+        "networkDiscoveryTitle": "Anfragen zur Netzwerkerkennung",
+        "networkDiscoveryText": "Diese Integration bittet Gladys, die folgenden Netzwerkankündigungen für sie zu erfassen. Sie kann niemals etwas anderes erfassen.",
+        "documentationLink": "Dokumentation",
+        "duplicateWarningTitle": "Eine andere Instanz ist bereits installiert",
+        "duplicateWarningText": "„{name}“ scheint eine weitere Instanz dieser Integration zu sein. Zwei Instanzen können sich um dasselbe Cloud-Konto oder dieselben Geräte streiten — stoppen Sie die bestehende Instanz während Ihrer Tests. Die Installation ist dennoch möglich (z. B. eine Dev-Version neben der Produktion).",
+        "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
+        "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
+        "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie)."
+      },
+      "networkDiscovery": {
+        "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
+        "udpActiveBroadcastText": "Eine Discovery-Anfrage per UDP-Broadcast auf den Ports {ports} senden und die Antworten sammeln",
+        "mdnsText": "mDNS-Dienste vom Typ {service} suchen",
+        "ssdpText": "SSDP-Suche nach {st}"
+      },
+      "installFromGithub": {
+        "cardTitle": "Von GitHub installieren",
+        "cardDescription": "Installiere eine Community-Integration aus einem GitHub-Repository.",
+        "modalTitle": "Eine Integration von GitHub installieren",
+        "repoUrlLabel": "GitHub-Repository-URL",
+        "repoUrlPlaceholder": "https://github.com/owner/repository",
+        "installButton": "Installieren",
+        "devModeLink": "Entwicklermodus: von einem Docker-Image installieren",
+        "devModeDescription": "Installiere eine Integration direkt aus einem Docker-Image, mit optionalem Manifest. Nur für Integrationsentwickler.",
+        "dockerImageLabel": "Docker-Image",
+        "dockerImagePlaceholder": "z. B. meinuser/meine-integration:latest",
+        "manifestLabel": "Manifest (JSON, optional)",
+        "manifestPlaceholder": "{ \"name\": \"Meine Integration\", ... }",
+        "errorUnknown": "Beim Installieren dieser Integration ist ein Fehler aufgetreten.",
+        "errorNotFound": "Repository nicht gefunden, oder es enthält keine gültige Gladys-Integration.",
+        "errorInvalidManifest": "Das Manifest der Integration ist ungültig.",
+        "manifestInvalidJson": "Das Manifest ist kein gültiges JSON."
+      },
+      "logs": {
+        "title": "Protokolle",
+        "refreshButton": "Aktualisieren",
+        "error": "Beim Laden der Protokolle ist ein Fehler aufgetreten.",
+        "empty": "Keine Protokolle verfügbar.",
+        "containerSelectLabel": "Container",
+        "mainContainerOption": "Haupt-Container"
+      },
+      "link": {
+        "title": "Mein Konto verknüpfen",
+        "notLinkedText": "Dein Konto ist nicht mit diesem Nachrichtenkanal verknüpft. Generiere einen Code und sende ihn an den Bot im externen Kanal, um dein Konto zu verknüpfen.",
+        "linkedText": "Dein Konto ist verknüpft mit:",
+        "generateCodeButton": "Verknüpfungscode generieren",
+        "codeText": "Sende diesen Code an den Bot:",
+        "codeExpiryText": "Dieser Code ist einmalig verwendbar und läuft in 15 Minuten ab.",
+        "unlinkButton": "Konto trennen",
+        "error": "Beim Verknüpfen des Kontos ist ein Fehler aufgetreten."
+      },
+      "subContainers": {
+        "title": "Zusätzliche Container",
+        "description": "Diese Integration führt die folgenden Container auf deinem Gerät aus. Die aufgeführten Ports sind aus deinem lokalen Netzwerk erreichbar.",
+        "nameLabel": "Name",
+        "imageLabel": "Image",
+        "limitsLabel": "Limits",
+        "portsLabel": "Veröffentlichte Ports"
+      },
+      "hardware": {
+        "title": "Hardware",
+        "installDescription": "Diese Integration fordert Zugriff auf Hardware deines Geräts an. Du kannst jeden Zugriff gewähren oder ablehnen und dies jederzeit nach der Installation ändern.",
+        "configDescription": "Dieser Integration gewährte Hardware-Zugriffe. Eine Änderung erstellt die betroffenen Container neu und benachrichtigt die Integration.",
+        "detected": "Erkannt",
+        "notDetected": "Nicht erkannt",
+        "saveButton": "Hardware speichern",
+        "saveError": "Beim Speichern der Hardware-Zugriffe ist ein Fehler aufgetreten.",
+        "classes": {
+          "coral-usb": "Coral USB (gesamter USB-Bus)",
+          "coral-pcie": "Coral PCIe",
+          "gpu": "GPU (Grafikbeschleunigung)",
+          "video": "Kameras (Videogeräte)"
+        }
+      },
+      "webhooks": {
+        "title": "Gladys-Plus-Webhooks",
+        "plusRequiredText": "Diese Integration kann Ereignisse aus dem Internet über Gladys Plus empfangen. Verknüpfen Sie Ihr Gladys-Plus-Konto in den Einstellungen, um Webhooks zu aktivieren; andernfalls arbeitet die Integration nur im Abfragemodus.",
+        "explanationText": "Erstellen Sie einen Open-API-Schlüssel in Gladys Plus (Einstellungen → Open API) und fügen Sie ihn hier ein. Gladys erstellt die Webhook-URLs und die Integration registriert sie beim Drittanbieterdienst.",
+        "openApiKeyLabel": "Gladys-Plus-Open-API-Schlüssel",
+        "openApiKeyPlaceholder": "Fügen Sie Ihren Open-API-Schlüssel ein",
+        "saveKeyButton": "Speichern",
+        "saveKeyError": "Beim Speichern des Open-API-Schlüssels ist ein Fehler aufgetreten.",
+        "notAvailableText": "Die Webhooks sind noch nicht aktiv: Speichern Sie Ihren Open-API-Schlüssel, um sie zu aktivieren.",
+        "urlsText": "Webhook-URLs (die Integration registriert sie automatisch, wenn möglich; manche Dienste verlangen das Einfügen in die Anbieterkonsole). Diese URLs enthalten Ihren Schlüssel: Teilen Sie sie nur mit dem Drittanbieterdienst."
+      },
+      "contactProfile": {
+        "title": "Mein Konto",
+        "description": "Dieser Kanal sendet Nachrichten mit Ihren persönlichen Zugangsdaten. Jeder Benutzer trägt seine eigenen Werte ein; leer lassen, um nichts zu erhalten. Das Löschen Ihrer Werte stoppt die Nachrichten.",
+        "saveButton": "Speichern",
+        "clearButton": "Meine Werte löschen",
+        "saveError": "Beim Speichern Ihrer Werte ist ein Fehler aufgetreten.",
+        "saveSuccess": "Ihre Werte wurden gespeichert."
+      }
+    },
     "telegram": {
       "title": "Telegram",
       "description": "Chatte in Telegram mit Gladys.",
@@ -603,7 +893,17 @@
       "note": "Dieser Link ist spezifisch für dein Account. Sende ihn nicht an andere Benutzer.",
       "configurationError": "Dein Account konnte nicht konfiguriert werden. Bist du sicher, dass dieser API-Schlüssel gültig ist?",
       "apiKey": "API-Schlüssel für den Telegram Bot",
-      "saveButton": "Sichern"
+      "saveButton": "Sichern",
+      "disable": {
+        "title": "Telegram-Integration deaktivieren",
+        "description": "Diese Integration ist zugunsten der neuen externen Telegram-Integration veraltet. Beim Deaktivieren wird der Telegram-Bot gestoppt, der gespeicherte API-Schlüssel gelöscht und die Verknüpfung aller Benutzer mit ihrem Telegram-Konto aufgehoben. Danach kannst du die neue Telegram-Integration installieren.",
+        "button": "Telegram-Integration deaktivieren",
+        "confirmation": "Bist du sicher, dass du die Telegram-Integration deaktivieren möchtest? Der API-Schlüssel wird endgültig gelöscht und die Benutzer müssen ihr Telegram-Konto erneut verknüpfen.",
+        "confirmButton": "Ja, deaktivieren",
+        "cancelButton": "Abbrechen",
+        "success": "Die Telegram-Integration wurde deaktiviert, der API-Schlüssel wurde gelöscht.",
+        "error": "Die Telegram-Integration konnte nicht deaktiviert werden. Bitte versuche es erneut."
+      }
     },
     "nextcloudTalk": {
       "title": "Nextcloud Talk",
@@ -2520,7 +2820,8 @@
       "generateButton": "Generieren",
       "keyNameLabel": "Schlüssel:",
       "registeredLabel": "Registriert am:"
-    }
+    },
+    "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden."
   },
   "editScene": {
     "settings": "Einstellungen",
@@ -3873,7 +4174,9 @@
         "mode": {
           "auto": "Automatisch",
           "cooling": "Kühlen",
-          "heating": "Heizen"
+          "heating": "Heizen",
+          "drying": "Entfeuchten",
+          "fan": "Lüften"
         }
       },
       "heater": {
@@ -4533,6 +4836,15 @@
       "index": "Zähler Hausausgang",
       "off-grid-power": "Notstrom-Ausgangsleistung",
       "off-grid-index": "Notstrom-Zähler"
+    },
+    "battery-storage": {
+      "shortCategoryName": "Batteriespeicher",
+      "battery-level": "Batteriestand",
+      "charge-power": "Ladeleistung",
+      "discharge-power": "Entladeleistung",
+      "charge-index": "Lade-Index",
+      "discharge-index": "Entlade-Index",
+      "battery-energy-remaining": "Verbleibende Batterieenergie"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",

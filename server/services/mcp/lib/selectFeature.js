@@ -44,6 +44,16 @@ const isSwitchableFeature = (deviceFeature) => {
   );
 };
 
+const lightControlFeatures = [
+  `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`,
+  `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`,
+  `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`,
+];
+
+const isLightControlFeature = (deviceFeature) => {
+  return lightControlFeatures.includes(`${deviceFeature.category}:${deviceFeature.type}`);
+};
+
 const shutterFeatures = [
   `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.STATE}`,
   `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`,
@@ -106,6 +116,7 @@ const isWritableSensorFeature = (deviceFeature, device) => {
 module.exports = {
   isSensorFeature,
   isSwitchableFeature,
+  isLightControlFeature,
   isShutterFeature,
   isHistoryFeature,
   isWritableSensorFeature,

@@ -16,6 +16,7 @@ const {
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
   NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
+  CarbonDioxideConcentrationMeasurement,
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
@@ -38,6 +39,7 @@ const {
 } = require('../../../utils/constants');
 const { slugify } = require('../../../utils/slugify');
 const { matterAttributeToNumber } = require('./fanMatterMapping');
+const { getAcModeSupportedOptions } = require('./thermostatMatterMapping');
 
 /**
  * @description Build a stable Gladys selector from a Matter external_id.
@@ -304,6 +306,20 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             min: -100,
             max: 200,
           });
+          // Air conditioners expose their operating mode (auto/cool/heat/dry/fan)
+          // through the Thermostat cluster SystemMode attribute
+          const acModeSupportedOptions = getAcModeSupportedOptions(clusterClient.supportedFeatures);
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Mode)`,
+            category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+            type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+            read_only: false,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:mode`,
+            min: acModeSupportedOptions[0].value,
+            max: acModeSupportedOptions[acModeSupportedOptions.length - 1].value,
+            supported_options: acModeSupportedOptions,
+          });
         }
       } else if (clusterIndex === Pm25ConcentrationMeasurement.Complete.id) {
         const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
@@ -371,6 +387,20 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           read_only: true,
           has_feedback: true,
           unit: deviceFeatureUnit,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: minMeasuredValue,
+          max: maxMeasuredValue,
+        });
+      } else if (clusterIndex === CarbonDioxideConcentrationMeasurement.Complete.id) {
+        const minMeasuredValue = (await clusterClient.getMinMeasuredValueAttribute()) ?? 0;
+        const maxMeasuredValue = (await clusterClient.getMaxMeasuredValueAttribute()) ?? 10000;
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          has_feedback: true,
+          unit: DEVICE_FEATURE_UNITS.PPM,
           external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
           min: minMeasuredValue,
           max: maxMeasuredValue,

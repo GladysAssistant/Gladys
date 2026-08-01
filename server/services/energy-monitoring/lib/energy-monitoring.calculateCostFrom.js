@@ -200,8 +200,10 @@ async function calculateCostFrom(startAt, jobId) {
     } catch (e) {
       logger.error(e);
     }
-    // Update the progress in percentage
-    await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / energyDevices.length) * 100));
+    // Update the progress in percentage when this calculation belongs to a job
+    if (jobId) {
+      await this.gladys.job.updateProgress(jobId, Math.round(((index + 1) / energyDevices.length) * 100));
+    }
   });
   return null;
 }

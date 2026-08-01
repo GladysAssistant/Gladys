@@ -263,8 +263,14 @@ const SERVICE_STATUS = {
   DISABLED: 'DISABLED',
   LOADING: 'LOADING',
   RUNNING: 'RUNNING',
+  DEGRADED: 'DEGRADED',
   STOPPED: 'STOPPED',
   ERROR: 'ERROR',
+};
+
+const SERVICE_TYPES = {
+  INTERNAL: 'internal',
+  EXTERNAL: 'external',
 };
 
 const SYSTEM_VARIABLE_NAMES = {
@@ -325,6 +331,8 @@ const EVENTS = {
     RESTORE_BACKUP: 'gateway.restore-backup',
     NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
     NEW_MESSAGE_OWNTRACKS_LOCATION: 'gateway.new-message-owntracks-location',
+    NEW_MESSAGE_EXTERNAL_INTEGRATION_WEBHOOK: 'gateway.new-message-external-integration-webhook',
+    LINK_STATUS_CHANGED: 'gateway.link-status-changed',
     USER_KEYS_CHANGED: 'gateway.user-keys-changed',
     SEND_WEEKLY_DIGEST: 'gateway.send-weekly-digest',
   },
@@ -432,6 +440,12 @@ const EVENTS = {
   },
   MQTT: {
     RECEIVED: 'mqtt.received',
+  },
+  EXTERNAL_INTEGRATION: {
+    STATUS_CHANGED: 'external-integration.status-changed',
+    DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
+    CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
+    DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
   },
 };
 
@@ -614,6 +628,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ANGLE_SENSOR: 'angle-sensor',
   BATTERY: 'battery',
   BATTERY_LOW: 'battery-low',
+  BATTERY_STORAGE: 'battery-storage',
   BUTTON: 'button',
   CAMERA: 'camera',
   CUBE: 'cube',
@@ -851,6 +866,10 @@ const DEVICE_FEATURE_TYPES = {
     THIRTY_MINUTES_PRODUCTION: 'thirty-minutes-production',
     THIRTY_MINUTES_PRODUCTION_REVENUE: 'thirty-minutes-production-revenue',
   },
+  // A device's OWN grid exchange (what it imports from / exports to the grid),
+  // NOT a whole-home meter (that stays energy-sensor). Import/export are split
+  // so core automations can tell direction apart; `power` is the signed single
+  // value some devices report instead (import > 0, export < 0).
   GRID_SENSOR: {
     INPUT_POWER: 'input-power', // instantaneous power imported from the grid, W (>= 0)
     OUTPUT_POWER: 'output-power', // instantaneous power exported to the grid, W (>= 0)
@@ -858,11 +877,22 @@ const DEVICE_FEATURE_TYPES = {
     INPUT_INDEX: 'input-index', // cumulative imported-energy meter index, kWh (>= 0)
     OUTPUT_INDEX: 'output-index', // cumulative exported-energy meter index, kWh (>= 0)
   },
+  // The power a device delivers to the local load / house it feeds (e.g. a
+  // storage inverter's home output), plus its backup/off-grid output. This is
+  // the DEVICE's own output, not whole-home consumption (energy-sensor).
   HOME_OUTPUT_SENSOR: {
     POWER: 'power', // instantaneous power delivered to the home, W (>= 0)
     INDEX: 'index', // cumulative delivered-energy meter index, kWh (>= 0)
     OFF_GRID_POWER: 'off-grid-power', // instantaneous power on the backup/off-grid output, W (>= 0)
     OFF_GRID_INDEX: 'off-grid-index', // cumulative backup-output energy meter index, kWh (>= 0)
+  },
+  BATTERY_STORAGE: {
+    BATTERY_LEVEL: 'battery-level', // state of charge, % (0..100)
+    CHARGE_POWER: 'charge-power', // power INTO the battery, W/kW (>=0)
+    DISCHARGE_POWER: 'discharge-power', // power OUT of the battery, W/kW (>=0)
+    CHARGE_INDEX: 'charge-index', // cumulative charged-energy meter index, kWh
+    DISCHARGE_INDEX: 'discharge-index', // cumulative discharged-energy meter index, kWh
+    BATTERY_ENERGY_REMAINING: 'battery-energy-remaining', // currently available stored energy (instantaneous), kWh
   },
   TELEINFORMATION: {
     BINARY: 'binary',
@@ -1286,6 +1316,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.WATT_HOUR,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
     DEVICE_FEATURE_UNITS.EURO,
+    DEVICE_FEATURE_UNITS.DOLLAR,
   ],
   [DEVICE_FEATURE_CATEGORIES.GRID_SENSOR]: [
     DEVICE_FEATURE_UNITS.WATT,
@@ -1294,6 +1325,13 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   ],
   [DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR]: [
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.WATT_HOUR,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: [
+    DEVICE_FEATURE_UNITS.PERCENT,
     DEVICE_FEATURE_UNITS.WATT,
     DEVICE_FEATURE_UNITS.KILOWATT,
     DEVICE_FEATURE_UNITS.WATT_HOUR,
@@ -1489,6 +1527,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
+    INTEGRATION_REQUEST: 'authenticate.integration-request',
     CONNECTED: 'authentication.connected',
   },
   GATEWAY: {
@@ -1579,6 +1618,30 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   MATTERBRIDGE: {
     STATUS_CHANGE: 'matterbridge.status-change',
+  },
+  EXTERNAL_INTEGRATION: {
+    STATUS_CHANGED: 'external-integration.status-changed',
+    DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
+    CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
+    DEVICE_SET_VALUE: 'external-integration.device.set-value',
+    DEVICE_POLL: 'external-integration.device.poll',
+    COMMAND_RESULT: 'external-integration.command-result',
+    SCAN_REQUEST: 'external-integration.scan-request',
+    DEVICE_CREATED: 'external-integration.device-created',
+    DEVICE_UPDATED: 'external-integration.device-updated',
+    DEVICE_DELETED: 'external-integration.device-deleted',
+    HEARTBEAT: 'external-integration.heartbeat',
+    CONFIG_UPDATED: 'external-integration.config-updated',
+    MESSAGE_SEND: 'external-integration.message.send',
+    HARDWARE_UPDATED: 'external-integration.hardware-updated',
+    OAUTH_GET_AUTHORIZE_URL: 'external-integration.oauth.get-authorize-url',
+    OAUTH_CALLBACK: 'external-integration.oauth.callback',
+    ACTION_RUN: 'external-integration.action.run',
+    CAMERA_GET_IMAGE: 'external-integration.camera.get-image',
+    DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
+    WEBHOOK_RECEIVED: 'external-integration.webhook.received',
+    WEBHOOK_REQUEST: 'external-integration.webhook.request',
+    WEBHOOK_UPDATED: 'external-integration.webhook-updated',
   },
 };
 
@@ -1703,6 +1766,23 @@ const ENERGY_PRICE_DAY_TYPES = {
   WHITE: 'white',
 };
 
+const AI_CHAT_TOOL_CATEGORIES = {
+  SCENES: 'scenes',
+  DEVICE_CONTROL: 'device_control',
+  DEVICE_QUERY: 'device_query',
+  WEB_AND_TIME: 'web_and_time',
+  OTHER: 'other',
+};
+
+// Explicit purpose of each AI request, sent to the Gladys Gateway so the
+// backend can pick the right model and reasoning settings per request type
+// without inspecting message content.
+const AI_CHAT_PURPOSES = {
+  CHAT: 'chat',
+  INTENT_CLASSIFICATION: 'intent-classification',
+  WEEKLY_DIGEST: 'weekly-digest',
+};
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -1736,6 +1816,7 @@ const JOB_TYPES_LIST = createList(JOB_TYPES);
 const JOB_STATUS_LIST = createList(JOB_STATUS);
 const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 const ALARM_MODES_LIST = createList(ALARM_MODES);
+const AI_CHAT_TOOL_CATEGORIES_LIST = createList(AI_CHAT_TOOL_CATEGORIES);
 const ENERGY_CONTRACT_TYPES_LIST = createList(ENERGY_CONTRACT_TYPES);
 const ENERGY_PRICE_TYPES_LIST = createList(ENERGY_PRICE_TYPES);
 const ENERGY_PRICE_DAY_TYPES_LIST = createList(ENERGY_PRICE_DAY_TYPES);
@@ -1797,6 +1878,9 @@ module.exports.DEVICE_FEATURE_UNITS_BY_CATEGORY = DEVICE_FEATURE_UNITS_BY_CATEGO
 module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
 
+module.exports.SERVICE_TYPES = SERVICE_TYPES;
+module.exports.SERVICE_TYPES_LIST = createList(SERVICE_TYPES);
+
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
 
 module.exports.DASHBOARD_TYPE = DASHBOARD_TYPE;
@@ -1826,6 +1910,10 @@ module.exports.DEFAULT_VALUE_TEMPERATURE = DEFAULT_VALUE_TEMPERATURE;
 
 module.exports.ALARM_MODES = ALARM_MODES;
 module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
+
+module.exports.AI_CHAT_TOOL_CATEGORIES = AI_CHAT_TOOL_CATEGORIES;
+module.exports.AI_CHAT_TOOL_CATEGORIES_LIST = AI_CHAT_TOOL_CATEGORIES_LIST;
+module.exports.AI_CHAT_PURPOSES = AI_CHAT_PURPOSES;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
 module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;

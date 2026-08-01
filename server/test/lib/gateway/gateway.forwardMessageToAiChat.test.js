@@ -8,6 +8,7 @@ const z = require('../../../services/mcp/node_modules/zod/v4');
 
 const resizeImageMock = fake.resolves('data:image/jpeg;base64,resized-image-data');
 const promptMock = 'You are Gladys AI.';
+const scenesPromptMock = 'Scene creation rules mock.';
 
 /**
  * @description Load module under test with mocked dependencies.
@@ -22,7 +23,7 @@ function getModule({ tools = [], prompt = promptMock } = {}) {
   return proxyquire('../../../lib/gateway/gateway.forwardMessageToAiChat', {
     '../../utils/resizeImage': { resizeImage: resizeImageMock },
     fs: {
-      readFileSync: fake.returns(prompt),
+      readFileSync: fake((filePath) => (String(filePath).includes('aiChatScenes') ? scenesPromptMock : prompt)),
     },
   });
 }
@@ -36,6 +37,7 @@ function getModule({ tools = [], prompt = promptMock } = {}) {
  * @param {Function} options.replyByIntent - Message replyByIntent mock.
  * @param {Function} [options.eventEmit] - Event emitter mock.
  * @param {string} [options.timezone] - Timezone returned by variable.getValue.
+ * @param {Function} [options.classifyAiChatToolCategories] - Tool categories classifier mock.
  * @returns {object} Bound context object.
  * @example
  * const ctx = buildContext({ tools: [], aiChat: fake(), reply: fake(), replyByIntent: fake() });
@@ -47,11 +49,13 @@ function buildContext({
   replyByIntent,
   eventEmit = fake.returns(null),
   timezone = 'Europe/Paris',
+  classifyAiChatToolCategories = fake.resolves(null),
 }) {
   return {
     event: {
       emit: eventEmit,
     },
+    classifyAiChatToolCategories,
     variable: {
       getValue: stub().callsFake((name) => {
         if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
@@ -119,12 +123,12 @@ describe('gateway.forwardMessageToAiChat', () => {
     const replyByIntent = fake.resolves(null);
 
     await forwardMessageToAiChat.call(buildContext({ tools: [], aiChat, reply, replyByIntent }), {
-      message: { text: 'Turn on the light', model: 'llama-3.3-70b-instruct' },
+      message: { text: 'Turn on the light', model: 'glm-5.2' },
       previousQuestions: [],
       context: {},
     });
 
-    expect(aiChat.getCall(0).args[0].model).to.equal('llama-3.3-70b-instruct');
+    expect(aiChat.getCall(0).args[0].model).to.equal('glm-5.2');
   });
 
   it('should omit model from the AI gateway request when auto is selected', async () => {
@@ -1058,5 +1062,597 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
     expect(result).to.deep.equal({ answer: '', imagesSent: 0 });
     assert.notCalled(reply);
     assert.notCalled(replyByIntent);
+  });
+
+  describe('two-stage tool routing', () => {
+    const buildRoutedTools = () => [
+      {
+        intent: 'scene.create',
+        config: {
+          title: 'Create scene',
+          description: 'Create a scene',
+          categories: ['scenes'],
+          inputSchema: { name: z.string() },
+        },
+        cb: fake.resolves({ content: [{ type: 'text', text: 'scene created' }] }),
+      },
+      {
+        intent: 'device.turn-on-off',
+        config: {
+          title: 'Turn devices on/off',
+          description: 'Turn on or off devices',
+          categories: ['device_control', 'other'],
+          inputSchema: { action: z.enum(['on', 'off']) },
+        },
+        cb: fake.resolves({ content: [{ type: 'text', text: 'done' }] }),
+      },
+    ];
+
+    it('should only send tools of the classified categories and omit scene rules', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_1',
+                  function: {
+                    name: 'device_turn_on_off',
+                    arguments: '{"action":"off"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: 'OK' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_control']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Éteins la lumière du salon' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      assert.calledOnce(classifyAiChatToolCategories);
+      assert.calledWithMatch(classifyAiChatToolCategories, {
+        messageText: 'Éteins la lumière du salon',
+        previousQuestions: [],
+      });
+      const request = aiChat.getCall(0).args[0];
+      expect(request.tools.map((tool) => tool.function.name)).to.deep.equal(['device_turn_on_off']);
+      expect(request.messages[0].content).to.not.include(scenesPromptMock);
+      expect(request.purpose).to.equal('chat');
+      expect(request.categories).to.deep.equal(['device_control']);
+      expect(request.tool_choice).to.equal('required');
+      expect(aiChat.getCall(1).args[0].tool_choice).to.equal('auto');
+    });
+
+    it('should force tool_choice=required for device_query then switch to auto after tools', async () => {
+      const tools = [
+        {
+          intent: 'device.get-state',
+          config: {
+            title: 'Get states',
+            description: 'Get device states',
+            categories: ['device_query', 'other'],
+            inputSchema: { room: z.enum(['Salon']).optional() },
+          },
+          cb: fake.resolves({ content: [{ type: 'text', text: 'Salon temperature: 25.3°C' }] }),
+        },
+      ];
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_temp',
+                  function: {
+                    name: 'device_get_state',
+                    arguments: '{"device_type":"temperature-sensor","room":"Salon"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: 'La température dans le salon est de 25,3 °C.' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_query']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Et la température ?' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: 'La température dans le salon est de 25,3 °C.', imagesSent: 0 });
+      expect(aiChat.getCall(0).args[0].tool_choice).to.equal('required');
+      expect(aiChat.getCall(1).args[0].tool_choice).to.equal('auto');
+      assert.calledWith(
+        reply,
+        match.has('text', 'Et la température ?'),
+        'device_get_state({"device_type":"temperature-sensor","room":"Salon"})',
+        {},
+        null,
+        match({ messageType: 'tool_call', toolName: 'device_get_state', toolStatus: 'success' }),
+      );
+    });
+
+    it('should retry once when forced tool use returns no tool_calls', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat, FORCE_TOOL_RETRY_MESSAGE } = getModule({ tools });
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [{ message: { content: 'La température est de 25,3 °C.' } }],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_retry',
+                  function: {
+                    name: 'device_turn_on_off',
+                    arguments: '{"action":"off"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(2).resolves({
+        choices: [{ message: { content: 'Fait après retry.' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_control']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Éteins la lumière' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: 'Fait après retry.', imagesSent: 0 });
+      expect(aiChat.callCount).to.equal(3);
+      expect(aiChat.getCall(0).args[0].tool_choice).to.equal('required');
+      expect(aiChat.getCall(1).args[0].tool_choice).to.equal('required');
+      // messagesForApi is mutated in place after the call, so assert presence rather than last element.
+      expect(
+        aiChat
+          .getCall(1)
+          .args[0].messages.some((message) => message.role === 'user' && message.content === FORCE_TOOL_RETRY_MESSAGE),
+      ).to.equal(true);
+      expect(aiChat.getCall(2).args[0].tool_choice).to.equal('auto');
+    });
+
+    it('should accept the answer after a failed forced-tool retry', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [{ message: { content: 'Il fait 22 °C.' } }],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: 'Il fait toujours 22 °C.' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_query']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Quelle température ?' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: 'Il fait toujours 22 °C.', imagesSent: 0 });
+      expect(aiChat.callCount).to.equal(2);
+      expect(aiChat.getCall(0).args[0].tool_choice).to.equal('required');
+      expect(aiChat.getCall(1).args[0].tool_choice).to.equal('required');
+    });
+
+    it('should retry once with a reformulation request when the final answer is raw JSON after a tool call', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat, RAW_DATA_ANSWER_RETRY_MESSAGE } = getModule({ tools });
+      const rawJsonAnswer = '{"state": {"value": 850, "timestamp": "2026-07-30T20:38:00.000Z"}}';
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_co2',
+                  function: {
+                    name: 'device_turn_on_off',
+                    arguments: '{"action":"off"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: rawJsonAnswer } }],
+      });
+      aiChat.onCall(2).resolves({
+        choices: [{ message: { content: 'Le taux de CO2 est de 850 ppm.' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_control']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Quel est le niveau de CO2 ?' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: 'Le taux de CO2 est de 850 ppm.', imagesSent: 0 });
+      expect(aiChat.callCount).to.equal(3);
+      const retryMessages = aiChat.getCall(2).args[0].messages;
+      expect(
+        retryMessages.some((message) => message.role === 'assistant' && message.content === rawJsonAnswer),
+      ).to.equal(true);
+      expect(
+        retryMessages.some((message) => message.role === 'user' && message.content === RAW_DATA_ANSWER_RETRY_MESSAGE),
+      ).to.equal(true);
+      expect(aiChat.getCall(2).args[0].tool_choice).to.equal('auto');
+    });
+
+    it('should accept the raw JSON answer after a failed reformulation retry', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const rawJsonAnswer = '{"state": {"value": 850}}';
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_co2',
+                  function: {
+                    name: 'device_turn_on_off',
+                    arguments: '{"action":"off"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: rawJsonAnswer } }],
+      });
+      aiChat.onCall(2).resolves({
+        choices: [{ message: { content: rawJsonAnswer } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['device_control']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Quel est le niveau de CO2 ?' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: rawJsonAnswer, imagesSent: 0 });
+      expect(aiChat.callCount).to.equal(3);
+    });
+
+    it('should not retry a JSON answer when no tool result exists in the conversation', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const rawJsonAnswer = '{"example": "value"}';
+      const aiChat = fake.resolves({
+        choices: [{ message: { content: rawJsonAnswer } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['other']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Donne-moi un exemple de JSON' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: rawJsonAnswer, imagesSent: 0 });
+      expect(aiChat.callCount).to.equal(1);
+    });
+
+    it('should keep tool_choice=auto for other, web_and_time and unclassified requests', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const otherAiChat = fake.resolves({
+        choices: [{ message: { content: 'OK other' } }],
+      });
+      const webAndTimeAiChat = fake.resolves({
+        choices: [{ message: { content: 'Il est 20:38.' } }],
+      });
+      const nullAiChat = fake.resolves({
+        choices: [{ message: { content: 'OK null' } }],
+      });
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({
+          tools,
+          aiChat: otherAiChat,
+          reply,
+          replyByIntent,
+          classifyAiChatToolCategories: fake.resolves(['other']),
+        }),
+        {
+          message: { text: "Quelle est la durée de cuisson d'un œuf ?" },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+      await forwardMessageToAiChat.call(
+        buildContext({
+          tools,
+          aiChat: webAndTimeAiChat,
+          reply,
+          replyByIntent,
+          classifyAiChatToolCategories: fake.resolves(['web_and_time']),
+        }),
+        {
+          message: { text: 'Quelle heure est-il ?' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+      await forwardMessageToAiChat.call(
+        buildContext({
+          tools,
+          aiChat: nullAiChat,
+          reply,
+          replyByIntent,
+          classifyAiChatToolCategories: fake.resolves(null),
+        }),
+        {
+          message: { text: 'Bonjour' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(otherAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
+      expect(webAndTimeAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
+      expect(nullAiChat.getCall(0).args[0].tool_choice).to.equal('auto');
+    });
+
+    it('should send scene tools and scene rules when the request is classified as scenes', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_scene',
+                  function: {
+                    name: 'scene_create',
+                    arguments: '{}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: 'OK' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['scenes']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Crée une scène qui éteint tout à 23h' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      const request = aiChat.getCall(0).args[0];
+      expect(request.tools.map((tool) => tool.function.name)).to.deep.equal(['scene_create']);
+      expect(request.messages[0].content).to.include(scenesPromptMock);
+      expect(request.tool_choice).to.equal('required');
+      expect(aiChat.getCall(1).args[0].tool_choice).to.equal('auto');
+    });
+
+    it('should fall back to all tools and scene rules when classification returns null', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = fake.resolves({
+        choices: [{ message: { content: 'OK' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(null);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Bonjour Gladys' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      const request = aiChat.getCall(0).args[0];
+      expect(request.tools.map((tool) => tool.function.name)).to.deep.equal(['scene_create', 'device_turn_on_off']);
+      expect(request.messages[0].content).to.include(scenesPromptMock);
+      expect(request.purpose).to.equal('chat');
+      expect(request).to.not.have.property('categories');
+      expect(request.tool_choice).to.equal('auto');
+    });
+
+    it('should not call the router when there is no tool to filter', async () => {
+      const { forwardMessageToAiChat } = getModule({ tools: [] });
+      const aiChat = fake.resolves({
+        choices: [{ message: { content: 'Bonjour !' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['other']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      await forwardMessageToAiChat.call(
+        buildContext({ tools: [], aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Bonjour' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      assert.notCalled(classifyAiChatToolCategories);
+      assert.calledOnce(aiChat);
+      expect(aiChat.getCall(0).args[0].tool_choice).to.equal('auto');
+    });
+
+    it('should still execute a tool excluded by routing if the model calls it', async () => {
+      const tools = buildRoutedTools();
+      const { forwardMessageToAiChat } = getModule({ tools });
+      const aiChat = stub();
+      aiChat.onCall(0).resolves({
+        choices: [
+          {
+            message: {
+              content: null,
+              tool_calls: [
+                {
+                  id: 'call_1',
+                  function: {
+                    name: 'device_turn_on_off',
+                    arguments: '{"action":"off"}',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      });
+      aiChat.onCall(1).resolves({
+        choices: [{ message: { content: 'Fait.' } }],
+      });
+      const classifyAiChatToolCategories = fake.resolves(['scenes']);
+      const reply = fake.resolves(null);
+      const replyByIntent = fake.resolves(null);
+
+      const result = await forwardMessageToAiChat.call(
+        buildContext({ tools, aiChat, reply, replyByIntent, classifyAiChatToolCategories }),
+        {
+          message: { text: 'Crée une scène et éteins la lumière' },
+          previousQuestions: [],
+          context: {},
+        },
+      );
+
+      expect(result).to.deep.equal({ answer: 'Fait.', imagesSent: 0 });
+      const toolMessage = aiChat.getCall(1).args[0].messages.find((m) => m.role === 'tool');
+      expect(toolMessage.content).to.equal('done');
+    });
+  });
+});
+
+describe('gateway.forwardMessageToAiChat tool choice helpers', () => {
+  it('shouldForceToolChoice should force home intents but not web/time or pure other', () => {
+    const { shouldForceToolChoice } = getModule();
+    expect(shouldForceToolChoice(['device_query'])).to.equal(true);
+    expect(shouldForceToolChoice(['device_control', 'other'])).to.equal(true);
+    expect(shouldForceToolChoice(['scenes'])).to.equal(true);
+    expect(shouldForceToolChoice(['web_and_time'])).to.equal(false);
+    expect(shouldForceToolChoice(['other'])).to.equal(false);
+    expect(shouldForceToolChoice(null)).to.equal(false);
+    expect(shouldForceToolChoice([])).to.equal(false);
+  });
+
+  it('resolveToolChoice should require tools only before the first tool iteration', () => {
+    const { resolveToolChoice } = getModule();
+    expect(resolveToolChoice({ forceToolUse: true, hasTools: true, hasCompletedToolIteration: false })).to.equal(
+      'required',
+    );
+    expect(resolveToolChoice({ forceToolUse: true, hasTools: true, hasCompletedToolIteration: true })).to.equal('auto');
+    expect(resolveToolChoice({ forceToolUse: true, hasTools: false, hasCompletedToolIteration: false })).to.equal(
+      'auto',
+    );
+    expect(resolveToolChoice({ forceToolUse: false, hasTools: true, hasCompletedToolIteration: false })).to.equal(
+      'auto',
+    );
+  });
+
+  it('looksLikeRawDataAnswer should only match answers that are entirely raw JSON data', () => {
+    const { looksLikeRawDataAnswer } = getModule();
+    expect(looksLikeRawDataAnswer('{"state": {"value": 850, "timestamp": "2026-07-30T20:38:00.000Z"}}')).to.equal(true);
+    expect(looksLikeRawDataAnswer('[{"room": "Salon", "value": 25.3}]')).to.equal(true);
+    expect(looksLikeRawDataAnswer('```json\n{"value": 850}\n```')).to.equal(true);
+    expect(looksLikeRawDataAnswer('```json5\n{"value": 850}\n```')).to.equal(true);
+    expect(looksLikeRawDataAnswer('```\n{"value": 850}\n```')).to.equal(true);
+    expect(looksLikeRawDataAnswer('  {"value": 850}  ')).to.equal(true);
+    expect(looksLikeRawDataAnswer('Le taux de CO2 est de 850 ppm.')).to.equal(false);
+    expect(looksLikeRawDataAnswer('Voici la valeur : {"value": 850}')).to.equal(false);
+    expect(looksLikeRawDataAnswer('850')).to.equal(false);
+    expect(looksLikeRawDataAnswer('{invalid json')).to.equal(false);
+    expect(looksLikeRawDataAnswer('')).to.equal(false);
+    expect(looksLikeRawDataAnswer(123)).to.equal(false);
+    expect(looksLikeRawDataAnswer(null)).to.equal(false);
+    expect(looksLikeRawDataAnswer(undefined)).to.equal(false);
   });
 });

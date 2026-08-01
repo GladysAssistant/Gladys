@@ -1,4 +1,5 @@
 const { send } = require('./message.send');
+const { sendToUser } = require('./message.sendToUser');
 
 /**
  * @description Add ability to send messages through CallMeBot.
@@ -13,5 +14,6 @@ const MessageHandler = function MessageHandler(gladys, serviceId) {
 };
 
 MessageHandler.prototype.send = send;
+MessageHandler.prototype.sendToUser = sendToUser;
 
 module.exports = MessageHandler;

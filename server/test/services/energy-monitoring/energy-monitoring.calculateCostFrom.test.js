@@ -158,6 +158,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(deviceFeatureState[0]).to.have.property('value', 10 * 0.18);
     // Price should be equal to 0.18€/kwh * 20kwh
     expect(deviceFeatureState[1]).to.have.property('value', 20 * 0.18);
+    expect(gladys.job.updateProgress.called).to.equal(false);
   });
   it('should calculate cost from a specific date with Watt-hour unit conversion', async () => {
     // Create a device with consumption in Watt-hour (not kWh)
@@ -463,6 +464,7 @@ describe('EnergyMonitoring.calculateCostFrom', () => {
     expect(deviceFeatureState[0]).to.have.property('value', 100 * 0.18);
     // Price should be equal to 0.18€/kwh * 200kwh
     expect(deviceFeatureState[1]).to.have.property('value', 200 * 0.18);
+    expect(gladys.job.updateProgress.called).to.equal(true);
   });
   it('should handle device with thirty minutes consumption but no cost feature (logs missing cost feature)', async () => {
     // Create a device that only has the THIRTY_MINUTES_CONSUMPTION feature, without the corresponding COST feature

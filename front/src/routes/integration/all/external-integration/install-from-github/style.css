@@ -1,0 +1,46 @@
+.cardLink {
+  display: block;
+  color: inherit;
+}
+
+.cardLink:hover,
+.cardLink:focus {
+  text-decoration: none;
+  color: inherit;
+}
+
+.installCard {
+  border-style: dashed;
+  height: 100%;
+}
+
+.installCardIcon {
+  font-size: 2.5rem;
+  color: #467fcf;
+}
+
+.listLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+}
+
+.listLink:hover,
+.listLink:focus {
+  text-decoration: none;
+  color: inherit;
+}
+
+.listIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(70, 127, 207, 0.12);
+  color: #467fcf;
+  font-size: 1.25rem;
+}

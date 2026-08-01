@@ -14,6 +14,12 @@ const names = {
     },
     reversedValue: true,
   },
+  garage_door_contact: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    },
+  },
   eco_mode: {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -76,6 +82,12 @@ const names = {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
       },
+    },
+  },
+  trigger: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
     },
   },
   vibration: {

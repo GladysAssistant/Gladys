@@ -366,7 +366,9 @@ class EnergyConsumption extends Component {
   };
 
   yAxisFormatter = value => {
-    if (Number.isNaN(value)) {
+    // ApexCharts calls this formatter with undefined values when a series
+    // is hidden through the legend, throwing here would break the tooltip
+    if (value === null || value === undefined || Number.isNaN(value)) {
       return value;
     }
     const { displayMode } = this.state;
@@ -378,7 +380,9 @@ class EnergyConsumption extends Component {
   };
 
   tooltipYFormatter = value => {
-    if (Number.isNaN(value)) {
+    // ApexCharts calls this formatter with undefined values when a series
+    // is hidden through the legend, throwing here would break the tooltip
+    if (value === null || value === undefined || Number.isNaN(value)) {
       return value;
     }
     const { displayMode } = this.state;
