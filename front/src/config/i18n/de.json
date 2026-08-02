@@ -818,7 +818,7 @@
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
         "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
-        "ttsInfoText": "Diese Integration ist ein Sprachsynthese-Anbieter: Wählen Sie sie nach der Installation als Stimme Ihrer Instanz unter Einstellungen → System aus. Ansagen werden über Ihr lokales Netzwerk bereitgestellt — Lautsprecher und Browser im selben Netzwerk können sie abspielen."
+        "ttsInfoText": "Diese Integration ist ein Sprachsynthese-Anbieter: Wählen Sie sie nach der Installation als Stimme Ihrer Instanz in der Integration Künstliche Intelligenz aus. Ansagen werden über Ihr lokales Netzwerk bereitgestellt — Lautsprecher und Browser im selben Netzwerk können sie abspielen."
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
