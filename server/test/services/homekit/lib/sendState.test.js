@@ -30,6 +30,7 @@ describe('Send state to HomeKit', () => {
         TargetPosition: 'TARGETPOSITION',
         CurrentAmbientLightLevel: 'CURRENTAMBIENTLIGHTLEVEL',
         CarbonMonoxideDetected: 'CARBONMONOXIDEDETECTED',
+        CarbonMonoxideLevel: 'CARBONMONOXIDELEVEL',
         CarbonDioxideLevel: 'CARBONDIOXIDELEVEL',
         CarbonDioxideDetected: 'CARBONDIOXIDEDETECTED',
         AirQuality: 'AIRQUALITY',
@@ -471,6 +472,36 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['CARBONDIOXIDELEVEL', 900]);
     // below the 1000 ppm threshold, no alarm
     expect(updateCharacteristic.args[1]).eql(['CARBONDIOXIDEDETECTED', 0]);
+
+    // above the threshold, and the decimal flavour of the same category
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL },
+      { ...event, last_value: 1500 },
+    );
+
+    expect(updateCharacteristic.args[2]).eql(['CARBONDIOXIDELEVEL', 1500]);
+    expect(updateCharacteristic.args[3]).eql(['CARBONDIOXIDEDETECTED', 1]);
+
+    // and a carbon monoxide sensor reporting a concentration, both flavours
+    const coFeature = {
+      ...feature,
+      category: DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
+    };
+    await homekitHandler.sendState(
+      accessory,
+      { ...coFeature, type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL },
+      { ...event, last_value: 40 },
+    );
+    await homekitHandler.sendState(
+      accessory,
+      { ...coFeature, type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER },
+      { ...event, last_value: 10 },
+    );
+
+    expect(updateCharacteristic.args[4]).eql(['CARBONMONOXIDELEVEL', 40]);
+    expect(updateCharacteristic.args[5]).eql(['CARBONMONOXIDEDETECTED', 1]);
+    expect(updateCharacteristic.args[7]).eql(['CARBONMONOXIDEDETECTED', 0]);
   });
 
   it('should notify air quality sensor', async () => {

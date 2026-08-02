@@ -579,6 +579,69 @@ describe('Build service', () => {
     expect(cb.args[1][1]).to.equal(1);
   });
 
+  it('should build carbon monoxide sensor service from a concentration', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'co-decimal').returns({ last_value: 40 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'co-integer').returns({ last_value: 10 });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: {
+        minValue: 0,
+        maxValue: 100,
+      },
+    });
+    const CarbonMonoxideSensor = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        CarbonMonoxideLevel: 'CARBONMONOXIDELEVEL',
+        CarbonMonoxideDetected: 'CARBONMONOXIDEDETECTED',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        CarbonMonoxideSensor,
+      },
+    };
+    const device = {
+      name: 'Détecteur CO',
+    };
+    // integrations report the concentration either as a decimal or as an integer
+    const features = [
+      {
+        name: 'CO decimal',
+        selector: 'co-decimal',
+        category: DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.PPM,
+      },
+      {
+        name: 'CO integer',
+        selector: 'co-integer',
+        category: DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.PPM,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.CO_SENSOR]);
+    await on.args[0][1](cb);
+    await on.args[1][1](cb);
+    await on.args[2][1](cb);
+    await on.args[3][1](cb);
+
+    expect(cb.args[0][1]).to.equal(40);
+    // 40 ppm is above the 25 ppm threshold
+    expect(cb.args[1][1]).to.equal(1);
+    expect(cb.args[2][1]).to.equal(10);
+    // 10 ppm is not
+    expect(cb.args[3][1]).to.equal(0);
+  });
+
   it('should build carbon monoxide sensor service from a binary feature', async () => {
     homekitHandler.gladys.stateManager.get = stub().returns({
       id: '3d0f4a08-05a3-4a2f-8f4d-7bbd2a6d54c2',
