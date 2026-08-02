@@ -40,6 +40,10 @@ class AiProviderSettings extends Component {
         selector: newSelector
       });
       this.setState({ selector, providers: providers || [] });
+      // let the parent page refresh its Plus upsell/rate-limit messaging
+      if (this.props.onProviderChange) {
+        this.props.onProviderChange(selector);
+      }
     } catch (error) {
       console.error(error);
       this.setState({ selector: previousSelector, saveError: true });

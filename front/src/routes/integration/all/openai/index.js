@@ -26,7 +26,8 @@ class OpenAIGateway extends Component {
 
   // with an external AI provider selected, the assistant already works
   // without Gladys Plus: the Plus upsell would be misleading as the hero
-  // of this page
+  // of this page. null = unknown (request pending or failed): the Plus
+  // messages only render once the absence of a provider is confirmed
   getAiProvider = async () => {
     try {
       const response = await this.props.httpClient.get('/api/v1/ai_provider');
@@ -36,6 +37,12 @@ class OpenAIGateway extends Component {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  // AiProviderSettings saves the selection itself: this callback keeps the
+  // upsell/rate-limit messaging of this page in sync without a reload
+  onProviderChange = selector => {
+    this.setState({ externalProviderActive: Boolean(selector) });
   };
 
   componentDidMount() {
@@ -48,7 +55,7 @@ class OpenAIGateway extends Component {
     this.props = props;
     this.state = {
       gladysPlusConnected: null,
-      externalProviderActive: false
+      externalProviderActive: null
     };
   }
 
@@ -63,7 +70,7 @@ class OpenAIGateway extends Component {
             </h1>
           </div>
           <div class="card-body">
-            {gladysPlusConnected === false && !externalProviderActive && (
+            {gladysPlusConnected === false && externalProviderActive === false && (
               <div class="mb-4">
                 <GladysPlusUpsellCard
                   icon="fe-cpu"
@@ -131,14 +138,14 @@ class OpenAIGateway extends Component {
                 <Text id="integration.openai.exampleScene3" />
               </li>
             </ul>
-            {gladysPlusConnected !== true && !externalProviderActive && (
+            {gladysPlusConnected !== true && externalProviderActive === false && (
               <p>
                 <Text id="integration.openai.rateLimit" />
               </p>
             )}
           </div>
         </div>
-        {isAdmin && <AiProviderSettings />}
+        {isAdmin && <AiProviderSettings onProviderChange={this.onProviderChange} />}
         {gladysPlusConnected === true && <AiQuotaDisplay />}
         {gladysPlusConnected === true && <WeeklyDigestSettings />}
         {gladysPlusConnected === true && <AiChatDebugDownload />}
