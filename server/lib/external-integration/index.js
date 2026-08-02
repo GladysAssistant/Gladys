@@ -12,6 +12,8 @@ const { validateManifest } = require('./externalIntegration.validateManifest');
 const { buildSelector } = require('./externalIntegration.buildSelector');
 const { buildContainerDescriptor } = require('./externalIntegration.buildContainerDescriptor');
 const { createIntegrationContainer } = require('./externalIntegration.createIntegrationContainer');
+const { ensureDataFolder } = require('./externalIntegration.ensureDataFolder');
+const { ensureSubContainerVolumes } = require('./externalIntegration.ensureSubContainerVolumes');
 const { ensureNetwork } = require('./externalIntegration.ensureNetwork');
 const { getHostApiUrl } = require('./externalIntegration.getHostApiUrl');
 const { registerProxyService } = require('./externalIntegration.registerProxyService');
@@ -39,6 +41,7 @@ const { handleHeartbeat } = require('./externalIntegration.handleHeartbeat');
 const { integrationConnected } = require('./externalIntegration.integrationConnected');
 const { integrationDisconnected } = require('./externalIntegration.integrationDisconnected');
 const { sendCommand } = require('./externalIntegration.sendCommand');
+const { waitForConnection } = require('./externalIntegration.waitForConnection');
 const { sendMessage } = require('./externalIntegration.sendMessage');
 const { handleCommandResult } = require('./externalIntegration.handleCommandResult');
 const { setConnectionStatus } = require('./externalIntegration.setConnectionStatus');
@@ -134,6 +137,9 @@ const ExternalIntegration = function ExternalIntegration(
   this.available = false;
   // serviceId -> WebSocket connection of the integration
   this.connections = new Map();
+  // serviceId -> Set of callbacks waiting for that connection during the
+  // startup window (message relay, see waitForConnection)
+  this.connectionWaiters = new Map();
   // messageId -> { resolve, reject, timer } of commands waiting for their ack
   this.pendingCommands = new Map();
   // serviceId -> in-memory list of discovered devices published by the integration
@@ -188,6 +194,8 @@ ExternalIntegration.prototype.validateManifest = validateManifest;
 ExternalIntegration.prototype.buildSelector = buildSelector;
 ExternalIntegration.prototype.buildContainerDescriptor = buildContainerDescriptor;
 ExternalIntegration.prototype.createIntegrationContainer = createIntegrationContainer;
+ExternalIntegration.prototype.ensureDataFolder = ensureDataFolder;
+ExternalIntegration.prototype.ensureSubContainerVolumes = ensureSubContainerVolumes;
 ExternalIntegration.prototype.ensureNetwork = ensureNetwork;
 ExternalIntegration.prototype.getHostApiUrl = getHostApiUrl;
 ExternalIntegration.prototype.registerProxyService = registerProxyService;
@@ -215,6 +223,7 @@ ExternalIntegration.prototype.handleHeartbeat = handleHeartbeat;
 ExternalIntegration.prototype.integrationConnected = integrationConnected;
 ExternalIntegration.prototype.integrationDisconnected = integrationDisconnected;
 ExternalIntegration.prototype.sendCommand = sendCommand;
+ExternalIntegration.prototype.waitForConnection = waitForConnection;
 ExternalIntegration.prototype.sendMessage = sendMessage;
 ExternalIntegration.prototype.handleCommandResult = handleCommandResult;
 ExternalIntegration.prototype.setConnectionStatus = setConnectionStatus;

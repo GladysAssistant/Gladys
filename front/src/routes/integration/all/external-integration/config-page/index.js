@@ -6,16 +6,22 @@ import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import ConfigTab from './ConfigTab';
 import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
+import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 class ExternalIntegrationConfigPage extends Component {
+  // a non-admin user only gets the "my account" part of this screen: the
+  // shared configuration of the integration is administration (and its
+  // routes are admin-only, so they must not even be called)
+  isAdmin = () => get(this.props, 'user.role') === USER_ROLE.ADMIN;
+
   loadData = async () => {
     this.setState({ loadStatus: RequestStatus.Getting });
     const { selector } = this.props;
+    const isAdmin = this.isAdmin();
     try {
       const [integration, configResponse] = await Promise.all([
         this.props.httpClient.get(`/api/v1/external_integration/${selector}`),
-        this.props.httpClient.get(`/api/v1/external_integration/${selector}/config`)
+        isAdmin ? this.props.httpClient.get(`/api/v1/external_integration/${selector}/config`) : Promise.resolve({})
       ]);
       if (selector !== this.props.selector) {
         // a newer request has started since, discard this stale result
@@ -40,9 +46,11 @@ class ExternalIntegrationConfigPage extends Component {
           await this.loadContactProfile();
         }
       }
-      await this.loadGatewayStatus(integration);
-      await this.loadDynamicOptions(integration);
-      await this.loadHardwareDetection(integration);
+      if (isAdmin) {
+        await this.loadGatewayStatus(integration);
+        await this.loadDynamicOptions(integration);
+        await this.loadHardwareDetection(integration);
+      }
     } catch (e) {
       console.error(e);
       if (selector !== this.props.selector) {

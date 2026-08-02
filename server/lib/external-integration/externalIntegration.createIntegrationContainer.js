@@ -23,6 +23,7 @@ async function createIntegrationContainer(service) {
   const tokenVersion = service.token_version + 1;
   const integrationToken = generateIntegrationToken(service.id, tokenVersion, this.jwtSecret);
   const descriptor = await this.buildContainerDescriptor(service, integrationToken);
+  await this.ensureDataFolder(service);
   const container = await this.system.createContainer(descriptor);
   // multi-container integration: the main container is connected to BOTH
   // networks (its private one + gladys-integrations); the sub-containers

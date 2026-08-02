@@ -180,6 +180,38 @@ const FAN_WIND_SETTING = {
   SLEEP_AND_NATURAL: 3,
 };
 
+const AC_FAN_SPEED = {
+  AUTO: 0,
+  LOW: 1,
+  LOW_MID: 2,
+  MID: 3,
+  MID_HIGH: 4,
+  HIGH: 5,
+  QUIET: 6,
+  TURBO: 7,
+};
+
+const AC_SWING_HORIZONTAL = {
+  OFF: 0,
+  SWING: 1,
+  POSITION_1: 2,
+  POSITION_2: 3,
+  POSITION_3: 4,
+  POSITION_4: 5,
+  POSITION_5: 6,
+  SWING_OPPOSITE: 7,
+};
+
+const AC_SWING_VERTICAL = {
+  OFF: 0,
+  SWING: 1,
+  POSITION_1: 2,
+  POSITION_2: 3,
+  POSITION_3: 4,
+  POSITION_4: 5,
+  POSITION_5: 6,
+};
+
 const PILOT_WIRE_MODE = {
   OFF: 0,
   FROST_PROTECTION: 1,
@@ -204,6 +236,14 @@ const LIQUID_STATE = {
   LOW: 0,
   NORMAL: 1,
   HIGH: 2,
+};
+
+// Used by the SONOFF SWV in Zigbee2mqtt
+const WATER_VALVE_CURRENT_DEVICE_STATUS = {
+  NORMAL_STATE: 0,
+  WATER_SHORTAGE: 1,
+  WATER_LEAKAGE: 2,
+  WATER_SHORTAGE_AND_WATER_LEAKAGE: 3,
 };
 
 const LEVEL_MATTER_STATE = {
@@ -641,6 +681,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   DATARATE: 'datarate',
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
   DISTANCE_SENSOR: 'distance-sensor',
+  DOORBELL: 'doorbell',
   DURATION: 'duration',
   ELECTRICAL_VEHICLE_BATTERY: 'electrical-vehicle-battery',
   ELECTRICAL_VEHICLE_CHARGE: 'electrical-vehicle-charge',
@@ -701,6 +742,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VACUUM_CLEANER: 'vacuum-cleaner',
   TEXT: 'text',
   INPUT: 'input',
+  WATER_VALVE: 'water-valve',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -745,6 +787,9 @@ const DEVICE_FEATURE_TYPES = {
   CAMERA: {
     IMAGE: 'image',
   },
+  DOORBELL: {
+    RING: 'ring',
+  },
   SIREN: {
     BINARY: 'binary',
     LMH_VOLUME: 'lmh_volume',
@@ -786,6 +831,9 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     MODE: 'mode',
     TARGET_TEMPERATURE: 'target-temperature',
+    FAN_SPEED: 'fan-speed',
+    SWING_HORIZONTAL: 'swing-horizontal',
+    SWING_VERTICAL: 'swing-vertical',
   },
   FAN: {
     MODE: 'mode',
@@ -1026,6 +1074,16 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
     LIQUID_DEPTH: 'liquid-depth',
   },
+  WATER_VALVE: {
+    // Types used by the SONOFF SWV in Zigbee2mqtt
+    CURRENT_DEVICE_STATUS: 'current-device-status',
+    FLOW: 'flow',
+    AUTO_CLOSE_WHEN_WATER_SHORTAGE: 'auto-close-when-water-shortage',
+    VALVE_WORK_STATE: 'valve-work-state',
+    REAL_TIME_IRRIGATION_DURATION: 'real-time-irrigation-duration',
+    REAL_TIME_IRRIGATION_VOLUME: 'real-time-irrigation-volume',
+    DAILY_IRRIGATION_VOLUME: 'daily-irrigation-volume',
+  },
   ELECTRICAL_VEHICLE_BATTERY: {
     // Features related to the battery state and metrics of the vehicle
     BATTERY_ENERGY_REMAINING: 'battery-energy-remaining', // Remaining energy in the battery in kWh (integer - sensor)
@@ -1177,6 +1235,8 @@ const DEVICE_FEATURE_UNITS = {
   LITER: 'liter',
   MILLILITER: 'milliliter',
   CUBIC_METER: 'cubicmeter',
+  // Flow units
+  CUBIC_METER_PER_HOUR: 'cubic-meter-per-hour',
   // Currency units
   EURO: 'euro',
   DOLLAR: 'dollar',
@@ -1388,6 +1448,11 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.MILLILITER,
     DEVICE_FEATURE_UNITS.CUBIC_METER,
   ],
+  [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: [
+    DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
+    DEVICE_FEATURE_UNITS.SECONDS,
+    DEVICE_FEATURE_UNITS.LITER,
+  ],
   [DEVICE_FEATURE_CATEGORIES.CURRENCY]: [
     DEVICE_FEATURE_UNITS.EURO,
     DEVICE_FEATURE_UNITS.DOLLAR,
@@ -1466,6 +1531,21 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.SQUARE_METER,
     DEVICE_FEATURE_UNITS.SQUARE_KILOMETER,
   ],
+};
+
+// Restricts the selectable units to the ones relevant for a given feature type,
+// when the category-level list mixes units of different dimensions.
+// An empty array means the feature type has no unit at all.
+const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: {
+    [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: [],
+    [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: [DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR],
+    [DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE]: [],
+    [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: [],
+    [DEVICE_FEATURE_TYPES.WATER_VALVE.REAL_TIME_IRRIGATION_DURATION]: [DEVICE_FEATURE_UNITS.SECONDS],
+    [DEVICE_FEATURE_TYPES.WATER_VALVE.REAL_TIME_IRRIGATION_VOLUME]: [DEVICE_FEATURE_UNITS.LITER],
+    [DEVICE_FEATURE_TYPES.WATER_VALVE.DAILY_IRRIGATION_VOLUME]: [DEVICE_FEATURE_UNITS.LITER],
+  },
 };
 
 const MEASUREMENT_UNITS = {
@@ -1716,6 +1796,7 @@ const JOB_TYPES = {
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING: 'energy-monitoring-consumption-from-index-beginning',
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
+  DEVICE_MIGRATE: 'device-migrate',
 };
 
 const JOB_STATUS = {
@@ -1833,11 +1914,15 @@ module.exports.FAN_AIRFLOW_DIRECTION = FAN_AIRFLOW_DIRECTION;
 module.exports.FAN_ROCK_SETTING = FAN_ROCK_SETTING;
 module.exports.FAN_WIND_SETTING = FAN_WIND_SETTING;
 module.exports.getFanFeatureOptions = getFanFeatureOptions;
+module.exports.AC_FAN_SPEED = AC_FAN_SPEED;
+module.exports.AC_SWING_HORIZONTAL = AC_SWING_HORIZONTAL;
+module.exports.AC_SWING_VERTICAL = AC_SWING_VERTICAL;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
+module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
@@ -1874,6 +1959,7 @@ module.exports.DEVICE_FEATURE_UNITS = DEVICE_FEATURE_UNITS;
 module.exports.DEVICE_FEATURE_UNITS_LIST = DEVICE_FEATURE_UNITS_LIST;
 
 module.exports.DEVICE_FEATURE_UNITS_BY_CATEGORY = DEVICE_FEATURE_UNITS_BY_CATEGORY;
+module.exports.DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE;
 
 module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);

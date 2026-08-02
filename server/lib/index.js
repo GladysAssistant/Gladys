@@ -116,6 +116,11 @@ function Gladys(params = {}) {
   );
   gateway.scene = scene;
   gateway.energyPrice = energyPrice;
+  // The device migration (device.migrate) rewrites scenes: the scene manager
+  // is created after the device manager, so it is attached post-construction
+  // (same pattern as gateway.scene above). Dashboards have no RAM cache and
+  // are rewritten straight through the DB model.
+  device.sceneManager = scene;
 
   const gladys = {
     version: '0.1.0', // todo, read package.json
@@ -200,7 +205,15 @@ function Gladys(params = {}) {
       gateway.init();
 
       if (!params.disableGladysUpgradedCheck) {
-        await system.checkIfGladysUpgraded(gateway);
+        // Voluntarily not awaited: the upgrade notification is forwarded to
+        // the outbound channels of the user, and an external integration
+        // container can only authenticate on the WebSocket once the HTTP
+        // server is listening — which happens after this boot sequence
+        // resolves. Blocking here would make the notification wait for a
+        // connection that cannot happen yet (and the server wait for the
+        // notification). checkIfGladysUpgraded catches its own errors and
+        // never rejects, so the promise can safely float.
+        system.checkIfGladysUpgraded(gateway);
       }
 
       event.emit(EVENTS.TRIGGERS.CHECK, {

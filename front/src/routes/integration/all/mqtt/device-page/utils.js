@@ -48,7 +48,8 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.DURATION ||
     category === DEVICE_FEATURE_CATEGORIES.TAMPER ||
     category === DEVICE_FEATURE_CATEGORIES.INPUT ||
-    category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE
+    category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE ||
+    category === DEVICE_FEATURE_CATEGORIES.DOORBELL
   ) {
     return true;
   }
@@ -64,7 +65,12 @@ export const normalizeForSearch = value =>
 const categoryTypeKey = (category, type) => `${category}|${type}`;
 
 const MQTT_CATALOG_EXCLUDED_FEATURES = new Set([
-  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR)
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR),
+  // Water valve types are only exposed by Zigbee2mqtt for now: the MQTT catalog defaults
+  // (min/max and unit) are not accurate for them yet.
+  ...Object.values(DEVICE_FEATURE_TYPES.WATER_VALVE).map(type =>
+    categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_VALVE, type)
+  )
 ]);
 
 export const isMqttCatalogFeatureVisible = (category, type) =>
@@ -750,6 +756,11 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
   }
 
+  // A doorbell ring is a read-only momentary event (0/1), not a 0-100 actuator.
+  if (category === DEVICE_FEATURE_CATEGORIES.DOORBELL) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
+  }
+
   if (!isSensorCategory(category)) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }
@@ -840,6 +851,10 @@ export const getFeaturePreviewValue = (category, type) => {
   }
 
   if (type === DEVICE_FEATURE_TYPES.SWITCH.BINARY || type === DEVICE_FEATURE_TYPES.LIGHT.BINARY) {
+    return 1;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.DOORBELL) {
     return 1;
   }
 

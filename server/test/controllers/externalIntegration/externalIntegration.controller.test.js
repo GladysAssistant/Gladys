@@ -2,8 +2,13 @@ const { expect } = require('chai');
 const { fake } = require('sinon');
 
 const db = require('../../../models');
-const { authenticatedRequest, request: unAuthenticatedRequest } = require('../request.test');
-const { SERVICE_STATUS, SERVICE_TYPES } = require('../../../utils/constants');
+const {
+  authenticatedRequest,
+  nonAdminRequest,
+  NON_ADMIN_USER_ID,
+  request: unAuthenticatedRequest,
+} = require('../request.test');
+const { SERVICE_STATUS, SERVICE_TYPES, USER_ROLE } = require('../../../utils/constants');
 const { Error422 } = require('../../../utils/httpErrors');
 
 const TEST_MANIFEST = {
@@ -691,6 +696,112 @@ describe('External integration admin API', () => {
         .post(`/api/v1/external_integration/${service.selector}/hardware`)
         .send({ granted_devices: ['coral-usb'] })
         .expect(422);
+    });
+  });
+
+  describe('non-admin user', () => {
+    // an installed communication integration is visible to every user (they
+    // link their own account there, like on the native Telegram service),
+    // but a non-admin never gets the administration data
+    const seedNonAdminUser = () =>
+      db.User.create({
+        id: NON_ADMIN_USER_ID,
+        firstname: 'Pepper',
+        lastname: 'Potts',
+        selector: 'pepper-habitant',
+        email: 'pepper-habitant@pots.com',
+        password: 'mysuperpassword',
+        role: USER_ROLE.HABITANT,
+        language: 'en',
+        birthdate: '1990-12-12',
+      });
+
+    const seedCommunicationService = () =>
+      seedExternalService({
+        name: 'ext-dev-telegram',
+        selector: 'ext-dev-telegram',
+        manifest: {
+          ...TEST_MANIFEST,
+          type: 'communication',
+          name: 'Telegram',
+          messaging: { receive: true },
+          webhooks: [{ key: 'events', label: { en: 'Events' } }],
+        },
+        has_message_feature: true,
+      });
+
+    beforeEach(async () => {
+      await seedNonAdminUser();
+    });
+
+    it('should list only the communication integrations, in their reduced view', async () => {
+      const communicationService = await seedCommunicationService();
+      // a device integration stays invisible: its screens are admin-only
+      await seedExternalService();
+      // a service without a manifest (interrupted install) is not a
+      // communication integration either
+      await seedExternalService({ name: 'ext-dev-no-manifest', selector: 'ext-dev-no-manifest', manifest: null });
+      const res = await nonAdminRequest
+        .get('/api/v1/external_integration')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(res.body).to.have.lengthOf(1);
+      expect(res.body[0]).to.deep.equal({
+        id: communicationService.id,
+        name: communicationService.name,
+        selector: communicationService.selector,
+        status: SERVICE_STATUS.RUNNING,
+        store_slug: null,
+        manifest: communicationService.manifest,
+      });
+    });
+
+    it('should return the reduced detail, without the webhook urls', async () => {
+      const service = await seedCommunicationService();
+      const res = await nonAdminRequest
+        .get(`/api/v1/external_integration/${service.selector}`)
+        .expect('Content-Type', /json/)
+        .expect(200);
+      expect(res.body).to.deep.equal({
+        id: service.id,
+        name: service.name,
+        selector: service.selector,
+        status: SERVICE_STATUS.RUNNING,
+        store_slug: null,
+        manifest: service.manifest,
+      });
+      // the webhook URLs embed the Gladys Plus Open API key
+      expect(res.body).to.not.have.property('webhooks');
+      expect(res.body).to.not.have.property('docker_image');
+    });
+
+    it('should refuse the detail of a device integration, as an unknown selector', async () => {
+      // probing selectors must not reveal an install a non-admin has no
+      // business seeing: same 404 as a selector that does not exist
+      const service = await seedExternalService();
+      const res = await nonAdminRequest.get(`/api/v1/external_integration/${service.selector}`).expect(404);
+      const unknownRes = await nonAdminRequest.get('/api/v1/external_integration/ext-unknown').expect(404);
+      expect(res.body).to.deep.equal(unknownRes.body);
+    });
+
+    it('should refuse the shared configuration of the integration', async () => {
+      const service = await seedCommunicationService();
+      await nonAdminRequest.get(`/api/v1/external_integration/${service.selector}/config`).expect(403);
+    });
+
+    it('should refuse the store, the hardware detection and the device discovery', async () => {
+      const service = await seedCommunicationService();
+      await nonAdminRequest.get('/api/v1/external_integration/store').expect(403);
+      await nonAdminRequest.get('/api/v1/external_integration/store/docs?store_slug=john/demo').expect(403);
+      await nonAdminRequest.get('/api/v1/external_integration/hardware').expect(403);
+      await nonAdminRequest.get(`/api/v1/external_integration/${service.selector}/discovered_device`).expect(403);
+      await nonAdminRequest.post(`/api/v1/external_integration/${service.selector}/scan`).expect(403);
+    });
+
+    it('should still allow linking their own account', async () => {
+      const service = await seedCommunicationService();
+      const res = await nonAdminRequest.post(`/api/v1/external_integration/${service.selector}/link_code`).expect(200);
+      expect(res.body.code).to.be.a('string');
     });
   });
 

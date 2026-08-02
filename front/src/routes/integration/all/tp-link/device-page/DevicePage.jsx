@@ -37,12 +37,14 @@ const DeviceTab = ({ children, ...props }) => (
             {props.tpLinkDevices &&
               props.tpLinkDevices.map((device, index) => (
                 <Device
+                  key={device.selector}
                   device={device}
                   deviceIndex={index}
                   houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
+                  getTpLinkDevices={props.getTpLinkDevices}
                 />
               ))}
             {props.tpLinkDevices && props.tpLinkDevices.length === 0 && (
