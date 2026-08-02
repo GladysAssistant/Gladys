@@ -61,4 +61,23 @@ describe('system.getNetworkMode', () => {
     expect(network).to.eq('host');
     assert.calledOnce(system.dockerode.getContainer);
   });
+
+  it('should return host-process mode when Gladys is not containerized', async () => {
+    system.networkMode = null;
+    system.getGladysContainerId = fake.rejects(new PlatformNotCompatible('DOCKER_CONTAINER_ID_NOT_AVAILABLE'));
+    const network = await system.getNetworkMode();
+    expect(network).to.eq('host-process');
+    assert.notCalled(system.dockerode.getContainer);
+  });
+
+  it('should rethrow unexpected errors of getGladysContainerId', async () => {
+    system.networkMode = null;
+    system.getGladysContainerId = fake.rejects(new Error('UNEXPECTED'));
+    try {
+      await system.getNetworkMode();
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e.message).to.eq('UNEXPECTED');
+    }
+  });
 });

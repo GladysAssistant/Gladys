@@ -8,8 +8,10 @@ const CorsMiddleware = require('./middlewares/corsMiddleware');
 
 // Simple middleware
 const adminMiddleware = require('./middlewares/adminMiddleware');
+const ExternalIntegrationAuthMiddleware = require('./middlewares/externalIntegrationAuthMiddleware');
 const rateLimitMiddleware = require('./middlewares/rateLimitMiddleware');
 const audioRawBodyMiddleware = require('./middlewares/audioRawBodyMiddleware');
+const { integrationHostJsonBodyMiddleware } = require('./middlewares/jsonBodyMiddleware');
 
 // routes
 const getRoutes = require('./routes');
@@ -30,6 +32,7 @@ function setupRoutes(gladys) {
   const isInstanceConfiguredMiddleware = IsInstanceConfiguredMiddleware(gladys);
   const resetPasswordAuthMiddleware = AuthMiddleware('reset-password:write', gladys);
   const alarmMiddleware = AuthMiddleware('alarm:write', gladys);
+  const externalIntegrationAuthMiddleware = ExternalIntegrationAuthMiddleware(gladys);
 
   // enable cross origin requests
   router.use(CorsMiddleware);
@@ -73,6 +76,15 @@ function setupRoutes(gladys) {
     // if the route need authentication for alarm
     if (routes[routeKey].alarmAuth) {
       routerParams.push(alarmMiddleware);
+    }
+    // if the route is part of the external integration host API. Its batch
+    // endpoints need a bigger JSON body bound than the frontend, mounted
+    // here rather than globally: parsing happens only once the integration
+    // token is validated, so an unauthenticated caller reaching the HTTP
+    // port never gets the core to buffer anything on those paths.
+    if (routes[routeKey].externalIntegrationAuth) {
+      routerParams.push(externalIntegrationAuthMiddleware);
+      routerParams.push(integrationHostJsonBodyMiddleware);
     }
     if (routes[routeKey].audioRawBody) {
       routerParams.push(audioRawBodyMiddleware);

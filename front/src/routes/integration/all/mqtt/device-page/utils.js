@@ -47,7 +47,9 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.DATARATE ||
     category === DEVICE_FEATURE_CATEGORIES.DURATION ||
     category === DEVICE_FEATURE_CATEGORIES.TAMPER ||
-    category === DEVICE_FEATURE_CATEGORIES.INPUT
+    category === DEVICE_FEATURE_CATEGORIES.INPUT ||
+    category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE ||
+    category === DEVICE_FEATURE_CATEGORIES.DOORBELL
   ) {
     return true;
   }
@@ -63,7 +65,12 @@ export const normalizeForSearch = value =>
 const categoryTypeKey = (category, type) => `${category}|${type}`;
 
 const MQTT_CATALOG_EXCLUDED_FEATURES = new Set([
-  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR)
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR),
+  // Water valve types are only exposed by Zigbee2mqtt for now: the MQTT catalog defaults
+  // (min/max and unit) are not accurate for them yet.
+  ...Object.values(DEVICE_FEATURE_TYPES.WATER_VALVE).map(type =>
+    categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_VALVE, type)
+  )
 ]);
 
 export const isMqttCatalogFeatureVisible = (category, type) =>
@@ -429,6 +436,18 @@ export const getDefaultUnitForFeature = (category, type) => {
     }
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    // State of charge in percent, instantaneous powers in watt, and every
+    // cumulative index (*-index) or stored energy (battery-energy-remaining) in kWh.
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return DEVICE_FEATURE_UNITS.PERCENT;
+    }
+    if (typeof type === 'string' && type.endsWith('-power')) {
+      return DEVICE_FEATURE_UNITS.WATT;
+    }
+    return DEVICE_FEATURE_UNITS.KILOWATT_HOUR;
+  }
+
   const preferredUnit = PREFERRED_DEFAULT_UNIT_BY_CATEGORY[category];
   if (preferredUnit) {
     return preferredUnit;
@@ -685,6 +704,22 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000000, unit: DEVICE_FEATURE_UNITS.EURO }, category, type);
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100 }, category, type);
+    }
+    if (typeof type === 'string' && type.endsWith('-power')) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
+    }
+    // *-index counters and battery-energy-remaining
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
+  }
+
+  // A doorbell ring is a read-only momentary event (0/1), not a 0-100 actuator.
+  if (category === DEVICE_FEATURE_CATEGORIES.DOORBELL) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
+  }
+
   if (!isSensorCategory(category)) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }
@@ -731,6 +766,10 @@ export const getFeaturePreviewValue = (category, type) => {
   }
 
   if (type === DEVICE_FEATURE_TYPES.SWITCH.BINARY || type === DEVICE_FEATURE_TYPES.LIGHT.BINARY) {
+    return 1;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.DOORBELL) {
     return 1;
   }
 
@@ -930,6 +969,19 @@ export const getFeaturePreviewValue = (category, type) => {
       return 2.4;
     }
     return 1;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return 54;
+    }
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_ENERGY_REMAINING) {
+      return 4.2;
+    }
+    if (typeof type === 'string' && type.endsWith('-index')) {
+      return 128.5;
+    }
+    return 320;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR) {

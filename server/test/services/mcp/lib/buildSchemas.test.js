@@ -1323,20 +1323,95 @@ describe('build schemas', () => {
       unit: 'kwh',
     });
     expect(invalidDateResult.content[0].text).to.eq(
-      'device.get-energy-consumption: start_date and end_date must be valid dates in YYYY-MM-DD format',
+      'device.get-energy-consumption: start_date and end_date must be in YYYY-MM-DD format, ' +
+        'with a month between 01 and 12 and a day between 01 and 31',
     );
 
-    // Calendar-invalid date that would roll over in the Date constructor.
-    const rolledOverDateResult = await energyTool.cb({
+    // Out-of-range month and day are still rejected.
+    const invalidMonthResult = await energyTool.cb({
       device: 'Prise onduleur',
-      start_date: '2026-02-30',
-      end_date: '2026-03-02',
+      start_date: '2026-13-01',
+      end_date: '2026-13-31',
       unit: 'kwh',
     });
-    expect(rolledOverDateResult.content[0].text).to.eq(
-      'device.get-energy-consumption: start_date and end_date must be valid dates in YYYY-MM-DD format',
-    );
+    expect(invalidMonthResult.content[0].text).to.contain('must be in YYYY-MM-DD format');
+    const invalidDayResult = await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-07-00',
+      end_date: '2026-07-32',
+      unit: 'kwh',
+    });
+    expect(invalidDayResult.content[0].text).to.contain('must be in YYYY-MM-DD format');
 
+    // February 29th on a non-leap year: the model means "end of February", the day
+    // is clamped to the last day of the month instead of failing the whole call.
+    getConsumptionByDates.resetHistory();
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [{ created_at: '2026-02-01T00:00:00.000Z', value: 12, sum_value: 12 }],
+      },
+    ]);
+    const clampedFebruaryResult = await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-02-01',
+      end_date: '2026-02-29',
+      unit: 'kwh',
+      group_by: 'month',
+    });
+    expect(getConsumptionByDates.callCount).to.eq(1);
+    expect(getConsumptionByDates.firstCall.args[1]).to.deep.equal({
+      from: new Date(2026, 1, 1),
+      to: new Date(2026, 2, 1),
+      group_by: 'month',
+      display_mode: 'kwh',
+    });
+    expect(clampedFebruaryResult.content[0].text).to.eq('toonmockdata');
+    // The effective period is echoed back, not the out-of-range input.
+    expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('2026-02-01');
+    expect(mcpHandler.toon.lastCall.args[0].end_date).to.eq('2026-02-28');
+
+    // Same clamping on a leap year keeps February 29th, and on a 30-day month.
+    getConsumptionByDates.resetHistory();
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2024-02-29',
+      end_date: '2024-04-31',
+      unit: 'kwh',
+    });
+    expect(getConsumptionByDates.firstCall.args[1]).to.deep.include({
+      from: new Date(2024, 1, 29),
+      to: new Date(2024, 4, 1),
+    });
+    expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('2024-02-29');
+    expect(mcpHandler.toon.lastCall.args[0].end_date).to.eq('2024-04-30');
+
+    // Years below 0100 keep their century: new Date(year, ...) would map them to
+    // 1900-1999 and query a period two millennia away from the one asked for.
+    getConsumptionByDates.resetHistory();
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '0000-02-29',
+      end_date: '0000-03-01',
+      unit: 'kwh',
+    });
+    const expectedYearZeroFrom = new Date(2000, 0, 1);
+    expectedYearZeroFrom.setFullYear(0, 1, 29);
+    const expectedYearZeroTo = new Date(2000, 0, 1);
+    expectedYearZeroTo.setFullYear(0, 2, 2);
+    expect(getConsumptionByDates.firstCall.args[1]).to.deep.include({
+      from: expectedYearZeroFrom,
+      to: expectedYearZeroTo,
+    });
+    expect(getConsumptionByDates.firstCall.args[1].from.getFullYear()).to.eq(0);
+    expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('0000-02-29');
+
+    getConsumptionByDates.resetHistory();
     const reversedDatesResult = await energyTool.cb({
       device: 'Prise onduleur',
       start_date: '2026-07-12',
@@ -3260,5 +3335,84 @@ describe('build schemas', () => {
     expect(partialResult.content[0].text).to.eq(
       'device.set-light: brightness 20% command sent for Brightness Only Light; could not dispatch for Brightness Only Light (missing color feature)',
     );
+  });
+
+  it('should tell device.get-state that no device is configured instead of returning an empty list', async () => {
+    const rooms = [
+      { id: 'room-1', name: 'Salon', selector: 'salon' },
+      { id: 'room-2', name: 'Cuisine', selector: 'cuisine' },
+    ];
+
+    // The humidity sensor lives in the living room, the kitchen has none.
+    const humiditySensor = {
+      selector: 'capteur-salon',
+      name: 'Capteur salon',
+      room: { selector: 'salon', name: 'Salon' },
+      features: [
+        {
+          id: 'feature-humidity',
+          selector: 'capteur-salon-humidity',
+          name: 'Humidité',
+          category: 'humidity-sensor',
+          type: 'decimal',
+          unit: '%',
+          last_value: 52,
+        },
+      ],
+    };
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({
+        value: feature.last_value,
+        unit: feature.unit,
+        age: '2min',
+      })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves([]) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves([humiditySensor]),
+          getBySelector: stub().resolves(humiditySensor),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(10) },
+      toon: stub().returns('toonmockdata'),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const getStateTool = tools.find((tool) => tool.intent === 'device.get-state');
+
+    const noSensorInRoom = await getStateTool.cb({ room: 'Cuisine', device_type: 'humidity-sensor' });
+    expect(noSensorInRoom.content[0].text).to.eq(
+      'device.get-state: no device of type "humidity-sensor" is configured in room "Cuisine". ' +
+        'No measurement exists for this query, do not report any value.',
+    );
+
+    const noSensorAtAll = await getStateTool.cb({ room: undefined, device_type: 'co2-sensor' });
+    expect(noSensorAtAll.content[0].text).to.eq(
+      'device.get-state: no device of type "co2-sensor" is configured. ' +
+        'No measurement exists for this query, do not report any value.',
+    );
+
+    // A room that does have the sensor still returns the regular payload.
+    const withSensor = await getStateTool.cb({ room: 'Salon', device_type: 'humidity-sensor' });
+    expect(withSensor.content[0].text).to.eq('toonmockdata');
   });
 });

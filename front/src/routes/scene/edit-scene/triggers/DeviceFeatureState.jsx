@@ -10,11 +10,13 @@ import PresenceSensorDeviceState from './device-states/PresenceSensorDeviceState
 import ThresholdDeviceState from './device-states/ThresholdDeviceState';
 import DefaultDeviceState from './device-states/DefaultDeviceState';
 import ButtonClickDeviceState from './device-states/ButtonClickDeviceState';
+import DoorbellRingDeviceState from './device-states/DoorbellRingDeviceState';
 import PilotWireModeDeviceState from './device-states/PilotWireModeDeviceState';
 import FanModeDeviceState from './device-states/FanModeDeviceState';
 import FanLabeledDeviceState from './device-states/FanLabeledDeviceState';
 import LevelSensorDeviceState from './device-states/LevelSensorDeviceState';
 import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDeviceState';
+import WaterValveDeviceState from './device-states/WaterValveDeviceState';
 
 class TurnOnLight extends Component {
   onDeviceFeatureChange = deviceFeature => {
@@ -87,18 +89,24 @@ class TurnOnLight extends Component {
     let binaryDevice = false;
     let presenceDevice = false;
     let buttonClickDevice = false;
+    let doorbellRingDevice = false;
     let pilotWireModeDevice = false;
     let fanModeDevice = false;
     let fanLabeledDevice = false;
     let levelSensorDevice = false;
     let levelMatterSensorDevice = false;
+    let waterValveStatusDevice = false;
 
     if (selectedDeviceFeature) {
       const { category, type } = selectedDeviceFeature;
 
-      binaryDevice = type === DEVICE_FEATURE_TYPES.SWITCH.BINARY;
+      binaryDevice =
+        type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
+        type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
+        type === DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE;
       presenceDevice = category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
+      doorbellRingDevice = category === DEVICE_FEATURE_CATEGORIES.DOORBELL;
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
       fanModeDevice = category === DEVICE_FEATURE_CATEGORIES.FAN && type === DEVICE_FEATURE_TYPES.FAN.MODE;
       fanLabeledDevice =
@@ -113,6 +121,9 @@ class TurnOnLight extends Component {
       levelMatterSensorDevice =
         category === DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR ||
         category === DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR;
+      waterValveStatusDevice =
+        category === DEVICE_FEATURE_CATEGORIES.WATER_VALVE &&
+        type === DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS;
     }
 
     const defaultDevice =
@@ -120,21 +131,25 @@ class TurnOnLight extends Component {
       !binaryDevice &&
       !presenceDevice &&
       !buttonClickDevice &&
+      !doorbellRingDevice &&
       !pilotWireModeDevice &&
       !fanModeDevice &&
       !fanLabeledDevice &&
       !levelSensorDevice &&
-      !levelMatterSensorDevice;
+      !levelMatterSensorDevice &&
+      !waterValveStatusDevice;
 
     const thresholdDevice =
       selectedDeviceFeature &&
       !presenceDevice &&
       !buttonClickDevice &&
+      !doorbellRingDevice &&
       !pilotWireModeDevice &&
       !fanModeDevice &&
       !fanLabeledDevice &&
       !levelSensorDevice &&
-      !levelMatterSensorDevice;
+      !levelMatterSensorDevice &&
+      !waterValveStatusDevice;
 
     return (
       <div>
@@ -150,11 +165,13 @@ class TurnOnLight extends Component {
           {binaryDevice && <BinaryDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {presenceDevice && <PresenceSensorDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {buttonClickDevice && <ButtonClickDeviceState {...props} />}
+          {doorbellRingDevice && <DoorbellRingDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {pilotWireModeDevice && <PilotWireModeDeviceState {...props} />}
           {fanModeDevice && <FanModeDeviceState {...props} />}
           {fanLabeledDevice && <FanLabeledDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {levelSensorDevice && <LevelSensorDeviceState {...props} />}
           {levelMatterSensorDevice && <LevelMatterSensorDeviceState {...props} />}
+          {waterValveStatusDevice && <WaterValveDeviceState {...props} />}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
         </div>
         {thresholdDevice && <ThresholdDeviceState {...props} />}

@@ -14,6 +14,12 @@ const names = {
     },
     reversedValue: true,
   },
+  garage_door_contact: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    },
+  },
   eco_mode: {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -78,6 +84,12 @@ const names = {
       },
     },
   },
+  trigger: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    },
+  },
   vibration: {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR,
@@ -106,6 +118,20 @@ const names = {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.INPUT,
       type: DEVICE_FEATURE_TYPES.INPUT.BINARY,
+    },
+  },
+  // SONOFF SWV water valve
+  // https://www.zigbee2mqtt.io/devices/SWV.html
+  auto_close_when_water_shortage: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.WATER_VALVE,
+      type: DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE,
+    },
+  },
+  valve_work_state: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.WATER_VALVE,
+      type: DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE,
     },
   },
 };
