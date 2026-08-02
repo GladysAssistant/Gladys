@@ -107,5 +107,6 @@ describe('system.getInfos', () => {
     const infos = await system.getInfos();
     expect(infos).to.not.have.property('docker_image');
     expect(infos).to.not.have.property('docker_image_pinned');
+    expect(infos).to.not.have.property('recommended_docker_image');
   });
 });

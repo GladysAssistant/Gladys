@@ -7,6 +7,12 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_UPGRADE_ERROR_CODES } = require(
 // can upgrade anymore.
 const WATCHTOWER_IMAGE = 'nickfedor/watchtower:1.20.2';
 
+// generous on purpose: pulling a new image over a slow connection on a
+// Raspberry Pi is legitimately long, this only bounds how long we watch
+const WATCHTOWER_TIMEOUT_IN_MS = 15 * 60 * 1000;
+
+const WATCHTOWER_TIMED_OUT = Symbol('WATCHTOWER_TIMED_OUT');
+
 /**
  * @description Parse a Watchtower log message to extract relevant information and remove Docker stream prefixes.
  * @example
@@ -143,6 +149,9 @@ async function installUpgrade() {
           if (line.trim()) {
             const parsedMessage = parseWatchtowerLog(line);
             if (parsedMessage) {
+              // deliberately loose: Watchtower has shipped both `Found new image`
+              // and `Found new <reference> image`. Narrowing this match would make
+              // a successful pull look like NO_UPDATE_APPLIED after a log reword.
               if (parsedMessage.includes('Found new')) {
                 newImageFound = true;
               }
@@ -156,8 +165,29 @@ async function installUpgrade() {
       }
     });
 
-    // Wait for container to finish
-    const { StatusCode } = await container.wait();
+    // an 'error' event with no listener is an uncaught exception in Node: a
+    // Docker socket dropping mid-upgrade would take the whole server down
+    logStream.on('error', (streamError) => {
+      logger.warn('Watchtower log stream error', streamError);
+    });
+
+    // Wait for container to finish. A stalled Watchtower (hanging pull, frozen
+    // Docker daemon) would otherwise leave the UI waiting forever, which is the
+    // very failure this whole flow exists to avoid.
+    let timeoutId;
+    const timeout = new Promise((resolve) => {
+      timeoutId = setTimeout(() => resolve(WATCHTOWER_TIMED_OUT), WATCHTOWER_TIMEOUT_IN_MS);
+    });
+    const result = await Promise.race([container.wait(), timeout]);
+    clearTimeout(timeoutId);
+
+    if (result === WATCHTOWER_TIMED_OUT) {
+      logger.warn(`Watchtower is still running after ${WATCHTOWER_TIMEOUT_IN_MS}ms, giving up on watching it`);
+      sendUpgradeError({ code: SYSTEM_UPGRADE_ERROR_CODES.WATCHTOWER_TIMEOUT });
+      return;
+    }
+
+    const { StatusCode } = result;
     logger.info(`Watchtower container finished with status code ${StatusCode}`);
 
     if (StatusCode !== 0) {

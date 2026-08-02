@@ -15,9 +15,10 @@ const SettingsSystemOperations = ({
   checkForUpdates
 }) => {
   const imagePinned = systemInfos && systemInfos.docker_image_pinned === true;
-  // an error code we don't know how to translate must not leak to the user
+  // an error code we don't know how to translate must not leak to the user.
+  // hasOwnProperty, so an inherited key like "constructor" cannot pass as valid.
   const upgradeErrorCode =
-    upgradeError && SYSTEM_UPGRADE_ERROR_CODES[upgradeError.code]
+    upgradeError && Object.prototype.hasOwnProperty.call(SYSTEM_UPGRADE_ERROR_CODES, upgradeError.code)
       ? upgradeError.code
       : SYSTEM_UPGRADE_ERROR_CODES.UNKNOWN_ERROR;
 

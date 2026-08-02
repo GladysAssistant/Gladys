@@ -3607,6 +3607,7 @@
       "IMAGE_TAG_PINNED": "Update cancelled: your container uses the fixed image \"{{image}}\". Re-create it with \"{{recommendedImage}}\" to be able to update it.",
       "NO_UPDATE_APPLIED": "No update was applied: Watchtower did not find any new image for \"{{image}}\". Try again in a few minutes, the new image may not be published yet for your architecture.",
       "WATCHTOWER_FAILED": "The update failed: the Watchtower container exited with error code {{statusCode}}. Check the Gladys logs for more details.",
+      "WATCHTOWER_TIMEOUT": "The update is taking longer than expected and Gladys stopped following it. It may still be running: refresh this page in a few minutes to check the installed version.",
       "GLADYS_CONTAINER_NOT_FOUND": "Update impossible: Gladys was not able to identify its own container. Make sure Gladys runs with Docker and the volume `-v /var/run/docker.sock:/var/run/docker.sock`.",
       "UNKNOWN_ERROR": "The update failed. Check the Gladys logs for more details."
     },

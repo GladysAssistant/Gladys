@@ -3607,6 +3607,7 @@
       "IMAGE_TAG_PINNED": "Aktualisierung abgebrochen: Dein Container verwendet das feste Image „{{image}}“. Erstelle ihn mit „{{recommendedImage}}“ neu, um ihn aktualisieren zu können.",
       "NO_UPDATE_APPLIED": "Es wurde keine Aktualisierung durchgeführt: Watchtower hat kein neues Image für „{{image}}“ gefunden. Versuche es in einigen Minuten erneut, das neue Image ist für deine Architektur möglicherweise noch nicht verfügbar.",
       "WATCHTOWER_FAILED": "Die Aktualisierung ist fehlgeschlagen: Der Watchtower-Container wurde mit dem Fehlercode {{statusCode}} beendet. Weitere Informationen findest du in den Gladys-Logs.",
+      "WATCHTOWER_TIMEOUT": "Die Aktualisierung dauert länger als erwartet und Gladys verfolgt sie nicht mehr. Sie läuft möglicherweise noch: Aktualisiere diese Seite in einigen Minuten, um die installierte Version zu prüfen.",
       "GLADYS_CONTAINER_NOT_FOUND": "Aktualisierung nicht möglich: Gladys konnte den eigenen Container nicht identifizieren. Stelle sicher, dass Gladys über Docker mit dem Volume `-v /var/run/docker.sock:/var/run/docker.sock` läuft.",
       "UNKNOWN_ERROR": "Die Aktualisierung ist fehlgeschlagen. Weitere Informationen findest du in den Gladys-Logs."
     },

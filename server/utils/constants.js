@@ -1705,6 +1705,8 @@ const SYSTEM_UPGRADE_ERROR_CODES = {
   NO_UPDATE_APPLIED: 'NO_UPDATE_APPLIED',
   // the Watchtower container exited with a non-zero status code
   WATCHTOWER_FAILED: 'WATCHTOWER_FAILED',
+  // the Watchtower container was still running after the timeout
+  WATCHTOWER_TIMEOUT: 'WATCHTOWER_TIMEOUT',
   // the container running Gladys could not be identified
   GLADYS_CONTAINER_NOT_FOUND: 'GLADYS_CONTAINER_NOT_FOUND',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',

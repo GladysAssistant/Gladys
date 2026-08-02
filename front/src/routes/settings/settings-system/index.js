@@ -25,9 +25,11 @@ class SettingsSystem extends Component {
     });
     try {
       await this.props.httpClient.post('/api/v1/system/upgrade');
-      this.setState({
-        SystemUpgradeStatus: RequestStatus.Success
-      });
+      // the route only acknowledges the request, the upgrade itself reports
+      // over the websocket: an error can already have landed, and it wins
+      this.setState(prevState =>
+        prevState.SystemUpgradeStatus === RequestStatus.Error ? null : { SystemUpgradeStatus: RequestStatus.Success }
+      );
     } catch (e) {
       console.error(e);
       this.setState({

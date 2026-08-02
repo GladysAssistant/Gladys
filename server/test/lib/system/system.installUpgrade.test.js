@@ -129,9 +129,11 @@ describe('system.installUpgrade', () => {
       pinned: false,
       recommended_image: null,
     });
+    system.pull = fake.resolves(null);
 
     await system.installUpgrade();
 
+    assert.notCalled(system.pull);
     assert.notCalled(system.dockerode.createContainer);
     expect(getUpgradeErrors()).to.deep.equal([{ code: SYSTEM_UPGRADE_ERROR_CODES.GLADYS_CONTAINER_NOT_FOUND }]);
   });
@@ -167,6 +169,37 @@ describe('system.installUpgrade', () => {
 
     await system.installUpgrade();
 
+    expect(getUpgradeErrors()).to.deep.equal([
+      { code: SYSTEM_UPGRADE_ERROR_CODES.NO_UPDATE_APPLIED, image: 'gladysassistant/gladys:v4' },
+    ]);
+  });
+
+  it('should report an error when Watchtower never finishes', async () => {
+    const container = await system.dockerode.createContainer({});
+    sandbox.replace(container, 'wait', () => new Promise(() => {}));
+    const clock = sandbox.useFakeTimers();
+
+    const upgrade = system.installUpgrade();
+    await clock.tickAsync(15 * 60 * 1000);
+    await upgrade;
+
+    expect(getUpgradeErrors()).to.deep.equal([{ code: SYSTEM_UPGRADE_ERROR_CODES.WATCHTOWER_TIMEOUT }]);
+  });
+
+  it('should survive an error on the Watchtower log stream', async () => {
+    const container = await system.dockerode.createContainer({});
+    sandbox.replace(container, 'logs', () => ({
+      on: (streamEvent, callback) => {
+        // an unhandled 'error' event would be an uncaught exception in Node
+        if (streamEvent === 'error') {
+          callback(new Error('SOCKET_CLOSED'));
+        }
+      },
+    }));
+
+    await system.installUpgrade();
+
+    // the stream died before any log arrived, so no new image was ever announced
     expect(getUpgradeErrors()).to.deep.equal([
       { code: SYSTEM_UPGRADE_ERROR_CODES.NO_UPDATE_APPLIED, image: 'gladysassistant/gladys:v4' },
     ]);

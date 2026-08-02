@@ -3607,6 +3607,7 @@
       "IMAGE_TAG_PINNED": "Mise à jour annulée : votre container utilise l'image figée « {{image}} ». Recréez-le avec « {{recommendedImage}} » pour pouvoir le mettre à jour.",
       "NO_UPDATE_APPLIED": "Aucune mise à jour n'a été appliquée : Watchtower n'a trouvé aucune nouvelle image pour « {{image}} ». Réessayez dans quelques minutes, la nouvelle image n'est peut-être pas encore disponible pour votre architecture.",
       "WATCHTOWER_FAILED": "La mise à jour a échoué : le container Watchtower s'est arrêté avec le code d'erreur {{statusCode}}. Consultez les logs de Gladys pour en savoir plus.",
+      "WATCHTOWER_TIMEOUT": "La mise à jour prend plus de temps que prévu et Gladys a cessé de la suivre. Elle est peut-être toujours en cours : rafraichissez cette page dans quelques minutes pour vérifier la version installée.",
       "GLADYS_CONTAINER_NOT_FOUND": "Mise à jour impossible : Gladys n'a pas réussi à identifier son propre container. Vérifiez que Gladys est bien lancée via Docker avec le volume `-v /var/run/docker.sock:/var/run/docker.sock`.",
       "UNKNOWN_ERROR": "La mise à jour a échoué. Consultez les logs de Gladys pour en savoir plus."
     },
