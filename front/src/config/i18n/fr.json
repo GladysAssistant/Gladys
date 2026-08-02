@@ -4274,6 +4274,15 @@
           "position-5": "Position 5 (Bas)"
         }
       },
+      "thermostat": {
+        "mode": {
+          "off": "Arrêt",
+          "heating": "Chauffage",
+          "cooling": "Clim.",
+          "auto": "Auto",
+          "energy_heat": "Chauffage éco"
+        }
+      },
       "heater": {
         "pilot-wire-mode": {
           "comfort": "Confort",
@@ -4526,6 +4535,21 @@
           "4": "Position 3",
           "5": "Position 4",
           "6": "Position 5 (Bas)"
+        }
+      },
+      "thermostat": {
+        "mode": {
+          "0": "Arrêt",
+          "1": "Chauffage",
+          "2": "Refroidissement",
+          "3": "Auto",
+          "4": "Chauffage éco"
+        },
+        "operating-state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Inactif",
+          "1": "Chauffe",
+          "2": "Refroidit"
         }
       },
       "siren": {
@@ -5128,7 +5152,9 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Température de consigne"
+      "target-temperature": "Température de consigne",
+      "mode": "Mode",
+      "operating-state": "État de fonctionnement du thermostat"
     },
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
