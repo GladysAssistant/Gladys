@@ -8,7 +8,7 @@ import withIntlAsProp from '../../utils/withIntlAsProp';
 import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
-import { getLocalizedText } from './all/external-integration/utils';
+import { getLocalizedText, isConfigOnlyIntegrationType } from './all/external-integration/utils';
 import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog } from './catalog-url';
 import { RequestStatus } from '../../utils/consts';
 
@@ -160,8 +160,8 @@ class Integration extends Component {
   buildExternalIntegrationCards() {
     const { user = {}, category } = this.props;
     // external integrations live in the category matching their manifest
-    // type ("device" or "communication"), and can also be favorites
-    const EXTERNAL_CATEGORIES = ['device', 'communication'];
+    // type ("device", "communication" or "tts"), and can also be favorites
+    const EXTERNAL_CATEGORIES = ['device', 'communication', 'tts'];
     if (category && !EXTERNAL_CATEGORIES.includes(category) && category !== 'favorites') {
       return [];
     }
@@ -185,12 +185,14 @@ class Integration extends Component {
 
     const externalCards = [];
 
-    // a communication integration has no device screens: its card lands
-    // straight on the configuration screen
+    // a communication or tts integration has no device screens: its card
+    // lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
-      manifest.type === 'communication'
+      isConfigOnlyIntegrationType(manifest.type)
         ? `/dashboard/integration/device/external/${selector}/config`
         : `/dashboard/integration/device/external/${selector}`;
+    // the card category is the manifest type, "device" as the fallback
+    const getCardType = manifest => (EXTERNAL_CATEGORIES.includes(manifest.type) ? manifest.type : 'device');
 
     // Installed external integrations
     installed.forEach(integration => {
@@ -202,7 +204,7 @@ class Integration extends Component {
         key: `external-${integration.store_slug || integration.selector}`,
         external: true,
         externalInstalled: true,
-        type: manifest.type === 'communication' ? 'communication' : 'device',
+        type: getCardType(manifest),
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: getInstalledUrl(integration.selector, manifest),
@@ -223,7 +225,7 @@ class Integration extends Component {
         key: `external-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
-        type: manifest.type === 'communication' ? 'communication' : 'device',
+        type: getCardType(manifest),
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled

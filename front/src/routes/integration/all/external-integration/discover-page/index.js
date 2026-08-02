@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import DiscoverTab from './DiscoverTab';
+import { isConfigOnlyIntegrationType } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
@@ -12,9 +13,9 @@ class ExternalIntegrationDiscoverPage extends Component {
   getIntegration = async () => {
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
-      // a communication integration has no device screens: direct URL
-      // access lands on the configuration screen instead
-      if (get(integration, 'manifest.type') === 'communication') {
+      // a communication or tts integration has no device screens: direct
+      // URL access lands on the configuration screen instead
+      if (isConfigOnlyIntegrationType(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
         return;
       }

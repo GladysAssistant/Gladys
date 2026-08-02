@@ -87,7 +87,9 @@ async function processVoiceMessage({ audio, contentType = 'application/octet-str
 
     let ttsUrl = null;
     if (answer) {
-      const ttsResponse = await this.getTTSApiUrl({ text: answer });
+      // active provider dispatch (Gladys Plus by default, or a TTS provider
+      // integration — see gladys.tts); attached post-construction in lib/index.js
+      const ttsResponse = await this.tts.getSpeechUrl({ text: answer, language: user.language });
       ttsUrl = ttsResponse?.url ?? null;
     }
 

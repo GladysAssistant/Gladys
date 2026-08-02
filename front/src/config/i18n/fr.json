@@ -624,7 +624,8 @@
         "music": "Musique",
         "health": "Santé",
         "weather": "Météo",
-        "navigation": "Navigation"
+        "navigation": "Navigation",
+        "tts": "Voix (TTS)"
       }
     },
     "externalIntegration": {
@@ -816,7 +817,8 @@
         "duplicateWarningText": "« {name} » semble être une autre instance de cette intégration. Deux instances peuvent se disputer le même compte cloud ou les mêmes appareils — pensez à arrêter l'instance existante pendant vos tests. Installer quand même est un usage supporté (ex. une version dev à côté de la prod).",
         "webhooksTitle": "Webhooks Internet (Gladys Plus)",
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
-        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur)."
+        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
+        "ttsInfoText": "Cette intégration est un fournisseur de synthèse vocale : une fois installée, sélectionnez-la comme voix de votre instance dans Paramètres → Système. Les annonces sont servies sur votre réseau local — les enceintes et navigateurs du même réseau peuvent les lire."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -3611,6 +3613,8 @@
     "configurationTitle": "Configuration",
     "timezone": "Fuseau horaire",
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
+    "ttsProvider": "Voix (fournisseur de synthèse vocale)",
+    "ttsProviderText": "Le fournisseur utilisé pour parler : les annonces des scènes sur vos enceintes et les réponses de l'assistant vocal. Gladys Plus fonctionne partout (y compris en accès à distance) ; une intégration fournisseur TTS génère la voix localement, servie sur votre réseau local.",
     "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
     "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états bruts des appareils.",
     "deviceAggregatesStateRetentionTime": "Conserver les états agrégés",

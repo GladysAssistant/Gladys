@@ -6,7 +6,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 
-import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses } from '../utils';
+import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses, isConfigOnlyIntegrationType } from '../utils';
 import { getBackToCatalogUrl } from '../../../catalog-url';
 import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
@@ -102,11 +102,11 @@ class ExternalIntegrationInstallPage extends Component {
         body.granted_devices = this.state.grantedDevices || [];
       }
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      // a communication integration has no device screens, and an
+      // a communication or tts integration has no device screens, and an
       // integration with settings needs them filled before any device can
       // be discovered: both land on the configuration screen after install
       const configSchema = get(installed, 'manifest.config_schema') || [];
-      if (get(installed, 'manifest.type') === 'communication' || configSchema.length > 0) {
+      if (isConfigOnlyIntegrationType(get(installed, 'manifest.type')) || configSchema.length > 0) {
         route(`/dashboard/integration/device/external/${installed.selector}/config`);
       } else {
         route(`/dashboard/integration/device/external/${installed.selector}`);
@@ -231,6 +231,13 @@ class ExternalIntegrationInstallPage extends Component {
                               <div class="alert alert-info">
                                 <i class="fe fe-bell mr-1" />
                                 <Text id="integration.externalIntegration.install.notificationWarningText" />
+                              </div>
+                            )}
+
+                            {manifest.type === 'tts' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-volume-2 mr-1" />
+                                <Text id="integration.externalIntegration.install.ttsInfoText" />
                               </div>
                             )}
 

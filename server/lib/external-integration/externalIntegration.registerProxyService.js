@@ -2,7 +2,13 @@ const db = require('../../models');
 const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
-const { CAMERA_GET_IMAGE_TIMEOUT_MS } = require('./constants');
+const {
+  CAMERA_GET_IMAGE_TIMEOUT_MS,
+  TTS_SYNTHESIZE_TIMEOUT_MS,
+  MAX_TTS_AUDIO_SIZE_BYTES,
+  MAX_TTS_TEXT_LENGTH,
+  TTS_AUDIO_CONTENT_TYPES,
+} = require('./constants');
 
 // scheduled polls only make sense against a live integration: outside
 // these statuses they become silent no-ops (see below)
@@ -77,6 +83,44 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // TTS provider integrations (B.18) expose the generic provider interface
+  // tts.synthesize: the core tts manager dispatches to any service exposing
+  // it, without knowing any engine by name. The audio comes back in the
+  // command-result as a data-URI, validated here (curated content types,
+  // decoded size bound) before a single byte is served to a speaker.
+  const isTts = service.manifest && service.manifest.type === 'tts';
+  const ttsCapability = isTts
+    ? {
+        tts: Object.freeze({
+          synthesize: async ({ text, language = null }) => {
+            // cap applied by the core before the relay: a long AI answer
+            // must speak its beginning rather than fail
+            const cappedText = String(text).substring(0, MAX_TTS_TEXT_LENGTH);
+            const result = await this.sendCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.TTS_SYNTHESIZE,
+              { text: cappedText, language },
+              { timeoutMs: TTS_SYNTHESIZE_TIMEOUT_MS },
+            );
+            const audio = result && result.data && result.data.audio;
+            if (typeof audio !== 'string' || audio.length === 0) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            const separatorIndex = audio.indexOf(';base64,');
+            const contentType = separatorIndex === -1 ? null : audio.substring(0, separatorIndex);
+            const extension = TTS_AUDIO_CONTENT_TYPES[contentType];
+            if (!extension) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            const buffer = Buffer.from(audio.substring(separatorIndex + ';base64,'.length), 'base64');
+            if (buffer.length === 0 || buffer.length > MAX_TTS_AUDIO_SIZE_BYTES) {
+              throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
+            }
+            return { buffer, contentType, extension };
+          },
+        }),
+      }
+    : {};
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -85,6 +129,7 @@ function registerProxyService(service) {
       await this.stop(service.selector);
     },
     ...messageCapability,
+    ...ttsCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {

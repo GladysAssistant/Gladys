@@ -272,6 +272,7 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/health" category="health" />
         <IntegrationPage path="/dashboard/integration/weather" category="weather" />
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
+        <IntegrationPage path="/dashboard/integration/tts" category="tts" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <Redirect

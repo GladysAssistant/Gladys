@@ -52,6 +52,15 @@ class PlayNotification extends Component {
     }
     this.setState({ selectedDeviceFeatureOption });
   };
+  getTtsProvider = async () => {
+    try {
+      const { active } = await this.props.httpClient.get('/api/v1/tts/provider');
+      this.setState({ ttsProvider: active });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   constructor(props) {
     super(props);
     this.props = props;
@@ -61,20 +70,26 @@ class PlayNotification extends Component {
   }
   componentDidMount() {
     this.getOptions();
+    this.getTtsProvider();
   }
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
   }
-  render(props, { selectedDeviceFeatureOption, devicesOptions }) {
+  render(props, { selectedDeviceFeatureOption, devicesOptions, ttsProvider }) {
     return (
       <div>
-        <GladysPlusUpsell
-          compact
-          icon="fe-volume-2"
-          utmCampaign="scene_action_tts"
-          titleKey="gladysPlusUpsell.tts.title"
-          descriptionKey="gladysPlusUpsell.tts.compactDescription"
-        />
+        {/* the Gladys Plus upsell only makes sense when the instance speaks
+            through Gladys Plus: with a TTS provider integration active, the
+            action works without any Plus subscription */}
+        {(!ttsProvider || ttsProvider === 'gladys-plus') && (
+          <GladysPlusUpsell
+            compact
+            icon="fe-volume-2"
+            utmCampaign="scene_action_tts"
+            titleKey="gladysPlusUpsell.tts.title"
+            descriptionKey="gladysPlusUpsell.tts.compactDescription"
+          />
+        )}
         <p>
           <Text id="editScene.actionsCard.playNotification.description" />
         </p>
