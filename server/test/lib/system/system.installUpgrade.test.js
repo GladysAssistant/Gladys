@@ -121,6 +121,30 @@ describe('system.installUpgrade', () => {
     expect(getUpgradeErrors()).to.deep.equal([{ code: SYSTEM_UPGRADE_ERROR_CODES.GLADYS_CONTAINER_NOT_FOUND }]);
   });
 
+  it('should report an error when the Gladys container has no name', async () => {
+    system.getGladysImage = fake.resolves({
+      container_name: '',
+      image: 'sha256:92e700688a85',
+      tag: null,
+      pinned: false,
+      recommended_image: null,
+    });
+
+    await system.installUpgrade();
+
+    assert.notCalled(system.dockerode.createContainer);
+    expect(getUpgradeErrors()).to.deep.equal([{ code: SYSTEM_UPGRADE_ERROR_CODES.GLADYS_CONTAINER_NOT_FOUND }]);
+  });
+
+  it('should report an error when the Watchtower run throws', async () => {
+    system.pull = fake.rejects(new Error('UNABLE_TO_PULL_IMAGE'));
+
+    await system.installUpgrade();
+
+    assert.notCalled(system.dockerode.createContainer);
+    expect(getUpgradeErrors()).to.deep.equal([{ code: SYSTEM_UPGRADE_ERROR_CODES.UNKNOWN_ERROR }]);
+  });
+
   it('should report an error when Watchtower exits with a non-zero status code', async () => {
     const container = await system.dockerode.createContainer({});
     sandbox.replace(container, 'wait', fake.resolves({ StatusCode: 1 }));

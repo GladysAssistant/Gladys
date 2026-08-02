@@ -136,6 +136,23 @@ describe('system.getGladysImage', () => {
     expect(gladysImage).to.have.property('recommended_image', 'gladysassistant/gladys:v4');
   });
 
+  it('should handle a container started from a raw image id', async () => {
+    system.inspectContainer = fake.resolves({
+      Config: { Image: 'sha256:92e700688a85' },
+    });
+
+    const gladysImage = await system.getGladysImage();
+    expect(gladysImage).to.deep.equal({
+      // an unnamed container cannot be passed to Watchtower
+      container_name: '',
+      image: 'sha256:92e700688a85',
+      tag: null,
+      pinned: true,
+      // no repository to build a moving tag from
+      recommended_image: null,
+    });
+  });
+
   it('should cache the image description', async () => {
     system.inspectContainer = fake.resolves({
       Name: '/gladys',
