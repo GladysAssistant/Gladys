@@ -568,7 +568,7 @@ describe('build schemas', () => {
       levenshtein: {
         distance: stub().returns(4),
       },
-      toon: stub().returns('toonmockdata'),
+      encode: stub().returns('encodedmockdata'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -631,7 +631,7 @@ describe('build schemas', () => {
       tags: [{ name: 'ai-generated' }],
     });
     expect(mcpHandler.gladys.scene.create.callCount).to.eq(1);
-    expect(sceneCreatedResult.content[0].text).to.eq('toonmockdata');
+    expect(sceneCreatedResult.content[0].text).to.eq('encodedmockdata');
 
     let flatActionsError = null;
     try {
@@ -682,7 +682,7 @@ describe('build schemas', () => {
       actions: [[{ type: 'message.send', user: 'john', text: 'Hello John' }]],
       tags: [],
     });
-    expect(sceneCreatedWithUserAction.content[0].text).to.eq('toonmockdata');
+    expect(sceneCreatedWithUserAction.content[0].text).to.eq('encodedmockdata');
 
     const sceneCreatedWithDeviceFeatureSelector = await tools[1].cb({
       name: 'Get device value scene',
@@ -691,7 +691,7 @@ describe('build schemas', () => {
       actions: [[{ type: 'device.get-value', device_feature: 'device-temp-1-temp' }]],
       tags: [],
     });
-    expect(sceneCreatedWithDeviceFeatureSelector.content[0].text).to.eq('toonmockdata');
+    expect(sceneCreatedWithDeviceFeatureSelector.content[0].text).to.eq('encodedmockdata');
 
     let invalidDeviceFeatureSelectorError = null;
     try {
@@ -715,7 +715,7 @@ describe('build schemas', () => {
       actions: [[{ type: 'light.turn-on', devices: ['device-light-1'] }]],
       tags: [],
     });
-    expect(sunriseSceneResult.content[0].text).to.eq('toonmockdata');
+    expect(sunriseSceneResult.content[0].text).to.eq('encodedmockdata');
 
     let invalidUserError = null;
     try {
@@ -882,7 +882,7 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[0]).to.eq('device-temp-1-temp');
     expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[1]).to.eq(43200);
     expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[2]).to.eq(500);
-    expect(getHistoryResult.content[0].text).to.eq('toonmockdata');
+    expect(getHistoryResult.content[0].text).to.eq('encodedmockdata');
 
     mcpHandler.gladys.device.getDeviceFeaturesAggregates.resetHistory();
 
@@ -895,7 +895,7 @@ describe('build schemas', () => {
     expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[0]).to.eq('device-temp-1-temp');
     expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[1]).to.eq(43200);
     expect(mcpHandler.gladys.device.getDeviceFeaturesAggregates.firstCall.args[2]).to.eq(500);
-    expect(getHistoryDefaultFeatureResult.content[0].text).to.eq('toonmockdata');
+    expect(getHistoryDefaultFeatureResult.content[0].text).to.eq('encodedmockdata');
 
     mcpHandler.gladys.device.getDeviceFeaturesAggregates.resetHistory();
 
@@ -1033,7 +1033,7 @@ describe('build schemas', () => {
       levenshtein: {
         distance: stub().returns(4),
       },
-      toon: stub().returns(),
+      encode: stub().returns(),
     };
 
     // Should not throw error
@@ -1167,7 +1167,7 @@ describe('build schemas', () => {
       levenshtein: {
         distance: stub().returns(4),
       },
-      toon: stub().returns('toonmockdata'),
+      encode: stub().returns('encodedmockdata'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -1194,8 +1194,8 @@ describe('build schemas', () => {
       group_by: 'day',
       display_mode: 'kwh',
     });
-    expect(kwhResult.content[0].text).to.eq('toonmockdata');
-    expect(mcpHandler.toon.lastCall.args[0]).to.deep.equal({
+    expect(kwhResult.content[0].text).to.eq('encodedmockdata');
+    expect(mcpHandler.encode.lastCall.args[0]).to.deep.equal({
       device: 'Prise onduleur',
       feature: 'Consommation',
       unit: 'kWh',
@@ -1250,8 +1250,8 @@ describe('build schemas', () => {
       group_by: 'day',
       display_mode: 'currency',
     });
-    expect(currencyResult.content[0].text).to.eq('toonmockdata');
-    expect(mcpHandler.toon.lastCall.args[0]).to.deep.equal({
+    expect(currencyResult.content[0].text).to.eq('encodedmockdata');
+    expect(mcpHandler.encode.lastCall.args[0]).to.deep.equal({
       device: 'Prise onduleur',
       feature: 'Coût',
       unit: 'euro',
@@ -1298,9 +1298,9 @@ describe('build schemas', () => {
       end_date: '2026-07-12',
       unit: 'kwh',
     });
-    expect(emptyResult.content[0].text).to.eq('toonmockdata');
-    expect(mcpHandler.toon.lastCall.args[0].total).to.eq(0);
-    expect(mcpHandler.toon.lastCall.args[0].note).to.eq(
+    expect(emptyResult.content[0].text).to.eq('encodedmockdata');
+    expect(mcpHandler.encode.lastCall.args[0].total).to.eq(0);
+    expect(mcpHandler.encode.lastCall.args[0].note).to.eq(
       'No consumption data recorded for this device over this period.',
     );
 
@@ -1371,10 +1371,10 @@ describe('build schemas', () => {
       group_by: 'month',
       display_mode: 'kwh',
     });
-    expect(clampedFebruaryResult.content[0].text).to.eq('toonmockdata');
+    expect(clampedFebruaryResult.content[0].text).to.eq('encodedmockdata');
     // The effective period is echoed back, not the out-of-range input.
-    expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('2026-02-01');
-    expect(mcpHandler.toon.lastCall.args[0].end_date).to.eq('2026-02-28');
+    expect(mcpHandler.encode.lastCall.args[0].start_date).to.eq('2026-02-01');
+    expect(mcpHandler.encode.lastCall.args[0].end_date).to.eq('2026-02-28');
 
     // Same clamping on a leap year keeps February 29th, and on a 30-day month.
     getConsumptionByDates.resetHistory();
@@ -1388,8 +1388,8 @@ describe('build schemas', () => {
       from: new Date(2024, 1, 29),
       to: new Date(2024, 4, 1),
     });
-    expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('2024-02-29');
-    expect(mcpHandler.toon.lastCall.args[0].end_date).to.eq('2024-04-30');
+    expect(mcpHandler.encode.lastCall.args[0].start_date).to.eq('2024-02-29');
+    expect(mcpHandler.encode.lastCall.args[0].end_date).to.eq('2024-04-30');
 
     // Years below 0100 keep their century: new Date(year, ...) would map them to
     // 1900-1999 and query a period two millennia away from the one asked for.
@@ -1409,7 +1409,7 @@ describe('build schemas', () => {
       to: expectedYearZeroTo,
     });
     expect(getConsumptionByDates.firstCall.args[1].from.getFullYear()).to.eq(0);
-    expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('0000-02-29');
+    expect(mcpHandler.encode.lastCall.args[0].start_date).to.eq('0000-02-29');
 
     getConsumptionByDates.resetHistory();
     const reversedDatesResult = await energyTool.cb({
@@ -1479,7 +1479,7 @@ describe('build schemas', () => {
       levenshtein: {
         distance: stub().returns(4),
       },
-      toon: stub().returns('toonmockdata'),
+      encode: stub().returns('encodedmockdata'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -1559,7 +1559,7 @@ describe('build schemas', () => {
       levenshtein: {
         distance: stub().returns(0),
       },
-      toon: stub().returns('toonmockdata'),
+      encode: stub().returns('encodedmockdata'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -1637,7 +1637,7 @@ describe('build schemas', () => {
         event: { emit: fake() },
       },
       levenshtein: { distance: stub().returns(0) },
-      toon: stub().returns('toonmockdata'),
+      encode: stub().returns('encodedmockdata'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -1728,7 +1728,7 @@ describe('build schemas', () => {
         event: { emit: fake() },
       },
       levenshtein: { distance: stub().returns(0) },
-      toon: stub().returns('ok'),
+      encode: stub().returns('ok'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -1788,7 +1788,7 @@ describe('build schemas', () => {
         event: { emit: fake() },
       },
       levenshtein: { distance: stub().returns(0) },
-      toon: stub().returns('ok'),
+      encode: stub().returns('ok'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -1815,7 +1815,7 @@ describe('build schemas', () => {
       isWritableSensorFeature,
       formatValue: stub().returns({ value: 1 }),
       findBySimilarity,
-      toon: stub().callsFake((value) => JSON.stringify(value)),
+      encode: stub().callsFake((value) => JSON.stringify(value)),
       gladys: {
         room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
         user: { get: stub().resolves([{ id: 'user-1', name: 'John', selector: 'john' }]) },
@@ -2577,7 +2577,7 @@ describe('build schemas', () => {
         event: { emit: fake() },
       },
       levenshtein: { distance: stub().returns(0) },
-      toon: stub().returns('toonmockdata'),
+      encode: stub().returns('encodedmockdata'),
     };
 
     const resources = await mcpHandler.getAllResources();
@@ -2627,7 +2627,7 @@ describe('build schemas', () => {
     );
 
     const stateResult = await getStateTool.cb({ room: 'salon', device_type: 'shutter' });
-    expect(stateResult.content[0].text).to.eq('toonmockdata');
+    expect(stateResult.content[0].text).to.eq('encodedmockdata');
   });
 
   it('should merge shutter features into an existing device in home schema', async () => {
@@ -2744,7 +2744,7 @@ describe('build schemas', () => {
         event: { emit: fake() },
       },
       levenshtein: { distance: stub().returns(10) },
-      toon: stub().returns('ok'),
+      encode: stub().returns('ok'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -2838,7 +2838,7 @@ describe('build schemas', () => {
         event: { emit: fake() },
       },
       levenshtein: { distance: stub().returns(10) },
-      toon: stub().returns('ok'),
+      encode: stub().returns('ok'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -2991,7 +2991,7 @@ describe('build schemas', () => {
         event: { emit: fake() },
       },
       levenshtein: { distance: stub().returns(0) },
-      toon: stub().returns('toonmockdata'),
+      encode: stub().returns('encodedmockdata'),
     };
 
     const resources = await mcpHandler.getAllResources();
@@ -3116,8 +3116,8 @@ describe('build schemas', () => {
     expect(noRoomResult.content[0].text).to.eq('device.set-light: brightness 10% command sent for No Room Light');
 
     const stateResult = await getStateTool.cb({ room: 'Salon', device_type: 'light' });
-    expect(stateResult.content[0].text).to.eq('toonmockdata');
-    const states = mcpHandler.toon.lastCall.args[0];
+    expect(stateResult.content[0].text).to.eq('encodedmockdata');
+    const states = mcpHandler.encode.lastCall.args[0];
     const stateFeatureNames = states.map((state) => state.feature);
     expect(stateFeatureNames).to.include.members(['On/Off', 'Brightness', 'Color', 'Color temperature']);
   });
@@ -3201,7 +3201,7 @@ describe('build schemas', () => {
         event: { emit: fake() },
       },
       levenshtein: { distance: stub().returns(10) },
-      toon: stub().returns('ok'),
+      encode: stub().returns('ok'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -3304,7 +3304,7 @@ describe('build schemas', () => {
         event: { emit: fake() },
       },
       levenshtein: { distance: stub().returns(10) },
-      toon: stub().returns('ok'),
+      encode: stub().returns('ok'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -3393,7 +3393,7 @@ describe('build schemas', () => {
         event: { emit: fake() },
       },
       levenshtein: { distance: stub().returns(10) },
-      toon: stub().returns('toonmockdata'),
+      encode: stub().returns('encodedmockdata'),
     };
 
     const tools = await mcpHandler.getAllTools();
@@ -3413,6 +3413,6 @@ describe('build schemas', () => {
 
     // A room that does have the sensor still returns the regular payload.
     const withSensor = await getStateTool.cb({ room: 'Salon', device_type: 'humidity-sensor' });
-    expect(withSensor.content[0].text).to.eq('toonmockdata');
+    expect(withSensor.content[0].text).to.eq('encodedmockdata');
   });
 });

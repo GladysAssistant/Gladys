@@ -19,16 +19,16 @@ const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
  * @param {object} gladys - Gladys instance.
  * @param {string} serviceId - UUID of the service in DB.
  * @param {object} mcp - MCP library.
- * @param {object} toon - Toon encoding library.
+ * @param {Function} encode - Encoder for MCP tool responses (GCF encodeGeneric).
  * @param {object} levenshtein - Levenshtein library.
  * @example
  * const mcpHandler = new MCPHandler(gladys, serviceId, mcp);
  */
-const MCPHandler = function MCPHandler(gladys, serviceId, mcp, toon, levenshtein) {
+const MCPHandler = function MCPHandler(gladys, serviceId, mcp, encode, levenshtein) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.mcp = mcp;
-  this.toon = toon;
+  this.encode = encode;
   this.levenshtein = levenshtein;
   this.server = null;
   this.transports = {};

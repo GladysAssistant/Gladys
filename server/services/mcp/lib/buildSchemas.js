@@ -435,7 +435,7 @@ async function getAllTools(userId) {
             content: [
               {
                 type: 'text',
-                text: this.toon({
+                text: this.encode({
                   id: createdScene.id,
                   name: createdScene.name,
                   selector: createdScene.selector,
@@ -577,7 +577,7 @@ async function getAllTools(userId) {
           content: [
             {
               type: 'text',
-              text: this.toon(states),
+              text: this.encode(states),
             },
           ],
         };
@@ -779,7 +779,7 @@ async function getAllTools(userId) {
             content: [
               {
                 type: 'text',
-                text: this.toon({
+                text: this.encode({
                   room: selectedDevices[0].room?.name || noRoom.name,
                   device: selectedDevices[0].name,
                   feature: selectedFeature.name,
@@ -1416,7 +1416,7 @@ async function getAllTools(userId) {
           content: [
             {
               type: 'text',
-              text: this.toon(response),
+              text: this.encode(response),
             },
           ],
         };
@@ -1498,7 +1498,7 @@ async function getAllTools(userId) {
           content: [
             {
               type: 'text',
-              text: this.toon(result),
+              text: this.encode(result),
             },
           ],
         };
