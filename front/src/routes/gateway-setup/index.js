@@ -93,6 +93,12 @@ class LinkGatewayUser extends Component {
     await Promise.all([this.props.getUsers(), this.getSetupState()]);
     await this.checkIfGladysUserIsLinkedToExistingUser();
   };
+  retry = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    await this.init();
+  };
   componentWillMount() {
     this.init();
   }
@@ -105,6 +111,7 @@ class LinkGatewayUser extends Component {
         errorNotAcceptedLocally={errorNotAcceptedLocally}
         selectUser={this.selectUser}
         saveUser={this.saveUser}
+        retry={this.retry}
         loading={loading}
         openStripeBilling={this.openStripeBilling}
         logout={this.logout}
