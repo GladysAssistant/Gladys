@@ -4212,6 +4212,35 @@
           "heating": "Heat",
           "drying": "Dry",
           "fan": "Fan"
+        },
+        "fan-speed": {
+          "auto": "Auto",
+          "low": "Low",
+          "low-mid": "Low-Med",
+          "mid": "Medium",
+          "mid-high": "Med-High",
+          "high": "High",
+          "quiet": "Quiet",
+          "turbo": "Turbo"
+        },
+        "swing-horizontal": {
+          "off": "Off",
+          "swing": "Swing",
+          "position-1": "Position 1 (Left)",
+          "position-2": "Position 2",
+          "position-3": "Position 3 (Center)",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Right)",
+          "swing-opposite": "Opposite Swing"
+        },
+        "swing-vertical": {
+          "off": "Off",
+          "swing": "Swing",
+          "position-1": "Position 1 (Top)",
+          "position-2": "Position 2",
+          "position-3": "Position 3",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Bottom)"
         }
       },
       "heater": {
@@ -4437,6 +4466,35 @@
           "2": "Heating",
           "3": "Drying",
           "4": "Fan"
+        },
+        "fan-speed": {
+          "0": "Auto",
+          "1": "Low",
+          "2": "Low-Med",
+          "3": "Medium",
+          "4": "Med-High",
+          "5": "High",
+          "6": "Quiet",
+          "7": "Turbo"
+        },
+        "swing-horizontal": {
+          "0": "Off",
+          "1": "Swing",
+          "2": "Position 1 (Left)",
+          "3": "Position 2",
+          "4": "Position 3 (Center)",
+          "5": "Position 4",
+          "6": "Position 5 (Right)",
+          "7": "Opposite Swing"
+        },
+        "swing-vertical": {
+          "0": "Off",
+          "1": "Swing",
+          "2": "Position 1 (Top)",
+          "3": "Position 2",
+          "4": "Position 3",
+          "5": "Position 4",
+          "6": "Position 5 (Bottom)"
         }
       },
       "siren": {
@@ -4772,7 +4830,10 @@
       "shortCategoryName": "Air Conditioning",
       "binary": "Switch (On/Off)",
       "mode": "Mode",
-      "target-temperature": "Target temperature"
+      "target-temperature": "Target temperature",
+      "fan-speed": "Fan speed",
+      "swing-horizontal": "Horizontal swing",
+      "swing-vertical": "Vertical swing"
     },
     "electrical-vehicle-battery": {
       "shortCategoryName": "Electric Vehicle - Battery",
