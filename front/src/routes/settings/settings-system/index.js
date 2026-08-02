@@ -12,14 +12,16 @@ class SettingsSystem extends Component {
     super(props);
     this.state = {
       SystemUpgradeStatus: null,
-      watchtowerLogs: []
+      watchtowerLogs: [],
+      upgradeError: null
     };
   }
 
   upgradeGladys = async () => {
     this.setState({
       SystemUpgradeStatus: RequestStatus.Getting,
-      watchtowerLogs: []
+      watchtowerLogs: [],
+      upgradeError: null
     });
     try {
       await this.props.httpClient.post('/api/v1/system/upgrade');
@@ -50,6 +52,7 @@ class SettingsSystem extends Component {
 
     // Listen to Watchtower logs
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SYSTEM.WATCHTOWER_LOG, this.handleWatchtowerLog);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.SYSTEM.UPGRADE_ERROR, this.handleUpgradeError);
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
 
@@ -60,6 +63,7 @@ class SettingsSystem extends Component {
       WEBSOCKET_MESSAGE_TYPES.SYSTEM.WATCHTOWER_LOG,
       this.handleWatchtowerLog
     );
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.SYSTEM.UPGRADE_ERROR, this.handleUpgradeError);
     this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
@@ -67,6 +71,13 @@ class SettingsSystem extends Component {
     this.setState(prevState => ({
       watchtowerLogs: [...prevState.watchtowerLogs, payload.message]
     }));
+  };
+
+  handleUpgradeError = payload => {
+    this.setState({
+      SystemUpgradeStatus: RequestStatus.Error,
+      upgradeError: payload
+    });
   };
 
   handleWebsocketConnected = payload => {
@@ -113,13 +124,17 @@ class SettingsSystem extends Component {
     }
   };
 
-  render(props, { SystemUpgradeStatus, watchtowerLogs, websocketConnected, SystemGetInfosStatus, systemInfos }) {
+  render(
+    props,
+    { SystemUpgradeStatus, watchtowerLogs, upgradeError, websocketConnected, SystemGetInfosStatus, systemInfos }
+  ) {
     return (
       <SettingsSystemPage
         {...props}
         upgradeGladys={this.upgradeGladys}
         SystemUpgradeStatus={SystemUpgradeStatus}
         watchtowerLogs={watchtowerLogs}
+        upgradeError={upgradeError}
         websocketConnected={websocketConnected}
         checkForUpdates={this.checkForUpdates}
         SystemGetInfosStatus={SystemGetInfosStatus}

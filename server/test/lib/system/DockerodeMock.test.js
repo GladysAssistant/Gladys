@@ -52,6 +52,10 @@ Docker.prototype.createContainer = fake.resolves(container);
 
 Docker.prototype.getContainer = fake.returns({
   inspect: fake.resolves({
+    Name: '/gladys',
+    Config: {
+      Image: 'gladysassistant/gladys:v4',
+    },
     HostConfig: {
       NetworkMode: 'host',
       Devices: [
@@ -100,7 +104,7 @@ Docker.prototype.getImage = fake.returns({
 });
 
 Docker.prototype.pull = (repoTag) => {
-  if (repoTag.endsWith('latest')) {
+  if (repoTag.endsWith('latest') || repoTag.startsWith('nickfedor/watchtower:')) {
     return fake.resolves(true)();
   }
   return fake.rejects('ERROR')();

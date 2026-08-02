@@ -1539,6 +1539,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SYSTEM: {
     VACUUM_FINISHED: 'system.vacuum-finished',
     WATCHTOWER_LOG: 'system.watchtower-log',
+    UPGRADE_ERROR: 'system.upgrade-error',
   },
   LOCATION: {
     NEW: 'location.new',
@@ -1691,6 +1692,18 @@ const DEFAULT_AGGREGATES_POLICY_IN_DAYS = {
   [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.HOURLY]: 6 * 30,
   [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.DAILY]: 365,
   [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.MONTHLY]: 5 * 365,
+};
+
+const SYSTEM_UPGRADE_ERROR_CODES = {
+  // Gladys runs on an immutable image reference, no upgrade can ever be applied
+  IMAGE_TAG_PINNED: 'IMAGE_TAG_PINNED',
+  // Watchtower ran fine but found no new image to install
+  NO_UPDATE_APPLIED: 'NO_UPDATE_APPLIED',
+  // the Watchtower container exited with a non-zero status code
+  WATCHTOWER_FAILED: 'WATCHTOWER_FAILED',
+  // the container running Gladys could not be identified
+  GLADYS_CONTAINER_NOT_FOUND: 'GLADYS_CONTAINER_NOT_FOUND',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 };
 
 const JOB_TYPES = {
@@ -1898,6 +1911,8 @@ module.exports.WEATHER_UNITS = WEATHER_UNITS;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES = DEVICE_FEATURE_STATE_AGGREGATE_TYPES;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST;
 module.exports.DEFAULT_AGGREGATES_POLICY_IN_DAYS = DEFAULT_AGGREGATES_POLICY_IN_DAYS;
+
+module.exports.SYSTEM_UPGRADE_ERROR_CODES = SYSTEM_UPGRADE_ERROR_CODES;
 
 module.exports.JOB_TYPES = JOB_TYPES;
 module.exports.JOB_TYPES_LIST = JOB_TYPES_LIST;
