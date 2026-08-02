@@ -3674,7 +3674,7 @@
     "deleteAreaError": "Diese Zone kann nicht gelöscht werden. Bitte aktualisiere diese Seite und versuche es erneut."
   },
   "iconSelector": {
-    "searchPlaceholder": "Symbol suchen (lightbulb, door, car...)",
+    "searchPlaceholder": "Symbol suchen (Zuhause, Schloss, Wetter...)",
     "noResult": "Kein Symbol entspricht \"{{search}}\"."
   },
   "newScene": {

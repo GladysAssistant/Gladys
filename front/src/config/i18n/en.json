@@ -3674,7 +3674,7 @@
     "deleteAreaError": "Unable to delete this zone. Please refresh this page and retry."
   },
   "iconSelector": {
-    "searchPlaceholder": "Search an icon (lightbulb, door, car...)",
+    "searchPlaceholder": "Search an icon (home, lock, weather...)",
     "noResult": "No icon matches \"{{search}}\"."
   },
   "newScene": {

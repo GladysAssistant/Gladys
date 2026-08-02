@@ -1,25 +1,48 @@
 import { Fragment } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import { Localizer, Text } from 'preact-i18n';
+import { connect } from 'unistore/preact';
 import cx from 'classnames';
+import get from 'get-value';
 
 import iconList from '../../../../server/config/icons.json';
+import iconKeywords from '../../config/i18n/icon-keywords';
+import { AVAILABLE_LANGUAGES } from '../../../../server/utils/constants';
 import style from './IconSelector.css';
 
-// Icon names are kebab-case ("door-open"), so fold both sides down to plain
-// alphanumerics: "door open", "door-open" and "dooropen" all find the icon.
-const normalize = value => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+// Fold both the query and the searched text down to plain lowercase letters:
+// dashes disappear, so "door open", "door-open" and "dooropen" all match the
+// same icon, and accents do too, so "eclair" finds "éclair" and "vergrossern"
+// finds "vergrößern".
+const normalize = value =>
+  value
+    .toLowerCase()
+    .replace(/ß/g, 'ss')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '');
 
-const IconSelector = ({ value, onChange, darkModeNoFilter = false }) => {
+const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
   const [search, setSearch] = useState('');
+  const language = get(user, 'language') || AVAILABLE_LANGUAGES.EN;
+
+  // Icon names are English, so a French or German user has no way to find one
+  // by name. Each icon carries translated keywords; both are searched.
+  const haystacks = useMemo(() => {
+    const keywords = iconKeywords[language] || iconKeywords[AVAILABLE_LANGUAGES.EN];
+    return iconList.reduce((acc, icon) => {
+      acc[icon] = normalize(`${icon} ${keywords[icon] || ''}`);
+      return acc;
+    }, {});
+  }, [language]);
 
   const icons = useMemo(() => {
     const searchTerm = normalize(search);
     if (searchTerm.length === 0) {
       return iconList;
     }
-    return iconList.filter(icon => normalize(icon).includes(searchTerm));
-  }, [search]);
+    return iconList.filter(icon => haystacks[icon].includes(searchTerm));
+  }, [search, haystacks]);
 
   // The selector lives inside the new/duplicate scene <form>, where Enter in a
   // text input submits it. Swallow it so searching never creates the scene.
@@ -82,4 +105,4 @@ const IconSelector = ({ value, onChange, darkModeNoFilter = false }) => {
   );
 };
 
-export default IconSelector;
+export default connect('user', {})(IconSelector);

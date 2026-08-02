@@ -3674,7 +3674,7 @@
     "getAreaError": "Impossible de récupérer les informations de cette zone. Merci de rafraichir cette page et de réessayer."
   },
   "iconSelector": {
-    "searchPlaceholder": "Rechercher une icône (lightbulb, door, car...)",
+    "searchPlaceholder": "Rechercher une icône (maison, cadenas, météo...)",
     "noResult": "Aucune icône ne correspond à \"{{search}}\"."
   },
   "newScene": {
