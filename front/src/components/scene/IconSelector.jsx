@@ -75,32 +75,37 @@ const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
         </Localizer>
       </div>
       <div class={cx('row', style.iconContainer)}>
-        {icons.map(icon => (
-          <div class={cx('col-4 col-sm-3', style.iconCol)} key={icon}>
-            <div
-              class={cx('text-center', style.iconDiv, {
-                [style.iconDivChecked]: value === icon
-              })}
-            >
-              <label class={style.iconLabel} title={icon}>
-                <input
-                  name="icon"
-                  type="radio"
-                  onChange={onChange}
-                  checked={value === icon}
-                  value={icon}
-                  class={style.iconInput}
-                />
-                <i
-                  class={cx('fe', `fe-${icon}`, style.iconGlyph, {
-                    'dark-mode-fe-none-filter': darkModeNoFilter
-                  })}
-                />
-                <span class={style.iconName}>{get(translations, `${icon}.label`) || icon}</span>
-              </label>
+        {icons.map(icon => {
+          const label = get(translations, `${icon}.label`) || icon;
+          return (
+            <div class={cx('col-4 col-sm-3', style.iconCol)} key={icon}>
+              <div
+                class={cx('text-center', style.iconDiv, {
+                  [style.iconDivChecked]: value === icon
+                })}
+              >
+                {/* The tile is a fixed size, so a long label can be clamped:
+                    keep the full one — and the icon name — on hover. */}
+                <label class={style.iconLabel} title={`${label} · ${icon}`}>
+                  <input
+                    name="icon"
+                    type="radio"
+                    onChange={onChange}
+                    checked={value === icon}
+                    value={icon}
+                    class={style.iconInput}
+                  />
+                  <i
+                    class={cx('fe', `fe-${icon}`, style.iconGlyph, {
+                      'dark-mode-fe-none-filter': darkModeNoFilter
+                    })}
+                  />
+                  <span class={style.iconName}>{label}</span>
+                </label>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         {icons.length === 0 && (
           <div class={cx('col-12', 'text-muted', style.noResult)}>
             <Text id="iconSelector.noResult" fields={{ search }} />

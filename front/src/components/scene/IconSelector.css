@@ -1,17 +1,27 @@
+/* The row is a flex container with a fixed height, so its columns would
+   stretch to fill it — a lone search result ended up as one tile 20rem tall.
+   Pin the lines to the top instead. */
 .iconContainer {
   margin-top: 1rem;
-  height: 20rem;
+  /* max-height, not height: a search narrowed to two icons should not leave
+     18rem of empty box above the submit button. */
+  max-height: 20rem;
   overflow-y: auto;
+  align-items: flex-start;
+  align-content: flex-start;
 }
 
 .iconCol {
   margin-bottom: 0.5rem;
 }
 
+/* Fixed height so every tile — and so every selection outline — is the same
+   size whatever the label wraps to. */
 .iconDiv {
-  height: 100%;
+  height: 5.5rem;
   padding: 0.5rem 0.25rem;
   border-radius: 4px;
+  overflow: hidden;
 }
 
 /* Dark mode inverts the whole page, so a background tint alone is unreliable
@@ -43,13 +53,18 @@
 }
 
 /* Labels are translated, so they vary in length a lot ("Sun" vs "Aktualisieren
-   gegen Uhrzeigersinn"). Let them wrap and break rather than widen the tile. */
+   (gegen Uhrzeigersinn)"). Let them wrap and break rather than widen the tile,
+   and clamp the few that still overflow — the title attribute keeps the full
+   name reachable. */
 .iconName {
-  display: block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
   margin-top: 0.35rem;
   font-size: 0.6875rem;
   line-height: 1.25;
   color: #6e7687;
+  overflow: hidden;
   overflow-wrap: anywhere;
 }
 
