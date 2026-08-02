@@ -73,6 +73,36 @@ describe('message.create', () => {
       previousQuestions: [],
     });
   });
+  it('should forward message to AI when an external AI provider is selected without Gladys Plus', async () => {
+    // Gladys Plus not configured, but the AI_PROVIDER variable points to an
+    // installed external AI integration: the AI path must be engaged
+    const variable = {
+      getValue: fake(async (variableName) => (variableName === 'AI_PROVIDER' ? 'ext-dev-claude-provider-demo' : null)),
+    };
+    const event = {
+      on: fake.returns(null),
+      emit: fake.returns(null),
+    };
+    const messageHandler = new MessageHandler(event, brain, service, {}, variable);
+    const message = {
+      text: 'Turn on the light in the kitchen',
+      language: 'en',
+      source: 'client-api',
+      source_user_id: userId,
+      user: {
+        id: userId,
+        language: 'en',
+      },
+      id: '5cd30aef-9c4e-4a23-88e3-3547971296e5',
+    };
+    const newMessage = await messageHandler.create(message);
+    expect(newMessage).to.have.property('message');
+    assert.calledWith(event.emit, 'message.new-for-open-ai', {
+      context: { user: { id: userId, language: 'en' } },
+      message,
+      previousQuestions: [],
+    });
+  });
   it('should forward message to OpenAI with previous questions context', async () => {
     const variable = {
       getValue: fake.resolves('configured-value'),

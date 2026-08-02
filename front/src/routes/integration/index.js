@@ -160,7 +160,8 @@ class Integration extends Component {
   buildExternalIntegrationCards() {
     const { user = {}, category } = this.props;
     // external integrations live in the category matching their manifest
-    // type ("device" or "communication"), and can also be favorites
+    // type ("device", or "communication" — AI providers land there too,
+    // next to the native AI page), and can also be favorites
     const EXTERNAL_CATEGORIES = ['device', 'communication'];
     if (category && !EXTERNAL_CATEGORIES.includes(category) && category !== 'favorites') {
       return [];
@@ -185,12 +186,15 @@ class Integration extends Component {
 
     const externalCards = [];
 
-    // a communication integration has no device screens: its card lands
-    // straight on the configuration screen
+    // communication and AI integrations have no device screens: their card
+    // lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
-      manifest.type === 'communication'
+      manifest.type === 'communication' || manifest.type === 'ai'
         ? `/dashboard/integration/device/external/${selector}/config`
         : `/dashboard/integration/device/external/${selector}`;
+    // AI providers share the communication category with the native AI page
+    const getCatalogType = manifest =>
+      manifest.type === 'communication' || manifest.type === 'ai' ? 'communication' : 'device';
 
     // Installed external integrations
     installed.forEach(integration => {
@@ -202,7 +206,7 @@ class Integration extends Component {
         key: `external-${integration.store_slug || integration.selector}`,
         external: true,
         externalInstalled: true,
-        type: manifest.type === 'communication' ? 'communication' : 'device',
+        type: getCatalogType(manifest),
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: getInstalledUrl(integration.selector, manifest),
@@ -223,7 +227,7 @@ class Integration extends Component {
         key: `external-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
-        type: manifest.type === 'communication' ? 'communication' : 'device',
+        type: getCatalogType(manifest),
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled

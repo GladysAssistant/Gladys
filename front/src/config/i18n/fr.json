@@ -816,7 +816,8 @@
         "duplicateWarningText": "« {name} » semble être une autre instance de cette intégration. Deux instances peuvent se disputer le même compte cloud ou les mêmes appareils — pensez à arrêter l'instance existante pendant vos tests. Installer quand même est un usage supporté (ex. une version dev à côté de la prod).",
         "webhooksTitle": "Webhooks Internet (Gladys Plus)",
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
-        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur)."
+        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
+        "aiWarningText": "Cette intégration est un fournisseur d'IA : si vous la sélectionnez comme fournisseur d'IA, elle recevra toutes vos conversations avec l'assistant (messages, historique, états des appareils renvoyés par les outils, images du chat), et ses réponses piloteront les actions de l'assistant sur votre logement."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -2687,6 +2688,18 @@
         "description": "Fonctionnalité avancée : télécharge le contexte JSON transmis à l'IA (prompt système, 50 derniers messages de la conversation et outils disponibles). Utile pour reproduire et diagnostiquer les problèmes rencontrés par les utilisateurs.",
         "downloadButton": "Télécharger le contexte JSON pour debug",
         "error": "Impossible de générer le contexte de debug. Vérifiez que le service MCP est démarré."
+      },
+      "aiProvider": {
+        "title": "Fournisseur d'IA",
+        "description": "Gladys utilise Gladys Plus comme fournisseur d'IA par défaut. Vous pouvez faire passer l'assistant (chat, routage d'intention, résumé hebdomadaire) par une intégration fournisseur d'IA installée : Claude, DeepSeek, OpenAI, un modèle local... Les réglages propres au fournisseur (clé d'API, modèle) se trouvent sur la page de son intégration.",
+        "selectLabel": "Fournisseur utilisé pour les requêtes d'IA",
+        "gladysPlusOption": "Gladys Plus (par défaut)",
+        "noProvider": "Aucune intégration fournisseur d'IA installée. Installez-en une depuis le catalogue d'intégrations pour utiliser un autre fournisseur que Gladys Plus.",
+        "loadError": "Impossible de charger les réglages du fournisseur d'IA.",
+        "retry": "Réessayer",
+        "saveError": "Impossible d'enregistrer le fournisseur d'IA. Veuillez réessayer.",
+        "providerNotRunning": "Cette intégration fournisseur d'IA n'est pas démarrée : les requêtes d'IA échoueront tant qu'elle ne tourne pas.",
+        "providerNotRunningLink": "Ouvrir la page de l'intégration"
       },
       "weeklyDigest": {
         "title": "Bilan hebdomadaire de la maison",

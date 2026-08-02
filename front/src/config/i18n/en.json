@@ -816,7 +816,8 @@
         "duplicateWarningText": "\"{name}\" looks like another instance of this integration. Two instances may fight over the same cloud account or the same devices — consider stopping the existing one during your tests. Installing anyway is supported (e.g. a dev build next to the production one).",
         "webhooksTitle": "Internet webhooks (Gladys Plus)",
         "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key).",
-        "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee)."
+        "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee).",
+        "aiWarningText": "This integration is an AI provider: if you select it as your AI provider, it will receive all your assistant conversations (messages, history, device states returned by tools, chat images), and its answers will drive the assistant's actions on your home."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
@@ -2687,6 +2688,18 @@
         "description": "Advanced feature: download the JSON context sent to the AI (system prompt, last 50 conversation messages, and available tools). Useful for reproducing and diagnosing user issues.",
         "downloadButton": "Download JSON context for debug",
         "error": "Unable to generate debug context. Make sure the MCP service is running."
+      },
+      "aiProvider": {
+        "title": "AI provider",
+        "description": "Gladys uses Gladys Plus as its AI provider by default. You can route the assistant (chat, intent routing, weekly digest) through an installed AI provider integration instead: Claude, DeepSeek, OpenAI, a local model... The provider's own settings (API key, model) are on its integration page.",
+        "selectLabel": "Provider used for AI requests",
+        "gladysPlusOption": "Gladys Plus (default)",
+        "noProvider": "No AI provider integration installed. Install one from the integrations catalog to use another provider than Gladys Plus.",
+        "loadError": "Unable to load the AI provider settings.",
+        "retry": "Retry",
+        "saveError": "Unable to save the AI provider. Please try again.",
+        "providerNotRunning": "This AI provider integration is not running: AI requests will fail until it is started.",
+        "providerNotRunningLink": "Open the integration page"
       },
       "weeklyDigest": {
         "title": "Weekly home digest",

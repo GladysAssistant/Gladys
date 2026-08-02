@@ -1,6 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { BadParameters, NotFoundError } = require('../../utils/coreErrors');
-const { USER_ROLE } = require('../../utils/constants');
+const { USER_ROLE, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 // Manifest type of the integrations a non-admin user can act on: they link
 // their own account on a communication integration, exactly like on the
@@ -459,6 +459,40 @@ module.exports = function ExternalIntegrationController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/ai_provider getAiProvider
+   * @apiName getAiProvider
+   * @apiGroup ExternalIntegration
+   * @apiDescription Current AI provider selection (null selector = the
+   * Gladys Plus default) and the installed AI provider integrations
+   * (manifest type "ai"). Authenticated but not admin-only: the chat needs
+   * to know an external provider is active to hide its model selector.
+   */
+  async function getAiProvider(req, res) {
+    const [selector, providers] = await Promise.all([
+      gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER),
+      gladys.externalIntegration.getAiProviders(),
+    ]);
+    res.json({ selector, providers });
+  }
+
+  /**
+   * @api {post} /api/v1/ai_provider setAiProvider
+   * @apiName setAiProvider
+   * @apiGroup ExternalIntegration
+   * @apiParam {string} [selector] Selector of an installed AI provider
+   * integration, or null to reset to Gladys Plus.
+   * @apiDescription Select the AI provider of the instance. All the AI
+   * traffic (chat, intent router, weekly digest) then goes through it
+   * instead of Gladys Plus.
+   */
+  async function setAiProvider(req, res) {
+    const requestedSelector = req.body.selector === undefined ? null : req.body.selector;
+    const selector = await gladys.externalIntegration.setAiProvider(requestedSelector);
+    const providers = await gladys.externalIntegration.getAiProviders();
+    res.json({ selector, providers });
+  }
+
+  /**
    * @api {delete} /api/v1/external_integration/:selector destroy
    * @apiName destroy
    * @apiGroup ExternalIntegration
@@ -497,6 +531,8 @@ module.exports = function ExternalIntegrationController(gladys) {
     getOwnContactProfile: asyncMiddleware(getOwnContactProfile),
     saveOwnContactProfile: asyncMiddleware(saveOwnContactProfile),
     deleteOwnContactProfile: asyncMiddleware(deleteOwnContactProfile),
+    getAiProvider: asyncMiddleware(getAiProvider),
+    setAiProvider: asyncMiddleware(setAiProvider),
     destroy: asyncMiddleware(destroy),
   });
 };

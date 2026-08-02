@@ -50,7 +50,16 @@ class InstallFromGithubCard extends Component {
     this.setState({ installStatus: RequestStatus.Getting, installError: null });
     try {
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      route(`/dashboard/integration/device/external/${installed.selector}`);
+      // communication and AI integrations have no device screens, and an
+      // integration with settings needs them filled first: both land on
+      // the configuration screen (same rule as the store install page)
+      const installedType = get(installed, 'manifest.type');
+      const configSchema = get(installed, 'manifest.config_schema') || [];
+      if (installedType === 'communication' || installedType === 'ai' || configSchema.length > 0) {
+        route(`/dashboard/integration/device/external/${installed.selector}/config`);
+      } else {
+        route(`/dashboard/integration/device/external/${installed.selector}`);
+      }
     } catch (e) {
       console.error(e);
       const status = get(e, 'response.status');

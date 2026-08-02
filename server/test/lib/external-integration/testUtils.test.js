@@ -95,6 +95,24 @@ const TEST_NOTIFICATION_MANIFEST = {
   ],
 };
 
+// AI-provider fixture (B.18): a thin adapter to any AI API (Claude,
+// DeepSeek, OpenAI, a local LLM...) — the core relays OpenAI-compatible
+// chat completion requests over the WebSocket, provider specifics (API
+// key, model) live in the integration's own config_schema.
+const TEST_AI_MANIFEST = {
+  manifest_version: 1,
+  type: 'ai',
+  name: 'Claude Provider Demo',
+  description: {
+    en: 'AI provider demo integration.',
+    fr: 'Intégration démo : fournisseur IA.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-claude-provider:1.0.0',
+  gladys_version: '>=4.62.0',
+  config_schema: [{ key: 'api_key', type: 'secret', label: { en: 'API key' } }],
+};
+
 // Netatmo-like fixture: inbound webhooks relayed by the Gladys Plus
 // gateway — one fire-and-forget event stream (default mode) and one sync
 // challenge/response registration callback.
@@ -252,6 +270,7 @@ module.exports = {
   TEST_MANIFEST,
   TEST_COMMUNICATION_MANIFEST,
   TEST_NOTIFICATION_MANIFEST,
+  TEST_AI_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_DETECTED_CLASSES,

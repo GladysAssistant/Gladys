@@ -106,7 +106,8 @@ class ExternalIntegrationInstallPage extends Component {
       // integration with settings needs them filled before any device can
       // be discovered: both land on the configuration screen after install
       const configSchema = get(installed, 'manifest.config_schema') || [];
-      if (get(installed, 'manifest.type') === 'communication' || configSchema.length > 0) {
+      const installedType = get(installed, 'manifest.type');
+      if (installedType === 'communication' || installedType === 'ai' || configSchema.length > 0) {
         route(`/dashboard/integration/device/external/${installed.selector}/config`);
       } else {
         route(`/dashboard/integration/device/external/${installed.selector}`);
@@ -231,6 +232,13 @@ class ExternalIntegrationInstallPage extends Component {
                               <div class="alert alert-info">
                                 <i class="fe fe-bell mr-1" />
                                 <Text id="integration.externalIntegration.install.notificationWarningText" />
+                              </div>
+                            )}
+
+                            {manifest.type === 'ai' && (
+                              <div class="alert alert-warning">
+                                <i class="fe fe-cpu mr-1" />
+                                <Text id="integration.externalIntegration.install.aiWarningText" />
                               </div>
                             )}
 

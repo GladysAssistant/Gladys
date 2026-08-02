@@ -511,6 +511,19 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: externalIntegrationController.getAll,
     },
+    // AI provider selection (external integrations of type "ai" can serve
+    // the assistant instead of Gladys Plus): read is authenticated (the
+    // chat hides its model selector when an external provider is active),
+    // write is an admin gesture
+    'get /api/v1/ai_provider': {
+      authenticated: true,
+      controller: externalIntegrationController.getAiProvider,
+    },
+    'post /api/v1/ai_provider': {
+      authenticated: true,
+      admin: true,
+      controller: externalIntegrationController.setAiProvider,
+    },
     'get /api/v1/external_integration/store': {
       authenticated: true,
       admin: true,
