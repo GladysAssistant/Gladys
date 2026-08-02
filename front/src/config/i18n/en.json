@@ -349,6 +349,7 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Motion detected",
+        "doorbellRinging": "Ringing",
         "pushButton": "Push",
         "vacuumDock": "Return to Dock"
       },
@@ -3259,6 +3260,7 @@
         "on": "On",
         "off": "Off",
         "deviceSeen": "If the device is detected",
+        "doorbellRang": "If the doorbell rings",
         "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)",
         "activateOrDeactivateForDuration": "Run the scene after the condition has been valid for:"
       },
@@ -4544,6 +4546,12 @@
           "1": "Open"
         }
       },
+      "doorbell": {
+        "ring": {
+          "0": "No ring",
+          "1": "Doorbell rang"
+        }
+      },
       "electrical-vehicle-charge": {
         "plugged": {
           "0": "Unplugged",
@@ -4668,6 +4676,10 @@
     "camera": {
       "shortCategoryName": "Camera",
       "image": "Camera"
+    },
+    "doorbell": {
+      "shortCategoryName": "Doorbell",
+      "ring": "Ring"
     },
     "counter-sensor": {
       "shortCategoryName": "Counter",

@@ -24,7 +24,7 @@ const CATEGORY_GROUPS = [
     id: 'buttons',
     icon: 'target',
     colorClass: 'purple',
-    categories: [DEVICE_FEATURE_CATEGORIES.BUTTON, DEVICE_FEATURE_CATEGORIES.CUBE]
+    categories: [DEVICE_FEATURE_CATEGORIES.BUTTON, DEVICE_FEATURE_CATEGORIES.DOORBELL, DEVICE_FEATURE_CATEGORIES.CUBE]
   },
   {
     id: 'lights',
