@@ -162,6 +162,18 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/device/:device_selector/migrate migrate
+   * @apiName migrate
+   * @apiGroup Device
+   * @apiParam {String} destination_device_selector Selector of the destination device.
+   * @apiParam {Object} [features_mapping] Map of source feature selector to destination feature selector.
+   */
+  async function migrate(req, res) {
+    const result = await gladys.device.migrate(req.params.device_selector, req.body);
+    res.json(result);
+  }
+
+  /**
    * @api {get} /api/v1/device/duckdb_migration_state getDuckDbMigrationState
    * @apiName getDuckDbMigrationState
    * @apiGroup Device
@@ -185,6 +197,7 @@ module.exports = function DeviceController(gladys) {
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),
     migrateFromSQLiteToDuckDb: asyncMiddleware(migrateFromSQLiteToDuckDb),
+    migrate: asyncMiddleware(migrate),
     updateDeviceFeature: asyncMiddleware(updateDeviceFeature),
   });
 };

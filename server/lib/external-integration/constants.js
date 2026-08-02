@@ -83,6 +83,14 @@ const MAX_MISSED_PINGS = 2;
 // Commands sent to the integration must be acked within this delay
 // (manifest actions override it with their declared timeout_seconds).
 const COMMAND_TIMEOUT_MS = 5 * 1000;
+// A message is not an interactive command: at boot the container is started
+// by service.startAll but authenticates on the WebSocket a few hundred
+// milliseconds later, and the notifications sent right after (the "Gladys
+// just upgraded" message) used to be lost on EXTERNAL_INTEGRATION_NOT_CONNECTED.
+// The message relay waits for the connection, but only inside the startup
+// window and only up to this delay — a stopped or broken integration still
+// fails immediately.
+const MESSAGE_CONNECTION_WAIT_MS = 15 * 1000;
 // Manifest actions: on-demand operations rendered as buttons in the
 // Configuration screen. Their ack delay is per-action (they can be long:
 // protocol detection, re-pairing...), bounded 5-120s.
@@ -249,6 +257,7 @@ module.exports = {
   WEBSOCKET_PING_INTERVAL_MS,
   MAX_MISSED_PINGS,
   COMMAND_TIMEOUT_MS,
+  MESSAGE_CONNECTION_WAIT_MS,
   MAX_ACTIONS,
   ACTION_MIN_TIMEOUT_SECONDS,
   ACTION_MAX_TIMEOUT_SECONDS,

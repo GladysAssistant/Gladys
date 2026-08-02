@@ -66,7 +66,26 @@
     "searchPlaceHolder": "Gerät suchen",
     "noRoom": "Kein Raum",
     "noFeatures": "Keine Funktionen",
-    "tooMuchStatesToDelete": "Dieses Gerät hat {{count}} Zustände in der Datenbank. Um zu verhindern, dass deine Gladys-Instanz langsam wird, während sie gelöscht werden, haben wir begonnen, diese Zustände langsam im Hintergrund zu löschen. Du kannst zurückkommen, um dieses Gerät zu löschen, wenn es keine Zustände mehr hat. Um den Löschvorgang zu überwachen, <a href=\"/dashboard/settings/jobs\">klicke hier</a>."
+    "tooMuchStatesToDelete": "Dieses Gerät hat {{count}} Zustände in der Datenbank. Um zu verhindern, dass deine Gladys-Instanz langsam wird, während sie gelöscht werden, haben wir begonnen, diese Zustände langsam im Hintergrund zu löschen. Du kannst zurückkommen, um dieses Gerät zu löschen, wenn es keine Zustände mehr hat. Um den Löschvorgang zu überwachen, <a href=\"/dashboard/settings/jobs\">klicke hier</a>.",
+    "migrate": {
+      "button": "Migrieren",
+      "modalTitle": "„{{name}}“ migrieren",
+      "description": "Migriere dieses Gerät zu einem Gerät einer anderen Integration: sein <b>Zustandsverlauf</b>, die <b>Szenen</b> und die <b>Dashboards</b>, die es verwenden, werden auf das Zielgerät übertragen, danach wird <b>dieses Gerät gelöscht</b>. Haben beide Geräte im selben Zeitraum Zustände aufgezeichnet, wird nur der Verlauf vor dem ersten Zustand des Zielgeräts übernommen, damit nichts doppelt gezählt wird.",
+      "destinationLabel": "Zielgerät",
+      "featuresTitle": "Zuordnung der Funktionen",
+      "doNotMigrate": "Nicht migrieren",
+      "typeMismatchWarning": "Diese Funktion hat einen anderen Typ als die Quellfunktion: ihr Verlauf ergibt nach der Migration möglicherweise keinen Sinn mehr.",
+      "unitMismatchWarning": "Diese Funktion hat eine andere Einheit als die Quellfunktion: die Werte werden ohne Umrechnung übernommen, die Diagramme können dadurch inkonsistent werden.",
+      "unmappedWarning": "Einige Funktionen sind nicht zugeordnet: ihr Verlauf wird gelöscht, und die Szenen und Dashboards, die sie verwenden, werden nicht aktualisiert.",
+      "noDestinationAvailable": "Es wurde kein Gerät einer anderen Integration gefunden. Erstelle zuerst das Zielgerät in seiner neuen Integration und komme dann hierher zurück, um zu migrieren.",
+      "loadError": "Die Geräteliste konnte nicht geladen werden. Bitte versuche es erneut.",
+      "migrateError": "Die Migration ist fehlgeschlagen. Das alte Gerät wurde nicht gelöscht, aber ein Teil des Verlaufs wurde möglicherweise bereits zum Zielgerät verschoben. Überprüfe die Aufgaben-Seite und deine Geräteliste und versuche es dann erneut: ein neuer Versuch migriert nur, was noch übrig ist.",
+      "networkError": "Die Verbindung wurde während der Migration unterbrochen: sie läuft möglicherweise noch im Hintergrund. Überprüfe die <a href=\"/dashboard/settings/jobs\">Aufgaben-Seite</a> und aktualisiere die Geräteliste, bevor du es erneut versuchst.",
+      "successText": "Migration abgeschlossen! <b>{{states}}</b> historische Zustände wurden verschoben, <b>{{scenes}}</b> Szene(n) und <b>{{dashboards}}</b> Dashboard(s) wurden aktualisiert. Das alte Gerät wurde gelöscht.",
+      "confirmButton": "Migrieren und altes Gerät löschen",
+      "cancelButton": "Abbrechen",
+      "closeButton": "Schließen"
+    }
   },
   "login": {
     "title": "Gladys Assistant",
@@ -3522,16 +3541,24 @@
       "target": "Ziel: {{device}} › {{feature}}",
       "statesCounts": "Zu löschende Zustände: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} Aggregate",
       "statesCountsDone": "Gelöschte Zustände: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} Aggregate",
+      "migrationTarget": "Migration: {{source}} › {{destination}}",
       "steps": {
         "waiting_database": "Warten auf die Datenbank…",
         "counting": "Zählen der Zustände…",
         "deleting_states": "Löschen der Zustände…",
-        "deleting_aggregates": "Löschen der Aggregate…"
+        "deleting_aggregates": "Löschen der Aggregate…",
+        "moving_states": "Verschieben des Zustandsverlaufs…",
+        "cleaning_sqlite": "Aufräumen der SQLite-Überreste…",
+        "updating_references": "Aktualisieren der Verweise…",
+        "rewriting_scenes": "Umschreiben der Szenen…",
+        "rewriting_dashboards": "Umschreiben der Dashboards…",
+        "deleting_source_device": "Löschen des alten Geräts…"
       },
       "orphanedStates": "Verwaiste Zustände: {{count}}",
       "duration": "Dauer: {{duration}}"
     },
     "jobTypes": {
+      "device-migrate": "Geräte-Migration",
       "monthly-device-state-aggregate": "Monatliche Sensorenaggregation",
       "daily-device-state-aggregate": "Tägliche Sensorenaggregation",
       "hourly-device-state-aggregate": "Stündliche Sensorenaggregation",
@@ -3964,6 +3991,7 @@
     "liter": "Liter (l)",
     "milliliter": "Milliliter (ml)",
     "cubicmeter": "Kubikmeter (m³)",
+    "cubic-meter-per-hour": "Kubikmeter pro Stunde (m³/h)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -4060,6 +4088,7 @@
     "liter": "l",
     "milliliter": "ml",
     "cubicmeter": "m³",
+    "cubic-meter-per-hour": "m³/h",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -4478,6 +4507,19 @@
           "unknown": "Unbekannt"
         }
       },
+      "water-valve": {
+        "current-device-status": {
+          "0": "Normal",
+          "1": "Wassermangel",
+          "2": "Wasserleck",
+          "3": "Wassermangel und Wasserleck",
+          "unknown": "{{value}} (unbekannt)"
+        },
+        "valve-work-state": {
+          "0": "Inaktiv",
+          "1": "Bewässerung läuft"
+        }
+      },
       "electrical-vehicle-state": {
         "door-opened": {
           "0": "Geschlossen",
@@ -4598,6 +4640,16 @@
       "liquid-state": "Flüssigkeitsstand-Status",
       "liquid-level-percent": "Flüssigkeitspegel in Prozent",
       "liquid-depth": "Flüssigkeitstiefe"
+    },
+    "water-valve": {
+      "shortCategoryName": "Wasserventil",
+      "current-device-status": "Wasserventil-Status",
+      "flow": "Wasserdurchfluss",
+      "auto-close-when-water-shortage": "Automatisches Schließen bei Wassermangel",
+      "valve-work-state": "Bewässerungsprogramm läuft",
+      "real-time-irrigation-duration": "Aktuelle Bewässerungsdauer",
+      "real-time-irrigation-volume": "Aktuelles Bewässerungsvolumen",
+      "daily-irrigation-volume": "Tägliches Bewässerungsvolumen"
     },
     "camera": {
       "shortCategoryName": "Kamera",

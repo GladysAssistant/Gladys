@@ -76,12 +76,16 @@ class Integration extends Component {
 
   async loadExternalIntegrations() {
     const { user = {}, httpClient } = this.props;
-    if (!httpClient || user.role !== USER_ROLE.ADMIN) {
+    if (!httpClient) {
       return;
     }
+    // a non-admin user sees the communication integrations already installed
+    // (to link their own account, like on the native Telegram service), but
+    // never the store: installing is an admin gesture
+    const isAdmin = user.role === USER_ROLE.ADMIN;
     const [externalInstalled, externalStoreResponse] = await Promise.all([
       httpClient.get('/api/v1/external_integration').catch(() => []),
-      httpClient.get('/api/v1/external_integration/store').catch(() => null)
+      isAdmin ? httpClient.get('/api/v1/external_integration/store').catch(() => null) : Promise.resolve(null)
     ]);
     await this.setState({
       externalInstalled,
@@ -159,15 +163,18 @@ class Integration extends Component {
     // type ("device", "communication" or "weather"), and can also be
     // favorites
     const EXTERNAL_CATEGORIES = ['device', 'communication', 'weather'];
-    if (
-      user.role !== USER_ROLE.ADMIN ||
-      (category && !EXTERNAL_CATEGORIES.includes(category) && category !== 'favorites')
-    ) {
+    if (category && !EXTERNAL_CATEGORIES.includes(category) && category !== 'favorites') {
       return [];
     }
+    const isAdmin = user.role === USER_ROLE.ADMIN;
     const language = user.language || 'en';
-    const installed = this.state.externalInstalled || [];
-    const store = this.state.externalStore || [];
+    // a non-admin user only sees the installed communication integrations:
+    // the device screens and the store are admin-only (the server already
+    // returns nothing else, this is the same rule on the display side)
+    const installed = (this.state.externalInstalled || []).filter(
+      integration => isAdmin || get(integration, 'manifest.type') === 'communication'
+    );
+    const store = isAdmin ? this.state.externalStore || [] : [];
 
     const storeBySlug = new Map();
     store.forEach(storeIntegration => {

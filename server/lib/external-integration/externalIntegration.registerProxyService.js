@@ -35,6 +35,13 @@ function registerProxyService(service) {
   const isCommunication = service.manifest && service.manifest.type === 'communication';
   const receiving = isReceivingChannel(service.manifest);
   const relayMessage = async (contact, message) => {
+    // unlike a device command, a message is not an interactive gesture
+    // waiting for immediate feedback: at boot the container is started by
+    // service.startAll and authenticates a moment later, so a notification
+    // forwarded in between (the "Gladys just upgraded" message) used to be
+    // lost on EXTERNAL_INTEGRATION_NOT_CONNECTED. Wait for the connection
+    // during the startup window; outside of it sendCommand throws as before.
+    await this.waitForConnection(service);
     await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.MESSAGE_SEND, {
       contact,
       message: { text: message.text, file: message.file || null },

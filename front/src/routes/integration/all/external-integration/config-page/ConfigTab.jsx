@@ -11,9 +11,15 @@ import WebhooksCard from './WebhooksCard';
 import HardwareCard from './HardwareCard';
 import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
+import { USER_ROLE } from '../../../../../../../server/utils/constants';
 
 const ConfigTab = props => {
   const { integration, loadStatus, user } = props;
+  // the shared configuration of the integration (settings, webhooks,
+  // actions, hardware) is administration; a non-admin user only gets the
+  // per-user blocks, to link their own account on a communication
+  // integration — exactly like on the native Telegram service
+  const isAdmin = get(user, 'role') === USER_ROLE.ADMIN;
   const schema = get(integration, 'manifest.config_schema') || [];
   const actions = get(integration, 'manifest.actions') || [];
   const manifestWebhooks = get(integration, 'manifest.webhooks') || [];
@@ -34,87 +40,95 @@ const ConfigTab = props => {
 
   return (
     <div>
-      <div class="card">
-        <div class="card-header">
-          <h1 class="card-title">
-            <Text id="integration.externalIntegration.config.title" />
-          </h1>
-          {docsUrl && (
-            <div class="card-options">
-              <DocsLink
-                docsUrl={docsUrl}
-                storeSlug={integration.store_slug}
-                lang={language}
-                httpClient={props.httpClient}
-                labelId="integration.externalIntegration.config.docsLink"
-                linkClass="btn btn-outline-secondary btn-sm"
-              />
-            </div>
-          )}
+      {!isAdmin && loadStatus === RequestStatus.Error && (
+        <div class="alert alert-danger">
+          <Text id="integration.externalIntegration.config.loadError" />
         </div>
-        <div class="card-body">
-          {loadStatus === RequestStatus.Error && (
-            <div class="alert alert-danger">
-              <Text id="integration.externalIntegration.config.loadError" />
-            </div>
-          )}
-          <div
-            class={cx('dimmer', {
-              active: loadStatus === RequestStatus.Getting
-            })}
-          >
-            <div class="loader" />
-            <div class="dimmer-content">
-              {hasDualTransports && loadStatus === RequestStatus.Success && (
-                <div class="form-group">
-                  <label class="custom-switch">
-                    <input
-                      type="checkbox"
-                      class="custom-switch-input"
-                      checked={get(props, 'configValues.GLADYS_PREFER_LOCAL') !== false}
-                      onClick={props.togglePreferLocal}
-                      disabled={props.preferLocalStatus === RequestStatus.Getting}
-                    />
-                    <span class="custom-switch-indicator" />
-                    <span class="custom-switch-description">
-                      <Text id="integration.externalIntegration.transport.preferLocalLabel" />
-                    </span>
-                  </label>
-                  <small class="form-text text-muted">
-                    <Text id="integration.externalIntegration.transport.preferLocalDescription" />
-                  </small>
-                  {props.preferLocalStatus === RequestStatus.Error && (
-                    <div class="alert alert-danger mt-2">
-                      <Text id="integration.externalIntegration.config.saveError" />
-                    </div>
-                  )}
-                </div>
-              )}
-              {loadStatus === RequestStatus.Success && schema.length === 0 && (
-                <div class="text-muted">
-                  <Text id="integration.externalIntegration.config.noConfig" />
-                </div>
-              )}
-              {schema.length > 0 && (
-                <ConfigSchemaForm
-                  schema={schema}
-                  language={language}
-                  values={props.configValues || {}}
-                  configuredSecrets={props.configuredSecrets || []}
-                  touchedSecrets={props.touchedSecrets || {}}
-                  saveConfigStatus={props.saveConfigStatus}
-                  updateConfigValue={props.updateConfigValue}
-                  saveConfig={props.saveConfig}
-                  connectionStatus={get(integration, 'connection_status')}
-                  oauthStatus={props.oauthStatus}
-                  connectOAuth={props.connectOAuth}
-                  dynamicOptions={props.dynamicOptions}
+      )}
+
+      {isAdmin && (
+        <div class="card">
+          <div class="card-header">
+            <h1 class="card-title">
+              <Text id="integration.externalIntegration.config.title" />
+            </h1>
+            {docsUrl && (
+              <div class="card-options">
+                <DocsLink
+                  docsUrl={docsUrl}
+                  storeSlug={integration.store_slug}
+                  lang={language}
+                  httpClient={props.httpClient}
+                  labelId="integration.externalIntegration.config.docsLink"
+                  linkClass="btn btn-outline-secondary btn-sm"
                 />
-              )}
+              </div>
+            )}
+          </div>
+          <div class="card-body">
+            {loadStatus === RequestStatus.Error && (
+              <div class="alert alert-danger">
+                <Text id="integration.externalIntegration.config.loadError" />
+              </div>
+            )}
+            <div
+              class={cx('dimmer', {
+                active: loadStatus === RequestStatus.Getting
+              })}
+            >
+              <div class="loader" />
+              <div class="dimmer-content">
+                {hasDualTransports && loadStatus === RequestStatus.Success && (
+                  <div class="form-group">
+                    <label class="custom-switch">
+                      <input
+                        type="checkbox"
+                        class="custom-switch-input"
+                        checked={get(props, 'configValues.GLADYS_PREFER_LOCAL') !== false}
+                        onClick={props.togglePreferLocal}
+                        disabled={props.preferLocalStatus === RequestStatus.Getting}
+                      />
+                      <span class="custom-switch-indicator" />
+                      <span class="custom-switch-description">
+                        <Text id="integration.externalIntegration.transport.preferLocalLabel" />
+                      </span>
+                    </label>
+                    <small class="form-text text-muted">
+                      <Text id="integration.externalIntegration.transport.preferLocalDescription" />
+                    </small>
+                    {props.preferLocalStatus === RequestStatus.Error && (
+                      <div class="alert alert-danger mt-2">
+                        <Text id="integration.externalIntegration.config.saveError" />
+                      </div>
+                    )}
+                  </div>
+                )}
+                {loadStatus === RequestStatus.Success && schema.length === 0 && (
+                  <div class="text-muted">
+                    <Text id="integration.externalIntegration.config.noConfig" />
+                  </div>
+                )}
+                {schema.length > 0 && (
+                  <ConfigSchemaForm
+                    schema={schema}
+                    language={language}
+                    values={props.configValues || {}}
+                    configuredSecrets={props.configuredSecrets || []}
+                    touchedSecrets={props.touchedSecrets || {}}
+                    saveConfigStatus={props.saveConfigStatus}
+                    updateConfigValue={props.updateConfigValue}
+                    saveConfig={props.saveConfig}
+                    connectionStatus={get(integration, 'connection_status')}
+                    oauthStatus={props.oauthStatus}
+                    connectOAuth={props.connectOAuth}
+                    dynamicOptions={props.dynamicOptions}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {isReceivingChannel && (
         <LinkAccountCard
@@ -141,7 +155,7 @@ const ConfigTab = props => {
         />
       )}
 
-      {integration && manifestWebhooks.length > 0 && (
+      {isAdmin && integration && manifestWebhooks.length > 0 && (
         <WebhooksCard
           manifestWebhooks={manifestWebhooks}
           webhooks={get(integration, 'webhooks')}
@@ -155,7 +169,7 @@ const ConfigTab = props => {
         />
       )}
 
-      {integration && actions.length > 0 && (
+      {isAdmin && integration && actions.length > 0 && (
         <ActionsCard
           actions={actions}
           language={language}
@@ -167,7 +181,7 @@ const ConfigTab = props => {
         />
       )}
 
-      {integration && requestedClasses.length > 0 && (
+      {isAdmin && integration && requestedClasses.length > 0 && (
         <HardwareCard
           requestedClasses={requestedClasses}
           detectedClasses={props.detectedClasses || {}}

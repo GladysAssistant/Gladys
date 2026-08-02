@@ -7,6 +7,7 @@ const {
   SIREN_LMH_VOLUME,
   PILOT_WIRE_MODE,
   LIQUID_STATE,
+  WATER_VALVE_CURRENT_DEVICE_STATUS,
 } = require('../../../utils/constants');
 
 const WRITE_VALUE_MAPPING = {};
@@ -171,6 +172,17 @@ addMapping('liquid_state', LIQUID_STATE.LOW, 'low');
 addMapping('liquid_state', LIQUID_STATE.NORMAL, 'normal');
 addMapping('liquid_state', LIQUID_STATE.HIGH, 'high');
 
+// SONOFF SWV water valve
+// https://www.zigbee2mqtt.io/devices/SWV.html
+addMapping('current_device_status', WATER_VALVE_CURRENT_DEVICE_STATUS.NORMAL_STATE, 'normal_state');
+addMapping('current_device_status', WATER_VALVE_CURRENT_DEVICE_STATUS.WATER_SHORTAGE, 'water_shortage');
+addMapping('current_device_status', WATER_VALVE_CURRENT_DEVICE_STATUS.WATER_LEAKAGE, 'water_leakage');
+addMapping(
+  'current_device_status',
+  WATER_VALVE_CURRENT_DEVICE_STATUS.WATER_SHORTAGE_AND_WATER_LEAKAGE,
+  'water_shortage & water_leakage',
+);
+
 // Bosch BSIR-EZ outdoor siren
 // https://www.zigbee2mqtt.io/devices/BSIR-EZ.html
 addMapping('trigger_alarm', BUTTON_PUSH.PRESSED, 'trigger');
@@ -244,6 +256,15 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR,
         type: DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE,
+      },
+    },
+    current_device_status: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.WATER_VALVE,
+        type: DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS,
+        min: 0,
+        max: 3,
+        forceOverride: true,
       },
     },
     trigger_alarm: {
