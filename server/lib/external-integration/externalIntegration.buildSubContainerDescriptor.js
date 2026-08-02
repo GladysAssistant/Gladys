@@ -31,6 +31,7 @@ const PIDS_LIMIT = 100;
 async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
   const { basePathOnHost } = await this.system.getGladysBasePath();
   const timezone = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE)) || 'UTC';
+  const cpuCfsSupported = await this.system.hasCpuCfsSupport();
   const networkName = `${PRIVATE_NETWORK_PREFIX}${service.selector}`;
   const finalEnv = { ...(entry.env || {}), ...env, TZ: timezone };
   // devices: requested ∩ granted ∩ present, resolved at every creation —
@@ -89,7 +90,9 @@ async function buildSubContainerDescriptor(service, entry, { env = {} } = {}) {
       SecurityOpt: ['no-new-privileges'],
       Memory: memoryInBytes,
       MemorySwap: memoryInBytes,
-      NanoCpus: Math.round((entry.cpu || SUB_CONTAINER_CPU_DEFAULT) * 1e9),
+      // omitted on kernels without the CPU CFS scheduler (Synology DSM):
+      // the daemon would reject the creation with an HTTP 400
+      ...(cpuCfsSupported ? { NanoCpus: Math.round((entry.cpu || SUB_CONTAINER_CPU_DEFAULT) * 1e9) } : {}),
       ShmSize: (entry.shm_mb || SUB_CONTAINER_SHM_DEFAULT_MB) * BYTES_PER_MB,
       PidsLimit: PIDS_LIMIT,
       ...(binds.length > 0 ? { Binds: binds } : {}),

@@ -197,6 +197,7 @@ function buildFakeSystem(overrides = {}) {
     connectToNetwork: fake.resolves(true),
     inspectNetwork: fake.resolves({ IPAM: { Config: [{ Gateway: '172.30.0.1' }] } }),
     getNetworkMode: fake.resolves('host'),
+    hasCpuCfsSupport: fake.resolves(true),
     getGladysBasePath: fake.resolves({
       basePathOnContainer: '/var/lib/gladysassistant',
       basePathOnHost: '/var/lib/gladysassistant',
