@@ -4279,8 +4279,7 @@
           "off": "Aus",
           "heating": "Heizen",
           "cooling": "Kühlen",
-          "auto": "Automatisch",
-          "energy_heat": "Energiesparheizen"
+          "auto": "Automatisch"
         }
       },
       "heater": {
@@ -4542,8 +4541,7 @@
           "0": "Aus",
           "1": "Heizen",
           "2": "Kühlen",
-          "3": "Automatisch",
-          "4": "Energiesparheizen"
+          "3": "Automatisch"
         },
         "operating-state": {
           "unknown": "{{value}} (unbekannt)",
@@ -5153,7 +5151,7 @@
     "thermostat": {
       "shortCategoryName": "Thermostat",
       "target-temperature": "Thermostat: Temperatur",
-      "mode": "Modus",
+      "mode": "Thermostat: Modus",
       "operating-state": "Thermostat: Betriebszustand"
     },
     "airquality-sensor": {

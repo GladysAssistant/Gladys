@@ -4278,9 +4278,8 @@
         "mode": {
           "off": "Arrêt",
           "heating": "Chauffage",
-          "cooling": "Clim.",
-          "auto": "Auto",
-          "energy_heat": "Chauffage éco"
+          "cooling": "Refroidissement",
+          "auto": "Auto"
         }
       },
       "heater": {
@@ -4542,8 +4541,7 @@
           "0": "Arrêt",
           "1": "Chauffage",
           "2": "Refroidissement",
-          "3": "Auto",
-          "4": "Chauffage éco"
+          "3": "Auto"
         },
         "operating-state": {
           "unknown": "{{value}} (inconnu)",
@@ -5153,7 +5151,7 @@
     "thermostat": {
       "shortCategoryName": "Thermostat",
       "target-temperature": "Température de consigne",
-      "mode": "Mode",
+      "mode": "Mode du thermostat",
       "operating-state": "État de fonctionnement du thermostat"
     },
     "airquality-sensor": {

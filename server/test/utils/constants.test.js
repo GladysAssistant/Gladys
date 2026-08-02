@@ -13,7 +13,6 @@ describe('constants THERMOSTAT_MODE', () => {
       HEATING: 1,
       COOLING: 2,
       AUTO: 3,
-      ENERGY_HEAT: 4,
     });
   });
 });
