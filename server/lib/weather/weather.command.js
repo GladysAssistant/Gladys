@@ -58,9 +58,11 @@ async function command(message, classification, context) {
         }
         const diff = dayjs(diffDate).diff(dayjs().startOf('day'), 'day');
 
-        const weatherDay = weather.days[diff];
+        // resolve the day by calendar date, never by index: the pivot
+        // weather format (B.18) does not guarantee that days[0] is today
+        const weatherDay = (weather.days || []).find((day) => dayjs(day.datetime).isSame(dayjs(diffDate), 'day'));
 
-        if (weatherDay !== undefined) {
+        if (weatherDay !== undefined && diff >= 0) {
           context.temperature_min = weatherDay.temperature_min;
           context.temperature_max = weatherDay.temperature_max;
           context.units = weather.units === 'metric' ? '°C' : '°F';

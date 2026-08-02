@@ -21,6 +21,8 @@ class ExternalIntegrationDiscoverPage extends Component {
       this.setState({ integration });
     } catch (e) {
       console.error(e);
+      // no confirmed metadata: do not fire the device-specific requests
+      return false;
     }
     return true;
   };

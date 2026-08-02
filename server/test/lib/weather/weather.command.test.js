@@ -15,7 +15,12 @@ const fakeWeather = {
   weather: 'cloud',
   days: [
     {
-      datetime: '2020-12-04T11:00:00.000Z',
+      // dynamic dates: the chat resolves days by calendar date (B.18),
+      datetime: dayjs()
+        .startOf('day')
+        .add(0, 'day')
+        .add(11, 'hour')
+        .toISOString(),
       humidity: 65,
       pressure: 992,
       temperature_max: 11,
@@ -26,7 +31,11 @@ const fakeWeather = {
       wind_speed: 3.13,
     },
     {
-      datetime: '2020-12-05T11:00:00.000Z',
+      datetime: dayjs()
+        .startOf('day')
+        .add(1, 'day')
+        .add(11, 'hour')
+        .toISOString(),
       humidity: 57,
       pressure: 997,
       temperature_max: 9,
@@ -37,7 +46,11 @@ const fakeWeather = {
       wind_speed: 1.95,
     },
     {
-      datetime: '2020-12-06T11:00:00.000Z',
+      datetime: dayjs()
+        .startOf('day')
+        .add(2, 'day')
+        .add(11, 'hour')
+        .toISOString(),
       humidity: 67,
       pressure: 1000,
       temperature_max: 9,
@@ -48,7 +61,11 @@ const fakeWeather = {
       wind_speed: 3.23,
     },
     {
-      datetime: '2020-12-07T11:00:00.000Z',
+      datetime: dayjs()
+        .startOf('day')
+        .add(3, 'day')
+        .add(11, 'hour')
+        .toISOString(),
       humidity: 51,
       pressure: 1006,
       temperature_max: 10,
@@ -59,7 +76,11 @@ const fakeWeather = {
       wind_speed: 6.27,
     },
     {
-      datetime: '2020-12-08T11:00:00.000Z',
+      datetime: dayjs()
+        .startOf('day')
+        .add(4, 'day')
+        .add(11, 'hour')
+        .toISOString(),
       humidity: 86,
       pressure: 1004,
       temperature_max: 6,
@@ -70,7 +91,11 @@ const fakeWeather = {
       wind_speed: 2.14,
     },
     {
-      datetime: '2020-12-09T11:00:00.000Z',
+      datetime: dayjs()
+        .startOf('day')
+        .add(5, 'day')
+        .add(11, 'hour')
+        .toISOString(),
       humidity: 61,
       pressure: 1010,
       temperature_max: 9,
@@ -81,7 +106,11 @@ const fakeWeather = {
       wind_speed: 2.55,
     },
     {
-      datetime: '2020-12-10T11:00:00.000Z',
+      datetime: dayjs()
+        .startOf('day')
+        .add(6, 'day')
+        .add(11, 'hour')
+        .toISOString(),
       humidity: 60,
       pressure: 1010,
       temperature_max: 7,
@@ -215,6 +244,51 @@ describe('weather.command', () => {
       units: '°C',
     });
   });
+  it('should get the weather for tomorrow from a provider whose days start tomorrow', async () => {
+    // the pivot weather format does not guarantee that days[0] is today:
+    // a provider returning only future days must not answer off-by-one
+    const futureOnlyWeather = {
+      ...fakeWeather,
+      days: fakeWeather.days.slice(1),
+    };
+    const futureOnlyService = {
+      getService: () => ({ weather: { get: fake.resolves(futureOnlyWeather) } }),
+      stateManager: {
+        getAllKeys: () => ['openweather'],
+      },
+    };
+    const weather = new Weather(futureOnlyService, event, messageManager, houses);
+    const message = {
+      text: 'Meteo Tomorrow?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
+    };
+    await weather.command(
+      message,
+      {
+        intent: 'weather.get',
+        entities: [
+          {
+            entity: 'date',
+            resolution: {
+              type: 'date',
+              date: dayjs()
+                .add(1, 'day')
+                .toDate(),
+            },
+          },
+        ],
+      },
+      {},
+    );
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.success.tomorrow.clear', {
+      temperature_max: 9,
+      temperature_min: 4,
+      units: '°C',
+    });
+  });
   it('should get the weather for after tomorrow', async () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {
@@ -283,6 +357,42 @@ describe('weather.command', () => {
       temperature_min: 5,
       units: '°C',
     });
+  });
+  it("shouldn't get the weather for a day from a provider without daily forecast", async () => {
+    const { days, ...noDaysWeather } = fakeWeather;
+    const noDaysService = {
+      getService: () => ({ weather: { get: fake.resolves(noDaysWeather) } }),
+      stateManager: {
+        getAllKeys: () => ['openweather'],
+      },
+    };
+    const weather = new Weather(noDaysService, event, messageManager, houses);
+    const message = {
+      text: 'Meteo Tomorrow?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
+    };
+    await weather.command(
+      message,
+      {
+        intent: 'weather.get',
+        entities: [
+          {
+            entity: 'date',
+            resolution: {
+              type: 'date',
+              date: dayjs()
+                .add(1, 'day')
+                .toDate(),
+            },
+          },
+        ],
+      },
+      {},
+    );
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.fail.no-weather', {});
   });
   it("shouldn't get the weather without day", async () => {
     const weather = new Weather(service, event, messageManager, houses);

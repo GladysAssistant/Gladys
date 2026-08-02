@@ -180,48 +180,53 @@ const WeatherBox = ({ children, ...props }) => (
             />
           </div>
         </div>
-        {props.display_mode[GetWeatherModes.AdvancedWeather] && (
-          <div className="col-9 p-0">
-            <span>
-              <i
-                class="fe fe-droplet"
-                style={{
-                  fpaddingRight: '5px'
-                }}
-              />
-              {props.humidity}
-              <span
-                style={{
-                  fontSize: '12px',
-                  color: 'grey'
-                }}
-              >
-                <Text id="global.percent" />
-              </span>
-            </span>
-            <span className="float-right">
-              <i
-                class="fe fe-wind"
-                style={{
-                  paddingRight: '5px'
-                }}
-              />
-              {props.wind}
-              <span
-                style={{
-                  fontSize: '12px',
-                  color: 'grey'
-                }}
-              >
-                {props.units === WEATHER_UNITS.METRIC ? (
-                  <Text id="global.metersPerSec" />
-                ) : (
-                  <Text id="global.milesPerHour" />
-                )}
-              </span>
-            </span>
-          </div>
-        )}
+        {props.display_mode[GetWeatherModes.AdvancedWeather] &&
+          (props.humidity !== undefined || props.wind !== undefined) && (
+            <div className="col-9 p-0">
+              {props.humidity !== undefined && (
+                <span>
+                  <i
+                    class="fe fe-droplet"
+                    style={{
+                      fpaddingRight: '5px'
+                    }}
+                  />
+                  {props.humidity}
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      color: 'grey'
+                    }}
+                  >
+                    <Text id="global.percent" />
+                  </span>
+                </span>
+              )}
+              {props.wind !== undefined && (
+                <span className="float-right">
+                  <i
+                    class="fe fe-wind"
+                    style={{
+                      paddingRight: '5px'
+                    }}
+                  />
+                  {props.wind}
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      color: 'grey'
+                    }}
+                  >
+                    {props.units === WEATHER_UNITS.METRIC ? (
+                      <Text id="global.metersPerSec" />
+                    ) : (
+                      <Text id="global.milesPerHour" />
+                    )}
+                  </span>
+                </span>
+              )}
+            </div>
+          )}
         {props.display_mode[GetWeatherModes.AdvancedWeather] &&
           (props.sunrise || props.sunset || props.uvIndex !== undefined) && (
             <div className="col-12 p-0" style={{ marginTop: '0.25em' }}>
