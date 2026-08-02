@@ -80,6 +80,14 @@ async function command(message, classification, context) {
             context.day = capitalizeFirstLetter(dateEntity.sourceText);
             await this.messageManager.replyByIntent(message, `weather.get.success.day.${weatherDay.weather}`, context);
           }
+        } else if (diff === 0) {
+          // the pivot format allows omitting today from days (B.18): a
+          // "today" question falls back to the current conditions of the
+          // root payload instead of failing
+          context.temperature = weather.temperature;
+          context.units = weather.units === 'metric' ? '°C' : '°F';
+
+          await this.messageManager.replyByIntent(message, `weather.get.success.now.${weather.weather}`, context);
         } else {
           throw new NoWeatherFoundError('weather for this day not found');
         }

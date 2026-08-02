@@ -274,6 +274,48 @@ describe('weather.command', () => {
       units: '°C',
     });
   });
+  it('should fall back to the current conditions for today when the provider omits today', async () => {
+    // B.18 allows omitting today from days: a "today" question answers
+    // with the root payload instead of failing
+    const futureOnlyWeather = {
+      ...fakeWeather,
+      days: fakeWeather.days.slice(1),
+    };
+    const futureOnlyService = {
+      getService: () => ({ weather: { get: fake.resolves(futureOnlyWeather) } }),
+      stateManager: {
+        getAllKeys: () => ['openweather'],
+      },
+    };
+    const weather = new Weather(futureOnlyService, event, messageManager, houses);
+    const message = {
+      text: 'Meteo Today?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
+    };
+    await weather.command(
+      message,
+      {
+        intent: 'weather.get',
+        entities: [
+          {
+            entity: 'date',
+            resolution: {
+              type: 'date',
+              date: TODAY.toDate(),
+            },
+          },
+        ],
+      },
+      {},
+    );
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.success.now.cloud', {
+      temperature: 54.87,
+      units: '°C',
+    });
+  });
   it('should get the weather for after tomorrow', async () => {
     const weather = new Weather(service, event, messageManager, houses);
     const message = {

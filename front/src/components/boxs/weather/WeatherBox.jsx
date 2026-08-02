@@ -188,7 +188,7 @@ const WeatherBox = ({ children, ...props }) => (
                   <i
                     class="fe fe-droplet"
                     style={{
-                      fpaddingRight: '5px'
+                      paddingRight: '5px'
                     }}
                   />
                   {props.humidity}
