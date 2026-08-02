@@ -2694,6 +2694,7 @@
         "description": "Gladys verwendet standardmäßig Gladys Plus als KI-Anbieter. Sie können den Assistenten (Chat, Absichtserkennung, Wochenrückblick) stattdessen über eine installierte KI-Anbieter-Integration leiten: Claude, DeepSeek, OpenAI, ein lokales Modell... Die Anbieter-Einstellungen (API-Schlüssel, Modell) finden Sie auf der Seite der Integration.",
         "selectLabel": "Für KI-Anfragen verwendeter Anbieter",
         "gladysPlusOption": "Gladys Plus (Standard)",
+        "trustWarning": "Alle Ihre Assistenten-Unterhaltungen (Nachrichten, Verlauf, von Werkzeugen zurückgegebene Gerätezustände, Chat-Bilder) werden an diesen Anbieter gesendet, und seine Antworten steuern die Aktionen des Assistenten in Ihrem Zuhause.",
         "noProvider": "Keine KI-Anbieter-Integration installiert. Installieren Sie eine aus dem Integrationskatalog, um einen anderen Anbieter als Gladys Plus zu verwenden.",
         "loadError": "Die KI-Anbieter-Einstellungen konnten nicht geladen werden.",
         "retry": "Erneut versuchen",

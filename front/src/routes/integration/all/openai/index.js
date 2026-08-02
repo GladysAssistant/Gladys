@@ -24,19 +24,35 @@ class OpenAIGateway extends Component {
     }
   };
 
+  // with an external AI provider selected, the assistant already works
+  // without Gladys Plus: the Plus upsell would be misleading as the hero
+  // of this page
+  getAiProvider = async () => {
+    try {
+      const response = await this.props.httpClient.get('/api/v1/ai_provider');
+      this.setState({
+        externalProviderActive: Boolean(response.selector)
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   componentDidMount() {
     this.isGladysPlusConnected();
+    this.getAiProvider();
   }
 
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
-      gladysPlusConnected: null
+      gladysPlusConnected: null,
+      externalProviderActive: false
     };
   }
 
-  render(props, { gladysPlusConnected }) {
+  render(props, { gladysPlusConnected, externalProviderActive }) {
     const isAdmin = props.user && props.user.role === USER_ROLE.ADMIN;
     return (
       <Layout user={props.user}>
@@ -47,7 +63,7 @@ class OpenAIGateway extends Component {
             </h1>
           </div>
           <div class="card-body">
-            {gladysPlusConnected === false && (
+            {gladysPlusConnected === false && !externalProviderActive && (
               <div class="mb-4">
                 <GladysPlusUpsellCard
                   icon="fe-cpu"
@@ -115,7 +131,7 @@ class OpenAIGateway extends Component {
                 <Text id="integration.openai.exampleScene3" />
               </li>
             </ul>
-            {gladysPlusConnected !== true && (
+            {gladysPlusConnected !== true && !externalProviderActive && (
               <p>
                 <Text id="integration.openai.rateLimit" />
               </p>

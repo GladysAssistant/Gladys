@@ -101,6 +101,12 @@ class AiProviderSettings extends Component {
               <Text id="integration.openai.aiProvider.noProvider" />
             </p>
           )}
+          {selector && (
+            <div class="alert alert-warning" role="alert">
+              <i class="fe fe-alert-triangle mr-1" />
+              <Text id="integration.openai.aiProvider.trustWarning" />
+            </div>
+          )}
           {selectedProvider && selectedProvider.status !== SERVICE_STATUS.RUNNING && (
             <div class="alert alert-warning mb-0" role="alert">
               <i class="fe fe-alert-triangle mr-1" />

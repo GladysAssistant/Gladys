@@ -2694,6 +2694,7 @@
         "description": "Gladys uses Gladys Plus as its AI provider by default. You can route the assistant (chat, intent routing, weekly digest) through an installed AI provider integration instead: Claude, DeepSeek, OpenAI, a local model... The provider's own settings (API key, model) are on its integration page.",
         "selectLabel": "Provider used for AI requests",
         "gladysPlusOption": "Gladys Plus (default)",
+        "trustWarning": "All your assistant conversations (messages, history, device states returned by tools, chat images) are sent to this provider, and its answers drive the assistant's actions on your home.",
         "noProvider": "No AI provider integration installed. Install one from the integrations catalog to use another provider than Gladys Plus.",
         "loadError": "Unable to load the AI provider settings.",
         "retry": "Retry",

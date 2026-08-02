@@ -2694,6 +2694,7 @@
         "description": "Gladys utilise Gladys Plus comme fournisseur d'IA par défaut. Vous pouvez faire passer l'assistant (chat, routage d'intention, résumé hebdomadaire) par une intégration fournisseur d'IA installée : Claude, DeepSeek, OpenAI, un modèle local... Les réglages propres au fournisseur (clé d'API, modèle) se trouvent sur la page de son intégration.",
         "selectLabel": "Fournisseur utilisé pour les requêtes d'IA",
         "gladysPlusOption": "Gladys Plus (par défaut)",
+        "trustWarning": "Toutes vos conversations avec l'assistant (messages, historique, états des appareils renvoyés par les outils, images du chat) sont envoyées à ce fournisseur, et ses réponses pilotent les actions de l'assistant sur votre logement.",
         "noProvider": "Aucune intégration fournisseur d'IA installée. Installez-en une depuis le catalogue d'intégrations pour utiliser un autre fournisseur que Gladys Plus.",
         "loadError": "Impossible de charger les réglages du fournisseur d'IA.",
         "retry": "Réessayer",
