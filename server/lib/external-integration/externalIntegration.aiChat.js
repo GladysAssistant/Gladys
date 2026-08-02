@@ -24,7 +24,13 @@ async function aiChat(service, request) {
     { timeoutMs: AI_CHAT_TIMEOUT_MS },
   );
   const completion = result && result.data;
-  if (completion === null || typeof completion !== 'object' || Array.isArray(completion)) {
+  // fail malformed completions at the contract boundary (C.4: data =
+  // OpenAI-compatible completion, choices[0].message) instead of letting
+  // the chat loop degrade them into a silent empty turn: adapter bugs
+  // surface as EXTERNAL_INTEGRATION_INVALID_AI_RESPONSE, much easier to
+  // diagnose from the integration side
+  const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+  if (!isObject(completion) || !Array.isArray(completion.choices) || !isObject(completion.choices[0]?.message)) {
     throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_AI_RESPONSE');
   }
   return completion;

@@ -53,7 +53,7 @@ describe('externalIntegration.aiChat', () => {
     );
   });
 
-  it('should throw when the integration acks a non-object completion', async () => {
+  it('should throw when the integration acks a malformed completion', async () => {
     const { externalIntegration } = buildSupervisor();
     const service = await seedAiService();
     const invalidAcks = [
@@ -61,6 +61,14 @@ describe('externalIntegration.aiChat', () => {
       { success: true, data: 'raw text' },
       { success: true, data: [1, 2] },
       { success: true, data: null },
+      // objects that are not OpenAI-compatible completions: adapter bugs
+      // must fail at the contract boundary, not as a silent empty turn
+      { success: true, data: {} },
+      { success: true, data: { choices: 'not-an-array' } },
+      { success: true, data: { choices: [] } },
+      { success: true, data: { choices: [{}] } },
+      { success: true, data: { choices: [{ message: 'raw text' }] } },
+      { success: true, data: { choices: [{ message: [1] }] } },
     ];
     // eslint-disable-next-line no-restricted-syntax
     for (const ack of invalidAcks) {
@@ -85,7 +93,7 @@ describe('externalIntegration.registerProxyService (ai)', () => {
   it('should expose the ai.chat capability for ai integrations', async () => {
     const { externalIntegration, stateManager } = buildSupervisor();
     const service = await seedAiService();
-    const completion = { choices: [] };
+    const completion = { choices: [{ message: { role: 'assistant', content: 'ok' } }] };
     externalIntegration.sendCommand = fake.resolves({ success: true, data: completion });
     externalIntegration.registerProxyService(service);
     const proxyService = stateManager.get('service', service.name);
@@ -163,6 +171,19 @@ describe('externalIntegration.setAiProvider', () => {
   it('should reject an unknown selector', async () => {
     const { externalIntegration } = buildSupervisor();
     await expect(externalIntegration.setAiProvider('ext-unknown')).to.be.rejectedWith(NotFoundError);
+  });
+
+  it('should roll back when the provider is uninstalled concurrently', async () => {
+    // the provider passes validation but its t_service row disappears
+    // before the write is re-checked (concurrent uninstall): the variable
+    // must not be left pointing to a removed integration
+    const { externalIntegration, variable } = buildSupervisor();
+    externalIntegration.getBySelector = fake.resolves({
+      selector: 'ext-dev-gone-provider',
+      manifest: { type: 'ai' },
+    });
+    await expect(externalIntegration.setAiProvider('ext-dev-gone-provider')).to.be.rejectedWith(NotFoundError);
+    expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER)).to.equal(null);
   });
 });
 

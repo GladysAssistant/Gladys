@@ -84,6 +84,7 @@ describe('message.create', () => {
       emit: fake.returns(null),
     };
     const messageHandler = new MessageHandler(event, brain, service, {}, variable);
+    messageHandler.replyByIntent = fake.resolves(null);
     const message = {
       text: 'Turn on the light in the kitchen',
       language: 'en',
@@ -102,6 +103,8 @@ describe('message.create', () => {
       message,
       previousQuestions: [],
     });
+    // and no "Gladys Plus required" fallback reply on top of the AI path
+    assert.notCalled(messageHandler.replyByIntent);
   });
   it('should forward message to OpenAI with previous questions context', async () => {
     const variable = {

@@ -1,5 +1,6 @@
-const { BadParameters } = require('../../utils/coreErrors');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const db = require('../../models');
+const { BadParameters, NotFoundError } = require('../../utils/coreErrors');
+const { SYSTEM_VARIABLE_NAMES, SERVICE_TYPES } = require('../../utils/constants');
 
 /**
  * @description Select the AI provider of the instance. A null selector
@@ -23,6 +24,17 @@ async function setAiProvider(selector) {
     throw new BadParameters(`External integration ${selector} is not an AI provider`);
   }
   await this.variable.setValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER, service.selector);
+  // guard against a concurrent uninstall of the provider between the
+  // validation above and the write: uninstall clears the variable before
+  // destroying the row, so re-checking the row after the write guarantees
+  // the variable never points to a removed integration
+  const stillInstalled = await db.Service.findOne({
+    where: { selector: service.selector, type: SERVICE_TYPES.EXTERNAL, pod_id: null },
+  });
+  if (stillInstalled === null) {
+    await this.variable.destroy(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+    throw new NotFoundError('EXTERNAL_INTEGRATION_NOT_FOUND');
+  }
   return service.selector;
 }
 

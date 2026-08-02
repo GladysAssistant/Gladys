@@ -95,7 +95,7 @@ const TEST_NOTIFICATION_MANIFEST = {
   ],
 };
 
-// AI-provider fixture (B.18): a thin adapter to any AI API (Claude,
+// AI-provider fixture (B.19): a thin adapter to any AI API (Claude,
 // DeepSeek, OpenAI, a local LLM...) — the core relays OpenAI-compatible
 // chat completion requests over the WebSocket, provider specifics (API
 // key, model) live in the integration's own config_schema.

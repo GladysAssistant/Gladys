@@ -34,7 +34,7 @@ function normalizeAiChatRequestBody(body) {
  * @description Ask the configured AI provider. All the AI traffic funnels
  * here (chat tool-calling loop, intent router, weekly digest): when the
  * user selected an external AI provider integration (AI_PROVIDER system
- * variable, see the external integrations spec B.18), the OpenAI-compatible
+ * variable, see the external integrations spec B.19), the OpenAI-compatible
  * request is relayed to it over WebSocket; otherwise it goes to the Gladys
  * Plus gateway (the default). No silent fallback in either direction: a
  * broken provider fails the request — choosing a provider can be a privacy
