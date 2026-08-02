@@ -748,6 +748,8 @@
         "noDevices": "No devices discovered yet. Press \"Scan\" to search for devices.",
         "noDevicesConfigureFirst": "Nothing found? Make sure the integration is configured in the <a href=\"{{configUrl}}\">Configuration</a> tab, then run a new scan.",
         "alreadyCreatedBadge": "Already added",
+        "searchPlaceholder": "Search devices",
+        "noSearchResults": "No discovered device matches your search.",
         "error": {
           "networkError": "Gladys did not answer the add request. Check that the Gladys server is running and reachable, then try again.",
           "badRequestError": "Gladys rejected this device: the data published by the integration is incorrect.",

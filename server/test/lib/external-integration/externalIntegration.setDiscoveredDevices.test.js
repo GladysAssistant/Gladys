@@ -79,9 +79,9 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     await expectBadParameters(null, 'must be an array');
   });
 
-  it('should reject more than 200 devices', async () => {
-    const devices = Array.from({ length: 201 }, (unused, i) => buildDiscoveredDevice(service.selector, `d${i}`));
-    await expectBadParameters(devices, 'max 200 devices');
+  it('should reject more than 2000 devices', async () => {
+    const devices = Array.from({ length: 2001 }, (unused, i) => buildDiscoveredDevice(service.selector, `d${i}`));
+    await expectBadParameters(devices, 'max 2000 devices');
   });
 
   it('should reject a device external_id with the wrong prefix', async () => {
