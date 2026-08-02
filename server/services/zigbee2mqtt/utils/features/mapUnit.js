@@ -33,6 +33,12 @@ function mapUnit(deviceUnit, featureUnit) {
       return DEVICE_FEATURE_UNITS.VOLT_AMPERE;
     case 'VArh':
       return DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE;
+    case 'm³/h':
+      return DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR;
+    case 'L':
+      return DEVICE_FEATURE_UNITS.LITER;
+    case 's':
+      return DEVICE_FEATURE_UNITS.SECONDS;
     default:
       return featureUnit || null;
   }
