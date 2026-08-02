@@ -25,6 +25,7 @@ async function buildContainerDescriptor(service, integrationToken) {
   const { basePathOnHost } = await this.system.getGladysBasePath();
   const hostApiUrl = await this.getHostApiUrl();
   const networkMode = await this.system.getNetworkMode();
+  const cpuCfsSupported = await this.system.hasCpuCfsSupport();
   const timezone = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE)) || 'UTC';
   // When Gladys runs as a host process, the integration reaches its API
   // through `host.docker.internal`. Docker Desktop resolves it out of the
@@ -59,7 +60,9 @@ async function buildContainerDescriptor(service, integrationToken) {
       SecurityOpt: ['no-new-privileges'],
       Memory: MEMORY_LIMIT_IN_BYTES,
       MemorySwap: MEMORY_LIMIT_IN_BYTES,
-      NanoCpus: NANO_CPUS,
+      // omitted on kernels without the CPU CFS scheduler (Synology DSM):
+      // the daemon would reject the creation with an HTTP 400
+      ...(cpuCfsSupported ? { NanoCpus: NANO_CPUS } : {}),
       PidsLimit: PIDS_LIMIT,
       // the only writable bind: local persistence of the integration,
       // survives container recreations, removed at uninstall
