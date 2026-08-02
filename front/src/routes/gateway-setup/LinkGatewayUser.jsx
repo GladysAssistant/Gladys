@@ -45,12 +45,40 @@ const SignupLayout = ({ children, ...props }) => (
                   <div class="loader" />
                   <div class="dimmer-content">
                     {props.usersGetStatus === RequestStatus.GatewayNoInstanceFound && (
-                      <div class="alert alert-danger">
+                      <div>
+                        <h4>
+                          <Text id="gatewayLinkUser.noInstanceFoundTitle" />
+                        </h4>
                         <p>
-                          <Text id="gatewayLinkUser.noInstanceFound" />
+                          <Text id="gatewayLinkUser.noInstanceFoundIntro" />
                         </p>
-                        <p class="mb-0">
-                          <MarkupText id="gatewayLinkUser.noInstanceFoundHelp" />
+                        <ol class="pl-4">
+                          <li class="mb-2">
+                            <MarkupText id="gatewayLinkUser.noInstanceFoundStepOpenLocalInstance" />
+                          </li>
+                          <li class="mb-2">
+                            <MarkupText id="gatewayLinkUser.noInstanceFoundStepGoToSettings" />
+                          </li>
+                          <li class="mb-2">
+                            <MarkupText id="gatewayLinkUser.noInstanceFoundStepLogin" />
+                          </li>
+                          <li class="mb-2">
+                            <MarkupText id="gatewayLinkUser.noInstanceFoundStepAcceptUser" />
+                          </li>
+                          <li class="mb-2">
+                            <Text id="gatewayLinkUser.noInstanceFoundStepComeBack" />
+                          </li>
+                        </ol>
+                        <div class="form-group">
+                          <button onClick={props.retry} class="btn btn-primary">
+                            <i class="fe fe-refresh-cw" /> <Text id="gatewayLinkUser.noInstanceFoundRetryButton" />
+                          </button>
+                        </div>
+                        <p>
+                          <MarkupText id="gatewayLinkUser.noInstanceFoundTutorialLink" />
+                        </p>
+                        <p class="text-muted small mb-0">
+                          <MarkupText id="gatewayLinkUser.noInstanceFoundNote" />
                         </p>
                       </div>
                     )}

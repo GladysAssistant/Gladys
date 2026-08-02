@@ -37,12 +37,14 @@ const DeviceTab = ({ children, ...props }) => (
             {props.philipsHueDevices &&
               props.philipsHueDevices.map((device, index) => (
                 <Device
+                  key={device.selector}
                   device={device}
                   deviceIndex={index}
                   houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
+                  getPhilipsHueDevices={props.getPhilipsHueDevices}
                 />
               ))}
             {props.philipsHueDevices && props.philipsHueDevices.length === 0 && (

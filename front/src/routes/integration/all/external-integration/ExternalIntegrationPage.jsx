@@ -1,6 +1,9 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import { connect } from 'unistore/preact';
 import get from 'get-value';
+
+import { USER_ROLE } from '../../../../../../server/utils/constants';
 
 // last known display name per integration: each tab reloads the integration
 // on mount, and showing the raw selector while it loads made the title
@@ -18,10 +21,13 @@ const getDisplayName = (selector, integration) => {
   return NAME_CACHE.get(selector) || '\u00A0';
 };
 
-const ExternalIntegrationPage = ({ selector, integration, children }) => {
+const ExternalIntegrationPage = ({ selector, integration, user, children }) => {
   // communication integrations have no device screens: the generic page
   // branches by type and only shows Configuration and Logs
   const isCommunication = get(integration, 'manifest.type') === 'communication';
+  // a non-admin user only comes here to link their own account: supervision
+  // and logs are administration screens (and their routes are admin-only)
+  const isAdmin = get(user, 'role') === USER_ROLE.ADMIN;
   return (
     <div class="page">
       <div class="page-main">
@@ -32,7 +38,7 @@ const ExternalIntegrationPage = ({ selector, integration, children }) => {
                 <h3 class="page-title mb-5">{getDisplayName(selector, integration)}</h3>
                 <div>
                   <div class="list-group list-group-transparent mb-0">
-                    {!isCommunication && (
+                    {!isCommunication && isAdmin && (
                       <Link
                         href={`/dashboard/integration/device/external/${selector}`}
                         activeClassName="active"
@@ -45,7 +51,7 @@ const ExternalIntegrationPage = ({ selector, integration, children }) => {
                       </Link>
                     )}
 
-                    {!isCommunication && (
+                    {!isCommunication && isAdmin && (
                       <Link
                         href={`/dashboard/integration/device/external/${selector}/discover`}
                         activeClassName="active"
@@ -69,27 +75,31 @@ const ExternalIntegrationPage = ({ selector, integration, children }) => {
                       <Text id="integration.externalIntegration.configTab" />
                     </Link>
 
-                    <Link
-                      href={`/dashboard/integration/device/external/${selector}/supervision`}
-                      activeClassName="active"
-                      class="list-group-item list-group-item-action d-flex align-items-center"
-                    >
-                      <span class="icon mr-3">
-                        <i class="fe fe-activity" />
-                      </span>
-                      <Text id="integration.externalIntegration.supervisionTab" />
-                    </Link>
+                    {isAdmin && (
+                      <Link
+                        href={`/dashboard/integration/device/external/${selector}/supervision`}
+                        activeClassName="active"
+                        class="list-group-item list-group-item-action d-flex align-items-center"
+                      >
+                        <span class="icon mr-3">
+                          <i class="fe fe-activity" />
+                        </span>
+                        <Text id="integration.externalIntegration.supervisionTab" />
+                      </Link>
+                    )}
 
-                    <Link
-                      href={`/dashboard/integration/device/external/${selector}/logs`}
-                      activeClassName="active"
-                      class="list-group-item list-group-item-action d-flex align-items-center"
-                    >
-                      <span class="icon mr-3">
-                        <i class="fe fe-file-text" />
-                      </span>
-                      <Text id="integration.externalIntegration.logsTab" />
-                    </Link>
+                    {isAdmin && (
+                      <Link
+                        href={`/dashboard/integration/device/external/${selector}/logs`}
+                        activeClassName="active"
+                        class="list-group-item list-group-item-action d-flex align-items-center"
+                      >
+                        <span class="icon mr-3">
+                          <i class="fe fe-file-text" />
+                        </span>
+                        <Text id="integration.externalIntegration.logsTab" />
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>
@@ -103,4 +113,4 @@ const ExternalIntegrationPage = ({ selector, integration, children }) => {
   );
 };
 
-export default ExternalIntegrationPage;
+export default connect('user', {})(ExternalIntegrationPage);

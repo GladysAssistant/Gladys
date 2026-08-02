@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const { fake } = require('sinon');
 
 const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 const { SUB_CONTAINER_PORTS_VARIABLE } = require('../../../lib/external-integration/constants');
@@ -79,6 +80,19 @@ describe('externalIntegration.buildSubContainerDescriptor', () => {
       '/var/lib/gladysassistant/external-integrations/ext-dev-open-meteo-demo/containers/mqtt/mosquitto/config:/mosquitto/config',
       '/var/lib/gladysassistant/external-integrations/ext-dev-open-meteo-demo/containers/mqtt/mosquitto/data:/mosquitto/data',
     ]);
+  });
+
+  it('should omit NanoCpus when the kernel has no CPU CFS support', async () => {
+    const { externalIntegration } = buildSupervisor({
+      system: {
+        hasCpuCfsSupport: fake.resolves(false),
+      },
+    });
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const entry = TEST_CONTAINERS_MANIFEST.containers[0];
+    const descriptor = await externalIntegration.buildSubContainerDescriptor(service, entry);
+    expect(descriptor.HostConfig).to.not.have.property('NanoCpus');
+    expect(descriptor.HostConfig.Memory).to.equal(128 * 1024 * 1024);
   });
 
   it('should not mount a granted class that is not detected', async () => {

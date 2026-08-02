@@ -21,6 +21,13 @@ const PRIVATE_NETWORK_PREFIX = 'gladys-int-';
 // Docker label carrying the sub-container `name` (the main container has
 // only the reconciliation label).
 const SUB_CONTAINER_LABEL = 'io.gladysassistant.container';
+// uid/gid of the `node` user in the official node images: the template
+// runs the integration as this unprivileged user (USER node), so the /data
+// bind source is created and chowned to it before the container exists —
+// Docker would otherwise create the folder owned by root:root, leaving the
+// only writable path of the container read-only for the integration.
+const INTEGRATION_DATA_UID = 1000;
+const INTEGRATION_DATA_GID = 1000;
 // Bounds of the `containers` manifest field (same rules as the indexer).
 const MAX_SUB_CONTAINERS = 5;
 const MAX_SUB_CONTAINER_VOLUMES = 5;
@@ -83,6 +90,14 @@ const MAX_MISSED_PINGS = 2;
 // Commands sent to the integration must be acked within this delay
 // (manifest actions override it with their declared timeout_seconds).
 const COMMAND_TIMEOUT_MS = 5 * 1000;
+// A message is not an interactive command: at boot the container is started
+// by service.startAll but authenticates on the WebSocket a few hundred
+// milliseconds later, and the notifications sent right after (the "Gladys
+// just upgraded" message) used to be lost on EXTERNAL_INTEGRATION_NOT_CONNECTED.
+// The message relay waits for the connection, but only inside the startup
+// window and only up to this delay — a stopped or broken integration still
+// fails immediately.
+const MESSAGE_CONNECTION_WAIT_MS = 15 * 1000;
 // Manifest actions: on-demand operations rendered as buttons in the
 // Configuration screen. Their ack delay is per-action (they can be long:
 // protocol detection, re-pairing...), bounded 5-120s.
@@ -91,7 +106,12 @@ const ACTION_MIN_TIMEOUT_SECONDS = 5;
 const ACTION_MAX_TIMEOUT_SECONDS = 120;
 const ACTION_DEFAULT_TIMEOUT_SECONDS = 30;
 // Host API limits.
-const MAX_DISCOVERED_DEVICES = 200;
+// Discovery is fleet-wide by construction: a network integration (UniFi,
+// router-based presence...) publishes one discovered device per client on
+// the network, which reaches ~1000 entries on a large home/small business
+// setup. The list is memory-only and cheap; the HTTP body bound
+// (jsonBodyMiddleware) is sized so this count stays the binding limit.
+const MAX_DISCOVERED_DEVICES = 2000;
 const MAX_STATES_PER_REQUEST = 100;
 const MAX_STATES_PER_MINUTE = 300;
 // Communication integrations: user <-> contact link. The link itself is a
@@ -183,6 +203,8 @@ module.exports = {
   MANIFEST_FILE_NAME,
   PRIVATE_NETWORK_PREFIX,
   SUB_CONTAINER_LABEL,
+  INTEGRATION_DATA_UID,
+  INTEGRATION_DATA_GID,
   MAX_SUB_CONTAINERS,
   MAX_SUB_CONTAINER_VOLUMES,
   MAX_SUB_CONTAINER_PORTS,
@@ -218,6 +240,7 @@ module.exports = {
   WEBSOCKET_PING_INTERVAL_MS,
   MAX_MISSED_PINGS,
   COMMAND_TIMEOUT_MS,
+  MESSAGE_CONNECTION_WAIT_MS,
   MAX_ACTIONS,
   ACTION_MIN_TIMEOUT_SECONDS,
   ACTION_MAX_TIMEOUT_SECONDS,
