@@ -83,6 +83,8 @@ jobs:
           echo "Triggering Cursor automation for PR #${PR_NUMBER}"
           echo "$PAYLOAD" | jq '{pr_number, pr_url, repo, title, head_ref, head_sha, is_fork, author, head_repository}'
 
+          # Response body is only printed on failure: Actions logs are public
+          # on this repo, and Cursor error payloads may include internal ids.
           HTTP_CODE=$(curl -sS -o /tmp/cursor-webhook-response.txt -w "%{http_code}" \
             -X POST "$WEBHOOK_URL" \
             -H "Authorization: Bearer ${WEBHOOK_TOKEN}" \
@@ -90,8 +92,6 @@ jobs:
             -d "$PAYLOAD")
 
           echo "Cursor webhook HTTP status: ${HTTP_CODE}"
-          cat /tmp/cursor-webhook-response.txt
-          echo
 
           case "$HTTP_CODE" in
             2*)
@@ -99,6 +99,8 @@ jobs:
               ;;
             *)
               echo "::error::Cursor webhook failed with HTTP ${HTTP_CODE}"
+              head -c 2000 /tmp/cursor-webhook-response.txt
+              echo
               exit 1
               ;;
           esac
