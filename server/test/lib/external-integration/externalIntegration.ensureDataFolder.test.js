@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { expect } = require('chai');
 const { assert: sinonAssert, fake } = require('sinon');
 
 const { buildSupervisor, seedExternalService } = require('./testUtils.test');
@@ -42,14 +41,30 @@ describe('externalIntegration.ensureDataFolder', () => {
 
   it('should prepare the data folder before the container is created', async () => {
     const service = await seedExternalService({ container_id: null });
-    const mkdir = fake.resolves(undefined);
-    const chown = fake.resolves(undefined);
-    fs.promises.mkdir = mkdir;
-    fs.promises.chown = chown;
+    fs.promises.mkdir = fake.resolves(undefined);
+    // deferred chown: proves the preparation is awaited, not just started —
+    // the container must not be created while the chown is still pending
+    let signalChownReached;
+    const chownReached = new Promise((resolve) => {
+      signalChownReached = resolve;
+    });
+    let resolveChown;
+    const pendingChown = new Promise((resolve) => {
+      resolveChown = resolve;
+    });
+    fs.promises.chown = fake(() => {
+      signalChownReached();
+      return pendingChown;
+    });
     const { externalIntegration, system } = buildSupervisor();
-    await externalIntegration.createIntegrationContainer(service);
-    sinonAssert.calledOnce(mkdir);
-    sinonAssert.calledOnce(chown);
-    expect(chown.calledBefore(system.createContainer)).to.equal(true);
+    const creation = externalIntegration.createIntegrationContainer(service);
+    await chownReached;
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    sinonAssert.notCalled(system.createContainer);
+    resolveChown();
+    await creation;
+    sinonAssert.calledOnce(system.createContainer);
   });
 });
