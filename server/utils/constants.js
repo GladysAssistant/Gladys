@@ -649,6 +649,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   DATARATE: 'datarate',
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
   DISTANCE_SENSOR: 'distance-sensor',
+  DOORBELL: 'doorbell',
   DURATION: 'duration',
   ELECTRICAL_VEHICLE_BATTERY: 'electrical-vehicle-battery',
   ELECTRICAL_VEHICLE_CHARGE: 'electrical-vehicle-charge',
@@ -751,6 +752,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   CAMERA: {
     IMAGE: 'image',
+  },
+  DOORBELL: {
+    RING: 'ring',
   },
   SIREN: {
     BINARY: 'binary',
