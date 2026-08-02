@@ -106,7 +106,12 @@ const ACTION_MIN_TIMEOUT_SECONDS = 5;
 const ACTION_MAX_TIMEOUT_SECONDS = 120;
 const ACTION_DEFAULT_TIMEOUT_SECONDS = 30;
 // Host API limits.
-const MAX_DISCOVERED_DEVICES = 200;
+// Discovery is fleet-wide by construction: a network integration (UniFi,
+// router-based presence...) publishes one discovered device per client on
+// the network, which reaches ~1000 entries on a large home/small business
+// setup. The list is memory-only and cheap; the HTTP body bound
+// (jsonBodyMiddleware) is sized so this count stays the binding limit.
+const MAX_DISCOVERED_DEVICES = 2000;
 const MAX_STATES_PER_REQUEST = 100;
 const MAX_STATES_PER_MINUTE = 300;
 // Communication integrations: user <-> contact link. The link itself is a
