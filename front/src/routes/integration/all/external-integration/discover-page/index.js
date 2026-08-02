@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import get from 'get-value';
+import debounce from 'debounce';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import DiscoverTab from './DiscoverTab';
@@ -9,6 +10,17 @@ import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 class ExternalIntegrationDiscoverPage extends Component {
+  constructor(props) {
+    super(props);
+    // debounced: the list can hold up to 2000 devices and each keystroke
+    // re-renders every visible card
+    this.debouncedSearchDevices = debounce(this.searchDevices, 200);
+  }
+
+  searchDevices = e => {
+    this.setState({ deviceSearch: e.target.value });
+  };
+
   getIntegration = async () => {
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
@@ -55,8 +67,17 @@ class ExternalIntegrationDiscoverPage extends Component {
     }
   };
 
-  createDevice = async index => {
-    const discoveredDevice = this.state.discoveredDevices[index];
+  // by external_id, not by index: the Discovery screen filters the list
+  // client-side, so an index in the filtered view does not point to the
+  // same device in the full list
+  createDevice = async externalId => {
+    const discoveredDevice = this.state.discoveredDevices.find(device => device.external_id === externalId);
+    // the list can be re-published (websocket refresh) between render and
+    // click: the clicked device may be gone from the fresh list, and the
+    // re-render is about to remove its card anyway
+    if (!discoveredDevice) {
+      return;
+    }
     // the same standard POST creates the device or, when it already exists
     // (same external_id), applies the re-published definition (the
     // "Update" gesture of the Discovery screen)
@@ -99,7 +120,13 @@ class ExternalIntegrationDiscoverPage extends Component {
   render(props, state) {
     return (
       <ExternalIntegrationPage selector={props.selector} integration={state.integration}>
-        <DiscoverTab {...state} selector={props.selector} scan={this.scan} createDevice={this.createDevice} />
+        <DiscoverTab
+          {...state}
+          selector={props.selector}
+          scan={this.scan}
+          createDevice={this.createDevice}
+          searchDevices={this.debouncedSearchDevices}
+        />
       </ExternalIntegrationPage>
     );
   }
