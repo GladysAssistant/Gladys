@@ -15,6 +15,8 @@ on:
 
 permissions:
   contents: write
+  # Needed to dispatch the release workflows on the new tag.
+  actions: write
 
 # Two overlapping runs would bump from the same tip and race on the same tag.
 concurrency:
@@ -33,16 +35,6 @@ jobs:
         run: |
           echo "::error::This workflow can only be run on master, got ${REF_NAME}."
           exit 1
-      - name: 🔑 Ensure the RELEASE_PAT secret is set
-        env:
-          RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
-        run: |
-          if [ -z "${RELEASE_PAT}" ]; then
-            echo "::error::The RELEASE_PAT secret is missing. It is required because a push made"
-            echo "::error::with the default GITHUB_TOKEN does not trigger the release workflows,"
-            echo "::error::which would leave a tag on master without any production image built."
-            exit 1
-          fi
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v4
         with:
@@ -50,10 +42,6 @@ jobs:
           # master pointed at when the workflow was dispatched.
           ref: master
           fetch-depth: 0
-          # Checkout runs with the default GITHUB_TOKEN, and nothing is written to
-          # the local git config: RELEASE_PAT is only handed to the final push,
-          # through a one-shot authentication header.
-          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v4
         with:
@@ -73,12 +61,22 @@ jobs:
       - name: 🚀 Push commit and tag
         env:
           NEW_VERSION: ${{ steps.bump.outputs.version }}
-          RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
         run: |
-          AUTH_HEADER=$(printf 'x-access-token:%s' "${RELEASE_PAT}" | base64 -w0)
-          echo "::add-mask::${AUTH_HEADER}"
-          git -c http.extraheader="AUTHORIZATION: basic ${AUTH_HEADER}" \
-            push --atomic origin master "refs/tags/${NEW_VERSION}"
+          git push --atomic origin master "refs/tags/${NEW_VERSION}"
+      - name: 🎬 Trigger the release workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NEW_VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          # A tag pushed with the default GITHUB_TOKEN does not trigger the
+          # workflows listening on `push: tags`, so they are dispatched explicitly
+          # on the new tag. workflow_dispatch is one of the two events GitHub does
+          # start from a GITHUB_TOKEN, which is why no PAT is needed here.
+          for workflow in docker-release-build.yml build-demo-website.yml build-apidoc-documentation.yml; do
+            echo "Triggering ${workflow} on ${NEW_VERSION}"
+            gh workflow run "${workflow}" --ref "${NEW_VERSION}"
+          done
       - name: 📝 Job summary
         env:
           NEW_VERSION: ${{ steps.bump.outputs.version }}
@@ -89,4 +87,5 @@ jobs:
             echo ""
             echo "- Bump type: \`${RELEASE_TYPE}\`"
             echo "- Tag: [\`${NEW_VERSION}\`](${{ github.server_url }}/${{ github.repository }}/releases/tag/${NEW_VERSION})"
+            echo "- Release workflows dispatched on the tag: production images, demo website, apidoc"
           } >> "$GITHUB_STEP_SUMMARY"
