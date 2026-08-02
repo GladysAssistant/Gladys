@@ -50,9 +50,10 @@ jobs:
           # master pointed at when the workflow was dispatched.
           ref: master
           fetch-depth: 0
-          # Credentials are persisted on purpose: the release commit and tag are
-          # pushed back with this token later in the job.
-          token: ${{ secrets.RELEASE_PAT }}
+          # Checkout runs with the default GITHUB_TOKEN, and nothing is written to
+          # the local git config: RELEASE_PAT is only handed to the final push,
+          # through a one-shot authentication header.
+          persist-credentials: false
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v4
         with:
@@ -72,8 +73,12 @@ jobs:
       - name: 🚀 Push commit and tag
         env:
           NEW_VERSION: ${{ steps.bump.outputs.version }}
+          RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
         run: |
-          git push --atomic origin master "refs/tags/${NEW_VERSION}"
+          AUTH_HEADER=$(printf 'x-access-token:%s' "${RELEASE_PAT}" | base64 -w0)
+          echo "::add-mask::${AUTH_HEADER}"
+          git -c http.extraheader="AUTHORIZATION: basic ${AUTH_HEADER}" \
+            push --atomic origin master "refs/tags/${NEW_VERSION}"
       - name: 📝 Job summary
         env:
           NEW_VERSION: ${{ steps.bump.outputs.version }}
