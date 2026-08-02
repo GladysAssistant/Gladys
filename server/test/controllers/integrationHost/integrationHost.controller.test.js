@@ -319,7 +319,7 @@ describe('Integration host API', () => {
     it('should answer 413 over the host API body bound', async () => {
       const res = await integrationRequest(token)
         .post('/api/integration/v1/discovered_device')
-        .send({ padding: 'x'.repeat(5 * 1024 * 1024) })
+        .send({ padding: 'x'.repeat(21 * 1024 * 1024) })
         .expect(413);
       expect(res.body).to.have.property('code', 'PAYLOAD_TOO_LARGE');
     });

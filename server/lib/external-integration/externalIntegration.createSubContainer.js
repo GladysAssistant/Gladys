@@ -25,6 +25,7 @@ async function createSubContainer(service, entry, { env = {} } = {}) {
   }
   await this.ensurePrivateNetwork(service);
   const descriptor = await this.buildSubContainerDescriptor(service, entry, { env });
+  await this.ensureSubContainerVolumes(service, entry);
   const container = await this.system.createContainer(descriptor);
   const storedEnvs = await this.getStoredSubContainerEnvs(service);
   storedEnvs[entry.name] = env;

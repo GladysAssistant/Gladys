@@ -349,6 +349,7 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Bewegung erkannt",
+        "doorbellRinging": "Klingelt",
         "pushButton": "Schieben",
         "vacuumDock": "Zurück zur Ladestation"
       },
@@ -747,6 +748,8 @@
         "noDevices": "Noch keine Geräte entdeckt. Klicke auf \"Scannen\", um nach Geräten zu suchen.",
         "noDevicesConfigureFirst": "Nichts gefunden? Stelle sicher, dass die Integration im Tab <a href=\"{{configUrl}}\">Konfiguration</a> konfiguriert ist, und starte dann einen neuen Scan.",
         "alreadyCreatedBadge": "Bereits hinzugefügt",
+        "searchPlaceholder": "Geräte suchen",
+        "noSearchResults": "Kein entdecktes Gerät entspricht deiner Suche.",
         "error": {
           "networkError": "Gladys hat auf die Hinzufügen-Anfrage nicht geantwortet. Prüfe, ob der Gladys-Server läuft und erreichbar ist, und versuche es erneut.",
           "badRequestError": "Gladys hat dieses Gerät abgelehnt: Die von der Integration veröffentlichten Daten sind fehlerhaft.",
@@ -3243,6 +3246,7 @@
         "on": "Ein",
         "off": "Aus",
         "deviceSeen": "Wenn das Gerät erkannt wird",
+        "doorbellRang": "Wenn die Türklingel klingelt",
         "onlyExecuteAtThreshold": "Nur ausführen, wenn der Schwellenwert überschritten wird (und nicht bei jedem vom Gerät gesendeten Wert)",
         "activateOrDeactivateForDuration": "Szene ausführen, nachdem die Bedingung für die Dauer gültig war:"
       },
@@ -4538,6 +4542,12 @@
           "1": "Offen"
         }
       },
+      "doorbell": {
+        "ring": {
+          "0": "Kein Klingeln",
+          "1": "Hat geklingelt"
+        }
+      },
       "electrical-vehicle-charge": {
         "plugged": {
           "0": "Nicht geladen",
@@ -4662,6 +4672,10 @@
     "camera": {
       "shortCategoryName": "Kamera",
       "image": "Kamera"
+    },
+    "doorbell": {
+      "shortCategoryName": "Türklingel",
+      "ring": "Klingeln"
     },
     "counter-sensor": {
       "shortCategoryName": "Zähler",

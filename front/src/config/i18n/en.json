@@ -349,6 +349,7 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Motion detected",
+        "doorbellRinging": "Ringing",
         "pushButton": "Push",
         "vacuumDock": "Return to Dock"
       },
@@ -747,6 +748,8 @@
         "noDevices": "No devices discovered yet. Press \"Scan\" to search for devices.",
         "noDevicesConfigureFirst": "Nothing found? Make sure the integration is configured in the <a href=\"{{configUrl}}\">Configuration</a> tab, then run a new scan.",
         "alreadyCreatedBadge": "Already added",
+        "searchPlaceholder": "Search devices",
+        "noSearchResults": "No discovered device matches your search.",
         "error": {
           "networkError": "Gladys did not answer the add request. Check that the Gladys server is running and reachable, then try again.",
           "badRequestError": "Gladys rejected this device: the data published by the integration is incorrect.",
@@ -3243,6 +3246,7 @@
         "on": "On",
         "off": "Off",
         "deviceSeen": "If the device is detected",
+        "doorbellRang": "If the doorbell rings",
         "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)",
         "activateOrDeactivateForDuration": "Run the scene after the condition has been valid for:"
       },
@@ -4538,6 +4542,12 @@
           "1": "Open"
         }
       },
+      "doorbell": {
+        "ring": {
+          "0": "No ring",
+          "1": "Doorbell rang"
+        }
+      },
       "electrical-vehicle-charge": {
         "plugged": {
           "0": "Unplugged",
@@ -4662,6 +4672,10 @@
     "camera": {
       "shortCategoryName": "Camera",
       "image": "Camera"
+    },
+    "doorbell": {
+      "shortCategoryName": "Doorbell",
+      "ring": "Ring"
     },
     "counter-sensor": {
       "shortCategoryName": "Counter",

@@ -10,6 +10,7 @@ import PresenceSensorDeviceState from './device-states/PresenceSensorDeviceState
 import ThresholdDeviceState from './device-states/ThresholdDeviceState';
 import DefaultDeviceState from './device-states/DefaultDeviceState';
 import ButtonClickDeviceState from './device-states/ButtonClickDeviceState';
+import DoorbellRingDeviceState from './device-states/DoorbellRingDeviceState';
 import PilotWireModeDeviceState from './device-states/PilotWireModeDeviceState';
 import FanModeDeviceState from './device-states/FanModeDeviceState';
 import FanLabeledDeviceState from './device-states/FanLabeledDeviceState';
@@ -88,6 +89,7 @@ class TurnOnLight extends Component {
     let binaryDevice = false;
     let presenceDevice = false;
     let buttonClickDevice = false;
+    let doorbellRingDevice = false;
     let pilotWireModeDevice = false;
     let fanModeDevice = false;
     let fanLabeledDevice = false;
@@ -104,6 +106,7 @@ class TurnOnLight extends Component {
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE;
       presenceDevice = category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
+      doorbellRingDevice = category === DEVICE_FEATURE_CATEGORIES.DOORBELL;
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
       fanModeDevice = category === DEVICE_FEATURE_CATEGORIES.FAN && type === DEVICE_FEATURE_TYPES.FAN.MODE;
       fanLabeledDevice =
@@ -128,6 +131,7 @@ class TurnOnLight extends Component {
       !binaryDevice &&
       !presenceDevice &&
       !buttonClickDevice &&
+      !doorbellRingDevice &&
       !pilotWireModeDevice &&
       !fanModeDevice &&
       !fanLabeledDevice &&
@@ -139,6 +143,7 @@ class TurnOnLight extends Component {
       selectedDeviceFeature &&
       !presenceDevice &&
       !buttonClickDevice &&
+      !doorbellRingDevice &&
       !pilotWireModeDevice &&
       !fanModeDevice &&
       !fanLabeledDevice &&
@@ -160,6 +165,7 @@ class TurnOnLight extends Component {
           {binaryDevice && <BinaryDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {presenceDevice && <PresenceSensorDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {buttonClickDevice && <ButtonClickDeviceState {...props} />}
+          {doorbellRingDevice && <DoorbellRingDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
           {pilotWireModeDevice && <PilotWireModeDeviceState {...props} />}
           {fanModeDevice && <FanModeDeviceState {...props} />}
           {fanLabeledDevice && <FanLabeledDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
