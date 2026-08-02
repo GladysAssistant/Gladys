@@ -5,6 +5,10 @@ const Weather = require('../../../lib/weather');
 
 const event = new EvenEmitter();
 
+// single clock baseline: the fixture days and the request dates all derive
+// from it, so they can never straddle midnight during the run
+const TODAY = dayjs().startOf('day');
+
 const fakeWeather = {
   temperature: 54.87,
   humidity: 0.76,
@@ -15,10 +19,7 @@ const fakeWeather = {
   weather: 'cloud',
   days: [
     {
-      // dynamic dates: the chat resolves days by calendar date (B.18),
-      datetime: dayjs()
-        .startOf('day')
-        .add(0, 'day')
+      datetime: TODAY.add(0, 'day')
         .add(11, 'hour')
         .toISOString(),
       humidity: 65,
@@ -31,9 +32,7 @@ const fakeWeather = {
       wind_speed: 3.13,
     },
     {
-      datetime: dayjs()
-        .startOf('day')
-        .add(1, 'day')
+      datetime: TODAY.add(1, 'day')
         .add(11, 'hour')
         .toISOString(),
       humidity: 57,
@@ -46,9 +45,7 @@ const fakeWeather = {
       wind_speed: 1.95,
     },
     {
-      datetime: dayjs()
-        .startOf('day')
-        .add(2, 'day')
+      datetime: TODAY.add(2, 'day')
         .add(11, 'hour')
         .toISOString(),
       humidity: 67,
@@ -61,9 +58,7 @@ const fakeWeather = {
       wind_speed: 3.23,
     },
     {
-      datetime: dayjs()
-        .startOf('day')
-        .add(3, 'day')
+      datetime: TODAY.add(3, 'day')
         .add(11, 'hour')
         .toISOString(),
       humidity: 51,
@@ -76,9 +71,7 @@ const fakeWeather = {
       wind_speed: 6.27,
     },
     {
-      datetime: dayjs()
-        .startOf('day')
-        .add(4, 'day')
+      datetime: TODAY.add(4, 'day')
         .add(11, 'hour')
         .toISOString(),
       humidity: 86,
@@ -91,9 +84,7 @@ const fakeWeather = {
       wind_speed: 2.14,
     },
     {
-      datetime: dayjs()
-        .startOf('day')
-        .add(5, 'day')
+      datetime: TODAY.add(5, 'day')
         .add(11, 'hour')
         .toISOString(),
       humidity: 61,
@@ -106,9 +97,7 @@ const fakeWeather = {
       wind_speed: 2.55,
     },
     {
-      datetime: dayjs()
-        .startOf('day')
-        .add(6, 'day')
+      datetime: TODAY.add(6, 'day')
         .add(11, 'hour')
         .toISOString(),
       humidity: 60,
@@ -198,7 +187,7 @@ describe('weather.command', () => {
             entity: 'date',
             resolution: {
               type: 'date',
-              date: dayjs().toDate(),
+              date: TODAY.toDate(),
             },
           },
         ],
@@ -229,9 +218,7 @@ describe('weather.command', () => {
             entity: 'date',
             resolution: {
               type: 'date',
-              date: dayjs()
-                .add(1, 'day')
-                .toDate(),
+              date: TODAY.add(1, 'day').toDate(),
             },
           },
         ],
@@ -274,9 +261,7 @@ describe('weather.command', () => {
             entity: 'date',
             resolution: {
               type: 'date',
-              date: dayjs()
-                .add(1, 'day')
-                .toDate(),
+              date: TODAY.add(1, 'day').toDate(),
             },
           },
         ],
@@ -307,9 +292,7 @@ describe('weather.command', () => {
             entity: 'date',
             resolution: {
               type: 'date',
-              date: dayjs()
-                .add(2, 'days')
-                .toDate(),
+              date: TODAY.add(2, 'days').toDate(),
             },
           },
         ],
@@ -342,9 +325,7 @@ describe('weather.command', () => {
             sourceText: 'sunday',
             resolution: {
               type: 'interval',
-              strFutureValue: dayjs()
-                .add(4, 'days')
-                .toDate(),
+              strFutureValue: TODAY.add(4, 'days').toDate(),
             },
           },
         ],
@@ -383,9 +364,7 @@ describe('weather.command', () => {
             entity: 'date',
             resolution: {
               type: 'date',
-              date: dayjs()
-                .add(1, 'day')
-                .toDate(),
+              date: TODAY.add(1, 'day').toDate(),
             },
           },
         ],
@@ -435,9 +414,7 @@ describe('weather.command', () => {
             sourceText: 'sunday',
             resolution: {
               type: 'interval',
-              strFutureValue: dayjs()
-                .add(30, 'days')
-                .toDate(),
+              strFutureValue: TODAY.add(30, 'days').toDate(),
             },
           },
         ],
