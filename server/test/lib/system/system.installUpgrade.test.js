@@ -176,14 +176,26 @@ describe('system.installUpgrade', () => {
 
   it('should report an error when Watchtower never finishes', async () => {
     const container = await system.dockerode.createContainer({});
-    sandbox.replace(container, 'wait', () => new Promise(() => {}));
     const clock = sandbox.useFakeTimers();
+    // the abandoned wait rejects after the timeout, like a Docker daemon dying
+    // mid-stall: it must be swallowed, not escape as an unhandled rejection
+    sandbox.replace(
+      container,
+      'wait',
+      () =>
+        new Promise((resolve, reject) => {
+          setTimeout(() => reject(new Error('DAEMON_DIED')), 20 * 60 * 1000);
+        }),
+    );
 
     const upgrade = system.installUpgrade();
     await clock.tickAsync(15 * 60 * 1000);
     await upgrade;
 
     expect(getUpgradeErrors()).to.deep.equal([{ code: SYSTEM_UPGRADE_ERROR_CODES.WATCHTOWER_TIMEOUT }]);
+
+    // deliver the late rejection while the swallowing catch is attached
+    await clock.tickAsync(5 * 60 * 1000);
   });
 
   it('should survive an error on the Watchtower log stream', async () => {

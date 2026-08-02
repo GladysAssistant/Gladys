@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import SettingsSystemPage from './SettingsSystemPage';
 import actions from '../../../actions/system';
 import { RequestStatus } from '../../../utils/consts';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import { WEBSOCKET_MESSAGE_TYPES, SYSTEM_UPGRADE_ERROR_CODES } from '../../../../../server/utils/constants';
 
 class SettingsSystem extends Component {
   constructor(props) {
@@ -32,8 +32,11 @@ class SettingsSystem extends Component {
       );
     } catch (e) {
       console.error(e);
+      // the error alert only renders when upgradeError is set: a failed POST
+      // must show something, not just silently re-enable the button
       this.setState({
-        SystemUpgradeStatus: RequestStatus.Error
+        SystemUpgradeStatus: RequestStatus.Error,
+        upgradeError: { code: SYSTEM_UPGRADE_ERROR_CODES.UNKNOWN_ERROR }
       });
     }
   };

@@ -178,10 +178,22 @@ async function installUpgrade() {
     const timeout = new Promise((resolve) => {
       timeoutId = setTimeout(() => resolve(WATCHTOWER_TIMED_OUT), WATCHTOWER_TIMEOUT_IN_MS);
     });
-    const result = await Promise.race([container.wait(), timeout]);
-    clearTimeout(timeoutId);
+    const waitForContainer = container.wait();
+    let result;
+    try {
+      result = await Promise.race([waitForContainer, timeout]);
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (result === WATCHTOWER_TIMED_OUT) {
+      // The abandoned wait can still reject later — a dying Docker daemon is
+      // precisely the timeout scenario. Swallow it so it does not surface as an
+      // unhandled rejection long after the upgrade was reported failed.
+      // eslint-disable-next-line promise/prefer-await-to-then
+      waitForContainer.catch((waitError) => {
+        logger.warn('Watchtower container wait failed after the timeout', waitError);
+      });
       logger.warn(`Watchtower is still running after ${WATCHTOWER_TIMEOUT_IN_MS}ms, giving up on watching it`);
       sendUpgradeError({ code: SYSTEM_UPGRADE_ERROR_CODES.WATCHTOWER_TIMEOUT });
       return;
