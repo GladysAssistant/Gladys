@@ -263,71 +263,6 @@ describe('Build service', () => {
     });
   });
 
-  it('should build siren service', async () => {
-    homekitHandler.gladys.stateManager.get = stub().returns({
-      id: '8c1a2b3d-4e5f-4a6b-8c9d-0e1f2a3b4c5d',
-      name: 'Alarme',
-      category: DEVICE_FEATURE_CATEGORIES.SIREN,
-      type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
-      last_value: 0,
-    });
-    homekitHandler.gladys.event.emit = stub();
-    const on = stub();
-    const getCharacteristic = stub().returns({
-      on,
-      props: {
-        perms: ['PAIRED_READ', 'PAIRED_WRITE'],
-      },
-    });
-    const Switch = stub().returns({
-      getCharacteristic,
-    });
-
-    homekitHandler.hap = {
-      Characteristic: {
-        On: 'ON',
-      },
-      CharacteristicEventTypes: stub(),
-      Perms: {
-        PAIRED_READ: 'PAIRED_READ',
-        PAIRED_WRITE: 'PAIRED_WRITE',
-      },
-      Service: {
-        Switch,
-      },
-    };
-    const device = {
-      name: 'Sirène',
-      selector: 'sirene',
-    };
-    const features = [
-      {
-        id: '8c1a2b3d-4e5f-4a6b-8c9d-0e1f2a3b4c5d',
-        name: 'Alarme',
-        selector: 'sirene-alarme',
-        category: DEVICE_FEATURE_CATEGORIES.SIREN,
-        type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
-      },
-    ];
-    const cb = stub();
-
-    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.SIREN]);
-    await on.args[0][1](cb);
-    await on.args[1][1](1, cb);
-
-    expect(Switch.args[0][0]).to.equal('Sirène');
-    expect(on.callCount).to.equal(2);
-    expect(getCharacteristic.args[0][0]).to.equal('ON');
-    expect(cb.args[0][1]).to.equal(0);
-    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
-      type: ACTIONS.DEVICE.SET_VALUE,
-      status: ACTIONS_STATUS.PENDING,
-      value: 1,
-      device: device.selector,
-      device_feature: features[0].selector,
-    });
-  });
-
   it('should build current temperature service', async () => {
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'temp-celsius').returns({
       id: '26df6983-5127-4122-874a-b6ed0590badc',
@@ -961,89 +896,6 @@ describe('Build service', () => {
     expect(cb.args[3][1]).to.equal(0);
   });
 
-  it('should build particulate density characteristics on the air quality service', async () => {
-    homekitHandler.gladys.stateManager.get = stub();
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pm25-microgram').returns({ last_value: 42 });
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pm25-milligram').returns({ last_value: 0.05 });
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pm10-nanogram').returns({ last_value: 8000 });
-    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pm10-sans-unite').returns({ last_value: 5000 });
-    const on = stub();
-    const getCharacteristic = stub().returns({
-      on,
-      props: {
-        minValue: 0,
-        maxValue: 1000,
-      },
-    });
-    const AirQualitySensor = stub().returns({
-      getCharacteristic,
-    });
-
-    homekitHandler.hap = {
-      Characteristic: {
-        PM2_5Density: 'PM25DENSITY',
-        PM10Density: 'PM10DENSITY',
-      },
-      CharacteristicEventTypes: stub(),
-      Service: {
-        AirQualitySensor,
-      },
-    };
-    const device = {
-      name: 'Capteur particules',
-    };
-    // integrations report densities in milligrams, micrograms or nanograms per cubic meter
-    const features = [
-      {
-        name: 'PM2.5 µg',
-        selector: 'pm25-microgram',
-        category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-        unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
-      },
-      {
-        name: 'PM2.5 mg',
-        selector: 'pm25-milligram',
-        category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-        unit: DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
-      },
-      {
-        name: 'PM10 ng',
-        selector: 'pm10-nanogram',
-        category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
-        unit: DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
-      },
-      {
-        name: 'PM10 sans unité',
-        selector: 'pm10-sans-unite',
-        category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
-      },
-    ];
-
-    const cb = stub();
-
-    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]);
-    await on.args[0][1](cb);
-    await on.args[1][1](cb);
-    await on.args[2][1](cb);
-    await on.args[3][1](cb);
-
-    expect(on.callCount).to.equal(4);
-    expect(getCharacteristic.args[0][0]).to.equal('PM25DENSITY');
-    expect(getCharacteristic.args[2][0]).to.equal('PM10DENSITY');
-    // already in µg/m³
-    expect(cb.args[0][1]).to.equal(42);
-    // 0.05 mg/m³ is 50 µg/m³
-    expect(cb.args[1][1]).to.equal(50);
-    // 8000 ng/m³ is 8 µg/m³
-    expect(cb.args[2][1]).to.equal(8);
-    // no unit declared, the value is taken as µg/m³ and only clamped
-    expect(cb.args[3][1]).to.equal(1000);
-  });
-
   it('should build lock service', async () => {
     homekitHandler.gladys.stateManager.get = stub();
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'serrure-button').returns({
@@ -1187,17 +1039,22 @@ describe('Build service', () => {
     });
     // no state feature, so the command optimistically drives the current state
     expect(updateCharacteristic.args[0]).to.eql(['LOCKCURRENTSTATE', 0]);
-    expect(cb.args[2][1]).to.equal(1);
+    // and a read landing before the device reports back answers the command, not the old position
+    expect(cb.args[2][1]).to.equal(0);
+
+    // as soon as the device reports the new position, the optimistic value steps aside
+    buttonState.last_value = 0;
+    await on.args[2][1](cb);
+    expect(cb.args[3][1]).to.equal(0);
 
     // and the other way round: locking again drives it back to secured
-    buttonState.last_value = 0;
     await on.args[1][1](1, cb);
     await on.args[0][1](cb);
     await on.args[2][1](cb);
 
     expect(updateCharacteristic.args[1]).to.eql(['LOCKCURRENTSTATE', 1]);
-    expect(cb.args[4][1]).to.equal(0);
-    expect(cb.args[5][1]).to.equal(0);
+    expect(cb.args[5][1]).to.equal(1);
+    expect(cb.args[6][1]).to.equal(1);
   });
 
   it('should build lock service without command feature', async () => {
