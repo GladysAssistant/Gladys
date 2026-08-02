@@ -8,6 +8,7 @@ import BatteryLevelFeature from './BatteryLevelFeature';
 import BinaryDeviceValue from './BinaryDeviceValue';
 import LastSeenDeviceValue from './LastSeenDeviceValue';
 import MotionSensorDeviceValue from './MotionSensorDeviceValue';
+import DoorbellRingDeviceValue from './DoorbellRingDeviceValue';
 import BadgeNumberDeviceValue from './BadgeNumberDeviceValue';
 import DistanceSensorDeviceValue from './DistanceSensorDeviceValue';
 import IconBinaryDeviceValue from './IconBinaryDeviceValue';
@@ -24,6 +25,7 @@ import VacuumCleanerStateDeviceValue from './VacuumCleanerStateDeviceValue';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: MotionSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.DOORBELL]: DoorbellRingDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: LastSeenDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: BinaryDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.SIGNAL]: SignalQualityDeviceValue,
