@@ -57,7 +57,9 @@ const ThermostatModeDeviceFeature = ({ children, ...props }) => {
                 onClick={() => updateValue(mode.value)}
               >
                 <Text
-                  id={`deviceFeatureAction.category.${category}.${type}.${THERMOSTAT_MODE_TRANSLATION_KEYS[mode.value]}`}
+                  id={`deviceFeatureAction.category.${category}.${type}.${
+                    THERMOSTAT_MODE_TRANSLATION_KEYS[mode.value]
+                  }`}
                   default={mode.label || String(mode.value)}
                 />
               </button>
