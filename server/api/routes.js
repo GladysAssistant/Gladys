@@ -435,7 +435,7 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: gatewayController.getTtsUrl,
     },
-    // tts (see docs/specs/external-integrations.md, B.18)
+    // tts (see docs/specs/external-integrations.md, B.20)
     'get /api/v1/tts/provider': {
       // non-admin read: the scene editor uses it to stop showing the
       // Gladys Plus upsell when another provider is active

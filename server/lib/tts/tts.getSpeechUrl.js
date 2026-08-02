@@ -1,7 +1,8 @@
 const crypto = require('crypto');
 
-const { NotFoundError } = require('../../utils/coreErrors');
+const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { MAX_TTS_AUDIO_SIZE_BYTES, TTS_AUDIO_CONTENT_TYPES } = require('../external-integration/constants');
 const { GLADYS_PLUS_PROVIDER, TTS_AUDIO_TTL_MS, TTS_AUDIO_TOKEN_BYTES } = require('./constants');
 
 /**
@@ -33,6 +34,17 @@ async function getSpeechUrl({ text, language = null }) {
     throw new NotFoundError(`TTS provider "${activeProvider}" is not available`);
   }
   const { buffer, contentType, extension } = await providerService.tts.synthesize({ text, language });
+  // defense in depth: the external-integration proxy already validates all
+  // of this, but nothing here is served or put in a URL without being
+  // checked against the curated list and the size bound — whatever service
+  // implements the provider interface
+  const expectedExtension = Object.prototype.hasOwnProperty.call(TTS_AUDIO_CONTENT_TYPES, contentType)
+    ? TTS_AUDIO_CONTENT_TYPES[contentType]
+    : undefined;
+  const validBuffer = Buffer.isBuffer(buffer) && buffer.length > 0 && buffer.length <= MAX_TTS_AUDIO_SIZE_BYTES;
+  if (!validBuffer || !expectedExtension || extension !== expectedExtension) {
+    throw new BadParameters(`TTS provider "${activeProvider}" returned an invalid audio payload`);
+  }
   this.purgeExpiredAudios();
   const token = crypto.randomBytes(TTS_AUDIO_TOKEN_BYTES).toString('hex');
   this.audios.set(token, { buffer, contentType, expiresAt: Date.now() + TTS_AUDIO_TTL_MS });

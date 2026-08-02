@@ -42,7 +42,10 @@ describe('TTS API', () => {
         .get('/api/v1/tts/provider')
         .expect('Content-Type', /json/)
         .expect(200);
-      expect(res.body).to.deep.equal({ active: 'gladys-plus', providers: [{ provider: 'gladys-plus' }] });
+      expect(res.body).to.deep.equal({
+        active: 'gladys-plus',
+        providers: [{ provider: 'gladys-plus', name: 'Gladys Plus' }],
+      });
     });
 
     it('should list registered TTS provider services, readable by a non-admin', async () => {
@@ -52,7 +55,11 @@ describe('TTS API', () => {
         .get('/api/v1/tts/provider')
         .expect('Content-Type', /json/)
         .expect(200);
-      expect(res.body.providers).to.deep.equal([{ provider: 'gladys-plus' }, { provider: 'ext-piper-tts' }]);
+      expect(res.body.providers).to.deep.equal([
+        { provider: 'gladys-plus', name: 'Gladys Plus' },
+        // no installed t_service row in this test: raw selector fallback
+        { provider: 'ext-piper-tts', name: 'ext-piper-tts' },
+      ]);
     });
   });
 

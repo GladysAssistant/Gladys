@@ -12,7 +12,7 @@ import { getLocalizedText, isConfigOnlyIntegrationType } from './all/external-in
 import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog } from './catalog-url';
 import { RequestStatus } from '../../utils/consts';
 
-const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
+const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'tts'];
 const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
 
 class Integration extends Component {

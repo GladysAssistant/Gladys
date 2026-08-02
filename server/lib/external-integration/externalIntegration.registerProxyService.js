@@ -83,7 +83,7 @@ function registerProxyService(service) {
         }),
       }
     : {};
-  // TTS provider integrations (B.18) expose the generic provider interface
+  // TTS provider integrations (B.20) expose the generic provider interface
   // tts.synthesize: the core tts manager dispatches to any service exposing
   // it, without knowing any engine by name. The audio comes back in the
   // command-result as a data-URI, validated here (curated content types,
@@ -108,7 +108,11 @@ function registerProxyService(service) {
             }
             const separatorIndex = audio.indexOf(';base64,');
             const contentType = separatorIndex === -1 ? null : audio.substring(0, separatorIndex);
-            const extension = TTS_AUDIO_CONTENT_TYPES[contentType];
+            // own-key lookup only: a content type like "constructor" must
+            // not match an inherited Object.prototype property
+            const extension = Object.prototype.hasOwnProperty.call(TTS_AUDIO_CONTENT_TYPES, contentType)
+              ? TTS_AUDIO_CONTENT_TYPES[contentType]
+              : undefined;
             if (!extension) {
               throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO');
             }

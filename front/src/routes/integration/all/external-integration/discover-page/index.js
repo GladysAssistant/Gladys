@@ -17,12 +17,23 @@ class ExternalIntegrationDiscoverPage extends Component {
       // URL access lands on the configuration screen instead
       if (isConfigOnlyIntegrationType(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
-        return;
+        return true;
       }
       this.setState({ integration });
     } catch (e) {
       console.error(e);
     }
+    return false;
+  };
+
+  loadData = async () => {
+    // resolve the integration type first: a configuration-only integration
+    // redirects, and the discovery request must never fire
+    const redirected = await this.getIntegration();
+    if (redirected) {
+      return;
+    }
+    this.getDiscoveredDevices();
   };
 
   getDiscoveredDevices = async () => {
@@ -79,14 +90,12 @@ class ExternalIntegrationDiscoverPage extends Component {
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DISCOVERED_DEVICES_UPDATED,
       this.onDiscoveredDevicesUpdated
     );
-    this.getIntegration();
-    this.getDiscoveredDevices();
+    this.loadData();
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.selector !== this.props.selector) {
-      this.getIntegration();
-      this.getDiscoveredDevices();
+      this.loadData();
     }
   }
 

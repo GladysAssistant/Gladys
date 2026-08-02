@@ -3,7 +3,7 @@ const sinon = require('sinon');
 
 const { fake, assert } = sinon;
 
-const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const { ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 const { Error422 } = require('../../../utils/httpErrors');
 const { buildSupervisor, seedExternalService, TEST_TTS_MANIFEST } = require('./testUtils.test');
@@ -46,6 +46,24 @@ describe('externalIntegration TTS providers (type tts)', () => {
         },
         'contact_schema: only allowed on send-only communication integrations',
       );
+    });
+  });
+
+  describe('uninstall of the selected TTS provider', () => {
+    it('should clear TTS_ACTIVE_PROVIDER: no dangling selector after uninstall', async () => {
+      const { externalIntegration, variable } = buildSupervisor();
+      const service = await seedTtsService();
+      await variable.setValue(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER, service.name);
+      await externalIntegration.uninstall(service.selector);
+      expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER)).to.equal(null);
+    });
+
+    it('should keep TTS_ACTIVE_PROVIDER when uninstalling another integration', async () => {
+      const { externalIntegration, variable } = buildSupervisor();
+      const service = await seedExternalService();
+      await variable.setValue(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER, 'ext-other-tts');
+      await externalIntegration.uninstall(service.selector);
+      expect(await variable.getValue(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER)).to.equal('ext-other-tts');
     });
   });
 
@@ -141,6 +159,15 @@ describe('externalIntegration TTS providers (type tts)', () => {
       externalIntegration.sendCommand = fake.resolves({
         success: true,
         data: { audio: audioDataUri(Buffer.from('x'), 'application/octet-stream') },
+      });
+      await expect(proxyService.tts.synthesize({ text: 'Bonjour' })).to.be.rejectedWith(
+        ExternalIntegrationUnavailableError,
+        'EXTERNAL_INTEGRATION_INVALID_TTS_AUDIO',
+      );
+      // an inherited Object.prototype key must not pass the allow-list
+      externalIntegration.sendCommand = fake.resolves({
+        success: true,
+        data: { audio: audioDataUri(Buffer.from('x'), 'constructor') },
       });
       await expect(proxyService.tts.synthesize({ text: 'Bonjour' })).to.be.rejectedWith(
         ExternalIntegrationUnavailableError,

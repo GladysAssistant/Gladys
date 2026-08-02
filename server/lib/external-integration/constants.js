@@ -134,8 +134,9 @@ const NETWORK_DISCOVERY_DEFAULT_TIMEOUT_SECONDS = 10;
 // small payload, one scan per 10 seconds per integration.
 const MAX_ACTIVE_BROADCAST_PAYLOAD_BYTES = 512;
 const ACTIVE_BROADCAST_MIN_INTERVAL_MS = 10 * 1000;
-// TTS providers (B.18): the synthesize command is the third documented
-// exception to the 5s ack rule (local synthesis on a Pi is slow). The audio
+// TTS providers (B.20): the synthesize command is a documented exception
+// to the 5s ack rule, alongside camera.get-image and action.run (local
+// synthesis on a Pi is slow). The audio
 // comes back in command-result.data as a data-URI; the core validates the
 // content type (what Sonos/Cast/browsers actually play — the served URL
 // extension is derived from it) and the decoded size before serving a byte.

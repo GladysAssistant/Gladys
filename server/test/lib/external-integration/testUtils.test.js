@@ -95,7 +95,7 @@ const TEST_NOTIFICATION_MANIFEST = {
   ],
 };
 
-// TTS-provider fixture (B.18): a text-to-speech engine — Configuration
+// TTS-provider fixture (B.20): a text-to-speech engine — Configuration
 // screen only, the core relays synthesize commands over WebSocket and
 // serves the returned audio to speakers.
 const TEST_TTS_MANIFEST = {

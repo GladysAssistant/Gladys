@@ -3,16 +3,16 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import Select from 'react-select';
 
-const GLADYS_PLUS_PROVIDER = 'gladys-plus';
-
 // The voice of the instance: Gladys Plus by default, or any installed TTS
 // provider integration (external integrations of type "tts"). Scene
 // announcements and the voice assistant speak through the active provider.
 class SettingsSystemTtsProvider extends Component {
+  // the API provides a display name per provider (the integration's
+  // manifest name), so the select matches the Integrations UI
   buildOptions = providers =>
-    providers.map(({ provider }) => ({
+    providers.map(({ provider, name }) => ({
       value: provider,
-      label: provider === GLADYS_PLUS_PROVIDER ? 'Gladys Plus' : provider
+      label: name || provider
     }));
 
   getProviderConfiguration = async () => {
@@ -29,15 +29,19 @@ class SettingsSystemTtsProvider extends Component {
   };
 
   updateProvider = async option => {
-    this.setState({
-      selectedProvider: option
-    });
+    // commit the selection only once the server accepted it: an optimistic
+    // update would show a provider that is not actually active on failure
+    this.setState({ isUpdatingProvider: true });
     try {
       await this.props.httpClient.post('/api/v1/tts/provider', {
         provider: option.value
       });
+      this.setState({ selectedProvider: option });
     } catch (e) {
       console.error(e);
+      await this.getProviderConfiguration();
+    } finally {
+      this.setState({ isUpdatingProvider: false });
     }
   };
 
@@ -45,7 +49,7 @@ class SettingsSystemTtsProvider extends Component {
     this.getProviderConfiguration();
   }
 
-  render({}, { options = [], selectedProvider }) {
+  render({}, { options = [], selectedProvider, isUpdatingProvider }) {
     return (
       <div class="card">
         <h4 class="card-header">
@@ -61,6 +65,7 @@ class SettingsSystemTtsProvider extends Component {
               options={options}
               onChange={this.updateProvider}
               value={selectedProvider}
+              isDisabled={isUpdatingProvider}
               className="react-select-container"
               classNamePrefix="react-select"
             />

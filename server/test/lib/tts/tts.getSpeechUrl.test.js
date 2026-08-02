@@ -4,7 +4,8 @@ const sinon = require('sinon');
 const { fake, assert } = sinon;
 
 const { buildTts, registerFakeTtsProvider } = require('./testUtils.test');
-const { NotFoundError } = require('../../../utils/coreErrors');
+const { NotFoundError, BadParameters } = require('../../../utils/coreErrors');
+const { MAX_TTS_AUDIO_SIZE_BYTES } = require('../../../lib/external-integration/constants');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const { GLADYS_PLUS_PROVIDER, TTS_AUDIO_TTL_MS } = require('../../../lib/tts/constants');
 
@@ -48,6 +49,31 @@ describe('tts.getSpeechUrl', () => {
     tts.getLocalApiBaseUrl = fake.returns('http://192.168.1.10:1443');
     await tts.getSpeechUrl({ text: 'Hello' });
     assert.calledWith(synthesize, { text: 'Hello', language: null });
+  });
+
+  it('should refuse an invalid provider payload before caching or minting a URL', async () => {
+    const { tts, stateManager, variableStore } = buildTts();
+    variableStore.set(SYSTEM_VARIABLE_NAMES.TTS_ACTIVE_PROVIDER, 'ext-piper-tts');
+    tts.getLocalApiBaseUrl = fake.returns('http://192.168.1.10:1443');
+    const invalidPayloads = [
+      // not a buffer at all
+      { buffer: 'not-a-buffer', contentType: 'audio/mpeg', extension: 'mp3' },
+      // empty and oversized buffers
+      { buffer: Buffer.alloc(0), contentType: 'audio/mpeg', extension: 'mp3' },
+      { buffer: Buffer.alloc(MAX_TTS_AUDIO_SIZE_BYTES + 1), contentType: 'audio/mpeg', extension: 'mp3' },
+      // content type outside the curated list (inherited object keys included)
+      { buffer: Buffer.from('x'), contentType: 'application/octet-stream', extension: 'mp3' },
+      { buffer: Buffer.from('x'), contentType: 'constructor', extension: 'mp3' },
+      // extension not matching the curated mapping of the content type
+      { buffer: Buffer.from('x'), contentType: 'audio/mpeg', extension: 'exe' },
+    ];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const payload of invalidPayloads) {
+      registerFakeTtsProvider(stateManager, 'ext-piper-tts', fake.resolves(payload));
+      // eslint-disable-next-line no-await-in-loop
+      await expect(tts.getSpeechUrl({ text: 'Bonjour' })).to.be.rejectedWith(BadParameters);
+    }
+    expect(tts.audios.size).to.equal(0);
   });
 
   it('should throw when the configured provider is gone or invalid — no silent fallback', async () => {
