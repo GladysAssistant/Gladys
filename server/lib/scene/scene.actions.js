@@ -709,12 +709,17 @@ const actionsFunc = {
   },
   [ACTIONS.CONDITION.IF_THEN_ELSE]: async (self, action, scope, path) => {
     const { if: ifActions, then: thenActions, else: elseActions } = action;
-    const { executeActions } = executeActionsFactory(actionsFunc);
+    const { executeAction, executeActions } = executeActionsFactory(actionsFunc);
 
     // verify the conditions
     let conditionsVerified;
     try {
-      await executeActions(self, [ifActions], scope, `${path}.if`, { throwUnknownError: true });
+      // Conditions are executed in parallel, but each one writes in the scope at the path
+      // used by the scene editor, so a variable declared by a condition (for example the
+      // event of a "calendar.is-event-running") can be re-used in the branches.
+      await Promise.map(ifActions, (ifAction, index) =>
+        executeAction(self, ifAction, scope, `${path}.if.${index}`, { throwUnknownError: true }),
+      );
       conditionsVerified = true;
     } catch (e) {
       if (e instanceof AbortScene) {

@@ -22,6 +22,15 @@ const isVariableAvailableAtThisPath = (variableSourcePath, targetPath) => {
       sourceSegments[sourceIndex] === 'else' ||
       sourceSegments[sourceIndex] === 'if'
     ) {
+      // Conditions of a block are always executed before the actions of its branches,
+      // so a variable declared in the "if" block is available in "then" and "else".
+      // This is what makes a loop able to re-use the value it refreshed in its conditions.
+      if (
+        sourceSegments[sourceIndex] === 'if' &&
+        (targetSegments[targetIndex] === 'then' || targetSegments[targetIndex] === 'else')
+      ) {
+        return true;
+      }
       // If target doesn't match the same branch, paths are not comparable
       if (sourceSegments[sourceIndex] !== targetSegments[targetIndex]) {
         return false;
