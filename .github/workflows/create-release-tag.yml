@@ -1,0 +1,58 @@
+name: Create release tag
+run-name: Create ${{ inputs.release_type }} release tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type of version bump'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+
+permissions:
+  contents: write
+
+jobs:
+  create-release-tag:
+    name: Bump version and push tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛑 Ensure workflow runs on master
+        if: github.ref != 'refs/heads/master'
+        run: |
+          echo "This workflow can only be run on master, got ${{ github.ref_name }}."
+          exit 1
+      - name: ⬇️ Checkout Gladys code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          # A PAT is needed for the pushed tag to trigger the release workflows.
+          # Pushes made with the default GITHUB_TOKEN do not trigger other workflows.
+          token: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: './package.json'
+      - name: 🔧 Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: 🔖 Bump version and create tag
+        id: bump
+        run: |
+          NEW_VERSION=$(npm version ${{ inputs.release_type }})
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Created tag ${NEW_VERSION}"
+      - name: 🚀 Push commit and tag
+        run: |
+          git push origin master --follow-tags
+      - name: 📝 Job summary
+        run: |
+          echo "### 🚀 Release ${{ steps.bump.outputs.version }} created" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Bump type: \`${{ inputs.release_type }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tag: [\`${{ steps.bump.outputs.version }}\`](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.bump.outputs.version }})" >> "$GITHUB_STEP_SUMMARY"
