@@ -263,10 +263,12 @@ const VACUUM_CLEANER_STATE = {
   DOCKED: 6,
 };
 
-// Generic EV charge point/connector status - matches OCPP's ChargePointStatus
-// enum (OCPP 1.6/2.x share these same states), but is not itself protocol-
-// specific: any EV charger integration (OCPP-based or not) reporting a
-// comparable lifecycle can map onto it.
+// Generic EV charge point/connector status - values align with OCPP 1.6's
+// ChargePointStatus enum, but is not itself protocol-specific: any EV charger
+// integration (OCPP-based or not) reporting a comparable lifecycle can map
+// onto it. Note: OCPP 2.x uses a different, simplified ConnectorStatusEnumType
+// (Available/Occupied/Reserved/Unavailable/Faulted) and requires its own
+// documented mapping onto these values.
 const EV_CHARGE_CONNECTOR_STATUS = {
   AVAILABLE: 0,
   PREPARING: 1,
