@@ -12,11 +12,15 @@ import style from './IconSelector.css';
 
 // Fold both the query and the searched text down to plain lowercase letters:
 // dashes disappear, so "door open", "door-open" and "dooropen" all match the
-// same icon, and accents do too, so "eclair" finds "éclair" and "vergrossern"
-// finds "vergrößern".
+// same icon, and accents and ligatures do too, so "eclair" finds "éclair",
+// "coeur" finds "Cœur" and "vergrossern" finds "vergrößern".
 const normalize = value =>
   value
     .toLowerCase()
+    // NFD leaves ligatures alone, so the ASCII filter below would drop them
+    // outright: "cœur" became "cur" and matched "curseurs".
+    .replace(/œ/g, 'oe')
+    .replace(/æ/g, 'ae')
     .replace(/ß/g, 'ss')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')

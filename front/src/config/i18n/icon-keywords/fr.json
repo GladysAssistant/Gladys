@@ -365,11 +365,11 @@
   },
   "eye": {
     "keywords": "voir visible regarder afficher",
-    "label": "Oeil"
+    "label": "Œil"
   },
   "eye-off": {
     "keywords": "caché invisible",
-    "label": "Oeil masqué"
+    "label": "Œil masqué"
   },
   "fast-forward": {
     "keywords": "lecture vitesse",
@@ -465,7 +465,7 @@
   },
   "heart": {
     "keywords": "amour favori aimer",
-    "label": "Coeur"
+    "label": "Cœur"
   },
   "help-circle": {
     "keywords": "question support cercle",

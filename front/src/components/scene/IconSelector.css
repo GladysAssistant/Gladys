@@ -34,6 +34,17 @@
   box-shadow: inset 0 0 0 2px #467fcf;
 }
 
+/* The radio itself is visually hidden, so without this a keyboard user tabbing
+   into the grid gets no cue at all about where they are — the selection ring
+   only appears once an icon is picked. :focus-within rather than
+   :has(:focus-visible) because the latter is unsupported on Safari 13, which
+   the build still targets for old wall tablets: the rule would simply be
+   dropped there, exactly where the indicator matters most. */
+.iconDiv:focus-within {
+  outline: 2px solid #467fcf;
+  outline-offset: -1px;
+}
+
 /* The tile is a fixed height but its content is not — a one-line label is much
    shorter than a three-line one. Centre it, otherwise short entries hang from
    the top of the selection outline. */
