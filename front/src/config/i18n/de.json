@@ -5232,7 +5232,7 @@
   "gatewayLinkUser": {
     "title": "Gladys Plus konfigurieren",
     "label": "Wähle deinen Gladys-Benutzer aus",
-    "description": "Wähle den Gladys-Benutzer aus, mit dem du deinen Gladys-Plus-Account verknüpfen möchtest. Dieser Benutzer muss lokal auf deiner Instanz akzeptiert sein: in den Einstellungen deiner Instanz, Tab \"Gladys Plus\", Bereich \"Benutzer\".",
+    "description": "Wähle den Gladys-Benutzer aus, mit dem du deinen Gladys-Plus-Account verknüpfen möchtest. Dieser Benutzer muss lokal auf deiner Instanz autorisiert sein: in den Einstellungen deiner Instanz, Tab \"Gladys Plus\", Abschnitt \"Remote-Benutzer\".",
     "noInstanceFoundTitle": "Nur noch ein Schritt!",
     "noInstanceFoundIntro": "Dein Gladys-Plus-Account ist aktiv 🙂 Es bleibt nur noch, deine Gladys-Instanz (die bei dir zu Hause installierte) mit deinem Gladys-Plus-Account zu verbinden. Das ist ein normaler Schritt bei der ersten Nutzung von Gladys Plus, nichts ist kaputt! Folge diesen Schritten:",
     "noInstanceFoundStepOpenLocalInstance": "Öffne deine Gladys-Instanz <b>lokal</b>, von deinem Heimnetzwerk aus, über ihre übliche lokale Adresse (zum Beispiel <code>http://ip-adresse-deines-geräts</code>).",

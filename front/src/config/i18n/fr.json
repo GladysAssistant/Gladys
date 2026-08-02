@@ -5232,7 +5232,7 @@
   "gatewayLinkUser": {
     "title": "Configurer Gladys Plus",
     "label": "Sélectionnez votre utilisateur Gladys",
-    "description": "Sélectionnez l'utilisateur Gladys auquel lier votre compte Gladys Plus. Cet utilisateur doit être accepté localement sur votre instance : dans les paramètres de votre instance, onglet \"Gladys Plus\", section \"Utilisateurs\".",
+    "description": "Sélectionnez l'utilisateur Gladys auquel lier votre compte Gladys Plus. Cet utilisateur doit être autorisé localement sur votre instance : dans les paramètres de votre instance, onglet « Gladys Plus », section « Utilisateurs distants ».",
     "noInstanceFoundTitle": "Plus qu'une étape !",
     "noInstanceFoundIntro": "Votre compte Gladys Plus est bien actif 🙂 Il ne reste plus qu'à connecter votre instance Gladys (celle installée chez vous) à votre compte Gladys Plus. C'est une étape normale lors de la première utilisation, rien n'est cassé ! Suivez ces étapes :",
     "noInstanceFoundStepOpenLocalInstance": "Ouvrez votre instance Gladys <b>en local</b>, depuis votre réseau à la maison, via son adresse locale habituelle (par exemple <code>http://adresse-ip-de-votre-appareil</code>).",

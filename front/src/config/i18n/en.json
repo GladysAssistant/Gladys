@@ -5231,8 +5231,8 @@
   },
   "gatewayLinkUser": {
     "title": "Configure Gladys Plus",
-    "label": "Select you Gladys user",
-    "description": "Select the Gladys user you want to link your Gladys Plus account to. This user must be accepted locally on your instance: in your instance settings, \"Gladys Plus\" tab, \"Users\" section.",
+    "label": "Select your Gladys user",
+    "description": "Select the Gladys user you want to link your Gladys Plus account to. This user must be authorized locally on your instance: in your instance settings, \"Gladys Plus\" tab, \"Remote users\" section.",
     "noInstanceFoundTitle": "One last step!",
     "noInstanceFoundIntro": "Your Gladys Plus account is active 🙂 The only thing left is to connect your Gladys instance (the one installed at your home) to your Gladys Plus account. This is a normal step the first time you use Gladys Plus, nothing is broken! Follow these steps:",
     "noInstanceFoundStepOpenLocalInstance": "Open your Gladys instance <b>locally</b>, from your home network, using its usual local address (for example <code>http://your-device-ip-address</code>).",
