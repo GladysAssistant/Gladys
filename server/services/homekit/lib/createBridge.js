@@ -1,7 +1,6 @@
 const uuid = require('uuid');
 const { EVENTS } = require('../../../utils/constants');
 const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
-const { mappings } = require('./deviceMappings');
 
 /**
  * @description Create HomeKit bridge.
@@ -33,13 +32,8 @@ async function createBridge() {
     pincode = await this.newPinCode();
   }
 
-  const devices = await this.gladys.device.get();
-  const compatibleDevices = devices.filter((device) => {
-    return device.features.find((feature) => {
-      return Object.keys(mappings).includes(feature.category);
-    });
-  });
-  const accessories = compatibleDevices
+  const exposedDevices = await this.getExposedDevices();
+  const accessories = exposedDevices
     .map((device) => this.buildAccessory(device))
     .filter((accessory) => accessory !== null);
 
