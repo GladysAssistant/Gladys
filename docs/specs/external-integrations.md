@@ -750,7 +750,7 @@ Field-by-field justification:
 | `CapDrop` | `ALL` | no Linux capabilities |
 | `SecurityOpt` | `no-new-privileges` | no escalation via setuid binaries |
 | `Memory`/`MemorySwap` | 256 MB (same values) | swap = memory ⇒ **no swap**; OOM kill → supervised restart |
-| `NanoCpus` | `500000000` (0.5 CPU) | an integration cannot starve Gladys on a Raspberry Pi |
+| `NanoCpus` | `500000000` (0.5 CPU) | an integration cannot starve Gladys on a Raspberry Pi; **omitted** when `docker info` reports `CPUCfsQuota: false` (e.g. Synology DSM kernels without the CFS scheduler), otherwise the daemon rejects the creation with an HTTP 400 |
 | `PidsLimit` | 100 | anti fork-bomb |
 | `Binds` | a single one: `<basePath>/external-integrations/<selector>:/data` | the integration's local persistence; survives container recreations, removed at uninstall |
 | `Tmpfs /tmp` | `noexec,nosuid,64m` | scratch in RAM, no execution of dropped binaries |
@@ -769,7 +769,7 @@ Field-by-field justification:
 | Ports | `PortBindings` only for the declared `ports[]` — host port **chosen by Gladys** (free at first start, then persisted), bound to `0.0.0.0` (LAN access assumed and displayed at install, see B.14.8) |
 | Devices | `Devices` = intersection **requested (manifest) ∩ granted (`granted_devices`, UI toggles) ∩ present (detection)** — classes resolved by the supervisor: `coral-usb` → `/dev/bus/usb`, `coral-pcie` → `/dev/apex_*`, `gpu` → `/dev/dri`, `video` → `/dev/video*`; recomputed at every container creation |
 | Rootfs | `ReadonlyRootfs` per the manifest's `read_only` (default `true`) |
-| Limits | `Memory`/`MemorySwap` = `memory_mb` (default 256), `NanoCpus` = `cpu` (default 0.5), `ShmSize` = `shm_mb` (default 64) — manifest values, displayed at install |
+| Limits | `Memory`/`MemorySwap` = `memory_mb` (default 256), `NanoCpus` = `cpu` (default 0.5, omitted like on the main container when the kernel has no CFS scheduler), `ShmSize` = `shm_mb` (default 64) — manifest values, displayed at install |
 | Labels | `io.gladysassistant.external-integration: <selector>` (same reconciliation key as the main one — a single filter catches the whole group) + `io.gladysassistant.container: <name>` |
 
 The private network `gladys-int-<selector>` is created at install and carries the same label — uninstall and boot-time reconciliation remove containers **and** network through the same filter.
