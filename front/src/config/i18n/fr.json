@@ -4205,7 +4205,9 @@
           "cooling": "Clim.",
           "heating": "Chauffage",
           "drying": "Déshu.",
-          "fan": "Ventil."
+          "fan": "Ventil.",
+          "off": "Arrêt",
+          "energy_heat": "Chauffage éco"
         }
       },
       "heater": {
@@ -4570,6 +4572,14 @@
           "4": "Retour à la base",
           "5": "En charge",
           "6": "Sur la base"
+        }
+      },
+      "thermostat": {
+        "operating-state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Inactif",
+          "1": "Chauffe",
+          "2": "Refroidit"
         }
       }
     }
@@ -5020,7 +5030,8 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Température de consigne"
+      "target-temperature": "Température de consigne",
+      "operating-state": "État de fonctionnement du thermostat"
     },
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",

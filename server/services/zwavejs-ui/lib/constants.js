@@ -6,7 +6,29 @@ const {
   BUTTON_STATUS,
   COVER_STATE,
   DEVICE_FEATURE_UNITS,
+  AC_MODE,
+  THERMOSTAT_OPERATING_STATE,
 } = require('../../../utils/constants');
+
+// Thermostat Mode / Thermostat Setpoint Command Classes values (Z-Wave specification)
+const ZWAVE_THERMOSTAT_MODE = {
+  OFF: 0,
+  HEATING: 1,
+  COOLING: 2,
+  ENERGY_HEAT: 11,
+};
+
+const ZWAVE_THERMOSTAT_SETPOINT_TYPE = {
+  HEATING: 1,
+  COOLING: 2,
+  ENERGY_SAVE_HEATING: 11,
+};
+
+const ZWAVE_THERMOSTAT_OPERATING_STATE = {
+  IDLE: 0,
+  HEATING: 1,
+  COOLING: 2,
+};
 
 const CONFIGURATION = {
   ZWAVEJS_UI_MQTT_URL_KEY: 'ZWAVEJS_UI_MQTT_URL',
@@ -170,6 +192,51 @@ const STATES = {
       ],
     },
   },
+  thermostat_mode: {
+    mode: [
+      {
+        converter: (val) => {
+          switch (val) {
+            case ZWAVE_THERMOSTAT_MODE.OFF:
+              return AC_MODE.OFF;
+            case ZWAVE_THERMOSTAT_MODE.HEATING:
+              return AC_MODE.HEATING;
+            case ZWAVE_THERMOSTAT_MODE.COOLING:
+              return AC_MODE.COOLING;
+            case ZWAVE_THERMOSTAT_MODE.ENERGY_HEAT:
+              return AC_MODE.ENERGY_HEAT;
+            default:
+              return null;
+          }
+        },
+      },
+    ],
+  },
+  thermostat_operating_state: {
+    state: [
+      {
+        converter: (val) => {
+          switch (val) {
+            case ZWAVE_THERMOSTAT_OPERATING_STATE.IDLE:
+              return THERMOSTAT_OPERATING_STATE.IDLE;
+            case ZWAVE_THERMOSTAT_OPERATING_STATE.HEATING:
+              return THERMOSTAT_OPERATING_STATE.HEATING;
+            case ZWAVE_THERMOSTAT_OPERATING_STATE.COOLING:
+              return THERMOSTAT_OPERATING_STATE.COOLING;
+            default:
+              return null;
+          }
+        },
+      },
+    ],
+  },
+  thermostat_setpoint: {
+    setpoint: {
+      heating: [{ converter: (val) => val }],
+      cooling: [{ converter: (val) => val }],
+      energy_save_heating: [{ converter: (val) => val }],
+    },
+  },
 };
 
 /**
@@ -194,15 +261,18 @@ function buildCommandAction(name, value, stateUpdate = null) {
  * @param {string} property - Property name.
  * @param {any} value - Value to write.
  * @param {Array|null} stateUpdate - State synchronization.
+ * @param {number|string|null} propertyKey - Z-Wave propertyKey, for properties with multiple
+ * instances (e.g. Thermostat Setpoint).
  * @returns {object} Action to perform.
  * @example buildWriteValueAction('targetValue', 99, [{property_name: 'position', feature_name: 'position', value: 99}])
  */
-function buildWriteValueAction(property, value, stateUpdate = null) {
+function buildWriteValueAction(property, value, stateUpdate = null, propertyKey = null) {
   return {
     isCommand: false,
     name: property,
     value,
     stateUpdate: stateUpdate || [],
+    propertyKey,
   };
 }
 const multilevelSwitchCurtainsActionsDefault = {
@@ -327,6 +397,31 @@ const ACTIONS = {
     '17-5': multilevelSwitchCurtainsActionsDefault,
     '17-6': multilevelSwitchCurtainsActionsDefault,
     '17-7': multilevelSwitchCurtainsActionsDefault,
+  },
+  thermostat_mode: {
+    mode: (value, _nodeContext) => {
+      switch (value) {
+        case AC_MODE.OFF:
+          return buildWriteValueAction('mode', ZWAVE_THERMOSTAT_MODE.OFF);
+        case AC_MODE.COOLING:
+          return buildWriteValueAction('mode', ZWAVE_THERMOSTAT_MODE.COOLING);
+        case AC_MODE.ENERGY_HEAT:
+          return buildWriteValueAction('mode', ZWAVE_THERMOSTAT_MODE.ENERGY_HEAT);
+        case AC_MODE.HEATING:
+        default:
+          return buildWriteValueAction('mode', ZWAVE_THERMOSTAT_MODE.HEATING);
+      }
+    },
+  },
+  thermostat_setpoint: {
+    setpoint: {
+      heating: (value, _nodeContext) =>
+        buildWriteValueAction('setpoint', value, null, ZWAVE_THERMOSTAT_SETPOINT_TYPE.HEATING),
+      cooling: (value, _nodeContext) =>
+        buildWriteValueAction('setpoint', value, null, ZWAVE_THERMOSTAT_SETPOINT_TYPE.COOLING),
+      energy_save_heating: (value, _nodeContext) =>
+        buildWriteValueAction('setpoint', value, null, ZWAVE_THERMOSTAT_SETPOINT_TYPE.ENERGY_SAVE_HEATING),
+    },
   },
 };
 
@@ -631,6 +726,68 @@ const EXPOSES = {
         max: 1,
         keep_history: true,
         read_only: true,
+        has_feedback: true,
+      },
+    },
+  },
+  thermostat_mode: {
+    mode: {
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+      min: AC_MODE.COOLING,
+      max: AC_MODE.ENERGY_HEAT,
+      keep_history: true,
+      read_only: false,
+      has_feedback: true,
+      supported_options: [
+        { value: AC_MODE.OFF, label: 'Off', sort_order: 0 },
+        { value: AC_MODE.HEATING, label: 'Heat', sort_order: 1 },
+        { value: AC_MODE.COOLING, label: 'Cool', sort_order: 2 },
+        { value: AC_MODE.ENERGY_HEAT, label: 'Energy Heat', sort_order: 3 },
+      ],
+    },
+  },
+  thermostat_operating_state: {
+    state: {
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
+      min: THERMOSTAT_OPERATING_STATE.IDLE,
+      max: THERMOSTAT_OPERATING_STATE.COOLING,
+      keep_history: true,
+      read_only: true,
+      has_feedback: true,
+    },
+  },
+  thermostat_setpoint: {
+    setpoint: {
+      heating: {
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        min: 5,
+        max: 40,
+        keep_history: true,
+        read_only: false,
+        has_feedback: true,
+      },
+      cooling: {
+        category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+        type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        min: 5,
+        max: 40,
+        keep_history: true,
+        read_only: false,
+        has_feedback: true,
+      },
+      energy_save_heating: {
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
+        min: 5,
+        max: 40,
+        keep_history: true,
+        read_only: false,
         has_feedback: true,
       },
     },

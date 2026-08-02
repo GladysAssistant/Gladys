@@ -10,7 +10,9 @@ const AC_MODE_TRANSLATION_KEYS = {
   [AC_MODE.COOLING]: 'cooling',
   [AC_MODE.HEATING]: 'heating',
   [AC_MODE.DRYING]: 'drying',
-  [AC_MODE.FAN]: 'fan'
+  [AC_MODE.FAN]: 'fan',
+  [AC_MODE.OFF]: 'off',
+  [AC_MODE.ENERGY_HEAT]: 'energy_heat'
 };
 
 const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
@@ -22,8 +24,16 @@ const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
     modes = [...supportedOptions].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
   } else {
     // Legacy features without supported_options: auto/cool/heat, plus
-    // dry/fan when the feature range covers them
-    modes = [AC_MODE.AUTO, AC_MODE.COOLING, AC_MODE.HEATING, AC_MODE.DRYING, AC_MODE.FAN]
+    // dry/fan/off/energy heat when the feature range covers them
+    modes = [
+      AC_MODE.AUTO,
+      AC_MODE.COOLING,
+      AC_MODE.HEATING,
+      AC_MODE.DRYING,
+      AC_MODE.FAN,
+      AC_MODE.OFF,
+      AC_MODE.ENERGY_HEAT
+    ]
       .filter(mode => mode <= AC_MODE.HEATING || mode <= deviceFeature.max)
       .map(mode => ({ value: mode }));
   }

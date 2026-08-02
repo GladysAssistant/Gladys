@@ -5,7 +5,7 @@ const { assert, fake } = sinon;
 
 const ZwaveJSUIHandler = require('../../../../services/zwavejs-ui/lib');
 const { BadParameters } = require('../../../../utils/coreErrors');
-const { STATE, COVER_STATE } = require('../../../../utils/constants');
+const { STATE, COVER_STATE, AC_MODE } = require('../../../../utils/constants');
 
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -1583,5 +1583,134 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     // Assert state has not been updated
     assert.neverCalledWith(gladys.device.saveState, gladysDevice.features[0], sinon.match.any);
+  });
+
+  [
+    { gladysMode: AC_MODE.OFF, zwaveMode: 0 },
+    { gladysMode: AC_MODE.HEATING, zwaveMode: 1 },
+    { gladysMode: AC_MODE.COOLING, zwaveMode: 2 },
+    { gladysMode: AC_MODE.ENERGY_HEAT, zwaveMode: 11 },
+  ].forEach(({ gladysMode, zwaveMode }) => {
+    it(`should set thermostat mode (${gladysMode} -> ${zwaveMode})`, async () => {
+      const mqttClient = {
+        publish: fake.returns(null),
+      };
+
+      const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+      zwaveJSUIHandler.mqttClient = mqttClient;
+      zwaveJSUIHandler.devices = [
+        {
+          external_id: 'zwavejs-ui:16',
+          features: [
+            {
+              command_class: 64,
+              command_class_name: 'Thermostat Mode',
+              endpoint: 1,
+              external_id: 'zwavejs-ui:16:1:thermostat_mode:mode',
+              node_id: 16,
+              property_key_name: undefined,
+              property_name: 'mode',
+            },
+          ],
+        },
+      ];
+      zwaveJSUIHandler.zwaveJSDevices = [
+        {
+          id: 16,
+          deviceClass: {
+            basic: 4,
+            generic: 8,
+            specific: 6,
+          },
+        },
+      ];
+
+      const gladysDevice = {
+        id: 'gladys-device-db-id-001',
+        external_id: 'zwavejs-ui:16',
+        features: [
+          {
+            id: 'gladys-device-feature-db-id-001',
+            device_id: 'gladys-device-db-id-001',
+            external_id: 'zwavejs-ui:16:1:thermostat_mode:mode',
+          },
+        ],
+      };
+      await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], gladysMode);
+
+      const mqttPayload = {
+        args: [{ nodeId: 16, commandClass: 64, endpoint: 1, property: 'mode' }, zwaveMode],
+      };
+      assert.calledWith(
+        mqttClient.publish,
+        'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+        JSON.stringify(mqttPayload),
+      );
+    });
+  });
+
+  [
+    { propertyKeyName: 'Heating', featureName: 'heating', propertyKey: 1 },
+    { propertyKeyName: 'Cooling', featureName: 'cooling', propertyKey: 2 },
+    { propertyKeyName: 'Energy Save Heating', featureName: 'energy_save_heating', propertyKey: 11 },
+  ].forEach(({ propertyKeyName, featureName, propertyKey }) => {
+    it(`should set thermostat setpoint with the right propertyKey (${featureName})`, async () => {
+      const mqttClient = {
+        publish: fake.returns(null),
+      };
+
+      const externalId = `zwavejs-ui:16:1:thermostat_setpoint:setpoint:${featureName}`;
+
+      const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+      zwaveJSUIHandler.mqttClient = mqttClient;
+      zwaveJSUIHandler.devices = [
+        {
+          external_id: 'zwavejs-ui:16',
+          features: [
+            {
+              command_class: 67,
+              command_class_name: 'Thermostat Setpoint',
+              endpoint: 1,
+              external_id: externalId,
+              node_id: 16,
+              property_key_name: propertyKeyName,
+              property_name: 'setpoint',
+            },
+          ],
+        },
+      ];
+      zwaveJSUIHandler.zwaveJSDevices = [
+        {
+          id: 16,
+          deviceClass: {
+            basic: 4,
+            generic: 8,
+            specific: 6,
+          },
+        },
+      ];
+
+      const gladysDevice = {
+        id: 'gladys-device-db-id-001',
+        external_id: 'zwavejs-ui:16',
+        features: [
+          {
+            id: 'gladys-device-feature-db-id-001',
+            device_id: 'gladys-device-db-id-001',
+            external_id: externalId,
+          },
+        ],
+      };
+      await zwaveJSUIHandler.setValue(gladysDevice, gladysDevice.features[0], 19.5);
+
+      const mqttPayload = {
+        args: [{ nodeId: 16, commandClass: 67, endpoint: 1, property: 'setpoint', propertyKey }, 19.5],
+      };
+      assert.calledWith(
+        mqttClient.publish,
+        'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/writeValue/set',
+        JSON.stringify(mqttPayload),
+      );
+    });
   });
 });
