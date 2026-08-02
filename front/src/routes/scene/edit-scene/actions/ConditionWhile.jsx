@@ -7,9 +7,13 @@ import ActionCard from '../ActionCard';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
-import { CONDITION_ACTIONS } from '../../../../../../server/utils/constants';
+import { ACTIONS, CONDITION_ACTIONS } from '../../../../../../server/utils/constants';
 
 const isNullOrUndefined = variable => variable === null || variable === undefined;
+
+// Conditions of a loop are executed in serie, so "device.get-value" can be used to refresh
+// the value of a device feature before comparing it, on each iteration of the loop.
+const WHILE_CONDITION_ACTIONS = [ACTIONS.DEVICE.GET_VALUE, ...CONDITION_ACTIONS];
 
 class ConditionWhile extends Component {
   constructor(props) {
@@ -23,6 +27,13 @@ class ConditionWhile extends Component {
     this.setState(prevState => ({
       repeatCollapsed: !prevState.repeatCollapsed
     }));
+  };
+
+  handleRepeatKeyDown = e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      this.toggleRepeatCollapse();
+    }
   };
 
   getNumberOfActionsInRepeat = () => {
@@ -44,7 +55,7 @@ class ConditionWhile extends Component {
   }
 
   addCondition = () => {
-    this.props.addAction(`${this.props.path}.if`, { filter: CONDITION_ACTIONS });
+    this.props.addAction(`${this.props.path}.if`, { filter: WHILE_CONDITION_ACTIONS });
   };
 
   updateMaxIterations = e => {
@@ -115,6 +126,10 @@ class ConditionWhile extends Component {
           <div
             class="d-flex justify-content-between align-items-center mb-2 cursor-pointer"
             onClick={this.toggleRepeatCollapse}
+            onKeyDown={this.handleRepeatKeyDown}
+            role="button"
+            tabIndex="0"
+            aria-expanded={!repeatCollapsed}
           >
             <h4>
               <i class={`fe fe-chevron-${repeatCollapsed ? 'right' : 'down'} mr-2`} />

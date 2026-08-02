@@ -649,11 +649,17 @@ const actionsFunc = {
   },
   [ACTIONS.CONDITION.WHILE]: async (self, action, scope, path) => {
     const { if: conditionActions, then: loopActions } = action;
-    const { executeActions } = executeActionsFactory(actionsFunc);
+    const { executeAction, executeActions } = executeActionsFactory(actionsFunc);
 
     // Without conditions, the loop would run until the max iterations safety limit
     if (!conditionActions || conditionActions.length === 0) {
       throw new AbortScene('WHILE_CONDITION_EMPTY');
+    }
+
+    // A loop with an empty body would only burn iterations doing nothing
+    const numberOfActionsInLoop = (loopActions || []).reduce((acc, group) => acc + group.length, 0);
+    if (numberOfActionsInLoop === 0) {
+      throw new AbortScene('WHILE_ACTIONS_EMPTY');
     }
 
     const maxIterations = Math.min(
@@ -663,7 +669,13 @@ const actionsFunc = {
 
     const verifyConditions = async () => {
       try {
-        await executeActions(self, [conditionActions], scope, `${path}.if`, { throwUnknownError: true });
+        // Unlike "if-then-else", conditions are executed in serie: it allows a "device.get-value"
+        // placed before a condition to refresh the scope with the live value of the device
+        // on each iteration, instead of comparing a value read once before the loop.
+        // The path matches the path used by the scene editor, so variables can be re-used.
+        await Promise.mapSeries(conditionActions, (conditionAction, index) =>
+          executeAction(self, conditionAction, scope, `${path}.if.${index}`, { throwUnknownError: true }),
+        );
         return true;
       } catch (e) {
         if (e instanceof AbortScene) {

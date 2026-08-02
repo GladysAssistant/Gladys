@@ -74,7 +74,7 @@ describe('scene.conditionWhile', () => {
     assert.notCalled(message.sendToUser);
   });
 
-  it('should execute loop actions until the condition becomes falsy', async () => {
+  it('should read the live value of a device feature on each iteration', async () => {
     const deviceFeature = {
       device_id: 'device-id',
       category: 'light',
@@ -89,6 +89,9 @@ describe('scene.conditionWhile', () => {
         deviceFeature.last_value = value;
       }),
     };
+    // The scope is empty, exactly like a scene executed without any trigger variable:
+    // the "device.get-value" condition is what seeds and refreshes the value.
+    const scope = {};
     await executeActions(
       { stateManager, event, device },
       [
@@ -97,10 +100,14 @@ describe('scene.conditionWhile', () => {
             type: ACTIONS.CONDITION.WHILE,
             if: [
               {
+                type: ACTIONS.DEVICE.GET_VALUE,
+                device_feature: 'my-device-feature',
+              },
+              {
                 type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
                 conditions: [
                   {
-                    variable: '0.0.then.1.0.last_value',
+                    variable: '0.0.if.0.last_value',
                     operator: '<',
                     value: 100,
                   },
@@ -112,26 +119,43 @@ describe('scene.conditionWhile', () => {
                 {
                   type: ACTIONS.DEVICE.SET_VALUE,
                   device_feature: 'my-device-feature',
-                  evaluate_value: '{{0.0.then.1.0.last_value}} + 10',
-                },
-              ],
-              [
-                {
-                  type: ACTIONS.DEVICE.GET_VALUE,
-                  device_feature: 'my-device-feature',
+                  evaluate_value: '{{0.0.if.0.last_value}} + 10',
                 },
               ],
             ],
           },
         ],
       ],
-      // the loop condition reads a variable refreshed inside the loop body,
-      // so we initialize it for the first evaluation
-      { '0': { '0': { then: { '1': { '0': { last_value: 70 } } } } } },
+      scope,
     );
     // 70 -> 80 -> 90 -> 100, then condition 100 < 100 fails
     expect(device.setValue.callCount).to.equal(3);
     expect(deviceFeature.last_value).to.equal(100);
+  });
+
+  it('should abort the scene when the loop body is empty', async () => {
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const promise = executeActions(
+      { stateManager, event, message },
+      [
+        [
+          {
+            type: ACTIONS.CONDITION.WHILE,
+            if: [
+              {
+                type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+                conditions: [{ variable: 'a', operator: '=', value: 1 }],
+              },
+            ],
+            // no "then" at all: this used to crash with a non-AbortScene TypeError
+          },
+        ],
+      ],
+      { a: 1 },
+    );
+    await chai.assert.isRejected(promise, AbortScene, 'WHILE_ACTIONS_EMPTY');
   });
 
   it('should stop the loop when max_iterations is reached', async () => {
@@ -217,7 +241,7 @@ describe('scene.conditionWhile', () => {
     assert.notCalled(message.sendToUser);
   });
 
-  it('should throw error, error happened in the condition', async () => {
+  it('should not run the loop when a condition action fails with an unknown error', async () => {
     const message = {
       sendToUser: fake.resolves(null),
     };

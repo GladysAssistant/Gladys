@@ -170,6 +170,8 @@ const ActionCard = ({ children, ...props }) => {
           props.action.type === ACTIONS.SMS.SEND,
         'col-lg-4':
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
+          props.action.type !== ACTIONS.CONDITION.IF_THEN_ELSE &&
+          props.action.type !== ACTIONS.CONDITION.WHILE &&
           props.action.type !== ACTIONS.MESSAGE.SEND &&
           props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING &&
           props.action.type !== ACTIONS.SMS.SEND
