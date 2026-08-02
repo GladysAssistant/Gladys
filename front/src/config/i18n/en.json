@@ -339,7 +339,19 @@
           "dailyForecast": "Forecast for the next 5 days"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
-        "uv": "UV"
+        "uv": "UV",
+        "alertTypes": {
+          "wind": "Strong wind",
+          "rain": "Heavy rain",
+          "flood": "Flood",
+          "thunderstorm": "Thunderstorms",
+          "snow": "Snow and ice",
+          "heat": "Heat wave",
+          "cold": "Extreme cold",
+          "avalanche": "Avalanches",
+          "coastal": "Coastal event",
+          "fog": "Fog"
+        }
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",

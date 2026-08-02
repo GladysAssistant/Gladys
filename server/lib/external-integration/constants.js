@@ -169,13 +169,18 @@ const MAX_WEATHER_ALERT_EVENT_LENGTH = 100;
 const MAX_WEATHER_ALERT_DESCRIPTION_LENGTH = 2000;
 // The generic condition enum of the pivot format; anything else is
 // coerced to 'unknown' (the frontend renders a neutral icon).
+// 'night' is deprecated for providers: send the real condition plus
+// is_day: false instead (a rainy night stays 'rain').
 const WEATHER_CONDITIONS = [
   'clear',
+  'partly-cloudy',
   'cloud',
   'fog',
   'drizzle',
   'rain',
+  'pouring',
   'sleet',
+  'hail',
   'snow',
   'thunderstorm',
   'wind',
@@ -186,6 +191,21 @@ const WEATHER_CONDITIONS = [
 // provider's scale (Météo France vigilance: yellow -> moderate,
 // orange -> severe, red -> extreme).
 const WEATHER_ALERT_SEVERITIES = ['minor', 'moderate', 'severe', 'extreme'];
+// Generic alert phenomenon types, generalized from the MF vigilance
+// phenomena, the MeteoAlarm awareness types and the NWS event catalog.
+// Optional metadata: an invalid type is dropped, the alert is kept.
+const WEATHER_ALERT_TYPES = [
+  'wind',
+  'rain',
+  'flood',
+  'thunderstorm',
+  'snow',
+  'heat',
+  'cold',
+  'avalanche',
+  'coastal',
+  'fog',
+];
 // Reserved GLADYS_* params namespace in discovered devices: only the
 // semantics defined by the spec are accepted. GLADYS_TRANSPORT is the
 // effective transport of the device (cloud/local badge in the UI) —
@@ -304,6 +324,7 @@ module.exports = {
   MAX_WEATHER_ALERT_DESCRIPTION_LENGTH,
   WEATHER_CONDITIONS,
   WEATHER_ALERT_SEVERITIES,
+  WEATHER_ALERT_TYPES,
   RESERVED_PARAM_PREFIX,
   TRANSPORT_PARAM,
   DEVICE_TRANSPORTS,

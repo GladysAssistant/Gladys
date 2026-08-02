@@ -261,6 +261,50 @@ describe('externalIntegration.normalizeWeather', () => {
     expect(weather.hours[0].precipitation_probability).to.equal(100);
   });
 
+  it('should accept the finer conditions and the strict-boolean is_day flag', () => {
+    const weather = normalizeWeather(
+      {
+        temperature: 10,
+        weather: 'partly-cloudy',
+        datetime: '2026-08-01T22:00:00.000Z',
+        is_day: false,
+        hours: [
+          { temperature: 9, weather: 'pouring', datetime: '2026-08-01T23:00:00.000Z', is_day: false },
+          // non-boolean is_day values are dropped, never coerced
+          { temperature: 8, weather: 'hail', datetime: '2026-08-02T00:00:00.000Z', is_day: 1 },
+          { temperature: 8, weather: 'hail', datetime: '2026-08-02T01:00:00.000Z' },
+        ],
+      },
+      'metric',
+    );
+    expect(weather.weather).to.equal('partly-cloudy');
+    expect(weather.is_day).to.equal(false);
+    expect(weather.hours[0].weather).to.equal('pouring');
+    expect(weather.hours[0].is_day).to.equal(false);
+    expect(weather.hours[1].weather).to.equal('hail');
+    expect(weather.hours[1].is_day).to.equal(undefined);
+    expect(weather.hours[2].is_day).to.equal(undefined);
+  });
+
+  it('should keep a valid alert type and drop an invalid one without rejecting the alert', () => {
+    const weather = normalizeWeather(
+      {
+        temperature: 10,
+        weather: 'rain',
+        datetime: '2026-08-01T12:00:00.000Z',
+        alerts: [
+          { severity: 'severe', event: 'Vent violent', type: 'wind' },
+          { severity: 'moderate', event: 'Phénomène local', type: 'tornado-of-frogs' },
+        ],
+      },
+      'metric',
+    );
+    expect(weather.alerts).to.deep.equal([
+      { severity: 'severe', event: 'Vent violent', type: 'wind' },
+      { severity: 'moderate', event: 'Phénomène local' },
+    ]);
+  });
+
   it('should cap the hours, days and alerts arrays', () => {
     const hour = { temperature: 10, weather: 'rain', datetime: '2026-08-01T13:00:00.000Z' };
     const day = { temperature_min: 1, temperature_max: 2, datetime: '2026-08-02T11:00:00.000Z' };

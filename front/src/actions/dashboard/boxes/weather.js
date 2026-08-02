@@ -9,17 +9,28 @@ const BOX_KEY = 'Weather';
 const WEATHER_ICONS = {
   snow: 'fe-cloud-snow',
   rain: 'fe-cloud-rain',
+  pouring: 'fe-cloud-rain',
   drizzle: 'fe-cloud-drizzle',
   thunderstorm: 'fe-cloud-lightning',
   clear: 'fe-sun',
+  'partly-cloudy': 'fe-cloud',
   cloud: 'fe-cloud',
   fog: 'fe-cloud',
   sleet: 'fe-cloud-drizzle',
+  hail: 'fe-cloud-snow',
   wind: 'fe-wind',
   night: 'fe-moon'
 };
 
-const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'fe-question' });
+// is_day is the optional day/night flag of the generic weather format:
+// a clear night renders as a moon while the condition stays 'clear'
+// ('night' as a condition is deprecated but still rendered)
+const translateWeatherToFeIcon = (weather, isDay) => {
+  if (weather === 'clear' && isDay === false) {
+    return 'fe-moon';
+  }
+  return get(WEATHER_ICONS, weather, { default: 'fe-question' });
+};
 
 function createActions(store) {
   const boxActions = createBoxActions(store);
@@ -32,7 +43,7 @@ function createActions(store) {
         weather.datetime_beautiful = dayjs(weather.datetime)
           .locale(state.user.language)
           .format('D MMM');
-        weather.weatherIcon = translateWeatherToFeIcon(weather.weather);
+        weather.weatherIcon = translateWeatherToFeIcon(weather.weather, weather.is_day);
         // optional fields of the generic weather format: only present when
         // the provider supplies them
         if (weather.sunrise) {
@@ -44,7 +55,7 @@ function createActions(store) {
 
         if (weather.hours) {
           weather.hours.map(hour => {
-            hour.weatherIcon = translateWeatherToFeIcon(hour.weather);
+            hour.weatherIcon = translateWeatherToFeIcon(hour.weather, hour.is_day);
             hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
           });
         }

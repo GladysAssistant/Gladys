@@ -339,7 +339,19 @@
           "dailyForecast": "Vorhersage für die nächsten 5 Tage"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
-        "uv": "UV"
+        "uv": "UV",
+        "alertTypes": {
+          "wind": "Starker Wind",
+          "rain": "Starkregen",
+          "flood": "Hochwasser",
+          "thunderstorm": "Gewitter",
+          "snow": "Schnee und Glätte",
+          "heat": "Hitzewelle",
+          "cold": "Extreme Kälte",
+          "avalanche": "Lawinen",
+          "coastal": "Sturmflut",
+          "fog": "Nebel"
+        }
       },
       "devicesInRoom": {
         "editRoomLabel": "Wähle den Raum aus, den du hier anzeigen möchtest.",

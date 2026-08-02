@@ -7,6 +7,7 @@ const {
   MAX_WEATHER_ALERT_DESCRIPTION_LENGTH,
   WEATHER_CONDITIONS,
   WEATHER_ALERT_SEVERITIES,
+  WEATHER_ALERT_TYPES,
 } = require('./constants');
 
 /**
@@ -74,6 +75,21 @@ function copyOptionalNumbers(source, target, fields) {
     // an out-of-range value must never reach it
     target[field] = PERCENT_FIELDS.includes(field) ? Math.min(100, Math.max(0, value)) : value;
   });
+}
+
+/**
+ * @description Copy the optional is_day flag of an entry. Strict boolean
+ * only: truthy strings or numbers are dropped, never coerced — an absent
+ * flag renders as day, a wrong guess would flip the whole icon set.
+ * @param {object} source - The raw entry sent by the integration.
+ * @param {object} target - The normalized entry.
+ * @example
+ * copyIsDay(payload, current);
+ */
+function copyIsDay(source, target) {
+  if (typeof source.is_day === 'boolean') {
+    target.is_day = source.is_day;
+  }
 }
 
 /**
@@ -165,6 +181,7 @@ function normalizeWeather(payload, units) {
   };
   copyOptionalNumbers(payload, weather, CURRENT_OPTIONAL_NUMBERS);
   copyOptionalDates(payload, weather, ['sunrise', 'sunset']);
+  copyIsDay(payload, weather);
   if (Array.isArray(payload.hours)) {
     weather.hours = [];
     payload.hours.slice(0, MAX_WEATHER_HOURS).forEach((rawHour) => {
@@ -183,6 +200,7 @@ function normalizeWeather(payload, units) {
         units: pivotUnits,
       };
       copyOptionalNumbers(rawHour, hour, HOUR_OPTIONAL_NUMBERS);
+      copyIsDay(rawHour, hour);
       weather.hours.push(hour);
     });
   }
@@ -228,6 +246,11 @@ function normalizeWeather(payload, units) {
         severity: rawAlert.severity,
         event,
       };
+      // optional phenomenon type: invalid values are dropped, the alert
+      // is kept and rendered from its event text alone
+      if (WEATHER_ALERT_TYPES.includes(rawAlert.type)) {
+        alert.type = rawAlert.type;
+      }
       if (typeof rawAlert.description === 'string' && rawAlert.description.trim().length > 0) {
         alert.description = rawAlert.description.trim().substring(0, MAX_WEATHER_ALERT_DESCRIPTION_LENGTH);
       }

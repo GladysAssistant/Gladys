@@ -36,6 +36,21 @@ const ALERT_SEVERITY_COLORS = {
   extreme: '#e74c3c'
 };
 
+// pictogram per generic alert phenomenon type; untyped alerts keep the
+// generic warning triangle
+const ALERT_TYPE_ICONS = {
+  wind: 'fe-wind',
+  rain: 'fe-cloud-rain',
+  flood: 'fe-droplet',
+  thunderstorm: 'fe-cloud-lightning',
+  snow: 'fe-cloud-snow',
+  heat: 'fe-sun',
+  cold: 'fe-thermometer',
+  avalanche: 'fe-alert-triangle',
+  coastal: 'fe-anchor',
+  fog: 'fe-cloud'
+};
+
 const WeatherBox = ({ children, ...props }) => (
   <div class="card">
     {props.boxStatus === GetWeatherStatus.HouseHasNoCoordinates && (
@@ -139,8 +154,14 @@ const WeatherBox = ({ children, ...props }) => (
                 }}
                 title={alert.description || alert.event}
               >
-                <i class="fe fe-alert-triangle mr-1" />
-                {alert.event}
+                <i class={cx('fe', 'mr-1', ALERT_TYPE_ICONS[alert.type] || 'fe-alert-triangle')} />
+                {/* typed alerts get a translated label, the provider's
+                free-text event stays the fallback */}
+                {alert.type ? (
+                  <Text id={`dashboard.boxes.weather.alertTypes.${alert.type}`}>{alert.event}</Text>
+                ) : (
+                  alert.event
+                )}
               </span>
             ))}
           </div>
