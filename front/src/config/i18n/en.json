@@ -3673,6 +3673,10 @@
     "getAreaError": "Unable to get data from this zone. Please refresh this page to retry.",
     "deleteAreaError": "Unable to delete this zone. Please refresh this page and retry."
   },
+  "iconSelector": {
+    "searchPlaceholder": "Search an icon (lightbulb, door, car...)",
+    "noResult": "No icon matches \"{{search}}\"."
+  },
   "newScene": {
     "cardTitle": "New scene",
     "nameLabel": "Name",

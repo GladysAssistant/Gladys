@@ -3673,6 +3673,10 @@
     "deleteAreaError": "Impossible de supprimer cette zone. Rafraichissez cette page et réessayez.",
     "getAreaError": "Impossible de récupérer les informations de cette zone. Merci de rafraichir cette page et de réessayer."
   },
+  "iconSelector": {
+    "searchPlaceholder": "Rechercher une icône (lightbulb, door, car...)",
+    "noResult": "Aucune icône ne correspond à \"{{search}}\"."
+  },
   "newScene": {
     "cardTitle": "Nouvelle scène",
     "nameLabel": "Nom",

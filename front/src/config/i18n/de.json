@@ -3673,6 +3673,10 @@
     "getAreaError": "Daten dieser Zone können nicht abgerufen werden. Bitte aktualisiere diese Seite, um es erneut zu versuchen.",
     "deleteAreaError": "Diese Zone kann nicht gelöscht werden. Bitte aktualisiere diese Seite und versuche es erneut."
   },
+  "iconSelector": {
+    "searchPlaceholder": "Symbol suchen (lightbulb, door, car...)",
+    "noResult": "Kein Symbol entspricht \"{{search}}\"."
+  },
   "newScene": {
     "cardTitle": "Neue Szene",
     "nameLabel": "Name",
