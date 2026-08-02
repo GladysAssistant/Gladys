@@ -4,6 +4,7 @@ const {
   DEVICE_FEATURE_TYPES
 } = require('../../server/utils/constants');
 const i18n = require('../src/config/i18n/en.json');
+const iconList = require('../../server/config/icons.json');
 const get = require('get-value');
 
 const missingKeys = [];
@@ -36,6 +37,28 @@ featureParentKey.forEach(parentKey => {
       const feature = DEVICE_FEATURE_TYPES[categoryKey][featureKey];
       checkTranslation(`${parentKey}.${category}.${feature}`, 'feature', `${categoryKey}.${featureKey}`);
     });
+  });
+});
+
+// Check scene icon labels and search keywords. Every icon needs a label in
+// every language: it is displayed under the icon in the picker, and an icon
+// without one would be unreachable through the search box in that language.
+// Entries for icons that no longer exist are reported too, so the files cannot
+// silently drift from icons.json.
+['en', 'fr', 'de'].forEach(language => {
+  // eslint-disable-next-line global-require, import/no-dynamic-require
+  const icons = require(`../src/config/i18n/icon-keywords/${language}.json`);
+
+  iconList.forEach(icon => {
+    if (!get(icons, `${icon}.label`)) {
+      missingKeys.push(`icon label ${icon} ==> icon-keywords/${language}.json`);
+    }
+  });
+
+  Object.keys(icons).forEach(icon => {
+    if (!iconList.includes(icon)) {
+      missingKeys.push(`unknown icon "${icon}" in icon-keywords/${language}.json ==> not in server/config/icons.json`);
+    }
   });
 });
 

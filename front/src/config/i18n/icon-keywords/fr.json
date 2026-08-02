@@ -1,0 +1,1050 @@
+{
+  "activity": {
+    "keywords": "pouls rythme graphique",
+    "label": "Activité"
+  },
+  "airplay": {
+    "keywords": "partage streaming",
+    "label": "Diffusion écran"
+  },
+  "alert-circle": {
+    "keywords": "attention erreur",
+    "label": "Alerte (cercle)"
+  },
+  "alert-octagon": {
+    "keywords": "danger stop",
+    "label": "Alerte (octogone)"
+  },
+  "alert-triangle": {
+    "keywords": "attention danger",
+    "label": "Alerte (triangle)"
+  },
+  "align-center": {
+    "keywords": "centrer texte",
+    "label": "Aligner au centre"
+  },
+  "align-justify": {
+    "keywords": "aligner texte",
+    "label": "Justifier"
+  },
+  "align-left": {
+    "keywords": "texte",
+    "label": "Aligner à gauche"
+  },
+  "align-right": {
+    "keywords": "texte",
+    "label": "Aligner à droite"
+  },
+  "anchor": {
+    "keywords": "bateau port",
+    "label": "Ancre"
+  },
+  "aperture": {
+    "keywords": "objectif photo appareil",
+    "label": "Ouverture"
+  },
+  "arrow-down": {
+    "keywords": "descendre",
+    "label": "Flèche bas"
+  },
+  "arrow-down-circle": {
+    "keywords": "descendre",
+    "label": "Flèche bas (cercle)"
+  },
+  "arrow-down-left": {
+    "keywords": "",
+    "label": "Flèche bas gauche"
+  },
+  "arrow-down-right": {
+    "keywords": "",
+    "label": "Flèche bas droite"
+  },
+  "arrow-left": {
+    "keywords": "retour",
+    "label": "Flèche gauche"
+  },
+  "arrow-left-circle": {
+    "keywords": "",
+    "label": "Flèche gauche (cercle)"
+  },
+  "arrow-right": {
+    "keywords": "suivant",
+    "label": "Flèche droite"
+  },
+  "arrow-right-circle": {
+    "keywords": "",
+    "label": "Flèche droite (cercle)"
+  },
+  "arrow-up": {
+    "keywords": "monter",
+    "label": "Flèche haut"
+  },
+  "arrow-up-circle": {
+    "keywords": "monter",
+    "label": "Flèche haut (cercle)"
+  },
+  "arrow-up-left": {
+    "keywords": "",
+    "label": "Flèche haut gauche"
+  },
+  "arrow-up-right": {
+    "keywords": "",
+    "label": "Flèche haut droite"
+  },
+  "at-sign": {
+    "keywords": "email mention courriel",
+    "label": "Arobase"
+  },
+  "award": {
+    "keywords": "médaille prix trophée",
+    "label": "Récompense"
+  },
+  "bar-chart": {
+    "keywords": "statistiques diagramme",
+    "label": "Graphique barres"
+  },
+  "bar-chart-2": {
+    "keywords": "statistiques diagramme",
+    "label": "Graphique barres (2)"
+  },
+  "battery": {
+    "keywords": "énergie accumulateur",
+    "label": "Batterie"
+  },
+  "battery-charging": {
+    "keywords": "énergie recharge",
+    "label": "Batterie en charge"
+  },
+  "bell": {
+    "keywords": "notification alarme sonnerie",
+    "label": "Cloche"
+  },
+  "bell-off": {
+    "keywords": "notification muet silence",
+    "label": "Cloche coupée"
+  },
+  "bluetooth": {
+    "keywords": "sans fil",
+    "label": "Bluetooth"
+  },
+  "bold": {
+    "keywords": "texte format",
+    "label": "Gras"
+  },
+  "book": {
+    "keywords": "lecture",
+    "label": "Livre"
+  },
+  "book-open": {
+    "keywords": "lecture",
+    "label": "Livre ouvert"
+  },
+  "bookmark": {
+    "keywords": "marque-page favori signet",
+    "label": "Marque-page"
+  },
+  "box": {
+    "keywords": "carton paquet cube",
+    "label": "Boîte"
+  },
+  "briefcase": {
+    "keywords": "travail bureau serviette",
+    "label": "Mallette"
+  },
+  "calendar": {
+    "keywords": "date agenda planning",
+    "label": "Calendrier"
+  },
+  "camera": {
+    "keywords": "appareil photo",
+    "label": "Caméra"
+  },
+  "camera-off": {
+    "keywords": "appareil photo désactivé",
+    "label": "Caméra coupée"
+  },
+  "cast": {
+    "keywords": "écran télévision streaming",
+    "label": "Diffuser"
+  },
+  "check": {
+    "keywords": "coché ok oui",
+    "label": "Validé"
+  },
+  "check-circle": {
+    "keywords": "coché succès",
+    "label": "Validé (cercle)"
+  },
+  "check-square": {
+    "keywords": "coché case",
+    "label": "Validé (carré)"
+  },
+  "chevron-down": {
+    "keywords": "flèche dérouler",
+    "label": "Chevron bas"
+  },
+  "chevron-left": {
+    "keywords": "flèche",
+    "label": "Chevron gauche"
+  },
+  "chevron-right": {
+    "keywords": "flèche",
+    "label": "Chevron droite"
+  },
+  "chevron-up": {
+    "keywords": "flèche replier",
+    "label": "Chevron haut"
+  },
+  "chevrons-down": {
+    "keywords": "chevrons flèche",
+    "label": "Double chevron bas"
+  },
+  "chevrons-left": {
+    "keywords": "chevrons flèche",
+    "label": "Double chevron gauche"
+  },
+  "chevrons-right": {
+    "keywords": "chevrons flèche",
+    "label": "Double chevron droite"
+  },
+  "chevrons-up": {
+    "keywords": "chevrons flèche",
+    "label": "Double chevron haut"
+  },
+  "chrome": {
+    "keywords": "navigateur google",
+    "label": "Chrome"
+  },
+  "circle": {
+    "keywords": "rond forme",
+    "label": "Cercle"
+  },
+  "clipboard": {
+    "keywords": "presse-papier copier coller bloc-notes",
+    "label": "Presse-papier"
+  },
+  "clock": {
+    "keywords": "heure temps montre pendule",
+    "label": "Horloge"
+  },
+  "cloud": {
+    "keywords": "ciel météo",
+    "label": "Nuage"
+  },
+  "cloud-drizzle": {
+    "keywords": "nuage pluie météo",
+    "label": "Bruine"
+  },
+  "cloud-lightning": {
+    "keywords": "nuage éclair foudre météo",
+    "label": "Orage"
+  },
+  "cloud-off": {
+    "keywords": "désactivé hors ligne",
+    "label": "Nuage coupé"
+  },
+  "cloud-rain": {
+    "keywords": "nuage météo",
+    "label": "Pluie"
+  },
+  "cloud-snow": {
+    "keywords": "nuage hiver météo",
+    "label": "Neige"
+  },
+  "code": {
+    "keywords": "programmation développeur",
+    "label": "Code"
+  },
+  "codepen": {
+    "keywords": "développeur",
+    "label": "CodePen"
+  },
+  "command": {
+    "keywords": "touche raccourci mac",
+    "label": "Commande"
+  },
+  "compass": {
+    "keywords": "direction navigation orientation",
+    "label": "Boussole"
+  },
+  "copy": {
+    "keywords": "dupliquer",
+    "label": "Copier"
+  },
+  "corner-down-left": {
+    "keywords": "flèche",
+    "label": "Coin bas gauche"
+  },
+  "corner-down-right": {
+    "keywords": "flèche",
+    "label": "Coin bas droite"
+  },
+  "corner-left-down": {
+    "keywords": "flèche",
+    "label": "Coin gauche bas"
+  },
+  "corner-left-up": {
+    "keywords": "flèche",
+    "label": "Coin gauche haut"
+  },
+  "corner-right-down": {
+    "keywords": "flèche",
+    "label": "Coin droite bas"
+  },
+  "corner-right-up": {
+    "keywords": "flèche",
+    "label": "Coin droite haut"
+  },
+  "corner-up-left": {
+    "keywords": "flèche",
+    "label": "Coin haut gauche"
+  },
+  "corner-up-right": {
+    "keywords": "flèche",
+    "label": "Coin haut droite"
+  },
+  "cpu": {
+    "keywords": "puce ordinateur",
+    "label": "Processeur"
+  },
+  "credit-card": {
+    "keywords": "paiement banque crédit",
+    "label": "Carte bancaire"
+  },
+  "crop": {
+    "keywords": "rogner image",
+    "label": "Recadrer"
+  },
+  "crosshair": {
+    "keywords": "cible précision mire",
+    "label": "Viseur"
+  },
+  "database": {
+    "keywords": "stockage",
+    "label": "Base de données"
+  },
+  "delete": {
+    "keywords": "effacer retour arrière",
+    "label": "Supprimer"
+  },
+  "disc": {
+    "keywords": "cd dvd album musique",
+    "label": "Disque"
+  },
+  "dollar-sign": {
+    "keywords": "argent monnaie prix",
+    "label": "Dollar"
+  },
+  "download": {
+    "keywords": "enregistrer descendre",
+    "label": "Télécharger"
+  },
+  "download-cloud": {
+    "keywords": "descendre",
+    "label": "Téléchargement (nuage)"
+  },
+  "droplet": {
+    "keywords": "eau humidité pluie",
+    "label": "Goutte"
+  },
+  "edit": {
+    "keywords": "éditer écrire",
+    "label": "Modifier"
+  },
+  "edit-2": {
+    "keywords": "éditer écrire",
+    "label": "Modifier (crayon)"
+  },
+  "edit-3": {
+    "keywords": "éditer écrire",
+    "label": "Modifier (stylo)"
+  },
+  "external-link": {
+    "keywords": "ouvrir nouvel onglet",
+    "label": "Lien externe"
+  },
+  "eye": {
+    "keywords": "voir visible regarder afficher",
+    "label": "Œil"
+  },
+  "eye-off": {
+    "keywords": "caché invisible",
+    "label": "Œil masqué"
+  },
+  "fast-forward": {
+    "keywords": "lecture vitesse",
+    "label": "Avance rapide"
+  },
+  "feather": {
+    "keywords": "léger écrire",
+    "label": "Plume"
+  },
+  "file": {
+    "keywords": "document",
+    "label": "Fichier"
+  },
+  "file-minus": {
+    "keywords": "retirer document",
+    "label": "Fichier moins"
+  },
+  "file-plus": {
+    "keywords": "ajouter nouveau document",
+    "label": "Fichier plus"
+  },
+  "file-text": {
+    "keywords": "document",
+    "label": "Fichier texte"
+  },
+  "film": {
+    "keywords": "vidéo cinéma pellicule",
+    "label": "Film"
+  },
+  "filter": {
+    "keywords": "trier entonnoir",
+    "label": "Filtre"
+  },
+  "flag": {
+    "keywords": "marquer signaler pays",
+    "label": "Drapeau"
+  },
+  "folder": {
+    "keywords": "répertoire",
+    "label": "Dossier"
+  },
+  "folder-minus": {
+    "keywords": "retirer répertoire",
+    "label": "Dossier moins"
+  },
+  "folder-plus": {
+    "keywords": "ajouter nouveau",
+    "label": "Dossier plus"
+  },
+  "git-branch": {
+    "keywords": "développeur version",
+    "label": "Branche Git"
+  },
+  "git-commit": {
+    "keywords": "développeur version",
+    "label": "Commit Git"
+  },
+  "git-merge": {
+    "keywords": "développeur version",
+    "label": "Fusion Git"
+  },
+  "git-pull-request": {
+    "keywords": "développeur",
+    "label": "Pull request Git"
+  },
+  "github": {
+    "keywords": "développeur code",
+    "label": "GitHub"
+  },
+  "gitlab": {
+    "keywords": "développeur code",
+    "label": "GitLab"
+  },
+  "globe": {
+    "keywords": "monde terre internet langue",
+    "label": "Globe"
+  },
+  "grid": {
+    "keywords": "tableau disposition carreaux",
+    "label": "Grille"
+  },
+  "hard-drive": {
+    "keywords": "stockage",
+    "label": "Disque dur"
+  },
+  "hash": {
+    "keywords": "hashtag numéro",
+    "label": "Dièse"
+  },
+  "headphones": {
+    "keywords": "musique écouter",
+    "label": "Casque audio"
+  },
+  "heart": {
+    "keywords": "amour favori aimer",
+    "label": "Cœur"
+  },
+  "help-circle": {
+    "keywords": "question support cercle",
+    "label": "Aide"
+  },
+  "home": {
+    "keywords": "accueil domicile principal",
+    "label": "Maison"
+  },
+  "image": {
+    "keywords": "photo illustration",
+    "label": "Image"
+  },
+  "inbox": {
+    "keywords": "courrier messages",
+    "label": "Boîte de réception"
+  },
+  "info": {
+    "keywords": "détails à propos",
+    "label": "Information"
+  },
+  "instagram": {
+    "keywords": "réseau social photo",
+    "label": "Instagram"
+  },
+  "italic": {
+    "keywords": "texte format",
+    "label": "Italique"
+  },
+  "layers": {
+    "keywords": "couches niveaux empiler",
+    "label": "Calques"
+  },
+  "layout": {
+    "keywords": "disposition grille",
+    "label": "Mise en page"
+  },
+  "life-buoy": {
+    "keywords": "aide secours support",
+    "label": "Bouée de sauvetage"
+  },
+  "link": {
+    "keywords": "url chaîne",
+    "label": "Lien"
+  },
+  "link-2": {
+    "keywords": "url chaîne",
+    "label": "Lien (2)"
+  },
+  "linkedin": {
+    "keywords": "réseau social travail",
+    "label": "LinkedIn"
+  },
+  "list": {
+    "keywords": "énumération éléments",
+    "label": "Liste"
+  },
+  "loader": {
+    "keywords": "attente rotation",
+    "label": "Chargement"
+  },
+  "lock": {
+    "keywords": "verrouillé sécurité",
+    "label": "Cadenas fermé"
+  },
+  "log-in": {
+    "keywords": "entrer se connecter",
+    "label": "Connexion"
+  },
+  "log-out": {
+    "keywords": "sortir quitter",
+    "label": "Déconnexion"
+  },
+  "mail": {
+    "keywords": "email enveloppe message",
+    "label": "Courrier"
+  },
+  "map": {
+    "keywords": "plan navigation",
+    "label": "Carte"
+  },
+  "map-pin": {
+    "keywords": "position lieu gps localisation",
+    "label": "Épingle de carte"
+  },
+  "maximize": {
+    "keywords": "agrandir",
+    "label": "Plein écran"
+  },
+  "maximize-2": {
+    "keywords": "plein écran étendre",
+    "label": "Agrandir (2)"
+  },
+  "menu": {
+    "keywords": "navigation hamburger",
+    "label": "Menu"
+  },
+  "message-circle": {
+    "keywords": "discussion commentaire",
+    "label": "Message (bulle ronde)"
+  },
+  "message-square": {
+    "keywords": "discussion commentaire",
+    "label": "Message (bulle carrée)"
+  },
+  "mic": {
+    "keywords": "microphone voix enregistrer",
+    "label": "Micro"
+  },
+  "mic-off": {
+    "keywords": "muet microphone",
+    "label": "Micro coupé"
+  },
+  "minimize": {
+    "keywords": "diminuer",
+    "label": "Réduire"
+  },
+  "minimize-2": {
+    "keywords": "diminuer rétrécir",
+    "label": "Réduire (2)"
+  },
+  "minus": {
+    "keywords": "retirer soustraire",
+    "label": "Moins"
+  },
+  "minus-circle": {
+    "keywords": "retirer soustraire",
+    "label": "Moins (cercle)"
+  },
+  "minus-square": {
+    "keywords": "retirer",
+    "label": "Moins (carré)"
+  },
+  "monitor": {
+    "keywords": "moniteur ordinateur affichage",
+    "label": "Écran"
+  },
+  "moon": {
+    "keywords": "nuit sombre nocturne sommeil",
+    "label": "Lune"
+  },
+  "more-horizontal": {
+    "keywords": "points",
+    "label": "Plus d'options (horizontal)"
+  },
+  "more-vertical": {
+    "keywords": "points",
+    "label": "Plus d'options (vertical)"
+  },
+  "move": {
+    "keywords": "bouger flèches glisser",
+    "label": "Déplacer"
+  },
+  "music": {
+    "keywords": "note audio chanson",
+    "label": "Musique"
+  },
+  "navigation": {
+    "keywords": "direction gps flèche",
+    "label": "Navigation"
+  },
+  "navigation-2": {
+    "keywords": "direction gps flèche",
+    "label": "Navigation (2)"
+  },
+  "octagon": {
+    "keywords": "forme stop",
+    "label": "Octogone"
+  },
+  "package": {
+    "keywords": "colis boîte livraison",
+    "label": "Paquet"
+  },
+  "paperclip": {
+    "keywords": "pièce jointe attache",
+    "label": "Trombone"
+  },
+  "pause": {
+    "keywords": "lecture",
+    "label": "Pause"
+  },
+  "pause-circle": {
+    "keywords": "lecture",
+    "label": "Pause (cercle)"
+  },
+  "percent": {
+    "keywords": "pourcent remise",
+    "label": "Pourcentage"
+  },
+  "phone": {
+    "keywords": "appel combiné",
+    "label": "Téléphone"
+  },
+  "phone-call": {
+    "keywords": "téléphone sonner",
+    "label": "Appel téléphonique"
+  },
+  "phone-forwarded": {
+    "keywords": "téléphone transfert renvoi",
+    "label": "Appel transféré"
+  },
+  "phone-incoming": {
+    "keywords": "téléphone reçu",
+    "label": "Appel entrant"
+  },
+  "phone-missed": {
+    "keywords": "téléphone perdu",
+    "label": "Appel manqué"
+  },
+  "phone-off": {
+    "keywords": "désactivé",
+    "label": "Téléphone coupé"
+  },
+  "phone-outgoing": {
+    "keywords": "téléphone émis",
+    "label": "Appel sortant"
+  },
+  "pie-chart": {
+    "keywords": "statistiques secteurs",
+    "label": "Graphique camembert"
+  },
+  "play": {
+    "keywords": "démarrer vidéo exécuter",
+    "label": "Lecture"
+  },
+  "play-circle": {
+    "keywords": "démarrer vidéo",
+    "label": "Lecture (cercle)"
+  },
+  "plus": {
+    "keywords": "ajouter nouveau créer",
+    "label": "Plus"
+  },
+  "plus-circle": {
+    "keywords": "ajouter nouveau créer",
+    "label": "Plus (cercle)"
+  },
+  "plus-square": {
+    "keywords": "ajouter nouveau",
+    "label": "Plus (carré)"
+  },
+  "pocket": {
+    "keywords": "enregistrer lire plus tard",
+    "label": "Pocket"
+  },
+  "power": {
+    "keywords": "alimentation éteindre veille",
+    "label": "Marche / Arrêt"
+  },
+  "printer": {
+    "keywords": "imprimer papier",
+    "label": "Imprimante"
+  },
+  "radio": {
+    "keywords": "diffusion signal fm",
+    "label": "Radio"
+  },
+  "refresh-ccw": {
+    "keywords": "recharger synchroniser inverse",
+    "label": "Actualiser (anti-horaire)"
+  },
+  "refresh-cw": {
+    "keywords": "recharger synchroniser",
+    "label": "Actualiser"
+  },
+  "repeat": {
+    "keywords": "boucle recommencer cycle",
+    "label": "Répéter"
+  },
+  "rewind": {
+    "keywords": "retour arrière lecture",
+    "label": "Rembobiner"
+  },
+  "rotate-ccw": {
+    "keywords": "gauche pivoter tourner",
+    "label": "Rotation anti-horaire"
+  },
+  "rotate-cw": {
+    "keywords": "droite pivoter tourner",
+    "label": "Rotation horaire"
+  },
+  "rss": {
+    "keywords": "actualités abonnement",
+    "label": "Flux RSS"
+  },
+  "save": {
+    "keywords": "sauvegarder disquette",
+    "label": "Enregistrer"
+  },
+  "scissors": {
+    "keywords": "couper",
+    "label": "Ciseaux"
+  },
+  "search": {
+    "keywords": "chercher loupe trouver",
+    "label": "Recherche"
+  },
+  "send": {
+    "keywords": "message courrier",
+    "label": "Envoyer"
+  },
+  "server": {
+    "keywords": "données hébergement baie",
+    "label": "Serveur"
+  },
+  "settings": {
+    "keywords": "paramètres engrenage configuration options",
+    "label": "Réglages"
+  },
+  "share": {
+    "keywords": "partage exporter",
+    "label": "Partager"
+  },
+  "share-2": {
+    "keywords": "partage réseau",
+    "label": "Partager (2)"
+  },
+  "shield": {
+    "keywords": "sécurité protection",
+    "label": "Bouclier"
+  },
+  "shield-off": {
+    "keywords": "protection",
+    "label": "Bouclier désactivé"
+  },
+  "shopping-bag": {
+    "keywords": "achat magasin",
+    "label": "Sac de courses"
+  },
+  "shopping-cart": {
+    "keywords": "caddie courses achat",
+    "label": "Panier"
+  },
+  "shuffle": {
+    "keywords": "mélanger hasard",
+    "label": "Aléatoire"
+  },
+  "sidebar": {
+    "keywords": "panneau",
+    "label": "Barre latérale"
+  },
+  "skip-back": {
+    "keywords": "précédent lecture",
+    "label": "Piste précédente"
+  },
+  "skip-forward": {
+    "keywords": "suivant lecture",
+    "label": "Piste suivante"
+  },
+  "slack": {
+    "keywords": "messagerie équipe travail",
+    "label": "Slack"
+  },
+  "slash": {
+    "keywords": "interdit aucun désactivé",
+    "label": "Barré"
+  },
+  "sliders": {
+    "keywords": "réglages égaliseur ajuster",
+    "label": "Curseurs"
+  },
+  "smartphone": {
+    "keywords": "mobile téléphone portable",
+    "label": "Smartphone"
+  },
+  "speaker": {
+    "keywords": "haut-parleur son audio",
+    "label": "Enceinte"
+  },
+  "square": {
+    "keywords": "forme",
+    "label": "Carré"
+  },
+  "star": {
+    "keywords": "favori note préféré",
+    "label": "Étoile"
+  },
+  "stop-circle": {
+    "keywords": "arrêt",
+    "label": "Stop (cercle)"
+  },
+  "sun": {
+    "keywords": "jour lumière météo clair",
+    "label": "Soleil"
+  },
+  "sunrise": {
+    "keywords": "aube matin",
+    "label": "Lever de soleil"
+  },
+  "sunset": {
+    "keywords": "crépuscule soir",
+    "label": "Coucher de soleil"
+  },
+  "tablet": {
+    "keywords": "appareil",
+    "label": "Tablette"
+  },
+  "tag": {
+    "keywords": "libellé prix",
+    "label": "Étiquette"
+  },
+  "target": {
+    "keywords": "objectif but viser",
+    "label": "Cible"
+  },
+  "terminal": {
+    "keywords": "console commande shell",
+    "label": "Terminal"
+  },
+  "thermometer": {
+    "keywords": "température chaleur degrés",
+    "label": "Thermomètre"
+  },
+  "thumbs-down": {
+    "keywords": "négatif désapprouver",
+    "label": "Pouce vers le bas"
+  },
+  "thumbs-up": {
+    "keywords": "positif approuver",
+    "label": "Pouce vers le haut"
+  },
+  "toggle-left": {
+    "keywords": "gauche bascule",
+    "label": "Interrupteur éteint"
+  },
+  "toggle-right": {
+    "keywords": "droite bascule",
+    "label": "Interrupteur allumé"
+  },
+  "trash": {
+    "keywords": "supprimer corbeille effacer",
+    "label": "Poubelle"
+  },
+  "trash-2": {
+    "keywords": "supprimer corbeille effacer",
+    "label": "Poubelle (2)"
+  },
+  "trending-down": {
+    "keywords": "diminution graphique",
+    "label": "Tendance à la baisse"
+  },
+  "trending-up": {
+    "keywords": "augmentation croissance",
+    "label": "Tendance à la hausse"
+  },
+  "triangle": {
+    "keywords": "forme",
+    "label": "Triangle"
+  },
+  "truck": {
+    "keywords": "livraison transport",
+    "label": "Camion"
+  },
+  "tv": {
+    "keywords": "écran téléviseur",
+    "label": "Télévision"
+  },
+  "twitter": {
+    "keywords": "réseau social oiseau",
+    "label": "Twitter"
+  },
+  "type": {
+    "keywords": "texte police lettre",
+    "label": "Typographie"
+  },
+  "umbrella": {
+    "keywords": "pluie météo protection",
+    "label": "Parapluie"
+  },
+  "underline": {
+    "keywords": "texte format",
+    "label": "Souligné"
+  },
+  "unlock": {
+    "keywords": "déverrouillé",
+    "label": "Cadenas ouvert"
+  },
+  "upload": {
+    "keywords": "envoyer importer",
+    "label": "Téléverser"
+  },
+  "upload-cloud": {
+    "keywords": "envoyer",
+    "label": "Téléversement (nuage)"
+  },
+  "user": {
+    "keywords": "personne profil compte",
+    "label": "Utilisateur"
+  },
+  "user-check": {
+    "keywords": "approuvé",
+    "label": "Utilisateur validé"
+  },
+  "user-minus": {
+    "keywords": "retirer supprimer",
+    "label": "Utilisateur retiré"
+  },
+  "user-plus": {
+    "keywords": "ajouter nouveau inviter",
+    "label": "Utilisateur ajouté"
+  },
+  "user-x": {
+    "keywords": "bloqué",
+    "label": "Utilisateur supprimé"
+  },
+  "users": {
+    "keywords": "personnes groupe équipe famille",
+    "label": "Utilisateurs"
+  },
+  "video": {
+    "keywords": "caméra film enregistrer",
+    "label": "Vidéo"
+  },
+  "video-off": {
+    "keywords": "désactivée caméra",
+    "label": "Vidéo coupée"
+  },
+  "voicemail": {
+    "keywords": "répondeur",
+    "label": "Messagerie vocale"
+  },
+  "volume": {
+    "keywords": "son audio",
+    "label": "Volume"
+  },
+  "volume-1": {
+    "keywords": "son bas audio",
+    "label": "Volume faible"
+  },
+  "volume-2": {
+    "keywords": "son audio",
+    "label": "Volume fort"
+  },
+  "volume-x": {
+    "keywords": "muet silence",
+    "label": "Volume coupé"
+  },
+  "watch": {
+    "keywords": "heure temps bracelet",
+    "label": "Montre"
+  },
+  "wifi": {
+    "keywords": "wifi réseau sans fil internet",
+    "label": "Wi-Fi"
+  },
+  "wifi-off": {
+    "keywords": "wifi désactivé réseau",
+    "label": "Wi-Fi coupé"
+  },
+  "wind": {
+    "keywords": "air brise météo souffle",
+    "label": "Vent"
+  },
+  "x": {
+    "keywords": "annuler croix non",
+    "label": "Fermer"
+  },
+  "x-circle": {
+    "keywords": "annuler croix",
+    "label": "Fermer (cercle)"
+  },
+  "x-square": {
+    "keywords": "annuler croix",
+    "label": "Fermer (carré)"
+  },
+  "zap": {
+    "keywords": "électricité énergie foudre puissance",
+    "label": "Éclair"
+  },
+  "zap-off": {
+    "keywords": "désactivé électricité",
+    "label": "Éclair coupé"
+  },
+  "zoom-in": {
+    "keywords": "agrandir loupe",
+    "label": "Zoom avant"
+  },
+  "zoom-out": {
+    "keywords": "réduire loupe",
+    "label": "Zoom arrière"
+  }
+}

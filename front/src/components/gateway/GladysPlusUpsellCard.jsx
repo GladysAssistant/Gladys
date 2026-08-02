@@ -90,7 +90,7 @@ const GladysPlusUpsellCard = ({
             )}
             {!isUpgrade && (
               <p class="text-muted small mb-3">
-                <i class="fe fe-gift mr-1" />
+                <i class="fe fe-award mr-1" />
                 <Text id="gladysPlusUpsell.freeTrialNotice" />
               </p>
             )}
