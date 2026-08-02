@@ -1,264 +1,1050 @@
 {
-  "activity": "pulse heartbeat graph",
-  "airplay": "stream screen mirror",
-  "alert-circle": "warning error",
-  "alert-octagon": "warning stop danger",
-  "alert-triangle": "warning caution danger",
-  "align-center": "text",
-  "align-justify": "text",
-  "align-left": "text",
-  "align-right": "text",
-  "anchor": "boat harbour",
-  "aperture": "camera lens photo",
-  "arrow-down": "descend lower",
-  "arrow-down-circle": "descend lower",
-  "arrow-down-left": "descend",
-  "arrow-down-right": "descend",
-  "arrow-left": "back",
-  "arrow-left-circle": "back previous",
-  "arrow-right": "next forward",
-  "arrow-right-circle": "next forward",
-  "arrow-up": "ascend raise",
-  "arrow-up-circle": "ascend raise",
-  "arrow-up-left": "ascend",
-  "arrow-up-right": "ascend",
-  "at-sign": "email mention",
-  "award": "prize medal trophy reward",
-  "bar-chart": "graph statistics",
-  "bar-chart-2": "graph statistics",
-  "battery": "power energy",
-  "battery-charging": "power energy",
-  "bell": "notification alarm ring",
-  "bell-off": "notification mute silent",
-  "bluetooth": "wireless",
-  "bold": "text format",
-  "book": "read",
-  "book-open": "read",
-  "bookmark": "favorite save",
-  "box": "package cube",
-  "briefcase": "work job bag",
-  "calendar": "date schedule",
-  "camera": "photo picture",
-  "camera-off": "photo disabled",
-  "cast": "screen stream tv",
-  "check": "done valid ok yes",
-  "check-circle": "done valid ok success",
-  "check-square": "done valid checkbox",
-  "chevron-down": "expand dropdown open",
-  "chevron-left": "previous back",
-  "chevron-right": "next forward",
-  "chevron-up": "collapse close",
-  "chevrons-down": "double",
-  "chevrons-left": "double",
-  "chevrons-right": "double",
-  "chevrons-up": "double",
-  "chrome": "browser google",
-  "circle": "round shape",
-  "clipboard": "paste copy",
-  "clock": "time hour",
-  "cloud": "weather sky",
-  "cloud-drizzle": "weather rain",
-  "cloud-lightning": "weather storm thunder",
-  "cloud-off": "disconnected",
-  "cloud-rain": "weather",
-  "cloud-snow": "weather winter",
-  "code": "developer programming",
-  "codepen": "developer",
-  "command": "key mac shortcut",
-  "compass": "direction navigation",
-  "copy": "duplicate",
-  "corner-down-left": "return enter branch",
-  "corner-down-right": "branch",
-  "corner-left-down": "branch",
-  "corner-left-up": "branch",
-  "corner-right-down": "branch",
-  "corner-right-up": "branch",
-  "corner-up-left": "branch",
-  "corner-up-right": "branch",
-  "cpu": "processor chip computer",
-  "credit-card": "payment bank money",
-  "crop": "image cut",
-  "crosshair": "target aim precision",
-  "database": "storage data server",
-  "delete": "backspace remove erase",
-  "disc": "cd dvd music album",
-  "dollar-sign": "money currency price",
-  "download": "save",
-  "download-cloud": "save cloud",
-  "droplet": "water humidity rain",
-  "edit": "modify write",
-  "edit-2": "pencil write modify",
-  "edit-3": "pen write modify",
-  "external-link": "open new tab",
-  "eye": "see view visible watch",
-  "eye-off": "hide invisible hidden",
-  "fast-forward": "media next speed",
-  "feather": "quill light write",
-  "file": "document",
-  "file-minus": "document remove",
-  "file-plus": "document add new",
-  "file-text": "document",
-  "film": "movie video cinema",
-  "filter": "sort funnel",
-  "flag": "country mark report",
-  "folder": "directory",
-  "folder-minus": "directory remove",
-  "folder-plus": "directory add new",
-  "git-branch": "developer version",
-  "git-commit": "developer version",
-  "git-merge": "developer version",
-  "git-pull-request": "developer version",
-  "github": "developer code",
-  "gitlab": "developer code",
-  "globe": "world earth internet language",
-  "grid": "layout table squares",
-  "hard-drive": "disk storage",
-  "hash": "hashtag number tag",
-  "headphones": "audio music listen",
-  "heart": "love favorite like",
-  "help-circle": "question support faq",
-  "home": "house main dashboard",
-  "image": "picture photo",
-  "inbox": "mail messages received",
-  "info": "information about details",
-  "instagram": "social network photo",
-  "italic": "text format",
-  "layers": "stack levels",
-  "layout": "grid page design",
-  "life-buoy": "help support rescue",
-  "link": "url chain",
-  "link-2": "url chain",
-  "linkedin": "social network work",
-  "list": "items enumeration",
-  "loader": "loading spinner wait",
-  "lock": "secure password closed",
-  "log-in": "sign in enter connect",
-  "log-out": "sign out exit disconnect",
-  "mail": "email envelope message",
-  "map": "location navigation",
-  "map-pin": "location marker place gps",
-  "maximize": "fullscreen expand",
-  "maximize-2": "expand fullscreen enlarge",
-  "menu": "hamburger navigation",
-  "message-circle": "chat comment bubble",
-  "message-square": "chat comment bubble",
-  "mic": "microphone voice record",
-  "mic-off": "microphone mute",
-  "minimize": "shrink reduce",
-  "minimize-2": "shrink reduce collapse",
-  "minus": "remove subtract less",
-  "minus-circle": "remove subtract",
-  "minus-square": "remove subtract",
-  "monitor": "screen display computer",
-  "moon": "night dark sleep",
-  "more-horizontal": "menu options dots",
-  "more-vertical": "menu options dots",
-  "move": "drag arrows",
-  "music": "song audio note",
-  "navigation": "direction gps arrow",
-  "navigation-2": "direction gps arrow",
-  "octagon": "shape stop",
-  "package": "box delivery parcel",
-  "paperclip": "attachment file",
-  "pause": "media stop",
-  "pause-circle": "media stop",
-  "percent": "percentage discount",
-  "phone": "telephone call",
-  "phone-call": "ring telephone",
-  "phone-forwarded": "transfer",
-  "phone-incoming": "received call",
-  "phone-missed": "lost call",
-  "phone-off": "disabled",
-  "phone-outgoing": "sent call",
-  "pie-chart": "graph statistics",
-  "play": "media start video run",
-  "play-circle": "media start video",
-  "plus": "add new create more",
-  "plus-circle": "add new create",
-  "plus-square": "add new create",
-  "pocket": "save read later",
-  "power": "on off shutdown standby",
-  "printer": "print paper",
-  "radio": "broadcast fm signal",
-  "refresh-ccw": "reload sync undo",
-  "refresh-cw": "reload sync",
-  "repeat": "loop cycle again",
-  "rewind": "media back previous",
-  "rotate-ccw": "turn left undo",
-  "rotate-cw": "turn right redo",
-  "rss": "feed news subscribe",
-  "save": "disk floppy store",
-  "scissors": "cut",
-  "search": "find magnifier look",
-  "send": "mail message plane",
-  "server": "data hosting rack",
-  "settings": "gear preferences config options",
-  "share": "send export",
-  "share-2": "send network",
-  "shield": "security protection safe",
-  "shield-off": "security disabled",
-  "shopping-bag": "buy store purchase",
-  "shopping-cart": "buy store basket",
-  "shuffle": "random mix",
-  "sidebar": "panel layout",
-  "skip-back": "media previous",
-  "skip-forward": "media next",
-  "slack": "chat team work",
-  "slash": "forbidden none disabled",
-  "sliders": "settings equalizer adjust",
-  "smartphone": "mobile phone cell",
-  "speaker": "audio sound loudspeaker",
-  "square": "shape box",
-  "star": "favorite rating like",
-  "stop-circle": "media halt",
-  "sun": "day light weather bright",
-  "sunrise": "morning dawn",
-  "sunset": "evening dusk",
-  "tablet": "ipad device",
-  "tag": "label price",
-  "target": "aim goal objective",
-  "terminal": "console command shell",
-  "thermometer": "temperature heat degrees",
-  "thumbs-down": "dislike bad no",
-  "thumbs-up": "like good yes ok",
-  "toggle-left": "switch off",
-  "toggle-right": "switch on",
-  "trash": "delete bin remove garbage",
-  "trash-2": "delete bin remove garbage",
-  "trending-down": "decrease chart fall",
-  "trending-up": "increase chart rise growth",
-  "triangle": "shape",
-  "truck": "delivery transport lorry",
-  "tv": "television screen",
-  "twitter": "social network bird",
-  "type": "text font letter",
-  "umbrella": "rain weather protection",
-  "underline": "text format",
-  "unlock": "open unsecure",
-  "upload": "send import",
-  "upload-cloud": "send cloud",
-  "user": "person profile account",
-  "user-check": "validated approved",
-  "user-minus": "remove delete",
-  "user-plus": "add new invite",
-  "user-x": "remove blocked",
-  "users": "people group team family",
-  "video": "camera film record",
-  "video-off": "camera disabled",
-  "voicemail": "message answering machine",
-  "volume": "sound audio",
-  "volume-1": "sound low audio",
-  "volume-2": "sound high audio loud",
-  "volume-x": "mute silent sound off",
-  "watch": "time clock wrist",
-  "wifi": "network wireless internet",
-  "wifi-off": "network disabled",
-  "wind": "air breeze weather fan",
-  "x": "close cancel cross no",
-  "x-circle": "close cancel error",
-  "x-square": "close cancel",
-  "zap": "flash lightning power electricity energy",
-  "zap-off": "flash disabled",
-  "zoom-in": "magnify enlarge",
-  "zoom-out": "magnify shrink"
+  "activity": {
+    "keywords": "pulse heartbeat graph",
+    "label": "Activity"
+  },
+  "airplay": {
+    "keywords": "stream screen mirror",
+    "label": "Airplay"
+  },
+  "alert-circle": {
+    "keywords": "warning error",
+    "label": "Alert circle"
+  },
+  "alert-octagon": {
+    "keywords": "warning stop danger",
+    "label": "Alert octagon"
+  },
+  "alert-triangle": {
+    "keywords": "warning caution danger",
+    "label": "Alert triangle"
+  },
+  "align-center": {
+    "keywords": "text",
+    "label": "Align center"
+  },
+  "align-justify": {
+    "keywords": "text",
+    "label": "Align justify"
+  },
+  "align-left": {
+    "keywords": "text",
+    "label": "Align left"
+  },
+  "align-right": {
+    "keywords": "text",
+    "label": "Align right"
+  },
+  "anchor": {
+    "keywords": "boat harbour",
+    "label": "Anchor"
+  },
+  "aperture": {
+    "keywords": "camera lens photo",
+    "label": "Aperture"
+  },
+  "arrow-down": {
+    "keywords": "descend lower",
+    "label": "Arrow down"
+  },
+  "arrow-down-circle": {
+    "keywords": "descend lower",
+    "label": "Arrow down circle"
+  },
+  "arrow-down-left": {
+    "keywords": "descend",
+    "label": "Arrow down left"
+  },
+  "arrow-down-right": {
+    "keywords": "descend",
+    "label": "Arrow down right"
+  },
+  "arrow-left": {
+    "keywords": "back",
+    "label": "Arrow left"
+  },
+  "arrow-left-circle": {
+    "keywords": "back previous",
+    "label": "Arrow left circle"
+  },
+  "arrow-right": {
+    "keywords": "next forward",
+    "label": "Arrow right"
+  },
+  "arrow-right-circle": {
+    "keywords": "next forward",
+    "label": "Arrow right circle"
+  },
+  "arrow-up": {
+    "keywords": "ascend raise",
+    "label": "Arrow up"
+  },
+  "arrow-up-circle": {
+    "keywords": "ascend raise",
+    "label": "Arrow up circle"
+  },
+  "arrow-up-left": {
+    "keywords": "ascend",
+    "label": "Arrow up left"
+  },
+  "arrow-up-right": {
+    "keywords": "ascend",
+    "label": "Arrow up right"
+  },
+  "at-sign": {
+    "keywords": "email mention",
+    "label": "At sign"
+  },
+  "award": {
+    "keywords": "prize medal trophy reward",
+    "label": "Award"
+  },
+  "bar-chart": {
+    "keywords": "graph statistics",
+    "label": "Bar chart"
+  },
+  "bar-chart-2": {
+    "keywords": "graph statistics",
+    "label": "Bar chart (2)"
+  },
+  "battery": {
+    "keywords": "power energy",
+    "label": "Battery"
+  },
+  "battery-charging": {
+    "keywords": "power energy",
+    "label": "Battery charging"
+  },
+  "bell": {
+    "keywords": "notification alarm ring",
+    "label": "Bell"
+  },
+  "bell-off": {
+    "keywords": "notification mute silent",
+    "label": "Bell off"
+  },
+  "bluetooth": {
+    "keywords": "wireless",
+    "label": "Bluetooth"
+  },
+  "bold": {
+    "keywords": "text format",
+    "label": "Bold"
+  },
+  "book": {
+    "keywords": "read",
+    "label": "Book"
+  },
+  "book-open": {
+    "keywords": "read",
+    "label": "Book open"
+  },
+  "bookmark": {
+    "keywords": "favorite save",
+    "label": "Bookmark"
+  },
+  "box": {
+    "keywords": "package cube",
+    "label": "Box"
+  },
+  "briefcase": {
+    "keywords": "work job bag",
+    "label": "Briefcase"
+  },
+  "calendar": {
+    "keywords": "date schedule",
+    "label": "Calendar"
+  },
+  "camera": {
+    "keywords": "photo picture",
+    "label": "Camera"
+  },
+  "camera-off": {
+    "keywords": "photo disabled",
+    "label": "Camera off"
+  },
+  "cast": {
+    "keywords": "screen stream tv",
+    "label": "Cast"
+  },
+  "check": {
+    "keywords": "done valid ok yes",
+    "label": "Check"
+  },
+  "check-circle": {
+    "keywords": "done valid ok success",
+    "label": "Check circle"
+  },
+  "check-square": {
+    "keywords": "done valid checkbox",
+    "label": "Check square"
+  },
+  "chevron-down": {
+    "keywords": "expand dropdown open",
+    "label": "Chevron down"
+  },
+  "chevron-left": {
+    "keywords": "previous back",
+    "label": "Chevron left"
+  },
+  "chevron-right": {
+    "keywords": "next forward",
+    "label": "Chevron right"
+  },
+  "chevron-up": {
+    "keywords": "collapse close",
+    "label": "Chevron up"
+  },
+  "chevrons-down": {
+    "keywords": "double",
+    "label": "Chevrons down"
+  },
+  "chevrons-left": {
+    "keywords": "double",
+    "label": "Chevrons left"
+  },
+  "chevrons-right": {
+    "keywords": "double",
+    "label": "Chevrons right"
+  },
+  "chevrons-up": {
+    "keywords": "double",
+    "label": "Chevrons up"
+  },
+  "chrome": {
+    "keywords": "browser google",
+    "label": "Chrome"
+  },
+  "circle": {
+    "keywords": "round shape",
+    "label": "Circle"
+  },
+  "clipboard": {
+    "keywords": "paste copy",
+    "label": "Clipboard"
+  },
+  "clock": {
+    "keywords": "time hour",
+    "label": "Clock"
+  },
+  "cloud": {
+    "keywords": "weather sky",
+    "label": "Cloud"
+  },
+  "cloud-drizzle": {
+    "keywords": "weather rain",
+    "label": "Cloud drizzle"
+  },
+  "cloud-lightning": {
+    "keywords": "weather storm thunder",
+    "label": "Cloud lightning"
+  },
+  "cloud-off": {
+    "keywords": "disconnected",
+    "label": "Cloud off"
+  },
+  "cloud-rain": {
+    "keywords": "weather",
+    "label": "Cloud rain"
+  },
+  "cloud-snow": {
+    "keywords": "weather winter",
+    "label": "Cloud snow"
+  },
+  "code": {
+    "keywords": "developer programming",
+    "label": "Code"
+  },
+  "codepen": {
+    "keywords": "developer",
+    "label": "CodePen"
+  },
+  "command": {
+    "keywords": "key mac shortcut",
+    "label": "Command"
+  },
+  "compass": {
+    "keywords": "direction navigation",
+    "label": "Compass"
+  },
+  "copy": {
+    "keywords": "duplicate",
+    "label": "Copy"
+  },
+  "corner-down-left": {
+    "keywords": "return enter branch",
+    "label": "Corner down left"
+  },
+  "corner-down-right": {
+    "keywords": "branch",
+    "label": "Corner down right"
+  },
+  "corner-left-down": {
+    "keywords": "branch",
+    "label": "Corner left down"
+  },
+  "corner-left-up": {
+    "keywords": "branch",
+    "label": "Corner left up"
+  },
+  "corner-right-down": {
+    "keywords": "branch",
+    "label": "Corner right down"
+  },
+  "corner-right-up": {
+    "keywords": "branch",
+    "label": "Corner right up"
+  },
+  "corner-up-left": {
+    "keywords": "branch",
+    "label": "Corner up left"
+  },
+  "corner-up-right": {
+    "keywords": "branch",
+    "label": "Corner up right"
+  },
+  "cpu": {
+    "keywords": "processor chip computer",
+    "label": "CPU"
+  },
+  "credit-card": {
+    "keywords": "payment bank money",
+    "label": "Credit card"
+  },
+  "crop": {
+    "keywords": "image cut",
+    "label": "Crop"
+  },
+  "crosshair": {
+    "keywords": "target aim precision",
+    "label": "Crosshair"
+  },
+  "database": {
+    "keywords": "storage data server",
+    "label": "Database"
+  },
+  "delete": {
+    "keywords": "backspace remove erase",
+    "label": "Delete"
+  },
+  "disc": {
+    "keywords": "cd dvd music album",
+    "label": "Disc"
+  },
+  "dollar-sign": {
+    "keywords": "money currency price",
+    "label": "Dollar sign"
+  },
+  "download": {
+    "keywords": "save",
+    "label": "Download"
+  },
+  "download-cloud": {
+    "keywords": "save",
+    "label": "Download cloud"
+  },
+  "droplet": {
+    "keywords": "water humidity rain",
+    "label": "Droplet"
+  },
+  "edit": {
+    "keywords": "modify write",
+    "label": "Edit"
+  },
+  "edit-2": {
+    "keywords": "pencil write modify",
+    "label": "Edit (2)"
+  },
+  "edit-3": {
+    "keywords": "pen write modify",
+    "label": "Edit (3)"
+  },
+  "external-link": {
+    "keywords": "open new tab",
+    "label": "External link"
+  },
+  "eye": {
+    "keywords": "see view visible watch",
+    "label": "Eye"
+  },
+  "eye-off": {
+    "keywords": "hide invisible hidden",
+    "label": "Eye off"
+  },
+  "fast-forward": {
+    "keywords": "media next speed",
+    "label": "Fast forward"
+  },
+  "feather": {
+    "keywords": "quill light write",
+    "label": "Feather"
+  },
+  "file": {
+    "keywords": "document",
+    "label": "File"
+  },
+  "file-minus": {
+    "keywords": "document remove",
+    "label": "File minus"
+  },
+  "file-plus": {
+    "keywords": "document add new",
+    "label": "File plus"
+  },
+  "file-text": {
+    "keywords": "document",
+    "label": "File text"
+  },
+  "film": {
+    "keywords": "movie video cinema",
+    "label": "Film"
+  },
+  "filter": {
+    "keywords": "sort funnel",
+    "label": "Filter"
+  },
+  "flag": {
+    "keywords": "country mark report",
+    "label": "Flag"
+  },
+  "folder": {
+    "keywords": "directory",
+    "label": "Folder"
+  },
+  "folder-minus": {
+    "keywords": "directory remove",
+    "label": "Folder minus"
+  },
+  "folder-plus": {
+    "keywords": "directory add new",
+    "label": "Folder plus"
+  },
+  "git-branch": {
+    "keywords": "developer version",
+    "label": "Git branch"
+  },
+  "git-commit": {
+    "keywords": "developer version",
+    "label": "Git commit"
+  },
+  "git-merge": {
+    "keywords": "developer version",
+    "label": "Git merge"
+  },
+  "git-pull-request": {
+    "keywords": "developer version",
+    "label": "Git pull request"
+  },
+  "github": {
+    "keywords": "developer code",
+    "label": "GitHub"
+  },
+  "gitlab": {
+    "keywords": "developer code",
+    "label": "GitLab"
+  },
+  "globe": {
+    "keywords": "world earth internet language",
+    "label": "Globe"
+  },
+  "grid": {
+    "keywords": "layout table squares",
+    "label": "Grid"
+  },
+  "hard-drive": {
+    "keywords": "disk storage",
+    "label": "Hard drive"
+  },
+  "hash": {
+    "keywords": "hashtag number tag",
+    "label": "Hash"
+  },
+  "headphones": {
+    "keywords": "audio music listen",
+    "label": "Headphones"
+  },
+  "heart": {
+    "keywords": "love favorite like",
+    "label": "Heart"
+  },
+  "help-circle": {
+    "keywords": "question support faq",
+    "label": "Help circle"
+  },
+  "home": {
+    "keywords": "house main dashboard",
+    "label": "Home"
+  },
+  "image": {
+    "keywords": "picture photo",
+    "label": "Image"
+  },
+  "inbox": {
+    "keywords": "mail messages received",
+    "label": "Inbox"
+  },
+  "info": {
+    "keywords": "information about details",
+    "label": "Info"
+  },
+  "instagram": {
+    "keywords": "social network photo",
+    "label": "Instagram"
+  },
+  "italic": {
+    "keywords": "text format",
+    "label": "Italic"
+  },
+  "layers": {
+    "keywords": "stack levels",
+    "label": "Layers"
+  },
+  "layout": {
+    "keywords": "grid page design",
+    "label": "Layout"
+  },
+  "life-buoy": {
+    "keywords": "help support rescue",
+    "label": "Life buoy"
+  },
+  "link": {
+    "keywords": "url chain",
+    "label": "Link"
+  },
+  "link-2": {
+    "keywords": "url chain",
+    "label": "Link (2)"
+  },
+  "linkedin": {
+    "keywords": "social network work",
+    "label": "LinkedIn"
+  },
+  "list": {
+    "keywords": "items enumeration",
+    "label": "List"
+  },
+  "loader": {
+    "keywords": "loading spinner wait",
+    "label": "Loader"
+  },
+  "lock": {
+    "keywords": "secure password closed",
+    "label": "Lock"
+  },
+  "log-in": {
+    "keywords": "sign enter connect",
+    "label": "Log in"
+  },
+  "log-out": {
+    "keywords": "sign exit disconnect",
+    "label": "Log out"
+  },
+  "mail": {
+    "keywords": "email envelope message",
+    "label": "Mail"
+  },
+  "map": {
+    "keywords": "location navigation",
+    "label": "Map"
+  },
+  "map-pin": {
+    "keywords": "location marker place gps",
+    "label": "Map pin"
+  },
+  "maximize": {
+    "keywords": "fullscreen expand",
+    "label": "Maximize"
+  },
+  "maximize-2": {
+    "keywords": "expand fullscreen enlarge",
+    "label": "Maximize (2)"
+  },
+  "menu": {
+    "keywords": "hamburger navigation",
+    "label": "Menu"
+  },
+  "message-circle": {
+    "keywords": "chat comment bubble",
+    "label": "Message circle"
+  },
+  "message-square": {
+    "keywords": "chat comment bubble",
+    "label": "Message square"
+  },
+  "mic": {
+    "keywords": "microphone voice record",
+    "label": "Mic"
+  },
+  "mic-off": {
+    "keywords": "microphone mute",
+    "label": "Mic off"
+  },
+  "minimize": {
+    "keywords": "shrink reduce",
+    "label": "Minimize"
+  },
+  "minimize-2": {
+    "keywords": "shrink reduce collapse",
+    "label": "Minimize (2)"
+  },
+  "minus": {
+    "keywords": "remove subtract less",
+    "label": "Minus"
+  },
+  "minus-circle": {
+    "keywords": "remove subtract",
+    "label": "Minus circle"
+  },
+  "minus-square": {
+    "keywords": "remove subtract",
+    "label": "Minus square"
+  },
+  "monitor": {
+    "keywords": "screen display computer",
+    "label": "Monitor"
+  },
+  "moon": {
+    "keywords": "night dark sleep",
+    "label": "Moon"
+  },
+  "more-horizontal": {
+    "keywords": "menu options dots",
+    "label": "More horizontal"
+  },
+  "more-vertical": {
+    "keywords": "menu options dots",
+    "label": "More vertical"
+  },
+  "move": {
+    "keywords": "drag arrows",
+    "label": "Move"
+  },
+  "music": {
+    "keywords": "song audio note",
+    "label": "Music"
+  },
+  "navigation": {
+    "keywords": "direction gps arrow",
+    "label": "Navigation"
+  },
+  "navigation-2": {
+    "keywords": "direction gps arrow",
+    "label": "Navigation (2)"
+  },
+  "octagon": {
+    "keywords": "shape stop",
+    "label": "Octagon"
+  },
+  "package": {
+    "keywords": "box delivery parcel",
+    "label": "Package"
+  },
+  "paperclip": {
+    "keywords": "attachment file",
+    "label": "Paperclip"
+  },
+  "pause": {
+    "keywords": "media stop",
+    "label": "Pause"
+  },
+  "pause-circle": {
+    "keywords": "media stop",
+    "label": "Pause circle"
+  },
+  "percent": {
+    "keywords": "percentage discount",
+    "label": "Percent"
+  },
+  "phone": {
+    "keywords": "telephone call",
+    "label": "Phone"
+  },
+  "phone-call": {
+    "keywords": "ring telephone",
+    "label": "Phone call"
+  },
+  "phone-forwarded": {
+    "keywords": "transfer",
+    "label": "Phone forwarded"
+  },
+  "phone-incoming": {
+    "keywords": "received call",
+    "label": "Phone incoming"
+  },
+  "phone-missed": {
+    "keywords": "lost call",
+    "label": "Phone missed"
+  },
+  "phone-off": {
+    "keywords": "disabled",
+    "label": "Phone off"
+  },
+  "phone-outgoing": {
+    "keywords": "sent call",
+    "label": "Phone outgoing"
+  },
+  "pie-chart": {
+    "keywords": "graph statistics",
+    "label": "Pie chart"
+  },
+  "play": {
+    "keywords": "media start video run",
+    "label": "Play"
+  },
+  "play-circle": {
+    "keywords": "media start video",
+    "label": "Play circle"
+  },
+  "plus": {
+    "keywords": "add new create more",
+    "label": "Plus"
+  },
+  "plus-circle": {
+    "keywords": "add new create",
+    "label": "Plus circle"
+  },
+  "plus-square": {
+    "keywords": "add new create",
+    "label": "Plus square"
+  },
+  "pocket": {
+    "keywords": "save read later",
+    "label": "Pocket"
+  },
+  "power": {
+    "keywords": "on off shutdown standby",
+    "label": "Power"
+  },
+  "printer": {
+    "keywords": "print paper",
+    "label": "Printer"
+  },
+  "radio": {
+    "keywords": "broadcast fm signal",
+    "label": "Radio"
+  },
+  "refresh-ccw": {
+    "keywords": "reload sync undo",
+    "label": "Refresh ccw"
+  },
+  "refresh-cw": {
+    "keywords": "reload sync",
+    "label": "Refresh cw"
+  },
+  "repeat": {
+    "keywords": "loop cycle again",
+    "label": "Repeat"
+  },
+  "rewind": {
+    "keywords": "media back previous",
+    "label": "Rewind"
+  },
+  "rotate-ccw": {
+    "keywords": "turn left undo",
+    "label": "Rotate ccw"
+  },
+  "rotate-cw": {
+    "keywords": "turn right redo",
+    "label": "Rotate cw"
+  },
+  "rss": {
+    "keywords": "news subscribe",
+    "label": "RSS feed"
+  },
+  "save": {
+    "keywords": "disk floppy store",
+    "label": "Save"
+  },
+  "scissors": {
+    "keywords": "cut",
+    "label": "Scissors"
+  },
+  "search": {
+    "keywords": "find magnifier look",
+    "label": "Search"
+  },
+  "send": {
+    "keywords": "mail message plane",
+    "label": "Send"
+  },
+  "server": {
+    "keywords": "data hosting rack",
+    "label": "Server"
+  },
+  "settings": {
+    "keywords": "gear preferences config options",
+    "label": "Settings"
+  },
+  "share": {
+    "keywords": "send export",
+    "label": "Share"
+  },
+  "share-2": {
+    "keywords": "send network",
+    "label": "Share (2)"
+  },
+  "shield": {
+    "keywords": "security protection safe",
+    "label": "Shield"
+  },
+  "shield-off": {
+    "keywords": "security disabled",
+    "label": "Shield off"
+  },
+  "shopping-bag": {
+    "keywords": "buy store purchase",
+    "label": "Shopping bag"
+  },
+  "shopping-cart": {
+    "keywords": "buy store basket",
+    "label": "Shopping cart"
+  },
+  "shuffle": {
+    "keywords": "random mix",
+    "label": "Shuffle"
+  },
+  "sidebar": {
+    "keywords": "panel layout",
+    "label": "Sidebar"
+  },
+  "skip-back": {
+    "keywords": "media previous",
+    "label": "Skip back"
+  },
+  "skip-forward": {
+    "keywords": "media next",
+    "label": "Skip forward"
+  },
+  "slack": {
+    "keywords": "chat team work",
+    "label": "Slack"
+  },
+  "slash": {
+    "keywords": "forbidden none disabled",
+    "label": "Slash"
+  },
+  "sliders": {
+    "keywords": "settings equalizer adjust",
+    "label": "Sliders"
+  },
+  "smartphone": {
+    "keywords": "mobile phone cell",
+    "label": "Smartphone"
+  },
+  "speaker": {
+    "keywords": "audio sound loudspeaker",
+    "label": "Speaker"
+  },
+  "square": {
+    "keywords": "shape box",
+    "label": "Square"
+  },
+  "star": {
+    "keywords": "favorite rating like",
+    "label": "Star"
+  },
+  "stop-circle": {
+    "keywords": "media halt",
+    "label": "Stop circle"
+  },
+  "sun": {
+    "keywords": "day light weather bright",
+    "label": "Sun"
+  },
+  "sunrise": {
+    "keywords": "morning dawn",
+    "label": "Sunrise"
+  },
+  "sunset": {
+    "keywords": "evening dusk",
+    "label": "Sunset"
+  },
+  "tablet": {
+    "keywords": "ipad device",
+    "label": "Tablet"
+  },
+  "tag": {
+    "keywords": "label price",
+    "label": "Tag"
+  },
+  "target": {
+    "keywords": "aim goal objective",
+    "label": "Target"
+  },
+  "terminal": {
+    "keywords": "console command shell",
+    "label": "Terminal"
+  },
+  "thermometer": {
+    "keywords": "temperature heat degrees",
+    "label": "Thermometer"
+  },
+  "thumbs-down": {
+    "keywords": "dislike bad no",
+    "label": "Thumbs down"
+  },
+  "thumbs-up": {
+    "keywords": "like good yes ok",
+    "label": "Thumbs up"
+  },
+  "toggle-left": {
+    "keywords": "switch off",
+    "label": "Toggle left"
+  },
+  "toggle-right": {
+    "keywords": "switch on",
+    "label": "Toggle right"
+  },
+  "trash": {
+    "keywords": "delete bin remove garbage",
+    "label": "Trash"
+  },
+  "trash-2": {
+    "keywords": "delete bin remove garbage",
+    "label": "Trash (2)"
+  },
+  "trending-down": {
+    "keywords": "decrease chart fall",
+    "label": "Trending down"
+  },
+  "trending-up": {
+    "keywords": "increase chart rise growth",
+    "label": "Trending up"
+  },
+  "triangle": {
+    "keywords": "shape",
+    "label": "Triangle"
+  },
+  "truck": {
+    "keywords": "delivery transport lorry",
+    "label": "Truck"
+  },
+  "tv": {
+    "keywords": "television screen",
+    "label": "TV"
+  },
+  "twitter": {
+    "keywords": "social network bird",
+    "label": "Twitter"
+  },
+  "type": {
+    "keywords": "text font letter",
+    "label": "Type"
+  },
+  "umbrella": {
+    "keywords": "rain weather protection",
+    "label": "Umbrella"
+  },
+  "underline": {
+    "keywords": "text format",
+    "label": "Underline"
+  },
+  "unlock": {
+    "keywords": "open unsecure",
+    "label": "Unlock"
+  },
+  "upload": {
+    "keywords": "send import",
+    "label": "Upload"
+  },
+  "upload-cloud": {
+    "keywords": "send",
+    "label": "Upload cloud"
+  },
+  "user": {
+    "keywords": "person profile account",
+    "label": "User"
+  },
+  "user-check": {
+    "keywords": "validated approved",
+    "label": "User check"
+  },
+  "user-minus": {
+    "keywords": "remove delete",
+    "label": "User minus"
+  },
+  "user-plus": {
+    "keywords": "add new invite",
+    "label": "User plus"
+  },
+  "user-x": {
+    "keywords": "remove blocked",
+    "label": "User x"
+  },
+  "users": {
+    "keywords": "people group team family",
+    "label": "Users"
+  },
+  "video": {
+    "keywords": "camera film record",
+    "label": "Video"
+  },
+  "video-off": {
+    "keywords": "camera disabled",
+    "label": "Video off"
+  },
+  "voicemail": {
+    "keywords": "message answering machine",
+    "label": "Voicemail"
+  },
+  "volume": {
+    "keywords": "sound audio",
+    "label": "Volume"
+  },
+  "volume-1": {
+    "keywords": "sound low audio",
+    "label": "Volume (1)"
+  },
+  "volume-2": {
+    "keywords": "sound high audio loud",
+    "label": "Volume (2)"
+  },
+  "volume-x": {
+    "keywords": "mute silent sound off",
+    "label": "Volume x"
+  },
+  "watch": {
+    "keywords": "time clock wrist",
+    "label": "Watch"
+  },
+  "wifi": {
+    "keywords": "network wireless internet",
+    "label": "Wi-Fi"
+  },
+  "wifi-off": {
+    "keywords": "network disabled",
+    "label": "Wi-Fi off"
+  },
+  "wind": {
+    "keywords": "air breeze weather fan",
+    "label": "Wind"
+  },
+  "x": {
+    "keywords": "cancel cross no",
+    "label": "Close"
+  },
+  "x-circle": {
+    "keywords": "cancel error",
+    "label": "Close (circle)"
+  },
+  "x-square": {
+    "keywords": "cancel",
+    "label": "Close (square)"
+  },
+  "zap": {
+    "keywords": "flash lightning power electricity energy",
+    "label": "Zap"
+  },
+  "zap-off": {
+    "keywords": "flash disabled",
+    "label": "Zap off"
+  },
+  "zoom-in": {
+    "keywords": "magnify enlarge",
+    "label": "Zoom in"
+  },
+  "zoom-out": {
+    "keywords": "magnify shrink",
+    "label": "Zoom out"
+  }
 }

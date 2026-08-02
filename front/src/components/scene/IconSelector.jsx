@@ -27,14 +27,19 @@ const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
   const language = get(user, 'language') || AVAILABLE_LANGUAGES.EN;
 
   // Icon names are English, so a French or German user has no way to find one
-  // by name. Each icon carries translated keywords; both are searched.
-  const haystacks = useMemo(() => {
-    const keywords = iconKeywords[language] || iconKeywords[AVAILABLE_LANGUAGES.EN];
-    return iconList.reduce((acc, icon) => {
-      acc[icon] = normalize(`${icon} ${keywords[icon] || ''}`);
-      return acc;
-    }, {});
-  }, [language]);
+  // by name. Each icon carries a translated label — shown under the icon — plus
+  // extra keywords. The English name, the label and the keywords are searched.
+  const translations = iconKeywords[language] || iconKeywords[AVAILABLE_LANGUAGES.EN];
+
+  const haystacks = useMemo(
+    () =>
+      iconList.reduce((acc, icon) => {
+        const { label = '', keywords = '' } = translations[icon] || {};
+        acc[icon] = normalize(`${icon} ${label} ${keywords}`);
+        return acc;
+      }, {}),
+    [translations]
+  );
 
   const icons = useMemo(() => {
     const searchTerm = normalize(search);
@@ -71,7 +76,7 @@ const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
       </div>
       <div class={cx('row', style.iconContainer)}>
         {icons.map(icon => (
-          <div class="col-2" key={icon}>
+          <div class={cx('col-4 col-sm-3', style.iconCol)} key={icon}>
             <div
               class={cx('text-center', style.iconDiv, {
                 [style.iconDivChecked]: value === icon
@@ -87,10 +92,11 @@ const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
                   class={style.iconInput}
                 />
                 <i
-                  class={cx('fe', `fe-${icon}`, {
+                  class={cx('fe', `fe-${icon}`, style.iconGlyph, {
                     'dark-mode-fe-none-filter': darkModeNoFilter
                   })}
                 />
+                <span class={style.iconName}>{get(translations, `${icon}.label`) || icon}</span>
               </label>
             </div>
           </div>

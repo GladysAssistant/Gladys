@@ -1,29 +1,56 @@
 .iconContainer {
   margin-top: 1rem;
-  height: 10rem;
-  overflow: scroll;
+  height: 20rem;
+  overflow-y: auto;
+}
+
+.iconCol {
+  margin-bottom: 0.5rem;
 }
 
 .iconDiv {
-  padding: 5px;
-  width: 35px;
-  margin-bottom: 8px;
-}
-
-.iconDivChecked {
-  background-color: #f5f7fb;
+  height: 100%;
+  padding: 0.5rem 0.25rem;
   border-radius: 4px;
 }
 
+/* Dark mode inverts the whole page, so a background tint alone is unreliable
+   here: it lands somewhere between "black hole" and invisible depending on the
+   card colour. The ring carries the selected state instead — invert()
+   + hue-rotate(180deg) round-trips a hue back to itself, so it stays blue in
+   both modes. */
+.iconDivChecked {
+  background-color: #f5f7fb;
+  box-shadow: inset 0 0 0 2px #467fcf;
+}
+
 .iconLabel {
-  cursor: pointer;
+  display: block;
+  width: 100%;
   margin-bottom: 0;
+  cursor: pointer;
 }
 
 .iconInput {
   position: absolute;
   z-index: -1;
   opacity: 0;
+}
+
+.iconGlyph {
+  display: block;
+  font-size: 1.25rem;
+}
+
+/* Labels are translated, so they vary in length a lot ("Sun" vs "Aktualisieren
+   gegen Uhrzeigersinn"). Let them wrap and break rather than widen the tile. */
+.iconName {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.6875rem;
+  line-height: 1.25;
+  color: #6e7687;
+  overflow-wrap: anywhere;
 }
 
 .noResult {

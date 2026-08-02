@@ -12,7 +12,7 @@ const DuplicateScenePage = ({ children, ...props }) => (
     </button>
 
     <div class="row">
-      <div class="col col-login mx-auto">
+      <div class={cx('col mx-auto', style.sceneFormCol)}>
         <form onSubmit={props.duplicateScene} class="card">
           <div class={props.loading ? 'dimmer active' : 'dimmer'}>
             <div class="loader" />

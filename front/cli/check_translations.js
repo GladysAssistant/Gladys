@@ -40,21 +40,22 @@ featureParentKey.forEach(parentKey => {
   });
 });
 
-// Check scene icon search keywords. Every icon needs one in every language,
-// otherwise it is unreachable through the picker's search box in that language.
+// Check scene icon labels and search keywords. Every icon needs a label in
+// every language: it is displayed under the icon in the picker, and an icon
+// without one would be unreachable through the search box in that language.
 // Entries for icons that no longer exist are reported too, so the files cannot
 // silently drift from icons.json.
 ['en', 'fr', 'de'].forEach(language => {
   // eslint-disable-next-line global-require, import/no-dynamic-require
-  const keywords = require(`../src/config/i18n/icon-keywords/${language}.json`);
+  const icons = require(`../src/config/i18n/icon-keywords/${language}.json`);
 
   iconList.forEach(icon => {
-    if (!keywords[icon]) {
-      missingKeys.push(`icon keyword ${icon} ==> icon-keywords/${language}.json`);
+    if (!get(icons, `${icon}.label`)) {
+      missingKeys.push(`icon label ${icon} ==> icon-keywords/${language}.json`);
     }
   });
 
-  Object.keys(keywords).forEach(icon => {
+  Object.keys(icons).forEach(icon => {
     if (!iconList.includes(icon)) {
       missingKeys.push(`unknown icon "${icon}" in icon-keywords/${language}.json ==> not in server/config/icons.json`);
     }

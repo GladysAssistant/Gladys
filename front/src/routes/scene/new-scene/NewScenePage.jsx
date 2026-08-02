@@ -12,7 +12,7 @@ const NewScenePage = ({ children, ...props }) => (
       <Text id="global.backButton" />
     </Link>
     <div class="row">
-      <div class="col col-login mx-auto">
+      <div class={cx('col mx-auto', style.sceneFormCol)}>
         <form onSubmit={props.createScene} class="card">
           <div class="card-body p-6">
             <div class="card-title">

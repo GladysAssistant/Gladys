@@ -1,264 +1,1050 @@
 {
-  "activity": "Aktivität Puls Herzschlag Diagramm",
-  "airplay": "Streaming Bildschirm übertragen",
-  "alert-circle": "Warnung Achtung Fehler Kreis",
-  "alert-octagon": "Warnung Gefahr Stopp Achteck",
-  "alert-triangle": "Warnung Achtung Gefahr Dreieck",
-  "align-center": "ausrichten zentrieren Text Mitte",
-  "align-justify": "ausrichten Blocksatz Text",
-  "align-left": "ausrichten links Text",
-  "align-right": "ausrichten rechts Text",
-  "anchor": "Anker Boot Hafen",
-  "aperture": "Blende Objektiv Foto Kamera",
-  "arrow-down": "Pfeil unten abwärts",
-  "arrow-down-circle": "Pfeil unten Kreis abwärts",
-  "arrow-down-left": "Pfeil unten links",
-  "arrow-down-right": "Pfeil unten rechts",
-  "arrow-left": "Pfeil links zurück",
-  "arrow-left-circle": "Pfeil links Kreis",
-  "arrow-right": "Pfeil rechts weiter",
-  "arrow-right-circle": "Pfeil rechts Kreis",
-  "arrow-up": "Pfeil oben aufwärts",
-  "arrow-up-circle": "Pfeil oben Kreis aufwärts",
-  "arrow-up-left": "Pfeil oben links",
-  "arrow-up-right": "Pfeil oben rechts",
-  "at-sign": "At-Zeichen E-Mail Erwähnung",
-  "award": "Auszeichnung Medaille Preis Trophäe",
-  "bar-chart": "Diagramm Balken Statistik",
-  "bar-chart-2": "Diagramm Balken Statistik",
-  "battery": "Batterie Akku Energie",
-  "battery-charging": "Batterie laden Energie Akku",
-  "bell": "Glocke Benachrichtigung Alarm",
-  "bell-off": "Glocke Benachrichtigung stumm",
-  "bluetooth": "Bluetooth drahtlos",
-  "bold": "fett Text Format",
-  "book": "Buch lesen",
-  "book-open": "Buch offen lesen",
-  "bookmark": "Lesezeichen Favorit",
-  "box": "Box Karton Paket Würfel",
-  "briefcase": "Aktentasche Arbeit Büro",
-  "calendar": "Kalender Datum Termin",
-  "camera": "Kamera Foto",
-  "camera-off": "Kamera aus deaktiviert",
-  "cast": "übertragen Bildschirm Fernseher",
-  "check": "Häkchen erledigt ok ja",
-  "check-circle": "Häkchen Kreis erledigt Erfolg",
-  "check-square": "Häkchen Kästchen erledigt",
-  "chevron-down": "Pfeil unten aufklappen",
-  "chevron-left": "Pfeil links",
-  "chevron-right": "Pfeil rechts",
-  "chevron-up": "Pfeil oben zuklappen",
-  "chevrons-down": "Doppelpfeil unten",
-  "chevrons-left": "Doppelpfeil links",
-  "chevrons-right": "Doppelpfeil rechts",
-  "chevrons-up": "Doppelpfeil oben",
-  "chrome": "Chrome Browser Google",
-  "circle": "Kreis rund Form",
-  "clipboard": "Zwischenablage kopieren Notizblock",
-  "clock": "Uhr Zeit Stunde",
-  "cloud": "Wolke Himmel Wetter",
-  "cloud-drizzle": "Wolke Nieselregen Regen Wetter",
-  "cloud-lightning": "Wolke Gewitter Blitz Wetter",
-  "cloud-off": "Wolke aus offline",
-  "cloud-rain": "Wolke Regen Wetter",
-  "cloud-snow": "Wolke Schnee Winter Wetter",
-  "code": "Code Programmierung Entwickler",
-  "codepen": "Codepen Entwickler",
-  "command": "Befehl Taste Kürzel Mac",
-  "compass": "Kompass Richtung Navigation",
-  "copy": "kopieren duplizieren",
-  "corner-down-left": "Ecke unten links Pfeil",
-  "corner-down-right": "Ecke unten rechts Pfeil",
-  "corner-left-down": "Ecke links unten Pfeil",
-  "corner-left-up": "Ecke links oben Pfeil",
-  "corner-right-down": "Ecke rechts unten Pfeil",
-  "corner-right-up": "Ecke rechts oben Pfeil",
-  "corner-up-left": "Ecke oben links Pfeil",
-  "corner-up-right": "Ecke oben rechts Pfeil",
-  "cpu": "Prozessor Chip Computer",
-  "credit-card": "Kreditkarte Zahlung Bank",
-  "crop": "zuschneiden Bild",
-  "crosshair": "Fadenkreuz Ziel Präzision",
-  "database": "Datenbank Speicher Daten",
-  "delete": "löschen entfernen Rücktaste",
-  "disc": "Disc CD DVD Album",
-  "dollar-sign": "Dollar Geld Währung Preis",
-  "download": "herunterladen speichern",
-  "download-cloud": "Download Wolke herunterladen",
-  "droplet": "Tropfen Wasser Feuchtigkeit",
-  "edit": "bearbeiten schreiben",
-  "edit-2": "bearbeiten Stift schreiben",
-  "edit-3": "bearbeiten Stift schreiben",
-  "external-link": "externer Link öffnen neuer Tab",
-  "eye": "Auge sehen sichtbar anzeigen",
-  "eye-off": "Auge verborgen versteckt",
-  "fast-forward": "schneller Vorlauf Geschwindigkeit",
-  "feather": "Feder leicht schreiben",
-  "file": "Datei Dokument",
-  "file-minus": "Datei minus entfernen Dokument",
-  "file-plus": "Datei plus hinzufügen Dokument",
-  "file-text": "Datei Text Dokument",
-  "film": "Film Video Kino",
-  "filter": "Filter sortieren Trichter",
-  "flag": "Flagge markieren melden",
-  "folder": "Ordner Verzeichnis",
-  "folder-minus": "Ordner minus entfernen",
-  "folder-plus": "Ordner plus hinzufügen",
-  "git-branch": "Git Branch Entwickler",
-  "git-commit": "Git Commit Entwickler",
-  "git-merge": "Git Merge Entwickler",
-  "git-pull-request": "Git Pull Request Entwickler",
-  "github": "GitHub Entwickler Code",
-  "gitlab": "GitLab Entwickler Code",
-  "globe": "Globus Welt Erde Internet Sprache",
-  "grid": "Raster Tabelle Layout",
-  "hard-drive": "Festplatte Speicher",
-  "hash": "Raute Hashtag Nummer",
-  "headphones": "Kopfhörer Audio Musik hören",
-  "heart": "Herz Liebe Favorit",
-  "help-circle": "Hilfe Frage Support Kreis",
-  "home": "Zuhause Haus Startseite",
-  "image": "Bild Foto",
-  "inbox": "Posteingang Post Nachrichten",
-  "info": "Information Details Info",
-  "instagram": "Instagram soziales Netzwerk",
-  "italic": "kursiv Text Format",
-  "layers": "Ebenen Schichten stapeln",
-  "layout": "Layout Seitenaufbau Raster",
-  "life-buoy": "Rettungsring Hilfe Unterstützung",
-  "link": "Link URL Kette",
-  "link-2": "Link URL Kette",
-  "linkedin": "LinkedIn soziales Netzwerk",
-  "list": "Liste Aufzählung",
-  "loader": "Laden warten Spinner",
-  "lock": "Schloss gesperrt Sicherheit",
-  "log-in": "Anmelden eintreten verbinden",
-  "log-out": "Abmelden verlassen beenden",
-  "mail": "Post E-Mail Umschlag Nachricht",
-  "map": "Karte Plan Navigation",
-  "map-pin": "Kartennadel Standort Ort GPS",
-  "maximize": "vergrößern Vollbild",
-  "maximize-2": "vergrößern Vollbild",
-  "menu": "Menü Navigation",
-  "message-circle": "Nachricht Blase Chat Kommentar",
-  "message-square": "Nachricht Blase Chat Kommentar",
-  "mic": "Mikrofon Stimme aufnehmen",
-  "mic-off": "Mikrofon aus stumm",
-  "minimize": "verkleinern reduzieren",
-  "minimize-2": "verkleinern reduzieren",
-  "minus": "Minus entfernen weniger",
-  "minus-circle": "Minus entfernen Kreis",
-  "minus-square": "Minus entfernen Quadrat",
-  "monitor": "Bildschirm Monitor Computer",
-  "moon": "Mond Nacht dunkel Schlaf",
-  "more-horizontal": "mehr Optionen Punkte",
-  "more-vertical": "mehr Optionen Punkte",
-  "move": "verschieben bewegen ziehen",
-  "music": "Musik Note Audio Lied",
-  "navigation": "Navigation Richtung GPS",
-  "navigation-2": "Navigation Richtung GPS",
-  "octagon": "Achteck Form Stopp",
-  "package": "Paket Karton Lieferung",
-  "paperclip": "Büroklammer Anhang",
-  "pause": "Pause",
-  "pause-circle": "Pause Kreis",
-  "percent": "Prozent Rabatt",
-  "phone": "Telefon Anruf",
-  "phone-call": "Telefon Anruf klingeln",
-  "phone-forwarded": "Telefon Weiterleitung",
-  "phone-incoming": "Telefon eingehend Anruf",
-  "phone-missed": "Telefon verpasst Anruf",
-  "phone-off": "Telefon aus deaktiviert",
-  "phone-outgoing": "Telefon ausgehend Anruf",
-  "pie-chart": "Kreisdiagramm Statistik",
-  "play": "Wiedergabe starten abspielen",
-  "play-circle": "Wiedergabe Kreis starten",
-  "plus": "Plus hinzufügen neu",
-  "plus-circle": "Plus hinzufügen Kreis neu",
-  "plus-square": "Plus hinzufügen Quadrat",
-  "pocket": "Pocket speichern später lesen",
-  "power": "Ein Aus Netzschalter herunterfahren",
-  "printer": "Drucker drucken Papier",
-  "radio": "Radio Sendung Signal",
-  "refresh-ccw": "aktualisieren neu laden synchronisieren",
-  "refresh-cw": "aktualisieren neu laden synchronisieren",
-  "repeat": "wiederholen Schleife",
-  "rewind": "zurückspulen zurück",
-  "rotate-ccw": "drehen links rotieren",
-  "rotate-cw": "drehen rechts rotieren",
-  "rss": "RSS Feed Nachrichten",
-  "save": "speichern sichern Diskette",
-  "scissors": "Schere schneiden",
-  "search": "Suche suchen Lupe finden",
-  "send": "senden Nachricht schicken",
-  "server": "Server Daten Hosting",
-  "settings": "Einstellungen Zahnrad Konfiguration",
-  "share": "teilen exportieren",
-  "share-2": "teilen Netzwerk",
-  "shield": "Schild Sicherheit Schutz",
-  "shield-off": "Schild aus Schutz",
-  "shopping-bag": "Einkaufstasche kaufen Geschäft",
-  "shopping-cart": "Einkaufswagen kaufen Korb",
-  "shuffle": "zufällig mischen",
-  "sidebar": "Seitenleiste Panel",
-  "skip-back": "vorheriger Titel zurück",
-  "skip-forward": "nächster Titel weiter",
-  "slack": "Slack Chat Team",
-  "slash": "durchgestrichen verboten keine",
-  "sliders": "Regler Einstellungen Equalizer",
-  "smartphone": "Smartphone Handy Mobiltelefon",
-  "speaker": "Lautsprecher Ton Audio",
-  "square": "Quadrat Form",
-  "star": "Stern Favorit Bewertung",
-  "stop-circle": "Stopp Kreis anhalten",
-  "sun": "Sonne Tag Licht Wetter hell",
-  "sunrise": "Sonnenaufgang Morgen Dämmerung",
-  "sunset": "Sonnenuntergang Abend Dämmerung",
-  "tablet": "Tablet Gerät",
-  "tag": "Etikett Label Preis",
-  "target": "Ziel Zielscheibe",
-  "terminal": "Terminal Konsole Befehl",
-  "thermometer": "Thermometer Temperatur Wärme Grad",
-  "thumbs-down": "Daumen runter negativ",
-  "thumbs-up": "Daumen hoch positiv",
-  "toggle-left": "Schalter links aus",
-  "toggle-right": "Schalter rechts ein",
-  "trash": "Papierkorb löschen Mülleimer",
-  "trash-2": "Papierkorb löschen Mülleimer",
-  "trending-down": "Trend abwärts Rückgang",
-  "trending-up": "Trend aufwärts Anstieg Wachstum",
-  "triangle": "Dreieck Form",
-  "truck": "Lastwagen Lieferung Transport",
-  "tv": "Fernseher Bildschirm TV",
-  "twitter": "Twitter soziales Netzwerk",
-  "type": "Text Schrift Buchstabe",
-  "umbrella": "Regenschirm Regen Wetter",
-  "underline": "unterstrichen Text Format",
-  "unlock": "entsperrt offen",
-  "upload": "hochladen senden importieren",
-  "upload-cloud": "Upload Wolke hochladen",
-  "user": "Benutzer Person Profil Konto",
-  "user-check": "Benutzer bestätigt genehmigt",
-  "user-minus": "Benutzer entfernen löschen",
-  "user-plus": "Benutzer hinzufügen einladen",
-  "user-x": "Benutzer entfernt blockiert",
-  "users": "Benutzer Personen Gruppe Team Familie",
-  "video": "Video Kamera Film",
-  "video-off": "Video aus deaktiviert",
-  "voicemail": "Mailbox Anrufbeantworter",
-  "volume": "Lautstärke Ton Audio",
-  "volume-1": "Lautstärke leise Ton",
-  "volume-2": "Lautstärke laut Ton",
-  "volume-x": "Lautstärke stumm aus",
-  "watch": "Uhr Armbanduhr Zeit",
-  "wifi": "WLAN Netzwerk drahtlos Internet",
-  "wifi-off": "WLAN aus deaktiviert",
-  "wind": "Wind Luft Brise Wetter",
-  "x": "schließen abbrechen Kreuz nein",
-  "x-circle": "schließen abbrechen Kreis",
-  "x-square": "schließen abbrechen Quadrat",
-  "zap": "Blitz Strom Energie",
-  "zap-off": "Blitz aus deaktiviert",
-  "zoom-in": "vergrößern Zoom Lupe",
-  "zoom-out": "verkleinern Zoom Lupe"
+  "activity": {
+    "keywords": "Puls Herzschlag Diagramm",
+    "label": "Aktivität"
+  },
+  "airplay": {
+    "keywords": "Streaming Bildschirm übertragen",
+    "label": "Bildschirmübertragung"
+  },
+  "alert-circle": {
+    "keywords": "Achtung Fehler",
+    "label": "Warnung (Kreis)"
+  },
+  "alert-octagon": {
+    "keywords": "Gefahr Stopp",
+    "label": "Warnung (Achteck)"
+  },
+  "alert-triangle": {
+    "keywords": "Achtung Gefahr",
+    "label": "Warnung (Dreieck)"
+  },
+  "align-center": {
+    "keywords": "zentrieren Text Mitte",
+    "label": "Zentriert ausrichten"
+  },
+  "align-justify": {
+    "keywords": "ausrichten Text",
+    "label": "Blocksatz"
+  },
+  "align-left": {
+    "keywords": "ausrichten links Text",
+    "label": "Linksbündig"
+  },
+  "align-right": {
+    "keywords": "ausrichten rechts Text",
+    "label": "Rechtsbündig"
+  },
+  "anchor": {
+    "keywords": "Boot Hafen",
+    "label": "Anker"
+  },
+  "aperture": {
+    "keywords": "Objektiv Foto Kamera",
+    "label": "Blende"
+  },
+  "arrow-down": {
+    "keywords": "abwärts",
+    "label": "Pfeil unten"
+  },
+  "arrow-down-circle": {
+    "keywords": "abwärts",
+    "label": "Pfeil unten (Kreis)"
+  },
+  "arrow-down-left": {
+    "keywords": "",
+    "label": "Pfeil unten links"
+  },
+  "arrow-down-right": {
+    "keywords": "",
+    "label": "Pfeil unten rechts"
+  },
+  "arrow-left": {
+    "keywords": "zurück",
+    "label": "Pfeil links"
+  },
+  "arrow-left-circle": {
+    "keywords": "",
+    "label": "Pfeil links (Kreis)"
+  },
+  "arrow-right": {
+    "keywords": "weiter",
+    "label": "Pfeil rechts"
+  },
+  "arrow-right-circle": {
+    "keywords": "",
+    "label": "Pfeil rechts (Kreis)"
+  },
+  "arrow-up": {
+    "keywords": "aufwärts",
+    "label": "Pfeil oben"
+  },
+  "arrow-up-circle": {
+    "keywords": "aufwärts",
+    "label": "Pfeil oben (Kreis)"
+  },
+  "arrow-up-left": {
+    "keywords": "",
+    "label": "Pfeil oben links"
+  },
+  "arrow-up-right": {
+    "keywords": "",
+    "label": "Pfeil oben rechts"
+  },
+  "at-sign": {
+    "keywords": "At-Zeichen E-Mail Erwähnung",
+    "label": "At-Zeichen"
+  },
+  "award": {
+    "keywords": "Medaille Preis Trophäe",
+    "label": "Auszeichnung"
+  },
+  "bar-chart": {
+    "keywords": "Diagramm Balken Statistik",
+    "label": "Balkendiagramm"
+  },
+  "bar-chart-2": {
+    "keywords": "Diagramm Balken Statistik",
+    "label": "Balkendiagramm (2)"
+  },
+  "battery": {
+    "keywords": "Akku Energie",
+    "label": "Batterie"
+  },
+  "battery-charging": {
+    "keywords": "laden Energie Akku",
+    "label": "Batterie lädt"
+  },
+  "bell": {
+    "keywords": "Benachrichtigung Alarm",
+    "label": "Glocke"
+  },
+  "bell-off": {
+    "keywords": "Benachrichtigung stumm",
+    "label": "Glocke aus"
+  },
+  "bluetooth": {
+    "keywords": "drahtlos",
+    "label": "Bluetooth"
+  },
+  "bold": {
+    "keywords": "Text Format",
+    "label": "Fett"
+  },
+  "book": {
+    "keywords": "lesen",
+    "label": "Buch"
+  },
+  "book-open": {
+    "keywords": "offen lesen",
+    "label": "Offenes Buch"
+  },
+  "bookmark": {
+    "keywords": "Favorit",
+    "label": "Lesezeichen"
+  },
+  "box": {
+    "keywords": "Karton Paket Würfel",
+    "label": "Box"
+  },
+  "briefcase": {
+    "keywords": "Arbeit Büro",
+    "label": "Aktentasche"
+  },
+  "calendar": {
+    "keywords": "Datum Termin",
+    "label": "Kalender"
+  },
+  "camera": {
+    "keywords": "Foto",
+    "label": "Kamera"
+  },
+  "camera-off": {
+    "keywords": "deaktiviert",
+    "label": "Kamera aus"
+  },
+  "cast": {
+    "keywords": "Bildschirm Fernseher",
+    "label": "Übertragen"
+  },
+  "check": {
+    "keywords": "erledigt ok ja",
+    "label": "Häkchen"
+  },
+  "check-circle": {
+    "keywords": "erledigt Erfolg",
+    "label": "Häkchen (Kreis)"
+  },
+  "check-square": {
+    "keywords": "erledigt",
+    "label": "Häkchen (Kästchen)"
+  },
+  "chevron-down": {
+    "keywords": "Pfeil aufklappen",
+    "label": "Chevron unten"
+  },
+  "chevron-left": {
+    "keywords": "Pfeil",
+    "label": "Chevron links"
+  },
+  "chevron-right": {
+    "keywords": "Pfeil",
+    "label": "Chevron rechts"
+  },
+  "chevron-up": {
+    "keywords": "Pfeil zuklappen",
+    "label": "Chevron oben"
+  },
+  "chevrons-down": {
+    "keywords": "Doppelpfeil",
+    "label": "Doppelchevron unten"
+  },
+  "chevrons-left": {
+    "keywords": "Doppelpfeil",
+    "label": "Doppelchevron links"
+  },
+  "chevrons-right": {
+    "keywords": "Doppelpfeil",
+    "label": "Doppelchevron rechts"
+  },
+  "chevrons-up": {
+    "keywords": "Doppelpfeil",
+    "label": "Doppelchevron oben"
+  },
+  "chrome": {
+    "keywords": "Browser Google",
+    "label": "Chrome"
+  },
+  "circle": {
+    "keywords": "rund Form",
+    "label": "Kreis"
+  },
+  "clipboard": {
+    "keywords": "kopieren Notizblock",
+    "label": "Zwischenablage"
+  },
+  "clock": {
+    "keywords": "Zeit Stunde",
+    "label": "Uhr"
+  },
+  "cloud": {
+    "keywords": "Himmel Wetter",
+    "label": "Wolke"
+  },
+  "cloud-drizzle": {
+    "keywords": "Wolke Regen Wetter",
+    "label": "Nieselregen"
+  },
+  "cloud-lightning": {
+    "keywords": "Wolke Blitz Wetter",
+    "label": "Gewitter"
+  },
+  "cloud-off": {
+    "keywords": "offline",
+    "label": "Wolke aus"
+  },
+  "cloud-rain": {
+    "keywords": "Wolke Wetter",
+    "label": "Regen"
+  },
+  "cloud-snow": {
+    "keywords": "Wolke Winter Wetter",
+    "label": "Schnee"
+  },
+  "code": {
+    "keywords": "Programmierung Entwickler",
+    "label": "Code"
+  },
+  "codepen": {
+    "keywords": "Entwickler",
+    "label": "CodePen"
+  },
+  "command": {
+    "keywords": "Befehl Taste Kürzel Mac",
+    "label": "Befehlstaste"
+  },
+  "compass": {
+    "keywords": "Richtung Navigation",
+    "label": "Kompass"
+  },
+  "copy": {
+    "keywords": "duplizieren",
+    "label": "Kopieren"
+  },
+  "corner-down-left": {
+    "keywords": "Pfeil",
+    "label": "Ecke unten links"
+  },
+  "corner-down-right": {
+    "keywords": "Pfeil",
+    "label": "Ecke unten rechts"
+  },
+  "corner-left-down": {
+    "keywords": "Pfeil",
+    "label": "Ecke links unten"
+  },
+  "corner-left-up": {
+    "keywords": "Pfeil",
+    "label": "Ecke links oben"
+  },
+  "corner-right-down": {
+    "keywords": "Pfeil",
+    "label": "Ecke rechts unten"
+  },
+  "corner-right-up": {
+    "keywords": "Pfeil",
+    "label": "Ecke rechts oben"
+  },
+  "corner-up-left": {
+    "keywords": "Pfeil",
+    "label": "Ecke oben links"
+  },
+  "corner-up-right": {
+    "keywords": "Pfeil",
+    "label": "Ecke oben rechts"
+  },
+  "cpu": {
+    "keywords": "Chip Computer",
+    "label": "Prozessor"
+  },
+  "credit-card": {
+    "keywords": "Zahlung Bank",
+    "label": "Kreditkarte"
+  },
+  "crop": {
+    "keywords": "Bild",
+    "label": "Zuschneiden"
+  },
+  "crosshair": {
+    "keywords": "Ziel Präzision",
+    "label": "Fadenkreuz"
+  },
+  "database": {
+    "keywords": "Speicher Daten",
+    "label": "Datenbank"
+  },
+  "delete": {
+    "keywords": "entfernen Rücktaste",
+    "label": "Löschen"
+  },
+  "disc": {
+    "keywords": "CD DVD Album",
+    "label": "Disc"
+  },
+  "dollar-sign": {
+    "keywords": "Geld Währung Preis",
+    "label": "Dollar"
+  },
+  "download": {
+    "keywords": "speichern",
+    "label": "Herunterladen"
+  },
+  "download-cloud": {
+    "keywords": "herunterladen",
+    "label": "Download (Wolke)"
+  },
+  "droplet": {
+    "keywords": "Wasser Feuchtigkeit",
+    "label": "Tropfen"
+  },
+  "edit": {
+    "keywords": "schreiben",
+    "label": "Bearbeiten"
+  },
+  "edit-2": {
+    "keywords": "Stift schreiben",
+    "label": "Bearbeiten (Bleistift)"
+  },
+  "edit-3": {
+    "keywords": "Stift schreiben",
+    "label": "Bearbeiten (Füller)"
+  },
+  "external-link": {
+    "keywords": "öffnen neuer Tab",
+    "label": "Externer Link"
+  },
+  "eye": {
+    "keywords": "sehen sichtbar anzeigen",
+    "label": "Auge"
+  },
+  "eye-off": {
+    "keywords": "verborgen versteckt",
+    "label": "Auge aus"
+  },
+  "fast-forward": {
+    "keywords": "Geschwindigkeit",
+    "label": "Schneller Vorlauf"
+  },
+  "feather": {
+    "keywords": "leicht schreiben",
+    "label": "Feder"
+  },
+  "file": {
+    "keywords": "Dokument",
+    "label": "Datei"
+  },
+  "file-minus": {
+    "keywords": "entfernen Dokument",
+    "label": "Datei minus"
+  },
+  "file-plus": {
+    "keywords": "hinzufügen Dokument",
+    "label": "Datei plus"
+  },
+  "file-text": {
+    "keywords": "Datei Text Dokument",
+    "label": "Textdatei"
+  },
+  "film": {
+    "keywords": "Video Kino",
+    "label": "Film"
+  },
+  "filter": {
+    "keywords": "sortieren Trichter",
+    "label": "Filter"
+  },
+  "flag": {
+    "keywords": "markieren melden",
+    "label": "Flagge"
+  },
+  "folder": {
+    "keywords": "Verzeichnis",
+    "label": "Ordner"
+  },
+  "folder-minus": {
+    "keywords": "entfernen",
+    "label": "Ordner minus"
+  },
+  "folder-plus": {
+    "keywords": "hinzufügen",
+    "label": "Ordner plus"
+  },
+  "git-branch": {
+    "keywords": "Entwickler",
+    "label": "Git-Branch"
+  },
+  "git-commit": {
+    "keywords": "Entwickler",
+    "label": "Git-Commit"
+  },
+  "git-merge": {
+    "keywords": "Entwickler",
+    "label": "Git-Merge"
+  },
+  "git-pull-request": {
+    "keywords": "Entwickler",
+    "label": "Git-Pull-Request"
+  },
+  "github": {
+    "keywords": "Entwickler Code",
+    "label": "GitHub"
+  },
+  "gitlab": {
+    "keywords": "Entwickler Code",
+    "label": "GitLab"
+  },
+  "globe": {
+    "keywords": "Welt Erde Internet Sprache",
+    "label": "Globus"
+  },
+  "grid": {
+    "keywords": "Tabelle Layout",
+    "label": "Raster"
+  },
+  "hard-drive": {
+    "keywords": "Speicher",
+    "label": "Festplatte"
+  },
+  "hash": {
+    "keywords": "Hashtag Nummer",
+    "label": "Raute"
+  },
+  "headphones": {
+    "keywords": "Audio Musik hören",
+    "label": "Kopfhörer"
+  },
+  "heart": {
+    "keywords": "Liebe Favorit",
+    "label": "Herz"
+  },
+  "help-circle": {
+    "keywords": "Frage Support Kreis",
+    "label": "Hilfe"
+  },
+  "home": {
+    "keywords": "Haus Startseite",
+    "label": "Zuhause"
+  },
+  "image": {
+    "keywords": "Foto",
+    "label": "Bild"
+  },
+  "inbox": {
+    "keywords": "Post Nachrichten",
+    "label": "Posteingang"
+  },
+  "info": {
+    "keywords": "Details Info",
+    "label": "Information"
+  },
+  "instagram": {
+    "keywords": "soziales Netzwerk",
+    "label": "Instagram"
+  },
+  "italic": {
+    "keywords": "Text Format",
+    "label": "Kursiv"
+  },
+  "layers": {
+    "keywords": "Schichten stapeln",
+    "label": "Ebenen"
+  },
+  "layout": {
+    "keywords": "Seitenaufbau Raster",
+    "label": "Layout"
+  },
+  "life-buoy": {
+    "keywords": "Hilfe Unterstützung",
+    "label": "Rettungsring"
+  },
+  "link": {
+    "keywords": "URL Kette",
+    "label": "Link"
+  },
+  "link-2": {
+    "keywords": "URL Kette",
+    "label": "Link (2)"
+  },
+  "linkedin": {
+    "keywords": "soziales Netzwerk",
+    "label": "LinkedIn"
+  },
+  "list": {
+    "keywords": "Aufzählung",
+    "label": "Liste"
+  },
+  "loader": {
+    "keywords": "warten Spinner",
+    "label": "Laden"
+  },
+  "lock": {
+    "keywords": "gesperrt Sicherheit",
+    "label": "Schloss zu"
+  },
+  "log-in": {
+    "keywords": "eintreten verbinden",
+    "label": "Anmelden"
+  },
+  "log-out": {
+    "keywords": "verlassen beenden",
+    "label": "Abmelden"
+  },
+  "mail": {
+    "keywords": "E-Mail Umschlag Nachricht",
+    "label": "Post"
+  },
+  "map": {
+    "keywords": "Plan Navigation",
+    "label": "Karte"
+  },
+  "map-pin": {
+    "keywords": "Standort Ort GPS",
+    "label": "Kartennadel"
+  },
+  "maximize": {
+    "keywords": "vergrößern",
+    "label": "Vollbild"
+  },
+  "maximize-2": {
+    "keywords": "Vollbild",
+    "label": "Vergrößern (2)"
+  },
+  "menu": {
+    "keywords": "Navigation",
+    "label": "Menü"
+  },
+  "message-circle": {
+    "keywords": "Chat Kommentar",
+    "label": "Nachricht (runde Blase)"
+  },
+  "message-square": {
+    "keywords": "Chat Kommentar",
+    "label": "Nachricht (eckige Blase)"
+  },
+  "mic": {
+    "keywords": "Stimme aufnehmen",
+    "label": "Mikrofon"
+  },
+  "mic-off": {
+    "keywords": "stumm",
+    "label": "Mikrofon aus"
+  },
+  "minimize": {
+    "keywords": "reduzieren",
+    "label": "Verkleinern"
+  },
+  "minimize-2": {
+    "keywords": "reduzieren",
+    "label": "Verkleinern (2)"
+  },
+  "minus": {
+    "keywords": "entfernen weniger",
+    "label": "Minus"
+  },
+  "minus-circle": {
+    "keywords": "entfernen",
+    "label": "Minus (Kreis)"
+  },
+  "minus-square": {
+    "keywords": "entfernen",
+    "label": "Minus (Quadrat)"
+  },
+  "monitor": {
+    "keywords": "Monitor Computer",
+    "label": "Bildschirm"
+  },
+  "moon": {
+    "keywords": "Nacht dunkel Schlaf",
+    "label": "Mond"
+  },
+  "more-horizontal": {
+    "keywords": "Punkte",
+    "label": "Mehr Optionen (waagerecht)"
+  },
+  "more-vertical": {
+    "keywords": "Punkte",
+    "label": "Mehr Optionen (senkrecht)"
+  },
+  "move": {
+    "keywords": "bewegen ziehen",
+    "label": "Verschieben"
+  },
+  "music": {
+    "keywords": "Note Audio Lied",
+    "label": "Musik"
+  },
+  "navigation": {
+    "keywords": "Richtung GPS",
+    "label": "Navigation"
+  },
+  "navigation-2": {
+    "keywords": "Richtung GPS",
+    "label": "Navigation (2)"
+  },
+  "octagon": {
+    "keywords": "Form Stopp",
+    "label": "Achteck"
+  },
+  "package": {
+    "keywords": "Karton Lieferung",
+    "label": "Paket"
+  },
+  "paperclip": {
+    "keywords": "Anhang",
+    "label": "Büroklammer"
+  },
+  "pause": {
+    "keywords": "",
+    "label": "Pause"
+  },
+  "pause-circle": {
+    "keywords": "",
+    "label": "Pause (Kreis)"
+  },
+  "percent": {
+    "keywords": "Rabatt",
+    "label": "Prozent"
+  },
+  "phone": {
+    "keywords": "Anruf",
+    "label": "Telefon"
+  },
+  "phone-call": {
+    "keywords": "Telefon Anruf klingeln",
+    "label": "Telefonanruf"
+  },
+  "phone-forwarded": {
+    "keywords": "Telefon Weiterleitung",
+    "label": "Anruf weitergeleitet"
+  },
+  "phone-incoming": {
+    "keywords": "Telefon eingehend",
+    "label": "Eingehender Anruf"
+  },
+  "phone-missed": {
+    "keywords": "Telefon verpasst",
+    "label": "Verpasster Anruf"
+  },
+  "phone-off": {
+    "keywords": "deaktiviert",
+    "label": "Telefon aus"
+  },
+  "phone-outgoing": {
+    "keywords": "Telefon ausgehend",
+    "label": "Ausgehender Anruf"
+  },
+  "pie-chart": {
+    "keywords": "Statistik",
+    "label": "Kreisdiagramm"
+  },
+  "play": {
+    "keywords": "starten abspielen",
+    "label": "Wiedergabe"
+  },
+  "play-circle": {
+    "keywords": "starten",
+    "label": "Wiedergabe (Kreis)"
+  },
+  "plus": {
+    "keywords": "hinzufügen neu",
+    "label": "Plus"
+  },
+  "plus-circle": {
+    "keywords": "hinzufügen neu",
+    "label": "Plus (Kreis)"
+  },
+  "plus-square": {
+    "keywords": "hinzufügen",
+    "label": "Plus (Quadrat)"
+  },
+  "pocket": {
+    "keywords": "speichern später lesen",
+    "label": "Pocket"
+  },
+  "power": {
+    "keywords": "Netzschalter herunterfahren",
+    "label": "Ein / Aus"
+  },
+  "printer": {
+    "keywords": "drucken Papier",
+    "label": "Drucker"
+  },
+  "radio": {
+    "keywords": "Sendung Signal",
+    "label": "Radio"
+  },
+  "refresh-ccw": {
+    "keywords": "neu laden synchronisieren",
+    "label": "Aktualisieren (gegen Uhrzeigersinn)"
+  },
+  "refresh-cw": {
+    "keywords": "neu laden synchronisieren",
+    "label": "Aktualisieren"
+  },
+  "repeat": {
+    "keywords": "Schleife",
+    "label": "Wiederholen"
+  },
+  "rewind": {
+    "keywords": "zurück",
+    "label": "Zurückspulen"
+  },
+  "rotate-ccw": {
+    "keywords": "links rotieren",
+    "label": "Drehen gegen Uhrzeigersinn"
+  },
+  "rotate-cw": {
+    "keywords": "rechts rotieren",
+    "label": "Drehen im Uhrzeigersinn"
+  },
+  "rss": {
+    "keywords": "Nachrichten",
+    "label": "RSS-Feed"
+  },
+  "save": {
+    "keywords": "sichern Diskette",
+    "label": "Speichern"
+  },
+  "scissors": {
+    "keywords": "schneiden",
+    "label": "Schere"
+  },
+  "search": {
+    "keywords": "suchen Lupe finden",
+    "label": "Suche"
+  },
+  "send": {
+    "keywords": "Nachricht schicken",
+    "label": "Senden"
+  },
+  "server": {
+    "keywords": "Daten Hosting",
+    "label": "Server"
+  },
+  "settings": {
+    "keywords": "Zahnrad Konfiguration",
+    "label": "Einstellungen"
+  },
+  "share": {
+    "keywords": "exportieren",
+    "label": "Teilen"
+  },
+  "share-2": {
+    "keywords": "Netzwerk",
+    "label": "Teilen (2)"
+  },
+  "shield": {
+    "keywords": "Sicherheit Schutz",
+    "label": "Schild"
+  },
+  "shield-off": {
+    "keywords": "Schutz",
+    "label": "Schild aus"
+  },
+  "shopping-bag": {
+    "keywords": "kaufen Geschäft",
+    "label": "Einkaufstasche"
+  },
+  "shopping-cart": {
+    "keywords": "kaufen Korb",
+    "label": "Einkaufswagen"
+  },
+  "shuffle": {
+    "keywords": "mischen",
+    "label": "Zufällig"
+  },
+  "sidebar": {
+    "keywords": "Panel",
+    "label": "Seitenleiste"
+  },
+  "skip-back": {
+    "keywords": "zurück",
+    "label": "Vorheriger Titel"
+  },
+  "skip-forward": {
+    "keywords": "weiter",
+    "label": "Nächster Titel"
+  },
+  "slack": {
+    "keywords": "Chat Team",
+    "label": "Slack"
+  },
+  "slash": {
+    "keywords": "verboten keine",
+    "label": "Durchgestrichen"
+  },
+  "sliders": {
+    "keywords": "Einstellungen Equalizer",
+    "label": "Regler"
+  },
+  "smartphone": {
+    "keywords": "Handy Mobiltelefon",
+    "label": "Smartphone"
+  },
+  "speaker": {
+    "keywords": "Ton Audio",
+    "label": "Lautsprecher"
+  },
+  "square": {
+    "keywords": "Form",
+    "label": "Quadrat"
+  },
+  "star": {
+    "keywords": "Favorit Bewertung",
+    "label": "Stern"
+  },
+  "stop-circle": {
+    "keywords": "anhalten",
+    "label": "Stopp (Kreis)"
+  },
+  "sun": {
+    "keywords": "Tag Licht Wetter hell",
+    "label": "Sonne"
+  },
+  "sunrise": {
+    "keywords": "Morgen Dämmerung",
+    "label": "Sonnenaufgang"
+  },
+  "sunset": {
+    "keywords": "Abend Dämmerung",
+    "label": "Sonnenuntergang"
+  },
+  "tablet": {
+    "keywords": "Gerät",
+    "label": "Tablet"
+  },
+  "tag": {
+    "keywords": "Label Preis",
+    "label": "Etikett"
+  },
+  "target": {
+    "keywords": "Zielscheibe",
+    "label": "Ziel"
+  },
+  "terminal": {
+    "keywords": "Konsole Befehl",
+    "label": "Terminal"
+  },
+  "thermometer": {
+    "keywords": "Temperatur Wärme Grad",
+    "label": "Thermometer"
+  },
+  "thumbs-down": {
+    "keywords": "negativ",
+    "label": "Daumen runter"
+  },
+  "thumbs-up": {
+    "keywords": "positiv",
+    "label": "Daumen hoch"
+  },
+  "toggle-left": {
+    "keywords": "links",
+    "label": "Schalter aus"
+  },
+  "toggle-right": {
+    "keywords": "rechts",
+    "label": "Schalter ein"
+  },
+  "trash": {
+    "keywords": "löschen Mülleimer",
+    "label": "Papierkorb"
+  },
+  "trash-2": {
+    "keywords": "löschen Mülleimer",
+    "label": "Papierkorb (2)"
+  },
+  "trending-down": {
+    "keywords": "Rückgang",
+    "label": "Trend abwärts"
+  },
+  "trending-up": {
+    "keywords": "Anstieg Wachstum",
+    "label": "Trend aufwärts"
+  },
+  "triangle": {
+    "keywords": "Form",
+    "label": "Dreieck"
+  },
+  "truck": {
+    "keywords": "Lieferung Transport",
+    "label": "Lastwagen"
+  },
+  "tv": {
+    "keywords": "Bildschirm TV",
+    "label": "Fernseher"
+  },
+  "twitter": {
+    "keywords": "soziales Netzwerk",
+    "label": "Twitter"
+  },
+  "type": {
+    "keywords": "Text Schrift Buchstabe",
+    "label": "Typografie"
+  },
+  "umbrella": {
+    "keywords": "Regen Wetter",
+    "label": "Regenschirm"
+  },
+  "underline": {
+    "keywords": "Text Format",
+    "label": "Unterstrichen"
+  },
+  "unlock": {
+    "keywords": "entsperrt",
+    "label": "Schloss offen"
+  },
+  "upload": {
+    "keywords": "senden importieren",
+    "label": "Hochladen"
+  },
+  "upload-cloud": {
+    "keywords": "hochladen",
+    "label": "Upload (Wolke)"
+  },
+  "user": {
+    "keywords": "Person Profil Konto",
+    "label": "Benutzer"
+  },
+  "user-check": {
+    "keywords": "genehmigt",
+    "label": "Benutzer bestätigt"
+  },
+  "user-minus": {
+    "keywords": "entfernen löschen",
+    "label": "Benutzer entfernt"
+  },
+  "user-plus": {
+    "keywords": "hinzufügen einladen",
+    "label": "Benutzer hinzugefügt"
+  },
+  "user-x": {
+    "keywords": "entfernt blockiert",
+    "label": "Benutzer gelöscht"
+  },
+  "users": {
+    "keywords": "Benutzer Personen Gruppe Team Familie",
+    "label": "Benutzergruppe"
+  },
+  "video": {
+    "keywords": "Kamera Film",
+    "label": "Video"
+  },
+  "video-off": {
+    "keywords": "deaktiviert",
+    "label": "Video aus"
+  },
+  "voicemail": {
+    "keywords": "Anrufbeantworter",
+    "label": "Mailbox"
+  },
+  "volume": {
+    "keywords": "Ton Audio",
+    "label": "Lautstärke"
+  },
+  "volume-1": {
+    "keywords": "Ton",
+    "label": "Lautstärke leise"
+  },
+  "volume-2": {
+    "keywords": "Ton",
+    "label": "Lautstärke laut"
+  },
+  "volume-x": {
+    "keywords": "aus",
+    "label": "Lautstärke stumm"
+  },
+  "watch": {
+    "keywords": "Uhr Zeit",
+    "label": "Armbanduhr"
+  },
+  "wifi": {
+    "keywords": "Netzwerk drahtlos Internet",
+    "label": "WLAN"
+  },
+  "wifi-off": {
+    "keywords": "deaktiviert",
+    "label": "WLAN aus"
+  },
+  "wind": {
+    "keywords": "Luft Brise Wetter",
+    "label": "Wind"
+  },
+  "x": {
+    "keywords": "abbrechen Kreuz nein",
+    "label": "Schließen"
+  },
+  "x-circle": {
+    "keywords": "abbrechen",
+    "label": "Schließen (Kreis)"
+  },
+  "x-square": {
+    "keywords": "abbrechen",
+    "label": "Schließen (Quadrat)"
+  },
+  "zap": {
+    "keywords": "Strom Energie",
+    "label": "Blitz"
+  },
+  "zap-off": {
+    "keywords": "deaktiviert",
+    "label": "Blitz aus"
+  },
+  "zoom-in": {
+    "keywords": "Zoom Lupe",
+    "label": "Vergrößern"
+  },
+  "zoom-out": {
+    "keywords": "Zoom Lupe",
+    "label": "Verkleinern"
+  }
 }
