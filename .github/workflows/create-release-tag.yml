@@ -16,6 +16,11 @@ on:
 permissions:
   contents: write
 
+# Two overlapping runs would bump from the same tip and race on the same tag.
+concurrency:
+  group: create-release-tag
+  cancel-in-progress: false
+
 jobs:
   create-release-tag:
     name: Bump version and push tag
@@ -23,16 +28,31 @@ jobs:
     steps:
       - name: 🛑 Ensure workflow runs on master
         if: github.ref != 'refs/heads/master'
+        env:
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          echo "This workflow can only be run on master, got ${{ github.ref_name }}."
+          echo "::error::This workflow can only be run on master, got ${REF_NAME}."
           exit 1
+      - name: 🔑 Ensure the RELEASE_PAT secret is set
+        env:
+          RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
+        run: |
+          if [ -z "${RELEASE_PAT}" ]; then
+            echo "::error::The RELEASE_PAT secret is missing. It is required because a push made"
+            echo "::error::with the default GITHUB_TOKEN does not trigger the release workflows,"
+            echo "::error::which would leave a tag on master without any production image built."
+            exit 1
+          fi
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v4
         with:
+          # Always release from the current tip of master, not from the commit
+          # master pointed at when the workflow was dispatched.
+          ref: master
           fetch-depth: 0
-          # A PAT is needed for the pushed tag to trigger the release workflows.
-          # Pushes made with the default GITHUB_TOKEN do not trigger other workflows.
-          token: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
+          # Credentials are persisted on purpose: the release commit and tag are
+          # pushed back with this token later in the job.
+          token: ${{ secrets.RELEASE_PAT }}
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v4
         with:
@@ -43,16 +63,25 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: 🔖 Bump version and create tag
         id: bump
+        env:
+          RELEASE_TYPE: ${{ inputs.release_type }}
         run: |
-          NEW_VERSION=$(npm version ${{ inputs.release_type }})
+          NEW_VERSION=$(npm version "${RELEASE_TYPE}")
           echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
           echo "Created tag ${NEW_VERSION}"
       - name: 🚀 Push commit and tag
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.version }}
         run: |
-          git push origin master --follow-tags
+          git push --atomic origin master "refs/tags/${NEW_VERSION}"
       - name: 📝 Job summary
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.version }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
         run: |
-          echo "### 🚀 Release ${{ steps.bump.outputs.version }} created" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Bump type: \`${{ inputs.release_type }}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Tag: [\`${{ steps.bump.outputs.version }}\`](${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.bump.outputs.version }})" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "### 🚀 Release ${NEW_VERSION} created"
+            echo ""
+            echo "- Bump type: \`${RELEASE_TYPE}\`"
+            echo "- Tag: [\`${NEW_VERSION}\`](${{ github.server_url }}/${{ github.repository }}/releases/tag/${NEW_VERSION})"
+          } >> "$GITHUB_STEP_SUMMARY"
