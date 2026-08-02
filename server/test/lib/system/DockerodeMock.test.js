@@ -14,6 +14,7 @@ class Docker {
 }
 
 Docker.prototype.listContainers = fake.resolves(containers);
+Docker.prototype.info = fake.resolves({ CPUCfsQuota: true });
 Docker.prototype.listImages = fake.resolves(images);
 
 const container = {
