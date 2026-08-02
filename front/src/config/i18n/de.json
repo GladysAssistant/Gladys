@@ -4462,6 +4462,35 @@
           "2": "Heizen",
           "3": "Entfeuchten",
           "4": "Lüften"
+        },
+        "fan-speed": {
+          "0": "Automatisch",
+          "1": "Niedrig",
+          "2": "Niedrig-Mittel",
+          "3": "Mittel",
+          "4": "Mittel-Hoch",
+          "5": "Hoch",
+          "6": "Leise",
+          "7": "Turbo"
+        },
+        "swing-horizontal": {
+          "0": "Aus",
+          "1": "Schwenk",
+          "2": "Position 1 (Links)",
+          "3": "Position 2",
+          "4": "Position 3 (Mitte)",
+          "5": "Position 4",
+          "6": "Position 5 (Rechts)",
+          "7": "Gegenläufiger Schwenk"
+        },
+        "swing-vertical": {
+          "0": "Aus",
+          "1": "Schwenken",
+          "2": "Position 1 (Oben)",
+          "3": "Position 2",
+          "4": "Position 3",
+          "5": "Position 4",
+          "6": "Position 5 (Unten)"
         }
       },
       "siren": {

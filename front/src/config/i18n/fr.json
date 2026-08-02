@@ -4462,6 +4462,35 @@
           "2": "Chauffage",
           "3": "Déshumidification",
           "4": "Ventilation"
+        },
+        "fan-speed": {
+          "0": "Auto",
+          "1": "Faible",
+          "2": "Faible-Moyen",
+          "3": "Moyen",
+          "4": "Moyen-Fort",
+          "5": "Fort",
+          "6": "Silencieux",
+          "7": "Turbo"
+        },
+        "swing-horizontal": {
+          "0": "Arrêt",
+          "1": "Balancement",
+          "2": "Position 1 (Gauche)",
+          "3": "Position 2",
+          "4": "Position 3 (Centre)",
+          "5": "Position 4",
+          "6": "Position 5 (Droite)",
+          "7": "Balancement inversé"
+        },
+        "swing-vertical": {
+          "0": "Arrêt",
+          "1": "Balayage",
+          "2": "Position 1 (Haut)",
+          "3": "Position 2",
+          "4": "Position 3",
+          "5": "Position 4",
+          "6": "Position 5 (Bas)"
         }
       },
       "siren": {
