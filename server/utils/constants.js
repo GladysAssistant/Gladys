@@ -187,14 +187,19 @@ const AC_FAN_SPEED = {
   MID: 3,
   MID_HIGH: 4,
   HIGH: 5,
-  MUTE: 6,
+  QUIET: 6,
   TURBO: 7,
 };
 
 const AC_SWING_HORIZONTAL = {
   OFF: 0,
   SWING: 1,
-  SWING_OPPOSITE: 2,
+  POSITION_1: 2,
+  POSITION_2: 3,
+  POSITION_3: 4,
+  POSITION_4: 5,
+  POSITION_5: 6,
+  SWING_OPPOSITE: 7,
 };
 
 const AC_SWING_VERTICAL = {

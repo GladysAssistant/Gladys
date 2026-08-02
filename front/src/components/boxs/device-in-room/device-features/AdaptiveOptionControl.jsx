@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import { registerAdaptiveControl } from './acAdaptiveControls';
+import { registerAdaptiveControl, scheduleReflow } from './acAdaptiveControls';
 import style from './AdaptiveOptionControl.css';
 
 /**
@@ -11,6 +11,13 @@ import style from './AdaptiveOptionControl.css';
  * decision is coordinated per card (see acAdaptiveControls) so controls sharing the same table
  * column stay consistent and never overflow the card.
  */
+// A stable signature of the option set: the buttons-vs-dropdown layout depends on the number of
+// options and their rendered labels, so a change in either must re-run the coordinator.
+const optionsSignature = options =>
+  (Array.isArray(options) ? options : [])
+    .map(option => `${option.value}:${option.i18nKey || option.label || ''}`)
+    .join('|');
+
 class AdaptiveOptionControl extends Component {
   setCell = element => {
     this.cell = element;
@@ -50,8 +57,18 @@ class AdaptiveOptionControl extends Component {
   };
 
   componentDidMount() {
-    const card = this.cell && this.cell.closest('.card');
-    this.unregister = registerAdaptiveControl(card, this.control);
+    this.card = this.cell && this.cell.closest('.card');
+    this.unregister = registerAdaptiveControl(this.card, this.control);
+  }
+
+  componentDidUpdate(prevProps) {
+    // The buttons-vs-dropdown choice is taken at mount and on card resize. When the option set
+    // itself changes later — e.g. supported_options arriving from a WebSocket update after the
+    // first render — re-run the layout so the control does not stay as overflowing buttons or a
+    // needless dropdown until the next resize.
+    if (this.card && optionsSignature(prevProps.options) !== optionsSignature(this.props.options)) {
+      scheduleReflow(this.card);
+    }
   }
 
   componentWillUnmount() {

@@ -4185,12 +4185,17 @@
           "mid": "Moyen",
           "mid-high": "Moyen-Fort",
           "high": "Fort",
-          "mute": "Silencieux",
+          "quiet": "Silencieux",
           "turbo": "Turbo"
         },
         "swing-horizontal": {
           "off": "Arrêt",
           "swing": "Balancement",
+          "position-1": "Position 1 (Gauche)",
+          "position-2": "Position 2",
+          "position-3": "Position 3 (Centre)",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Droite)",
           "swing-opposite": "Balancement inversé"
         },
         "swing-vertical": {

@@ -12,7 +12,7 @@ const FAN_SPEED_OPTIONS = [
   { value: AC_FAN_SPEED.MID, i18nKey: 'mid' },
   { value: AC_FAN_SPEED.MID_HIGH, i18nKey: 'mid-high' },
   { value: AC_FAN_SPEED.HIGH, i18nKey: 'high' },
-  { value: AC_FAN_SPEED.MUTE, i18nKey: 'mute' },
+  { value: AC_FAN_SPEED.QUIET, i18nKey: 'quiet' },
   { value: AC_FAN_SPEED.TURBO, i18nKey: 'turbo' }
 ];
 

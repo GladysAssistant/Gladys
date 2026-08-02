@@ -4185,12 +4185,17 @@
           "mid": "Medium",
           "mid-high": "Med-High",
           "high": "High",
-          "mute": "Quiet",
+          "quiet": "Quiet",
           "turbo": "Turbo"
         },
         "swing-horizontal": {
           "off": "Off",
           "swing": "Swing",
+          "position-1": "Position 1 (Left)",
+          "position-2": "Position 2",
+          "position-3": "Position 3 (Center)",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Right)",
           "swing-opposite": "Opposite Swing"
         },
         "swing-vertical": {

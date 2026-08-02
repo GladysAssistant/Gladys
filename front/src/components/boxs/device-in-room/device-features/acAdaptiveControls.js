@@ -95,4 +95,4 @@ function registerAdaptiveControl(cardElement, control) {
   };
 }
 
-export { registerAdaptiveControl };
+export { registerAdaptiveControl, scheduleReflow };
