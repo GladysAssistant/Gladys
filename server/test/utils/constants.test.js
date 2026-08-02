@@ -33,7 +33,8 @@ describe('constants DEVICE_FEATURE_CATEGORIES.THERMOSTAT / DEVICE_FEATURE_TYPES.
     expect(DEVICE_FEATURE_CATEGORIES.THERMOSTAT).to.equal('thermostat');
   });
 
-  it('should expose the mode and operating-state feature types', () => {
+  it('should expose the mode, the temperature and operating-state feature types', () => {
+    expect(DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE).to.equal('target-temperature');
     expect(DEVICE_FEATURE_TYPES.THERMOSTAT.MODE).to.equal('mode');
     expect(DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE).to.equal('operating-state');
   });
