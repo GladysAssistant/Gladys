@@ -60,6 +60,12 @@ const initializeSceneVariables = (actions, parentPath = '') => {
 
       // Handle nested conditions
       if (action && (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE)) {
+        // "if" is a flat list of conditions, each one can declare a variable (device.get-value)
+        if (Array.isArray(action.if)) {
+          action.if.forEach((condition, conditionIndex) => {
+            variables[`${currentPath}.if.${conditionIndex}`] = [];
+          });
+        }
         if (Array.isArray(action.then)) {
           const thenVariables = initializeSceneVariables(action.then, `${currentPath}.then`);
           variables = { ...variables, ...thenVariables };

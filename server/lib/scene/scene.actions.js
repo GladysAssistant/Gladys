@@ -687,11 +687,13 @@ const actionsFunc = {
 
     let iterations = 0;
     /* eslint-disable no-await-in-loop */
-    // Iterations are sequential by design: conditions are re-evaluated before each one
-    while (await verifyConditions()) {
-      if (iterations >= maxIterations) {
-        logger.warn(`While loop: max number of iterations reached (${maxIterations}), stopping the loop.`);
-        break;
+    // Iterations are sequential by design: conditions are re-evaluated before each one.
+    // The max iterations limit is checked first, so conditions are never evaluated
+    // one extra time after the last allowed iteration.
+    while (iterations < maxIterations) {
+      if (!(await verifyConditions())) {
+        // Conditions are not verified anymore: this is the normal end of the loop
+        return;
       }
       const iterationStartTime = Date.now();
       await executeActions(self, loopActions, scope, `${path}.then`);
@@ -703,6 +705,7 @@ const actionsFunc = {
       }
     }
     /* eslint-enable no-await-in-loop */
+    logger.warn(`While loop: max number of iterations reached (${maxIterations}), stopping the loop.`);
   },
   [ACTIONS.CONDITION.IF_THEN_ELSE]: async (self, action, scope, path) => {
     const { if: ifActions, then: thenActions, else: elseActions } = action;

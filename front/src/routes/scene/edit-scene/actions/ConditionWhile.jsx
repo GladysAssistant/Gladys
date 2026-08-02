@@ -15,6 +15,10 @@ const isNullOrUndefined = variable => variable === null || variable === undefine
 // the value of a device feature before comparing it, on each iteration of the loop.
 const WHILE_CONDITION_ACTIONS = [ACTIONS.DEVICE.GET_VALUE, ...CONDITION_ACTIONS];
 
+// Must stay in sync with the max_iterations validation of the scene model
+const MIN_ITERATIONS = 1;
+const MAX_ITERATIONS = 10000;
+
 class ConditionWhile extends Component {
   constructor(props) {
     super(props);
@@ -59,12 +63,25 @@ class ConditionWhile extends Component {
   };
 
   updateMaxIterations = e => {
-    const value = parseInt(e.target.value, 10);
-    this.props.updateActionProperty(this.props.path, 'max_iterations', Number.isNaN(value) ? undefined : value);
+    const rawValue = e.target.value;
+    // An empty field means "use the default value"
+    if (rawValue === '') {
+      this.props.updateActionProperty(this.props.path, 'max_iterations', undefined);
+      return;
+    }
+    const value = Number(rawValue);
+    // Only persist values the server would accept, so the scene stays saveable
+    if (!Number.isInteger(value) || value < MIN_ITERATIONS || value > MAX_ITERATIONS) {
+      return;
+    }
+    this.props.updateActionProperty(this.props.path, 'max_iterations', value);
   };
 
   render(props, { repeatCollapsed }) {
-    const conditions = get(props, 'action.if', []);
+    // "action.if" can be explicitly null before componentDidMount initializes it
+    const conditionsFromAction = get(props, 'action.if', []);
+    const conditions = Array.isArray(conditionsFromAction) ? conditionsFromAction : [];
+    const maxIterationsInputId = `while-max-iterations-${props.path}`;
 
     return (
       <>
@@ -176,16 +193,17 @@ class ConditionWhile extends Component {
 
         {/* Max iterations safety limit */}
         <div class="form-group mb-0">
-          <label class="form-label">
+          <label class="form-label" for={maxIterationsInputId}>
             <Text id="editScene.actionsCard.conditionWhile.maxIterationsLabel">
               Maximum number of iterations (safety limit)
             </Text>
           </label>
           <input
+            id={maxIterationsInputId}
             type="number"
             class="form-control"
-            min="1"
-            max="10000"
+            min={MIN_ITERATIONS}
+            max={MAX_ITERATIONS}
             placeholder="1000"
             value={isNullOrUndefined(props.action.max_iterations) ? '' : props.action.max_iterations}
             onChange={this.updateMaxIterations}

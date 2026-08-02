@@ -133,6 +133,47 @@ describe('scene.conditionWhile', () => {
     expect(deviceFeature.last_value).to.equal(100);
   });
 
+  it('should not evaluate the conditions more than max_iterations times', async () => {
+    const deviceFeature = { device_id: 'device-id', category: 'light', type: 'brightness', last_value: 10 };
+    stateManager.setState('deviceFeature', 'my-device-feature', deviceFeature);
+    stateManager.setState('deviceById', 'device-id', { id: 'device-id' });
+    const message = { sendToUser: fake.resolves(null) };
+    // Count how many times the conditions are actually evaluated
+    let conditionEvaluations = 0;
+    const originalGet = stateManager.get.bind(stateManager);
+    stateManager.get = (entity, selector) => {
+      if (entity === 'deviceFeature' && selector === 'my-device-feature') {
+        conditionEvaluations += 1;
+      }
+      return originalGet(entity, selector);
+    };
+    await executeActions(
+      { stateManager, event, message },
+      [
+        [
+          {
+            type: ACTIONS.CONDITION.WHILE,
+            max_iterations: 3,
+            if: [
+              // This condition reads the device state on every evaluation
+              { type: ACTIONS.DEVICE.GET_VALUE, device_feature: 'my-device-feature' },
+              {
+                type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+                // Always true, so only max_iterations stops the loop
+                conditions: [{ variable: '0.0.if.0.last_value', operator: '=', value: 10 }],
+              },
+            ],
+            then: [[{ type: ACTIONS.MESSAGE.SEND, user: 'pepper', text: 'Loop executed' }]],
+          },
+        ],
+      ],
+      {},
+    );
+    // 3 iterations, and no extra condition evaluation once the limit is reached
+    expect(message.sendToUser.callCount).to.equal(3);
+    expect(conditionEvaluations).to.equal(3);
+  });
+
   it('should abort the scene when the loop body is empty', async () => {
     const message = {
       sendToUser: fake.resolves(null),
