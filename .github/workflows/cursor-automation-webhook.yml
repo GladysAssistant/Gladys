@@ -1,0 +1,104 @@
+name: Trigger Cursor automation
+
+# Manual button to start a Cursor Automation webhook for a given PR.
+# Useful for fork PRs, which native Cursor PR triggers cannot run on.
+#
+# Required repository secrets:
+#   CURSOR_AUTOMATION_WEBHOOK_URL   - full webhook URL from the automation page
+#                                     (https://api2.cursor.sh/automations/webhook/<id>)
+#   CURSOR_AUTOMATION_WEBHOOK_TOKEN - API key from "Generate auth header"
+#                                     (crsr_... value only, without "Bearer ")
+#
+# SECURITY: this workflow never checks out or executes PR head code. It only
+# reads PR metadata through the GitHub API, then POSTs to Cursor.
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to pass to the Cursor automation
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate secrets
+        env:
+          WEBHOOK_URL: ${{ secrets.CURSOR_AUTOMATION_WEBHOOK_URL }}
+          WEBHOOK_TOKEN: ${{ secrets.CURSOR_AUTOMATION_WEBHOOK_TOKEN }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "::error::Missing secret CURSOR_AUTOMATION_WEBHOOK_URL"
+            exit 1
+          fi
+          if [ -z "$WEBHOOK_TOKEN" ]; then
+            echo "::error::Missing secret CURSOR_AUTOMATION_WEBHOOK_TOKEN"
+            exit 1
+          fi
+
+      - name: Fetch PR metadata and call Cursor webhook
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          WEBHOOK_URL: ${{ secrets.CURSOR_AUTOMATION_WEBHOOK_URL }}
+          WEBHOOK_TOKEN: ${{ secrets.CURSOR_AUTOMATION_WEBHOOK_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          PR_NUMBER=$(echo "$PR_NUMBER" | tr -d '[:space:]')
+          case "$PR_NUMBER" in
+            ''|*[!0-9]*)
+              echo "::error::Invalid PR number '$PR_NUMBER'"
+              exit 1
+              ;;
+          esac
+
+          # REST payload is stable for fork and same-repo PRs.
+          PR_JSON=$(gh api "repos/${GH_REPO}/pulls/${PR_NUMBER}")
+
+          PAYLOAD=$(jq -n \
+            --argjson pr "$PR_JSON" \
+            --arg repo "$GH_REPO" \
+            '{
+              pr_number: $pr.number,
+              pr_url: $pr.html_url,
+              repo: $repo,
+              title: $pr.title,
+              body: ($pr.body // ""),
+              state: $pr.state,
+              base_ref: $pr.base.ref,
+              head_ref: $pr.head.ref,
+              head_sha: $pr.head.sha,
+              is_fork: ($pr.head.repo.full_name != $repo),
+              author: $pr.user.login,
+              head_repository: ($pr.head.repo.full_name // $repo)
+            }')
+
+          echo "Triggering Cursor automation for PR #${PR_NUMBER}"
+          echo "$PAYLOAD" | jq '{pr_number, pr_url, repo, title, head_ref, head_sha, is_fork, author, head_repository}'
+
+          HTTP_CODE=$(curl -sS -o /tmp/cursor-webhook-response.txt -w "%{http_code}" \
+            -X POST "$WEBHOOK_URL" \
+            -H "Authorization: Bearer ${WEBHOOK_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD")
+
+          echo "Cursor webhook HTTP status: ${HTTP_CODE}"
+          cat /tmp/cursor-webhook-response.txt
+          echo
+
+          case "$HTTP_CODE" in
+            2*)
+              echo "Cursor automation triggered successfully."
+              ;;
+            *)
+              echo "::error::Cursor webhook failed with HTTP ${HTTP_CODE}"
+              exit 1
+              ;;
+          esac
