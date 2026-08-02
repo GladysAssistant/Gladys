@@ -2709,7 +2709,9 @@
       },
       "rateLimit": "Da die KI-API nicht kostenlos ist, ist diese Integration auf 3.000 Textanfragen und 500 Bildanfragen pro Monat und Konto begrenzt.",
       "notOnGladysPlus": "Da die KI-API nicht kostenlos ist, ist diese Integration nur für Gladys-Plus-Benutzer verfügbar.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Klicke hier</a>, um Gladys Plus zu abonnieren.",
+      "ttsProvider": "Stimme (Sprachsynthese-Anbieter)",
+      "ttsProviderText": "Der Anbieter, der zum Sprechen verwendet wird: Szenen-Ansagen auf Ihren Lautsprechern und die Antworten des Sprachassistenten. Gladys Plus funktioniert überall (auch beim Fernzugriff); eine TTS-Anbieter-Integration erzeugt die Stimme lokal und stellt sie über Ihr lokales Netzwerk bereit."
     },
     "callmebot": {
       "title": "CallMeBot",
@@ -3613,8 +3615,6 @@
     "configurationTitle": "Konfiguration",
     "timezone": "Zeitzone",
     "timezoneText": "Die Zeitzone wird für zeitabhängige Szenen verwendet.",
-    "ttsProvider": "Stimme (Sprachsynthese-Anbieter)",
-    "ttsProviderText": "Der Anbieter, der zum Sprechen verwendet wird: Szenen-Ansagen auf Ihren Lautsprechern und die Antworten des Sprachassistenten. Gladys Plus funktioniert überall (auch beim Fernzugriff); eine TTS-Anbieter-Integration erzeugt die Stimme lokal und stellt sie über Ihr lokales Netzwerk bereit.",
     "deviceStateRetentionTime": "Gerätestatusverlauf behalten",
     "deviceStateRetentionTimeDescription": "Lege fest, wie lange Gladys die Status deiner Geräte in der Datenbank aufbewahren soll.",
     "deviceAggregatesStateRetentionTime": "Aggregierte Zustände behalten",

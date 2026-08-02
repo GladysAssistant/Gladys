@@ -4,7 +4,6 @@ import SettingsSystemBatteryLevelWarning from './SettingsSystemBatteryLevelWarni
 import SettingsSystemContainers from './SettingsSystemContainers';
 import SettingsSystemOperations from './SettingsSystemOperations';
 import SettingsSystemTimezone from './SettingsSystemTimezone';
-import SettingsSystemTtsProvider from './SettingsSystemTtsProvider';
 import SettingsSystemKeepDeviceHistory from './SettingsSystemKeepDeviceHistory';
 import SettingsSystemTimeExpiryState from './SettingsSystemTimeExpiryState';
 import SettingsSystemDatabaseCleaning from './SettingsSystemDatabaseCleaning';
@@ -130,7 +129,6 @@ const SystemPage = ({ children, ...props }) => (
       </div>
       <div class="col-lg-6">
         <SettingsSystemTimezone />
-        <SettingsSystemTtsProvider />
         <SettingsSystemBatteryLevelWarning />
         <SettingsSystemDownloadLogs />
         <SettingsSystemDatabaseCleaning />

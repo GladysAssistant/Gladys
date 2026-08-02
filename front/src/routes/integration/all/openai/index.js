@@ -6,6 +6,7 @@ import GladysPlusUpsellCard from '../../../../components/gateway/GladysPlusUpsel
 import WeeklyDigestSettings from './WeeklyDigestSettings';
 import AiChatDebugDownload from './AiChatDebugDownload';
 import AiQuotaDisplay from './AiQuotaDisplay';
+import TtsProviderSettings from './TtsProviderSettings';
 
 class OpenAIGateway extends Component {
   isGladysPlusConnected = async () => {
@@ -119,6 +120,9 @@ class OpenAIGateway extends Component {
             )}
           </div>
         </div>
+        {/* the voice does not need Gladys Plus: an installed TTS provider
+            integration works locally, so the card is always shown */}
+        <TtsProviderSettings />
         {gladysPlusConnected === true && <AiQuotaDisplay />}
         {gladysPlusConnected === true && <WeeklyDigestSettings />}
         {gladysPlusConnected === true && <AiChatDebugDownload />}

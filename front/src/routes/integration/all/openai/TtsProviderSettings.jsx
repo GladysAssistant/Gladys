@@ -6,7 +6,7 @@ import Select from 'react-select';
 // The voice of the instance: Gladys Plus by default, or any installed TTS
 // provider integration (external integrations of type "tts"). Scene
 // announcements and the voice assistant speak through the active provider.
-class SettingsSystemTtsProvider extends Component {
+class TtsProviderSettings extends Component {
   // the API provides a display name per provider (the integration's
   // manifest name), so the select matches the Integrations UI
   buildOptions = providers =>
@@ -53,13 +53,13 @@ class SettingsSystemTtsProvider extends Component {
     return (
       <div class="card">
         <h4 class="card-header">
-          <Text id="systemSettings.ttsProvider" />
+          <Text id="integration.openai.ttsProvider" />
         </h4>
 
         <div class="card-body">
           <form className="">
             <p>
-              <Text id="systemSettings.ttsProviderText" />
+              <Text id="integration.openai.ttsProviderText" />
             </p>
             <Select
               options={options}
@@ -76,4 +76,4 @@ class SettingsSystemTtsProvider extends Component {
   }
 }
 
-export default connect('httpClient', null)(SettingsSystemTtsProvider);
+export default connect('httpClient', null)(TtsProviderSettings);

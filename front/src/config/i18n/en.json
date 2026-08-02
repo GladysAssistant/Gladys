@@ -2709,7 +2709,9 @@
       },
       "rateLimit": "As the AI API is not free, this integration is limited to 3,000 text requests and 500 image requests per month per account.",
       "notOnGladysPlus": "As the AI API is not free, this integration is only available to Gladys Plus users.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
+      "ttsProvider": "Voice (text-to-speech provider)",
+      "ttsProviderText": "The provider used to speak: scene announcements on your speakers and the voice assistant replies. Gladys Plus works everywhere (including remote access); a TTS provider integration generates the voice locally, served on your local network."
     },
     "callmebot": {
       "title": "CallMeBot",
@@ -3613,8 +3615,6 @@
     "configurationTitle": "Configuration",
     "timezone": "Timezone",
     "timezoneText": "The timezone is used in scheduled scene.",
-    "ttsProvider": "Voice (text-to-speech provider)",
-    "ttsProviderText": "The provider used to speak: scene announcements on your speakers and the voice assistant replies. Gladys Plus works everywhere (including remote access); a TTS provider integration generates the voice locally, served on your local network.",
     "deviceStateRetentionTime": "Keep Device State History",
     "deviceStateRetentionTimeDescription": "How long Gladys will keep your device states in database.",
     "deviceAggregatesStateRetentionTime": "Keep Aggregated States",
