@@ -85,6 +85,26 @@ class ConditionWhile extends Component {
 
     return (
       <>
+        {/* Max iterations safety limit. Kept at the top of the block: the "Repeat" section
+            below can be long, and this limit should stay visible without scrolling. */}
+        <div class="form-group mb-4">
+          <label class="form-label" for={maxIterationsInputId}>
+            <Text id="editScene.actionsCard.conditionWhile.maxIterationsLabel">
+              Maximum number of iterations (safety limit)
+            </Text>
+          </label>
+          <input
+            id={maxIterationsInputId}
+            type="number"
+            class="form-control"
+            min={MIN_ITERATIONS}
+            max={MAX_ITERATIONS}
+            placeholder="1000"
+            value={isNullOrUndefined(props.action.max_iterations) ? '' : props.action.max_iterations}
+            onChange={this.updateMaxIterations}
+          />
+        </div>
+
         {/* Conditions Section */}
         <div class="conditions-container mb-4">
           <div class="d-flex justify-content-between align-items-center mb-2">
@@ -189,25 +209,6 @@ class ConditionWhile extends Component {
               ))}
             </div>
           )}
-        </div>
-
-        {/* Max iterations safety limit */}
-        <div class="form-group mb-0">
-          <label class="form-label" for={maxIterationsInputId}>
-            <Text id="editScene.actionsCard.conditionWhile.maxIterationsLabel">
-              Maximum number of iterations (safety limit)
-            </Text>
-          </label>
-          <input
-            id={maxIterationsInputId}
-            type="number"
-            class="form-control"
-            min={MIN_ITERATIONS}
-            max={MAX_ITERATIONS}
-            placeholder="1000"
-            value={isNullOrUndefined(props.action.max_iterations) ? '' : props.action.max_iterations}
-            onChange={this.updateMaxIterations}
-          />
         </div>
       </>
     );
