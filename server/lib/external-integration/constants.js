@@ -21,6 +21,13 @@ const PRIVATE_NETWORK_PREFIX = 'gladys-int-';
 // Docker label carrying the sub-container `name` (the main container has
 // only the reconciliation label).
 const SUB_CONTAINER_LABEL = 'io.gladysassistant.container';
+// uid/gid of the `node` user in the official node images: the template
+// runs the integration as this unprivileged user (USER node), so the /data
+// bind source is created and chowned to it before the container exists —
+// Docker would otherwise create the folder owned by root:root, leaving the
+// only writable path of the container read-only for the integration.
+const INTEGRATION_DATA_UID = 1000;
+const INTEGRATION_DATA_GID = 1000;
 // Bounds of the `containers` manifest field (same rules as the indexer).
 const MAX_SUB_CONTAINERS = 5;
 const MAX_SUB_CONTAINER_VOLUMES = 5;
@@ -191,6 +198,8 @@ module.exports = {
   MANIFEST_FILE_NAME,
   PRIVATE_NETWORK_PREFIX,
   SUB_CONTAINER_LABEL,
+  INTEGRATION_DATA_UID,
+  INTEGRATION_DATA_GID,
   MAX_SUB_CONTAINERS,
   MAX_SUB_CONTAINER_VOLUMES,
   MAX_SUB_CONTAINER_PORTS,

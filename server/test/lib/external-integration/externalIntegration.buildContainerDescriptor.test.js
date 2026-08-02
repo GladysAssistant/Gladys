@@ -66,6 +66,18 @@ describe('externalIntegration.buildContainerDescriptor', () => {
     );
   });
 
+  it('should omit NanoCpus when the kernel has no CPU CFS support', async () => {
+    const { externalIntegration } = buildSupervisor({
+      system: {
+        hasCpuCfsSupport: fake.resolves(false),
+      },
+    });
+    const service = await seedExternalService();
+    const descriptor = await externalIntegration.buildContainerDescriptor(service, 'token');
+    expect(descriptor.HostConfig).to.not.have.property('NanoCpus');
+    expect(descriptor.HostConfig.Memory).to.equal(268435456);
+  });
+
   it('should not add ExtraHosts when Gladys runs in a container', async () => {
     const { externalIntegration } = buildSupervisor();
     const service = await seedExternalService();
