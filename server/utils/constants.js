@@ -263,6 +263,22 @@ const VACUUM_CLEANER_STATE = {
   DOCKED: 6,
 };
 
+// Generic EV charge point/connector status - matches OCPP's ChargePointStatus
+// enum (OCPP 1.6/2.x share these same states), but is not itself protocol-
+// specific: any EV charger integration (OCPP-based or not) reporting a
+// comparable lifecycle can map onto it.
+const EV_CHARGE_CONNECTOR_STATUS = {
+  AVAILABLE: 0,
+  PREPARING: 1,
+  CHARGING: 2,
+  SUSPENDED_EVSE: 3,
+  SUSPENDED_EV: 4,
+  FINISHING: 5,
+  RESERVED: 6,
+  UNAVAILABLE: 7,
+  FAULTED: 8,
+};
+
 const VACUUM_CLEANER_MODE = {
   IDLE: 0,
   CLEANING: 1,
@@ -1080,6 +1096,7 @@ const DEVICE_FEATURE_TYPES = {
     CHARGE_VOLTAGE: 'charge-voltage', // Charging voltage in V (integer - sensor)
     LAST_CHARGE_ENERGY_ADDED: 'last-charge-energy-added', // Energy added in the last charge session in kWh (integer - sensor)
     LAST_CHARGE_ENERGY_CONSUMPTION: 'last-charge-energy-consumption', // Energy consumed in the last charge session in kWh (integer - sensor)
+    CONNECTOR_STATUS: 'connector-status', // Charge point/connector status enum (integer - sensor), see EV_CHARGE_CONNECTOR_STATUS
     PLUGGED: 'plugged', // Whether the vehicle is plugged in (binary - sensor)
     TARGET_CHARGE_LIMIT: 'target-charge-limit', // Target state of charge limit in percent (integer - command)
     TARGET_CURRENT: 'target-current', // Target charging current in A (integer - command)
@@ -1890,6 +1907,7 @@ module.exports.AC_FAN_SPEED = AC_FAN_SPEED;
 module.exports.AC_SWING_HORIZONTAL = AC_SWING_HORIZONTAL;
 module.exports.AC_SWING_VERTICAL = AC_SWING_VERTICAL;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
+module.exports.EV_CHARGE_CONNECTOR_STATUS = EV_CHARGE_CONNECTOR_STATUS;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;

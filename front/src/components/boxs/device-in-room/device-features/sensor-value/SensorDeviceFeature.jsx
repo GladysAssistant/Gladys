@@ -22,6 +22,7 @@ import WaterValveDeviceValue from './WaterValveDeviceValue';
 import PressureSensorDeviceValue from './PressureSensorDeviceValue';
 import FanSensorDeviceValue from './FanSensorDeviceValue';
 import VacuumCleanerStateDeviceValue from './VacuumCleanerStateDeviceValue';
+import EvChargeConnectorStatusDeviceValue from './EvChargeConnectorStatusDeviceValue';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: MotionSensorDeviceValue,
@@ -59,7 +60,8 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_RANGE_ESTIMATE]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.ODOMETER]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.TIRE_PRESSURE]: PressureSensorDeviceValue,
-  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE]: VacuumCleanerStateDeviceValue
+  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE]: VacuumCleanerStateDeviceValue,
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.CONNECTOR_STATUS]: EvChargeConnectorStatusDeviceValue
 };
 
 const DEVICE_FEATURES_WITHOUT_EXPIRATION = [

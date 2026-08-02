@@ -4617,6 +4617,18 @@
         "plugged": {
           "0": "Nicht geladen",
           "1": "Geladen"
+        },
+        "connector-status": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Verfügbar",
+          "1": "Vorbereitung",
+          "2": "Lädt",
+          "3": "Angehalten (Ladestation)",
+          "4": "Angehalten (Fahrzeug)",
+          "5": "Abschluss",
+          "6": "Reserviert",
+          "7": "Nicht verfügbar",
+          "8": "Fehler"
         }
       },
       "voc-matter-index-sensor": {
@@ -4870,6 +4882,7 @@
       "last-charge-energy-added": "Zugefügte Energie (letzte Ladung)",
       "last-charge-energy-consumption": "Verbrauchte Energie (letzte Ladung)",
       "plugged": "Fahrzeug angeschlossen",
+      "connector-status": "Steckerstatus",
       "target-charge-limit": "Ladegrenze",
       "target-current": "Zielstrom"
     },

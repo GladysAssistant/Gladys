@@ -4617,6 +4617,18 @@
         "plugged": {
           "0": "Déconnecté",
           "1": "Connecté"
+        },
+        "connector-status": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Disponible",
+          "1": "Préparation",
+          "2": "En charge",
+          "3": "Suspendue (borne)",
+          "4": "Suspendue (véhicule)",
+          "5": "Finalisation",
+          "6": "Réservée",
+          "7": "Indisponible",
+          "8": "En défaut"
         }
       },
       "voc-matter-index-sensor": {
@@ -4870,6 +4882,7 @@
       "last-charge-energy-added": "Énergie ajoutée (dernière charge)",
       "last-charge-energy-consumption": "Énergie consommée (dernière charge)",
       "plugged": "Véhicule branché",
+      "connector-status": "Statut du connecteur",
       "target-charge-limit": "Limite de charge",
       "target-current": "Intensité de consigne"
     },

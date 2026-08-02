@@ -4617,6 +4617,18 @@
         "plugged": {
           "0": "Unplugged",
           "1": "Plugged"
+        },
+        "connector-status": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Available",
+          "1": "Preparing",
+          "2": "Charging",
+          "3": "Suspended (EVSE)",
+          "4": "Suspended (EV)",
+          "5": "Finishing",
+          "6": "Reserved",
+          "7": "Unavailable",
+          "8": "Faulted"
         }
       },
       "voc-matter-index-sensor": {
@@ -4870,6 +4882,7 @@
       "last-charge-energy-added": "Energy added (last charge)",
       "last-charge-energy-consumption": "Energy consumed (last charge)",
       "plugged": "Vehicle plugged",
+      "connector-status": "Connector status",
       "target-charge-limit": "Charge limit",
       "target-current": "Target current"
     },
