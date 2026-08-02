@@ -52,7 +52,8 @@ function rewriteReferences(item, featureReplacements, deviceReplacements) {
 /**
  * @description Replace selectors in scene actions/triggers or dashboard boxes. Handles both
  * flat arrays (triggers) and arrays of arrays (actions, boxes), and recurses into the nested
- * actions of condition.if-then-else (`if` is a flat list, `then`/`else` are arrays of arrays).
+ * actions of condition.if-then-else and condition.while (`if` is a flat list, `then`/`else`
+ * are arrays of arrays).
  * @param {Array} items - Array of items (or of arrays of items), mutated in place.
  * @param {object} featureReplacements - Map of source feature selector to destination feature selector.
  * @param {object} deviceReplacements - Map of source device selector to destination device selector.

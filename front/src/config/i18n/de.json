@@ -2988,6 +2988,19 @@
           "other": "{{count}} Aktionen"
         }
       },
+      "conditionWhile": {
+        "conditions": "Bedingungen",
+        "conditionDescription": "Solange alle Bedingungen erfüllt sind, werden die Aktionen im \"Wiederholen...\"-Block in einer Schleife ausgeführt. Die Bedingungen werden vor jeder Iteration neu ausgewertet.",
+        "noCondition": "Es wurde noch keine Bedingung hinzugefügt. Klicken Sie auf die '+'-Schaltfläche, um diesem Block eine Bedingung hinzuzufügen. Ohne Bedingung wird die Schleife nicht ausgeführt.",
+        "addCondition": "Bedingung hinzufügen",
+        "repeat": "Wiederholen...",
+        "maxIterationsLabel": "Maximale Anzahl an Iterationen (Sicherheitslimit)",
+        "actionCount": {
+          "zero": "Keine Aktionen",
+          "one": "1 Aktion",
+          "other": "{{count}} Aktionen"
+        }
+      },
       "checkTime": {
         "description": "Die Szene wird nur fortgesetzt, wenn die aktuelle Uhrzeit außerhalb der ausgewählten Tage liegt. Wenn ein Feld leer gelassen wird, wird es nicht berücksichtigt.",
         "beforeLabel": "Vor",
@@ -3140,7 +3153,8 @@
       "condition": {
         "only-continue-if": "Nur fortsetzen, wenn",
         "check-time": "Zeitbedingung",
-        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\""
+        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\"",
+        "while": "Schleife: \"Solange... wiederholen...\""
       },
       "user": {
         "set-seen-at-home": "Benutzer zu Hause gesehen",

@@ -44,6 +44,11 @@ const { evaluate } = create({
   randomDependencies,
 });
 
+// Safety limits for the "while" loop action
+const WHILE_DEFAULT_MAX_ITERATIONS = 1000;
+const WHILE_ABSOLUTE_MAX_ITERATIONS = 10000;
+const WHILE_MIN_ITERATION_TIME_MS = 100;
+
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope) => {
     let device;
@@ -641,6 +646,51 @@ const actionsFunc = {
       const textWithVariables = Handlebars.compile(action.text, { noEscape: true })(scope);
       freeMobileService.sms.send(textWithVariables);
     }
+  },
+  [ACTIONS.CONDITION.WHILE]: async (self, action, scope, path) => {
+    const { if: conditionActions, then: loopActions } = action;
+    const { executeActions } = executeActionsFactory(actionsFunc);
+
+    // Without conditions, the loop would run until the max iterations safety limit
+    if (!conditionActions || conditionActions.length === 0) {
+      throw new AbortScene('WHILE_CONDITION_EMPTY');
+    }
+
+    const maxIterations = Math.min(
+      action.max_iterations !== undefined ? action.max_iterations : WHILE_DEFAULT_MAX_ITERATIONS,
+      WHILE_ABSOLUTE_MAX_ITERATIONS,
+    );
+
+    const verifyConditions = async () => {
+      try {
+        await executeActions(self, [conditionActions], scope, `${path}.if`, { throwUnknownError: true });
+        return true;
+      } catch (e) {
+        if (e instanceof AbortScene) {
+          return false;
+        }
+        throw e;
+      }
+    };
+
+    let iterations = 0;
+    /* eslint-disable no-await-in-loop */
+    // Iterations are sequential by design: conditions are re-evaluated before each one
+    while (await verifyConditions()) {
+      if (iterations >= maxIterations) {
+        logger.warn(`While loop: max number of iterations reached (${maxIterations}), stopping the loop.`);
+        break;
+      }
+      const iterationStartTime = Date.now();
+      await executeActions(self, loopActions, scope, `${path}.then`);
+      iterations += 1;
+      // Safety: prevent CPU-intensive tight loops when the executed actions are instantaneous
+      const iterationDuration = Date.now() - iterationStartTime;
+      if (iterationDuration < WHILE_MIN_ITERATION_TIME_MS) {
+        await Promise.delay(WHILE_MIN_ITERATION_TIME_MS - iterationDuration);
+      }
+    }
+    /* eslint-enable no-await-in-loop */
   },
   [ACTIONS.CONDITION.IF_THEN_ELSE]: async (self, action, scope, path) => {
     const { if: ifActions, then: thenActions, else: elseActions } = action;

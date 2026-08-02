@@ -305,6 +305,20 @@ function createSceneCreateInputSchema(
         then: z.array(z.array(sceneActionSchema)),
         else: z.array(z.array(sceneActionSchema)),
       }),
+      actionSchemaByType(ACTIONS.CONDITION.WHILE, {
+        if: z
+          .array(sceneActionSchema)
+          .min(1)
+          .describe('Conditions re-evaluated before each iteration. The loop stops when one of them fails.'),
+        then: z.array(z.array(sceneActionSchema)).describe('Actions executed on each iteration of the loop.'),
+        max_iterations: z
+          .number()
+          .int()
+          .min(1)
+          .max(10000)
+          .optional()
+          .describe('Safety limit for the number of iterations (default 1000).'),
+      }),
     ]),
   );
 

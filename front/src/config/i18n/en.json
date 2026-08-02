@@ -2988,6 +2988,19 @@
           "other": "{{count}} actions"
         }
       },
+      "conditionWhile": {
+        "conditions": "Conditions",
+        "conditionDescription": "As long as all conditions are met, the actions in the \"Repeat...\" block will be executed in a loop. The conditions are re-evaluated before each iteration.",
+        "noCondition": "No condition has been added yet. Click the '+' button to add a condition to this block. Without condition, the loop will not run.",
+        "addCondition": "Add condition",
+        "repeat": "Repeat...",
+        "maxIterationsLabel": "Maximum number of iterations (safety limit)",
+        "actionCount": {
+          "zero": "No action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
+      },
       "checkTime": {
         "description": "The scene will continue only if current time is between the selected limits, in the selected days. If a field is left empty, it'll not be taken into account.",
         "beforeLabel": "Before",
@@ -3140,7 +3153,8 @@
       "condition": {
         "only-continue-if": "Condition on variables",
         "check-time": "Time condition",
-        "if-then-else": "Condition: If...then...else..."
+        "if-then-else": "Condition: If...then...else...",
+        "while": "Loop: As long as... repeat..."
       },
       "user": {
         "set-seen-at-home": "User seen at home",
