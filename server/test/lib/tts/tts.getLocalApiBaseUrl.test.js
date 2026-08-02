@@ -39,15 +39,29 @@ describe('tts.getLocalApiBaseUrl', () => {
     expect(tts.getLocalApiBaseUrl()).to.equal('http://192.168.1.42:8080');
   });
 
-  it('should prefer an RFC1918 address on a multi-homed host', () => {
+  it('should prefer the physical NIC over tunnels and Docker bridges on a multi-homed host', () => {
     const { tts } = buildTts();
     delete process.env.SERVER_PORT;
     sandbox.stub(os, 'networkInterfaces').returns({
-      // a VPN tunnel with a public address enumerates first: the home-LAN
-      // RFC1918 address is still the one handed to speakers
+      // Docker bridges are never candidates: a speaker cannot fetch there
+      docker0: [{ family: 'IPv4', internal: false, address: '172.17.0.1' }],
+      'br-42ab': [{ family: 'IPv4', internal: false, address: '172.30.0.1' }],
+      veth1a2b: [{ family: 'IPv4', internal: false, address: '172.18.0.1' }],
+      // VPN tunnels enumerate first but only VPN peers can fetch there:
+      // the home-LAN NIC is the address handed to speakers
       tun0: [{ family: 'IPv4', internal: false, address: '203.0.113.7' }],
       wg0: [{ family: 'IPv4', internal: false, address: '172.22.0.3' }],
       eth0: [{ family: 'IPv4', internal: false, address: '10.0.0.8' }],
+    });
+    expect(tts.getLocalApiBaseUrl()).to.equal('http://10.0.0.8:1443');
+  });
+
+  it('should fall back to a tunnel RFC1918 address when no physical NIC has one', () => {
+    const { tts } = buildTts();
+    delete process.env.SERVER_PORT;
+    sandbox.stub(os, 'networkInterfaces').returns({
+      wg0: [{ family: 'IPv4', internal: false, address: '172.22.0.3' }],
+      eth0: [{ family: 'IPv4', internal: false, address: '203.0.113.7' }],
     });
     expect(tts.getLocalApiBaseUrl()).to.equal('http://172.22.0.3:1443');
   });
@@ -56,6 +70,8 @@ describe('tts.getLocalApiBaseUrl', () => {
     const { tts } = buildTts();
     delete process.env.SERVER_PORT;
     sandbox.stub(os, 'networkInterfaces').returns({
+      // the Docker bridge stays excluded even as a last resort
+      docker0: [{ family: 'IPv4', internal: false, address: '172.17.0.1' }],
       eth0: [{ family: 'IPv4', internal: false, address: '203.0.113.7' }],
     });
     expect(tts.getLocalApiBaseUrl()).to.equal('http://203.0.113.7:1443');
