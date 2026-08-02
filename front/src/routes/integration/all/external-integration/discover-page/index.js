@@ -72,6 +72,12 @@ class ExternalIntegrationDiscoverPage extends Component {
   // same device in the full list
   createDevice = async externalId => {
     const discoveredDevice = this.state.discoveredDevices.find(device => device.external_id === externalId);
+    // the list can be re-published (websocket refresh) between render and
+    // click: the clicked device may be gone from the fresh list, and the
+    // re-render is about to remove its card anyway
+    if (!discoveredDevice) {
+      return;
+    }
     // the same standard POST creates the device or, when it already exists
     // (same external_id), applies the re-published definition (the
     // "Update" gesture of the Discovery screen)
