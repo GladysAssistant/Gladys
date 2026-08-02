@@ -85,7 +85,7 @@ class OpenAIGateway extends Component {
                 />
               </div>
             )}
-            {gladysPlusConnected === true && (
+            {gladysPlusConnected === true && externalProviderActive === false && (
               <p class="text-success mb-4">
                 <i class="fe fe-check mr-1" />
                 <Text id="integration.openai.chatEnabledByDefault" />
@@ -146,7 +146,10 @@ class OpenAIGateway extends Component {
           </div>
         </div>
         {isAdmin && <AiProviderSettings onProviderChange={this.onProviderChange} />}
-        {gladysPlusConnected === true && <AiQuotaDisplay />}
+        {/* the Plus quota is meaningless once the AI traffic goes through an
+        external provider; the weekly digest and the debug context download
+        stay: both follow the selected provider through gateway.aiChat */}
+        {gladysPlusConnected === true && externalProviderActive === false && <AiQuotaDisplay />}
         {gladysPlusConnected === true && <WeeklyDigestSettings />}
         {gladysPlusConnected === true && <AiChatDebugDownload />}
       </Layout>
