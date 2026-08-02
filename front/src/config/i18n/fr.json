@@ -349,6 +349,7 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Mouvement détecté",
+        "doorbellRinging": "Sonne",
         "pushButton": "Appuyer",
         "vacuumDock": "Retour à la base"
       },
@@ -3243,6 +3244,7 @@
         "on": "On",
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
+        "doorbellRang": "Si la sonnette sonne",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
         "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : "
       },
@@ -4528,6 +4530,12 @@
           "1": "Ouverte(s)"
         }
       },
+      "doorbell": {
+        "ring": {
+          "0": "Pas de sonnerie",
+          "1": "Sonnette actionnée"
+        }
+      },
       "electrical-vehicle-charge": {
         "plugged": {
           "0": "Déconnecté",
@@ -4652,6 +4660,10 @@
     "camera": {
       "shortCategoryName": "Caméra",
       "image": "Caméra (Image)"
+    },
+    "doorbell": {
+      "shortCategoryName": "Sonnette",
+      "ring": "Sonnerie"
     },
     "counter-sensor": {
       "shortCategoryName": "Compteur",
