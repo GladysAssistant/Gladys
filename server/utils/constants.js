@@ -914,10 +914,14 @@ const DEVICE_FEATURE_TYPES = {
     THIRTY_MINUTES_PRODUCTION: 'thirty-minutes-production',
     THIRTY_MINUTES_PRODUCTION_REVENUE: 'thirty-minutes-production-revenue',
   },
-  // A device's OWN grid exchange (what it imports from / exports to the grid),
-  // NOT a whole-home meter (that stays energy-sensor). Import/export are split
-  // so core automations can tell direction apart; `power` is the signed single
-  // value some devices report instead (import > 0, export < 0).
+  // Exchange with the public grid (the connection point), whatever the
+  // measuring device: a plug-in battery's grid port, an EM clamp or a
+  // whole-home meter all publish here, so the same physical quantity never
+  // splits across categories. (teleinformation stays as-is for Linky legacy.)
+  // Import/export are split so core automations can tell direction apart;
+  // `power` is the signed single value some devices report instead
+  // (import > 0, export < 0). An integration maps whichever form its device
+  // NATIVELY reports - never both for the same measurement.
   GRID_SENSOR: {
     INPUT_POWER: 'input-power', // instantaneous power imported from the grid, W (>= 0)
     OUTPUT_POWER: 'output-power', // instantaneous power exported to the grid, W (>= 0)
@@ -925,9 +929,11 @@ const DEVICE_FEATURE_TYPES = {
     INPUT_INDEX: 'input-index', // cumulative imported-energy meter index, kWh (>= 0)
     OUTPUT_INDEX: 'output-index', // cumulative exported-energy meter index, kWh (>= 0)
   },
-  // The power a device delivers to the local load / house it feeds (e.g. a
-  // storage inverter's home output), plus its backup/off-grid output. This is
-  // the DEVICE's own output, not whole-home consumption (energy-sensor).
+  // The power the device ITSELF delivers to the installation it feeds (e.g. a
+  // storage inverter's home output), plus its backup/off-grid output.
+  // House consumption measured by an inverter (the "load power" many hybrid
+  // inverters report, which can exceed the inverter's own output when the
+  // grid tops up) is NOT this category - it goes to energy-sensor.
   HOME_OUTPUT_SENSOR: {
     POWER: 'power', // instantaneous power delivered to the home, W (>= 0)
     INDEX: 'index', // cumulative delivered-energy meter index, kWh (>= 0)

@@ -4970,7 +4970,7 @@
       "shortCategoryName": "Netzsensor",
       "input-power": "Netzbezugsleistung",
       "output-power": "Netzeinspeiseleistung",
-      "power": "Netzleistung (vorzeichenbehaftet)",
+      "power": "Netzleistung (Bezug +, Einspeisung −)",
       "input-index": "Netzbezugszähler",
       "output-index": "Netzeinspeisezähler"
     },

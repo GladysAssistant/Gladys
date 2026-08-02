@@ -4970,7 +4970,7 @@
       "shortCategoryName": "Grid sensor",
       "input-power": "Grid import power",
       "output-power": "Grid export power",
-      "power": "Grid power (signed)",
+      "power": "Grid power (import +, export −)",
       "input-index": "Grid import index",
       "output-index": "Grid export index"
     },

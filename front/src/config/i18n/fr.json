@@ -4970,7 +4970,7 @@
       "shortCategoryName": "Capteur réseau électrique",
       "input-power": "Puissance importée du réseau",
       "output-power": "Puissance exportée vers le réseau",
-      "power": "Échange réseau électrique (signé)",
+      "power": "Échange réseau électrique (import +, export −)",
       "input-index": "Index import réseau électrique",
       "output-index": "Index export réseau électrique"
     },
