@@ -53,6 +53,9 @@ function toCondition(value) {
   return WEATHER_CONDITIONS.includes(value) ? value : 'unknown';
 }
 
+// the pivot fields expressed as a percentage (0-100)
+const PERCENT_FIELDS = ['humidity', 'cloud_cover', 'precipitation_probability'];
+
 /**
  * @description Copy the optional finite-number fields of an entry.
  * @param {object} source - The raw entry sent by the integration.
@@ -64,9 +67,12 @@ function toCondition(value) {
 function copyOptionalNumbers(source, target, fields) {
   fields.forEach((field) => {
     const value = toFiniteNumber(source[field]);
-    if (value !== null) {
-      target[field] = value;
+    if (value === null) {
+      return;
     }
+    // percent fields are clamped to [0, 100]: the widget appends '%' as-is,
+    // an out-of-range value must never reach it
+    target[field] = PERCENT_FIELDS.includes(field) ? Math.min(100, Math.max(0, value)) : value;
   });
 }
 

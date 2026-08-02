@@ -49,7 +49,9 @@ function createActions(store) {
           });
         }
         if (weather.days) {
-          weather.days.shift();
+          // keep future days only: never assume the provider leads with
+          // today (that was an OpenWeather-specific shape)
+          weather.days = weather.days.filter(day => dayjs(day.datetime).isAfter(dayjs(), 'day'));
           weather.days.map(day => {
             // the per-day condition is optional in the generic weather
             // format (openweather does not provide it): no icon without it

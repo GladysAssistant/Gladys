@@ -130,6 +130,7 @@ const WeatherBox = ({ children, ...props }) => (
           >
             {props.alerts.map(alert => (
               <span
+                key={`${alert.severity}-${alert.event}-${alert.start || ''}`}
                 class="badge"
                 style={{
                   backgroundColor: ALERT_SEVERITY_COLORS[alert.severity],

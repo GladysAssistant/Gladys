@@ -1,7 +1,9 @@
 const Promise = require('bluebird');
 
 const logger = require('../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
+const { ServiceNotConfiguredError, ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
+const { Error400 } = require('../../utils/httpErrors');
+const { ERROR_MESSAGES } = require('../../utils/constants');
 
 /**
  * @description Get the weather from the first working weather provider.
@@ -67,6 +69,12 @@ async function get(options) {
   );
   if (weather === null) {
     if (firstRealError !== null) {
+      // transport/payload failures of an external provider surface as the
+      // error the weather widget already knows (it shows the weather
+      // integrations call to action), not as an opaque internal code
+      if (firstRealError instanceof ExternalIntegrationUnavailableError) {
+        throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
+      }
       throw firstRealError;
     }
     throw new ServiceNotConfiguredError('No weather provider is installed or configured.');

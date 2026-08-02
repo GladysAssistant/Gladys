@@ -144,6 +144,24 @@ describe('weather.get', () => {
       },
     );
   });
+  it('should surface external integration failures as a request-to-third-party error', async () => {
+    const externalProvider = {
+      weather: {
+        get: fake.rejects(new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_COMMAND_TIMEOUT')),
+      },
+    };
+    const service = buildServiceManager({ 'ext-william-meteo-france': externalProvider });
+    const weather = new Weather(service, event, messageManager);
+    const promise = weather.get(options);
+    await promise.then(
+      () => Promise.reject(new Error('should have failed')),
+      (e) => {
+        // the widget knows this error and shows its weather CTA; the
+        // internal EXTERNAL_INTEGRATION_* code never leaks to the user
+        expect(e.message).to.equal('REQUEST_TO_THIRD_PARTY_FAILED');
+      },
+    );
+  });
   it('should rethrow the first real failure over a not configured one', async () => {
     const realError = new Error('REQUEST_TO_THIRD_PARTY_FAILED');
     const externalProvider = {

@@ -237,6 +237,30 @@ describe('externalIntegration.normalizeWeather', () => {
     expect(weather.alerts).to.deep.equal([{ severity: 'moderate', event: 'Vent violent' }]);
   });
 
+  it('should clamp the percent fields to 0-100', () => {
+    const weather = normalizeWeather(
+      {
+        temperature: 10,
+        weather: 'rain',
+        datetime: '2026-08-01T12:00:00.000Z',
+        humidity: 150,
+        cloud_cover: -5,
+        hours: [
+          {
+            temperature: 9,
+            weather: 'rain',
+            datetime: '2026-08-01T13:00:00.000Z',
+            precipitation_probability: 400,
+          },
+        ],
+      },
+      'metric',
+    );
+    expect(weather.humidity).to.equal(100);
+    expect(weather.cloud_cover).to.equal(0);
+    expect(weather.hours[0].precipitation_probability).to.equal(100);
+  });
+
   it('should cap the hours, days and alerts arrays', () => {
     const hour = { temperature: 10, weather: 'rain', datetime: '2026-08-01T13:00:00.000Z' };
     const day = { temperature_min: 1, temperature_max: 2, datetime: '2026-08-02T11:00:00.000Z' };
