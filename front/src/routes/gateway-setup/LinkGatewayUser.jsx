@@ -63,6 +63,9 @@ const SignupLayout = ({ children, ...props }) => (
                             <MarkupText id="gatewayLinkUser.noInstanceFoundStepLogin" />
                           </li>
                           <li class="mb-2">
+                            <MarkupText id="gatewayLinkUser.noInstanceFoundStepAcceptUser" />
+                          </li>
+                          <li class="mb-2">
                             <Text id="gatewayLinkUser.noInstanceFoundStepComeBack" />
                           </li>
                         </ol>
