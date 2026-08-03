@@ -22,7 +22,8 @@ A Gladys category should be able to represent the same capability coming from **
 
 1. **Matter** (device types and clusters) — the primary reference. When Matter models the capability well, align the category's semantics (types, value ranges, and naming where reasonable) with the Matter model **by default**: the Matter and Zigbee integrations have to map their clusters onto Gladys categories, and every unjustified divergence turns that mapping into a lossy conversion.
 2. **Zigbee** (ZCL clusters, as exposed by Zigbee2MQTT) — the second reference for capabilities Matter does not cover yet.
-3. Other mature protocols (Z-Wave, Bluetooth/BLE profiles, KNX…) when neither of the above covers the capability.
+
+Matter and Zigbee are the only reference standards: older protocols (Z-Wave, BLE profiles, KNX…) are loosely specified and inconsistently implemented, and must not be used as design references for the taxonomy. When neither Matter nor Zigbee covers the capability, fall back to the "no standard covers the capability" case below.
 
 Standards are the reference, **not a veto**. Matter has real gaps and lags behind the market (electric vehicles, pool sensors, energy metering specifics…), and Gladys must be able to model capabilities beyond it — the existing `electrical-vehicle-*` or `ph-sensor`/`orp-sensor` categories are legitimate examples with no Matter equivalent. Two situations, two burdens of proof:
 
