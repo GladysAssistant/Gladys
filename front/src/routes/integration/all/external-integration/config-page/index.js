@@ -6,7 +6,10 @@ import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import ConfigTab from './ConfigTab';
 import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
+import { OAUTH_REDIRECT_URI, getOAuthCallbackPath, wrapAuthorizeUrl } from '../../../../../utils/oauth';
 import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
+
+const OAUTH_USE_INSTANCE_REDIRECT_KEY = 'externalIntegrationOAuthUseInstanceRedirect';
 
 class ExternalIntegrationConfigPage extends Component {
   // a non-admin user only gets the "my account" part of this screen: the
@@ -427,10 +430,25 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  toggleOAuthUseInstanceRedirect = e => {
+    const useInstanceRedirect = e.target.checked;
+    // remembered for the whole instance, not per integration: it describes how
+    // this Gladys is reachable, which does not change from one provider to the
+    // next
+    localStorage.setItem(OAUTH_USE_INSTANCE_REDIRECT_KEY, useInstanceRedirect ? 'true' : 'false');
+    this.setState({ oauthUseInstanceRedirect: useInstanceRedirect, oauthStatus: null });
+  };
+
   connectOAuth = async field => {
-    this.setState({ oauthStatus: RequestStatus.Getting });
+    this.setState({ oauthStatus: RequestStatus.Getting, oauthMissingState: false });
     const { selector } = this.props;
-    const redirectUri = `${window.location.origin}/dashboard/integration/device/external/${selector}/oauth-callback`;
+    const callbackPath = getOAuthCallbackPath(selector);
+    // providers refuse a plain HTTP redirect URI, which is how most people
+    // reach their Gladys: the flow goes through the HTTPS redirect page, which
+    // sends the browser back here. Users who already serve Gladys over HTTPS
+    // can opt out and declare their own address at the provider.
+    const useInstanceRedirect = this.state.oauthUseInstanceRedirect && window.location.protocol === 'https:';
+    const redirectUri = useInstanceRedirect ? `${window.location.origin}${callbackPath}` : OAUTH_REDIRECT_URI;
     try {
       const { authorize_url: authorizeUrl } = await this.props.httpClient.post(
         `/api/v1/external_integration/${selector}/oauth/authorize_url`,
@@ -439,14 +457,23 @@ class ExternalIntegrationConfigPage extends Component {
           redirect_uri: redirectUri
         }
       );
-      // the callback popup is a new tab: it recovers the oauth2 key
-      // through localStorage (shared across same-origin tabs)
+      const urlToOpen = useInstanceRedirect
+        ? authorizeUrl
+        : wrapAuthorizeUrl(authorizeUrl, { origin: window.location.origin, path: callbackPath });
+      // the callback popup is a new tab: it recovers the oauth2 key and the
+      // redirect_uri used through localStorage (shared across same-origin
+      // tabs). The token exchange fails unless the exact same redirect_uri
+      // comes back.
       localStorage.setItem(`externalIntegrationOAuthKey:${selector}`, field.key);
-      window.open(authorizeUrl, '_blank', 'noopener');
+      localStorage.setItem(`externalIntegrationOAuthRedirectUri:${selector}`, redirectUri);
+      window.open(urlToOpen, '_blank', 'noopener');
       this.setState({ oauthStatus: RequestStatus.Success });
     } catch (e) {
       console.error(e);
-      this.setState({ oauthStatus: RequestStatus.Error });
+      this.setState({
+        oauthStatus: RequestStatus.Error,
+        oauthMissingState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_MISSING_STATE'
+      });
     }
   };
 
@@ -469,6 +496,9 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   componentWillMount() {
+    this.setState({
+      oauthUseInstanceRedirect: localStorage.getItem(OAUTH_USE_INSTANCE_REDIRECT_KEY) === 'true'
+    });
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
       this.onStatusChanged
@@ -502,11 +532,13 @@ class ExternalIntegrationConfigPage extends Component {
       <ExternalIntegrationPage selector={props.selector} integration={state.integration}>
         <ConfigTab
           {...state}
+          selector={props.selector}
           user={props.user}
           httpClient={props.httpClient}
           updateConfigValue={this.updateConfigValue}
           saveConfig={this.saveConfig}
           connectOAuth={this.connectOAuth}
+          toggleOAuthUseInstanceRedirect={this.toggleOAuthUseInstanceRedirect}
           togglePreferLocal={this.togglePreferLocal}
           updateActionFieldValue={this.updateActionFieldValue}
           runAction={this.runAction}

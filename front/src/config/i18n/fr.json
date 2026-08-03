@@ -660,6 +660,11 @@
         "saveError": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
         "saveButton": "Enregistrer la configuration",
         "oauthConnectButton": "Connecter",
+        "oauthMissingStateError": "Cette int\u00e9gration ne fournit pas d'\u00e9l\u00e9ment de s\u00e9curit\u00e9 pour la connexion. Elle ne peut pas \u00eatre connect\u00e9e tant que son d\u00e9veloppeur ne l'a pas corrig\u00e9.",
+        "oauthRedirectUriLabel": "Adresse de redirection \u00e0 d\u00e9clarer dans votre application d\u00e9veloppeur",
+        "oauthRedirectUriDescription": "Les services refusent une adresse locale : cette page HTTPS h\u00e9berg\u00e9e par Gladys vous renvoie vers votre instance une fois l'autorisation donn\u00e9e. Rien n'y est stock\u00e9, aucune donn\u00e9e ne passe par nos serveurs.",
+        "oauthRedirectUriCopied": "Copi\u00e9 !",
+        "oauthUseInstanceRedirectLabel": "Utiliser plut\u00f4t l'adresse de mon instance (j'acc\u00e8de d\u00e9j\u00e0 \u00e0 Gladys en HTTPS)",
         "oauthConnectError": "Erreur au lancement de la connexion. Vérifiez que l'intégration est démarrée."
       },
       "actions": {

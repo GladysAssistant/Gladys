@@ -660,6 +660,11 @@
         "saveError": "There was an error saving the configuration.",
         "saveButton": "Save configuration",
         "oauthConnectButton": "Connect",
+        "oauthMissingStateError": "This integration did not provide a security state for the connection. It cannot be connected until its developer fixes it.",
+        "oauthRedirectUriLabel": "Redirect URI to declare in your developer application",
+        "oauthRedirectUriDescription": "Providers refuse a local address: this HTTPS page hosted by Gladys sends you back to your instance once you have authorized access. Nothing is stored, no data goes through our servers.",
+        "oauthRedirectUriCopied": "Copied!",
+        "oauthUseInstanceRedirectLabel": "Use the address of my instance instead (I already access Gladys over HTTPS)",
         "oauthConnectError": "There was an error starting the connection. Check that the integration is running."
       },
       "actions": {

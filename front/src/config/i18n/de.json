@@ -660,6 +660,11 @@
         "saveError": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
         "saveButton": "Konfiguration speichern",
         "oauthConnectButton": "Verbinden",
+        "oauthMissingStateError": "Diese Integration liefert keinen Sicherheits-State f\u00fcr die Verbindung. Sie kann nicht verbunden werden, bis der Entwickler das behoben hat.",
+        "oauthRedirectUriLabel": "Weiterleitungsadresse, die in Ihrer Entwickler-Anwendung einzutragen ist",
+        "oauthRedirectUriDescription": "Die Dienste akzeptieren keine lokale Adresse: diese von Gladys gehostete HTTPS-Seite schickt Sie nach der Autorisierung zu Ihrer Instanz zur\u00fcck. Dort wird nichts gespeichert, keine Daten laufen \u00fcber unsere Server.",
+        "oauthRedirectUriCopied": "Kopiert!",
+        "oauthUseInstanceRedirectLabel": "Stattdessen die Adresse meiner Instanz verwenden (ich erreiche Gladys bereits per HTTPS)",
         "oauthConnectError": "Fehler beim Starten der Verbindung. Prüfen Sie, ob die Integration läuft."
       },
       "actions": {

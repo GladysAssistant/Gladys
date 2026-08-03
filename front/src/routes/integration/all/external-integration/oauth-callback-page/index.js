@@ -5,6 +5,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
+import { OAUTH_REDIRECT_URI } from '../../../../../utils/oauth';
 
 // Generic OAuth2 callback route: the provider redirects the popup here with
 // code + state; the page relays them to the Gladys server (which forwards
@@ -19,6 +20,10 @@ class ExternalIntegrationOAuthCallbackPage extends Component {
     const code = searchParams.get('code');
     const state = searchParams.get('state');
     const key = localStorage.getItem(`externalIntegrationOAuthKey:${selector}`);
+    // the provider checks the redirect_uri of the token exchange against the
+    // one used to authorize: it must come back byte for byte. Older flows had
+    // no stored value, they used the address of this page.
+    const redirectUri = localStorage.getItem(`externalIntegrationOAuthRedirectUri:${selector}`) || OAUTH_REDIRECT_URI;
     if (!code || !state || !key) {
       this.setState({ relayStatus: RequestStatus.Error, missingParams: true });
       return;
@@ -29,9 +34,10 @@ class ExternalIntegrationOAuthCallbackPage extends Component {
         key,
         code,
         state,
-        redirect_uri: `${window.location.origin}/dashboard/integration/device/external/${selector}/oauth-callback`
+        redirect_uri: redirectUri
       });
       localStorage.removeItem(`externalIntegrationOAuthKey:${selector}`);
+      localStorage.removeItem(`externalIntegrationOAuthRedirectUri:${selector}`);
       this.setState({ relayStatus: RequestStatus.Success });
     } catch (e) {
       console.error(e);
