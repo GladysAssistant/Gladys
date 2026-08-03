@@ -71,7 +71,7 @@ Adding a category or type is not just a constant. The same PR must include:
 - an **inline comment on the new constant** defining the category's scope, its boundary with neighboring categories (e.g. `home-output-sensor` = power the device itself delivers to the installation it feeds; house consumption measured by an inverter goes to `energy-sensor`), and its value conventions — sign, direction, non-negative semantics. When both a signed type and split input/output types exist, state that an integration maps whichever form its device natively reports, never both for the same measurement. Without this comment, the first integration that stretches the category's meaning wins by default;
 - translations in **all** `front/src/config/i18n/*.json` files (`npm run compare-translations` enforces this);
 - the allowed units in `DEVICE_FEATURE_UNITS_BY_CATEGORY` when the category is a measurement — and in `DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE` when units differ by type within the category;
-- front display support (icon, feature edition/display components) where relevant;
+- front display support where relevant: icon, feature edition/display components, and the explicit allowlists a control-type feature must join to render at all — `SUPPORTED_FEATURE_TYPES` in `front/src/components/boxs/device-in-room/SupportedFeatureTypes.jsx` and any category-aware dashboard maps;
 - MQTT feature defaults in `front/src/routes/integration/all/mqtt/device-page/utils.js` where relevant (`isSensorCategory` special cases, `getFeatureDefaultValues` min/max/`read_only`, `getFeaturePreviewValue`);
 - history grouping in `front/src/routes/history/categoryGroups.js` when the category should appear in the activity history;
 - enumerated value translations (`deviceFeatureValue` keys in all locale files) when the type's values are an enum not covered by the existing binary/push helpers;
@@ -86,7 +86,7 @@ For any PR touching `DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES`:
 - [ ] The same physical quantity is not split across categories depending on which device measures it.
 - [ ] Types are intrinsic to the capability; other values the product reports go to their own categories on the same device.
 - [ ] The Matter model (then Zigbee) was checked; semantics align with the standard by default, and any divergence from an existing standard model is justified in the PR.
-- [ ] If no standard covers the capability, the PR shows the category is generic (several brands/protocols would map onto it) and not modeled on a single proprietary API.
+- [ ] If no standard covers the capability, the PR shows the category is generic — capability-first; multi-brand/protocol mapping is the usual evidence — and not modeled on a single proprietary API.
 - [ ] Enum-like types expose the full generic value set; per-device subsets go through `supported_options`, not through a narrowed category or type.
 - [ ] Naming follows the conventions above (kebab-case, `*-sensor` suffix, English, no protocol name).
 - [ ] Names and semantics stress-tested against neighboring and future device classes (a later rename is breaking; adding types later is not).
