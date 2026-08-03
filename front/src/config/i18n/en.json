@@ -2970,11 +2970,13 @@
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR",
+        "logicExplanationText": "The conditions in this box are combined with an OR: the box is satisfied as soon as one of them is met. To make an AND, add several \"Condition on variables\" boxes: they will then all have to be satisfied.",
         "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
         "conditionDescription": "If all conditions are met, the actions in the \"Then\" block will be executed. If not, the \"Else\" block will be executed.",
+        "conditionLogicDescription": "The conditions below are combined with an AND: they all need to be met. To make an OR, use a single \"Condition on variables\" box and add several conditions to it with the \"+ OR\" button.",
         "noCondition": "No condition has been added yet. Click the '+' button to add a condition to this block",
         "addCondition": "Add condition",
         "if": "If",
