@@ -1371,10 +1371,12 @@ async function getAllTools(userId) {
           };
         }
 
+        const effectiveGroupBy = groupBy || 'day';
+
         const results = await this.gladys.device.energySensorManager.getConsumptionByDates([selectedFeature.selector], {
           from,
           to,
-          group_by: groupBy || 'day',
+          group_by: effectiveGroupBy,
           display_mode: displayMode,
         });
 
@@ -1385,6 +1387,33 @@ async function getAllTools(userId) {
         const roundValue = (value) => Number(value.toFixed(decimalPlaces));
         const deviceValues = deviceResult?.values ?? [];
 
+        // DuckDB truncates the TIMESTAMPTZ buckets in the local timezone, so a bucket
+        // is local midnight. Serialized as a UTC instant, local 2026-01-01 in Paris
+        // reads back as 2025-12-31T23:00:00Z and every month of the answer is labelled
+        // one month early. Report the local calendar date instead, at the granularity
+        // that was grouped by, so there is no offset left for the model to misread.
+        const formatBucketDate = (bucketDate) => {
+          const date = new Date(bucketDate);
+          if (Number.isNaN(date.getTime())) {
+            return bucketDate;
+          }
+          const year = String(date.getFullYear()).padStart(4, '0');
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          const hour = String(date.getHours()).padStart(2, '0');
+          switch (effectiveGroupBy) {
+            case 'year':
+              return year;
+            case 'month':
+              return `${year}-${month}`;
+            case 'hour':
+              return `${year}-${month}-${day} ${hour}:00`;
+            // 'day' and 'week' are both a calendar day, the start of the bucket.
+            default:
+              return `${year}-${month}-${day}`;
+          }
+        };
+
         const response = {
           device: selectedDevice.name,
           feature: selectedFeature.name,
@@ -1393,10 +1422,10 @@ async function getAllTools(userId) {
           // reported back as the day the caller asked for.
           start_date: formatDateInput(parsedStart),
           end_date: formatDateInput(parsedEnd),
-          group_by: groupBy || 'day',
+          group_by: effectiveGroupBy,
           total: roundValue(deviceValues.reduce((acc, value) => acc + value.sum_value, 0)),
           values: deviceValues.map((value) => ({
-            date: value.created_at,
+            date: formatBucketDate(value.created_at),
             value: roundValue(value.sum_value),
           })),
         };
