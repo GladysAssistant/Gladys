@@ -4617,7 +4617,9 @@
         "plugged": {
           "0": "Unplugged",
           "1": "Plugged"
-        },
+        }
+      },
+      "charging-station": {
         "connector-status": {
           "unknown": "{{value}} (unknown)",
           "0": "Available",
@@ -4749,6 +4751,10 @@
     "camera": {
       "shortCategoryName": "Camera",
       "image": "Camera"
+    },
+    "charging-station": {
+      "shortCategoryName": "Charging station",
+      "connector-status": "Connector status"
     },
     "doorbell": {
       "shortCategoryName": "Doorbell",
@@ -4882,7 +4888,6 @@
       "last-charge-energy-added": "Energy added (last charge)",
       "last-charge-energy-consumption": "Energy consumed (last charge)",
       "plugged": "Vehicle plugged",
-      "connector-status": "Connector status",
       "target-charge-limit": "Charge limit",
       "target-current": "Target current"
     },

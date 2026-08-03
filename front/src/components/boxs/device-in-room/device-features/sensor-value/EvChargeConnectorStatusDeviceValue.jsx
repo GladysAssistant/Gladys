@@ -14,9 +14,9 @@ const EvChargeConnectorStatusDeviceValue = props => {
     >
       {!valued && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
       {valued && (
-        <Text id={`deviceFeatureValue.category.electrical-vehicle-charge.connector-status.${lastValue}`}>
+        <Text id={`deviceFeatureValue.category.charging-station.connector-status.${lastValue}`}>
           <Text
-            id="deviceFeatureValue.category.electrical-vehicle-charge.connector-status.unknown"
+            id="deviceFeatureValue.category.charging-station.connector-status.unknown"
             fields={{ value: lastValue }}
           />
         </Text>

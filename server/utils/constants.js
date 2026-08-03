@@ -263,12 +263,12 @@ const VACUUM_CLEANER_STATE = {
   DOCKED: 6,
 };
 
-// Generic EV charge point/connector status - values align with OCPP 1.6's
-// ChargePointStatus enum, but is not itself protocol-specific: any EV charger
-// integration (OCPP-based or not) reporting a comparable lifecycle can map
-// onto it. Note: OCPP 2.x uses a different, simplified ConnectorStatusEnumType
-// (Available/Occupied/Reserved/Unavailable/Faulted) and requires its own
-// documented mapping onto these values.
+// Generic charging station connector status - values align with OCPP 1.6's
+// ChargePointStatus enum, but is not itself protocol-specific: any charging
+// station integration (OCPP-based or not) reporting a comparable connector
+// lifecycle can map onto it. Note: OCPP 2.x uses a different, simplified
+// ConnectorStatusEnumType (Available/Occupied/Reserved/Unavailable/Faulted)
+// and requires its own documented mapping onto these values.
 const EV_CHARGE_CONNECTOR_STATUS = {
   AVAILABLE: 0,
   PREPARING: 1,
@@ -689,6 +689,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   BATTERY_STORAGE: 'battery-storage',
   BUTTON: 'button',
   CAMERA: 'camera',
+  CHARGING_STATION: 'charging-station',
   CUBE: 'cube',
   CURRENCY: 'currency',
   CO_SENSOR: 'co-sensor',
@@ -802,6 +803,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   CAMERA: {
     IMAGE: 'image',
+  },
+  CHARGING_STATION: {
+    CONNECTOR_STATUS: 'connector-status', // Charge point/connector status enum (integer - sensor), see EV_CHARGE_CONNECTOR_STATUS
   },
   DOORBELL: {
     RING: 'ring',
@@ -1098,7 +1102,6 @@ const DEVICE_FEATURE_TYPES = {
     CHARGE_VOLTAGE: 'charge-voltage', // Charging voltage in V (integer - sensor)
     LAST_CHARGE_ENERGY_ADDED: 'last-charge-energy-added', // Energy added in the last charge session in kWh (integer - sensor)
     LAST_CHARGE_ENERGY_CONSUMPTION: 'last-charge-energy-consumption', // Energy consumed in the last charge session in kWh (integer - sensor)
-    CONNECTOR_STATUS: 'connector-status', // Charge point/connector status enum (integer - sensor), see EV_CHARGE_CONNECTOR_STATUS
     PLUGGED: 'plugged', // Whether the vehicle is plugged in (binary - sensor)
     TARGET_CHARGE_LIMIT: 'target-charge-limit', // Target state of charge limit in percent (integer - command)
     TARGET_CURRENT: 'target-current', // Target charging current in A (integer - command)

@@ -4617,7 +4617,9 @@
         "plugged": {
           "0": "Nicht geladen",
           "1": "Geladen"
-        },
+        }
+      },
+      "charging-station": {
         "connector-status": {
           "unknown": "{{value}} (unbekannt)",
           "0": "Verfügbar",
@@ -4749,6 +4751,10 @@
     "camera": {
       "shortCategoryName": "Kamera",
       "image": "Kamera"
+    },
+    "charging-station": {
+      "shortCategoryName": "Ladestation",
+      "connector-status": "Anschlussstatus"
     },
     "doorbell": {
       "shortCategoryName": "Türklingel",
@@ -4882,7 +4888,6 @@
       "last-charge-energy-added": "Zugefügte Energie (letzte Ladung)",
       "last-charge-energy-consumption": "Verbrauchte Energie (letzte Ladung)",
       "plugged": "Fahrzeug angeschlossen",
-      "connector-status": "Steckerstatus",
       "target-charge-limit": "Ladegrenze",
       "target-current": "Zielstrom"
     },
