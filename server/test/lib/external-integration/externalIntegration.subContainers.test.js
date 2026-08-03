@@ -247,6 +247,8 @@ describe('externalIntegration.startSubContainer', () => {
     const entry = TEST_CONTAINERS_MANIFEST.containers[0];
     const container = await externalIntegration.startSubContainer(service, entry);
     expect(container).to.deep.equal({ id: 'sub-2' });
+    // remembered so the new descriptor directly omits the CPU limit
+    expect(system.cpuCfsSupport).to.equal(false);
     assert.calledWith(system.removeContainer, 'sub-1', { force: true });
     assert.calledOnce(system.createContainer);
     assert.calledWith(restartContainer.secondCall, 'sub-2');

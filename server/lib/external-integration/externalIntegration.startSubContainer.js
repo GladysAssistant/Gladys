@@ -29,9 +29,14 @@ async function startSubContainer(service, entry, { env } = {}) {
     // Docker re-validates the stored HostConfig at every start: a container
     // created with a CPU limit on a kernel that no longer supports CFS
     // (Synology DSM update) can never start again — recreate it without
+    // the CPU limit
     if (!isNanoCpusError(e)) {
       throw e;
     }
+    // the daemon just told us CPU limits are rejected: remember it so the
+    // new descriptor directly omits NanoCpus, even when the docker info
+    // detection misreports the support
+    this.system.cpuCfsSupport = false;
     container = await this.createSubContainer(service, entry, { env: effectiveEnv });
     await this.system.restartContainer(container.id);
   }

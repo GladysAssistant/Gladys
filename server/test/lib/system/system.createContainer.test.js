@@ -6,6 +6,7 @@ const { fake, assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
+const { isNanoCpusError } = require('../../../lib/system/system.createContainer');
 const DockerodeMock = require('./DockerodeMock.test');
 
 const System = proxyquire('../../../lib/system', {
@@ -128,5 +129,31 @@ describe('system.createContainer', () => {
       expect(e).to.equal(error);
     }
     assert.calledOnce(createContainerStub);
+  });
+});
+
+describe('system.createContainer isNanoCpusError', () => {
+  const NANO_CPUS_MESSAGE =
+    'NanoCPUs can not be set, as your kernel does not support CPU CFS scheduler or the cgroup is not mounted';
+
+  it('should return false without an error', () => {
+    expect(isNanoCpusError(null)).to.equal(false);
+    expect(isNanoCpusError(undefined)).to.equal(false);
+  });
+
+  it('should match on the error message', () => {
+    const error = Object.assign(new Error(`(HTTP code 400) unexpected - ${NANO_CPUS_MESSAGE}`), { statusCode: 400 });
+    expect(isNanoCpusError(error)).to.equal(true);
+  });
+
+  it('should match on the daemon json message alone', () => {
+    expect(isNanoCpusError({ statusCode: 400, json: { message: NANO_CPUS_MESSAGE } })).to.equal(true);
+  });
+
+  it('should not match another 400 or another status code', () => {
+    expect(isNanoCpusError(Object.assign(new Error('(HTTP code 400) invalid port'), { statusCode: 400 }))).to.equal(
+      false,
+    );
+    expect(isNanoCpusError(Object.assign(new Error(NANO_CPUS_MESSAGE), { statusCode: 500 }))).to.equal(false);
   });
 });
