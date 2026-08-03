@@ -844,7 +844,8 @@
         "errorUnknown": "Beim Installieren dieser Integration ist ein Fehler aufgetreten.",
         "errorNotFound": "Repository nicht gefunden, oder es enthält keine gültige Gladys-Integration.",
         "errorInvalidManifest": "Das Manifest der Integration ist ungültig.",
-        "manifestInvalidJson": "Das Manifest ist kein gültiges JSON."
+        "manifestInvalidJson": "Das Manifest ist kein gültiges JSON.",
+        "errorDetailsTitle": "Fehlerdetails:"
       },
       "logs": {
         "title": "Protokolle",

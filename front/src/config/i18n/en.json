@@ -844,7 +844,8 @@
         "errorUnknown": "There was an error installing this integration.",
         "errorNotFound": "Repository not found, or it does not contain a valid Gladys integration.",
         "errorInvalidManifest": "The integration manifest is invalid.",
-        "manifestInvalidJson": "The manifest is not valid JSON."
+        "manifestInvalidJson": "The manifest is not valid JSON.",
+        "errorDetailsTitle": "Error details:"
       },
       "logs": {
         "title": "Logs",
