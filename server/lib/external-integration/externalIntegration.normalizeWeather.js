@@ -8,6 +8,9 @@ const {
   WEATHER_CONDITIONS,
   WEATHER_ALERT_SEVERITIES,
   WEATHER_ALERT_TYPES,
+  MAX_WEATHER_IMAGES,
+  WEATHER_IMAGE_KEY_REGEX,
+  MAX_WEATHER_IMAGE_LABEL_LENGTH,
 } = require('./constants');
 
 /**
@@ -227,6 +230,38 @@ function normalizeWeather(payload, units) {
       copyOptionalNumbers(rawDay, day, DAY_OPTIONAL_NUMBERS);
       copyOptionalDates(rawDay, day, ['sunrise', 'sunset']);
       weather.days.push(day);
+    });
+  }
+  if (Array.isArray(payload.images)) {
+    // provider images (B.18 point 6): metadata only — the bytes travel on
+    // demand over weather.get-image and are validated separately
+    weather.images = [];
+    const seenImageKeys = new Set();
+    payload.images.slice(0, MAX_WEATHER_IMAGES).forEach((rawImage) => {
+      if (rawImage === null || typeof rawImage !== 'object') {
+        return;
+      }
+      if (typeof rawImage.key !== 'string' || !WEATHER_IMAGE_KEY_REGEX.test(rawImage.key)) {
+        return;
+      }
+      if (seenImageKeys.has(rawImage.key)) {
+        return;
+      }
+      seenImageKeys.add(rawImage.key);
+      const image = { key: rawImage.key };
+      if (rawImage.label !== null && typeof rawImage.label === 'object' && !Array.isArray(rawImage.label)) {
+        const label = {};
+        Object.keys(rawImage.label).forEach((language) => {
+          const value = rawImage.label[language];
+          if (language.length <= 5 && typeof value === 'string' && value.trim().length > 0) {
+            label[language] = value.trim().substring(0, MAX_WEATHER_IMAGE_LABEL_LENGTH);
+          }
+        });
+        if (Object.keys(label).length > 0) {
+          image.label = label;
+        }
+      }
+      weather.images.push(image);
     });
   }
   if (Array.isArray(payload.alerts)) {

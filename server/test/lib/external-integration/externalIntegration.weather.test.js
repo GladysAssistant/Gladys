@@ -4,7 +4,10 @@ const { assert: sinonAssert, fake } = require('sinon');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
 const { normalizeWeather } = require('../../../lib/external-integration/externalIntegration.normalizeWeather');
-const { WEATHER_GET_TIMEOUT_MS } = require('../../../lib/external-integration/constants');
+const {
+  normalizeWeatherImage,
+} = require('../../../lib/external-integration/externalIntegration.normalizeWeatherImage');
+const { WEATHER_GET_TIMEOUT_MS, MAX_WEATHER_IMAGE_BYTES } = require('../../../lib/external-integration/constants');
 const { buildSupervisor, seedExternalService, TEST_WEATHER_MANIFEST } = require('./testUtils.test');
 
 const seedWeatherService = (overrides = {}) => seedExternalService({ manifest: TEST_WEATHER_MANIFEST, ...overrides });
@@ -331,12 +334,12 @@ describe('externalIntegration.normalizeWeather', () => {
         temperature: 10,
         weather: 'rain',
         datetime: '2026-08-01T12:00:00.000Z',
-        alerts: [{ severity: 'extreme', event: 'x'.repeat(500), description: 'y'.repeat(5000) }],
+        alerts: [{ severity: 'extreme', event: 'x'.repeat(500), description: 'y'.repeat(6000) }],
       },
       'metric',
     );
     expect(weather.alerts[0].event).to.have.lengthOf(100);
-    expect(weather.alerts[0].description).to.have.lengthOf(2000);
+    expect(weather.alerts[0].description).to.have.lengthOf(5000);
   });
 
   it('should reject a payload that is not an object', () => {
@@ -358,5 +361,138 @@ describe('externalIntegration.normalizeWeather', () => {
     expect(() => normalizeWeather({ temperature: 12, weather: 'rain', datetime: {} }, 'metric')).to.throw(
       ExternalIntegrationUnavailableError,
     );
+  });
+});
+
+describe('externalIntegration.normalizeWeather images metadata', () => {
+  const base = { temperature: 10, weather: 'rain', datetime: '2026-08-01T12:00:00.000Z' };
+
+  it('should keep valid image metadata and bound the labels', () => {
+    const weather = normalizeWeather(
+      {
+        ...base,
+        images: [
+          { key: 'vigilance-map', label: { en: 'Vigilance map', fr: `  ${'x'.repeat(80)}  ` } },
+          { key: 'rain-radar' },
+        ],
+      },
+      'metric',
+    );
+    expect(weather.images).to.have.lengthOf(2);
+    expect(weather.images[0].key).to.equal('vigilance-map');
+    expect(weather.images[0].label.en).to.equal('Vigilance map');
+    expect(weather.images[0].label.fr).to.have.lengthOf(50);
+    expect(weather.images[1]).to.deep.equal({ key: 'rain-radar' });
+  });
+
+  it('should drop invalid entries, invalid keys, duplicates and cap at 3', () => {
+    // the slice(0, 3) cap applies before validation: spread the invalid
+    // variants over several calls so each one is actually evaluated
+    const invalidEntries = normalizeWeather(
+      { ...base, images: [null, 'not-an-object', { key: 'UPPERCASE' }] },
+      'metric',
+    );
+    expect(invalidEntries.images).to.deep.equal([]);
+    const invalidKeys = normalizeWeather(
+      { ...base, images: [{ key: '-starts-with-dash' }, { key: 42 }, { key: 'a'.repeat(40) }] },
+      'metric',
+    );
+    expect(invalidKeys.images).to.deep.equal([]);
+    const invalidLabels = normalizeWeather(
+      {
+        ...base,
+        images: [
+          { key: 'string-label', label: 'not-an-object' },
+          { key: 'array-label', label: ['not-an-object'] },
+          { key: 'empty-label', label: { en: '   ', veryverylonglanguage: 'dropped', fr: 42 } },
+        ],
+      },
+      'metric',
+    );
+    // invalid labels never reject the image: the metadata degrades to the key
+    expect(invalidLabels.images).to.deep.equal([
+      { key: 'string-label' },
+      { key: 'array-label' },
+      { key: 'empty-label' },
+    ]);
+    const capped = normalizeWeather(
+      {
+        ...base,
+        images: [{ key: 'one' }, { key: 'one' }, { key: 'two', label: { en: '  ', xx: 'kept' } }, { key: 'four' }],
+      },
+      'metric',
+    );
+    expect(capped.images).to.deep.equal([{ key: 'one' }, { key: 'two', label: { xx: 'kept' } }]);
+  });
+});
+
+describe('externalIntegration.normalizeWeatherImage', () => {
+  const pngBytes = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(16, 1)]);
+  const jpegBytes = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(16, 1)]);
+
+  it('should accept a PNG and return a data URI', () => {
+    const image = normalizeWeatherImage(pngBytes.toString('base64'));
+    expect(image).to.equal(`data:image/png;base64,${pngBytes.toString('base64')}`);
+  });
+
+  it('should accept a JPEG and return a data URI', () => {
+    const image = normalizeWeatherImage(jpegBytes.toString('base64'));
+    expect(image).to.equal(`data:image/jpeg;base64,${jpegBytes.toString('base64')}`);
+  });
+
+  it('should reject anything that is not a bounded PNG or JPEG', () => {
+    expect(() => normalizeWeatherImage(undefined)).to.throw(ExternalIntegrationUnavailableError);
+    expect(() => normalizeWeatherImage('')).to.throw(ExternalIntegrationUnavailableError);
+    expect(() => normalizeWeatherImage('!!!!')).to.throw(ExternalIntegrationUnavailableError);
+    // valid base64 of non-image bytes: magic numbers reject it
+    expect(() => normalizeWeatherImage(Buffer.from('<svg onload=alert(1)>').toString('base64'))).to.throw(
+      ExternalIntegrationUnavailableError,
+    );
+    // over the 500 KB cap
+    const bigPng = Buffer.concat([pngBytes, Buffer.alloc(MAX_WEATHER_IMAGE_BYTES)]);
+    expect(() => normalizeWeatherImage(bigPng.toString('base64'))).to.throw(ExternalIntegrationUnavailableError);
+  });
+});
+
+describe('externalIntegration weather proxy getImage', () => {
+  const pngBase64 = Buffer.concat([
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    Buffer.alloc(8, 2),
+  ]).toString('base64');
+
+  it('should relay weather.get-image, validate the bytes and cache the result', async () => {
+    const { externalIntegration, stateManager } = buildSupervisor();
+    const service = await seedWeatherService();
+    externalIntegration.registerProxyService(service);
+    externalIntegration.sendCommand = fake.resolves({ success: true, data: { image: pngBase64 } });
+    const proxyService = stateManager.get('service', service.name);
+    const image = await proxyService.weather.getImage('vigilance-map');
+    expect(image).to.equal(`data:image/png;base64,${pngBase64}`);
+    sinonAssert.calledWith(
+      externalIntegration.sendCommand,
+      service,
+      WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEATHER_GET_IMAGE,
+      { key: 'vigilance-map' },
+      { timeoutMs: WEATHER_GET_TIMEOUT_MS },
+    );
+    // second call within the TTL: served from cache, no new command
+    const cachedImage = await proxyService.weather.getImage('vigilance-map');
+    expect(cachedImage).to.equal(image);
+    expect(externalIntegration.sendCommand.callCount).to.equal(1);
+  });
+
+  it('should reject an invalid image payload without caching it', async () => {
+    const { externalIntegration, stateManager } = buildSupervisor();
+    const service = await seedWeatherService();
+    externalIntegration.registerProxyService(service);
+    externalIntegration.sendCommand = fake.resolves({ success: true, data: { image: 'bm90LWFuLWltYWdl' } });
+    const proxyService = stateManager.get('service', service.name);
+    await expect(proxyService.weather.getImage('vigilance-map')).to.be.rejectedWith(
+      ExternalIntegrationUnavailableError,
+    );
+    await expect(proxyService.weather.getImage('vigilance-map')).to.be.rejectedWith(
+      ExternalIntegrationUnavailableError,
+    );
+    expect(externalIntegration.sendCommand.callCount).to.equal(2);
   });
 });

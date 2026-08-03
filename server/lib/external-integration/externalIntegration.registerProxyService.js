@@ -3,7 +3,13 @@ const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors'
 const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
 const { normalizeWeather } = require('./externalIntegration.normalizeWeather');
-const { CAMERA_GET_IMAGE_TIMEOUT_MS, WEATHER_GET_TIMEOUT_MS } = require('./constants');
+const { normalizeWeatherImage } = require('./externalIntegration.normalizeWeatherImage');
+const {
+  CAMERA_GET_IMAGE_TIMEOUT_MS,
+  WEATHER_GET_TIMEOUT_MS,
+  WEATHER_IMAGE_CACHE_TTL_MS,
+  WEATHER_IMAGE_CACHE_PREFIX,
+} = require('./constants');
 
 // scheduled polls only make sense against a live integration: outside
 // these statuses they become silent no-ops (see below)
@@ -104,6 +110,24 @@ function registerProxyService(service) {
             );
             const payload = result && result.data && result.data.weather;
             return normalizeWeather(payload, options.units);
+          },
+          getImage: async (key) => {
+            // validated provider images are cached: the dashboard refresh
+            // never hammers the integration (nor the third party behind it)
+            const cacheKey = `${WEATHER_IMAGE_CACHE_PREFIX}:${service.id}:${key}`;
+            const cached = this.cache.get(cacheKey);
+            if (cached && cached.expiresAt > Date.now()) {
+              return cached.image;
+            }
+            const result = await this.sendCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEATHER_GET_IMAGE,
+              { key },
+              { timeoutMs: WEATHER_GET_TIMEOUT_MS },
+            );
+            const image = normalizeWeatherImage(result && result.data && result.data.image);
+            this.cache.set(cacheKey, { image, expiresAt: Date.now() + WEATHER_IMAGE_CACHE_TTL_MS });
+            return image;
           },
         }),
       }

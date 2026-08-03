@@ -164,8 +164,51 @@ const WeatherBox = ({ children, ...props }) => (
                 )}
               </span>
             ))}
+            {props.alerts
+              .filter(alert => alert.description)
+              .map(alert => {
+                const alertKey = `${alert.severity}-${alert.event}-${alert.start || ''}`;
+                const expanded = props.expandedAlerts[alertKey];
+                return (
+                  <div
+                    key={`description-${alertKey}`}
+                    onClick={() => props.toggleAlertDescription(alertKey)}
+                    style={`font-size: 12px; color: #76838f; margin-top: 0.25em; white-space: pre-line; cursor: pointer; ${
+                      expanded
+                        ? ''
+                        : 'display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden'
+                    }`}
+                  >
+                    {alert.description}
+                  </div>
+                );
+              })}
           </div>
         )}
+        {props.display_mode[GetWeatherModes.ProviderImages] &&
+          props.images &&
+          props.images
+            .filter(image => image.src)
+            .map(image => {
+              const imageLabel =
+                image.label && (image.label[props.user.language] || image.label.en || Object.values(image.label)[0]);
+              return (
+                <div key={image.key} style={{ marginTop: '0.5em', marginBottom: '0.5em' }}>
+                  {imageLabel && (
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        color: '#76838f',
+                        marginBottom: '0.25em'
+                      }}
+                    >
+                      {imageLabel}
+                    </div>
+                  )}
+                  <img src={image.src} alt={imageLabel || image.key} style={{ width: '100%', borderRadius: '4px' }} />
+                </div>
+              );
+            })}
         <div class="row">
           <div class="col-9">
             <div
@@ -312,6 +355,14 @@ class WeatherBoxComponent extends Component {
   refreshData = () => {
     this.props.getWeather(this.props.box, this.props.x, this.props.y);
   };
+
+  // full alert bulletins fold to 3 lines, one click swaps folded/expanded
+  toggleAlertDescription = alertKey => {
+    const expandedAlerts = this.state.expandedAlerts || {};
+    this.setState({
+      expandedAlerts: { ...expandedAlerts, [alertKey]: !expandedAlerts[alertKey] }
+    });
+  };
   componentDidMount() {
     this.refreshData();
     // refresh weather every interval
@@ -326,7 +377,15 @@ class WeatherBoxComponent extends Component {
       get(previousProps, 'box.modes.dailyForecast') !== get(this.props, 'box.modes.dailyForecast');
     const hourlyForecastChanged =
       get(previousProps, 'box.modes.hourlyForecast') !== get(this.props, 'box.modes.hourlyForecast');
-    if (houseChanged || advancedWeatherChanged || dailyForecastChanged || hourlyForecastChanged) {
+    const providerImagesChanged =
+      get(previousProps, 'box.modes.providerImages') !== get(this.props, 'box.modes.providerImages');
+    if (
+      houseChanged ||
+      advancedWeatherChanged ||
+      dailyForecastChanged ||
+      hourlyForecastChanged ||
+      providerImagesChanged
+    ) {
       this.refreshData();
     }
   }
@@ -350,6 +409,7 @@ class WeatherBoxComponent extends Component {
     const weatherIcon = get(weatherObject, 'weatherIcon');
     // optional fields of the generic weather format
     const alerts = get(weatherObject, 'alerts');
+    const images = get(weatherObject, 'images');
     const sunrise = get(weatherObject, 'sunrise_beautiful');
     const sunset = get(weatherObject, 'sunset_beautiful');
     const uvIndex = get(weatherObject, 'uv_index');
@@ -426,6 +486,9 @@ class WeatherBoxComponent extends Component {
         humidity={humidity}
         wind={wind}
         alerts={alerts}
+        images={images}
+        expandedAlerts={this.state.expandedAlerts || {}}
+        toggleAlertDescription={this.toggleAlertDescription}
         sunrise={sunrise}
         sunset={sunset}
         uvIndex={uvIndex}

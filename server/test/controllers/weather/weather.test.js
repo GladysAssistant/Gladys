@@ -71,3 +71,45 @@ describe('GET /api/v1/house/:selector/weather', () => {
       .expect(401);
   });
 });
+
+describe('GET /api/v1/house/:selector/weather/image/:image_key', () => {
+  const FAKE_PROVIDER_NAME = 'ext-fake-weather-images';
+  afterEach(() => {
+    // eslint-disable-next-line no-undef
+    TEST_GLADYS_INSTANCE.stateManager.deleteState('service', FAKE_PROVIDER_NAME);
+  });
+  it('should return the provider image', async () => {
+    // eslint-disable-next-line no-undef
+    TEST_GLADYS_INSTANCE.stateManager.setState('service', FAKE_PROVIDER_NAME, {
+      weather: {
+        get: () => Promise.resolve({}),
+        getImage: () => Promise.resolve('data:image/png;base64,ok'),
+      },
+    });
+    await authenticatedRequest
+      .get('/api/v1/house/test-house/weather/image/vigilance-map')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({ image: 'data:image/png;base64,ok' });
+      });
+  });
+  it('should return 404 when no provider serves images', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/test-house/weather/image/vigilance-map')
+      .expect('Content-Type', /json/)
+      .expect(404);
+  });
+  it('should return 404 on an unknown house', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/unknown-house/weather/image/vigilance-map')
+      .expect('Content-Type', /json/)
+      .expect(404);
+  });
+  it('should return 401 unauthorized', async () => {
+    await request
+      .get('/api/v1/house/test-house/weather/image/vigilance-map')
+      .expect('Content-Type', /json/)
+      .expect(401);
+  });
+});

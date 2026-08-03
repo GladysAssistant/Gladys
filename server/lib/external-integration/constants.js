@@ -166,7 +166,20 @@ const MAX_WEATHER_HOURS = 24;
 const MAX_WEATHER_DAYS = 8;
 const MAX_WEATHER_ALERTS = 10;
 const MAX_WEATHER_ALERT_EVENT_LENGTH = 100;
-const MAX_WEATHER_ALERT_DESCRIPTION_LENGTH = 2000;
+// CAP descriptions run long (NWS bulletins regularly exceed 2000 chars,
+// the MF vigilance bulletin runs up to ~4000): 5000 keeps the full text.
+const MAX_WEATHER_ALERT_DESCRIPTION_LENGTH = 5000;
+// Minimal interval between two accepted freshness nudges of one
+// integration (B.18 point 5); beyond it the nudge is silently dropped.
+const WEATHER_REFRESH_MIN_INTERVAL_MS = 60 * 1000;
+// Provider images (B.18 point 6): declared as metadata in the pivot
+// payload, bytes fetched on demand and validated before entering the core.
+const MAX_WEATHER_IMAGES = 3;
+const WEATHER_IMAGE_KEY_REGEX = /^[a-z0-9][a-z0-9-]{0,31}$/;
+const MAX_WEATHER_IMAGE_LABEL_LENGTH = 50;
+const MAX_WEATHER_IMAGE_BYTES = 500 * 1024;
+const WEATHER_IMAGE_CACHE_TTL_MS = 10 * 60 * 1000;
+const WEATHER_IMAGE_CACHE_PREFIX = 'weather-image';
 // The generic condition enum of the pivot format; anything else is
 // coerced to 'unknown' (the frontend renders a neutral icon).
 // 'night' is deprecated for providers: send the real condition plus
@@ -325,6 +338,13 @@ module.exports = {
   WEATHER_CONDITIONS,
   WEATHER_ALERT_SEVERITIES,
   WEATHER_ALERT_TYPES,
+  WEATHER_REFRESH_MIN_INTERVAL_MS,
+  MAX_WEATHER_IMAGES,
+  WEATHER_IMAGE_KEY_REGEX,
+  MAX_WEATHER_IMAGE_LABEL_LENGTH,
+  MAX_WEATHER_IMAGE_BYTES,
+  WEATHER_IMAGE_CACHE_TTL_MS,
+  WEATHER_IMAGE_CACHE_PREFIX,
   RESERVED_PARAM_PREFIX,
   TRANSPORT_PARAM,
   DEVICE_TRANSPORTS,

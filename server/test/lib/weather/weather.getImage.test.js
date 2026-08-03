@@ -1,0 +1,80 @@
+const { expect } = require('chai');
+const { fake } = require('sinon');
+const EventEmitter = require('events');
+
+const Weather = require('../../../lib/weather');
+const { NotFoundError, ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
+const { Error400 } = require('../../../utils/httpErrors');
+const { ERROR_MESSAGES } = require('../../../utils/constants');
+
+const event = new EventEmitter();
+
+const buildServiceManager = (servicesByName) => ({
+  getService: (name) => servicesByName[name],
+  stateManager: {
+    getAllKeys: () => Object.keys(servicesByName),
+  },
+});
+
+describe('weather.getImage', () => {
+  it('should get the image from the only provider exposing getImage', async () => {
+    const service = buildServiceManager({
+      openweather: { weather: { get: fake.resolves({}) } },
+      'ext-meteo-france': { weather: { get: fake.resolves({}), getImage: fake.resolves('data:image/png;base64,ok') } },
+    });
+    const weather = new Weather(service, event, {}, {});
+    const image = await weather.getImage('vigilance-map');
+    expect(image).to.equal('data:image/png;base64,ok');
+  });
+
+  it('should fall back to the next provider when the first fails and stop at the first success', async () => {
+    const failing = { weather: { get: fake.resolves({}), getImage: fake.rejects(new Error('down')) } };
+    const working = { weather: { get: fake.resolves({}), getImage: fake.resolves('data:image/png;base64,ok') } };
+    const untouched = { weather: { get: fake.resolves({}), getImage: fake.resolves('data:image/png;base64,no') } };
+    const service = buildServiceManager({
+      'ext-a-failing': failing,
+      'ext-b-working': working,
+      'ext-c-untouched': untouched,
+    });
+    const weather = new Weather(service, event, {}, {});
+    const image = await weather.getImage('vigilance-map');
+    expect(image).to.equal('data:image/png;base64,ok');
+    expect(untouched.weather.getImage.callCount).to.equal(0);
+  });
+
+  it('should throw NotFoundError when no provider serves images', async () => {
+    const service = buildServiceManager({
+      openweather: { weather: { get: fake.resolves({}) } },
+    });
+    const weather = new Weather(service, event, {}, {});
+    await expect(weather.getImage('vigilance-map')).to.be.rejectedWith(NotFoundError);
+  });
+
+  it('should surface an integration failure as REQUEST_TO_THIRD_PARTY_FAILED', async () => {
+    const service = buildServiceManager({
+      'ext-meteo-france': {
+        weather: {
+          get: fake.resolves({}),
+          getImage: fake.rejects(new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_WEATHER_IMAGE')),
+        },
+      },
+    });
+    const weather = new Weather(service, event, {}, {});
+    try {
+      await weather.getImage('vigilance-map');
+      expect.fail('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error400);
+      expect(e.message).to.equal(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
+    }
+  });
+
+  it('should rethrow the first failure when every provider fails', async () => {
+    const service = buildServiceManager({
+      'ext-a-first': { weather: { get: fake.resolves({}), getImage: fake.rejects(new Error('boom-first')) } },
+      'ext-b-second': { weather: { get: fake.resolves({}), getImage: fake.rejects(new Error('boom-second')) } },
+    });
+    const weather = new Weather(service, event, {}, {});
+    await expect(weather.getImage('vigilance-map')).to.be.rejectedWith('boom-first');
+  });
+});

@@ -59,6 +59,23 @@ function createActions(store) {
             hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
           });
         }
+        // provider images (vigilance map, rain radar…): metadata comes in
+        // the payload, the validated bytes are fetched per key on demand
+        if (get(box, 'modes.providerImages') && weather.images && weather.images.length > 0) {
+          await Promise.all(
+            weather.images.map(async image => {
+              try {
+                const { image: src } = await state.httpClient.get(
+                  `/api/v1/house/${box.house}/weather/image/${image.key}`
+                );
+                image.src = src;
+              } catch (imageError) {
+                // an unavailable image never breaks the widget: it is skipped
+                console.error(imageError);
+              }
+            })
+          );
+        }
         if (weather.days) {
           // keep future days only: never assume the provider leads with
           // today (that was an OpenWeather-specific shape)

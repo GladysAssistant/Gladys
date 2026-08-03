@@ -61,8 +61,26 @@ module.exports = function WeatherController(gladys) {
     res.json(responseWithHouseAndOptions);
   }
 
+  /**
+   * @api {get} /api/v1/house/:house_selector/weather/image/:image_key get weather provider image
+   * @apiName getWeatherImage
+   * @apiGroup Weather
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "image": "data:image/png;base64,iVBORw0KGgo..."
+   * }
+   */
+  async function getImage(req, res) {
+    // resolves the house first: the route stays scoped like the weather
+    // route it extends, and an unknown house 404s before any provider call
+    await gladys.house.getBySelector(req.params.house_selector);
+    const image = await gladys.weather.getImage(req.params.image_key);
+    res.json({ image });
+  }
+
   return Object.freeze({
     getByHouse: asyncMiddleware(getByHouse),
     getByUser: asyncMiddleware(getByUser),
+    getImage: asyncMiddleware(getImage),
   });
 };
