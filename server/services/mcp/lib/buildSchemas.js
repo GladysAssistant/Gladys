@@ -1394,9 +1394,6 @@ async function getAllTools(userId) {
         // that was grouped by, so there is no offset left for the model to misread.
         const formatBucketDate = (bucketDate) => {
           const date = new Date(bucketDate);
-          if (Number.isNaN(date.getTime())) {
-            return bucketDate;
-          }
           const year = String(date.getFullYear()).padStart(4, '0');
           const month = String(date.getMonth() + 1).padStart(2, '0');
           const day = String(date.getDate()).padStart(2, '0');
