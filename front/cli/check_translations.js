@@ -3,6 +3,8 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES
 } = require('../../server/utils/constants');
+const fs = require('fs');
+const path = require('path');
 const i18n = require('../src/config/i18n/en.json');
 const iconList = require('../../server/config/icons.json');
 const get = require('get-value');
@@ -60,6 +62,36 @@ featureParentKey.forEach(parentKey => {
       missingKeys.push(`unknown icon "${icon}" in icon-keywords/${language}.json ==> not in server/config/icons.json`);
     }
   });
+});
+
+// The theme keeps Lucide's renamed aliases next to the original Feather names
+// so existing markup keeps working: `house` and `home`, `circle-alert` and
+// `alert-circle`, `tool` and `wrench`… They point at the same glyph, so
+// offering both in the picker shows two identical tiles the user cannot tell
+// apart. Only one name per glyph may appear in icons.json.
+const themeCssPath = path.join(__dirname, '..', 'node_modules', '@gladysassistant', 'theme-optimized', 'dashboard.css');
+const themeCss = fs.readFileSync(themeCssPath, 'utf8');
+const codepoints = new Map();
+const iconRule = /\.fe-([a-z0-9-]+):before \{\s*content: "\\([0-9a-f]+)";/g;
+let match = iconRule.exec(themeCss);
+while (match !== null) {
+  codepoints.set(match[1], match[2]);
+  match = iconRule.exec(themeCss);
+}
+
+const iconsByCodepoint = new Map();
+iconList.forEach(icon => {
+  const codepoint = codepoints.get(icon);
+  if (!codepoint) {
+    missingKeys.push(`icon ${icon} ==> no .fe-${icon} rule in the installed theme, it would render as a blank box`);
+    return;
+  }
+  const twin = iconsByCodepoint.get(codepoint);
+  if (twin) {
+    missingKeys.push(`icon ${icon} ==> same glyph (\\${codepoint}) as "${twin}", keep only one of the two`);
+  } else {
+    iconsByCodepoint.set(codepoint, icon);
+  }
 });
 
 if (missingKeys.length > 0) {
