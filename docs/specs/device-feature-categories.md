@@ -61,9 +61,12 @@ Adding a category or type is not just a constant. The same PR must include:
 
 - the entry in `server/utils/constants.js` (`DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES`);
 - translations in **all** `front/src/config/i18n/*.json` files (`npm run compare-translations` enforces this);
-- the allowed units in `DEVICE_FEATURE_UNITS_BY_CATEGORY` when the category is a measurement;
+- the allowed units in `DEVICE_FEATURE_UNITS_BY_CATEGORY` when the category is a measurement — and in `DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE` when units differ by type within the category;
 - front display support (icon, feature edition/display components) where relevant;
-- server tests covering the new code paths.
+- MQTT feature defaults in `front/src/routes/integration/all/mqtt/device-page/utils.js` where relevant (`isSensorCategory` special cases, `getFeatureDefaultValues` min/max/`read_only`, `getFeaturePreviewValue`);
+- history grouping in `front/src/routes/history/categoryGroups.js` when the category should appear in the activity history;
+- enumerated value translations (`deviceFeatureValue` keys in all locale files) when the type's values are an enum not covered by the existing binary/push helpers;
+- tests for any new or changed runtime behavior (a constant-only addition does not need a test that dumps the constants list).
 
 ## Review checklist
 
@@ -75,9 +78,10 @@ For any PR touching `DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES`:
 - [ ] If no standard covers the capability, the PR shows the category is generic (several brands/protocols would map onto it) and not modeled on a single proprietary API.
 - [ ] Enum-like types expose the full generic value set; per-device subsets go through `supported_options`, not through a narrowed category or type.
 - [ ] Naming follows the conventions above (kebab-case, `*-sensor` suffix, English, no protocol name).
-- [ ] Translations added to all i18n language files.
-- [ ] Units declared in `DEVICE_FEATURE_UNITS_BY_CATEGORY` if the category is a measurement.
-- [ ] Tests and (if behavior is covered by a living spec) spec updates are in the same diff.
+- [ ] Translations added to all i18n language files (including `deviceFeatureValue` keys for enumerated values, where relevant).
+- [ ] Units declared in `DEVICE_FEATURE_UNITS_BY_CATEGORY` if the category is a measurement (and in `DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE` when units are type-specific).
+- [ ] MQTT feature defaults (`front/src/routes/integration/all/mqtt/device-page/utils.js`) and history grouping (`front/src/routes/history/categoryGroups.js`) updated where relevant.
+- [ ] Tests for new/changed runtime behavior and (if behavior is covered by a living spec) spec updates are in the same diff.
 
 ## Known legacy exceptions
 
