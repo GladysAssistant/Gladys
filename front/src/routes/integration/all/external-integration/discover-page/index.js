@@ -20,6 +20,10 @@ class ExternalIntegrationDiscoverPage extends Component {
     // debounced: the list can hold up to 2000 devices and each keystroke
     // re-renders every visible card
     this.debouncedSearchDevices = debounce(this.searchDevices, 200);
+    // bumped on every page (re)load and on unmount, so a response resolving
+    // after the user moved to another integration is dropped instead of
+    // applying its state to the wrong page
+    this.pageGeneration = 0;
   }
 
   searchDevices = e => {
@@ -27,8 +31,12 @@ class ExternalIntegrationDiscoverPage extends Component {
   };
 
   getIntegration = async () => {
+    const generation = this.pageGeneration;
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
+      if (generation !== this.pageGeneration) {
+        return;
+      }
       // a communication integration has no device screens: direct URL
       // access lands on the configuration screen instead
       if (get(integration, 'manifest.type') === 'communication') {
@@ -42,30 +50,44 @@ class ExternalIntegrationDiscoverPage extends Component {
   };
 
   getDiscoveredDevices = async () => {
+    const generation = this.pageGeneration;
     this.setState({ getDiscoveredDevicesStatus: RequestStatus.Getting });
     try {
       const discoveredDevices = await this.props.httpClient.get(
         `/api/v1/external_integration/${this.props.selector}/discovered_device`
       );
+      if (generation !== this.pageGeneration) {
+        return;
+      }
       this.setState({ discoveredDevices, getDiscoveredDevicesStatus: RequestStatus.Success });
     } catch (e) {
       console.error(e);
+      if (generation !== this.pageGeneration) {
+        return;
+      }
       this.setState({ getDiscoveredDevicesStatus: RequestStatus.Error });
     }
   };
 
   scan = async () => {
+    const generation = this.pageGeneration;
+    // the POST only relays the scan request: the integration scans on its
+    // own (up to ~30s for a Tuya-like cloud integration) and the results
+    // arrive later through the DISCOVERED_DEVICES_UPDATED websocket event,
+    // so the scanning state stays on until that event. The cap is armed
+    // before the await: the request itself has no timeout, and a hung
+    // request must not leave the loader spinning forever either.
+    this.clearScanTimer();
+    this.scanTimer = setTimeout(this.finishScan, SCAN_MAX_DURATION_MS);
     this.setState({ scanStatus: RequestStatus.Getting, scanError: null });
     try {
       await this.props.httpClient.post(`/api/v1/external_integration/${this.props.selector}/scan`);
-      // the POST only relays the scan request: the integration scans on its
-      // own (up to ~30s for a Tuya-like cloud integration) and the results
-      // arrive later through the DISCOVERED_DEVICES_UPDATED websocket
-      // event, so the scanning state stays on until that event
-      this.clearScanTimer();
-      this.scanTimer = setTimeout(this.finishScan, SCAN_MAX_DURATION_MS);
     } catch (e) {
       console.error(e);
+      if (generation !== this.pageGeneration) {
+        return;
+      }
+      this.clearScanTimer();
       const status = get(e, 'response.status');
       this.setState({
         scanStatus: RequestStatus.Error,
@@ -128,10 +150,12 @@ class ExternalIntegrationDiscoverPage extends Component {
   }
 
   loadIntegrationPage = () => {
-    // a still-running scan belongs to the previous integration: its loader
-    // and its timer must not leak into the page of the new one
+    // requests and scan still in flight belong to the previous integration:
+    // drop their late responses and clear their timer and their state so
+    // nothing leaks into the page of the new one
+    this.pageGeneration += 1;
     this.clearScanTimer();
-    this.setState({ scanStatus: null, scanError: null });
+    this.setState({ integration: null, discoveredDevices: null, scanStatus: null, scanError: null });
     this.getIntegration();
     this.getDiscoveredDevices();
   };
@@ -143,6 +167,7 @@ class ExternalIntegrationDiscoverPage extends Component {
   }
 
   componentWillUnmount() {
+    this.pageGeneration += 1;
     this.clearScanTimer();
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DISCOVERED_DEVICES_UPDATED,

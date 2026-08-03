@@ -75,9 +75,12 @@ const DiscoverTab = ({
             <Text id="integration.externalIntegration.discover.scanningInProgress" />
           </div>
         )}
+        {/* the dimmer only covers the list refresh: during the scan itself
+            the alert above is the progress signal and the list stays
+            interactive, so already-discovered devices can still be added */}
         <div
           class={cx('dimmer', {
-            active: scanning || getDiscoveredDevicesStatus === RequestStatus.Getting
+            active: getDiscoveredDevicesStatus === RequestStatus.Getting
           })}
         >
           <div class="loader" />
