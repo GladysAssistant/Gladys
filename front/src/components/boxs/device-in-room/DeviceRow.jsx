@@ -3,6 +3,7 @@ import get from 'get-value';
 import { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } from '../../../../../server/utils/constants';
 
 import { getDeviceName } from '../../../utils/device';
+import { TelevisionPushButtonFeatureTypes } from '../../../utils/consts';
 
 import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
 import ColorDeviceFeature from './device-features/ColorDeviceFeature';
@@ -15,6 +16,8 @@ import SetpointDeviceFeature from './device-features/SetpointDeviceFeature';
 import AirConditioningModeDeviceFeature from './device-features/AirConditioningModeDeviceFeature';
 import FanModeDeviceFeature from './device-features/FanModeDeviceFeature';
 import FanLabeledSelectDeviceFeature from './device-features/FanLabeledSelectDeviceFeature';
+import AirConditioningFanSpeedDeviceFeature from './device-features/AirConditioningFanSpeedDeviceFeature';
+import AirConditioningSwingDeviceFeature from './device-features/AirConditioningSwingDeviceFeature';
 import PilotWireModeDeviceFeature from './device-features/PilotWireModeDeviceFeature';
 import LMHVolumeDeviceFeature from './device-features/LMHVolumeDeviceFeature';
 import PushDeviceFeature from './device-features/PushDeviceFeature';
@@ -45,6 +48,9 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING]: FanLabeledSelectDeviceFeature,
   [DEVICE_FEATURE_TYPES.FAN.WIND_SETTING]: FanLabeledSelectDeviceFeature,
   [DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION]: FanLabeledSelectDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.FAN_SPEED]: AirConditioningFanSpeedDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_HORIZONTAL]: AirConditioningSwingDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.SWING_VERTICAL]: AirConditioningSwingDeviceFeature,
   [DEVICE_FEATURE_TYPES.HEATER.PILOT_WIRE_MODE]: PilotWireModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.LOCK.BINARY]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.SIREN.LMH_VOLUME]: LMHVolumeDeviceFeature,
@@ -76,7 +82,13 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   },
   [DEVICE_FEATURE_CATEGORIES.FAN]: {
     [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
-  }
+  },
+  // Television remote-control orders (play, pause, channel up, ...) are write-only commands: they
+  // are displayed as push buttons instead of falling back to a read-only sensor row.
+  [DEVICE_FEATURE_CATEGORIES.TELEVISION]: TelevisionPushButtonFeatureTypes.reduce(
+    (acc, type) => ({ ...acc, [type]: PushDeviceFeature }),
+    {}
+  )
 };
 
 const DeviceRow = ({ children, ...props }) => {

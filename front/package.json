@@ -15,7 +15,7 @@
     "start-gateway": "cross-env GATEWAY_MODE=true vite --port 1445",
     "start-demo": "cross-env DEMO_MODE=true vite --port 1445",
     "eslint": "eslint src cypress --ext .json --ext .js --ext .jsx",
-    "compare-translations": "comparejson -e ./src/config/i18n/*.json && node ./cli/check_translations.js",
+    "compare-translations": "comparejson -e ./src/config/i18n/*.json && comparejson -e ./src/config/i18n/icon-keywords/*.json && node ./cli/check_translations.js",
     "prettier-check": "prettier --check '**/*.js' '**/*.jsx' '**/*.json'",
     "prettier": "prettier --write '**/*.js' '**/*.jsx' '**/*.json'",
     "start:cypress": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 npm run build && sirv build --port 1444 --cors --single",
@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^4.19.1",
-    "@gladysassistant/theme-optimized": "^1.0.4",
+    "@gladysassistant/theme-optimized": "^2.1.0",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "4.5.0",
     "apexcharts": "^3.41.1",

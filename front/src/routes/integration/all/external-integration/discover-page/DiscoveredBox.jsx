@@ -11,7 +11,7 @@ class DiscoveredBox extends Component {
   createDevice = async () => {
     this.setState({ loading: true, errorMessage: null, errorDetail: null, validationErrors: [], isKnownError: true });
     try {
-      await this.props.createDevice(this.props.deviceIndex);
+      await this.props.createDevice(this.props.device.external_id);
     } catch (e) {
       console.error(e);
       this.setState(getDiscoveredDeviceCreateError(e));

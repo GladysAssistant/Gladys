@@ -6,6 +6,7 @@ import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
+import { isPushButtonFeature } from '../../../../../utils/consts';
 
 const SENSOR_CATEGORY_SUFFIX = '-sensor';
 
@@ -48,7 +49,8 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.DURATION ||
     category === DEVICE_FEATURE_CATEGORIES.TAMPER ||
     category === DEVICE_FEATURE_CATEGORIES.INPUT ||
-    category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE
+    category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE ||
+    category === DEVICE_FEATURE_CATEGORIES.DOORBELL
   ) {
     return true;
   }
@@ -473,32 +475,7 @@ const applyDefaultUnit = (defaults, category, type) => {
   return { ...defaults, unit };
 };
 
-const TELEVISION_CONTINUOUS_CONTROL_TYPES = new Set([
-  DEVICE_FEATURE_TYPES.TELEVISION.BINARY,
-  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
-  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL
-]);
-
-const MUSIC_CONTINUOUS_CONTROL_TYPES = new Set([
-  DEVICE_FEATURE_TYPES.MUSIC.VOLUME,
-  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE
-]);
-
-export const isCatalogPushButtonFeature = (category, type) => {
-  if (category === DEVICE_FEATURE_CATEGORIES.BUTTON && type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
-    return true;
-  }
-
-  if (category === DEVICE_FEATURE_CATEGORIES.TELEVISION) {
-    return !TELEVISION_CONTINUOUS_CONTROL_TYPES.has(type);
-  }
-
-  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
-    return !MUSIC_CONTINUOUS_CONTROL_TYPES.has(type);
-  }
-
-  return false;
-};
+export const isCatalogPushButtonFeature = isPushButtonFeature;
 
 export const getCatalogPreviewMode = (category, type) => {
   if (isCatalogPushButtonFeature(category, type)) {
@@ -714,6 +691,11 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
   }
 
+  // A doorbell ring is a read-only momentary event (0/1), not a 0-100 actuator.
+  if (category === DEVICE_FEATURE_CATEGORIES.DOORBELL) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
+  }
+
   if (!isSensorCategory(category)) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }
@@ -760,6 +742,10 @@ export const getFeaturePreviewValue = (category, type) => {
   }
 
   if (type === DEVICE_FEATURE_TYPES.SWITCH.BINARY || type === DEVICE_FEATURE_TYPES.LIGHT.BINARY) {
+    return 1;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.DOORBELL) {
     return 1;
   }
 

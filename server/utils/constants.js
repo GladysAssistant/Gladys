@@ -180,6 +180,38 @@ const FAN_WIND_SETTING = {
   SLEEP_AND_NATURAL: 3,
 };
 
+const AC_FAN_SPEED = {
+  AUTO: 0,
+  LOW: 1,
+  LOW_MID: 2,
+  MID: 3,
+  MID_HIGH: 4,
+  HIGH: 5,
+  QUIET: 6,
+  TURBO: 7,
+};
+
+const AC_SWING_HORIZONTAL = {
+  OFF: 0,
+  SWING: 1,
+  POSITION_1: 2,
+  POSITION_2: 3,
+  POSITION_3: 4,
+  POSITION_4: 5,
+  POSITION_5: 6,
+  SWING_OPPOSITE: 7,
+};
+
+const AC_SWING_VERTICAL = {
+  OFF: 0,
+  SWING: 1,
+  POSITION_1: 2,
+  POSITION_2: 3,
+  POSITION_3: 4,
+  POSITION_4: 5,
+  POSITION_5: 6,
+};
+
 const PILOT_WIRE_MODE = {
   OFF: 0,
   FROST_PROTECTION: 1,
@@ -650,6 +682,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   DATARATE: 'datarate',
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
   DISTANCE_SENSOR: 'distance-sensor',
+  DOORBELL: 'doorbell',
   DURATION: 'duration',
   ELECTRICAL_VEHICLE_BATTERY: 'electrical-vehicle-battery',
   ELECTRICAL_VEHICLE_CHARGE: 'electrical-vehicle-charge',
@@ -753,6 +786,9 @@ const DEVICE_FEATURE_TYPES = {
   CAMERA: {
     IMAGE: 'image',
   },
+  DOORBELL: {
+    RING: 'ring',
+  },
   SIREN: {
     BINARY: 'binary',
     LMH_VOLUME: 'lmh_volume',
@@ -794,6 +830,9 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     MODE: 'mode',
     TARGET_TEMPERATURE: 'target-temperature',
+    FAN_SPEED: 'fan-speed',
+    SWING_HORIZONTAL: 'swing-horizontal',
+    SWING_VERTICAL: 'swing-vertical',
   },
   FAN: {
     MODE: 'mode',
@@ -1540,6 +1579,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SYSTEM: {
     VACUUM_FINISHED: 'system.vacuum-finished',
     WATCHTOWER_LOG: 'system.watchtower-log',
+    UPGRADE_ERROR: 'system.upgrade-error',
   },
   LOCATION: {
     NEW: 'location.new',
@@ -1695,6 +1735,20 @@ const DEFAULT_AGGREGATES_POLICY_IN_DAYS = {
   [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.MONTHLY]: 5 * 365,
 };
 
+const SYSTEM_UPGRADE_ERROR_CODES = {
+  // Gladys runs on an immutable image reference, no upgrade can ever be applied
+  IMAGE_TAG_PINNED: 'IMAGE_TAG_PINNED',
+  // Watchtower ran fine but found no new image to install
+  NO_UPDATE_APPLIED: 'NO_UPDATE_APPLIED',
+  // the Watchtower container exited with a non-zero status code
+  WATCHTOWER_FAILED: 'WATCHTOWER_FAILED',
+  // the Watchtower container was still running after the timeout
+  WATCHTOWER_TIMEOUT: 'WATCHTOWER_TIMEOUT',
+  // the container running Gladys could not be identified
+  GLADYS_CONTAINER_NOT_FOUND: 'GLADYS_CONTAINER_NOT_FOUND',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+};
+
 const JOB_TYPES = {
   HOURLY_DEVICE_STATE_AGGREGATE: 'hourly-device-state-aggregate',
   DAILY_DEVICE_STATE_AGGREGATE: 'daily-device-state-aggregate',
@@ -1834,6 +1888,9 @@ module.exports.FAN_AIRFLOW_DIRECTION = FAN_AIRFLOW_DIRECTION;
 module.exports.FAN_ROCK_SETTING = FAN_ROCK_SETTING;
 module.exports.FAN_WIND_SETTING = FAN_WIND_SETTING;
 module.exports.getFanFeatureOptions = getFanFeatureOptions;
+module.exports.AC_FAN_SPEED = AC_FAN_SPEED;
+module.exports.AC_SWING_HORIZONTAL = AC_SWING_HORIZONTAL;
+module.exports.AC_SWING_VERTICAL = AC_SWING_VERTICAL;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
@@ -1900,6 +1957,8 @@ module.exports.WEATHER_UNITS = WEATHER_UNITS;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES = DEVICE_FEATURE_STATE_AGGREGATE_TYPES;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST;
 module.exports.DEFAULT_AGGREGATES_POLICY_IN_DAYS = DEFAULT_AGGREGATES_POLICY_IN_DAYS;
+
+module.exports.SYSTEM_UPGRADE_ERROR_CODES = SYSTEM_UPGRADE_ERROR_CODES;
 
 module.exports.JOB_TYPES = JOB_TYPES;
 module.exports.JOB_TYPES_LIST = JOB_TYPES_LIST;
