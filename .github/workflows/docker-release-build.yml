@@ -2,6 +2,9 @@ name: Release Gladys Production Images
 run-name: Release Gladys ${{ github.ref_name }} Production Image
 
 on:
+  # Dispatched on the new tag by the "Create release tag" workflow: a tag pushed
+  # with the default GITHUB_TOKEN does not trigger the `push` event below.
+  workflow_dispatch:
   push:
     tags:
       - 'v*.*.*'
@@ -121,6 +124,9 @@ jobs:
   docker:
     needs: build-front
     name: Docker magic !
+    # Production images are only published from a release tag, never from a
+    # branch a manual dispatch could have been started on.
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-22.04
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}

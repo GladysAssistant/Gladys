@@ -349,6 +349,7 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Mouvement détecté",
+        "doorbellRinging": "Sonne",
         "pushButton": "Appuyer",
         "vacuumDock": "Retour à la base"
       },
@@ -742,12 +743,15 @@
         "title": "Appareils découverts",
         "scanButton": "Scanner",
         "scanning": "Scan en cours...",
+        "scanningInProgress": "Scan en cours... Selon l'intégration, cela peut prendre jusqu'à une minute. La liste se mettra à jour automatiquement dès que des appareils seront publiés.",
         "scanError": "Une erreur s'est produite lors du lancement du scan.",
         "scanErrorDisconnected": "Impossible de lancer le scan : l'intégration n'est pas connectée. Vérifiez qu'elle est bien démarrée dans l'onglet « Configuration ».",
         "loadError": "Une erreur s'est produite lors du chargement des appareils découverts.",
         "noDevices": "Aucun appareil découvert pour le moment. Cliquez sur « Scanner » pour rechercher des appareils.",
         "noDevicesConfigureFirst": "Rien trouvé ? Vérifiez que l'intégration est bien configurée dans l'onglet <a href=\"{{configUrl}}\">Configuration</a>, puis relancez un scan.",
         "alreadyCreatedBadge": "Déjà ajouté",
+        "searchPlaceholder": "Rechercher un appareil",
+        "noSearchResults": "Aucun appareil découvert ne correspond à votre recherche.",
         "error": {
           "networkError": "Gladys n'a pas répondu à la demande d'ajout. Vérifiez que le serveur Gladys est bien démarré et accessible, puis réessayez.",
           "badRequestError": "Gladys a refusé cet appareil : les données publiées par l'intégration sont incorrectes.",
@@ -2971,11 +2975,13 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU",
-        "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
+        "logicExplanationText": "Les conditions de ce bloc sont reliées par un OU : le bloc est validé dès qu'une seule d'entre elles est réalisée. Pour faire un ET, ajoutez plusieurs blocs « Condition sur variables » : ils devront alors tous être validés.",
+        "explanationText": "Dans le champ de valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
         "conditionDescription": "Si toutes les conditions sont réalisées, les actions du bloc \"Alors...\" seront exécutées. Sinon, les actions du bloc \"Sinon...\" seront exécutées.",
+        "conditionLogicDescription": "Les conditions ci-dessous sont reliées par un ET : elles doivent toutes être réalisées. Pour faire un OU, utilisez un seul bloc « Condition sur variables » et ajoutez-y plusieurs conditions avec le bouton « + OU ».",
         "noCondition": "Aucune condition ajoutée. Cliquez sur le bouton '+' pour ajouter une condition à ce bloc",
         "addCondition": "Ajouter une condition",
         "if": "Si",
@@ -3247,6 +3253,7 @@
         "on": "On",
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
+        "doorbellRang": "Si la sonnette sonne",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
         "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : "
       },
@@ -3599,7 +3606,18 @@
     "operations": "Opérations",
     "upToDate": "Gladys est à jour",
     "newUpgradeAvailable": "Mise à jour disponible",
-    "newUpgradeAvailableText": "Gladys se mettra à jour automatiquement si vous utilisez Watchtower. Si vous voulez mettre à jour manuellement, cliquez sur le bouton ci-dessous. Cela lancera un container Watchtower qui mettra à jour tous les containers présents sur cette machine.",
+    "newUpgradeAvailableText": "Gladys se mettra à jour automatiquement si vous utilisez Watchtower. Si vous voulez mettre à jour manuellement, cliquez sur le bouton ci-dessous. Cela lancera un container Watchtower qui mettra à jour uniquement le container Gladys, les autres containers de cette machine ne seront pas touchés.",
+    "pinnedImageTitle": "Mise à jour impossible avec cette image",
+    "pinnedImageText": "Votre container Gladys a été créé à partir de l'image « {{image}} », qui pointe vers une version figée. Une mise à jour retéléchargerait exactement la même image : Gladys ne peut donc pas se mettre à jour toute seule.",
+    "pinnedImageRecommendation": "Pour que la mise à jour fonctionne, recréez votre container avec l'image « {{recommendedImage}} », qui suit les nouvelles versions. Vos données ne sont pas dans le container, elles ne seront pas perdues.",
+    "upgradeError": {
+      "IMAGE_TAG_PINNED": "Mise à jour annulée : votre container utilise l'image figée « {{image}} ». Recréez-le avec « {{recommendedImage}} » pour pouvoir le mettre à jour.",
+      "NO_UPDATE_APPLIED": "Aucune mise à jour n'a été appliquée : Watchtower n'a trouvé aucune nouvelle image pour « {{image}} ». Réessayez dans quelques minutes, la nouvelle image n'est peut-être pas encore disponible pour votre architecture.",
+      "WATCHTOWER_FAILED": "La mise à jour a échoué : le container Watchtower s'est arrêté avec le code d'erreur {{statusCode}}. Consultez les logs de Gladys pour en savoir plus.",
+      "WATCHTOWER_TIMEOUT": "La mise à jour prend plus de temps que prévu et Gladys a cessé de la suivre. Elle est peut-être toujours en cours : rafraichissez cette page dans quelques minutes pour vérifier la version installée.",
+      "GLADYS_CONTAINER_NOT_FOUND": "Mise à jour impossible : Gladys n'a pas réussi à identifier son propre container. Vérifiez que Gladys est bien lancée via Docker avec le volume `-v /var/run/docker.sock:/var/run/docker.sock`.",
+      "UNKNOWN_ERROR": "La mise à jour a échoué. Consultez les logs de Gladys pour en savoir plus."
+    },
     "notConnectedToDocker": "Gladys n'est pas connectée à Docker. Pour avoir accès à Docker depuis Gladys, il faut lancer Gladys avec le bon volume `-v /var/run/docker.sock:/var/run/docker.sock`.",
     "updateNow": "Mettre à jour maintenant",
     "upgradeInProgress": "Mise à jour en cours...",
@@ -3675,6 +3693,10 @@
     "deleteAreaError": "Impossible de supprimer cette zone. Rafraichissez cette page et réessayez.",
     "getAreaError": "Impossible de récupérer les informations de cette zone. Merci de rafraichir cette page et de réessayer."
   },
+  "iconSelector": {
+    "searchPlaceholder": "Rechercher une icône (maison, cadenas, météo...)",
+    "noResult": "Aucune icône ne correspond à \"{{search}}\"."
+  },
   "newScene": {
     "cardTitle": "Nouvelle scène",
     "nameLabel": "Nom",
@@ -3723,7 +3745,9 @@
     "statusColumn": "Etat",
     "userRsaKey": "Clé RSA",
     "userEcdsaKey": "Clé ECDSA",
-    "usersListDescription": "Cette liste est synchronisée avec vos utilisateurs Gladys Plus. Pour garantir la sécurité de votre instance, vous devez accorder manuellement l'accès à chaque utilisateur. La suppression d'un utilisateur se fait depuis la gestion des utilisateurs Gladys Plus.",
+    "usersListDescription": "Cette liste est synchronisée avec vos utilisateurs Gladys Plus. Pour qu'un utilisateur (y compris vous-même) puisse accéder à votre instance à distance, vous devez l'autoriser ici en activant l'interrupteur en face de son nom.",
+    "usersListWhyAcceptDescription": "<b>Pourquoi cette étape ?</b> Chaque utilisateur Gladys Plus possède ses propres clés de chiffrement, dont les empreintes sont affichées ci-dessous. En autorisant un utilisateur, vous validez localement, sur votre instance, que ses clés sont acceptées : c'est cette validation locale qui protège votre maison des attaques « de l'homme du milieu » (man-in-the-middle). Personne, pas même les serveurs Gladys Plus, ne peut donner accès à votre instance sans cette validation faite chez vous.",
+    "usersListRevokedDescription": "Si les clés d'un utilisateur changent (par exemple lorsque sa double authentification a été réinitialisée), son accès est automatiquement révoqué par sécurité : il faudra l'autoriser à nouveau ici. La suppression d'un utilisateur se fait depuis la gestion des utilisateurs Gladys Plus.",
     "disconnectTitle": "Déconnectez votre compte Gladys Plus",
     "disconnectButton": "Déconnecter",
     "gatewayConnectedSuccessTitle": "Gladys Plus est connecté avec succès !",
@@ -4210,6 +4234,35 @@
           "heating": "Chauffage",
           "drying": "Déshu.",
           "fan": "Ventil."
+        },
+        "fan-speed": {
+          "auto": "Auto",
+          "low": "Faible",
+          "low-mid": "Faible-Moyen",
+          "mid": "Moyen",
+          "mid-high": "Moyen-Fort",
+          "high": "Fort",
+          "quiet": "Silencieux",
+          "turbo": "Turbo"
+        },
+        "swing-horizontal": {
+          "off": "Arrêt",
+          "swing": "Balancement",
+          "position-1": "Position 1 (Gauche)",
+          "position-2": "Position 2",
+          "position-3": "Position 3 (Centre)",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Droite)",
+          "swing-opposite": "Balancement inversé"
+        },
+        "swing-vertical": {
+          "off": "Arrêt",
+          "swing": "Balayage",
+          "position-1": "Position 1 (Haut)",
+          "position-2": "Position 2",
+          "position-3": "Position 3",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Bas)"
         }
       },
       "heater": {
@@ -4435,6 +4488,35 @@
           "2": "Chauffage",
           "3": "Déshumidification",
           "4": "Ventilation"
+        },
+        "fan-speed": {
+          "0": "Auto",
+          "1": "Faible",
+          "2": "Faible-Moyen",
+          "3": "Moyen",
+          "4": "Moyen-Fort",
+          "5": "Fort",
+          "6": "Silencieux",
+          "7": "Turbo"
+        },
+        "swing-horizontal": {
+          "0": "Arrêt",
+          "1": "Balancement",
+          "2": "Position 1 (Gauche)",
+          "3": "Position 2",
+          "4": "Position 3 (Centre)",
+          "5": "Position 4",
+          "6": "Position 5 (Droite)",
+          "7": "Balancement inversé"
+        },
+        "swing-vertical": {
+          "0": "Arrêt",
+          "1": "Balayage",
+          "2": "Position 1 (Haut)",
+          "3": "Position 2",
+          "4": "Position 3",
+          "5": "Position 4",
+          "6": "Position 5 (Bas)"
         }
       },
       "siren": {
@@ -4530,6 +4612,12 @@
         "window-opened": {
           "0": "Fermée(s)",
           "1": "Ouverte(s)"
+        }
+      },
+      "doorbell": {
+        "ring": {
+          "0": "Pas de sonnerie",
+          "1": "Sonnette actionnée"
         }
       },
       "electrical-vehicle-charge": {
@@ -4657,6 +4745,10 @@
       "shortCategoryName": "Caméra",
       "image": "Caméra (Image)"
     },
+    "doorbell": {
+      "shortCategoryName": "Sonnette",
+      "ring": "Sonnerie"
+    },
     "counter-sensor": {
       "shortCategoryName": "Compteur",
       "integer": "Compteur entier"
@@ -4760,7 +4852,10 @@
       "shortCategoryName": "Climatisation",
       "binary": "Commutateur",
       "mode": "Mode",
-      "target-temperature": "Température de consigne"
+      "target-temperature": "Température de consigne",
+      "fan-speed": "Vitesse de ventilation",
+      "swing-horizontal": "Balayage horizontal",
+      "swing-vertical": "Balayage vertical"
     },
     "electrical-vehicle-battery": {
       "shortCategoryName": "Véhicule électrique - Batterie",
@@ -5220,11 +5315,19 @@
   "gatewayLinkUser": {
     "title": "Configurer Gladys Plus",
     "label": "Sélectionnez votre utilisateur Gladys",
-    "description": "Sélectionnez l'utilisateur Gladys auquel lier votre compte Gladys Plus. Cet utilisateur doit être accepté localement sur votre instance : dans les paramètres de votre instance, onglet \"Gladys Plus\", section \"Utilisateurs\".",
-    "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
-    "noInstanceFoundHelp": "Cela peut arriver si vous ne vous êtes jamais connecté à votre compte Gladys Plus dans votre instance locale, ou si votre 2FA a été réinitialisée. Dans les deux cas, ouvrez votre instance Gladys locale, allez dans les paramètres, onglet \"Gladys Plus\", et connectez-vous à votre compte. Besoin d'aide ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
+    "description": "Sélectionnez l'utilisateur Gladys auquel lier votre compte Gladys Plus. Cet utilisateur doit être autorisé localement sur votre instance : dans les paramètres de votre instance, onglet « Gladys Plus », section « Utilisateurs distants ».",
+    "noInstanceFoundTitle": "Plus qu'une étape !",
+    "noInstanceFoundIntro": "Votre compte Gladys Plus est bien actif 🙂 Il ne reste plus qu'à connecter votre instance Gladys (celle installée chez vous) à votre compte Gladys Plus. C'est une étape normale lors de la première utilisation, rien n'est cassé ! Suivez ces étapes :",
+    "noInstanceFoundStepOpenLocalInstance": "Ouvrez votre instance Gladys <b>en local</b>, depuis votre réseau à la maison, via son adresse locale habituelle (par exemple <code>http://adresse-ip-de-votre-appareil</code>).",
+    "noInstanceFoundStepGoToSettings": "Connectez-vous, puis allez dans <b>Paramètres</b>, onglet <b>« Gladys Plus »</b>.",
+    "noInstanceFoundStepLogin": "Cliquez sur <b>« J'ai déjà un compte »</b>, puis identifiez-vous avec votre compte Gladys Plus (le même e-mail et mot de passe qu'ici).",
+    "noInstanceFoundStepAcceptUser": "Toujours dans l'onglet « Gladys Plus », section <b>« Utilisateurs distants »</b>, <b>autorisez votre utilisateur</b> en activant l'interrupteur en face de son nom. Cette validation locale garantit que seules les clés de chiffrement que vous avez approuvées chez vous peuvent accéder à votre instance (protection contre les attaques man-in-the-middle).",
+    "noInstanceFoundStepComeBack": "Revenez sur cette page, puis cliquez sur le bouton ci-dessous.",
+    "noInstanceFoundRetryButton": "J'ai connecté mon instance, réessayer",
+    "noInstanceFoundTutorialLink": "Besoin d'un guide pas à pas avec des captures d'écran ? <a href=\"https://gladysassistant.com/fr/docs/plus/connect-gladys-plus/\" target=\"_blank\" rel=\"noopener noreferrer\">Consultez le tutoriel dans notre documentation</a>.",
+    "noInstanceFoundNote": "Vous aviez déjà fait cette étape par le passé ? Il faut parfois la refaire, par exemple lorsque votre double authentification (2FA) a été réinitialisée : reconnectez-vous simplement dans l'onglet « Gladys Plus » de votre instance. Besoin d'aide ? Écrivez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
-    "errorNotAcceptedLocally": "L'utilisateur n'a pas été accepté localement dans l'instance Gladys. Veuillez l'accepter dans les paramètres de votre instance.",
+    "errorNotAcceptedLocally": "L'utilisateur n'a pas encore été autorisé localement dans l'instance Gladys. Dans votre instance locale, allez dans les paramètres, onglet « Gladys Plus », section « Utilisateurs distants », et activez l'interrupteur en face de son nom.",
     "saveButton": "Sauvegarder",
     "manageBillingLink": "Gérer mon abonnement et mes factures",
     "logoutButton": "Se déconnecter"

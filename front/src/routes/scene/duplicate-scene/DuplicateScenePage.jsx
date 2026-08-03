@@ -3,7 +3,7 @@ import { RequestStatus } from '../../../utils/consts';
 import cx from 'classnames';
 import get from 'get-value';
 import style from './style.css';
-import iconList from '../../../../../server/config/icons.json';
+import IconSelector from '../../../components/scene/IconSelector';
 
 const DuplicateScenePage = ({ children, ...props }) => (
   <div class={cx('container', style.containerWithMargin)}>
@@ -12,7 +12,7 @@ const DuplicateScenePage = ({ children, ...props }) => (
     </button>
 
     <div class="row">
-      <div class="col col-login mx-auto">
+      <div class={cx('col mx-auto', style.sceneFormCol)}>
         <form onSubmit={props.duplicateScene} class="card">
           <div class={props.loading ? 'dimmer active' : 'dimmer'}>
             <div class="loader" />
@@ -56,29 +56,7 @@ const DuplicateScenePage = ({ children, ...props }) => (
                       <Text id="duplicateScene.invalidIcon" />
                     </div>
                   )}
-                  <div className={cx('row', style.iconContainer)}>
-                    {iconList.map(icon => (
-                      <div className="col-2">
-                        <div
-                          className={cx('text-center', style.iconDiv, {
-                            [style.iconDivChecked]: get(props, 'scene.icon') === icon
-                          })}
-                        >
-                          <label className={style.iconLabel}>
-                            <input
-                              name="icon"
-                              type="radio"
-                              onChange={props.updateDuplicateSceneIcon}
-                              checked={get(props, 'scene.icon') === icon}
-                              value={icon}
-                              className={style.iconInput}
-                            />
-                            <i className={`fe fe-${icon}`} />
-                          </label>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <IconSelector value={get(props, 'scene.icon')} onChange={props.updateDuplicateSceneIcon} />
                 </div>
                 <div class="form-footer">
                   <button
