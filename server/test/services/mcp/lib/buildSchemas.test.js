@@ -1468,7 +1468,39 @@ describe('build schemas', () => {
       { date: '2025-10-26 02:00+01:00', value: 0.4 },
     ]);
 
-    // A home sitting at UTC: longOffset reads plain "GMT" there, still report +00:00.
+    // Same night west of Greenwich, where the offset is negative: 01:00 happens twice
+    // in New York too, on 2025-11-02.
+    getConsumptionByDates.resetHistory();
+    mcpHandler.gladys.variable.getValue.resolves('America/New_York');
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [
+          { created_at: new Date('2025-11-02T05:00:00.000Z'), value: 1, sum_value: 0.5 },
+          { created_at: new Date('2025-11-02T06:00:00.000Z'), value: 1, sum_value: 0.6 },
+        ],
+      },
+    ]);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2025-11-02',
+      end_date: '2025-11-02',
+      unit: 'kwh',
+      group_by: 'hour',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([
+      { date: '2025-11-02 01:00-04:00', value: 0.5 },
+      { date: '2025-11-02 01:00-05:00', value: 0.6 },
+    ]);
+
+    // A home sitting at UTC: the offset is zero, and still reported as +00:00 so the
+    // hourly format never changes shape. Not read off Intl's timeZoneName, which
+    // spells that case "GMT" on ICU 76 and "GMT+00:00" on ICU 78.
     mcpHandler.gladys.variable.getValue.resolves('UTC');
     getConsumptionByDates.resolves([
       {

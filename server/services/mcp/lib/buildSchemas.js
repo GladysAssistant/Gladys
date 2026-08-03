@@ -1410,27 +1410,41 @@ async function getAllTools(userId) {
           hour: '2-digit',
           minute: '2-digit',
           hourCycle: 'h23',
-          timeZoneName: 'longOffset',
         });
 
+        // Distance between the local clock reading and the instant it stands for.
+        // Computed from the formatted parts rather than read from a timeZoneName
+        // part: that field is CLDR text, and a zero offset spells "GMT" on ICU 76
+        // (Node 22.14) but "GMT+00:00" on ICU 78, both of which "node": "22.x"
+        // accepts. Arithmetic is the same on every ICU, and gets the zones that sit
+        // on a half or quarter hour right for free.
+        const formatUtcOffset = (parts, bucketDate) => {
+          const localAsUtc = new Date(0);
+          localAsUtc.setUTCFullYear(Number(parts.year), Number(parts.month) - 1, Number(parts.day));
+          localAsUtc.setUTCHours(Number(parts.hour), Number(parts.minute), 0, 0);
+          const offsetMinutes = Math.round((localAsUtc.getTime() - bucketDate.getTime()) / 60000);
+          const sign = offsetMinutes < 0 ? '-' : '+';
+          const absoluteMinutes = Math.abs(offsetMinutes);
+          const hours = String(Math.floor(absoluteMinutes / 60)).padStart(2, '0');
+          const minutes = String(absoluteMinutes % 60).padStart(2, '0');
+          return `${sign}${hours}:${minutes}`;
+        };
+
         const formatBucketDate = (bucketDate) => {
+          const date = new Date(bucketDate);
           const parts = Object.fromEntries(
-            bucketDateFormat.formatToParts(new Date(bucketDate)).map(({ type, value }) => [type, value]),
+            bucketDateFormat.formatToParts(date).map(({ type, value }) => [type, value]),
           );
           switch (effectiveGroupBy) {
             case 'year':
               return parts.year;
             case 'month':
               return `${parts.year}-${parts.month}`;
-            // The offset keeps hourly labels unique on the night a timezone falls back:
-            // in Paris, 2025-10-26T00:00Z and 2025-10-26T01:00Z are two different
-            // buckets that are both 02:00 on the local clock. longOffset always reads
-            // "GMT±HH:mm", including "GMT+00:00" for a home sitting at UTC.
+            // The offset keeps hourly labels unique on the night a timezone falls
+            // back: in Paris, 2025-10-26T00:00Z and 2025-10-26T01:00Z are two
+            // different buckets that are both 02:00 on the local clock.
             case 'hour':
-              return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:00${parts.timeZoneName.replace(
-                'GMT',
-                '',
-              )}`;
+              return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:00${formatUtcOffset(parts, date)}`;
             // 'day' and 'week' are both a calendar day, the start of the bucket.
             default:
               return `${parts.year}-${parts.month}-${parts.day}`;
