@@ -4623,14 +4623,18 @@
         "connector-status": {
           "unknown": "{{value}} (unbekannt)",
           "0": "Verfügbar",
-          "1": "Vorbereitung",
-          "2": "Lädt",
+          "1": "Belegt",
+          "2": "Reserviert",
+          "3": "Nicht verfügbar",
+          "4": "Fehler"
+        },
+        "charging-state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Lädt",
+          "1": "Fahrzeug verbunden",
+          "2": "Angehalten (Fahrzeug)",
           "3": "Angehalten (Ladestation)",
-          "4": "Angehalten (Fahrzeug)",
-          "5": "Abschluss",
-          "6": "Reserviert",
-          "7": "Nicht verfügbar",
-          "8": "Fehler"
+          "4": "Inaktiv"
         }
       },
       "voc-matter-index-sensor": {
@@ -4754,7 +4758,8 @@
     },
     "charging-station": {
       "shortCategoryName": "Ladestation",
-      "connector-status": "Anschlussstatus"
+      "connector-status": "Anschlussstatus",
+      "charging-state": "Ladevorgangsstatus"
     },
     "doorbell": {
       "shortCategoryName": "Türklingel",

@@ -4623,14 +4623,18 @@
         "connector-status": {
           "unknown": "{{value}} (inconnu)",
           "0": "Disponible",
-          "1": "Préparation",
-          "2": "En charge",
+          "1": "Occupé",
+          "2": "Réservé",
+          "3": "Indisponible",
+          "4": "En défaut"
+        },
+        "charging-state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "En charge",
+          "1": "Véhicule connecté",
+          "2": "Suspendue (véhicule)",
           "3": "Suspendue (borne)",
-          "4": "Suspendue (véhicule)",
-          "5": "Finalisation",
-          "6": "Réservée",
-          "7": "Indisponible",
-          "8": "En défaut"
+          "4": "Inactive"
         }
       },
       "voc-matter-index-sensor": {
@@ -4754,7 +4758,8 @@
     },
     "charging-station": {
       "shortCategoryName": "Borne de recharge",
-      "connector-status": "Statut du connecteur"
+      "connector-status": "Statut du connecteur",
+      "charging-state": "État de la charge"
     },
     "doorbell": {
       "shortCategoryName": "Sonnette",

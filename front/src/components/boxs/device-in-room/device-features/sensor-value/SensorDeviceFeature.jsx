@@ -23,6 +23,7 @@ import PressureSensorDeviceValue from './PressureSensorDeviceValue';
 import FanSensorDeviceValue from './FanSensorDeviceValue';
 import VacuumCleanerStateDeviceValue from './VacuumCleanerStateDeviceValue';
 import EvChargeConnectorStatusDeviceValue from './EvChargeConnectorStatusDeviceValue';
+import EvChargeChargingStateDeviceValue from './EvChargeChargingStateDeviceValue';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: MotionSensorDeviceValue,
@@ -61,7 +62,8 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.ODOMETER]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.TIRE_PRESSURE]: PressureSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE]: VacuumCleanerStateDeviceValue,
-  [DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS]: EvChargeConnectorStatusDeviceValue
+  [DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS]: EvChargeConnectorStatusDeviceValue,
+  [DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE]: EvChargeChargingStateDeviceValue
 };
 
 const DEVICE_FEATURES_WITHOUT_EXPIRATION = [

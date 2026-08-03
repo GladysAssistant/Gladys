@@ -4623,14 +4623,18 @@
         "connector-status": {
           "unknown": "{{value}} (unknown)",
           "0": "Available",
-          "1": "Preparing",
-          "2": "Charging",
+          "1": "Occupied",
+          "2": "Reserved",
+          "3": "Unavailable",
+          "4": "Faulted"
+        },
+        "charging-state": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Charging",
+          "1": "Vehicle connected",
+          "2": "Suspended (EV)",
           "3": "Suspended (EVSE)",
-          "4": "Suspended (EV)",
-          "5": "Finishing",
-          "6": "Reserved",
-          "7": "Unavailable",
-          "8": "Faulted"
+          "4": "Idle"
         }
       },
       "voc-matter-index-sensor": {
@@ -4754,7 +4758,8 @@
     },
     "charging-station": {
       "shortCategoryName": "Charging station",
-      "connector-status": "Connector status"
+      "connector-status": "Connector status",
+      "charging-state": "Charging state"
     },
     "doorbell": {
       "shortCategoryName": "Doorbell",

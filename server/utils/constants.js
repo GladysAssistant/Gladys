@@ -263,22 +263,40 @@ const VACUUM_CLEANER_STATE = {
   DOCKED: 6,
 };
 
-// Generic charging station connector status - values align with OCPP 1.6's
-// ChargePointStatus enum, but is not itself protocol-specific: any charging
-// station integration (OCPP-based or not) reporting a comparable connector
-// lifecycle can map onto it. Note: OCPP 2.x uses a different, simplified
-// ConnectorStatusEnumType (Available/Occupied/Reserved/Unavailable/Faulted)
-// and requires its own documented mapping onto these values.
+// Generic charging station connector status - values align with OCPP 2.x's
+// ConnectorStatusEnumType, reported independently of any charging session.
+// Not itself protocol-specific: any charging station integration (OCPP-based
+// or not) reporting a comparable connector availability can map onto it.
 const EV_CHARGE_CONNECTOR_STATUS = {
   AVAILABLE: 0,
-  PREPARING: 1,
-  CHARGING: 2,
+  OCCUPIED: 1,
+  RESERVED: 2,
+  UNAVAILABLE: 3,
+  FAULTED: 4,
+};
+
+// Generic charging session state - values align with OCPP 2.x's
+// ChargingStateEnumType. Only meaningful while a charging session/transaction
+// is in progress (EV_CHARGE_CONNECTOR_STATUS is OCCUPIED); has no value the
+// rest of the time.
+//
+// OCPP 1.6 integrations report a single, more granular ChargePointStatus and
+// must split it across both enums:
+//   Available      -> CONNECTOR_STATUS.AVAILABLE
+//   Preparing      -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.EV_CONNECTED
+//   Charging       -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.CHARGING
+//   SuspendedEVSE  -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.SUSPENDED_EVSE
+//   SuspendedEV    -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.SUSPENDED_EV
+//   Finishing      -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.IDLE
+//   Reserved       -> CONNECTOR_STATUS.RESERVED
+//   Unavailable    -> CONNECTOR_STATUS.UNAVAILABLE
+//   Faulted        -> CONNECTOR_STATUS.FAULTED
+const EV_CHARGE_CHARGING_STATE = {
+  CHARGING: 0,
+  EV_CONNECTED: 1,
+  SUSPENDED_EV: 2,
   SUSPENDED_EVSE: 3,
-  SUSPENDED_EV: 4,
-  FINISHING: 5,
-  RESERVED: 6,
-  UNAVAILABLE: 7,
-  FAULTED: 8,
+  IDLE: 4,
 };
 
 const VACUUM_CLEANER_MODE = {
@@ -805,7 +823,8 @@ const DEVICE_FEATURE_TYPES = {
     IMAGE: 'image',
   },
   CHARGING_STATION: {
-    CONNECTOR_STATUS: 'connector-status', // Charge point/connector status enum (integer - sensor), see EV_CHARGE_CONNECTOR_STATUS
+    CONNECTOR_STATUS: 'connector-status', // Connector availability enum (integer - sensor), see EV_CHARGE_CONNECTOR_STATUS
+    CHARGING_STATE: 'charging-state', // Charging session state enum (integer - sensor), see EV_CHARGE_CHARGING_STATE
   },
   DOORBELL: {
     RING: 'ring',
@@ -1913,6 +1932,7 @@ module.exports.AC_SWING_HORIZONTAL = AC_SWING_HORIZONTAL;
 module.exports.AC_SWING_VERTICAL = AC_SWING_VERTICAL;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.EV_CHARGE_CONNECTOR_STATUS = EV_CHARGE_CONNECTOR_STATUS;
+module.exports.EV_CHARGE_CHARGING_STATE = EV_CHARGE_CHARGING_STATE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;

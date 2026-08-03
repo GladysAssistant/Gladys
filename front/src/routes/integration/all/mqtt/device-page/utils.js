@@ -4,7 +4,8 @@ import {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
-  EV_CHARGE_CONNECTOR_STATUS
+  EV_CHARGE_CONNECTOR_STATUS,
+  EV_CHARGE_CHARGING_STATE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 
@@ -722,9 +723,9 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
   }
 
-  // A connector status is a read-only enum (0-8), not a 0-100 actuator.
+  // Connector status and charging state are read-only enums (0-4), not 0-100 actuators.
   if (category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION) {
-    return applyDefaultUnit({ ...defaults, min: 0, max: 8, read_only: true }, category, type);
+    return applyDefaultUnit({ ...defaults, min: 0, max: 4, read_only: true }, category, type);
   }
 
   if (!isSensorCategory(category)) {
@@ -761,7 +762,11 @@ export const getCatalogPreviewLabelKey = (category, type) => {
     [categoryTypeKey(
       DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
       DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS
-    )]: `deviceFeatureValue.category.charging-station.connector-status.${EV_CHARGE_CONNECTOR_STATUS.CHARGING}`
+    )]: `deviceFeatureValue.category.charging-station.connector-status.${EV_CHARGE_CONNECTOR_STATUS.OCCUPIED}`,
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
+      DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE
+    )]: `deviceFeatureValue.category.charging-station.charging-state.${EV_CHARGE_CHARGING_STATE.CHARGING}`
   };
 
   return labeledPreviewKeys[key] || null;
@@ -784,8 +789,12 @@ export const getFeaturePreviewValue = (category, type) => {
     return 1;
   }
 
-  if (category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION) {
-    return EV_CHARGE_CONNECTOR_STATUS.CHARGING;
+  if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS) {
+    return EV_CHARGE_CONNECTOR_STATUS.OCCUPIED;
+  }
+
+  if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE) {
+    return EV_CHARGE_CHARGING_STATE.CHARGING;
   }
 
   if (
