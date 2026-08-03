@@ -546,34 +546,42 @@ export const DeviceFeatureCategoriesIcon = {
 
 export const DeviceFeatureTypesString = [DEVICE_FEATURE_TYPES.TEXT.TEXT];
 
-// Television features that are remote-control orders instead of a state: pressing them sends a
-// one-shot command to the device and there is no meaningful value to display. Every television
-// type which is not a continuous control (binary, volume and channel) belongs to this list.
-export const TelevisionPushButtonFeatureTypes = [
-  DEVICE_FEATURE_TYPES.TELEVISION.SOURCE,
-  DEVICE_FEATURE_TYPES.TELEVISION.GUIDE,
-  DEVICE_FEATURE_TYPES.TELEVISION.MENU,
-  DEVICE_FEATURE_TYPES.TELEVISION.TOOLS,
-  DEVICE_FEATURE_TYPES.TELEVISION.INFO,
-  DEVICE_FEATURE_TYPES.TELEVISION.ENTER,
-  DEVICE_FEATURE_TYPES.TELEVISION.RETURN,
-  DEVICE_FEATURE_TYPES.TELEVISION.EXIT,
-  DEVICE_FEATURE_TYPES.TELEVISION.LEFT,
-  DEVICE_FEATURE_TYPES.TELEVISION.RIGHT,
-  DEVICE_FEATURE_TYPES.TELEVISION.UP,
-  DEVICE_FEATURE_TYPES.TELEVISION.DOWN,
-  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_UP,
-  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_DOWN,
-  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_PREVIOUS,
-  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME_UP,
-  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME_DOWN,
-  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME_MUTE,
-  DEVICE_FEATURE_TYPES.TELEVISION.PLAY,
-  DEVICE_FEATURE_TYPES.TELEVISION.PAUSE,
-  DEVICE_FEATURE_TYPES.TELEVISION.STOP,
-  DEVICE_FEATURE_TYPES.TELEVISION.PREVIOUS,
-  DEVICE_FEATURE_TYPES.TELEVISION.NEXT,
-  DEVICE_FEATURE_TYPES.TELEVISION.REWIND,
-  DEVICE_FEATURE_TYPES.TELEVISION.FORWARD,
-  DEVICE_FEATURE_TYPES.TELEVISION.RECORD
-];
+// Television and music features come in two flavours: continuous controls, which carry a value the
+// user reads and adjusts, and remote-control orders, which are one-shot commands with no meaningful
+// value to display. Only the continuous ones are listed here: everything else in those categories is
+// a push button, so a new DEVICE_FEATURE_TYPES.TELEVISION.* / .MUSIC.* is handled without touching
+// this file. These sets are the single source of truth for both the dashboard rows and the MQTT
+// device catalog defaults.
+export const TelevisionContinuousControlFeatureTypes = new Set([
+  DEVICE_FEATURE_TYPES.TELEVISION.BINARY,
+  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
+  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL
+]);
+
+export const MusicContinuousControlFeatureTypes = new Set([
+  DEVICE_FEATURE_TYPES.MUSIC.VOLUME,
+  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE
+]);
+
+// Note: music push buttons are not routed to a dashboard push button row yet, because
+// MUSIC.PLAY_NOTIFICATION expects a TTS URL instead of the one-shot value the other keys take.
+
+export const isPushButtonFeature = (category, type) => {
+  if (category === DEVICE_FEATURE_CATEGORIES.BUTTON && type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
+    return true;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.TELEVISION) {
+    return !TelevisionContinuousControlFeatureTypes.has(type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
+    return !MusicContinuousControlFeatureTypes.has(type);
+  }
+
+  return false;
+};
+
+export const TelevisionPushButtonFeatureTypes = Object.values(DEVICE_FEATURE_TYPES.TELEVISION).filter(type =>
+  isPushButtonFeature(DEVICE_FEATURE_CATEGORIES.TELEVISION, type)
+);
