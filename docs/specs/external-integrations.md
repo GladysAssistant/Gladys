@@ -750,7 +750,7 @@ Field-by-field justification:
 | `CapDrop` | `ALL` | no Linux capabilities |
 | `SecurityOpt` | `no-new-privileges` | no escalation via setuid binaries |
 | `Memory`/`MemorySwap` | 256 MB (same values) | swap = memory ⇒ **no swap**; OOM kill → supervised restart |
-| `NanoCpus` | `500000000` (0.5 CPU) | an integration cannot starve Gladys on a Raspberry Pi; **omitted** when `docker info` reports `CPUCfsQuota: false` (e.g. Synology DSM kernels without the CFS scheduler), otherwise the daemon rejects the creation with an HTTP 400 |
+| `NanoCpus` | `500000000` (0.5 CPU) | an integration cannot starve Gladys on a Raspberry Pi; **omitted** when the Docker `/info` API reports `CpuCfsQuota: false` or `CpuCfsPeriod: false` (e.g. Synology DSM kernels without the CFS scheduler), otherwise the daemon rejects the creation — and every later start — with an HTTP 400; if the detection is wrong the creation retries once without the limit |
 | `PidsLimit` | 100 | anti fork-bomb |
 | `Binds` | a single one: `<basePath>/external-integrations/<selector>:/data` | the integration's local persistence; survives container recreations, removed at uninstall; **precreated and handed to uid/gid 1000 by the supervisor** before every creation (non-recursive, best-effort — see B.2): Docker would create a missing source `root:root`, unwritable for `USER node` |
 | `Tmpfs /tmp` | `noexec,nosuid,64m` | scratch in RAM, no execution of dropped binaries |
