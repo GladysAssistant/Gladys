@@ -18,8 +18,9 @@ async function hasCpuCfsSupport() {
     try {
       const dockerInfo = await this.dockerode.info();
       // only an explicit false means unsupported: on any doubt keep the
-      // CPU limit, the kernels concerned always report the field
-      this.cpuCfsSupport = dockerInfo.CPUCfsQuota !== false;
+      // CPU limit, the kernels concerned always report the fields — the
+      // daemon needs both the CFS period and quota to apply NanoCpus
+      this.cpuCfsSupport = dockerInfo.CPUCfsQuota !== false && dockerInfo.CPUCfsPeriod !== false;
     } catch (e) {
       logger.warn(`hasCpuCfsSupport: unable to read Docker info, assuming CPU CFS support. ${e}`);
       return true;

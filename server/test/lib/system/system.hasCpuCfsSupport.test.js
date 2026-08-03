@@ -65,6 +65,12 @@ describe('system.hasCpuCfsSupport', () => {
     expect(cpuCfsSupported).to.equal(false);
   });
 
+  it('should return false when only the CFS period is unsupported', async () => {
+    system.dockerode.info = fake.resolves({ CPUCfsQuota: true, CPUCfsPeriod: false });
+    const cpuCfsSupported = await system.hasCpuCfsSupport();
+    expect(cpuCfsSupported).to.equal(false);
+  });
+
   it('should cache the result', async () => {
     const info = fake.resolves({ CPUCfsQuota: false });
     system.dockerode.info = info;
