@@ -563,9 +563,6 @@ export const MusicContinuousControlFeatureTypes = new Set([
   DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE
 ]);
 
-// Note: music push buttons are not routed to a dashboard push button row yet, because
-// MUSIC.PLAY_NOTIFICATION expects a TTS URL instead of the one-shot value the other keys take.
-
 export const isPushButtonFeature = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.BUTTON && type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
     return true;
@@ -575,6 +572,11 @@ export const isPushButtonFeature = (category, type) => {
     return !TelevisionContinuousControlFeatureTypes.has(type);
   }
 
+  // MUSIC.PLAY_NOTIFICATION lands here and is reported as a push button, which is how the MQTT
+  // catalog has always classified it. It is not a plain key: scene.actions.js calls it with a TTS
+  // URL, so it must be excluded before this predicate is used to route music onto a dashboard push
+  // button row. It is left as-is here because narrowing it would silently change the MQTT catalog
+  // defaults (a 0-100 slider instead of a one-shot button), which is no more correct for a URL.
   if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
     return !MusicContinuousControlFeatureTypes.has(type);
   }
