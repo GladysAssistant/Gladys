@@ -24,6 +24,10 @@ class ExternalIntegrationDiscoverPage extends Component {
     // after the user moved to another integration is dropped instead of
     // applying its state to the wrong page
     this.pageGeneration = 0;
+    // bumped on every scan start and every scan end, so a scan POST
+    // settling after its scan already ended (60s cap or websocket event)
+    // cannot report its error on a later scan or on an ended one
+    this.scanToken = 0;
   }
 
   searchDevices = e => {
@@ -71,6 +75,8 @@ class ExternalIntegrationDiscoverPage extends Component {
 
   scan = async () => {
     const generation = this.pageGeneration;
+    this.scanToken += 1;
+    const scanToken = this.scanToken;
     // the POST only relays the scan request: the integration scans on its
     // own (up to ~30s for a Tuya-like cloud integration) and the results
     // arrive later through the DISCOVERED_DEVICES_UPDATED websocket event,
@@ -78,15 +84,16 @@ class ExternalIntegrationDiscoverPage extends Component {
     // before the await: the request itself has no timeout, and a hung
     // request must not leave the loader spinning forever either.
     this.clearScanTimer();
-    this.scanTimer = setTimeout(this.finishScan, SCAN_MAX_DURATION_MS);
+    this.scanTimer = setTimeout(() => this.finishScan(scanToken), SCAN_MAX_DURATION_MS);
     this.setState({ scanStatus: RequestStatus.Getting, scanError: null });
     try {
       await this.props.httpClient.post(`/api/v1/external_integration/${this.props.selector}/scan`);
     } catch (e) {
       console.error(e);
-      if (generation !== this.pageGeneration) {
+      if (generation !== this.pageGeneration || scanToken !== this.scanToken) {
         return;
       }
+      this.scanToken += 1;
       this.clearScanTimer();
       const status = get(e, 'response.status');
       this.setState({
@@ -99,7 +106,13 @@ class ExternalIntegrationDiscoverPage extends Component {
     }
   };
 
-  finishScan = () => {
+  finishScan = scanToken => {
+    // called without a token by the websocket event (always the freshest
+    // signal), with one by the 60s cap of a specific scan invocation
+    if (scanToken !== undefined && scanToken !== this.scanToken) {
+      return;
+    }
+    this.scanToken += 1;
     this.clearScanTimer();
     if (this.state.scanStatus === RequestStatus.Getting) {
       this.setState({ scanStatus: RequestStatus.Success });
