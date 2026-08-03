@@ -742,6 +742,7 @@
         "title": "Entdeckte Geräte",
         "scanButton": "Scannen",
         "scanning": "Scannen...",
+        "scanningInProgress": "Scan läuft... Je nach Integration kann dies bis zu einer Minute dauern. Die Liste wird automatisch aktualisiert, sobald Geräte veröffentlicht werden.",
         "scanError": "Beim Starten des Scans ist ein Fehler aufgetreten.",
         "scanErrorDisconnected": "Der Scan konnte nicht gestartet werden: Die Integration ist nicht verbunden. Prüfe im Tab \"Konfiguration\", ob sie läuft.",
         "loadError": "Beim Laden der entdeckten Geräte ist ein Fehler aufgetreten.",

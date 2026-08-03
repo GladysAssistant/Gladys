@@ -9,6 +9,11 @@ import DiscoverTab from './DiscoverTab';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
+// the scan runs inside the integration and ends with a re-publish of the
+// discovered devices (websocket event); an integration that never
+// re-publishes would leave the loader spinning forever without this cap
+const SCAN_MAX_DURATION_MS = 60 * 1000;
+
 class ExternalIntegrationDiscoverPage extends Component {
   constructor(props) {
     super(props);
@@ -53,7 +58,12 @@ class ExternalIntegrationDiscoverPage extends Component {
     this.setState({ scanStatus: RequestStatus.Getting, scanError: null });
     try {
       await this.props.httpClient.post(`/api/v1/external_integration/${this.props.selector}/scan`);
-      this.setState({ scanStatus: RequestStatus.Success });
+      // the POST only relays the scan request: the integration scans on its
+      // own (up to ~30s for a Tuya-like cloud integration) and the results
+      // arrive later through the DISCOVERED_DEVICES_UPDATED websocket
+      // event, so the scanning state stays on until that event
+      this.clearScanTimer();
+      this.scanTimer = setTimeout(this.finishScan, SCAN_MAX_DURATION_MS);
     } catch (e) {
       console.error(e);
       const status = get(e, 'response.status');
@@ -64,6 +74,20 @@ class ExternalIntegrationDiscoverPage extends Component {
             ? 'integration.externalIntegration.discover.scanErrorDisconnected'
             : 'integration.externalIntegration.discover.scanError'
       });
+    }
+  };
+
+  finishScan = () => {
+    this.clearScanTimer();
+    if (this.state.scanStatus === RequestStatus.Getting) {
+      this.setState({ scanStatus: RequestStatus.Success });
+    }
+  };
+
+  clearScanTimer = () => {
+    if (this.scanTimer) {
+      clearTimeout(this.scanTimer);
+      this.scanTimer = null;
     }
   };
 
@@ -90,6 +114,7 @@ class ExternalIntegrationDiscoverPage extends Component {
 
   onDiscoveredDevicesUpdated = payload => {
     if (payload && payload.selector === this.props.selector) {
+      this.finishScan();
       this.getDiscoveredDevices();
     }
   };
@@ -99,18 +124,26 @@ class ExternalIntegrationDiscoverPage extends Component {
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DISCOVERED_DEVICES_UPDATED,
       this.onDiscoveredDevicesUpdated
     );
+    this.loadIntegrationPage();
+  }
+
+  loadIntegrationPage = () => {
+    // a still-running scan belongs to the previous integration: its loader
+    // and its timer must not leak into the page of the new one
+    this.clearScanTimer();
+    this.setState({ scanStatus: null, scanError: null });
     this.getIntegration();
     this.getDiscoveredDevices();
-  }
+  };
 
   componentDidUpdate(prevProps) {
     if (prevProps.selector !== this.props.selector) {
-      this.getIntegration();
-      this.getDiscoveredDevices();
+      this.loadIntegrationPage();
     }
   }
 
   componentWillUnmount() {
+    this.clearScanTimer();
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DISCOVERED_DEVICES_UPDATED,
       this.onDiscoveredDevicesUpdated

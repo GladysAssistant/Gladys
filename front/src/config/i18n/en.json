@@ -742,6 +742,7 @@
         "title": "Discovered devices",
         "scanButton": "Scan",
         "scanning": "Scanning...",
+        "scanningInProgress": "Scan in progress... Depending on the integration, this can take up to a minute. The list will refresh automatically as soon as devices are published.",
         "scanError": "There was an error launching the scan.",
         "scanErrorDisconnected": "Unable to launch the scan: the integration is not connected. Check that it is running in the \"Configuration\" tab.",
         "loadError": "There was an error loading the discovered devices.",

@@ -742,6 +742,7 @@
         "title": "Appareils découverts",
         "scanButton": "Scanner",
         "scanning": "Scan en cours...",
+        "scanningInProgress": "Scan en cours... Selon l'intégration, cela peut prendre jusqu'à une minute. La liste se mettra à jour automatiquement dès que des appareils seront publiés.",
         "scanError": "Une erreur s'est produite lors du lancement du scan.",
         "scanErrorDisconnected": "Impossible de lancer le scan : l'intégration n'est pas connectée. Vérifiez qu'elle est bien démarrée dans l'onglet « Configuration ».",
         "loadError": "Une erreur s'est produite lors du chargement des appareils découverts.",
