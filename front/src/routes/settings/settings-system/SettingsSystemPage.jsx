@@ -118,6 +118,7 @@ const SystemPage = ({ children, ...props }) => (
           upgradeGladys={props.upgradeGladys}
           SystemUpgradeStatus={props.SystemUpgradeStatus}
           watchtowerLogs={props.watchtowerLogs}
+          upgradeError={props.upgradeError}
           websocketConnected={props.websocketConnected}
           checkForUpdates={props.checkForUpdates}
           SystemGetInfosStatus={props.SystemGetInfosStatus}

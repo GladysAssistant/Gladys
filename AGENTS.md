@@ -19,6 +19,16 @@ From the repo root: `npm start` (runs `run-p start-server:dev start-front:dev`).
 - **Service dependencies:** the server has ~38 integration services under `server/services/*`, each with its own `package.json`. `cd server && npm install` runs a `postinstall` (`cli/install_service_dependencies.js`) that installs deps for every service. Set `INSTALL_SERVICES_SILENT_FAIL=true` so a single flaky service install does not abort the whole install.
 - **Native modules** (`sqlite3`, `bcrypt`, `sharp`, USB/bluetooth services) compile from source; they need build tools (`gcc/g++/make/python3`) and `libudev-dev` on the system. DuckDB (`@duckdb/node-api`) ships prebuilt platform binaries and does not compile from source.
 
+## Feature specs (spec-first process)
+
+Living specifications live in `docs/specs/`. They are the source of truth for the behavior and cross-repo contracts of the features they cover.
+
+**When to go spec-first:** large projects and anything touching the data model — write and challenge the spec before the code, and fold field feedback into the spec before implementing it. Small, isolated changes do not need a spec written first.
+
+**Keeping existing specs truthful:** when an area is already covered by a living spec, any PR that changes its behavior or contracts must update the spec **in the same diff**, whatever the size of the change — otherwise the spec drifts and stops being the source of truth.
+
+- **External integrations** (`docs/specs/external-integrations.md`): supervisor, host API, integration WebSocket protocol, manifest, store formats, SDK contract. Any PR that changes a behavior or contract of external integrations must update this spec **in the same diff**. Phase-2 designs (B.15 communication, B.16 network discovery, B.17 Gladys Plus webhooks) are specified there but not yet implemented — implement from the spec, not from scratch.
+
 ## Git workflow (agents)
 
 All changes made by agents must follow this workflow:

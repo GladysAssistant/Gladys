@@ -1,24 +1,25 @@
 const logger = require('../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const db = require('../../models');
-const { forwardToService } = require('./message.sendToUser');
-
-const TOOL_CALL_EXTERNAL_SOURCES = new Set(['telegram', 'nextcloud-talk', 'callmebot']);
 
 /**
  * @description Whether a tool_call trace should be forwarded to external channels.
- * Web/API clients already receive tool traces through websocket.
+ * Web/API clients already receive tool traces through websocket. An external
+ * channel is any service exposing the outbound interface message.sendToUser —
+ * telegram & co, and external "communication" integrations — instead of a
+ * hard-coded name list.
  * @param {string} source - Original message source.
  * @param {string} messageType - Message type.
+ * @param {object|null} sourceService - The service the message came from.
  * @returns {boolean} True when the message should be forwarded externally.
  * @example
- * shouldForwardToolCallToExternalChannel('telegram', 'tool_call');
+ * shouldForwardToolCallToExternalChannel('telegram', 'tool_call', telegramService);
  */
-function shouldForwardToolCallToExternalChannel(source, messageType) {
+function shouldForwardToolCallToExternalChannel(source, messageType, sourceService) {
   if (messageType !== 'tool_call') {
     return true;
   }
-  return TOOL_CALL_EXTERNAL_SOURCES.has(source);
+  return Boolean(sourceService && sourceService.message && typeof sourceService.message.sendToUser === 'function');
 }
 
 /**
@@ -74,53 +75,25 @@ async function reply(originalMessage, text, context, file = null, options = {}) 
       payload: messageCreated,
     });
 
+    // then, we get the service sending the original message
+    const sourceService = originalMessage.source === 'AI' ? null : this.service.getService(originalMessage.source);
+
     // Tool call traces stay in Gladys chat for web/API clients (websocket only).
-    if (!shouldForwardToolCallToExternalChannel(originalMessage.source, messageType)) {
+    if (!shouldForwardToolCallToExternalChannel(originalMessage.source, messageType, sourceService)) {
       return;
     }
 
     const externalMessage = formatMessageForExternalChannel(messageCreated);
 
-    // If the source is Gladys AI, then we should answer by all means available
+    // If the source is Gladys AI, then we should answer by all means available:
+    // every service exposing message.sendToUser resolves its own identity and
+    // no-ops when the user is not linked (generic loop, no channel hard-coded)
     if (originalMessage.source === 'AI') {
       const user = this.state.get('user', originalMessage.user.selector);
-      const telegramService = this.service.getService('telegram');
-      // if the service exist and the user had telegram configured
-      if (telegramService && user.telegram_user_id) {
-        // we forward the message to Telegram
-        await forwardToService('telegram', () => telegramService.message.send(user.telegram_user_id, externalMessage));
-      }
-      // We send the message to the nextcloud talk service
-      const nextcloudTalkService = this.service.getService('nextcloud-talk');
-      // if the service exist
-      if (nextcloudTalkService) {
-        const nextcloudTalkToken = await this.variable.getValue(
-          'NEXTCLOUD_TALK_TOKEN',
-          nextcloudTalkService.message.serviceId,
-          user.id,
-        );
-        // if the user had nextcloud talk configured
-        if (nextcloudTalkToken) {
-          // we forward the message to Nextcloud Talk
-          await forwardToService('nextcloud-talk', () =>
-            nextcloudTalkService.message.send(nextcloudTalkToken, externalMessage),
-          );
-        }
-      }
-      // We send the message to the callmebot service
-      const callmebotService = this.service.getService('callmebot');
-      // if the service exist
-      if (callmebotService) {
-        // we forward the message to CallMeBot
-        await forwardToService('callmebot', () => callmebotService.message.send(user.id, externalMessage));
-      }
-    } else {
-      // then, we get the service sending the original message
-      const service = this.service.getService(originalMessage.source);
+      await this.forwardToChannels(user, externalMessage);
+    } else if (sourceService) {
       // if the service exist, we send the message
-      if (service) {
-        await service.message.send(originalMessage.source_user_id, externalMessage);
-      }
+      await sourceService.message.send(originalMessage.source_user_id, externalMessage);
     }
   } catch (e) {
     logger.warn(`Unable to reply to user`);

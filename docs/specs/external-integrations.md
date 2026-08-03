@@ -1,0 +1,893 @@
+# External integrations in Gladys Assistant
+
+> **Living specification — source of truth.** This document specifies the behavior of external integrations and the contracts binding the monorepo to the ecosystem repos (section C: manifest, host API, WS protocol, store formats). Phase 1 is implemented; sections B.15–B.17 are phase 2 designs not yet implemented. **Rule: any PR that changes an external-integration behavior or contract modifies this file in the same diff** — spec first, code second. Field feedback (pilot ports, forum) is captured here before being coded.
+
+## Context
+
+Community RFC (topic 10343): open Gladys to integrations developed and published by anyone, installable in one click, without maintainer review — without sacrificing stability. Four non-negotiable requirements: (1) a crashing integration never crashes Gladys, (2) no zombie state (state always visible and actionable in the UI), (3) consistent UI with no code injected by integrations, (4) zero technical fiddling for the user.
+
+Scoping decisions validated with the maintainer:
+- **Scope**: overall architecture + executable detail of **phase 1** (host API + Docker supervisor + PoC + **store**).
+- **Decentralized, zero-approval store**: the source of truth is the GitHub topic `gladys-assistant-integration` (publishing = tagging your public repo); a 100% automatic indexer (public GitHub Action) mechanically validates manifests and publishes a static `index.json` that Gladys instances consume. The maintainer approves nothing and is never a bottleneck. Docker images on **any public registry**; **no moderation in v1** (the Docker sandbox is the defense — assumed and documented).
+- **Core→integration return channel**: outbound WebSocket from the integration (no HTTP server in the container).
+- **SDK v1**: REST/WS host API documented and open to all languages; official SDK + template in Node.js only.
+- **No device creation by the integration**: it publishes discovered devices, the user creates/edits/deletes from the interface (the internal-integration pattern).
+- **Merged data model**: no dedicated table — an external integration **is** a `t_service` row (`type` column), to avoid any dual identity to keep in sync.
+- **Auth via stateless integration JWT**: not tied to a user, outside `t_session` (reserved for user sessions), regenerated on every container recreation.
+- **Frontend on par with internal integrations**: presence in the integration catalog with a simple "external" badge, then a generic 3-screen page — Devices / Discovery / Configuration (form defined in JSON by the integration). A single integration type in v1: "Devices".
+- **Multi-container integrations**: some integrations need additional containers (the Frigate case: Frigate container + Mosquitto broker, with a web UI reachable on the LAN and access to the Coral). The manifest **declares** what may run — images, limits, published ports, hardware access — and that is what the user approves at install time; the integration **then drives the lifecycle via the host API** (create/start/stop/restart, only within the declared bounds). Data confined to the integration's folder, full deletion at uninstall, and **never** any access to the Docker socket.
+
+## A. Overall architecture
+
+```
+┌───────────────────── Gladys core (host network) ─────────────────────┐
+│  gladys.externalIntegration (supervisor)    gladys.system (dockerode) │
+│   • state machine + backoff + health   ──►  • pull/create/stop/logs   │
+│   • integration WS connection registry      • + createNetwork (new)   │
+│   • proxy service in the stateManager                                 │
+│      ▲ REST /api/integration/v1/*    ▲ WS (JWT auth, commands)        │
+└──────┼───────────────────────────────┼────────────────────────────────┘
+       │   dedicated bridge network `gladys-integrations` (icc disabled) │
+  ┌── integration container A ──┐  ┌── integration container B ──┐
+  │  Node SDK (or any language) │  │  ...                        │
+  └─────────────────────────────┘  └─────────────────────────────┘
+```
+
+- **Supervisor** (`server/lib/external-integration/`): full lifecycle — `Installed → Starting → Running → Degraded → Broken → Stopped` — persisted in DB and pushed to the frontend in real time.
+- **REST host API** (`/api/integration/v1/*`): the only integration→core surface, delegates to existing libs (`saveState`, `gladys.variable`), strict "tenant" isolation via integration JWT. **The integration never creates or deletes a device**: it publishes *discovered devices*, and it is the user who creates/edits/deletes from the interface (same pattern as internal integrations with their "Discovery" tab).
+- **Integration WS**: extension of the existing `WebsocketManager`, auth via integration JWT; core→integration channel (device commands, scan requests, device lifecycle notifications, ping/pong, config).
+- **Manifest**: file **`gladys-assistant-integration.json` at the root of the GitHub repo** — the one the store robot scrapes (source of truth for the index) — and duplicated in the Docker image (LABEL `io.gladysassistant.manifest`, for the "dev" install by image name without a repo). Content: name, version, compatible Gladys versions, **`config_schema`** (describes the Configuration screen's form, see B.8). Field `manifest_version: 1` frozen from v1. No permission system in v1 (not technically applicable, see B.14).
+- **An external integration is a service**: a `t_service` row with `type: 'external'`, devices attached normally, and a *proxy service* in the stateManager (start/stop/setValue) that inserts it into the existing lifecycle **without modifying the core device or the core service**.
+- **Sub-containers: declaration + lifecycle API**: the manifest declares the allowed additional containers (`containers` field, see C.1 — images, volumes, limits, published ports, hardware access), and the `/container` host API (C.3) lets the integration drive their lifecycle **within those bounds**. The supervisor executes everything: private network per integration, same sandbox, volumes derived under the integration's folder, full deletion at uninstall (detail in B.2, contracts C.1/C.3/C.7).
+- **Decentralized store**: publishing an integration = creating a public GitHub repo with the `gladys-assistant-integration` topic and a manifest at the root. An automatic indexer (repo `GladysAssistant/integration-store`, scheduled GitHub Action) crawls the topic, validates by script, publishes a static `index.json` on GitHub Pages/CDN. Gladys downloads and caches this index → catalog, one-click install, update detection (detail in B.9).
+
+### Deliverable phases
+
+| Phase | Content | Observable deliverable |
+|---|---|---|
+| **1** *(shipped)* | Host API + WS, supervisor, auth, admin API, **decentralized store** (indexer + catalog + 1-click install + updates), frontend on par with internal integrations: entry in the catalog ("external" badge) + generic 3-screen page Devices / Discovery / Configuration (form generated from the `config_schema`), Node SDK (dedicated repo), template/PoC (dedicated repo), **public documentation on the website** (internal vs external + developer guide). "Dev" install by Docker image kept. | Any dev tags their repo → their integration appears in the catalog of every Gladys with no approval whatsoever → a user installs it in one click, its discovered devices are created from the UI, actionable, configurable via the generated form; the integration survives a kill (auto restart), goes "Broken" with logs after repeated failures. |
+| **2** | Mediated network discovery (passive listening **and active scan** broadcast/mDNS/SSDP by the core — full design in B.16), inbound webhooks via Gladys Plus (generic gateway → integration relay, full design in B.17), advanced config widgets, device-scoped actions (`scope: "device"`, button on the device card — in v1 the `source: "devices"` select covers the need, see C.1), integration types other than "Devices" — first the "communication" type to move Telegram & co out of the core (full design in B.15), then weather…. | An integration detects its hardware without manual config; a messaging channel installs from the store. |
+| **3** | Ecosystem: community SDKs in other languages, store ranking/stats, supply-chain hardening (digest pinning, image signing?). | Self-sufficient ecosystem, with no maintainer intervention. |
+
+## B. Detailed design
+
+### B.1 Data model: everything in `t_service`
+
+**No dedicated table.** An external integration is a `t_service` row — it is conceptually the same thing as an internal service, and it avoids the dual identity to keep in sync (status, version, name in two tables). Verified in the code:
+- `service.load.js:14` only iterates over the keys of `servicesFromFiles` → dynamically created rows are never touched/overwritten at boot;
+- `service.startAll.js:20` iterates over the stateManager and calls `start()` → if the proxy service exposes `start()`/`stop()` delegating to the supervisor, external integrations slot into the existing lifecycle **for free** (including the "`STOPPED` = skipped at startup" rule, which replaces the `enabled` column initially considered);
+- `t_service` already has `version`, `status`, and `pod_id` (aligned with the remote integrations mentioned by the RFC).
+
+**`addColumn` migration on `t_service`** (`server/migrations/<timestamp>-add-external-integration-columns.js`, + update of `server/models/service.js`):
+
+| Column | Type | Role |
+|---|---|---|
+| `type` | ENUM `('internal','external')`, default `'internal'` | ENUM rather than boolean: a future type (`'remote'` off-instance…) fits without a migration (TEXT under SQLite) |
+| `docker_image` | STRING nullable | installed image:tag |
+| `manifest` | JSON nullable | full manifest |
+| `container_id` | STRING nullable | current Docker id |
+| `failure_count` | INTEGER default 0 | backoff counter |
+| `last_heartbeat` | DATE nullable | |
+| `token_version` | INTEGER default 0 | integration JWT invalidation (see B.3) |
+| `store_slug` | STRING nullable | link to the store index entry (`owner/repo`) for update detection; null for dev installs |
+| `granted_devices` | JSON nullable | hardware access classes **granted by the user** (subset of the classes requested by the manifest, see B.2); null = none |
+
+All nullable/defaulted for existing internal services. **Derivation of the `selector`** (and the `name`): `ext-` prefix to avoid any collision with a future native service (`service.load` looks up by `(pod_id: null, name)`), then — store or `repo_url` install: `ext-<owner>-<repo>` slugified, **unique by construction** (it is the `store_slug`); dev install by image: `ext-dev-<slugified manifest name>`, numeric suffix on collision.
+
+- **Statuses**: reuse the existing `SERVICE_STATUS`, adding **a single value: `DEGRADED`**. Projection of the RFC state machine: Installed→`ENABLED`, Starting→`LOADING`, Running→`RUNNING`, Degraded→`DEGRADED`, Broken→`ERROR`, Stopped→`STOPPED`.
+- **Logs: no table, no push.** The integration writes to stdout/stderr; Gladys reads the logs on demand via the Docker API (existing `system.getContainerLogs(container_id)`, equivalent to `docker logs`).
+- **Constants** (`server/utils/constants.js`): `SERVICE_STATUS.DEGRADED`, `SERVICE_TYPES`, `EVENTS.EXTERNAL_INTEGRATION.*`, `WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.*` (frontend: `STATUS_CHANGED`, `DISCOVERED_DEVICES_UPDATED`, `CONNECTION_STATUS_UPDATED`, `DEVICE_TRANSPORT_UPDATED`; integration: `DEVICE_SET_VALUE`, `DEVICE_POLL`, `COMMAND_RESULT`, `SCAN_REQUEST`, `DEVICE_CREATED`, `DEVICE_UPDATED`, `DEVICE_DELETED`, `HEARTBEAT`, `CONFIG_UPDATED`, `HARDWARE_UPDATED`, `OAUTH_GET_AUTHORIZE_URL`, `OAUTH_CALLBACK`, `ACTION_RUN`, `CAMERA_GET_IMAGE`), `AUTHENTICATION.INTEGRATION_REQUEST`.
+- **Discovered devices: no table.** The list of discovered devices published by each integration is held **in memory** in the supervisor (as internal service handlers do, e.g. philips-hue), lost on restart and republished by the integration on connection.
+
+### B.2 Supervisor — `server/lib/external-integration/`
+
+Prototype "one function per file" pattern (like `server/lib/system/`). Injected in `server/lib/index.js` (with the `jwtSecret`, like `Session`); `init()` called **before** `service.startAll()`: it registers the proxy services in the stateManager, and `startAll` then starts internal and external integrations through the same path (+ `disableExternalIntegration` flag for tests).
+
+Main files: `index.js` (constructor: WS connection maps, pending commands, timers), `externalIntegration.init.js` (loads `t_service` rows of type `external`, **reconciles** containers by label — the backup-restore case —, registers the proxy services), `install.js` (manifest resolution — from the store index, or from the image labels in dev mode — → pull → validation → creation of the `t_service` row of type `external` → JWT generation (B.3) → container → start), `buildContainerDescriptor.js`, `start/stop/restart/uninstall.js` (start/stop also called via the proxy service by the standard lifecycle; **uninstall removes everything**: stop + deletion of the container, of any sub-containers and their private network (see below), of the devices, of the config variables, then destroy of the `t_service` row — no "keep the devices" option, `t_device.service_id` is a mandatory FK and orphan devices do not exist in the model; the user gets everything back via Discovery if they reinstall), `saveStatus.js` (update `t_service.status` + `EVENTS.WEBSOCKET.SEND_ALL`), `checkHealth.js` (every 30 s), `scheduleRestart.js` (backoff `min(10s·2^n, 15min)`), `integrationConnected/Disconnected.js`, `sendCommand.js` (message_id + ack, **5 s timeout**), `registerProxyService.js`, `getLogs.js` (simple delegation to `system.getContainerLogs(container_id)`).
+
+**State machine transitions (exact rules)**:
+- `LOADING`: on container start (start/restart/install/update).
+- `LOADING → RUNNING`: on the **first successful WS auth or first HTTP heartbeat** — a started container is not a working integration. Neither one within **60 s** of the start → `DEGRADED`.
+- `RUNNING → DEGRADED`: 2 missed WS pongs, or WS closed, or heartbeat > 60 s (`checkHealth`).
+- `DEGRADED → RUNNING`: on WS reconnection or receipt of a heartbeat.
+- Container exited (observed by `checkHealth`) → restart with backoff; `failure_count` incremented on every supervisor restart, **reset to zero after 60 s of stable `RUNNING`** (without the reset, 5 crashes spread over six months would mark the integration broken); `failure_count ≥ 5` → `ERROR` (no more auto restart, admin action required).
+- `STOPPED`: only by user action (stop); skipped at boot by `startAll`.
+
+**Locked-down container**: read-only rootfs, zero capabilities, no escalation, 256 MB / 0.5 CPU / 100 pids, a single `/data` bind (via `system.getGladysBasePath()`), noexec `/tmp` tmpfs, dedicated bridge, restart handled by the supervisor (not by Docker), reconciliation label, bounded logs. The supervisor **precreates the `/data` bind source and hands it to uid/gid 1000** (`ensureDataFolder`, before every container creation): Docker creates a missing bind source owned by `root:root`, which left the only writable path read-only for the template's `USER node`. The `chown` is deliberately **non-recursive** (the folder itself, never the files — a later "recursive chown hardening" must not land: sub-container volume files may legitimately use other uids, see the sub-containers section) and **best-effort** (Gladys running as an unprivileged host process cannot chown to another uid: warn and continue, same behavior as before). **Complete `createContainer` descriptor, field-by-field justification and environment variable contract (`GLADYS_HOST_API_URL`, `GLADYS_INTEGRATION_TOKEN`, `GLADYS_INTEGRATION_SELECTOR`, `TZ`): specified in C.7.**
+
+**Additions to `server/lib/system/`**: `system.createNetwork.js` (`gladys-integrations` bridge, `enable_icc=false` to isolate integrations from each other, **subnet pinned via IPAM**: `172.30.0.0/24`, gateway `172.30.0.1` — see C.7), `system.inspectNetwork.js` (reads the effective gateway for `GLADYS_HOST_API_URL`), `system.getImageLabels.js` (reads the manifest).
+
+**Networking: compatible with production Gladys running `--network=host`, without touching the existing `docker run`.**
+- The bridge is created **on the fly** at the supervisor's first startup (`dockerode.createNetwork`, idempotent via `listNetworks`) — creating a Docker network after the fact requires no restart.
+- A container in `--network=host` **cannot** join another network (Docker refuses) — but it does not need to: Gladys in host mode listens on all host interfaces, including the bridge's (`br-xxxx`). From an integration container, the **bridge gateway** is the host → `GLADYS_HOST_API_URL = http://<gateway>:<SERVER_PORT>`. Since the subnet is pinned at network creation (`172.30.0.0/24`), the gateway is **deterministic: `172.30.0.1`** on virtually every install; if that subnet is already taken on the machine (rare), fall back to Docker auto-assignment, and the effective gateway is read via `inspectNetwork` (`IPAM.Config[0].Gateway`). No NAT, no port to publish.
+- Gladys running in **bridge** mode (non-standard installs): attaching after the fact does work there (`network.connect(getGladysContainerId())`, hot), and integrations reach Gladys through the custom bridge's embedded DNS. The two cases are told apart via the existing `getNetworkMode()`. More permissive design than current services (node-red/z2m/matterbridge require host mode).
+- `enable_icc=false` only blocks container↔container traffic on the bridge (the intended isolation between integrations); container→gateway (Gladys) and container→internet (NAT) pass normally. To document: a strict host firewall (ufw) filters bridge→host traffic (INPUT chain).
+- **Guarantee: unicast LAN access works.** Reaching a device at `192.168.x` (TCP or UDP — Tuya local protocol port 6668, Shelly local API, local MQTT…) traverses the bridge NAT like any outbound connection: Gladys filters **nothing** on egress, neither internet nor LAN. This is a **contractual requirement** for local integrations, verified in the e2e journey (Verification section). If it fails at a user's, the cause is outside the framework — classic case: a strict host firewall that DROPs bridge→LAN-interface FORWARD traffic (symptom: cloud OK, LAN KO) — to cover in the docs' troubleshooting section (B.12).
+- **Accepted bridge limitation: no inbound LAN broadcast/multicast.** Broadcast, mDNS or SSDP packets emitted on the LAN do not cross the NAT bridge — verified on a real case: the Tuya local scan (`tuya.localScan.js`) listens for UDP broadcasts (ports 6666/6667/7000) and would not work in a bridge container (the core only gets away with it because it runs with `network=host`). The limitation holds **in both directions**: a broadcast emitted from the container does not cross the NAT to the LAN either (the TP-Link case: active discovery request, see B.16). Outbound LAN **unicast**, on the other hand, does traverse the NAT: reaching a known IP (obtained from a cloud, entered in config) or a cloud API works. **Mediated discovery** (the core, in host mode, captures and relays — full design in B.16) is the subject of phase 2 — to be documented honestly until then (B.12).
+
+**Sub-containers (multi-container integrations, e.g. Frigate + Mosquitto).** An integration that needs other containers never gets the Docker socket nor a free-form creation API. The model is two-step:
+- the **manifest declares** (`containers` field, C.1) everything that may run — images, volumes, limits, published ports, hardware access. It is the **authorization contract**: displayed on the install screen (and visible in the catalog), it is what the user approves;
+- the **host API drives** (`/container` endpoints, C.3) the lifecycle — create/start/stop/restart, **only the declared entries**, at the time chosen by the integration.
+
+We thus get the flexibility of an imperative API (preparing files before the first start, restarting after a config change, stopping an unused component) without losing transparency: nothing can run that was not shown at install time. Phase 2 lead: dynamic instances of a declared entry (e.g. one container per camera).
+
+- **Startup**: each entry declares `start: "auto"` (default — the supervisor creates and starts the sub-container before the main one: zero code for the simple case) or `"manual"` (nothing starts until the integration calls `POST /container/:name/start` — the Mosquitto case: generate the password file in `/data` **before** the first start, to never run an unconfigured broker).
+- **Desired state**: the supervisor remembers what should be running (`auto`, or started via the API and not stopped via the API). A container "supposed to run" that exits is restarted with the same backoff and increments the same `failure_count` as the main one (≥ 5 → `ERROR`, everything stops); a container stopped by the integration stays stopped. The global state machine remains driven by the main container (WS/heartbeat); the individual state of sub-containers is visible in the frontend's supervision block (B.8). Start/stop/restart requested by the integration do not increment the counter (deliberate gestures, not crashes).
+- **Private network per integration**: bridge `gladys-int-<selector>` (icc **enabled** inside — Frigate must reach Mosquitto), created at install, removed at uninstall. DNS alias = each sub-container's `name`: the main container simply reaches `mqtt:1883` or `frigate:5000`. The main container is connected to **both** networks (private + `gladys-integrations`); sub-containers **never** join `gladys-integrations` — no token, no host API access, invisible to other integrations.
+- **Published ports**: each declared port is published on a **host port chosen by Gladys** (a free port, allocated at first start then **persisted** — stable across recreations), never by the manifest: no collision possible between integrations or with a host service. The frontend shows an "Open <label>" link in the supervision block (Frigate's UI is one click away); the integration reads the assigned port via `GET /container`. Publishing a port = exposing a third-party interface on the LAN: stated on the install screen (B.14.8).
+- **Hardware access: requested by the manifest, granted by the user.** The manifest requests **named access classes**, never paths: in v1 `coral-usb` (`/dev/bus/usb`), `coral-pcie` (`/dev/apex_*`), `gpu` (`/dev/dri`), `video` (`/dev/video*`). The user flow, entirely within the Gladys UI:
+  1. **Detection**: `system.detectHardwareClasses()` (new, best effort: presence of the matching `/dev` paths — works with the standard Gladys install; otherwise the class is shown as "not detected") feeds the install screen;
+  2. **Granular consent**: the install screen shows each requested class with its detection state ("Coral USB detected" / "not detected") and a **toggle per class** — pre-checked if detected, uncheckable; the user can refuse a present class or grant an absent one (hardware plugged in later). The choice is persisted in `t_service.granted_devices` (B.1);
+  3. **Mounting** = the intersection **requested ∩ granted ∩ present**, resolved at every container creation — plugging in a Coral then recreating is enough;
+  4. **Editable at any time**: a "Hardware" section of the supervision block (Configuration screen, admin) repeats the same toggles; a change recreates the affected sub-containers and notifies the integration over WS (`hardware-updated`, C.4) so it regenerates its config (e.g. Frigate: `edgetpu` detector if the Coral is granted and available, else `cpu`) and restarts what is needed.
+
+  The integration therefore does not have to "detect" anything itself on the UI side: it reads the granted/available state via `GET /container` (C.3) and adapts. An arbitrary path (`/dev/sda`…) remains impossible by construction.
+- **Atomic lifecycle**: install = pull of all images + creation of the private network (`auto` entries are created/started, `manual` ones wait for the API); stopping the integration = everything stops (main first); update = recreation of the whole set per the new manifest; **uninstall = everything goes** (containers, private network, ports freed, data folder). Sub-containers carry the same reconciliation labels (C.7): even after a Gladys crash mid-operation, the next boot destroys the orphans — no ghost container possible.
+- **Data confined by construction**: each declared volume is mounted from `<basePath>/external-integrations/<selector>/containers/<name><path>` — the host path is **derived by the supervisor, never chosen by the manifest**: a sub-container cannot write outside its integration's folder. The main container, which mounts the whole `<selector>:/data`, sees these volumes under `/data/containers/<name>/...`: this is the **intended configuration channel** — generate config files at runtime (e.g. Frigate's `config.yml`, Mosquitto credentials: secrets never go through the manifest, which is public), then start or restart the sub-container via the API. Because `auto` entries are created **before** the main container, the supervisor also **precreates the volume bind sources** (`ensureSubContainerVolumes`, before every sub-container creation): Docker would otherwise create the nested folders `root:root` and the main container (uid 1000) could not write its configs under `/data/containers/...`. Each missing folder is created owned by uid/gid 1000; an existing folder is re-chowned **only when still owned by root** (a Docker-created one) — an image that owns its data with another uid (a Mosquitto-style broker) is never stomped. Best-effort, like `ensureDataFolder`.
+
+### B.3 Integration auth: stateless JWT, outside `t_session`
+
+`t_session` stays reserved for **user** sessions (it is used to see connections from an unknown browser) — an integration is tied to no user, the two notions are not mixed.
+
+- **One integration JWT per container**: signed HS256 with the existing `jwtSecret` (same mechanics as `server/utils/accessToken.js`, new file `server/utils/integrationToken.js`), payload `{ service_id, token_version }`, `issuer: 'gladys'`, **`audience: 'integration'`** (a user access token can therefore never pass as an integration token, and vice versa), **without expiration** (no `exp` claim): revocation via `token_version` is the only end-of-life mechanism — an expiration would add a failure mode ("the integration dies after N months") with no security benefit.
+- **Rotation/revocation via `t_service.token_version`**: the token embeds the current version; the middleware compares it with the column. On every **container recreation**, `token_version` is incremented and a new JWT injected as Env → all old tokens are immediately invalid, without storing any token anywhere (nothing to hash, nothing to revoke row by row). Cost: zero extra query, the middleware must load the `t_service` row anyway to build the tenant context. Uninstall = destroy of the row → the token dies with it.
+- New middleware `server/api/middlewares/externalIntegrationAuthMiddleware.js`: verifies signature + audience + `type: 'external'` + `token_version`, loads the row → `req.externalIntegrationService`; new `externalIntegrationAuth: true` flag handled in `server/api/setupRoutes.js` (same mechanics as `alarmAuth`/`resetPasswordAuth`).
+- **Tenant isolation (absolute rule)**: the JWT's `service_id` is authoritative, `external_id` forced to the `ext:<selector>:` prefix, ownership checked on every read, variables via `gladys.variable.*(key, service_id)`.
+- The token is injected as Env, never displayed again; the "regenerate token" admin action = increment `token_version` + recreate the container.
+
+### B.4 REST host API — `/api/integration/v1/`
+
+Prefix outside the user-facing `/api/v1/`, versioned by URL. Controller `server/api/controllers/integrationHost.controller.js`, routes in `server/api/routes.js`. **Detailed contracts (request/response bodies) in C.2–C.3.**
+
+**The host API allows neither device creation nor deletion.** The integration publishes its discovered devices; creation/edition/deletion remains a user gesture in the UI (via the standard `POST /api/v1/device`, as for internal integrations).
+
+| Endpoint | Mapping |
+|---|---|
+| `POST /discovered_device` (batch, replaces the list) | stored in memory by the supervisor (`external_id`s forced to the `ext:<selector>:` prefix); frontend push `DISCOVERED_DEVICES_UPDATED`; the supervisor flags those already created in DB (match on `external_id`) and **silently upserts their `params`** (see C.3) |
+| `GET /device` | **read only**: the integration's devices actually created by the user (`service_id` forced) — lets the integration know what to drive/poll at startup |
+| `POST /state` (batch) | `EVENTS.DEVICE.NEW_STATE` (the native services' path); rate limit 300 states/min (see C.3) |
+| `POST /camera/image` | `gladys.device.camera.setImage` — new image from one of the integration's cameras (≤ 150 KB, 12/min per device, see C.3) |
+| `GET/POST /config` | `gladys.variable.getValue/setValue(key, service_id)` (config + secrets in core DB) |
+| `POST /heartbeat`, `GET /status` | HTTP fallback + status at SDK boot |
+
+**No logs endpoint**: the integration does not push its logs, it simply writes to stdout/stderr and Gladys reads them via the Docker API (existing `system.getContainerLogs(container_id)`, equivalent to `docker logs`). Much simpler, and it works in every language without an SDK.
+
+Do **not** expose these routes through the Gladys Plus gateway (`setupGateway`).
+
+### B.5 Integration WebSocket
+
+Extend `server/api/websockets/index.js` (same WSS, new `case` in the switch): message `AUTHENTICATION.INTEGRATION_REQUEST { token }` → integration JWT validation (signature + audience + `token_version`, see B.3) → `gladys.externalIntegration.integrationConnected(service, ws)`. Heartbeat: `ws.ping()` every 20 s + `isAlive` flag on `pong` + application-level `HEARTBEAT` message (updates `last_heartbeat`); 2 missed pings → DEGRADED. Reconnection handled by the SDK (backoff), a reconnection replaces the previous entry.
+
+**Full protocol (types and payloads) specified in C.4.** Downstream messages (core→integration):
+- **specific commands** (one type per action, no generic type): `DEVICE_SET_VALUE`, `DEVICE_POLL` — each carries a `message_id` and expects a `COMMAND_RESULT` ack (see B.6);
+- `SCAN_REQUEST`: (re)discovery request triggered from the UI's Discovery tab — the integration responds by republishing via `POST /discovered_device`;
+- `DEVICE_CREATED` / `DEVICE_UPDATED` / `DEVICE_DELETED { device }`: relayed by the proxy service's `postCreate`/`postUpdate`/`postDelete` hooks — the core already calls them on the owning service on every user gesture (verified: `server/lib/device/device.notify.js`). The integration thus knows immediately which devices to track or drop, without polling.
+
+### B.6 Command routing
+
+No modification of `device.setValue.js` nor `device.notify.js`: `registerProxyService.js` places in the stateManager, under the integration's `t_service` name, a frozen object `{ device: { setValue, poll, getImage, postCreate, postUpdate, postDelete } }` — `setValue` sends `DEVICE_SET_VALUE`, `poll` sends `DEVICE_POLL` (called by the core scheduler for devices with a `poll_frequency`, as for internal services), `getImage` sends `CAMERA_GET_IMAGE` (called by `camera.getLiveImage` — live view, chat intent — 15 s timeout, the image comes back in `command-result.data`), the three hooks relay the lifecycle notifications (B.5). `sendCommand(type, payload)` → WS + ack (5 s timeout by default — `action.run` uses the action's declared `timeout_seconds`, see C.1; exceeded → throw, e.g. new `ExternalIntegrationUnavailableError` in `utils/coreErrors.js`); integration disconnected → immediate throw. **Exception for `poll`**: if the integration is not `RUNNING`/`DEGRADED` (deliberately stopped, broken), the scheduler-planned `poll` becomes a **silent no-op** — no throw and no log repeated every N seconds (log pollution for a state already known and displayed); `setValue`, however, always throws: a user actioning a device must see the error. Real state feedback via `POST /state` (document `has_feedback: true` for actionable features).
+
+### B.7 Management API (admin)
+
+`server/api/controllers/externalIntegration.controller.js`, operating on `t_service` rows of type `external` (no new table). **Detailed contracts in C.5.**
+
+- **Admin**: `POST /api/v1/external_integration` with **three install modes** — `{ store_slug }` (from the store, the server resolves image + manifest from its index cache), `{ repo_url }` (**from a GitHub repo URL**, indexed or not: the server resolves the default branch via the GitHub API, downloads the raw `gladys-assistant-integration.json`, validates it with the same JSON Schema as the indexer, then follows the standard install path; `store_slug` is inferred = `owner/repo`), `{ docker_image, manifest }` (dev mode without a repo). Then `POST .../:selector/update` (pull + container recreation), `POST .../start|stop|restart`, `GET .../logs`, `DELETE` (removes **everything**: container, devices, config — see B.2).
+- **Standard user**: `GET /api/v1/external_integration` (list + status, feeds the frontend's integration catalog, see B.8), `GET .../:selector` (detail: manifest, `config_schema`, status) and `GET /api/v1/external_integration/store` (store catalog from the server's index cache, filtered by Gladys version compatibility, with search + "installed" / "update available" flags; `POST .../store/refresh` to re-download the index on demand).
+- **Discovery screen**: `GET /api/v1/external_integration/:selector/discovered_device` (the supervisor's in-memory list, with the "already created" flag) and `POST .../scan` (sends `SCAN_REQUEST` to the integration). Device creation then goes through the existing `POST /api/v1/device`, as for internal integrations. When that creation fails, the screen does **not** show a generic message: it maps the HTTP status to a precise explanation (validation, conflict on `external_id`/`selector`, permissions, server unreachable…), lists the rejected fields returned by the API, and displays the raw technical detail to copy in a bug report. To make the field list actionable when a device publishes many features, `POST /api/v1/device` tags validation/conflict errors raised while saving a feature with an optional **structured** `context` (`{ type: "device_feature", name: "<feature name, its external_id as a fallback, or null>" }`), carried in the `properties[]` entries of a `422` and in the `error` object of a `409`. The key is absent when the thrower knew no context, and the API only ever **names** the entity — the wording around it belongs to the frontend, so it stays translated like the rest of the UI.
+- **Configuration screen**: `GET/POST /api/v1/external_integration/:selector/config` — validates the payload against the manifest's `config_schema` (flat format specified in C.1), persists via `gladys.variable.setValue(key, service_id)` (`secret: true` fields are never returned in clear by the `GET`), then pushes `CONFIG_UPDATED` to the integration over WS so it reloads its config without a restart.
+
+### B.8 Frontend: on par with internal integrations
+
+No "separate" page in the Settings: an external integration presents itself and is used **exactly like an internal integration**, with just an "external" badge. A single type handled in phase 1: **"Devices"**-type integrations (the catalog's `device` category).
+
+**In the integration catalog** (`front/src/routes/integration/index.js`): today the list comes from static JSON (`front/src/config/integrations/devices.json`). We merge in the external integrations from the **store** (`GET /api/v1/external_integration/store`, see B.9) — same cards (name, cover re-hosted by the indexer — `cover_url` — or placeholder), plus an **"external" badge**, and for installed ones the real-time status badge (`STATUS_CHANGED`) and the "update available" flag. The displayed list is the **union** of `GET /api/v1/external_integration` (installed — including those outside the index: `repo_url` install not yet crawled, dev mode) and of `GET .../store` (index), **deduplicated by `store_slug`**: an installed integration appears only once, with its status. Clicking a non-installed integration opens an install screen: description, "**Documentation**" link (markdown re-hosted by the indexer, `docs` from C.6, user language with `en` fallback), a clear warning (unaudited third-party code, full outbound network access), the list of any sub-containers (name, image, memory/CPU limits, published ports — the user sees what will run on their machine and what will be exposed on their network), the **Hardware** section (one row per requested class: detection state + grant toggle, see B.2), "Install" button (one click).
+
+**Installing from outside the store — a mainstream journey, not a hidden "dev mode".** A **dedicated card at the end of the catalog** (Devices category), "Install from GitHub", opens a modal where the user simply pastes the **URL of a GitHub repo**; Gladys fetches and validates the repo's manifest, shows the same install screen (name, description, warning) and installs (`POST` with `repo_url`, see C.5). It is the link between the store and direct sharing: beta-testing an integration, a repo not yet crawled by the indexer, a private-circle integration. In the same modal, a discreet "Developer mode" link reveals the advanced Docker image + inline manifest form (to work without a repo). **Double-instance warning**: at install (all modes — store, `repo_url`, dev), if an already-installed integration shares the same Docker image (comparison **without the tag**: a `:dev` next to a `:1.2.0`) or the same manifest `name`, the install screen warns: "another instance of this integration is already running — two instances may fight over the same cloud account or the same devices; advice: stop the existing instance during your tests". Installing remains possible — running a dev version next to prod is an **intended** use (the `ext-dev-*` selectors guarantee no technical collision); the potential conflict is a domain matter, the user decides knowingly. Note: like any install, the action remains restricted to the admin role — the catalog's Devices category is hidden from non-admins in the current frontend anyway — but the UX is designed for a non-technical user: paste a URL, click Install.
+
+**A single generic page** `front/src/routes/integration/all/external-integration/` serves all external integrations, exactly on the model of the internal pages (`Zigbee2mqttPage`-like sidebar, dynamic routes in `front/src/components/app.jsx`), with the 3 screens:
+
+| Screen | Route | Content |
+|---|---|---|
+| **Devices** | `/dashboard/integration/device/external/:selector` | The integration's already-created devices (same cards/editing as internal device pages, filtered by the integration's `t_service`); a **transport pill** per device when the `GLADYS_TRANSPORT` param is set (`local` / `cloud` / `unreachable`, translated tooltip) — if `GLADYS_TRANSPORT_DEGRADED`, the pill **keeps its transport color** with an **orange dot** overlaid and the tooltip shows the `message` (the device works, but not in nominal mode — see C.3) — + a **global summary at the top** ("12 local · 3 cloud · 1 unreachable · 1 degraded"), real-time via `device-transport-updated` |
+| **Discovery** | `.../discover` | Discovered devices (name, features, "already created" badge), "Scan" button (`POST .../scan`), "Create" button per device (standard `POST /api/v1/device`), "**Update**" button when an already-created device is republished with a different structure (features — applies the new definition via the same `POST /api/v1/device`; `params` alone are upserted automatically, see C.3), real-time via `DISCOVERED_DEVICES_UPDATED` |
+| **Configuration** | `.../config` | **Form generated from the manifest's JSON `config_schema`** (the RFC's declarative UI: text/number/boolean/select/secret/oauth2 fields in v1 — the `oauth2` field is a "Connect" button, see C.1 —, `section` fields render **primer blocks** that break up the form: title, text, https links with the target domain displayed (see C.1), no injected code), saved via `POST .../config`. At the top of the screen, a permanent "**Documentation**" link (the same re-hosted markdown as at install, user language with `en` fallback): configuration time is when it is needed most (creating the manufacturer's developer account, obtaining credentials…). The generic page also handles the **OAuth callback route** (`.../oauth-callback?code&state`) which relays to the server (C.5) then closes the flow. Added to that: the **standard "Prefer local connection" toggle** if the manifest declares both `transports` (rendered and translated by the core, see C.1), the **Actions** section (one button per action declared in the manifest, mini-form if `fields`, result displayed under the button — see C.1) and the supervision block: container status **and application-level connection status** published by the integration (`connection_status` C.3 — badge + message, e.g. "token expired, please reconnect"), the **container start time** (`started_at`, "running since…"), start/stop/restart actions, logs modal, uninstall (admin); for multi-container integrations, each sub-container's state, a container selector in the logs modal, an "Open <label>" link per published port (e.g. Frigate's UI, `http://<gladys-host>:<assigned port>`), and the **Hardware** section (same toggles as at install, admin — changing recreates the affected sub-containers, see B.2) |
+
+Code models: `front/src/routes/integration/all/zigbee2mqtt/` (3-tab device/discover/setup structure) and `front/src/routes/integration/all/mcp/` (API calls). i18n in **all** languages (`front/src/config/i18n/*.json`, `compare-translations` check) — config field labels come from the manifest (with optional multi-language keys), not from Gladys's i18n files.
+
+### B.9 The store: an auto-generated decentralized index
+
+**Principle: publishing asks nobody's permission.** The source of truth is distributed on GitHub; the index is just a public cache rebuilt by a robot.
+
+**On the integration developer's side** — publishing =
+1. a **public** GitHub repo with the topic **`gladys-assistant-integration`**;
+2. a file **`gladys-assistant-integration.json`** at the root (the manifest: `manifest_version`, implicit `slug` = `owner/repo`, name, multi-language description, `version`, `docker_image` — any public registry, tag or digest —, compatible Gladys versions, `config_schema`, cover image URL);
+3. **mandatory multi-language user documentation**: `docs/en.md` **and** `docs/fr.md` (the project's two languages; other languages welcome), structured per the **provided template** (B.11: Overview / Prerequisites / Configuration / Troubleshooting sections). The indexer checks the presence of both files and a minimum size (≥ 300 characters each) — absent or empty → **rejection** (`level: "error"` in `rejected.json`); fine-grained adherence to the sections stays conventional. The files are **re-hosted** on Pages like the covers (`docs` in the index, see C.6) and shown on the install screen;
+4. publishing a new version = bumping `version` + `docker_image` in the manifest and pushing. That's it — no account to create, no PR to get approved.
+
+The same manifest is duplicated in the Docker image (LABEL `io.gladysassistant.manifest`, the template does it automatically at build time): the **repo**'s file is authoritative for the store (it is the one the robot scrapes); the **LABEL** is only used for the "dev" install by image name, without a GitHub repo. When installing from the store, the index's version is the one recorded in `t_service.manifest`.
+
+**The indexer** — new public repo `GladysAssistant/integration-store` (outside the monorepo):
+- GitHub Action **scheduled hourly** (+ manually triggerable): GitHub search by topic → fetch of each repo's `gladys-assistant-integration.json` (raw.githubusercontent) → **validation by script only** (manifest JSON Schema, well-formed image reference, supported `manifest_version`, cover downloaded/validated/re-hosted see C.1, `docs/en.md` + `docs/fr.md` documentation present/re-hosted else rejection) → building of `index.json` enriched with GitHub metadata (stars, last-commit date — free ranking without centralized telemetry) → publication on **GitHub Pages** (static, CDN). `index.json`/`rejected.json` formats specified in C.6.
+- Invalid manifests are listed in a public `rejected.json` with the reason → a dev diagnoses on their own why their integration does not appear, without opening a ticket.
+- The validation code is public: the admission rules are verifiable by everyone, and anyone can regenerate the index (fork of the Action) — the store itself is forkable, hence no point of control.
+- **No moderation in v1** (an owned decision): no blocklist, no manual removal. The defense is the sandbox (B.2) + the install-time warning. A blocklist could still be added later on the indexer side without touching the client.
+
+**On the Gladys side** — `store/` subfolder of the supervisor (`store.getIndex.js`, `store.refreshIndex.js`, `store.checkForUpdates.js`):
+- downloads `index.json` (default URL overridable by a variable — useful for tests and for pointing at an alternative index), **persistent local cache** (file or `t_variable`) refreshed every 30 min (the indexer rebuilds `index.json` hourly): the catalog remains browsable offline or if GitHub Pages is unavailable, and installed integrations never depend on the index to work;
+- filters by Gladys version compatibility before exposing to the frontend;
+- compares `index.version` vs `t_service.version` (linked by `store_slug`) → "update available" flag, the update is an explicit admin gesture (no auto-update in v1);
+- for integrations installed by `repo_url` (see C.5) absent from the index, the refresh re-downloads the manifest straight from their repo — same update-detection mechanics, without depending on the crawl.
+
+**Resilience, in short**: static GitHub Pages up front (no rate limit, CDN), local cache as the second layer, runtime fully decoupled from the store as the last resort. The worst-case scenario (GitHub entirely down) suspends the discovery of new integrations, never the operation of existing ones.
+
+### B.10 JS SDK: dedicated repo `GladysAssistant/integration-sdk-js`
+
+**Dedicated repo from phase 1** (not a monorepo folder): npm versioning independent from the Gladys release cadence, clean CI, and it is the dependency third-party devs install — they never have to touch the monorepo. It depends **only on the C.2–C.4 contracts** (no import of Gladys code).
+
+- **npm package `@gladysassistant/integration-sdk`**: Node ≥ 20, a single runtime dependency (`ws`), TypeScript typings provided (`.d.ts`), CommonJS + ESM. **Full public API specified in C.8.**
+- The repo contains **only the library** (+ its tests against a fake server, see B.13): the complete example integration lives in the template repo (B.11). The README keeps a minimal getting-started snippet and points to the template and the website docs (B.12).
+- No logging helper: the integration logs to stdout/stderr, retrieved via `docker logs`.
+
+### B.11 Integration template: dedicated repo `GladysAssistant/integration-template-js`
+
+Public repo marked as a **GitHub "Template repository"** from its creation: "Use this template" + edit the manifest + tag the topic = being in the store. It is both the **official starting point** for a third-party dev and the **PoC** used in the e2e journey (Verification section) — it is published in the store exactly as a third-party dev would (topic + image on a public registry), which validates the "zero approval" path end to end.
+
+**Content = a complete, working integration** (testable without hardware, covers the whole cycle including the 3 screens): publishes two discovered devices — an Open-Meteo temperature sensor (public API, no key) and a virtual switch. The user creates them from the Discovery screen; the integration then publishes the temperature every 10 min and responds to the switch's commands (receives `onSetValue`, republishes the state). Its manifest embeds a `config_schema` (latitude/longitude + refresh interval) to exercise the Configuration screen's generated form and `onConfigUpdated`.
+
+Repo files:
+- `index.js`: the demo integration, built on `@gladysassistant/integration-sdk` (~40 lines, see C.8); during the parallel development of the workstreams, dependency installed from the SDK's git repo, switched to the npm version before publication;
+- `gladys-assistant-integration.json` at the root (manifest compliant with C.1, including the name/description bounds) + a compliant `cover.jpg` (800×534, ≤ 150 KB);
+- `docs/en.md` + `docs/fr.md` pre-filled: this is **the official template for the store's mandatory documentation** (B.9) — Overview / Prerequisites / Configuration / Troubleshooting sections, to adapt;
+- `Dockerfile`: `node:22-alpine`, `USER node`, compatible with a read-only rootfs (C.7), copies the manifest into the `io.gladysassistant.manifest` LABEL at build time;
+- a ready-to-use GitHub Actions workflow: **multi-arch `linux/amd64` + `linux/arm64` build via buildx** (see B.14.7), push to GHCR on git tag — a third-party dev publishes without writing a line of CI;
+- a short `README`: "publish your integration in 5 steps", pointing to the website's developer docs (B.12) for the details.
+
+### B.12 Documentation: website `GladysAssistant/v4-website`
+
+The public website (gladysassistant.com) must host the feature's documentation — a full workstream of its own, **in the website's two languages (fr + en)**, following the repo's existing structure and conventions (the agent in charge starts by auditing the docs tree). The content is a **transposition of sections B/C of this spec** (which remain the source of truth), not an invention. Two deliverables:
+
+1. **User docs: "Internal and external integrations, what's the difference?"** — a page in the existing integrations docs: what an external integration is (developed by the community, run in an isolated container, **not audited by the Gladys team**), the meaning of the "external" badge and of the warning screen, what the sandbox guarantees (CPU/memory limits, no Docker access, hardware only if the user grants it class by class — toggles at install and in the Configuration screen) and what it does not guarantee (full outbound network access, web interfaces exposed on the LAN if declared), where to report a bug (the integration's GitHub repo, not the Gladys tracker), and the practical consequences: manual update from the catalog, uninstall = deletion of the devices and the config.
+2. **Developer docs: "Developing an external integration"** — a dedicated section in two parts:
+   - *Tutorial* (the happy path, from zero to the store): "Use this template" on `integration-template-js` → develop locally with the SDK outside Docker (dev JWT, see B.14.2) → test against your own Gladys → push the image (the provided workflow does it) → add the `gladys-assistant-integration` topic → the integration appears in every Gladys's catalog at the next indexing, with no approval;
+   - *Reference*: the manifest field by field with its validation rules (C.1, including the 800×534 cover and the name/description bounds), the REST host API (C.2–C.3), the WebSocket protocol (C.4), the JS SDK API (C.8), the container contract (C.7: read-only rootfs, `/data` as the only volume, resource limits, environment variables), **sub-containers** (`containers` declaration = authorization, lifecycle via the `/container` API, private network, confined volumes, published ports, hardware classes including the Coral — requested by the manifest, granted by the user, adapt via `GET /container` and `hardware-updated` —, the "generate the config in `/data` then start/restart" pattern — with the complete Frigate + Mosquitto example), the **per-device transport status** (`GLADYS_TRANSPORT`, including the degraded state `GLADYS_TRANSPORT_DEGRADED`/`_MESSAGE`) and the standard local preference (`transports`/`GLADYS_PREFER_LOCAL`), the **OAuth2 flow** for cloud services (`oauth2` field, `onOAuthAuthorizeUrl`/`onOAuthCallback` handlers) and the **application-level connection status** (`connection_status`), network best practices (**LAN unicast and cloud work, guaranteed** — only inbound broadcast/mDNS does not pass in bridge mode, see B.2/B.16; troubleshooting: a host firewall that DROPs bridge→LAN FORWARD = "cloud OK, LAN KO"; only publish states that change, see the C.3 rate limit), the multi-arch requirement, the publish/update cycle (bump `version`), and self-service diagnosis via `rejected.json` (C.6).
+
+### B.13 Tests (100% patch coverage required in CI)
+
+- Supervisor: `server/test/lib/external-integration/` (one file per function), Docker mocked via `server/test/lib/system/DockerodeMock.test.js` to extend (createNetwork, getImage().inspect with Labels), or sinon fakes of `gladys.system.*` otherwise.
+- Controllers: supertest; host API called with an integration JWT generated in the seed (not `authenticatedRequest`, which is a user token). **Mandatory tenant-isolation tests** (A's token ≠ B's devices, `external_id` prefix rejected, user access token refused on the host API — wrong audience).
+- Middleware: 401 (token absent/invalid signature/wrong audience/stale `token_version`/non-external service). WS: auth OK/KO, command + ack + timeout (extend `server/test/websockets/`).
+- Server-side store: mocked index fetch (nock or fake), local cache (hit/miss/expiration/index unavailable), version-compatibility filter, update detection, install with an unknown `store_slug` → 404, install by `repo_url` (mocked GitHub fetch: success, repo not found → 404, manifest absent/invalid → 422), and a route-collision test (`GET .../store` returns the catalog, not the `:selector` handler, see C.5).
+- Sub-containers: validation of the `containers` field (bounds, unique names, `GLADYS_*` env forbidden, absolute volumes, unknown `devices` classes rejected, `ports` bounded), descriptors + private network on a Frigate + Mosquitto-like fixture (DockerodeMock), `start` auto vs manual, desired state (exited container "supposed to run" → restart with backoff; stopped via the API → left stopped), host-port assignment (free, persisted across recreations), hardware grants (intersection requested ∩ granted ∩ present, `granted_devices` outside the manifest → `422`, `POST .../:selector/hardware` → recreation + `hardware-updated` push, mocked detection present/absent, literal `hardware` route before `:selector`), `/container` endpoints (list with `granted`/`available`, start with `env` → recreation if diff, stop, restart, `404` on unknown name, **isolation: A's token does not drive B's containers**), complete uninstall (containers + private network + ports freed + data folder deleted), orphan reconciliation at boot.
+- OAuth & application status: `oauth2` field validated in the schema, `authorize_url` relay (response via `command-result.data`, timeout, integration disconnected → `400`), `callback` relay (success; `success: false` → `422` with the message), `connection_status` (stored in memory, exposed in the detail, WS push `connection-status-updated`, message language fallback).
+- Field feedback: **`params` upsert** on republication of an already-created device (modified params → updated in DB, name/features untouched, no `device-updated` echo), **actions** (`fields` validated → `422`, **per-action** timeout honored instead of the 5 s, `404` on an undeclared `key`, multi-language message), **silent no-op `poll`** when the integration is `STOPPED`/`ERROR` (zero logs, `setValue` still throws), new `multi_select`/`display: "radio"` types validated, `source: "devices"` (options populated with only the devices of the integration's `t_service`; manifest rejected if `source` unknown or `source` + `options` together), `section` (purely presentational: `required`/`default`/`placeholder` present or non-https `url` → manifest rejected; no write to `t_variable`, absent from the payload accepted by `POST .../config`), double-instance warning (same image without tag or same `name`), `started_at` exposed in the detail.
+- Camera: `POST /camera/image` (image > 150 KB → `400`, rate limit 12/min per device → `429`, another integration's device → `404`, device without a camera feature → `400`, `saveStringState` called — never the states path), `camera.get-image` relay (image in `command-result.data`, **15 s** timeout honored, failure/timeout → `camera.getLiveImage` error).
+- Transport: `GLADYS_TRANSPORT` param validated (`local|cloud|unreachable`, undefined `GLADYS_*` key → `400`), `POST /device/transport` (batch, param updated, WS push `device-transport-updated`, unknown external_id ignored; degraded state: `GLADYS_TRANSPORT_DEGRADED`/`GLADYS_TRANSPORT_MESSAGE` params set then **cleared** by an entry without `degraded`, `message` without `en` → `400`), `GLADYS_PREFER_LOCAL` toggle (rendered if `transports: ["local","cloud"]`, stored, pushed via `config-updated`, rejected for writing on the integration's `POST /config` → `400`).
+- Indexer (repo `integration-store`, its own CI outside the monorepo): validation of valid/invalid manifests (including name/description bounds), cover validation (format/dimensions/weight, warning + placeholder if KO), **documentation validation** (`docs/en.md` + `docs/fr.md` present and ≥ 300 characters → else `error` rejection; re-hosting and `docs` URLs in the index), deterministic `index.json`/`rejected.json` generation on fixtures.
+- SDK (repo `integration-sdk-js`, its own CI): tests against a local fake server (mocked C.3 endpoints + test WSS) — auth, resync on reconnection, auto ack (resolve/throw/absent), backoff, batch `publishState`, `externalId()`.
+- Template (repo `integration-template-js`, its own CI): lint, validation of the repo's manifest against the canonical `manifest.schema.json` (the template must never itself be rejected by the indexer), passing Docker build.
+- Website (repo `v4-website`): green site build, the new pages present in both languages (fr + en).
+
+### B.14 Accepted risks (v1)
+
+1. **Fully open network egress** (v1 choice): Docker does not filter by destination host, and we do not pretend to — **no `permissions` field in the manifest**: a declaration not technically enforced would be false security. The install screen clearly says the integration has full outbound network access. The dedicated bridge + `enable_icc=false` only isolate integrations **from each other**. Phase 3 lead: sidecar proxy or nftables — and reintroduction of a permissions field the day it is actually enforced.
+2. **Without the Docker socket** (dev, exotic installs): `PlatformNotCompatible` already thrown by `system.*` → supervisor no-op + "unavailable" in the UI + documented SDK dev mode outside Docker (admin endpoint to generate a dev integration JWT).
+3. **Secrets in Env**: the JWT is visible via `docker inspect` (which already assumes access to the socket = de facto root). Acceptable in v1: token scoped to a single integration and instantly invalidable via `token_version`.
+4. **Backup/restore**: `container_id` stale after a restore → reconciliation by label at boot; the container's `/data` outside the DB backup (document: persist what matters via `/config`).
+5. **No store moderation** (v1 choice): a proven malware stays listed as long as its author does not remove the topic. Real defenses: strict sandbox (B.2), warning displayed before install, visible GitHub metadata (stars, repo age). A blocklist on the indexer side can still be added later without touching the client.
+6. **Image supply chain** (open registry + mutable tags): a manifest can reference anyone's image, and a tag can be rewritten after indexing. V1: accepted and documented (the template recommends the same repo's GHCR and digest pinning, without mandating them); hardening (mandatory digest, signing) in phase 3.
+7. **CPU architectures**: a large share of the Gladys fleet runs on Raspberry Pi (arm64) — an amd64-only image fails there at pull or run time. V1: the **template builds multi-arch by default** (`docker buildx`, `linux/amd64` + `linux/arm64`, the provided workflow does it with no config); on the Gladys side, a pull/run failure due to an incompatible architecture → `ERROR` status with an **explicit message** in the UI ("image not available for your architecture"), not a raw Docker error — a rule that also applies to sub-container images. Indexer lead: check the platforms of the image's manifest list and display them in the catalog.
+8. **Sub-containers: resources and exposed surface**: memory/CPU limits are declared by the dev (bounded by the C.1 schema, **displayed on the install screen**) — a Frigate-type integration can legitimately ask for 1 GB and more, it is up to the user to judge before installing. Volume disk space (`/data`, e.g. video recordings) is **not quota'd in v1** (documented; leads: quota, folder-size display in the supervision block). **A published port = a third-party interface exposed on the LAN** (with its own attack surface, potentially unauthenticated): declared in the manifest, displayed plainly at install, host port chosen by Gladys — it is the user who accepts that exposure, not Gladys that decides it. **`coral-usb` mounts all of `/dev/bus/usb`** (Docker's granularity), not just the Coral — stated honestly on the install screen. Guardrails: each class is **granted individually by the user** (toggles, revocable at any time — revocation recreates the container without the device), the classes are a curated list (v1: `coral-usb`, `coral-pcie`, `gpu`, `video`), extensible without breaking the schema; never a free-form `/dev` path.
+
+### B.15 "Communication" type: moving Telegram & co out of the core (design, phase 2)
+
+Goal: that Telegram, Nextcloud Talk, CallMeBot, Free Mobile — and tomorrow Matrix, Signal, WhatsApp… — become ordinary external integrations, and that the core stops knowing them by name. This design is **phase 2**; it is written now so the v1 contracts have nothing to break.
+
+The type covers **two families** that must not be confused (field feedback from the Free Mobile port: presupposing bidirectionality blocked the case): bidirectional **chat channels** (Telegram — inbound + outbound, the user's authority) and send-only **notification channels** (Free Mobile, CallMeBot — no inbound possible). The manifest declares it: `messaging: { "receive": true|false }` (sending is always present); everything else — linking, endpoints, warning level — follows from it.
+
+**Current state (verified in the code)** — three paths, of increasing asymmetry:
+- **Inbound and replies: already generic.** A service emits `EVENTS.MESSAGE.NEW` with `{ source: '<service name>', source_user_id: '<chat id>', user_id, user, language, text, id, created_at }` (`telegram/lib/message.new.js`); the brain replies via `message.reply`, which does `service.getService(originalMessage.source).message.send(source_user_id, message)` (`message.reply.js:116`) — any stateManager service exposing `message.send` receives its replies without core modification.
+- **Outbound (`sendToUser` and the `source: 'AI'` case of `reply`): hardcoded.** `message.sendToUser.js:37-65` enumerates by name telegram (`t_user.telegram_user_id` column), nextcloud-talk (per-user variable `NEXTCLOUD_TALK_TOKEN`) and callmebot — three ad hoc identity mechanisms. This is the block that forbids any new channel without touching the core.
+- **Pure notification: yet another hardcoded name, elsewhere.** Free Mobile is not even a chat channel: service-level credentials (a single account per instance), no inbound, a single consumer — the scene action `ACTIONS.SMS.SEND` which hardcodes `getService('free-mobile')` (`scene.actions.js:638`). The generic `ACTIONS.MESSAGE.SEND` action, though, already goes through `message.sendToUser(action.user, …)`: the refactor loop below covers scenes **for free**.
+
+**1. Core refactor (a prerequisite, beneficial even without external integrations)**: replace the hardcoded blocks with a generic loop — for each stateManager service exposing `message.sendToUser(user, message)`, call it; each service resolves its own per-user identity and no-ops if the user is not linked. Telegram/nextcloud-talk/callmebot implement this interface (their current logic moves from the core to their service), the `TOOL_CALL_EXTERNAL_SOURCES` list of `message.reply.js` becomes "any service exposing `message.sendToUser`", and the core no longer knows any name. The hardcoded `SMS.SEND` scene action becomes redundant with `MESSAGE.SEND` as soon as a per-user Free Mobile channel exists — deprecated in phase 3 along with the core service (in passing, the port lifts a current limitation: one Free Mobile account **per user** instead of one per instance — a visible model change, to document for existing users).
+
+**2. On the external integration side** — a natural extension of the v1 contracts:
+- **Manifest**: `type: "communication"` (the `type` field of C.1 is designed for this) + `messaging: { "receive": true|false }`; if `receive: false`, a **`contact_schema`** (same flat format as the `config_schema`, C.1 — e.g. Free Mobile: `username` + `access_token` as `secret`) describes the channel's **per-user** identity. No Devices/Discovery screens — the generic page only shows Configuration (it already branches by type), enriched with a "**My account**" block when a `contact_schema` is declared: each user (not only the admin) enters **their** values there, stored in `t_variable` scoped `(service_id, user_id)`. **Visible to every user, unlike a device integration**: an installed communication integration appears in the catalog of a non-admin user too (Communication category, never the store — installing stays an admin gesture), and its Configuration screen shows them only the per-user blocks ("My account" / account linking). The shared configuration of the integration, its actions, its webhooks, its hardware, supervision and logs remain admin-only — the same split as the native Telegram service, which non-admins have always seen so they could link their account.
+- **Proxy service**: exposes `message.send(contactId, message)` (the reply path, already generic — only exists if `receive: true`) and `message.sendToUser(user, message)` (the refactor loop above, identity resolution by the supervisor); relay over WS `external-integration.message.send { message_id, contact, message: { text, file } }` with the standard `command-result` ack (the `<domain>.<action>` convention of C.4 was designed for this). **`text` is Markdown**: the brain and the AI produce it, and the core cannot convert it on the channel's behalf — it knows neither Telegram's HTML subset, nor Discord's native Markdown, nor the fact that an SMS channel displays nothing. It is therefore up to each communication integration to render Markdown into its channel's format (see C.4). The `contact` field carries the resolved identity: `{ "id": "<contact_id>" }` for a code-linked channel (`receive: true`), or the **target user's `contact_schema` values** for a send-only channel (e.g. `{ "username": "...", "access_token": "..." }`) — user without a configured identity → silent no-op, exactly the semantics of the `sendToUser` loop.
+- **Inbound (`receive: true` only)**: `POST /api/integration/v1/message` `{ "contact_id": "...", "text": "...", "created_at"? }` — the supervisor resolves `contact_id → user` via the linking table, then emits `EVENTS.MESSAGE.NEW` with `source = <selector>`: brain, reply and history work as-is. Unknown contact → `404` (the integration can then reply in the channel "account not linked, code required"); `403` if the manifest declares `receive: false` (a notification channel never talks to the brain).
+- **User↔channel identity, two modes depending on `receive`**:
+  - `receive: true` — **link by code in the channel** (a generalization of the existing Telegram deep-link, `message.getCustomLink.js`): the user clicks "Link my account" on the integration's page → Gladys generates a short code in cache (15 min TTL, tied to the `user_id`) → the user sends this code to the bot in the external channel → the integration calls `POST /api/integration/v1/contact/link { code, contact_id, contact_name? }` → the supervisor validates and persists the link → `200 { user: { selector, first_name, language } }`. Going through the channel is the **proof of control of the external account** — indispensable given the authority conferred (point 3). `GET /contact` lists the linked contacts; revocation by the user from the integration's page (each user sees and unlinks **their** account).
+  - `receive: false` — **entry in the Gladys UI**: no inbound, so linking by code is impossible by construction — and useless (no authority to protect). The identity comes from the "My account" block (`contact_schema`, above); revocation = clearing one's values.
+  - Common storage: `t_variable` scoped `(service_id, user_id)` (the existing nextcloud-talk pattern — no migration).
+
+**3. Specific risk, to be treated at the height of the danger — asymmetric by construction**: an inbound message carries the **authority of the linked user** (triggering scenes, opening doors via the brain…). Linking by code is therefore the critical consent: single-use code, short TTL, generated only by the user from the UI, revocable; and the install screen warns at **two levels depending on `messaging.receive`** — `true`: "this integration will be able to send **and receive** messages on your behalf" (high class, the trust model of the current Telegram bot — but with unaudited code, to spell out in black and white in the user docs B.12); `false`: "this integration will be able to send you messages" (low class — no inbound, therefore **never** the user's authority, the supervisor's `403` guarantees it server-side, not just manifest-side).
+
+**What v1 must anticipate (and already does)**: extensible `type` in the manifest and the catalog filter; generic page branching by type; WS `<domain>.<action>` convention; proxy service extensible by capability (`device.*` today, `message.*` tomorrow); `(service_id, user_id)`-scoped variables available. The only v1 work: not closing these doors. Phase 3: deprecation of the core's communication services in favor of community-maintained external equivalents.
+
+### B.16 Mediated network discovery (design, phase 2)
+
+Problem (established in B.2): bridge containers **never** receive the LAN's broadcasts, mDNS or SSDP — only the core, running `network=host`, sees them. And the reverse is true too: a broadcast **emitted** from a bridge container does not cross the NAT to the LAN. Two concrete, symmetric validation cases: the **Tuya** local scan (`tuya.localScan.js`) is **passive** — listening for UDP broadcasts on ports 6666/6667/7000 then parsing/decrypting with the tuyapi lib; the **TP-Link** scan (Kasa protocol, surfaced by the integration's field port) is **active** — emitting an encrypted request as a UDP broadcast (port 9999, 20002 for recent devices) and collecting the responses, which come back as **unicast to the sender** (hence to whoever emitted: only the core can play that role). Design principle: **the core captures and emits (network position), the integration interprets and forges (protocol knowledge)** — the core never parses or crafts a payload.
+
+**Declaration in the manifest** (same philosophy as `containers`/`devices`: requesting = showing the user) — optional `network_discovery` field, a list of **curated** captures:
+
+```json
+"network_discovery": [
+  { "type": "udp-broadcast", "ports": [6666, 6667, 7000] },
+  { "type": "udp-active-broadcast", "ports": [9999, 20002] },
+  { "type": "mdns", "service": "_hue._tcp" }
+]
+```
+
+V1 types for the field (extensible by schema version): `udp-broadcast` (passive listening on the declared ports, max 5 ports), `udp-active-broadcast` (request/response: emission of an integration-provided payload as a broadcast on the declared ports, max 5 ports, then collection of the unicast responses — the TP-Link case), `mdns` (browse of a declared service type), `ssdp` (M-SEARCH on a declared `st`). Displayed on the install screen ("this integration will be able to listen to UDP network announcements on ports 6666–6667", "will be able to emit a discovery request as a UDP broadcast on port 9999"); never arbitrary capture (no pcap, no undeclared port).
+
+**Host API (phase 2)** — on-demand scan, synchronous and bounded:
+- `POST /api/integration/v1/network_discovery/scan` `{ "type": "udp-broadcast", "timeout_seconds": 10 }` (1–30 s, `403` if the type/ports are not declared in the manifest) → `200` with the **raw** results: `udp-broadcast` → `[ { "source_ip", "source_port", "payload_base64" } ]`; `mdns` → `[ { "name", "host", "addresses", "port", "txt" } ]`; `ssdp` → raw headers per responder.
+- **Active scan**: same endpoint, `{ "type": "udp-active-broadcast", "port": 9999, "payload_base64": "...", "timeout_seconds": 5 }` — the core emits the payload as a broadcast on the port (limited broadcast `255.255.255.255` + directed broadcast of each non-Docker interface), then collects the unicast responses during the timeout; return = same raw format as `udp-broadcast`. Guardrails specific to emission (the core sends a packet forged by a third party, the primitive must remain uninteresting to abuse): **broadcast only** (never unicast to a chosen target — no LAN sweep by proxy), port ∈ those declared in the manifest, `payload_base64` ≤ 512 decoded bytes, **1 scan / 10 s per integration** (`429` otherwise) — no targeting, no port scanning, no volume.
+- The integration parses by itself (Tuya: `MessageParser` on the `payload_base64`s, exactly the current `localScan` code; TP-Link: forges the encrypted Kasa request, decrypts the responses — the crypto stays in the container), then reaches the devices in **unicast** (which crosses the NAT, already possible in v1) and publishes its `discovered_device`s.
+
+On the core side: `server/lib/external-integration/networkDiscovery/` — sockets open only during a scan (cost bounded by the timeout), one concurrent scan per integration, reuses the `network=host` position (and the lan-manager know-how for a possible later `ip-scan` type).
+
+**What v1 must anticipate (and already does)**: additive manifest field (a manifest with `network_discovery` is simply refused by a too-old Gladys via `gladys_version`), versioned host API, install screen already structured as approved "requests" (containers, hardware — the captures will slot in). In the meantime: external Tuya = cloud + local unicast poll (IPs obtained from the cloud), without LAN scan; external TP-Link = manual IP entry (made livable by the `params` upsert and the `source: "devices"` select actions, C.1/C.3) — documented honestly (B.2, B.12). Two out of two pilot ports stumbled on discovery (Tuya passively, TP-Link actively): B.16 is the **first phase 2 workstream**, and the active scan alone (a `dgram` socket that emits then collects) is detachable if we want to ship it fast.
+
+### B.17 Inbound webhooks via Gladys Plus (design, phase 2)
+
+Problem: third-party services push their events by webhook (Netatmo: setpoint changes in ~2-3 s instead of the 2-min poll), but a local Gladys instance is not reachable from the Internet. The core has already solved this **for Netatmo** (PR #2627) via a Gladys Plus gateway route wired in 2021: `POST https://api.gladysgateway.com/v1/api/netatmo/:open_api_key` relays the raw body to the instance over the Plus WebSocket (`gladys-open-api` message). The external Netatmo port is blocked on it: the gateway → integration container path does not exist. We industrialize — **for all integrations, without the gateway knowing any of them**.
+
+**Declaration in the manifest** — optional `webhooks` field (≤ 3), displayed at install ("will be able to receive events from the Internet via Gladys Plus"):
+
+```json
+"webhooks": [
+  { "key": "events", "label": { "en": "Netatmo events" }, "mode": "fire_and_forget" },
+  { "key": "callback", "label": { "en": "Subscription callback" }, "mode": "sync" }
+]
+```
+
+Two modes, because both exist in the field: **`fire_and_forget`** (default) — the third party pushes and only expects an acknowledgment (the Netatmo class); **`sync`** — the caller waits for the **integration's response** (registration challenge/response à la Strava/Microsoft Graph, application-level returns).
+
+**Cloud side (repo `GladysAssistant/gladys-gateway`, outside the ecosystem listed at the end of the spec — carried by the maintainer, the spec defines the contract)**: a generic route `GET|POST /v1/api/external-integration/:open_api_key/:selector/:webhook_key` that relays `{ selector, webhook_key, method, query, raw body, content_type }` (body ≤ 256 KB) under the single action `external-integration-webhook`, waits for the instance's ack with a **hard timeout** (10 s) and responds with whatever the ack contains; **timeout or unreachable instance → `200` empty body, always** — the durable fix for the Netatmo lesson (5 consecutive failures = webhook banned by the third party, observed for real; PR #2627 notes that the current gateway lets the request fail). The gateway relays, period: zero knowledge of integrations.
+
+**Instance side**: an `external-integration-webhook` branch in `gateway.handleNewMessage.js` → the supervisor verifies selector + declared `webhook_key` (unknown → empty `200` ack, silent — no validity leak), then depending on the mode:
+- `fire_and_forget`: **immediate** ack `{ status: 200 }`, asynchronous relay over the integration WS — `external-integration.webhook.received` `{ "webhook_key", "method", "query", "body", "content_type" }`, without `message_id` or ack; integration disconnected/stopped → lost without error (see doctrine below);
+- `sync`: relay `external-integration.webhook.request` (same fields + `message_id`), standard 5 s ack expected; the integration's `command-result.data` — `{ "status": 200–499, "content_type", "body" }` (body ≤ 64 KB) — is returned as-is to the gateway, hence to the third party; timeout or stopped integration → empty `{ status: 200 }`.
+
+**"Trigger, not data" doctrine** (field lesson from PR #2627, to transpose into the developer docs B.12): webhook events arrive duplicated, late, out of order (observed: a stale event delivered a minute after its successor), and their payloads are partial or misleading. A webhook is for **triggering a refresh** via the manufacturer's API, never for applying the payload as a state — which is also what makes `fire_and_forget` losses painless: polling remains the source of truth and catches everything up.
+
+**Key and UI (standard block, rendered by the core — the `GLADYS_PREFER_LOCAL` pattern)**: the user creates their Open API key in Gladys Plus (Settings → Open API) and pastes it in a "**Gladys Plus webhooks**" block of the Configuration screen, displayed only if the manifest declares `webhooks` (Plus not linked → explanatory message instead). Stored under the reserved config key **`GLADYS_OPEN_API_KEY`** (secret, scoped to the `service_id`, rejected for writing on the integration's `POST /config` like any `GLADYS_*` key). The core builds the full URLs. Deliberately manual: the user already handles the URL on the manufacturer's side; automatic provisioning (a key minted per integration via the Plus API) is a later improvement that will not change the integration contract.
+
+**Integration side**: `GET /api/integration/v1/webhook` → `{ "available": true|false, "webhooks": [ { "key", "mode", "url" } ] }` (URLs ready to register with the third party — the Netatmo pattern: `addwebhook` on every successful connection, best effort); event `external-integration.webhook-updated` when availability changes (Plus linked/unlinked, key changed). `available: false` (no Gladys Plus) → the integration degrades to poll-only. SDK: `getWebhooks()`, `onWebhook(key, cb)` — in `fire_and_forget` the callback's return is ignored; in `sync` the resolved value `{ status?, contentType?, body? }` goes into the `command-result`.
+
+Security, stated honestly: the URL **is** the secret (unauthenticated payloads — anyone with the URL can post; authenticity verification — provider signature — belongs to the integration); the integration sees the Open API key (it is in the URL it registers with the third party) — a key scoped to the Open API relay, not to the Plus account, and revocable by the user in Gladys Plus; an integration's events are only routed to it (selector in the URL + declared `webhook_key`); sizes bounded in both directions.
+
+## C. Interface specification (v1 contracts)
+
+General conventions, aligned with the existing code:
+- **REST**: JSON exclusively; errors in the standard Gladys format `{ "status": <HTTP code>, "code": "NOT_FOUND" | "UNAUTHORIZED" | "FORBIDDEN" | "BAD_REQUEST" | "UNPROCESSABLE_ENTITY" | ..., "message": "..." }` (produced by `errorMiddleware`).
+- **WebSocket**: existing envelope `{ "type": "<namespace.kebab-case>", "payload": { ... } }` (`formatWebsocketMessage`).
+- **Dates**: ISO 8601 UTC. **External identifiers**: every integration `external_id` is prefixed `ext:<selector>:` (the server rejects everything else).
+
+### C.1 The `gladys-assistant-integration.json` manifest
+
+Complete example (the PoC's):
+
+```json
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "Open-Meteo Demo",
+  "description": {
+    "en": "Weather sensor and virtual switch demo integration.",
+    "fr": "Intégration démo : capteur météo et interrupteur virtuel."
+  },
+  "version": "1.2.0",
+  "docker_image": "ghcr.io/john/gladys-open-meteo-demo:1.2.0",
+  "gladys_version": ">=4.62.0",
+  "cover_image": "https://raw.githubusercontent.com/john/gladys-open-meteo-demo/main/cover.jpg",
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "description": { "en": "Create a developer account to get your API key.", "fr": "Créez un compte développeur pour obtenir votre clé d'API." },
+      "links": [ { "url": "https://open-meteo.com/en/docs", "label": { "en": "Open-Meteo docs", "fr": "Doc Open-Meteo" } } ]
+    },
+    {
+      "key": "latitude",
+      "type": "number",
+      "label": { "en": "Latitude", "fr": "Latitude" },
+      "required": true,
+      "default": 48.85,
+      "min": -90,
+      "max": 90
+    },
+    {
+      "key": "api_key",
+      "type": "secret",
+      "label": { "en": "API key", "fr": "Clé d'API" },
+      "required": false
+    },
+    {
+      "key": "unit",
+      "type": "select",
+      "label": { "en": "Unit", "fr": "Unité" },
+      "default": "celsius",
+      "options": [
+        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
+        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+      ]
+    }
+  ]
+}
+```
+
+| Field | Type | Required | Validation rules (indexer **and** server) |
+|---|---|---|---|
+| `manifest_version` | integer | yes | `1`; rejected if higher than the supported version |
+| `type` | string | yes | `"device"` (only value in v1) |
+| `name` | string | yes | 3–30 characters (displayed as the catalog card's title; internal integrations run 3–23) |
+| `description` | object `{lang: string}` | yes | `en` key required, other languages optional; each value **10–100 characters** (displayed on the card; internal descriptions run 23–63, one short sentence) |
+| `version` | string | yes | strict semver; must be bumped to trigger "update available" |
+| `docker_image` | string | yes | valid image reference, public registry, tag **or digest** |
+| `gladys_version` | string | yes | semver range (npm syntax); used by the compatibility filter |
+| `cover_image` | string | no | `https` URL of a **JPEG or PNG** image, **exactly 800×534 px** (the single format of internal covers, 3:2 ratio), **≤ 150 KB** (internal covers run 13–85 KB). Validated then **re-hosted by the indexer** (see below) |
+| `config_schema` | array | no | **flat** list of fields (see below) |
+| `containers` | array | no | additional **sub-containers**, max 5 (see below) |
+| `actions` | array | no | **on-demand actions** displayed on the Configuration screen, max 10 (see below) |
+| `transports` | array | no | supported channels, subset of `["local", "cloud"]`; both present → standard "Prefer local connection" toggle (see below) |
+
+No `permissions` field in v1: outbound network access is open and the install screen says so — we do not specify what we cannot enforce (see B.14). The field may appear in a future `manifest_version` when a real restriction exists.
+
+**Cover re-hosted by the indexer**: at each crawl, the indexer downloads the `cover_image`, validates it (JPEG/PNG magic bytes, 800×534, ≤ 150 KB) and publishes a copy on GitHub Pages; **that URL** is the one the index references (`cover_url`, see C.6). Three benefits: no dead link in the catalog, no user IP leak to a third-party server on every catalog display, and guaranteed weight/format. An absent or invalid cover does not reject the integration: it is indexed with a placeholder, and a warning (`level: "warning"`) is published in `rejected.json`.
+
+**Language fallback** (all multi-language fields: the manifest's `description`, the `config_schema`'s `label`/`description`/`placeholder`/`options[].label`): the frontend displays the user's language if present, else `en` (required everywhere, hence always available).
+
+**`config_schema`**: deliberately a flat list of fields, not full JSON Schema — the form rendering stays deterministic and unsurprising (the "declarative UI" principle). Fields per entry: `key` (unique, `[a-z0-9_]`), `type` (`string` | `number` | `boolean` | `select` | `multi_select` | `secret` | `oauth2` | `section`), `label` (multi-language, `en` required), `description` (multi-language, optional), `placeholder` (multi-language, optional — example text shown in the empty field, e.g. `48.85`), `required` (default `false`), `default`, `min`/`max` (number), `options` (select/multi_select: `[{ value, label }]`) **or** `source` (dynamic options provided by the core, see below — mutually exclusive with `options`), `display` (select: `"dropdown"` default or `"radio"` — radio buttons). Renderings: `boolean` = toggle/checkbox; `multi_select` = checkboxes, stored value = array of `value`s. Values are stored in `t_variable` scoped by `service_id`; `secret`s are **never returned to the frontend** (see C.5), but are provided to the integration.
+
+**`section` — primer chapters** (field need from the Netatmo port: facing "Client ID", the user must know they first have to create an app on the manufacturer's developer platform — core integrations have that text in their JSX pages, the generated form did not): a **purely presentational** field, no stored value (`required`/`default`/`placeholder` present → manifest rejected; never any write to `t_variable`). Content: `label` (multi-language, `en` required — the chapter title), `description` (**plain** multi-language text, ≤ 1000 characters per language), `links` (optional, ≤ 5 entries `[{ "url", "label" }]` — `url` **https required**, multi-language `label`). Rendered by the core: visual separator + text + links opened in a new tab with the **target domain displayed** next to the label (unmoderated third-party content, same trust level as the re-hosted docs: the user sees where they are clicking). **No markdown, no HTML** — the declarative version of the need, zero interpreted rich content (the "declarative UI" principle). Since the `config_schema` is an ordered list, sections naturally structure large forms; and since action `fields` reuse this format, they are available there too. For long walkthroughs (screenshots…), the repo's mandatory documentation remains the right medium (B.9), permanently reachable from the Configuration screen (B.8).
+
+**`source` — selects with dynamic options**: a `select`/`multi_select` field can replace its static `options` with `"source"`, a **reserved enum defined by the core** — never a URL or an expression: nothing arbitrary enters the rendering, extensible without breaking the schema. V1: a single value, **`"devices"`** — the frontend populates the options with the **integration's already-created devices** (label = device name, value = `external_id`), fetched via the standard endpoint for a service's devices and therefore filtered by the integration's `t_service` (zero leakage between integrations). It is the answer to the "act on a specific device" need without making the user copy an identifier: in an action (below), a `source: "devices"` select passes the chosen `external_id` to the integration like any field value. Manifest validation: `source` outside the enum, or `source` and `options` present together → rejection.
+
+**`oauth2` type** (cloud services with browser authorization — the Netatmo case, verified in `netatmo.retrieveTokens.js`: it is the frontend that carries the flow). Rendering: a "Connect" button (+ the connection state, see `connection_status` C.3). Flow, entirely relayed — **the Gladys server knows no provider**:
+1. click on "Connect" → `POST .../:selector/oauth/authorize_url { key, redirect_uri }` (C.5), relayed to the integration over WS (`oauth.get-authorize-url`, C.4) — **it** builds the URL (client_id from its config, scopes, anti-CSRF `state` it generates and retains);
+2. the frontend opens the URL (popup), the user consents at the provider, which redirects to the frontend page's **generic callback route** (`.../oauth-callback?code&state`);
+3. the frontend relays `POST .../:selector/oauth/callback { key, code, state, redirect_uri }` (C.5) → WS `oauth.callback` → the integration verifies `state`, exchanges the code for the tokens, stores them in config **outside the schema** (`POST /config`) and updates its `connection_status`.
+
+Tokens never transit through the frontend, and refreshing is the integration's business (like `netatmo.refreshingTokens` today).
+
+**`containers`**: the sub-containers' **authorization contract** (B.2) — declares what may run; the lifecycle is then driven via the `/container` API (C.3), only within these bounds. Example (a Frigate integration):
+
+```json
+"containers": [
+  {
+    "name": "mqtt",
+    "docker_image": "eclipse-mosquitto:2.0.18",
+    "start": "manual",
+    "volumes": ["/mosquitto/config", "/mosquitto/data"],
+    "memory_mb": 128
+  },
+  {
+    "name": "frigate",
+    "docker_image": "ghcr.io/blakeblackshear/frigate:0.14.1",
+    "start": "manual",
+    "volumes": ["/config", "/media/frigate"],
+    "read_only": false,
+    "memory_mb": 1024,
+    "shm_mb": 128,
+    "ports": [{ "container_port": 5000, "label": { "en": "Frigate UI", "fr": "Interface Frigate" } }],
+    "devices": ["coral-usb"]
+  }
+]
+```
+
+Fields per entry (validated by the indexer **and** the server, all displayed on the install screen):
+- `name` (required): `[a-z0-9-]{2,20}`, unique within the manifest — serves as the DNS alias on the private network, the container name suffix and the identifier in the `/container` API;
+- `docker_image` (required): same rules as the main image (public registry, tag or digest, multi-arch recommended);
+- `start`: `"auto"` (default: started by the supervisor before the main container) or `"manual"` (started by the integration via the API, see B.2);
+- `env`: object `{ key: value }` of **static strings**; `GLADYS_*` keys forbidden; the manifest is public → **never a secret here** (credentials are generated at runtime and go through `/data` files or the `env` of `POST /container/:name/start`, see B.2/C.3);
+- `volumes`: **absolute** paths inside the container, max 5 — each mounted from a subfolder derived from the integration's folder (C.7), the manifest never chooses a host path;
+- `ports`: max 3 entries `{ container_port, protocol ("tcp" default), label (multi-language, en required) }` — the **host** port is chosen by Gladys (free, persisted), never declared (C.7); the `label` names the "Open" link in the UI;
+- `devices`: **requested** hardware access classes, among `coral-usb` | `coral-pcie` | `gpu` | `video` (v1 list, extensible by schema version — never a free-form `/dev` path); requesting is not obtaining: each class is **granted or refused by the user** in the UI (B.2), the effective mount = requested ∩ granted ∩ present;
+- `read_only`: default `true`; opt-out possible (some upstream images, e.g. Frigate, do not run on a read-only rootfs);
+- `memory_mb`: 32–4096, default 256; `cpu`: 0.1–2, default 0.5; `shm_mb`: 64–512, default 64 (`/dev/shm`, useful for video processing);
+- `command`: optional, array (override of the image's CMD).
+
+**`actions`**: the generic "run this operation and show me the result" need without custom UI — connection test, identify, re-pairing, protocol version detection… Rendered as **buttons on the Configuration screen** (B.8). Example (the Tuya case: detecting the protocol version and data points of a device whose IP was entered by hand when the UDP scan did not find it — a long operation, ~15 s):
+
+```json
+"actions": [
+  {
+    "key": "detect_protocol",
+    "label": { "en": "Detect protocol version", "fr": "Détecter la version de protocole" },
+    "description": { "en": "Tries each protocol version against the device.", "fr": "Essaie chaque version de protocole sur l'appareil." },
+    "timeout_seconds": 30,
+    "fields": [
+      { "key": "device", "type": "select", "source": "devices", "label": { "en": "Device", "fr": "Appareil" }, "required": true },
+      { "key": "ip", "type": "string", "label": { "en": "Manual IP (optional)", "fr": "IP manuelle (optionnel)" }, "placeholder": { "en": "192.168.1.42" } }
+    ]
+  }
+]
+```
+
+Rules: unique `key` `[a-z0-9_]`; multi-language `label` (`en` required), optional `description`; optional `fields` = **same format as the `config_schema`** (the mini-form is rendered by the same engine, validated the same); `timeout_seconds` 5–120, default 30 — this is the ack delay granted to `action.run` (C.4), **an exception to the 5 s rule**, because these operations can be long. Execution: button (± form) → `POST .../:selector/action/:key` (C.5) → WS relay → the result (`data.message`, string or multi-language) is displayed under the button, success or failure.
+
+Actions are **integration-scoped**: a single rendering place, the Configuration screen — no buttons injected by the manifest on device cards in v1 (the scoping's "consistent UI" requirement: where to render them, how many, on which cards has no good generic answer). The "act on a specific device" need goes through a `source: "devices"` field as in the example above; device-scoped actions (`scope: "device"`, a button on the device card) remain a **phase 2** lead if usage demands it.
+
+**`transports`**: declares the channels the integration can use. If `["local", "cloud"]` (both), Gladys renders at the top of the Configuration screen a **standard toggle, translated by the core** — same wording for all integrations: "Prefer the local (LAN) connection when available" — stored under the reserved config key **`GLADYS_PREFER_LOCAL`** (boolean, default `true`). The integration receives it like any key (`GET /config`, `config-updated` event) but cannot write it (`GLADYS_*` key on the integration's `POST /config` → `400`: it is a user preference). The preference is a **wish**, not an order: the integration applies it when it can, and reflects reality per device via `GLADYS_TRANSPORT` (C.3) — standard preference + standard status, zero manufacturer semantics in the core.
+
+### C.2 Host API: access conventions
+
+- Base: `GLADYS_HOST_API_URL` (injected env, e.g. `http://172.18.0.1:80`) + the **`/api/integration/v1`** prefix.
+- Auth: **`Authorization: Bearer <GLADYS_INTEGRATION_TOKEN>`** header (JWT injected as env, see B.3). Absent/invalid/wrong audience/stale `token_version` → `401 UNAUTHORIZED`.
+- **No integration selector in the URLs**: identity comes from the JWT (`service_id` in the payload), each integration only sees its own perimeter. Putting the selector in the URL would be redundant — the server would have to verify it matches the token anyway — and would create a needless error surface (URL/token mismatch). It is the "the API talks to *the authenticated integration*" pattern, like a `/me`.
+
+### C.3 Host API: endpoints
+
+**`GET /api/integration/v1/status`** → `200`
+```json
+{ "gladys_version": "4.62.0", "service": { "id": "uuid", "selector": "ext-open-meteo-demo", "status": "RUNNING", "version": "1.2.0" } }
+```
+
+**`POST /api/integration/v1/heartbeat`** — body `{}` → `200 { "success": true }` (HTTP fallback of the WS heartbeat).
+
+**`POST /api/integration/v1/connection_status`** — body `{ "connected": false, "message": { "en": "Token expired, please reconnect.", "fr": "Token expiré, reconnectez-vous." } }` (`message` optional, multi-language with `en` fallback) → `200 { "success": true }`. The integration's **application-level status** ("connected to Netatmo", "token expired"…), held in memory by the supervisor, exposed in the detail (C.5), displayed on the Configuration screen and pushed to the frontend (`connection-status-updated`, C.4). Distinct from the container state machine (B.2): a cloud integration can be `RUNNING` (healthy container, WS connected) and yet disconnected from its third-party service — without this channel, it would be silently broken.
+
+**`POST /api/integration/v1/discovered_device`** — publishes the **complete** list of discovered devices (replaces the previous one). Device object = standard Gladys format, without `service_id` or `selector` (forced server-side):
+```json
+{
+  "devices": [
+    {
+      "name": "Météo Paris",
+      "external_id": "ext:open-meteo-demo:paris",
+      "features": [
+        {
+          "name": "Température",
+          "external_id": "ext:open-meteo-demo:paris:temperature",
+          "category": "temperature-sensor",
+          "type": "decimal",
+          "unit": "celsius",
+          "min": -50,
+          "max": 60,
+          "read_only": true,
+          "has_feedback": false,
+          "keep_history": true
+        }
+      ],
+      "params": [{ "name": "CITY", "value": "paris" }]
+    }
+  ]
+}
+```
+→ `200 { "success": true, "count": 1 }`. Rules: prefixed `external_id`s (device **and** features), `category`/`type`/`unit` within Gladys's standard lists (`DEVICE_FEATURE_CATEGORIES`/`TYPES`/`UNITS`), max 2000 devices (discovery is fleet-wide: a network integration publishes one entry per client on the network, ~1000 on a large setup), `400` otherwise. Optional device-level field **`poll_frequency`** (values from the existing `DEVICE_POLL_FREQUENCIES`: 1 s to 60 s) to receive `device.poll` from the core scheduler once the device is created.
+
+**Payload size**: the whole host API (`/api/integration/v1/*`) accepts a **20 MB** JSON body, against the 100 kB of the routes serving the frontend — the endpoints here are batch by construction and the device count, not the byte count, must be the binding limit. This endpoint in particular cannot be split: publishing **replaces** the previous list, so a second call would erase the first. A device with many features is heavy (a Shelly Pro 3EM exposes 24 features, ~8 kB serialized): under the frontend bound, discovery died around a dozen devices and the user simply saw nothing. Over the bound the core answers `413 PAYLOAD_TOO_LARGE` (never an opaque `500`), so the integration can say so instead of failing silently.
+
+**Reserved `GLADYS_*` params**: `params` names prefixed `GLADYS_` are reserved for the semantics defined by this spec — any undefined `GLADYS_*` key → `400`. Defined in v1: **`GLADYS_TRANSPORT`** = `"local"` | `"cloud"` | `"unreachable"`, the device's **effective transport status**. It is the generic pattern of dual-channel integrations (Tuya cloud+LAN, Shelly, eWeLink/Sonoff, Somfy TaHoma, Netatmo cameras, Zendure local MQTT…): the transport can differ from one device to another and change over time, and without a visible indication the user cannot diagnose a slow or frozen device. The integration sets it at discovery and keeps it up to date (republication, or the dedicated `POST /device/transport` endpoint below); Gladys renders it as a **pill** on the devices (B.8). Purely declarative: **no routing semantics on the core side**, the cloud/local "kitchen" stays in the container.
+
+Two more reserved keys cover the **degraded state** — the "it works, but not as intended" case, which the three transport values cannot express (field case: device detected by the local scan, but local sessions refused — rotated local key, another client holding the connection… — → falls back to cloud; the user sees a perfectly normal "cloud" pill and nothing invites them to investigate): **`GLADYS_TRANSPORT_DEGRADED`** (`"true"`, absent otherwise) and **`GLADYS_TRANSPORT_MESSAGE`** (multi-language object serialized as JSON, `en` required, ≤ 200 characters per language — the reason, e.g. "Local detected but sessions refused, falling back to cloud"). Degraded is deliberately **orthogonal to the transport** — not a 4th enum value: "which channel is used right now" and "is this the nominal state" are two pieces of information, and it is their combination ("cloud + degraded") that enables diagnosis.
+
+**Republication of an already-created device** (same `external_id`): the `params` are the **integration's technical data** — the supervisor compares them with those in DB and **silently upserts** them (add/update by `name`): a LAN IP that changes under DHCP, a cloud→local switch after a scan, without deleting/recreating the device. The `name`, the room and the features remain untouched (the user's property), and there is **no `device-updated` echo** to the integration (it is its own publication — otherwise a loop). If the published **structure** differs (features added/modified), the Discovery screen offers "Update" (B.8): a user gesture, via the standard `POST /api/v1/device`.
+
+**`POST /api/integration/v1/device/transport`** — body `{ "transports": [ { "device_external_id": "ext:tuya-demo:plug1", "transport": "cloud", "degraded": true, "message": { "en": "Local session refused, falling back to cloud", "fr": "Session locale refusée, bascule cloud" } } ] }` (batch ≤ 100; `degraded` default `false`, `message` optional and only honored if `degraded`) → `200 { "success": true }`. Updates the affected devices' `GLADYS_TRANSPORT*` params **without republishing the discovered list** (the lightweight path for hot switches: the cloud link drops → `unreachable`, the LAN comes back → `local`) — an entry without `degraded` **clears** the degraded params (explicit return to nominal, no ghost orange state) — and pushes `device-transport-updated` to the frontend (real-time pills). Value outside `local|cloud|unreachable`, or `message` without `en` → `400`; an unknown `device_external_id` is silently ignored.
+
+**`GET /api/integration/v1/device`** → `200 [ <device> ]` — the integration's devices **actually created by the user** (full standard format: `id`, `selector`, `features` with their `selector`/`last_value`, `params`).
+
+**`POST /api/integration/v1/state`** — batch of states, mapped onto `EVENTS.DEVICE.NEW_STATE` (same fields as `device.newStateEvent`):
+```json
+{
+  "states": [
+    { "device_feature_external_id": "ext:open-meteo-demo:paris:temperature", "state": 21.5 },
+    { "device_feature_external_id": "ext:open-meteo-demo:cam:text", "text": "hello" },
+    { "device_feature_external_id": "ext:open-meteo-demo:paris:temperature", "state": 19.2, "created_at": "2026-07-12T10:00:00.000Z" }
+  ]
+}
+```
+→ `200 { "success": true }`. Numeric `state` **or** string `text`; optional `created_at` for a past state. Max 100 states/request; **rate limit: 300 states/minute per integration**, `429 TOO_MANY_REQUESTS` beyond (SQLite/DuckDB anti-spam). The threshold is sized for **state changes**, not full snapshots: an integration polling a large fleet (e.g. 50 Tuya devices × 6 features) must **deduplicate** and only publish what changed — a best practice to write in the developer docs (B.12). An unknown `device_feature_external_id` is silently ignored (standard `newStateEvent` behavior: the user has not created that device).
+
+**`POST /api/integration/v1/camera/image`** — body `{ "device_external_id": "ext:tuya-demo:cam", "image": "image/jpg;base64,/9j/4AAQ..." }` → `200 { "success": true }`. Publishes a **camera's new image**: a device of the integration carrying a `camera`/`image` feature (`DEVICE_FEATURE_CATEGORIES.CAMERA` + `DEVICE_FEATURE_TYPES.CAMERA.IMAGE`, declared like any feature in `discovered_device`), mapped onto `gladys.device.camera.setImage` — same format as the internal camera services (`image/jpg;base64,<data>`, see `rtsp-camera/lib/getImage.js:95`), the dashboard's camera widget updates in real time. Limits: **≤ 150 KB** (the core's bound, `camera.setImage.js`), **12 images/minute per device** (one every 5 s — continuous video streaming is not in the v1 scope, see `camera.start-streaming` phase 2), `404` if the device does not belong to the integration, `400` if it has no camera feature. Images **never** go through `POST /state`: a dedicated `saveStringState` path, outside the state history and outside the states rate limit.
+
+**`GET /api/integration/v1/config`** → `200 { "config": { "latitude": 48.85, "unit": "celsius", "api_key": "s3cr3t" } }` — all values, secrets included (it is the integration, not the frontend).
+
+**`POST /api/integration/v1/config`** — body `{ "config": { "<key>": <value> } }`, partial merge → `200 { "success": true }`. Keys present in the `config_schema` are validated against it; keys outside the schema are the integration's **free internal storage** (pairing state, third-party tokens…), never displayed in the UI.
+
+**Sub-container lifecycle** — all these routes only know the `containers[]` entries of **this** integration's manifest (the JWT sets the perimeter, as everywhere): `404 NOT_FOUND` for any other `:name`. No route allows creating an undeclared container. None of these deliberate gestures increments `failure_count`.
+
+**`GET /api/integration/v1/container`** → `200`
+```json
+{
+  "containers": [
+    { "name": "mqtt", "status": "running", "desired": "running", "started_at": "2026-07-13T08:00:00.000Z", "ports": [] },
+    { "name": "frigate", "status": "stopped", "desired": "stopped", "started_at": null,
+      "ports": [{ "container_port": 5000, "host_port": 42115 }],
+      "devices": [{ "class": "coral-usb", "granted": true, "available": true }] }
+  ]
+}
+```
+— the declared sub-containers, their Docker state, the desired state (B.2), the assigned host ports and, per requested hardware class, the granted/available state (this is how the integration knows what to put in its config — e.g. `edgetpu` vs `cpu` detector for Frigate); empty list if the integration declares none.
+
+**`POST /api/integration/v1/container/:name/start`** — body `{}` or `{ "env": { "MQTT_PASSWORD": "..." } }` → `200 { "success": true }`. Creates the container if it does not exist yet, then starts it; it enters the "running" desired state (restarted by the supervisor if it crashes). The provided `env` is merged **on top of** the manifest's `env` (`GLADYS_*` keys forbidden → `400`) — it is the channel for values computed at runtime; if the `env` differs from the existing container's, the supervisor **recreates** it (destroy + create, the `/data` volumes persist) before starting it.
+
+**`POST /api/integration/v1/container/:name/stop`** — body `{}` → `200 { "success": true }`. Stops the container and removes it from the desired state: the supervisor will not restart it.
+
+**`POST /api/integration/v1/container/:name/restart`** — body `{}` → `200 { "success": true }`. Typical use: the integration has rewritten one of the sub-container's config files via `/data` (see B.2) and restarts it to apply.
+
+### C.4 Integration WebSocket: protocol
+
+Connection: same host/port as the host API (`ws://<gateway>:<port>/`, same HTTP server). Not authenticated within 5 s → connection terminated (existing behavior).
+
+| Direction | `type` | `payload` |
+|---|---|---|
+| integration → core | `authenticate.integration-request` | `{ "token": "<JWT>" }` — **mandatory first message** |
+| core → integration | `authentication.connected` | `{}` (reused as-is; failure = close code `4000` `INVALID_ACCESS_TOKEN`) |
+| core → integration | `external-integration.device.set-value` | `{ "message_id": "uuid", "device": { "external_id", "selector", "params" }, "device_feature": { "external_id", "category", "type" }, "value": 1 }` |
+| core → integration | `external-integration.device.poll` | `{ "message_id": "uuid", "device": { "external_id", "selector", "params" } }` — reading request for a device with a `poll_frequency`; states come back via `POST /state` |
+| core → integration | `external-integration.camera.get-image` | `{ "message_id": "uuid", "device": { "external_id", "selector", "params" } }` — request for a **fresh** image (dashboard live view, chat intent "show me the camera": `camera.getLiveImage` → the proxy service's `device.getImage`); respond via `command-result` with `data: { "image": "image/jpg;base64,..." }` (≤ 150 KB); ack expected within **15 s** (an ffmpeg capture is possible), not 5 s |
+| integration → core | `external-integration.command-result` | `{ "message_id": "uuid", "success": true, "data": { ... } }` or `{ "message_id": "uuid", "success": false, "error": "..." }` — ack of **every** command carrying a `message_id`, expected within **5 s**, otherwise the command fails on the core side; `data` is **optional**, for commands expecting a response (e.g. `oauth.get-authorize-url`; tomorrow `camera.get-image`) |
+| core → integration | `external-integration.scan-request` | `{}` — the integration responds by republishing `POST /discovered_device` |
+| core → integration | `external-integration.device-created` / `.device-updated` / `.device-deleted` | `{ "device": <standard device> }` (relay of the `postCreate`/`postUpdate`/`postDelete` hooks) |
+| core → integration | `external-integration.config-updated` | `{ "config": { ... } }` — complete new values (no need to re-fetch) |
+| core → integration | `external-integration.hardware-updated` | `{ "containers": [ { "name", "devices": [{ "class", "granted", "available" }] } ] }` — the user changed the hardware grants (B.2); the affected sub-containers have been recreated, it is up to the integration to regenerate its configs and (re)start what is needed |
+| core → integration | `external-integration.message.send` | `{ "message_id": "uuid", "contact": { ... }, "message": { "text": "...", "file": "image/jpg;base64,..." \| null } }` — a brain reply or a notification to deliver on the channel ("communication" type, B.15); `contact` carries the resolved identity (see B.15). **`text` is Markdown** — the brain and the AI produce it (`**27 °C**`, headings, lists, `code`) —, it is up to the integration to render it into its channel's format: HTML for Telegram, native Markdown for a channel that handles it, plain text otherwise. An integration delivering `text` as-is shows the syntax to the user |
+| core → integration | `external-integration.oauth.get-authorize-url` | `{ "message_id": "uuid", "key": "netatmo_account", "redirect_uri": "https://..." }` — the user clicked "Connect" on an `oauth2` field (C.1); respond via `command-result` with `data: { "authorize_url": "https://..." }` |
+| core → integration | `external-integration.oauth.callback` | `{ "message_id": "uuid", "key": "netatmo_account", "code": "...", "state": "...", "redirect_uri": "https://..." }` — return from the provider; the integration verifies `state`, exchanges the tokens, stores them (`POST /config` outside the schema) and acks |
+| core → integration | `external-integration.action.run` | `{ "message_id": "uuid", "key": "detect_protocol", "fields": { "ip": "192.168.1.42" } }` — the user clicked an action button (C.1); respond via `command-result` with `data: { "message": "..." }` (string or multi-language); the ack is expected within the action's **declared `timeout_seconds`** (not 5 s) |
+| integration → core | `external-integration.heartbeat` | `{}` — application-level, optional if the WS lib answers protocol pings |
+
+Command naming convention: **one specific type per action**, `external-integration.<domain>.<action>` — no generic type with an `action` field. Future commands (phase 2: `webhook.received`/`webhook.request` for the Gladys Plus webhooks (B.17), `camera.start-streaming` for continuous video streaming… depending on the integration types added) will follow this scheme, each with `message_id` + `command-result` ack (unless a documented exception, e.g. `webhook.received` deliberately without an ack, see B.17); an integration silently ignores a type it does not know.
+
+Protocol reliability rules:
+- **No queue**: core→integration messages (`device-created/updated/deleted`, `config-updated`, `scan-request`) emitted during a disconnection are **lost**. Contract: on every (re)connection, the integration redoes `GET /device` and `GET /config` to resynchronize its state — the SDK does it automatically.
+- **No config echo**: `config-updated` is only pushed for changes coming from the frontend; a `POST /config` from the integration itself never triggers a `config-updated` back (otherwise a loop).
+- **`command-result` with `success: false`**: treated on the core side exactly like a timeout — throw (`ExternalIntegrationUnavailableError` or the relayed error message), error visible in the device UI.
+- **At most once, never re-emitted**: the core has **no retry mechanism** — each command is emitted once; timeout, `success: false` or disconnected integration → throw, the error surfaces to the user, who decides whether to redo their gesture. A lost ack can therefore never cause a core-initiated double execution, and integrations have **no `message_id` deduplication to implement** (an already-seen `message_id` may be ignored out of caution, but the protocol does not require it).
+
+Health: the core sends a **protocol-level WebSocket ping** every 20 s; any standard WS lib answers it automatically (pong). 2 missed pongs or a closed socket → `DEGRADED` status. A reconnection replaces the previously registered connection.
+
+Core → frontend messages (real-time UI, on the existing user WS): `external-integration.status-changed` `{ "selector", "status" }`, `external-integration.discovered-devices-updated` `{ "selector" }`, `external-integration.connection-status-updated` `{ "selector", "connected", "message" }` (see C.3) and `external-integration.device-transport-updated` `{ "selector", "transports": [ { "device_external_id", "transport", "degraded", "message" } ] }` (pills, see C.3).
+
+### C.5 Management API (frontend ↔ server)
+
+Routes `/api/v1/external_integration`, standard Gladys user auth; **admin** required for anything that modifies, and for everything that concerns the administration of an integration (store, hardware, configuration, discovery, supervision, logs). A **non-admin** user only has access to what they need to link **their own** account on a communication integration (B.15) — everything else answers `403`: the list and the detail **of the communication integrations only** (a `type: "device"` selector answers the same `404` as an unknown selector, so probing selectors reveals nothing), in their **reduced view** (`{ id, name, selector, status, store_slug, manifest }` — no resolved `docker_image`, no `containers`, no `webhooks`: the webhook URLs embed the Gladys Plus Open API key; the `manifest` stays whole, it is the public description published by the store, image reference included), plus the per-user contact routes.
+
+⚠️ **Literal routes vs `:selector` collision**: routes are registered in Express in the declaration order of the `routes.js` object (`setupRoutes.js` iterates `Object.keys`). The literal routes `store`, `store/refresh` and `hardware` must therefore be declared **before** `:selector` — an existing precedent in the code: `get /api/v1/device/duckdb_migration_state` declared before `get /api/v1/device/:device_selector`. Double protection: integration selectors are prefixed `ext-` (B.1), so `store` or `hardware` can never be valid selectors; and a dedicated test verifies that `GET .../store` returns the catalog (not the detail handler), to break CI if someone reorders the routes.
+
+| Method & route | Body → Response |
+|---|---|
+| `GET /api/v1/external_integration` | → `[ { "id", "name", "selector", "status", "version", "docker_image", "store_slug", "manifest", "update_available" } ]`; **non-admin**: only the installed `type: "communication"` integrations, in their reduced view |
+| `GET .../:selector` | → detail (same fields, + the main container's `"started_at"`, + `"connection_status": { "connected", "message" }` (C.3), + `"containers": [ { "name", "status", "started_at", "ports": [{ "container_port", "host_port", "label" }] } ]` for multi-container ones — the frontend derives the "Open" links from it); **non-admin**: the reduced view on a communication integration, `404` on any other (indistinguishable from an unknown selector) |
+| `GET /api/v1/external_integration/store` *(admin)* | → `{ "refreshed_at", "integrations": [ { "store_slug", "manifest": <manifest>, "github": { "stars", "pushed_at" }, "installed": false, "update_available": false, "compatible": true } ] }` (filtered by `gladys_version`) |
+| `POST .../store/refresh` *(admin)* | `{}` → index re-downloaded, same response as `GET .../store` |
+| `GET /api/v1/external_integration/hardware` *(admin)* | → `{ "classes": [ { "class": "coral-usb", "detected": true }, { "class": "gpu", "detected": false }, ... ] }` — detection on the host (`system.detectHardwareClasses()`, see B.2); feeds the install screen's toggles |
+| `POST /api/v1/external_integration` *(admin)* | `{ "store_slug": "john/gladys-open-meteo-demo" }` **or** `{ "repo_url": "https://github.com/john/gladys-open-meteo-demo" }` **or** `{ "docker_image": "...", "manifest": {...} }` (dev mode); + optional `"granted_devices": ["coral-usb"]` (the install screen's toggles; classes not requested by the manifest → `422`) → `201` detail; `repo_url`: `422` if the manifest is absent/invalid in the repo, `404` if the repo is not found |
+| `POST .../:selector/start` / `stop` / `restart` / `update` *(admin)* | `{}` → `200` detail (up-to-date status) |
+| `POST .../:selector/hardware` *(admin)* | `{ "granted_devices": ["coral-usb", "gpu"] }` (complete granted list, replaces the previous one; non-requested classes → `422`) → `200` detail — recreates the affected sub-containers + pushes `hardware-updated` to the integration (B.2) |
+| `GET .../:selector/logs?lines=200&container=frigate` *(admin)* | → `{ "logs": "<raw stdout/stderr via docker logs>" }`; `container` optional (default: the main container), `404` if not declared |
+| `GET .../:selector/discovered_device` *(admin)* | → `[ { ...discovered device, "created": false } ]` (flag = a device with this `external_id` already exists) |
+| `POST .../:selector/scan` *(admin)* | `{}` → `200 { "success": true }` (relays `scan-request`; `400` if the integration is disconnected) |
+| `GET .../:selector/config` *(admin)* | → `{ "config": { "latitude": 48.85, "api_key": null }, "configured_secrets": ["api_key"] }` — `secret`s are always `null`, the flag says whether they are set |
+| `POST .../:selector/config` *(admin)* | `{ "config": {...} }` validated against the `config_schema` (`422` otherwise) → `200` + `config-updated` push to the integration; a `secret` set to `null` = unchanged |
+| `POST .../:selector/oauth/authorize_url` *(admin)* | `{ "key", "redirect_uri" }` → `200 { "authorize_url": "https://..." }` — WS relay `oauth.get-authorize-url` (C.4, response via `command-result.data`); `400` if the field is not of type `oauth2` or if the integration is disconnected |
+| `POST .../:selector/oauth/callback` *(admin)* | `{ "key", "code", "state", "redirect_uri" }` → `200 { "success": true }` — WS relay `oauth.callback`; a failure on the integration side (`success: false`) surfaces as `422` with its message |
+| `POST .../:selector/action/:key` *(admin)* | `{ "fields": {...} }` validated against the action's `fields` (`422` otherwise) → `200 { "success": true, "message": ... }` — WS relay `action.run`, wait = the action's `timeout_seconds`; `success: false` → `422` with the message; `404` if `:key` is not declared; `400` if the integration is disconnected |
+| `DELETE .../:selector` *(admin)* | → `200 { "success": true }` — removes **everything**: container, devices, config variables, `t_service` row (explicit confirmation in the UI) |
+
+### C.6 Formats published by the indexer
+
+**`index.json`** (GitHub Pages, consumed by every Gladys):
+```json
+{
+  "index_format": 1,
+  "generated_at": "2026-07-13T08:00:00.000Z",
+  "integrations": [
+    {
+      "store_slug": "john/gladys-open-meteo-demo",
+      "repo_url": "https://github.com/john/gladys-open-meteo-demo",
+      "manifest": { "...": "full validated manifest (C.1)" },
+      "cover_url": "https://<store-pages>/covers/john--gladys-open-meteo-demo.jpg",
+      "docs": {
+        "en": "https://<store-pages>/docs/john--gladys-open-meteo-demo/en.md",
+        "fr": "https://<store-pages>/docs/john--gladys-open-meteo-demo/fr.md"
+      },
+      "github": { "stars": 12, "pushed_at": "2026-07-10T12:00:00.000Z", "owner_avatar_url": "https://..." }
+    }
+  ]
+}
+```
+
+**`rejected.json`** (public self-service diagnosis; `level: "error"` = not indexed, `level: "warning"` = indexed with degradation, e.g. cover replaced by a placeholder):
+```json
+[
+  { "store_slug": "jane/my-integration", "level": "error", "reason": "manifest.version: must be valid semver", "checked_at": "2026-07-13T08:00:00.000Z" },
+  { "store_slug": "bob/gladys-foo", "level": "warning", "reason": "cover_image: expected 800x534, got 1200x800 — placeholder used", "checked_at": "2026-07-13T08:00:00.000Z" }
+]
+```
+
+### C.7 The integration container: Docker descriptor and environment
+
+Complete `createContainer` descriptor (generated by `buildContainerDescriptor.js`, same format as the internal services' descriptors, e.g. `server/services/zigbee2mqtt/docker/*.json`):
+
+```json
+{
+  "name": "gladys-ext-john-gladys-open-meteo-demo",
+  "Image": "ghcr.io/john/gladys-open-meteo-demo:1.2.0",
+  "Labels": {
+    "io.gladysassistant.external-integration": "ext-john-gladys-open-meteo-demo"
+  },
+  "Env": [
+    "GLADYS_HOST_API_URL=http://172.30.0.1:80",
+    "GLADYS_INTEGRATION_TOKEN=<JWT>",
+    "GLADYS_INTEGRATION_SELECTOR=ext-john-gladys-open-meteo-demo",
+    "TZ=Europe/Paris"
+  ],
+  "HostConfig": {
+    "NetworkMode": "gladys-integrations",
+    "RestartPolicy": { "Name": "no" },
+    "ReadonlyRootfs": true,
+    "CapDrop": ["ALL"],
+    "SecurityOpt": ["no-new-privileges"],
+    "Memory": 268435456,
+    "MemorySwap": 268435456,
+    "NanoCpus": 500000000,
+    "PidsLimit": 100,
+    "Binds": ["/var/lib/gladysassistant/external-integrations/ext-john-gladys-open-meteo-demo:/data"],
+    "Tmpfs": { "/tmp": "rw,noexec,nosuid,size=64m" },
+    "LogConfig": { "Type": "json-file", "Config": { "max-size": "10m", "max-file": "2" } }
+  },
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}
+```
+
+Field-by-field justification:
+
+| Field | Value | Why |
+|---|---|---|
+| `name` | `gladys-<selector>` | findable/debuggable in `docker ps`; uniqueness guaranteed by the selector |
+| `Labels` | selector as the value | **reconciliation key** at boot and after backup/restore (B.2); also lets us find orphan containers of uninstalled integrations |
+| `NetworkMode` | `gladys-integrations` | dedicated bridge, `enable_icc=false` (B.2 networking) |
+| `RestartPolicy` | `no` | it is the **supervisor** that restarts (backoff + state machine); a Docker `always` policy would bypass it |
+| `ReadonlyRootfs` | `true` | only `/data` and `/tmp` are writable |
+| `CapDrop` | `ALL` | no Linux capabilities |
+| `SecurityOpt` | `no-new-privileges` | no escalation via setuid binaries |
+| `Memory`/`MemorySwap` | 256 MB (same values) | swap = memory ⇒ **no swap**; OOM kill → supervised restart |
+| `NanoCpus` | `500000000` (0.5 CPU) | an integration cannot starve Gladys on a Raspberry Pi; **omitted** when `docker info` reports `CPUCfsQuota: false` (e.g. Synology DSM kernels without the CFS scheduler), otherwise the daemon rejects the creation with an HTTP 400 |
+| `PidsLimit` | 100 | anti fork-bomb |
+| `Binds` | a single one: `<basePath>/external-integrations/<selector>:/data` | the integration's local persistence; survives container recreations, removed at uninstall; **precreated and handed to uid/gid 1000 by the supervisor** before every creation (non-recursive, best-effort — see B.2): Docker would create a missing source `root:root`, unwritable for `USER node` |
+| `Tmpfs /tmp` | `noexec,nosuid,64m` | scratch in RAM, no execution of dropped binaries |
+| `LogConfig` | json-file 10 MB × 2 | bounds the disk (logs are read via `docker logs`, see B.2); same values as Gladys's `docker run` |
+| `User` | *(not forced)* | the image chooses its user; the template sets `USER node` — forcing an arbitrary uid would break legitimate images; the `/data` ownership convention (uid/gid 1000, see `Binds`) follows that template convention, an image running as another non-root uid must manage `/data` permissions itself |
+
+**What is never granted, to any container**: no `Privileged`, no mounting of the Docker socket (additional containers go through the `containers` declaration + the `/container` API), no `NetworkMode: host`. The **main** container additionally has neither published ports nor devices (empty `ExposedPorts`/`PortBindings`/`Devices` — its inbound channel is the outbound WS): ports and hardware only exist on **sub-containers**, only as declared in the manifest and approved at install.
+
+**Sub-containers: descriptor.** Each `containers[]` entry of the manifest (C.1) produces a container `gladys-<selector>-<name>` with the **same lockdown** as the main one (`CapDrop ALL`, `no-new-privileges`, `RestartPolicy no`, `PidsLimit 100`, bounded `LogConfig`, `/tmp` tmpfs), with these differences:
+
+| Aspect | Sub-container |
+|---|---|
+| Network | **only** the private bridge `gladys-int-<selector>` (icc enabled, DNS alias = `name`); never `gladys-integrations` → no host API access |
+| Env | the manifest's static `env`, overridden by the `env` of `POST /container/:name/start` (C.3), + `TZ`; **no** `GLADYS_*` variable (no token — a sub-container has no Gladys identity) |
+| Volumes | each `volumes[]` entry → bind `<basePath>/external-integrations/<selector>/containers/<name><path>` — host path **derived by the supervisor**, never provided by the manifest; the main container sees them under its `/data/containers/<name>/...`; bind sources **precreated by the supervisor** (created folders owned by uid/gid 1000, root-owned existing folders repaired, other uids preserved — see B.2) |
+| Ports | `PortBindings` only for the declared `ports[]` — host port **chosen by Gladys** (free at first start, then persisted), bound to `0.0.0.0` (LAN access assumed and displayed at install, see B.14.8) |
+| Devices | `Devices` = intersection **requested (manifest) ∩ granted (`granted_devices`, UI toggles) ∩ present (detection)** — classes resolved by the supervisor: `coral-usb` → `/dev/bus/usb`, `coral-pcie` → `/dev/apex_*`, `gpu` → `/dev/dri`, `video` → `/dev/video*`; recomputed at every container creation |
+| Rootfs | `ReadonlyRootfs` per the manifest's `read_only` (default `true`) |
+| Limits | `Memory`/`MemorySwap` = `memory_mb` (default 256), `NanoCpus` = `cpu` (default 0.5, omitted like on the main container when the kernel has no CFS scheduler), `ShmSize` = `shm_mb` (default 64) — manifest values, displayed at install |
+| Labels | `io.gladysassistant.external-integration: <selector>` (same reconciliation key as the main one — a single filter catches the whole group) + `io.gladysassistant.container: <name>` |
+
+The private network `gladys-int-<selector>` is created at install and carries the same label — uninstall and boot-time reconciliation remove containers **and** network through the same filter.
+
+**Injected environment variables** (complete contract — nothing else is passed):
+
+| Variable | Example | Role |
+|---|---|---|
+| `GLADYS_HOST_API_URL` | `http://172.30.0.1:80` | base of the host API (C.2), no trailing slash; the WS URL derives from it (`http→ws`, same host/port). **Nominal value: `http://172.30.0.1:80`** — bridge gateway pinned via IPAM + `SERVER_PORT` (80 on the standard install). Degraded cases: subnet taken → auto-assigned gateway read via `inspectNetwork`; Gladys in bridge mode → DNS alias `http://gladys:<port>` (B.2 networking). **The integration must always read the variable**, never hardcode the URL — the variable is the contract, its value is only predictable for debugging |
+| `GLADYS_INTEGRATION_TOKEN` | JWT | REST auth (`Authorization: Bearer`) and WS auth (`authenticate.integration-request`); regenerated on **every recreation** of the container (`token_version++`, B.3) |
+| `GLADYS_INTEGRATION_SELECTOR` | `ext-john-gladys-open-meteo-demo` | the integration's selector, to build the `external_id`s (`ext:<selector>:...`) |
+| `TZ` | `Europe/Paris` | timezone configured in Gladys (system variable `TIMEZONE`), for consistent logs and crons |
+
+Container recreation (update, token regeneration, descriptor change) = destroy + create with the same `Binds`: `/data` is the container's only persistent memory, everything else is disposable by design.
+
+### C.8 JS SDK: public API of `@gladysassistant/integration-sdk`
+
+Complete example (the demo fits in ~40 lines):
+
+```js
+const { GladysIntegration } = require('@gladysassistant/integration-sdk');
+
+// All options are read from the container's env vars (C.7) by default;
+// they can be overridden for development outside Docker.
+const gladys = new GladysIntegration();
+
+gladys.onScanRequest(async () => {
+  await gladys.publishDiscoveredDevices([
+    {
+      name: 'Virtual switch',
+      external_id: gladys.externalId('switch'),
+      features: [
+        {
+          name: 'On/Off',
+          external_id: gladys.externalId('switch:binary'),
+          category: 'switch',
+          type: 'binary',
+          min: 0,
+          max: 1,
+          read_only: false,
+          has_feedback: true,
+          keep_history: true
+        }
+      ]
+    }
+  ]);
+});
+
+gladys.onSetValue(async (device, feature, value) => {
+  // resolving = ack success:true; throwing = ack success:false + message
+  await gladys.publishState(feature.external_id, value);
+});
+
+gladys.onConfigUpdated(async (config) => {
+  console.log('New config', config); // stdout → docker logs
+});
+
+await gladys.connect(); // resolves once authenticated
+```
+
+**Constructor** — `new GladysIntegration(options?)`: `hostApiUrl` (default `GLADYS_HOST_API_URL`), `token` (default `GLADYS_INTEGRATION_TOKEN`), `selector` (default `GLADYS_INTEGRATION_SELECTOR`). Throws immediately if a value is missing (neither option nor env var).
+
+**Methods** (all return Promises; HTTP errors are thrown as `GladysApiError { status, code, message }`):
+
+| Method | Contract |
+|---|---|
+| `connect()` | opens the WS, authenticates (`authenticate.integration-request`), **resynchronizes** (`GET /device` + `GET /config`, see C.4 reliability), then resolves. Automatic reconnection for life with backoff `min(1s·2^n, 60s)`; each reconnection redoes auth + resync |
+| `disconnect()` | closes cleanly (no more reconnection) |
+| `externalId(suffix)` | helper → `` `ext:${selector}:${suffix}` `` (the only documented way to build an `external_id`) |
+| `publishDiscoveredDevices(devices)` | `POST /discovered_device` (complete list, replaces the previous one — max 2000 devices, 20 MB body, see C.3) |
+| `getDevices()` | `GET /device` → devices created by the user; also updates `gladys.devices` |
+| `publishState(featureExternalId, value)` | `POST /state` — `value` number, or `{ text }`, or `{ state, created_at }` for a past state |
+| `publishStates(states)` | batch `POST /state` (max 100, see C.3) |
+| `publishCameraImage(deviceExternalId, imageBase64)` | `POST /camera/image` — a camera's new image (format `image/jpg;base64,...`, ≤ 150 KB, see C.3) |
+| `publishTransports(transports)` | batch `POST /device/transport` — `[{ external_id, transport: 'local' \| 'cloud' \| 'unreachable', degraded?, message? }]` (pills + degraded state, see C.3); the user preference arrives in `gladys.config.GLADYS_PREFER_LOCAL` |
+| `getConfig()` / `setConfig(partialConfig)` | `GET` / `POST /config`; `getConfig` also updates `gladys.config` |
+| `getStatus()` | `GET /status` |
+| `setConnectionStatus(connected, message?)` | `POST /connection_status` — application-level status displayed in the UI (C.3); optional multi-language `message` |
+| `getContainers()` | `GET /container` → declared sub-containers, state, desired state, assigned host ports (C.3) |
+| `startContainer(name, { env }?)` | `POST /container/:name/start` — typically after generating its config files in `/data` (the Mosquitto pattern, see B.2); optional `env` for values computed at runtime |
+| `stopContainer(name)` | `POST /container/:name/stop` — the supervisor will not restart it |
+| `restartContainer(name)` | `POST /container/:name/restart` — after rewriting its config via `/data` (the Frigate pattern, see B.2) |
+
+**Handlers** (registered before `connect()`; **automatic ack** for commands: the handler resolves → `command-result success:true` — and if the resolved value is not `undefined`, it goes into `data` (C.4) —, it throws → `success:false` with `error.message`, handler absent → `success:false "not implemented"`):
+
+| Handler | Callback signature |
+|---|---|
+| `onSetValue(cb)` | `(device, deviceFeature, value) => Promise` |
+| `onPoll(cb)` | `(device) => Promise` (respond by publishing the states via `publishState`) |
+| `onGetImage(cb)` | `(device) => Promise<string>` — capture and resolve a fresh image (`image/jpg;base64,...`); it goes into `data.image` (C.4, 15 s delay) |
+| `onScanRequest(cb)` | `() => Promise` (respond via `publishDiscoveredDevices`) |
+| `onDeviceCreated(cb)` / `onDeviceUpdated(cb)` / `onDeviceDeleted(cb)` | `(device) => Promise` |
+| `onConfigUpdated(cb)` | `(config) => Promise` (complete values, see C.4) |
+| `onHardwareUpdated(cb)` | `(containers) => Promise` — the hardware grants changed (C.4): regenerate the affected configs then `startContainer`/`restartContainer` |
+| `onOAuthAuthorizeUrl(cb)` | `(key, redirectUri) => Promise<string>` — build the authorization URL (client_id from the config, scopes, `state` generated and retained); the resolved string goes into `data.authorize_url` |
+| `onOAuthCallback(cb)` | `(key, { code, state, redirectUri }) => Promise` — verify `state`, exchange the tokens, store them via `setConfig` (keys outside the schema), then `setConnectionStatus(true)` |
+| `onAction(key, cb)` | `(fields) => Promise<string \| object>` — handler of a declared action (C.1), registered by `key`; the resolved value goes into `data.message` (the ack delay is the action's `timeout_seconds`) |
+
+**Local state held by the SDK** (refreshed on every (re)connection and by the `device-created/updated/deleted` and `config-updated` events): `gladys.devices` (array), `gladys.config` (object), `gladys.connected` (boolean). Observable lifecycle: `gladys.on('connected')`, `gladys.on('disconnected')` (the class extends `EventEmitter`) — useful to suspend a poll while Gladys is unreachable.
+
+**Behavior guarantees**: answers protocol-level WS pings (native to the `ws` lib); logs nothing by default (stdout belongs to the integration) except with `DEBUG=gladys-integration-sdk`; no state persisted to disk by the SDK (everything resynchronizes, `/data` stays in the integration's hands); an unknown message type is silently ignored (forward compatibility, see C.4).
+
+## Repo ecosystem
+
+The section C contracts decouple five repos; the `manifest.schema.json` has a **canonical owner: `GladysAssistant/integration-store`** (published on Pages next to the index), the monorepo embeds a vendored copy.
+
+| Repo | Role | Sections |
+|---|---|---|
+| `GladysAssistant/Gladys` (monorepo) | Supervisor, host API, WS, server-side store, frontend — **and this spec** | B.1–B.9, B.13, C.2–C.5, C.7 |
+| `GladysAssistant/integration-store` | Indexer (GitHub Action) + `index.json` on Pages; canonical manifest schema | B.9, C.1, C.6 |
+| `GladysAssistant/integration-sdk-js` | npm package `@gladysassistant/integration-sdk` — depends only on the C contracts, no monorepo import | B.10, C.8 |
+| `GladysAssistant/integration-template-js` | Official template repository + PoC of the e2e journey (published in the store as a third-party dev would) | B.11, C.1, C.7 |
+| `GladysAssistant/v4-website` | Public documentation fr + en (transposition of sections B/C — the spec remains the source of truth) | B.12 |
+
+## Verification
+
+1. `cd server && npm test` (100% patch coverage), `npm run compare-translations` on the frontend side, lint of both workspaces.
+2. **Manual e2e journey** (environment with the Docker socket): publish the `integration-template-js` template repo (B.11) as a third-party dev would (`gladys-assistant-integration` topic + `gladys-assistant-integration.json` at the root + multi-arch image pushed to a public registry) → wait for/trigger the indexing → the demo appears in the Gladys catalog with the "external" badge, **with no approval whatsoever** → one-click install (warning screen) → the card appears in the list with the "external" badge, status `Starting → Running` in real time → Configuration screen: latitude/longitude form generated from the `config_schema`, save → the integration receives `CONFIG_UPDATED` → the demo devices appear in the Discovery screen → creation from the UI → the integration receives `DEVICE_CREATED` and publishes its states, devices visible in the Devices screen and the dashboard → actuate the virtual switch (command received in the container logs, state republished) → `docker kill` of the container → `Degraded` status then auto restart → force 5 crashes → `Broken` status with visible logs and a restart button → bump `version` in the template repo's manifest → after re-indexing, "update available" badge → one-click update (new container, old JWT invalidated) → clean uninstall (container removed, `t_service` row destroyed, old JWT refused).
+3. Manual isolation test: call the host API with one integration's token on another's devices → 403/404; with a user access token → 401 (wrong audience); with a token of an old `token_version` after container recreation → 401.
+4. **Unicast LAN access test** (B.2 guarantee, vital for Tuya/Shelly & co): from an installed integration's container, reach a LAN IP in unicast (e.g. `wget -qO- http://<router-ip>` or a TCP connection to a device) → OK through the bridge NAT; redo the test with ufw enabled to document the FORWARD troubleshooting in the docs (B.12).
+5. **Manual multi-container test**: install (dev mode) a manifest declaring an `mqtt` sub-container (`eclipse-mosquitto` image, `start: "manual"`, one published port) and a hardware class (`gpu`) → the install screen lists the sub-container, its port, its limits, and the Hardware row with the detection state + toggle (leave it unchecked: `GET /container` shows `granted: false`, nothing is mounted; enable it later from the Configuration screen's Hardware section → sub-container recreated, the integration receives `hardware-updated`) → after install, private network `gladys-int-<selector>` created, `mqtt` **not started yet** → the main container writes the password file via `/data/containers/mqtt/` then `POST /container/mqtt/start` → broker started, reachable at `mqtt:1883` via DNS, assigned host port visible in `GET /container` and clickable in the supervision block → `docker kill` of the sub-container → restarted by the supervisor (desired state, backoff, `failure_count`) → `POST /container/mqtt/stop` → stays stopped (no auto restart) → uninstall → `docker ps -a` and `docker network ls` clean, port freed, data folder deleted.

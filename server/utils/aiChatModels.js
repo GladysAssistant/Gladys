@@ -22,14 +22,10 @@ const ALLOWED_SCALEWAY_MODELS = {
   [DEFAULT_VISION_MODEL]: { vision: true, priceTier: AI_CHAT_MODEL_PRICE_TIER.LOW },
   // Vision — image analysis (cameras, scene understanding)
   'qwen3.6-35b-a3b': { vision: true, priceTier: AI_CHAT_MODEL_PRICE_TIER.MEDIUM },
-  'pixtral-12b-2409': { vision: true, priceTier: AI_CHAT_MODEL_PRICE_TIER.LOW },
-  'gemma-3-27b-it': { vision: true, priceTier: AI_CHAT_MODEL_PRICE_TIER.LOW },
-  'holo2-30b-a3b': { vision: true, priceTier: AI_CHAT_MODEL_PRICE_TIER.LOW },
   // Premium vision — complex multimodal requests
   'qwen3.5-397b-a17b': { vision: true, priceTier: AI_CHAT_MODEL_PRICE_TIER.HIGH },
   // Text — richer reasoning for ambiguous or multi-step commands
-  'llama-3.3-70b-instruct': { vision: false, priceTier: AI_CHAT_MODEL_PRICE_TIER.MEDIUM },
-  'qwen3-235b-a22b-instruct-2507': { vision: false, priceTier: AI_CHAT_MODEL_PRICE_TIER.HIGH },
+  'glm-5.2': { vision: false, priceTier: AI_CHAT_MODEL_PRICE_TIER.HIGH },
 };
 
 /**

@@ -555,6 +555,24 @@ async function getAllTools(userId) {
           }),
         );
 
+        // An empty list is an ambiguous signal for the model, which tends to fill the
+        // gap with a plausible value. Say explicitly that nothing is configured.
+        if (states.length === 0) {
+          const typeLabel = deviceType && deviceType.length > 0 ? ` of type "${deviceType}"` : '';
+          const roomLabel = room && room !== '' ? ` in room "${room}"` : '';
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `device.get-state: no device${typeLabel} is configured${roomLabel}. ` +
+                  'No measurement exists for this query, do not report any value.',
+              },
+            ],
+          };
+        }
+
         return {
           content: [
             {
@@ -1228,6 +1246,9 @@ async function getAllTools(userId) {
           'of an energy monitoring device over a date range. ' +
           'Dates are inclusive: for a single day use the same start_date and end_date, ' +
           'for a full month use the first and last day of the month. ' +
+          'A day past the end of its month (for example 2026-02-30) is clamped to the last day of that month. ' +
+          'To cover several months or a whole year, make a single call over the whole range with group_by month ' +
+          'instead of one call per month. ' +
           'The result contains the total over the period and the detail per group_by period. ' +
           'In currency mode, a separate home_subscription entry may be present: it is the fixed subscription cost ' +
           'of the whole home electricity contract, and is not part of the device consumption cost.',
@@ -1254,18 +1275,36 @@ async function getAllTools(userId) {
         },
       },
       cb: async ({ device, start_date: startDate, end_date: endDate, unit, group_by: groupBy }) => {
+        const DAYS_PER_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+
         const parseDateInput = (value) => {
           if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
             return null;
           }
           const [year, month, day] = value.split('-').map(Number);
-          // Reject calendar-invalid dates (2026-02-30, 2026-13-01) that the
-          // Date constructor would silently roll over to another day.
-          const date = new Date(year, month - 1, day);
-          if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+          if (month < 1 || month > 12 || day < 1 || day > 31) {
             return null;
           }
-          return { year, month, day };
+          // "Last day of February" is a date a model has to compute, and it gets it
+          // wrong on non-leap years (2026-02-29) or on 30-day months (2026-04-31).
+          // That intent is unambiguous, so clamp to the end of the month instead of
+          // failing: the Date constructor would silently roll over to the next month.
+          const lastDayOfMonth = month === 2 && isLeapYear(year) ? 29 : DAYS_PER_MONTH[month - 1];
+          return { year, month, day: Math.min(day, lastDayOfMonth) };
+        };
+
+        const formatDateInput = ({ year, month, day }) =>
+          `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+        // new Date(year, ...) maps years 0 to 99 to 1900 to 1999, so a 4-digit year
+        // below 0100 would query a period two millennia away from the one asked for.
+        // Setting the year explicitly keeps it, and still rolls the day over the
+        // month boundary as the exclusive end date needs.
+        const createLocalDate = ({ year, month, day }) => {
+          const date = new Date(2000, 0, 1);
+          date.setFullYear(year, month - 1, day);
+          return date;
         };
 
         const parsedStart = parseDateInput(startDate);
@@ -1275,7 +1314,9 @@ async function getAllTools(userId) {
             content: [
               {
                 type: 'text',
-                text: 'device.get-energy-consumption: start_date and end_date must be valid dates in YYYY-MM-DD format',
+                text:
+                  'device.get-energy-consumption: start_date and end_date must be in YYYY-MM-DD format, ' +
+                  'with a month between 01 and 12 and a day between 01 and 31',
               },
             ],
           };
@@ -1317,8 +1358,8 @@ async function getAllTools(userId) {
         }
 
         // Same date boundaries as the energy dashboard: local midnight, end exclusive.
-        const from = new Date(parsedStart.year, parsedStart.month - 1, parsedStart.day);
-        const to = new Date(parsedEnd.year, parsedEnd.month - 1, parsedEnd.day + 1);
+        const from = createLocalDate(parsedStart);
+        const to = createLocalDate({ ...parsedEnd, day: parsedEnd.day + 1 });
         if (!(from < to)) {
           return {
             content: [
@@ -1348,8 +1389,10 @@ async function getAllTools(userId) {
           device: selectedDevice.name,
           feature: selectedFeature.name,
           unit: displayMode === 'currency' ? deviceResult?.deviceFeature?.currency_unit || 'currency' : 'kWh',
-          start_date: startDate,
-          end_date: endDate,
+          // Echo the effective period, not the raw input: a clamped date must not be
+          // reported back as the day the caller asked for.
+          start_date: formatDateInput(parsedStart),
+          end_date: formatDateInput(parsedEnd),
           group_by: groupBy || 'day',
           total: roundValue(deviceValues.reduce((acc, value) => acc + value.sum_value, 0)),
           values: deviceValues.map((value) => ({

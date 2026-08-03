@@ -93,18 +93,40 @@ class LinkGatewayUser extends Component {
     await Promise.all([this.props.getUsers(), this.getSetupState()]);
     await this.checkIfGladysUserIsLinkedToExistingUser();
   };
+  retry = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState({ error: false, errorNotAcceptedLocally: false, retrying: true });
+    try {
+      await this.init();
+    } catch (err) {
+      console.error(err);
+      this.setState({ error: true });
+    } finally {
+      this.setState({ retrying: false });
+    }
+  };
   componentWillMount() {
     this.init();
   }
-  render(props, { savingUserLoading, error, errorNotAcceptedLocally }) {
+  render(props, { savingUserLoading, error, errorNotAcceptedLocally, retrying }) {
     const loading = savingUserLoading || props.usersGetStatus === RequestStatus.Getting;
+    // While retrying, we keep displaying the step-by-step guide (under the loading
+    // dimmer) instead of flashing the user-select form during the "Getting" state.
+    const usersGetStatus =
+      retrying && props.usersGetStatus === RequestStatus.Getting
+        ? RequestStatus.GatewayNoInstanceFound
+        : props.usersGetStatus;
     return (
       <LinkGatewayUserPage
         {...props}
+        usersGetStatus={usersGetStatus}
         error={error}
         errorNotAcceptedLocally={errorNotAcceptedLocally}
         selectUser={this.selectUser}
         saveUser={this.saveUser}
+        retry={this.retry}
         loading={loading}
         openStripeBilling={this.openStripeBilling}
         logout={this.logout}

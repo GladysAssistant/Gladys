@@ -138,6 +138,7 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
     },
     deviceFeature: {
       name: deviceFeature.name,
+      unit: deviceFeature.unit,
     },
     values,
   };

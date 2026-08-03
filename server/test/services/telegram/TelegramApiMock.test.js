@@ -12,6 +12,7 @@ TelegramApiMock.prototype.getMe = fake.resolves({
   username: 'faketelegrambot',
 });
 
+TelegramApiMock.prototype.stopPolling = fake.resolves(null);
 TelegramApiMock.prototype.sendMessage = fake.resolves(null);
 TelegramApiMock.prototype.sendPhoto = fake.resolves(null);
 

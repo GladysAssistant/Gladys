@@ -1,0 +1,91 @@
+name: Create release tag
+run-name: Create ${{ inputs.release_type }} release tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type of version bump'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+
+permissions:
+  contents: write
+  # Needed to dispatch the release workflows on the new tag.
+  actions: write
+
+# Two overlapping runs would bump from the same tip and race on the same tag.
+concurrency:
+  group: create-release-tag
+  cancel-in-progress: false
+
+jobs:
+  create-release-tag:
+    name: Bump version and push tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛑 Ensure workflow runs on master
+        if: github.ref != 'refs/heads/master'
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          echo "::error::This workflow can only be run on master, got ${REF_NAME}."
+          exit 1
+      - name: ⬇️ Checkout Gladys code
+        uses: actions/checkout@v4
+        with:
+          # Always release from the current tip of master, not from the commit
+          # master pointed at when the workflow was dispatched.
+          ref: master
+          fetch-depth: 0
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: './package.json'
+      - name: 🔧 Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: 🔖 Bump version and create tag
+        id: bump
+        env:
+          RELEASE_TYPE: ${{ inputs.release_type }}
+        run: |
+          NEW_VERSION=$(npm version "${RELEASE_TYPE}")
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Created tag ${NEW_VERSION}"
+      - name: 🚀 Push commit and tag
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          git push --atomic origin master "refs/tags/${NEW_VERSION}"
+      - name: 🎬 Trigger the release workflows
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          NEW_VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          # A tag pushed with the default GITHUB_TOKEN does not trigger the
+          # workflows listening on `push: tags`, so they are dispatched explicitly
+          # on the new tag. workflow_dispatch is one of the two events GitHub does
+          # start from a GITHUB_TOKEN, which is why no PAT is needed here.
+          for workflow in docker-release-build.yml build-demo-website.yml build-apidoc-documentation.yml; do
+            echo "Triggering ${workflow} on ${NEW_VERSION}"
+            gh workflow run "${workflow}" --ref "${NEW_VERSION}"
+          done
+      - name: 📝 Job summary
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.version }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
+        run: |
+          {
+            echo "### 🚀 Release ${NEW_VERSION} created"
+            echo ""
+            echo "- Bump type: \`${RELEASE_TYPE}\`"
+            echo "- Tag: [\`${NEW_VERSION}\`](${{ github.server_url }}/${{ github.repository }}/releases/tag/${NEW_VERSION})"
+            echo "- Release workflows dispatched on the tag: production images, demo website, apidoc"
+          } >> "$GITHUB_STEP_SUMMARY"
