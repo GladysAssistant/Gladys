@@ -228,8 +228,8 @@
     "label": "Bird"
   },
   "blinds": {
-    "keywords": "blind window",
-    "label": "Roller shutter"
+    "keywords": "roller shutter venetian window shade",
+    "label": "Blinds"
   },
   "bluetooth": {
     "keywords": "wireless",
@@ -272,7 +272,7 @@
     "label": "Brain"
   },
   "brick-wall": {
-    "keywords": "",
+    "keywords": "wall masonry fence brick",
     "label": "Brick wall"
   },
   "briefcase": {
@@ -410,18 +410,6 @@
   "circle": {
     "keywords": "round shape",
     "label": "Circle"
-  },
-  "circle-alert": {
-    "keywords": "warning error attention",
-    "label": "Alert (circle)"
-  },
-  "circle-check-big": {
-    "keywords": "done success ok confirmed",
-    "label": "Check (large circle)"
-  },
-  "circle-help": {
-    "keywords": "question support faq",
-    "label": "Help (circle)"
   },
   "clapperboard": {
     "keywords": "movie film video",
@@ -860,16 +848,12 @@
     "label": "History"
   },
   "home": {
-    "keywords": "house main dashboard",
+    "keywords": "house main dashboard dwelling building",
     "label": "Home"
   },
   "hourglass": {
     "keywords": "wait time duration",
     "label": "Hourglass"
-  },
-  "house": {
-    "keywords": "home building dwelling",
-    "label": "House"
   },
   "ice-cream-cone": {
     "keywords": "dessert summer cold",
@@ -994,10 +978,6 @@
   "lock-keyhole": {
     "keywords": "locked secure key",
     "label": "Lock (keyhole)"
-  },
-  "lock-open": {
-    "keywords": "unlocked",
-    "label": "Lock open"
   },
   "log-in": {
     "keywords": "sign enter connect",
@@ -1142,10 +1122,6 @@
   "octagon": {
     "keywords": "shape stop",
     "label": "Octagon"
-  },
-  "octagon-alert": {
-    "keywords": "warning stop danger",
-    "label": "Alert (octagon)"
   },
   "package": {
     "keywords": "box delivery parcel",
@@ -1703,10 +1679,6 @@
     "keywords": "shape",
     "label": "Triangle"
   },
-  "triangle-alert": {
-    "keywords": "warning caution danger",
-    "label": "Alert (triangle)"
-  },
   "truck": {
     "keywords": "delivery transport lorry",
     "label": "Truck"
@@ -1740,7 +1712,7 @@
     "label": "Underline"
   },
   "unlock": {
-    "keywords": "open unsecure",
+    "keywords": "open unsecure lock unlocked",
     "label": "Unlock"
   },
   "unplug": {

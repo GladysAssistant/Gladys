@@ -228,8 +228,8 @@
     "label": "Oiseau"
   },
   "blinds": {
-    "keywords": "store fenêtre persienne",
-    "label": "Volet roulant"
+    "keywords": "volet roulant store jalousie fenêtre",
+    "label": "Persienne"
   },
   "bluetooth": {
     "keywords": "sans fil",
@@ -410,18 +410,6 @@
   "circle": {
     "keywords": "rond forme",
     "label": "Cercle"
-  },
-  "circle-alert": {
-    "keywords": "erreur attention",
-    "label": "Alerte (cercle plein)"
-  },
-  "circle-check-big": {
-    "keywords": "succès confirmé terminé",
-    "label": "Validé (grand cercle)"
-  },
-  "circle-help": {
-    "keywords": "question support faq",
-    "label": "Aide (cercle)"
   },
   "clapperboard": {
     "keywords": "film vidéo tournage",
@@ -860,16 +848,12 @@
     "label": "Historique"
   },
   "home": {
-    "keywords": "accueil domicile principal",
+    "keywords": "accueil domicile principal logement habitation",
     "label": "Maison"
   },
   "hourglass": {
     "keywords": "attente durée temps",
     "label": "Sablier"
-  },
-  "house": {
-    "keywords": "logement domicile habitation",
-    "label": "Maison"
   },
   "ice-cream-cone": {
     "keywords": "dessert été froid cornet",
@@ -994,10 +978,6 @@
   "lock-keyhole": {
     "keywords": "verrou fermé sécurité clé",
     "label": "Serrure"
-  },
-  "lock-open": {
-    "keywords": "déverrouillé",
-    "label": "Serrure ouverte"
   },
   "log-in": {
     "keywords": "entrer se connecter",
@@ -1142,10 +1122,6 @@
   "octagon": {
     "keywords": "forme stop",
     "label": "Octogone"
-  },
-  "octagon-alert": {
-    "keywords": "danger stop",
-    "label": "Alerte (octogone)"
   },
   "package": {
     "keywords": "colis boîte livraison",
@@ -1703,10 +1679,6 @@
     "keywords": "forme",
     "label": "Triangle"
   },
-  "triangle-alert": {
-    "keywords": "danger avertissement",
-    "label": "Attention (triangle)"
-  },
   "truck": {
     "keywords": "livraison transport",
     "label": "Camion"
@@ -1740,7 +1712,7 @@
     "label": "Souligné"
   },
   "unlock": {
-    "keywords": "déverrouillé",
+    "keywords": "déverrouillé serrure",
     "label": "Cadenas ouvert"
   },
   "unplug": {

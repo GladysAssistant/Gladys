@@ -228,8 +228,8 @@
     "label": "Vogel"
   },
   "blinds": {
-    "keywords": "Jalousie Fenster",
-    "label": "Rollladen"
+    "keywords": "Rollladen Fenster Sonnenschutz",
+    "label": "Jalousie"
   },
   "bluetooth": {
     "keywords": "drahtlos",
@@ -410,18 +410,6 @@
   "circle": {
     "keywords": "rund Form",
     "label": "Kreis"
-  },
-  "circle-alert": {
-    "keywords": "Fehler Achtung",
-    "label": "Warnung (Kreis)"
-  },
-  "circle-check-big": {
-    "keywords": "Erfolg erledigt",
-    "label": "Bestätigt (Kreis)"
-  },
-  "circle-help": {
-    "keywords": "Frage Support",
-    "label": "Hilfe (Kreis)"
   },
   "clapperboard": {
     "keywords": "Kino Film Video",
@@ -860,16 +848,12 @@
     "label": "Verlauf"
   },
   "home": {
-    "keywords": "Haus Startseite",
+    "keywords": "Haus Startseite Gebäude Wohnung",
     "label": "Zuhause"
   },
   "hourglass": {
     "keywords": "warten Dauer",
     "label": "Sanduhr"
-  },
-  "house": {
-    "keywords": "Gebäude Wohnung",
-    "label": "Haus"
   },
   "ice-cream-cone": {
     "keywords": "Nachtisch Sommer",
@@ -994,10 +978,6 @@
   "lock-keyhole": {
     "keywords": "verschlossen Sicherheit",
     "label": "Schloss mit Loch"
-  },
-  "lock-open": {
-    "keywords": "entsperrt",
-    "label": "Schloss offen"
   },
   "log-in": {
     "keywords": "eintreten verbinden",
@@ -1142,10 +1122,6 @@
   "octagon": {
     "keywords": "Form Stopp",
     "label": "Achteck"
-  },
-  "octagon-alert": {
-    "keywords": "Gefahr Stopp",
-    "label": "Warnung (Achteck)"
   },
   "package": {
     "keywords": "Karton Lieferung",
@@ -1703,10 +1679,6 @@
     "keywords": "Form",
     "label": "Dreieck"
   },
-  "triangle-alert": {
-    "keywords": "Gefahr Warnung",
-    "label": "Achtung (Dreieck)"
-  },
   "truck": {
     "keywords": "Lieferung Transport",
     "label": "Lastwagen"
@@ -1740,7 +1712,7 @@
     "label": "Unterstrichen"
   },
   "unlock": {
-    "keywords": "entsperrt",
+    "keywords": "entsperrt Riegel aufgeschlossen",
     "label": "Schloss offen"
   },
   "unplug": {
