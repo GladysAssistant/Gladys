@@ -16,7 +16,11 @@ A category (and its types) must describe **what a device does**, not who makes i
 
 **Litmus test:** would a device from a completely different brand, with the same capability, naturally use this exact category and these exact types? If the answer is "no, this only makes sense for brand X's device", the category is too specific.
 
-### 2. Categories must group protocols — standards as the reference, not the ceiling
+### 2. One physical quantity, one category — whatever device measures it
+
+A category represents a quantity or capability, never the device that happens to measure it. The same physical quantity must not be split across categories depending on the measuring hardware: grid import/export is the same measurement whether it comes from a plug-in battery's grid port, an EM clamp, or a whole-home meter — they all publish to `grid-sensor`. If a category's definition depends on which device reports the value, the same data ends up scattered across several categories, and every future cross-device feature (auto-built energy dashboards, room aggregations…) has to special-case them all.
+
+### 3. Categories must group protocols — standards as the reference, not the ceiling
 
 A Gladys category should be able to represent the same capability coming from **several protocols**. When designing a new category or type, check how established smart-home standards model that capability, in this priority order:
 
@@ -32,15 +36,17 @@ Standards are the reference, **not a veto**. Matter has real gaps and lags behin
 
 What remains unacceptable is a category whose semantics are a copy of a **single proprietary API**: being absent from Matter is not a blocker, but being modeled on one brand is.
 
-### 3. Reuse before creating
+### 4. Reuse before creating
 
 Before adding a category or type, check the existing list in `server/utils/constants.js`. If an existing category + type combination covers the capability — even under a different name than the integration's native vocabulary — **map to the existing one** instead of creating a new one. A new category is justified only when no existing category can represent the capability without distorting its meaning.
 
-### 4. Right granularity
+### 5. Right granularity — intrinsic metrics only
 
 A device feature holds **one atomic value**: one measurement (a sensor reading) or one control (a command/state). Types within a category are the different atomic values that capability can expose (e.g. `light` → `binary`, `brightness`, `temperature`). Do not create a category that bundles several unrelated values, and do not create a new category when only a new type on an existing category is needed.
 
-### 5. Model the full capability — declare per-device support with `supported_options`
+A category also covers only the metrics **intrinsic** to its capability. Real products often report values belonging to other subsystems (a storage battery's API may expose PV production, grid exchange, and home output) — a Gladys device simply exposes features from several categories, one per capability. Shaping a single category around everything one product family reports is how brand-specific contracts sneak in: `battery-storage` was initially proposed with 17 types mirroring one vendor's telemetry, and was narrowed down to the six metrics intrinsic to storage (level, charge/discharge power and indexes, remaining energy), the rest going to the existing energy categories.
+
+### 6. Model the full capability — declare per-device support with `supported_options`
 
 For enum-like features (modes, fan speeds, swing positions, button click types…), the category/type defines the **full generic set of values** the capability can have (e.g. `AC_MODE`), never the subset one brand happens to implement.
 
@@ -48,18 +54,21 @@ Real devices rarely support the whole set: an air conditioner may only do cool +
 
 Consequence for reviews: "brand X only supports 3 of the 5 modes" is **never** a reason to create a narrower category, a brand-specific type, or a stripped-down enum. Keep the generic value set and let the integration declare what each device supports. The air-conditioning features are the reference example: the Matter service builds the `supported_options` of the AC mode feature from the Thermostat cluster's capability flags (heating/cooling/autoMode).
 
-### 6. Naming conventions
+### 7. Naming conventions — renaming is the costly mistake
 
 - Values are **kebab-case** (`co2-sensor`, `energy-production-sensor`).
 - Read-only measurement categories use the `*-sensor` suffix.
-- Names are in **English** and use the standard's vocabulary when one exists (see rule 2).
+- Names are in **English** and use the standard's vocabulary when one exists (see rule 3).
 - No protocol name inside a category/type name: the taxonomy is protocol-agnostic by definition.
 
-### 7. Full plumbing is part of the change
+Adding a type to an existing category later is non-breaking; renaming a category or changing its semantics after integrations have published it is. Review effort should therefore concentrate on **names and semantics**: stress-test them against the neighboring and future device classes that will use the category (for an energy category: hybrid inverters, micro-inverters, EM clamps / P1 meters, plug-in batteries…), not only against the device that motivates the PR. A category that would need renaming to fit the next device class is not ready to merge; a category that only needs more types later is fine.
+
+### 8. Full plumbing is part of the change
 
 Adding a category or type is not just a constant. The same PR must include:
 
 - the entry in `server/utils/constants.js` (`DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES`);
+- an **inline comment on the new constant** defining the category's scope, its boundary with neighboring categories (e.g. `home-output-sensor` = power the device itself delivers to the installation it feeds; house consumption measured by an inverter goes to `energy-sensor`), and its value conventions — sign, direction, non-negative semantics. When both a signed type and split input/output types exist, state that an integration maps whichever form its device natively reports, never both for the same measurement. Without this comment, the first integration that stretches the category's meaning wins by default;
 - translations in **all** `front/src/config/i18n/*.json` files (`npm run compare-translations` enforces this);
 - the allowed units in `DEVICE_FEATURE_UNITS_BY_CATEGORY` when the category is a measurement — and in `DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE` when units differ by type within the category;
 - front display support (icon, feature edition/display components) where relevant;
@@ -74,10 +83,14 @@ For any PR touching `DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES`:
 
 - [ ] No brand, product, or vendor-ecosystem name in category/type names or semantics.
 - [ ] The capability could not be mapped onto an existing category + type.
+- [ ] The same physical quantity is not split across categories depending on which device measures it.
+- [ ] Types are intrinsic to the capability; other values the product reports go to their own categories on the same device.
 - [ ] The Matter model (then Zigbee) was checked; semantics align with the standard by default, and any divergence from an existing standard model is justified in the PR.
 - [ ] If no standard covers the capability, the PR shows the category is generic (several brands/protocols would map onto it) and not modeled on a single proprietary API.
 - [ ] Enum-like types expose the full generic value set; per-device subsets go through `supported_options`, not through a narrowed category or type.
 - [ ] Naming follows the conventions above (kebab-case, `*-sensor` suffix, English, no protocol name).
+- [ ] Names and semantics stress-tested against neighboring and future device classes (a later rename is breaking; adding types later is not).
+- [ ] The new constant carries an inline scope comment: boundary with neighboring categories and value conventions (sign/direction, signed vs split input/output).
 - [ ] Translations added to all i18n language files (including `deviceFeatureValue` keys for enumerated values, where relevant).
 - [ ] Units declared in `DEVICE_FEATURE_UNITS_BY_CATEGORY` if the category is a measurement (and in `DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE` when units are type-specific).
 - [ ] MQTT feature defaults (`front/src/routes/integration/all/mqtt/device-page/utils.js`) and history grouping (`front/src/routes/history/categoryGroups.js`) updated where relevant.
