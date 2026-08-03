@@ -1437,7 +1437,62 @@ describe('build schemas', () => {
       unit: 'kwh',
       group_by: 'hour',
     });
-    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([{ date: '2026-07-12 08:00', value: 0.5 }]);
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([{ date: '2026-07-12 08:00+02:00', value: 0.5 }]);
+
+    // Night a timezone falls back: both buckets are 02:00 on the Paris clock, so the
+    // offset is what keeps them from collapsing into one duplicated date.
+    getConsumptionByDates.resetHistory();
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [
+          { created_at: new Date('2025-10-26T00:00:00.000Z'), value: 1, sum_value: 0.3 },
+          { created_at: new Date('2025-10-26T01:00:00.000Z'), value: 1, sum_value: 0.4 },
+        ],
+      },
+    ]);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2025-10-26',
+      end_date: '2025-10-26',
+      unit: 'kwh',
+      group_by: 'hour',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([
+      { date: '2025-10-26 02:00+02:00', value: 0.3 },
+      { date: '2025-10-26 02:00+01:00', value: 0.4 },
+    ]);
+
+    // A home sitting at UTC: longOffset reads plain "GMT" there, still report +00:00.
+    mcpHandler.gladys.variable.getValue.resolves('UTC');
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [{ created_at: new Date('2026-01-01T00:00:00.000Z'), value: 1, sum_value: 0.7 }],
+      },
+    ]);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-01-01',
+      end_date: '2026-01-01',
+      unit: 'kwh',
+      group_by: 'hour',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].timezone).to.eq('UTC');
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([{ date: '2026-01-01 00:00+00:00', value: 0.7 }]);
+    mcpHandler.gladys.variable.getValue.callsFake((name) =>
+      Promise.resolve(name === SYSTEM_VARIABLE_NAMES.TIMEZONE ? 'Europe/Paris' : null),
+    );
 
     getConsumptionByDates.resolves([
       {

@@ -1,7 +1,4 @@
 const z = require('zod/v4');
-const dayjs = require('dayjs');
-const dayjsUtc = require('dayjs/plugin/utc');
-const dayjsTimezone = require('dayjs/plugin/timezone');
 const {
   SYSTEM_VARIABLE_NAMES,
   DEVICE_FEATURE_CATEGORIES,
@@ -21,9 +18,6 @@ const {
 } = require('./sceneSchemas');
 const { fetchWebPage } = require('./webRequest');
 const { compareTimes } = require('./compareTimes');
-
-dayjs.extend(dayjsUtc);
-dayjs.extend(dayjsTimezone);
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
 
@@ -1404,18 +1398,42 @@ async function getAllTools(userId) {
         // 2026-01-01 in Paris reads back as 2025-12-31T23:00:00Z. Format in that same
         // timezone, at the granularity that was grouped by, so the label always matches
         // the bucket DuckDB built.
+        // Intl rather than dayjs here: the dayjs timezone plugin resolves the offset of
+        // an ambiguous local hour wrongly when the process runs in the target zone. It
+        // reports +00:00 for the second 02:00 of a Paris fall-back night, which is the
+        // one case the offset below exists to disambiguate.
+        const bucketDateFormat = new Intl.DateTimeFormat('en-US', {
+          timeZone: timezoneName,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hourCycle: 'h23',
+          timeZoneName: 'longOffset',
+        });
+
         const formatBucketDate = (bucketDate) => {
-          const date = dayjs(bucketDate).tz(timezoneName);
+          const parts = Object.fromEntries(
+            bucketDateFormat.formatToParts(new Date(bucketDate)).map(({ type, value }) => [type, value]),
+          );
           switch (effectiveGroupBy) {
             case 'year':
-              return date.format('YYYY');
+              return parts.year;
             case 'month':
-              return date.format('YYYY-MM');
+              return `${parts.year}-${parts.month}`;
+            // The offset keeps hourly labels unique on the night a timezone falls back:
+            // in Paris, 2025-10-26T00:00Z and 2025-10-26T01:00Z are two different
+            // buckets that are both 02:00 on the local clock. longOffset always reads
+            // "GMT±HH:mm", including "GMT+00:00" for a home sitting at UTC.
             case 'hour':
-              return date.format('YYYY-MM-DD HH:00');
+              return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:00${parts.timeZoneName.replace(
+                'GMT',
+                '',
+              )}`;
             // 'day' and 'week' are both a calendar day, the start of the bucket.
             default:
-              return date.format('YYYY-MM-DD');
+              return `${parts.year}-${parts.month}-${parts.day}`;
           }
         };
 
