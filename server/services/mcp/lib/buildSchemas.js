@@ -1,4 +1,7 @@
 const z = require('zod/v4');
+const dayjs = require('dayjs');
+const dayjsUtc = require('dayjs/plugin/utc');
+const dayjsTimezone = require('dayjs/plugin/timezone');
 const {
   SYSTEM_VARIABLE_NAMES,
   DEVICE_FEATURE_CATEGORIES,
@@ -18,6 +21,11 @@ const {
 } = require('./sceneSchemas');
 const { fetchWebPage } = require('./webRequest');
 const { compareTimes } = require('./compareTimes');
+
+dayjs.extend(dayjsUtc);
+dayjs.extend(dayjsTimezone);
+
+const DEFAULT_TIMEZONE = 'Europe/Paris';
 
 const noRoom = {
   id: null,
@@ -1372,6 +1380,8 @@ async function getAllTools(userId) {
         }
 
         const effectiveGroupBy = groupBy || 'day';
+        const configuredTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+        const timezoneName = configuredTimezone || DEFAULT_TIMEZONE;
 
         const results = await this.gladys.device.energySensorManager.getConsumptionByDates([selectedFeature.selector], {
           from,
@@ -1387,27 +1397,25 @@ async function getAllTools(userId) {
         const roundValue = (value) => Number(value.toFixed(decimalPlaces));
         const deviceValues = deviceResult?.values ?? [];
 
-        // DuckDB truncates the TIMESTAMPTZ buckets in the local timezone, so a bucket
-        // is local midnight. Serialized as a UTC instant, local 2026-01-01 in Paris
-        // reads back as 2025-12-31T23:00:00Z and every month of the answer is labelled
-        // one month early. Report the local calendar date instead, at the granularity
-        // that was grouped by, so there is no offset left for the model to misread.
+        // DuckDB truncates the TIMESTAMPTZ buckets in the timezone set on its
+        // connection, which system.setDuckDbTimezone takes from the TIMEZONE variable.
+        // A monthly bucket is therefore midnight on the 1st in the home timezone, and
+        // serializing it as a UTC instant labels it one month early east of Greenwich:
+        // 2026-01-01 in Paris reads back as 2025-12-31T23:00:00Z. Format in that same
+        // timezone, at the granularity that was grouped by, so the label always matches
+        // the bucket DuckDB built.
         const formatBucketDate = (bucketDate) => {
-          const date = new Date(bucketDate);
-          const year = String(date.getFullYear()).padStart(4, '0');
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const day = String(date.getDate()).padStart(2, '0');
-          const hour = String(date.getHours()).padStart(2, '0');
+          const date = dayjs(bucketDate).tz(timezoneName);
           switch (effectiveGroupBy) {
             case 'year':
-              return year;
+              return date.format('YYYY');
             case 'month':
-              return `${year}-${month}`;
+              return date.format('YYYY-MM');
             case 'hour':
-              return `${year}-${month}-${day} ${hour}:00`;
+              return date.format('YYYY-MM-DD HH:00');
             // 'day' and 'week' are both a calendar day, the start of the bucket.
             default:
-              return `${year}-${month}-${day}`;
+              return date.format('YYYY-MM-DD');
           }
         };
 
@@ -1420,6 +1428,7 @@ async function getAllTools(userId) {
           start_date: formatDateInput(parsedStart),
           end_date: formatDateInput(parsedEnd),
           group_by: effectiveGroupBy,
+          timezone: timezoneName,
           total: roundValue(deviceValues.reduce((acc, value) => acc + value.sum_value, 0)),
           values: deviceValues.map((value) => ({
             date: formatBucketDate(value.created_at),

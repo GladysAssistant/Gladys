@@ -1109,7 +1109,9 @@ describe('build schemas', () => {
           selector: 'prise-onduleur-thirty-minutes-consumption',
           currency_unit: null,
         },
-        values: [{ created_at: new Date(2026, 6, 12), value: 0.05, sum_value: 2.345678, count_value: 48 }],
+        values: [
+          { created_at: new Date('2026-07-11T22:00:00.000Z'), value: 0.05, sum_value: 2.345678, count_value: 48 },
+        ],
       },
     ]);
 
@@ -1136,6 +1138,11 @@ describe('build schemas', () => {
         },
         house: {
           get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]),
+        },
+        variable: {
+          getValue: stub().callsFake((name) =>
+            Promise.resolve(name === SYSTEM_VARIABLE_NAMES.TIMEZONE ? 'Europe/Paris' : null),
+          ),
         },
         calendar: {
           get: stub().resolves([]),
@@ -1202,6 +1209,7 @@ describe('build schemas', () => {
       start_date: '2026-07-12',
       end_date: '2026-07-12',
       group_by: 'day',
+      timezone: 'Europe/Paris',
       total: 2.346,
       values: [{ date: '2026-07-12', value: 2.346 }],
     });
@@ -1218,8 +1226,8 @@ describe('build schemas', () => {
           is_subscription: true,
         },
         values: [
-          { created_at: new Date(2026, 5, 1), value: 0.42, sum_value: 0.42 },
-          { created_at: new Date(2026, 5, 2), value: 0.42, sum_value: 0.42 },
+          { created_at: new Date('2026-05-31T22:00:00.000Z'), value: 0.42, sum_value: 0.42 },
+          { created_at: new Date('2026-06-01T22:00:00.000Z'), value: 0.42, sum_value: 0.42 },
         ],
       },
       {
@@ -1230,8 +1238,8 @@ describe('build schemas', () => {
           currency_unit: 'euro',
         },
         values: [
-          { created_at: new Date(2026, 5, 1), value: 0.1, sum_value: 1.234567 },
-          { created_at: new Date(2026, 5, 2), value: 0.1, sum_value: 2.1 },
+          { created_at: new Date('2026-05-31T22:00:00.000Z'), value: 0.1, sum_value: 1.234567 },
+          { created_at: new Date('2026-06-01T22:00:00.000Z'), value: 0.1, sum_value: 2.1 },
         ],
       },
     ]);
@@ -1258,6 +1266,7 @@ describe('build schemas', () => {
       start_date: '2026-06-01',
       end_date: '2026-06-30',
       group_by: 'day',
+      timezone: 'Europe/Paris',
       total: 3.33,
       values: [
         { date: '2026-06-01', value: 1.23 },
@@ -1354,7 +1363,7 @@ describe('build schemas', () => {
           selector: 'prise-onduleur-thirty-minutes-consumption',
           currency_unit: null,
         },
-        values: [{ created_at: new Date(2026, 1, 1), value: 12, sum_value: 12 }],
+        values: [{ created_at: new Date('2026-01-31T23:00:00.000Z'), value: 12, sum_value: 12 }],
       },
     ]);
     const clampedFebruaryResult = await energyTool.cb({
@@ -1389,9 +1398,9 @@ describe('build schemas', () => {
           currency_unit: null,
         },
         values: [
-          { created_at: new Date(2026, 0, 1), value: 1, sum_value: 118.247 },
-          { created_at: new Date(2026, 1, 1), value: 1, sum_value: 121.17 },
-          { created_at: new Date(2026, 2, 1), value: 1, sum_value: 126.954 },
+          { created_at: new Date('2025-12-31T23:00:00.000Z'), value: 1, sum_value: 118.247 },
+          { created_at: new Date('2026-01-31T23:00:00.000Z'), value: 1, sum_value: 121.17 },
+          { created_at: new Date('2026-02-28T23:00:00.000Z'), value: 1, sum_value: 126.954 },
         ],
       },
     ]);
@@ -1418,7 +1427,7 @@ describe('build schemas', () => {
           selector: 'prise-onduleur-thirty-minutes-consumption',
           currency_unit: null,
         },
-        values: [{ created_at: new Date(2026, 6, 12, 8), value: 1, sum_value: 0.5 }],
+        values: [{ created_at: new Date('2026-07-12T06:00:00.000Z'), value: 1, sum_value: 0.5 }],
       },
     ]);
     await energyTool.cb({
@@ -1438,7 +1447,7 @@ describe('build schemas', () => {
           selector: 'prise-onduleur-thirty-minutes-consumption',
           currency_unit: null,
         },
-        values: [{ created_at: new Date(2026, 0, 1), value: 1, sum_value: 1500 }],
+        values: [{ created_at: new Date('2025-12-31T23:00:00.000Z'), value: 1, sum_value: 1500 }],
       },
     ]);
     await energyTool.cb({
@@ -1449,6 +1458,20 @@ describe('build schemas', () => {
       group_by: 'year',
     });
     expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([{ date: '2026', value: 1500 }]);
+
+    // No TIMEZONE variable set yet: fall back to the same default the other tools use.
+    mcpHandler.gladys.variable.getValue.resolves(null);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-01-01',
+      end_date: '2026-12-31',
+      unit: 'kwh',
+      group_by: 'year',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].timezone).to.eq('Europe/Paris');
+    mcpHandler.gladys.variable.getValue.callsFake((name) =>
+      Promise.resolve(name === SYSTEM_VARIABLE_NAMES.TIMEZONE ? 'Europe/Paris' : null),
+    );
 
     // Same clamping on a leap year keeps February 29th, and on a 30-day month.
     getConsumptionByDates.resetHistory();
