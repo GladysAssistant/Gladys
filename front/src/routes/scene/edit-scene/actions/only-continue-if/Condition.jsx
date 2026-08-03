@@ -91,9 +91,6 @@ class Condition extends Component {
     const selectedOption = this.getSelectedOption();
     return (
       <div>
-        <div className={style.explanationText}>
-          <Text id="editScene.actionsCard.onlyContinueIf.explanationText" />
-        </div>
         <div class="row">
           <div class="col-md-4">
             <div class="form-group">

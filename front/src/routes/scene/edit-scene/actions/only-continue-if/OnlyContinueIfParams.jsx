@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import get from 'get-value';
@@ -66,6 +67,14 @@ class OnlyContinueIf extends Component {
 
     return (
       <div>
+        <div class="alert alert-secondary">
+          <div>
+            <Text id="editScene.actionsCard.onlyContinueIf.logicExplanationText" />
+          </div>
+          <div class="mt-2">
+            <Text id="editScene.actionsCard.onlyContinueIf.explanationText" />
+          </div>
+        </div>
         {props.action.conditions &&
           props.action.conditions.map((condition, index) => (
             <Condition
