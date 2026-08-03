@@ -33,23 +33,38 @@ class ConfigField extends Component {
     this.props.connectOAuth(this.props.field);
   };
 
-  onCopyRedirectUri = async e => {
-    const input = e.target.closest('.input-group').querySelector('input');
+  copyRedirectUri = async value => {
+    let copied = false;
     if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
       try {
-        await navigator.clipboard.writeText(input.value);
-      } catch (err) {
-        // the browser can refuse the permission: the field stays selectable,
-        // the user copies it by hand
-        console.error(err);
-        return;
+        await navigator.clipboard.writeText(value);
+        copied = true;
+      } catch (error) {
+        copied = false;
       }
-      this.setState({ redirectUriCopied: true });
-      if (this.copyTimer) {
-        clearTimeout(this.copyTimer);
-      }
-      this.copyTimer = setTimeout(() => this.setState({ redirectUriCopied: false }), 2000);
     }
+    // navigator.clipboard only exists in a secure context, and the users this
+    // whole flow unblocks are precisely the ones on a plain-HTTP local
+    // address: fall back to the legacy selection-based copy, as the Tuya
+    // screen already does
+    if (!copied && this.redirectUriInput) {
+      try {
+        this.redirectUriInput.focus();
+        this.redirectUriInput.select();
+        this.redirectUriInput.setSelectionRange(0, this.redirectUriInput.value.length);
+        copied = document.execCommand('copy');
+      } catch (error) {
+        copied = false;
+      }
+    }
+    if (!copied) {
+      return;
+    }
+    this.setState({ redirectUriCopied: true });
+    if (this.copyTimer) {
+      clearTimeout(this.copyTimer);
+    }
+    this.copyTimer = setTimeout(() => this.setState({ redirectUriCopied: false }), 2000);
   };
 
   componentWillUnmount() {
@@ -110,7 +125,6 @@ class ConfigField extends Component {
         useInstanceRedirect && selector
           ? `${window.location.origin}${getOAuthCallbackPath(selector)}`
           : OAUTH_REDIRECT_URI;
-      const canCopy = typeof window !== 'undefined' && window.isSecureContext;
       return (
         <div class="form-group">
           <label class="form-label">{label}</label>
@@ -128,14 +142,25 @@ class ConfigField extends Component {
               <Text id="integration.externalIntegration.config.oauthRedirectUriLabel" />
             </small>
             <div class="input-group">
-              <input type="text" class="form-control" value={redirectUri} readOnly onFocus={selectOnFocus} />
-              {canCopy && (
-                <span class="input-group-append">
-                  <button type="button" class="btn btn-outline-secondary" onClick={this.onCopyRedirectUri}>
-                    <i class="fe fe-copy" />
-                  </button>
-                </span>
-              )}
+              <input
+                type="text"
+                class="form-control"
+                value={redirectUri}
+                readOnly
+                onFocus={selectOnFocus}
+                ref={element => {
+                  this.redirectUriInput = element;
+                }}
+              />
+              <span class="input-group-append">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  onClick={() => this.copyRedirectUri(redirectUri)}
+                >
+                  <i class="fe fe-copy" />
+                </button>
+              </span>
             </div>
             {this.state.redirectUriCopied && (
               <small class="text-success d-block mt-1">

@@ -20,9 +20,11 @@
 export const OAUTH_REDIRECT_URI = 'https://my.gladysassistant.com/redirect/oauth';
 
 const OAUTH_STATE_VERSION = 1;
-// mirrored from the redirect page, which refuses anything above these bounds:
-// better an immediate error on "Connect" than a dead end once the user has
-// already consented at the provider
+// mirrored from MAX_INNER_STATE_LENGTH / MAX_WRAPPED_STATE_LENGTH in
+// assets/js/oauth-state.js of GladysAssistant/my.gladysassistant.com, which
+// refuses anything above these bounds: better an immediate error on "Connect"
+// than a dead end once the user has already consented at the provider. Keep
+// both files in sync.
 const MAX_INNER_STATE_LENGTH = 1024;
 const MAX_WRAPPED_STATE_LENGTH = 4096;
 

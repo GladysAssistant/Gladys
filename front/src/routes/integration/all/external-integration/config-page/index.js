@@ -437,9 +437,11 @@ class ExternalIntegrationConfigPage extends Component {
 
   toggleOAuthUseInstanceRedirect = e => {
     const useInstanceRedirect = e.target.checked;
-    // remembered for the whole instance, not per integration: it describes how
-    // this Gladys is reachable, which does not change from one provider to the
-    // next
+    // remembered per browser and per origin, but not per integration: it
+    // describes how this Gladys is reached, which does not change from one
+    // provider to the next (reaching the same instance through Gladys Plus is
+    // another origin, hence another preference — which is what we want, that
+    // one is already HTTPS)
     localStorage.setItem(OAUTH_USE_INSTANCE_REDIRECT_KEY, useInstanceRedirect ? 'true' : 'false');
     this.setState({ oauthUseInstanceRedirect: useInstanceRedirect, oauthStatus: null });
   };
