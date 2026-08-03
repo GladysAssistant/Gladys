@@ -6,9 +6,9 @@ const { GLADYS_PLUS_PROVIDER } = require('./constants');
  * @description The TTS provider configuration for the frontend: the list
  * of available providers and the active one (TTS_ACTIVE_PROVIDER system
  * variable, Gladys Plus by default). Each provider carries a display
- * name — the integration's manifest name when it has one — so the System
- * settings card matches the Integrations UI instead of showing raw
- * selectors.
+ * name — the integration's manifest name when it has one — so the voice
+ * card on the Artificial Intelligence integration page matches the
+ * Integrations UI instead of showing raw selectors.
  * @returns {Promise<object>} Resolve with { active, providers }.
  * @example
  * const { active, providers } = await gladys.tts.getProviderConfiguration();
