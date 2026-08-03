@@ -459,7 +459,9 @@ state = base64url(JSON.stringify({ v: 1, origin, path, state: '<the integration 
 
 The page only ever redirects to an HTTPS origin or to a plain-HTTP origin that can exist solely on the visitor's own network, always behind an explicit click. The integration sees none of this: it receives a `redirect_uri` and uses it as-is (**never hardcode it**), gets its own `state` back, and the same `redirect_uri` comes back byte for byte for the token exchange. One consequence worth knowing: a single URL now has to be declared at the provider, whether the user reaches Gladys locally or through Gladys Plus.
 
-Tokens never transit through the frontend nor through the redirect page, and refreshing is the integration's business (like `netatmo.refreshingTokens` today).
+**What the redirect page does and does not see**, stated precisely because the user-facing wording depends on it: the provider redirect carries the authorization `code` in the query string of a request to a Gladys-operated host, so the static hosting in front of it does see that URL. Nothing runs server-side there, nothing is stored, and the page strips the query string from the address bar once read. The code alone is useless — the exchange needs the client secret, which never leaves the integration — and **tokens never transit through the frontend nor through the redirect page**. What must not be claimed is that no data ever touches Gladys-operated infrastructure. Users who prefer no third-party host at all have the instance-redirect option.
+
+Refreshing tokens stays the integration's business (like `netatmo.refreshingTokens` today).
 
 **`containers`**: the sub-containers' **authorization contract** (B.2) — declares what may run; the lifecycle is then driven via the `/container` API (C.3), only within these bounds. Example (a Frigate integration):
 

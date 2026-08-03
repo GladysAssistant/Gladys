@@ -6,7 +6,12 @@ import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import ConfigTab from './ConfigTab';
 import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
-import { OAUTH_REDIRECT_URI, getOAuthCallbackPath, wrapAuthorizeUrl } from '../../../../../utils/oauth';
+import {
+  OAUTH_REDIRECT_URI,
+  getAuthorizeUrlState,
+  getOAuthCallbackPath,
+  wrapAuthorizeUrl
+} from '../../../../../utils/oauth';
 import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 const OAUTH_USE_INSTANCE_REDIRECT_KEY = 'externalIntegrationOAuthUseInstanceRedirect';
@@ -440,7 +445,7 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   connectOAuth = async field => {
-    this.setState({ oauthStatus: RequestStatus.Getting, oauthMissingState: false });
+    this.setState({ oauthStatus: RequestStatus.Getting, oauthInvalidState: false });
     const { selector } = this.props;
     const callbackPath = getOAuthCallbackPath(selector);
     // providers refuse a plain HTTP redirect URI, which is how most people
@@ -457,9 +462,15 @@ class ExternalIntegrationConfigPage extends Component {
           redirect_uri: redirectUri
         }
       );
-      const urlToOpen = useInstanceRedirect
-        ? authorizeUrl
-        : wrapAuthorizeUrl(authorizeUrl, { origin: window.location.origin, path: callbackPath });
+      let urlToOpen;
+      if (useInstanceRedirect) {
+        // nothing to wrap, the provider comes back here directly, but the
+        // anti-CSRF state stays mandatory
+        getAuthorizeUrlState(authorizeUrl);
+        urlToOpen = authorizeUrl;
+      } else {
+        urlToOpen = wrapAuthorizeUrl(authorizeUrl, { origin: window.location.origin, path: callbackPath });
+      }
       // the callback popup is a new tab: it recovers the oauth2 key and the
       // redirect_uri used through localStorage (shared across same-origin
       // tabs). The token exchange fails unless the exact same redirect_uri
@@ -472,7 +483,7 @@ class ExternalIntegrationConfigPage extends Component {
       console.error(e);
       this.setState({
         oauthStatus: RequestStatus.Error,
-        oauthMissingState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_MISSING_STATE'
+        oauthInvalidState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE'
       });
     }
   };

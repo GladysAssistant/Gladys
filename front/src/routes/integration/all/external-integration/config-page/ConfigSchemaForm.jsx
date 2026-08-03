@@ -36,7 +36,14 @@ class ConfigField extends Component {
   onCopyRedirectUri = async e => {
     const input = e.target.closest('.input-group').querySelector('input');
     if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
-      await navigator.clipboard.writeText(input.value);
+      try {
+        await navigator.clipboard.writeText(input.value);
+      } catch (err) {
+        // the browser can refuse the permission: the field stays selectable,
+        // the user copies it by hand
+        console.error(err);
+        return;
+      }
       this.setState({ redirectUriCopied: true });
       if (this.copyTimer) {
         clearTimeout(this.copyTimer);
@@ -109,8 +116,8 @@ class ConfigField extends Component {
           <label class="form-label">{label}</label>
           {oauthStatus === RequestStatus.Error && (
             <div class="alert alert-danger">
-              {this.props.oauthMissingState ? (
-                <Text id="integration.externalIntegration.config.oauthMissingStateError" />
+              {this.props.oauthInvalidState ? (
+                <Text id="integration.externalIntegration.config.oauthInvalidStateError" />
               ) : (
                 <Text id="integration.externalIntegration.config.oauthConnectError" />
               )}
@@ -136,7 +143,11 @@ class ConfigField extends Component {
               </small>
             )}
             <small class="form-text text-muted">
-              <Text id="integration.externalIntegration.config.oauthRedirectUriDescription" />
+              {useInstanceRedirect ? (
+                <Text id="integration.externalIntegration.config.oauthRedirectUriInstanceDescription" />
+              ) : (
+                <Text id="integration.externalIntegration.config.oauthRedirectUriDescription" />
+              )}
             </small>
           </div>
           <div>
@@ -309,7 +320,7 @@ const ConfigSchemaForm = ({
   saveConfig,
   connectionStatus,
   oauthStatus,
-  oauthMissingState,
+  oauthInvalidState,
   oauthUseInstanceRedirect,
   toggleOAuthUseInstanceRedirect,
   connectOAuth,
@@ -342,7 +353,7 @@ const ConfigSchemaForm = ({
           updateConfigValue={updateConfigValue}
           connectionStatus={connectionStatus}
           oauthStatus={oauthStatus}
-          oauthMissingState={oauthMissingState}
+          oauthInvalidState={oauthInvalidState}
           oauthUseInstanceRedirect={oauthUseInstanceRedirect}
           toggleOAuthUseInstanceRedirect={toggleOAuthUseInstanceRedirect}
           connectOAuth={connectOAuth}

@@ -120,7 +120,7 @@ const ConfigTab = props => {
                     saveConfig={props.saveConfig}
                     connectionStatus={get(integration, 'connection_status')}
                     oauthStatus={props.oauthStatus}
-                    oauthMissingState={props.oauthMissingState}
+                    oauthInvalidState={props.oauthInvalidState}
                     oauthUseInstanceRedirect={props.oauthUseInstanceRedirect}
                     toggleOAuthUseInstanceRedirect={props.toggleOAuthUseInstanceRedirect}
                     connectOAuth={props.connectOAuth}
