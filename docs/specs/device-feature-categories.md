@@ -40,14 +40,22 @@ Before adding a category or type, check the existing list in `server/utils/const
 
 A device feature holds **one atomic value**: one measurement (a sensor reading) or one control (a command/state). Types within a category are the different atomic values that capability can expose (e.g. `light` → `binary`, `brightness`, `temperature`). Do not create a category that bundles several unrelated values, and do not create a new category when only a new type on an existing category is needed.
 
-### 5. Naming conventions
+### 5. Model the full capability — declare per-device support with `supported_options`
+
+For enum-like features (modes, fan speeds, swing positions, button click types…), the category/type defines the **full generic set of values** the capability can have (e.g. `AC_MODE`), never the subset one brand happens to implement.
+
+Real devices rarely support the whole set: an air conditioner may only do cool + fan, another one heat + cool + dry. That per-device subset is **not** expressed in the taxonomy — it is declared by the integration through **`supported_options`** on the device feature (rows in `t_device_feature_supported_option`, `{ value, label, sort_order }`, validated by `normalizeSupportedOptions` at device creation/update). The UI then only shows the declared subset (`resolveFeatureOptions` in the front), and falls back to the full static list when a feature declares none.
+
+Consequence for reviews: "brand X only supports 3 of the 5 modes" is **never** a reason to create a narrower category, a brand-specific type, or a stripped-down enum. Keep the generic value set and let the integration declare what each device supports. The air-conditioning features are the reference example: the Matter service builds the `supported_options` of the AC mode feature from the Thermostat cluster's capability flags (heating/cooling/autoMode).
+
+### 6. Naming conventions
 
 - Values are **kebab-case** (`co2-sensor`, `energy-production-sensor`).
 - Read-only measurement categories use the `*-sensor` suffix.
 - Names are in **English** and use the standard's vocabulary when one exists (see rule 2).
 - No protocol name inside a category/type name: the taxonomy is protocol-agnostic by definition.
 
-### 6. Full plumbing is part of the change
+### 7. Full plumbing is part of the change
 
 Adding a category or type is not just a constant. The same PR must include:
 
@@ -65,6 +73,7 @@ For any PR touching `DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES`:
 - [ ] The capability could not be mapped onto an existing category + type.
 - [ ] The Matter model (then Zigbee) was checked; semantics align with the standard by default, and any divergence from an existing standard model is justified in the PR.
 - [ ] If no standard covers the capability, the PR shows the category is generic (several brands/protocols would map onto it) and not modeled on a single proprietary API.
+- [ ] Enum-like types expose the full generic value set; per-device subsets go through `supported_options`, not through a narrowed category or type.
 - [ ] Naming follows the conventions above (kebab-case, `*-sensor` suffix, English, no protocol name).
 - [ ] Translations added to all i18n language files.
 - [ ] Units declared in `DEVICE_FEATURE_UNITS_BY_CATEGORY` if the category is a measurement.
