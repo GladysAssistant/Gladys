@@ -61,6 +61,11 @@ jobs:
             exit 1
           fi
           BRANCH="release/${TAG}"
+          if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null 2>&1; then
+            echo "::error::Branch ${BRANCH} already exists, from an abandoned release."
+            echo "::error::Reuse its pull request, or delete the branch and run this workflow again."
+            exit 1
+          fi
           git switch -c "${BRANCH}"
           git add package.json package-lock.json
           # Version-only commit message, as every release commit before it.

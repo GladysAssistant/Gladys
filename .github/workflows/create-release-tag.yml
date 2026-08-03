@@ -1,7 +1,9 @@
 name: Create release tag
 
 # Tags master as soon as the version in package.json changes, whether the bump
-# came from the "Prepare release" workflow or was pushed by hand.
+# came from the "Prepare release" workflow or was pushed by hand. Editing the
+# version field in an unrelated pull request therefore ships a release: it is
+# not a casually editable field.
 on:
   push:
     branches:
@@ -34,18 +36,26 @@ jobs:
           # package.json also changes for plain dependency updates: only an
           # unreleased version is worth tagging. An empty output skips the
           # remaining steps.
-          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
-            echo "Tag ${TAG} already exists, nothing to release."
-          else
+          TAGGED_COMMIT=$(git rev-parse -q --verify "refs/tags/${TAG}^{commit}" || true)
+          if [ -z "${TAGGED_COMMIT}" ]; then
             echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+            echo "create=true" >> "$GITHUB_OUTPUT"
+          elif [ "${TAGGED_COMMIT}" = "${GITHUB_SHA}" ]; then
+            # The tag was created by an earlier attempt on this very commit, which
+            # then failed. Keep going, without recreating it, so re-running the job
+            # replays the dispatches it never reached.
+            echo "Tag ${TAG} already points at this commit, replaying the dispatches."
+            echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tag ${TAG} already exists on another commit, nothing to release."
           fi
       - name: 🔧 Configure git
-        if: steps.version.outputs.tag
+        if: steps.version.outputs.create
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - name: 🔖 Create and push the tag
-        if: steps.version.outputs.tag
+        if: steps.version.outputs.create
         env:
           TAG: ${{ steps.version.outputs.tag }}
         run: |
@@ -64,7 +74,18 @@ jobs:
           # start from a GITHUB_TOKEN, which is why no PAT is needed here.
           for workflow in docker-release-build.yml build-demo-website.yml build-apidoc-documentation.yml; do
             echo "Triggering ${workflow} on ${TAG}"
-            gh workflow run "${workflow}" --ref "${TAG}"
+            # The tag was pushed a second ago and may not be visible to the API yet.
+            for attempt in 1 2 3; do
+              if gh workflow run "${workflow}" --ref "${TAG}"; then
+                break
+              fi
+              if [ "${attempt}" = 3 ]; then
+                echo "::error::Could not dispatch ${workflow} on ${TAG}. Re-run this job to replay the dispatches."
+                exit 1
+              fi
+              echo "Dispatch failed, retrying in 5s (attempt ${attempt}/3)"
+              sleep 5
+            done
           done
       - name: 📝 Job summary
         if: steps.version.outputs.tag
