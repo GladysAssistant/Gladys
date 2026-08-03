@@ -43,6 +43,8 @@ Then, follow our guide:
 
 👉 [How to contribute a new service](https://gladysassistant.com/docs/dev/developing-a-service/)
 
+> ⚠️ If your PR adds new **device categories or types** (`DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES`), read the [device feature categories design & review criteria](../docs/specs/device-feature-categories.md) first: categories must describe generic capabilities (never a specific brand) and align with mature standards like Matter and Zigbee.
+
 > 💡 As soon as you have some code, feel free to open a **Draft Pull Request**. This allows the team to follow your progress and provide early feedback.
 
 ---
