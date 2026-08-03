@@ -750,7 +750,7 @@ Field-by-field justification:
 | `CapDrop` | `ALL` | no Linux capabilities |
 | `SecurityOpt` | `no-new-privileges` | no escalation via setuid binaries |
 | `Memory`/`MemorySwap` | 256 MB (same values) | swap = memory ⇒ **no swap**; OOM kill → supervised restart |
-| `NanoCpus` | `500000000` (0.5 CPU) | an integration cannot starve Gladys on a Raspberry Pi; **omitted** when `docker info` reports `CPUCfsQuota: false` (e.g. Synology DSM kernels without the CFS scheduler), otherwise the daemon rejects the creation with an HTTP 400 |
+| `NanoCpus` | `500000000` (0.5 CPU) | an integration cannot starve Gladys on a Raspberry Pi; **omitted** when the Docker `/info` API reports `CpuCfsQuota: false` or `CpuCfsPeriod: false` (e.g. Synology DSM kernels without the CFS scheduler), otherwise the daemon rejects the creation — and every later start, since Docker re-validates the stored `HostConfig` at start — with an HTTP 400. Two recovery paths when the detection is wrong or the kernel lost CFS support after the container was created (NAS update): the creation retries once without the limit (remembering the lack of support for later descriptors), and a container rejected at start is **recreated without the limit** — supervised fallback of `start` for the main container, dedicated recreate in `startSubContainer` for sub-containers (see the sub-container Limits row) |
 | `PidsLimit` | 100 | anti fork-bomb |
 | `Binds` | a single one: `<basePath>/external-integrations/<selector>:/data` | the integration's local persistence; survives container recreations, removed at uninstall; **precreated and handed to uid/gid 1000 by the supervisor** before every creation (non-recursive, best-effort — see B.2): Docker would create a missing source `root:root`, unwritable for `USER node` |
 | `Tmpfs /tmp` | `noexec,nosuid,64m` | scratch in RAM, no execution of dropped binaries |
@@ -769,7 +769,7 @@ Field-by-field justification:
 | Ports | `PortBindings` only for the declared `ports[]` — host port **chosen by Gladys** (free at first start, then persisted), bound to `0.0.0.0` (LAN access assumed and displayed at install, see B.14.8) |
 | Devices | `Devices` = intersection **requested (manifest) ∩ granted (`granted_devices`, UI toggles) ∩ present (detection)** — classes resolved by the supervisor: `coral-usb` → `/dev/bus/usb`, `coral-pcie` → `/dev/apex_*`, `gpu` → `/dev/dri`, `video` → `/dev/video*`; recomputed at every container creation |
 | Rootfs | `ReadonlyRootfs` per the manifest's `read_only` (default `true`) |
-| Limits | `Memory`/`MemorySwap` = `memory_mb` (default 256), `NanoCpus` = `cpu` (default 0.5, omitted like on the main container when the kernel has no CFS scheduler), `ShmSize` = `shm_mb` (default 64) — manifest values, displayed at install |
+| Limits | `Memory`/`MemorySwap` = `memory_mb` (default 256), `NanoCpus` = `cpu` (default 0.5, omitted like on the main container when the kernel has no CFS scheduler; an existing sub-container whose stored CPU limit is rejected at start is recreated without it, after marking the support as absent), `ShmSize` = `shm_mb` (default 64) — manifest values, displayed at install |
 | Labels | `io.gladysassistant.external-integration: <selector>` (same reconciliation key as the main one — a single filter catches the whole group) + `io.gladysassistant.container: <name>` |
 
 The private network `gladys-int-<selector>` is created at install and carries the same label — uninstall and boot-time reconciliation remove containers **and** network through the same filter.
