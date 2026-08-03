@@ -16,15 +16,20 @@ A category (and its types) must describe **what a device does**, not who makes i
 
 **Litmus test:** would a device from a completely different brand, with the same capability, naturally use this exact category and these exact types? If the answer is "no, this only makes sense for brand X's device", the category is too specific.
 
-### 2. Categories must group protocols — standards first
+### 2. Categories must group protocols — standards as the reference, not the ceiling
 
 A Gladys category should be able to represent the same capability coming from **several protocols**. When designing a new category or type, check how established smart-home standards model that capability, in this priority order:
 
-1. **Matter** (device types and clusters) — the primary reference. If Matter defines the capability, align the category's semantics (types, value ranges, and naming where reasonable) with the Matter model.
+1. **Matter** (device types and clusters) — the primary reference. When Matter models the capability well, align the category's semantics (types, value ranges, and naming where reasonable) with the Matter model **by default**: the Matter and Zigbee integrations have to map their clusters onto Gladys categories, and every unjustified divergence turns that mapping into a lossy conversion.
 2. **Zigbee** (ZCL clusters, as exposed by Zigbee2MQTT) — the second reference for capabilities Matter does not cover yet.
 3. Other mature protocols (Z-Wave, Bluetooth/BLE profiles, KNX…) when neither of the above covers the capability.
 
-A proprietary API (a single brand's cloud API, for instance) is **not** an acceptable sole reference for a new category: if only one vendor models the capability that way, model it more generically or wait until a standard covers it.
+Standards are the reference, **not a veto**. Matter has real gaps and lags behind the market (electric vehicles, pool sensors, energy metering specifics…), and Gladys must be able to model capabilities beyond it — the existing `electrical-vehicle-*` or `ph-sensor`/`orp-sensor` categories are legitimate examples with no Matter equivalent. Two situations, two burdens of proof:
+
+- **The standard covers the capability but you diverge from it**: allowed, with an explicit justification in the PR of what the standard's model gets wrong or misses for Gladys's use case.
+- **No standard covers the capability**: a new category is fine, provided it is designed from the **capability** itself, not from one vendor's API. Show that it is generic — typically, that devices from several brands (or several protocols) expose the same capability and would map onto it naturally.
+
+What remains unacceptable is a category whose semantics are a copy of a **single proprietary API**: being absent from Matter is not a blocker, but being modeled on one brand is.
 
 ### 3. Reuse before creating
 
@@ -57,8 +62,8 @@ For any PR touching `DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES`:
 
 - [ ] No brand, product, or vendor-ecosystem name in category/type names or semantics.
 - [ ] The capability could not be mapped onto an existing category + type.
-- [ ] The Matter model (then Zigbee) was checked; semantics align with the standard when it defines the capability.
-- [ ] The category is not modeled on a single proprietary API.
+- [ ] The Matter model (then Zigbee) was checked; semantics align with the standard by default, and any divergence from an existing standard model is justified in the PR.
+- [ ] If no standard covers the capability, the PR shows the category is generic (several brands/protocols would map onto it) and not modeled on a single proprietary API.
 - [ ] Naming follows the conventions above (kebab-case, `*-sensor` suffix, English, no protocol name).
 - [ ] Translations added to all i18n language files.
 - [ ] Units declared in `DEVICE_FEATURE_UNITS_BY_CATEGORY` if the category is a measurement.
