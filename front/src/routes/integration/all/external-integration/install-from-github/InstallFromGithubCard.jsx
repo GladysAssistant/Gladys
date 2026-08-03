@@ -32,7 +32,11 @@ class InstallFromGithubCard extends Component {
 
   toggleDevMode = e => {
     e.preventDefault();
-    this.setState({ devMode: !this.state.devMode, installError: null, installErrorDetails: null });
+    this.setState(prevState => ({
+      devMode: !prevState.devMode,
+      installError: null,
+      installErrorDetails: null
+    }));
   };
 
   updateRepoUrl = e => {

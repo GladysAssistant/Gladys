@@ -37,7 +37,7 @@
   padding-left: 1.25rem;
   font-family: SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.75rem;
-  word-break: break-word;
+  overflow-wrap: anywhere;
   /* an invalid manifest can pile up dozens of errors: keep the modal usable */
   max-height: 12rem;
   overflow-y: auto;
