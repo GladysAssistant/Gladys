@@ -844,7 +844,8 @@
         "errorUnknown": "Une erreur s'est produite lors de l'installation de cette intégration.",
         "errorNotFound": "Dépôt introuvable, ou il ne contient pas d'intégration Gladys valide.",
         "errorInvalidManifest": "Le manifeste de l'intégration est invalide.",
-        "manifestInvalidJson": "Le manifeste n'est pas un JSON valide."
+        "manifestInvalidJson": "Le manifeste n'est pas un JSON valide.",
+        "errorDetailsTitle": "Détail des erreurs :"
       },
       "logs": {
         "title": "Journaux",
