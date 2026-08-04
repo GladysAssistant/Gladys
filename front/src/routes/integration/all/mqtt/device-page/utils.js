@@ -699,7 +699,6 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
   }
 
-  // Connector status and charging state are read-only enums (0-4), not 0-100 actuators.
   if (category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 4, read_only: true }, category, type);
   }
