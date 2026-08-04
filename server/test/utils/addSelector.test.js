@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 
 const { buildUniqueSelector } = require('../../utils/addSelector');
+const { ConflictError } = require('../../utils/coreErrors');
 
 const BASE = 'macbook-pro-de-pierre';
 
@@ -47,12 +48,14 @@ describe('utils.buildUniqueSelector', () => {
     expect(selector).to.match(new RegExp(`^${BASE}-[a-z0-9]{4}$`));
   });
 
-  it('should throw when no candidate is free', async () => {
+  it('should throw a ConflictError when no candidate is free', async () => {
     const alwaysTakenModel = { findOne: async () => ({ id: 'existing-row' }) };
     try {
       await buildUniqueSelector(alwaysTakenModel, BASE);
       expect.fail('should have thrown');
     } catch (e) {
+      // a 409 like the one the DB unique constraint produces, not a 500
+      expect(e).to.be.an.instanceOf(ConflictError);
       expect(e.message).to.include(`Unable to find a free selector based on "${BASE}"`);
     }
   });

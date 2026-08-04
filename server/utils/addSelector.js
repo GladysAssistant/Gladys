@@ -1,4 +1,5 @@
 const { slugify } = require('./slugify');
+const { ConflictError } = require('./coreErrors');
 
 // A selector derived from a name is not unique by construction: two objects
 // can legitimately carry the same name (an integration publishing two
@@ -72,7 +73,10 @@ async function buildUniqueSelector(model, base, { transaction, taken } = {}) {
   while (!(await isFree(candidate))) {
     attempt += 1;
     if (attempt > MAX_NUMERIC_SUFFIX + MAX_RANDOM_ATTEMPTS) {
-      throw new Error(`Unable to find a free selector based on "${slugifiedBase}"`);
+      // A ConflictError, like the 409 a DB unique-constraint collision on the
+      // selector produces: exhausting the candidates is the same conflict,
+      // seen before the insert instead of by the constraint.
+      throw new ConflictError(`Unable to find a free selector based on "${slugifiedBase}"`);
     }
     candidate = attempt <= MAX_NUMERIC_SUFFIX ? `${slugifiedBase}-${attempt + 1}` : slugify(slugifiedBase, true);
   }
