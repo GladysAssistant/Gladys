@@ -4668,7 +4668,8 @@
           "1": "Fahrzeug verbunden",
           "2": "Angehalten (Fahrzeug)",
           "3": "Angehalten (Ladestation)",
-          "4": "Inaktiv"
+          "4": "Inaktiv",
+          "5": "Entlädt"
         }
       },
       "voc-matter-index-sensor": {

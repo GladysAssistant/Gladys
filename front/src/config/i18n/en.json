@@ -4666,9 +4666,10 @@
           "unknown": "{{value}} (unknown)",
           "0": "Charging",
           "1": "Vehicle connected",
-          "2": "Suspended (EV)",
-          "3": "Suspended (EVSE)",
-          "4": "Idle"
+          "2": "Paused (vehicle)",
+          "3": "Paused (charger)",
+          "4": "Idle",
+          "5": "Discharging"
         }
       },
       "voc-matter-index-sensor": {

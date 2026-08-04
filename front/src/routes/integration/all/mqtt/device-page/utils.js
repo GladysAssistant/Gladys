@@ -700,6 +700,10 @@ export const getFeatureDefaultValues = (category, type) => {
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION) {
+    if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 5, read_only: true }, category, type);
+    }
+
     return applyDefaultUnit({ ...defaults, min: 0, max: 4, read_only: true }, category, type);
   }
 

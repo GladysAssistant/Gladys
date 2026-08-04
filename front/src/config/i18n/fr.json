@@ -4668,7 +4668,8 @@
           "1": "Véhicule connecté",
           "2": "Suspendue (véhicule)",
           "3": "Suspendue (borne)",
-          "4": "Inactive"
+          "4": "Inactive",
+          "5": "En décharge"
         }
       },
       "voc-matter-index-sensor": {
