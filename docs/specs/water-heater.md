@@ -32,7 +32,7 @@ Scoping decisions:
 | Type | Value | Direction | Units | min / max | Semantics |
 |---|---|---|---|---|---|
 | `BINARY` | `binary` | command | — | 0 / 1 | Appliance on/off. `0` = standby (frost protection may still run), `1` = running. |
-| `MODE` | `mode` | command | — | 0 / 7 | Operating mode, `WATER_HEATER_MODE` (A.2). The enum is the **full generic set**; which modes a given appliance offers is declared per feature via `supported_options` (A.3). |
+| `MODE` | `mode` | command | — | 0 / 6 | Operating mode, `WATER_HEATER_MODE` (A.2). The enum is the **full generic set**; which modes a given appliance offers is declared per feature via `supported_options` (A.3). |
 | `TARGET_TEMPERATURE` | `target-temperature` | command | `celsius`, `fahrenheit` | 30 / 70 | Hot water setpoint. Bounds are defaults: an integration publishes the appliance's real range. |
 | `REMAINING_HOT_WATER` | `remaining-hot-water` | sensor | `percent`, `liter` | 0 / 100 | Hot water available for use. Appliances publish it either as a percentage of the tank or as a V40 volume (litres usable at 40 °C) — hence two allowed units, `percent` being the default. With `liter`, `max` carries the tank's V40 capacity. |
 | `HEATING` | `heating` | sensor | — | 0 / 1 | `1` while the appliance is actively heating water, `0` at rest. |
@@ -57,14 +57,15 @@ const WATER_HEATER_MODE = {
   BOOST: 3,        // the fastest heating the appliance is capable of
   MANUAL: 4,       // fixed setpoint, no learning
   ABSENCE: 5,      // holiday / away, minimum temperature kept
-  ELECTRIC: 6,     // electric resistance only, auxiliary heat source disabled
-  PROGRAM: 7,      // follows the schedule stored in the appliance
+  PROGRAM: 6,      // follows the schedule stored in the appliance
 };
 ```
 
 This is the **full generic set of operating modes a water heater can have**, deliberately wider than any single appliance. Per rule 6 of the taxonomy spec, an appliance supporting three of these is not a reason to narrow the enum or to add a binary type per mode: it declares its three through `supported_options` (A.3).
 
-Values are **append-only**. A new mode takes the next free integer; an existing integer never changes meaning, because it is already stored in device states and hard-coded in users' scenes.
+Every value is an **operating mode**, never a heat source. An earlier draft carried an `ELECTRIC` value ("resistive element only, auxiliary source disabled"); it was dropped because selecting a heat source is precisely what section C defers under `heat-source`, Matter's mode tags have no equivalent, and the enum is append-only — a value shaped around one appliance family cannot be taken back later. "Which source is heating right now" is a separate question from "what is the appliance trying to do".
+
+Values are **append-only once this spec is merged**. A new mode takes the next free integer; an existing integer never changes meaning, because it will be stored in device states and hard-coded in users' scenes. Renumbering is free only until then.
 
 `BOOST` appears both as a mode value and as the `boost` command type. That mirrors Matter, where boosting is a *command* (`WaterHeaterManagement`) while the operating mode lives in a separate mode cluster. **An integration maps whichever form its appliance natively reports, never both for the same function** — two controls over one state would drift apart the moment one of them is written. When the appliance exposes a real mode enumeration, `mode` is preferred: translated labels, ordered options, one dashboard row instead of several.
 
@@ -110,7 +111,7 @@ The category covers only the metrics **intrinsic** to producing and storing hot 
       "category": "water-heater",
       "type": "mode",
       "read_only": false, "has_feedback": true, "keep_history": true,
-      "min": 0, "max": 7,
+      "min": 0, "max": 6,
       "supported_options": [
         { "value": 1, "label": "Auto", "sort_order": 0 },
         { "value": 2, "label": "Eco", "sort_order": 1 },
@@ -183,7 +184,7 @@ The counter-example: a flat multi-position steatite electric storage tank with n
       "category": "water-heater",
       "type": "mode",
       "read_only": false, "has_feedback": true, "keep_history": true,
-      "min": 0, "max": 7,
+      "min": 0, "max": 6,
       "supported_options": [
         { "value": 4, "label": "Manual", "sort_order": 0 },
         { "value": 2, "label": "Eco", "sort_order": 1 },
@@ -314,8 +315,8 @@ Three namespaces, three files (`en.json`, `fr.json`, `de.json`), all key-paralle
 |---|---|---|
 | `deviceFeatureCategory.water-heater.shortCategoryName` | `check_translations.js` (hard CI failure) | "Water heater" / "Chauffe-eau" / "Warmwasserbereiter" |
 | `deviceFeatureCategory.water-heater.<type>` | `check_translations.js`, one per type | Feature label shown in device lists, charts and the box editor |
-| `deviceFeatureAction.category.water-heater.mode.<i18nKey>` | `WaterHeaterModeDeviceFeature`, `SelectWaterHeaterMode` | Mode button labels: `off`, `auto`, `eco`, `boost`, `manual`, `absence`, `electric`, `program` |
-| `deviceFeatureValue.category.water-heater.mode.<0..7>` | history, sensor rendering | Same labels, addressed by integer |
+| `deviceFeatureAction.category.water-heater.mode.<i18nKey>` | `WaterHeaterModeDeviceFeature`, `SelectWaterHeaterMode` | Mode button labels: `off`, `auto`, `eco`, `boost`, `manual`, `absence`, `program` |
+| `deviceFeatureValue.category.water-heater.mode.<0..6>` | history, sensor rendering | Same labels, addressed by integer |
 | `deviceFeatureAction.category.water-heater.binary.{state,stateLiveFinished}.{0,1}` | `BinaryDeviceFeature` | Turning these on switches the toggle to a labelled two-button group ("Stop" / "Start" instead of an unlabelled switch) — worth doing for an appliance whose on/off is not self-evident |
 | `deviceFeatureAction.category.water-heater.boost.{state,stateLiveFinished}.{0,1}` | `BinaryDeviceFeature` | "Cancel boost" / "Start boost" |
 
@@ -326,7 +327,18 @@ The MQTT feature catalog also reads `integration.mqtt.featureCatalog.categoryDes
 Two files outside the dashboard path that degrade silently when skipped:
 
 - `front/src/routes/history/categoryGroups.js` — add `WATER_HEATER` to the `climate` group (which already holds `HEATER`, `THERMOSTAT`, `AIR_CONDITIONING`, `FAN`). Unlisted categories fall into the computed "other" bucket, where the activity history shows them with a generic icon and colour.
-- `front/src/routes/integration/all/mqtt/device-page/utils.js` — the MQTT catalog builds its category/type picker from the i18n dictionary, so the category appears by itself as soon as B.5 lands; but `getFeatureDefaultValues` decides the pre-filled `min`/`max`/`read_only`/`unit`. Without an entry, every water-heater feature defaults to `0..100, read_only: false` — wrong for **every type** of the category, since none is a 0..100 writable number. Add the per-type defaults of the A.1 table (`min: 0, max: 1` for the three binaries, `0..7` for `mode`, the real bounds and units for the rest), register `remaining-hot-water` and `heating` through `isSensorCategory`'s special cases, the unitless types in `CATEGORIES_WITHOUT_UNIT`, and a `getFeaturePreviewValue` entry.
+- `front/src/routes/integration/all/mqtt/device-page/utils.js` — the MQTT catalog builds its category/type picker from the i18n dictionary, so the category appears by itself as soon as B.5 lands; but `getFeatureDefaultValues` decides the pre-filled `min`/`max`/`read_only`/`unit`. Without an entry, every water-heater feature defaults to `0..100, read_only: false` — wrong for **every type** of the category, since none is a 0..100 writable number. 
+  **Add per-type branches in `getFeatureDefaultValues`, and do not touch `isSensorCategory`.** That helper takes a *category*, not a type, and its result is the category-wide baseline (`read_only: isSensorCategory(category)`); listing `water-heater` there would default the four **command** features to `read_only: true`. Since `water-heater` neither ends in `-sensor` nor appears in that list, the baseline is already `read_only: false` — right for the commands — and only the two sensor types need an explicit override. Follow the existing per-type pattern of the `LIGHT.BINARY`, `SWITCH.BINARY` and `THERMOSTAT.TARGET_TEMPERATURE` branches:
+
+  | Type | Defaults |
+  |---|---|
+  | `binary`, `boost` | `min: 0, max: 1, read_only: false` |
+  | `mode` | `min: 0, max: 6, read_only: false` |
+  | `target-temperature` | `min: 30, max: 70, read_only: false, unit: celsius` |
+  | `remaining-hot-water` | `min: 0, max: 100, read_only: true, unit: percent` |
+  | `heating` | `min: 0, max: 1, read_only: true` |
+
+  Then add a `getFeaturePreviewValue(category, type)` entry, and register the unitless features in `CATEGORIES_WITHOUT_UNIT` — that set is keyed by **(category, type) pairs** through `categoryTypeKey`, so it needs one entry per pair: `water-heater`×`binary`, ×`mode`, ×`heating`, ×`boost`. The generic short-circuit that drops the unit for `SENSOR.BINARY` / `SWITCH.BINARY` / `BUTTON.PUSH` does not apply here, because these type strings are the category's own.
 
 This path matters more than it looks: it is how a user brings in an appliance no native integration supports yet, hand-building the device from the MQTT catalog and picking category and type per feature.
 
@@ -359,7 +371,7 @@ Named explicitly, so their absence reads as a decision rather than an oversight.
 
 - **`heat-source`** — which source is currently producing heat. Matter models this as a **bitmap** of heater types (resistive elements, heat pump, boiler…), and a Gladys feature holds a single scalar; a four-value enum would be a lossy, under-specified divergence from the standard. Deferred until the bitmap-to-scalar question is settled against the real Matter model.
 - **`cop`** — coefficient of performance. It is a heat-pump efficiency ratio, not a metric intrinsic to producing hot water, and no standard models it. It would be the kind of vendor-telemetry type the taxonomy spec's rule 5 warns about.
-- **`absence-duration`** — how long the away mode lasts. Deferred: the `duration` category may already cover it, and neither reference profile needs it.
+- **Durations, as a whole** — how long the away mode lasts (`absence-duration`) and how long a boost runs. v1 has no duration type: `boost` is a bare on/off even though Matter's boost command carries a duration (D.1, divergence 2), and absence has no end date. Deferred together because they are one question, not two — whether such durations belong in this category at all or reuse the existing `duration` category. Neither reference profile needs them.
 - **Sanitary safety** — anti-legionella cycles and anti-scald protection. They deserve their own types and, more importantly, their own thinking about what Gladys should be allowed to command on a health-relevant function.
 - **A dedicated dashboard box.** The `devices-in-room` box renders the whole category correctly; a bespoke box (hot-water gauge, off-peak schedule) is a UI project of its own.
 - **Native scheduling.** Off-peak-hours control is expressible today with scenes plus `CONDITION.CHECK_TIME`, and appliance-side programs are covered by `MODE = PROGRAM`.
@@ -374,20 +386,43 @@ Audited against the checklist of `docs/specs/device-feature-categories.md`.
 
 Matter is the primary reference and it **does** model this capability: `server/services/matter/README.md` lists `WaterHeaterManagement` ("control the operation of a hot water heating appliance so that it can be used with energy management") and `WaterHeaterMode` ("derived from the Mode Base cluster… for water heater devices"), both currently unhandled. The category is shaped on that model:
 
-| Water-heater type | Matter counterpart |
+Each type below states **what kind of mapping it is** — a direct correspondence, a derivation that loses information, or a declared divergence. An unqualified "aligned with Matter" claim is not reviewable, and this table is meant to be checked line by line when the Matter mapping is written.
+
+| Water-heater type | Matter counterpart | Nature of the mapping |
+|---|---|---|
+| `mode` | `WaterHeaterMode` (a Mode Base derivative — an enumerated mode with per-device supported modes, exactly the `supported_options` shape) | **Direct**, tag by tag (table below) |
+| `binary` | `OnOff` | **Direct** |
+| `remaining-hot-water` | `WaterHeaterManagement`'s tank-percentage attribute | **Direct** when the appliance reports a percentage; the `liter` unit has no Matter counterpart and is there for appliances that report a V40 volume instead |
+| `heating` | `WaterHeaterManagement`'s heat-demand attribute | **Derived, lossy.** Heat demand is a heat-source *bitmap*, not a boolean: `heating` is `0` when the bitmap is empty and `1` as soon as any bit is set. Which source is active is dropped — that is the `heat-source` type deferred in section C, built from the same bitmap |
+| `boost` | `WaterHeaterManagement`'s boost command and boost state | **Partial.** The state maps directly; the command does not — Matter's boost carries a **duration**, Gladys's `boost` is a bare `0`/`1` (divergence below) |
+| `target-temperature` | `Thermostat` / `TemperatureControl` setpoint | **Declared divergence** on the Gladys side (below); the underlying value maps directly |
+
+Proposed mode-tag correspondence, to be confirmed against the Matter specification at implementation time:
+
+| `WATER_HEATER_MODE` | Matter mode tag |
 |---|---|
-| `mode` | `WaterHeaterMode` (a Mode Base cluster — an enumerated mode with per-device supported modes, which is exactly the `supported_options` shape) |
-| `boost` | `WaterHeaterManagement`'s boost command and boost state — a command, not a mode value, which is why `boost` exists as its own type |
-| `remaining-hot-water` | `WaterHeaterManagement`'s tank-percentage attribute |
-| `heating` | `WaterHeaterManagement`'s heat-demand attribute |
-| `binary` | `OnOff` |
-| `target-temperature` | `Thermostat` / `TemperatureControl` setpoint |
+| `OFF` | `Off` |
+| `AUTO` | `Auto` (Mode Base) |
+| `ECO` | `LowEnergy` (Mode Base) |
+| `BOOST` | `Quick` (Mode Base) — the *mode*, not to be confused with the `Boost` command, which is carried by the `boost` type |
+| `MANUAL` | `Manual` |
+| `ABSENCE` | `Vacation` (Mode Base) |
+| `PROGRAM` | `Timed` |
 
-Attribute-level naming and exact value ranges must be re-checked against the Matter specification when the Matter mapping is implemented; this section commits to the cluster-level model, not to attribute spellings.
+Attribute-level naming and exact value ranges must be re-checked against the Matter specification when the mapping is implemented; this section commits to the cluster- and tag-level model, not to attribute spellings.
 
-**One declared divergence.** Matter carries the water heater's setpoint on the `Thermostat` (or `TemperatureControl`) cluster, and `server/services/matter/README.md` suggests mapping `TemperatureControl` onto `thermostat/target-temperature`. This spec gives the category **its own** `target-temperature` instead. Rationale: `thermostat` in Gladys means the ambient setpoint of a room, and labelling a tank setpoint "Thermostat Temperature" misinforms the user; the codebase already applies exactly this pattern, with `thermostat`, `air-conditioning` and `electrical-vehicle-climate` each carrying their own `target-temperature` type for the same underlying quantity in different capabilities. A heat pump that heats both the house and the tank must be able to expose both setpoints on one device without collision. **This is the point of the design most worth a maintainer's opinion**: reusing `thermostat/target-temperature` is the alternative, and it is a one-line change if preferred.
+**Declared divergence 1 — the setpoint's category.** Matter carries the water heater's setpoint on the `Thermostat` (or `TemperatureControl`) cluster, and `server/services/matter/README.md` suggests mapping `TemperatureControl` onto `thermostat/target-temperature`. This spec gives the category **its own** `target-temperature` instead. Rationale: `thermostat` in Gladys means the ambient setpoint of a room, and labelling a tank setpoint "Thermostat Temperature" misinforms the user; the codebase already applies exactly this pattern, with `thermostat`, `air-conditioning` and `electrical-vehicle-climate` each carrying their own `target-temperature` type for the same underlying quantity in different capabilities. A heat pump that heats both the house and the tank must be able to expose both setpoints on one device without collision.
+
+**Declared divergence 2 — boost has no duration.** Matter's boost command takes a duration; `boost` is a bare on/off. A Gladys feature holds one atomic value, so a duration would need a second feature, and v1 has no duration type at all (see `absence-duration` in section C — the same gap). Consequence for a Matter mapping: boosting is issued with the appliance's or the integration's default duration, and cancelling goes through the cancel path rather than by writing `0` to a timer. Adding a duration type later is non-breaking.
 
 Zigbee (ZCL, via Zigbee2MQTT) has no water-heater-specific cluster; the second reference adds nothing here.
+
+#### Open questions for maintainers
+
+Two decisions are deliberately left open — both are cheap to change now and expensive later:
+
+1. **Own `target-temperature`, or reuse `thermostat/target-temperature`?** Argued under divergence 1 above. Reusing is a one-line change if preferred.
+2. **Enum vocabulary: Gladys names or Matter tag names?** `ECO` / `ABSENCE` / `PROGRAM` versus `LowEnergy` / `Vacation` / `Timed`. This spec keeps the Gladys names: they match the existing `PILOT_WIRE_MODE` and `AC_MODE` enums, and rule 7's naming conventions govern category and type *values* (kebab-case strings in the taxonomy), not internal enum keys. The correspondence is documented above either way, so switching is a rename of seven constants and their i18n keys.
 
 ### D.2 Known limitation — appliances reachable only as booleans
 
@@ -403,7 +438,7 @@ This is recorded as a **tooling gap, not a taxonomy one**: the fix belongs in th
 - [x] **Types are intrinsic to the capability**; everything else the appliance reports goes to its own category on the same device (A.4). Six types, deliberately narrow; deferrals listed in C.
 - [x] **Matter checked** (D.1), semantics aligned cluster by cluster, the single divergence declared and argued.
 - [x] **Generic, not modelled on one API.** The two reference profiles are different appliance families with different native interfaces mapping onto the same types.
-- [x] **Enum-like types expose the full generic set** (A.2, eight modes); per-device subsets go through `supported_options` (A.3), including for appliances whose native interface is switches.
+- [x] **Enum-like types expose the full generic set** (A.2, seven modes); per-device subsets go through `supported_options` (A.3), including for appliances whose native interface is switches.
 - [x] **Naming**: kebab-case, English, no protocol name. No `*-sensor` suffix on the category — it is a controllable appliance, not a measurement category; its two read-only types are the sensor side of that appliance.
 - [x] **Names stress-tested** against neighbouring and future classes: gas and solar-assisted water heaters (same six types, fewer of them), heat pumps heating both house and tank (D.1), instantaneous water heaters (`target-temperature` + `heating`, no `remaining-hot-water`).
 - [x] **Inline scope comment** on the constant, with the boundary and the value conventions (B.1).
