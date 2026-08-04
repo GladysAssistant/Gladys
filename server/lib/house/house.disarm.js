@@ -13,8 +13,9 @@ const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
  */
 async function disarm(selector) {
   // In case there is a timeout to arm this house, we clear it
-  clearTimeout(this.armingHouseTimeout.get(selector));
-  if (this.armingHouseTimeout.get(selector)) {
+  const armingWasInProgress = this.armingHouseTimeout.has(selector);
+  if (armingWasInProgress) {
+    clearTimeout(this.armingHouseTimeout.get(selector));
     this.armingHouseTimeout.delete(selector);
   }
   // Delete all rate limit associated to this house
@@ -30,7 +31,10 @@ async function disarm(selector) {
     throw new NotFoundError('House not found');
   }
 
-  if (house.alarm_mode === ALARM_MODES.DISARMED) {
+  // While a house is arming, its alarm mode is still "disarmed" in DB: it only switches
+  // to "armed" at the end of the delay. So we only consider the house already disarmed
+  // when there was no arming in progress to cancel.
+  if (house.alarm_mode === ALARM_MODES.DISARMED && !armingWasInProgress) {
     throw new ConflictError('House is already disarmed');
   }
   // Update database
