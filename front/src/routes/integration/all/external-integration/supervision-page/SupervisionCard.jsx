@@ -45,6 +45,7 @@ const SupervisionCard = ({
   language,
   actionStatus,
   actionError,
+  updateResult,
   uninstallStatus,
   askingUninstall,
   executeAction,
@@ -81,6 +82,18 @@ const SupervisionCard = ({
             {uninstallStatus === RequestStatus.Error && (
               <div class="alert alert-danger">
                 <Text id="integration.externalIntegration.supervision.uninstallError" />
+              </div>
+            )}
+            {updateResult && (
+              <div class={cx('alert', updateResult.upToDate ? 'alert-info' : 'alert-success')}>
+                <Text
+                  id={
+                    updateResult.upToDate
+                      ? 'integration.externalIntegration.supervision.alreadyUpToDateText'
+                      : 'integration.externalIntegration.supervision.updateSuccessText'
+                  }
+                  fields={{ version: updateResult.version }}
+                />
               </div>
             )}
             {integration.update_available && (

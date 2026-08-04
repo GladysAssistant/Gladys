@@ -660,6 +660,12 @@
         "saveError": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
         "saveButton": "Enregistrer la configuration",
         "oauthConnectButton": "Connecter",
+        "oauthInvalidStateError": "Cette intégration ne fournit pas d'élément de sécurité exploitable pour la connexion (absent ou trop long). Elle ne peut pas être connectée tant que son développeur ne l'a pas corrigé.",
+        "oauthRedirectUriLabel": "Adresse de redirection à déclarer dans votre application développeur",
+        "oauthRedirectUriDescription": "Les services refusent une adresse locale : cette page HTTPS hébergée par Gladys vous renvoie vers votre instance une fois l'autorisation donnée. Elle fonctionne entièrement dans votre navigateur, Gladys n'enregistre ni n'utilise le code d'autorisation, et vos jetons d'accès sont échangés directement entre votre instance et le service.",
+        "oauthRedirectUriInstanceDescription": "Vous avez choisi d'utiliser l'adresse de votre instance : déclarez cette URL exacte dans votre application développeur. Le service reviendra directement sur votre Gladys, sans passer par la page de redirection Gladys.",
+        "oauthRedirectUriCopied": "Copié !",
+        "oauthUseInstanceRedirectLabel": "Utiliser plutôt l'adresse de mon instance (j'accède déjà à Gladys en HTTPS)",
         "oauthConnectError": "Erreur au lancement de la connexion. Vérifiez que l'intégration est démarrée."
       },
       "actions": {
@@ -699,6 +705,8 @@
         "actionError": "Une erreur s'est produite lors de l'exécution de cette action.",
         "uninstallError": "Une erreur s'est produite lors de la désinstallation de cette intégration.",
         "updateAvailableText": "Une nouvelle version de cette intégration est disponible.",
+        "updateSuccessText": "Intégration mise à jour en version {{version}}.",
+        "alreadyUpToDateText": "L'intégration est déjà à jour (version {{version}}) : l'image Docker a été re-téléchargée et le conteneur recréé.",
         "statusLabel": "Statut",
         "versionLabel": "Version",
         "dockerImageLabel": "Image Docker",
@@ -708,7 +716,7 @@
         "restartButton": "Redémarrer",
         "updateButton": "Mettre à jour",
         "forceUpdateButton": "Forcer la mise à jour",
-        "forceUpdateTitle": "Re-télécharge l'image Docker et recrée le conteneur, même sans nouvelle version",
+        "forceUpdateTitle": "Vérifie la dernière version publiée, re-télécharge l'image Docker et recrée le conteneur",
         "logsButton": "Journaux",
         "uninstallButton": "Désinstaller",
         "containersTitle": "Conteneurs additionnels",
@@ -742,6 +750,7 @@
         "title": "Appareils découverts",
         "scanButton": "Scanner",
         "scanning": "Scan en cours...",
+        "scanningInProgress": "Scan en cours... Selon l'intégration, cela peut prendre jusqu'à une minute. La liste se mettra à jour automatiquement dès que des appareils seront publiés.",
         "scanError": "Une erreur s'est produite lors du lancement du scan.",
         "scanErrorDisconnected": "Impossible de lancer le scan : l'intégration n'est pas connectée. Vérifiez qu'elle est bien démarrée dans l'onglet « Configuration ».",
         "loadError": "Une erreur s'est produite lors du chargement des appareils découverts.",
@@ -843,7 +852,8 @@
         "errorUnknown": "Une erreur s'est produite lors de l'installation de cette intégration.",
         "errorNotFound": "Dépôt introuvable, ou il ne contient pas d'intégration Gladys valide.",
         "errorInvalidManifest": "Le manifeste de l'intégration est invalide.",
-        "manifestInvalidJson": "Le manifeste n'est pas un JSON valide."
+        "manifestInvalidJson": "Le manifeste n'est pas un JSON valide.",
+        "errorDetailsTitle": "Détail des erreurs :"
       },
       "logs": {
         "title": "Journaux",
@@ -2970,11 +2980,15 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU",
-        "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
+        "logicExplanationText": "Les conditions de ce bloc sont reliées par un OU : le bloc est validé dès qu'une seule d'entre elles est réalisée. Pour faire un ET, ajoutez plusieurs blocs « Condition sur variables » : ils devront alors tous être validés.",
+        "explanationText": "Dans le champ de valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
         "conditionDescription": "Si toutes les conditions sont réalisées, les actions du bloc \"Alors...\" seront exécutées. Sinon, les actions du bloc \"Sinon...\" seront exécutées.",
+        "conditionLogicDescription": "Les conditions ci-dessous sont reliées par un ET : elles doivent toutes être réalisées. Pour faire un OU, utilisez un seul bloc « Condition sur variables » et ajoutez-y plusieurs conditions avec le bouton « + OU ».",
         "noCondition": "Aucune condition ajoutée. Cliquez sur le bouton '+' pour ajouter une condition à ce bloc",
         "addCondition": "Ajouter une condition",
         "if": "Si",
@@ -3599,6 +3613,12 @@
     "operations": "Opérations",
     "upToDate": "Gladys est à jour",
     "newUpgradeAvailable": "Mise à jour disponible",
+    "newUpgradeAvailableVersion": "Gladys {{version}} est disponible",
+    "checkForUpdates": "Vérifier les mises à jour",
+    "checkingForUpdates": "Vérification en cours...",
+    "checkForUpdatesText": "Gladys vérifie automatiquement si une nouvelle version est disponible. Cliquez ci-dessous pour vérifier maintenant.",
+    "checkForUpdatesError": "Impossible de vérifier les mises à jour. Vérifiez votre connexion internet et réessayez.",
+    "noUpdateAvailable": "Aucune nouvelle version disponible, vous utilisez la dernière version de Gladys.",
     "newUpgradeAvailableText": "Gladys se mettra à jour automatiquement si vous utilisez Watchtower. Si vous voulez mettre à jour manuellement, cliquez sur le bouton ci-dessous. Cela lancera un container Watchtower qui mettra à jour uniquement le container Gladys, les autres containers de cette machine ne seront pas touchés.",
     "pinnedImageTitle": "Mise à jour impossible avec cette image",
     "pinnedImageText": "Votre container Gladys a été créé à partir de l'image « {{image}} », qui pointe vers une version figée. Une mise à jour retéléchargerait exactement la même image : Gladys ne peut donc pas se mettre à jour toute seule.",
@@ -4530,6 +4550,20 @@
           "other": "Aucune valeur reçue",
           "zero": "Ouvert",
           "one": "Fermé"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Pas de mouvement",
+          "one": "Mouvement détecté"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Sain",
+          "one": "Fumée détectée"
         }
       },
       "co-sensor": {

@@ -1,91 +1,101 @@
 name: Create release tag
-run-name: Create ${{ inputs.release_type }} release tag
 
+# Tags master as soon as the version in package.json changes, whether the bump
+# came from the "Prepare release" workflow or was pushed by hand. Editing the
+# version field in an unrelated pull request therefore ships a release: it is
+# not a casually editable field.
 on:
-  workflow_dispatch:
-    inputs:
-      release_type:
-        description: 'Type of version bump'
-        required: true
-        default: 'patch'
-        type: choice
-        options:
-          - patch
-          - minor
+  push:
+    branches:
+      - master
+    paths:
+      - package.json
 
 permissions:
   contents: write
   # Needed to dispatch the release workflows on the new tag.
   actions: write
 
-# Two overlapping runs would bump from the same tip and race on the same tag.
 concurrency:
   group: create-release-tag
   cancel-in-progress: false
 
 jobs:
   create-release-tag:
-    name: Bump version and push tag
+    name: Tag the new version
     runs-on: ubuntu-latest
     steps:
-      - name: 🛑 Ensure workflow runs on master
-        if: github.ref != 'refs/heads/master'
-        env:
-          REF_NAME: ${{ github.ref_name }}
-        run: |
-          echo "::error::This workflow can only be run on master, got ${REF_NAME}."
-          exit 1
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v4
         with:
-          # Always release from the current tip of master, not from the commit
-          # master pointed at when the workflow was dispatched.
-          ref: master
           fetch-depth: 0
-      - name: 💽 Setup nodejs
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: './package.json'
+      - name: 🔍 Read the version to tag
+        id: version
+        run: |
+          TAG="v$(node -p "require('./package.json').version")"
+          # package.json also changes for plain dependency updates: only an
+          # unreleased version is worth tagging. An empty output skips the
+          # remaining steps.
+          TAGGED_COMMIT=$(git rev-parse -q --verify "refs/tags/${TAG}^{commit}" || true)
+          if [ -z "${TAGGED_COMMIT}" ]; then
+            echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+            echo "create=true" >> "$GITHUB_OUTPUT"
+          elif [ "${TAGGED_COMMIT}" = "${GITHUB_SHA}" ]; then
+            # The tag was created by an earlier attempt on this very commit, which
+            # then failed. Keep going, without recreating it, so re-running the job
+            # replays the dispatches it never reached.
+            echo "Tag ${TAG} already points at this commit, replaying the dispatches."
+            echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tag ${TAG} already exists on another commit, nothing to release."
+          fi
       - name: 🔧 Configure git
+        if: steps.version.outputs.create
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - name: 🔖 Bump version and create tag
-        id: bump
+      - name: 🔖 Create and push the tag
+        if: steps.version.outputs.create
         env:
-          RELEASE_TYPE: ${{ inputs.release_type }}
+          TAG: ${{ steps.version.outputs.tag }}
         run: |
-          NEW_VERSION=$(npm version "${RELEASE_TYPE}")
-          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "Created tag ${NEW_VERSION}"
-      - name: 🚀 Push commit and tag
-        env:
-          NEW_VERSION: ${{ steps.bump.outputs.version }}
-        run: |
-          git push --atomic origin master "refs/tags/${NEW_VERSION}"
+          git tag -a "${TAG}" -m "${TAG}"
+          git push origin "refs/tags/${TAG}"
       - name: 🎬 Trigger the release workflows
+        if: steps.version.outputs.tag
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          NEW_VERSION: ${{ steps.bump.outputs.version }}
+          TAG: ${{ steps.version.outputs.tag }}
         run: |
           # A tag pushed with the default GITHUB_TOKEN does not trigger the
           # workflows listening on `push: tags`, so they are dispatched explicitly
           # on the new tag. workflow_dispatch is one of the two events GitHub does
           # start from a GITHUB_TOKEN, which is why no PAT is needed here.
           for workflow in docker-release-build.yml build-demo-website.yml build-apidoc-documentation.yml; do
-            echo "Triggering ${workflow} on ${NEW_VERSION}"
-            gh workflow run "${workflow}" --ref "${NEW_VERSION}"
+            echo "Triggering ${workflow} on ${TAG}"
+            # The tag was pushed a second ago and may not be visible to the API yet.
+            for attempt in 1 2 3; do
+              if gh workflow run "${workflow}" --ref "${TAG}"; then
+                break
+              fi
+              if [ "${attempt}" = 3 ]; then
+                echo "::error::Could not dispatch ${workflow} on ${TAG}. Re-run this job to replay the dispatches."
+                exit 1
+              fi
+              echo "Dispatch failed, retrying in 5s (attempt ${attempt}/3)"
+              sleep 5
+            done
           done
       - name: 📝 Job summary
+        if: steps.version.outputs.tag
         env:
-          NEW_VERSION: ${{ steps.bump.outputs.version }}
-          RELEASE_TYPE: ${{ inputs.release_type }}
+          TAG: ${{ steps.version.outputs.tag }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
           {
-            echo "### 🚀 Release ${NEW_VERSION} created"
+            echo "### 🚀 Release ${TAG} created"
             echo ""
-            echo "- Bump type: \`${RELEASE_TYPE}\`"
-            echo "- Tag: [\`${NEW_VERSION}\`](${{ github.server_url }}/${{ github.repository }}/releases/tag/${NEW_VERSION})"
+            echo "- Tag: [\`${TAG}\`](${REPO_URL}/releases/tag/${TAG})"
             echo "- Release workflows dispatched on the tag: production images, demo website, apidoc"
           } >> "$GITHUB_STEP_SUMMARY"

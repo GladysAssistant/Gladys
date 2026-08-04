@@ -660,6 +660,12 @@
         "saveError": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
         "saveButton": "Konfiguration speichern",
         "oauthConnectButton": "Verbinden",
+        "oauthInvalidStateError": "Diese Integration liefert keinen brauchbaren Sicherheits-State für die Verbindung (fehlt oder zu lang). Sie kann nicht verbunden werden, bis der Entwickler das behoben hat.",
+        "oauthRedirectUriLabel": "Weiterleitungsadresse, die in Ihrer Entwickler-Anwendung einzutragen ist",
+        "oauthRedirectUriDescription": "Die Dienste akzeptieren keine lokale Adresse: diese von Gladys gehostete HTTPS-Seite schickt Sie nach der Autorisierung zu Ihrer Instanz zurück. Sie läuft vollständig in Ihrem Browser, Gladys speichert und verwendet den Autorisierungscode nicht, und Ihre Zugriffstoken werden direkt zwischen Ihrer Instanz und dem Dienst ausgetauscht.",
+        "oauthRedirectUriInstanceDescription": "Sie haben die Adresse Ihrer Instanz gewählt: tragen Sie genau diese URL in Ihrer Entwickler-Anwendung ein. Der Dienst kommt dann direkt zu Ihrem Gladys zurück, ohne den Umweg über die Gladys-Weiterleitungsseite.",
+        "oauthRedirectUriCopied": "Kopiert!",
+        "oauthUseInstanceRedirectLabel": "Stattdessen die Adresse meiner Instanz verwenden (ich erreiche Gladys bereits per HTTPS)",
         "oauthConnectError": "Fehler beim Starten der Verbindung. Prüfen Sie, ob die Integration läuft."
       },
       "actions": {
@@ -699,6 +705,8 @@
         "actionError": "Beim Ausführen dieser Aktion ist ein Fehler aufgetreten.",
         "uninstallError": "Beim Deinstallieren dieser Integration ist ein Fehler aufgetreten.",
         "updateAvailableText": "Eine neue Version dieser Integration ist verfügbar.",
+        "updateSuccessText": "Integration auf Version {{version}} aktualisiert.",
+        "alreadyUpToDateText": "Die Integration ist bereits aktuell (Version {{version}}): Das Docker-Image wurde erneut heruntergeladen und der Container neu erstellt.",
         "statusLabel": "Status",
         "versionLabel": "Version",
         "dockerImageLabel": "Docker-Image",
@@ -708,7 +716,7 @@
         "restartButton": "Neu starten",
         "updateButton": "Aktualisieren",
         "forceUpdateButton": "Update erzwingen",
-        "forceUpdateTitle": "Lädt das Docker-Image neu herunter und erstellt den Container neu, auch ohne neue Version",
+        "forceUpdateTitle": "Prüft die zuletzt veröffentlichte Version, lädt das Docker-Image neu herunter und erstellt den Container neu",
         "logsButton": "Logs",
         "uninstallButton": "Deinstallieren",
         "containersTitle": "Zusätzliche Container",
@@ -742,6 +750,7 @@
         "title": "Entdeckte Geräte",
         "scanButton": "Scannen",
         "scanning": "Scannen...",
+        "scanningInProgress": "Scan läuft... Je nach Integration kann dies bis zu einer Minute dauern. Die Liste wird automatisch aktualisiert, sobald Geräte veröffentlicht werden.",
         "scanError": "Beim Starten des Scans ist ein Fehler aufgetreten.",
         "scanErrorDisconnected": "Der Scan konnte nicht gestartet werden: Die Integration ist nicht verbunden. Prüfe im Tab \"Konfiguration\", ob sie läuft.",
         "loadError": "Beim Laden der entdeckten Geräte ist ein Fehler aufgetreten.",
@@ -843,7 +852,8 @@
         "errorUnknown": "Beim Installieren dieser Integration ist ein Fehler aufgetreten.",
         "errorNotFound": "Repository nicht gefunden, oder es enthält keine gültige Gladys-Integration.",
         "errorInvalidManifest": "Das Manifest der Integration ist ungültig.",
-        "manifestInvalidJson": "Das Manifest ist kein gültiges JSON."
+        "manifestInvalidJson": "Das Manifest ist kein gültiges JSON.",
+        "errorDetailsTitle": "Fehlerdetails:"
       },
       "logs": {
         "title": "Protokolle",
@@ -2970,11 +2980,15 @@
         "removeLabel": "Entfernen",
         "orText": "ODER",
         "orButton": "+ ODER",
+        "useCustomValue": "Eigenen Wert eingeben",
+        "useValueList": "Aus der Werteliste auswählen",
+        "logicExplanationText": "Die Bedingungen in diesem Block sind mit ODER verknüpft: Der Block ist erfüllt, sobald eine davon zutrifft. Für ein UND fügst du mehrere Blöcke \"Nur fortsetzen, wenn\" hinzu: Dann müssen alle erfüllt sein.",
         "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
       "conditionIfThenElse": {
         "conditions": "Bedingungen",
         "conditionDescription": "Wenn alle Bedingungen erfüllt sind, werden die Aktionen im \"Dann\"-Block ausgeführt. Wenn nicht, werden die Aktionen im \"Sonst\"-Block ausgeführt.",
+        "conditionLogicDescription": "Die folgenden Bedingungen sind mit UND verknüpft: Sie müssen alle erfüllt sein. Für ein ODER verwendest du einen einzigen Block \"Nur fortsetzen, wenn\" und fügst dort mit der Schaltfläche \"+ ODER\" mehrere Bedingungen hinzu.",
         "noCondition": "Es wurde noch keine Bedingung hinzugefügt. Klicken Sie auf die '+'-Schaltfläche, um diesem Block eine Bedingung hinzuzufügen",
         "addCondition": "Bedingung hinzufügen",
         "if": "Wenn",
@@ -3599,6 +3613,12 @@
     "operations": "Operatives",
     "upToDate": "Gladys ist auf dem neuesten Stand",
     "newUpgradeAvailable": "Softwareupdate verfügbar",
+    "newUpgradeAvailableVersion": "Gladys {{version}} ist verfügbar",
+    "checkForUpdates": "Nach Updates suchen",
+    "checkingForUpdates": "Suche nach Updates …",
+    "checkForUpdatesText": "Gladys sucht automatisch nach neuen Versionen. Klicke unten, um jetzt zu suchen.",
+    "checkForUpdatesError": "Die Suche nach Updates ist fehlgeschlagen. Prüfe deine Internetverbindung und versuche es erneut.",
+    "noUpdateAvailable": "Keine neue Version verfügbar, du verwendest die neueste Gladys-Version.",
     "newUpgradeAvailableText": "Gladys wird sich automatisch aktualisieren, wenn du Gladys mit dem offiziellen Gladys-Raspberry-Pi-OS-Image installiert hast. Wenn du Gladys manuell installiert hast, achte darauf, dass Watchtower ausgeführt wird. Eine manuelle Aktualisierung aktualisiert nur den Gladys-Container, die anderen Container auf diesem Rechner bleiben unberührt.",
     "pinnedImageTitle": "Dieses Image kann nicht aktualisiert werden",
     "pinnedImageText": "Dein Gladys-Container wurde aus dem Image „{{image}}“ erstellt, das auf eine feste Version verweist. Eine Aktualisierung würde genau dasselbe Image erneut herunterladen, Gladys kann sich also nicht selbst aktualisieren.",
@@ -4530,6 +4550,20 @@
           "other": "Kein Wert empfangen",
           "zero": "Geöffnet",
           "one": "Geschlossen"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Keine Bewegung",
+          "one": "Bewegung erkannt"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Kein Rauch",
+          "one": "Rauch erkannt"
         }
       },
       "co-sensor": {

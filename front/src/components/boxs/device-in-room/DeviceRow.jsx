@@ -3,6 +3,7 @@ import get from 'get-value';
 import { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } from '../../../../../server/utils/constants';
 
 import { getDeviceName } from '../../../utils/device';
+import { TelevisionPushButtonFeatureTypes } from '../../../utils/consts';
 
 import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
 import ColorDeviceFeature from './device-features/ColorDeviceFeature';
@@ -81,7 +82,13 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   },
   [DEVICE_FEATURE_CATEGORIES.FAN]: {
     [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
-  }
+  },
+  // Television remote-control orders (play, pause, channel up, ...) are write-only commands: they
+  // are displayed as push buttons instead of falling back to a read-only sensor row.
+  [DEVICE_FEATURE_CATEGORIES.TELEVISION]: TelevisionPushButtonFeatureTypes.reduce(
+    (acc, type) => ({ ...acc, [type]: PushDeviceFeature }),
+    {}
+  )
 };
 
 const DeviceRow = ({ children, ...props }) => {

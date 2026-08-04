@@ -3,9 +3,25 @@
     "keywords": "pouls rythme graphique",
     "label": "Activité"
   },
+  "air-vent": {
+    "keywords": "ventilation climatisation vmc conduit",
+    "label": "Bouche d'aération"
+  },
   "airplay": {
     "keywords": "partage streaming",
     "label": "Diffusion écran"
+  },
+  "alarm-clock": {
+    "keywords": "alarme matin sonnerie lever",
+    "label": "Réveil"
+  },
+  "alarm-clock-check": {
+    "keywords": "alarme confirmée",
+    "label": "Réveil validé"
+  },
+  "alarm-smoke": {
+    "keywords": "incendie alarme feu",
+    "label": "Détecteur de fumée"
   },
   "alert-circle": {
     "keywords": "attention erreur",
@@ -39,9 +55,21 @@
     "keywords": "bateau port",
     "label": "Ancre"
   },
+  "antenna": {
+    "keywords": "signal radio réception",
+    "label": "Antenne"
+  },
   "aperture": {
     "keywords": "objectif photo appareil",
     "label": "Ouverture"
+  },
+  "apple": {
+    "keywords": "fruit nourriture",
+    "label": "Pomme"
+  },
+  "armchair": {
+    "keywords": "salon siège",
+    "label": "Fauteuil"
   },
   "arrow-down": {
     "keywords": "descendre",
@@ -95,9 +123,33 @@
     "keywords": "email mention courriel",
     "label": "Arobase"
   },
+  "audio-lines": {
+    "keywords": "son audio spectre",
+    "label": "Onde sonore"
+  },
   "award": {
     "keywords": "médaille prix trophée",
     "label": "Récompense"
+  },
+  "baby": {
+    "keywords": "enfant nourrisson chambre",
+    "label": "Bébé"
+  },
+  "backpack": {
+    "keywords": "école cartable voyage",
+    "label": "Sac à dos"
+  },
+  "badge-check": {
+    "keywords": "vérifié certifié",
+    "label": "Badge validé"
+  },
+  "ban": {
+    "keywords": "bloqué refusé non",
+    "label": "Interdit"
+  },
+  "banknote": {
+    "keywords": "argent liquide paiement",
+    "label": "Billet de banque"
   },
   "bar-chart": {
     "keywords": "statistiques diagramme",
@@ -107,6 +159,10 @@
     "keywords": "statistiques diagramme",
     "label": "Graphique barres (2)"
   },
+  "bath": {
+    "keywords": "salle de bain bain",
+    "label": "Baignoire"
+  },
   "battery": {
     "keywords": "énergie accumulateur",
     "label": "Batterie"
@@ -115,21 +171,81 @@
     "keywords": "énergie recharge",
     "label": "Batterie en charge"
   },
+  "battery-full": {
+    "keywords": "chargée niveau",
+    "label": "Batterie pleine"
+  },
+  "battery-low": {
+    "keywords": "vide niveau décharge",
+    "label": "Batterie faible"
+  },
+  "battery-medium": {
+    "keywords": "moitié niveau",
+    "label": "Batterie moyenne"
+  },
+  "battery-warning": {
+    "keywords": "problème défaut",
+    "label": "Batterie en alerte"
+  },
+  "bed": {
+    "keywords": "chambre sommeil nuit coucher",
+    "label": "Lit"
+  },
+  "bed-double": {
+    "keywords": "chambre parentale",
+    "label": "Lit double"
+  },
+  "bed-single": {
+    "keywords": "chambre enfant",
+    "label": "Lit simple"
+  },
+  "beer": {
+    "keywords": "boisson alcool pinte",
+    "label": "Bière"
+  },
   "bell": {
     "keywords": "notification alarme sonnerie",
     "label": "Cloche"
+  },
+  "bell-dot": {
+    "keywords": "cloche non lu alerte",
+    "label": "Notification"
   },
   "bell-off": {
     "keywords": "notification muet silence",
     "label": "Cloche coupée"
   },
+  "bell-ring": {
+    "keywords": "cloche alarme notification sonner",
+    "label": "Sonnerie"
+  },
+  "bike": {
+    "keywords": "bicyclette cycle",
+    "label": "Vélo"
+  },
+  "bird": {
+    "keywords": "animal volatile",
+    "label": "Oiseau"
+  },
+  "blinds": {
+    "keywords": "volet roulant store jalousie fenêtre",
+    "label": "Persienne"
+  },
   "bluetooth": {
     "keywords": "sans fil",
     "label": "Bluetooth"
   },
+  "bluetooth-connected": {
+    "keywords": "appairé sans fil",
+    "label": "Bluetooth connecté"
+  },
   "bold": {
     "keywords": "texte format",
     "label": "Gras"
+  },
+  "bone": {
+    "keywords": "chien croquette gamelle",
+    "label": "Os"
   },
   "book": {
     "keywords": "lecture",
@@ -143,17 +259,65 @@
     "keywords": "marque-page favori signet",
     "label": "Marque-page"
   },
+  "bot": {
+    "keywords": "ia assistant automatisation bot",
+    "label": "Robot"
+  },
   "box": {
     "keywords": "carton paquet cube",
     "label": "Boîte"
+  },
+  "brain": {
+    "keywords": "ia intelligence réflexion",
+    "label": "Cerveau"
+  },
+  "brick-wall": {
+    "keywords": "brique cloison",
+    "label": "Mur"
   },
   "briefcase": {
     "keywords": "travail bureau serviette",
     "label": "Mallette"
   },
+  "brush-cleaning": {
+    "keywords": "nettoyage aspirateur balai",
+    "label": "Ménage"
+  },
+  "building": {
+    "keywords": "bâtiment bureau",
+    "label": "Immeuble"
+  },
+  "bus": {
+    "keywords": "autobus transport en commun",
+    "label": "Bus"
+  },
+  "cable": {
+    "keywords": "fil connecteur branchement",
+    "label": "Câble"
+  },
+  "cake": {
+    "keywords": "anniversaire dessert fête",
+    "label": "Gâteau"
+  },
+  "cake-slice": {
+    "keywords": "dessert tranche",
+    "label": "Part de gâteau"
+  },
   "calendar": {
     "keywords": "date agenda planning",
     "label": "Calendrier"
+  },
+  "calendar-check": {
+    "keywords": "confirmé planning",
+    "label": "Calendrier validé"
+  },
+  "calendar-clock": {
+    "keywords": "heure planning rendez-vous",
+    "label": "Calendrier horaire"
+  },
+  "calendar-days": {
+    "keywords": "mois planning dates agenda",
+    "label": "Calendrier mensuel"
   },
   "camera": {
     "keywords": "appareil photo",
@@ -163,9 +327,33 @@
     "keywords": "appareil photo désactivé",
     "label": "Caméra coupée"
   },
+  "car": {
+    "keywords": "véhicule auto garage conduire",
+    "label": "Voiture"
+  },
+  "car-front": {
+    "keywords": "véhicule auto garage",
+    "label": "Voiture (face)"
+  },
+  "caravan": {
+    "keywords": "camping-car remorque vacances",
+    "label": "Caravane"
+  },
+  "carrot": {
+    "keywords": "légume potager nourriture",
+    "label": "Carotte"
+  },
   "cast": {
     "keywords": "écran télévision streaming",
     "label": "Diffuser"
+  },
+  "cat": {
+    "keywords": "animal compagnie chaton",
+    "label": "Chat"
+  },
+  "cctv": {
+    "keywords": "sécurité vidéo",
+    "label": "Caméra de surveillance"
   },
   "check": {
     "keywords": "coché ok oui",
@@ -178,6 +366,10 @@
   "check-square": {
     "keywords": "coché case",
     "label": "Validé (carré)"
+  },
+  "chef-hat": {
+    "keywords": "cuisine cuisinier",
+    "label": "Toque de chef"
   },
   "chevron-down": {
     "keywords": "flèche dérouler",
@@ -219,6 +411,10 @@
     "keywords": "rond forme",
     "label": "Cercle"
   },
+  "clapperboard": {
+    "keywords": "film vidéo tournage",
+    "label": "Clap de cinéma"
+  },
   "clipboard": {
     "keywords": "presse-papier copier coller bloc-notes",
     "label": "Presse-papier"
@@ -235,9 +431,25 @@
     "keywords": "nuage pluie météo",
     "label": "Bruine"
   },
+  "cloud-fog": {
+    "keywords": "brume météo visibilité",
+    "label": "Brouillard"
+  },
+  "cloud-hail": {
+    "keywords": "grêlons météo orage",
+    "label": "Grêle"
+  },
   "cloud-lightning": {
     "keywords": "nuage éclair foudre météo",
     "label": "Orage"
+  },
+  "cloud-moon": {
+    "keywords": "nuage lune météo",
+    "label": "Nuit nuageuse"
+  },
+  "cloud-moon-rain": {
+    "keywords": "nuit pluie lune météo",
+    "label": "Averses nocturnes"
   },
   "cloud-off": {
     "keywords": "désactivé hors ligne",
@@ -251,6 +463,14 @@
     "keywords": "nuage hiver météo",
     "label": "Neige"
   },
+  "cloud-sun": {
+    "keywords": "nuage soleil météo partiellement",
+    "label": "Éclaircies"
+  },
+  "cloud-sun-rain": {
+    "keywords": "pluie soleil météo",
+    "label": "Averses"
+  },
   "code": {
     "keywords": "programmation développeur",
     "label": "Code"
@@ -259,6 +479,10 @@
     "keywords": "développeur",
     "label": "CodePen"
   },
+  "coffee": {
+    "keywords": "boisson chaud tasse matin",
+    "label": "Café"
+  },
   "command": {
     "keywords": "touche raccourci mac",
     "label": "Commande"
@@ -266,6 +490,10 @@
   "compass": {
     "keywords": "direction navigation orientation",
     "label": "Boussole"
+  },
+  "cooking-pot": {
+    "keywords": "cuisine cuisson marmite",
+    "label": "Casserole"
   },
   "copy": {
     "keywords": "dupliquer",
@@ -311,6 +539,10 @@
     "keywords": "paiement banque crédit",
     "label": "Carte bancaire"
   },
+  "croissant": {
+    "keywords": "petit-déjeuner viennoiserie boulangerie",
+    "label": "Croissant"
+  },
   "crop": {
     "keywords": "rogner image",
     "label": "Recadrer"
@@ -318,6 +550,10 @@
   "crosshair": {
     "keywords": "cible précision mire",
     "label": "Viseur"
+  },
+  "cup-soda": {
+    "keywords": "boisson fraîche verre",
+    "label": "Soda"
   },
   "database": {
     "keywords": "stockage",
@@ -331,9 +567,29 @@
     "keywords": "cd dvd album musique",
     "label": "Disque"
   },
+  "disc-3": {
+    "keywords": "disque musique album platine",
+    "label": "Vinyle"
+  },
+  "dog": {
+    "keywords": "animal compagnie chiot",
+    "label": "Chien"
+  },
   "dollar-sign": {
     "keywords": "argent monnaie prix",
     "label": "Dollar"
+  },
+  "door-closed": {
+    "keywords": "entrée fermeture",
+    "label": "Porte fermée"
+  },
+  "door-closed-locked": {
+    "keywords": "fermée à clé sécurité",
+    "label": "Porte verrouillée"
+  },
+  "door-open": {
+    "keywords": "entrée ouverture",
+    "label": "Porte ouverte"
   },
   "download": {
     "keywords": "enregistrer descendre",
@@ -343,9 +599,21 @@
     "keywords": "descendre",
     "label": "Téléchargement (nuage)"
   },
+  "drill": {
+    "keywords": "outil bricolage visser",
+    "label": "Perceuse"
+  },
   "droplet": {
     "keywords": "eau humidité pluie",
     "label": "Goutte"
+  },
+  "droplets": {
+    "keywords": "eau humidité pluie arrosage",
+    "label": "Gouttes"
+  },
+  "dumbbell": {
+    "keywords": "sport musculation fitness salle",
+    "label": "Haltère"
   },
   "edit": {
     "keywords": "éditer écrire",
@@ -359,6 +627,14 @@
     "keywords": "éditer écrire",
     "label": "Modifier (stylo)"
   },
+  "egg": {
+    "keywords": "nourriture petit-déjeuner cuisine",
+    "label": "Oeuf"
+  },
+  "euro": {
+    "keywords": "argent monnaie prix",
+    "label": "Euro"
+  },
   "external-link": {
     "keywords": "ouvrir nouvel onglet",
     "label": "Lien externe"
@@ -371,6 +647,14 @@
     "keywords": "caché invisible",
     "label": "Œil masqué"
   },
+  "facebook": {
+    "keywords": "réseau social",
+    "label": "Facebook"
+  },
+  "fan": {
+    "keywords": "air brassage rafraîchir",
+    "label": "Ventilateur"
+  },
   "fast-forward": {
     "keywords": "lecture vitesse",
     "label": "Avance rapide"
@@ -378,6 +662,10 @@
   "feather": {
     "keywords": "léger écrire",
     "label": "Plume"
+  },
+  "fence": {
+    "keywords": "barrière jardin portail",
+    "label": "Clôture"
   },
   "file": {
     "keywords": "document",
@@ -403,9 +691,37 @@
     "keywords": "trier entonnoir",
     "label": "Filtre"
   },
+  "fingerprint": {
+    "keywords": "doigt biométrie identité",
+    "label": "Empreinte digitale"
+  },
+  "fish": {
+    "keywords": "aquarium animal",
+    "label": "Poisson"
+  },
   "flag": {
     "keywords": "marquer signaler pays",
     "label": "Drapeau"
+  },
+  "flame": {
+    "keywords": "feu chauffage chaudière brûleur",
+    "label": "Flamme"
+  },
+  "flame-kindling": {
+    "keywords": "cheminée foyer",
+    "label": "Feu de bois"
+  },
+  "flashlight": {
+    "keywords": "éclairage faisceau",
+    "label": "Lampe torche"
+  },
+  "flower": {
+    "keywords": "jardin plante floraison",
+    "label": "Fleur"
+  },
+  "flower-2": {
+    "keywords": "jardin plante floraison",
+    "label": "Fleur (2)"
   },
   "folder": {
     "keywords": "répertoire",
@@ -418,6 +734,30 @@
   "folder-plus": {
     "keywords": "ajouter nouveau",
     "label": "Dossier plus"
+  },
+  "footprints": {
+    "keywords": "présence marche mouvement",
+    "label": "Empreintes de pas"
+  },
+  "fuel": {
+    "keywords": "essence station réservoir plein",
+    "label": "Carburant"
+  },
+  "gamepad": {
+    "keywords": "vidéo console jouer",
+    "label": "Manette de jeu"
+  },
+  "gamepad-2": {
+    "keywords": "vidéo console jouer",
+    "label": "Manette de jeu (2)"
+  },
+  "gauge": {
+    "keywords": "cadran manomètre niveau pression compteur",
+    "label": "Jauge"
+  },
+  "gift": {
+    "keywords": "anniversaire noël offre présent",
+    "label": "Cadeau"
   },
   "git-branch": {
     "keywords": "développeur version",
@@ -443,13 +783,33 @@
     "keywords": "développeur code",
     "label": "GitLab"
   },
+  "glass-water": {
+    "keywords": "boisson boire",
+    "label": "Verre d'eau"
+  },
+  "glasses": {
+    "keywords": "vue lire optique",
+    "label": "Lunettes"
+  },
   "globe": {
     "keywords": "monde terre internet langue",
     "label": "Globe"
   },
+  "graduation-cap": {
+    "keywords": "école études université",
+    "label": "Diplôme"
+  },
   "grid": {
     "keywords": "tableau disposition carreaux",
     "label": "Grille"
+  },
+  "hammer": {
+    "keywords": "outil bricolage construire",
+    "label": "Marteau"
+  },
+  "hand": {
+    "keywords": "geste toucher salut",
+    "label": "Main"
   },
   "hard-drive": {
     "keywords": "stockage",
@@ -459,6 +819,10 @@
     "keywords": "hashtag numéro",
     "label": "Dièse"
   },
+  "haze": {
+    "keywords": "brouillard voile météo",
+    "label": "Brume"
+  },
   "headphones": {
     "keywords": "musique écouter",
     "label": "Casque audio"
@@ -467,13 +831,33 @@
     "keywords": "amour favori aimer",
     "label": "Cœur"
   },
+  "heart-pulse": {
+    "keywords": "santé coeur pouls médical",
+    "label": "Rythme cardiaque"
+  },
+  "heater": {
+    "keywords": "chauffage chauffer thermostat convecteur",
+    "label": "Radiateur"
+  },
   "help-circle": {
     "keywords": "question support cercle",
     "label": "Aide"
   },
+  "history": {
+    "keywords": "journal passé récent",
+    "label": "Historique"
+  },
   "home": {
-    "keywords": "accueil domicile principal",
+    "keywords": "accueil domicile principal logement habitation",
     "label": "Maison"
+  },
+  "hourglass": {
+    "keywords": "attente durée temps",
+    "label": "Sablier"
+  },
+  "ice-cream-cone": {
+    "keywords": "dessert été froid cornet",
+    "label": "Glace"
   },
   "image": {
     "keywords": "photo illustration",
@@ -495,6 +879,46 @@
     "keywords": "texte format",
     "label": "Italique"
   },
+  "key": {
+    "keywords": "accès ouvrir porte trousseau",
+    "label": "Clé"
+  },
+  "key-round": {
+    "keywords": "accès ouvrir porte",
+    "label": "Clé ronde"
+  },
+  "keyboard": {
+    "keywords": "saisie touches",
+    "label": "Clavier"
+  },
+  "lamp": {
+    "keywords": "lumière éclairage",
+    "label": "Lampe"
+  },
+  "lamp-ceiling": {
+    "keywords": "suspension lumière plafond",
+    "label": "Plafonnier"
+  },
+  "lamp-desk": {
+    "keywords": "lumière",
+    "label": "Lampe de bureau"
+  },
+  "lamp-floor": {
+    "keywords": "lampe sur pied lumière",
+    "label": "Lampadaire"
+  },
+  "lamp-wall-up": {
+    "keywords": "murale lumière mur",
+    "label": "Applique"
+  },
+  "languages": {
+    "keywords": "traduction langue internationalisation",
+    "label": "Langues"
+  },
+  "laptop": {
+    "keywords": "pc laptop",
+    "label": "Ordinateur portable"
+  },
   "layers": {
     "keywords": "couches niveaux empiler",
     "label": "Calques"
@@ -503,9 +927,21 @@
     "keywords": "disposition grille",
     "label": "Mise en page"
   },
+  "leaf": {
+    "keywords": "plante nature écologie vert",
+    "label": "Feuille"
+  },
   "life-buoy": {
     "keywords": "aide secours support",
     "label": "Bouée de sauvetage"
+  },
+  "lightbulb": {
+    "keywords": "lumière lampe allumé éclairage",
+    "label": "Ampoule"
+  },
+  "lightbulb-off": {
+    "keywords": "lumière coupée noir",
+    "label": "Ampoule éteinte"
   },
   "link": {
     "keywords": "url chaîne",
@@ -523,13 +959,25 @@
     "keywords": "énumération éléments",
     "label": "Liste"
   },
+  "list-music": {
+    "keywords": "liste lecture musique file",
+    "label": "Playlist"
+  },
   "loader": {
     "keywords": "attente rotation",
     "label": "Chargement"
   },
+  "locate-fixed": {
+    "keywords": "gps géolocalisation cible",
+    "label": "Position précise"
+  },
   "lock": {
     "keywords": "verrouillé sécurité",
     "label": "Cadenas fermé"
+  },
+  "lock-keyhole": {
+    "keywords": "verrou fermé sécurité clé",
+    "label": "Serrure"
   },
   "log-in": {
     "keywords": "entrer se connecter",
@@ -543,6 +991,10 @@
     "keywords": "email enveloppe message",
     "label": "Courrier"
   },
+  "mailbox": {
+    "keywords": "courrier facteur",
+    "label": "Boîte aux lettres"
+  },
   "map": {
     "keywords": "plan navigation",
     "label": "Carte"
@@ -550,6 +1002,10 @@
   "map-pin": {
     "keywords": "position lieu gps localisation",
     "label": "Épingle de carte"
+  },
+  "map-pinned": {
+    "keywords": "localisation lieu gps position",
+    "label": "Carte localisée"
   },
   "maximize": {
     "keywords": "agrandir",
@@ -579,6 +1035,22 @@
     "keywords": "muet microphone",
     "label": "Micro coupé"
   },
+  "mic-vocal": {
+    "keywords": "karaoké voix chanter",
+    "label": "Micro chant"
+  },
+  "microwave": {
+    "keywords": "micro-ondes cuisine four",
+    "label": "Micro-ondes"
+  },
+  "milestone": {
+    "keywords": "borne direction étape",
+    "label": "Panneau"
+  },
+  "milk": {
+    "keywords": "boisson laitier bouteille",
+    "label": "Lait"
+  },
   "minimize": {
     "keywords": "diminuer",
     "label": "Réduire"
@@ -607,6 +1079,10 @@
     "keywords": "nuit sombre nocturne sommeil",
     "label": "Lune"
   },
+  "moon-star": {
+    "keywords": "étoiles ciel clair sommeil",
+    "label": "Nuit étoilée"
+  },
   "more-horizontal": {
     "keywords": "points",
     "label": "Plus d'options (horizontal)"
@@ -623,6 +1099,14 @@
     "keywords": "note audio chanson",
     "label": "Musique"
   },
+  "music-2": {
+    "keywords": "note audio chanson",
+    "label": "Musique (2)"
+  },
+  "music-4": {
+    "keywords": "notes audio chanson",
+    "label": "Musique (4)"
+  },
   "navigation": {
     "keywords": "direction gps flèche",
     "label": "Navigation"
@@ -630,6 +1114,10 @@
   "navigation-2": {
     "keywords": "direction gps flèche",
     "label": "Navigation (2)"
+  },
+  "network": {
+    "keywords": "lan topologie noeuds",
+    "label": "Réseau"
   },
   "octagon": {
     "keywords": "forme stop",
@@ -639,9 +1127,29 @@
     "keywords": "colis boîte livraison",
     "label": "Paquet"
   },
+  "package-open": {
+    "keywords": "livraison paquet",
+    "label": "Colis ouvert"
+  },
+  "paint-roller": {
+    "keywords": "mur décoration",
+    "label": "Rouleau à peinture"
+  },
+  "paintbrush": {
+    "keywords": "peinture décoration couleur",
+    "label": "Pinceau"
+  },
   "paperclip": {
     "keywords": "pièce jointe attache",
     "label": "Trombone"
+  },
+  "parking-meter": {
+    "keywords": "stationnement parking voiture",
+    "label": "Parcmètre"
+  },
+  "party-popper": {
+    "keywords": "célébration confettis anniversaire",
+    "label": "Fête"
   },
   "pause": {
     "keywords": "lecture",
@@ -651,9 +1159,17 @@
     "keywords": "lecture",
     "label": "Pause (cercle)"
   },
+  "paw-print": {
+    "keywords": "animal empreinte compagnie",
+    "label": "Patte"
+  },
   "percent": {
     "keywords": "pourcent remise",
     "label": "Pourcentage"
+  },
+  "person-standing": {
+    "keywords": "présence humain quelqu'un debout",
+    "label": "Personne"
   },
   "phone": {
     "keywords": "appel combiné",
@@ -687,6 +1203,26 @@
     "keywords": "statistiques secteurs",
     "label": "Graphique camembert"
   },
+  "piggy-bank": {
+    "keywords": "économies épargne argent",
+    "label": "Tirelire"
+  },
+  "pill": {
+    "keywords": "santé pilule cachet",
+    "label": "Médicament"
+  },
+  "pipette": {
+    "keywords": "couleur échantillon prélever",
+    "label": "Pipette"
+  },
+  "pizza": {
+    "keywords": "repas nourriture italien",
+    "label": "Pizza"
+  },
+  "plane": {
+    "keywords": "vol voyage aéroport vacances",
+    "label": "Avion"
+  },
   "play": {
     "keywords": "démarrer vidéo exécuter",
     "label": "Lecture"
@@ -694,6 +1230,18 @@
   "play-circle": {
     "keywords": "démarrer vidéo",
     "label": "Lecture (cercle)"
+  },
+  "plug": {
+    "keywords": "électrique courant branchement",
+    "label": "Prise"
+  },
+  "plug-2": {
+    "keywords": "électrique courant branchement",
+    "label": "Prise (2)"
+  },
+  "plug-zap": {
+    "keywords": "intelligente courant",
+    "label": "Prise connectée"
   },
   "plus": {
     "keywords": "ajouter nouveau créer",
@@ -711,6 +1259,14 @@
     "keywords": "enregistrer lire plus tard",
     "label": "Pocket"
   },
+  "podcast": {
+    "keywords": "radio émission audio",
+    "label": "Podcast"
+  },
+  "popcorn": {
+    "keywords": "pop-corn cinéma film grignotage",
+    "label": "Pop-corn"
+  },
   "power": {
     "keywords": "alimentation éteindre veille",
     "label": "Marche / Arrêt"
@@ -719,9 +1275,37 @@
     "keywords": "imprimer papier",
     "label": "Imprimante"
   },
+  "projector": {
+    "keywords": "projection cinéma écran",
+    "label": "Vidéoprojecteur"
+  },
+  "qr-code": {
+    "keywords": "scanner lien",
+    "label": "QR code"
+  },
+  "rabbit": {
+    "keywords": "animal compagnie",
+    "label": "Lapin"
+  },
   "radio": {
     "keywords": "diffusion signal fm",
     "label": "Radio"
+  },
+  "radio-tower": {
+    "keywords": "émetteur signal diffusion",
+    "label": "Antenne radio"
+  },
+  "rainbow": {
+    "keywords": "arc-en-ciel couleurs météo",
+    "label": "Arc-en-ciel"
+  },
+  "receipt": {
+    "keywords": "facture ticket note",
+    "label": "Reçu"
+  },
+  "recycle": {
+    "keywords": "tri déchets écologie poubelle",
+    "label": "Recyclage"
   },
   "refresh-ccw": {
     "keywords": "recharger synchroniser inverse",
@@ -730,6 +1314,10 @@
   "refresh-cw": {
     "keywords": "recharger synchroniser",
     "label": "Actualiser"
+  },
+  "refrigerator": {
+    "keywords": "frigo cuisine froid",
+    "label": "Réfrigérateur"
   },
   "repeat": {
     "keywords": "boucle recommencer cycle",
@@ -747,13 +1335,49 @@
     "keywords": "droite pivoter tourner",
     "label": "Rotation horaire"
   },
+  "route": {
+    "keywords": "trajet parcours navigation",
+    "label": "Itinéraire"
+  },
+  "router": {
+    "keywords": "box modem réseau passerelle",
+    "label": "Routeur"
+  },
   "rss": {
     "keywords": "actualités abonnement",
     "label": "Flux RSS"
   },
+  "ruler": {
+    "keywords": "mesure taille longueur",
+    "label": "Règle"
+  },
+  "salad": {
+    "keywords": "nourriture légume sain",
+    "label": "Salade"
+  },
+  "sandwich": {
+    "keywords": "repas déjeuner casse-croûte",
+    "label": "Sandwich"
+  },
+  "satellite-dish": {
+    "keywords": "parabole réception",
+    "label": "Antenne satellite"
+  },
   "save": {
     "keywords": "sauvegarder disquette",
     "label": "Enregistrer"
+  },
+  "scan": {
+    "keywords": "détecter analyser balayage",
+    "label": "Scanner"
+  },
+  "scan-barcode": {
+    "keywords": "code-barres scanner produit",
+    "label": "Code-barres"
+  },
+  "scan-face": {
+    "keywords": "visage biométrie",
+    "label": "Reconnaissance faciale"
   },
   "scissors": {
     "keywords": "couper",
@@ -775,6 +1399,10 @@
     "keywords": "paramètres engrenage configuration options",
     "label": "Réglages"
   },
+  "settings-2": {
+    "keywords": "paramètres configuration engrenage",
+    "label": "Réglages (2)"
+  },
   "share": {
     "keywords": "partage exporter",
     "label": "Partager"
@@ -787,17 +1415,45 @@
     "keywords": "sécurité protection",
     "label": "Bouclier"
   },
+  "shield-alert": {
+    "keywords": "sécurité alarme intrusion",
+    "label": "Bouclier en alerte"
+  },
+  "shield-check": {
+    "keywords": "sécurisé protégé",
+    "label": "Bouclier validé"
+  },
   "shield-off": {
     "keywords": "protection",
     "label": "Bouclier désactivé"
+  },
+  "ship": {
+    "keywords": "navire mer port",
+    "label": "Bateau"
+  },
+  "shirt": {
+    "keywords": "chemise linge habits",
+    "label": "Vêtement"
   },
   "shopping-bag": {
     "keywords": "achat magasin",
     "label": "Sac de courses"
   },
+  "shopping-basket": {
+    "keywords": "achat épicerie",
+    "label": "Panier de courses"
+  },
   "shopping-cart": {
     "keywords": "caddie courses achat",
     "label": "Panier"
+  },
+  "shovel": {
+    "keywords": "bêche jardin creuser",
+    "label": "Pelle"
+  },
+  "shower-head": {
+    "keywords": "salle de bain eau",
+    "label": "Douche"
   },
   "shuffle": {
     "keywords": "mélanger hasard",
@@ -806,6 +1462,10 @@
   "sidebar": {
     "keywords": "panneau",
     "label": "Barre latérale"
+  },
+  "siren": {
+    "keywords": "alarme urgence intrusion son",
+    "label": "Sirène"
   },
   "skip-back": {
     "keywords": "précédent lecture",
@@ -827,21 +1487,57 @@
     "keywords": "réglages égaliseur ajuster",
     "label": "Curseurs"
   },
+  "sliders-horizontal": {
+    "keywords": "ajuster filtre égaliseur",
+    "label": "Réglages (curseurs)"
+  },
   "smartphone": {
     "keywords": "mobile téléphone portable",
     "label": "Smartphone"
+  },
+  "smartphone-charging": {
+    "keywords": "batterie mobile recharge",
+    "label": "Téléphone en charge"
+  },
+  "snowflake": {
+    "keywords": "froid gel givre hiver climatisation clim refroidissement",
+    "label": "Flocon de neige"
+  },
+  "sofa": {
+    "keywords": "salon séjour sofa",
+    "label": "Canapé"
+  },
+  "solar-panel": {
+    "keywords": "photovoltaïque énergie production",
+    "label": "Panneau solaire"
+  },
+  "sparkles": {
+    "keywords": "magie brillant nouveau ia",
+    "label": "Étincelles"
   },
   "speaker": {
     "keywords": "haut-parleur son audio",
     "label": "Enceinte"
   },
+  "sprout": {
+    "keywords": "plante jardin germe semis",
+    "label": "Pousse"
+  },
   "square": {
     "keywords": "forme",
     "label": "Carré"
   },
+  "squirrel": {
+    "keywords": "animal jardin faune",
+    "label": "Écureuil"
+  },
   "star": {
     "keywords": "favori note préféré",
     "label": "Étoile"
+  },
+  "stethoscope": {
+    "keywords": "médecin santé médical",
+    "label": "Stéthoscope"
   },
   "stop-circle": {
     "keywords": "arrêt",
@@ -850,6 +1546,22 @@
   "sun": {
     "keywords": "jour lumière météo clair",
     "label": "Soleil"
+  },
+  "sun-dim": {
+    "keywords": "tamisé variateur lumière",
+    "label": "Luminosité faible"
+  },
+  "sun-medium": {
+    "keywords": "intensité lumière variateur",
+    "label": "Luminosité"
+  },
+  "sun-moon": {
+    "keywords": "thème clair sombre bascule",
+    "label": "Jour et nuit"
+  },
+  "sun-snow": {
+    "keywords": "chauffage climatisation réversible",
+    "label": "Chaud et froid"
   },
   "sunrise": {
     "keywords": "aube matin",
@@ -862,6 +1574,10 @@
   "tablet": {
     "keywords": "appareil",
     "label": "Tablette"
+  },
+  "tablet-smartphone": {
+    "keywords": "appareils écrans",
+    "label": "Tablette et mobile"
   },
   "tag": {
     "keywords": "libellé prix",
@@ -879,6 +1595,14 @@
     "keywords": "température chaleur degrés",
     "label": "Thermomètre"
   },
+  "thermometer-snowflake": {
+    "keywords": "thermomètre froid hiver gel frais",
+    "label": "Température froide"
+  },
+  "thermometer-sun": {
+    "keywords": "thermomètre chaud chaleur été canicule",
+    "label": "Température chaude"
+  },
   "thumbs-down": {
     "keywords": "négatif désapprouver",
     "label": "Pouce vers le bas"
@@ -886,6 +1610,14 @@
   "thumbs-up": {
     "keywords": "positif approuver",
     "label": "Pouce vers le haut"
+  },
+  "ticket": {
+    "keywords": "ticket événement cinéma entrée",
+    "label": "Billet"
+  },
+  "timer": {
+    "keywords": "chrono compte à rebours délai",
+    "label": "Minuteur"
   },
   "toggle-left": {
     "keywords": "gauche bascule",
@@ -895,6 +1627,26 @@
     "keywords": "droite bascule",
     "label": "Interrupteur allumé"
   },
+  "toilet": {
+    "keywords": "wc sanitaires",
+    "label": "Toilettes"
+  },
+  "toolbox": {
+    "keywords": "bricolage maintenance",
+    "label": "Boîte à outils"
+  },
+  "tornado": {
+    "keywords": "tempête vent météo",
+    "label": "Tornade"
+  },
+  "tractor": {
+    "keywords": "ferme agriculture champ",
+    "label": "Tracteur"
+  },
+  "train-front": {
+    "keywords": "rail transport gare",
+    "label": "Train"
+  },
   "trash": {
     "keywords": "supprimer corbeille effacer",
     "label": "Poubelle"
@@ -902,6 +1654,18 @@
   "trash-2": {
     "keywords": "supprimer corbeille effacer",
     "label": "Poubelle (2)"
+  },
+  "tree-deciduous": {
+    "keywords": "jardin nature feuillu forêt",
+    "label": "Arbre"
+  },
+  "tree-pine": {
+    "keywords": "conifère forêt noël",
+    "label": "Sapin"
+  },
+  "trees": {
+    "keywords": "bois arbres nature parc",
+    "label": "Forêt"
   },
   "trending-down": {
     "keywords": "diminution graphique",
@@ -919,9 +1683,17 @@
     "keywords": "livraison transport",
     "label": "Camion"
   },
+  "turtle": {
+    "keywords": "animal lent",
+    "label": "Tortue"
+  },
   "tv": {
     "keywords": "écran téléviseur",
     "label": "Télévision"
+  },
+  "tv-minimal": {
+    "keywords": "écran télé média",
+    "label": "Télévision (épurée)"
   },
   "twitter": {
     "keywords": "réseau social oiseau",
@@ -940,8 +1712,12 @@
     "label": "Souligné"
   },
   "unlock": {
-    "keywords": "déverrouillé",
+    "keywords": "déverrouillé serrure",
     "label": "Cadenas ouvert"
+  },
+  "unplug": {
+    "keywords": "déconnecté coupé",
+    "label": "Prise débranchée"
   },
   "upload": {
     "keywords": "envoyer importer",
@@ -950,6 +1726,10 @@
   "upload-cloud": {
     "keywords": "envoyer",
     "label": "Téléversement (nuage)"
+  },
+  "usb": {
+    "keywords": "port clé connecteur",
+    "label": "USB"
   },
   "user": {
     "keywords": "personne profil compte",
@@ -967,6 +1747,10 @@
     "keywords": "ajouter nouveau inviter",
     "label": "Utilisateur ajouté"
   },
+  "user-round": {
+    "keywords": "profil compte utilisateur",
+    "label": "Personne (rond)"
+  },
   "user-x": {
     "keywords": "bloqué",
     "label": "Utilisateur supprimé"
@@ -974,6 +1758,22 @@
   "users": {
     "keywords": "personnes groupe équipe famille",
     "label": "Utilisateurs"
+  },
+  "users-round": {
+    "keywords": "personnes famille équipe",
+    "label": "Groupe"
+  },
+  "utensils": {
+    "keywords": "cuisine repas manger fourchette",
+    "label": "Couverts"
+  },
+  "utensils-crossed": {
+    "keywords": "restaurant cuisine repas",
+    "label": "Couverts croisés"
+  },
+  "utility-pole": {
+    "keywords": "ligne réseau électricité",
+    "label": "Poteau électrique"
   },
   "video": {
     "keywords": "caméra film enregistrer",
@@ -999,17 +1799,49 @@
     "keywords": "son audio",
     "label": "Volume fort"
   },
+  "volume-off": {
+    "keywords": "muet silence sans",
+    "label": "Son coupé"
+  },
   "volume-x": {
     "keywords": "muet silence",
     "label": "Volume coupé"
+  },
+  "wallet": {
+    "keywords": "argent paiement budget",
+    "label": "Portefeuille"
+  },
+  "wand-sparkles": {
+    "keywords": "automatique ia générer",
+    "label": "Baguette magique"
+  },
+  "warehouse": {
+    "keywords": "garage remise hangar",
+    "label": "Entrepôt"
+  },
+  "washing-machine": {
+    "keywords": "lave-linge machine à laver buanderie lessive",
+    "label": "Lave-linge"
   },
   "watch": {
     "keywords": "heure temps bracelet",
     "label": "Montre"
   },
+  "waves": {
+    "keywords": "eau mer ondes humidité",
+    "label": "Vagues"
+  },
   "wifi": {
     "keywords": "wifi réseau sans fil internet",
     "label": "Wi-Fi"
+  },
+  "wifi-high": {
+    "keywords": "wifi réseau signal connexion",
+    "label": "Wi-Fi fort"
+  },
+  "wifi-low": {
+    "keywords": "wifi réseau signal connexion",
+    "label": "Wi-Fi faible"
   },
   "wifi-off": {
     "keywords": "wifi désactivé réseau",
@@ -1018,6 +1850,14 @@
   "wind": {
     "keywords": "air brise météo souffle",
     "label": "Vent"
+  },
+  "wine": {
+    "keywords": "boisson alcool verre cave",
+    "label": "Vin"
+  },
+  "wrench": {
+    "keywords": "outil réparer maintenance réglage",
+    "label": "Clé à molette"
   },
   "x": {
     "keywords": "annuler croix non",

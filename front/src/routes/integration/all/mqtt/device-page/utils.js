@@ -8,6 +8,7 @@ import {
   EV_CHARGE_CHARGING_STATE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
+import { isPushButtonFeature } from '../../../../../utils/consts';
 
 const SENSOR_CATEGORY_SUFFIX = '-sensor';
 
@@ -477,32 +478,7 @@ const applyDefaultUnit = (defaults, category, type) => {
   return { ...defaults, unit };
 };
 
-const TELEVISION_CONTINUOUS_CONTROL_TYPES = new Set([
-  DEVICE_FEATURE_TYPES.TELEVISION.BINARY,
-  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
-  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL
-]);
-
-const MUSIC_CONTINUOUS_CONTROL_TYPES = new Set([
-  DEVICE_FEATURE_TYPES.MUSIC.VOLUME,
-  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE
-]);
-
-export const isCatalogPushButtonFeature = (category, type) => {
-  if (category === DEVICE_FEATURE_CATEGORIES.BUTTON && type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
-    return true;
-  }
-
-  if (category === DEVICE_FEATURE_CATEGORIES.TELEVISION) {
-    return !TELEVISION_CONTINUOUS_CONTROL_TYPES.has(type);
-  }
-
-  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
-    return !MUSIC_CONTINUOUS_CONTROL_TYPES.has(type);
-  }
-
-  return false;
-};
+export const isCatalogPushButtonFeature = isPushButtonFeature;
 
 export const getCatalogPreviewMode = (category, type) => {
   if (isCatalogPushButtonFeature(category, type)) {
