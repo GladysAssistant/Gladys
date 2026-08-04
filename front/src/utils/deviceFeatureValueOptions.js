@@ -40,10 +40,12 @@ function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
   const { category, type, min, max } = deviceFeature;
 
   if (category === DEVICE_FEATURE_CATEGORIES.FAN && FAN_LABELED_FEATURE_TYPES.includes(type)) {
-    return getFanFeatureOptions(type, min, max).map(value => ({
+    // The device can declare min/max bounds outside of the enum, in that case there is no value to propose
+    const fanOptions = getFanFeatureOptions(type, min, max).map(value => ({
       value,
       label: getValueLabel(dictionary, `deviceFeatureValue.category.${category}.${type}`, value)
     }));
+    return fanOptions.length > 0 ? fanOptions : null;
   }
 
   if (MATTER_INDEX_SENSOR_CATEGORIES.includes(category)) {

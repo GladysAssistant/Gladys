@@ -14,15 +14,21 @@ const getDeviceFeature = option => (option && option.data ? option.data.deviceFe
 const isSameValue = (optionValue, conditionValue) => `${optionValue}` === `${conditionValue}`;
 
 class Condition extends Component {
+  // The current value can be displayed in the list only if it's a raw value present in that list
+  isValueInValueOptions = valueOptions => {
+    const { value, evaluate_value: evaluateValue } = this.props.condition;
+    return Boolean(
+      valueOptions &&
+        evaluateValue === undefined &&
+        value !== undefined &&
+        valueOptions.some(option => isSameValue(option.value, value))
+    );
+  };
+
   handleChange = selectedOption => {
     const valueOptions = getDeviceFeatureValueOptions(this.props.intl.dictionary, getDeviceFeature(selectedOption));
     // If the new variable only accepts a list of values, we drop the previous value if it's not in that list
-    const shouldResetValue =
-      valueOptions &&
-      !(
-        this.props.condition.value !== undefined &&
-        valueOptions.some(option => isSameValue(option.value, this.props.condition.value))
-      );
+    const shouldResetValue = Boolean(valueOptions) && !this.isValueInValueOptions(valueOptions);
 
     const newCondition = update(this.props.condition, {
       variable: {
@@ -61,6 +67,10 @@ class Condition extends Component {
   displayValueOptions = e => {
     e.preventDefault();
     this.setState({ customValue: false });
+    // We keep the current value if it can be pre-selected in the list
+    if (this.isValueInValueOptions(this.getValueOptions(this.getSelectedOption()))) {
+      return;
+    }
     const newCondition = update(this.props.condition, {
       value: {
         $set: undefined
@@ -159,7 +169,7 @@ class Condition extends Component {
     if (value === undefined || value === '') {
       return true;
     }
-    return valueOptions.some(option => isSameValue(option.value, value));
+    return this.isValueInValueOptions(valueOptions);
   };
 
   render(props, { customValue }) {
