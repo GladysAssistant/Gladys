@@ -79,6 +79,75 @@ describe('externalIntegration.update', () => {
     externalIntegration.clearTimers(service.id);
   });
 
+  it('should fall back to the indexed release when the repo version is not published yet', async () => {
+    // the common window: the author bumps the version on the default branch,
+    // the release workflow is still building the image. The higher version
+    // must not turn the update into a dead end, and must not be cached as
+    // "available" either — every later force update would retry that same
+    // unpullable tag and the badge would stay on forever
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const pullStub = sinon.stub();
+    pullStub.withArgs('ghcr.io/john/gladys-open-meteo-demo:1.4.0').rejects(new Error('NO_MATCHING_MANIFEST'));
+    pullStub.resolves(true);
+    const { externalIntegration } = buildSupervisor({ system: { pull: pullStub } });
+    externalIntegration.refreshIndex = fake.resolves({
+      index_format: 1,
+      integrations: [
+        {
+          store_slug: 'john/gladys-open-meteo-demo',
+          manifest: { ...TEST_MANIFEST, version: '1.3.0', docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.3.0' },
+        },
+      ],
+    });
+    externalIntegration.fetchManifestFromRepo = fake.resolves({
+      ...TEST_MANIFEST,
+      version: '1.4.0',
+      docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.4.0',
+    });
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.3.0');
+    sinonAssert.calledWith(pullStub, 'ghcr.io/john/gladys-open-meteo-demo:1.4.0');
+    sinonAssert.calledWith(pullStub, 'ghcr.io/john/gladys-open-meteo-demo:1.3.0');
+    expect(externalIntegration.repoManifests.has('john/gladys-open-meteo-demo')).to.equal(false);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should fall back to the running image when no published image can be pulled', async () => {
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const pullStub = sinon.stub();
+    pullStub.withArgs('ghcr.io/john/gladys-open-meteo-demo:1.4.0').rejects(new Error('NO_MATCHING_MANIFEST'));
+    pullStub.resolves(true);
+    const { externalIntegration } = buildSupervisor({ system: { pull: pullStub } });
+    externalIntegration.getIndex = fake.resolves(null);
+    externalIntegration.fetchManifestFromRepo = fake.resolves({
+      ...TEST_MANIFEST,
+      version: '1.4.0',
+      docker_image: 'ghcr.io/john/gladys-open-meteo-demo:1.4.0',
+    });
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.2.0');
+    expect(integration.docker_image).to.equal(TEST_MANIFEST.docker_image);
+    expect(externalIntegration.repoManifests.has('john/gladys-open-meteo-demo')).to.equal(false);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should drop an invalid manifest instead of failing the update', async () => {
+    // the index is unmoderated external data: one malformed entry must not
+    // make the button throw a 422 in the user's face
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.refreshIndex = fake.resolves({
+      index_format: 1,
+      integrations: [
+        { store_slug: 'john/gladys-open-meteo-demo', manifest: { ...TEST_MANIFEST, version: 'not-semver' } },
+      ],
+    });
+    externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+    const integration = await externalIntegration.update(service.selector);
+    expect(integration.version).to.equal('1.2.0');
+    externalIntegration.clearTimers(service.id);
+  });
+
   it('should update from the repo when the index cannot be read at all', async () => {
     const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
     const { externalIntegration } = buildSupervisor();

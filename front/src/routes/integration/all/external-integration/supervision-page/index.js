@@ -11,7 +11,14 @@ import style from './style.css';
 
 class ExternalIntegrationSupervisionPage extends Component {
   loadData = async () => {
-    this.setState({ loadStatus: RequestStatus.Getting });
+    // loadData also runs when the user navigates to another integration: the
+    // feedback of the previous one must not be shown on the new card
+    this.setState({
+      loadStatus: RequestStatus.Getting,
+      actionStatus: null,
+      actionError: null,
+      updateResult: null
+    });
     const { selector } = this.props;
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${selector}`);
