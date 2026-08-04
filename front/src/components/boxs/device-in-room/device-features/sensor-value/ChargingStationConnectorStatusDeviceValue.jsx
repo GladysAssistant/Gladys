@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-const EvChargeChargingStateDeviceValue = props => {
+const ChargingStationConnectorStatusDeviceValue = props => {
   const { last_value: lastValue = null } = props.deviceFeature;
   const valued = lastValue !== null;
 
@@ -14,9 +14,9 @@ const EvChargeChargingStateDeviceValue = props => {
     >
       {!valued && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
       {valued && (
-        <Text id={`deviceFeatureValue.category.charging-station.charging-state.${lastValue}`}>
+        <Text id={`deviceFeatureValue.category.charging-station.connector-status.${lastValue}`}>
           <Text
-            id="deviceFeatureValue.category.charging-station.charging-state.unknown"
+            id="deviceFeatureValue.category.charging-station.connector-status.unknown"
             fields={{ value: lastValue }}
           />
         </Text>
@@ -25,4 +25,4 @@ const EvChargeChargingStateDeviceValue = props => {
   );
 };
 
-export default EvChargeChargingStateDeviceValue;
+export default ChargingStationConnectorStatusDeviceValue;

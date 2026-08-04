@@ -267,7 +267,7 @@ const VACUUM_CLEANER_STATE = {
 // ConnectorStatusEnumType, reported independently of any charging session.
 // Not itself protocol-specific: any charging station integration (OCPP-based
 // or not) reporting a comparable connector availability can map onto it.
-const EV_CHARGE_CONNECTOR_STATUS = {
+const CHARGING_STATION_CONNECTOR_STATUS = {
   AVAILABLE: 0,
   OCCUPIED: 1,
   RESERVED: 2,
@@ -277,8 +277,8 @@ const EV_CHARGE_CONNECTOR_STATUS = {
 
 // Generic charging session state - values align with OCPP 2.x's
 // ChargingStateEnumType. Only meaningful while a charging session/transaction
-// is in progress (EV_CHARGE_CONNECTOR_STATUS is OCCUPIED); has no value the
-// rest of the time.
+// is in progress (CHARGING_STATION_CONNECTOR_STATUS is OCCUPIED); has no
+// value the rest of the time.
 //
 // OCPP 1.6 integrations report a single, more granular ChargePointStatus and
 // must split it across both enums:
@@ -291,7 +291,7 @@ const EV_CHARGE_CONNECTOR_STATUS = {
 //   Reserved       -> CONNECTOR_STATUS.RESERVED
 //   Unavailable    -> CONNECTOR_STATUS.UNAVAILABLE
 //   Faulted        -> CONNECTOR_STATUS.FAULTED
-const EV_CHARGE_CHARGING_STATE = {
+const CHARGING_STATION_CHARGING_STATE = {
   CHARGING: 0,
   EV_CONNECTED: 1,
   SUSPENDED_EV: 2,
@@ -823,8 +823,8 @@ const DEVICE_FEATURE_TYPES = {
     IMAGE: 'image',
   },
   CHARGING_STATION: {
-    CONNECTOR_STATUS: 'connector-status', // Connector availability enum (integer - sensor), see EV_CHARGE_CONNECTOR_STATUS
-    CHARGING_STATE: 'charging-state', // Charging session state enum (integer - sensor), see EV_CHARGE_CHARGING_STATE
+    CONNECTOR_STATUS: 'connector-status', // Connector availability enum (integer - sensor), see CHARGING_STATION_CONNECTOR_STATUS
+    CHARGING_STATE: 'charging-state', // Charging session state enum (integer - sensor), see CHARGING_STATION_CHARGING_STATE
   },
   DOORBELL: {
     RING: 'ring',
@@ -1931,8 +1931,8 @@ module.exports.AC_FAN_SPEED = AC_FAN_SPEED;
 module.exports.AC_SWING_HORIZONTAL = AC_SWING_HORIZONTAL;
 module.exports.AC_SWING_VERTICAL = AC_SWING_VERTICAL;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
-module.exports.EV_CHARGE_CONNECTOR_STATUS = EV_CHARGE_CONNECTOR_STATUS;
-module.exports.EV_CHARGE_CHARGING_STATE = EV_CHARGE_CHARGING_STATE;
+module.exports.CHARGING_STATION_CONNECTOR_STATUS = CHARGING_STATION_CONNECTOR_STATUS;
+module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;

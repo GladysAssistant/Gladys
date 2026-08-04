@@ -4,8 +4,8 @@ import {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
-  EV_CHARGE_CONNECTOR_STATUS,
-  EV_CHARGE_CHARGING_STATE
+  CHARGING_STATION_CONNECTOR_STATUS,
+  CHARGING_STATION_CHARGING_STATE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { isPushButtonFeature } from '../../../../../utils/consts';
@@ -738,11 +738,11 @@ export const getCatalogPreviewLabelKey = (category, type) => {
     [categoryTypeKey(
       DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
       DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS
-    )]: `deviceFeatureValue.category.charging-station.connector-status.${EV_CHARGE_CONNECTOR_STATUS.OCCUPIED}`,
+    )]: `deviceFeatureValue.category.charging-station.connector-status.${CHARGING_STATION_CONNECTOR_STATUS.OCCUPIED}`,
     [categoryTypeKey(
       DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
       DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE
-    )]: `deviceFeatureValue.category.charging-station.charging-state.${EV_CHARGE_CHARGING_STATE.CHARGING}`
+    )]: `deviceFeatureValue.category.charging-station.charging-state.${CHARGING_STATION_CHARGING_STATE.CHARGING}`
   };
 
   return labeledPreviewKeys[key] || null;
@@ -766,11 +766,11 @@ export const getFeaturePreviewValue = (category, type) => {
   }
 
   if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS) {
-    return EV_CHARGE_CONNECTOR_STATUS.OCCUPIED;
+    return CHARGING_STATION_CONNECTOR_STATUS.OCCUPIED;
   }
 
   if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE) {
-    return EV_CHARGE_CHARGING_STATE.CHARGING;
+    return CHARGING_STATION_CHARGING_STATE.CHARGING;
   }
 
   if (
