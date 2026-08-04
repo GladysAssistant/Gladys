@@ -1,10 +1,40 @@
 const Promise = require('bluebird');
+const semver = require('semver');
 
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { BadParameters, PlatformNotCompatible } = require('../../utils/coreErrors');
 const { Error422 } = require('../../utils/httpErrors');
 const { MANIFEST_IMAGE_LABEL } = require('./constants');
+
+/**
+ * @description Pick the manifest carrying the most recent version between the
+ * store index entry and the manifest read directly from the repo. The repo
+ * wins ties: it is the source the indexer mirrors, so an equal version means
+ * the same release, and it is always at least as fresh as the index.
+ * @param {object|null} indexManifest - The manifest of the store index entry.
+ * @param {object|null} repoManifest - The manifest read from the repo.
+ * @returns {object|null} The most recent manifest, null if there is none.
+ * @example
+ * const manifest = getMostRecentManifest(indexManifest, repoManifest);
+ */
+function getMostRecentManifest(indexManifest, repoManifest) {
+  if (!indexManifest) {
+    return repoManifest;
+  }
+  if (!repoManifest) {
+    return indexManifest;
+  }
+  const indexVersion = semver.valid(indexManifest.version);
+  const repoVersion = semver.valid(repoManifest.version);
+  if (repoVersion === null) {
+    return indexManifest;
+  }
+  if (indexVersion === null) {
+    return repoManifest;
+  }
+  return semver.gt(indexVersion, repoVersion) ? indexManifest : repoManifest;
+}
 
 /**
  * @description Update an external integration: resolve the latest manifest
@@ -27,19 +57,38 @@ async function update(selector) {
   let { manifest } = service;
   let image = service.docker_image;
   if (service.store_slug) {
-    const index = await this.getIndex();
-    const entry = ((index && index.integrations) || []).find(
-      (indexEntry) => indexEntry.store_slug === service.store_slug,
-    );
-    if (entry) {
-      manifest = entry.manifest;
+    // an update is an explicit admin gesture: no cache may decide its
+    // outcome. The store index lags behind the repo by up to 1h30 (the
+    // indexer rebuilds it hourly, the client caches it 30 min), so reading
+    // the in-memory index would resolve a release published minutes ago to
+    // the *previous* manifest — the same image tag re-pulled, nothing
+    // updated, a "Force update" button that looks broken. Both sources are
+    // read (index refreshed on the spot + repo manifest, the source of truth
+    // the indexer itself mirrors) and the most recent version wins.
+    let indexManifest = null;
+    try {
+      const index = await this.getIndex({ refresh: true });
+      const entry = ((index && index.integrations) || []).find(
+        (indexEntry) => indexEntry.store_slug === service.store_slug,
+      );
+      indexManifest = (entry && entry.manifest) || null;
+    } catch (e) {
+      logger.warn(`Unable to refresh the store index before updating ${service.store_slug}`, e);
+    }
+    let repoManifest = null;
+    try {
+      repoManifest = await this.fetchManifestFromRepo(service.store_slug);
+      // the cache read by isUpdateAvailable follows, so the "update
+      // available" banner reflects the version we just resolved
+      this.repoManifests.set(service.store_slug, repoManifest);
+    } catch (e) {
+      logger.warn(`Unable to fetch the latest manifest of ${service.store_slug} from its repository`, e);
+    }
+    const latestManifest = getMostRecentManifest(indexManifest, repoManifest);
+    if (latestManifest === null) {
+      logger.warn(`No manifest found for ${service.store_slug}, re-pulling the current image`);
     } else {
-      try {
-        manifest = await this.fetchManifestFromRepo(service.store_slug);
-        this.repoManifests.set(service.store_slug, manifest);
-      } catch (e) {
-        logger.warn(`Unable to fetch latest manifest of ${service.store_slug}, re-pulling current image`, e);
-      }
+      manifest = latestManifest;
     }
     this.validateManifest(manifest);
     image = (manifest && manifest.docker_image) || service.docker_image;
