@@ -705,6 +705,8 @@
         "actionError": "Beim Ausführen dieser Aktion ist ein Fehler aufgetreten.",
         "uninstallError": "Beim Deinstallieren dieser Integration ist ein Fehler aufgetreten.",
         "updateAvailableText": "Eine neue Version dieser Integration ist verfügbar.",
+        "updateSuccessText": "Integration auf Version {{version}} aktualisiert.",
+        "alreadyUpToDateText": "Die Integration ist bereits aktuell (Version {{version}}): Das Docker-Image wurde erneut heruntergeladen und der Container neu erstellt.",
         "statusLabel": "Status",
         "versionLabel": "Version",
         "dockerImageLabel": "Docker-Image",
@@ -714,7 +716,7 @@
         "restartButton": "Neu starten",
         "updateButton": "Aktualisieren",
         "forceUpdateButton": "Update erzwingen",
-        "forceUpdateTitle": "Lädt das Docker-Image neu herunter und erstellt den Container neu, auch ohne neue Version",
+        "forceUpdateTitle": "Prüft die zuletzt veröffentlichte Version, lädt das Docker-Image neu herunter und erstellt den Container neu",
         "logsButton": "Logs",
         "uninstallButton": "Deinstallieren",
         "containersTitle": "Zusätzliche Container",
@@ -2978,6 +2980,8 @@
         "removeLabel": "Entfernen",
         "orText": "ODER",
         "orButton": "+ ODER",
+        "useCustomValue": "Eigenen Wert eingeben",
+        "useValueList": "Aus der Werteliste auswählen",
         "logicExplanationText": "Die Bedingungen in diesem Block sind mit ODER verknüpft: Der Block ist erfüllt, sobald eine davon zutrifft. Für ein UND fügst du mehrere Blöcke \"Nur fortsetzen, wenn\" hinzu: Dann müssen alle erfüllt sein.",
         "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
@@ -4568,6 +4572,20 @@
           "other": "Kein Wert empfangen",
           "zero": "Geöffnet",
           "one": "Geschlossen"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Keine Bewegung",
+          "one": "Bewegung erkannt"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Kein Rauch",
+          "one": "Rauch erkannt"
         }
       },
       "co-sensor": {

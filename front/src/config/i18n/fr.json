@@ -705,6 +705,8 @@
         "actionError": "Une erreur s'est produite lors de l'exécution de cette action.",
         "uninstallError": "Une erreur s'est produite lors de la désinstallation de cette intégration.",
         "updateAvailableText": "Une nouvelle version de cette intégration est disponible.",
+        "updateSuccessText": "Intégration mise à jour en version {{version}}.",
+        "alreadyUpToDateText": "L'intégration est déjà à jour (version {{version}}) : l'image Docker a été re-téléchargée et le conteneur recréé.",
         "statusLabel": "Statut",
         "versionLabel": "Version",
         "dockerImageLabel": "Image Docker",
@@ -714,7 +716,7 @@
         "restartButton": "Redémarrer",
         "updateButton": "Mettre à jour",
         "forceUpdateButton": "Forcer la mise à jour",
-        "forceUpdateTitle": "Re-télécharge l'image Docker et recrée le conteneur, même sans nouvelle version",
+        "forceUpdateTitle": "Vérifie la dernière version publiée, re-télécharge l'image Docker et recrée le conteneur",
         "logsButton": "Journaux",
         "uninstallButton": "Désinstaller",
         "containersTitle": "Conteneurs additionnels",
@@ -2978,6 +2980,8 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
         "logicExplanationText": "Les conditions de ce bloc sont reliées par un OU : le bloc est validé dès qu'une seule d'entre elles est réalisée. Pour faire un ET, ajoutez plusieurs blocs « Condition sur variables » : ils devront alors tous être validés.",
         "explanationText": "Dans le champ de valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
       },
@@ -4568,6 +4572,20 @@
           "other": "Aucune valeur reçue",
           "zero": "Ouvert",
           "one": "Fermé"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Pas de mouvement",
+          "one": "Mouvement détecté"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Sain",
+          "one": "Fumée détectée"
         }
       },
       "co-sensor": {
