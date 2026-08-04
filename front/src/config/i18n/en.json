@@ -2980,6 +2980,8 @@
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
         "logicExplanationText": "The conditions in this box are combined with an OR: the box is satisfied as soon as one of them is met. To make an AND, add several \"Condition on variables\" boxes: they will then all have to be satisfied.",
         "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
@@ -4548,6 +4550,20 @@
           "other": "No value received",
           "zero": "Opened",
           "one": "Closed"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No motion",
+          "one": "Motion detected"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "Clear",
+          "one": "Smoke detected"
         }
       },
       "co-sensor": {

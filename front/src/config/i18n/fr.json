@@ -2980,6 +2980,8 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
         "logicExplanationText": "Les conditions de ce bloc sont reliées par un OU : le bloc est validé dès qu'une seule d'entre elles est réalisée. Pour faire un ET, ajoutez plusieurs blocs « Condition sur variables » : ils devront alors tous être validés.",
         "explanationText": "Dans le champ de valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
       },
@@ -4548,6 +4550,20 @@
           "other": "Aucune valeur reçue",
           "zero": "Ouvert",
           "one": "Fermé"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Pas de mouvement",
+          "one": "Mouvement détecté"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Sain",
+          "one": "Fumée détectée"
         }
       },
       "co-sensor": {
