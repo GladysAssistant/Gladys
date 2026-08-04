@@ -143,7 +143,7 @@ Prefix outside the user-facing `/api/v1/`, versioned by URL. Controller `server/
 
 | Endpoint | Mapping |
 |---|---|
-| `POST /discovered_device` (batch, replaces the list) | stored in memory by the supervisor (`external_id`s forced to the `ext:<selector>:` prefix); frontend push `DISCOVERED_DEVICES_UPDATED`; the supervisor flags those already created in DB (match on `external_id`) and **silently upserts their `params`** (see C.3) |
+| `POST /discovered_device` (batch, replaces the list) | stored in memory by the supervisor (`external_id`s forced to the `ext:<selector>:` prefix); frontend push `DISCOVERED_DEVICES_UPDATED`; the supervisor flags those already created in DB (match on `external_id`) and **silently upserts their `params` and their features' `supported_options`** (see C.3) |
 | `GET /device` | **read only**: the integration's devices actually created by the user (`service_id` forced) — lets the integration know what to drive/poll at startup |
 | `POST /state` (batch) | `EVENTS.DEVICE.NEW_STATE` (the native services' path); rate limit 300 states/min (see C.3) |
 | `POST /camera/image` | `gladys.device.camera.setImage` — new image from one of the integration's cameras (≤ 150 KB, 12/min per device, see C.3) |
@@ -557,6 +557,8 @@ Actions are **integration-scoped**: a single rendering place, the Configuration 
 }
 ```
 → `200 { "success": true, "count": 1 }`. Rules: prefixed `external_id`s (device **and** features), `category`/`type`/`unit` within Gladys's standard lists (`DEVICE_FEATURE_CATEGORIES`/`TYPES`/`UNITS`), max 2000 devices (discovery is fleet-wide: a network integration publishes one entry per client on the network, ~1000 on a large setup), `400` otherwise. Optional device-level field **`poll_frequency`** (values from the existing `DEVICE_POLL_FREQUENCIES`: 1 s to 60 s) to receive `device.poll` from the core scheduler once the device is created.
+
+A feature may carry an optional **`supported_options`** array (`[{ "value": 1, "label": "Entrée", "sort_order": 0 }]`) — the labeled option list of enumerated features: camera presets and supported movements (`docs/specs/camera-ptz-control.md`), AC/fan modes… Validated at publish time (integer `value`s, unique, non-empty `label`s, `400` otherwise); the standard `POST /api/v1/device` then persists it in `t_device_feature_supported_option` when the user creates the device. On re-publish, the options of **already-created** devices are silently upserted like the `params` (they are the integration's technical data — e.g. a preset renamed on the camera): synced by feature `external_id` when the published feature carries a `supported_options` array, no user gesture, no device-updated echo back to the integration.
 
 **Payload size**: the whole host API (`/api/integration/v1/*`) accepts a **20 MB** JSON body, against the 100 kB of the routes serving the frontend — the endpoints here are batch by construction and the device count, not the byte count, must be the binding limit. This endpoint in particular cannot be split: publishing **replaces** the previous list, so a second call would erase the first. A device with many features is heavy (a Shelly Pro 3EM exposes 24 features, ~8 kB serialized): under the frontend bound, discovery died around a dozen devices and the user simply saw nothing. Over the bound the core answers `413 PAYLOAD_TOO_LARGE` (never an opaque `500`), so the integration can say so instead of failing silently.
 

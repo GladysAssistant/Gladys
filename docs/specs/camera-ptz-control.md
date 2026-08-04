@@ -2,7 +2,7 @@
 
 > **Living specification — source of truth.** This document specifies how motorized cameras (pan/tilt/zoom, "PTZ") are modeled and controlled in Gladys Assistant. It covers the data model, the server contracts (including MQTT and external integrations), and the frontend. **Rule: any PR that changes a PTZ behavior or contract modifies this file in the same diff** — spec first, code second.
 >
-> Status: **designed, not yet implemented**.
+> Status: **phase 1 implemented** (see Phases).
 
 ## Context
 
@@ -74,7 +74,7 @@ The `preset` feature models the camera's saved positions ("Entrance", "Garden"�
 - `setValue(feature, n)` = **recall** preset `n`. Nothing else — creating/renaming/deleting presets on the camera stays in the camera's own app or the integration's settings screen (v1 non-goal, see Phases).
 - The preset list lives in the feature's **`supported_options`**: `value` = integer slot sent as the command value, `label` = human name (free text, per device — unlike `move`, there are no canonical values), `sort_order` = display order. Integration side, `value` maps to the protocol token (ONVIF preset token, Tapo preset id…). Values MUST be unique per feature; contiguity is not required.
 - `min` = 0, `max` = highest option value (kept consistent by the integration when it syncs options).
-- The list is synced through the existing device payload path: `POST /api/v1/device` with `features[].supported_options` → `device.syncFeatureSupportedOptions` (already implemented, transaction-safe, preserves ids). An integration that can read presets from the camera (ONVIF `GetPresets`) republishes the device with the fresh list; the UI updates via the existing device WebSocket events.
+- The list is synced through the existing device payload path: `POST /api/v1/device` with `features[].supported_options` → `device.syncFeatureSupportedOptions` (already implemented, transaction-safe, preserves ids). An integration that can read presets from the camera (ONVIF `GetPresets`) republishes the device with the fresh list; for external integrations the supervisor silently upserts the options of already-created devices on re-publish, like the `params` (`upsertFeatureSupportedOptions`, see `external-integrations.md` C.3).
 - A `preset` feature with zero options is valid but renders nothing in dashboards.
 
 ### A.4 Absolute position (optional tier)

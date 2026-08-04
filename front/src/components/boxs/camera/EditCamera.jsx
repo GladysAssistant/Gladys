@@ -80,6 +80,27 @@ const EditCameraBox = ({ children, ...props }) => (
         </small>
       </p>
     </div>
+    <div class="form-group">
+      <label class="custom-switch">
+        <input
+          type="checkbox"
+          id="cameraPtzControls"
+          name="cameraPtzControls"
+          class="custom-switch-input"
+          checked={props.box.camera_ptz_controls !== false}
+          onClick={props.updateCameraPtzControls}
+        />
+        <span class="custom-switch-indicator" />
+        <span class="custom-switch-description">
+          <Text id="dashboard.boxes.camera.ptzControlsLabel" />
+        </span>
+      </label>
+      <p class="mt-2">
+        <small class="text-muted">
+          <Text id="dashboard.boxes.camera.ptzControlsDescription" />
+        </small>
+      </p>
+    </div>
   </BaseEditBox>
 );
 
@@ -106,6 +127,13 @@ class EditCameraBoxComponent extends Component {
     const newValue = e.target.checked;
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       camera_live_auto_start: newValue
+    });
+  };
+
+  updateCameraPtzControls = e => {
+    const newValue = e.target.checked;
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      camera_ptz_controls: newValue
     });
   };
 
@@ -148,6 +176,7 @@ class EditCameraBoxComponent extends Component {
         updateBoxName={this.updateBoxName}
         updateBoxLatency={this.updateBoxLatency}
         updateCameraLiveAutoStart={this.updateCameraLiveAutoStart}
+        updateCameraPtzControls={this.updateCameraPtzControls}
       />
     );
   }

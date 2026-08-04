@@ -21,6 +21,8 @@ import PilotWireModeDeviceFeature from './device-features/PilotWireModeDeviceFea
 import LMHVolumeDeviceFeature from './device-features/LMHVolumeDeviceFeature';
 import PushDeviceFeature from './device-features/PushDeviceFeature';
 import VacuumCleanerDockDeviceFeature from './device-features/VacuumCleanerDockDeviceFeature';
+import CameraMoveDeviceFeature from './device-features/CameraMoveDeviceFeature';
+import CameraPresetDeviceFeature from './device-features/CameraPresetDeviceFeature';
 import VacuumCleanerModeDeviceFeature from './device-features/VacuumCleanerModeDeviceFeature';
 import VacuumCleanerCleanModeDeviceFeature from './device-features/VacuumCleanerCleanModeDeviceFeature';
 
@@ -81,6 +83,10 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   },
   [DEVICE_FEATURE_CATEGORIES.FAN]: {
     [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
+  },
+  [DEVICE_FEATURE_CATEGORIES.CAMERA]: {
+    [DEVICE_FEATURE_TYPES.CAMERA.MOVE]: CameraMoveDeviceFeature,
+    [DEVICE_FEATURE_TYPES.CAMERA.PRESET]: CameraPresetDeviceFeature
   }
 };
 

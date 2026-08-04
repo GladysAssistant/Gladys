@@ -16,6 +16,7 @@ const {
   DEVICE_TRANSPORTS,
 } = require('./constants');
 const { validateTransportMessage } = require('./externalIntegration.setDeviceTransports');
+const { normalizeSupportedOptions } = require('../../utils/normalizeSupportedOptions');
 
 /**
  * @description Store the complete list of discovered devices published by an
@@ -72,7 +73,16 @@ async function setDiscoveredDevices(service, devices) {
       if (feature.unit !== undefined && feature.unit !== null && !DEVICE_FEATURE_UNITS_LIST.includes(feature.unit)) {
         throw new BadParameters(`${featurePath}.unit: unknown unit`);
       }
-      return { ...feature };
+      const normalizedFeature = { ...feature };
+      if (feature.supported_options !== undefined) {
+        // labeled option lists (camera presets, supported movements, AC modes...)
+        try {
+          normalizedFeature.supported_options = normalizeSupportedOptions(feature.supported_options);
+        } catch (e) {
+          throw new BadParameters(`${featurePath}.supported_options: ${e.message}`);
+        }
+      }
+      return normalizedFeature;
     });
     const params = Array.isArray(device.params) ? device.params : [];
     params.forEach((param, paramIndex) => {
@@ -119,6 +129,7 @@ async function setDiscoveredDevices(service, devices) {
       const createdDevice = this.stateManager.get('deviceByExternalId', device.external_id);
       if (createdDevice && createdDevice.service_id === service.id) {
         await this.upsertDeviceParams(createdDevice, device.params);
+        await this.upsertFeatureSupportedOptions(createdDevice, device.features);
       }
     }),
   );

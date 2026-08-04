@@ -5,10 +5,15 @@ import { Text } from 'preact-i18n';
 import Hls from 'hls.js';
 
 import config from '../../../config';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import {
+  WEBSOCKET_MESSAGE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES
+} from '../../../../../server/utils/constants';
 import get from 'get-value';
 import style from './style.css';
 import GladysPlusUpsellCard from '../../gateway/GladysPlusUpsellCard';
+import CameraPtzControls from './CameraPtzControls';
 
 const SEGMENT_DURATIONS_PER_LATENCY = {
   'ultra-low': 1,
@@ -31,6 +36,43 @@ class CameraBoxComponent extends Component {
       console.error(e);
       this.setState({ error: true });
     }
+  };
+
+  refreshPtzDevice = async () => {
+    if (!this.props.box.camera) {
+      this.setState({ ptzDevice: null });
+      return;
+    }
+    try {
+      const ptzDevice = await this.props.httpClient.get(`/api/v1/device/${this.props.box.camera}`);
+      this.setState({ ptzDevice });
+    } catch (e) {
+      console.error(e);
+      this.setState({ ptzDevice: null });
+    }
+  };
+
+  renderPtzControls = () => {
+    if (this.props.box.camera_ptz_controls === false) {
+      return null;
+    }
+    const features = get(this.state, 'ptzDevice.features') || [];
+    const moveFeature = features.find(
+      feature =>
+        feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.MOVE
+    );
+    const presetFeature = features.find(
+      feature =>
+        feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.PRESET
+    );
+    const hasPresets =
+      presetFeature && Array.isArray(presetFeature.supported_options) && presetFeature.supported_options.length > 0;
+    if (!moveFeature && !hasPresets) {
+      return null;
+    }
+    return (
+      <CameraPtzControls httpClient={this.props.httpClient} moveFeature={moveFeature} presetFeature={presetFeature} />
+    );
   };
 
   handleWebsocketConnected = ({ connected }) => {
@@ -231,6 +273,7 @@ class CameraBoxComponent extends Component {
 
   componentDidMount() {
     this.refreshData();
+    this.refreshPtzDevice();
     if (this.props.box.camera_live_auto_start === true) {
       this.startStreaming();
     }
@@ -246,6 +289,9 @@ class CameraBoxComponent extends Component {
     const nameChanged = get(previousProps, 'box.name') !== get(this.props, 'box.name');
     if (cameraChanged || nameChanged) {
       this.refreshData();
+    }
+    if (cameraChanged) {
+      this.refreshPtzDevice();
     }
   }
 
@@ -273,6 +319,7 @@ class CameraBoxComponent extends Component {
       upgradeGladysPlusPlanRequired
     }
   ) {
+    const ptzControls = this.renderPtzControls();
     if (streaming) {
       return (
         <div class="card">
@@ -282,8 +329,9 @@ class CameraBoxComponent extends Component {
             })}
           >
             <div class="loader" />
-            <div class="dimmer-content">
+            <div class={cx('dimmer-content', style.cameraMediaContainer)}>
               <video class="w-100" ref={this.videoRef} controls autoPlay muted />
+              {ptzControls}
             </div>
           </div>
           <div class="card-header">
@@ -299,7 +347,12 @@ class CameraBoxComponent extends Component {
     }
     return (
       <div class="card">
-        {image && <img class="card-img-top" src={`data:${image}`} alt={props.roomName} />}
+        {image && (
+          <div class={style.cameraMediaContainer}>
+            <img class="card-img-top" src={`data:${image}`} alt={props.roomName} />
+            {ptzControls}
+          </div>
+        )}
         {error && (
           <div>
             <p class={style.noImageToShowError}>

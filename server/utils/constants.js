@@ -147,6 +147,16 @@ const AC_MODE = {
   FAN: 4,
 };
 
+const CAMERA_MOVE = {
+  STOP: 0,
+  PAN_LEFT: 1,
+  PAN_RIGHT: 2,
+  TILT_UP: 3,
+  TILT_DOWN: 4,
+  ZOOM_IN: 5,
+  ZOOM_OUT: 6,
+};
+
 const FAN_MODE = {
   OFF: 0,
   LOW: 1,
@@ -784,6 +794,11 @@ const DEVICE_FEATURE_TYPES = {
   },
   CAMERA: {
     IMAGE: 'image',
+    MOVE: 'move',
+    PRESET: 'preset',
+    PAN_POSITION: 'pan-position',
+    TILT_POSITION: 'tilt-position',
+    ZOOM_POSITION: 'zoom-position',
   },
   DOORBELL: {
     RING: 'ring',
@@ -1881,6 +1896,7 @@ module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
+module.exports.CAMERA_MOVE = CAMERA_MOVE;
 module.exports.FAN_MODE = FAN_MODE;
 module.exports.FAN_AIRFLOW_DIRECTION = FAN_AIRFLOW_DIRECTION;
 module.exports.FAN_ROCK_SETTING = FAN_ROCK_SETTING;
