@@ -833,8 +833,8 @@ const DEVICE_FEATURE_TYPES = {
     IMAGE: 'image',
   },
   CHARGING_STATION: {
-    CONNECTOR_STATUS: 'connector-status', // Connector availability enum (integer - sensor), see CHARGING_STATION_CONNECTOR_STATUS
-    CHARGING_STATE: 'charging-state', // Charging session state enum (integer - sensor), see CHARGING_STATION_CHARGING_STATE
+    CONNECTOR_STATUS: 'connector-status',
+    CHARGING_STATE: 'charging-state',
   },
   DOORBELL: {
     RING: 'ring',
