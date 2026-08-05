@@ -13,6 +13,7 @@ const SCENE_TRIGGER_TYPES = new Set([
   EVENTS.TIME.CHANGED,
   EVENTS.TIME.SUNRISE,
   EVENTS.TIME.SUNSET,
+  EVENTS.TIME.SUN_POSITION,
   EVENTS.USER_PRESENCE.BACK_HOME,
   EVENTS.USER_PRESENCE.LEFT_HOME,
   EVENTS.HOUSE.EMPTY,
@@ -419,6 +420,17 @@ function createSceneCreateInputSchema(
         .min(-1440)
         .max(1440)
         .optional(),
+    }),
+    triggerSchemaByType(EVENTS.TIME.SUN_POSITION, {
+      house: houseSelectorSchema,
+      altitude: z
+        .number()
+        .min(-90)
+        .max(90),
+      azimuth: z
+        .number()
+        .min(0)
+        .max(359.999),
     }),
     triggerSchemaByType(EVENTS.USER_PRESENCE.BACK_HOME, {
       user: userSelectorSchema,

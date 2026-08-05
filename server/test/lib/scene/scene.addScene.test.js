@@ -240,6 +240,25 @@ describe('SceneManager.addScene', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
     assert.calledOnce(sceneManager.dailyUpdate);
   });
+  it('should add a scene with a sun position trigger', async () => {
+    sceneManager.dailyUpdate = fake.resolves(null);
+    const scene = await sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.TIME.SUN_POSITION,
+          house: 'house',
+          altitude: 31,
+          azimuth: 160,
+        },
+      ],
+      actions: [],
+    });
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
+    assert.calledOnce(sceneManager.dailyUpdate);
+  });
   it('should NOT call dailyUpdate when adding a scene without sunrise/sunset triggers', async () => {
     sceneManager.dailyUpdate = fake.resolves(null);
     await sceneManager.addScene({

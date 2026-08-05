@@ -19,7 +19,12 @@ function hasSunriseSunsetTrigger(scene) {
   if (!scene.triggers) {
     return false;
   }
-  return scene.triggers.some((trigger) => trigger.type === EVENTS.TIME.SUNRISE || trigger.type === EVENTS.TIME.SUNSET);
+  return scene.triggers.some(
+    (trigger) =>
+      trigger.type === EVENTS.TIME.SUNRISE ||
+      trigger.type === EVENTS.TIME.SUNSET ||
+      trigger.type === EVENTS.TIME.SUN_POSITION,
+  );
 }
 
 const nodeScheduleDaysOfWeek = {
