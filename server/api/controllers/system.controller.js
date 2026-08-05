@@ -1,5 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS } = require('../../utils/constants');
+const logger = require('../../utils/logger');
 
 module.exports = function SystemController(gladys) {
   /**
@@ -64,11 +65,19 @@ module.exports = function SystemController(gladys) {
    * @apiGroup System
    */
   async function rebootHost(req, res) {
-    await gladys.system.rebootHost();
+    // Acknowledge BEFORE triggering the reboot: the host may start going down
+    // before the HTTP response is flushed, which would surface as a spurious
+    // "Network Error" in the UI even though the reboot succeeded. Errors are
+    // logged server-side (the buttons are already gated by the capability check).
     res.json({
       success: true,
       message: 'Host will reboot soon',
     });
+    gladys.system.rebootHost().catch(
+      /* istanbul ignore next */ (e) => {
+        logger.error('System: reboot host failed', e);
+      },
+    );
   }
 
   /**
@@ -77,11 +86,16 @@ module.exports = function SystemController(gladys) {
    * @apiGroup System
    */
   async function shutdownHost(req, res) {
-    await gladys.system.shutdownHost();
+    // Acknowledge BEFORE triggering the power off (see rebootHost above).
     res.json({
       success: true,
       message: 'Host will shutdown soon',
     });
+    gladys.system.shutdownHost().catch(
+      /* istanbul ignore next */ (e) => {
+        logger.error('System: shutdown host failed', e);
+      },
+    );
   }
 
   /**
