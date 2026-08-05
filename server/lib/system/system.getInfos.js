@@ -151,6 +151,7 @@ async function getInfos() {
     gladys_version: this.gladysVersion,
     latest_gladys_version: this.latestGladysVersion,
     is_docker: await this.isDocker(),
+    host_power_management_available: this.isHostPowerManagementAvailable(),
   };
   const cpuTemperature = readCpuTemperature();
   infos.cpu_temperature = cpuTemperature;

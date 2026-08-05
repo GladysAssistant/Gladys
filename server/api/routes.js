@@ -912,6 +912,16 @@ function getRoutes(gladys) {
       admin: true,
       controller: systemController.installUpgrade,
     },
+    'post /api/v1/system/reboot': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.rebootHost,
+    },
+    'post /api/v1/system/shutdown-host': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.shutdownHost,
+    },
     'post /api/v1/system/vacuum': {
       authenticated: true,
       admin: true,
