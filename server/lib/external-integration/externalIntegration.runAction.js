@@ -3,6 +3,7 @@ const { Error422 } = require('../../utils/httpErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { ACTION_DEFAULT_TIMEOUT_SECONDS } = require('./constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
+const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
 
 // transport-level failures stay a 400 (integration unreachable), only an
 // explicit refusal of the integration (success: false) becomes a 422
@@ -34,12 +35,15 @@ async function runAction(selector, actionKey, fields = {}) {
     throw new NotFoundError(`action ${actionKey} is not declared in the manifest`);
   }
   const declaredFields = action.fields || [];
+  // a select/multi_select of the mini form can take its options from a
+  // core-defined source ("devices"), exactly like a config_schema field
+  const dynamicOptions = await getDynamicOptions(service, declaredFields);
   Object.keys(fields).forEach((key) => {
     const field = declaredFields.find((declaredField) => declaredField.key === key);
     if (!field) {
       throw new Error422(`fields.${key}: unknown action field`);
     }
-    validateConfigValue(field, fields[key]);
+    validateConfigValue(field, fields[key], dynamicOptions);
   });
   declaredFields.forEach((field) => {
     if (field.required && fields[field.key] === undefined) {
