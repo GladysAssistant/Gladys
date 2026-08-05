@@ -1,10 +1,12 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import QRCode from 'qrcode';
 
 import { getLocalizedText, getUrlDomain } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { OAUTH_REDIRECT_URI, getOAuthCallbackPath } from '../../../../../utils/oauth';
+import { ACCOUNT_FIELD_TYPES } from '../../../../../../../server/lib/external-integration/constants';
 
 // the redirect URI is meant to be copied into the developer application of the
 // provider: a click should select all of it
@@ -28,9 +30,20 @@ class ConfigField extends Component {
     this.props.updateConfigValue(field, newValues);
   };
 
-  onOAuthConnect = e => {
+  onOAuthConnect = async e => {
     e.preventDefault();
-    this.props.connectOAuth(this.props.field);
+    const authorizeUrl = await this.props.connectOAuth(this.props.field);
+    // An account_link provider is approved outside Gladys, and for several of
+    // them (Xiaomi Home, Tuya...) that means their own mobile app. The very URL
+    // that just opened in a tab is offered as a QR code too, so it can be
+    // scanned from a phone instead of signing in again on the computer.
+    if (authorizeUrl && this.props.field.type === 'account_link') {
+      QRCode.toDataURL(authorizeUrl, (err, dataUrl) => {
+        if (!err) {
+          this.setState({ linkQrCode: dataUrl });
+        }
+      });
+    }
   };
 
   copyRedirectUri = async value => {
@@ -116,10 +129,21 @@ class ConfigField extends Component {
       );
     }
 
-    if (field.type === 'oauth2') {
-      // the whole OAuth2 flow is relayed: the integration builds the
-      // authorize URL, the tokens never transit through the frontend
-      const canUseInstanceRedirect = typeof window !== 'undefined' && window.location.protocol === 'https:';
+    if (ACCOUNT_FIELD_TYPES.includes(field.type)) {
+      // Both link a provider account and hold no value: the integration builds
+      // the sign-in URL and the credentials never transit through the frontend.
+      //
+      // They differ on the way back. `oauth2` is the redirect-based flow: the
+      // provider returns to a redirect URI with an authorization code, so that
+      // URI has to be declared in the developer application and an anti-CSRF
+      // state is mandatory. `account_link` never comes back: the user approves
+      // the provider somewhere else — a QR sign-in validated in the vendor app,
+      // a pairing confirmed on a device — and the integration notices on its own
+      // side, then reports it through the connection status. Showing a redirect
+      // URI to declare, or requiring a state, would be meaningless there.
+      const usesRedirect = field.type === 'oauth2';
+      const canUseInstanceRedirect =
+        usesRedirect && typeof window !== 'undefined' && window.location.protocol === 'https:';
       const useInstanceRedirect = canUseInstanceRedirect && this.props.oauthUseInstanceRedirect;
       const redirectUri =
         useInstanceRedirect && selector
@@ -137,44 +161,46 @@ class ConfigField extends Component {
               )}
             </div>
           )}
-          <div class="mb-3">
-            <small class="form-text text-muted mb-1">
-              <Text id="integration.externalIntegration.config.oauthRedirectUriLabel" />
-            </small>
-            <div class="input-group">
-              <input
-                type="text"
-                class="form-control"
-                value={redirectUri}
-                readOnly
-                onFocus={selectOnFocus}
-                ref={element => {
-                  this.redirectUriInput = element;
-                }}
-              />
-              <span class="input-group-append">
-                <button
-                  type="button"
-                  class="btn btn-outline-secondary"
-                  onClick={() => this.copyRedirectUri(redirectUri)}
-                >
-                  <i class="fe fe-copy" />
-                </button>
-              </span>
-            </div>
-            {this.state.redirectUriCopied && (
-              <small class="text-success d-block mt-1">
-                <Text id="integration.externalIntegration.config.oauthRedirectUriCopied" />
+          {usesRedirect && (
+            <div class="mb-3">
+              <small class="form-text text-muted mb-1">
+                <Text id="integration.externalIntegration.config.oauthRedirectUriLabel" />
               </small>
-            )}
-            <small class="form-text text-muted">
-              {useInstanceRedirect ? (
-                <Text id="integration.externalIntegration.config.oauthRedirectUriInstanceDescription" />
-              ) : (
-                <Text id="integration.externalIntegration.config.oauthRedirectUriDescription" />
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  value={redirectUri}
+                  readOnly
+                  onFocus={selectOnFocus}
+                  ref={element => {
+                    this.redirectUriInput = element;
+                  }}
+                />
+                <span class="input-group-append">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    onClick={() => this.copyRedirectUri(redirectUri)}
+                  >
+                    <i class="fe fe-copy" />
+                  </button>
+                </span>
+              </div>
+              {this.state.redirectUriCopied && (
+                <small class="text-success d-block mt-1">
+                  <Text id="integration.externalIntegration.config.oauthRedirectUriCopied" />
+                </small>
               )}
-            </small>
-          </div>
+              <small class="form-text text-muted">
+                {useInstanceRedirect ? (
+                  <Text id="integration.externalIntegration.config.oauthRedirectUriInstanceDescription" />
+                ) : (
+                  <Text id="integration.externalIntegration.config.oauthRedirectUriDescription" />
+                )}
+              </small>
+            </div>
+          )}
           <div>
             <button
               type="button"
@@ -209,6 +235,16 @@ class ConfigField extends Component {
                 <Text id="integration.externalIntegration.config.oauthUseInstanceRedirectLabel" />
               </span>
             </label>
+          )}
+          {!usesRedirect && this.state.linkQrCode && (
+            // the sign-in page also opened in a new tab; this is the same URL as
+            // a QR code, for the providers whose own app is the way to approve it
+            <div class="mt-3">
+              <img src={this.state.linkQrCode} alt="" width="180" height="180" />
+              <small class="form-text text-muted">
+                <Text id="integration.externalIntegration.config.accountLinkQrCode" />
+              </small>
+            </div>
           )}
           {connectionStatus && connectionStatus.message && (
             <small class="form-text text-muted">{getLocalizedText(connectionStatus.message, language)}</small>
