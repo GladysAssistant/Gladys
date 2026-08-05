@@ -32,15 +32,17 @@ class SelectWaterHeaterMode extends Component {
 
   getSelectedOption = () => {
     const { value } = this.props;
+    const { deviceFeatureOptions } = this.state;
 
-    if (value === undefined) {
-      return undefined;
+    if (value === undefined || !deviceFeatureOptions) {
+      return null;
     }
 
-    return {
-      label: this.getLabel(value),
-      value
-    };
+    // Resolve against the offered options rather than rebuilding a label from the raw value: a
+    // mode the feature does not declare must show as nothing selected, not as a valid-looking
+    // choice absent from the list, and options already carry the device's own label when the
+    // value falls outside the catalog.
+    return deviceFeatureOptions.find(option => option.value === value) || null;
   };
 
   componentDidMount() {
@@ -60,7 +62,6 @@ class SelectWaterHeaterMode extends Component {
     return (
       <Select
         class="select-device-feature"
-        defaultValue={''}
         value={selectedOption}
         onChange={this.handleValueChange}
         options={deviceFeatureOptions}

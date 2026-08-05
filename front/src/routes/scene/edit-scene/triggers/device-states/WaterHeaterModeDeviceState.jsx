@@ -42,7 +42,10 @@ class WaterHeaterModeDeviceState extends Component {
   }
 
   render({ trigger }, { options }) {
-    const defaultValue = options.find(option => trigger.value === option.value);
+    // Controlled rather than defaultValue: the option list is recomputed when the selected feature
+    // changes, and an uncontrolled select would keep displaying the previous device's mode. `null`
+    // when nothing matches, so a mode the feature no longer declares shows as unselected.
+    const selectedOption = (options || []).find(option => trigger.value === option.value) || null;
 
     return (
       <Fragment>
@@ -54,7 +57,7 @@ class WaterHeaterModeDeviceState extends Component {
         <div class="col-10 col-md-5">
           <div class="form-group">
             <Select
-              defaultValue={defaultValue || ''}
+              value={selectedOption}
               onChange={this.handleValueChange}
               options={options}
               className="react-select-container"
