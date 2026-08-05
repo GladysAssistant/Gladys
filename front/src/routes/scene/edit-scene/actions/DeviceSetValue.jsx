@@ -14,6 +14,7 @@ import '../../../../components/boxs/device-in-room/device-features/style.css';
 import style from './DeviceSetValue.css';
 import ShutterButtons from '../../../../components/device/ShutterButtons';
 import SelectPilotWireMode from '../../../../components/device/SelectPilotWireMode';
+import SelectWaterHeaterMode from '../../../../components/device/SelectWaterHeaterMode';
 import SelectFanMode from '../../../../components/device/SelectFanMode';
 import SelectFanFeatureValue from '../../../../components/device/SelectFanFeatureValue';
 
@@ -38,7 +39,8 @@ class DeviceSetValue extends Component {
     if (deviceFeatureChanged) {
       if (
         deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
-        deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE
+        deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
+        deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST
       ) {
         this.props.updateActionProperty(this.props.path, 'value', 0);
         this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
@@ -159,6 +161,13 @@ class DeviceSetValue extends Component {
           value={this.props.action.value}
         />
       );
+    }
+
+    if (
+      this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
+      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE
+    ) {
+      return <SelectWaterHeaterMode updateValue={this.handleNewPureValue} value={this.props.action.value} />;
     }
 
     if (this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.FAN.MODE) {

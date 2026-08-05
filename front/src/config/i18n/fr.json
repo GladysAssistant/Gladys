@@ -2191,7 +2191,8 @@
           "button": "Déclenchez des actions à l'appui d'un bouton.",
           "text": "Affichez ou envoyez des valeurs texte.",
           "battery": "Surveillez le niveau de batterie de vos appareils.",
-          "currency": "Affichez des valeurs monétaires ou de cryptomonnaies."
+          "currency": "Affichez des valeurs monétaires ou de cryptomonnaies.",
+          "water-heater": "Piloter un chauffe-eau : état, mode de fonctionnement, consigne d'eau chaude et boost."
         },
         "descriptions": {
           "light": {
@@ -2238,6 +2239,14 @@
           },
           "currency": {
             "decimal": "Affiche une valeur monétaire avec son unité."
+          },
+          "water-heater": {
+            "binary": "Allumer ou éteindre l'appareil.",
+            "mode": "Choisir le mode de fonctionnement.",
+            "target-temperature": "Régler la consigne d'eau chaude avec les boutons +/-.",
+            "remaining-hot-water": "Lire la part d'eau chaude encore disponible.",
+            "heating": "Lire si l'appareil est en train de chauffer l'eau.",
+            "boost": "Lancer ou annuler une chauffe forcée."
           }
         },
         "keywords": {
@@ -4310,6 +4319,37 @@
           "vacuum": "Aspiration",
           "mop": "Serpillère"
         }
+      },
+      "water-heater": {
+        "mode": {
+          "off": "Off",
+          "auto": "Auto",
+          "eco": "Eco",
+          "boost": "Boost",
+          "manual": "Manuel",
+          "absence": "Absence",
+          "program": "Programmation"
+        },
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Éteint",
+            "1": "Allumé"
+          },
+          "state": {
+            "0": "Éteindre",
+            "1": "Allumer"
+          }
+        },
+        "boost": {
+          "stateLiveFinished": {
+            "0": "Boost inactif",
+            "1": "Boost actif"
+          },
+          "state": {
+            "0": "Annuler le boost",
+            "1": "Lancer le boost"
+          }
+        }
       }
     }
   },
@@ -4690,6 +4730,17 @@
           "5": "En charge",
           "6": "Sur la base"
         }
+      },
+      "water-heater": {
+        "mode": {
+          "0": "Off",
+          "1": "Auto",
+          "2": "Eco",
+          "3": "Boost",
+          "4": "Manuel",
+          "5": "Absence",
+          "6": "Programmation"
+        }
       }
     }
   },
@@ -4757,6 +4808,15 @@
       "liquid-state": "État du niveau",
       "liquid-level-percent": "Niveau du liquide (Pourcentage)",
       "liquid-depth": "Profondeur du liquide"
+    },
+    "water-heater": {
+      "shortCategoryName": "Chauffe-eau",
+      "binary": "État",
+      "mode": "Mode",
+      "target-temperature": "Consigne d'eau chaude",
+      "remaining-hot-water": "Eau chaude disponible",
+      "heating": "En chauffe",
+      "boost": "Boost"
     },
     "water-valve": {
       "shortCategoryName": "Vanne d'eau",

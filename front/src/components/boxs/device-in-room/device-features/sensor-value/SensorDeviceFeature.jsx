@@ -59,7 +59,10 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_RANGE_ESTIMATE]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.ODOMETER]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.TIRE_PRESSURE]: PressureSensorDeviceValue,
-  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE]: VacuumCleanerStateDeviceValue
+  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE]: VacuumCleanerStateDeviceValue,
+  // Registered by type, not by category: the category map is checked first and would force one
+  // renderer on every water-heater sensor. remaining-hot-water keeps the numeric-badge default.
+  [DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING]: BinaryDeviceValue
 };
 
 const DEVICE_FEATURES_WITHOUT_EXPIRATION = [

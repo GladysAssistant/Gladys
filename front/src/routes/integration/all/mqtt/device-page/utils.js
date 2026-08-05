@@ -3,7 +3,8 @@ import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
-  DEVICE_FEATURE_UNITS_BY_CATEGORY
+  DEVICE_FEATURE_UNITS_BY_CATEGORY,
+  WATER_HEATER_MODE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { isPushButtonFeature } from '../../../../../utils/consts';
@@ -78,6 +79,10 @@ export const isMqttCatalogFeatureVisible = (category, type) =>
   !MQTT_CATALOG_EXCLUDED_FEATURES.has(categoryTypeKey(category, type));
 
 const CATEGORIES_WITHOUT_UNIT = new Set([
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.MODE),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'integer'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'decimal'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.FAN, DEVICE_FEATURE_TYPES.FAN.SPEED),
@@ -523,6 +528,35 @@ export const getFeatureDefaultValues = (category, type) => {
     );
   }
 
+  // water-heater is a mixed actuator/sensor category, so read_only is decided per type here and
+  // the category is deliberately absent from isSensorCategory (which is category-wide and would
+  // make every command read-only).
+  if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY || type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: false }, category, type);
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 6, read_only: false }, category, type);
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE) {
+      return applyDefaultUnit(
+        { ...defaults, min: 30, max: 70, read_only: false, unit: DEVICE_FEATURE_UNITS.CELSIUS },
+        category,
+        type
+      );
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER) {
+      return applyDefaultUnit(
+        { ...defaults, min: 0, max: 100, read_only: true, unit: DEVICE_FEATURE_UNITS.PERCENT },
+        category,
+        type
+      );
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
+    }
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.MUSIC && type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
   }
@@ -756,6 +790,21 @@ export const getFeaturePreviewValue = (category, type) => {
     type === DEVICE_FEATURE_TYPES.SHUTTER.POSITION
   ) {
     return 65;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
+      return WATER_HEATER_MODE.ECO;
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE) {
+      return 55;
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER) {
+      return 80;
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING) {
+      return 1;
+    }
   }
 
   if (type === DEVICE_FEATURE_TYPES.CURTAIN.POSITION) {

@@ -419,12 +419,12 @@ Attribute-level naming and exact value ranges must be re-checked against the Mat
 
 Zigbee (ZCL, via Zigbee2MQTT) has no water-heater-specific cluster; the second reference adds nothing here.
 
-#### Open questions for maintainers
+#### Two decisions, settled by the author — still open to a maintainer's call
 
-Two decisions are deliberately left open — both are cheap to change now and expensive later:
+Both were raised as open questions before implementation and are now settled **by the PR author**, not by a Gladys maintainer. They are recorded here rather than deleted, because both remain cheap to reverse and a maintainer may still overrule either one:
 
-1. **Own `target-temperature`, or reuse `thermostat/target-temperature`?** Argued under divergence 1 above. Reusing is a one-line change if preferred.
-2. **Enum vocabulary: Gladys names or Matter tag names?** `ECO` / `ABSENCE` / `PROGRAM` versus `LowEnergy` / `Vacation` / `Timed`. This spec keeps the Gladys names: they match the existing `PILOT_WIRE_MODE` and `AC_MODE` enums, and rule 7's naming conventions govern category and type *values* (kebab-case strings in the taxonomy), not internal enum keys. The correspondence is documented above either way, so switching is a rename of seven constants and their i18n keys.
+1. **Own `target-temperature`, kept** — not a reuse of `thermostat/target-temperature`. Rationale under divergence 1 above. Reversing it is a one-line change in `constants.js` plus the frontend registrations that name the type.
+2. **Gladys enum vocabulary, kept** — `ECO` / `ABSENCE` / `PROGRAM` rather than Matter's `LowEnergy` / `Vacation` / `Timed`. They match the existing `PILOT_WIRE_MODE` and `AC_MODE` enums, and rule 7's naming conventions govern category and type *values* (kebab-case strings in the taxonomy), not internal enum keys. The tag-by-tag correspondence is documented above either way, so switching is a rename of seven constants and their i18n keys.
 
 ### D.2 Known limitation — appliances reachable only as booleans
 

@@ -795,7 +795,7 @@
             "value": "Wert"
           },
           "contextTypes": {
-            "device_feature": "Funktion \u201e{{name}}\u201c"
+            "device_feature": "Funktion „{{name}}“"
           },
           "fieldErrorTypes": {
             "notNullViolation": "Pflichtfeld wurde von der Integration nicht gesetzt",
@@ -2058,7 +2058,8 @@
           "button": "Aktionen bei Tastendruck auslösen.",
           "text": "Textwerte anzeigen oder senden.",
           "battery": "Überwachen Sie den Batteriestand Ihrer Geräte.",
-          "currency": "Zeigen Sie Währungs- oder Kryptowährungswerte an."
+          "currency": "Zeigen Sie Währungs- oder Kryptowährungswerte an.",
+          "water-heater": "Warmwasserbereiter steuern: Status, Betriebsmodus, Warmwasser-Sollwert und Boost."
         },
         "descriptions": {
           "light": {
@@ -2105,6 +2106,14 @@
           },
           "currency": {
             "decimal": "Zeigt einen Geldbetrag mit seiner Währungseinheit an."
+          },
+          "water-heater": {
+            "binary": "Das Gerät ein- oder ausschalten.",
+            "mode": "Den Betriebsmodus wählen.",
+            "target-temperature": "Den Warmwasser-Sollwert mit +/- einstellen.",
+            "remaining-hot-water": "Den noch verfügbaren Warmwasseranteil ablesen.",
+            "heating": "Ablesen, ob das Gerät gerade Wasser erhitzt.",
+            "boost": "Eine Zwangsheizung starten oder abbrechen."
           }
         },
         "keywords": {
@@ -4310,6 +4319,37 @@
           "vacuum": "Saugen",
           "mop": "Wischen"
         }
+      },
+      "water-heater": {
+        "mode": {
+          "off": "Aus",
+          "auto": "Auto",
+          "eco": "Öko",
+          "boost": "Boost",
+          "manual": "Manuell",
+          "absence": "Abwesenheit",
+          "program": "Zeitplan"
+        },
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Aus",
+            "1": "Ein"
+          },
+          "state": {
+            "0": "Ausschalten",
+            "1": "Einschalten"
+          }
+        },
+        "boost": {
+          "stateLiveFinished": {
+            "0": "Boost aus",
+            "1": "Boost ein"
+          },
+          "state": {
+            "0": "Boost abbrechen",
+            "1": "Boost starten"
+          }
+        }
       }
     }
   },
@@ -4690,6 +4730,17 @@
           "5": "Lädt",
           "6": "Angedockt"
         }
+      },
+      "water-heater": {
+        "mode": {
+          "0": "Aus",
+          "1": "Auto",
+          "2": "Öko",
+          "3": "Boost",
+          "4": "Manuell",
+          "5": "Abwesenheit",
+          "6": "Zeitplan"
+        }
       }
     }
   },
@@ -4757,6 +4808,15 @@
       "liquid-state": "Flüssigkeitsstand-Status",
       "liquid-level-percent": "Flüssigkeitspegel in Prozent",
       "liquid-depth": "Flüssigkeitstiefe"
+    },
+    "water-heater": {
+      "shortCategoryName": "Warmwasserbereiter",
+      "binary": "Status",
+      "mode": "Modus",
+      "target-temperature": "Warmwasser-Sollwert",
+      "remaining-hot-water": "Verfügbares Warmwasser",
+      "heating": "Heizt",
+      "boost": "Boost"
     },
     "water-valve": {
       "shortCategoryName": "Wasserventil",
