@@ -8,6 +8,7 @@ import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import {
   OAUTH_REDIRECT_URI,
+  assertOpenableUrl,
   getAuthorizeUrlState,
   getOAuthCallbackPath,
   wrapAuthorizeUrl
@@ -447,7 +448,7 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   connectOAuth = async field => {
-    this.setState({ oauthStatus: RequestStatus.Getting, oauthInvalidState: false });
+    this.setState({ oauthStatus: RequestStatus.Getting, oauthInvalidState: false, oauthInvalidUrl: false });
     const { selector } = this.props;
     const callbackPath = getOAuthCallbackPath(selector);
     // an account_link provider never comes back to Gladys: the user approves it
@@ -469,7 +470,7 @@ class ExternalIntegrationConfigPage extends Component {
           redirect_uri: usesRedirect ? redirectUri : undefined
         }
       );
-      let urlToOpen = authorizeUrl;
+      let urlToOpen = assertOpenableUrl(authorizeUrl);
       if (usesRedirect) {
         if (useInstanceRedirect) {
           // nothing to wrap, the provider comes back here directly, but the
@@ -497,7 +498,8 @@ class ExternalIntegrationConfigPage extends Component {
       console.error(e);
       this.setState({
         oauthStatus: RequestStatus.Error,
-        oauthInvalidState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE'
+        oauthInvalidState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE',
+        oauthInvalidUrl: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_URL'
       });
     }
     return undefined;

@@ -154,9 +154,11 @@ class ConfigField extends Component {
           <label class="form-label">{label}</label>
           {oauthStatus === RequestStatus.Error && (
             <div class="alert alert-danger">
-              {this.props.oauthInvalidState ? (
+              {this.props.oauthInvalidState && (
                 <Text id="integration.externalIntegration.config.oauthInvalidStateError" />
-              ) : (
+              )}
+              {this.props.oauthInvalidUrl && <Text id="integration.externalIntegration.config.oauthInvalidUrlError" />}
+              {!this.props.oauthInvalidState && !this.props.oauthInvalidUrl && (
                 <Text id="integration.externalIntegration.config.oauthConnectError" />
               )}
             </div>
@@ -388,9 +390,9 @@ const ConfigSchemaForm = ({
   selector,
   dynamicOptions
 }) => {
-  // sections are presentational and oauth2 has its own Connect button: a
-  // schema made only of those has nothing to save, hide the save button
-  const hasSavableField = schema.some(field => field.type !== 'section' && field.type !== 'oauth2');
+  // sections are presentational and the account fields have their own Connect
+  // button: a schema made only of those has nothing to save, hide the save button
+  const hasSavableField = schema.some(field => field.type !== 'section' && !ACCOUNT_FIELD_TYPES.includes(field.type));
   return (
     <form onSubmit={saveConfig}>
       {saveConfigStatus === RequestStatus.Success && (
