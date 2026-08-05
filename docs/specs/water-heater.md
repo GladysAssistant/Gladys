@@ -288,7 +288,7 @@ Routing happens in `front/src/components/boxs/device-in-room/DeviceRow.jsx`, in 
 | `mode` | **new** `WaterHeaterModeDeviceFeature.jsx` |
 | `target-temperature` | `SetpointDeviceFeature` (existing) |
 
-`WaterHeaterModeDeviceFeature.jsx` is a copy of `AirConditioningModeDeviceFeature.jsx`: a static `MODE_OPTIONS` catalog mapping each `WATER_HEATER_MODE` value to an i18n key, passed through `resolveFeatureOptions` (A.3) and rendered by the shared `AdaptiveOptionControl` — a button group that collapses into a `<select>` when it does not fit the card, which matters here because the enum has eight values.
+`WaterHeaterModeDeviceFeature.jsx` is a copy of `AirConditioningModeDeviceFeature.jsx`: a static `MODE_OPTIONS` catalog mapping each `WATER_HEATER_MODE` value to an i18n key, passed through `resolveFeatureOptions` (A.3) and rendered by the shared `AdaptiveOptionControl` — a button group that collapses into a `<select>` when it does not fit the card, which matters here because the enum has seven values.
 
 `SetpointDeviceFeature` needs two entries in its existing per-category tables: `SETPOINT_STEP_BY_CATEGORY[WATER_HEATER] = 1` (the default 0.5 °C step is a room-thermostat granularity; no tank is set to 54.5 °C) and `DEFAULT_VALUE_BY_CATEGORY[WATER_HEATER] = 55` (a common storage setpoint, used when the feature has no value yet).
 
@@ -438,7 +438,7 @@ This is recorded as a **tooling gap, not a taxonomy one**: the fix belongs in th
 - [x] **Could not be mapped onto an existing category.** `heater` is room heating via pilot wire, `thermostat` is an ambient setpoint, `switch` loses all meaning. No existing category expresses stored hot water.
 - [x] **The same quantity is not split across categories.** Water temperature stays `temperature-sensor`, consumption stays `energy-sensor` (A.4) — the main correction this audit produced.
 - [x] **Types are intrinsic to the capability**; everything else the appliance reports goes to its own category on the same device (A.4). Six types, deliberately narrow; deferrals listed in C.
-- [x] **Matter checked** (D.1), semantics aligned cluster by cluster, the single divergence declared and argued.
+- [x] **Matter checked** (D.1), every mapping qualified as direct, lossy-derived or divergent, and the three declared divergences argued.
 - [x] **Generic, not modelled on one API.** The two reference profiles are different appliance families with different native interfaces mapping onto the same types.
 - [x] **Enum-like types expose the full generic set** (A.2, seven modes); per-device subsets go through `supported_options` (A.3), including for appliances whose native interface is switches.
 - [x] **Naming**: kebab-case, English, no protocol name. No `*-sensor` suffix on the category — it is a controllable appliance, not a measurement category; its two read-only types are the sensor side of that appliance.
