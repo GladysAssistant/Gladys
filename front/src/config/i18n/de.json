@@ -795,7 +795,7 @@
             "value": "Wert"
           },
           "contextTypes": {
-            "device_feature": "Funktion „{{name}}“"
+            "device_feature": "Funktion \u201e{{name}}\u201c"
           },
           "fieldErrorTypes": {
             "notNullViolation": "Pflichtfeld wurde von der Integration nicht gesetzt",
