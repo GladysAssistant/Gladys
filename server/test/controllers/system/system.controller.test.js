@@ -66,12 +66,17 @@ describe('POST /api/v1/system/reboot', () => {
     sinon.assert.calledOnce(rebootHostStub);
   });
 
-  it('should forward the error when the reboot command fails', async () => {
+  it('should still acknowledge (200) even if the reboot command fails asynchronously', async () => {
+    // The reboot is triggered AFTER the response is sent, so a failure is logged
+    // server-side and never turns the acknowledgement into an error.
     rebootHostStub.rejects(new Error('dbus-send not found'));
     await authenticatedRequest
       .post('/api/v1/system/reboot')
       .expect('Content-Type', /json/)
-      .expect(500);
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success', true);
+      });
     sinon.assert.calledOnce(rebootHostStub);
   });
 });
@@ -100,12 +105,15 @@ describe('POST /api/v1/system/shutdown-host', () => {
     sinon.assert.calledOnce(shutdownHostStub);
   });
 
-  it('should forward the error when the shutdown command fails', async () => {
+  it('should still acknowledge (200) even if the shutdown command fails asynchronously', async () => {
     shutdownHostStub.rejects(new Error('dbus-send not found'));
     await authenticatedRequest
       .post('/api/v1/system/shutdown-host')
       .expect('Content-Type', /json/)
-      .expect(500);
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success', true);
+      });
     sinon.assert.calledOnce(shutdownHostStub);
   });
 });
