@@ -1,68 +1,74 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const proxyquire = require('proxyquire').noCallThru();
+const { rebootHost } = require('../../../lib/system/system.rebootHost');
+const { shutdownHost } = require('../../../lib/system/system.shutdownHost');
 
 describe('system.rebootHost', () => {
-  it('should reboot the host through systemd-logind (DBus)', async () => {
-    const exec = sinon.stub().callsFake((command, options, callback) => callback(null, { stdout: '', stderr: '' }));
-    const { rebootHost } = proxyquire('../../../lib/system/system.rebootHost', {
-      child_process: { exec },
-    });
-    await rebootHost();
-    expect(exec.callCount).to.equal(1);
-    const [command, options] = exec.firstCall.args;
-    expect(command).to.contain('org.freedesktop.login1.Manager.Reboot');
-    expect(command).to.contain('--system');
-    expect(options)
-      .to.have.property('timeout')
-      .that.is.a('number');
+  it('should reboot using the cached mechanism without re-detecting', async () => {
+    const self = {
+      hostPowerManagement: 'docker-helper',
+      detectHostPowerManagement: sinon.stub().resolves('docker-helper'),
+      runHostPowerDbusCommand: sinon.stub().resolves(''),
+    };
+    await rebootHost.call(self);
+    sinon.assert.notCalled(self.detectHostPowerManagement);
+    sinon.assert.calledOnceWithExactly(self.runHostPowerDbusCommand, 'Reboot', 'docker-helper');
   });
 
-  it('should reject if the DBus command fails', async () => {
-    const exec = sinon.stub().callsFake((command, options, callback) => callback(new Error('dbus-send not found')));
-    const { rebootHost } = proxyquire('../../../lib/system/system.rebootHost', {
-      child_process: { exec },
-    });
-    let caughtError;
+  it('should detect the mechanism when not cached, then reboot', async () => {
+    const self = {
+      hostPowerManagement: null,
+      detectHostPowerManagement: sinon.stub().resolves('local'),
+      runHostPowerDbusCommand: sinon.stub().resolves(''),
+    };
+    await rebootHost.call(self);
+    sinon.assert.calledOnce(self.detectHostPowerManagement);
+    sinon.assert.calledOnceWithExactly(self.runHostPowerDbusCommand, 'Reboot', 'local');
+  });
+
+  it('should throw and not run any command when no mechanism is available', async () => {
+    const self = {
+      hostPowerManagement: null,
+      detectHostPowerManagement: sinon.stub().resolves(null),
+      runHostPowerDbusCommand: sinon.stub().resolves(''),
+    };
+    let caught;
     try {
-      await rebootHost();
-    } catch (err) {
-      caughtError = err;
+      await rebootHost.call(self);
+    } catch (e) {
+      caught = e;
     }
-    expect(caughtError).to.be.an('error');
-    expect(caughtError.message).to.contain('dbus-send not found');
+    expect(caught).to.be.an('error');
+    sinon.assert.notCalled(self.runHostPowerDbusCommand);
   });
 });
 
 describe('system.shutdownHost', () => {
-  it('should power off the host through systemd-logind (DBus)', async () => {
-    const exec = sinon.stub().callsFake((command, options, callback) => callback(null, { stdout: '', stderr: '' }));
-    const { shutdownHost } = proxyquire('../../../lib/system/system.shutdownHost', {
-      child_process: { exec },
-    });
-    await shutdownHost();
-    expect(exec.callCount).to.equal(1);
-    const [command, options] = exec.firstCall.args;
-    expect(command).to.contain('org.freedesktop.login1.Manager.PowerOff');
-    expect(command).to.contain('--system');
-    expect(options)
-      .to.have.property('timeout')
-      .that.is.a('number');
+  it('should power off using the cached mechanism', async () => {
+    const self = {
+      hostPowerManagement: 'docker-helper',
+      detectHostPowerManagement: sinon.stub().resolves('docker-helper'),
+      runHostPowerDbusCommand: sinon.stub().resolves(''),
+    };
+    await shutdownHost.call(self);
+    sinon.assert.notCalled(self.detectHostPowerManagement);
+    sinon.assert.calledOnceWithExactly(self.runHostPowerDbusCommand, 'PowerOff', 'docker-helper');
   });
 
-  it('should reject if the DBus command fails', async () => {
-    const exec = sinon.stub().callsFake((command, options, callback) => callback(new Error('dbus-send not found')));
-    const { shutdownHost } = proxyquire('../../../lib/system/system.shutdownHost', {
-      child_process: { exec },
-    });
-    let caughtError;
+  it('should throw when no mechanism is available', async () => {
+    const self = {
+      hostPowerManagement: null,
+      detectHostPowerManagement: sinon.stub().resolves(null),
+      runHostPowerDbusCommand: sinon.stub().resolves(''),
+    };
+    let caught;
     try {
-      await shutdownHost();
-    } catch (err) {
-      caughtError = err;
+      await shutdownHost.call(self);
+    } catch (e) {
+      caught = e;
     }
-    expect(caughtError).to.be.an('error');
-    expect(caughtError.message).to.contain('dbus-send not found');
+    expect(caught).to.be.an('error');
+    sinon.assert.notCalled(self.runHostPowerDbusCommand);
   });
 });
