@@ -295,6 +295,58 @@ const VACUUM_CLEANER_CLEAN_MODE = {
   MOP: 6,
 };
 
+// Generic charging station connector status - values align with OCPP 2.0.1/
+// 2.1's StatusNotification.connectorStatus field, reported independently of
+// any charging session. Not itself protocol-specific: any charging station
+// integration (OCPP-based or not) reporting a comparable connector
+// availability can map onto it.
+// Source (OCPP 2.0.1's own data-dictionary type name for this field is
+// ConnectorStatusEnumType, not reproduced verbatim on every third-party
+// reference site - verified against implementation source instead):
+// https://github.com/lorenzodonini/ocpp-go/blob/master/ocpp2.0.1/availability/status_notification.go
+const CHARGING_STATION_CONNECTOR_STATUS = {
+  AVAILABLE: 0,
+  OCCUPIED: 1,
+  RESERVED: 2,
+  UNAVAILABLE: 3,
+  FAULTED: 4,
+};
+
+// Generic charging session state - values align with OCPP 2.0.1/2.1's
+// TransactionEvent.transactionInfo.chargingState field. Only meaningful
+// while a charging session/transaction is in progress
+// (CHARGING_STATION_CONNECTOR_STATUS is OCCUPIED); has no value the rest of
+// the time.
+// Source (OCPP 2.0.1's own data-dictionary type name for this field is
+// ChargingStateEnumType, not reproduced verbatim on every third-party
+// reference site - verified against implementation source instead):
+// https://github.com/lorenzodonini/ocpp-go/blob/master/ocpp2.0.1/transactions/transaction_event.go
+//
+// OCPP 1.6 integrations report a single, more granular ChargePointStatus and
+// must split it across both enums:
+//   Available      -> CONNECTOR_STATUS.AVAILABLE
+//   Preparing      -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.EV_CONNECTED
+//   Charging       -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.CHARGING
+//   SuspendedEVSE  -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.PAUSED_BY_CHARGER
+//   SuspendedEV    -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.PAUSED_BY_VEHICLE
+//   Finishing      -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.IDLE
+//   Reserved       -> CONNECTOR_STATUS.RESERVED
+//   Unavailable    -> CONNECTOR_STATUS.UNAVAILABLE
+//   Faulted        -> CONNECTOR_STATUS.FAULTED
+//
+// DISCHARGING is not part of OCPP 2.0.1 (so not covered by the source link
+// above) and is therefore not in that mapping: it comes from OCPP 2.1, which
+// added Discharging to ChargingStateEnumType, and matches Matter Energy EVSE's
+// PluggedInDischarging. It covers the vehicle feeding energy back (V2G/V2L).
+const CHARGING_STATION_CHARGING_STATE = {
+  CHARGING: 0,
+  EV_CONNECTED: 1,
+  PAUSED_BY_VEHICLE: 2,
+  PAUSED_BY_CHARGER: 3,
+  IDLE: 4,
+  DISCHARGING: 5,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -687,6 +739,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   BATTERY_STORAGE: 'battery-storage',
   BUTTON: 'button',
   CAMERA: 'camera',
+  CHARGING_STATION: 'charging-station',
   CUBE: 'cube',
   CURRENCY: 'currency',
   CO_SENSOR: 'co-sensor',
@@ -801,6 +854,10 @@ const DEVICE_FEATURE_TYPES = {
   },
   CAMERA: {
     IMAGE: 'image',
+  },
+  CHARGING_STATION: {
+    CONNECTOR_STATUS: 'connector-status',
+    CHARGING_STATE: 'charging-state',
   },
   DOORBELL: {
     RING: 'ring',
@@ -1945,6 +2002,8 @@ module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
+module.exports.CHARGING_STATION_CONNECTOR_STATUS = CHARGING_STATION_CONNECTOR_STATUS;
+module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.WATER_HEATER_MODE = WATER_HEATER_MODE;
 module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
