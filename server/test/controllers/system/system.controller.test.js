@@ -42,6 +42,74 @@ describe('POST /api/v1/system/vacuum', () => {
   });
 });
 
+describe('POST /api/v1/system/reboot', () => {
+  let rebootHostStub;
+
+  beforeEach(() => {
+    rebootHostStub = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'rebootHost');
+  });
+
+  afterEach(() => {
+    rebootHostStub.restore();
+  });
+
+  it('should reboot the host', async () => {
+    rebootHostStub.resolves(null);
+    await authenticatedRequest
+      .post('/api/v1/system/reboot')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success', true);
+        expect(res.body).to.have.property('message');
+      });
+    sinon.assert.calledOnce(rebootHostStub);
+  });
+
+  it('should forward the error when the reboot command fails', async () => {
+    rebootHostStub.rejects(new Error('dbus-send not found'));
+    await authenticatedRequest
+      .post('/api/v1/system/reboot')
+      .expect('Content-Type', /json/)
+      .expect(500);
+    sinon.assert.calledOnce(rebootHostStub);
+  });
+});
+
+describe('POST /api/v1/system/shutdown-host', () => {
+  let shutdownHostStub;
+
+  beforeEach(() => {
+    shutdownHostStub = sinon.stub(global.TEST_GLADYS_INSTANCE.system, 'shutdownHost');
+  });
+
+  afterEach(() => {
+    shutdownHostStub.restore();
+  });
+
+  it('should shutdown the host', async () => {
+    shutdownHostStub.resolves(null);
+    await authenticatedRequest
+      .post('/api/v1/system/shutdown-host')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success', true);
+        expect(res.body).to.have.property('message');
+      });
+    sinon.assert.calledOnce(shutdownHostStub);
+  });
+
+  it('should forward the error when the shutdown command fails', async () => {
+    shutdownHostStub.rejects(new Error('dbus-send not found'));
+    await authenticatedRequest
+      .post('/api/v1/system/shutdown-host')
+      .expect('Content-Type', /json/)
+      .expect(500);
+    sinon.assert.calledOnce(shutdownHostStub);
+  });
+});
+
 describe('POST /api/v1/system/upgrade', () => {
   it('should upgrade', async () => {
     const res = await authenticatedRequest
