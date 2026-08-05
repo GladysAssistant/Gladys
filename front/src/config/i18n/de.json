@@ -4653,6 +4653,25 @@
           "1": "Geladen"
         }
       },
+      "charging-station": {
+        "connector-status": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Verfügbar",
+          "1": "Belegt",
+          "2": "Reserviert",
+          "3": "Nicht verfügbar",
+          "4": "Fehler"
+        },
+        "charging-state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Lädt",
+          "1": "Fahrzeug verbunden",
+          "2": "Angehalten (Fahrzeug)",
+          "3": "Angehalten (Ladestation)",
+          "4": "Inaktiv",
+          "5": "Entlädt"
+        }
+      },
       "voc-matter-index-sensor": {
         "integer": {
           "unknown": "Unbekannt",
@@ -4771,6 +4790,11 @@
     "camera": {
       "shortCategoryName": "Kamera",
       "image": "Kamera"
+    },
+    "charging-station": {
+      "shortCategoryName": "Ladestation",
+      "connector-status": "Anschlussstatus",
+      "charging-state": "Ladevorgangsstatus"
     },
     "doorbell": {
       "shortCategoryName": "Türklingel",

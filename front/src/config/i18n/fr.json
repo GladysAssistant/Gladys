@@ -4653,6 +4653,25 @@
           "1": "Connecté"
         }
       },
+      "charging-station": {
+        "connector-status": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Disponible",
+          "1": "Occupé",
+          "2": "Réservé",
+          "3": "Indisponible",
+          "4": "En défaut"
+        },
+        "charging-state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "En charge",
+          "1": "Véhicule connecté",
+          "2": "Suspendue (véhicule)",
+          "3": "Suspendue (borne)",
+          "4": "Inactive",
+          "5": "En décharge"
+        }
+      },
       "voc-matter-index-sensor": {
         "integer": {
           "unknown": "Inconnu",
@@ -4771,6 +4790,11 @@
     "camera": {
       "shortCategoryName": "Caméra",
       "image": "Caméra (Image)"
+    },
+    "charging-station": {
+      "shortCategoryName": "Borne de recharge",
+      "connector-status": "Statut du connecteur",
+      "charging-state": "État de la charge"
     },
     "doorbell": {
       "shortCategoryName": "Sonnette",
