@@ -170,7 +170,13 @@ class DeviceSetValue extends Component {
       this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
       this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE
     ) {
-      return <SelectWaterHeaterMode updateValue={this.handleNewPureValue} value={this.props.action.value} />;
+      return (
+        <SelectWaterHeaterMode
+          deviceFeature={this.state.deviceFeature}
+          updateValue={this.handleNewPureValue}
+          value={this.props.action.value}
+        />
+      );
     }
 
     if (this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.FAN.MODE) {

@@ -183,7 +183,9 @@ class TurnOnLight extends Component {
           {levelSensorDevice && <LevelSensorDeviceState {...props} />}
           {levelMatterSensorDevice && <LevelMatterSensorDeviceState {...props} />}
           {waterValveStatusDevice && <WaterValveDeviceState {...props} />}
-          {waterHeaterModeDevice && <WaterHeaterModeDeviceState {...props} />}
+          {waterHeaterModeDevice && (
+            <WaterHeaterModeDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />
+          )}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
         </div>
         {thresholdDevice && <ThresholdDeviceState {...props} />}

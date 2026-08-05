@@ -3,7 +3,10 @@ import Select from 'react-select';
 import get from 'get-value';
 
 import { WATER_HEATER_MODE } from '../../../../../../../server/utils/constants';
+import { resolveFeatureOptions } from '../../../../../utils/supportedOptions';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
+
+const MODE_CATALOG = Object.keys(WATER_HEATER_MODE).map(key => ({ value: WATER_HEATER_MODE[key] }));
 
 class WaterHeaterModeDeviceState extends Component {
   handleValueChange = ({ value }) => {
@@ -11,15 +14,15 @@ class WaterHeaterModeDeviceState extends Component {
   };
 
   getOptions = () => {
-    const options = Object.keys(WATER_HEATER_MODE).map(key => {
-      const value = WATER_HEATER_MODE[key];
-      return {
-        label: get(this.props.intl.dictionary, `deviceFeatureValue.category.water-heater.mode.${value}`, {
-          default: value
-        }),
-        value
-      };
-    });
+    // Offer only the modes this appliance declares, so a trigger cannot be saved on a mode the
+    // device never reports. resolveFeatureOptions returns the whole catalog when the feature
+    // carries no supported_options, which keeps legacy and hand-made features usable.
+    const options = resolveFeatureOptions(this.props.selectedDeviceFeature, MODE_CATALOG).map(option => ({
+      label: get(this.props.intl.dictionary, `deviceFeatureValue.category.water-heater.mode.${option.value}`, {
+        default: option.label || option.value
+      }),
+      value: option.value
+    }));
 
     this.setState({ options });
   };
@@ -28,6 +31,14 @@ class WaterHeaterModeDeviceState extends Component {
     this.props.updateTriggerProperty(this.props.index, 'operator', '=');
 
     this.getOptions();
+  }
+
+  componentDidUpdate(previousProps) {
+    // Same reason as the action-side selector: the options depend on the selected feature, and
+    // switching between two water-heater mode features does not remount this component.
+    if (previousProps.selectedDeviceFeature !== this.props.selectedDeviceFeature) {
+      this.getOptions();
+    }
   }
 
   render({ trigger }, { options }) {
