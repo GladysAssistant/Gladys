@@ -121,6 +121,7 @@ const ConfigTab = props => {
                     connectionStatus={get(integration, 'connection_status')}
                     oauthStatus={props.oauthStatus}
                     oauthInvalidState={props.oauthInvalidState}
+                    oauthInvalidUrl={props.oauthInvalidUrl}
                     oauthUseInstanceRedirect={props.oauthUseInstanceRedirect}
                     toggleOAuthUseInstanceRedirect={props.toggleOAuthUseInstanceRedirect}
                     connectOAuth={props.connectOAuth}
