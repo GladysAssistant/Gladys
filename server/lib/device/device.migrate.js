@@ -274,10 +274,23 @@ async function moveDuckDbHistory(pairs, sourceFeatureIds, jobId) {
     await Promise.delay(Math.min(pauseInMs, this.DUCKDB_STATES_MIGRATE_MAX_PAUSE_IN_MS));
   });
 
-  // Final unbounded sweep: a state back-dated by the source device into an already
-  // processed slice would otherwise stay behind, and the destroy at the end of the
-  // migration counts the states of the device before accepting to delete it.
+  // The source device keeps publishing while the migration runs. States written during
+  // the run land after the last slice was cut, so they are picked up by the last slice
+  // (no upper bound) — except the last few, written while that slice was being drained.
+  // Replay the move on the last slice's bounds to catch them, rather than have the sweep
+  // below delete history the mapping asked to keep. Cheap: bounded below, so DuckDB skips
+  // everything but the tail of the table.
+  if (pairsWithCutoff.length > 0) {
+    statesMigrated += await moveSlice(buildSliceBounds(numberOfSlices - 1, numberOfSlices, startTime, stepInMs));
+  }
+
+  // Final unbounded sweep: a state back-dated into an already processed slice would
+  // otherwise stay behind, and the destroy at the end of the migration counts the states
+  // of the device before accepting to delete it. Such a state is dropped, not moved: it
+  // cannot be caught without blocking the source device's writes for the whole migration.
+  // The replay above leaves this to the rare back-dated write, not to normal polling.
   await deleteSourceStatesOfSlice({ sql: 'TRUE', params: [] });
+  await this.job.updateProgress(jobId, MOVE_PROGRESS_END, { step: 'moving_states', states_migrated: statesMigrated });
 
   // Flush the WAL and release the delete-tracking memory of the moves/deletes.
   await db.duckDbWriteConnectionAllAsync('CHECKPOINT');
