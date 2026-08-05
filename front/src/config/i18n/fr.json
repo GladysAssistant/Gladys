@@ -3570,6 +3570,7 @@
         "rewriting_dashboards": "Réécriture des tableaux de bord…",
         "deleting_source_device": "Suppression de l'ancien appareil…"
       },
+      "statesMigrated": "États d'historique déplacés : {{count}}",
       "orphanedStates": "États orphelins : {{count}}",
       "duration": "Durée : {{duration}}"
     },

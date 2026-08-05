@@ -3570,6 +3570,7 @@
         "rewriting_dashboards": "Umschreiben der Dashboards…",
         "deleting_source_device": "Löschen des alten Geräts…"
       },
+      "statesMigrated": "Verschobene Verlaufszustände: {{count}}",
       "orphanedStates": "Verwaiste Zustände: {{count}}",
       "duration": "Dauer: {{duration}}"
     },

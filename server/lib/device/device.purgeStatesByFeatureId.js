@@ -103,11 +103,16 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   if (numberOfDuckDbStatesToDelete > 0) {
     // Every DELETE statement is a transaction rewriting row groups: slicing a
     // small purge is pure overhead. Only big purges (where progress reporting
-    // and releasing the write connection matter) are sliced.
+    // and releasing the write connection matter) are sliced, in as many slices
+    // as needed to keep each statement around the threshold — a fixed number of
+    // slices leaves statements growing with the size of the history again.
     if (numberOfDuckDbStatesToDelete <= this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD) {
       sliceUpperBounds = [null];
     } else {
-      const numberOfSlices = this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES;
+      const numberOfSlices = Math.min(
+        this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES,
+        Math.ceil(numberOfDuckDbStatesToDelete / this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD),
+      );
       const [{ min_date: minDate, max_date: maxDate }] = await db.duckDbReadConnectionAllAsync(
         `SELECT MIN(created_at) AS min_date, MAX(created_at) AS max_date
          FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID)`,

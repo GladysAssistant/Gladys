@@ -294,6 +294,57 @@ describe('Device.migrate', () => {
     sinonAssert.notCalled(sceneManagerFake.update);
   });
 
+  it('should move the whole history in slices, with one cutoff per feature', async () => {
+    // One state per month on the source features
+    const sourceTempStates = [...Array(12)].map((value, month) => ({
+      value: 20 + month,
+      created_at: new Date(Date.UTC(2024, month, 1)),
+    }));
+    const sourceBinaryStates = [...Array(12)].map((value, month) => ({
+      value: month % 2,
+      created_at: new Date(Date.UTC(2024, month, 15)),
+    }));
+    await db.duckDbBatchInsertState(sourceTempFeature.id, sourceTempStates);
+    await db.duckDbBatchInsertState(sourceBinaryFeature.id, sourceBinaryStates);
+    // The two destination features have their own cutoff: the temperature one already has
+    // history since July, the binary one has none and takes everything.
+    await db.duckDbBatchInsertState(destinationTempFeature.id, [
+      { value: 30, created_at: new Date(Date.UTC(2024, 6, 1)) },
+    ]);
+    const destinationBinaryFeature = await db.DeviceFeature.findOne({
+      where: { selector: 'migration-destination-binary' },
+    });
+    // Small enough to force one slice per state: the slice bounds, the first slice
+    // (no lower bound) and the last one (no upper bound) are all exercised.
+    deviceManager.DUCKDB_STATES_MIGRATE_STATES_PER_SLICE = 1;
+    deviceManager.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 0;
+    deviceManager.DUCKDB_STATES_MIGRATE_PAUSE_FACTOR = 0;
+
+    const result = await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: {
+        'migration-source-temp': 'migration-destination-temp',
+        'migration-source-binary': 'migration-destination-binary',
+      },
+    });
+
+    // 6 temperature states before July + the 12 binary states
+    expect(result.duck_db_states_migrated).to.equal(18);
+    expect(await countDuckDbStates(destinationTempFeature.id)).to.equal(7);
+    expect(await countDuckDbStates(destinationBinaryFeature.id)).to.equal(12);
+    expect(await countDuckDbStates(sourceTempFeature.id)).to.equal(0);
+    expect(await countDuckDbStates(sourceBinaryFeature.id)).to.equal(0);
+    // The moved values are the right ones, in the right order
+    const movedStates = await db.duckDbReadConnectionAllAsync(
+      'SELECT value FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID) ORDER BY created_at',
+      destinationTempFeature.id,
+    );
+    expect(movedStates.map((state) => state.value)).to.deep.equal([20, 21, 22, 23, 24, 25, 30]);
+    // The job reports how many states were moved, live
+    const migrationJob = await db.Job.findOne({ where: { type: 'device-migrate' }, order: [['created_at', 'DESC']] });
+    expect(migrationJob.data.states_migrated).to.equal(18);
+  });
+
   it('should migrate a device without features and with an empty mapping', async () => {
     await db.DeviceFeature.destroy({ where: { device_id: sourceDevice.id } });
     const result = await deviceManager.migrate('migration-source', {

@@ -17,7 +17,7 @@ Scoping decisions validated with the maintainer:
 
 | Data | Behavior |
 |---|---|
-| DuckDB state history (`t_device_feature_state`, keyed by feature UUID) | **Moved** per mapped feature pair, re-keyed with `UPDATE … SET device_feature_id`, cut at the destination's oldest state. Remaining source rows deleted. |
+| DuckDB state history (`t_device_feature_state`, keyed by feature UUID) | **Moved** for every mapped feature pair, re-keyed with `UPDATE … SET device_feature_id`, cut at the destination's oldest state. Remaining source rows deleted. Done in `created_at` slices, all pairs re-keyed by the same statement (rationale and measurements in B.4). |
 | SQLite leftover states + aggregates (pre-DuckDB-migration installs) | **Deleted** (not moved): they are legacy leftovers pending purge; the DuckDB migration at boot has already imported them. Deleting them inline also guarantees the final `destroy` never hits the 5000-states refusal. |
 | Scenes (`t_scene.actions` / `t_scene.triggers`, selector strings) | **Rewritten**: every mapped source feature selector and the source device selector are replaced by their destination counterparts (exhaustive field list in B.3). RAM scene cache resynchronized via `addScene`. |
 | Dashboards (`t_dashboard.boxes`, selector strings) | **Rewritten** with the same replacement maps (field list in B.3). Selector replacement never changes array positions, so the positional companions (`device_feature_names`, `units`, `colors`) stay aligned by construction. |
@@ -88,22 +88,30 @@ Only scenes/dashboards that actually changed are saved. Rewritten scenes go thro
 
 `DeviceManager.migrate(sourceSelector, { destination_device_selector, features_mapping })`, wrapped as a job (`JOB_TYPES.DEVICE_MIGRATE = 'device-migrate'`) for progress/visibility in the jobs page, **and** awaited by the controller (the HTTP response carries the final report). The device manager gets `sceneManager` by post-construction assignment in `server/lib/index.js` (existing precedent: `gateway.scene = scene`); dashboards have no RAM cache and are rewritten straight through `db.Dashboard` (deliberately bypassing the per-user scoping of `dashboard.update`: a migration is a whole-instance operation).
 
-The job's structured progress (`device_name`, `destination_device_name`, `step`) is **rendered by the jobs page**: `JobData.jsx` registers a `DEVICE_MIGRATE` renderer (same pattern as the purge jobs) and every step key has a `jobsSettings.jobData.steps.*` translation — the error/timeout copy sends users there, so the page must show more than a bare percentage.
+The job's structured progress (`device_name`, `destination_device_name`, `step`, `states_migrated`) is **rendered by the jobs page**: `JobData.jsx` registers a `DEVICE_MIGRATE` renderer (same pattern as the purge jobs) and every step key has a `jobsSettings.jobData.steps.*` translation — the error/timeout copy sends users there, so the page must show more than a bare percentage.
 
-Known trade-off: each per-feature DuckDB `UPDATE` runs as a single statement on the serial write queue, so a feature with years of history briefly stalls live state inserts (same behavior as the other one-shot data moves). Acceptable for a one-off admin gesture; slicing by `created_at` ranges (purge-style) is the hardening lever if field feedback asks for it.
+**History move — why it is sliced (hardening of the first implementation).** The first version ran one `UPDATE` per mapped feature over the whole table. Field feedback on a 10 GB database (community thread 10444, a Netatmo weather station): 1h26 for one device, RAM climbing past 8 GB until the OOM killer fired, the DuckDB file nearly doubling in size, and the jobs page stuck at 5% for the whole run. Three causes, three fixes, all measured on a synthetic 2.9 GB / 176M-row database:
+
+| | first implementation | sliced, all features at once |
+|---|---|---|
+| statements over the history | one per mapped feature (+ 2 counting scans each) | one `UPDATE` + one `DELETE` per slice, every feature in the same `CASE` |
+| memory of a statement | grows with the rows it updates — not bounded by `memory_limit`, and DuckDB cannot spill transaction memory | bounded by the slice size (`DUCKDB_STATES_MIGRATE_STATES_PER_SLICE`) |
+| write connection | held for the whole run | released between two slices, plus a duty-cycle pause of one slice duration |
+| progress | 5% until the whole move is done | one update per slice, with a live moved-states counter |
+
+Cutoffs are read with one `MIN(created_at) FILTER (WHERE device_feature_id = ?)` per pair in a **single** statement, and the source range/volume with a single `MIN`/`MAX`/`COUNT`: `device_feature_id` is not indexed, so per-feature metadata queries were themselves one full scan of the history each.
 
 Ordered steps (order is a contract — history first, then references, deletion last, so a failure leaves a re-runnable state):
 1. Load + validate (B.2).
-2. **Per mapped pair — history move**: read `MIN(created_at)` of the destination feature in DuckDB; `UPDATE t_device_feature_state SET device_feature_id = CAST(? AS UUID) WHERE device_feature_id = CAST(? AS UUID)` with `AND created_at < CAST(? AS TIMESTAMPTZ)` when a cutoff exists; count moved rows for the report. Then `DELETE` the remaining source rows of that feature (overlap period).
-3. **Per unmapped source feature**: `DELETE` its DuckDB rows.
-4. One `CHECKPOINT` after all DuckDB writes (flushes the WAL, releases delete-tracking memory — same rationale as the purge).
-5. **SQLite leftovers**: single `DELETE` per source feature on `t_device_feature_state` and `t_device_feature_state_aggregate` (no batching: one-off migration gesture, indexed column; this also guarantees step 9 passes the destroy count check).
-6. **`last_value` copy** (freshness rule of section A) + **`energy_parent_id` re-point** for mapped pairs; refresh the affected feature rows in the state manager caches.
-7. **`t_energy_price.electric_meter_device_id` re-point** (section A) then **room inheritance** (rule of section A); on room change, refresh the destination device in caches and `notify(EVENTS.DEVICE.UPDATE)`.
-8. **Rewrite scenes then dashboards** (B.3).
-9. **Destroy the source device** via `this.destroy(source.selector)` — standard semantics (hooks, caches, poll, notify).
+2. **History move + source cleanup, in `created_at` slices** (`moveDuckDbHistory`): read the destination cutoffs and the source range/volume (2 statements, whatever the number of features), then for each slice `UPDATE t_device_feature_state SET device_feature_id = CASE device_feature_id WHEN <source> THEN <destination> … END WHERE <slice> AND (<per-feature cutoff clause>)`, followed by `DELETE … WHERE <slice> AND device_feature_id IN (<all source features>)` which drops the overlap period and the history of the unmapped features. The number of moved rows comes from the `UPDATE` result count. The **first slice has no lower bound and the last one no upper bound**, so states written by the source device while the migration runs — or back-dated by `saveHistoricalState` — are never left behind (a leftover would also make the final destroy hit the "too much states" refusal).
+3. One `CHECKPOINT` after all DuckDB writes (flushes the WAL, releases delete-tracking memory — same rationale as the purge).
+4. **SQLite leftovers**: single `DELETE` per source feature on `t_device_feature_state` and `t_device_feature_state_aggregate` (no batching: one-off migration gesture, indexed column; this also guarantees step 8 passes the destroy count check).
+5. **`last_value` copy** (freshness rule of section A) + **`energy_parent_id` re-point** for mapped pairs; refresh the affected feature rows in the state manager caches.
+6. **`t_energy_price.electric_meter_device_id` re-point** (section A) then **room inheritance** (rule of section A); on room change, refresh the destination device in caches and `notify(EVENTS.DEVICE.UPDATE)`.
+7. **Rewrite scenes then dashboards** (B.3).
+8. **Destroy the source device** via `this.destroy(source.selector)` — standard semantics (hooks, caches, poll, notify).
 
-Failure modes: any throw before step 9 leaves both devices in place; the migration is re-runnable (already-moved rows simply stay on the destination; the cutoff rule makes re-running convergent). The job records the failure (`JOB_STATUS.FAILED` + error string) like every wrapped job. If the HTTP client times out mid-run, the server-side run continues; the result is visible in the jobs page and the device list reflects the outcome (the in-flight guard of B.2 rejects a retry started while the first run is still going).
+Failure modes: any throw before step 8 leaves both devices in place; the migration is re-runnable (already-moved rows simply stay on the destination; the cutoff rule makes re-running convergent). The job records the failure (`JOB_STATUS.FAILED` + error string) like every wrapped job. If the HTTP client times out mid-run, the server-side run continues; the result is visible in the jobs page and the device list reflects the outcome (the in-flight guard of B.2 rejects a retry started while the first run is still going).
 
 **Atomicity — a deliberate non-goal.** DuckDB cannot join a SQLite transaction, so a migration can never be fully atomic; wrapping only the SQLite writes in a transaction would buy little (the irreversible part is the DuckDB history move) while forcing the scene rewrites out of the scene manager path that keeps the RAM cache in sync — a rollback would desynchronize RAM from DB. Instead the design leans on ordering and convergence: the only data irreversibly gone before the final destroy is history the user explicitly chose to drop (unmapped features) or overlap duplicates; every SQLite rewrite (scenes, dashboards, FKs, room) is idempotent; re-running after a mid-run failure converges to the same final state. The failure copy in the frontend reflects this honestly (some history may already have been moved; re-running only moves what remains).
 

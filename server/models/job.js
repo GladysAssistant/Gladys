@@ -45,6 +45,7 @@ const dataKeysByJobType = {
     ),
     device_name: Joi.string(),
     destination_device_name: Joi.string(),
+    states_migrated: countKey(),
   },
 };
 
