@@ -120,8 +120,10 @@ async function readDestinationCutoffs(pairs) {
 
 /**
  * @description Build the `created_at` bounds of one slice. The first slice has no lower
- * bound and the last one no upper bound, so states written by the source device while the
- * migration runs (or back-dated by `saveHistoricalState`) are never left behind.
+ * bound and the last one no upper bound, so the slices always cover the whole timeline
+ * (a state written at "now" while the migration runs falls in the last slice). A state
+ * back-dated into an already-processed slice is caught by the final unbounded sweep of
+ * `moveDuckDbHistory` instead.
  * @param {number} index - Index of the slice.
  * @param {number} numberOfSlices - Total number of slices.
  * @param {number} startTime - Timestamp of the oldest state to process.
@@ -156,6 +158,12 @@ function buildSliceBounds(index, numberOfSlices, startTime, stepInMs) {
  *   inserts and the energy jobs the write connection back between two slices.
  * - moving every mapped feature in the same statement turns N passes over the history into
  *   one, which is where most of the wall-clock time went.
+ *
+ * The slices are cut in time, which only bounds the rows per statement when the history has
+ * a roughly even density: a burst of states in one window, or a whole feature sharing a
+ * single timestamp, would put everything back into one statement. So each statement also
+ * carries a hard cardinality cap (`rowid IN (SELECT … LIMIT n)`) and is repeated until the
+ * slice is drained. In the even case the cap never triggers and costs nothing.
  * @param {Array} pairs - Array of { sourceFeature, destinationFeature }.
  * @param {Array} sourceFeatureIds - Ids of all the features of the source device.
  * @param {string} [jobId] - Id of the job.
@@ -207,28 +215,49 @@ async function moveDuckDbHistory(pairs, sourceFeatureIds, jobId) {
     cutoff === null ? [sourceFeature.id] : [sourceFeature.id, cutoff],
   );
 
+  // A statement never touches more than `cap` rows: it is repeated until it affects fewer
+  // than that, which means the slice is drained. Termination is guaranteed — moved rows no
+  // longer carry a source feature id, deleted rows are gone — and in an evenly spread
+  // history the first statement already drains the slice.
+  const cap = Math.max(1, Math.floor(this.DUCKDB_STATES_MIGRATE_STATES_PER_SLICE));
+  const runCapped = async (query, params) => {
+    let affected = cap;
+    let total = 0;
+    while (affected === cap) {
+      // Sequential on purpose: the next statement works on what the previous one left.
+      // eslint-disable-next-line no-await-in-loop
+      const result = await db.duckDbWriteConnectionAllAsync(query, ...params);
+      // DuckDB returns the number of affected rows
+      affected = result && result[0] && result[0].Count !== undefined ? Number(result[0].Count) : 0;
+      total += affected;
+    }
+    return total;
+  };
+  const moveSlice = (slice) =>
+    runCapped(
+      `UPDATE t_device_feature_state SET device_feature_id = CASE device_feature_id ${caseSql} END
+       WHERE rowid IN (SELECT rowid FROM t_device_feature_state
+                       WHERE ${slice.sql} AND (${moveSql}) LIMIT ${cap})`,
+      [...caseParams, ...slice.params, ...moveParams],
+    );
+  // Whatever is left on a source feature is dropped: states of the overlap period (already
+  // on the destination) and history of the unmapped features.
+  const deleteSourceStatesOfSlice = (slice) =>
+    runCapped(
+      `DELETE FROM t_device_feature_state
+       WHERE rowid IN (SELECT rowid FROM t_device_feature_state
+                       WHERE ${slice.sql} AND device_feature_id IN (${sourceIdsSql}) LIMIT ${cap})`,
+      [...slice.params, ...sourceFeatureIds],
+    );
+
   let statesMigrated = 0;
   await Promise.each([...Array(numberOfSlices)], async (value, index) => {
     const slice = buildSliceBounds(index, numberOfSlices, startTime, stepInMs);
     const sliceStartedAt = Date.now();
     if (pairsWithCutoff.length > 0) {
-      const result = await db.duckDbWriteConnectionAllAsync(
-        `UPDATE t_device_feature_state SET device_feature_id = CASE device_feature_id ${caseSql} END
-         WHERE ${slice.sql} AND (${moveSql})`,
-        ...caseParams,
-        ...slice.params,
-        ...moveParams,
-      );
-      // DuckDB returns the number of updated rows
-      statesMigrated += result && result[0] && result[0].Count !== undefined ? Number(result[0].Count) : 0;
+      statesMigrated += await moveSlice(slice);
     }
-    // Whatever is left on a source feature in this slice is dropped: states of the overlap
-    // period (already on the destination) and history of the unmapped features.
-    await db.duckDbWriteConnectionAllAsync(
-      `DELETE FROM t_device_feature_state WHERE ${slice.sql} AND device_feature_id IN (${sourceIdsSql})`,
-      ...slice.params,
-      ...sourceFeatureIds,
-    );
+    await deleteSourceStatesOfSlice(slice);
     const sliceDurationInMs = Date.now() - sliceStartedAt;
     await this.job.updateProgress(
       jobId,
@@ -244,6 +273,11 @@ async function moveDuckDbHistory(pairs, sourceFeatureIds, jobId) {
     );
     await Promise.delay(Math.min(pauseInMs, this.DUCKDB_STATES_MIGRATE_MAX_PAUSE_IN_MS));
   });
+
+  // Final unbounded sweep: a state back-dated by the source device into an already
+  // processed slice would otherwise stay behind, and the destroy at the end of the
+  // migration counts the states of the device before accepting to delete it.
+  await deleteSourceStatesOfSlice({ sql: 'TRUE', params: [] });
 
   // Flush the WAL and release the delete-tracking memory of the moves/deletes.
   await db.duckDbWriteConnectionAllAsync('CHECKPOINT');
@@ -319,6 +353,9 @@ async function executeMigration(selector, options, jobId) {
     device_name: source.name,
     destination_device_name: destination.name,
     step: 'moving_states',
+    // Published up front so the jobs page shows a counter from the start, and still shows
+    // "0 states moved" when the history move returns early (no feature, or no state).
+    states_migrated: 0,
   });
 
   // Move the DuckDB history of the mapped pairs, cut at the destination's oldest state so
