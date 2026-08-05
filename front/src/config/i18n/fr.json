@@ -4322,9 +4322,9 @@
       },
       "water-heater": {
         "mode": {
-          "off": "Off",
+          "off": "Arrêt",
           "auto": "Auto",
-          "eco": "Eco",
+          "eco": "Éco",
           "boost": "Boost",
           "manual": "Manuel",
           "absence": "Absence",
@@ -4733,9 +4733,9 @@
       },
       "water-heater": {
         "mode": {
-          "0": "Off",
+          "0": "Arrêt",
           "1": "Auto",
-          "2": "Eco",
+          "2": "Éco",
           "3": "Boost",
           "4": "Manuel",
           "5": "Absence",

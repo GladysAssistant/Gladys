@@ -40,7 +40,8 @@ class DeviceSetValue extends Component {
       if (
         deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
         deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
-        deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST
+        (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
+          deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST)
       ) {
         this.props.updateActionProperty(this.props.path, 'value', 0);
         this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
@@ -116,7 +117,8 @@ class DeviceSetValue extends Component {
     if (
       this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
       this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
-      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST
+      (this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
+        this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST)
     ) {
       return (
         <label class="custom-switch">

@@ -357,7 +357,7 @@ Command semantics over `external-integration.device.set-value` (the core → int
 
 Since these features are published with `has_feedback: true`, the integration must publish the resulting state through `POST /api/integration/v1/state` — nothing is persisted by the core on the write path.
 
-Documentation gap to close in the implementation PR: `docs/specs/external-integrations.md` documents `discovered_device` but never mentions `supported_options`, even though it already flows end-to-end. One sentence in the `discovered_device` section, in the same diff.
+`docs/specs/external-integrations.md` documented `discovered_device` without ever mentioning `supported_options`, even though it already flowed end-to-end; its `discovered_device` section now describes the field, closed in this diff.
 
 ### B.8 Compatibility
 
