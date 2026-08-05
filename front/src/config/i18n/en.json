@@ -4740,6 +4740,18 @@
           "4": "Manual",
           "5": "Away",
           "6": "Schedule"
+        },
+        "binary": {
+          "0": "Off",
+          "1": "On"
+        },
+        "boost": {
+          "0": "Boost off",
+          "1": "Boost on"
+        },
+        "heating": {
+          "0": "Idle",
+          "1": "Heating"
         }
       }
     }

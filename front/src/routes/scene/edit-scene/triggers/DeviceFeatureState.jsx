@@ -103,13 +103,14 @@ class TurnOnLight extends Component {
       const { category, type } = selectedDeviceFeature;
 
       // water-heater's own `binary` shares the 'binary' string with SWITCH, so it is already
-      // covered by the first test; `boost` and `heating` belong to this category alone.
+      // covered by the first test. `boost` and `heating` are scoped to their category so that a
+      // future category reusing either string does not silently inherit this widget.
       binaryDevice =
         type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE ||
-        type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST ||
-        type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING;
+        (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
+          (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST || type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING));
       presenceDevice = category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
       doorbellRingDevice = category === DEVICE_FEATURE_CATEGORIES.DOORBELL;

@@ -84,9 +84,10 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.FAN]: {
     [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
   },
-  // Every water-heater command reuses a type string another category already owns (binary, mode,
-  // target-temperature), so they all belong here rather than in the type-keyed map, where
-  // declaration order would decide the winner for every category.
+  // `mode` and `target-temperature` are strings other categories already own, so routing them from
+  // the type-keyed map would let declaration order decide the winner for every category. `binary`
+  // and `boost` would resolve correctly there too; they are kept here so the whole category reads
+  // in one place.
   [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
     [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: BinaryDeviceFeature,
     [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: WaterHeaterModeDeviceFeature,

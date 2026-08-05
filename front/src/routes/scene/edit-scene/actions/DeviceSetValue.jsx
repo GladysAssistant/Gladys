@@ -115,7 +115,8 @@ class DeviceSetValue extends Component {
 
     if (
       this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
-      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE
+      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
+      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST
     ) {
       return (
         <label class="custom-switch">
