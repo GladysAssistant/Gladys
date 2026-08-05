@@ -46,12 +46,13 @@ describe('system.runHostPowerDbusCommand (docker-helper)', () => {
     start: sinon.stub().resolves(),
     wait: sinon.stub().resolves({ StatusCode: statusCode }),
     logs: sinon.stub().resolves(Buffer.from(logs)),
+    kill: sinon.stub().resolves(),
     remove: sinon.stub().resolves(),
   });
 
   const buildSelf = (container) => ({
     dockerode: { createContainer: sinon.stub().resolves(container) },
-    getGladysImageName: sinon.stub().resolves('gladysassistant/gladys:v4'),
+    getGladysImage: sinon.stub().resolves({ image: 'gladysassistant/gladys:v4' }),
   });
 
   it('should launch a helper container mounting the host DBus socket and return its output', async () => {
@@ -59,7 +60,7 @@ describe('system.runHostPowerDbusCommand (docker-helper)', () => {
     const self = buildSelf(container);
     const output = await runHostPowerDbusCommand.call(self, 'Reboot', 'docker-helper');
     expect(output).to.contain('yes');
-    sinon.assert.calledOnce(self.getGladysImageName);
+    sinon.assert.calledOnce(self.getGladysImage);
     const options = self.dockerode.createContainer.firstCall.args[0];
     expect(options.Image).to.equal('gladysassistant/gladys:v4');
     expect(options.Cmd).to.include('org.freedesktop.login1.Manager.Reboot');
@@ -79,6 +80,34 @@ describe('system.runHostPowerDbusCommand (docker-helper)', () => {
     expect(caught).to.be.an('error');
     expect(caught.message).to.contain('status 1');
     sinon.assert.calledOnce(container.remove);
+  });
+
+  it('should time out and clean up when the helper container never exits', async () => {
+    const clock = sinon.useFakeTimers();
+    try {
+      const container = buildContainer(0, '');
+      // a stuck helper: wait() never settles
+      container.wait = sinon.stub().returns(new Promise(() => {}));
+      const self = buildSelf(container);
+      const promise = runHostPowerDbusCommand.call(self, 'Reboot', 'docker-helper');
+      let caught;
+      // attach the handler before advancing the clock, so the rejection is never unhandled
+      const settled = (async () => {
+        try {
+          await promise;
+        } catch (e) {
+          caught = e;
+        }
+      })();
+      await clock.tickAsync(20000);
+      await settled;
+      expect(caught).to.be.an('error');
+      expect(caught.message).to.contain('timed out');
+      sinon.assert.calledOnce(container.kill);
+      sinon.assert.calledOnce(container.remove);
+    } finally {
+      clock.restore();
+    }
   });
 
   it('should throw when Docker is not available for the helper', async () => {

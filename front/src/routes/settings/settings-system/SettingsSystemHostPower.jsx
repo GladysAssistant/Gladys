@@ -42,6 +42,13 @@ class SettingsSystemHostPower extends Component {
       this.setState({ pendingAction: null, actionSent: pendingAction, error: false, errorDetail: null });
     } catch (err) {
       console.error(err);
+      // No HTTP response at all: the connection dropped, which is exactly what
+      // happens when the host starts going down as asked. Treat it as sent
+      // rather than showing a spurious error.
+      if (!(err && err.response)) {
+        this.setState({ pendingAction: null, actionSent: pendingAction, error: false, errorDetail: null });
+        return;
+      }
       // Surface the server-side error message to the user when available.
       const errorDetail =
         (err && err.response && err.response.data && (err.response.data.message || err.response.data.error)) ||

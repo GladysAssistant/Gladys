@@ -1,6 +1,9 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS } = require('../../utils/constants');
-const logger = require('../../utils/logger');
+// How long a reboot/shutdown command is given to fail before the request is
+// acknowledged: long enough to catch an immediate refusal, short enough not to
+// keep the request open until the host actually goes down.
+const HOST_POWER_ACK_DELAY_MS = 3000;
 
 module.exports = function SystemController(gladys) {
   /**
@@ -65,19 +68,21 @@ module.exports = function SystemController(gladys) {
    * @apiGroup System
    */
   async function rebootHost(req, res) {
-    // Acknowledge BEFORE triggering the reboot: the host may start going down
-    // before the HTTP response is flushed, which would surface as a spurious
-    // "Network Error" in the UI even though the reboot succeeded. Errors are
-    // logged server-side (the buttons are already gated by the capability check).
+    // A destructive action must not report a success it did not get: wait for
+    // the command, so an immediate failure (polkit refusal, helper container
+    // error) is surfaced to the user. But do not wait forever either: the host
+    // may go down before the HTTP response is flushed, so acknowledge once the
+    // command has been running for a short while without failing.
+    await Promise.race([
+      gladys.system.rebootHost(),
+      new Promise((resolve) => {
+        setTimeout(resolve, HOST_POWER_ACK_DELAY_MS);
+      }),
+    ]);
     res.json({
       success: true,
       message: 'Host will reboot soon',
     });
-    gladys.system.rebootHost().catch(
-      /* istanbul ignore next */ (e) => {
-        logger.error('System: reboot host failed', e);
-      },
-    );
   }
 
   /**
@@ -86,16 +91,17 @@ module.exports = function SystemController(gladys) {
    * @apiGroup System
    */
   async function shutdownHost(req, res) {
-    // Acknowledge BEFORE triggering the power off (see rebootHost above).
+    // Same trade-off as rebootHost above.
+    await Promise.race([
+      gladys.system.shutdownHost(),
+      new Promise((resolve) => {
+        setTimeout(resolve, HOST_POWER_ACK_DELAY_MS);
+      }),
+    ]);
     res.json({
       success: true,
       message: 'Host will shutdown soon',
     });
-    gladys.system.shutdownHost().catch(
-      /* istanbul ignore next */ (e) => {
-        logger.error('System: shutdown host failed', e);
-      },
-    );
   }
 
   /**

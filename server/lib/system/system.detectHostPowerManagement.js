@@ -27,23 +27,25 @@ function parseCanReply(output) {
 }
 
 /**
- * @description logind CanReboot/CanPowerOff answers "yes", "challenge" (allowed,
- * maybe after auth), "no" or "na" (not available).
+ * @description logind CanReboot/CanPowerOff answers "yes", "challenge" (allowed
+ * only after an interactive authentication), "no" or "na" (not available).
+ * Reboot/PowerOff are called with `boolean:false` (non-interactive), so
+ * "challenge" would be refused at click time: only "yes" counts as available.
  * @param {string} reply - Parsed reply value.
  * @returns {boolean} True if the action is available.
  * @example
  * replyMeansAvailable('yes');
  */
 function replyMeansAvailable(reply) {
-  return reply === 'yes' || reply === 'challenge';
+  return reply === 'yes';
 }
 
 /**
  * @description Detect (and cache on the instance) how the host can be
  * rebooted/powered off: `'local'` (Gladys reaches /run/dbus directly),
  * `'docker-helper'` (via a helper container through the Docker socket), or
- * `null` (not possible). The Docker-helper branch runs a non-destructive
- * CanReboot probe. Result is cached in `this.hostPowerManagement`.
+ * `null` (not possible). Both branches confirm with a non-destructive CanReboot
+ * probe. Result is cached in `this.hostPowerManagement`.
  * @returns {Promise<string|null>} Resolve with the mechanism or null.
  * @example
  * await system.detectHostPowerManagement();
@@ -55,12 +57,23 @@ async function detectHostPowerManagement() {
   }
 
   // 1. Local: Gladys can reach the host system DBus socket directly (bare-metal
-  //    install, or a container that happens to mount it). Cheap FS check.
+  //    install, or a container that happens to mount it). The cheap FS check is
+  //    only a pre-filter: having the socket does not mean polkit allows the
+  //    action, so confirm with the same non-destructive CanReboot probe.
   const hasLocalBinary = DBUS_SEND_BINARIES.some((binaryPath) => fs.existsSync(binaryPath));
   const hasLocalSocket = DBUS_SYSTEM_SOCKETS.some((socketPath) => fs.existsSync(socketPath));
   if (hasLocalBinary && hasLocalSocket) {
-    this.hostPowerManagement = 'local';
-    return 'local';
+    try {
+      const reply = parseCanReply(await this.runHostPowerDbusCommand('CanReboot', 'local'));
+      if (replyMeansAvailable(reply)) {
+        this.hostPowerManagement = 'local';
+        return 'local';
+      }
+      logger.info(`System: local host power probe returned "${reply}" — not available`);
+    } catch (e) {
+      logger.info('System: host power management not available locally');
+      logger.debug(e);
+    }
   }
 
   // 2. Docker helper: no local socket, but if the Docker daemon is reachable we
