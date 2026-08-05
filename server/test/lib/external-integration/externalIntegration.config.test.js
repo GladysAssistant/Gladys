@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const { assert: sinonAssert, fake } = require('sinon');
 
+const db = require('../../../models');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { Error422 } = require('../../../utils/httpErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
@@ -36,6 +37,33 @@ describe('externalIntegration.validateConfigValue', () => {
         expect(e.properties).to.include('must be an array of unique values');
       }
     });
+  });
+
+  it('should validate a select/multi_select against the values of its dynamic source', () => {
+    const selectField = { key: 'main_station', type: 'select', source: 'devices' };
+    const multiSelectField = { key: 'stations', type: 'multi_select', source: 'devices' };
+    const dynamicOptions = { devices: ['ext:demo:station-1', 'ext:demo:station-2'] };
+    expect(validateConfigValue(selectField, 'ext:demo:station-2', dynamicOptions)).to.equal('ext:demo:station-2');
+    expect(validateConfigValue(multiSelectField, ['ext:demo:station-1'], dynamicOptions)).to.deep.equal([
+      'ext:demo:station-1',
+    ]);
+    try {
+      validateConfigValue(selectField, 'ext:demo:unknown', dynamicOptions);
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.include('must be one of ext:demo:station-1, ext:demo:station-2');
+    }
+  });
+
+  it('should tell that a dynamic source is empty instead of listing nothing', () => {
+    try {
+      validateConfigValue({ key: 'main_station', type: 'select', source: 'devices' }, 'ext:demo:station-1');
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.include('must be one of the devices of the integration (none available yet)');
+    }
   });
 
   it('should reject a direct value on an oauth2 field', () => {
@@ -195,6 +223,69 @@ describe('externalIntegration config', () => {
         throw new Error('should have thrown');
       } catch (e) {
         expect(e).to.be.instanceOf(BadParameters);
+      }
+    });
+  });
+
+  describe('config fields fed by the "devices" source', () => {
+    let devicesService;
+
+    beforeEach(async () => {
+      devicesService = await seedExternalService({
+        name: 'ext-dev-ocpp',
+        selector: 'ext-dev-ocpp',
+        manifest: {
+          ...service.manifest,
+          config_schema: [
+            { key: 'main_station', type: 'select', source: 'devices', label: { en: 'Main charging station' } },
+            { key: 'stations', type: 'multi_select', source: 'devices', label: { en: 'Charging stations' } },
+          ],
+        },
+      });
+      await db.Device.create({
+        service_id: devicesService.id,
+        name: 'Borne garage',
+        selector: 'ext-ocpp-station-1',
+        external_id: 'ext:ext-dev-ocpp:station-1',
+      });
+    });
+
+    it('should accept an existing device from the front', async () => {
+      externalIntegration.sendMessage = fake.returns(true);
+      const result = await externalIntegration.saveConfigFromFront(devicesService.selector, {
+        main_station: 'ext:ext-dev-ocpp:station-1',
+        stations: ['ext:ext-dev-ocpp:station-1'],
+      });
+      expect(result.config).to.deep.equal({
+        main_station: 'ext:ext-dev-ocpp:station-1',
+        stations: ['ext:ext-dev-ocpp:station-1'],
+      });
+    });
+
+    it('should accept an existing device from the integration itself', async () => {
+      await externalIntegration.setIntegrationConfig(devicesService, {
+        main_station: 'ext:ext-dev-ocpp:station-1',
+      });
+      const config = await externalIntegration.getIntegrationConfig(devicesService);
+      expect(config).to.deep.equal({ main_station: 'ext:ext-dev-ocpp:station-1' });
+    });
+
+    it('should reject a device of another integration', async () => {
+      externalIntegration.sendMessage = fake.returns(true);
+      await db.Device.create({
+        service_id: service.id,
+        name: 'Capteur météo',
+        selector: 'ext-open-meteo-sensor',
+        external_id: 'ext:ext-dev-open-meteo-demo:sensor-1',
+      });
+      try {
+        await externalIntegration.saveConfigFromFront(devicesService.selector, {
+          main_station: 'ext:ext-dev-open-meteo-demo:sensor-1',
+        });
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+        expect(e.properties).to.include('must be one of ext:ext-dev-ocpp:station-1');
       }
     });
   });
