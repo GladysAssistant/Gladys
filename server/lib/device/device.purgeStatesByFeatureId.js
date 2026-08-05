@@ -160,8 +160,7 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   const cap = Math.max(1, Math.floor(this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD));
   const deleteSlice = async (sliceUpperBound) => {
     const upperBoundCondition = sliceUpperBound === null ? '' : ' AND created_at < CAST(? AS TIMESTAMPTZ)';
-    const params =
-      sliceUpperBound === null ? [deviceFeatureId] : [deviceFeatureId, sliceUpperBound.toISOString()];
+    const params = sliceUpperBound === null ? [deviceFeatureId] : [deviceFeatureId, sliceUpperBound.toISOString()];
     let deleted = cap;
     while (deleted === cap) {
       // Sequential on purpose: the next statement deletes what the previous one left.
