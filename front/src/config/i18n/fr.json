@@ -2192,7 +2192,7 @@
           "text": "Affichez ou envoyez des valeurs texte.",
           "battery": "Surveillez le niveau de batterie de vos appareils.",
           "currency": "Affichez des valeurs monétaires ou de cryptomonnaies.",
-          "water-heater": "Piloter un chauffe-eau : état, mode de fonctionnement, consigne d'eau chaude et boost."
+          "water-heater": "Pilotez un chauffe-eau : état, mode de fonctionnement, consigne d'eau chaude et boost."
         },
         "descriptions": {
           "light": {
@@ -2241,12 +2241,12 @@
             "decimal": "Affiche une valeur monétaire avec son unité."
           },
           "water-heater": {
-            "binary": "Allumer ou éteindre l'appareil.",
-            "mode": "Choisir le mode de fonctionnement.",
-            "target-temperature": "Régler la consigne d'eau chaude avec les boutons +/-.",
-            "remaining-hot-water": "Lire la part d'eau chaude encore disponible.",
-            "heating": "Lire si l'appareil est en train de chauffer l'eau.",
-            "boost": "Lancer ou annuler une chauffe forcée."
+            "binary": "Allumez ou éteignez l'appareil.",
+            "mode": "Choisissez le mode de fonctionnement.",
+            "target-temperature": "Définissez la consigne d'eau chaude avec les boutons +/-.",
+            "remaining-hot-water": "Lisez la part d'eau chaude encore disponible.",
+            "heating": "Lisez si l'appareil est en train de chauffer l'eau.",
+            "boost": "Lancez ou annulez une chauffe forcée."
           }
         },
         "keywords": {
@@ -4827,7 +4827,7 @@
       "mode": "Mode",
       "target-temperature": "Consigne d'eau chaude",
       "remaining-hot-water": "Eau chaude disponible",
-      "heating": "En chauffe",
+      "heating": "Chauffe en cours",
       "boost": "Boost"
     },
     "water-valve": {

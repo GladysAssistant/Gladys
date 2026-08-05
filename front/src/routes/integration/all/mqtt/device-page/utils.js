@@ -154,6 +154,14 @@ export const groupDevicesByRoom = (devices, houses) => {
 const flattenUnit = unit => (Array.isArray(unit) ? unit[0] : unit);
 
 const FEATURE_UNIT_BY_CATEGORY_TYPE = {
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
+    DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE
+  )]: DEVICE_FEATURE_UNITS.CELSIUS,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
+    DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.LUX,
@@ -532,7 +540,9 @@ export const getFeatureDefaultValues = (category, type) => {
   // the category is deliberately absent from isSensorCategory (which is category-wide and would
   // make every command read-only).
   if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
-    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY || type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST) {
+    // `binary` is deliberately absent: its string is shared with SWITCH.BINARY, whose branch
+    // above matches on the type alone and already yields these same defaults.
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST) {
       return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: false }, category, type);
     }
     if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {

@@ -2059,7 +2059,7 @@
           "text": "Textwerte anzeigen oder senden.",
           "battery": "Überwachen Sie den Batteriestand Ihrer Geräte.",
           "currency": "Zeigen Sie Währungs- oder Kryptowährungswerte an.",
-          "water-heater": "Warmwasserbereiter steuern: Status, Betriebsmodus, Warmwasser-Sollwert und Boost."
+          "water-heater": "Steuern Sie einen Warmwasserbereiter: Status, Betriebsmodus, Warmwasser-Sollwert und Boost."
         },
         "descriptions": {
           "light": {
@@ -2108,12 +2108,12 @@
             "decimal": "Zeigt einen Geldbetrag mit seiner Währungseinheit an."
           },
           "water-heater": {
-            "binary": "Das Gerät ein- oder ausschalten.",
-            "mode": "Den Betriebsmodus wählen.",
-            "target-temperature": "Den Warmwasser-Sollwert mit +/- einstellen.",
-            "remaining-hot-water": "Den noch verfügbaren Warmwasseranteil ablesen.",
-            "heating": "Ablesen, ob das Gerät gerade Wasser erhitzt.",
-            "boost": "Eine Zwangsheizung starten oder abbrechen."
+            "binary": "Schalten Sie das Gerät ein oder aus.",
+            "mode": "Wählen Sie den Betriebsmodus.",
+            "target-temperature": "Stellen Sie den Warmwasser-Sollwert mit +/- Tasten ein.",
+            "remaining-hot-water": "Lesen Sie den noch verfügbaren Warmwasseranteil ab.",
+            "heating": "Lesen Sie ab, ob das Gerät gerade Wasser erhitzt.",
+            "boost": "Starten oder brechen Sie eine Zwangsheizung ab."
           }
         },
         "keywords": {
@@ -4827,7 +4827,7 @@
       "mode": "Modus",
       "target-temperature": "Warmwasser-Sollwert",
       "remaining-hot-water": "Verfügbares Warmwasser",
-      "heating": "Heizt",
+      "heating": "Heizvorgang",
       "boost": "Boost"
     },
     "water-valve": {

@@ -246,13 +246,6 @@ const WATER_VALVE_CURRENT_DEVICE_STATUS = {
   WATER_SHORTAGE_AND_WATER_LEAKAGE: 3,
 };
 
-const LEVEL_MATTER_STATE = {
-  LOW: 1,
-  MEDIUM: 2,
-  HIGH: 3,
-  CRITICAL: 4,
-};
-
 // Operating modes of a domestic hot water appliance. This is the full generic set:
 // an appliance supporting only some of them declares its subset through the
 // supported_options of its `mode` feature, never by narrowing this enum.
@@ -267,6 +260,13 @@ const WATER_HEATER_MODE = {
   MANUAL: 4, // fixed setpoint, no learning
   ABSENCE: 5, // holiday / away, minimum temperature kept
   PROGRAM: 6, // follows the schedule stored in the appliance
+};
+
+const LEVEL_MATTER_STATE = {
+  LOW: 1,
+  MEDIUM: 2,
+  HIGH: 3,
+  CRITICAL: 4,
 };
 
 const VACUUM_CLEANER_STATE = {
@@ -1943,10 +1943,10 @@ module.exports.AC_SWING_HORIZONTAL = AC_SWING_HORIZONTAL;
 module.exports.AC_SWING_VERTICAL = AC_SWING_VERTICAL;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
-module.exports.WATER_HEATER_MODE = WATER_HEATER_MODE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
+module.exports.WATER_HEATER_MODE = WATER_HEATER_MODE;
 module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
