@@ -16,9 +16,11 @@ describe('system.parseCanReply', () => {
 });
 
 describe('system.replyMeansAvailable', () => {
-  it('should accept yes and challenge', () => {
+  it('should accept yes', () => {
     expect(replyMeansAvailable('yes')).to.equal(true);
-    expect(replyMeansAvailable('challenge')).to.equal(true);
+  });
+  it('should reject challenge, which needs an interactive authentication', () => {
+    expect(replyMeansAvailable('challenge')).to.equal(false);
   });
   it('should reject no, na and null', () => {
     expect(replyMeansAvailable('no')).to.equal(false);
@@ -53,16 +55,39 @@ describe('system.detectHostPowerManagement', () => {
     expect(self.hostPowerManagement).to.equal(null);
   });
 
-  it('should return "local" when dbus-send binary and socket are present', async () => {
+  it('should return "local" when dbus-send, the socket and the CanReboot probe all answer', async () => {
     platformStub = sinon.stub(process, 'platform').value('linux');
     const detect = load(() => true);
-    const runHostPowerDbusCommand = sinon.stub();
+    const runHostPowerDbusCommand = sinon.stub().resolves('   string "yes"');
     const self = { runHostPowerDbusCommand };
     const result = await detect.call(self);
     expect(result).to.equal('local');
     expect(self.hostPowerManagement).to.equal('local');
-    // local path must not spin up a helper container
-    sinon.assert.notCalled(runHostPowerDbusCommand);
+    sinon.assert.calledOnceWithExactly(runHostPowerDbusCommand, 'CanReboot', 'local');
+  });
+
+  it('should not return "local" when the local probe is refused by polkit', async () => {
+    platformStub = sinon.stub(process, 'platform').value('linux');
+    const detect = load(() => true); // socket is there...
+    const self = {
+      dockerode: null,
+      // ...but logind requires an interactive authentication we cannot provide
+      runHostPowerDbusCommand: sinon.stub().resolves('   string "challenge"'),
+    };
+    const result = await detect.call(self);
+    expect(result).to.equal(null);
+    expect(self.hostPowerManagement).to.equal(null);
+  });
+
+  it('should fall back to the Docker helper when the local probe throws', async () => {
+    platformStub = sinon.stub(process, 'platform').value('linux');
+    const detect = load(() => true);
+    const runHostPowerDbusCommand = sinon.stub();
+    runHostPowerDbusCommand.withArgs('CanReboot', 'local').rejects(new Error('connection refused'));
+    runHostPowerDbusCommand.withArgs('CanReboot', 'docker-helper').resolves('   string "yes"');
+    const self = { dockerode: {}, runHostPowerDbusCommand };
+    const result = await detect.call(self);
+    expect(result).to.equal('docker-helper');
   });
 
   it('should return "docker-helper" when the CanReboot probe answers yes', async () => {

@@ -13,6 +13,9 @@ const LOGIND_PATH = '/org/freedesktop/login1';
 const HOST_DBUS_SOCKET_BIND = '/run/dbus:/run/dbus:ro';
 // Bound the DBus call so it can never hang forever.
 const COMMAND_TIMEOUT_MS = 10000;
+// Bound the helper container lifetime: a stuck container would otherwise block
+// the capability probe (and the reboot/shutdown call) forever.
+const HELPER_TIMEOUT_MS = 15000;
 // Non-destructive query methods (take no boolean argument).
 const QUERY_METHODS = ['CanReboot', 'CanPowerOff'];
 
@@ -67,7 +70,7 @@ async function runViaHelperContainer(method) {
   if (!this.dockerode) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
-  const image = await this.getGladysImageName();
+  const { image } = await this.getGladysImage();
   const container = await this.dockerode.createContainer({
     Image: image,
     name: `gladys-host-power-${method.toLowerCase()}-${Date.now()}`,
@@ -77,9 +80,18 @@ async function runViaHelperContainer(method) {
     },
   });
   let output = '';
+  let timeout;
   try {
     await container.start();
-    const { StatusCode } = await container.wait();
+    const { StatusCode } = await Promise.race([
+      container.wait(),
+      new Promise((resolve, reject) => {
+        timeout = setTimeout(
+          () => reject(new Error(`Host power helper container timed out after ${HELPER_TIMEOUT_MS}ms`)),
+          HELPER_TIMEOUT_MS,
+        );
+      }),
+    ]);
     const logBuffer = await container.logs({ follow: false, stdout: true, stderr: true });
     output = logBuffer.toString('utf8');
     if (StatusCode !== 0) {
@@ -87,7 +99,10 @@ async function runViaHelperContainer(method) {
     }
     return output;
   } finally {
-    // AutoRemove is not used (we need the logs after exit), so clean up here.
+    clearTimeout(timeout);
+    // AutoRemove is not used (we need the logs after exit), so clean up here. On
+    // timeout the container is still running: kill it before removing it.
+    await container.kill().catch(() => {});
     await container.remove({ force: true }).catch(() => {});
   }
 }

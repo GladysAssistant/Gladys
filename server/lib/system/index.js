@@ -47,7 +47,6 @@ const { shutdownHost } = require('./system.shutdownHost');
 const { isHostPowerManagementAvailable } = require('./system.isHostPowerManagementAvailable');
 const { detectHostPowerManagement } = require('./system.detectHostPowerManagement');
 const { runHostPowerDbusCommand } = require('./system.runHostPowerDbusCommand');
-const { getGladysImageName } = require('./system.getGladysImageName');
 
 const System = function System(sequelize, event, config, job, variable, user, message, brain) {
   this.downloadUpgradeError = null;
@@ -125,6 +124,5 @@ System.prototype.shutdownHost = shutdownHost;
 System.prototype.isHostPowerManagementAvailable = isHostPowerManagementAvailable;
 System.prototype.detectHostPowerManagement = detectHostPowerManagement;
 System.prototype.runHostPowerDbusCommand = runHostPowerDbusCommand;
-System.prototype.getGladysImageName = getGladysImageName;
 
 module.exports = System;
