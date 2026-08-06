@@ -11,6 +11,7 @@ import ClockBox from '../../components/boxs/clock/Clock';
 import SceneBox from '../../components/boxs/scene/SceneBox';
 import AlarmBox from '../../components/boxs/alarm/Alarm';
 import MusicBox from '../../components/boxs/music/MusicBox';
+import TelevisionBox from '../../components/boxs/television/TelevisionBox';
 import EdfTempoBox from '../../components/boxs/edf-tempo/EdfTempo';
 import GaugeBox from '../../components/boxs/gauge/GaugeBox';
 import EnergyConsumptionBox from '../../components/boxs/energy-consumption/EnergyConsumption';
@@ -45,6 +46,8 @@ const Box = ({ children, ...props }) => {
       return <AlarmBox {...props} />;
     case 'music':
       return <MusicBox {...props} />;
+    case 'television':
+      return <TelevisionBox {...props} />;
     case 'edf-tempo':
       return <EdfTempoBox {...props} />;
     case 'gauge':
