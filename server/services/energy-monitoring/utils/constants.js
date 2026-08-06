@@ -21,6 +21,14 @@ const ENERGY_INDEX_FEATURE_TYPES = {
   ],
 };
 
+// Cumulative production meter indexes: their deltas are turned into
+// THIRTY_MINUTES_PRODUCTION states (production is tracked separately from
+// consumption so a solar meter is never counted as a consumer).
+const PRODUCTION_INDEX_FEATURE_TYPES = {
+  [DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR]: [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX],
+};
+
 module.exports = {
   ENERGY_INDEX_FEATURE_TYPES,
+  PRODUCTION_INDEX_FEATURE_TYPES,
 };
