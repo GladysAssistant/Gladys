@@ -75,17 +75,7 @@ class ConfigField extends Component {
     }
   }
 
-  render({
-    field,
-    language,
-    values,
-    configuredSecrets,
-    touchedSecrets,
-    connectionStatus,
-    oauthStatus,
-    selector,
-    dynamicOptions
-  }) {
+  render({ field, language, values, configuredSecrets, touchedSecrets, oauthStatus, selector, dynamicOptions }) {
     const label = getLocalizedText(field.label, language) || field.key;
     const description = getLocalizedText(field.description, language);
     const placeholder = getLocalizedText(field.placeholder, language) || '';
@@ -352,7 +342,6 @@ const ConfigSchemaForm = ({
   saveConfigStatus,
   updateConfigValue,
   saveConfig,
-  connectionStatus,
   oauthStatus,
   oauthInvalidState,
   oauthUseInstanceRedirect,
@@ -385,7 +374,6 @@ const ConfigSchemaForm = ({
           configuredSecrets={configuredSecrets}
           touchedSecrets={touchedSecrets}
           updateConfigValue={updateConfigValue}
-          connectionStatus={connectionStatus}
           oauthStatus={oauthStatus}
           oauthInvalidState={oauthInvalidState}
           oauthUseInstanceRedirect={oauthUseInstanceRedirect}
