@@ -21,6 +21,7 @@ const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
+const WeatherWidgetController = require('./controllers/weatherWidget.controller');
 const EnergyPriceController = require('./controllers/energy-price.controller');
 
 /**
@@ -54,6 +55,7 @@ function getRoutes(gladys) {
   const sceneController = SceneController(gladys);
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
+  const weatherWidgetController = WeatherWidgetController(gladys);
   const energyPriceController = EnergyPriceController(gladys);
 
   const routes = {};
@@ -910,6 +912,10 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather': {
       authenticated: true,
       controller: weatherController.getByHouse,
+    },
+    'get /api/v1/house/:house_selector/weather-widget/openweather': {
+      authenticated: true,
+      controller: weatherWidgetController.getHouseOpenWeather,
     },
     // energy price
     'get /api/v1/energy_price': {

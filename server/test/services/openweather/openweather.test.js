@@ -63,6 +63,17 @@ describe('OpenWeatherService', () => {
     });
     expect(JSON.parse(JSON.stringify(weather))).to.deep.equal(expectedResult);
   });
+  it('should return raw weather and forecast responses', async () => {
+    const OpenWeatherService = proxyquire('../../../services/openweather/index', workingAxios);
+    const openWeatherService = OpenWeatherService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await openWeatherService.start();
+    const { data, forecastData } = await openWeatherService.weather.getRaw({
+      latitude: 12,
+      longitude: 10,
+    });
+    expect(data).to.deep.equal(weatherData);
+    expect(forecastData).to.deep.equal(weatherForecast);
+  });
   it('should return error, unable to contact third party provider', async () => {
     const OpenWeatherService = proxyquire('../../../services/openweather/index', brokenAxios);
     const openWeatherService = OpenWeatherService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');

@@ -42,6 +42,13 @@ const actionSchema = Joi.object()
     stop_scene_if_event_not_found: Joi.boolean(),
     request_response_keys: Joi.array().items(Joi.string()),
     ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
+    // Météo France forecast summary length in days
+    days: Joi.number()
+      .integer()
+      .min(1)
+      .max(5),
+    // Météo France vigilance map day ('J' = today, 'J1' = tomorrow)
+    day: Joi.string().valid('J', 'J1'),
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
     edf_tempo_day: Joi.string().valid('today', 'tomorrow'),
     edf_tempo_peak_hour_type: Joi.string().valid('peak-hour', 'off-peak-hour', 'no-check'),
@@ -95,6 +102,8 @@ const triggersSchema = Joi.array().items(
     user: Joi.string(),
     area: Joi.string(),
     scheduler_type: Joi.string().valid('every-month', 'every-week', 'every-day', 'interval', 'custom-time'),
+    // Météo France vigilance minimum color level (2 = yellow, 3 = orange, 4 = red)
+    color: Joi.number().valid(2, 3, 4),
     // Calendar event
     calendar_event_attribute: Joi.string().valid('start', 'end'),
     calendar_event_name_comparator: Joi.string().valid(

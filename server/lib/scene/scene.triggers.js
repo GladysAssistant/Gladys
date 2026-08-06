@@ -102,6 +102,8 @@ const triggersFunc = {
   [EVENTS.ALARM.PARTIAL_ARM]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.PANIC]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: (self, sceneSelector, event, trigger) => event.house === trigger.house,
+  [EVENTS.METEO_FRANCE.NEW_VIGILANCE]: (self, sceneSelector, event, trigger) =>
+    (!trigger.house || event.house === trigger.house) && event.color >= (trigger.color || 3),
   [EVENTS.SYSTEM.START]: () => true,
   [EVENTS.MQTT.RECEIVED]: (self, sceneSelector, event, trigger) =>
     event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),

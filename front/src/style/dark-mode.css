@@ -199,3 +199,15 @@ body.dark-mode {
 .dark-mode .mode-toggle:hover {
   background-color: rgba(0, 0, 0, 0.1); /* Keep the same in dark mode due to global inversion */
 }
+
+/* Météo France vigilance map: pre-darkening keeps the double inversion within gamut,
+   so the map keeps its real hues (yellow/orange/red) instead of washed-out ones */
+.dark-mode img.meteofrance-vigilance-map {
+  filter: brightness(0.6) invert(100%) hue-rotate(180deg) !important;
+}
+
+/* Météo France widget emojis, badges and colored icons: same pre-darkening trick
+   as the vigilance map to keep real colors (yellow/orange suns, alert badges) */
+.dark-mode .mf-dark-real-colors {
+  filter: brightness(0.7) invert(100%) hue-rotate(180deg) !important;
+}

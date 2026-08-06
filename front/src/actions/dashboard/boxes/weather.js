@@ -1,23 +1,102 @@
-import { RequestStatus, GetWeatherStatus } from '../../../utils/consts';
-import { ERROR_MESSAGES } from '../../../../../server/utils/constants';
+import { RequestStatus } from '../../../utils/consts';
 import createBoxActions from '../boxActions';
 import dayjs from 'dayjs';
-import get from 'get-value';
 
 const BOX_KEY = 'Weather';
 
-const WEATHER_ICONS = {
-  snow: 'fe-cloud-snow',
-  rain: 'fe-cloud-rain',
-  clear: 'fe-sun',
-  cloud: 'fe-cloud',
-  fog: 'fe-cloud',
-  sleet: 'fe-cloud-drizzle',
-  wind: 'fe-wind',
-  night: 'fe-moon'
+const MF_ICONS = {
+  1: { j: '☀️', n: '🌙' },
+  2: { j: '🌤️', n: '🌤️' },
+  3: { j: '🌥️', n: '☁️' },
+  4: { j: '🌥️', n: '☁️' },
+  5: { j: '☁️', n: '☁️' },
+  6: { j: '🌫️', n: '🌫️' },
+  7: { j: '🌫️', n: '🌫️' },
+  8: { j: '🌦️', n: '🌧️' },
+  9: { j: '🌧️', n: '🌧️' },
+  10: { j: '🌧️', n: '🌧️' },
+  11: { j: '🌦️', n: '🌦️' },
+  12: { j: '⛈️', n: '⛈️' },
+  13: { j: '🌨️', n: '🌨️' },
+  14: { j: '❄️', n: '❄️' },
+  15: { j: '❄️', n: '❄️' },
+  16: { j: '❄️', n: '❄️' },
+  17: { j: '🌩️', n: '🌩️' },
+  18: { j: '⛈️', n: '⛈️' },
+  19: { j: '⛈️', n: '⛈️' },
+  20: { j: '⛈️', n: '⛈️' },
+  21: { j: '⛈️', n: '⛈️' },
+  // 26 confirmed from the API's own "desc" field ("Risque d'orages"); 22-25 are
+  // undocumented and left out on purpose rather than guessing their meaning
+  26: { j: '⛈️', n: '⛈️' }
 };
 
-const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'fe-question' });
+// Translation keys per icon code: the API only provides fr/en descriptions,
+// so the widget translates the current conditions itself from the icon code
+const MF_CONDITIONS = {
+  1: { j: 'sunny', n: 'clearNight' },
+  2: { j: 'partlyCloudy', n: 'partlyCloudy' },
+  3: { j: 'cloudy', n: 'cloudy' },
+  4: { j: 'cloudy', n: 'cloudy' },
+  5: { j: 'overcast', n: 'overcast' },
+  6: { j: 'fog', n: 'fog' },
+  7: { j: 'fog', n: 'fog' },
+  8: { j: 'lightShowers', n: 'lightShowers' },
+  9: { j: 'rain', n: 'rain' },
+  10: { j: 'rain', n: 'rain' },
+  11: { j: 'showers', n: 'showers' },
+  12: { j: 'stormyRain', n: 'stormyRain' },
+  13: { j: 'sleet', n: 'sleet' },
+  14: { j: 'snow', n: 'snow' },
+  15: { j: 'heavySnow', n: 'heavySnow' },
+  16: { j: 'snow', n: 'snow' },
+  17: { j: 'thunderstorm', n: 'thunderstorm' },
+  18: { j: 'thunderstorm', n: 'thunderstorm' },
+  19: { j: 'thunderstorm', n: 'thunderstorm' },
+  20: { j: 'thunderstorm', n: 'thunderstorm' },
+  21: { j: 'thunderstorm', n: 'thunderstorm' },
+  26: { j: 'thunderstorm', n: 'thunderstorm' }
+};
+
+// Keyword fallback for icon codes not in MF_ICONS (undocumented codes like p22-p25):
+// guess a reasonable icon from the API's own French description instead of a meaningless
+// placeholder. Order matters: more specific keywords (orage) are checked before generic ones.
+const DESC_KEYWORD_ICONS = [
+  { keywords: ['orage'], j: '⛈️', n: '⛈️' },
+  { keywords: ['neige', 'verglas'], j: '❄️', n: '❄️' },
+  { keywords: ['pluie', 'averse', 'bruine'], j: '🌧️', n: '🌧️' },
+  { keywords: ['brouillard', 'brume'], j: '🌫️', n: '🌫️' },
+  { keywords: ['nuage', 'nuageux', 'voilé', 'couvert'], j: '☁️', n: '☁️' }
+];
+
+function guessIconFromDesc(desc, period) {
+  const normalizedDesc = (desc || '').toLowerCase();
+  const match = DESC_KEYWORD_ICONS.find(entry => entry.keywords.some(keyword => normalizedDesc.includes(keyword)));
+  if (match) {
+    return match[period];
+  }
+  // No recognizable keyword: default to a clear-sky icon rather than the meaningless thermometer
+  return period === 'n' ? '🌙' : '☀️';
+}
+
+function getMFIcon(weather) {
+  const iconCode = weather ? weather.icon : null;
+  const m = iconCode && iconCode.match(/p(\d+)(bis)?([jn])/);
+  if (!m) return '🌡️';
+  // A "bis" suffix denotes a distinct condition from its base code (e.g. p14 = "Neige"
+  // but p14bis = "Averses"), not a variant of it: never look it up in MF_ICONS.
+  const entry = m[2] ? null : MF_ICONS[parseInt(m[1], 10)];
+  return entry ? entry[m[3]] : guessIconFromDesc(weather && weather.desc, m[3]);
+}
+
+function getMFCondition(weather) {
+  const iconCode = weather ? weather.icon : null;
+  const m = iconCode && iconCode.match(/p(\d+)(bis)?([jn])/);
+  if (!m || m[2]) return null;
+  const entry = MF_CONDITIONS[parseInt(m[1], 10)];
+  // Unknown code: return null so the caller falls back to the API's own French description
+  return entry ? entry[m[3]] : null;
+}
 
 function createActions(store) {
   const boxActions = createBoxActions(store);
@@ -26,35 +105,182 @@ function createActions(store) {
     async getWeather(state, box, x, y) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
-        const weather = await state.httpClient.get(`/api/v1/house/${box.house}/weather`);
-        weather.datetime_beautiful = dayjs(weather.datetime)
-          .locale(state.user.language)
-          .format('D MMM');
-        weather.weatherIcon = translateWeatherToFeIcon(weather.weather);
+        if (!box.house) {
+          boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
+          return;
+        }
+        const isMeteoFranceSource = (box.source || 'meteofrance') !== 'openweather';
+        const url = isMeteoFranceSource
+          ? `/api/v1/house/${box.house}/meteofrance/weather${box.vigilance ? '?vigilance=true' : ''}`
+          : `/api/v1/house/${box.house}/weather-widget/openweather`;
+        const data = await state.httpClient.get(url);
 
-        weather.hours.map(hour => {
-          hour.weatherIcon = translateWeatherToFeIcon(hour.weather);
-          hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
+        // The API returns the full current day, including past hours: keep future entries only
+        const nowTs = Math.floor(Date.now() / 1000);
+        const rawForecast = data.forecast.forecast || [];
+        const upcoming = rawForecast.filter(h => h.dt >= nowTs - 1800);
+        const current = upcoming.find(h => h.T && h.T.value != null) || upcoming[0] || rawForecast[0];
+        const currentIcon = getMFIcon(current ? current.weather : null);
+        const currentCondition = getMFCondition(current ? current.weather : null);
+
+        // Anchor the hourly strip on the same entry as the current conditions,
+        // so the emphasized first column matches the displayed current weather
+        const hourlySource = upcoming.slice(Math.max(0, upcoming.indexOf(current)));
+
+        // Cover the next 24 hours in 8 columns (one entry every 3 hours).
+        // Météo France entries are hourly (keep 1 out of 3); OpenWeather entries
+        // are already 3-hourly (keep them all): detect the step from the data.
+        let stepSeconds = 3600;
+        if (hourlySource.length > 2) {
+          stepSeconds = hourlySource[2].dt - hourlySource[1].dt;
+        } else if (hourlySource.length > 1) {
+          stepSeconds = hourlySource[1].dt - hourlySource[0].dt;
+        }
+        const columnSkip = stepSeconds >= 3 * 3600 ? 1 : 3;
+        const hourly = hourlySource
+          .filter(h => h.dt <= hourlySource[0].dt + 24 * 3600)
+          .filter((h, index) => index % columnSkip === 0)
+          .slice(0, 8)
+          .map(h => {
+            // Rain amount key depends on the forecast step (1h first, then 3h)
+            let rain = null;
+            if (h.rain && h.rain['1h'] != null) {
+              rain = h.rain['1h'];
+            } else if (h.rain && h.rain['3h'] != null) {
+              rain = h.rain['3h'];
+            }
+            return {
+              time: dayjs.unix(h.dt).format('HH'),
+              temp: h.T && h.T.value != null ? h.T.value : null,
+              icon: getMFIcon(h.weather),
+              desc: h.weather ? h.weather.desc : '',
+              rain: rain !== null ? Math.round(rain * 10) / 10 : null,
+              // Wind speed comes in m/s, same as the current conditions block
+              wind: h.wind && h.wind.speed != null ? h.wind.speed : null
+            };
+          });
+
+        const daily = (data.forecast.daily_forecast || []).slice(1, 6).map(d => {
+          let weather = d.weather12H;
+          if (!weather || !weather.icon) {
+            // weather12H can be null on some days: fall back to the hourly forecast closest to midday
+            const midday = d.dt + 12 * 3600;
+            const sameDay = rawForecast.filter(
+              h => h.dt >= d.dt && h.dt < d.dt + 24 * 3600 && h.weather && h.weather.icon
+            );
+            weather = sameDay.reduce(
+              (best, h) => (!best || Math.abs(h.dt - midday) < Math.abs(best.dt - midday) ? h : best),
+              null
+            );
+            weather = weather && weather.weather;
+          }
+          // The 24h total can be missing on some days: sum the hourly rain amounts instead
+          let rain = d.precipitation && d.precipitation['24h'] != null ? d.precipitation['24h'] : null;
+          if (rain === null) {
+            let hourlyRainSum = 0;
+            let hourlyRainFound = false;
+            rawForecast.forEach(h => {
+              if (h.dt >= d.dt && h.dt < d.dt + 24 * 3600 && h.rain) {
+                let value = null;
+                if (h.rain['1h'] != null) {
+                  value = h.rain['1h'];
+                } else if (h.rain['3h'] != null) {
+                  value = h.rain['3h'];
+                } else if (h.rain['6h'] != null) {
+                  value = h.rain['6h'];
+                }
+                if (value !== null) {
+                  hourlyRainSum += value;
+                  hourlyRainFound = true;
+                }
+              }
+            });
+            if (hourlyRainFound) {
+              rain = hourlyRainSum;
+            }
+          }
+          // Daily wind: the strongest hourly gust of the day, more useful than an average
+          let wind = null;
+          rawForecast.forEach(h => {
+            if (h.dt >= d.dt && h.dt < d.dt + 24 * 3600 && h.wind && h.wind.speed != null) {
+              wind = wind === null ? h.wind.speed : Math.max(wind, h.wind.speed);
+            }
+          });
+          return {
+            dt: d.dt,
+            min: d.T && d.T.min != null ? d.T.min : null,
+            max: d.T && d.T.max != null ? d.T.max : null,
+            icon: getMFIcon(weather),
+            desc: weather ? weather.desc : '',
+            rain: rain !== null ? Math.round(rain * 10) / 10 : null,
+            wind
+          };
         });
-        weather.days.shift();
-        weather.days.map(day => {
-          day.weather_icon = translateWeatherToFeIcon(day.weather);
-          day.datetime_beautiful = dayjs(day.datetime).format('dddd');
+
+        // Today's sunrise/sunset and UV index come from the first daily entry
+        const today = (data.forecast.daily_forecast || [])[0];
+        const sun = today && today.sun && today.sun.rise ? { rise: today.sun.rise, set: today.sun.set } : null;
+        const uv = today && today.uv != null ? today.uv : null;
+
+        // Rain probability for the current slot (3h entries, or 6h when only that window exists)
+        const probabilities = data.forecast.probability_forecast || [];
+        const currentProba = probabilities.find(p => {
+          if (!p.rain || (p.rain['3h'] == null && p.rain['6h'] == null)) {
+            return false;
+          }
+          const slotDuration = p.rain['3h'] != null ? 3 * 3600 : 6 * 3600;
+          return p.dt + slotDuration > nowTs;
         });
+        let rainChance = null;
+        if (currentProba) {
+          rainChance = currentProba.rain['3h'] != null ? currentProba.rain['3h'] : currentProba.rain['6h'];
+        }
+
+        // The national vigilance map is a Météo France feature and needs the
+        // optional API key: fetch it separately, never with the OpenWeather source
+        let vigilanceMapImage = null;
+        if (box.modes && box.modes.vigilanceMap && isMeteoFranceSource) {
+          try {
+            const mapData = await state.httpClient.get('/api/v1/service/meteofrance/vigilance/map');
+            vigilanceMapImage = mapData.image;
+          } catch (mapError) {
+            // Map unavailable (no API key configured or API error): the widget shows a hint
+          }
+        }
+        let vigilanceMapImageJ1 = null;
+        if (box.modes && box.modes.vigilanceMapJ1 && isMeteoFranceSource) {
+          try {
+            const mapDataJ1 = await state.httpClient.get('/api/v1/service/meteofrance/vigilance/map?day=J1');
+            vigilanceMapImageJ1 = mapDataJ1.image;
+          } catch (mapError) {
+            // Map unavailable (no API key configured or API error): the widget shows a hint
+          }
+        }
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          weather
+          source: data.source,
+          houseName: (data.house && data.house.name) || null,
+          current,
+          currentIcon,
+          currentCondition,
+          hourly,
+          daily,
+          sun,
+          uv,
+          rainChance,
+          position: data.forecast.position || {},
+          vigilance: data.vigilance || { alerts: [] },
+          vigilanceMapImage,
+          vigilanceMapImageJ1
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
-        console.error(e);
-        const responseMessage = get(e, 'response.data.message');
-        if (responseMessage === ERROR_MESSAGES.HOUSE_HAS_NO_COORDINATES) {
-          boxActions.updateBoxStatus(state, BOX_KEY, x, y, GetWeatherStatus.HouseHasNoCoordinates);
-        } else if (responseMessage === ERROR_MESSAGES.SERVICE_NOT_CONFIGURED) {
-          boxActions.updateBoxStatus(state, BOX_KEY, x, y, GetWeatherStatus.ServiceNotConfigured);
-        } else if (responseMessage === ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED) {
-          boxActions.updateBoxStatus(state, BOX_KEY, x, y, GetWeatherStatus.RequestToThirdPartyFailed);
+        const msg = e && e.response && e.response.data && e.response.data.message;
+        console.error('[Weather] error:', msg || e);
+        if (msg === 'HOUSE_HAS_NO_COORDINATES') {
+          boxActions.updateBoxStatus(state, BOX_KEY, x, y, 'no-coordinates');
+        } else if (msg === 'FORECAST_API_ERROR') {
+          boxActions.updateBoxStatus(state, BOX_KEY, x, y, 'forecast-api-error');
         } else {
           boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
         }
