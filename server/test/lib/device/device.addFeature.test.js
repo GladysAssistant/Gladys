@@ -123,4 +123,29 @@ describe('Device.addFeature', () => {
     const newDeviceFeature = newDevice.features.find((f) => f.external_id === 'philips-hue:1:homonym');
     expect(newDeviceFeature).to.have.property('selector', 'test-device-feature-3');
   });
+  it('should refuse a step of 0', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('device', 'test-device', {
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'Philips Hue',
+      selector: 'test-device',
+      features: [],
+      params: [],
+    });
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
+    const promise = device.addFeature('test-device', {
+      name: 'Target temperature',
+      external_id: 'philips-hue:1:setpoint',
+      category: 'air-conditioning',
+      type: 'target-temperature',
+      read_only: false,
+      keep_history: true,
+      has_feedback: false,
+      min: 16,
+      max: 31,
+      step: 0,
+    });
+    await expect(promise).to.be.rejectedWith('step must be greater than 0');
+  });
 });

@@ -88,7 +88,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DOUBLE,
         validate: {
           isFloat: true,
-          min: 0,
+          isStrictlyPositive(value) {
+            // a step of 0 would freeze the +/- buttons, and a negative one
+            // would invert them: null means "no step declared", not "zero"
+            if (value !== null && value !== undefined && value <= 0) {
+              throw new Error('step must be greater than 0');
+            }
+          },
         },
       },
       last_value: {
