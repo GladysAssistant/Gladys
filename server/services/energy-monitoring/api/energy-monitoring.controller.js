@@ -1,4 +1,28 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+const { BadParameters } = require('../../../utils/coreErrors');
+
+/**
+ * @description Read and validate feature selectors from request body.
+ * Missing/null values are treated as an empty array.
+ * @param {Object} body - Request body.
+ * @returns {Array<string>} Return normalized feature selectors.
+ * @throws {BadParameters} Throw if provided value is not an array of non-empty strings.
+ */
+function getFeatureSelectors(body) {
+  const value = body && body.feature_selectors;
+  if (value === undefined || value === null) {
+    return [];
+  }
+  if (!Array.isArray(value)) {
+    throw new BadParameters('feature_selectors must be an array of non-empty strings');
+  }
+  const selectors = value.map((selector) => (typeof selector === 'string' ? selector.trim() : selector));
+  const hasInvalidSelector = selectors.some((selector) => typeof selector !== 'string' || selector.length === 0);
+  if (hasInvalidSelector) {
+    throw new BadParameters('feature_selectors must be an array of non-empty strings');
+  }
+  return selectors;
+}
 
 module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
   /**
@@ -7,7 +31,8 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    * @apiGroup EnergyMonitoring
    */
   async function calculateCostFromBeginning(req, res) {
-    energyMonitoringHandler.calculateCostFromBeginning();
+    const featureSelectors = getFeatureSelectors(req.body);
+    energyMonitoringHandler.calculateCostFromBeginning(featureSelectors);
     res.json({
       success: true,
     });
@@ -20,7 +45,8 @@ module.exports = function EnergyMonitoringController(energyMonitoringHandler) {
    * @apiGroup EnergyMonitoring
    */
   async function calculateConsumptionFromIndexFromBeginning(req, res) {
-    energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning();
+    const featureSelectors = getFeatureSelectors(req.body);
+    energyMonitoringHandler.calculateConsumptionFromIndexFromBeginning(featureSelectors);
     res.json({
       success: true,
     });

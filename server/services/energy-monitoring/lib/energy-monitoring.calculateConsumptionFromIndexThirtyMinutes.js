@@ -19,7 +19,7 @@ async function calculateConsumptionFromIndexThirtyMinutes(now, jobId) {
     } else {
       thirtyMinuteWindow.setMinutes(30, 0, 0);
     }
-    await this.calculateConsumptionFromIndex(thirtyMinuteWindow, jobId);
+    await this.calculateConsumptionFromIndex(thirtyMinuteWindow, null, jobId);
   });
 }
 
