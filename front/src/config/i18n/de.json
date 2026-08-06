@@ -2022,7 +2022,7 @@
           "external_id": "Dieses Feld ist erforderlich und muss eindeutig sein",
           "unit": "Die gewählte Einheit ist für diese Funktion ungültig",
           "room_id": "Der gewählte Raum ist ungültig",
-          "supported_options": "Jedes Preset braucht einen Namen und einen eindeutigen Wert"
+          "supported_options": "Jedes Preset braucht einen Namen und einen eindeutigen ganzzahligen Wert (0 oder mehr)"
         },
         "saveConflictError": "Konflikt: Sind alle externen IDs wirklich eindeutig?",
         "mostRecentValueAt": "Zuletzt empfangener Wert {{mostRecentValueAt}}.",

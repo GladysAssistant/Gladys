@@ -6,9 +6,11 @@ import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { CAMERA_MOVE } from '../../../../../../server/utils/constants';
 import { CAMERA_MOVE_OPTIONS, getSupportedMoves } from '../../../../utils/cameraMove';
 
-// Press-and-hold camera movement row: pressing a button sends its CAMERA_MOVE value,
-// releasing sends STOP (0). Integrations bound every move with a watchdog, so a press
-// without a release stays safe (spec docs/specs/camera-ptz-control.md, A.2).
+const isActivationKey = e => e.key === 'Enter' || e.key === ' ';
+
+// Press-and-hold camera movement row: pressing a button (pointer or Space/Enter) sends its
+// CAMERA_MOVE value, releasing sends STOP (0). Integrations bound every move with a watchdog,
+// so a press without a release stays safe (spec docs/specs/camera-ptz-control.md, A.2).
 class CameraMoveDeviceFeature extends Component {
   activeMove = null;
 
@@ -18,6 +20,22 @@ class CameraMoveDeviceFeature extends Component {
     }
     this.activeMove = value;
     this.props.updateValue(this.props.deviceFeature, value);
+  };
+
+  handleKeyDown = (e, value) => {
+    if (!isActivationKey(e) || e.repeat) {
+      return;
+    }
+    e.preventDefault();
+    this.pressMove(value);
+  };
+
+  handleKeyUp = e => {
+    if (!isActivationKey(e)) {
+      return;
+    }
+    e.preventDefault();
+    this.releaseMove();
   };
 
   releaseMove = () => {
@@ -60,6 +78,9 @@ class CameraMoveDeviceFeature extends Component {
                   onPointerUp={this.releaseMove}
                   onPointerLeave={this.releaseMove}
                   onPointerCancel={this.releaseMove}
+                  onKeyDown={e => this.handleKeyDown(e, option.value)}
+                  onKeyUp={this.handleKeyUp}
+                  onBlur={this.releaseMove}
                   onContextMenu={e => e.preventDefault()}
                 >
                   <i class={`fe fe-${option.icon}`} />

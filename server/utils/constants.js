@@ -147,6 +147,9 @@ const AC_MODE = {
   FAN: 4,
 };
 
+// Canonical values of the camera "move" feature (spec docs/specs/camera-ptz-control.md, A.2).
+// A movement value (1..6) starts a bounded move or one step; STOP (0) halts all movement and is
+// always supported (never listed in supported_options — options declare the movements only).
 const CAMERA_MOVE = {
   STOP: 0,
   PAN_LEFT: 1,
@@ -847,6 +850,12 @@ const DEVICE_FEATURE_TYPES = {
   },
   CAMERA: {
     IMAGE: 'image',
+    // PTZ control (spec docs/specs/camera-ptz-control.md). MOVE: one command feature for all
+    // movements, values from CAMERA_MOVE, per-camera subset declared via supported_options.
+    // PRESET: recall a saved position; the labeled list lives in supported_options, the value
+    // sent is the option's integer (the integration maps it to its protocol token).
+    // *_POSITION: optional absolute position, numeric read/write, bounds declared by the
+    // integration via min/max (units are integration-defined: normalized ONVIF space, degrees...).
     MOVE: 'move',
     PRESET: 'preset',
     PAN_POSITION: 'pan-position',

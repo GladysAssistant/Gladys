@@ -39,21 +39,31 @@ class CameraBoxComponent extends Component {
   };
 
   refreshPtzDevice = async () => {
-    if (!this.props.box.camera) {
-      this.setState({ ptzDevice: null });
+    const cameraSelector = this.props.box.camera;
+    // Request generation guard: a camera change clears the controls immediately, and a slow
+    // response for a previous camera can never overwrite the current one (a stale overlay
+    // would send commands to the wrong camera).
+    this.ptzRequestId = (this.ptzRequestId || 0) + 1;
+    const requestId = this.ptzRequestId;
+    this.setState({ ptzDevice: null });
+    if (!cameraSelector) {
       return;
     }
     try {
-      const ptzDevice = await this.props.httpClient.get(`/api/v1/device/${this.props.box.camera}`);
-      this.setState({ ptzDevice });
+      const ptzDevice = await this.props.httpClient.get(`/api/v1/device/${cameraSelector}`);
+      if (requestId === this.ptzRequestId && this.props.box.camera === cameraSelector) {
+        this.setState({ ptzDevice });
+      }
     } catch (e) {
       console.error(e);
-      this.setState({ ptzDevice: null });
     }
   };
 
   renderPtzControls = () => {
     if (this.props.box.camera_ptz_controls === false) {
+      return null;
+    }
+    if (!this.state.ptzDevice || this.state.ptzDevice.selector !== this.props.box.camera) {
       return null;
     }
     const features = get(this.state, 'ptzDevice.features') || [];

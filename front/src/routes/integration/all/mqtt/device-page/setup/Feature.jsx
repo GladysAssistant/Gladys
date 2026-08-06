@@ -224,6 +224,9 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
                       type="checkbox"
                       class="custom-control-input"
                       checked={supportedMoveValues.has(option.value)}
+                      // an empty list would fall back to "all movements supported" (spec A.2):
+                      // the last checked movement cannot be removed
+                      disabled={supportedMoveValues.size === 1 && supportedMoveValues.has(option.value)}
                       onChange={() => props.toggleCameraMoveOption(option.value)}
                     />
                     <span class="custom-control-label">
@@ -532,7 +535,9 @@ class MqttFeatureBoxComponent extends Component {
       if (index !== optionIndex) {
         return option;
       }
-      return { ...option, [field]: field === 'value' ? Number(rawValue) : rawValue };
+      // an emptied value field stays empty (flagged by validation) instead of silently becoming 0
+      const value = field === 'value' && rawValue !== '' ? Number(rawValue) : rawValue;
+      return { ...option, [field]: value };
     });
     this.props.updateFeatureSupportedOptions(this.props.featureIndex, options);
   };

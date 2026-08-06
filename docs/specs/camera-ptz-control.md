@@ -63,6 +63,8 @@ const CAMERA_MOVE = {
 
 **Safety rule (MUST):** an integration implementing continuous movement MUST bound every move with the watchdog. A lost stop (network drop, browser tab killed mid-press) must never leave a camera rotating against its mechanical stop — this was an explicit pain point in the community request. Because a direction value alone is always safe, a plain "send `V` once" is a valid client behavior everywhere (scenes, voice, device list rows…), producing a bounded move or one step.
 
+**Lone-value callers beware:** with continuous movement and the default watchdog, a lone `V` without a `0` (a scene action, a quick push row tap whose release is lost) means up to **the full watchdog duration of motion** (~5 s by default) — not a small nudge. Integrations SHOULD therefore prefer a relative step (e.g. ONVIF `RelativeMove`) when the camera supports it, or expose a shorter watchdog / step size as a device param, so that lone values behave as the "one step" callers intuitively expect.
+
 **Capability declaration:** the feature's `supported_options` list the movement values (1–6) the camera actually supports — e.g. a pan/tilt camera without motorized zoom declares options 1–4. `STOP` (0) is always supported and is **not** listed as an option. Labels in `supported_options` default to the canonical i18n labels (D.5); the UI renders from the canonical values (arrow icons, not labels), so labels only matter in label-based surfaces (scene editor, MQTT setup recap). A `move` feature without any `supported_options` row is treated as supporting all six movements (fallback, mirroring the AC-mode legacy behavior).
 
 Movement speed is **not** part of the v1 contract. Integrations pick a sensible default and MAY expose speed as a device param (`t_device_param`) configurable from their own settings screen. Diagonal/simultaneous movement is likewise out of v1: one movement at a time; if a real need emerges, new canonical values (e.g. `UP_LEFT: 7`…) extend the enum without breaking the contract. See "Alternatives considered".
@@ -129,7 +131,7 @@ The user's "Tapo ONVIF" bridge therefore subscribes to the command topics and tr
 
 The scalar command already flows: `external-integration.device.set-value` carries `{ device, device_feature: { external_id, category, type }, value }` — a PTZ command is just `category: "camera", type: "move", value: 1`. Camera image and states are untouched.
 
-**One contract addition is required:** the *discovered device* payload (`POST /discovered_device`, C.2 of `external-integrations.md`) and the device payload accepted at creation must carry `features[].supported_options` so an ONVIF integration can publish both its supported movements and the preset list it read from the camera (and republish when presets change). The core side (`device.create` → `syncFeatureSupportedOptions`) already supports it; the external-integrations spec, SDK typings (`publishDiscoveredDevice`), and store validator must document/accept the field. **Per the living-spec rule, `docs/specs/external-integrations.md` is updated in the same diff as that implementation.**
+**One contract addition is required:** the *discovered device* payload (`POST /discovered_device`, C.2 of `external-integrations.md`) and the device payload accepted at creation must carry `features[].supported_options` so an ONVIF integration can publish both its supported movements and the preset list it read from the camera (and republish when presets change). The core side (`device.create` → `syncFeatureSupportedOptions`) already supports it; the external-integrations spec, SDK typings (`publishDiscoveredDevices`), and store validator must document/accept the field. **Per the living-spec rule, `docs/specs/external-integrations.md` is updated in the same diff as that implementation.**
 
 ### C.3 Internal services
 
@@ -147,7 +149,8 @@ The scalar command already flows: `external-integration.device.set-value` carrie
   - a **D-pad** (◀ ▶ ▲ ▼ around a central ■ stop) — each arrow shown only if the matching `CAMERA_MOVE` value is in the supported options (fallback: all, per A.2); the stop center is always shown when the `move` feature exists;
   - **zoom** `+` / `−` buttons if `ZOOM_IN`/`ZOOM_OUT` are supported;
   - a **preset select** (options from the `preset` feature's `supported_options`, ordered by `sort_order`) if present and non-empty.
-- **Interaction** (press-and-hold): `pointerdown` on a control → send its `CAMERA_MOVE` value; `pointerup` / `pointerleave` / `pointercancel` → send `0`. A quick tap therefore produces `V` then `0` (short bounded move or one step — A.2 makes both correct). While a press is active, other directional presses are ignored. Failsafe: on component unmount, tab `visibilitychange`, or a failed release request, send `0` (one retry); the integration watchdog remains the last line of defense.
+- **Interaction** (press-and-hold): `pointerdown` on a control → send its `CAMERA_MOVE` value; `pointerup` / `pointerleave` / `pointercancel` → send `0`. Keyboard is a first-class path: `Space`/`Enter` `keydown` (non-repeated) = press, `keyup` or focus loss (`blur`) = release — same duplicate-press guard as pointers. A quick tap therefore produces `V` then `0` (short bounded move or one step — A.2 makes both correct). While a press is active, other directional presses are ignored. Each press opens a **movement session** bound to the feature it was sent to: the release `0` is queued **after** the move request settles (a fast release can never reach the server before its move, and a move whose response is lost still gets its stop), and is sent on the session's feature (a camera change mid-press never stops another camera). Failsafe: on component unmount, tab `visibilitychange`, or a failed release request, the session is released the same way (stop retried once); the integration watchdog remains the last line of defense. The stop button renders whenever any movement is supported — including zoom-only cameras.
+- **Staleness guards**: a camera change clears the overlay immediately and responses from superseded requests are dropped (request generation), so the controls can never target the previously selected camera. The feature list (and thus the preset list) is loaded on widget mount and camera change; there is **no live push of device-structure changes today** (the device WebSocket events cover states only), so a preset list resynced by an integration appears on the next dashboard load — a device-structure WS event is a phase-2 candidate.
 - Commands go through `POST /api/v1/device_feature/:selector/value` (fire-and-forget; a failed command shows the widget's standard transient error style). No optimistic state to manage — the `move` feature has no meaningful state.
 - **Visibility**: overlay appears on hover/focus on pointer devices, always visible on touch devices (same pattern as the video controls). `EditCamera.jsx` gains one checkbox — "Show camera controls (PTZ)" (`box.camera_ptz_controls`, default `true`) — for users who want a clean image even on a motorized camera.
 - Overlay is available in both modes (still image and live streaming); in still mode movements won't be visible until the next image refresh, which is acceptable (a hint in the docs recommends live view for aiming).
@@ -156,7 +159,7 @@ The scalar command already flows: `external-integration.device.set-value` carrie
 
 `front/src/components/boxs/device-in-room/DeviceRow.jsx` mappings (via `ROW_TYPE_BY_CATEGORY_AND_TYPE`, category-scoped so the new type strings stay collision-proof):
 
-- `camera.move` → new `CameraMoveDeviceFeature`: one compact row of icon buttons (◀ ▶ ▲ ▼ − + and stop) derived from `supported_options`, each press sending its `CAMERA_MOVE` value then `0` on release (same bounded semantics as the widget). One row per camera instead of up to seven.
+- `camera.move` → new `CameraMoveDeviceFeature`: one compact row of icon buttons (◀ ▶ ▲ ▼ − + and stop) derived from `supported_options`, each press (pointer or keyboard, same semantics as D.1) sending its `CAMERA_MOVE` value then `0` on release. One row per camera instead of up to seven. Both `move` and `preset` join the devices-in-room allowlist (`SUPPORTED_FEATURE_TYPES_BY_CATEGORY` in `SupportedFeatureTypes.jsx`) — a control type absent from it never renders (see `docs/specs/device-feature-categories.md`, rule 8).
 - `camera.preset` → new `CameraPresetDeviceFeature`: labeled select fed by `supported_options` (the `AdaptiveOptionControl` pattern — same as AC/fan modes), sending the option value on change. Stateless: no selected value is highlighted (recalling a preset is an action, not a state); the select resets to a placeholder after sending.
 - Position features → existing numeric components (no dedicated UI in v1).
 
@@ -170,7 +173,7 @@ Generic device/feature views (`front/src/components/device/…`) work as-is; `fr
 
 ### D.5 Translations
 
-`front/src/config/i18n/{fr,en}.json` (kept in sync — CI `compare-translations`):
+All locale files under `front/src/config/i18n/` (`en.json`, `fr.json`, `de.json` today) — the repository rule is full key parity across every language file, enforced by CI `compare-translations`:
 
 - `deviceFeatureCategory.camera.{move,preset,pan-position,tilt-position,zoom-position}` — these labels drive the MQTT catalog, device views, and the scene feature picker;
 - canonical `CAMERA_MOVE` value labels (e.g. `deviceFeatureValue.camera.move.{stop,pan-left,pan-right,tilt-up,tilt-down,zoom-in,zoom-out}`) — used for default `supported_options` labels, MQTT checkboxes, and button aria-labels;
@@ -181,16 +184,16 @@ Generic device/feature views (`front/src/components/device/…`) work as-is; `fr
 
 Per repo policy (100% patch coverage server-side):
 
-- Server: constants list growth is covered by existing model validation tests; add tests for any touched helper (e.g. the no-unit set) and — in the same diff as C.2 — external-integration tests for `supported_options` passing through discovery/creation.
-- Front: component tests for the overlay (supported-options detection → which controls render; pointer sequence → `V`/`0` calls; failsafe stop) and the preset select; MQTT setup tests for the movement checkboxes and preset options editor payloads.
-- Cypress: extend the MQTT device E2E to create a camera with a `move` feature and assert the dashboard widget shows the overlay.
+- Server: constants list growth is covered by existing model validation tests; add tests for any touched helper (e.g. the no-unit set) and — in the same diff as C.2 — external-integration tests for `supported_options` passing through discovery/creation and the re-publish upsert.
+- Front: the repo has no unit-test script — front behavior is validated by eslint, `compare-translations`, the production build, and Cypress.
+- Cypress: no MQTT device-setup E2E exists today; when one is added, cover creating a camera with a `move` feature and assert the dashboard widget shows the overlay.
 
 ## F. Phases
 
 | Phase | Content | Deliverable |
 |---|---|---|
 | **1** | Constants (`CAMERA_MOVE` + types) + i18n + camera widget overlay (D-pad, zoom, stop, presets) + devices-in-room rows + MQTT catalog, movement checkboxes & preset options editor + `external-integrations.md` contract addition (C.2) | A Tapo ONVIF bridge (MQTT or store integration) gives full pan/tilt/zoom/preset control from the dashboard; presets callable from scenes |
-| **2** *(not committed)* | Labeled select for `supported_options` features in the scene editor (B.2), saving/renaming presets from the Gladys UI, position sliders UI, speed control, diagonal moves (new `CAMERA_MOVE` values), internal ONVIF service (discovery + preset auto-sync), voice intents | — |
+| **2** *(not committed)* | Labeled select for `supported_options` features in the scene editor (B.2), saving/renaming presets from the Gladys UI, position sliders UI, speed control, diagonal moves (new `CAMERA_MOVE` values), a device-structure WebSocket event so open widgets pick up resynced preset lists live (D.1), internal ONVIF service (discovery + preset auto-sync), voice intents | — |
 
 ## Alternatives considered (rejected)
 

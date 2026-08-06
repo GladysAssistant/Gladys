@@ -1917,7 +1917,7 @@
           "external_id": "This field is required and must be unique",
           "unit": "The selected unit is not valid for this feature",
           "room_id": "The selected room is not valid",
-          "supported_options": "Each preset needs a name and a unique value"
+          "supported_options": "Each preset needs a name and a unique whole number value (0 or more)"
         },
         "saveConflictError": "Conflict: Are you sure all external IDs are unique?",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",

@@ -456,7 +456,8 @@ class MqttDeviceSetupPage extends Component {
         const hasEmptyLabel = options.some(option => !option.label || option.label.trim() === '');
         const values = options.map(option => option.value);
         const hasDuplicateValue = new Set(values).size !== values.length;
-        if (hasEmptyLabel || hasDuplicateValue) {
+        const hasInvalidValue = values.some(value => !Number.isInteger(value) || value < 0);
+        if (hasEmptyLabel || hasDuplicateValue || hasInvalidValue) {
           properties.push({
             message: 'supported_options invalid',
             attribute: 'supported_options',

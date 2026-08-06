@@ -8,57 +8,72 @@ import style from './style.css';
 
 const ZOOM_VALUES = [CAMERA_MOVE.ZOOM_IN, CAMERA_MOVE.ZOOM_OUT];
 
+const isActivationKey = e => e.key === 'Enter' || e.key === ' ';
+
 // PTZ overlay of the camera dashboard widget: D-pad + zoom + stop + preset select.
 // Press-and-hold semantics (spec docs/specs/camera-ptz-control.md, A.2 and D.1): pressing a
-// direction sends its CAMERA_MOVE value, releasing sends STOP (0). The integration-side
-// watchdog bounds every move, so a lost release can never leave the camera rotating; the
-// component still stops on unmount and when the tab is hidden, and retries a failed stop once.
+// direction (pointer or Space/Enter) sends its CAMERA_MOVE value, releasing sends STOP (0).
+// Each press opens a movement session bound to the feature it was sent to; the STOP is always
+// queued AFTER the move request settles, so a fast release can never reach the server before
+// the move, and a move whose response is lost still gets its STOP. The integration-side
+// watchdog stays the last line of defense; the component also stops on unmount and when the
+// tab is hidden, and retries a failed stop once.
 class CameraPtzControls extends Component {
   state = {
     activeMove: null
   };
 
+  moveSession = null;
+
   sendValue = async (deviceFeature, value) => {
     await this.props.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, { value });
   };
 
-  pressMove = async value => {
-    if (this.state.activeMove !== null) {
-      return;
-    }
-    this.setState({ activeMove: value });
+  sendStop = async deviceFeature => {
     try {
-      await this.sendValue(this.props.moveFeature, value);
-    } catch (e) {
-      console.error(e);
-      this.setState({ activeMove: null });
-    }
-  };
-
-  releaseMove = async () => {
-    if (this.state.activeMove === null) {
-      return;
-    }
-    this.setState({ activeMove: null });
-    await this.sendStop();
-  };
-
-  stopAll = async () => {
-    this.setState({ activeMove: null });
-    await this.sendStop();
-  };
-
-  sendStop = async () => {
-    try {
-      await this.sendValue(this.props.moveFeature, CAMERA_MOVE.STOP);
+      await this.sendValue(deviceFeature, CAMERA_MOVE.STOP);
     } catch (e) {
       console.error(e);
       try {
-        await this.sendValue(this.props.moveFeature, CAMERA_MOVE.STOP);
+        await this.sendValue(deviceFeature, CAMERA_MOVE.STOP);
       } catch (retryError) {
         console.error(retryError);
       }
     }
+  };
+
+  pressMove = value => {
+    if (this.moveSession) {
+      return;
+    }
+    const session = { feature: this.props.moveFeature, stopQueued: false };
+    session.movePromise = this.sendValue(session.feature, value).catch(e => console.error(e));
+    this.moveSession = session;
+    this.setState({ activeMove: value });
+  };
+
+  // Ends the current movement session: waits for the move request to settle, then sends STOP on
+  // the SAME feature the move was sent to (a camera change mid-press must not stop another
+  // camera). Always sends STOP, even when the move request failed — the request may have
+  // reached the server with only its response lost.
+  releaseMove = async () => {
+    const session = this.moveSession;
+    if (!session || session.stopQueued) {
+      return;
+    }
+    session.stopQueued = true;
+    this.setState({ activeMove: null });
+    await session.movePromise;
+    await this.sendStop(session.feature);
+    this.moveSession = null;
+  };
+
+  stopAll = async () => {
+    if (this.moveSession) {
+      await this.releaseMove();
+      return;
+    }
+    await this.sendStop(this.props.moveFeature);
   };
 
   recallPreset = e => {
@@ -76,15 +91,29 @@ class CameraPtzControls extends Component {
     }
   };
 
+  handleMoveKeyDown = (e, value) => {
+    if (!isActivationKey(e) || e.repeat) {
+      return;
+    }
+    e.preventDefault();
+    this.pressMove(value);
+  };
+
+  handleMoveKeyUp = e => {
+    if (!isActivationKey(e)) {
+      return;
+    }
+    e.preventDefault();
+    this.releaseMove();
+  };
+
   componentDidMount() {
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   componentWillUnmount() {
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
-    if (this.state.activeMove !== null && this.props.moveFeature) {
-      this.sendValue(this.props.moveFeature, CAMERA_MOVE.STOP).catch(error => console.error(error));
-    }
+    this.releaseMove();
   }
 
   renderMoveButton(option, gridAreaClass) {
@@ -100,6 +129,9 @@ class CameraPtzControls extends Component {
           onPointerUp={this.releaseMove}
           onPointerLeave={this.releaseMove}
           onPointerCancel={this.releaseMove}
+          onKeyDown={e => this.handleMoveKeyDown(e, option.value)}
+          onKeyUp={this.handleMoveKeyUp}
+          onBlur={this.releaseMove}
           onContextMenu={e => e.preventDefault()}
         >
           <i class={`fe fe-${option.icon}`} />
@@ -128,7 +160,9 @@ class CameraPtzControls extends Component {
 
     return (
       <div class={style.ptzOverlay}>
-        {moveFeature && directionValues.length > 0 && (
+        {/* Stop must stay reachable for zoom-only cameras too, so the pad renders (with its
+            center stop button) as soon as any movement is supported */}
+        {moveFeature && (directionValues.length > 0 || zoomValues.length > 0) && (
           <div class={style.ptzPad}>
             {directionValues.map(value => this.renderMoveButton(optionsByValue.get(value), directionAreas[value]))}
             <Localizer>

@@ -2155,7 +2155,7 @@
           "external_id": "Le champ est obligatoire et doit être unique",
           "unit": "L'unité sélectionnée n'est pas valide pour cette fonctionnalité",
           "room_id": "La pièce sélectionnée n'est pas valide",
-          "supported_options": "Chaque position doit avoir un nom et une valeur unique"
+          "supported_options": "Chaque position doit avoir un nom et une valeur entière unique (0 ou plus)"
         },
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes sont uniques ?",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
@@ -4821,11 +4821,11 @@
     "camera": {
       "shortCategoryName": "Caméra",
       "image": "Caméra (Image)",
-      "move": "Mouvement caméra (PTZ)",
-      "preset": "Position caméra (preset)",
-      "pan-position": "Position panoramique caméra",
-      "tilt-position": "Position inclinaison caméra",
-      "zoom-position": "Position zoom caméra"
+      "move": "Mouvement de la caméra (PTZ)",
+      "preset": "Position mémorisée de la caméra (preset)",
+      "pan-position": "Position panoramique de la caméra",
+      "tilt-position": "Position d'inclinaison de la caméra",
+      "zoom-position": "Position du zoom de la caméra"
     },
     "charging-station": {
       "shortCategoryName": "Borne de recharge",
