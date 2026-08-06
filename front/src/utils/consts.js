@@ -116,6 +116,10 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.CAMERA.TILT_POSITION]: 'crosshair',
     [DEVICE_FEATURE_TYPES.CAMERA.ZOOM_POSITION]: 'crosshair'
   },
+  [DEVICE_FEATURE_CATEGORIES.CHARGING_STATION]: {
+    [DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS]: 'activity',
+    [DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE]: 'zap'
+  },
   [DEVICE_FEATURE_CATEGORIES.DOORBELL]: {
     [DEVICE_FEATURE_TYPES.DOORBELL.RING]: 'bell'
   },
@@ -550,3 +554,45 @@ export const DeviceFeatureCategoriesIcon = {
 };
 
 export const DeviceFeatureTypesString = [DEVICE_FEATURE_TYPES.TEXT.TEXT];
+
+// Television and music features come in two flavours: continuous controls, which carry a value the
+// user reads and adjusts, and remote-control orders, which are one-shot commands with no meaningful
+// value to display. Only the continuous ones are listed here: everything else in those categories is
+// a push button, so a new DEVICE_FEATURE_TYPES.TELEVISION.* / .MUSIC.* is handled without touching
+// this file. These sets are the single source of truth for both the dashboard rows and the MQTT
+// device catalog defaults.
+export const TelevisionContinuousControlFeatureTypes = new Set([
+  DEVICE_FEATURE_TYPES.TELEVISION.BINARY,
+  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
+  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL
+]);
+
+export const MusicContinuousControlFeatureTypes = new Set([
+  DEVICE_FEATURE_TYPES.MUSIC.VOLUME,
+  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE
+]);
+
+export const isPushButtonFeature = (category, type) => {
+  if (category === DEVICE_FEATURE_CATEGORIES.BUTTON && type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
+    return true;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.TELEVISION) {
+    return !TelevisionContinuousControlFeatureTypes.has(type);
+  }
+
+  // MUSIC.PLAY_NOTIFICATION lands here and is reported as a push button, which is how the MQTT
+  // catalog has always classified it. It is not a plain key: scene.actions.js calls it with a TTS
+  // URL, so it must be excluded before this predicate is used to route music onto a dashboard push
+  // button row. It is left as-is here because narrowing it would silently change the MQTT catalog
+  // defaults (a 0-100 slider instead of a one-shot button), which is no more correct for a URL.
+  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
+    return !MusicContinuousControlFeatureTypes.has(type);
+  }
+
+  return false;
+};
+
+export const TelevisionPushButtonFeatureTypes = Object.values(DEVICE_FEATURE_TYPES.TELEVISION).filter(type =>
+  isPushButtonFeature(DEVICE_FEATURE_CATEGORIES.TELEVISION, type)
+);

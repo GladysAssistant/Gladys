@@ -68,6 +68,29 @@ describe('externalIntegration.isUpdateAvailable', () => {
     expect(externalIntegration.isUpdateAvailable({ store_slug: 'john/demo', version: '3.0.0' })).to.equal(false);
   });
 
+  it('should prefer the repo manifest when it is ahead of the index', () => {
+    // the index lags behind the repo by up to 1h30: once the repo manifest
+    // has been read, its version is the one to compare against
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.storeIndex = {
+      index_format: 1,
+      integrations: [{ store_slug: 'john/demo', manifest: { ...TEST_MANIFEST, version: '2.0.0' } }],
+    };
+    externalIntegration.repoManifests.set('john/demo', { ...TEST_MANIFEST, version: '3.0.0' });
+    expect(externalIntegration.isUpdateAvailable({ store_slug: 'john/demo', version: '2.0.0' })).to.equal(true);
+    expect(externalIntegration.isUpdateAvailable({ store_slug: 'john/demo', version: '3.0.0' })).to.equal(false);
+  });
+
+  it('should keep the index version when the repo manifest is older', () => {
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.storeIndex = {
+      index_format: 1,
+      integrations: [{ store_slug: 'john/demo', manifest: { ...TEST_MANIFEST, version: '3.0.0' } }],
+    };
+    externalIntegration.repoManifests.set('john/demo', { ...TEST_MANIFEST, version: '1.0.0' });
+    expect(externalIntegration.isUpdateAvailable({ store_slug: 'john/demo', version: '2.0.0' })).to.equal(true);
+  });
+
   it('should return false on invalid versions', () => {
     const { externalIntegration } = buildSupervisor();
     externalIntegration.repoManifests.set('john/demo', { ...TEST_MANIFEST, version: 'not-semver' });

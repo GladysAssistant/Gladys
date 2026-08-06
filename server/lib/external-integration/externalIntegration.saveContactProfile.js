@@ -1,6 +1,7 @@
 const { Error422 } = require('../../utils/httpErrors');
 const { BadParameters } = require('../../utils/coreErrors');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
+const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
 const { getContactSchema } = require('./externalIntegration.getContactProfile');
 const { CONTACT_PROFILE_VARIABLE } = require('./constants');
 
@@ -25,6 +26,7 @@ async function saveContactProfile(service, userId, values) {
   if (contactSchema.length === 0) {
     throw new Error422('this integration has no contact schema');
   }
+  const dynamicOptions = await getDynamicOptions(service, contactSchema);
   const existingProfile = (await this.getContactProfile(service, userId)) || {};
   const newProfile = { ...existingProfile };
   Object.keys(values).forEach((key) => {
@@ -36,7 +38,7 @@ async function saveContactProfile(service, userId, values) {
       // a secret set to null means unchanged
       return;
     }
-    validateConfigValue(field, values[key]);
+    validateConfigValue(field, values[key], dynamicOptions);
     newProfile[key] = values[key];
   });
   await this.variable.setValue(CONTACT_PROFILE_VARIABLE, JSON.stringify(newProfile), service.id, userId);

@@ -664,6 +664,12 @@
         "saveError": "There was an error saving the configuration.",
         "saveButton": "Save configuration",
         "oauthConnectButton": "Connect",
+        "oauthInvalidStateError": "This integration did not provide a usable security state for the connection (missing or too long). It cannot be connected until its developer fixes it.",
+        "oauthRedirectUriLabel": "Redirect URI to declare in your developer application",
+        "oauthRedirectUriDescription": "Providers refuse a local address: this HTTPS page hosted by Gladys sends you back to your instance once you have authorized access. It runs entirely in your browser, Gladys neither stores nor uses the authorization code, and your access tokens are exchanged directly between your instance and the provider.",
+        "oauthRedirectUriInstanceDescription": "You chose to use the address of your instance: declare this exact URL in your developer application. The provider will come back to your Gladys directly, without going through the Gladys redirect page.",
+        "oauthRedirectUriCopied": "Copied!",
+        "oauthUseInstanceRedirectLabel": "Use the address of my instance instead (I already access Gladys over HTTPS)",
         "oauthConnectError": "There was an error starting the connection. Check that the integration is running."
       },
       "actions": {
@@ -703,6 +709,8 @@
         "actionError": "There was an error executing this action.",
         "uninstallError": "There was an error uninstalling this integration.",
         "updateAvailableText": "A new version of this integration is available.",
+        "updateSuccessText": "Integration updated to version {{version}}.",
+        "alreadyUpToDateText": "The integration is already up to date (version {{version}}): the Docker image was re-pulled and the container recreated.",
         "statusLabel": "Status",
         "versionLabel": "Version",
         "dockerImageLabel": "Docker image",
@@ -712,7 +720,7 @@
         "restartButton": "Restart",
         "updateButton": "Update",
         "forceUpdateButton": "Force update",
-        "forceUpdateTitle": "Re-pulls the Docker image and recreates the container, even without a new version",
+        "forceUpdateTitle": "Checks the latest published version, re-pulls the Docker image and recreates the container",
         "logsButton": "Logs",
         "uninstallButton": "Uninstall",
         "containersTitle": "Additional containers",
@@ -746,6 +754,7 @@
         "title": "Discovered devices",
         "scanButton": "Scan",
         "scanning": "Scanning...",
+        "scanningInProgress": "Scan in progress... Depending on the integration, this can take up to a minute. The list will refresh automatically as soon as devices are published.",
         "scanError": "There was an error launching the scan.",
         "scanErrorDisconnected": "Unable to launch the scan: the integration is not connected. Check that it is running in the \"Configuration\" tab.",
         "loadError": "There was an error loading the discovered devices.",
@@ -847,7 +856,8 @@
         "errorUnknown": "There was an error installing this integration.",
         "errorNotFound": "Repository not found, or it does not contain a valid Gladys integration.",
         "errorInvalidManifest": "The integration manifest is invalid.",
-        "manifestInvalidJson": "The manifest is not valid JSON."
+        "manifestInvalidJson": "The manifest is not valid JSON.",
+        "errorDetailsTitle": "Error details:"
       },
       "logs": {
         "title": "Logs",
@@ -2990,11 +3000,15 @@
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
+        "logicExplanationText": "The conditions in this box are combined with an OR: the box is satisfied as soon as one of them is met. To make an AND, add several \"Condition on variables\" boxes: they will then all have to be satisfied.",
         "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
         "conditionDescription": "If all conditions are met, the actions in the \"Then\" block will be executed. If not, the \"Else\" block will be executed.",
+        "conditionLogicDescription": "The conditions below are combined with an AND: they all need to be met. To make an OR, use a single \"Condition on variables\" box and add several conditions to it with the \"+ OR\" button.",
         "noCondition": "No condition has been added yet. Click the '+' button to add a condition to this block",
         "addCondition": "Add condition",
         "if": "If",
@@ -3619,6 +3633,12 @@
     "operations": "Operations",
     "upToDate": "Gladys is up to date",
     "newUpgradeAvailable": "New upgrade available",
+    "newUpgradeAvailableVersion": "Gladys {{version}} is available",
+    "checkForUpdates": "Check for updates",
+    "checkingForUpdates": "Checking for updates...",
+    "checkForUpdatesText": "Gladys checks for new versions automatically. Click below to check right now.",
+    "checkForUpdatesError": "Unable to check for updates. Check your internet connection and try again.",
+    "noUpdateAvailable": "No new version available, you are running the latest Gladys.",
     "newUpgradeAvailableText": "Gladys will update automatically if you use Watchtower. If you want to update manually, click the button below. This will launch a Watchtower container that will only update the Gladys container, the other containers on this machine will be left untouched.",
     "pinnedImageTitle": "This image cannot be updated",
     "pinnedImageText": "Your Gladys container was created from the image \"{{image}}\", which points to a fixed version. An update would download the exact same image again, so Gladys cannot update itself.",
@@ -4563,6 +4583,20 @@
           "one": "Closed"
         }
       },
+      "motion-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No motion",
+          "one": "Motion detected"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "Clear",
+          "one": "Smoke detected"
+        }
+      },
       "co-sensor": {
         "binary": {
           "other": "No value received",
@@ -4648,6 +4682,25 @@
         "plugged": {
           "0": "Unplugged",
           "1": "Plugged"
+        }
+      },
+      "charging-station": {
+        "connector-status": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Available",
+          "1": "Occupied",
+          "2": "Reserved",
+          "3": "Unavailable",
+          "4": "Faulted"
+        },
+        "charging-state": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Charging",
+          "1": "Vehicle connected",
+          "2": "Paused (vehicle)",
+          "3": "Paused (charger)",
+          "4": "Idle",
+          "5": "Discharging"
         }
       },
       "voc-matter-index-sensor": {
@@ -4773,6 +4826,11 @@
       "pan-position": "Camera pan position",
       "tilt-position": "Camera tilt position",
       "zoom-position": "Camera zoom position"
+    },
+    "charging-station": {
+      "shortCategoryName": "Charging station",
+      "connector-status": "Connector status",
+      "charging-state": "Charging state"
     },
     "doorbell": {
       "shortCategoryName": "Doorbell",

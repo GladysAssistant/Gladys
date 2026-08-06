@@ -19,6 +19,13 @@ class ExternalIntegrationOAuthCallbackPage extends Component {
     const code = searchParams.get('code');
     const state = searchParams.get('state');
     const key = localStorage.getItem(`externalIntegrationOAuthKey:${selector}`);
+    // the provider checks the redirect_uri of the token exchange against the
+    // one used to authorize: it must come back byte for byte. A flow started
+    // before this release stored no value and authorized with the address of
+    // this very page, so that is what the fallback has to be.
+    const redirectUri =
+      localStorage.getItem(`externalIntegrationOAuthRedirectUri:${selector}`) ||
+      `${window.location.origin}${window.location.pathname}`;
     if (!code || !state || !key) {
       this.setState({ relayStatus: RequestStatus.Error, missingParams: true });
       return;
@@ -29,9 +36,10 @@ class ExternalIntegrationOAuthCallbackPage extends Component {
         key,
         code,
         state,
-        redirect_uri: `${window.location.origin}/dashboard/integration/device/external/${selector}/oauth-callback`
+        redirect_uri: redirectUri
       });
       localStorage.removeItem(`externalIntegrationOAuthKey:${selector}`);
+      localStorage.removeItem(`externalIntegrationOAuthRedirectUri:${selector}`);
       this.setState({ relayStatus: RequestStatus.Success });
     } catch (e) {
       console.error(e);
