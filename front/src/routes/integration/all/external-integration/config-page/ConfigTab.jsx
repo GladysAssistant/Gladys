@@ -9,7 +9,7 @@ import LinkAccountCard from './LinkAccountCard';
 import ContactProfileCard from './ContactProfileCard';
 import WebhooksCard from './WebhooksCard';
 import HardwareCard from './HardwareCard';
-import { getRequestedHardwareClasses } from '../utils';
+import { getLocalizedText, getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { USER_ROLE } from '../../../../../../../server/utils/constants';
 
@@ -37,6 +37,7 @@ const ConfigTab = props => {
   // vendor developer account, get credentials...)
   const docs = get(integration, 'docs') || {};
   const docsUrl = docs[language] || docs.en;
+  const connectionMessage = getLocalizedText(get(integration, 'connection_status.message'), language);
 
   return (
     <div>
@@ -69,6 +70,21 @@ const ConfigTab = props => {
             {loadStatus === RequestStatus.Error && (
               <div class="alert alert-danger">
                 <Text id="integration.externalIntegration.config.loadError" />
+              </div>
+            )}
+            {/* What the integration has to say about its connection belongs to
+                the integration, not to one field: it may link several accounts,
+                and a message rendered next to one of them reads as if it were
+                about that one. Here it is also simply more visible than the
+                muted line it used to be. */}
+            {connectionMessage && (
+              <div
+                class={cx('alert', {
+                  'alert-info': get(integration, 'connection_status.connected'),
+                  'alert-warning': !get(integration, 'connection_status.connected')
+                })}
+              >
+                {connectionMessage}
               </div>
             )}
             <div
