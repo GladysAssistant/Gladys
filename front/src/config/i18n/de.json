@@ -4293,6 +4293,10 @@
           "low": "Niedrig",
           "medium": "Mittel",
           "high": "Hoch"
+        },
+        "for-automation-only": {
+          "stop": "Stopp",
+          "smoke-siren": "Rauchsirene"
         }
       },
       "vacuum-cleaner": {
@@ -4537,6 +4541,10 @@
           "0": "Niedrig",
           "1": "Mittel",
           "2": "Hoch"
+        },
+        "for-automation-only": {
+          "0": "Stopp",
+          "1": "Rauchsirene"
         }
       },
       "music": {
@@ -4608,6 +4616,13 @@
           "medium-risk": "Mittel",
           "high-risk": "Hoch",
           "unknown": "Unbekannt"
+        }
+      },
+      "test": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Nein",
+          "one": "Ja"
         }
       },
       "level-sensor": {
@@ -4822,6 +4837,10 @@
       "decimal": "CO2 (Dezimal)",
       "integer": "CO2 (Ganzzahl)"
     },
+    "test": {
+      "shortCategoryName": "Test",
+      "binary": "Test"
+    },
     "switch": {
       "shortCategoryName": "Schalter",
       "voltage": "Schalter: Spannung",
@@ -4837,7 +4856,8 @@
       "shortCategoryName": "Sirene",
       "binary": "Sirene",
       "lmh_volume": "Lautstärke der Sirene",
-      "melody": "Melodie"
+      "melody": "Melodie",
+      "for-automation-only": "Sirene (Automation)"
     },
     "cube": {
       "shortCategoryName": "Würfel",
