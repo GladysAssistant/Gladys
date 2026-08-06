@@ -3,7 +3,7 @@ const { buildUniqueSelector } = require('../../utils/addSelector');
 const { areObjectsEqual, pick } = require('../../utils/objects');
 const db = require('../../models');
 
-const UPDATABLE_FIELDS = ['category', 'type', 'unit', 'min', 'max'];
+const UPDATABLE_FIELDS = ['category', 'type', 'unit', 'min', 'max', 'step'];
 
 /**
  * @description Add a feature to a device.

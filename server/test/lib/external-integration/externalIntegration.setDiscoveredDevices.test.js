@@ -119,6 +119,22 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     await expectBadParameters([wrongUnit], 'unknown unit');
   });
 
+  it('should reject a non-positive or non-numeric step', async () => {
+    const zeroStep = buildDiscoveredDevice(service.selector);
+    zeroStep.features[0].step = 0;
+    await expectBadParameters([zeroStep], 'features[0].step: must be a positive number');
+    const stringStep = buildDiscoveredDevice(service.selector);
+    stringStep.features[0].step = '0.5';
+    await expectBadParameters([stringStep], 'features[0].step: must be a positive number');
+  });
+
+  it('should accept a valid step', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0].step = 0.5;
+    const count = await externalIntegration.setDiscoveredDevices(service, [device]);
+    expect(count).to.equal(1);
+  });
+
   it('should reject an invalid poll_frequency', async () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 12345 };
     await expectBadParameters([device], 'poll_frequency');

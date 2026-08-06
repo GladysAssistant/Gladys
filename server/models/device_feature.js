@@ -83,6 +83,14 @@ module.exports = (sequelize, DataTypes) => {
           isFloat: true,
         },
       },
+      step: {
+        allowNull: true,
+        type: DataTypes.DOUBLE,
+        validate: {
+          isFloat: true,
+          min: 0,
+        },
+      },
       last_value: {
         type: DataTypes.DOUBLE,
         validate: {

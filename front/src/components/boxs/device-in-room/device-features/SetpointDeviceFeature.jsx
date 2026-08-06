@@ -27,7 +27,7 @@ const DEFAULT_VALUE_BY_CATEGORY = {
 };
 
 const SetpointDeviceFeature = ({ children, ...props }) => {
-  const SETPOINT_STEP = SETPOINT_STEP_BY_CATEGORY[props.deviceFeature.category] || 0.5;
+  const SETPOINT_STEP = props.deviceFeature.step || SETPOINT_STEP_BY_CATEGORY[props.deviceFeature.category] || 0.5;
   const DEFAULT_VALUE_IN_CASE_EMPTY = DEFAULT_VALUE_BY_CATEGORY[props.deviceFeature.category] || 0;
 
   function updateValue(value) {

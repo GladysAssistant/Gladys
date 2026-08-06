@@ -19,6 +19,7 @@ const DEVICE_FEATURES_ATTRIBUTES = [
   'unit',
   'min',
   'max',
+  'step',
   'last_value',
   'last_value_string',
   'last_value_changed',
