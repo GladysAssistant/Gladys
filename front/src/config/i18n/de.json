@@ -667,7 +667,6 @@
         "oauthRedirectUriInstanceDescription": "Sie haben die Adresse Ihrer Instanz gewählt: tragen Sie genau diese URL in Ihrer Entwickler-Anwendung ein. Der Dienst kommt dann direkt zu Ihrem Gladys zurück, ohne den Umweg über die Gladys-Weiterleitungsseite.",
         "oauthRedirectUriCopied": "Kopiert!",
         "oauthUseInstanceRedirectLabel": "Stattdessen die Adresse meiner Instanz verwenden (ich erreiche Gladys bereits per HTTPS)",
-        "accountLinkQrCode": "Sie können diesen Code auch mit der App des Dienstes von Ihrem Telefon aus scannen.",
         "oauthConnectError": "Fehler beim Starten der Verbindung. Prüfen Sie, ob die Integration läuft."
       },
       "actions": {
