@@ -259,7 +259,23 @@ const actionsFunc = {
 
     logger.debug(`Delay: Wait ${timeToWaitMilliseconds} milliseconds.`);
 
-    await Promise.delay(timeToWaitMilliseconds);
+    const { abortSignal } = scope;
+    // Abortable wait: resolves after the delay, or rejects immediately if the
+    // scene is stopped while waiting (so a long "delay" can be interrupted).
+    // Note: an already-aborted scene is caught earlier by executeAction.
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(resolve, timeToWaitMilliseconds);
+      if (abortSignal) {
+        abortSignal.addEventListener(
+          'abort',
+          () => {
+            clearTimeout(timer);
+            reject(new AbortScene('SCENE_STOPPED'));
+          },
+          { once: true },
+        );
+      }
+    });
   },
 
   [ACTIONS.SCENE.START]: async (self, action, scope) => {

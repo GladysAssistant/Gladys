@@ -4,6 +4,8 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import style from './style.css';
 import { MAX_LENGTH_TAG } from './constant';
+import { computeRunningInfo } from './runningInfo';
+import RunningStopButton from './RunningStopButton';
 
 class SceneCard extends Component {
   getSceneUrl = () => {
@@ -31,7 +33,13 @@ class SceneCard extends Component {
     return `/dashboard/scene/${this.props.scene.selector}`;
   };
 
+  getRunningInfo = props => computeRunningInfo(props.runningScenes, props.scene.selector, props.now);
+
   startScene = async () => {
+    // Prevent launching a new instance while the scene is already running
+    if (this.getRunningInfo(this.props)) {
+      return;
+    }
     try {
       await this.setState({ saving: true });
       await this.props.httpClient.post(`/api/v1/scene/${this.props.scene.selector}/start`);
@@ -43,6 +51,14 @@ class SceneCard extends Component {
     setTimeout(() => this.setState({ saving: false }), 200);
   };
 
+  stopScene = async () => {
+    try {
+      await this.props.httpClient.post(`/api/v1/scene/${this.props.scene.selector}/stop`);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   switchActiveScene = async () => {
     await this.setState({ saving: true });
     await this.props.switchActiveScene(this.props.index);
@@ -50,6 +66,7 @@ class SceneCard extends Component {
   };
 
   getMobileView = (props, { saving }) => {
+    const runningInfo = this.getRunningInfo(props);
     return (
       <div class="list-group-item">
         <div class="row align-items-center">
@@ -79,15 +96,19 @@ class SceneCard extends Component {
             </div>
           </a>
           <div class="col-auto">
-            <button
-              onClick={this.startScene}
-              type="button"
-              class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
-                'btn-loading': saving
-              })}
-            >
-              <i class="fe fe-play" />
-            </button>
+            {runningInfo ? (
+              <RunningStopButton runningInfo={runningInfo} onStop={this.stopScene} small />
+            ) : (
+              <button
+                onClick={this.startScene}
+                type="button"
+                class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
+                  'btn-loading': saving
+                })}
+              >
+                <i class="fe fe-play" />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -95,6 +116,7 @@ class SceneCard extends Component {
   };
 
   getDesktopView = (props, { saving }) => {
+    const runningInfo = this.getRunningInfo(props);
     return (
       <div class="col-lg-3 p-2">
         <div
@@ -142,10 +164,14 @@ class SceneCard extends Component {
                       <i class="fe fe-edit" />
                       <Text id="scene.editButton" />
                     </Link>
-                    <button onClick={this.startScene} type="button" class="btn btn-outline-success btn-sm">
-                      <i class="fe fe-play" />
-                      <Text id="scene.startButton" />
-                    </button>
+                    {runningInfo ? (
+                      <RunningStopButton runningInfo={runningInfo} onStop={this.stopScene} small />
+                    ) : (
+                      <button onClick={this.startScene} type="button" class="btn btn-outline-success btn-sm">
+                        <i class="fe fe-play" />
+                        <Text id="scene.startButton" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

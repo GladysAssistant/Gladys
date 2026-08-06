@@ -68,6 +68,18 @@ describe('GET /api/v1/scene', () => {
   });
 });
 
+describe('GET /api/v1/scene/running', () => {
+  it('should return an empty list when no scene is running', async () => {
+    await authenticatedRequest
+      .get('/api/v1/scene/running')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal([]);
+      });
+  });
+});
+
 describe('PATCH /api/v1/scene/:scene_selector', () => {
   it('should update scene', async () => {
     await authenticatedRequest
@@ -122,6 +134,35 @@ describe('POST /api/v1/scene/:scene_selector/start', () => {
           type: ACTIONS.SCENE.START,
           scene: 'test-scene',
           status: ACTIONS_STATUS.PENDING,
+        });
+      });
+  });
+});
+
+describe('POST /api/v1/scene/:scene_selector/stop', () => {
+  it('should return stopped 0 when no execution of the scene is running', async () => {
+    await authenticatedRequest
+      .post('/api/v1/scene/test-scene/stop')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          success: false,
+          stopped: 0,
+        });
+      });
+  });
+});
+
+describe('POST /api/v1/scene/execution/:execution_id/stop', () => {
+  it('should return success false when the execution is not running', async () => {
+    await authenticatedRequest
+      .post('/api/v1/scene/execution/unknown-execution-id/stop')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          success: false,
         });
       });
   });
