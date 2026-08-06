@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import QRCode from 'qrcode';
 
 import { getLocalizedText, getUrlDomain } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -30,20 +29,9 @@ class ConfigField extends Component {
     this.props.updateConfigValue(field, newValues);
   };
 
-  onOAuthConnect = async e => {
+  onOAuthConnect = e => {
     e.preventDefault();
-    const authorizeUrl = await this.props.connectOAuth(this.props.field);
-    // An account_link provider is approved outside Gladys, and for several of
-    // them (Xiaomi Home, Tuya...) that means their own mobile app. The very URL
-    // that just opened in a tab is offered as a QR code too, so it can be
-    // scanned from a phone instead of signing in again on the computer.
-    if (authorizeUrl && this.props.field.type === 'account_link') {
-      QRCode.toDataURL(authorizeUrl, (err, dataUrl) => {
-        if (!err) {
-          this.setState({ linkQrCode: dataUrl });
-        }
-      });
-    }
+    this.props.connectOAuth(this.props.field);
   };
 
   copyRedirectUri = async value => {
@@ -237,16 +225,6 @@ class ConfigField extends Component {
                 <Text id="integration.externalIntegration.config.oauthUseInstanceRedirectLabel" />
               </span>
             </label>
-          )}
-          {!usesRedirect && this.state.linkQrCode && (
-            // the sign-in page also opened in a new tab; this is the same URL as
-            // a QR code, for the providers whose own app is the way to approve it
-            <div class="mt-3">
-              <img src={this.state.linkQrCode} alt="" width="180" height="180" />
-              <small class="form-text text-muted">
-                <Text id="integration.externalIntegration.config.accountLinkQrCode" />
-              </small>
-            </div>
           )}
           {connectionStatus && connectionStatus.message && (
             <small class="form-text text-muted">{getLocalizedText(connectionStatus.message, language)}</small>

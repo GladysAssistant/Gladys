@@ -492,8 +492,6 @@ class ExternalIntegrationConfigPage extends Component {
       // them — reject a sign-in URL opened with a cross-site Referer outright.
       window.open(urlToOpen, '_blank', usesRedirect ? 'noopener' : 'noopener,noreferrer');
       this.setState({ oauthStatus: RequestStatus.Success });
-      // handed back so the field can offer the same URL as a QR code
-      return urlToOpen;
     } catch (e) {
       console.error(e);
       this.setState({
@@ -502,7 +500,6 @@ class ExternalIntegrationConfigPage extends Component {
         oauthInvalidUrl: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_URL'
       });
     }
-    return undefined;
   };
 
   onStatusChanged = payload => {
