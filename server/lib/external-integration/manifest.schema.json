@@ -15,8 +15,8 @@
     },
     "type": {
       "type": "string",
-      "enum": ["device", "communication"],
-      "description": "Integration type. \"device\" integrations expose devices through the Devices/Discovery/Configuration screens; \"communication\" integrations are messaging channels (Telegram-like bots): no device screens, the user links their account from the Gladys UI and the integration exchanges messages through the host API."
+      "enum": ["device", "communication", "ai"],
+      "description": "Integration type. \"device\" integrations expose devices through the Devices/Discovery/Configuration screens; \"communication\" integrations are messaging channels (Telegram-like bots): no device screens, the user links their account from the Gladys UI and the integration exchanges messages through the host API; \"ai\" integrations are AI providers: they receive OpenAI-compatible chat completion requests over the integration WebSocket and answer with completions, so the user can route the assistant through them instead of Gladys Plus."
     },
     "name": {
       "type": "string",

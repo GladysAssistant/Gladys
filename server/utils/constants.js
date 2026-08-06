@@ -386,6 +386,7 @@ const SYSTEM_VARIABLE_NAMES = {
   DUCKDB_MIGRATED: 'DUCKDB_MIGRATED',
   DUCKDB_ORPHANED_STATES_PURGED: 'DUCKDB_ORPHANED_STATES_PURGED',
   GLADYS_VERSION: 'GLADYS_VERSION',
+  AI_PROVIDER: 'AI_PROVIDER',
 };
 
 const EVENTS = {
@@ -1732,6 +1733,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     OAUTH_GET_AUTHORIZE_URL: 'external-integration.oauth.get-authorize-url',
     OAUTH_CALLBACK: 'external-integration.oauth.callback',
     ACTION_RUN: 'external-integration.action.run',
+    AI_CHAT: 'external-integration.ai.chat',
     CAMERA_GET_IMAGE: 'external-integration.camera.get-image',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',

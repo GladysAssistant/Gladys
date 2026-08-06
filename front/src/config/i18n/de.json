@@ -795,7 +795,7 @@
             "value": "Wert"
           },
           "contextTypes": {
-            "device_feature": "Funktion \u201e{{name}}\u201c"
+            "device_feature": "Funktion „{{name}}“"
           },
           "fieldErrorTypes": {
             "notNullViolation": "Pflichtfeld wurde von der Integration nicht gesetzt",
@@ -828,7 +828,8 @@
         "duplicateWarningText": "„{name}“ scheint eine weitere Instanz dieser Integration zu sein. Zwei Instanzen können sich um dasselbe Cloud-Konto oder dieselben Geräte streiten — stoppen Sie die bestehende Instanz während Ihrer Tests. Die Installation ist dennoch möglich (z. B. eine Dev-Version neben der Produktion).",
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
-        "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie)."
+        "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
+        "aiWarningText": "Diese Integration ist ein KI-Anbieter: Wenn Sie sie als KI-Anbieter auswählen, erhält sie alle Ihre Assistenten-Unterhaltungen (Nachrichten, Verlauf, von Werkzeugen zurückgegebene Gerätezustände, Chat-Bilder), und ihre Antworten steuern die Aktionen des Assistenten in Ihrem Zuhause."
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
@@ -2700,6 +2701,19 @@
         "description": "Erweiterte Funktion: lädt den JSON-Kontext herunter, der an die KI gesendet wird (System-Prompt, die letzten 50 Nachrichten der Unterhaltung und verfügbare Tools). Nützlich zum Reproduzieren und Diagnostizieren von Benutzerproblemen.",
         "downloadButton": "JSON-Kontext für Debug herunterladen",
         "error": "Debug-Kontext konnte nicht erstellt werden. Stelle sicher, dass der MCP-Dienst läuft."
+      },
+      "aiProvider": {
+        "title": "KI-Anbieter",
+        "description": "Gladys verwendet standardmäßig Gladys Plus als KI-Anbieter. Sie können den Assistenten (Chat, Absichtserkennung, Wochenrückblick) stattdessen über eine installierte KI-Anbieter-Integration leiten: Claude, DeepSeek, OpenAI, ein lokales Modell... Die Anbieter-Einstellungen (API-Schlüssel, Modell) finden Sie auf der Seite der Integration.",
+        "selectLabel": "Für KI-Anfragen verwendeter Anbieter",
+        "gladysPlusOption": "Gladys Plus (Standard)",
+        "trustWarning": "Alle Ihre Assistenten-Unterhaltungen (Nachrichten, Verlauf, von Werkzeugen zurückgegebene Gerätezustände, Chat-Bilder) werden an diesen Anbieter gesendet, und seine Antworten steuern die Aktionen des Assistenten in Ihrem Zuhause.",
+        "noProvider": "Keine KI-Anbieter-Integration installiert. Installieren Sie eine aus dem Integrationskatalog, um einen anderen Anbieter als Gladys Plus zu verwenden.",
+        "loadError": "Die KI-Anbieter-Einstellungen konnten nicht geladen werden.",
+        "retry": "Erneut versuchen",
+        "saveError": "Der KI-Anbieter konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+        "providerNotRunning": "Diese KI-Anbieter-Integration läuft nicht: KI-Anfragen schlagen fehl, solange sie nicht gestartet ist.",
+        "providerNotRunningLink": "Integrationsseite öffnen"
       },
       "weeklyDigest": {
         "title": "Wöchentlicher Hausbericht",

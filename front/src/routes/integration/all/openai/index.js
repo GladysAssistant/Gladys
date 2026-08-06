@@ -5,7 +5,9 @@ import Layout from './Layout';
 import GladysPlusUpsellCard from '../../../../components/gateway/GladysPlusUpsellCard';
 import WeeklyDigestSettings from './WeeklyDigestSettings';
 import AiChatDebugDownload from './AiChatDebugDownload';
+import AiProviderSettings from './AiProviderSettings';
 import AiQuotaDisplay from './AiQuotaDisplay';
+import { USER_ROLE } from '../../../../../../server/utils/constants';
 
 class OpenAIGateway extends Component {
   isGladysPlusConnected = async () => {
@@ -22,19 +24,43 @@ class OpenAIGateway extends Component {
     }
   };
 
+  // with an external AI provider selected, the assistant already works
+  // without Gladys Plus: the Plus upsell would be misleading as the hero
+  // of this page. null = unknown (request pending or failed): the Plus
+  // messages only render once the absence of a provider is confirmed
+  getAiProvider = async () => {
+    try {
+      const response = await this.props.httpClient.get('/api/v1/ai_provider');
+      this.setState({
+        externalProviderActive: Boolean(response.selector)
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // AiProviderSettings saves the selection itself: this callback keeps the
+  // upsell/rate-limit messaging of this page in sync without a reload
+  onProviderChange = selector => {
+    this.setState({ externalProviderActive: Boolean(selector) });
+  };
+
   componentDidMount() {
     this.isGladysPlusConnected();
+    this.getAiProvider();
   }
 
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
-      gladysPlusConnected: null
+      gladysPlusConnected: null,
+      externalProviderActive: null
     };
   }
 
-  render(props, { gladysPlusConnected }) {
+  render(props, { gladysPlusConnected, externalProviderActive }) {
+    const isAdmin = props.user && props.user.role === USER_ROLE.ADMIN;
     return (
       <Layout user={props.user}>
         <div class="card">
@@ -44,7 +70,7 @@ class OpenAIGateway extends Component {
             </h1>
           </div>
           <div class="card-body">
-            {gladysPlusConnected === false && (
+            {gladysPlusConnected === false && externalProviderActive === false && (
               <div class="mb-4">
                 <GladysPlusUpsellCard
                   icon="fe-cpu"
@@ -59,7 +85,7 @@ class OpenAIGateway extends Component {
                 />
               </div>
             )}
-            {gladysPlusConnected === true && (
+            {gladysPlusConnected === true && externalProviderActive === false && (
               <p class="text-success mb-4">
                 <i class="fe fe-check mr-1" />
                 <Text id="integration.openai.chatEnabledByDefault" />
@@ -112,14 +138,18 @@ class OpenAIGateway extends Component {
                 <Text id="integration.openai.exampleScene3" />
               </li>
             </ul>
-            {gladysPlusConnected !== true && (
+            {gladysPlusConnected !== true && externalProviderActive === false && (
               <p>
                 <Text id="integration.openai.rateLimit" />
               </p>
             )}
           </div>
         </div>
-        {gladysPlusConnected === true && <AiQuotaDisplay />}
+        {isAdmin && <AiProviderSettings onProviderChange={this.onProviderChange} />}
+        {/* the Plus quota is meaningless once the AI traffic goes through an
+        external provider; the weekly digest and the debug context download
+        stay: both follow the selected provider through gateway.aiChat */}
+        {gladysPlusConnected === true && externalProviderActive === false && <AiQuotaDisplay />}
         {gladysPlusConnected === true && <WeeklyDigestSettings />}
         {gladysPlusConnected === true && <AiChatDebugDownload />}
       </Layout>

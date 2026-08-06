@@ -41,9 +41,10 @@ class ExternalIntegrationDiscoverPage extends Component {
       if (generation !== this.pageGeneration) {
         return;
       }
-      // a communication integration has no device screens: direct URL
-      // access lands on the configuration screen instead
-      if (get(integration, 'manifest.type') === 'communication') {
+      // communication and AI integrations have no device screens: direct
+      // URL access lands on the configuration screen instead
+      const integrationType = get(integration, 'manifest.type');
+      if (integrationType === 'communication' || integrationType === 'ai') {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
         return;
       }

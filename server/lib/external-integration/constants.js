@@ -155,6 +155,9 @@ const MAX_CAMERA_IMAGE_SIZE = 150 * 1024;
 // on-demand fresh image (dashboard live view): an ffmpeg capture can be
 // slow, this is the second exception to the 5s ack rule
 const CAMERA_GET_IMAGE_TIMEOUT_MS = 15 * 1000;
+// AI provider relay (ai.chat): reasoning models are slow and a request can
+// carry a full tool-calling context — third exception to the 5s ack rule
+const AI_CHAT_TIMEOUT_MS = 120 * 1000;
 // Reserved GLADYS_* params namespace in discovered devices: only the
 // semantics defined by the spec are accepted. GLADYS_TRANSPORT is the
 // effective transport of the device (cloud/local badge in the UI) —
@@ -265,6 +268,7 @@ module.exports = {
   MAX_CAMERA_IMAGES_PER_MINUTE,
   MAX_CAMERA_IMAGE_SIZE,
   CAMERA_GET_IMAGE_TIMEOUT_MS,
+  AI_CHAT_TIMEOUT_MS,
   RESERVED_PARAM_PREFIX,
   TRANSPORT_PARAM,
   DEVICE_TRANSPORTS,

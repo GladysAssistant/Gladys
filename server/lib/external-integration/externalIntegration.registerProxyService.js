@@ -77,6 +77,17 @@ function registerProxyService(service) {
         }),
       }
     : {};
+  // AI provider integrations expose the ai.chat capability: gateway.aiChat
+  // routes the OpenAI-compatible requests here when the integration is the
+  // selected AI provider (AI_PROVIDER variable), instead of Gladys Plus.
+  const isAiProvider = service.manifest && service.manifest.type === 'ai';
+  const aiCapability = isAiProvider
+    ? {
+        ai: Object.freeze({
+          chat: async (request) => this.aiChat(service, request),
+        }),
+      }
+    : {};
   const proxyService = Object.freeze({
     start: async () => {
       await this.start(service.selector);
@@ -85,6 +96,7 @@ function registerProxyService(service) {
       await this.stop(service.selector);
     },
     ...messageCapability,
+    ...aiCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {
         await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_SET_VALUE, {

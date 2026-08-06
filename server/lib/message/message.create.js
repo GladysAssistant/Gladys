@@ -1,5 +1,5 @@
 const db = require('../../models');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 const { getPreviousQuestionsForUser } = require('./message.getPreviousQuestionsForUser');
 
 /**
@@ -31,6 +31,11 @@ async function create(message) {
     user: message.user,
   };
   const gladysPlusConfigured = await isGladysPlusConfigured.call(this);
+  // an external AI provider integration (AI_PROVIDER variable) serves the
+  // assistant without any Gladys Plus account: the AI path is engaged when
+  // either is present (gateway.aiChat then routes to the right backend)
+  const aiProviderSelector = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.AI_PROVIDER);
+  const aiConfigured = gladysPlusConfigured || aiProviderSelector !== null;
 
   const messageToInsert = {
     text: message.text,
@@ -40,14 +45,14 @@ async function create(message) {
     id: message.id,
   };
 
-  if (gladysPlusConfigured) {
+  if (aiConfigured) {
     const previousQuestions = await getPreviousQuestionsForUser(message.user.id);
     this.event.emit(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, { message, previousQuestions, context });
   }
 
   await db.Message.create(messageToInsert);
 
-  if (!gladysPlusConfigured) {
+  if (!aiConfigured) {
     await this.replyByIntent(message, 'openai.plus-required', context);
   }
 
