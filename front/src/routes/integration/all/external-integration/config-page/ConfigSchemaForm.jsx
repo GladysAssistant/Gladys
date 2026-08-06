@@ -226,9 +226,11 @@ class ConfigField extends Component {
               </span>
             </label>
           )}
-          {connectionStatus && connectionStatus.message && (
-            <small class="form-text text-muted">{getLocalizedText(connectionStatus.message, language)}</small>
-          )}
+          {/* the message that goes with the badge is integration-level, not
+              field-level: it is rendered once for the whole screen (see
+              ConfigTab), because an integration may well link more than one
+              account and a message glued here would look like it described THIS
+              one */}
           {description && <small class="form-text text-muted">{description}</small>}
         </div>
       );
