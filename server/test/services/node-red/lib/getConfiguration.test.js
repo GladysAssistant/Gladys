@@ -28,10 +28,11 @@ describe('NodeRed getConfiguration', () => {
   it('should load stored configuration', async () => {
     const result = await nodeRedManager.getConfiguration();
 
-    assert.callCount(gladys.variable.getValue, 4);
+    assert.callCount(gladys.variable.getValue, 5);
     assert.calledWithExactly(gladys.variable.getValue, 'NODE_RED_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'NODE_RED_PASSWORD', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'DOCKER_NODE_RED_VERSION', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'NODE_RED_CONTAINER_NAME', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'TIMEZONE');
 
     expect(result).to.deep.equal({
@@ -39,6 +40,7 @@ describe('NodeRed getConfiguration', () => {
       availableMajorVersions: ['3', '4', '5'],
       nodeRedPassword: 'fake',
       nodeRedUsername: 'fake',
+      nodeRedContainerName: 'fake',
       timezone: 'fake',
     });
   });

@@ -2,7 +2,7 @@ const { promisify } = require('util');
 const { CONFIGURATION, DEFAULT } = require('./constants');
 const { SERVICE_STATUS } = require('../../../utils/constants');
 const { NotFoundError } = require('../../../utils/coreErrors');
-const containerParams = require('../docker/eclipse-mosquitto-container.json');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 
 const sleep = promisify(setTimeout);
 
@@ -34,13 +34,11 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
   await updateOrDestroyVariable(variable, CONFIGURATION.MQTT_PASSWORD_KEY, mqttPassword, this.serviceId);
 
   if (useEmbeddedBroker) {
-    const dockerContainers = await this.gladys.system.getContainers({
-      all: true,
-      filters: { name: [containerParams.name] },
-    });
+    const brokerContainerName = await this.getBrokerContainerName();
+    const dockerContainers = await getContainersByExactName(this.gladys.system, brokerContainerName);
 
     if (dockerContainers.length === 0) {
-      throw new NotFoundError(`${containerParams.name} container not found`);
+      throw new NotFoundError(`${brokerContainerName} container not found`);
     }
 
     const [container] = dockerContainers;

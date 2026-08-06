@@ -15,11 +15,13 @@ const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
 const container = {
   id: 'docker-test',
   state: 'running',
+  name: '/gladys-z2m-mqtt',
 };
 
 const containerStopped = {
   id: 'docker-test',
   state: 'stopped',
+  name: '/gladys-z2m-mqtt',
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -71,7 +73,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
   it('should restart MQTT container', async function Test() {
     // PREPARE
     this.timeout(6000);
-    const config = {};
+    const config = { mqttContainerName: 'gladys-z2m-mqtt' };
     // EXECUTE
     await zigbee2mqttManager.installMqttContainer(config);
     // ASSERT
@@ -99,7 +101,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
 
   it('should do nothing', async () => {
     // PREPARE
-    const config = {};
+    const config = { mqttContainerName: 'gladys-z2m-mqtt' };
     gladys.system.getContainers = fake.resolves([container]);
     // EXECUTE
     await zigbee2mqttManager.installMqttContainer(config);
@@ -128,7 +130,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
 
   it('should fail to start MQTT container', async () => {
     // PREPARE
-    const config = {};
+    const config = { mqttContainerName: 'gladys-z2m-mqtt' };
     gladys.system.getContainers = fake.resolves([containerStopped]);
     gladys.system.restartContainer = fake.throws(new Error('docker fail'));
     // EXECUTE
@@ -163,7 +165,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
 
   it('should fail to install MQTT container', async () => {
     // PREPARE
-    const config = {};
+    const config = { mqttContainerName: 'gladys-z2m-mqtt' };
     gladys.system.getContainers = fake.resolves([]);
     gladys.system.pull = fake.throws(new Error('docker fail pull'));
     // EXECUTE
@@ -197,7 +199,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
 
   it('should install MQTT container', async function Test() {
     // PREPARE
-    const config = {};
+    const config = { mqttContainerName: 'gladys-z2m-mqtt' };
     this.timeout(11000);
     const getContainersStub = sinon.stub();
     getContainersStub
@@ -266,7 +268,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
   it('should fail to configure MQTT container', async function Test() {
     // PREPARE
     this.timeout(11000);
-    const config = {};
+    const config = { mqttContainerName: 'gladys-z2m-mqtt' };
     const getContainersStub = sinon.stub();
     getContainersStub
       .onFirstCall()
