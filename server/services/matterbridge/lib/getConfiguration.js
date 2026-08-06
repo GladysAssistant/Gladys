@@ -14,9 +14,15 @@ async function getConfiguration() {
     CONFIGURATION.DOCKER_MATTERBRIDGE_VERSION,
     this.serviceId,
   );
+  // Load persisted container name (resolved once at init)
+  const matterbridgeContainerName = await this.gladys.variable.getValue(
+    CONFIGURATION.MATTERBRIDGE_CONTAINER_NAME,
+    this.serviceId,
+  );
 
   return {
     dockerMatterbridgeVersion,
+    matterbridgeContainerName,
   };
 }
 

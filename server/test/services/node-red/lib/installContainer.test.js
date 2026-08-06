@@ -9,15 +9,18 @@ const NodeRedManager = require('../../../../services/node-red/lib');
 const container = {
   id: 'docker-test',
   state: 'running',
+  name: '/gladys-node-red',
 };
 
 const config = {
   dockerNodeRedVersion: '3',
+  nodeRedContainerName: 'gladys-node-red',
 };
 
 const containerStopped = {
   id: 'docker-test',
   state: 'stopped',
+  name: '/gladys-node-red',
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -117,7 +120,7 @@ describe('NodeRed installContainer', () => {
     this.timeout(6000);
 
     try {
-      await nodeRedManager.installContainer();
+      await nodeRedManager.installContainer(config);
       assert.fail();
     } catch (e) {
       expect(e.message).to.equal('Error');
@@ -148,7 +151,7 @@ describe('NodeRed installContainer', () => {
     gladys.system.restartContainer = fake.rejects('Error');
 
     try {
-      await nodeRedManager.installContainer();
+      await nodeRedManager.installContainer(config);
       assert.fail();
     } catch (e) {
       expect(e.message).to.equal('Error');

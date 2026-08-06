@@ -47,11 +47,13 @@ describe('zigbee2mqtt saveConfiguration', () => {
       mqttPassword: 'mqttPassword',
       dockerMqttVersion: 'dockerMqttVersion',
       dockerZ2mVersion: 'dockerZ2mVersion',
+      mqttContainerName: 'gladys-z2m-mqtt',
+      z2mContainerName: 'gladys-z2m-zigbee2mqtt',
     };
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 9);
+    assert.callCount(gladys.variable.setValue, 11);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_FRONTEND_URL', config.z2mFrontendUrl, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', config.z2mTcpPort, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_USERNAME', config.z2mMqttUsername, serviceId);
@@ -61,6 +63,8 @@ describe('zigbee2mqtt saveConfiguration', () => {
     assert.calledWithExactly(gladys.variable.setValue, 'GLADYS_MQTT_PASSWORD', config.mqttPassword, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'DOCKER_MQTT_VERSION', config.dockerMqttVersion, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'DOCKER_Z2M_VERSION', config.dockerZ2mVersion, serviceId);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_CONTAINER_NAME', config.mqttContainerName, serviceId);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_CONTAINER_NAME', config.z2mContainerName, serviceId);
   });
 
   it('should destroy all variables', async () => {
@@ -69,7 +73,7 @@ describe('zigbee2mqtt saveConfiguration', () => {
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.destroy, 10);
+    assert.callCount(gladys.variable.destroy, 12);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_FRONTEND_URL', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_TCP_PORT', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_USERNAME', serviceId);
@@ -80,5 +84,7 @@ describe('zigbee2mqtt saveConfiguration', () => {
     assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_MQTT_VERSION', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_Z2M_VERSION', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_MODE', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_CONTAINER_NAME', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_CONTAINER_NAME', serviceId);
   });
 });

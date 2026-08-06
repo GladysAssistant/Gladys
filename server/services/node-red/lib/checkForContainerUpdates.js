@@ -1,6 +1,6 @@
 const logger = require('../../../utils/logger');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 
-const nodeRedContainerDescriptor = require('../docker/gladys-node-red-container.json');
 const { containerMatchesMajorVersion, resolveNodeRedMajorVersion } = require('./nodeRedVersion');
 
 /**
@@ -14,10 +14,7 @@ async function checkForContainerUpdates(config = {}) {
 
   const selectedMajorVersion = resolveNodeRedMajorVersion(config);
 
-  const containers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [nodeRedContainerDescriptor.name] },
-  });
+  const containers = await getContainersByExactName(this.gladys.system, config.nodeRedContainerName);
 
   if (containers.length === 0) {
     return;

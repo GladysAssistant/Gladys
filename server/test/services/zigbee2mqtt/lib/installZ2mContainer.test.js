@@ -16,11 +16,13 @@ const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
 const container = {
   id: 'docker-test',
   state: 'running',
+  name: '/gladys-z2m-zigbee2mqtt',
 };
 
 const containerStopped = {
   id: 'docker-test',
   state: 'stopped',
+  name: '/gladys-z2m-zigbee2mqtt',
 };
 
 const containerDescription = {
@@ -94,7 +96,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('should restart z2m container (container stopped)', async () => {
     // PREPARE
-    const config = {};
+    const config = { z2mContainerName: 'gladys-z2m-zigbee2mqtt' };
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
@@ -123,7 +125,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('should restart z2m container (container running but config changed)', async () => {
     // PREPARE
-    const config = {};
+    const config = { z2mContainerName: 'gladys-z2m-zigbee2mqtt' };
     gladys.system.getContainers = fake.resolves([container]);
     zigbee2mqttManager.configureContainer = fake.resolves({ configChanged: true, adapterChanged: false });
     // EXECUTE
@@ -154,8 +156,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('should remove and recreate z2m container when adapter type changes', async () => {
     // PREPARE
-    const config = { z2mDriverPath: '/dev/ttyUSB0' };
-    const newContainer = { id: 'docker-test-new', state: 'stopped' };
+    const config = { z2mDriverPath: '/dev/ttyUSB0', z2mContainerName: 'gladys-z2m-zigbee2mqtt' };
+    const newContainer = { id: 'docker-test-new', state: 'stopped', name: '/gladys-z2m-zigbee2mqtt' };
     const getContainersStub = stub();
     getContainersStub
       .onFirstCall()
@@ -179,7 +181,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('should do nothing', async () => {
     // PREPARE
-    const config = {};
+    const config = { z2mContainerName: 'gladys-z2m-zigbee2mqtt' };
     gladys.system.getContainers = fake.resolves([container]);
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
@@ -209,7 +211,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('it should fail to start z2m container', async () => {
     // PREPARE
-    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    const config = { z2mDriverPath: '/dev/ttyUSB0', z2mContainerName: 'gladys-z2m-zigbee2mqtt' };
     gladys.system.getContainers = fake.resolves([containerStopped]);
     gladys.system.restartContainer = fake.throws(new Error('docker fail'));
     // EXECUTE
@@ -245,7 +247,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('it should fail to install z2m container', async () => {
     // PREPARE
-    const config = {};
+    const config = { z2mContainerName: 'gladys-z2m-zigbee2mqtt' };
     gladys.system.getContainers = fake.resolves([]);
     gladys.system.pull = fake.throws(new Error('docker fail pull'));
     // EXECUTE
@@ -280,7 +282,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('it should install z2m container and error reading configuration', async () => {
     // PREPARE
-    const config = {};
+    const config = { z2mContainerName: 'gladys-z2m-zigbee2mqtt' };
     const getContainersStub = stub();
     getContainersStub
       .onFirstCall()
@@ -332,12 +334,12 @@ describe('zigbee2mqtt installz2mContainer', () => {
     assert.calledOnce(gladys.system.createContainer);
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
-    expect(config).to.deep.equal({});
+    expect(config).to.deep.equal({ z2mContainerName: 'gladys-z2m-zigbee2mqtt' });
   });
 
   it('should detect EZSP protocol version error in container logs', async () => {
     // PREPARE
-    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    const config = { z2mDriverPath: '/dev/ttyUSB0', z2mContainerName: 'gladys-z2m-zigbee2mqtt' };
     gladys.system.getContainers = fake.resolves([containerStopped]);
     gladys.system.getContainerLogs = sinon.stub().callsFake(() => {
       const stream = new EventEmitter();
@@ -360,7 +362,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('should not set error when container logs are clean', async () => {
     // PREPARE
-    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    const config = { z2mDriverPath: '/dev/ttyUSB0', z2mContainerName: 'gladys-z2m-zigbee2mqtt' };
     gladys.system.getContainers = fake.resolves([containerStopped]);
     gladys.system.getContainerLogs = sinon.stub().callsFake(() => {
       const stream = new EventEmitter();
@@ -379,7 +381,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('should not fail startup when getContainerLogs throws', async () => {
     // PREPARE
-    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    const config = { z2mDriverPath: '/dev/ttyUSB0', z2mContainerName: 'gladys-z2m-zigbee2mqtt' };
     gladys.system.getContainers = fake.resolves([containerStopped]);
     gladys.system.getContainerLogs = fake.throws(new Error('docker logs error'));
     // EXECUTE

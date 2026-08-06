@@ -1,7 +1,5 @@
 const logger = require('../../../utils/logger');
-
-const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
-const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 
 /**
  * @description Disconnect service from dependent containers.
@@ -28,28 +26,30 @@ async function disconnect() {
   this.gladysConnected = false;
   this.emitStatusEvent();
 
+  // Only tear down the containers we own (names resolved and persisted at init).
+  // If a name was never persisted, we never created that container: nothing to do.
+  const { mqttContainerName, z2mContainerName } = await this.getConfiguration();
+
   // Stop & remove MQTT container
-  let dockerContainer = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [mqttContainerDescriptor.name] },
-  });
-  if (dockerContainer.length > 0) {
-    [container] = dockerContainer;
-    await this.gladys.system.stopContainer(container.id);
-    await this.gladys.system.removeContainer(container.id);
+  if (mqttContainerName) {
+    const dockerContainer = await getContainersByExactName(this.gladys.system, mqttContainerName);
+    if (dockerContainer.length > 0) {
+      [container] = dockerContainer;
+      await this.gladys.system.stopContainer(container.id);
+      await this.gladys.system.removeContainer(container.id);
+    }
   }
   this.mqttRunning = false;
   this.emitStatusEvent();
 
   // Stop & remove zigbee2mqtt container
-  dockerContainer = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [zigbee2mqttContainerDescriptor.name] },
-  });
-  if (dockerContainer.length > 0) {
-    [container] = dockerContainer;
-    await this.gladys.system.stopContainer(container.id);
-    await this.gladys.system.removeContainer(container.id);
+  if (z2mContainerName) {
+    const dockerContainer = await getContainersByExactName(this.gladys.system, z2mContainerName);
+    if (dockerContainer.length > 0) {
+      [container] = dockerContainer;
+      await this.gladys.system.stopContainer(container.id);
+      await this.gladys.system.removeContainer(container.id);
+    }
   }
   this.zigbee2mqttRunning = false;
   this.zigbee2mqttConnected = false;
