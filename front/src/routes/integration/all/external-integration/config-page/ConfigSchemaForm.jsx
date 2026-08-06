@@ -203,15 +203,6 @@ class ConfigField extends Component {
               <i class="fe fe-link mr-1" />
               <Text id="integration.externalIntegration.config.oauthConnectButton" />
             </button>
-            {connectionStatus && (
-              <span class={cx('badge ml-2', connectionStatus.connected ? 'badge-success' : 'badge-danger')}>
-                {connectionStatus.connected ? (
-                  <Text id="integration.externalIntegration.connection.connectedBadge" />
-                ) : (
-                  <Text id="integration.externalIntegration.connection.disconnectedBadge" />
-                )}
-              </span>
-            )}
           </div>
           {canUseInstanceRedirect && (
             <label class="custom-control custom-checkbox mt-3">

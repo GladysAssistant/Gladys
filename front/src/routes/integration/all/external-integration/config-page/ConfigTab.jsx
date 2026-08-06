@@ -37,7 +37,8 @@ const ConfigTab = props => {
   // vendor developer account, get credentials...)
   const docs = get(integration, 'docs') || {};
   const docsUrl = docs[language] || docs.en;
-  const connectionMessage = getLocalizedText(get(integration, 'connection_status.message'), language);
+  const connectionStatus = get(integration, 'connection_status');
+  const connectionMessage = getLocalizedText(get(connectionStatus, 'message'), language);
 
   return (
     <div>
@@ -52,6 +53,21 @@ const ConfigTab = props => {
           <div class="card-header">
             <h1 class="card-title">
               <Text id="integration.externalIntegration.config.title" />
+              {/* Whether the integration is connected belongs here, on the screen
+                  where it is configured, for EVERY integration. It used to be
+                  rendered only inside an oauth2 field, so an integration that
+                  links its account through plain settings — an email and a code,
+                  an API key — showed no state at all: the user saved and had no
+                  idea whether it had worked. */}
+              {connectionStatus && (
+                <span class={cx('badge ml-2', connectionStatus.connected ? 'badge-success' : 'badge-danger')}>
+                  {connectionStatus.connected ? (
+                    <Text id="integration.externalIntegration.connection.connectedBadge" />
+                  ) : (
+                    <Text id="integration.externalIntegration.connection.disconnectedBadge" />
+                  )}
+                </span>
+              )}
             </h1>
             {docsUrl && (
               <div class="card-options">
@@ -80,8 +96,8 @@ const ConfigTab = props => {
             {connectionMessage && (
               <div
                 class={cx('alert', {
-                  'alert-info': get(integration, 'connection_status.connected'),
-                  'alert-warning': !get(integration, 'connection_status.connected')
+                  'alert-info': get(connectionStatus, 'connected'),
+                  'alert-warning': !get(connectionStatus, 'connected')
                 })}
               >
                 {connectionMessage}
@@ -134,7 +150,7 @@ const ConfigTab = props => {
                     saveConfigStatus={props.saveConfigStatus}
                     updateConfigValue={props.updateConfigValue}
                     saveConfig={props.saveConfig}
-                    connectionStatus={get(integration, 'connection_status')}
+                    connectionStatus={connectionStatus}
                     oauthStatus={props.oauthStatus}
                     oauthInvalidState={props.oauthInvalidState}
                     oauthInvalidUrl={props.oauthInvalidUrl}
