@@ -452,14 +452,13 @@ describe('Build service', () => {
   });
 
   it('should build light sensor service', async () => {
-    homekitHandler.gladys.stateManager.get = stub().returns({
-      id: '2d5b1e13-9ee7-4a02-9b28-2df9f1e63bd6',
-      name: 'Luminosité',
-      category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
-      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-      unit: DEVICE_FEATURE_UNITS.LUX,
-      last_value: 150000,
-    });
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get
+      .withArgs('deviceFeature', 'capteur-luminosite')
+      .returns({ last_value: 150000 });
+    homekitHandler.gladys.stateManager.get
+      .withArgs('deviceFeature', 'capteur-luminosite-entier')
+      .returns({ last_value: 300 });
     const on = stub();
     const getCharacteristic = stub().returns({
       on,
@@ -484,6 +483,7 @@ describe('Build service', () => {
     const device = {
       name: 'Capteur luminosité',
     };
+    // integrations report the illuminance either as a decimal or as an integer
     const features = [
       {
         id: '2d5b1e13-9ee7-4a02-9b28-2df9f1e63bd6',
@@ -495,18 +495,31 @@ describe('Build service', () => {
         min: 0,
         max: 100000,
       },
+      {
+        id: 'f0a2c6f7-4a6d-4d3c-9f6a-0f0d5ac2b6a1',
+        name: 'Luminosité entière',
+        selector: 'capteur-luminosite-entier',
+        category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.LUX,
+        min: 0,
+        max: 100000,
+      },
     ];
 
     const cb = stub();
 
     await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]);
     await on.args[0][1](cb);
+    await on.args[1][1](cb);
 
     expect(LightSensor.args[0][0]).to.equal('Capteur luminosité');
-    expect(on.callCount).to.equal(1);
+    expect(on.callCount).to.equal(2);
     expect(getCharacteristic.args[0][0]).to.equal('CURRENTAMBIENTLIGHTLEVEL');
+    expect(getCharacteristic.args[1][0]).to.equal('CURRENTAMBIENTLIGHTLEVEL');
     // the raw value is in lux, it's only clamped to the HomeKit bounds, never rescaled
     expect(cb.args[0][1]).to.equal(100000);
+    expect(cb.args[1][1]).to.equal(300);
   });
 
   it('should build carbon dioxide sensor service', async () => {
@@ -696,6 +709,127 @@ describe('Build service', () => {
     expect(on.callCount).to.equal(1);
     expect(getCharacteristic.args[0][0]).to.equal('CARBONMONOXIDEDETECTED');
     expect(cb.args[0][1]).to.equal(1);
+  });
+
+  it('should build carbon dioxide sensor service from a binary feature', async () => {
+    homekitHandler.gladys.stateManager.get = stub().returns({
+      id: '8b2b0d47-3a4e-4d0f-9c5b-2f6a1d3e7c90',
+      name: 'CO2',
+      category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      last_value: 1,
+    });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: {
+        perms: ['PAIRED_READ'],
+      },
+    });
+    const CarbonDioxideSensor = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        CarbonDioxideDetected: 'CARBONDIOXIDEDETECTED',
+      },
+      CharacteristicEventTypes: stub(),
+      Perms: {
+        PAIRED_READ: 'PAIRED_READ',
+        PAIRED_WRITE: 'PAIRED_WRITE',
+      },
+      Service: {
+        CarbonDioxideSensor,
+      },
+    };
+    const device = {
+      name: 'Détecteur CO2',
+    };
+    const features = [
+      {
+        id: '8b2b0d47-3a4e-4d0f-9c5b-2f6a1d3e7c90',
+        name: 'CO2',
+        selector: 'detecteur-co2',
+        category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]);
+    await on.args[0][1](cb);
+
+    expect(CarbonDioxideSensor.args[0][0]).to.equal('Détecteur CO2');
+    expect(on.callCount).to.equal(1);
+    expect(getCharacteristic.args[0][0]).to.equal('CARBONDIOXIDEDETECTED');
+    expect(cb.args[0][1]).to.equal(1);
+  });
+
+  it('should report a gas as detected at the exact threshold', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'co-seuil').returns({ last_value: 25 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'co2-seuil').returns({ last_value: 1000 });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: {
+        minValue: 0,
+        maxValue: 100000,
+      },
+    });
+    const CarbonMonoxideSensor = stub().returns({ getCharacteristic });
+    const CarbonDioxideSensor = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        CarbonMonoxideLevel: 'CARBONMONOXIDELEVEL',
+        CarbonMonoxideDetected: 'CARBONMONOXIDEDETECTED',
+        CarbonDioxideLevel: 'CARBONDIOXIDELEVEL',
+        CarbonDioxideDetected: 'CARBONDIOXIDEDETECTED',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        CarbonMonoxideSensor,
+        CarbonDioxideSensor,
+      },
+    };
+
+    const cb = stub();
+
+    await homekitHandler.buildService(
+      { name: 'Détecteur CO' },
+      [
+        {
+          name: 'CO',
+          selector: 'co-seuil',
+          category: DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+          unit: DEVICE_FEATURE_UNITS.PPM,
+        },
+      ],
+      mappings[DEVICE_FEATURE_CATEGORIES.CO_SENSOR],
+    );
+    await homekitHandler.buildService(
+      { name: 'Détecteur CO2' },
+      [
+        {
+          name: 'CO2',
+          selector: 'co2-seuil',
+          category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+          unit: DEVICE_FEATURE_UNITS.PPM,
+        },
+      ],
+      mappings[DEVICE_FEATURE_CATEGORIES.CO2_SENSOR],
+    );
+    await on.args[1][1](cb);
+    await on.args[3][1](cb);
+
+    // the comparison is inclusive: sitting exactly on the alarm level is alarming, not safe
+    expect(cb.args[0][1]).to.equal(1);
+    expect(cb.args[1][1]).to.equal(1);
   });
 
   it('should build air quality sensor service', async () => {

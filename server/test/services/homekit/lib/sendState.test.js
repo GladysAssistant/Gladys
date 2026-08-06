@@ -409,8 +409,15 @@ describe('Send state to HomeKit', () => {
     };
 
     await homekitHandler.sendState(accessory, feature, event);
+    // integrations report the illuminance either as a decimal or as an integer
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER },
+      { ...event, last_value: 300 },
+    );
 
     expect(updateCharacteristic.args[0]).eql(['CURRENTAMBIENTLIGHTLEVEL', 250]);
+    expect(updateCharacteristic.args[1]).eql(['CURRENTAMBIENTLIGHTLEVEL', 300]);
   });
 
   it('should notify carbon monoxide sensor', async () => {
@@ -434,8 +441,11 @@ describe('Send state to HomeKit', () => {
     };
 
     await homekitHandler.sendState(accessory, feature, event);
+    // Z-Wave binary sensors are remapped to the CO2 category while staying binary
+    await homekitHandler.sendState(accessory, { ...feature, category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR }, event);
 
     expect(updateCharacteristic.args[0]).eql(['CARBONMONOXIDEDETECTED', 1]);
+    expect(updateCharacteristic.args[1]).eql(['CARBONDIOXIDEDETECTED', 1]);
   });
 
   it('should notify carbon dioxide sensor level and alarm', async () => {
@@ -502,6 +512,13 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[4]).eql(['CARBONMONOXIDELEVEL', 40]);
     expect(updateCharacteristic.args[5]).eql(['CARBONMONOXIDEDETECTED', 1]);
     expect(updateCharacteristic.args[7]).eql(['CARBONMONOXIDEDETECTED', 0]);
+
+    // sitting exactly on the alarm level is alarming, not safe
+    await homekitHandler.sendState(accessory, coFeature, { ...event, last_value: 25 });
+    await homekitHandler.sendState(accessory, feature, { ...event, last_value: 1000 });
+
+    expect(updateCharacteristic.args[9]).eql(['CARBONMONOXIDEDETECTED', 1]);
+    expect(updateCharacteristic.args[11]).eql(['CARBONDIOXIDEDETECTED', 1]);
   });
 
   it('should notify air quality sensor', async () => {

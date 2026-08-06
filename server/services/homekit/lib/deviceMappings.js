@@ -72,6 +72,9 @@ const mappings = {
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: {
     service: 'CarbonDioxideSensor',
     capabilities: {
+      [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
+        characteristics: ['CarbonDioxideDetected'],
+      },
       [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: {
         characteristics: ['CarbonDioxideLevel', 'CarbonDioxideDetected'],
       },
@@ -152,7 +155,10 @@ const HOMEKIT_AIR_QUALITY = {
   POOR: 5,
 };
 
-// US EPA air quality index bands, each one mapped to the closest HomeKit air quality level.
+// US EPA air quality index bands, each one mapped to the closest HomeKit air quality level. Gladys
+// stores a unitless index without declaring which standard it follows, so a standard has to be
+// assumed: the EPA one is what the other HomeKit bridges use. European indices (CAQI, EAQI) would
+// bucket differently, and this table is where to adjust if Gladys ever tells them apart.
 const airQualityIndexMapping = [
   { maxIndex: 50, airQuality: HOMEKIT_AIR_QUALITY.EXCELLENT },
   { maxIndex: 100, airQuality: HOMEKIT_AIR_QUALITY.GOOD },
@@ -160,7 +166,8 @@ const airQualityIndexMapping = [
   { maxIndex: 200, airQuality: HOMEKIT_AIR_QUALITY.INFERIOR },
 ];
 
-// Concentration, in ppm, above which HomeKit is told the gas is detected.
+// Concentration, in ppm, at or above which HomeKit is told the gas is detected. The comparison is
+// inclusive: a sensor sitting exactly on the alarm level is alarming, not safe.
 const gasDetectedThresholds = {
   [DEVICE_FEATURE_CATEGORIES.CO_SENSOR]: 25,
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: 1000,
