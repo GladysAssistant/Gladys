@@ -3,6 +3,7 @@ import cx from 'classnames';
 import get from 'get-value';
 import { RequestStatus } from '../../utils/consts';
 import Map from './Map';
+import AddressSearch from './AddressSearch';
 import EditRoom from './EditRoom';
 
 const EditHouse = ({ children, ...props }) => (
@@ -56,6 +57,7 @@ const EditHouse = ({ children, ...props }) => (
         <label class="form-label">
           <Text id="signup.configureHouse.houseLocationLabel" />
         </label>
+        <AddressSearch onSelectLocation={props.selectHouseLocation} />
         <Map house={props.house} houseIndex={props.houseIndex} updateHouseLocation={props.updateHouseLocation} />
       </div>
       <div class="form-group">
