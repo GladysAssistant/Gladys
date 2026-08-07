@@ -4,6 +4,23 @@ import { RequestStatus } from '../../../utils/consts';
 import SceneRow from './SceneRow';
 import cx from 'classnames';
 
+const sortScenesByBoxOrder = (scenes, boxScenes) => {
+  if (!boxScenes || boxScenes.length === 0) {
+    return scenes;
+  }
+
+  const orderMap = boxScenes.reduce((acc, selector, index) => {
+    acc[selector] = index;
+    return acc;
+  }, {});
+
+  return [...scenes].sort((sceneA, sceneB) => {
+    const orderA = orderMap[sceneA.selector] !== undefined ? orderMap[sceneA.selector] : Number.MAX_SAFE_INTEGER;
+    const orderB = orderMap[sceneB.selector] !== undefined ? orderMap[sceneB.selector] : Number.MAX_SAFE_INTEGER;
+    return orderA - orderB;
+  });
+};
+
 class SceneBoxComponent extends Component {
   refreshData = () => {
     this.getScene();
@@ -16,7 +33,7 @@ class SceneBoxComponent extends Component {
         selectors: this.props.box.scenes.join(',')
       });
       this.setState({
-        scenes,
+        scenes: sortScenesByBoxOrder(scenes, this.props.box.scenes),
         status: RequestStatus.Success
       });
     } catch (e) {

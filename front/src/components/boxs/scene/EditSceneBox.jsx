@@ -4,22 +4,58 @@ import BaseEditBox from '../baseEditBox';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
+import update from 'immutability-helper';
 import { RequestStatus } from '../../../utils/consts';
+import { SceneListWithDragAndDrop } from '../../drag-and-drop/SceneListWithDragAndDrop';
 
 class EditSceneBox extends Component {
-  updateScenes = selectedSceneOptions => {
-    selectedSceneOptions = selectedSceneOptions || [];
-    const selectedScenes = selectedSceneOptions.map(option => option.value);
-    this.props.updateBoxConfig(this.props.x, this.props.y, {
-      scenes: selectedScenes
-    });
-    this.setState({ selectedSceneOptions });
-  };
-
   updateName = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       name: e.target.value
     });
+  };
+
+  refreshScenesConfig = selectedSceneOptions => {
+    const selectedScenes = selectedSceneOptions.map(option => option.value);
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      scenes: selectedScenes
+    });
+  };
+
+  addScene = async selectedSceneOption => {
+    if (!selectedSceneOption) {
+      return;
+    }
+    const newSelectedSceneOptions = [...this.state.selectedSceneOptions, selectedSceneOption];
+    await this.setState({ selectedSceneOptions: newSelectedSceneOptions });
+    this.refreshScenesConfig(newSelectedSceneOptions);
+  };
+
+  moveScene = async (currentIndex, newIndex) => {
+    const element = this.state.selectedSceneOptions[currentIndex];
+
+    const newStateWithoutElement = update(this.state, {
+      selectedSceneOptions: {
+        $splice: [[currentIndex, 1]]
+      }
+    });
+    const newState = update(newStateWithoutElement, {
+      selectedSceneOptions: {
+        $splice: [[newIndex, 0, element]]
+      }
+    });
+    await this.setState(newState);
+    this.refreshScenesConfig(newState.selectedSceneOptions);
+  };
+
+  removeScene = async index => {
+    const newStateWithoutElement = update(this.state, {
+      selectedSceneOptions: {
+        $splice: [[index, 1]]
+      }
+    });
+    await this.setState(newStateWithoutElement);
+    this.refreshScenesConfig(newStateWithoutElement.selectedSceneOptions);
   };
 
   getScenes = async () => {
@@ -53,14 +89,20 @@ class EditSceneBox extends Component {
 
   refreshSelectedOptions = async props => {
     const selectedSceneOptions = [];
-    if (this.state.sceneOptions) {
-      this.state.sceneOptions.forEach(sceneOption => {
-        if (props.box.scenes && props.box.scenes.indexOf(sceneOption.value) !== -1) {
+    if (this.state.sceneOptions && props.box.scenes) {
+      props.box.scenes.forEach(sceneSelector => {
+        const sceneOption = this.state.sceneOptions.find(option => option.value === sceneSelector);
+        if (sceneOption) {
           selectedSceneOptions.push(sceneOption);
         }
       });
     }
     await this.setState({ selectedSceneOptions });
+  };
+
+  getAvailableSceneOptions = () => {
+    const selectedSceneValues = (this.state.selectedSceneOptions || []).map(option => option.value);
+    return (this.state.sceneOptions || []).filter(option => !selectedSceneValues.includes(option.value));
   };
 
   componentDidMount = () => {
@@ -74,8 +116,11 @@ class EditSceneBox extends Component {
       }
     }
   }
-  render(props, { status, selectedSceneOptions, sceneOptions }) {
+
+  render(props, { status, selectedSceneOptions }) {
     const loading = status === RequestStatus.Getting && !status;
+    const availableSceneOptions = this.getAvailableSceneOptions();
+
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.scene">
         <div class={loading ? 'dimmer active' : 'dimmer'}>
@@ -95,17 +140,28 @@ class EditSceneBox extends Component {
                 />
               </Localizer>
             </div>
-            {sceneOptions && (
+            <div class="form-group">
+              <label>
+                <Text id="dashboard.boxes.scene.editSceneLabel" />
+              </label>
+              {selectedSceneOptions && (
+                <SceneListWithDragAndDrop
+                  selectedSceneOptions={selectedSceneOptions}
+                  moveScene={this.moveScene}
+                  removeScene={this.removeScene}
+                  isTouchDevice={false}
+                />
+              )}
+            </div>
+            {availableSceneOptions.length > 0 && (
               <div class="form-group">
                 <label>
-                  <Text id="dashboard.boxes.scene.editSceneLabel" />
+                  <Text id="dashboard.boxes.scene.addSceneLabel" />
                 </label>
                 <Select
-                  defaultValue={[]}
-                  value={selectedSceneOptions}
-                  options={sceneOptions}
-                  isMulti
-                  onChange={this.updateScenes}
+                  onChange={this.addScene}
+                  value={[]}
+                  options={availableSceneOptions}
                   maxMenuHeight={220}
                   className="react-select-container"
                   classNamePrefix="react-select"
