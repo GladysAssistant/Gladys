@@ -315,10 +315,13 @@ Three namespaces, three files (`en.json`, `fr.json`, `de.json`), all key-paralle
 |---|---|---|
 | `deviceFeatureCategory.water-heater.shortCategoryName` | `check_translations.js` (hard CI failure) | "Water heater" / "Chauffe-eau" / "Warmwasserbereiter" |
 | `deviceFeatureCategory.water-heater.<type>` | `check_translations.js`, one per type | Feature label shown in device lists, charts and the box editor |
-| `deviceFeatureAction.category.water-heater.mode.<i18nKey>` | `WaterHeaterModeDeviceFeature`, `SelectWaterHeaterMode` | Mode button labels: `off`, `auto`, `eco`, `boost`, `manual`, `absence`, `program` |
+| `deviceFeatureAction.category.water-heater.mode.<i18nKey>` | `WaterHeaterModeDeviceFeature`, `SelectWaterHeaterMode` | Mode button labels: `off`, `auto`, `eco`, `boost`, `manual`, `away`, `program` |
 | `deviceFeatureValue.category.water-heater.mode.<0..6>` | history, sensor rendering | Same labels, addressed by integer |
 | `deviceFeatureAction.category.water-heater.binary.{state,stateLiveFinished}.{0,1}` | `BinaryDeviceFeature` | Turning these on switches the toggle to a labelled two-button group ("Stop" / "Start" instead of an unlabelled switch) — worth doing for an appliance whose on/off is not self-evident |
 | `deviceFeatureAction.category.water-heater.boost.{state,stateLiveFinished}.{0,1}` | `BinaryDeviceFeature` | "Cancel boost" / "Start boost" |
+| `deviceFeatureValue.category.water-heater.{boost,heating}.{0,1}` | `BinaryDeviceValue`, `BinaryDeviceState` | Read-only labels: "Boost off" / "Boost on", "Idle" / "Heating". Without them the dashboard badge and the scene trigger fall back to the generic "Inactive" / "Active" |
+
+**Do not add a `deviceFeatureValue.category.water-heater.binary` key.** `BinaryDeviceValue` and `BinaryDeviceState` both build their label from a hardcoded `deviceFeatureValue.category.<category>.binary` lookup with `plural={value}`, *whatever the feature's type is*, and fall back to their children only when that lookup misses. Defining the key makes it resolve — to an object with no `zero`/`one`/`other` form — and it does so for **every** binary-rendered feature of the category, `heating` and `boost` included, not just the `binary` type. `water-valve` works precisely because it never defines that key. The cost is that the `binary` type falls back to the generic "Inactive" / "Active", exactly like `light` and `switch`: the type is literally named `binary`, so its per-type key and the category-wide plural key are the same path and cannot both exist. The writable toggle is unaffected — it reads `deviceFeatureAction`, which has no such hardcoded suffix.
 
 The MQTT feature catalog also reads `integration.mqtt.featureCatalog.categoryDescriptions.water-heater` and `.descriptions.water-heater.<type>`; without them the catalog falls back to a generic description, which is acceptable but poor.
 

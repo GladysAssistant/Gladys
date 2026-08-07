@@ -4783,10 +4783,6 @@
           "5": "Abwesenheit",
           "6": "Zeitplan"
         },
-        "binary": {
-          "0": "Aus",
-          "1": "Ein"
-        },
         "boost": {
           "0": "Boost aus",
           "1": "Boost ein"

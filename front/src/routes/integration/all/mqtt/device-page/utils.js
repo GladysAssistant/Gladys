@@ -806,6 +806,23 @@ export const getCatalogPreviewLabelKey = (category, type) => {
 };
 
 export const getFeaturePreviewValue = (category, type) => {
+  // Ahead of the branches below: `target-temperature` and `mode` are type strings other
+  // categories match on without a category guard, and they would shadow these values.
+  if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
+      return WATER_HEATER_MODE.ECO;
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE) {
+      return 55;
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER) {
+      return 80;
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING) {
+      return 1;
+    }
+  }
+
   if (
     type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE ||
     type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE ||
@@ -837,21 +854,6 @@ export const getFeaturePreviewValue = (category, type) => {
     type === DEVICE_FEATURE_TYPES.SHUTTER.POSITION
   ) {
     return 65;
-  }
-
-  if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
-    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
-      return WATER_HEATER_MODE.ECO;
-    }
-    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE) {
-      return 55;
-    }
-    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER) {
-      return 80;
-    }
-    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING) {
-      return 1;
-    }
   }
 
   if (type === DEVICE_FEATURE_TYPES.CURTAIN.POSITION) {

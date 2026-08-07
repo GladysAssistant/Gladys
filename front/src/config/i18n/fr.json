@@ -4783,10 +4783,6 @@
           "5": "Absence",
           "6": "Programmation"
         },
-        "binary": {
-          "0": "Éteint",
-          "1": "Allumé"
-        },
         "boost": {
           "0": "Boost inactif",
           "1": "Boost actif"
