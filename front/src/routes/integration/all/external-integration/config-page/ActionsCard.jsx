@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import { ConfigField } from './ConfigSchemaForm';
@@ -59,32 +59,42 @@ const ActionsCard = ({
             </button>
             {/* the result is a scroll container (its length is whatever the
                 integration decided to return): tabIndex makes it focusable,
-                without which a keyboard-only user cannot scroll a long one */}
+                without which a keyboard-only user cannot scroll a long one,
+                and the named region gives that tab stop something to announce
+                — the message itself is the integration's, untranslatable here */}
             {actionState.status === RequestStatus.Success && actionState.message && (
-              <div
-                class={cx(
-                  'alert alert-success mt-3 mb-0',
-                  integrationText.integrationText,
-                  integrationText.resultScroll
-                )}
-                tabIndex={0}
-              >
-                {getLocalizedText(actionState.message, language)}
-              </div>
+              <Localizer>
+                <div
+                  class={cx(
+                    'alert alert-success mt-3 mb-0',
+                    integrationText.integrationText,
+                    integrationText.resultScroll
+                  )}
+                  tabIndex={0}
+                  role="region"
+                  aria-label={<Text id="integration.externalIntegration.actions.resultRegionLabel" />}
+                >
+                  {getLocalizedText(actionState.message, language)}
+                </div>
+              </Localizer>
             )}
             {actionState.status === RequestStatus.Error && (
-              <div
-                class={cx(
-                  'alert alert-danger mt-3 mb-0',
-                  integrationText.integrationText,
-                  integrationText.resultScroll
-                )}
-                tabIndex={0}
-              >
-                {getLocalizedText(actionState.message, language) || (
-                  <Text id="integration.externalIntegration.actions.error" />
-                )}
-              </div>
+              <Localizer>
+                <div
+                  class={cx(
+                    'alert alert-danger mt-3 mb-0',
+                    integrationText.integrationText,
+                    integrationText.resultScroll
+                  )}
+                  tabIndex={0}
+                  role="region"
+                  aria-label={<Text id="integration.externalIntegration.actions.resultRegionLabel" />}
+                >
+                  {getLocalizedText(actionState.message, language) || (
+                    <Text id="integration.externalIntegration.actions.error" />
+                  )}
+                </div>
+              </Localizer>
             )}
           </div>
         );
