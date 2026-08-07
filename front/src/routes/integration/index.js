@@ -390,9 +390,15 @@ class Integration extends Component {
       return 0;
     }
     const integrationsToUpdate = externalInstalled.filter(integration => integration.update_available).length;
-    // getIntegrations() runs on every keystroke of the search field: only a
-    // real change is worth re-rendering every component reading the counter
-    if (this.props.setExternalIntegrationsToUpdate && integrationsToUpdate !== this.state.integrationsToUpdate) {
+    // compared to the shared value and not to the local one: getIntegrations()
+    // runs on every keystroke of the search field, so an unchanged count must
+    // not re-render every component reading it — but a fresh fetch that
+    // disagrees with the poll has to correct it, otherwise the header stays on
+    // a count the catalog no longer shows
+    if (
+      this.props.setExternalIntegrationsToUpdate &&
+      integrationsToUpdate !== this.props.externalIntegrationsToUpdate
+    ) {
       this.props.setExternalIntegrationsToUpdate(integrationsToUpdate);
     }
     return integrationsToUpdate;

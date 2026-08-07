@@ -11,12 +11,16 @@ const EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
  * can be displayed in the header, from any page, and not only in the
  * integration catalog which is the only screen loading that list today.
  */
-function createActions(store) {
-  // the periodic poll and the refresh triggered right after an update can
-  // overlap: without this, the slower request wins and puts back the count it
-  // read before the update
-  let lastRequestId = 0;
+// the periodic poll and the refresh triggered right after an update can
+// overlap: without this, the slower request wins and puts back the count it
+// read before the update.
+// Module scope and not a closure of createActions: unistore calls the factory
+// once per connected component instance, so a per-factory counter would be
+// bumped by logout (bound on AppRouter) without invalidating the request the
+// poll (bound on MainApp) has in flight — one counter, or no guard at all
+let lastRequestId = 0;
 
+function createActions(store) {
   const applyCount = (requestId, externalIntegrationsToUpdate) => {
     if (requestId === lastRequestId) {
       store.setState({ externalIntegrationsToUpdate });
