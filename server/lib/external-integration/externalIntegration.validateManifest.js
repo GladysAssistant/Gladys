@@ -284,7 +284,14 @@ function validateSectionPortPlaceholders(value, path, declaredPortNames, errors)
  * @example
  * validateConfigField({ key: 'latitude', type: 'number', label: { en: 'Latitude' } }, 0, seenKeys, errors);
  */
-function validateConfigField(field, index, seenKeys, errors, basePath = 'config_schema', declaredPortNames = new Set()) {
+function validateConfigField(
+  field,
+  index,
+  seenKeys,
+  errors,
+  basePath = 'config_schema',
+  declaredPortNames = new Set(),
+) {
   const path = `${basePath}[${index}]`;
   if (field === null || typeof field !== 'object' || Array.isArray(field)) {
     errors.push(`${path}: must be an object`);
