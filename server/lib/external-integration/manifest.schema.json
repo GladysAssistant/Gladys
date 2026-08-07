@@ -463,7 +463,7 @@
               },
               "label": {
                 "$ref": "#/definitions/multiLanguageText",
-                "description": "Names the \"Open\" link in the Gladys UI."
+                "description": "Names the \"Open\" link in the Gladys UI, or the badge when the port is not browsable."
               },
               "browsable": {
                 "type": "boolean",
