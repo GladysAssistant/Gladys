@@ -724,10 +724,16 @@ describe('Send state to HomeKit', () => {
       ['STATUSLOWBATTERY', 1],
     ]);
 
+    // and back up: a battery that has been changed has to clear the warning as fast as it raised it
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 21 });
+
+    expect(updateCharacteristic.args[4]).eql(['BATTERYLEVEL', 21]);
+    expect(updateCharacteristic.args[5]).eql(['STATUSLOWBATTERY', 0]);
+
     // a device that reports nothing is not low on battery: `null <= 20` is true in JavaScript
     await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: null });
 
-    expect(updateCharacteristic.args[5]).eql(['STATUSLOWBATTERY', 0]);
+    expect(updateCharacteristic.args[7]).eql(['STATUSLOWBATTERY', 0]);
   });
 
   it('should do nothing wrong device category & type', async () => {
