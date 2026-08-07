@@ -5418,7 +5418,7 @@
     "history": "Activity",
     "devices": "Devices",
     "integrations": "Integrations",
-    "integrationsToUpdate": "Integrations to update",
+    "integrationsToUpdate": "Integrations to update: {{count}}",
     "calendar": "Calendar",
     "maps": "Maps",
     "scenes": "Scenes",

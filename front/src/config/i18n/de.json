@@ -5418,7 +5418,7 @@
     "history": "Aktivität",
     "devices": "Geräte",
     "integrations": "Integrationen",
-    "integrationsToUpdate": "Zu aktualisierende Integrationen",
+    "integrationsToUpdate": "Zu aktualisierende Integrationen: {{count}}",
     "calendar": "Kalender",
     "maps": "Karten",
     "scenes": "Szenen",

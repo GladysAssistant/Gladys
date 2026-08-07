@@ -161,9 +161,26 @@ class Header extends Component {
                       class={props.currentUrl.startsWith('/dashboard/integration') ? 'active nav-link' : 'nav-link'}
                     >
                       <i class="fe fe-grid" /> <Text id="header.integrations" />
+                      {/* the label carries the count: aria-label replaces the
+                          text content of the badge, so a label without it
+                          would hide the very number the badge exists for */}
                       {props.externalIntegrationsToUpdate > 0 && (
                         <Localizer>
-                          <span class="badge badge-danger ml-2" title={<Text id="header.integrationsToUpdate" />}>
+                          <span
+                            class="badge badge-danger ml-2"
+                            title={
+                              <Text
+                                id="header.integrationsToUpdate"
+                                fields={{ count: props.externalIntegrationsToUpdate }}
+                              />
+                            }
+                            aria-label={
+                              <Text
+                                id="header.integrationsToUpdate"
+                                fields={{ count: props.externalIntegrationsToUpdate }}
+                              />
+                            }
+                          >
                             {props.externalIntegrationsToUpdate}
                           </span>
                         </Localizer>
