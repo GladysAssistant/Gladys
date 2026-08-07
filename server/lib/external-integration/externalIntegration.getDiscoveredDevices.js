@@ -9,6 +9,7 @@ const featureSignature = (feature) =>
     feature.unit || null,
     feature.min !== undefined ? feature.min : null,
     feature.max !== undefined ? feature.max : null,
+    feature.step !== undefined && feature.step !== null ? feature.step : null,
   ]);
 
 /**

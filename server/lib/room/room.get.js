@@ -1,5 +1,5 @@
 const db = require('../../models');
-const { getFeaturesInclude } = require('../../utils/deviceQueryIncludes');
+const { getFeaturesInclude, ROOM_DEVICE_FEATURES_ATTRIBUTES } = require('../../utils/deviceQueryIncludes');
 
 const DEFAULT_OPTIONS = {
   expand: [],
@@ -9,19 +9,6 @@ const DEFAULT_OPTIONS = {
 };
 
 const DEVICE_ATTRIBUTES = ['name', 'selector'];
-
-const DEVICE_FEATURES_ATTRIBUTES = [
-  'name',
-  'selector',
-  'category',
-  'type',
-  'read_only',
-  'unit',
-  'min',
-  'max',
-  'last_value',
-  'last_value_changed',
-];
 
 const SERVICE_ATTRIBUTES = ['id', 'name'];
 
@@ -42,7 +29,7 @@ async function get(options) {
       attributes: DEVICE_ATTRIBUTES,
       include: [
         getFeaturesInclude({
-          attributes: DEVICE_FEATURES_ATTRIBUTES,
+          attributes: ROOM_DEVICE_FEATURES_ATTRIBUTES,
         }),
         {
           model: db.Service,
