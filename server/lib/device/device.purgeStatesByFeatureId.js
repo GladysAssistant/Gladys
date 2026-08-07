@@ -95,19 +95,27 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   await db.duckDbWriteConnectionAllAsync('SELECT 1');
   await this.job.updateProgress(jobId, 0, { step: 'deleting_states' });
 
-  // The DuckDB table has no id column, so states cannot be deleted in LIMIT-ed
-  // chunks like in SQLite. Delete them in created_at slices instead: it reports
-  // progress, and it releases the single DuckDB write connection between two
-  // slices so live state inserts are not blocked for the whole purge.
+  // States are deleted in created_at slices: it reports progress, it releases the
+  // single DuckDB write connection between two slices so live state inserts are
+  // not blocked for the whole purge, and each slice only reads the row groups of
+  // its own time window. Slices alone do not bound the rows of one statement
+  // though (a dense burst, or a feature whose states all share one timestamp,
+  // falls in a single slice), so every DELETE also carries the cardinality cap
+  // below — same reasoning as the device migration, see device.migrate.js.
   let sliceUpperBounds = [];
   if (numberOfDuckDbStatesToDelete > 0) {
     // Every DELETE statement is a transaction rewriting row groups: slicing a
     // small purge is pure overhead. Only big purges (where progress reporting
-    // and releasing the write connection matter) are sliced.
+    // and releasing the write connection matter) are sliced, in as many slices
+    // as needed to keep each statement around the threshold — a fixed number of
+    // slices leaves statements growing with the size of the history again.
     if (numberOfDuckDbStatesToDelete <= this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD) {
       sliceUpperBounds = [null];
     } else {
-      const numberOfSlices = this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES;
+      const numberOfSlices = Math.min(
+        this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES,
+        Math.ceil(numberOfDuckDbStatesToDelete / this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD),
+      );
       const [{ min_date: minDate, max_date: maxDate }] = await db.duckDbReadConnectionAllAsync(
         `SELECT MIN(created_at) AS min_date, MAX(created_at) AS max_date
          FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID)`,
@@ -146,19 +154,29 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
     }
   };
 
-  await Promise.each(sliceUpperBounds, async (sliceUpperBound) => {
-    if (sliceUpperBound === null) {
-      await db.duckDbWriteConnectionAllAsync(
-        'DELETE FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID)',
-        deviceFeatureId,
+  // Hard cap on the rows a single DELETE touches, whatever the shape of the history:
+  // the statement is repeated until it deletes fewer rows than the cap, which means the
+  // slice is drained. Deleted rows are gone, so it always terminates.
+  const cap = Math.max(1, Math.floor(this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD));
+  const deleteSlice = async (sliceUpperBound) => {
+    const upperBoundCondition = sliceUpperBound === null ? '' : ' AND created_at < CAST(? AS TIMESTAMPTZ)';
+    const params = sliceUpperBound === null ? [deviceFeatureId] : [deviceFeatureId, sliceUpperBound.toISOString()];
+    let deleted = cap;
+    while (deleted === cap) {
+      // Sequential on purpose: the next statement deletes what the previous one left.
+      // eslint-disable-next-line no-await-in-loop
+      const result = await db.duckDbWriteConnectionAllAsync(
+        `DELETE FROM t_device_feature_state
+         WHERE rowid IN (SELECT rowid FROM t_device_feature_state
+                         WHERE device_feature_id = CAST(? AS UUID)${upperBoundCondition} LIMIT ${cap})`,
+        ...params,
       );
-    } else {
-      await db.duckDbWriteConnectionAllAsync(
-        'DELETE FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID) AND created_at < CAST(? AS TIMESTAMPTZ)',
-        deviceFeatureId,
-        sliceUpperBound.toISOString(),
-      );
+      deleted = result && result[0] && result[0].Count !== undefined ? Number(result[0].Count) : 0;
     }
+  };
+
+  await Promise.each(sliceUpperBounds, async (sliceUpperBound) => {
+    await deleteSlice(sliceUpperBound);
     await updateProgressIfNeeded();
     await Promise.delay(this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH);
   });

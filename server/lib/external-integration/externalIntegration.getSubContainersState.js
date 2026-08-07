@@ -62,6 +62,10 @@ async function getSubContainersState(service) {
         protocol,
         host_port: assignedPort === undefined ? null : assignedPort,
         label: port.label,
+        // manifest-unique identifier referenced by the {{port:<name>}}
+        // placeholder of the section texts, resolved by the frontend
+        name: port.name === undefined ? null : port.name,
+        browsable: port.browsable !== false,
       };
     });
     const devices = (entry.devices || []).map((hardwareClass) => {

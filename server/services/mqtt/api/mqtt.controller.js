@@ -54,6 +54,15 @@ module.exports = function MqttController(mqttManager) {
     res.json({ status: DEFAULT.INSTALLATION_STATUS.DONE });
   }
 
+  /**
+   * @api {get} /api/v1/service/mqtt/discovery Get devices discovered through Home Assistant discovery
+   * @apiName getHomeAssistantDiscoveredDevices
+   * @apiGroup Mqtt
+   */
+  async function getHomeAssistantDiscoveredDevices(req, res) {
+    res.json(mqttManager.getHomeAssistantDiscoveredDevices(req.query));
+  }
+
   return {
     'post /api/v1/service/mqtt/connect': {
       authenticated: true,
@@ -77,6 +86,10 @@ module.exports = function MqttController(mqttManager) {
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(installContainer),
+    },
+    'get /api/v1/service/mqtt/discovery': {
+      authenticated: true,
+      controller: asyncMiddleware(getHomeAssistantDiscoveredDevices),
     },
   };
 };

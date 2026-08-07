@@ -320,7 +320,8 @@
       "gauge": "Messanzeige",
       "energy-consumption": "Energieverbrauch",
       "voice-assistant": "Sprachassistent",
-      "link": "Link"
+      "link": "Link",
+      "photo": "Foto"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -328,17 +329,34 @@
       "weather": {
         "editHouseLabel": "Wähle ein Zuhause aus. Ich werde seine Breiten- und Längengrade verwenden, um das Wetter abzurufen.",
         "houseHasNoCoordinates": "Dein Zuhause hat keine definierten Koordinaten. Gehe zu den Gladys-Parametern, um die Position deines Zuhause zu definieren.",
-        "serviceNotConfigured": "Der OpenWeather-Dienst ist nicht konfiguriert. Gehe zum Tab \"Integrationen\" und konfiguriere den OpenWeather-Dienst.",
-        "requestToThirdPartyFailed": "Die Anfrage an die OpenWeather-API ist fehlgeschlagen. Ist dein Gladys mit dem Internet verbunden? Gehe zum OpenWeather-Konfigurationspanel, um das Problem zu beheben.",
-        "clickHere": "Klicke hier, um zum OpenWeather-Konfigurationspanel zu gelangen.",
+        "serviceNotConfigured": "Es ist kein Wetterdienst konfiguriert. Gehe zum Tab \"Integrationen\" und konfiguriere eine Wetter-Integration (OpenWeather oder eine Wetter-Integration aus dem Store).",
+        "requestToThirdPartyFailed": "Die Anfrage an den Wetteranbieter ist fehlgeschlagen. Ist dein Gladys mit dem Internet verbunden? Gehe zum Panel der Wetter-Integrationen, um das Problem zu beheben.",
+        "clickHere": "Klicke hier, um zu den Wetter-Integrationen zu gelangen.",
         "unknownError": "Wir können das Wetter für dieses Zuhause nicht abrufen. Hast du für diese Box ein Zuhause definiert?",
+        "editProviderLabel": "Wetteranbieter:",
+        "providerAuto": "Automatisch (erster verfügbarer Anbieter)",
+        "providerInternalOpenWeather": "Internes OpenWeather (veraltet)",
         "editModeLabel": "Wähle den Anzeigemodus aus:",
         "displayModes": {
           "advancedWeather": "Luftfeuchtigkeit und Windgeschwindigkeit",
           "hourlyForecast": "Vorhersage für die nächsten 24 Stunden",
-          "dailyForecast": "Vorhersage für die nächsten 5 Tage"
+          "dailyForecast": "Vorhersage für die nächsten 5 Tage",
+          "providerImages": "Anbieter-Bilder (Warnkarte, Regenradar…)"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "minMaxDegreeValue": "{{min}}°/{{max}}°",
+        "uv": "UV",
+        "alertTypes": {
+          "wind": "Starker Wind",
+          "rain": "Starkregen",
+          "flood": "Hochwasser",
+          "thunderstorm": "Gewitter",
+          "snow": "Schnee und Glätte",
+          "heat": "Hitzewelle",
+          "cold": "Extreme Kälte",
+          "avalanche": "Lawinen",
+          "coastal": "Sturmflut",
+          "fog": "Nebel"
+        }
       },
       "devicesInRoom": {
         "editRoomLabel": "Wähle den Raum aus, den du hier anzeigen möchtest.",
@@ -451,7 +469,11 @@
           "week": "Woche",
           "month": "Monat",
           "year": "Jahr"
-        }
+        },
+        "previousPeriod": "Vorheriger Zeitraum",
+        "nextPeriod": "Nächster Zeitraum",
+        "currentPeriod": "Live",
+        "backToNow": "Zurück zu jetzt"
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -522,6 +544,23 @@
           "cpu": "Verbundenes Gerät",
           "home": "Zuhause"
         }
+      },
+      "photo": {
+        "description": "Zeige ein oder mehrere Fotos auf deinem Dashboard an. Bilder werden von deiner Gladys-Instanz geladen (nicht vom Browser), sodass Fotos auf einem lokalen NAS auch per Gladys Plus aus der Ferne funktionieren.",
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "z. B. Sommerurlaub 2025",
+        "photosLabel": "Fotos",
+        "editUrlPlaceholder": "https://mein-nas.local/fotos/urlaub.jpg",
+        "editCaptionPlaceholder": "Beschriftung (optional)",
+        "addPhotoButton": "Foto hinzufügen",
+        "fitLabel": "Bildanzeige",
+        "fitCover": "Füllen (zuschneiden)",
+        "fitContain": "Enthalten (ganzes Bild)",
+        "slideshowIntervalLabel": "Diashow (Sekunden)",
+        "slideshowIntervalHelp": "0 zum Deaktivieren der Diashow. Empfohlen: 10-30 Sekunden.",
+        "showCaptionLabel": "Beschriftungen anzeigen",
+        "emptyPhotos": "Keine Fotos konfiguriert.",
+        "imageError": "Dieses Bild konnte nicht geladen werden."
       },
       "alarm": {
         "armButton": "Einschalten",
@@ -601,6 +640,7 @@
       "subtitle": "{{length}} von {{total}} Integrationen",
       "searchPlaceholder": "Integration suchen",
       "noIntegrations": "Keine Integrationen gefunden",
+      "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
       "refreshStore": {
@@ -619,6 +659,7 @@
       "menu": {
         "all": "Alle Integrationen",
         "favorites": "Favoriten",
+        "updates": "Zu aktualisieren",
         "device": "Geräte",
         "communication": "Kommunikation",
         "calendar": "Kalender",
@@ -660,12 +701,19 @@
         "saveError": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
         "saveButton": "Konfiguration speichern",
         "oauthConnectButton": "Verbinden",
+        "oauthInvalidStateError": "Diese Integration liefert keinen brauchbaren Sicherheits-State für die Verbindung (fehlt oder zu lang). Sie kann nicht verbunden werden, bis der Entwickler das behoben hat.",
+        "oauthRedirectUriLabel": "Weiterleitungsadresse, die in Ihrer Entwickler-Anwendung einzutragen ist",
+        "oauthRedirectUriDescription": "Die Dienste akzeptieren keine lokale Adresse: diese von Gladys gehostete HTTPS-Seite schickt Sie nach der Autorisierung zu Ihrer Instanz zurück. Sie läuft vollständig in Ihrem Browser, Gladys speichert und verwendet den Autorisierungscode nicht, und Ihre Zugriffstoken werden direkt zwischen Ihrer Instanz und dem Dienst ausgetauscht.",
+        "oauthRedirectUriInstanceDescription": "Sie haben die Adresse Ihrer Instanz gewählt: tragen Sie genau diese URL in Ihrer Entwickler-Anwendung ein. Der Dienst kommt dann direkt zu Ihrem Gladys zurück, ohne den Umweg über die Gladys-Weiterleitungsseite.",
+        "oauthRedirectUriCopied": "Kopiert!",
+        "oauthUseInstanceRedirectLabel": "Stattdessen die Adresse meiner Instanz verwenden (ich erreiche Gladys bereits per HTTPS)",
         "oauthConnectError": "Fehler beim Starten der Verbindung. Prüfen Sie, ob die Integration läuft."
       },
       "actions": {
         "title": "Aktionen",
         "runButton": "Ausführen",
-        "error": "Die Aktion ist fehlgeschlagen. Prüfen Sie, ob die Integration läuft."
+        "error": "Die Aktion ist fehlgeschlagen. Prüfen Sie, ob die Integration läuft.",
+        "resultRegionLabel": "Ergebnis der Aktion"
       },
       "connection": {
         "label": "Verbindung",
@@ -699,6 +747,8 @@
         "actionError": "Beim Ausführen dieser Aktion ist ein Fehler aufgetreten.",
         "uninstallError": "Beim Deinstallieren dieser Integration ist ein Fehler aufgetreten.",
         "updateAvailableText": "Eine neue Version dieser Integration ist verfügbar.",
+        "updateSuccessText": "Integration auf Version {{version}} aktualisiert.",
+        "alreadyUpToDateText": "Die Integration ist bereits aktuell (Version {{version}}): Das Docker-Image wurde erneut heruntergeladen und der Container neu erstellt.",
         "statusLabel": "Status",
         "versionLabel": "Version",
         "dockerImageLabel": "Docker-Image",
@@ -708,7 +758,7 @@
         "restartButton": "Neu starten",
         "updateButton": "Aktualisieren",
         "forceUpdateButton": "Update erzwingen",
-        "forceUpdateTitle": "Lädt das Docker-Image neu herunter und erstellt den Container neu, auch ohne neue Version",
+        "forceUpdateTitle": "Prüft die zuletzt veröffentlichte Version, lädt das Docker-Image neu herunter und erstellt den Container neu",
         "logsButton": "Logs",
         "uninstallButton": "Deinstallieren",
         "containersTitle": "Zusätzliche Container",
@@ -742,6 +792,7 @@
         "title": "Entdeckte Geräte",
         "scanButton": "Scannen",
         "scanning": "Scannen...",
+        "scanningInProgress": "Scan läuft... Je nach Integration kann dies bis zu einer Minute dauern. Die Liste wird automatisch aktualisiert, sobald Geräte veröffentlicht werden.",
         "scanError": "Beim Starten des Scans ist ein Fehler aufgetreten.",
         "scanErrorDisconnected": "Der Scan konnte nicht gestartet werden: Die Integration ist nicht verbunden. Prüfe im Tab \"Konfiguration\", ob sie läuft.",
         "loadError": "Beim Laden der entdeckten Geräte ist ein Fehler aufgetreten.",
@@ -786,7 +837,7 @@
             "value": "Wert"
           },
           "contextTypes": {
-            "device_feature": "Funktion \u201e{{name}}\u201c"
+            "device_feature": "Funktion „{{name}}“"
           },
           "fieldErrorTypes": {
             "notNullViolation": "Pflichtfeld wurde von der Integration nicht gesetzt",
@@ -814,12 +865,14 @@
         "installButton": "Installieren",
         "networkDiscoveryTitle": "Anfragen zur Netzwerkerkennung",
         "networkDiscoveryText": "Diese Integration bittet Gladys, die folgenden Netzwerkankündigungen für sie zu erfassen. Sie kann niemals etwas anderes erfassen.",
+        "locationText": "Diese Integration fordert Zugriff auf die Koordinaten (Breiten-/Längengrad) der in Gladys konfigurierten Häuser an.",
         "documentationLink": "Dokumentation",
         "duplicateWarningTitle": "Eine andere Instanz ist bereits installiert",
         "duplicateWarningText": "„{name}“ scheint eine weitere Instanz dieser Integration zu sein. Zwei Instanzen können sich um dasselbe Cloud-Konto oder dieselben Geräte streiten — stoppen Sie die bestehende Instanz während Ihrer Tests. Die Installation ist dennoch möglich (z. B. eine Dev-Version neben der Produktion).",
         "webhooksTitle": "Internet-Webhooks (Gladys Plus)",
         "webhooksText": "Diese Integration kann die folgenden Ereignisse aus dem Internet über das Gladys-Plus-Relais empfangen (erfordert ein Gladys-Plus-Abonnement und einen Open-API-Schlüssel).",
-        "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie)."
+        "notificationWarningText": "Diese Integration ist ein Benachrichtigungskanal: Sie kann Ihnen Nachrichten senden, aber niemals Nachrichten empfangen oder in Ihrem Namen handeln (serverseitige Garantie).",
+        "weatherInfoText": "Diese Integration ist ein Wetteranbieter: Nach der Installation liefert sie das in Gladys angezeigte Wetter (Dashboard-Widget und Assistent)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "UDP-Netzwerkankündigungen auf den Ports {ports} abhören",
@@ -843,7 +896,8 @@
         "errorUnknown": "Beim Installieren dieser Integration ist ein Fehler aufgetreten.",
         "errorNotFound": "Repository nicht gefunden, oder es enthält keine gültige Gladys-Integration.",
         "errorInvalidManifest": "Das Manifest der Integration ist ungültig.",
-        "manifestInvalidJson": "Das Manifest ist kein gültiges JSON."
+        "manifestInvalidJson": "Das Manifest ist kein gültiges JSON.",
+        "errorDetailsTitle": "Fehlerdetails:"
       },
       "logs": {
         "title": "Protokolle",
@@ -1963,8 +2017,28 @@
       "description": "Erstellen Sie virtuelle Geräte, die über MQTT steuerbar sind.",
       "virtualDevicesExplanation": "Diese Integration ermöglicht es Ihnen, virtuelle Geräte zu erstellen, die über MQTT, HTTP, in Szenen und auf dem Dashboard steuerbar sind. Um Zigbee-Geräte zu verwenden, nutzen Sie bitte die <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a>-Integration. Um Z-Wave-Geräte zu verwenden, nutzen Sie bitte die <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a>-Integration. Um Nuki-MQTT-Geräte zu verwenden, nutzen Sie bitte die <a href=\"/dashboard/integration/device/nuki\">Nuki</a>-Integration.",
       "deviceTab": "Meine Geräte",
+      "discoverTab": "Erkennung",
       "debugTab": "Debug MQTT",
       "setupTab": "Einrichtung",
+      "discover": {
+        "title": "Home Assistant Discovery",
+        "description": "Geräte, die ihre Konfiguration über das <b>Home Assistant Discovery</b>-Protokoll (Topic <i>homeassistant/</i>) auf dem MQTT-Broker veröffentlichen, werden automatisch erkannt und unten angezeigt. Du kannst sie dann zu Gladys hinzufügen.",
+        "refreshButton": "Aktualisieren",
+        "hideExistingDevices": "Bereits in Gladys vorhandene Geräte ausblenden",
+        "nameLabel": "Gerätename",
+        "namePlaceholder": "Gib den Namen deines Geräts ein",
+        "roomLabel": "Raum",
+        "modelLabel": "Modell",
+        "externalIdLabel": "Externe ID",
+        "featuresLabel": "Funktionen",
+        "saveButton": "Speichern",
+        "updateButton": "Aktualisieren",
+        "alreadyExistsButton": "Bereits erstellt",
+        "saveError": "Beim Speichern dieses Geräts ist ein Fehler aufgetreten.",
+        "serverError": "Beim Abrufen der erkannten Geräte ist ein Fehler aufgetreten.",
+        "deviceNotHandled": "Dieses Gerät bietet keine Funktion, die derzeit von Gladys unterstützt wird.",
+        "noDeviceDiscovered": "Noch keine Geräte erkannt. Geräte, die dauerhafte (retained) Home Assistant Discovery-Nachrichten auf dem MQTT-Broker veröffentlichen, erscheinen hier automatisch."
+      },
       "documentation": "MQTT-Dokumentation",
       "apiDocumentation": "MQTT-API-Dokumentation ",
       "status": {
@@ -2048,7 +2122,8 @@
           "button": "Aktionen bei Tastendruck auslösen.",
           "text": "Textwerte anzeigen oder senden.",
           "battery": "Überwachen Sie den Batteriestand Ihrer Geräte.",
-          "currency": "Zeigen Sie Währungs- oder Kryptowährungswerte an."
+          "currency": "Zeigen Sie Währungs- oder Kryptowährungswerte an.",
+          "water-heater": "Steuern Sie einen Warmwasserbereiter: Status, Betriebsmodus, Warmwasser-Sollwert und Boost."
         },
         "descriptions": {
           "light": {
@@ -2095,6 +2170,14 @@
           },
           "currency": {
             "decimal": "Zeigt einen Geldbetrag mit seiner Währungseinheit an."
+          },
+          "water-heater": {
+            "binary": "Schalten Sie das Gerät ein oder aus.",
+            "mode": "Wählen Sie den Betriebsmodus.",
+            "target-temperature": "Stellen Sie den Warmwasser-Sollwert mit +/- Tasten ein.",
+            "remaining-hot-water": "Lesen Sie den noch verfügbaren Warmwasseranteil ab.",
+            "heating": "Lesen Sie ab, ob das Gerät gerade Wasser erhitzt.",
+            "boost": "Starten oder brechen Sie eine Zwangsheizung ab."
           }
         },
         "keywords": {
@@ -2970,11 +3053,15 @@
         "removeLabel": "Entfernen",
         "orText": "ODER",
         "orButton": "+ ODER",
+        "useCustomValue": "Eigenen Wert eingeben",
+        "useValueList": "Aus der Werteliste auswählen",
+        "logicExplanationText": "Die Bedingungen in diesem Block sind mit ODER verknüpft: Der Block ist erfüllt, sobald eine davon zutrifft. Für ein UND fügst du mehrere Blöcke \"Nur fortsetzen, wenn\" hinzu: Dann müssen alle erfüllt sein.",
         "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
       "conditionIfThenElse": {
         "conditions": "Bedingungen",
         "conditionDescription": "Wenn alle Bedingungen erfüllt sind, werden die Aktionen im \"Dann\"-Block ausgeführt. Wenn nicht, werden die Aktionen im \"Sonst\"-Block ausgeführt.",
+        "conditionLogicDescription": "Die folgenden Bedingungen sind mit UND verknüpft: Sie müssen alle erfüllt sein. Für ein ODER verwendest du einen einzigen Block \"Nur fortsetzen, wenn\" und fügst dort mit der Schaltfläche \"+ ODER\" mehrere Bedingungen hinzu.",
         "noCondition": "Es wurde noch keine Bedingung hinzugefügt. Klicken Sie auf die '+'-Schaltfläche, um diesem Block eine Bedingung hinzuzufügen",
         "addCondition": "Bedingung hinzufügen",
         "if": "Wenn",
@@ -3246,6 +3333,10 @@
       },
       "mqtt": {
         "received": "MQTT-Message empfangen"
+      },
+      "weather": {
+        "alert-raised": "Wetterwarnung ausgelöst",
+        "alert-ended": "Wetterwarnung beendet"
       }
     },
     "triggersCard": {
@@ -3361,6 +3452,20 @@
         "messageLabel": "Message",
         "messagePlaceholder": "Gib die erwartete Message ein",
         "messageDescription": "Gib die erwartete Message ein oder lasse das Feld leer, um die Szene unabhängig von der Message auszuführen"
+      },
+      "weatherAlert": {
+        "alertRaisedDescription": "Wird ausgelöst, wenn eine Wetterwarnung für das ausgewählte Haus erscheint oder sich verschärft (alle 30 Minuten geprüft, oder sobald die Wetter-Integration eine Änderung meldet).",
+        "alertEndedDescription": "Wird ausgelöst, wenn eine Wetterwarnung für das ausgewählte Haus endet.",
+        "houseLabel": "Haus",
+        "typeLabel": "Warnungstyp",
+        "anyType": "Alle Warnungstypen",
+        "severityLabel": "Minimale Schwere",
+        "severities": {
+          "minor": "Gering (blau)",
+          "moderate": "Mäßig (gelb)",
+          "severe": "Schwer (orange)",
+          "extreme": "Extrem (rot)"
+        }
       }
     }
   },
@@ -3570,6 +3675,7 @@
         "rewriting_dashboards": "Umschreiben der Dashboards…",
         "deleting_source_device": "Löschen des alten Geräts…"
       },
+      "statesMigrated": "Verschobene Verlaufszustände: {{count}}",
       "orphanedStates": "Verwaiste Zustände: {{count}}",
       "duration": "Dauer: {{duration}}"
     },
@@ -3613,7 +3719,24 @@
     "operations": "Operatives",
     "upToDate": "Gladys ist auf dem neuesten Stand",
     "newUpgradeAvailable": "Softwareupdate verfügbar",
-    "newUpgradeAvailableText": "Gladys wird sich automatisch aktualisieren, wenn du Gladys mit dem offiziellen Gladys-Raspberry-Pi-OS-Image installiert hast. Wenn du Gladys manuell installiert hast, achte darauf, dass Watchtower ausgeführt wird.",
+    "newUpgradeAvailableVersion": "Gladys {{version}} ist verfügbar",
+    "checkForUpdates": "Nach Updates suchen",
+    "checkingForUpdates": "Suche nach Updates …",
+    "checkForUpdatesText": "Gladys sucht automatisch nach neuen Versionen. Klicke unten, um jetzt zu suchen.",
+    "checkForUpdatesError": "Die Suche nach Updates ist fehlgeschlagen. Prüfe deine Internetverbindung und versuche es erneut.",
+    "noUpdateAvailable": "Keine neue Version verfügbar, du verwendest die neueste Gladys-Version.",
+    "newUpgradeAvailableText": "Gladys wird sich automatisch aktualisieren, wenn du Gladys mit dem offiziellen Gladys-Raspberry-Pi-OS-Image installiert hast. Wenn du Gladys manuell installiert hast, achte darauf, dass Watchtower ausgeführt wird. Eine manuelle Aktualisierung aktualisiert nur den Gladys-Container, die anderen Container auf diesem Rechner bleiben unberührt.",
+    "pinnedImageTitle": "Dieses Image kann nicht aktualisiert werden",
+    "pinnedImageText": "Dein Gladys-Container wurde aus dem Image „{{image}}“ erstellt, das auf eine feste Version verweist. Eine Aktualisierung würde genau dasselbe Image erneut herunterladen, Gladys kann sich also nicht selbst aktualisieren.",
+    "pinnedImageRecommendation": "Damit die Aktualisierung funktioniert, erstelle deinen Container mit dem Image „{{recommendedImage}}“ neu, das neuen Versionen folgt. Deine Daten liegen nicht im Container und gehen daher nicht verloren.",
+    "upgradeError": {
+      "IMAGE_TAG_PINNED": "Aktualisierung abgebrochen: Dein Container verwendet das feste Image „{{image}}“. Erstelle ihn mit „{{recommendedImage}}“ neu, um ihn aktualisieren zu können.",
+      "NO_UPDATE_APPLIED": "Es wurde keine Aktualisierung durchgeführt: Watchtower hat kein neues Image für „{{image}}“ gefunden. Versuche es in einigen Minuten erneut, das neue Image ist für deine Architektur möglicherweise noch nicht verfügbar.",
+      "WATCHTOWER_FAILED": "Die Aktualisierung ist fehlgeschlagen: Der Watchtower-Container wurde mit dem Fehlercode {{statusCode}} beendet. Weitere Informationen findest du in den Gladys-Logs.",
+      "WATCHTOWER_TIMEOUT": "Die Aktualisierung dauert länger als erwartet und Gladys verfolgt sie nicht mehr. Sie läuft möglicherweise noch: Aktualisiere diese Seite in einigen Minuten, um die installierte Version zu prüfen.",
+      "GLADYS_CONTAINER_NOT_FOUND": "Aktualisierung nicht möglich: Gladys konnte den eigenen Container nicht identifizieren. Stelle sicher, dass Gladys über Docker mit dem Volume `-v /var/run/docker.sock:/var/run/docker.sock` läuft.",
+      "UNKNOWN_ERROR": "Die Aktualisierung ist fehlgeschlagen. Weitere Informationen findest du in den Gladys-Logs."
+    },
     "notConnectedToDocker": "Gladys ist nicht mit Docker verbunden. Um Docker aus Gladys heraus zugänglich zu machen, musst du Gladys mit dem richtigen Volume `-v /var/run/docker.sock:/var/run/docker.sock` starten.",
     "updateNow": "Jetzt aktualisieren",
     "upgradeInProgress": "Aktualisierung läuft …",
@@ -3689,6 +3812,10 @@
     "getAreaError": "Daten dieser Zone können nicht abgerufen werden. Bitte aktualisiere diese Seite, um es erneut zu versuchen.",
     "deleteAreaError": "Diese Zone kann nicht gelöscht werden. Bitte aktualisiere diese Seite und versuche es erneut."
   },
+  "iconSelector": {
+    "searchPlaceholder": "Symbol suchen (Zuhause, Schloss, Wetter...)",
+    "noResult": "Kein Symbol entspricht \"{{search}}\"."
+  },
   "newScene": {
     "cardTitle": "Neue Szene",
     "nameLabel": "Name",
@@ -3737,7 +3864,9 @@
     "statusColumn": "Status",
     "userRsaKey": "RSA-Schlüssel:",
     "userEcdsaKey": "ECDSA-Schlüssel:",
-    "usersListDescription": "Diese Liste wird mit deinen Gladys-Plus-Benutzern synchronisiert. Um sicherzustellen, dass dein Gladys sicher bleibt, musst du jedem Benutzer manuell Zugriff gewähren. Um einen Benutzer zu entfernen, gehe zur Gladys-Plus-Benutzerverwaltung.",
+    "usersListDescription": "Diese Liste wird mit deinen Gladys-Plus-Benutzern synchronisiert. Damit ein Benutzer (auch du selbst) aus der Ferne auf deine Instanz zugreifen kann, musst du ihn hier autorisieren, indem du den Schalter neben seinem Namen aktivierst.",
+    "usersListWhyAcceptDescription": "<b>Warum dieser Schritt?</b> Jeder Gladys-Plus-Benutzer besitzt eigene Verschlüsselungsschlüssel, deren Fingerabdrücke unten angezeigt werden. Indem du einen Benutzer autorisierst, bestätigst du lokal auf deiner Instanz, dass seine Schlüssel akzeptiert werden: Diese lokale Validierung schützt dein Zuhause vor Man-in-the-Middle-Angriffen. Niemand, nicht einmal die Gladys-Plus-Server, kann ohne diese bei dir zu Hause durchgeführte Validierung Zugriff auf deine Instanz gewähren.",
+    "usersListRevokedDescription": "Wenn sich die Schlüssel eines Benutzers ändern (zum Beispiel wenn seine Zwei-Faktor-Authentifizierung zurückgesetzt wurde), wird sein Zugriff aus Sicherheitsgründen automatisch widerrufen: Du musst ihn hier erneut autorisieren. Um einen Benutzer zu entfernen, gehe zur Gladys-Plus-Benutzerverwaltung.",
     "disconnectTitle": "Trenne deinen Plus-Account",
     "disconnectButton": "Trennen",
     "gatewayConnectedSuccessTitle": "Erfolgreich mit Gladys Plus verbunden!",
@@ -4224,6 +4353,43 @@
           "heating": "Heizen",
           "drying": "Entfeuchten",
           "fan": "Lüften"
+        },
+        "fan-speed": {
+          "auto": "Automatisch",
+          "low": "Niedrig",
+          "low-mid": "Niedrig-Mittel",
+          "mid": "Mittel",
+          "mid-high": "Mittel-Hoch",
+          "high": "Hoch",
+          "quiet": "Leise",
+          "turbo": "Turbo"
+        },
+        "swing-horizontal": {
+          "off": "Aus",
+          "swing": "Schwenk",
+          "position-1": "Position 1 (Links)",
+          "position-2": "Position 2",
+          "position-3": "Position 3 (Mitte)",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Rechts)",
+          "swing-opposite": "Gegenläufiger Schwenk"
+        },
+        "swing-vertical": {
+          "off": "Aus",
+          "swing": "Schwenken",
+          "position-1": "Position 1 (Oben)",
+          "position-2": "Position 2",
+          "position-3": "Position 3",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Unten)"
+        }
+      },
+      "thermostat": {
+        "mode": {
+          "off": "Aus",
+          "heating": "Heizen",
+          "cooling": "Kühlen",
+          "auto": "Automatisch"
         }
       },
       "heater": {
@@ -4257,6 +4423,37 @@
           "deep-clean": "Tiefenreinigung",
           "vacuum": "Saugen",
           "mop": "Wischen"
+        }
+      },
+      "water-heater": {
+        "mode": {
+          "off": "Aus",
+          "auto": "Auto",
+          "eco": "Öko",
+          "boost": "Boost",
+          "manual": "Manuell",
+          "away": "Abwesenheit",
+          "program": "Zeitplan"
+        },
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Aus",
+            "1": "Ein"
+          },
+          "state": {
+            "0": "Ausschalten",
+            "1": "Einschalten"
+          }
+        },
+        "boost": {
+          "stateLiveFinished": {
+            "0": "Boost aus",
+            "1": "Boost ein"
+          },
+          "state": {
+            "0": "Boost abbrechen",
+            "1": "Boost starten"
+          }
         }
       }
     }
@@ -4449,6 +4646,49 @@
           "2": "Heizen",
           "3": "Entfeuchten",
           "4": "Lüften"
+        },
+        "fan-speed": {
+          "0": "Automatisch",
+          "1": "Niedrig",
+          "2": "Niedrig-Mittel",
+          "3": "Mittel",
+          "4": "Mittel-Hoch",
+          "5": "Hoch",
+          "6": "Leise",
+          "7": "Turbo"
+        },
+        "swing-horizontal": {
+          "0": "Aus",
+          "1": "Schwenk",
+          "2": "Position 1 (Links)",
+          "3": "Position 2",
+          "4": "Position 3 (Mitte)",
+          "5": "Position 4",
+          "6": "Position 5 (Rechts)",
+          "7": "Gegenläufiger Schwenk"
+        },
+        "swing-vertical": {
+          "0": "Aus",
+          "1": "Schwenken",
+          "2": "Position 1 (Oben)",
+          "3": "Position 2",
+          "4": "Position 3",
+          "5": "Position 4",
+          "6": "Position 5 (Unten)"
+        }
+      },
+      "thermostat": {
+        "mode": {
+          "0": "Aus",
+          "1": "Heizen",
+          "2": "Kühlen",
+          "3": "Automatisch"
+        },
+        "operating-state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Inaktiv",
+          "1": "Heizt",
+          "2": "Kühlt"
         }
       },
       "siren": {
@@ -4469,6 +4709,20 @@
           "other": "Kein Wert empfangen",
           "zero": "Geöffnet",
           "one": "Geschlossen"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Keine Bewegung",
+          "one": "Bewegung erkannt"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Kein Rauch",
+          "one": "Rauch erkannt"
         }
       },
       "co-sensor": {
@@ -4558,6 +4812,25 @@
           "1": "Geladen"
         }
       },
+      "charging-station": {
+        "connector-status": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Verfügbar",
+          "1": "Belegt",
+          "2": "Reserviert",
+          "3": "Nicht verfügbar",
+          "4": "Fehler"
+        },
+        "charging-state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Lädt",
+          "1": "Fahrzeug verbunden",
+          "2": "Angehalten (Fahrzeug)",
+          "3": "Angehalten (Ladestation)",
+          "4": "Inaktiv",
+          "5": "Entlädt"
+        }
+      },
       "voc-matter-index-sensor": {
         "integer": {
           "unknown": "Unbekannt",
@@ -4594,6 +4867,25 @@
           "4": "Kehrt zur Ladestation zurück",
           "5": "Lädt",
           "6": "Angedockt"
+        }
+      },
+      "water-heater": {
+        "mode": {
+          "0": "Aus",
+          "1": "Auto",
+          "2": "Öko",
+          "3": "Boost",
+          "4": "Manuell",
+          "5": "Abwesenheit",
+          "6": "Zeitplan"
+        },
+        "boost": {
+          "0": "Boost aus",
+          "1": "Boost ein"
+        },
+        "heating": {
+          "0": "Bereit",
+          "1": "Heizt"
         }
       }
     }
@@ -4663,6 +4955,15 @@
       "liquid-level-percent": "Flüssigkeitspegel in Prozent",
       "liquid-depth": "Flüssigkeitstiefe"
     },
+    "water-heater": {
+      "shortCategoryName": "Warmwasserbereiter",
+      "binary": "Status",
+      "mode": "Modus",
+      "target-temperature": "Warmwasser-Sollwert",
+      "remaining-hot-water": "Verfügbares Warmwasser",
+      "heating": "Heizvorgang",
+      "boost": "Boost"
+    },
     "water-valve": {
       "shortCategoryName": "Wasserventil",
       "current-device-status": "Wasserventil-Status",
@@ -4676,6 +4977,11 @@
     "camera": {
       "shortCategoryName": "Kamera",
       "image": "Kamera"
+    },
+    "charging-station": {
+      "shortCategoryName": "Ladestation",
+      "connector-status": "Anschlussstatus",
+      "charging-state": "Ladevorgangsstatus"
     },
     "doorbell": {
       "shortCategoryName": "Türklingel",
@@ -4784,7 +5090,10 @@
       "shortCategoryName": "Klimaanlage",
       "binary": "Schalter ein/aus",
       "mode": "Modus",
-      "target-temperature": "Solltemperatur"
+      "target-temperature": "Solltemperatur",
+      "fan-speed": "Lüftergeschwindigkeit",
+      "swing-horizontal": "Horizontaler Schwenk",
+      "swing-vertical": "Vertikaler Schwenk"
     },
     "electrical-vehicle-battery": {
       "shortCategoryName": "Elektrofahrzeug - Batterie",
@@ -5048,7 +5357,9 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Thermostat: Temperatur"
+      "target-temperature": "Thermostat: Temperatur",
+      "mode": "Thermostat: Modus",
+      "operating-state": "Thermostat: Betriebszustand"
     },
     "airquality-sensor": {
       "shortCategoryName": "Luftqualität",
@@ -5103,6 +5414,7 @@
       "binary": "Status des Eingangs"
     },
     "unknown": {
+      "binary": "Binär (an/aus)",
       "shortCategoryName": "Unbekannt",
       "unknown": "Unbekannt"
     },
@@ -5233,6 +5545,7 @@
     "history": "Aktivität",
     "devices": "Geräte",
     "integrations": "Integrationen",
+    "integrationsToUpdate": "Zu aktualisierende Integrationen: {{count}}",
     "calendar": "Kalender",
     "maps": "Karten",
     "scenes": "Szenen",
@@ -5244,11 +5557,19 @@
   "gatewayLinkUser": {
     "title": "Gladys Plus konfigurieren",
     "label": "Wähle deinen Gladys-Benutzer aus",
-    "description": "Wähle den Gladys-Benutzer aus, mit dem du deinen Gladys-Plus-Account verknüpfen möchtest. Dieser Benutzer muss lokal auf deiner Instanz akzeptiert sein: in den Einstellungen deiner Instanz, Tab \"Gladys Plus\", Bereich \"Benutzer\".",
-    "noInstanceFound": "Deine Gladys-Instanz ist nicht mit dem Gladys Gateway verbunden. Hast du dich in deiner Gladys-Installation mit deinem Gladys-Plus-Account verbunden?",
-    "noInstanceFoundHelp": "Das kann passieren, wenn du dich in deiner lokalen Instanz nie mit deinem Gladys-Plus-Account verbunden hast, oder wenn deine 2FA zurückgesetzt wurde. Öffne in beiden Fällen deine lokale Gladys-Instanz, gehe in die Einstellungen, Tab \"Gladys Plus\", und melde dich mit deinem Account an. Brauchst du Hilfe? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
+    "description": "Wähle den Gladys-Benutzer aus, mit dem du deinen Gladys-Plus-Account verknüpfen möchtest. Dieser Benutzer muss lokal auf deiner Instanz autorisiert sein: in den Einstellungen deiner Instanz, Tab \"Gladys Plus\", Abschnitt \"Remote-Benutzer\".",
+    "noInstanceFoundTitle": "Nur noch ein Schritt!",
+    "noInstanceFoundIntro": "Dein Gladys-Plus-Account ist aktiv 🙂 Es bleibt nur noch, deine Gladys-Instanz (die bei dir zu Hause installierte) mit deinem Gladys-Plus-Account zu verbinden. Das ist ein normaler Schritt bei der ersten Nutzung von Gladys Plus, nichts ist kaputt! Folge diesen Schritten:",
+    "noInstanceFoundStepOpenLocalInstance": "Öffne deine Gladys-Instanz <b>lokal</b>, von deinem Heimnetzwerk aus, über ihre übliche lokale Adresse (zum Beispiel <code>http://ip-adresse-deines-geräts</code>).",
+    "noInstanceFoundStepGoToSettings": "Melde dich an und gehe dann in die <b>Einstellungen</b>, Tab \"<b>Gladys Plus</b>\".",
+    "noInstanceFoundStepLogin": "Klicke auf \"<b>Ich habe bereits ein Konto</b>\" und melde dich mit deinem Gladys-Plus-Account an (dieselbe E-Mail-Adresse und dasselbe Passwort wie hier).",
+    "noInstanceFoundStepAcceptUser": "Autorisiere deinen Benutzer im Tab \"Gladys Plus\", Abschnitt \"<b>Remote-Benutzer</b>\", indem du den Schalter neben seinem Namen aktivierst. Diese lokale Validierung garantiert, dass nur die Verschlüsselungsschlüssel, die du bei dir zu Hause genehmigt hast, auf deine Instanz zugreifen können (Schutz vor Man-in-the-Middle-Angriffen).",
+    "noInstanceFoundStepComeBack": "Komm zurück auf diese Seite und klicke auf den Button unten.",
+    "noInstanceFoundRetryButton": "Ich habe meine Instanz verbunden, erneut versuchen",
+    "noInstanceFoundTutorialLink": "Brauchst du eine Schritt-für-Schritt-Anleitung mit Screenshots? <a href=\"https://gladysassistant.com/docs/plus/connect-gladys-plus/\" target=\"_blank\" rel=\"noopener noreferrer\">Schau dir das Tutorial in unserer Dokumentation an</a>.",
+    "noInstanceFoundNote": "Hast du diesen Schritt in der Vergangenheit bereits durchgeführt? Manchmal muss er wiederholt werden, zum Beispiel wenn deine Zwei-Faktor-Authentifizierung (2FA) zurückgesetzt wurde: Melde dich einfach erneut im Tab \"Gladys Plus\" deiner Instanz an. Brauchst du Hilfe? Kontaktiere uns unter <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Ein Fehler ist aufgetreten. Ist dein Benutzer lokal in deiner Gladys-Instanz akzeptiert?",
-    "errorNotAcceptedLocally": "Der Benutzer wurde lokal in der Gladys-Instanz nicht akzeptiert. Bitte akzeptiere ihn in den Einstellungen deiner Instanz.",
+    "errorNotAcceptedLocally": "Der Benutzer wurde in der Gladys-Instanz noch nicht lokal autorisiert. Gehe in deiner lokalen Instanz in die Einstellungen, Tab \"Gladys Plus\", Abschnitt \"Remote-Benutzer\", und aktiviere den Schalter neben seinem Namen.",
     "saveButton": "Speichern",
     "manageBillingLink": "Mein Abo und meine Rechnungen verwalten",
     "logoutButton": "Abmelden"

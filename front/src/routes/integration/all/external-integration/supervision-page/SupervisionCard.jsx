@@ -5,46 +5,62 @@ import cx from 'classnames';
 import StatusBadge from '../components/StatusBadge';
 import { getGithubRepoUrl, getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
+import integrationText from '../integrationText.css';
 
-const SubContainerRow = ({ container, language }) => (
-  <tr>
-    <td>{container.name}</td>
-    <td>
-      {container.status === 'running' ? (
-        <span class="badge badge-success">
-          <Text id="integration.externalIntegration.supervision.containerRunning" />
-        </span>
-      ) : (
-        <span class="badge badge-secondary">
-          <Text id="integration.externalIntegration.supervision.containerStopped" />
-        </span>
-      )}
-    </td>
-    <td>
-      {(container.ports || [])
-        .filter(port => port.host_port)
-        .map(port => (
-          <a
-            class="btn btn-sm btn-outline-primary mr-1"
-            href={`${window.location.protocol}//${window.location.hostname}:${port.host_port}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            disabled={container.status !== 'running'}
-          >
-            <i class="fe fe-external-link mr-1" />
-            <Text id="integration.externalIntegration.supervision.openButton" />{' '}
-            {getLocalizedText(port.label, language) || port.container_port}
-          </a>
-        ))}
-    </td>
-  </tr>
-);
+const SubContainerRow = ({ container, language }) => {
+  const running = container.status === 'running';
+  return (
+    <tr>
+      <td>{container.name}</td>
+      <td>
+        {running ? (
+          <span class="badge badge-success">
+            <Text id="integration.externalIntegration.supervision.containerRunning" />
+          </span>
+        ) : (
+          <span class="badge badge-secondary">
+            <Text id="integration.externalIntegration.supervision.containerStopped" />
+          </span>
+        )}
+      </td>
+      <td>
+        {(container.ports || [])
+          .filter(port => port.host_port)
+          .map(port =>
+            port.browsable === false ? (
+              <span class="badge badge-secondary mr-1">
+                {getLocalizedText(port.label, language) || port.container_port}
+                {' : '}
+                {port.host_port}
+              </span>
+            ) : (
+              // no href while the container is stopped: nothing listens on the host port yet
+              <a
+                class={cx('btn btn-sm btn-outline-primary mr-1', { disabled: !running })}
+                href={
+                  running ? `${window.location.protocol}//${window.location.hostname}:${port.host_port}` : undefined
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-disabled={!running}
+              >
+                <i class="fe fe-external-link mr-1" />
+                <Text id="integration.externalIntegration.supervision.openButton" />{' '}
+                {getLocalizedText(port.label, language) || port.container_port}
+              </a>
+            )
+          )}
+      </td>
+    </tr>
+  );
+};
 
 const SupervisionCard = ({
   integration,
   language,
   actionStatus,
   actionError,
+  updateResult,
   uninstallStatus,
   askingUninstall,
   executeAction,
@@ -83,6 +99,18 @@ const SupervisionCard = ({
                 <Text id="integration.externalIntegration.supervision.uninstallError" />
               </div>
             )}
+            {updateResult && (
+              <div class={cx('alert', updateResult.upToDate ? 'alert-info' : 'alert-success')}>
+                <Text
+                  id={
+                    updateResult.upToDate
+                      ? 'integration.externalIntegration.supervision.alreadyUpToDateText'
+                      : 'integration.externalIntegration.supervision.updateSuccessText'
+                  }
+                  fields={{ version: updateResult.version }}
+                />
+              </div>
+            )}
             {integration.update_available && (
               <div class="alert alert-info">
                 <Text id="integration.externalIntegration.supervision.updateAvailableText" />
@@ -108,7 +136,7 @@ const SupervisionCard = ({
                     )}
                   </span>
                   {integration.connection_status.message && (
-                    <div class="text-muted small">
+                    <div class={cx('text-muted small', integrationText.integrationText)}>
                       {getLocalizedText(integration.connection_status.message, language)}
                     </div>
                   )}

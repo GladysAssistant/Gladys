@@ -26,6 +26,11 @@ const jobs = [
     rule: '0 0 9 * * 6', // At 09:00 AM, only on Saturday
     event: EVENTS.DEVICE.CHECK_BATTERIES,
   },
+  {
+    name: 'check-weather-alerts',
+    rule: '0 */30 * * * *', // every 30 minutes
+    event: EVENTS.WEATHER.CHECK_ALERTS,
+  },
 ];
 
 module.exports = jobs;
