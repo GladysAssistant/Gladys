@@ -118,6 +118,33 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
+    service: 'Battery',
+    capabilities: {
+      // Integrations disagree on which type carries a battery percentage: Nuki reports it as a lock
+      // integer, most others as a sensor or battery integer. All three mean the same thing here.
+      [DEVICE_FEATURE_TYPES.BATTERY.INTEGER]: {
+        characteristics: ['BatteryLevel', 'StatusLowBattery'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: {
+        characteristics: ['BatteryLevel', 'StatusLowBattery'],
+      },
+      [DEVICE_FEATURE_TYPES.LOCK.INTEGER]: {
+        characteristics: ['BatteryLevel', 'StatusLowBattery'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.BATTERY_LOW]: {
+    service: 'Battery',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY]: {
+        characteristics: ['StatusLowBattery'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
+        characteristics: ['StatusLowBattery'],
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     service: 'Switch',
     capabilities: {
@@ -276,7 +303,18 @@ const mergedServiceCategories = [
     ],
     merged: [],
   },
+  // Same for the battery: HomeKit shows a single Battery service, while Gladys splits the
+  // percentage and the low-battery flag across two categories.
+  {
+    hosts: [DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_CATEGORIES.BATTERY_LOW],
+    merged: [],
+  },
 ];
+
+// Percentage at or below which a device with no dedicated low-battery feature is reported as low.
+// HomeKit requires StatusLowBattery on every Battery service, so it has to be derived from the
+// level when the device does not report it. 20% is what the other HomeKit bridges use.
+const LOW_BATTERY_THRESHOLD = 20;
 
 module.exports = {
   mappings,
@@ -286,4 +324,5 @@ module.exports = {
   clampToCharacteristic,
   toMicrogramPerCubicMeter,
   mergedServiceCategories,
+  LOW_BATTERY_THRESHOLD,
 };

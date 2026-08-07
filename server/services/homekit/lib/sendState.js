@@ -122,6 +122,32 @@ function sendState(hkAccessory, feature, event) {
       );
       break;
     }
+    case `${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.BATTERY.INTEGER}`:
+    case `${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
+    case `${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.LOCK.INTEGER}`: {
+      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const [levelName] = mappings[feature.category].capabilities[feature.type].characteristics;
+      const levelCharacteristic = service.getCharacteristic(Characteristic[levelName]);
+
+      service.updateCharacteristic(
+        Characteristic[levelName],
+        clampToCharacteristic(event.last_value, levelCharacteristic.props),
+      );
+      // StatusLowBattery is not pushed here: on a device that also reports a dedicated
+      // low-battery feature, pushing a derived value would fight with the real one. The GET handler
+      // built by buildService keeps it correct either way.
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.BATTERY_LOW}:${DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY}`:
+    case `${DEVICE_FEATURE_CATEGORIES.BATTERY_LOW}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
+      hkAccessory
+        .getService(Service[mappings[feature.category].service])
+        .updateCharacteristic(
+          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+          event.last_value ? 1 : 0,
+        );
+      break;
+    }
     case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
     case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
     case `${DEVICE_FEATURE_CATEGORIES.CO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:

@@ -99,4 +99,28 @@ describe('Build accessory', () => {
     expect(homekitHandler.buildService.callCount).to.equal(1);
     expect(homekitHandler.buildService.args[0][1]).to.have.deep.members(device.features);
   });
+  it('should build a single battery service from the level and the low flag', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Serrure',
+      features: [
+        { name: 'Batterie', category: 'battery', type: 'integer' },
+        { name: 'Batterie faible', category: 'battery-low', type: 'binary' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    // one Battery service, not two
+    expect(homekitHandler.buildService.callCount).to.equal(1);
+    expect(homekitHandler.buildService.args[0][1]).to.have.deep.members(device.features);
+    expect(homekitHandler.buildService.args[0][3]).to.equal(undefined);
+    expect(addService.callCount).to.equal(1);
+  });
 });

@@ -34,6 +34,8 @@ describe('Send state to HomeKit', () => {
         CarbonDioxideLevel: 'CARBONDIOXIDELEVEL',
         CarbonDioxideDetected: 'CARBONDIOXIDEDETECTED',
         AirQuality: 'AIRQUALITY',
+        BatteryLevel: 'BATTERYLEVEL',
+        StatusLowBattery: 'STATUSLOWBATTERY',
         PM2_5Density: 'PM25DENSITY',
         PM10Density: 'PM10DENSITY',
       },
@@ -45,6 +47,7 @@ describe('Send state to HomeKit', () => {
         CarbonMonoxideSensor: 'CARBONMONOXIDESENSOR',
         CarbonDioxideSensor: 'CARBONDIOXIDESENSOR',
         AirQualitySensor: 'AIRQUALITYSENSOR',
+        Battery: 'BATTERY',
       },
     },
     notifyTimeouts: {},
@@ -618,6 +621,58 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['PM25DENSITY', 42]);
     expect(updateCharacteristic.args[1]).eql(['PM25DENSITY', 50]);
     expect(updateCharacteristic.args[2]).eql(['PM10DENSITY', 8]);
+  });
+
+  it('should notify battery level and low battery flag', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({ props: { minValue: 0, maxValue: 100 } });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Battery',
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+      type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 42 });
+    // Nuki reports the same thing as a lock integer
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, type: DEVICE_FEATURE_TYPES.LOCK.INTEGER },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 8 },
+    );
+    await homekitHandler.sendState(
+      accessory,
+      {
+        ...feature,
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+        type: DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY,
+      },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 },
+    );
+
+    expect(updateCharacteristic.args[0]).eql(['BATTERYLEVEL', 42]);
+    expect(updateCharacteristic.args[1]).eql(['BATTERYLEVEL', 8]);
+    // the two remaining type flavours reach the same branches
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, type: DEVICE_FEATURE_TYPES.BATTERY.INTEGER },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 60 },
+    );
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW, type: DEVICE_FEATURE_TYPES.SENSOR.BINARY },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 0 },
+    );
+
+    expect(updateCharacteristic.args[2]).eql(['STATUSLOWBATTERY', 1]);
+    expect(updateCharacteristic.args[3]).eql(['BATTERYLEVEL', 60]);
+    expect(updateCharacteristic.args[4]).eql(['STATUSLOWBATTERY', 0]);
   });
 
   it('should do nothing wrong device category & type', async () => {
