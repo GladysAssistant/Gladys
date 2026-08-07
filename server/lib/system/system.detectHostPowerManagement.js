@@ -41,56 +41,81 @@ function replyMeansAvailable(reply) {
 }
 
 /**
+ * @description Probe, via the given mechanism, whether the host allows reboot
+ * and power-off (two non-destructive logind queries: CanReboot / CanPowerOff).
+ * @param {object} system - The System instance (for runHostPowerDbusCommand).
+ * @param {string} mechanism - 'local' | 'docker-helper'.
+ * @returns {Promise<object|null>} `{ reboot, shutdown }`, or null if the path
+ * cannot reach logind at all.
+ * @example
+ * await probeHostPowerCapabilities(system, 'docker-helper');
+ */
+async function probeHostPowerCapabilities(system, mechanism) {
+  let rebootReply;
+  try {
+    // If this first call throws, the path cannot reach logind (no socket, no
+    // Docker, etc.) — report the whole path as unusable.
+    rebootReply = await system.runHostPowerDbusCommand('CanReboot', mechanism);
+  } catch (e) {
+    logger.info(`System: host power management not reachable via ${mechanism}`);
+    logger.debug(e);
+    return null;
+  }
+  let powerOffReply = null;
+  try {
+    powerOffReply = await system.runHostPowerDbusCommand('CanPowerOff', mechanism);
+  } catch (e) {
+    // Reachable for reboot but the power-off probe failed: keep reboot, drop shutdown.
+    logger.debug(e);
+  }
+  return {
+    reboot: replyMeansAvailable(parseCanReply(rebootReply)),
+    shutdown: replyMeansAvailable(parseCanReply(powerOffReply)),
+  };
+}
+
+/**
  * @description Detect (and cache on the instance) how the host can be
  * rebooted/powered off: `'local'` (Gladys reaches /run/dbus directly),
  * `'docker-helper'` (via a helper container through the Docker socket), or
- * `null` (not possible). Both branches confirm with a non-destructive CanReboot
- * probe. Result is cached in `this.hostPowerManagement`.
+ * `null` (not possible). Each candidate path confirms with non-destructive
+ * CanReboot / CanPowerOff probes; per-action availability is cached in
+ * `this.hostPowerCapabilities` and the chosen mechanism in
+ * `this.hostPowerManagement`.
  * @returns {Promise<string|null>} Resolve with the mechanism or null.
  * @example
  * await system.detectHostPowerManagement();
  */
 async function detectHostPowerManagement() {
+  this.hostPowerCapabilities = { reboot: false, shutdown: false };
   if (process.platform !== 'linux') {
     this.hostPowerManagement = null;
     return null;
   }
 
-  // 1. Local: Gladys can reach the host system DBus socket directly (bare-metal
-  //    install, or a container that happens to mount it). The cheap FS check is
-  //    only a pre-filter: having the socket does not mean polkit allows the
-  //    action, so confirm with the same non-destructive CanReboot probe.
+  // A path is retained as soon as it can reach logind AND at least one action is
+  // allowed. Local first (cheap, no container), then the Docker helper.
+  const tryMechanism = async (mechanism) => {
+    const capabilities = await probeHostPowerCapabilities(this, mechanism);
+    if (capabilities && (capabilities.reboot || capabilities.shutdown)) {
+      this.hostPowerManagement = mechanism;
+      this.hostPowerCapabilities = capabilities;
+      return true;
+    }
+    return false;
+  };
+
+  // Local: Gladys reaches the host DBus socket directly (bare-metal, or a
+  // container that mounts it). The FS check is only a pre-filter.
   const hasLocalBinary = DBUS_SEND_BINARIES.some((binaryPath) => fs.existsSync(binaryPath));
   const hasLocalSocket = DBUS_SYSTEM_SOCKETS.some((socketPath) => fs.existsSync(socketPath));
-  if (hasLocalBinary && hasLocalSocket) {
-    try {
-      const reply = parseCanReply(await this.runHostPowerDbusCommand('CanReboot', 'local'));
-      if (replyMeansAvailable(reply)) {
-        this.hostPowerManagement = 'local';
-        return 'local';
-      }
-      logger.info(`System: local host power probe returned "${reply}" — not available`);
-    } catch (e) {
-      logger.info('System: host power management not available locally');
-      logger.debug(e);
-    }
+  if (hasLocalBinary && hasLocalSocket && (await tryMechanism('local'))) {
+    return 'local';
   }
 
-  // 2. Docker helper: no local socket, but if the Docker daemon is reachable we
-  //    can act through a helper container. A non-destructive CanReboot probe
-  //    tells us whether the host actually supports it.
-  if (this.dockerode) {
-    try {
-      const reply = parseCanReply(await this.runHostPowerDbusCommand('CanReboot', 'docker-helper'));
-      if (replyMeansAvailable(reply)) {
-        this.hostPowerManagement = 'docker-helper';
-        return 'docker-helper';
-      }
-      logger.info(`System: host power management probe returned "${reply}" — not available`);
-    } catch (e) {
-      logger.info('System: host power management not available through the Docker helper');
-      logger.debug(e);
-    }
+  // Docker helper: act through a short-lived helper container via the socket.
+  if (this.dockerode && (await tryMechanism('docker-helper'))) {
+    return 'docker-helper';
   }
 
   this.hostPowerManagement = null;
@@ -99,6 +124,7 @@ async function detectHostPowerManagement() {
 
 module.exports = {
   detectHostPowerManagement,
+  probeHostPowerCapabilities,
   parseCanReply,
   replyMeansAvailable,
 };

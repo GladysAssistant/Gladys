@@ -1,9 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS } = require('../../utils/constants');
-// How long a reboot/shutdown command is given to fail before the request is
-// acknowledged: long enough to catch an immediate refusal, short enough not to
-// keep the request open until the host actually goes down.
-const HOST_POWER_ACK_DELAY_MS = 3000;
+const { acknowledgeHostPowerCommand } = require('./system.controller.helpers');
 
 module.exports = function SystemController(gladys) {
   /**
@@ -68,17 +65,9 @@ module.exports = function SystemController(gladys) {
    * @apiGroup System
    */
   async function rebootHost(req, res) {
-    // A destructive action must not report a success it did not get: wait for
-    // the command, so an immediate failure (polkit refusal, helper container
-    // error) is surfaced to the user. But do not wait forever either: the host
-    // may go down before the HTTP response is flushed, so acknowledge once the
-    // command has been running for a short while without failing.
-    await Promise.race([
-      gladys.system.rebootHost(),
-      new Promise((resolve) => {
-        setTimeout(resolve, HOST_POWER_ACK_DELAY_MS);
-      }),
-    ]);
+    // Surface an immediate failure (polkit refusal, helper error) but don't wait
+    // for the host to actually go down. A late failure is logged, not thrown.
+    await acknowledgeHostPowerCommand(gladys.system.rebootHost(), 'reboot host');
     res.json({
       success: true,
       message: 'Host will reboot soon',
@@ -92,12 +81,7 @@ module.exports = function SystemController(gladys) {
    */
   async function shutdownHost(req, res) {
     // Same trade-off as rebootHost above.
-    await Promise.race([
-      gladys.system.shutdownHost(),
-      new Promise((resolve) => {
-        setTimeout(resolve, HOST_POWER_ACK_DELAY_MS);
-      }),
-    ]);
+    await acknowledgeHostPowerCommand(gladys.system.shutdownHost(), 'shutdown host');
     res.json({
       success: true,
       message: 'Host will shutdown soon',

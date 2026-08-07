@@ -62,10 +62,11 @@ class SettingsSystemHostPower extends Component {
   };
 
   render({ systemInfos }, { pendingAction, actionSent, error, errorDetail, submitting }) {
-    // Fail closed: keep the destructive actions disabled until the capability
-    // has been loaded and explicitly reported as available.
-    const available = systemInfos && systemInfos.host_power_management_available === true;
-    const disabled = !available;
+    // Fail closed and per action: a host may allow reboot but refuse power-off
+    // (or the reverse), so each button is gated by its own capability.
+    const rebootAvailable = systemInfos && systemInfos.host_power_reboot_available === true;
+    const shutdownAvailable = systemInfos && systemInfos.host_power_shutdown_available === true;
+    const anyAvailable = rebootAvailable || shutdownAvailable;
 
     return (
       <div class="card">
@@ -77,7 +78,7 @@ class SettingsSystemHostPower extends Component {
             <Text id="systemSettings.hostPowerDescription" />
           </p>
 
-          {disabled && (
+          {!anyAvailable && (
             <div class="alert alert-secondary">
               <Text id="systemSettings.hostPowerUnavailable" />
             </div>
@@ -125,16 +126,25 @@ class SettingsSystemHostPower extends Component {
             </div>
           ) : (
             <Localizer>
-              <div
-                title={disabled ? <Text id="systemSettings.hostPowerUnavailableTooltip" /> : null}
-                data-toggle={disabled ? 'tooltip' : null}
-              >
-                <button onClick={this.askConfirmation('reboot')} disabled={disabled} class="btn btn-orange mr-2">
-                  <Text id="systemSettings.hostRebootButton" />
-                </button>
-                <button onClick={this.askConfirmation('shutdown')} disabled={disabled} class="btn btn-danger">
-                  <Text id="systemSettings.hostShutdownButton" />
-                </button>
+              <div>
+                <span title={!rebootAvailable ? <Text id="systemSettings.hostPowerUnavailableTooltip" /> : null}>
+                  <button
+                    onClick={this.askConfirmation('reboot')}
+                    disabled={!rebootAvailable}
+                    class="btn btn-orange mr-2"
+                  >
+                    <Text id="systemSettings.hostRebootButton" />
+                  </button>
+                </span>
+                <span title={!shutdownAvailable ? <Text id="systemSettings.hostPowerUnavailableTooltip" /> : null}>
+                  <button
+                    onClick={this.askConfirmation('shutdown')}
+                    disabled={!shutdownAvailable}
+                    class="btn btn-danger"
+                  >
+                    <Text id="systemSettings.hostShutdownButton" />
+                  </button>
+                </span>
               </div>
             </Localizer>
           )}

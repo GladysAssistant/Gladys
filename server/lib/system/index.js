@@ -66,9 +66,11 @@ const System = function System(sequelize, event, config, job, variable, user, me
   this.cpuCfsSupport = null;
   this.gladysLogsCache = null;
   this.gladysImage = null;
-  // Detected host power-management mechanism ('local' | 'docker-helper' | null),
-  // populated by detectHostPowerManagement() at init and cached here.
+  // Detected host power-management mechanism ('local' | 'docker-helper' | null)
+  // and per-action availability, populated by detectHostPowerManagement() at
+  // init and cached here.
   this.hostPowerManagement = null;
+  this.hostPowerCapabilities = { reboot: false, shutdown: false };
 };
 
 System.prototype.init = init;
