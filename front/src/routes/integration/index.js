@@ -10,10 +10,15 @@ import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
 import { getLocalizedText } from './all/external-integration/utils';
 import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog } from './catalog-url';
+import createActionsExternalIntegrationUpdates from '../../actions/externalIntegrationUpdates';
 import { RequestStatus } from '../../utils/consts';
 
 const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
 const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
+// cross-cutting views: they are not integration types, they filter the whole
+// catalog (a favorite, or an integration with a pending update, can be of any
+// type) — so no type filter must be applied to them
+const VIRTUAL_CATEGORIES = ['favorites', 'updates'];
 
 class Integration extends Component {
   constructor(props) {
@@ -162,7 +167,7 @@ class Integration extends Component {
     // external integrations live in the category matching their manifest
     // type ("device" or "communication"), and can also be favorites
     const EXTERNAL_CATEGORIES = ['device', 'communication'];
-    if (category && !EXTERNAL_CATEGORIES.includes(category) && category !== 'favorites') {
+    if (category && !EXTERNAL_CATEGORIES.includes(category) && !VIRTUAL_CATEGORIES.includes(category)) {
       return [];
     }
     const isAdmin = user.role === USER_ROLE.ADMIN;
@@ -240,8 +245,9 @@ class Integration extends Component {
       });
     });
 
-    // the favorites view keeps every type, the favorite filter comes later
-    if (category && category !== 'favorites') {
+    // the favorites and updates views keep every type, their own filter
+    // comes later
+    if (category && !VIRTUAL_CATEGORIES.includes(category)) {
       return externalCards.filter(card => card.type === category);
     }
     return externalCards;
@@ -252,7 +258,8 @@ class Integration extends Component {
     const { searchKeyword = '', orderDir = 'asc' } = this.state;
 
     // Load all or category related integrations
-    let selectedIntegrations = category && category !== 'favorites' ? integrationsByType[category] || [] : integrations;
+    let selectedIntegrations =
+      category && !VIRTUAL_CATEGORIES.includes(category) ? integrationsByType[category] || [] : integrations;
     // Load all categories
     let integrationCategories = categories;
     // Total size
@@ -310,6 +317,12 @@ class Integration extends Component {
       totalSize = selectedIntegrations.length;
     }
 
+    // If we are in updates view, only display the integrations to update
+    if (category === 'updates') {
+      selectedIntegrations = selectedIntegrations.filter(integration => integration.updateAvailable);
+      totalSize = selectedIntegrations.length;
+    }
+
     // Filter
     if (searchKeyword && searchKeyword.length > 0) {
       const lowerCaseSearchKeyword = searchKeyword.toLowerCase();
@@ -329,13 +342,34 @@ class Integration extends Component {
       selectedIntegrations.sort((a, b) => b.name.localeCompare(a.name));
     }
 
+    // the counter is computed from the installed integrations, not from the
+    // cards being displayed: it must stay the same in every category
+    const integrationsToUpdate = this.countIntegrationsToUpdate();
+
     this.setState({
       integrations: selectedIntegrations,
       totalSize,
       integrationCategories,
+      integrationsToUpdate,
       searchKeyword,
       orderDir
     });
+  }
+
+  // the header counter is shared by every page, so the catalog refreshes it
+  // from the list it just downloaded instead of letting it go stale
+  countIntegrationsToUpdate() {
+    const { externalInstalled } = this.state;
+    if (!externalInstalled) {
+      return 0;
+    }
+    const integrationsToUpdate = externalInstalled.filter(integration => integration.update_available).length;
+    // getIntegrations() runs on every keystroke of the search field: only a
+    // real change is worth re-rendering every component reading the counter
+    if (this.props.setExternalIntegrationsToUpdate && integrationsToUpdate !== this.state.integrationsToUpdate) {
+      this.props.setExternalIntegrationsToUpdate(integrationsToUpdate);
+    }
+    return integrationsToUpdate;
   }
 
   toggleFavorite = async integrationKey => {
@@ -396,4 +430,4 @@ class Integration extends Component {
   }
 }
 
-export default connect('user,session,httpClient', {})(withIntlAsProp(Integration));
+export default connect('user,session,httpClient', createActionsExternalIntegrationUpdates)(withIntlAsProp(Integration));

@@ -601,6 +601,7 @@
       "subtitle": "{{length}} von {{total}} Integrationen",
       "searchPlaceholder": "Integration suchen",
       "noIntegrations": "Keine Integrationen gefunden",
+      "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
       "refreshStore": {
@@ -619,6 +620,7 @@
       "menu": {
         "all": "Alle Integrationen",
         "favorites": "Favoriten",
+        "updates": "Zu aktualisieren",
         "device": "Geräte",
         "communication": "Kommunikation",
         "calendar": "Kalender",
@@ -5380,6 +5382,7 @@
     "history": "Aktivität",
     "devices": "Geräte",
     "integrations": "Integrationen",
+    "integrationsToUpdate": "Zu aktualisierende Integrationen",
     "calendar": "Kalender",
     "maps": "Karten",
     "scenes": "Szenen",

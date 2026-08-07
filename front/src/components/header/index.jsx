@@ -161,6 +161,13 @@ class Header extends Component {
                       class={props.currentUrl.startsWith('/dashboard/integration') ? 'active nav-link' : 'nav-link'}
                     >
                       <i class="fe fe-grid" /> <Text id="header.integrations" />
+                      {props.externalIntegrationsToUpdate > 0 && (
+                        <Localizer>
+                          <span class="badge badge-danger ml-2" title={<Text id="header.integrationsToUpdate" />}>
+                            {props.externalIntegrationsToUpdate}
+                          </span>
+                        </Localizer>
+                      )}
                     </Link>
                   </li>
                   <li class="nav-item">
