@@ -167,16 +167,33 @@ const SunBox = ({ sunState, chartId, loading, error }) => {
 };
 
 class Sun extends Component {
-  refreshData = async () => {
+  refreshData = async ({ resetData = false } = {}) => {
     if (!this.props.box.house) {
-      this.setState({ error: 'noHouse', loading: false });
+      this.setState({ error: 'noHouse', loading: false, sunState: undefined });
       return;
     }
+    // Only the latest request is allowed to update the state: a slow response
+    // must not overwrite the data of a house selected afterwards.
+    this.requestId += 1;
+    const { requestId } = this;
     try {
-      await this.setState({ error: false, loading: true });
+      // Keep the chart visible while refreshing: the loader would otherwise
+      // flash over the already rendered chart on every periodic refresh.
+      // On a house change, the previous data is dropped so the old chart is not shown.
+      await this.setState(prevState => ({
+        error: false,
+        sunState: resetData ? undefined : prevState.sunState,
+        loading: resetData || !prevState.sunState
+      }));
       const sunState = await this.props.httpClient.get(`/api/v1/house/${this.props.box.house}/sun`);
+      if (requestId !== this.requestId) {
+        return;
+      }
       this.setState({ sunState, error: false, loading: false });
     } catch (e) {
+      if (requestId !== this.requestId) {
+        return;
+      }
       const status = e.response && e.response.status;
       this.setState({ error: status === 400 ? 'noCoordinates' : 'error', loading: false });
     }
@@ -184,22 +201,26 @@ class Sun extends Component {
 
   componentDidMount() {
     this.refreshData();
-    this.interval = setInterval(this.refreshData, REFRESH_INTERVAL_MS);
+    // Wrapped in an arrow function so setInterval does not pass its own argument
+    this.interval = setInterval(() => this.refreshData(), REFRESH_INTERVAL_MS);
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.box.house !== this.props.box.house) {
-      this.refreshData();
+      this.refreshData({ resetData: true });
     }
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
+    // Invalidate any in-flight request so it does not setState after unmount.
+    this.requestId += 1;
   }
 
   constructor(props) {
     super(props);
     this.props = props;
+    this.requestId = 0;
     this.chartId = `sun-chart-${Math.random()
       .toString(36)
       .slice(2)}`;

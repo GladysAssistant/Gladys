@@ -184,6 +184,8 @@ module.exports = function HouseController(gladys) {
    * @apiName getSunState
    * @apiGroup House
    * @apiDescription Get sun times, current sun position and daily elevation curve for a house.
+   * Times are computed for the local day of the instance timezone. In polar day/night,
+   * dawn, sunrise, sunset and dusk are null because the sun never crosses the horizon.
    * @apiSuccessExample {json} Success-Example
    * {
    *   "dawn": "2026-07-05T04:23:12.000Z",
@@ -202,7 +204,7 @@ module.exports = function HouseController(gladys) {
     if (latitude === null || latitude === undefined || longitude === null || longitude === undefined) {
       throw new Error400(ERROR_MESSAGES.HOUSE_HAS_NO_COORDINATES);
     }
-    const sunState = gladys.house.getSunState(house);
+    const sunState = await gladys.house.getSunState(house);
     res.json(sunState);
   }
 

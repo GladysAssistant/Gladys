@@ -17,10 +17,11 @@ const { userSeen } = require('./house.userSeen');
 const { getBySelector } = require('./house.getBySelector');
 const { getSunState } = require('./house.getSunState');
 
-const House = function House(event, stateManager, session) {
+const House = function House(event, stateManager, session, variable) {
   this.event = event;
   this.stateManager = stateManager;
   this.session = session;
+  this.variable = variable;
   this.armingHouseTimeout = new Map();
   this.alarmCodeRateLimit = new RateLimiterMemory({
     points: 3, // 3 tries

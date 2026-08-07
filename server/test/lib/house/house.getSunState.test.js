@@ -1,30 +1,43 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezonePlugin = require('dayjs/plugin/timezone');
 
 const { fake } = sinon;
 
 const House = require('../../../lib/house');
 
+dayjs.extend(utc);
+dayjs.extend(timezonePlugin);
+
 const event = {
   emit: fake.returns(null),
 };
 
+const buildHouse = (timezone) => {
+  const variable = {
+    getValue: fake.resolves(timezone),
+  };
+  return new House(event, {}, {}, variable);
+};
+
 describe('house.getSunState', () => {
-  const house = new House(event);
+  const house = buildHouse('Europe/Paris');
   const parisHouse = { latitude: 48.8566, longitude: 2.3522 };
   // Midday UTC on a summer day, the sun is up in Paris
   const summerNoon = new Date('2026-07-05T12:00:00.000Z');
 
-  it('should return sun times in chronological order', () => {
-    const sunState = house.getSunState(parisHouse, summerNoon);
+  it('should return sun times in chronological order', async () => {
+    const sunState = await house.getSunState(parisHouse, summerNoon);
     expect(sunState.dawn.getTime()).to.be.below(sunState.sunrise.getTime());
     expect(sunState.sunrise.getTime()).to.be.below(sunState.solar_noon.getTime());
     expect(sunState.solar_noon.getTime()).to.be.below(sunState.sunset.getTime());
     expect(sunState.sunset.getTime()).to.be.below(sunState.dusk.getTime());
   });
 
-  it('should return current azimuth and elevation in degrees', () => {
-    const sunState = house.getSunState(parisHouse, summerNoon);
+  it('should return current azimuth and elevation in degrees', async () => {
+    const sunState = await house.getSunState(parisHouse, summerNoon);
     expect(sunState.azimuth).to.be.a('number');
     expect(sunState.azimuth).to.be.at.least(0);
     expect(sunState.azimuth).to.be.below(360);
@@ -32,8 +45,8 @@ describe('house.getSunState', () => {
     expect(sunState.elevation).to.be.above(45);
   });
 
-  it('should return a full day elevation curve', () => {
-    const sunState = house.getSunState(parisHouse, summerNoon);
+  it('should return a full day elevation curve', async () => {
+    const sunState = await house.getSunState(parisHouse, summerNoon);
     // One point every 20 minutes from 00:00 to 24:00 included
     expect(sunState.curve).to.have.lengthOf(73);
     sunState.curve.forEach((point) => {
@@ -45,5 +58,62 @@ describe('house.getSunState', () => {
     // In Paris in July, the sun goes well above the horizon during the day and below at night
     expect(maxElevation).to.be.above(45);
     expect(minElevation).to.be.below(0);
+  });
+
+  it('should default to Europe/Paris when no timezone is configured', async () => {
+    const houseWithoutTimezone = buildHouse(null);
+    const sunState = await houseWithoutTimezone.getSunState(parisHouse, summerNoon);
+    const startOfCurve = dayjs(sunState.curve[0].time).tz('Europe/Paris');
+    expect(startOfCurve.hour()).to.equal(0);
+    expect(startOfCurve.minute()).to.equal(0);
+  });
+
+  it('should build the curve on the local day of the configured timezone', async () => {
+    const tokyoHouse = { latitude: 35.6762, longitude: 139.6503 };
+    const tokyoHouseInstance = buildHouse('Asia/Tokyo');
+    // 06:00 UTC = 15:00 in Tokyo, so the local day is not the UTC day
+    const tokyoAfternoon = new Date('2026-07-05T06:00:00.000Z');
+    const sunState = await tokyoHouseInstance.getSunState(tokyoHouse, tokyoAfternoon);
+
+    // The curve must start at local midnight in Tokyo
+    const startOfCurve = dayjs(sunState.curve[0].time).tz('Asia/Tokyo');
+    expect(startOfCurve.hour()).to.equal(0);
+    expect(startOfCurve.minute()).to.equal(0);
+
+    // Sunrise and sunset must fall inside the curve window, not before it
+    const curveStart = sunState.curve[0].time.getTime();
+    const curveEnd = sunState.curve[sunState.curve.length - 1].time.getTime();
+    expect(sunState.sunrise.getTime()).to.be.above(curveStart);
+    expect(sunState.sunrise.getTime()).to.be.below(curveEnd);
+    expect(sunState.sunset.getTime()).to.be.above(sunState.sunrise.getTime());
+    expect(sunState.sunset.getTime()).to.be.below(curveEnd);
+  });
+
+  it('should return null sun times during polar day', async () => {
+    // Tromsø at the summer solstice: the sun never sets
+    const tromsoHouse = { latitude: 69.6492, longitude: 18.9553 };
+    const tromsoHouseInstance = buildHouse('Europe/Oslo');
+    const sunState = await tromsoHouseInstance.getSunState(tromsoHouse, new Date('2026-06-21T12:00:00.000Z'));
+
+    expect(sunState.sunrise).to.equal(null);
+    expect(sunState.sunset).to.equal(null);
+    expect(sunState.dawn).to.equal(null);
+    expect(sunState.dusk).to.equal(null);
+    // Solar noon always exists, and the sun stays above the horizon all day long
+    expect(sunState.solar_noon).to.be.a('date');
+    const minElevation = Math.min(...sunState.curve.map((point) => point.elevation));
+    expect(minElevation).to.be.above(0);
+  });
+
+  it('should return null sun times during polar night', async () => {
+    // Tromsø at the winter solstice: the sun never rises
+    const tromsoHouse = { latitude: 69.6492, longitude: 18.9553 };
+    const tromsoHouseInstance = buildHouse('Europe/Oslo');
+    const sunState = await tromsoHouseInstance.getSunState(tromsoHouse, new Date('2026-12-21T12:00:00.000Z'));
+
+    expect(sunState.sunrise).to.equal(null);
+    expect(sunState.sunset).to.equal(null);
+    const maxElevation = Math.max(...sunState.curve.map((point) => point.elevation));
+    expect(maxElevation).to.be.below(0);
   });
 });
