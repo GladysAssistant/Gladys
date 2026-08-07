@@ -134,3 +134,11 @@
   padding-right: 1.5rem;
   text-align: justify;
 }
+
+:global(.gladys-chart-tooltip) {
+  max-width: min(320px, 90vw);
+}
+
+:global(.gladys-chart-tooltip .apexcharts-tooltip-series-group) {
+  white-space: normal;
+}

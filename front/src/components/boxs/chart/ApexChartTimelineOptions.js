@@ -190,7 +190,6 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       }
     },
     tooltip: {
-      //theme: 'dark',
       marker: {
         show: true
       },
@@ -200,13 +199,7 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       items: {
         display: 'flex'
       },
-      fillSeriesColor: false,
-      fixed: {
-        enabled: true,
-        position: 'topLeft',
-        offsetX: 0,
-        offsetY: -70
-      }
+      fillSeriesColor: false
     }
   };
   return options;
