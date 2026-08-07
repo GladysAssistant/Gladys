@@ -603,7 +603,18 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     // a Gladys lock error is reported as jammed to HomeKit
+    // a Gladys lock error is reported as jammed to HomeKit
     expect(updateCharacteristic.args[0]).eql(['LOCKCURRENTSTATE', 2]);
+
+    // the three other states, so the whole mapping is covered
+    await homekitHandler.sendState(accessory, feature, { ...event, last_value: LOCK.STATE.UNLOCKED });
+    await homekitHandler.sendState(accessory, feature, { ...event, last_value: LOCK.STATE.LOCKED });
+    // a lock in motion has no HomeKit equivalent and is reported as unknown, not as locked
+    await homekitHandler.sendState(accessory, feature, { ...event, last_value: LOCK.STATE.ACTIVITY });
+
+    expect(updateCharacteristic.args[1]).eql(['LOCKCURRENTSTATE', 0]);
+    expect(updateCharacteristic.args[2]).eql(['LOCKCURRENTSTATE', 1]);
+    expect(updateCharacteristic.args[3]).eql(['LOCKCURRENTSTATE', 3]);
   });
 
   it('should do nothing wrong device category & type', async () => {
