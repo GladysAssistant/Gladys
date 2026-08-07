@@ -23,19 +23,27 @@ const SubContainerRow = ({ container, language }) => (
     <td>
       {(container.ports || [])
         .filter(port => port.host_port)
-        .map(port => (
-          <a
-            class="btn btn-sm btn-outline-primary mr-1"
-            href={`${window.location.protocol}//${window.location.hostname}:${port.host_port}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            disabled={container.status !== 'running'}
-          >
-            <i class="fe fe-external-link mr-1" />
-            <Text id="integration.externalIntegration.supervision.openButton" />{' '}
-            {getLocalizedText(port.label, language) || port.container_port}
-          </a>
-        ))}
+        .map(port =>
+          port.browsable === false ? (
+            <span class="badge badge-secondary mr-1">
+              {getLocalizedText(port.label, language) || port.container_port}
+              {' : '}
+              {port.host_port}
+            </span>
+          ) : (
+            <a
+              class="btn btn-sm btn-outline-primary mr-1"
+              href={`${window.location.protocol}//${window.location.hostname}:${port.host_port}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              disabled={container.status !== 'running'}
+            >
+              <i class="fe fe-external-link mr-1" />
+              <Text id="integration.externalIntegration.supervision.openButton" />{' '}
+              {getLocalizedText(port.label, language) || port.container_port}
+            </a>
+          )
+        )}
     </td>
   </tr>
 );

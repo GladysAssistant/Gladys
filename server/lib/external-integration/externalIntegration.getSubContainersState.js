@@ -62,6 +62,7 @@ async function getSubContainersState(service) {
         protocol,
         host_port: assignedPort === undefined ? null : assignedPort,
         label: port.label,
+        browsable: port.browsable !== false,
       };
     });
     const devices = (entry.devices || []).map((hardwareClass) => {
