@@ -339,6 +339,20 @@ describe('mqttHandler.handleHomeAssistantDiscoveryMessage', () => {
     expect(device.entities['switch:relay-0'].command_topic).to.equal('my-device/relay-0/updated');
   });
 
+  it('should not emit a pending discovery update after a disconnection', () => {
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/switch/relay/config',
+      JSON.stringify({ dev: { ids: ['0x1234'] }, cmd_t: 'my-device/set' }),
+    );
+    expect(mqttHandler.haDiscoveryEmitTimeout).to.not.equal(null);
+
+    mqttHandler.disconnect();
+    expect(mqttHandler.haDiscoveryEmitTimeout).to.equal(null);
+
+    clock.tick(600);
+    assert.notCalled(gladys.event.emit);
+  });
+
   describe('getDeviceIdentifier', () => {
     it('should use the first identifier of an array', () => {
       expect(getDeviceIdentifier({ device: { identifiers: ['0x1234', 'other'] } }, 'node', 'object')).to.equal(

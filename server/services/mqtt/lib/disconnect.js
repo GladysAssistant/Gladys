@@ -8,6 +8,13 @@ const logger = require('../../../utils/logger');
 function disconnect() {
   this.connected = false;
 
+  // A Home Assistant discovery burst may have a debounced websocket emit pending: firing it after
+  // the service is stopped would push a discovery list nothing is listening for anymore
+  if (this.haDiscoveryEmitTimeout) {
+    clearTimeout(this.haDiscoveryEmitTimeout);
+    this.haDiscoveryEmitTimeout = null;
+  }
+
   if (this.mqttClient) {
     logger.debug(`Disconnecting existing MQTT server...`);
     this.mqttClient.end();

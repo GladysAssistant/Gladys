@@ -202,6 +202,20 @@ describe('mqttHandler.homeAssistant.convertToGladysDevice', () => {
       });
     });
 
+    it('should convert presence and occupancy binary sensors to motion sensors', () => {
+      ['presence', 'occupancy'].forEach((deviceClass) => {
+        const features = convertEntityToFeatures('homeassistant:my-device', `binary_sensor:${deviceClass}`, {
+          state_topic: `my-device/${deviceClass}`,
+          device_class: deviceClass,
+        });
+        expect(features[0]).to.deep.include({
+          category: 'motion-sensor',
+          type: 'binary',
+          read_only: true,
+        });
+      });
+    });
+
     it('should convert a lock binary sensor to a read-only lock', () => {
       const features = convertEntityToFeatures('homeassistant:my-device', 'binary_sensor:lock', {
         state_topic: 'my-device/lock',
@@ -426,6 +440,26 @@ describe('mqttHandler.homeAssistant.convertToGladysDevice', () => {
         min: 0,
         max: 100,
       });
+    });
+
+    it('should convert a curtain cover to the curtain category', () => {
+      const features = convertEntityToFeatures('homeassistant:my-device', 'cover:curtain', {
+        command_topic: 'my-device/set',
+        position_topic: 'my-device/position',
+        set_position_topic: 'my-device/position/set',
+        device_class: 'curtain',
+      });
+      expect(features).to.have.lengthOf(2);
+      expect(features[0]).to.deep.include({ category: 'curtain', type: 'state' });
+      expect(features[1]).to.deep.include({ category: 'curtain', type: 'position' });
+    });
+
+    it('should keep the shutter category for other cover device classes', () => {
+      const features = convertEntityToFeatures('homeassistant:my-device', 'cover:garage', {
+        command_topic: 'my-device/set',
+        device_class: 'garage',
+      });
+      expect(features[0]).to.deep.include({ category: 'shutter', type: 'state' });
     });
 
     it('should convert a cover with a read-only position', () => {

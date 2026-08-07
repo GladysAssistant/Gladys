@@ -246,6 +246,11 @@ describe('mqttHandler.handleHomeAssistantStateMessage', () => {
       expect(rgbToInt('255,abc,0')).to.equal(undefined);
       expect(rgbToInt(12)).to.equal(undefined);
     });
+    it('should return undefined on channels out of the 0-255 range', () => {
+      expect(rgbToInt('-1,0,0')).to.equal(undefined);
+      expect(rgbToInt([0, 256, 0])).to.equal(undefined);
+      expect(rgbToInt({ r: 0, g: 0, b: 12.5 })).to.equal(undefined);
+    });
   });
 
   describe('toBinaryState', () => {
@@ -263,6 +268,10 @@ describe('mqttHandler.handleHomeAssistantStateMessage', () => {
       expect(toNumber(null)).to.equal(undefined);
       expect(toNumber('')).to.equal(undefined);
       expect(toNumber('abc')).to.equal(undefined);
+    });
+    it('should return undefined on non finite numbers', () => {
+      expect(toNumber('Infinity')).to.equal(undefined);
+      expect(toNumber('-Infinity')).to.equal(undefined);
     });
   });
 });

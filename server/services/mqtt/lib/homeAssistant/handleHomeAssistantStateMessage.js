@@ -28,7 +28,9 @@ function rgbToInt(color) {
     green = Number(color.g);
     blue = Number(color.b);
   }
-  if ([red, green, blue].some((part) => part === undefined || Number.isNaN(part))) {
+  // A channel outside 0-255, or a fractional one, would silently wrap or corrupt
+  // neighbouring channels through the bit shifts below
+  if ([red, green, blue].some((part) => !Number.isInteger(part) || part < 0 || part > 255)) {
     return undefined;
   }
   // eslint-disable-next-line no-bitwise
@@ -66,7 +68,8 @@ function toNumber(value) {
     return undefined;
   }
   const parsed = Number(value);
-  return Number.isNaN(parsed) ? undefined : parsed;
+  // Number('Infinity') is not NaN, but is not a state Gladys can store either
+  return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 /**

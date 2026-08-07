@@ -9,6 +9,7 @@ const {
   FEATURE_PROPERTIES,
   SENSOR_DEVICE_CLASSES,
   BINARY_SENSOR_DEVICE_CLASSES,
+  CURTAIN_COVER_DEVICE_CLASSES,
   COLOR_TEMP_BOUNDS,
   UNITS,
 } = require('./constants');
@@ -257,13 +258,19 @@ function convertLight(externalIdBase, name, config) {
  */
 function convertCover(externalIdBase, name, config) {
   const features = [];
+  // A curtain motor and a shutter are driven the same way, but Gladys has a dedicated category
+  // so the dashboard wording and icons match what the user actually has on the window
+  const isCurtain = CURTAIN_COVER_DEVICE_CLASSES.includes(config.device_class);
+  const category = isCurtain ? DEVICE_FEATURE_CATEGORIES.CURTAIN : DEVICE_FEATURE_CATEGORIES.SHUTTER;
+  const stateType = isCurtain ? DEVICE_FEATURE_TYPES.CURTAIN.STATE : DEVICE_FEATURE_TYPES.SHUTTER.STATE;
+  const positionType = isCurtain ? DEVICE_FEATURE_TYPES.CURTAIN.POSITION : DEVICE_FEATURE_TYPES.SHUTTER.POSITION;
   if (config.command_topic) {
     features.push(
       buildFeature({
         name,
         external_id: `${externalIdBase}:${FEATURE_PROPERTIES.STATE}`,
-        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-        type: DEVICE_FEATURE_TYPES.SHUTTER.STATE,
+        category,
+        type: stateType,
         read_only: false,
         has_feedback: config.state_topic !== undefined,
         min: COVER_STATE.CLOSE,
@@ -276,8 +283,8 @@ function convertCover(externalIdBase, name, config) {
       buildFeature({
         name: `${name} - position`,
         external_id: `${externalIdBase}:${FEATURE_PROPERTIES.POSITION}`,
-        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-        type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+        category,
+        type: positionType,
         read_only: config.set_position_topic === undefined,
         has_feedback: config.position_topic !== undefined,
         min: 0,

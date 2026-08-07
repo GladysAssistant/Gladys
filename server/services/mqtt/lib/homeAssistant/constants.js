@@ -226,8 +226,11 @@ const BINARY_SENSOR_DEVICE_CLASSES = {
   garage_door: { category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, inverted: true },
   opening: { category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, inverted: true },
   lock: { category: DEVICE_FEATURE_CATEGORIES.LOCK, inverted: true },
-  presence: { category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR },
-  occupancy: { category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR },
+  // "is someone there right now": the Gladys `presence-sensor` category is the LAN/Bluetooth
+  // "last seen" capability and renders as a relative timestamp, so both classes go to the motion
+  // sensor category, like zigbee2mqtt does for the same exposes
+  presence: { category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR },
+  occupancy: { category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR },
   smoke: { category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR },
   carbon_monoxide: { category: DEVICE_FEATURE_CATEGORIES.CO_SENSOR },
   moisture: { category: DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR },
@@ -236,6 +239,10 @@ const BINARY_SENSOR_DEVICE_CLASSES = {
   battery: { category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW },
   rain: { category: DEVICE_FEATURE_CATEGORIES.RAIN_SENSOR },
 };
+
+// Home Assistant cover device classes driving a curtain rather than a shutter. Every other class
+// (blind, shade, awning, garage, gate, door...) stays on the shutter category.
+const CURTAIN_COVER_DEVICE_CLASSES = ['curtain'];
 
 // Default bounds of the light color temperature, in mireds and in Kelvin.
 // See https://www.home-assistant.io/integrations/light.mqtt/
@@ -314,6 +321,7 @@ module.exports = {
   ORIGIN_ABBREVIATIONS,
   SENSOR_DEVICE_CLASSES,
   BINARY_SENSOR_DEVICE_CLASSES,
+  CURTAIN_COVER_DEVICE_CLASSES,
   COLOR_TEMP_BOUNDS,
   UNITS,
   DEFAULT_PAYLOADS,

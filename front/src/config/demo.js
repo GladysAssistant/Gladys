@@ -1768,6 +1768,7 @@ const data = {
       external_id: 'homeassistant:demo-temperature-sensor',
       selector: 'homeassistant:demo-temperature-sensor',
       model: 'Sensor 2000',
+      service_id: '2e0bc58b-11e2-4176-8ad3-9ebc8cdd2318',
       should_poll: false,
       features: [
         {
