@@ -12,24 +12,36 @@ const EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
  * integration catalog which is the only screen loading that list today.
  */
 function createActions(store) {
+  // the periodic poll and the refresh triggered right after an update can
+  // overlap: without this, the slower request wins and puts back the count it
+  // read before the update
+  let lastRequestId = 0;
+
+  const applyCount = (requestId, externalIntegrationsToUpdate) => {
+    if (requestId === lastRequestId) {
+      store.setState({ externalIntegrationsToUpdate });
+    }
+  };
+
   const actions = {
     // the integration catalog already downloaded the list: it feeds the
     // counter from what it has instead of asking the server a second time
     setExternalIntegrationsToUpdate(state, externalIntegrationsToUpdate) {
+      lastRequestId += 1;
       store.setState({ externalIntegrationsToUpdate });
     },
     async refreshExternalIntegrationsToUpdate(state, user = state.user) {
+      lastRequestId += 1;
+      const requestId = lastRequestId;
       // update detection is an admin matter: the server does not even send
       // the update_available flag to the other users
       if (!user || user.role !== USER_ROLE.ADMIN) {
-        store.setState({ externalIntegrationsToUpdate: 0 });
+        applyCount(requestId, 0);
         return;
       }
       try {
         const integrations = await state.httpClient.get('/api/v1/external_integration');
-        store.setState({
-          externalIntegrationsToUpdate: integrations.filter(integration => integration.update_available).length
-        });
+        applyCount(requestId, integrations.filter(integration => integration.update_available).length);
       } catch (e) {
         console.error(e);
       }

@@ -1746,6 +1746,11 @@ const data = {
   },
   'post /api/v1/service/broadlink/learn': {},
   'post /api/v1/service/broadlink/learn/cancel': {},
+  // no community integration installed in the demo: the "integrations to
+  // update" counter is loaded on every page, so a missing fixture would log
+  // an error on each visit
+  'get /api/v1/external_integration': [],
+  'get /api/v1/external_integration/store': { integrations: [] },
   'get /api/v1/service/mqtt': {},
   'get /api/v1/service/mqtt/status': {
     configured: true,

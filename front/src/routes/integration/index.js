@@ -160,6 +160,17 @@ class Integration extends Component {
     if (prevUserId !== currentUserId) {
       this.loadExternalIntegrations();
     }
+    // the periodic poll only refreshes the global counter: on a catalog left
+    // open, the menu entry and the "to update" list would keep showing the
+    // state of the last load while the header already says otherwise
+    const sharedCount = this.props.externalIntegrationsToUpdate;
+    if (
+      prevProps.externalIntegrationsToUpdate !== sharedCount &&
+      sharedCount !== this.state.integrationsToUpdate &&
+      prevUserId === currentUserId
+    ) {
+      this.loadExternalIntegrations();
+    }
   }
 
   buildExternalIntegrationCards() {
@@ -430,4 +441,7 @@ class Integration extends Component {
   }
 }
 
-export default connect('user,session,httpClient', createActionsExternalIntegrationUpdates)(withIntlAsProp(Integration));
+export default connect(
+  'user,session,httpClient,externalIntegrationsToUpdate',
+  createActionsExternalIntegrationUpdates
+)(withIntlAsProp(Integration));
