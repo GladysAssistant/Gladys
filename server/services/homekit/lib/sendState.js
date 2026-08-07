@@ -9,6 +9,7 @@ const {
   aqiToAirQuality,
   clampToCharacteristic,
   toMicrogramPerCubicMeter,
+  buttonEventMapping,
 } = require('./deviceMappings');
 
 /**
@@ -35,6 +36,20 @@ function sendState(hkAccessory, feature, event) {
           Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
           event.last_value,
         );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.BUTTON}:${DEVICE_FEATURE_TYPES.BUTTON.CLICK}`:
+    case `${DEVICE_FEATURE_CATEGORIES.BUTTON}:${DEVICE_FEATURE_TYPES.BUTTON.PUSH}`: {
+      const buttonEvent = buttonEventMapping[event.last_value];
+      // A press HomeKit has no equivalent for is dropped rather than reported as another one.
+      if (buttonEvent !== undefined) {
+        hkAccessory
+          .getService(Service[mappings[feature.category].service])
+          .updateCharacteristic(
+            Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+            buttonEvent,
+          );
+      }
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {

@@ -3,6 +3,7 @@ const {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   COVER_STATE,
+  BUTTON_STATUS,
 } = require('../../../utils/constants');
 
 const mappings = {
@@ -115,6 +116,21 @@ const mappings = {
       },
       [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: {
         characteristics: ['PM10Density'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.BUTTON]: {
+    service: 'StatelessProgrammableSwitch',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.BUTTON.CLICK]: {
+        characteristics: ['ProgrammableSwitchEvent'],
+        // A button press is an event, not a state: the default debounce would make HomeKit react
+        // seconds after the press, or swallow it entirely.
+        notifDelay: 0,
+      },
+      [DEVICE_FEATURE_TYPES.BUTTON.PUSH]: {
+        characteristics: ['ProgrammableSwitchEvent'],
+        notifDelay: 0,
       },
     },
   },
@@ -277,6 +293,15 @@ const mergedServiceCategories = [
     merged: [],
   },
 ];
+// HomeKit knows three button events, Gladys has more than a hundred button statuses. Only the
+// three that have an exact HomeKit equivalent are forwarded: anything else — arrow keys, rotation,
+// shake, brightness gestures — would have to be reported as one of these three, and firing the
+// wrong event in someone's home automation is worse than firing none.
+const buttonEventMapping = {
+  [BUTTON_STATUS.CLICK]: 0, // SINGLE_PRESS
+  [BUTTON_STATUS.DOUBLE_CLICK]: 1, // DOUBLE_PRESS
+  [BUTTON_STATUS.LONG_CLICK]: 2, // LONG_PRESS
+};
 
 module.exports = {
   mappings,
@@ -286,4 +311,5 @@ module.exports = {
   clampToCharacteristic,
   toMicrogramPerCubicMeter,
   mergedServiceCategories,
+  buttonEventMapping,
 };

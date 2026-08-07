@@ -6,6 +6,7 @@ const {
   DEVICE_FEATURE_TYPES,
   EVENTS,
   DEVICE_FEATURE_UNITS,
+  BUTTON_STATUS,
 } = require('../../../../utils/constants');
 
 describe('Send state to HomeKit', () => {
@@ -34,6 +35,7 @@ describe('Send state to HomeKit', () => {
         CarbonDioxideLevel: 'CARBONDIOXIDELEVEL',
         CarbonDioxideDetected: 'CARBONDIOXIDEDETECTED',
         AirQuality: 'AIRQUALITY',
+        ProgrammableSwitchEvent: 'PROGRAMMABLESWITCHEVENT',
         PM2_5Density: 'PM25DENSITY',
         PM10Density: 'PM10DENSITY',
       },
@@ -45,6 +47,7 @@ describe('Send state to HomeKit', () => {
         CarbonMonoxideSensor: 'CARBONMONOXIDESENSOR',
         CarbonDioxideSensor: 'CARBONDIOXIDESENSOR',
         AirQualitySensor: 'AIRQUALITYSENSOR',
+        StatelessProgrammableSwitch: 'STATELESSPROGRAMMABLESWITCH',
       },
     },
     notifyTimeouts: {},
@@ -618,6 +621,42 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['PM25DENSITY', 42]);
     expect(updateCharacteristic.args[1]).eql(['PM25DENSITY', 50]);
     expect(updateCharacteristic.args[2]).eql(['PM10DENSITY', 8]);
+  });
+
+  it('should notify the three button events HomeKit knows, and drop the others', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Button',
+      category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+      type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+    };
+    const press = (status, overrides = {}) =>
+      homekitHandler.sendState(
+        accessory,
+        { ...feature, ...overrides },
+        { type: EVENTS.DEVICE.NEW_STATE, last_value: status },
+      );
+
+    await press(BUTTON_STATUS.CLICK);
+    await press(BUTTON_STATUS.DOUBLE_CLICK);
+    await press(BUTTON_STATUS.LONG_CLICK, { type: DEVICE_FEATURE_TYPES.BUTTON.PUSH });
+
+    expect(updateCharacteristic.args[0]).eql(['PROGRAMMABLESWITCHEVENT', 0]);
+    expect(updateCharacteristic.args[1]).eql(['PROGRAMMABLESWITCHEVENT', 1]);
+    expect(updateCharacteristic.args[2]).eql(['PROGRAMMABLESWITCHEVENT', 2]);
+
+    // a gesture with no HomeKit equivalent must not fire one of the three above
+    await press(BUTTON_STATUS.SHAKE);
+    await press(BUTTON_STATUS.ROTATE_LEFT);
+
+    expect(updateCharacteristic.callCount).to.equal(3);
   });
 
   it('should do nothing wrong device category & type', async () => {

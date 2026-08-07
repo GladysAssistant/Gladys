@@ -73,6 +73,17 @@ function buildService(device, features, categoryMapping, subtype) {
         }
         break;
       }
+      case `${DEVICE_FEATURE_CATEGORIES.BUTTON}:${DEVICE_FEATURE_TYPES.BUTTON.CLICK}`:
+      case `${DEVICE_FEATURE_CATEGORIES.BUTTON}:${DEVICE_FEATURE_TYPES.BUTTON.PUSH}`: {
+        // A stateless switch has no state to read: HomeKit expects null and only listens to the
+        // events pushed when the button is actually pressed.
+        service
+          .getCharacteristic(Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]])
+          .on(CharacteristicEventTypes.GET, async (callback) => {
+            callback(undefined, null);
+          });
+        break;
+      }
       case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
         const contactCharacteristic = service.getCharacteristic(Characteristic.ContactSensorState);
 
