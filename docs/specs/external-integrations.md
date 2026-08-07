@@ -614,7 +614,7 @@ Two more reserved keys cover the **degraded state** — the "it works, but not a
   "containers": [
     { "name": "mqtt", "status": "running", "desired": "running", "started_at": "2026-07-13T08:00:00.000Z", "ports": [] },
     { "name": "frigate", "status": "stopped", "desired": "stopped", "started_at": null,
-      "ports": [{ "container_port": 5000, "host_port": 42115 }],
+      "ports": [{ "container_port": 5000, "protocol": "tcp", "host_port": 42115, "label": { "en": "Frigate UI" }, "browsable": true }],
       "devices": [{ "class": "coral-usb", "granted": true, "available": true }] }
   ]
 }
@@ -670,7 +670,7 @@ Routes `/api/v1/external_integration`, standard Gladys user auth; **admin** requ
 | Method & route | Body → Response |
 |---|---|
 | `GET /api/v1/external_integration` | → `[ { "id", "name", "selector", "status", "version", "docker_image", "store_slug", "manifest", "update_available" } ]`; **non-admin**: only the installed `type: "communication"` integrations, in their reduced view |
-| `GET .../:selector` | → detail (same fields, + the main container's `"started_at"`, + `"connection_status": { "connected", "message" }` (C.3), + `"containers": [ { "name", "status", "started_at", "ports": [{ "container_port", "host_port", "label", "browsable" }] } ]` for multi-container ones — the frontend derives the "Open" links from it (`browsable: false` → host port displayed without link)); **non-admin**: the reduced view on a communication integration, `404` on any other (indistinguishable from an unknown selector) |
+| `GET .../:selector` | → detail (same fields, + the main container's `"started_at"`, + `"connection_status": { "connected", "message" }` (C.3), + `"containers": [ { "name", "status", "desired", "started_at", "ports": [{ "container_port", "protocol", "host_port", "label", "browsable" }], "devices": [{ "class", "granted", "available" }] } ]` for multi-container ones — the same state as `GET /container` (C.3), from which the frontend derives the "Open" links (`browsable: false` → host port displayed without link)); **non-admin**: the reduced view on a communication integration, `404` on any other (indistinguishable from an unknown selector) |
 | `GET /api/v1/external_integration/store` *(admin)* | → `{ "refreshed_at", "integrations": [ { "store_slug", "manifest": <manifest>, "github": { "stars", "pushed_at" }, "installed": false, "update_available": false, "compatible": true } ] }` (filtered by `gladys_version`) |
 | `POST .../store/refresh` *(admin)* | `{}` → index re-downloaded, same response as `GET .../store` |
 | `GET /api/v1/external_integration/hardware` *(admin)* | → `{ "classes": [ { "class": "coral-usb", "detected": true }, { "class": "gpu", "detected": false }, ... ] }` — detection on the host (`system.detectHardwareClasses()`, see B.2); feeds the install screen's toggles |
