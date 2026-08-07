@@ -168,6 +168,21 @@ function sendState(hkAccessory, feature, event) {
     }
     case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.PERCENT}`:
     case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.SPEED}`: {
+      // buildService reads RotationSpeed from the percentage when the fan exposes one, since it
+      // already uses the HomeKit scale. A fan reporting both would otherwise emit two events per
+      // change and the raw speed, rescaled, would overwrite the percentage HomeKit is showing.
+      if (feature.type === DEVICE_FEATURE_TYPES.FAN.SPEED) {
+        const device = this.gladys.stateManager.get('deviceById', feature.device_id);
+        const hasPercentFeature = ((device && device.features) || []).some(
+          (deviceFeature) =>
+            deviceFeature.category === DEVICE_FEATURE_CATEGORIES.FAN &&
+            deviceFeature.type === DEVICE_FEATURE_TYPES.FAN.PERCENT,
+        );
+        if (hasPercentFeature) {
+          break;
+        }
+      }
+
       const service = hkAccessory.getService(Service[mappings[feature.category].service]);
       const [rotationSpeedName] = mappings[feature.category].capabilities[feature.type].characteristics;
       const rotationSpeedCharacteristic = service.getCharacteristic(Characteristic[rotationSpeedName]);

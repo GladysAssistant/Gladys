@@ -648,6 +648,13 @@ describe('Send state to HomeKit', () => {
       category: DEVICE_FEATURE_CATEGORIES.FAN,
     };
 
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        features: [{ ...baseFeature, type: DEVICE_FEATURE_TYPES.FAN.SPEED }],
+      }),
+    };
+
     await homekitHandler.sendState(
       accessory,
       { ...baseFeature, type: DEVICE_FEATURE_TYPES.FAN.MODE },
@@ -703,6 +710,52 @@ describe('Send state to HomeKit', () => {
     );
 
     expect(updateCharacteristic.args[7]).eql(['ROTATIONSPEED', 30]);
+  });
+
+  it('should ignore the raw speed of a fan that also reports a percentage', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({ props: { minValue: 0, maxValue: 100 } });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const baseFeature = {
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Fan',
+      category: DEVICE_FEATURE_CATEGORIES.FAN,
+    };
+    const percentFeature = {
+      ...baseFeature,
+      id: 'e9ba4c39-4e8c-4dd1-9a4f-1a5c3b3f9b4d',
+      type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
+      min: 0,
+      max: 100,
+    };
+    const speedFeature = {
+      ...baseFeature,
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      type: DEVICE_FEATURE_TYPES.FAN.SPEED,
+      min: 0,
+      max: 10,
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        features: [percentFeature, speedFeature],
+      }),
+    };
+
+    await homekitHandler.sendState(accessory, speedFeature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 5 });
+
+    // buildService reads RotationSpeed from the percentage, so rescaling the raw speed here would
+    // overwrite it with a value HomeKit is not showing
+    expect(updateCharacteristic.callCount).to.equal(0);
+
+    await homekitHandler.sendState(accessory, percentFeature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 30 });
+
+    expect(updateCharacteristic.args).eql([['ROTATIONSPEED', 30]]);
   });
 
   it('should do nothing wrong device category & type', async () => {
