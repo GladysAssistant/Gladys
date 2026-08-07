@@ -1975,7 +1975,8 @@
           "button": "Trigger actions on button press.",
           "text": "Display or send text values.",
           "battery": "Monitor battery level of your devices.",
-          "currency": "Display currency or cryptocurrency values."
+          "currency": "Display currency or cryptocurrency values.",
+          "water-heater": "Control a water heater: state, operating mode, hot water setpoint and boost."
         },
         "descriptions": {
           "light": {
@@ -2022,6 +2023,14 @@
           },
           "currency": {
             "decimal": "Displays a monetary value with its currency unit."
+          },
+          "water-heater": {
+            "binary": "Turn the appliance on or off.",
+            "mode": "Select the operating mode.",
+            "target-temperature": "Set the hot water setpoint with +/- buttons.",
+            "remaining-hot-water": "Read the share of hot water still available.",
+            "heating": "Read whether the appliance is currently heating water.",
+            "boost": "Start or cancel a forced heating cycle."
           }
         },
         "keywords": {
@@ -4359,6 +4368,37 @@
           "vacuum": "Vacuum",
           "mop": "Mop"
         }
+      },
+      "water-heater": {
+        "mode": {
+          "off": "Off",
+          "auto": "Auto",
+          "eco": "Eco",
+          "boost": "Boost",
+          "manual": "Manual",
+          "away": "Away",
+          "program": "Schedule"
+        },
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Off",
+            "1": "On"
+          },
+          "state": {
+            "0": "Turn off",
+            "1": "Turn on"
+          }
+        },
+        "boost": {
+          "stateLiveFinished": {
+            "0": "Boost off",
+            "1": "Boost on"
+          },
+          "state": {
+            "0": "Cancel boost",
+            "1": "Start boost"
+          }
+        }
       }
     }
   },
@@ -4772,6 +4812,25 @@
           "5": "Charging",
           "6": "Docked"
         }
+      },
+      "water-heater": {
+        "mode": {
+          "0": "Off",
+          "1": "Auto",
+          "2": "Eco",
+          "3": "Boost",
+          "4": "Manual",
+          "5": "Away",
+          "6": "Schedule"
+        },
+        "boost": {
+          "0": "Boost off",
+          "1": "Boost on"
+        },
+        "heating": {
+          "0": "Idle",
+          "1": "Heating"
+        }
       }
     }
   },
@@ -4839,6 +4898,15 @@
       "liquid-state": "Liquid level state",
       "liquid-level-percent": "Liquid level percent",
       "liquid-depth": "Liquid depth"
+    },
+    "water-heater": {
+      "shortCategoryName": "Water heater",
+      "binary": "State",
+      "mode": "Mode",
+      "target-temperature": "Hot water setpoint",
+      "remaining-hot-water": "Available hot water",
+      "heating": "Heating",
+      "boost": "Boost"
     },
     "water-valve": {
       "shortCategoryName": "Water valve",

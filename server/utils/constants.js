@@ -259,6 +259,22 @@ const WATER_VALVE_CURRENT_DEVICE_STATUS = {
   WATER_SHORTAGE_AND_WATER_LEAKAGE: 3,
 };
 
+// Operating modes of a domestic hot water appliance. This is the full generic set:
+// an appliance supporting only some of them declares its subset through the
+// supported_options of its `mode` feature, never by narrowing this enum.
+// Values are append-only: an existing integer never changes meaning, because it is
+// stored in device states and hard-coded in users' scenes.
+const WATER_HEATER_MODE = {
+  OFF: 0, // appliance stopped (frost protection may remain active)
+  AUTO: 1, // the appliance decides, learning the household's consumption
+  ECO: 2, // energy-saving mode: heat-pump-only on a heat-pump appliance,
+  // consumption learning on a plain electric tank
+  BOOST: 3, // the fastest heating the appliance is capable of
+  MANUAL: 4, // fixed setpoint, no learning
+  AWAY: 5, // holiday / away, minimum temperature kept
+  PROGRAM: 6, // follows the schedule stored in the appliance
+};
+
 const LEVEL_MATTER_STATE = {
   LOW: 1,
   MEDIUM: 2,
@@ -811,6 +827,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VACUUM_CLEANER: 'vacuum-cleaner',
   TEXT: 'text',
   INPUT: 'input',
+  WATER_HEATER: 'water-heater',
   WATER_VALVE: 'water-valve',
 };
 
@@ -1127,6 +1144,24 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_STATE: 'liquid-state',
     LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
     LIQUID_DEPTH: 'liquid-depth',
+  },
+  // Domestic hot water appliances: electric storage tanks, heat-pump water heaters,
+  // gas-fired water heaters. Scope is limited to producing and storing hot water.
+  // Boundary with neighboring categories: the water temperature measured in the tank
+  // is a temperature-sensor/decimal feature, electrical consumption is energy-sensor,
+  // and room heating stays in heater/thermostat — a water heater device carries those
+  // features alongside its water-heater ones.
+  // Value conventions: all commands are non-negative integers; `mode` is an index into
+  // WATER_HEATER_MODE, `binary`/`heating`/`boost` are 0/1. Boosting exists both as a
+  // mode value and as the `boost` command: an integration maps whichever form its
+  // appliance natively reports, never both for the same function.
+  WATER_HEATER: {
+    BINARY: 'binary', // appliance on/off (command)
+    MODE: 'mode', // operating mode, WATER_HEATER_MODE (command)
+    TARGET_TEMPERATURE: 'target-temperature', // hot water setpoint (command)
+    REMAINING_HOT_WATER: 'remaining-hot-water', // hot water available, % or litres V40 (sensor)
+    HEATING: 'heating', // actively heating water or not (sensor)
+    BOOST: 'boost', // forced heating on/off (command)
   },
   WATER_VALVE: {
     // Types used by the SONOFF SWV in Zigbee2mqtt
@@ -1482,6 +1517,12 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.MILLILITER,
     DEVICE_FEATURE_UNITS.CUBIC_METER,
   ],
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: [
+    DEVICE_FEATURE_UNITS.CELSIUS,
+    DEVICE_FEATURE_UNITS.FAHRENHEIT,
+    DEVICE_FEATURE_UNITS.PERCENT,
+    DEVICE_FEATURE_UNITS.LITER,
+  ],
   [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: [
     DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
     DEVICE_FEATURE_UNITS.SECONDS,
@@ -1571,6 +1612,17 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
 // when the category-level list mixes units of different dimensions.
 // An empty array means the feature type has no unit at all.
 const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: [],
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: [],
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE]: [
+      DEVICE_FEATURE_UNITS.CELSIUS,
+      DEVICE_FEATURE_UNITS.FAHRENHEIT,
+    ],
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER]: [DEVICE_FEATURE_UNITS.PERCENT, DEVICE_FEATURE_UNITS.LITER],
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING]: [],
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST]: [],
+  },
   [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: {
     [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: [],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: [DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR],
@@ -1978,6 +2030,7 @@ module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
 module.exports.CHARGING_STATION_CONNECTOR_STATUS = CHARGING_STATION_CONNECTOR_STATUS;
 module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
+module.exports.WATER_HEATER_MODE = WATER_HEATER_MODE;
 module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;

@@ -65,7 +65,10 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE]: VacuumCleanerStateDeviceValue,
   [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: ThermostatOperatingStateDeviceValue,
   [DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS]: ChargingStationConnectorStatusDeviceValue,
-  [DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE]: ChargingStationChargingStateDeviceValue
+  [DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE]: ChargingStationChargingStateDeviceValue,
+  // Registered by type, not by category: the category map is checked first and would force one
+  // renderer on every water-heater sensor. remaining-hot-water keeps the numeric-badge default.
+  [DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING]: BinaryDeviceValue
 };
 
 const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
