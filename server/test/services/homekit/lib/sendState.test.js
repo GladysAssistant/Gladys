@@ -34,6 +34,8 @@ describe('Send state to HomeKit', () => {
         CarbonDioxideLevel: 'CARBONDIOXIDELEVEL',
         CarbonDioxideDetected: 'CARBONDIOXIDEDETECTED',
         AirQuality: 'AIRQUALITY',
+        PM2_5Density: 'PM25DENSITY',
+        PM10Density: 'PM10DENSITY',
       },
       Service: {
         ContactSensor: 'CONTACTSENSOR',
@@ -544,6 +546,53 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     expect(updateCharacteristic.args[0]).eql(['AIRQUALITY', 4]);
+  });
+
+  it('should notify particulate densities', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({
+      props: {
+        minValue: 0,
+        maxValue: 1000,
+      },
+    });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'PM2.5 sensor',
+      category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+    };
+    const event = { type: EVENTS.DEVICE.NEW_STATE, last_value: 42 };
+
+    await homekitHandler.sendState(accessory, feature, event);
+    // 0.05 mg/m³ is 50 µg/m³
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, unit: DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER },
+      { ...event, last_value: 0.05 },
+    );
+    // 8000 ng/m³ is 8 µg/m³, on the PM10 category this time
+    await homekitHandler.sendState(
+      accessory,
+      {
+        ...feature,
+        category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
+      },
+      { ...event, last_value: 8000 },
+    );
+
+    expect(updateCharacteristic.args[0]).eql(['PM25DENSITY', 42]);
+    expect(updateCharacteristic.args[1]).eql(['PM25DENSITY', 50]);
+    expect(updateCharacteristic.args[2]).eql(['PM10DENSITY', 8]);
   });
 
   it('should do nothing wrong device category & type', async () => {
