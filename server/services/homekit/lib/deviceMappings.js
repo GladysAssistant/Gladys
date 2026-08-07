@@ -293,14 +293,24 @@ const mergedServiceCategories = [
     merged: [],
   },
 ];
-// HomeKit knows three button events, Gladys has more than a hundred button statuses. Only the
-// three that have an exact HomeKit equivalent are forwarded: anything else — arrow keys, rotation,
-// shake, brightness gestures — would have to be reported as one of these three, and firing the
-// wrong event in someone's home automation is worse than firing none.
+// HomeKit knows three button events, Gladys has more than a hundred button statuses. Only those
+// with an exact HomeKit equivalent are forwarded: anything else — arrow keys, rotation, shake,
+// brightness gestures — would have to be reported as one of these three, and firing the wrong
+// event in someone's home automation is worse than firing none.
+//
+// Integrations name the same three gestures differently. Zigbee2MQTT and Z-Wave use the CLICK
+// family; Matter and the Zigbee2MQTT devices following its Switch cluster report a press and its
+// release separately. INITIAL_PRESS is deliberately absent: Matter emits it at the start of every
+// press, long ones included, so mapping it to SINGLE_PRESS would fire a single press each time
+// someone holds the button down. The release carries the gesture, so that is what is mapped.
 const buttonEventMapping = {
   [BUTTON_STATUS.CLICK]: 0, // SINGLE_PRESS
+  [BUTTON_STATUS.SHORT_RELEASE]: 0, // SINGLE_PRESS — Matter and Zigbee2MQTT short_release
   [BUTTON_STATUS.DOUBLE_CLICK]: 1, // DOUBLE_PRESS
+  [BUTTON_STATUS.DOUBLE_PRESS]: 1, // DOUBLE_PRESS — Zigbee2MQTT double_press
   [BUTTON_STATUS.LONG_CLICK]: 2, // LONG_PRESS
+  [BUTTON_STATUS.LONG_PRESS]: 2, // LONG_PRESS — Matter and Zigbee2MQTT long_press
+  [BUTTON_STATUS.HOLD_CLICK]: 2, // LONG_PRESS — Zigbee2MQTT hold, Z-Wave hold
 };
 
 module.exports = {

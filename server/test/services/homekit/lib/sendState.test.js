@@ -667,6 +667,74 @@ describe('Send state to HomeKit', () => {
     expect(sendEventNotification.callCount).to.equal(5);
   });
 
+  it('should notify the press names used by Matter and Zigbee2MQTT', async () => {
+    const sendEventNotification = stub();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ getCharacteristic: stub().returns({ sendEventNotification }) }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Button',
+      category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+      type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+    };
+    const press = (status) =>
+      homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: status });
+
+    await press(BUTTON_STATUS.SHORT_RELEASE);
+    await press(BUTTON_STATUS.DOUBLE_PRESS);
+    await press(BUTTON_STATUS.LONG_PRESS);
+    await press(BUTTON_STATUS.HOLD_CLICK);
+
+    expect(sendEventNotification.args.map(([value]) => value)).eql([0, 1, 2, 2]);
+
+    // Matter opens every press with INITIAL_PRESS, long ones included: forwarding it would fire a
+    // single press each time the button is held down
+    await press(BUTTON_STATUS.INITIAL_PRESS);
+    await press(BUTTON_STATUS.LONG_RELEASE);
+
+    expect(sendEventNotification.callCount).to.equal(4);
+  });
+
+  it('should notify the button that was actually pressed on a multi-button remote', async () => {
+    const firstButton = stub();
+    const secondButton = stub();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      services: [
+        {
+          subtype: 'button 1',
+          displayName: 'Left',
+          getCharacteristic: stub().returns({ sendEventNotification: firstButton }),
+        },
+        {
+          subtype: 'button 2',
+          displayName: 'Right',
+          getCharacteristic: stub().returns({ sendEventNotification: secondButton }),
+        },
+      ],
+      getService: stub().returns({ getCharacteristic: stub().returns({ sendEventNotification: firstButton }) }),
+    };
+
+    await homekitHandler.sendState(
+      accessory,
+      {
+        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        name: 'Right',
+        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+        type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+      },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: BUTTON_STATUS.CLICK },
+    );
+
+    expect(secondButton.args).eql([[0]]);
+    expect(firstButton.callCount).to.equal(0);
+  });
+
   it('should do nothing wrong device category & type', async () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
