@@ -18,6 +18,8 @@ const DEVICE_FEATURE_CATEGORIES_TO_DISPLAY = [
   DEVICE_FEATURE_CATEGORIES.TELEINFORMATION
 ];
 
+const ENERCOOP_CONTRACT_TYPES = ['enercoop-nuit-weekend', 'enercoop-2-saisons'];
+
 const DEVICE_FEATURE_TYPES_TO_DISPLAY = [
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
   DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST,
@@ -55,6 +57,10 @@ class EnergyMonitoringPage extends Component {
     settingsError: null,
     consumptionSettingsSuccess: null,
     consumptionSettingsError: null,
+    schoolVacationZone: '',
+    savingSchoolVacationZone: false,
+    schoolVacationZoneSuccess: null,
+    schoolVacationZoneError: null,
     // UI state for collapsible price items
     expandedPriceIds: new Set(),
     // UI state for collapsible contract groups (collapsed by default)
@@ -75,6 +81,7 @@ class EnergyMonitoringPage extends Component {
       end_date: '',
       electric_meter_device_id: '',
       day_type: 'any',
+      rate_type: 'peak',
       price: '',
       hour_slots: '',
       subscribed_power: ''
@@ -173,6 +180,9 @@ class EnergyMonitoringPage extends Component {
     if (this.isPricesRoute()) {
       this.loadPrices();
     }
+    if (this.isSettingsRoute()) {
+      this.loadSchoolVacationZone();
+    }
   }
 
   componentDidUpdate() {
@@ -182,6 +192,12 @@ class EnergyMonitoringPage extends Component {
       this.loadPrices();
     }
     this.wasPricesRouteLastUpdate = wasPricesRoute;
+
+    const isSettingsRoute = this.isSettingsRoute();
+    if (isSettingsRoute && !this.wasSettingsRouteLastUpdate) {
+      this.loadSchoolVacationZone();
+    }
+    this.wasSettingsRouteLastUpdate = isSettingsRoute;
   }
 
   // ----- ROUTE HELPERS -----
@@ -204,6 +220,31 @@ class EnergyMonitoringPage extends Component {
     const path = (typeof window !== 'undefined' && window.location && window.location.pathname) || '';
     return path.startsWith('/dashboard/integration/device/energy-monitoring') && path.includes('/settings');
   }
+
+  isEnercoopContract = contract => ENERCOOP_CONTRACT_TYPES.includes(contract);
+
+  loadSchoolVacationZone = async () => {
+    try {
+      const result = await this.props.httpClient.get('/api/v1/variable/ENERGY_SCHOOL_VACATION_ZONE');
+      this.setState({ schoolVacationZone: result.value || '' });
+    } catch (e) {
+      this.setState({ schoolVacationZone: '' });
+    }
+  };
+
+  saveSchoolVacationZone = async () => {
+    try {
+      this.setState({ savingSchoolVacationZone: true, schoolVacationZoneError: null, schoolVacationZoneSuccess: null });
+      await this.props.httpClient.post('/api/v1/variable/ENERGY_SCHOOL_VACATION_ZONE', {
+        value: this.state.schoolVacationZone || ''
+      });
+      this.setState({ schoolVacationZoneSuccess: 'ok' });
+    } catch (e) {
+      this.setState({ schoolVacationZoneError: e });
+    } finally {
+      this.setState({ savingSchoolVacationZone: false });
+    }
+  };
 
   isImportPricesRoute() {
     const path = (typeof window !== 'undefined' && window.location && window.location.pathname) || '';
@@ -257,6 +298,7 @@ class EnergyMonitoringPage extends Component {
           end_date: p.end_date || '',
           electric_meter_device_id: p.electric_meter_device_id || '',
           day_type: p.day_type || 'any',
+          rate_type: p.rate_type || 'peak',
           price: p.price != null && p.price !== '' ? p.price / 10000 : '',
           hour_slots: p.hour_slots || '',
           subscribed_power: p.subscribed_power || ''
@@ -322,6 +364,14 @@ class EnergyMonitoringPage extends Component {
       // Convert empty end_date to null
       if (payload.end_date === '' || payload.end_date === 'Invalid date') {
         payload.end_date = null;
+      }
+      if (payload.day_type === 'any') {
+        payload.day_type = null;
+      }
+      if (!this.isEnercoopContract(payload.contract)) {
+        delete payload.rate_type;
+      } else {
+        payload.hour_slots = null;
       }
       // Scale price to integer with 4 decimals (x10000) before saving
       if (payload.price !== undefined && payload.price !== null && payload.price !== '') {
@@ -720,6 +770,8 @@ class EnergyMonitoringPage extends Component {
     // Peak hours are typically during the day (e.g., 08:00-12:00, 18:00-22:00)
     // Off-peak hours typically include night hours (00:00-06:00)
     const isPeakPrice = p => {
+      if (p.rate_type === 'peak') return true;
+      if (p.rate_type === 'off_peak') return false;
       if (!p.hour_slots || String(p.hour_slots).trim().length === 0) {
         // No hour slots = base contract, not peak/off-peak
         return null;
@@ -1038,6 +1090,12 @@ class EnergyMonitoringPage extends Component {
                         <option value="edf-tempo">
                           <Text id="integration.energyMonitoring.contractTypes.edf-tempo" />
                         </option>
+                        <option value="enercoop-nuit-weekend">
+                          <Text id="integration.energyMonitoring.contractTypes.enercoop-nuit-weekend" />
+                        </option>
+                        <option value="enercoop-2-saisons">
+                          <Text id="integration.energyMonitoring.contractTypes.enercoop-2-saisons" />
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -1082,6 +1140,11 @@ class EnergyMonitoringPage extends Component {
                     </div>
                   </div>
                 </div>
+                {this.isEnercoopContract(state.newPrice.contract) && (
+                  <div class="alert alert-info mt-3">
+                    <Text id="integration.energyMonitoring.enercoopContractHelp" />
+                  </div>
+                )}
               </div>
             )}
             {state.wizardStep === 1 && (
@@ -1131,6 +1194,7 @@ class EnergyMonitoringPage extends Component {
                         class="form-control"
                         value={state.newPrice.day_type}
                         onChange={e => updateNewPrice({ day_type: e.target.value })}
+                        disabled={this.isEnercoopContract(state.newPrice.contract)}
                       >
                         <option value="any">
                           <Text id="integration.energyMonitoring.dayTypeOptions.any" />
@@ -1187,6 +1251,29 @@ class EnergyMonitoringPage extends Component {
                 <h5 class="mb-3">
                   <Text id="integration.energyMonitoring.priceAndTimeSlots" />
                 </h5>
+                {this.isEnercoopContract(state.newPrice.contract) && (
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label>
+                          <Text id="integration.energyMonitoring.rateType" />
+                        </label>
+                        <select
+                          class="form-control"
+                          value={state.newPrice.rate_type || 'peak'}
+                          onChange={e => updateNewPrice({ rate_type: e.target.value })}
+                        >
+                          <option value="peak">
+                            <Text id="integration.energyMonitoring.rateTypes.peak" />
+                          </option>
+                          <option value="off_peak">
+                            <Text id="integration.energyMonitoring.rateTypes.off_peak" />
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div class="row">
                   <div class="col-12 col-md-6">
                     <div class="form-group">
@@ -1202,80 +1289,84 @@ class EnergyMonitoringPage extends Component {
                     </div>
                   </div>
                 </div>
-                <div class="row">
-                  <div class="col-12">
-                    <div class="form-group">
-                      <label>
-                        <Text id="integration.energyMonitoring.hourSlots" />
-                      </label>
-                      <div class="mb-2 d-flex justify-content-between align-items-center">
-                        <div class="small text-muted">
-                          <Text id="integration.energyMonitoring.selectHoursHelp" />
-                        </div>
-                        <div>
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-outline-secondary mr-2"
-                            onClick={() =>
-                              this.setState({ wizardHourSlots: new Set(Array.from({ length: 24 }, (_, i) => i + 16)) })
-                            }
-                          >
-                            <Text id="integration.energyMonitoring.daytime820" />
-                          </button>
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-outline-secondary"
-                            onClick={() => this.setState({ wizardHourSlots: new Set() })}
-                          >
-                            <Text id="integration.energyMonitoring.clear" />
-                          </button>
-                        </div>
-                      </div>
-                      <div class="row">
-                        {Array.from({ length: 48 }, (_, slot) => (
-                          <div class="col-3 col-sm-2 mb-2" key={slot}>
+                {!this.isEnercoopContract(state.newPrice.contract) && (
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="form-group">
+                        <label>
+                          <Text id="integration.energyMonitoring.hourSlots" />
+                        </label>
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                          <div class="small text-muted">
+                            <Text id="integration.energyMonitoring.selectHoursHelp" />
+                          </div>
+                          <div>
                             <button
                               type="button"
-                              class={cx(
-                                'btn btn-sm btn-block text-center py-2 text-nowrap',
-                                state.wizardHourSlots.has(slot) ? 'btn-primary' : 'btn-outline-secondary'
-                              )}
+                              class="btn btn-sm btn-outline-secondary mr-2"
                               onClick={() =>
-                                this.setState(({ wizardHourSlots }) => {
-                                  const next = new Set(wizardHourSlots);
-                                  if (next.has(slot)) next.delete(slot);
-                                  else next.add(slot);
-                                  return { wizardHourSlots: next };
+                                this.setState({
+                                  wizardHourSlots: new Set(Array.from({ length: 24 }, (_, i) => i + 16))
                                 })
                               }
                             >
-                              {(() => {
-                                const hour = Math.floor(slot / 2);
-                                const m = slot % 2 === 1 ? '30' : '00';
-                                const hh = hour < 10 ? `0${hour}` : `${hour}`;
-                                return <span class="text-monospace font-weight-bold">{`${hh}:${m}`}</span>;
-                              })()}
+                              <Text id="integration.energyMonitoring.daytime820" />
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-secondary"
+                              onClick={() => this.setState({ wizardHourSlots: new Set() })}
+                            >
+                              <Text id="integration.energyMonitoring.clear" />
                             </button>
                           </div>
-                        ))}
-                      </div>
-                      <div class="small text-muted mt-2">
-                        <Text id="integration.energyMonitoring.selected" />{' '}
-                        {(() => {
-                          const arr = Array.from(state.wizardHourSlots).sort((a, b) => a - b);
-                          if (!arr.length) return <Text id="integration.energyMonitoring.none" />;
-                          const toLabel = slot => {
-                            const hour = Math.floor(slot / 2);
-                            const m = slot % 2 === 1 ? '30' : '00';
-                            const hh = hour < 10 ? `0${hour}` : `${hour}`;
-                            return `${hh}:${m}`;
-                          };
-                          return arr.map(toLabel).join(', ');
-                        })()}
+                        </div>
+                        <div class="row">
+                          {Array.from({ length: 48 }, (_, slot) => (
+                            <div class="col-3 col-sm-2 mb-2" key={slot}>
+                              <button
+                                type="button"
+                                class={cx(
+                                  'btn btn-sm btn-block text-center py-2 text-nowrap',
+                                  state.wizardHourSlots.has(slot) ? 'btn-primary' : 'btn-outline-secondary'
+                                )}
+                                onClick={() =>
+                                  this.setState(({ wizardHourSlots }) => {
+                                    const next = new Set(wizardHourSlots);
+                                    if (next.has(slot)) next.delete(slot);
+                                    else next.add(slot);
+                                    return { wizardHourSlots: next };
+                                  })
+                                }
+                              >
+                                {(() => {
+                                  const hour = Math.floor(slot / 2);
+                                  const m = slot % 2 === 1 ? '30' : '00';
+                                  const hh = hour < 10 ? `0${hour}` : `${hour}`;
+                                  return <span class="text-monospace font-weight-bold">{`${hh}:${m}`}</span>;
+                                })()}
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div class="small text-muted mt-2">
+                          <Text id="integration.energyMonitoring.selected" />{' '}
+                          {(() => {
+                            const arr = Array.from(state.wizardHourSlots).sort((a, b) => a - b);
+                            if (!arr.length) return <Text id="integration.energyMonitoring.none" />;
+                            const toLabel = slot => {
+                              const hour = Math.floor(slot / 2);
+                              const m = slot % 2 === 1 ? '30' : '00';
+                              const hh = hour < 10 ? `0${hour}` : `${hour}`;
+                              return `${hh}:${m}`;
+                            };
+                            return arr.map(toLabel).join(', ');
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
                 <div class="row">
                   <div class="col-12 col-md-6">
                     <div class="form-group">
@@ -1442,6 +1533,47 @@ class EnergyMonitoringPage extends Component {
                 />
               </div>
             )}
+            <div class="mb-4">
+              <p class="text-muted">
+                <Text id="integration.energyMonitoring.schoolVacationZoneDescription" />
+              </p>
+              <div class="row">
+                <div class="col-md-4">
+                  <select
+                    class="form-control"
+                    value={state.schoolVacationZone}
+                    onChange={e => this.setState({ schoolVacationZone: e.target.value })}
+                  >
+                    <option value="">
+                      <Text id="integration.energyMonitoring.schoolVacationZoneNone" />
+                    </option>
+                    <option value="Zone A">Zone A</option>
+                    <option value="Zone B">Zone B</option>
+                    <option value="Zone C">Zone C</option>
+                    <option value="Corse">Corse</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <button
+                    class="btn btn-primary"
+                    disabled={state.savingSchoolVacationZone}
+                    onClick={this.saveSchoolVacationZone}
+                  >
+                    <Text id="global.save" defaultMessage="Save" />
+                  </button>
+                </div>
+              </div>
+              {state.schoolVacationZoneError && (
+                <div class="alert alert-danger mt-2" role="alert">
+                  <Text id="integration.energyMonitoring.schoolVacationZoneError" />
+                </div>
+              )}
+              {state.schoolVacationZoneSuccess && (
+                <div class="alert alert-success mt-2" role="alert">
+                  <Text id="integration.energyMonitoring.schoolVacationZoneSuccess" />
+                </div>
+              )}
+            </div>
             <div class="mb-4">
               <p class="text-muted">
                 <Text
