@@ -11,10 +11,12 @@ const {
 const { normalize } = require('../../../utils/device');
 const { fahrenheitToCelsius } = require('../../../utils/units');
 const {
+  mappings,
   coverStateMapping,
   gasDetectedThresholds,
   aqiToAirQuality,
   clampToCharacteristic,
+  toMicrogramPerCubicMeter,
 } = require('./deviceMappings');
 
 const sleep = promisify(setTimeout);
@@ -201,6 +203,30 @@ function buildService(device, features, categoryMapping, subtype) {
             clampToCharacteristic(
               this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
               lightLevelCharacteristic.props,
+            ),
+          );
+        });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.PM25_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+      case `${DEVICE_FEATURE_CATEGORIES.PM25_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
+      case `${DEVICE_FEATURE_CATEGORIES.PM10_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+      case `${DEVICE_FEATURE_CATEGORIES.PM10_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
+        // Densities share the AirQualitySensor service with the index, so the characteristic comes
+        // from the feature category and not from the category hosting the service.
+        const densityCharacteristic = service.getCharacteristic(
+          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+        );
+
+        densityCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          callback(
+            undefined,
+            clampToCharacteristic(
+              toMicrogramPerCubicMeter(
+                this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
+                feature.unit,
+              ),
+              densityCharacteristic.props,
             ),
           );
         });

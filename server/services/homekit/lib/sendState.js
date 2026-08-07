@@ -8,6 +8,7 @@ const {
   gasDetectedThresholds,
   aqiToAirQuality,
   clampToCharacteristic,
+  toMicrogramPerCubicMeter,
 } = require('./deviceMappings');
 
 /**
@@ -104,6 +105,20 @@ function sendState(hkAccessory, feature, event) {
       service.updateCharacteristic(
         Characteristic[characteristicName],
         clampToCharacteristic(event.last_value, characteristic.props),
+      );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.PM25_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.PM25_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
+    case `${DEVICE_FEATURE_CATEGORIES.PM10_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.PM10_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
+      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const characteristicName = mappings[feature.category].capabilities[feature.type].characteristics[0];
+      const characteristic = service.getCharacteristic(Characteristic[characteristicName]);
+
+      service.updateCharacteristic(
+        Characteristic[characteristicName],
+        clampToCharacteristic(toMicrogramPerCubicMeter(event.last_value, feature.unit), characteristic.props),
       );
       break;
     }
