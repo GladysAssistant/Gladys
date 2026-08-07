@@ -47,6 +47,10 @@ jobs:
   lint-server:
     name: Server lint
     runs-on: ubuntu-22.04
+    # This job only reads the repository, so restrict the GITHUB_TOKEN
+    # accordingly (npm ci runs dependency lifecycle scripts).
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
