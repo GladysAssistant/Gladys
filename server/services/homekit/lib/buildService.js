@@ -17,6 +17,7 @@ const {
   aqiToAirQuality,
   clampToCharacteristic,
   toMicrogramPerCubicMeter,
+  LOW_BATTERY_THRESHOLD,
 } = require('./deviceMappings');
 
 const sleep = promisify(setTimeout);
@@ -230,6 +231,44 @@ function buildService(device, features, categoryMapping, subtype) {
             ),
           );
         });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.BATTERY.INTEGER}`:
+      case `${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
+      case `${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.LOCK.INTEGER}`: {
+        const [levelName, lowName] = mappings[feature.category].capabilities[feature.type].characteristics;
+
+        const levelCharacteristic = service.getCharacteristic(Characteristic[levelName]);
+        levelCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          callback(
+            undefined,
+            clampToCharacteristic(
+              this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
+              levelCharacteristic.props,
+            ),
+          );
+        });
+
+        // StatusLowBattery is required by HomeKit, so it is derived from the level — but only when
+        // the device has no dedicated low-battery feature, which is authoritative when present.
+        if (!features.some((f) => f.category === DEVICE_FEATURE_CATEGORIES.BATTERY_LOW)) {
+          service.getCharacteristic(Characteristic[lowName]).on(CharacteristicEventTypes.GET, async (callback) => {
+            const level = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+            // Number.isFinite and not a bare comparison: `null <= 20` is true in JavaScript, so a
+            // device that has not reported yet would be announced as low on battery.
+            callback(undefined, Number.isFinite(level) && level <= LOW_BATTERY_THRESHOLD ? 1 : 0);
+          });
+        }
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.BATTERY_LOW}:${DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY}`:
+      case `${DEVICE_FEATURE_CATEGORIES.BATTERY_LOW}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
+        // Gladys and HomeKit agree on the direction: 1 means the battery is low.
+        service
+          .getCharacteristic(Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]])
+          .on(CharacteristicEventTypes.GET, async (callback) => {
+            callback(undefined, this.gladys.stateManager.get('deviceFeature', feature.selector).last_value ? 1 : 0);
+          });
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
