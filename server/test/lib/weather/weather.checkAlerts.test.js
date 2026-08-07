@@ -135,6 +135,51 @@ describe('weather.checkAlerts', () => {
     expect(calls[0].args[1].type).to.equal(EVENTS.WEATHER.ALERT_ENDED);
   });
 
+  it('should drop a check landing while another one is still in flight', async () => {
+    const alert = { severity: 'severe', event: 'Orages', type: 'thunderstorm' };
+    let resolveInFlight;
+    const inFlight = new Promise((resolve) => {
+      resolveInFlight = resolve;
+    });
+    let call = 0;
+    const provider = {
+      weather: {
+        get: fake(() => {
+          call += 1;
+          return call === 1 ? Promise.resolve({ alerts: [] }) : inFlight;
+        }),
+      },
+    };
+    const service = { getService: () => provider, stateManager: { getAllKeys: () => ['ext-fake-weather'] } };
+    const event = { on: fake.returns(null), emit: fake.returns(null) };
+    const house = { get: fake.resolves([HOUSE]) };
+    const weather = new Weather(service, event, {}, house);
+
+    // poll 1: baseline
+    await weather.checkAlerts();
+
+    // poll 2 hangs on the provider; poll 3 lands while it is in flight
+    // and must be dropped immediately, without waiting for the provider
+    const second = weather.checkAlerts();
+    const third = weather.checkAlerts();
+    await third;
+    resolveInFlight({ alerts: [alert] });
+    await second;
+
+    // one provider call per accepted run, one single raised event: the
+    // overlapping check never diffed the same baseline a second time
+    expect(provider.weather.get.callCount).to.equal(2);
+    const calls = triggerCheckCalls(event);
+    expect(calls).to.have.lengthOf(1);
+    expect(calls[0].args[1].type).to.equal(EVENTS.WEATHER.ALERT_RAISED);
+
+    // the guard is released: a later check polls again (same alerts, so
+    // still no new event)
+    await weather.checkAlerts();
+    expect(provider.weather.get.callCount).to.equal(3);
+    expect(triggerCheckCalls(event)).to.have.lengthOf(1);
+  });
+
   it('should keep the previous baseline when the provider fails', async () => {
     const alert = { severity: 'severe', event: 'Orages', type: 'thunderstorm' };
     const { weather, event, provider } = buildWeather([

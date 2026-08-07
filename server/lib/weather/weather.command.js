@@ -67,18 +67,19 @@ async function command(message, classification, context) {
           context.temperature_max = weatherDay.temperature_max;
           context.units = weather.units === 'metric' ? '°C' : '°F';
 
+          // the per-day condition is optional in the pivot format (B.18):
+          // a provider that omits it still gets a min/max answer through
+          // the condition-agnostic "unknown" templates
+          const dayWeather = weatherDay.weather || 'unknown';
+
           if (diff <= 2) {
             const days1 = ['today', 'tomorrow', 'after-tomorrow'];
             const day = days1[diff];
 
-            await this.messageManager.replyByIntent(
-              message,
-              `weather.get.success.${day}.${weatherDay.weather}`,
-              context,
-            );
+            await this.messageManager.replyByIntent(message, `weather.get.success.${day}.${dayWeather}`, context);
           } else {
             context.day = capitalizeFirstLetter(dateEntity.sourceText);
-            await this.messageManager.replyByIntent(message, `weather.get.success.day.${weatherDay.weather}`, context);
+            await this.messageManager.replyByIntent(message, `weather.get.success.day.${dayWeather}`, context);
           }
         } else if (diff === 0) {
           // the pivot format allows omitting today from days (B.18): a

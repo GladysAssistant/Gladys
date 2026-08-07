@@ -274,6 +274,53 @@ describe('weather.command', () => {
       units: '°C',
     });
   });
+  it('should answer with the condition-agnostic template when the day carries no condition', async () => {
+    // the per-day condition is optional in the pivot format (B.18): the
+    // min/max answer goes through the "unknown" templates
+    const noConditionWeather = {
+      ...fakeWeather,
+      days: fakeWeather.days.map((day) => {
+        const copy = { ...day };
+        delete copy.weather;
+        return copy;
+      }),
+    };
+    const noConditionService = {
+      getService: () => ({ weather: { get: fake.resolves(noConditionWeather) } }),
+      stateManager: {
+        getAllKeys: () => ['openweather'],
+      },
+    };
+    const weather = new Weather(noConditionService, event, messageManager, houses);
+    const message = {
+      text: 'Meteo Tomorrow?',
+      user: {
+        language: 'fr',
+        distance_unit_preference: 'metric',
+      },
+    };
+    await weather.command(
+      message,
+      {
+        intent: 'weather.get',
+        entities: [
+          {
+            entity: 'date',
+            resolution: {
+              type: 'date',
+              date: TODAY.add(1, 'day').toDate(),
+            },
+          },
+        ],
+      },
+      {},
+    );
+    assert.calledWith(messageManager.replyByIntent, message, 'weather.get.success.tomorrow.unknown', {
+      temperature_max: 9,
+      temperature_min: 4,
+      units: '°C',
+    });
+  });
   it('should fall back to the current conditions for today when the provider omits today', async () => {
     // B.18 allows omitting today from days: a "today" question answers
     // with the root payload instead of failing

@@ -23,21 +23,13 @@ function alertKey(alert) {
 }
 
 /**
- * @description Poll the weather of every located house and diff the
- * normalized alerts against the previous poll, firing the weather-alert
- * scene triggers (B.18 point 4). Runs every 30 minutes (scheduler job
- * check-weather-alerts) and on an integration freshness nudge. Gated: no
- * active scene with a weather-alert trigger means zero third-party calls.
- * A new alert or a severity increase fires weather.alert-raised, a
- * disappeared alert fires weather.alert-ended, a de-escalation that does
- * not clear the alert fires nothing. The first poll of a house is a
- * baseline: no events, so a core restart during an ongoing alert never
- * re-fires the scenes.
+ * @description The actual check, always called under the in-flight guard
+ * of checkAlerts.
  * @returns {Promise} Resolves when every house has been checked.
  * @example
- * await weather.checkAlerts();
+ * await runCheck.call(this);
  */
-async function checkAlerts() {
+async function runCheck() {
   // a LIKE probe on the JSON column is dialect-dependent (sequelize
   // JSON-serializes the pattern): the trigger types are checked in JS on
   // the active scenes instead — a light query, ran at most every 30 min
@@ -99,6 +91,37 @@ async function checkAlerts() {
       }
     });
   });
+}
+
+/**
+ * @description Poll the weather of every located house and diff the
+ * normalized alerts against the previous poll, firing the weather-alert
+ * scene triggers (B.18 point 4). Runs every 30 minutes (scheduler job
+ * check-weather-alerts) and on an integration freshness nudge. Gated: no
+ * active scene with a weather-alert trigger means zero third-party calls.
+ * A new alert or a severity increase fires weather.alert-raised, a
+ * disappeared alert fires weather.alert-ended, a de-escalation that does
+ * not clear the alert fires nothing. The first poll of a house is a
+ * baseline: no events, so a core restart during an ongoing alert never
+ * re-fires the scenes.
+ * @returns {Promise} Resolves when every house has been checked.
+ * @example
+ * await weather.checkAlerts();
+ */
+async function checkAlerts() {
+  // the scheduled job and the freshness nudge both land here: two
+  // overlapping runs would diff the same baseline and fire every
+  // transition twice, so a run already in flight wins and the new one
+  // is dropped (a dropped nudge costs at most the 30-min floor)
+  if (this.checkAlertsRunning) {
+    return;
+  }
+  this.checkAlertsRunning = true;
+  try {
+    await runCheck.call(this);
+  } finally {
+    this.checkAlertsRunning = false;
+  }
 }
 
 module.exports = {

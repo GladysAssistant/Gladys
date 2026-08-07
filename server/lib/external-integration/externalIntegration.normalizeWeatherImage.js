@@ -5,6 +5,10 @@ const { MAX_WEATHER_IMAGE_BYTES } = require('./constants');
 const PNG_MAGIC = [0x89, 0x50, 0x4e, 0x47];
 const JPEG_MAGIC = [0xff, 0xd8, 0xff];
 
+// base64 encodes 3 bytes in 4 chars: any string longer than this cannot
+// decode under the size cap, and is rejected before the decode allocates
+const MAX_BASE64_LENGTH = Math.ceil(MAX_WEATHER_IMAGE_BYTES / 3) * 4 + 4;
+
 /**
  * @description Validate the provider image returned over
  * weather.get-image (B.18 point 6). The raw base64 comes from unaudited
@@ -18,7 +22,7 @@ const JPEG_MAGIC = [0xff, 0xd8, 0xff];
  * const image = normalizeWeatherImage('iVBORw0KGgo...');
  */
 function normalizeWeatherImage(rawBase64) {
-  if (typeof rawBase64 !== 'string' || rawBase64.length === 0) {
+  if (typeof rawBase64 !== 'string' || rawBase64.length === 0 || rawBase64.length > MAX_BASE64_LENGTH) {
     throw new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_INVALID_WEATHER_IMAGE');
   }
   const bytes = Buffer.from(rawBase64, 'base64');

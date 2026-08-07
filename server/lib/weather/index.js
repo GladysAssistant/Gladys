@@ -13,6 +13,9 @@ const Weather = function Weather(service, event, messageManager, house) {
   // last normalized alerts per house selector, diffed by checkAlerts;
   // in-memory on purpose: a restart resets the baseline without firing
   this.houseAlerts = new Map();
+  // in-flight guard of checkAlerts: the scheduled job and the freshness
+  // nudge must never diff the same baseline concurrently
+  this.checkAlertsRunning = false;
   this.event.on(INTENTS.WEATHER.GET, this.command.bind(this));
   this.event.on(INTENTS.WEATHER.TOMORROW, this.command.bind(this));
   this.event.on(INTENTS.WEATHER.AFTER_TOMORROW, this.command.bind(this));

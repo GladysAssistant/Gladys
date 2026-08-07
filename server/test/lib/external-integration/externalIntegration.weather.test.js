@@ -448,9 +448,16 @@ describe('externalIntegration.normalizeWeatherImage', () => {
     expect(() => normalizeWeatherImage(Buffer.from('<svg onload=alert(1)>').toString('base64'))).to.throw(
       ExternalIntegrationUnavailableError,
     );
-    // over the 500 KB cap
+    // far over the 500 KB cap: the base64 length pre-check rejects it
+    // before the decode allocates anything
     const bigPng = Buffer.concat([pngBytes, Buffer.alloc(MAX_WEATHER_IMAGE_BYTES)]);
     expect(() => normalizeWeatherImage(bigPng.toString('base64'))).to.throw(ExternalIntegrationUnavailableError);
+    // one byte over the cap: short enough in base64 to pass the length
+    // pre-check, rejected on the decoded size
+    const barelyTooBigPng = Buffer.concat([pngBytes, Buffer.alloc(MAX_WEATHER_IMAGE_BYTES + 1 - pngBytes.length)]);
+    expect(() => normalizeWeatherImage(barelyTooBigPng.toString('base64'))).to.throw(
+      ExternalIntegrationUnavailableError,
+    );
   });
 });
 
