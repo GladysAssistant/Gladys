@@ -57,13 +57,28 @@ function buildAccessory(device) {
     const serviceConfigs = [];
 
     categories[category].forEach((cat) => {
-      if (
-        serviceConfigs.length > 0 &&
-        !serviceConfigs[serviceConfigs.length - 1].find(
-          (config) => config.category === cat.category && config.type === cat.type,
-        )
-      ) {
-        serviceConfigs[serviceConfigs.length - 1].push(cat);
+      const currentConfig = serviceConfigs[serviceConfigs.length - 1];
+      const sameFeature =
+        currentConfig && currentConfig.find((config) => config.category === cat.category && config.type === cat.type);
+
+      if (currentConfig && !sameFeature) {
+        currentConfig.push(cat);
+
+        return;
+      }
+
+      // Some integrations expose a writable feature and its read-only counterpart (for example the
+      // Matter fan speed setting and the speed actually reached). Those are the two halves of a
+      // single HomeKit characteristic, not two devices: keep the writable one and drop the other.
+      // Only the feature types declaring it are merged, because a read-only feature is not always
+      // the feedback of its writable namesake: Matter exposes both an OnOff relay and a BooleanState
+      // sensor as SWITCH.BINARY, and those two really are separate services.
+      const mergeReadOnlyTwin = mappings[cat.category].capabilities[cat.type].mergeReadOnlyTwin === true;
+
+      if (mergeReadOnlyTwin && sameFeature && sameFeature.read_only !== cat.read_only) {
+        if (sameFeature.read_only) {
+          currentConfig[currentConfig.indexOf(sameFeature)] = cat;
+        }
 
         return;
       }

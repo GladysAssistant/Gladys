@@ -8,6 +8,9 @@ const {
   ACTIONS,
   ACTIONS_STATUS,
   DEVICE_FEATURE_UNITS,
+  FAN_MODE,
+  FAN_ROCK_SETTING,
+  FAN_AIRFLOW_DIRECTION,
 } = require('../../../../utils/constants');
 
 describe('Build service', () => {
@@ -1041,6 +1044,427 @@ describe('Build service', () => {
     expect(cb.args[2][1]).to.equal(8);
     // no unit declared, the value is taken as µg/m³ and only clamped
     expect(cb.args[3][1]).to.equal(1000);
+  });
+
+  it('should build fan service', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get
+      .withArgs('deviceFeature', 'ventilateur-mode')
+      .returns({ last_value: FAN_MODE.MEDIUM });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'ventilateur-percent').returns({ last_value: 40 });
+    homekitHandler.gladys.stateManager.get
+      .withArgs('deviceFeature', 'ventilateur-rock')
+      .returns({ last_value: FAN_ROCK_SETTING.OFF });
+    homekitHandler.gladys.stateManager.get
+      .withArgs('deviceFeature', 'ventilateur-airflow')
+      .returns({ last_value: FAN_AIRFLOW_DIRECTION.REVERSE });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub()
+      .returns({ on })
+      .onCall(1)
+      .returns({
+        on,
+        props: {
+          minValue: 0,
+          maxValue: 100,
+        },
+      });
+    const Fanv2 = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        Active: 'ACTIVE',
+        RotationSpeed: 'ROTATIONSPEED',
+        SwingMode: 'SWINGMODE',
+        RotationDirection: 'ROTATIONDIRECTION',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        Fanv2,
+      },
+    };
+    const device = {
+      name: 'Ventilateur',
+      selector: 'ventilateur',
+    };
+    const features = [
+      {
+        name: 'Mode',
+        selector: 'ventilateur-mode',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.MODE,
+        min: FAN_MODE.OFF,
+        max: FAN_MODE.AUTO,
+      },
+      {
+        name: 'Vitesse %',
+        selector: 'ventilateur-percent',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
+        min: 0,
+        max: 100,
+      },
+      {
+        name: 'Vitesse',
+        selector: 'ventilateur-speed',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.SPEED,
+        min: 0,
+        max: 10,
+      },
+      {
+        name: 'Oscillation',
+        selector: 'ventilateur-rock',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
+        min: FAN_ROCK_SETTING.OFF,
+        max: FAN_ROCK_SETTING.LEFT_RIGHT_AND_UP_DOWN,
+      },
+      {
+        name: 'Direction',
+        selector: 'ventilateur-airflow',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
+        min: FAN_AIRFLOW_DIRECTION.FORWARD,
+        max: FAN_AIRFLOW_DIRECTION.REVERSE,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.FAN]);
+    await on.args[0][1](cb);
+    await on.args[1][1](0, cb);
+    await on.args[2][1](cb);
+    await on.args[3][1](60, cb);
+    await on.args[4][1](cb);
+    await on.args[5][1](1, cb);
+    await on.args[6][1](cb);
+    await on.args[7][1](0, cb);
+
+    expect(Fanv2.args[0][0]).to.equal('Ventilateur');
+    // the raw speed feature is ignored, the percentage already drives RotationSpeed
+    expect(getCharacteristic.callCount).to.equal(4);
+    expect(on.callCount).to.equal(8);
+    expect(getCharacteristic.args[0][0]).to.equal('ACTIVE');
+    expect(getCharacteristic.args[1][0]).to.equal('ROTATIONSPEED');
+    expect(getCharacteristic.args[2][0]).to.equal('SWINGMODE');
+    expect(getCharacteristic.args[3][0]).to.equal('ROTATIONDIRECTION');
+    expect(cb.args[0][1]).to.equal(1);
+    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: FAN_MODE.OFF,
+      device: device.selector,
+      device_feature: features[0].selector,
+    });
+    expect(cb.args[2][1]).to.equal(40);
+    expect(homekitHandler.gladys.event.emit.args[1][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: 60,
+      device: device.selector,
+      device_feature: features[1].selector,
+    });
+    expect(cb.args[4][1]).to.equal(0);
+    // enabling oscillation uses every axis the device supports
+    expect(homekitHandler.gladys.event.emit.args[2][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: FAN_ROCK_SETTING.LEFT_RIGHT_AND_UP_DOWN,
+      device: device.selector,
+      device_feature: features[3].selector,
+    });
+    expect(cb.args[6][1]).to.equal(1);
+    expect(homekitHandler.gladys.event.emit.args[3][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: FAN_AIRFLOW_DIRECTION.FORWARD,
+      device: device.selector,
+      device_feature: features[4].selector,
+    });
+
+    // same characteristics read and written the other way round
+    homekitHandler.gladys.stateManager.get
+      .withArgs('deviceFeature', 'ventilateur-mode')
+      .returns({ last_value: FAN_MODE.OFF });
+    homekitHandler.gladys.stateManager.get
+      .withArgs('deviceFeature', 'ventilateur-rock')
+      .returns({ last_value: FAN_ROCK_SETTING.UP_DOWN });
+    homekitHandler.gladys.stateManager.get
+      .withArgs('deviceFeature', 'ventilateur-airflow')
+      .returns({ last_value: FAN_AIRFLOW_DIRECTION.FORWARD });
+
+    await on.args[0][1](cb);
+    await on.args[4][1](cb);
+    await on.args[5][1](0, cb);
+    await on.args[6][1](cb);
+    await on.args[7][1](1, cb);
+
+    expect(cb.args[8][1]).to.equal(0);
+    expect(cb.args[9][1]).to.equal(1);
+    expect(homekitHandler.gladys.event.emit.args[4][1].value).to.equal(FAN_ROCK_SETTING.OFF);
+    expect(cb.args[11][1]).to.equal(0);
+    expect(homekitHandler.gladys.event.emit.args[5][1].value).to.equal(FAN_AIRFLOW_DIRECTION.REVERSE);
+  });
+
+  it('should fall back to sane defaults when the fan declares no bounds', async () => {
+    homekitHandler.gladys.stateManager.get = stub().returns({ last_value: 0 });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub().returns({ on });
+    const Fanv2 = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        Active: 'ACTIVE',
+        SwingMode: 'SWINGMODE',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        Fanv2,
+      },
+    };
+    const device = {
+      name: 'Ventilateur',
+      selector: 'ventilateur',
+    };
+    // neither feature declares a max
+    const features = [
+      {
+        name: 'Mode',
+        selector: 'ventilateur-mode',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.MODE,
+      },
+      {
+        name: 'Oscillation',
+        selector: 'ventilateur-rock',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.FAN]);
+    // the fan is off, turning it on falls back to the highest standard mode
+    await on.args[1][1](1, cb);
+    // no supported axis bitmap, oscillation falls back to left/right
+    await on.args[3][1](1, cb);
+
+    expect(homekitHandler.gladys.event.emit.args[0][1].value).to.equal(FAN_MODE.HIGH);
+    expect(homekitHandler.gladys.event.emit.args[1][1].value).to.equal(FAN_ROCK_SETTING.LEFT_RIGHT);
+  });
+
+  it('should restore the last fan mode when switched back on', async () => {
+    const modeState = { last_value: FAN_MODE.LOW };
+    homekitHandler.gladys.stateManager.get = stub().returns(modeState);
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub().returns({ on });
+    const Fanv2 = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        Active: 'ACTIVE',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        Fanv2,
+      },
+    };
+    const device = {
+      name: 'Ventilateur',
+      selector: 'ventilateur',
+    };
+    const features = [
+      {
+        name: 'Mode',
+        selector: 'ventilateur-mode',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.MODE,
+        min: FAN_MODE.OFF,
+        max: FAN_MODE.AUTO,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.FAN]);
+    // the fan is running in LOW, then HomeKit turns it off and back on
+    await on.args[0][1](cb);
+    modeState.last_value = FAN_MODE.OFF;
+    await on.args[1][1](1, cb);
+
+    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: FAN_MODE.LOW,
+      device: device.selector,
+      device_feature: features[0].selector,
+    });
+  });
+
+  it('should build fan service without mode feature', async () => {
+    homekitHandler.gladys.stateManager.get = stub().returns({ last_value: 0 });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub()
+      .returns({ on })
+      .onCall(0)
+      .returns({
+        on,
+        props: {
+          minValue: 0,
+          maxValue: 100,
+        },
+      });
+    const Fanv2 = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        Active: 'ACTIVE',
+        RotationSpeed: 'ROTATIONSPEED',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        Fanv2,
+      },
+    };
+    const device = {
+      name: 'Ventilateur',
+      selector: 'ventilateur',
+    };
+    const features = [
+      {
+        name: 'Vitesse',
+        selector: 'ventilateur-speed',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.SPEED,
+        min: 0,
+        max: 10,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.FAN]);
+    await on.args[2][1](cb);
+    await on.args[3][1](1, cb);
+    // running at speed 6, then switched off from HomeKit
+    homekitHandler.gladys.stateManager.get = stub().returns({ last_value: 6 });
+    await on.args[2][1](cb);
+    await on.args[3][1](0, cb);
+
+    expect(getCharacteristic.args[0][0]).to.equal('ROTATIONSPEED');
+    expect(getCharacteristic.args[1][0]).to.equal('ACTIVE');
+    expect(on.callCount).to.equal(4);
+    expect(cb.args[0][1]).to.equal(0);
+    expect(cb.args[2][1]).to.equal(1);
+    // switching off writes the minimum speed
+    expect(homekitHandler.gladys.event.emit.args[1][1].value).to.equal(0);
+    // no mode feature, so turning the fan on falls back to the top speed
+    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: 10,
+      device: device.selector,
+      device_feature: features[0].selector,
+    });
+  });
+
+  it('should send fan speed commands to the writable feature, not the read-only one', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'ventilo-percent').returns({ last_value: 50 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'ventilo-speed').returns({ last_value: 3 });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub().returns({ on, props: { minValue: 0, maxValue: 100 } });
+    const Fanv2 = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { RotationSpeed: 'ROTATIONSPEED', Active: 'ACTIVE' },
+      CharacteristicEventTypes: stub(),
+      Service: { Fanv2 },
+    };
+    // Matter can expose the reached percentage read-only, and the speed setting as the command
+    const features = [
+      {
+        name: 'Pourcentage',
+        selector: 'ventilo-percent',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
+        read_only: true,
+        min: 0,
+        max: 100,
+      },
+      {
+        name: 'Vitesse',
+        selector: 'ventilo-speed',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.SPEED,
+        read_only: false,
+        min: 0,
+        max: 5,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Ventilateur' }, features, mappings[DEVICE_FEATURE_CATEGORIES.FAN]);
+    // reads come from the percentage, which is already on the HomeKit scale
+    await on.args[0][1](cb);
+    expect(cb.args[0][1]).to.equal(50);
+
+    // writes must reach the speed feature, rescaled to its own bounds
+    await on.args[1][1](60, cb);
+    expect(homekitHandler.gladys.event.emit.args[0][1].device_feature).to.equal('ventilo-speed');
+    expect(homekitHandler.gladys.event.emit.args[0][1].value).to.equal(3);
+  });
+
+  it('should remember the fan speed when switched off without a prior read', async () => {
+    homekitHandler.gladys.stateManager.get = stub().returns({ last_value: 40 });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub().returns({ on, props: { minValue: 0, maxValue: 100 } });
+    const Fanv2 = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { RotationSpeed: 'ROTATIONSPEED', Active: 'ACTIVE' },
+      CharacteristicEventTypes: stub(),
+      Service: { Fanv2 },
+    };
+    const features = [
+      {
+        name: 'Vitesse',
+        selector: 'ventilo-percent',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
+        min: 0,
+        max: 100,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Ventilateur' }, features, mappings[DEVICE_FEATURE_CATEGORIES.FAN]);
+    // switch off straight away, with no GET beforehand
+    await on.args[3][1](0, cb);
+    expect(homekitHandler.gladys.event.emit.args[0][1].value).to.equal(0);
+
+    // switching back on must restore the speed it had, not jump to full
+    await on.args[3][1](1, cb);
+    expect(homekitHandler.gladys.event.emit.args[1][1].value).to.equal(40);
   });
 
   it('should build shutter/curtain service', async () => {
