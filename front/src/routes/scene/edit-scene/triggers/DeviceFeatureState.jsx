@@ -17,6 +17,7 @@ import FanLabeledDeviceState from './device-states/FanLabeledDeviceState';
 import LevelSensorDeviceState from './device-states/LevelSensorDeviceState';
 import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDeviceState';
 import WaterValveDeviceState from './device-states/WaterValveDeviceState';
+import WaterHeaterModeDeviceState from './device-states/WaterHeaterModeDeviceState';
 
 class TurnOnLight extends Component {
   onDeviceFeatureChange = deviceFeature => {
@@ -96,14 +97,20 @@ class TurnOnLight extends Component {
     let levelSensorDevice = false;
     let levelMatterSensorDevice = false;
     let waterValveStatusDevice = false;
+    let waterHeaterModeDevice = false;
 
     if (selectedDeviceFeature) {
       const { category, type } = selectedDeviceFeature;
 
+      // water-heater's own `binary` shares the 'binary' string with SWITCH, so it is already
+      // covered by the first test. `boost` and `heating` are scoped to their category so that a
+      // future category reusing either string does not silently inherit this widget.
       binaryDevice =
         type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
-        type === DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE;
+        type === DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE ||
+        (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
+          (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST || type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING));
       presenceDevice = category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
       doorbellRingDevice = category === DEVICE_FEATURE_CATEGORIES.DOORBELL;
@@ -124,6 +131,8 @@ class TurnOnLight extends Component {
       waterValveStatusDevice =
         category === DEVICE_FEATURE_CATEGORIES.WATER_VALVE &&
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS;
+      waterHeaterModeDevice =
+        category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER && type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE;
     }
 
     const defaultDevice =
@@ -137,7 +146,8 @@ class TurnOnLight extends Component {
       !fanLabeledDevice &&
       !levelSensorDevice &&
       !levelMatterSensorDevice &&
-      !waterValveStatusDevice;
+      !waterValveStatusDevice &&
+      !waterHeaterModeDevice;
 
     const thresholdDevice =
       selectedDeviceFeature &&
@@ -149,7 +159,8 @@ class TurnOnLight extends Component {
       !fanLabeledDevice &&
       !levelSensorDevice &&
       !levelMatterSensorDevice &&
-      !waterValveStatusDevice;
+      !waterValveStatusDevice &&
+      !waterHeaterModeDevice;
 
     return (
       <div>
@@ -172,6 +183,9 @@ class TurnOnLight extends Component {
           {levelSensorDevice && <LevelSensorDeviceState {...props} />}
           {levelMatterSensorDevice && <LevelMatterSensorDeviceState {...props} />}
           {waterValveStatusDevice && <WaterValveDeviceState {...props} />}
+          {waterHeaterModeDevice && (
+            <WaterHeaterModeDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />
+          )}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
         </div>
         {thresholdDevice && <ThresholdDeviceState {...props} />}
