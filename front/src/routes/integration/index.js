@@ -387,7 +387,11 @@ class Integration extends Component {
   countIntegrationsToUpdate() {
     const { externalInstalled } = this.state;
     if (!externalInstalled) {
-      return 0;
+      // the installed list is still loading (loadFavorites finishes first and
+      // calls getIntegrations on its way): counting 0 here would hide the
+      // "to update" menu entry until it lands, while the header keeps showing
+      // its count. Falling back on the shared value keeps the two consistent
+      return this.props.externalIntegrationsToUpdate || 0;
     }
     const integrationsToUpdate = externalInstalled.filter(integration => integration.update_available).length;
     // compared to the shared value and not to the local one: getIntegrations()
