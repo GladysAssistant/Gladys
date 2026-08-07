@@ -66,7 +66,7 @@ const SUB_CONTAINER_FIELDS = [
   'shm_mb',
   'command',
 ];
-const PORT_FIELDS = ['container_port', 'protocol', 'label'];
+const PORT_FIELDS = ['container_port', 'protocol', 'label', 'browsable'];
 const PORT_PROTOCOLS = ['tcp', 'udp'];
 const ACTION_FIELDS = ['key', 'label', 'description', 'timeout_seconds', 'fields'];
 // inbound webhooks via Gladys Plus (B.17): shown on the install screen
@@ -543,6 +543,9 @@ function validateSubContainerPort(port, path, errors) {
   }
   if (port.protocol !== undefined && !PORT_PROTOCOLS.includes(port.protocol)) {
     errors.push(`${path}.protocol: must be one of ${PORT_PROTOCOLS.join(', ')}`);
+  }
+  if (port.browsable !== undefined && typeof port.browsable !== 'boolean') {
+    errors.push(`${path}.browsable: must be a boolean`);
   }
   validateMultiLanguageText(port.label, `${path}.label`, errors);
 }
