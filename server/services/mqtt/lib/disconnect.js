@@ -15,6 +15,13 @@ function disconnect() {
     this.haDiscoveryEmitTimeout = null;
   }
 
+  // The discovered devices come from the retained configs of the broker we are leaving. Reconnecting
+  // to another broker, or to one that no longer holds those configs, would otherwise keep showing
+  // them in the Discovery tab. They are replayed on subscription, so the list rebuilds by itself.
+  // The state bindings are not touched: they belong to devices the user already created in Gladys.
+  this.haDiscoveredDevices = {};
+  this.haEntitiesByTopic = {};
+
   if (this.mqttClient) {
     logger.debug(`Disconnecting existing MQTT server...`);
     this.mqttClient.end();

@@ -353,6 +353,23 @@ describe('mqttHandler.handleHomeAssistantDiscoveryMessage', () => {
     assert.notCalled(gladys.event.emit);
   });
 
+  it('should forget the discovered devices of the broker it disconnects from', () => {
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/switch/relay/config',
+      JSON.stringify({ dev: { ids: ['0x1234'] }, cmd_t: 'my-device/set' }),
+    );
+    expect(mqttHandler.haDiscoveredDevices).to.not.deep.equal({});
+    expect(mqttHandler.haEntitiesByTopic).to.not.deep.equal({});
+
+    // The state bindings of already created devices must survive the disconnection
+    mqttHandler.haStateBindings['my-device/state'] = [{ deviceExternalId: 'homeassistant:0x1234' }];
+
+    mqttHandler.disconnect();
+    expect(mqttHandler.haDiscoveredDevices).to.deep.equal({});
+    expect(mqttHandler.haEntitiesByTopic).to.deep.equal({});
+    expect(mqttHandler.haStateBindings['my-device/state']).to.have.lengthOf(1);
+  });
+
   describe('getDeviceIdentifier', () => {
     it('should use the first identifier of an array', () => {
       expect(getDeviceIdentifier({ device: { identifiers: ['0x1234', 'other'] } }, 'node', 'object')).to.equal(
