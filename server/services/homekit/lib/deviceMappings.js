@@ -67,6 +67,8 @@ const mappings = {
       // is a concentration, which has no HomeKit characteristic, so it stays out.
       [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
         characteristics: ['SmokeDetected'],
+        // No debounce at all: the default five seconds is far too slow for a smoke alarm.
+        notifDelay: 0,
       },
     },
   },

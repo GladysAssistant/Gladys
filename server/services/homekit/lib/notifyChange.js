@@ -20,7 +20,9 @@ function notifyChange(accessories, event) {
     return;
   }
 
-  const delay = mappings[feature.category].capabilities[feature.type].notifDelay || 5000;
+  // Nullish and not ||, so that a mapping asking for no delay at all gets it: `0 || 5000` would
+  // silently push a smoke alarm back to the default five seconds.
+  const delay = mappings[feature.category].capabilities[feature.type].notifDelay ?? 5000;
   if (!this.notifyTimeouts[event.device_feature]) {
     this.notifyTimeouts[event.device_feature] = {
       timeout: setTimeout(() => {

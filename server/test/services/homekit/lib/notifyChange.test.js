@@ -66,6 +66,37 @@ describe('Notify change to HomeKit', () => {
     expect(homekitHandler.notifyTimeouts['home:door:binary']).haveOwnProperty('startDateTime');
   });
 
+  it('should not delay a smoke alarm', async () => {
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic: stub() }),
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        name: 'Smoke sensor',
+        category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      }),
+    };
+    homekitHandler.sendState = stub();
+    homekitHandler.notifyTimeouts = {};
+
+    await homekitHandler.notifyChange([accessory], {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+      device_feature: 'home:smoke:binary',
+    });
+
+    // notifDelay is 0: the alarm must not sit in the default five-second timeout
+    await new Promise((resolve) => {
+      setTimeout(resolve, 20);
+    });
+    expect(homekitHandler.sendState.callCount).to.equal(1);
+  });
+
   it('should update timeout to notify', async () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
