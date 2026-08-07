@@ -30,6 +30,11 @@ describe('externalIntegration.validateManifest', () => {
     expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
   });
 
+  it('should accept a weather manifest', () => {
+    const manifest = { ...TEST_MANIFEST, type: 'weather' };
+    expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
+  });
+
   it('should accept a manifest without optional fields', () => {
     const { cover_image: coverImage, config_schema: configSchema, ...minimalManifest } = TEST_MANIFEST;
     const validated = externalIntegration.validateManifest(minimalManifest);
@@ -54,7 +59,7 @@ describe('externalIntegration.validateManifest', () => {
   });
 
   it('should reject an unknown type', () => {
-    expect422({ ...TEST_MANIFEST, type: 'weather' }, 'type: must be one of device');
+    expect422({ ...TEST_MANIFEST, type: 'tts' }, 'type: must be one of device');
   });
 
   it('should reject a name out of bounds', () => {

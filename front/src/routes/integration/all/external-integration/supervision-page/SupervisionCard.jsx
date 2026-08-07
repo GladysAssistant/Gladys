@@ -5,6 +5,7 @@ import cx from 'classnames';
 import StatusBadge from '../components/StatusBadge';
 import { getGithubRepoUrl, getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
+import integrationText from '../integrationText.css';
 
 const SubContainerRow = ({ container, language }) => (
   <tr>
@@ -121,7 +122,7 @@ const SupervisionCard = ({
                     )}
                   </span>
                   {integration.connection_status.message && (
-                    <div class="text-muted small">
+                    <div class={cx('text-muted small', integrationText.integrationText)}>
                       {getLocalizedText(integration.connection_status.message, language)}
                     </div>
                   )}

@@ -903,6 +903,10 @@ function getRoutes(gladys) {
       controller: userController.create,
     },
     // weather
+    'get /api/v1/weather/provider': {
+      authenticated: true,
+      controller: weatherController.getProviders,
+    },
     'get /api/v1/user/:user_selector/weather': {
       authenticated: true,
       controller: weatherController.getByUser,
@@ -910,6 +914,10 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather': {
       authenticated: true,
       controller: weatherController.getByHouse,
+    },
+    'get /api/v1/house/:house_selector/weather/image/:image_key': {
+      authenticated: true,
+      controller: weatherController.getImage,
     },
     // energy price
     'get /api/v1/energy_price': {

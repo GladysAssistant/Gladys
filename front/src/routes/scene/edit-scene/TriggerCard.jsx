@@ -11,6 +11,7 @@ import UserEnteredOrLeftArea from './triggers/UserEnteredOrLeftArea';
 import CalendarEventIsComing from './triggers/CalendarEventIsComing';
 import AlarmModeTrigger from './triggers/AlarmModeTrigger';
 import MQTTReceivedTrigger from './triggers/MQTTReceivedTrigger';
+import WeatherAlert from './triggers/WeatherAlert';
 
 import { EVENTS } from '../../../../../server/utils/constants';
 import GladysStartTrigger from './triggers/GladysStartTrigger';
@@ -33,8 +34,12 @@ const TRIGGER_ICON = {
   [EVENTS.ALARM.PANIC]: 'fe-alert-triangle',
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: 'fe-alert-triangle',
   [EVENTS.SYSTEM.START]: 'fe-activity',
-  [EVENTS.MQTT.RECEIVED]: 'fe-hash'
+  [EVENTS.MQTT.RECEIVED]: 'fe-hash',
+  [EVENTS.WEATHER.ALERT_RAISED]: 'fe-alert-triangle',
+  [EVENTS.WEATHER.ALERT_ENDED]: 'fe-check-circle'
 };
+
+const WEATHER_ALERT_TRIGGERS = [EVENTS.WEATHER.ALERT_RAISED, EVENTS.WEATHER.ALERT_ENDED];
 
 const ALARM_TRIGGERS = [
   EVENTS.ALARM.ARM,
@@ -173,6 +178,9 @@ const TriggerCard = ({ children, ...props }) => (
           index={props.index}
           trigger={props.trigger}
         />
+      )}
+      {WEATHER_ALERT_TRIGGERS.includes(props.trigger.type) && (
+        <WeatherAlert updateTriggerProperty={props.updateTriggerProperty} index={props.index} trigger={props.trigger} />
       )}
     </div>
   </div>

@@ -160,8 +160,9 @@ class Integration extends Component {
   buildExternalIntegrationCards() {
     const { user = {}, category } = this.props;
     // external integrations live in the category matching their manifest
-    // type ("device" or "communication"), and can also be favorites
-    const EXTERNAL_CATEGORIES = ['device', 'communication'];
+    // type ("device", "communication" or "weather"), and can also be
+    // favorites
+    const EXTERNAL_CATEGORIES = ['device', 'communication', 'weather'];
     if (category && !EXTERNAL_CATEGORIES.includes(category) && category !== 'favorites') {
       return [];
     }
@@ -185,10 +186,22 @@ class Integration extends Component {
 
     const externalCards = [];
 
-    // a communication integration has no device screens: its card lands
-    // straight on the configuration screen
+    // the manifest declares the channels the integration knows how to use
+    // ("local", "cloud", or both): this is the same information the native
+    // integrations carry in their JSON config, so the catalog can show the
+    // Local/Cloud tags on a community integration too
+    const getTransportTags = manifest => {
+      const transports = manifest.transports || [];
+      return {
+        local: transports.includes('local'),
+        cloud: transports.includes('cloud')
+      };
+    };
+
+    // communication and weather integrations have no device screens: their
+    // card lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
-      manifest.type === 'communication'
+      ['communication', 'weather'].includes(manifest.type)
         ? `/dashboard/integration/device/external/${selector}/config`
         : `/dashboard/integration/device/external/${selector}`;
 
@@ -202,13 +215,14 @@ class Integration extends Component {
         key: `external-${integration.store_slug || integration.selector}`,
         external: true,
         externalInstalled: true,
-        type: manifest.type === 'communication' ? 'communication' : 'device',
+        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: getInstalledUrl(integration.selector, manifest),
         img: (storeIntegration && storeIntegration.cover_url) || manifest.cover_image || null,
         status: integration.status,
-        updateAvailable: integration.update_available
+        updateAvailable: integration.update_available,
+        ...getTransportTags(manifest)
       });
     });
 
@@ -223,7 +237,7 @@ class Integration extends Component {
         key: `external-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
-        type: manifest.type === 'communication' ? 'communication' : 'device',
+        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled
@@ -236,7 +250,8 @@ class Integration extends Component {
               orderDir: this.state.orderDir
             }),
         img: storeIntegration.cover_url || manifest.cover_image || null,
-        updateAvailable: isInstalled ? storeIntegration.update_available : false
+        updateAvailable: isInstalled ? storeIntegration.update_available : false,
+        ...getTransportTags(manifest)
       });
     });
 
