@@ -162,6 +162,69 @@ describe('weather.get', () => {
       },
     );
   });
+  it('should pin the provider chosen in the widget configuration', async () => {
+    const externalProvider = {
+      weather: {
+        get: fake.resolves({ ...fakeWeather, temperature: 12.3 }),
+      },
+    };
+    const openWeather = {
+      weather: {
+        get: fake.resolves(fakeWeather),
+      },
+    };
+    const service = buildServiceManager({
+      openweather: openWeather,
+      'ext-william-meteo-france': externalProvider,
+    });
+    const weather = new Weather(service, event, messageManager);
+    // openweather wins although the external provider has precedence
+    const result = await weather.get({ ...options, service: 'openweather' });
+    expect(result).to.deep.equal(fakeWeather);
+    assert.notCalled(externalProvider.weather.get);
+  });
+  it('should surface the failure of a pinned provider instead of falling back', async () => {
+    const externalProvider = {
+      weather: {
+        get: fake.rejects(new ExternalIntegrationUnavailableError('EXTERNAL_INTEGRATION_COMMAND_TIMEOUT')),
+      },
+    };
+    const openWeather = {
+      weather: {
+        get: fake.resolves(fakeWeather),
+      },
+    };
+    const service = buildServiceManager({
+      openweather: openWeather,
+      'ext-william-meteo-france': externalProvider,
+    });
+    const weather = new Weather(service, event, messageManager);
+    const promise = weather.get({ ...options, service: 'ext-william-meteo-france' });
+    await promise.then(
+      () => Promise.reject(new Error('should have failed')),
+      (e) => {
+        expect(e.message).to.equal('REQUEST_TO_THIRD_PARTY_FAILED');
+      },
+    );
+    assert.notCalled(openWeather.weather.get);
+  });
+  it('should throw a service not configured error when the pinned provider is gone', async () => {
+    const openWeather = {
+      weather: {
+        get: fake.resolves(fakeWeather),
+      },
+    };
+    const service = buildServiceManager({ openweather: openWeather });
+    const weather = new Weather(service, event, messageManager);
+    const promise = weather.get({ ...options, service: 'ext-uninstalled-provider' });
+    await promise.then(
+      () => Promise.reject(new Error('should have failed')),
+      (e) => {
+        expect(e).to.be.instanceOf(ServiceNotConfiguredError);
+      },
+    );
+    assert.notCalled(openWeather.weather.get);
+  });
   it('should rethrow the first real failure over a not configured one', async () => {
     const realError = new Error('REQUEST_TO_THIRD_PARTY_FAILED');
     const externalProvider = {
@@ -186,5 +249,17 @@ describe('weather.get', () => {
         expect(e.message).to.equal('REQUEST_TO_THIRD_PARTY_FAILED');
       },
     );
+  });
+});
+
+describe('weather.getProviders', () => {
+  it('should list the weather providers in the precedence order of the loop', () => {
+    const service = buildServiceManager({
+      openweather: { weather: { get: fake.resolves({}) } },
+      telegram: { message: { send: fake.resolves(null) } },
+      'ext-meteo-france': { weather: { get: fake.resolves({}) } },
+    });
+    const weather = new Weather(service, event, messageManager);
+    expect(weather.getProviders()).to.deep.equal(['ext-meteo-france', 'openweather']);
   });
 });

@@ -1,5 +1,6 @@
 const { get } = require('./weather.get');
 const { getImage } = require('./weather.getImage');
+const { getProviders } = require('./weather.getProviders');
 const { command } = require('./weather.command');
 const { checkAlerts } = require('./weather.checkAlerts');
 const { INTENTS, EVENTS } = require('../../utils/constants');
@@ -25,6 +26,7 @@ const Weather = function Weather(service, event, messageManager, house) {
 
 Weather.prototype.get = get;
 Weather.prototype.getImage = getImage;
+Weather.prototype.getProviders = getProviders;
 Weather.prototype.command = command;
 Weather.prototype.checkAlerts = checkAlerts;
 

@@ -332,6 +332,8 @@
         "requestToThirdPartyFailed": "Die Anfrage an den Wetteranbieter ist fehlgeschlagen. Ist dein Gladys mit dem Internet verbunden? Gehe zum Panel der Wetter-Integrationen, um das Problem zu beheben.",
         "clickHere": "Klicke hier, um zu den Wetter-Integrationen zu gelangen.",
         "unknownError": "Wir können das Wetter für dieses Zuhause nicht abrufen. Hast du für diese Box ein Zuhause definiert?",
+        "editProviderLabel": "Wetteranbieter:",
+        "providerAuto": "Automatisch (erster verfügbarer Anbieter)",
         "editModeLabel": "Wähle den Anzeigemodus aus:",
         "displayModes": {
           "advancedWeather": "Luftfeuchtigkeit und Windgeschwindigkeit",

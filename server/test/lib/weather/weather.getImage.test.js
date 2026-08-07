@@ -42,6 +42,25 @@ describe('weather.getImage', () => {
     expect(untouched.weather.getImage.callCount).to.equal(0);
   });
 
+  it('should pin the provider of the widget for its images', async () => {
+    const first = { weather: { get: fake.resolves({}), getImage: fake.resolves('data:image/png;base64,first') } };
+    const second = { weather: { get: fake.resolves({}), getImage: fake.resolves('data:image/png;base64,second') } };
+    const service = buildServiceManager({ 'ext-a-first': first, 'ext-b-second': second });
+    const weather = new Weather(service, event, {}, {});
+    // the pinned provider wins although the first one has precedence
+    const image = await weather.getImage('vigilance-map', 'ext-b-second');
+    expect(image).to.equal('data:image/png;base64,second');
+    expect(first.weather.getImage.callCount).to.equal(0);
+  });
+
+  it('should throw NotFoundError when the pinned provider is gone', async () => {
+    const provider = { weather: { get: fake.resolves({}), getImage: fake.resolves('data:image/png;base64,ok') } };
+    const service = buildServiceManager({ 'ext-a-first': provider });
+    const weather = new Weather(service, event, {}, {});
+    await expect(weather.getImage('vigilance-map', 'ext-uninstalled')).to.be.rejectedWith(NotFoundError);
+    expect(provider.weather.getImage.callCount).to.equal(0);
+  });
+
   it('should 404 a key outside the declared-key shape without consulting any provider', async () => {
     const provider = {
       weather: { get: fake.resolves({}), getImage: fake.resolves('data:image/png;base64,ok') },

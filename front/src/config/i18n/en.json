@@ -332,6 +332,8 @@
         "requestToThirdPartyFailed": "The request to the weather provider failed. Is your Gladys instance connected to the internet? Please go to the weather integrations panel to troubleshoot this problem.",
         "clickHere": "Click here to access the weather integrations.",
         "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
+        "editProviderLabel": "Weather provider:",
+        "providerAuto": "Automatic (first available provider)",
         "editModeLabel": "Select display mode:",
         "displayModes": {
           "advancedWeather": "Humidity and wind speed",

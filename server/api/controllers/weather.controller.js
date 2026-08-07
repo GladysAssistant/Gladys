@@ -56,9 +56,42 @@ module.exports = function WeatherController(gladys) {
       language: req.user.language,
       units: req.user.distance_unit_preference,
     };
+    // ?service=<name>: the widget configuration can pin a provider —
+    // weather.get shrinks its loop to that name, no silent fallback
+    if (typeof req.query.service === 'string' && req.query.service.length > 0) {
+      options.service = req.query.service;
+    }
     const weatherResult = await gladys.weather.get(options);
     const responseWithHouseAndOptions = { ...weatherResult, house, options };
     res.json(responseWithHouseAndOptions);
+  }
+
+  /**
+   * @api {get} /api/v1/weather/provider get weather providers
+   * @apiName getProviders
+   * @apiGroup Weather
+   * @apiSuccessExample {json} Success-Example
+   * [
+   *   { "service_name": "ext-meteo-france", "label": "Météo France" },
+   *   { "service_name": "openweather", "label": null }
+   * ]
+   * @apiDescription The available weather providers, in the precedence
+   * order of the automatic mode. Open to every authenticated user (any
+   * user can configure their own weather widget): the payload only
+   * carries the service name and the manifest display name — none of the
+   * operational fields of the external integration routes.
+   */
+  async function getProviders(req, res) {
+    const serviceNames = gladys.weather.getProviders();
+    const integrations = await gladys.externalIntegration.get();
+    const providers = serviceNames.map((serviceName) => {
+      const integration = integrations.find((row) => row.name === serviceName);
+      return {
+        service_name: serviceName,
+        label: (integration && integration.manifest && integration.manifest.name) || null,
+      };
+    });
+    res.json(providers);
   }
 
   /**
@@ -74,7 +107,10 @@ module.exports = function WeatherController(gladys) {
     // resolves the house first: the route stays scoped like the weather
     // route it extends, and an unknown house 404s before any provider call
     await gladys.house.getBySelector(req.params.house_selector);
-    const image = await gladys.weather.getImage(req.params.image_key);
+    // same ?service= pin as the weather route: a pinned widget only ever
+    // shows the images of its own provider
+    const serviceName = typeof req.query.service === 'string' ? req.query.service : undefined;
+    const image = await gladys.weather.getImage(req.params.image_key, serviceName);
     res.json({ image });
   }
 
@@ -82,5 +118,6 @@ module.exports = function WeatherController(gladys) {
     getByHouse: asyncMiddleware(getByHouse),
     getByUser: asyncMiddleware(getByUser),
     getImage: asyncMiddleware(getImage),
+    getProviders: asyncMiddleware(getProviders),
   });
 };

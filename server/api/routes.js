@@ -903,6 +903,10 @@ function getRoutes(gladys) {
       controller: userController.create,
     },
     // weather
+    'get /api/v1/weather/provider': {
+      authenticated: true,
+      controller: weatherController.getProviders,
+    },
     'get /api/v1/user/:user_selector/weather': {
       authenticated: true,
       controller: weatherController.getByUser,

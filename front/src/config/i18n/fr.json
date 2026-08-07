@@ -332,6 +332,8 @@
         "requestToThirdPartyFailed": "La requête au fournisseur météo a échoué. Votre instance Gladys est-elle connectée à Internet ? Veuillez vous rendre dans le panneau des intégrations météo pour résoudre ce problème.",
         "clickHere": "Cliquez ici pour accéder aux intégrations météo.",
         "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
+        "editProviderLabel": "Fournisseur météo :",
+        "providerAuto": "Automatique (premier fournisseur disponible)",
         "editModeLabel": "Mode d'affichage :",
         "displayModes": {
           "advancedWeather": "Humidité et vitesse du vent",

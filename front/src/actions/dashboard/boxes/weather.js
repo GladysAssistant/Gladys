@@ -39,7 +39,10 @@ function createActions(store) {
     async getWeather(state, box, x, y) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
-        const weather = await state.httpClient.get(`/api/v1/house/${box.house}/weather`);
+        // a provider pinned in the widget configuration travels as
+        // ?service= — absent, the server picks the first available one
+        const providerParams = box.provider ? { service: box.provider } : undefined;
+        const weather = await state.httpClient.get(`/api/v1/house/${box.house}/weather`, providerParams);
         weather.datetime_beautiful = dayjs(weather.datetime)
           .locale(state.user.language)
           .format('D MMM');
@@ -66,7 +69,8 @@ function createActions(store) {
             weather.images.map(async image => {
               try {
                 const { image: src } = await state.httpClient.get(
-                  `/api/v1/house/${box.house}/weather/image/${image.key}`
+                  `/api/v1/house/${box.house}/weather/image/${image.key}`,
+                  providerParams
                 );
                 image.src = src;
               } catch (imageError) {

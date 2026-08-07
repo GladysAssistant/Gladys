@@ -22,6 +22,8 @@ const { ERROR_MESSAGES } = require('../../utils/constants');
  * @param {number} options.offset - Get weather in the future, offset is in hour.
  * @param {string} [options.language] - The language of the report.
  * @param {string} [options.units] - Unit system of the weather [metric, us].
+ * @param {string} [options.service] - Pin a single provider by service name
+ * (widget configuration): no fallback, its failure is surfaced as-is.
  * @returns {Promise<object>} Resolve with the weather.
  * @example
  * gladys.weather.get({
@@ -34,12 +36,18 @@ const { ERROR_MESSAGES } = require('../../utils/constants');
  */
 async function get(options) {
   const serviceNames = this.service.stateManager.getAllKeys('service');
-  const candidates = serviceNames
+  let candidates = serviceNames
     .filter((serviceName) => {
       const service = this.service.getService(serviceName);
       return service && service.weather && typeof service.weather.get === 'function';
     })
     .sort();
+  // a pinned provider (chosen in the widget configuration) is an explicit
+  // user choice: the loop shrinks to that single candidate and a failure
+  // surfaces instead of silently falling back to another provider
+  if (typeof options.service === 'string' && options.service.length > 0) {
+    candidates = candidates.filter((serviceName) => serviceName === options.service);
+  }
   if (candidates.length === 0) {
     throw new ServiceNotConfiguredError('No weather provider is installed or configured.');
   }
