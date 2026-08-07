@@ -157,9 +157,21 @@ function sendState(hkAccessory, feature, event) {
       const lockState = event.last_value ? 1 : 0;
 
       service.updateCharacteristic(Characteristic[targetStateName], lockState);
+
       // On a lock with no state feature, the command is also what HomeKit reads as the current
       // position. Updating only the target would leave the Home app showing the old one.
-      if (!service.testCharacteristic || service.testCharacteristic(Characteristic[currentStateName])) {
+      //
+      // Whether the service carries LockCurrentState says nothing here: HomeKit requires it on
+      // every LockMechanism. What matters is whether the device reports a state of its own. That
+      // feature knows about motion and jamming, so a lock command must not overwrite it — a Nuki
+      // reports `locking` on the command feature before the state feature says it is moving.
+      const device = this.gladys.stateManager.get('deviceById', feature.device_id);
+      const hasStateFeature = ((device && device.features) || []).some(
+        (deviceFeature) =>
+          deviceFeature.category === DEVICE_FEATURE_CATEGORIES.LOCK &&
+          deviceFeature.type === DEVICE_FEATURE_TYPES.LOCK.STATE,
+      );
+      if (!hasStateFeature) {
         service.updateCharacteristic(Characteristic[currentStateName], lockState);
       }
       break;

@@ -570,6 +570,10 @@ describe('Send state to HomeKit', () => {
       type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
     };
 
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({ id: '4756151c-369e-4772-8bf7-943a6ac70583', features: [feature] }),
+    };
+
     await homekitHandler.sendState(accessory, feature, event);
     await homekitHandler.sendState(accessory, feature, { ...event, last_value: 0 });
 
@@ -578,6 +582,45 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[1]).eql(['LOCKCURRENTSTATE', 1]);
     expect(updateCharacteristic.args[2]).eql(['LOCKTARGETSTATE', 0]);
     expect(updateCharacteristic.args[3]).eql(['LOCKCURRENTSTATE', 0]);
+  });
+
+  it('should leave the current state alone when the lock reports one', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const binaryFeature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Lock button',
+      category: DEVICE_FEATURE_CATEGORIES.LOCK,
+      type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
+    };
+    const stateFeature = {
+      id: '0e2d1e1a-0a67-4b58-a2ff-0eb0e13a4b32',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Lock state',
+      category: DEVICE_FEATURE_CATEGORIES.LOCK,
+      type: DEVICE_FEATURE_TYPES.LOCK.STATE,
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        features: [binaryFeature, stateFeature],
+      }),
+    };
+
+    await homekitHandler.sendState(accessory, binaryFeature, {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+    });
+
+    // the state feature is the one that knows about motion and jamming: the command must move the
+    // target only, or a Nuki reporting `locking` would be shown as secured while it is still moving
+    expect(updateCharacteristic.args).eql([['LOCKTARGETSTATE', 1]]);
   });
 
   it('should notify lock current state', async () => {
@@ -602,7 +645,6 @@ describe('Send state to HomeKit', () => {
 
     await homekitHandler.sendState(accessory, feature, event);
 
-    // a Gladys lock error is reported as jammed to HomeKit
     // a Gladys lock error is reported as jammed to HomeKit
     expect(updateCharacteristic.args[0]).eql(['LOCKCURRENTSTATE', 2]);
 
