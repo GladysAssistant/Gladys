@@ -4,11 +4,12 @@ const CATALOG_BASE_URL = '/dashboard/integration';
 const DEFAULT_ORDER_DIR = 'asc';
 const ORDER_DIRS = ['asc', 'desc'];
 
-// the catalog is displayed for every category, plus "all" and "favorites":
-// only those paths are accepted as a "back to the catalog" target
+// the catalog is displayed for every category, plus "all", "favorites" and
+// "updates": only those paths are accepted as a "back to the catalog" target
 const CATALOG_PATHS = new Set([
   CATALOG_BASE_URL,
   `${CATALOG_BASE_URL}/favorites`,
+  `${CATALOG_BASE_URL}/updates`,
   ...categories.map(category => `${CATALOG_BASE_URL}/${category.type}`)
 ]);
 

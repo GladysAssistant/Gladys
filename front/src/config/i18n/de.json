@@ -320,7 +320,8 @@
       "gauge": "Messanzeige",
       "energy-consumption": "Energieverbrauch",
       "voice-assistant": "Sprachassistent",
-      "link": "Link"
+      "link": "Link",
+      "photo": "Foto"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -544,6 +545,23 @@
           "home": "Zuhause"
         }
       },
+      "photo": {
+        "description": "Zeige ein oder mehrere Fotos auf deinem Dashboard an. Bilder werden von deiner Gladys-Instanz geladen (nicht vom Browser), sodass Fotos auf einem lokalen NAS auch per Gladys Plus aus der Ferne funktionieren.",
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "z. B. Sommerurlaub 2025",
+        "photosLabel": "Fotos",
+        "editUrlPlaceholder": "https://mein-nas.local/fotos/urlaub.jpg",
+        "editCaptionPlaceholder": "Beschriftung (optional)",
+        "addPhotoButton": "Foto hinzufügen",
+        "fitLabel": "Bildanzeige",
+        "fitCover": "Füllen (zuschneiden)",
+        "fitContain": "Enthalten (ganzes Bild)",
+        "slideshowIntervalLabel": "Diashow (Sekunden)",
+        "slideshowIntervalHelp": "0 zum Deaktivieren der Diashow. Empfohlen: 10-30 Sekunden.",
+        "showCaptionLabel": "Beschriftungen anzeigen",
+        "emptyPhotos": "Keine Fotos konfiguriert.",
+        "imageError": "Dieses Bild konnte nicht geladen werden."
+      },
       "alarm": {
         "armButton": "Einschalten",
         "disarmButton": "Ausschalten",
@@ -622,6 +640,7 @@
       "subtitle": "{{length}} von {{total}} Integrationen",
       "searchPlaceholder": "Integration suchen",
       "noIntegrations": "Keine Integrationen gefunden",
+      "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
       "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
       "refreshStore": {
@@ -640,6 +659,7 @@
       "menu": {
         "all": "Alle Integrationen",
         "favorites": "Favoriten",
+        "updates": "Zu aktualisieren",
         "device": "Geräte",
         "communication": "Kommunikation",
         "calendar": "Kalender",
@@ -5490,6 +5510,7 @@
     "history": "Aktivität",
     "devices": "Geräte",
     "integrations": "Integrationen",
+    "integrationsToUpdate": "Zu aktualisierende Integrationen: {{count}}",
     "calendar": "Kalender",
     "maps": "Karten",
     "scenes": "Szenen",

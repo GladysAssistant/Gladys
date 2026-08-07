@@ -50,6 +50,25 @@ const boxesSchema = Joi.array().items(
       show_subscription_prices: Joi.boolean(),
       url: Joi.string().uri({ scheme: ['http', 'https'] }),
       icon: Joi.string(),
+      photos: Joi.array()
+        .items(
+          Joi.object().keys({
+            // An empty URL is allowed so a widget being configured can still be saved,
+            // empty rows are filtered out by the front-end before saving.
+            url: Joi.string()
+              .uri({ scheme: ['http', 'https'] })
+              .allow('')
+              .required(),
+            caption: Joi.string().allow(''),
+          }),
+        )
+        .max(100),
+      photo_fit: Joi.string().valid('cover', 'contain'),
+      photo_slideshow_interval: Joi.number()
+        .integer()
+        .min(0)
+        .max(3600),
+      photo_show_caption: Joi.boolean(),
     }),
   ),
 );

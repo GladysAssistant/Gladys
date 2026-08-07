@@ -1,4 +1,32 @@
-const { mappings } = require('./deviceMappings');
+const { mappings, mergedServiceCategories } = require('./deviceMappings');
+
+/**
+ * @description Move the features of categories HomeKit models as a single service into their host
+ * category, so they end up in the same HomeKit service instead of one service per Gladys category.
+ * @param {object} categories - Device features grouped by Gladys category.
+ * @returns {object} The same grouping, with merged categories folded into their host.
+ * @example
+ * mergeCategories({ 'airquality-sensor': [aqi], 'pm25-sensor': [density] });
+ */
+function mergeCategories(categories) {
+  const mergedCategories = { ...categories };
+
+  mergedServiceCategories.forEach(({ hosts }) => {
+    const hostCategory = hosts.find((category) => mergedCategories[category]);
+    if (!hostCategory) {
+      return;
+    }
+
+    hosts
+      .filter((category) => category !== hostCategory && mergedCategories[category])
+      .forEach((category) => {
+        mergedCategories[hostCategory] = [...mergedCategories[hostCategory], ...mergedCategories[category]];
+        delete mergedCategories[category];
+      });
+  });
+
+  return mergedCategories;
+}
 
 /**
  * @description Create HomeKit accessory.
@@ -8,7 +36,7 @@ const { mappings } = require('./deviceMappings');
  * buildAccessory(device)
  */
 function buildAccessory(device) {
-  const categories = device.features.reduce((previousValue, currentValue) => {
+  const featuresByCategory = device.features.reduce((previousValue, currentValue) => {
     if (!mappings[currentValue.category] || !mappings[currentValue.category].capabilities[currentValue.type]) {
       return {
         ...previousValue,
@@ -21,6 +49,8 @@ function buildAccessory(device) {
         : [currentValue],
     };
   }, {});
+
+  const categories = mergeCategories(featuresByCategory);
 
   const accessory = new this.hap.Accessory(device.name.substring(0, 64), device.id);
   Object.keys(categories).forEach((category) => {

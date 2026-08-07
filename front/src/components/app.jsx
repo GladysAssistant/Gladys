@@ -8,6 +8,7 @@ import AsyncRoute from 'preact-async-route';
 import { IntlProvider } from 'preact-i18n';
 import translations from '../config/i18n';
 import actions from '../actions/main';
+import { EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS } from '../actions/externalIntegrationUpdates';
 
 import { getDefaultState } from '../utils/getDefaultState';
 
@@ -211,7 +212,7 @@ const SafeAsyncRoute = props => (
 );
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate',
   actions
 )(props => (
   <div id="app">
@@ -219,6 +220,7 @@ const AppRouter = connect(
       <Header
         currentUrl={props.currentUrl}
         user={props.user}
+        externalIntegrationsToUpdate={props.externalIntegrationsToUpdate}
         fullScreen={props.fullScreen}
         profilePicture={props.profilePicture}
         toggleDropDown={props.toggleDropDown}
@@ -265,6 +267,7 @@ const AppRouter = connect(
         <SafeAsyncRoute path="/dashboard/integration" component={IntegrationPage} />
 
         <IntegrationPage path="/dashboard/integration/favorites" category="favorites" />
+        <IntegrationPage path="/dashboard/integration/updates" category="updates" />
         <IntegrationPage path="/dashboard/integration/device" category="device" />
         <IntegrationPage path="/dashboard/integration/communication" category="communication" />
         <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
@@ -434,11 +437,19 @@ class MainApp extends Component {
     // Listen for system preference change
     const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
     prefersDarkMode.addEventListener('change', this.handleSystemPreferenceChange);
+    // Gladys never pushes the "update available" flag: it is recomputed when
+    // the server refreshes the store index, so a long-opened tab only learns
+    // about a new version by asking again at the same cadence
+    this.externalIntegrationUpdatesInterval = setInterval(
+      this.props.refreshExternalIntegrationsToUpdate,
+      EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS
+    );
   }
 
   componentWillUnmount() {
     // Remove event listener to prevent memory leaks
     window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleSystemPreferenceChange);
+    clearInterval(this.externalIntegrationUpdatesInterval);
   }
 
   handleSystemPreferenceChange = () => {

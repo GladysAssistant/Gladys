@@ -320,7 +320,8 @@
       "gauge": "Gauge",
       "energy-consumption": "Energy Consumption",
       "voice-assistant": "Voice assistant",
-      "link": "Link"
+      "link": "Link",
+      "photo": "Photo"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -561,6 +562,23 @@
           "home": "Home"
         }
       },
+      "photo": {
+        "description": "Display one or more photos on your dashboard. Images are fetched by your Gladys instance (not by your browser), so photos hosted on a local NAS work remotely via Gladys Plus.",
+        "editNameLabel": "Widget name (optional)",
+        "editNamePlaceholder": "E.g. Summer vacation 2025",
+        "photosLabel": "Photos",
+        "editUrlPlaceholder": "https://my-nas.local/photos/vacation.jpg",
+        "editCaptionPlaceholder": "Caption (optional)",
+        "addPhotoButton": "Add a photo",
+        "fitLabel": "Image display",
+        "fitCover": "Fill (crop)",
+        "fitContain": "Contain (full image)",
+        "slideshowIntervalLabel": "Slideshow (seconds)",
+        "slideshowIntervalHelp": "Set to 0 to disable slideshow. Recommended: 10-30 seconds.",
+        "showCaptionLabel": "Show captions",
+        "emptyPhotos": "No photos configured.",
+        "imageError": "Unable to load this image."
+      },
       "alarm": {
         "armButton": "Arm",
         "disarmButton": "Disarm",
@@ -622,6 +640,7 @@
       "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
+      "allIntegrationsUpToDate": "All your integrations are up to date.",
       "noSearchResults": "No integration matching \"{{searchKeyword}}\" was found.",
       "noSearchResultsSuggestion": "Try <a href=\"/dashboard/integration/device/matter\">Matter</a> for Matter/Thread compatible devices, or <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> to connect Somfy, Shelly, Daikin and many other devices.",
       "refreshStore": {
@@ -640,6 +659,7 @@
       "menu": {
         "all": "All integrations",
         "favorites": "Favorites",
+        "updates": "To update",
         "device": "Devices",
         "communication": "Communication",
         "calendar": "Calendar",
@@ -5490,6 +5510,7 @@
     "history": "Activity",
     "devices": "Devices",
     "integrations": "Integrations",
+    "integrationsToUpdate": "Integrations to update: {{count}}",
     "calendar": "Calendar",
     "maps": "Maps",
     "scenes": "Scenes",

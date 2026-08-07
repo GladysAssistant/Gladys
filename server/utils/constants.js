@@ -1843,6 +1843,7 @@ const DASHBOARD_BOX_TYPE = {
   ENERGY_CONSUMPTION: 'energy-consumption',
   VOICE_ASSISTANT: 'voice-assistant',
   LINK: 'link',
+  PHOTO: 'photo',
 };
 
 const ERROR_MESSAGES = {
