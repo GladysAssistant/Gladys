@@ -269,6 +269,13 @@ class ExternalIntegrationInstallPage extends Component {
 
                             <NetworkDiscoverySummary networkDiscovery={manifest.network_discovery} />
 
+                            {manifest.location === true && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-map-pin mr-1" />
+                                <Text id="integration.externalIntegration.install.locationText" />
+                              </div>
+                            )}
+
                             <WebhooksSummary webhooks={manifest.webhooks} language={language} />
 
                             {duplicateOfInstalled && (

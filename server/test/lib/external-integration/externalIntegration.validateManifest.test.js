@@ -92,6 +92,12 @@ describe('externalIntegration.validateManifest', () => {
     expect422({ ...TEST_MANIFEST, homepage: 'https://example.com' }, 'homepage: unknown field');
   });
 
+  it('should accept a location declaration and reject a non-boolean one', () => {
+    const manifest = { ...TEST_MANIFEST, location: true };
+    expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
+    expect422({ ...TEST_MANIFEST, location: 'yes' }, 'location: must be a boolean');
+  });
+
   it('should reject an invalid semver version', () => {
     expect422({ ...TEST_MANIFEST, version: 'not-semver' }, 'version: must be valid semver');
     // strict semver: the normalized form must be the exact input

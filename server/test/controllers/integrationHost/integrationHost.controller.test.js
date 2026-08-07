@@ -365,6 +365,56 @@ describe('Integration host API', () => {
     });
   });
 
+  describe('GET /api/integration/v1/house', () => {
+    it('should return the houses with only their location fields', async () => {
+      const locationService = await seedExternalService({
+        name: 'ext-dev-vigieau-demo',
+        selector: 'ext-dev-vigieau-demo',
+        manifest: { ...TEST_MANIFEST, location: true },
+      });
+      const locationToken = generateIntegrationToken(locationService.id, 1, 'secret');
+      const res = await integrationRequest(locationToken)
+        .get('/api/integration/v1/house')
+        .expect('Content-Type', /json/)
+        .expect(200);
+      // seeded houses: "Peppers house" has no coordinates yet — null, not absent
+      expect(res.body).to.deep.equal([
+        {
+          id: '6295ad8b-b655-4422-9e6d-b4612da5d55f',
+          name: 'Peppers house',
+          selector: 'pepper-house',
+          latitude: null,
+          longitude: null,
+        },
+        {
+          id: 'a741dfa6-24de-4b46-afc7-370772f068d5',
+          name: 'Test house',
+          selector: 'test-house',
+          latitude: 12,
+          longitude: 12,
+        },
+      ]);
+    });
+
+    it('should answer 403 without a location declaration in the manifest: server-side guarantee', async () => {
+      await integrationRequest(token)
+        .get('/api/integration/v1/house')
+        .expect(403);
+    });
+
+    it('should answer 403 with location declared false', async () => {
+      const noLocationService = await seedExternalService({
+        name: 'ext-dev-no-location',
+        selector: 'ext-dev-no-location',
+        manifest: { ...TEST_MANIFEST, location: false },
+      });
+      const noLocationToken = generateIntegrationToken(noLocationService.id, 1, 'secret');
+      await integrationRequest(noLocationToken)
+        .get('/api/integration/v1/house')
+        .expect(403);
+    });
+  });
+
   describe('POST /api/integration/v1/state', () => {
     it('should accept a batch of states', async () => {
       await integrationRequest(token)
