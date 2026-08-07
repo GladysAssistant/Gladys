@@ -108,14 +108,23 @@ async function getDeviceFeaturesAggregates(
 
   const isBinary = ['binary', 'push'].includes(deviceFeature.type);
 
-  if (offsetInMinutes < 0) {
+  // Those parameters can come from the HTTP query string, so they may be strings.
+  // They need to be coerced before any arithmetic, otherwise "1440" + "1440" concatenates.
+  const interval = Number(intervalInMinutes);
+  const offset = Number(offsetInMinutes);
+
+  if (!Number.isFinite(interval) || interval <= 0) {
+    throw new BadParameters('Invalid interval parameter. Must be a positive number.');
+  }
+
+  if (!Number.isFinite(offset) || offset < 0) {
     throw new BadParameters('Invalid offset parameter. Must be a positive number.');
   }
 
-  const endDate = new Date(Date.now() - offsetInMinutes * 60 * 1000);
+  const endDate = new Date(Date.now() - offset * 60 * 1000);
   endDate.setMinutes(endDate.getMinutes() - endDate.getTimezoneOffset());
 
-  const startDate = new Date(Date.now() - (offsetInMinutes + intervalInMinutes) * 60 * 1000);
+  const startDate = new Date(Date.now() - (offset + interval) * 60 * 1000);
   startDate.setMinutes(startDate.getMinutes() - startDate.getTimezoneOffset());
 
   let values;

@@ -260,8 +260,9 @@
 .backToNow {
   font-size: 0.625rem;
   font-weight: 600;
-  color: #206bc4;
+  color: #656d77;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   line-height: 1.2;
+  transition: color 0.15s ease;
 }

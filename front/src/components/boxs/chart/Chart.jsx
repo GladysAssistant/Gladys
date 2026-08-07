@@ -272,9 +272,11 @@ class Chartbox extends Component {
           name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.on'),
           data: []
         };
-        const now = new Date();
+        // Segments still open at the end of the displayed period are clamped to the end of
+        // that period, so browsing a past period doesn't stretch the last bar until now.
+        const periodEnd = dayjs().subtract(this.state.offset, 'minute');
 
-        const lastValueTime = Math.round(now.getTime() / 1000) * 1000;
+        const lastValueTime = Math.round(periodEnd.valueOf() / 1000) * 1000;
         data.forEach((oneFeature, index) => {
           const { values, deviceFeature, device } = oneFeature;
           const deviceFeatureName = deviceFeatureNames

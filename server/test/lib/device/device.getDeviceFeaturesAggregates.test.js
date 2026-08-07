@@ -293,6 +293,67 @@ describe('Device.getDeviceFeaturesAggregates non binary feature', function Descr
       new Date(currentValues[0].created_at).getTime(),
     );
   });
+  it('should return the same period when interval and offset are strings', async () => {
+    await insertStates(72 * 60);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const { values: withNumbers } = await device.getDeviceFeaturesAggregates(
+      'test-device-feature',
+      24 * 60,
+      100,
+      null,
+      24 * 60,
+    );
+    // The API layer can forward query string values, so strings must give the same window
+    const { values: withStrings } = await device.getDeviceFeaturesAggregates(
+      'test-device-feature',
+      '1440',
+      100,
+      null,
+      '1440',
+    );
+    expect(withStrings).to.have.lengthOf(withNumbers.length);
+    expect(new Date(withStrings[0].created_at).getTime()).to.equal(new Date(withNumbers[0].created_at).getTime());
+    expect(new Date(withStrings[withStrings.length - 1].created_at).getTime()).to.equal(
+      new Date(withNumbers[withNumbers.length - 1].created_at).getTime(),
+    );
+  });
+  it('should return error when interval is not a number', async () => {
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const promise = device.getDeviceFeaturesAggregates('test-device-feature', 'not-a-number', 100, null, 0);
+    return assert.isRejected(promise, 'Invalid interval parameter');
+  });
+  it('should return error when offset is not a number', async () => {
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const promise = device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100, null, 'not-a-number');
+    return assert.isRejected(promise, 'Invalid offset parameter');
+  });
   it('should return error when offset is negative', async () => {
     const variable = {
       getValue: fake.resolves(null),
