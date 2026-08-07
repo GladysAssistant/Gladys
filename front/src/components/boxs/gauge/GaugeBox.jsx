@@ -6,6 +6,7 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import { checkAndConvertUnit } from '../../../../../server/utils/units';
+import { getDeviceName } from '../../../utils/device';
 
 const DEFAULT_GAUGE_COLOR_LOW = '#316cbe';
 const DEFAULT_GAUGE_COLOR_IN_RANGE = '#00b894';
@@ -63,7 +64,7 @@ class GaugeBox extends Component {
       const deviceFeature = device.features.find(f => f.selector === this.props.box.device_feature);
 
       this.setState({
-        boxName: device.name,
+        device,
         deviceFeature,
         noDeviceFeatureSelector: false
       });
@@ -164,6 +165,16 @@ class GaugeBox extends Component {
     return `${formattedValue} ${unitTranslation || displayUnit}`;
   };
 
+  getDisplayLabel = (device, deviceFeature) => {
+    if (this.props.box.name) {
+      return this.props.box.name;
+    }
+    if (device && deviceFeature) {
+      return getDeviceName(device, deviceFeature);
+    }
+    return device ? device.name : 'Value';
+  };
+
   handleWebsocketConnected = ({ connected }) => {
     // When the websocket is disconnected, we refresh the data when the websocket is reconnected
     if (!connected) {
@@ -216,7 +227,8 @@ class GaugeBox extends Component {
         prevProps.box.gauge_color_low !== this.props.box.gauge_color_low ||
         prevProps.box.gauge_color_in_range !== this.props.box.gauge_color_in_range ||
         prevProps.box.gauge_color_high !== this.props.box.gauge_color_high);
-    if (deviceFeatureIdentityChanged) {
+    const displayLabelChanged = prevProps.box.name !== this.props.box.name;
+    if (deviceFeatureIdentityChanged || displayLabelChanged) {
       this.initChart();
     } else if (valueChanged || gaugeStyleChanged) {
       // Only initialize the chart if it doesn't exist yet
@@ -229,7 +241,7 @@ class GaugeBox extends Component {
   }
 
   initChart() {
-    const { deviceFeature, boxName } = this.state;
+    const { device, deviceFeature } = this.state;
     if (!deviceFeature || !this.chartElement) return;
 
     if (deviceFeature.last_value === null) {
@@ -305,7 +317,7 @@ class GaugeBox extends Component {
       stroke: {
         dashArray: 4
       },
-      labels: [boxName || 'Value']
+      labels: [this.getDisplayLabel(device, deviceFeature)]
     };
 
     // Create and render the chart

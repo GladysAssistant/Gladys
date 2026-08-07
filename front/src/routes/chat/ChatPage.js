@@ -1,16 +1,16 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { useEffect, useRef } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { connect } from 'unistore/preact';
 import actions from '../../actions/message';
 import { RequestStatus } from '../../utils/consts';
 import ChatItems from './ChatItems';
 import EmptyChat from './EmptyChat';
-import ChatSidebar from './ChatSidebar';
+import AiModelSelector from './AiModelSelector';
 import style from './style.css';
 
 const IntegrationPage = connect(
-  'user,messages,currentMessageTextInput,gladysIsTyping,MessageGetStatus',
+  'user,messages,currentMessageTextInput,gladysIsTyping,MessageGetStatus,httpClient',
   actions
 )(
   ({
@@ -21,10 +21,25 @@ const IntegrationPage = connect(
     updateMessageTextInput,
     onKeyPress,
     sendMessage,
-    gladysIsTyping
+    gladysIsTyping,
+    httpClient
   }) => {
     const textareaRef = useRef(null);
+    const [selectedModel, setSelectedModel] = useState('auto');
+    const [gladysPlusConfigured, setGladysPlusConfigured] = useState(null);
     const hasMessageToSend = Boolean(currentMessageTextInput && currentMessageTextInput.trim().length > 0);
+
+    useEffect(() => {
+      const fetchGatewayStatus = async () => {
+        try {
+          const gatewayStatus = await httpClient.get('/api/v1/gateway/status');
+          setGladysPlusConfigured(gatewayStatus.configured === true);
+        } catch (e) {
+          setGladysPlusConfigured(false);
+        }
+      };
+      fetchGatewayStatus();
+    }, [httpClient]);
 
     const resizeComposerInput = () => {
       if (!textareaRef.current) {
@@ -47,6 +62,19 @@ const IntegrationPage = connect(
       resizeComposerInput();
     };
 
+    const handleSendMessage = () => {
+      sendMessage(selectedModel);
+    };
+
+    const handleKeyPress = e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage(selectedModel);
+        return;
+      }
+      onKeyPress(e);
+    };
+
     useEffect(() => {
       resizeComposerInput();
     }, [currentMessageTextInput]);
@@ -54,58 +82,55 @@ const IntegrationPage = connect(
     return (
       <div class={cx('page', style.chatPage)}>
         <div class={cx('page-main', style.chatPageMain)}>
-          <div class={cx('my-3 my-md-5', style.chatPageContent)}>
+          <div class={style.chatPageContent}>
             <div class={cx('container', style.chatPageContainer)}>
-              <div class="page-header" />
-              <div class={cx('row', style.chatLayout)}>
-                <div class={cx('col-lg-8', style.chatMainColumn)}>
-                  <div class={cx('card', style.chatCard)}>
-                    <div
-                      class={cx('dimmer', style.chatDimmer, {
-                        active: MessageGetStatus === RequestStatus.Getting
-                      })}
-                    >
-                      <div class="loader" />
-                      <div class={cx('dimmer-content', style.chatCardBody)}>
-                        <div class={style.chatMessagesArea}>
-                          {messages && messages.length ? (
-                            <ChatItems user={user} messages={messages} gladysIsTyping={gladysIsTyping} />
-                          ) : (
-                            <EmptyChat />
-                          )}
-                        </div>
-                        <div class={cx('card-footer', style.chatComposer)}>
-                          <div class={style.composerInputWrap}>
-                            <Localizer>
-                              <textarea
-                                ref={textareaRef}
-                                rows="1"
-                                class={cx('form-control', style.chatInput)}
-                                placeholder={<Text id="chat.messagePlaceholder" />}
-                                value={currentMessageTextInput}
-                                onInput={onComposerInput}
-                                onKeyPress={onKeyPress}
-                              />
-                            </Localizer>
-                            <button
-                              type="button"
-                              class={cx('btn', style.sendButton, {
-                                [style.sendButtonActive]: hasMessageToSend,
-                                [style.sendButtonIdle]: !hasMessageToSend
-                              })}
-                              onClick={sendMessage}
-                              disabled={!hasMessageToSend}
-                            >
-                              <i class="fe fe-send" />
-                            </button>
-                          </div>
+              <div class={style.chatMainColumn}>
+                <div class={cx('card', style.chatCard)}>
+                  <div
+                    class={cx('dimmer', style.chatDimmer, {
+                      active: MessageGetStatus === RequestStatus.Getting
+                    })}
+                  >
+                    <div class="loader" />
+                    <div class={cx('dimmer-content', style.chatCardBody)}>
+                      <div class={style.chatMessagesArea}>
+                        {messages && messages.length ? (
+                          <ChatItems user={user} messages={messages} gladysIsTyping={gladysIsTyping} />
+                        ) : (
+                          <EmptyChat />
+                        )}
+                      </div>
+                      <div class={cx('card-footer', style.chatComposer)}>
+                        {gladysPlusConfigured === true && (
+                          <AiModelSelector value={selectedModel} onChange={setSelectedModel} />
+                        )}
+                        <div class={style.composerInputWrap}>
+                          <Localizer>
+                            <textarea
+                              ref={textareaRef}
+                              rows="1"
+                              class={cx('form-control', style.chatInput)}
+                              placeholder={<Text id="chat.messagePlaceholder" />}
+                              value={currentMessageTextInput}
+                              onInput={onComposerInput}
+                              onKeyPress={handleKeyPress}
+                            />
+                          </Localizer>
+                          <button
+                            type="button"
+                            class={cx('btn', style.sendButton, {
+                              [style.sendButtonActive]: hasMessageToSend,
+                              [style.sendButtonIdle]: !hasMessageToSend
+                            })}
+                            onClick={handleSendMessage}
+                            disabled={!hasMessageToSend}
+                          >
+                            <i class="fe fe-send" />
+                          </button>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class={cx('col-lg-4', style.desktopSidebarColumn)}>
-                  <ChatSidebar />
                 </div>
               </div>
             </div>

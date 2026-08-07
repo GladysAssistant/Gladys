@@ -4,14 +4,79 @@ import Select from 'react-select';
 import update from 'immutability-helper';
 
 import TextWithVariablesInjected from '../../../../../components/scene/TextWithVariablesInjected';
+import getDeviceFeatureValueOptions from '../../../../../utils/deviceFeatureValueOptions';
+import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 import style from './Condition.css';
 
+const getDeviceFeature = option => (option && option.data ? option.data.deviceFeature : null);
+
+const isSameValue = (optionValue, conditionValue) => `${optionValue}` === `${conditionValue}`;
+
 class Condition extends Component {
+  // The current value can be displayed in the list only if it's a raw value present in that list
+  isValueInValueOptions = valueOptions => {
+    const { value, evaluate_value: evaluateValue } = this.props.condition;
+    return Boolean(
+      valueOptions &&
+        evaluateValue === undefined &&
+        value !== undefined &&
+        valueOptions.some(option => isSameValue(option.value, value))
+    );
+  };
+
   handleChange = selectedOption => {
+    const valueOptions = getDeviceFeatureValueOptions(this.props.intl.dictionary, getDeviceFeature(selectedOption));
+    // If the new variable only accepts a list of values, we drop the previous value if it's not in that list
+    const shouldResetValue = Boolean(valueOptions) && !this.isValueInValueOptions(valueOptions);
+
     const newCondition = update(this.props.condition, {
       variable: {
         $set: selectedOption && selectedOption.value ? selectedOption.value : null
+      },
+      ...(shouldResetValue
+        ? {
+            value: { $set: undefined },
+            evaluate_value: { $set: undefined }
+          }
+        : {})
+    });
+    if (shouldResetValue) {
+      this.setState({ customValue: false });
+    }
+    this.props.handleConditionChange(this.props.index, newCondition);
+  };
+
+  handleValueOptionChange = selectedOption => {
+    const newCondition = update(this.props.condition, {
+      value: {
+        $set: selectedOption ? selectedOption.value : undefined
+      },
+      evaluate_value: {
+        $set: undefined
+      }
+    });
+    this.props.handleConditionChange(this.props.index, newCondition);
+  };
+
+  displayCustomValue = e => {
+    e.preventDefault();
+    this.setState({ customValue: true });
+  };
+
+  displayValueOptions = e => {
+    e.preventDefault();
+    this.setState({ customValue: false });
+    // We keep the current value if it can be pre-selected in the list
+    if (this.isValueInValueOptions(this.getValueOptions(this.getSelectedOption()))) {
+      return;
+    }
+    const newCondition = update(this.props.condition, {
+      value: {
+        $set: undefined
+      },
+      evaluate_value: {
+        $set: undefined
       }
     });
     this.props.handleConditionChange(this.props.index, newCondition);
@@ -87,13 +152,35 @@ class Condition extends Component {
     return selectedOption;
   };
 
-  render(props, {}) {
+  getValueOptions = selectedOption =>
+    getDeviceFeatureValueOptions(this.props.intl.dictionary, getDeviceFeature(selectedOption));
+
+  // We display the list of values only if the variable is a device feature holding constants,
+  // and if the current value can be represented in that list (it's not a scene variable or
+  // a value saved before this list existed)
+  shouldDisplayValueOptions = (valueOptions, customValue) => {
+    if (!valueOptions || customValue) {
+      return false;
+    }
+    const { value, evaluate_value: evaluateValue } = this.props.condition;
+    if (evaluateValue !== undefined) {
+      return false;
+    }
+    if (value === undefined || value === '') {
+      return true;
+    }
+    return this.isValueInValueOptions(valueOptions);
+  };
+
+  render(props, { customValue }) {
     const selectedOption = this.getSelectedOption();
+    const valueOptions = this.getValueOptions(selectedOption);
+    const showValueOptions = this.shouldDisplayValueOptions(valueOptions, customValue);
+    const selectedValueOption = showValueOptions
+      ? valueOptions.find(option => isSameValue(option.value, props.condition.value)) || null
+      : null;
     return (
       <div>
-        <div className={style.explanationText}>
-          <Text id="editScene.actionsCard.onlyContinueIf.explanationText" />
-        </div>
         <div class="row">
           <div class="col-md-4">
             <div class="form-group">
@@ -154,22 +241,46 @@ class Condition extends Component {
                   <Text id="global.requiredField" />
                 </span>
               </label>
-              <Localizer>
-                <TextWithVariablesInjected
-                  text={
-                    props.condition.value !== undefined
-                      ? props.condition.value.toString()
-                      : props.condition.evaluate_value
-                  }
-                  triggersVariables={props.triggersVariables}
-                  actionsGroupsBefore={props.actionsGroupsBefore}
-                  variables={props.variables}
-                  path={props.path}
-                  updateText={this.handleValueChange}
-                  singleLineInput
-                  class={`${style.conditionTagify}`}
+              {showValueOptions && (
+                <Select
+                  value={selectedValueOption}
+                  onChange={this.handleValueOptionChange}
+                  options={valueOptions}
+                  className="react-select-container"
+                  classNamePrefix="react-select"
                 />
-              </Localizer>
+              )}
+              {!showValueOptions && (
+                <Localizer>
+                  <TextWithVariablesInjected
+                    text={
+                      props.condition.value !== undefined
+                        ? props.condition.value.toString()
+                        : props.condition.evaluate_value
+                    }
+                    triggersVariables={props.triggersVariables}
+                    actionsGroupsBefore={props.actionsGroupsBefore}
+                    variables={props.variables}
+                    path={props.path}
+                    updateText={this.handleValueChange}
+                    singleLineInput
+                    class={`${style.conditionTagify}`}
+                  />
+                </Localizer>
+              )}
+              {valueOptions && (
+                <small class="form-text">
+                  <a href="#" onClick={showValueOptions ? this.displayCustomValue : this.displayValueOptions}>
+                    <Text
+                      id={
+                        showValueOptions
+                          ? 'editScene.actionsCard.onlyContinueIf.useCustomValue'
+                          : 'editScene.actionsCard.onlyContinueIf.useValueList'
+                      }
+                    />
+                  </a>
+                </small>
+              )}
             </div>
           </div>
           <div class="col-md-2">
@@ -204,4 +315,4 @@ class Condition extends Component {
   }
 }
 
-export default Condition;
+export default withIntlAsProp(Condition);

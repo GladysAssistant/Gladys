@@ -1,0 +1,10 @@
+[
+  {
+    "device_feature_external_id": "tuya:socket-device-id:switch_1",
+    "state": 1
+  },
+  {
+    "device_feature_external_id": "tuya:socket-device-id:cur_power",
+    "state": 224.5
+  }
+]

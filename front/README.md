@@ -20,4 +20,4 @@ npm start
 npm run build
 ```
 
-For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
+For build tooling details, see the [Vite documentation](https://vite.dev/).

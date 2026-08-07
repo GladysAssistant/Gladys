@@ -1,4 +1,5 @@
 import { Text } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 
 const GatewayPage = ({ children, ...props }) => (
   <div class="card">
@@ -8,14 +9,16 @@ const GatewayPage = ({ children, ...props }) => (
       </h2>
     </div>
     <div class="card-body">
-      <p>
-        <Text id="signup.restoreBackupInProgress.description" />
-      </p>
       {!props.gatewayRestoreErrored && (
-        <div class="dimmer active">
-          <div class="loader" />
-          <div class="dimmer-content">
-            <div style={{ height: '10rem' }} />
+        <div>
+          <p>
+            <Text id="signup.restoreBackupInProgress.description" />
+          </p>
+          <div class="dimmer active">
+            <div class="loader" />
+            <div class="dimmer-content">
+              <div style={{ height: '10rem' }} />
+            </div>
           </div>
         </div>
       )}
@@ -24,9 +27,15 @@ const GatewayPage = ({ children, ...props }) => (
           <div class="alert alert-danger">
             <Text id="signup.restoreBackupInProgress.errored" />
           </div>
-          <div class="btn btn-primary" onClick={props.changeStepToUpdateRestoreKey}>
+          <p>
+            <Text id="signup.restoreBackupInProgress.erroredHelp" />
+          </p>
+          <button class="btn btn-primary btn-block" onClick={props.changeStepToUpdateRestoreKey}>
             <Text id="signup.restoreBackupInProgress.updateRestoreKeyButton" />
-          </div>
+          </button>
+          <Link href="/signup/create-account-local" class="btn btn-secondary btn-block">
+            <Text id="signup.restoreBackupInProgress.createLocalAccountButton" />
+          </Link>
         </div>
       )}
     </div>

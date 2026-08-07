@@ -1011,6 +1011,127 @@ const data = {
     device: 'main-lamp',
     status: 'pending'
   },
+  'get /api/v1/room': [
+    {
+      id: '1c634ff4-0476-4733-a084-b4a43d649c84',
+      name: 'Living Room',
+      selector: 'living-room'
+    },
+    {
+      id: 'be6ba391-ebb3-472d-81af-d75d710a8430',
+      name: 'Kitchen',
+      selector: 'kitchen'
+    }
+  ],
+  'get /api/v1/device_feature/states_history': [
+    {
+      value: 1,
+      created_at: dayjs()
+        .subtract(2, 'minute')
+        .toISOString(),
+      device_feature: {
+        name: 'Motion',
+        selector: 'demo-motion-sensor',
+        category: 'motion-sensor',
+        type: 'binary',
+        unit: null
+      },
+      device: { name: 'Motion sensor', selector: 'demo-motion' },
+      room: { name: 'Living Room', selector: 'living-room' }
+    },
+    {
+      value: 0,
+      created_at: dayjs()
+        .subtract(9, 'minute')
+        .toISOString(),
+      device_feature: {
+        name: 'Opening',
+        selector: 'demo-front-door-opening',
+        category: 'opening-sensor',
+        type: 'binary',
+        unit: null
+      },
+      device: { name: 'Front door', selector: 'demo-front-door' },
+      room: { name: 'Living Room', selector: 'living-room' }
+    },
+    {
+      value: 21.4,
+      created_at: dayjs()
+        .subtract(25, 'minute')
+        .toISOString(),
+      device_feature: {
+        name: 'Temperature',
+        selector: 'temperature-sensor',
+        category: 'temperature-sensor',
+        type: 'decimal',
+        unit: 'celsius'
+      },
+      device: { name: 'Multi-sensor', selector: 'sensors' },
+      room: { name: 'Living Room', selector: 'living-room' }
+    },
+    {
+      value: 1,
+      created_at: dayjs()
+        .subtract(42, 'minute')
+        .toISOString(),
+      device_feature: {
+        name: 'On/Off',
+        selector: 'demo-main-lamp-binary',
+        category: 'light',
+        type: 'binary',
+        unit: null
+      },
+      device: { name: 'Main lamp', selector: 'main-lamp' },
+      room: { name: 'Living Room', selector: 'living-room' }
+    },
+    {
+      value: 52,
+      created_at: dayjs()
+        .subtract(55, 'minute')
+        .toISOString(),
+      device_feature: {
+        name: 'Humidity',
+        selector: 'humidity-sensor',
+        category: 'humidity-sensor',
+        type: 'decimal',
+        unit: 'percent'
+      },
+      device: { name: 'Multi-sensor', selector: 'sensors' },
+      room: { name: 'Kitchen', selector: 'kitchen' }
+    },
+    {
+      value: 1,
+      created_at: dayjs()
+        .subtract(1, 'day')
+        .subtract(2, 'hour')
+        .toISOString(),
+      device_feature: {
+        name: 'Click',
+        selector: 'demo-button-click',
+        category: 'button',
+        type: 'click',
+        unit: null
+      },
+      device: { name: 'Wall button', selector: 'demo-button' },
+      room: { name: 'Kitchen', selector: 'kitchen' }
+    },
+    {
+      value: 0,
+      created_at: dayjs()
+        .subtract(1, 'day')
+        .subtract(3, 'hour')
+        .toISOString(),
+      device_feature: {
+        name: 'Opening',
+        selector: 'demo-front-door-opening',
+        category: 'opening-sensor',
+        type: 'binary',
+        unit: null
+      },
+      device: { name: 'Front door', selector: 'demo-front-door' },
+      room: { name: 'Living Room', selector: 'living-room' }
+    }
+  ],
   'get /api/v1/service/philips-hue/bridge': [
     {
       name: 'Philips hue',

@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import ConfigureTwoFactorForm from './ConfigureTwoFactorForm';
 import QRCode from 'qrcode';
+import actions from '../../actions/login/loginGateway';
 
 class ConfigureTwoFactorPage extends Component {
   state = {
@@ -55,18 +56,28 @@ class ConfigureTwoFactorPage extends Component {
 
     let twoFactorCode = this.state.twoFactorCode.replace(/\s/g, '');
 
-    this.props.session.gatewayClient
-      .enableTwoFactor(accessToken, twoFactorCode)
-      .then(() => {
+    try {
+      await this.props.session.gatewayClient.enableTwoFactor(accessToken, twoFactorCode);
+    } catch (err) {
+      if (err && err.response && err.response.status === 401) {
         window.location = '/login';
-      })
-      .catch(err => {
-        if (err && err.response && err.response.status === 401) {
-          window.location = '/login';
-        } else {
-          this.setState({ errored: true });
-        }
-      });
+      } else {
+        this.setState({ errored: true });
+      }
+      return;
+    }
+    // 2FA is now enabled. If the credentials used to reach this page are still
+    // in memory, we log in again silently so the user only has to enter a fresh
+    // code. Otherwise (page reloaded), we fall back to the classic login page.
+    if (this.props.gatewayLoginEmail && this.props.gatewayLoginPassword) {
+      try {
+        await this.props.finalizeTwoFactorSetup();
+        return;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    window.location = '/login';
   };
 
   componentWillMount = () => {
@@ -90,4 +101,4 @@ class ConfigureTwoFactorPage extends Component {
   }
 }
 
-export default connect('session', {})(ConfigureTwoFactorPage);
+export default connect('session,gatewayLoginEmail,gatewayLoginPassword', actions)(ConfigureTwoFactorPage);

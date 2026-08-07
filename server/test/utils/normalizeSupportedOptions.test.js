@@ -68,6 +68,24 @@ describe('normalizeSupportedOptions', () => {
     expect(() => normalizeSupportedOptions([{ id: 'not-a-uuid', value: 1, label: 'On' }])).to.throw(BadParameters);
   });
 
+  it('should strip database metadata fields so saved devices can be round-tripped', () => {
+    const options = normalizeSupportedOptions([
+      {
+        id: 'fc235c88-b10d-4706-8b59-fef92a7119b2',
+        value: 1,
+        label: 'On',
+        sort_order: 0,
+        device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        created_at: '2026-07-20T10:00:00.000Z',
+        updated_at: '2026-07-20T10:00:00.000Z',
+      },
+    ]);
+
+    expect(options).to.deep.equal([
+      { id: 'fc235c88-b10d-4706-8b59-fef92a7119b2', value: 1, label: 'On', sort_order: 0 },
+    ]);
+  });
+
   it('should aggregate multiple validation errors', () => {
     try {
       normalizeSupportedOptions([{ value: 'bad', label: '' }]);

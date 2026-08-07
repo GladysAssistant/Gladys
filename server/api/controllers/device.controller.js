@@ -113,6 +113,16 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/device_feature/states_history getDeviceStatesHistory
+   * @apiName getDeviceStatesHistory
+   * @apiGroup Device
+   */
+  async function getDeviceStatesHistory(req, res) {
+    const states = await gladys.device.getDeviceStatesHistory(req.query);
+    res.json(states);
+  }
+
+  /**
    * @api {get} /api/v1/device_feature/energy_consumption getConsumptionByDates
    * @apiName getConsumptionByDates
    * @apiGroup Device
@@ -157,6 +167,18 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/device/:device_selector/migrate migrate
+   * @apiName migrate
+   * @apiGroup Device
+   * @apiParam {String} destination_device_selector Selector of the destination device.
+   * @apiParam {Object} [features_mapping] Map of source feature selector to destination feature selector.
+   */
+  async function migrate(req, res) {
+    const result = await gladys.device.migrate(req.params.device_selector, req.body);
+    res.json(result);
+  }
+
+  /**
    * @api {get} /api/v1/device/duckdb_migration_state getDuckDbMigrationState
    * @apiName getDuckDbMigrationState
    * @apiGroup Device
@@ -175,10 +197,12 @@ module.exports = function DeviceController(gladys) {
     setValue: asyncMiddleware(setValue),
     setValueFeature: asyncMiddleware(setValueFeature),
     getDeviceFeaturesAggregated: asyncMiddleware(getDeviceFeaturesAggregated),
+    getDeviceStatesHistory: asyncMiddleware(getDeviceStatesHistory),
     getConsumptionByDates: asyncMiddleware(getConsumptionByDates),
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),
     migrateFromSQLiteToDuckDb: asyncMiddleware(migrateFromSQLiteToDuckDb),
+    migrate: asyncMiddleware(migrate),
     updateDeviceFeature: asyncMiddleware(updateDeviceFeature),
   });
 };

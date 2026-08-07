@@ -1,0 +1,22 @@
+/* Free-form text published by an external integration and rendered by the
+   core: action results, connection status messages, manifest and field
+   descriptions. The core renders it as escaped plain text — never HTML,
+   the container is unaudited third-party code — so line breaks are the
+   only formatting an integration can use, and HTML collapses them by
+   default. pre-wrap preserves them; overflow-wrap keeps a long unbroken
+   token (a URL, an id) from blowing out the card. Same idiom as the
+   container logs and the chat bubbles. */
+.integrationText {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Added next to integrationText on an action result, whose length nothing
+   bounds — the integration decides what it returns: a verbose message
+   scrolls inside its alert instead of pushing the rest of the screen
+   down. Purely the height cap, so the wrapping rules above stay defined
+   in exactly one place. */
+.resultScroll {
+  max-height: 18rem;
+  overflow-y: auto;
+}

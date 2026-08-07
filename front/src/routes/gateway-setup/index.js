@@ -19,6 +19,24 @@ class LinkGatewayUser extends Component {
       `${this.props.session.gladysGatewayApiUrl}/accounts/stripe_customer_portal/${this.state.setupState.stripe_portal_key}`
     );
   };
+  logout = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    try {
+      // We try to revoke the session, but this call goes through the local Gladys
+      // instance: it can fail when the instance is disconnected, which is precisely
+      // the case where the user is stuck on this page. We log out locally anyway.
+      const user = this.props.session.getUser();
+      if (user && user.session_id) {
+        await this.props.httpClient.post(`/api/v1/session/${user.session_id}/revoke`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    this.props.session.reset();
+    window.location = '/login';
+  };
   selectUser = e => {
     this.setState({
       selectedUser: e.target.value
@@ -75,20 +93,43 @@ class LinkGatewayUser extends Component {
     await Promise.all([this.props.getUsers(), this.getSetupState()]);
     await this.checkIfGladysUserIsLinkedToExistingUser();
   };
+  retry = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState({ error: false, errorNotAcceptedLocally: false, retrying: true });
+    try {
+      await this.init();
+    } catch (err) {
+      console.error(err);
+      this.setState({ error: true });
+    } finally {
+      this.setState({ retrying: false });
+    }
+  };
   componentWillMount() {
     this.init();
   }
-  render(props, { savingUserLoading, error, errorNotAcceptedLocally }) {
+  render(props, { savingUserLoading, error, errorNotAcceptedLocally, retrying }) {
     const loading = savingUserLoading || props.usersGetStatus === RequestStatus.Getting;
+    // While retrying, we keep displaying the step-by-step guide (under the loading
+    // dimmer) instead of flashing the user-select form during the "Getting" state.
+    const usersGetStatus =
+      retrying && props.usersGetStatus === RequestStatus.Getting
+        ? RequestStatus.GatewayNoInstanceFound
+        : props.usersGetStatus;
     return (
       <LinkGatewayUserPage
         {...props}
+        usersGetStatus={usersGetStatus}
         error={error}
         errorNotAcceptedLocally={errorNotAcceptedLocally}
         selectUser={this.selectUser}
         saveUser={this.saveUser}
+        retry={this.retry}
         loading={loading}
         openStripeBilling={this.openStripeBilling}
+        logout={this.logout}
       />
     );
   }

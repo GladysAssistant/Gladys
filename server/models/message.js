@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         defaultValue: 'chat',
         validate: {
-          isIn: [['chat', 'tool_call']],
+          isIn: [['chat', 'tool_call', 'notification']],
         },
       },
       tool_name: {

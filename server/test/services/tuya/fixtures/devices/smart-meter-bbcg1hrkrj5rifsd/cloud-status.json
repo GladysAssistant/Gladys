@@ -1,0 +1,37 @@
+{
+  "result": {
+    "properties": [
+      { "code": "power_a", "value": 706 },
+      { "code": "direction_a", "value": "FORWARD" },
+      { "code": "tbd", "value": false },
+      { "code": "direction_b", "value": "REVERSE" },
+      { "code": "power_b", "value": 0 },
+      { "code": "energy_forword_a", "value": 149241 },
+      { "code": "energy_reverse_a", "value": 43222 },
+      { "code": "energy_forword_b", "value": 0 },
+      { "code": "energy_reserse_b", "value": 0 },
+      { "code": "power_factor", "value": 73 },
+      { "code": "freq", "value": 4927 },
+      { "code": "voltage_a", "value": 2352 },
+      { "code": "current_a", "value": 410 },
+      { "code": "current_b", "value": 0 },
+      { "code": "total_power", "value": 706 },
+      { "code": "voltage_coef", "value": 1000 },
+      { "code": "current_a_calibration", "value": 1000 },
+      { "code": "power_a_calibration", "value": 1000 },
+      { "code": "energy_a_calibration_fwd", "value": 1000 },
+      { "code": "coef_a_reset", "value": false },
+      { "code": "power_factor_b", "value": 100 },
+      { "code": "freq_calibration", "value": 1000 },
+      { "code": "current_b_calibration", "value": 1000 },
+      { "code": "power_b_calibration", "value": 1000 },
+      { "code": "energy_b_calibration_fwd", "value": 1000 },
+      { "code": "coef_b_reset", "value": false },
+      { "code": "energy_a_calibration_rev", "value": 1000 },
+      { "code": "energy_b_calibration_rev", "value": 1000 },
+      { "code": "report_rate_control", "value": 10 },
+      { "code": "forward_energy_total", "value": 149241 },
+      { "code": "reverse_energy_total", "value": 43222 }
+    ]
+  }
+}

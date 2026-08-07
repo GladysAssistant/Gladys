@@ -1,5 +1,7 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS } = require('../../utils/constants');
+const { resolveAiChatModel } = require('../../utils/aiChatModels');
+const { Error400 } = require('../../utils/httpErrors');
 
 module.exports = function MessageController(gladys) {
   /**
@@ -17,6 +19,11 @@ module.exports = function MessageController(gladys) {
    * }
    */
   async function create(req, res) {
+    const resolvedModel = resolveAiChatModel(req.body.model);
+    if (req.body.model && resolvedModel === null) {
+      throw new Error400('INVALID_AI_MODEL');
+    }
+
     const messageToSend = {
       text: req.body.text,
       source: 'api_client',
@@ -26,6 +33,9 @@ module.exports = function MessageController(gladys) {
       created_at: req.body.created_at || new Date(),
       id: req.body.id,
     };
+    if (resolvedModel) {
+      messageToSend.model = resolvedModel;
+    }
     gladys.event.emit(EVENTS.MESSAGE.NEW, messageToSend);
     res.status(201).json({
       text: req.body.text,

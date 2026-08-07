@@ -25,7 +25,12 @@ async function finish(id, status, data) {
     status,
   };
   if (data) {
-    toUpdate.data = data;
+    // Merge with existing data: a failure report must not erase the structured
+    // data the job attached while running (counts, names, ...).
+    toUpdate.data = {
+      ...(job.data || {}),
+      ...data,
+    };
   }
   await job.update(toUpdate);
   const jobUpdated = job.get({ plain: true });

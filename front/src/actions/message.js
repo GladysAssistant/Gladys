@@ -87,7 +87,7 @@ function createActions(store) {
         actions.sendMessage(state);
       }
     },
-    async sendMessage(state) {
+    async sendMessage(state, aiChatModel = 'auto') {
       if (!state.currentMessageTextInput || state.currentMessageTextInput.trim().length === 0) {
         return;
       }
@@ -102,6 +102,13 @@ function createActions(store) {
           created_at: new Date(),
           id
         };
+        const messagePayload = {
+          text: messageText,
+          id
+        };
+        if (aiChatModel && aiChatModel !== 'auto') {
+          messagePayload.model = aiChatModel;
+        }
         // we first push the message
         const newState = update(state, {
           messages: {
@@ -117,7 +124,7 @@ function createActions(store) {
         newState.messages = sortMessages(newState.messages);
         store.setState(newState);
         // then we send the message
-        await state.httpClient.post('/api/v1/message', newMessage);
+        await state.httpClient.post('/api/v1/message', messagePayload);
         // then we remove the message loading
         const finalState = update(state, {
           messages: {

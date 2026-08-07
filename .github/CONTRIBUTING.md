@@ -43,7 +43,23 @@ Then, follow our guide:
 
 👉 [How to contribute a new service](https://gladysassistant.com/docs/dev/developing-a-service/)
 
+> ⚠️ If your PR adds new **device categories or types** (`DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES`), read the [device feature categories design & review criteria](../docs/specs/device-feature-categories.md) first: categories must describe generic capabilities (never a specific brand) and align with mature standards like Matter and Zigbee.
+>
 > 💡 As soon as you have some code, feel free to open a **Draft Pull Request**. This allows the team to follow your progress and provide early feedback.
+
+---
+
+## 🏷️ Labels & Forum Link
+
+Most labels are applied automatically, you don't need to set them yourself:
+
+- `type:feature` / `type:fix` / `type:chore` — set automatically when the PR is opened (you can pre-set one manually, it won't be overwritten)
+- `area:*` (server, front, integration, ai, infra) — set automatically from the files changed
+- `risk:high` / `needs:human-review` — set by the automated review
+
+Labels for contributors: look for [`good first issue`](https://github.com/gladysassistant/Gladys/labels/good%20first%20issue) and [`help wanted`](https://github.com/gladysassistant/Gladys/labels/help%20wanted) to find issues to work on.
+
+If your PR implements a forum request, add a line `Forum: https://community.gladysassistant.com/t/...` in the PR description (see the PR template): the release pipeline uses it to notify the forum topic when the feature ships.
 
 ---
 

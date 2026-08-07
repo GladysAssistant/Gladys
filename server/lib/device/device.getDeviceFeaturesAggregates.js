@@ -163,6 +163,7 @@ async function getDeviceFeaturesAggregates(
     },
     deviceFeature: {
       name: deviceFeature.name,
+      unit: deviceFeature.unit,
     },
     values,
   };

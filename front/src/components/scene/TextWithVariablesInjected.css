@@ -1,0 +1,45 @@
+/*
+ * Tagify draws tag backgrounds with a fixed-size inset box-shadow (1.1em).
+ * When a variable label wraps onto multiple lines, the tag is taller than 2.2em
+ * and the shadow no longer fills the middle, leaving a visible gap (black in dark mode).
+ */
+.tagify__tag > div {
+  white-space: normal;
+}
+
+.tagify__tag > div::before {
+  box-shadow: none !important;
+  background: var(--tag-bg, #e5e5e5);
+}
+
+.tagify__tag:focus div::before,
+.tagify__tag:hover:not([readonly]) div::before {
+  box-shadow: none !important;
+  background: var(--tag-hover, #d3e2e2);
+}
+
+.tagify__tag__removeBtn:hover + div::before {
+  box-shadow: none !important;
+  background: var(--tag-remove-bg, rgba(211, 148, 148, 0.3));
+}
+
+.tagify__tag.tagify--notAllowed:not(.tagify__tag--editable) div::before {
+  box-shadow: none !important;
+  background: var(--tag-invalid-bg, rgba(211, 148, 148, 0.5));
+}
+
+.tagify__tag--editable > div::before {
+  box-shadow: none !important;
+  background: var(--tag-hover, #d3e2e2);
+}
+
+.tagify__tag--editable.tagify--invalid > div::before {
+  box-shadow: none !important;
+  background: var(--tag-invalid-color, #d39494);
+}
+
+/* Keep tag colors readable in dark mode (same double-invert trick as .tag badges). */
+:global(.dark-mode) .tagify__tag > div,
+:global(.dark-mode) .tagify__tag__removeBtn {
+  filter: invert(100%) hue-rotate(180deg);
+}

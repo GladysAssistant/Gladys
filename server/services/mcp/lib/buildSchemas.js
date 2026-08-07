@@ -1,5 +1,13 @@
 const z = require('zod/v4');
-const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../utils/constants');
+const {
+  SYSTEM_VARIABLE_NAMES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  COVER_STATE,
+  AI_CHAT_TOOL_CATEGORIES,
+} = require('../../../utils/constants');
+const { normalize } = require('../../../utils/device');
+const { hexToInt, kelvinToMired } = require('../../../utils/colors');
 const {
   createSceneCreateInputSchema,
   formatSceneCreateZodIssue,
@@ -10,6 +18,8 @@ const {
 } = require('./sceneSchemas');
 const { fetchWebPage } = require('./webRequest');
 const { compareTimes } = require('./compareTimes');
+
+const DEFAULT_TIMEZONE = 'Europe/Paris';
 
 const noRoom = {
   id: null,
@@ -140,6 +150,37 @@ async function getAllResources() {
     homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
   });
 
+  const lightControlDevices = allDevices
+    .filter((device) => {
+      return device.features.some((feature) => this.isLightControlFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      features: device.features.filter((feature) => this.isLightControlFeature(feature)),
+    }));
+
+  lightControlDevices.forEach((device) => {
+    const d = {
+      name: device.name,
+      selector: device.selector,
+      features: device.features.map((feature) => ({
+        name: feature.name,
+        selector: feature.selector,
+        category: feature.category,
+        type: feature.type,
+        access: ['write', 'read'],
+      })),
+    };
+
+    if (homeSchema[device.room?.selector || noRoom.selector].devices[device.selector]?.name) {
+      homeSchema[device.room?.selector || noRoom.selector].devices[device.selector].features.push(...d.features);
+
+      return;
+    }
+
+    homeSchema[device.room?.selector || noRoom.selector].devices[device.selector] = d;
+  });
+
   const shutterDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isShutterFeature(feature));
@@ -248,6 +289,24 @@ async function getAllTools(userId) {
         .flat(),
     ),
   ];
+  const lightControlDevices = allDevices
+    .filter((device) => {
+      return device.features.some((feature) => this.isLightControlFeature(feature));
+    })
+    .map((device) => ({
+      ...device,
+      name: device.name,
+      features: device.features.filter((feature) => this.isLightControlFeature(feature)),
+    }));
+  const availableLightControlFeatureCategories = [
+    ...new Set(
+      lightControlDevices
+        .map((device) => {
+          return device.features.map((feature) => feature.category);
+        })
+        .flat(),
+    ),
+  ];
   const shutterDevices = allDevices
     .filter((device) => {
       return device.features.some((feature) => this.isShutterFeature(feature));
@@ -318,12 +377,27 @@ async function getAllTools(userId) {
       features: device.features.filter((feature) => this.isWritableSensorFeature(feature, device)),
     }));
 
+  const isEnergyMonitoringFeature = (feature) =>
+    feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
+    [
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+    ].includes(feature.type);
+  const energyMonitoringDevices = allDevices
+    .filter((device) => device.features.some(isEnergyMonitoringFeature))
+    .map((device) => ({
+      ...device,
+      name: device.name,
+      features: device.features.filter(isEnergyMonitoringFeature),
+    }));
+
   const tools = [
     {
       intent: 'camera.get-image',
       config: {
         title: 'Get image from camera',
         description: 'Get image from camera in specific room.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           room: z.enum(rooms.map(({ name }) => name)).describe('Room to get image from.'),
         },
@@ -347,6 +421,7 @@ async function getAllTools(userId) {
       config: {
         title: 'Create scene',
         description: SCENE_CREATE_TOOL_DESCRIPTION,
+        categories: [AI_CHAT_TOOL_CATEGORIES.SCENES],
         inputSchema: sceneCreateInputSchema.shape,
       },
       cb: async (scene) => {
@@ -388,6 +463,11 @@ async function getAllTools(userId) {
       config: {
         title: 'Start scene',
         description: 'Start a home automation scene.',
+        categories: [
+          AI_CHAT_TOOL_CATEGORIES.SCENES,
+          AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
+          AI_CHAT_TOOL_CATEGORIES.OTHER,
+        ],
         inputSchema: {
           scene: z.enum(scenes.map(({ name }) => name)).describe('Scene name to start.'),
         },
@@ -414,6 +494,12 @@ async function getAllTools(userId) {
       config: {
         title: 'Get states from devices',
         description: 'Get last state of specific device type or in a specific room.',
+        categories: [
+          AI_CHAT_TOOL_CATEGORIES.SCENES,
+          AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
+          AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY,
+          AI_CHAT_TOOL_CATEGORIES.OTHER,
+        ],
         inputSchema: {
           room: z
             .enum(rooms.map(({ name }) => name))
@@ -424,6 +510,7 @@ async function getAllTools(userId) {
               ...new Set([
                 ...availableSensorFeatureCategories,
                 ...availableSwitchableFeatureCategories,
+                ...availableLightControlFeatureCategories,
                 ...availableShutterFeatureCategories,
               ]),
             ])
@@ -434,7 +521,7 @@ async function getAllTools(userId) {
       cb: async ({ room, device_type: deviceType }) => {
         const states = [];
 
-        let selectedDevices = [...sensorDevices, ...switchableDevices, ...shutterDevices];
+        let selectedDevices = [...sensorDevices, ...switchableDevices, ...lightControlDevices, ...shutterDevices];
 
         if (room && room !== '') {
           const { selector } = this.findBySimilarity(rooms, room);
@@ -470,6 +557,24 @@ async function getAllTools(userId) {
           }),
         );
 
+        // An empty list is an ambiguous signal for the model, which tends to fill the
+        // gap with a plausible value. Say explicitly that nothing is configured.
+        if (states.length === 0) {
+          const typeLabel = deviceType && deviceType.length > 0 ? ` of type "${deviceType}"` : '';
+          const roomLabel = room && room !== '' ? ` in room "${room}"` : '';
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `device.get-state: no device${typeLabel} is configured${roomLabel}. ` +
+                  'No measurement exists for this query, do not report any value.',
+              },
+            ],
+          };
+        }
+
         return {
           content: [
             {
@@ -487,6 +592,7 @@ async function getAllTools(userId) {
         description:
           'Turn a device on or off. Requires either `device` (exact device name from the enum), or both `room` and `device_category` together. Never call with only `action`. For requests covering multiple rooms (for example "all lights"), call once per room with room and device_category, or use device_get_state with device_type light then turn off each device by name.',
         requireDeviceTargeting: true,
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           action: z.enum(['on', 'off']).describe('Action to perform on the device.'),
           device: z
@@ -592,6 +698,7 @@ async function getAllTools(userId) {
       config: {
         title: 'Get device history',
         description: 'Get history states of specific device.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           room: z
             .enum(rooms.map(({ name }) => name))
@@ -702,6 +809,7 @@ async function getAllTools(userId) {
         title: 'Control shutters and curtains',
         description:
           'Open, close, stop or set the position of shutters and curtains. Use action for open/close/stop commands, or position (0-100) to set a percentage. Select the device by name, or by room and device category.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           action: z
             .enum(['open', 'close', 'stop'])
@@ -848,6 +956,184 @@ async function getAllTools(userId) {
     });
   }
 
+  if (lightControlDevices.length > 0) {
+    tools.push({
+      intent: 'device.set-light',
+      config: {
+        title: 'Set light brightness, color and color temperature',
+        description:
+          'Set the brightness, the color and/or the white color temperature of lights. ' +
+          'Provide at least one of brightness (percent 0-100), color (hex RGB, for example #0000FF for blue) ' +
+          'or temperature (Kelvin, for example 2700 for warm white, 4000 for neutral white, 6500 for cool white). ' +
+          'Select the light by device name, or by room to target every light of the room. ' +
+          'This tool does not turn lights on or off, use device_turn_on_off for that.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL, AI_CHAT_TOOL_CATEGORIES.OTHER],
+        inputSchema: {
+          brightness: z
+            .number()
+            .min(0)
+            .max(100)
+            .optional()
+            .describe('Brightness as a percentage, from 0 to 100.'),
+          color: z
+            .string()
+            .regex(/^#?[0-9a-fA-F]{6}$/)
+            .optional()
+            .describe("Color as a 6 digit hexadecimal RGB value, for example '#FF0000' for red."),
+          temperature: z
+            .number()
+            .min(1000)
+            .max(10000)
+            .optional()
+            .describe(
+              'White color temperature in Kelvin, for example 2700 for warm white, 4000 for neutral white, 6500 for cool white.',
+            ),
+          device: z
+            .enum([...new Set(lightControlDevices.map(({ name }) => name))])
+            .describe('Light device name to control.')
+            .optional(),
+          room: z
+            .enum(rooms.map(({ name }) => name))
+            .describe('Room name, to control all lights of the room when device is not specified.')
+            .optional(),
+        },
+      },
+      cb: async ({ brightness, color, temperature, device, room }) => {
+        if (brightness === undefined && color === undefined && temperature === undefined) {
+          return {
+            content: [{ type: 'text', text: 'device.set-light: brightness, color or temperature is required' }],
+          };
+        }
+
+        if (!device && !room) {
+          return {
+            content: [{ type: 'text', text: 'device.set-light: device or room is required' }],
+          };
+        }
+
+        let selectedDevices = lightControlDevices;
+
+        if (room && room !== '') {
+          const { selector } = this.findBySimilarity(rooms, room);
+          selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
+        }
+
+        if (device) {
+          const selectedDevice = this.findBySimilarity(selectedDevices, device);
+          if (selectedDevice?.name) {
+            selectedDevices = [selectedDevice];
+          } else {
+            return {
+              content: [{ type: 'text', text: 'device.set-light: no device found' }],
+            };
+          }
+        }
+
+        if (selectedDevices.length === 0) {
+          return {
+            content: [{ type: 'text', text: 'device.set-light: no device found' }],
+          };
+        }
+
+        const dispatchResults = [];
+
+        await Promise.all(
+          selectedDevices.map(async (d) => {
+            const sent = [];
+            const missing = [];
+
+            if (brightness !== undefined) {
+              const brightnessFeature = d.features.find((f) => f.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS);
+              if (brightnessFeature) {
+                const value = Math.round(normalize(brightness, 0, 100, brightnessFeature.min, brightnessFeature.max));
+                await this.gladys.device.setValue(d, brightnessFeature, value);
+                sent.push(`brightness ${brightness}%`);
+              } else {
+                missing.push('brightness');
+              }
+            }
+
+            if (color !== undefined) {
+              const colorFeature = d.features.find((f) => f.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR);
+              if (colorFeature) {
+                await this.gladys.device.setValue(d, colorFeature, hexToInt(color));
+                sent.push(`color ${color}`);
+              } else {
+                missing.push('color');
+              }
+            }
+
+            if (temperature !== undefined) {
+              const temperatureFeature = d.features.find((f) => f.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE);
+              if (temperatureFeature) {
+                // Color temperature features are stored in mired (min = coolest, max = warmest).
+                let value = Math.round(kelvinToMired(temperature));
+                if (value > temperatureFeature.max) {
+                  value = temperatureFeature.max;
+                }
+                if (value < temperatureFeature.min) {
+                  value = temperatureFeature.min;
+                }
+                await this.gladys.device.setValue(d, temperatureFeature, value);
+                sent.push(`temperature ${temperature}K`);
+              } else {
+                missing.push('temperature');
+              }
+            }
+
+            dispatchResults.push({ device: d.name, sent, missing });
+          }),
+        );
+
+        const successfulDevices = dispatchResults.filter((result) => result.sent.length > 0);
+        const devicesWithMissingFeatures = dispatchResults.filter((result) => result.missing.length > 0);
+
+        if (successfulDevices.length === 0) {
+          const missingByDevice = devicesWithMissingFeatures
+            .map((result) => `${result.device} (missing ${result.missing.join(' and ')} feature)`)
+            .join('; ');
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.set-light: no command sent, no matching feature on ${missingByDevice}`,
+              },
+            ],
+          };
+        }
+
+        const successMessage = successfulDevices
+          .map((result) => `${result.sent.join(' and ')} command sent for ${result.device}`)
+          .join('; ');
+
+        if (devicesWithMissingFeatures.length > 0) {
+          const partialFailures = devicesWithMissingFeatures
+            .map((result) => `${result.device} (missing ${result.missing.join(' and ')} feature)`)
+            .join('; ');
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.set-light: ${successMessage}; could not dispatch for ${partialFailures}`,
+              },
+            ],
+          };
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `device.set-light: ${successMessage}`,
+            },
+          ],
+        };
+      },
+    });
+  }
+
   if (writableSensorDevices.length > 0) {
     tools.push({
       intent: 'sensor.set-state',
@@ -855,6 +1141,11 @@ async function getAllTools(userId) {
         title: 'Set sensor state',
         description:
           'Write a value to an MQTT virtual sensor (read-only sensor feature, for example after reading a value from a camera image). Use numeric values for numeric sensors and strings for text sensors such as license plates. Only MQTT virtual devices are supported.',
+        categories: [
+          AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
+          AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY,
+          AI_CHAT_TOOL_CATEGORIES.OTHER,
+        ],
         inputSchema: {
           device: z
             .enum([...new Set(writableSensorDevices.map(({ name }) => name))])
@@ -947,6 +1238,259 @@ async function getAllTools(userId) {
     });
   }
 
+  if (energyMonitoringDevices.length > 0) {
+    tools.push({
+      intent: 'device.get-energy-consumption',
+      config: {
+        title: 'Get energy consumption and cost over a period',
+        description:
+          'Get the electricity consumption (in kWh) or the consumption cost (in the home currency, for example euros) ' +
+          'of an energy monitoring device over a date range. ' +
+          'Dates are inclusive: for a single day use the same start_date and end_date, ' +
+          'for a full month use the first and last day of the month. ' +
+          'A day past the end of its month (for example 2026-02-30) is clamped to the last day of that month. ' +
+          'To cover several months or a whole year, make a single call over the whole range with group_by month ' +
+          'instead of one call per month. ' +
+          'The result contains the total over the period and the detail per group_by period. ' +
+          'In currency mode, a separate home_subscription entry may be present: it is the fixed subscription cost ' +
+          'of the whole home electricity contract, and is not part of the device consumption cost.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
+        inputSchema: {
+          device: z
+            .enum([...new Set(energyMonitoringDevices.map(({ name }) => name))])
+            .describe('Energy monitoring device name.'),
+          start_date: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/)
+            .describe('Start date of the period in YYYY-MM-DD format, inclusive.'),
+          end_date: z
+            .string()
+            .regex(/^\d{4}-\d{2}-\d{2}$/)
+            .describe('End date of the period in YYYY-MM-DD format, inclusive.'),
+          unit: z
+            .enum(['kwh', 'currency'])
+            .describe('Use kwh to get the consumption in kWh, currency to get the cost in the home currency.'),
+          group_by: z
+            .enum(['hour', 'day', 'week', 'month', 'year'])
+            .optional()
+            .describe('Aggregation of the returned detail values. Defaults to day.'),
+        },
+      },
+      cb: async ({ device, start_date: startDate, end_date: endDate, unit, group_by: groupBy }) => {
+        const DAYS_PER_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+
+        const parseDateInput = (value) => {
+          if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            return null;
+          }
+          const [year, month, day] = value.split('-').map(Number);
+          if (month < 1 || month > 12 || day < 1 || day > 31) {
+            return null;
+          }
+          // "Last day of February" is a date a model has to compute, and it gets it
+          // wrong on non-leap years (2026-02-29) or on 30-day months (2026-04-31).
+          // That intent is unambiguous, so clamp to the end of the month instead of
+          // failing: the Date constructor would silently roll over to the next month.
+          const lastDayOfMonth = month === 2 && isLeapYear(year) ? 29 : DAYS_PER_MONTH[month - 1];
+          return { year, month, day: Math.min(day, lastDayOfMonth) };
+        };
+
+        const formatDateInput = ({ year, month, day }) =>
+          `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+        // new Date(year, ...) maps years 0 to 99 to 1900 to 1999, so a 4-digit year
+        // below 0100 would query a period two millennia away from the one asked for.
+        // Setting the year explicitly keeps it, and still rolls the day over the
+        // month boundary as the exclusive end date needs.
+        const createLocalDate = ({ year, month, day }) => {
+          const date = new Date(2000, 0, 1);
+          date.setFullYear(year, month - 1, day);
+          return date;
+        };
+
+        const parsedStart = parseDateInput(startDate);
+        const parsedEnd = parseDateInput(endDate);
+        if (!parsedStart || !parsedEnd) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  'device.get-energy-consumption: start_date and end_date must be in YYYY-MM-DD format, ' +
+                  'with a month between 01 and 12 and a day between 01 and 31',
+              },
+            ],
+          };
+        }
+
+        const selectedDevice = this.findBySimilarity(energyMonitoringDevices, device);
+        if (!selectedDevice?.name) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `device.get-energy-consumption: no energy monitoring device found matching "${device}"`,
+              },
+            ],
+          };
+        }
+
+        const consumptionFeature = selectedDevice.features.find(
+          (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+        );
+        const costFeature = selectedDevice.features.find(
+          (f) => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
+        );
+        const displayMode = unit === 'currency' ? 'currency' : 'kwh';
+        // In kwh mode a cost feature also works: getConsumptionByDates hot-swaps it
+        // with its parent consumption feature through energy_parent_id.
+        const selectedFeature = displayMode === 'currency' ? costFeature : consumptionFeature || costFeature;
+        if (!selectedFeature) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `device.get-energy-consumption: no consumption cost tracking configured on ${selectedDevice.name}. ` +
+                  'An energy contract with prices must be configured in the energy monitoring settings.',
+              },
+            ],
+          };
+        }
+
+        // Same date boundaries as the energy dashboard: local midnight, end exclusive.
+        const from = createLocalDate(parsedStart);
+        const to = createLocalDate({ ...parsedEnd, day: parsedEnd.day + 1 });
+        if (!(from < to)) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: 'device.get-energy-consumption: start_date must be before or equal to end_date',
+              },
+            ],
+          };
+        }
+
+        const effectiveGroupBy = groupBy || 'day';
+        const configuredTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+        const timezoneName = configuredTimezone || DEFAULT_TIMEZONE;
+
+        const results = await this.gladys.device.energySensorManager.getConsumptionByDates([selectedFeature.selector], {
+          from,
+          to,
+          group_by: effectiveGroupBy,
+          display_mode: displayMode,
+        });
+
+        const deviceResult = results.find((result) => !result.deviceFeature?.is_subscription);
+        const subscriptionResult = results.find((result) => result.deviceFeature?.is_subscription);
+
+        const decimalPlaces = displayMode === 'currency' ? 2 : 3;
+        const roundValue = (value) => Number(value.toFixed(decimalPlaces));
+        const deviceValues = deviceResult?.values ?? [];
+
+        // DuckDB truncates the TIMESTAMPTZ buckets in the timezone set on its
+        // connection, which system.setDuckDbTimezone takes from the TIMEZONE variable.
+        // A monthly bucket is therefore midnight on the 1st in the home timezone, and
+        // serializing it as a UTC instant labels it one month early east of Greenwich:
+        // 2026-01-01 in Paris reads back as 2025-12-31T23:00:00Z. Format in that same
+        // timezone, at the granularity that was grouped by, so the label always matches
+        // the bucket DuckDB built.
+        // Intl rather than dayjs here: the dayjs timezone plugin resolves the offset of
+        // an ambiguous local hour wrongly when the process runs in the target zone. It
+        // reports +00:00 for the second 02:00 of a Paris fall-back night, which is the
+        // one case the offset below exists to disambiguate.
+        const bucketDateFormat = new Intl.DateTimeFormat('en-US', {
+          timeZone: timezoneName,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hourCycle: 'h23',
+        });
+
+        // Distance between the local clock reading and the instant it stands for.
+        // Computed from the formatted parts rather than read from a timeZoneName
+        // part: that field is CLDR text, and a zero offset spells "GMT" on ICU 76
+        // (Node 22.14) but "GMT+00:00" on ICU 78, both of which "node": "22.x"
+        // accepts. Arithmetic is the same on every ICU, and gets the zones that sit
+        // on a half or quarter hour right for free.
+        const formatUtcOffset = (parts, bucketDate) => {
+          const localAsUtc = new Date(0);
+          localAsUtc.setUTCFullYear(Number(parts.year), Number(parts.month) - 1, Number(parts.day));
+          localAsUtc.setUTCHours(Number(parts.hour), Number(parts.minute), 0, 0);
+          const offsetMinutes = Math.round((localAsUtc.getTime() - bucketDate.getTime()) / 60000);
+          const sign = offsetMinutes < 0 ? '-' : '+';
+          const absoluteMinutes = Math.abs(offsetMinutes);
+          const hours = String(Math.floor(absoluteMinutes / 60)).padStart(2, '0');
+          const minutes = String(absoluteMinutes % 60).padStart(2, '0');
+          return `${sign}${hours}:${minutes}`;
+        };
+
+        const formatBucketDate = (bucketDate) => {
+          const date = new Date(bucketDate);
+          const parts = Object.fromEntries(
+            bucketDateFormat.formatToParts(date).map(({ type, value }) => [type, value]),
+          );
+          switch (effectiveGroupBy) {
+            case 'year':
+              return parts.year;
+            case 'month':
+              return `${parts.year}-${parts.month}`;
+            // The offset keeps hourly labels unique on the night a timezone falls
+            // back: in Paris, 2025-10-26T00:00Z and 2025-10-26T01:00Z are two
+            // different buckets that are both 02:00 on the local clock.
+            case 'hour':
+              return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:00${formatUtcOffset(parts, date)}`;
+            // 'day' and 'week' are both a calendar day, the start of the bucket.
+            default:
+              return `${parts.year}-${parts.month}-${parts.day}`;
+          }
+        };
+
+        const response = {
+          device: selectedDevice.name,
+          feature: selectedFeature.name,
+          unit: displayMode === 'currency' ? deviceResult?.deviceFeature?.currency_unit || 'currency' : 'kWh',
+          // Echo the effective period, not the raw input: a clamped date must not be
+          // reported back as the day the caller asked for.
+          start_date: formatDateInput(parsedStart),
+          end_date: formatDateInput(parsedEnd),
+          group_by: effectiveGroupBy,
+          timezone: timezoneName,
+          total: roundValue(deviceValues.reduce((acc, value) => acc + value.sum_value, 0)),
+          values: deviceValues.map((value) => ({
+            date: formatBucketDate(value.created_at),
+            value: roundValue(value.sum_value),
+          })),
+        };
+
+        if (subscriptionResult) {
+          response.home_subscription = {
+            name: subscriptionResult.deviceFeature.name,
+            total: roundValue(subscriptionResult.values.reduce((acc, value) => acc + value.sum_value, 0)),
+          };
+        }
+
+        if (deviceValues.length === 0) {
+          response.note = 'No consumption data recorded for this device over this period.';
+        }
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: this.toon(response),
+            },
+          ],
+        };
+      },
+    });
+  }
+
   tools.push(
     {
       intent: 'web.fetch',
@@ -954,6 +1498,7 @@ async function getAllTools(userId) {
         title: 'Fetch web page',
         description:
           'Fetch a public web page and return its readable text content. Use this to read information from websites such as opening hours, schedules, or public announcements. Only HTTP/HTTPS public URLs are allowed.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.WEB_AND_TIME, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           url: z.url().describe('Full public URL of the page to fetch (http or https).'),
         },
@@ -977,6 +1522,11 @@ async function getAllTools(userId) {
         title: 'Compare times',
         description:
           'Compare times deterministically. Use operator in_ranges to check whether the current time (or reference_time) falls within one or more HH:mm ranges. Use before/after/same to compare two times. Prefer this tool over mental time reasoning for schedules and opening hours.',
+        categories: [
+          AI_CHAT_TOOL_CATEGORIES.WEB_AND_TIME,
+          AI_CHAT_TOOL_CATEGORIES.SCENES,
+          AI_CHAT_TOOL_CATEGORIES.OTHER,
+        ],
         inputSchema: {
           operator: z
             .enum(['in_ranges', 'before', 'after', 'same'])
