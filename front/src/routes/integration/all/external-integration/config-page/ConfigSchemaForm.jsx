@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-import { getLocalizedText, getUrlDomain } from '../utils';
+import { getLocalizedText, getUrlDomain, resolveManifestPlaceholders } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { OAUTH_REDIRECT_URI, getOAuthCallbackPath } from '../../../../../utils/oauth';
 import integrationText from '../integrationText.css';
@@ -84,7 +84,8 @@ class ConfigField extends Component {
     connectionStatus,
     oauthStatus,
     selector,
-    dynamicOptions
+    dynamicOptions,
+    placeholderPorts
   }) {
     const label = getLocalizedText(field.label, language) || field.key;
     const description = getLocalizedText(field.description, language);
@@ -99,11 +100,17 @@ class ConfigField extends Component {
     if (field.type === 'section') {
       // purely presentational intro block splitting the form: title,
       // plain text and typed links opened in a new tab with the target
-      // domain displayed (no value, no input)
+      // domain displayed (no value, no input). The {{gladys_host}} and
+      // {{port:<name>}} placeholders are substituted here — only the
+      // browser knows the address the user reaches Gladys by
       return (
         <div class="form-group mt-4">
-          <h4 class="mb-1">{label}</h4>
-          {description && <p class={cx('text-muted small mb-2', integrationText.integrationText)}>{description}</p>}
+          <h4 class="mb-1">{resolveManifestPlaceholders(label, placeholderPorts)}</h4>
+          {description && (
+            <p class={cx('text-muted small mb-2', integrationText.integrationText)}>
+              {resolveManifestPlaceholders(description, placeholderPorts)}
+            </p>
+          )}
           {(field.links || []).map(link => (
             <div>
               <a href={link.url} target="_blank" rel="noopener noreferrer">
@@ -359,7 +366,8 @@ const ConfigSchemaForm = ({
   toggleOAuthUseInstanceRedirect,
   connectOAuth,
   selector,
-  dynamicOptions
+  dynamicOptions,
+  placeholderPorts
 }) => {
   // sections are presentational and oauth2 has its own Connect button: a
   // schema made only of those has nothing to save, hide the save button
@@ -393,6 +401,7 @@ const ConfigSchemaForm = ({
           connectOAuth={connectOAuth}
           selector={selector}
           dynamicOptions={dynamicOptions}
+          placeholderPorts={placeholderPorts}
         />
       ))}
       {hasSavableField && (

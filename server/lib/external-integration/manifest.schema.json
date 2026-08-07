@@ -465,6 +465,11 @@
                 "enum": ["tcp", "udp"],
                 "default": "tcp"
               },
+              "name": {
+                "type": "string",
+                "pattern": "^[a-z0-9_]{2,20}$",
+                "description": "Optional stable identifier, unique across the whole manifest: makes the assigned host port referenceable by the {{port:<name>}} placeholder of the section texts, resolved by the frontend."
+              },
               "label": {
                 "$ref": "#/definitions/multiLanguageText",
                 "description": "Names the \"Open\" link in the Gladys UI, or the badge when the port is not browsable."

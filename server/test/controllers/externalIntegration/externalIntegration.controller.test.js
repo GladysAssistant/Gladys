@@ -828,7 +828,14 @@ describe('External integration admin API', () => {
           desired: 'running',
           started_at: null,
           ports: [
-            { container_port: 5000, protocol: 'tcp', host_port: null, label: { en: 'Frigate UI' }, browsable: true },
+            {
+              container_port: 5000,
+              protocol: 'tcp',
+              host_port: null,
+              label: { en: 'Frigate UI' },
+              name: null,
+              browsable: true,
+            },
           ],
           devices: [],
         },

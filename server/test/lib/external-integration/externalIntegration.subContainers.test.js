@@ -450,6 +450,7 @@ describe('externalIntegration.getSubContainersState', () => {
             protocol: 'tcp',
             host_port: 42115,
             label: { en: 'Frigate UI', fr: 'Interface Frigate' },
+            name: 'frigate_ui',
             browsable: true,
           },
         ],
@@ -478,7 +479,14 @@ describe('externalIntegration.getSubContainersState', () => {
     await variable.setValue(SUB_CONTAINER_PORTS_VARIABLE, JSON.stringify({ 'ocpp/9000/tcp': 42116 }), service.id);
     const state = await externalIntegration.getSubContainersState(service);
     expect(state[0].ports).to.deep.equal([
-      { container_port: 9000, protocol: 'tcp', host_port: 42116, label: { en: 'OCPP WebSocket' }, browsable: false },
+      {
+        container_port: 9000,
+        protocol: 'tcp',
+        host_port: 42116,
+        label: { en: 'OCPP WebSocket' },
+        name: null,
+        browsable: false,
+      },
     ]);
   });
 
