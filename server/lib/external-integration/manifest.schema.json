@@ -468,7 +468,12 @@
               },
               "label": {
                 "$ref": "#/definitions/multiLanguageText",
-                "description": "Names the \"Open\" link in the Gladys UI."
+                "description": "Names the \"Open\" link in the Gladys UI, or the badge when the port is not browsable."
+              },
+              "browsable": {
+                "type": "boolean",
+                "default": true,
+                "description": "false: the port does not serve a web UI (e.g. a WebSocket endpoint for devices, the OCPP case) — the supervision screen shows the assigned host port without the \"Open\" link."
               }
             }
           }

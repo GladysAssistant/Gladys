@@ -65,6 +65,7 @@ async function getSubContainersState(service) {
         // manifest-unique identifier referenced by the {{port:<name>}}
         // placeholder of the section texts, resolved by the frontend
         name: port.name === undefined ? null : port.name,
+        browsable: port.browsable !== false,
       };
     });
     const devices = (entry.devices || []).map((hardwareClass) => {

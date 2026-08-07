@@ -763,7 +763,11 @@ describe('externalIntegration.validateManifest', () => {
           cpu: 1,
           env: { LIBVA_DRIVER_NAME: 'i965' },
           command: ['python3', '-m', 'frigate'],
-          ports: [{ container_port: 5000, protocol: 'tcp', label: { en: 'Frigate UI' } }],
+          ports: [
+            { container_port: 5000, protocol: 'tcp', label: { en: 'Frigate UI' } },
+            // WebSocket endpoint for devices (the OCPP case): no "Open" link
+            { container_port: 9000, label: { en: 'OCPP WebSocket' }, browsable: false },
+          ],
           devices: ['coral-usb', 'gpu'],
         },
       ],
@@ -871,6 +875,13 @@ describe('externalIntegration.validateManifest', () => {
         containers: [{ ...base, ports: [{ container_port: 80, host_port: 8080, label: { en: 'UI' } }] }],
       },
       'containers[0].ports[0].host_port: unknown field',
+    );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        containers: [{ ...base, ports: [{ container_port: 80, label: { en: 'UI' }, browsable: 'no' }] }],
+      },
+      'containers[0].ports[0].browsable: must be a boolean',
     );
   });
 

@@ -67,7 +67,7 @@ const SUB_CONTAINER_FIELDS = [
   'shm_mb',
   'command',
 ];
-const PORT_FIELDS = ['container_port', 'protocol', 'label', 'name'];
+const PORT_FIELDS = ['container_port', 'protocol', 'label', 'name', 'browsable'];
 const PORT_PROTOCOLS = ['tcp', 'udp'];
 // {{port:<name>}} placeholder of the section texts, resolved by the
 // frontend with the host port assigned to the named declared port (C.1).
@@ -628,6 +628,9 @@ function validateSubContainerPort(port, path, errors, seenPortNames) {
     } else {
       seenPortNames.add(port.name);
     }
+  }
+  if (port.browsable !== undefined && typeof port.browsable !== 'boolean') {
+    errors.push(`${path}.browsable: must be a boolean`);
   }
   validateMultiLanguageText(port.label, `${path}.label`, errors);
 }
