@@ -15,6 +15,7 @@ import WebhooksSummary from '../components/WebhooksSummary';
 import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
+import integrationText from '../integrationText.css';
 
 class ExternalIntegrationInstallPage extends Component {
   getStoreIntegration = async () => {
@@ -210,7 +211,9 @@ class ExternalIntegrationInstallPage extends Component {
                                 />
                               )}
                             </div>
-                            <p>{getLocalizedText(manifest.description, language)}</p>
+                            <p class={integrationText.integrationText}>
+                              {getLocalizedText(manifest.description, language)}
+                            </p>
 
                             <div class="alert alert-warning">
                               <h4 class="alert-title">

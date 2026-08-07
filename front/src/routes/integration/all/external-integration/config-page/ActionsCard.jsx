@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { ConfigField } from './ConfigSchemaForm';
 import { getLocalizedText } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
+import integrationText from '../integrationText.css';
 
 // On-demand actions declared in the manifest (connection test, protocol
 // detection, re-pairing...): a button per action, an optional mini form
@@ -32,7 +33,7 @@ const ActionsCard = ({
         return (
           <div class={cx({ 'mb-5': index < actions.length - 1 })}>
             <h4>{getLocalizedText(action.label, language) || action.key}</h4>
-            {description && <p class="text-muted small">{description}</p>}
+            {description && <p class={cx('text-muted small', integrationText.integrationText)}>{description}</p>}
             {(action.fields || []).map(field => (
               <ConfigField
                 key={field.key}
@@ -57,10 +58,12 @@ const ActionsCard = ({
               <Text id="integration.externalIntegration.actions.runButton" />
             </button>
             {actionState.status === RequestStatus.Success && actionState.message && (
-              <div class="alert alert-success mt-3 mb-0">{getLocalizedText(actionState.message, language)}</div>
+              <div class={cx('alert alert-success mt-3 mb-0', integrationText.result)}>
+                {getLocalizedText(actionState.message, language)}
+              </div>
             )}
             {actionState.status === RequestStatus.Error && (
-              <div class="alert alert-danger mt-3 mb-0">
+              <div class={cx('alert alert-danger mt-3 mb-0', integrationText.result)}>
                 {getLocalizedText(actionState.message, language) || (
                   <Text id="integration.externalIntegration.actions.error" />
                 )}
