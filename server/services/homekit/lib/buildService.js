@@ -374,6 +374,16 @@ function buildService(device, features, categoryMapping, subtype) {
             callback(undefined, speed > readFeature.min ? 1 : 0);
           });
           activeCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
+            // Snapshot the speed on the way down rather than relying on a GET having happened
+            // first: switching the fan off from the Home app without reading it beforehand would
+            // otherwise restore it at full speed instead of where the user had left it.
+            if (!value) {
+              const currentSpeed = this.gladys.stateManager.get('deviceFeature', writeFeature.selector).last_value;
+              if (currentSpeed > writeFeature.min) {
+                lastActiveSpeed = currentSpeed;
+              }
+            }
+
             const action = {
               type: ACTIONS.DEVICE.SET_VALUE,
               status: ACTIONS_STATUS.PENDING,

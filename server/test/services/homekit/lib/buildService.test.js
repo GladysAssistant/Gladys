@@ -1432,6 +1432,41 @@ describe('Build service', () => {
     expect(homekitHandler.gladys.event.emit.args[0][1].value).to.equal(3);
   });
 
+  it('should remember the fan speed when switched off without a prior read', async () => {
+    homekitHandler.gladys.stateManager.get = stub().returns({ last_value: 40 });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub().returns({ on, props: { minValue: 0, maxValue: 100 } });
+    const Fanv2 = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { RotationSpeed: 'ROTATIONSPEED', Active: 'ACTIVE' },
+      CharacteristicEventTypes: stub(),
+      Service: { Fanv2 },
+    };
+    const features = [
+      {
+        name: 'Vitesse',
+        selector: 'ventilo-percent',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
+        min: 0,
+        max: 100,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Ventilateur' }, features, mappings[DEVICE_FEATURE_CATEGORIES.FAN]);
+    // switch off straight away, with no GET beforehand
+    await on.args[3][1](0, cb);
+    expect(homekitHandler.gladys.event.emit.args[0][1].value).to.equal(0);
+
+    // switching back on must restore the speed it had, not jump to full
+    await on.args[3][1](1, cb);
+    expect(homekitHandler.gladys.event.emit.args[1][1].value).to.equal(40);
+  });
+
   it('should build shutter/curtain service', async () => {
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'shutter-state').returns({
       id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
