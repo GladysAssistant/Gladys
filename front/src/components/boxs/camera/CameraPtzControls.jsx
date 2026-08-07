@@ -25,8 +25,9 @@ class CameraPtzControls extends Component {
 
   moveSession = null;
 
-  // Last standalone STOP (stop button pressed with no movement in flight): the next move is
-  // queued after it settles, so a stale STOP can never terminate a movement started after it.
+  // Chain of standalone STOPs (stop button pressed with no movement in flight): each new STOP
+  // and the next move are queued after it settles, so a stale STOP can never terminate a
+  // movement started after it.
   pendingStop = null;
 
   sendValue = async (deviceFeature, value) => {
@@ -78,7 +79,8 @@ class CameraPtzControls extends Component {
       await this.releaseMove();
       return;
     }
-    const stopPromise = this.sendStop(this.props.moveFeature);
+    const previousStop = this.pendingStop || Promise.resolve();
+    const stopPromise = previousStop.then(() => this.sendStop(this.props.moveFeature));
     this.pendingStop = stopPromise;
     await stopPromise;
     if (this.pendingStop === stopPromise) {
