@@ -45,6 +45,7 @@ function getDefaultState() {
     user: {
       language
     },
+    systemTimezone: null,
     showDropDown: false,
     darkMode
   };

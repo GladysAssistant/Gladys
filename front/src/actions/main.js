@@ -1,6 +1,7 @@
 import createActionsProfilePicture from './profilePicture';
 import createActionsDarkMode from './darkMode';
 import { getDefaultState } from '../utils/getDefaultState';
+import { fetchSystemTimezone } from '../utils/systemTimezone';
 import { route } from 'preact-router';
 import get from 'get-value';
 import { isUrlInArray } from '../utils/url';
@@ -71,11 +72,13 @@ function createActions(store) {
         const tasks = [
           state.httpClient.get('/api/v1/me'),
           actionsProfilePicture.loadProfilePicture(state),
-          actions.refreshTabletMode(state)
+          actions.refreshTabletMode(state),
+          fetchSystemTimezone(state.httpClient)
         ];
-        const [user] = await Promise.all(tasks);
+        const [user, , , systemTimezone] = await Promise.all(tasks);
         store.setState({
-          user
+          user,
+          systemTimezone
         });
         if (state.session.getGatewayUser) {
           const gatewayUser = await state.session.getGatewayUser();
