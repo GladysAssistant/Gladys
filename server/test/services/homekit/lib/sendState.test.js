@@ -624,10 +624,10 @@ describe('Send state to HomeKit', () => {
   });
 
   it('should notify the three button events HomeKit knows, and drop the others', async () => {
-    const updateCharacteristic = stub().returns();
+    const sendEventNotification = stub();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({ getCharacteristic: stub().returns({ sendEventNotification }) }),
     };
 
     const feature = {
@@ -648,15 +648,23 @@ describe('Send state to HomeKit', () => {
     await press(BUTTON_STATUS.DOUBLE_CLICK);
     await press(BUTTON_STATUS.LONG_CLICK, { type: DEVICE_FEATURE_TYPES.BUTTON.PUSH });
 
-    expect(updateCharacteristic.args[0]).eql(['PROGRAMMABLESWITCHEVENT', 0]);
-    expect(updateCharacteristic.args[1]).eql(['PROGRAMMABLESWITCHEVENT', 1]);
-    expect(updateCharacteristic.args[2]).eql(['PROGRAMMABLESWITCHEVENT', 2]);
+    expect(sendEventNotification.args[0][0]).to.equal(0);
+    expect(sendEventNotification.args[1][0]).to.equal(1);
+    expect(sendEventNotification.args[2][0]).to.equal(2);
+
+    // two identical presses in a row must both be delivered, which updateCharacteristic would not do
+    await press(BUTTON_STATUS.CLICK);
+    await press(BUTTON_STATUS.CLICK);
+
+    expect(sendEventNotification.callCount).to.equal(5);
+    expect(sendEventNotification.args[3][0]).to.equal(0);
+    expect(sendEventNotification.args[4][0]).to.equal(0);
 
     // a gesture with no HomeKit equivalent must not fire one of the three above
     await press(BUTTON_STATUS.SHAKE);
     await press(BUTTON_STATUS.ROTATE_LEFT);
 
-    expect(updateCharacteristic.callCount).to.equal(3);
+    expect(sendEventNotification.callCount).to.equal(5);
   });
 
   it('should do nothing wrong device category & type', async () => {

@@ -43,12 +43,13 @@ function sendState(hkAccessory, feature, event) {
       const buttonEvent = buttonEventMapping[event.last_value];
       // A press HomeKit has no equivalent for is dropped rather than reported as another one.
       if (buttonEvent !== undefined) {
+        // sendEventNotification and not updateCharacteristic: the latter only notifies when the
+        // value changes, so two single presses in a row — both mapping to 0 — would be reported
+        // once. A button press must always be delivered.
         hkAccessory
           .getService(Service[mappings[feature.category].service])
-          .updateCharacteristic(
-            Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-            buttonEvent,
-          );
+          .getCharacteristic(Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]])
+          .sendEventNotification(buttonEvent);
       }
       break;
     }
