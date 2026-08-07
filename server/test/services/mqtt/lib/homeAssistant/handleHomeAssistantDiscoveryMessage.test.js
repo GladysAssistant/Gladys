@@ -8,6 +8,9 @@ const {
   getDeviceIdentifier,
 } = require('../../../../../services/mqtt/lib/homeAssistant/handleHomeAssistantDiscoveryMessage');
 const MqttHandler = require('../../../../../services/mqtt/lib');
+const { HOME_ASSISTANT } = require('../../../../../services/mqtt/lib/homeAssistant/constants');
+
+const { MAX_DISCOVERED_DEVICES, MAX_ENTITIES_PER_DISCOVERED_DEVICE } = HOME_ASSISTANT;
 
 describe('mqttHandler.handleHomeAssistantDiscoveryMessage', () => {
   let mqttHandler;
@@ -234,6 +237,106 @@ describe('mqttHandler.handleHomeAssistantDiscoveryMessage', () => {
     expect(mqttHandler.haEntitiesByTopic).to.deep.equal({});
     clock.tick(600);
     assert.calledOnce(gladys.event.emit);
+  });
+
+  it('should remove the previous entities when a device-based discovery has null components', () => {
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/device/my-device/config',
+      JSON.stringify({
+        dev: { ids: ['0x1234'] },
+        cmps: { relay: { p: 'switch', cmd_t: 'my-device/set' } },
+      }),
+    );
+    clock.tick(600);
+    gladys.event.emit = fake.returns(null);
+
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/device/my-device/config',
+      JSON.stringify({ dev: { ids: ['0x1234'] }, cmps: null }),
+    );
+    expect(mqttHandler.haDiscoveredDevices).to.deep.equal({});
+    expect(mqttHandler.haEntitiesByTopic).to.deep.equal({});
+    clock.tick(600);
+    assert.calledOnce(gladys.event.emit);
+  });
+
+  it('should ignore a device-based discovery with components that are not objects', () => {
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/device/my-device/config',
+      JSON.stringify({
+        dev: { ids: ['0x1234'] },
+        cmps: { broken: null, alsoBroken: 'switch' },
+      }),
+    );
+    expect(mqttHandler.haDiscoveredDevices).to.deep.equal({});
+    expect(mqttHandler.haEntitiesByTopic).to.deep.equal({});
+  });
+
+  it('should ignore new devices above the discovery limit', () => {
+    for (let i = 0; i < MAX_DISCOVERED_DEVICES; i += 1) {
+      mqttHandler.handleHomeAssistantDiscoveryMessage(
+        `homeassistant/switch/relay-${i}/config`,
+        JSON.stringify({ dev: { ids: [`0x${i}`] }, cmd_t: `my-device-${i}/set` }),
+      );
+    }
+    expect(Object.keys(mqttHandler.haDiscoveredDevices)).to.have.lengthOf(MAX_DISCOVERED_DEVICES);
+
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/switch/one-too-many/config',
+      JSON.stringify({ dev: { ids: ['0xtoomany'] }, cmd_t: 'my-device/set' }),
+    );
+    expect(Object.keys(mqttHandler.haDiscoveredDevices)).to.have.lengthOf(MAX_DISCOVERED_DEVICES);
+    expect(mqttHandler.haEntitiesByTopic['homeassistant/switch/one-too-many/config']).to.equal(undefined);
+  });
+
+  it('should ignore new entities above the per device limit', () => {
+    for (let i = 0; i < MAX_ENTITIES_PER_DISCOVERED_DEVICE; i += 1) {
+      mqttHandler.handleHomeAssistantDiscoveryMessage(
+        `homeassistant/switch/relay-${i}/config`,
+        JSON.stringify({ dev: { ids: ['0x1234'] }, cmd_t: `my-device/relay-${i}/set` }),
+      );
+    }
+    const device = mqttHandler.haDiscoveredDevices['homeassistant:0x1234'];
+    expect(Object.keys(device.entities)).to.have.lengthOf(MAX_ENTITIES_PER_DISCOVERED_DEVICE);
+
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/switch/one-too-many/config',
+      JSON.stringify({ dev: { ids: ['0x1234'] }, cmd_t: 'my-device/one-too-many/set' }),
+    );
+    expect(Object.keys(device.entities)).to.have.lengthOf(MAX_ENTITIES_PER_DISCOVERED_DEVICE);
+    expect(mqttHandler.haEntitiesByTopic['homeassistant/switch/one-too-many/config']).to.equal(undefined);
+  });
+
+  it('should ignore device-based components above the per device limit', () => {
+    const components = {};
+    for (let i = 0; i < MAX_ENTITIES_PER_DISCOVERED_DEVICE + 1; i += 1) {
+      components[`relay-${i}`] = { p: 'switch', cmd_t: `my-device/relay-${i}/set` };
+    }
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/device/my-device/config',
+      JSON.stringify({ dev: { ids: ['0x1234'] }, cmps: components }),
+    );
+    const device = mqttHandler.haDiscoveredDevices['homeassistant:0x1234'];
+    expect(Object.keys(device.entities)).to.have.lengthOf(MAX_ENTITIES_PER_DISCOVERED_DEVICE);
+    expect(mqttHandler.haEntitiesByTopic['homeassistant/device/my-device/config'].entityKeys).to.have.lengthOf(
+      MAX_ENTITIES_PER_DISCOVERED_DEVICE,
+    );
+  });
+
+  it('should still update an entity already registered on a device at the limit', () => {
+    for (let i = 0; i < MAX_ENTITIES_PER_DISCOVERED_DEVICE; i += 1) {
+      mqttHandler.handleHomeAssistantDiscoveryMessage(
+        `homeassistant/switch/relay-${i}/config`,
+        JSON.stringify({ dev: { ids: ['0x1234'] }, cmd_t: `my-device/relay-${i}/set` }),
+      );
+    }
+    mqttHandler.handleHomeAssistantDiscoveryMessage(
+      'homeassistant/switch/relay-0/config',
+      JSON.stringify({ dev: { ids: ['0x1234'] }, cmd_t: 'my-device/relay-0/updated' }),
+    );
+    const device = mqttHandler.haDiscoveredDevices['homeassistant:0x1234'];
+    expect(Object.keys(device.entities)).to.have.lengthOf(MAX_ENTITIES_PER_DISCOVERED_DEVICE);
+    expect(device.entities['switch:relay-0'].command_topic).to.equal('my-device/relay-0/updated');
   });
 
   describe('getDeviceIdentifier', () => {

@@ -84,13 +84,20 @@ function removeHomeAssistantEntitiesFromTopic(topic) {
  * @param {object} deviceInfo - Device information from the discovery payload.
  * @param {string} entityKey - Unique key of the entity.
  * @param {object} config - Expanded entity discovery configuration.
- * @returns {object} The registered entity { deviceExternalId, entityKey }.
+ * @returns {object} The registered entity { deviceExternalId, entityKey }, or null when
+ * a discovery limit is reached.
  * @example
  * this.registerHomeAssistantEntity('my-device', { name: 'My device' }, 'sensor:temp', { state_topic: 'a/topic' });
  */
 function registerHomeAssistantEntity(identifier, deviceInfo, entityKey, config) {
   const deviceExternalId = `${HOME_ASSISTANT.EXTERNAL_ID_PREFIX}:${identifier}`;
   if (!this.haDiscoveredDevices[deviceExternalId]) {
+    if (Object.keys(this.haDiscoveredDevices).length >= HOME_ASSISTANT.MAX_DISCOVERED_DEVICES) {
+      logger.warn(
+        `MQTT Home Assistant: ignoring device ${identifier}, the limit of ${HOME_ASSISTANT.MAX_DISCOVERED_DEVICES} discovered devices is reached`,
+      );
+      return null;
+    }
     this.haDiscoveredDevices[deviceExternalId] = {
       identifier,
       info: {},
@@ -98,6 +105,15 @@ function registerHomeAssistantEntity(identifier, deviceInfo, entityKey, config) 
     };
   }
   const discoveredDevice = this.haDiscoveredDevices[deviceExternalId];
+  if (
+    discoveredDevice.entities[entityKey] === undefined &&
+    Object.keys(discoveredDevice.entities).length >= HOME_ASSISTANT.MAX_ENTITIES_PER_DISCOVERED_DEVICE
+  ) {
+    logger.warn(
+      `MQTT Home Assistant: ignoring entity ${entityKey}, the limit of ${HOME_ASSISTANT.MAX_ENTITIES_PER_DISCOVERED_DEVICE} entities is reached on device ${identifier}`,
+    );
+    return null;
+  }
   discoveredDevice.info = { ...discoveredDevice.info, ...deviceInfo };
   discoveredDevice.entities[entityKey] = config;
   return { deviceExternalId, entityKey };
@@ -162,10 +178,20 @@ function handleHomeAssistantDiscoveryMessage(topic, message) {
   if (isDeviceBasedDiscovery) {
     // Device-based discovery: a single config describes all components of the device
     // https://www.home-assistant.io/integrations/mqtt/#device-discovery-payload
-    const { components = {}, device: deviceInfo, origin, ...sharedConfig } = config;
+    const { components: rawComponents, device: deviceInfo, origin, ...sharedConfig } = config;
+    // A retained payload can hold anything: `components` is normalized to an empty set when it is
+    // missing, null or not an object, so the entities of the previous payload are still removed
+    // and the removal is still sent to the dashboard
+    const components =
+      rawComponents !== null && typeof rawComponents === 'object' && !Array.isArray(rawComponents) ? rawComponents : {};
     Object.keys(components).forEach((componentKey) => {
+      const componentDefinition = components[componentKey];
+      if (componentDefinition === null || typeof componentDefinition !== 'object') {
+        logger.debug(`MQTT Home Assistant: ignoring invalid component ${componentKey}`);
+        return;
+      }
       // Share the "~" base topic of the device with each component
-      const rawComponent = config['~'] ? { '~': config['~'], ...components[componentKey] } : components[componentKey];
+      const rawComponent = config['~'] ? { '~': config['~'], ...componentDefinition } : componentDefinition;
       const componentConfig = expandHomeAssistantConfig(rawComponent);
       const { platform } = componentConfig;
       if (!SUPPORTED_COMPONENTS.includes(platform)) {
@@ -175,14 +201,19 @@ function handleHomeAssistantDiscoveryMessage(topic, message) {
       const entityKey = `${platform}:${objectId}:${componentKey}`;
       const entityConfig = { ...sharedConfig, ...componentConfig };
       const registered = this.registerHomeAssistantEntity(identifier, deviceInfo, entityKey, entityConfig);
+      if (registered === null) {
+        return;
+      }
       deviceExternalId = registered.deviceExternalId;
       entityKeys.push(entityKey);
     });
   } else {
     const entityKey = `${component}:${nodeId ? `${nodeId}:` : ''}${objectId}`;
     const registered = this.registerHomeAssistantEntity(identifier, config.device, entityKey, config);
-    deviceExternalId = registered.deviceExternalId;
-    entityKeys.push(entityKey);
+    if (registered !== null) {
+      deviceExternalId = registered.deviceExternalId;
+      entityKeys.push(entityKey);
+    }
   }
 
   if (entityKeys.length === 0) {

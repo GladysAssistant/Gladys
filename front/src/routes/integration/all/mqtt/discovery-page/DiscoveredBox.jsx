@@ -92,9 +92,9 @@ class DiscoveredBox extends Component {
                           <Text id="global.emptySelectOption" />
                         </option>
                         {houses.map(house => (
-                          <optgroup label={house.name}>
+                          <optgroup key={house.id} label={house.name}>
                             {house.rooms.map(room => (
-                              <option selected={room.id === device.room_id} value={room.id}>
+                              <option key={room.id} selected={room.id === device.room_id} value={room.id}>
                                 {room.name}
                               </option>
                             ))}

@@ -11,6 +11,11 @@ const HOME_ASSISTANT = {
   EXTERNAL_ID_PREFIX: 'homeassistant',
   DEVICE_PARAM_PREFIX: 'ha_discovery_config:',
   DISCOVERY_EMIT_DEBOUNCE_MS: 500,
+  // The discovered devices are kept in memory and fed by whatever is published on the broker.
+  // These bounds keep a misbehaving publisher flooding `homeassistant/#` from growing that memory
+  // indefinitely. They are far above any realistic installation.
+  MAX_DISCOVERED_DEVICES: 1000,
+  MAX_ENTITIES_PER_DISCOVERED_DEVICE: 200,
 };
 
 // Components of the Home Assistant discovery protocol handled by Gladys

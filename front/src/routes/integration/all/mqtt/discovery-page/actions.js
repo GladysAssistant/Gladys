@@ -5,8 +5,12 @@ const filterExistingDevices = devices => devices.filter(device => device.id === 
 
 function createActions(store) {
   const houseActions = createActionsHouse(store);
+  // Bumped by every websocket update, so a REST response that resolves after one
+  // can be discarded instead of overwriting the list with older data
+  let discoveryRevision = 0;
   const actions = {
     async getDiscoveredDevices(state) {
+      const requestRevision = discoveryRevision;
       store.setState({
         mqttDiscoveryLoading: true,
         mqttDiscoveryError: null
@@ -16,6 +20,10 @@ function createActions(store) {
         const mqttDiscoveredDevices = await state.httpClient.get('/api/v1/service/mqtt/discovery', {
           filter_existing: mqttDiscoveryFilterExisting
         });
+        if (discoveryRevision !== requestRevision) {
+          store.setState({ mqttDiscoveryLoading: false });
+          return;
+        }
         store.setState({ mqttDiscoveredDevices, mqttDiscoveryLoading: false });
       } catch (e) {
         store.setState({
@@ -33,6 +41,7 @@ function createActions(store) {
       await actions.getDiscoveredDevices(store.getState());
     },
     setDiscoveredDevices(state = {}, incomingDevices) {
+      discoveryRevision += 1;
       const { mqttDiscoveryFilterExisting = true } = state;
       let mqttDiscoveredDevices = incomingDevices;
       if (incomingDevices && mqttDiscoveryFilterExisting) {
