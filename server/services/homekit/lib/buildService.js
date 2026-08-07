@@ -18,6 +18,7 @@ const {
   clampToCharacteristic,
   toMicrogramPerCubicMeter,
 } = require('./deviceMappings');
+const { buildThermostatService } = require('./buildThermostatService');
 
 const sleep = promisify(setTimeout);
 
@@ -38,6 +39,12 @@ function buildService(device, features, categoryMapping, subtype) {
     (subtype ? features[0].name : device.name).substring(0, 64),
     subtype,
   );
+
+  // A thermostat is driven by features of several Gladys categories at once, so its characteristics
+  // cannot be wired one feature at a time like the others.
+  if (categoryMapping.service === 'Thermostat') {
+    return buildThermostatService.call(this, service, device, features);
+  }
 
   features.forEach((feature) => {
     switch (`${feature.category}:${feature.type}`) {
