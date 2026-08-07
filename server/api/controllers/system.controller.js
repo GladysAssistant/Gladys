@@ -1,5 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { EVENTS } = require('../../utils/constants');
+const { acknowledgeHostPowerCommand } = require('./system.controller.helpers');
 
 module.exports = function SystemController(gladys) {
   /**
@@ -59,6 +60,35 @@ module.exports = function SystemController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/system/reboot
+   * @apiName rebootHost
+   * @apiGroup System
+   */
+  async function rebootHost(req, res) {
+    // Surface an immediate failure (polkit refusal, helper error) but don't wait
+    // for the host to actually go down. A late failure is logged, not thrown.
+    await acknowledgeHostPowerCommand(gladys.system.rebootHost(), 'reboot host');
+    res.json({
+      success: true,
+      message: 'Host will reboot soon',
+    });
+  }
+
+  /**
+   * @api {post} /api/v1/system/shutdown-host
+   * @apiName shutdownHost
+   * @apiGroup System
+   */
+  async function shutdownHost(req, res) {
+    // Same trade-off as rebootHost above.
+    await acknowledgeHostPowerCommand(gladys.system.shutdownHost(), 'shutdown host');
+    res.json({
+      success: true,
+      message: 'Host will shutdown soon',
+    });
+  }
+
+  /**
    * @api {post} /api/v1/system/vacuum
    * @apiName vacuumSystem
    * @apiGroup System
@@ -93,6 +123,8 @@ module.exports = function SystemController(gladys) {
     getDiskSpace: asyncMiddleware(getDiskSpace),
     getContainers: asyncMiddleware(getContainers),
     shutdown: asyncMiddleware(shutdown),
+    rebootHost: asyncMiddleware(rebootHost),
+    shutdownHost: asyncMiddleware(shutdownHost),
     vacuum: asyncMiddleware(vacuum),
     getGladysLogs: asyncMiddleware(getGladysLogs),
   });
