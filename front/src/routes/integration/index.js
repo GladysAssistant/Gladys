@@ -89,7 +89,10 @@ class Integration extends Component {
     // never the store: installing is an admin gesture
     const isAdmin = user.role === USER_ROLE.ADMIN;
     const [externalInstalled, externalStoreResponse] = await Promise.all([
-      httpClient.get('/api/v1/external_integration').catch(() => []),
+      // null and not []: a failed request means "unknown", not "nothing
+      // installed". An empty array would be counted as zero integration to
+      // update and would clear the header counter on a network hiccup
+      httpClient.get('/api/v1/external_integration').catch(() => null),
       isAdmin ? httpClient.get('/api/v1/external_integration/store').catch(() => null) : Promise.resolve(null)
     ]);
     await this.setState({
