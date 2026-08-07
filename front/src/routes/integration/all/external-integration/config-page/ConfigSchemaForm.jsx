@@ -5,6 +5,7 @@ import cx from 'classnames';
 import { getLocalizedText, getUrlDomain } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { OAUTH_REDIRECT_URI, getOAuthCallbackPath } from '../../../../../utils/oauth';
+import integrationText from '../integrationText.css';
 
 // the redirect URI is meant to be copied into the developer application of the
 // provider: a click should select all of it
@@ -102,7 +103,7 @@ class ConfigField extends Component {
       return (
         <div class="form-group mt-4">
           <h4 class="mb-1">{label}</h4>
-          {description && <p class="text-muted small mb-2">{description}</p>}
+          {description && <p class={cx('text-muted small mb-2', integrationText.integrationText)}>{description}</p>}
           {(field.links || []).map(link => (
             <div>
               <a href={link.url} target="_blank" rel="noopener noreferrer">
@@ -211,9 +212,13 @@ class ConfigField extends Component {
             </label>
           )}
           {connectionStatus && connectionStatus.message && (
-            <small class="form-text text-muted">{getLocalizedText(connectionStatus.message, language)}</small>
+            <small class={cx('form-text text-muted', integrationText.integrationText)}>
+              {getLocalizedText(connectionStatus.message, language)}
+            </small>
           )}
-          {description && <small class="form-text text-muted">{description}</small>}
+          {description && (
+            <small class={cx('form-text text-muted', integrationText.integrationText)}>{description}</small>
+          )}
         </div>
       );
     }
@@ -226,7 +231,9 @@ class ConfigField extends Component {
             <span class="custom-switch-indicator" />
             <span class="custom-switch-description">{label}</span>
           </label>
-          {description && <small class="form-text text-muted">{description}</small>}
+          {description && (
+            <small class={cx('form-text text-muted', integrationText.integrationText)}>{description}</small>
+          )}
         </div>
       );
     }
@@ -326,7 +333,9 @@ class ConfigField extends Component {
             required={field.required}
           />
         )}
-        {description && <small class="form-text text-muted">{description}</small>}
+        {description && (
+          <small class={cx('form-text text-muted', integrationText.integrationText)}>{description}</small>
+        )}
       </div>
     );
   }
