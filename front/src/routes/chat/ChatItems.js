@@ -17,14 +17,14 @@ const IncomingMessage = ({ children, ...props }) => (
     </div>
     <div class={style.received_msg}>
       <div class={style.received_withd_msg}>
-        <p class={style.msg_txt_wrap}>
-          <ChatMessageText text={props.message.text} />
+        <div class={style.msg_txt_wrap}>
+          <ChatMessageText text={props.message.text} markdown />
           {props.message.file && (
             <span>
               <img class={style.imageInMessage} src={`data:${props.message.file}`} alt={props.message.text} />
             </span>
           )}
-        </p>
+        </div>
         <span class={style.time_date}>
           {' '}
           {dayjs(props.message.created_at)
@@ -80,9 +80,9 @@ const ToolCallMessage = ({ children, ...props }) => {
 const OutGoingMessage = ({ children, ...props }) => (
   <div class={style.outgoing_msg}>
     <div class={style.sent_msg}>
-      <p class={style.msg_txt_wrap}>
+      <div class={style.msg_txt_wrap}>
         <ChatMessageText text={props.message.text} />
-      </p>
+      </div>
       <span class={style.time_date}>
         {' '}
         {props.message.tempId ? (

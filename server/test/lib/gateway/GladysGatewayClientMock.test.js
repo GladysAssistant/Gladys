@@ -21,6 +21,12 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
       });
     },
     loginInstance: fake.resolves({}),
+    configureTwoFactor: fake.resolves({
+      otpauth_url: 'otpauth://totp/Gladys%20Gateway?secret=THISISMYSECRET',
+    }),
+    enableTwoFactor: fake.resolves({
+      two_factor_enabled: true,
+    }),
     createInstance: fake.resolves({
       instance: {
         id: '25239392-debf-40c9-9363-fc8d3b9ebbbe',

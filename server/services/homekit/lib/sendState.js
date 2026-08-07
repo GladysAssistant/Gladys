@@ -2,7 +2,14 @@ const { intToRgb, rgbToHsb } = require('../../../utils/colors');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
 const { normalize } = require('../../../utils/device');
 const { fahrenheitToCelsius } = require('../../../utils/units');
-const { mappings, coverStateMapping } = require('./deviceMappings');
+const {
+  mappings,
+  coverStateMapping,
+  gasDetectedThresholds,
+  aqiToAirQuality,
+  clampToCharacteristic,
+  toMicrogramPerCubicMeter,
+} = require('./deviceMappings');
 
 /**
  * @description Forward new state value to HomeKit.
@@ -17,8 +24,11 @@ function sendState(hkAccessory, feature, event) {
   switch (`${feature.category}:${feature.type}`) {
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`:
     case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`:
+    case `${DEVICE_FEATURE_CATEGORIES.SIREN}:${DEVICE_FEATURE_TYPES.SIREN.BINARY}`:
     case `${DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
-    case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
+    case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
+    case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
+    case `${DEVICE_FEATURE_CATEGORIES.CO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
       hkAccessory
         .getService(Service[mappings[feature.category].service])
         .updateCharacteristic(
@@ -84,6 +94,60 @@ function sendState(hkAccessory, feature, event) {
       hkAccessory
         .getService(Service.TemperatureSensor)
         .updateCharacteristic(Characteristic.CurrentTemperature, currentTemp);
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
+      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const characteristicName = mappings[feature.category].capabilities[feature.type].characteristics[0];
+      const characteristic = service.getCharacteristic(Characteristic[characteristicName]);
+
+      service.updateCharacteristic(
+        Characteristic[characteristicName],
+        clampToCharacteristic(event.last_value, characteristic.props),
+      );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.PM25_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.PM25_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
+    case `${DEVICE_FEATURE_CATEGORIES.PM10_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.PM10_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
+      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const characteristicName = mappings[feature.category].capabilities[feature.type].characteristics[0];
+      const characteristic = service.getCharacteristic(Characteristic[characteristicName]);
+
+      service.updateCharacteristic(
+        Characteristic[characteristicName],
+        clampToCharacteristic(toMicrogramPerCubicMeter(event.last_value, feature.unit), characteristic.props),
+      );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
+    case `${DEVICE_FEATURE_CATEGORIES.CO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.CO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
+      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const [levelName, detectedName] = mappings[feature.category].capabilities[feature.type].characteristics;
+      const levelCharacteristic = service.getCharacteristic(Characteristic[levelName]);
+
+      service
+        .updateCharacteristic(
+          Characteristic[levelName],
+          clampToCharacteristic(event.last_value, levelCharacteristic.props),
+        )
+        .updateCharacteristic(
+          Characteristic[detectedName],
+          event.last_value >= gasDetectedThresholds[feature.category] ? 1 : 0,
+        );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR}:${DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI}`: {
+      hkAccessory
+        .getService(Service[mappings[feature.category].service])
+        .updateCharacteristic(
+          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+          aqiToAirQuality(event.last_value),
+        );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.STATE}`:

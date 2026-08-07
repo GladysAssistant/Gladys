@@ -58,7 +58,35 @@ export function preactCliCssModules() {
         return null;
       }
 
+      // The module graph knows this module as the virtual id, so the real file
+      // has to be watched explicitly.
+      this.addWatchFile(absoluteCssPath);
+
       return readFileSync(absoluteCssPath, 'utf8');
+    },
+
+    /**
+     * Vite maps a changed file to its modules by path. Our modules live under a
+     * virtual id (`foo.css.module.css`) that no file on disk matches, so editing
+     * `foo.css` in dev updated nothing at all (no HMR, not even a reload).
+     * Hand back the virtual module so Vite invalidates it and pushes the update.
+     */
+    hotUpdate({ type, file, modules }) {
+      if (type !== 'update') {
+        return null;
+      }
+
+      const virtualModuleId = `${file}.module.css`;
+      if (!resolvedModules.has(virtualModuleId)) {
+        return null;
+      }
+
+      const virtualModule = this.environment.moduleGraph.getModuleById(virtualModuleId);
+      if (!virtualModule || modules.includes(virtualModule)) {
+        return null;
+      }
+
+      return [...modules, virtualModule];
     }
   };
 }

@@ -25,6 +25,7 @@ module.exports = {
       `Enedis migration: Admin ${frenchAdminUser.email} has language in french. Converting possible Enedis devices.`,
     );
     const service = await db.Service.findOne({
+      attributes: ['id', 'selector'],
       where: {
         name: 'enedis',
       },

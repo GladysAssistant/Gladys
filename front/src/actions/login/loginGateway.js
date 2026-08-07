@@ -9,12 +9,26 @@ function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
   const actions = {
     init(state, returnUrl) {
+      // One-shot flag set by finalizeTwoFactorSetup: the user just enabled 2FA
+      // and was routed here with a valid two_factor_token already in the state,
+      // so we keep the step 2 form instead of resetting the login flow.
+      if (state.gatewayLoginPreserveStateOnce) {
+        const preservedState = {
+          gatewayLoginPreserveStateOnce: false
+        };
+        if (returnUrl && returnUrl.startsWith('/')) {
+          preservedState.gatewayLoginReturnUrl = returnUrl;
+        }
+        store.setState(preservedState);
+        return;
+      }
       const newState = {
         gatewayLoginStep2: false,
         gatewayLoginStatus: null,
         gatewayLoginEmail: null,
         gatewayLoginPassword: null,
-        gatewayLoginTwoFactorCode: null
+        gatewayLoginTwoFactorCode: null,
+        gatewayTwoFactorJustEnabled: false
       };
       // If there is a return URL and the URL is relative to this domain
       // (we want to avoid redirecting to another domain for security issues)
@@ -45,6 +59,7 @@ function createActions(store) {
           store.setState({
             gatewayLoginResults,
             gatewayLoginStep2: true,
+            gatewayTwoFactorJustEnabled: false,
             gatewayLoginStatus: RequestStatus.Success
           });
         } else {
@@ -70,6 +85,24 @@ function createActions(store) {
           });
         }
       }
+    },
+    async finalizeTwoFactorSetup(state) {
+      // The user just enabled 2FA from the configure page: we log in again
+      // silently with the credentials still in memory, so they only have to
+      // enter a fresh code from their app to finalize the connection.
+      const gatewayLoginResults = await state.session.gatewayClient.login(
+        state.gatewayLoginEmail,
+        state.gatewayLoginPassword
+      );
+      store.setState({
+        gatewayLoginResults,
+        gatewayLoginStep2: true,
+        gatewayLoginTwoFactorCode: null,
+        gatewayTwoFactorJustEnabled: true,
+        gatewayLoginPreserveStateOnce: true,
+        gatewayLoginStatus: RequestStatus.Success
+      });
+      route('/login');
     },
     async loginTwoFactor(state, e) {
       if (e) {
@@ -113,6 +146,7 @@ function createActions(store) {
         console.error(e);
         const error = get(e, 'response.data.error');
         const errorMessage = get(e, 'response.data.error_message');
+        const status = get(e, 'response.status');
         // if user was previously linked to another instance, we reset the user id
         if (error === 'LINKED_USER_NOT_FOUND') {
           await state.session.gatewayClient.updateUserIdInGladys(null);
@@ -124,6 +158,10 @@ function createActions(store) {
         } else if (errorMessage === 'NO_INSTANCE_FOUND') {
           store.setState({
             gatewayLoginStatus: RequestStatus.GatewayNoInstanceFound
+          });
+        } else if (status >= 400 && status < 500) {
+          store.setState({
+            gatewayLoginStatus: LoginStatus.WrongTwoFactorCodeError
           });
         } else {
           store.setState({

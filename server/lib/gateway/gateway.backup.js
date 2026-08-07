@@ -97,12 +97,13 @@ async function backup(jobId) {
     logger.info(`Gateway backup : Backing up DuckDB into a Parquet folder ${duckDbBackupFolderPath}`);
     // DuckDB backup to parquet file using a dedicated connection
     // This connection will be closed after export to release memory
-    const backupInstance = db.duckDbCreateBackupInstance();
+    const backupInstance = await db.duckDbCreateBackupInstance();
     try {
+      // ZSTD compresses better than GZIP and needs less memory during the export
       await backupInstance.allAsync(
         ` EXPORT DATABASE '${duckDbBackupFolderPath}' (
             FORMAT PARQUET,
-            COMPRESSION GZIP
+            COMPRESSION ZSTD
         )`,
       );
     } finally {

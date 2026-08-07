@@ -1,20 +1,28 @@
-### Pull Request check-list
+### Description
 
-To ensure your Pull Request can be accepted as fast as possible, make sure to review and check all of these items:
+<!-- A short description of the change. Screenshots are always welcome! -->
 
-- [ ] If your changes affect the code, did you write the tests?
-- [ ] Are server tests passing with coverage? (`cd server && npm run coverage`) — Codecov requires **100% coverage on lines changed in this PR**
-- [ ] Did Cypress E2E tests pass? (`npm run cypress:run` from repo root, if UI changed)
-- [ ] Is the linter passing? (`npm run eslint` on both front/server)
-- [ ] Did you run prettier? (`npm run prettier` on both front/server)
-- [ ] If you are adding a new feature/service, did you run the integration comparator? (`npm run compare-translations` on front)
-- [ ] Did you test this pull request in real life? With real devices? If this development is a big feature or a new service, we recommend that you provide a Docker image to the community ([forum](https://community.gladysassistant.com/)) for testing before merging.
-- [ ] If your changes modify the API (REST or Node.js), did you modify the API documentation? (Documentation is based on comments in code)
-- [ ] If you are adding a new features/services which needs explanation, did you modify the user documentation? See [the GitHub repo](https://github.com/GladysAssistant/v4-website) and the [website](https://gladysassistant.com).
-- [ ] Did you add fake requests data for the demo mode (`front/src/config/demo.js`) so that the demo website is working without a backend? (if needed) See [https://demo.gladysassistant.com](https://demo.gladysassistant.com).
+## Forum
 
-NOTE: these things are not required to open a PR and can be done afterwards / while the PR is open.
+<!--
+If this pull request implements a feature requested on the community forum,
+paste the topic URL on a single line using this exact format:
 
-### Description of change
+Forum: https://community.gladysassistant.com/t/...
 
-Please provide a description of the change here. It's always best with screenshots, so don't hesitate to add some!
+This link is what allows the release pipeline to automatically notify the
+forum topic when the feature ships.
+-->
+
+### Checklist
+
+- [ ] Tests pass: `cd server && npm run coverage` (Codecov requires 100% coverage on changed lines) and Cypress (`npm run cypress:run`) if the UI changed
+- [ ] Linter and prettier pass on both front and server (`npm run eslint`, `npm run prettier`)
+- [ ] No undocumented breaking change
+
+<!--
+More details in the contribution guide: .github/CONTRIBUTING.md
+Testing in real life with real devices is always appreciated. An AMD64 preview
+Docker image is built automatically for non-draft PRs; for ARM64, comment
+/build-arm64 on the PR.
+-->

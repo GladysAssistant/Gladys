@@ -5,6 +5,7 @@ import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceForm from './DeviceForm';
+import MigrateDeviceButton from '../../../../../components/device/migrate/MigrateDeviceButton';
 
 class TpLinkDeviceBox extends Component {
   saveDevice = async () => {
@@ -65,6 +66,7 @@ class TpLinkDeviceBox extends Component {
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
                     <Text id="integration.tpLink.device.saveButton" />
                   </button>
+                  <MigrateDeviceButton device={props.device} onMigrated={props.getTpLinkDevices} />
                   <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                     <Text id="integration.tpLink.device.deleteButton" />
                   </button>

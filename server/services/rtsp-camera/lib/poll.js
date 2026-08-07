@@ -11,8 +11,8 @@ async function poll(device) {
     const cameraImage = await this.getImage(device);
     await this.gladys.device.camera.setImage(device.selector, cameraImage);
   } catch (e) {
-    logger.warn('Unable to poll camera');
-    logger.debug(e);
+    const reason = e && e.message ? e.message : e;
+    logger.warn(`Unable to poll camera "${device.selector}": ${reason}`);
   }
 }
 

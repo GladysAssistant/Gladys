@@ -26,7 +26,9 @@ const TRIGGER_LIST = [
   EVENTS.ALARM.PARTIAL_ARM,
   EVENTS.ALARM.TOO_MANY_CODES_TESTS,
   EVENTS.SYSTEM.START,
-  EVENTS.MQTT.RECEIVED
+  EVENTS.MQTT.RECEIVED,
+  EVENTS.WEATHER.ALERT_RAISED,
+  EVENTS.WEATHER.ALERT_ENDED
 ];
 
 class ChooseTriggerType extends Component {
@@ -47,7 +49,7 @@ class ChooseTriggerType extends Component {
         value: trigger,
         label: get(props.intl.dictionary, `editScene.triggers.${trigger}`, { default: trigger })
       };
-    });
+    }).sort((a, b) => a.label.localeCompare(b.label));
 
     this.state = {
       options,

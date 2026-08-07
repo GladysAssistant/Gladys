@@ -8,6 +8,7 @@ import AsyncRoute from 'preact-async-route';
 import { IntlProvider } from 'preact-i18n';
 import translations from '../config/i18n';
 import actions from '../actions/main';
+import { EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS } from '../actions/externalIntegrationUpdates';
 
 import { getDefaultState } from '../utils/getDefaultState';
 
@@ -193,6 +194,15 @@ import CallMeBotPage from '../routes/integration/all/callmebot/setup-page';
 // Energy Monitoring integration
 import EnergyMonitoringIntegration from '../routes/integration/all/energy-monitoring/index';
 
+// External integrations (community integrations running in isolated Docker containers)
+import ExternalIntegrationDevicePage from '../routes/integration/all/external-integration/device-page';
+import ExternalIntegrationDiscoverPage from '../routes/integration/all/external-integration/discover-page';
+import ExternalIntegrationConfigPage from '../routes/integration/all/external-integration/config-page';
+import ExternalIntegrationSupervisionPage from '../routes/integration/all/external-integration/supervision-page';
+import ExternalIntegrationLogsPage from '../routes/integration/all/external-integration/logs-page';
+import ExternalIntegrationInstallPage from '../routes/integration/all/external-integration/install-page';
+import ExternalIntegrationOAuthCallbackPage from '../routes/integration/all/external-integration/oauth-callback-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -203,7 +213,7 @@ const SafeAsyncRoute = props => (
 );
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate',
   actions
 )(props => (
   <div id="app">
@@ -211,6 +221,7 @@ const AppRouter = connect(
       <Header
         currentUrl={props.currentUrl}
         user={props.user}
+        externalIntegrationsToUpdate={props.externalIntegrationsToUpdate}
         fullScreen={props.fullScreen}
         profilePicture={props.profilePicture}
         toggleDropDown={props.toggleDropDown}
@@ -257,6 +268,7 @@ const AppRouter = connect(
         <SafeAsyncRoute path="/dashboard/integration" component={IntegrationPage} />
 
         <IntegrationPage path="/dashboard/integration/favorites" category="favorites" />
+        <IntegrationPage path="/dashboard/integration/updates" category="updates" />
         <IntegrationPage path="/dashboard/integration/device" category="device" />
         <IntegrationPage path="/dashboard/integration/communication" category="communication" />
         <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
@@ -374,6 +386,14 @@ const AppRouter = connect(
         <LANManagerDiscoverPage path="/dashboard/integration/device/lan-manager/discover" />
         <LANManagerSettingsPage path="/dashboard/integration/device/lan-manager/config" />
 
+        <ExternalIntegrationDevicePage path="/dashboard/integration/device/external/:selector" />
+        <ExternalIntegrationDiscoverPage path="/dashboard/integration/device/external/:selector/discover" />
+        <ExternalIntegrationConfigPage path="/dashboard/integration/device/external/:selector/config" />
+        <ExternalIntegrationSupervisionPage path="/dashboard/integration/device/external/:selector/supervision" />
+        <ExternalIntegrationLogsPage path="/dashboard/integration/device/external/:selector/logs" />
+        <ExternalIntegrationInstallPage path="/dashboard/integration/device/external-install/:owner/:repo" />
+        <ExternalIntegrationOAuthCallbackPage path="/dashboard/integration/device/external/:selector/oauth-callback" />
+
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
         <AlexaWelcomePage path="/dashboard/integration/communication/alexa" />
@@ -419,11 +439,19 @@ class MainApp extends Component {
     // Listen for system preference change
     const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
     prefersDarkMode.addEventListener('change', this.handleSystemPreferenceChange);
+    // Gladys never pushes the "update available" flag: it is recomputed when
+    // the server refreshes the store index, so a long-opened tab only learns
+    // about a new version by asking again at the same cadence
+    this.externalIntegrationUpdatesInterval = setInterval(
+      this.props.refreshExternalIntegrationsToUpdate,
+      EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS
+    );
   }
 
   componentWillUnmount() {
     // Remove event listener to prevent memory leaks
     window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleSystemPreferenceChange);
+    clearInterval(this.externalIntegrationUpdatesInterval);
   }
 
   handleSystemPreferenceChange = () => {

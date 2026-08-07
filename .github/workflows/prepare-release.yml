@@ -1,0 +1,100 @@
+name: Prepare release
+run-name: Prepare ${{ inputs.release_type }} release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Type of version bump'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+
+permissions:
+  contents: write
+
+# Two overlapping runs would bump from the same tip and race on the same version.
+concurrency:
+  group: prepare-release
+  cancel-in-progress: false
+
+jobs:
+  prepare-release:
+    name: Bump version on a release branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛑 Ensure workflow runs on master
+        if: github.ref != 'refs/heads/master'
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          echo "::error::This workflow can only be run on master, got ${REF_NAME}."
+          exit 1
+      - name: ⬇️ Checkout Gladys code
+        uses: actions/checkout@v4
+        with:
+          # Always release from the current tip of master, not from the commit
+          # master pointed at when the workflow was dispatched.
+          ref: master
+          fetch-depth: 0
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: './package.json'
+      - name: 🔧 Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: 🔖 Bump version on a release branch
+        id: bump
+        env:
+          RELEASE_TYPE: ${{ inputs.release_type }}
+        run: |
+          npm version "${RELEASE_TYPE}" --no-git-tag-version
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v${VERSION}"
+          if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "::error::Tag ${TAG} already exists, master may not have been released yet."
+            exit 1
+          fi
+          BRANCH="release/${TAG}"
+          if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null 2>&1; then
+            echo "::error::Branch ${BRANCH} already exists, from an abandoned release."
+            echo "::error::Reuse its pull request, or delete the branch and run this workflow again."
+            exit 1
+          fi
+          git switch -c "${BRANCH}"
+          git add package.json package-lock.json
+          # Version-only commit message, as every release commit before it.
+          git commit -m "${VERSION}"
+          git push origin "${BRANCH}"
+          {
+            echo "version=${VERSION}"
+            echo "tag=${TAG}"
+            echo "branch=${BRANCH}"
+          } >> "$GITHUB_OUTPUT"
+      - name: 📝 Job summary
+        env:
+          TAG: ${{ steps.bump.outputs.tag }}
+          BRANCH: ${{ steps.bump.outputs.branch }}
+          RELEASE_TYPE: ${{ inputs.release_type }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          {
+            echo "### 📦 Release ${TAG} ready for review"
+            echo ""
+            echo "- Bump type: \`${RELEASE_TYPE}\`"
+            echo "- Branch: [\`${BRANCH}\`](${REPO_URL}/tree/${BRANCH})"
+            echo ""
+            echo "**[👉 Open the release pull request](${REPO_URL}/compare/master...${BRANCH}?expand=1)**"
+            echo ""
+            echo "The pull request has to be opened by a human: GitHub does not run the"
+            echo "required checks on a pull request opened by the \`GITHUB_TOKEN\`, so an"
+            echo "automatically opened one would stay blocked on them forever."
+            echo ""
+            echo "Once it is merged, the \`Create release tag\` workflow tags \`${TAG}\` on"
+            echo "master and starts the production images, demo website and apidoc builds."
+          } >> "$GITHUB_STEP_SUMMARY"

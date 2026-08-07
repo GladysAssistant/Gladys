@@ -24,6 +24,8 @@ async function init(startDuckDbMigration = true) {
   this.setupPoll();
   if (startDuckDbMigration) {
     this.migrateFromSQLiteToDuckDb();
+    // One-shot background cleanup, no-op once its system variable is set
+    this.purgeOrphanedDuckDbStates();
   }
   return plainDevices;
 }

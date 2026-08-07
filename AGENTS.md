@@ -17,7 +17,19 @@ From the repo root: `npm start` (runs `run-p start-server:dev start-front:dev`).
 
 - **Harmless startup errors:** on `npm start` you'll see smart-home device discovery errors (e.g. `SonosDiscoveryError: No players found`) because no physical devices exist in the VM/network. These are expected and do not affect the app.
 - **Service dependencies:** the server has ~38 integration services under `server/services/*`, each with its own `package.json`. `cd server && npm install` runs a `postinstall` (`cli/install_service_dependencies.js`) that installs deps for every service. Set `INSTALL_SERVICES_SILENT_FAIL=true` so a single flaky service install does not abort the whole install.
-- **Native modules** (`sqlite3`, `bcrypt`, `sharp`, `duckdb`, USB/bluetooth services) compile from source; they need build tools (`gcc/g++/make/python3`) and `libudev-dev` on the system.
+- **Native modules** (`sqlite3`, `bcrypt`, `sharp`, USB/bluetooth services) compile from source; they need build tools (`gcc/g++/make/python3`) and `libudev-dev` on the system. DuckDB (`@duckdb/node-api`) ships prebuilt platform binaries and does not compile from source.
+
+## Feature specs (spec-first process)
+
+Living specifications live in `docs/specs/`. They are the source of truth for the behavior and cross-repo contracts of the features they cover.
+
+**When to go spec-first:** large projects and anything touching the data model — write and challenge the spec before the code, and fold field feedback into the spec before implementing it. Small, isolated changes do not need a spec written first.
+
+**Keeping existing specs truthful:** when an area is already covered by a living spec, any PR that changes its behavior or contracts must update the spec **in the same diff**, whatever the size of the change — otherwise the spec drifts and stops being the source of truth.
+
+- **External integrations** (`docs/specs/external-integrations.md`): supervisor, host API, integration WebSocket protocol, manifest, store formats, SDK contract. Any PR that changes a behavior or contract of external integrations must update this spec **in the same diff**. Phase-2 designs (B.15 communication, B.16 network discovery, B.17 Gladys Plus webhooks) are specified there but not yet implemented — implement from the spec, not from scratch.
+- **Device feature categories & types** (`docs/specs/device-feature-categories.md`): design and review criteria for `DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES` in `server/utils/constants.js`. Categories must describe capabilities (never brands), group protocols together, and use mature standards (Matter first, then Zigbee) as the default reference — divergence and standard-free categories are allowed with justification. Any PR — and any PR review — that adds or changes device categories/types must be checked against this spec's checklist.
+- **Water heater** (`docs/specs/water-heater.md`): the `water-heater` device feature category — its six types, the `WATER_HEATER_MODE` enum, how per-appliance mode subsets are declared through `supported_options`, the frontend registration points and the external-integration contract. Designed under `device-feature-categories.md`, whose checklist it answers in its section D. Its section C lists what is deliberately out of scope, and any PR that changes those types or their semantics must update the spec in the same diff.
 
 ## Git workflow (agents)
 
@@ -25,6 +37,7 @@ All changes made by agents must follow this workflow:
 
 1. **Never commit directly to `master`.** Create a feature branch for every change (no matter how small) and open a pull request targeting `master`.
 2. **Write PR titles and descriptions in English**, even when the conversation with the user is in another language. This keeps the project history accessible to all contributors and matches the existing CI, templates, and documentation.
+3. **Create pull requests as ready for review (not draft).** When opening a PR, set `draft: false`. Do not create draft PRs.
 
 ## Pull Request requirements (CI)
 
@@ -37,10 +50,10 @@ Every PR to `master` triggers the workflow `.github/workflows/docker-pr-build.ym
 | **Front test** | Always | `prettier-check`, `eslint`, `compare-translations` |
 | **Server test** | Always | `prettier-check`, `eslint`, `npm run coverage` + Codecov upload |
 | **Cypress run** | Always | E2E tests (signup, dashboard, integrations…) |
-| **Front build** | Non-draft PRs only | `npm run build` (Vite) |
-| **Docker build** | Non-draft PRs only | AMD64 Docker image build |
+| **Front build** | When the PR is ready for review (`draft: false`) | `npm run build` (Vite) |
+| **Docker build** | When the PR is ready for review (`draft: false`) | AMD64 Docker image build |
 
-Draft PRs skip the front build and Docker jobs. Mark a PR as "Ready for review" only after the build checks pass locally.
+When the PR is ready for review (`draft: false`), the front build and Docker jobs run in CI. Agent PRs should be opened that way, so run the build checks locally before opening the PR.
 
 ### Mandatory checklist before push
 
@@ -73,7 +86,7 @@ cd front
 npm run prettier && npm run prettier-check
 npm run eslint
 npm run compare-translations   # required if i18n or device constants changed
-npm run build                  # required before marking PR as ready for review
+npm run build                  # required before opening the PR
 ```
 
 - The front has **no unit-test script**. CI validates the front via eslint, `compare-translations`, build, and Cypress.
@@ -91,7 +104,7 @@ npm run cypress:run   # starts server + front, then runs E2E specs in front/cypr
 - **Codecov patch coverage:** CI uploads the coverage report to Codecov, which measures only the lines changed in your PR. Any new server line not hit by a test fails the `codecov/patch` status. Run `npm run coverage` locally and confirm your tests exercise every branch and path you added before pushing.
 - **Server tests:** Changes to `server/lib/`, `server/api/`, `server/controllers/`, or `server/services/` almost always need corresponding tests. Look at neighboring files in `server/test/` for patterns (Mocha + Chai + Sinon).
 - **Cypress:** UI changes to signup, dashboard, scenes, or integration pages can break E2E specs under `front/cypress/e2e/`.
-- **Front build:** Only runs on non-draft PRs. A webpack/build error will block merge when the PR is marked ready.
+- **Front build:** Agent PRs are created as ready for review, so this job runs in CI. Run `npm run build` locally before opening the PR to catch errors early.
 
 ### Lint / test / build commands (reference)
 

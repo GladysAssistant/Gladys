@@ -78,9 +78,16 @@ class ConditionIfElseThen extends Component {
             <div class="row">
               <div class="col">
                 <div class="alert alert-secondary">
-                  <Text id="editScene.actionsCard.conditionIfThenElse.conditionDescription">
-                    If all conditions are met, the actions in the "Then" block will be executed.
-                  </Text>
+                  <div>
+                    <Text id="editScene.actionsCard.conditionIfThenElse.conditionDescription">
+                      If all conditions are met, the actions in the "Then" block will be executed.
+                    </Text>
+                  </div>
+                  <div class="mt-2">
+                    <Text id="editScene.actionsCard.conditionIfThenElse.conditionLogicDescription">
+                      The conditions below are combined with an AND: they all need to be verified.
+                    </Text>
+                  </div>
                 </div>
               </div>
             </div>

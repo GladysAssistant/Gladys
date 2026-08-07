@@ -9,6 +9,7 @@ const {
   RvcCleanMode,
   PowerSource,
   Thermostat,
+  CarbonDioxideConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
@@ -16,6 +17,7 @@ const {
   convertToGladysDevice,
   matterExternalIdToSelector,
 } = require('../../../../services/matter/utils/convertToGladysDevice');
+const { AC_MODE } = require('../../../../utils/constants');
 
 describe('Matter.convertToGladysDevice', () => {
   const serviceId = 'service-1';
@@ -365,6 +367,65 @@ describe('Matter.convertToGladysDevice', () => {
     expect(gladysDevice.features).to.have.lengthOf(0);
   });
 
+  it('should create a CO2 sensor feature for CarbonDioxideConcentrationMeasurement cluster', async () => {
+    const clusterClient = {
+      id: CarbonDioxideConcentrationMeasurement.Complete.id,
+      name: 'CarbonDioxideConcentrationMeasurement',
+      endpointId: 1,
+      getMinMeasuredValueAttribute: async () => 400,
+      getMaxMeasuredValueAttribute: async () => 5000,
+    };
+
+    const device = {
+      name: 'CO2 Sensor',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'CarbonDioxideConcentrationMeasurement - 1',
+      selector: gladysDevice.features[0].selector,
+      category: 'co2-sensor',
+      type: 'decimal',
+      read_only: true,
+      has_feedback: true,
+      unit: 'ppm',
+      external_id: `matter:12345:1:${CarbonDioxideConcentrationMeasurement.Complete.id}`,
+      min: 400,
+      max: 5000,
+    });
+  });
+
+  it('should use fallback CO2 sensor bounds when Matter values are missing', async () => {
+    const clusterClient = {
+      id: CarbonDioxideConcentrationMeasurement.Complete.id,
+      name: 'CarbonDioxideConcentrationMeasurement',
+      endpointId: 1,
+      getMinMeasuredValueAttribute: async () => null,
+      getMaxMeasuredValueAttribute: async () => null,
+    };
+
+    const device = {
+      name: 'CO2 Sensor',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.include({
+      category: 'co2-sensor',
+      min: 0,
+      max: 10000,
+    });
+  });
+
   it('should create thermostat local temperature and setpoint features for Thermostat cluster', async () => {
     const clusterClient = {
       id: Thermostat.Complete.id,
@@ -385,7 +446,7 @@ describe('Matter.convertToGladysDevice', () => {
 
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:4');
 
-    expect(gladysDevice.features).to.have.lengthOf(3);
+    expect(gladysDevice.features).to.have.lengthOf(4);
     expect(gladysDevice.features[0]).to.deep.equal({
       name: 'Thermostat - 4 (Local temperature)',
       selector: gladysDevice.features[0].selector,
@@ -410,5 +471,79 @@ describe('Matter.convertToGladysDevice', () => {
       type: 'target-temperature',
       external_id: 'matter:12345:1:child_endpoint:4:513:cooling',
     });
+    expect(gladysDevice.features[3]).to.deep.include({
+      name: 'Thermostat - 4 (Mode)',
+      category: 'air-conditioning',
+      type: 'mode',
+      read_only: false,
+      has_feedback: true,
+      external_id: 'matter:12345:1:child_endpoint:4:513:mode',
+      min: AC_MODE.COOLING,
+      max: AC_MODE.FAN,
+      supported_options: [
+        { value: AC_MODE.COOLING, label: 'Cool' },
+        { value: AC_MODE.HEATING, label: 'Heat' },
+        { value: AC_MODE.DRYING, label: 'Dry' },
+        { value: AC_MODE.FAN, label: 'Fan' },
+      ],
+    });
+  });
+
+  it('should include auto in the mode supported options when auto mode is supported', async () => {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      name: 'Thermostat',
+      endpointId: 4,
+      supportedFeatures: {
+        heating: true,
+        cooling: true,
+        autoMode: true,
+      },
+    };
+
+    const device = {
+      name: 'Air Conditioner',
+      number: 4,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:4');
+
+    const modeFeature = gladysDevice.features.find((feature) => feature.type === 'mode');
+    expect(modeFeature).to.deep.include({
+      min: AC_MODE.AUTO,
+      max: AC_MODE.FAN,
+      supported_options: [
+        { value: AC_MODE.AUTO, label: 'Auto' },
+        { value: AC_MODE.COOLING, label: 'Cool' },
+        { value: AC_MODE.HEATING, label: 'Heat' },
+        { value: AC_MODE.DRYING, label: 'Dry' },
+        { value: AC_MODE.FAN, label: 'Fan' },
+      ],
+    });
+  });
+
+  it('should not create air conditioning mode feature when cooling is not supported', async () => {
+    const clusterClient = {
+      id: Thermostat.Complete.id,
+      name: 'Thermostat',
+      endpointId: 4,
+      supportedFeatures: {
+        heating: true,
+      },
+    };
+
+    const device = {
+      name: 'Radiator',
+      number: 4,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1:child_endpoint:4');
+
+    const modeFeatures = gladysDevice.features.filter((feature) => feature.type === 'mode');
+    expect(modeFeatures).to.have.lengthOf(0);
   });
 });

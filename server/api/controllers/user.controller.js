@@ -162,9 +162,13 @@ module.exports = function UserController(gladys) {
     const link = `${req.body.origin}/reset-password?token=${session.access_token}`;
     // Try to send the link to the user if he has configured an external service like Telegram
     const text = gladys.brain.getReply(user.language, 'user.forgot-password.success', {});
-    await gladys.message.sendToUser(user.selector, text);
-    await gladys.message.sendToUser(user.selector, link);
-    // If not, we log the link to the logs.
+    try {
+      await gladys.message.sendToUser(user.selector, text);
+      await gladys.message.sendToUser(user.selector, link);
+    } catch (e) {
+      logger.error(`Error while sending forgot password message to user ${req.body.email}:`, e);
+    }
+    // Always log the link so an admin can still recover the reset URL if messaging fails.
     logger.info(`Forgot password initiated for user ${req.body.email}, link = ${link}`);
     res.json({
       success: true,

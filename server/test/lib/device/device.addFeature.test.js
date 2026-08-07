@@ -96,4 +96,31 @@ describe('Device.addFeature', () => {
     expect(newDeviceFeature).to.have.property('name', 'On/Off');
     expect(newDeviceFeature).to.have.property('selector', 'philips-hue-binary');
   });
+  it('should add a feature whose name is already taken by another feature', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('device', 'test-device', {
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'Philips Hue',
+      selector: 'test-device',
+      features: [],
+      params: [],
+    });
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
+    // "test-device-feature" is already taken by the seeders: the selector
+    // derived from this name must be disambiguated instead of failing
+    const newDevice = await device.addFeature('test-device', {
+      name: 'Test device feature',
+      external_id: 'philips-hue:1:homonym',
+      category: 'light',
+      type: 'binary',
+      read_only: false,
+      keep_history: true,
+      has_feedback: false,
+      min: 0,
+      max: 1,
+    });
+    const newDeviceFeature = newDevice.features.find((f) => f.external_id === 'philips-hue:1:homonym');
+    expect(newDeviceFeature).to.have.property('selector', 'test-device-feature-3');
+  });
 });
