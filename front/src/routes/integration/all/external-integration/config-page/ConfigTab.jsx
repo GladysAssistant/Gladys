@@ -160,7 +160,6 @@ const ConfigTab = props => {
           updateValue={props.updateContactProfileValue}
           onSave={props.saveContactProfile}
           onClear={props.clearContactProfile}
-          placeholderPorts={placeholderPorts}
         />
       )}
 

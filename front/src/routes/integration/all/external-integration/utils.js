@@ -39,7 +39,10 @@ export const getUrlDomain = url => (url || '').split('/')[2] || '';
 // integration detail (containers[].ports[]). Feeds the {{port:<name>}}
 // placeholder resolution below.
 export const getAssignedPortsByName = integration => {
-  const portsByName = {};
+  // null prototype: the allowed port name pattern ([a-z0-9_]) accepts
+  // `constructor` and `__proto__`, which on a plain object would either
+  // read an inherited value or silently fail to store one
+  const portsByName = Object.create(null);
   ((integration && integration.containers) || []).forEach(container => {
     (container.ports || []).forEach(port => {
       if (port.name && port.host_port !== null && port.host_port !== undefined) {
@@ -65,8 +68,11 @@ export const resolveManifestPlaceholders = (text, portsByName = {}) => {
   if (typeof window !== 'undefined') {
     resolved = resolved.replace(/\{\{gladys_host\}\}/g, window.location.hostname);
   }
+  // own-property check, never a plain lookup: `{{port:constructor}}` would
+  // otherwise stringify the inherited Object constructor instead of
+  // staying unresolved
   return resolved.replace(/\{\{port:([a-z0-9_]+)\}\}/g, (token, name) =>
-    portsByName[name] === undefined ? token : `${portsByName[name]}`
+    Object.prototype.hasOwnProperty.call(portsByName, name) ? `${portsByName[name]}` : token
   );
 };
 

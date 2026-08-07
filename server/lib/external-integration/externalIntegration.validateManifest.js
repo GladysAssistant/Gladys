@@ -244,17 +244,14 @@ function validateConfigFieldDefault(field, path, errors) {
 }
 
 /**
- * @description Check the {{port:<name>}} placeholders of a section text:
- * every referenced name must be the `name` of a port declared in the
- * manifest — an unknown reference would sit unresolved on screen forever.
+ * @description Run a callback on every {{port:<name>}} placeholder found in a
+ * multi-language text, with the referenced name and the language it sits in.
  * @param {object} value - The multi-language text to scan.
- * @param {string} path - The path of the field, for error messages.
- * @param {Set} declaredPortNames - Port names declared in the manifest.
- * @param {Array} errors - The array of errors to push to.
+ * @param {Function} callback - Called with (name, language) per placeholder.
  * @example
- * validateSectionPortPlaceholders({ en: 'ws://{{gladys_host}}:{{port:ocpp}}' }, 'config_schema[0].description', declaredPortNames, errors);
+ * forEachPortPlaceholder({ en: 'ws://host:{{port:ocpp}}' }, (name) => names.push(name));
  */
-function validateSectionPortPlaceholders(value, path, declaredPortNames, errors) {
+function forEachPortPlaceholder(value, callback) {
   if (value === null || typeof value !== 'object') {
     return;
   }
@@ -263,11 +260,44 @@ function validateSectionPortPlaceholders(value, path, declaredPortNames, errors)
     if (typeof text !== 'string') {
       return;
     }
-    [...text.matchAll(PORT_PLACEHOLDER_REGEX)].forEach((match) => {
-      if (!declaredPortNames.has(match[1])) {
-        errors.push(`${path}.${language}: {{port:${match[1]}}} does not reference any declared port name`);
-      }
-    });
+    [...text.matchAll(PORT_PLACEHOLDER_REGEX)].forEach((match) => callback(match[1], language));
+  });
+}
+
+/**
+ * @description Check the {{port:<name>}} placeholders of a section text:
+ * every referenced name must be the `name` of a port declared in the
+ * manifest — an unknown reference would sit unresolved on screen forever.
+ * @param {object} value - The multi-language text to scan.
+ * @param {string} path - The path of the field, for error messages.
+ * @param {Set} declaredPortNames - Port names declared in the manifest.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateSectionPortPlaceholders({ en: '{{port:ocpp}}' }, 'config_schema[0].description', declaredPortNames, errors);
+ */
+function validateSectionPortPlaceholders(value, path, declaredPortNames, errors) {
+  forEachPortPlaceholder(value, (name, language) => {
+    if (!declaredPortNames.has(name)) {
+      errors.push(`${path}.${language}: {{port:${name}}} does not reference any declared port name`);
+    }
+  });
+}
+
+/**
+ * @description Reject the {{port:<name>}} placeholders of a per-user contact
+ * schema section. The block is rendered from the reduced view a non-admin
+ * gets, which deliberately carries no container state (C.5): the token would
+ * resolve for an admin and stay raw for everyone else. `{{gladys_host}}`
+ * stays allowed — the browser resolves it whatever the role.
+ * @param {object} value - The multi-language text to scan.
+ * @param {string} path - The path of the field, for error messages.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * rejectContactSchemaPortPlaceholders({ en: '{{port:ocpp}}' }, 'contact_schema[0].label', errors);
+ */
+function rejectContactSchemaPortPlaceholders(value, path, errors) {
+  forEachPortPlaceholder(value, (name, language) => {
+    errors.push(`${path}.${language}: {{port:${name}}} is not available in the per-user contact schema`);
   });
 }
 
@@ -877,6 +907,12 @@ function validateManifest(manifest) {
         if (field && field.type === 'oauth2') {
           // the OAuth relay is integration-scoped, never per user
           errors.push(`contact_schema[${index}].type: oauth2 is not allowed in the per-user contact schema`);
+        }
+        if (field && field.type === 'section') {
+          // the per-user block is the one screen a non-admin reaches, and
+          // their reduced view carries no container state
+          rejectContactSchemaPortPlaceholders(field.label, `contact_schema[${index}].label`, errors);
+          rejectContactSchemaPortPlaceholders(field.description, `contact_schema[${index}].description`, errors);
         }
       });
     }

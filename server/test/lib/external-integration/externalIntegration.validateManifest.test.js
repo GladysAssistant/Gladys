@@ -634,6 +634,43 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should refuse a {{port}} placeholder in the per-user contact schema, but allow {{gladys_host}}', () => {
+    // the per-user block is the one screen a non-admin reaches, and their
+    // reduced view carries no container state: the token would resolve for
+    // an admin and stay raw for everyone else
+    const sendOnlyChannel = {
+      ...TEST_MANIFEST,
+      type: 'communication',
+      messaging: { receive: false },
+      containers: [
+        {
+          name: 'gateway',
+          docker_image: 'img:1.0.0',
+          ports: [{ container_port: 9000, name: 'ocpp', label: { en: 'Gateway' } }],
+        },
+      ],
+    };
+    const section = { key: 'intro', type: 'section', label: { en: 'Intro' } };
+    // the browser resolves {{gladys_host}} whatever the role
+    const acceptedManifest = {
+      ...sendOnlyChannel,
+      contact_schema: [{ ...section, description: { en: 'Open http://{{gladys_host}} on your phone.' } }],
+    };
+    expect(externalIntegration.validateManifest(acceptedManifest)).to.deep.equal(acceptedManifest);
+    // declared port name, and still refused here
+    expect422(
+      {
+        ...sendOnlyChannel,
+        contact_schema: [{ ...section, description: { en: 'ws://{{gladys_host}}:{{port:ocpp}}' } }],
+      },
+      'contact_schema[0].description.en: {{port:ocpp}} is not available in the per-user contact schema',
+    );
+    expect422(
+      { ...sendOnlyChannel, contact_schema: [{ ...section, label: { en: '{{port:ocpp}}' } }] },
+      'contact_schema[0].label.en: {{port:ocpp}} is not available in the per-user contact schema',
+    );
+  });
+
   it('should accept a valid actions list', () => {
     const manifest = {
       ...TEST_MANIFEST,
