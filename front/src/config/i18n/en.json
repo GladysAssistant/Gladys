@@ -3037,6 +3037,10 @@
       },
       "messageSend": {
         "userLabel": "User",
+        "serviceLabel": "Send through",
+        "allServicesLabel": "All configured services",
+        "serviceExplanation": "Choose the messaging service which will send this message. By default, the message is sent to every service configured by the user.",
+        "serviceUnavailable": "unavailable",
         "textLabel": "Message",
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."

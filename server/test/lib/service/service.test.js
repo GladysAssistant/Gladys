@@ -7,6 +7,14 @@ const services = {
   example: () => ({
     start: async () => Promise.resolve(),
   }),
+  // a messaging channel is any service exposing message.sendToUser: that is
+  // the only interface forwardToChannels relies on
+  'test-service': () => ({
+    start: async () => Promise.resolve(),
+    message: {
+      sendToUser: async () => Promise.resolve(),
+    },
+  }),
 };
 
 const gladys = {
@@ -27,8 +35,23 @@ describe('service', () => {
     expect(service.getService('DONOTEXIST')).to.be.null; // eslint-disable-line
   });
   it('should return service with message capabilities', async () => {
+    // the global beforeEach reseeds the database before every test, so the
+    // has_message_feature flag written by a previous load() is gone: reload
+    // here to make this test self-contained
+    await service.load(gladys);
     const messageServices = await service.getMessageServices();
     expect(messageServices).to.be.instanceOf(Array);
+    // the selector needs the technical name to store in the action, plus the
+    // status so a stopped channel can be flagged in the UI
+    const messagingService = messageServices.find((s) => s.name === 'test-service');
+    expect(messagingService).to.not.equal(undefined);
+    expect(messagingService).to.have.property('name', 'test-service');
+    expect(messagingService).to.have.property('status');
+    expect(messagingService).to.have.property('label');
+    // a core service has no manifest: the front translates its technical name
+    expect(messagingService).to.have.property('manifest_name', null);
+    // "example" has no message interface: it could not deliver anything
+    expect(messageServices.map((s) => s.name)).to.not.include('example');
   });
   it('should return service by name', async () => {
     const testService = await service.getByName('test-service');

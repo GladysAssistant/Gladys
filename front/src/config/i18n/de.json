@@ -3037,6 +3037,10 @@
       },
       "messageSend": {
         "userLabel": "Benutzer",
+        "serviceLabel": "Senden über",
+        "allServicesLabel": "Alle konfigurierten Dienste",
+        "serviceExplanation": "Wähle den Nachrichtendienst, der diese Nachricht sendet. Standardmäßig wird die Nachricht an alle vom Benutzer konfigurierten Dienste gesendet.",
+        "serviceUnavailable": "nicht verfügbar",
         "textLabel": "Nachricht",
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."

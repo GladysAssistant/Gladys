@@ -62,3 +62,15 @@ describe('GET /api/v1/service', () => {
       });
   });
 });
+
+describe('GET /api/v1/message_service', () => {
+  it('should get the messaging services', async () => {
+    await authenticatedRequest
+      .get('/api/v1/message_service')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.be.an('array');
+      });
+  });
+});

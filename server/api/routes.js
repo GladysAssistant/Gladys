@@ -509,6 +509,12 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: serviceController.getAll,
     },
+    // distinct path: /api/v1/service/message would be swallowed by the
+    // :service_name route above
+    'get /api/v1/message_service': {
+      authenticated: true,
+      controller: serviceController.getMessageServices,
+    },
     // external integrations (admin API, except the routes explicitly open to
     // every user: the list and the detail — in their reduced view — plus the
     // per-user account linking below, so a non-admin can link their own

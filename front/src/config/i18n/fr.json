@@ -3037,6 +3037,10 @@
       },
       "messageSend": {
         "userLabel": "Utilisateur",
+        "serviceLabel": "Envoyer via",
+        "allServicesLabel": "Tous les services configurés",
+        "serviceExplanation": "Choisissez le service de messagerie qui enverra ce message. Par défaut, le message est envoyé sur tous les services configurés par l'utilisateur.",
+        "serviceUnavailable": "indisponible",
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."

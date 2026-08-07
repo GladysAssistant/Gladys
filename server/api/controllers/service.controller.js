@@ -108,10 +108,31 @@ module.exports = function ServiceController(gladys) {
     res.json(service);
   }
 
+  /**
+   * @api {get} /api/v1/service_message get message services
+   * @apiName getMessageServices
+   * @apiGroup Service
+   * @apiSuccessExample {json} Success-Example
+   * [
+   *  {
+   *   "id":"57ae1702-c071-483a-b532-384a507c1f04",
+   *   "name":"telegram",
+   *   "selector":"telegram",
+   *   "status":"RUNNING",
+   *   "label":"telegram"
+   *  }
+   * ]
+   */
+  async function getMessageServices(req, res) {
+    const messageServices = await gladys.service.getMessageServices();
+    res.json(messageServices);
+  }
+
   return Object.freeze({
     start: asyncMiddleware(start),
     stop: asyncMiddleware(stop),
     getByName: asyncMiddleware(getByName),
     getAll: asyncMiddleware(getAll),
+    getMessageServices: asyncMiddleware(getMessageServices),
   });
 };

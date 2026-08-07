@@ -148,6 +148,12 @@ function createSceneCreateInputSchema(
   const deviceFeatureSelectorSchema = deviceFeatureSelectors.length > 0 ? z.enum(deviceFeatureSelectors) : z.string();
   const calendarSelectorSchema = calendarSelectors.length > 0 ? z.enum(calendarSelectors) : z.string();
   const areaSelectorSchema = areaSelectors.length > 0 ? z.enum(areaSelectors) : z.string();
+  const messageServiceSchema = z
+    .string()
+    .nullish()
+    .describe(
+      'Name of the messaging service to send through (example: "telegram"). Omit or set to null to send to every messaging channel the user configured.',
+    );
   const sceneActionSchema = z.lazy(() =>
     z.discriminatedUnion('type', [
       actionSchemaByType(ACTIONS.DEVICE.SET_VALUE, {
@@ -192,11 +198,13 @@ function createSceneCreateInputSchema(
       actionSchemaByType(ACTIONS.MESSAGE.SEND, {
         user: userSelectorSchema,
         text: z.string(),
+        service: messageServiceSchema,
       }),
       actionSchemaByType(ACTIONS.MESSAGE.SEND_CAMERA, {
         user: userSelectorSchema,
         text: z.string(),
         camera: z.string(),
+        service: messageServiceSchema,
       }),
       actionSchemaByType(ACTIONS.AI.ASK, {
         user: userSelectorSchema,

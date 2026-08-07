@@ -17,6 +17,9 @@ const actionSchema = Joi.object()
     house: Joi.string(),
     scene: Joi.string(),
     camera: Joi.string(),
+    // messaging channel of a "send message" action: null/absent means
+    // broadcast to every channel the user configured
+    service: Joi.string().allow(null),
     text: Joi.string(),
     value: Joi.number(),
     evaluate_value: Joi.string(),
