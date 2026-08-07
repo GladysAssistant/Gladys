@@ -328,17 +328,34 @@
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
         "houseHasNoCoordinates": "Your house has no coordinates defined. Go to Gladys parameters to define the position of your house.",
-        "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
-        "requestToThirdPartyFailed": "The request to OpenWeather API failed. Is your Gladys instance connected to the internet? Please go to the OpenWeather configuration panel to troubleshoot this problem.",
-        "clickHere": "Click here to access the OpenWeather configuration panel.",
+        "serviceNotConfigured": "No weather service is configured. Please go to the 'Integrations' tab and configure a weather integration (OpenWeather, or a weather integration from the store).",
+        "requestToThirdPartyFailed": "The request to the weather provider failed. Is your Gladys instance connected to the internet? Please go to the weather integrations panel to troubleshoot this problem.",
+        "clickHere": "Click here to access the weather integrations.",
         "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
+        "editProviderLabel": "Weather provider:",
+        "providerAuto": "Automatic (first available provider)",
+        "providerInternalOpenWeather": "Internal OpenWeather (deprecated)",
         "editModeLabel": "Select display mode:",
         "displayModes": {
           "advancedWeather": "Humidity and wind speed",
           "hourlyForecast": "Forecast for the next 24 hours",
-          "dailyForecast": "Forecast for the next 5 days"
+          "dailyForecast": "Forecast for the next 5 days",
+          "providerImages": "Provider images (vigilance map, rain radar…)"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "minMaxDegreeValue": "{{min}}°/{{max}}°",
+        "uv": "UV",
+        "alertTypes": {
+          "wind": "Strong wind",
+          "rain": "Heavy rain",
+          "flood": "Flood",
+          "thunderstorm": "Thunderstorms",
+          "snow": "Snow and ice",
+          "heat": "Heat wave",
+          "cold": "Extreme cold",
+          "avalanche": "Avalanches",
+          "coastal": "Coastal event",
+          "fog": "Fog"
+        }
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -828,7 +845,8 @@
         "duplicateWarningText": "\"{name}\" looks like another instance of this integration. Two instances may fight over the same cloud account or the same devices — consider stopping the existing one during your tests. Installing anyway is supported (e.g. a dev build next to the production one).",
         "webhooksTitle": "Internet webhooks (Gladys Plus)",
         "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key).",
-        "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee)."
+        "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee).",
+        "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
@@ -3246,6 +3264,10 @@
       },
       "mqtt": {
         "received": "Receive message from MQTT"
+      },
+      "weather": {
+        "alert-raised": "Weather alert raised",
+        "alert-ended": "Weather alert ended"
       }
     },
     "triggersCard": {
@@ -3361,6 +3383,20 @@
         "messageLabel": "Message",
         "messagePlaceholder": "Enter the expected message",
         "messageDescription": "Enter the expected message or leave blank to run the scene regardless of the message"
+      },
+      "weatherAlert": {
+        "alertRaisedDescription": "This will trigger when a weather alert appears or worsens for the selected house (checked every 30 minutes, or as soon as the weather integration signals a change).",
+        "alertEndedDescription": "This will trigger when a weather alert ends for the selected house.",
+        "houseLabel": "House",
+        "typeLabel": "Alert type",
+        "anyType": "Any alert type",
+        "severityLabel": "Minimal severity",
+        "severities": {
+          "minor": "Minor (blue)",
+          "moderate": "Moderate (yellow)",
+          "severe": "Severe (orange)",
+          "extreme": "Extreme (red)"
+        }
       }
     }
   },
