@@ -1845,6 +1845,7 @@ const DASHBOARD_BOX_TYPE = {
   VOICE_ASSISTANT: 'voice-assistant',
   LINK: 'link',
   PHOTO: 'photo',
+  SUN: 'sun',
 };
 
 const ERROR_MESSAGES = {
