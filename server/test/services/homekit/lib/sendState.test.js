@@ -34,6 +34,7 @@ describe('Send state to HomeKit', () => {
         CarbonDioxideLevel: 'CARBONDIOXIDELEVEL',
         CarbonDioxideDetected: 'CARBONDIOXIDEDETECTED',
         AirQuality: 'AIRQUALITY',
+        SmokeDetected: 'SMOKEDETECTED',
         PM2_5Density: 'PM25DENSITY',
         PM10Density: 'PM10DENSITY',
       },
@@ -45,6 +46,7 @@ describe('Send state to HomeKit', () => {
         CarbonMonoxideSensor: 'CARBONMONOXIDESENSOR',
         CarbonDioxideSensor: 'CARBONDIOXIDESENSOR',
         AirQualitySensor: 'AIRQUALITYSENSOR',
+        SmokeSensor: 'SMOKESENSOR',
       },
     },
     notifyTimeouts: {},
@@ -618,6 +620,26 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['PM25DENSITY', 42]);
     expect(updateCharacteristic.args[1]).eql(['PM25DENSITY', 50]);
     expect(updateCharacteristic.args[2]).eql(['PM10DENSITY', 8]);
+  });
+
+  it('should notify smoke sensor', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Smoke sensor',
+      category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 });
+
+    expect(updateCharacteristic.args[0]).eql(['SMOKEDETECTED', 1]);
   });
 
   it('should do nothing wrong device category & type', async () => {
