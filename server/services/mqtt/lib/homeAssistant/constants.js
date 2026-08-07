@@ -72,9 +72,11 @@ const ABBREVIATIONS = {
   json_attr_t: 'json_attributes_topic',
   json_attr_tpl: 'json_attributes_template',
   max_hum: 'max_humidity',
+  max_k: 'max_kelvin',
   max_mirs: 'max_mireds',
   max_temp: 'max_temp',
   min_hum: 'min_humidity',
+  min_k: 'min_kelvin',
   min_mirs: 'min_mireds',
   min_temp: 'min_temp',
   mode_cmd_t: 'mode_command_topic',
@@ -205,25 +207,38 @@ const SENSOR_DEVICE_CLASSES = {
   aqi: { category: DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR, type: DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI },
 };
 
-// Mapping between Home Assistant binary sensor device classes and Gladys categories
+// Mapping between Home Assistant binary sensor device classes and Gladys categories.
+// `inverted` is set when the Home Assistant "on" payload is the opposite of the Gladys value 1:
+// Home Assistant reports "on" for an open door and for an unlocked lock, while Gladys uses 1 for
+// "closed" on an opening sensor and 1 for "locked" on a lock.
+// Home Assistant device classes without a Gladys equivalent (gas, problem, safety...) are left out
+// on purpose: they fall back to the "unknown" category instead of borrowing an unrelated one.
 const BINARY_SENSOR_DEVICE_CLASSES = {
-  motion: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
-  moving: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
-  door: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-  window: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-  garage_door: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-  opening: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-  lock: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
-  presence: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
-  occupancy: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
-  smoke: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
-  gas: DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
-  carbon_monoxide: DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
-  moisture: DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
-  vibration: DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR,
-  tamper: DEVICE_FEATURE_CATEGORIES.TAMPER,
-  battery: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
-  rain: DEVICE_FEATURE_CATEGORIES.RAIN_SENSOR,
+  motion: { category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR },
+  moving: { category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR },
+  door: { category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, inverted: true },
+  window: { category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, inverted: true },
+  garage_door: { category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, inverted: true },
+  opening: { category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR, inverted: true },
+  lock: { category: DEVICE_FEATURE_CATEGORIES.LOCK, inverted: true },
+  presence: { category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR },
+  occupancy: { category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR },
+  smoke: { category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR },
+  carbon_monoxide: { category: DEVICE_FEATURE_CATEGORIES.CO_SENSOR },
+  moisture: { category: DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR },
+  vibration: { category: DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR },
+  tamper: { category: DEVICE_FEATURE_CATEGORIES.TAMPER },
+  battery: { category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW },
+  rain: { category: DEVICE_FEATURE_CATEGORIES.RAIN_SENSOR },
+};
+
+// Default bounds of the light color temperature, in mireds and in Kelvin.
+// See https://www.home-assistant.io/integrations/light.mqtt/
+const COLOR_TEMP_BOUNDS = {
+  MIN_MIREDS: 153,
+  MAX_MIREDS: 500,
+  MIN_KELVIN: 2000,
+  MAX_KELVIN: 6535,
 };
 
 // Mapping between Home Assistant units of measurement and Gladys units
@@ -294,6 +309,7 @@ module.exports = {
   ORIGIN_ABBREVIATIONS,
   SENSOR_DEVICE_CLASSES,
   BINARY_SENSOR_DEVICE_CLASSES,
+  COLOR_TEMP_BOUNDS,
   UNITS,
   DEFAULT_PAYLOADS,
   COVER_STATE_BY_PAYLOAD_KEY,

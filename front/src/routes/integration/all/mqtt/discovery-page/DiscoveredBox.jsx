@@ -33,8 +33,11 @@ class DiscoveredBox extends Component {
     });
   };
 
-  render({ device = {}, deviceIndex, houses = [] }, { loading, saveError }) {
+  render({ device = {}, houses = [] }, { loading, saveError }) {
     const { features = [] } = device;
+    // The list is re-ordered by live websocket updates, so DOM ids are derived from the stable
+    // external_id instead of the position of the device in the list
+    const domId = device.external_id;
     const supportedDevice = features.length > 0;
     const enableSaveButton = !device.created_at;
     const enableUpdateButton = device.updatable;
@@ -57,12 +60,12 @@ class DiscoveredBox extends Component {
                   </div>
                 )}
                 <div class="form-group">
-                  <label class="form-label" for={`name_${deviceIndex}`}>
+                  <label class="form-label" for={`name_${domId}`}>
                     <Text id="integration.mqtt.discover.nameLabel" />
                   </label>
                   <Localizer>
                     <input
-                      id={`name_${deviceIndex}`}
+                      id={`name_${domId}`}
                       type="text"
                       value={device.name}
                       onInput={this.updateName}
@@ -81,10 +84,10 @@ class DiscoveredBox extends Component {
                 {supportedDevice && (
                   <div>
                     <div class="form-group">
-                      <label class="form-label" for={`room_${deviceIndex}`}>
+                      <label class="form-label" for={`room_${domId}`}>
                         <Text id="integration.mqtt.discover.roomLabel" />
                       </label>
-                      <select onChange={this.updateRoom} class="form-control" id={`room_${deviceIndex}`}>
+                      <select onChange={this.updateRoom} class="form-control" id={`room_${domId}`}>
                         <option value="">
                           <Text id="global.emptySelectOption" />
                         </option>
@@ -102,25 +105,19 @@ class DiscoveredBox extends Component {
 
                     {device.model && (
                       <div class="form-group">
-                        <label class="form-label" for={`model_${deviceIndex}`}>
+                        <label class="form-label" for={`model_${domId}`}>
                           <Text id="integration.mqtt.discover.modelLabel" />
                         </label>
-                        <input
-                          id={`model_${deviceIndex}`}
-                          type="text"
-                          value={device.model}
-                          class="form-control"
-                          disabled
-                        />
+                        <input id={`model_${domId}`} type="text" value={device.model} class="form-control" disabled />
                       </div>
                     )}
 
                     <div class="form-group">
-                      <label class="form-label" for={`external_id_${deviceIndex}`}>
+                      <label class="form-label" for={`external_id_${domId}`}>
                         <Text id="integration.mqtt.discover.externalIdLabel" />
                       </label>
                       <input
-                        id={`external_id_${deviceIndex}`}
+                        id={`external_id_${domId}`}
                         type="text"
                         value={device.external_id}
                         class="form-control"

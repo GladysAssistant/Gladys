@@ -5382,6 +5382,7 @@
       "binary": "Etat de l'entrée"
     },
     "unknown": {
+      "binary": "Binaire (on/off)",
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
     },

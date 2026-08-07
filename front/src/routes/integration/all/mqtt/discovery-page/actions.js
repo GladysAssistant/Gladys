@@ -68,7 +68,10 @@ function createActions(store) {
         return;
       }
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
-      const mqttDiscoveredDevices = state.mqttDiscoveredDevices.filter(d => d.external_id !== savedDevice.external_id);
+      // Discovery updates are pushed live over websocket, so the list may have been replaced
+      // while the device was being saved: the current list is read back from the store
+      const { mqttDiscoveredDevices: currentDevices = [] } = store.getState();
+      const mqttDiscoveredDevices = currentDevices.filter(d => d.external_id !== savedDevice.external_id);
       store.setState({
         mqttDiscoveredDevices
       });

@@ -1,6 +1,11 @@
 const logger = require('../../../../utils/logger');
 const { EVENTS, STATE } = require('../../../../utils/constants');
-const { FEATURE_PROPERTIES, DEFAULT_PAYLOADS, COVER_STATE_BY_PAYLOAD_KEY } = require('./constants');
+const {
+  FEATURE_PROPERTIES,
+  DEFAULT_PAYLOADS,
+  COVER_STATE_BY_PAYLOAD_KEY,
+  BINARY_SENSOR_DEVICE_CLASSES,
+} = require('./constants');
 const { applyValueTemplate } = require('./applyValueTemplate');
 
 /**
@@ -159,12 +164,23 @@ function parseHomeAssistantIncomingState(binding, message) {
         config.state_on || config.payload_on || DEFAULT_PAYLOADS.PAYLOAD_ON,
         config.state_off || config.payload_off || DEFAULT_PAYLOADS.PAYLOAD_OFF,
       );
-    case 'binary_sensor':
-      return toBinaryState(
+    case 'binary_sensor': {
+      const state = toBinaryState(
         applyValueTemplate(config.value_template, message),
         config.payload_on || DEFAULT_PAYLOADS.PAYLOAD_ON,
         config.payload_off || DEFAULT_PAYLOADS.PAYLOAD_OFF,
       );
+      if (state === undefined) {
+        return undefined;
+      }
+      // Home Assistant reports "on" for an open door and for an unlocked lock, while Gladys uses
+      // 1 for "closed" and 1 for "locked": those device classes need the value to be reversed.
+      const mapping = BINARY_SENSOR_DEVICE_CLASSES[config.device_class];
+      if (mapping && mapping.inverted) {
+        return state === STATE.ON ? STATE.OFF : STATE.ON;
+      }
+      return state;
+    }
     case 'lock': {
       const value = applyValueTemplate(config.value_template, message);
       return toBinaryState(

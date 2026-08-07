@@ -9,6 +9,7 @@ const {
   FEATURE_PROPERTIES,
   SENSOR_DEVICE_CLASSES,
   BINARY_SENSOR_DEVICE_CLASSES,
+  COLOR_TEMP_BOUNDS,
   UNITS,
 } = require('./constants');
 
@@ -44,9 +45,20 @@ function buildFeature(attributes) {
  * convertSensor('homeassistant:my-device:sensor:temp', 'Temperature', { state_topic: 'my/topic' });
  */
 function convertSensor(externalIdBase, name, config) {
-  const mapping = SENSOR_DEVICE_CLASSES[config.device_class];
-  if (!mapping || !config.state_topic) {
+  if (!config.state_topic) {
     return [];
+  }
+  // Many firmwares (Tasmota, ESPHome, DIY...) publish sensors without a device class, or with a
+  // device class Gladys has no category for. They are still exposed, as a generic "unknown" sensor,
+  // instead of being silently dropped from the device. Only numeric sensors are kept: Gladys stores
+  // states as numbers, so a text sensor (SSID, firmware version, timestamp...) would never receive
+  // a value. Home Assistant marks numeric sensors with a unit of measurement or a state class.
+  let mapping = SENSOR_DEVICE_CLASSES[config.device_class];
+  if (!mapping) {
+    if (config.unit_of_measurement === undefined && config.state_class === undefined) {
+      return [];
+    }
+    mapping = { category: DEVICE_FEATURE_CATEGORIES.UNKNOWN, type: DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN };
   }
   const unit = UNITS[config.unit_of_measurement];
   const isPercent = unit === DEVICE_FEATURE_UNITS.PERCENT;
@@ -76,12 +88,14 @@ function convertBinarySensor(externalIdBase, name, config) {
   if (!config.state_topic) {
     return [];
   }
-  const category = BINARY_SENSOR_DEVICE_CLASSES[config.device_class] || DEVICE_FEATURE_CATEGORIES.SWITCH;
+  // A binary sensor is read-only: an unmapped device class must not land in the "switch" category,
+  // which the dashboard and the scene editor treat as something the user can turn on and off.
+  const mapping = BINARY_SENSOR_DEVICE_CLASSES[config.device_class];
   return [
     buildFeature({
       name,
       external_id: externalIdBase,
-      category,
+      category: mapping ? mapping.category : DEVICE_FEATURE_CATEGORIES.UNKNOWN,
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     }),
   ];
@@ -125,12 +139,14 @@ function convertButton(externalIdBase, name, config) {
   if (!config.command_topic) {
     return [];
   }
+  // A Home Assistant button is a momentary action, not a toggle: pressing it publishes
+  // `payload_press` and there is nothing to turn back off.
   return [
     buildFeature({
       name,
       external_id: externalIdBase,
-      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+      type: DEVICE_FEATURE_TYPES.BUTTON.PUSH,
       read_only: false,
       has_feedback: false,
       keep_history: false,
@@ -188,6 +204,9 @@ function convertLight(externalIdBase, name, config) {
     ? supportedColorModes.includes('color_temp')
     : config.color_temp_command_topic !== undefined || config.color_temp_state_topic !== undefined;
   if (hasColorTemp) {
+    // Recent Home Assistant firmwares advertise `color_temp_kelvin: true` and send/expect Kelvin
+    // on the color temperature topics, with `min_kelvin`/`max_kelvin` bounds instead of mireds.
+    const useKelvin = config.color_temp_kelvin === true;
     features.push(
       buildFeature({
         name: `${name} - color temperature`,
@@ -196,8 +215,12 @@ function convertLight(externalIdBase, name, config) {
         type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
         read_only: false,
         has_feedback: isJsonSchema ? config.state_topic !== undefined : config.color_temp_state_topic !== undefined,
-        min: config.min_mireds || 153,
-        max: config.max_mireds || 500,
+        min: useKelvin
+          ? config.min_kelvin || COLOR_TEMP_BOUNDS.MIN_KELVIN
+          : config.min_mireds || COLOR_TEMP_BOUNDS.MIN_MIREDS,
+        max: useKelvin
+          ? config.max_kelvin || COLOR_TEMP_BOUNDS.MAX_KELVIN
+          : config.max_mireds || COLOR_TEMP_BOUNDS.MAX_MIREDS,
       }),
     );
   }

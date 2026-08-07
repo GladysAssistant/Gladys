@@ -60,8 +60,8 @@ const DiscoverTab = props => (
         <div class={cx('dimmer-content', style.mqttDiscoveryListBody)}>
           <div class="row">
             {props.mqttDiscoveredDevices &&
-              props.mqttDiscoveredDevices.map((device, index) => (
-                <DiscoveredBox {...props} device={device} deviceIndex={index} />
+              props.mqttDiscoveredDevices.map(device => (
+                <DiscoveredBox key={device.external_id} {...props} device={device} />
               ))}
             {(!props.mqttDiscoveredDevices || props.mqttDiscoveredDevices.length === 0) && <EmptyState />}
           </div>

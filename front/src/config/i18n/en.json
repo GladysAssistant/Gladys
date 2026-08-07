@@ -5382,6 +5382,7 @@
       "binary": "State of input"
     },
     "unknown": {
+      "binary": "Binary (on/off)",
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
     },

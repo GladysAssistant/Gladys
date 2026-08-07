@@ -5382,6 +5382,7 @@
       "binary": "Status des Eingangs"
     },
     "unknown": {
+      "binary": "Binär (an/aus)",
       "shortCategoryName": "Unbekannt",
       "unknown": "Unbekannt"
     },

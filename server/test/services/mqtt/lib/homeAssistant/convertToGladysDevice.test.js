@@ -72,7 +72,7 @@ describe('mqttHandler.homeAssistant.convertToGladysDevice', () => {
       identifier: 'my-device',
       info: {},
       entities: {
-        'sensor:unknown': { state_topic: 'my-device/unknown', device_class: 'unknown_class' },
+        'sensor:unknown': { device_class: 'unknown_class' },
       },
     });
     expect(device.features).to.deep.equal([]);
@@ -124,10 +124,39 @@ describe('mqttHandler.homeAssistant.convertToGladysDevice', () => {
       expect(features).to.deep.equal([]);
     });
 
-    it('should return no feature for an unsupported device class', () => {
+    it('should convert an unsupported device class to an unknown sensor', () => {
       const features = convertEntityToFeatures('homeassistant:my-device', 'sensor:custom', {
         state_topic: 'my-device/custom',
         device_class: 'i-dont-exist',
+        unit_of_measurement: 'W',
+      });
+      expect(features).to.have.lengthOf(1);
+      expect(features[0]).to.deep.include({
+        category: 'unknown',
+        type: 'unknown',
+        unit: 'watt',
+        read_only: true,
+        min: -100000,
+        max: 100000,
+      });
+    });
+
+    it('should convert a sensor without device class but with a state class to an unknown sensor', () => {
+      const features = convertEntityToFeatures('homeassistant:my-device', 'sensor:custom', {
+        state_topic: 'my-device/custom',
+        state_class: 'measurement',
+      });
+      expect(features).to.have.lengthOf(1);
+      expect(features[0]).to.deep.include({
+        category: 'unknown',
+        type: 'unknown',
+        unit: undefined,
+      });
+    });
+
+    it('should return no feature for a non numeric sensor without device class', () => {
+      const features = convertEntityToFeatures('homeassistant:my-device', 'sensor:ssid', {
+        state_topic: 'my-device/ssid',
       });
       expect(features).to.deep.equal([]);
     });
@@ -150,12 +179,48 @@ describe('mqttHandler.homeAssistant.convertToGladysDevice', () => {
       });
     });
 
-    it('should convert a binary sensor without device class to a read-only switch', () => {
+    it('should convert a binary sensor without device class to a read-only unknown sensor', () => {
       const features = convertEntityToFeatures('homeassistant:my-device', 'binary_sensor:generic', {
         state_topic: 'my-device/generic',
       });
       expect(features[0]).to.deep.include({
-        category: 'switch',
+        category: 'unknown',
+        type: 'binary',
+        read_only: true,
+      });
+    });
+
+    it('should convert a binary sensor with an unmapped device class to a read-only unknown sensor', () => {
+      const features = convertEntityToFeatures('homeassistant:my-device', 'binary_sensor:gas', {
+        state_topic: 'my-device/gas',
+        device_class: 'gas',
+      });
+      expect(features[0]).to.deep.include({
+        category: 'unknown',
+        type: 'binary',
+        read_only: true,
+      });
+    });
+
+    it('should convert a lock binary sensor to a read-only lock', () => {
+      const features = convertEntityToFeatures('homeassistant:my-device', 'binary_sensor:lock', {
+        state_topic: 'my-device/lock',
+        device_class: 'lock',
+      });
+      expect(features[0]).to.deep.include({
+        category: 'lock',
+        type: 'binary',
+        read_only: true,
+      });
+    });
+
+    it('should convert a door binary sensor to an opening sensor', () => {
+      const features = convertEntityToFeatures('homeassistant:my-device', 'binary_sensor:door', {
+        state_topic: 'my-device/door',
+        device_class: 'door',
+      });
+      expect(features[0]).to.deep.include({
+        category: 'opening-sensor',
         type: 'binary',
         read_only: true,
       });
@@ -202,9 +267,10 @@ describe('mqttHandler.homeAssistant.convertToGladysDevice', () => {
       });
       expect(features).to.have.lengthOf(1);
       expect(features[0]).to.deep.include({
-        category: 'switch',
-        type: 'binary',
+        category: 'button',
+        type: 'push',
         read_only: false,
+        has_feedback: false,
         keep_history: false,
       });
     });
@@ -299,6 +365,29 @@ describe('mqttHandler.homeAssistant.convertToGladysDevice', () => {
       expect(features[1]).to.deep.include({ type: 'brightness', has_feedback: true, min: 0, max: 255 });
       expect(features[2]).to.deep.include({ type: 'temperature', has_feedback: true, min: 153, max: 500 });
       expect(features[3]).to.deep.include({ type: 'color', has_feedback: true });
+    });
+
+    it('should use the kelvin bounds when the light advertises color_temp_kelvin', () => {
+      const features = convertEntityToFeatures('homeassistant:my-device', 'light:main', {
+        command_topic: 'my-device/set',
+        color_temp_command_topic: 'my-device/color_temp/set',
+        color_temp_kelvin: true,
+        min_kelvin: 2200,
+        max_kelvin: 4000,
+      });
+      expect(features).to.have.lengthOf(2);
+      expect(features[1]).to.deep.include({ type: 'temperature', min: 2200, max: 4000 });
+    });
+
+    it('should use the default kelvin bounds when the light advertises color_temp_kelvin only', () => {
+      const features = convertEntityToFeatures('homeassistant:my-device', 'light:main', {
+        schema: 'json',
+        command_topic: 'my-device/set',
+        color_temp_kelvin: true,
+        supported_color_modes: ['color_temp'],
+      });
+      expect(features).to.have.lengthOf(2);
+      expect(features[1]).to.deep.include({ type: 'temperature', min: 2000, max: 6535 });
     });
 
     it('should convert a json schema light without brightness and colors', () => {

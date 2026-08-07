@@ -99,6 +99,25 @@ describe('mqttHandler.handleHomeAssistantStateMessage', () => {
       expect(parseHomeAssistantIncomingState(binding, 'unknown')).to.equal(undefined);
     });
 
+    it('should reverse a door binary sensor, Home Assistant "on" meaning open', () => {
+      const binding = { component: 'binary_sensor', property: 'state', config: { device_class: 'door' } };
+      expect(parseHomeAssistantIncomingState(binding, 'ON')).to.equal(STATE.OFF);
+      expect(parseHomeAssistantIncomingState(binding, 'OFF')).to.equal(STATE.ON);
+      expect(parseHomeAssistantIncomingState(binding, 'unknown')).to.equal(undefined);
+    });
+
+    it('should reverse a lock binary sensor, Home Assistant "on" meaning unlocked', () => {
+      const binding = { component: 'binary_sensor', property: 'state', config: { device_class: 'lock' } };
+      expect(parseHomeAssistantIncomingState(binding, 'ON')).to.equal(STATE.OFF);
+      expect(parseHomeAssistantIncomingState(binding, 'OFF')).to.equal(STATE.ON);
+    });
+
+    it('should not reverse a motion binary sensor', () => {
+      const binding = { component: 'binary_sensor', property: 'state', config: { device_class: 'motion' } };
+      expect(parseHomeAssistantIncomingState(binding, 'ON')).to.equal(STATE.ON);
+      expect(parseHomeAssistantIncomingState(binding, 'OFF')).to.equal(STATE.OFF);
+    });
+
     it('should parse a switch with state_on/state_off', () => {
       const binding = { component: 'switch', property: 'state', config: { state_on: '1', state_off: '0' } };
       expect(parseHomeAssistantIncomingState(binding, '1')).to.equal(STATE.ON);
