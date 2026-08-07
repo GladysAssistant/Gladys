@@ -688,7 +688,8 @@
       "actions": {
         "title": "Actions",
         "runButton": "Run",
-        "error": "The action failed. Check that the integration is running."
+        "error": "The action failed. Check that the integration is running.",
+        "resultRegionLabel": "Action result"
       },
       "connection": {
         "label": "Connection",
