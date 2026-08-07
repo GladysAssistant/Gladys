@@ -16,6 +16,7 @@ const {
   DEVICE_TRANSPORTS,
 } = require('./constants');
 const { validateTransportMessage } = require('./externalIntegration.setDeviceTransports');
+const { normalizeSupportedOptions } = require('../../utils/normalizeSupportedOptions');
 
 /**
  * @description Store the complete list of discovered devices published by an
@@ -76,6 +77,14 @@ async function setDiscoveredDevices(service, devices) {
       // (buildUniqueSelector): an integration publishes none, and dropping it
       // here keeps the Discovery screen from posting one back to POST /device
       const { selector: publishedFeatureSelector, ...featureWithoutSelector } = feature;
+      if (feature.supported_options !== undefined) {
+        // labeled option lists (camera presets, supported movements, AC modes...)
+        try {
+          featureWithoutSelector.supported_options = normalizeSupportedOptions(feature.supported_options);
+        } catch (e) {
+          throw new BadParameters(`${featurePath}.supported_options: ${e.message}`);
+        }
+      }
       return featureWithoutSelector;
     });
     const params = Array.isArray(device.params) ? device.params : [];
@@ -124,6 +133,7 @@ async function setDiscoveredDevices(service, devices) {
       const createdDevice = this.stateManager.get('deviceByExternalId', device.external_id);
       if (createdDevice && createdDevice.service_id === service.id) {
         await this.upsertDeviceParams(createdDevice, device.params);
+        await this.upsertFeatureSupportedOptions(createdDevice, device.features);
       }
     }),
   );

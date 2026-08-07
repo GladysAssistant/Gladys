@@ -8,6 +8,7 @@ import {
   CHARGING_STATION_CHARGING_STATE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
+import { CAMERA_MOVE_OPTIONS } from '../../../../../utils/cameraMove';
 import { isPushButtonFeature } from '../../../../../utils/consts';
 
 const SENSOR_CATEGORY_SUFFIX = '-sensor';
@@ -536,6 +537,16 @@ export const getFeatureDefaultValues = (category, type) => {
 
   if (isCatalogPushButtonFeature(category, type)) {
     return { ...defaults, min: 1, max: 1, read_only: false, keep_history: false };
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.MOVE) {
+    // min/max cover the CAMERA_MOVE canonical values (STOP=0 .. ZOOM_OUT=6)
+    return { ...defaults, min: 0, max: 6, read_only: false, keep_history: false };
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.PRESET) {
+    // max follows the highest preset value, kept in sync when the preset list is edited
+    return { ...defaults, min: 0, max: 0, read_only: false, keep_history: false };
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.SIGNAL) {
@@ -1151,11 +1162,30 @@ export const filterFeatureCatalogOptions = (options, search, dictionary) => {
     .filter(Boolean);
 };
 
+// Build the supported_options rows of a camera move feature from the selected CAMERA_MOVE
+// values (all movements when values is omitted). Labels are stored in the current locale as a
+// fallback: control surfaces always render from the canonical values, not from these labels.
+export const buildCameraMoveSupportedOptions = (dictionary, values) => {
+  const selected = values ? new Set(values) : null;
+  return CAMERA_MOVE_OPTIONS.filter(option => !selected || selected.has(option.value)).map((option, index) => ({
+    value: option.value,
+    label: get(dictionary, `deviceFeatureAction.category.camera.move.${option.i18nKey}`) || option.i18nKey,
+    sort_order: index
+  }));
+};
+
 export const featureNeedsMinMax = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.TEXT) {
     return false;
   }
   if (type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
+    return false;
+  }
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.CAMERA &&
+    (type === DEVICE_FEATURE_TYPES.CAMERA.MOVE || type === DEVICE_FEATURE_TYPES.CAMERA.PRESET)
+  ) {
+    // min/max are derived from the supported movements / preset list, not edited by hand
     return false;
   }
   return true;

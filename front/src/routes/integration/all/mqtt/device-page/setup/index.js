@@ -11,6 +11,7 @@ import { slugify } from '../../../../../../../../server/utils/slugify';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import {
   getFeatureDefaultValues,
+  buildCameraMoveSupportedOptions,
   buildMqttExternalId,
   generateMqttExternalIdSuffix,
   normalizeMqttExternalId,
@@ -42,6 +43,14 @@ class MqttDeviceSetupPage extends Component {
     const type = featureData[1];
     const defaultValues = getFeatureDefaultValues(category, type);
     const newFeatureIndex = this.state.device.features.length;
+
+    if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.MOVE) {
+      // All movements supported by default; the user unchecks the ones the camera lacks
+      defaultValues.supported_options = buildCameraMoveSupportedOptions(get(this.props, 'intl.dictionary') || {});
+    }
+    if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.PRESET) {
+      defaultValues.supported_options = [];
+    }
 
     const device = update(this.state.device, {
       features: {
@@ -283,6 +292,23 @@ class MqttDeviceSetupPage extends Component {
     this.setState({ device });
   };
 
+  updateFeatureSupportedOptions(featureIndex, supportedOptions) {
+    const feature = this.state.device.features[featureIndex];
+    const featureUpdate = {
+      supported_options: { $set: supportedOptions }
+    };
+    if (feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.PRESET) {
+      // Keep max consistent with the highest preset value (spec camera-ptz-control.md, A.3)
+      featureUpdate.max = { $set: supportedOptions.reduce((max, option) => Math.max(max, option.value), 0) };
+    }
+    const device = update(this.state.device, {
+      features: {
+        [featureIndex]: featureUpdate
+      }
+    });
+    this.setState({ device });
+  }
+
   updateFeatureProperty(e, property, featureIndex) {
     let value = e.target.value;
     const feature = this.state.device.features[featureIndex];
@@ -420,6 +446,25 @@ class MqttDeviceSetupPage extends Component {
           value: feature.external_id || null,
           type: 'notNull Violation'
         });
+      }
+
+      if (
+        feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA &&
+        feature.type === DEVICE_FEATURE_TYPES.CAMERA.PRESET
+      ) {
+        const options = feature.supported_options || [];
+        const hasEmptyLabel = options.some(option => !option.label || option.label.trim() === '');
+        const values = options.map(option => option.value);
+        const hasDuplicateValue = new Set(values).size !== values.length;
+        const hasInvalidValue = values.some(value => !Number.isInteger(value) || value < 0);
+        if (hasEmptyLabel || hasDuplicateValue || hasInvalidValue) {
+          properties.push({
+            message: 'supported_options invalid',
+            attribute: 'supported_options',
+            value: feature.supported_options,
+            type: 'notNull Violation'
+          });
+        }
       }
     });
 
@@ -572,6 +617,7 @@ class MqttDeviceSetupPage extends Component {
     this.deleteFeature = this.deleteFeature.bind(this);
     this.updateDeviceProperty = this.updateDeviceProperty.bind(this);
     this.updateFeatureProperty = this.updateFeatureProperty.bind(this);
+    this.updateFeatureSupportedOptions = this.updateFeatureSupportedOptions.bind(this);
     this.saveDevice = this.saveDevice.bind(this);
     this.createEnergyConsumptionFeatures = this.createEnergyConsumptionFeatures.bind(this);
   }
@@ -632,6 +678,7 @@ class MqttDeviceSetupPage extends Component {
           deleteFeature={this.deleteFeature}
           updateDeviceProperty={this.updateDeviceProperty}
           updateFeatureProperty={this.updateFeatureProperty}
+          updateFeatureSupportedOptions={this.updateFeatureSupportedOptions}
           updateDeviceParam={this.updateDeviceParam}
           saveDevice={this.saveDevice}
           createEnergyConsumptionFeatures={this.createEnergyConsumptionFeatures}
