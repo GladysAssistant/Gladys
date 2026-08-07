@@ -673,6 +673,13 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[2]).eql(['STATUSLOWBATTERY', 1]);
     expect(updateCharacteristic.args[3]).eql(['BATTERYLEVEL', 60]);
     expect(updateCharacteristic.args[4]).eql(['STATUSLOWBATTERY', 0]);
+
+    // a reading outside the HomeKit 0-100 range is clamped, not rejected
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 120 });
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: -5 });
+
+    expect(updateCharacteristic.args[5]).eql(['BATTERYLEVEL', 100]);
+    expect(updateCharacteristic.args[6]).eql(['BATTERYLEVEL', 0]);
   });
 
   it('should do nothing wrong device category & type', async () => {
