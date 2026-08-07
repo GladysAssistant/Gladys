@@ -4327,7 +4327,7 @@
           "eco": "Eco",
           "boost": "Boost",
           "manual": "Manual",
-          "absence": "Away",
+          "away": "Away",
           "program": "Schedule"
         },
         "binary": {

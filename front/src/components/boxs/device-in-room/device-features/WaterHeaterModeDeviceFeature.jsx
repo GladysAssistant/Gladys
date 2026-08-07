@@ -11,7 +11,7 @@ const MODE_OPTIONS = [
   { value: WATER_HEATER_MODE.ECO, i18nKey: 'eco' },
   { value: WATER_HEATER_MODE.BOOST, i18nKey: 'boost' },
   { value: WATER_HEATER_MODE.MANUAL, i18nKey: 'manual' },
-  { value: WATER_HEATER_MODE.ABSENCE, i18nKey: 'absence' },
+  { value: WATER_HEATER_MODE.AWAY, i18nKey: 'away' },
   { value: WATER_HEATER_MODE.PROGRAM, i18nKey: 'program' }
 ];
 
@@ -24,7 +24,7 @@ const WaterHeaterModeDeviceFeature = props => {
   // No two water heaters offer the same mode list, so the feature's supported_options drive which
   // entries appear and in what order. Features published without them (legacy, or an integration
   // that cannot enumerate its modes) fall back to the whole catalog: unlike a fan speed, these
-  // values are a set and not a ladder — ABSENCE is not "more" than MANUAL — so the feature's `max`
+  // values are a set and not a ladder — AWAY is not "more" than MANUAL — so the feature's `max`
   // carries no information about which modes exist, and filtering on it would hide valid modes, or
   // every mode at all when `max` is unset (a feature created by hand has no min/max).
   const hasSupportedOptions =

@@ -258,7 +258,7 @@ const WATER_HEATER_MODE = {
   // consumption learning on a plain electric tank
   BOOST: 3, // the fastest heating the appliance is capable of
   MANUAL: 4, // fixed setpoint, no learning
-  ABSENCE: 5, // holiday / away, minimum temperature kept
+  AWAY: 5, // holiday / away, minimum temperature kept
   PROGRAM: 6, // follows the schedule stored in the appliance
 };
 

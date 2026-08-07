@@ -56,7 +56,7 @@ const WATER_HEATER_MODE = {
                    // appliance, consumption learning on a plain electric tank
   BOOST: 3,        // the fastest heating the appliance is capable of
   MANUAL: 4,       // fixed setpoint, no learning
-  ABSENCE: 5,      // holiday / away, minimum temperature kept
+  AWAY: 5,         // holiday / away, minimum temperature kept
   PROGRAM: 6,      // follows the schedule stored in the appliance
 };
 ```
@@ -76,9 +76,9 @@ No two water heaters offer the same mode list, and one appliance may present its
 - integrations publish `supported_options: [{ value, label, sort_order }]` alongside the feature; `server/utils/normalizeSupportedOptions.js` validates it (integer values, non-empty labels, no duplicates, `sort_order` defaulted to the array index) and `server/lib/device/device.syncFeatureSupportedOptions.js` persists it on create/update;
 - the frontend resolves the list with `resolveFeatureOptions` (`front/src/utils/supportedOptions.js`): the declared options drive **which** entries appear and in what order, while the static catalog supplies the i18n key so the labels stay translated. The integration's raw `label` is only a fallback for a value Gladys does not know.
 
-A feature published **without** `supported_options` falls back to the full `WATER_HEATER_MODE` catalog — **not** bounded by the feature's `max`. The modes are a set, not a ladder: `ABSENCE` is not "more" than `MANUAL`, so `max` says nothing about which modes an appliance has, and filtering on it would hide valid modes — or, when `max` is unset (a device built by hand carries no `min`/`max`), leave the control with no options at all. Offering every mode is the safe failure: the appliance rejects what it cannot do, whereas an empty selector is a dead end. This fallback exists for legacy and hand-made features; declaring `supported_options` is the recommended path.
+A feature published **without** `supported_options` falls back to the full `WATER_HEATER_MODE` catalog — **not** bounded by the feature's `max`. The modes are a set, not a ladder: `AWAY` is not "more" than `MANUAL`, so `max` says nothing about which modes an appliance has, and filtering on it would hide valid modes — or, when `max` is unset (a device built by hand carries no `min`/`max`), leave the control with no options at all. Offering every mode is the safe failure: the appliance rejects what it cannot do, whereas an empty selector is a dead end. This fallback exists for legacy and hand-made features; declaring `supported_options` is the recommended path.
 
-**Appliances whose modes are separate toggles.** Many tanks expose "away" and "eco" as independent on/off switches rather than as one selector. They still map onto `mode`: the integration declares the reachable values (`MANUAL`, `ECO`, `ABSENCE`) in `supported_options` and translates the appliance's switch combination into the current value, writing the corresponding switch when Gladys sets a new one. The user gets one row with named buttons instead of several unlabelled switches, and the appliance keeps its own notion of which mode to return to when "away" is cleared. This is a mapping concern, deliberately kept out of the taxonomy — see D.2 for the one case where it is genuinely constraining.
+**Appliances whose modes are separate toggles.** Many tanks expose "away" and "eco" as independent on/off switches rather than as one selector. They still map onto `mode`: the integration declares the reachable values (`MANUAL`, `ECO`, `AWAY`) in `supported_options` and translates the appliance's switch combination into the current value, writing the corresponding switch when Gladys sets a new one. The user gets one row with named buttons instead of several unlabelled switches, and the appliance keeps its own notion of which mode to return to when "away" is cleared. This is a mapping concern, deliberately kept out of the taxonomy — see D.2 for the one case where it is genuinely constraining.
 
 ### A.4 What belongs to other categories
 
@@ -116,7 +116,7 @@ The category covers only the metrics **intrinsic** to producing and storing hot 
         { "value": 1, "label": "Auto", "sort_order": 0 },
         { "value": 2, "label": "Eco", "sort_order": 1 },
         { "value": 3, "label": "Boost", "sort_order": 2 },
-        { "value": 5, "label": "Absence", "sort_order": 3 }
+        { "value": 5, "label": "Away", "sort_order": 3 }
       ]
     },
     {
@@ -188,7 +188,7 @@ The counter-example: a flat multi-position steatite electric storage tank with n
       "supported_options": [
         { "value": 4, "label": "Manual", "sort_order": 0 },
         { "value": 2, "label": "Eco", "sort_order": 1 },
-        { "value": 5, "label": "Absence", "sort_order": 2 }
+        { "value": 5, "label": "Away", "sort_order": 2 }
       ]
     },
     {
@@ -406,7 +406,7 @@ Proposed mode-tag correspondence, to be confirmed against the Matter specificati
 | `ECO` | `LowEnergy` (Mode Base) |
 | `BOOST` | `Quick` (Mode Base) — the *mode*, not to be confused with the `Boost` command, which is carried by the `boost` type |
 | `MANUAL` | `Manual` |
-| `ABSENCE` | `Vacation` (Mode Base) |
+| `AWAY` | `Vacation` (Mode Base) |
 | `PROGRAM` | `Timed` |
 
 Attribute-level naming and exact value ranges must be re-checked against the Matter specification when the mapping is implemented; this section commits to the cluster- and tag-level model, not to attribute spellings.
@@ -424,7 +424,7 @@ Zigbee (ZCL, via Zigbee2MQTT) has no water-heater-specific cluster; the second r
 Both were raised as open questions before implementation and are now settled **by the PR author**, not by a Gladys maintainer. They are recorded here rather than deleted, because both remain cheap to reverse and a maintainer may still overrule either one:
 
 1. **Own `target-temperature`, kept** — not a reuse of `thermostat/target-temperature`. Rationale under divergence 1 above. Reversing it is a one-line change in `constants.js` plus the frontend registrations that name the type.
-2. **Gladys enum vocabulary, kept** — `ECO` / `ABSENCE` / `PROGRAM` rather than Matter's `LowEnergy` / `Vacation` / `Timed`. They match the existing `PILOT_WIRE_MODE` and `AC_MODE` enums, and rule 7's naming conventions govern category and type *values* (kebab-case strings in the taxonomy), not internal enum keys. The tag-by-tag correspondence is documented above either way, so switching is a rename of seven constants and their i18n keys.
+2. **Gladys enum vocabulary, kept** — `ECO` / `AWAY` / `PROGRAM` rather than Matter's `LowEnergy` / `Vacation` / `Timed`. They match the existing `PILOT_WIRE_MODE` and `AC_MODE` enums, and rule 7's naming conventions govern category and type *values* (kebab-case strings in the taxonomy), not internal enum keys. The tag-by-tag correspondence is documented above either way, so switching is a rename of seven constants and their i18n keys.
 
 ### D.2 Known limitation — appliances reachable only as booleans
 
