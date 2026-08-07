@@ -29,6 +29,19 @@ export const EXTERNAL_INTEGRATION_STATUS_BADGES = {
   ERROR: 'badge-danger'
 };
 
+// Statuses that need no badge in the integration catalog: they are the
+// expected state of an installed integration, and repeating them on every
+// card only pushes the tags the user actually scans for (Local, Cloud,
+// Community) onto a second line. The status stays permanently displayed on
+// the integration page itself, where it is the information being looked for.
+const EXTERNAL_INTEGRATION_NOMINAL_STATUSES = ['RUNNING', 'ENABLED'];
+
+// True when a status is worth a badge in the catalog: anything that is not
+// the nominal state (ERROR, DEGRADED, STOPPED, DISABLED, LOADING, UNKNOWN)
+// is what the user wants to spot at a glance among dozens of cards.
+export const isNoteworthyExternalIntegrationStatus = status =>
+  Boolean(status) && !EXTERNAL_INTEGRATION_NOMINAL_STATUSES.includes(status);
+
 export const getGithubRepoUrl = storeSlug => (storeSlug ? `https://github.com/${storeSlug}` : null);
 
 // Domain of an https URL, displayed next to section links (third-party
