@@ -147,6 +147,19 @@ const AC_MODE = {
   FAN: 4,
 };
 
+const THERMOSTAT_MODE = {
+  OFF: 0,
+  HEATING: 1,
+  COOLING: 2,
+  AUTO: 3,
+};
+
+const THERMOSTAT_OPERATING_STATE = {
+  IDLE: 0,
+  HEATING: 1,
+  COOLING: 2,
+};
+
 const FAN_MODE = {
   OFF: 0,
   LOW: 1,
@@ -178,6 +191,38 @@ const FAN_WIND_SETTING = {
   SLEEP: 1,
   NATURAL: 2,
   SLEEP_AND_NATURAL: 3,
+};
+
+const AC_FAN_SPEED = {
+  AUTO: 0,
+  LOW: 1,
+  LOW_MID: 2,
+  MID: 3,
+  MID_HIGH: 4,
+  HIGH: 5,
+  QUIET: 6,
+  TURBO: 7,
+};
+
+const AC_SWING_HORIZONTAL = {
+  OFF: 0,
+  SWING: 1,
+  POSITION_1: 2,
+  POSITION_2: 3,
+  POSITION_3: 4,
+  POSITION_4: 5,
+  POSITION_5: 6,
+  SWING_OPPOSITE: 7,
+};
+
+const AC_SWING_VERTICAL = {
+  OFF: 0,
+  SWING: 1,
+  POSITION_1: 2,
+  POSITION_2: 3,
+  POSITION_3: 4,
+  POSITION_4: 5,
+  POSITION_5: 6,
 };
 
 const PILOT_WIRE_MODE = {
@@ -245,6 +290,58 @@ const VACUUM_CLEANER_CLEAN_MODE = {
   DEEP_CLEAN: 4,
   VACUUM: 5,
   MOP: 6,
+};
+
+// Generic charging station connector status - values align with OCPP 2.0.1/
+// 2.1's StatusNotification.connectorStatus field, reported independently of
+// any charging session. Not itself protocol-specific: any charging station
+// integration (OCPP-based or not) reporting a comparable connector
+// availability can map onto it.
+// Source (OCPP 2.0.1's own data-dictionary type name for this field is
+// ConnectorStatusEnumType, not reproduced verbatim on every third-party
+// reference site - verified against implementation source instead):
+// https://github.com/lorenzodonini/ocpp-go/blob/master/ocpp2.0.1/availability/status_notification.go
+const CHARGING_STATION_CONNECTOR_STATUS = {
+  AVAILABLE: 0,
+  OCCUPIED: 1,
+  RESERVED: 2,
+  UNAVAILABLE: 3,
+  FAULTED: 4,
+};
+
+// Generic charging session state - values align with OCPP 2.0.1/2.1's
+// TransactionEvent.transactionInfo.chargingState field. Only meaningful
+// while a charging session/transaction is in progress
+// (CHARGING_STATION_CONNECTOR_STATUS is OCCUPIED); has no value the rest of
+// the time.
+// Source (OCPP 2.0.1's own data-dictionary type name for this field is
+// ChargingStateEnumType, not reproduced verbatim on every third-party
+// reference site - verified against implementation source instead):
+// https://github.com/lorenzodonini/ocpp-go/blob/master/ocpp2.0.1/transactions/transaction_event.go
+//
+// OCPP 1.6 integrations report a single, more granular ChargePointStatus and
+// must split it across both enums:
+//   Available      -> CONNECTOR_STATUS.AVAILABLE
+//   Preparing      -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.EV_CONNECTED
+//   Charging       -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.CHARGING
+//   SuspendedEVSE  -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.PAUSED_BY_CHARGER
+//   SuspendedEV    -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.PAUSED_BY_VEHICLE
+//   Finishing      -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.IDLE
+//   Reserved       -> CONNECTOR_STATUS.RESERVED
+//   Unavailable    -> CONNECTOR_STATUS.UNAVAILABLE
+//   Faulted        -> CONNECTOR_STATUS.FAULTED
+//
+// DISCHARGING is not part of OCPP 2.0.1 (so not covered by the source link
+// above) and is therefore not in that mapping: it comes from OCPP 2.1, which
+// added Discharging to ChargingStateEnumType, and matches Matter Energy EVSE's
+// PluggedInDischarging. It covers the vehicle feeding energy back (V2G/V2L).
+const CHARGING_STATION_CHARGING_STATE = {
+  CHARGING: 0,
+  EV_CONNECTED: 1,
+  PAUSED_BY_VEHICLE: 2,
+  PAUSED_BY_CHARGER: 3,
+  IDLE: 4,
+  DISCHARGING: 5,
 };
 
 const USER_ROLE = {
@@ -644,6 +741,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   BATTERY_STORAGE: 'battery-storage',
   BUTTON: 'button',
   CAMERA: 'camera',
+  CHARGING_STATION: 'charging-station',
   CUBE: 'cube',
   CURRENCY: 'currency',
   CO_SENSOR: 'co-sensor',
@@ -758,6 +856,10 @@ const DEVICE_FEATURE_TYPES = {
   CAMERA: {
     IMAGE: 'image',
   },
+  CHARGING_STATION: {
+    CONNECTOR_STATUS: 'connector-status',
+    CHARGING_STATE: 'charging-state',
+  },
   DOORBELL: {
     RING: 'ring',
   },
@@ -802,6 +904,9 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     MODE: 'mode',
     TARGET_TEMPERATURE: 'target-temperature',
+    FAN_SPEED: 'fan-speed',
+    SWING_HORIZONTAL: 'swing-horizontal',
+    SWING_VERTICAL: 'swing-vertical',
   },
   FAN: {
     MODE: 'mode',
@@ -996,6 +1101,8 @@ const DEVICE_FEATURE_TYPES = {
   },
   THERMOSTAT: {
     TARGET_TEMPERATURE: 'target-temperature',
+    MODE: 'mode',
+    OPERATING_STATE: 'operating-state',
   },
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
@@ -1548,6 +1655,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SYSTEM: {
     VACUUM_FINISHED: 'system.vacuum-finished',
     WATCHTOWER_LOG: 'system.watchtower-log',
+    UPGRADE_ERROR: 'system.upgrade-error',
   },
   LOCATION: {
     NEW: 'location.new',
@@ -1705,6 +1813,20 @@ const DEFAULT_AGGREGATES_POLICY_IN_DAYS = {
   [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.MONTHLY]: 5 * 365,
 };
 
+const SYSTEM_UPGRADE_ERROR_CODES = {
+  // Gladys runs on an immutable image reference, no upgrade can ever be applied
+  IMAGE_TAG_PINNED: 'IMAGE_TAG_PINNED',
+  // Watchtower ran fine but found no new image to install
+  NO_UPDATE_APPLIED: 'NO_UPDATE_APPLIED',
+  // the Watchtower container exited with a non-zero status code
+  WATCHTOWER_FAILED: 'WATCHTOWER_FAILED',
+  // the Watchtower container was still running after the timeout
+  WATCHTOWER_TIMEOUT: 'WATCHTOWER_TIMEOUT',
+  // the container running Gladys could not be identified
+  GLADYS_CONTAINER_NOT_FOUND: 'GLADYS_CONTAINER_NOT_FOUND',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+};
+
 const JOB_TYPES = {
   HOURLY_DEVICE_STATE_AGGREGATE: 'hourly-device-state-aggregate',
   DAILY_DEVICE_STATE_AGGREGATE: 'daily-device-state-aggregate',
@@ -1839,15 +1961,22 @@ module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
+module.exports.THERMOSTAT_MODE = THERMOSTAT_MODE;
+module.exports.THERMOSTAT_OPERATING_STATE = THERMOSTAT_OPERATING_STATE;
 module.exports.FAN_MODE = FAN_MODE;
 module.exports.FAN_AIRFLOW_DIRECTION = FAN_AIRFLOW_DIRECTION;
 module.exports.FAN_ROCK_SETTING = FAN_ROCK_SETTING;
 module.exports.FAN_WIND_SETTING = FAN_WIND_SETTING;
 module.exports.getFanFeatureOptions = getFanFeatureOptions;
+module.exports.AC_FAN_SPEED = AC_FAN_SPEED;
+module.exports.AC_SWING_HORIZONTAL = AC_SWING_HORIZONTAL;
+module.exports.AC_SWING_VERTICAL = AC_SWING_VERTICAL;
 module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
+module.exports.CHARGING_STATION_CONNECTOR_STATUS = CHARGING_STATION_CONNECTOR_STATUS;
+module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
 module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
 module.exports.EVENTS = EVENTS;
@@ -1910,6 +2039,8 @@ module.exports.WEATHER_UNITS = WEATHER_UNITS;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES = DEVICE_FEATURE_STATE_AGGREGATE_TYPES;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST;
 module.exports.DEFAULT_AGGREGATES_POLICY_IN_DAYS = DEFAULT_AGGREGATES_POLICY_IN_DAYS;
+
+module.exports.SYSTEM_UPGRADE_ERROR_CODES = SYSTEM_UPGRADE_ERROR_CODES;
 
 module.exports.JOB_TYPES = JOB_TYPES;
 module.exports.JOB_TYPES_LIST = JOB_TYPES_LIST;

@@ -32,8 +32,15 @@ class UpdateDeviceFeature extends Component {
   deleteFeature = () => this.props.deleteFeature(this.props.featureIndex);
 
   render({ feature, featureIndex, canEditCategory, device, ...props }) {
+    // The current category must belong to the compatible list: types are not unique across
+    // categories (SWITCH.BINARY and SENSOR.BINARY are both 'binary'), so checking the type
+    // alone would display the selector on read-only binary sensors and wipe their category.
+    const compatibleCategories = DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type];
     const allowModifyCategory =
-      canEditCategory && canEditCategory(device, feature) && DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type];
+      canEditCategory &&
+      canEditCategory(device, feature) &&
+      compatibleCategories &&
+      compatibleCategories.includes(feature.category);
     const availableUnits =
       get(DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE, `${feature.category}.${feature.type}`) ||
       DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category];
@@ -74,9 +81,6 @@ class UpdateDeviceFeature extends Component {
                     onChange={this.updateCategory}
                     class="form-control"
                   >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
                     {DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type].map(type => (
                       <option value={type}>
                         <Text id={`deviceFeatureCategory.${type}.shortCategoryName`}>{type}</Text>

@@ -3,6 +3,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import DiscoveredBox from './DiscoveredBox';
+import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 
 // client-side filter: the discovered list is already fully loaded (a
@@ -26,6 +27,7 @@ const DiscoverTab = ({
   const search = (deviceSearch || '').trim().toLowerCase();
   const filteredDevices =
     discoveredDevices && search ? discoveredDevices.filter(device => matchesSearch(device, search)) : discoveredDevices;
+  const scanning = scanStatus === RequestStatus.Getting;
   return (
     <div class="card">
       <div class="card-header">
@@ -46,9 +48,9 @@ const DiscoverTab = ({
               />
             </Localizer>
           </div>
-          <button class="btn btn-outline-primary btn-sm" onClick={scan} disabled={scanStatus === RequestStatus.Getting}>
+          <button class="btn btn-outline-primary btn-sm" onClick={scan} disabled={scanning}>
             <i class="fe fe-radio mr-1" />
-            {scanStatus === RequestStatus.Getting ? (
+            {scanning ? (
               <Text id="integration.externalIntegration.discover.scanning" />
             ) : (
               <Text id="integration.externalIntegration.discover.scanButton" />
@@ -67,13 +69,22 @@ const DiscoverTab = ({
             <Text id="integration.externalIntegration.discover.loadError" />
           </div>
         )}
+        {scanning && (
+          <div class={cx('alert alert-info', style.scanLoader)}>
+            <div class="loader" />
+            <Text id="integration.externalIntegration.discover.scanningInProgress" />
+          </div>
+        )}
+        {/* the dimmer only covers the list refresh: during the scan itself
+            the alert above is the progress signal and the list stays
+            interactive, so already-discovered devices can still be added */}
         <div
           class={cx('dimmer', {
             active: getDiscoveredDevicesStatus === RequestStatus.Getting
           })}
         >
           <div class="loader" />
-          <div class="dimmer-content">
+          <div class={cx('dimmer-content', style.discoverListBody)}>
             <div class="row">
               {filteredDevices &&
                 filteredDevices.map(device => (

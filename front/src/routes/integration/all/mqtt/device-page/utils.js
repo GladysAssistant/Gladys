@@ -3,9 +3,12 @@ import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
-  DEVICE_FEATURE_UNITS_BY_CATEGORY
+  DEVICE_FEATURE_UNITS_BY_CATEGORY,
+  CHARGING_STATION_CONNECTOR_STATUS,
+  CHARGING_STATION_CHARGING_STATE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
+import { isPushButtonFeature } from '../../../../../utils/consts';
 
 const SENSOR_CATEGORY_SUFFIX = '-sensor';
 
@@ -49,7 +52,8 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.TAMPER ||
     category === DEVICE_FEATURE_CATEGORIES.INPUT ||
     category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE ||
-    category === DEVICE_FEATURE_CATEGORIES.DOORBELL
+    category === DEVICE_FEATURE_CATEGORIES.DOORBELL ||
+    category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION
   ) {
     return true;
   }
@@ -474,32 +478,7 @@ const applyDefaultUnit = (defaults, category, type) => {
   return { ...defaults, unit };
 };
 
-const TELEVISION_CONTINUOUS_CONTROL_TYPES = new Set([
-  DEVICE_FEATURE_TYPES.TELEVISION.BINARY,
-  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
-  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL
-]);
-
-const MUSIC_CONTINUOUS_CONTROL_TYPES = new Set([
-  DEVICE_FEATURE_TYPES.MUSIC.VOLUME,
-  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE
-]);
-
-export const isCatalogPushButtonFeature = (category, type) => {
-  if (category === DEVICE_FEATURE_CATEGORIES.BUTTON && type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
-    return true;
-  }
-
-  if (category === DEVICE_FEATURE_CATEGORIES.TELEVISION) {
-    return !TELEVISION_CONTINUOUS_CONTROL_TYPES.has(type);
-  }
-
-  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
-    return !MUSIC_CONTINUOUS_CONTROL_TYPES.has(type);
-  }
-
-  return false;
-};
+export const isCatalogPushButtonFeature = isPushButtonFeature;
 
 export const getCatalogPreviewMode = (category, type) => {
   if (isCatalogPushButtonFeature(category, type)) {
@@ -595,6 +574,16 @@ export const getFeatureDefaultValues = (category, type) => {
       category,
       type
     );
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) {
+    // THERMOSTAT_MODE: OFF/HEATING/COOLING/AUTO
+    return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: false }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE) {
+    // THERMOSTAT_OPERATING_STATE: IDLE/HEATING/COOLING
+    return applyDefaultUnit({ ...defaults, min: 0, max: 2, read_only: true }, category, type);
   }
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE) {
@@ -720,6 +709,14 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION) {
+    if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 5, read_only: true }, category, type);
+    }
+
+    return applyDefaultUnit({ ...defaults, min: 0, max: 4, read_only: true }, category, type);
+  }
+
   if (!isSensorCategory(category)) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }
@@ -750,7 +747,15 @@ export const getCatalogPreviewLabelKey = (category, type) => {
     [categoryTypeKey(
       DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE,
       DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED
-    )]: 'deviceFeatureValue.category.electrical-vehicle-charge.plugged.1'
+    )]: 'deviceFeatureValue.category.electrical-vehicle-charge.plugged.1',
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
+      DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS
+    )]: `deviceFeatureValue.category.charging-station.connector-status.${CHARGING_STATION_CONNECTOR_STATUS.OCCUPIED}`,
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
+      DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE
+    )]: `deviceFeatureValue.category.charging-station.charging-state.${CHARGING_STATION_CHARGING_STATE.CHARGING}`
   };
 
   return labeledPreviewKeys[key] || null;
@@ -771,6 +776,14 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.DOORBELL) {
     return 1;
+  }
+
+  if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS) {
+    return CHARGING_STATION_CONNECTOR_STATUS.OCCUPIED;
+  }
+
+  if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE) {
+    return CHARGING_STATION_CHARGING_STATE.CHARGING;
   }
 
   if (

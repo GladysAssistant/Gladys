@@ -225,6 +225,53 @@ describe('externalIntegration.startSubContainer', () => {
     assert.calledOnce(system.createContainer);
     assert.calledWith(system.restartContainer, 'sub-2');
   });
+
+  it('should recreate the container when its stored CPU limit is rejected at start', async () => {
+    const nanoCpusError = Object.assign(
+      new Error(
+        '(HTTP code 400) unexpected - NanoCPUs can not be set, as your kernel does not support CPU CFS scheduler or the cgroup is not mounted',
+      ),
+      { statusCode: 400 },
+    );
+    const restartContainer = sinon.stub();
+    restartContainer.onFirstCall().rejects(nanoCpusError);
+    restartContainer.onSecondCall().resolves(true);
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getContainers: fake.resolves([{ id: 'sub-1' }]),
+        createContainer: fake.resolves({ id: 'sub-2' }),
+        restartContainer,
+      },
+    });
+    const service = await seedMultiContainerService();
+    const entry = TEST_CONTAINERS_MANIFEST.containers[0];
+    const container = await externalIntegration.startSubContainer(service, entry);
+    expect(container).to.deep.equal({ id: 'sub-2' });
+    // remembered so the new descriptor directly omits the CPU limit
+    expect(system.cpuCfsSupport).to.equal(false);
+    assert.calledWith(system.removeContainer, 'sub-1', { force: true });
+    assert.calledOnce(system.createContainer);
+    assert.calledWith(restartContainer.secondCall, 'sub-2');
+  });
+
+  it('should not recreate the container on another start failure', async () => {
+    const error = new Error('DOCKER_DAEMON_DOWN');
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getContainers: fake.resolves([{ id: 'sub-1' }]),
+        restartContainer: fake.rejects(error),
+      },
+    });
+    const service = await seedMultiContainerService();
+    const entry = TEST_CONTAINERS_MANIFEST.containers[0];
+    try {
+      await externalIntegration.startSubContainer(service, entry);
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e.message).to.equal('DOCKER_DAEMON_DOWN');
+    }
+    assert.notCalled(system.createContainer);
+  });
 });
 
 describe('externalIntegration.ensureSubContainers', () => {

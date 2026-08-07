@@ -28,6 +28,7 @@ Living specifications live in `docs/specs/`. They are the source of truth for th
 **Keeping existing specs truthful:** when an area is already covered by a living spec, any PR that changes its behavior or contracts must update the spec **in the same diff**, whatever the size of the change — otherwise the spec drifts and stops being the source of truth.
 
 - **External integrations** (`docs/specs/external-integrations.md`): supervisor, host API, integration WebSocket protocol, manifest, store formats, SDK contract. Any PR that changes a behavior or contract of external integrations must update this spec **in the same diff**. Phase-2 designs (B.15 communication, B.16 network discovery, B.17 Gladys Plus webhooks) are specified there but not yet implemented — implement from the spec, not from scratch.
+- **Device feature categories & types** (`docs/specs/device-feature-categories.md`): design and review criteria for `DEVICE_FEATURE_CATEGORIES` / `DEVICE_FEATURE_TYPES` in `server/utils/constants.js`. Categories must describe capabilities (never brands), group protocols together, and use mature standards (Matter first, then Zigbee) as the default reference — divergence and standard-free categories are allowed with justification. Any PR — and any PR review — that adds or changes device categories/types must be checked against this spec's checklist.
 
 ## Git workflow (agents)
 
