@@ -16,6 +16,10 @@ const isActivationKey = e => e.key === 'Enter' || e.key === ' ';
 class CameraMoveDeviceFeature extends Component {
   moveSession = null;
 
+  // Last standalone STOP (stop button pressed with no movement in flight): the next move is
+  // queued after it settles, so a stale STOP can never terminate a movement started after it.
+  pendingStop = null;
+
   sendValue = value =>
     Promise.resolve(this.props.updateValue(this.props.deviceFeature, value)).catch(e => console.error(e));
 
@@ -24,7 +28,8 @@ class CameraMoveDeviceFeature extends Component {
       return;
     }
     const session = { stopQueued: false };
-    session.movePromise = this.sendValue(value);
+    const previousStop = this.pendingStop || Promise.resolve();
+    session.movePromise = previousStop.then(() => this.sendValue(value));
     this.moveSession = session;
   };
 
@@ -55,11 +60,17 @@ class CameraMoveDeviceFeature extends Component {
     this.moveSession = null;
   };
 
-  stopAll = () => {
+  stopAll = async () => {
     if (this.moveSession) {
-      return this.releaseMove();
+      await this.releaseMove();
+      return;
     }
-    return this.sendValue(CAMERA_MOVE.STOP);
+    const stopPromise = this.sendValue(CAMERA_MOVE.STOP);
+    this.pendingStop = stopPromise;
+    await stopPromise;
+    if (this.pendingStop === stopPromise) {
+      this.pendingStop = null;
+    }
   };
 
   componentWillUnmount() {
