@@ -57,13 +57,30 @@ const ActionsCard = ({
               <i class="fe fe-play mr-1" />
               <Text id="integration.externalIntegration.actions.runButton" />
             </button>
+            {/* the result is a scroll container (its length is whatever the
+                integration decided to return): tabIndex makes it focusable,
+                without which a keyboard-only user cannot scroll a long one */}
             {actionState.status === RequestStatus.Success && actionState.message && (
-              <div class={cx('alert alert-success mt-3 mb-0', integrationText.result)}>
+              <div
+                class={cx(
+                  'alert alert-success mt-3 mb-0',
+                  integrationText.integrationText,
+                  integrationText.resultScroll
+                )}
+                tabIndex={0}
+              >
                 {getLocalizedText(actionState.message, language)}
               </div>
             )}
             {actionState.status === RequestStatus.Error && (
-              <div class={cx('alert alert-danger mt-3 mb-0', integrationText.result)}>
+              <div
+                class={cx(
+                  'alert alert-danger mt-3 mb-0',
+                  integrationText.integrationText,
+                  integrationText.resultScroll
+                )}
+                tabIndex={0}
+              >
                 {getLocalizedText(actionState.message, language) || (
                   <Text id="integration.externalIntegration.actions.error" />
                 )}

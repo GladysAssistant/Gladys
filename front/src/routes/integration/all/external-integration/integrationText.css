@@ -11,12 +11,12 @@
   overflow-wrap: anywhere;
 }
 
-/* An action result, whose length nothing bounds — the integration decides
-   what it returns: a verbose message scrolls inside its alert instead of
-   pushing the rest of the screen down. */
-.result {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+/* Added next to integrationText on an action result, whose length nothing
+   bounds — the integration decides what it returns: a verbose message
+   scrolls inside its alert instead of pushing the rest of the screen
+   down. Purely the height cap, so the wrapping rules above stay defined
+   in exactly one place. */
+.resultScroll {
   max-height: 18rem;
   overflow-y: auto;
 }
