@@ -184,6 +184,11 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: dashboardController.updateOrder,
     },
+    'get /api/v1/dashboard/photo/proxy': {
+      authenticated: true,
+      rateLimit: true,
+      controller: dashboardController.getPhotoProxy,
+    },
     'get /api/v1/dashboard/:dashboard_selector': {
       authenticated: true,
       controller: dashboardController.getBySelector,

@@ -85,6 +85,19 @@ module.exports = function DashboardController(gladys) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/dashboard/photo/proxy getPhoto
+   * @apiName getPhoto
+   * @apiGroup Dashboard
+   * @apiParam {String} url External image URL to fetch through Gladys.
+   * @apiSuccessExample {text} Success-Response:
+   * image/jpeg;base64,/9j/4AAQSkZJRg...
+   */
+  async function getPhotoProxy(req, res) {
+    const image = await gladys.dashboard.getPhoto(req.query.url);
+    res.send(image);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
@@ -92,5 +105,6 @@ module.exports = function DashboardController(gladys) {
     getBySelector: asyncMiddleware(getBySelector),
     update: asyncMiddleware(update),
     updateOrder: asyncMiddleware(updateOrder),
+    getPhotoProxy: asyncMiddleware(getPhotoProxy),
   });
 };
