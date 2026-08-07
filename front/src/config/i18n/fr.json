@@ -66,7 +66,7 @@
     "searchPlaceHolder": "Chercher un appareil",
     "noRoom": "Sans pièce",
     "noFeatures": "Aucune fonctionnalité",
-    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes ou quelques heures (selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil.",
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes ou quelques heures (selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\">ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil.",
     "migrate": {
       "button": "Migrer",
       "modalTitle": "Migrer « {{name}} »",
@@ -3590,6 +3590,7 @@
         "rewriting_dashboards": "Réécriture des tableaux de bord…",
         "deleting_source_device": "Suppression de l'ancien appareil…"
       },
+      "statesMigrated": "États d'historique déplacés : {{count}}",
       "orphanedStates": "États orphelins : {{count}}",
       "duration": "Durée : {{duration}}"
     },
@@ -4309,6 +4310,14 @@
           "position-5": "Position 5 (Bas)"
         }
       },
+      "thermostat": {
+        "mode": {
+          "off": "Arrêt",
+          "heating": "Chauffage",
+          "cooling": "Refroidissement",
+          "auto": "Auto"
+        }
+      },
       "heater": {
         "pilot-wire-mode": {
           "comfort": "Confort",
@@ -4561,6 +4570,20 @@
           "4": "Position 3",
           "5": "Position 4",
           "6": "Position 5 (Bas)"
+        }
+      },
+      "thermostat": {
+        "mode": {
+          "0": "Arrêt",
+          "1": "Chauffage",
+          "2": "Refroidissement",
+          "3": "Auto"
+        },
+        "operating-state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Inactif",
+          "1": "Chauffe",
+          "2": "Refroidit"
         }
       },
       "siren": {
@@ -5206,7 +5229,9 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Température de consigne"
+      "target-temperature": "Température de consigne",
+      "mode": "Mode du thermostat",
+      "operating-state": "État de fonctionnement du thermostat"
     },
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
