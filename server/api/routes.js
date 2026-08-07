@@ -681,6 +681,11 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.getDevices,
     },
+    'get /api/integration/v1/house': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getHouses,
+    },
     'post /api/integration/v1/state': {
       authenticated: false,
       externalIntegrationAuth: true,

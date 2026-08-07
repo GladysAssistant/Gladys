@@ -144,7 +144,7 @@ const TEST_CONTAINERS_MANIFEST = {
       cpu: 1,
       env: { LIBVA_DRIVER_NAME: 'i965' },
       command: ['python3', '-u', '-m', 'frigate'],
-      ports: [{ container_port: 5000, label: { en: 'Frigate UI', fr: 'Interface Frigate' } }],
+      ports: [{ container_port: 5000, name: 'frigate_ui', label: { en: 'Frigate UI', fr: 'Interface Frigate' } }],
       devices: ['coral-usb', 'gpu'],
     },
   ],

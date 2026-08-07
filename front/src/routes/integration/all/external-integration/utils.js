@@ -48,6 +48,47 @@ export const getGithubRepoUrl = storeSlug => (storeSlug ? `https://github.com/${
 // non-moderated content: the user sees where they click).
 export const getUrlDomain = url => (url || '').split('/')[2] || '';
 
+// Assigned host ports of the manifest-named declared ports, from the
+// integration detail (containers[].ports[]). Feeds the {{port:<name>}}
+// placeholder resolution below.
+export const getAssignedPortsByName = integration => {
+  // null prototype: the allowed port name pattern ([a-z0-9_]) accepts
+  // `constructor` and `__proto__`, which on a plain object would either
+  // read an inherited value or silently fail to store one
+  const portsByName = Object.create(null);
+  ((integration && integration.containers) || []).forEach(container => {
+    (container.ports || []).forEach(port => {
+      if (port.name && port.host_port !== null && port.host_port !== undefined) {
+        portsByName[port.name] = port.host_port;
+      }
+    });
+  });
+  return portsByName;
+};
+
+// Resolve the declarative placeholders of the manifest section texts:
+// {{gladys_host}} -> the hostname the browser reaches Gladys by (the
+// server cannot know it reliably — multiple interfaces, reverse proxy,
+// VPN — but the browser does, by construction), {{port:<name>}} -> the
+// host port assigned to the declared port carrying that name. A token
+// whose port has no assigned host port yet is left as-is: honest and
+// debuggable, it resolves once the port is allocated.
+export const resolveManifestPlaceholders = (text, portsByName = {}) => {
+  if (!text) {
+    return text;
+  }
+  let resolved = text;
+  if (typeof window !== 'undefined') {
+    resolved = resolved.replace(/\{\{gladys_host\}\}/g, window.location.hostname);
+  }
+  // own-property check, never a plain lookup: `{{port:constructor}}` would
+  // otherwise stringify the inherited Object constructor instead of
+  // staying unresolved
+  return resolved.replace(/\{\{port:([a-z0-9_]+)\}\}/g, (token, name) =>
+    Object.prototype.hasOwnProperty.call(portsByName, name) ? `${portsByName[name]}` : token
+  );
+};
+
 // Union of the hardware classes requested by the sub-container declarations
 // of a manifest, in declaration order.
 export const getRequestedHardwareClasses = containers => {

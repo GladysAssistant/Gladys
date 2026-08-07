@@ -15,6 +15,7 @@ import WebhooksSummary from '../components/WebhooksSummary';
 import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
+import integrationText from '../integrationText.css';
 
 class ExternalIntegrationInstallPage extends Component {
   getStoreIntegration = async () => {
@@ -211,7 +212,9 @@ class ExternalIntegrationInstallPage extends Component {
                                 />
                               )}
                             </div>
-                            <p>{getLocalizedText(manifest.description, language)}</p>
+                            <p class={integrationText.integrationText}>
+                              {getLocalizedText(manifest.description, language)}
+                            </p>
 
                             <div class="alert alert-warning">
                               <h4 class="alert-title">
@@ -265,6 +268,13 @@ class ExternalIntegrationInstallPage extends Component {
                             )}
 
                             <NetworkDiscoverySummary networkDiscovery={manifest.network_discovery} />
+
+                            {manifest.location === true && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-map-pin mr-1" />
+                                <Text id="integration.externalIntegration.install.locationText" />
+                              </div>
+                            )}
 
                             <WebhooksSummary webhooks={manifest.webhooks} language={language} />
 
