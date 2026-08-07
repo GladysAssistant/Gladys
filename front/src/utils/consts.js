@@ -95,7 +95,8 @@ export const GetWeatherStatus = {
 export const GetWeatherModes = {
   AdvancedWeather: 'advancedWeather',
   HourlyForecast: 'hourlyForecast',
-  DailyForecast: 'dailyForecast'
+  DailyForecast: 'dailyForecast',
+  ProviderImages: 'providerImages'
 };
 
 export const DASHBOARD_BOX_STATUS_KEY = 'DashboardBoxStatus';

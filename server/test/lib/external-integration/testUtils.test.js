@@ -95,6 +95,21 @@ const TEST_NOTIFICATION_MANIFEST = {
   ],
 };
 
+// Weather-provider fixture (B.18): a dedicated provider API — answers the
+// core's weather requests over WebSocket, no device screens.
+const TEST_WEATHER_MANIFEST = {
+  manifest_version: 1,
+  type: 'weather',
+  name: 'Meteo France Demo',
+  description: {
+    en: 'Meteo France weather provider demo integration.',
+    fr: 'Intégration démo : fournisseur météo Météo France.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-meteo-france:1.0.0',
+  gladys_version: '>=4.62.0',
+};
+
 // Netatmo-like fixture: inbound webhooks relayed by the Gladys Plus
 // gateway — one fire-and-forget event stream (default mode) and one sync
 // challenge/response registration callback.
@@ -253,6 +268,7 @@ module.exports = {
   TEST_MANIFEST,
   TEST_COMMUNICATION_MANIFEST,
   TEST_NOTIFICATION_MANIFEST,
+  TEST_WEATHER_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_DETECTED_CLASSES,
