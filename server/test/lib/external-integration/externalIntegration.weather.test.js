@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { assert: sinonAssert, fake } = require('sinon');
 
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const { ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');
+const { ExternalIntegrationUnavailableError, NotFoundError } = require('../../../utils/coreErrors');
 const { normalizeWeather } = require('../../../lib/external-integration/externalIntegration.normalizeWeather');
 const {
   normalizeWeatherImage,
@@ -467,12 +467,37 @@ describe('externalIntegration weather proxy getImage', () => {
     Buffer.alloc(8, 2),
   ]).toString('base64');
 
-  it('should relay weather.get-image, validate the bytes and cache the result', async () => {
+  // dispatching sendCommand fake: the images the weather payload declares
+  // are controlled per test through the returned `declared` array
+  const buildImageSupervisor = async (declared) => {
     const { externalIntegration, stateManager } = buildSupervisor();
     const service = await seedWeatherService();
     externalIntegration.registerProxyService(service);
-    externalIntegration.sendCommand = fake.resolves({ success: true, data: { image: pngBase64 } });
+    externalIntegration.sendCommand = fake(async (targetService, type) => {
+      if (type === WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEATHER_GET) {
+        return {
+          success: true,
+          data: {
+            weather: {
+              temperature: 10,
+              weather: 'rain',
+              datetime: '2026-08-01T12:00:00.000Z',
+              images: declared.map((key) => ({ key })),
+            },
+          },
+        };
+      }
+      return { success: true, data: { image: pngBase64 } };
+    });
     const proxyService = stateManager.get('service', service.name);
+    return { externalIntegration, service, proxyService };
+  };
+
+  const GET_OPTIONS = { latitude: 48.85, longitude: 2.35, language: 'en', units: 'metric' };
+
+  it('should relay weather.get-image for a declared key, validate the bytes and cache the result', async () => {
+    const { externalIntegration, service, proxyService } = await buildImageSupervisor(['vigilance-map']);
+    await proxyService.weather.get(GET_OPTIONS);
     const image = await proxyService.weather.getImage('vigilance-map');
     expect(image).to.equal(`data:image/png;base64,${pngBase64}`);
     sinonAssert.calledWith(
@@ -483,23 +508,68 @@ describe('externalIntegration weather proxy getImage', () => {
       { timeoutMs: WEATHER_GET_TIMEOUT_MS },
     );
     // second call within the TTL: served from cache, no new command
+    // (one weather.get command + one weather.get-image command in total)
     const cachedImage = await proxyService.weather.getImage('vigilance-map');
     expect(cachedImage).to.equal(image);
-    expect(externalIntegration.sendCommand.callCount).to.equal(1);
+    expect(externalIntegration.sendCommand.callCount).to.equal(2);
+  });
+
+  it('should only relay a key declared in the last weather payload', async () => {
+    const { externalIntegration, proxyService } = await buildImageSupervisor(['vigilance-map']);
+    // nothing declared yet (no weather.get ran): no command is sent at all
+    await expect(proxyService.weather.getImage('vigilance-map')).to.be.rejectedWith(NotFoundError);
+    expect(externalIntegration.sendCommand.callCount).to.equal(0);
+    // declared: relayed
+    await proxyService.weather.get(GET_OPTIONS);
+    await proxyService.weather.getImage('vigilance-map');
+    // an undeclared key is refused without reaching the integration
+    await expect(proxyService.weather.getImage('rain-radar')).to.be.rejectedWith(NotFoundError);
+    expect(externalIntegration.sendCommand.callCount).to.equal(2);
+  });
+
+  it('should stop serving a key the latest weather payload no longer declares', async () => {
+    const declared = ['vigilance-map'];
+    const { externalIntegration, proxyService } = await buildImageSupervisor(declared);
+    await proxyService.weather.get(GET_OPTIONS);
+    await proxyService.weather.getImage('vigilance-map');
+    // the provider stops declaring the image: even the cached copy stops
+    // being served — the declaration of the last payload is the truth
+    declared.length = 0;
+    await proxyService.weather.get(GET_OPTIONS);
+    await expect(proxyService.weather.getImage('vigilance-map')).to.be.rejectedWith(NotFoundError);
+    // two weather.get + one relayed get-image; the refused key costs none
+    expect(externalIntegration.sendCommand.callCount).to.equal(3);
   });
 
   it('should reject an invalid image payload without caching it', async () => {
     const { externalIntegration, stateManager } = buildSupervisor();
     const service = await seedWeatherService();
     externalIntegration.registerProxyService(service);
-    externalIntegration.sendCommand = fake.resolves({ success: true, data: { image: 'bm90LWFuLWltYWdl' } });
+    externalIntegration.sendCommand = fake(async (targetService, type) => {
+      if (type === WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEATHER_GET) {
+        return {
+          success: true,
+          data: {
+            weather: {
+              temperature: 10,
+              weather: 'rain',
+              datetime: '2026-08-01T12:00:00.000Z',
+              images: [{ key: 'vigilance-map' }],
+            },
+          },
+        };
+      }
+      return { success: true, data: { image: 'bm90LWFuLWltYWdl' } };
+    });
     const proxyService = stateManager.get('service', service.name);
+    await proxyService.weather.get(GET_OPTIONS);
     await expect(proxyService.weather.getImage('vigilance-map')).to.be.rejectedWith(
       ExternalIntegrationUnavailableError,
     );
     await expect(proxyService.weather.getImage('vigilance-map')).to.be.rejectedWith(
       ExternalIntegrationUnavailableError,
     );
-    expect(externalIntegration.sendCommand.callCount).to.equal(2);
+    // one weather.get + two relayed get-image attempts, none cached
+    expect(externalIntegration.sendCommand.callCount).to.equal(3);
   });
 });

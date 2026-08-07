@@ -42,6 +42,18 @@ describe('weather.getImage', () => {
     expect(untouched.weather.getImage.callCount).to.equal(0);
   });
 
+  it('should 404 a key outside the declared-key shape without consulting any provider', async () => {
+    const provider = {
+      weather: { get: fake.resolves({}), getImage: fake.resolves('data:image/png;base64,ok') },
+    };
+    const service = buildServiceManager({ 'ext-meteo-france': provider });
+    const weather = new Weather(service, event, {}, {});
+    await expect(weather.getImage('NOT A KEY !!')).to.be.rejectedWith(NotFoundError);
+    await expect(weather.getImage(`${'a'.repeat(40)}`)).to.be.rejectedWith(NotFoundError);
+    await expect(weather.getImage(42)).to.be.rejectedWith(NotFoundError);
+    expect(provider.weather.getImage.callCount).to.equal(0);
+  });
+
   it('should throw NotFoundError when no provider serves images', async () => {
     const service = buildServiceManager({
       openweather: { weather: { get: fake.resolves({}) } },

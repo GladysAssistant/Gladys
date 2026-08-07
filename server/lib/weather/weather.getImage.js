@@ -4,6 +4,7 @@ const logger = require('../../utils/logger');
 const { NotFoundError, ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
 const { Error400 } = require('../../utils/httpErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
+const { WEATHER_IMAGE_KEY_REGEX } = require('../external-integration/constants');
 
 /**
  * @description Get a provider image (B.18 point 6) from the first weather
@@ -17,6 +18,13 @@ const { ERROR_MESSAGES } = require('../../utils/constants');
  * const image = await gladys.weather.getImage('vigilance-map');
  */
 async function getImage(key) {
+  // shape gate first: a key that could never be declared (B.18 point 6
+  // regex, ≤ 32 chars) 404s before any provider is consulted, and an
+  // attacker-sized string never reaches a log line, an error message or
+  // a cache key
+  if (typeof key !== 'string' || !WEATHER_IMAGE_KEY_REGEX.test(key)) {
+    throw new NotFoundError('No weather provider serves this image.');
+  }
   const serviceNames = this.service.stateManager.getAllKeys('service');
   const candidates = serviceNames
     .filter((serviceName) => {
