@@ -9,6 +9,19 @@ import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import { DeviceFeatureTypesString } from '../../../../utils/consts';
 
 class DeviceGetValue extends Component {
+  onAdditionalDeviceFeaturesSelected = additionalSelections => {
+    if (!this.props.addAction || additionalSelections.length === 0) {
+      return;
+    }
+
+    additionalSelections.forEach(({ deviceFeature }) => {
+      this.props.addAction(this.props.path, {
+        type: this.props.action.type,
+        device_feature: deviceFeature.selector
+      });
+    });
+  };
+
   onDeviceFeatureChange = (deviceFeature, device) => {
     if (deviceFeature) {
       this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
@@ -65,7 +78,13 @@ class DeviceGetValue extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <SelectDeviceFeature value={action.device_feature} onDeviceFeatureChange={this.onDeviceFeatureChange} />
+          <SelectDeviceFeature
+            value={action.device_feature}
+            onDeviceFeatureChange={this.onDeviceFeatureChange}
+            withFilters
+            isMulti
+            onAdditionalDeviceFeaturesSelected={this.onAdditionalDeviceFeaturesSelected}
+          />
         </div>
       </div>
     );

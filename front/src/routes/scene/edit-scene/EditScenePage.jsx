@@ -124,6 +124,7 @@ const EditScenePage = ({ children, ...props }) => (
               <TriggerGroup
                 triggers={props.scene.triggers}
                 addTrigger={props.addTrigger}
+                addTriggersAfter={props.addTriggersAfter}
                 deleteTrigger={props.deleteTrigger}
                 updateTriggerProperty={props.updateTriggerProperty}
                 saving={props.saving}

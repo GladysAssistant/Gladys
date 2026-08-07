@@ -87,6 +87,10 @@
       "closeButton": "Close"
     }
   },
+  "selectDeviceFeature": {
+    "filterByRoom": "Filter by room",
+    "filterByType": "Filter by feature type"
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Welcome",

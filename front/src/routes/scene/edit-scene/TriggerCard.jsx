@@ -82,6 +82,7 @@ const TriggerCard = ({ children, ...props }) => (
       {props.trigger.type === EVENTS.DEVICE.NEW_STATE && (
         <DeviceFeatureState
           updateTriggerProperty={props.updateTriggerProperty}
+          addTriggersAfter={props.addTriggersAfter}
           index={props.index}
           trigger={props.trigger}
         />

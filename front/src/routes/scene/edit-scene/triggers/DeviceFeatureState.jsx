@@ -19,6 +19,28 @@ import LevelMatterSensorDeviceState from './device-states/LevelMatterSensorDevic
 import WaterValveDeviceState from './device-states/WaterValveDeviceState';
 
 class TurnOnLight extends Component {
+  onAdditionalDeviceFeaturesSelected = additionalSelections => {
+    if (!this.props.addTriggersAfter || additionalSelections.length === 0) {
+      return;
+    }
+
+    const template = {
+      type: this.props.trigger.type,
+      value: this.props.trigger.value,
+      operator: this.props.trigger.operator,
+      for_duration: this.props.trigger.for_duration,
+      threshold: this.props.trigger.threshold
+    };
+
+    this.props.addTriggersAfter(
+      this.props.index,
+      additionalSelections.map(({ deviceFeature }) => ({
+        ...template,
+        device_feature: deviceFeature.selector
+      }))
+    );
+  };
+
   onDeviceFeatureChange = deviceFeature => {
     this.setState({ selectedDeviceFeature: deviceFeature });
     if (deviceFeature) {
@@ -159,6 +181,9 @@ class TurnOnLight extends Component {
               <SelectDeviceFeature
                 value={props.trigger.device_feature}
                 onDeviceFeatureChange={this.onDeviceFeatureChange}
+                withFilters
+                isMulti
+                onAdditionalDeviceFeaturesSelected={this.onAdditionalDeviceFeaturesSelected}
               />
             </div>
           </div>

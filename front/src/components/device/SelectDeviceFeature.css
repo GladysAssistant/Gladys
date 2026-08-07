@@ -1,0 +1,15 @@
+.select-device-feature-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.select-device-feature-filter {
+  flex: 1 1 10rem;
+  min-width: 10rem;
+}
+
+.select-device-feature-filter .react-select-container {
+  font-size: 0.875rem;
+}
