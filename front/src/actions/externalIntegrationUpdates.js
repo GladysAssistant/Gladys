@@ -24,6 +24,13 @@ function createActions(store) {
   };
 
   const actions = {
+    // called on logout: the revoke races the requests already dispatched, so
+    // one of them can resolve with the previous admin's count after the state
+    // has been reset. It would then be rendered on the next login, before the
+    // refresh of that session has answered — to a non-admin too
+    invalidateExternalIntegrationsToUpdate() {
+      lastRequestId += 1;
+    },
     // the integration catalog already downloaded the list: it feeds the
     // counter from what it has instead of asking the server a second time
     setExternalIntegrationsToUpdate(state, externalIntegrationsToUpdate) {

@@ -120,6 +120,9 @@ function createActions(store) {
         await state.httpClient.post(`/api/v1/session/${user.session_id}/revoke`);
       }
       state.session.reset();
+      // a pending "integrations to update" request must not write the count of
+      // the session being closed into the fresh state
+      actionsExternalIntegrationUpdates.invalidateExternalIntegrationsToUpdate();
       route('/login', true);
       const defaultState = getDefaultState();
       store.setState(defaultState, true);
