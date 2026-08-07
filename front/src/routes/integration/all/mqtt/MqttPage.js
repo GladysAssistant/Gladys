@@ -26,6 +26,17 @@ const MqttPage = ({ children, user }) => (
                   </Link>
 
                   <Link
+                    href="/dashboard/integration/device/mqtt/discovery"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-search" />
+                    </span>
+                    <Text id="integration.mqtt.discoverTab" />
+                  </Link>
+
+                  <Link
                     href="/dashboard/integration/device/mqtt/debug"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
