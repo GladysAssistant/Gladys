@@ -66,6 +66,26 @@ function clampToCharacteristic(value, props = {}) {
 }
 
 /**
+ * @description List the Gladys air conditioning modes a device declares.
+ * @param {object} modeFeature - Gladys mode feature of the device.
+ * @returns {Array} AC_MODE values the device supports.
+ * @example
+ * listSupportedAcModes({ supported_options: [{ value: 1 }, { value: 3 }] });
+ */
+function listSupportedAcModes(modeFeature) {
+  // supported_options lists the modes the device actually declares, and they are not contiguous:
+  // a Matter cooling-only air conditioner reports cool, dry and fan — 1, 3 and 4 — so walking
+  // min..max would offer HomeKit a heat mode the device cannot honour, and SET would write it.
+  // min/max are only a fallback for integrations that declare no options.
+  if (modeFeature.supported_options) {
+    return modeFeature.supported_options.map(({ value }) => value);
+  }
+  return Object.keys(acModeToHeatingCoolingState)
+    .map(Number)
+    .filter((acMode) => acMode >= modeFeature.min && acMode <= modeFeature.max);
+}
+
+/**
  * @description List the HomeKit heating/cooling states the device can actually be switched to, so
  * the Home app does not offer modes the device cannot honour.
  * @param {object} thermostatFeatures - Features driving the thermostat state.
@@ -82,17 +102,7 @@ function buildValidTargetStates(thermostatFeatures) {
   }
 
   if (modeFeature) {
-    // supported_options lists the modes the device actually declares, and they are not contiguous:
-    // a Matter cooling-only air conditioner reports cool, dry and fan — 1, 3 and 4 — so walking
-    // min..max would offer HomeKit a heat mode the device cannot honour, and SET would write it.
-    // min/max are only a fallback for integrations that declare no options.
-    const supportedAcModes = modeFeature.supported_options
-      ? modeFeature.supported_options.map(({ value }) => value)
-      : Object.keys(acModeToHeatingCoolingState)
-          .map(Number)
-          .filter((acMode) => acMode >= modeFeature.min && acMode <= modeFeature.max);
-
-    supportedAcModes.forEach((acMode) => {
+    listSupportedAcModes(modeFeature).forEach((acMode) => {
       const state = acModeToHeatingCoolingState[acMode];
       if (state !== undefined && !validStates.includes(state)) {
         validStates.push(state);
@@ -215,6 +225,20 @@ function buildThermostatService(service, device, features) {
       return targetState;
     }
 
+    // A device driven as a range sits idle between its two setpoints. Comparing against the heating
+    // one alone would report a room at 21 °C, between a 20 °C heating and a 25 °C cooling setpoint,
+    // as cooling — the Home app would show it working when it is doing nothing.
+    if (currentTemperatureFeature && heatingSetpointFeature && coolingSetpointFeature) {
+      const currentTemperature = readCelsius(currentTemperatureFeature);
+      if (currentTemperature < readCelsius(heatingSetpointFeature)) {
+        return HOMEKIT_HEATING_COOLING_STATE.HEAT;
+      }
+      if (currentTemperature > readCelsius(coolingSetpointFeature)) {
+        return HOMEKIT_HEATING_COOLING_STATE.COOL;
+      }
+      return HOMEKIT_HEATING_COOLING_STATE.OFF;
+    }
+
     const setpointFeature = heatingSetpointFeature || coolingSetpointFeature;
     if (currentTemperatureFeature && setpointFeature) {
       return readCelsius(setpointFeature) > readCelsius(currentTemperatureFeature)
@@ -288,7 +312,12 @@ function buildThermostatService(service, device, features) {
       emitValue(powerFeature, 1);
     }
     if (modeFeature && heatingCoolingStateToAcMode[value] !== undefined) {
-      emitValue(modeFeature, heatingCoolingStateToAcMode[value]);
+      // Dry and fan are reported to HomeKit as Auto, so Auto has to stay selectable even on a
+      // device that has no auto mode — but writing AC_MODE.AUTO there would push a mode it never
+      // declared. The device is left in whatever mode it was running in; powering it on is enough.
+      if (listSupportedAcModes(modeFeature).includes(heatingCoolingStateToAcMode[value])) {
+        emitValue(modeFeature, heatingCoolingStateToAcMode[value]);
+      }
     }
     callback();
   });
