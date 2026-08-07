@@ -2991,7 +2991,7 @@
       },
       "conditionWhile": {
         "conditions": "Bedingungen",
-        "conditionDescription": "Solange alle Bedingungen erfüllt sind, werden die Aktionen im \"Wiederholen...\"-Block in einer Schleife ausgeführt. Die Bedingungen werden vor jeder Iteration neu ausgewertet.",
+        "conditionDescription": "Solange alle Bedingungen erfüllt sind, werden die Aktionen im \"Wiederholen...\"-Block in einer Schleife ausgeführt. Anders als in anderen Blöcken werden die Bedingungen nacheinander in der angezeigten Reihenfolge ausgewertet und vor jeder Iteration neu ausgewertet. Eine Aktion \"Letzten Zustand abrufen\" vor einer Bedingung aktualisiert deren Wert somit bei jedem Durchlauf.",
         "noCondition": "Es wurde noch keine Bedingung hinzugefügt. Klicken Sie auf die '+'-Schaltfläche, um diesem Block eine Bedingung hinzuzufügen. Ohne Bedingung wird die Schleife nicht ausgeführt.",
         "addCondition": "Bedingung hinzufügen",
         "repeat": "Wiederholen...",
