@@ -5,7 +5,7 @@ const server = require('../api');
 const Gladys = require('../lib');
 const db = require('../models');
 const logger = require('../utils/logger');
-const { seedDb, cleanDb } = require('./helpers/db.test');
+const { seedDb, cleanDb, resetDb } = require('./helpers/db.test');
 const fakeOpenWeatherService = require('./services/openweather/fakeOpenWeatherService');
 
 chai.use(chaiAsPromised);
@@ -53,8 +53,7 @@ before(async function before() {
 beforeEach(async function beforeEach() {
   this.timeout(16000);
   try {
-    await cleanDb();
-    await seedDb();
+    await resetDb();
     // @ts-ignore
     global.TEST_GLADYS_INSTANCE.cache.clear();
   } catch (e) {
