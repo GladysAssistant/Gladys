@@ -153,6 +153,8 @@ async function getInfos() {
     is_docker: await this.isDocker(),
     host_power_management_available: this.isHostPowerManagementAvailable(),
     host_power_management_mechanism: this.hostPowerManagement || null,
+    host_power_reboot_available: this.hostPowerCapabilities ? this.hostPowerCapabilities.reboot === true : false,
+    host_power_shutdown_available: this.hostPowerCapabilities ? this.hostPowerCapabilities.shutdown === true : false,
   };
   const cpuTemperature = readCpuTemperature();
   infos.cpu_temperature = cpuTemperature;

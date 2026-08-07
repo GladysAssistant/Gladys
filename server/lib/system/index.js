@@ -75,9 +75,11 @@ const System = function System(sequelize, event, config, job, variable, user, me
   // integration image cleanup so it never collects an image pulled seconds
   // ago. Bounded in practice by the number of distinct images Gladys pulls.
   this.imagePullTimes = new Map();
-  // Detected host power-management mechanism ('local' | 'docker-helper' | null),
-  // populated by detectHostPowerManagement() at init and cached here.
+  // Detected host power-management mechanism ('local' | 'docker-helper' | null)
+  // and per-action availability, populated by detectHostPowerManagement() at
+  // init and cached here.
   this.hostPowerManagement = null;
+  this.hostPowerCapabilities = { reboot: false, shutdown: false };
 };
 
 System.prototype.init = init;

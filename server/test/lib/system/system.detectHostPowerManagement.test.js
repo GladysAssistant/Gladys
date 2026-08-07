@@ -63,7 +63,9 @@ describe('system.detectHostPowerManagement', () => {
     const result = await detect.call(self);
     expect(result).to.equal('local');
     expect(self.hostPowerManagement).to.equal('local');
-    sinon.assert.calledOnceWithExactly(runHostPowerDbusCommand, 'CanReboot', 'local');
+    expect(self.hostPowerCapabilities).to.deep.equal({ reboot: true, shutdown: true });
+    sinon.assert.calledWithExactly(runHostPowerDbusCommand, 'CanReboot', 'local');
+    sinon.assert.calledWithExactly(runHostPowerDbusCommand, 'CanPowerOff', 'local');
   });
 
   it('should not return "local" when the local probe is refused by polkit', async () => {
@@ -100,7 +102,33 @@ describe('system.detectHostPowerManagement', () => {
     const result = await detect.call(self);
     expect(result).to.equal('docker-helper');
     expect(self.hostPowerManagement).to.equal('docker-helper');
-    sinon.assert.calledOnceWithExactly(self.runHostPowerDbusCommand, 'CanReboot', 'docker-helper');
+    expect(self.hostPowerCapabilities).to.deep.equal({ reboot: true, shutdown: true });
+    sinon.assert.calledWithExactly(self.runHostPowerDbusCommand, 'CanReboot', 'docker-helper');
+    sinon.assert.calledWithExactly(self.runHostPowerDbusCommand, 'CanPowerOff', 'docker-helper');
+  });
+
+  it('should enable only reboot when power-off is refused by the host', async () => {
+    platformStub = sinon.stub(process, 'platform').value('linux');
+    const detect = load(() => false);
+    const runHostPowerDbusCommand = sinon.stub();
+    runHostPowerDbusCommand.withArgs('CanReboot', 'docker-helper').resolves('   string "yes"');
+    runHostPowerDbusCommand.withArgs('CanPowerOff', 'docker-helper').resolves('   string "no"');
+    const self = { dockerode: {}, runHostPowerDbusCommand };
+    const result = await detect.call(self);
+    expect(result).to.equal('docker-helper');
+    expect(self.hostPowerCapabilities).to.deep.equal({ reboot: true, shutdown: false });
+  });
+
+  it('should keep reboot available when the power-off probe itself fails', async () => {
+    platformStub = sinon.stub(process, 'platform').value('linux');
+    const detect = load(() => false);
+    const runHostPowerDbusCommand = sinon.stub();
+    runHostPowerDbusCommand.withArgs('CanReboot', 'docker-helper').resolves('   string "yes"');
+    runHostPowerDbusCommand.withArgs('CanPowerOff', 'docker-helper').rejects(new Error('probe failed'));
+    const self = { dockerode: {}, runHostPowerDbusCommand };
+    const result = await detect.call(self);
+    expect(result).to.equal('docker-helper');
+    expect(self.hostPowerCapabilities).to.deep.equal({ reboot: true, shutdown: false });
   });
 
   it('should return null when the probe answers no', async () => {
