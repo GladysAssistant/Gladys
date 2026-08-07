@@ -38,6 +38,7 @@ const { getConfigForFront } = require('./externalIntegration.getConfigForFront')
 const { saveConfigFromFront } = require('./externalIntegration.saveConfigFromFront');
 const { setRunning } = require('./externalIntegration.setRunning');
 const { handleHeartbeat } = require('./externalIntegration.handleHeartbeat');
+const { handleWeatherRefresh } = require('./externalIntegration.handleWeatherRefresh');
 const { integrationConnected } = require('./externalIntegration.integrationConnected');
 const { integrationDisconnected } = require('./externalIntegration.integrationDisconnected');
 const { sendCommand } = require('./externalIntegration.sendCommand');
@@ -163,6 +164,8 @@ const ExternalIntegration = function ExternalIntegration(
   this.stateRateLimits = new Map();
   // deviceExternalId -> { count, resetAt } rate limit on POST /camera/image
   this.cameraImageRateLimits = new Map();
+  // serviceId -> timestamp of the last accepted weather freshness nudge
+  this.weatherRefreshTimes = new Map();
   this.checkHealthInterval = null;
   // store index cache (see store/ sub-folder)
   this.storeIndex = null;
@@ -220,6 +223,7 @@ ExternalIntegration.prototype.getConfigForFront = getConfigForFront;
 ExternalIntegration.prototype.saveConfigFromFront = saveConfigFromFront;
 ExternalIntegration.prototype.setRunning = setRunning;
 ExternalIntegration.prototype.handleHeartbeat = handleHeartbeat;
+ExternalIntegration.prototype.handleWeatherRefresh = handleWeatherRefresh;
 ExternalIntegration.prototype.integrationConnected = integrationConnected;
 ExternalIntegration.prototype.integrationDisconnected = integrationDisconnected;
 ExternalIntegration.prototype.sendCommand = sendCommand;

@@ -328,17 +328,34 @@
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
         "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
-        "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
-        "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échoué. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
-        "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
+        "serviceNotConfigured": "Aucun service météo n'est configuré. Veuillez accéder à l'onglet «Intégrations» et configurer une intégration météo (OpenWeather, ou une intégration météo du store).",
+        "requestToThirdPartyFailed": "La requête au fournisseur météo a échoué. Votre instance Gladys est-elle connectée à Internet ? Veuillez vous rendre dans le panneau des intégrations météo pour résoudre ce problème.",
+        "clickHere": "Cliquez ici pour accéder aux intégrations météo.",
         "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
+        "editProviderLabel": "Fournisseur météo :",
+        "providerAuto": "Automatique (premier fournisseur disponible)",
+        "providerInternalOpenWeather": "OpenWeather interne (déprécié)",
         "editModeLabel": "Mode d'affichage :",
         "displayModes": {
           "advancedWeather": "Humidité et vitesse du vent",
           "hourlyForecast": "Prévisions pour les 24 prochaines heures",
-          "dailyForecast": "Prévisions pour les 5 prochains jours"
+          "dailyForecast": "Prévisions pour les 5 prochains jours",
+          "providerImages": "Images du fournisseur (carte de vigilance, radar de pluie…)"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "minMaxDegreeValue": "{{min}}°/{{max}}°",
+        "uv": "UV",
+        "alertTypes": {
+          "wind": "Vent violent",
+          "rain": "Pluie-inondation",
+          "flood": "Inondation",
+          "thunderstorm": "Orages",
+          "snow": "Neige-verglas",
+          "heat": "Canicule",
+          "cold": "Grand froid",
+          "avalanche": "Avalanches",
+          "coastal": "Vagues-submersion",
+          "fog": "Brouillard"
+        }
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -828,7 +845,8 @@
         "duplicateWarningText": "« {name} » semble être une autre instance de cette intégration. Deux instances peuvent se disputer le même compte cloud ou les mêmes appareils — pensez à arrêter l'instance existante pendant vos tests. Installer quand même est un usage supporté (ex. une version dev à côté de la prod).",
         "webhooksTitle": "Webhooks Internet (Gladys Plus)",
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
-        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur)."
+        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
+        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -3246,6 +3264,10 @@
       },
       "mqtt": {
         "received": "Recevoir un message MQTT"
+      },
+      "weather": {
+        "alert-raised": "Alerte météo déclenchée",
+        "alert-ended": "Alerte météo terminée"
       }
     },
     "triggersCard": {
@@ -3361,6 +3383,20 @@
         "messageLabel": "Message",
         "messagePlaceholder": "Entrez le message attendu",
         "messageDescription": "Entrez le message attendu ou laissez vide pour exécuter la scène quelque soit le message"
+      },
+      "weatherAlert": {
+        "alertRaisedDescription": "Se déclenche quand une alerte météo apparaît ou s'aggrave pour la maison sélectionnée (vérifié toutes les 30 minutes, ou dès que l'intégration météo signale un changement).",
+        "alertEndedDescription": "Se déclenche quand une alerte météo se termine pour la maison sélectionnée.",
+        "houseLabel": "Maison",
+        "typeLabel": "Type d'alerte",
+        "anyType": "Tous les types d'alerte",
+        "severityLabel": "Sévérité minimale",
+        "severities": {
+          "minor": "Mineure (bleu)",
+          "moderate": "Modérée (jaune)",
+          "severe": "Sévère (orange)",
+          "extreme": "Extrême (rouge)"
+        }
       }
     }
   },

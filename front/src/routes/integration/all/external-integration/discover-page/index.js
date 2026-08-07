@@ -39,18 +39,21 @@ class ExternalIntegrationDiscoverPage extends Component {
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
       if (generation !== this.pageGeneration) {
-        return;
+        return false;
       }
-      // a communication integration has no device screens: direct URL
-      // access lands on the configuration screen instead
-      if (get(integration, 'manifest.type') === 'communication') {
+      // communication and weather integrations have no device screens:
+      // direct URL access lands on the configuration screen instead
+      if (['communication', 'weather'].includes(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
-        return;
+        return false;
       }
       this.setState({ integration });
     } catch (e) {
       console.error(e);
+      // no confirmed metadata: do not fire the device-specific requests
+      return false;
     }
+    return true;
   };
 
   getDiscoveredDevices = async () => {
@@ -162,14 +165,20 @@ class ExternalIntegrationDiscoverPage extends Component {
     this.loadIntegrationPage();
   }
 
-  loadIntegrationPage = () => {
+  loadIntegrationPage = async () => {
     // requests and scan still in flight belong to the previous integration:
     // drop their late responses and clear their timer and their state so
     // nothing leaks into the page of the new one
     this.pageGeneration += 1;
     this.clearScanTimer();
     this.setState({ integration: null, discoveredDevices: null, scanStatus: null, scanError: null });
-    this.getIntegration();
+    // the integration metadata comes first: a communication or weather
+    // integration redirects to the configuration screen before any
+    // device-specific request is fired
+    const hasDeviceScreens = await this.getIntegration();
+    if (!hasDeviceScreens) {
+      return;
+    }
     this.getDiscoveredDevices();
   };
 
