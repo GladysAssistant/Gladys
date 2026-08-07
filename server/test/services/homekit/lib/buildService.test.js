@@ -897,6 +897,62 @@ describe('Build service', () => {
     expect(cb.args[1][1]).to.equal(1);
   });
 
+  it('should build smoke sensor service', async () => {
+    homekitHandler.gladys.stateManager.get = stub().returns({
+      id: '5c1d3f2a-7b8e-4c9d-a0f1-2e3b4c5d6e7f',
+      name: 'Fumée',
+      category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      last_value: 1,
+    });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: {
+        perms: ['PAIRED_READ'],
+      },
+    });
+    const SmokeSensor = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        SmokeDetected: 'SMOKEDETECTED',
+      },
+      CharacteristicEventTypes: stub(),
+      Perms: {
+        PAIRED_READ: 'PAIRED_READ',
+        PAIRED_WRITE: 'PAIRED_WRITE',
+      },
+      Service: {
+        SmokeSensor,
+      },
+    };
+    const device = {
+      name: 'Détecteur de fumée',
+    };
+    const features = [
+      {
+        id: '5c1d3f2a-7b8e-4c9d-a0f1-2e3b4c5d6e7f',
+        name: 'Fumée',
+        selector: 'detecteur-fumee',
+        category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]);
+    await on.args[0][1](cb);
+
+    expect(SmokeSensor.args[0][0]).to.equal('Détecteur de fumée');
+    expect(on.callCount).to.equal(1);
+    expect(getCharacteristic.args[0][0]).to.equal('SMOKEDETECTED');
+    expect(cb.args[0][1]).to.equal(1);
+  });
+
   it('should build air quality sensor service', async () => {
     homekitHandler.gladys.stateManager.get = stub().returns({
       id: 'ec9de6a2-6f0a-4f0e-9d0e-1b5f1cb0a5ce',
