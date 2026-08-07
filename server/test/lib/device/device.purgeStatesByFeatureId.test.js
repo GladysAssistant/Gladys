@@ -62,7 +62,27 @@ describe('device.purgeStatesByFeatureId', async function Describe() {
     // Below this threshold the delete is a single statement: lower it so this
     // test exercises the time-sliced path
     device.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD = 10;
-    const res = await device.purgeStatesByFeatureId(DEVICE_FEATURE_ID);
+    // The 110 states above were inserted in a tight loop, so they all share (almost) the
+    // same timestamp: the time slices cannot split them and everything falls into the
+    // last, unbounded one. Only the cardinality cap keeps a statement small here, so
+    // assert it holds rather than trust the final count, which passes either way.
+    const realWrite = db.duckDbWriteConnectionAllAsync;
+    const deletedRowCounts = [];
+    db.duckDbWriteConnectionAllAsync = async (query, ...params) => {
+      const result = await realWrite(query, ...params);
+      if (query.includes('DELETE') && result && result[0] && result[0].Count !== undefined) {
+        deletedRowCounts.push(Number(result[0].Count));
+      }
+      return result;
+    };
+    let res;
+    try {
+      res = await device.purgeStatesByFeatureId(DEVICE_FEATURE_ID);
+    } finally {
+      db.duckDbWriteConnectionAllAsync = realWrite;
+    }
+    expect(Math.max(...deletedRowCounts)).to.equal(10);
+    expect(deletedRowCounts.filter((count) => count === 10).length).to.equal(11);
     expect(res).to.deep.equal({
       numberOfDeviceFeatureStateToDelete: 115,
       numberOfDeviceFeatureStateAggregateToDelete: 3,

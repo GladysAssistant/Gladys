@@ -3570,6 +3570,7 @@
         "rewriting_dashboards": "Rewriting dashboards…",
         "deleting_source_device": "Deleting the old device…"
       },
+      "statesMigrated": "History states moved: {{count}}",
       "orphanedStates": "Orphaned states: {{count}}",
       "duration": "Duration: {{duration}}"
     },
