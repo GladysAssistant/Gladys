@@ -41,6 +41,7 @@ const MANIFEST_FIELDS = [
   'cover_image',
   'config_schema',
   'containers',
+  'location',
   'network_discovery',
   'actions',
   'transports',
@@ -735,6 +736,9 @@ function validateManifest(manifest) {
       const seenNames = new Set();
       manifest.containers.forEach((entry, index) => validateSubContainer(entry, index, seenNames, errors));
     }
+  }
+  if (manifest.location !== undefined && typeof manifest.location !== 'boolean') {
+    errors.push('location: must be a boolean');
   }
   if (manifest.network_discovery !== undefined) {
     if (
