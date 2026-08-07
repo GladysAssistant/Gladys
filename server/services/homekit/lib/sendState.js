@@ -9,6 +9,7 @@ const {
   aqiToAirQuality,
   clampToCharacteristic,
   toMicrogramPerCubicMeter,
+  LOW_BATTERY_THRESHOLD,
 } = require('./deviceMappings');
 
 /**
@@ -133,9 +134,24 @@ function sendState(hkAccessory, feature, event) {
         Characteristic[levelName],
         clampToCharacteristic(event.last_value, levelCharacteristic.props),
       );
-      // StatusLowBattery is not pushed here: on a device that also reports a dedicated
-      // low-battery feature, pushing a derived value would fight with the real one. The GET handler
-      // built by buildService keeps it correct either way.
+
+      // StatusLowBattery has to be pushed as well, or crossing the threshold would only show up
+      // the next time HomeKit polls — updateCharacteristic is what notifies subscribers, the GET
+      // handler is not. Only when the device has no dedicated low-battery feature though: that one
+      // is authoritative, and a derived value would fight with it.
+      const device = this.gladys.stateManager.get('deviceById', feature.device_id);
+      const hasDedicatedLowFeature = ((device && device.features) || []).some(
+        (deviceFeature) => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+      );
+      if (!hasDedicatedLowFeature) {
+        const [, lowName] = mappings[feature.category].capabilities[feature.type].characteristics;
+        // Number.isFinite and not a bare comparison: `null <= 20` is true in JavaScript, so a
+        // device reporting nothing would be announced as low on battery.
+        service.updateCharacteristic(
+          Characteristic[lowName],
+          Number.isFinite(event.last_value) && event.last_value <= LOW_BATTERY_THRESHOLD ? 1 : 0,
+        );
+      }
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.BATTERY_LOW}:${DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY}`:

@@ -995,6 +995,38 @@ describe('Build service', () => {
     expect(cb.args[1][1]).to.equal(0);
   });
 
+  it('should not claim a battery level for a device that only reports a low flag', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'contact-faible').returns({ last_value: 1 });
+    const on = stub();
+    const getCharacteristic = stub().returns({ on, props: { minValue: 0, maxValue: 100 } });
+    const Battery = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { BatteryLevel: 'BATTERYLEVEL', StatusLowBattery: 'STATUSLOWBATTERY' },
+      CharacteristicEventTypes: stub(),
+      Service: { Battery },
+    };
+    const features = [
+      {
+        name: 'Batterie faible',
+        selector: 'contact-faible',
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+        type: DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Contact' }, features, mappings[DEVICE_FEATURE_CATEGORIES.BATTERY_LOW]);
+    await on.args[0][1](cb);
+
+    // BatteryLevel is optional on the HAP Battery service, so it is never added and the Home app
+    // does not show a made-up 0%. Only the flag the device actually reports is exposed.
+    expect(getCharacteristic.args).eql([['STATUSLOWBATTERY']]);
+    expect(cb.args[0][1]).to.equal(1);
+  });
+
   it('should build air quality sensor service', async () => {
     homekitHandler.gladys.stateManager.get = stub().returns({
       id: 'ec9de6a2-6f0a-4f0e-9d0e-1b5f1cb0a5ce',

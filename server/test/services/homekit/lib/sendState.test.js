@@ -639,6 +639,14 @@ describe('Send state to HomeKit', () => {
       type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
     };
 
+    // this device reports its own low-battery flag, so the level must not derive a second one
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        features: [feature, { ...feature, category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW }],
+      }),
+    };
+
     await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 42 });
     // Nuki reports the same thing as a lock integer
     await homekitHandler.sendState(
@@ -680,6 +688,43 @@ describe('Send state to HomeKit', () => {
 
     expect(updateCharacteristic.args[5]).eql(['BATTERYLEVEL', 100]);
     expect(updateCharacteristic.args[6]).eql(['BATTERYLEVEL', 0]);
+  });
+
+  it('should derive the low battery flag when the device only reports a percentage', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({ props: { minValue: 0, maxValue: 100 } });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Battery',
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+      type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({ id: '4756151c-369e-4772-8bf7-943a6ac70583', features: [feature] }),
+    };
+
+    // the threshold is inclusive, and crossing it has to notify HomeKit rather than wait for a poll
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 21 });
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 20 });
+
+    expect(updateCharacteristic.args).eql([
+      ['BATTERYLEVEL', 21],
+      ['STATUSLOWBATTERY', 0],
+      ['BATTERYLEVEL', 20],
+      ['STATUSLOWBATTERY', 1],
+    ]);
+
+    // a device that reports nothing is not low on battery: `null <= 20` is true in JavaScript
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: null });
+
+    expect(updateCharacteristic.args[5]).eql(['STATUSLOWBATTERY', 0]);
   });
 
   it('should do nothing wrong device category & type', async () => {
