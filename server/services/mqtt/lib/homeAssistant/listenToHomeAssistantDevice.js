@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { HOME_ASSISTANT, FEATURE_PROPERTIES } = require('./constants');
+const { HOME_ASSISTANT, FEATURE_PROPERTIES, MQTT_WILDCARD_REGEX } = require('./constants');
 const { convertEntityToFeatures } = require('./convertToGladysDevice');
 
 /**
@@ -99,6 +99,12 @@ function listenToHomeAssistantDeviceStateIfNeeded(device) {
             : builtFeature.external_id.substring(externalIdBase.length + 1);
         const topic = getStateTopic(component, property, config);
         if (!topic) {
+          return;
+        }
+        // A discovery payload is whatever was published on the broker: a wildcard state topic
+        // would subscribe Gladys to traffic far beyond the device it claims to describe
+        if (MQTT_WILDCARD_REGEX.test(topic)) {
+          logger.warn(`MQTT Home Assistant: ignoring state topic ${topic}, wildcards are not allowed`);
           return;
         }
         if (!this.haStateBindings[topic]) {

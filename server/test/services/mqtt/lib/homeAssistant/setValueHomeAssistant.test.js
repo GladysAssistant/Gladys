@@ -97,6 +97,21 @@ describe('mqttHandler.setValueHomeAssistant', () => {
     }
   });
 
+  it('should throw when the command topic contains a wildcard', async () => {
+    const device = buildDevice([
+      {
+        name: 'ha_discovery_config:switch:relay',
+        value: JSON.stringify({ command_topic: 'my-device/#/set' }),
+      },
+    ]);
+    try {
+      await mqttHandler.setValueHomeAssistant(device, { external_id: 'homeassistant:my-device:switch:relay' }, 1);
+      expect.fail('should have thrown');
+    } catch (e) {
+      expect(e.message).to.include('wildcards are not allowed');
+    }
+  });
+
   it('should pick the longest matching entity key', async () => {
     const device = buildDevice([
       {

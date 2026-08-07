@@ -1,7 +1,7 @@
 const logger = require('../../../../utils/logger');
-const { NotFoundError } = require('../../../../utils/coreErrors');
+const { NotFoundError, BadParameters } = require('../../../../utils/coreErrors');
 const { COVER_STATE } = require('../../../../utils/constants');
-const { HOME_ASSISTANT, FEATURE_PROPERTIES, DEFAULT_PAYLOADS } = require('./constants');
+const { HOME_ASSISTANT, FEATURE_PROPERTIES, DEFAULT_PAYLOADS, MQTT_WILDCARD_REGEX } = require('./constants');
 
 /**
  * @description Convert a Gladys integer color to { r, g, b }.
@@ -170,6 +170,11 @@ async function setValueHomeAssistant(device, deviceFeature, value) {
   const { topic, payload } = buildHomeAssistantCommand(component, config, property, value);
   if (!topic) {
     throw new NotFoundError(`MQTT Home Assistant: no command topic found for feature ${deviceFeature.external_id}`);
+  }
+  // The command topic comes from a discovery payload published on the broker: a wildcard is not a
+  // publishable topic, so it can only be a malformed or hostile config
+  if (MQTT_WILDCARD_REGEX.test(topic)) {
+    throw new BadParameters(`MQTT Home Assistant: invalid command topic ${topic}, wildcards are not allowed`);
   }
 
   logger.debug(`MQTT Home Assistant: publishing "${payload}" on ${topic}`);
