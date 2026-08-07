@@ -5,11 +5,15 @@ const proxyquire = require('proxyquire').noCallThru();
 const { BadParameters } = require('../../../utils/coreErrors');
 const { createPinnedLookup, isRestrictedAddress } = require('../../../lib/dashboard/dashboard.getPhoto');
 
-const getDashboard = (resizeImageBufferMock) => {
+const getDashboard = (resizeImageBufferMock, dnsMock) => {
+  const stubs = { '../../utils/resizeImage': { resizeImageBuffer: resizeImageBufferMock } };
+
+  if (dnsMock) {
+    stubs.dns = dnsMock;
+  }
+
   const Dashboard = proxyquire('../../../lib/dashboard', {
-    './dashboard.getPhoto': proxyquire('../../../lib/dashboard/dashboard.getPhoto', {
-      '../../utils/resizeImage': { resizeImageBuffer: resizeImageBufferMock },
-    }),
+    './dashboard.getPhoto': proxyquire('../../../lib/dashboard/dashboard.getPhoto', stubs),
   });
   return new Dashboard();
 };
@@ -141,6 +145,20 @@ describe('dashboard.getPhoto', () => {
     expect(image).to.equal(resizedJpegDataUri(outputBuffer));
   });
 
+  it('should fetch an image from a hostname resolving to an allowed address', async () => {
+    const outputBuffer = Buffer.from('resized-image');
+    const dashboard = getDashboard(fake.resolves(resizedJpegDataUri(outputBuffer)), {
+      promises: { lookup: fake.resolves([{ address: '203.0.113.10', family: 4 }]) },
+    });
+
+    nock('http://photos.example.com')
+      .get('/vacation.jpg')
+      .reply(200, Buffer.from('fake-image'), { 'Content-Type': 'image/jpeg' });
+
+    const image = await dashboard.getPhoto('http://photos.example.com/vacation.jpg');
+    expect(image).to.equal(resizedJpegDataUri(outputBuffer));
+  });
+
   it('should not follow redirects', async () => {
     const dashboard = getDashboard(fake.resolves('image/jpeg;base64,'));
     nock('http://192.168.1.10')
@@ -193,6 +211,15 @@ describe('dashboard.getPhoto isRestrictedAddress', () => {
 
   it('should not treat a regular IPv6 address starting with ::ffff as IPv4-mapped', () => {
     expect(isRestrictedAddress('::ffff:1:2:3')).to.equal(false);
+  });
+
+  it('should not treat an embedded dotted quad as IPv4-mapped', () => {
+    // ::ffff:0:1.2.3.4 is ::ffff:0:102:304, not an IPv4-mapped address
+    expect(isRestrictedAddress('::ffff:0:1.2.3.4')).to.equal(false);
+  });
+
+  it('should allow a 169.x address that is not link-local', () => {
+    expect(isRestrictedAddress('169.1.1.1')).to.equal(false);
   });
 
   it('should allow public and LAN addresses', () => {
