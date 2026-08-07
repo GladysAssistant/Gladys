@@ -19,7 +19,8 @@ const ContactProfileCard = ({
   profileStatus,
   updateValue,
   onSave,
-  onClear
+  onClear,
+  placeholderPorts
 }) => {
   const working = profileStatus === RequestStatus.Getting;
   const configured = Boolean(profile && profile.configured);
@@ -55,6 +56,7 @@ const ContactProfileCard = ({
               configuredSecrets={configuredSecrets || []}
               touchedSecrets={touchedSecrets || {}}
               updateConfigValue={updateValue}
+              placeholderPorts={placeholderPorts}
             />
           ))}
           <div class="form-footer">

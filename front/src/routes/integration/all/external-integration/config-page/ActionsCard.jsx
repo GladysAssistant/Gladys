@@ -16,7 +16,8 @@ const ActionsCard = ({
   actionFieldValues,
   updateActionFieldValue,
   runAction,
-  dynamicOptions
+  dynamicOptions,
+  placeholderPorts
 }) => (
   <div class="card">
     <div class="card-header">
@@ -43,6 +44,7 @@ const ActionsCard = ({
                 touchedSecrets={{}}
                 updateConfigValue={(updatedField, value) => updateActionFieldValue(action.key, updatedField, value)}
                 dynamicOptions={dynamicOptions}
+                placeholderPorts={placeholderPorts}
               />
             ))}
             <button

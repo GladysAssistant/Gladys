@@ -33,6 +33,10 @@ const MAX_SUB_CONTAINERS = 5;
 const MAX_SUB_CONTAINER_VOLUMES = 5;
 const MAX_SUB_CONTAINER_PORTS = 3;
 const SUB_CONTAINER_NAME_REGEX = /^[a-z0-9-]{2,20}$/;
+// Optional stable identifier of a declared port, unique across the whole
+// manifest: referenced by the {{port:<name>}} placeholder of the section
+// texts, resolved by the frontend with the assigned host port (C.1).
+const SUB_CONTAINER_PORT_NAME_REGEX = /^[a-z0-9_]{2,20}$/;
 const SUB_CONTAINER_MEMORY_MIN_MB = 32;
 const SUB_CONTAINER_MEMORY_MAX_MB = 4096;
 const SUB_CONTAINER_MEMORY_DEFAULT_MB = 256;
@@ -209,6 +213,7 @@ module.exports = {
   MAX_SUB_CONTAINER_VOLUMES,
   MAX_SUB_CONTAINER_PORTS,
   SUB_CONTAINER_NAME_REGEX,
+  SUB_CONTAINER_PORT_NAME_REGEX,
   SUB_CONTAINER_MEMORY_MIN_MB,
   SUB_CONTAINER_MEMORY_MAX_MB,
   SUB_CONTAINER_MEMORY_DEFAULT_MB,

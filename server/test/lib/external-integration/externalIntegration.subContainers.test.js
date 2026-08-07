@@ -450,6 +450,7 @@ describe('externalIntegration.getSubContainersState', () => {
             protocol: 'tcp',
             host_port: 42115,
             label: { en: 'Frigate UI', fr: 'Interface Frigate' },
+            name: 'frigate_ui',
           },
         ],
         devices: [

@@ -581,6 +581,59 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept section placeholders referencing a declared port name', () => {
+    // the OCPP case: the section text shows a URL pointing at Gladys,
+    // resolved by the frontend ({{gladys_host}} + {{port:<name>}})
+    const manifest = {
+      ...TEST_MANIFEST,
+      containers: [
+        {
+          name: 'ocpp',
+          docker_image: 'img:1.0.0',
+          ports: [{ container_port: 9000, name: 'ocpp', label: { en: 'OCPP endpoint' } }],
+        },
+      ],
+      config_schema: [
+        {
+          key: 'intro',
+          type: 'section',
+          label: { en: 'Charge point setup' },
+          description: {
+            en: 'Point your charge point to ws://{{gladys_host}}:{{port:ocpp}}',
+            fr: 'Faites pointer votre borne vers ws://{{gladys_host}}:{{port:ocpp}}',
+          },
+        },
+      ],
+    };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should reject a section placeholder referencing an unknown port name', () => {
+    // an unknown reference would sit unresolved on screen forever
+    const section = {
+      key: 'intro',
+      type: 'section',
+      label: { en: 'Intro' },
+      description: { en: 'ws://{{gladys_host}}:{{port:ocpp}}' },
+    };
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [section] },
+      'config_schema[0].description.en: {{port:ocpp}} does not reference any declared port name',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, description: undefined, label: { en: '{{port:ocpp}}' } }] },
+      'config_schema[0].label.en: {{port:ocpp}} does not reference any declared port name',
+    );
+    // same engine, same rule inside the action mini forms
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        actions: [{ key: 'pair', label: { en: 'Pair' }, fields: [section] }],
+      },
+      'actions[0].fields[0].description.en: {{port:ocpp}} does not reference any declared port name',
+    );
+  });
+
   it('should accept a valid actions list', () => {
     const manifest = {
       ...TEST_MANIFEST,
@@ -770,6 +823,33 @@ describe('externalIntegration.validateManifest', () => {
         containers: [{ ...base, ports: [{ container_port: 80, host_port: 8080, label: { en: 'UI' } }] }],
       },
       'containers[0].ports[0].host_port: unknown field',
+    );
+  });
+
+  it('should validate the optional port names, unique across the whole manifest', () => {
+    const base = { name: 'ui', docker_image: 'img:1.0.0' };
+    const namedPort = { container_port: 80, name: 'web_ui', label: { en: 'UI' } };
+    const manifest = { ...TEST_MANIFEST, containers: [{ ...base, ports: [namedPort] }] };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ ...namedPort, name: 'UI' }] }] },
+      'containers[0].ports[0].name: must be a string matching [a-z0-9_]{2,20}',
+    );
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ ...namedPort, name: 42 }] }] },
+      'containers[0].ports[0].name: must be a string matching [a-z0-9_]{2,20}',
+    );
+    // {{port:<name>}} carries no container prefix: names are unique
+    // manifest-wide, even across containers
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        containers: [
+          { ...base, ports: [namedPort] },
+          { name: 'api', docker_image: 'img:1.0.0', ports: [{ ...namedPort, container_port: 81 }] },
+        ],
+      },
+      'containers[1].ports[0].name: duplicate port name "web_ui"',
     );
   });
 

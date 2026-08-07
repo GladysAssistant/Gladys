@@ -7,6 +7,7 @@ const {
   MAX_SUB_CONTAINER_VOLUMES,
   MAX_SUB_CONTAINER_PORTS,
   SUB_CONTAINER_NAME_REGEX,
+  SUB_CONTAINER_PORT_NAME_REGEX,
   SUB_CONTAINER_MEMORY_MIN_MB,
   SUB_CONTAINER_MEMORY_MAX_MB,
   SUB_CONTAINER_CPU_MIN,
@@ -66,8 +67,12 @@ const SUB_CONTAINER_FIELDS = [
   'shm_mb',
   'command',
 ];
-const PORT_FIELDS = ['container_port', 'protocol', 'label'];
+const PORT_FIELDS = ['container_port', 'protocol', 'label', 'name'];
 const PORT_PROTOCOLS = ['tcp', 'udp'];
+// {{port:<name>}} placeholder of the section texts, resolved by the
+// frontend with the host port assigned to the named declared port (C.1).
+// Strict syntax, no spaces inside the braces.
+const PORT_PLACEHOLDER_REGEX = /\{\{port:([a-z0-9_]+)\}\}/g;
 const ACTION_FIELDS = ['key', 'label', 'description', 'timeout_seconds', 'fields'];
 // inbound webhooks via Gladys Plus (B.17): shown on the install screen
 // ("will be able to receive events from the Internet via Gladys Plus")
@@ -239,6 +244,34 @@ function validateConfigFieldDefault(field, path, errors) {
 }
 
 /**
+ * @description Check the {{port:<name>}} placeholders of a section text:
+ * every referenced name must be the `name` of a port declared in the
+ * manifest — an unknown reference would sit unresolved on screen forever.
+ * @param {object} value - The multi-language text to scan.
+ * @param {string} path - The path of the field, for error messages.
+ * @param {Set} declaredPortNames - Port names declared in the manifest.
+ * @param {Array} errors - The array of errors to push to.
+ * @example
+ * validateSectionPortPlaceholders({ en: 'ws://{{gladys_host}}:{{port:ocpp}}' }, 'config_schema[0].description', declaredPortNames, errors);
+ */
+function validateSectionPortPlaceholders(value, path, declaredPortNames, errors) {
+  if (value === null || typeof value !== 'object') {
+    return;
+  }
+  Object.keys(value).forEach((language) => {
+    const text = value[language];
+    if (typeof text !== 'string') {
+      return;
+    }
+    [...text.matchAll(PORT_PLACEHOLDER_REGEX)].forEach((match) => {
+      if (!declaredPortNames.has(match[1])) {
+        errors.push(`${path}.${language}: {{port:${match[1]}}} does not reference any declared port name`);
+      }
+    });
+  });
+}
+
+/**
  * @description Validate one entry of the config_schema flat list.
  * @param {object} field - The field to validate.
  * @param {number} index - Index of the field in the list.
@@ -246,10 +279,12 @@ function validateConfigFieldDefault(field, path, errors) {
  * @param {Array} errors - The array of errors to push to.
  * @param {string} [basePath] - Path prefix for error messages (the action
  * mini forms reuse the same format under another path).
+ * @param {Set} [declaredPortNames] - Port names declared in the manifest,
+ * for the {{port:<name>}} placeholder references of section texts.
  * @example
  * validateConfigField({ key: 'latitude', type: 'number', label: { en: 'Latitude' } }, 0, seenKeys, errors);
  */
-function validateConfigField(field, index, seenKeys, errors, basePath = 'config_schema') {
+function validateConfigField(field, index, seenKeys, errors, basePath = 'config_schema', declaredPortNames = new Set()) {
   const path = `${basePath}[${index}]`;
   if (field === null || typeof field !== 'object' || Array.isArray(field)) {
     errors.push(`${path}: must be an object`);
@@ -279,6 +314,12 @@ function validateConfigField(field, index, seenKeys, errors, basePath = 'config_
     } else {
       validateMultiLanguageText(field.description, `${path}.description`, errors);
     }
+  }
+  if (field.type === 'section') {
+    // {{port:<name>}} placeholders only live in section texts: an unknown
+    // reference would never resolve on screen
+    validateSectionPortPlaceholders(field.label, `${path}.label`, declaredPortNames, errors);
+    validateSectionPortPlaceholders(field.description, `${path}.description`, declaredPortNames, errors);
   }
   if (field.placeholder !== undefined) {
     if (!PLACEHOLDER_FIELD_TYPES.includes(field.type)) {
@@ -385,10 +426,12 @@ function validateConfigField(field, index, seenKeys, errors, basePath = 'config_
  * @param {number} index - Index of the action in the list.
  * @param {Set} seenKeys - Action keys already seen, to detect duplicates.
  * @param {Array} errors - The array of errors to push to.
+ * @param {Set} declaredPortNames - Port names declared in the manifest,
+ * for the {{port:<name>}} placeholder references of section texts.
  * @example
- * validateAction({ key: 'detect_protocol', label: { en: 'Detect' } }, 0, seenKeys, errors);
+ * validateAction({ key: 'detect_protocol', label: { en: 'Detect' } }, 0, seenKeys, errors, declaredPortNames);
  */
-function validateAction(action, index, seenKeys, errors) {
+function validateAction(action, index, seenKeys, errors, declaredPortNames) {
   const path = `actions[${index}]`;
   if (action === null || typeof action !== 'object' || Array.isArray(action)) {
     errors.push(`${path}: must be an object`);
@@ -429,7 +472,7 @@ function validateAction(action, index, seenKeys, errors) {
       // rendered by the same engine); keys unique within the action
       const seenFieldKeys = new Set();
       action.fields.forEach((field, fieldIndex) => {
-        validateConfigField(field, fieldIndex, seenFieldKeys, errors, `${path}.fields`);
+        validateConfigField(field, fieldIndex, seenFieldKeys, errors, `${path}.fields`, declaredPortNames);
       });
     }
   }
@@ -525,10 +568,13 @@ function validateNetworkDiscoveryEntry(entry, index, errors) {
  * @param {object} port - The port entry.
  * @param {string} path - The path of the entry, for error messages.
  * @param {Array} errors - The array of errors to push to.
+ * @param {Set} seenPortNames - Port names already seen, manifest-wide: the
+ * {{port:<name>}} placeholder references a name with no container prefix,
+ * so a name must be unique across every container of the manifest.
  * @example
- * validateSubContainerPort({ container_port: 5000, label: { en: 'UI' } }, 'containers[0].ports[0]', errors);
+ * validateSubContainerPort({ container_port: 5000, label: { en: 'UI' } }, 'containers[0].ports[0]', errors, names);
  */
-function validateSubContainerPort(port, path, errors) {
+function validateSubContainerPort(port, path, errors, seenPortNames) {
   if (port === null || typeof port !== 'object' || Array.isArray(port)) {
     errors.push(`${path}: must be an object`);
     return;
@@ -544,6 +590,15 @@ function validateSubContainerPort(port, path, errors) {
   if (port.protocol !== undefined && !PORT_PROTOCOLS.includes(port.protocol)) {
     errors.push(`${path}.protocol: must be one of ${PORT_PROTOCOLS.join(', ')}`);
   }
+  if (port.name !== undefined) {
+    if (typeof port.name !== 'string' || !SUB_CONTAINER_PORT_NAME_REGEX.test(port.name)) {
+      errors.push(`${path}.name: must be a string matching [a-z0-9_]{2,20}`);
+    } else if (seenPortNames.has(port.name)) {
+      errors.push(`${path}.name: duplicate port name "${port.name}"`);
+    } else {
+      seenPortNames.add(port.name);
+    }
+  }
   validateMultiLanguageText(port.label, `${path}.label`, errors);
 }
 
@@ -555,10 +610,11 @@ function validateSubContainerPort(port, path, errors) {
  * @param {number} index - Index of the entry in the list.
  * @param {Set} seenNames - Names already seen, to detect duplicates.
  * @param {Array} errors - The array of errors to push to.
+ * @param {Set} seenPortNames - Port names already seen, manifest-wide.
  * @example
- * validateSubContainer({ name: 'mqtt', docker_image: 'eclipse-mosquitto:2.0.18' }, 0, seenNames, errors);
+ * validateSubContainer({ name: 'mqtt', docker_image: 'eclipse-mosquitto:2.0.18' }, 0, seenNames, errors, names);
  */
-function validateSubContainer(entry, index, seenNames, errors) {
+function validateSubContainer(entry, index, seenNames, errors, seenPortNames) {
   const path = `containers[${index}]`;
   if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) {
     errors.push(`${path}: must be an object`);
@@ -615,7 +671,9 @@ function validateSubContainer(entry, index, seenNames, errors) {
     if (!Array.isArray(entry.ports) || entry.ports.length > MAX_SUB_CONTAINER_PORTS) {
       errors.push(`${path}.ports: must be an array of at most ${MAX_SUB_CONTAINER_PORTS} entries`);
     } else {
-      entry.ports.forEach((port, portIndex) => validateSubContainerPort(port, `${path}.ports[${portIndex}]`, errors));
+      entry.ports.forEach((port, portIndex) =>
+        validateSubContainerPort(port, `${path}.ports[${portIndex}]`, errors, seenPortNames),
+      );
     }
   }
   if (entry.devices !== undefined) {
@@ -720,12 +778,28 @@ function validateManifest(manifest) {
       errors.push('cover_image: must be an https URL');
     }
   }
+  // gathered before the schemas are validated: the section texts of the
+  // config_schema, action fields and contact_schema may reference these
+  // names through the {{port:<name>}} placeholder (C.1)
+  const declaredPortNames = new Set();
+  if (Array.isArray(manifest.containers)) {
+    manifest.containers.forEach((entry) => {
+      const ports = entry && Array.isArray(entry.ports) ? entry.ports : [];
+      ports.forEach((port) => {
+        if (port && typeof port.name === 'string') {
+          declaredPortNames.add(port.name);
+        }
+      });
+    });
+  }
   if (manifest.config_schema !== undefined) {
     if (!Array.isArray(manifest.config_schema)) {
       errors.push('config_schema: must be an array');
     } else {
       const seenKeys = new Set();
-      manifest.config_schema.forEach((field, index) => validateConfigField(field, index, seenKeys, errors));
+      manifest.config_schema.forEach((field, index) =>
+        validateConfigField(field, index, seenKeys, errors, 'config_schema', declaredPortNames),
+      );
     }
   }
   if (manifest.containers !== undefined) {
@@ -733,7 +807,10 @@ function validateManifest(manifest) {
       errors.push(`containers: must be an array of at most ${MAX_SUB_CONTAINERS} entries`);
     } else {
       const seenNames = new Set();
-      manifest.containers.forEach((entry, index) => validateSubContainer(entry, index, seenNames, errors));
+      const seenPortNames = new Set();
+      manifest.containers.forEach((entry, index) =>
+        validateSubContainer(entry, index, seenNames, errors, seenPortNames),
+      );
     }
   }
   if (manifest.network_discovery !== undefined) {
@@ -752,7 +829,9 @@ function validateManifest(manifest) {
       errors.push(`actions: must be a list of 1-${MAX_ACTIONS} actions`);
     } else {
       const seenActionKeys = new Set();
-      manifest.actions.forEach((action, index) => validateAction(action, index, seenActionKeys, errors));
+      manifest.actions.forEach((action, index) =>
+        validateAction(action, index, seenActionKeys, errors, declaredPortNames),
+      );
     }
   }
   if (manifest.messaging !== undefined) {
@@ -787,7 +866,7 @@ function validateManifest(manifest) {
     } else {
       const seenContactKeys = new Set();
       manifest.contact_schema.forEach((field, index) => {
-        validateConfigField(field, index, seenContactKeys, errors, 'contact_schema');
+        validateConfigField(field, index, seenContactKeys, errors, 'contact_schema', declaredPortNames);
         if (field && field.type === 'oauth2') {
           // the OAuth relay is integration-scoped, never per user
           errors.push(`contact_schema[${index}].type: oauth2 is not allowed in the per-user contact schema`);
