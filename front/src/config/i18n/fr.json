@@ -47,6 +47,11 @@
     "red": "Rouge",
     "yellow": "Jaune"
   },
+  "colorPicker": {
+    "coolWhite": "Blanc froid",
+    "neutralWhite": "Blanc neutre",
+    "warmWhite": "Blanc chaud"
+  },
   "calendar": {
     "allDay": "Toute la journée",
     "previous": "Précédent",

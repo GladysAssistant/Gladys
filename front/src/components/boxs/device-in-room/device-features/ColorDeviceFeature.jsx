@@ -3,14 +3,16 @@ import cx from 'classnames';
 import iro from '@jaames/iro';
 
 import { intToHex, hexToInt } from '../../../../../../server/utils/colors';
+import ColorPalette from '../../../device/ColorPalette';
 
 import style from './style.css';
 
 class ColorDeviceType extends Component {
   colorPickerRef = createRef();
+  popoverContentRef = createRef();
 
   blur = event => {
-    if (!event.composedPath().includes(this.colorPickerRef.current.parentElement)) {
+    if (!event.composedPath().includes(this.popoverContentRef.current)) {
       this.closeColorPicker(false);
     }
   };
@@ -37,6 +39,13 @@ class ColorDeviceType extends Component {
 
   updateValue = color => {
     const colorInt = hexToInt(color.hexString);
+    this.props.updateValue(this.props.deviceFeature, colorInt);
+  };
+
+  selectPaletteColor = colorInt => {
+    if (this.colorPicker) {
+      this.colorPicker.color.hexString = `#${intToHex(colorInt)}`;
+    }
     this.props.updateValue(this.props.deviceFeature, colorInt);
   };
 
@@ -99,7 +108,8 @@ class ColorDeviceType extends Component {
               })}
             >
               <div class="row justify-content-end">
-                <div class="col-8 py-3 d-flex justify-content-center">
+                <div class="col-10 py-3 d-flex flex-column align-items-center" ref={this.popoverContentRef}>
+                  <ColorPalette value={deviceLastValue} onSelectColor={this.selectPaletteColor} />
                   <div ref={this.colorPickerRef} />
                 </div>
                 <div class="col-2">
