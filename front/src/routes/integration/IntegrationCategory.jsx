@@ -28,12 +28,15 @@ const IntegrationTags = ({ integration }) => (
     )}
     {/* icon only: the label is the longest of the whole row, and the catalog
         just needs to signal the update — the wording is in the tooltip, and
-        the integration page carries the full update section */}
+        the integration page carries the full update section. aria-label as
+        well as title: on a non-interactive span, title alone is not reliably
+        announced by screen readers, and the icon carries no text */}
     {integration.external && integration.updateAvailable && (
       <Localizer>
         <span
           class="badge badge-primary integration-tag"
           title={<Text id="integration.externalIntegration.updateAvailable" />}
+          aria-label={<Text id="integration.externalIntegration.updateAvailable" />}
         >
           <i class="fe fe-arrow-up-circle" />
         </span>
