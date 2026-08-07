@@ -47,7 +47,7 @@ describe('house.getSunState', () => {
 
   it('should return a full day elevation curve', async () => {
     const sunState = await house.getSunState(parisHouse, summerNoon);
-    // One point every 20 minutes from 00:00 to 24:00 included
+    // One point every 20 minutes from local midnight to the next one included
     expect(sunState.curve).to.have.lengthOf(73);
     sunState.curve.forEach((point) => {
       expect(point.time).to.be.a('date');
@@ -87,6 +87,32 @@ describe('house.getSunState', () => {
     expect(sunState.sunrise.getTime()).to.be.below(curveEnd);
     expect(sunState.sunset.getTime()).to.be.above(sunState.sunrise.getTime());
     expect(sunState.sunset.getTime()).to.be.below(curveEnd);
+  });
+
+  it('should end the curve at the next local midnight on the spring DST day', async () => {
+    // 2026-03-29 in Paris: the clock jumps from 02:00 to 03:00, the day lasts 23 hours
+    const sunState = await house.getSunState(parisHouse, new Date('2026-03-29T10:00:00.000Z'));
+    const firstPoint = dayjs(sunState.curve[0].time).tz('Europe/Paris');
+    const lastPoint = dayjs(sunState.curve[sunState.curve.length - 1].time).tz('Europe/Paris');
+
+    expect(firstPoint.format('YYYY-MM-DD HH:mm')).to.equal('2026-03-29 00:00');
+    // The curve must stop at the next local midnight, not one hour into the next day
+    expect(lastPoint.format('YYYY-MM-DD HH:mm')).to.equal('2026-03-30 00:00');
+    expect(sunState.sunrise.getTime()).to.be.above(sunState.curve[0].time.getTime());
+    expect(sunState.sunset.getTime()).to.be.below(lastPoint.valueOf());
+  });
+
+  it('should end the curve at the next local midnight on the autumn DST day', async () => {
+    // 2026-10-25 in Paris: the clock goes back from 03:00 to 02:00, the day lasts 25 hours
+    const sunState = await house.getSunState(parisHouse, new Date('2026-10-25T10:00:00.000Z'));
+    const firstPoint = dayjs(sunState.curve[0].time).tz('Europe/Paris');
+    const lastPoint = dayjs(sunState.curve[sunState.curve.length - 1].time).tz('Europe/Paris');
+
+    expect(firstPoint.format('YYYY-MM-DD HH:mm')).to.equal('2026-10-25 00:00');
+    // The curve must reach the next local midnight, not stop one hour earlier
+    expect(lastPoint.format('YYYY-MM-DD HH:mm')).to.equal('2026-10-26 00:00');
+    expect(sunState.sunrise.getTime()).to.be.above(sunState.curve[0].time.getTime());
+    expect(sunState.sunset.getTime()).to.be.below(lastPoint.valueOf());
   });
 
   it('should return null sun times during polar day', async () => {

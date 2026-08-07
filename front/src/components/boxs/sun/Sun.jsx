@@ -168,14 +168,16 @@ const SunBox = ({ sunState, chartId, loading, error }) => {
 
 class Sun extends Component {
   refreshData = async ({ resetData = false } = {}) => {
-    if (!this.props.box.house) {
+    // Only the latest request is allowed to update the state: a slow response
+    // must not overwrite the data of a house selected afterwards. Invalidating
+    // before the no-house case also protects it from a request still in flight.
+    this.requestId += 1;
+    const { requestId } = this;
+    const house = this.props.box.house;
+    if (!house) {
       this.setState({ error: 'noHouse', loading: false, sunState: undefined });
       return;
     }
-    // Only the latest request is allowed to update the state: a slow response
-    // must not overwrite the data of a house selected afterwards.
-    this.requestId += 1;
-    const { requestId } = this;
     try {
       // Keep the chart visible while refreshing: the loader would otherwise
       // flash over the already rendered chart on every periodic refresh.
@@ -185,7 +187,7 @@ class Sun extends Component {
         sunState: resetData ? undefined : prevState.sunState,
         loading: resetData || !prevState.sunState
       }));
-      const sunState = await this.props.httpClient.get(`/api/v1/house/${this.props.box.house}/sun`);
+      const sunState = await this.props.httpClient.get(`/api/v1/house/${house}/sun`);
       if (requestId !== this.requestId) {
         return;
       }

@@ -10,7 +10,6 @@ dayjs.extend(timezonePlugin);
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
 const CURVE_STEP_MINUTES = 20;
-const MINUTES_IN_DAY = 24 * 60;
 
 /**
  * @description Convert radians to degrees.
@@ -59,30 +58,37 @@ function nullIfInvalidDate(date) {
 async function getSunState(house, now = new Date()) {
   const { latitude, longitude } = house;
   const timezone = (await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE)) || DEFAULT_TIMEZONE;
-  // Take the sun times of the local day, not of the day in the server timezone
-  // (official Gladys images run in UTC): use local noon as the reference date.
-  const localNoon = dayjs(now)
-    .tz(timezone)
-    .hour(12)
-    .minute(0)
-    .second(0)
-    .millisecond(0)
-    .toDate();
+  // Work on the local day, not on the day in the server timezone (official
+  // Gladys images run in UTC). Times are re-parsed from their local date as
+  // wall clock times: adding to a dayjs.tz object keeps the original UTC
+  // offset, which would be wrong on a DST day (the local day then lasts 23 or
+  // 25 hours, not 24).
+  const localDay = dayjs(now).tz(timezone);
+  const today = localDay.format('YYYY-MM-DD');
+  const tomorrow = localDay.add(1, 'day').format('YYYY-MM-DD');
+
+  // Local noon is the reference date, so the sun times are the ones of the local day
+  const localNoon = dayjs.tz(`${today} 12:00:00`, timezone).toDate();
   const times = SunCalc.getTimes(localNoon, latitude, longitude);
   const position = SunCalc.getPosition(now, latitude, longitude);
 
   // The curve spans the local day, so sunrise/sunset always fall inside it
-  const startOfDay = dayjs(now)
-    .tz(timezone)
-    .startOf('day');
+  const startOfDay = dayjs.tz(`${today} 00:00:00`, timezone);
+  const endOfDay = dayjs.tz(`${tomorrow} 00:00:00`, timezone);
+  const startTime = startOfDay.valueOf();
+  const endTime = endOfDay.valueOf();
 
   /** @type {Array<{time: Date, elevation: number}>} */
   const curve = [];
-  for (let minutes = 0; minutes <= MINUTES_IN_DAY; minutes += CURVE_STEP_MINUTES) {
-    const time = startOfDay.add(minutes, 'minute').toDate();
-    const { altitude } = SunCalc.getPosition(time, latitude, longitude);
-    curve.push({ time, elevation: roundTwoDecimals(toDegrees(altitude)) });
+  for (let time = startTime; time < endTime; time += CURVE_STEP_MINUTES * 60 * 1000) {
+    const date = new Date(time);
+    const { altitude } = SunCalc.getPosition(date, latitude, longitude);
+    curve.push({ time: date, elevation: roundTwoDecimals(toDegrees(altitude)) });
   }
+  // Always close the curve on the next local midnight
+  const endDate = new Date(endTime);
+  const { altitude } = SunCalc.getPosition(endDate, latitude, longitude);
+  curve.push({ time: endDate, elevation: roundTwoDecimals(toDegrees(altitude)) });
 
   return {
     dawn: nullIfInvalidDate(times.dawn),
