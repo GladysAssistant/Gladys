@@ -17,6 +17,11 @@ export const getLocalizedText = (value, language) => {
   return firstLanguage ? value[firstLanguage] : '';
 };
 
+// Config-only integration types: no Devices/Discovery screens, the generic
+// page only shows Configuration (plus the admin supervision screens).
+// "communication" = messaging channels (B.15), "tts" = TTS providers (B.20).
+export const isConfigOnlyIntegrationType = type => type === 'communication' || type === 'tts';
+
 // Badge color for each external integration status
 export const EXTERNAL_INTEGRATION_STATUS_BADGES = {
   UNKNOWN: 'badge-secondary',

@@ -37,7 +37,7 @@ function buildContext(overrides = {}) {
   return {
     stt: overrides.stt || fake.resolves({ text: 'allume la lumière' }),
     forwardMessageToAiChat: overrides.forwardMessageToAiChat || fake.resolves({ answer: 'La lumière est allumée.' }),
-    getTTSApiUrl: overrides.getTTSApiUrl || fake.resolves({ url: 'http://tts.test/audio.mp3' }),
+    tts: overrides.tts || { getSpeechUrl: fake.resolves({ url: 'http://tts.test/audio.mp3' }) },
     event: overrides.event === null ? null : overrides.event || { emit: fake() },
     message: overrides.message || {
       getPreviousQuestionsForUser: getPreviousQuestionsForUserStub,
@@ -117,7 +117,8 @@ describe('gateway.processVoiceMessage', () => {
     sinonAssert.calledOnce(messageCreate);
     sinonAssert.callOrder(ctx.message.getPreviousQuestionsForUser, messageCreate);
     sinonAssert.calledOnce(ctx.forwardMessageToAiChat);
-    sinonAssert.calledOnce(ctx.getTTSApiUrl);
+    sinonAssert.calledOnce(ctx.tts.getSpeechUrl);
+    sinonAssert.calledWith(ctx.tts.getSpeechUrl, { text: 'La lumière est allumée.', language: 'fr' });
 
     const emittedTypes = eventEmit.getCalls().map((call) => call.args[0]);
     expect(emittedTypes).to.include(EVENTS.WEBSOCKET.SEND);
@@ -163,7 +164,7 @@ describe('gateway.processVoiceMessage', () => {
       answer: '',
       ttsUrl: null,
     });
-    sinonAssert.notCalled(ctx.getTTSApiUrl);
+    sinonAssert.notCalled(ctx.tts.getSpeechUrl);
 
     const responseEvents = eventEmit
       .getCalls()
@@ -185,7 +186,7 @@ describe('gateway.processVoiceMessage', () => {
 
   it('should handle tts response without url', async () => {
     const ctx = buildContext({
-      getTTSApiUrl: fake.resolves({}),
+      tts: { getSpeechUrl: fake.resolves({}) },
     });
 
     const result = await processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user });
@@ -259,7 +260,7 @@ describe('gateway.processVoiceMessage', () => {
     const eventEmit = fake();
     const ctx = buildContext({
       event: { emit: eventEmit },
-      getTTSApiUrl: fake.rejects(new Error('tts down')),
+      tts: { getSpeechUrl: fake.rejects(new Error('tts down')) },
     });
 
     await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), 'tts down');

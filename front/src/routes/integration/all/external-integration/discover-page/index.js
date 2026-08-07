@@ -6,6 +6,7 @@ import debounce from 'debounce';
 
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import DiscoverTab from './DiscoverTab';
+import { isConfigOnlyIntegrationType } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
@@ -39,18 +40,21 @@ class ExternalIntegrationDiscoverPage extends Component {
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
       if (generation !== this.pageGeneration) {
-        return;
+        // stale response: another page load took over — report "stop
+        // loading" so the caller does not fire a discovery request either
+        return true;
       }
-      // a communication integration has no device screens: direct URL
-      // access lands on the configuration screen instead
-      if (get(integration, 'manifest.type') === 'communication') {
+      // a communication or tts integration has no device screens: direct
+      // URL access lands on the configuration screen instead
+      if (isConfigOnlyIntegrationType(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
-        return;
+        return true;
       }
       this.setState({ integration });
     } catch (e) {
       console.error(e);
     }
+    return false;
   };
 
   getDiscoveredDevices = async () => {
@@ -162,14 +166,19 @@ class ExternalIntegrationDiscoverPage extends Component {
     this.loadIntegrationPage();
   }
 
-  loadIntegrationPage = () => {
+  loadIntegrationPage = async () => {
     // requests and scan still in flight belong to the previous integration:
     // drop their late responses and clear their timer and their state so
     // nothing leaks into the page of the new one
     this.pageGeneration += 1;
     this.clearScanTimer();
     this.setState({ integration: null, discoveredDevices: null, scanStatus: null, scanError: null });
-    this.getIntegration();
+    // resolve the integration type first: a configuration-only integration
+    // redirects, and the discovery request must never fire
+    const redirected = await this.getIntegration();
+    if (redirected) {
+      return;
+    }
     this.getDiscoveredDevices();
   };
 

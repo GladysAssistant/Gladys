@@ -2,6 +2,7 @@ import devices from './devices.json';
 import communications from './communications.json';
 import calendars from './calendars.json';
 import weathers from './weathers.json';
+import ttsProviders from './tts.json';
 
 const integrations = [];
 const integrationsByType = {};
@@ -25,5 +26,8 @@ pushAllWithType(devices, 'device', 'toggle-right');
 pushAllWithType(communications, 'communication', 'message-square');
 pushAllWithType(calendars, 'calendar', 'calendar');
 pushAllWithType(weathers, 'weather', 'cloud');
+// no internal TTS integration: the category is filled by external
+// "tts" integrations from the store (TTS providers)
+pushAllWithType(ttsProviders, 'tts', 'volume-2');
 
 export { integrations, integrationsByType, categories };
