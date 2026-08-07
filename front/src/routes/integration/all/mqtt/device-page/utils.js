@@ -576,6 +576,16 @@ export const getFeatureDefaultValues = (category, type) => {
     );
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) {
+    // THERMOSTAT_MODE: OFF/HEATING/COOLING/AUTO
+    return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: false }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE) {
+    // THERMOSTAT_OPERATING_STATE: IDLE/HEATING/COOLING
+    return applyDefaultUnit({ ...defaults, min: 0, max: 2, read_only: true }, category, type);
+  }
+
   if (type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE) {
     return applyDefaultUnit({ ...defaults, min: 153, max: 500, read_only: false }, category, type);
   }

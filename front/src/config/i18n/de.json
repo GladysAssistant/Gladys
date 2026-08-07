@@ -4278,6 +4278,14 @@
           "position-5": "Position 5 (Unten)"
         }
       },
+      "thermostat": {
+        "mode": {
+          "off": "Aus",
+          "heating": "Heizen",
+          "cooling": "Kühlen",
+          "auto": "Automatisch"
+        }
+      },
       "heater": {
         "pilot-wire-mode": {
           "comfort": "Komfort",
@@ -4530,6 +4538,20 @@
           "4": "Position 3",
           "5": "Position 4",
           "6": "Position 5 (Unten)"
+        }
+      },
+      "thermostat": {
+        "mode": {
+          "0": "Aus",
+          "1": "Heizen",
+          "2": "Kühlen",
+          "3": "Automatisch"
+        },
+        "operating-state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Inaktiv",
+          "1": "Heizt",
+          "2": "Kühlt"
         }
       },
       "siren": {
@@ -5170,7 +5192,9 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Thermostat: Temperatur"
+      "target-temperature": "Thermostat: Temperatur",
+      "mode": "Thermostat: Modus",
+      "operating-state": "Thermostat: Betriebszustand"
     },
     "airquality-sensor": {
       "shortCategoryName": "Luftqualität",
