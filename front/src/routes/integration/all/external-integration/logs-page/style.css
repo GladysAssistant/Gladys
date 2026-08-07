@@ -1,3 +1,16 @@
+/*
+ * `.custom-select` keeps the full-size vertical padding (0.5rem) and line-height (1.5),
+ * while `.form-control-sm` shrinks the select down to the small height. The text no longer
+ * fits in the content box and ends up pushed down and cut off, so realign it with the
+ * small sizing used by the neighbouring `.btn-sm`.
+ */
+select.containerSelect {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 0.5rem;
+  line-height: 1.33333333;
+}
+
 .logs {
   max-height: 65vh;
   overflow: auto;
