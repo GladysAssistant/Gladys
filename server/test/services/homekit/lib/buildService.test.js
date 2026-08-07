@@ -1383,6 +1383,55 @@ describe('Build service', () => {
     });
   });
 
+  it('should send fan speed commands to the writable feature, not the read-only one', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'ventilo-percent').returns({ last_value: 50 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'ventilo-speed').returns({ last_value: 3 });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub().returns({ on, props: { minValue: 0, maxValue: 100 } });
+    const Fanv2 = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { RotationSpeed: 'ROTATIONSPEED', Active: 'ACTIVE' },
+      CharacteristicEventTypes: stub(),
+      Service: { Fanv2 },
+    };
+    // Matter can expose the reached percentage read-only, and the speed setting as the command
+    const features = [
+      {
+        name: 'Pourcentage',
+        selector: 'ventilo-percent',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.PERCENT,
+        read_only: true,
+        min: 0,
+        max: 100,
+      },
+      {
+        name: 'Vitesse',
+        selector: 'ventilo-speed',
+        category: DEVICE_FEATURE_CATEGORIES.FAN,
+        type: DEVICE_FEATURE_TYPES.FAN.SPEED,
+        read_only: false,
+        min: 0,
+        max: 5,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Ventilateur' }, features, mappings[DEVICE_FEATURE_CATEGORIES.FAN]);
+    // reads come from the percentage, which is already on the HomeKit scale
+    await on.args[0][1](cb);
+    expect(cb.args[0][1]).to.equal(50);
+
+    // writes must reach the speed feature, rescaled to its own bounds
+    await on.args[1][1](60, cb);
+    expect(homekitHandler.gladys.event.emit.args[0][1].device_feature).to.equal('ventilo-speed');
+    expect(homekitHandler.gladys.event.emit.args[0][1].value).to.equal(3);
+  });
+
   it('should build shutter/curtain service', async () => {
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'shutter-state').returns({
       id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',

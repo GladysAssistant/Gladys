@@ -309,12 +309,20 @@ function buildService(device, features, categoryMapping, subtype) {
       }
       case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.PERCENT}`:
       case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.SPEED}`: {
-        // A fan can expose both a percentage and a raw speed, HomeKit has a single RotationSpeed:
-        // the percentage wins because it already uses the HomeKit scale.
-        const hasPercentFeature = features.some((f) => f.type === DEVICE_FEATURE_TYPES.FAN.PERCENT);
-        if (feature.type === DEVICE_FEATURE_TYPES.FAN.SPEED && hasPercentFeature) {
+        // A fan can expose both a percentage and a raw speed, HomeKit has a single RotationSpeed.
+        // They are wired once, on whichever comes first, so the handlers are not registered twice.
+        const speedFeatures = features.filter(
+          (f) => f.type === DEVICE_FEATURE_TYPES.FAN.PERCENT || f.type === DEVICE_FEATURE_TYPES.FAN.SPEED,
+        );
+        if (speedFeatures[0] !== feature) {
           break;
         }
+
+        // Reads prefer the percentage, which already uses the HomeKit scale. Writes must go to a
+        // feature that accepts them: an integration can expose a read-only percentage as the
+        // feedback of a writable speed, and commanding the percentage would go nowhere.
+        const readFeature = speedFeatures.find((f) => f.type === DEVICE_FEATURE_TYPES.FAN.PERCENT) || speedFeatures[0];
+        const writeFeature = speedFeatures.find((f) => !f.read_only) || readFeature;
 
         const [rotationSpeedName, activeName] = categoryMapping.capabilities[feature.type].characteristics;
         const rotationSpeedCharacteristic = service.getCharacteristic(Characteristic[rotationSpeedName]);
@@ -323,9 +331,9 @@ function buildService(device, features, categoryMapping, subtype) {
           callback(
             undefined,
             normalize(
-              this.gladys.stateManager.get('deviceFeature', feature.selector).last_value,
-              feature.min,
-              feature.max,
+              this.gladys.stateManager.get('deviceFeature', readFeature.selector).last_value,
+              readFeature.min,
+              readFeature.max,
               rotationSpeedCharacteristic.props.minValue,
               rotationSpeedCharacteristic.props.maxValue,
             ),
@@ -340,12 +348,12 @@ function buildService(device, features, categoryMapping, subtype) {
                 value,
                 rotationSpeedCharacteristic.props.minValue,
                 rotationSpeedCharacteristic.props.maxValue,
-                feature.min,
-                feature.max,
+                writeFeature.min,
+                writeFeature.max,
               ),
             ),
             device: device.selector,
-            device_feature: feature.selector,
+            device_feature: writeFeature.selector,
           };
           this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
           callback();
@@ -353,23 +361,25 @@ function buildService(device, features, categoryMapping, subtype) {
 
         // Fanv2 always requires Active. Without a mode feature, the speed is the only on/off signal.
         if (!features.some((f) => f.type === DEVICE_FEATURE_TYPES.FAN.MODE)) {
-          let lastActiveSpeed = feature.max;
+          let lastActiveSpeed = writeFeature.max;
           const activeCharacteristic = service.getCharacteristic(Characteristic[activeName]);
 
           activeCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-            const speed = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
-            if (speed > feature.min) {
-              lastActiveSpeed = speed;
+            const speed = this.gladys.stateManager.get('deviceFeature', readFeature.selector).last_value;
+            if (speed > readFeature.min) {
+              // The speed to restore is remembered on the feature it will be written back to, since
+              // the read and write features can use different scales.
+              lastActiveSpeed = this.gladys.stateManager.get('deviceFeature', writeFeature.selector).last_value;
             }
-            callback(undefined, speed > feature.min ? 1 : 0);
+            callback(undefined, speed > readFeature.min ? 1 : 0);
           });
           activeCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
             const action = {
               type: ACTIONS.DEVICE.SET_VALUE,
               status: ACTIONS_STATUS.PENDING,
-              value: value ? lastActiveSpeed : feature.min,
+              value: value ? lastActiveSpeed : writeFeature.min,
               device: device.selector,
-              device_feature: feature.selector,
+              device_feature: writeFeature.selector,
             };
             this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
             callback();
