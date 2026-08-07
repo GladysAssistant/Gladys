@@ -98,6 +98,31 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['CONTACTSENSORSTATE', 1]);
   });
 
+  it('should notify siren', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Siren',
+      category: DEVICE_FEATURE_CATEGORIES.SIREN,
+      type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['ON', 1]);
+  });
+
   it('should notify motion sensor', async () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
