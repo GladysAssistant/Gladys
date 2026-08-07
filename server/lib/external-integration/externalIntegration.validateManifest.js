@@ -307,21 +307,14 @@ function rejectContactSchemaPortPlaceholders(value, path, errors) {
  * @param {number} index - Index of the field in the list.
  * @param {Set} seenKeys - Keys already seen, to detect duplicates.
  * @param {Array} errors - The array of errors to push to.
- * @param {string} [basePath] - Path prefix for error messages (the action
- * mini forms reuse the same format under another path).
- * @param {Set} [declaredPortNames] - Port names declared in the manifest,
+ * @param {string} basePath - Path prefix for error messages (the action
+ * mini forms and the contact schema reuse the same format under another path).
+ * @param {Set} declaredPortNames - Port names declared in the manifest,
  * for the {{port:<name>}} placeholder references of section texts.
  * @example
- * validateConfigField({ key: 'latitude', type: 'number', label: { en: 'Latitude' } }, 0, seenKeys, errors);
+ * validateConfigField(field, 0, seenKeys, errors, 'config_schema', declaredPortNames);
  */
-function validateConfigField(
-  field,
-  index,
-  seenKeys,
-  errors,
-  basePath = 'config_schema',
-  declaredPortNames = new Set(),
-) {
+function validateConfigField(field, index, seenKeys, errors, basePath, declaredPortNames) {
   const path = `${basePath}[${index}]`;
   if (field === null || typeof field !== 'object' || Array.isArray(field)) {
     errors.push(`${path}: must be an object`);

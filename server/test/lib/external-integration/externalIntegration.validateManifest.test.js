@@ -632,6 +632,12 @@ describe('externalIntegration.validateManifest', () => {
       },
       'actions[0].fields[0].description.en: {{port:ocpp}} does not reference any declared port name',
     );
+    // a non-string translation is caught by the multi-language check, and
+    // the placeholder scan skips it instead of choking on it
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, description: { en: 'Intro', fr: 42 } }] },
+      'config_schema[0].description.fr: must be a string of 1-1000 characters',
+    );
   });
 
   it('should refuse a {{port}} placeholder in the per-user contact schema, but allow {{gladys_host}}', () => {
