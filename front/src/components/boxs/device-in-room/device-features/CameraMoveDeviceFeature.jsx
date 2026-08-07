@@ -11,15 +11,21 @@ const isActivationKey = e => e.key === 'Enter' || e.key === ' ';
 // Press-and-hold camera movement row: pressing a button (pointer or Space/Enter) sends its
 // CAMERA_MOVE value, releasing sends STOP (0). Integrations bound every move with a watchdog,
 // so a press without a release stays safe (spec docs/specs/camera-ptz-control.md, A.2).
+// Like the dashboard overlay, each press opens a movement session: STOP is only sent once the
+// move request settled, so a quick tap can never get its STOP processed before its MOVE.
 class CameraMoveDeviceFeature extends Component {
-  activeMove = null;
+  moveSession = null;
+
+  sendValue = value =>
+    Promise.resolve(this.props.updateValue(this.props.deviceFeature, value)).catch(e => console.error(e));
 
   pressMove = value => {
-    if (this.activeMove !== null) {
+    if (this.moveSession) {
       return;
     }
-    this.activeMove = value;
-    this.props.updateValue(this.props.deviceFeature, value);
+    const session = { stopQueued: false };
+    session.movePromise = this.sendValue(value);
+    this.moveSession = session;
   };
 
   handleKeyDown = (e, value) => {
@@ -38,17 +44,22 @@ class CameraMoveDeviceFeature extends Component {
     this.releaseMove();
   };
 
-  releaseMove = () => {
-    if (this.activeMove === null) {
+  releaseMove = async () => {
+    const session = this.moveSession;
+    if (!session || session.stopQueued) {
       return;
     }
-    this.activeMove = null;
-    this.props.updateValue(this.props.deviceFeature, CAMERA_MOVE.STOP);
+    session.stopQueued = true;
+    await session.movePromise;
+    await this.sendValue(CAMERA_MOVE.STOP);
+    this.moveSession = null;
   };
 
   stopAll = () => {
-    this.activeMove = null;
-    this.props.updateValue(this.props.deviceFeature, CAMERA_MOVE.STOP);
+    if (this.moveSession) {
+      return this.releaseMove();
+    }
+    return this.sendValue(CAMERA_MOVE.STOP);
   };
 
   componentWillUnmount() {

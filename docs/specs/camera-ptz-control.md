@@ -159,7 +159,7 @@ The scalar command already flows: `external-integration.device.set-value` carrie
 
 `front/src/components/boxs/device-in-room/DeviceRow.jsx` mappings (via `ROW_TYPE_BY_CATEGORY_AND_TYPE`, category-scoped so the new type strings stay collision-proof):
 
-- `camera.move` → new `CameraMoveDeviceFeature`: one compact row of icon buttons (◀ ▶ ▲ ▼ − + and stop) derived from `supported_options`, each press (pointer or keyboard, same semantics as D.1) sending its `CAMERA_MOVE` value then `0` on release. One row per camera instead of up to seven. Both `move` and `preset` join the devices-in-room allowlist (`SUPPORTED_FEATURE_TYPES_BY_CATEGORY` in `SupportedFeatureTypes.jsx`) — a control type absent from it never renders (see `docs/specs/device-feature-categories.md`, rule 8).
+- `camera.move` → new `CameraMoveDeviceFeature`: one compact row of icon buttons (◀ ▶ ▲ ▼ − + and stop) derived from `supported_options`, each press (pointer or keyboard, same semantics as D.1, including the movement session — STOP is only sent once the move request settled) sending its `CAMERA_MOVE` value then `0` on release. One row per camera instead of up to seven. Both `move` and `preset` join the devices-in-room allowlist (`SUPPORTED_FEATURE_TYPES_BY_CATEGORY` in `SupportedFeatureTypes.jsx`) — a control type absent from it never renders (see `docs/specs/device-feature-categories.md`, rule 8).
 - `camera.preset` → new `CameraPresetDeviceFeature`: labeled select fed by `supported_options` (the `AdaptiveOptionControl` pattern — same as AC/fan modes), sending the option value on change. Stateless: no selected value is highlighted (recalling a preset is an action, not a state); the select resets to a placeholder after sending.
 - Position features → existing numeric components (no dedicated UI in v1).
 
@@ -176,7 +176,7 @@ Generic device/feature views (`front/src/components/device/…`) work as-is; `fr
 All locale files under `front/src/config/i18n/` (`en.json`, `fr.json`, `de.json` today) — the repository rule is full key parity across every language file, enforced by CI `compare-translations`:
 
 - `deviceFeatureCategory.camera.{move,preset,pan-position,tilt-position,zoom-position}` — these labels drive the MQTT catalog, device views, and the scene feature picker;
-- canonical `CAMERA_MOVE` value labels (e.g. `deviceFeatureValue.camera.move.{stop,pan-left,pan-right,tilt-up,tilt-down,zoom-in,zoom-out}`) — used for default `supported_options` labels, MQTT checkboxes, and button aria-labels;
+- canonical `CAMERA_MOVE` value labels (`deviceFeatureAction.category.camera.move.{stop,pan-left,pan-right,tilt-up,tilt-down,zoom-in,zoom-out}`) — used for default `supported_options` labels, MQTT checkboxes, and button aria-labels;
 - camera widget overlay strings (preset placeholder, PTZ checkbox label in `EditCamera`);
 - MQTT catalog notice for camera command features (points to the Camera widget).
 
