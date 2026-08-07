@@ -14,6 +14,7 @@ import '../../../../components/boxs/device-in-room/device-features/style.css';
 import style from './DeviceSetValue.css';
 import ShutterButtons from '../../../../components/device/ShutterButtons';
 import SelectPilotWireMode from '../../../../components/device/SelectPilotWireMode';
+import SelectWaterHeaterMode from '../../../../components/device/SelectWaterHeaterMode';
 import SelectFanMode from '../../../../components/device/SelectFanMode';
 import SelectFanFeatureValue from '../../../../components/device/SelectFanFeatureValue';
 
@@ -29,16 +30,24 @@ class DeviceSetValue extends Component {
   toggleType = () => this.setState({ computed: !this.state.computed });
 
   onDeviceFeatureChange = (deviceFeature, device) => {
-    const deviceFeatureChanged = this.props.action.device_feature !== deviceFeature.selector;
-    if (deviceFeature) {
-      this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
-    } else {
+    // SelectDeviceFeature passes null both when the user clears the select and when a saved
+    // selector no longer resolves to a loaded feature; reading .selector before this guard threw
+    // and took the whole scene editor down. Same shape as the trigger side's handler.
+    if (!deviceFeature) {
       this.props.updateActionProperty(this.props.path, 'device_feature', null);
+      this.setState({ deviceFeature: null, device: null });
+      return;
     }
+
+    const deviceFeatureChanged = this.props.action.device_feature !== deviceFeature.selector;
+    this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
+
     if (deviceFeatureChanged) {
       if (
         deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
-        deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE
+        deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
+        (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
+          deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST)
       ) {
         this.props.updateActionProperty(this.props.path, 'value', 0);
         this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
@@ -113,7 +122,9 @@ class DeviceSetValue extends Component {
 
     if (
       this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
-      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE
+      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE ||
+      (this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
+        this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST)
     ) {
       return (
         <label class="custom-switch">
@@ -155,6 +166,19 @@ class DeviceSetValue extends Component {
         <SelectPilotWireMode
           category={this.state.deviceFeature.category}
           type={this.state.deviceFeature.type}
+          updateValue={this.handleNewPureValue}
+          value={this.props.action.value}
+        />
+      );
+    }
+
+    if (
+      this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
+      this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE
+    ) {
+      return (
+        <SelectWaterHeaterMode
+          deviceFeature={this.state.deviceFeature}
           updateValue={this.handleNewPureValue}
           value={this.props.action.value}
         />

@@ -16,6 +16,9 @@ const gladys = {
   system: {
     isDocker: fake.resolves(false),
   },
+  device: {
+    get: fake.resolves([]),
+  },
 };
 
 describe('MqttService', () => {
