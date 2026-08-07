@@ -546,6 +546,11 @@ const EVENTS = {
   MQTT: {
     RECEIVED: 'mqtt.received',
   },
+  WEATHER: {
+    CHECK_ALERTS: 'weather.check-alerts',
+    ALERT_RAISED: 'weather.alert-raised',
+    ALERT_ENDED: 'weather.alert-ended',
+  },
   EXTERNAL_INTEGRATION: {
     STATUS_CHANGED: 'external-integration.status-changed',
     DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
@@ -1748,6 +1753,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     OAUTH_CALLBACK: 'external-integration.oauth.callback',
     ACTION_RUN: 'external-integration.action.run',
     CAMERA_GET_IMAGE: 'external-integration.camera.get-image',
+    WEATHER_GET: 'external-integration.weather.get',
+    WEATHER_GET_IMAGE: 'external-integration.weather.get-image',
+    WEATHER_REFRESH: 'external-integration.weather.refresh',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
     WEBHOOK_REQUEST: 'external-integration.webhook.request',
