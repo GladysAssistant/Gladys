@@ -185,6 +185,18 @@ class Integration extends Component {
 
     const externalCards = [];
 
+    // the manifest declares the channels the integration knows how to use
+    // ("local", "cloud", or both): this is the same information the native
+    // integrations carry in their JSON config, so the catalog can show the
+    // Local/Cloud tags on a community integration too
+    const getTransportTags = manifest => {
+      const transports = manifest.transports || [];
+      return {
+        local: transports.includes('local'),
+        cloud: transports.includes('cloud')
+      };
+    };
+
     // a communication integration has no device screens: its card lands
     // straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
@@ -208,7 +220,8 @@ class Integration extends Component {
         url: getInstalledUrl(integration.selector, manifest),
         img: (storeIntegration && storeIntegration.cover_url) || manifest.cover_image || null,
         status: integration.status,
-        updateAvailable: integration.update_available
+        updateAvailable: integration.update_available,
+        ...getTransportTags(manifest)
       });
     });
 
@@ -236,7 +249,8 @@ class Integration extends Component {
               orderDir: this.state.orderDir
             }),
         img: storeIntegration.cover_url || manifest.cover_image || null,
-        updateAvailable: isInstalled ? storeIntegration.update_available : false
+        updateAvailable: isInstalled ? storeIntegration.update_available : false,
+        ...getTransportTags(manifest)
       });
     });
 
