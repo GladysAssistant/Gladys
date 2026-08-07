@@ -30,12 +30,18 @@ class DeviceSetValue extends Component {
   toggleType = () => this.setState({ computed: !this.state.computed });
 
   onDeviceFeatureChange = (deviceFeature, device) => {
-    const deviceFeatureChanged = this.props.action.device_feature !== deviceFeature.selector;
-    if (deviceFeature) {
-      this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
-    } else {
+    // SelectDeviceFeature passes null both when the user clears the select and when a saved
+    // selector no longer resolves to a loaded feature; reading .selector before this guard threw
+    // and took the whole scene editor down. Same shape as the trigger side's handler.
+    if (!deviceFeature) {
       this.props.updateActionProperty(this.props.path, 'device_feature', null);
+      this.setState({ deviceFeature: null, device: null });
+      return;
     }
+
+    const deviceFeatureChanged = this.props.action.device_feature !== deviceFeature.selector;
+    this.props.updateActionProperty(this.props.path, 'device_feature', deviceFeature.selector);
+
     if (deviceFeatureChanged) {
       if (
         deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ||
