@@ -70,16 +70,24 @@ class PhotoBox extends Component {
       this.preloadNextImage();
     }
 
+    // Only useful when the URL changed at the same index (the user edited the photo URL):
+    // an index change is already handled above, reloading here would fire a second request.
     const prevUrl = getPhotoUrlAtIndex(prevPhotos, prevState.currentIndex);
     const currentUrl = getPhotoUrlAtIndex(photos, this.state.currentIndex);
-    if (prevUrl !== currentUrl) {
+    if (prevState.currentIndex === this.state.currentIndex && prevUrl !== currentUrl) {
       this.loadCurrentPhoto();
     }
   }
 
   componentWillUnmount() {
     clearInterval(this.slideshowInterval);
+    clearTimeout(this.transitionTimeout);
   }
+
+  startTransition = () => {
+    clearTimeout(this.transitionTimeout);
+    this.transitionTimeout = setTimeout(() => this.setState({ isTransitioning: false }), 600);
+  };
 
   getCurrentPhotoUrl = () => {
     const photos = getValidPhotos(get(this.props, 'box.photos', []));
@@ -164,7 +172,8 @@ class PhotoBox extends Component {
       imageError: false,
       isTransitioning: true
     }));
-    setTimeout(() => this.setState({ isTransitioning: false }), 600);
+    this.startTransition();
+    this.startSlideshow();
   };
 
   goToPrevious = () => {
@@ -178,13 +187,13 @@ class PhotoBox extends Component {
       imageError: false,
       isTransitioning: true
     }));
-    setTimeout(() => this.setState({ isTransitioning: false }), 600);
+    this.startTransition();
     this.startSlideshow();
   };
 
   goToIndex = index => {
     this.setState({ currentIndex: index, image: null, imageError: false, isTransitioning: true });
-    setTimeout(() => this.setState({ isTransitioning: false }), 600);
+    this.startTransition();
     this.startSlideshow();
   };
 

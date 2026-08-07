@@ -55,6 +55,33 @@ describe('POST /api/v1/dashboard', () => {
         expect(res.body.boxes[0][0]).to.have.property('type', 'photo');
       });
   });
+
+  it('should create dashboard with a photo box not fully configured yet', async () => {
+    await authenticatedRequest
+      .post('/api/v1/dashboard')
+      .send({
+        name: 'photo draft dashboard',
+        type: 'main',
+        position: 0,
+        visibility: DASHBOARD_VISIBILITY.PRIVATE,
+        boxes: [
+          [
+            {
+              type: 'photo',
+              photos: [{ url: '', caption: '' }],
+              photo_fit: 'cover',
+              photo_slideshow_interval: 10,
+              photo_show_caption: true,
+            },
+          ],
+        ],
+      })
+      .expect('Content-Type', /json/)
+      .expect(201)
+      .then((res) => {
+        expect(res.body.boxes[0][0]).to.have.property('type', 'photo');
+      });
+  });
 });
 
 describe('GET /api/v1/dashboard', () => {

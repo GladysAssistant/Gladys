@@ -182,6 +182,7 @@ function getRoutes(gladys) {
     },
     'get /api/v1/dashboard/photo/proxy': {
       authenticated: true,
+      rateLimit: true,
       controller: dashboardController.getPhotoProxy,
     },
     'get /api/v1/dashboard/:dashboard_selector': {

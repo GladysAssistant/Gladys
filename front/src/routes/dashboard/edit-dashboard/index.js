@@ -208,9 +208,17 @@ class EditDashboard extends Component {
     const { currentDashboard } = this.state;
     // new boxes without empty boxes
     const newBoxes = currentDashboard.boxes.map(column => {
-      return column.filter(box => {
-        return box.type !== undefined;
-      });
+      return column
+        .filter(box => {
+          return box.type !== undefined;
+        })
+        .map(box => {
+          // A photo box can contain rows the user started but never filled in, we don't save them
+          if (box.type === 'photo' && Array.isArray(box.photos)) {
+            return { ...box, photos: box.photos.filter(photo => photo && photo.url) };
+          }
+          return box;
+        });
     });
     const newDashboard = update(currentDashboard, {
       boxes: {
