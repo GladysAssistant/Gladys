@@ -3,6 +3,7 @@ const { fake } = require('sinon');
 const nock = require('nock');
 const proxyquire = require('proxyquire').noCallThru();
 const { BadParameters } = require('../../../utils/coreErrors');
+const { createPinnedLookup, isRestrictedAddress } = require('../../../lib/dashboard/dashboard.getPhoto');
 
 const getDashboard = (resizeImageBufferMock) => {
   const Dashboard = proxyquire('../../../lib/dashboard', {
@@ -92,6 +93,30 @@ describe('dashboard.getPhoto', () => {
     await assert.isRejected(promise, BadParameters);
   });
 
+  it('should reject the unspecified IPv4 address', async () => {
+    const dashboard = getDashboard(fake.resolves('image/jpeg;base64,'));
+    const promise = dashboard.getPhoto('http://0.0.0.0/photo.jpg');
+    await assert.isRejected(promise, BadParameters);
+  });
+
+  it('should reject IPv6 link-local addresses', async () => {
+    const dashboard = getDashboard(fake.resolves('image/jpeg;base64,'));
+    const promise = dashboard.getPhoto('http://[fe80::1]/photo.jpg');
+    await assert.isRejected(promise, BadParameters);
+  });
+
+  it('should reject the unspecified IPv6 address', async () => {
+    const dashboard = getDashboard(fake.resolves('image/jpeg;base64,'));
+    const promise = dashboard.getPhoto('http://[::]/photo.jpg');
+    await assert.isRejected(promise, BadParameters);
+  });
+
+  it('should reject IPv4-mapped IPv6 loopback addresses', async () => {
+    const dashboard = getDashboard(fake.resolves('image/jpeg;base64,'));
+    const promise = dashboard.getPhoto('http://[::ffff:127.0.0.1]/photo.jpg');
+    await assert.isRejected(promise, BadParameters);
+  });
+
   it('should reject a hostname resolving to a loopback address', async () => {
     const dashboard = getDashboard(fake.resolves('image/jpeg;base64,'));
     const promise = dashboard.getPhoto('http://localhost/photo.jpg');
@@ -145,5 +170,101 @@ describe('dashboard.getPhoto', () => {
 
     const promise = dashboard.getPhoto('http://192.168.1.10/photos/invalid.jpg');
     await assert.isRejected(promise, BadParameters);
+  });
+});
+
+describe('dashboard.getPhoto isRestrictedAddress', () => {
+  it('should restrict anything that is not an IP address', () => {
+    expect(isRestrictedAddress('not-an-ip')).to.equal(true);
+  });
+
+  it('should restrict the dotted IPv4-mapped loopback address', () => {
+    expect(isRestrictedAddress('::ffff:127.0.0.1')).to.equal(true);
+  });
+
+  it('should restrict an IPv4-mapped address written with a single group', () => {
+    // ::ffff:1 is ::ffff:0.0.0.1, in the unspecified 0.0.0.0/8 range
+    expect(isRestrictedAddress('::ffff:1')).to.equal(true);
+  });
+
+  it('should allow an IPv4-mapped public address', () => {
+    expect(isRestrictedAddress('::ffff:cb00:710a')).to.equal(false);
+  });
+
+  it('should not treat a regular IPv6 address starting with ::ffff as IPv4-mapped', () => {
+    expect(isRestrictedAddress('::ffff:1:2:3')).to.equal(false);
+  });
+
+  it('should allow public and LAN addresses', () => {
+    expect(isRestrictedAddress('203.0.113.10')).to.equal(false);
+    expect(isRestrictedAddress('192.168.1.10')).to.equal(false);
+    expect(isRestrictedAddress('10.0.0.5')).to.equal(false);
+    expect(isRestrictedAddress('172.16.0.1')).to.equal(false);
+    expect(isRestrictedAddress('2001:db8::1')).to.equal(false);
+  });
+});
+
+describe('dashboard.getPhoto pinned lookup', () => {
+  const validatedAddresses = [
+    { address: '203.0.113.10', family: 4 },
+    { address: '2001:db8::1', family: 6 },
+  ];
+
+  // The socket must connect to the address validated before the request, so a domain that
+  // rebinds to 169.254.169.254 in between never reaches the restricted target.
+  it('should always answer with the validated addresses', (done) => {
+    const lookup = createPinnedLookup(validatedAddresses);
+    lookup('rebinding.example.com', { all: true }, (err, result) => {
+      expect(err).to.equal(null);
+      expect(result).to.deep.equal(validatedAddresses);
+      done();
+    });
+  });
+
+  it('should answer with a single address when all is not requested', (done) => {
+    const lookup = createPinnedLookup(validatedAddresses);
+    lookup('rebinding.example.com', {}, (err, address, family) => {
+      expect(err).to.equal(null);
+      expect(address).to.equal('203.0.113.10');
+      expect(family).to.equal(4);
+      done();
+    });
+  });
+
+  it('should filter the validated addresses on the requested family', (done) => {
+    const lookup = createPinnedLookup(validatedAddresses);
+    lookup('rebinding.example.com', { family: 6, all: true }, (err, result) => {
+      expect(err).to.equal(null);
+      expect(result).to.deep.equal([{ address: '2001:db8::1', family: 6 }]);
+      done();
+    });
+  });
+
+  it('should support the legacy numeric family argument', (done) => {
+    const lookup = createPinnedLookup(validatedAddresses);
+    lookup('rebinding.example.com', 4, (err, address, family) => {
+      expect(err).to.equal(null);
+      expect(address).to.equal('203.0.113.10');
+      expect(family).to.equal(4);
+      done();
+    });
+  });
+
+  it('should fail when no validated address matches the requested family', (done) => {
+    const lookup = createPinnedLookup([{ address: '203.0.113.10', family: 4 }]);
+    lookup('rebinding.example.com', { family: 6 }, (err) => {
+      expect(err).to.be.an.instanceOf(BadParameters);
+      done();
+    });
+  });
+
+  it('should default to the validated addresses when no option is given', (done) => {
+    const lookup = createPinnedLookup(validatedAddresses);
+    lookup('rebinding.example.com', undefined, (err, address, family) => {
+      expect(err).to.equal(null);
+      expect(address).to.equal('203.0.113.10');
+      expect(family).to.equal(4);
+      done();
+    });
   });
 });

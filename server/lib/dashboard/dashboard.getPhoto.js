@@ -1,5 +1,7 @@
 const dns = require('dns');
 const net = require('net');
+const http = require('http');
+const https = require('https');
 const axios = require('axios');
 const { BadParameters } = require('../../utils/coreErrors');
 const { resizeImageBuffer } = require('../../utils/resizeImage');
@@ -21,6 +23,40 @@ const ALLOWED_CONTENT_TYPES = new Set([
 ]);
 
 /**
+ * @description Convert an IPv4-mapped IPv6 address to its dotted IPv4 form.
+ * Both notations are handled: ::ffff:127.0.0.1 and the hexadecimal form ::ffff:7f00:1,
+ * which is what the URL parser produces.
+ * @param {string} address - Lowercased IPv6 address.
+ * @returns {string|null} The IPv4 address, or null when it is not an IPv4-mapped address.
+ * @example
+ * toIpv4Mapped('::ffff:7f00:1');
+ */
+function toIpv4Mapped(address) {
+  const match = /^::ffff:(.+)$/.exec(address);
+
+  if (match === null) {
+    return null;
+  }
+
+  const rest = match[1];
+
+  if (net.isIPv4(rest)) {
+    return rest;
+  }
+
+  const groups = rest.split(':');
+
+  if (groups.length > 2 || groups.some((group) => !/^[0-9a-f]{1,4}$/.test(group))) {
+    return null;
+  }
+
+  const [high, low] = groups.length === 2 ? groups : ['0', groups[0]];
+  // eslint-disable-next-line no-bitwise
+  const bytes = [parseInt(high, 16) >> 8, parseInt(high, 16) & 0xff, parseInt(low, 16) >> 8, parseInt(low, 16) & 0xff];
+  return bytes.join('.');
+}
+
+/**
  * @description Tell if an IP address must never be reached by the photo proxy.
  * Loopback, link-local (including the cloud metadata endpoint 169.254.169.254) and unspecified
  * addresses are blocked. RFC1918 LAN ranges stay allowed on purpose: the whole point of this proxy
@@ -38,11 +74,8 @@ function isRestrictedAddress(ip) {
   }
 
   // Normalize IPv4-mapped IPv6 addresses (::ffff:127.0.0.1) so they go through the IPv4 rules.
-  let address = ip.toLowerCase();
-  const ipv4MappedPrefix = '::ffff:';
-  if (address.startsWith(ipv4MappedPrefix) && net.isIPv4(address.slice(ipv4MappedPrefix.length))) {
-    address = address.slice(ipv4MappedPrefix.length);
-  }
+  const lowerCased = ip.toLowerCase();
+  const address = toIpv4Mapped(lowerCased) || lowerCased;
 
   if (net.isIPv4(address)) {
     const bytes = address.split('.').map(Number);
@@ -57,7 +90,7 @@ function isRestrictedAddress(ip) {
 /**
  * @description Resolve the URL hostname and make sure it does not point to a restricted address.
  * @param {URL} parsedUrl - Photo URL.
- * @returns {Promise<void>} Resolves when the target is allowed.
+ * @returns {Promise<Array|null>} The validated addresses, or null when the host is already an IP literal.
  * @example
  * await assertHostIsAllowed(new URL('http://192.168.1.10/photo.jpg'));
  */
@@ -69,7 +102,8 @@ async function assertHostIsAllowed(parsedUrl) {
     if (isRestrictedAddress(hostname)) {
       throw new BadParameters('Photo URL points to a restricted address');
     }
-    return;
+    // No DNS resolution happens for an IP literal, there is nothing to pin.
+    return null;
   }
 
   let addresses;
@@ -83,6 +117,39 @@ async function assertHostIsAllowed(parsedUrl) {
   if (restricted) {
     throw new BadParameters('Photo URL points to a restricted address');
   }
+
+  return addresses;
+}
+
+/**
+ * @description Build a dns.lookup replacement that always answers with the addresses already
+ * validated by assertHostIsAllowed. Without it the hostname would be resolved a second time when
+ * the socket connects, and an attacker-controlled domain could rebind to a restricted address
+ * in between (DNS rebinding).
+ * @param {Array} addresses - Validated addresses, as returned by dns.promises.lookup with all: true.
+ * @returns {Function} A lookup function compatible with net.connect.
+ * @example
+ * createPinnedLookup([{ address: '203.0.113.10', family: 4 }]);
+ */
+function createPinnedLookup(addresses) {
+  return (hostname, options, callback) => {
+    const lookupOptions = typeof options === 'number' ? { family: options } : options || {};
+    const matching = lookupOptions.family
+      ? addresses.filter(({ family }) => family === lookupOptions.family)
+      : addresses;
+
+    if (matching.length === 0) {
+      callback(new BadParameters('Photo URL points to a restricted address'));
+      return;
+    }
+
+    if (lookupOptions.all) {
+      callback(null, matching);
+      return;
+    }
+
+    callback(null, matching[0].address, matching[0].family);
+  };
 }
 
 /**
@@ -106,7 +173,8 @@ async function getPhoto(url) {
     throw new BadParameters('Photo URL must use HTTP or HTTPS');
   }
 
-  await assertHostIsAllowed(parsedUrl);
+  const validatedAddresses = await assertHostIsAllowed(parsedUrl);
+  const agentOptions = validatedAddresses ? { lookup: createPinnedLookup(validatedAddresses) } : {};
 
   const response = await axios({
     url: parsedUrl.toString(),
@@ -118,6 +186,11 @@ async function getPhoto(url) {
     // Redirects are disabled: a public URL could otherwise 302 to a restricted address
     // after the host check above.
     maxRedirects: 0,
+    // The socket connects to the address we validated, not to a freshly resolved one.
+    httpAgent: new http.Agent(agentOptions),
+    httpsAgent: new https.Agent(agentOptions),
+    // A proxy would resolve the hostname itself and defeat the address validation.
+    proxy: false,
     validateStatus: (status) => status >= 200 && status < 300,
   });
 
@@ -147,4 +220,6 @@ async function getPhoto(url) {
 
 module.exports = {
   getPhoto,
+  createPinnedLookup,
+  isRestrictedAddress,
 };
