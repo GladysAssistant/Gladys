@@ -334,6 +334,7 @@
         "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
         "editProviderLabel": "Weather provider:",
         "providerAuto": "Automatic (first available provider)",
+        "providerInternalOpenWeather": "Internal OpenWeather (deprecated)",
         "editModeLabel": "Select display mode:",
         "displayModes": {
           "advancedWeather": "Humidity and wind speed",

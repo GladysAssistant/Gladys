@@ -334,6 +334,7 @@
         "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
         "editProviderLabel": "Fournisseur météo :",
         "providerAuto": "Automatique (premier fournisseur disponible)",
+        "providerInternalOpenWeather": "OpenWeather interne (déprécié)",
         "editModeLabel": "Mode d'affichage :",
         "displayModes": {
           "advancedWeather": "Humidité et vitesse du vent",

@@ -34,7 +34,11 @@ const EditWeatherBox = ({ children, ...props }) => (
         {props.providers &&
           props.providers.map(provider => (
             <option selected={provider.service_name === props.box.provider} value={provider.service_name}>
-              {provider.service_name === 'openweather' ? 'OpenWeather' : provider.label || provider.service_name}
+              {provider.service_name === 'openweather' ? (
+                <Text id="dashboard.boxes.weather.providerInternalOpenWeather" />
+              ) : (
+                provider.label || provider.service_name
+              )}
             </option>
           ))}
       </select>
