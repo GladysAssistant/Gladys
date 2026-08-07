@@ -2,10 +2,52 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { addSelector } = require('../../../../utils/addSelector');
 const { DEVICE_PARAM_NAME } = require('../utils/tuya.constants');
 const { normalizeBoolean } = require('../utils/tuya.normalize');
+const { resolveCloudReadStrategy } = require('../utils/tuya.cloudStrategy');
 const { mergeTuyaReport } = require('../utils/tuya.report');
 const { convertFeature } = require('./tuya.convertFeature');
-const { getDeviceType, getIgnoredCloudCodes, getIgnoredLocalDps } = require('../mappings');
+const { getDeviceType, getIgnoredCloudCodes, getIgnoredLocalDps, DEVICE_TYPES } = require('../mappings');
 const logger = require('../../../../utils/logger');
+
+const parseFeatureValues = (values) => {
+  if (!values || typeof values !== 'object') {
+    if (typeof values === 'string') {
+      try {
+        const parsed = JSON.parse(values);
+        return parsed && typeof parsed === 'object' ? parsed : null;
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+  return values;
+};
+
+const mergeFeatureValues = (currentValues, nextValues) => {
+  const currentParsed = parseFeatureValues(currentValues);
+  const nextParsed = parseFeatureValues(nextValues);
+
+  if (currentParsed && nextParsed) {
+    // Keep existing keys first, enrich missing metadata from the new source.
+    return {
+      ...nextParsed,
+      ...currentParsed,
+    };
+  }
+  if (currentParsed) {
+    return currentParsed;
+  }
+  if (nextParsed) {
+    return nextParsed;
+  }
+  if (currentValues !== undefined && currentValues !== null) {
+    return currentValues;
+  }
+  if (nextValues !== undefined && nextValues !== null) {
+    return nextValues;
+  }
+  return {};
+};
 
 /**
  * @description Transform Tuya device to Gladys device.
@@ -30,6 +72,7 @@ function convertDevice(tuyaDevice) {
     properties,
     thing_model: thingModel,
     specifications = {},
+    status: deviceStatus,
     category,
     tuya_report: tuyaReport,
   } = tuyaDevice;
@@ -37,6 +80,20 @@ function convertDevice(tuyaDevice) {
   const { functions = [], status = [] } = specifications;
   const online = tuyaDevice.online !== undefined ? tuyaDevice.online : tuyaDevice.is_online;
   const normalizedLocalOverride = normalizeBoolean(localOverride);
+
+  logger.debug(`Tuya convert device "${name}, ${productName || model}"`);
+  const deviceType = getDeviceType({
+    specifications,
+    status: deviceStatus,
+    model,
+    product_name: productName,
+    product_id: productId,
+    name,
+    category: specifications.category || category,
+    properties,
+    thing_model: thingModel,
+  });
+  const cloudReadStrategy = resolveCloudReadStrategy(tuyaDevice, deviceType);
 
   const params = [];
   if (id) {
@@ -63,6 +120,9 @@ function convertDevice(tuyaDevice) {
   if (productKey) {
     params.push({ name: DEVICE_PARAM_NAME.PRODUCT_KEY, value: productKey });
   }
+  if (cloudReadStrategy) {
+    params.push({ name: DEVICE_PARAM_NAME.CLOUD_READ_STRATEGY, value: cloudReadStrategy });
+  }
   const safeDeviceLog = {
     id,
     name,
@@ -75,43 +135,67 @@ function convertDevice(tuyaDevice) {
   logger.debug('Tuya convert device specifications');
   logger.debug(JSON.stringify(safeDeviceLog));
 
-  logger.debug(`Tuya convert device "${name}, ${productName || model}"`);
-  const deviceType = getDeviceType({
-    specifications,
-    model,
-    product_name: productName,
-    product_id: productId,
-    name,
-    category: specifications.category || category,
-    properties,
-    thing_model: thingModel,
-  });
-
-  // Groups cloud specification entries first, then thing model properties, then current property shadow codes.
+  // Build features from specifications first, enrich metadata from thing model, then fallback to status/properties.
   const groups = {};
   status.forEach((stat) => {
-    const { code } = stat;
-    groups[code] = { ...stat, readOnly: true };
+    const { code } = stat || {};
+    if (!code) {
+      return;
+    }
+    const existingGroup = groups[code] || {};
+    groups[code] = {
+      ...existingGroup,
+      ...stat,
+      values: mergeFeatureValues(existingGroup.values, stat && stat.values),
+      readOnly: true,
+    };
   });
   functions.forEach((func) => {
-    const { code } = func;
-    groups[code] = { ...func, readOnly: false };
+    const { code } = func || {};
+    if (!code) {
+      return;
+    }
+    const existingGroup = groups[code] || {};
+    groups[code] = {
+      ...existingGroup,
+      ...func,
+      values: mergeFeatureValues(existingGroup.values, func && func.values),
+      readOnly: false,
+    };
   });
   const services = Array.isArray(thingModel && thingModel.services) ? thingModel.services : [];
   services.forEach((service) => {
     const thingProperties = Array.isArray(service && service.properties) ? service.properties : [];
     thingProperties.forEach((property) => {
       const { code } = property || {};
-      if (!code || groups[code]) {
+      if (!code) {
         return;
       }
+      const existingGroup = groups[code] || {};
       groups[code] = {
+        ...existingGroup,
         code,
-        name: property.name,
-        values: property.typeSpec || {},
-        readOnly: property.accessMode !== 'rw',
+        name: existingGroup.name || property.name,
+        values: mergeFeatureValues(existingGroup.values, property.typeSpec || {}),
+        readOnly:
+          existingGroup.readOnly !== undefined && existingGroup.readOnly !== null
+            ? existingGroup.readOnly
+            : property.accessMode !== 'rw',
       };
     });
+  });
+  const topLevelStatus = Array.isArray(deviceStatus) ? deviceStatus : [];
+  topLevelStatus.forEach((entry) => {
+    const { code } = entry || {};
+    if (!code || groups[code]) {
+      return;
+    }
+    groups[code] = {
+      code,
+      name: code,
+      values: {},
+      readOnly: true,
+    };
   });
   const currentProperties = Array.isArray(properties && properties.properties) ? properties.properties : [];
   currentProperties.forEach((property) => {
@@ -135,10 +219,21 @@ function convertDevice(tuyaDevice) {
       ignoredCloudCodes,
     }),
   );
+  const filteredFeatures = features.filter((feature) => feature);
+  if (filteredFeatures.length === 0 && deviceType !== DEVICE_TYPES.UNKNOWN) {
+    logger.debug(
+      `[Tuya][convertDevice] inferred type=${deviceType} but no supported feature found (device=${id ||
+        'unknown'} product_id=${productId || 'unknown'} spec_functions=${functions.length} spec_status=${
+        status.length
+      } list_status=${topLevelStatus.length} shadow_properties=${currentProperties.length} thing_services=${
+        services.length
+      })`,
+    );
+  }
 
   const device = {
     name,
-    features: features.filter((feature) => feature),
+    features: filteredFeatures,
     device_type: deviceType,
     external_id: externalId,
     selector: externalId,

@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const fse = require('fs-extra');
 const assertChai = require('chai').assert;
 const { fake, assert } = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const RtspCameraService = require('../../../services/rtsp-camera');
 
@@ -205,8 +206,87 @@ describe('RtspCameraManager commands', () => {
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    rtspCameraManagerBroken.getImage = fake.rejects('NOT_WORKING');
+    rtspCameraManagerBroken.getImage = fake.rejects(new Error('ffmpeg failed (code=1): Connection refused'));
     await rtspCameraManagerBroken.poll(device);
+  });
+  it('should return a concise ffmpeg error on getImage failure', async () => {
+    const childProcessWithStderr = {
+      execFile: (prog, args, options, cb) => {
+        const error = Object.assign(new Error('Command failed: ffmpeg -i broken'), {
+          signal: 'SIGABRT',
+          code: null,
+        });
+        cb(
+          error,
+          '',
+          `dyld[1]: Library not loaded: /opt/homebrew/opt/x265/lib/libx265.215.dylib
+  Referenced from: /opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg
+  Reason: tried: '/opt/homebrew/opt/x265/lib/libx265.215.dylib' (no such file)`,
+        );
+      },
+    };
+    const manager = new RtspCameraManager(gladys, childProcessWithStderr, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+    try {
+      await manager.getImage(brokenDevice);
+      assertChai.fail('should have thrown');
+    } catch (e) {
+      expect(e.message).to.equal(
+        'ffmpeg failed (signal=SIGABRT): dyld[1]: Library not loaded: /opt/homebrew/opt/x265/lib/libx265.215.dylib — Referenced from: /opt/homebrew/Cellar/ffmpeg/8.1/bin/ffmpeg',
+      );
+      expect(e.message).to.not.include('tried:');
+      expect(e.message).to.not.include('Command failed');
+    }
+  });
+  it('should log ffmpeg stderr using device id when selector is missing', async () => {
+    const deviceWithoutSelector = {
+      id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+      params: [
+        {
+          name: 'CAMERA_URL',
+          value: 'broken',
+        },
+      ],
+    };
+    const childProcessWithStderr = {
+      execFile: (prog, args, options, cb) => {
+        cb(new Error('Command failed'), '', 'Connection timed out');
+      },
+    };
+    const manager = new RtspCameraManager(gladys, childProcessWithStderr, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+    const promise = manager.getImage(deviceWithoutSelector);
+    return assertChai.isRejected(promise, 'ffmpeg failed: Connection timed out');
+  });
+  it('should log a concise warn when poll fails', async () => {
+    const warn = fake();
+    const { poll } = proxyquire('../../../services/rtsp-camera/lib/poll', {
+      '../../../utils/logger': {
+        warn,
+        debug: fake(),
+      },
+    });
+    const handler = {
+      getImage: fake.rejects(new Error('ffmpeg failed (signal=SIGABRT): Library not loaded')),
+      gladys,
+    };
+    await poll.call(handler, device);
+    assert.calledOnce(warn);
+    assert.calledWith(warn, 'Unable to poll camera "my-camera": ffmpeg failed (signal=SIGABRT): Library not loaded');
+  });
+  it('should log non-Error rejection reasons when poll fails', async () => {
+    const warn = fake();
+    const { poll } = proxyquire('../../../services/rtsp-camera/lib/poll', {
+      '../../../utils/logger': {
+        warn,
+        debug: fake(),
+      },
+    });
+    const handler = {
+      getImage: fake.rejects('NOT_WORKING'),
+      gladys,
+    };
+    await poll.call(handler, device);
+    assert.calledOnce(warn);
+    assert.calledWith(warn, 'Unable to poll camera "my-camera": NOT_WORKING');
   });
   it('should stop service', async () => {
     const rtspCameraService = RtspCameraService(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');

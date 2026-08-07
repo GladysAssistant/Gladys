@@ -1062,5 +1062,43 @@ module.exports = {
         max: 100,
       },
     },
+    // SONOFF SWV water valve
+    // https://www.zigbee2mqtt.io/devices/SWV.html
+    flow: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.WATER_VALVE,
+        type: DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW,
+        unit: DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
+        min: 0,
+        max: 100,
+      },
+    },
+    real_time_irrigation_duration: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.WATER_VALVE,
+        type: DEVICE_FEATURE_TYPES.WATER_VALVE.REAL_TIME_IRRIGATION_DURATION,
+        unit: DEVICE_FEATURE_UNITS.SECONDS,
+        min: 0,
+        max: 86400,
+      },
+    },
+    real_time_irrigation_volume: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.WATER_VALVE,
+        type: DEVICE_FEATURE_TYPES.WATER_VALVE.REAL_TIME_IRRIGATION_VOLUME,
+        unit: DEVICE_FEATURE_UNITS.LITER,
+        min: 0,
+        max: 1000000,
+      },
+    },
+    daily_irrigation_volume: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.WATER_VALVE,
+        type: DEVICE_FEATURE_TYPES.WATER_VALVE.DAILY_IRRIGATION_VOLUME,
+        unit: DEVICE_FEATURE_UNITS.LITER,
+        min: 0,
+        max: 1000000,
+      },
+    },
   },
 };

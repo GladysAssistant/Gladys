@@ -1,8 +1,74 @@
+import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import { JOB_STATUS, JOB_ERROR_TYPES } from '../../../../../server/utils/constants';
 import RelativeTime from '../../../components/device/RelativeTime';
+import JobData from './JobData';
 import style from './style.css';
+
+// Format a duration with an adaptive unit: "247 ms", "12 s", "3 min 05 s", "2 h 04 min"
+const formatJobDuration = durationMs => {
+  if (!Number.isFinite(durationMs) || durationMs < 0) {
+    return null;
+  }
+  if (durationMs < 1000) {
+    return `${Math.round(durationMs)} ms`;
+  }
+  const totalSeconds = Math.round(durationMs / 1000);
+  if (totalSeconds < 60) {
+    return `${totalSeconds} s`;
+  }
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const restSeconds = totalSeconds % 60;
+  if (totalMinutes < 60) {
+    return `${totalMinutes} min ${String(restSeconds).padStart(2, '0')} s`;
+  }
+  const hours = Math.floor(totalMinutes / 60);
+  const restMinutes = totalMinutes % 60;
+  return `${hours} h ${String(restMinutes).padStart(2, '0')} min`;
+};
+
+// Displays the duration of a job: final duration for a finished job, live elapsed
+// time (ticking every second, only after the first second) for a running one.
+class JobDuration extends Component {
+  startTickingIfNeeded = () => {
+    if (this.props.inProgress && !this.interval) {
+      this.interval = setInterval(() => this.forceUpdate(), 1000);
+    }
+    if (!this.props.inProgress && this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  };
+
+  componentDidMount() {
+    this.startTickingIfNeeded();
+  }
+
+  componentDidUpdate() {
+    this.startTickingIfNeeded();
+  }
+
+  componentWillUnmount() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  }
+
+  render({ start, end, inProgress }) {
+    const durationMs = (inProgress ? Date.now() : new Date(end).getTime()) - new Date(start).getTime();
+    const formatted = formatJobDuration(durationMs);
+    if (!formatted || (inProgress && durationMs < 1000)) {
+      return null;
+    }
+    return (
+      <div class="text-muted small">
+        <Text id="jobsSettings.jobData.duration" fields={{ duration: formatted }} />
+      </div>
+    );
+  }
+}
 
 const JobList = ({ children, ...props }) => (
   <div class="card">
@@ -40,6 +106,12 @@ const JobList = ({ children, ...props }) => (
                       <RelativeTime datetime={job.created_at} language={props.user.language} futureDisabled />
                     </small>
                   </div>
+                  <JobData job={job} user={props.user} />
+                  <JobDuration
+                    start={job.created_at}
+                    end={job.updated_at}
+                    inProgress={job.status === JOB_STATUS.IN_PROGRESS}
+                  />
                   {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
                     <div class={style.errorDiv}>
                       <pre class={style.errorDirectDiv}>

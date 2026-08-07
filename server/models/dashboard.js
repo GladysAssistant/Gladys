@@ -13,6 +13,8 @@ const boxesSchema = Joi.array().items(
       camera: Joi.string(),
       name: Joi.string().allow(''),
       modes: Joi.object(),
+      // weather box: provider pinned in the widget configuration, '' = automatic
+      provider: Joi.string().allow(''),
       device: Joi.string(),
       device_features: Joi.array().items(Joi.string()),
       device_feature_names: Joi.array().items(Joi.string()),

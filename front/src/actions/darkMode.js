@@ -1,15 +1,17 @@
+import {
+  applyDarkModeToDom,
+  DARK_MODE_PREFERENCE_DARK,
+  DARK_MODE_PREFERENCE_LIGHT,
+  DARK_MODE_PREFERENCE_SYSTEM,
+  getDarkModePreference,
+  setDarkModePreference,
+  systemPrefersDarkMode
+} from '../utils/darkModePreference';
+
 function createActionsDarkMode(store) {
   const actions = {
     initDarkMode(state) {
-      const { darkMode } = state;
-      // Apply or remove dark mode class from DOM
-      if (darkMode) {
-        document.documentElement.classList.add('dark-mode');
-        document.body.classList.add('dark-mode');
-      } else {
-        document.documentElement.classList.remove('dark-mode');
-        document.body.classList.remove('dark-mode');
-      }
+      applyDarkModeToDom(state.darkMode);
     },
     /**
      * Toggle dark mode
@@ -18,17 +20,8 @@ function createActionsDarkMode(store) {
       const currentDarkMode = store.getState().darkMode;
       const newDarkMode = !currentDarkMode;
 
-      // Save to localStorage
-      localStorage.setItem('dark-mode', newDarkMode);
-
-      // Apply or remove dark mode class from DOM
-      if (newDarkMode) {
-        document.documentElement.classList.add('dark-mode');
-        document.body.classList.add('dark-mode');
-      } else {
-        document.documentElement.classList.remove('dark-mode');
-        document.body.classList.remove('dark-mode');
-      }
+      setDarkModePreference(newDarkMode ? DARK_MODE_PREFERENCE_DARK : DARK_MODE_PREFERENCE_LIGHT);
+      applyDarkModeToDom(newDarkMode);
 
       return { darkMode: newDarkMode };
     },
@@ -37,40 +30,25 @@ function createActionsDarkMode(store) {
      * Set dark mode to a specific value
      */
     setDarkMode(state, darkMode) {
-      // Save to localStorage
-      localStorage.setItem('dark-mode', darkMode);
-
-      // Apply or remove dark mode class from DOM
-      if (darkMode) {
-        document.documentElement.classList.add('dark-mode');
-        document.body.classList.add('dark-mode');
-      } else {
-        document.documentElement.classList.remove('dark-mode');
-        document.body.classList.remove('dark-mode');
-      }
+      setDarkModePreference(darkMode ? DARK_MODE_PREFERENCE_DARK : DARK_MODE_PREFERENCE_LIGHT);
+      applyDarkModeToDom(darkMode);
 
       return { darkMode };
     },
 
     /**
-     * Update dark mode based on system preference
+     * Update dark mode based on system preference.
+     * Only applies when the user has not set an explicit preference.
      */
     updateDarkModeFromSystem() {
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-      // Save to localStorage
-      localStorage.setItem('dark-mode', systemPrefersDark);
-
-      // Apply or remove dark mode class from DOM
-      if (systemPrefersDark) {
-        document.documentElement.classList.add('dark-mode');
-        document.body.classList.add('dark-mode');
-      } else {
-        document.documentElement.classList.remove('dark-mode');
-        document.body.classList.remove('dark-mode');
+      if (getDarkModePreference() !== DARK_MODE_PREFERENCE_SYSTEM) {
+        return null;
       }
 
-      return { darkMode: systemPrefersDark };
+      const darkMode = systemPrefersDarkMode();
+      applyDarkModeToDom(darkMode);
+
+      return { darkMode };
     }
   };
 

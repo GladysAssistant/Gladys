@@ -3,6 +3,7 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceForm from './DeviceForm';
+import MigrateDeviceButton from '../../../../../components/device/migrate/MigrateDeviceButton';
 import get from 'get-value';
 
 class PhilipsHueDeviceBox extends Component {
@@ -57,6 +58,7 @@ class PhilipsHueDeviceBox extends Component {
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
                     <Text id="integration.mqtt.device.saveButton" />
                   </button>
+                  <MigrateDeviceButton device={props.device} onMigrated={props.getPhilipsHueDevices} />
                   <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                     <Text id="integration.mqtt.device.deleteButton" />
                   </button>

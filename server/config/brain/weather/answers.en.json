@@ -31,6 +31,30 @@
     "label": "weather.get.success.now.unknown",
     "answers": ["Temperature outside is {{ temperature }} {{ units }}."]
   },
+  {
+    "label": "weather.get.success.now.drizzle",
+    "answers": ["Light drizzle outside and the temperature is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.thunderstorm",
+    "answers": ["There is a thunderstorm outside and the temperature is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.night",
+    "answers": ["The sky is clear tonight and the temperature is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.partly-cloudy",
+    "answers": ["It's partly cloudy outside and the temperature is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.pouring",
+    "answers": ["It's pouring outside and the temperature is {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.hail",
+    "answers": ["It's hailing outside and the temperature is {{ temperature }} {{ units }}."]
+  },
 
   {
     "label": "weather.get.success.today.snow",
@@ -77,6 +101,42 @@
   {
     "label": "weather.get.success.today.unknown",
     "answers": ["Today, the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."]
+  },
+  {
+    "label": "weather.get.success.today.drizzle",
+    "answers": [
+      "Today, there is light drizzle and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.thunderstorm",
+    "answers": [
+      "Today, thunderstorms are expected and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.night",
+    "answers": [
+      "Today, the night will be clear and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.partly-cloudy",
+    "answers": [
+      "Today, the sky is partly cloudy and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.pouring",
+    "answers": [
+      "Today, heavy rain is expected and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.hail",
+    "answers": [
+      "Today, hail is expected and the temperature is between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
   },
 
   {
@@ -125,6 +185,42 @@
     "label": "weather.get.success.tomorrow.unknown",
     "answers": [
       "Tomorrow the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.drizzle",
+    "answers": [
+      "Tomorrow there will be light drizzle and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.thunderstorm",
+    "answers": [
+      "Tomorrow thunderstorms are expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.night",
+    "answers": [
+      "Tomorrow the night will be clear and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.partly-cloudy",
+    "answers": [
+      "Tomorrow the sky will be partly cloudy and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.pouring",
+    "answers": [
+      "Tomorrow heavy rain is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.hail",
+    "answers": [
+      "Tomorrow hail is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
     ]
   },
 
@@ -176,6 +272,42 @@
       "The day after tomorrow the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
     ]
   },
+  {
+    "label": "weather.get.success.after-tomorrow.drizzle",
+    "answers": [
+      "The day after tomorrow there will be light drizzle and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.thunderstorm",
+    "answers": [
+      "The day after tomorrow thunderstorms are expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.night",
+    "answers": [
+      "The day after tomorrow the night will be clear and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.partly-cloudy",
+    "answers": [
+      "The day after tomorrow the sky will be partly cloudy and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.pouring",
+    "answers": [
+      "The day after tomorrow heavy rain is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.hail",
+    "answers": [
+      "The day after tomorrow hail is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
 
   {
     "label": "weather.get.success.day.snow",
@@ -223,6 +355,42 @@
     "label": "weather.get.success.day.unknown",
     "answers": [
       "{{ day }} the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.drizzle",
+    "answers": [
+      "{{ day }}, there will be light drizzle and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.thunderstorm",
+    "answers": [
+      "{{ day }}, thunderstorms are expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.night",
+    "answers": [
+      "{{ day }}, the night will be clear and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.partly-cloudy",
+    "answers": [
+      "{{ day }}, the sky will be partly cloudy and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.pouring",
+    "answers": [
+      "{{ day }}, heavy rain is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.hail",
+    "answers": [
+      "{{ day }}, hail is expected and the temperature will be between {{temperature_min}} {{units}} and {{temperature_max}} {{units}}."
     ]
   },
 

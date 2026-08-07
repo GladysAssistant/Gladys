@@ -1,9 +1,10 @@
 const { fake, assert, stub } = require('sinon');
 const { expect } = require('chai');
 const Enedis = require('../../../services/enedis/lib');
+const logger = require('../../../utils/logger');
 
-const getDailyConsumptionArray = (size) => {
-  const date = new Date('2022-08-01');
+const getDailyConsumptionArray = (size, startAt = '2022-08-01') => {
+  const date = new Date(startAt);
   const arr = [];
   for (let i = 0; i < size; i += 1) {
     date.setDate(date.getDate() + 1);
@@ -34,9 +35,7 @@ describe('enedis.sync.dailySync', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetDailyConsumption: fake.resolves(getDailyConsumptionArray(4)),
@@ -50,13 +49,13 @@ describe('enedis.sync.dailySync', () => {
     enedisService.syncDelayBetweenCallsInMs = 0;
     enedisService.enedisSyncBatchSize = 100;
     await enedisService.sync();
-    assert.callCount(gladys.event.emit, 4);
+    assert.callCount(gladys.device.saveHistoricalState, 4);
     assert.calledOnce(gladys.device.setParam);
   });
   it('should sync with 2 pages', async () => {
     const dailyConsumptionStub = stub();
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -73,9 +72,7 @@ describe('enedis.sync.dailySync', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
@@ -89,13 +86,13 @@ describe('enedis.sync.dailySync', () => {
     enedisService.syncDelayBetweenCallsInMs = 0;
     enedisService.enedisSyncBatchSize = 100;
     await enedisService.sync();
-    assert.callCount(gladys.event.emit, 110);
+    assert.callCount(gladys.device.saveHistoricalState, 110);
     assert.calledOnce(gladys.device.setParam);
   });
   it('should not do anything, feature not found', async () => {
     const dailyConsumptionStub = stub();
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -107,9 +104,7 @@ describe('enedis.sync.dailySync', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
@@ -133,7 +128,7 @@ describe('enedis.sync.dailySync', () => {
   it('should sync from one week ago', async () => {
     const dailyConsumptionStub = stub();
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -156,9 +151,7 @@ describe('enedis.sync.dailySync', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
@@ -177,7 +170,8 @@ describe('enedis.sync.dailySync', () => {
         dailyConsumptionSync: {
           syncFromDate: '2022-05-13',
           lastDateSynced: '2022-05-20',
-          lastDateSync: '2022-08-11',
+          firstDateSync: '2022-08-02',
+          lastDateSync: '2022-11-19',
           usagePointExternalId: 'enedis:16401220101758',
         },
         consumptionLoadCurveSync: null,
@@ -187,7 +181,7 @@ describe('enedis.sync.dailySync', () => {
   it('should sync from start', async () => {
     const dailyConsumptionStub = stub();
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -210,9 +204,7 @@ describe('enedis.sync.dailySync', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
@@ -231,12 +223,165 @@ describe('enedis.sync.dailySync', () => {
         dailyConsumptionSync: {
           syncFromDate: undefined,
           lastDateSynced: '2022-05-20',
-          lastDateSync: '2022-08-11',
+          firstDateSync: '2022-08-02',
+          lastDateSync: '2022-11-19',
           usagePointExternalId: 'enedis:16401220101758',
         },
         consumptionLoadCurveSync: null,
       },
     ]);
+  });
+  it('should await state persistence before recalculating cost from earliest synced date', async () => {
+    const dailyConsumptionStub = stub();
+    dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10, '2022-11-09'));
+    let persistedStateCount = 0;
+    const saveHistoricalState = fake(async () => {
+      await Promise.resolve();
+      persistedStateCount += 1;
+    });
+    const calculateCostFromDate = fake(async () => {
+      expect(persistedStateCount).to.equal(110);
+    });
+    const gladys = {
+      device: {
+        get: fake.resolves([
+          {
+            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
+            external_id: 'enedis:16401220101758',
+            features: [
+              {
+                external_id: 'enedis:16401220101758',
+                category: 'energy-sensor',
+                type: 'daily-consumption',
+              },
+            ],
+          },
+        ]),
+        setParam: fake.resolves(null),
+        saveHistoricalState,
+      },
+      gateway: {
+        enedisGetDailyConsumption: dailyConsumptionStub,
+      },
+      service: {
+        getService: fake.returns({
+          device: {
+            calculateCostFromDate,
+          },
+        }),
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
+    };
+    const enedisService = new Enedis(gladys);
+    enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
+    await enedisService.sync();
+
+    assert.calledOnce(calculateCostFromDate);
+    assert.calledWithExactly(calculateCostFromDate, '2022-08-02');
+  });
+  it('should not recalculate cost when enedis daily sync returns no new data', async () => {
+    const calculateCostFromDate = fake.resolves(null);
+    const gladys = {
+      device: {
+        get: fake.resolves([
+          {
+            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
+            external_id: 'enedis:16401220101758',
+            features: [
+              {
+                external_id: 'enedis:16401220101758',
+                category: 'energy-sensor',
+                type: 'daily-consumption',
+              },
+            ],
+            params: [
+              {
+                name: 'LAST_DATE_SYNCED',
+                value: '2022-05-20',
+              },
+            ],
+          },
+        ]),
+        setParam: fake.resolves(null),
+        saveHistoricalState: fake.resolves(null),
+      },
+      gateway: {
+        enedisGetDailyConsumption: fake.resolves([]),
+      },
+      service: {
+        getService: fake.returns({
+          device: {
+            calculateCostFromDate,
+          },
+        }),
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
+    };
+    const enedisService = new Enedis(gladys);
+    enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
+
+    await enedisService.sync();
+
+    assert.notCalled(calculateCostFromDate);
+  });
+  it('should warn and skip recalculation when energy monitoring is unavailable', async () => {
+    const calculateCostFromDate = fake.resolves(null);
+    const warnStub = stub(logger, 'warn');
+    const gladys = {
+      device: {
+        get: fake.resolves([
+          {
+            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
+            external_id: 'enedis:16401220101758',
+            features: [
+              {
+                external_id: 'enedis:16401220101758',
+                category: 'energy-sensor',
+                type: 'daily-consumption',
+              },
+            ],
+          },
+        ]),
+        setParam: fake.resolves(null),
+        saveHistoricalState: fake.resolves(null),
+      },
+      gateway: {
+        enedisGetDailyConsumption: fake.resolves(getDailyConsumptionArray(1)),
+      },
+      service: {
+        getService: fake.returns({
+          calculateCostFromDate,
+        }),
+      },
+      job: {
+        wrapper: (type, func) => func,
+        updateProgress: fake.resolves(null),
+      },
+    };
+    const enedisService = new Enedis(gladys);
+    enedisService.syncDelayBetweenCallsInMs = 0;
+    enedisService.enedisSyncBatchSize = 100;
+
+    try {
+      await enedisService.sync();
+
+      assert.calledOnceWithExactly(
+        warnStub,
+        'Enedis: energy-monitoring service unavailable, skipping cost recalculation after sync',
+      );
+      assert.notCalled(calculateCostFromDate);
+    } finally {
+      warnStub.restore();
+    }
   });
   it('should sync with 1 page = 100', async () => {
     const dailyConsumptionStub = stub();
@@ -258,9 +403,7 @@ describe('enedis.sync.dailySync', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
@@ -274,14 +417,14 @@ describe('enedis.sync.dailySync', () => {
     enedisService.syncDelayBetweenCallsInMs = 0;
     enedisService.enedisSyncBatchSize = 100;
     await enedisService.sync();
-    assert.callCount(gladys.event.emit, 100);
+    assert.callCount(gladys.device.saveHistoricalState, 100);
     assert.calledOnce(gladys.device.setParam);
   });
   it('should sync with jobId and update progress after each batch', async () => {
     const dailyConsumptionStub = stub();
     // Simulate 2 batches for daily consumption
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
-    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(4));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(4, '2022-11-09'));
     const gladys = {
       device: {
         get: fake.resolves([
@@ -298,9 +441,7 @@ describe('enedis.sync.dailySync', () => {
           },
         ]),
         setParam: fake.resolves(null),
-      },
-      event: {
-        emit: fake.returns(null),
+        saveHistoricalState: fake.resolves(null),
       },
       gateway: {
         enedisGetDailyConsumption: dailyConsumptionStub,
@@ -315,7 +456,7 @@ describe('enedis.sync.dailySync', () => {
     enedisService.enedisSyncBatchSize = 100;
     const jobId = 'test-job-id';
     await enedisService.sync(false, jobId);
-    assert.callCount(gladys.event.emit, 104);
+    assert.callCount(gladys.device.saveHistoricalState, 104);
     assert.calledOnce(gladys.device.setParam);
     // Progress should be updated after each batch request (2 batches in this case)
     assert.calledTwice(gladys.job.updateProgress);

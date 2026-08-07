@@ -14,11 +14,61 @@ const logger = require('../../utils/logger');
 async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   logger.info(`Purging states of device feature ${deviceFeatureId}`);
 
-  const numberOfDeviceFeatureStateToDelete = await db.DeviceFeatureState.count({
+  // Attach the purge target to the job first: counting millions of states can
+  // take a while and the jobs page would show a blank entry meanwhile.
+  const deviceFeature = await db.DeviceFeature.findOne({
+    where: { id: deviceFeatureId },
+    attributes: ['name'],
+    include: [
+      {
+        model: db.Device,
+        as: 'device',
+        attributes: ['name'],
+      },
+    ],
+  });
+  await this.job.updateProgress(jobId, 0, {
+    ...(deviceFeature ? { device_name: deviceFeature.device.name, device_feature_name: deviceFeature.name } : {}),
+    step: 'waiting_database',
+  });
+
+  // The DuckDB connection is FIFO: submit the probe and the real query in the
+  // same tick, so no other job can slip between them — when the probe resolves,
+  // the count below is actually running, not merely queued behind another job.
+  // Since the DuckDB migration, device states live in DuckDB. The explicit UUID
+  // cast is on the parameter: without it, comparing a VARCHAR parameter against
+  // the UUID column can cost a per-row cast over the whole table.
+  const waitStartedAt = Date.now();
+  const probePromise = db.duckDbReadConnectionAllAsync('SELECT 1');
+  const countPromise = db.duckDbReadConnectionAllAsync(
+    `SELECT COUNT(*) AS count FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID)`,
+    deviceFeatureId,
+  );
+  // If the probe rejects, the queued count rejects for the same reason before
+  // being awaited: pre-attach a no-op handler so it does not surface as an
+  // unhandled rejection (the await below still receives the error).
+  // eslint-disable-next-line promise/prefer-await-to-then
+  countPromise.catch(() => {});
+  await probePromise;
+  const countStartedAt = Date.now();
+  await this.job.updateProgress(jobId, 0, { step: 'counting' });
+  const [{ count: duckDbCount }] = await countPromise;
+  const numberOfDuckDbStatesToDelete = Number(duckDbCount);
+  logger.info(
+    `Purging "${deviceFeatureId}": waited ${countStartedAt - waitStartedAt}ms for the read connection,` +
+      ` counted ${numberOfDuckDbStatesToDelete} DuckDB states in ${Date.now() - countStartedAt}ms.`,
+  );
+
+  // States may also remain in SQLite on installations that have not run the
+  // DuckDB migration yet: purge them too, or the migration would re-import
+  // states of a feature that was already purged.
+  const numberOfSqliteStatesToDelete = await db.DeviceFeatureState.count({
     where: {
       device_feature_id: deviceFeatureId,
     },
   });
+
+  const numberOfDeviceFeatureStateToDelete = numberOfDuckDbStatesToDelete + numberOfSqliteStatesToDelete;
 
   const numberOfDeviceFeatureStateAggregateToDelete = await db.DeviceFeatureStateAggregate.count({
     where: {
@@ -27,11 +77,60 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   });
 
   logger.info(
-    `Purging "${deviceFeatureId}": ${numberOfDeviceFeatureStateToDelete} states & ${numberOfDeviceFeatureStateAggregateToDelete} aggregates to delete.`,
+    `Purging "${deviceFeatureId}": ${numberOfDeviceFeatureStateToDelete} states` +
+      ` (${numberOfDuckDbStatesToDelete} DuckDB + ${numberOfSqliteStatesToDelete} SQLite)` +
+      ` & ${numberOfDeviceFeatureStateAggregateToDelete} aggregates to delete.`,
   );
 
+  // Attach the counts to the job so the front can display them (translated
+  // front-side) while the purge runs and after it finishes.
+  await this.job.updateProgress(jobId, 0, {
+    duckdb_states_count: numberOfDuckDbStatesToDelete,
+    sqlite_states_count: numberOfSqliteStatesToDelete,
+    aggregates_count: numberOfDeviceFeatureStateAggregateToDelete,
+    step: 'waiting_database',
+  });
+  // Same probe on the write connection: deletes may have to wait behind
+  // another purge already deleting.
+  await db.duckDbWriteConnectionAllAsync('SELECT 1');
+  await this.job.updateProgress(jobId, 0, { step: 'deleting_states' });
+
+  // States are deleted in created_at slices: it reports progress, it releases the
+  // single DuckDB write connection between two slices so live state inserts are
+  // not blocked for the whole purge, and each slice only reads the row groups of
+  // its own time window. Slices alone do not bound the rows of one statement
+  // though (a dense burst, or a feature whose states all share one timestamp,
+  // falls in a single slice), so every DELETE also carries the cardinality cap
+  // below — same reasoning as the device migration, see device.migrate.js.
+  let sliceUpperBounds = [];
+  if (numberOfDuckDbStatesToDelete > 0) {
+    // Every DELETE statement is a transaction rewriting row groups: slicing a
+    // small purge is pure overhead. Only big purges (where progress reporting
+    // and releasing the write connection matter) are sliced, in as many slices
+    // as needed to keep each statement around the threshold — a fixed number of
+    // slices leaves statements growing with the size of the history again.
+    if (numberOfDuckDbStatesToDelete <= this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD) {
+      sliceUpperBounds = [null];
+    } else {
+      const numberOfSlices = Math.min(
+        this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES,
+        Math.ceil(numberOfDuckDbStatesToDelete / this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD),
+      );
+      const [{ min_date: minDate, max_date: maxDate }] = await db.duckDbReadConnectionAllAsync(
+        `SELECT MIN(created_at) AS min_date, MAX(created_at) AS max_date
+         FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID)`,
+        deviceFeatureId,
+      );
+      const stepInMs = (new Date(maxDate).getTime() - new Date(minDate).getTime()) / numberOfSlices;
+      sliceUpperBounds = [...Array(numberOfSlices)].map((value, i) => {
+        // The last slice has no upper bound so it catches every remaining state
+        return i === numberOfSlices - 1 ? null : new Date(new Date(minDate).getTime() + (i + 1) * stepInMs);
+      });
+    }
+  }
+
   const numberOfIterationsStates = Math.ceil(
-    numberOfDeviceFeatureStateToDelete / this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
+    numberOfSqliteStatesToDelete / this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
   );
   const iterator = [...Array(numberOfIterationsStates)];
 
@@ -40,7 +139,7 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
   );
   const iteratorAggregates = [...Array(numberOfIterationsStatesAggregates)];
 
-  const total = numberOfIterationsStates + numberOfIterationsStatesAggregates;
+  const total = sliceUpperBounds.length + numberOfIterationsStates + numberOfIterationsStatesAggregates;
   let currentBatch = 0;
   let currentProgressPercent = 0;
 
@@ -54,6 +153,39 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
       await this.job.updateProgress(jobId, currentProgressPercent);
     }
   };
+
+  // Hard cap on the rows a single DELETE touches, whatever the shape of the history:
+  // the statement is repeated until it deletes fewer rows than the cap, which means the
+  // slice is drained. Deleted rows are gone, so it always terminates.
+  const cap = Math.max(1, Math.floor(this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD));
+  const deleteSlice = async (sliceUpperBound) => {
+    const upperBoundCondition = sliceUpperBound === null ? '' : ' AND created_at < CAST(? AS TIMESTAMPTZ)';
+    const params = sliceUpperBound === null ? [deviceFeatureId] : [deviceFeatureId, sliceUpperBound.toISOString()];
+    let deleted = cap;
+    while (deleted === cap) {
+      // Sequential on purpose: the next statement deletes what the previous one left.
+      // eslint-disable-next-line no-await-in-loop
+      const result = await db.duckDbWriteConnectionAllAsync(
+        `DELETE FROM t_device_feature_state
+         WHERE rowid IN (SELECT rowid FROM t_device_feature_state
+                         WHERE device_feature_id = CAST(? AS UUID)${upperBoundCondition} LIMIT ${cap})`,
+        ...params,
+      );
+      deleted = result && result[0] && result[0].Count !== undefined ? Number(result[0].Count) : 0;
+    }
+  };
+
+  await Promise.each(sliceUpperBounds, async (sliceUpperBound) => {
+    await deleteSlice(sliceUpperBound);
+    await updateProgressIfNeeded();
+    await Promise.delay(this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH);
+  });
+
+  if (numberOfDuckDbStatesToDelete > 0) {
+    // Flush the WAL and release the delete-tracking memory accumulated by the
+    // deletes, so the space is reusable right away
+    await db.duckDbWriteConnectionAllAsync('CHECKPOINT');
+  }
 
   await Promise.each(iterator, async () => {
     await db.sequelize.query(
@@ -75,6 +207,10 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
     await updateProgressIfNeeded();
     await Promise.delay(this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH);
   });
+
+  if (iteratorAggregates.length > 0) {
+    await this.job.updateProgress(jobId, currentProgressPercent, { step: 'deleting_aggregates' });
+  }
 
   await Promise.each(iteratorAggregates, async () => {
     await db.sequelize.query(

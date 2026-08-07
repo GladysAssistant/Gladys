@@ -1,4 +1,5 @@
 import { Text, Localizer } from 'preact-i18n';
+import cx from 'classnames';
 
 const GatewayPage = ({ children, ...props }) => (
   <div class="card">
@@ -10,6 +11,11 @@ const GatewayPage = ({ children, ...props }) => (
     <div class="card-body">
       <div class="row">
         <div class="col-md-12">
+          {props.error && (
+            <div class="alert alert-danger">
+              <Text id="signup.restoreBackupSetBackupKey.error" />
+            </div>
+          )}
           <div class="form-group">
             <p>
               <Text id="signup.restoreBackupSetBackupKey.description" />
@@ -33,7 +39,12 @@ const GatewayPage = ({ children, ...props }) => (
     </div>
     <div class="card-footer text-right">
       <div class="d-flex">
-        <button type="submit" class="btn btn-primary ml-auto" onClick={props.saveBackupKey}>
+        <button
+          type="submit"
+          class={cx('btn btn-primary ml-auto', { 'btn-loading': props.loading })}
+          disabled={props.loading}
+          onClick={props.saveBackupKey}
+        >
           <Text id="signup.restoreBackupSetBackupKey.saveButton" />
         </button>
       </div>

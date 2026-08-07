@@ -27,7 +27,7 @@ const DeviceTab = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
-      {!props.z2mUrl && (
+      {props.showZ2mUrlWarning && (
         <div class="alert alert-info mb-4">
           <MarkupText id="integration.zigbee2mqtt.noZ2mUrlMessage" />
         </div>

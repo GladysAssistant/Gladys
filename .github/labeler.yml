@@ -1,0 +1,52 @@
+# Configuration for actions/labeler@v5 (area labels).
+# A PR can receive several area labels.
+
+'area:server':
+  - changed-files:
+      # At least one changed file in server/** outside the integrations code:
+      # a PR only touching an integration gets area:integration, not
+      # area:server
+      - all-globs-to-any-file:
+          - 'server/**'
+          - '!server/services/**'
+          - '!server/test/services/**'
+
+'area:front':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'front/**'
+
+'area:integration':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'server/services/**'
+          - 'server/test/services/**'
+
+'area:ai':
+  - changed-files:
+      - any-glob-to-any-file:
+          # NLP brain: message routing to intents
+          - 'server/lib/brain/**'
+          - 'server/test/lib/brain/**'
+          # Gladys Plus gateway AI chat (LLM forwarding, tool classification, prompts)
+          - 'server/lib/gateway/gateway.aiChat.js'
+          - 'server/lib/gateway/gateway.classifyAiChatToolCategories.js'
+          - 'server/lib/gateway/gateway.forwardMessageToAiChat.js'
+          - 'server/lib/gateway/gateway.getAiChatDebugContext.js'
+          - 'server/lib/gateway/gateway.getAiChatModels.js'
+          - 'server/lib/gateway/gateway.getOpenAIQuota.js'
+          - 'server/utils/aiChatModels.js'
+
+'area:database':
+  - changed-files:
+      - any-glob-to-any-file:
+          # DB migrations run on every user install at upgrade: review carefully
+          - 'server/migrations/**'
+          - 'server/models/**'
+
+'area:infra':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+          - 'docker/**'
+          - 'codecov.yml'

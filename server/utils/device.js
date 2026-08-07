@@ -223,7 +223,9 @@ function mergeDevices(newDevice, existingDevice, updateAttribute = 'updatable') 
 }
 
 /**
- * @description Normalize value to new range.
+ * @description Normalize value to new range and clamp it within target bounds.
+ * Values outside the source range are mapped then clamped so callers (e.g. HomeKit)
+ * never receive a value outside [newRangeMin, newRangeMax].
  * @param {number} value - Actual value.
  * @param {number} currentMin - Actual possible min value.
  * @param {number} currentMax - Actual possible max value.
@@ -234,7 +236,13 @@ function mergeDevices(newDevice, existingDevice, updateAttribute = 'updatable') 
  * normalize(5, 0, 255, 0, 360)
  */
 function normalize(value, currentMin, currentMax, newRangeMin, newRangeMax) {
-  return ((newRangeMax - newRangeMin) * (value - currentMin)) / (currentMax - currentMin) + newRangeMin;
+  if (currentMax === currentMin) {
+    return newRangeMin;
+  }
+  const normalized = ((newRangeMax - newRangeMin) * (value - currentMin)) / (currentMax - currentMin) + newRangeMin;
+  const lowerBound = Math.min(newRangeMin, newRangeMax);
+  const upperBound = Math.max(newRangeMin, newRangeMax);
+  return Math.min(upperBound, Math.max(lowerBound, normalized));
 }
 
 /**

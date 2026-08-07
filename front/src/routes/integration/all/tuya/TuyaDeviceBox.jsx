@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { Link } from 'preact-router';
 import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 import { connect } from 'unistore/preact';
 import {
   normalizeBoolean,
@@ -180,10 +181,23 @@ class TuyaDeviceBox extends Component {
       errorMessage: null
     });
     try {
+      const localConfig = getLocalConfig(this.state.device);
+      const baselineFeatures = this.state.baselineDevice && this.state.baselineDevice.features;
+      const currentFeatures = this.state.device && this.state.device.features;
+      const shouldFallbackToBaselineFeatures =
+        !!this.state.device.created_at &&
+        localConfig.localOverride === true &&
+        Array.isArray(baselineFeatures) &&
+        baselineFeatures.length > 0 &&
+        (!Array.isArray(currentFeatures) || currentFeatures.length === 0);
+
       const payload = {
         ...this.state.device,
-        poll_frequency: getLocalConfig(this.state.device).localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY
+        poll_frequency: localConfig.localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY
       };
+      if (shouldFallbackToBaselineFeatures) {
+        payload.features = baselineFeatures;
+      }
       const savedDevice = await this.props.httpClient.post(`/api/v1/device`, payload);
       this.setState({
         device: savedDevice,
@@ -481,6 +495,10 @@ class TuyaDeviceBox extends Component {
                         <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!canSave}>
                           <Text id="integration.tuya.saveButton" />
                         </button>
+                      )}
+
+                      {validModel && deleteButton && (
+                        <MigrateDeviceButton device={device} onMigrated={this.props.getTuyaDevices} />
                       )}
 
                       {validModel && deleteButton && (

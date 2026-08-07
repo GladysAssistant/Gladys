@@ -5,6 +5,9 @@ coverage:
         target: 90%
         flags:
           - server
+    patch:
+      default:
+        target: 100%
 
 flags:
   server:

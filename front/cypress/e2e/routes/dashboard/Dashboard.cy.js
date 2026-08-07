@@ -5,8 +5,9 @@ describe('Dashboard', () => {
   it('Should create new dashboard', () => {
     cy.visit('/dashboard');
 
-    cy.get('a')
-      .contains('dashboard.newDashboardButton')
+    // cy.contains as root command: the subject is re-queried on retry, so the
+    // assertion survives the async route chunk rendering after the header.
+    cy.contains('a', 'dashboard.newDashboardButton')
       .should('have.class', 'btn-success')
       .click();
 
@@ -17,8 +18,7 @@ describe('Dashboard', () => {
       cy.wrap(inputs[0]).type('My new dashboard');
     });
 
-    cy.get('button')
-      .contains('newDashboard.createDashboardButton')
+    cy.contains('button', 'newDashboard.createDashboardButton')
       .should('have.class', 'btn-primary')
       .click();
 

@@ -11,8 +11,8 @@ const connect = proxyquire('../../../../services/tuya/lib/tuya.connect', {
 const TuyaHandler = proxyquire('../../../../services/tuya/lib/index', {
   './tuya.connect.js': connect,
 });
-const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
 const { EVENTS } = require('../../../../utils/constants');
+const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
 
 const { BadParameters } = require('../../../../utils/coreErrors');
 
@@ -136,7 +136,6 @@ describe('TuyaHandler.poll', () => {
       state: 1,
     });
   });
-
   it('should skip cloud feature when code is missing from payload', async () => {
     await tuyaHandler.poll({
       external_id: 'tuya:device',
@@ -194,6 +193,38 @@ describe('TuyaHandler.poll', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'tuya:device:switch_1',
       state: 1,
+    });
+  });
+
+  it('should read cloud values from thing shadow when strategy is shadow', async () => {
+    tuyaHandler.connector.request = sinon.stub().resolves({
+      result: {
+        properties: [{ code: 'power_a', value: 706 }],
+      },
+    });
+
+    await tuyaHandler.poll({
+      external_id: 'tuya:device',
+      params: [{ name: 'CLOUD_READ_STRATEGY', value: 'shadow' }],
+      features: [
+        {
+          external_id: 'tuya:device:power_a',
+          category: 'energy-sensor',
+          type: 'power',
+          scale: 1,
+        },
+      ],
+    });
+
+    assert.callCount(tuyaHandler.connector.request, 1);
+    assert.calledWith(tuyaHandler.connector.request, {
+      method: 'GET',
+      path: `${API.VERSION_2_0}/thing/device/shadow/properties`,
+    });
+    assert.callCount(gladys.event.emit, 1);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tuya:device:power_a',
+      state: 70.6,
     });
   });
 

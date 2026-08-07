@@ -1,6 +1,7 @@
 const { connect } = require('./message/message.connect');
 const { newMessage } = require('./message/message.new');
 const { send } = require('./message/message.send');
+const { sendToUser } = require('./message/message.sendToUser');
 const { disconnect } = require('./message/message.disconnect');
 const { startPolling } = require('./bot/bot.startPolling');
 const { stopPolling } = require('./bot/bot.stopPolling');
@@ -27,6 +28,7 @@ MessageHandler.prototype.connect = connect;
 MessageHandler.prototype.disconnect = disconnect;
 MessageHandler.prototype.newMessage = newMessage;
 MessageHandler.prototype.send = send;
+MessageHandler.prototype.sendToUser = sendToUser;
 MessageHandler.prototype.startPolling = startPolling;
 MessageHandler.prototype.stopPolling = stopPolling;
 MessageHandler.prototype.poll = poll;

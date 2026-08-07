@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 import Select from 'react-select';
 import ReactSlider from 'react-slider';
 import cx from 'classnames';
@@ -41,6 +41,12 @@ const renderColorOption = ({ value, label }) => (
 );
 
 class EditGaugeBoxComponent extends Component {
+  updateBoxName = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      name: e.target.value
+    });
+  };
+
   updateDeviceFeature = option => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       device_feature: option ? option.value : null
@@ -178,10 +184,24 @@ class EditGaugeBoxComponent extends Component {
     };
 
     return (
-      <BaseEditBox {...props} titleKey="dashboard.boxTitle.gauge">
+      <BaseEditBox {...props} titleKey="dashboard.boxTitle.gauge" titleValue={box.name}>
         <p>
           <Text id="dashboard.boxes.gauge.description" />
         </p>
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="dashboard.boxes.gauge.editNameLabel" />
+          </label>
+          <Localizer>
+            <input
+              type="text"
+              value={box.name || ''}
+              onInput={this.updateBoxName}
+              class="form-control"
+              placeholder={<Text id="dashboard.boxes.gauge.editNamePlaceholder" />}
+            />
+          </Localizer>
+        </div>
         <div class="form-group">
           <label class="form-label">
             <Text id="dashboard.boxes.gauge.selectDeviceLabel" />

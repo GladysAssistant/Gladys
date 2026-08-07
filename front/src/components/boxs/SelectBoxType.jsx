@@ -1,6 +1,8 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
+import get from 'get-value';
 import { DASHBOARD_BOX_TYPE_LIST } from '../../../../server/utils/constants';
+import withIntlAsProp from '../../utils/withIntlAsProp';
 
 // Widget "devices in room" is deprecated and will be removed soon
 const DASHBOARD_BOX_TYPE_LIST_FILTERED = DASHBOARD_BOX_TYPE_LIST.filter(
@@ -14,6 +16,10 @@ class SelectBoxType extends Component {
     this.props.updateNewSelectedBox(this.props.x, this.props.y, e.target.value);
   };
   render(props) {
+    const sortedBoxTypes = DASHBOARD_BOX_TYPE_LIST_FILTERED.map(dashboardBoxType => ({
+      type: dashboardBoxType,
+      label: get(props.intl.dictionary, `dashboard.boxTitle.${dashboardBoxType}`, { default: dashboardBoxType })
+    })).sort((a, b) => a.label.localeCompare(b.label));
     return (
       <BaseEditBox {...props} titleKey="dashboard.selectBoxType">
         <div class="form-group">
@@ -24,10 +30,8 @@ class SelectBoxType extends Component {
             <option>
               <Text id="global.emptySelectOption" />
             </option>
-            {DASHBOARD_BOX_TYPE_LIST_FILTERED.map(dashboardBoxType => (
-              <option value={dashboardBoxType}>
-                <Text id={`dashboard.boxTitle.${dashboardBoxType}`} />
-              </option>
+            {sortedBoxTypes.map(({ type, label }) => (
+              <option value={type}>{label}</option>
             ))}
           </select>
         </div>
@@ -36,4 +40,4 @@ class SelectBoxType extends Component {
   }
 }
 
-export default SelectBoxType;
+export default withIntlAsProp(SelectBoxType);

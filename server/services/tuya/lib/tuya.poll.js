@@ -3,6 +3,7 @@ const logger = require('../../../utils/logger');
 const { readValues } = require('./device/tuya.deviceMapping');
 const { API, DEVICE_PARAM_NAME } = require('./utils/tuya.constants');
 const { EVENTS } = require('../../../utils/constants');
+const { CLOUD_STRATEGY, getConfiguredCloudReadStrategy } = require('./utils/tuya.cloudStrategy');
 const { normalizeBoolean } = require('./utils/tuya.normalize');
 const { getParamValue } = require('./utils/tuya.deviceParams');
 const { localPoll } = require('./tuya.localPoll');
@@ -96,16 +97,35 @@ const emitFeatureState = (gladys, deviceFeature, transformedValue, previousValue
   return { emitted, changed };
 };
 
+const extractValuesFromResultArray = (result) => {
+  const values = {};
+  const entries = Array.isArray(result) ? result : [];
+  entries.forEach((feature) => {
+    if (!feature || typeof feature !== 'object' || feature.code === undefined || feature.code === null) {
+      return;
+    }
+    values[String(feature.code)] = feature.value;
+  });
+  return values;
+};
+
+const extractShadowValues = (response) => {
+  const payload = response && response.result;
+  const properties = payload && Array.isArray(payload.properties) ? payload.properties : [];
+  return extractValuesFromResultArray(properties);
+};
+
 /**
  * @description Poll the given features against the Tuya cloud API and emit state changes.
  * @param {object} self - The TuyaHandler instance (passed explicitly to avoid `this` rebinding).
+ * @param {object} device - The Gladys device (used to resolve the cloud read strategy).
  * @param {Array} deviceFeatures - Features to poll.
  * @param {string} topic - Tuya device id used for the API path and logs.
  * @returns {Promise<object>} Summary with polled/handled/changed/missing/skipped counters.
  * @example
- * const summary = await pollCloudFeatures(this, deviceFeatures, topic);
+ * const summary = await pollCloudFeatures(this, device, deviceFeatures, topic);
  */
-async function pollCloudFeatures(self, deviceFeatures, topic) {
+async function pollCloudFeatures(self, device, deviceFeatures, topic) {
   const summary = {
     polled: Array.isArray(deviceFeatures) ? deviceFeatures.length : 0,
     handled: 0,
@@ -122,19 +142,22 @@ async function pollCloudFeatures(self, deviceFeatures, topic) {
     return summary;
   }
 
-  const response = await self.connector.request({
-    method: 'GET',
-    path: `${API.VERSION_1_0}/devices/${topic}/status`,
-  });
+  const cloudReadStrategy = getConfiguredCloudReadStrategy(device);
+  const response =
+    cloudReadStrategy === CLOUD_STRATEGY.SHADOW
+      ? await self.connector.request({
+          method: 'GET',
+          path: `${API.VERSION_2_0}/thing/${topic}/shadow/properties`,
+        })
+      : await self.connector.request({
+          method: 'GET',
+          path: `${API.VERSION_1_0}/devices/${topic}/status`,
+        });
 
-  const values = {};
-  const result = Array.isArray(response && response.result) ? response.result : [];
-  result.forEach((feature) => {
-    if (!feature || typeof feature !== 'object' || feature.code === undefined || feature.code === null) {
-      return;
-    }
-    values[String(feature.code)] = feature.value;
-  });
+  const values =
+    cloudReadStrategy === CLOUD_STRATEGY.SHADOW
+      ? extractShadowValues(response)
+      : extractValuesFromResultArray(response && response.result);
 
   deviceFeatures.forEach((deviceFeature) => {
     const code = getFeatureCode(deviceFeature);
@@ -292,7 +315,7 @@ async function poll(device) {
 
         fallbackReason = 'partial_local_mapping';
         try {
-          cloudSummary = await pollCloudFeatures(this, pendingCloudFeatures, topic);
+          cloudSummary = await pollCloudFeatures(this, device, pendingCloudFeatures, topic);
         } catch (e) {
           logger.warn(`[Tuya][poll] local poll succeeded but cloud fallback failed for ${topic}`, e);
           fallbackReason = 'cloud_fallback_failed';
@@ -326,7 +349,7 @@ async function poll(device) {
   }
 
   try {
-    cloudSummary = await pollCloudFeatures(this, deviceFeatures, topic);
+    cloudSummary = await pollCloudFeatures(this, device, deviceFeatures, topic);
   } catch (e) {
     logger.warn(`[Tuya][poll] cloud poll failed for ${topic}`, e);
     fallbackReason = fallbackReason === 'none' ? 'cloud_poll_failed' : `${fallbackReason}+cloud_poll_failed`;

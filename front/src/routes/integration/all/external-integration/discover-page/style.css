@@ -1,0 +1,9 @@
+.discoverListBody {
+  min-height: 200px;
+}
+
+.scanLoader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
