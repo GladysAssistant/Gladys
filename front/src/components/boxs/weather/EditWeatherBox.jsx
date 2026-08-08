@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
 import actions from '../../../actions/dashboard/boxActions';
-import { GetWeatherModes } from '../../../utils/consts';
+import { GetWeatherModes, DEFAULT_ON_WEATHER_MODES } from '../../../utils/consts';
 
 const EditWeatherBox = ({ children, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.weather">
@@ -53,13 +53,17 @@ const EditWeatherBox = ({ children, ...props }) => (
         {Object.keys(GetWeatherModes).map(key => {
           const mode = GetWeatherModes[key];
           const label = `dashboard.boxes.weather.displayModes.${mode}`;
+          const modes = props.box.modes || {};
+          // modes on by default stay checked until explicitly unchecked,
+          // so widgets saved before they existed keep their current look
+          const checked = DEFAULT_ON_WEATHER_MODES.includes(mode) ? modes[mode] !== false : Boolean(modes[mode]);
           return (
             <div className="form-check">
               <input
                 type="checkbox"
                 className="form-check-input"
                 name={mode}
-                checked={props.box.modes !== undefined && props.box.modes[mode]}
+                checked={checked}
                 onChange={props.updateBoxModes}
               />
               <label className="form-check-label">
@@ -81,7 +85,9 @@ class EditWeatherBoxComponent extends Component {
   };
 
   updateBoxModes = e => {
-    const modes = this.props.box.modes || {};
+    // clone the modes object: mutating it in place would prevent
+    // componentDidUpdate from detecting the change in the widget
+    const modes = { ...(this.props.box.modes || {}) };
     modes[e.target.name] = e.target.checked;
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       modes
