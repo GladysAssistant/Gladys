@@ -25,8 +25,6 @@ const BinaryDeviceValue = ({ deviceFeature, intl }) => {
     (DANGER_ON_VALUE_SENSORS_CATEGORY_TYPES[category] &&
       DANGER_ON_VALUE_SENSORS_CATEGORY_TYPES[category].includes(type));
   const { dictionary } = intl;
-  const customText =
-    dictionary.deviceFeatureValue.category[category] && dictionary.deviceFeatureValue.category[category][type];
 
   const value = lastValue === null ? -1 : lastValue;
   const valued = value !== -1;
