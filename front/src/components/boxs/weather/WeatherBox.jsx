@@ -262,7 +262,9 @@ class WeatherBoxComponent extends Component {
                   {weather.weatherEmoji}
                 </div>
                 <div style="font-size: 16px; font-weight: 500; margin-left: 12px">
-                  <Text id={`dashboard.boxes.weather.conditions.${weather.weather}`} />
+                  {/* same fallback as the emoji mapping: a provider omitting
+                  the condition still gets a label instead of a blank line */}
+                  <Text id={`dashboard.boxes.weather.conditions.${weather.weather || 'unknown'}`} />
                 </div>
               </div>
               <div style="font-size: 36px; font-weight: 600; line-height: 1; white-space: nowrap; margin-left: 8px">
@@ -379,7 +381,16 @@ class WeatherBoxComponent extends Component {
                   <div
                     key={`description-${alertKey}`}
                     class="text-muted"
+                    role="button"
+                    tabIndex="0"
+                    aria-expanded={Boolean(expanded)}
                     onClick={() => this.toggleAlertDescription(alertKey)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.toggleAlertDescription(alertKey);
+                      }
+                    }}
                     style={`font-size: 12px; margin-top: 4px; white-space: pre-line; cursor: pointer; ${
                       expanded
                         ? ''

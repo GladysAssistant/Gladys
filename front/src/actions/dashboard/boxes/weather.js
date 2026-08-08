@@ -152,11 +152,12 @@ function createActions(store) {
           // entries of the current day
           const now = dayjs().subtract(30, 'minute');
           weather.hours = weather.hours.filter(hour => dayjs(hour.datetime).isAfter(now));
-          // cover the next 24 hours in 8 columns: hourly entries keep one
-          // out of three, entries already spaced by 3 hours are kept as-is
+          // cover the next 24 hours in 8 columns, so one entry every 3 hours:
+          // the skip is derived from the provider's own step, entries already
+          // spaced by 3 hours or more are kept as-is
           if (weather.hours.length > 1) {
             const stepMinutes = dayjs(weather.hours[1].datetime).diff(dayjs(weather.hours[0].datetime), 'minute');
-            const columnSkip = stepMinutes >= 180 ? 1 : 3;
+            const columnSkip = stepMinutes > 0 ? Math.max(1, Math.round(180 / stepMinutes)) : 1;
             weather.hours = weather.hours.filter((hour, index) => index % columnSkip === 0);
           }
           weather.hours = weather.hours.slice(0, 8);
