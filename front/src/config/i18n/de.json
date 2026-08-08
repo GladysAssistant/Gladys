@@ -349,6 +349,7 @@
         "noModeSelected": "Wähle mindestens einen Anzeigemodus aus, sonst bleibt das Widget leer.",
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
         "uv": "UV",
+        "windGustTitle": "Windböen (der Anbieter liefert für diesen Tag keine mittlere Windgeschwindigkeit)",
         "alertTypes": {
           "wind": "Starker Wind",
           "rain": "Starkregen",

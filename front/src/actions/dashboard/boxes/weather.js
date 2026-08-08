@@ -78,7 +78,11 @@ const isAlertOngoing = alert => {
  * identical 'heat' entries. Expired bulletins are dropped first — the same
  * providers keep serving them after their end date — then the rest are merged
  * on their type (or on their event label when the provider sends no type),
- * keeping the worst severity, the widest time range and the first description.
+ * keeping the worst severity and the widest time range.
+ * Descriptions are accumulated instead of collapsed: two bulletins of a same
+ * phenomenon may carry different safety instructions, and keeping only the
+ * first would silently drop the others. `description` stays the first one, for
+ * the badge tooltip; `descriptions` holds every distinct text, for the widget.
  */
 const normalizeAlerts = alerts => {
   const byPhenomenon = new Map();
@@ -86,7 +90,7 @@ const normalizeAlerts = alerts => {
     const key = alert.type || alert.event;
     const previous = byPhenomenon.get(key);
     if (!previous) {
-      byPhenomenon.set(key, { ...alert });
+      byPhenomenon.set(key, { ...alert, descriptions: alert.description ? [alert.description] : [] });
       return;
     }
     // the merged alert carries the worst severity, so its badge keeps the
@@ -103,6 +107,9 @@ const normalizeAlerts = alerts => {
     }
     if (!previous.description && alert.description) {
       previous.description = alert.description;
+    }
+    if (alert.description && !previous.descriptions.includes(alert.description)) {
+      previous.descriptions.push(alert.description);
     }
   });
   return Array.from(byPhenomenon.values());
@@ -200,8 +207,12 @@ function createActions(store) {
             // option — the pivot caps `hours` at 24 entries (a single day),
             // so only the first day could ever be filled. The row is shown
             // only when the provider fills wind_speed on every day itself.
+            // gusts are peaks, not an average: the value is flagged so the
+            // widget can mark it with a `~` instead of passing a peak off as
+            // the day's wind speed
             if (typeof day.wind_speed !== 'number' && typeof day.wind_gust === 'number') {
               day.wind_speed = day.wind_gust;
+              day.wind_speed_from_gust = true;
             }
             day.datetime_beautiful = dayjs(day.datetime)
               .locale(state.user.language)

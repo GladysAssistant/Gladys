@@ -349,6 +349,7 @@
         "noModeSelected": "Select at least one display mode, otherwise the widget will stay empty.",
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
         "uv": "UV",
+        "windGustTitle": "Wind gusts (the provider gives no average wind speed for this day)",
         "alertTypes": {
           "wind": "Strong wind",
           "rain": "Heavy rain",

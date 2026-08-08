@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import get from 'get-value';
 
@@ -166,15 +166,21 @@ class WeatherBoxComponent extends Component {
       );
     }
 
-    // the pivot format carries its own unit system: the provider already
-    // converted the values, the widget only picks the matching labels
+    // the pivot format carries its own unit system: temperatures and wind are
+    // already in the requested system, the widget only picks the matching
+    // labels — precipitation is the exception, always in mm (see formatRain)
     const isMetric = weather.units === WEATHER_UNITS.METRIC;
     const tempUnit = isMetric ? '°C' : '°F';
     const windUnit = isMetric ? 'km/h' : 'mph';
     // metric wind speed comes in m/s, imperial already in mph
-    const formatWind = speed => `${Math.round(isMetric ? speed * 3.6 : speed)} ${windUnit}`;
+    // `fromGust` marks a value the provider only gave as a gust: prefixed with
+    // `~` so a peak is not read as the average wind speed
+    const formatWind = (speed, fromGust) =>
+      `${fromGust ? '~' : ''}${Math.round(isMetric ? speed * 3.6 : speed)} ${windUnit}`;
+    // precipitation is always in mm in the pivot, whatever `units` says: the
+    // server stamps the unit system but never converts the amounts
     const formatRain = amount =>
-      isMetric ? `${Math.round(amount * 10) / 10} mm` : `${Math.round(amount * 100) / 100} in`;
+      isMetric ? `${Math.round(amount * 10) / 10} mm` : `${Math.round((amount / 25.4) * 100) / 100} in`;
 
     const temperature = Math.round(weather.temperature);
     const humidity = typeof weather.humidity === 'number' ? Math.round(weather.humidity) : null;
@@ -207,19 +213,25 @@ class WeatherBoxComponent extends Component {
     const showDateLocation = isModeOn(GetWeatherModes.DateLocation);
     const showCurrentWeather = isModeOn(GetWeatherModes.CurrentWeather);
     const shownAlerts = isModeOn(GetWeatherModes.Alerts) ? alerts : [];
-    // several phenomena of a same area often share one bulletin (Météo France
-    // sends the whole department bulletin as every alert description), so the
-    // text is only printed once
+    // a merged alert carries every distinct bulletin text of its phenomenon,
+    // and several phenomena of a same area often share one bulletin (Météo
+    // France sends the whole department bulletin as every alert description),
+    // so each text is printed once across the whole widget
     const seenDescriptions = new Set();
-    const alertDescriptions = shownAlerts
-      .filter(alert => alert.description && !seenDescriptions.has(alert.description))
-      .map(alert => {
-        seenDescriptions.add(alert.description);
-        return {
-          alertKey: `${alert.severity}-${alert.event}-${alert.start || ''}`,
-          description: alert.description
-        };
+    const alertDescriptions = [];
+    shownAlerts.forEach(alert => {
+      const descriptions = alert.descriptions || (alert.description ? [alert.description] : []);
+      descriptions.forEach((description, index) => {
+        if (seenDescriptions.has(description)) {
+          return;
+        }
+        seenDescriptions.add(description);
+        alertDescriptions.push({
+          alertKey: `${alert.severity}-${alert.event}-${alert.start || ''}-${index}`,
+          description
+        });
       });
+    });
     const showChips =
       isModeOn(GetWeatherModes.AdvancedWeather) &&
       (humidity !== null ||
@@ -497,9 +509,21 @@ class WeatherBoxComponent extends Component {
                     </div>
                   )}
                   {hasDailyWind && (
-                    <div class="text-muted" style="font-size: 11px; white-space: nowrap">
-                      {typeof day.wind_speed === 'number' ? formatWind(day.wind_speed) : ' '}
-                    </div>
+                    // the `~` of a gust-only value is not self-explanatory:
+                    // the tooltip spells it out without widening the column
+                    <Localizer>
+                      <div
+                        class="text-muted"
+                        style="font-size: 11px; white-space: nowrap"
+                        title={
+                          day.wind_speed_from_gust ? <Text id="dashboard.boxes.weather.windGustTitle" /> : undefined
+                        }
+                      >
+                        {typeof day.wind_speed === 'number'
+                          ? formatWind(day.wind_speed, day.wind_speed_from_gust)
+                          : ' '}
+                      </div>
+                    </Localizer>
                   )}
                 </div>
               ))}

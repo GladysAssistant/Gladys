@@ -349,6 +349,7 @@
         "noModeSelected": "Sélectionnez au moins un mode d'affichage, sinon le widget restera vide.",
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
         "uv": "UV",
+        "windGustTitle": "Rafales de vent (le fournisseur ne donne pas de vent moyen pour ce jour)",
         "alertTypes": {
           "wind": "Vent violent",
           "rain": "Pluie-inondation",
