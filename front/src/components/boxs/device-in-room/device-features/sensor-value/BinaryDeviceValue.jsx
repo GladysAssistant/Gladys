@@ -18,13 +18,12 @@ const DANGER_ON_VALUE_SENSORS_CATEGORY_TYPES = {
   [DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]: [DEVICE_FEATURE_TYPES.SENSOR.BINARY]
 };
 
-const BinaryDeviceValue = ({ deviceFeature, intl }) => {
+const BinaryDeviceValue = ({ deviceFeature }) => {
   const { category, type, last_value: lastValue = null } = deviceFeature;
   const reverseColors =
     DANGER_ON_VALUE_SENSORS.includes(category) ||
     (DANGER_ON_VALUE_SENSORS_CATEGORY_TYPES[category] &&
       DANGER_ON_VALUE_SENSORS_CATEGORY_TYPES[category].includes(type));
-  const { dictionary } = intl;
 
   const value = lastValue === null ? -1 : lastValue;
   const valued = value !== -1;
