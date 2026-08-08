@@ -303,14 +303,24 @@ const mergedServiceCategories = [
 // release separately. INITIAL_PRESS is deliberately absent: Matter emits it at the start of every
 // press, long ones included, so mapping it to SINGLE_PRESS would fire a single press each time
 // someone holds the button down. The release carries the gesture, so that is what is mapped.
+//
+// Careful when checking which statuses have a producer: an integration does not have to import
+// BUTTON_STATUS to emit one. Xiaomi keeps its own SWITCH_STATUS table in
+// services/xiaomi/lib/utils/deviceStatus.js and emits those numbers straight onto a button:click
+// feature, so LONG_CLICK_PRESS reaches this table as the value 3 without the constant ever being
+// referenced. Grep for the value, not only for the name.
 const buttonEventMapping = {
   [BUTTON_STATUS.CLICK]: 0, // SINGLE_PRESS
   [BUTTON_STATUS.SHORT_RELEASE]: 0, // SINGLE_PRESS — Matter and Zigbee2MQTT short_release
+  [BUTTON_STATUS.PRESSED]: 0, // SINGLE_PRESS — Zigbee2MQTT pressed
   [BUTTON_STATUS.DOUBLE_CLICK]: 1, // DOUBLE_PRESS
   [BUTTON_STATUS.DOUBLE_PRESS]: 1, // DOUBLE_PRESS — Zigbee2MQTT double_press
   [BUTTON_STATUS.LONG_CLICK]: 2, // LONG_PRESS
   [BUTTON_STATUS.LONG_PRESS]: 2, // LONG_PRESS — Matter and Zigbee2MQTT long_press
   [BUTTON_STATUS.HOLD_CLICK]: 2, // LONG_PRESS — Zigbee2MQTT hold, Z-Wave hold
+  // Xiaomi wireless switches, through SWITCH_STATUS. Its LONG_CLICK_RELEASE is left out so a
+  // single hold does not fire twice.
+  [BUTTON_STATUS.LONG_CLICK_PRESS]: 2, // LONG_PRESS
 };
 
 module.exports = {
