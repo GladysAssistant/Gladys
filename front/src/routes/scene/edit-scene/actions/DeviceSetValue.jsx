@@ -17,6 +17,7 @@ import SelectPilotWireMode from '../../../../components/device/SelectPilotWireMo
 import SelectWaterHeaterMode from '../../../../components/device/SelectWaterHeaterMode';
 import SelectFanMode from '../../../../components/device/SelectFanMode';
 import SelectFanFeatureValue from '../../../../components/device/SelectFanFeatureValue';
+import SelectSirenForAutomationOnly from '../../../../components/device/SelectSirenForAutomationOnly';
 
 class DeviceSetValue extends Component {
   constructor(props) {
@@ -204,6 +205,10 @@ class DeviceSetValue extends Component {
           value={this.props.action.value}
         />
       );
+    }
+
+    if (this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.SIREN.FOR_AUTOMATION_ONLY) {
+      return <SelectSirenForAutomationOnly updateValue={this.handleNewPureValue} value={this.props.action.value} />;
     }
 
     return (

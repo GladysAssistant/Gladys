@@ -4393,6 +4393,10 @@
           "low": "Faible",
           "medium": "Moyen",
           "high": "Fort"
+        },
+        "for-automation-only": {
+          "stop": "Arrêt",
+          "smoke-siren": "Sirène fumée"
         }
       },
       "vacuum-cleaner": {
@@ -4682,6 +4686,10 @@
           "0": "Faible",
           "1": "Moyen",
           "2": "Fort"
+        },
+        "for-automation-only": {
+          "0": "Arrêt",
+          "1": "Sirène fumée"
         }
       },
       "music": {
@@ -4753,6 +4761,13 @@
           "medium-risk": "Moyen",
           "high-risk": "Élevé",
           "unknown": "Inconnu"
+        }
+      },
+      "test": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Non",
+          "one": "Oui"
         }
       },
       "level-sensor": {
@@ -4995,6 +5010,10 @@
       "decimal": "Niveau de CO2 (décimal)",
       "integer": "Niveau de CO2 (entier)"
     },
+    "test": {
+      "shortCategoryName": "Test",
+      "binary": "Test"
+    },
     "switch": {
       "shortCategoryName": "Prise",
       "voltage": "Tension moyenne",
@@ -5010,7 +5029,8 @@
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
       "lmh_volume": "Volume de la sirène",
-      "melody": "Mélodie"
+      "melody": "Mélodie",
+      "for-automation-only": "Sirène (automatisation)"
     },
     "cube": {
       "shortCategoryName": "Cube",

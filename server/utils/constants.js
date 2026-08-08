@@ -139,6 +139,11 @@ const SIREN_LMH_VOLUME = {
   HIGH: 2,
 };
 
+const SIREN_AUTOMATION_STATE = {
+  STOP: 0,
+  SMOKE_SIREN: 1,
+};
+
 const AC_MODE = {
   AUTO: 0,
   COOLING: 1,
@@ -815,6 +820,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   TELEINFORMATION: 'teleinformation',
   TELEVISION: 'television',
   TEMPERATURE_SENSOR: 'temperature-sensor',
+  TEST: 'test',
   THERMOSTAT: 'thermostat',
   UNKNOWN: 'unknown',
   UV_SENSOR: 'uv-sensor',
@@ -884,6 +890,10 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     LMH_VOLUME: 'lmh_volume',
     MELODY: 'melody',
+    FOR_AUTOMATION_ONLY: 'for-automation-only',
+  },
+  TEST: {
+    BINARY: 'binary',
   },
   CHILD_LOCK: {
     BINARY: 'binary',
@@ -2014,6 +2024,7 @@ module.exports.BUTTON_PUSH = BUTTON_PUSH;
 module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
+module.exports.SIREN_AUTOMATION_STATE = SIREN_AUTOMATION_STATE;
 module.exports.AC_MODE = AC_MODE;
 module.exports.THERMOSTAT_MODE = THERMOSTAT_MODE;
 module.exports.THERMOSTAT_OPERATING_STATE = THERMOSTAT_OPERATING_STATE;

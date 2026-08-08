@@ -62,6 +62,12 @@ const names = {
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     },
   },
+  test: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.TEST,
+      type: DEVICE_FEATURE_TYPES.TEST.BINARY,
+    },
+  },
   child_lock: {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.CHILD_LOCK,
