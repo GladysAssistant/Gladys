@@ -9,6 +9,7 @@ const {
   aqiToAirQuality,
   clampToCharacteristic,
   toMicrogramPerCubicMeter,
+  buttonEventMapping,
 } = require('./deviceMappings');
 
 /**
@@ -35,6 +36,32 @@ function sendState(hkAccessory, feature, event) {
           Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
           event.last_value,
         );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.BUTTON}:${DEVICE_FEATURE_TYPES.BUTTON.CLICK}`:
+    case `${DEVICE_FEATURE_CATEGORIES.BUTTON}:${DEVICE_FEATURE_TYPES.BUTTON.PUSH}`: {
+      const buttonEvent = buttonEventMapping[event.last_value];
+      // A press HomeKit has no equivalent for is dropped rather than reported as another one.
+      if (buttonEvent !== undefined) {
+        // A remote carries one service per button, so getService — which returns the first match —
+        // would report every press on button one. buildAccessory gives those services a subtype
+        // prefixed with the category and names them after their feature, which pins the right one.
+        const subtypePrefix = `${feature.category} `;
+        const service =
+          (hkAccessory.services || []).find(
+            (candidate) =>
+              typeof candidate.subtype === 'string' &&
+              candidate.subtype.startsWith(subtypePrefix) &&
+              candidate.displayName === feature.name,
+          ) || hkAccessory.getService(Service[mappings[feature.category].service]);
+
+        // sendEventNotification and not updateCharacteristic: the latter only notifies when the
+        // value changes, so two single presses in a row — both mapping to 0 — would be reported
+        // once. A button press must always be delivered.
+        service
+          .getCharacteristic(Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]])
+          .sendEventNotification(buttonEvent);
+      }
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {

@@ -468,6 +468,54 @@ describe('Build service', () => {
     expect(cb.args[0][1]).to.equal(0);
   });
 
+  it('should build stateless programmable switch service', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    const on = stub();
+    const getCharacteristic = stub().returns({ on, props: {} });
+    const StatelessProgrammableSwitch = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { ProgrammableSwitchEvent: 'PROGRAMMABLESWITCHEVENT' },
+      CharacteristicEventTypes: stub(),
+      Service: { StatelessProgrammableSwitch },
+    };
+    const features = [
+      {
+        name: 'Clic',
+        selector: 'bouton-clic',
+        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+        type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+      },
+      {
+        name: 'Appui',
+        selector: 'bouton-appui',
+        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+        type: DEVICE_FEATURE_TYPES.BUTTON.PUSH,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Télécommande' }, features, mappings[DEVICE_FEATURE_CATEGORIES.BUTTON]);
+    await on.args[0][1](cb);
+    await on.args[1][1](cb);
+
+    expect(StatelessProgrammableSwitch.args[0][0]).to.equal('Télécommande');
+    expect(getCharacteristic.args[0][0]).to.equal('PROGRAMMABLESWITCHEVENT');
+    // a stateless switch reports no state
+    expect(cb.args[0][1]).to.equal(null);
+    expect(cb.args[1][1]).to.equal(null);
+  });
+
+  it('should not debounce button presses', async () => {
+    expect(
+      mappings[DEVICE_FEATURE_CATEGORIES.BUTTON].capabilities[DEVICE_FEATURE_TYPES.BUTTON.CLICK].notifDelay,
+    ).to.equal(0);
+    expect(
+      mappings[DEVICE_FEATURE_CATEGORIES.BUTTON].capabilities[DEVICE_FEATURE_TYPES.BUTTON.PUSH].notifDelay,
+    ).to.equal(0);
+  });
+
   it('should build contact sensor service', async () => {
     homekitHandler.gladys.stateManager.get = stub().returns({
       id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
