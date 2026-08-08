@@ -338,11 +338,15 @@
         "providerInternalOpenWeather": "Internal OpenWeather (deprecated)",
         "editModeLabel": "Select display mode:",
         "displayModes": {
-          "advancedWeather": "Humidity and wind speed",
+          "dateLocation": "Date and location",
+          "currentWeather": "Current weather",
+          "alerts": "Weather alerts",
+          "advancedWeather": "Weather details (humidity, wind, UV, moon…)",
           "hourlyForecast": "Forecast for the next 24 hours",
           "dailyForecast": "Forecast for the next 5 days",
           "providerImages": "Provider images (vigilance map, rain radar…)"
         },
+        "noModeSelected": "Select at least one display mode, otherwise the widget will stay empty.",
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
         "uv": "UV",
         "alertTypes": {
@@ -356,6 +360,42 @@
           "avalanche": "Avalanches",
           "coastal": "Coastal event",
           "fog": "Fog"
+        },
+        "conditions": {
+          "clear": "Clear sky",
+          "partly-cloudy": "Partly cloudy",
+          "cloud": "Cloudy",
+          "fog": "Fog",
+          "drizzle": "Drizzle",
+          "rain": "Rain",
+          "pouring": "Heavy rain",
+          "sleet": "Sleet",
+          "hail": "Hail",
+          "snow": "Snow",
+          "thunderstorm": "Thunderstorm",
+          "wind": "Windy",
+          "night": "Night",
+          "unknown": "Unavailable"
+        },
+        "moonPhases": {
+          "0": "New moon",
+          "1": "Waxing crescent",
+          "2": "First quarter",
+          "3": "Waxing gibbous",
+          "4": "Full moon",
+          "5": "Waning gibbous",
+          "6": "Last quarter",
+          "7": "Waning crescent"
+        },
+        "windCardinals": {
+          "n": "N",
+          "ne": "NE",
+          "e": "E",
+          "se": "SE",
+          "s": "S",
+          "sw": "SW",
+          "w": "W",
+          "nw": "NW"
         }
       },
       "devicesInRoom": {

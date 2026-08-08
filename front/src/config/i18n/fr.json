@@ -338,11 +338,15 @@
         "providerInternalOpenWeather": "OpenWeather interne (déprécié)",
         "editModeLabel": "Mode d'affichage :",
         "displayModes": {
-          "advancedWeather": "Humidité et vitesse du vent",
+          "dateLocation": "Date et lieu",
+          "currentWeather": "Météo actuelle",
+          "alerts": "Alertes météo",
+          "advancedWeather": "Détails météo (humidité, vent, UV, lune…)",
           "hourlyForecast": "Prévisions pour les 24 prochaines heures",
           "dailyForecast": "Prévisions pour les 5 prochains jours",
           "providerImages": "Images du fournisseur (carte de vigilance, radar de pluie…)"
         },
+        "noModeSelected": "Sélectionnez au moins un mode d'affichage, sinon le widget restera vide.",
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
         "uv": "UV",
         "alertTypes": {
@@ -356,6 +360,42 @@
           "avalanche": "Avalanches",
           "coastal": "Vagues-submersion",
           "fog": "Brouillard"
+        },
+        "conditions": {
+          "clear": "Ciel dégagé",
+          "partly-cloudy": "Peu nuageux",
+          "cloud": "Nuageux",
+          "fog": "Brouillard",
+          "drizzle": "Bruine",
+          "rain": "Pluie",
+          "pouring": "Fortes pluies",
+          "sleet": "Pluie et neige mêlées",
+          "hail": "Grêle",
+          "snow": "Neige",
+          "thunderstorm": "Orages",
+          "wind": "Vent",
+          "night": "Nuit",
+          "unknown": "Indisponible"
+        },
+        "moonPhases": {
+          "0": "Nouvelle lune",
+          "1": "Premier croissant",
+          "2": "Premier quartier",
+          "3": "Gibbeuse croissante",
+          "4": "Pleine lune",
+          "5": "Gibbeuse décroissante",
+          "6": "Dernier quartier",
+          "7": "Dernier croissant"
+        },
+        "windCardinals": {
+          "n": "N",
+          "ne": "NE",
+          "e": "E",
+          "se": "SE",
+          "s": "S",
+          "sw": "SO",
+          "w": "O",
+          "nw": "NO"
         }
       },
       "devicesInRoom": {
