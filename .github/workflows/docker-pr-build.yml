@@ -130,6 +130,7 @@ jobs:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
+        id: setup-node
         uses: actions/setup-node@v3
         with:
           node-version-file: 'front/package.json'
@@ -142,6 +143,10 @@ jobs:
       # Installing the root + front + server dependencies takes ~1min20 on every
       # run, so cache the installed node_modules (and the Cypress binary) keyed
       # on the lockfiles, and skip the install entirely on a cache hit.
+      # server/services/*/node_modules matters: the server postinstall installs
+      # every service's own dependencies, and the server does not boot without
+      # them. The node version is part of the key because the trees contain
+      # native addons built for the running node.
       - name: 💾 Restore NPM dependencies cache
         id: deps-cache
         uses: actions/cache@v4
@@ -150,8 +155,9 @@ jobs:
             node_modules
             front/node_modules
             server/node_modules
+            server/services/*/node_modules
             ~/.cache/Cypress
-          key: cypress-deps-v1-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          key: cypress-deps-v1-${{ runner.os }}-node${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('**/package-lock.json') }}
       - name: 📦 Install NPM packages
         if: steps.deps-cache.outputs.cache-hit != 'true'
         run: |
