@@ -4293,10 +4293,6 @@
           "low": "Faible",
           "medium": "Moyen",
           "high": "Fort"
-        },
-        "for-automation-only": {
-          "stop": "Arrêt",
-          "smoke-siren": "Sirène fumée"
         }
       },
       "vacuum-cleaner": {
@@ -4541,10 +4537,6 @@
           "0": "Faible",
           "1": "Moyen",
           "2": "Fort"
-        },
-        "for-automation-only": {
-          "0": "Arrêt",
-          "1": "Sirène fumée"
         }
       },
       "music": {
@@ -4572,6 +4564,10 @@
           "other": "Aucune valeur reçue",
           "zero": "Sain",
           "one": "Fumée détectée"
+        },
+        "test-in-progress": {
+          "0": "Non",
+          "1": "Oui"
         }
       },
       "co-sensor": {
@@ -4616,13 +4612,6 @@
           "medium-risk": "Moyen",
           "high-risk": "Élevé",
           "unknown": "Inconnu"
-        }
-      },
-      "test": {
-        "binary": {
-          "other": "Aucune valeur reçue",
-          "zero": "Non",
-          "one": "Oui"
         }
       },
       "level-sensor": {
@@ -4826,7 +4815,8 @@
     "smoke-sensor": {
       "shortCategoryName": "Détecteur de fumée",
       "binary": "Capteur de fumée - Oui/Non",
-      "decimal": "Valeur de fumée décimale"
+      "decimal": "Valeur de fumée décimale",
+      "test-in-progress": "Test en cours"
     },
     "co-sensor": {
       "shortCategoryName": "Capteur de monoxyde de carbone (CO)",
@@ -4836,10 +4826,6 @@
       "shortCategoryName": "Capteur de dioxyde de carbone (Co2)",
       "decimal": "Niveau de CO2 (décimal)",
       "integer": "Niveau de CO2 (entier)"
-    },
-    "test": {
-      "shortCategoryName": "Test",
-      "binary": "Test"
     },
     "switch": {
       "shortCategoryName": "Prise",
@@ -4856,8 +4842,7 @@
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
       "lmh_volume": "Volume de la sirène",
-      "melody": "Mélodie",
-      "for-automation-only": "Sirène (automatisation)"
+      "melody": "Mélodie"
     },
     "cube": {
       "shortCategoryName": "Cube",

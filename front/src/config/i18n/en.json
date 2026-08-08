@@ -4293,10 +4293,6 @@
           "low": "Low",
           "medium": "Medium",
           "high": "High"
-        },
-        "for-automation-only": {
-          "stop": "Stop",
-          "smoke-siren": "Smoke siren"
         }
       },
       "vacuum-cleaner": {
@@ -4541,10 +4537,6 @@
           "0": "Low",
           "1": "Medium",
           "2": "High"
-        },
-        "for-automation-only": {
-          "0": "Stop",
-          "1": "Smoke siren"
         }
       },
       "music": {
@@ -4572,6 +4564,10 @@
           "other": "No value received",
           "zero": "Clear",
           "one": "Smoke detected"
+        },
+        "test-in-progress": {
+          "0": "No",
+          "1": "Yes"
         }
       },
       "co-sensor": {
@@ -4616,13 +4612,6 @@
           "medium-risk": "Medium",
           "high-risk": "High",
           "unknown": "Unknown"
-        }
-      },
-      "test": {
-        "binary": {
-          "other": "No value received",
-          "zero": "No",
-          "one": "Yes"
         }
       },
       "level-sensor": {
@@ -4826,7 +4815,8 @@
     "smoke-sensor": {
       "shortCategoryName": "Smoke sensor",
       "binary": "Smoke (on/off)",
-      "decimal": "Density (decimal)"
+      "decimal": "Density (decimal)",
+      "test-in-progress": "Test in progress"
     },
     "co-sensor": {
       "shortCategoryName": "Carbon Monoxide (CO) Sensor",
@@ -4836,10 +4826,6 @@
       "shortCategoryName": "Co2 Sensor",
       "decimal": "Co2 (decimal)",
       "integer": "Co2 (integer)"
-    },
-    "test": {
-      "shortCategoryName": "Test",
-      "binary": "Test"
     },
     "switch": {
       "shortCategoryName": "Switch",
@@ -4856,8 +4842,7 @@
       "shortCategoryName": "Siren",
       "binary": "Siren",
       "lmh_volume": "Siren volume",
-      "melody": "Melody",
-      "for-automation-only": "Siren (automation)"
+      "melody": "Melody"
     },
     "cube": {
       "shortCategoryName": "Cube",

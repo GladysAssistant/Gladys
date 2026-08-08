@@ -15,7 +15,7 @@ const DANGER_ON_VALUE_SENSORS_CATEGORY_TYPES = {
     DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.DOOR_OPENED,
     DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.WINDOW_OPENED
   ],
-  [DEVICE_FEATURE_CATEGORIES.TEST]: [DEVICE_FEATURE_TYPES.TEST.BINARY]
+  [DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]: [DEVICE_FEATURE_TYPES.SENSOR.BINARY]
 };
 
 const BinaryDeviceValue = ({ deviceFeature, intl }) => {
@@ -42,9 +42,10 @@ const BinaryDeviceValue = ({ deviceFeature, intl }) => {
         'bg-secondary': !valued
       })}
     >
-      <Text id={`deviceFeatureValue.category.${category}.binary`} plural={value}>
-        {!customText && <Text id="deviceFeatureValue.type.binary" plural={value} />}
-        {customText && <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`} />}
+      <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`}>
+        <Text id={`deviceFeatureValue.category.${category}.binary`} plural={value}>
+          <Text id="deviceFeatureValue.type.binary" plural={value} />
+        </Text>
       </Text>
     </span>
   );
