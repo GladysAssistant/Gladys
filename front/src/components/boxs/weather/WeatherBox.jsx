@@ -206,6 +206,20 @@ class WeatherBoxComponent extends Component {
     const isModeOn = mode => (DEFAULT_ON_WEATHER_MODES.includes(mode) ? modes[mode] !== false : Boolean(modes[mode]));
     const showDateLocation = isModeOn(GetWeatherModes.DateLocation);
     const showCurrentWeather = isModeOn(GetWeatherModes.CurrentWeather);
+    const shownAlerts = isModeOn(GetWeatherModes.Alerts) ? alerts : [];
+    // several phenomena of a same area often share one bulletin (Météo France
+    // sends the whole department bulletin as every alert description), so the
+    // text is only printed once
+    const seenDescriptions = new Set();
+    const alertDescriptions = shownAlerts
+      .filter(alert => alert.description && !seenDescriptions.has(alert.description))
+      .map(alert => {
+        seenDescriptions.add(alert.description);
+        return {
+          alertKey: `${alert.severity}-${alert.event}-${alert.start || ''}`,
+          description: alert.description
+        };
+      });
     const showChips =
       isModeOn(GetWeatherModes.AdvancedWeather) &&
       (humidity !== null ||
@@ -222,7 +236,7 @@ class WeatherBoxComponent extends Component {
 
     // section separators are only useful when there is content above them
     const hasContentAboveHourly =
-      showDateLocation || showCurrentWeather || showChips || alerts.length > 0 || shownImages.length > 0;
+      showDateLocation || showCurrentWeather || showChips || shownAlerts.length > 0 || shownImages.length > 0;
     const hasContentAboveDaily = hasContentAboveHourly || showHourly;
 
     return (
@@ -337,9 +351,9 @@ class WeatherBoxComponent extends Component {
           )}
 
           {/* Weather alerts */}
-          {alerts.length > 0 && (
+          {shownAlerts.length > 0 && (
             <div style="margin-bottom: 10px">
-              {alerts.map(alert => {
+              {shownAlerts.map(alert => {
                 const style = ALERT_SEVERITY_STYLE[alert.severity] || { background: '#ccc', color: '#333' };
                 return (
                   <span
@@ -359,26 +373,23 @@ class WeatherBoxComponent extends Component {
                   </span>
                 );
               })}
-              {alerts
-                .filter(alert => alert.description)
-                .map(alert => {
-                  const alertKey = `${alert.severity}-${alert.event}-${alert.start || ''}`;
-                  const expanded = expandedAlerts[alertKey];
-                  return (
-                    <div
-                      key={`description-${alertKey}`}
-                      class="text-muted"
-                      onClick={() => this.toggleAlertDescription(alertKey)}
-                      style={`font-size: 12px; margin-top: 4px; white-space: pre-line; cursor: pointer; ${
-                        expanded
-                          ? ''
-                          : 'display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden'
-                      }`}
-                    >
-                      {alert.description}
-                    </div>
-                  );
-                })}
+              {alertDescriptions.map(({ alertKey, description }) => {
+                const expanded = expandedAlerts[alertKey];
+                return (
+                  <div
+                    key={`description-${alertKey}`}
+                    class="text-muted"
+                    onClick={() => this.toggleAlertDescription(alertKey)}
+                    style={`font-size: 12px; margin-top: 4px; white-space: pre-line; cursor: pointer; ${
+                      expanded
+                        ? ''
+                        : 'display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden'
+                    }`}
+                  >
+                    {description}
+                  </div>
+                );
+              })}
             </div>
           )}
 

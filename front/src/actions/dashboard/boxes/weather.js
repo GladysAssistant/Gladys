@@ -47,6 +47,67 @@ const degreesToCardinal = degrees => {
   return WIND_CARDINALS[Math.round((((Number(degrees) % 360) + 360) % 360) / 45) % 8];
 };
 
+// CAP severities from the least to the most serious, to keep the worst one
+// when several bulletins of the same phenomenon are merged
+const ALERT_SEVERITY_ORDER = ['minor', 'moderate', 'severe', 'extreme'];
+
+const severityRank = severity => {
+  const rank = ALERT_SEVERITY_ORDER.indexOf(severity);
+  return rank === -1 ? 0 : rank;
+};
+
+/**
+ * Whether an alert is still running.
+ * `end` is optional in the generic weather format: an alert without one has no
+ * known expiry and is kept — dropping it would hide the Météo France alerts,
+ * which carry no end date on most bulletins. An unparsable date is kept too:
+ * hiding a real alert over a malformed field is the worse failure.
+ */
+const isAlertOngoing = alert => {
+  if (!alert.end) {
+    return true;
+  }
+  const end = dayjs(alert.end);
+  return !end.isValid() || end.isAfter(dayjs());
+};
+
+/**
+ * Collapse the alerts of a same phenomenon into a single one.
+ * Providers relaying raw CAP bulletins (OpenWeather does) emit one alert per
+ * phenomenon AND per validity window, so a two-day heat wave arrives as two
+ * identical 'heat' entries. Expired bulletins are dropped first — the same
+ * providers keep serving them after their end date — then the rest are merged
+ * on their type (or on their event label when the provider sends no type),
+ * keeping the worst severity, the widest time range and the first description.
+ */
+const normalizeAlerts = alerts => {
+  const byPhenomenon = new Map();
+  alerts.filter(isAlertOngoing).forEach(alert => {
+    const key = alert.type || alert.event;
+    const previous = byPhenomenon.get(key);
+    if (!previous) {
+      byPhenomenon.set(key, { ...alert });
+      return;
+    }
+    // the merged alert carries the worst severity, so its badge keeps the
+    // color of the most serious bulletin of the phenomenon
+    if (severityRank(alert.severity) > severityRank(previous.severity)) {
+      previous.severity = alert.severity;
+      previous.event = alert.event;
+    }
+    if (alert.start && (!previous.start || alert.start < previous.start)) {
+      previous.start = alert.start;
+    }
+    if (alert.end && (!previous.end || alert.end > previous.end)) {
+      previous.end = alert.end;
+    }
+    if (!previous.description && alert.description) {
+      previous.description = alert.description;
+    }
+  });
+  return Array.from(byPhenomenon.values());
+};
+
 function createActions(store) {
   const boxActions = createBoxActions(store);
 
@@ -121,6 +182,9 @@ function createActions(store) {
               }
             })
           );
+        }
+        if (weather.alerts) {
+          weather.alerts = normalizeAlerts(weather.alerts);
         }
         if (weather.days) {
           // keep future days only: never assume the provider leads with

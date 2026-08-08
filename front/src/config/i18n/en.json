@@ -340,11 +340,13 @@
         "displayModes": {
           "dateLocation": "Date and location",
           "currentWeather": "Current weather",
+          "alerts": "Weather alerts",
           "advancedWeather": "Weather details (humidity, wind, UV, moon…)",
           "hourlyForecast": "Forecast for the next 24 hours",
           "dailyForecast": "Forecast for the next 5 days",
           "providerImages": "Provider images (vigilance map, rain radar…)"
         },
+        "noModeSelected": "Select at least one display mode, otherwise the widget will stay empty.",
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
         "uv": "UV",
         "alertTypes": {
