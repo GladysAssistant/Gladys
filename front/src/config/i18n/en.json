@@ -4305,8 +4305,8 @@
             "1": "Enabled"
           },
           "state": {
-            "0": "Enable",
-            "1": "Disable"
+            "0": "Disable",
+            "1": "Enable"
           }
         },
         "lock": {

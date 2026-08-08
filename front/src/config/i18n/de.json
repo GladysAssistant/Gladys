@@ -4305,8 +4305,8 @@
             "1": "Aktiviert"
           },
           "state": {
-            "0": "Aktivieren",
-            "1": "Deaktivieren"
+            "0": "Deaktivieren",
+            "1": "Aktivieren"
           }
         },
         "lock": {
