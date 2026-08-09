@@ -4537,6 +4537,10 @@
           "0": "Faible",
           "1": "Moyen",
           "2": "Fort"
+        },
+        "test-in-progress": {
+          "0": "Non",
+          "1": "Oui"
         }
       },
       "music": {
@@ -4564,10 +4568,6 @@
           "other": "Aucune valeur reçue",
           "zero": "Sain",
           "one": "Fumée détectée"
-        },
-        "test-in-progress": {
-          "0": "Non",
-          "1": "Oui"
         }
       },
       "co-sensor": {
@@ -4815,8 +4815,7 @@
     "smoke-sensor": {
       "shortCategoryName": "Détecteur de fumée",
       "binary": "Capteur de fumée - Oui/Non",
-      "decimal": "Valeur de fumée décimale",
-      "test-in-progress": "Test en cours"
+      "decimal": "Valeur de fumée décimale"
     },
     "co-sensor": {
       "shortCategoryName": "Capteur de monoxyde de carbone (CO)",
@@ -4842,7 +4841,8 @@
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
       "lmh_volume": "Volume de la sirène",
-      "melody": "Mélodie"
+      "melody": "Mélodie",
+      "test-in-progress": "Test en cours"
     },
     "cube": {
       "shortCategoryName": "Cube",

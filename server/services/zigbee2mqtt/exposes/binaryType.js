@@ -64,8 +64,8 @@ const names = {
   },
   test: {
     feature: {
-      category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
-      type: DEVICE_FEATURE_TYPES.SENSOR.TEST_IN_PROGRESS,
+      category: DEVICE_FEATURE_CATEGORIES.SIREN,
+      type: DEVICE_FEATURE_TYPES.SIREN.TEST_IN_PROGRESS,
     },
   },
   child_lock: {
@@ -138,12 +138,6 @@ const names = {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.WATER_VALVE,
       type: DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE,
-    },
-  },
-  siren_for_automation_only: {
-    feature: {
-      category: DEVICE_FEATURE_CATEGORIES.SIREN,
-      type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
     },
   },
 };

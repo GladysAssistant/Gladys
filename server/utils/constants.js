@@ -813,7 +813,6 @@ const DEVICE_FEATURE_TYPES = {
     INTEGER: 'integer',
     BINARY: 'binary',
     PUSH: 'push',
-    TEST_IN_PROGRESS: 'test-in-progress',
     UNKNOWN: 'unknown',
   },
   TEMPERATURE_SENSOR: {
@@ -850,6 +849,7 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     LMH_VOLUME: 'lmh_volume',
     MELODY: 'melody',
+    TEST_IN_PROGRESS: 'test-in-progress',
   },
   CHILD_LOCK: {
     BINARY: 'binary',

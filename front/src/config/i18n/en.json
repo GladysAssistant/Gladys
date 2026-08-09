@@ -4537,6 +4537,10 @@
           "0": "Low",
           "1": "Medium",
           "2": "High"
+        },
+        "test-in-progress": {
+          "0": "No",
+          "1": "Yes"
         }
       },
       "music": {
@@ -4564,10 +4568,6 @@
           "other": "No value received",
           "zero": "Clear",
           "one": "Smoke detected"
-        },
-        "test-in-progress": {
-          "0": "No",
-          "1": "Yes"
         }
       },
       "co-sensor": {
@@ -4815,8 +4815,7 @@
     "smoke-sensor": {
       "shortCategoryName": "Smoke sensor",
       "binary": "Smoke (on/off)",
-      "decimal": "Density (decimal)",
-      "test-in-progress": "Test in progress"
+      "decimal": "Density (decimal)"
     },
     "co-sensor": {
       "shortCategoryName": "Carbon Monoxide (CO) Sensor",
@@ -4842,7 +4841,8 @@
       "shortCategoryName": "Siren",
       "binary": "Siren",
       "lmh_volume": "Siren volume",
-      "melody": "Melody"
+      "melody": "Melody",
+      "test-in-progress": "Test in progress"
     },
     "cube": {
       "shortCategoryName": "Cube",

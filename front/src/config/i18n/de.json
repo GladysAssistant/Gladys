@@ -4537,6 +4537,10 @@
           "0": "Niedrig",
           "1": "Mittel",
           "2": "Hoch"
+        },
+        "test-in-progress": {
+          "0": "Nein",
+          "1": "Ja"
         }
       },
       "music": {
@@ -4564,10 +4568,6 @@
           "other": "Kein Wert empfangen",
           "zero": "Kein Rauch",
           "one": "Rauch erkannt"
-        },
-        "test-in-progress": {
-          "0": "Nein",
-          "1": "Ja"
         }
       },
       "co-sensor": {
@@ -4815,8 +4815,7 @@
     "smoke-sensor": {
       "shortCategoryName": "Rauchsensor",
       "binary": "Rauch (an/aus)",
-      "decimal": "Dichte (dezimal)",
-      "test-in-progress": "Test läuft"
+      "decimal": "Dichte (dezimal)"
     },
     "co-sensor": {
       "shortCategoryName": "Kohlenmonoxid (CO)-Sensor",
@@ -4842,7 +4841,8 @@
       "shortCategoryName": "Sirene",
       "binary": "Sirene",
       "lmh_volume": "Lautstärke der Sirene",
-      "melody": "Melodie"
+      "melody": "Melodie",
+      "test-in-progress": "Test läuft"
     },
     "cube": {
       "shortCategoryName": "Würfel",
