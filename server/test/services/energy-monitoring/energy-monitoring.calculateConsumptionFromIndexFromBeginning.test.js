@@ -123,14 +123,14 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
         where: { id: testConsumptionFeatureId },
       });
 
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
       expect(result).to.equal(null);
     });
 
     it('should return null when no device states found in database', async () => {
       // No device states inserted, so database should be empty
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
       expect(result).to.equal(null);
     });
@@ -159,7 +159,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       // Mock current time to be just after the last state
       clock = useFakeTimers(new Date(baseTime.getTime() + 5 * 60 * 1000)); // 5 minutes after
 
-      await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
       // Verify that consumption states were created
       const consumptionStates = await db.duckDbReadConnectionAllAsync(
@@ -187,7 +187,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       // Mock current time to be 1 hour after the newest state
       clock = useFakeTimers(new Date('2023-10-03T12:00:00.000Z'));
 
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
       expect(result).to.equal(null); // Function should complete successfully
 
@@ -279,7 +279,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       // Mock current time
       clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
 
-      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+      const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
       expect(result).to.equal(null); // Function should complete successfully
 
@@ -345,7 +345,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
       return originalCalculateConsumptionFromIndex.call(energyMonitoring, jobId, windowTime);
     };
 
-    const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning('job-123');
+    const result = await energyMonitoring.calculateConsumptionFromIndexFromBeginning(undefined, 'job-123');
 
     // Restore original function
     energyMonitoring.calculateConsumptionFromIndex = originalCalculateConsumptionFromIndex;
@@ -357,5 +357,158 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
 
     // Should have processed multiple windows (at least 3: 10:00, 10:30, 11:00, 11:30)
     expect(callCount).to.be.at.least(3);
+  });
+
+  describe('Progress updates', () => {
+    it('should update progress with job id', async () => {
+      await db.duckDbBatchInsertState(testIndexFeatureId, [
+        { value: 1000, created_at: new Date('2023-10-02T20:00:00.000Z') },
+        { value: 1100, created_at: new Date('2023-10-02T20:30:00.000Z') },
+      ]);
+      clock = useFakeTimers(new Date('2023-10-02T21:10:00.000Z'));
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(['test-energy-device-consumption'], 'job-123');
+      expect(gladys.job.updateProgress.called).to.equal(true);
+    });
+  });
+
+  describe('Edge cases on params and selectors', () => {
+    it('should restore previous last processed timestamp on selector-based recalculation', async () => {
+      const customDevice = {
+        id: 'custom-device',
+        name: 'Custom Energy Device',
+        params: [{ name: 'ENERGY_INDEX_LAST_PROCESSED', value: '2023-10-03T08:30:00.000Z' }],
+        features: [
+          {
+            id: '11111111-1111-1111-1111-111111111111',
+            selector: 'custom-index',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
+          },
+          {
+            id: '33333333-3333-3333-3333-333333333333',
+            selector: 'valid-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: '11111111-1111-1111-1111-111111111111',
+          },
+        ],
+      };
+
+      clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
+
+      const getStub = stub(gladys.device, 'get').returns([customDevice]);
+      const oldestStub = stub(gladys.device, 'getOldestStateFromDeviceFeatures').resolves([
+        { oldest_created_at: new Date('2023-10-03T10:00:00.000Z') },
+      ]);
+      const destroyFromStub = stub(gladys.device, 'destroyStatesFrom').resolves();
+      const destroyParamStub = stub(gladys.device, 'destroyParam').resolves();
+      const setParamStub = stub(gladys.device, 'setParam').resolves();
+      const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').resolves();
+
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning(['valid-consumption'], 'job-restore');
+
+      expect(setParamStub.called).to.equal(true);
+      expect(setParamStub.firstCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
+      expect(setParamStub.firstCall.args[2]).to.equal('2023-10-03T08:30:00.000Z');
+
+      calcStub.restore();
+      setParamStub.restore();
+      destroyParamStub.restore();
+      destroyFromStub.restore();
+      oldestStub.restore();
+      getStub.restore();
+    });
+
+    it('should restore previous last processed timestamp on full-history recalculation when a window fails', async () => {
+      const customDevice = {
+        id: 'custom-device',
+        name: 'Custom Energy Device',
+        params: [{ name: 'ENERGY_INDEX_LAST_PROCESSED', value: '2023-10-03T08:30:00.000Z' }],
+        features: [
+          {
+            id: '11111111-1111-1111-1111-111111111111',
+            selector: 'custom-index',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
+          },
+          {
+            id: '33333333-3333-3333-3333-333333333333',
+            selector: 'valid-consumption',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: '11111111-1111-1111-1111-111111111111',
+          },
+        ],
+      };
+
+      clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
+
+      const getStub = stub(gladys.device, 'get').returns([customDevice]);
+      const oldestStub = stub(gladys.device, 'getOldestStateFromDeviceFeatures').resolves([
+        { oldest_created_at: new Date('2023-10-03T10:00:00.000Z') },
+      ]);
+      const destroyFromStub = stub(gladys.device, 'destroyStatesFrom').resolves();
+      const destroyParamStub = stub(gladys.device, 'destroyParam').resolves();
+      const setParamStub = stub(gladys.device, 'setParam').resolves();
+
+      let callCount = 0;
+      const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').callsFake(async () => {
+        callCount += 1;
+        if (callCount === 1) {
+          throw new Error('Simulated window failure');
+        }
+        return null;
+      });
+
+      await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-restore-on-failure');
+
+      expect(setParamStub.called).to.equal(true);
+      expect(setParamStub.firstCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
+      expect(setParamStub.firstCall.args[2]).to.equal('2023-10-03T08:30:00.000Z');
+
+      calcStub.restore();
+      setParamStub.restore();
+      destroyParamStub.restore();
+      destroyFromStub.restore();
+      oldestStub.restore();
+      getStub.restore();
+    });
+  });
+
+  it('should return null when no oldest state exists (effectiveStartAt falsy)', async () => {
+    const deviceWithFeatures = {
+      id: 'no-state-device',
+      name: 'No State Device',
+      features: [
+        {
+          id: 'no-state-index',
+          selector: 'no-state-index',
+          external_id: 'no-state-index',
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+          energy_parent_id: null,
+        },
+        {
+          id: 'no-state-consumption',
+          selector: 'no-state-consumption',
+          external_id: 'no-state-consumption',
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+          energy_parent_id: 'no-state-index',
+        },
+      ],
+    };
+    const getStub = stub(gladys.device, 'get').resolves([deviceWithFeatures]);
+    const oldestStub = stub(gladys.device, 'getOldestStateFromDeviceFeatures').resolves([]);
+    clock = useFakeTimers(new Date('2023-10-03T11:00:00.000Z'));
+    const calcStub = stub(energyMonitoring, 'calculateConsumptionFromIndex').resolves();
+    const res = await energyMonitoring.calculateConsumptionFromIndexFromBeginning([], 'job-nooldest');
+    expect(res).to.equal(null);
+    expect(calcStub.called).to.equal(false);
+    oldestStub.restore();
+    getStub.restore();
+    calcStub.restore();
   });
 });

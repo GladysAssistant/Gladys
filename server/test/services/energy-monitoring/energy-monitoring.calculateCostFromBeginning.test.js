@@ -55,7 +55,14 @@ describe('EnergyMonitoring.calculateCostFromBeginning', () => {
   it('should calculate cost from beginning', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     energyMonitoring.calculateCostFrom = fake.returns(null);
-    await energyMonitoring.calculateCostFromBeginning('12345678-1234-1234-1234-1234567890ab');
-    assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), '12345678-1234-1234-1234-1234567890ab');
+    await energyMonitoring.calculateCostFromBeginning([], '12345678-1234-1234-1234-1234567890ab');
+    assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), [], '12345678-1234-1234-1234-1234567890ab');
+  });
+
+  it('should forward selectors and job id', async () => {
+    const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+    energyMonitoring.calculateCostFrom = fake.returns(null);
+    await energyMonitoring.calculateCostFromBeginning(['feature-1', 'feature-2'], 'job-456');
+    assert.calledWith(energyMonitoring.calculateCostFrom, new Date(0), ['feature-1', 'feature-2'], 'job-456');
   });
 });
