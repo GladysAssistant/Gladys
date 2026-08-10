@@ -8,7 +8,7 @@ the runaway loop of the event-driven mode (Claude pushes → the bots re-review
 
 ## How it works
 
-```
+```text
  select (bash + gh api, no LLM)      fire (matrix, one job per PR)      Anthropic cloud
  ┌────────────────────────────┐      ┌─────────────────────────────┐    ┌─────────────────────────┐
  │ list open PRs              │      │ POST the routine /fire API  │    │ new Claude Code session │
@@ -31,22 +31,27 @@ A PR is eligible when **all** of this is true:
    head branch belongs to this repository (fork PRs are skipped) and starts
    with `HEAD_BRANCH_PREFIX` (cloud sessions may only push `claude/`
    branches);
-2. it carries fewer than `MAX_PASSES` autofix commits, counted via the
-   `Autofix-Pass: <n>` commit-message trailer (commit authors are ambiguous,
-   the trailer is not);
+2. its highest `Autofix-Pass: <n>` commit-message trailer is below
+   `MAX_PASSES` (commit authors are ambiguous, the trailer is not; the
+   highest value rather than the commit count, so an amended or rebased
+   pass cannot burn the budget twice);
 3. it has neither the `claude:autofix-exhausted` nor the `claude:autofix-skip`
    label;
 4. it has at least one review comment or issue comment that is, all at once:
    - authored by a review bot (`REVIEW_BOT_LOGINS`),
    - not in a resolved review thread,
    - not yet replied to by the autofix (see "How a comment is marked handled"),
-   - created **after** the last autofix commit (or the PR creation when no
-     pass ran yet) and **before** now minus `QUIET_PERIOD_HOURS`.
+   - older than now minus `QUIET_PERIOD_HOURS`.
 
-The date window and the mandatory replies are the anti-loop core: feedback the
-bots post after an autofix push can trigger at most one more pass, and a pass
-never re-processes what a previous one already answered. `MAX_PASSES` bounds
-the total no matter what.
+The mandatory marker replies are the anti-loop core: a pass never re-processes
+what a previous one already answered, and feedback the bots post after an
+autofix push can trigger at most one more pass. There is deliberately **no
+lower date bound** on comments: markers, not dates, are the source of truth
+for "handled", so a session that pushed but died before posting its replies
+leaves its comments eligible — they are retried the next day (burning another
+pass) instead of silently falling out of a date window. A stuck PR therefore
+always ends up either fixed or visibly `exhausted`; feedback is never
+orphaned. `MAX_PASSES` bounds the total no matter what.
 
 ## How a comment is marked handled
 
@@ -67,14 +72,14 @@ also marks the whole thread, and resolving a thread by hand excludes it too.
 
 | Constant | Value | Role |
 | --- | --- | --- |
-| `MAX_PASSES` | 3 | Hard cap of autofix commits per PR. Reached with feedback still pending → exhausted. |
+| `MAX_PASSES` | 3 | Hard cap of autofix passes per PR (highest trailer value). Reached with feedback still pending → exhausted. |
 | `MAX_PRS` | 8 | Budget circuit breaker: max PRs per daily run, oldest activity first. Each fire also draws down the account's daily routine-run allowance. |
 | `QUIET_PERIOD_HOURS` | 2 | A comment younger than this is left for the next run, so a review round can finish (and a human can veto). |
 | `REVIEW_BOT_LOGINS` | `cursor[bot]`, `coderabbitai[bot]` | Whose comments count as actionable feedback. |
 | `AUTOFIX_ACTOR_LOGINS` | `Pierre-Gilles`, `github-actions[bot]`, `claude[bot]` | Whose replies/markers count as "handled". Cloud sessions post as the routine owner (first login). |
 | `HEAD_BRANCH_PREFIX` | `claude/` | Cloud sessions can only push branches with this prefix; other PRs are skipped. |
-| `FIRE_STAGGER_MINUTES` | 8 | How long each matrix slot is held after firing. With `max-parallel: 2`, keeps ~2 sessions running at a time (no public API exposes session completion). |
-| `EXHAUSTED_LABEL` | `claude:autofix-exhausted` | Permanently stops the autofix on a PR. Posed automatically. |
+| `FIRE_STAGGER_MINUTES` | 8 | How long each matrix slot is held after firing. With `max-parallel: 2`, staggers session *launches* (~2 fires per window); it does not bound how many sessions run concurrently. |
+| `EXHAUSTED_LABEL` | `claude:autofix-exhausted` | Permanently stops the autofix on a PR. Posted automatically. |
 | `SKIP_LABEL` | `claude:autofix-skip` | Manual opt-out for a PR. |
 | `NOISE_MARKER` | `This is an auto-generated comment` | Filters CodeRabbit's non-actionable issue comments (walkthroughs, status notes). |
 
@@ -98,9 +103,25 @@ environment. What remains is web-UI-only:
 
 No Anthropic API key and no PAT are needed: sessions bill the claude.ai
 subscription, and their GitHub access comes from the account's GitHub
-connection. If the routine's prompt needs changing (it mirrors the contract
-described here: payload fields, strict scope, trailer, mandatory replies with
-markers), edit it on the routine's page.
+connection (keep that connection's OAuth scopes to the minimum the routine
+needs: push and comment on this repository).
+
+The routine's full prompt is versioned in
+[`CLAUDE_AUTOFIX_ROUTINE_PROMPT.md`](CLAUDE_AUTOFIX_ROUTINE_PROMPT.md) — it is
+the security boundary of the fired sessions (strict scope, mandatory markers,
+payload treated as data), so treat any edit to it like a workflow change:
+review it in a pull request first, then copy it to the routine's page, and
+keep the two in sync.
+
+## Decommissioning the event-driven mode (merge prerequisite)
+
+This repository contains no event-driven Claude workflow: the old event mode
+lives in the Claude GitHub App / claude.ai automation configuration, outside
+git. Before (or immediately when) this workflow goes live, disable any
+automatic Claude response to PR events there — otherwise both systems run and
+the push → re-review → react loop this workflow exists to kill continues.
+`cursor-automation-webhook.yml` and `pr-classify.yml` trigger reviews and
+labels, not Claude, and stay in place.
 
 ## When a PR becomes "exhausted"
 
@@ -132,8 +153,15 @@ excerpt). Nothing is written and no cloud session is fired.
   `experimental-cc-routine-2026-04-01` beta header; Anthropic may change it.
 - Routine runs count against the account's **daily routine-run cap** and
   subscription usage; HTTP 429 on the fire call means the cap was hit.
+- The fire is not idempotent: manually re-running the workflow while the
+  daily run's sessions are still working can fire a second session for the
+  same PR and pass. Consequences are bounded (the pass counter takes the
+  highest trailer, markers dedupe the replies) but reviews get noisy — avoid
+  manual dispatches right after the scheduled run.
 - A comment posted less than `QUIET_PERIOD_HOURS` before the daily run waits
   for the next day: worst-case latency is ~26 h.
+- Review threads with more than 100 replies are read truncated when looking
+  for autofix replies (unreachable in practice on this repo's PRs).
 - `mergeable_state` is computed asynchronously by GitHub; a PR in `unknown`
   state is treated as conflict-free.
 - Cursor/CodeRabbit re-review every push, including autofix pushes: each pass

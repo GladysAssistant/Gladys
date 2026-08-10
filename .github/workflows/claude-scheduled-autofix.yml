@@ -8,13 +8,16 @@ run-name: Scheduled Claude autofix${{ inputs.dry_run == true && ' (dry run)' || 
 # being reprocessed even though nothing had changed.
 #
 # The anti-loop core (do not simplify):
-#   - a comment is only eligible if it was posted AFTER the last autofix
-#     commit on the branch (so feedback already covered by a pass never
-#     retriggers one), and
 #   - every pass replies to EVERY comment it considered, with a hidden
-#     "Autofix-Handled: rc-<id> / ic-<id>" marker; a marked comment is never
-#     selected again, even when the fix was declined.
-# Hard caps on top: MAX_PASSES autofix commits per PR (then the PR is
+#     "Autofix-Handled: rc-<id> / ic-<id>" marker; a marked comment (or a
+#     thread with an autofix reply, or a resolved thread) is never
+#     selected again, even when the fix was declined;
+#   - markers, not dates, are the source of truth for "handled": a session
+#     that pushed but died before replying leaves its comments unmarked, so
+#     they come back the next day and burn another pass until MAX_PASSES
+#     flips the PR to "exhausted" for a human. A wasted pass is visible;
+#     silently orphaned feedback is not possible.
+# Hard caps on top: MAX_PASSES autofix passes per PR (then the PR is
 # labeled and left to a human) and MAX_PRS PRs per day.
 #
 # Two jobs:
@@ -79,10 +82,11 @@ env:
   # branches are rejected when they carry commits by someone else), so
   # only PRs from such branches are eligible.
   HEAD_BRANCH_PREFIX: 'claude/'
-  # Minutes each matrix slot is held after firing. There is no public API
-  # to wait for a cloud session's completion, so this stagger combined
-  # with max-parallel 2 keeps roughly two autofix sessions running at a
-  # time instead of MAX_PRS at once.
+  # Minutes each matrix slot is held after firing. Combined with
+  # max-parallel 2 this staggers session LAUNCHES (about two fires per
+  # window) so pushes do not all land at once; it does NOT bound how many
+  # sessions are alive concurrently, since sessions outlive the job and no
+  # public API exposes their completion.
   FIRE_STAGGER_MINUTES: 8
   # Label that permanently stops the scheduled autofix on a PR (posed
   # automatically at MAX_PASSES).
@@ -136,7 +140,8 @@ jobs:
           # Bot logins as JSON arrays without the "[bot]" suffix: REST says
           # "cursor[bot]" where GraphQL says "cursor", so every comparison
           # below strips the suffix first.
-          to_json_list() { printf '%s\n' $1 | sed 's/\[bot\]$//' | jq -R . | jq -sc .; }
+          # tr instead of unquoted expansion so "[bot]" can never glob.
+          to_json_list() { tr ' ' '\n' <<< "$1" | sed '/^$/d; s/\[bot\]$//' | jq -R . | jq -sc .; }
           REVIEW_JSON=$(to_json_list "$REVIEW_BOT_LOGINS")
           AUTOFIX_JSON=$(to_json_list "$AUTOFIX_ACTOR_LOGINS")
 
@@ -202,17 +207,15 @@ jobs:
             echo "$LABELS" | grep -qxF "$EXHAUSTED_LABEL" && { skip "label $EXHAUSTED_LABEL"; continue; }
             echo "$LABELS" | grep -qxF "$SKIP_LABEL" && { skip "label $SKIP_LABEL"; continue; }
 
-            # 2. Autofix passes already burnt, counted via the commit
-            # trailer (the author of automated commits is ambiguous, the
-            # trailer is not). The last autofix commit date is the lower
-            # bound of the comment eligibility window; before any pass, the
-            # PR creation date plays that role.
+            # 2. Autofix passes already burnt: the highest "Autofix-Pass:
+            # <n>" commit-message trailer on the branch (the author of
+            # automated commits is ambiguous, the trailer is not). The
+            # highest value rather than the commit count, so an amended or
+            # rebased pass cannot burn the budget twice.
             COMMITS=$(gh api --paginate "repos/$GH_REPO/pulls/$NUM/commits?per_page=100" | jq -s 'add // []') \
               || { echo "::warning::PR #$NUM: could not fetch commits, skipping"; continue; }
-            AUTOFIX_COMMITS=$(echo "$COMMITS" | jq '[.[] | select(.commit.message | test("(^|\\n)Autofix-Pass: *[0-9]+"))]')
-            PASSES=$(echo "$AUTOFIX_COMMITS" | jq 'length')
-            REF_DATE=$(echo "$AUTOFIX_COMMITS" | jq -r '[.[].commit.committer.date] | max // empty')
-            [ -n "$REF_DATE" ] || REF_DATE=$(echo "$PR" | jq -r '.created_at')
+            PASSES=$(echo "$COMMITS" | jq '[.[].commit.message
+              | capture("(^|\n)Autofix-Pass: *(?<n>[0-9]+)").n | tonumber] | max // 0')
 
             ISSUE_COMMENTS=$(gh api --paginate "repos/$GH_REPO/issues/$NUM/comments?per_page=100" | jq -s 'add // []') \
               || { echo "::warning::PR #$NUM: could not fetch issue comments, skipping"; continue; }
@@ -229,12 +232,15 @@ jobs:
                            '.[].comments[] | select((.login | sub("\\[bot\\]$";"")) as $l | ($af | index($l)) != null) | .body'; } \
                        | { grep -oE 'Autofix-Handled: *[ri]c-[0-9]+' || true; } | sed -E 's/Autofix-Handled: *//' | sort -u)
 
-            # 5. Eligible review comments: root of an unresolved thread
-            # (5b), opened by a review bot (5a), with no in-thread autofix
-            # reply and no handled marker (5c), inside the [last autofix
-            # commit, now - quiet period] window (5d).
+            # 5. Eligible review comments: root of an unresolved thread,
+            # opened by a review bot, with no in-thread autofix reply and
+            # no handled marker, older than the quiet period. Deliberately
+            # NO lower date bound: markers are the source of truth for
+            # "handled", so a comment a session failed to reply to stays
+            # eligible and is retried (at the price of a pass) instead of
+            # falling out of a date window and being orphaned.
             RC=$(echo "$THREADS" | jq --argjson bots "$REVIEW_JSON" --argjson af "$AUTOFIX_JSON" \
-                   --arg ref "$REF_DATE" --arg cutoff "$CUTOFF" --arg handled "$HANDLED" '
+                   --arg cutoff "$CUTOFF" --arg handled "$HANDLED" '
               [ .[]
                 | select(.isResolved | not)
                 | . as $t
@@ -244,20 +250,20 @@ jobs:
                           | any(. as $l | ($af | index($l)) != null)) | not)
                 | ("rc-" + (.id | tostring)) as $tok
                 | select(($handled | split("\n") | index($tok)) == null)
-                | select(.created > $ref and .created < $cutoff)
+                | select(.created < $cutoff)
                 | {id, created, author: .login, excerpt: (.body | gsub("[\\r\\n]+"; " ") | .[0:110])}
               ]')
 
             # Same for issue comments (no resolution concept there), minus
             # the auto-generated CodeRabbit chatter.
             IC=$(echo "$ISSUE_COMMENTS" | jq --argjson bots "$REVIEW_JSON" \
-                   --arg ref "$REF_DATE" --arg cutoff "$CUTOFF" --arg handled "$HANDLED" --arg noise "$NOISE_MARKER" '
+                   --arg cutoff "$CUTOFF" --arg handled "$HANDLED" --arg noise "$NOISE_MARKER" '
               [ .[]
                 | select(((.user.login // "") | sub("\\[bot\\]$";"")) as $l | ($bots | index($l)) != null)
                 | select((.body | contains($noise)) | not)
                 | ("ic-" + (.id | tostring)) as $tok
                 | select(($handled | split("\n") | index($tok)) == null)
-                | select(.created_at > $ref and .created_at < $cutoff)
+                | select(.created_at < $cutoff)
                 | {id, created: .created_at, author: .user.login, excerpt: (.body | gsub("[\\r\\n]+"; " ") | .[0:110])}
               ]')
 
@@ -270,7 +276,7 @@ jobs:
               continue
             fi
 
-            echo "PR #$NUM: ELIGIBLE — passes done: $PASSES, next pass: $((PASSES + 1)), unhandled comments: $PENDING, window: ($REF_DATE .. $CUTOFF)"
+            echo "PR #$NUM: ELIGIBLE — passes done: $PASSES, next pass: $((PASSES + 1)), unhandled comments: $PENDING, quiet-period cutoff: $CUTOFF"
             jq -rn --argjson rc "$RC" --argjson ic "$IC" '
               ($rc[] | "    - review comment rc-\(.id) by \(.author) at \(.created): \(.excerpt)"),
               ($ic[] | "    - issue comment ic-\(.id) by \(.author) at \(.created): \(.excerpt)")'
@@ -337,8 +343,8 @@ jobs:
     timeout-minutes: 15
     strategy:
       fail-fast: false
-      # Together with the stagger hold, keeps roughly two cloud sessions
-      # working at a time.
+      # Together with the stagger hold, spaces the session launches out
+      # (about two fires per stagger window).
       max-parallel: 2
       matrix:
         pr: ${{ fromJSON(needs.select.outputs.matrix) }}
@@ -399,11 +405,12 @@ jobs:
               ;;
           esac
 
-      - name: ⏳ Hold the slot to stagger sessions
+      - name: ⏳ Hold the slot to stagger launches
         run: |
-          # No public API exposes the cloud session's completion, so the
-          # matrix slot is simply held for a while after firing. With
-          # max-parallel 2 this spaces the sessions out instead of starting
-          # MAX_PRS of them at the same instant (and flooding the review
-          # bots and CI with simultaneous pushes).
+          # No public API exposes the cloud session's completion, so this
+          # only staggers the LAUNCHES (with max-parallel 2, about two
+          # fires per window) instead of starting MAX_PRS sessions at the
+          # same instant. It spreads the review-bot and CI load of the
+          # resulting pushes; it does not bound how many sessions are
+          # alive at once.
           sleep $(( FIRE_STAGGER_MINUTES * 60 ))
