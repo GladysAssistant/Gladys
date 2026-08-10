@@ -65,8 +65,11 @@ jobs:
           EVENT_PR: ${{ github.event.pull_request.number }}
           EVENT_PR_DRAFT: ${{ github.event.pull_request.draft }}
           EVENT_PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          EVENT_PR_STATE: ${{ github.event.pull_request.state }}
+          EVENT_PR_CREATED_AT: ${{ github.event.pull_request.created_at }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_STATE: ${{ github.event.issue.state }}
           COMMENT_ID: ${{ github.event.comment.id }}
           COMMENT_BODY: ${{ github.event.comment.body }}
           COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
@@ -95,8 +98,20 @@ jobs:
               PR_NUMBER="$EVENT_PR"
               case "$EVENT_ACTION" in
                 labeled)
-                  REASON='label'
-                  RUN=true
+                  # A PR can be opened with the label already set (maintainers,
+                  # `gh pr create --label`): GitHub then emits "opened" and
+                  # "labeled" back to back, and the "opened" branch below has
+                  # already asked for a review. An unparsable date yields a
+                  # huge age, which errs towards triggering the review.
+                  PR_AGE=$(($(date -u +%s) - $(date -u -d "$EVENT_PR_CREATED_AT" +%s 2> /dev/null || echo 0)))
+                  if [ "$EVENT_PR_STATE" != 'open' ]; then
+                    echo "PR #${PR_NUMBER} is ${EVENT_PR_STATE}: skipping the review."
+                  elif [ "$EVENT_PR_DRAFT" != 'true' ] && [ "$PR_AGE" -lt 120 ]; then
+                    echo "PR #${PR_NUMBER} was opened ${PR_AGE}s ago with the label already set: the 'opened' event already triggered a review."
+                  else
+                    REASON='label'
+                    RUN=true
+                  fi
                   ;;
                 ready_for_review)
                   REASON='pr_ready_for_review'
@@ -128,36 +143,37 @@ jobs:
             issue_comment)
               PR_NUMBER="$ISSUE_NUMBER"
 
+              # Anyone who can already influence the PR content may ask for a
+              # review: its author, and anyone with a write-ish relationship
+              # to the repository.
+              ALLOWED=false
+              if [ "$COMMENT_AUTHOR" = "$ISSUE_AUTHOR" ]; then
+                ALLOWED=true
+              else
+                case "$COMMENT_ASSOCIATION" in
+                  OWNER | MEMBER | COLLABORATOR) ALLOWED=true ;;
+                esac
+              fi
+
               # The command must start its own line, so quoting someone else
               # ("> /cursor review") never triggers a new review. Trailing
-              # text on the same line is allowed and ignored.
-              if printf '%s\n' "$COMMENT_BODY" \
-                | grep -qiE '^[[:space:]]*/cursor([[:space:]]|-)+review([[:space:]]|$)'; then
-                # Anyone who can already influence the PR content may ask for
-                # a review: its author, and anyone with a write-ish
-                # relationship to the repository.
-                if [ "$COMMENT_AUTHOR" = "$ISSUE_AUTHOR" ]; then
-                  REASON='comment'
-                  RUN=true
-                else
-                  case "$COMMENT_ASSOCIATION" in
-                    OWNER | MEMBER | COLLABORATOR)
-                      REASON='comment'
-                      RUN=true
-                      ;;
-                    *)
-                      echo "::warning::${COMMENT_AUTHOR} (${COMMENT_ASSOCIATION}) is not allowed to request a Cursor review on PR #${PR_NUMBER}."
-                      react '-1'
-                      ;;
-                  esac
-                fi
-
-                if [ "$RUN" = true ]; then
-                  echo "Cursor review requested by ${COMMENT_AUTHOR} on PR #${PR_NUMBER}."
-                  react 'eyes'
-                fi
-              else
+              # text on the same line is allowed and ignored. GitHub stores
+              # comment bodies with CRLF line endings: strip the CR so that
+              # "review" can be anchored to the end of the line.
+              if ! printf '%s\n' "$COMMENT_BODY" | tr -d '\r' \
+                | grep -qiE '^[[:blank:]]*/cursor([[:blank:]]+|-)review([[:blank:]]|$)'; then
                 echo "Comment does not contain the /cursor review command, skipping."
+              elif [ "$ISSUE_STATE" != 'open' ]; then
+                echo "::warning::PR #${PR_NUMBER} is ${ISSUE_STATE}: not starting a Cursor review."
+                react 'confused'
+              elif [ "$ALLOWED" != true ]; then
+                echo "::warning::${COMMENT_AUTHOR} (${COMMENT_ASSOCIATION}) is not allowed to request a Cursor review on PR #${PR_NUMBER}."
+                react '-1'
+              else
+                echo "Cursor review requested by ${COMMENT_AUTHOR} on PR #${PR_NUMBER}."
+                react 'eyes'
+                REASON='comment'
+                RUN=true
               fi
               ;;
           esac

@@ -65,7 +65,7 @@ If your PR implements a forum request, add a line `Forum: https://community.glad
 
 ## 🤖 Automated review
 
-An automated review runs on your PR as soon as you open it (or, for a draft, as soon as you mark it **ready for review**). Dependency bump PRs are skipped.
+An automated review runs on your PR as soon as you open it. A draft PR waits until you mark it **ready for review**. PRs authored by `dependabot[bot]` and `renovate[bot]` are the only ones skipped.
 
 To ask for a new review after pushing changes, comment on the PR:
 
@@ -73,7 +73,9 @@ To ask for a new review after pushing changes, comment on the PR:
 /cursor review
 ```
 
-The command must be alone on its line. It works for the PR author and for anyone with write access on the repository. The bot reacts with 👀 when the request is accepted and 🚀 once the review has been started. Maintainers can also add the `needs:cursor-review` label, which triggers the same thing.
+`/cursor-review` works too, and the command is case-insensitive. It has to start its own line — anything you write after it on the same line is ignored, and quoting someone else's command (`> /cursor review`) never triggers a review.
+
+The command works for the PR author and for repository owners, organization members and collaborators. The bot reacts to your comment with 👀 when the request is accepted, 🚀 once the review has been started, and 👎 if you are not allowed to ask for one. Maintainers can also add the `needs:cursor-review` label, which triggers the same thing.
 
 ---
 
