@@ -51,7 +51,9 @@ for "handled", so a session that pushed but died before posting its replies
 leaves its comments eligible — they are retried the next day (burning another
 pass) instead of silently falling out of a date window. A stuck PR therefore
 always ends up either fixed or visibly `exhausted`; feedback is never
-orphaned. `MAX_PASSES` bounds the total no matter what.
+orphaned. `MAX_PASSES` bounds the total no matter what. (A fire that fails
+before a session starts — daily routine cap, bad token — burns no pass and
+simply retries the next day, at the cost of one HTTP call and a red job.)
 
 ## How a comment is marked handled
 
@@ -156,8 +158,10 @@ excerpt). Nothing is written and no cloud session is fired.
 - The fire is not idempotent: manually re-running the workflow while the
   daily run's sessions are still working can fire a second session for the
   same PR and pass. Consequences are bounded (the pass counter takes the
-  highest trailer, markers dedupe the replies) but reviews get noisy — avoid
-  manual dispatches right after the scheduled run.
+  highest trailer, and markers prevent re-selection on *later* runs — they
+  are not concurrency control, so two live sessions can post duplicate
+  replies and overlapping commits). Avoid manual dispatches right after the
+  scheduled run.
 - A comment posted less than `QUIET_PERIOD_HOURS` before the daily run waits
   for the next day: worst-case latency is ~26 h.
 - Review threads with more than 100 replies are read truncated when looking
