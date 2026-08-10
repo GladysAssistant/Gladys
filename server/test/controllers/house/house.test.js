@@ -182,3 +182,35 @@ describe('POST /api/v1/house/:user_selector/user/:user_selector/seen', () => {
       });
   });
 });
+
+describe('GET /api/v1/house/:house_selector/sun', () => {
+  it('should return the sun state of the house', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/test-house/sun')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('dawn');
+        expect(res.body).to.have.property('sunrise');
+        expect(res.body).to.have.property('solar_noon');
+        expect(res.body).to.have.property('sunset');
+        expect(res.body).to.have.property('dusk');
+        expect(res.body.azimuth).to.be.a('number');
+        expect(res.body.elevation).to.be.a('number');
+        expect(res.body.curve).to.be.an('array');
+        expect(res.body.curve).to.have.lengthOf(73);
+      });
+  });
+  it('should return 400 when the house has no coordinates', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/pepper-house/sun')
+      .expect('Content-Type', /json/)
+      .expect(400);
+  });
+  it('should return 404 when the house does not exist', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/house-does-not-exist/sun')
+      .expect('Content-Type', /json/)
+      .expect(404);
+  });
+});
