@@ -160,5 +160,66 @@ describe('scene.send-mqtt-message', () => {
     );
     assert.calledWith(mqttService.device.publish, '/my/mqtt/topic', '{"state":"ON","on_time": }');
     assert.calledOnce(loggerWarn);
+    assert.calledWith(
+      loggerWarn,
+      sinon.match('/my/mqtt/topic').and(sinon.match('Message sent: {"state":"ON","on_time": }')),
+    );
+  });
+  it('should warn with the exact untrimmed message sent', async () => {
+    const loggerWarn = sinon.stub(logger, 'warn');
+    const stateManager = new StateManager(event);
+    const mqttService = {
+      device: {
+        publish: fake.resolves(null),
+      },
+    };
+    const service = {
+      getService: fake.returns(mqttService),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, service },
+      [
+        [
+          {
+            type: ACTIONS.MQTT.SEND,
+            topic: '/my/mqtt/topic',
+            message: '  {"state":"ON","on_time":{{unknown_variable}} }  ',
+          },
+        ],
+      ],
+      scope,
+    );
+    const messageSent = '  {"state":"ON","on_time": }  ';
+    assert.calledWith(mqttService.device.publish, '/my/mqtt/topic', messageSent);
+    assert.calledWith(loggerWarn, sinon.match(`Message sent: ${messageSent}`));
+  });
+  it('should not warn when the message is not JSON', async () => {
+    const loggerWarn = sinon.stub(logger, 'warn');
+    const stateManager = new StateManager(event);
+    const mqttService = {
+      device: {
+        publish: fake.resolves(null),
+      },
+    };
+    const service = {
+      getService: fake.returns(mqttService),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, service },
+      [
+        [
+          {
+            type: ACTIONS.MQTT.SEND,
+            topic: '/my/mqtt/topic',
+            message: 'ON',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(mqttService.device.publish, '/my/mqtt/topic', 'ON');
+    assert.notCalled(loggerWarn);
   });
 });

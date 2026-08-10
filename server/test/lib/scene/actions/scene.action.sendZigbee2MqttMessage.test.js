@@ -160,5 +160,9 @@ describe('scene.send-zigbee2mqtt-message', () => {
     );
     assert.calledWith(zigbee2MqttService.device.publish, 'zigbee2mqtt/my-device/set', '{"state":"ON","on_time": }');
     assert.calledOnce(loggerWarn);
+    assert.calledWith(
+      loggerWarn,
+      sinon.match('zigbee2mqtt/my-device/set').and(sinon.match('Message sent: {"state":"ON","on_time": }')),
+    );
   });
 });

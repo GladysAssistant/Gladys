@@ -54,11 +54,11 @@ const { evaluate } = create({
  * @example warnIfInvalidJsonMessage('MQTT', 'my/topic', '{"state":}');
  */
 function warnIfInvalidJsonMessage(actionName, topic, message) {
-  const trimmedMessage = message.trim();
+  const trimmedMessage = String(message).trim();
   if (trimmedMessage.startsWith('{') && typeof parseJsonIfJson(trimmedMessage) === 'string') {
     logger.warn(
       `${actionName}: the message sent on topic "${topic}" looks like JSON but is not valid JSON. ` +
-        `It's usually the sign of a variable which could not be resolved. Message sent: ${trimmedMessage}`,
+        `It's usually the sign of a variable which could not be resolved. Message sent: ${message}`,
     );
   }
 }
