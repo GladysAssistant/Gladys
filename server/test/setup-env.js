@@ -19,12 +19,51 @@ if (!process.env.SQLITE_FILE_PATH) {
 // own Gladys against its own database: derive a per-process path (the DuckDB
 // file and the reset snapshot are both derived from this path, so they follow
 // automatically). The files are removed when the process exits.
+// The main mocha process runs this file first and marks itself: worker
+// processes inherit the variable and skip the startup purge below.
+const isMainMochaProcess = !process.env.GLADYS_TEST_MAIN_PID;
+if (isMainMochaProcess) {
+  process.env.GLADYS_TEST_MAIN_PID = String(process.pid);
+}
+
 const workerDb = process.env.SQLITE_FILE_PATH.replace(/\.db$/, `-${process.pid}.db`);
 process.env.SQLITE_FILE_PATH = workerDb;
 
+// A run killed before its exit handlers (SIGKILL, hard timeout) leaves
+// per-pid database files behind; a later run whose worker happens to get the
+// same pid would then boot on a stale file with a possibly different schema.
+// Purge every leftover of previous runs before this one starts.
+if (isMainMochaProcess) {
+  // eslint-disable-next-line global-require
+  const { readdirSync, rmSync } = require('fs');
+  const dbDir = path.dirname(path.resolve(workerDb));
+  const dbPrefix = path.basename(process.env.SQLITE_FILE_PATH.replace(`-${process.pid}.db`, ''));
+  readdirSync(dbDir).forEach((file) => {
+    if (file.startsWith(`${dbPrefix}-`) || file.startsWith(`${dbPrefix}.`) || file.startsWith('gladys-backups-')) {
+      try {
+        rmSync(path.join(dbDir, file), { recursive: true, force: true });
+      } catch (e) {
+        // Best-effort cleanup: never fail the run for a leftover file.
+      }
+    }
+  });
+}
+
+// The gateway backup/restore tests write real files into the backups folder:
+// give each worker its own (the test config reads BACKUP_FOLDER, see
+// config/config.js).
+if (!process.env.BACKUP_FOLDER) {
+  process.env.BACKUP_FOLDER = `./gladys-backups-${process.pid}`;
+}
+
 process.on('exit', () => {
   // eslint-disable-next-line global-require
-  const { unlinkSync, readdirSync } = require('fs');
+  const { unlinkSync, readdirSync, rmSync } = require('fs');
+  try {
+    rmSync(process.env.BACKUP_FOLDER, { recursive: true, force: true });
+  } catch (e) {
+    // Best-effort cleanup: never fail the run for a leftover folder.
+  }
   const dir = path.dirname(path.resolve(workerDb));
   const base = path.basename(workerDb).replace(/\.db$/, '');
   readdirSync(dir).forEach((file) => {

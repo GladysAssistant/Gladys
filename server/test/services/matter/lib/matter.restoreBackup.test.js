@@ -21,7 +21,7 @@ describe('Matter.restoreBackup', () => {
 
   beforeEach(async () => {
     previousMatterPath = process.env.MATTER_FOLDER_PATH;
-    newMatterPath = '/tmp/gladysmattertest';
+    newMatterPath = `/tmp/gladysmattertest-${process.pid}`;
     process.env.MATTER_FOLDER_PATH = newMatterPath;
     await fse.remove(newMatterPath);
     await fse.ensureDir(newMatterPath);

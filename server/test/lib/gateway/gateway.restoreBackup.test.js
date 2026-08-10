@@ -50,7 +50,7 @@ describe('gateway.restoreBackup', () => {
     sequelize.close = fake.resolves(null);
 
     gateway = new Gateway(variable, event, {}, sequelize, config, {}, {}, {}, job, scheduler);
-    gateway.config.storage = '/tmp/gladys-database-restore-test.db';
+    gateway.config.storage = `/tmp/gladys-database-restore-test-${process.pid}.db`;
   });
 
   afterEach(() => {
