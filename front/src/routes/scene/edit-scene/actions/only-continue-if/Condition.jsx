@@ -4,7 +4,7 @@ import Select from 'react-select';
 import update from 'immutability-helper';
 
 import TextWithVariablesInjected from '../../../../../components/scene/TextWithVariablesInjected';
-import getDeviceFeatureValueOptions from '../../../../../utils/deviceFeatureValueOptions';
+import getDeviceFeatureValueOptions, { isValueInOptions } from '../../../../../utils/deviceFeatureValueOptions';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 import style from './Condition.css';
@@ -17,12 +17,7 @@ class Condition extends Component {
   // The current value can be displayed in the list only if it's a raw value present in that list
   isValueInValueOptions = valueOptions => {
     const { value, evaluate_value: evaluateValue } = this.props.condition;
-    return Boolean(
-      valueOptions &&
-        evaluateValue === undefined &&
-        value !== undefined &&
-        valueOptions.some(option => isSameValue(option.value, value))
-    );
+    return evaluateValue === undefined && isValueInOptions(valueOptions, value);
   };
 
   handleChange = selectedOption => {

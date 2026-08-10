@@ -3105,6 +3105,8 @@
         "valueLabel": "Value",
         "valueTypeSimple": "Simple",
         "simpleExplanationText": "Enter the new value you wish to assign to your device here.",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
         "valueTypeComputed": "Computed",
         "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
@@ -3396,6 +3398,8 @@
         "lessOrEqual": "less or equal",
         "different": "different",
         "valuePlaceholder": "Value",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
         "on": "On",
         "off": "Off",
         "deviceSeen": "If the device is detected",
@@ -4919,6 +4923,22 @@
           "4": "Returning to Dock",
           "5": "Charging",
           "6": "Docked"
+        },
+        "run-mode": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Idle",
+          "1": "Clean",
+          "2": "Map"
+        },
+        "clean-mode": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Auto",
+          "1": "Quick",
+          "2": "Quiet",
+          "3": "Low Noise",
+          "4": "Deep Clean",
+          "5": "Vacuum",
+          "6": "Mop"
         }
       },
       "water-heater": {

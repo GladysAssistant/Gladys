@@ -25,6 +25,20 @@ const MATTER_INDEX_SENSOR_CATEGORIES = [
 const getValueLabel = (dictionary, path, value) => get(dictionary, `${path}.${value}`, { default: `${value}` });
 
 /**
+ * @description Tell if a value can be pre-selected in a list of options.
+ * @param {Array} options - The list of { label, value } options, or null.
+ * @param {any} value - The value to look for.
+ * @returns {boolean} True if the value is one of the options.
+ * @example
+ * const found = isValueInOptions([{ label: 'Idle', value: 0 }], '0');
+ */
+function isValueInOptions(options, value) {
+  // Values saved in scenes are not always typed like the options: a value entered by hand in the
+  // free input is a string, while the options built from the translations are numbers.
+  return Boolean(options && value !== undefined && options.some(option => `${option.value}` === `${value}`));
+}
+
+/**
  * @description Get the list of values a device feature can take, with their translated label.
  * @param {Object} dictionary - The i18n dictionary.
  * @param {Object} deviceFeature - The device feature.
@@ -85,4 +99,5 @@ function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
   return options.length > 0 ? options : null;
 }
 
+export { isValueInOptions };
 export default getDeviceFeatureValueOptions;
