@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
@@ -34,7 +34,10 @@ describe('system.listImages', () => {
   beforeEach(async () => {
     system = new System(sequelize, event, config, job);
     await system.init();
+    // Reset all fakes invoked within init call (the Dockerode mock fakes live
+    // in the mock file's own sandbox, hence the dedicated reset)
     sinon.reset();
+    DockerodeMock.resetMockHistory();
   });
 
   afterEach(() => {

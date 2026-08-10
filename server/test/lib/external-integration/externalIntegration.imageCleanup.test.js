@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { assert: sinonAssert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert, fake } = sinon;
 
 const { MANIFEST_IMAGE_LABEL, RECENTLY_PULLED_PROTECTION_MS } = require('../../../lib/external-integration/constants');
 const { buildSupervisor, seedExternalService, TEST_MANIFEST, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
