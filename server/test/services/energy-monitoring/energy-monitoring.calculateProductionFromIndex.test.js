@@ -138,7 +138,9 @@ describe('EnergyMonitoring.calculateProductionFromIndex', () => {
       // Verify last processed timestamp was saved under the production-specific param
       assert.calledOnce(device.setParam);
       const setParamCall = device.setParam.getCall(0);
-      expect(setParamCall.args[1]).to.equal('ENERGY_PRODUCTION_INDEX_LAST_PROCESSED');
+      expect(setParamCall.args[1]).to.equal(
+        'ENERGY_PRODUCTION_INDEX_LAST_PROCESSED_b2c3d4e5-f6a7-8901-bcde-f12345678901',
+      );
       expect(setParamCall.args[2]).to.equal('2023-10-03T13:50:00.000Z');
     });
   });

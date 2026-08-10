@@ -7,6 +7,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const { queueWrapper } = require('../utils/queueWrapper');
+const { floorToThirtyMinutes, ceilToNextThirtyMinutes } = require('../utils/thirtyMinutesWindow');
 const logger = require('../../../utils/logger');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 
@@ -53,9 +54,16 @@ async function calculateEnergyFromIndexFromBeginning(kind, jobId) {
     });
 
     await Promise.each(devicesWithBothFeatures, async (deviceWithBothFeatures) => {
-      // Reset the last processed timestamp
+      // Reset the last processed timestamps: the per-feature cursors and the
+      // legacy device-level one (kept for installs migrated from older versions)
       logger.debug(`Destroying last index processed for ${deviceWithBothFeatures.device.id}`);
       await this.gladys.device.destroyParam(deviceWithBothFeatures.device, kind.lastProcessedParamName);
+      await Promise.each(deviceWithBothFeatures.indexFeatures, async (indexFeature) => {
+        await this.gladys.device.destroyParam(
+          deviceWithBothFeatures.device,
+          `${kind.lastProcessedParamName}_${indexFeature.id}`,
+        );
+      });
     });
 
     logger.info(
@@ -88,19 +96,10 @@ async function calculateEnergyFromIndexFromBeginning(kind, jobId) {
     logger.info(`Oldest device state found at: ${oldestStateTime}`);
 
     // Round the oldest time down to the nearest 30-minute mark
-    const startTime = dayjs(oldestStateTime).tz(systemTimezone);
-    const roundedStartTime = startTime
-      .minute(startTime.minute() < 30 ? 0 : 30)
-      .second(0)
-      .millisecond(0);
+    const roundedStartTime = floorToThirtyMinutes(oldestStateTime, systemTimezone);
 
     // Get current time and round up to the next 30-minute mark
-    const now = dayjs().tz(systemTimezone);
-    const currentMinute = now.minute();
-    const roundedEndTime = now
-      .minute(currentMinute < 30 ? 30 : 60)
-      .second(0)
-      .millisecond(0);
+    const roundedEndTime = ceilToNextThirtyMinutes(dayjs(), systemTimezone);
 
     logger.info(
       `Processing 30-minute windows from ${roundedStartTime.toISOString()} to ${roundedEndTime.toISOString()}`,

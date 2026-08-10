@@ -212,4 +212,29 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes', () => {
     const callArgs = calculateConsumptionFromIndex.getCall(0).args;
     expect(callArgs[1]).to.equal('specific-job-id-12345');
   });
+
+  it('should round in the system timezone so half-hour-offset timezones bucket like the backfill', async () => {
+    // Asia/Kolkata is UTC+5:30: local :00/:30 marks fall on UTC :30/:00.
+    const kolkataVariable = {
+      getValue: (name) => {
+        if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
+          return 'Asia/Kolkata';
+        }
+        return null;
+      },
+    };
+    const kolkataEnergyMonitoring = new EnergyMonitoring(
+      { ...gladys, variable: kolkataVariable },
+      'a810b8db-6d04-4697-bed3-c4b72c996279',
+    );
+    const kolkataCalculate = fake.resolves(null);
+    kolkataEnergyMonitoring.calculateConsumptionFromIndex = kolkataCalculate;
+
+    // 10:20:00 UTC = 15:50 in Kolkata, floored to 15:30 Kolkata = 10:00:00 UTC
+    const now = new Date('2023-10-15T10:20:00.000Z');
+    await kolkataEnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes(now, 'test-job-id');
+
+    assert.calledOnce(kolkataCalculate);
+    expect(kolkataCalculate.getCall(0).args[0].toISOString()).to.equal('2023-10-15T10:00:00.000Z');
+  });
 });

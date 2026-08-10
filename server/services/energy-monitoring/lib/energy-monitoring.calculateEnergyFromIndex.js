@@ -78,8 +78,16 @@ async function calculateEnergyFromIndex(kind, thirtyMinutesWindowTime, jobId) {
 
       logger.debug(`Processing device ${device.name} for window ${windowStart} to ${windowEnd}`);
 
-      // Get the last processed index timestamp from device parameters
-      const lastProcessedParam = device.params.find((p) => p.name === kind.lastProcessedParamName);
+      // Get the last processed index timestamp from device parameters.
+      // The cursor is scoped per index feature so a device with several
+      // index/thirty-minutes pairs (e.g. a multi-string inverter) cannot
+      // rewind or advance another pair's watermark. Devices that processed
+      // indexes before the cursor became per-feature fall back to the
+      // legacy device-level param.
+      const lastProcessedParamName = `${kind.lastProcessedParamName}_${indexFeature.id}`;
+      const lastProcessedParam =
+        device.params.find((p) => p.name === lastProcessedParamName) ||
+        device.params.find((p) => p.name === kind.lastProcessedParamName);
       let lastProcessedTimestamp;
 
       if (!lastProcessedParam || !lastProcessedParam.value) {
@@ -135,7 +143,7 @@ async function calculateEnergyFromIndex(kind, thirtyMinutesWindowTime, jobId) {
       }
 
       // Update the last processed timestamp in device parameters
-      await this.gladys.device.setParam(device, kind.lastProcessedParamName, newLastProcessedTimestamp.toISOString());
+      await this.gladys.device.setParam(device, lastProcessedParamName, newLastProcessedTimestamp.toISOString());
 
       // Save the total value (always create historical state, even if 0)
       logger.debug(`Device ${device.name}: total ${kind.name} = ${totalValue}`);

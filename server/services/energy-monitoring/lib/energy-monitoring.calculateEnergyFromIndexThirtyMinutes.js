@@ -1,4 +1,6 @@
 const { queueWrapper } = require('../utils/queueWrapper');
+const { floorToThirtyMinutes } = require('../utils/thirtyMinutesWindow');
+const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 
 /**
  * @description Calculate energy (consumption or production, depending on the kind) from index
@@ -12,15 +14,11 @@ const { queueWrapper } = require('../utils/queueWrapper');
  */
 async function calculateEnergyFromIndexThirtyMinutes(kind, now, jobId) {
   return queueWrapper(this.queue, async () => {
-    const minutes = now.getMinutes();
-    const thirtyMinuteWindow = new Date(now);
-
-    // Round to the nearest 30-minute mark (00:00 or 00:30)
-    if (minutes < 30) {
-      thirtyMinuteWindow.setMinutes(0, 0, 0);
-    } else {
-      thirtyMinuteWindow.setMinutes(30, 0, 0);
-    }
+    // Round down to the nearest 30-minute mark (:00 or :30) in the system
+    // timezone, so the scheduled path buckets to the same timestamps as the
+    // from-beginning path whatever the timezone UTC offset.
+    const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+    const thirtyMinuteWindow = floorToThirtyMinutes(now, systemTimezone).toDate();
     // Dispatched through `this` so instance-level overrides (tests) still apply.
     await this[kind.calculateFromIndexMethod](thirtyMinuteWindow, jobId);
   });
