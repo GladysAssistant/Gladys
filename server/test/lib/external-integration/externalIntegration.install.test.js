@@ -175,6 +175,25 @@ describe('externalIntegration.install', () => {
     sinonAssert.calledOnce(system.createContainer);
   });
 
+  it('should never fall back on a local image for a store install', async () => {
+    // the local fallback is reserved to dev installs: on the store path a
+    // leftover local tag must never shadow a registry failure
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        pull: fake.rejects(new Error('registry unreachable')),
+        imageExists: fake.resolves(true),
+      },
+    });
+    try {
+      await externalIntegration.install({ manifest: TEST_MANIFEST, storeSlug: 'john/gladys-open-meteo-demo' });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
+    }
+    sinonAssert.notCalled(system.imageExists);
+  });
+
   it('should return the explicit pull error when the local presence check itself fails', async () => {
     const { externalIntegration } = buildSupervisor({
       system: {

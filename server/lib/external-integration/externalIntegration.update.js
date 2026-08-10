@@ -67,20 +67,24 @@ function buildUpdateCandidates(supervisor, service, indexManifest, repoManifest)
 }
 
 /**
- * @description Make available the image of the first candidate that can
- * actually be obtained — pulled, or already present locally when the pull
- * fails (ensureImage: the dev workflow rebuilds an image with `docker build`
- * that exists in no registry). A version bumped on the default branch before
- * its image is published (the release workflow is still building) must not
- * turn the update into a dead end: the next candidate — the indexed release,
- * then the running image — takes over.
+ * @description Pull the image of the first candidate that can actually be
+ * pulled. A version bumped on the default branch before its image is
+ * published (the release workflow is still building) must not turn the
+ * update into a dead end: the next candidate — the indexed release, then the
+ * running image — takes over. For dev installs only (`allowLocal`), a failed
+ * pull additionally falls back on the image already present locally
+ * (ensureImage: the dev workflow rebuilds an image with `docker build` that
+ * exists in no registry). Store updates keep the strict pull rule: a remote
+ * failure fails closed instead of silently recreating from a local tag.
  * @param {object} supervisor - The external integration service.
  * @param {Array} candidates - The candidates built by buildUpdateCandidates.
+ * @param {object} options - Options.
+ * @param {boolean} options.allowLocal - Local fallback (dev installs only).
  * @returns {Promise<object|null>} The applied candidate, null if none is available.
  * @example
- * const applied = await pullFirstAvailable(this, candidates);
+ * const applied = await pullFirstAvailable(this, candidates, { allowLocal: false });
  */
-async function pullFirstAvailable(supervisor, candidates) {
+async function pullFirstAvailable(supervisor, candidates, { allowLocal }) {
   return Promise.reduce(
     candidates,
     async (applied, candidate) => {
@@ -88,7 +92,7 @@ async function pullFirstAvailable(supervisor, candidates) {
         return applied;
       }
       try {
-        await supervisor.ensureImage(candidate.image);
+        await supervisor.ensureImage(candidate.image, { allowLocal });
         return candidate;
       } catch (e) {
         logger.warn(`Unable to get image ${candidate.image}`, e);
@@ -103,7 +107,7 @@ async function pullFirstAvailable(supervisor, candidates) {
  * @description Update an external integration: resolve the latest manifest
  * (store index refreshed on the spot *and* manifest of the repo, most recent
  * first, falling back on the running image), pull the first image that can
- * actually be obtained and recreate the container (which rotates the
+ * actually be pulled and recreate the container (which rotates the
  * integration token: the previous JWT is instantly invalidated). For dev
  * installs without a store_slug, the image tag installed by the user is
  * re-pulled — or, for an image only built locally, re-read from the local
@@ -149,7 +153,8 @@ async function update(selector) {
     }
   }
   const candidates = buildUpdateCandidates(this, service, indexManifest, repoManifest);
-  const applied = await pullFirstAvailable(this, candidates);
+  const allowLocal = !service.store_slug;
+  const applied = await pullFirstAvailable(this, candidates, { allowLocal });
   if (applied === null) {
     throw new BadParameters(`UNABLE_TO_PULL_IMAGE: image may not exist or may not be available for your architecture`);
   }
@@ -194,7 +199,7 @@ async function update(selector) {
     }
   }
   await Promise.each((manifest && manifest.containers) || [], async (entry) => {
-    await this.ensureImage(entry.docker_image);
+    await this.ensureImage(entry.docker_image, { allowLocal });
   });
   // captured before the row is rewritten: what the integration ran *until now*.
   // Whatever the new manifest still declares is filtered back out by

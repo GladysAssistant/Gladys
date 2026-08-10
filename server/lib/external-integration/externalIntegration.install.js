@@ -38,9 +38,12 @@ async function install({ dockerImage, manifest, storeSlug = null, grantedDevices
       throw new ConflictError('EXTERNAL_INTEGRATION_ALREADY_INSTALLED');
     }
   }
-  // pull with local fallback: a dev install can run an image built with
-  // `docker build` on the host, which exists in no registry
-  await this.ensureImage(image);
+  // dev installs only (no storeSlug) fall back on a locally present image
+  // when the pull fails: a dev install can run an image built with
+  // `docker build` on the host, which exists in no registry. Store installs
+  // keep failing closed — a leftover local tag must never shadow the registry
+  const allowLocal = !storeSlug;
+  await this.ensureImage(image, { allowLocal });
   let finalManifest = manifest;
   if (!finalManifest) {
     // dev install by image name without repo: the manifest is read from the image labels
@@ -72,7 +75,7 @@ async function install({ dockerImage, manifest, storeSlug = null, grantedDevices
   // install = every image (main + sub-containers) made available now, so a
   // start never depends on the network
   await Promise.each(finalManifest.containers || [], async (entry) => {
-    await this.ensureImage(entry.docker_image);
+    await this.ensureImage(entry.docker_image, { allowLocal });
   });
   const selector = await this.buildSelector({ storeSlug, manifestName: finalManifest.name });
   const existingSelector = await db.Service.findOne({ where: { selector } });

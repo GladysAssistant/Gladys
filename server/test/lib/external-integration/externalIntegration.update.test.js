@@ -212,6 +212,30 @@ describe('externalIntegration.update', () => {
     externalIntegration.clearTimers(service.id);
   });
 
+  it('should fail closed on a store update when nothing can be pulled, even with a local image', async () => {
+    // the ordered-candidate design of store updates relies on strict pulls:
+    // when every candidate — including the installed last resort — cannot be
+    // pulled, the update must fail with the explicit error, never silently
+    // recreate the container from whatever local tag shadows the registry
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        pull: fake.rejects(new Error('registry unreachable')),
+        imageExists: fake.resolves(true),
+      },
+    });
+    externalIntegration.getIndex = fake.resolves(null);
+    externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+    try {
+      await externalIntegration.update(service.selector);
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
+    }
+    sinonAssert.notCalled(system.imageExists);
+  });
+
   it('should update a dev install from an image only built locally', async () => {
     // the local dev loop: rebuild the image with `docker build`, hit force
     // update. The tag exists in no registry so the pull fails, and the image
