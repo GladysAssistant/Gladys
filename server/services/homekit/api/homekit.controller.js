@@ -25,7 +25,22 @@ module.exports = function HomeKitController(homekitHandler) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/service/homekit/device Get HomeKit compatible devices
+   * @apiName getDevices
+   * @apiGroup HomeKit
+   */
+  async function getDevices(req, res) {
+    const devices = await homekitHandler.getCompatibleDevices();
+    res.json(devices.map(({ name, selector }) => ({ name, selector })));
+  }
+
   return {
+    'get /api/v1/service/homekit/device': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(getDevices),
+    },
     'get /api/v1/service/homekit/reload': {
       authenticated: true,
       admin: true,
