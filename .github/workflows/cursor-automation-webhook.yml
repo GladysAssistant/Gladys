@@ -65,6 +65,7 @@ jobs:
           EVENT_PR: ${{ github.event.pull_request.number }}
           EVENT_PR_DRAFT: ${{ github.event.pull_request.draft }}
           EVENT_PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          EVENT_PR_ASSOCIATION: ${{ github.event.pull_request.author_association }}
           EVENT_PR_STATE: ${{ github.event.pull_request.state }}
           EVENT_PR_CREATED_AT: ${{ github.event.pull_request.created_at }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
@@ -127,16 +128,33 @@ jobs:
                   ;;
               esac
 
-              # Automatic triggers only: dependency bumps are not worth a
-              # review, but the label still forces one when needed. Exact
-              # logins only, a user named e.g. "dependabot-fan" is not a bot.
+              # The two filters below apply to automatic triggers only: the
+              # "needs:cursor-review" label and workflow_dispatch stay the
+              # escape hatch a maintainer can always use.
               if [ "$RUN" = true ] && [ "$REASON" != 'label' ]; then
+                # Dependency bumps are not worth a review. Exact logins only,
+                # a user named e.g. "dependabot-fan" is not a bot.
                 case "$EVENT_PR_AUTHOR" in
                   'dependabot[bot]' | 'renovate[bot]')
                     echo "PR #${PR_NUMBER} opened by ${EVENT_PR_AUTHOR}: skipping the automatic review."
                     RUN=false
                     ;;
                 esac
+
+                # Anyone can open a PR on a public repository and every
+                # automatic review costs a Cursor run, so only authors who
+                # already landed a commit here get one without asking.
+                # CONTRIBUTOR means "has already committed to this repo",
+                # FIRST_TIME_CONTRIBUTOR and NONE mean they have not.
+                if [ "$RUN" = true ]; then
+                  case "$EVENT_PR_ASSOCIATION" in
+                    OWNER | MEMBER | COLLABORATOR | CONTRIBUTOR) ;;
+                    *)
+                      echo "PR #${PR_NUMBER}: ${EVENT_PR_AUTHOR} (${EVENT_PR_ASSOCIATION}) has no merged contribution yet, skipping the automatic review. Add the needs:cursor-review label to start one."
+                      RUN=false
+                      ;;
+                  esac
+                fi
               fi
               ;;
 

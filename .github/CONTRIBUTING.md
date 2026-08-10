@@ -65,7 +65,9 @@ If your PR implements a forum request, add a line `Forum: https://community.glad
 
 ## 🤖 Automated review
 
-An automated review runs on your PR as soon as you open it. A draft PR waits until you mark it **ready for review**. PRs authored by `dependabot[bot]` and `renovate[bot]` are the only ones skipped.
+An automated review runs on your PR as soon as you open it. A draft PR waits until you mark it **ready for review**.
+
+Two cases do not get that automatic review: PRs authored by `dependabot[bot]` or `renovate[bot]`, and PRs from contributors whose first contribution has not been merged yet. **If this is your first PR here, just ask for a review in a comment** (see below) or wait for a maintainer — nothing is wrong with your PR.
 
 To ask for a new review after pushing changes, comment on the PR:
 
