@@ -93,11 +93,22 @@ export const GetWeatherStatus = {
 };
 
 export const GetWeatherModes = {
+  DateLocation: 'dateLocation',
+  CurrentWeather: 'currentWeather',
+  Alerts: 'alerts',
   AdvancedWeather: 'advancedWeather',
   HourlyForecast: 'hourlyForecast',
   DailyForecast: 'dailyForecast',
   ProviderImages: 'providerImages'
 };
+
+// Modes enabled by default for widgets saved before they existed: the
+// blocks the widget has always displayed unconditionally
+export const DEFAULT_ON_WEATHER_MODES = [
+  GetWeatherModes.DateLocation,
+  GetWeatherModes.CurrentWeather,
+  GetWeatherModes.Alerts
+];
 
 export const DASHBOARD_BOX_STATUS_KEY = 'DashboardBoxStatus';
 export const DASHBOARD_BOX_DATA_KEY = 'DashboardBoxData';
