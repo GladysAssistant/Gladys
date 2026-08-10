@@ -52,6 +52,28 @@ const PurgeAllSqliteJobData = ({ job, user }) => (
   </Fragment>
 );
 
+const DeviceMigrateJobData = ({ job, user }) => (
+  <Fragment>
+    {job.data.device_name && job.data.destination_device_name && (
+      <div class="text-muted small">
+        <Text
+          id="jobsSettings.jobData.migrationTarget"
+          fields={{ source: job.data.device_name, destination: job.data.destination_device_name }}
+        />
+      </div>
+    )}
+    <JobStep job={job} />
+    {job.data.states_migrated !== undefined && (
+      <div class="text-muted small">
+        <Text
+          id="jobsSettings.jobData.statesMigrated"
+          fields={{ count: job.data.states_migrated.toLocaleString(user.language) }}
+        />
+      </div>
+    )}
+  </Fragment>
+);
+
 const PurgeOrphanedJobData = ({ job, user }) => (
   <Fragment>
     <JobStep job={job} />
@@ -71,7 +93,8 @@ const PurgeOrphanedJobData = ({ job, user }) => (
 const JOB_DATA_RENDERERS = {
   [JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE]: PurgeSingleFeatureJobData,
   [JOB_TYPES.DEVICE_STATES_PURGE_ALL_SQLITE_STATES]: PurgeAllSqliteJobData,
-  [JOB_TYPES.DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES]: PurgeOrphanedJobData
+  [JOB_TYPES.DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES]: PurgeOrphanedJobData,
+  [JOB_TYPES.DEVICE_MIGRATE]: DeviceMigrateJobData
 };
 
 // Structured facts attached by the job (job.data), rendered by the job type's own renderer

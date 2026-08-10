@@ -26,7 +26,7 @@ describe('POST /api/v1/message', () => {
       .post('/api/v1/message')
       .send({
         text: 'What time is it?',
-        model: 'llama-3.3-70b-instruct',
+        model: 'glm-5.2',
       })
       .expect('Content-Type', /json/)
       .expect(201)

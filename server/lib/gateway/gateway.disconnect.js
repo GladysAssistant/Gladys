@@ -1,4 +1,5 @@
 const logger = require('../../utils/logger');
+const { EVENTS } = require('../../utils/constants');
 
 /**
  * @description Disconnect Gladys Gateway.
@@ -22,6 +23,9 @@ async function disconnect() {
     logger.debug(e);
     this.connected = false;
   }
+  // Gladys Plus is now unlinked: features depending on the link recompute
+  // their availability (e.g. external integration webhooks)
+  this.event.emit(EVENTS.GATEWAY.LINK_STATUS_CHANGED);
 }
 
 module.exports = {

@@ -1,5 +1,6 @@
 import createActionsProfilePicture from './profilePicture';
 import createActionsDarkMode from './darkMode';
+import createActionsExternalIntegrationUpdates from './externalIntegrationUpdates';
 import { getDefaultState } from '../utils/getDefaultState';
 import { route } from 'preact-router';
 import get from 'get-value';
@@ -20,6 +21,7 @@ const OPEN_PAGES = [
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
   const actionsDarkMode = createActionsDarkMode(store);
+  const actionsExternalIntegrationUpdates = createActionsExternalIntegrationUpdates(store);
 
   const actions = {
     handleRoute(state, e) {
@@ -77,6 +79,10 @@ function createActions(store) {
         store.setState({
           user
         });
+        // the "integrations to update" counter is displayed in the header, on
+        // every page: it is loaded once the user (and their role) is known,
+        // without blocking the rest of the session check
+        actionsExternalIntegrationUpdates.refreshExternalIntegrationsToUpdate(state, user);
         if (state.session.getGatewayUser) {
           const gatewayUser = await state.session.getGatewayUser();
           const now = new Date();
@@ -114,13 +120,16 @@ function createActions(store) {
         await state.httpClient.post(`/api/v1/session/${user.session_id}/revoke`);
       }
       state.session.reset();
+      // a pending "integrations to update" request must not write the count of
+      // the session being closed into the fresh state
+      actionsExternalIntegrationUpdates.invalidateExternalIntegrationsToUpdate();
       route('/login', true);
       const defaultState = getDefaultState();
       store.setState(defaultState, true);
     }
   };
 
-  return Object.assign(actions, actionsProfilePicture, actionsDarkMode);
+  return Object.assign(actions, actionsProfilePicture, actionsDarkMode, actionsExternalIntegrationUpdates);
 }
 
 export default createActions;

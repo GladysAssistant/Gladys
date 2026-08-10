@@ -19,6 +19,8 @@ const {
 const { fetchWebPage } = require('./webRequest');
 const { compareTimes } = require('./compareTimes');
 
+const DEFAULT_TIMEZONE = 'Europe/Paris';
+
 const noRoom = {
   id: null,
   name: 'No room',
@@ -554,6 +556,24 @@ async function getAllTools(userId) {
             });
           }),
         );
+
+        // An empty list is an ambiguous signal for the model, which tends to fill the
+        // gap with a plausible value. Say explicitly that nothing is configured.
+        if (states.length === 0) {
+          const typeLabel = deviceType && deviceType.length > 0 ? ` of type "${deviceType}"` : '';
+          const roomLabel = room && room !== '' ? ` in room "${room}"` : '';
+
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `device.get-state: no device${typeLabel} is configured${roomLabel}. ` +
+                  'No measurement exists for this query, do not report any value.',
+              },
+            ],
+          };
+        }
 
         return {
           content: [
@@ -1228,6 +1248,9 @@ async function getAllTools(userId) {
           'of an energy monitoring device over a date range. ' +
           'Dates are inclusive: for a single day use the same start_date and end_date, ' +
           'for a full month use the first and last day of the month. ' +
+          'A day past the end of its month (for example 2026-02-30) is clamped to the last day of that month. ' +
+          'To cover several months or a whole year, make a single call over the whole range with group_by month ' +
+          'instead of one call per month. ' +
           'The result contains the total over the period and the detail per group_by period. ' +
           'In currency mode, a separate home_subscription entry may be present: it is the fixed subscription cost ' +
           'of the whole home electricity contract, and is not part of the device consumption cost.',
@@ -1254,18 +1277,36 @@ async function getAllTools(userId) {
         },
       },
       cb: async ({ device, start_date: startDate, end_date: endDate, unit, group_by: groupBy }) => {
+        const DAYS_PER_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        const isLeapYear = (year) => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+
         const parseDateInput = (value) => {
           if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
             return null;
           }
           const [year, month, day] = value.split('-').map(Number);
-          // Reject calendar-invalid dates (2026-02-30, 2026-13-01) that the
-          // Date constructor would silently roll over to another day.
-          const date = new Date(year, month - 1, day);
-          if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+          if (month < 1 || month > 12 || day < 1 || day > 31) {
             return null;
           }
-          return { year, month, day };
+          // "Last day of February" is a date a model has to compute, and it gets it
+          // wrong on non-leap years (2026-02-29) or on 30-day months (2026-04-31).
+          // That intent is unambiguous, so clamp to the end of the month instead of
+          // failing: the Date constructor would silently roll over to the next month.
+          const lastDayOfMonth = month === 2 && isLeapYear(year) ? 29 : DAYS_PER_MONTH[month - 1];
+          return { year, month, day: Math.min(day, lastDayOfMonth) };
+        };
+
+        const formatDateInput = ({ year, month, day }) =>
+          `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+        // new Date(year, ...) maps years 0 to 99 to 1900 to 1999, so a 4-digit year
+        // below 0100 would query a period two millennia away from the one asked for.
+        // Setting the year explicitly keeps it, and still rolls the day over the
+        // month boundary as the exclusive end date needs.
+        const createLocalDate = ({ year, month, day }) => {
+          const date = new Date(2000, 0, 1);
+          date.setFullYear(year, month - 1, day);
+          return date;
         };
 
         const parsedStart = parseDateInput(startDate);
@@ -1275,7 +1316,9 @@ async function getAllTools(userId) {
             content: [
               {
                 type: 'text',
-                text: 'device.get-energy-consumption: start_date and end_date must be valid dates in YYYY-MM-DD format',
+                text:
+                  'device.get-energy-consumption: start_date and end_date must be in YYYY-MM-DD format, ' +
+                  'with a month between 01 and 12 and a day between 01 and 31',
               },
             ],
           };
@@ -1317,8 +1360,8 @@ async function getAllTools(userId) {
         }
 
         // Same date boundaries as the energy dashboard: local midnight, end exclusive.
-        const from = new Date(parsedStart.year, parsedStart.month - 1, parsedStart.day);
-        const to = new Date(parsedEnd.year, parsedEnd.month - 1, parsedEnd.day + 1);
+        const from = createLocalDate(parsedStart);
+        const to = createLocalDate({ ...parsedEnd, day: parsedEnd.day + 1 });
         if (!(from < to)) {
           return {
             content: [
@@ -1330,10 +1373,14 @@ async function getAllTools(userId) {
           };
         }
 
+        const effectiveGroupBy = groupBy || 'day';
+        const configuredTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+        const timezoneName = configuredTimezone || DEFAULT_TIMEZONE;
+
         const results = await this.gladys.device.energySensorManager.getConsumptionByDates([selectedFeature.selector], {
           from,
           to,
-          group_by: groupBy || 'day',
+          group_by: effectiveGroupBy,
           display_mode: displayMode,
         });
 
@@ -1344,16 +1391,79 @@ async function getAllTools(userId) {
         const roundValue = (value) => Number(value.toFixed(decimalPlaces));
         const deviceValues = deviceResult?.values ?? [];
 
+        // DuckDB truncates the TIMESTAMPTZ buckets in the timezone set on its
+        // connection, which system.setDuckDbTimezone takes from the TIMEZONE variable.
+        // A monthly bucket is therefore midnight on the 1st in the home timezone, and
+        // serializing it as a UTC instant labels it one month early east of Greenwich:
+        // 2026-01-01 in Paris reads back as 2025-12-31T23:00:00Z. Format in that same
+        // timezone, at the granularity that was grouped by, so the label always matches
+        // the bucket DuckDB built.
+        // Intl rather than dayjs here: the dayjs timezone plugin resolves the offset of
+        // an ambiguous local hour wrongly when the process runs in the target zone. It
+        // reports +00:00 for the second 02:00 of a Paris fall-back night, which is the
+        // one case the offset below exists to disambiguate.
+        const bucketDateFormat = new Intl.DateTimeFormat('en-US', {
+          timeZone: timezoneName,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hourCycle: 'h23',
+        });
+
+        // Distance between the local clock reading and the instant it stands for.
+        // Computed from the formatted parts rather than read from a timeZoneName
+        // part: that field is CLDR text, and a zero offset spells "GMT" on ICU 76
+        // (Node 22.14) but "GMT+00:00" on ICU 78, both of which "node": "22.x"
+        // accepts. Arithmetic is the same on every ICU, and gets the zones that sit
+        // on a half or quarter hour right for free.
+        const formatUtcOffset = (parts, bucketDate) => {
+          const localAsUtc = new Date(0);
+          localAsUtc.setUTCFullYear(Number(parts.year), Number(parts.month) - 1, Number(parts.day));
+          localAsUtc.setUTCHours(Number(parts.hour), Number(parts.minute), 0, 0);
+          const offsetMinutes = Math.round((localAsUtc.getTime() - bucketDate.getTime()) / 60000);
+          const sign = offsetMinutes < 0 ? '-' : '+';
+          const absoluteMinutes = Math.abs(offsetMinutes);
+          const hours = String(Math.floor(absoluteMinutes / 60)).padStart(2, '0');
+          const minutes = String(absoluteMinutes % 60).padStart(2, '0');
+          return `${sign}${hours}:${minutes}`;
+        };
+
+        const formatBucketDate = (bucketDate) => {
+          const date = new Date(bucketDate);
+          const parts = Object.fromEntries(
+            bucketDateFormat.formatToParts(date).map(({ type, value }) => [type, value]),
+          );
+          switch (effectiveGroupBy) {
+            case 'year':
+              return parts.year;
+            case 'month':
+              return `${parts.year}-${parts.month}`;
+            // The offset keeps hourly labels unique on the night a timezone falls
+            // back: in Paris, 2025-10-26T00:00Z and 2025-10-26T01:00Z are two
+            // different buckets that are both 02:00 on the local clock.
+            case 'hour':
+              return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:00${formatUtcOffset(parts, date)}`;
+            // 'day' and 'week' are both a calendar day, the start of the bucket.
+            default:
+              return `${parts.year}-${parts.month}-${parts.day}`;
+          }
+        };
+
         const response = {
           device: selectedDevice.name,
           feature: selectedFeature.name,
           unit: displayMode === 'currency' ? deviceResult?.deviceFeature?.currency_unit || 'currency' : 'kWh',
-          start_date: startDate,
-          end_date: endDate,
-          group_by: groupBy || 'day',
+          // Echo the effective period, not the raw input: a clamped date must not be
+          // reported back as the day the caller asked for.
+          start_date: formatDateInput(parsedStart),
+          end_date: formatDateInput(parsedEnd),
+          group_by: effectiveGroupBy,
+          timezone: timezoneName,
           total: roundValue(deviceValues.reduce((acc, value) => acc + value.sum_value, 0)),
           values: deviceValues.map((value) => ({
-            date: value.created_at,
+            date: formatBucketDate(value.created_at),
             value: roundValue(value.sum_value),
           })),
         };

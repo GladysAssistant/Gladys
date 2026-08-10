@@ -12,21 +12,27 @@ describe('message.reply', () => {
   let apiClientSource;
   let variable;
   beforeEach(() => {
+    // the outbound channels expose message.sendToUser (generic interface,
+    // no channel hard-coded in the core); api-client does not: it is a
+    // reply-only source, never an external channel
     telegramService = {
       message: {
         send: fake.resolves(null),
+        sendToUser: fake.resolves(null),
       },
     };
 
     nextCloudTalkService = {
       message: {
         send: fake.resolves(null),
+        sendToUser: fake.resolves(null),
       },
     };
 
     callmebotService = {
       message: {
         send: fake.resolves(null),
+        sendToUser: fake.resolves(null),
       },
     };
 
@@ -67,6 +73,7 @@ describe('message.reply', () => {
           telegram_user_id: 'telegram-user-id',
         };
       },
+      getAllKeys: () => ['telegram', 'nextcloud-talk', 'callmebot', 'api-client'],
     };
 
     variable = {
@@ -106,12 +113,19 @@ describe('message.reply', () => {
       'hey!',
       {},
     );
-    assert.calledWith(telegramService.message.send, 'telegram-user-id');
-    assert.calledWith(nextCloudTalkService.message.send, 'next-cloud-talk-token');
-    assert.calledWith(callmebotService.message.send, '0cd30aef-9c4e-4a23-88e3-3547971296e5');
+    // every service exposing message.sendToUser receives the user; each one
+    // resolves its own identity and no-ops when the user is not linked
+    assert.calledOnce(telegramService.message.sendToUser);
+    expect(telegramService.message.sendToUser.firstCall.args[0]).to.have.property(
+      'telegram_user_id',
+      'telegram-user-id',
+    );
+    expect(telegramService.message.sendToUser.firstCall.args[1]).to.have.property('text', 'hey!');
+    assert.calledOnce(nextCloudTalkService.message.sendToUser);
+    assert.calledOnce(callmebotService.message.sendToUser);
   });
-  it('should continue sending AI reply to other services when one service fails', async () => {
-    telegramService.message.send = fake.rejects(new Error('telegram down'));
+  it('should still reply through the other channels when one fails', async () => {
+    telegramService.message.sendToUser = fake.rejects(new Error('CHANNEL_DOWN'));
     await messageHandler.reply(
       {
         language: 'en',
@@ -125,26 +139,9 @@ describe('message.reply', () => {
       'hey!',
       {},
     );
-    assert.calledOnce(telegramService.message.send);
-    assert.calledWith(nextCloudTalkService.message.send, 'next-cloud-talk-token');
-    assert.calledWith(callmebotService.message.send, '0cd30aef-9c4e-4a23-88e3-3547971296e5');
-  });
-  it('should fail to reply', async () => {
-    variable.getValue = fake.rejects(new Error('cannot get'));
-    await messageHandler.reply(
-      {
-        language: 'en',
-        source: 'AI',
-        source_user_id: 'XXXX',
-        user: {
-          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
-          language: 'en',
-        },
-      },
-      'hey!',
-      {},
-    );
-    assert.notCalled(nextCloudTalkService.message.send);
+    assert.calledOnce(telegramService.message.sendToUser);
+    assert.calledOnce(nextCloudTalkService.message.sendToUser);
+    assert.calledOnce(callmebotService.message.sendToUser);
   });
 
   it('should persist tool_call but not forward externally for AI source', async () => {
