@@ -897,6 +897,136 @@ describe('Build service', () => {
     expect(cb.args[1][1]).to.equal(1);
   });
 
+  it('should build battery service and derive the low flag from the level', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'batterie').returns({ last_value: 15 });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: { minValue: 0, maxValue: 100 },
+    });
+    const Battery = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { BatteryLevel: 'BATTERYLEVEL', StatusLowBattery: 'STATUSLOWBATTERY' },
+      CharacteristicEventTypes: stub(),
+      Service: { Battery },
+    };
+    const features = [
+      {
+        name: 'Batterie',
+        selector: 'batterie',
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Capteur' }, features, mappings[DEVICE_FEATURE_CATEGORIES.BATTERY]);
+    await on.args[0][1](cb);
+    await on.args[1][1](cb);
+
+    expect(getCharacteristic.args[0][0]).to.equal('BATTERYLEVEL');
+    expect(getCharacteristic.args[1][0]).to.equal('STATUSLOWBATTERY');
+    expect(cb.args[0][1]).to.equal(15);
+    // 15% is at or below the 20% threshold
+    expect(cb.args[1][1]).to.equal(1);
+
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'batterie').returns({ last_value: 80 });
+    await on.args[1][1](cb);
+    expect(cb.args[2][1]).to.equal(0);
+
+    // the comparison is inclusive: exactly 20% is low, 21% is not
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'batterie').returns({ last_value: 20 });
+    await on.args[1][1](cb);
+    expect(cb.args[3][1]).to.equal(1);
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'batterie').returns({ last_value: 21 });
+    await on.args[1][1](cb);
+    expect(cb.args[4][1]).to.equal(0);
+
+    // a device that has not reported yet must not be announced as low: null <= 20 is true in JS
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'batterie').returns({ last_value: null });
+    await on.args[1][1](cb);
+    expect(cb.args[5][1]).to.equal(0);
+  });
+
+  it('should let a dedicated low battery feature win over the derived flag', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'nuki-batterie').returns({ last_value: 5 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'nuki-faible').returns({ last_value: 0 });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: { minValue: 0, maxValue: 100 },
+    });
+    const Battery = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { BatteryLevel: 'BATTERYLEVEL', StatusLowBattery: 'STATUSLOWBATTERY' },
+      CharacteristicEventTypes: stub(),
+      Service: { Battery },
+    };
+    // Nuki reports its battery percentage as a lock integer, not a sensor integer
+    const features = [
+      {
+        name: 'Batterie',
+        selector: 'nuki-batterie',
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+        type: DEVICE_FEATURE_TYPES.LOCK.INTEGER,
+      },
+      {
+        name: 'Batterie faible',
+        selector: 'nuki-faible',
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+        type: DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Serrure' }, features, mappings[DEVICE_FEATURE_CATEGORIES.BATTERY]);
+    await on.args[0][1](cb);
+    await on.args[1][1](cb);
+
+    // the level alone would say low at 5%, the dedicated feature says it is not
+    expect(on.callCount).to.equal(2);
+    expect(cb.args[0][1]).to.equal(5);
+    expect(cb.args[1][1]).to.equal(0);
+  });
+
+  it('should not claim a battery level for a device that only reports a low flag', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'contact-faible').returns({ last_value: 1 });
+    const on = stub();
+    const getCharacteristic = stub().returns({ on, props: { minValue: 0, maxValue: 100 } });
+    const Battery = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { BatteryLevel: 'BATTERYLEVEL', StatusLowBattery: 'STATUSLOWBATTERY' },
+      CharacteristicEventTypes: stub(),
+      Service: { Battery },
+    };
+    const features = [
+      {
+        name: 'Batterie faible',
+        selector: 'contact-faible',
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+        type: DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Contact' }, features, mappings[DEVICE_FEATURE_CATEGORIES.BATTERY_LOW]);
+    await on.args[0][1](cb);
+
+    // BatteryLevel is optional on the HAP Battery service, so it is never added and the Home app
+    // does not show a made-up 0%. Only the flag the device actually reports is exposed.
+    expect(getCharacteristic.args).eql([['STATUSLOWBATTERY']]);
+    expect(cb.args[0][1]).to.equal(1);
+  });
+
   it('should build air quality sensor service', async () => {
     homekitHandler.gladys.stateManager.get = stub().returns({
       id: 'ec9de6a2-6f0a-4f0e-9d0e-1b5f1cb0a5ce',

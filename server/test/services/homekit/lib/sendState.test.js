@@ -34,6 +34,8 @@ describe('Send state to HomeKit', () => {
         CarbonDioxideLevel: 'CARBONDIOXIDELEVEL',
         CarbonDioxideDetected: 'CARBONDIOXIDEDETECTED',
         AirQuality: 'AIRQUALITY',
+        BatteryLevel: 'BATTERYLEVEL',
+        StatusLowBattery: 'STATUSLOWBATTERY',
         PM2_5Density: 'PM25DENSITY',
         PM10Density: 'PM10DENSITY',
       },
@@ -45,6 +47,7 @@ describe('Send state to HomeKit', () => {
         CarbonMonoxideSensor: 'CARBONMONOXIDESENSOR',
         CarbonDioxideSensor: 'CARBONDIOXIDESENSOR',
         AirQualitySensor: 'AIRQUALITYSENSOR',
+        Battery: 'BATTERY',
       },
     },
     notifyTimeouts: {},
@@ -618,6 +621,119 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['PM25DENSITY', 42]);
     expect(updateCharacteristic.args[1]).eql(['PM25DENSITY', 50]);
     expect(updateCharacteristic.args[2]).eql(['PM10DENSITY', 8]);
+  });
+
+  it('should notify battery level and low battery flag', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({ props: { minValue: 0, maxValue: 100 } });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Battery',
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+      type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+    };
+
+    // this device reports its own low-battery flag, so the level must not derive a second one
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        features: [feature, { ...feature, category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW }],
+      }),
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 42 });
+    // Nuki reports the same thing as a lock integer
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, type: DEVICE_FEATURE_TYPES.LOCK.INTEGER },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 8 },
+    );
+    await homekitHandler.sendState(
+      accessory,
+      {
+        ...feature,
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+        type: DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY,
+      },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 },
+    );
+
+    expect(updateCharacteristic.args[0]).eql(['BATTERYLEVEL', 42]);
+    expect(updateCharacteristic.args[1]).eql(['BATTERYLEVEL', 8]);
+    // the two remaining type flavours reach the same branches
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, type: DEVICE_FEATURE_TYPES.BATTERY.INTEGER },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 60 },
+    );
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW, type: DEVICE_FEATURE_TYPES.SENSOR.BINARY },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 0 },
+    );
+
+    expect(updateCharacteristic.args[2]).eql(['STATUSLOWBATTERY', 1]);
+    expect(updateCharacteristic.args[3]).eql(['BATTERYLEVEL', 60]);
+    expect(updateCharacteristic.args[4]).eql(['STATUSLOWBATTERY', 0]);
+
+    // a reading outside the HomeKit 0-100 range is clamped, not rejected
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 120 });
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: -5 });
+
+    expect(updateCharacteristic.args[5]).eql(['BATTERYLEVEL', 100]);
+    expect(updateCharacteristic.args[6]).eql(['BATTERYLEVEL', 0]);
+  });
+
+  it('should derive the low battery flag when the device only reports a percentage', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({ props: { minValue: 0, maxValue: 100 } });
+    // narrowed to the battery service, so picking the wrong one fails here rather than passing
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub()
+        .withArgs('BATTERY')
+        .returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Battery',
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+      type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({ id: '4756151c-369e-4772-8bf7-943a6ac70583', features: [feature] }),
+    };
+
+    // the threshold is inclusive, and crossing it has to notify HomeKit rather than wait for a poll
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 21 });
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 20 });
+
+    expect(updateCharacteristic.args).eql([
+      ['BATTERYLEVEL', 21],
+      ['STATUSLOWBATTERY', 0],
+      ['BATTERYLEVEL', 20],
+      ['STATUSLOWBATTERY', 1],
+    ]);
+
+    // and back up: a battery that has been changed has to clear the warning as fast as it raised it
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 21 });
+
+    expect(updateCharacteristic.args[4]).eql(['BATTERYLEVEL', 21]);
+    expect(updateCharacteristic.args[5]).eql(['STATUSLOWBATTERY', 0]);
+
+    // a device that reports nothing is not low on battery: `null <= 20` is true in JavaScript
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: null });
+
+    expect(updateCharacteristic.args[7]).eql(['STATUSLOWBATTERY', 0]);
   });
 
   it('should do nothing wrong device category & type', async () => {
