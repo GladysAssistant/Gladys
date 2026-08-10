@@ -109,8 +109,8 @@ module.exports = function ServiceController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/service_message get message services
-   * @apiName getMessageServices
+   * @api {get} /api/v1/service/message getMessage
+   * @apiName getMessage
    * @apiGroup Service
    * @apiSuccessExample {json} Success-Example
    * [
@@ -119,7 +119,7 @@ module.exports = function ServiceController(gladys) {
    *   "name":"telegram",
    *   "selector":"telegram",
    *   "status":"RUNNING",
-   *   "label":"telegram"
+   *   "manifest_name":null
    *  }
    * ]
    */

@@ -47,9 +47,10 @@ describe('service', () => {
     expect(messagingService).to.not.equal(undefined);
     expect(messagingService).to.have.property('name', 'test-service');
     expect(messagingService).to.have.property('status');
-    expect(messagingService).to.have.property('label');
     // a core service has no manifest: the front translates its technical name
     expect(messagingService).to.have.property('manifest_name', null);
+    // `label` would only ever repeat manifest_name or name: the front derives it
+    expect(messagingService).to.not.have.property('label');
     // "example" has no message interface: it could not deliver anything
     expect(messageServices.map((s) => s.name)).to.not.include('example');
   });

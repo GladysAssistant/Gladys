@@ -501,6 +501,13 @@ function getRoutes(gladys) {
       admin: true,
       controller: serviceController.stop,
     },
+    // ⚠️ the literal `message` route must be declared BEFORE `:service_name`
+    // (setupRoutes registers routes in declaration order), otherwise it would
+    // be swallowed and read as a service named "message".
+    'get /api/v1/service/message': {
+      authenticated: true,
+      controller: serviceController.getMessageServices,
+    },
     'get /api/v1/service/:service_name': {
       authenticated: true,
       controller: serviceController.getByName,
@@ -508,12 +515,6 @@ function getRoutes(gladys) {
     'get /api/v1/service': {
       authenticated: true,
       controller: serviceController.getAll,
-    },
-    // distinct path: /api/v1/service/message would be swallowed by the
-    // :service_name route above
-    'get /api/v1/message_service': {
-      authenticated: true,
-      controller: serviceController.getMessageServices,
     },
     // external integrations (admin API, except the routes explicitly open to
     // every user: the list and the detail — in their reduced view — plus the

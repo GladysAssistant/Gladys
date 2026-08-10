@@ -42,10 +42,8 @@ async function getMessageServices() {
       // an external integration carries its human readable name in its
       // manifest. A core service has none: the front translates its
       // technical name through the integration.* i18n dictionary, so send
-      // the manifest name separately instead of collapsing both into one
-      // field the front cannot tell apart.
+      // the manifest name on its own and let the front fall back to `name`.
       manifest_name: (plainService.manifest && plainService.manifest.name) || null,
-      label: (plainService.manifest && plainService.manifest.name) || plainService.name,
     }));
 }
 

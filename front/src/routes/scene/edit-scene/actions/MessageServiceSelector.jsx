@@ -34,7 +34,7 @@ class MessageServiceSelector extends Component {
     // service is translated from the front dictionary, falling back to the
     // technical name when no translation exists
     const translated = get(this.props.intl.dictionary, `integration.${toI18nKey(service.name)}.title`);
-    const name = service.manifest_name || translated || service.label;
+    const name = service.manifest_name || translated || service.name;
     if (service.status === RUNNING_STATUS) {
       return name;
     }
@@ -47,7 +47,7 @@ class MessageServiceSelector extends Component {
   };
   getOptions = async () => {
     try {
-      const services = await this.props.httpClient.get('/api/v1/message_service');
+      const services = await this.props.httpClient.get('/api/v1/service/message');
       const serviceOptions = services.map(service => ({
         label: this.buildLabel(service),
         value: service.name
@@ -96,7 +96,7 @@ class MessageServiceSelector extends Component {
         // or uninstalled) still needs to be readable: translate what we can
         // and mark it unavailable, rather than showing a raw technical name
         serviceOptions.find(option => option.value === currentService) || {
-          label: this.buildLabel({ name: currentService, label: currentService, status: null }),
+          label: this.buildLabel({ name: currentService, status: null }),
           value: currentService
         }
       : allServicesOption;
