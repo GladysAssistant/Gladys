@@ -212,6 +212,31 @@ describe('externalIntegration.update', () => {
     externalIntegration.clearTimers(service.id);
   });
 
+  it('should update a dev install from an image only built locally', async () => {
+    // the local dev loop: rebuild the image with `docker build`, hit force
+    // update. The tag exists in no registry so the pull fails, and the image
+    // already present locally is used instead
+    const service = await seedExternalService({
+      store_slug: null,
+      docker_image: 'my-local-integration:dev',
+    });
+    const newManifest = { ...TEST_MANIFEST, version: '1.3.0' };
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        pull: fake.rejects(new Error('pull access denied')),
+        imageExists: fake.resolves(true),
+        getImageLabels: fake.resolves({ 'io.gladysassistant.manifest': JSON.stringify(newManifest) }),
+      },
+    });
+    const integration = await externalIntegration.update(service.selector);
+    sinonAssert.calledWith(system.pull, 'my-local-integration:dev');
+    sinonAssert.calledWith(system.imageExists, 'my-local-integration:dev');
+    expect(integration.version).to.equal('1.3.0');
+    expect(integration.manifest.version).to.equal('1.3.0');
+    expect(integration.docker_image).to.equal('my-local-integration:dev');
+    externalIntegration.clearTimers(service.id);
+  });
+
   it('should re-pull the installed dev tag, not the released image of the manifest', async () => {
     // dev install alongside a prod one: the user installed :dev while the
     // labels manifest declares the released image — force update must never

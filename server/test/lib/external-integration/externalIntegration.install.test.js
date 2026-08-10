@@ -152,6 +152,42 @@ describe('externalIntegration.install', () => {
     }
   });
 
+  it('should install from a local image when the pull fails (local docker build)', async () => {
+    // the dev workflow: the image is built with `docker build` on the host
+    // and exists in no registry, so the pull fails but the image is there
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        pull: fake.rejects(new Error('pull access denied')),
+        imageExists: fake.resolves(true),
+        getImageLabels: fake.resolves({
+          'io.gladysassistant.manifest': JSON.stringify(TEST_MANIFEST),
+        }),
+      },
+    });
+    const integration = await externalIntegration.install({
+      dockerImage: 'my-local-integration:dev',
+    });
+    expect(integration).to.have.property('selector', 'ext-dev-open-meteo-demo');
+    expect(integration).to.have.property('docker_image', 'my-local-integration:dev');
+    expect(integration.manifest).to.deep.equal(TEST_MANIFEST);
+    sinonAssert.calledWith(system.pull, 'my-local-integration:dev');
+    sinonAssert.calledWith(system.imageExists, 'my-local-integration:dev');
+    sinonAssert.calledOnce(system.createContainer);
+  });
+
+  it('should install a local sub-container image when its pull fails', async () => {
+    const pull = sinon.stub();
+    pull.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('pull access denied'));
+    pull.resolves(true);
+    const imageExists = sinon.stub();
+    imageExists.withArgs('eclipse-mosquitto:2.0.18').resolves(true);
+    imageExists.resolves(false);
+    const { externalIntegration } = buildSupervisor({ system: { pull, imageExists } });
+    const integration = await externalIntegration.install({ manifest: TEST_CONTAINERS_MANIFEST });
+    expect(integration.status).to.not.equal('ERROR');
+    sinonAssert.calledWith(imageExists, 'eclipse-mosquitto:2.0.18');
+  });
+
   it('should reject an image without manifest label in dev mode', async () => {
     const { externalIntegration } = buildSupervisor();
     try {
