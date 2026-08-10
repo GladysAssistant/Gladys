@@ -34,7 +34,7 @@ describe('Matter.init', () => {
 
   beforeEach(() => {
     previousMatterPath = process.env.MATTER_FOLDER_PATH;
-    process.env.MATTER_FOLDER_PATH = '/tmp/gladysmattertest';
+    process.env.MATTER_FOLDER_PATH = `/tmp/gladysmattertest-${process.pid}`;
 
     // Mock environment and storage service
     environment = {
