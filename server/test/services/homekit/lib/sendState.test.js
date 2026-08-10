@@ -28,6 +28,11 @@ describe('Send state to HomeKit', () => {
         Saturation: 'SATURATION',
         ColorTemperature: 'COLORTEMPERATURE',
         ContactSensorState: 'CONTACTSENSORSTATE',
+        CoolingThresholdTemperature: 'COOLINGTHRESHOLDTEMPERATURE',
+        HeatingThresholdTemperature: 'HEATINGTHRESHOLDTEMPERATURE',
+        TargetHeatingCoolingState: 'TARGETHEATINGCOOLINGSTATE',
+        CurrentHeatingCoolingState: 'CURRENTHEATINGCOOLINGSTATE',
+        TargetTemperature: 'TARGETTEMPERATURE',
         MotionDetected: 'MOTIONDETECTED',
         CurrentTemperature: 'CURRENTTEMPERATURE',
         CurrentPosition: 'CURRENTPOSITION',
@@ -53,10 +58,13 @@ describe('Send state to HomeKit', () => {
         PM2_5Density: 'PM25DENSITY',
         PM10Density: 'PM10DENSITY',
       },
+      CharacteristicEventTypes: { GET: 'get', SET: 'set' },
       Service: {
         ContactSensor: 'CONTACTSENSOR',
         MotionSensor: 'MOTIONSENSOR',
         WindowCovering: 'WINDOWCOVERING',
+        Thermostat: 'THERMOSTAT',
+        TemperatureSensor: 'TEMPERATURESENSOR',
         LockMechanism: 'LOCKMECHANISM',
         LightSensor: 'LIGHTSENSOR',
         CarbonMonoxideSensor: 'CARBONMONOXIDESENSOR',
@@ -74,7 +82,11 @@ describe('Send state to HomeKit', () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {
@@ -99,7 +111,11 @@ describe('Send state to HomeKit', () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {
@@ -124,7 +140,11 @@ describe('Send state to HomeKit', () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {
@@ -149,7 +169,11 @@ describe('Send state to HomeKit', () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {
@@ -213,7 +237,11 @@ describe('Send state to HomeKit', () => {
 
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {
@@ -314,7 +342,11 @@ describe('Send state to HomeKit', () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {
@@ -340,7 +372,11 @@ describe('Send state to HomeKit', () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {
@@ -366,7 +402,11 @@ describe('Send state to HomeKit', () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {
@@ -471,7 +511,11 @@ describe('Send state to HomeKit', () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {
@@ -572,7 +616,11 @@ describe('Send state to HomeKit', () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {
@@ -1154,11 +1202,250 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args).eql([['ROTATIONSPEED', 30]]);
   });
 
+  it('should notify current temperature on a merged thermostat', async () => {
+    const updateCharacteristic = stub().returns();
+    const currentStateCharacteristic = { emit: stub().callsArgWith(1, undefined, 2) };
+    const thermostatService = {
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(currentStateCharacteristic),
+    };
+    // the device has no standalone TemperatureSensor service, it was merged into the thermostat
+    const getService = stub();
+    getService.withArgs('TEMPERATURESENSOR').returns(undefined);
+    getService.withArgs('THERMOSTAT').returns(thermostatService);
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService,
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 19.5,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Room temperature',
+      category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.CELSIUS,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['CURRENTTEMPERATURE', 19.5]);
+    // heating or cooling in AUTO depends on the room temperature, so it is recomputed
+    expect(updateCharacteristic.args[1]).eql(['CURRENTHEATINGCOOLINGSTATE', 2]);
+  });
+
+  it('should notify a thermostat setpoint', async () => {
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, undefined, 21) };
+    const thermostatService = {
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(thermostatService),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 69.8,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Setpoint',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+      unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    // 69.8 °F is 21 °C
+    expect(updateCharacteristic.args[0][0]).eql('HEATINGTHRESHOLDTEMPERATURE');
+    expect(updateCharacteristic.args[0][1]).to.be.closeTo(21, 0.001);
+    expect(updateCharacteristic.args[1]).eql(['TARGETTEMPERATURE', 21]);
+  });
+
+  it('should notify an air conditioning setpoint on a thermostat without thresholds', async () => {
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, undefined, 24) };
+    const thermostatService = {
+      updateCharacteristic,
+      // a device with a single setpoint has no threshold characteristic
+      testCharacteristic: stub().returns(false),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(thermostatService),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 24,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Cooling setpoint',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
+      unit: DEVICE_FEATURE_UNITS.CELSIUS,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    // a service exposing none of those characteristics is left untouched
+    expect(updateCharacteristic.callCount).eql(0);
+  });
+
+  it('should notify an air conditioning mode change', async () => {
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, undefined, 2) };
+    const thermostatService = {
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(thermostatService),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Mode',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['TARGETHEATINGCOOLINGSTATE', 2]);
+    expect(updateCharacteristic.args[1]).eql(['CURRENTHEATINGCOOLINGSTATE', 2]);
+    expect(updateCharacteristic.args[2]).eql(['TARGETTEMPERATURE', 2]);
+  });
+
+  it('should not push a thermostat characteristic whose read failed', async () => {
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, new Error('read failed')) };
+    const thermostatService = {
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(thermostatService),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Mode',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.callCount).eql(0);
+  });
+
+  it('should notify an air conditioning power change', async () => {
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, undefined, 0) };
+    const thermostatService = {
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(thermostatService),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 0,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Power',
+      category: DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
+      type: DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['TARGETHEATINGCOOLINGSTATE', 0]);
+    expect(updateCharacteristic.args[1]).eql(['CURRENTHEATINGCOOLINGSTATE', 0]);
+    expect(updateCharacteristic.args[2]).eql(['TARGETTEMPERATURE', 0]);
+  });
+
+  it('should clamp temperatures pushed to a thermostat', async () => {
+    const updateCharacteristic = stub().returns();
+    const service = {
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns({
+        props: { minValue: -270, maxValue: 100 },
+        emit: (event, cb) => cb(undefined, 0),
+      }),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(service),
+    };
+
+    // a sensor glitching far outside the HomeKit bounds must be clamped, not thrown at HAP
+    await homekitHandler.sendState(
+      accessory,
+      {
+        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        name: 'Room temperature',
+        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 5000 },
+    );
+
+    expect(updateCharacteristic.args[0]).eql(['CURRENTTEMPERATURE', 100]);
+  });
+
   it('should do nothing wrong device category & type', async () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        updateCharacteristic,
+        testCharacteristic: stub().returns(false),
+        getCharacteristic: stub().returns({ props: { minValue: -270, maxValue: 100 } }),
+      }),
     };
 
     const event = {

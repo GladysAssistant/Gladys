@@ -5,6 +5,7 @@ const {
   COVER_STATE,
   LOCK,
   BUTTON_STATUS,
+  AC_MODE,
 } = require('../../../utils/constants');
 
 const mappings = {
@@ -239,6 +240,28 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
+    service: 'Thermostat',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: {
+        characteristics: ['TargetTemperature'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
+    service: 'Thermostat',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: {
+        characteristics: ['TargetTemperature'],
+      },
+      [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: {
+        characteristics: ['TargetHeatingCoolingState', 'CurrentHeatingCoolingState'],
+      },
+      [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY]: {
+        characteristics: ['TargetHeatingCoolingState', 'CurrentHeatingCoolingState'],
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.SHUTTER]: {
     service: 'WindowCovering',
     capabilities: {
@@ -379,7 +402,37 @@ const mergedServiceCategories = [
     hosts: [DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_CATEGORIES.BATTERY_LOW],
     merged: [],
   },
+  // A heating or cooling device is one Thermostat service, while Gladys splits it across the
+  // setpoints, the mode, the on/off command and the temperature sensor reading the room.
+  {
+    hosts: [DEVICE_FEATURE_CATEGORIES.THERMOSTAT, DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING],
+    merged: [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR],
+  },
 ];
+
+// Values of the HomeKit TargetHeatingCoolingState characteristic. CurrentHeatingCoolingState uses
+// the same values without AUTO.
+const HOMEKIT_HEATING_COOLING_STATE = {
+  OFF: 0,
+  HEAT: 1,
+  COOL: 2,
+  AUTO: 3,
+};
+
+// AC_MODE.DRYING and AC_MODE.FAN have no HomeKit equivalent, they are reported as AUTO.
+const acModeToHeatingCoolingState = {
+  [AC_MODE.AUTO]: HOMEKIT_HEATING_COOLING_STATE.AUTO,
+  [AC_MODE.COOLING]: HOMEKIT_HEATING_COOLING_STATE.COOL,
+  [AC_MODE.HEATING]: HOMEKIT_HEATING_COOLING_STATE.HEAT,
+  [AC_MODE.DRYING]: HOMEKIT_HEATING_COOLING_STATE.AUTO,
+  [AC_MODE.FAN]: HOMEKIT_HEATING_COOLING_STATE.AUTO,
+};
+
+const heatingCoolingStateToAcMode = {
+  [HOMEKIT_HEATING_COOLING_STATE.HEAT]: AC_MODE.HEATING,
+  [HOMEKIT_HEATING_COOLING_STATE.COOL]: AC_MODE.COOLING,
+  [HOMEKIT_HEATING_COOLING_STATE.AUTO]: AC_MODE.AUTO,
+};
 // HomeKit knows three button events, Gladys has more than a hundred button statuses. Only those
 // with an exact HomeKit equivalent are forwarded: anything else — arrow keys, rotation, shake,
 // brightness gestures — would have to be reported as one of these three, and firing the wrong
@@ -426,4 +479,7 @@ module.exports = {
   mergedServiceCategories,
   LOW_BATTERY_THRESHOLD,
   buttonEventMapping,
+  HOMEKIT_HEATING_COOLING_STATE,
+  acModeToHeatingCoolingState,
+  heatingCoolingStateToAcMode,
 };

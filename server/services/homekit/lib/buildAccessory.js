@@ -11,7 +11,7 @@ const { mappings, mergedServiceCategories } = require('./deviceMappings');
 function mergeCategories(categories) {
   const mergedCategories = { ...categories };
 
-  mergedServiceCategories.forEach(({ hosts }) => {
+  mergedServiceCategories.forEach(({ hosts, merged }) => {
     const hostCategory = hosts.find((category) => mergedCategories[category]);
     if (!hostCategory) {
       return;
@@ -22,6 +22,21 @@ function mergeCategories(categories) {
       .forEach((category) => {
         mergedCategories[hostCategory] = [...mergedCategories[hostCategory], ...mergedCategories[category]];
         delete mergedCategories[category];
+      });
+
+    // A Thermostat has a single CurrentTemperature, so only the first feature of a merged category
+    // joins it. Any extra one keeps its own service, as it did before.
+    merged
+      .filter((category) => mergedCategories[category])
+      .forEach((category) => {
+        const [firstFeature, ...otherFeatures] = mergedCategories[category];
+        mergedCategories[hostCategory] = [...mergedCategories[hostCategory], firstFeature];
+
+        if (otherFeatures.length === 0) {
+          delete mergedCategories[category];
+        } else {
+          mergedCategories[category] = otherFeatures;
+        }
       });
   });
 

@@ -20,6 +20,31 @@ const {
   LOW_BATTERY_THRESHOLD,
   buttonEventMapping,
 } = require('./deviceMappings');
+const { toCelsius } = require('./buildThermostatService');
+
+/**
+ * @description Recompute a thermostat characteristic through the GET handler built by buildService
+ * and push the result to HomeKit. A thermostat characteristic depends on several Gladys features at
+ * once (power, mode, setpoints, room temperature), so it cannot be derived from the single feature
+ * that changed.
+ * @param {object} hap - HAP library.
+ * @param {object} service - HomeKit service holding the characteristic.
+ * @param {object} characteristicType - HomeKit characteristic to refresh.
+ * @returns {undefined}
+ * @example
+ * refreshCharacteristic(hap, service, hap.Characteristic.CurrentHeatingCoolingState);
+ */
+function refreshCharacteristic(hap, service, characteristicType) {
+  if (!service.testCharacteristic(characteristicType)) {
+    return;
+  }
+
+  service.getCharacteristic(characteristicType).emit(hap.CharacteristicEventTypes.GET, (error, value) => {
+    if (!error) {
+      service.updateCharacteristic(characteristicType, value);
+    }
+  });
+}
 
 /**
  * @description Forward new state value to HomeKit.
@@ -128,9 +153,46 @@ function sendState(hkAccessory, feature, event) {
       } else if (feature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
         currentTemp = fahrenheitToCelsius(currentTemp);
       }
-      hkAccessory
-        .getService(Service.TemperatureSensor)
-        .updateCharacteristic(Characteristic.CurrentTemperature, currentTemp);
+      // On a heating or cooling device the temperature sensor is merged into the Thermostat service.
+      const service = hkAccessory.getService(Service.TemperatureSensor) || hkAccessory.getService(Service.Thermostat);
+      // Clamped like the GET path: HAP throws on a value outside the characteristic bounds, and a
+      // sensor reporting an out-of-range reading must not take the bridge down.
+      service.updateCharacteristic(
+        Characteristic.CurrentTemperature,
+        clampToCharacteristic(currentTemp, service.getCharacteristic(Characteristic.CurrentTemperature).props),
+      );
+      // In AUTO, whether the device is heating or cooling depends on the room temperature.
+      refreshCharacteristic(this.hap, service, Characteristic.CurrentHeatingCoolingState);
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.THERMOSTAT}:${DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE}`:
+    case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE}`: {
+      const service = hkAccessory.getService(Service.Thermostat);
+      const thresholdCharacteristic =
+        feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT
+          ? Characteristic.HeatingThresholdTemperature
+          : Characteristic.CoolingThresholdTemperature;
+
+      if (service.testCharacteristic(thresholdCharacteristic)) {
+        service.updateCharacteristic(
+          thresholdCharacteristic,
+          clampToCharacteristic(
+            toCelsius(event.last_value, feature.unit),
+            service.getCharacteristic(thresholdCharacteristic).props,
+          ),
+        );
+      }
+      // Which setpoint TargetTemperature follows depends on the mode, so it is recomputed.
+      refreshCharacteristic(this.hap, service, Characteristic.TargetTemperature);
+      refreshCharacteristic(this.hap, service, Characteristic.CurrentHeatingCoolingState);
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE}`:
+    case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY}`: {
+      const service = hkAccessory.getService(Service.Thermostat);
+      refreshCharacteristic(this.hap, service, Characteristic.TargetHeatingCoolingState);
+      refreshCharacteristic(this.hap, service, Characteristic.CurrentHeatingCoolingState);
+      refreshCharacteristic(this.hap, service, Characteristic.TargetTemperature);
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
