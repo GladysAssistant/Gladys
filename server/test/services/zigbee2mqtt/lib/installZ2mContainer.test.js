@@ -27,6 +27,9 @@ const containerDescription = {
   Id: 'a8293feec54547a797aa2e52cc14b93f89a007d6c5608c587e30491feec8ee61',
   HostConfig: {
     NetworkMode: 'host',
+    RestartPolicy: {
+      Name: 'always',
+    },
     Devices: [
       {
         PathOnHost: '/dev/ttyUSB0',
@@ -68,6 +71,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
         restartContainer: fake.resolves(true),
         removeContainer: fake.resolves(true),
         createContainer: fake.resolves(true),
+        updateContainer: fake.resolves(true),
         getGladysBasePath: fake.resolves({
           basePathOnHost: path.join(__dirname, 'host'),
           basePathOnContainer,
@@ -185,6 +189,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
     assert.notCalled(gladys.system.restartContainer);
+    assert.notCalled(gladys.system.updateContainer);
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config, false);
     assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
@@ -205,6 +210,57 @@ describe('zigbee2mqtt installz2mContainer', () => {
     });
     expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
     expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+  });
+
+  it('should update restart policy of an existing z2m container missing it (#2734)', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    gladys.system.getContainers = fake.resolves([container]);
+    gladys.system.inspectContainer = fake.resolves({
+      ...containerDescription,
+      HostConfig: {
+        ...containerDescription.HostConfig,
+        RestartPolicy: undefined,
+      },
+    });
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledOnceWithExactly(gladys.system.updateContainer, container.id, {
+      RestartPolicy: { Name: 'always' },
+    });
+    assert.notCalled(gladys.system.removeContainer);
+    assert.notCalled(gladys.system.createContainer);
+  });
+
+  it('should update restart policy of an existing z2m container set to a different policy (#2734)', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    gladys.system.getContainers = fake.resolves([container]);
+    gladys.system.inspectContainer = fake.resolves({
+      ...containerDescription,
+      HostConfig: {
+        ...containerDescription.HostConfig,
+        RestartPolicy: { Name: 'no' },
+      },
+    });
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledOnceWithExactly(gladys.system.updateContainer, container.id, {
+      RestartPolicy: { Name: 'always' },
+    });
+  });
+
+  it('should not update restart policy when it already matches the expected one', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    gladys.system.getContainers = fake.resolves([container]);
+    // containerDescription already has RestartPolicy.Name === 'always'
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.notCalled(gladys.system.updateContainer);
   });
 
   it('it should fail to start z2m container', async () => {
