@@ -358,13 +358,18 @@ class Integration extends Component {
       // both sides are stripped of their accents: "meteo" has to find "Météo",
       // and typing "Météo" has to keep finding it
       const normalizedSearchKeyword = normalizeSearchText(searchKeyword);
-      selectedIntegrations = selectedIntegrations.filter(integration => {
-        const { name, description } = integration;
-        return (
-          normalizeSearchText(name).includes(normalizedSearchKeyword) ||
-          normalizeSearchText(description).includes(normalizedSearchKeyword)
-        );
-      });
+      // a keyword made of accents only folds down to nothing, and every string
+      // contains the empty string: without this, such a search would display
+      // the whole catalog as if the field were empty
+      selectedIntegrations = normalizedSearchKeyword.length
+        ? selectedIntegrations.filter(integration => {
+            const { name, description } = integration;
+            return (
+              normalizeSearchText(name).includes(normalizedSearchKeyword) ||
+              normalizeSearchText(description).includes(normalizedSearchKeyword)
+            );
+          })
+        : [];
     }
 
     // Sort
