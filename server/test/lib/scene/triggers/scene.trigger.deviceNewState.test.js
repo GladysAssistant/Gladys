@@ -59,6 +59,48 @@ describe('scene.triggers.deviceNewState', () => {
     sinon.reset();
   });
 
+  const buildSceneManagerWithMessage = (stateManager, message) => {
+    const house = {
+      get: fake.resolves([]),
+    };
+    const scheduler = {
+      scheduleJob: (date, callback) => {
+        return {
+          callback,
+          date,
+          cancel: () => {},
+        };
+      },
+    };
+    return new SceneManager(stateManager, event, device, message, {}, house, {}, {}, {}, scheduler, brain, service);
+  };
+
+  const addSceneSendingTriggerVariables = (sceneManagerWithMessage, deviceFeatureSelector) =>
+    sceneManagerWithMessage.addScene({
+      selector: 'my-scene-trigger-variables',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.MESSAGE.SEND,
+            user: 'pepper',
+            text:
+              '{{triggerEvent.device.name}} ({{triggerEvent.deviceFeature.name}}) = {{triggerEvent.last_value}}, ' +
+              'previous = {{triggerEvent.previous_value}}, ' +
+              'selectors = {{triggerEvent.device.selector}}/{{triggerEvent.deviceFeature.selector}}',
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: deviceFeatureSelector,
+          value: 1,
+          operator: '=',
+        },
+      ],
+    });
+
   it('should execute scene', async () => {
     await sceneManager.addScene({
       selector: 'my-scene',
@@ -110,53 +152,8 @@ describe('scene.triggers.deviceNewState', () => {
     const message = {
       sendToUser: fake.resolves(null),
     };
-    const house = {
-      get: fake.resolves([]),
-    };
-    const scheduler = {
-      scheduleJob: (date, callback) => {
-        return {
-          callback,
-          date,
-          cancel: () => {},
-        };
-      },
-    };
-    const sceneManagerWithMessage = new SceneManager(
-      stateManager,
-      event,
-      device,
-      message,
-      {},
-      house,
-      {},
-      {},
-      {},
-      scheduler,
-      brain,
-      service,
-    );
-    await sceneManagerWithMessage.addScene({
-      selector: 'my-scene-trigger-variables',
-      active: true,
-      actions: [
-        [
-          {
-            type: ACTIONS.MESSAGE.SEND,
-            user: 'pepper',
-            text: '{{triggerEvent.device.name}} ({{triggerEvent.deviceFeature.name}}) = {{triggerEvent.last_value}}',
-          },
-        ],
-      ],
-      triggers: [
-        {
-          type: EVENTS.DEVICE.NEW_STATE,
-          device_feature: 'door-sensor-1',
-          value: 1,
-          operator: '=',
-        },
-      ],
-    });
+    const sceneManagerWithMessage = buildSceneManagerWithMessage(stateManager, message);
+    await addSceneSendingTriggerVariables(sceneManagerWithMessage, 'door-sensor-1');
     sceneManagerWithMessage.checkTrigger({
       type: EVENTS.DEVICE.NEW_STATE,
       device_feature: 'door-sensor-1',
@@ -166,7 +163,72 @@ describe('scene.triggers.deviceNewState', () => {
     return new Promise((resolve, reject) => {
       sceneManagerWithMessage.queue.start(() => {
         try {
-          assert.calledOnceWithExactly(message.sendToUser, 'pepper', 'Garage door (Door state) = 1');
+          assert.calledOnceWithExactly(
+            message.sendToUser,
+            'pepper',
+            'Garage door (Door state) = 1, previous = 0, selectors = garage-door/door-sensor-1',
+          );
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should execute scene with empty device variables when the device is not in RAM', async () => {
+    const stateManager = new StateManager();
+    stateManager.setState('deviceFeature', 'door-sensor-1', {
+      name: 'Door state',
+      device_id: 'device-1',
+      last_value: 0,
+    });
+    // The device itself is not in RAM: the feature variables are still exposed,
+    // the device ones render as empty strings.
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const sceneManagerWithMessage = buildSceneManagerWithMessage(stateManager, message);
+    await addSceneSendingTriggerVariables(sceneManagerWithMessage, 'door-sensor-1');
+    sceneManagerWithMessage.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'door-sensor-1',
+      previous_value: 0,
+      last_value: 1,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManagerWithMessage.queue.start(() => {
+        try {
+          assert.calledOnceWithExactly(
+            message.sendToUser,
+            'pepper',
+            ' (Door state) = 1, previous = 0, selectors = /door-sensor-1',
+          );
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should execute scene with empty trigger variables when the device feature is not in RAM', async () => {
+    // Nothing is in RAM: the event is passed through unchanged, so only the
+    // event values are rendered.
+    const stateManager = new StateManager();
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const sceneManagerWithMessage = buildSceneManagerWithMessage(stateManager, message);
+    await addSceneSendingTriggerVariables(sceneManagerWithMessage, 'unknown-sensor-1');
+    sceneManagerWithMessage.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'unknown-sensor-1',
+      previous_value: 0,
+      last_value: 1,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManagerWithMessage.queue.start(() => {
+        try {
+          assert.calledOnceWithExactly(message.sendToUser, 'pepper', ' () = 1, previous = 0, selectors = /');
           resolve();
         } catch (e) {
           reject(e);
