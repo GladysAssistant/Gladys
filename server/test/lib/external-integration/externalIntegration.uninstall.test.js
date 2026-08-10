@@ -6,7 +6,7 @@ const { assert: sinonAssert, fake } = sinon;
 
 const db = require('../../../models');
 const { NotFoundError } = require('../../../utils/coreErrors');
-const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
+const { buildSupervisor, seedExternalService, TEST_MANIFEST, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.uninstall', () => {
   it('should remove container, devices, variables and the service row', async () => {
@@ -97,6 +97,34 @@ describe('externalIntegration.uninstall', () => {
     } finally {
       fs.promises.rm = originalRm;
     }
+  });
+
+  it('should remove the images of the integration and of its sub-containers', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    const { externalIntegration, system } = buildSupervisor();
+
+    await externalIntegration.uninstall(service.selector);
+
+    sinonAssert.calledWith(system.removeImage, TEST_MANIFEST.docker_image);
+    sinonAssert.calledWith(system.removeImage, 'eclipse-mosquitto:2.0.18');
+    sinonAssert.calledWith(system.removeImage, 'ghcr.io/blakeblackshear/frigate:0.14.1');
+  });
+
+  it('should keep an image another installed integration still uses', async () => {
+    const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
+    await seedExternalService({
+      name: 'ext-dev-other',
+      selector: 'ext-dev-other',
+      docker_image: 'ghcr.io/john/other:1.0.0',
+      manifest: { ...TEST_MANIFEST, containers: [{ name: 'mqtt', docker_image: 'eclipse-mosquitto:2.0.18' }] },
+      container_id: 'container-2',
+    });
+    const { externalIntegration, system } = buildSupervisor();
+
+    await externalIntegration.uninstall(service.selector);
+
+    sinonAssert.neverCalledWith(system.removeImage, 'eclipse-mosquitto:2.0.18');
+    sinonAssert.calledWith(system.removeImage, 'ghcr.io/blakeblackshear/frigate:0.14.1');
   });
 
   it('should uninstall even when the sub-containers and data folder cannot be removed', async () => {
