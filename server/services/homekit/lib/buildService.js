@@ -7,12 +7,14 @@ const {
   ACTIONS_STATUS,
   EVENTS,
   DEVICE_FEATURE_UNITS,
+  LOCK,
 } = require('../../../utils/constants');
 const { normalize } = require('../../../utils/device');
 const { fahrenheitToCelsius } = require('../../../utils/units');
 const {
   mappings,
   coverStateMapping,
+  lockStateMapping,
   gasDetectedThresholds,
   aqiToAirQuality,
   clampToCharacteristic,
@@ -310,6 +312,83 @@ function buildService(device, features, categoryMapping, subtype) {
             aqiToAirQuality(this.gladys.stateManager.get('deviceFeature', feature.selector).last_value),
           );
         });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.LOCK}:${DEVICE_FEATURE_TYPES.LOCK.BINARY}`: {
+        const [targetStateName, currentStateName] = categoryMapping.capabilities[feature.type].characteristics;
+        const hasStateFeature = features.some((f) => f.type === DEVICE_FEATURE_TYPES.LOCK.STATE);
+
+        // Without a state feature, the command is the only source of truth for the lock position,
+        // and a lock takes time to move. The commanded value is remembered so that a read landing
+        // before the device reports back does not answer with the previous position. It is dropped
+        // as soon as the device reports anything, so a command that failed cannot be masked for
+        // long — on a lock, a stale optimistic answer is worse than a slow honest one.
+        let commanded;
+        let valueAtCommand;
+        const readLockState = () => {
+          const { last_value: lastValue } = this.gladys.stateManager.get('deviceFeature', feature.selector);
+          if (commanded !== undefined && lastValue === valueAtCommand) {
+            return commanded;
+          }
+          commanded = undefined;
+          return lastValue ? 1 : 0;
+        };
+
+        const targetStateCharacteristic = service.getCharacteristic(Characteristic[targetStateName]);
+        targetStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          callback(undefined, readLockState());
+        });
+        targetStateCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
+          const action = {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            status: ACTIONS_STATUS.PENDING,
+            value: value ? LOCK.ACTION.LOCK : LOCK.ACTION.UNLOCK,
+            device: device.selector,
+            device_feature: feature.selector,
+          };
+          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+
+          if (!hasStateFeature) {
+            commanded = value ? 1 : 0;
+            valueAtCommand = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+            service.updateCharacteristic(Characteristic[currentStateName], commanded);
+          }
+          callback();
+        });
+
+        if (!hasStateFeature) {
+          const currentStateCharacteristic = service.getCharacteristic(Characteristic[currentStateName]);
+          currentStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+            callback(undefined, readLockState());
+          });
+        }
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.LOCK}:${DEVICE_FEATURE_TYPES.LOCK.STATE}`: {
+        const [currentStateName, targetStateName] = categoryMapping.capabilities[feature.type].characteristics;
+
+        const currentStateCharacteristic = service.getCharacteristic(Characteristic[currentStateName]);
+        currentStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          callback(
+            undefined,
+            lockStateMapping[this.gladys.stateManager.get('deviceFeature', feature.selector).last_value],
+          );
+        });
+
+        // HomeKit always requires a target state, even on a lock Gladys can only read.
+        if (!features.some((f) => f.type === DEVICE_FEATURE_TYPES.LOCK.BINARY)) {
+          const targetStateCharacteristic = service.getCharacteristic(Characteristic[targetStateName]);
+          // Without a command feature there is nothing to write to. Dropping the write permission
+          // makes the Home app show the lock as a read-only accessory, instead of accepting a
+          // lock or unlock that silently does nothing.
+          targetStateCharacteristic.setProps({
+            perms: targetStateCharacteristic.props.perms.filter((perm) => perm !== Perms.PAIRED_WRITE),
+          });
+          targetStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+            const state = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+            callback(undefined, state === LOCK.STATE.LOCKED ? 1 : 0);
+          });
+        }
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.STATE}`:

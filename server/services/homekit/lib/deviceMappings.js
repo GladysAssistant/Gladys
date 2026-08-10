@@ -3,6 +3,7 @@ const {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   COVER_STATE,
+  LOCK,
 } = require('../../../utils/constants');
 
 const mappings = {
@@ -189,6 +190,17 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.LOCK]: {
+    service: 'LockMechanism',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.LOCK.BINARY]: {
+        characteristics: ['LockTargetState', 'LockCurrentState'],
+      },
+      [DEVICE_FEATURE_TYPES.LOCK.STATE]: {
+        characteristics: ['LockCurrentState', 'LockTargetState'],
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.SHUTTER]: {
     service: 'WindowCovering',
     capabilities: {
@@ -217,6 +229,14 @@ const coverStateMapping = {
   [COVER_STATE.CLOSE]: 0,
   [COVER_STATE.OPEN]: 1,
   [COVER_STATE.STOP]: 2,
+};
+
+// HomeKit LockCurrentState has no "moving" value, so a lock in motion is reported as unknown.
+const lockStateMapping = {
+  [LOCK.STATE.UNLOCKED]: 0, // UNSECURED
+  [LOCK.STATE.LOCKED]: 1, // SECURED
+  [LOCK.STATE.ACTIVITY]: 3, // UNKNOWN
+  [LOCK.STATE.ERROR]: 2, // JAMMED
 };
 
 // Values of the HomeKit AirQuality characteristic.
@@ -331,6 +351,7 @@ const LOW_BATTERY_THRESHOLD = 20;
 module.exports = {
   mappings,
   coverStateMapping,
+  lockStateMapping,
   gasDetectedThresholds,
   aqiToAirQuality,
   clampToCharacteristic,
