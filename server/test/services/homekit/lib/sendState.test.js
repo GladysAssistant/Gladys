@@ -3,6 +3,7 @@ const sinon = require('sinon').createSandbox();
 
 const { stub } = sinon;
 const { sendState } = require('../../../../services/homekit/lib/sendState');
+const { indexFeatureService } = require('../../../../services/homekit/lib/featureServices');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -1041,37 +1042,110 @@ describe('Send state to HomeKit', () => {
   it('should notify the button that was actually pressed on a multi-button remote', async () => {
     const firstButton = stub();
     const secondButton = stub();
+    const leftFeature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      selector: 'remote-button-left',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Left',
+      category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+      type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+    };
+    const rightFeature = { ...leftFeature, selector: 'remote-button-right', name: 'Right' };
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      services: [
-        {
-          subtype: 'button 1',
-          displayName: 'Left',
-          getCharacteristic: stub().returns({ sendEventNotification: firstButton }),
-        },
-        {
-          subtype: 'button 2',
-          displayName: 'Right',
-          getCharacteristic: stub().returns({ sendEventNotification: secondButton }),
-        },
-      ],
       getService: stub().returns({ getCharacteristic: stub().returns({ sendEventNotification: firstButton }) }),
     };
 
-    await homekitHandler.sendState(
-      accessory,
-      {
-        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
-        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
-        name: 'Right',
-        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
-        type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
-      },
-      { type: EVENTS.DEVICE.NEW_STATE, last_value: BUTTON_STATUS.CLICK },
-    );
+    // The remote carries one StatelessProgrammableSwitch service per button, as buildAccessory
+    // builds them.
+    indexFeatureService(accessory, { getCharacteristic: stub().returns({ sendEventNotification: firstButton }) }, [
+      leftFeature,
+    ]);
+    indexFeatureService(accessory, { getCharacteristic: stub().returns({ sendEventNotification: secondButton }) }, [
+      rightFeature,
+    ]);
+
+    await homekitHandler.sendState(accessory, rightFeature, {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: BUTTON_STATUS.CLICK,
+    });
 
     expect(secondButton.args).eql([[0]]);
     expect(firstButton.callCount).to.equal(0);
+    // getService — which returns the first service of a type — is never consulted
+    expect(accessory.getService.callCount).to.equal(0);
+  });
+
+  it('should notify a shutter position on the shutter it belongs to', async () => {
+    const firstShutter = stub();
+    const secondShutter = stub();
+    const getCharacteristic = stub().returns({ props: { minValue: 0, maxValue: 100 } });
+    const leftFeature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      selector: 'shutter-left-position',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Volet gauche',
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+      min: 0,
+      max: 100,
+    };
+    const rightFeature = { ...leftFeature, selector: 'shutter-right-position', name: 'Volet droit' };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic: firstShutter, getCharacteristic }),
+    };
+
+    indexFeatureService(accessory, { updateCharacteristic: firstShutter, getCharacteristic }, [leftFeature]);
+    indexFeatureService(accessory, { updateCharacteristic: secondShutter, getCharacteristic }, [rightFeature]);
+
+    await homekitHandler.sendState(accessory, rightFeature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 42 });
+
+    expect(secondShutter.args).eql([
+      ['CURRENTPOSITION', 42],
+      ['TARGETPOSITION', 42],
+    ]);
+    expect(firstShutter.callCount).to.equal(0);
+  });
+
+  it('should notify the temperature merged into a thermostat rather than a standalone sensor', async () => {
+    const thermostat = stub();
+    const standaloneSensor = stub();
+    const getCharacteristic = stub().returns({ props: { minValue: -270, maxValue: 100 } });
+    const mergedFeature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      selector: 'thermostat-room-temperature',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Température intérieure',
+      category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+    };
+    const outsideFeature = { ...mergedFeature, selector: 'thermostat-outside-temperature', name: 'Extérieur' };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      // the extra sensor keeps its own TemperatureSensor service, and comes first
+      getService: stub().returns({
+        updateCharacteristic: standaloneSensor,
+        getCharacteristic,
+        testCharacteristic: stub().returns(false),
+      }),
+    };
+
+    indexFeatureService(
+      accessory,
+      { updateCharacteristic: standaloneSensor, getCharacteristic, testCharacteristic: stub().returns(false) },
+      [outsideFeature],
+    );
+    indexFeatureService(
+      accessory,
+      { updateCharacteristic: thermostat, getCharacteristic, testCharacteristic: stub().returns(false) },
+      [mergedFeature],
+    );
+
+    await homekitHandler.sendState(accessory, mergedFeature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 21 });
+
+    expect(thermostat.args).eql([['CURRENTTEMPERATURE', 21]]);
+    expect(standaloneSensor.callCount).to.equal(0);
   });
 
   it('should notify fan mode, speed, oscillation and direction', async () => {

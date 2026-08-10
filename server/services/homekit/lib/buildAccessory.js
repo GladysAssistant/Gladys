@@ -1,4 +1,5 @@
 const { mappings, mergedServiceCategories } = require('./deviceMappings');
+const { indexFeatureService } = require('./featureServices');
 
 /**
  * @description Move the features of categories HomeKit models as a single service into their host
@@ -108,6 +109,9 @@ function buildAccessory(device) {
         mappings[category],
         serviceConfigs.length > 1 ? `${category} ${i + 1}` : undefined,
       );
+      // Which features went into which service is only known here. sendState reads it back to
+      // update the service the feature belongs to instead of the first one of its type.
+      indexFeatureService(accessory, service, config);
       accessory.addService(service);
     });
   });

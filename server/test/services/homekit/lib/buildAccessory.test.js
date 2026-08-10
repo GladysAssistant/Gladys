@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 const { buildAccessory } = require('../../../../services/homekit/lib/buildAccessory');
+const { findFeatureService } = require('../../../../services/homekit/lib/featureServices');
 
 describe('Build accessory', () => {
   const homekitHandler = {
@@ -346,6 +347,57 @@ describe('Build accessory', () => {
     expect(homekitHandler.buildService.args[1][1]).to.have.deep.members([device.features[2], device.features[0]]);
     expect(homekitHandler.buildService.args[1][2].service).to.equal('Thermostat');
     expect(addService.callCount).to.equal(2);
+  });
+
+  it('should index every service by the features it was built from', async () => {
+    homekitHandler.buildService = sinon.stub();
+    homekitHandler.buildService.onFirstCall().returns('switch-service-1');
+    homekitHandler.buildService.onSecondCall().returns('switch-service-2');
+    const addService = sinon.stub();
+    const accessory = { addService, services: ['service1', 'service2'] };
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns(accessory),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Double interrupteur',
+      features: [
+        { selector: 'switch-1', name: 'Switch 1', category: 'switch', type: 'binary', read_only: false },
+        { selector: 'switch-2', name: 'Switch 2', category: 'switch', type: 'binary', read_only: false },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    // sendState resolves through this index, so the second switch reaches its own service instead
+    // of the first one getService would return
+    expect(findFeatureService(accessory, device.features[0])).to.equal('switch-service-1');
+    expect(findFeatureService(accessory, device.features[1])).to.equal('switch-service-2');
+  });
+
+  it('should index a merged service under every feature it carries', async () => {
+    homekitHandler.buildService = sinon.stub().returns('thermostat-service');
+    const addService = sinon.stub();
+    const accessory = { addService, services: ['service1', 'service2'] };
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns(accessory),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Thermostat',
+      features: [
+        { selector: 'room-temperature', name: 'Température', category: 'temperature-sensor', type: 'decimal' },
+        { selector: 'setpoint', name: 'Chauffage', category: 'thermostat', type: 'target-temperature' },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    // both the host feature and the temperature folded into it point at the Thermostat service
+    expect(findFeatureService(accessory, device.features[0])).to.equal('thermostat-service');
+    expect(findFeatureService(accessory, device.features[1])).to.equal('thermostat-service');
   });
 
   it('should leave a temperature sensor alone when the device has no thermostat', async () => {
