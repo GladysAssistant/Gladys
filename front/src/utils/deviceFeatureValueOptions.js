@@ -86,25 +86,23 @@ function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
     ];
   }
 
-  // For all other features, the translations are the source of truth: a feature holding
-  // constants (button click, shutter state, pilot wire mode...) has one label per value.
+  // For all other features, two things can tell us a feature holds constants: the translations,
+  // which give one label per value (button click, shutter state, pilot wire mode...), and the
+  // supported_options the integration declared for this very appliance. Either one is enough.
   const valueLabels = get(dictionary, `deviceFeatureValue.category.${category}.${type}`);
-  if (!valueLabels) {
+  const supportedOptions = deviceFeature.supported_options;
+  if (!valueLabels && !(Array.isArray(supportedOptions) && supportedOptions.length > 0)) {
     return null;
   }
 
-  const catalog = Object.keys(valueLabels)
+  const catalog = Object.keys(valueLabels || {})
     .filter(key => NUMERIC_VALUE.test(key))
     .map(key => ({ value: Number(key) }))
     .sort((optionA, optionB) => optionA.value - optionB.value);
 
-  if (catalog.length === 0) {
-    return null;
-  }
-
   // When the integration declares which values this appliance actually supports, they drive the
   // list and its order, so a scene cannot be built on a mode the device does not have. A supported
-  // value outside the catalog keeps the label the device gave it.
+  // value the category knows nothing about keeps the label the device gave it.
   const options = resolveFeatureOptions(deviceFeature, catalog).map(option => ({
     value: option.value,
     label: getValueLabel(dictionary, `deviceFeatureValue.category.${category}.${type}`, option.value, option.label)

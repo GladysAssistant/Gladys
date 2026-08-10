@@ -3,6 +3,7 @@ import { Text, Localizer } from 'preact-i18n';
 import Select from 'react-select';
 import update from 'immutability-helper';
 
+import SelectDeviceFeatureValue from '../../../../../components/device/SelectDeviceFeatureValue';
 import TextWithVariablesInjected from '../../../../../components/scene/TextWithVariablesInjected';
 import getDeviceFeatureValueOptions, { isValueInOptions } from '../../../../../utils/deviceFeatureValueOptions';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
@@ -10,8 +11,6 @@ import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 import style from './Condition.css';
 
 const getDeviceFeature = option => (option && option.data ? option.data.deviceFeature : null);
-
-const isSameValue = (optionValue, conditionValue) => `${optionValue}` === `${conditionValue}`;
 
 class Condition extends Component {
   // The current value can be displayed in the list only if it's a raw value present in that list
@@ -42,10 +41,10 @@ class Condition extends Component {
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
-  handleValueOptionChange = selectedOption => {
+  handleValueOptionChange = value => {
     const newCondition = update(this.props.condition, {
       value: {
-        $set: selectedOption ? selectedOption.value : undefined
+        $set: value
       },
       evaluate_value: {
         $set: undefined
@@ -171,9 +170,6 @@ class Condition extends Component {
     const selectedOption = this.getSelectedOption();
     const valueOptions = this.getValueOptions(selectedOption);
     const showValueOptions = this.shouldDisplayValueOptions(valueOptions, customValue);
-    const selectedValueOption = showValueOptions
-      ? valueOptions.find(option => isSameValue(option.value, props.condition.value)) || null
-      : null;
     return (
       <div>
         <div class="row">
@@ -237,12 +233,10 @@ class Condition extends Component {
                 </span>
               </label>
               {showValueOptions && (
-                <Select
-                  value={selectedValueOption}
-                  onChange={this.handleValueOptionChange}
+                <SelectDeviceFeatureValue
                   options={valueOptions}
-                  className="react-select-container"
-                  classNamePrefix="react-select"
+                  value={props.condition.value}
+                  updateValue={this.handleValueOptionChange}
                 />
               )}
               {!showValueOptions && (

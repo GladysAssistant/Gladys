@@ -107,7 +107,7 @@ class DeviceSetValue extends Component {
       return false;
     }
     const { value } = this.props.action;
-    return value === undefined || value === '' || isValueInOptions(valueOptions, value);
+    return value === undefined || value === null || value === '' || isValueInOptions(valueOptions, value);
   };
 
   handleNewEvalValue = text => {
@@ -286,17 +286,21 @@ class DeviceSetValue extends Component {
           )}
         </div>
 
-        <input
-          type="range"
-          value={this.props.action.value}
-          onChange={this.handleNewValue}
-          class={cx('form-control custom-range', {
-            'light-temperature': this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
-          })}
-          step="1"
-          min={this.state.deviceFeature.min}
-          max={this.state.deviceFeature.max}
-        />
+        {/* A feature holding constants has no continuous range to slide through: min/max are only
+            the bounds of its values, so the slider would be misleading next to a custom value */}
+        {!valueOptions && (
+          <input
+            type="range"
+            value={this.props.action.value}
+            onChange={this.handleNewValue}
+            class={cx('form-control custom-range', {
+              'light-temperature': this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
+            })}
+            step="1"
+            min={this.state.deviceFeature.min}
+            max={this.state.deviceFeature.max}
+          />
+        )}
         {valueOptions && (
           <small class="form-text">
             <a href="#" onClick={this.displayValueOptions}>
