@@ -4771,6 +4771,13 @@
           "one": "Motion detected"
         }
       },
+      "presence-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No presence",
+          "one": "Presence detected"
+        }
+      },
       "smoke-sensor": {
         "binary": {
           "other": "No value received",
@@ -4982,7 +4989,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Presence sensor",
-      "push": "Presence"
+      "push": "Presence",
+      "binary": "Presence (binary)"
     },
     "rain-sensor": {
       "shortCategoryName": "Rain sensor",

@@ -111,7 +111,12 @@ class TurnOnLight extends Component {
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE ||
         (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
           (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST || type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING));
-      presenceDevice = category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
+      // Scoped to `push`: the locked "device seen" widget only makes sense for a heartbeat
+      // sensor. A binary presence sensor (a camera reporting a person) shares the 'binary'
+      // string with SWITCH, so it is already served by BinaryDeviceState above, and both
+      // widgets would show up side by side if this test stayed on the category alone.
+      presenceDevice =
+        category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR && type === DEVICE_FEATURE_TYPES.SENSOR.PUSH;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
       doorbellRingDevice = category === DEVICE_FEATURE_CATEGORIES.DOORBELL;
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
