@@ -572,6 +572,7 @@ const EVENTS = {
     DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
     CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
+    CLEAN_IMAGES: 'external-integration.clean-images',
   },
 };
 

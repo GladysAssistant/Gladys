@@ -3240,7 +3240,8 @@
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "gladys/my-topic",
+        "topicPlaceholder": "zigbee2mqtt/my-device/set",
+        "topicExplanation": "The topic is published as-is: you must write the full MQTT topic, including the 'zigbee2mqtt/' prefix (for example 'zigbee2mqtt/my-device/set').",
         "messageLabel": "Message",
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
@@ -4770,6 +4771,13 @@
           "one": "Motion detected"
         }
       },
+      "presence-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No presence",
+          "one": "Presence detected"
+        }
+      },
       "smoke-sensor": {
         "binary": {
           "other": "No value received",
@@ -4981,7 +4989,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Presence sensor",
-      "push": "Presence"
+      "push": "Presence",
+      "binary": "Presence (binary)"
     },
     "rain-sensor": {
       "shortCategoryName": "Rain sensor",

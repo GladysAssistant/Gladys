@@ -103,6 +103,7 @@ Docker.prototype.getImage = fake.returns({
       },
     },
   }),
+  remove: fake.resolves(true),
 });
 
 Docker.prototype.pull = (repoTag) => {

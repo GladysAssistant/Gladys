@@ -36,8 +36,13 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
-  # Needed to react to the triggering comment (PR comments are issue comments).
+  # Reacting to the triggering comment needs write access. A comment on a PR is
+  # an issue comment, so the reaction endpoint lives under /issues/comments/,
+  # but GitHub authorises it against the scope of the parent resource, which is
+  # a pull request: "issues: write" alone answers "Resource not accessible by
+  # integration" (HTTP 403). Both scopes are declared to match the endpoint and
+  # the resource it hangs from.
+  pull-requests: write
   issues: write
 
 jobs:

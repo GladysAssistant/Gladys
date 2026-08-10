@@ -372,6 +372,71 @@ describe('externalIntegration.update', () => {
     sinonAssert.notCalled(system.removeNetwork);
   });
 
+  it('should remove the images of the replaced version once the new one runs', async () => {
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const { externalIntegration, system } = buildSupervisor();
+    externalIntegration.refreshIndex = fake.resolves({
+      index_format: 1,
+      integrations: [
+        {
+          store_slug: 'john/gladys-open-meteo-demo',
+          manifest: { ...TEST_MANIFEST, version: '2.0.0', docker_image: 'ghcr.io/john/demo:2.0.0' },
+        },
+      ],
+    });
+    externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+
+    await externalIntegration.update(service.selector);
+
+    sinonAssert.calledOnceWithExactly(system.removeImage, TEST_MANIFEST.docker_image);
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should keep a sub-container image the new manifest still declares', async () => {
+    const service = await seedExternalService({
+      store_slug: 'john/gladys-frigate',
+      manifest: TEST_CONTAINERS_MANIFEST,
+    });
+    const { externalIntegration, system } = buildSupervisor();
+    externalIntegration.refreshIndex = fake.resolves({
+      index_format: 1,
+      integrations: [
+        {
+          store_slug: 'john/gladys-frigate',
+          manifest: {
+            ...TEST_CONTAINERS_MANIFEST,
+            version: '2.0.0',
+            docker_image: 'ghcr.io/john/demo:2.0.0',
+            // the Frigate sub-container is dropped, Mosquitto is kept as-is
+            containers: [TEST_CONTAINERS_MANIFEST.containers[0]],
+          },
+        },
+      ],
+    });
+    externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+
+    await externalIntegration.update(service.selector);
+
+    sinonAssert.neverCalledWith(system.removeImage, 'eclipse-mosquitto:2.0.18');
+    sinonAssert.calledWith(system.removeImage, TEST_MANIFEST.docker_image);
+    sinonAssert.calledWith(system.removeImage, 'ghcr.io/blakeblackshear/frigate:0.14.1');
+    externalIntegration.clearTimers(service.id);
+  });
+
+  it('should keep the image when the same tag is re-pulled (dev install)', async () => {
+    const service = await seedExternalService({
+      store_slug: null,
+      docker_image: 'terdious/gladys-tuya:dev',
+      manifest: { ...TEST_MANIFEST, docker_image: 'terdious/gladys-tuya:dev' },
+    });
+    const { externalIntegration, system } = buildSupervisor();
+
+    await externalIntegration.update(service.selector);
+
+    sinonAssert.notCalled(system.removeImage);
+    externalIntegration.clearTimers(service.id);
+  });
+
   it('should translate a failing sub-container image pull on update', async () => {
     const service = await seedExternalService({ manifest: TEST_CONTAINERS_MANIFEST });
     const pullStub = sinon.stub();

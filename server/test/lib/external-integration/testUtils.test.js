@@ -211,6 +211,9 @@ function buildFakeSystem(overrides = {}) {
     }),
     getGladysContainerId: fake.resolves('gladys-container-id'),
     getImageLabels: fake.resolves({}),
+    listImages: fake.resolves([]),
+    getImagePullTime: fake.returns(undefined),
+    removeImage: fake.resolves(true),
     detectHardwareClasses: fake.resolves(TEST_DETECTED_CLASSES),
     ...overrides,
   };
