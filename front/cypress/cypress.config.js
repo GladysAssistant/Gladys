@@ -35,6 +35,13 @@ module.exports = defineConfig({
 
       return config;
     },
+    // The signup spec must run first: every other spec logs in through
+    // cy.login(), which creates the account through the API when the instance
+    // is not configured yet, and the interactive signup flow only works on a
+    // fresh instance. Cypress discovers specs in filesystem order (not
+    // alphabetical), so make the order explicit instead of relying on the
+    // 0- prefix.
+    specPattern: ['cypress/e2e/routes/0-signup/**/*.cy.js', 'cypress/e2e/**/*.cy.js'],
     video: false,
     screenshotOnRunFailure: false,
     defaultCommandTimeout: 30000,
