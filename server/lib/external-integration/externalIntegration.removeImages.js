@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 
 const logger = require('../../utils/logger');
+const { RECENTLY_PULLED_PROTECTION_MS } = require('./constants');
 
 /**
  * @description Remove Docker images Gladys pulled and no longer needs. Two
@@ -12,11 +13,17 @@ const logger = require('../../utils/logger');
  * failure is logged, never raised — the update or uninstall that called it has
  * already succeeded and must not be reported as failed over reclaimed disk.
  * @param {Array<string>} images - The image references to remove.
+ * @param {object} [options] - Options.
+ * @param {boolean} [options.skipRecentlyPulled] - Spare the images pulled less
+ * than RECENTLY_PULLED_PROTECTION_MS ago. For the nightly sweep, whose
+ * candidates are guesses about what nobody needs; never for update/uninstall,
+ * which name images they know are theirs to drop — two updates within the hour
+ * would otherwise leave the first one's image behind.
  * @returns {Promise<Array<string>>} Resolve with the references actually removed.
  * @example
  * await gladys.externalIntegration.removeImages(['ghcr.io/john/demo:1.2.0']);
  */
-async function removeImages(images) {
+async function removeImages(images, { skipRecentlyPulled = false } = {}) {
   if (!this.available) {
     return [];
   }
@@ -35,6 +42,18 @@ async function removeImages(images) {
   await Promise.each(
     candidates.filter((image) => !inUse.has(image)),
     async (image) => {
+      // read at the last moment, never once up front: removals are sequential,
+      // so an install starting while the earlier images are being removed
+      // would otherwise get its brand new image deleted from under it. This
+      // also covers `inUse` going stale during the loop — that install writes
+      // its t_service row after the pull this check sees.
+      if (skipRecentlyPulled) {
+        const pulledAt = this.system.getImagePullTime(image);
+        if (pulledAt !== undefined && Date.now() - pulledAt < RECENTLY_PULLED_PROTECTION_MS) {
+          logger.debug(`Sparing the Docker image ${image}, it was just pulled`);
+          return;
+        }
+      }
       try {
         if (await this.system.removeImage(image)) {
           logger.info(`Removed unused Docker image ${image}`);

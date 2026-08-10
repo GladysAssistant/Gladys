@@ -57,4 +57,22 @@ describe('system.getImagePullTime', () => {
     expect(pulledAt).to.be.at.least(before);
     expect(pulledAt).to.be.at.most(Date.now());
   });
+
+  it('should stamp the image before the download completes, not after', async () => {
+    // the whole point of the stamp: a pull is slow on a Raspberry Pi and the
+    // image must be protected from the nightly cleanup for its whole duration.
+    // Asserting only after `pull` resolves would pass either way.
+    let resolvePull;
+    system.dockerode.pull = () =>
+      new Promise((resolve) => {
+        resolvePull = resolve;
+      });
+
+    const pullPromise = system.pull('my-image:latest');
+
+    expect(system.getImagePullTime('my-image:latest')).to.be.a('number');
+
+    resolvePull({});
+    await pullPromise;
+  });
 });

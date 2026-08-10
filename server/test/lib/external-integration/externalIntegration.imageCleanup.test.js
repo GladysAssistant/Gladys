@@ -205,6 +205,48 @@ describe('externalIntegration.cleanImages', () => {
     sinonAssert.calledOnce(system.removeImage);
   });
 
+  it('should spare an image whose pull starts while the sweep is running', async () => {
+    // removals are sequential: an install starting after the sweep began, but
+    // before its image's turn came, must not have it deleted from under it.
+    // The pull time is therefore read right before each deletion, never once
+    // up front over the whole candidate list.
+    let secondJustPulled = false;
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        listImages: fake.resolves([
+          { id: 'sha256:aaa', tags: ['ghcr.io/john/demo:1.0.0'] },
+          { id: 'sha256:bbb', tags: ['ghcr.io/john/other:1.0.0'] },
+        ]),
+        // an install pulls the second image while the first is being removed
+        removeImage: fake(async () => {
+          secondJustPulled = true;
+          return true;
+        }),
+        getImagePullTime: fake((image) =>
+          image === 'ghcr.io/john/other:1.0.0' && secondJustPulled ? Date.now() : undefined,
+        ),
+      },
+    });
+
+    const removed = await externalIntegration.cleanImages();
+
+    expect(removed).to.deep.equal(['ghcr.io/john/demo:1.0.0']);
+    sinonAssert.calledOnceWithExactly(system.removeImage, 'ghcr.io/john/demo:1.0.0');
+  });
+
+  it('should not spare a recently pulled image on the targeted removal path', async () => {
+    // update/uninstall name images they know are theirs to drop: two updates
+    // within the hour must not leave the first one's image behind
+    const { externalIntegration, system } = buildSupervisor({
+      system: { getImagePullTime: fake.returns(Date.now()) },
+    });
+
+    const removed = await externalIntegration.removeImages(['ghcr.io/john/demo:1.0.0']);
+
+    expect(removed).to.deep.equal(['ghcr.io/john/demo:1.0.0']);
+    sinonAssert.calledOnce(system.removeImage);
+  });
+
   it('should do nothing when Docker is not available', async () => {
     const { externalIntegration, system } = buildSupervisor();
     externalIntegration.available = false;
