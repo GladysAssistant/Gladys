@@ -5,7 +5,7 @@ const {
   fromCelsius,
 } = require('../../../../services/homekit/lib/buildThermostatService');
 const { clampToCharacteristic } = require('../../../../services/homekit/lib/deviceMappings');
-const { DEVICE_FEATURE_UNITS, AC_MODE } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_UNITS, AC_MODE, THERMOSTAT_MODE } = require('../../../../utils/constants');
 
 const HEATING_SETPOINT = { selector: 'heating' };
 const COOLING_SETPOINT = { selector: 'cooling' };
@@ -99,6 +99,56 @@ describe('Thermostat valid target states', () => {
         heatingSetpointFeature: HEATING_SETPOINT,
       }),
     ).to.eql([0, 1]);
+  });
+
+  it('should offer off on a thermostat mode, which carries its own off value', () => {
+    // a heating only thermostat: off and heat, and no cool the device could not honour — the whole
+    // point of mapping the thermostat mode, since without it the device is heat-only with no off
+    expect(
+      buildValidTargetStates({
+        thermostatModeFeature: {
+          supported_options: [{ value: THERMOSTAT_MODE.OFF }, { value: THERMOSTAT_MODE.HEATING }],
+        },
+        heatingSetpointFeature: HEATING_SETPOINT,
+      }),
+    ).to.eql([0, 1]);
+  });
+
+  it('should fall back on the min/max range of a thermostat mode', () => {
+    // what the MQTT integration declares by default for a thermostat mode feature
+    expect(buildValidTargetStates({ thermostatModeFeature: { min: 0, max: 3 } })).to.eql([0, 1, 2, 3]);
+    expect(
+      buildValidTargetStates({ thermostatModeFeature: { min: THERMOSTAT_MODE.OFF, max: THERMOSTAT_MODE.HEATING } }),
+    ).to.eql([0, 1]);
+  });
+
+  it('should not offer off twice when the device has both an on/off command and a thermostat mode', () => {
+    expect(
+      buildValidTargetStates({
+        powerFeature: POWER,
+        thermostatModeFeature: { supported_options: [{ value: THERMOSTAT_MODE.OFF }, { value: THERMOSTAT_MODE.AUTO }] },
+      }),
+    ).to.eql([0, 3]);
+  });
+
+  it('should combine an air conditioning mode with a thermostat mode', () => {
+    expect(
+      buildValidTargetStates({
+        modeFeature: { supported_options: [{ value: AC_MODE.COOLING }] },
+        thermostatModeFeature: { supported_options: [{ value: THERMOSTAT_MODE.HEATING }] },
+      }),
+    ).to.eql([1, 2]);
+  });
+
+  it('should ignore the setpoints when a thermostat mode is declared', () => {
+    // both setpoints would otherwise fold into auto, which this device does not support
+    expect(
+      buildValidTargetStates({
+        thermostatModeFeature: { supported_options: [{ value: THERMOSTAT_MODE.HEATING }] },
+        heatingSetpointFeature: HEATING_SETPOINT,
+        coolingSetpointFeature: COOLING_SETPOINT,
+      }),
+    ).to.eql([1]);
   });
 
   it('should derive the states from the AC modes the device declares', () => {

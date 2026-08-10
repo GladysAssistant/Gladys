@@ -5,12 +5,16 @@ const {
   ACTIONS_STATUS,
   EVENTS,
   DEVICE_FEATURE_UNITS,
+  THERMOSTAT_MODE,
 } = require('../../../utils/constants');
 const { celsiusToFahrenheit, fahrenheitToCelsius } = require('../../../utils/units');
 const {
   HOMEKIT_HEATING_COOLING_STATE,
   acModeToHeatingCoolingState,
   heatingCoolingStateToAcMode,
+  thermostatModeToHeatingCoolingState,
+  heatingCoolingStateToThermostatMode,
+  thermostatOperatingStateToHeatingCoolingState,
 } = require('./deviceMappings');
 
 const KELVIN_OFFSET = 273.15;
@@ -66,13 +70,14 @@ function clampToCharacteristic(value, props = {}) {
 }
 
 /**
- * @description List the Gladys air conditioning modes a device declares.
+ * @description List the Gladys modes a device declares, in the enum of its mode feature.
  * @param {object} modeFeature - Gladys mode feature of the device.
- * @returns {Array} AC_MODE values the device supports.
+ * @param {object} modeToHeatingCoolingState - Table mapping that enum to the HomeKit states.
+ * @returns {Array} Gladys mode values the device supports.
  * @example
- * listSupportedAcModes({ supported_options: [{ value: 1 }, { value: 3 }] });
+ * listSupportedModes({ supported_options: [{ value: 1 }, { value: 3 }] }, acModeToHeatingCoolingState);
  */
-function listSupportedAcModes(modeFeature) {
+function listSupportedModes(modeFeature, modeToHeatingCoolingState) {
   // supported_options lists the modes the device actually declares, and they are not contiguous:
   // a Matter cooling-only air conditioner reports cool, dry and fan — 1, 3 and 4 — so walking
   // min..max would offer HomeKit a heat mode the device cannot honour, and SET would write it.
@@ -80,9 +85,9 @@ function listSupportedAcModes(modeFeature) {
   if (modeFeature.supported_options) {
     return modeFeature.supported_options.map(({ value }) => value);
   }
-  return Object.keys(acModeToHeatingCoolingState)
+  return Object.keys(modeToHeatingCoolingState)
     .map(Number)
-    .filter((acMode) => acMode >= modeFeature.min && acMode <= modeFeature.max);
+    .filter((mode) => mode >= modeFeature.min && mode <= modeFeature.max);
 }
 
 /**
@@ -91,29 +96,48 @@ function listSupportedAcModes(modeFeature) {
  * @param {object} thermostatFeatures - Features driving the thermostat state.
  * @returns {Array} HomeKit TargetHeatingCoolingState values the device supports.
  * @example
- * buildValidTargetStates({ powerFeature, modeFeature, heatingSetpointFeature, coolingSetpointFeature });
+ * buildValidTargetStates({ powerFeature, modeFeature, thermostatModeFeature, heatingSetpointFeature });
  */
 function buildValidTargetStates(thermostatFeatures) {
-  const { powerFeature, modeFeature, heatingSetpointFeature, coolingSetpointFeature } = thermostatFeatures;
+  const {
+    powerFeature,
+    modeFeature,
+    thermostatModeFeature,
+    heatingSetpointFeature,
+    coolingSetpointFeature,
+  } = thermostatFeatures;
   const validStates = [];
 
   if (powerFeature) {
     validStates.push(HOMEKIT_HEATING_COOLING_STATE.OFF);
   }
 
-  if (modeFeature) {
-    listSupportedAcModes(modeFeature).forEach((acMode) => {
-      const state = acModeToHeatingCoolingState[acMode];
+  const addStatesOf = (feature, modeToHeatingCoolingState) => {
+    listSupportedModes(feature, modeToHeatingCoolingState).forEach((mode) => {
+      const state = modeToHeatingCoolingState[mode];
       if (state !== undefined && !validStates.includes(state)) {
         validStates.push(state);
       }
     });
-  } else if (heatingSetpointFeature && !coolingSetpointFeature) {
-    validStates.push(HOMEKIT_HEATING_COOLING_STATE.HEAT);
-  } else if (coolingSetpointFeature && !heatingSetpointFeature) {
-    validStates.push(HOMEKIT_HEATING_COOLING_STATE.COOL);
-  } else {
-    validStates.push(HOMEKIT_HEATING_COOLING_STATE.AUTO);
+  };
+
+  if (modeFeature) {
+    addStatesOf(modeFeature, acModeToHeatingCoolingState);
+  }
+  if (thermostatModeFeature) {
+    addStatesOf(thermostatModeFeature, thermostatModeToHeatingCoolingState);
+  }
+
+  // Without a mode feature of either kind, the states are deduced from the setpoints the device
+  // exposes.
+  if (!modeFeature && !thermostatModeFeature) {
+    if (heatingSetpointFeature && !coolingSetpointFeature) {
+      validStates.push(HOMEKIT_HEATING_COOLING_STATE.HEAT);
+    } else if (coolingSetpointFeature && !heatingSetpointFeature) {
+      validStates.push(HOMEKIT_HEATING_COOLING_STATE.COOL);
+    } else {
+      validStates.push(HOMEKIT_HEATING_COOLING_STATE.AUTO);
+    }
   }
 
   return validStates.sort((a, b) => a - b);
@@ -179,6 +203,11 @@ function buildThermostatService(service, device, features) {
     DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING,
     DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY,
   );
+  const thermostatModeFeature = findFeature(DEVICE_FEATURE_CATEGORIES.THERMOSTAT, DEVICE_FEATURE_TYPES.THERMOSTAT.MODE);
+  const operatingStateFeature = findFeature(
+    DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+    DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
+  );
 
   const readValue = (feature) => this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
   const readCelsius = (feature) => toCelsius(readValue(feature), feature.unit);
@@ -205,6 +234,12 @@ function buildThermostatService(service, device, features) {
       const state = acModeToHeatingCoolingState[readValue(modeFeature)];
       return state === undefined ? HOMEKIT_HEATING_COOLING_STATE.AUTO : state;
     }
+    // The thermostat mode has an off value of its own, so it can report OFF without the device
+    // carrying an on/off command.
+    if (thermostatModeFeature) {
+      const state = thermostatModeToHeatingCoolingState[readValue(thermostatModeFeature)];
+      return state === undefined ? HOMEKIT_HEATING_COOLING_STATE.AUTO : state;
+    }
     if (heatingSetpointFeature && !coolingSetpointFeature) {
       return HOMEKIT_HEATING_COOLING_STATE.HEAT;
     }
@@ -221,6 +256,16 @@ function buildThermostatService(service, device, features) {
     if (targetState === HOMEKIT_HEATING_COOLING_STATE.OFF) {
       return HOMEKIT_HEATING_COOLING_STATE.OFF;
     }
+
+    // A device reporting its operating state is telling us what it is doing, which beats any
+    // deduction: a thermostat set to heat but sitting at its setpoint is idle, not heating.
+    if (operatingStateFeature) {
+      const state = thermostatOperatingStateToHeatingCoolingState[readValue(operatingStateFeature)];
+      if (state !== undefined) {
+        return state;
+      }
+    }
+
     if (targetState !== HOMEKIT_HEATING_COOLING_STATE.AUTO) {
       return targetState;
     }
@@ -284,10 +329,18 @@ function buildThermostatService(service, device, features) {
     });
   }
 
+  // A mode the device never declared must not be written to it, whichever enum it is expressed in.
+  const writeMode = (feature, mode, modeToHeatingCoolingState) => {
+    if (mode !== undefined && listSupportedModes(feature, modeToHeatingCoolingState).includes(mode)) {
+      emitValue(feature, mode);
+    }
+  };
+
   const targetStateCharacteristic = service.getCharacteristic(Characteristic.TargetHeatingCoolingState);
   const validTargetStates = buildValidTargetStates({
     powerFeature,
     modeFeature,
+    thermostatModeFeature,
     heatingSetpointFeature,
     coolingSetpointFeature,
   });
@@ -304,6 +357,10 @@ function buildThermostatService(service, device, features) {
       if (powerFeature) {
         emitValue(powerFeature, 0);
       }
+      // A thermostat driven by its mode is switched off through that mode: it has no on/off command.
+      if (thermostatModeFeature) {
+        writeMode(thermostatModeFeature, THERMOSTAT_MODE.OFF, thermostatModeToHeatingCoolingState);
+      }
       callback();
       return;
     }
@@ -311,13 +368,14 @@ function buildThermostatService(service, device, features) {
     if (powerFeature) {
       emitValue(powerFeature, 1);
     }
-    if (modeFeature && heatingCoolingStateToAcMode[value] !== undefined) {
+    if (modeFeature) {
       // Dry and fan are reported to HomeKit as Auto, so Auto has to stay selectable even on a
       // device that has no auto mode — but writing AC_MODE.AUTO there would push a mode it never
       // declared. The device is left in whatever mode it was running in; powering it on is enough.
-      if (listSupportedAcModes(modeFeature).includes(heatingCoolingStateToAcMode[value])) {
-        emitValue(modeFeature, heatingCoolingStateToAcMode[value]);
-      }
+      writeMode(modeFeature, heatingCoolingStateToAcMode[value], acModeToHeatingCoolingState);
+    }
+    if (thermostatModeFeature) {
+      writeMode(thermostatModeFeature, heatingCoolingStateToThermostatMode[value], thermostatModeToHeatingCoolingState);
     }
     callback();
   });
