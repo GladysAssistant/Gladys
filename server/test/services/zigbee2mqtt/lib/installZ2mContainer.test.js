@@ -252,6 +252,28 @@ describe('zigbee2mqtt installz2mContainer', () => {
     });
   });
 
+  it('should still start z2m container when the restart policy update fails (#2734)', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
+    gladys.system.getContainers = fake.resolves([containerStopped]);
+    gladys.system.inspectContainer = fake.resolves({
+      ...containerDescription,
+      HostConfig: {
+        ...containerDescription.HostConfig,
+        RestartPolicy: { Name: 'no' },
+      },
+    });
+    // Some Docker engines reject the in-place update: healing the policy is best-effort
+    gladys.system.updateContainer = fake.rejects(new Error('Docker engine error'));
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledOnce(gladys.system.updateContainer);
+    // The container must still be (re)started despite the failed policy update
+    assert.calledOnce(gladys.system.restartContainer);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+  });
+
   it('should not update restart policy when it already matches the expected one', async () => {
     // PREPARE
     const config = { z2mDriverPath: '/dev/ttyUSB0' };

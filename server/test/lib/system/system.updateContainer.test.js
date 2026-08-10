@@ -68,6 +68,8 @@ describe('system.updateContainer', () => {
     assert.notCalled(event.on);
     assert.notCalled(event.emit);
 
-    assert.calledOnce(system.dockerode.getContainer);
+    assert.calledOnceWithExactly(system.dockerode.getContainer, 'my-container');
+    const [containerMock] = system.dockerode.getContainer.returnValues;
+    assert.calledOnceWithExactly(containerMock.update, { RestartPolicy: { Name: 'always' } });
   });
 });
