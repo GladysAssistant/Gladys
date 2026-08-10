@@ -217,6 +217,28 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.FAN]: {
+    service: 'Fanv2',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.FAN.MODE]: {
+        characteristics: ['Active'],
+      },
+      [DEVICE_FEATURE_TYPES.FAN.PERCENT]: {
+        characteristics: ['RotationSpeed', 'Active'],
+        mergeReadOnlyTwin: true,
+      },
+      [DEVICE_FEATURE_TYPES.FAN.SPEED]: {
+        characteristics: ['RotationSpeed', 'Active'],
+        mergeReadOnlyTwin: true,
+      },
+      [DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING]: {
+        characteristics: ['SwingMode'],
+      },
+      [DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION]: {
+        characteristics: ['RotationDirection'],
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.SHUTTER]: {
     service: 'WindowCovering',
     capabilities: {

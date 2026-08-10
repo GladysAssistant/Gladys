@@ -1,5 +1,12 @@
 const { intToRgb, rgbToHsb } = require('../../../utils/colors');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  FAN_MODE,
+  FAN_ROCK_SETTING,
+  FAN_AIRFLOW_DIRECTION,
+} = require('../../../utils/constants');
 const { normalize } = require('../../../utils/device');
 const { fahrenheitToCelsius } = require('../../../utils/units');
 const {
@@ -252,6 +259,66 @@ function sendState(hkAccessory, feature, event) {
         .updateCharacteristic(
           Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
           lockStateMapping[event.last_value],
+        );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.MODE}`: {
+      hkAccessory
+        .getService(Service[mappings[feature.category].service])
+        .updateCharacteristic(
+          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+          event.last_value === FAN_MODE.OFF ? 0 : 1,
+        );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.PERCENT}`:
+    case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.SPEED}`: {
+      // buildService reads RotationSpeed from the percentage when the fan exposes one, since it
+      // already uses the HomeKit scale. A fan reporting both would otherwise emit two events per
+      // change and the raw speed, rescaled, would overwrite the percentage HomeKit is showing.
+      if (feature.type === DEVICE_FEATURE_TYPES.FAN.SPEED) {
+        const device = this.gladys.stateManager.get('deviceById', feature.device_id);
+        const hasPercentFeature = ((device && device.features) || []).some(
+          (deviceFeature) =>
+            deviceFeature.category === DEVICE_FEATURE_CATEGORIES.FAN &&
+            deviceFeature.type === DEVICE_FEATURE_TYPES.FAN.PERCENT,
+        );
+        if (hasPercentFeature) {
+          break;
+        }
+      }
+
+      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const [rotationSpeedName] = mappings[feature.category].capabilities[feature.type].characteristics;
+      const rotationSpeedCharacteristic = service.getCharacteristic(Characteristic[rotationSpeedName]);
+
+      service.updateCharacteristic(
+        Characteristic[rotationSpeedName],
+        normalize(
+          event.last_value,
+          feature.min,
+          feature.max,
+          rotationSpeedCharacteristic.props.minValue,
+          rotationSpeedCharacteristic.props.maxValue,
+        ),
+      );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING}`: {
+      hkAccessory
+        .getService(Service[mappings[feature.category].service])
+        .updateCharacteristic(
+          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+          event.last_value === FAN_ROCK_SETTING.OFF ? 0 : 1,
+        );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION}`: {
+      hkAccessory
+        .getService(Service[mappings[feature.category].service])
+        .updateCharacteristic(
+          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+          event.last_value === FAN_AIRFLOW_DIRECTION.REVERSE ? 1 : 0,
         );
       break;
     }

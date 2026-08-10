@@ -123,4 +123,148 @@ describe('Build accessory', () => {
     expect(homekitHandler.buildService.args[0][3]).to.equal(undefined);
     expect(addService.callCount).to.equal(1);
   });
+  it('should keep the writable feature when a read-only twin exists', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Ventilateur',
+      features: [
+        {
+          name: 'Speed %',
+          category: 'fan',
+          type: 'percent',
+          read_only: false,
+        },
+        {
+          name: 'Speed % current',
+          category: 'fan',
+          type: 'percent',
+          read_only: true,
+        },
+        {
+          name: 'Oscillation',
+          category: 'fan',
+          type: 'rock-setting',
+          read_only: false,
+        },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    // a single Fanv2 service, built from the writable percent feature
+    expect(homekitHandler.buildService.callCount).to.equal(1);
+    expect(homekitHandler.buildService.args[0][1]).to.have.deep.members([
+      { name: 'Speed %', category: 'fan', type: 'percent', read_only: false },
+      { name: 'Oscillation', category: 'fan', type: 'rock-setting', read_only: false },
+    ]);
+    expect(addService.callCount).to.equal(1);
+  });
+
+  it('should keep the writable feature whichever order the twins come in', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    // the read-only counterpart comes first this time
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Ventilateur',
+      features: [
+        {
+          name: 'Speed % current',
+          category: 'fan',
+          type: 'percent',
+          read_only: true,
+        },
+        {
+          name: 'Speed %',
+          category: 'fan',
+          type: 'percent',
+          read_only: false,
+        },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.callCount).to.equal(1);
+    expect(homekitHandler.buildService.args[0][1]).to.have.deep.members([device.features[1]]);
+    expect(addService.callCount).to.equal(1);
+  });
+
+  it('should not merge a read-only twin of a feature type that did not ask for it', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    // Matter exposes an OnOff relay and a BooleanState sensor as the same category and type, but
+    // they are two separate things and must stay two services.
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Matter',
+      features: [
+        {
+          name: 'OnOff',
+          category: 'switch',
+          type: 'binary',
+          read_only: false,
+        },
+        {
+          name: 'BooleanState',
+          category: 'switch',
+          type: 'binary',
+          read_only: true,
+        },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.callCount).to.equal(2);
+    expect(homekitHandler.buildService.args[0][1]).to.have.deep.members([device.features[0]]);
+    expect(homekitHandler.buildService.args[1][1]).to.have.deep.members([device.features[1]]);
+    expect(addService.callCount).to.equal(2);
+  });
+
+  it('should still split identical features into several services', async () => {
+    homekitHandler.buildService = sinon.stub().returns('builded-service');
+    const addService = sinon.stub();
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns({ addService, services: ['service1', 'service2'] }),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Double interrupteur',
+      features: [
+        {
+          name: 'Switch 1',
+          category: 'switch',
+          type: 'binary',
+          read_only: false,
+        },
+        {
+          name: 'Switch 2',
+          category: 'switch',
+          type: 'binary',
+          read_only: false,
+        },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.callCount).to.equal(2);
+    expect(addService.callCount).to.equal(2);
+  });
 });

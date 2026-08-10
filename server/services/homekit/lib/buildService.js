@@ -7,6 +7,9 @@ const {
   ACTIONS_STATUS,
   EVENTS,
   DEVICE_FEATURE_UNITS,
+  FAN_MODE,
+  FAN_ROCK_SETTING,
+  FAN_AIRFLOW_DIRECTION,
   LOCK,
 } = require('../../../utils/constants');
 const { normalize } = require('../../../utils/device');
@@ -400,6 +403,177 @@ function buildService(device, features, categoryMapping, subtype) {
             callback(undefined, state === LOCK.STATE.LOCKED ? 1 : 0);
           });
         }
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.MODE}`: {
+        const activeCharacteristic = service.getCharacteristic(
+          Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
+        );
+
+        // HomeKit only knows on/off, so turning the fan back on restores the last mode it ran at.
+        let lastActiveMode = Math.min(FAN_MODE.HIGH, feature.max === undefined ? FAN_MODE.HIGH : feature.max);
+
+        activeCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          const mode = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+          if (mode !== FAN_MODE.OFF) {
+            lastActiveMode = mode;
+          }
+          callback(undefined, mode === FAN_MODE.OFF ? 0 : 1);
+        });
+        activeCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
+          const mode = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+          if (mode !== FAN_MODE.OFF) {
+            lastActiveMode = mode;
+          }
+          const action = {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            status: ACTIONS_STATUS.PENDING,
+            value: value ? lastActiveMode : FAN_MODE.OFF,
+            device: device.selector,
+            device_feature: feature.selector,
+          };
+          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+          callback();
+        });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.PERCENT}`:
+      case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.SPEED}`: {
+        // A fan can expose both a percentage and a raw speed, HomeKit has a single RotationSpeed.
+        // They are wired once, on whichever comes first, so the handlers are not registered twice.
+        const speedFeatures = features.filter(
+          (f) => f.type === DEVICE_FEATURE_TYPES.FAN.PERCENT || f.type === DEVICE_FEATURE_TYPES.FAN.SPEED,
+        );
+        if (speedFeatures[0] !== feature) {
+          break;
+        }
+
+        // Reads prefer the percentage, which already uses the HomeKit scale. Writes must go to a
+        // feature that accepts them: an integration can expose a read-only percentage as the
+        // feedback of a writable speed, and commanding the percentage would go nowhere.
+        const readFeature = speedFeatures.find((f) => f.type === DEVICE_FEATURE_TYPES.FAN.PERCENT) || speedFeatures[0];
+        const writeFeature = speedFeatures.find((f) => !f.read_only) || readFeature;
+
+        const [rotationSpeedName, activeName] = categoryMapping.capabilities[feature.type].characteristics;
+        const rotationSpeedCharacteristic = service.getCharacteristic(Characteristic[rotationSpeedName]);
+
+        rotationSpeedCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          callback(
+            undefined,
+            normalize(
+              this.gladys.stateManager.get('deviceFeature', readFeature.selector).last_value,
+              readFeature.min,
+              readFeature.max,
+              rotationSpeedCharacteristic.props.minValue,
+              rotationSpeedCharacteristic.props.maxValue,
+            ),
+          );
+        });
+        rotationSpeedCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
+          const action = {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            status: ACTIONS_STATUS.PENDING,
+            value: Math.round(
+              normalize(
+                value,
+                rotationSpeedCharacteristic.props.minValue,
+                rotationSpeedCharacteristic.props.maxValue,
+                writeFeature.min,
+                writeFeature.max,
+              ),
+            ),
+            device: device.selector,
+            device_feature: writeFeature.selector,
+          };
+          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+          callback();
+        });
+
+        // Fanv2 always requires Active. Without a mode feature, the speed is the only on/off signal.
+        if (!features.some((f) => f.type === DEVICE_FEATURE_TYPES.FAN.MODE)) {
+          let lastActiveSpeed = writeFeature.max;
+          const activeCharacteristic = service.getCharacteristic(Characteristic[activeName]);
+
+          activeCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+            const speed = this.gladys.stateManager.get('deviceFeature', readFeature.selector).last_value;
+            if (speed > readFeature.min) {
+              // The speed to restore is remembered on the feature it will be written back to, since
+              // the read and write features can use different scales.
+              lastActiveSpeed = this.gladys.stateManager.get('deviceFeature', writeFeature.selector).last_value;
+            }
+            callback(undefined, speed > readFeature.min ? 1 : 0);
+          });
+          activeCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
+            // Snapshot the speed on the way down rather than relying on a GET having happened
+            // first: switching the fan off from the Home app without reading it beforehand would
+            // otherwise restore it at full speed instead of where the user had left it.
+            if (!value) {
+              const currentSpeed = this.gladys.stateManager.get('deviceFeature', writeFeature.selector).last_value;
+              if (currentSpeed > writeFeature.min) {
+                lastActiveSpeed = currentSpeed;
+              }
+            }
+
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: value ? lastActiveSpeed : writeFeature.min,
+              device: device.selector,
+              device_feature: writeFeature.selector,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+            callback();
+          });
+        }
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING}`: {
+        const swingModeCharacteristic = service.getCharacteristic(
+          Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
+        );
+
+        // Gladys stores a bitmap of the oscillation axes, HomeKit only has on/off. The feature max
+        // is the set of axes the device supports, so it is the value used to enable oscillation.
+        const enabledRockSetting = feature.max || FAN_ROCK_SETTING.LEFT_RIGHT;
+
+        swingModeCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          const rockSetting = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+          callback(undefined, rockSetting === FAN_ROCK_SETTING.OFF ? 0 : 1);
+        });
+        swingModeCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
+          const action = {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            status: ACTIONS_STATUS.PENDING,
+            value: value ? enabledRockSetting : FAN_ROCK_SETTING.OFF,
+            device: device.selector,
+            device_feature: feature.selector,
+          };
+          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+          callback();
+        });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION}`: {
+        const rotationDirectionCharacteristic = service.getCharacteristic(
+          Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
+        );
+
+        rotationDirectionCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          const direction = this.gladys.stateManager.get('deviceFeature', feature.selector).last_value;
+          // HomeKit RotationDirection: 0 clockwise, 1 counter clockwise.
+          callback(undefined, direction === FAN_AIRFLOW_DIRECTION.REVERSE ? 1 : 0);
+        });
+        rotationDirectionCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
+          const action = {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            status: ACTIONS_STATUS.PENDING,
+            value: value ? FAN_AIRFLOW_DIRECTION.REVERSE : FAN_AIRFLOW_DIRECTION.FORWARD,
+            device: device.selector,
+            device_feature: feature.selector,
+          };
+          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+          callback();
+        });
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.STATE}`:
