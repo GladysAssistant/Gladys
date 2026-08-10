@@ -44,6 +44,25 @@ const { evaluate } = create({
   randomDependencies,
 });
 
+/**
+ * @description Warn the user when a rendered MQTT payload looks like JSON but is not valid JSON.
+ * This is the usual symptom of a `{{variable}}` which could not be resolved and was
+ * rendered as an empty string by Handlebars.
+ * @param {string} actionName - Name of the scene action, used as log prefix.
+ * @param {string} topic - Topic the message is published to.
+ * @param {string} message - Message after Handlebars rendering.
+ * @example warnIfInvalidJsonMessage('MQTT', 'my/topic', '{"state":}');
+ */
+function warnIfInvalidJsonMessage(actionName, topic, message) {
+  const trimmedMessage = message.trim();
+  if (trimmedMessage.startsWith('{') && typeof parseJsonIfJson(trimmedMessage) === 'string') {
+    logger.warn(
+      `${actionName}: the message sent on topic "${topic}" looks like JSON but is not valid JSON. ` +
+        `It's usually the sign of a variable which could not be resolved. Message sent: ${trimmedMessage}`,
+    );
+  }
+}
+
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope) => {
     let device;
@@ -606,6 +625,7 @@ const actionsFunc = {
       const messageWithVariables = Handlebars.compile(action.message, {
         noEscape: true,
       })(scope);
+      warnIfInvalidJsonMessage('MQTT', action.topic, messageWithVariables);
       mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
@@ -616,6 +636,7 @@ const actionsFunc = {
       const messageWithVariables = Handlebars.compile(action.message, {
         noEscape: true,
       })(scope);
+      warnIfInvalidJsonMessage('Zigbee2mqtt', action.topic, messageWithVariables);
       zigbee2mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
