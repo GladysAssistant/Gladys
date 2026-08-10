@@ -32,8 +32,8 @@ function setValue(device, deviceFeature, value) {
   if (expose) {
     zigbeeValue = exposesMap[expose.type].writeValue(expose, value, featureIndex);
     // Send message to Zigbee2mqtt topics
-    const mqttPaylad = JSON.stringify({ [property]: zigbeeValue });
-    this.mqttClient.publish(`zigbee2mqtt/${topic}/set`, mqttPaylad);
+    const mqttPayload = JSON.stringify({ [property]: zigbeeValue });
+    this.mqttClient.publish(`zigbee2mqtt/${topic}/set`, mqttPayload);
   } else {
     throw new BadParameters(`Zigbee2mqtt expose not found: "${externalId}" with property "${property}"`);
   }

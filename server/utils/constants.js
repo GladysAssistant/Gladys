@@ -884,6 +884,7 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     LMH_VOLUME: 'lmh_volume',
     MELODY: 'melody',
+    TEST_IN_PROGRESS: 'test-in-progress', // Alarm testing status (binary - sensor)
   },
   CHILD_LOCK: {
     BINARY: 'binary',

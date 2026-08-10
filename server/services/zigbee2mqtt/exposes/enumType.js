@@ -8,6 +8,7 @@ const {
   PILOT_WIRE_MODE,
   LIQUID_STATE,
   WATER_VALVE_CURRENT_DEVICE_STATUS,
+  STATE,
 } = require('../../../utils/constants');
 
 const WRITE_VALUE_MAPPING = {};
@@ -188,6 +189,12 @@ addMapping(
 addMapping('trigger_alarm', BUTTON_PUSH.PRESSED, 'trigger');
 addMapping('stop_alarm', BUTTON_PUSH.PRESSED, 'stop');
 
+// Heiman HS1SA-E Lover smoke detector
+// https://www.zigbee2mqtt.io/devices/HS1SA-E_Lover.html
+addMapping('trigger_selftest', BUTTON_PUSH.PRESSED, 'test');
+addMapping('siren_for_automation_only', STATE.OFF, 'stop');
+addMapping('siren_for_automation_only', STATE.ON, 'smoke_siren');
+
 module.exports = {
   type: 'enum',
   writeValue: (expose, value) => {
@@ -277,6 +284,18 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.BUTTON,
         type: DEVICE_FEATURE_TYPES.BUTTON.PUSH,
+      },
+    },
+    trigger_selftest: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+        type: DEVICE_FEATURE_TYPES.BUTTON.PUSH,
+      },
+    },
+    siren_for_automation_only: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
       },
     },
   },

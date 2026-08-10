@@ -4730,6 +4730,10 @@
           "0": "Low",
           "1": "Medium",
           "2": "High"
+        },
+        "test-in-progress": {
+          "0": "No",
+          "1": "Yes"
         }
       },
       "music": {
@@ -5058,7 +5062,8 @@
       "shortCategoryName": "Siren",
       "binary": "Siren",
       "lmh_volume": "Siren volume",
-      "melody": "Melody"
+      "melody": "Melody",
+      "test-in-progress": "Test in progress"
     },
     "cube": {
       "shortCategoryName": "Cube",

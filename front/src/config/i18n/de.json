@@ -4730,6 +4730,10 @@
           "0": "Niedrig",
           "1": "Mittel",
           "2": "Hoch"
+        },
+        "test-in-progress": {
+          "0": "Nein",
+          "1": "Ja"
         }
       },
       "music": {
@@ -5058,7 +5062,8 @@
       "shortCategoryName": "Sirene",
       "binary": "Sirene",
       "lmh_volume": "Lautstärke der Sirene",
-      "melody": "Melodie"
+      "melody": "Melodie",
+      "test-in-progress": "Test läuft"
     },
     "cube": {
       "shortCategoryName": "Würfel",

@@ -4730,6 +4730,10 @@
           "0": "Faible",
           "1": "Moyen",
           "2": "Fort"
+        },
+        "test-in-progress": {
+          "0": "Non",
+          "1": "Oui"
         }
       },
       "music": {
@@ -5058,7 +5062,8 @@
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
       "lmh_volume": "Volume de la sirène",
-      "melody": "Mélodie"
+      "melody": "Mélodie",
+      "test-in-progress": "Test en cours"
     },
     "cube": {
       "shortCategoryName": "Cube",
