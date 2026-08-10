@@ -89,6 +89,37 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
         });
       });
   });
+  it('should get device aggregated state with offset', async () => {
+    const intervalInMinutes = 24 * 60;
+    const offsetInMinutes = 24 * 60;
+    // The states are inserted right before the request, and the request goes through
+    // the real HTTP layer, so a small tolerance is enough to absorb the elapsed time.
+    const toleranceInMs = 5 * 60 * 1000;
+    const now = Date.now();
+    const expectedEnd = now - offsetInMinutes * 60 * 1000;
+    const expectedStart = expectedEnd - intervalInMinutes * 60 * 1000;
+    await authenticatedRequest
+      .get('/api/v1/device_feature/aggregated_states')
+      .query({
+        interval: intervalInMinutes,
+        max_states: 100,
+        offset: offsetInMinutes,
+        device_features: 'test-device-feature',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.lengthOf(1);
+        const { values } = res.body[0];
+        expect(values).to.be.instanceOf(Array);
+        expect(values).to.not.have.lengthOf(0);
+        values.forEach((state) => {
+          const createdAt = new Date(state.created_at).getTime();
+          expect(createdAt).to.be.at.least(expectedStart - toleranceInMs);
+          expect(createdAt).to.be.at.most(expectedEnd + toleranceInMs);
+        });
+      });
+  });
 });
 
 describe('GET /api/v1/device_feature/states_history', () => {

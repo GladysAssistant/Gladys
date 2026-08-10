@@ -49,6 +49,18 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     expect(devices[0]).to.have.property('created', false);
   });
 
+  it('should drop a selector published by the integration', async () => {
+    // the selector is derived by the core at creation, and made unique there:
+    // an integration does not choose it (C.3)
+    const device = buildDiscoveredDevice(service.selector);
+    device.selector = 'chosen-by-the-integration';
+    device.features[0].selector = 'chosen-by-the-integration-feature';
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0]).to.not.have.property('selector');
+    expect(devices[0].features[0]).to.not.have.property('selector');
+  });
+
   it('should replace the previous list', async () => {
     await externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector, 'one')]);
     await externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector, 'two')]);

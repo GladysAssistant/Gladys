@@ -17,9 +17,16 @@ async function hasCpuCfsSupport() {
   if (this.cpuCfsSupport === null) {
     try {
       const dockerInfo = await this.dockerode.info();
+      // the JSON keys of the /info API are `CpuCfsQuota`/`CpuCfsPeriod`
+      // (json struct tags in moby api/types, they differ from the Go field
+      // names `CPUCfsQuota`/`CPUCfsPeriod`) — accept both casings to be
+      // robust across daemon variants
+      const cfsQuota = dockerInfo.CpuCfsQuota !== undefined ? dockerInfo.CpuCfsQuota : dockerInfo.CPUCfsQuota;
+      const cfsPeriod = dockerInfo.CpuCfsPeriod !== undefined ? dockerInfo.CpuCfsPeriod : dockerInfo.CPUCfsPeriod;
       // only an explicit false means unsupported: on any doubt keep the
-      // CPU limit, the kernels concerned always report the field
-      this.cpuCfsSupport = dockerInfo.CPUCfsQuota !== false;
+      // CPU limit — the daemon needs both the CFS period and quota to
+      // apply NanoCpus
+      this.cpuCfsSupport = cfsQuota !== false && cfsPeriod !== false;
     } catch (e) {
       logger.warn(`hasCpuCfsSupport: unable to read Docker info, assuming CPU CFS support. ${e}`);
       return true;

@@ -26,6 +26,31 @@ const padding = {
 
 const BOX_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
 
+// CAP-style severities of the generic weather format, mapped to the
+// Météo France vigilance color language (minor = blue, moderate = yellow,
+// severe = orange, extreme = red)
+const ALERT_SEVERITY_COLORS = {
+  minor: '#45aaf2',
+  moderate: '#f1c40f',
+  severe: '#fd9644',
+  extreme: '#e74c3c'
+};
+
+// pictogram per generic alert phenomenon type; untyped alerts keep the
+// generic warning triangle
+const ALERT_TYPE_ICONS = {
+  wind: 'fe-wind',
+  rain: 'fe-cloud-rain',
+  flood: 'fe-droplet',
+  thunderstorm: 'fe-cloud-lightning',
+  snow: 'fe-cloud-snow',
+  heat: 'fe-sun',
+  cold: 'fe-thermometer',
+  avalanche: 'fe-alert-triangle',
+  coastal: 'fe-anchor',
+  fog: 'fe-cloud'
+};
+
 const WeatherBox = ({ children, ...props }) => (
   <div class="card">
     {props.boxStatus === GetWeatherStatus.HouseHasNoCoordinates && (
@@ -93,7 +118,7 @@ const WeatherBox = ({ children, ...props }) => (
             <i class="fe fe-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.requestToThirdPartyFailed" />{' '}
-              <Link href="/dashboard/integration/weather/openweather">
+              <Link href="/dashboard/integration/weather">
                 <Text id="dashboard.boxes.weather.clickHere" />
               </Link>
             </span>
@@ -111,6 +136,79 @@ const WeatherBox = ({ children, ...props }) => (
         >
           {`${props.datetimeBeautiful} - ${props.houseName}`}
         </div>
+        {props.alerts && props.alerts.length > 0 && (
+          <div
+            style={{
+              marginTop: '0.25em',
+              marginBottom: '0.25em'
+            }}
+          >
+            {props.alerts.map(alert => (
+              <span
+                key={`${alert.severity}-${alert.event}-${alert.start || ''}`}
+                class="badge"
+                style={{
+                  backgroundColor: ALERT_SEVERITY_COLORS[alert.severity],
+                  color: 'white',
+                  marginRight: '0.25em'
+                }}
+                title={alert.description || alert.event}
+              >
+                <i class={cx('fe', 'mr-1', ALERT_TYPE_ICONS[alert.type] || 'fe-alert-triangle')} />
+                {/* typed alerts get a translated label, the provider's
+                free-text event stays the fallback */}
+                {alert.type ? (
+                  <Text id={`dashboard.boxes.weather.alertTypes.${alert.type}`}>{alert.event}</Text>
+                ) : (
+                  alert.event
+                )}
+              </span>
+            ))}
+            {props.alerts
+              .filter(alert => alert.description)
+              .map(alert => {
+                const alertKey = `${alert.severity}-${alert.event}-${alert.start || ''}`;
+                const expanded = props.expandedAlerts[alertKey];
+                return (
+                  <div
+                    key={`description-${alertKey}`}
+                    onClick={() => props.toggleAlertDescription(alertKey)}
+                    style={`font-size: 12px; color: #76838f; margin-top: 0.25em; white-space: pre-line; cursor: pointer; ${
+                      expanded
+                        ? ''
+                        : 'display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden'
+                    }`}
+                  >
+                    {alert.description}
+                  </div>
+                );
+              })}
+          </div>
+        )}
+        {props.display_mode[GetWeatherModes.ProviderImages] &&
+          props.images &&
+          props.images
+            .filter(image => image.src)
+            .map(image => {
+              const imageLabel =
+                image.label && (image.label[props.user.language] || image.label.en || Object.values(image.label)[0]);
+              return (
+                <div key={image.key} style={{ marginTop: '0.5em', marginBottom: '0.5em' }}>
+                  {imageLabel && (
+                    <div
+                      style={{
+                        fontSize: '12px',
+                        color: '#76838f',
+                        marginBottom: '0.25em'
+                      }}
+                    >
+                      {imageLabel}
+                    </div>
+                  )}
+                  <img src={image.src} alt={imageLabel || image.key} style={{ width: '100%', borderRadius: '4px' }} />
+                </div>
+              );
+            })}
         <div class="row">
           <div class="col-9">
             <div
@@ -146,48 +244,89 @@ const WeatherBox = ({ children, ...props }) => (
             />
           </div>
         </div>
-        {props.display_mode[GetWeatherModes.AdvancedWeather] && (
-          <div className="col-9 p-0">
-            <span>
-              <i
-                class="fe fe-droplet"
-                style={{
-                  fpaddingRight: '5px'
-                }}
-              />
-              {props.humidity}
-              <span
-                style={{
-                  fontSize: '12px',
-                  color: 'grey'
-                }}
-              >
-                <Text id="global.percent" />
-              </span>
-            </span>
-            <span className="float-right">
-              <i
-                class="fe fe-wind"
-                style={{
-                  paddingRight: '5px'
-                }}
-              />
-              {props.wind}
-              <span
-                style={{
-                  fontSize: '12px',
-                  color: 'grey'
-                }}
-              >
-                {props.units === WEATHER_UNITS.METRIC ? (
-                  <Text id="global.metersPerSec" />
-                ) : (
-                  <Text id="global.milesPerHour" />
-                )}
-              </span>
-            </span>
-          </div>
-        )}
+        {props.display_mode[GetWeatherModes.AdvancedWeather] &&
+          (props.humidity !== undefined || props.wind !== undefined) && (
+            <div className="col-9 p-0">
+              {props.humidity !== undefined && (
+                <span>
+                  <i
+                    class="fe fe-droplet"
+                    style={{
+                      paddingRight: '5px'
+                    }}
+                  />
+                  {props.humidity}
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      color: 'grey'
+                    }}
+                  >
+                    <Text id="global.percent" />
+                  </span>
+                </span>
+              )}
+              {props.wind !== undefined && (
+                <span className="float-right">
+                  <i
+                    class="fe fe-wind"
+                    style={{
+                      paddingRight: '5px'
+                    }}
+                  />
+                  {props.wind}
+                  <span
+                    style={{
+                      fontSize: '12px',
+                      color: 'grey'
+                    }}
+                  >
+                    {props.units === WEATHER_UNITS.METRIC ? (
+                      <Text id="global.metersPerSec" />
+                    ) : (
+                      <Text id="global.milesPerHour" />
+                    )}
+                  </span>
+                </span>
+              )}
+            </div>
+          )}
+        {props.display_mode[GetWeatherModes.AdvancedWeather] &&
+          (props.sunrise || props.sunset || props.uvIndex !== undefined) && (
+            <div className="col-12 p-0" style={{ marginTop: '0.25em' }}>
+              {props.sunrise && (
+                <span>
+                  <i
+                    class="fe fe-sunrise"
+                    style={{
+                      paddingRight: '5px'
+                    }}
+                  />
+                  {props.sunrise}
+                </span>
+              )}
+              {props.sunset && (
+                <span
+                  style={{
+                    marginLeft: '1em'
+                  }}
+                >
+                  <i
+                    class="fe fe-sunset"
+                    style={{
+                      paddingRight: '5px'
+                    }}
+                  />
+                  {props.sunset}
+                </span>
+              )}
+              {props.uvIndex !== undefined && (
+                <span className="float-right">
+                  <Text id="dashboard.boxes.weather.uv" /> {props.uvIndex}
+                </span>
+              )}
+            </div>
+          )}
         {props.display_mode[GetWeatherModes.HourlyForecast] && (
           <div>
             <div
@@ -216,6 +355,14 @@ class WeatherBoxComponent extends Component {
   refreshData = () => {
     this.props.getWeather(this.props.box, this.props.x, this.props.y);
   };
+
+  // full alert bulletins fold to 3 lines, one click swaps folded/expanded
+  toggleAlertDescription = alertKey => {
+    const expandedAlerts = this.state.expandedAlerts || {};
+    this.setState({
+      expandedAlerts: { ...expandedAlerts, [alertKey]: !expandedAlerts[alertKey] }
+    });
+  };
   componentDidMount() {
     this.refreshData();
     // refresh weather every interval
@@ -230,7 +377,15 @@ class WeatherBoxComponent extends Component {
       get(previousProps, 'box.modes.dailyForecast') !== get(this.props, 'box.modes.dailyForecast');
     const hourlyForecastChanged =
       get(previousProps, 'box.modes.hourlyForecast') !== get(this.props, 'box.modes.hourlyForecast');
-    if (houseChanged || advancedWeatherChanged || dailyForecastChanged || hourlyForecastChanged) {
+    const providerImagesChanged =
+      get(previousProps, 'box.modes.providerImages') !== get(this.props, 'box.modes.providerImages');
+    if (
+      houseChanged ||
+      advancedWeatherChanged ||
+      dailyForecastChanged ||
+      hourlyForecastChanged ||
+      providerImagesChanged
+    ) {
       this.refreshData();
     }
   }
@@ -252,6 +407,12 @@ class WeatherBoxComponent extends Component {
 
     const weather = get(weatherObject, 'weather');
     const weatherIcon = get(weatherObject, 'weatherIcon');
+    // optional fields of the generic weather format
+    const alerts = get(weatherObject, 'alerts');
+    const images = get(weatherObject, 'images');
+    const sunrise = get(weatherObject, 'sunrise_beautiful');
+    const sunset = get(weatherObject, 'sunset_beautiful');
+    const uvIndex = get(weatherObject, 'uv_index');
 
     let humidity, wind, hoursDisplay, daysDisplay;
     if (displayMode[GetWeatherModes.AdvancedWeather]) {
@@ -296,7 +457,7 @@ class WeatherBoxComponent extends Component {
                   .format('dddd')}
               </div>
               <div className="col-3">
-                <i className={cx('fe', day.weatherIcon)} style={{ fontSize: '20px' }} />
+                {day.weatherIcon && <i className={cx('fe', day.weatherIcon)} style={{ fontSize: '20px' }} />}
               </div>
               <div className="col-4" style={{ textAlign: 'right' }}>
                 <Text
@@ -324,6 +485,13 @@ class WeatherBoxComponent extends Component {
         days_display={daysDisplay}
         humidity={humidity}
         wind={wind}
+        alerts={alerts}
+        images={images}
+        expandedAlerts={this.state.expandedAlerts || {}}
+        toggleAlertDescription={this.toggleAlertDescription}
+        sunrise={sunrise}
+        sunset={sunset}
+        uvIndex={uvIndex}
         display_mode={displayMode}
       />
     );

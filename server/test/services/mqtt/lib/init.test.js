@@ -16,11 +16,17 @@ describe('mqttHandler.init', () => {
       system: {
         isDocker: fake.resolves(false),
       },
+      device: {
+        get: fake.resolves([{ external_id: 'homeassistant:my-device', params: [], features: [] }]),
+      },
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
+    const listenToHomeAssistantDeviceStateIfNeeded = sinon.spy(mqttHandler, 'listenToHomeAssistantDeviceStateIfNeeded');
     await mqttHandler.init();
     assert.callCount(gladys.variable.getValue, 3);
-    expect(Object.keys(mqttHandler.topicBinds)).is.deep.eq(DEFAULT.TOPICS);
+    assert.calledWith(gladys.device.get, { service: 'mqtt' });
+    assert.calledOnce(listenToHomeAssistantDeviceStateIfNeeded);
+    expect(Object.keys(mqttHandler.topicBinds)).is.deep.eq([...DEFAULT.TOPICS, 'homeassistant/#']);
   });
 });

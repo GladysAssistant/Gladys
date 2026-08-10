@@ -81,6 +81,25 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {get} /api/integration/v1/house getHouses
+   * @apiName getHouses
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The houses with their coordinates. The home location is
+   * sensitive: only available to integrations declaring `location: true` in
+   * their manifest (shown on the install screen), 403 otherwise. Coordinates
+   * are null when the user has not located the house; the alarm fields are
+   * never returned.
+   * @apiSuccessExample {json} Success-Example
+   * [
+   *   { "id": "uuid", "name": "Home", "selector": "home", "latitude": 48.85, "longitude": 2.35 }
+   * ]
+   */
+  async function getHouses(req, res) {
+    const houses = await gladys.externalIntegration.getHouses(req.externalIntegrationService);
+    res.json(houses);
+  }
+
+  /**
    * @api {post} /api/integration/v1/state publishStates
    * @apiName publishStates
    * @apiGroup IntegrationHostApi
@@ -296,6 +315,7 @@ module.exports = function IntegrationHostController(gladys) {
     setDeviceTransports: asyncMiddleware(setDeviceTransports),
     publishDiscoveredDevices: asyncMiddleware(publishDiscoveredDevices),
     getDevices: asyncMiddleware(getDevices),
+    getHouses: asyncMiddleware(getHouses),
     publishStates: asyncMiddleware(publishStates),
     getConfig: asyncMiddleware(getConfig),
     saveConfig: asyncMiddleware(saveConfig),

@@ -52,7 +52,7 @@ const PurgeAllSqliteJobData = ({ job, user }) => (
   </Fragment>
 );
 
-const DeviceMigrateJobData = ({ job }) => (
+const DeviceMigrateJobData = ({ job, user }) => (
   <Fragment>
     {job.data.device_name && job.data.destination_device_name && (
       <div class="text-muted small">
@@ -63,6 +63,14 @@ const DeviceMigrateJobData = ({ job }) => (
       </div>
     )}
     <JobStep job={job} />
+    {job.data.states_migrated !== undefined && (
+      <div class="text-muted small">
+        <Text
+          id="jobsSettings.jobData.statesMigrated"
+          fields={{ count: job.data.states_migrated.toLocaleString(user.language) }}
+        />
+      </div>
+    )}
   </Fragment>
 );
 

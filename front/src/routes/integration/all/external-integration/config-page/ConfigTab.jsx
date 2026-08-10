@@ -9,7 +9,7 @@ import LinkAccountCard from './LinkAccountCard';
 import ContactProfileCard from './ContactProfileCard';
 import WebhooksCard from './WebhooksCard';
 import HardwareCard from './HardwareCard';
-import { getRequestedHardwareClasses } from '../utils';
+import { getAssignedPortsByName, getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { USER_ROLE } from '../../../../../../../server/utils/constants';
 
@@ -32,6 +32,9 @@ const ConfigTab = props => {
   const isReceivingChannel = isCommunication && get(integration, 'manifest.messaging.receive') !== false;
   const contactSchema = get(integration, 'manifest.contact_schema') || [];
   const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
+  // host ports assigned to the manifest-named declared ports, for the
+  // {{port:<name>}} placeholders of the section texts
+  const placeholderPorts = getAssignedPortsByName(integration);
   // permanent link to the mandatory re-hosted docs (store installs): it
   // is while configuring that the user needs them most (create the
   // vendor developer account, get credentials...)
@@ -120,8 +123,13 @@ const ConfigTab = props => {
                     saveConfig={props.saveConfig}
                     connectionStatus={get(integration, 'connection_status')}
                     oauthStatus={props.oauthStatus}
+                    oauthInvalidState={props.oauthInvalidState}
+                    oauthUseInstanceRedirect={props.oauthUseInstanceRedirect}
+                    toggleOAuthUseInstanceRedirect={props.toggleOAuthUseInstanceRedirect}
                     connectOAuth={props.connectOAuth}
+                    selector={props.selector || get(integration, 'selector')}
                     dynamicOptions={props.dynamicOptions}
+                    placeholderPorts={placeholderPorts}
                   />
                 )}
               </div>
@@ -178,6 +186,7 @@ const ConfigTab = props => {
           updateActionFieldValue={props.updateActionFieldValue}
           runAction={props.runAction}
           dynamicOptions={props.dynamicOptions}
+          placeholderPorts={placeholderPorts}
         />
       )}
 

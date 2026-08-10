@@ -13,16 +13,19 @@ class ExternalIntegrationDevicePage extends Component {
   getIntegration = async () => {
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
-      // a communication integration has no device screens: direct URL
-      // access lands on the configuration screen instead
-      if (get(integration, 'manifest.type') === 'communication') {
+      // communication and weather integrations have no device screens:
+      // direct URL access lands on the configuration screen instead
+      if (['communication', 'weather'].includes(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
-        return;
+        return false;
       }
       this.setState({ integration });
     } catch (e) {
       console.error(e);
+      // no confirmed metadata: do not fire the device-specific requests
+      return false;
     }
+    return true;
   };
 
   getDevices = async () => {
@@ -76,8 +79,14 @@ class ExternalIntegrationDevicePage extends Component {
     this.setState({ devices });
   };
 
-  loadData = () => {
-    this.getIntegration();
+  loadData = async () => {
+    // the integration metadata comes first: a communication or weather
+    // integration redirects to the configuration screen before any
+    // device-specific request is fired
+    const hasDeviceScreens = await this.getIntegration();
+    if (!hasDeviceScreens) {
+      return;
+    }
     this.getDevices();
     this.getHouses();
   };

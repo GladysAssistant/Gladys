@@ -1,6 +1,7 @@
 const { BadParameters } = require('../../utils/coreErrors');
 const { RESERVED_PARAM_PREFIX } = require('./constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
+const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
 
 const CONFIG_KEY_REGEX = /^[a-z0-9_]+$/;
 
@@ -21,6 +22,9 @@ async function setIntegrationConfig(service, config) {
     throw new BadParameters('config: must be an object');
   }
   const configSchema = (service.manifest && service.manifest.config_schema) || [];
+  // a select/multi_select can take its options from a core-defined source
+  // ("devices"): the valid values are only known at runtime
+  const dynamicOptions = await getDynamicOptions(service, configSchema);
   const keys = Object.keys(config);
   keys.forEach((key) => {
     if (!CONFIG_KEY_REGEX.test(key)) {
@@ -34,7 +38,7 @@ async function setIntegrationConfig(service, config) {
     }
     const field = configSchema.find((schemaField) => schemaField.key === key);
     if (field) {
-      validateConfigValue(field, config[key]);
+      validateConfigValue(field, config[key], dynamicOptions);
     }
   });
   // t_variable names must be uppercase: keys are uppercased at write time

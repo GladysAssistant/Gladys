@@ -2,6 +2,7 @@ const { Error422 } = require('../../utils/httpErrors');
 const { BadParameters } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { validateConfigValue } = require('./externalIntegration.validateConfigValue');
+const { getDynamicOptions } = require('./externalIntegration.getDynamicOptions');
 const { hasDualTransports } = require('./externalIntegration.getIntegrationConfig');
 const { hasWebhooks } = require('./externalIntegration.getWebhooks');
 const { PREFER_LOCAL_CONFIG_KEY, OPEN_API_KEY_CONFIG_KEY } = require('./constants');
@@ -24,6 +25,9 @@ async function saveConfigFromFront(selector, config) {
   }
   const service = await this.getBySelector(selector);
   const configSchema = (service.manifest && service.manifest.config_schema) || [];
+  // a select/multi_select can take its options from a core-defined source
+  // ("devices"): the valid values are only known at runtime
+  const dynamicOptions = await getDynamicOptions(service, configSchema);
   const valuesToSave = {};
   Object.keys(config).forEach((key) => {
     // the standard "prefer local" toggle is a reserved key outside the
@@ -57,7 +61,7 @@ async function saveConfigFromFront(selector, config) {
       // a secret set to null means unchanged
       return;
     }
-    validateConfigValue(field, config[key]);
+    validateConfigValue(field, config[key], dynamicOptions);
     valuesToSave[key] = config[key];
   });
   // t_variable names must be uppercase (see getIntegrationConfig)
