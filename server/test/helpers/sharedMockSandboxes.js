@@ -4,6 +4,11 @@
 // here, and the global beforeEach in bootstrap.test.js clears every registered
 // history in a single hook — one mocha hook instead of one per mock module,
 // whose fixed per-hook overhead is measurable over ~5500 tests.
+//
+// Only call HISTORY is cleared here (resetHistory), never programmed behavior:
+// a test that programs behavior (throws/rejects/returns) on a registered
+// shared-mock stub must reset() that stub itself in its own afterEach, like
+// tuya.connect.test.js does for client.init.
 const sandboxes = [];
 
 const registerSharedMockSandbox = (sandbox) => {
