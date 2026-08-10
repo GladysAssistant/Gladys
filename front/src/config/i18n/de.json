@@ -4305,8 +4305,8 @@
             "1": "Aktiviert"
           },
           "state": {
-            "0": "Aktivieren",
-            "1": "Deaktivieren"
+            "0": "Deaktivieren",
+            "1": "Aktivieren"
           }
         },
         "lock": {
@@ -4315,8 +4315,8 @@
             "1": "Verriegelt"
           },
           "state": {
-            "0": "Verriegeln",
-            "1": "Entriegeln"
+            "0": "Entriegeln",
+            "1": "Verriegeln"
           }
         }
       },
@@ -4327,8 +4327,8 @@
             "1": "Verriegelt"
           },
           "state": {
-            "0": "Verriegeln",
-            "1": "Entriegeln"
+            "0": "Entriegeln",
+            "1": "Verriegeln"
           }
         }
       },

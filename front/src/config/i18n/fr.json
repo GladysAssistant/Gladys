@@ -4305,8 +4305,8 @@
             "1": "Activée"
           },
           "state": {
-            "0": "Activer",
-            "1": "Désactiver"
+            "0": "Désactiver",
+            "1": "Activer"
           }
         },
         "lock": {
@@ -4315,8 +4315,8 @@
             "1": "Verrouillée"
           },
           "state": {
-            "0": "Verrouiller",
-            "1": "Déverrouiller"
+            "0": "Déverrouiller",
+            "1": "Verrouiller"
           }
         }
       },
@@ -4327,8 +4327,8 @@
             "1": "Verrouillée"
           },
           "state": {
-            "0": "Verrouiller",
-            "1": "Déverrouiller"
+            "0": "Déverrouiller",
+            "1": "Verrouiller"
           }
         }
       },
