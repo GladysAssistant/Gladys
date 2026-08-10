@@ -60,6 +60,18 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]: {
+    service: 'SmokeSensor',
+    capabilities: {
+      // HomeKit only knows whether smoke is detected. The decimal flavour some integrations report
+      // is a concentration, which has no HomeKit characteristic, so it stays out.
+      [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
+        characteristics: ['SmokeDetected'],
+        // No debounce at all: the default five seconds is far too slow for a smoke alarm.
+        notifDelay: 0,
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.CO_SENSOR]: {
     service: 'CarbonMonoxideSensor',
     capabilities: {
