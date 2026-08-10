@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const AxiosMock = require('./AxiosMock.test');
 

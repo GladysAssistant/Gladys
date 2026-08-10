@@ -1,4 +1,6 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const TpLinkControllers = require('../../../../services/tp-link/api/tp-link.controller');
 
 const devices = [

@@ -4,7 +4,9 @@ const fs = require('fs');
 
 const proxyquire = require('proxyquire').noCallThru();
 
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 
 const mockPassword = require('../mockPassword');
 

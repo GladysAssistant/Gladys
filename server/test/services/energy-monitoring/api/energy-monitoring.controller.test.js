@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 const EnergyMonitoringController = require('../../../../services/energy-monitoring/api/energy-monitoring.controller');
 
 describe('EnergyMonitoringController', () => {

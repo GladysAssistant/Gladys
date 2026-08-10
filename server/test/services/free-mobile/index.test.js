@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-syntax -- needs the sinon module to build per-test sandboxes
 const sinon = require('sinon');
 const { expect } = require('chai');
 const assert = require('assert');

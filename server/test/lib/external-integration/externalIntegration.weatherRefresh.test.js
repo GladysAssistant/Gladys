@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { assert: sinonAssert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert } = sinon;
 
 const { EVENTS } = require('../../../utils/constants');
 const { buildSupervisor, seedExternalService, TEST_WEATHER_MANIFEST } = require('./testUtils.test');

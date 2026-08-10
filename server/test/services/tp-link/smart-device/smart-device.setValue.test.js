@@ -1,4 +1,6 @@
-const { assert, fake, reset } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake, reset } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const TpLinkApiClient = require('../mocks.test');
 const devices = require('../devices.json');

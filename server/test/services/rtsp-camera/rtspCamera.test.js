@@ -1,7 +1,9 @@
 const { expect } = require('chai');
 const fse = require('fs-extra');
 const assertChai = require('chai').assert;
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const RtspCameraService = require('../../../services/rtsp-camera');

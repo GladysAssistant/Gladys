@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { serviceId } = require('../../mocks/consts.test');
 const { mqttService } = require('../../mocks/mqtt.mock.test');
 

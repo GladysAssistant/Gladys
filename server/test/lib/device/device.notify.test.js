@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 const { EVENTS } = require('../../../utils/constants');

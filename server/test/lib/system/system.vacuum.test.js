@@ -1,4 +1,6 @@
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 
 const System = require('../../../lib/system');
 const Job = require('../../../lib/job');

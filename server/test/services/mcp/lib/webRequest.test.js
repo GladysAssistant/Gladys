@@ -1,7 +1,9 @@
 const { expect } = require('chai');
 const nock = require('nock');
 const dns = require('dns');
-const { stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub } = sinon;
 
 const axios = require('../../../../services/mcp/node_modules/axios');
 const {

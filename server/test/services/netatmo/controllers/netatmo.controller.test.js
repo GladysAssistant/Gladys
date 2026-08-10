@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const NetatmoController = require('../../../../services/netatmo/api/netatmo.controller');
 const { NetatmoHandlerMock } = require('../netatmo.mock.test');

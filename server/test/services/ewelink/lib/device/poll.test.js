@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 const { deviceManagerFull, event, serviceId, stateManagerFull, variableOk } = require('../../mocks/consts.test');
 const Gladys2ChDevice = require('../../mocks/Gladys-2ch.json');

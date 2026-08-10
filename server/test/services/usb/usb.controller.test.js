@@ -1,4 +1,6 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const UsbController = require('../../../services/usb/api/usb.controller');
 
 const ports = [

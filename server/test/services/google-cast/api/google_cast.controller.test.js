@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const GoogleCastController = require('../../../../services/google-cast/api/google_cast.controller');
 
 const { assert, fake } = sinon;

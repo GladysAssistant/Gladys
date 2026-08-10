@@ -1,3 +1,10 @@
+// This module only creates fresh fakes inside its factory functions, never
+// module-level shared ones, so consumers never need their history reset from
+// the outside. They are deliberately created on the sinon singleton: a per-file
+// sandbox would accumulate thousands of factory-built fakes over the suite and
+// make every resetHistory() pass over them (nothing ever iterates the
+// singleton's collection).
+// eslint-disable-next-line no-restricted-syntax
 const { fake } = require('sinon');
 
 const ExternalIntegration = require('../../../lib/external-integration');

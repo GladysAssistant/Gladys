@@ -1,4 +1,6 @@
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 const EvenEmitter = require('events');
 const dayjs = require('dayjs');
 const Weather = require('../../../lib/weather');

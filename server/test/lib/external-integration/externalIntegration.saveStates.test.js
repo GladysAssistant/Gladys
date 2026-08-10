@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { assert: sinonAssert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert } = sinon;
 
 const { BadParameters, TooManyRequests } = require('../../../utils/coreErrors');
 const { EVENTS } = require('../../../utils/constants');

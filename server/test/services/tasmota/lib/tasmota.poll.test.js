@@ -1,5 +1,5 @@
 const proxyquire = require('proxyquire').noCallThru();
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { assert } = sinon;
 

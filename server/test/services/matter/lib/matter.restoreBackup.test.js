@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const path = require('path');
 const fse = require('fs-extra');
 const { expect } = require('chai');

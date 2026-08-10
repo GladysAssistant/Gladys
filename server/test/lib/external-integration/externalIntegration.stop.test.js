@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { assert: sinonAssert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert, fake } = sinon;
 
 const { SERVICE_STATUS } = require('../../../utils/constants');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');

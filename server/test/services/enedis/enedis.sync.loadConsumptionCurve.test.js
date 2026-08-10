@@ -1,4 +1,6 @@
-const { fake, assert, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert, stub } = sinon;
 const { expect } = require('chai');
 const Enedis = require('../../../services/enedis/lib');
 

@@ -10,7 +10,7 @@ const {
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 
 const { fake, assert } = sinon;

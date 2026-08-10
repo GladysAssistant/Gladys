@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { assert: chaiAssert } = require('chai');
 
 const { fake, assert } = sinon;

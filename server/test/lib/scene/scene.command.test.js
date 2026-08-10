@@ -1,4 +1,6 @@
-const { fake, assert: assertSinon } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert: assertSinon } = sinon;
 const EventEmitter = require('events');
 const SceneManager = require('../../../lib/scene');
 
