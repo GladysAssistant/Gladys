@@ -97,17 +97,47 @@ jobs:
 
             pull_request_target)
               PR_NUMBER="$EVENT_PR"
+
+              # Is this author entitled to a free automatic review? Dependency
+              # bumps are not worth one, and since anyone can open a PR on a
+              # public repository while every automatic review costs a Cursor
+              # run, only authors who already landed a commit here get one
+              # without asking. Exact logins only, a user named e.g.
+              # "dependabot-fan" is not a bot. CONTRIBUTOR means "has already
+              # committed to this repo", FIRST_TIME_CONTRIBUTOR and NONE mean
+              # they have not.
+              AUTO_ALLOWED=true
+              AUTO_SKIPPED_BECAUSE=''
+              case "$EVENT_PR_AUTHOR" in
+                'dependabot[bot]' | 'renovate[bot]')
+                  AUTO_ALLOWED=false
+                  AUTO_SKIPPED_BECAUSE="it was opened by ${EVENT_PR_AUTHOR}"
+                  ;;
+                *)
+                  case "$EVENT_PR_ASSOCIATION" in
+                    OWNER | MEMBER | COLLABORATOR | CONTRIBUTOR) ;;
+                    *)
+                      AUTO_ALLOWED=false
+                      AUTO_SKIPPED_BECAUSE="${EVENT_PR_AUTHOR} (${EVENT_PR_ASSOCIATION}) has no merged contribution yet"
+                      ;;
+                  esac
+                  ;;
+              esac
+
               case "$EVENT_ACTION" in
                 labeled)
                   # A PR can be opened with the label already set (maintainers,
                   # `gh pr create --label`): GitHub then emits "opened" and
-                  # "labeled" back to back, and the "opened" branch below has
-                  # already asked for a review. An unparsable date yields a
-                  # huge age, which errs towards triggering the review.
+                  # "labeled" back to back, which would review the PR twice.
+                  # Only suppress the label when that "opened" event really did
+                  # start a review, otherwise the label would stop working as
+                  # the escape hatch for the authors it is meant for. An
+                  # unparsable date yields a huge age, which errs towards
+                  # triggering the review.
                   PR_AGE=$(($(date -u +%s) - $(date -u -d "$EVENT_PR_CREATED_AT" +%s 2> /dev/null || echo 0)))
                   if [ "$EVENT_PR_STATE" != 'open' ]; then
                     echo "PR #${PR_NUMBER} is ${EVENT_PR_STATE}: skipping the review."
-                  elif [ "$EVENT_PR_DRAFT" != 'true' ] && [ "$PR_AGE" -lt 120 ]; then
+                  elif [ "$AUTO_ALLOWED" = true ] && [ "$EVENT_PR_DRAFT" != 'true' ] && [ "$PR_AGE" -lt 120 ]; then
                     echo "PR #${PR_NUMBER} was opened ${PR_AGE}s ago with the label already set: the 'opened' event already triggered a review."
                   else
                     REASON='label'
@@ -128,33 +158,12 @@ jobs:
                   ;;
               esac
 
-              # The two filters below apply to automatic triggers only: the
-              # "needs:cursor-review" label and workflow_dispatch stay the
-              # escape hatch a maintainer can always use.
-              if [ "$RUN" = true ] && [ "$REASON" != 'label' ]; then
-                # Dependency bumps are not worth a review. Exact logins only,
-                # a user named e.g. "dependabot-fan" is not a bot.
-                case "$EVENT_PR_AUTHOR" in
-                  'dependabot[bot]' | 'renovate[bot]')
-                    echo "PR #${PR_NUMBER} opened by ${EVENT_PR_AUTHOR}: skipping the automatic review."
-                    RUN=false
-                    ;;
-                esac
-
-                # Anyone can open a PR on a public repository and every
-                # automatic review costs a Cursor run, so only authors who
-                # already landed a commit here get one without asking.
-                # CONTRIBUTOR means "has already committed to this repo",
-                # FIRST_TIME_CONTRIBUTOR and NONE mean they have not.
-                if [ "$RUN" = true ]; then
-                  case "$EVENT_PR_ASSOCIATION" in
-                    OWNER | MEMBER | COLLABORATOR | CONTRIBUTOR) ;;
-                    *)
-                      echo "PR #${PR_NUMBER}: ${EVENT_PR_AUTHOR} (${EVENT_PR_ASSOCIATION}) has no merged contribution yet, skipping the automatic review. Add the needs:cursor-review label to start one."
-                      RUN=false
-                      ;;
-                  esac
-                fi
+              # Applies to the automatic triggers only: the label and
+              # workflow_dispatch stay the escape hatch a maintainer can
+              # always use.
+              if [ "$RUN" = true ] && [ "$REASON" != 'label' ] && [ "$AUTO_ALLOWED" != true ]; then
+                echo "PR #${PR_NUMBER}: no automatic review because ${AUTO_SKIPPED_BECAUSE}. Add the needs:cursor-review label to start one."
+                RUN=false
               fi
               ;;
 

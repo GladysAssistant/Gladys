@@ -71,7 +71,7 @@ Two cases do not get that automatic review: PRs authored by `dependabot[bot]` or
 
 To ask for a new review after pushing changes, comment on the PR:
 
-```
+```text
 /cursor review
 ```
 
