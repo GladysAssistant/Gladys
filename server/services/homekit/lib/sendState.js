@@ -1,3 +1,4 @@
+const logger = require('../../../utils/logger');
 const { intToRgb, rgbToHsb } = require('../../../utils/colors');
 const {
   DEVICE_FEATURE_CATEGORIES,
@@ -63,8 +64,30 @@ function sendState(hkAccessory, feature, event) {
   // next to a standalone TemperatureSensor — would otherwise have every update funnelled into the
   // first one by getService, silently. The type lookup stays as a fallback for a service that was
   // not built by buildAccessory.
-  const serviceFor = () =>
-    findFeatureService(hkAccessory, feature) || hkAccessory.getService(Service[mappings[feature.category].service]);
+  const serviceFor = () => {
+    const featureService = findFeatureService(hkAccessory, feature);
+
+    if (featureService) {
+      return featureService;
+    }
+
+    const serviceType = Service[mappings[feature.category].service];
+    // The fallback returns the first service of the type, which is only the right one while the
+    // accessory carries a single one. Say so instead of updating the wrong service silently.
+    const sameTypeServices = (hkAccessory.services || []).filter(
+      (service) => service.UUID !== undefined && service.UUID === serviceType.UUID,
+    );
+
+    if (sameTypeServices.length > 1) {
+      logger.warn(
+        `HomeKit: feature ${feature.selector} is not indexed and its accessory exposes ` +
+          `${sameTypeServices.length} ${mappings[feature.category].service} services, ` +
+          `the update may be sent to the wrong one`,
+      );
+    }
+
+    return hkAccessory.getService(serviceType);
+  };
 
   switch (`${feature.category}:${feature.type}`) {
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`:

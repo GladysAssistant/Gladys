@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const { stub } = sinon;
+const logger = require('../../../../utils/logger');
 const { sendState } = require('../../../../services/homekit/lib/sendState');
 const { indexFeatureService } = require('../../../../services/homekit/lib/featureServices');
 const {
@@ -1540,5 +1541,61 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     expect(updateCharacteristic.callCount).eql(0);
+  });
+
+  it('should warn when the type fallback cannot tell two services of the same type apart', async () => {
+    const updateCharacteristic = stub().returns();
+    // an accessory that was not built by buildAccessory: nothing is indexed, and it exposes two
+    // Switch services, so getService can only return the first one
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      services: [{ UUID: 'switch-uuid' }, { UUID: 'switch-uuid' }],
+      getService: stub().returns({ updateCharacteristic }),
+    };
+    homekitHandler.hap.Service.Switch = { UUID: 'switch-uuid' };
+    const warn = stub(logger, 'warn');
+
+    const feature = {
+      selector: 'switch-2',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Switch 2',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 });
+    warn.restore();
+    delete homekitHandler.hap.Service.Switch;
+
+    expect(warn.callCount).to.equal(1);
+    expect(warn.args[0][0]).to.contain('switch-2');
+    // the update is still sent, on the service getService returned
+    expect(updateCharacteristic.args[0]).eql(['ON', 1]);
+  });
+
+  it('should not warn when the type fallback has a single service to choose from', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      services: [{ UUID: 'switch-uuid' }],
+      getService: stub().returns({ updateCharacteristic }),
+    };
+    homekitHandler.hap.Service.Switch = { UUID: 'switch-uuid' };
+    const warn = stub(logger, 'warn');
+
+    const feature = {
+      selector: 'switch-1',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Switch 1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 });
+    warn.restore();
+    delete homekitHandler.hap.Service.Switch;
+
+    expect(warn.callCount).to.equal(0);
+    expect(updateCharacteristic.args[0]).eql(['ON', 1]);
   });
 });

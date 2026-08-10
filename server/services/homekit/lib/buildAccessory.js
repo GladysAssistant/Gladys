@@ -71,6 +71,10 @@ function buildAccessory(device) {
   const accessory = new this.hap.Accessory(device.name.substring(0, 64), device.id);
   Object.keys(categories).forEach((category) => {
     const serviceConfigs = [];
+    // Features dropped by the read-only twin merge below, per service config. They build no
+    // characteristic of their own, but an update on one of them still reaches sendState, so they
+    // have to be indexed onto the service carrying their twin rather than left to the type lookup.
+    const droppedTwins = new Map();
 
     categories[category].forEach((cat) => {
       const currentConfig = serviceConfigs[serviceConfigs.length - 1];
@@ -92,9 +96,16 @@ function buildAccessory(device) {
       const mergeReadOnlyTwin = mappings[cat.category].capabilities[cat.type].mergeReadOnlyTwin === true;
 
       if (mergeReadOnlyTwin && sameFeature && sameFeature.read_only !== cat.read_only) {
+        const dropped = droppedTwins.get(currentConfig) || [];
+
         if (sameFeature.read_only) {
           currentConfig[currentConfig.indexOf(sameFeature)] = cat;
+          dropped.push(sameFeature);
+        } else {
+          dropped.push(cat);
         }
+
+        droppedTwins.set(currentConfig, dropped);
 
         return;
       }
@@ -111,7 +122,7 @@ function buildAccessory(device) {
       );
       // Which features went into which service is only known here. sendState reads it back to
       // update the service the feature belongs to instead of the first one of its type.
-      indexFeatureService(accessory, service, config);
+      indexFeatureService(accessory, service, [...config, ...(droppedTwins.get(config) || [])]);
       accessory.addService(service);
     });
   });

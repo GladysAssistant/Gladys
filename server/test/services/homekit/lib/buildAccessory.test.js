@@ -376,6 +376,57 @@ describe('Build accessory', () => {
     expect(findFeatureService(accessory, device.features[1])).to.equal('switch-service-2');
   });
 
+  it('should index the read-only twin dropped from a service onto that service', async () => {
+    homekitHandler.buildService = sinon.stub().returns('fan-service');
+    const addService = sinon.stub();
+    const accessory = { addService, services: ['service1', 'service2'] };
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns(accessory),
+    };
+
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Ventilateur',
+      features: [
+        { selector: 'fan-speed', name: 'Speed %', category: 'fan', type: 'percent', read_only: false },
+        { selector: 'fan-speed-current', name: 'Speed % current', category: 'fan', type: 'percent', read_only: true },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    // the read-only twin builds no characteristic of its own, but an update on it still has to
+    // reach the Fanv2 service its writable twin was built into
+    expect(homekitHandler.buildService.args[0][1]).to.have.deep.members([device.features[0]]);
+    expect(findFeatureService(accessory, device.features[0])).to.equal('fan-service');
+    expect(findFeatureService(accessory, device.features[1])).to.equal('fan-service');
+  });
+
+  it('should index the writable twin dropped from a service onto that service', async () => {
+    homekitHandler.buildService = sinon.stub().returns('fan-service');
+    const addService = sinon.stub();
+    const accessory = { addService, services: ['service1', 'service2'] };
+    homekitHandler.hap = {
+      Accessory: sinon.stub().returns(accessory),
+    };
+
+    // the read-only counterpart comes first this time, so it is the one replaced in the config
+    const device = {
+      id: 'c22a4d4b-e261-4b22-a2be-309baf12c3ca',
+      name: 'Ventilateur',
+      features: [
+        { selector: 'fan-speed-current', name: 'Speed % current', category: 'fan', type: 'percent', read_only: true },
+        { selector: 'fan-speed', name: 'Speed %', category: 'fan', type: 'percent', read_only: false },
+      ],
+    };
+
+    await homekitHandler.buildAccessory(device);
+
+    expect(homekitHandler.buildService.args[0][1]).to.have.deep.members([device.features[1]]);
+    expect(findFeatureService(accessory, device.features[0])).to.equal('fan-service');
+    expect(findFeatureService(accessory, device.features[1])).to.equal('fan-service');
+  });
+
   it('should index a merged service under every feature it carries', async () => {
     homekitHandler.buildService = sinon.stub().returns('thermostat-service');
     const addService = sinon.stub();
