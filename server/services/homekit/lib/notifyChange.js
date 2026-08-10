@@ -20,7 +20,20 @@ function notifyChange(accessories, event) {
     return;
   }
 
-  const delay = mappings[feature.category].capabilities[feature.type].notifDelay || 5000;
+  // Nullish and not ||, so that a mapping asking for no delay at all gets it: a smoke alarm and a
+  // button press are both events, and `0 || 5000` would silently push them back to the default
+  // five seconds.
+  const delay = mappings[feature.category].capabilities[feature.type].notifDelay ?? 5000;
+
+  // A zero delay means "no debounce at all", so it must not go through the timeout bookkeeping:
+  // two events in the same tick would clear the first timer and only the second would reach
+  // HomeKit. Send straight away instead.
+  if (delay === 0) {
+    this.sendState(hkAccessory, feature, event);
+
+    return;
+  }
+
   if (!this.notifyTimeouts[event.device_feature]) {
     this.notifyTimeouts[event.device_feature] = {
       timeout: setTimeout(() => {
