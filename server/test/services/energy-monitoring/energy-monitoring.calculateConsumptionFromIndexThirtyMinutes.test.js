@@ -213,28 +213,29 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes', () => {
     expect(callArgs[1]).to.equal('specific-job-id-12345');
   });
 
-  it('should round in the system timezone so half-hour-offset timezones bucket like the backfill', async () => {
-    // Asia/Kolkata is UTC+5:30: local :00/:30 marks fall on UTC :30/:00.
-    const kolkataVariable = {
+  it('should round in the system timezone so offset timezones bucket like the backfill', async () => {
+    // Australia/Eucla is UTC+8:45: local :00/:30 marks do not fall on UTC :00/:30,
+    // so this input discriminates local-timezone rounding from UTC/local-machine rounding.
+    const euclaVariable = {
       getValue: (name) => {
         if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
-          return 'Asia/Kolkata';
+          return 'Australia/Eucla';
         }
         return null;
       },
     };
-    const kolkataEnergyMonitoring = new EnergyMonitoring(
-      { ...gladys, variable: kolkataVariable },
+    const euclaEnergyMonitoring = new EnergyMonitoring(
+      { ...gladys, variable: euclaVariable },
       'a810b8db-6d04-4697-bed3-c4b72c996279',
     );
-    const kolkataCalculate = fake.resolves(null);
-    kolkataEnergyMonitoring.calculateConsumptionFromIndex = kolkataCalculate;
+    const euclaCalculate = fake.resolves(null);
+    euclaEnergyMonitoring.calculateConsumptionFromIndex = euclaCalculate;
 
-    // 10:20:00 UTC = 15:50 in Kolkata, floored to 15:30 Kolkata = 10:00:00 UTC
+    // 10:20:00 UTC = 19:05 in Eucla, floored to 19:00 Eucla = 10:15:00 UTC
     const now = new Date('2023-10-15T10:20:00.000Z');
-    await kolkataEnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes(now, 'test-job-id');
+    await euclaEnergyMonitoring.calculateConsumptionFromIndexThirtyMinutes(now, 'test-job-id');
 
-    assert.calledOnce(kolkataCalculate);
-    expect(kolkataCalculate.getCall(0).args[0].toISOString()).to.equal('2023-10-15T10:00:00.000Z');
+    assert.calledOnce(euclaCalculate);
+    expect(euclaCalculate.getCall(0).args[0].toISOString()).to.equal('2023-10-15T10:15:00.000Z');
   });
 });
