@@ -175,6 +175,22 @@ describe('externalIntegration.install', () => {
     sinonAssert.calledOnce(system.createContainer);
   });
 
+  it('should return the explicit pull error when the local presence check itself fails', async () => {
+    const { externalIntegration } = buildSupervisor({
+      system: {
+        pull: fake.rejects(new Error('no matching manifest for linux/arm64')),
+        imageExists: fake.rejects(new Error('docker daemon unreachable')),
+      },
+    });
+    try {
+      await externalIntegration.install({ manifest: TEST_MANIFEST });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
+    }
+  });
+
   it('should install a local sub-container image when its pull fails', async () => {
     const pull = sinon.stub();
     pull.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('pull access denied'));
