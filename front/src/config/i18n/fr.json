@@ -3240,7 +3240,8 @@
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "gladys/my-topic",
+        "topicPlaceholder": "zigbee2mqtt/mon-appareil/set",
+        "topicExplanation": "Le topic est publié tel quel : vous devez écrire le topic MQTT complet, préfixe 'zigbee2mqtt/' inclus (par exemple 'zigbee2mqtt/mon-appareil/set').",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
