@@ -1,8 +1,9 @@
 const EventEmitter = require('events');
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const WebSocket = require('ws');
-const { assert: sinonAssert, fake } = require('sinon');
+
+const { assert: sinonAssert, fake } = sinon;
 
 const db = require('../../../models');
 const { ExternalIntegrationUnavailableError, BadParameters } = require('../../../utils/coreErrors');

@@ -1,6 +1,8 @@
 const fs = require('fs');
 const { expect } = require('chai');
-const { assert: sinonAssert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert, fake } = sinon;
 
 const db = require('../../../models');
 const { NotFoundError } = require('../../../utils/coreErrors');

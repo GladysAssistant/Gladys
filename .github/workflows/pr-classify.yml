@@ -104,8 +104,11 @@ jobs:
             PR_BODY=$(echo "$PR_DATA" | jq -r '.body // ""')
             FILES=$(gh api "repos/$GH_REPO/pulls/$PR/files" --paginate --jq '.[].filename') \
               || { warn "$PR" "could not fetch the list of changed files"; continue; }
+            # The diff endpoint rejects PRs above 300 files (HTTP 406): the
+            # title, description and file list are enough to classify those,
+            # so degrade to an empty diff instead of failing the run.
             DIFF=$(gh api "repos/$GH_REPO/pulls/$PR" -H "Accept: application/vnd.github.diff") \
-              || { warn "$PR" "could not fetch the PR diff"; continue; }
+              || { echo "PR #$PR: diff unavailable (probably >300 files), classifying without it"; DIFF=''; }
             # Bound every free-form field so a huge PR can never overflow the
             # model context. Truncate in bash: piping into `head -c` would
             # kill gh with SIGPIPE on large payloads and fail the step under

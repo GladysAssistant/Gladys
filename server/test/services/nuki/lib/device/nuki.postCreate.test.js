@@ -1,5 +1,5 @@
 const proxyquire = require('proxyquire').noCallThru();
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { serviceId } = require('../../mocks/consts.test');
 const NukiProtocolHandlerMock = require('../../mocks/nuki.protocol.mock.test');
 

@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, stub } = sinon;
 const MCPController = require('../../../../services/mcp/api/mcp.controller');
 
 describe('POST /api/v1/service/mcp/proxy', () => {

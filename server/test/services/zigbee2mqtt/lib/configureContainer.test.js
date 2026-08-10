@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const path = require('path');
 const fs = require('fs');
 const proxyquire = require('proxyquire').noCallThru();
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 

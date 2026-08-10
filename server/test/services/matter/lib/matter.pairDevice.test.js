@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { expect, assert } = require('chai');
 // eslint-disable-next-line import/no-unresolved
 const { BridgedDeviceBasicInformation } = require('@matter/main/clusters');

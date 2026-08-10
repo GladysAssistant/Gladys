@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { assert, stub, useFakeTimers } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, stub, useFakeTimers } = sinon;
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const Job = require('../../../lib/job');

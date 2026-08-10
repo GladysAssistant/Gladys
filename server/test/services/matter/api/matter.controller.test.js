@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const MatterController = require('../../../../services/matter/api/matter.controller');
 
 const { assert, fake } = sinon;

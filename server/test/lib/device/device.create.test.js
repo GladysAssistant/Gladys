@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 const EventEmitter = require('events');
 
 const { DEVICE_POLL_FREQUENCIES, EVENTS } = require('../../../utils/constants');

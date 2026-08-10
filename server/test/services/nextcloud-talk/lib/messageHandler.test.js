@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, useFakeTimers, spy, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, useFakeTimers, spy, stub } = sinon;
 const MessageHandler = require('../../../../services/nextcloud-talk/lib');
 const { EVENTS } = require('../../../../utils/constants');
 

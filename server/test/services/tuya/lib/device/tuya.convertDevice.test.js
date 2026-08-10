@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { convertDevice } = require('../../../../../services/tuya/lib/device/tuya.convertDevice');
 const { DEVICE_PARAM_NAME } = require('../../../../../services/tuya/lib/utils/tuya.constants');

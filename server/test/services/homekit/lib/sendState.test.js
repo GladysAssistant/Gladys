@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub } = sinon;
 const { sendState } = require('../../../../services/homekit/lib/sendState');
 const {
   DEVICE_FEATURE_CATEGORIES,

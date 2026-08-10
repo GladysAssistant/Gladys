@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
 const { MockedPhilipsHueClient, fakes, hueApi } = require('../mocks.test');

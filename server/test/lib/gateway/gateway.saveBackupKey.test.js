@@ -1,5 +1,5 @@
 const { assert: chaiAssert } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { saveBackupKey } = require('../../../lib/gateway/gateway.saveBackupKey');
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');

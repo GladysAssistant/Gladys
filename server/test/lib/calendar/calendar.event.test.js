@@ -1,5 +1,7 @@
 const { expect, assert } = require('chai');
-const { useFakeTimers } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { useFakeTimers } = sinon;
 const dayjs = require('dayjs');
 
 const Calendar = require('../../../lib/calendar');

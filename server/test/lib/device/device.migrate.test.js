@@ -1,6 +1,8 @@
 const EventEmitter = require('events');
 const { assert, expect } = require('chai');
-const { fake, assert: sinonAssert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert: sinonAssert } = sinon;
 const uuid = require('uuid');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');

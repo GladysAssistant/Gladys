@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 const { serviceId, event } = require('../../mocks/consts.test');
 const EweLinkApi = require('../../mocks/ewelink-api.mock.test');

@@ -1,4 +1,6 @@
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 
 const MessageHandler = require('../../../../services/nextcloud-talk/lib');
 

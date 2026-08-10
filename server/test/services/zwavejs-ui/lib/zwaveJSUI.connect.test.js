@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const Promise = require('bluebird');
 
 const { assert: chaiAssert } = require('chai');

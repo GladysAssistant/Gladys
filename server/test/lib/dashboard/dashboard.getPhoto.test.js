@@ -1,5 +1,7 @@
 const { expect, assert } = require('chai');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 const nock = require('nock');
 const proxyquire = require('proxyquire').noCallThru();
 const { BadParameters } = require('../../../utils/coreErrors');

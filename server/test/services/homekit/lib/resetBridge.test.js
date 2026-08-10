@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub } = sinon;
 const { resetBridge } = require('../../../../services/homekit/lib/resetBridge');
 const { EVENTS } = require('../../../../utils/constants');
 

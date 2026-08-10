@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub } = sinon;
 const { buildService } = require('../../../../services/homekit/lib/buildService');
 const { mappings } = require('../../../../services/homekit/lib/deviceMappings');
 const {

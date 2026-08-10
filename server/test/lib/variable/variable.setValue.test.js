@@ -1,6 +1,8 @@
 const { expect } = require('chai');
 const chaiAssert = require('chai').assert;
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const Variable = require('../../../lib/variable');
 

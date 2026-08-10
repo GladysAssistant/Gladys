@@ -1,5 +1,7 @@
 const fs = require('fs');
-const { assert: sinonAssert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert, fake } = sinon;
 
 const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 

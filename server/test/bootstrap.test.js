@@ -6,6 +6,7 @@ const Gladys = require('../lib');
 const db = require('../models');
 const logger = require('../utils/logger');
 const { seedDb, cleanDb, resetDb } = require('./helpers/db.test');
+const { resetSharedMockHistories } = require('./helpers/sharedMockSandboxes');
 const fakeOpenWeatherService = require('./services/openweather/fakeOpenWeatherService');
 
 chai.use(chaiAsPromised);
@@ -54,6 +55,7 @@ beforeEach(async function beforeEach() {
   this.timeout(16000);
   try {
     await resetDb();
+    resetSharedMockHistories();
     // @ts-ignore
     global.TEST_GLADYS_INSTANCE.cache.clear();
   } catch (e) {

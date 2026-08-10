@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { NukiHandlerMock, discoveredDevices } = require('../mocks/nuki.mock.test');
 const { serviceId } = require('../mocks/consts.test');
 

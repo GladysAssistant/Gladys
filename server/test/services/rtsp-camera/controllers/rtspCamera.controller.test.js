@@ -1,5 +1,7 @@
 const { assert: chaiAssert } = require('chai');
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const fse = require('fs-extra');
 const path = require('path');

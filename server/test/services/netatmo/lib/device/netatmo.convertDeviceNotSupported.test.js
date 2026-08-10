@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const devicesNetatmoMock = JSON.parse(JSON.stringify(require('../../netatmo.loadDevices.mock.test.json')));
 const devicesGladysMock = JSON.parse(JSON.stringify(require('../../netatmo.convertDevices.mock.test.json')));

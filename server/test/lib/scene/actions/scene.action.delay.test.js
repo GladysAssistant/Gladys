@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const EventEmitter = require('events');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
