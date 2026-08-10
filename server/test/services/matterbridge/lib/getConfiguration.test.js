@@ -30,6 +30,7 @@ describe('Matterbridge getConfiguration', () => {
 
     expect(config).to.deep.equal({
       dockerMatterbridgeVersion: '1',
+      matterbridgeContainerName: '1',
     });
   });
 });

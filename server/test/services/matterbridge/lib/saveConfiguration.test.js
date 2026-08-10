@@ -28,12 +28,14 @@ describe('Matterbridge saveConfiguration', () => {
   it('should save configuration', async () => {
     const config = {
       dockerMatterbridgeVersion: '1',
+      matterbridgeContainerName: 'gladys-matterbridge',
     };
 
     await matterbridgeManager.saveConfiguration(config);
 
     assert.calledWith(gladys.variable.setValue, 'DOCKER_MATTERBRIDGE_VERSION', '1', serviceId);
     assert.calledWith(gladys.variable.setValue, 'MATTERBRIDGE_PORT', '8283', serviceId);
+    assert.calledWith(gladys.variable.setValue, 'MATTERBRIDGE_CONTAINER_NAME', 'gladys-matterbridge', serviceId);
   });
 
   it('should destroy configuration when value is null', async () => {

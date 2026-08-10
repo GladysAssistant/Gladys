@@ -20,6 +20,11 @@ async function getConfiguration() {
     CONFIGURATION.DOCKER_NODE_RED_VERSION,
     this.serviceId,
   );
+  // Load persisted container name (resolved once at init)
+  const nodeRedContainerName = await this.gladys.variable.getValue(
+    CONFIGURATION.NODE_RED_CONTAINER_NAME,
+    this.serviceId,
+  );
   // Gladys params
   const timezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
 
@@ -27,6 +32,7 @@ async function getConfiguration() {
     nodeRedUsername,
     nodeRedPassword,
     dockerNodeRedVersion,
+    nodeRedContainerName,
     timezone,
   };
 

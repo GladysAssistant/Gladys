@@ -36,6 +36,7 @@ describe('mqttHandler.updateContainer', () => {
 
   beforeEach(() => {
     mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.getBrokerContainerName = fake.resolves('eclipse-mosquitto');
   });
 
   afterEach(() => {
@@ -92,7 +93,7 @@ describe('mqttHandler.updateContainer', () => {
       brokerContainerAvailable: true,
       mosquittoVersion: '2',
     };
-    gladys.system.getContainers = fake.resolves([{ id: 'container' }]);
+    gladys.system.getContainers = fake.resolves([{ id: 'container', name: '/eclipse-mosquitto' }]);
 
     await mqttHandler.updateContainer(config);
 
@@ -111,5 +112,19 @@ describe('mqttHandler.updateContainer', () => {
       DEFAULT.MOSQUITTO_VERSION,
       serviceId,
     );
+  });
+
+  it('should never remove a user container matching only as a substring', async () => {
+    const config = {
+      brokerContainerAvailable: true,
+      mosquittoVersion: '2',
+    };
+    // Docker filters match by substring; a user container named 'eclipse-mosquitto-custom'
+    // must never be picked up by the exact-name lookup and removed.
+    gladys.system.getContainers = fake.resolves([{ id: 'user-container', name: '/eclipse-mosquitto-custom' }]);
+
+    await mqttHandler.updateContainer(config);
+
+    assert.notCalled(gladys.system.removeContainer);
   });
 });

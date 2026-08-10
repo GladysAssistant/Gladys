@@ -37,11 +37,13 @@ describe('NodeRed checkForContainerUpdates', () => {
     gladys.system.getContainers = fake.resolves([
       {
         id: 'container-id',
+        name: '/gladys-node-red',
         image: 'nodered/node-red:3.1',
       },
     ]);
     const config = {
       dockerNodeRedVersion: '5',
+      nodeRedContainerName: 'gladys-node-red',
     };
 
     await nodeRedManager.checkForContainerUpdates(config);
@@ -57,11 +59,13 @@ describe('NodeRed checkForContainerUpdates', () => {
     gladys.system.getContainers = fake.resolves([
       {
         id: 'container-id',
+        name: '/gladys-node-red',
         image: 'nodered/node-red:3.1',
       },
     ]);
     const config = {
       dockerNodeRedVersion: '3',
+      nodeRedContainerName: 'gladys-node-red',
     };
 
     await nodeRedManager.checkForContainerUpdates(config);
@@ -73,9 +77,51 @@ describe('NodeRed checkForContainerUpdates', () => {
     assert.notCalled(gladys.system.removeContainer);
   });
 
+  it('should ignore a user container matching only as a substring', async () => {
+    // Docker filters match by substring, but only the exact name is ours
+    gladys.system.getContainers = fake.resolves([
+      {
+        id: 'user-container',
+        name: '/gladys-node-red-old',
+        image: 'nodered/node-red:1.0',
+      },
+    ]);
+    const config = {
+      dockerNodeRedVersion: '5',
+      nodeRedContainerName: 'gladys-node-red',
+    };
+
+    await nodeRedManager.checkForContainerUpdates(config);
+
+    assert.notCalled(gladys.system.removeContainer);
+  });
+
+  it('should remove the resolved (suffixed) container on a version bump', async () => {
+    gladys.system.getContainers = fake.resolves([
+      {
+        id: 'container-id',
+        name: '/gladys-node-red-ab12cd3',
+        image: 'nodered/node-red:3.1',
+      },
+    ]);
+    const config = {
+      dockerNodeRedVersion: '5',
+      nodeRedContainerName: 'gladys-node-red-ab12cd3',
+    };
+
+    await nodeRedManager.checkForContainerUpdates(config);
+
+    assert.calledWithExactly(gladys.system.getContainers, {
+      all: true,
+      filters: { name: ['gladys-node-red-ab12cd3'] },
+    });
+    assert.calledWithExactly(gladys.system.removeContainer, 'container-id', { force: true });
+  });
+
   it('should do nothing when no container is installed', async () => {
     const config = {
       dockerNodeRedVersion: '3',
+      nodeRedContainerName: 'gladys-node-red',
     };
 
     await nodeRedManager.checkForContainerUpdates(config);
@@ -84,6 +130,7 @@ describe('NodeRed checkForContainerUpdates', () => {
     assert.notCalled(gladys.system.removeContainer);
     expect(config).deep.equal({
       dockerNodeRedVersion: '3',
+      nodeRedContainerName: 'gladys-node-red',
     });
   });
 });
