@@ -39,6 +39,10 @@ let sqliteExec = null;
 let sqliteAll = null;
 let cleanMarkers = null;
 
+// Observability for dbReset.test.js: lets the tests assert that the skip
+// branches really skip (an unnecessary reset would produce the same data).
+const resetDbStats = { sqliteResets: 0, duckDeletes: 0 };
+
 // Most tests never write to the database, so even the fast snapshot copy is
 // wasted work for them. Before copying, we read two cheap freshness markers
 // and skip the reset when both are unchanged since the last one:
@@ -104,6 +108,7 @@ const resetDb = async () => {
   } else {
     const markers = await readFreshnessMarkers();
     if (markers !== cleanMarkers) {
+      resetDbStats.sqliteResets += 1;
       try {
         await sqliteExec(sqliteResetScript);
       } catch (e) {
@@ -122,6 +127,7 @@ const resetDb = async () => {
   // serialized write queue, so they cannot race a pending write.
   const rows = await db.duckDbWriteConnectionAllAsync('SELECT count(*) AS c FROM t_device_feature_state');
   if (rows.length === 0 || Number(rows[0].c) !== 0) {
+    resetDbStats.duckDeletes += 1;
     await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
   }
 };
@@ -130,4 +136,5 @@ module.exports = {
   seedDb,
   cleanDb,
   resetDb,
+  resetDbStats,
 };

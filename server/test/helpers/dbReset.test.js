@@ -2,19 +2,24 @@ const { expect } = require('chai');
 const { promisify } = require('util');
 const sqlite3 = require('sqlite3');
 const db = require('../../models');
-const { resetDb } = require('./db.test');
+const { resetDb, resetDbStats } = require('./db.test');
 
 // Direct tests of the freshness detection in resetDb (see db.test.js): a clean
 // database must be left intact by the skip path, and every kind of write —
 // through Sequelize, through a foreign connection, or into DuckDB — must be
-// detected and rolled back to the seeded state.
+// detected and rolled back to the seeded state. The resetDbStats counters
+// prove which branch ran: a skipped reset and an unnecessary one would
+// otherwise produce the same data.
 describe('resetDb freshness detection', () => {
-  it('should keep the seeded rows intact when nothing was written (skip path)', async () => {
+  it('should skip both resets and keep the seeded rows when nothing was written', async () => {
     const before = await db.House.count();
     expect(before).to.be.above(0);
+    const stats = { ...resetDbStats };
     // The global beforeEach just reset the database, so this call must take
     // the "markers unchanged" branch and leave the data as-is.
     await resetDb();
+    expect(resetDbStats.sqliteResets).to.equal(stats.sqliteResets);
+    expect(resetDbStats.duckDeletes).to.equal(stats.duckDeletes);
     expect(await db.House.count()).to.equal(before);
   });
 
@@ -22,8 +27,10 @@ describe('resetDb freshness detection', () => {
     const [house] = await db.House.findAll();
     await db.sequelize.query(`UPDATE t_house SET name = 'dirty' WHERE id = '${house.id}'`);
     expect((await db.House.findByPk(house.id)).name).to.equal('dirty');
+    const stats = { ...resetDbStats };
     // total_changes() moved: the reset must detect it and restore the seed.
     await resetDb();
+    expect(resetDbStats.sqliteResets).to.equal(stats.sqliteResets + 1);
     const restored = await db.House.findByPk(house.id);
     expect(restored.name).to.equal(house.name);
   });
@@ -38,7 +45,9 @@ describe('resetDb freshness detection', () => {
     await promisify(external.run.bind(external))(`UPDATE t_house SET name = 'dirty' WHERE id = '${house.id}'`);
     await promisify(external.close.bind(external))();
     expect((await db.House.findByPk(house.id)).name).to.equal('dirty');
+    const stats = { ...resetDbStats };
     await resetDb();
+    expect(resetDbStats.sqliteResets).to.equal(stats.sqliteResets + 1);
     const restored = await db.House.findByPk(house.id);
     expect(restored.name).to.equal(house.name);
   });
@@ -49,7 +58,9 @@ describe('resetDb freshness detection', () => {
     );
     const inserted = await db.duckDbWriteConnectionAllAsync('SELECT count(*) AS c FROM t_device_feature_state');
     expect(Number(inserted[0].c)).to.equal(1);
+    const stats = { ...resetDbStats };
     await resetDb();
+    expect(resetDbStats.duckDeletes).to.equal(stats.duckDeletes + 1);
     const after = await db.duckDbWriteConnectionAllAsync('SELECT count(*) AS c FROM t_device_feature_state');
     expect(Number(after[0].c)).to.equal(0);
   });
