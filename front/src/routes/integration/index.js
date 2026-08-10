@@ -291,8 +291,6 @@ class Integration extends Component {
       category && !VIRTUAL_CATEGORIES.includes(category) ? integrationsByType[category] || [] : integrations;
     // Load all categories
     let integrationCategories = categories;
-    // Total size
-    let totalSize = integrations.length;
 
     // Filter integrations and categories according to user role
     if (user.role !== USER_ROLE.ADMIN) {
@@ -305,8 +303,6 @@ class Integration extends Component {
       integrationCategories = integrationCategories.filter(
         i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1
       );
-
-      totalSize = integrations.filter(i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1).length;
     }
 
     // Get favorites (use cached state if available, otherwise empty)
@@ -338,19 +334,23 @@ class Integration extends Component {
       isFavorite: favorites.includes(card.key)
     }));
     selectedIntegrations = selectedIntegrations.concat(externalCards);
-    totalSize += externalCards.length;
 
     // If we are in favorites view, only display favorites
     if (category === 'favorites') {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.isFavorite);
-      totalSize = selectedIntegrations.length;
     }
 
     // If we are in updates view, only display the integrations to update
     if (category === 'updates') {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.updateAvailable);
-      totalSize = selectedIntegrations.length;
     }
+
+    // the total is the size of the view the user is currently looking at, once
+    // every filter that defines this view has been applied (role, category,
+    // favorites, updates) but before the search: it is the reference the search
+    // result count is compared to. Computing it any earlier would mix scopes,
+    // e.g. counting the integrations of every type while displaying only one
+    const totalSize = selectedIntegrations.length;
 
     // Filter
     if (searchKeyword && searchKeyword.length > 0) {

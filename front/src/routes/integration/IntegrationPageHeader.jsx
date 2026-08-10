@@ -5,6 +5,16 @@ import InstallFromGithubCard from './all/external-integration/install-from-githu
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import style from './style.css';
 
+// while no search narrows the list down, the displayed count and the total of
+// the current view are the same number: showing "75 of 75 integrations" is
+// noise, the total alone says everything
+const IntegrationCount = ({ searching, integrationsLength, totalSize }) =>
+  searching ? (
+    <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
+  ) : (
+    <Text id="integration.root.subtitleTotal" fields={{ total: totalSize }} />
+  );
+
 const IntegrationPageHeader = ({
   intl,
   orderDir,
@@ -15,7 +25,10 @@ const IntegrationPageHeader = ({
   totalSize,
   showInstallFromGithub
 }) => {
-  const showResultCount = searchKeyword.length > 0 || integrationsLength !== totalSize;
+  const searching = searchKeyword.length > 0;
+  // an empty view (the catalog still loading, no favorite yet) already displays
+  // a message in the page body, "0 integrations" on top of it says nothing more
+  const showCount = searching || totalSize > 0;
   const searchPlaceholder = get(intl.dictionary, 'integration.root.searchPlaceholder', {
     default: ''
   });
@@ -27,9 +40,11 @@ const IntegrationPageHeader = ({
           <h1 class="page-title">
             <Text id="integration.root.title" />
           </h1>
-          <div class="page-subtitle">
-            <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
-          </div>
+          {showCount && (
+            <div class="page-subtitle">
+              <IntegrationCount searching={searching} integrationsLength={integrationsLength} totalSize={totalSize} />
+            </div>
+          )}
           <div class="page-options d-flex align-items-center">
             {showInstallFromGithub && (
               <div class="mr-3">
@@ -80,9 +95,9 @@ const IntegrationPageHeader = ({
             <InstallFromGithubCard button block />
           </div>
         )}
-        {showResultCount && (
+        {showCount && (
           <div class={style.mobileResultCount}>
-            <Text id="integration.root.subtitle" fields={{ length: integrationsLength, total: totalSize }} />
+            <IntegrationCount searching={searching} integrationsLength={integrationsLength} totalSize={totalSize} />
           </div>
         )}
       </div>

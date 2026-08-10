@@ -693,6 +693,7 @@
     "root": {
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
+      "subtitleTotal": "{{total}} integrations",
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
       "allIntegrationsUpToDate": "All your integrations are up to date.",
