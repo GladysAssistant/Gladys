@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { assert: sinonAssert, fake } = require('sinon');
 
-const { MANIFEST_IMAGE_LABEL } = require('../../../lib/external-integration/constants');
+const { MANIFEST_IMAGE_LABEL, RECENTLY_PULLED_PROTECTION_MS } = require('../../../lib/external-integration/constants');
 const { buildSupervisor, seedExternalService, TEST_MANIFEST, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 
 describe('externalIntegration.getImagesInUse', () => {
@@ -170,6 +170,37 @@ describe('externalIntegration.cleanImages', () => {
 
     expect(removed).to.deep.equal(['ghcr.io/john/gladys-open-meteo-demo:1.1.0']);
     sinonAssert.calledOnceWithExactly(system.removeImage, 'ghcr.io/john/gladys-open-meteo-demo:1.1.0');
+  });
+
+  it('should never collect an image that was just pulled', async () => {
+    // install/update pull before writing the row that declares the image: a
+    // sweep landing in that window must not delete it under them
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        listImages: fake.resolves([
+          { id: 'sha256:aaa', tags: ['ghcr.io/john/demo:2.0.0'] },
+          { id: 'sha256:bbb', tags: ['ghcr.io/john/demo:1.0.0'] },
+        ]),
+        getImagePullTime: fake((image) => (image === 'ghcr.io/john/demo:2.0.0' ? Date.now() : undefined)),
+      },
+    });
+
+    const removed = await externalIntegration.cleanImages();
+
+    expect(removed).to.deep.equal(['ghcr.io/john/demo:1.0.0']);
+    sinonAssert.calledOnceWithExactly(system.removeImage, 'ghcr.io/john/demo:1.0.0');
+  });
+
+  it('should collect an image pulled long enough ago', async () => {
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        listImages: fake.resolves([{ id: 'sha256:aaa', tags: ['ghcr.io/john/demo:1.0.0'] }]),
+        getImagePullTime: fake.returns(Date.now() - RECENTLY_PULLED_PROTECTION_MS - 1000),
+      },
+    });
+
+    expect(await externalIntegration.cleanImages()).to.deep.equal(['ghcr.io/john/demo:1.0.0']);
+    sinonAssert.calledOnce(system.removeImage);
   });
 
   it('should do nothing when Docker is not available', async () => {

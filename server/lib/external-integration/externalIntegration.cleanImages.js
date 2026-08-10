@@ -1,5 +1,5 @@
 const logger = require('../../utils/logger');
-const { MANIFEST_IMAGE_LABEL } = require('./constants');
+const { MANIFEST_IMAGE_LABEL, RECENTLY_PULLED_PROTECTION_MS } = require('./constants');
 
 /**
  * @description Scheduled sweep of the integration images left behind: the ones
@@ -39,7 +39,16 @@ async function cleanImages() {
     (references, image) => references.concat(image.tags.length > 0 ? image.tags : [image.id]),
     [],
   );
-  const removed = await this.removeImages(candidates);
+  // install and update pull their images *before* writing the t_service row
+  // that declares them. A sweep landing in that window would see a brand new
+  // image as an orphan and delete it under the operation that just fetched it
+  // — and Docker's own 409 is no help there, the container does not exist yet.
+  const now = Date.now();
+  const notJustPulled = candidates.filter((reference) => {
+    const pulledAt = this.system.getImagePullTime(reference);
+    return pulledAt === undefined || now - pulledAt >= RECENTLY_PULLED_PROTECTION_MS;
+  });
+  const removed = await this.removeImages(notJustPulled);
   if (removed.length > 0) {
     logger.info(`External integration image cleanup: removed ${removed.length} unused image(s)`);
   }

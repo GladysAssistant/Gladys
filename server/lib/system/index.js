@@ -18,6 +18,7 @@ const { getDiskSpace } = require('./system.getDiskSpace');
 const { saveLatestGladysVersion } = require('./system.saveLatestGladysVersion');
 
 const { pull } = require('./system.pull');
+const { getImagePullTime } = require('./system.getImagePullTime');
 const { exec } = require('./system.exec');
 const { createContainer } = require('./system.createContainer');
 const { createNetwork } = require('./system.createNetwork');
@@ -63,6 +64,10 @@ const System = function System(sequelize, event, config, job, variable, user, me
   this.cpuCfsSupport = null;
   this.gladysLogsCache = null;
   this.gladysImage = null;
+  // image reference -> timestamp of the last pull, read by the external
+  // integration image cleanup so it never collects an image pulled seconds
+  // ago. Bounded in practice by the number of distinct images Gladys pulls.
+  this.imagePullTimes = new Map();
 };
 
 System.prototype.init = init;
@@ -82,6 +87,7 @@ System.prototype.saveLatestGladysVersion = saveLatestGladysVersion;
 System.prototype.checkIfGladysUpgraded = checkIfGladysUpgraded;
 
 System.prototype.pull = pull;
+System.prototype.getImagePullTime = getImagePullTime;
 System.prototype.exec = exec;
 System.prototype.createContainer = createContainer;
 System.prototype.createNetwork = createNetwork;

@@ -74,7 +74,18 @@ describe('system.removeImage', () => {
 
     expect(removed).to.equal(true);
     assert.calledWith(system.dockerode.getImage, 'my-image:1.0.0');
-    assert.calledWith(remove, { noprune: true });
+    assert.calledWith(remove, { noprune: true, force: false });
+  });
+
+  it('should never force, even when a caller asks for it', async () => {
+    // the "never force" rule is the safety invariant of every caller: deleting
+    // an image from under a running container turns a cleanup into an outage
+    const remove = fake.resolves(true);
+    system.dockerode.getImage = fake.returns({ remove });
+
+    await system.removeImage('my-image:1.0.0', { force: true });
+
+    assert.calledWith(remove, { force: false });
   });
 
   it('should resolve with false when the image does not exist (HTTP 404)', async () => {

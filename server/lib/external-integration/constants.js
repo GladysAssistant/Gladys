@@ -28,6 +28,12 @@ const SUB_CONTAINER_LABEL = 'io.gladysassistant.container';
 // only writable path of the container read-only for the integration.
 const INTEGRATION_DATA_UID = 1000;
 const INTEGRATION_DATA_GID = 1000;
+// An image pulled more recently than this is never swept by cleanImages.
+// install/update pull their images *before* writing the t_service row that
+// declares them, so between the two the sweep would see a brand new image as
+// an orphan and delete it under the operation that just fetched it. One hour
+// dwarfs the slowest install and only delays a genuine orphan by a day.
+const RECENTLY_PULLED_PROTECTION_MS = 60 * 60 * 1000;
 // Bounds of the `containers` manifest field (same rules as the indexer).
 const MAX_SUB_CONTAINERS = 5;
 const MAX_SUB_CONTAINER_VOLUMES = 5;
@@ -273,6 +279,7 @@ module.exports = {
   SUB_CONTAINER_LABEL,
   INTEGRATION_DATA_UID,
   INTEGRATION_DATA_GID,
+  RECENTLY_PULLED_PROTECTION_MS,
   MAX_SUB_CONTAINERS,
   MAX_SUB_CONTAINER_VOLUMES,
   MAX_SUB_CONTAINER_PORTS,
