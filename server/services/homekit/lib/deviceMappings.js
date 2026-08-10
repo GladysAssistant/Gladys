@@ -4,6 +4,7 @@ const {
   DEVICE_FEATURE_UNITS,
   COVER_STATE,
   LOCK,
+  BUTTON_STATUS,
 } = require('../../../utils/constants');
 
 const mappings = {
@@ -155,6 +156,21 @@ const mappings = {
       },
       [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
         characteristics: ['StatusLowBattery'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.BUTTON]: {
+    service: 'StatelessProgrammableSwitch',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.BUTTON.CLICK]: {
+        characteristics: ['ProgrammableSwitchEvent'],
+        // A button press is an event, not a state: the default debounce would make HomeKit react
+        // seconds after the press, or swallow it entirely.
+        notifDelay: 0,
+      },
+      [DEVICE_FEATURE_TYPES.BUTTON.PUSH]: {
+        characteristics: ['ProgrammableSwitchEvent'],
+        notifDelay: 0,
       },
     },
   },
@@ -342,6 +358,35 @@ const mergedServiceCategories = [
     merged: [],
   },
 ];
+// HomeKit knows three button events, Gladys has more than a hundred button statuses. Only those
+// with an exact HomeKit equivalent are forwarded: anything else — arrow keys, rotation, shake,
+// brightness gestures — would have to be reported as one of these three, and firing the wrong
+// event in someone's home automation is worse than firing none.
+//
+// Integrations name the same three gestures differently. Zigbee2MQTT and Z-Wave use the CLICK
+// family; Matter and the Zigbee2MQTT devices following its Switch cluster report a press and its
+// release separately. INITIAL_PRESS is deliberately absent: Matter emits it at the start of every
+// press, long ones included, so mapping it to SINGLE_PRESS would fire a single press each time
+// someone holds the button down. The release carries the gesture, so that is what is mapped.
+//
+// Careful when checking which statuses have a producer: an integration does not have to import
+// BUTTON_STATUS to emit one. Xiaomi keeps its own SWITCH_STATUS table in
+// services/xiaomi/lib/utils/deviceStatus.js and emits those numbers straight onto a button:click
+// feature, so LONG_CLICK_PRESS reaches this table as the value 3 without the constant ever being
+// referenced. Grep for the value, not only for the name.
+const buttonEventMapping = {
+  [BUTTON_STATUS.CLICK]: 0, // SINGLE_PRESS
+  [BUTTON_STATUS.SHORT_RELEASE]: 0, // SINGLE_PRESS — Matter and Zigbee2MQTT short_release
+  [BUTTON_STATUS.PRESSED]: 0, // SINGLE_PRESS — Zigbee2MQTT pressed
+  [BUTTON_STATUS.DOUBLE_CLICK]: 1, // DOUBLE_PRESS
+  [BUTTON_STATUS.DOUBLE_PRESS]: 1, // DOUBLE_PRESS — Zigbee2MQTT double_press
+  [BUTTON_STATUS.LONG_CLICK]: 2, // LONG_PRESS
+  [BUTTON_STATUS.LONG_PRESS]: 2, // LONG_PRESS — Matter and Zigbee2MQTT long_press
+  [BUTTON_STATUS.HOLD_CLICK]: 2, // LONG_PRESS — Zigbee2MQTT hold, Z-Wave hold
+  // Xiaomi wireless switches, through SWITCH_STATUS. Its LONG_CLICK_RELEASE is left out so a
+  // single hold does not fire twice.
+  [BUTTON_STATUS.LONG_CLICK_PRESS]: 2, // LONG_PRESS
+};
 
 // Percentage at or below which a device with no dedicated low-battery feature is reported as low.
 // HomeKit requires StatusLowBattery on every Battery service, so it has to be derived from the
@@ -358,4 +403,5 @@ module.exports = {
   toMicrogramPerCubicMeter,
   mergedServiceCategories,
   LOW_BATTERY_THRESHOLD,
+  buttonEventMapping,
 };
