@@ -15,6 +15,29 @@ if (!process.env.SQLITE_FILE_PATH) {
   process.env.SQLITE_FILE_PATH = './gladys-test.db';
 }
 
+// In --parallel mode every mocha worker is a separate process that boots its
+// own Gladys against its own database: derive a per-process path (the DuckDB
+// file and the reset snapshot are both derived from this path, so they follow
+// automatically). The files are removed when the process exits.
+const workerDb = process.env.SQLITE_FILE_PATH.replace(/\.db$/, `-${process.pid}.db`);
+process.env.SQLITE_FILE_PATH = workerDb;
+
+process.on('exit', () => {
+  // eslint-disable-next-line global-require
+  const { unlinkSync, readdirSync } = require('fs');
+  const dir = path.dirname(path.resolve(workerDb));
+  const base = path.basename(workerDb).replace(/\.db$/, '');
+  readdirSync(dir).forEach((file) => {
+    if (file.startsWith(base)) {
+      try {
+        unlinkSync(path.join(dir, file));
+      } catch (e) {
+        // Best-effort cleanup: never fail the run for a leftover file.
+      }
+    }
+  });
+});
+
 const resolvedDb = path.resolve(process.env.SQLITE_FILE_PATH);
 
 if (resolvedDb === DEV_DB) {
