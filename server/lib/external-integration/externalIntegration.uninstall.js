@@ -7,7 +7,8 @@ const logger = require('../../utils/logger');
 /**
  * @description Uninstall an external integration. Removes everything:
  * container, sub-containers and their private network, data folder,
- * devices, config variables, then the t_service row. There is no
+ * devices, config variables, the t_service row, and finally the Docker images
+ * that were pulled for it and are not shared with another integration. There is no
  * "keep the devices" option: t_device.service_id is a mandatory FK and
  * orphan devices don't exist in the model — the user gets everything back
  * through Discovery on reinstall.
@@ -66,6 +67,12 @@ async function uninstall(selector) {
   [...this.cameraImageRateLimits.keys()]
     .filter((externalId) => externalId.startsWith(externalIdPrefix))
     .forEach((externalId) => this.cameraImageRateLimits.delete(externalId));
+  // last, once the row is gone: the in-use check reads the DB, so running it
+  // before the destroy would find this very integration and spare its images
+  await this.removeImages([
+    service.docker_image,
+    ...this.getManifestContainers(service).map((entry) => entry.docker_image),
+  ]);
 }
 
 module.exports = {

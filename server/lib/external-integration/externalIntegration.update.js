@@ -105,6 +105,8 @@ async function pullFirstAvailable(supervisor, candidates) {
  * integration token: the previous JWT is instantly invalidated). For dev
  * installs without a store_slug, the image tag installed by the user is
  * re-pulled and the manifest is refreshed from the labels of the new image.
+ * Once the new containers run, the images the previous version left behind are
+ * removed — an integration updated a dozen times used to cost a dozen images.
  * Updates are an explicit admin gesture — no auto-update in v1.
  * @param {string} selector - The selector of the external integration.
  * @returns {Promise<object>} Resolve with the updated integration.
@@ -197,6 +199,13 @@ async function update(selector) {
       );
     }
   });
+  // captured before the row is rewritten: what the integration ran *until now*.
+  // Whatever the new manifest still declares is filtered back out by
+  // removeImages, so a sub-container image kept across the update survives.
+  const previousImages = [
+    service.docker_image,
+    ...this.getManifestContainers(service).map((entry) => entry.docker_image),
+  ];
   if (service.container_id) {
     try {
       await this.system.stopContainer(service.container_id);
@@ -215,7 +224,11 @@ async function update(selector) {
   await db.Service.update({ version: manifest.version, manifest, docker_image: image }, { where: { id: service.id } });
   service = await this.getBySelector(selector);
   await this.createIntegrationContainer(service);
-  return this.start(selector);
+  const started = await this.start(selector);
+  // only once the new containers actually run: dropping the previous image
+  // before that would take away the one thing a broken update can fall back on
+  await this.removeImages(previousImages);
+  return started;
 }
 
 module.exports = {

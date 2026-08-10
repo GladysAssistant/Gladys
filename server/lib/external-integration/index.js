@@ -86,6 +86,9 @@ const { startSubContainer } = require('./externalIntegration.startSubContainer')
 const { ensureSubContainers } = require('./externalIntegration.ensureSubContainers');
 const { stopSubContainers } = require('./externalIntegration.stopSubContainers');
 const { removeSubContainers } = require('./externalIntegration.removeSubContainers');
+const { getImagesInUse } = require('./externalIntegration.getImagesInUse');
+const { removeImages } = require('./externalIntegration.removeImages');
+const { cleanImages } = require('./externalIntegration.cleanImages');
 const { controlSubContainer } = require('./externalIntegration.controlSubContainer');
 const { getSubContainersState } = require('./externalIntegration.getSubContainersState');
 const { checkSubContainersHealth } = require('./externalIntegration.checkSubContainersHealth');
@@ -182,6 +185,9 @@ const ExternalIntegration = function ExternalIntegration(
     eventFunctionWrapper(this.handleGatewayWebhook.bind(this)),
   );
   this.event.on(EVENTS.GATEWAY.LINK_STATUS_CHANGED, eventFunctionWrapper(this.notifyWebhookAvailability.bind(this)));
+  // nightly sweep of the integration images no installed integration needs
+  // anymore (config/scheduler-jobs.js)
+  this.event.on(EVENTS.EXTERNAL_INTEGRATION.CLEAN_IMAGES, eventFunctionWrapper(this.cleanImages.bind(this)));
 };
 
 ExternalIntegration.prototype.init = init;
@@ -272,6 +278,9 @@ ExternalIntegration.prototype.startSubContainer = startSubContainer;
 ExternalIntegration.prototype.ensureSubContainers = ensureSubContainers;
 ExternalIntegration.prototype.stopSubContainers = stopSubContainers;
 ExternalIntegration.prototype.removeSubContainers = removeSubContainers;
+ExternalIntegration.prototype.getImagesInUse = getImagesInUse;
+ExternalIntegration.prototype.removeImages = removeImages;
+ExternalIntegration.prototype.cleanImages = cleanImages;
 ExternalIntegration.prototype.controlSubContainer = controlSubContainer;
 ExternalIntegration.prototype.getSubContainersState = getSubContainersState;
 ExternalIntegration.prototype.checkSubContainersHealth = checkSubContainersHealth;
