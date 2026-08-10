@@ -1179,6 +1179,12 @@ export const filterFeatureCatalogOptions = (options, search, dictionary) => {
   }
 
   const normalizedSearch = normalizeForSearch(search.trim());
+  // a search made of accents only folds down to nothing, and every string
+  // contains the empty string: without this it would list the whole catalog,
+  // as if the field were empty
+  if (!normalizedSearch.length) {
+    return [];
+  }
 
   return options
     .map(group => {
