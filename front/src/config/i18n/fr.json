@@ -4771,6 +4771,13 @@
           "one": "Mouvement détecté"
         }
       },
+      "presence-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Pas de présence",
+          "one": "Présence détectée"
+        }
+      },
       "smoke-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
@@ -4982,7 +4989,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Détecteur de présence",
-      "push": "Présence"
+      "push": "Présence",
+      "binary": "Détection présence Oui/Non"
     },
     "rain-sensor": {
       "shortCategoryName": "Détecteur de pluie",
