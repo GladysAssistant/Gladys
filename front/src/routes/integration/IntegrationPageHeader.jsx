@@ -25,10 +25,13 @@ const IntegrationPageHeader = ({
   totalSize,
   showInstallFromGithub
 }) => {
-  const searching = searchKeyword.length > 0;
+  const hasSearch = searchKeyword.length > 0;
+  // a search matching every integration of the view leaves the list untouched,
+  // so it is not a case for "X of Y" either
+  const searchNarrowsView = hasSearch && integrationsLength < totalSize;
   // an empty view (the catalog still loading, no favorite yet) already displays
   // a message in the page body, "0 integrations" on top of it says nothing more
-  const showCount = searching || totalSize > 0;
+  const showCount = hasSearch || totalSize > 0;
   const searchPlaceholder = get(intl.dictionary, 'integration.root.searchPlaceholder', {
     default: ''
   });
@@ -42,7 +45,11 @@ const IntegrationPageHeader = ({
           </h1>
           {showCount && (
             <div class="page-subtitle">
-              <IntegrationCount searching={searching} integrationsLength={integrationsLength} totalSize={totalSize} />
+              <IntegrationCount
+                searching={searchNarrowsView}
+                integrationsLength={integrationsLength}
+                totalSize={totalSize}
+              />
             </div>
           )}
           <div class="page-options d-flex align-items-center">
@@ -97,7 +104,11 @@ const IntegrationPageHeader = ({
         )}
         {showCount && (
           <div class={style.mobileResultCount}>
-            <IntegrationCount searching={searching} integrationsLength={integrationsLength} totalSize={totalSize} />
+            <IntegrationCount
+              searching={searchNarrowsView}
+              integrationsLength={integrationsLength}
+              totalSize={totalSize}
+            />
           </div>
         )}
       </div>
