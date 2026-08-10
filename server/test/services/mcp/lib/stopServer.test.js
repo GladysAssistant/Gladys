@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { stub, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub, fake } = sinon;
 const { stopServer } = require('../../../../services/mcp/lib/stopServer');
 
 describe('Stop server', () => {

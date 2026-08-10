@@ -75,7 +75,7 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": ["**/*.test.js"]
+        "devDependencies": ["**/*.test.js", "test/**/*.js"]
       }
     ],
     "max-len": [
@@ -139,6 +139,34 @@
       "files": ["services/**/*.js"],
       "rules": {
         "global-require": 0
+      }
+    },
+    {
+      "files": ["test/**/*.js"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "VariableDeclarator[init.callee.name='require'][init.arguments.0.value='sinon']",
+            "message": "Test files must use a per-file sinon sandbox: require('sinon').createSandbox(). The shared singleton accumulates every fake of the whole suite and makes sinon.reset() slower for everyone."
+          },
+          {
+            "selector": "ForInStatement",
+            "message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
+          },
+          {
+            "selector": "ForOfStatement",
+            "message": "iterators/generators require regenerator-runtime, which is too heavyweight for this guide to allow them. Separately, loops should be avoided in favor of array iterations."
+          },
+          {
+            "selector": "LabeledStatement",
+            "message": "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand."
+          },
+          {
+            "selector": "WithStatement",
+            "message": "`with` is disallowed in strict mode because it makes code impossible to predict and optimize."
+          }
+        ]
       }
     },
     {

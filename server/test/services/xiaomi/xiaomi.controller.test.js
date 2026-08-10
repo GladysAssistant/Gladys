@@ -1,4 +1,6 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const XiaomiController = require('../../../services/xiaomi/api/xiaomi.controller');
 
 const sensors = [

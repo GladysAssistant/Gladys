@@ -36,11 +36,33 @@ const cleanDb = async () => {
 // state is a complete consistent snapshot, so integrity holds by construction.
 let sqliteResetScript = null;
 let sqliteExec = null;
+let sqliteAll = null;
+let cleanMarkers = null;
+
+// Observability for dbReset.test.js: lets the tests assert that the skip
+// branches really skip (an unnecessary reset would produce the same data).
+const resetDbStats = { sqliteResets: 0, duckDeletes: 0 };
+
+// Most tests never write to the database, so even the fast snapshot copy is
+// wasted work for them. Before copying, we read two cheap freshness markers
+// and skip the reset when both are unchanged since the last one:
+// - total_changes() counts every row insert/update/delete made through this
+//   connection (Sequelize routes all queries through it), including changes
+//   later rolled back, so a dirty database can never look clean;
+// - PRAGMA data_version increments when the file is modified by any OTHER
+//   connection or process (e.g. gateway.restoreBackup shelling out to the
+//   sqlite3 CLI), covering writes the first marker cannot see.
+const readFreshnessMarkers = async () => {
+  // node-sqlite3 all() only runs the first statement of a script: two queries.
+  const totalChanges = await sqliteAll('SELECT total_changes() AS tc');
+  const dataVersion = await sqliteAll('PRAGMA data_version');
+  return JSON.stringify([totalChanges, dataVersion]);
+};
 
 const initSnapshotReset = async () => {
   const connection = await db.sequelize.connectionManager.getConnection({ type: 'write' });
   sqliteExec = promisify(connection.exec.bind(connection));
-  const sqliteAll = promisify(connection.all.bind(connection));
+  sqliteAll = promisify(connection.all.bind(connection));
 
   const snapshotPath = `${db.sequelize.options.storage.replace(/\.db$/, '')}-snapshot.db`;
   if (existsSync(snapshotPath)) {
@@ -82,21 +104,37 @@ const resetDb = async () => {
       throw e;
     }
     await initSnapshotReset();
+    cleanMarkers = await readFreshnessMarkers();
   } else {
-    try {
-      await sqliteExec(sqliteResetScript);
-    } catch (e) {
-      // A failed exec can leave an open transaction and foreign keys disabled.
-      await sqliteExec('ROLLBACK; PRAGMA foreign_keys = ON').catch(() => {});
-      throw e;
+    const markers = await readFreshnessMarkers();
+    if (markers !== cleanMarkers) {
+      resetDbStats.sqliteResets += 1;
+      try {
+        await sqliteExec(sqliteResetScript);
+      } catch (e) {
+        // A failed exec can leave an open transaction and foreign keys disabled.
+        await sqliteExec('ROLLBACK; PRAGMA foreign_keys = ON').catch(() => {});
+        throw e;
+      }
+      // The reset itself moved the markers: re-read them so the next call
+      // compares against the freshly restored state.
+      cleanMarkers = await readFreshnessMarkers();
     }
   }
-  // Clean DuckDB database (a separate database, not covered by the snapshot)
-  await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+  // Clean DuckDB database (a separate database, not covered by the snapshot).
+  // Same idea as above: the table is empty for the vast majority of tests, and
+  // counting is much cheaper than deleting. Both queries go through the
+  // serialized write queue, so they cannot race a pending write.
+  const rows = await db.duckDbWriteConnectionAllAsync('SELECT count(*) AS c FROM t_device_feature_state');
+  if (rows.length === 0 || Number(rows[0].c) !== 0) {
+    resetDbStats.duckDeletes += 1;
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+  }
 };
 
 module.exports = {
   seedDb,
   cleanDb,
   resetDb,
+  resetDbStats,
 };

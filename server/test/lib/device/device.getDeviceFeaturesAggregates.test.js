@@ -1,8 +1,9 @@
 const EventEmitter = require('events');
 const { expect, assert } = require('chai');
 const Promise = require('bluebird');
-const sinon = require('sinon');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');

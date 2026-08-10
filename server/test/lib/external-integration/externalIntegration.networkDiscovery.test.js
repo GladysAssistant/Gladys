@@ -1,7 +1,9 @@
 const dgram = require('dgram');
 const os = require('os');
 const { expect } = require('chai');
-const { fake, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, stub } = sinon;
 const multicastDns = require('multicast-dns');
 
 const { BadParameters, ForbiddenError, ConflictError, TooManyRequests } = require('../../../utils/coreErrors');

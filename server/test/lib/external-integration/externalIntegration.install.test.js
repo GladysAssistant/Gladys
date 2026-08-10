@@ -1,6 +1,7 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
-const { assert: sinonAssert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert, fake } = sinon;
 
 const db = require('../../../models');
 const { BadParameters, ConflictError, PlatformNotCompatible } = require('../../../utils/coreErrors');

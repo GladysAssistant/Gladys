@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const cloneDeep = require('lodash.clonedeep');
 const { expect } = require('chai');
 

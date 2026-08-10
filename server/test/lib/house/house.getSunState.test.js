@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezonePlugin = require('dayjs/plugin/timezone');

@@ -34,10 +34,13 @@ module.exports = {
       name: 'query',
       max: 5,
     },
-    backupsFolder: './gladys-backups',
+    // Both folders are overridable so each mocha parallel worker gets its own
+    // (see test/setup-env.js): the backup/restore and upgrade tests write real
+    // files there and would otherwise delete each other's across workers.
+    backupsFolder: process.env.BACKUP_FOLDER || './gladys-backups',
     gladysGatewayServerUrl: process.env.GLADYS_GATEWAY_SERVER_URL || 'https://api.gladysgateway.com',
     dockerImage: 'gladysassistant/gladys-4-playground',
-    tempFolder: '/tmp/gladys',
+    tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
   },
   production: {
     dialect: 'sqlite',
