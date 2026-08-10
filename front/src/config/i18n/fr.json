@@ -3083,6 +3083,7 @@
         "addCondition": "Ajouter une condition",
         "repeat": "Répéter...",
         "maxIterationsLabel": "Nombre maximum d'itérations (limite de sécurité)",
+        "maxIterationsDescription": "Lorsque cette limite est atteinte, seule la boucle s'arrête : les actions suivantes de la scène sont quand même exécutées.",
         "actionCount": {
           "zero": "Aucune action",
           "one": "1 action",

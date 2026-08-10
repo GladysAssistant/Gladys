@@ -3083,6 +3083,7 @@
         "addCondition": "Add condition",
         "repeat": "Repeat...",
         "maxIterationsLabel": "Maximum number of iterations (safety limit)",
+        "maxIterationsDescription": "When this limit is reached, only the loop stops: the following actions of the scene are still executed.",
         "actionCount": {
           "zero": "No action",
           "one": "1 action",

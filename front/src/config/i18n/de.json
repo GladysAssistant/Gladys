@@ -3083,6 +3083,7 @@
         "addCondition": "Bedingung hinzufügen",
         "repeat": "Wiederholen...",
         "maxIterationsLabel": "Maximale Anzahl an Iterationen (Sicherheitslimit)",
+        "maxIterationsDescription": "Wenn dieses Limit erreicht ist, wird nur die Schleife beendet: die folgenden Aktionen der Szene werden trotzdem ausgeführt.",
         "actionCount": {
           "zero": "Keine Aktionen",
           "one": "1 Aktion",

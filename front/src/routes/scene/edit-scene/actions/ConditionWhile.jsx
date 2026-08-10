@@ -103,6 +103,11 @@ class ConditionWhile extends Component {
             value={isNullOrUndefined(props.action.max_iterations) ? '' : props.action.max_iterations}
             onChange={this.updateMaxIterations}
           />
+          <small class="form-text text-muted">
+            <Text id="editScene.actionsCard.conditionWhile.maxIterationsDescription">
+              When this limit is reached, only the loop stops: the following actions of the scene are still executed.
+            </Text>
+          </small>
         </div>
 
         {/* Conditions Section */}
