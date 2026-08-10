@@ -1,0 +1,388 @@
+name: Scheduled Claude autofix
+run-name: Scheduled Claude autofix${{ inputs.dry_run == true && ' (dry run)' || '' }}
+
+# Once a day, find the open pull requests that carry review-bot feedback
+# (Cursor, CodeRabbit) nobody has handled yet, and run ONE Claude Code pass
+# per PR to address it. This replaces the event-driven Claude automation,
+# whose cost was unbounded: a PR left open for two weeks kept being
+# reprocessed even though nothing had changed.
+#
+# The anti-loop core (do not simplify):
+#   - a comment is only eligible if it was posted AFTER the last autofix
+#     commit on the branch (so feedback already covered by a pass never
+#     retriggers one), and
+#   - every pass replies to EVERY comment it considered, with a hidden
+#     "Autofix-Handled: rc-<id> / ic-<id>" marker; a marked comment is never
+#     selected again, even when the fix was declined.
+# Hard caps on top: MAX_PASSES autofix commits per PR (then the PR is
+# labeled and left to a human) and MAX_PRS PRs per day.
+#
+# Two jobs:
+#   select - pure bash + gh api, no LLM call. Computes the eligible PR list
+#            and exposes it as JSON.
+#   fix    - matrix over that list, one job per PR, max-parallel 2. Checks
+#            out the PR branch and invokes Claude Code exactly once.
+#
+# See .github/CLAUDE_AUTOFIX.md for the full picture, the role of every
+# constant below, and the procedure when a PR gets exhausted.
+#
+# Required repository secrets:
+#   ANTHROPIC_API_KEY  - Claude API key used by the fix job.
+#   AUTOFIX_PUSH_TOKEN - optional PAT (contents: write). When present, the
+#                        autofix pushes are made with it so the PR CI
+#                        (docker-pr-build) runs on autofix commits. Pushes
+#                        made with the default GITHUB_TOKEN never retrigger
+#                        workflows (GitHub's recursion guard).
+
+on:
+  schedule:
+    # Daily, before the (European) workday starts.
+    - cron: '30 4 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: >-
+          Run the selection and print the detailed list (passes done and
+          retained comments per PR) without invoking Claude and without
+          writing anything (no labels, no comments).
+        type: boolean
+        required: false
+        default: false
+
+# All the tuning knobs live here.
+env:
+  # Hard cap of autofix commits per PR, counted via the "Autofix-Pass: <n>"
+  # commit-message trailer. When a PR still has unhandled feedback after
+  # this many passes, it gets EXHAUSTED_LABEL and a human takes over.
+  MAX_PASSES: 3
+  # Budget circuit breaker: at most this many PRs processed per run. The
+  # eligible list is sorted by last activity (oldest first) before
+  # truncating, so long-waiting PRs are served first.
+  MAX_PRS: 8
+  # A comment younger than this many hours is not processed yet: it lets a
+  # review round finish (and a human veto it) before Claude reacts.
+  QUIET_PERIOD_HOURS: 2
+  # Logins of the review bots whose comments are actionable feedback.
+  # Space-separated, REST form; the "[bot]" suffix is stripped internally
+  # because GraphQL returns the bare app slug ("cursor", "coderabbitai").
+  REVIEW_BOT_LOGINS: 'cursor[bot] coderabbitai[bot]'
+  # Logins under which autofix replies may appear. The fix job posts its
+  # replies with the workflow GITHUB_TOKEN (github-actions[bot]);
+  # claude[bot] is kept for replies posted through the Claude GitHub App.
+  AUTOFIX_ACTOR_LOGINS: 'github-actions[bot] claude[bot]'
+  # Label that permanently stops the scheduled autofix on a PR (posed
+  # automatically at MAX_PASSES).
+  EXHAUSTED_LABEL: 'claude:autofix-exhausted'
+  # Label a human can pose to opt a PR out of the scheduled autofix.
+  SKIP_LABEL: 'claude:autofix-skip'
+  # Issue comments containing this marker are ignored: CodeRabbit tags all
+  # its non-actionable chatter (walkthroughs, status notes) with it, and
+  # its actionable feedback lives in review threads anyway.
+  NOISE_MARKER: 'This is an auto-generated comment'
+
+# Never two daily runs at the same time (a manual dispatch during the
+# scheduled run would double-process PRs).
+concurrency:
+  group: claude-scheduled-autofix
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  select:
+    name: Select eligible PRs
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      # Creating labels and commenting on exhausted PRs. A PR is an issue
+      # for the labels/comments endpoints, hence both scopes (same reason
+      # as in cursor-automation-webhook.yml).
+      pull-requests: write
+      issues: write
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+      has_prs: ${{ steps.select.outputs.has_prs }}
+    steps:
+      - name: Compute the eligible PR list
+        id: select
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run == true }}
+        run: |
+          set -uo pipefail
+
+          OWNER=${GH_REPO%/*}
+          REPO_NAME=${GH_REPO#*/}
+          # Eligibility window upper bound: now minus the quiet period.
+          CUTOFF=$(date -u -d "${QUIET_PERIOD_HOURS} hours ago" '+%Y-%m-%dT%H:%M:%SZ')
+
+          # Bot logins as JSON arrays without the "[bot]" suffix: REST says
+          # "cursor[bot]" where GraphQL says "cursor", so every comparison
+          # below strips the suffix first.
+          to_json_list() { printf '%s\n' $1 | sed 's/\[bot\]$//' | jq -R . | jq -sc .; }
+          REVIEW_JSON=$(to_json_list "$REVIEW_BOT_LOGINS")
+          AUTOFIX_JSON=$(to_json_list "$AUTOFIX_ACTOR_LOGINS")
+
+          # Review threads come from GraphQL: isResolved does not exist in
+          # the REST payloads.
+          THREADS_QUERY='query($owner:String!,$name:String!,$number:Int!,$cursor:String){
+            repository(owner:$owner,name:$name){pullRequest(number:$number){
+              reviewThreads(first:100,after:$cursor){
+                pageInfo{hasNextPage endCursor}
+                nodes{isResolved comments(first:100){nodes{databaseId createdAt body author{login}}}}}}}}'
+
+          fetch_threads() {
+            local num=$1 cursor='' all='[]' resp page
+            while :; do
+              if [ -n "$cursor" ]; then
+                resp=$(gh api graphql -f query="$THREADS_QUERY" -f owner="$OWNER" -f name="$REPO_NAME" -F number="$num" -f cursor="$cursor") || return 1
+              else
+                resp=$(gh api graphql -f query="$THREADS_QUERY" -f owner="$OWNER" -f name="$REPO_NAME" -F number="$num") || return 1
+              fi
+              page=$(echo "$resp" | jq '.data.repository.pullRequest.reviewThreads') || return 1
+              all=$(jq -n --argjson a "$all" --argjson p "$page" \
+                '$a + [$p.nodes[] | {isResolved, comments: [.comments.nodes[]
+                   | {id: .databaseId, created: .createdAt, body, login: (.author.login // "")}]}]') || return 1
+              [ "$(echo "$page" | jq -r '.pageInfo.hasNextPage')" = "true" ] || break
+              cursor=$(echo "$page" | jq -r '.pageInfo.endCursor')
+            done
+            echo "$all"
+          }
+
+          skip() { echo "PR #${NUM}: skipped — $1"; }
+
+          MATRIX='[]'
+          EXHAUSTED='[]'
+
+          PR_NUMBERS=$(gh api --paginate "repos/$GH_REPO/pulls?state=open&per_page=100" \
+            | jq -rs 'add // [] | .[].number' | sort -n) \
+            || { echo "::error::Could not list the open pull requests"; exit 1; }
+
+          for NUM in $PR_NUMBERS; do
+            # The list payload has no mergeable_state: fetch each PR.
+            PR=$(gh api "repos/$GH_REPO/pulls/$NUM") \
+              || { echo "::warning::PR #$NUM: could not fetch, skipping"; continue; }
+
+            # 1. Open (guaranteed by the listing), not draft, no conflict.
+            [ "$(echo "$PR" | jq -r '.draft')" = "false" ] || { skip 'draft'; continue; }
+            # Fork PRs are out: the fix job checks out and pushes to the
+            # head branch, which only works (and is only safe to run with
+            # secrets) for branches of this repository.
+            [ "$(echo "$PR" | jq -r '.head.repo.full_name // ""')" = "$GH_REPO" ] \
+              || { skip 'fork PR'; continue; }
+            # "dirty" is the only state that positively means a conflict;
+            # "unknown" just means GitHub has not computed it yet.
+            [ "$(echo "$PR" | jq -r '.mergeable_state // "unknown"')" != "dirty" ] \
+              || { skip 'merge conflict'; continue; }
+
+            # 3. Opt-out labels.
+            LABELS=$(echo "$PR" | jq -r '[.labels[].name] | join("\n")')
+            echo "$LABELS" | grep -qxF "$EXHAUSTED_LABEL" && { skip "label $EXHAUSTED_LABEL"; continue; }
+            echo "$LABELS" | grep -qxF "$SKIP_LABEL" && { skip "label $SKIP_LABEL"; continue; }
+
+            # 2. Autofix passes already burnt, counted via the commit
+            # trailer (the author of automated commits is ambiguous, the
+            # trailer is not). The last autofix commit date is the lower
+            # bound of the comment eligibility window; before any pass, the
+            # PR creation date plays that role.
+            COMMITS=$(gh api --paginate "repos/$GH_REPO/pulls/$NUM/commits?per_page=100" | jq -s 'add // []') \
+              || { echo "::warning::PR #$NUM: could not fetch commits, skipping"; continue; }
+            AUTOFIX_COMMITS=$(echo "$COMMITS" | jq '[.[] | select(.commit.message | test("(^|\\n)Autofix-Pass: *[0-9]+"))]')
+            PASSES=$(echo "$AUTOFIX_COMMITS" | jq 'length')
+            REF_DATE=$(echo "$AUTOFIX_COMMITS" | jq -r '[.[].commit.committer.date] | max // empty')
+            [ -n "$REF_DATE" ] || REF_DATE=$(echo "$PR" | jq -r '.created_at')
+
+            ISSUE_COMMENTS=$(gh api --paginate "repos/$GH_REPO/issues/$NUM/comments?per_page=100" | jq -s 'add // []') \
+              || { echo "::warning::PR #$NUM: could not fetch issue comments, skipping"; continue; }
+            THREADS=$(fetch_threads "$NUM") \
+              || { echo "::warning::PR #$NUM: could not fetch review threads, skipping"; continue; }
+
+            # 5c. A comment is "handled" once an autofix reply carries its
+            # "Autofix-Handled: rc-<id>" (review comment) or "ic-<id>"
+            # (issue comment) marker. Collect every marker posted by the
+            # autofix actors anywhere on the PR, one per line.
+            HANDLED=$( { echo "$ISSUE_COMMENTS" | jq -r --argjson af "$AUTOFIX_JSON" \
+                           '.[] | select(((.user.login // "") | sub("\\[bot\\]$";"")) as $l | ($af | index($l)) != null) | .body';
+                         echo "$THREADS" | jq -r --argjson af "$AUTOFIX_JSON" \
+                           '.[].comments[] | select((.login | sub("\\[bot\\]$";"")) as $l | ($af | index($l)) != null) | .body'; } \
+                       | { grep -oE 'Autofix-Handled: *[ri]c-[0-9]+' || true; } | sed -E 's/Autofix-Handled: *//' | sort -u)
+
+            # 5. Eligible review comments: root of an unresolved thread
+            # (5b), opened by a review bot (5a), with no in-thread autofix
+            # reply and no handled marker (5c), inside the [last autofix
+            # commit, now - quiet period] window (5d).
+            RC=$(echo "$THREADS" | jq --argjson bots "$REVIEW_JSON" --argjson af "$AUTOFIX_JSON" \
+                   --arg ref "$REF_DATE" --arg cutoff "$CUTOFF" --arg handled "$HANDLED" '
+              [ .[]
+                | select(.isResolved | not)
+                | . as $t
+                | ($t.comments[0] // empty)
+                | select((.login | sub("\\[bot\\]$";"")) as $l | ($bots | index($l)) != null)
+                | select(([$t.comments[1:][] | (.login | sub("\\[bot\\]$";""))]
+                          | any(. as $l | ($af | index($l)) != null)) | not)
+                | ("rc-" + (.id | tostring)) as $tok
+                | select(($handled | split("\n") | index($tok)) == null)
+                | select(.created > $ref and .created < $cutoff)
+                | {id, created, author: .login, excerpt: (.body | gsub("[\\r\\n]+"; " ") | .[0:110])}
+              ]')
+
+            # Same for issue comments (no resolution concept there), minus
+            # the auto-generated CodeRabbit chatter.
+            IC=$(echo "$ISSUE_COMMENTS" | jq --argjson bots "$REVIEW_JSON" \
+                   --arg ref "$REF_DATE" --arg cutoff "$CUTOFF" --arg handled "$HANDLED" --arg noise "$NOISE_MARKER" '
+              [ .[]
+                | select(((.user.login // "") | sub("\\[bot\\]$";"")) as $l | ($bots | index($l)) != null)
+                | select((.body | contains($noise)) | not)
+                | ("ic-" + (.id | tostring)) as $tok
+                | select(($handled | split("\n") | index($tok)) == null)
+                | select(.created_at > $ref and .created_at < $cutoff)
+                | {id, created: .created_at, author: .user.login, excerpt: (.body | gsub("[\\r\\n]+"; " ") | .[0:110])}
+              ]')
+
+            PENDING=$(jq -n --argjson rc "$RC" --argjson ic "$IC" '($rc | length) + ($ic | length)')
+            [ "$PENDING" -gt 0 ] || { skip 'no unhandled review-bot feedback'; continue; }
+
+            if [ "$PASSES" -ge "$MAX_PASSES" ]; then
+              echo "PR #$NUM: $PENDING unhandled comment(s) but already $PASSES/$MAX_PASSES autofix passes -> exhausted"
+              EXHAUSTED=$(echo "$EXHAUSTED" | jq --argjson n "$NUM" '. + [$n]')
+              continue
+            fi
+
+            echo "PR #$NUM: ELIGIBLE — passes done: $PASSES, next pass: $((PASSES + 1)), unhandled comments: $PENDING, window: ($REF_DATE .. $CUTOFF)"
+            jq -rn --argjson rc "$RC" --argjson ic "$IC" '
+              ($rc[] | "    - review comment rc-\(.id) by \(.author) at \(.created): \(.excerpt)"),
+              ($ic[] | "    - issue comment ic-\(.id) by \(.author) at \(.created): \(.excerpt)")'
+
+            ENTRY=$(jq -n --argjson n "$NUM" --argjson p "$PASSES" \
+              --arg b "$(echo "$PR" | jq -r '.head.ref')" --arg u "$(echo "$PR" | jq -r '.updated_at')" \
+              --argjson rc "$RC" --argjson ic "$IC" '
+              {number: $n, branch: $b, pass: ($p + 1),
+               rc_ids: ($rc | map(.id | tostring) | join(" ")),
+               ic_ids: ($ic | map(.id | tostring) | join(" ")),
+               updated_at: $u}')
+            MATRIX=$(echo "$MATRIX" | jq --argjson e "$ENTRY" '. + [$e]')
+          done
+
+          # Budget circuit breaker: least recently active PRs first, hard
+          # cap at MAX_PRS.
+          MATRIX=$(echo "$MATRIX" | jq 'sort_by(.updated_at)')
+          TOTAL=$(echo "$MATRIX" | jq 'length')
+          if [ "$TOTAL" -gt "$MAX_PRS" ]; then
+            DROPPED=$(echo "$MATRIX" | jq -r --argjson m "$MAX_PRS" '[.[$m:][].number | "#\(.)"] | join(" ")')
+            echo "Budget cap: $TOTAL eligible PRs, keeping the $MAX_PRS least recently active, postponing: $DROPPED"
+          fi
+          MATRIX=$(echo "$MATRIX" | jq -c --argjson m "$MAX_PRS" '.[:$m] | map(del(.updated_at))')
+
+          if [ "$DRY_RUN" = 'true' ]; then
+            echo "Dry run: Claude will not be invoked, no label or comment will be written."
+            [ "$(echo "$EXHAUSTED" | jq 'length')" -eq 0 ] \
+              || echo "Dry run: would label as exhausted: $(echo "$EXHAUSTED" | jq -cr '[.[] | "#\(.)"] | join(" ")')"
+          else
+            # Both labels are created idempotently (POST fails silently
+            # when the label already exists).
+            gh api -X POST "repos/$GH_REPO/labels" -f name="$EXHAUSTED_LABEL" -f color='B60205' \
+              -f description='Scheduled Claude autofix reached its pass limit; a human must take over' > /dev/null 2>&1 || true
+            gh api -X POST "repos/$GH_REPO/labels" -f name="$SKIP_LABEL" -f color='ededed' \
+              -f description='Exclude this PR from the scheduled Claude autofix' > /dev/null 2>&1 || true
+
+            for NUM in $(echo "$EXHAUSTED" | jq -r '.[]'); do
+              BODY=$(printf '🛑 **Scheduled autofix stopped for this pull request.**\n\nIt already received %s automated fix passes and still has unhandled review-bot feedback, so the daily autofix will not process it anymore (label `%s`).\n\nPlease review the remaining bot comments manually. See `.github/CLAUDE_AUTOFIX.md` for details.' \
+                "$MAX_PASSES" "$EXHAUSTED_LABEL")
+              gh api --silent -X POST "repos/$GH_REPO/issues/$NUM/labels" -f "labels[]=$EXHAUSTED_LABEL" \
+                || echo "::warning::PR #$NUM: could not add the $EXHAUSTED_LABEL label"
+              gh api --silent -X POST "repos/$GH_REPO/issues/$NUM/comments" -f body="$BODY" \
+                || echo "::warning::PR #$NUM: could not post the exhausted comment"
+            done
+          fi
+
+          {
+            echo "matrix=$MATRIX"
+            if [ "$(echo "$MATRIX" | jq 'length')" -gt 0 ]; then
+              echo 'has_prs=true'
+            else
+              echo 'has_prs=false'
+            fi
+          } >> "$GITHUB_OUTPUT"
+
+  fix:
+    name: 'Fix PR #${{ matrix.pr.number }} (pass ${{ matrix.pr.pass }})'
+    needs: select
+    # An empty list must not start any fix job, and a dry run never invokes
+    # Claude (inputs.dry_run is null on schedule, which is != true).
+    if: needs.select.outputs.has_prs == 'true' && inputs.dry_run != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      # Cost / runner cap: at most two Claude sessions at the same time.
+      max-parallel: 2
+      matrix:
+        pr: ${{ fromJSON(needs.select.outputs.matrix) }}
+    # One autofix at a time per PR, whatever run it belongs to.
+    concurrency:
+      group: claude-autofix-pr-${{ matrix.pr.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      # OIDC + CI results access for the Claude Code action.
+      id-token: write
+      actions: read
+    steps:
+      - name: ⬇️ Checkout the PR branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ matrix.pr.branch }}
+          # Full history: Claude needs the merge-base with master to
+          # understand what the PR changes.
+          fetch-depth: 0
+          # With a PAT, the autofix pushes retrigger the PR CI; with the
+          # default token GitHub suppresses downstream workflows.
+          token: ${{ secrets.AUTOFIX_PUSH_TOKEN || github.token }}
+
+      - name: 🤖 Address the review feedback with Claude Code
+        uses: anthropics/claude-code-action@v1
+        env:
+          # gh in Claude's shell authenticates with the workflow token, so
+          # the replies are posted by github-actions[bot] — one of the
+          # AUTOFIX_ACTOR_LOGINS the select job looks for.
+          GH_TOKEN: ${{ github.token }}
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --allowedTools "Bash,Read,Edit,Write,Glob,Grep"
+          prompt: |
+            You are running the scheduled autofix pass ${{ matrix.pr.pass }} of ${{ env.MAX_PASSES }} on pull request #${{ matrix.pr.number }} of ${{ github.repository }}. The PR branch `${{ matrix.pr.branch }}` is checked out in the current directory.
+
+            Process ONLY the following review-bot comments. This list is exhaustive and exclusive; it was computed by the selection job and nothing outside it is in scope.
+
+            - Pull request review comment IDs: ${{ matrix.pr.rc_ids }}
+              (fetch each one with: gh api repos/${{ github.repository }}/pulls/comments/<ID>)
+            - Issue comment IDs: ${{ matrix.pr.ic_ids }}
+              (fetch each one with: gh api repos/${{ github.repository }}/issues/comments/<ID>)
+
+            An empty list means there are no comments of that kind.
+
+            Steps:
+
+            1. Fetch every comment listed above and read the current code it refers to. Comments may be outdated: always verify the finding against the code as it is now.
+            2. For each comment, decide: apply a fix, or decline it with a reason (already fixed, incorrect, out of the PR's scope, deliberate style choice...).
+            3. STRICT SCOPE: only change what these comments require. No opportunistic refactoring, no drive-by cleanups, no edits to code the comments do not concern.
+            4. If you changed code, run the narrowest relevant checks you reasonably can (for example `npm run prettier-check` and `npm run eslint` in `front/` or `server/` for the side you touched; skip the heavy test suites). Then make a single commit whose message follows the repository style and ENDS with exactly this trailer line:
+
+               Autofix-Pass: ${{ matrix.pr.pass }}
+
+               and push it with: git push origin HEAD:${{ matrix.pr.branch }}
+            5. If no code change is needed, do NOT commit or push anything.
+            6. CRITICAL — whether or not you changed code, reply to EVERY comment listed above, without exception, including the ones you declined (state the reason). These replies are what marks the feedback as processed: a comment left without a reply will be selected again by tomorrow's run and will burn another of the ${{ env.MAX_PASSES }} passes this PR gets, so a missing reply defeats the whole system. Never skip a reply.
+               - Review comment: gh api -X POST repos/${{ github.repository }}/pulls/${{ matrix.pr.number }}/comments/<ID>/replies -f body='...'
+               - Issue comments: post ONE regular PR comment covering each listed issue-comment ID: gh api -X POST repos/${{ github.repository }}/issues/${{ matrix.pr.number }}/comments -f body='...'
+               Every reply body MUST contain, for each comment it covers, a marker line in exactly this format:
+               <!-- Autofix-Handled: rc-<ID> -->   for a review comment
+               <!-- Autofix-Handled: ic-<ID> -->   for an issue comment
+               The selection job greps for these markers; without one, the comment is reprocessed forever.
+            7. Keep the replies short and factual: what you changed, or why you declined.
