@@ -72,6 +72,7 @@ Docker.prototype.getContainer = fake.returns({
   restart: fake.resolves(true),
   remove: fake.resolves(true),
   stop: fake.resolves(true),
+  update: fake.resolves(true),
   exec: ({ Cmd }) => {
     const mockedStream = new stream.Readable();
     return fake.resolves({
