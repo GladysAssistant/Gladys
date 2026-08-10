@@ -108,7 +108,7 @@
     "queue": "^6.0.2",
     "rate-limiter-flexible": "^3.0.2",
     "semver": "^7.3.8",
-    "sequelize": "^6.26.0",
+    "sequelize": "^6.29.0",
     "sequelize-cli": "^6.5.2",
     "set-value": "^4.1.0",
     "sharp": "^0.33.2",
