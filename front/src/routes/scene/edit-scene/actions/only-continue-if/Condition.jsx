@@ -243,7 +243,7 @@ class Condition extends Component {
                 <Localizer>
                   <TextWithVariablesInjected
                     text={
-                      props.condition.value !== undefined
+                      props.condition.value !== undefined && props.condition.value !== null
                         ? props.condition.value.toString()
                         : props.condition.evaluate_value
                     }
