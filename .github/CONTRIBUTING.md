@@ -63,6 +63,20 @@ If your PR implements a forum request, add a line `Forum: https://community.glad
 
 ---
 
+## 🤖 Automated review
+
+An automated review runs on your PR as soon as you open it (or, for a draft, as soon as you mark it **ready for review**). Dependency bump PRs are skipped.
+
+To ask for a new review after pushing changes, comment on the PR:
+
+```
+/cursor review
+```
+
+The command must be alone on its line. It works for the PR author and for anyone with write access on the repository. The bot reacts with 👀 when the request is accepted and 🚀 once the review has been started. Maintainers can also add the `needs:cursor-review` label, which triggers the same thing.
+
+---
+
 ## 📜 Licensing
 
 All contributions to Gladys are submitted under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).  
