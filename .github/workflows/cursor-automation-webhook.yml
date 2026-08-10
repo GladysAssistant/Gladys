@@ -1,8 +1,10 @@
 name: Trigger Cursor automation
 
 # Starts a Cursor Automation webhook for a given PR, either:
-# - manually via workflow_dispatch, or
-# - when the label "needs:cursor-review" is added to a PR
+# - automatically when a PR is opened (or marked "ready for review"),
+# - when anyone allowed to do so comments "/cursor review" on the PR,
+# - when the label "needs:cursor-review" is added to a PR, or
+# - manually via workflow_dispatch.
 #
 # Useful for fork PRs, which native Cursor PR triggers cannot run on.
 #
@@ -12,13 +14,19 @@ name: Trigger Cursor automation
 #   CURSOR_AUTOMATION_WEBHOOK_TOKEN - API key from "Generate auth header"
 #                                     (crsr_... value only, without "Bearer ")
 #
-# SECURITY: use pull_request_target so secrets work for fork PRs. This workflow
-# must NEVER check out or execute code from the PR head. It only reads PR
-# metadata through the GitHub API, then POSTs to Cursor.
+# SECURITY: use pull_request_target / issue_comment so secrets work for fork
+# PRs. This workflow must NEVER check out or execute code from the PR head. It
+# only reads PR metadata through the GitHub API, then POSTs to Cursor. The
+# comment body is untrusted input: it only ever transits through shell
+# variables, never interpolated into code.
 on:
   # Secrets are available for fork PRs with pull_request_target.
   pull_request_target:
-    types: [labeled]
+    types: [opened, ready_for_review, labeled]
+  # Comment command. issue_comment always runs from the base branch with
+  # secrets available, including for comments on fork PRs.
+  issue_comment:
+    types: [created]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -29,15 +37,192 @@ on:
 permissions:
   contents: read
   pull-requests: read
+  # Needed to react to the triggering comment (PR comments are issue comments).
+  issues: write
 
 jobs:
   trigger:
+    # Coarse filter so a runner is not started for every single comment. The
+    # exact command match and the permission check happen in "Resolve trigger".
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      github.event.label.name == 'needs:cursor-review'
+      (github.event_name == 'pull_request_target' &&
+        (github.event.action != 'labeled' ||
+         github.event.label.name == 'needs:cursor-review')) ||
+      (github.event_name == 'issue_comment' &&
+        github.event.issue.pull_request != null &&
+        contains(github.event.comment.body, '/cursor'))
     runs-on: ubuntu-latest
     steps:
+      - name: Resolve trigger
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_ACTION: ${{ github.event.action }}
+          INPUT_PR: ${{ inputs.pr_number }}
+          EVENT_PR: ${{ github.event.pull_request.number }}
+          EVENT_PR_DRAFT: ${{ github.event.pull_request.draft }}
+          EVENT_PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          EVENT_PR_ASSOCIATION: ${{ github.event.pull_request.author_association }}
+          EVENT_PR_STATE: ${{ github.event.pull_request.state }}
+          EVENT_PR_CREATED_AT: ${{ github.event.pull_request.created_at }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_STATE: ${{ github.event.issue.state }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          COMMENT_ASSOCIATION: ${{ github.event.comment.author_association }}
+        run: |
+          set -uo pipefail
+
+          RUN=false
+          REASON=''
+          PR_NUMBER=''
+
+          react() {
+            gh api --silent -X POST \
+              "repos/${GH_REPO}/issues/comments/${COMMENT_ID}/reactions" \
+              -f "content=$1" || echo "::warning::Could not react to comment ${COMMENT_ID}"
+          }
+
+          case "$EVENT_NAME" in
+            workflow_dispatch)
+              PR_NUMBER="$INPUT_PR"
+              REASON='manual'
+              RUN=true
+              ;;
+
+            pull_request_target)
+              PR_NUMBER="$EVENT_PR"
+
+              # Is this author entitled to a free automatic review? Dependency
+              # bumps are not worth one, and since anyone can open a PR on a
+              # public repository while every automatic review costs a Cursor
+              # run, only authors who already landed a commit here get one
+              # without asking. Exact logins only, a user named e.g.
+              # "dependabot-fan" is not a bot. CONTRIBUTOR means "has already
+              # committed to this repo", FIRST_TIME_CONTRIBUTOR and NONE mean
+              # they have not.
+              AUTO_ALLOWED=true
+              AUTO_SKIPPED_BECAUSE=''
+              case "$EVENT_PR_AUTHOR" in
+                'dependabot[bot]' | 'renovate[bot]')
+                  AUTO_ALLOWED=false
+                  AUTO_SKIPPED_BECAUSE="it was opened by ${EVENT_PR_AUTHOR}"
+                  ;;
+                *)
+                  case "$EVENT_PR_ASSOCIATION" in
+                    OWNER | MEMBER | COLLABORATOR | CONTRIBUTOR) ;;
+                    *)
+                      AUTO_ALLOWED=false
+                      AUTO_SKIPPED_BECAUSE="${EVENT_PR_AUTHOR} (${EVENT_PR_ASSOCIATION}) has no merged contribution yet"
+                      ;;
+                  esac
+                  ;;
+              esac
+
+              case "$EVENT_ACTION" in
+                labeled)
+                  # A PR can be opened with the label already set (maintainers,
+                  # `gh pr create --label`): GitHub then emits "opened" and
+                  # "labeled" back to back, which would review the PR twice.
+                  # Only suppress the label when that "opened" event really did
+                  # start a review, otherwise the label would stop working as
+                  # the escape hatch for the authors it is meant for. An
+                  # unparsable date yields a huge age, which errs towards
+                  # triggering the review.
+                  PR_AGE=$(($(date -u +%s) - $(date -u -d "$EVENT_PR_CREATED_AT" +%s 2> /dev/null || echo 0)))
+                  if [ "$EVENT_PR_STATE" != 'open' ]; then
+                    echo "PR #${PR_NUMBER} is ${EVENT_PR_STATE}: skipping the review."
+                  elif [ "$AUTO_ALLOWED" = true ] && [ "$EVENT_PR_DRAFT" != 'true' ] && [ "$PR_AGE" -lt 120 ]; then
+                    echo "PR #${PR_NUMBER} was opened ${PR_AGE}s ago with the label already set: the 'opened' event already triggered a review."
+                  else
+                    REASON='label'
+                    RUN=true
+                  fi
+                  ;;
+                ready_for_review)
+                  REASON='pr_ready_for_review'
+                  RUN=true
+                  ;;
+                opened)
+                  if [ "$EVENT_PR_DRAFT" = 'true' ]; then
+                    echo "PR #${PR_NUMBER} opened as a draft: the review will run when it is marked ready for review."
+                  else
+                    REASON='pr_opened'
+                    RUN=true
+                  fi
+                  ;;
+              esac
+
+              # Applies to the automatic triggers only: the label and
+              # workflow_dispatch stay the escape hatch a maintainer can
+              # always use.
+              if [ "$RUN" = true ] && [ "$REASON" != 'label' ] && [ "$AUTO_ALLOWED" != true ]; then
+                echo "PR #${PR_NUMBER}: no automatic review because ${AUTO_SKIPPED_BECAUSE}. Add the needs:cursor-review label to start one."
+                RUN=false
+              fi
+              ;;
+
+            issue_comment)
+              PR_NUMBER="$ISSUE_NUMBER"
+
+              # Anyone who can already influence the PR content may ask for a
+              # review: its author, and anyone with a write-ish relationship
+              # to the repository.
+              ALLOWED=false
+              if [ "$COMMENT_AUTHOR" = "$ISSUE_AUTHOR" ]; then
+                ALLOWED=true
+              else
+                case "$COMMENT_ASSOCIATION" in
+                  OWNER | MEMBER | COLLABORATOR) ALLOWED=true ;;
+                esac
+              fi
+
+              # The command must start its own line, so quoting someone else
+              # ("> /cursor review") never triggers a new review. Trailing
+              # text on the same line is allowed and ignored. GitHub stores
+              # comment bodies with CRLF line endings: strip the CR so that
+              # "review" can be anchored to the end of the line.
+              if ! printf '%s\n' "$COMMENT_BODY" | tr -d '\r' \
+                | grep -qiE '^[[:blank:]]*/cursor([[:blank:]]+|-)review([[:blank:]]|$)'; then
+                echo "Comment does not contain the /cursor review command, skipping."
+              elif [ "$ISSUE_STATE" != 'open' ]; then
+                echo "::warning::PR #${PR_NUMBER} is ${ISSUE_STATE}: not starting a Cursor review."
+                react 'confused'
+              elif [ "$ALLOWED" != true ]; then
+                echo "::warning::${COMMENT_AUTHOR} (${COMMENT_ASSOCIATION}) is not allowed to request a Cursor review on PR #${PR_NUMBER}."
+                react '-1'
+              else
+                echo "Cursor review requested by ${COMMENT_AUTHOR} on PR #${PR_NUMBER}."
+                react 'eyes'
+                REASON='comment'
+                RUN=true
+              fi
+              ;;
+          esac
+
+          if [ "$RUN" = true ]; then
+            PR_NUMBER=$(echo "$PR_NUMBER" | tr -d '[:space:]')
+            case "$PR_NUMBER" in
+              '' | *[!0-9]*)
+                echo "::error::Invalid PR number '$PR_NUMBER'"
+                exit 1
+                ;;
+            esac
+          fi
+
+          {
+            echo "run=${RUN}"
+            echo "reason=${REASON}"
+            echo "number=${PR_NUMBER}"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Validate secrets
+        if: steps.gate.outputs.run == 'true'
         env:
           WEBHOOK_URL: ${{ secrets.CURSOR_AUTOMATION_WEBHOOK_URL }}
           WEBHOOK_TOKEN: ${{ secrets.CURSOR_AUTOMATION_WEBHOOK_TOKEN }}
@@ -51,35 +236,17 @@ jobs:
             exit 1
           fi
 
-      - name: Resolve PR number
-        id: pr
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          INPUT_PR: ${{ inputs.pr_number }}
-          LABELED_PR: ${{ github.event.pull_request.number }}
-        run: |
-          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
-            PR_NUMBER="$INPUT_PR"
-          else
-            PR_NUMBER="$LABELED_PR"
-          fi
-
-          PR_NUMBER=$(echo "$PR_NUMBER" | tr -d '[:space:]')
-          case "$PR_NUMBER" in
-            ''|*[!0-9]*)
-              echo "::error::Invalid PR number '$PR_NUMBER'"
-              exit 1
-              ;;
-          esac
-
-          echo "number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
-
       - name: Fetch PR metadata and call Cursor webhook
+        if: steps.gate.outputs.run == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          PR_NUMBER: ${{ steps.gate.outputs.number }}
           TRIGGER_SOURCE: ${{ github.event_name }}
+          TRIGGER_REASON: ${{ steps.gate.outputs.reason }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          COMMENT_URL: ${{ github.event.comment.html_url }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
           WEBHOOK_URL: ${{ secrets.CURSOR_AUTOMATION_WEBHOOK_URL }}
           WEBHOOK_TOKEN: ${{ secrets.CURSOR_AUTOMATION_WEBHOOK_TOKEN }}
         run: |
@@ -88,10 +255,20 @@ jobs:
           # REST payload is stable for fork and same-repo PRs.
           PR_JSON=$(gh api "repos/${GH_REPO}/pulls/${PR_NUMBER}")
 
+          if [ "$TRIGGER_REASON" = 'label' ]; then
+            TRIGGER_LABEL='needs:cursor-review'
+          else
+            TRIGGER_LABEL=''
+          fi
+
           PAYLOAD=$(jq -n \
             --argjson pr "$PR_JSON" \
             --arg repo "$GH_REPO" \
             --arg trigger_source "$TRIGGER_SOURCE" \
+            --arg trigger_reason "$TRIGGER_REASON" \
+            --arg label "$TRIGGER_LABEL" \
+            --arg requested_by "$COMMENT_AUTHOR" \
+            --arg comment_url "$COMMENT_URL" \
             '{
               pr_number: $pr.number,
               pr_url: $pr.html_url,
@@ -106,11 +283,14 @@ jobs:
               author: $pr.user.login,
               head_repository: ($pr.head.repo.full_name // $repo),
               trigger_source: $trigger_source,
-              label: "needs:cursor-review"
+              trigger_reason: $trigger_reason,
+              requested_by: $requested_by,
+              comment_url: $comment_url,
+              label: $label
             }')
 
-          echo "Triggering Cursor automation for PR #${PR_NUMBER} (source=${TRIGGER_SOURCE})"
-          echo "$PAYLOAD" | jq '{pr_number, pr_url, repo, title, head_ref, head_sha, is_fork, author, head_repository, trigger_source, label}'
+          echo "Triggering Cursor automation for PR #${PR_NUMBER} (source=${TRIGGER_SOURCE}, reason=${TRIGGER_REASON})"
+          echo "$PAYLOAD" | jq '{pr_number, pr_url, repo, title, head_ref, head_sha, is_fork, author, head_repository, trigger_source, trigger_reason, requested_by, label}'
 
           # Response body is only printed on failure: Actions logs are public
           # on this repo, and Cursor error payloads may include internal ids.
@@ -125,6 +305,11 @@ jobs:
           case "$HTTP_CODE" in
             2*)
               echo "Cursor automation triggered successfully."
+              if [ -n "${COMMENT_ID}" ]; then
+                gh api --silent -X POST \
+                  "repos/${GH_REPO}/issues/comments/${COMMENT_ID}/reactions" \
+                  -f 'content=rocket' || echo "::warning::Could not react to comment ${COMMENT_ID}"
+              fi
               ;;
             *)
               echo "::error::Cursor webhook failed with HTTP ${HTTP_CODE}"
