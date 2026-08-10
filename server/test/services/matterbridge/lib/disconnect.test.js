@@ -1,10 +1,12 @@
 const { expect } = require('chai');
+const path = require('path');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { DEFAULT } = require('../../../../services/matterbridge/lib/constants');
 
 const fsMock = {
   rm: fake.resolves(true),
@@ -20,6 +22,7 @@ const MatterbridgeManager = proxyquire('../../../../services/matterbridge/lib', 
 
 const container = {
   id: 'docker-test',
+  name: '/gladys-matterbridge',
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -49,6 +52,8 @@ describe('Matterbridge disconnect', () => {
     matterbridgeManager = new MatterbridgeManager(gladys, serviceId);
     matterbridgeManager.matterbridgeRunning = true;
     matterbridgeManager.matterbridgeExist = true;
+    // Container name resolved and persisted at init
+    matterbridgeManager.getConfiguration = fake.resolves({ matterbridgeContainerName: 'gladys-matterbridge' });
   });
 
   afterEach(() => {
@@ -67,6 +72,36 @@ describe('Matterbridge disconnect', () => {
 
     expect(matterbridgeManager.matterbridgeRunning).to.equal(false);
     expect(matterbridgeManager.matterbridgeExist).to.equal(true);
+  });
+
+  it('should not touch any container when the name was never persisted', async () => {
+    matterbridgeManager.getConfiguration = fake.resolves({ matterbridgeContainerName: undefined });
+
+    await matterbridgeManager.disconnect();
+
+    assert.notCalled(gladys.system.getContainers);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    expect(matterbridgeManager.matterbridgeRunning).to.equal(false);
+  });
+
+  it('should not crash when the persisted container is already gone', async () => {
+    // Name is persisted but the container no longer exists
+    gladys.system.getContainers = fake.resolves([]);
+
+    await matterbridgeManager.disconnect();
+
+    assert.called(gladys.system.getContainers);
+    assert.notCalled(gladys.system.stopContainer);
+    assert.notCalled(gladys.system.removeContainer);
+    // The config cleanup and flag reset must still run even though no container was stopped
+    assert.calledOnceWithExactly(fsMock.rm, path.join(TEMP_GLADYS_FOLDER, DEFAULT.CONFIGURATION_PATH), {
+      recursive: true,
+    });
+    expect(matterbridgeManager.matterbridgeRunning).to.equal(false);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.MATTERBRIDGE.STATUS_CHANGE,
+    });
   });
 
   it('stop container failed', async () => {

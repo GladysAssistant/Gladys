@@ -4,6 +4,7 @@ const path = require('path');
 const fse = require('fs-extra');
 
 const logger = require('../../../utils/logger');
+const { getContainersByExactName } = require('../../../utils/dockerContainers');
 
 const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 
@@ -16,10 +17,7 @@ const sleep = promisify(setTimeout);
  * await z2m.installMqttContainer(config);
  */
 async function installMqttContainer(config) {
-  let dockerContainers = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [containerDescriptor.name] },
-  });
+  let dockerContainers = await getContainersByExactName(this.gladys.system, config.mqttContainerName);
   let [container] = dockerContainers;
 
   if (dockerContainers.length === 0) {
@@ -32,6 +30,7 @@ async function installMqttContainer(config) {
       // Prepare broker env
       logger.info(`Preparing broker environment...`);
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+      containerDescriptorToMutate.name = config.mqttContainerName;
       const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
 
       const mosquittoFolderPath = path.join(basePathOnContainer, '/zigbee2mqtt/mqtt');
@@ -99,10 +98,7 @@ async function installMqttContainer(config) {
   } else {
     this.mqttExist = true;
     try {
-      dockerContainers = await this.gladys.system.getContainers({
-        all: true,
-        filters: { name: [containerDescriptor.name] },
-      });
+      dockerContainers = await getContainersByExactName(this.gladys.system, config.mqttContainerName);
       [container] = dockerContainers;
       if (container.state !== 'running') {
         logger.info('MQTT broker is starting...');
