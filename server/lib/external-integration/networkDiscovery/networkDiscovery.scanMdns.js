@@ -37,13 +37,17 @@ async function scanMdns({ service, timeoutMs, mdnsOptions }) {
   mdns.on('response', (response) => {
     const records = [...(response.answers || []), ...(response.additionals || [])];
     records.forEach((record) => {
+      // the socket sees every mDNS packet on the network, not only the
+      // answers to our PTR query: SRV/TXT records of foreign services
+      // (unsolicited announcements) must never create an instance, or the
+      // scan would return arbitrary hosts/ports of the whole network
       if (record.type === 'PTR' && record.name === serviceName) {
         getInstance(record.data);
-      } else if (record.type === 'SRV') {
+      } else if (record.type === 'SRV' && record.name.endsWith(`.${serviceName}`)) {
         const instance = getInstance(record.name);
         instance.host = record.data.target;
         instance.port = record.data.port;
-      } else if (record.type === 'TXT') {
+      } else if (record.type === 'TXT' && record.name.endsWith(`.${serviceName}`)) {
         const entries = Array.isArray(record.data) ? record.data : [record.data];
         getInstance(record.name).txt = entries.map((entry) => entry.toString('utf8'));
       } else if (record.type === 'A' || record.type === 'AAAA') {

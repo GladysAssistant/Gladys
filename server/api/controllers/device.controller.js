@@ -98,11 +98,16 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function getDeviceFeaturesAggregated(req, res) {
+    // Query string values are strings: they are normalized here so the
+    // aggregation layer only ever receives numbers.
+    const parsedMaxStates = parseInt(req.query.max_states, 10);
+    const maxStates = Number.isNaN(parsedMaxStates) ? undefined : parsedMaxStates;
     const states = await gladys.device.getDeviceFeaturesAggregatesMulti(
       req.query.device_features.split(','),
-      req.query.interval,
-      req.query.max_states,
+      parseInt(req.query.interval, 10),
+      maxStates,
       req.query.group_by,
+      parseInt(req.query.offset, 10) || 0,
     );
     res.json(states);
   }

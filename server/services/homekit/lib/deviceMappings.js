@@ -1,4 +1,9 @@
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, COVER_STATE } = require('../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  COVER_STATE,
+} = require('../../../utils/constants');
 
 const mappings = {
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
@@ -91,10 +96,67 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: {
+    service: 'AirQualitySensor',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: {
+        characteristics: ['PM2_5Density'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: {
+        characteristics: ['PM2_5Density'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.PM10_SENSOR]: {
+    service: 'AirQualitySensor',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: {
+        characteristics: ['PM10Density'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: {
+        characteristics: ['PM10Density'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
+    service: 'Battery',
+    capabilities: {
+      // Integrations disagree on which type carries a battery percentage: Nuki reports it as a lock
+      // integer, most others as a sensor or battery integer. All three mean the same thing here.
+      [DEVICE_FEATURE_TYPES.BATTERY.INTEGER]: {
+        characteristics: ['BatteryLevel', 'StatusLowBattery'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: {
+        characteristics: ['BatteryLevel', 'StatusLowBattery'],
+      },
+      [DEVICE_FEATURE_TYPES.LOCK.INTEGER]: {
+        characteristics: ['BatteryLevel', 'StatusLowBattery'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.BATTERY_LOW]: {
+    service: 'Battery',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY]: {
+        characteristics: ['StatusLowBattery'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
+        characteristics: ['StatusLowBattery'],
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     service: 'Switch',
     capabilities: {
       [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: {
+        characteristics: ['On'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.SIREN]: {
+    service: 'Switch',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SIREN.BINARY]: {
         characteristics: ['On'],
       },
     },
@@ -173,6 +235,30 @@ const gasDetectedThresholds = {
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: 1000,
 };
 
+// HomeKit expects particulate densities in µg/m³, while Gladys lets an integration report them in
+// milligrams, micrograms or nanograms. Without this conversion a sensor reporting mg/m³ would be
+// shown a thousand times too low.
+const microgramPerCubicMeterFactors = {
+  [DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER]: 1000,
+  [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER]: 1,
+  [DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER]: 0.001,
+};
+
+/**
+ * @description Convert a particulate concentration to the µg/m³ HomeKit expects.
+ * @param {number} value - Concentration reported by Gladys.
+ * @param {string} unit - Gladys unit the concentration is expressed in.
+ * @returns {number} The concentration in µg/m³.
+ * @example
+ * toMicrogramPerCubicMeter(0.05, DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER);
+ */
+function toMicrogramPerCubicMeter(value, unit) {
+  // An integration that declares no unit is assumed to already report µg/m³, which is what the
+  // Zigbee and Matter clusters use.
+  const factor = microgramPerCubicMeterFactors[unit] === undefined ? 1 : microgramPerCubicMeterFactors[unit];
+  return value * factor;
+}
+
 /**
  * @description Convert a Gladys air quality index to the HomeKit AirQuality characteristic value.
  * @param {number} airQualityIndex - Air quality index reported by Gladys.
@@ -205,10 +291,38 @@ function clampToCharacteristic(value, props = {}) {
   return Math.min(maxValue, Math.max(minValue, value));
 }
 
+// HomeKit exposes air quality as a single AirQualitySensor service carrying the index and the
+// particulate densities, while Gladys splits them across categories. The first host category present
+// on a device owns the service and absorbs the features of the other categories listed here.
+const mergedServiceCategories = [
+  {
+    hosts: [
+      DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR,
+      DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
+      DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
+    ],
+    merged: [],
+  },
+  // Same for the battery: HomeKit shows a single Battery service, while Gladys splits the
+  // percentage and the low-battery flag across two categories.
+  {
+    hosts: [DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_CATEGORIES.BATTERY_LOW],
+    merged: [],
+  },
+];
+
+// Percentage at or below which a device with no dedicated low-battery feature is reported as low.
+// HomeKit requires StatusLowBattery on every Battery service, so it has to be derived from the
+// level when the device does not report it. 20% is what the other HomeKit bridges use.
+const LOW_BATTERY_THRESHOLD = 20;
+
 module.exports = {
   mappings,
   coverStateMapping,
   gasDetectedThresholds,
   aqiToAirQuality,
   clampToCharacteristic,
+  toMicrogramPerCubicMeter,
+  mergedServiceCategories,
+  LOW_BATTERY_THRESHOLD,
 };

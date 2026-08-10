@@ -45,7 +45,13 @@ const SUPPORTED_FEATURE_TYPES = [
 // ambiguous (television "play" and music "play" share the same type). They are listed here so that
 // they don't leak into every other category.
 const SUPPORTED_FEATURE_TYPES_BY_CATEGORY = {
-  [DEVICE_FEATURE_CATEGORIES.TELEVISION]: TelevisionPushButtonFeatureTypes
+  [DEVICE_FEATURE_CATEGORIES.TELEVISION]: TelevisionPushButtonFeatureTypes,
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: [
+    DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY,
+    DEVICE_FEATURE_TYPES.WATER_HEATER.MODE,
+    DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE,
+    DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST
+  ]
 };
 
 const isSupportedFeature = ({ category, type }) =>

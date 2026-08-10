@@ -95,7 +95,8 @@ export const GetWeatherStatus = {
 export const GetWeatherModes = {
   AdvancedWeather: 'advancedWeather',
   HourlyForecast: 'hourlyForecast',
-  DailyForecast: 'dailyForecast'
+  DailyForecast: 'dailyForecast',
+  ProviderImages: 'providerImages'
 };
 
 export const DASHBOARD_BOX_STATUS_KEY = 'DashboardBoxStatus';
@@ -301,6 +302,14 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_LEVEL_PERCENT]: 'droplet',
     [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH]: 'droplet'
   },
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: 'heater',
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: 'sliders',
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE]: 'thermometer',
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER]: 'shower-head',
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING]: 'flame',
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST]: 'zap'
+  },
   [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: {
     [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: 'droplet',
     [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: 'droplet',
@@ -478,7 +487,8 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: 'rotate-cw'
   },
   [DEVICE_FEATURE_CATEGORIES.UNKNOWN]: {
-    [DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN]: 'help-circle'
+    [DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN]: 'help-circle',
+    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'help-circle'
   },
   [DEVICE_FEATURE_CATEGORIES.MUSIC]: {
     [DEVICE_FEATURE_TYPES.MUSIC.VOLUME]: 'volume-1',

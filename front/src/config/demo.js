@@ -1746,6 +1746,11 @@ const data = {
   },
   'post /api/v1/service/broadlink/learn': {},
   'post /api/v1/service/broadlink/learn/cancel': {},
+  // no community integration installed in the demo: the "integrations to
+  // update" counter is loaded on every page, so a missing fixture would log
+  // an error on each visit
+  'get /api/v1/external_integration': [],
+  'get /api/v1/external_integration/store': { integrations: [] },
   'get /api/v1/service/mqtt': {},
   'get /api/v1/service/mqtt/status': {
     configured: true,
@@ -1757,6 +1762,32 @@ const data = {
     networkModeValid: true,
     brokerContainerAvailable: false
   },
+  'get /api/v1/service/mqtt/discovery': [
+    {
+      name: 'Temperature sensor',
+      external_id: 'homeassistant:demo-temperature-sensor',
+      selector: 'homeassistant:demo-temperature-sensor',
+      model: 'Sensor 2000',
+      service_id: '2e0bc58b-11e2-4176-8ad3-9ebc8cdd2318',
+      should_poll: false,
+      features: [
+        {
+          name: 'Temperature',
+          external_id: 'homeassistant:demo-temperature-sensor:sensor:temperature',
+          selector: 'homeassistant:demo-temperature-sensor:sensor:temperature',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          unit: 'celsius',
+          read_only: true,
+          has_feedback: true,
+          keep_history: true,
+          min: -100000,
+          max: 100000
+        }
+      ],
+      params: []
+    }
+  ],
   'get /api/v1/service/zigbee2mqtt': {},
   'get /api/v1/service/zigbee2mqtt/permit_join': true,
   'get /api/v1/service/zigbee2mqtt/device': [

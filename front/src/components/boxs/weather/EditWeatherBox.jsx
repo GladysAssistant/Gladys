@@ -23,6 +23,26 @@ const EditWeatherBox = ({ children, ...props }) => (
           ))}
       </select>
     </div>
+    <div class="form-group">
+      <label>
+        <Text id="dashboard.boxes.weather.editProviderLabel" />
+      </label>
+      <select onChange={props.updateBoxProvider} class="form-control">
+        <option value="" selected={!props.box.provider}>
+          <Text id="dashboard.boxes.weather.providerAuto" />
+        </option>
+        {props.providers &&
+          props.providers.map(provider => (
+            <option selected={provider.service_name === props.box.provider} value={provider.service_name}>
+              {provider.service_name === 'openweather' ? (
+                <Text id="dashboard.boxes.weather.providerInternalOpenWeather" />
+              ) : (
+                provider.label || provider.service_name
+              )}
+            </option>
+          ))}
+      </select>
+    </div>
     <div className="form-group">
       <div>
         <label>
@@ -68,6 +88,23 @@ class EditWeatherBoxComponent extends Component {
     });
   };
 
+  updateBoxProvider = e => {
+    // '' = automatic mode (first available provider, the default)
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      provider: e.target.value
+    });
+  };
+
+  getProviders = async () => {
+    try {
+      const providers = await this.props.httpClient.get('/api/v1/weather/provider');
+      this.setState({ providers });
+    } catch (e) {
+      // without the list the select simply stays on automatic mode
+      console.error(e);
+    }
+  };
+
   getHouses = async () => {
     try {
       await this.setState({
@@ -90,15 +127,18 @@ class EditWeatherBoxComponent extends Component {
 
   componentDidMount() {
     this.getHouses();
+    this.getProviders();
   }
 
-  render(props, { houses }) {
+  render(props, { houses, providers }) {
     return (
       <EditWeatherBox
         {...props}
         houses={houses}
+        providers={providers}
         updateBoxHouse={this.updateBoxHouse}
         updateBoxModes={this.updateBoxModes}
+        updateBoxProvider={this.updateBoxProvider}
       />
     );
   }

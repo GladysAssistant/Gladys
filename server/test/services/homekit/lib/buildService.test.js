@@ -262,6 +262,71 @@ describe('Build service', () => {
     });
   });
 
+  it('should build siren service', async () => {
+    homekitHandler.gladys.stateManager.get = stub().returns({
+      id: '8c1a2b3d-4e5f-4a6b-8c9d-0e1f2a3b4c5d',
+      name: 'Alarme',
+      category: DEVICE_FEATURE_CATEGORIES.SIREN,
+      type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+      last_value: 0,
+    });
+    homekitHandler.gladys.event.emit = stub();
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: {
+        perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+      },
+    });
+    const Switch = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        On: 'ON',
+      },
+      CharacteristicEventTypes: stub(),
+      Perms: {
+        PAIRED_READ: 'PAIRED_READ',
+        PAIRED_WRITE: 'PAIRED_WRITE',
+      },
+      Service: {
+        Switch,
+      },
+    };
+    const device = {
+      name: 'Sirène',
+      selector: 'sirene',
+    };
+    const features = [
+      {
+        id: '8c1a2b3d-4e5f-4a6b-8c9d-0e1f2a3b4c5d',
+        name: 'Alarme',
+        selector: 'sirene-alarme',
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+      },
+    ];
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.SIREN]);
+    await on.args[0][1](cb);
+    await on.args[1][1](1, cb);
+
+    expect(Switch.args[0][0]).to.equal('Sirène');
+    expect(on.callCount).to.equal(2);
+    expect(getCharacteristic.args[0][0]).to.equal('ON');
+    expect(cb.args[0][1]).to.equal(0);
+    expect(homekitHandler.gladys.event.emit.args[0][1]).to.eql({
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: 1,
+      device: device.selector,
+      device_feature: features[0].selector,
+    });
+  });
+
   it('should build current temperature service', async () => {
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'temp-celsius').returns({
       id: '26df6983-5127-4122-874a-b6ed0590badc',
@@ -832,6 +897,136 @@ describe('Build service', () => {
     expect(cb.args[1][1]).to.equal(1);
   });
 
+  it('should build battery service and derive the low flag from the level', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'batterie').returns({ last_value: 15 });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: { minValue: 0, maxValue: 100 },
+    });
+    const Battery = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { BatteryLevel: 'BATTERYLEVEL', StatusLowBattery: 'STATUSLOWBATTERY' },
+      CharacteristicEventTypes: stub(),
+      Service: { Battery },
+    };
+    const features = [
+      {
+        name: 'Batterie',
+        selector: 'batterie',
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Capteur' }, features, mappings[DEVICE_FEATURE_CATEGORIES.BATTERY]);
+    await on.args[0][1](cb);
+    await on.args[1][1](cb);
+
+    expect(getCharacteristic.args[0][0]).to.equal('BATTERYLEVEL');
+    expect(getCharacteristic.args[1][0]).to.equal('STATUSLOWBATTERY');
+    expect(cb.args[0][1]).to.equal(15);
+    // 15% is at or below the 20% threshold
+    expect(cb.args[1][1]).to.equal(1);
+
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'batterie').returns({ last_value: 80 });
+    await on.args[1][1](cb);
+    expect(cb.args[2][1]).to.equal(0);
+
+    // the comparison is inclusive: exactly 20% is low, 21% is not
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'batterie').returns({ last_value: 20 });
+    await on.args[1][1](cb);
+    expect(cb.args[3][1]).to.equal(1);
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'batterie').returns({ last_value: 21 });
+    await on.args[1][1](cb);
+    expect(cb.args[4][1]).to.equal(0);
+
+    // a device that has not reported yet must not be announced as low: null <= 20 is true in JS
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'batterie').returns({ last_value: null });
+    await on.args[1][1](cb);
+    expect(cb.args[5][1]).to.equal(0);
+  });
+
+  it('should let a dedicated low battery feature win over the derived flag', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'nuki-batterie').returns({ last_value: 5 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'nuki-faible').returns({ last_value: 0 });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: { minValue: 0, maxValue: 100 },
+    });
+    const Battery = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { BatteryLevel: 'BATTERYLEVEL', StatusLowBattery: 'STATUSLOWBATTERY' },
+      CharacteristicEventTypes: stub(),
+      Service: { Battery },
+    };
+    // Nuki reports its battery percentage as a lock integer, not a sensor integer
+    const features = [
+      {
+        name: 'Batterie',
+        selector: 'nuki-batterie',
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+        type: DEVICE_FEATURE_TYPES.LOCK.INTEGER,
+      },
+      {
+        name: 'Batterie faible',
+        selector: 'nuki-faible',
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+        type: DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Serrure' }, features, mappings[DEVICE_FEATURE_CATEGORIES.BATTERY]);
+    await on.args[0][1](cb);
+    await on.args[1][1](cb);
+
+    // the level alone would say low at 5%, the dedicated feature says it is not
+    expect(on.callCount).to.equal(2);
+    expect(cb.args[0][1]).to.equal(5);
+    expect(cb.args[1][1]).to.equal(0);
+  });
+
+  it('should not claim a battery level for a device that only reports a low flag', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'contact-faible').returns({ last_value: 1 });
+    const on = stub();
+    const getCharacteristic = stub().returns({ on, props: { minValue: 0, maxValue: 100 } });
+    const Battery = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { BatteryLevel: 'BATTERYLEVEL', StatusLowBattery: 'STATUSLOWBATTERY' },
+      CharacteristicEventTypes: stub(),
+      Service: { Battery },
+    };
+    const features = [
+      {
+        name: 'Batterie faible',
+        selector: 'contact-faible',
+        category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+        type: DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService({ name: 'Contact' }, features, mappings[DEVICE_FEATURE_CATEGORIES.BATTERY_LOW]);
+    await on.args[0][1](cb);
+
+    // BatteryLevel is optional on the HAP Battery service, so it is never added and the Home app
+    // does not show a made-up 0%. Only the flag the device actually reports is exposed.
+    expect(getCharacteristic.args).eql([['STATUSLOWBATTERY']]);
+    expect(cb.args[0][1]).to.equal(1);
+  });
+
   it('should build air quality sensor service', async () => {
     homekitHandler.gladys.stateManager.get = stub().returns({
       id: 'ec9de6a2-6f0a-4f0e-9d0e-1b5f1cb0a5ce',
@@ -893,6 +1088,89 @@ describe('Build service', () => {
     expect(cb.args[1][1]).to.equal(1);
     expect(cb.args[2][1]).to.equal(5);
     expect(cb.args[3][1]).to.equal(0);
+  });
+
+  it('should build particulate density characteristics on the air quality service', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pm25-microgram').returns({ last_value: 42 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pm25-milligram').returns({ last_value: 0.05 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pm10-nanogram').returns({ last_value: 8000 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pm10-sans-unite').returns({ last_value: 5000 });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: {
+        minValue: 0,
+        maxValue: 1000,
+      },
+    });
+    const AirQualitySensor = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        PM2_5Density: 'PM25DENSITY',
+        PM10Density: 'PM10DENSITY',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        AirQualitySensor,
+      },
+    };
+    const device = {
+      name: 'Capteur particules',
+    };
+    // integrations report densities in milligrams, micrograms or nanograms per cubic meter
+    const features = [
+      {
+        name: 'PM2.5 µg',
+        selector: 'pm25-microgram',
+        category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+      },
+      {
+        name: 'PM2.5 mg',
+        selector: 'pm25-milligram',
+        category: DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
+      },
+      {
+        name: 'PM10 ng',
+        selector: 'pm10-nanogram',
+        category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
+      },
+      {
+        name: 'PM10 sans unité',
+        selector: 'pm10-sans-unite',
+        category: DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]);
+    await on.args[0][1](cb);
+    await on.args[1][1](cb);
+    await on.args[2][1](cb);
+    await on.args[3][1](cb);
+
+    expect(on.callCount).to.equal(4);
+    expect(getCharacteristic.args[0][0]).to.equal('PM25DENSITY');
+    expect(getCharacteristic.args[2][0]).to.equal('PM10DENSITY');
+    // already in µg/m³
+    expect(cb.args[0][1]).to.equal(42);
+    // 0.05 mg/m³ is 50 µg/m³
+    expect(cb.args[1][1]).to.equal(50);
+    // 8000 ng/m³ is 8 µg/m³
+    expect(cb.args[2][1]).to.equal(8);
+    // no unit declared, the value is taken as µg/m³ and only clamped
+    expect(cb.args[3][1]).to.equal(1000);
   });
 
   it('should build shutter/curtain service', async () => {
