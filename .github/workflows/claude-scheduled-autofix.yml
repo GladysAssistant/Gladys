@@ -2,10 +2,10 @@ name: Scheduled Claude autofix
 run-name: Scheduled Claude autofix${{ inputs.dry_run == true && ' (dry run)' || '' }}
 
 # Once a day, find the open pull requests that carry review-bot feedback
-# (Cursor, CodeRabbit) nobody has handled yet, and run ONE Claude Code pass
-# per PR to address it. This replaces the event-driven Claude automation,
-# whose cost was unbounded: a PR left open for two weeks kept being
-# reprocessed even though nothing had changed.
+# (Cursor, CodeRabbit) nobody has handled yet, and launch ONE Claude Code
+# cloud session per PR to address it. This replaces the event-driven Claude
+# automation, whose cost was unbounded: a PR left open for two weeks kept
+# being reprocessed even though nothing had changed.
 #
 # The anti-loop core (do not simplify):
 #   - a comment is only eligible if it was posted AFTER the last autofix
@@ -20,19 +20,23 @@ run-name: Scheduled Claude autofix${{ inputs.dry_run == true && ' (dry run)' || 
 # Two jobs:
 #   select - pure bash + gh api, no LLM call. Computes the eligible PR list
 #            and exposes it as JSON.
-#   fix    - matrix over that list, one job per PR, max-parallel 2. Checks
-#            out the PR branch and invokes Claude Code exactly once.
+#   fire   - matrix over that list, one job per PR. Fires the "Gladys
+#            scheduled PR autofix" routine, which starts a Claude Code
+#            CLOUD session (visible at claude.ai/code) working on that PR.
+#            The session clones the repo, checks out the PR branch, fixes,
+#            pushes and replies by itself; the runner only makes one HTTP
+#            call. Sessions act under the routine owner's GitHub identity,
+#            so their pushes trigger the PR CI like any human push.
 #
 # See .github/CLAUDE_AUTOFIX.md for the full picture, the role of every
 # constant below, and the procedure when a PR gets exhausted.
 #
-# Required repository secrets:
-#   ANTHROPIC_API_KEY  - Claude API key used by the fix job.
-#   AUTOFIX_PUSH_TOKEN - optional PAT (contents: write). When present, the
-#                        autofix pushes are made with it so the PR CI
-#                        (docker-pr-build) runs on autofix commits. Pushes
-#                        made with the default GITHUB_TOKEN never retrigger
-#                        workflows (GitHub's recursion guard).
+# Required configuration (see the README for the one-time setup):
+#   vars.CLAUDE_AUTOFIX_FIRE_URL      - the routine's API trigger URL
+#                                       (https://api.anthropic.com/v1/claude_code/routines/trig_.../fire)
+#   secrets.CLAUDE_AUTOFIX_ROUTINE_TOKEN - the routine's bearer token
+#                                       (sk-ant-oat01-..., shown once when
+#                                       generated on the routine's page)
 
 on:
   schedule:
@@ -43,8 +47,8 @@ on:
       dry_run:
         description: >-
           Run the selection and print the detailed list (passes done and
-          retained comments per PR) without invoking Claude and without
-          writing anything (no labels, no comments).
+          retained comments per PR) without firing any cloud session and
+          without writing anything (no labels, no comments).
         type: boolean
         required: false
         default: false
@@ -57,7 +61,8 @@ env:
   MAX_PASSES: 3
   # Budget circuit breaker: at most this many PRs processed per run. The
   # eligible list is sorted by last activity (oldest first) before
-  # truncating, so long-waiting PRs are served first.
+  # truncating, so long-waiting PRs are served first. Cloud sessions also
+  # count against the account's daily routine-run allowance.
   MAX_PRS: 8
   # A comment younger than this many hours is not processed yet: it lets a
   # review round finish (and a human veto it) before Claude reacts.
@@ -66,10 +71,19 @@ env:
   # Space-separated, REST form; the "[bot]" suffix is stripped internally
   # because GraphQL returns the bare app slug ("cursor", "coderabbitai").
   REVIEW_BOT_LOGINS: 'cursor[bot] coderabbitai[bot]'
-  # Logins under which autofix replies may appear. The fix job posts its
-  # replies with the workflow GITHUB_TOKEN (github-actions[bot]);
-  # claude[bot] is kept for replies posted through the Claude GitHub App.
-  AUTOFIX_ACTOR_LOGINS: 'github-actions[bot] claude[bot]'
+  # Logins under which autofix replies may appear. Cloud sessions act under
+  # the routine owner's GitHub identity, so their replies are authored by
+  # that user; the bot logins cover replies posted by earlier tooling.
+  AUTOFIX_ACTOR_LOGINS: 'Pierre-Gilles github-actions[bot] claude[bot]'
+  # Cloud sessions may only push to claude/-prefixed branches (other
+  # branches are rejected when they carry commits by someone else), so
+  # only PRs from such branches are eligible.
+  HEAD_BRANCH_PREFIX: 'claude/'
+  # Minutes each matrix slot is held after firing. There is no public API
+  # to wait for a cloud session's completion, so this stagger combined
+  # with max-parallel 2 keeps roughly two autofix sessions running at a
+  # time instead of MAX_PRS at once.
+  FIRE_STAGGER_MINUTES: 8
   # Label that permanently stops the scheduled autofix on a PR (posed
   # automatically at MAX_PASSES).
   EXHAUSTED_LABEL: 'claude:autofix-exhausted'
@@ -168,11 +182,16 @@ jobs:
 
             # 1. Open (guaranteed by the listing), not draft, no conflict.
             [ "$(echo "$PR" | jq -r '.draft')" = "false" ] || { skip 'draft'; continue; }
-            # Fork PRs are out: the fix job checks out and pushes to the
-            # head branch, which only works (and is only safe to run with
-            # secrets) for branches of this repository.
+            # Fork PRs are out: the fired cloud session pushes to the head
+            # branch, which only works for branches of this repository.
             [ "$(echo "$PR" | jq -r '.head.repo.full_name // ""')" = "$GH_REPO" ] \
               || { skip 'fork PR'; continue; }
+            # Cloud sessions can only push claude/-prefixed branches.
+            BRANCH=$(echo "$PR" | jq -r '.head.ref')
+            case "$BRANCH" in
+              "$HEAD_BRANCH_PREFIX"*) ;;
+              *) skip "branch $BRANCH is not ${HEAD_BRANCH_PREFIX}-prefixed"; continue ;;
+            esac
             # "dirty" is the only state that positively means a conflict;
             # "unknown" just means GitHub has not computed it yet.
             [ "$(echo "$PR" | jq -r '.mergeable_state // "unknown"')" != "dirty" ] \
@@ -257,7 +276,7 @@ jobs:
               ($ic[] | "    - issue comment ic-\(.id) by \(.author) at \(.created): \(.excerpt)")'
 
             ENTRY=$(jq -n --argjson n "$NUM" --argjson p "$PASSES" \
-              --arg b "$(echo "$PR" | jq -r '.head.ref')" --arg u "$(echo "$PR" | jq -r '.updated_at')" \
+              --arg b "$BRANCH" --arg u "$(echo "$PR" | jq -r '.updated_at')" \
               --argjson rc "$RC" --argjson ic "$IC" '
               {number: $n, branch: $b, pass: ($p + 1),
                rc_ids: ($rc | map(.id | tostring) | join(" ")),
@@ -277,7 +296,7 @@ jobs:
           MATRIX=$(echo "$MATRIX" | jq -c --argjson m "$MAX_PRS" '.[:$m] | map(del(.updated_at))')
 
           if [ "$DRY_RUN" = 'true' ]; then
-            echo "Dry run: Claude will not be invoked, no label or comment will be written."
+            echo "Dry run: no cloud session will be fired, no label or comment will be written."
             [ "$(echo "$EXHAUSTED" | jq 'length')" -eq 0 ] \
               || echo "Dry run: would label as exhausted: $(echo "$EXHAUSTED" | jq -cr '[.[] | "#\(.)"] | join(" ")')"
           else
@@ -307,82 +326,84 @@ jobs:
             fi
           } >> "$GITHUB_OUTPUT"
 
-  fix:
-    name: 'Fix PR #${{ matrix.pr.number }} (pass ${{ matrix.pr.pass }})'
+  fire:
+    name: 'Fire cloud session for PR #${{ matrix.pr.number }} (pass ${{ matrix.pr.pass }})'
     needs: select
-    # An empty list must not start any fix job, and a dry run never invokes
-    # Claude (inputs.dry_run is null on schedule, which is != true).
+    # An empty list must not start any fire job, and a dry run never fires
+    # a session (inputs.dry_run is null on schedule, which is != true).
     if: needs.select.outputs.has_prs == 'true' && inputs.dry_run != true
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    # Covers the API call plus the stagger hold below.
+    timeout-minutes: 15
     strategy:
       fail-fast: false
-      # Cost / runner cap: at most two Claude sessions at the same time.
+      # Together with the stagger hold, keeps roughly two cloud sessions
+      # working at a time.
       max-parallel: 2
       matrix:
         pr: ${{ fromJSON(needs.select.outputs.matrix) }}
-    # One autofix at a time per PR, whatever run it belongs to.
+    # One autofix fire at a time per PR, whatever run it belongs to.
     concurrency:
       group: claude-autofix-pr-${{ matrix.pr.number }}
       cancel-in-progress: false
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
-      # OIDC + CI results access for the Claude Code action.
-      id-token: write
-      actions: read
+    # The job only calls the Anthropic routine API: it needs no repository
+    # access at all. The cloud session brings its own GitHub access.
+    permissions: {}
     steps:
-      - name: ⬇️ Checkout the PR branch
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ matrix.pr.branch }}
-          # Full history: Claude needs the merge-base with master to
-          # understand what the PR changes.
-          fetch-depth: 0
-          # With a PAT, the autofix pushes retrigger the PR CI; with the
-          # default token GitHub suppresses downstream workflows.
-          token: ${{ secrets.AUTOFIX_PUSH_TOKEN || github.token }}
-
-      - name: 🤖 Address the review feedback with Claude Code
-        uses: anthropics/claude-code-action@v1
+      - name: 🚀 Fire a Claude Code cloud session
         env:
-          # gh in Claude's shell authenticates with the workflow token, so
-          # the replies are posted by github-actions[bot] — one of the
-          # AUTOFIX_ACTOR_LOGINS the select job looks for.
-          GH_TOKEN: ${{ github.token }}
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_args: |
-            --allowedTools "Bash,Read,Edit,Write,Glob,Grep"
-          prompt: |
-            You are running the scheduled autofix pass ${{ matrix.pr.pass }} of ${{ env.MAX_PASSES }} on pull request #${{ matrix.pr.number }} of ${{ github.repository }}. The PR branch `${{ matrix.pr.branch }}` is checked out in the current directory.
+          FIRE_URL: ${{ vars.CLAUDE_AUTOFIX_FIRE_URL }}
+          FIRE_TOKEN: ${{ secrets.CLAUDE_AUTOFIX_ROUTINE_TOKEN }}
+          PR_NUMBER: ${{ matrix.pr.number }}
+          PR_BRANCH: ${{ matrix.pr.branch }}
+          PR_PASS: ${{ matrix.pr.pass }}
+          RC_IDS: ${{ matrix.pr.rc_ids }}
+          IC_IDS: ${{ matrix.pr.ic_ids }}
+        run: |
+          set -uo pipefail
 
-            Process ONLY the following review-bot comments. This list is exhaustive and exclusive; it was computed by the selection job and nothing outside it is in scope.
+          if [ -z "${FIRE_URL:-}" ] || [ -z "${FIRE_TOKEN:-}" ]; then
+            echo "::error::Missing CLAUDE_AUTOFIX_FIRE_URL (repository variable) or CLAUDE_AUTOFIX_ROUTINE_TOKEN (secret). See .github/CLAUDE_AUTOFIX.md for the one-time routine setup."
+            exit 1
+          fi
 
-            - Pull request review comment IDs: ${{ matrix.pr.rc_ids }}
-              (fetch each one with: gh api repos/${{ github.repository }}/pulls/comments/<ID>)
-            - Issue comment IDs: ${{ matrix.pr.ic_ids }}
-              (fetch each one with: gh api repos/${{ github.repository }}/issues/comments/<ID>)
+          # The payload reaches the routine wrapped in an untrusted
+          # <routine-fire-payload> block; the routine's saved prompt
+          # explicitly opts in to acting on it and treats every field as
+          # data, never as instructions.
+          PAYLOAD=$(jq -cn --argjson number "$PR_NUMBER" --arg branch "$PR_BRANCH" \
+            --argjson pass "$PR_PASS" --argjson max "$MAX_PASSES" \
+            --arg rc "$RC_IDS" --arg ic "$IC_IDS" \
+            '{number: $number, branch: $branch, pass: $pass, max_passes: $max, rc_ids: $rc, ic_ids: $ic}')
+          BODY=$(jq -cn --arg text "$PAYLOAD" '{text: $text}')
 
-            An empty list means there are no comments of that kind.
+          HTTP_CODE=$(curl -sS -o /tmp/fire-response.json -w '%{http_code}' \
+            -X POST "$FIRE_URL" \
+            -H "Authorization: Bearer ${FIRE_TOKEN}" \
+            -H 'anthropic-beta: experimental-cc-routine-2026-04-01' \
+            -H 'anthropic-version: 2023-06-01' \
+            -H 'Content-Type: application/json' \
+            -d "$BODY")
 
-            Steps:
+          case "$HTTP_CODE" in
+            2*)
+              SESSION_URL=$(jq -r '.claude_code_session_url // empty' /tmp/fire-response.json)
+              echo "PR #${PR_NUMBER}: cloud session started (pass ${PR_PASS}): ${SESSION_URL}"
+              echo "- PR [#${PR_NUMBER}](https://github.com/${GITHUB_REPOSITORY}/pull/${PR_NUMBER}) — pass ${PR_PASS} — [cloud session](${SESSION_URL})" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            *)
+              echo "::error::PR #${PR_NUMBER}: routine fire failed with HTTP ${HTTP_CODE} (401: bad or revoked token; 429: daily routine cap or rate limit reached)"
+              head -c 2000 /tmp/fire-response.json
+              echo
+              exit 1
+              ;;
+          esac
 
-            1. Fetch every comment listed above and read the current code it refers to. Comments may be outdated: always verify the finding against the code as it is now.
-            2. For each comment, decide: apply a fix, or decline it with a reason (already fixed, incorrect, out of the PR's scope, deliberate style choice...).
-            3. STRICT SCOPE: only change what these comments require. No opportunistic refactoring, no drive-by cleanups, no edits to code the comments do not concern.
-            4. If you changed code, run the narrowest relevant checks you reasonably can (for example `npm run prettier-check` and `npm run eslint` in `front/` or `server/` for the side you touched; skip the heavy test suites). Then make a single commit whose message follows the repository style and ENDS with exactly this trailer line:
-
-               Autofix-Pass: ${{ matrix.pr.pass }}
-
-               and push it with: git push origin HEAD:${{ matrix.pr.branch }}
-            5. If no code change is needed, do NOT commit or push anything.
-            6. CRITICAL — whether or not you changed code, reply to EVERY comment listed above, without exception, including the ones you declined (state the reason). These replies are what marks the feedback as processed: a comment left without a reply will be selected again by tomorrow's run and will burn another of the ${{ env.MAX_PASSES }} passes this PR gets, so a missing reply defeats the whole system. Never skip a reply.
-               - Review comment: gh api -X POST repos/${{ github.repository }}/pulls/${{ matrix.pr.number }}/comments/<ID>/replies -f body='...'
-               - Issue comments: post ONE regular PR comment covering each listed issue-comment ID: gh api -X POST repos/${{ github.repository }}/issues/${{ matrix.pr.number }}/comments -f body='...'
-               Every reply body MUST contain, for each comment it covers, a marker line in exactly this format:
-               <!-- Autofix-Handled: rc-<ID> -->   for a review comment
-               <!-- Autofix-Handled: ic-<ID> -->   for an issue comment
-               The selection job greps for these markers; without one, the comment is reprocessed forever.
-            7. Keep the replies short and factual: what you changed, or why you declined.
+      - name: ⏳ Hold the slot to stagger sessions
+        run: |
+          # No public API exposes the cloud session's completion, so the
+          # matrix slot is simply held for a while after firing. With
+          # max-parallel 2 this spaces the sessions out instead of starting
+          # MAX_PRS of them at the same instant (and flooding the review
+          # bots and CI with simultaneous pushes).
+          sleep $(( FIRE_STAGGER_MINUTES * 60 ))
