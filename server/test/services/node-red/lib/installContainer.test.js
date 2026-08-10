@@ -82,7 +82,7 @@ describe('NodeRed installContainer', () => {
       ExposedPorts: { '1880/tcp': {} },
       HostConfig: {
         Privileged: true,
-        Binds: ['../.tmp/node-red:/data', '/dev:/dev', '/run/udev:/run/udev:ro'],
+        Binds: [`${TEMP_GLADYS_FOLDER}/node-red:/data`, '/dev:/dev', '/run/udev:/run/udev:ro'],
         BlkioWeightDevice: [],
         Devices: [],
         Dns: [],
