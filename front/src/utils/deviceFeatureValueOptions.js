@@ -6,6 +6,7 @@ import {
   LEVEL_MATTER_STATE,
   getFanFeatureOptions
 } from '../../../server/utils/constants';
+import { resolveFeatureOptions } from './supportedOptions';
 
 const NUMERIC_VALUE = /^-?\d+$/;
 
@@ -22,7 +23,8 @@ const MATTER_INDEX_SENSOR_CATEGORIES = [
   DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR
 ];
 
-const getValueLabel = (dictionary, path, value) => get(dictionary, `${path}.${value}`, { default: `${value}` });
+const getValueLabel = (dictionary, path, value, fallback) =>
+  get(dictionary, `${path}.${value}`, { default: fallback || `${value}` });
 
 /**
  * @description Tell if a value can be pre-selected in a list of options.
@@ -91,10 +93,22 @@ function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
     return null;
   }
 
-  const options = Object.keys(valueLabels)
+  const catalog = Object.keys(valueLabels)
     .filter(key => NUMERIC_VALUE.test(key))
-    .map(key => ({ value: Number(key), label: valueLabels[key] }))
+    .map(key => ({ value: Number(key) }))
     .sort((optionA, optionB) => optionA.value - optionB.value);
+
+  if (catalog.length === 0) {
+    return null;
+  }
+
+  // When the integration declares which values this appliance actually supports, they drive the
+  // list and its order, so a scene cannot be built on a mode the device does not have. A supported
+  // value outside the catalog keeps the label the device gave it.
+  const options = resolveFeatureOptions(deviceFeature, catalog).map(option => ({
+    value: option.value,
+    label: getValueLabel(dictionary, `deviceFeatureValue.category.${category}.${type}`, option.value, option.label)
+  }));
 
   return options.length > 0 ? options : null;
 }
