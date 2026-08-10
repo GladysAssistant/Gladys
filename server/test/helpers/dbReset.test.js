@@ -42,8 +42,11 @@ describe('resetDb freshness detection', () => {
     // must catch it — this mirrors gateway.restoreBackup calling the sqlite3
     // CLI on the database file.
     const external = new sqlite3.Database(db.sequelize.options.storage);
-    await promisify(external.run.bind(external))(`UPDATE t_house SET name = 'dirty' WHERE id = '${house.id}'`);
-    await promisify(external.close.bind(external))();
+    try {
+      await promisify(external.run.bind(external))(`UPDATE t_house SET name = 'dirty' WHERE id = '${house.id}'`);
+    } finally {
+      await promisify(external.close.bind(external))();
+    }
     expect((await db.House.findByPk(house.id)).name).to.equal('dirty');
     const stats = { ...resetDbStats };
     await resetDb();
