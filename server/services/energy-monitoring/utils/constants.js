@@ -28,7 +28,32 @@ const PRODUCTION_INDEX_FEATURE_TYPES = {
   [DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR]: [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.INDEX],
 };
 
+// The two "index delta -> thirty-minutes state" pipelines share the same
+// implementation (energy-monitoring.calculateEnergyFromIndex*), parameterized
+// by these kinds. Each kind uses its own last-processed device param so a
+// device carrying both a consumption and a production index never corrupts
+// the other pipeline's cursor.
+const ENERGY_FROM_INDEX_KINDS = {
+  CONSUMPTION: {
+    name: 'consumption',
+    indexFeatureTypes: ENERGY_INDEX_FEATURE_TYPES,
+    targetFeatureCategory: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+    targetFeatureType: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+    lastProcessedParamName: 'ENERGY_INDEX_LAST_PROCESSED',
+    calculateFromIndexMethod: 'calculateConsumptionFromIndex',
+  },
+  PRODUCTION: {
+    name: 'production',
+    indexFeatureTypes: PRODUCTION_INDEX_FEATURE_TYPES,
+    targetFeatureCategory: DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
+    targetFeatureType: DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION,
+    lastProcessedParamName: 'ENERGY_PRODUCTION_INDEX_LAST_PROCESSED',
+    calculateFromIndexMethod: 'calculateProductionFromIndex',
+  },
+};
+
 module.exports = {
   ENERGY_INDEX_FEATURE_TYPES,
   PRODUCTION_INDEX_FEATURE_TYPES,
+  ENERGY_FROM_INDEX_KINDS,
 };

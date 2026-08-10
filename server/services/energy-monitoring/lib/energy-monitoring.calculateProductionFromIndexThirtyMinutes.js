@@ -1,4 +1,4 @@
-const { queueWrapper } = require('../utils/queueWrapper');
+const { ENERGY_FROM_INDEX_KINDS } = require('../utils/constants');
 
 /**
  * @description Calculate energy production from index every thirty minutes.
@@ -9,18 +9,7 @@ const { queueWrapper } = require('../utils/queueWrapper');
  * calculateProductionFromIndexThirtyMinutes(new Date(), '12345678-1234-1234-1234-1234567890ab');
  */
 async function calculateProductionFromIndexThirtyMinutes(now, jobId) {
-  return queueWrapper(this.queue, async () => {
-    const minutes = now.getMinutes();
-    const thirtyMinuteWindow = new Date(now);
-
-    // Round to the nearest 30-minute mark (00:00 or 00:30)
-    if (minutes < 30) {
-      thirtyMinuteWindow.setMinutes(0, 0, 0);
-    } else {
-      thirtyMinuteWindow.setMinutes(30, 0, 0);
-    }
-    await this.calculateProductionFromIndex(thirtyMinuteWindow, jobId);
-  });
+  return this.calculateEnergyFromIndexThirtyMinutes(ENERGY_FROM_INDEX_KINDS.PRODUCTION, now, jobId);
 }
 
 module.exports = {

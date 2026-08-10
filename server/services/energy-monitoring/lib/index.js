@@ -7,6 +7,9 @@ const { calculateCostFromDate } = require('./energy-monitoring.calculateCostFrom
 const { calculateCostFromYesterday } = require('./energy-monitoring.calculateCostFromYesterday');
 const { calculateCostFromBeginning } = require('./energy-monitoring.calculateCostFromBeginning');
 const { getContracts } = require('./energy-monitoring.getContracts');
+const { calculateEnergyFromIndex } = require('./energy-monitoring.calculateEnergyFromIndex');
+const { calculateEnergyFromIndexFromBeginning } = require('./energy-monitoring.calculateEnergyFromIndexFromBeginning');
+const { calculateEnergyFromIndexThirtyMinutes } = require('./energy-monitoring.calculateEnergyFromIndexThirtyMinutes');
 const { calculateConsumptionFromIndex } = require('./energy-monitoring.calculateConsumptionFromIndex');
 const {
   calculateConsumptionFromIndexFromBeginning: ccFromIndexFromBeginning,
@@ -69,6 +72,9 @@ EnergyMonitoringHandler.prototype.calculateCostFromDate = calculateCostFromDate;
 EnergyMonitoringHandler.prototype.calculateCostFromYesterday = calculateCostFromYesterday;
 EnergyMonitoringHandler.prototype.calculateCostFromBeginning = calculateCostFromBeginning;
 EnergyMonitoringHandler.prototype.getContracts = getContracts;
+EnergyMonitoringHandler.prototype.calculateEnergyFromIndex = calculateEnergyFromIndex;
+EnergyMonitoringHandler.prototype.calculateEnergyFromIndexFromBeginning = calculateEnergyFromIndexFromBeginning;
+EnergyMonitoringHandler.prototype.calculateEnergyFromIndexThirtyMinutes = calculateEnergyFromIndexThirtyMinutes;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndex = calculateConsumptionFromIndex;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndexFromBeginning = ccFromIndexFromBeginning;
 EnergyMonitoringHandler.prototype.calculateConsumptionFromIndexThirtyMinutes = ccConsumptionFromIndexThirtyMinutes;
