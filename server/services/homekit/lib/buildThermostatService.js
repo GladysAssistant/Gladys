@@ -121,10 +121,13 @@ function buildValidTargetStates(thermostatFeatures) {
     });
   };
 
+  // A device should not carry both mode enums, but if one does, a single feature has to be the
+  // authority for the reads, the states offered and the writes alike — the air conditioning one,
+  // as it already was. Offering the union instead would let HomeKit set a state written to the
+  // thermostat mode while the next read still reports the air conditioning one.
   if (modeFeature) {
     addStatesOf(modeFeature, acModeToHeatingCoolingState);
-  }
-  if (thermostatModeFeature) {
+  } else if (thermostatModeFeature) {
     addStatesOf(thermostatModeFeature, thermostatModeToHeatingCoolingState);
   }
 
@@ -358,7 +361,8 @@ function buildThermostatService(service, device, features) {
         emitValue(powerFeature, 0);
       }
       // A thermostat driven by its mode is switched off through that mode: it has no on/off command.
-      if (thermostatModeFeature) {
+      // Behind the air conditioning mode, which stays the authority, that mode is not written.
+      if (!modeFeature && thermostatModeFeature) {
         writeMode(thermostatModeFeature, THERMOSTAT_MODE.OFF, thermostatModeToHeatingCoolingState);
       }
       callback();
@@ -373,8 +377,7 @@ function buildThermostatService(service, device, features) {
       // device that has no auto mode — but writing AC_MODE.AUTO there would push a mode it never
       // declared. The device is left in whatever mode it was running in; powering it on is enough.
       writeMode(modeFeature, heatingCoolingStateToAcMode[value], acModeToHeatingCoolingState);
-    }
-    if (thermostatModeFeature) {
+    } else if (thermostatModeFeature) {
       writeMode(thermostatModeFeature, heatingCoolingStateToThermostatMode[value], thermostatModeToHeatingCoolingState);
     }
     callback();

@@ -131,13 +131,15 @@ describe('Thermostat valid target states', () => {
     ).to.eql([0, 3]);
   });
 
-  it('should combine an air conditioning mode with a thermostat mode', () => {
+  it('should offer only the air conditioning states when both mode features exist', () => {
+    // the air conditioning mode is the authority for the reads and the writes, so offering heat
+    // here would let HomeKit set a state the next read could not report back
     expect(
       buildValidTargetStates({
         modeFeature: { supported_options: [{ value: AC_MODE.COOLING }] },
         thermostatModeFeature: { supported_options: [{ value: THERMOSTAT_MODE.HEATING }] },
       }),
-    ).to.eql([1, 2]);
+    ).to.eql([2]);
   });
 
   it('should ignore the setpoints when a thermostat mode is declared', () => {

@@ -2684,7 +2684,7 @@ describe('Build service', () => {
     expect(await readCharacteristic(characteristics.CurrentHeatingCoolingState)).to.equal(1);
   });
 
-  it('should let an air conditioning mode and a thermostat mode be written together', async () => {
+  it('should keep the air conditioning mode the authority over a thermostat mode', async () => {
     homekitHandler.gladys.stateManager.get = stub();
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pac-power').returns({ last_value: 1 });
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'pac-ac-mode').returns({
@@ -2732,6 +2732,8 @@ describe('Build service', () => {
 
     await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.THERMOSTAT]);
 
+    // off comes from the on/off command and heat from the air conditioning mode: the thermostat
+    // mode adds nothing, it is not the feature the reads and the writes go through
     expect(characteristics.TargetHeatingCoolingState.setProps.args[0][0]).to.eql({ validValues: [0, 1] });
     // the air conditioning mode stays the one driving the reads, as it did before
     expect(await readCharacteristic(characteristics.TargetHeatingCoolingState)).to.equal(1);
@@ -2741,16 +2743,12 @@ describe('Build service', () => {
     expect(homekitHandler.gladys.event.emit.args.map(([, action]) => action.device_feature)).to.eql([
       'pac-power',
       'pac-ac-mode',
-      'pac-mode',
     ]);
 
-    // and switching off writes both the on/off command and the off mode
+    // and switching off writes the on/off command, the way it does without a thermostat mode
     homekitHandler.gladys.event.emit = stub();
     await characteristics.TargetHeatingCoolingState.handlers.set(0, cb);
-    expect(homekitHandler.gladys.event.emit.args.map(([, action]) => action.device_feature)).to.eql([
-      'pac-power',
-      'pac-mode',
-    ]);
+    expect(homekitHandler.gladys.event.emit.args.map(([, action]) => action.device_feature)).to.eql(['pac-power']);
   });
 
   it('should build shutter/curtain service', async () => {
