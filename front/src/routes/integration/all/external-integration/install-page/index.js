@@ -16,7 +16,7 @@ import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import integrationText from '../integrationText.css';
-import NetworkWakeSummary from "../components/NetworkWakeSumamary";
+import NetworkWakeSummary from '../components/NetworkWakeSumamary';
 
 class ExternalIntegrationInstallPage extends Component {
   getStoreIntegration = async () => {

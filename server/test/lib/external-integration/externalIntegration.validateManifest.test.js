@@ -1091,14 +1091,15 @@ describe('externalIntegration.validateManifest', () => {
       network_wake: true,
     };
 
-    expect(() => externalIntegration.validateManifest(manifest)).to.not.throw();
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
   });
   it('should reject network_wake when it is not a boolean', () => {
-    const manifest = {
-      ...TEST_MANIFEST,
-      network_wake: 'true',
-    };
-
-    expect(() => externalIntegration.validateManifest(manifest)).to.throw(/network_wake: must be a boolean/);
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        network_wake: 'true',
+      },
+      'network_wake: must be a boolean',
+    );
   });
 });
