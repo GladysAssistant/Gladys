@@ -104,6 +104,7 @@ const { installFromStore } = require('./store/store.installFromStore');
 const { installFromRepoUrl } = require('./store/store.installFromRepoUrl');
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
+const { wakeOnLan } = require('./externalIntegration.wakeOnLan');
 
 /**
  * @description External integration supervisor: complete lifecycle of the
@@ -294,5 +295,6 @@ ExternalIntegration.prototype.getDocsMarkdown = getDocsMarkdown;
 ExternalIntegration.prototype.fetchManifestFromRepo = fetchManifestFromRepo;
 ExternalIntegration.prototype.installFromStore = installFromStore;
 ExternalIntegration.prototype.installFromRepoUrl = installFromRepoUrl;
+ExternalIntegration.prototype.wakeOnLan = wakeOnLan;
 
 module.exports = ExternalIntegration;

@@ -132,6 +132,27 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {post} /api/integration/v1/network/wake networkWake
+   * @apiName networkWake
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Send a Wake-on-LAN magic packet from the Gladys core
+   * network namespace.
+   */
+  async function networkWake(req, res) {
+    const { mac, address, port, sourcePort } = req.body;
+    await gladys.externalIntegration.wakeOnLan({
+      mac,
+      address,
+      port,
+      sourcePort,
+    });
+
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
    * @api {post} /api/integration/v1/camera/image saveCameraImage
    * @apiName saveCameraImage
    * @apiGroup IntegrationHostApi
@@ -311,6 +332,7 @@ module.exports = function IntegrationHostController(gladys) {
     heartbeat: asyncMiddleware(heartbeat),
     saveConnectionStatus: asyncMiddleware(saveConnectionStatus),
     networkDiscoveryScan: asyncMiddleware(networkDiscoveryScan),
+    networkWake: asyncMiddleware(networkWake),
     saveCameraImage: asyncMiddleware(saveCameraImage),
     setDeviceTransports: asyncMiddleware(setDeviceTransports),
     publishDiscoveredDevices: asyncMiddleware(publishDiscoveredDevices),
