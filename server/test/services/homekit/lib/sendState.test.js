@@ -36,6 +36,7 @@ describe('Send state to HomeKit', () => {
         CurrentHeatingCoolingState: 'CURRENTHEATINGCOOLINGSTATE',
         TargetTemperature: 'TARGETTEMPERATURE',
         MotionDetected: 'MOTIONDETECTED',
+        OccupancyDetected: 'OCCUPANCYDETECTED',
         CurrentTemperature: 'CURRENTTEMPERATURE',
         CurrentPosition: 'CURRENTPOSITION',
         Active: 'ACTIVE',
@@ -64,6 +65,7 @@ describe('Send state to HomeKit', () => {
       Service: {
         ContactSensor: 'CONTACTSENSOR',
         MotionSensor: 'MOTIONSENSOR',
+        OccupancySensor: 'OCCUPANCYSENSOR',
         WindowCovering: 'WINDOWCOVERING',
         Thermostat: 'THERMOSTAT',
         TemperatureSensor: 'TEMPERATURESENSOR',
@@ -194,6 +196,39 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     expect(updateCharacteristic.args[0]).eql(['MOTIONDETECTED', 0]);
+  });
+
+  it('should notify presence sensor', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Presence',
+      category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.PUSH,
+    };
+
+    // the scanner reports the device answering, then no longer answering
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 });
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 0 });
+
+    // an integration exposing presence as a plain binary reaches the same branch
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, type: DEVICE_FEATURE_TYPES.SENSOR.BINARY },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 },
+    );
+
+    expect(updateCharacteristic.args).eql([
+      ['OCCUPANCYDETECTED', 1],
+      ['OCCUPANCYDETECTED', 0],
+      ['OCCUPANCYDETECTED', 1],
+    ]);
   });
 
   it('should notify light brightness', async () => {

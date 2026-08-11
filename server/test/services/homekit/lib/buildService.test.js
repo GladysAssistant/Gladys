@@ -489,6 +489,50 @@ describe('Build service', () => {
     expect(cb.args[0][1]).to.equal(0);
   });
 
+  it('should build presence sensor service', async () => {
+    homekitHandler.gladys.stateManager.get = stub().returns({
+      id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+      name: 'Presence',
+      category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.PUSH,
+      last_value: 1,
+    });
+    const on = stub();
+    // OccupancyDetected is read and notify only, so no write handler is registered
+    const getCharacteristic = stub().returns({ on, props: { perms: ['PAIRED_READ'] } });
+    const OccupancySensor = stub().returns({ getCharacteristic });
+
+    homekitHandler.hap = {
+      Characteristic: { OccupancyDetected: 'OCCUPANCYDETECTED' },
+      CharacteristicEventTypes: stub(),
+      Perms: { PAIRED_READ: 'PAIRED_READ', PAIRED_WRITE: 'PAIRED_WRITE' },
+      Service: { OccupancySensor },
+    };
+    const features = [
+      {
+        id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+        name: 'Presence',
+        selector: 'telephone-presence',
+        category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.PUSH,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(
+      { name: 'Téléphone' },
+      features,
+      mappings[DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR],
+    );
+    await on.args[0][1](cb);
+
+    expect(OccupancySensor.args[0][0]).to.equal('Téléphone');
+    expect(on.callCount).to.equal(1);
+    expect(getCharacteristic.args[0][0]).to.equal('OCCUPANCYDETECTED');
+    expect(cb.args[0][1]).to.equal(1);
+  });
+
   it('should build stateless programmable switch service', async () => {
     homekitHandler.gladys.stateManager.get = stub();
     const on = stub();

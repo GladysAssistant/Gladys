@@ -44,6 +44,21 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
+    service: 'OccupancySensor',
+    capabilities: {
+      // The push flavour is what lan-manager creates, and despite its name it carries a lasting
+      // state rather than an event: the scanner emits 1 when the device answers and 0 when it stops
+      // answering, and reads the stored value back before emitting so the same one is not repeated.
+      // Gladys and HomeKit agree that 1 means occupied, so the value goes through untouched.
+      [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: {
+        characteristics: ['OccupancyDetected'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
+        characteristics: ['OccupancyDetected'],
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR]: {
     service: 'LeakSensor',
     capabilities: {
