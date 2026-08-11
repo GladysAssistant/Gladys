@@ -230,7 +230,7 @@ class ZwaveJSUIDeviceBox extends Component {
                   )}
 
                   {deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                    <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                       <Text id="integration.zwavejs-ui.deleteButton" />
                     </button>
                   )}
