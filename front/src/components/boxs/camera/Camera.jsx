@@ -329,7 +329,9 @@ class CameraBoxComponent extends Component {
       upgradeGladysPlusPlanRequired
     }
   ) {
-    const ptzControls = this.renderPtzControls();
+    // PTZ controls only make sense on the live view: in snapshot mode movements are not
+    // visible, and the overlay was covering the widget's other actions (field feedback).
+    const ptzControls = streaming ? this.renderPtzControls() : null;
     if (streaming) {
       return (
         <div class="card">
@@ -357,12 +359,7 @@ class CameraBoxComponent extends Component {
     }
     return (
       <div class="card">
-        {image && (
-          <div class={style.cameraMediaContainer}>
-            <img class="card-img-top" src={`data:${image}`} alt={props.roomName} />
-            {ptzControls}
-          </div>
-        )}
+        {image && <img class="card-img-top" src={`data:${image}`} alt={props.roomName} />}
         {error && (
           <div>
             <p class={style.noImageToShowError}>

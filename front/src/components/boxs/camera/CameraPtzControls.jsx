@@ -11,6 +11,8 @@ const ZOOM_VALUES = [CAMERA_MOVE.ZOOM_IN, CAMERA_MOVE.ZOOM_OUT];
 const isActivationKey = e => e.key === 'Enter' || e.key === ' ';
 
 // PTZ overlay of the camera dashboard widget: D-pad + zoom + stop + preset select.
+// Rendered on the live view only, anchored top-right so the native <video> controls at the
+// bottom of the player stay usable (spec docs/specs/camera-ptz-control.md, D.1).
 // Press-and-hold semantics (spec docs/specs/camera-ptz-control.md, A.2 and D.1): pressing a
 // direction (pointer or Space/Enter) sends its CAMERA_MOVE value, releasing sends STOP (0).
 // Each press opens a movement session bound to the feature it was sent to; the STOP is always

@@ -145,7 +145,7 @@ The scalar command already flows: `external-integration.device.set-value` carrie
 `front/src/components/boxs/camera/Camera.jsx` (still image + HLS live view) gains a PTZ overlay:
 
 - **Data**: on mount (and when `box.camera` changes), fetch `GET /api/v1/device/:selector`, find the `move`/`preset` features and read the `move` feature's `supported_options`. No PTZ feature → no overlay, widget unchanged.
-- **Controls**, overlaid on the image/video, bottom-right, Tabler-style semi-transparent buttons:
+- **Controls**, overlaid on the live video, top-right, Tabler-style semi-transparent buttons (the bottom band of the player belongs to the native `<video>` controls — seek bar, volume — which a bottom-anchored pad covered, per field feedback):
   - a **D-pad** (◀ ▶ ▲ ▼ around a central ■ stop) — each arrow shown only if the matching `CAMERA_MOVE` value is in the supported options (fallback: all, per A.2); the stop center is always shown when the `move` feature exists;
   - **zoom** `+` / `−` buttons if `ZOOM_IN`/`ZOOM_OUT` are supported;
   - a **preset select** (options from the `preset` feature's `supported_options`, ordered by `sort_order`) if present and non-empty.
@@ -153,7 +153,7 @@ The scalar command already flows: `external-integration.device.set-value` carrie
 - **Staleness guards**: a camera change clears the overlay immediately and responses from superseded requests are dropped (request generation), so the controls can never target the previously selected camera. The feature list (and thus the preset list) is loaded on widget mount and camera change; there is **no live push of device-structure changes today** (the device WebSocket events cover states only), so a preset list resynced by an integration appears on the next dashboard load — a device-structure WS event is a phase-2 candidate.
 - Commands go through `POST /api/v1/device_feature/:selector/value` (fire-and-forget; a failed command shows the widget's standard transient error style). No optimistic state to manage — the `move` feature has no meaningful state.
 - **Visibility**: overlay appears on hover/focus on pointer devices, always visible on touch devices (same pattern as the video controls). `EditCamera.jsx` gains one checkbox — "Show camera controls (PTZ)" (`box.camera_ptz_controls`, default `true`) — for users who want a clean image even on a motorized camera.
-- Overlay is available in both modes (still image and live streaming); in still mode movements won't be visible until the next image refresh, which is acceptable (a hint in the docs recommends live view for aiming).
+- Overlay is rendered on the **live view only**: in snapshot mode movements are not visible until the next image refresh, so the pad is pointless there and only got in the way of the widget's other actions (field feedback from the first ONVIF integration test). Cameras without live streaming keep PTZ control through the devices-in-room rows (D.2) and scenes.
 
 ### D.2 Devices-in-room widget
 

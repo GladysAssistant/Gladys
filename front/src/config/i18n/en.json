@@ -393,7 +393,7 @@
         "liveAutoStartDescription": "Warning: This can increase the load on your machine/network.",
         "presetPlaceholder": "Presets...",
         "ptzControlsLabel": "Show camera controls (PTZ)",
-        "ptzControlsDescription": "When the camera device has movement or preset features, a directional pad and a preset selector are displayed on the image.",
+        "ptzControlsDescription": "When the camera device has movement or preset features, a directional pad and a preset selector are displayed on the live view (top-right corner, during streaming only).",
         "latency": {
           "ultraLow": "Ultra low",
           "low": "Low",

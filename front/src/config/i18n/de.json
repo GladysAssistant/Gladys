@@ -393,7 +393,7 @@
         "liveAutoStartDescription": "Warnung: Dies kann die Belastung deines Gerätes sowie Netzwerks erhöhen.",
         "presetPlaceholder": "Presets...",
         "ptzControlsLabel": "Kamerasteuerung anzeigen (PTZ)",
-        "ptzControlsDescription": "Wenn das Kameragerät Bewegungs- oder Preset-Funktionen hat, werden ein Steuerkreuz und eine Preset-Auswahl auf dem Bild angezeigt.",
+        "ptzControlsDescription": "Wenn das Kameragerät Bewegungs- oder Preset-Funktionen hat, werden ein Steuerkreuz und eine Preset-Auswahl in der Live-Ansicht angezeigt (obere rechte Ecke, nur während des Streamings).",
         "latency": {
           "ultraLow": "Sehr niedrig",
           "low": "Niedrig",

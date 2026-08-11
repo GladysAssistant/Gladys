@@ -393,7 +393,7 @@
         "liveAutoStartDescription": "Attention: Cette option peut augmenter la charge sur votre machine/réseau.",
         "presetPlaceholder": "Positions...",
         "ptzControlsLabel": "Afficher les contrôles caméra (PTZ)",
-        "ptzControlsDescription": "Quand l'appareil caméra a des fonctionnalités de mouvement ou de positions, un pavé directionnel et un sélecteur de position sont affichés sur l'image.",
+        "ptzControlsDescription": "Quand l'appareil caméra a des fonctionnalités de mouvement ou de positions, un pavé directionnel et un sélecteur de position sont affichés sur la vue live (coin supérieur droit, uniquement pendant le streaming).",
         "latency": {
           "ultraLow": "Très basse",
           "low": "Basse",
