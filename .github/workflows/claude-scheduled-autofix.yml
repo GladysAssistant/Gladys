@@ -358,7 +358,11 @@ jobs:
     steps:
       - name: 🚀 Fire a Claude Code cloud session
         env:
-          FIRE_URL: ${{ vars.CLAUDE_AUTOFIX_FIRE_URL }}
+          # The URL is not sensitive (the token is), so it belongs in a
+          # repository variable — but a secret of the same name works too,
+          # since mixing up the two tabs of Settings > Secrets and
+          # variables is an easy mistake.
+          FIRE_URL: ${{ vars.CLAUDE_AUTOFIX_FIRE_URL || secrets.CLAUDE_AUTOFIX_FIRE_URL }}
           FIRE_TOKEN: ${{ secrets.CLAUDE_AUTOFIX_ROUTINE_TOKEN }}
           PR_NUMBER: ${{ matrix.pr.number }}
           PR_BRANCH: ${{ matrix.pr.branch }}
@@ -368,8 +372,11 @@ jobs:
         run: |
           set -uo pipefail
 
-          if [ -z "${FIRE_URL:-}" ] || [ -z "${FIRE_TOKEN:-}" ]; then
-            echo "::error::Missing CLAUDE_AUTOFIX_FIRE_URL (repository variable) or CLAUDE_AUTOFIX_ROUTINE_TOKEN (secret). See .github/CLAUDE_AUTOFIX.md for the one-time routine setup."
+          MISSING=''
+          [ -n "${FIRE_URL:-}" ] || MISSING="CLAUDE_AUTOFIX_FIRE_URL (repository variable, or secret)"
+          [ -n "${FIRE_TOKEN:-}" ] || MISSING="${MISSING:+$MISSING and }CLAUDE_AUTOFIX_ROUTINE_TOKEN (repository secret)"
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing: $MISSING. Both live under Settings > Secrets and variables > Actions. See .github/CLAUDE_AUTOFIX.md for the one-time routine setup."
             exit 1
           fi
 
