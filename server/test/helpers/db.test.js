@@ -3,6 +3,7 @@ const { promisify } = require('util');
 const Promise = require('bluebird');
 const { join } = require('path');
 const db = require('../../models');
+const logger = require('../../utils/logger');
 
 const SEEDERS_PATH = join(__filename, '../../../seeders');
 
@@ -41,7 +42,7 @@ let cleanMarkers = null;
 
 // Observability for dbReset.test.js: lets the tests assert that the skip
 // branches really skip (an unnecessary reset would produce the same data).
-const resetDbStats = { sqliteResets: 0, duckDeletes: 0 };
+const resetDbStats = { sqliteResets: 0, duckDeletes: 0, snapshotRebuilds: 0 };
 
 // Most tests never write to the database, so even the fast snapshot copy is
 // wasted work for them. Before copying, we read two cheap freshness markers
@@ -65,6 +66,9 @@ const initSnapshotReset = async () => {
   sqliteAll = promisify(connection.all.bind(connection));
 
   const snapshotPath = `${db.sequelize.options.storage.replace(/\.db$/, '')}-snapshot.db`;
+  // On a rebuild the previous snapshot is still attached: detach it first so
+  // the file can be replaced (no-op errors ignored on the first build).
+  await sqliteExec('DETACH DATABASE seed_snapshot').catch(() => {});
   if (existsSync(snapshotPath)) {
     unlinkSync(snapshotPath);
   }
@@ -84,41 +88,53 @@ const initSnapshotReset = async () => {
   ].join(';\n');
 };
 
+// Build a pristine seeded state with the real seeders (in a single
+// transaction to avoid one journal sync per statement), then snapshot it so
+// every later reset is a fast native copy. Called on the first reset, and
+// again as a rescue whenever the fast copy no longer matches the live schema.
+const rebuildSeededSnapshot = async () => {
+  await db.sequelize.query('BEGIN');
+  try {
+    const queryInterface = db.sequelize.getQueryInterface();
+    await Promise.each(reversedSeed, async (seed) => {
+      await seed.down(queryInterface);
+    });
+    await Promise.each(seeds, async (seed) => {
+      await seed.up(queryInterface);
+    });
+    await db.sequelize.query('COMMIT');
+  } catch (e) {
+    await db.sequelize.query('ROLLBACK');
+    throw e;
+  }
+  await initSnapshotReset();
+  cleanMarkers = await readFreshnessMarkers();
+};
+
 const resetDb = async () => {
   if (!sqliteResetScript) {
-    // First reset: build a pristine seeded state with the real seeders (in a
-    // single transaction to avoid one journal sync per statement), then
-    // snapshot it so every later reset is a fast native copy.
-    await db.sequelize.query('BEGIN');
-    try {
-      const queryInterface = db.sequelize.getQueryInterface();
-      await Promise.each(reversedSeed, async (seed) => {
-        await seed.down(queryInterface);
-      });
-      await Promise.each(seeds, async (seed) => {
-        await seed.up(queryInterface);
-      });
-      await db.sequelize.query('COMMIT');
-    } catch (e) {
-      await db.sequelize.query('ROLLBACK');
-      throw e;
-    }
-    await initSnapshotReset();
-    cleanMarkers = await readFreshnessMarkers();
+    await rebuildSeededSnapshot();
   } else {
     const markers = await readFreshnessMarkers();
     if (markers !== cleanMarkers) {
       resetDbStats.sqliteResets += 1;
       try {
         await sqliteExec(sqliteResetScript);
+        // The reset itself moved the markers: re-read them so the next call
+        // compares against the freshly restored state.
+        cleanMarkers = await readFreshnessMarkers();
       } catch (e) {
         // A failed exec can leave an open transaction and foreign keys disabled.
-        await sqliteExec('ROLLBACK; PRAGMA foreign_keys = ON').catch(() => {});
-        throw e;
+        await sqliteExec('ROLLBACK').catch(() => {});
+        await sqliteExec('PRAGMA foreign_keys = ON').catch(() => {});
+        // The fast copy assumes the live schema still matches the snapshot's.
+        // A test that alters the schema (e.g. restoring a real backup over the
+        // database file) would otherwise fail every later test of this worker:
+        // rebuild the seeded state and a fresh snapshot instead of giving up.
+        logger.warn(`resetDb: snapshot reset failed (${e.message}), rebuilding the seed snapshot`);
+        resetDbStats.snapshotRebuilds += 1;
+        await rebuildSeededSnapshot();
       }
-      // The reset itself moved the markers: re-read them so the next call
-      // compares against the freshly restored state.
-      cleanMarkers = await readFreshnessMarkers();
     }
   }
   // Clean DuckDB database (a separate database, not covered by the snapshot).
