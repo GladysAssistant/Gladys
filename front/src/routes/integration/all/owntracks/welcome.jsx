@@ -1,6 +1,7 @@
 import { Text, MarkupText } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const OwntracksWelcomePage = ({ user }) => (
   <div class="page">
@@ -9,6 +10,7 @@ const OwntracksWelcomePage = ({ user }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.owntracks.title" />
               </h3>

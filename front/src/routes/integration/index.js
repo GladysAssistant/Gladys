@@ -5,11 +5,12 @@ import { route } from 'preact-router';
 
 import IntegrationPage from './IntegrationPage';
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import normalizeSearchText from '../../utils/normalizeSearchText';
 import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
 import { getLocalizedText } from './all/external-integration/utils';
-import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog } from './catalog-url';
+import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog, rememberCatalogUrl } from './catalog-url';
 import createActionsExternalIntegrationUpdates from '../../actions/externalIntegrationUpdates';
 import { RequestStatus } from '../../utils/consts';
 
@@ -40,8 +41,13 @@ class Integration extends Component {
   // a render, the new value is not readable in the state right away
   updateURL(filters = this.state) {
     const { searchKeyword, orderDir } = filters;
+    const url = getCatalogUrl({ category: this.props.category, searchKeyword, orderDir });
+    // the list is only reloaded 300ms later (the search is debounced): without
+    // this, opening an integration in between would send its back link to the
+    // previous view, while the browser back button already goes to this one
+    rememberCatalogUrl(url);
     // replace and not push: filtering should not fill the browser history
-    route(getCatalogUrl({ category: this.props.category, searchKeyword, orderDir }), true);
+    route(url, true);
   }
 
   componentWillMount() {
@@ -291,8 +297,6 @@ class Integration extends Component {
       category && !VIRTUAL_CATEGORIES.includes(category) ? integrationsByType[category] || [] : integrations;
     // Load all categories
     let integrationCategories = categories;
-    // Total size
-    let totalSize = integrations.length;
 
     // Filter integrations and categories according to user role
     if (user.role !== USER_ROLE.ADMIN) {
@@ -305,8 +309,6 @@ class Integration extends Component {
       integrationCategories = integrationCategories.filter(
         i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1
       );
-
-      totalSize = integrations.filter(i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1).length;
     }
 
     // Get favorites (use cached state if available, otherwise empty)
@@ -338,30 +340,41 @@ class Integration extends Component {
       isFavorite: favorites.includes(card.key)
     }));
     selectedIntegrations = selectedIntegrations.concat(externalCards);
-    totalSize += externalCards.length;
 
     // If we are in favorites view, only display favorites
     if (category === 'favorites') {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.isFavorite);
-      totalSize = selectedIntegrations.length;
     }
 
     // If we are in updates view, only display the integrations to update
     if (category === 'updates') {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.updateAvailable);
-      totalSize = selectedIntegrations.length;
     }
+
+    // the total is the size of the view the user is currently looking at, once
+    // every filter that defines this view has been applied (role, category,
+    // favorites, updates) but before the search: it is the reference the search
+    // result count is compared to. Computing it any earlier would mix scopes,
+    // e.g. counting the integrations of every type while displaying only one
+    const totalSize = selectedIntegrations.length;
 
     // Filter
     if (searchKeyword && searchKeyword.length > 0) {
-      const lowerCaseSearchKeyword = searchKeyword.toLowerCase();
-      selectedIntegrations = selectedIntegrations.filter(integration => {
-        const { name, description } = integration;
-        return (
-          name.toLowerCase().includes(lowerCaseSearchKeyword) ||
-          description.toLowerCase().includes(lowerCaseSearchKeyword)
-        );
-      });
+      // both sides are stripped of their accents: "meteo" has to find "Météo",
+      // and typing "Météo" has to keep finding it
+      const normalizedSearchKeyword = normalizeSearchText(searchKeyword);
+      // a keyword made of accents only folds down to nothing, and every string
+      // contains the empty string: without this, such a search would display
+      // the whole catalog as if the field were empty
+      selectedIntegrations = normalizedSearchKeyword.length
+        ? selectedIntegrations.filter(integration => {
+            const { name, description } = integration;
+            return (
+              normalizeSearchText(name).includes(normalizedSearchKeyword) ||
+              normalizeSearchText(description).includes(normalizedSearchKeyword)
+            );
+          })
+        : [];
     }
 
     // Sort
@@ -374,6 +387,10 @@ class Integration extends Component {
     // the counter is computed from the installed integrations, not from the
     // cards being displayed: it must stay the same in every category
     const integrationsToUpdate = this.countIntegrationsToUpdate();
+
+    // the integration pages send the user back here: this runs on mount and on
+    // every filter change, so the remembered view is always the current one
+    rememberCatalogUrl(getCatalogUrl({ category, searchKeyword, orderDir }));
 
     this.setState({
       integrations: selectedIntegrations,

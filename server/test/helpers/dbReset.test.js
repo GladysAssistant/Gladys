@@ -55,6 +55,30 @@ describe('resetDb freshness detection', () => {
     expect(restored.name).to.equal(house.name);
   });
 
+  it('should rebuild the snapshot when the live schema drifted', async () => {
+    // Simulate what restoring a real backup over the database file does: the
+    // live schema no longer matches the snapshot's, so the positional
+    // INSERT ... SELECT * of the fast reset cannot work anymore. resetDb must
+    // rebuild the seeded snapshot instead of failing every later test.
+    // (DDL moves neither freshness marker, so also dirty a row to make sure
+    // the reset path actually runs.)
+    const [house] = await db.House.findAll();
+    await db.sequelize.query('ALTER TABLE t_house ADD COLUMN test_drift_column INTEGER');
+    await db.sequelize.query(`UPDATE t_house SET name = 'dirty' WHERE id = '${house.id}'`);
+    const stats = { ...resetDbStats };
+    await resetDb();
+    expect(resetDbStats.snapshotRebuilds).to.equal(stats.snapshotRebuilds + 1);
+    expect((await db.House.findByPk(house.id)).name).to.equal(house.name);
+    // Heal in the other direction too: dropping the column makes the live
+    // table narrower than the (just rebuilt) snapshot. The second rebuild
+    // brings the snapshot back to the pristine schema for the tests after us.
+    await db.sequelize.query('ALTER TABLE t_house DROP COLUMN test_drift_column');
+    await db.sequelize.query(`UPDATE t_house SET name = 'dirty' WHERE id = '${house.id}'`);
+    await resetDb();
+    expect(resetDbStats.snapshotRebuilds).to.equal(stats.snapshotRebuilds + 2);
+    expect((await db.House.findByPk(house.id)).name).to.equal(house.name);
+  });
+
   it('should clear DuckDB states when rows are present', async () => {
     await db.duckDbWriteConnectionAllAsync(
       `INSERT INTO t_device_feature_state VALUES ('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', 12, '2024-01-01 00:00:00')`,

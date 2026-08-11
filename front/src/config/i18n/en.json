@@ -693,6 +693,7 @@
     "root": {
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
+      "subtitleTotal": "{{total}} integrations",
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
       "allIntegrationsUpToDate": "All your integrations are up to date.",
@@ -905,7 +906,6 @@
         "updateTitle": "The integration re-published this device with a different structure: apply the new definition"
       },
       "install": {
-        "backToCatalog": "Back to integrations",
         "notFound": "This integration was not found in the store.",
         "starsLabel": "stars",
         "lastPushLabel": "Last update:",
@@ -943,7 +943,7 @@
         "repoUrlPlaceholder": "https://github.com/owner/repository",
         "installButton": "Install",
         "devModeLink": "Developer mode: install from a Docker image",
-        "devModeDescription": "Install an integration directly from a Docker image, with an optional manifest. Only for integration developers.",
+        "devModeDescription": "Install an integration directly from a Docker image, with an optional manifest. The image can be built locally with docker build, no registry needed. Only for integration developers.",
         "dockerImageLabel": "Docker image",
         "dockerImagePlaceholder": "e.g. myuser/my-integration:latest",
         "manifestLabel": "Manifest (JSON, optional)",
@@ -2988,6 +2988,7 @@
       "keyNameLabel": "Key:",
       "registeredLabel": "Registered on:"
     },
+    "backToIntegrations": "Back to integrations",
     "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now."
   },
   "editScene": {
@@ -3105,6 +3106,8 @@
         "valueLabel": "Value",
         "valueTypeSimple": "Simple",
         "simpleExplanationText": "Enter the new value you wish to assign to your device here.",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
         "valueTypeComputed": "Computed",
         "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
@@ -3240,7 +3243,8 @@
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "gladys/my-topic",
+        "topicPlaceholder": "zigbee2mqtt/my-device/set",
+        "topicExplanation": "The topic is published as-is: you must write the full MQTT topic, including the 'zigbee2mqtt/' prefix (for example 'zigbee2mqtt/my-device/set').",
         "messageLabel": "Message",
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
@@ -3396,6 +3400,8 @@
         "lessOrEqual": "less or equal",
         "different": "different",
         "valuePlaceholder": "Value",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
         "on": "On",
         "off": "Off",
         "deviceSeen": "If the device is detected",
@@ -4770,6 +4776,13 @@
           "one": "Motion detected"
         }
       },
+      "presence-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No presence",
+          "one": "Presence detected"
+        }
+      },
       "smoke-sensor": {
         "binary": {
           "other": "No value received",
@@ -4919,6 +4932,22 @@
           "4": "Returning to Dock",
           "5": "Charging",
           "6": "Docked"
+        },
+        "run-mode": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Idle",
+          "1": "Clean",
+          "2": "Map"
+        },
+        "clean-mode": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Auto",
+          "1": "Quick",
+          "2": "Quiet",
+          "3": "Low Noise",
+          "4": "Deep Clean",
+          "5": "Vacuum",
+          "6": "Mop"
         }
       },
       "water-heater": {
@@ -4981,7 +5010,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Presence sensor",
-      "push": "Presence"
+      "push": "Presence",
+      "binary": "Presence (binary)"
     },
     "rain-sensor": {
       "shortCategoryName": "Rain sensor",
@@ -5121,6 +5151,18 @@
     "formaldehyd-sensor": {
       "shortCategoryName": "Formaldehyd sensor",
       "decimal": "Formaldehyd (decimal)"
+    },
+    "no2-sensor": {
+      "shortCategoryName": "NO2 sensor",
+      "decimal": "NO2 (decimal)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "O3 sensor",
+      "decimal": "O3 (decimal)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "SO2 sensor",
+      "decimal": "SO2 (decimal)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
