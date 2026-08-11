@@ -9,7 +9,7 @@ import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/con
 import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
 import { getLocalizedText } from './all/external-integration/utils';
-import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog } from './catalog-url';
+import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog, rememberCatalogUrl } from './catalog-url';
 import createActionsExternalIntegrationUpdates from '../../actions/externalIntegrationUpdates';
 import { RequestStatus } from '../../utils/consts';
 
@@ -40,8 +40,13 @@ class Integration extends Component {
   // a render, the new value is not readable in the state right away
   updateURL(filters = this.state) {
     const { searchKeyword, orderDir } = filters;
+    const url = getCatalogUrl({ category: this.props.category, searchKeyword, orderDir });
+    // the list is only reloaded 300ms later (the search is debounced): without
+    // this, opening an integration in between would send its back link to the
+    // previous view, while the browser back button already goes to this one
+    rememberCatalogUrl(url);
     // replace and not push: filtering should not fill the browser history
-    route(getCatalogUrl({ category: this.props.category, searchKeyword, orderDir }), true);
+    route(url, true);
   }
 
   componentWillMount() {
@@ -374,6 +379,10 @@ class Integration extends Component {
     // the counter is computed from the installed integrations, not from the
     // cards being displayed: it must stay the same in every category
     const integrationsToUpdate = this.countIntegrationsToUpdate();
+
+    // the integration pages send the user back here: this runs on mount and on
+    // every filter change, so the remembered view is always the current one
+    rememberCatalogUrl(getCatalogUrl({ category, searchKeyword, orderDir }));
 
     this.setState({
       integrations: selectedIntegrations,

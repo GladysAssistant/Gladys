@@ -905,7 +905,6 @@
         "updateTitle": "The integration re-published this device with a different structure: apply the new definition"
       },
       "install": {
-        "backToCatalog": "Back to integrations",
         "notFound": "This integration was not found in the store.",
         "starsLabel": "stars",
         "lastPushLabel": "Last update:",
@@ -2988,6 +2987,7 @@
       "keyNameLabel": "Key:",
       "registeredLabel": "Registered on:"
     },
+    "backToIntegrations": "Back to integrations",
     "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now."
   },
   "editScene": {
