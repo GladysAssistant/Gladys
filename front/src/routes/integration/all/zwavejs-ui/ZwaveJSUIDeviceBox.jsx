@@ -113,8 +113,8 @@ class ZwaveJSUIDeviceBox extends Component {
   };
 
   render(
-    { deviceIndex, editable, deleteButton, housesWithRooms },
-    { device, loading, errorMessage, tooMuchStatesError, statesNumber, getZwaveJSUIDevices }
+    { deviceIndex, editable, deleteButton, housesWithRooms, getZwaveJSUIDevices },
+    { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
     const { locationZwaveUi } = this.getDeviceProperty();
@@ -230,12 +230,13 @@ class ZwaveJSUIDeviceBox extends Component {
                   )}
 
                   {deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
-                      <Text id="integration.zwavejs-ui.deleteButton" />
-                    </button>
+                    <>
+                      <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
+                        <Text id="integration.zwavejs-ui.deleteButton" />
+                      </button>
+                      <MigrateDeviceButton device={device} onMigrated={getZwaveJSUIDevices} />
+                    </>
                   )}
-
-                  <MigrateDeviceButton device={device} onMigrated={getZwaveJSUIDevices} />
                 </div>
               </div>
             </div>
