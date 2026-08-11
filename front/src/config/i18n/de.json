@@ -905,7 +905,6 @@
         "updateTitle": "Die Integration hat dieses Gerät mit einer anderen Struktur erneut veröffentlicht: neue Definition anwenden"
       },
       "install": {
-        "backToCatalog": "Zurück zu den Integrationen",
         "notFound": "Diese Integration wurde nicht im Store gefunden.",
         "starsLabel": "Sterne",
         "lastPushLabel": "Letzte Aktualisierung:",
@@ -2988,6 +2987,7 @@
       "keyNameLabel": "Schlüssel:",
       "registeredLabel": "Registriert am:"
     },
+    "backToIntegrations": "Zurück zu den Integrationen",
     "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden."
   },
   "editScene": {

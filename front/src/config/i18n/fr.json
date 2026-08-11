@@ -905,7 +905,6 @@
         "updateTitle": "L'intégration a re-publié cet appareil avec une structure différente : appliquer la nouvelle définition"
       },
       "install": {
-        "backToCatalog": "Retour aux intégrations",
         "notFound": "Cette intégration n'a pas été trouvée dans le store.",
         "starsLabel": "étoiles",
         "lastPushLabel": "Dernière mise à jour :",
@@ -2988,6 +2987,7 @@
       "keyNameLabel": "Clé :",
       "registeredLabel": "Enregistré le :"
     },
+    "backToIntegrations": "Retour aux intégrations",
     "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment."
   },
   "editScene": {

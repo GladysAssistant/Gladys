@@ -9,7 +9,7 @@ import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/con
 import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
 import { getLocalizedText } from './all/external-integration/utils';
-import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog } from './catalog-url';
+import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog, rememberCatalogUrl } from './catalog-url';
 import createActionsExternalIntegrationUpdates from '../../actions/externalIntegrationUpdates';
 import { RequestStatus } from '../../utils/consts';
 
@@ -374,6 +374,10 @@ class Integration extends Component {
     // the counter is computed from the installed integrations, not from the
     // cards being displayed: it must stay the same in every category
     const integrationsToUpdate = this.countIntegrationsToUpdate();
+
+    // the integration pages send the user back here: this runs on mount and on
+    // every filter change, so the remembered view is always the current one
+    rememberCatalogUrl(getCatalogUrl({ category, searchKeyword, orderDir }));
 
     this.setState({
       integrations: selectedIntegrations,

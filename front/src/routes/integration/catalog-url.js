@@ -58,10 +58,25 @@ export const getUrlFromCatalog = (path, { category, searchKeyword, orderDir }) =
   return withQuery(path, urlParams);
 };
 
+// last catalog view the user visited. The native integration pages cannot
+// carry the filters in their own URL the way the install page does: their
+// query string is handed to the page component as props by preact-router,
+// where a "search" parameter would shadow the search action of the pages that
+// have one. Remembering the catalog here keeps their back link accurate
+// without touching their URL — a page reload simply forgets it and the link
+// falls back to the whole catalog.
+let lastCatalogUrl = null;
+
+export const rememberCatalogUrl = url => {
+  lastCatalogUrl = url;
+};
+
 export const getBackToCatalogUrl = (queryString = window.location.search) => {
   const from = new URLSearchParams(queryString).get('from');
-  // the parameter comes from the URL: fall back to the whole catalog rather
-  // than trusting an arbitrary path
-  const path = CATALOG_PATHS.has(from) ? from : CATALOG_BASE_URL;
-  return withQuery(path, buildFilterParams(getCatalogFilters(queryString)));
+  // the parameter comes from the URL: fall back to the last catalog seen
+  // rather than trusting an arbitrary path
+  if (!CATALOG_PATHS.has(from)) {
+    return lastCatalogUrl || CATALOG_BASE_URL;
+  }
+  return withQuery(from, buildFilterParams(getCatalogFilters(queryString)));
 };
