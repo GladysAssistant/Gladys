@@ -1,6 +1,11 @@
 const { EVENTS } = require('../../../utils/constants');
 const { mappings } = require('./deviceMappings');
 
+// The alarm of a house is not a device feature, so its changes arrive on the same trigger stream
+// under their own event types. ARMING is left out: it announces the delay before the house actually
+// arms, and the mode has not changed yet when it fires.
+const ALARM_EVENTS = new Set([EVENTS.ALARM.ARM, EVENTS.ALARM.DISARM, EVENTS.ALARM.PARTIAL_ARM, EVENTS.ALARM.PANIC]);
+
 /**
  * @description Add delay before send new state to Homekit.
  * @param {object} accessories - HomeKit accessories.
@@ -10,6 +15,13 @@ const { mappings } = require('./deviceMappings');
  * notifyChange(accessories, event)
  */
 function notifyChange(accessories, event) {
+  if (ALARM_EVENTS.has(event.type)) {
+    // No debounce: an alarm arming or going off is exactly what HomeKit must hear about at once.
+    this.sendAlarmState(event.house);
+
+    return;
+  }
+
   if (event.type !== EVENTS.DEVICE.NEW_STATE) {
     return;
   }

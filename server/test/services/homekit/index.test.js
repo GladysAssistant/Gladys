@@ -27,6 +27,9 @@ describe('HomeKitService', () => {
       system: {
         isDocker: stub().resolves(true),
       },
+      house: {
+        get: stub().resolves([]),
+      },
       event: {
         on: stub().returns(),
         removeListener: stub().returns(),

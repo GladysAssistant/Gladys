@@ -13,6 +13,7 @@ describe('Create bridge', () => {
       serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
       createBridge,
       buildAccessory: stub().returns({ UUID: '78a7b724-18e8-4c15-ab30-c8486c253f36' }),
+      buildAlarmAccessory: stub().returns({ UUID: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55' }),
       getExposedDevices: stub().resolves([
         {
           id: '07f16117-8556-4b50-b9f0-e190d08f8d92',
@@ -28,6 +29,9 @@ describe('Create bridge', () => {
         },
         event: {
           on: stub().returns(),
+        },
+        house: {
+          get: stub().resolves([{ id: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55', name: 'Maison', selector: 'maison' }]),
         },
       },
       newUsername: stub().resolves('C4:D0:AB:12:BC:51'),
@@ -48,7 +52,13 @@ describe('Create bridge', () => {
 
     expect(homekitHandler.hap.Bridge.args[0][0]).to.equal('Gladys');
     expect(homekitHandler.hap.Bridge.args[0][1]).not.equal(null);
-    expect(addBridgedAccessories.args[0][0]).to.deep.members([{ UUID: '78a7b724-18e8-4c15-ab30-c8486c253f36' }]);
+    // the house alarm is exposed alongside the devices, and is indexed by selector so an alarm
+    // event can find its accessory again
+    expect(addBridgedAccessories.args[0][0]).to.deep.members([
+      { UUID: '78a7b724-18e8-4c15-ab30-c8486c253f36' },
+      { UUID: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55' },
+    ]);
+    expect(homekitHandler.alarmAccessories.get('maison')).to.eql({ UUID: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55' });
     expect(publish.args[0][0]).to.eql({
       username: 'C4:D0:AB:12:BC:51',
       pincode: '123-45-678',
