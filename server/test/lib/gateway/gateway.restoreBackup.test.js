@@ -35,7 +35,10 @@ describe('gateway.restoreBackup', () => {
     event.on = fake.returns(null);
     event.emit = fake.returns(null);
 
-    const config = getConfig();
+    // Restore into a throwaway file, NOT the worker's live test database (see
+    // gateway.restoreBackupEvent.test.js). Spread getConfig()'s result: it
+    // returns a shared object, mutating it would leak to the whole process.
+    const config = { ...getConfig(), storage: `/tmp/gladys-database-restore-test-${process.pid}.db` };
 
     const scheduler = {
       scheduleJob: (rule, callback) => {
@@ -50,7 +53,6 @@ describe('gateway.restoreBackup', () => {
     sequelize.close = fake.resolves(null);
 
     gateway = new Gateway(variable, event, {}, sequelize, config, {}, {}, {}, job, scheduler);
-    gateway.config.storage = `/tmp/gladys-database-restore-test-${process.pid}.db`;
   });
 
   afterEach(() => {
