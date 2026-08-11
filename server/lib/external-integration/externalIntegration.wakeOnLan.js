@@ -1,4 +1,6 @@
 const dgram = require('dgram');
+const net = require('net');
+
 const { BadParameters, ForbiddenError } = require('../../utils/coreErrors');
 
 const DEFAULT_PORT = 9;
@@ -36,11 +38,11 @@ function buildMagicPacket(mac) {
 
 /**
  * @description Send a Wake-on-LAN magic packet to a target device.
- * @param {{manifest: {network_wake: boolean}}} service - The external integration service (plain object).
- * @param {string} service.manifest - The external integration manifest.
- * @param {string} service.manifest.network_wake - The external integration manifest network_wake property.
+ * @param {object} service - The external integration service (plain object).
+ * @param {object} service.manifest - The external integration manifest.
+ * @param {boolean} [service.manifest.network_wake] - Whether Wake-on-LAN is allowed for this integration.
  * @param {object} options - Wake-on-LAN options.
- * @param {string} [options.mac] - Target MAC address.
+ * @param {string} options.mac - Target MAC address.
  * @param {string} [options.address] - Destination/broadcast address.
  * @param {number} [options.port] - Destination UDP port.
  * @param {number} [options.sourcePort] - Source UDP port.
@@ -54,6 +56,10 @@ async function wakeOnLan(service, options) {
   }
 
   const { mac, address = DEFAULT_ADDRESS, port = DEFAULT_PORT, sourcePort = DEFAULT_PORT } = options;
+
+  if (!net.isIPv4(address)) {
+    throw new BadParameters('Invalid IPv4 address');
+  }
 
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new BadParameters('port: must be an integer between 1 and 65535');

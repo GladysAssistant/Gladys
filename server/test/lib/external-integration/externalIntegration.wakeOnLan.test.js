@@ -1,6 +1,7 @@
 const dgram = require('dgram');
 const { expect } = require('chai');
 
+const { BadParameters, ForbiddenError } = require('../../../utils/coreErrors');
 const { buildSupervisor } = require('./testUtils.test');
 
 const externalIntegrationService = {
@@ -166,7 +167,7 @@ describe('externalIntegration.wakeOnLan', () => {
       error = e;
     }
 
-    expect(error).to.be.instanceOf(Error);
+    expect(error).to.be.instanceOf(BadParameters);
   });
 
   it('should reject an invalid destination port', async () => {
@@ -235,5 +236,47 @@ describe('externalIntegration.wakeOnLan', () => {
         expect(error).to.be.instanceOf(Error);
       }),
     );
+  });
+  it('should reject Wake-on-LAN when network_wake permission is missing', async () => {
+    const { externalIntegration } = buildSupervisor();
+
+    const unauthorizedExternalIntegrationService = {
+      manifest: {
+        network_wake: false,
+      },
+    };
+
+    let error;
+
+    try {
+      await externalIntegration.wakeOnLan(unauthorizedExternalIntegrationService, {
+        mac: '64:e4:d5:b4:12:66',
+        address: '127.0.0.1',
+      });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.instanceOf(ForbiddenError);
+  });
+  it('should reject Wake-on-LAN when network_wake permission is not declared', async () => {
+    const { externalIntegration } = buildSupervisor();
+
+    const externalIntegrationServiceWithoutNetworkWake = {
+      manifest: {},
+    };
+
+    let error;
+
+    try {
+      await externalIntegration.wakeOnLan(externalIntegrationServiceWithoutNetworkWake, {
+        mac: '64:e4:d5:b4:12:66',
+        address: '127.0.0.1',
+      });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).to.be.instanceOf(ForbiddenError);
   });
 });
