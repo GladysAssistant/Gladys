@@ -1,5 +1,6 @@
 const dgram = require('dgram');
 const { expect } = require('chai');
+const sinon = require('sinon');
 
 const { BadParameters, ForbiddenError } = require('../../../utils/coreErrors');
 const { buildSupervisor } = require('./testUtils.test');
@@ -278,5 +279,65 @@ describe('externalIntegration.wakeOnLan', () => {
     }
 
     expect(error).to.be.instanceOf(ForbiddenError);
+  });
+  it('should reject when socket.send returns an error', async () => {
+    const { externalIntegration } = buildSupervisor();
+
+    const expectedError = new Error('send failed');
+
+    const socket = {
+      once: sinon.stub(),
+      bind: sinon.stub().callsFake((sourcePort, callback) => callback()),
+      setBroadcast: sinon.stub(),
+      send: sinon.stub().callsFake((payload, port, address, callback) => callback(expectedError)),
+      close: sinon.stub().callsFake((callback) => callback()),
+    };
+
+    const createSocketStub = sinon.stub(dgram, 'createSocket').returns(socket);
+
+    let error;
+
+    try {
+      await externalIntegration.wakeOnLan(externalIntegrationService, {
+        mac: '64:e4:d5:b4:12:66',
+        address: '127.0.0.1',
+      });
+    } catch (e) {
+      error = e;
+    } finally {
+      createSocketStub.restore();
+    }
+
+    expect(error).to.equal(expectedError);
+  });
+  it('should reject when setBroadcast throws an error', async () => {
+    const { externalIntegration } = buildSupervisor();
+
+    const expectedError = new Error('setBroadcast failed');
+
+    const socket = {
+      once: sinon.stub(),
+      bind: sinon.stub().callsFake((sourcePort, callback) => callback()),
+      setBroadcast: sinon.stub().throws(expectedError),
+      send: sinon.stub(),
+      close: sinon.stub().callsFake((callback) => callback()),
+    };
+
+    const createSocketStub = sinon.stub(dgram, 'createSocket').returns(socket);
+
+    let error;
+
+    try {
+      await externalIntegration.wakeOnLan(externalIntegrationService, {
+        mac: '64:e4:d5:b4:12:66',
+        address: '127.0.0.1',
+      });
+    } catch (e) {
+      error = e;
+    } finally {
+      createSocketStub.restore();
+    }
+
+    expect(error).to.equal(expectedError);
   });
 });

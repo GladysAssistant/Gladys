@@ -83,14 +83,6 @@ async function wakeOnLan(service, options) {
   await new Promise((resolve, reject) => {
     let settled = false;
 
-    const close = (callback) => {
-      if (socket) {
-        socket.close(callback);
-      } else {
-        callback();
-      }
-    };
-
     const fail = (error) => {
       if (settled) {
         return;
@@ -98,7 +90,7 @@ async function wakeOnLan(service, options) {
 
       settled = true;
 
-      close(() => {
+      socket.close(() => {
         reject(error);
       });
     };
