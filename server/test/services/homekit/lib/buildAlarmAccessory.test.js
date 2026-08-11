@@ -92,13 +92,38 @@ describe('Build alarm accessory', () => {
     expect(await readCharacteristic(characteristics.TARGETSTATE)).to.equal(0);
   });
 
-  it('should keep the target armed while the alarm is going off', async () => {
+  it('should assume away for a house that went off before the bridge started', async () => {
     const { characteristics } = build(ALARM_MODES.PANIC);
 
     // HomeKit has no triggered target, and reporting disarmed there would show the alarm as
-    // switched off while it rings
+    // switched off while it rings. Nothing records what preceded the panic, so away is assumed —
+    // the stricter of the two.
     expect(await readCharacteristic(characteristics.CURRENTSTATE)).to.equal(4);
     expect(await readCharacteristic(characteristics.TARGETSTATE)).to.equal(1);
+  });
+
+  it('should keep the target the house was armed with while the alarm is going off', async () => {
+    const { homekitHandler, characteristics } = build(ALARM_MODES.PARTIALLY_ARMED);
+
+    // read once while partially armed, so the accessory knows what the house is running
+    expect(await readCharacteristic(characteristics.TARGETSTATE)).to.equal(0);
+
+    homekitHandler.gladys.house.getBySelector = stub().resolves({ ...HOUSE, alarm_mode: ALARM_MODES.PANIC });
+
+    // a house armed in part that goes off must not be shown as armed away
+    expect(await readCharacteristic(characteristics.CURRENTSTATE)).to.equal(4);
+    expect(await readCharacteristic(characteristics.TARGETSTATE)).to.equal(0);
+  });
+
+  it('should remember the target the Home app asked for', async () => {
+    const { homekitHandler, characteristics } = build(ALARM_MODES.DISARMED);
+    const cb = stub();
+
+    await characteristics.TARGETSTATE.handlers.set(0, cb);
+    homekitHandler.gladys.house.getBySelector = stub().resolves({ ...HOUSE, alarm_mode: ALARM_MODES.PANIC });
+
+    // the mode it was armed with is what it goes back to showing, without waiting for a read first
+    expect(await readCharacteristic(characteristics.TARGETSTATE)).to.equal(0);
   });
 
   it('should not offer the night mode Gladys has no equivalent for', async () => {

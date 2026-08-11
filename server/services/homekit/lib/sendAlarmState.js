@@ -27,11 +27,17 @@ async function sendAlarmState(houseSelector) {
   const service = accessory.getService(Service.SecuritySystem);
 
   service.updateCharacteristic(Characteristic.SecuritySystemCurrentState, state);
-  // The target has no triggered value, so a ringing house keeps the armed target it was set to.
-  // Pushing disarmed there would show the alarm as switched off while it is going off.
-  if (state !== HOMEKIT_SECURITY_SYSTEM_STATE.ALARM_TRIGGERED) {
-    service.updateCharacteristic(Characteristic.SecuritySystemTargetState, state);
-  }
+
+  // The target is recomputed through its own handler rather than derived a second time here: which
+  // target a ringing house keeps is only known inside the accessory, and deciding it in both places
+  // is how the two came to disagree.
+  service
+    .getCharacteristic(Characteristic.SecuritySystemTargetState)
+    .emit(this.hap.CharacteristicEventTypes.GET, (error, value) => {
+      if (!error) {
+        service.updateCharacteristic(Characteristic.SecuritySystemTargetState, value);
+      }
+    });
 }
 
 module.exports = {

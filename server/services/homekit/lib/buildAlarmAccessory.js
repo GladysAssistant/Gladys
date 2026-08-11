@@ -66,19 +66,28 @@ function buildAlarmAccessory(house) {
       }
     });
 
+  // HomeKit has no triggered target, so a house that went off has to keep the target it was armed
+  // with — reporting disarmed there would show the alarm as switched off while it rings. Gladys
+  // does not record which mode preceded the panic, so it is remembered here. A bridge restart
+  // forgets it, and away is then the assumption: it is the stricter of the two.
+  let lastArmedTarget = HOMEKIT_SECURITY_SYSTEM_STATE.AWAY_ARM;
+
   const targetStateCharacteristic = service.getCharacteristic(Characteristic.SecuritySystemTargetState);
   targetStateCharacteristic.setProps({ validValues: SUPPORTED_TARGET_STATES });
   targetStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
     try {
       const state = await readState();
 
-      // A house that went off is still armed as far as the target goes: HomeKit has no triggered
-      // target, and reporting disarmed there would show the alarm as switched off while it rings.
-      // Which armed mode it was in before is not recorded anywhere, so away is the assumption.
-      callback(
-        undefined,
-        state === HOMEKIT_SECURITY_SYSTEM_STATE.ALARM_TRIGGERED ? HOMEKIT_SECURITY_SYSTEM_STATE.AWAY_ARM : state,
-      );
+      if (state === HOMEKIT_SECURITY_SYSTEM_STATE.ALARM_TRIGGERED) {
+        callback(undefined, lastArmedTarget);
+
+        return;
+      }
+
+      if (state !== HOMEKIT_SECURITY_SYSTEM_STATE.DISARMED) {
+        lastArmedTarget = state;
+      }
+      callback(undefined, state);
     } catch (e) {
       callback(e);
     }
@@ -91,6 +100,11 @@ function buildAlarmAccessory(house) {
         await this.gladys.house.partialArm(house.selector);
       } else if (value === HOMEKIT_SECURITY_SYSTEM_STATE.AWAY_ARM) {
         await this.gladys.house.arm(house.selector);
+      }
+
+      // What the house is armed with is what it goes back to showing once the siren stops.
+      if (value !== HOMEKIT_SECURITY_SYSTEM_STATE.DISARMED) {
+        lastArmedTarget = value;
       }
       callback();
     } catch (e) {

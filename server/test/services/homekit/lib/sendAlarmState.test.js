@@ -6,15 +6,20 @@ const { sendAlarmState } = require('../../../../services/homekit/lib/sendAlarmSt
 const { ALARM_MODES } = require('../../../../utils/constants');
 
 describe('Send alarm state to HomeKit', () => {
-  const build = (alarmMode) => {
+  const build = (alarmMode, targetFromHandler = 1) => {
     const updateCharacteristic = stub();
     updateCharacteristic.returns({ updateCharacteristic });
-    const accessory = { getService: stub().returns({ updateCharacteristic }) };
+    // the target is refreshed through its own GET handler, as the accessory builds it
+    const emit = stub().callsFake((event, cb) => cb(undefined, targetFromHandler));
+    const accessory = {
+      getService: stub().returns({ updateCharacteristic, getCharacteristic: stub().returns({ emit }) }),
+    };
 
     const homekitHandler = {
       sendAlarmState,
       alarmAccessories: new Map([['maison', accessory]]),
       hap: {
+        CharacteristicEventTypes: { GET: 'get' },
         Service: { SecuritySystem: 'SECURITYSYSTEM' },
         Characteristic: {
           SecuritySystemCurrentState: 'CURRENTSTATE',
@@ -40,13 +45,17 @@ describe('Send alarm state to HomeKit', () => {
     ]);
   });
 
-  it('should leave the target alone when the alarm goes off', async () => {
-    const { homekitHandler, updateCharacteristic } = build(ALARM_MODES.PANIC);
+  it('should take the target from the accessory when the alarm goes off', async () => {
+    // the accessory knows the house was armed in part, which this module cannot derive from the
+    // alarm mode alone — deciding it in both places is how the two came to disagree
+    const { homekitHandler, updateCharacteristic } = build(ALARM_MODES.PANIC, 0);
 
     await homekitHandler.sendAlarmState('maison');
 
-    // pushing disarmed on the target would show the alarm as switched off while it rings
-    expect(updateCharacteristic.args).to.eql([['CURRENTSTATE', 4]]);
+    expect(updateCharacteristic.args).to.eql([
+      ['CURRENTSTATE', 4],
+      ['TARGETSTATE', 0],
+    ]);
   });
 
   it('should do nothing for a house the bridge has no accessory for', async () => {
@@ -60,7 +69,7 @@ describe('Send alarm state to HomeKit', () => {
   });
 
   it('should report an alarm mode it does not know as disarmed', async () => {
-    const { homekitHandler, updateCharacteristic } = build('something-else');
+    const { homekitHandler, updateCharacteristic } = build('something-else', 3);
 
     await homekitHandler.sendAlarmState('maison');
 
