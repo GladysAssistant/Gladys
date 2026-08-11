@@ -137,7 +137,8 @@
     "link": "zwavejs-ui",
     "img": "/assets/integrations/cover/zwave-js-ui.jpg",
     "invertInDarkMode": true,
-    "local": true
+    "local": true,
+    "deprecated": true
   },
   {
     "key": "google-cast",

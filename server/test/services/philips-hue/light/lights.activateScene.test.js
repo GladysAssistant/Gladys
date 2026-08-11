@@ -1,4 +1,6 @@
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
 const { MockedPhilipsHueClient } = require('../mocks.test');

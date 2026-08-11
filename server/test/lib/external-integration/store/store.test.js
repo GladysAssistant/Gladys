@@ -1,6 +1,8 @@
 const { expect } = require('chai');
 const nock = require('nock');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 
 const { NotFoundError, BadParameters, ConflictError } = require('../../../../utils/coreErrors');
 const { Error422 } = require('../../../../utils/httpErrors');

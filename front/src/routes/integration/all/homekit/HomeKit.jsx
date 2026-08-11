@@ -1,15 +1,45 @@
 import { Text, MarkupText } from 'preact-i18n';
+import Select from 'react-select';
 import { RequestStatus } from '../../../../utils/consts';
 import { USER_ROLE } from '../../../../../../server/utils/constants';
 import cx from 'classnames';
 import style from './style.css';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import { EXPOSURE_MODES } from './actions';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const mdnsAdvertisers = {
   AVAHI: 'avahi',
   BONJOUR: 'bonjour-hap',
   CIAO: 'ciao',
   RESOLVED: 'resolved'
+};
+
+const ExposedDevicesSelect = ({ homekitCompatibleDevices, homekitExposedDevices, updateExposedDevices }) => {
+  const deviceOptions = (homekitCompatibleDevices || []).map(device => ({
+    value: device.selector,
+    label: device.name
+  }));
+
+  if (deviceOptions.length === 0) {
+    return (
+      <div class="alert alert-info">
+        <Text id="integration.homekit.noCompatibleDevice" />
+      </div>
+    );
+  }
+
+  return (
+    <Select
+      isMulti
+      options={deviceOptions}
+      value={deviceOptions.filter(option => (homekitExposedDevices || []).includes(option.value))}
+      onChange={updateExposedDevices}
+      maxMenuHeight={220}
+      className="react-select-container"
+      classNamePrefix="react-select"
+    />
+  );
 };
 
 const HomKitPage = ({ children, ...props }) => (
@@ -19,6 +49,7 @@ const HomKitPage = ({ children, ...props }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.homekit.title" />
               </h3>
@@ -102,6 +133,39 @@ const HomKitPage = ({ children, ...props }) => (
                           {props.homekitSaveMDNSStatus === RequestStatus.Error && (
                             <div class="alert alert-danger">
                               <Text id="integration.homekit.saveMDNSError" />
+                            </div>
+                          )}
+                          <p className={style.buttonDescription}>
+                            <Text id="integration.homekit.exposure" />
+                          </p>
+                          <select
+                            class="form-control mb-2"
+                            onChange={props.updateExposureMode}
+                            value={props.homekitExposureMode}
+                          >
+                            <option value={EXPOSURE_MODES.ALL}>
+                              <Text id="integration.homekit.exposureModeAll" />
+                            </option>
+                            <option value={EXPOSURE_MODES.SELECTION}>
+                              <Text id="integration.homekit.exposureModeSelection" />
+                            </option>
+                          </select>
+                          {props.homekitExposureMode === EXPOSURE_MODES.SELECTION && (
+                            <div class="mb-2">
+                              <ExposedDevicesSelect {...props} />
+                            </div>
+                          )}
+                          <button class="btn btn-success" onClick={props.saveExposure}>
+                            <Text id="integration.homekit.saveExposureButton" />
+                          </button>
+                          {props.homekitSaveExposureStatus === RequestStatus.Success && (
+                            <div class="alert alert-success mt-2">
+                              <Text id="integration.homekit.saveExposureSuccess" />
+                            </div>
+                          )}
+                          {props.homekitSaveExposureStatus === RequestStatus.Error && (
+                            <div class="alert alert-danger mt-2">
+                              <Text id="integration.homekit.saveExposureError" />
                             </div>
                           )}
                           <p className={style.buttonDescription}>

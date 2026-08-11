@@ -63,6 +63,24 @@ If your PR implements a forum request, add a line `Forum: https://community.glad
 
 ---
 
+## 🤖 Automated review
+
+An automated review runs on your PR as soon as you open it. A draft PR waits until you mark it **ready for review**.
+
+Two cases do not get that automatic review: PRs authored by `dependabot[bot]` or `renovate[bot]`, and PRs from contributors whose first contribution has not been merged yet. **If this is your first PR here, just ask for a review in a comment** (see below) or wait for a maintainer — nothing is wrong with your PR.
+
+To ask for a new review after pushing changes, comment on the PR:
+
+```text
+/cursor review
+```
+
+`/cursor-review` works too, and the command is case-insensitive. It has to start its own line — anything you write after it on the same line is ignored, and quoting someone else's command (`> /cursor review`) never triggers a review.
+
+The command works for the PR author and for repository owners, organization members and collaborators. The bot reacts to your comment with 👀 when the request is accepted, 🚀 once the review has been started, and 👎 if you are not allowed to ask for one. Maintainers can also add the `needs:cursor-review` label, which triggers the same thing.
+
+---
+
 ## 📜 Licensing
 
 All contributions to Gladys are submitted under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0).  

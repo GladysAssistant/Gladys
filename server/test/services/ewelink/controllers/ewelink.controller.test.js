@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const EweLinkController = require('../../../../services/ewelink/api/ewelink.controller');
 
 const { assert, fake } = sinon;

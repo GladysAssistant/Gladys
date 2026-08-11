@@ -1,7 +1,9 @@
 const EventEmitter = require('events');
 const { expect } = require('chai');
 const WebSocket = require('ws');
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { ExternalIntegrationUnavailableError } = require('../../../utils/coreErrors');

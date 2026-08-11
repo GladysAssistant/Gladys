@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { stub, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub, fake } = sinon;
 const nock = require('nock');
 const dns = require('dns');
 const { SYSTEM_VARIABLE_NAMES, COVER_STATE, AI_CHAT_TOOL_CATEGORIES } = require('../../../../utils/constants');

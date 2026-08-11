@@ -1,6 +1,8 @@
 const EventEmitter = require('events');
 const { expect } = require('chai');
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 
 const WebsocketManager = require('../../api/websockets');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');

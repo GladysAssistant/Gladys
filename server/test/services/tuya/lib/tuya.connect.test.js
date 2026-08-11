@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 const { TuyaContext, client } = require('../tuya.mock.test');
 
@@ -35,6 +35,9 @@ describe('TuyaHandler.connect', () => {
 
   afterEach(() => {
     sinon.reset();
+    // client.init lives in the shared tuya mock's sandbox: the behaviors
+    // programmed here (throws/rejects) must not leak into the other tuya files.
+    client.init.reset();
   });
 
   it('no url stored, should fail', async () => {

@@ -1,5 +1,7 @@
 const { assert, expect } = require('chai');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 const EventEmitter = require('events');
 const { ACTIONS } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
