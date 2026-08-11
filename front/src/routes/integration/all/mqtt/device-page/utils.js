@@ -10,6 +10,7 @@ import {
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { isPushButtonFeature } from '../../../../../utils/consts';
+import normalizeSearchText from '../../../../../utils/normalizeSearchText';
 
 const SENSOR_CATEGORY_SUFFIX = '-sensor';
 
@@ -61,11 +62,7 @@ export const isSensorCategory = category => {
   return category.endsWith(SENSOR_CATEGORY_SUFFIX) || category === DEVICE_FEATURE_CATEGORIES.SIGNAL;
 };
 
-export const normalizeForSearch = value =>
-  value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+export const normalizeForSearch = normalizeSearchText;
 
 const categoryTypeKey = (category, type) => `${category}|${type}`;
 
@@ -1182,6 +1179,12 @@ export const filterFeatureCatalogOptions = (options, search, dictionary) => {
   }
 
   const normalizedSearch = normalizeForSearch(search.trim());
+  // a search made of accents only folds down to nothing, and every string
+  // contains the empty string: without this it would list the whole catalog,
+  // as if the field were empty
+  if (!normalizedSearch.length) {
+    return [];
+  }
 
   return options
     .map(group => {

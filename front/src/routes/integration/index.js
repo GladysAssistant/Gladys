@@ -5,6 +5,7 @@ import { route } from 'preact-router';
 
 import IntegrationPage from './IntegrationPage';
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import normalizeSearchText from '../../utils/normalizeSearchText';
 import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
@@ -359,14 +360,21 @@ class Integration extends Component {
 
     // Filter
     if (searchKeyword && searchKeyword.length > 0) {
-      const lowerCaseSearchKeyword = searchKeyword.toLowerCase();
-      selectedIntegrations = selectedIntegrations.filter(integration => {
-        const { name, description } = integration;
-        return (
-          name.toLowerCase().includes(lowerCaseSearchKeyword) ||
-          description.toLowerCase().includes(lowerCaseSearchKeyword)
-        );
-      });
+      // both sides are stripped of their accents: "meteo" has to find "Météo",
+      // and typing "Météo" has to keep finding it
+      const normalizedSearchKeyword = normalizeSearchText(searchKeyword);
+      // a keyword made of accents only folds down to nothing, and every string
+      // contains the empty string: without this, such a search would display
+      // the whole catalog as if the field were empty
+      selectedIntegrations = normalizedSearchKeyword.length
+        ? selectedIntegrations.filter(integration => {
+            const { name, description } = integration;
+            return (
+              normalizeSearchText(name).includes(normalizedSearchKeyword) ||
+              normalizeSearchText(description).includes(normalizedSearchKeyword)
+            );
+          })
+        : [];
     }
 
     // Sort
