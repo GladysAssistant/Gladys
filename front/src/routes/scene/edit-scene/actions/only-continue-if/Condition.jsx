@@ -3,26 +3,20 @@ import { Text, Localizer } from 'preact-i18n';
 import Select from 'react-select';
 import update from 'immutability-helper';
 
+import SelectDeviceFeatureValue from '../../../../../components/device/SelectDeviceFeatureValue';
 import TextWithVariablesInjected from '../../../../../components/scene/TextWithVariablesInjected';
-import getDeviceFeatureValueOptions from '../../../../../utils/deviceFeatureValueOptions';
+import getDeviceFeatureValueOptions, { isValueInOptions } from '../../../../../utils/deviceFeatureValueOptions';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 import style from './Condition.css';
 
 const getDeviceFeature = option => (option && option.data ? option.data.deviceFeature : null);
 
-const isSameValue = (optionValue, conditionValue) => `${optionValue}` === `${conditionValue}`;
-
 class Condition extends Component {
   // The current value can be displayed in the list only if it's a raw value present in that list
   isValueInValueOptions = valueOptions => {
     const { value, evaluate_value: evaluateValue } = this.props.condition;
-    return Boolean(
-      valueOptions &&
-        evaluateValue === undefined &&
-        value !== undefined &&
-        valueOptions.some(option => isSameValue(option.value, value))
-    );
+    return evaluateValue === undefined && isValueInOptions(valueOptions, value);
   };
 
   handleChange = selectedOption => {
@@ -47,10 +41,10 @@ class Condition extends Component {
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
-  handleValueOptionChange = selectedOption => {
+  handleValueOptionChange = value => {
     const newCondition = update(this.props.condition, {
       value: {
-        $set: selectedOption ? selectedOption.value : undefined
+        $set: value
       },
       evaluate_value: {
         $set: undefined
@@ -176,9 +170,6 @@ class Condition extends Component {
     const selectedOption = this.getSelectedOption();
     const valueOptions = this.getValueOptions(selectedOption);
     const showValueOptions = this.shouldDisplayValueOptions(valueOptions, customValue);
-    const selectedValueOption = showValueOptions
-      ? valueOptions.find(option => isSameValue(option.value, props.condition.value)) || null
-      : null;
     return (
       <div>
         <div class="row">
@@ -242,19 +233,17 @@ class Condition extends Component {
                 </span>
               </label>
               {showValueOptions && (
-                <Select
-                  value={selectedValueOption}
-                  onChange={this.handleValueOptionChange}
+                <SelectDeviceFeatureValue
                   options={valueOptions}
-                  className="react-select-container"
-                  classNamePrefix="react-select"
+                  value={props.condition.value}
+                  updateValue={this.handleValueOptionChange}
                 />
               )}
               {!showValueOptions && (
                 <Localizer>
                   <TextWithVariablesInjected
                     text={
-                      props.condition.value !== undefined
+                      props.condition.value !== undefined && props.condition.value !== null
                         ? props.condition.value.toString()
                         : props.condition.evaluate_value
                     }
