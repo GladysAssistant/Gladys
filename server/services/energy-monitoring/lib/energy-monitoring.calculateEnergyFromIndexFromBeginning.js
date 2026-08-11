@@ -134,21 +134,21 @@ async function calculateEnergyFromIndexFromBeginning(kind, jobId) {
         // Dispatched through `this` so instance-level overrides (tests) still apply.
         await this[kind.calculateFromIndexMethod](windowTime);
         successfulWindows += 1;
-
-        // Update job progress
-        processedWindows += 1;
-        const progressPercentage = Math.round((processedWindows / windows.length) * 100);
-        await this.gladys.job.updateProgress(jobId, progressPercentage);
-
-        logger.debug(`Processed window ${processedWindows}/${windows.length}: ${windowTime.toISOString()}`);
+        logger.debug(`Processed window ${processedWindows + 1}/${windows.length}: ${windowTime.toISOString()}`);
       } catch (error) {
+        // Continue processing other windows even if one fails
         failedWindows += 1;
         logger.error(`Error processing window ${windowTime.toISOString()}:`, error);
-
-        // Continue processing other windows even if one fails
+      } finally {
+        // Update job progress; a progress-update failure must not mark the
+        // window as failed nor stop the remaining windows from processing
         processedWindows += 1;
         const progressPercentage = Math.round((processedWindows / windows.length) * 100);
-        await this.gladys.job.updateProgress(jobId, progressPercentage);
+        try {
+          await this.gladys.job.updateProgress(jobId, progressPercentage);
+        } catch (progressError) {
+          logger.error(`Error updating progress for window ${windowTime.toISOString()}:`, progressError);
+        }
       }
     });
 

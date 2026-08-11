@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { useFakeTimers, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { useFakeTimers, stub } = sinon;
 const EventEmitter = require('events');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
