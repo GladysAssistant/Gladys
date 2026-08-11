@@ -4,11 +4,12 @@ const CATALOG_BASE_URL = '/dashboard/integration';
 const DEFAULT_ORDER_DIR = 'asc';
 const ORDER_DIRS = ['asc', 'desc'];
 
-// the catalog is displayed for every category, plus "all" and "favorites":
-// only those paths are accepted as a "back to the catalog" target
+// the catalog is displayed for every category, plus "all", "favorites" and
+// "updates": only those paths are accepted as a "back to the catalog" target
 const CATALOG_PATHS = new Set([
   CATALOG_BASE_URL,
   `${CATALOG_BASE_URL}/favorites`,
+  `${CATALOG_BASE_URL}/updates`,
   ...categories.map(category => `${CATALOG_BASE_URL}/${category.type}`)
 ]);
 
@@ -57,10 +58,33 @@ export const getUrlFromCatalog = (path, { category, searchKeyword, orderDir }) =
   return withQuery(path, urlParams);
 };
 
+// last catalog view the user visited. The native integration pages cannot
+// carry the filters in their own URL the way the install page does: their
+// query string is handed to the page component as props by preact-router,
+// where a "search" parameter would shadow the search action of the pages that
+// have one. Remembering the catalog here keeps their back link accurate
+// without touching their URL — a page reload simply forgets it and the link
+// falls back to the whole catalog.
+let lastCatalogUrl = null;
+
+export const rememberCatalogUrl = url => {
+  lastCatalogUrl = url;
+};
+
+// a remembered URL carries its filters in the query string, so only its path
+// is compared to the known catalog views. It is written from getCatalogUrl()
+// alone today: checking it keeps the guarantee held by the "from" parameter,
+// that this helper never sends the user outside of the catalog
+const isCatalogUrl = url => typeof url === 'string' && CATALOG_PATHS.has(url.split('?')[0]);
+
 export const getBackToCatalogUrl = (queryString = window.location.search) => {
   const from = new URLSearchParams(queryString).get('from');
-  // the parameter comes from the URL: fall back to the whole catalog rather
-  // than trusting an arbitrary path
-  const path = CATALOG_PATHS.has(from) ? from : CATALOG_BASE_URL;
-  return withQuery(path, buildFilterParams(getCatalogFilters(queryString)));
+  // the parameter comes from the URL: fall back to the last catalog seen, then
+  // to the whole catalog, rather than trusting an arbitrary path
+  if (!CATALOG_PATHS.has(from)) {
+    return isCatalogUrl(lastCatalogUrl)
+      ? lastCatalogUrl
+      : withQuery(CATALOG_BASE_URL, buildFilterParams(getCatalogFilters(queryString)));
+  }
+  return withQuery(from, buildFilterParams(getCatalogFilters(queryString)));
 };

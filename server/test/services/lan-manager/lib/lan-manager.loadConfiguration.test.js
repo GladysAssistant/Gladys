@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 
 const { VARIABLES, PRESENCE_STATUS, TIMERS } = require('../../../../services/lan-manager/lib/lan-manager.constants');

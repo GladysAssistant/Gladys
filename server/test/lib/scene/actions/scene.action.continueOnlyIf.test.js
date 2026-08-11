@@ -1,4 +1,6 @@
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const EventEmitter = require('events');
 const chaiAssert = require('chai').assert;
 
@@ -90,6 +92,53 @@ describe('scene.continue-only-if', () => {
       scope,
     );
     return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_VALUE_NOT_A_NUMBER');
+  });
+  it('should abort scene and not run following actions, condition formula cannot be evaluated', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value',
+                operator: '=',
+                // "sqrt" is not part of the restricted formula engine namespace,
+                // so evaluating this condition throws.
+                evaluate_value: 'sqrt(400)',
+              },
+            ],
+          },
+        ],
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-device-feature',
+            value: 99,
+          },
+        ],
+      ],
+      scope,
+    );
+    await chaiAssert.isRejected(promise, AbortScene, 'CONDITION_VALUE_NOT_A_NUMBER');
+    // The guard must fail closed: the action after it must not have been executed.
+    assert.notCalled(device.setValue);
   });
   it('should finish scene, condition is verified', async () => {
     stateManager.setState('deviceFeature', 'my-device-feature', {

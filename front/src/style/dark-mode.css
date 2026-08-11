@@ -199,3 +199,18 @@ body.dark-mode {
 .dark-mode .mode-toggle:hover {
   background-color: rgba(0, 0, 0, 0.1); /* Keep the same in dark mode due to global inversion */
 }
+
+/* Weather provider images (vigilance map, rain radar…): pre-darkening keeps the
+   double inversion within gamut, so the image keeps its real hues (yellow/orange/red)
+   instead of washed-out ones */
+.dark-mode img.weather-provider-image {
+  filter: brightness(0.6) invert(100%) hue-rotate(180deg) !important;
+}
+
+/* Weather widget emojis, badges and colored icons: same pre-darkening trick as
+   the provider images. Plain dark-mode-no-invert only cancels the global
+   inversion, which leaves these washed out — the brightness step keeps the
+   real colors (yellow/orange suns, alert badges, UV index) */
+.dark-mode .weather-real-colors {
+  filter: brightness(0.7) invert(100%) hue-rotate(180deg) !important;
+}

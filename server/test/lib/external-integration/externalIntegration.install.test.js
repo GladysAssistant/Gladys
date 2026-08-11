@@ -1,6 +1,7 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
-const { assert: sinonAssert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert, fake } = sinon;
 
 const db = require('../../../models');
 const { BadParameters, ConflictError, PlatformNotCompatible } = require('../../../utils/coreErrors');
@@ -149,6 +150,77 @@ describe('externalIntegration.install', () => {
       expect(e).to.be.instanceOf(BadParameters);
       expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
     }
+  });
+
+  it('should install from a local image when the pull fails (local docker build)', async () => {
+    // the dev workflow: the image is built with `docker build` on the host
+    // and exists in no registry, so the pull fails but the image is there
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        pull: fake.rejects(new Error('pull access denied')),
+        imageExists: fake.resolves(true),
+        getImageLabels: fake.resolves({
+          'io.gladysassistant.manifest': JSON.stringify(TEST_MANIFEST),
+        }),
+      },
+    });
+    const integration = await externalIntegration.install({
+      dockerImage: 'my-local-integration:dev',
+    });
+    expect(integration).to.have.property('selector', 'ext-dev-open-meteo-demo');
+    expect(integration).to.have.property('docker_image', 'my-local-integration:dev');
+    expect(integration.manifest).to.deep.equal(TEST_MANIFEST);
+    sinonAssert.calledWith(system.pull, 'my-local-integration:dev');
+    sinonAssert.calledWith(system.imageExists, 'my-local-integration:dev');
+    sinonAssert.calledOnce(system.createContainer);
+  });
+
+  it('should never fall back on a local image for a store install', async () => {
+    // the local fallback is reserved to dev installs: on the store path a
+    // leftover local tag must never shadow a registry failure
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        pull: fake.rejects(new Error('registry unreachable')),
+        imageExists: fake.resolves(true),
+      },
+    });
+    try {
+      await externalIntegration.install({ manifest: TEST_MANIFEST, storeSlug: 'john/gladys-open-meteo-demo' });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
+    }
+    sinonAssert.notCalled(system.imageExists);
+  });
+
+  it('should return the explicit pull error when the local presence check itself fails', async () => {
+    const { externalIntegration } = buildSupervisor({
+      system: {
+        pull: fake.rejects(new Error('no matching manifest for linux/arm64')),
+        imageExists: fake.rejects(new Error('docker daemon unreachable')),
+      },
+    });
+    try {
+      await externalIntegration.install({ manifest: TEST_MANIFEST });
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
+    }
+  });
+
+  it('should install a local sub-container image when its pull fails', async () => {
+    const pull = sinon.stub();
+    pull.withArgs('eclipse-mosquitto:2.0.18').rejects(new Error('pull access denied'));
+    pull.resolves(true);
+    const imageExists = sinon.stub();
+    imageExists.withArgs('eclipse-mosquitto:2.0.18').resolves(true);
+    imageExists.resolves(false);
+    const { externalIntegration } = buildSupervisor({ system: { pull, imageExists } });
+    const integration = await externalIntegration.install({ manifest: TEST_CONTAINERS_MANIFEST });
+    expect(integration.status).to.not.equal('ERROR');
+    sinonAssert.calledWith(imageExists, 'eclipse-mosquitto:2.0.18');
   });
 
   it('should reject an image without manifest label in dev mode', async () => {

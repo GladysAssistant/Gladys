@@ -1,4 +1,5 @@
 const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
+const { buildUniqueSelector } = require('../../utils/addSelector');
 const { areObjectsEqual, pick } = require('../../utils/objects');
 const db = require('../../models');
 
@@ -39,7 +40,17 @@ async function addFeature(deviceSelector, feature) {
 
   // if the feature does not already exist, we create it.
   if (featureIndex === -1) {
-    const createdFeature = await db.DeviceFeature.create({ ...feature, device_id: device.id });
+    // same unique selector constraint as in device.create: a feature named
+    // like one of another device must not fail the creation
+    const featureToCreate = { ...feature, device_id: device.id };
+    const uniqueSelector = await buildUniqueSelector(
+      db.DeviceFeature,
+      featureToCreate.selector || featureToCreate.name,
+    );
+    if (uniqueSelector) {
+      featureToCreate.selector = uniqueSelector;
+    }
+    const createdFeature = await db.DeviceFeature.create(featureToCreate);
     featureInStore = createdFeature.get({ plain: true });
     device.features.push(featureInStore);
     // we save again the device in RAM

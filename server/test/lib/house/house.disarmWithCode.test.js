@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
@@ -73,5 +73,34 @@ describe('house.disarmWithCode', () => {
   it('should just resolve if house is already disarmed', async () => {
     await house.disarmWithCode('test-house', '123456');
     await house.disarmWithCode('test-house', '123456');
+  });
+  it('should cancel the arming in progress', async () => {
+    await house.update('test-house', {
+      alarm_code: '123456',
+      alarm_delay_before_arming: 5,
+      alarm_mode: ALARM_MODES.DISARMED,
+    });
+    await house.arm('test-house');
+    sinon.reset();
+    await house.disarmWithCode('test-house', '123456');
+    // Timeout should be deleted
+    expect(house.armingHouseTimeout.size).to.equal(0);
+    assert.calledTwice(event.emit);
+    expect(event.emit.firstCall.args).to.deep.equal([
+      EVENTS.TRIGGERS.CHECK,
+      {
+        type: EVENTS.ALARM.DISARM,
+        house: 'test-house',
+      },
+    ]);
+    expect(event.emit.secondCall.args).to.deep.equal([
+      EVENTS.WEBSOCKET.SEND_ALL,
+      {
+        type: WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED,
+        payload: {
+          house: 'test-house',
+        },
+      },
+    ]);
   });
 });

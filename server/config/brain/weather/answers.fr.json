@@ -31,6 +31,30 @@
     "label": "weather.get.success.now.unknown",
     "answers": ["La température est de {{ temperature }} {{ units }}."]
   },
+  {
+    "label": "weather.get.success.now.drizzle",
+    "answers": ["Il bruine dehors et la température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.thunderstorm",
+    "answers": ["Il y a de l'orage dehors et la température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.night",
+    "answers": ["Le ciel est dégagé cette nuit et la température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.partly-cloudy",
+    "answers": ["Le ciel est partiellement nuageux et la température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.pouring",
+    "answers": ["Il pleut à verse dehors et la température est de {{ temperature }} {{ units }}."]
+  },
+  {
+    "label": "weather.get.success.now.hail",
+    "answers": ["Il grêle dehors et la température est de {{ temperature }} {{ units }}."]
+  },
 
   {
     "label": "weather.get.success.today.snow",
@@ -78,6 +102,42 @@
     "label": "weather.get.success.today.unknown",
     "answers": [
       "Aujourd'hui, la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.drizzle",
+    "answers": [
+      "Aujourd'hui, il bruine et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.thunderstorm",
+    "answers": [
+      "Aujourd'hui, des orages sont attendus et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.night",
+    "answers": [
+      "Aujourd'hui, la nuit sera dégagée et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.partly-cloudy",
+    "answers": [
+      "Aujourd'hui, le ciel est partiellement nuageux et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.pouring",
+    "answers": [
+      "Aujourd'hui, de fortes pluies sont attendues et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.today.hail",
+    "answers": [
+      "Aujourd'hui, de la grêle est attendue et la température est comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
     ]
   },
 
@@ -129,6 +189,42 @@
       "Demain la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
     ]
   },
+  {
+    "label": "weather.get.success.tomorrow.drizzle",
+    "answers": [
+      "Demain il y aura de la bruine et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.thunderstorm",
+    "answers": [
+      "Demain des orages sont attendus et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.night",
+    "answers": [
+      "Demain la nuit sera dégagée et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.partly-cloudy",
+    "answers": [
+      "Demain le ciel sera partiellement nuageux et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.pouring",
+    "answers": [
+      "Demain de fortes pluies sont attendues et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.tomorrow.hail",
+    "answers": [
+      "Demain de la grêle est attendue et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
 
   {
     "label": "weather.get.success.after-tomorrow.snow",
@@ -178,6 +274,42 @@
       "Après demain la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
     ]
   },
+  {
+    "label": "weather.get.success.after-tomorrow.drizzle",
+    "answers": [
+      "Après demain il y aura de la bruine et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.thunderstorm",
+    "answers": [
+      "Après demain des orages sont attendus et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.night",
+    "answers": [
+      "Après demain la nuit sera dégagée et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.partly-cloudy",
+    "answers": [
+      "Après demain le ciel sera partiellement nuageux et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.pouring",
+    "answers": [
+      "Après demain de fortes pluies sont attendues et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.after-tomorrow.hail",
+    "answers": [
+      "Après demain de la grêle est attendue et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
 
   {
     "label": "weather.get.success.day.snow",
@@ -225,6 +357,42 @@
     "label": "weather.get.success.day.unknown",
     "answers": [
       "{{ day }} la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.drizzle",
+    "answers": [
+      "{{ day }} il y aura de la bruine et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.thunderstorm",
+    "answers": [
+      "{{ day }} des orages sont attendus et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.night",
+    "answers": [
+      "{{ day }} la nuit sera dégagée et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.partly-cloudy",
+    "answers": [
+      "{{ day }} le ciel sera partiellement nuageux et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.pouring",
+    "answers": [
+      "{{ day }} de fortes pluies sont attendues et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
+    ]
+  },
+  {
+    "label": "weather.get.success.day.hail",
+    "answers": [
+      "{{ day }} de la grêle est attendue et la température sera comprise entre {{ temperature_min }} {{ units }} et {{ temperature_max }} {{ units }}."
     ]
   },
 

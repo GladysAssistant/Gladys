@@ -72,7 +72,11 @@ async function setDiscoveredDevices(service, devices) {
       if (feature.unit !== undefined && feature.unit !== null && !DEVICE_FEATURE_UNITS_LIST.includes(feature.unit)) {
         throw new BadParameters(`${featurePath}.unit: unknown unit`);
       }
-      return { ...feature };
+      // the selector is derived and made unique by the core at creation
+      // (buildUniqueSelector): an integration publishes none, and dropping it
+      // here keeps the Discovery screen from posting one back to POST /device
+      const { selector: publishedFeatureSelector, ...featureWithoutSelector } = feature;
+      return featureWithoutSelector;
     });
     const params = Array.isArray(device.params) ? device.params : [];
     params.forEach((param, paramIndex) => {
@@ -105,8 +109,9 @@ async function setDiscoveredDevices(service, devices) {
         throw new BadParameters(`${paramPath}.name: ${RESERVED_PARAM_PREFIX}* names are reserved (${paramName})`);
       }
     });
+    const { selector: publishedDeviceSelector, ...deviceWithoutSelector } = device;
     return {
-      ...device,
+      ...deviceWithoutSelector,
       features,
       params,
       // service_id and selector are forced server side

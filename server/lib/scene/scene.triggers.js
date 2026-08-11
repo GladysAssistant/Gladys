@@ -7,6 +7,24 @@ const { compare } = require('../../utils/compare');
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
   event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0);
 
+// severity scale of the generic weather alerts (B.18)
+const WEATHER_ALERT_SEVERITY_RANK = {
+  minor: 1,
+  moderate: 2,
+  severe: 3,
+  extreme: 4,
+};
+
+// same house, phenomenon type filter ('any' or absent = every type),
+// minimal severity (absent = minor, so every alert matches)
+const matchWeatherAlert = (self, sceneSelector, event, trigger) =>
+  event.house === trigger.house &&
+  (!trigger.weather_alert_type ||
+    trigger.weather_alert_type === 'any' ||
+    event.alert.type === trigger.weather_alert_type) &&
+  WEATHER_ALERT_SEVERITY_RANK[event.alert.severity] >=
+    (WEATHER_ALERT_SEVERITY_RANK[trigger.weather_alert_severity] || 1);
+
 const triggersFunc = {
   [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {
     // we check that we are talking about the same device feature
@@ -105,6 +123,8 @@ const triggersFunc = {
   [EVENTS.SYSTEM.START]: () => true,
   [EVENTS.MQTT.RECEIVED]: (self, sceneSelector, event, trigger) =>
     event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),
+  [EVENTS.WEATHER.ALERT_RAISED]: matchWeatherAlert,
+  [EVENTS.WEATHER.ALERT_ENDED]: matchWeatherAlert,
 };
 
 module.exports = {

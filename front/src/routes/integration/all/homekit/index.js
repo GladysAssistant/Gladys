@@ -13,12 +13,13 @@ class HomeKitIntegration extends Component {
     const loading =
       props.homkitGetSettingsStatus === RequestStatus.Getting ||
       props.homekitReloadStatus === RequestStatus.Getting ||
-      props.homekitResetStatus === RequestStatus.Getting;
+      props.homekitResetStatus === RequestStatus.Getting ||
+      props.homekitSaveExposureStatus === RequestStatus.Getting;
     return <HomeKitPage {...props} loading={loading} />;
   }
 }
 
 export default connect(
-  'user,homekitSetupDataUrl,homekitMdnsAdvertiser,homekitSaveMDNSStatus,homkitGetSettingsStatus,homekitReloadStatus,homekitResetStatus',
+  'user,homekitSetupDataUrl,homekitMdnsAdvertiser,homekitSaveMDNSStatus,homkitGetSettingsStatus,homekitReloadStatus,homekitResetStatus,homekitExposureMode,homekitExposedDevices,homekitCompatibleDevices,homekitSaveExposureStatus',
   actions
 )(HomeKitIntegration);

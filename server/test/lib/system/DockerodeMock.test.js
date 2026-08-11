@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const stream = require('stream');
 
 const { fake } = sinon;
@@ -14,7 +14,7 @@ class Docker {
 }
 
 Docker.prototype.listContainers = fake.resolves(containers);
-Docker.prototype.info = fake.resolves({ CPUCfsQuota: true });
+Docker.prototype.info = fake.resolves({ CpuCfsQuota: true, CpuCfsPeriod: true });
 Docker.prototype.listImages = fake.resolves(images);
 
 const container = {
@@ -72,6 +72,7 @@ Docker.prototype.getContainer = fake.returns({
   restart: fake.resolves(true),
   remove: fake.resolves(true),
   stop: fake.resolves(true),
+  update: fake.resolves(true),
   exec: ({ Cmd }) => {
     const mockedStream = new stream.Readable();
     return fake.resolves({
@@ -102,6 +103,7 @@ Docker.prototype.getImage = fake.returns({
       },
     },
   }),
+  remove: fake.resolves(true),
 });
 
 Docker.prototype.pull = (repoTag) => {
@@ -116,4 +118,15 @@ Docker.prototype.followProgress = (onStream, onFinished, onProgress) => {
   onFinished(null, {});
 };
 
+// Consumers that boot System in their beforeEach (init() calls the Docker
+// fakes) need to clear the recorded history themselves afterwards: the fakes
+// live in this file's sandbox, out of reach of their own sinon.reset().
+Docker.resetMockHistory = () => sinon.resetHistory();
+
 module.exports = Docker;
+
+// This mock module is shared by several test files. Its fakes live in this
+// file's own sandbox, so the consumers' sinon.reset() cannot clear the call
+// history they record — register the sandbox so the global beforeEach clears
+// it before every test (the shared sinon singleton used to do this implicitly).
+require('../../helpers/sharedMockSandboxes').registerSharedMockSandbox(sinon);

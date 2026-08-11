@@ -19,6 +19,8 @@ const {
 const { fetchWebPage } = require('./webRequest');
 const { compareTimes } = require('./compareTimes');
 
+const DEFAULT_TIMEZONE = 'Europe/Paris';
+
 const noRoom = {
   id: null,
   name: 'No room',
@@ -1371,10 +1373,14 @@ async function getAllTools(userId) {
           };
         }
 
+        const effectiveGroupBy = groupBy || 'day';
+        const configuredTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+        const timezoneName = configuredTimezone || DEFAULT_TIMEZONE;
+
         const results = await this.gladys.device.energySensorManager.getConsumptionByDates([selectedFeature.selector], {
           from,
           to,
-          group_by: groupBy || 'day',
+          group_by: effectiveGroupBy,
           display_mode: displayMode,
         });
 
@@ -1385,6 +1391,66 @@ async function getAllTools(userId) {
         const roundValue = (value) => Number(value.toFixed(decimalPlaces));
         const deviceValues = deviceResult?.values ?? [];
 
+        // DuckDB truncates the TIMESTAMPTZ buckets in the timezone set on its
+        // connection, which system.setDuckDbTimezone takes from the TIMEZONE variable.
+        // A monthly bucket is therefore midnight on the 1st in the home timezone, and
+        // serializing it as a UTC instant labels it one month early east of Greenwich:
+        // 2026-01-01 in Paris reads back as 2025-12-31T23:00:00Z. Format in that same
+        // timezone, at the granularity that was grouped by, so the label always matches
+        // the bucket DuckDB built.
+        // Intl rather than dayjs here: the dayjs timezone plugin resolves the offset of
+        // an ambiguous local hour wrongly when the process runs in the target zone. It
+        // reports +00:00 for the second 02:00 of a Paris fall-back night, which is the
+        // one case the offset below exists to disambiguate.
+        const bucketDateFormat = new Intl.DateTimeFormat('en-US', {
+          timeZone: timezoneName,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          hourCycle: 'h23',
+        });
+
+        // Distance between the local clock reading and the instant it stands for.
+        // Computed from the formatted parts rather than read from a timeZoneName
+        // part: that field is CLDR text, and a zero offset spells "GMT" on ICU 76
+        // (Node 22.14) but "GMT+00:00" on ICU 78, both of which "node": "22.x"
+        // accepts. Arithmetic is the same on every ICU, and gets the zones that sit
+        // on a half or quarter hour right for free.
+        const formatUtcOffset = (parts, bucketDate) => {
+          const localAsUtc = new Date(0);
+          localAsUtc.setUTCFullYear(Number(parts.year), Number(parts.month) - 1, Number(parts.day));
+          localAsUtc.setUTCHours(Number(parts.hour), Number(parts.minute), 0, 0);
+          const offsetMinutes = Math.round((localAsUtc.getTime() - bucketDate.getTime()) / 60000);
+          const sign = offsetMinutes < 0 ? '-' : '+';
+          const absoluteMinutes = Math.abs(offsetMinutes);
+          const hours = String(Math.floor(absoluteMinutes / 60)).padStart(2, '0');
+          const minutes = String(absoluteMinutes % 60).padStart(2, '0');
+          return `${sign}${hours}:${minutes}`;
+        };
+
+        const formatBucketDate = (bucketDate) => {
+          const date = new Date(bucketDate);
+          const parts = Object.fromEntries(
+            bucketDateFormat.formatToParts(date).map(({ type, value }) => [type, value]),
+          );
+          switch (effectiveGroupBy) {
+            case 'year':
+              return parts.year;
+            case 'month':
+              return `${parts.year}-${parts.month}`;
+            // The offset keeps hourly labels unique on the night a timezone falls
+            // back: in Paris, 2025-10-26T00:00Z and 2025-10-26T01:00Z are two
+            // different buckets that are both 02:00 on the local clock.
+            case 'hour':
+              return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:00${formatUtcOffset(parts, date)}`;
+            // 'day' and 'week' are both a calendar day, the start of the bucket.
+            default:
+              return `${parts.year}-${parts.month}-${parts.day}`;
+          }
+        };
+
         const response = {
           device: selectedDevice.name,
           feature: selectedFeature.name,
@@ -1393,10 +1459,11 @@ async function getAllTools(userId) {
           // reported back as the day the caller asked for.
           start_date: formatDateInput(parsedStart),
           end_date: formatDateInput(parsedEnd),
-          group_by: groupBy || 'day',
+          group_by: effectiveGroupBy,
+          timezone: timezoneName,
           total: roundValue(deviceValues.reduce((acc, value) => acc + value.sum_value, 0)),
           values: deviceValues.map((value) => ({
-            date: value.created_at,
+            date: formatBucketDate(value.created_at),
             value: roundValue(value.sum_value),
           })),
         };

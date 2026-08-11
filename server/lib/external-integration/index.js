@@ -32,12 +32,14 @@ const { setDeviceTransports } = require('./externalIntegration.setDeviceTranspor
 const { getDiscoveredDevices } = require('./externalIntegration.getDiscoveredDevices');
 const { saveStates } = require('./externalIntegration.saveStates');
 const { getDevices } = require('./externalIntegration.getDevices');
+const { getHouses } = require('./externalIntegration.getHouses');
 const { getIntegrationConfig } = require('./externalIntegration.getIntegrationConfig');
 const { setIntegrationConfig } = require('./externalIntegration.setIntegrationConfig');
 const { getConfigForFront } = require('./externalIntegration.getConfigForFront');
 const { saveConfigFromFront } = require('./externalIntegration.saveConfigFromFront');
 const { setRunning } = require('./externalIntegration.setRunning');
 const { handleHeartbeat } = require('./externalIntegration.handleHeartbeat');
+const { handleWeatherRefresh } = require('./externalIntegration.handleWeatherRefresh');
 const { integrationConnected } = require('./externalIntegration.integrationConnected');
 const { integrationDisconnected } = require('./externalIntegration.integrationDisconnected');
 const { sendCommand } = require('./externalIntegration.sendCommand');
@@ -84,6 +86,10 @@ const { startSubContainer } = require('./externalIntegration.startSubContainer')
 const { ensureSubContainers } = require('./externalIntegration.ensureSubContainers');
 const { stopSubContainers } = require('./externalIntegration.stopSubContainers');
 const { removeSubContainers } = require('./externalIntegration.removeSubContainers');
+const { getImagesInUse } = require('./externalIntegration.getImagesInUse');
+const { ensureImage } = require('./externalIntegration.ensureImage');
+const { removeImages } = require('./externalIntegration.removeImages');
+const { cleanImages } = require('./externalIntegration.cleanImages');
 const { controlSubContainer } = require('./externalIntegration.controlSubContainer');
 const { getSubContainersState } = require('./externalIntegration.getSubContainersState');
 const { checkSubContainersHealth } = require('./externalIntegration.checkSubContainersHealth');
@@ -163,6 +169,8 @@ const ExternalIntegration = function ExternalIntegration(
   this.stateRateLimits = new Map();
   // deviceExternalId -> { count, resetAt } rate limit on POST /camera/image
   this.cameraImageRateLimits = new Map();
+  // serviceId -> timestamp of the last accepted weather freshness nudge
+  this.weatherRefreshTimes = new Map();
   this.checkHealthInterval = null;
   // store index cache (see store/ sub-folder)
   this.storeIndex = null;
@@ -178,6 +186,9 @@ const ExternalIntegration = function ExternalIntegration(
     eventFunctionWrapper(this.handleGatewayWebhook.bind(this)),
   );
   this.event.on(EVENTS.GATEWAY.LINK_STATUS_CHANGED, eventFunctionWrapper(this.notifyWebhookAvailability.bind(this)));
+  // nightly sweep of the integration images no installed integration needs
+  // anymore (config/scheduler-jobs.js)
+  this.event.on(EVENTS.EXTERNAL_INTEGRATION.CLEAN_IMAGES, eventFunctionWrapper(this.cleanImages.bind(this)));
 };
 
 ExternalIntegration.prototype.init = init;
@@ -214,12 +225,14 @@ ExternalIntegration.prototype.setDeviceTransports = setDeviceTransports;
 ExternalIntegration.prototype.getDiscoveredDevices = getDiscoveredDevices;
 ExternalIntegration.prototype.saveStates = saveStates;
 ExternalIntegration.prototype.getDevices = getDevices;
+ExternalIntegration.prototype.getHouses = getHouses;
 ExternalIntegration.prototype.getIntegrationConfig = getIntegrationConfig;
 ExternalIntegration.prototype.setIntegrationConfig = setIntegrationConfig;
 ExternalIntegration.prototype.getConfigForFront = getConfigForFront;
 ExternalIntegration.prototype.saveConfigFromFront = saveConfigFromFront;
 ExternalIntegration.prototype.setRunning = setRunning;
 ExternalIntegration.prototype.handleHeartbeat = handleHeartbeat;
+ExternalIntegration.prototype.handleWeatherRefresh = handleWeatherRefresh;
 ExternalIntegration.prototype.integrationConnected = integrationConnected;
 ExternalIntegration.prototype.integrationDisconnected = integrationDisconnected;
 ExternalIntegration.prototype.sendCommand = sendCommand;
@@ -266,6 +279,10 @@ ExternalIntegration.prototype.startSubContainer = startSubContainer;
 ExternalIntegration.prototype.ensureSubContainers = ensureSubContainers;
 ExternalIntegration.prototype.stopSubContainers = stopSubContainers;
 ExternalIntegration.prototype.removeSubContainers = removeSubContainers;
+ExternalIntegration.prototype.getImagesInUse = getImagesInUse;
+ExternalIntegration.prototype.ensureImage = ensureImage;
+ExternalIntegration.prototype.removeImages = removeImages;
+ExternalIntegration.prototype.cleanImages = cleanImages;
 ExternalIntegration.prototype.controlSubContainer = controlSubContainer;
 ExternalIntegration.prototype.getSubContainersState = getSubContainersState;
 ExternalIntegration.prototype.checkSubContainersHealth = checkSubContainersHealth;

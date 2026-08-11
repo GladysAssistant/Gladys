@@ -42,8 +42,34 @@ async function resizeImage(base64Image, options = {}) {
   return `data:image/jpeg;base64,${resizedBase64}`;
 }
 
+/**
+ * @description Resize an image buffer and return it as a JPEG data URI without the data: prefix.
+ * @param {Buffer} inputBuffer - Raw image buffer.
+ * @param {object} options - Resize options.
+ * @param {number} [options.maxWidth=640] - Maximum width in pixels.
+ * @param {number} [options.maxHeight=480] - Maximum height in pixels.
+ * @param {number} [options.quality=80] - JPEG quality (1-100).
+ * @returns {Promise<string>} Resized image as image/jpeg;base64,...
+ * @example
+ * const image = await resizeImageBuffer(buffer, { maxWidth: 800, maxHeight: 400 });
+ */
+async function resizeImageBuffer(inputBuffer, options = {}) {
+  const { maxWidth = DEFAULT_MAX_WIDTH, maxHeight = DEFAULT_MAX_HEIGHT, quality = 80 } = options;
+
+  const resizedBuffer = await sharp(inputBuffer)
+    .resize(maxWidth, maxHeight, {
+      fit: 'inside',
+      withoutEnlargement: true,
+    })
+    .jpeg({ quality })
+    .toBuffer();
+
+  return `image/jpeg;base64,${resizedBuffer.toString('base64')}`;
+}
+
 module.exports = {
   resizeImage,
+  resizeImageBuffer,
   DEFAULT_MAX_WIDTH,
   DEFAULT_MAX_HEIGHT,
 };

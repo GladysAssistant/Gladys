@@ -183,15 +183,20 @@ class EditDashboard extends Component {
   };
 
   updateNewSelectedBox = (x, y, type) => {
+    const defaultBoxData = { type: { $set: type } };
+
+    if (type === 'photo') {
+      defaultBoxData.photos = { $set: [{ url: '', caption: '' }] };
+      defaultBoxData.photo_fit = { $set: 'cover' };
+      defaultBoxData.photo_slideshow_interval = { $set: 10 };
+      defaultBoxData.photo_show_caption = { $set: true };
+    }
+
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
           [x]: {
-            [y]: {
-              type: {
-                $set: type
-              }
-            }
+            [y]: defaultBoxData
           }
         }
       }
@@ -203,9 +208,17 @@ class EditDashboard extends Component {
     const { currentDashboard } = this.state;
     // new boxes without empty boxes
     const newBoxes = currentDashboard.boxes.map(column => {
-      return column.filter(box => {
-        return box.type !== undefined;
-      });
+      return column
+        .filter(box => {
+          return box.type !== undefined;
+        })
+        .map(box => {
+          // A photo box can contain rows the user started but never filled in, we don't save them
+          if (box.type === 'photo' && Array.isArray(box.photos)) {
+            return { ...box, photos: box.photos.filter(photo => photo && photo.url) };
+          }
+          return box;
+        });
     });
     const newDashboard = update(currentDashboard, {
       boxes: {

@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub } = sinon;
 const { notifyChange } = require('../../../../services/homekit/lib/notifyChange');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } = require('../../../../utils/constants');
 
@@ -64,6 +66,126 @@ describe('Notify change to HomeKit', () => {
 
     expect(homekitHandler.notifyTimeouts['home:door:binary']).haveOwnProperty('timeout');
     expect(homekitHandler.notifyTimeouts['home:door:binary']).haveOwnProperty('startDateTime');
+  });
+
+  it('should not delay a smoke alarm', async () => {
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic: stub() }),
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        name: 'Smoke sensor',
+        category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      }),
+    };
+    homekitHandler.sendState = stub();
+    homekitHandler.notifyTimeouts = {};
+
+    await homekitHandler.notifyChange([accessory], {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+      device_feature: 'home:smoke:binary',
+    });
+
+    // notifDelay is 0: the alarm is forwarded synchronously, without waiting on any timer
+    expect(homekitHandler.sendState.callCount).to.equal(1);
+    expect(homekitHandler.notifyTimeouts['home:smoke:binary']).to.equal(undefined);
+  });
+
+  it('should forward two smoke alarms fired in the same tick', async () => {
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic: stub() }),
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        name: 'Smoke sensor',
+        category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      }),
+    };
+    homekitHandler.sendState = stub();
+    homekitHandler.notifyTimeouts = {};
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+      device_feature: 'home:smoke:binary',
+    };
+    await homekitHandler.notifyChange([accessory], event);
+    await homekitHandler.notifyChange([accessory], event);
+
+    // debouncing a zero delay would clear the first timer and drop the first alarm
+    expect(homekitHandler.sendState.callCount).to.equal(2);
+  });
+
+  it('should not delay a mapping that asks for no delay', async () => {
+    const sendEventNotification = stub();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ getCharacteristic: stub().returns({ sendEventNotification }) }),
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        name: 'Button',
+        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+        type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+      }),
+    };
+    homekitHandler.sendState = stub();
+    homekitHandler.notifyTimeouts = {};
+
+    await homekitHandler.notifyChange([accessory], {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+      device_feature: 'home:button:click',
+    });
+
+    // notifDelay is 0 on a button: the press is forwarded synchronously, without waiting on a timer
+    expect(homekitHandler.sendState.callCount).to.equal(1);
+    expect(homekitHandler.notifyTimeouts['home:button:click']).to.equal(undefined);
+  });
+
+  it('should forward two presses fired in the same tick', async () => {
+    const sendEventNotification = stub();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ getCharacteristic: stub().returns({ sendEventNotification }) }),
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        name: 'Button',
+        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+        type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+      }),
+    };
+    homekitHandler.sendState = stub();
+    homekitHandler.notifyTimeouts = {};
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 1,
+      device_feature: 'home:button:click',
+    };
+    await homekitHandler.notifyChange([accessory], event);
+    await homekitHandler.notifyChange([accessory], event);
+
+    // debouncing a zero delay would clear the first timer and drop the first press
+    expect(homekitHandler.sendState.callCount).to.equal(2);
   });
 
   it('should update timeout to notify', async () => {

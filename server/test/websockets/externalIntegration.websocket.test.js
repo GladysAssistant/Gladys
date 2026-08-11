@@ -1,6 +1,8 @@
 const EventEmitter = require('events');
 const { expect } = require('chai');
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 
 const WebsocketManager = require('../../api/websockets');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
@@ -85,6 +87,7 @@ describe('Websockets external integrations', () => {
         integrationDisconnected: fake.resolves(null),
         handleCommandResult: fake.returns(null),
         handleHeartbeat: fake.resolves(null),
+        handleWeatherRefresh: fake.returns(null),
       },
     };
     const websocketManager = new WebsocketManager(wss, gladys);
@@ -115,11 +118,19 @@ describe('Websockets external integrations', () => {
         payload: {},
       }),
     );
+    ws.emit(
+      'message',
+      JSON.stringify({
+        type: WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEATHER_REFRESH,
+        payload: {},
+      }),
+    );
     await new Promise((resolve) => {
       setTimeout(resolve, 20);
     });
     assert.calledWith(gladys.externalIntegration.handleCommandResult, service, { message_id: 'uuid', success: true });
     assert.calledWith(gladys.externalIntegration.handleHeartbeat, service);
+    assert.calledWith(gladys.externalIntegration.handleWeatherRefresh, service);
     // close -> integrationDisconnected
     ws.emit('close');
     await new Promise((resolve) => {
@@ -167,6 +178,7 @@ describe('Websockets external integrations', () => {
       externalIntegration: {
         handleCommandResult: fake.returns(null),
         handleHeartbeat: fake.resolves(null),
+        handleWeatherRefresh: fake.returns(null),
       },
     };
     const websocketManager = new WebsocketManager(wss, gladys);
@@ -187,10 +199,18 @@ describe('Websockets external integrations', () => {
         payload: {},
       }),
     );
+    ws.emit(
+      'message',
+      JSON.stringify({
+        type: WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEATHER_REFRESH,
+        payload: {},
+      }),
+    );
     await new Promise((resolve) => {
       setTimeout(resolve, 20);
     });
     assert.notCalled(gladys.externalIntegration.handleCommandResult);
     assert.notCalled(gladys.externalIntegration.handleHeartbeat);
+    assert.notCalled(gladys.externalIntegration.handleWeatherRefresh);
   });
 });

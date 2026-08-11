@@ -6,12 +6,20 @@ import { Text } from 'preact-i18n';
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import SupervisionCard from './SupervisionCard';
 import { RequestStatus } from '../../../../../utils/consts';
+import createActionsExternalIntegrationUpdates from '../../../../../actions/externalIntegrationUpdates';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import style from './style.css';
 
 class ExternalIntegrationSupervisionPage extends Component {
   loadData = async () => {
-    this.setState({ loadStatus: RequestStatus.Getting });
+    // loadData also runs when the user navigates to another integration: the
+    // feedback of the previous one must not be shown on the new card
+    this.setState({
+      loadStatus: RequestStatus.Getting,
+      actionStatus: null,
+      actionError: null,
+      updateResult: null
+    });
     const { selector } = this.props;
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${selector}`);
@@ -30,15 +38,28 @@ class ExternalIntegrationSupervisionPage extends Component {
   };
 
   executeAction = async action => {
-    this.setState({ actionStatus: RequestStatus.Getting, actionError: null });
+    const previousVersion = this.state.integration && this.state.integration.version;
+    this.setState({ actionStatus: RequestStatus.Getting, actionError: null, updateResult: null });
     try {
       const integration = await this.props.httpClient.post(
         `/api/v1/external_integration/${this.props.selector}/${action}`
       );
-      this.setState({ integration, actionStatus: RequestStatus.Success });
+      // an update that changes nothing is a legitimate outcome (already on
+      // the latest version): without this the button looks like it did
+      // nothing at all
+      const updateResult =
+        action === 'update'
+          ? { version: integration.version, upToDate: integration.version === previousVersion }
+          : null;
+      this.setState({ integration, actionStatus: RequestStatus.Success, updateResult });
+      if (action === 'update') {
+        // the header counter must drop right away, the user just did the
+        // update it was asking for
+        this.props.refreshExternalIntegrationsToUpdate();
+      }
     } catch (e) {
       console.error(e);
-      this.setState({ actionStatus: RequestStatus.Error, actionError: action });
+      this.setState({ actionStatus: RequestStatus.Error, actionError: action, updateResult: null });
     }
   };
 
@@ -123,6 +144,7 @@ class ExternalIntegrationSupervisionPage extends Component {
             language={language}
             actionStatus={state.actionStatus}
             actionError={state.actionError}
+            updateResult={state.updateResult}
             uninstallStatus={state.uninstallStatus}
             askingUninstall={state.askingUninstall}
             executeAction={this.executeAction}
@@ -147,4 +169,7 @@ class ExternalIntegrationSupervisionPage extends Component {
   }
 }
 
-export default connect('user,session,httpClient')(ExternalIntegrationSupervisionPage);
+export default connect(
+  'user,session,httpClient',
+  createActionsExternalIntegrationUpdates
+)(ExternalIntegrationSupervisionPage);

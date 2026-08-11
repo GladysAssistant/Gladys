@@ -4,6 +4,7 @@ import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import config from '../../../../config';
 import MCPApiKey from './MCPApiKeys';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const MCPWelcomePage = ({ user, ...props }) => (
   <div class="page">
@@ -12,6 +13,7 @@ const MCPWelcomePage = ({ user, ...props }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.mcp.title" />
               </h3>

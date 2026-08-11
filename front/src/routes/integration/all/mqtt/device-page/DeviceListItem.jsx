@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
@@ -79,7 +79,7 @@ class DeviceListItem extends Component {
 
         {tooMuchStatesError && (
           <div class={cx('alert alert-warning mt-2 mb-0', style.deviceListItemAlert)}>
-            <Text id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+            <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
           </div>
         )}
         {error && (

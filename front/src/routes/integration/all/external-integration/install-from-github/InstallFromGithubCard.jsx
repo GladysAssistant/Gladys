@@ -21,7 +21,8 @@ class InstallFromGithubCard extends Component {
       dockerImage: '',
       manifestJson: '',
       installStatus: null,
-      installError: null
+      installError: null,
+      installErrorDetails: null
     });
   };
 
@@ -31,7 +32,11 @@ class InstallFromGithubCard extends Component {
 
   toggleDevMode = e => {
     e.preventDefault();
-    this.setState({ devMode: !this.state.devMode, installError: null });
+    this.setState(prevState => ({
+      devMode: !prevState.devMode,
+      installError: null,
+      installErrorDetails: null
+    }));
   };
 
   updateRepoUrl = e => {
@@ -47,7 +52,7 @@ class InstallFromGithubCard extends Component {
   };
 
   install = async body => {
-    this.setState({ installStatus: RequestStatus.Getting, installError: null });
+    this.setState({ installStatus: RequestStatus.Getting, installError: null, installErrorDetails: null });
     try {
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
       route(`/dashboard/integration/device/external/${installed.selector}`);
@@ -60,8 +65,28 @@ class InstallFromGithubCard extends Component {
       } else if (status === 422) {
         installError = 'integration.externalIntegration.installFromGithub.errorInvalidManifest';
       }
-      this.setState({ installStatus: RequestStatus.Error, installError });
+      // this screen is meant for integration developers: the exact validation
+      // errors of the manifest ("actions[1].depends_on: unknown field") are
+      // far more actionable than the generic message. The server joins them
+      // with " ; ", we display them back as a list.
+      const properties = status === 422 ? get(e, 'response.data.properties') : null;
+      this.setState({
+        installStatus: RequestStatus.Error,
+        installError,
+        installErrorDetails: this.parseErrorDetails(properties)
+      });
     }
+  };
+
+  parseErrorDetails = properties => {
+    if (typeof properties !== 'string' || properties.trim().length === 0) {
+      return null;
+    }
+    const details = properties
+      .split(' ; ')
+      .map(detail => detail.trim())
+      .filter(detail => detail.length > 0);
+    return details.length > 0 ? details : null;
   };
 
   installFromRepoUrl = e => {
@@ -90,7 +115,8 @@ class InstallFromGithubCard extends Component {
       } catch (err) {
         this.setState({
           installStatus: RequestStatus.Error,
-          installError: 'integration.externalIntegration.installFromGithub.manifestInvalidJson'
+          installError: 'integration.externalIntegration.installFromGithub.manifestInvalidJson',
+          installErrorDetails: err.message ? [err.message] : null
         });
         return;
       }
@@ -98,7 +124,7 @@ class InstallFromGithubCard extends Component {
     this.install(body);
   };
 
-  renderModal({ devMode, repoUrl, dockerImage, manifestJson, installStatus, installError }) {
+  renderModal({ devMode, repoUrl, dockerImage, manifestJson, installStatus, installError, installErrorDetails }) {
     const installing = installStatus === RequestStatus.Getting;
     return (
       <Modal
@@ -109,6 +135,18 @@ class InstallFromGithubCard extends Component {
           {installError && (
             <div class="alert alert-danger">
               <Text id={installError} />
+              {installErrorDetails && (
+                <>
+                  <div class="mt-2 font-weight-bold">
+                    <Text id="integration.externalIntegration.installFromGithub.errorDetailsTitle" />
+                  </div>
+                  <ul class={style.errorDetails}>
+                    {installErrorDetails.map(detail => (
+                      <li key={detail}>{detail}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
             </div>
           )}
           <form onSubmit={this.installFromRepoUrl}>

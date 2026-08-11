@@ -122,6 +122,7 @@ const SystemPage = ({ children, ...props }) => (
           websocketConnected={props.websocketConnected}
           checkForUpdates={props.checkForUpdates}
           SystemGetInfosStatus={props.SystemGetInfosStatus}
+          CheckForUpdatesStatus={props.CheckForUpdatesStatus}
           systemInfos={props.systemInfos}
         />
         <SettingsSystemDuckDbMigration />

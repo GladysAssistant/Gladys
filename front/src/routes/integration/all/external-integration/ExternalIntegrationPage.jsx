@@ -4,6 +4,7 @@ import { connect } from 'unistore/preact';
 import get from 'get-value';
 
 import { USER_ROLE } from '../../../../../../server/utils/constants';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 // last known display name per integration: each tab reloads the integration
 // on mount, and showing the raw selector while it loads made the title
@@ -22,9 +23,12 @@ const getDisplayName = (selector, integration) => {
 };
 
 const ExternalIntegrationPage = ({ selector, integration, user, children }) => {
-  // communication integrations have no device screens: the generic page
-  // branches by type and only shows Configuration and Logs
-  const isCommunication = get(integration, 'manifest.type') === 'communication';
+  // communication and weather integrations have no device screens (they are
+  // dedicated provider APIs, not device controllers): the generic page
+  // branches by type and only shows Configuration and Logs. An unknown type
+  // (metadata still loading) hides the tabs too, instead of flashing them.
+  const integrationType = get(integration, 'manifest.type');
+  const hasDeviceScreens = Boolean(integrationType) && !['communication', 'weather'].includes(integrationType);
   // a non-admin user only comes here to link their own account: supervision
   // and logs are administration screens (and their routes are admin-only)
   const isAdmin = get(user, 'role') === USER_ROLE.ADMIN;
@@ -35,10 +39,11 @@ const ExternalIntegrationPage = ({ selector, integration, user, children }) => {
           <div class="container">
             <div class="row">
               <div class="col-lg-3">
+                <BackToIntegrationsLink />
                 <h3 class="page-title mb-5">{getDisplayName(selector, integration)}</h3>
                 <div>
                   <div class="list-group list-group-transparent mb-0">
-                    {!isCommunication && isAdmin && (
+                    {hasDeviceScreens && isAdmin && (
                       <Link
                         href={`/dashboard/integration/device/external/${selector}`}
                         activeClassName="active"
@@ -51,7 +56,7 @@ const ExternalIntegrationPage = ({ selector, integration, user, children }) => {
                       </Link>
                     )}
 
-                    {!isCommunication && isAdmin && (
+                    {hasDeviceScreens && isAdmin && (
                       <Link
                         href={`/dashboard/integration/device/external/${selector}/discover`}
                         activeClassName="active"

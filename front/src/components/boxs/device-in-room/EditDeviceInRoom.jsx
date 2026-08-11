@@ -6,7 +6,7 @@ import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
-import SUPPORTED_FEATURE_TYPES from './SupportedFeatureTypes';
+import { isSupportedFeature } from './SupportedFeatureTypes';
 
 class EditDeviceInRoom extends Component {
   updateBoxRoom = room => {
@@ -38,7 +38,7 @@ class EditDeviceInRoom extends Component {
             label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
           };
           // for now, we only supports binary on/off and sensors
-          if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
+          if (feature.read_only || isSupportedFeature(feature)) {
             roomDeviceFeatures.push(featureOption);
           }
           if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {

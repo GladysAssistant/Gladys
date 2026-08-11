@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, assert: sinonAssert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert: sinonAssert } = sinon;
 
 const UserController = require('../../../api/controllers/user.controller');
 

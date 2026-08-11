@@ -45,8 +45,11 @@ async function disarmWithCode(selector, code) {
   // If code is right, delete all rate limit associated to this house
   await this.alarmCodeRateLimit.delete(selector);
 
-  // In this case, we don't throw an error if the house is already disarmed
-  if (house.alarm_mode === ALARM_MODES.DISARMED) {
+  // In this case, we don't throw an error if the house is already disarmed.
+  // A house currently arming is still "disarmed" in DB, so we let it go through
+  // disarm to cancel the pending arming.
+  const armingInProgress = this.armingHouseTimeout.has(selector);
+  if (house.alarm_mode === ALARM_MODES.DISARMED && !armingInProgress) {
     return house.get({ plain: true });
   }
 

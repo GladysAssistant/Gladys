@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { stub, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub, fake } = sinon;
 const nock = require('nock');
 const dns = require('dns');
 const { SYSTEM_VARIABLE_NAMES, COVER_STATE, AI_CHAT_TOOL_CATEGORIES } = require('../../../../utils/constants');
@@ -1109,7 +1111,9 @@ describe('build schemas', () => {
           selector: 'prise-onduleur-thirty-minutes-consumption',
           currency_unit: null,
         },
-        values: [{ created_at: '2026-07-12T00:00:00.000Z', value: 0.05, sum_value: 2.345678, count_value: 48 }],
+        values: [
+          { created_at: new Date('2026-07-11T22:00:00.000Z'), value: 0.05, sum_value: 2.345678, count_value: 48 },
+        ],
       },
     ]);
 
@@ -1136,6 +1140,11 @@ describe('build schemas', () => {
         },
         house: {
           get: stub().resolves([{ id: 'house-1', name: 'Main house', selector: 'main-house' }]),
+        },
+        variable: {
+          getValue: stub().callsFake((name) =>
+            Promise.resolve(name === SYSTEM_VARIABLE_NAMES.TIMEZONE ? 'Europe/Paris' : null),
+          ),
         },
         calendar: {
           get: stub().resolves([]),
@@ -1202,8 +1211,9 @@ describe('build schemas', () => {
       start_date: '2026-07-12',
       end_date: '2026-07-12',
       group_by: 'day',
+      timezone: 'Europe/Paris',
       total: 2.346,
-      values: [{ date: '2026-07-12T00:00:00.000Z', value: 2.346 }],
+      values: [{ date: '2026-07-12', value: 2.346 }],
     });
 
     // Cost in currency for a full month: uses the cost feature and includes the
@@ -1218,8 +1228,8 @@ describe('build schemas', () => {
           is_subscription: true,
         },
         values: [
-          { created_at: '2026-06-01T00:00:00.000Z', value: 0.42, sum_value: 0.42 },
-          { created_at: '2026-06-02T00:00:00.000Z', value: 0.42, sum_value: 0.42 },
+          { created_at: new Date('2026-05-31T22:00:00.000Z'), value: 0.42, sum_value: 0.42 },
+          { created_at: new Date('2026-06-01T22:00:00.000Z'), value: 0.42, sum_value: 0.42 },
         ],
       },
       {
@@ -1230,8 +1240,8 @@ describe('build schemas', () => {
           currency_unit: 'euro',
         },
         values: [
-          { created_at: '2026-06-01T00:00:00.000Z', value: 0.1, sum_value: 1.234567 },
-          { created_at: '2026-06-02T00:00:00.000Z', value: 0.1, sum_value: 2.1 },
+          { created_at: new Date('2026-05-31T22:00:00.000Z'), value: 0.1, sum_value: 1.234567 },
+          { created_at: new Date('2026-06-01T22:00:00.000Z'), value: 0.1, sum_value: 2.1 },
         ],
       },
     ]);
@@ -1258,10 +1268,11 @@ describe('build schemas', () => {
       start_date: '2026-06-01',
       end_date: '2026-06-30',
       group_by: 'day',
+      timezone: 'Europe/Paris',
       total: 3.33,
       values: [
-        { date: '2026-06-01T00:00:00.000Z', value: 1.23 },
-        { date: '2026-06-02T00:00:00.000Z', value: 2.1 },
+        { date: '2026-06-01', value: 1.23 },
+        { date: '2026-06-02', value: 2.1 },
       ],
       home_subscription: {
         name: 'Abonnement',
@@ -1354,7 +1365,7 @@ describe('build schemas', () => {
           selector: 'prise-onduleur-thirty-minutes-consumption',
           currency_unit: null,
         },
-        values: [{ created_at: '2026-02-01T00:00:00.000Z', value: 12, sum_value: 12 }],
+        values: [{ created_at: new Date('2026-01-31T23:00:00.000Z'), value: 12, sum_value: 12 }],
       },
     ]);
     const clampedFebruaryResult = await energyTool.cb({
@@ -1375,6 +1386,181 @@ describe('build schemas', () => {
     // The effective period is echoed back, not the out-of-range input.
     expect(mcpHandler.toon.lastCall.args[0].start_date).to.eq('2026-02-01');
     expect(mcpHandler.toon.lastCall.args[0].end_date).to.eq('2026-02-28');
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([{ date: '2026-02', value: 12 }]);
+
+    // A whole year grouped by month: the buckets are local midnight, and serializing
+    // them as UTC instants labelled every month one month early east of Greenwich.
+    getConsumptionByDates.resetHistory();
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [
+          { created_at: new Date('2025-12-31T23:00:00.000Z'), value: 1, sum_value: 118.247 },
+          { created_at: new Date('2026-01-31T23:00:00.000Z'), value: 1, sum_value: 121.17 },
+          { created_at: new Date('2026-02-28T23:00:00.000Z'), value: 1, sum_value: 126.954 },
+        ],
+      },
+    ]);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-01-01',
+      end_date: '2026-12-31',
+      unit: 'kwh',
+      group_by: 'month',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([
+      { date: '2026-01', value: 118.247 },
+      { date: '2026-02', value: 121.17 },
+      { date: '2026-03', value: 126.954 },
+    ]);
+
+    // Hour and year grouping report their own granularity.
+    getConsumptionByDates.resetHistory();
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [{ created_at: new Date('2026-07-12T06:00:00.000Z'), value: 1, sum_value: 0.5 }],
+      },
+    ]);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-07-12',
+      end_date: '2026-07-12',
+      unit: 'kwh',
+      group_by: 'hour',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([{ date: '2026-07-12 08:00+02:00', value: 0.5 }]);
+
+    // Night a timezone falls back: both buckets are 02:00 on the Paris clock, so the
+    // offset is what keeps them from collapsing into one duplicated date.
+    getConsumptionByDates.resetHistory();
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [
+          { created_at: new Date('2025-10-26T00:00:00.000Z'), value: 1, sum_value: 0.3 },
+          { created_at: new Date('2025-10-26T01:00:00.000Z'), value: 1, sum_value: 0.4 },
+        ],
+      },
+    ]);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2025-10-26',
+      end_date: '2025-10-26',
+      unit: 'kwh',
+      group_by: 'hour',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([
+      { date: '2025-10-26 02:00+02:00', value: 0.3 },
+      { date: '2025-10-26 02:00+01:00', value: 0.4 },
+    ]);
+
+    // Same night west of Greenwich, where the offset is negative: 01:00 happens twice
+    // in New York too, on 2025-11-02.
+    getConsumptionByDates.resetHistory();
+    mcpHandler.gladys.variable.getValue.resolves('America/New_York');
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [
+          { created_at: new Date('2025-11-02T05:00:00.000Z'), value: 1, sum_value: 0.5 },
+          { created_at: new Date('2025-11-02T06:00:00.000Z'), value: 1, sum_value: 0.6 },
+        ],
+      },
+    ]);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2025-11-02',
+      end_date: '2025-11-02',
+      unit: 'kwh',
+      group_by: 'hour',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([
+      { date: '2025-11-02 01:00-04:00', value: 0.5 },
+      { date: '2025-11-02 01:00-05:00', value: 0.6 },
+    ]);
+
+    // A home sitting at UTC: the offset is zero, and still reported as +00:00 so the
+    // hourly format never changes shape. Not read off Intl's timeZoneName, which
+    // spells that case "GMT" on ICU 76 and "GMT+00:00" on ICU 78.
+    mcpHandler.gladys.variable.getValue.resolves('UTC');
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [{ created_at: new Date('2026-01-01T00:00:00.000Z'), value: 1, sum_value: 0.7 }],
+      },
+    ]);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-01-01',
+      end_date: '2026-01-01',
+      unit: 'kwh',
+      group_by: 'hour',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].timezone).to.eq('UTC');
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([{ date: '2026-01-01 00:00+00:00', value: 0.7 }]);
+    mcpHandler.gladys.variable.getValue.callsFake((name) =>
+      Promise.resolve(name === SYSTEM_VARIABLE_NAMES.TIMEZONE ? 'Europe/Paris' : null),
+    );
+
+    getConsumptionByDates.resolves([
+      {
+        device: { name: 'Prise onduleur' },
+        deviceFeature: {
+          name: 'Consommation',
+          selector: 'prise-onduleur-thirty-minutes-consumption',
+          currency_unit: null,
+        },
+        values: [{ created_at: new Date('2025-12-31T23:00:00.000Z'), value: 1, sum_value: 1500 }],
+      },
+    ]);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-01-01',
+      end_date: '2026-12-31',
+      unit: 'kwh',
+      group_by: 'year',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].values).to.deep.equal([{ date: '2026', value: 1500 }]);
+
+    // No TIMEZONE variable set yet: fall back to the same default the other tools use.
+    mcpHandler.gladys.variable.getValue.resolves(null);
+    await energyTool.cb({
+      device: 'Prise onduleur',
+      start_date: '2026-01-01',
+      end_date: '2026-12-31',
+      unit: 'kwh',
+      group_by: 'year',
+    });
+    expect(mcpHandler.toon.lastCall.args[0].timezone).to.eq('Europe/Paris');
+    mcpHandler.gladys.variable.getValue.callsFake((name) =>
+      Promise.resolve(name === SYSTEM_VARIABLE_NAMES.TIMEZONE ? 'Europe/Paris' : null),
+    );
 
     // Same clamping on a leap year keeps February 29th, and on a 30-day month.
     getConsumptionByDates.resetHistory();

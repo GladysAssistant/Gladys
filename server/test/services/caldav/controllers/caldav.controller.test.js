@@ -1,4 +1,6 @@
-const { assert, fake, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake, stub } = sinon;
 const CaldavController = require('../../../../services/caldav/api/caldav.controller');
 
 const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';

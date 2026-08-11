@@ -14,7 +14,7 @@ const LogsTab = ({ logs, logsStatus, getLogs, subContainers = [], selectedContai
         {subContainers.length > 0 && (
           <Localizer>
             <select
-              class="form-control form-control-sm custom-select w-auto mr-2"
+              class={cx('form-control form-control-sm custom-select w-auto mr-2', style.containerSelect)}
               value={selectedContainer}
               onChange={selectContainer}
               aria-label={<Text id="integration.externalIntegration.logs.containerSelectLabel" />}

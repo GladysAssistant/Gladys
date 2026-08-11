@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 const { IncomingMessageMock } = require('../../../../services/mcp/lib/IncomingMessageMock');
 
 describe('IncomingMessageMock', () => {
