@@ -943,7 +943,7 @@
         "repoUrlPlaceholder": "https://github.com/owner/repository",
         "installButton": "Install",
         "devModeLink": "Developer mode: install from a Docker image",
-        "devModeDescription": "Install an integration directly from a Docker image, with an optional manifest. Only for integration developers.",
+        "devModeDescription": "Install an integration directly from a Docker image, with an optional manifest. The image can be built locally with docker build, no registry needed. Only for integration developers.",
         "dockerImageLabel": "Docker image",
         "dockerImagePlaceholder": "e.g. myuser/my-integration:latest",
         "manifestLabel": "Manifest (JSON, optional)",

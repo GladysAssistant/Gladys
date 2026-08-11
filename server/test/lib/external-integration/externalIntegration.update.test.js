@@ -212,6 +212,55 @@ describe('externalIntegration.update', () => {
     externalIntegration.clearTimers(service.id);
   });
 
+  it('should fail closed on a store update when nothing can be pulled, even with a local image', async () => {
+    // the ordered-candidate design of store updates relies on strict pulls:
+    // when every candidate — including the installed last resort — cannot be
+    // pulled, the update must fail with the explicit error, never silently
+    // recreate the container from whatever local tag shadows the registry
+    const service = await seedExternalService({ store_slug: 'john/gladys-open-meteo-demo', version: '1.2.0' });
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        pull: fake.rejects(new Error('registry unreachable')),
+        imageExists: fake.resolves(true),
+      },
+    });
+    externalIntegration.getIndex = fake.resolves(null);
+    externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
+    try {
+      await externalIntegration.update(service.selector);
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(BadParameters);
+      expect(e.message).to.include('UNABLE_TO_PULL_IMAGE');
+    }
+    sinonAssert.notCalled(system.imageExists);
+  });
+
+  it('should update a dev install from an image only built locally', async () => {
+    // the local dev loop: rebuild the image with `docker build`, hit force
+    // update. The tag exists in no registry so the pull fails, and the image
+    // already present locally is used instead
+    const service = await seedExternalService({
+      store_slug: null,
+      docker_image: 'my-local-integration:dev',
+    });
+    const newManifest = { ...TEST_MANIFEST, version: '1.3.0' };
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        pull: fake.rejects(new Error('pull access denied')),
+        imageExists: fake.resolves(true),
+        getImageLabels: fake.resolves({ 'io.gladysassistant.manifest': JSON.stringify(newManifest) }),
+      },
+    });
+    const integration = await externalIntegration.update(service.selector);
+    sinonAssert.calledWith(system.pull, 'my-local-integration:dev');
+    sinonAssert.calledWith(system.imageExists, 'my-local-integration:dev');
+    expect(integration.version).to.equal('1.3.0');
+    expect(integration.manifest.version).to.equal('1.3.0');
+    expect(integration.docker_image).to.equal('my-local-integration:dev');
+    externalIntegration.clearTimers(service.id);
+  });
+
   it('should re-pull the installed dev tag, not the released image of the manifest', async () => {
     // dev install alongside a prod one: the user installed :dev while the
     // labels manifest declares the released image — force update must never
