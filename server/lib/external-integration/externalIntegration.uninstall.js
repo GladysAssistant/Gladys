@@ -54,6 +54,9 @@ async function uninstall(selector) {
   }
   const devices = await db.Device.findAll({ where: { service_id: service.id } });
   await Promise.each(devices, (device) => this.device.destroy(device.selector));
+  // Calendars of a calendar-type integration are removed explicitly (all
+  // users), never left to the service_id FK cascade (see the spec, B.19).
+  await db.Calendar.destroy({ where: { service_id: service.id } });
   await db.Variable.destroy({ where: { service_id: service.id } });
   await db.Service.destroy({ where: { id: service.id } });
   this.stateManager.deleteState('service', service.name);

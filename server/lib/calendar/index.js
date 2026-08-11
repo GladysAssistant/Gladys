@@ -8,6 +8,8 @@ const { destroyEvent } = require('./calendar.destroyEvent');
 const { findCurrentlyRunningEvent } = require('./calendar.findCurrentlyRunningEvent');
 const { destroyEvents } = require('./calendar.destroyEvents');
 const { updateEvent } = require('./calendar.updateEvent');
+const { upsertCalendars } = require('./calendar.upsertCalendars');
+const { upsertEvents } = require('./calendar.upsertEvents');
 
 const Calendar = function Calendar(service) {
   this.service = service;
@@ -23,5 +25,7 @@ Calendar.prototype.destroyEvent = destroyEvent;
 Calendar.prototype.findCurrentlyRunningEvent = findCurrentlyRunningEvent;
 Calendar.prototype.destroyEvents = destroyEvents;
 Calendar.prototype.updateEvent = updateEvent;
+Calendar.prototype.upsertCalendars = upsertCalendars;
+Calendar.prototype.upsertEvents = upsertEvents;
 
 module.exports = Calendar;

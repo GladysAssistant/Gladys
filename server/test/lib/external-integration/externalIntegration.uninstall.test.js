@@ -23,6 +23,21 @@ describe('externalIntegration.uninstall', () => {
       external_id: `ext:${service.selector}:test`,
     });
     await variable.setValue('LATITUDE', '48.85', service.id);
+    const calendar = await db.Calendar.create({
+      name: 'Integration calendar',
+      description: '',
+      selector: 'ext-test-integration-calendar',
+      user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      service_id: service.id,
+      external_id: `ext:${service.selector}:john:primary`,
+    });
+    await db.CalendarEvent.create({
+      name: 'Integration event',
+      selector: 'ext-test-integration-event',
+      calendar_id: calendar.id,
+      start: '2026-08-14T09:00:00.000Z',
+      external_id: `ext:${service.selector}:john:uid-1`,
+    });
 
     await externalIntegration.uninstall(service.selector);
 
@@ -31,6 +46,11 @@ describe('externalIntegration.uninstall', () => {
     sinonAssert.calledWith(device.destroy, 'ext-test-device');
     const variables = await db.Variable.findAll({ where: { service_id: service.id } });
     expect(variables).to.have.lengthOf(0);
+    // calendars are removed explicitly, and their events with them
+    const calendars = await db.Calendar.findAll({ where: { service_id: service.id } });
+    expect(calendars).to.have.lengthOf(0);
+    const events = await db.CalendarEvent.findAll({ where: { calendar_id: calendar.id } });
+    expect(events).to.have.lengthOf(0);
     const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
     expect(serviceInDb).to.equal(null);
     expect(stateManager.get('service', service.name)).to.equal(null);
