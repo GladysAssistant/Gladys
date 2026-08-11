@@ -504,7 +504,8 @@ describe('Build service', () => {
 
     homekitHandler.hap = {
       Characteristic: { OccupancyDetected: 'OCCUPANCYDETECTED' },
-      CharacteristicEventTypes: stub(),
+      // named rather than stubbed, so the test can tell a GET handler from a SET one
+      CharacteristicEventTypes: { GET: 'get', SET: 'set' },
       Perms: { PAIRED_READ: 'PAIRED_READ', PAIRED_WRITE: 'PAIRED_WRITE' },
       Service: { OccupancySensor },
     };
@@ -528,8 +529,9 @@ describe('Build service', () => {
     await on.args[0][1](cb);
 
     expect(OccupancySensor.args[0][0]).to.equal('Téléphone');
-    expect(on.callCount).to.equal(1);
     expect(getCharacteristic.args[0][0]).to.equal('OCCUPANCYDETECTED');
+    // a read handler and nothing else: OccupancyDetected takes no write
+    expect(on.args.map(([event]) => event)).to.eql(['get']);
     expect(cb.args[0][1]).to.equal(1);
   });
 
