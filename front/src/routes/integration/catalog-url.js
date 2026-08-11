@@ -71,12 +71,20 @@ export const rememberCatalogUrl = url => {
   lastCatalogUrl = url;
 };
 
+// a remembered URL carries its filters in the query string, so only its path
+// is compared to the known catalog views. It is written from getCatalogUrl()
+// alone today: checking it keeps the guarantee held by the "from" parameter,
+// that this helper never sends the user outside of the catalog
+const isCatalogUrl = url => typeof url === 'string' && CATALOG_PATHS.has(url.split('?')[0]);
+
 export const getBackToCatalogUrl = (queryString = window.location.search) => {
   const from = new URLSearchParams(queryString).get('from');
-  // the parameter comes from the URL: fall back to the last catalog seen
-  // rather than trusting an arbitrary path
+  // the parameter comes from the URL: fall back to the last catalog seen, then
+  // to the whole catalog, rather than trusting an arbitrary path
   if (!CATALOG_PATHS.has(from)) {
-    return lastCatalogUrl || CATALOG_BASE_URL;
+    return isCatalogUrl(lastCatalogUrl)
+      ? lastCatalogUrl
+      : withQuery(CATALOG_BASE_URL, buildFilterParams(getCatalogFilters(queryString)));
   }
   return withQuery(from, buildFilterParams(getCatalogFilters(queryString)));
 };

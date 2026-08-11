@@ -40,8 +40,13 @@ class Integration extends Component {
   // a render, the new value is not readable in the state right away
   updateURL(filters = this.state) {
     const { searchKeyword, orderDir } = filters;
+    const url = getCatalogUrl({ category: this.props.category, searchKeyword, orderDir });
+    // the list is only reloaded 300ms later (the search is debounced): without
+    // this, opening an integration in between would send its back link to the
+    // previous view, while the browser back button already goes to this one
+    rememberCatalogUrl(url);
     // replace and not push: filtering should not fill the browser history
-    route(getCatalogUrl({ category: this.props.category, searchKeyword, orderDir }), true);
+    route(url, true);
   }
 
   componentWillMount() {
