@@ -358,13 +358,20 @@ class Integration extends Component {
     // "meteo" has to find "Météo" and "camera" has to find "Caméra"
     if (searchKeyword && searchKeyword.length > 0) {
       const normalizedSearchKeyword = normalizeSearchText(searchKeyword);
-      selectedIntegrations = selectedIntegrations.filter(integration => {
-        const { name, description } = integration;
-        return (
-          normalizeSearchText(name).includes(normalizedSearchKeyword) ||
-          normalizeSearchText(description).includes(normalizedSearchKeyword)
-        );
-      });
+      // A keyword made only of combining marks folds down to an empty string,
+      // which every name contains: without this guard the search would answer
+      // with the whole catalog instead of no match at all.
+      if (normalizedSearchKeyword.length === 0) {
+        selectedIntegrations = [];
+      } else {
+        selectedIntegrations = selectedIntegrations.filter(integration => {
+          const { name, description } = integration;
+          return (
+            normalizeSearchText(name).includes(normalizedSearchKeyword) ||
+            normalizeSearchText(description).includes(normalizedSearchKeyword)
+          );
+        });
+      }
     }
 
     // Sort

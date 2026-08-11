@@ -5,9 +5,9 @@
 // finds "Météo", "eclair" finds "Éclair", "coeur" finds "Cœur" and
 // "vergrossern" finds "vergrößern".
 //
-// `stripSeparators` additionally drops everything that is not a letter or a
-// digit, so "door open", "door-open" and "dooropen" all match each other. Use
-// it on identifier-like haystacks (icon names, slugs), not on free text, where
+// `stripSeparators` additionally drops the spaces, dashes and punctuation, so
+// "door open", "door-open" and "dooropen" all match each other. Use it on
+// identifier-like haystacks (icon names, slugs), not on free text, where
 // removing spaces would let unrelated words match across a word boundary.
 const normalizeSearchText = (value, { stripSeparators = false } = {}) => {
   if (!value) {
@@ -23,7 +23,13 @@ const normalizeSearchText = (value, { stripSeparators = false } = {}) => {
     .normalize('NFD')
     // combining diacritical marks, split out by the NFD normalization above
     .replace(/[\u0300-\u036f]/g, '');
-  return stripSeparators ? folded.replace(/[^a-z0-9]/g, '') : folded;
+  // Everything ASCII that is not a letter or a digit: spaces, dashes,
+  // punctuation. Characters outside ASCII are kept — they are letters in other
+  // scripts, and dropping them folded a query like "门开" down to an empty
+  // string, which then matched every icon instead of none. `\p{L}` would say
+  // this more directly but the build targets Firefox 72 (front/vite.config.mjs),
+  // which predates Unicode property escapes.
+  return stripSeparators ? folded.replace(/[^a-z0-9\u0080-\uffff]/g, '') : folded;
 };
 
 export default normalizeSearchText;
