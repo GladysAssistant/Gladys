@@ -3,6 +3,7 @@ const net = require('net');
 
 const { BadParameters, ForbiddenError } = require('../../utils/coreErrors');
 
+const DEFAULT_SOURCE_PORT = 0;
 const DEFAULT_PORT = 9;
 const DEFAULT_ADDRESS = '255.255.255.255';
 
@@ -55,7 +56,7 @@ async function wakeOnLan(service, options) {
     throw new BadParameters('Invalid Wake-on-LAN options');
   }
 
-  const { mac, address = DEFAULT_ADDRESS, port = DEFAULT_PORT, sourcePort = DEFAULT_PORT } = options;
+  const { mac, address = DEFAULT_ADDRESS, port = DEFAULT_PORT, sourcePort = DEFAULT_SOURCE_PORT } = options;
 
   if (!net.isIPv4(address)) {
     throw new BadParameters('Invalid IPv4 address');
