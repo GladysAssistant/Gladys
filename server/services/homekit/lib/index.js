@@ -9,7 +9,7 @@ const { newUsername } = require('./newUsername');
 const { notifyChange } = require('./notifyChange');
 const { sendState } = require('./sendState');
 const { sendAlarmState } = require('./sendAlarmState');
-const { getCompatibleDevices, getExposedDevices } = require('./exposedDevices');
+const { getCompatibleDevices, getCompatibleAlarms, getExposedDevices, getExposedAlarms } = require('./exposedDevices');
 
 /**
  * @description Add ability to connect to HomeKit.
@@ -41,6 +41,8 @@ HomeKitHandler.prototype.notifyChange = notifyChange;
 HomeKitHandler.prototype.sendState = sendState;
 HomeKitHandler.prototype.sendAlarmState = sendAlarmState;
 HomeKitHandler.prototype.getCompatibleDevices = getCompatibleDevices;
+HomeKitHandler.prototype.getCompatibleAlarms = getCompatibleAlarms;
 HomeKitHandler.prototype.getExposedDevices = getExposedDevices;
+HomeKitHandler.prototype.getExposedAlarms = getExposedAlarms;
 
 module.exports = HomeKitHandler;

@@ -14,6 +14,13 @@ describe('Create bridge', () => {
       createBridge,
       buildAccessory: stub().returns({ UUID: '78a7b724-18e8-4c15-ab30-c8486c253f36' }),
       buildAlarmAccessory: stub().returns({ UUID: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55' }),
+      getExposedAlarms: stub().resolves([
+        {
+          name: 'Maison',
+          selector: 'house-alarm:maison',
+          house: { id: 'e1b0a9cf', name: 'Maison', selector: 'maison' },
+        },
+      ]),
       getExposedDevices: stub().resolves([
         {
           id: '07f16117-8556-4b50-b9f0-e190d08f8d92',
@@ -29,9 +36,6 @@ describe('Create bridge', () => {
         },
         event: {
           on: stub().returns(),
-        },
-        house: {
-          get: stub().resolves([{ id: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55', name: 'Maison', selector: 'maison' }]),
         },
       },
       newUsername: stub().resolves('C4:D0:AB:12:BC:51'),

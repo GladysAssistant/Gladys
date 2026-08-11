@@ -39,10 +39,11 @@ async function createBridge() {
 
   // The alarm is not a device: it lives on the house, so one accessory per house is built here
   // rather than from the device list. Several houses give several alarms in the Home app, each
-  // named after its own.
-  const houses = await this.gladys.house.get();
+  // named after its own. They go through the same exposure setting as the devices, so someone who
+  // does not use the Gladys alarm can leave it out.
+  const exposedAlarms = await this.getExposedAlarms();
   this.alarmAccessories = new Map();
-  houses.forEach((house) => {
+  exposedAlarms.forEach(({ house }) => {
     const alarmAccessory = this.buildAlarmAccessory(house);
     this.alarmAccessories.set(house.selector, alarmAccessory);
     accessories.push(alarmAccessory);
