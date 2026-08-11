@@ -607,6 +607,24 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: externalIntegrationController.deleteOwnContactProfile,
     },
+    // calendar integrations (B.19): each user enables their OWN account and
+    // manages their OWN calendars (sync/shared toggles, no admin flag either)
+    'get /api/v1/external_integration/:selector/calendar/account': {
+      authenticated: true,
+      controller: externalIntegrationController.getOwnCalendarAccount,
+    },
+    'post /api/v1/external_integration/:selector/calendar/account': {
+      authenticated: true,
+      controller: externalIntegrationController.saveOwnCalendarAccount,
+    },
+    'delete /api/v1/external_integration/:selector/calendar/account': {
+      authenticated: true,
+      controller: externalIntegrationController.disableOwnCalendarAccount,
+    },
+    'patch /api/v1/external_integration/:selector/calendar/:calendar_selector': {
+      authenticated: true,
+      controller: externalIntegrationController.updateOwnCalendar,
+    },
     'get /api/v1/external_integration/:selector/discovered_device': {
       authenticated: true,
       admin: true,
@@ -724,6 +742,33 @@ function getRoutes(gladys) {
       authenticated: false,
       externalIntegrationAuth: true,
       controller: integrationHostController.getContacts,
+    },
+    // calendar integrations (B.19): the integration syncs, the core stores.
+    // User-scoped external_id prefix enforced, 30 writes/min per integration.
+    'get /api/integration/v1/calendar/account': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getCalendarAccounts,
+    },
+    'get /api/integration/v1/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getIntegrationCalendars,
+    },
+    'post /api/integration/v1/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishCalendars,
+    },
+    'delete /api/integration/v1/calendar': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.deleteIntegrationCalendar,
+    },
+    'post /api/integration/v1/calendar/event': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.publishCalendarEvents,
     },
     'get /api/integration/v1/webhook': {
       authenticated: false,

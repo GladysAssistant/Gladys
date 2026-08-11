@@ -69,6 +69,20 @@ const { getContactProfile } = require('./externalIntegration.getContactProfile')
 const { getContactProfileForFront } = require('./externalIntegration.getContactProfileForFront');
 const { saveContactProfile } = require('./externalIntegration.saveContactProfile');
 const { deleteContactProfile } = require('./externalIntegration.deleteContactProfile');
+const { getCalendarAccount, getCalendarAccountForUser } = require('./externalIntegration.getCalendarAccount');
+const {
+  notifyCalendarUpdated,
+  notifyCalendarAccountUpdated,
+  assertCalendarWriteAllowed,
+} = require('./externalIntegration.calendarNotify');
+const { saveCalendarAccount } = require('./externalIntegration.saveCalendarAccount');
+const { disableCalendarAccount } = require('./externalIntegration.disableCalendarAccount');
+const { updateUserCalendar } = require('./externalIntegration.updateUserCalendar');
+const { getCalendarAccounts } = require('./externalIntegration.getCalendarAccounts');
+const { getIntegrationCalendars } = require('./externalIntegration.getIntegrationCalendars');
+const { publishCalendars } = require('./externalIntegration.publishCalendars');
+const { deleteIntegrationCalendar } = require('./externalIntegration.deleteIntegrationCalendar');
+const { publishCalendarEvents } = require('./externalIntegration.publishCalendarEvents');
 const { handleIncomingMessage } = require('./externalIntegration.handleIncomingMessage');
 const { getWebhooks } = require('./externalIntegration.getWebhooks');
 const { handleGatewayWebhook } = require('./externalIntegration.handleGatewayWebhook');
@@ -119,6 +133,7 @@ const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
  * @param {object} variable - Variable manager.
  * @param {string} jwtSecret - Secret to sign integration JWTs.
  * @param {object} cache - In-memory cache (contact link codes).
+ * @param {object} calendar - Calendar manager (calendar-type integrations, B.19).
  * @example
  * const externalIntegration = new ExternalIntegration(event, system, service, stateManager, device, variable, 's');
  */
@@ -131,6 +146,7 @@ const ExternalIntegration = function ExternalIntegration(
   variable,
   jwtSecret,
   cache,
+  calendar,
 ) {
   this.event = event;
   this.system = system;
@@ -140,6 +156,7 @@ const ExternalIntegration = function ExternalIntegration(
   this.variable = variable;
   this.jwtSecret = jwtSecret;
   this.cache = cache;
+  this.calendar = calendar;
   this.available = false;
   // serviceId -> WebSocket connection of the integration
   this.connections = new Map();
@@ -158,6 +175,9 @@ const ExternalIntegration = function ExternalIntegration(
   this.networkDiscoveryScans = new Set();
   // serviceId -> timestamp of the last active broadcast scan (1/10s)
   this.networkDiscoveryActiveScanTimes = new Map();
+  // serviceId -> { count, resetAt } fixed one-minute window rate limit on
+  // the calendar write endpoints (POST/DELETE /calendar*)
+  this.calendarWriteRateLimits = new Map();
   // supervision timers
   this.startupTimers = new Map();
   this.restartTimers = new Map();
@@ -262,6 +282,19 @@ ExternalIntegration.prototype.getContactProfile = getContactProfile;
 ExternalIntegration.prototype.getContactProfileForFront = getContactProfileForFront;
 ExternalIntegration.prototype.saveContactProfile = saveContactProfile;
 ExternalIntegration.prototype.deleteContactProfile = deleteContactProfile;
+ExternalIntegration.prototype.getCalendarAccount = getCalendarAccount;
+ExternalIntegration.prototype.getCalendarAccountForUser = getCalendarAccountForUser;
+ExternalIntegration.prototype.notifyCalendarUpdated = notifyCalendarUpdated;
+ExternalIntegration.prototype.notifyCalendarAccountUpdated = notifyCalendarAccountUpdated;
+ExternalIntegration.prototype.assertCalendarWriteAllowed = assertCalendarWriteAllowed;
+ExternalIntegration.prototype.saveCalendarAccount = saveCalendarAccount;
+ExternalIntegration.prototype.disableCalendarAccount = disableCalendarAccount;
+ExternalIntegration.prototype.updateUserCalendar = updateUserCalendar;
+ExternalIntegration.prototype.getCalendarAccounts = getCalendarAccounts;
+ExternalIntegration.prototype.getIntegrationCalendars = getIntegrationCalendars;
+ExternalIntegration.prototype.publishCalendars = publishCalendars;
+ExternalIntegration.prototype.deleteIntegrationCalendar = deleteIntegrationCalendar;
+ExternalIntegration.prototype.publishCalendarEvents = publishCalendarEvents;
 ExternalIntegration.prototype.handleIncomingMessage = handleIncomingMessage;
 ExternalIntegration.prototype.getWebhooks = getWebhooks;
 ExternalIntegration.prototype.handleGatewayWebhook = handleGatewayWebhook;

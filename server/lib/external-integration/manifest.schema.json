@@ -15,8 +15,8 @@
     },
     "type": {
       "type": "string",
-      "enum": ["device", "communication", "weather"],
-      "description": "Integration type. \"device\" integrations expose devices through the Devices/Discovery/Configuration screens; \"communication\" integrations are messaging channels (Telegram-like bots): no device screens, the user links their account from the Gladys UI and the integration exchanges messages through the host API; \"weather\" integrations are weather providers: a dedicated API (no device screens), they answer the core's weather requests over WebSocket."
+      "enum": ["device", "communication", "weather", "calendar"],
+      "description": "Integration type. \"device\" integrations expose devices through the Devices/Discovery/Configuration screens; \"communication\" integrations are messaging channels (Telegram-like bots): no device screens, the user links their account from the Gladys UI and the integration exchanges messages through the host API; \"weather\" integrations are weather providers: a dedicated API (no device screens), they answer the core's weather requests over WebSocket; \"calendar\" integrations are calendar providers: no device screens, each user enables their own account and the integration pushes calendars and events through the host API."
     },
     "name": {
       "type": "string",
@@ -144,6 +144,26 @@
           }
         ]
       }
+    },
+    "account_schema": {
+      "type": "array",
+      "description": "Calendar integrations only: per-user account form rendered by the core as a \"My calendars\" block on the Configuration screen (every user fills their OWN values, stored per user; an integration with nothing to ask declares no account_schema and the block only carries the Enable/Disable action). Same flat format as config_schema; oauth2 fields are not allowed in milestone 1 (the OAuth relay is integration-scoped, never per user).",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/definitions/configField"
+          },
+          {
+            "properties": {
+              "type": {
+                "not": {
+                  "const": "oauth2"
+                }
+              }
+            }
+          }
+        ]
+      }
     }
   },
   "allOf": [
@@ -175,6 +195,19 @@
                 "const": false
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "account_schema only makes sense on calendar integrations",
+      "if": {
+        "required": ["account_schema"]
+      },
+      "then": {
+        "properties": {
+          "type": {
+            "const": "calendar"
           }
         }
       }

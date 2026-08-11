@@ -8,6 +8,7 @@
 const { fake } = require('sinon');
 
 const ExternalIntegration = require('../../../lib/external-integration');
+const Calendar = require('../../../lib/calendar');
 const StateManager = require('../../../lib/state');
 const Variable = require('../../../lib/variable');
 const { Cache } = require('../../../utils/cache');
@@ -104,6 +105,23 @@ const TEST_NOTIFICATION_MANIFEST = {
 
 // Weather-provider fixture (B.18): a dedicated provider API — answers the
 // core's weather requests over WebSocket, no device screens.
+const TEST_CALENDAR_MANIFEST = {
+  manifest_version: 1,
+  type: 'calendar',
+  name: 'Nextcloud Calendar',
+  description: {
+    en: 'Nextcloud calendar provider demo integration.',
+    fr: 'Intégration démo : fournisseur de calendrier Nextcloud.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-nextcloud-calendar:1.0.0',
+  gladys_version: '>=4.62.0',
+  account_schema: [
+    { key: 'server_url', type: 'string', label: { en: 'Server URL' }, required: true },
+    { key: 'app_password', type: 'secret', label: { en: 'App password' } },
+  ],
+};
+
 const TEST_WEATHER_MANIFEST = {
   manifest_version: 1,
   type: 'weather',
@@ -238,6 +256,7 @@ function buildSupervisor({ system: systemOverrides } = {}) {
   const variable = new Variable(event);
   const serviceManager = {};
   const cache = new Cache();
+  const calendar = new Calendar();
   const externalIntegration = new ExternalIntegration(
     event,
     system,
@@ -247,9 +266,10 @@ function buildSupervisor({ system: systemOverrides } = {}) {
     variable,
     TEST_JWT_SECRET,
     cache,
+    calendar,
   );
   externalIntegration.available = true;
-  return { externalIntegration, event, system, stateManager, device, variable, cache };
+  return { externalIntegration, event, system, stateManager, device, variable, cache, calendar };
 }
 
 /**
@@ -282,6 +302,7 @@ module.exports = {
   TEST_COMMUNICATION_MANIFEST,
   TEST_NOTIFICATION_MANIFEST,
   TEST_WEATHER_MANIFEST,
+  TEST_CALENDAR_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_DETECTED_CLASSES,

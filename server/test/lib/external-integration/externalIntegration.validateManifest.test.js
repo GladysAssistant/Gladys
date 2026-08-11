@@ -1017,6 +1017,47 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept a calendar manifest with and without an account_schema', () => {
+    const calendarManifest = { ...TEST_MANIFEST, type: 'calendar', config_schema: undefined };
+    expect(externalIntegration.validateManifest(calendarManifest)).to.deep.equal(calendarManifest);
+    const withAccountSchema = {
+      ...calendarManifest,
+      account_schema: [
+        { key: 'server_url', type: 'string', label: { en: 'Server URL' }, required: true },
+        { key: 'app_password', type: 'secret', label: { en: 'App password' } },
+      ],
+    };
+    expect(externalIntegration.validateManifest(withAccountSchema)).to.deep.equal(withAccountSchema);
+  });
+
+  it('should reject account_schema outside calendar integrations and invalid entries', () => {
+    const accountSchema = [{ key: 'server_url', type: 'string', label: { en: 'Server URL' } }];
+    expect422({ ...TEST_MANIFEST, account_schema: accountSchema }, 'account_schema: only allowed on calendar');
+    const base = { ...TEST_MANIFEST, type: 'calendar', config_schema: undefined };
+    expect422({ ...base, account_schema: 'server_url' }, 'account_schema: must be an array');
+    expect422({ ...base, account_schema: [{ key: 'x', type: 'unknown', label: { en: 'X' } }] }, 'account_schema[0]');
+    // the OAuth relay is integration-scoped, never per user (milestone 1)
+    expect422(
+      { ...base, account_schema: [{ key: 'account', type: 'oauth2', label: { en: 'Account' } }] },
+      'account_schema[0].type: oauth2 is not allowed in the per-user account schema',
+    );
+    // the per-user block carries no container state: {{port:<name>}} refused
+    expect422(
+      {
+        ...base,
+        account_schema: [
+          {
+            key: 'intro',
+            type: 'section',
+            label: { en: 'Setup' },
+            description: { en: 'ws://{{gladys_host}}:{{port:ocpp}}' },
+          },
+        ],
+      },
+      'account_schema[0].description.en: {{port:ocpp}} is not available in the per-user account schema',
+    );
+  });
+
   it('should accept a valid webhooks declaration', () => {
     const manifest = {
       ...TEST_MANIFEST,
