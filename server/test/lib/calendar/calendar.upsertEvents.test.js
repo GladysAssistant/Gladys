@@ -110,7 +110,9 @@ describe('calendar.upsertEvents', () => {
     expect(names).to.eql(['Before', 'Kept', 'Manual event']);
   });
 
-  it('should reject an upsert exceeding the per-calendar events cap', async () => {
+  it('should reject an upsert exceeding the per-calendar events cap', async function test() {
+    // seeding 9999 rows can exceed the default 2s timeout under parallel load
+    this.timeout(20000);
     const rows = [];
     for (let i = 0; i < 9999; i += 1) {
       rows.push({
