@@ -164,6 +164,9 @@ const FEATURE_UNIT_BY_CATEGORY_TYPE = {
   )]: DEVICE_FEATURE_UNITS.PERCENT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.PPM,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.NO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.O3_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.LUX,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.LUX,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
@@ -702,6 +705,18 @@ export const getFeatureDefaultValues = (category, type) => {
     );
   }
 
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.NO2_SENSOR ||
+    category === DEVICE_FEATURE_CATEGORIES.O3_SENSOR ||
+    category === DEVICE_FEATURE_CATEGORIES.SO2_SENSOR
+  ) {
+    return applyDefaultUnit(
+      { ...defaults, min: 0, max: 1000, read_only: true, unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER },
+      category,
+      type
+    );
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR) {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 100000, read_only: true, unit: DEVICE_FEATURE_UNITS.LUX },
@@ -916,6 +931,14 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {
     return 850;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.NO2_SENSOR || category === DEVICE_FEATURE_CATEGORIES.SO2_SENSOR) {
+    return 25;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.O3_SENSOR) {
+    return 70;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR) {

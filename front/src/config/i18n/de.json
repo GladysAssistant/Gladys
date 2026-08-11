@@ -5152,6 +5152,18 @@
       "shortCategoryName": "Formaldehyd-Sensor",
       "decimal": "Formaldehyd (Dezimal)"
     },
+    "no2-sensor": {
+      "shortCategoryName": "NO2-Sensor",
+      "decimal": "NO2 (Dezimal)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "O3-Sensor",
+      "decimal": "O3 (Dezimal)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "SO2-Sensor",
+      "decimal": "SO2 (Dezimal)"
+    },
     "vibration-sensor": {
       "shortCategoryName": "Vibrationssensor",
       "binary": "Vibration (ja/nein)",

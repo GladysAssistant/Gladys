@@ -1363,6 +1363,80 @@ describe('Build service', () => {
     expect(cb.args[3][1]).to.equal(1000);
   });
 
+  it('should build gas density characteristics on the air quality service', async () => {
+    homekitHandler.gladys.stateManager.get = stub();
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'no2-microgram').returns({ last_value: 35 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'o3-milligram').returns({ last_value: 0.12 });
+    homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'so2-nanogram').returns({ last_value: 45000 });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+      props: {
+        minValue: 0,
+        maxValue: 1000,
+      },
+    });
+    const AirQualitySensor = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        NitrogenDioxideDensity: 'NO2DENSITY',
+        OzoneDensity: 'O3DENSITY',
+        SulphurDioxideDensity: 'SO2DENSITY',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        AirQualitySensor,
+      },
+    };
+    const device = {
+      name: 'Capteur gaz',
+    };
+    const features = [
+      {
+        name: 'NO2 µg',
+        selector: 'no2-microgram',
+        category: DEVICE_FEATURE_CATEGORIES.NO2_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+      },
+      {
+        name: 'O3 mg',
+        selector: 'o3-milligram',
+        category: DEVICE_FEATURE_CATEGORIES.O3_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
+      },
+      {
+        name: 'SO2 ng',
+        selector: 'so2-nanogram',
+        category: DEVICE_FEATURE_CATEGORIES.SO2_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]);
+    await on.args[0][1](cb);
+    await on.args[1][1](cb);
+    await on.args[2][1](cb);
+
+    expect(on.callCount).to.equal(3);
+    expect(getCharacteristic.args[0][0]).to.equal('NO2DENSITY');
+    expect(getCharacteristic.args[1][0]).to.equal('O3DENSITY');
+    expect(getCharacteristic.args[2][0]).to.equal('SO2DENSITY');
+    // already in µg/m³
+    expect(cb.args[0][1]).to.equal(35);
+    // 0.12 mg/m³ is 120 µg/m³
+    expect(cb.args[1][1]).to.equal(120);
+    // 45000 ng/m³ is 45 µg/m³
+    expect(cb.args[2][1]).to.equal(45);
+  });
+
   it('should build lock service', async () => {
     homekitHandler.gladys.stateManager.get = stub();
     homekitHandler.gladys.stateManager.get.withArgs('deviceFeature', 'serrure-button').returns({

@@ -15,6 +15,20 @@ const colorLowAsGreen = (value, safeLimit, warnLimit) => {
   return 'danger';
 };
 
+// Same as colorLowAsGreen, with the intermediate "orange" step the air quality guidelines for
+// gaseous pollutants use between the informational and the alert threshold.
+const colorLowAsGreenWithAlert = (value, safeLimit, warnLimit, alertLimit) => {
+  if (value < safeLimit) {
+    return 'success';
+  } else if (value < warnLimit) {
+    return 'warning';
+  } else if (value < alertLimit) {
+    return 'orange';
+  }
+
+  return 'danger';
+};
+
 const getAqiColor = value => {
   if (value < 50) {
     // Safe
@@ -80,6 +94,10 @@ const BADGE_CATEGORIES = {
   [DEVICE_FEATURE_CATEGORIES.PM10_SENSOR]: value => colorLowAsGreen(value, 30, 50),
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: value => colorLowAsGreen(value, 15, 25),
   [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: value => colorLowAsGreen(value, 50, 120),
+  // Thresholds in µg/m³, as the categories declare that unit by default.
+  [DEVICE_FEATURE_CATEGORIES.NO2_SENSOR]: value => colorLowAsGreenWithAlert(value, 40, 100, 200),
+  [DEVICE_FEATURE_CATEGORIES.O3_SENSOR]: value => colorLowAsGreenWithAlert(value, 100, 160, 240),
+  [DEVICE_FEATURE_CATEGORIES.SO2_SENSOR]: value => colorLowAsGreenWithAlert(value, 40, 100, 300),
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: value => getAqiColor(value),
   [DEVICE_FEATURE_CATEGORIES.RISK]: value => getRiskColor(value)
 };

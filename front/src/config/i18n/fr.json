@@ -5152,6 +5152,18 @@
       "shortCategoryName": "Capteur Formaldéhyde",
       "decimal": "Formaldéhyde (Décimale)"
     },
+    "no2-sensor": {
+      "shortCategoryName": "Capteur de NO2",
+      "decimal": "NO2 (Décimale)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "Capteur d'O3",
+      "decimal": "O3 (Décimale)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "Capteur de SO2",
+      "decimal": "SO2 (Décimale)"
+    },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
       "binary": "Vibration (Oui/Non)",
