@@ -59,11 +59,15 @@ describe('Send alarm state to HomeKit', () => {
     expect(homekitHandler.gladys.house.getBySelector.callCount).to.equal(0);
   });
 
-  it('should do nothing for an alarm mode it does not know', async () => {
+  it('should report an alarm mode it does not know as disarmed', async () => {
     const { homekitHandler, updateCharacteristic } = build('something-else');
 
     await homekitHandler.sendAlarmState('maison');
 
-    expect(updateCharacteristic.callCount).to.equal(0);
+    // leaving HomeKit alone would keep it showing a stale armed state
+    expect(updateCharacteristic.args).to.eql([
+      ['CURRENTSTATE', 3],
+      ['TARGETSTATE', 3],
+    ]);
   });
 });

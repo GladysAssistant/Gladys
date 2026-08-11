@@ -1,4 +1,5 @@
 const { EVENTS } = require('../../../utils/constants');
+const logger = require('../../../utils/logger');
 const { mappings } = require('./deviceMappings');
 
 // The alarm of a house is not a device feature, so its changes arrive on the same trigger stream
@@ -17,7 +18,11 @@ const ALARM_EVENTS = new Set([EVENTS.ALARM.ARM, EVENTS.ALARM.DISARM, EVENTS.ALAR
 function notifyChange(accessories, event) {
   if (ALARM_EVENTS.has(event.type)) {
     // No debounce: an alarm arming or going off is exactly what HomeKit must hear about at once.
-    this.sendAlarmState(event.house);
+    // The promise is caught rather than dropped: this runs from an event listener, where a
+    // rejection would go unhandled.
+    this.sendAlarmState(event.house).catch((e) => {
+      logger.error(`HomeKit: could not forward the alarm state of house ${event.house}: ${e.message}`);
+    });
 
     return;
   }

@@ -4,6 +4,7 @@ const sinon = require('sinon').createSandbox();
 const { stub } = sinon;
 const { buildAlarmAccessory } = require('../../../../services/homekit/lib/buildAlarmAccessory');
 const { ALARM_MODES } = require('../../../../utils/constants');
+const { ConflictError, NotFoundError } = require('../../../../utils/coreErrors');
 
 const HOUSE = { id: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55', name: 'Maison', selector: 'maison' };
 
@@ -129,7 +130,7 @@ describe('Build alarm accessory', () => {
 
   it('should answer without failing when the house is already in the mode asked for', async () => {
     const { homekitHandler, characteristics } = build(ALARM_MODES.ARMED);
-    homekitHandler.gladys.house.arm = stub().rejects(new Error('House is already armed'));
+    homekitHandler.gladys.house.arm = stub().rejects(new ConflictError('House is already armed'));
     const cb = stub();
 
     await characteristics.TARGETSTATE.handlers.set(1, cb);
@@ -138,5 +139,30 @@ describe('Build alarm accessory', () => {
     // that was asked for either way
     expect(cb.callCount).to.equal(1);
     expect(cb.args[0]).to.eql([]);
+  });
+
+  it('should report a command that really failed', async () => {
+    const { homekitHandler, characteristics } = build(ALARM_MODES.ARMED);
+    const failure = new NotFoundError('House not found');
+    homekitHandler.gladys.house.disarm = stub().rejects(failure);
+    const cb = stub();
+
+    await characteristics.TARGETSTATE.handlers.set(3, cb);
+
+    // answering a failed disarm with a success would show the alarm off while the house stays armed
+    expect(cb.args[0]).to.eql([failure]);
+  });
+
+  it('should answer a read that failed instead of leaving it hanging', async () => {
+    const { homekitHandler, characteristics } = build(ALARM_MODES.ARMED);
+    const failure = new NotFoundError('House not found');
+    homekitHandler.gladys.house.getBySelector = stub().rejects(failure);
+
+    // a callback that is never called leaves the HAP request hanging until it times out
+    const current = await new Promise((resolve) => characteristics.CURRENTSTATE.handlers.get(resolve));
+    const target = await new Promise((resolve) => characteristics.TARGETSTATE.handlers.get(resolve));
+
+    expect(current).to.equal(failure);
+    expect(target).to.equal(failure);
   });
 });

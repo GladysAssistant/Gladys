@@ -17,11 +17,12 @@ async function sendAlarmState(houseSelector) {
 
   const { Characteristic, Service } = this.hap;
   const { alarm_mode: alarmMode } = await this.gladys.house.getBySelector(houseSelector);
-  const state = alarmModeToSecuritySystemState[alarmMode];
-
-  if (state === undefined) {
-    return;
-  }
+  // Same fallback as the GET handler: a mode this bridge does not know about is reported as
+  // disarmed rather than left alone, which would keep HomeKit showing a stale armed state.
+  const state =
+    alarmModeToSecuritySystemState[alarmMode] === undefined
+      ? HOMEKIT_SECURITY_SYSTEM_STATE.DISARMED
+      : alarmModeToSecuritySystemState[alarmMode];
 
   const service = accessory.getService(Service.SecuritySystem);
 

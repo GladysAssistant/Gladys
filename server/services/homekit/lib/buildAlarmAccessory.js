@@ -1,4 +1,5 @@
 const { ALARM_MODES } = require('../../../utils/constants');
+const { ConflictError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
 
 // Values of the HomeKit SecuritySystemCurrentState characteristic. The target one uses the same
@@ -56,20 +57,31 @@ function buildAlarmAccessory(house) {
   service
     .getCharacteristic(Characteristic.SecuritySystemCurrentState)
     .on(CharacteristicEventTypes.GET, async (callback) => {
-      callback(undefined, await readState());
+      try {
+        callback(undefined, await readState());
+      } catch (e) {
+        // Answering the failure rather than saying nothing: a callback that is never called leaves
+        // the HAP request hanging until it times out.
+        callback(e);
+      }
     });
 
   const targetStateCharacteristic = service.getCharacteristic(Characteristic.SecuritySystemTargetState);
   targetStateCharacteristic.setProps({ validValues: SUPPORTED_TARGET_STATES });
   targetStateCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-    const state = await readState();
+    try {
+      const state = await readState();
 
-    // A house that went off is still armed as far as the target goes: HomeKit has no triggered
-    // target, and reporting disarmed there would show the alarm as switched off while it rings.
-    callback(
-      undefined,
-      state === HOMEKIT_SECURITY_SYSTEM_STATE.ALARM_TRIGGERED ? HOMEKIT_SECURITY_SYSTEM_STATE.AWAY_ARM : state,
-    );
+      // A house that went off is still armed as far as the target goes: HomeKit has no triggered
+      // target, and reporting disarmed there would show the alarm as switched off while it rings.
+      // Which armed mode it was in before is not recorded anywhere, so away is the assumption.
+      callback(
+        undefined,
+        state === HOMEKIT_SECURITY_SYSTEM_STATE.ALARM_TRIGGERED ? HOMEKIT_SECURITY_SYSTEM_STATE.AWAY_ARM : state,
+      );
+    } catch (e) {
+      callback(e);
+    }
   });
   targetStateCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
     try {
@@ -83,10 +95,19 @@ function buildAlarmAccessory(house) {
       callback();
     } catch (e) {
       // Asking for the mode the house is already in throws a conflict, and the Home app does that
-      // whenever two people press the same button. The request is answered as done rather than as
-      // failed: the house is in the state that was asked for either way.
-      logger.debug(`HomeKit: could not set alarm mode of house ${house.selector}: ${e.message}`);
-      callback();
+      // whenever two people press the same button. That one is answered as done: the house is in
+      // the state that was asked for either way.
+      if (e instanceof ConflictError) {
+        logger.debug(`HomeKit: house ${house.selector} is already in the requested alarm mode`);
+        callback();
+
+        return;
+      }
+
+      // Anything else really failed, and must be reported as such. Answering a failed disarm with a
+      // success would leave the Home app showing the alarm off while the house stays armed.
+      logger.error(`HomeKit: could not set alarm mode of house ${house.selector}: ${e.message}`);
+      callback(e);
     }
   });
 
