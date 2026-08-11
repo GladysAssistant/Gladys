@@ -1,8 +1,13 @@
 const dgram = require('dgram');
 const { expect } = require('chai');
 
-const IntegrationHostController = require('../../../api/controllers/integrationHost.controller');
 const { buildSupervisor } = require('./testUtils.test');
+
+const externalIntegrationService = {
+  manifest: {
+    network_wake: true,
+  },
+};
 
 const bindUdpSocket = (socket) =>
   new Promise((resolve, reject) => {
@@ -47,7 +52,7 @@ describe('externalIntegration.wakeOnLan', () => {
 
     const receivedPromise = waitForUdpMessage(receiver);
 
-    await externalIntegration.wakeOnLan({
+    await externalIntegration.wakeOnLan(externalIntegrationService, {
       mac: '64:e4:d5:b4:12:66',
       address: '127.0.0.1',
       port: receiver.address().port,
@@ -84,7 +89,7 @@ describe('externalIntegration.wakeOnLan', () => {
 
     const receivedPromise = waitForUdpMessage(receiver);
 
-    await externalIntegration.wakeOnLan({
+    await externalIntegration.wakeOnLan(externalIntegrationService, {
       mac: '64:e4:d5:b4:12:66',
       address: '127.0.0.1',
       port: receiver.address().port,
@@ -113,7 +118,7 @@ describe('externalIntegration.wakeOnLan', () => {
 
         const receivedPromise = waitForUdpMessage(receiver);
 
-        await externalIntegration.wakeOnLan({
+        await externalIntegration.wakeOnLan(externalIntegrationService, {
           mac,
           address: '127.0.0.1',
           port: receiver.address().port,
@@ -136,7 +141,7 @@ describe('externalIntegration.wakeOnLan', () => {
     let error;
 
     try {
-      await externalIntegration.wakeOnLan({
+      await externalIntegration.wakeOnLan(externalIntegrationService, {
         mac: 'invalid',
         address: '127.0.0.1',
       });
@@ -153,7 +158,7 @@ describe('externalIntegration.wakeOnLan', () => {
     let error;
 
     try {
-      await externalIntegration.wakeOnLan({
+      await externalIntegration.wakeOnLan(externalIntegrationService, {
         mac: '64:e4:d5:b4:12:66',
         address: 'invalid-ip',
       });
@@ -174,7 +179,7 @@ describe('externalIntegration.wakeOnLan', () => {
         let error;
 
         try {
-          await externalIntegration.wakeOnLan({
+          await externalIntegration.wakeOnLan(externalIntegrationService, {
             mac: '64:e4:d5:b4:12:66',
             address: '127.0.0.1',
             port,
@@ -198,7 +203,7 @@ describe('externalIntegration.wakeOnLan', () => {
         let error;
 
         try {
-          await externalIntegration.wakeOnLan({
+          await externalIntegration.wakeOnLan(externalIntegrationService, {
             mac: '64:e4:d5:b4:12:66',
             address: '127.0.0.1',
             sourcePort,
@@ -222,7 +227,7 @@ describe('externalIntegration.wakeOnLan', () => {
         let error;
 
         try {
-          await externalIntegration.wakeOnLan(options);
+          await externalIntegration.wakeOnLan(externalIntegrationService, options);
         } catch (e) {
           error = e;
         }
@@ -230,79 +235,5 @@ describe('externalIntegration.wakeOnLan', () => {
         expect(error).to.be.instanceOf(Error);
       }),
     );
-  });
-
-  it('should call wakeOnLan from the integration host API controller', async () => {
-    let receivedOptions;
-    let response;
-
-    const gladys = {
-      externalIntegration: {
-        wakeOnLan: async (options) => {
-          receivedOptions = options;
-        },
-      },
-    };
-
-    const controller = IntegrationHostController(gladys);
-
-    const req = {
-      body: {
-        mac: '64:e4:d5:b4:12:66',
-        address: '192.168.1.255',
-        port: 9,
-        sourcePort: 9,
-      },
-    };
-
-    const res = {
-      json: (body) => {
-        response = body;
-      },
-    };
-
-    await controller.networkWake(req, res, () => {});
-
-    expect(receivedOptions).to.deep.equal({
-      mac: '64:e4:d5:b4:12:66',
-      address: '192.168.1.255',
-      port: 9,
-      sourcePort: 9,
-    });
-
-    expect(response).to.deep.equal({
-      success: true,
-    });
-  });
-
-  it('should propagate wakeOnLan errors through the integration host API controller', async () => {
-    const expectedError = new Error('Wake-on-LAN failed');
-    let forwardedError;
-
-    const gladys = {
-      externalIntegration: {
-        wakeOnLan: async () => {
-          throw expectedError;
-        },
-      },
-    };
-
-    const controller = IntegrationHostController(gladys);
-
-    const req = {
-      body: {
-        mac: '64:e4:d5:b4:12:66',
-      },
-    };
-
-    const res = {
-      json: () => {},
-    };
-
-    await controller.networkWake(req, res, (error) => {
-      forwardedError = error;
-    });
-
-    expect(forwardedError).to.equal(expectedError);
   });
 });

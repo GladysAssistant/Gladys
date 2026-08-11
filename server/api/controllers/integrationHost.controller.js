@@ -139,13 +139,7 @@ module.exports = function IntegrationHostController(gladys) {
    * network namespace.
    */
   async function networkWake(req, res) {
-    const { mac, address, port, sourcePort } = req.body;
-    await gladys.externalIntegration.wakeOnLan({
-      mac,
-      address,
-      port,
-      sourcePort,
-    });
+    await gladys.externalIntegration.wakeOnLan(req.externalIntegrationService, req.body);
 
     res.json({
       success: true,

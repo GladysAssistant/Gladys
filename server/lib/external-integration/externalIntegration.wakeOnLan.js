@@ -1,6 +1,5 @@
 const dgram = require('dgram');
-const net = require('net');
-const { BadParameters } = require('../../utils/coreErrors');
+const { BadParameters, ForbiddenError } = require('../../utils/coreErrors');
 
 const DEFAULT_PORT = 9;
 const DEFAULT_ADDRESS = '255.255.255.255';
@@ -16,7 +15,7 @@ function normalizeMac(mac) {
   const normalized = mac.replace(/[:-]/g, '');
 
   if (!/^[0-9a-fA-F]{12}$/.test(normalized)) {
-    throw new Error('Invalid MAC address');
+    throw new BadParameters('Invalid MAC address');
   }
 
   return Buffer.from(normalized, 'hex');
@@ -37,30 +36,35 @@ function buildMagicPacket(mac) {
 
 /**
  * @description Send a Wake-on-LAN magic packet to a target device.
+ * @param {{manifest: {network_wake: boolean}}} service - The external integration service (plain object).
+ * @param {string} service.manifest - The external integration manifest.
+ * @param {string} service.manifest.network_wake - The external integration manifest network_wake property.
  * @param {object} options - Wake-on-LAN options.
- * @param {string} options.mac - Target MAC address.
+ * @param {string} [options.mac] - Target MAC address.
  * @param {string} [options.address] - Destination/broadcast address.
  * @param {number} [options.port] - Destination UDP port.
  * @param {number} [options.sourcePort] - Source UDP port.
  * @returns {Promise<void>} Promise that resolves when the magic packet is sent.
  * @example
- * await wakeOnLan({ mac: '00:11:22:33:44:55' });
+ * await gladys.externalIntegration.wakeOnLan(service, { mac: '00:11:22:33:44:55' });
  */
-async function wakeOnLan({ mac, address = DEFAULT_ADDRESS, port = DEFAULT_PORT, sourcePort = 0 }) {
-  if (typeof mac !== 'string') {
-    throw new BadParameters('mac is required');
+async function wakeOnLan(service, options) {
+  if (!options || typeof options !== 'object' || Array.isArray(options)) {
+    throw new BadParameters('Invalid Wake-on-LAN options');
   }
 
-  if (address !== undefined && net.isIPv4(address) === false) {
-    throw new BadParameters('address must be a valid IPv4 address');
+  const { mac, address = DEFAULT_ADDRESS, port = DEFAULT_PORT, sourcePort = DEFAULT_PORT } = options;
+
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new BadParameters('port: must be an integer between 1 and 65535');
   }
 
-  if (port !== undefined && (!Number.isInteger(port) || port < 1 || port > 65535)) {
-    throw new BadParameters('port must be between 1 and 65535');
+  if (!Number.isInteger(sourcePort) || sourcePort < 0 || sourcePort > 65535) {
+    throw new BadParameters('sourcePort: must be an integer between 0 and 65535');
   }
 
-  if (sourcePort !== undefined && (!Number.isInteger(sourcePort) || sourcePort < 0 || sourcePort > 65535)) {
-    throw new BadParameters('sourcePort must be between 0 and 65535');
+  if (!service.manifest?.network_wake) {
+    throw new ForbiddenError('Wake-on-LAN is not allowed for this integration');
   }
   const payload = buildMagicPacket(mac);
 
@@ -70,25 +74,52 @@ async function wakeOnLan({ mac, address = DEFAULT_ADDRESS, port = DEFAULT_PORT, 
   });
 
   await new Promise((resolve, reject) => {
-    socket.once('error', reject);
+    let settled = false;
+
+    const close = (callback) => {
+      if (socket) {
+        socket.close(callback);
+      } else {
+        callback();
+      }
+    };
+
+    const fail = (error) => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+
+      close(() => {
+        reject(error);
+      });
+    };
+
+    socket.once('error', fail);
 
     socket.bind(sourcePort, () => {
       try {
         socket.setBroadcast(true);
 
         socket.send(payload, port, address, (error) => {
-          socket.close();
-
-          if (error) {
-            reject(error);
+          if (settled) {
             return;
           }
 
-          resolve();
+          if (error) {
+            fail(error);
+            return;
+          }
+
+          settled = true;
+
+          socket.close(() => {
+            resolve();
+          });
         });
       } catch (error) {
-        socket.close();
-        reject(error);
+        fail(error);
       }
     });
   });
