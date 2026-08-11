@@ -9,22 +9,15 @@ import iconList from '../../../../server/config/icons.json';
 import iconKeywords from '../../config/i18n/icon-keywords';
 import { AVAILABLE_LANGUAGES } from '../../../../server/utils/constants';
 import style from './IconSelector.css';
+import normalizeSearchText from '../../utils/normalizeSearchText';
 
 // Fold both the query and the searched text down to plain lowercase letters:
-// dashes disappear, so "door open", "door-open" and "dooropen" all match the
-// same icon, and accents and ligatures do too, so "eclair" finds "éclair",
-// "coeur" finds "Cœur" and "vergrossern" finds "vergrößern".
-const normalize = value =>
-  value
-    .toLowerCase()
-    // NFD leaves ligatures alone, so the ASCII filter below would drop them
-    // outright: "cœur" became "cur" and matched "curseurs".
-    .replace(/œ/g, 'oe')
-    .replace(/æ/g, 'ae')
-    .replace(/ß/g, 'ss')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]/g, '');
+// the shared search fold takes care of the case, of the accents and of the
+// ligatures, so "eclair" finds "éclair", "coeur" finds "Cœur" and
+// "vergrossern" finds "vergrößern". Icons take a stricter fold than the rest
+// of the front on top of it: everything that is not a letter or a digit goes
+// too, so "door open", "door-open" and "dooropen" all match the same icon.
+const normalize = value => normalizeSearchText(value).replace(/[^a-z0-9]/g, '');
 
 const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
   const [search, setSearch] = useState('');

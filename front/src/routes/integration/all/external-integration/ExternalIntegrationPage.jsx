@@ -4,6 +4,7 @@ import { connect } from 'unistore/preact';
 import get from 'get-value';
 
 import { USER_ROLE } from '../../../../../../server/utils/constants';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 // last known display name per integration: each tab reloads the integration
 // on mount, and showing the raw selector while it loads made the title
@@ -38,6 +39,7 @@ const ExternalIntegrationPage = ({ selector, integration, user, children }) => {
           <div class="container">
             <div class="row">
               <div class="col-lg-3">
+                <BackToIntegrationsLink />
                 <h3 class="page-title mb-5">{getDisplayName(selector, integration)}</h3>
                 <div>
                   <div class="list-group list-group-transparent mb-0">

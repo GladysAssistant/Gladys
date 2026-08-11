@@ -10,6 +10,7 @@ import {
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { isPushButtonFeature } from '../../../../../utils/consts';
+import normalizeSearchText from '../../../../../utils/normalizeSearchText';
 
 const SENSOR_CATEGORY_SUFFIX = '-sensor';
 
@@ -61,11 +62,7 @@ export const isSensorCategory = category => {
   return category.endsWith(SENSOR_CATEGORY_SUFFIX) || category === DEVICE_FEATURE_CATEGORIES.SIGNAL;
 };
 
-export const normalizeForSearch = value =>
-  value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+export const normalizeForSearch = normalizeSearchText;
 
 const categoryTypeKey = (category, type) => `${category}|${type}`;
 
@@ -167,6 +164,9 @@ const FEATURE_UNIT_BY_CATEGORY_TYPE = {
   )]: DEVICE_FEATURE_UNITS.PERCENT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.PPM,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.NO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.O3_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.LUX,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.LUX,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
@@ -705,6 +705,18 @@ export const getFeatureDefaultValues = (category, type) => {
     );
   }
 
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.NO2_SENSOR ||
+    category === DEVICE_FEATURE_CATEGORIES.O3_SENSOR ||
+    category === DEVICE_FEATURE_CATEGORIES.SO2_SENSOR
+  ) {
+    return applyDefaultUnit(
+      { ...defaults, min: 0, max: 1000, read_only: true, unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER },
+      category,
+      type
+    );
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR) {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 100000, read_only: true, unit: DEVICE_FEATURE_UNITS.LUX },
@@ -919,6 +931,14 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {
     return 850;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.NO2_SENSOR || category === DEVICE_FEATURE_CATEGORIES.SO2_SENSOR) {
+    return 25;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.O3_SENSOR) {
+    return 70;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR) {
@@ -1182,6 +1202,12 @@ export const filterFeatureCatalogOptions = (options, search, dictionary) => {
   }
 
   const normalizedSearch = normalizeForSearch(search.trim());
+  // a search made of accents only folds down to nothing, and every string
+  // contains the empty string: without this it would list the whole catalog,
+  // as if the field were empty
+  if (!normalizedSearch.length) {
+    return [];
+  }
 
   return options
     .map(group => {

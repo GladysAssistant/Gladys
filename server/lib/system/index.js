@@ -18,6 +18,7 @@ const { getDiskSpace } = require('./system.getDiskSpace');
 const { saveLatestGladysVersion } = require('./system.saveLatestGladysVersion');
 
 const { pull } = require('./system.pull');
+const { getImagePullTime } = require('./system.getImagePullTime');
 const { exec } = require('./system.exec');
 const { createContainer } = require('./system.createContainer');
 const { updateContainer } = require('./system.updateContainer');
@@ -28,6 +29,9 @@ const { removeNetwork } = require('./system.removeNetwork');
 const { getNetworks } = require('./system.getNetworks');
 const { detectHardwareClasses } = require('./system.detectHardwareClasses');
 const { getImageLabels } = require('./system.getImageLabels');
+const { imageExists } = require('./system.imageExists');
+const { listImages } = require('./system.listImages');
+const { removeImage } = require('./system.removeImage');
 const { restartContainer } = require('./system.restartContainer');
 const { removeContainer } = require('./system.removeContainer');
 const { stopContainer } = require('./system.stopContainer');
@@ -62,6 +66,10 @@ const System = function System(sequelize, event, config, job, variable, user, me
   this.cpuCfsSupport = null;
   this.gladysLogsCache = null;
   this.gladysImage = null;
+  // image reference -> timestamp of the last pull, read by the external
+  // integration image cleanup so it never collects an image pulled seconds
+  // ago. Bounded in practice by the number of distinct images Gladys pulls.
+  this.imagePullTimes = new Map();
 };
 
 System.prototype.init = init;
@@ -81,6 +89,7 @@ System.prototype.saveLatestGladysVersion = saveLatestGladysVersion;
 System.prototype.checkIfGladysUpgraded = checkIfGladysUpgraded;
 
 System.prototype.pull = pull;
+System.prototype.getImagePullTime = getImagePullTime;
 System.prototype.exec = exec;
 System.prototype.createContainer = createContainer;
 System.prototype.updateContainer = updateContainer;
@@ -91,6 +100,9 @@ System.prototype.removeNetwork = removeNetwork;
 System.prototype.getNetworks = getNetworks;
 System.prototype.detectHardwareClasses = detectHardwareClasses;
 System.prototype.getImageLabels = getImageLabels;
+System.prototype.imageExists = imageExists;
+System.prototype.listImages = listImages;
+System.prototype.removeImage = removeImage;
 System.prototype.restartContainer = restartContainer;
 System.prototype.removeContainer = removeContainer;
 System.prototype.stopContainer = stopContainer;

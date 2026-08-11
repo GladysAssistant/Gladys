@@ -9,9 +9,12 @@ const {
   largerDependencies,
   largerEqDependencies,
   modDependencies,
+  multiplyDependencies,
   roundDependencies,
   smallerDependencies,
   smallerEqDependencies,
+  subtractDependencies,
+  unaryMinusDependencies,
   randomDependencies,
 } = require('mathjs');
 const set = require('set-value');
@@ -31,6 +34,10 @@ const executeActionsFactory = require('./scene.executeActions');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// Every operator the formula engine supports must be listed explicitly here.
+// mathjs only exposes in the "math" namespace what is passed to create(), so an operator
+// that is only pulled in transitively by another factory (multiply through divide, for example)
+// is not guaranteed to stay available across mathjs releases.
 const { evaluate } = create({
   addDependencies,
   divideDependencies,
@@ -39,7 +46,10 @@ const { evaluate } = create({
   smallerDependencies,
   largerEqDependencies,
   modDependencies,
+  multiplyDependencies,
   smallerEqDependencies,
+  subtractDependencies,
+  unaryMinusDependencies,
   roundDependencies,
   randomDependencies,
 });
@@ -341,11 +351,19 @@ const actionsFunc = {
     action.conditions.forEach((condition) => {
       let { value } = condition;
       if (condition.evaluate_value !== undefined) {
-        value = evaluate(
-          Handlebars.compile(condition.evaluate_value, {
-            noEscape: true,
-          })(scope).replace(/\s/g, ''),
-        );
+        // If the formula cannot be evaluated, the condition cannot be trusted:
+        // we abort the scene instead of silently letting the rest of the scene run.
+        try {
+          value = evaluate(
+            Handlebars.compile(condition.evaluate_value, {
+              noEscape: true,
+            })(scope).replace(/\s/g, ''),
+          );
+        } catch (e) {
+          logger.warn(`Continue only if: Error evaluating value: ${condition.evaluate_value}`);
+          logger.warn(e);
+          throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
+        }
       }
 
       // For numeric comparison operators (>, >=, <, <=), value must be a number
