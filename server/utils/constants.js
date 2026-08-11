@@ -798,6 +798,16 @@ const DEVICE_FEATURE_CATEGORIES = {
   PM25_SENSOR: 'pm25-sensor',
   PM10_SENSOR: 'pm10-sensor',
   FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
+  // Gaseous air pollutants, one category per gas, holding the raw mass concentration measured in
+  // the air (µg/m³ by default, non-negative). Boundary with the neighbouring air quality
+  // categories: an index synthesizing several pollutants goes to `airquality-sensor`, and a
+  // protocol-specific severity level (Matter reports these gases as a 0-4 LevelValue, see
+  // `no2-matter-index-sensor`) is not a concentration and must not be published here. Whichever
+  // form the device natively reports is the one the integration maps, never both for the same
+  // measurement.
+  NO2_SENSOR: 'no2-sensor',
+  O3_SENSOR: 'o3-sensor',
+  SO2_SENSOR: 'so2-sensor',
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
@@ -1602,6 +1612,21 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
     [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
     [DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER],
+  ],
+  [DEVICE_FEATURE_CATEGORIES.NO2_SENSOR]: [
+    DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.O3_SENSOR]: [
+    DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.SO2_SENSOR]: [
+    DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
   ],
   [DEVICE_FEATURE_CATEGORIES.SURFACE]: [
     DEVICE_FEATURE_UNITS.SQUARE_CENTIMETER,
