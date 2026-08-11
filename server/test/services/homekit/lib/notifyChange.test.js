@@ -295,7 +295,9 @@ describe('Notify change to HomeKit', () => {
 
     // this runs from an event listener: a dropped rejection would go unhandled
     await homekitHandler.notifyChange([], { type: EVENTS.ALARM.ARM, house: 'maison' });
-    await new Promise((resolve) => setImmediate(resolve));
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
 
     expect(homekitHandler.sendAlarmState.callCount).to.equal(1);
   });

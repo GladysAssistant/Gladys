@@ -159,8 +159,12 @@ describe('Build alarm accessory', () => {
     homekitHandler.gladys.house.getBySelector = stub().rejects(failure);
 
     // a callback that is never called leaves the HAP request hanging until it times out
-    const current = await new Promise((resolve) => characteristics.CURRENTSTATE.handlers.get(resolve));
-    const target = await new Promise((resolve) => characteristics.TARGETSTATE.handlers.get(resolve));
+    const current = await new Promise((resolve) => {
+      characteristics.CURRENTSTATE.handlers.get(resolve);
+    });
+    const target = await new Promise((resolve) => {
+      characteristics.TARGETSTATE.handlers.get(resolve);
+    });
 
     expect(current).to.equal(failure);
     expect(target).to.equal(failure);
