@@ -494,7 +494,7 @@ Complete example (the PoC's):
 | `location` | boolean | no | `true` = requests access to the coordinates of the houses configured in Gladys (`GET /house`, see C.3). The home location is sensitive personal data: the request is shown on the install screen, and an undeclared access gets a `403` — **enforced server-side**, same authorization-contract pattern as `network_discovery` |
 | `network_wake` | boolean | no | `true` = requests permission to send Wake-on-LAN magic packets through the Gladys core (`POST /network/wake`, see C.3). The request is shown on the install screen and an undeclared access gets a `403`, enforced server-side. |
 
-No `permissions` field in v1: outbound network access is open and the install screen says so — we do not specify what we cannot enforce (see B.14). The field may appear in a future `manifest_version` when a real restriction exists. What does exist are **targeted, enforceable authorization contracts** — `containers`, `network_discovery`, `webhooks`, `location` — each declared in the manifest, shown to the user before install, and enforced server-side.
+No `permissions` field in v1: outbound network access is open and the install screen says so — we do not specify what we cannot enforce (see B.14). The field may appear in a future `manifest_version` when a real restriction exists. What does exist are **targeted, enforceable authorization contracts** — `containers`, `network_discovery`, `webhooks`, `location`, `network_wake` — each declared in the manifest, shown to the user before install, and enforced server-side.
 
 **Cover re-hosted by the indexer**: at each crawl, the indexer downloads the `cover_image`, validates it (JPEG/PNG magic bytes, 800×534, ≤ 150 KB) and publishes a copy on GitHub Pages; **that URL** is the one the index references (`cover_url`, see C.6). Three benefits: no dead link in the catalog, no user IP leak to a third-party server on every catalog display, and guaranteed weight/format. An absent or invalid cover does not reject the integration: it is indexed with a placeholder, and a warning (`level: "warning"`) is published in `rejected.json`.
 
@@ -691,7 +691,13 @@ Two more reserved keys cover the **degraded state** — the "it works, but not a
 
 **`POST /api/integration/v1/container/:name/restart`** — body `{}` → `200 { "success": true }`. Typical use: the integration has rewritten one of the sub-container's config files via `/data` (see B.2) and restarts it to apply.
 
-**`POST /api/integration/v1/network/wake`** - body `{ "mac": "64:e4:d5:b4:12:66" }` -> `200 { "success": true }`. 100% reliable wake-on-LAN,
+**`POST /api/integration/v1/network/wake`** - body `{ "mac": "64:e4:d5:b4:12:66", "address": "255.255.255.255", "port": 9, "sourcePort": 0 }` -> `200 { "success": true }`. sends a standard Wake-on-LAN magic packet from the Gladys core network namespace. **Requires `network_wake: true` in the manifest** (shown on the install screen); otherwise the core returns `403 FORBIDDEN`.
+* mac is required. Accepted formats: 64:e4:d5:b4:12:66, 64-e4-d5-b4-12-66, or 64E4D5B41266.
+* address is optional and defaults to 255.255.255.255.
+* port is optional and defaults to UDP destination port 9.
+* sourcePort is optional and defaults to 0 (ephemeral UDP source port chosen by the operating system).
+* The core always builds the standard fixed 102-byte Wake-on-LAN magic packet (6 × 0xFF followed by the target MAC repeated 16 times). The integration cannot provide an arbitrary UDP payload, so this endpoint is not a general UDP proxy.
+* A successful send returns 200 { "success": true }. This confirms that the packet was emitted by Gladys, not that the target device actually woke up.
 
 ### C.4 Integration WebSocket: protocol
 

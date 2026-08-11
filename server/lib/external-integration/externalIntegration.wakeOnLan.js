@@ -74,7 +74,7 @@ async function wakeOnLan(service, options) {
     throw new BadParameters('sourcePort: must be an integer between 0 and 65535');
   }
 
-  if (!service.manifest?.network_wake) {
+  if (!service.manifest || service.manifest.network_wake !== true) {
     throw new ForbiddenError('Wake-on-LAN is not allowed for this integration');
   }
   const payload = buildMagicPacket(mac);
