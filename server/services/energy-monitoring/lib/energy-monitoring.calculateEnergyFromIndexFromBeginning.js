@@ -33,19 +33,26 @@ async function calculateEnergyFromIndexFromBeginning(kind, jobId) {
 
     logger.info(`Found ${energyDevices.length} energy devices`);
 
-    // Filter devices that have both INDEX and thirty-minutes features
+    // Filter devices that have INDEX features with a corresponding thirty-minutes feature.
+    // Like the per-window calculation, the thirty-minutes feature must point to the index
+    // feature through energy_parent_id: unlinked indexes are never written by the per-window
+    // pass, so they must not have their cursor reset nor widen the backfill window.
     const devicesWithBothFeatures = [];
 
     energyDevices.forEach((energyDevice) => {
       const indexFeatures = energyDevice.features.filter(
-        (f) => kind.indexFeatureTypes[f.category] && kind.indexFeatureTypes[f.category].includes(f.type),
+        (f) =>
+          kind.indexFeatureTypes[f.category] &&
+          kind.indexFeatureTypes[f.category].includes(f.type) &&
+          energyDevice.features.some(
+            (targetFeature) =>
+              targetFeature.category === kind.targetFeatureCategory &&
+              targetFeature.type === kind.targetFeatureType &&
+              targetFeature.energy_parent_id === f.id,
+          ),
       );
 
-      const targetFeatures = energyDevice.features.filter(
-        (f) => f.category === kind.targetFeatureCategory && f.type === kind.targetFeatureType,
-      );
-
-      if (indexFeatures.length > 0 && targetFeatures.length > 0) {
+      if (indexFeatures.length > 0) {
         devicesWithBothFeatures.push({
           device: energyDevice,
           indexFeatures,
