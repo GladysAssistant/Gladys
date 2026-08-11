@@ -15,6 +15,10 @@ const DEFAULT_ADDRESS = '255.255.255.255';
  * normalizeMac('00:11:22:33:44:55');
  */
 function normalizeMac(mac) {
+  if (typeof mac !== 'string') {
+    throw new BadParameters('MAC address must be a string');
+  }
+
   const normalized = mac.replace(/[:-]/g, '');
 
   if (!/^[0-9a-fA-F]{12}$/.test(normalized)) {

@@ -151,7 +151,7 @@ describe('externalIntegration.wakeOnLan', () => {
       error = e;
     }
 
-    expect(error).to.be.instanceOf(Error);
+    expect(error).to.be.instanceOf(BadParameters);
   });
 
   it('should reject an invalid IPv4 address', async () => {
@@ -336,6 +336,104 @@ describe('externalIntegration.wakeOnLan', () => {
       error = e;
     } finally {
       createSocketStub.restore();
+    }
+
+    expect(error).to.equal(expectedError);
+  });
+
+  it('should ignore a socket error after the packet was sent', async () => {
+    const { externalIntegration } = buildSupervisor();
+
+    let socketErrorHandler;
+
+    const socket = {
+      once: sinon.stub().callsFake((event, callback) => {
+        if (event === 'error') {
+          socketErrorHandler = callback;
+        }
+      }),
+      bind: sinon.stub().callsFake((sourcePort, callback) => {
+        callback();
+      }),
+      setBroadcast: sinon.stub(),
+      send: sinon.stub().callsFake((payload, port, address, callback) => {
+        callback();
+        socketErrorHandler(new Error('late socket error'));
+      }),
+      close: sinon.stub().callsFake((callback) => {
+        callback();
+      }),
+    };
+
+    sinon.stub(dgram, 'createSocket').returns(socket);
+
+    await externalIntegration.wakeOnLan(externalIntegrationService, {
+      mac: '64:e4:d5:b4:12:66',
+      address: '127.0.0.1',
+    });
+
+    sinon.restore();
+  });
+
+  it('should reject missing or null MAC with BadParameters', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const invalidOptions = [{}, { mac: null }];
+
+    await Promise.all(
+      invalidOptions.map(async (options) => {
+        let error;
+
+        try {
+          await externalIntegration.wakeOnLan(externalIntegrationService, options);
+        } catch (e) {
+          error = e;
+        }
+
+        expect(error).to.be.instanceOf(BadParameters);
+      }),
+    );
+  });
+  it('should ignore the send callback after a socket error', async () => {
+    const { externalIntegration } = buildSupervisor();
+
+    const expectedError = new Error('socket error');
+
+    let socketErrorHandler;
+    let closeCallback;
+
+    const socket = {
+      once: sinon.stub().callsFake((event, callback) => {
+        if (event === 'error') {
+          socketErrorHandler = callback;
+        }
+      }),
+      bind: sinon.stub().callsFake((sourcePort, callback) => {
+        callback();
+      }),
+      setBroadcast: sinon.stub(),
+      send: sinon.stub().callsFake((payload, port, address, callback) => {
+        socketErrorHandler(expectedError);
+        callback();
+        closeCallback();
+      }),
+      close: sinon.stub().callsFake((callback) => {
+        closeCallback = callback;
+      }),
+    };
+
+    sinon.stub(dgram, 'createSocket').returns(socket);
+
+    let error;
+
+    try {
+      await externalIntegration.wakeOnLan(externalIntegrationService, {
+        mac: '64:e4:d5:b4:12:66',
+        address: '127.0.0.1',
+      });
+    } catch (e) {
+      error = e;
+    } finally {
+      sinon.restore();
     }
 
     expect(error).to.equal(expectedError);

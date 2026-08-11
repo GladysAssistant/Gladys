@@ -920,6 +920,8 @@
         "installButton": "Installer",
         "networkDiscoveryTitle": "Demandes de découverte réseau",
         "networkDiscoveryText": "Cette intégration demande à Gladys de capturer pour elle les annonces réseau suivantes. Elle ne pourra jamais rien capturer d'autre.",
+        "networkWakeTitle": "Accès Wake-on-LAN",
+        "networkWakeText": "Cette intégration demande l’autorisation d’envoyer des paquets Wake-on-LAN via Gladys sur votre réseau local.",
         "locationText": "Cette intégration demande l'accès aux coordonnées (latitude/longitude) des maisons configurées dans Gladys.",
         "documentationLink": "Documentation",
         "duplicateWarningTitle": "Une autre instance est déjà installée",

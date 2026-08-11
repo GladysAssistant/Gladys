@@ -492,6 +492,7 @@ Complete example (the PoC's):
 | `actions` | array | no | **on-demand actions** displayed on the Configuration screen, max 10 (see below) |
 | `transports` | array | no | supported channels, subset of `["local", "cloud"]`; both present → standard "Prefer local connection" toggle (see below) |
 | `location` | boolean | no | `true` = requests access to the coordinates of the houses configured in Gladys (`GET /house`, see C.3). The home location is sensitive personal data: the request is shown on the install screen, and an undeclared access gets a `403` — **enforced server-side**, same authorization-contract pattern as `network_discovery` |
+| `network_wake` | boolean | no | `true` = requests permission to send Wake-on-LAN magic packets through the Gladys core (`POST /network/wake`, see C.3). The request is shown on the install screen and an undeclared access gets a `403`, enforced server-side. |
 
 No `permissions` field in v1: outbound network access is open and the install screen says so — we do not specify what we cannot enforce (see B.14). The field may appear in a future `manifest_version` when a real restriction exists. What does exist are **targeted, enforceable authorization contracts** — `containers`, `network_discovery`, `webhooks`, `location` — each declared in the manifest, shown to the user before install, and enforced server-side.
 
@@ -689,6 +690,8 @@ Two more reserved keys cover the **degraded state** — the "it works, but not a
 **`POST /api/integration/v1/container/:name/stop`** — body `{}` → `200 { "success": true }`. Stops the container and removes it from the desired state: the supervisor will not restart it.
 
 **`POST /api/integration/v1/container/:name/restart`** — body `{}` → `200 { "success": true }`. Typical use: the integration has rewritten one of the sub-container's config files via `/data` (see B.2) and restarts it to apply.
+
+**`POST /api/integration/v1/network/wake`** - body `{ "mac": "64:e4:d5:b4:12:66" }` -> `200 { "success": true }`. 100% reliable wake-on-LAN,
 
 ### C.4 Integration WebSocket: protocol
 

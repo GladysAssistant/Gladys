@@ -1085,4 +1085,20 @@ describe('externalIntegration.validateManifest', () => {
       'config_schema[0].options[0].icon: unknown field',
     );
   });
+  it('should accept network_wake boolean', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      network_wake: true,
+    };
+
+    expect(() => externalIntegration.validateManifest(manifest)).to.not.throw();
+  });
+  it('should reject network_wake when it is not a boolean', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      network_wake: 'true',
+    };
+
+    expect(() => externalIntegration.validateManifest(manifest)).to.throw(/network_wake: must be a boolean/);
+  });
 });
