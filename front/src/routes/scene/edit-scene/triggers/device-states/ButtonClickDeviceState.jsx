@@ -11,13 +11,13 @@ class ButtonClickDeviceState extends Component {
   };
 
   getOptions = () => {
-    const options = Object.keys(BUTTON_STATUS).map(key => {
+    const options = Object.keys(BUTTON_STATUS).map((key) => {
       const value = BUTTON_STATUS[key];
       return {
         label: get(this.props.intl.dictionary, `deviceFeatureValue.category.button.click.${value}`, {
-          default: value
+          default: value,
         }),
-        value
+        value,
       };
     });
 
@@ -31,7 +31,7 @@ class ButtonClickDeviceState extends Component {
   }
 
   render({ trigger }, { options }) {
-    const defaultValue = options.find(option => trigger.value === option.value);
+    const defaultValue = options.find((option) => trigger.value === option.value);
 
     return (
       <Fragment>

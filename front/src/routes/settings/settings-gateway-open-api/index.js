@@ -8,7 +8,7 @@ import linkState from 'linkstate';
 class SettingsGatewayOpenApi extends Component {
   state = {
     apiKeys: [],
-    newApiKeyName: ''
+    newApiKeyName: '',
   };
 
   getApiKeys = async () => {
@@ -26,7 +26,7 @@ class SettingsGatewayOpenApi extends Component {
       apiKeys: { $push: [apiKey] },
       newApiKey: { $set: apiKey },
       newApiKeyName: { $set: '' },
-      missingNewOpenApiName: { $set: false }
+      missingNewOpenApiName: { $set: false },
     });
     this.setState(newState);
   };
@@ -34,7 +34,7 @@ class SettingsGatewayOpenApi extends Component {
   revokeOpenApiKey = async (id, index) => {
     await this.props.session.gatewayClient.revokeApiKey(id);
     const newState = update(this.state, {
-      apiKeys: { $splice: [[index, 1]] }
+      apiKeys: { $splice: [[index, 1]] },
     });
     this.setState(newState);
   };

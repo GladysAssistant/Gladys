@@ -10,11 +10,11 @@ class Zigbee2mqttIntegration extends Component {
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
-      this.props.setDiscoveredDevices
+      this.props.setDiscoveredDevices,
     );
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      this.props.updatePermitJoin
+      this.props.updatePermitJoin,
     );
 
     this.props.checkStatus();
@@ -29,11 +29,11 @@ class Zigbee2mqttIntegration extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
-      this.props.setDiscoveredDevices
+      this.props.setDiscoveredDevices,
     );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
-      this.props.updatePermitJoin
+      this.props.updatePermitJoin,
     );
   }
 
@@ -49,6 +49,6 @@ class Zigbee2mqttIntegration extends Component {
 export default withIntlAsProp(
   connect(
     'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled,filterExisting,z2mUrl,showZ2mUrlWarning',
-    actions
-  )(Zigbee2mqttIntegration)
+    actions,
+  )(Zigbee2mqttIntegration),
 );

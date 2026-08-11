@@ -32,7 +32,7 @@ class Integration extends Component {
       integrationCategories: [],
       totalSize: 0,
       searchKeyword,
-      orderDir
+      orderDir,
     };
     this.getIntegrationsDebounced = debounce(this.getIntegrations, 300);
   }
@@ -59,7 +59,7 @@ class Integration extends Component {
     if (this.props.session && this.props.session.dispatcher) {
       this.props.session.dispatcher.addListener(
         WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
-        this.onExternalIntegrationStatusChanged
+        this.onExternalIntegrationStatusChanged,
       );
     }
   }
@@ -68,18 +68,18 @@ class Integration extends Component {
     if (this.props.session && this.props.session.dispatcher) {
       this.props.session.dispatcher.removeListener(
         WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
-        this.onExternalIntegrationStatusChanged
+        this.onExternalIntegrationStatusChanged,
       );
     }
   }
 
-  onExternalIntegrationStatusChanged = async payload => {
+  onExternalIntegrationStatusChanged = async (payload) => {
     const { externalInstalled } = this.state;
     if (!payload || !externalInstalled) {
       return;
     }
-    const updated = externalInstalled.map(integration =>
-      integration.selector === payload.selector ? { ...integration, status: payload.status } : integration
+    const updated = externalInstalled.map((integration) =>
+      integration.selector === payload.selector ? { ...integration, status: payload.status } : integration,
     );
     await this.setState({ externalInstalled: updated });
     this.getIntegrations();
@@ -99,11 +99,11 @@ class Integration extends Component {
       // installed". An empty array would be counted as zero integration to
       // update and would clear the header counter on a network hiccup
       httpClient.get('/api/v1/external_integration').catch(() => null),
-      isAdmin ? httpClient.get('/api/v1/external_integration/store').catch(() => null) : Promise.resolve(null)
+      isAdmin ? httpClient.get('/api/v1/external_integration/store').catch(() => null) : Promise.resolve(null),
     ]);
     await this.setState({
       externalInstalled,
-      externalStore: externalStoreResponse ? externalStoreResponse.integrations : []
+      externalStore: externalStoreResponse ? externalStoreResponse.integrations : [],
     });
     this.getIntegrations();
   }
@@ -120,7 +120,7 @@ class Integration extends Component {
     try {
       const [externalInstalled, externalStoreResponse] = await Promise.all([
         httpClient.get('/api/v1/external_integration'),
-        httpClient.post('/api/v1/external_integration/store/refresh')
+        httpClient.post('/api/v1/external_integration/store/refresh'),
       ]);
       // an unreachable store is not an error: the server answers with its
       // cached catalog and says so with refreshed: false, so we warn instead
@@ -129,7 +129,7 @@ class Integration extends Component {
         externalInstalled,
         externalStore: externalStoreResponse ? externalStoreResponse.integrations : [],
         refreshStoreStale: !externalStoreResponse || externalStoreResponse.refreshed !== true,
-        refreshStoreStatus: RequestStatus.Success
+        refreshStoreStatus: RequestStatus.Success,
       });
       this.getIntegrations();
     } catch (e) {
@@ -185,29 +185,30 @@ class Integration extends Component {
   buildExternalIntegrationCards() {
     const { user = {}, category } = this.props;
     // external integrations live in the category matching their manifest
-    // type ("device", "communication" or "weather"), and can also be
-    // favorites
-    const EXTERNAL_CATEGORIES = ['device', 'communication', 'weather'];
+    // type ("device", "communication", "weather" or "calendar"), and can
+    // also be favorites
+    const EXTERNAL_CATEGORIES = ['device', 'communication', 'weather', 'calendar'];
     if (category && !EXTERNAL_CATEGORIES.includes(category) && !VIRTUAL_CATEGORIES.includes(category)) {
       return [];
     }
     const isAdmin = user.role === USER_ROLE.ADMIN;
     const language = user.language || 'en';
-    // a non-admin user only sees the installed communication integrations:
-    // the device screens and the store are admin-only (the server already
-    // returns nothing else, this is the same rule on the display side)
+    // a non-admin user only sees the installed communication and calendar
+    // integrations: the device screens and the store are admin-only (the
+    // server already returns nothing else, this is the same rule on the
+    // display side)
     const installed = (this.state.externalInstalled || []).filter(
-      integration => isAdmin || get(integration, 'manifest.type') === 'communication'
+      (integration) => isAdmin || ['communication', 'calendar'].includes(get(integration, 'manifest.type')),
     );
     const store = isAdmin ? this.state.externalStore || [] : [];
 
     const storeBySlug = new Map();
-    store.forEach(storeIntegration => {
+    store.forEach((storeIntegration) => {
       if (storeIntegration.store_slug) {
         storeBySlug.set(storeIntegration.store_slug, storeIntegration);
       }
     });
-    const installedSlugs = new Set(installed.filter(i => i.store_slug).map(i => i.store_slug));
+    const installedSlugs = new Set(installed.filter((i) => i.store_slug).map((i) => i.store_slug));
 
     const externalCards = [];
 
@@ -215,23 +216,23 @@ class Integration extends Component {
     // ("local", "cloud", or both): this is the same information the native
     // integrations carry in their JSON config, so the catalog can show the
     // Local/Cloud tags on a community integration too
-    const getTransportTags = manifest => {
+    const getTransportTags = (manifest) => {
       const transports = manifest.transports || [];
       return {
         local: transports.includes('local'),
-        cloud: transports.includes('cloud')
+        cloud: transports.includes('cloud'),
       };
     };
 
-    // communication and weather integrations have no device screens: their
-    // card lands straight on the configuration screen
+    // communication, weather and calendar integrations have no device
+    // screens: their card lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
-      ['communication', 'weather'].includes(manifest.type)
+      ['communication', 'weather', 'calendar'].includes(manifest.type)
         ? `/dashboard/integration/device/external/${selector}/config`
         : `/dashboard/integration/device/external/${selector}`;
 
     // Installed external integrations
-    installed.forEach(integration => {
+    installed.forEach((integration) => {
       const manifest = integration.manifest || {};
       const storeIntegration = integration.store_slug ? storeBySlug.get(integration.store_slug) : null;
       externalCards.push({
@@ -240,19 +241,19 @@ class Integration extends Component {
         key: `external-${integration.store_slug || integration.selector}`,
         external: true,
         externalInstalled: true,
-        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
+        type: ['communication', 'weather', 'calendar'].includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: getInstalledUrl(integration.selector, manifest),
         img: (storeIntegration && storeIntegration.cover_url) || manifest.cover_image || null,
         status: integration.status,
         updateAvailable: integration.update_available,
-        ...getTransportTags(manifest)
+        ...getTransportTags(manifest),
       });
     });
 
     // External integrations available in the store, not installed locally
-    store.forEach(storeIntegration => {
+    store.forEach((storeIntegration) => {
       if (storeIntegration.store_slug && installedSlugs.has(storeIntegration.store_slug)) {
         return;
       }
@@ -262,7 +263,7 @@ class Integration extends Component {
         key: `external-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
-        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
+        type: ['communication', 'weather', 'calendar'].includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled
@@ -272,18 +273,18 @@ class Integration extends Component {
             getUrlFromCatalog(`/dashboard/integration/device/external-install/${storeIntegration.store_slug}`, {
               category,
               searchKeyword: this.state.searchKeyword,
-              orderDir: this.state.orderDir
+              orderDir: this.state.orderDir,
             }),
         img: storeIntegration.cover_url || manifest.cover_image || null,
         updateAvailable: isInstalled ? storeIntegration.update_available : false,
-        ...getTransportTags(manifest)
+        ...getTransportTags(manifest),
       });
     });
 
     // the favorites and updates views keep every type, their own filter
     // comes later
     if (category && !VIRTUAL_CATEGORIES.includes(category)) {
-      return externalCards.filter(card => card.type === category);
+      return externalCards.filter((card) => card.type === category);
     }
     return externalCards;
   }
@@ -301,13 +302,13 @@ class Integration extends Component {
     // Filter integrations and categories according to user role
     if (user.role !== USER_ROLE.ADMIN) {
       selectedIntegrations = selectedIntegrations.filter(
-        i =>
+        (i) =>
           HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1 &&
-          HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS.indexOf(i.key) === -1
+          HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS.indexOf(i.key) === -1,
       );
 
       integrationCategories = integrationCategories.filter(
-        i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1
+        (i) => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1,
       );
     }
 
@@ -315,19 +316,19 @@ class Integration extends Component {
     const favorites = this.state.favorites || [];
 
     // Add favorite status to integrations
-    selectedIntegrations = selectedIntegrations.map(integration => ({
+    selectedIntegrations = selectedIntegrations.map((integration) => ({
       ...integration,
-      isFavorite: favorites.includes(integration.key)
+      isFavorite: favorites.includes(integration.key),
     }));
 
     // Translate with i18n
-    selectedIntegrations = selectedIntegrations.map(integration => {
+    selectedIntegrations = selectedIntegrations.map((integration) => {
       const name = get(intl.dictionary, `integration.${integration.key}.title`, { default: integration.key });
       const description = get(intl.dictionary, `integration.${integration.key}.description`, {
-        default: ''
+        default: '',
       });
       const url = `/dashboard/integration/${integration.type}/${get(integration, 'link', {
-        default: integration.key
+        default: integration.key,
       }).toLowerCase()}`;
       return { ...integration, name, description, url };
     });
@@ -335,20 +336,20 @@ class Integration extends Component {
     // Merge external integrations (community integrations running in isolated
     // Docker containers), after the i18n pass (their name comes from the
     // manifest) and before the favorites filter so they can be favorites too
-    const externalCards = this.buildExternalIntegrationCards().map(card => ({
+    const externalCards = this.buildExternalIntegrationCards().map((card) => ({
       ...card,
-      isFavorite: favorites.includes(card.key)
+      isFavorite: favorites.includes(card.key),
     }));
     selectedIntegrations = selectedIntegrations.concat(externalCards);
 
     // If we are in favorites view, only display favorites
     if (category === 'favorites') {
-      selectedIntegrations = selectedIntegrations.filter(integration => integration.isFavorite);
+      selectedIntegrations = selectedIntegrations.filter((integration) => integration.isFavorite);
     }
 
     // If we are in updates view, only display the integrations to update
     if (category === 'updates') {
-      selectedIntegrations = selectedIntegrations.filter(integration => integration.updateAvailable);
+      selectedIntegrations = selectedIntegrations.filter((integration) => integration.updateAvailable);
     }
 
     // the total is the size of the view the user is currently looking at, once
@@ -367,7 +368,7 @@ class Integration extends Component {
       // contains the empty string: without this, such a search would display
       // the whole catalog as if the field were empty
       selectedIntegrations = normalizedSearchKeyword.length
-        ? selectedIntegrations.filter(integration => {
+        ? selectedIntegrations.filter((integration) => {
             const { name, description } = integration;
             return (
               normalizeSearchText(name).includes(normalizedSearchKeyword) ||
@@ -398,7 +399,7 @@ class Integration extends Component {
       integrationCategories,
       integrationsToUpdate,
       searchKeyword,
-      orderDir
+      orderDir,
     });
   }
 
@@ -413,7 +414,7 @@ class Integration extends Component {
       // its count. Falling back on the shared value keeps the two consistent
       return this.props.externalIntegrationsToUpdate || 0;
     }
-    const integrationsToUpdate = externalInstalled.filter(integration => integration.update_available).length;
+    const integrationsToUpdate = externalInstalled.filter((integration) => integration.update_available).length;
     // compared to the shared value and not to the local one: getIntegrations()
     // runs on every keystroke of the search field, so an unchanged count must
     // not re-render every component reading it — but a fresh fetch that
@@ -428,10 +429,10 @@ class Integration extends Component {
     return integrationsToUpdate;
   }
 
-  toggleFavorite = async integrationKey => {
+  toggleFavorite = async (integrationKey) => {
     const favorites = this.state.favorites || [];
     const newFavorites = favorites.includes(integrationKey)
-      ? favorites.filter(key => key !== integrationKey)
+      ? favorites.filter((key) => key !== integrationKey)
       : [...favorites, integrationKey];
 
     // Update state immediately for responsive UI
@@ -441,21 +442,21 @@ class Integration extends Component {
     // Persist to backend
     try {
       await this.props.httpClient.post('/api/v1/user/variable/INTEGRATION_FAVORITES', {
-        value: JSON.stringify(newFavorites)
+        value: JSON.stringify(newFavorites),
       });
     } catch (e) {
       console.error('[integration] Failed to save favorites', e);
     }
   };
 
-  search = async e => {
+  search = async (e) => {
     const searchKeyword = e.target.value;
     await this.setState({ searchKeyword });
     this.updateURL({ searchKeyword, orderDir: this.state.orderDir });
     await this.getIntegrationsDebounced();
   };
 
-  changeOrderDir = async e => {
+  changeOrderDir = async (e) => {
     const orderDir = e.target.value;
     await this.setState({ orderDir });
     this.updateURL({ searchKeyword: this.state.searchKeyword, orderDir });
@@ -479,7 +480,7 @@ class Integration extends Component {
       search: this.search,
       changeOrderDir: this.changeOrderDir,
       toggleFavorite: this.toggleFavorite,
-      refreshStore: this.refreshStore
+      refreshStore: this.refreshStore,
     };
 
     return <IntegrationPage {...combinedProps} />;
@@ -488,5 +489,5 @@ class Integration extends Component {
 
 export default connect(
   'user,session,httpClient,externalIntegrationsToUpdate',
-  createActionsExternalIntegrationUpdates
+  createActionsExternalIntegrationUpdates,
 )(withIntlAsProp(Integration));

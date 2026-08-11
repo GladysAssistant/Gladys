@@ -10,20 +10,20 @@ class UserPresenceTrigger extends Component {
     try {
       const [users, areas] = await Promise.all([
         this.props.httpClient.get('/api/v1/user'),
-        this.props.httpClient.get('/api/v1/area')
+        this.props.httpClient.get('/api/v1/area'),
       ]);
       const userOptions = [];
-      users.forEach(user => {
+      users.forEach((user) => {
         userOptions.push({
           label: user.firstname,
-          value: user.selector
+          value: user.selector,
         });
       });
       const areaOptions = [];
-      areas.forEach(area => {
+      areas.forEach((area) => {
         areaOptions.push({
           label: area.name,
-          value: area.selector
+          value: area.selector,
         });
       });
       await this.setState({ userOptions, areaOptions });
@@ -34,32 +34,32 @@ class UserPresenceTrigger extends Component {
     }
   };
 
-  handleChange = selectedOption => {
+  handleChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateTriggerProperty(this.props.index, 'user', selectedOption.value);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'user', null);
     }
   };
-  handleAreaChange = selectedOption => {
+  handleAreaChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateTriggerProperty(this.props.index, 'area', selectedOption.value);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'area', null);
     }
   };
-  refreshSelectedOptions = nextProps => {
+  refreshSelectedOptions = (nextProps) => {
     let selectedOption = '';
     let selectedAreaOption = '';
     if (nextProps.trigger.user && this.state.userOptions) {
-      const userOption = this.state.userOptions.find(option => option.value === nextProps.trigger.user);
+      const userOption = this.state.userOptions.find((option) => option.value === nextProps.trigger.user);
 
       if (userOption) {
         selectedOption = userOption;
       }
     }
     if (nextProps.trigger.area && this.state.areaOptions) {
-      const areaOption = this.state.areaOptions.find(option => option.value === nextProps.trigger.area);
+      const areaOption = this.state.areaOptions.find((option) => option.value === nextProps.trigger.area);
 
       if (areaOption) {
         selectedAreaOption = areaOption;
@@ -72,7 +72,7 @@ class UserPresenceTrigger extends Component {
     this.props = props;
     this.state = {
       selectedOption: '',
-      selectedAreaOption: ''
+      selectedAreaOption: '',
     };
   }
   componentDidMount() {

@@ -38,9 +38,9 @@ class DeviceGetValue extends Component {
             : DEFAULT_VARIABLE_NAME,
         data: {
           device,
-          deviceFeature
-        }
-      }
+          deviceFeature,
+        },
+      },
     ]);
   };
 

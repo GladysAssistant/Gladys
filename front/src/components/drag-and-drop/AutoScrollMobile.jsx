@@ -18,10 +18,10 @@ const ScrollBottomMobile = ({ children, ...props }) => {
   const autoScrollDropRef = useRef(null);
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: props.box_type,
-    collect: monitor => ({
+    collect: (monitor) => ({
       isOver: monitor.isOver(),
-      canDrop: monitor.canDrop()
-    })
+      canDrop: monitor.canDrop(),
+    }),
   });
 
   drop(autoScrollDropRef);
@@ -47,7 +47,7 @@ const ScrollBottomMobile = ({ children, ...props }) => {
       class={cx({
         'd-none': !canDrop,
         [style.scrollTopGuide]: props.position === 'top',
-        [style.scrollBottomGuide]: props.position !== 'top'
+        [style.scrollBottomGuide]: props.position !== 'top',
       })}
     />
   );

@@ -9,13 +9,13 @@ const INTERNAL_PARAMS = ['GLADYS_TRANSPORT', 'GLADYS_TRANSPORT_DEGRADED', 'GLADY
 // version...), collapsed by default: they help the user understand what the
 // integration sees without cluttering the card
 class DeviceParams extends Component {
-  toggle = e => {
+  toggle = (e) => {
     e.preventDefault();
     this.setState({ show: !this.state.show });
   };
 
   render({ device }, { show }) {
-    const params = ((device && device.params) || []).filter(param => !INTERNAL_PARAMS.includes(param.name));
+    const params = ((device && device.params) || []).filter((param) => !INTERNAL_PARAMS.includes(param.name));
     if (params.length === 0) {
       return null;
     }
@@ -29,7 +29,7 @@ class DeviceParams extends Component {
           <div class="table-responsive mt-2">
             <table class="table table-sm mb-0">
               <tbody>
-                {params.map(param => (
+                {params.map((param) => (
                   <tr>
                     <td class="text-muted">{param.name}</td>
                     <td>

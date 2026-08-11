@@ -2,7 +2,7 @@ import { connect } from 'unistore/preact';
 import DiscoverTab from './DiscoverTab';
 import TuyaPage from '../TuyaPage';
 
-const TuyaDiscoverPage = props => (
+const TuyaDiscoverPage = (props) => (
   <TuyaPage user={props.user}>
     <DiscoverTab {...props} />
   </TuyaPage>

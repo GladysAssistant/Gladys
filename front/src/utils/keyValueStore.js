@@ -9,7 +9,7 @@ const keyValStore = {
   },
   clear() {
     return localStorage.clear();
-  }
+  },
 };
 
 export default keyValStore;

@@ -13,17 +13,17 @@ class AskAI extends Component {
     try {
       const users = await this.props.httpClient.get('/api/v1/user');
       const userOptions = [];
-      users.forEach(user => {
+      users.forEach((user) => {
         userOptions.push({
           label: user.firstname,
-          value: user.selector
+          value: user.selector,
         });
       });
 
       const cameras = await this.props.httpClient.get('/api/v1/camera');
-      const cameraOptions = cameras.map(camera => ({
+      const cameraOptions = cameras.map((camera) => ({
         label: camera.name,
-        value: camera.selector
+        value: camera.selector,
       }));
 
       let selectedUserOption = '';
@@ -33,10 +33,10 @@ class AskAI extends Component {
         actionUpdates.push(['user', userOptions[0].value]);
         selectedUserOption = userOptions[0];
       } else if (this.props.action.user) {
-        selectedUserOption = userOptions.find(option => option.value === this.props.action.user) || '';
+        selectedUserOption = userOptions.find((option) => option.value === this.props.action.user) || '';
       }
       if (this.props.action.camera) {
-        selectedCameraOption = cameraOptions.find(option => option.value === this.props.action.camera) || '';
+        selectedCameraOption = cameraOptions.find((option) => option.value === this.props.action.camera) || '';
       }
       this.setState({ userOptions, cameraOptions, selectedUserOption, selectedCameraOption }, () => {
         actionUpdates.forEach(([key, value]) => this.props.updateActionProperty(this.props.path, key, value));
@@ -46,17 +46,17 @@ class AskAI extends Component {
       console.error(e);
     }
   };
-  updateText = text => {
+  updateText = (text) => {
     this.props.updateActionProperty(this.props.path, 'text', text);
   };
-  handleUserChange = selectedOption => {
+  handleUserChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
     } else {
       this.props.updateActionProperty(this.props.path, 'user', null);
     }
   };
-  handleCameraChange = selectedOption => {
+  handleCameraChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'camera', selectedOption.value);
     } else {
@@ -64,10 +64,10 @@ class AskAI extends Component {
     }
   };
 
-  refreshSelectedOptions = nextProps => {
+  refreshSelectedOptions = (nextProps) => {
     let selectedUserOption = '';
     if (nextProps.action.user && this.state.userOptions) {
-      const userOption = this.state.userOptions.find(option => option.value === nextProps.action.user);
+      const userOption = this.state.userOptions.find((option) => option.value === nextProps.action.user);
 
       if (userOption) {
         selectedUserOption = userOption;
@@ -75,7 +75,7 @@ class AskAI extends Component {
     }
     let selectedCameraOption = '';
     if (nextProps.action.camera && this.state.cameraOptions) {
-      const cameraOption = this.state.cameraOptions.find(option => option.value === nextProps.action.camera);
+      const cameraOption = this.state.cameraOptions.find((option) => option.value === nextProps.action.camera);
 
       if (cameraOption) {
         selectedCameraOption = cameraOption;
@@ -91,15 +91,15 @@ class AskAI extends Component {
         type: 'askAi',
         ready: true,
         label: ASK_AI_ANSWER_VARIABLE,
-        data: {}
-      }
+        data: {},
+      },
     ]);
   };
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
-      selectedOption: ''
+      selectedOption: '',
     };
   }
   componentDidMount() {
@@ -156,7 +156,7 @@ class AskAI extends Component {
           <Select
             styles={{
               // Fixes the overlapping problem of the component
-              menu: provided => ({ ...provided, zIndex: 2 })
+              menu: (provided) => ({ ...provided, zIndex: 2 }),
             }}
             options={userOptions}
             value={selectedUserOption}
@@ -172,7 +172,7 @@ class AskAI extends Component {
           <Select
             styles={{
               // Fixes the overlapping problem of the component
-              menu: provided => ({ ...provided, zIndex: 2 })
+              menu: (provided) => ({ ...provided, zIndex: 2 }),
             }}
             options={cameraOptions}
             value={selectedCameraOption}

@@ -20,21 +20,21 @@ const HORIZON_COLOR = '#ced4da';
 const DAY_FILL_COLOR = '#fdecc0';
 const NIGHT_FILL_COLOR = '#9ca0c5';
 
-const formatTime = time => (time ? dayjs(time).format('HH:mm') : '--:--');
+const formatTime = (time) => (time ? dayjs(time).format('HH:mm') : '--:--');
 
-const buildChart = sunState => {
+const buildChart = (sunState) => {
   const curve = sunState.curve || [];
   if (curve.length < 2) {
     return null;
   }
   const startTime = new Date(curve[0].time).getTime();
   const endTime = new Date(curve[curve.length - 1].time).getTime();
-  const xFor = time => ((new Date(time).getTime() - startTime) / (endTime - startTime)) * CHART_WIDTH;
-  const elevations = curve.map(point => point.elevation);
+  const xFor = (time) => ((new Date(time).getTime() - startTime) / (endTime - startTime)) * CHART_WIDTH;
+  const elevations = curve.map((point) => point.elevation);
   // Keep the horizon visible even on days where the sun stays on one side of it
   const maxElevation = Math.max(...elevations, 10);
   const minElevation = Math.min(...elevations, -10);
-  const yFor = elevation =>
+  const yFor = (elevation) =>
     CHART_MARGIN + ((maxElevation - elevation) / (maxElevation - minElevation)) * (CHART_HEIGHT - 2 * CHART_MARGIN);
 
   const curvePath = curve
@@ -182,10 +182,10 @@ class Sun extends Component {
       // Keep the chart visible while refreshing: the loader would otherwise
       // flash over the already rendered chart on every periodic refresh.
       // On a house change, the previous data is dropped so the old chart is not shown.
-      await this.setState(prevState => ({
+      await this.setState((prevState) => ({
         error: false,
         sunState: resetData ? undefined : prevState.sunState,
-        loading: resetData || !prevState.sunState
+        loading: resetData || !prevState.sunState,
       }));
       const sunState = await this.props.httpClient.get(`/api/v1/house/${house}/sun`);
       if (requestId !== this.requestId) {
@@ -223,12 +223,10 @@ class Sun extends Component {
     super(props);
     this.props = props;
     this.requestId = 0;
-    this.chartId = `sun-chart-${Math.random()
-      .toString(36)
-      .slice(2)}`;
+    this.chartId = `sun-chart-${Math.random().toString(36).slice(2)}`;
     this.state = {
       loading: true,
-      error: false
+      error: false,
     };
   }
 

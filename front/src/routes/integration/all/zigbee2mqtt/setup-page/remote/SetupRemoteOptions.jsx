@@ -7,21 +7,21 @@ import SubmitConfiguration from '../components/SubmitConfiguration';
 
 class SetupRemoteOptions extends Component {
   togglePassword = () => {
-    this.setState(prevState => ({ showPassword: !prevState.showPassword }));
+    this.setState((prevState) => ({ showPassword: !prevState.showPassword }));
   };
-  updateMqttUrl = e => {
+  updateMqttUrl = (e) => {
     this.setState({ mqttUrl: e.target.value });
   };
 
-  updateZ2mFrontendUrl = e => {
+  updateZ2mFrontendUrl = (e) => {
     this.setState({ z2mFrontendUrl: e.target.value });
   };
 
-  updateMqttUsername = e => {
+  updateMqttUsername = (e) => {
     this.setState({ mqttUsername: e.target.value });
   };
 
-  updateMqttPassword = e => {
+  updateMqttPassword = (e) => {
     this.setState({ mqttPassword: e.target.value });
   };
 
@@ -32,7 +32,7 @@ class SetupRemoteOptions extends Component {
       mqttUrl,
       mqttUsername,
       mqttPassword,
-      z2mFrontendUrl
+      z2mFrontendUrl,
     });
   };
 
@@ -56,7 +56,7 @@ class SetupRemoteOptions extends Component {
       mqttPassword,
       mqttUsername,
       z2mFrontendUrl,
-      showPassword: false
+      showPassword: false,
     };
   }
 
@@ -142,7 +142,7 @@ class SetupRemoteOptions extends Component {
                     <i
                       class={cx('fe', {
                         'fe-eye': !showPassword,
-                        'fe-eye-off': showPassword
+                        'fe-eye-off': showPassword,
                       })}
                     />
                   </span>

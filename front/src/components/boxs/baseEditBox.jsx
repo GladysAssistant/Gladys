@@ -12,21 +12,21 @@ const BaseEditBox = ({ children, ...props }) => {
     item: () => {
       return { x, y };
     },
-    collect: monitor => ({
-      isDragging: !!monitor.isDragging()
-    })
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
   }));
   const [{ isActive }, drop] = useDrop({
     accept: DASHBOARD_EDIT_BOX_TYPE,
-    collect: monitor => ({
-      isActive: monitor.canDrop() && monitor.isOver()
+    collect: (monitor) => ({
+      isActive: monitor.canDrop() && monitor.isOver(),
     }),
     drop(item) {
       if (!ref.current) {
         return;
       }
       props.moveCard(item.x, item.y, x, y);
-    }
+    },
   });
   preview(drop(ref));
   const removeBox = () => {
@@ -41,7 +41,7 @@ const BaseEditBox = ({ children, ...props }) => {
           opacity: isDragging ? 0.5 : 1,
           cursor: 'pointer',
           backgroundColor: isActive ? '#ecf0f1' : undefined,
-          userSelect: 'none'
+          userSelect: 'none',
         }}
       >
         <div ref={drag} style={{ minHeight: '2.5rem', padding: '1rem 1.5rem' }}>
@@ -65,7 +65,7 @@ const BaseEditBox = ({ children, ...props }) => {
       style={{
         opacity: isDragging ? 0.5 : 1,
         cursor: 'pointer',
-        backgroundColor: isActive ? '#ecf0f1' : undefined
+        backgroundColor: isActive ? '#ecf0f1' : undefined,
       }}
     >
       <div class="card-header">

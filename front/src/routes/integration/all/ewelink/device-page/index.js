@@ -22,5 +22,5 @@ class EweLinkIntegration extends Component {
 
 export default connect(
   'user,eweLinkDevices,housesWithRooms,getEweLinkStatus,eweLinkSearch,getEweLinkOrderDir',
-  actions
+  actions,
 )(EweLinkIntegration);

@@ -7,7 +7,7 @@ const Requirement = ({ verified, mandatory, children }) => (
       class={cx('requirement', 'fe', 'mr-2', {
         'fe-check-circle text-success': verified,
         'fe-x-circle text-danger': !verified && mandatory,
-        'fe-help-circle text-primary': !verified && !mandatory
+        'fe-help-circle text-primary': !verified && !mandatory,
       })}
     />
     {children}

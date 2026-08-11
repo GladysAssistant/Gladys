@@ -25,12 +25,7 @@ const IncomingMessage = ({ children, ...props }) => (
             </span>
           )}
         </div>
-        <span class={style.time_date}>
-          {' '}
-          {dayjs(props.message.created_at)
-            .locale(props.user.language)
-            .fromNow()}
-        </span>
+        <span class={style.time_date}> {dayjs(props.message.created_at).locale(props.user.language).fromNow()}</span>
       </div>
     </div>
   </div>
@@ -68,11 +63,7 @@ const ToolCallMessage = ({ children, ...props }) => {
           <i class={showDetails ? 'fe fe-chevron-up' : 'fe fe-chevron-down'} />
         </button>
       </div>
-      <span class={style.time_date}>
-        {dayjs(props.message.created_at)
-          .locale(props.user.language)
-          .fromNow()}
-      </span>
+      <span class={style.time_date}>{dayjs(props.message.created_at).locale(props.user.language).fromNow()}</span>
     </div>
   );
 };
@@ -88,9 +79,7 @@ const OutGoingMessage = ({ children, ...props }) => (
         {props.message.tempId ? (
           <Text id="chat.sendingInProgress" />
         ) : (
-          dayjs(props.message.created_at)
-            .locale(props.user.language)
-            .fromNow()
+          dayjs(props.message.created_at).locale(props.user.language).fromNow()
         )}
       </span>
     </div>
@@ -103,7 +92,7 @@ const Messages = ({ children, ...props }) => (
       <div class={style.mesgs}>
         <div class={style.msg_history} id="chat-window">
           {props.messages &&
-            props.messages.map(message => {
+            props.messages.map((message) => {
               if (message.message_type === 'tool_call') {
                 return <ToolCallMessage key={message.id || message.created_at} user={props.user} message={message} />;
               }

@@ -12,13 +12,13 @@ class SelectFanMode extends Component {
   };
 
   getOptions = () => {
-    const deviceFeatureOptions = Object.keys(FAN_MODE).map(key => {
+    const deviceFeatureOptions = Object.keys(FAN_MODE).map((key) => {
       const value = FAN_MODE[key];
       return {
         label: get(this.props.intl.dictionary, `deviceFeatureValue.category.fan.mode.${value}`, {
-          default: value
+          default: value,
         }),
-        value
+        value,
       };
     });
 
@@ -31,9 +31,9 @@ class SelectFanMode extends Component {
     if (value !== undefined) {
       return {
         label: get(this.props.intl.dictionary, `deviceFeatureValue.category.fan.mode.${value}`, {
-          default: value
+          default: value,
         }),
-        value
+        value,
       };
     }
     return undefined;

@@ -22,5 +22,5 @@ class TasmotaIntegration extends Component {
 
 export default connect(
   'user,tasmotaDevices,housesWithRooms,getTasmotaStatus,tasmotaSearch,getTasmotaOrderDir',
-  actions
+  actions,
 )(TasmotaIntegration);

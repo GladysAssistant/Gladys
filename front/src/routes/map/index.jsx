@@ -9,10 +9,10 @@ class MapPage extends Component {
   getUsersWithLocation = async () => {
     try {
       const usersWithLocation = await this.props.httpClient.get(
-        '/api/v1/user?fields=id,firstname,selector,picture,last_latitude,last_longitude,last_altitude,last_accuracy,last_location_changed'
+        '/api/v1/user?fields=id,firstname,selector,picture,last_latitude,last_longitude,last_altitude,last_accuracy,last_location_changed',
       );
       this.setState({
-        usersWithLocation
+        usersWithLocation,
       });
     } catch (e) {
       console.error(e);
@@ -22,7 +22,7 @@ class MapPage extends Component {
     try {
       const housesWithLocation = await this.props.httpClient.get('/api/v1/house');
       this.setState({
-        housesWithLocation
+        housesWithLocation,
       });
     } catch (e) {
       console.error(e);
@@ -32,29 +32,29 @@ class MapPage extends Component {
     try {
       const areas = await this.props.httpClient.get('/api/v1/area');
       this.setState({
-        areas
+        areas,
       });
     } catch (e) {
       console.error(e);
     }
   };
-  updateUserLocationWebsocket = event => {
-    const userIndex = this.state.usersWithLocation.findIndex(user => user.id === event.id);
+  updateUserLocationWebsocket = (event) => {
+    const userIndex = this.state.usersWithLocation.findIndex((user) => user.id === event.id);
     if (userIndex !== -1) {
       const newState = update(this.state, {
         usersWithLocation: {
           [userIndex]: {
             last_latitude: {
-              $set: event.last_latitude
+              $set: event.last_latitude,
             },
             last_longitude: {
-              $set: event.last_longitude
+              $set: event.last_longitude,
             },
             last_location_changed: {
-              $set: event.last_location_changed
-            }
-          }
-        }
+              $set: event.last_location_changed,
+            },
+          },
+        },
       });
       this.setState(newState);
     }
@@ -66,7 +66,7 @@ class MapPage extends Component {
     this.state = {
       usersWithLocation: [],
       housesWithLocation: [],
-      areas: []
+      areas: [],
     };
   }
 
@@ -80,7 +80,7 @@ class MapPage extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.LOCATION.NEW,
-      this.updateUserLocationWebsocket
+      this.updateUserLocationWebsocket,
     );
   }
 

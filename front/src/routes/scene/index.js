@@ -18,7 +18,7 @@ class Scene extends Component {
   getScenes = async () => {
     this.setState({
       loading: true,
-      getError: false
+      getError: false,
     });
     try {
       const params = {};
@@ -39,12 +39,12 @@ class Scene extends Component {
       this.setState({
         scenes,
         loading: false,
-        getError: false
+        getError: false,
       });
     } catch (e) {
       this.setState({
         loading: false,
-        getError: true
+        getError: true,
       });
     }
   };
@@ -52,7 +52,7 @@ class Scene extends Component {
     try {
       const tags = await this.props.httpClient.get(`/api/v1/tag_scene`);
       this.setState({
-        tags
+        tags,
       });
     } catch (e) {
       console.error(e);
@@ -73,7 +73,7 @@ class Scene extends Component {
 
     // If we are updating the tags
     if (sceneTagSearch && sceneTagSearch.length > 0) {
-      sceneTagSearch.forEach(tag => urlParams.append('tags', tag));
+      sceneTagSearch.forEach((tag) => urlParams.append('tags', tag));
     }
 
     if (urlParams.toString()) {
@@ -82,56 +82,56 @@ class Scene extends Component {
       route(`/dashboard/scene`, true);
     }
   };
-  search = async e => {
+  search = async (e) => {
     this.updateURL({
-      sceneSearch: e.target.value
+      sceneSearch: e.target.value,
     });
     await this.debouncedGetScenes();
   };
-  searchTags = async tags => {
+  searchTags = async (tags) => {
     this.updateURL({
-      sceneTagSearch: tags
+      sceneTagSearch: tags,
     });
     await this.getScenes();
   };
 
-  changeOrderDir = async e => {
+  changeOrderDir = async (e) => {
     this.updateURL({
-      orderDir: e.target.value
+      orderDir: e.target.value,
     });
     await this.getScenes();
   };
-  switchActiveScene = async sceneIndex => {
+  switchActiveScene = async (sceneIndex) => {
     this.setState({ saving: true });
     try {
-      await this.setState(prevState => {
+      await this.setState((prevState) => {
         const newState = update(prevState, {
           scenes: {
             [sceneIndex]: {
               active: {
-                $set: !prevState.scenes[sceneIndex].active
-              }
-            }
-          }
+                $set: !prevState.scenes[sceneIndex].active,
+              },
+            },
+          },
         });
         return newState;
       });
       const scene = this.state.scenes[sceneIndex];
       await this.props.httpClient.patch(`/api/v1/scene/${scene.selector}`, {
-        active: scene.active
+        active: scene.active,
       });
     } catch (e) {
       console.error(e);
       // Rollback change if an error happened
-      await this.setState(prevState => {
+      await this.setState((prevState) => {
         const newState = update(prevState, {
           scenes: {
             [sceneIndex]: {
               active: {
-                $set: !prevState.scenes[sceneIndex].active
-              }
-            }
-          }
+                $set: !prevState.scenes[sceneIndex].active,
+              },
+            },
+          },
         });
         return newState;
       });
@@ -144,7 +144,7 @@ class Scene extends Component {
     this.props = props;
     this.state = {
       scenes: [],
-      loading: true
+      loading: true,
     };
     this.debouncedGetScenes = debounce(this.getScenes.bind(this), 200);
   }

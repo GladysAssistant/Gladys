@@ -10,56 +10,56 @@ const getApexChartStepLineOptions = ({ height, displayAxes, series, colors, loca
       height,
       parentHeightOffset: 0,
       sparkline: {
-        enabled: !displayAxes
+        enabled: !displayAxes,
       },
       toolbar: {
-        show: false
+        show: false,
       },
       animations: {
-        enabled: false
-      }
+        enabled: false,
+      },
     },
     dataLabels: {
-      enabled: false
+      enabled: false,
     },
     fill: {
-      opacity: 1
+      opacity: 1,
     },
     stroke: {
       width: 2,
-      curve: 'stepline'
+      curve: 'stepline',
     },
     series,
     grid: {
       strokeDashArray: 4,
       padding: {
-        left: -4
-      }
+        left: -4,
+      },
     },
     xaxis: {
       labels: {
         padding: 0,
-        datetimeUTC: false
+        datetimeUTC: false,
       },
       tooltip: {
-        enabled: false
+        enabled: false,
       },
       axisBorder: {
-        show: false
+        show: false,
       },
-      type: 'datetime'
+      type: 'datetime',
     },
     yaxis: {
       labels: {
         padding: 4,
-        formatter: yAxisFormatter
-      }
+        formatter: yAxisFormatter,
+      },
     },
     colors,
     legend: {
       show: displayAxes,
-      position: 'bottom'
-    }
+      position: 'bottom',
+    },
   };
   return options;
 };

@@ -24,7 +24,7 @@ const WEATHER_EMOJIS = {
   wind: { day: '💨', night: '💨' },
   // 'night' is deprecated as a condition but still rendered
   night: { day: '🌙', night: '🌙' },
-  unknown: { day: '🌡️', night: '🌡️' }
+  unknown: { day: '🌡️', night: '🌡️' },
 };
 
 /**
@@ -40,7 +40,7 @@ const translateWeatherToEmoji = (weather, isDay) => {
 // Wind direction in degrees to a localized cardinal key (N, NE, E, SE, S, SW, W, NW)
 const WIND_CARDINALS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
 
-const degreesToCardinal = degrees => {
+const degreesToCardinal = (degrees) => {
   if (degrees === undefined || degrees === null || Number.isNaN(Number(degrees))) {
     return null;
   }
@@ -51,7 +51,7 @@ const degreesToCardinal = degrees => {
 // when several bulletins of the same phenomenon are merged
 const ALERT_SEVERITY_ORDER = ['minor', 'moderate', 'severe', 'extreme'];
 
-const severityRank = severity => {
+const severityRank = (severity) => {
   const rank = ALERT_SEVERITY_ORDER.indexOf(severity);
   return rank === -1 ? 0 : rank;
 };
@@ -63,7 +63,7 @@ const severityRank = severity => {
  * which carry no end date on most bulletins. An unparsable date is kept too:
  * hiding a real alert over a malformed field is the worse failure.
  */
-const isAlertOngoing = alert => {
+const isAlertOngoing = (alert) => {
   if (!alert.end) {
     return true;
   }
@@ -84,9 +84,9 @@ const isAlertOngoing = alert => {
  * first would silently drop the others. `description` stays the first one, for
  * the badge tooltip; `descriptions` holds every distinct text, for the widget.
  */
-const normalizeAlerts = alerts => {
+const normalizeAlerts = (alerts) => {
   const byPhenomenon = new Map();
-  alerts.filter(isAlertOngoing).forEach(alert => {
+  alerts.filter(isAlertOngoing).forEach((alert) => {
     const key = alert.type || alert.event;
     const previous = byPhenomenon.get(key);
     if (!previous) {
@@ -126,9 +126,7 @@ function createActions(store) {
         // ?service= — absent, the server picks the first available one
         const providerParams = box.provider ? { service: box.provider } : undefined;
         const weather = await state.httpClient.get(`/api/v1/house/${box.house}/weather`, providerParams);
-        weather.datetime_beautiful = dayjs(weather.datetime)
-          .locale(state.user.language)
-          .format('dddd D MMMM');
+        weather.datetime_beautiful = dayjs(weather.datetime).locale(state.user.language).format('dddd D MMMM');
         weather.weatherEmoji = translateWeatherToEmoji(weather.weather, weather.is_day);
         // optional fields of the generic weather format: only present when
         // the provider supplies them
@@ -146,7 +144,7 @@ function createActions(store) {
           // rather than hours[0] — the trim drops the running hour, so
           // hours[0] is already the *next* slot
           const currentSlot =
-            weather.hours.filter(hour => !dayjs(hour.datetime).isAfter(dayjs())).pop() || weather.hours[0];
+            weather.hours.filter((hour) => !dayjs(hour.datetime).isAfter(dayjs())).pop() || weather.hours[0];
           if (currentSlot) {
             if (typeof currentSlot.precipitation === 'number') {
               weather.current_precipitation = currentSlot.precipitation;
@@ -158,7 +156,7 @@ function createActions(store) {
           // keep the coming hours only: a provider may lead with past
           // entries of the current day
           const now = dayjs().subtract(30, 'minute');
-          weather.hours = weather.hours.filter(hour => dayjs(hour.datetime).isAfter(now));
+          weather.hours = weather.hours.filter((hour) => dayjs(hour.datetime).isAfter(now));
           // cover the next 24 hours in 8 columns, so one entry every 3 hours:
           // the skip is derived from the provider's own step, entries already
           // spaced by 3 hours or more are kept as-is
@@ -168,7 +166,7 @@ function createActions(store) {
             weather.hours = weather.hours.filter((hour, index) => index % columnSkip === 0);
           }
           weather.hours = weather.hours.slice(0, 8);
-          weather.hours.forEach(hour => {
+          weather.hours.forEach((hour) => {
             hour.weatherEmoji = translateWeatherToEmoji(hour.weather, hour.is_day);
             hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
           });
@@ -177,18 +175,18 @@ function createActions(store) {
         // the payload, the validated bytes are fetched per key on demand
         if (get(box, 'modes.providerImages') && weather.images && weather.images.length > 0) {
           await Promise.all(
-            weather.images.map(async image => {
+            weather.images.map(async (image) => {
               try {
                 const { image: src } = await state.httpClient.get(
                   `/api/v1/house/${box.house}/weather/image/${image.key}`,
-                  providerParams
+                  providerParams,
                 );
                 image.src = src;
               } catch (imageError) {
                 // an unavailable image never breaks the widget: it is skipped
                 console.error(imageError);
               }
-            })
+            }),
           );
         }
         if (weather.alerts) {
@@ -197,9 +195,9 @@ function createActions(store) {
         if (weather.days) {
           // keep future days only: never assume the provider leads with
           // today (that was an OpenWeather-specific shape)
-          weather.days = weather.days.filter(day => dayjs(day.datetime).isAfter(dayjs(), 'day'));
+          weather.days = weather.days.filter((day) => dayjs(day.datetime).isAfter(dayjs(), 'day'));
           weather.days = weather.days.slice(0, 5);
-          weather.days.forEach(day => {
+          weather.days.forEach((day) => {
             // the per-day condition is optional in the generic weather
             // format (openweather does not provide it): no emoji without it
             day.weatherEmoji = day.weather ? translateWeatherToEmoji(day.weather) : null;
@@ -214,14 +212,12 @@ function createActions(store) {
               day.wind_speed = day.wind_gust;
               day.wind_speed_from_gust = true;
             }
-            day.datetime_beautiful = dayjs(day.datetime)
-              .locale(state.user.language)
-              .format('ddd D');
+            day.datetime_beautiful = dayjs(day.datetime).locale(state.user.language).format('ddd D');
           });
         }
 
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          weather
+          weather,
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
@@ -237,7 +233,7 @@ function createActions(store) {
           boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
         }
       }
-    }
+    },
   };
   return Object.assign({}, actions);
 }

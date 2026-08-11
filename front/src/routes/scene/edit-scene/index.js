@@ -22,7 +22,7 @@ const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.ZIGBEE2MQTT.SEND]: ['message'],
   [ACTIONS.DEVICE.SET_VALUE]: ['evaluate_value'],
   [ACTIONS.HTTP.REQUEST]: ['body'],
-  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable']
+  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable'],
 };
 
 // Helper function to merge update objects
@@ -32,7 +32,7 @@ const deepMergeUpdates = (target, source) => {
 
   const result = { ...target };
 
-  Object.keys(source).forEach(key => {
+  Object.keys(source).forEach((key) => {
     if (source[key] && typeof source[key] === 'object') {
       if (result[key] && typeof result[key] === 'object') {
         result[key] = deepMergeUpdates(result[key], source[key]);
@@ -78,7 +78,7 @@ const initializeSceneVariables = (actions, parentPath = '') => {
 class EditScene extends Component {
   getSceneBySelector = async () => {
     this.setState({
-      SceneGetStatus: RequestStatus.Getting
+      SceneGetStatus: RequestStatus.Getting,
     });
     try {
       const scene = await this.props.httpClient.get(`/api/v1/scene/${this.props.scene_selector}`);
@@ -97,11 +97,11 @@ class EditScene extends Component {
         scene,
         variables,
         triggersVariables,
-        SceneGetStatus: RequestStatus.Success
+        SceneGetStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        SceneGetStatus: RequestStatus.Error
+        SceneGetStatus: RequestStatus.Error,
       });
     }
   };
@@ -117,38 +117,38 @@ class EditScene extends Component {
   switchActiveScene = async () => {
     this.setState({ saving: true });
     try {
-      await this.setState(prevState => {
+      await this.setState((prevState) => {
         const newState = update(prevState, {
           scene: {
             active: {
-              $set: !prevState.scene.active
-            }
-          }
+              $set: !prevState.scene.active,
+            },
+          },
         });
         return newState;
       });
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, {
-        active: this.state.scene.active
+        active: this.state.scene.active,
       });
       this.setState({ saving: false });
     } catch (e) {
       console.error(e);
-      await this.setState(prevState => {
+      await this.setState((prevState) => {
         const newState = update(prevState, {
           saving: {
-            $set: false
+            $set: false,
           },
           scene: {
             active: {
-              $set: !prevState.scene.active
-            }
-          }
+              $set: !prevState.scene.active,
+            },
+          },
         });
         return newState;
       });
     }
   };
-  saveScene = async e => {
+  saveScene = async (e) => {
     if (e) {
       e.preventDefault();
     }
@@ -161,7 +161,7 @@ class EditScene extends Component {
       if (e.response && e.response.data) {
         if (e.response.data.properties && e.response.data.properties.length > 0) {
           // Extract validation error messages from properties array
-          errorMessage = e.response.data.properties.map(prop => prop.message).join('\n');
+          errorMessage = e.response.data.properties.map((prop) => prop.message).join('\n');
         } else if (e.response.data.message) {
           errorMessage = e.response.data.message;
         }
@@ -188,8 +188,8 @@ class EditScene extends Component {
         let updateObject = {
           scene: { actions: {} },
           variables: {
-            [path]: { $set: [] }
-          }
+            [path]: { $set: [] },
+          },
         };
         let actionsPath = updateObject.scene.actions;
 
@@ -209,14 +209,14 @@ class EditScene extends Component {
         updates = {
           scene: {
             actions: {
-              $push: [[]]
-            }
+              $push: [[]],
+            },
           },
           variables: {
             [path]: {
-              $set: []
-            }
-          }
+              $set: [],
+            },
+          },
         };
       }
     }
@@ -254,9 +254,9 @@ class EditScene extends Component {
     await this.setState(newState);
   };
 
-  addActionGroupAfter = async index => {
+  addActionGroupAfter = async (index) => {
     // Update variable paths for all actions after the inserted group
-    await this.setState(prevState => {
+    await this.setState((prevState) => {
       const newVariables = { ...prevState.variables };
 
       const pathToUpdateInVariables = [];
@@ -300,25 +300,25 @@ class EditScene extends Component {
 
       const newScene = update(prevState.scene, {
         actions: {
-          $splice: [[index + 1, 0, []]]
-        }
+          $splice: [[index + 1, 0, []]],
+        },
       });
 
       // Update variable paths for all actions after the inserted group
       pathToUpdateInVariables.reverse().forEach(({ prevPath, newPath }) => {
         // Recursive function to process all actions, including nested ones in if/then/else blocks
-        const processActions = actions => {
+        const processActions = (actions) => {
           if (!Array.isArray(actions)) return;
 
-          actions.forEach(actionGroup => {
+          actions.forEach((actionGroup) => {
             if (!Array.isArray(actionGroup)) return;
 
-            actionGroup.forEach(action => {
+            actionGroup.forEach((action) => {
               if (!action) return;
 
               // Process the current action
               if (VARIABLES_ATTRIBUTES_IN_ACTION[action.type]) {
-                VARIABLES_ATTRIBUTES_IN_ACTION[action.type].forEach(attribute => {
+                VARIABLES_ATTRIBUTES_IN_ACTION[action.type].forEach((attribute) => {
                   // In case there are 2 parts in the attribute (e.g., conditions[0].variable)
                   if (attribute.includes('.')) {
                     // We split the attribute path
@@ -326,7 +326,7 @@ class EditScene extends Component {
                     // If the first part is an array (e.g., conditions[])
                     if (attributePath[0].endsWith('[]') && action[attributePath[0].slice(0, -2)]) {
                       // We loop through the array
-                      action[attributePath[0].slice(0, -2)].forEach(subAction => {
+                      action[attributePath[0].slice(0, -2)].forEach((subAction) => {
                         if (subAction[attributePath[1]] && subAction[attributePath[1]].includes(prevPath)) {
                           // And replace the second part if it is a variable
                           // Here, we don't prefix prevPath by {{ because if it's a variable, it's not prefixed by {{
@@ -368,13 +368,13 @@ class EditScene extends Component {
 
       return {
         variables: newVariables,
-        scene: newScene
+        scene: newScene,
       };
     });
   };
 
   addAction = async (path, options = {}) => {
-    await this.setState(prevState => {
+    await this.setState((prevState) => {
       // Build the nested update object for actions
       const pathSegments = path.split('.');
       let updateObject = { scene: { actions: {} } };
@@ -386,9 +386,9 @@ class EditScene extends Component {
             $push: [
               {
                 type: null,
-                ...options
-              }
-            ]
+                ...options,
+              },
+            ],
           };
         } else {
           current[segment] = {};
@@ -399,30 +399,30 @@ class EditScene extends Component {
       // Add empty variables array for the new action
       const newVariables = {
         ...prevState.variables,
-        [path]: []
+        [path]: [],
       };
 
       return update(prevState, {
         ...updateObject,
-        variables: { $set: newVariables }
+        variables: { $set: newVariables },
       });
     });
 
     await this.addEmptyActionGroupIfNeeded();
   };
 
-  deleteActionGroup = path => {
-    this.setState(prevState => {
+  deleteActionGroup = (path) => {
+    this.setState((prevState) => {
       // Split the path into segments
       const pathSegments = path.split('.');
 
       // Handle variables
       const newVariables = {
-        ...prevState.variables
+        ...prevState.variables,
       };
       Object.keys(prevState.variables)
-        .filter(variablePath => variablePath.startsWith(path))
-        .forEach(pathToDelete => {
+        .filter((variablePath) => variablePath.startsWith(path))
+        .forEach((pathToDelete) => {
           delete newVariables[pathToDelete];
         });
 
@@ -431,12 +431,12 @@ class EditScene extends Component {
         return update(prevState, {
           scene: {
             actions: {
-              $splice: [[parseInt(pathSegments[0], 10), 1]]
-            }
+              $splice: [[parseInt(pathSegments[0], 10), 1]],
+            },
           },
           variables: {
-            $set: newVariables
-          }
+            $set: newVariables,
+          },
         });
       }
 
@@ -444,8 +444,8 @@ class EditScene extends Component {
       let updateObject = {
         scene: { actions: {} },
         variables: {
-          $set: newVariables
-        }
+          $set: newVariables,
+        },
       };
       let actionsPath = updateObject.scene.actions;
 
@@ -480,8 +480,8 @@ class EditScene extends Component {
     });
   };
 
-  deleteAction = path => {
-    this.setState(prevState => {
+  deleteAction = (path) => {
+    this.setState((prevState) => {
       // Remove the action
       const pathSegments = path.split('.');
       let updateObject = { scene: { actions: {} } };
@@ -490,7 +490,7 @@ class EditScene extends Component {
       pathSegments.forEach((segment, index) => {
         if (index === pathSegments.length - 2) {
           current[segment] = {
-            $splice: [[parseInt(pathSegments[index + 1], 10), 1]]
+            $splice: [[parseInt(pathSegments[index + 1], 10), 1]],
           };
         } else if (index < pathSegments.length - 2) {
           current[segment] = {};
@@ -503,16 +503,9 @@ class EditScene extends Component {
       delete newVariables[path];
 
       // Update paths for actions after the deleted one
-      Object.keys(newVariables).forEach(varPath => {
+      Object.keys(newVariables).forEach((varPath) => {
         // Check if the variable path is in the same parent group as the deleted action
-        if (
-          varPath.startsWith(
-            path
-              .split('.')
-              .slice(0, -1)
-              .join('.')
-          )
-        ) {
+        if (varPath.startsWith(path.split('.').slice(0, -1).join('.'))) {
           const remainingVars = newVariables[varPath];
           delete newVariables[varPath];
           const newPath = this.updatePathAfterDeletion(varPath, path);
@@ -525,10 +518,7 @@ class EditScene extends Component {
       // Check if we need to remove an empty action group
       // Only if we are not in a "if" action
       if (!path.includes('if')) {
-        const parentPath = path
-          .split('.')
-          .slice(0, -1)
-          .join('.');
+        const parentPath = path.split('.').slice(0, -1).join('.');
         const parentSegments = parentPath.split('.');
 
         // Get the current action group and check if it will be empty after deletion
@@ -612,7 +602,7 @@ class EditScene extends Component {
 
       return update(prevState, {
         ...updateObject,
-        variables: { $set: newVariables }
+        variables: { $set: newVariables },
       });
     });
   };
@@ -640,7 +630,7 @@ class EditScene extends Component {
   };
 
   updateActionProperty = (path, property, value) => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       // Split the path into segments
       const pathSegments = path.split('.');
 
@@ -652,7 +642,7 @@ class EditScene extends Component {
       pathSegments.forEach((segment, index) => {
         if (index === pathSegments.length - 1) {
           current[segment] = {
-            [property]: { $set: value }
+            [property]: { $set: value },
           };
         } else {
           current[segment] = {};
@@ -667,29 +657,29 @@ class EditScene extends Component {
   highlighCurrentlyExecutedAction = ({ columnIndex, rowIndex }) => {
     this.setState({
       highLightedActions: {
-        [`${columnIndex}:${rowIndex}`]: true
-      }
+        [`${columnIndex}:${rowIndex}`]: true,
+      },
     });
   };
   removeHighlighAction = ({ columnIndex, rowIndex }) => {
     setTimeout(() => {
       this.setState({
         highLightedActions: {
-          [`${columnIndex}:${rowIndex}`]: false
-        }
+          [`${columnIndex}:${rowIndex}`]: false,
+        },
       });
     }, 500);
   };
 
   askDeleteCurrentScene = async () => {
     await this.setState({
-      askDeleteScene: true
+      askDeleteScene: true,
     });
   };
 
   cancelDeleteCurrentScene = async () => {
     await this.setState({
-      askDeleteScene: false
+      askDeleteScene: false,
     });
   };
 
@@ -708,112 +698,112 @@ class EditScene extends Component {
     }
   };
   addTrigger = () => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       const newState = update(prevState, {
         scene: {
           triggers: {
             $push: [
               {
-                type: null
-              }
-            ]
-          }
+                type: null,
+              },
+            ],
+          },
         },
         triggersVariables: {
-          $push: [[]]
-        }
+          $push: [[]],
+        },
       });
       return newState;
     });
   };
-  deleteTrigger = index => {
-    this.setState(prevState => {
+  deleteTrigger = (index) => {
+    this.setState((prevState) => {
       const newState = update(prevState, {
         scene: {
           triggers: {
-            $splice: [[index, 1]]
-          }
+            $splice: [[index, 1]],
+          },
         },
         triggersVariables: {
-          $splice: [[index, 1]]
-        }
+          $splice: [[index, 1]],
+        },
       });
       return newState;
     });
   };
   updateTriggerProperty = (index, property, value) => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       const newState = update(prevState, {
         scene: {
           triggers: {
             [index]: {
               [property]: {
-                $set: value
-              }
-            }
-          }
-        }
+                $set: value,
+              },
+            },
+          },
+        },
       });
       return newState;
     });
   };
 
   setVariables = (path, newVariables) => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       variables: {
         ...prevState.variables,
-        [path]: newVariables
-      }
+        [path]: newVariables,
+      },
     }));
   };
 
   setVariablesTrigger = (index, variables) => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       const newState = update(prevState, {
         triggersVariables: {
           [index]: {
-            $set: variables
-          }
-        }
+            $set: variables,
+          },
+        },
       });
       return newState;
     });
   };
 
-  updateSceneName = e => {
-    this.setState(prevState => {
+  updateSceneName = (e) => {
+    this.setState((prevState) => {
       const newState = update(prevState, {
         scene: {
           name: {
-            $set: e.target.value
-          }
-        }
+            $set: e.target.value,
+          },
+        },
       });
       return newState;
     });
   };
 
-  updateSceneDescription = e => {
-    this.setState(prevState => {
+  updateSceneDescription = (e) => {
+    this.setState((prevState) => {
       const newState = update(prevState, {
         scene: {
           description: {
-            $set: e.target.value
-          }
-        }
+            $set: e.target.value,
+          },
+        },
       });
       return newState;
     });
   };
 
-  updateSceneIcon = e => {
-    this.setState(prevState => {
+  updateSceneIcon = (e) => {
+    this.setState((prevState) => {
       const newState = update(prevState, {
         scene: {
           icon: {
-            $set: e.target.value
-          }
-        }
+            $set: e.target.value,
+          },
+        },
       });
       return newState;
     });
@@ -860,7 +850,7 @@ class EditScene extends Component {
     originalPath.split('.').forEach((segment, index, array) => {
       if (index === array.length - 2) {
         removeActionsPath[segment] = {
-          $splice: [[parseInt(array[array.length - 1], 10), 1]]
+          $splice: [[parseInt(array[array.length - 1], 10), 1]],
         };
       } else if (index < array.length - 2) {
         removeActionsPath[segment] = {};
@@ -878,7 +868,7 @@ class EditScene extends Component {
     destPath.split('.').forEach((segment, index, array) => {
       if (index === array.length - 2) {
         addActionsPath[segment] = {
-          $splice: [[parseInt(array[array.length - 1], 10), 0, element]]
+          $splice: [[parseInt(array[array.length - 1], 10), 0, element]],
         };
       } else if (index < array.length - 2) {
         addActionsPath[segment] = {};
@@ -950,7 +940,7 @@ class EditScene extends Component {
   };
 
   moveCardGroup = async (sourcePath, destPath) => {
-    const getElementByPath = path => {
+    const getElementByPath = (path) => {
       const parts = path.split('.');
       const lastPart = parts.pop();
       const arrayPath = parts.join('.');
@@ -963,7 +953,7 @@ class EditScene extends Component {
 
       return {
         array,
-        index: parseInt(lastPart, 10)
+        index: parseInt(lastPart, 10),
       };
     };
 
@@ -1030,7 +1020,7 @@ class EditScene extends Component {
       // Set the new state
       await this.setState({
         ...newState,
-        variables: newVariables
+        variables: newVariables,
       });
 
       await this.addEmptyActionGroupIfNeeded();
@@ -1040,14 +1030,14 @@ class EditScene extends Component {
     }
   };
 
-  setTags = tags => {
-    this.setState(prevState => {
+  setTags = (tags) => {
+    this.setState((prevState) => {
       const newState = update(prevState, {
         scene: {
           tags: {
-            $set: tags.map(tag => ({ name: tag }))
-          }
-        }
+            $set: tags.map((tag) => ({ name: tag })),
+          },
+        },
       });
       return newState;
     });
@@ -1057,7 +1047,7 @@ class EditScene extends Component {
     try {
       const tags = await this.props.httpClient.get(`/api/v1/tag_scene`);
       this.setState({
-        tags
+        tags,
       });
     } catch (e) {
       console.error(e);
@@ -1124,18 +1114,18 @@ class EditScene extends Component {
     this.state = {
       scene: null,
       variables: {},
-      triggersVariables: []
+      triggersVariables: [],
     };
   }
 
   componentDidMount() {
     this.getSceneBySelector();
     this.getTags();
-    this.props.session.dispatcher.addListener('scene.executing-action', payload =>
-      this.highlighCurrentlyExecutedAction(payload)
+    this.props.session.dispatcher.addListener('scene.executing-action', (payload) =>
+      this.highlighCurrentlyExecutedAction(payload),
     );
-    this.props.session.dispatcher.addListener('scene.finished-executing-action', payload =>
-      this.removeHighlighAction(payload)
+    this.props.session.dispatcher.addListener('scene.finished-executing-action', (payload) =>
+      this.removeHighlighAction(payload),
     );
   }
 

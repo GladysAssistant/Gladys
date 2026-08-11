@@ -14,13 +14,13 @@ import linkState from 'linkstate';
 class CreateAccountGladysGateway extends Component {
   state = {
     step: 1,
-    backupKey: ''
+    backupKey: '',
   };
   saveBackupKey = async () => {
     this.setState({ loading: true, error: false });
     try {
       await this.props.httpClient.post('/api/v1/gateway/backup-key', {
-        backup_key: this.state.backupKey
+        backup_key: this.state.backupKey,
       });
       await this.props.getBackups();
       this.setState({ loading: false, step: 3 });
@@ -28,17 +28,17 @@ class CreateAccountGladysGateway extends Component {
       this.setState({ loading: false, error: true });
     }
   };
-  restoreBackup = async fileUrl => {
+  restoreBackup = async (fileUrl) => {
     this.setState({
       step: 4,
-      gatewayRestoreErrored: false
+      gatewayRestoreErrored: false,
     });
     try {
       // The POST must be awaited before polling the restore status, otherwise
       // the first poll can reach the server before the restore has started and
       // be misread as a finished restore.
       await this.props.httpClient.post('/api/v1/gateway/backup/restore', {
-        file_url: fileUrl
+        file_url: fileUrl,
       });
       this.getRestoreStatus();
     } catch (e) {
@@ -51,7 +51,7 @@ class CreateAccountGladysGateway extends Component {
 
       if (restoreStatus.restore_errored) {
         this.setState({
-          gatewayRestoreErrored: true
+          gatewayRestoreErrored: true,
         });
       } else {
         // A successful restore keeps "restore_in_progress" true until Gladys
@@ -163,5 +163,5 @@ class CreateAccountGladysGateway extends Component {
 
 export default connect(
   'user,session,httpClient,gatewayBackups,gatewayGetBackupsStatus,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
-  actions
+  actions,
 )(CreateAccountGladysGateway);

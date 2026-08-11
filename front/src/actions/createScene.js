@@ -17,7 +17,7 @@ function createActions(store) {
         newSceneErrors.icon = true;
       }
       store.setState({
-        newSceneErrors
+        newSceneErrors,
       });
       return Object.keys(newSceneErrors).length > 0;
     },
@@ -28,23 +28,23 @@ function createActions(store) {
         return;
       }
       store.setState({
-        createSceneStatus: RequestStatus.Getting
+        createSceneStatus: RequestStatus.Getting,
       });
       try {
         const createdScene = await state.httpClient.post('/api/v1/scene', state.newScene);
         store.setState({
-          createSceneStatus: RequestStatus.Success
+          createSceneStatus: RequestStatus.Success,
         });
         route(`/dashboard/scene/${createdScene.selector}`);
       } catch (e) {
         const status = get(e, 'response.status');
         if (status === 409) {
           store.setState({
-            createSceneStatus: RequestStatus.ConflictError
+            createSceneStatus: RequestStatus.ConflictError,
           });
         } else {
           store.setState({
-            createSceneStatus: RequestStatus.Error
+            createSceneStatus: RequestStatus.Error,
           });
         }
       }
@@ -55,19 +55,19 @@ function createActions(store) {
           name: '',
           icon: null,
           actions: [[]],
-          tags: []
+          tags: [],
         },
         newSceneErrors: null,
-        createSceneStatus: null
+        createSceneStatus: null,
       });
     },
     updateNewSceneName(state, e) {
       const newState = update(state, {
         newScene: {
           name: {
-            $set: e.target.value
-          }
-        }
+            $set: e.target.value,
+          },
+        },
       });
       store.setState(newState);
       if (state.newSceneErrors) {
@@ -78,15 +78,15 @@ function createActions(store) {
       const newState = update(state, {
         newScene: {
           icon: {
-            $set: e.target.value
-          }
-        }
+            $set: e.target.value,
+          },
+        },
       });
       store.setState(newState);
       if (state.newSceneErrors) {
         actions.checkErrors(store.getState());
       }
-    }
+    },
   };
   return actions;
 }

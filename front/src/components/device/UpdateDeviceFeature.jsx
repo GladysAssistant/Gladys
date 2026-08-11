@@ -4,28 +4,28 @@ import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
-  DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE
+  DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE,
 } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
 
 const DEVICE_FEATURE_COMPATIBLE_CATEGORY = {
   [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: [DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_CATEGORIES.SWITCH],
-  [DEVICE_FEATURE_TYPES.SHUTTER.STATE]: [DEVICE_FEATURE_CATEGORIES.SHUTTER, DEVICE_FEATURE_CATEGORIES.CURTAIN]
+  [DEVICE_FEATURE_TYPES.SHUTTER.STATE]: [DEVICE_FEATURE_CATEGORIES.SHUTTER, DEVICE_FEATURE_CATEGORIES.CURTAIN],
 };
 
 class UpdateDeviceFeature extends Component {
-  updateName = e => this.props.updateFeatureProperty(this.props.featureIndex, 'name', e.target.value);
-  updateExternalId = e => this.props.updateFeatureProperty(this.props.featureIndex, 'external_id', e.target.value);
-  updateMin = e => this.props.updateFeatureProperty(this.props.featureIndex, 'min', e.target.value);
-  updateMax = e => this.props.updateFeatureProperty(this.props.featureIndex, 'max', e.target.value);
-  updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
-  updateCategory = e => this.props.updateFeatureProperty(this.props.featureIndex, 'category', e.target.value);
+  updateName = (e) => this.props.updateFeatureProperty(this.props.featureIndex, 'name', e.target.value);
+  updateExternalId = (e) => this.props.updateFeatureProperty(this.props.featureIndex, 'external_id', e.target.value);
+  updateMin = (e) => this.props.updateFeatureProperty(this.props.featureIndex, 'min', e.target.value);
+  updateMax = (e) => this.props.updateFeatureProperty(this.props.featureIndex, 'max', e.target.value);
+  updateUnit = (e) => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
+  updateCategory = (e) => this.props.updateFeatureProperty(this.props.featureIndex, 'category', e.target.value);
   updateKeepHistory = () => {
     const e = {
       target: {
-        value: !this.props.feature.keep_history
-      }
+        value: !this.props.feature.keep_history,
+      },
     };
     this.props.updateFeatureProperty(this.props.featureIndex, 'keep_history', e.target.value);
   };
@@ -81,7 +81,7 @@ class UpdateDeviceFeature extends Component {
                     onChange={this.updateCategory}
                     class="form-control"
                   >
-                    {DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type].map(type => (
+                    {DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type].map((type) => (
                       <option value={type}>
                         <Text id={`deviceFeatureCategory.${type}.shortCategoryName`}>{type}</Text>
                       </option>
@@ -122,7 +122,7 @@ class UpdateDeviceFeature extends Component {
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {availableUnits.map(unit => (
+                    {availableUnits.map((unit) => (
                       <option value={unit}>
                         <Text id={`deviceFeatureUnit.${unit}`}>{unit}</Text>
                       </option>

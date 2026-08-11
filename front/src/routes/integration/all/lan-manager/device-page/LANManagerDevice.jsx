@@ -33,17 +33,17 @@ class LANManagerDevice extends Component {
     }
     this.setState({ loading: false });
   };
-  updateName = e => {
+  updateName = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
   render({ device, houses }, { loading, tooMuchStatesError, statesNumber }) {
-    const manufacturer = device.params.find(param => param.name === PARAMS.MANUFACTURER);
-    const macAddress = device.params.find(param => param.name === PARAMS.MAC);
-    const orginalName = device.params.find(param => param.name === PARAMS.NAME);
+    const manufacturer = device.params.find((param) => param.name === PARAMS.MANUFACTURER);
+    const macAddress = device.params.find((param) => param.name === PARAMS.MAC);
+    const orginalName = device.params.find((param) => param.name === PARAMS.NAME);
 
     return (
       <div class="col-md-6">
@@ -51,7 +51,7 @@ class LANManagerDevice extends Component {
           <div class="card-header">{device.name}</div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -85,9 +85,9 @@ class LANManagerDevice extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {houses &&
-                      houses.map(house => (
+                      houses.map((house) => (
                         <optgroup label={house.name}>
-                          {house.rooms.map(room => (
+                          {house.rooms.map((room) => (
                             <option selected={room.id === device.room_id} value={room.id}>
                               {room.name}
                             </option>

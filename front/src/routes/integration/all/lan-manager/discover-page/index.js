@@ -29,5 +29,5 @@ class LANManagerDiscoverPage extends Component {
 
 export default connect(
   'session,user,httpClient,houses,lanManagerDiscoveredDevices,lanManagerGetDiscoveredDevicesStatus,lanManagerDiscoverUpdate,lanManagerStatus,filterExisting',
-  actions
+  actions,
 )(LANManagerDiscoverPage);

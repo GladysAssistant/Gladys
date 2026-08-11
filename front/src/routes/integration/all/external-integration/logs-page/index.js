@@ -39,7 +39,7 @@ class ExternalIntegrationLogsPage extends Component {
     }
   };
 
-  selectContainer = e => {
+  selectContainer = (e) => {
     this.setState({ selectedContainer: e.target.value }, this.getLogs);
   };
 
@@ -62,7 +62,7 @@ class ExternalIntegrationLogsPage extends Component {
   }
 
   render(props, { integration, logs, logsStatus, selectedContainer = MAIN_CONTAINER }) {
-    const subContainers = (get(integration, 'manifest.containers') || []).map(container => container.name);
+    const subContainers = (get(integration, 'manifest.containers') || []).map((container) => container.name);
     return (
       <ExternalIntegrationPage selector={props.selector} integration={integration}>
         <LogsTab

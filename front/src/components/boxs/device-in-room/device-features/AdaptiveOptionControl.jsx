@@ -13,21 +13,21 @@ import style from './AdaptiveOptionControl.css';
  */
 // A stable signature of the option set: the buttons-vs-dropdown layout depends on the number of
 // options and their rendered labels, so a change in either must re-run the coordinator.
-const optionsSignature = options =>
+const optionsSignature = (options) =>
   (Array.isArray(options) ? options : [])
-    .map(option => `${option.value}:${option.i18nKey || option.label || ''}`)
+    .map((option) => `${option.value}:${option.i18nKey || option.label || ''}`)
     .join('|');
 
 class AdaptiveOptionControl extends Component {
-  setCell = element => {
+  setCell = (element) => {
     this.cell = element;
   };
 
-  setButtons = element => {
+  setButtons = (element) => {
     this.buttons = element;
   };
 
-  setSelect = element => {
+  setSelect = (element) => {
     this.select = element;
     // Hidden by default (buttons first); the coordinator reveals it if the buttons don't fit.
     // Done here rather than via a JSX `style` prop so Preact never manages this element's display
@@ -37,7 +37,7 @@ class AdaptiveOptionControl extends Component {
     }
   };
 
-  setProbe = element => {
+  setProbe = (element) => {
     this.probe = element;
   };
 
@@ -45,7 +45,7 @@ class AdaptiveOptionControl extends Component {
   // the DOM (synchronously) so it can measure overflow between switches.
   control = {
     mode: 'buttons',
-    show: mode => {
+    show: (mode) => {
       if (!this.buttons || !this.select) {
         return;
       }
@@ -53,7 +53,7 @@ class AdaptiveOptionControl extends Component {
       this.buttons.style.display = mode === 'buttons' ? '' : 'none';
       this.select.style.display = mode === 'buttons' ? 'none' : '';
     },
-    requiredWidth: () => (this.probe ? this.probe.getBoundingClientRect().width : 0)
+    requiredWidth: () => (this.probe ? this.probe.getBoundingClientRect().width : 0),
   };
 
   componentDidMount() {
@@ -77,7 +77,7 @@ class AdaptiveOptionControl extends Component {
     }
   }
 
-  updateFromSelect = e => {
+  updateFromSelect = (e) => {
     this.props.updateValue(Number(e.currentTarget.value));
   };
 
@@ -99,7 +99,7 @@ class AdaptiveOptionControl extends Component {
       <td class="py-0" ref={this.setCell}>
         <div class="d-flex justify-content-end">
           <div class="btn-group" role="group" ref={this.setButtons}>
-            {options.map(option => (
+            {options.map((option) => (
               <button
                 type="button"
                 key={option.value}
@@ -112,7 +112,7 @@ class AdaptiveOptionControl extends Component {
           </div>
           <div class="form-group mb-0" ref={this.setSelect}>
             <select value={value} onChange={this.updateFromSelect} class="form-control form-control-sm">
-              {options.map(option => (
+              {options.map((option) => (
                 <option value={option.value} key={option.value}>
                   {this.renderLabel(option)}
                 </option>
@@ -124,7 +124,7 @@ class AdaptiveOptionControl extends Component {
             control collapses first. Absolutely positioned so it never affects the table layout. */}
         <div ref={this.setProbe} aria-hidden="true" class={style.probe}>
           <div class="btn-group">
-            {options.map(option => (
+            {options.map((option) => (
               <span class="btn btn-sm btn-secondary" key={option.value}>
                 {this.renderLabel(option)}
               </span>

@@ -6,7 +6,7 @@ import SetupRemoteOptions from './SetupRemoteOptions';
 import SetupRemoteSummary from './SetupRemoteSummary';
 
 class SetupRemoteMode extends Component {
-  saveConfiguration = configuration => {
+  saveConfiguration = (configuration) => {
     this.props.saveConfiguration(configuration);
   };
 
@@ -29,7 +29,7 @@ class SetupRemoteMode extends Component {
     const { configuration = {} } = props;
 
     this.state = {
-      editionMode: !configuration.mqttMode
+      editionMode: !configuration.mqttMode,
     };
   }
 

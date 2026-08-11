@@ -16,7 +16,7 @@ export function unlockSpeechTtsPlayback(audio) {
     },
     () => {
       /* Strict autoplay policies: TTS may still fail later; response text remains visible. */
-    }
+    },
   );
 }
 

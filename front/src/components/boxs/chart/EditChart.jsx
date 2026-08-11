@@ -15,12 +15,12 @@ import { DEFAULT_COLORS, DEFAULT_COLORS_NAME } from './ApexChartComponent';
 
 const FEATURES_THAT_ARE_NOT_COMPATIBLE = {
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: true,
-  [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: true
+  [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: true,
 };
 
 const FEATURE_BINARY = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true,
-  [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: true
+  [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: true,
 };
 
 const CHART_TYPE_OTHERS = ['line', 'stepline', 'area', 'bar'];
@@ -37,12 +37,12 @@ const square = (color = 'transparent') => ({
     display: 'block',
     marginRight: 8,
     height: 10,
-    width: 10
-  }
+    width: 10,
+  },
 });
 
 const colorSelectorStyles = {
-  control: styles => ({ ...styles, backgroundColor: 'white' }),
+  control: (styles) => ({ ...styles, backgroundColor: 'white' }),
   option: (styles, { data, isDisabled, isFocused, isSelected }) => {
     const { value: color } = data;
     return {
@@ -53,29 +53,29 @@ const colorSelectorStyles = {
 
       ':active': {
         ...styles[':active'],
-        backgroundColor: !isDisabled ? color : undefined
-      }
+        backgroundColor: !isDisabled ? color : undefined,
+      },
     };
   },
-  input: styles => ({ ...styles, ...square() }),
-  placeholder: styles => ({ ...styles, ...square('#ccc') }),
-  singleValue: (styles, { data }) => ({ ...styles, ...square(data.value) })
+  input: (styles) => ({ ...styles, ...square() }),
+  placeholder: (styles) => ({ ...styles, ...square('#ccc') }),
+  singleValue: (styles, { data }) => ({ ...styles, ...square(data.value) }),
 };
 
 class EditChart extends Component {
   showPreview = () => {
     this.setState({
-      displayPreview: true
+      displayPreview: true,
     });
   };
 
   toggleAdvancedOptions = () => {
-    this.setState(prevState => ({
-      showAdvancedOptions: !prevState.showAdvancedOptions
+    this.setState((prevState) => ({
+      showAdvancedOptions: !prevState.showAdvancedOptions,
     }));
   };
 
-  updateDefaultInterval = e => {
+  updateDefaultInterval = (e) => {
     if (e.target.value && e.target.value.length) {
       this.props.updateBoxConfig(this.props.x, this.props.y, { interval: e.target.value });
     } else {
@@ -83,7 +83,7 @@ class EditChart extends Component {
     }
   };
 
-  updateChartType = e => {
+  updateChartType = (e) => {
     if (e.target.value && e.target.value.length) {
       this.props.updateBoxConfig(this.props.x, this.props.y, { chart_type: e.target.value });
     } else {
@@ -113,7 +113,7 @@ class EditChart extends Component {
     this.props.updateBoxConfig(this.props.x, this.props.y, { colors });
   };
 
-  updateDisplayAxes = e => {
+  updateDisplayAxes = (e) => {
     if (e.target.value && e.target.value.length) {
       const valueBoolean = e.target.value === 'yes';
       this.props.updateBoxConfig(this.props.x, this.props.y, { display_axes: valueBoolean });
@@ -122,7 +122,7 @@ class EditChart extends Component {
     }
   };
 
-  updateDisplayVariation = e => {
+  updateDisplayVariation = (e) => {
     if (e.target.value && e.target.value.length) {
       const valueBoolean = e.target.value === 'yes';
       this.props.updateBoxConfig(this.props.x, this.props.y, { display_variation: valueBoolean });
@@ -131,15 +131,15 @@ class EditChart extends Component {
     }
   };
 
-  updateAggregateFunction = e => {
+  updateAggregateFunction = (e) => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { aggregate_function: e.target.value });
   };
 
-  updateGroupBy = e => {
+  updateGroupBy = (e) => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { group_by: e.target.value ? e.target.value : undefined });
   };
 
-  updateBoxTitle = e => {
+  updateBoxTitle = (e) => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { title: e.target.value });
   };
 
@@ -160,7 +160,7 @@ class EditChart extends Component {
     }
   };
 
-  addDeviceFeature = async selectedDeviceFeatureOption => {
+  addDeviceFeature = async (selectedDeviceFeatureOption) => {
     const newSelectedDeviceFeaturesOptions = [...this.state.selectedDeviceFeaturesOptions, selectedDeviceFeatureOption];
     await this.setState({ selectedDeviceFeaturesOptions: newSelectedDeviceFeaturesOptions });
     this.refreshDeviceUnitAndChartType(newSelectedDeviceFeaturesOptions);
@@ -168,23 +168,23 @@ class EditChart extends Component {
   };
 
   refreshDeviceFeaturesNames = () => {
-    const newDeviceFeatureNames = this.state.selectedDeviceFeaturesOptions.map(o => {
+    const newDeviceFeatureNames = this.state.selectedDeviceFeaturesOptions.map((o) => {
       return o.new_label !== undefined && o.new_label !== '' ? o.new_label : o.label;
     });
-    const newDeviceFeature = this.state.selectedDeviceFeaturesOptions.map(o => {
+    const newDeviceFeature = this.state.selectedDeviceFeaturesOptions.map((o) => {
       return o.value;
     });
     // The units must always stay aligned with the device features: they are read by index
     // in the chart. Re-computing them here keeps them in sync when features are re-ordered,
     // and refreshes units that changed since the box was configured.
-    const newUnits = this.state.selectedDeviceFeaturesOptions.map(o => {
+    const newUnits = this.state.selectedDeviceFeaturesOptions.map((o) => {
       const deviceFeature = this.deviceFeatureBySelector.get(o.value);
       return deviceFeature ? deviceFeature.unit : null;
     });
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       device_feature_names: newDeviceFeatureNames,
       device_features: newDeviceFeature,
-      units: newUnits
+      units: newUnits,
     });
   };
 
@@ -201,7 +201,7 @@ class EditChart extends Component {
     this.setState({ chartTypeList });
   };
 
-  refreshDeviceUnitAndChartType = selectedDeviceFeaturesOptions => {
+  refreshDeviceUnitAndChartType = (selectedDeviceFeaturesOptions) => {
     const firstDeviceSelector =
       selectedDeviceFeaturesOptions.length > 0
         ? this.deviceFeatureBySelector.get(selectedDeviceFeaturesOptions[0].value)
@@ -209,23 +209,23 @@ class EditChart extends Component {
 
     if (selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 0) {
       const deviceFeaturesSelectors = selectedDeviceFeaturesOptions.map(
-        selectedDeviceFeaturesOption => selectedDeviceFeaturesOption.value
+        (selectedDeviceFeaturesOption) => selectedDeviceFeaturesOption.value,
       );
-      const units = selectedDeviceFeaturesOptions.map(selectedDeviceFeaturesOption => {
+      const units = selectedDeviceFeaturesOptions.map((selectedDeviceFeaturesOption) => {
         const deviceFeature = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOption.value);
         return deviceFeature.unit;
       });
       this.props.updateBoxConfig(this.props.x, this.props.y, {
         device_features: deviceFeaturesSelectors,
         units,
-        unit: undefined
+        unit: undefined,
       });
     } else {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
         device_features: [],
         units: [],
         unit: undefined,
-        chart_type: ''
+        chart_type: '',
       });
       this.setState({ chart_type: '' });
     }
@@ -246,7 +246,7 @@ class EditChart extends Component {
       return;
     }
     const { deviceOptions, selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(
-      this.state.devices
+      this.state.devices,
     );
     await this.setState({ deviceOptions, selectedDeviceFeaturesOptions });
   };
@@ -256,10 +256,10 @@ class EditChart extends Component {
       selectedDeviceFeaturesOptions: {
         [index]: {
           new_label: {
-            $set: name
-          }
-        }
-      }
+            $set: name,
+          },
+        },
+      },
     });
     await this.setState(newState);
 
@@ -272,12 +272,12 @@ class EditChart extends Component {
     const deviceOptions = [];
     let selectedDeviceFeaturesOptions = [];
 
-    devices.forEach(device => {
+    devices.forEach((device) => {
       const deviceFeaturesOptions = [];
-      device.features.forEach(feature => {
+      device.features.forEach((feature) => {
         const featureOption = {
           value: feature.selector,
-          label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+          label: getDeviceFeatureName(this.props.intl.dictionary, device, feature),
         };
         this.deviceFeatureBySelector.set(feature.selector, feature);
         // We don't support all devices for this view
@@ -316,12 +316,12 @@ class EditChart extends Component {
           return 0;
         });
         const filteredDeviceFeatures = deviceFeaturesOptions.filter(
-          feature => !selectedDeviceFeaturesOptions.some(selected => selected.value === feature.value)
+          (feature) => !selectedDeviceFeaturesOptions.some((selected) => selected.value === feature.value),
         );
         if (filteredDeviceFeatures.length > 0) {
           deviceOptions.push({
             label: device.name,
-            options: filteredDeviceFeatures
+            options: filteredDeviceFeatures,
           });
         }
       }
@@ -332,14 +332,14 @@ class EditChart extends Component {
       const firstDeviceSelector = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOptions[0].value);
       this.refreshChartTypeList(firstDeviceSelector);
       if (FEATURE_BINARY[firstDeviceSelector.type]) {
-        deviceOptions.forEach(deviceOption => {
-          deviceOption.options = deviceOption.options.filter(featureOption => {
+        deviceOptions.forEach((deviceOption) => {
+          deviceOption.options = deviceOption.options.filter((featureOption) => {
             return FEATURE_BINARY[this.deviceFeatureBySelector.get(featureOption.value).type];
           });
         });
       } else {
-        deviceOptions.forEach(deviceOption => {
-          deviceOption.options = deviceOption.options.filter(featureOption => {
+        deviceOptions.forEach((deviceOption) => {
+          deviceOption.options = deviceOption.options.filter((featureOption) => {
             return !FEATURE_BINARY[this.deviceFeatureBySelector.get(featureOption.value).type];
           });
         });
@@ -347,7 +347,7 @@ class EditChart extends Component {
     }
     if (this.props.box.device_features) {
       selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions.sort(
-        (a, b) => this.props.box.device_features.indexOf(a.value) - this.props.box.device_features.indexOf(b.value)
+        (a, b) => this.props.box.device_features.indexOf(a.value) - this.props.box.device_features.indexOf(b.value),
       );
     }
     return { deviceOptions, selectedDeviceFeaturesOptions };
@@ -360,7 +360,7 @@ class EditChart extends Component {
       const devices = await this.props.httpClient.get(`/api/v1/device`);
       const { deviceOptions, selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(
         devices,
-        chartType
+        chartType,
       );
       await this.setState({ devices, deviceOptions, selectedDeviceFeaturesOptions, loading: false });
       this.refreshDeviceFeaturesNames();
@@ -376,13 +376,13 @@ class EditChart extends Component {
 
     const newStateWithoutElement = update(this.state, {
       selectedDeviceFeaturesOptions: {
-        $splice: [[currentIndex, 1]]
-      }
+        $splice: [[currentIndex, 1]],
+      },
     });
     const newState = update(newStateWithoutElement, {
       selectedDeviceFeaturesOptions: {
-        $splice: [[newIndex, 0, element]]
-      }
+        $splice: [[newIndex, 0, element]],
+      },
     });
     await this.setState(newState);
     this.refreshDeviceFeaturesNames();
@@ -390,27 +390,27 @@ class EditChart extends Component {
     if (this.props.box.colors && this.props.box.colors[currentIndex]) {
       const currentColor = this.props.box.colors[currentIndex];
       const newArrayWithoutOldColor = update(this.props.box.colors, {
-        $splice: [[currentIndex, 1]]
+        $splice: [[currentIndex, 1]],
       });
       const newColorsArray = update(newArrayWithoutOldColor, {
-        $splice: [[newIndex, 0, currentColor]]
+        $splice: [[newIndex, 0, currentColor]],
       });
       this.props.updateBoxConfig(this.props.x, this.props.y, {
-        colors: newColorsArray
+        colors: newColorsArray,
       });
     }
   };
 
-  removeDevice = async index => {
+  removeDevice = async (index) => {
     const newStateWithoutElement = update(this.state, {
       selectedDeviceFeaturesOptions: {
-        $splice: [[index, 1]]
-      }
+        $splice: [[index, 1]],
+      },
     });
     // Update color array
     if (this.props.box.colors) {
       const newColors = update(this.props.box.colors, {
-        $splice: [[index, 1]]
+        $splice: [[index, 1]],
       });
       this.props.updateBoxConfig(this.props.x, this.props.y, { colors: newColors });
     }
@@ -430,7 +430,7 @@ class EditChart extends Component {
       loading: false,
       displayPreview: false,
       showAdvancedOptions: false,
-      chartTypeList: [...CHART_TYPE_BINARY, ...CHART_TYPE_OTHERS]
+      chartTypeList: [...CHART_TYPE_BINARY, ...CHART_TYPE_OTHERS],
     };
   }
 
@@ -448,12 +448,12 @@ class EditChart extends Component {
 
   render(
     props,
-    { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview, showAdvancedOptions, chartTypeList }
+    { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview, showAdvancedOptions, chartTypeList },
   ) {
     const manyFeatures = selectedDeviceFeaturesOptions && selectedDeviceFeaturesOptions.length > 1;
     const colorOptions = DEFAULT_COLORS.map((colorValue, i) => ({
       value: colorValue,
-      label: props.intl.dictionary.color[DEFAULT_COLORS_NAME[i]] || DEFAULT_COLORS_NAME[i]
+      label: props.intl.dictionary.color[DEFAULT_COLORS_NAME[i]] || DEFAULT_COLORS_NAME[i],
     }));
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart" titleValue={props.box.title}>
@@ -512,7 +512,7 @@ class EditChart extends Component {
                   <Text id="global.emptySelectOption" />
                 </option>
                 {chartTypeList &&
-                  chartTypeList.map(chartType => (
+                  chartTypeList.map((chartType) => (
                     <option value={chartType}>
                       <Text id={`dashboard.boxes.chart.${chartType}`} />
                     </option>

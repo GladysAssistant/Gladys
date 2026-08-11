@@ -3,7 +3,7 @@ import debounce from 'debounce';
 import { RequestStatus } from '../../../../utils/consts';
 import createActionsIntegration from '../../../../actions/integration';
 
-const getDeviceSortRank = device => {
+const getDeviceSortRank = (device) => {
   const features = device.features || [];
   const validModel = features.length > 0 || device.needAuthentication;
   if (!validModel) return 3; // Unsupported model last
@@ -12,10 +12,10 @@ const getDeviceSortRank = device => {
   return 2; // Then already created devices
 };
 
-const getDeviceNameKey = device => (device.name || '').toLowerCase();
-const getDeviceTopicKey = device => (device.external_id || '').replace(/^tasmota:/, '').toLowerCase();
+const getDeviceNameKey = (device) => (device.name || '').toLowerCase();
+const getDeviceTopicKey = (device) => (device.external_id || '').replace(/^tasmota:/, '').toLowerCase();
 
-const sortDiscoveredDevices = devices => {
+const sortDiscoveredDevices = (devices) => {
   return [...devices].sort((a, b) => {
     const rankDiff = getDeviceSortRank(a) - getDeviceSortRank(b);
     if (rankDiff !== 0) return rankDiff;
@@ -32,11 +32,11 @@ function createActions(store) {
   const actions = {
     async getTasmotaDevices(state) {
       store.setState({
-        getTasmotaStatus: RequestStatus.Getting
+        getTasmotaStatus: RequestStatus.Getting,
       });
       try {
         const options = {
-          order_dir: state.getTasmotaOrderDir || 'asc'
+          order_dir: state.getTasmotaOrderDir || 'asc',
         };
         if (state.tasmotaSearch && state.tasmotaSearch.length) {
           options.search = state.tasmotaSearch;
@@ -45,50 +45,50 @@ function createActions(store) {
         const tasmotaDevices = await state.httpClient.get('/api/v1/service/tasmota/device', options);
         store.setState({
           tasmotaDevices,
-          getTasmotaStatus: RequestStatus.Success
+          getTasmotaStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
           philipsHueGetBridgesStatus: RequestStatus.Error,
-          getTasmotaStatus: e.message
+          getTasmotaStatus: e.message,
         });
       }
     },
     async getDiscoveredTasmotaDevices(state, type) {
       store.setState({
-        loading: true
+        loading: true,
       });
       try {
         const discoveredDevices = await state.httpClient.get(`/api/v1/service/tasmota/discover/${type}`);
         store.setState({
           discoveredDevices: sortDiscoveredDevices(discoveredDevices),
           loading: false,
-          errorLoading: false
+          errorLoading: false,
         });
       } catch (e) {
         store.setState({
           discoveredDevices: undefined,
           loading: false,
-          errorLoading: true
+          errorLoading: true,
         });
       }
     },
     async getHouses(state) {
       store.setState({
-        housesGetStatus: RequestStatus.Getting
+        housesGetStatus: RequestStatus.Getting,
       });
       try {
         const params = {
-          expand: 'rooms'
+          expand: 'rooms',
         };
         const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
         store.setState({
           housesWithRooms,
-          housesGetStatus: RequestStatus.Success
+          housesGetStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          housesGetStatus: RequestStatus.Error
+          housesGetStatus: RequestStatus.Error,
         });
       }
     },
@@ -96,12 +96,12 @@ function createActions(store) {
       const devices = update(state[listName], {
         [index]: {
           [field]: {
-            $set: value
-          }
-        }
+            $set: value,
+          },
+        },
       });
       store.setState({
-        [listName]: devices
+        [listName]: devices,
       });
     },
     updateFeatureProperty(state, listName, deviceIndex, featureIndex, property, value) {
@@ -110,25 +110,25 @@ function createActions(store) {
           features: {
             [featureIndex]: {
               [property]: {
-                $set: value
-              }
-            }
-          }
-        }
+                $set: value,
+              },
+            },
+          },
+        },
       });
 
       store.setState({
-        [listName]: devices
+        [listName]: devices,
       });
     },
     async saveDevice(state, listName, index) {
       const device = state[listName][index];
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
       const devices = update(state[listName], {
-        $splice: [[index, 1, savedDevice]]
+        $splice: [[index, 1, savedDevice]],
       });
       store.setState({
-        [listName]: devices
+        [listName]: devices,
       });
     },
     async deleteDevice(state, index) {
@@ -137,42 +137,42 @@ function createActions(store) {
         await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       }
       const tasmotaDevices = update(state.tasmotaDevices, {
-        $splice: [[index, 1]]
+        $splice: [[index, 1]],
       });
       store.setState({
-        tasmotaDevices
+        tasmotaDevices,
       });
     },
     async search(state, e) {
       store.setState({
-        tasmotaSearch: e.target.value
+        tasmotaSearch: e.target.value,
       });
       await actions.getTasmotaDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getTasmotaOrderDir: e.target.value
+        getTasmotaOrderDir: e.target.value,
       });
       await actions.getTasmotaDevices(store.getState());
     },
     async searchDevices(state, type, options = undefined) {
       store.setState({
-        loading: true
+        loading: true,
       });
       try {
         await state.httpClient.post(`/api/v1/service/tasmota/discover/${type}`, options);
         store.setState({
           discoveredDevices: [],
-          errorLoading: false
+          errorLoading: false,
         });
 
         setTimeout(store.setState, 5000, {
-          loading: false
+          loading: false,
         });
       } catch (e) {
         store.setState({
           loading: false,
-          errorLoading: true
+          errorLoading: true,
         });
       }
     },
@@ -181,7 +181,7 @@ function createActions(store) {
       const options = {
         singleAddress: device.external_id.replace('tasmota:', ''),
         username,
-        password
+        password,
       };
       await state.httpClient.post('/api/v1/service/tasmota/discover/http', options);
     },
@@ -190,7 +190,7 @@ function createActions(store) {
       const newDevices = [];
 
       let added = false;
-      existingDevices.forEach(device => {
+      existingDevices.forEach((device) => {
         if (device.external_id === newDevice.external_id) {
           newDevices.push(newDevice);
           added = true;
@@ -205,9 +205,9 @@ function createActions(store) {
 
       store.setState({
         discoveredDevices: sortDiscoveredDevices(newDevices),
-        loading: false
+        loading: false,
       });
-    }
+    },
   };
   actions.debouncedSearch = debounce(actions.search, 200);
 

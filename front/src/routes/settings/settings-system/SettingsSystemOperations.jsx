@@ -13,7 +13,7 @@ const SettingsSystemOperations = ({
   websocketConnected,
   SystemGetInfosStatus,
   CheckForUpdatesStatus,
-  checkForUpdates
+  checkForUpdates,
 }) => {
   const imagePinned = systemInfos && systemInfos.docker_image_pinned === true;
   const checkingForUpdates = CheckForUpdatesStatus === RequestStatus.Getting;
@@ -76,7 +76,7 @@ const SettingsSystemOperations = ({
                       fields={{
                         image: upgradeError.image,
                         recommendedImage: upgradeError.recommended_image,
-                        statusCode: upgradeError.status_code
+                        statusCode: upgradeError.status_code,
                       }}
                     />
                   </div>
@@ -105,7 +105,7 @@ const SettingsSystemOperations = ({
                                 overflowY: 'auto',
                                 fontFamily: 'monospace',
                                 whiteSpace: 'pre-wrap',
-                                wordBreak: 'break-word'
+                                wordBreak: 'break-word',
                               }}
                             >
                               {watchtowerLogs.map((log, index) => (

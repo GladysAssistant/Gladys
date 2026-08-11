@@ -22,5 +22,5 @@ class MqttDevicePage extends Component {
 
 export default connect(
   'session,user,mqttDevices,houses,getMqttDevicesStatus,mqttDeviceSearch,getMqttDeviceOrderDir',
-  actions
+  actions,
 )(MqttDevicePage);

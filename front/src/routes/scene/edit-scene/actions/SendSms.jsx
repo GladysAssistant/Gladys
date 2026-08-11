@@ -5,7 +5,7 @@ import { Localizer, Text } from 'preact-i18n';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
 class SendSms extends Component {
-  updateText = text => {
+  updateText = (text) => {
     this.props.updateActionProperty(this.props.path, 'text', text);
   };
 

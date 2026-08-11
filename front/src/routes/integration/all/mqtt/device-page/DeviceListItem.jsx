@@ -33,7 +33,7 @@ class DeviceListItem extends Component {
       return null;
     }
     const batteryFeature = this.props.device.features.find(
-      feature => feature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
+      (feature) => feature.category === DEVICE_FEATURE_CATEGORIES.BATTERY,
     );
     return get(batteryFeature, 'last_value');
   };

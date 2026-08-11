@@ -32,15 +32,15 @@ class MapComponent extends Component {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
         subdomains: 'abcd',
         maxZoom: 19,
-        noCache: true
+        noCache: true,
       })
       .addTo(this.leafletMap);
     this.displayAll(this.props);
   };
 
-  displayUsers = props => {
+  displayUsers = (props) => {
     if (props.users) {
-      props.users.forEach(user => {
+      props.users.forEach((user) => {
         if (this.userMarkers[user.id]) {
           this.userMarkers[user.id].remove();
         }
@@ -50,9 +50,9 @@ class MapComponent extends Component {
               icon: leaflet.icon({
                 iconUrl: user.picture,
                 iconSize: [40, 40],
-                className: style.userIconImage
+                className: style.userIconImage,
               }),
-              zIndexOffset: 1000
+              zIndexOffset: 1000,
             })
             .addTo(this.leafletMap);
           this.markerArray.push(this.userMarkers[user.id]);
@@ -61,7 +61,7 @@ class MapComponent extends Component {
     }
   };
 
-  displayAll = props => {
+  displayAll = (props) => {
     this.markerArray = [];
     this.displayHouses(props);
     this.displayUsers(props);
@@ -72,9 +72,9 @@ class MapComponent extends Component {
     }
   };
 
-  displayHouses = props => {
+  displayHouses = (props) => {
     if (props.houses) {
-      props.houses.forEach(house => {
+      props.houses.forEach((house) => {
         if (this.houseMarkers[house.id]) {
           this.houseMarkers[house.id].remove();
         }
@@ -84,8 +84,8 @@ class MapComponent extends Component {
               icon: leaflet.icon({
                 iconUrl: '/assets/images/home-icon.png',
                 iconSize: [40, 40],
-                className: style.houseIconImage
-              })
+                className: style.houseIconImage,
+              }),
             })
             .addTo(this.leafletMap);
           this.markerArray.push(this.houseMarkers[house.id]);
@@ -94,9 +94,9 @@ class MapComponent extends Component {
     }
   };
 
-  displayAreas = async props => {
+  displayAreas = async (props) => {
     if (props.areas) {
-      props.areas.forEach(area => {
+      props.areas.forEach((area) => {
         if (this.areaMarkers[area.id]) {
           this.areaMarkers[area.id].remove();
         }
@@ -105,7 +105,7 @@ class MapComponent extends Component {
             radius: area.radius,
             color: area.color,
             fillColor: area.color,
-            fillOpacity: 0.2
+            fillOpacity: 0.2,
           })
           .addTo(this.leafletMap);
         this.markerArray.push(this.areaMarkers[area.id]);
@@ -123,7 +123,7 @@ class MapComponent extends Component {
     route('/dashboard/maps/area/new');
   };
 
-  setMapRef = map => {
+  setMapRef = (map) => {
     this.map = map;
   };
   updateDimensions = () => {

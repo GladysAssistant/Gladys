@@ -6,7 +6,7 @@ const DeviceFeatures = ({ features = [] }) => {
   if (features.length > 0) {
     return (
       <div class="tags device-features">
-        {features.map(feature => (
+        {features.map((feature) => (
           <DeviceFeature feature={feature} />
         ))}
       </div>

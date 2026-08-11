@@ -8,26 +8,26 @@ import { RequestStatus } from '../../../../utils/consts';
 class SunriseSunsetTrigger extends Component {
   getHouses = async () => {
     this.setState({
-      SceneGetHouses: RequestStatus.Getting
+      SceneGetHouses: RequestStatus.Getting,
     });
     try {
       const houses = await this.props.httpClient.get('/api/v1/house');
       this.setState({
         houses,
-        SceneGetHouses: RequestStatus.Success
+        SceneGetHouses: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        SceneGetHouses: RequestStatus.Error
+        SceneGetHouses: RequestStatus.Error,
       });
     }
   };
 
-  onHouseChange = houseSelector => {
+  onHouseChange = (houseSelector) => {
     this.props.updateTriggerProperty(this.props.index, 'house', houseSelector);
   };
 
-  onOffsetDirectionChange = e => {
+  onOffsetDirectionChange = (e) => {
     const direction = e.target.value;
     const currentMinutes = Math.min(parseInt(this.state.offsetMinutesInput, 10) || 30, 1440);
     if (direction === 'exact') {
@@ -39,7 +39,7 @@ class SunriseSunsetTrigger extends Component {
     }
   };
 
-  onOffsetMinutesChange = e => {
+  onOffsetMinutesChange = (e) => {
     const raw = e.target.value;
     this.setState({ offsetMinutesInput: raw });
     const minutes = parseInt(raw, 10);
@@ -56,7 +56,7 @@ class SunriseSunsetTrigger extends Component {
     const initialMinutes = Math.abs(props.trigger.offset || 0);
     this.state = {
       houses: [],
-      offsetMinutesInput: initialMinutes > 0 ? String(initialMinutes) : '30'
+      offsetMinutesInput: initialMinutes > 0 ? String(initialMinutes) : '30',
     };
   }
 
@@ -117,7 +117,7 @@ class SunriseSunsetTrigger extends Component {
 }
 
 class SelectSunriseSunset extends Component {
-  handleHouseChange = e => {
+  handleHouseChange = (e) => {
     this.props.onHouseChange(e.target.value);
   };
 
@@ -127,7 +127,7 @@ class SelectSunriseSunset extends Component {
     if (houseSelector === undefined || houseSelector === '') {
       houseValid = true;
     } else if (houses) {
-      const selectedHouse = houses.find(house => house.selector === houseSelector);
+      const selectedHouse = houses.find((house) => house.selector === houseSelector);
       if (selectedHouse !== undefined) {
         houseValid = selectedHouse.latitude && selectedHouse.longitude;
       }
@@ -138,7 +138,7 @@ class SelectSunriseSunset extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      houseValid: true
+      houseValid: true,
     };
   }
 
@@ -164,7 +164,7 @@ class SelectSunriseSunset extends Component {
             <Text id="global.emptySelectOption" />
           </option>
           {this.props.houses &&
-            this.props.houses.map(house => (
+            this.props.houses.map((house) => (
               <option selected={house.selector === this.props.house} value={house.selector}>
                 {house.name}
               </option>

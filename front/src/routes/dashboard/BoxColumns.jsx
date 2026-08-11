@@ -14,7 +14,7 @@ const BoxColumns = ({ children, ...props }) => {
             class={cx('d-flex flex-column', columnClass, style.removePadding, {
               [style.removePaddingFirstCol]: x === 0,
               [style.removePaddingLastCol]: x === boxesLength - 1,
-              [style.removePadding]: true // it will remove padding when in mobile view
+              [style.removePadding]: true, // it will remove padding when in mobile view
             })}
           >
             {column.map((box, y) => (

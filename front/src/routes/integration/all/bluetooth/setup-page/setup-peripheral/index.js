@@ -15,7 +15,7 @@ import CheckBluetoothPanel from '../../commons/CheckBluetoothPanel';
 import style from '../../style.css';
 
 class BluetoothConnnectPage extends Component {
-  updatePeripheral = peripheral => {
+  updatePeripheral = (peripheral) => {
     if (peripheral.uuid === this.state.peripheral.uuid) {
       this.setState({ peripheral });
     }
@@ -27,11 +27,11 @@ class BluetoothConnnectPage extends Component {
 
       this.setState({
         peripheral,
-        status: RequestStatus.Success
+        status: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        status: RequestStatus.Error
+        status: RequestStatus.Error,
       });
     }
   };
@@ -43,7 +43,7 @@ class BluetoothConnnectPage extends Component {
 
     this.state = {
       uuid: matches.uuid,
-      status: RequestStatus.Getting
+      status: RequestStatus.Getting,
     };
   }
 

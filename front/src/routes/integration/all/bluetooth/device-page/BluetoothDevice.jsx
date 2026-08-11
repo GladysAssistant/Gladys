@@ -15,11 +15,11 @@ class BluetoothDevice extends Component {
       return null;
     }
     const batteryLevelDeviceFeature = this.props.device.features.find(
-      deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
+      (deviceFeature) => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY,
     );
     const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
     this.setState({
-      batteryLevel
+      batteryLevel,
     });
   };
   saveDevice = async () => {
@@ -47,10 +47,10 @@ class BluetoothDevice extends Component {
     }
     this.setState({ loading: false });
   };
-  updateName = e => {
+  updateName = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
   componentWillMount() {
@@ -75,7 +75,7 @@ class BluetoothDevice extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -109,9 +109,9 @@ class BluetoothDevice extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {houses &&
-                      houses.map(house => (
+                      houses.map((house) => (
                         <optgroup label={house.name}>
-                          {house.rooms.map(room => (
+                          {house.rooms.map((room) => (
                             <option selected={room.id === device.room_id} value={room.id}>
                               {room.name}
                             </option>

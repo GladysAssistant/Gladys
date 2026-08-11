@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import actions from '../../actions/calendar';
 import { isBright } from '../../utils/color';
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -12,7 +13,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 const localizer = dayjsLocalizer(dayjs);
 
 class Map extends Component {
-  onRangeChange = range => {
+  onRangeChange = (range) => {
     let from, to;
     if (Array.isArray(range)) {
       from = dayjs(range[0]).toDate();
@@ -23,60 +24,63 @@ class Map extends Component {
       from = dayjs(range.start).toDate();
       to = dayjs(range.end).toDate();
     }
+    // remembered so a calendar.updated push can refetch the displayed range
+    this.currentRange = { from, to };
     this.props.getEventsInRange(from, to);
   };
 
-  eventPropGetter = event =>
+  onCalendarUpdated = () => {
+    if (this.currentRange) {
+      this.props.getEventsInRange(this.currentRange.from, this.currentRange.to);
+    }
+  };
+
+  eventPropGetter = (event) =>
     event.color && {
       style: {
         backgroundColor: event.color,
-        color: isBright(event.color) ? 'black' : 'white'
-      }
+        color: isBright(event.color) ? 'black' : 'white',
+      },
     };
 
-  onViewChange = newView => {
+  onViewChange = (newView) => {
     localStorage.setItem('calendar_last_view', newView);
   };
 
   componentWillMount() {
     dayjs.locale(this.props.user.language);
 
-    let from = dayjs()
-      .startOf('week')
-      .subtract(1, 'day')
-      .toDate();
-    let to = dayjs()
-      .endOf('week')
-      .add(1, 'day')
-      .toDate();
+    let from = dayjs().startOf('week').subtract(1, 'day').toDate();
+    let to = dayjs().endOf('week').add(1, 'day').toDate();
 
     switch (localStorage.getItem('calendar_last_view')) {
       case 'month':
-        from = dayjs()
-          .startOf('month')
-          .subtract(7, 'day')
-          .toDate();
-        to = dayjs()
-          .endOf('month')
-          .add(7, 'day')
-          .toDate();
+        from = dayjs().startOf('month').subtract(7, 'day').toDate();
+        to = dayjs().endOf('month').add(7, 'day').toDate();
         break;
       case 'day':
-        from = dayjs()
-          .subtract(1, 'day')
-          .toDate();
-        to = dayjs()
-          .add(1, 'day')
-          .toDate();
+        from = dayjs().subtract(1, 'day').toDate();
+        to = dayjs().add(1, 'day').toDate();
         break;
       case 'agenda':
         from = dayjs().toDate();
-        to = dayjs()
-          .add(1, 'month')
-          .toDate();
+        to = dayjs().add(1, 'month').toDate();
         break;
     }
+    this.currentRange = { from, to };
     this.props.getEventsInRange(from, to);
+  }
+
+  componentDidMount() {
+    if (this.props.session && this.props.session.dispatcher) {
+      this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED, this.onCalendarUpdated);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.session && this.props.session.dispatcher) {
+      this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED, this.onCalendarUpdated);
+    }
   }
 
   render(props, {}) {
@@ -99,7 +103,7 @@ class Map extends Component {
                         localizer={localizer}
                         events={props.eventsFormated || []}
                         style={{
-                          height: '550px'
+                          height: '550px',
                         }}
                         popup
                         onRangeChange={this.onRangeChange}
@@ -107,9 +111,7 @@ class Map extends Component {
                         onView={this.onViewChange}
                         culture={props.user.language}
                         messages={this.props.intl.dictionary.calendar}
-                        scrollToTime={dayjs()
-                          .subtract(2, 'hour')
-                          .toDate()}
+                        scrollToTime={dayjs().subtract(2, 'hour').toDate()}
                         eventPropGetter={this.eventPropGetter}
                       />
                     </div>
@@ -124,4 +126,4 @@ class Map extends Component {
   }
 }
 
-export default connect('eventsFormated,calendars,user', actions, dayjs)(withIntlAsProp(Map));
+export default connect('eventsFormated,calendars,user,session', actions, dayjs)(withIntlAsProp(Map));

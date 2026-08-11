@@ -7,7 +7,7 @@ class AiChatDebugDownload extends Component {
     super(props);
     this.state = {
       downloading: false,
-      error: false
+      error: false,
     };
   }
 
@@ -28,7 +28,7 @@ class AiChatDebugDownload extends Component {
           hour: '2-digit',
           minute: '2-digit',
           second: '2-digit',
-          hour12: false
+          hour12: false,
         })
         .replace(/[/,:]/g, '-')
         .replace(/\s/g, '_');

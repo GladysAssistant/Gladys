@@ -2,11 +2,11 @@ import { Text } from 'preact-i18n';
 import style from '../style.css';
 import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
 
-const updateUserProperty = (property, func) => e => {
+const updateUserProperty = (property, func) => (e) => {
   func(property, e.target.value);
 };
 
-const updateSystemProperty = (property, func) => e => {
+const updateSystemProperty = (property, func) => (e) => {
   func(property, parseInt(e.target.value, 10));
 };
 
@@ -62,7 +62,7 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
           value={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS]}
           onChange={updateSystemProperty(
             SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS,
-            props.updateSystemPreferences
+            props.updateSystemPreferences,
           )}
         >
           <option value="7">

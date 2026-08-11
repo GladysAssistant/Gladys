@@ -11,7 +11,7 @@ class SettingsUsers extends Component {
       await this.setState({ loading: true });
       const params = {
         fields: 'id,firstname,lastname,selector,role,picture',
-        order_dir: this.state.getUsersOrderDir || 'asc'
+        order_dir: this.state.getUsersOrderDir || 'asc',
       };
       if (this.state.userSearchTerms && this.state.userSearchTerms.length) {
         params.search = this.state.userSearchTerms;
@@ -23,23 +23,23 @@ class SettingsUsers extends Component {
       this.setState({ loading: false });
     }
   };
-  search = async e => {
+  search = async (e) => {
     await this.setState({ userSearchTerms: e.target.value });
     this.getUsers();
   };
-  changeOrderDir = async e => {
+  changeOrderDir = async (e) => {
     await this.setState({
-      getUsersOrderDir: e.target.value
+      getUsersOrderDir: e.target.value,
     });
     this.getUsers();
   };
-  removeUserFromList = index => {
+  removeUserFromList = (index) => {
     this.setState(
       update(this.state, {
         users: {
-          $splice: [[index, 1]]
-        }
-      })
+          $splice: [[index, 1]],
+        },
+      }),
     );
   };
   componentDidMount() {

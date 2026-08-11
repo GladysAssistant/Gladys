@@ -13,14 +13,14 @@ class TasmotaIntegration extends Component {
 
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE,
-      this.props.addDiscoveredDevice
+      this.props.addDiscoveredDevice,
     );
   }
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.TASMOTA.NEW_HTTP_DEVICE,
-      this.props.addDiscoveredDevice
+      this.props.addDiscoveredDevice,
     );
   }
 
@@ -35,5 +35,5 @@ class TasmotaIntegration extends Component {
 
 export default connect(
   'user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading',
-  actions
+  actions,
 )(TasmotaIntegration);

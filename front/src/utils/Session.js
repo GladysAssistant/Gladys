@@ -50,11 +50,11 @@ class Session {
         JSON.stringify({
           type: 'authenticate.request',
           payload: {
-            accessToken: this.user.access_token
-          }
-        })
+            accessToken: this.user.access_token,
+          },
+        }),
       );
-      this.ws.onmessage = e => {
+      this.ws.onmessage = (e) => {
         const { data } = e;
         const { type, payload } = JSON.parse(data);
         // Only dispatch connected websocket message in case we are authenticated
@@ -65,10 +65,10 @@ class Session {
         this.dispatcher.dispatch(type, payload);
       };
     };
-    this.ws.onerror = e => {
+    this.ws.onerror = (e) => {
       console.error('Error', e);
     };
-    this.ws.onclose = e => {
+    this.ws.onclose = (e) => {
       console.error(e);
       if (this.websocketOpened) {
         this.websocketOpened = false;
@@ -128,7 +128,7 @@ class Session {
 
   setAccessToken(accessToken) {
     const newUser = Object.assign({}, this.user, {
-      access_token: accessToken
+      access_token: accessToken,
     });
     this.saveUser(newUser);
   }

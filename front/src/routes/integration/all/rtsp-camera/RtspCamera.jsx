@@ -64,7 +64,7 @@ const RtspCameraPage = ({ children, ...props }) => (
                 <div class="card-body">
                   <div
                     class={cx('dimmer', {
-                      active: props.getRtspCameraStatus === RequestStatus.Getting
+                      active: props.getRtspCameraStatus === RequestStatus.Getting,
                     })}
                   >
                     <div class="loader" />

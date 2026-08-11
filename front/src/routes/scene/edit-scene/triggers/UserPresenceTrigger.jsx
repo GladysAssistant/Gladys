@@ -11,20 +11,20 @@ class UserPresenceTrigger extends Component {
     try {
       const [users, houses] = await Promise.all([
         this.props.httpClient.get('/api/v1/user'),
-        this.props.httpClient.get('/api/v1/house')
+        this.props.httpClient.get('/api/v1/house'),
       ]);
       const userOptions = [];
-      users.forEach(user => {
+      users.forEach((user) => {
         userOptions.push({
           label: user.firstname,
-          value: user.selector
+          value: user.selector,
         });
       });
       const houseOptions = [];
-      houses.forEach(house => {
+      houses.forEach((house) => {
         houseOptions.push({
           label: house.name,
-          value: house.selector
+          value: house.selector,
         });
       });
       await this.setState({ userOptions, houseOptions });
@@ -35,32 +35,32 @@ class UserPresenceTrigger extends Component {
     }
   };
 
-  handleChange = selectedOption => {
+  handleChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateTriggerProperty(this.props.index, 'user', selectedOption.value);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'user', null);
     }
   };
-  handleHouseChange = selectedOption => {
+  handleHouseChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateTriggerProperty(this.props.index, 'house', selectedOption.value);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'house', null);
     }
   };
-  refreshSelectedOptions = nextProps => {
+  refreshSelectedOptions = (nextProps) => {
     let selectedOption = '';
     let selectedHouseOption = '';
     if (nextProps.trigger.user && this.state.userOptions) {
-      const userOption = this.state.userOptions.find(option => option.value === nextProps.trigger.user);
+      const userOption = this.state.userOptions.find((option) => option.value === nextProps.trigger.user);
 
       if (userOption) {
         selectedOption = userOption;
       }
     }
     if (nextProps.trigger.house && this.state.houseOptions) {
-      const houseOption = this.state.houseOptions.find(option => option.value === nextProps.trigger.house);
+      const houseOption = this.state.houseOptions.find((option) => option.value === nextProps.trigger.house);
 
       if (houseOption) {
         selectedHouseOption = houseOption;
@@ -73,7 +73,7 @@ class UserPresenceTrigger extends Component {
     this.props = props;
     this.state = {
       selectedOption: '',
-      selectedHouseOption: ''
+      selectedHouseOption: '',
     };
   }
   componentDidMount() {

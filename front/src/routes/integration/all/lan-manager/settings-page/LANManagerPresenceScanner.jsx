@@ -11,7 +11,7 @@ class LANManagerPresenceScanner extends Component {
     this.props.updateConfig('presenceScanner', 'status', newStatus);
   };
 
-  updateFrequency = e => {
+  updateFrequency = (e) => {
     const { value } = e.target;
     const rawFrequency = parseFloat(value, 10);
 

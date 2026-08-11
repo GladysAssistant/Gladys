@@ -20,12 +20,12 @@ const WebhooksCard = ({
   openApiKeyStatus,
   language,
   onOpenApiKeyInput,
-  onSaveOpenApiKey
+  onSaveOpenApiKey,
 }) => {
   const gatewayConfigured = Boolean(gatewayStatus && gatewayStatus.configured);
   const available = Boolean(webhooks && webhooks.available);
   const urlByKey = {};
-  ((webhooks && webhooks.webhooks) || []).forEach(webhook => {
+  ((webhooks && webhooks.webhooks) || []).forEach((webhook) => {
     urlByKey[webhook.key] = webhook.url;
   });
   const saving = openApiKeyStatus === RequestStatus.Getting;
@@ -99,7 +99,7 @@ const WebhooksCard = ({
                 <p class="text-muted small mb-2">
                   <Text id="integration.externalIntegration.webhooks.urlsText" />
                 </p>
-                {(manifestWebhooks || []).map(webhook => (
+                {(manifestWebhooks || []).map((webhook) => (
                   <div class="mb-2">
                     <div>
                       <strong>{getLocalizedText(webhook.label, language) || webhook.key}</strong>

@@ -47,7 +47,7 @@ const LANManagerDeviceTab = ({ children, getLANManagerDevicesStatus, lanManagerD
       <div
         class={cx('dimmer', {
           active: getLANManagerDevicesStatus === RequestStatus.Getting,
-          [style.lanManagerListBody]: getLANManagerDevicesStatus === RequestStatus.Getting
+          [style.lanManagerListBody]: getLANManagerDevicesStatus === RequestStatus.Getting,
         })}
       >
         <div class="loader" />

@@ -15,7 +15,7 @@ class TuyaLocalPollSection extends Component {
     const params = Array.isArray(device.params) ? [...device.params] : [];
     const currentOverride = normalizeBoolean(getLocalOverrideValue(device));
     const nextOverride = currentOverride !== true;
-    const existingIndex = params.findIndex(param => param.name === 'LOCAL_OVERRIDE');
+    const existingIndex = params.findIndex((param) => param.name === 'LOCAL_OVERRIDE');
     if (existingIndex >= 0) {
       params[existingIndex] = { ...params[existingIndex], value: nextOverride };
     } else {
@@ -25,23 +25,23 @@ class TuyaLocalPollSection extends Component {
       device: {
         ...device,
         params,
-        local_override: nextOverride
+        local_override: nextOverride,
       },
       localPollValidation: null,
       localPollStatus: null,
       localPollError: null,
-      localPollDps: null
+      localPollDps: null,
     });
   };
 
-  updateProtocol = e => {
+  updateProtocol = (e) => {
     const { device, onLocalPollChange } = this.props;
     if (!device || typeof onLocalPollChange !== 'function') {
       return;
     }
     const protocolVersion = e.target.value;
     const params = Array.isArray(device.params) ? [...device.params] : [];
-    const existingIndex = params.findIndex(param => param.name === 'PROTOCOL_VERSION');
+    const existingIndex = params.findIndex((param) => param.name === 'PROTOCOL_VERSION');
     if (existingIndex >= 0) {
       params[existingIndex] = { ...params[existingIndex], value: protocolVersion };
     } else {
@@ -50,23 +50,23 @@ class TuyaLocalPollSection extends Component {
     onLocalPollChange({
       device: {
         ...device,
-        params
+        params,
       },
       localPollValidation: null,
       localPollStatus: null,
       localPollError: null,
-      localPollDps: null
+      localPollDps: null,
     });
   };
 
-  updateIpAddress = e => {
+  updateIpAddress = (e) => {
     const { device, onLocalPollChange } = this.props;
     if (!device || typeof onLocalPollChange !== 'function') {
       return;
     }
     const ipAddress = e.target.value;
     const params = Array.isArray(device.params) ? [...device.params] : [];
-    const existingIndex = params.findIndex(param => param.name === 'IP_ADDRESS');
+    const existingIndex = params.findIndex((param) => param.name === 'IP_ADDRESS');
     if (existingIndex >= 0) {
       params[existingIndex] = { ...params[existingIndex], value: ipAddress };
     } else {
@@ -75,12 +75,12 @@ class TuyaLocalPollSection extends Component {
     onLocalPollChange({
       device: {
         ...device,
-        params
+        params,
       },
       localPollValidation: null,
       localPollStatus: null,
       localPollError: null,
-      localPollDps: null
+      localPollDps: null,
     });
   };
 
@@ -93,17 +93,17 @@ class TuyaLocalPollSection extends Component {
       localPollStatus: RequestStatus.Getting,
       localPollError: null,
       localPollProtocol: null,
-      localPollDps: null
+      localPollDps: null,
     });
     try {
       const pollResult = await pollLocalDevice({
         httpClient,
         device,
-        onProtocolAttempt: protocolVersion => {
+        onProtocolAttempt: (protocolVersion) => {
           onLocalPollChange({
-            localPollProtocol: protocolVersion
+            localPollProtocol: protocolVersion,
           });
-        }
+        },
       });
       onLocalPollChange({
         device: pollResult.device,
@@ -113,9 +113,9 @@ class TuyaLocalPollSection extends Component {
         localPollValidation: {
           ip: pollResult.ip,
           protocol: pollResult.protocol,
-          localOverride: true
+          localOverride: true,
         },
-        localPollDps: pollResult.dps
+        localPollDps: pollResult.dps,
       });
     } catch (e) {
       const message =
@@ -124,7 +124,7 @@ class TuyaLocalPollSection extends Component {
         localPollStatus: RequestStatus.Error,
         localPollError: message,
         localPollProtocol: null,
-        localPollDps: null
+        localPollDps: null,
       });
     }
   };
@@ -182,7 +182,7 @@ class TuyaLocalPollSection extends Component {
             <option value="">
               <Text id="global.emptySelectOption" />
             </option>
-            {PROTOCOL_OPTIONS.map(option => (
+            {PROTOCOL_OPTIONS.map((option) => (
               <option value={option}>{option}</option>
             ))}
           </select>

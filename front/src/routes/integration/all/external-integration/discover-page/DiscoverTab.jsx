@@ -22,11 +22,13 @@ const DiscoverTab = ({
   scanStatus,
   scanError,
   scan,
-  createDevice
+  createDevice,
 }) => {
   const search = (deviceSearch || '').trim().toLowerCase();
   const filteredDevices =
-    discoveredDevices && search ? discoveredDevices.filter(device => matchesSearch(device, search)) : discoveredDevices;
+    discoveredDevices && search
+      ? discoveredDevices.filter((device) => matchesSearch(device, search))
+      : discoveredDevices;
   const scanning = scanStatus === RequestStatus.Getting;
   return (
     <div class="card">
@@ -80,14 +82,14 @@ const DiscoverTab = ({
             interactive, so already-discovered devices can still be added */}
         <div
           class={cx('dimmer', {
-            active: getDiscoveredDevicesStatus === RequestStatus.Getting
+            active: getDiscoveredDevicesStatus === RequestStatus.Getting,
           })}
         >
           <div class="loader" />
           <div class={cx('dimmer-content', style.discoverListBody)}>
             <div class="row">
               {filteredDevices &&
-                filteredDevices.map(device => (
+                filteredDevices.map((device) => (
                   <DiscoveredBox key={device.external_id} device={device} createDevice={createDevice} />
                 ))}
             </div>

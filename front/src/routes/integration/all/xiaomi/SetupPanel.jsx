@@ -17,7 +17,7 @@ const SetupTab = ({ children, ...props }) => (
       </div>
       <div
         class={cx('dimmer', {
-          active: props.getXiaomiSensorsStatus === RequestStatus.Getting
+          active: props.getXiaomiSensorsStatus === RequestStatus.Getting,
         })}
       >
         <div class="loader" />

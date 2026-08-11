@@ -26,13 +26,13 @@ const UsagePointDevice = ({
   saveDevice,
   destroyDevice,
   reCreateUsagePointDevice,
-  syncs = []
+  syncs = [],
 }) => {
   const usagePointId = device.external_id.split(':')[1];
 
   const lastRefresh = getDeviceParam(device, DEVICE_PARAMS.LAST_REFRESH);
   const numberOfStates = getDeviceParam(device, DEVICE_PARAMS.NUMBER_OF_STATES);
-  const mySyncs = syncs.filter(sync => sync.usage_point_id === usagePointId);
+  const mySyncs = syncs.filter((sync) => sync.usage_point_id === usagePointId);
   const deviceShouldBeUpdated = device.features.length < 3;
 
   let syncInProgress;
@@ -44,11 +44,7 @@ const UsagePointDevice = ({
     }
   }
 
-  const lastRefreshDate = lastRefresh
-    ? dayjs(lastRefresh)
-        .locale(language)
-        .format('L LTS')
-    : undefined;
+  const lastRefreshDate = lastRefresh ? dayjs(lastRefresh).locale(language).format('L LTS') : undefined;
 
   const save = () => {
     saveDevice(deviceIndex);
@@ -86,7 +82,7 @@ const UsagePointDevice = ({
                 <div
                   class="progress-bar bg-primary"
                   style={{
-                    width: `${syncInProgress.progress}%`
+                    width: `${syncInProgress.progress}%`,
                   }}
                   role="progressbar"
                   aria-valuenow={syncInProgress.progress}
@@ -180,7 +176,7 @@ const EnedisUsagePoints = ({
   destroyDevice,
   reCreateUsagePointDevice,
   syncs,
-  sync
+  sync,
 }) => (
   <div class="card">
     <div class="card-header">
@@ -201,7 +197,7 @@ const EnedisUsagePoints = ({
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: loading
+          active: loading,
         })}
       >
         <div class="loader" />
@@ -255,7 +251,7 @@ class EnedisWelcomePageComponent extends Component {
   };
   updateDeviceParam = async (deviceIndex, deviceParam, value) => {
     const device = this.state.usagePointsDevices[deviceIndex];
-    const deviceParamIndex = device.params.findIndex(p => p.name === deviceParam);
+    const deviceParamIndex = device.params.findIndex((p) => p.name === deviceParam);
     let newUsagePointsDevices;
     if (deviceParamIndex !== -1) {
       newUsagePointsDevices = update(this.state.usagePointsDevices, {
@@ -263,11 +259,11 @@ class EnedisWelcomePageComponent extends Component {
           params: {
             [deviceParamIndex]: {
               value: {
-                $set: value
-              }
-            }
-          }
-        }
+                $set: value,
+              },
+            },
+          },
+        },
       });
     } else {
       newUsagePointsDevices = update(this.state.usagePointsDevices, {
@@ -276,11 +272,11 @@ class EnedisWelcomePageComponent extends Component {
             $push: [
               {
                 name: deviceParam,
-                value
-              }
-            ]
-          }
-        }
+                value,
+              },
+            ],
+          },
+        },
       });
     }
     await this.setState({ usagePointsDevices: newUsagePointsDevices });
@@ -303,7 +299,7 @@ class EnedisWelcomePageComponent extends Component {
     }
     await this.setState({ loading: false });
   };
-  saveDevice = async deviceIndex => {
+  saveDevice = async (deviceIndex) => {
     await this.setState({ loading: true });
     try {
       const device = this.state.usagePointsDevices[deviceIndex];
@@ -313,7 +309,7 @@ class EnedisWelcomePageComponent extends Component {
     }
     await this.setState({ loading: false });
   };
-  destroyDevice = async deviceIndex => {
+  destroyDevice = async (deviceIndex) => {
     await this.setState({ loading: true });
     try {
       const device = this.state.usagePointsDevices[deviceIndex];
@@ -328,7 +324,7 @@ class EnedisWelcomePageComponent extends Component {
   reCreateUsagePointDevice = async (usagePointId, deviceIndex) => {
     const existingDevice = this.state.usagePointsDevices[deviceIndex];
     const enedisIntegration = await this.props.httpClient.get(`/api/v1/service/enedis`, {
-      pod_id: null
+      pod_id: null,
     });
     const serviceId = enedisIntegration.id;
 
@@ -336,7 +332,7 @@ class EnedisWelcomePageComponent extends Component {
       usagePointId,
       serviceId,
       intlDictionary: this.props.intl.dictionary,
-      existingDevice
+      existingDevice,
     });
 
     await this.props.httpClient.post('/api/v1/device', device);

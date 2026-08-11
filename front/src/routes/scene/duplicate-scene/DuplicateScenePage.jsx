@@ -34,7 +34,7 @@ const DuplicateScenePage = ({ children, ...props }) => (
                     <input
                       type="text"
                       class={cx('form-control', {
-                        'is-invalid': get(props, 'duplicateSceneErrors.name')
+                        'is-invalid': get(props, 'duplicateSceneErrors.name'),
                       })}
                       disabled={props.loading}
                       placeholder={<Text id="duplicateScene.namePlaceholder" />}

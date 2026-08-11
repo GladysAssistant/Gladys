@@ -11,7 +11,7 @@ const CheckStatus = ({
   matterbridgeRunning,
   dockerBased,
   networkModeValid,
-  matterbridgeStatus
+  matterbridgeStatus,
 }) => {
   let textLabel = null;
   if (matterbridgeStatus === RequestStatus.Getting) {
@@ -39,7 +39,7 @@ const CheckStatus = ({
           'alert-success': matterbridgeEnabled && matterbridgeExist && matterbridgeRunning,
           'alert-warning': matterbridgeEnabled && matterbridgeExist && !matterbridgeRunning,
           'alert-danger': (matterbridgeEnabled && !matterbridgeExist) || !dockerBased || !networkModeValid,
-          'alert-info': !matterbridgeEnabled
+          'alert-info': !matterbridgeEnabled,
         })}
       >
         <div class={cx(style.textAlignMiddleContainer)}>

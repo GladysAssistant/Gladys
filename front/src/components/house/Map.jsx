@@ -10,7 +10,7 @@ const icon = leaflet.icon({
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   tooltipAnchor: [16, -28],
-  shadowSize: [41, 41]
+  shadowSize: [41, 41],
 });
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
@@ -45,7 +45,7 @@ class MapComponent extends Component {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
         subdomains: 'abcd',
         maxZoom: 19,
-        noCache: true
+        noCache: true,
       })
       .addTo(this.leafletMap);
     this.leafletMap.on('click', this.onClickOnMap);
@@ -56,7 +56,7 @@ class MapComponent extends Component {
     }
   };
 
-  onClickOnMap = e => {
+  onClickOnMap = (e) => {
     this.setPinMap(e.latlng.lat, e.latlng.lng);
     this.props.updateHouseLocation(e.latlng.lat, e.latlng.lng, this.props.houseIndex);
   };
@@ -67,13 +67,13 @@ class MapComponent extends Component {
     } else {
       this.houseMarker = leaflet
         .marker([latitude, longitude], {
-          icon
+          icon,
         })
         .addTo(this.leafletMap);
     }
   };
 
-  setMapRef = map => {
+  setMapRef = (map) => {
     this.map = map;
   };
   constructor(props) {

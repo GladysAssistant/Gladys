@@ -28,13 +28,13 @@ function resolveGetUserMedia() {
   }
 
   if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function') {
-    return constraints => navigator.mediaDevices.getUserMedia(constraints);
+    return (constraints) => navigator.mediaDevices.getUserMedia(constraints);
   }
 
   const legacyGetUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
   if (typeof legacyGetUserMedia === 'function') {
-    return constraints =>
+    return (constraints) =>
       new Promise((resolve, reject) => {
         legacyGetUserMedia.call(navigator, constraints, resolve, reject);
       });
@@ -134,15 +134,15 @@ export async function probeMicrophoneAvailability() {
 
   try {
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const audioInputs = devices.filter(device => device.kind === 'audioinput');
+    const audioInputs = devices.filter((device) => device.kind === 'audioinput');
     if (audioInputs.length === 0) {
       return 'NO_MICROPHONE';
     }
-    const hasUsableInput = audioInputs.some(device => device.deviceId && device.deviceId !== 'default');
-    if (!hasUsableInput && audioInputs.every(device => !device.label)) {
+    const hasUsableInput = audioInputs.some((device) => device.deviceId && device.deviceId !== 'default');
+    if (!hasUsableInput && audioInputs.every((device) => !device.label)) {
       return null;
     }
-    if (!hasUsableInput && audioInputs.length > 0 && audioInputs.every(device => device.deviceId === '')) {
+    if (!hasUsableInput && audioInputs.length > 0 && audioInputs.every((device) => device.deviceId === '')) {
       return null;
     }
     return null;

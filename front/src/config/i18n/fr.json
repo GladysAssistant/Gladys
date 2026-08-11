@@ -1006,6 +1006,22 @@
         "notAvailableText": "Les webhooks ne sont pas encore actifs : enregistrez votre clé Open API pour les activer.",
         "urlsText": "URLs de webhook (l'intégration les enregistre automatiquement quand c'est possible ; certains services demandent de les coller dans la console du fabricant). Ces URLs contiennent votre clé : ne les partagez qu'avec le service tiers."
       },
+      "myCalendars": {
+        "title": "Mes calendriers",
+        "description": "Cette intégration crée des calendriers et des événements dans Gladys pour les utilisateurs qui l'activent. Activez-la avec votre propre compte pour voir ses calendriers dans votre vue calendrier ; la désactiver supprime vos calendriers de Gladys (ils restent intacts chez le fournisseur).",
+        "enableButton": "Activer pour moi",
+        "saveButton": "Enregistrer",
+        "disableButton": "Désactiver et supprimer mes calendriers",
+        "disableConfirmText": "Vos calendriers issus de cette intégration et leurs événements seront supprimés de Gladys. Les calendriers chez le fournisseur ne sont pas touchés, et une réactivation restaure tout à la prochaine synchronisation.",
+        "disableConfirmButton": "Supprimer mes calendriers",
+        "cancelButton": "Annuler",
+        "saveError": "Une erreur est survenue lors de l'enregistrement de votre compte.",
+        "saveSuccess": "Votre compte a été enregistré.",
+        "noCalendars": "Aucun calendrier pour le moment : l'intégration poussera vos calendriers à sa prochaine synchronisation.",
+        "syncLabel": "Synchroniser ce calendrier",
+        "sharedLabel": "Partager avec le foyer",
+        "sharedHelp": "Un calendrier partagé est visible par tout le foyer et peut déclencher des scènes."
+      },
       "contactProfile": {
         "title": "Mon compte",
         "description": "Ce canal envoie des messages avec vos identifiants personnels. Chaque utilisateur saisit ses propres valeurs ; laissez vide pour ne rien recevoir. Effacer vos valeurs arrête les messages.",

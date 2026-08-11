@@ -13,17 +13,17 @@ function createActions(store) {
       }
       if (!validateEmail(state.loginFormEmailValue)) {
         return store.setState({
-          loginStatus: LoginStatus.WrongEmailError
+          loginStatus: LoginStatus.WrongEmailError,
         });
       }
       store.setState({
-        loginStatus: LoginStatus.Processing
+        loginStatus: LoginStatus.Processing,
       });
       try {
         // Login
         const userFromLogin = await state.httpClient.post('/api/v1/login', {
           email: state.loginFormEmailValue,
-          password: state.loginFormPasswordValue
+          password: state.loginFormPasswordValue,
         });
         state.session.saveUser(userFromLogin);
         state.session.init();
@@ -33,31 +33,31 @@ function createActions(store) {
           user,
           loginStatus: LoginStatus.LoginSuccess,
           loginFormEmailValue: '',
-          loginFormPasswordValue: ''
+          loginFormPasswordValue: '',
         });
         actionsProfilePicture.loadProfilePicture(state);
         // redirect to dashboard
         route('/dashboard');
       } catch (e) {
         store.setState({
-          loginStatus: LoginStatus.WrongCredentialsError
+          loginStatus: LoginStatus.WrongCredentialsError,
         });
       }
     },
     onEmailChange(state, event) {
       store.setState({
-        loginFormEmailValue: event.target.value
+        loginFormEmailValue: event.target.value,
       });
     },
     onPasswordChange(state, event) {
       store.setState({
-        loginFormPasswordValue: event.target.value
+        loginFormPasswordValue: event.target.value,
       });
     },
     async checkIfInstanceIsConfigured(state) {
       // check instance state
       store.setState({
-        checkIfInstanceIsConfiguredRequestState: RequestStatus.Getting
+        checkIfInstanceIsConfiguredRequestState: RequestStatus.Getting,
       });
       try {
         const instanceState = await state.httpClient.get('/api/v1/setup');
@@ -65,14 +65,14 @@ function createActions(store) {
           route('/signup');
         }
         store.setState({
-          checkIfInstanceIsConfiguredRequestState: RequestStatus.Success
+          checkIfInstanceIsConfiguredRequestState: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          checkIfInstanceIsConfiguredRequestState: RequestStatus.Error
+          checkIfInstanceIsConfiguredRequestState: RequestStatus.Error,
         });
       }
-    }
+    },
   };
 
   return actions;

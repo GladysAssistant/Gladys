@@ -9,20 +9,20 @@ function createActions(store) {
       store.setState({
         signupUserPreferences: {
           temperature_unit_preference: 'celsius',
-          distance_unit_preference: 'metric'
+          distance_unit_preference: 'metric',
         },
         signupSystemPreferences: {
-          [SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS]: 90
-        }
+          [SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS]: 90,
+        },
       });
     },
     updateUserPreferences(state, property, value) {
       const newState = update(state, {
         signupUserPreferences: {
           [property]: {
-            $set: value
-          }
-        }
+            $set: value,
+          },
+        },
       });
       store.setState(newState);
     },
@@ -30,45 +30,45 @@ function createActions(store) {
       const newState = update(state, {
         signupSystemPreferences: {
           [property]: {
-            $set: value
-          }
-        }
+            $set: value,
+          },
+        },
       });
       store.setState(newState);
     },
     async savePreferences(state) {
       // saving user preferences
       store.setState({
-        signupSaveUserPreferences: RequestStatus.Getting
+        signupSaveUserPreferences: RequestStatus.Getting,
       });
       try {
         await state.httpClient.patch(`/api/v1/me`, state.signupUserPreferences);
         store.setState({
-          signupSaveUserPreferences: RequestStatus.Success
+          signupSaveUserPreferences: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          signupSaveUserPreferences: RequestStatus.Error
+          signupSaveUserPreferences: RequestStatus.Error,
         });
       }
       // saving system preferences
       store.setState({
-        signupSaveSystemPreferences: RequestStatus.Getting
+        signupSaveSystemPreferences: RequestStatus.Getting,
       });
       try {
         await state.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS}`, {
-          value: state.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS]
+          value: state.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS],
         });
         store.setState({
-          signupSaveSystemPreferences: RequestStatus.Success
+          signupSaveSystemPreferences: RequestStatus.Success,
         });
         route('/signup/configure-house');
       } catch (e) {
         store.setState({
-          signupSaveSystemPreferences: RequestStatus.Error
+          signupSaveSystemPreferences: RequestStatus.Error,
         });
       }
-    }
+    },
   };
   return actions;
 }

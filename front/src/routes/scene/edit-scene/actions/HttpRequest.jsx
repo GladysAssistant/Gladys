@@ -10,7 +10,7 @@ const METHOD_WITH_BODY = ['post', 'patch', 'put'];
 
 const helpTextStyle = {
   fontSize: 12,
-  marginBottom: '.375rem'
+  marginBottom: '.375rem',
 };
 
 function isNumeric(str) {
@@ -21,7 +21,7 @@ function isNumeric(str) {
 }
 
 const getAllPropertiesObject = (obj, path = '', results = []) => {
-  Object.keys(obj).forEach(key => {
+  Object.keys(obj).forEach((key) => {
     const value = obj[key];
     const shouldContinueParsingTree = typeof value === 'object' && value !== null && value !== undefined;
     const keyIsNumber = isNumeric(key);
@@ -39,19 +39,19 @@ const getAllPropertiesObject = (obj, path = '', results = []) => {
 };
 
 class Header extends Component {
-  updateHeaderKey = e => {
+  updateHeaderKey = (e) => {
     this.props.updateHeader(this.props.index, {
       key: e.target.value,
-      value: this.props.header.value
+      value: this.props.header.value,
     });
   };
-  updateHeaderValue = e => {
+  updateHeaderValue = (e) => {
     this.props.updateHeader(this.props.index, {
       key: this.props.header.key,
-      value: e.target.value
+      value: e.target.value,
     });
   };
-  deleteHeader = e => {
+  deleteHeader = (e) => {
     e.preventDefault();
     this.props.deleteHeader(this.props.index);
   };
@@ -91,77 +91,77 @@ class Header extends Component {
 }
 
 class HttpRequestAction extends Component {
-  handleChangeMethod = e => {
+  handleChangeMethod = (e) => {
     this.props.updateActionProperty(this.props.path, 'method', e.target.value);
     if (!METHOD_WITH_BODY.includes(e.target.value)) {
       this.props.updateActionProperty(this.props.path, 'body', undefined);
     }
   };
-  handleChangeUrl = e => {
+  handleChangeUrl = (e) => {
     this.props.updateActionProperty(this.props.path, 'url', e.target.value);
   };
-  handleChangeBody = text => {
+  handleChangeBody = (text) => {
     const newBody = text && text.length > 0 ? text : undefined;
     this.props.updateActionProperty(this.props.path, 'body', newBody);
   };
-  addNewHeader = e => {
+  addNewHeader = (e) => {
     e.preventDefault();
     const newHeaderArray = update(this.props.action.headers || [], {
       $push: [
         {
           key: null,
-          value: null
-        }
-      ]
+          value: null,
+        },
+      ],
     });
     this.props.updateActionProperty(this.props.path, 'headers', newHeaderArray);
   };
   updateHeader = (index, newHeader) => {
     const newHeaderArray = update(this.props.action.headers, {
       [index]: {
-        $set: newHeader
-      }
+        $set: newHeader,
+      },
     });
     this.props.updateActionProperty(this.props.path, 'headers', newHeaderArray);
   };
-  deleteHeader = index => {
+  deleteHeader = (index) => {
     const newHeaderArray = update(this.props.action.headers, {
-      $splice: [[index, 1]]
+      $splice: [[index, 1]],
     });
     this.props.updateActionProperty(this.props.path, 'headers', newHeaderArray);
   };
-  loadVariables = keys => {
+  loadVariables = (keys) => {
     const { path } = this.props;
-    const keysVariables = keys.map(key => {
+    const keysVariables = keys.map((key) => {
       const keyWithData = `data.${key}`;
       return {
         name: keyWithData,
         type: 'http_request',
         ready: true,
-        label: keyWithData
+        label: keyWithData,
       };
     });
     keysVariables.push({
       name: 'status',
       type: 'http_request',
       ready: true,
-      label: 'status'
+      label: 'status',
     });
     this.props.setVariables(path, keysVariables);
   };
-  tryRequest = async e => {
+  tryRequest = async (e) => {
     e.preventDefault();
     try {
       await this.setState({ error: false, pending: true });
       // format headers properly for the http request route
       const newHeaders = {};
-      this.props.action.headers.forEach(header => {
+      this.props.action.headers.forEach((header) => {
         newHeaders[header.key] = header.value;
       });
       const actionWithCorrectHeader = update(this.props.action, {
         headers: {
-          $set: newHeaders
-        }
+          $set: newHeaders,
+        },
       });
       const { data, headers } = await this.props.httpClient.post('/api/v1/http/request', actionWithCorrectHeader);
       let responseData = data;
@@ -171,7 +171,7 @@ class HttpRequestAction extends Component {
         responseData = JSON.stringify(data, null, 2);
       }
       this.setState({
-        apiTestResponse: responseData
+        apiTestResponse: responseData,
       });
       if (isJsonResponse) {
         const keys = getAllPropertiesObject(data);
@@ -201,7 +201,7 @@ class HttpRequestAction extends Component {
       <div>
         <div
           class={cx('dimmer', {
-            active: this.state.pending
+            active: this.state.pending,
           })}
         >
           <div class="loader" />

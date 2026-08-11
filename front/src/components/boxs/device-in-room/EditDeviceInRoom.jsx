@@ -9,15 +9,15 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { isSupportedFeature } from './SupportedFeatureTypes';
 
 class EditDeviceInRoom extends Component {
-  updateBoxRoom = room => {
+  updateBoxRoom = (room) => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_features: [] });
   };
 
-  updateDeviceFeatures = selectedDeviceFeaturesOptions => {
+  updateDeviceFeatures = (selectedDeviceFeaturesOptions) => {
     selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions || [];
-    const deviceFeatures = selectedDeviceFeaturesOptions.map(option => option.value);
+    const deviceFeatures = selectedDeviceFeaturesOptions.map((option) => option.value);
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      device_features: deviceFeatures
+      device_features: deviceFeatures,
     });
     this.setState({ selectedDeviceFeaturesOptions });
   };
@@ -30,12 +30,12 @@ class EditDeviceInRoom extends Component {
       const deviceOptions = [];
       const selectedDeviceFeaturesOptions = [];
 
-      room.devices.forEach(device => {
+      room.devices.forEach((device) => {
         const roomDeviceFeatures = [];
-        device.features.forEach(feature => {
+        device.features.forEach((feature) => {
           const featureOption = {
             value: feature.selector,
-            label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+            label: getDeviceFeatureName(this.props.intl.dictionary, device, feature),
           };
           // for now, we only supports binary on/off and sensors
           if (feature.read_only || isSupportedFeature(feature)) {
@@ -56,7 +56,7 @@ class EditDeviceInRoom extends Component {
           });
           deviceOptions.push({
             label: device.name,
-            options: roomDeviceFeatures
+            options: roomDeviceFeatures,
           });
         }
       });

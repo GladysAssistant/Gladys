@@ -9,9 +9,9 @@ import { RequestStatus } from '../../../../../utils/consts';
 
 // global summary of the per-device transports ("12 local · 3 cloud ·
 // 1 unreachable · 1 degraded"), only counting devices that report one
-const getTransportCounts = devices => {
+const getTransportCounts = (devices) => {
   const counts = {};
-  (devices || []).forEach(device => {
+  (devices || []).forEach((device) => {
     const transport = getDeviceTransport(device);
     if (transport) {
       counts[transport] = (counts[transport] || 0) + 1;
@@ -30,13 +30,13 @@ const DeviceTab = ({
   getDevices,
   updateDeviceField,
   saveDevice,
-  deleteDevice
+  deleteDevice,
 }) => {
   // first-run guidance: an integration with settings probably needs them
   // filled before anything shows up here
   const hasConfigSchema = (get(integration, 'manifest.config_schema') || []).length > 0;
   const transportCounts = getTransportCounts(devices);
-  const reportedTransports = ['local', 'cloud', 'unreachable'].filter(transport => transportCounts[transport]);
+  const reportedTransports = ['local', 'cloud', 'unreachable'].filter((transport) => transportCounts[transport]);
   const degradedCount = (devices || []).filter(isDeviceTransportDegraded).length;
   return (
     <div class="card">
@@ -54,7 +54,7 @@ const DeviceTab = ({
       <div class="card-body">
         {(reportedTransports.length > 0 || degradedCount > 0) && (
           <div class="mb-4">
-            {reportedTransports.map(transport => (
+            {reportedTransports.map((transport) => (
               <span class="mr-3">
                 {transportCounts[transport]} <TransportBadge transport={transport} />
               </span>
@@ -81,7 +81,7 @@ const DeviceTab = ({
         )}
         <div
           class={cx('dimmer', {
-            active: getDevicesStatus === RequestStatus.Getting
+            active: getDevicesStatus === RequestStatus.Getting,
           })}
         >
           <div class="loader" />

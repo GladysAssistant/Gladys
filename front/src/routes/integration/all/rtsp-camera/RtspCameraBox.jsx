@@ -8,70 +8,70 @@ import { DEVICE_POLL_FREQUENCIES, DEVICE_ROTATION } from '../../../../../../serv
 class RtspCameraBox extends Component {
   saveCamera = async () => {
     this.setState({
-      loading: true
+      loading: true,
     });
     try {
       await this.props.saveCamera(this.props.cameraIndex);
       this.setState({
-        saveError: null
+        saveError: null,
       });
     } catch (e) {
       this.setState({
-        saveError: RequestStatus.Error
+        saveError: RequestStatus.Error,
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
   deleteCamera = async () => {
     this.setState({
-      loading: true
+      loading: true,
     });
     try {
       await this.props.deleteCamera(this.props.cameraIndex);
     } catch (e) {
       this.setState({
-        error: RequestStatus.Error
+        error: RequestStatus.Error,
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
   testConnection = async () => {
     this.setState({
-      loading: true
+      loading: true,
     });
     try {
       await this.props.testConnection(this.props.cameraIndex);
       this.setState({
         testConnectionError: null,
-        testConnectionErrorMessage: null
+        testConnectionErrorMessage: null,
       });
     } catch (e) {
       this.setState({
         testConnectionError: RequestStatus.Error,
-        testConnectionErrorMessage: get(e, 'response.data.error')
+        testConnectionErrorMessage: get(e, 'response.data.error'),
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
-  updateCameraName = e => {
+  updateCameraName = (e) => {
     this.props.updateCameraField(this.props.cameraIndex, 'name', e.target.value);
   };
-  updatePollFrequency = e => {
+  updatePollFrequency = (e) => {
     this.props.updateCameraField(this.props.cameraIndex, 'poll_frequency', parseInt(e.target.value, 10));
   };
-  updateCameraUrl = e => {
+  updateCameraUrl = (e) => {
     this.props.updateCameraUrl(this.props.cameraIndex, e.target.value);
   };
-  updateCameraRotation = e => {
+  updateCameraRotation = (e) => {
     this.props.updateCameraRotation(this.props.cameraIndex, e.target.value);
   };
-  updateCameraRoom = e => {
+  updateCameraRoom = (e) => {
     const newRoom = e.target.value === '' ? null : e.target.value;
     this.props.updateCameraField(this.props.cameraIndex, 'room_id', newRoom);
   };
@@ -83,7 +83,7 @@ class RtspCameraBox extends Component {
         <div class="card">
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -126,9 +126,9 @@ class RtspCameraBox extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {props.housesWithRooms &&
-                      props.housesWithRooms.map(house => (
+                      props.housesWithRooms.map((house) => (
                         <optgroup label={house.name}>
-                          {house.rooms.map(room => (
+                          {house.rooms.map((room) => (
                             <option selected={room.id === props.camera.room_id} value={room.id}>
                               {room.name}
                             </option>

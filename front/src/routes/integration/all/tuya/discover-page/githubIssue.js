@@ -6,7 +6,7 @@ import {
   getLocalOverrideValue,
   getProductIdentifier,
   getUnknownDpsKeys,
-  getUnknownSpecificationCodes
+  getUnknownSpecificationCodes,
 } from '../commons/deviceHelpers';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
@@ -17,22 +17,22 @@ const MAX_GITHUB_CACHE_SIZE = 100;
 const MAX_GITHUB_URL_LENGTH = 8000;
 const githubIssueCache = new Map();
 
-const maskIp = ip => {
+const maskIp = (ip) => {
   if (!ip || typeof ip !== 'string') {
     return null;
   }
   const parts = ip.split('.');
-  if (parts.length !== 4 || parts.some(part => part === '' || Number.isNaN(parseInt(part, 10)))) {
+  if (parts.length !== 4 || parts.some((part) => part === '' || Number.isNaN(parseInt(part, 10)))) {
     return null;
   }
   return `${parts[0]}.x.x.x`;
 };
 
-const sanitizeParams = params => {
+const sanitizeParams = (params) => {
   if (!Array.isArray(params)) {
     return [];
   }
-  return params.map(param => {
+  return params.map((param) => {
     if (param.name === 'LOCAL_KEY') {
       return { ...param, value: '***' };
     }
@@ -51,7 +51,7 @@ const sanitizeIssueValue = (key, value) => {
     return maskIp(value);
   }
   if (Array.isArray(value)) {
-    return value.map(item => sanitizeIssueValue(null, item));
+    return value.map((item) => sanitizeIssueValue(null, item));
   }
   if (value && typeof value === 'object') {
     return Object.keys(value).reduce((acc, currentKey) => {
@@ -62,31 +62,31 @@ const sanitizeIssueValue = (key, value) => {
   return value;
 };
 
-const buildFallbackTuyaReport = device => ({
+const buildFallbackTuyaReport = (device) => ({
   schema_version: 2,
   cloud: {
     assembled: {
       specifications: (device && device.specifications) || null,
       properties: (device && device.properties) || null,
-      thing_model: (device && device.thing_model) || null
+      thing_model: (device && device.thing_model) || null,
     },
     raw: {
       device_list_entry: null,
       device_specification: null,
       device_details: null,
       thing_shadow_properties: null,
-      thing_model: null
-    }
+      thing_model: null,
+    },
   },
   local: {
-    scan: null
-  }
+    scan: null,
+  },
 });
 
-const getSanitizedTuyaReport = device =>
+const getSanitizedTuyaReport = (device) =>
   sanitizeIssueValue(null, device && device.tuya_report ? device.tuya_report : buildFallbackTuyaReport(device));
 
-const getDeviceId = device => {
+const getDeviceId = (device) => {
   if (!device) {
     return null;
   }
@@ -103,7 +103,7 @@ const getDeviceId = device => {
   return null;
 };
 
-const compactObject = value => {
+const compactObject = (value) => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return value;
   }
@@ -115,14 +115,14 @@ const compactObject = value => {
   }, {});
 };
 
-const isResolvedDeviceType = value => !!value && value !== 'unknown';
+const isResolvedDeviceType = (value) => !!value && value !== 'unknown';
 
-const toPrettyJson = value => JSON.stringify(value, null, 2);
+const toPrettyJson = (value) => JSON.stringify(value, null, 2);
 
 const toCodeBlock = (language, value) =>
   `\`\`\`${language}\n${typeof value === 'string' ? value : toPrettyJson(value)}\n\`\`\``;
 
-const slugifyFixturePart = value => {
+const slugifyFixturePart = (value) => {
   if (!value || typeof value !== 'string') {
     return 'tuya-device';
   }
@@ -135,7 +135,7 @@ const slugifyFixturePart = value => {
   return slug || 'tuya-device';
 };
 
-const buildSuggestedFixtureDirectory = issuePayload => {
+const buildSuggestedFixtureDirectory = (issuePayload) => {
   const modelPart = slugifyFixturePart(get(issuePayload, 'device.model') || get(issuePayload, 'device.name'));
   const productPart = slugifyFixturePart(get(issuePayload, 'device.product_id') || get(issuePayload, 'device.id'));
   if (modelPart === productPart) {
@@ -144,7 +144,7 @@ const buildSuggestedFixtureDirectory = issuePayload => {
   return `${modelPart}-${productPart}`;
 };
 
-const buildSuggestedInputDevice = issuePayload => {
+const buildSuggestedInputDevice = (issuePayload) => {
   const device = issuePayload && issuePayload.device ? issuePayload.device : {};
   const params = buildParamsMap(device);
   const details = get(issuePayload, 'cloud.raw.device_details.response.result') || {};
@@ -163,11 +163,11 @@ const buildSuggestedInputDevice = issuePayload => {
     online: device.online,
     specifications: get(issuePayload, 'cloud.assembled.specifications') || {},
     properties: get(issuePayload, 'cloud.assembled.properties') || {},
-    thing_model: get(issuePayload, 'cloud.assembled.thing_model') || null
+    thing_model: get(issuePayload, 'cloud.assembled.thing_model') || null,
   });
 };
 
-const buildSuggestedPollDevice = issuePayload =>
+const buildSuggestedPollDevice = (issuePayload) =>
   compactObject({
     external_id: get(issuePayload, 'device.external_id') || null,
     device_type: isResolvedDeviceType(get(issuePayload, 'device.device_type'))
@@ -175,27 +175,27 @@ const buildSuggestedPollDevice = issuePayload =>
       : null,
     params: get(issuePayload, 'device.params') || [],
     features: get(issuePayload, 'device.features') || [],
-    tuya_mapping: get(issuePayload, 'device.tuya_mapping') || null
+    tuya_mapping: get(issuePayload, 'device.tuya_mapping') || null,
   });
 
-const buildSuggestedCloudStatus = issuePayload => {
+const buildSuggestedCloudStatus = (issuePayload) => {
   const properties = get(issuePayload, 'cloud.assembled.properties.properties') || [];
   return {
     result: properties
-      .filter(item => item && item.code !== undefined && item.code !== null && item.value !== undefined)
-      .map(item => ({
+      .filter((item) => item && item.code !== undefined && item.code !== null && item.value !== undefined)
+      .map((item) => ({
         code: item.code,
-        value: item.value
-      }))
+        value: item.value,
+      })),
   };
 };
 
-const escapeJsString = value =>
+const escapeJsString = (value) =>
   String(value || '')
     .replace(/\\/g, '\\\\')
     .replace(/'/g, "\\'");
 
-const buildSuggestedManifest = issuePayload => {
+const buildSuggestedManifest = (issuePayload) => {
   const name = get(issuePayload, 'device.name') || get(issuePayload, 'device.model') || 'tuya device';
   const hasLocalPoll = !!get(issuePayload, 'local.poll.dps');
   const lines = [
@@ -209,7 +209,7 @@ const buildSuggestedManifest = issuePayload => {
     "    device: './poll-device.json',",
     "    response: './cloud-status.json',",
     "    expectedEvents: './expected-cloud-events.json',",
-    '  },'
+    '  },',
   ];
   if (hasLocalPoll) {
     lines.push(
@@ -218,7 +218,7 @@ const buildSuggestedManifest = issuePayload => {
       "    dps: './local-dps.json',",
       "    expectedEvents: './expected-local-events.json',",
       '    expectedCloudRequests: 0,',
-      '  },'
+      '  },',
     );
   }
   lines.push(
@@ -226,7 +226,7 @@ const buildSuggestedManifest = issuePayload => {
     "    device: './poll-device.json',",
     "    expected: './expected-local-mapping.json',",
     '  },',
-    '};'
+    '};',
   );
   return lines.join('\n');
 };
@@ -248,7 +248,7 @@ const buildSupplementalDiagnostics = (device, issuePayload, localPollStatus, loc
     specification: get(issuePayload, 'cloud.raw.device_specification.error') || null,
     details: get(issuePayload, 'cloud.raw.device_details.error') || null,
     shadow_properties: get(issuePayload, 'cloud.raw.thing_shadow_properties.error') || null,
-    thing_model: get(issuePayload, 'cloud.raw.thing_model.error') || null
+    thing_model: get(issuePayload, 'cloud.raw.thing_model.error') || null,
   });
   return compactObject({
     selector: get(issuePayload, 'device.selector') || null,
@@ -262,7 +262,7 @@ const buildSupplementalDiagnostics = (device, issuePayload, localPollStatus, loc
       model: get(issuePayload, 'device.model') || null,
       category_from_specification: assembledSpecifications.category || null,
       category_from_list_entry: listEntry.category || null,
-      thing_model_id: assembledThingModel.modelId || null
+      thing_model_id: assembledThingModel.modelId || null,
     },
     cloud_source_counts: {
       specification_functions: Array.isArray(assembledSpecifications.functions)
@@ -271,7 +271,7 @@ const buildSupplementalDiagnostics = (device, issuePayload, localPollStatus, loc
       specification_status: Array.isArray(assembledSpecifications.status) ? assembledSpecifications.status.length : 0,
       list_status: listStatus.length,
       shadow_properties: Array.isArray(assembledProperties.properties) ? assembledProperties.properties.length : 0,
-      thing_model_properties: thingModelPropertyCount
+      thing_model_properties: thingModelPropertyCount,
     },
     cloud_raw_errors: Object.keys(cloudErrors).length > 0 ? cloudErrors : undefined,
     protocol_version: get(issuePayload, 'device.protocol_version') || null,
@@ -280,11 +280,11 @@ const buildSupplementalDiagnostics = (device, issuePayload, localPollStatus, loc
     local_poll_status: localPollStatus || null,
     local_poll_error: localPollError || null,
     unknown_specification_codes: unknownSpecificationCodes.length > 0 ? unknownSpecificationCodes : undefined,
-    unknown_local_dps: unknownLocalDpsKeys.length > 0 ? unknownLocalDpsKeys : undefined
+    unknown_local_dps: unknownLocalDpsKeys.length > 0 ? unknownLocalDpsKeys : undefined,
   });
 };
 
-export const buildIssueTitle = device => {
+export const buildIssueTitle = (device) => {
   const isLocal = normalizeBoolean(getLocalOverrideValue(device));
   const modeLabel = isLocal ? 'local' : 'cloud';
   const productIdentifier = getProductIdentifier(device);
@@ -301,12 +301,12 @@ export const buildFollowUpIssueTitle = (baseTitle, latestIssueNumber) => {
   return `${normalizedBaseTitle} (follow-up)`;
 };
 
-const buildGithubSearchQuery = title => `repo:GladysAssistant/Gladys in:title "${title}"`;
+const buildGithubSearchQuery = (title) => `repo:GladysAssistant/Gladys in:title "${title}"`;
 
-export const buildGithubSearchUrl = title =>
+export const buildGithubSearchUrl = (title) =>
   `${GITHUB_SEARCH_BASE_URL}${encodeURIComponent(buildGithubSearchQuery(title))}`;
 
-const buildGithubSearchApiUrl = title => {
+const buildGithubSearchApiUrl = (title) => {
   const query = buildGithubSearchQuery(title);
   return `${GITHUB_SEARCH_API_URL}${encodeURIComponent(query)}&sort=created&order=desc&per_page=1`;
 };
@@ -324,7 +324,7 @@ const setGithubIssueCache = (query, value) => {
   githubIssueCache.set(query, value);
 };
 
-export const checkGithubIssues = async title => {
+export const checkGithubIssues = async (title) => {
   const query = buildGithubSearchQuery(title);
   const cached = githubIssueCache.get(query);
   if (cached && Date.now() - cached.timestamp < GITHUB_SEARCH_CACHE_TTL_MS) {
@@ -340,7 +340,7 @@ export const checkGithubIssues = async title => {
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
       response = await fetch(searchApiUrl, {
-        signal: controller.signal
+        signal: controller.signal,
       });
     } finally {
       clearTimeout(timeoutId);
@@ -357,7 +357,7 @@ export const checkGithubIssues = async title => {
   const result = {
     exists: totalCount > 0,
     totalCount,
-    latestIssueNumber
+    latestIssueNumber,
   };
   setGithubIssueCache(query, { result, timestamp: Date.now() });
   return result;
@@ -390,7 +390,7 @@ const buildIssuePayload = (device, localPollStatus, localPollError, localPollVal
       should_poll: device.should_poll !== undefined ? device.should_poll : null,
       features: Array.isArray(device.features) ? device.features : [],
       params: sanitizeParams(device.params),
-      tuya_mapping: device.tuya_mapping || null
+      tuya_mapping: device.tuya_mapping || null,
     },
     cloud: tuyaReport.cloud,
     local: {
@@ -399,9 +399,9 @@ const buildIssuePayload = (device, localPollStatus, localPollError, localPollVal
         status: localPollStatus || null,
         error: localPollError || null,
         protocol: localPollValidation ? localPollValidation.protocol : null,
-        dps: localPollDps || null
-      }
-    }
+        dps: localPollDps || null,
+      },
+    },
   };
 };
 
@@ -422,7 +422,7 @@ const buildIssueBody = (device, localPollStatus, localPollError, localPollValida
     issuePayload,
     localPollStatus,
     localPollError,
-    localDps
+    localDps,
   );
 
   const sections = [
@@ -521,7 +521,7 @@ const buildIssueBody = (device, localPollStatus, localPollError, localPollValida
     'Derived from `cloud.assembled.properties`.',
     '',
     toCodeBlock('json', cloudStatus),
-    ''
+    '',
   ];
 
   if (localDps) {
@@ -531,7 +531,7 @@ const buildIssueBody = (device, localPollStatus, localPollError, localPollValida
       'Use this as the local poll DPS fixture.',
       '',
       toCodeBlock('json', localDps),
-      ''
+      '',
     );
   }
 
@@ -542,7 +542,7 @@ const buildIssueBody = (device, localPollStatus, localPollError, localPollValida
       'Use this only if a local scan payload exists.',
       '',
       toCodeBlock('json', localScan),
-      ''
+      '',
     );
   }
 
@@ -557,7 +557,7 @@ const buildIssueBody = (device, localPollStatus, localPollError, localPollValida
     '4. Copy `cloud-status.json` from the cloud property values and `local-dps.json` from the local poll DPS payload when available.',
     '5. Create `expected-events.json` if cloud and local polling should emit the same states. If they differ, keep separate `expected-cloud-events.json` and `expected-local-events.json` files instead.',
     '6. Create `expected-local-mapping.json` from the final supported features present in `poll-device.json`, using the resolved DPS returned by the local mapping.',
-    ''
+    '',
   );
 
   sections.push(
@@ -589,8 +589,8 @@ const buildIssueBody = (device, localPollStatus, localPollError, localPollValida
         'poll-device.json (completed with final supported features)',
         'expected-device.json',
         'expected-events.json or expected-cloud-events.json / expected-local-events.json',
-        'expected-local-mapping.json'
-      ].join('\n')
+        'expected-local-mapping.json',
+      ].join('\n'),
     ),
     '',
     '## Validation Checklist',
@@ -607,7 +607,7 @@ const buildIssueBody = (device, localPollStatus, localPollError, localPollValida
     '- Confirm cloud polling behavior',
     '- Confirm local polling behavior',
     '- Confirm local mapping',
-    '- Add or update mapping files if needed'
+    '- Add or update mapping files if needed',
   );
 
   return sections.join('\n');
@@ -619,7 +619,7 @@ export const createGithubIssueData = (
   localPollError,
   localPollValidation,
   localPollDps,
-  options = {}
+  options = {},
 ) => {
   const issueTitle = options.title || buildIssueTitle(device);
   const title = encodeURIComponent(issueTitle);
@@ -632,8 +632,8 @@ export const createGithubIssueData = (
     url: `${GITHUB_BASE_URL}?title=${title}`,
     body,
     truncated: true,
-    title: issueTitle
+    title: issueTitle,
   };
 };
 
-export const createEmptyGithubIssueUrl = title => `${GITHUB_BASE_URL}?title=${encodeURIComponent(title)}`;
+export const createEmptyGithubIssueUrl = (title) => `${GITHUB_BASE_URL}?title=${encodeURIComponent(title)}`;

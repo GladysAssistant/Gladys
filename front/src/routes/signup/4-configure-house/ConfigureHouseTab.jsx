@@ -24,7 +24,7 @@ const ConfigureHouseTab = ({ children, ...props }) => (
             type="text"
             value={props.signupNewHouseName}
             class={cx('form-control', {
-              'is-invalid': props.signupConfigureHouseErrors && props.signupConfigureHouseErrors.houseName
+              'is-invalid': props.signupConfigureHouseErrors && props.signupConfigureHouseErrors.houseName,
             })}
             onInput={props.updateNewHouseName}
             placeholder={<Text id="signup.configureHouse.houseNamePlaceHolder" />}
@@ -47,7 +47,7 @@ const ConfigureHouseTab = ({ children, ...props }) => (
         <div
           class="tags"
           style={{
-            marginBottom: '10px'
+            marginBottom: '10px',
           }}
         >
           {props.signupRooms &&

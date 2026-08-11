@@ -5,7 +5,7 @@ import loginActions from '../../actions/login/login';
 
 const LoginPage = connect(
   'loginFormEmailValue,loginFormPasswordValue,loginStatus',
-  loginActions
+  loginActions,
 )(({ loginFormEmailValue, loginFormPasswordValue, loginStatus, login, onEmailChange, onPasswordChange }) => (
   <div class="container">
     <div class="row">

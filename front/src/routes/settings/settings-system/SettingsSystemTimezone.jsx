@@ -9,10 +9,10 @@ class SettingsSystemTimezone extends Component {
   getTimezone = async () => {
     try {
       const { value } = await this.props.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.TIMEZONE}`);
-      const selectedTimezone = timezones.find(tz => tz.value === value);
+      const selectedTimezone = timezones.find((tz) => tz.value === value);
       if (selectedTimezone) {
         this.setState({
-          selectedTimezone
+          selectedTimezone,
         });
       }
     } catch (e) {
@@ -20,14 +20,14 @@ class SettingsSystemTimezone extends Component {
     }
   };
 
-  updateTimezone = async option => {
+  updateTimezone = async (option) => {
     this.setState({
       savingTimezone: true,
-      selectedTimezone: option
+      selectedTimezone: option,
     });
     try {
       await this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.TIMEZONE}`, {
-        value: option.value
+        value: option.value,
       });
     } catch (e) {
       console.error(e);

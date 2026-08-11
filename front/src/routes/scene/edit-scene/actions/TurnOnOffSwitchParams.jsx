@@ -10,16 +10,16 @@ class TurnOnOffSwitch extends Component {
     try {
       const devices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'switch',
-        device_feature_type: 'binary'
+        device_feature_type: 'binary',
       });
       // keep only write switches, not read only
-      const devicesFiltered = devices.filter(device => {
-        const writeSwitch = device.features.find(f => f.read_only === false);
+      const devicesFiltered = devices.filter((device) => {
+        const writeSwitch = device.features.find((f) => f.read_only === false);
         return writeSwitch !== undefined;
       });
-      const deviceOptions = devicesFiltered.map(device => ({
+      const deviceOptions = devicesFiltered.map((device) => ({
         value: device.selector,
-        label: device.name
+        label: device.name,
       }));
       await this.setState({ deviceOptions });
       this.refreshSelectedOptions(this.props);
@@ -28,19 +28,19 @@ class TurnOnOffSwitch extends Component {
       console.error(e);
     }
   };
-  handleChange = selectedOptions => {
+  handleChange = (selectedOptions) => {
     if (selectedOptions) {
-      const switches = selectedOptions.map(selectedOption => selectedOption.value);
+      const switches = selectedOptions.map((selectedOption) => selectedOption.value);
       this.props.updateActionProperty(this.props.path, 'devices', switches);
     } else {
       this.props.updateActionProperty(this.props.path, 'devices', []);
     }
   };
-  refreshSelectedOptions = nextProps => {
+  refreshSelectedOptions = (nextProps) => {
     const selectedOptions = [];
     if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach(switches => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === switches);
+      nextProps.action.devices.forEach((switches) => {
+        const deviceOption = this.state.deviceOptions.find((deviceOption) => deviceOption.value === switches);
         if (deviceOption) {
           selectedOptions.push(deviceOption);
         }
@@ -52,7 +52,7 @@ class TurnOnOffSwitch extends Component {
     super(props);
     this.state = {
       deviceOptions: null,
-      selectedOptions: []
+      selectedOptions: [],
     };
   }
   async componentDidMount() {

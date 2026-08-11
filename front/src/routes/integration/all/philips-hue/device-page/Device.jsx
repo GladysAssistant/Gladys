@@ -41,7 +41,7 @@ class PhilipsHueDeviceBox extends Component {
           <div class="card-header">{props.device.name || <Text id="integration.mqtt.device.noNameLabel" />}</div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />

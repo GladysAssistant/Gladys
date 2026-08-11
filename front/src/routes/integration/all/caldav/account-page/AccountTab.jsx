@@ -14,7 +14,7 @@ const AccountTab = ({ children, ...props }) => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.loading
+          active: props.loading,
         })}
       >
         <div class="loader" />
@@ -28,7 +28,7 @@ const AccountTab = ({ children, ...props }) => (
             </div>
             <Text id="integration.caldav.hostInfo" />
             <select class="form-control" onChange={props.updateCaldavHost} value={props.caldavHost}>
-              {Object.keys(props.dictionary.services).map(host => (
+              {Object.keys(props.dictionary.services).map((host) => (
                 <option value={host}>
                   <Text id={`integration.caldav.services.${host}.name`} />
                 </option>
@@ -153,7 +153,7 @@ const AccountTab = ({ children, ...props }) => (
                   <i
                     class={cx('fe me-2', {
                       'fe-chevron-right': props.caldavLogVisibility,
-                      'fe-chevron-down': !props.caldavLogVisibility
+                      'fe-chevron-down': !props.caldavLogVisibility,
                     })}
                   />
                   <Text id="integration.caldav.logTitle" />

@@ -28,7 +28,7 @@ const DeviceTab = ({ children, ...props }) => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.getTasmotaStatus === RequestStatus.Getting
+          active: props.getTasmotaStatus === RequestStatus.Getting,
         })}
       >
         <div class="loader" />

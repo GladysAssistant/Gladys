@@ -41,7 +41,7 @@ const OpenWeatherPage = ({ children, ...props }) => (
                 <div class="card-body">
                   <div
                     class={cx('dimmer', {
-                      active: props.loading
+                      active: props.loading,
                     })}
                   >
                     <div class="loader" />
@@ -70,7 +70,7 @@ const OpenWeatherPage = ({ children, ...props }) => (
                             <span class="input-group-append">
                               <button
                                 class={cx('btn', 'btn-success', {
-                                  'btn-loading': props.loading
+                                  'btn-loading': props.loading,
                                 })}
                                 type="submit"
                               >

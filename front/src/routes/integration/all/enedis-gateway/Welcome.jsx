@@ -22,7 +22,7 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: loading
+          active: loading,
         })}
       >
         <div class="loader" />
@@ -48,7 +48,7 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
             featureKeys={[
               'gladysPlusUpsell.enedis.feature1',
               'gladysPlusUpsell.enedis.feature2',
-              'gladysPlusUpsell.enedis.feature3'
+              'gladysPlusUpsell.enedis.feature3',
             ]}
           />
           {usagePointsIds && (
@@ -91,13 +91,13 @@ class EnedisWelcomePageComponent extends Component {
     try {
       if (!this.props.session.gatewayClient) {
         this.setState({
-          notOnGladysGateway: true
+          notOnGladysGateway: true,
         });
         return;
       }
       const response = await this.props.session.gatewayClient.initializeEnedis();
       this.setState({
-        redirectUri: response.redirect_uri
+        redirectUri: response.redirect_uri,
       });
     } catch (e) {
       console.error(e);
@@ -116,12 +116,12 @@ class EnedisWelcomePageComponent extends Component {
     // Get current enedis devices
     const existingDevices = await this.getCurrentEnedisUsagePoints();
     // Check if device already exists
-    const existingDevice = existingDevices.find(device => device.external_id.split(':')[1] === usagePointId);
+    const existingDevice = existingDevices.find((device) => device.external_id.split(':')[1] === usagePointId);
     const device = buildUsagePointDevicePayload({
       usagePointId,
       serviceId,
       intlDictionary: this.props.intl.dictionary,
-      existingDevice
+      existingDevice,
     });
     await this.props.httpClient.post('/api/v1/device', device);
   };
@@ -133,7 +133,7 @@ class EnedisWelcomePageComponent extends Component {
       try {
         await this.setState({ errored: false });
         const finalizeBody = {
-          code: this.props.code
+          code: this.props.code,
         };
         if (config.enedisForceUsagePoints) {
           finalizeBody.usage_points_id = config.enedisForceUsagePoints.split(',');
@@ -143,15 +143,15 @@ class EnedisWelcomePageComponent extends Component {
         }
         const response = await this.props.session.gatewayClient.finalizeEnedis(finalizeBody);
         this.setState({
-          usagePointsIds: response.usage_points_id
+          usagePointsIds: response.usage_points_id,
         });
         await this.props.httpClient.post('/api/v1/service/enedis/variable/ENEDIS_USAGE_POINTS_ID', {
-          value: JSON.stringify(response.usage_points_id)
+          value: JSON.stringify(response.usage_points_id),
         });
         const enedisIntegration = await this.props.httpClient.get(`/api/v1/service/enedis`, {
-          pod_id: null
+          pod_id: null,
         });
-        await Promise.each(response.usage_points_id, async usagePointId => {
+        await Promise.each(response.usage_points_id, async (usagePointId) => {
           await this.createUsagePointDevice(usagePointId, enedisIntegration.id);
         });
         await this.props.session.gatewayClient.enedisRefreshAllData();

@@ -5,7 +5,7 @@ import EditPage from './EditPage';
 
 const XIAOMI_PAGE_PATH = '/dashboard/integration/device/xiaomi';
 
-const EditXiaomiDevice = props => (
+const EditXiaomiDevice = (props) => (
   <XiaomiLayout>
     <EditPage integrationName="xiaomi" allowModifyFeatures={false} previousPage={XIAOMI_PAGE_PATH} {...props} />
   </XiaomiLayout>

@@ -28,7 +28,7 @@ const ChatMessageText = ({ text, markdown = false }) => {
     }
     let cancelled = false;
     loadMarkdownRenderer()
-      .then(render => {
+      .then((render) => {
         if (!cancelled) {
           setHtml(render(text));
         }
@@ -59,7 +59,7 @@ const ChatMessageText = ({ text, markdown = false }) => {
           </a>
         ) : (
           <span key={index}>{part.content}</span>
-        )
+        ),
       )}
     </span>
   );

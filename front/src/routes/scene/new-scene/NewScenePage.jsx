@@ -31,7 +31,7 @@ const NewScenePage = ({ children, ...props }) => (
                 <input
                   type="text"
                   class={cx('form-control', {
-                    'is-invalid': get(props, 'newSceneErrors.name')
+                    'is-invalid': get(props, 'newSceneErrors.name'),
                   })}
                   placeholder={<Text id="newScene.nameLabel" />}
                   value={get(props, 'newScene.name')}

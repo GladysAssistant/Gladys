@@ -12,12 +12,12 @@ import style from './style.css';
 
 // Groups consecutive events of the same device feature ("bursts") so
 // a chatty sensor doesn't flood the timeline, then splits them by day.
-const buildTimeline = events => {
+const buildTimeline = (events) => {
   const days = [];
   let currentDay = null;
   let currentEventGroup = null;
 
-  events.forEach(event => {
+  events.forEach((event) => {
     const dayKey = dayjs(event.created_at).format('YYYY-MM-DD');
     if (!currentDay || currentDay.dayKey !== dayKey) {
       currentDay = { dayKey, date: event.created_at, eventGroups: [] };
@@ -34,7 +34,7 @@ const buildTimeline = events => {
       currentEventGroup = {
         key: `${event.device_feature.selector}-${event.created_at}`,
         selector: event.device_feature.selector,
-        events: [event]
+        events: [event],
       };
       currentDay.eventGroups.push(currentEventGroup);
     }
@@ -58,12 +58,12 @@ class LoadMoreSentinel extends Component {
   componentDidMount() {
     if (typeof IntersectionObserver === 'function') {
       this.observer = new IntersectionObserver(
-        entries => {
+        (entries) => {
           if (entries[0].isIntersecting) {
             this.props.onVisible();
           }
         },
-        { rootMargin: '300px' }
+        { rootMargin: '300px' },
       );
       this.observer.observe(this.base);
     }
@@ -121,7 +121,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
                   <option value="">
                     <Text id="history.allRooms" />
                   </option>
-                  {props.rooms.map(room => (
+                  {props.rooms.map((room) => (
                     <option value={room.id} selected={props.selectedRoomId === room.id}>
                       {room.name}
                     </option>
@@ -148,18 +148,18 @@ const HistoryPage = ({ intl, user, ...props }) => {
               <button
                 type="button"
                 class={cx(style.groupChip, {
-                  [style.groupChipActive]: !props.selectedGroup
+                  [style.groupChipActive]: !props.selectedGroup,
                 })}
                 onClick={() => props.selectGroup(null)}
               >
                 <i class="fe fe-list" />
                 <Text id="history.groups.all" />
               </button>
-              {ALL_GROUPS.map(group => (
+              {ALL_GROUPS.map((group) => (
                 <button
                   type="button"
                   class={cx(style.groupChip, style[`groupChip-${group.colorClass}`], {
-                    [style.groupChipActive]: props.selectedGroup === group.id
+                    [style.groupChipActive]: props.selectedGroup === group.id,
                   })}
                   onClick={() => props.selectGroup(group.id)}
                 >
@@ -201,7 +201,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
 
             <div
               class={cx('dimmer', {
-                active: props.loading && !props.initialized
+                active: props.loading && !props.initialized,
               })}
             >
               <div class="loader" />
@@ -222,7 +222,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
                   </div>
                 )}
 
-                {timeline.map(day => (
+                {timeline.map((day) => (
                   <div class={style.daySection}>
                     <div class={style.dayHeader}>
                       <span class={style.dayHeaderLabel}>
@@ -232,7 +232,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
                     </div>
                     <div class="card">
                       <div class={cx('card-body', style.timelineCard)}>
-                        {day.eventGroups.map(eventGroup => (
+                        {day.eventGroups.map((eventGroup) => (
                           <EventLine
                             eventGroup={eventGroup}
                             intl={intl}
@@ -254,7 +254,7 @@ const HistoryPage = ({ intl, user, ...props }) => {
                       fields={{
                         date: dayjs(props.searchedUntil)
                           .locale(language || 'en')
-                          .format('MMMM YYYY')
+                          .format('MMMM YYYY'),
                       }}
                     />
                   </div>

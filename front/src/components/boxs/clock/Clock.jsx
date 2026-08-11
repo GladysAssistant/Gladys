@@ -45,23 +45,15 @@ const Clock = ({ children, ...props }) => (
 
 class ClockComponent extends Component {
   refreshTime = () => {
-    let month = dayjs()
-      .locale(this.props.user.language)
-      .format('MMMM');
+    let month = dayjs().locale(this.props.user.language).format('MMMM');
     month = month.charAt(0).toUpperCase() + month.slice(1);
 
-    let day = dayjs()
-      .locale(this.props.user.language)
-      .format('dddd');
+    let day = dayjs().locale(this.props.user.language).format('dddd');
     day = day.charAt(0).toUpperCase() + day.slice(1);
 
-    const dayNumber = dayjs()
-      .locale(this.props.user.language)
-      .format('D');
+    const dayNumber = dayjs().locale(this.props.user.language).format('D');
 
-    const year = dayjs()
-      .locale(this.props.user.language)
-      .format('YYYY');
+    const year = dayjs().locale(this.props.user.language).format('YYYY');
 
     const displaySecond = get(this.props, 'box.clock_display_second', false);
 

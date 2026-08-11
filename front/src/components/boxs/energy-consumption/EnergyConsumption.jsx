@@ -15,18 +15,18 @@ import 'react-datepicker/dist/react-datepicker.css';
 const PERIODS = {
   YEAR: 'year',
   MONTH: 'month',
-  DAY: 'day'
+  DAY: 'day',
 };
 
 const DISPLAY_MODES = {
   CURRENCY: 'currency',
-  KWH: 'kwh'
+  KWH: 'kwh',
 };
 
 const PERIOD_LABELS = {
   [PERIODS.YEAR]: 'dashboard.boxes.energyConsumption.year',
   [PERIODS.MONTH]: 'dashboard.boxes.energyConsumption.month',
-  [PERIODS.DAY]: 'dashboard.boxes.energyConsumption.day'
+  [PERIODS.DAY]: 'dashboard.boxes.energyConsumption.day',
 };
 
 const SUBSCRIPTION_COLOR = '#b8c2cc';
@@ -36,7 +36,7 @@ const findDeviceFeatureBySelector = (devices, selector) => {
     return null;
   }
   for (const device of devices) {
-    const feature = (device.features || []).find(f => f.selector === selector);
+    const feature = (device.features || []).find((f) => f.selector === selector);
     if (feature) {
       return { device, feature };
     }
@@ -52,7 +52,7 @@ const getEnergyFeatureDisplayName = (devices, selector, deviceData) => {
   const found = findDeviceFeatureBySelector(devices, selector);
   if (found) {
     const { device, feature } = found;
-    const featureById = new Map((device.features || []).map(f => [f.id, f]));
+    const featureById = new Map((device.features || []).map((f) => [f.id, f]));
     const pathNames = [];
     let current = feature;
     const visited = new Set();
@@ -75,14 +75,14 @@ const getEnergyFeatureDisplayName = (devices, selector, deviceData) => {
     : deviceData.device.name;
 };
 
-const disambiguateDisplayNames = names => {
+const disambiguateDisplayNames = (names) => {
   const nameCount = {};
-  names.forEach(name => {
+  names.forEach((name) => {
     nameCount[name] = (nameCount[name] || 0) + 1;
   });
 
   const nameIndex = {};
-  return names.map(name => {
+  return names.map((name) => {
     if (nameCount[name] === 1) {
       return name;
     }
@@ -106,7 +106,7 @@ class EnergyConsumption extends Component {
       selectedPeriod: PERIODS.MONTH,
       selectedDate: now,
       displayMode: DISPLAY_MODES.CURRENCY,
-      currencyUnit: null
+      currencyUnit: null,
     };
   }
 
@@ -127,7 +127,7 @@ class EnergyConsumption extends Component {
     if (!this.props.box.device_features || this.props.box.device_features.length === 0) {
       await this.setState({
         emptySeries: true,
-        loading: false
+        loading: false,
       });
       return;
     }
@@ -143,7 +143,7 @@ class EnergyConsumption extends Component {
         from: startDate.toISOString(),
         to: endDate.toISOString(),
         group_by: this.getGroupBy(),
-        display_mode: this.state.displayMode
+        display_mode: this.state.displayMode,
       });
 
       let emptySeries = true;
@@ -152,8 +152,8 @@ class EnergyConsumption extends Component {
 
       // Collect all unique timestamps across all device features
       const allTimestamps = new Set();
-      data.forEach(deviceData => {
-        deviceData.values.forEach(value => {
+      data.forEach((deviceData) => {
+        deviceData.values.forEach((value) => {
           allTimestamps.add(new Date(value.created_at).getTime());
         });
       });
@@ -163,7 +163,7 @@ class EnergyConsumption extends Component {
 
       // Get the currency unit from the first device feature that has one
       let currencyUnit = null;
-      data.forEach(deviceData => {
+      data.forEach((deviceData) => {
         if (deviceData.deviceFeature.currency_unit && !currencyUnit) {
           currencyUnit = deviceData.deviceFeature.currency_unit;
         }
@@ -179,7 +179,7 @@ class EnergyConsumption extends Component {
       let consumptionSelectorIndex = 0;
       const pendingSeries = [];
 
-      data.forEach(deviceData => {
+      data.forEach((deviceData) => {
         const isSubscription = deviceData.deviceFeature.is_subscription === true;
 
         // Skip subscription data if show_subscription_prices is not enabled
@@ -196,7 +196,7 @@ class EnergyConsumption extends Component {
 
         // Create a map of timestamp -> value for this device feature
         const valueMap = new Map();
-        deviceData.values.forEach(value => {
+        deviceData.values.forEach((value) => {
           emptySeries = false;
           totalConsumption += parseFloat(value.sum_value);
           const timestamp = new Date(value.created_at).getTime();
@@ -204,25 +204,25 @@ class EnergyConsumption extends Component {
         });
 
         // Create series data with all timestamps, filling missing values with 0
-        const seriesData = sortedTimestamps.map(timestamp => ({
+        const seriesData = sortedTimestamps.map((timestamp) => ({
           x: timestamp,
-          y: valueMap.get(timestamp) || 0
+          y: valueMap.get(timestamp) || 0,
         }));
 
         pendingSeries.push({
           displayName: getEnergyFeatureDisplayName(this.props.devices, selector, deviceData),
           seriesData,
-          isSubscription
+          isSubscription,
         });
       });
 
-      const seriesNames = disambiguateDisplayNames(pendingSeries.map(item => item.displayName));
+      const seriesNames = disambiguateDisplayNames(pendingSeries.map((item) => item.displayName));
 
       pendingSeries.forEach((item, index) => {
         // ApexCharts requires unique series names for stacked bars to render correctly.
         series.push({
           name: seriesNames[index],
-          data: item.seriesData
+          data: item.seriesData,
         });
 
         if (item.isSubscription) {
@@ -239,7 +239,7 @@ class EnergyConsumption extends Component {
         loading: false,
         emptySeries,
         totalConsumption,
-        currencyUnit
+        currencyUnit,
       });
     } catch (e) {
       console.error('Error fetching energy consumption data:', e);
@@ -247,7 +247,7 @@ class EnergyConsumption extends Component {
       await this.setState({
         error: error.message,
         errorDetail: error.detail,
-        loading: false
+        loading: false,
       });
     }
   };
@@ -305,7 +305,7 @@ class EnergyConsumption extends Component {
     }
   };
 
-  changePeriod = period => {
+  changePeriod = (period) => {
     this.setState({ selectedPeriod: period }, () => {
       this.refreshData();
     });
@@ -349,11 +349,11 @@ class EnergyConsumption extends Component {
     this.setState({ selectedDate: newDate }, this.refreshData);
   };
 
-  onDateChange = date => {
+  onDateChange = (date) => {
     this.setState({ selectedDate: date }, this.refreshData);
   };
 
-  changeDisplayMode = mode => {
+  changeDisplayMode = (mode) => {
     this.setState({ displayMode: mode }, this.refreshData);
   };
 
@@ -365,7 +365,7 @@ class EnergyConsumption extends Component {
     return '€';
   };
 
-  yAxisFormatter = value => {
+  yAxisFormatter = (value) => {
     // ApexCharts calls this formatter with undefined values when a series
     // is hidden through the legend, throwing here would break the tooltip
     if (value === null || value === undefined || Number.isNaN(value)) {
@@ -379,7 +379,7 @@ class EnergyConsumption extends Component {
     return `${value.toFixed(2)}${unit}`;
   };
 
-  tooltipYFormatter = value => {
+  tooltipYFormatter = (value) => {
     // ApexCharts calls this formatter with undefined values when a series
     // is hidden through the legend, throwing here would break the tooltip
     if (value === null || value === undefined || Number.isNaN(value)) {
@@ -390,24 +390,18 @@ class EnergyConsumption extends Component {
     return `${value.toFixed(2)}${unit}`;
   };
 
-  tooltipXFormatter = value => {
+  tooltipXFormatter = (value) => {
     const { selectedPeriod } = this.state;
     // Format date based on period - show date only, not datetime
     if (selectedPeriod === PERIODS.DAY) {
       // For day view, show hour only
-      return dayjs(value)
-        .locale(this.props.user.language)
-        .format('HH:mm');
+      return dayjs(value).locale(this.props.user.language).format('HH:mm');
     } else if (selectedPeriod === PERIODS.MONTH) {
       // For month view, show day
-      return dayjs(value)
-        .locale(this.props.user.language)
-        .format('DD MMM YYYY');
+      return dayjs(value).locale(this.props.user.language).format('DD MMM YYYY');
     } else {
       // For year view, show month
-      return dayjs(value)
-        .locale(this.props.user.language)
-        .format('MMM YYYY');
+      return dayjs(value).locale(this.props.user.language).format('MMM YYYY');
     }
   };
 
@@ -451,7 +445,7 @@ class EnergyConsumption extends Component {
       emptySeries,
       selectedPeriod,
       totalConsumption,
-      displayMode
+      displayMode,
     } = state;
     const localeSet = this.props.user.language === 'fr' ? fr : 'en';
     return (
@@ -467,13 +461,13 @@ class EnergyConsumption extends Component {
           <div class="row mb-3">
             <div class="col-12">
               <div class="d-flex justify-content-between">
-                {Object.values(PERIODS).map(period => (
+                {Object.values(PERIODS).map((period) => (
                   <button
                     key={period}
                     type="button"
                     class={cx('btn flex-fill mx-1', {
                       'btn-primary': selectedPeriod === period,
-                      'btn-outline-primary': selectedPeriod !== period
+                      'btn-outline-primary': selectedPeriod !== period,
                     })}
                     onClick={() => this.changePeriod(period)}
                   >
@@ -519,7 +513,7 @@ class EnergyConsumption extends Component {
                 type="button"
                 class={cx('btn btn-sm mx-1', {
                   'btn-outline-secondary': displayMode === DISPLAY_MODES.CURRENCY,
-                  'btn-secondary': displayMode !== DISPLAY_MODES.CURRENCY
+                  'btn-secondary': displayMode !== DISPLAY_MODES.CURRENCY,
                 })}
                 onClick={() => this.changeDisplayMode(DISPLAY_MODES.CURRENCY)}
               >
@@ -529,7 +523,7 @@ class EnergyConsumption extends Component {
                 type="button"
                 class={cx('btn btn-sm mx-1', {
                   'btn-outline-secondary': displayMode === DISPLAY_MODES.KWH,
-                  'btn-secondary': displayMode !== DISPLAY_MODES.KWH
+                  'btn-secondary': displayMode !== DISPLAY_MODES.KWH,
                 })}
                 onClick={() => this.changeDisplayMode(DISPLAY_MODES.KWH)}
               >

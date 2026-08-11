@@ -6,7 +6,7 @@ import SetupLocalOptions from './SetupLocalOptions';
 import SetupLocalSummary from './SetupLocalSummary';
 
 class SetupLocalMode extends Component {
-  saveConfiguration = configuration => {
+  saveConfiguration = (configuration) => {
     this.props.saveConfiguration(configuration);
   };
 
@@ -29,7 +29,7 @@ class SetupLocalMode extends Component {
     const { configuration = {} } = props;
 
     this.state = {
-      editionMode: !configuration.z2mDriverPath
+      editionMode: !configuration.z2mDriverPath,
     };
   }
 

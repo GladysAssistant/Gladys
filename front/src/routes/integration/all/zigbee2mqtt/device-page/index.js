@@ -23,5 +23,5 @@ class Zigbee2mqttIntegration extends Component {
 
 export default connect(
   'user,zigbee2mqttDevices,houses,getZigbee2mqttStatus,zigbee2mqttSearch,getZigbee2mqttOrderDir,z2mUrl,showZ2mUrlWarning',
-  actions
+  actions,
 )(Zigbee2mqttIntegration);

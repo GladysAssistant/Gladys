@@ -31,7 +31,7 @@ describe('Sign-up', () => {
     // Check errors
     cy.get('.invalid-feedback:visible')
       .should('be.length', 4)
-      .then(elements => {
+      .then((elements) => {
         cy.wrap(elements[0]).i18n('profile.firstnameError');
         cy.wrap(elements[1]).i18n('profile.lastnameError');
         cy.wrap(elements[2]).i18n('profile.emailError');
@@ -44,7 +44,7 @@ describe('Sign-up', () => {
     const language = Cypress.env('language');
 
     // Fill form
-    cy.get('input:visible').then(inputs => {
+    cy.get('input:visible').then((inputs) => {
       // First name
       cy.wrap(inputs[0]).type(tony.firstname);
       // Last name
@@ -59,7 +59,7 @@ describe('Sign-up', () => {
       cy.wrap(inputs[5]).type('short');
     });
 
-    cy.get('select:visible').then(selects => {
+    cy.get('select:visible').then((selects) => {
       // Language
       cy.wrap(selects[0]).select(language);
     });
@@ -68,16 +68,14 @@ describe('Sign-up', () => {
     cy.contains('button', 'signup.createLocalAccount.createAccountButton').click();
 
     // Check errors
-    cy.get('.invalid-feedback:visible')
-      .should('be.length', 1)
-      .i18n('profile.passwordError');
+    cy.get('.invalid-feedback:visible').should('be.length', 1).i18n('profile.passwordError');
   });
 
   it('Create new account - not same password', () => {
     const { tony } = Cypress.env('users');
 
     // Fill form
-    cy.get('input:visible').then(inputs => {
+    cy.get('input:visible').then((inputs) => {
       // Password
       cy.wrap(inputs[4]).as('passwordInput');
       cy.get('@passwordInput').clear();
@@ -88,9 +86,7 @@ describe('Sign-up', () => {
     cy.contains('button', 'signup.createLocalAccount.createAccountButton').click();
 
     // Check errors
-    cy.get('.invalid-feedback:visible')
-      .should('be.length', 1)
-      .i18n('profile.passwordRepeatError');
+    cy.get('.invalid-feedback:visible').should('be.length', 1).i18n('profile.passwordRepeatError');
   });
 
   it('Create new account - done', () => {
@@ -98,7 +94,7 @@ describe('Sign-up', () => {
     const { tony } = users;
 
     // Fill form
-    cy.get('input:visible').then(inputs => {
+    cy.get('input:visible').then((inputs) => {
       // Password
       cy.wrap(inputs[5]).as('passwordConfirmInput');
       cy.get('@passwordConfirmInput').clear();
@@ -110,13 +106,13 @@ describe('Sign-up', () => {
     cy.intercept(
       {
         method: 'POST',
-        url: `${serverUrl}/api/v1/signup`
+        url: `${serverUrl}/api/v1/signup`,
       },
-      req => {
-        req.reply(res => {
+      (req) => {
+        req.reply((res) => {
           window.localStorage.setItem('user', JSON.stringify(res.body));
         });
-      }
+      },
     );
 
     // Submit empty form
@@ -138,14 +134,14 @@ describe('Sign-up', () => {
     const house = Cypress.env('house');
 
     // Fill form
-    cy.get('input:visible').then(inputs => {
+    cy.get('input:visible').then((inputs) => {
       // House name
       cy.wrap(inputs[0]).as('houseNameInput');
       cy.get('@houseNameInput').clear();
       cy.get('@houseNameInput').type(house.name);
 
       // Room
-      house.rooms.forEach(room => {
+      house.rooms.forEach((room) => {
         cy.wrap(inputs[1]).as('roomInput');
         cy.get('@roomInput').clear();
         cy.get('@roomInput').type(room.name);
@@ -159,15 +155,15 @@ describe('Sign-up', () => {
     cy.intercept(
       {
         method: 'POST',
-        url: `${serverUrl}/api/v1/house/room/${house.rooms[0].selector}`
+        url: `${serverUrl}/api/v1/house/room/${house.rooms[0].selector}`,
       },
-      req => {
-        req.reply(res => {
+      (req) => {
+        req.reply((res) => {
           const house = Cypress.env('house');
           house.rooms[0] = res.body;
           Cypress.env('house', house);
         });
-      }
+      },
     );
 
     // Submit form

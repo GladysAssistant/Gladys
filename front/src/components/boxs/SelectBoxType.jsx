@@ -6,19 +6,19 @@ import withIntlAsProp from '../../utils/withIntlAsProp';
 
 // Widget "devices in room" is deprecated and will be removed soon
 const DASHBOARD_BOX_TYPE_LIST_FILTERED = DASHBOARD_BOX_TYPE_LIST.filter(
-  dashboardBoxType => dashboardBoxType !== 'devices-in-room'
+  (dashboardBoxType) => dashboardBoxType !== 'devices-in-room',
 );
 
 import BaseEditBox from './baseEditBox';
 
 class SelectBoxType extends Component {
-  selectType = e => {
+  selectType = (e) => {
     this.props.updateNewSelectedBox(this.props.x, this.props.y, e.target.value);
   };
   render(props) {
-    const sortedBoxTypes = DASHBOARD_BOX_TYPE_LIST_FILTERED.map(dashboardBoxType => ({
+    const sortedBoxTypes = DASHBOARD_BOX_TYPE_LIST_FILTERED.map((dashboardBoxType) => ({
       type: dashboardBoxType,
-      label: get(props.intl.dictionary, `dashboard.boxTitle.${dashboardBoxType}`, { default: dashboardBoxType })
+      label: get(props.intl.dictionary, `dashboard.boxTitle.${dashboardBoxType}`, { default: dashboardBoxType }),
     })).sort((a, b) => a.label.localeCompare(b.label));
     return (
       <BaseEditBox {...props} titleKey="dashboard.selectBoxType">

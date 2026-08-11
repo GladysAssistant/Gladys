@@ -11,10 +11,10 @@ const pushAllWithType = (items, type, icon) => {
   integrationsByType[type] = [];
   categories.push({
     type,
-    icon
+    icon,
   });
 
-  items.forEach(item => {
+  items.forEach((item) => {
     const newItem = { ...item, type };
     integrations.push(newItem);
     integrationsByType[type].push(newItem);

@@ -12,7 +12,7 @@ import style from './transportBadge.css';
 const BADGE_CLASSES = {
   local: 'badge-success',
   cloud: 'badge-info',
-  unreachable: 'badge-danger'
+  unreachable: 'badge-danger',
 };
 
 const TransportBadge = ({ transport, degraded, message }) => {

@@ -19,18 +19,18 @@ describe('Dashboard Humidity Box', () => {
           [
             {
               type: 'humidity-in-room',
-              room: roomSelector
-            }
+              room: roomSelector,
+            },
           ],
-          []
-        ]
-      }
+          [],
+        ],
+      },
     });
 
     cy.request({
       method: 'GET',
-      url: `${serverUrl}/api/v1/room/${roomSelector}`
-    }).then(res => {
+      url: `${serverUrl}/api/v1/room/${roomSelector}`,
+    }).then((res) => {
       // Create humidity device in room
       const device1 = {
         name: 'First device',
@@ -48,9 +48,9 @@ describe('Dashboard Humidity Box', () => {
             keep_history: true,
             has_feedback: false,
             min: -50,
-            max: 100
-          }
-        ]
+            max: 100,
+          },
+        ],
       };
       cy.createDevice(device1, 'example');
     });
@@ -71,20 +71,20 @@ describe('Dashboard Humidity Box', () => {
           keep_history: true,
           has_feedback: false,
           min: -50,
-          max: 100
-        }
-      ]
+          max: 100,
+        },
+      ],
     };
     cy.createDevice(otherRoomDevice, 'example');
 
     cy.intercept({
       method: 'GET',
-      url: `${serverUrl}/api/v1/dashboard/test`
+      url: `${serverUrl}/api/v1/dashboard/test`,
     }).as('loadDashboard');
 
     cy.intercept({
       method: 'GET',
-      url: `${serverUrl}/api/v1/room/${roomSelector}?expand=humidity,devices`
+      url: `${serverUrl}/api/v1/room/${roomSelector}?expand=humidity,devices`,
     }).as('loadBox');
 
     cy.visit('/dashboard/test');
@@ -99,7 +99,7 @@ describe('Dashboard Humidity Box', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.request({
       method: 'DELETE',
-      url: `${serverUrl}/api/v1/dashboard/test`
+      url: `${serverUrl}/api/v1/dashboard/test`,
     });
   });
   it('Should have no value box', () => {
@@ -117,13 +117,13 @@ describe('Dashboard Humidity Box', () => {
 
     cy.intercept({
       method: 'GET',
-      url: `${serverUrl}/api/v1/room/${roomSelector}?expand=humidity,devices`
+      url: `${serverUrl}/api/v1/room/${roomSelector}?expand=humidity,devices`,
     }).as('reloadBox');
 
     cy.request({
       method: 'POST',
       url: `${serverUrl}/api/v1/device/first-device/humidity-sensor/decimal/value`,
-      body: { value: 24 }
+      body: { value: 24 },
     });
 
     cy.sendWebSocket({ type: 'device.new-state', payload: { device_feature_selector: 'first-humidity' } });
@@ -139,7 +139,7 @@ describe('Dashboard Humidity Box', () => {
     cy.request({
       method: 'POST',
       url: `${serverUrl}/api/v1/device/first-device/humidity-sensor/decimal/value`,
-      body: { value: 24 }
+      body: { value: 24 },
     });
 
     cy.sendWebSocket({ type: 'device.new-state', payload: { device_feature_selector: 'second-humidity' } });

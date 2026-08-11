@@ -2,9 +2,10 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-const IP_PATTERN = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-const atoi = addr => {
-  const parts = addr.split('.').map(str => {
+const IP_PATTERN =
+  /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+const atoi = (addr) => {
+  const parts = addr.split('.').map((str) => {
     return parseInt(str, 10);
   });
 
@@ -32,17 +33,17 @@ class SearchForm extends Component {
     this.setState({ searchByRange: true });
   };
 
-  updateSingleAddress = e => {
+  updateSingleAddress = (e) => {
     e.preventDefault();
     this.setState({ singleAddress: e.target.value });
   };
 
-  updateFirstAddress = e => {
+  updateFirstAddress = (e) => {
     e.preventDefault();
     this.setState({ firstAddress: e.target.value });
   };
 
-  updateLastAddress = e => {
+  updateLastAddress = (e) => {
     e.preventDefault();
     this.setState({ lastAddress: e.target.value });
   };

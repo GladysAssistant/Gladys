@@ -12,13 +12,13 @@ const mdnsAdvertisers = {
   AVAHI: 'avahi',
   BONJOUR: 'bonjour-hap',
   CIAO: 'ciao',
-  RESOLVED: 'resolved'
+  RESOLVED: 'resolved',
 };
 
 const ExposedDevicesSelect = ({ homekitCompatibleDevices, homekitExposedDevices, updateExposedDevices }) => {
-  const deviceOptions = (homekitCompatibleDevices || []).map(device => ({
+  const deviceOptions = (homekitCompatibleDevices || []).map((device) => ({
     value: device.selector,
-    label: device.name
+    label: device.name,
   }));
 
   if (deviceOptions.length === 0) {
@@ -33,7 +33,7 @@ const ExposedDevicesSelect = ({ homekitCompatibleDevices, homekitExposedDevices,
     <Select
       isMulti
       options={deviceOptions}
-      value={deviceOptions.filter(option => (homekitExposedDevices || []).includes(option.value))}
+      value={deviceOptions.filter((option) => (homekitExposedDevices || []).includes(option.value))}
       onChange={updateExposedDevices}
       maxMenuHeight={220}
       className="react-select-container"
@@ -80,7 +80,7 @@ const HomKitPage = ({ children, ...props }) => (
                 <div class="card-body">
                   <div
                     class={cx('dimmer', {
-                      active: props.loading
+                      active: props.loading,
                     })}
                   >
                     <div class="loader" />
@@ -115,7 +115,7 @@ const HomKitPage = ({ children, ...props }) => (
                               onChange={props.updateMDNSAdvertiser}
                               value={props.homekitMdnsAdvertiser}
                             >
-                              {Object.keys(mdnsAdvertisers).map(mdns => (
+                              {Object.keys(mdnsAdvertisers).map((mdns) => (
                                 <option value={mdnsAdvertisers[mdns]}>{mdns}</option>
                               ))}
                             </select>

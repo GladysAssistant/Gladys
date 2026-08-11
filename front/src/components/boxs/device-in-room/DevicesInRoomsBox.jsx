@@ -8,7 +8,7 @@ class DevicesInRoomComponent extends Component {
     try {
       const room = await this.props.httpClient.get(`/api/v1/room/${this.props.box.room}`);
       this.setState({
-        room
+        room,
       });
     } catch (e) {
       console.error(e);

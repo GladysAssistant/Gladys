@@ -3,7 +3,7 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
-const formatDuration = duration => {
+const formatDuration = (duration) => {
   const hours = Math.floor(duration / (1000 * 60 * 60));
   const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
   const seconds = Math.floor((duration % (1000 * 60)) / 1000);
@@ -15,14 +15,14 @@ class SettingsSystemDatabaseCleaning extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      vacuumStarted: false
+      vacuumStarted: false,
     };
   }
 
-  vacuumDatabase = async e => {
+  vacuumDatabase = async (e) => {
     e.preventDefault();
     this.setState({
-      vacuumStarted: true
+      vacuumStarted: true,
     });
     try {
       await this.props.httpClient.post('/api/v1/system/vacuum');
@@ -31,11 +31,11 @@ class SettingsSystemDatabaseCleaning extends Component {
     }
   };
 
-  vacuumFinished = payload => {
+  vacuumFinished = (payload) => {
     this.setState({
       vacuumStarted: false,
       vacuumFinished: true,
-      vacuumDuration: payload.duration
+      vacuumDuration: payload.duration,
     });
   };
 

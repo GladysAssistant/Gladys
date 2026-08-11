@@ -7,43 +7,43 @@ import SettingsLayout from '../../SettingsLayout';
 import { RequestStatus } from '../../../../utils/consts';
 
 class SettingsUsers extends Component {
-  updateFirstname = e => {
+  updateFirstname = (e) => {
     this.props.updateNewUserProperty('firstname', e.target.value);
   };
-  updateLastname = e => {
+  updateLastname = (e) => {
     this.props.updateNewUserProperty('lastname', e.target.value);
   };
-  updateEmail = e => {
+  updateEmail = (e) => {
     this.props.updateNewUserProperty('email', e.target.value);
   };
-  updateRole = e => {
+  updateRole = (e) => {
     this.props.updateNewUserProperty('role', e.target.value);
   };
-  updateLanguage = e => {
+  updateLanguage = (e) => {
     this.props.updateNewUserProperty('language', e.target.value);
   };
-  updatePassword = e => {
+  updatePassword = (e) => {
     this.props.updateNewUserProperty('password', e.target.value);
     this.props.validatePassword();
   };
-  updatePasswordRepeat = e => {
+  updatePasswordRepeat = (e) => {
     this.props.updateNewUserProperty('passwordRepeat', e.target.value);
     this.props.validatePasswordRepeat();
   };
-  updateBirthdateDay = e => {
+  updateBirthdateDay = (e) => {
     this.props.updateNewUserProperty('birthdateDay', e.target.value);
   };
-  updateBirthdateMonth = e => {
+  updateBirthdateMonth = (e) => {
     this.props.updateNewUserProperty('birthdateMonth', e.target.value);
     this.props.updateDays();
   };
-  updateBirthdateYear = e => {
+  updateBirthdateYear = (e) => {
     this.props.updateNewUserProperty('birthdateYear', e.target.value);
   };
-  updateTemperatureUnit = e => {
+  updateTemperatureUnit = (e) => {
     this.props.updateNewUserProperty('temperature_unit_preference', e.target.value);
   };
-  updateDistanceUnit = e => {
+  updateDistanceUnit = (e) => {
     this.props.updateNewUserProperty('distance_unit_preference', e.target.value);
   };
 
@@ -74,7 +74,7 @@ class SettingsUsers extends Component {
       language: 'en',
       role: 'admin',
       birthdateYear: null,
-      birthdateMonth: null
+      birthdateMonth: null,
     });
   }
 
@@ -119,5 +119,5 @@ class SettingsUsers extends Component {
 
 export default connect(
   'currentUrl,newUser,years,months,days,createUserStatus,createUserError,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue,ProfilePatchStatus,ProfileGetStatus',
-  actions
+  actions,
 )(SettingsUsers);

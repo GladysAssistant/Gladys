@@ -19,5 +19,5 @@ class FreeMobileIntegration extends Component {
 
 export default connect(
   'user,freeMobileUsername,freeMobileAccessToken,freeMobileGetSettingsStatus,freeMobileSaveSettingsStatus',
-  actions
+  actions,
 )(FreeMobileIntegration);

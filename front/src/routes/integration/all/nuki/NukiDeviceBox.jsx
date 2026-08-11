@@ -9,32 +9,32 @@ import { connect } from 'unistore/preact';
 class NukiDeviceBox extends Component {
   componentWillMount() {
     this.setState({
-      device: this.props.device
+      device: this.props.device,
     });
   }
 
-  updateName = e => {
+  updateName = (e) => {
     this.setState({
       device: {
         ...this.state.device,
-        name: e.target.value
-      }
+        name: e.target.value,
+      },
     });
   };
 
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.setState({
       device: {
         ...this.state.device,
-        room_id: e.target.value
-      }
+        room_id: e.target.value,
+      },
     });
   };
 
   saveDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null
+      errorMessage: null,
     });
     try {
       const deviceDidNotExist = this.state.device.id === undefined;
@@ -43,7 +43,7 @@ class NukiDeviceBox extends Component {
         savedDevice.alreadyExist = true;
       }
       this.setState({
-        device: savedDevice
+        device: savedDevice,
       });
     } catch (e) {
       let errorMessage = 'integration.nuki.error.defaultError';
@@ -51,11 +51,11 @@ class NukiDeviceBox extends Component {
         errorMessage = 'integration.nuki.error.conflictError';
       }
       this.setState({
-        errorMessage
+        errorMessage,
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
@@ -64,7 +64,7 @@ class NukiDeviceBox extends Component {
       loading: true,
       errorMessage: null,
       tooMuchStatesError: false,
-      statesNumber: undefined
+      statesNumber: undefined,
     });
     try {
       if (this.state.device.created_at) {
@@ -79,22 +79,22 @@ class NukiDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.nuki.error.defaultDeletionError'
+          errorMessage: 'integration.nuki.error.defaultDeletionError',
         });
       }
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
   render(
     { deviceIndex, editable, alreadyCreatedButton, deleteButton, housesWithRooms },
-    { device, loading, errorMessage, tooMuchStatesError, statesNumber }
+    { device, loading, errorMessage, tooMuchStatesError, statesNumber },
   ) {
     const validModel = device.features && device.features.length > 0;
     // default value is 'mqtt'
-    const deviceProtocol = ((device.params || []).find(p => p.name === 'protocol') || { value: 'mqtt' }).value;
+    const deviceProtocol = ((device.params || []).find((p) => p.name === 'protocol') || { value: 'mqtt' }).value;
 
     return (
       <div class="col-md-6">
@@ -102,7 +102,7 @@ class NukiDeviceBox extends Component {
           <div class="card-header">{device.name}</div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -150,9 +150,9 @@ class NukiDeviceBox extends Component {
                         <Text id="global.emptySelectOption" />
                       </option>
                       {housesWithRooms &&
-                        housesWithRooms.map(house => (
+                        housesWithRooms.map((house) => (
                           <optgroup label={house.name}>
-                            {house.rooms.map(room => (
+                            {house.rooms.map((room) => (
                               <option selected={room.id === device.room_id} value={room.id}>
                                 {room.name}
                               </option>

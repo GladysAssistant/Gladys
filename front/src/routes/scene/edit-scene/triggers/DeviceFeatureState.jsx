@@ -20,7 +20,7 @@ import WaterValveDeviceState from './device-states/WaterValveDeviceState';
 import WaterHeaterModeDeviceState from './device-states/WaterHeaterModeDeviceState';
 
 class TurnOnLight extends Component {
-  onDeviceFeatureChange = deviceFeature => {
+  onDeviceFeatureChange = (deviceFeature) => {
     this.setState({ selectedDeviceFeature: deviceFeature });
     if (deviceFeature) {
       this.props.updateTriggerProperty(this.props.index, 'device_feature', deviceFeature.selector);
@@ -32,11 +32,11 @@ class TurnOnLight extends Component {
     }
   };
 
-  getForDurationUnit = trigger => trigger.unit || 'minute';
+  getForDurationUnit = (trigger) => trigger.unit || 'minute';
 
-  getForDurationMultiplier = unit => (unit === 'second' ? 1000 : 60 * 1000);
+  getForDurationMultiplier = (unit) => (unit === 'second' ? 1000 : 60 * 1000);
 
-  getForDurationDisplayValue = trigger => {
+  getForDurationDisplayValue = (trigger) => {
     if (!Number.isInteger(trigger.for_duration)) {
       return trigger.for_duration;
     }
@@ -44,21 +44,21 @@ class TurnOnLight extends Component {
     return trigger.for_duration / this.getForDurationMultiplier(this.getForDurationUnit(trigger));
   };
 
-  onForDurationChange = e => {
+  onForDurationChange = (e) => {
     e.preventDefault();
     if (e.target.value) {
       const unit = this.getForDurationUnit(this.props.trigger);
       this.props.updateTriggerProperty(
         this.props.index,
         'for_duration',
-        Number(e.target.value) * this.getForDurationMultiplier(unit)
+        Number(e.target.value) * this.getForDurationMultiplier(unit),
       );
     } else {
       this.props.updateTriggerProperty(this.props.index, 'for_duration', '');
     }
   };
 
-  onForDurationUnitChange = e => {
+  onForDurationUnitChange = (e) => {
     e.preventDefault();
     const newUnit = e.target.value;
     const currentUnit = this.getForDurationUnit(this.props.trigger);
@@ -68,14 +68,14 @@ class TurnOnLight extends Component {
       this.props.updateTriggerProperty(
         this.props.index,
         'for_duration',
-        displayValue * this.getForDurationMultiplier(newUnit)
+        displayValue * this.getForDurationMultiplier(newUnit),
       );
     }
 
     this.props.updateTriggerProperty(this.props.index, 'unit', newUnit);
   };
 
-  enableOrDisableForDuration = e => {
+  enableOrDisableForDuration = (e) => {
     e.preventDefault();
     if (e.target.checked) {
       this.props.updateTriggerProperty(this.props.index, 'for_duration', 60 * 1000);
@@ -126,7 +126,7 @@ class TurnOnLight extends Component {
         [
           DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
           DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
-          DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION
+          DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
         ].includes(type);
       levelSensorDevice =
         category === DEVICE_FEATURE_CATEGORIES.LEVEL_SENSOR && type === DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE;

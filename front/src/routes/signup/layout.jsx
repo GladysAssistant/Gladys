@@ -26,12 +26,12 @@ const SignupLayout = ({ children, ...props }) => (
                 <ul class="nav nav-pills nav-fill">
                   <li
                     class={cx('nav-item', {
-                      'd-none d-lg-block': props.currentUrl !== '/signup'
+                      'd-none d-lg-block': props.currentUrl !== '/signup',
                     })}
                   >
                     <Link
                       class={cx('nav-link', style.navLinkWithoutCursor, {
-                        active: props.currentUrl === '/signup'
+                        active: props.currentUrl === '/signup',
                       })}
                       href="#"
                     >
@@ -40,12 +40,12 @@ const SignupLayout = ({ children, ...props }) => (
                   </li>
                   <li
                     class={cx('nav-item', {
-                      'd-none d-lg-block': props.currentUrl !== '/signup/create-account-local'
+                      'd-none d-lg-block': props.currentUrl !== '/signup/create-account-local',
                     })}
                   >
                     <Link
                       class={cx('nav-link', style.navLinkWithoutCursor, {
-                        active: props.currentUrl === '/signup/create-account-local'
+                        active: props.currentUrl === '/signup/create-account-local',
                       })}
                       href="#"
                     >
@@ -54,12 +54,12 @@ const SignupLayout = ({ children, ...props }) => (
                   </li>
                   <li
                     class={cx('nav-item', {
-                      'd-none d-lg-block': props.currentUrl !== '/signup/preference'
+                      'd-none d-lg-block': props.currentUrl !== '/signup/preference',
                     })}
                   >
                     <Link
                       class={cx('nav-link', style.navLinkWithoutCursor, {
-                        active: props.currentUrl && props.currentUrl === '/signup/preference'
+                        active: props.currentUrl && props.currentUrl === '/signup/preference',
                       })}
                       href="#"
                     >
@@ -68,12 +68,12 @@ const SignupLayout = ({ children, ...props }) => (
                   </li>
                   <li
                     class={cx('nav-item', {
-                      'd-none d-lg-block': props.currentUrl !== '/signup/configure-house'
+                      'd-none d-lg-block': props.currentUrl !== '/signup/configure-house',
                     })}
                   >
                     <Link
                       class={cx('nav-link', style.navLinkWithoutCursor, {
-                        active: props.currentUrl && props.currentUrl === '/signup/configure-house'
+                        active: props.currentUrl && props.currentUrl === '/signup/configure-house',
                       })}
                       href="#"
                     >
@@ -82,12 +82,12 @@ const SignupLayout = ({ children, ...props }) => (
                   </li>
                   <li
                     class={cx('nav-item', {
-                      'd-none d-lg-block': props.currentUrl !== '/signup/success'
+                      'd-none d-lg-block': props.currentUrl !== '/signup/success',
                     })}
                   >
                     <Link
                       class={cx('nav-link', style.navLinkWithoutCursor, {
-                        active: props.currentUrl && props.currentUrl === '/signup/success'
+                        active: props.currentUrl && props.currentUrl === '/signup/success',
                       })}
                       href="#"
                     >

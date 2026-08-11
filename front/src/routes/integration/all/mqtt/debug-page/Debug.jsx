@@ -8,20 +8,20 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 
 class MqttNodePage extends Component {
   state = {
-    messages: []
+    messages: [],
   };
   setDebugMode = async () => {
     try {
       await this.props.httpClient.post('/api/v1/service/mqtt/debug_mode', {
-        debug_mode: true
+        debug_mode: true,
       });
       this.setState({
-        debugModeActivated: true
+        debugModeActivated: true,
       });
       clearTimeout(this.disableDebugModeTimeout);
       this.disableDebugModeTimeout = setTimeout(() => {
         this.setState({
-          debugModeActivated: false
+          debugModeActivated: false,
         });
       }, 120 * 1000);
     } catch (e) {
@@ -29,13 +29,11 @@ class MqttNodePage extends Component {
     }
   };
 
-  displayNewMqttMessage = payload => {
-    const now = dayjs()
-      .locale(this.props.user.language)
-      .format('HH:mm:ss');
+  displayNewMqttMessage = (payload) => {
+    const now = dayjs().locale(this.props.user.language).format('HH:mm:ss');
     const message = { ...payload, date: now };
     const newMessages = update(this.state.messages, {
-      $unshift: [message]
+      $unshift: [message],
     });
     this.setState({ messages: newMessages });
   };
@@ -44,14 +42,14 @@ class MqttNodePage extends Component {
     this.setDebugMode();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.MQTT.DEBUG_NEW_MQTT_MESSAGE,
-      this.displayNewMqttMessage
+      this.displayNewMqttMessage,
     );
   }
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.MQTT.DEBUG_NEW_MQTT_MESSAGE,
-      this.displayNewMqttMessage
+      this.displayNewMqttMessage,
     );
   }
 
@@ -98,7 +96,7 @@ class MqttNodePage extends Component {
                 </tr>
               </thead>
               <tbody>
-                {messages.map(message => (
+                {messages.map((message) => (
                   <tr>
                     <td>{message.date}</td>
                     <td>{message.topic}</td>

@@ -1006,6 +1006,22 @@
         "notAvailableText": "Webhooks are not active yet: save your Open API key to activate them.",
         "urlsText": "Webhook URLs (the integration registers them automatically when possible; some services require pasting them in the vendor console). These URLs contain your key: share them only with the third-party service."
       },
+      "myCalendars": {
+        "title": "My calendars",
+        "description": "This integration creates calendars and events in Gladys for the users who enable it. Enable it with your own account to see its calendars in your calendar view; disabling it deletes your calendars from Gladys (they stay untouched at the provider).",
+        "enableButton": "Enable for me",
+        "saveButton": "Save",
+        "disableButton": "Disable and delete my calendars",
+        "disableConfirmText": "Your calendars from this integration and their events will be deleted from Gladys. The provider-side calendars are not touched, and re-enabling restores everything at the next sync.",
+        "disableConfirmButton": "Delete my calendars",
+        "cancelButton": "Cancel",
+        "saveError": "There was an error saving your account.",
+        "saveSuccess": "Your account was saved.",
+        "noCalendars": "No calendar yet: the integration will push your calendars after its next synchronization.",
+        "syncLabel": "Synchronize this calendar",
+        "sharedLabel": "Share with the household",
+        "sharedHelp": "A shared calendar is visible to the whole household and can trigger scenes."
+      },
       "contactProfile": {
         "title": "My account",
         "description": "This channel sends messages using your personal credentials. Each user fills in their own values; leave empty to not receive anything. Deleting your values stops the messages.",

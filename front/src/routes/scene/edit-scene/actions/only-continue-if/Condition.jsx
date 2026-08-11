@@ -10,30 +10,30 @@ import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 import style from './Condition.css';
 
-const getDeviceFeature = option => (option && option.data ? option.data.deviceFeature : null);
+const getDeviceFeature = (option) => (option && option.data ? option.data.deviceFeature : null);
 
 class Condition extends Component {
   // The current value can be displayed in the list only if it's a raw value present in that list
-  isValueInValueOptions = valueOptions => {
+  isValueInValueOptions = (valueOptions) => {
     const { value, evaluate_value: evaluateValue } = this.props.condition;
     return evaluateValue === undefined && isValueInOptions(valueOptions, value);
   };
 
-  handleChange = selectedOption => {
+  handleChange = (selectedOption) => {
     const valueOptions = getDeviceFeatureValueOptions(this.props.intl.dictionary, getDeviceFeature(selectedOption));
     // If the new variable only accepts a list of values, we drop the previous value if it's not in that list
     const shouldResetValue = Boolean(valueOptions) && !this.isValueInValueOptions(valueOptions);
 
     const newCondition = update(this.props.condition, {
       variable: {
-        $set: selectedOption && selectedOption.value ? selectedOption.value : null
+        $set: selectedOption && selectedOption.value ? selectedOption.value : null,
       },
       ...(shouldResetValue
         ? {
             value: { $set: undefined },
-            evaluate_value: { $set: undefined }
+            evaluate_value: { $set: undefined },
           }
-        : {})
+        : {}),
     });
     if (shouldResetValue) {
       this.setState({ customValue: false });
@@ -41,24 +41,24 @@ class Condition extends Component {
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
-  handleValueOptionChange = value => {
+  handleValueOptionChange = (value) => {
     const newCondition = update(this.props.condition, {
       value: {
-        $set: value
+        $set: value,
       },
       evaluate_value: {
-        $set: undefined
-      }
+        $set: undefined,
+      },
     });
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
-  displayCustomValue = e => {
+  displayCustomValue = (e) => {
     e.preventDefault();
     this.setState({ customValue: true });
   };
 
-  displayValueOptions = e => {
+  displayValueOptions = (e) => {
     e.preventDefault();
     this.setState({ customValue: false });
     // We keep the current value if it can be pre-selected in the list
@@ -67,25 +67,25 @@ class Condition extends Component {
     }
     const newCondition = update(this.props.condition, {
       value: {
-        $set: undefined
+        $set: undefined,
       },
       evaluate_value: {
-        $set: undefined
-      }
+        $set: undefined,
+      },
     });
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
-  handleOperatorChange = e => {
+  handleOperatorChange = (e) => {
     const newCondition = update(this.props.condition, {
       operator: {
-        $set: e.target.value
-      }
+        $set: e.target.value,
+      },
     });
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
-  handleValueChange = value => {
+  handleValueChange = (value) => {
     let newValue;
     let evalValue;
     // We handle the case where it's a variable
@@ -120,11 +120,11 @@ class Condition extends Component {
     }
     const newCondition = update(this.props.condition, {
       value: {
-        $set: newValue
+        $set: newValue,
       },
       evaluate_value: {
-        $set: evalValue
-      }
+        $set: evalValue,
+      },
     });
     this.props.handleConditionChange(this.props.index, newCondition);
   };
@@ -136,8 +136,8 @@ class Condition extends Component {
   getSelectedOption = () => {
     let selectedOption = null;
 
-    this.props.variableOptions.forEach(variableOption => {
-      const foundOption = variableOption.options.find(option => this.props.condition.variable === option.value);
+    this.props.variableOptions.forEach((variableOption) => {
+      const foundOption = variableOption.options.find((option) => this.props.condition.variable === option.value);
       if (foundOption) {
         selectedOption = foundOption;
       }
@@ -146,7 +146,7 @@ class Condition extends Component {
     return selectedOption;
   };
 
-  getValueOptions = selectedOption =>
+  getValueOptions = (selectedOption) =>
     getDeviceFeatureValueOptions(this.props.intl.dictionary, getDeviceFeature(selectedOption));
 
   // We display the list of values only if the variable is a device feature holding constants,

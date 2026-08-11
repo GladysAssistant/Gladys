@@ -15,7 +15,7 @@ function createActions(store) {
         ProfileGetStatus: RequestStatus.Getting,
         cropper: null,
         newProfilePicture: null,
-        newProfilePictureFormValue: null
+        newProfilePictureFormValue: null,
       });
       try {
         const user = await state.httpClient.get('/api/v1/me');
@@ -24,11 +24,11 @@ function createActions(store) {
         user.birthdateYear = parseInt(user.birthdate.substr(0, 4), 10);
         store.setState({
           newUser: user,
-          ProfileGetStatus: RequestStatus.Success
+          ProfileGetStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          ProfileGetStatus: RequestStatus.Error
+          ProfileGetStatus: RequestStatus.Error,
         });
       }
     },
@@ -37,7 +37,7 @@ function createActions(store) {
         ProfileGetStatus: RequestStatus.Getting,
         cropper: null,
         newProfilePicture: null,
-        newProfilePictureFormValue: null
+        newProfilePictureFormValue: null,
       });
       try {
         const user = await state.httpClient.get(`/api/v1/user/${selector}`);
@@ -46,11 +46,11 @@ function createActions(store) {
         user.birthdateYear = parseInt(user.birthdate.substr(0, 4), 10);
         store.setState({
           newUser: user,
-          ProfileGetStatus: RequestStatus.Success
+          ProfileGetStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          ProfileGetStatus: RequestStatus.Error
+          ProfileGetStatus: RequestStatus.Error,
         });
       }
     },
@@ -85,7 +85,7 @@ function createActions(store) {
         errors.birthdate = true;
       }
       store.setState({
-        profileUpdateErrors: errors
+        profileUpdateErrors: errors,
       });
       return errored;
     },
@@ -93,26 +93,26 @@ function createActions(store) {
       const base64Image = await fileToBase64(e.target.files[0]);
       const newState = update(state, {
         newProfilePicture: {
-          $set: base64Image
+          $set: base64Image,
         },
         newProfilePictureFormValue: {
-          $set: e.target.value
-        }
+          $set: e.target.value,
+        },
       });
       store.setState(newState);
     },
     setCropperInstance(state, cropper) {
       store.setState({
-        cropper
+        cropper,
       });
     },
     updateNewUserProperty(state, property, value) {
       const newState = update(state, {
         newUser: {
           [property]: {
-            $set: value
-          }
-        }
+            $set: value,
+          },
+        },
       });
       store.setState(newState);
     },
@@ -123,35 +123,35 @@ function createActions(store) {
         profileUpdateErrors: null,
         newProfilePicture: null,
         newProfilePictureFormValue: null,
-        ProfilePatchStatus: null
+        ProfilePatchStatus: null,
       });
     },
     validatePassword(state) {
       store.setState({
-        validPassword: state.newUser.password.length >= MIN_PASSWORD_LENGTH
+        validPassword: state.newUser.password.length >= MIN_PASSWORD_LENGTH,
       });
     },
     validatePasswordRepeat(state) {
       store.setState({
-        validPasswordRepeat: state.newUser.password === state.newUser.passwordRepeat
+        validPasswordRepeat: state.newUser.password === state.newUser.passwordRepeat,
       });
     },
     updateDays(state) {
       const { days, months, years } = getYearsMonthsAndDays(
         get(state, 'newUser.birthdateYear'),
-        get(state, 'newUser.birthdateMonth')
+        get(state, 'newUser.birthdateMonth'),
       );
       store.setState({
         days,
         months,
-        years
+        years,
       });
     },
     async createUser(state, e) {
       e.preventDefault();
       store.setState({
         createUserError: null,
-        createUserStatus: RequestStatus.Getting
+        createUserStatus: RequestStatus.Getting,
       });
       try {
         const data = Object.assign({}, state.newUser);
@@ -171,7 +171,7 @@ function createActions(store) {
         }
         await state.httpClient.post('/api/v1/user', data);
         store.setState({
-          createUserStatus: RequestStatus.Success
+          createUserStatus: RequestStatus.Success,
         });
         route('/dashboard/settings/user');
       } catch (e) {
@@ -182,11 +182,11 @@ function createActions(store) {
         } else if (status === 409) {
           store.setState({
             createUserError: e.response.data,
-            createUserStatus: RequestStatus.ConflictError
+            createUserStatus: RequestStatus.ConflictError,
           });
         } else {
           store.setState({
-            createUserStatus: RequestStatus.Error
+            createUserStatus: RequestStatus.Error,
           });
         }
       }
@@ -194,7 +194,7 @@ function createActions(store) {
     async saveProfile(state, e) {
       e.preventDefault();
       store.setState({
-        ProfilePatchStatus: RequestStatus.Getting
+        ProfilePatchStatus: RequestStatus.Getting,
       });
       try {
         const data = Object.assign({}, state.newUser);
@@ -216,27 +216,27 @@ function createActions(store) {
         if (data.picture) {
           state.session.saveProfilePicture(data.picture);
           store.setState({
-            profilePicture: data.picture
+            profilePicture: data.picture,
           });
         }
         state.session.saveUser(data);
         store.setState({
           user: data,
           ProfileGetStatus: RequestStatus.Getting,
-          ProfilePatchStatus: RequestStatus.Success
+          ProfilePatchStatus: RequestStatus.Success,
         });
         actions.getMySelf(state);
       } catch (e) {
         console.error(e);
         store.setState({
-          ProfilePatchStatus: RequestStatus.Error
+          ProfilePatchStatus: RequestStatus.Error,
         });
       }
     },
     async updateUser(state, e) {
       e.preventDefault();
       store.setState({
-        ProfilePatchStatus: RequestStatus.Getting
+        ProfilePatchStatus: RequestStatus.Getting,
       });
       try {
         const data = Object.assign({}, state.newUser);
@@ -256,7 +256,7 @@ function createActions(store) {
         }
         await state.httpClient.patch(`/api/v1/user/${data.selector}`, data);
         store.setState({
-          ProfilePatchStatus: RequestStatus.Success
+          ProfilePatchStatus: RequestStatus.Success,
         });
       } catch (e) {
         console.error(e);
@@ -264,15 +264,15 @@ function createActions(store) {
         if (status === 409) {
           store.setState({
             ProfilePatchError: e.response.data,
-            ProfilePatchStatus: RequestStatus.ConflictError
+            ProfilePatchStatus: RequestStatus.ConflictError,
           });
         } else {
           store.setState({
-            ProfilePatchStatus: RequestStatus.Error
+            ProfilePatchStatus: RequestStatus.Error,
           });
         }
       }
-    }
+    },
   };
   return actions;
 }

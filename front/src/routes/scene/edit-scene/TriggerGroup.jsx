@@ -23,7 +23,7 @@ const TriggerGroup = ({ children, ...props }) => (
       <div class="card-body">
         <div
           class={cx('dimmer', {
-            active: props.saving
+            active: props.saving,
           })}
         >
           <div class="loader" />

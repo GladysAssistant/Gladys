@@ -10,14 +10,14 @@ import {
   DEFAULT_SIGNAL_MAX,
   DEFAULT_SIGNAL_MIN,
   getSignalQualityIcon,
-  getSignalQualityLevel
+  getSignalQualityLevel,
 } from '../../utils/signalQuality';
 import { getGroupOfCategory } from './categoryGroups';
 import style from './style.css';
 
 const BINARY_TYPES = [DEVICE_FEATURE_TYPES.SENSOR.BINARY, DEVICE_FEATURE_TYPES.SENSOR.PUSH];
 
-const roundValue = value => {
+const roundValue = (value) => {
   if (value === null || value === undefined) {
     return value;
   }
@@ -128,7 +128,7 @@ const EventLine = ({ eventGroup, intl, toggleExpand, expanded, featuresBySelecto
         </div>
         {expanded && count > 1 && (
           <div class={style.eventOccurrences}>
-            {eventGroup.events.map(oneEvent => (
+            {eventGroup.events.map((oneEvent) => (
               <div class={style.eventOccurrence}>
                 <span class={style.eventOccurrenceTime}>{dayjs(oneEvent.created_at).format('HH:mm:ss')}</span>
                 <span>
