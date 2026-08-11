@@ -693,6 +693,7 @@
     "root": {
       "title": "Integrationen",
       "subtitle": "{{length}} von {{total}} Integrationen",
+      "subtitleTotal": "{{total}} Integrationen",
       "searchPlaceholder": "Integration suchen",
       "noIntegrations": "Keine Integrationen gefunden",
       "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
@@ -905,7 +906,6 @@
         "updateTitle": "Die Integration hat dieses Gerät mit einer anderen Struktur erneut veröffentlicht: neue Definition anwenden"
       },
       "install": {
-        "backToCatalog": "Zurück zu den Integrationen",
         "notFound": "Diese Integration wurde nicht im Store gefunden.",
         "starsLabel": "Sterne",
         "lastPushLabel": "Letzte Aktualisierung:",
@@ -943,7 +943,7 @@
         "repoUrlPlaceholder": "https://github.com/owner/repository",
         "installButton": "Installieren",
         "devModeLink": "Entwicklermodus: von einem Docker-Image installieren",
-        "devModeDescription": "Installiere eine Integration direkt aus einem Docker-Image, mit optionalem Manifest. Nur für Integrationsentwickler.",
+        "devModeDescription": "Installiere eine Integration direkt aus einem Docker-Image, mit optionalem Manifest. Das Image kann lokal mit docker build gebaut werden, ohne Registry. Nur für Integrationsentwickler.",
         "dockerImageLabel": "Docker-Image",
         "dockerImagePlaceholder": "z. B. meinuser/meine-integration:latest",
         "manifestLabel": "Manifest (JSON, optional)",
@@ -2988,6 +2988,7 @@
       "keyNameLabel": "Schlüssel:",
       "registeredLabel": "Registriert am:"
     },
+    "backToIntegrations": "Zurück zu den Integrationen",
     "deprecationWarning": "Diese native Integration wird bald zugunsten einer gleichwertigen externen Community-Integration <b>eingestellt</b>. Beide Versionen werden während der Übergangszeit im Katalog nebeneinander bestehen — du kannst diese vorerst weiter verwenden."
   },
   "editScene": {
@@ -3105,6 +3106,8 @@
         "valueLabel": "Wert",
         "valueTypeSimple": "Einfach",
         "simpleExplanationText": "Gebe hier den neuen Wert ein, den du deinem Gerät zuweisen möchten.",
+        "useCustomValue": "Eigenen Wert eingeben",
+        "useValueList": "Aus der Werteliste auswählen",
         "valueTypeComputed": "Berechnet",
         "computedExplanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
       },
@@ -3240,7 +3243,8 @@
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "gladys/mein-topic",
+        "topicPlaceholder": "zigbee2mqtt/mein-geraet/set",
+        "topicExplanation": "Das Topic wird unverändert veröffentlicht: Du musst das vollständige MQTT-Topic angeben, einschließlich des Präfixes \"zigbee2mqtt/\" (zum Beispiel \"zigbee2mqtt/mein-geraet/set\").",
         "messageLabel": "Message",
         "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das das Feld \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
@@ -3396,6 +3400,8 @@
         "lessOrEqual": "kleiner oder gleich",
         "different": "unterschiedlich",
         "valuePlaceholder": "Wert",
+        "useCustomValue": "Eigenen Wert eingeben",
+        "useValueList": "Aus der Werteliste auswählen",
         "on": "Ein",
         "off": "Aus",
         "deviceSeen": "Wenn das Gerät erkannt wird",
@@ -4770,6 +4776,13 @@
           "one": "Bewegung erkannt"
         }
       },
+      "presence-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Keine Anwesenheit",
+          "one": "Anwesenheit erkannt"
+        }
+      },
       "smoke-sensor": {
         "binary": {
           "other": "Kein Wert empfangen",
@@ -4919,6 +4932,22 @@
           "4": "Kehrt zur Ladestation zurück",
           "5": "Lädt",
           "6": "Angedockt"
+        },
+        "run-mode": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Leerlauf",
+          "1": "Reinigen",
+          "2": "Kartieren"
+        },
+        "clean-mode": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Auto",
+          "1": "Schnell",
+          "2": "Leise",
+          "3": "Geräuscharm",
+          "4": "Tiefenreinigung",
+          "5": "Saugen",
+          "6": "Wischen"
         }
       },
       "water-heater": {
@@ -4981,7 +5010,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Anwesenheitssensor",
-      "push": "Anwesenheit"
+      "push": "Anwesenheit",
+      "binary": "Anwesenheit (binary)"
     },
     "rain-sensor": {
       "shortCategoryName": "Regensensor",
@@ -5121,6 +5151,18 @@
     "formaldehyd-sensor": {
       "shortCategoryName": "Formaldehyd-Sensor",
       "decimal": "Formaldehyd (Dezimal)"
+    },
+    "no2-sensor": {
+      "shortCategoryName": "NO2-Sensor",
+      "decimal": "NO2 (Dezimal)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "O3-Sensor",
+      "decimal": "O3 (Dezimal)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "SO2-Sensor",
+      "decimal": "SO2 (Dezimal)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Vibrationssensor",

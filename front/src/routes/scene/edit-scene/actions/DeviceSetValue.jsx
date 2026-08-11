@@ -5,6 +5,8 @@ import cx from 'classnames';
 import ColorPicker from '../../../../components/device/ColorPicker';
 
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
+import SelectDeviceFeatureValue from '../../../../components/device/SelectDeviceFeatureValue';
+import getDeviceFeatureValueOptions, { isValueInOptions } from '../../../../utils/deviceFeatureValueOptions';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
@@ -23,7 +25,8 @@ class DeviceSetValue extends Component {
     super(props);
     this.props = props;
     this.state = {
-      computed: props.action.evaluate_value !== undefined
+      computed: props.action.evaluate_value !== undefined,
+      customValue: false
     };
   }
 
@@ -35,7 +38,7 @@ class DeviceSetValue extends Component {
     // and took the whole scene editor down. Same shape as the trigger side's handler.
     if (!deviceFeature) {
       this.props.updateActionProperty(this.props.path, 'device_feature', null);
-      this.setState({ deviceFeature: null, device: null });
+      this.setState({ deviceFeature: null, device: null, customValue: false });
       return;
     }
 
@@ -55,6 +58,8 @@ class DeviceSetValue extends Component {
         this.props.updateActionProperty(this.props.path, 'value', undefined);
         this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
       }
+      // The new feature comes with its own list of values, so we go back to that list
+      this.setState({ customValue: false });
     }
     this.setState({ deviceFeature, device });
   };
@@ -75,6 +80,34 @@ class DeviceSetValue extends Component {
     const newValue = previousValue === 1 ? 0 : 1;
     this.props.updateActionProperty(this.props.path, 'value', newValue);
     this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
+  };
+
+  displayCustomValue = e => {
+    e.preventDefault();
+    this.setState({ customValue: true });
+  };
+
+  displayValueOptions = e => {
+    e.preventDefault();
+    this.setState({ customValue: false });
+    // A value that cannot be pre-selected in the list is dropped, otherwise the select would
+    // display nothing while the action still carries the old value
+    if (!isValueInOptions(this.getValueOptions(), this.props.action.value)) {
+      this.props.updateActionProperty(this.props.path, 'value', undefined);
+      this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
+    }
+  };
+
+  getValueOptions = () => getDeviceFeatureValueOptions(this.props.intl.dictionary, this.state.deviceFeature);
+
+  // We display the list of values only if the feature holds constants, and if the current value can
+  // be represented in that list (it's not a value saved before this list existed)
+  shouldDisplayValueOptions = valueOptions => {
+    if (!valueOptions || this.state.customValue) {
+      return false;
+    }
+    const { value } = this.props.action;
+    return value === undefined || value === null || value === '' || isValueInOptions(valueOptions, value);
   };
 
   handleNewEvalValue = text => {
@@ -206,6 +239,29 @@ class DeviceSetValue extends Component {
       );
     }
 
+    // Features holding a known list of constants (vacuum cleaner run mode, lock state, siren
+    // mode...) get the same labeled list as the device widget, instead of a raw number to guess
+    const valueOptions = this.getValueOptions();
+    if (this.shouldDisplayValueOptions(valueOptions)) {
+      return (
+        <div>
+          <div className={style.explanationText}>
+            <Text id="editScene.actionsCard.deviceSetValue.simpleExplanationText" />
+          </div>
+          <SelectDeviceFeatureValue
+            options={valueOptions}
+            value={this.props.action.value}
+            updateValue={this.handleNewPureValue}
+          />
+          <small class="form-text">
+            <a href="#" onClick={this.displayCustomValue}>
+              <Text id="editScene.actionsCard.deviceSetValue.useCustomValue" />
+            </a>
+          </small>
+        </div>
+      );
+    }
+
     return (
       <div>
         <div className={style.explanationText}>
@@ -230,17 +286,28 @@ class DeviceSetValue extends Component {
           )}
         </div>
 
-        <input
-          type="range"
-          value={this.props.action.value}
-          onChange={this.handleNewValue}
-          class={cx('form-control custom-range', {
-            'light-temperature': this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
-          })}
-          step="1"
-          min={this.state.deviceFeature.min}
-          max={this.state.deviceFeature.max}
-        />
+        {/* A feature holding constants has no continuous range to slide through: min/max are only
+            the bounds of its values, so the slider would be misleading next to a custom value */}
+        {!valueOptions && (
+          <input
+            type="range"
+            value={this.props.action.value}
+            onChange={this.handleNewValue}
+            class={cx('form-control custom-range', {
+              'light-temperature': this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
+            })}
+            step="1"
+            min={this.state.deviceFeature.min}
+            max={this.state.deviceFeature.max}
+          />
+        )}
+        {valueOptions && (
+          <small class="form-text">
+            <a href="#" onClick={this.displayValueOptions}>
+              <Text id="editScene.actionsCard.deviceSetValue.useValueList" />
+            </a>
+          </small>
+        )}
       </div>
     );
   };

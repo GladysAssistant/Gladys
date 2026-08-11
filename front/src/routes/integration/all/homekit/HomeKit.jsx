@@ -6,6 +6,7 @@ import cx from 'classnames';
 import style from './style.css';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import { EXPOSURE_MODES } from './actions';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const mdnsAdvertisers = {
   AVAHI: 'avahi',
@@ -48,6 +49,7 @@ const HomKitPage = ({ children, ...props }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.homekit.title" />
               </h3>

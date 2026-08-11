@@ -26,6 +26,15 @@ import ThermostatOperatingStateDeviceValue from './ThermostatOperatingStateDevic
 import ChargingStationConnectorStatusDeviceValue from './ChargingStationConnectorStatusDeviceValue';
 import ChargingStationChargingStateDeviceValue from './ChargingStationChargingStateDeviceValue';
 
+// Checked before the category map: a category whose renderer only makes sense for one of its
+// types needs an escape hatch. presence-sensor is historically a "push" category rendered as a
+// last-seen date, but cameras report presence as a binary, which deserves a Yes/No badge.
+const DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue
+  }
+};
+
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: MotionSensorDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.DOORBELL]: DoorbellRingDeviceValue,
@@ -83,7 +92,11 @@ const SensorDeviceType = ({ children, ...props }) => {
   const { deviceFeature: feature } = props;
   const { category, type } = feature;
 
-  let elementType = DISPLAY_BY_FEATURE_CATEGORY[category];
+  let elementType = get(DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE, `${category}.${type}`);
+
+  if (!elementType) {
+    elementType = DISPLAY_BY_FEATURE_CATEGORY[category];
+  }
 
   if (!elementType) {
     elementType = DISPLAY_BY_FEATURE_TYPE[type];
