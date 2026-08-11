@@ -1827,6 +1827,7 @@
       "exposureModeAll": "Exposer tous les appareils compatibles",
       "exposureModeSelection": "Exposer uniquement les appareils sélectionnés",
       "noCompatibleDevice": "Aucun appareil de votre Gladys ne peut encore être exposé à HomeKit.",
+      "alarmLabel": "Alarme",
       "saveExposureButton": "Enregistrer les appareils exposés",
       "saveExposureSuccess": "Appareils exposés enregistrés. Le pont HomeKit redémarre automatiquement, votre appairage est conservé.",
       "saveExposureError": "Une erreur est survenue lors de l'enregistrement des appareils exposés.",

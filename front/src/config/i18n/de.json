@@ -1694,6 +1694,7 @@
       "exposureModeAll": "Alle kompatiblen Geräte bereitstellen",
       "exposureModeSelection": "Nur die ausgewählten Geräte bereitstellen",
       "noCompatibleDevice": "Noch kein Gerät Ihres Gladys kann in HomeKit bereitgestellt werden.",
+      "alarmLabel": "Alarm",
       "saveExposureButton": "Bereitgestellte Geräte speichern",
       "saveExposureSuccess": "Bereitgestellte Geräte gespeichert. Die HomeKit-Bridge startet automatisch neu, Ihre Kopplung bleibt erhalten.",
       "saveExposureError": "Beim Speichern der bereitgestellten Geräte ist ein Fehler aufgetreten.",
