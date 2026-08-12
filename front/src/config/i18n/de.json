@@ -3201,6 +3201,19 @@
         "stopScene": "Szene stoppen",
         "continueScene": "Szene fortsetzen"
       },
+      "calendarGetEvents": {
+        "description": "Diese Aktion ruft die Liste der Ereignisse im ausgewählten Zeitraum ab und stellt sie als Variablen (ein fertiger Satz, die Anzahl der Ereignisse und die Liste der Ereignisse) für die nächsten Aktionen der Szene bereit. Es werden nur freigegebene Kalender angezeigt.",
+        "calendarLabel": "Suche in den folgenden freigegebenen Kalendern",
+        "timeRangeLabel": "Ereignisse abrufen",
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "nextXHours": "In den nächsten X Stunden",
+        "durationLabel": "Anzahl der Stunden",
+        "durationPlaceholder": "Anzahl der Stunden",
+        "whenNoEventsLabel": "Wenn kein Ereignis gefunden wird",
+        "stopScene": "Szene stoppen",
+        "continueScene": "Szene fortsetzen"
+      },
       "ecowattCondition": {
         "description": "Diese Bedingung ermöglicht es dir, den Status des französischen Stromnetzes zu überprüfen",
         "knowMore": "Mehr erfahren",
@@ -3259,7 +3272,8 @@
     },
     "actions": {
       "calendar": {
-        "is-event-running": "Bedingung für Kalenderereignisse"
+        "is-event-running": "Bedingung für Kalenderereignisse",
+        "get-events": "Kalenderereignisse abrufen"
       },
       "device": {
         "get-value": "Gerätewert abrufen",
@@ -3343,6 +3357,10 @@
         "eventDescription": "Ereignisbeschreibung",
         "eventStart": "Startdatum",
         "eventEnd": "Enddatum"
+      },
+      "calendarEvents": {
+        "text": "Satz mit der Zusammenfassung der Ereignisse",
+        "count": "Anzahl der Ereignisse"
       },
       "askAi": {
         "answer": "AI Antwort"

@@ -563,6 +563,85 @@ const actionsFunc = {
       );
     }
   },
+  [ACTIONS.CALENDAR.GET_EVENTS]: async (self, action, scope, path) => {
+    const now = dayjs.tz(dayjs(), self.timezone);
+    let from;
+    let to;
+    // eslint-disable-next-line default-case
+    switch (action.time_range) {
+      case 'today':
+        from = now.startOf('day');
+        to = now.endOf('day');
+        break;
+      case 'tomorrow':
+        from = now.add(1, 'day').startOf('day');
+        to = now.add(1, 'day').endOf('day');
+        break;
+      case 'next-x-hours':
+        from = now;
+        to = now.add(action.duration, 'hour');
+        break;
+    }
+    if (!from || !to) {
+      throw new AbortScene('INVALID_TIME_RANGE');
+    }
+
+    const events = await self.calendar.findEventsInRange(action.calendars, from.toDate(), to.toDate());
+
+    if (events.length === 0 && action.stop_scene_if_no_events === true) {
+      throw new AbortScene('NO_EVENTS_FOUND');
+    }
+
+    // Small translation map for the generated summary sentence, as the
+    // server has no i18n system. Falls back to english.
+    const AT_TRANSLATIONS = {
+      en: 'at',
+      fr: 'à',
+      de: 'um',
+    };
+
+    const eventsFormatted = events.map((eventRaw) => {
+      const language = get(eventRaw, 'calendar.creator.language') || 'en';
+      const startDayjs = dayjs(eventRaw.start)
+        .tz(self.timezone)
+        .locale(language);
+      let summary;
+      if (eventRaw.full_day) {
+        summary = eventRaw.name;
+      } else {
+        // Events starting on the same day as the range are announced with the
+        // time only, events further away with the full date.
+        const startFormatted = startDayjs.isSame(from, 'day') ? startDayjs.format('LT') : startDayjs.format('LLL');
+        summary = `${eventRaw.name} ${AT_TRANSLATIONS[language] || AT_TRANSLATIONS.en} ${startFormatted}`;
+      }
+      return {
+        name: eventRaw.name,
+        location: eventRaw.location,
+        description: eventRaw.description,
+        start: startDayjs.format('LLL'),
+        end: eventRaw.end
+          ? dayjs(eventRaw.end)
+              .tz(self.timezone)
+              .locale(language)
+              .format('LLL')
+          : null,
+        summary,
+      };
+    });
+
+    set(
+      scope,
+      path,
+      {
+        calendarEvents: {
+          text: eventsFormatted.map((event) => event.summary).join(', '),
+          count: eventsFormatted.length,
+          events: eventsFormatted,
+        },
+      },
+      { merge: true },
+    );
+  },
   [ACTIONS.ECOWATT.CONDITION]: async (self, action) => {
     try {
       const data = await self.gateway.getEcowattSignals();

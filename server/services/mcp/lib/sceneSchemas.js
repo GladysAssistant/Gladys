@@ -263,6 +263,16 @@ function createSceneCreateInputSchema(
         stop_scene_if_event_found: z.boolean().optional(),
         stop_scene_if_event_not_found: z.boolean().optional(),
       }),
+      actionSchemaByType(ACTIONS.CALENDAR.GET_EVENTS, {
+        calendars: z.array(calendarSelectorSchema).min(1),
+        time_range: z.enum(['today', 'tomorrow', 'next-x-hours']),
+        duration: z
+          .number()
+          .int()
+          .min(1)
+          .optional(),
+        stop_scene_if_no_events: z.boolean().optional(),
+      }),
       actionSchemaByType(ACTIONS.ECOWATT.CONDITION, {
         ecowatt_network_status: z.enum(['ok', 'warning', 'critical']),
       }),

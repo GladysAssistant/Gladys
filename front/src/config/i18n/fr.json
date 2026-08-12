@@ -3201,6 +3201,19 @@
         "stopScene": "Arrêter la scène",
         "continueScene": "Continuer la scène"
       },
+      "calendarGetEvents": {
+        "description": "Cette action récupère la liste des évènements sur la période sélectionnée, et les rend disponibles sous forme de variables (une phrase prête à l'emploi, le nombre d'évènements et la liste des évènements) pour les actions suivantes de la scène. Seuls les calendriers partagés sont affichés ici.",
+        "calendarLabel": "Dans les calendriers partagés suivants",
+        "timeRangeLabel": "Récupérer les évènements",
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "nextXHours": "Dans les X prochaines heures",
+        "durationLabel": "Nombre d'heures",
+        "durationPlaceholder": "Nombre d'heures",
+        "whenNoEventsLabel": "Si aucun évènement n'est trouvé",
+        "stopScene": "Arrêter la scène",
+        "continueScene": "Continuer la scène"
+      },
       "ecowattCondition": {
         "description": "Cette condition vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
         "knowMore": "En savoir plus",
@@ -3259,7 +3272,8 @@
     },
     "actions": {
       "calendar": {
-        "is-event-running": "Condition sur un évènement d'un calendrier"
+        "is-event-running": "Condition sur un évènement d'un calendrier",
+        "get-events": "Récupérer les évènements d'un calendrier"
       },
       "device": {
         "get-value": "Récupérer le dernier état",
@@ -3343,6 +3357,10 @@
         "eventDescription": "Description de l'évènement",
         "eventStart": "Date de début",
         "eventEnd": "Date de fin"
+      },
+      "calendarEvents": {
+        "text": "Phrase résumant les évènements",
+        "count": "Nombre d'évènements"
       },
       "askAi": {
         "answer": "Réponse de l'IA"
