@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { assert: sinonAssert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert, fake } = sinon;
 
 const { NotFoundError } = require('../../../utils/coreErrors');
 const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');

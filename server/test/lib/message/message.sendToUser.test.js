@@ -1,4 +1,6 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
 const EventEmitter = require('events');

@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub } = sinon;
 const { stopBridge } = require('../../../../services/homekit/lib/stopBridge');
 
 describe('Stop bridge', () => {

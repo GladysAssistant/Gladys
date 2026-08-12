@@ -7,6 +7,7 @@ const { newPinCode } = require('./newPinCode');
 const { newUsername } = require('./newUsername');
 const { notifyChange } = require('./notifyChange');
 const { sendState } = require('./sendState');
+const { getCompatibleDevices, getExposedDevices } = require('./exposedDevices');
 
 /**
  * @description Add ability to connect to HomeKit.
@@ -34,5 +35,7 @@ HomeKitHandler.prototype.buildAccessory = buildAccessory;
 HomeKitHandler.prototype.buildService = buildService;
 HomeKitHandler.prototype.notifyChange = notifyChange;
 HomeKitHandler.prototype.sendState = sendState;
+HomeKitHandler.prototype.getCompatibleDevices = getCompatibleDevices;
+HomeKitHandler.prototype.getExposedDevices = getExposedDevices;
 
 module.exports = HomeKitHandler;

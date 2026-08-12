@@ -1,7 +1,9 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub } = sinon;
 const { createBridge } = require('../../../../services/homekit/lib/createBridge');
-const { DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 describe('Create bridge', () => {
   it('should create a bridge', async () => {
@@ -11,19 +13,18 @@ describe('Create bridge', () => {
       serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
       createBridge,
       buildAccessory: stub().returns({ UUID: '78a7b724-18e8-4c15-ab30-c8486c253f36' }),
+      getExposedDevices: stub().resolves([
+        {
+          id: '07f16117-8556-4b50-b9f0-e190d08f8d92',
+          name: 'Lampe bureau',
+          selector: 'lampe-bureau',
+          features: [{ category: DEVICE_FEATURE_CATEGORIES.LIGHT, type: DEVICE_FEATURE_TYPES.LIGHT.BINARY }],
+        },
+      ]),
       gladys: {
         variable: {
           getValue: stub().resolves(null),
           setValue: stub().resolves(),
-        },
-        device: {
-          get: stub().resolves([
-            {
-              id: '07f16117-8556-4b50-b9f0-e190d08f8d92',
-              name: 'Lampe bureau',
-              features: [{ category: DEVICE_FEATURE_CATEGORIES.LIGHT }],
-            },
-          ]),
         },
         event: {
           on: stub().returns(),

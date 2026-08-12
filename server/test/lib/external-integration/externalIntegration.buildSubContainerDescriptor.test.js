@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 
 const { buildSupervisor, seedExternalService, TEST_CONTAINERS_MANIFEST } = require('./testUtils.test');
 const { SUB_CONTAINER_PORTS_VARIABLE } = require('../../../lib/external-integration/constants');

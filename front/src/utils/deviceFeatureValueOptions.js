@@ -6,6 +6,7 @@ import {
   LEVEL_MATTER_STATE,
   getFanFeatureOptions
 } from '../../../server/utils/constants';
+import { resolveFeatureOptions } from './supportedOptions';
 
 const NUMERIC_VALUE = /^-?\d+$/;
 
@@ -22,7 +23,22 @@ const MATTER_INDEX_SENSOR_CATEGORIES = [
   DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR
 ];
 
-const getValueLabel = (dictionary, path, value) => get(dictionary, `${path}.${value}`, { default: `${value}` });
+const getValueLabel = (dictionary, path, value, fallback) =>
+  get(dictionary, `${path}.${value}`, { default: fallback || `${value}` });
+
+/**
+ * @description Tell if a value can be pre-selected in a list of options.
+ * @param {Array} options - The list of { label, value } options, or null.
+ * @param {any} value - The value to look for.
+ * @returns {boolean} True if the value is one of the options.
+ * @example
+ * const found = isValueInOptions([{ label: 'Idle', value: 0 }], '0');
+ */
+function isValueInOptions(options, value) {
+  // Values saved in scenes are not always typed like the options: a value entered by hand in the
+  // free input is a string, while the options built from the translations are numbers.
+  return Boolean(options && value !== undefined && options.some(option => `${option.value}` === `${value}`));
+}
 
 /**
  * @description Get the list of values a device feature can take, with their translated label.
@@ -70,19 +86,30 @@ function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
     ];
   }
 
-  // For all other features, the translations are the source of truth: a feature holding
-  // constants (button click, shutter state, pilot wire mode...) has one label per value.
+  // For all other features, two things can tell us a feature holds constants: the translations,
+  // which give one label per value (button click, shutter state, pilot wire mode...), and the
+  // supported_options the integration declared for this very appliance. Either one is enough.
   const valueLabels = get(dictionary, `deviceFeatureValue.category.${category}.${type}`);
-  if (!valueLabels) {
+  const supportedOptions = deviceFeature.supported_options;
+  if (!valueLabels && !(Array.isArray(supportedOptions) && supportedOptions.length > 0)) {
     return null;
   }
 
-  const options = Object.keys(valueLabels)
+  const catalog = Object.keys(valueLabels || {})
     .filter(key => NUMERIC_VALUE.test(key))
-    .map(key => ({ value: Number(key), label: valueLabels[key] }))
+    .map(key => ({ value: Number(key) }))
     .sort((optionA, optionB) => optionA.value - optionB.value);
+
+  // When the integration declares which values this appliance actually supports, they drive the
+  // list and its order, so a scene cannot be built on a mode the device does not have. A supported
+  // value the category knows nothing about keeps the label the device gave it.
+  const options = resolveFeatureOptions(deviceFeature, catalog).map(option => ({
+    value: option.value,
+    label: getValueLabel(dictionary, `deviceFeatureValue.category.${category}.${type}`, option.value, option.label)
+  }));
 
   return options.length > 0 ? options : null;
 }
 
+export { isValueInOptions };
 export default getDeviceFeatureValueOptions;

@@ -321,7 +321,8 @@
       "energy-consumption": "Consommation Énergétique",
       "voice-assistant": "Assistant vocal",
       "link": "Lien",
-      "photo": "Photo"
+      "photo": "Photo",
+      "sun": "Soleil"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -338,13 +339,18 @@
         "providerInternalOpenWeather": "OpenWeather interne (déprécié)",
         "editModeLabel": "Mode d'affichage :",
         "displayModes": {
-          "advancedWeather": "Humidité et vitesse du vent",
+          "dateLocation": "Date et lieu",
+          "currentWeather": "Météo actuelle",
+          "alerts": "Alertes météo",
+          "advancedWeather": "Détails météo (humidité, vent, UV, lune…)",
           "hourlyForecast": "Prévisions pour les 24 prochaines heures",
           "dailyForecast": "Prévisions pour les 5 prochains jours",
           "providerImages": "Images du fournisseur (carte de vigilance, radar de pluie…)"
         },
+        "noModeSelected": "Sélectionnez au moins un mode d'affichage, sinon le widget restera vide.",
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
         "uv": "UV",
+        "windGustTitle": "Rafales de vent (le fournisseur ne donne pas de vent moyen pour ce jour)",
         "alertTypes": {
           "wind": "Vent violent",
           "rain": "Pluie-inondation",
@@ -356,6 +362,42 @@
           "avalanche": "Avalanches",
           "coastal": "Vagues-submersion",
           "fog": "Brouillard"
+        },
+        "conditions": {
+          "clear": "Ciel dégagé",
+          "partly-cloudy": "Peu nuageux",
+          "cloud": "Nuageux",
+          "fog": "Brouillard",
+          "drizzle": "Bruine",
+          "rain": "Pluie",
+          "pouring": "Fortes pluies",
+          "sleet": "Pluie et neige mêlées",
+          "hail": "Grêle",
+          "snow": "Neige",
+          "thunderstorm": "Orages",
+          "wind": "Vent",
+          "night": "Nuit",
+          "unknown": "Indisponible"
+        },
+        "moonPhases": {
+          "0": "Nouvelle lune",
+          "1": "Premier croissant",
+          "2": "Premier quartier",
+          "3": "Gibbeuse croissante",
+          "4": "Pleine lune",
+          "5": "Gibbeuse décroissante",
+          "6": "Dernier quartier",
+          "7": "Dernier croissant"
+        },
+        "windCardinals": {
+          "n": "N",
+          "ne": "NE",
+          "e": "E",
+          "se": "SE",
+          "s": "S",
+          "sw": "SO",
+          "w": "O",
+          "nw": "NO"
         }
       },
       "devicesInRoom": {
@@ -474,6 +516,19 @@
         "nextPeriod": "Période suivante",
         "currentPeriod": "En cours",
         "backToNow": "Revenir à maintenant"
+      },
+      "sun": {
+        "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour calculer la position du soleil.",
+        "sunrise": "Lever du soleil",
+        "sunset": "Coucher du soleil",
+        "dawn": "Aube",
+        "solarNoon": "Midi solaire",
+        "dusk": "Crépuscule",
+        "azimuth": "Azimut",
+        "elevation": "Élévation",
+        "noHouse": "Veuillez sélectionner une maison dans les paramètres du widget.",
+        "noCoordinates": "Cette maison n'a pas de coordonnées. Veuillez d'abord configurer sa localisation.",
+        "error": "Une erreur est survenue lors de la récupération des données du soleil, merci de réessayer."
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -637,7 +692,8 @@
     },
     "root": {
       "title": "Intégrations",
-      "subtitle": "{{length}} de {{total}} intégrations",
+      "subtitle": "{{length}} sur {{total}} intégrations",
+      "subtitleTotal": "{{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
       "noIntegrations": "Aucune intégration trouvée",
       "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
@@ -850,7 +906,6 @@
         "updateTitle": "L'intégration a re-publié cet appareil avec une structure différente : appliquer la nouvelle définition"
       },
       "install": {
-        "backToCatalog": "Retour aux intégrations",
         "notFound": "Cette intégration n'a pas été trouvée dans le store.",
         "starsLabel": "étoiles",
         "lastPushLabel": "Dernière mise à jour :",
@@ -888,7 +943,7 @@
         "repoUrlPlaceholder": "https://github.com/owner/repository",
         "installButton": "Installer",
         "devModeLink": "Mode développeur : installer depuis une image Docker",
-        "devModeDescription": "Installez une intégration directement depuis une image Docker, avec un manifeste optionnel. Réservé aux développeurs d’intégrations.",
+        "devModeDescription": "Installez une intégration directement depuis une image Docker, avec un manifeste optionnel. L’image peut être construite localement avec docker build, sans registre. Réservé aux développeurs d’intégrations.",
         "dockerImageLabel": "Image Docker",
         "dockerImagePlaceholder": "ex. monuser/mon-integration:latest",
         "manifestLabel": "Manifeste (JSON, optionnel)",
@@ -1768,6 +1823,13 @@
       "description": "Connectez Gladys à HomeKit et utilisez Siri pour lui parler.",
       "introduction": "Pour connecter Gladys à HomeKit, vous devez être en possession d'un appareil compatible Apple (iPhone, iPad, iPod touch).",
       "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
+      "exposure": "Par défaut Gladys expose tous les appareils compatibles à HomeKit. Vous pouvez à la place choisir les appareils que vous souhaitez voir dans l'application Maison.",
+      "exposureModeAll": "Exposer tous les appareils compatibles",
+      "exposureModeSelection": "Exposer uniquement les appareils sélectionnés",
+      "noCompatibleDevice": "Aucun appareil de votre Gladys ne peut encore être exposé à HomeKit.",
+      "saveExposureButton": "Enregistrer les appareils exposés",
+      "saveExposureSuccess": "Appareils exposés enregistrés. Le pont HomeKit redémarre automatiquement, votre appairage est conservé.",
+      "saveExposureError": "Une erreur est survenue lors de l'enregistrement des appareils exposés.",
       "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
       "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparaît pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
       "reloadButton": "Relancer",
@@ -2926,6 +2988,7 @@
       "keyNameLabel": "Clé :",
       "registeredLabel": "Enregistré le :"
     },
+    "backToIntegrations": "Retour aux intégrations",
     "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment."
   },
   "editScene": {
@@ -3043,6 +3106,8 @@
         "valueLabel": "Valeur",
         "valueTypeSimple": "Simple",
         "simpleExplanationText": "Entrez ici la nouvelle valeur que vous souhaitez assigner à votre appareil.",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
         "valueTypeComputed": "Calculée",
         "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc."
       },
@@ -3192,7 +3257,8 @@
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "gladys/my-topic",
+        "topicPlaceholder": "zigbee2mqtt/mon-appareil/set",
+        "topicExplanation": "Le topic est publié tel quel : vous devez écrire le topic MQTT complet, préfixe 'zigbee2mqtt/' inclus (par exemple 'zigbee2mqtt/mon-appareil/set').",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
@@ -3349,6 +3415,8 @@
         "lessOrEqual": "inférieur ou égal",
         "different": "différent",
         "valuePlaceholder": "Valeur",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
         "on": "On",
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
@@ -4320,8 +4388,8 @@
             "1": "Activée"
           },
           "state": {
-            "0": "Activer",
-            "1": "Désactiver"
+            "0": "Désactiver",
+            "1": "Activer"
           }
         },
         "lock": {
@@ -4330,8 +4398,8 @@
             "1": "Verrouillée"
           },
           "state": {
-            "0": "Verrouiller",
-            "1": "Déverrouiller"
+            "0": "Déverrouiller",
+            "1": "Verrouiller"
           }
         }
       },
@@ -4342,8 +4410,8 @@
             "1": "Verrouillée"
           },
           "state": {
-            "0": "Verrouiller",
-            "1": "Déverrouiller"
+            "0": "Déverrouiller",
+            "1": "Verrouiller"
           }
         }
       },
@@ -4697,6 +4765,10 @@
           "0": "Faible",
           "1": "Moyen",
           "2": "Fort"
+        },
+        "test-in-progress": {
+          "0": "Non",
+          "1": "Oui"
         }
       },
       "music": {
@@ -4717,6 +4789,13 @@
           "other": "Aucune valeur reçue",
           "zero": "Pas de mouvement",
           "one": "Mouvement détecté"
+        }
+      },
+      "presence-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Pas de présence",
+          "one": "Présence détectée"
         }
       },
       "smoke-sensor": {
@@ -4868,6 +4947,22 @@
           "4": "Retour à la base",
           "5": "En charge",
           "6": "Sur la base"
+        },
+        "run-mode": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Repos",
+          "1": "Nettoyer",
+          "2": "Cartographier"
+        },
+        "clean-mode": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Auto",
+          "1": "Rapide",
+          "2": "Silencieux",
+          "3": "Faible bruit",
+          "4": "Nettoyage profond",
+          "5": "Aspiration",
+          "6": "Serpillère"
         }
       },
       "water-heater": {
@@ -4930,7 +5025,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Détecteur de présence",
-      "push": "Présence"
+      "push": "Présence",
+      "binary": "Détection présence Oui/Non"
     },
     "rain-sensor": {
       "shortCategoryName": "Détecteur de pluie",
@@ -5025,7 +5121,8 @@
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
       "lmh_volume": "Volume de la sirène",
-      "melody": "Mélodie"
+      "melody": "Mélodie",
+      "test-in-progress": "Test en cours"
     },
     "cube": {
       "shortCategoryName": "Cube",
@@ -5069,6 +5166,18 @@
     "formaldehyd-sensor": {
       "shortCategoryName": "Capteur Formaldéhyde",
       "decimal": "Formaldéhyde (Décimale)"
+    },
+    "no2-sensor": {
+      "shortCategoryName": "Capteur de NO2",
+      "decimal": "NO2 (Décimale)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "Capteur d'O3",
+      "decimal": "O3 (Décimale)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "Capteur de SO2",
+      "decimal": "SO2 (Décimale)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",

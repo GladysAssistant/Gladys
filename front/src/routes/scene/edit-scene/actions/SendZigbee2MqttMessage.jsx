@@ -29,6 +29,9 @@ class SendZigbee2MqttMessage extends Component {
                 <Text id="global.requiredField" />
               </span>
             </label>
+            <div style={helpTextStyle}>
+              <Text id="editScene.actionsCard.zigbee2mqttMessage.topicExplanation" />
+            </div>
             <Localizer>
               <input
                 type="text"

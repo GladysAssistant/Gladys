@@ -1,6 +1,7 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const OpenWeatherPage = ({ children, ...props }) => (
   <div class="page">
@@ -9,6 +10,7 @@ const OpenWeatherPage = ({ children, ...props }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.openWeather.title" />
               </h3>

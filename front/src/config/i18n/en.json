@@ -321,7 +321,8 @@
       "energy-consumption": "Energy Consumption",
       "voice-assistant": "Voice assistant",
       "link": "Link",
-      "photo": "Photo"
+      "photo": "Photo",
+      "sun": "Sun"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -338,13 +339,18 @@
         "providerInternalOpenWeather": "Internal OpenWeather (deprecated)",
         "editModeLabel": "Select display mode:",
         "displayModes": {
-          "advancedWeather": "Humidity and wind speed",
+          "dateLocation": "Date and location",
+          "currentWeather": "Current weather",
+          "alerts": "Weather alerts",
+          "advancedWeather": "Weather details (humidity, wind, UV, moon…)",
           "hourlyForecast": "Forecast for the next 24 hours",
           "dailyForecast": "Forecast for the next 5 days",
           "providerImages": "Provider images (vigilance map, rain radar…)"
         },
+        "noModeSelected": "Select at least one display mode, otherwise the widget will stay empty.",
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
         "uv": "UV",
+        "windGustTitle": "Wind gusts (the provider gives no average wind speed for this day)",
         "alertTypes": {
           "wind": "Strong wind",
           "rain": "Heavy rain",
@@ -356,6 +362,42 @@
           "avalanche": "Avalanches",
           "coastal": "Coastal event",
           "fog": "Fog"
+        },
+        "conditions": {
+          "clear": "Clear sky",
+          "partly-cloudy": "Partly cloudy",
+          "cloud": "Cloudy",
+          "fog": "Fog",
+          "drizzle": "Drizzle",
+          "rain": "Rain",
+          "pouring": "Heavy rain",
+          "sleet": "Sleet",
+          "hail": "Hail",
+          "snow": "Snow",
+          "thunderstorm": "Thunderstorm",
+          "wind": "Windy",
+          "night": "Night",
+          "unknown": "Unavailable"
+        },
+        "moonPhases": {
+          "0": "New moon",
+          "1": "Waxing crescent",
+          "2": "First quarter",
+          "3": "Waxing gibbous",
+          "4": "Full moon",
+          "5": "Waning gibbous",
+          "6": "Last quarter",
+          "7": "Waning crescent"
+        },
+        "windCardinals": {
+          "n": "N",
+          "ne": "NE",
+          "e": "E",
+          "se": "SE",
+          "s": "S",
+          "sw": "SW",
+          "w": "W",
+          "nw": "NW"
         }
       },
       "devicesInRoom": {
@@ -474,6 +516,19 @@
         "nextPeriod": "Next period",
         "currentPeriod": "Live",
         "backToNow": "Back to now"
+      },
+      "sun": {
+        "editHouseLabel": "Select a house. I will use its latitude/longitude to compute the sun position.",
+        "sunrise": "Sunrise",
+        "sunset": "Sunset",
+        "dawn": "Dawn",
+        "solarNoon": "Solar noon",
+        "dusk": "Dusk",
+        "azimuth": "Azimuth",
+        "elevation": "Elevation",
+        "noHouse": "Please select a house in the box settings.",
+        "noCoordinates": "This house has no coordinates. Please configure the house location first.",
+        "error": "An error occurred while getting the sun data. Please retry."
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -638,6 +693,7 @@
     "root": {
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
+      "subtitleTotal": "{{total}} integrations",
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
       "allIntegrationsUpToDate": "All your integrations are up to date.",
@@ -850,7 +906,6 @@
         "updateTitle": "The integration re-published this device with a different structure: apply the new definition"
       },
       "install": {
-        "backToCatalog": "Back to integrations",
         "notFound": "This integration was not found in the store.",
         "starsLabel": "stars",
         "lastPushLabel": "Last update:",
@@ -888,7 +943,7 @@
         "repoUrlPlaceholder": "https://github.com/owner/repository",
         "installButton": "Install",
         "devModeLink": "Developer mode: install from a Docker image",
-        "devModeDescription": "Install an integration directly from a Docker image, with an optional manifest. Only for integration developers.",
+        "devModeDescription": "Install an integration directly from a Docker image, with an optional manifest. The image can be built locally with docker build, no registry needed. Only for integration developers.",
         "dockerImageLabel": "Docker image",
         "dockerImagePlaceholder": "e.g. myuser/my-integration:latest",
         "manifestLabel": "Manifest (JSON, optional)",
@@ -1530,6 +1585,13 @@
       "description": "Connect Gladys to HomeKit and use Siri to control your devices.",
       "introduction": "To connect Gladys to HomeKit, you need an Apple device (iPhone, iPad, iPod touch).",
       "qrCode": "Scan this QR code from your iOS Home app to add Gladys and all compatible devices.",
+      "exposure": "By default Gladys exposes every compatible device to HomeKit. You can instead pick the devices you want to see in the Home app.",
+      "exposureModeAll": "Expose all compatible devices",
+      "exposureModeSelection": "Only expose the selected devices",
+      "noCompatibleDevice": "No device of your Gladys can be exposed to HomeKit yet.",
+      "saveExposureButton": "Save the exposed devices",
+      "saveExposureSuccess": "Exposed devices saved successfully. The HomeKit bridge restarts automatically, your pairing is kept.",
+      "saveExposureError": "An error occurred while saving the exposed devices.",
       "configurationError": "An error appears while getting settings.",
       "reload": "If you add a device recently on Gladys and it is not on Home app, try to reload the service with this button.",
       "reloadButton": "Reload",
@@ -2926,6 +2988,7 @@
       "keyNameLabel": "Key:",
       "registeredLabel": "Registered on:"
     },
+    "backToIntegrations": "Back to integrations",
     "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now."
   },
   "editScene": {
@@ -3043,6 +3106,8 @@
         "valueLabel": "Value",
         "valueTypeSimple": "Simple",
         "simpleExplanationText": "Enter the new value you wish to assign to your device here.",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
         "valueTypeComputed": "Computed",
         "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
@@ -3192,7 +3257,8 @@
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "gladys/my-topic",
+        "topicPlaceholder": "zigbee2mqtt/my-device/set",
+        "topicExplanation": "The topic is published as-is: you must write the full MQTT topic, including the 'zigbee2mqtt/' prefix (for example 'zigbee2mqtt/my-device/set').",
         "messageLabel": "Message",
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
@@ -3349,6 +3415,8 @@
         "lessOrEqual": "less or equal",
         "different": "different",
         "valuePlaceholder": "Value",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
         "on": "On",
         "off": "Off",
         "deviceSeen": "If the device is detected",
@@ -4320,8 +4388,8 @@
             "1": "Enabled"
           },
           "state": {
-            "0": "Enable",
-            "1": "Disable"
+            "0": "Disable",
+            "1": "Enable"
           }
         },
         "lock": {
@@ -4697,6 +4765,10 @@
           "0": "Low",
           "1": "Medium",
           "2": "High"
+        },
+        "test-in-progress": {
+          "0": "No",
+          "1": "Yes"
         }
       },
       "music": {
@@ -4717,6 +4789,13 @@
           "other": "No value received",
           "zero": "No motion",
           "one": "Motion detected"
+        }
+      },
+      "presence-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No presence",
+          "one": "Presence detected"
         }
       },
       "smoke-sensor": {
@@ -4868,6 +4947,22 @@
           "4": "Returning to Dock",
           "5": "Charging",
           "6": "Docked"
+        },
+        "run-mode": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Idle",
+          "1": "Clean",
+          "2": "Map"
+        },
+        "clean-mode": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Auto",
+          "1": "Quick",
+          "2": "Quiet",
+          "3": "Low Noise",
+          "4": "Deep Clean",
+          "5": "Vacuum",
+          "6": "Mop"
         }
       },
       "water-heater": {
@@ -4930,7 +5025,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Presence sensor",
-      "push": "Presence"
+      "push": "Presence",
+      "binary": "Presence (binary)"
     },
     "rain-sensor": {
       "shortCategoryName": "Rain sensor",
@@ -5025,7 +5121,8 @@
       "shortCategoryName": "Siren",
       "binary": "Siren",
       "lmh_volume": "Siren volume",
-      "melody": "Melody"
+      "melody": "Melody",
+      "test-in-progress": "Test in progress"
     },
     "cube": {
       "shortCategoryName": "Cube",
@@ -5069,6 +5166,18 @@
     "formaldehyd-sensor": {
       "shortCategoryName": "Formaldehyd sensor",
       "decimal": "Formaldehyd (decimal)"
+    },
+    "no2-sensor": {
+      "shortCategoryName": "NO2 sensor",
+      "decimal": "NO2 (decimal)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "O3 sensor",
+      "decimal": "O3 (decimal)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "SO2 sensor",
+      "decimal": "SO2 (decimal)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
