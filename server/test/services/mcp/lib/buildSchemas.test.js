@@ -3690,7 +3690,7 @@ describe('build schemas', () => {
     const unknownRoom = await getStateTool.cb({ room: 'Véranda', device_type: 'temperature' });
     expect(unknownRoom.content[0].text).to.eq(
       'device.get-state: "Véranda" is not a room of this home, no state was read. ' +
-        'Available rooms: Salon, Cuisine, No room. ' +
+        'Available rooms: Salon, Cuisine. ' +
         'Call this tool again with one of them, or without the room parameter to cover the whole home.',
     );
 

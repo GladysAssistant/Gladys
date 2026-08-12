@@ -46,32 +46,34 @@ const intervalByName = {
 };
 
 /**
- * @description Resolve a device type sent by the model to a feature category of this home.
+ * @description Resolve a device type sent by the model to the feature categories of this home.
  * @param {string} requestedType - Device type as sent by the model.
  * @param {Array<string>} availableDeviceTypes - Feature categories available in this home.
- * @returns {string} Matching feature category, or the requested type when nothing matches.
+ * @returns {Array<string>} Matching feature categories, or the requested type when nothing matches.
  * @example
- * resolveDeviceType('temperature', ['temperature-sensor']);
+ * resolveDeviceTypes('temperature', ['temperature-sensor']);
  */
-function resolveDeviceType(requestedType, availableDeviceTypes) {
+function resolveDeviceTypes(requestedType, availableDeviceTypes) {
   const normalized = String(requestedType)
     .trim()
     .toLowerCase();
 
   const exactMatch = availableDeviceTypes.find((category) => category.toLowerCase() === normalized);
   if (exactMatch) {
-    return exactMatch;
+    return [exactMatch];
   }
 
   // Models routinely drop the category suffix and ask for "temperature" instead of
-  // "temperature-sensor". Returning the requested type untouched when nothing
-  // matches keeps "this category does not exist in this home" a distinct outcome.
-  const prefixMatch = availableDeviceTypes.find((category) => category.toLowerCase().startsWith(`${normalized}-`));
-  if (prefixMatch) {
-    return prefixMatch;
+  // "temperature-sensor". Several categories can share a prefix ("energy-sensor" and
+  // "energy-production-sensor"), so keep them all instead of silently picking whichever
+  // comes first. Returning the requested type untouched when nothing matches keeps
+  // "this category does not exist in this home" a distinct outcome.
+  const prefixMatches = availableDeviceTypes.filter((category) => category.toLowerCase().startsWith(`${normalized}-`));
+  if (prefixMatches.length > 0) {
+    return prefixMatches;
   }
 
-  return requestedType;
+  return [requestedType];
 }
 
 /**
@@ -595,7 +597,12 @@ async function getAllTools(userId) {
                     type: 'text',
                     text:
                       `device.get-state: "${room}" is not a room of this home, no state was read. ` +
-                      `Available rooms: ${rooms.map(({ name }) => name).join(', ')}. ` +
+                      // "No room" is the sentinel holding the devices that were never assigned
+                      // to a room, not a room the model should be invited to retry with.
+                      `Available rooms: ${rooms
+                        .filter(({ selector }) => selector !== noRoom.selector)
+                        .map(({ name }) => name)
+                        .join(', ')}. ` +
                       'Call this tool again with one of them, or without the room parameter to cover the whole home.',
                   },
                 ],
@@ -605,9 +612,11 @@ async function getAllTools(userId) {
         }
 
         const requestedDeviceTypes = (Array.isArray(deviceType) ? deviceType : [deviceType]).filter(Boolean);
-        const deviceTypes = requestedDeviceTypes.map((requestedType) =>
-          resolveDeviceType(requestedType, availableDeviceTypes),
-        );
+        const deviceTypes = [
+          ...new Set(
+            requestedDeviceTypes.flatMap((requestedType) => resolveDeviceTypes(requestedType, availableDeviceTypes)),
+          ),
+        ];
 
         if (deviceTypes.length > 0) {
           selectedDevices = selectedDevices.filter((device) => {
