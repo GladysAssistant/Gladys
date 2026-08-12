@@ -185,6 +185,44 @@ describe('externalIntegration.updateUserCalendar', () => {
     );
   });
 
+  it('should still push to everyone when unsharing a shared calendar', async () => {
+    await externalIntegration.updateUserCalendar(service.selector, JOHN_USER_ID, 'primary', { shared: true });
+    await externalIntegration.updateUserCalendar(service.selector, JOHN_USER_ID, 'primary', { shared: false });
+    // the previous household viewers must drop the calendar: the unshare
+    // itself still goes out as a send-all
+    const sendAllCalls = event.emit
+      .getCalls()
+      .filter((call) => call.args[0] === 'websocket.send-all')
+      .filter((call) => call.args[1].type === WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED);
+    expect(sendAllCalls.length).to.be.greaterThan(1);
+    expect(sendAllCalls[sendAllCalls.length - 1].args[1].payload).to.deep.equal({
+      calendar_selectors: ['primary'],
+    });
+  });
+
+  it('should include the source calendar in the push when an event moves', async () => {
+    await externalIntegration.publishCalendars(service, {
+      user: 'john',
+      calendars: [{ external_id: `ext:${service.selector}:john:work`, name: 'Work' }],
+    });
+    await externalIntegration.publishCalendarEvents(service, {
+      calendar_external_id: `ext:${service.selector}:john:work`,
+      events: [
+        {
+          external_id: `ext:${service.selector}:john:uid-1`,
+          name: 'Dentist',
+          start: '2026-08-14T09:00:00.000Z',
+        },
+      ],
+    });
+    const sendCalls = event.emit
+      .getCalls()
+      .filter((call) => call.args[0] === 'websocket.send')
+      .filter((call) => call.args[1].type === WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED);
+    const lastPayload = sendCalls[sendCalls.length - 1].args[1].payload;
+    expect(lastPayload.calendar_selectors.sort()).to.eql(['primary', 'work']);
+  });
+
   it('should push calendar.updated to everyone when the calendar is shared', async () => {
     await externalIntegration.updateUserCalendar(service.selector, JOHN_USER_ID, 'primary', { shared: true });
     const sendAllCalls = event.emit

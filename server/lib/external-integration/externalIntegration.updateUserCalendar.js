@@ -39,11 +39,14 @@ async function updateUserCalendar(selector, userId, calendarSelector, changes = 
     throw new NotFoundError('CALENDAR_NOT_FOUND');
   }
   const syncDisabled = changes.sync === false && calendar.sync === true;
+  // snapshot before the update: unsharing must still notify the previous
+  // viewers, so the push targets the union of old and new visibility
+  const wasShared = calendar.shared;
   await calendar.update(changes);
   if (syncDisabled) {
     await this.calendar.destroyEvents(calendar.id);
   }
-  this.notifyCalendarUpdated(userId, [calendar.selector], calendar.shared);
+  this.notifyCalendarUpdated(userId, [calendar.selector], wasShared || calendar.shared);
   await this.notifyCalendarAccountUpdated(service, userId);
   return {
     selector: calendar.selector,

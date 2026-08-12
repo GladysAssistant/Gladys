@@ -24,15 +24,15 @@ class ExternalIntegrationInstallPage extends Component {
       const storeSlug = `${this.props.owner}/${this.props.repo}`;
       const [{ integrations = [] }, installedIntegrations] = await Promise.all([
         this.props.httpClient.get('/api/v1/external_integration/store'),
-        this.props.httpClient.get('/api/v1/external_integration'),
+        this.props.httpClient.get('/api/v1/external_integration')
       ]);
-      const storeIntegration = integrations.find((integration) => integration.store_slug === storeSlug);
+      const storeIntegration = integrations.find(integration => integration.store_slug === storeSlug);
       this.setState({
         storeIntegration,
         duplicateOfInstalled: storeIntegration
           ? this.findDuplicateOfInstalled(storeIntegration, installedIntegrations)
           : null,
-        loadStatus: storeIntegration ? RequestStatus.Success : RequestStatus.Error,
+        loadStatus: storeIntegration ? RequestStatus.Success : RequestStatus.Error
       });
       if (storeIntegration) {
         await this.loadHardware(storeIntegration);
@@ -43,7 +43,7 @@ class ExternalIntegrationInstallPage extends Component {
     }
   };
 
-  loadHardware = async (storeIntegration) => {
+  loadHardware = async storeIntegration => {
     const requestedClasses = getRequestedHardwareClasses(get(storeIntegration, 'manifest.containers') || []);
     if (requestedClasses.length === 0) {
       this.setState({ detectedClasses: {}, grantedDevices: [] });
@@ -52,7 +52,7 @@ class ExternalIntegrationInstallPage extends Component {
     let detectedClasses = {};
     try {
       const { classes = [] } = await this.props.httpClient.get('/api/v1/external_integration/hardware');
-      classes.forEach((hardwareClass) => {
+      classes.forEach(hardwareClass => {
         detectedClasses[hardwareClass.class] = hardwareClass.detected;
       });
     } catch (e) {
@@ -62,16 +62,16 @@ class ExternalIntegrationInstallPage extends Component {
     // grant an absent one (hardware plugged later)
     this.setState({
       detectedClasses,
-      grantedDevices: requestedClasses.filter((hardwareClass) => detectedClasses[hardwareClass]),
+      grantedDevices: requestedClasses.filter(hardwareClass => detectedClasses[hardwareClass])
     });
   };
 
-  toggleHardwareClass = (hardwareClass) => {
+  toggleHardwareClass = hardwareClass => {
     const { grantedDevices = [] } = this.state;
     this.setState({
       grantedDevices: grantedDevices.includes(hardwareClass)
-        ? grantedDevices.filter((grantedClass) => grantedClass !== hardwareClass)
-        : grantedDevices.concat([hardwareClass]),
+        ? grantedDevices.filter(grantedClass => grantedClass !== hardwareClass)
+        : grantedDevices.concat([hardwareClass])
     });
   };
 
@@ -80,13 +80,13 @@ class ExternalIntegrationInstallPage extends Component {
   // the user install anyway — it is a supported workflow
   findDuplicateOfInstalled = (storeIntegration, installedIntegrations) => {
     const manifest = storeIntegration.manifest || {};
-    const imageWithoutTag = (reference) => (reference || '').split('@')[0].split(':')[0];
+    const imageWithoutTag = reference => (reference || '').split('@')[0].split(':')[0];
     return (
       (installedIntegrations || []).find(
-        (installed) =>
+        installed =>
           (manifest.docker_image &&
             imageWithoutTag(installed.docker_image) === imageWithoutTag(manifest.docker_image)) ||
-          (manifest.name && get(installed, 'manifest.name') === manifest.name),
+          (manifest.name && get(installed, 'manifest.name') === manifest.name)
       ) || null
     );
   };
@@ -97,18 +97,21 @@ class ExternalIntegrationInstallPage extends Component {
       const storeSlug = `${this.props.owner}/${this.props.repo}`;
       const body = { store_slug: storeSlug };
       const requestedClasses = getRequestedHardwareClasses(
-        get(this.state.storeIntegration, 'manifest.containers') || [],
+        get(this.state.storeIntegration, 'manifest.containers') || []
       );
       if (requestedClasses.length > 0) {
         body.granted_devices = this.state.grantedDevices || [];
       }
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      // communication and weather integrations have no device screens, and
+      // communication, weather and calendar integrations have no device screens, and
       // an integration with settings needs them filled before any device
       // can be discovered: all land on the configuration screen after
       // install
       const configSchema = get(installed, 'manifest.config_schema') || [];
-      if (['communication', 'weather'].includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
+      if (
+        ['communication', 'weather', 'calendar'].includes(get(installed, 'manifest.type')) ||
+        configSchema.length > 0
+      ) {
         route(`/dashboard/integration/device/external/${installed.selector}/config`);
       } else {
         route(`/dashboard/integration/device/external/${installed.selector}`);
@@ -131,7 +134,7 @@ class ExternalIntegrationInstallPage extends Component {
 
   render(
     props,
-    { storeIntegration, loadStatus, installStatus, detectedClasses = {}, grantedDevices = [], duplicateOfInstalled },
+    { storeIntegration, loadStatus, installStatus, detectedClasses = {}, grantedDevices = [], duplicateOfInstalled }
   ) {
     const language = get(props, 'user.language') || 'en';
     const manifest = (storeIntegration && storeIntegration.manifest) || {};
@@ -151,7 +154,7 @@ class ExternalIntegrationInstallPage extends Component {
                   <BackToIntegrationsLink />
                   <div
                     class={cx('dimmer', {
-                      active: loadStatus === RequestStatus.Getting,
+                      active: loadStatus === RequestStatus.Getting
                     })}
                   >
                     <div class="loader" />
@@ -312,7 +315,7 @@ class ExternalIntegrationInstallPage extends Component {
                             ) : (
                               <button
                                 class={cx('btn btn-success', {
-                                  'btn-loading': installing,
+                                  'btn-loading': installing
                                 })}
                                 onClick={this.install}
                                 disabled={installing || storeIntegration.compatible === false}

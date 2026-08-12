@@ -13,9 +13,9 @@ class ExternalIntegrationDevicePage extends Component {
   getIntegration = async () => {
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
-      // communication and weather integrations have no device screens:
+      // communication, weather and calendar integrations have no device screens:
       // direct URL access lands on the configuration screen instead
-      if (['communication', 'weather'].includes(get(integration, 'manifest.type'))) {
+      if (['communication', 'weather', 'calendar'].includes(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
         return false;
       }
@@ -52,29 +52,29 @@ class ExternalIntegrationDevicePage extends Component {
     const devices = update(this.state.devices, {
       [index]: {
         [field]: {
-          $set: value,
-        },
-      },
+          $set: value
+        }
+      }
     });
     this.setState({ devices });
   };
 
-  saveDevice = async (index) => {
+  saveDevice = async index => {
     const device = this.state.devices[index];
     const savedDevice = await this.props.httpClient.post('/api/v1/device', device);
     const devices = update(this.state.devices, {
-      $splice: [[index, 1, savedDevice]],
+      $splice: [[index, 1, savedDevice]]
     });
     this.setState({ devices });
   };
 
-  deleteDevice = async (index) => {
+  deleteDevice = async index => {
     const device = this.state.devices[index];
     if (device.created_at) {
       await this.props.httpClient.delete(`/api/v1/device/${device.selector}`);
     }
     const devices = update(this.state.devices, {
-      $splice: [[index, 1]],
+      $splice: [[index, 1]]
     });
     this.setState({ devices });
   };
@@ -91,7 +91,7 @@ class ExternalIntegrationDevicePage extends Component {
     this.getHouses();
   };
 
-  onDeviceTransportUpdated = (payload) => {
+  onDeviceTransportUpdated = payload => {
     if (!payload || payload.selector !== this.props.selector || !this.state.devices) {
       return;
     }
@@ -100,15 +100,15 @@ class ExternalIntegrationDevicePage extends Component {
     // refetching the list
     const TRANSPORT_PARAM_NAMES = ['GLADYS_TRANSPORT', 'GLADYS_TRANSPORT_DEGRADED', 'GLADYS_TRANSPORT_MESSAGE'];
     const entryByExternalId = {};
-    (payload.transports || []).forEach((entry) => {
+    (payload.transports || []).forEach(entry => {
       entryByExternalId[entry.device_external_id] = entry;
     });
-    const devices = this.state.devices.map((device) => {
+    const devices = this.state.devices.map(device => {
       const entry = entryByExternalId[device.external_id];
       if (!entry) {
         return device;
       }
-      const params = (device.params || []).filter((param) => !TRANSPORT_PARAM_NAMES.includes(param.name));
+      const params = (device.params || []).filter(param => !TRANSPORT_PARAM_NAMES.includes(param.name));
       params.push({ name: 'GLADYS_TRANSPORT', value: entry.transport });
       if (entry.degraded) {
         params.push({ name: 'GLADYS_TRANSPORT_DEGRADED', value: 'true' });
@@ -124,7 +124,7 @@ class ExternalIntegrationDevicePage extends Component {
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_TRANSPORT_UPDATED,
-      this.onDeviceTransportUpdated,
+      this.onDeviceTransportUpdated
     );
     this.loadData();
   }
@@ -138,7 +138,7 @@ class ExternalIntegrationDevicePage extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DEVICE_TRANSPORT_UPDATED,
-      this.onDeviceTransportUpdated,
+      this.onDeviceTransportUpdated
     );
   }
 

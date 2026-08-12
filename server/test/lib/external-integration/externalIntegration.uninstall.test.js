@@ -11,7 +11,7 @@ const { buildSupervisor, seedExternalService, TEST_MANIFEST, TEST_CONTAINERS_MAN
 describe('externalIntegration.uninstall', () => {
   it('should remove container, devices, variables and the service row', async () => {
     const service = await seedExternalService();
-    const { externalIntegration, system, device, stateManager, variable } = buildSupervisor();
+    const { externalIntegration, system, device, stateManager, variable, event } = buildSupervisor();
     externalIntegration.registerProxyService(service);
     externalIntegration.discoveredDevices.set(service.id, []);
     const connection = { terminate: fake.returns(null) };
@@ -51,6 +51,15 @@ describe('externalIntegration.uninstall', () => {
     expect(calendars).to.have.lengthOf(0);
     const events = await db.CalendarEvent.findAll({ where: { calendar_id: calendar.id } });
     expect(events).to.have.lengthOf(0);
+    // and their previous viewers are notified
+    const calendarPushes = event.emit
+      .getCalls()
+      .filter((call) => call.args[0] === 'websocket.send')
+      .filter((call) => call.args[1].type === 'calendar.updated');
+    expect(calendarPushes).to.have.lengthOf(1);
+    expect(calendarPushes[0].args[1].payload).to.deep.equal({
+      calendar_selectors: ['ext-test-integration-calendar'],
+    });
     const serviceInDb = await db.Service.findOne({ where: { id: service.id } });
     expect(serviceInDb).to.equal(null);
     expect(stateManager.get('service', service.name)).to.equal(null);

@@ -99,6 +99,17 @@ describe('calendar.upsertEvents', () => {
       name: 'Manual event',
       start: '2026-08-12T09:00:00.000Z',
     });
+    // full-day event ending exactly at the window start: exclusive end, does
+    // not overlap, must not be pruned
+    await calendar.upsertEvents(calendarA.id, [
+      {
+        external_id: `${PREFIX}boundary`,
+        name: 'Boundary',
+        start: '2026-07-31T00:00:00.000Z',
+        end: '2026-08-01T00:00:00.000Z',
+        full_day: true,
+      },
+    ]);
     const result = await calendar.upsertEvents(
       calendarA.id,
       [{ external_id: `${PREFIX}kept`, name: 'Kept', start: '2026-08-10T09:00:00.000Z' }],
@@ -107,7 +118,7 @@ describe('calendar.upsertEvents', () => {
     expect(result).to.deep.include({ created: 0, updated: 1, deleted: 1 });
     const remaining = await db.CalendarEvent.findAll({ where: { calendar_id: calendarA.id } });
     const names = remaining.map((event) => event.name).sort();
-    expect(names).to.eql(['Before', 'Kept', 'Manual event']);
+    expect(names).to.eql(['Before', 'Boundary', 'Kept', 'Manual event']);
   });
 
   it('should reject an upsert exceeding the per-calendar events cap', async function test() {
@@ -133,5 +144,20 @@ describe('calendar.upsertEvents', () => {
       { external_id: `${PREFIX}cap-2`, name: 'Too many', start: '2026-08-14T09:00:00.000Z' },
     ]);
     await assert.isRejected(promise, 'cannot hold more than 10000 events');
+    // fill the last slot, then verify the cap also holds on the move path
+    await calendar.upsertEvents(calendarA.id, [
+      { external_id: `${PREFIX}cap-1`, name: 'Last one', start: '2026-08-14T09:00:00.000Z' },
+    ]);
+    const { calendars } = await calendar.upsertCalendars(USER_A, SERVICE_ID, [
+      { external_id: `${PREFIX}other`, name: 'Other' },
+    ]);
+    const [calendarOther] = calendars;
+    await calendar.upsertEvents(calendarOther.id, [
+      { external_id: `${PREFIX}mover`, name: 'Mover', start: '2026-08-14T09:00:00.000Z' },
+    ]);
+    const movePromise = calendar.upsertEvents(calendarA.id, [
+      { external_id: `${PREFIX}mover`, name: 'Mover', start: '2026-08-14T09:00:00.000Z' },
+    ]);
+    await assert.isRejected(movePromise, 'cannot hold more than 10000 events');
   });
 });

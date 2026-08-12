@@ -31,7 +31,8 @@ function parseDate(value, path) {
  * @description Upsert a batch of events in one of the integration's
  * calendars, keyed by external_id (never trusted: whitelist of fields,
  * bounded strings, dates parsed and validated). With a window, membership is
- * by overlap (start < to and (end ?? start) >= from): the integration's
+ * by overlap — start < to, and end > from when end is set (exclusive end,
+ * the iCalendar convention) else start >= from: the integration's
  * events overlapping the window and absent from the list are pruned —
  * manually created events never are — and every pushed event must overlap
  * the window. A sync-disabled calendar answers 403.
@@ -149,19 +150,42 @@ async function publishCalendarEvents(service, body = {}) {
       result.url = url;
     }
     if (parsedWindow) {
-      // replace semantics stay crisp: every pushed event must overlap the window
-      const effectiveEnd = result.end !== undefined ? result.end : start;
-      if (!(start < parsedWindow.to && effectiveEnd >= parsedWindow.from)) {
+      // replace semantics stay crisp: every pushed event must overlap the
+      // window — exclusive on the end side (a full-day event ending exactly
+      // at `from` belongs to the previous window)
+      const overlaps =
+        start < parsedWindow.to &&
+        (result.end !== undefined ? result.end > parsedWindow.from : start >= parsedWindow.from);
+      if (!overlaps) {
         throw new BadParameters(`events[${index}]: must overlap the window`);
       }
     }
     return result;
   });
-  const { created, updated, deleted } = await this.calendar.upsertEvents(calendar.id, normalized, {
-    window: parsedWindow,
-    prunePrefix: prefix,
-  });
-  this.notifyCalendarUpdated(calendar.user_id, [calendar.selector], calendar.shared);
+  const { created, updated, deleted, movedFromCalendarIds } = await this.calendar.upsertEvents(
+    calendar.id,
+    normalized,
+    {
+      window: parsedWindow,
+      prunePrefix: prefix,
+    },
+  );
+  // an event move empties a row out of its source calendar: the push targets
+  // the union of the source and destination calendars (same user, enforced
+  // by the upsert), everyone when any of them is shared
+  const selectors = [calendar.selector];
+  let anyShared = calendar.shared;
+  if (movedFromCalendarIds.length > 0) {
+    const sourceCalendars = await db.Calendar.findAll({
+      where: { id: movedFromCalendarIds },
+      attributes: ['selector', 'shared'],
+    });
+    sourceCalendars.forEach((sourceCalendar) => {
+      selectors.push(sourceCalendar.selector);
+      anyShared = anyShared || sourceCalendar.shared;
+    });
+  }
+  this.notifyCalendarUpdated(calendar.user_id, selectors, anyShared);
   return { success: true, created, updated, deleted };
 }
 

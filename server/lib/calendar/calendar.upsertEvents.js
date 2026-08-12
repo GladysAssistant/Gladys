@@ -34,6 +34,7 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
     let created = 0;
     let updated = 0;
     let deleted = 0;
+    const movedFromCalendarIds = new Set();
     const taken = new Set();
     const pushedExternalIds = new Set(events.map((event) => event.external_id));
     const existingCount = await db.CalendarEvent.count({ where: { calendar_id: calendarId }, transaction });
@@ -73,6 +74,11 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
           }
           fields.calendar_id = calendarId;
           count += 1;
+          // the hard cap holds on the move path too, not only on creations
+          if (count > MAX_EVENTS_PER_CALENDAR) {
+            throw new BadParameters(`A calendar cannot hold more than ${MAX_EVENTS_PER_CALENDAR} events`);
+          }
+          movedFromCalendarIds.add(existing.calendar_id);
         }
         // eslint-disable-next-line no-await-in-loop
         await existing.update(fields, { transaction });
@@ -98,15 +104,17 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
       }
     }
     if (window) {
-      // Overlap semantics: start < to and (end ?? start) >= from — a multi-day
-      // event straddling `from` stays prunable. The prefix filter runs in JS:
-      // a LIKE pattern would need escaping for % and _ in external_ids.
+      // Overlap semantics: start < to, and end > from when end is set (the
+      // exclusive-end convention: a full-day event ending exactly at `from`
+      // does not overlap), else start >= from — a multi-day event straddling
+      // `from` stays prunable. The prefix filter runs in JS: a LIKE pattern
+      // would need escaping for % and _ in external_ids.
       const candidates = await db.CalendarEvent.findAll({
         where: {
           calendar_id: calendarId,
           start: { [Op.lt]: new Date(window.to) },
           [Op.or]: [
-            { end: { [Op.gte]: new Date(window.from) } },
+            { end: { [Op.gt]: new Date(window.from) } },
             { end: null, start: { [Op.gte]: new Date(window.from) } },
           ],
         },
@@ -125,7 +133,7 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
         deleted = await db.CalendarEvent.destroy({ where: { id: toDelete }, transaction });
       }
     }
-    return { created, updated, deleted };
+    return { created, updated, deleted, movedFromCalendarIds: [...movedFromCalendarIds] };
   });
 }
 

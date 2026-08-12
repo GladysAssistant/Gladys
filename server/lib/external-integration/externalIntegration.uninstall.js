@@ -55,8 +55,24 @@ async function uninstall(selector) {
   const devices = await db.Device.findAll({ where: { service_id: service.id } });
   await Promise.each(devices, (device) => this.device.destroy(device.selector));
   // Calendars of a calendar-type integration are removed explicitly (all
-  // users), never left to the service_id FK cascade (see the spec, B.19).
+  // users), never left to the service_id FK cascade (see the spec, B.19) —
+  // and their viewers are notified, or a shared calendar would stay
+  // displayed on other users' calendar views until a manual refresh.
+  const calendars = await db.Calendar.findAll({
+    where: { service_id: service.id },
+    attributes: ['selector', 'shared', 'user_id'],
+  });
   await db.Calendar.destroy({ where: { service_id: service.id } });
+  const calendarsByUser = new Map();
+  calendars.forEach((calendar) => {
+    const entry = calendarsByUser.get(calendar.user_id) || { selectors: [], anyShared: false };
+    entry.selectors.push(calendar.selector);
+    entry.anyShared = entry.anyShared || calendar.shared;
+    calendarsByUser.set(calendar.user_id, entry);
+  });
+  calendarsByUser.forEach((entry, userId) => {
+    this.notifyCalendarUpdated(userId, entry.selectors, entry.anyShared);
+  });
   await db.Variable.destroy({ where: { service_id: service.id } });
   await db.Service.destroy({ where: { id: service.id } });
   this.stateManager.deleteState('service', service.name);
