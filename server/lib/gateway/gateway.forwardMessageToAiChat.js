@@ -73,17 +73,37 @@ function buildSystemPromptWithCurrentTime(timezoneName, now = new Date(), { incl
 
 /**
  * @description Whether the classified intent should force at least one tool call.
- * Forced for home/device/scene intents; not for web/time, pure "other" chat, or unknown routing.
+ * Forced for home/device/scene/weather intents; not for web/time, pure "other" chat,
+ * or unknown routing. When the selected tools are given, a forced category also has
+ * to be served by one of them: a weather question on an instance whose houses have
+ * no coordinates reaches a tool list without any weather tool (the category filter
+ * falls back to the full list), and forcing a call there would make the model run an
+ * unrelated tool before saying the weather is unavailable.
  * @param {Array<string>|null|undefined} toolCategories - Categories selected by the intent router.
+ * @param {Array<object>|null} [selectedTools] - MCP tools sent with the request, when known.
  * @returns {boolean} True when tool use must be required on the first model turn.
  * @example
  * shouldForceToolChoice(['device_query']);
  */
-function shouldForceToolChoice(toolCategories) {
+function shouldForceToolChoice(toolCategories, selectedTools = null) {
   if (!Array.isArray(toolCategories) || toolCategories.length === 0) {
     return false;
   }
-  return toolCategories.some((category) => FORCE_TOOL_CHOICE_CATEGORIES.has(category));
+  const forcedCategories = toolCategories.filter((category) => FORCE_TOOL_CHOICE_CATEGORIES.has(category));
+  if (forcedCategories.length === 0) {
+    return false;
+  }
+  if (!Array.isArray(selectedTools)) {
+    return true;
+  }
+  return selectedTools.some((tool) => {
+    const toolCategoriesOfTool = tool?.config?.categories;
+    // an untagged tool can serve any intent, like the category filter assumes
+    if (!Array.isArray(toolCategoriesOfTool) || toolCategoriesOfTool.length === 0) {
+      return true;
+    }
+    return toolCategoriesOfTool.some((category) => forcedCategories.includes(category));
+  });
 }
 
 /**
@@ -520,7 +540,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     let lastSceneCreateErrorText = null;
     let sceneCreateSuccessCount = 0;
     let toolIterations = 0;
-    const forceToolUse = shouldForceToolChoice(toolCategories) && toolsForApi.length > 0;
+    const forceToolUse = shouldForceToolChoice(toolCategories, selectedMcpTools) && toolsForApi.length > 0;
     let forcedToolRetryUsed = false;
     let rawDataAnswerRetryUsed = false;
     const selectedModel = resolveAiChatModel(message?.model);
