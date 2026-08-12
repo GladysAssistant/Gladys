@@ -81,6 +81,17 @@ function roundWeatherValue(value) {
 }
 
 /**
+ * @description Whether a list entry of the pivot payload can be formatted.
+ * @param {any} entry - Entry of the hours, days or alerts list.
+ * @returns {boolean} True when the entry is an object to read fields from.
+ * @example
+ * isEntryObject({ temperature: 21 });
+ */
+function isEntryObject(entry) {
+  return entry !== null && typeof entry === 'object';
+}
+
+/**
  * @description Copy the numeric fields reported by the provider into a target object.
  * @param {object} source - Weather entry from the pivot payload.
  * @param {Array<string>} fields - Field names to copy.
@@ -330,62 +341,74 @@ function formatWeather(weather, { house, timezone: timezoneName, language = DEFA
     now,
   };
 
-  const hours = (Array.isArray(weather.hours) ? weather.hours : []).slice(0, MAX_HOURS).map((hour) => {
-    const entry = {};
-    const hourDatetime = toTimestamp(hour.datetime);
-    if (hourDatetime !== undefined) {
-      // The offset keeps hourly labels unique on the night a timezone falls
-      // back: in Paris, 2025-10-26T00:00Z and 2025-10-26T01:00Z are two
-      // different hours of the forecast that both read 02:00 on the local clock.
-      entry.datetime = `${formatZonedDateTime(hourDatetime, timezoneName)}${utcOffsetLabel(
-        hourDatetime,
-        timezoneName,
-      )}`;
-    }
-    if (hour.weather) {
-      entry.weather = hour.weather;
-    }
-    copyNumberFields(hour, HOUR_NUMBER_FIELDS, entry);
-    // strict boolean only, like the current conditions: `weather` carries the
-    // meteorology and `is_day` the day/night half of it (B.18)
-    if (typeof hour.is_day === 'boolean') {
-      entry.is_day = hour.is_day;
-    }
-    return entry;
-  });
+  // Entries that are not objects are dropped rather than formatted: the core
+  // normalizes the payload of an external integration the same way, but an
+  // internal provider service reaches the loop unnormalized (it is duck-typed on
+  // `weather.get`), and one malformed entry must not sink the whole answer.
+  // Filtered before the cap so a bad entry does not consume one of the slots.
+  const hours = (Array.isArray(weather.hours) ? weather.hours : [])
+    .filter(isEntryObject)
+    .slice(0, MAX_HOURS)
+    .map((hour) => {
+      const entry = {};
+      const hourDatetime = toTimestamp(hour.datetime);
+      if (hourDatetime !== undefined) {
+        // The offset keeps hourly labels unique on the night a timezone falls
+        // back: in Paris, 2025-10-26T00:00Z and 2025-10-26T01:00Z are two
+        // different hours of the forecast that both read 02:00 on the local clock.
+        entry.datetime = `${formatZonedDateTime(hourDatetime, timezoneName)}${utcOffsetLabel(
+          hourDatetime,
+          timezoneName,
+        )}`;
+      }
+      if (hour.weather) {
+        entry.weather = hour.weather;
+      }
+      copyNumberFields(hour, HOUR_NUMBER_FIELDS, entry);
+      // strict boolean only, like the current conditions: `weather` carries the
+      // meteorology and `is_day` the day/night half of it (B.18)
+      if (typeof hour.is_day === 'boolean') {
+        entry.is_day = hour.is_day;
+      }
+      return entry;
+    });
   if (hours.length > 0) {
     formatted.hours = hours;
   }
 
-  const days = (Array.isArray(weather.days) ? weather.days : []).slice(0, MAX_DAYS).map((day) => {
-    const entry = {};
-    const dayDatetime = toTimestamp(day.datetime);
-    if (dayDatetime !== undefined) {
-      entry.date = formatZonedDate(dayDatetime, timezoneName);
-      // The weekday name saves the model from deriving it from the date: a
-      // "what is the weather on saturday" question is answered by matching a
-      // row, never by counting days from today.
-      entry.day_of_week = weekdayName(dayDatetime, timezoneName, language);
-    }
-    if (day.weather) {
-      entry.weather = day.weather;
-    }
-    copyNumberFields(day, DAY_NUMBER_FIELDS, entry);
-    const daySunrise = toTimestamp(day.sunrise);
-    if (daySunrise !== undefined) {
-      entry.sunrise = formatZonedTime(daySunrise, timezoneName);
-    }
-    const daySunset = toTimestamp(day.sunset);
-    if (daySunset !== undefined) {
-      entry.sunset = formatZonedTime(daySunset, timezoneName);
-    }
-    return entry;
-  });
+  const days = (Array.isArray(weather.days) ? weather.days : [])
+    .filter(isEntryObject)
+    .slice(0, MAX_DAYS)
+    .map((day) => {
+      const entry = {};
+      const dayDatetime = toTimestamp(day.datetime);
+      if (dayDatetime !== undefined) {
+        entry.date = formatZonedDate(dayDatetime, timezoneName);
+        // The weekday name saves the model from deriving it from the date: a
+        // "what is the weather on saturday" question is answered by matching a
+        // row, never by counting days from today.
+        entry.day_of_week = weekdayName(dayDatetime, timezoneName, language);
+      }
+      if (day.weather) {
+        entry.weather = day.weather;
+      }
+      copyNumberFields(day, DAY_NUMBER_FIELDS, entry);
+      const daySunrise = toTimestamp(day.sunrise);
+      if (daySunrise !== undefined) {
+        entry.sunrise = formatZonedTime(daySunrise, timezoneName);
+      }
+      const daySunset = toTimestamp(day.sunset);
+      if (daySunset !== undefined) {
+        entry.sunset = formatZonedTime(daySunset, timezoneName);
+      }
+      return entry;
+    });
   if (days.length > 0) {
     formatted.days = days;
   }
 
   const alerts = (Array.isArray(weather.alerts) ? weather.alerts : [])
+    .filter(isEntryObject)
     .slice(0, MAX_ALERTS)
     .map((alert) => formatAlert(alert, timezoneName));
   if (alerts.length > 0) {

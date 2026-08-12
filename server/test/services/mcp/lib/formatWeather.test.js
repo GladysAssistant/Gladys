@@ -302,6 +302,41 @@ describe('formatWeather', () => {
     ]);
   });
 
+  it('should drop malformed list entries instead of failing the whole answer', () => {
+    const formatted = formatWeather(
+      {
+        temperature: 20,
+        units: 'metric',
+        hours: [null, { datetime: '2026-08-12T13:00:00.000Z', temperature: 26 }, 'not-an-hour'],
+        days: ['not-a-day', null, { datetime: '2026-08-13T00:00:00.000Z', temperature_min: 17, temperature_max: 24 }],
+        alerts: [null, { severity: 'minor', event: 'Vent' }, 42],
+      },
+      { house: 'Home', timezone: 'Europe/Paris' },
+    );
+
+    expect(formatted.hours).to.deep.equal([{ datetime: '2026-08-12 15:00+02:00', temperature: 26 }]);
+    expect(formatted.days).to.deep.equal([
+      { date: '2026-08-13', day_of_week: 'Thursday', temperature_min: 17, temperature_max: 24 },
+    ]);
+    expect(formatted.alerts).to.deep.equal([{ severity: 'minor', event: 'Vent' }]);
+  });
+
+  it('should not let a malformed entry consume one of the capped slots', () => {
+    const formatted = formatWeather(
+      {
+        units: 'metric',
+        hours: [null, ...new Array(MAX_HOURS).fill(null).map((value, index) => ({ temperature: index }))],
+        days: [null, ...new Array(MAX_DAYS).fill(null).map((value, index) => ({ temperature_min: index }))],
+        alerts: [null, ...new Array(MAX_ALERTS).fill(null).map((value, index) => ({ event: `Alert ${index}` }))],
+      },
+      { house: 'Home', timezone: 'UTC' },
+    );
+
+    expect(formatted.hours).to.have.lengthOf(MAX_HOURS);
+    expect(formatted.days).to.have.lengthOf(MAX_DAYS);
+    expect(formatted.alerts).to.have.lengthOf(MAX_ALERTS);
+  });
+
   it('should render the weekday names in the language of the user', () => {
     const weather = {
       temperature: 20,
