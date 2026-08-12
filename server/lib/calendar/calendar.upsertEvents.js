@@ -8,9 +8,10 @@ const MAX_EVENTS_PER_CALENDAR = 10000;
 /**
  * @description Upsert a batch of events in a calendar, keyed by external_id, and
  * optionally prune: with a window, events of the calendar overlapping the window
- * (start < to and (end ?? start) >= from), whose external_id starts with
- * prunePrefix, and absent from the pushed list are deleted. Events without the
- * prefix (manually created ones) are never pruned.
+ * (start < to, and end > from when end is set — the exclusive-end convention —
+ * else start >= from), whose external_id starts with prunePrefix, and absent
+ * from the pushed list are deleted. Events without the prefix (manually created
+ * ones) are never pruned.
  * @param {string} calendarId - The calendar id.
  * @param {Array} events - Events to upsert ({ external_id, name, start, end, full_day, location, description, url }).
  * @param {object} [options] - Options.
