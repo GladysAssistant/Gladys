@@ -3,6 +3,7 @@
     "key": "openWeather",
     "img": "/assets/integrations/cover/openweather.jpg",
     "whiteBackground": true,
-    "cloud": true
+    "cloud": true,
+    "deprecated": true
   }
 ]

@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const Promise = require('bluebird');
@@ -8,6 +8,7 @@ const { assert, fake } = sinon;
 const { EVENTS, ACTIONS } = require('../../../../utils/constants');
 const SceneManager = require('../../../../lib/scene');
 const StateManager = require('../../../../lib/state');
+const { waitUntil } = require('../../../helpers/waitUntil');
 
 const event = new EventEmitter();
 
@@ -358,18 +359,13 @@ describe('scene.triggers.deviceNewState', () => {
       previous_value: 11,
       last_value: 14,
     });
-    return new Promise((resolve, reject) => {
-      sceneManager.queue.start(async () => {
-        try {
-          await Promise.delay(5);
-          assert.calledOnce(device.setValue);
-          expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
+    // The scene is not executed synchronously: the trigger first schedules a timer,
+    // and the scene is only queued when this timer fires. So we wait for the scene
+    // to be executed, then for the queue to be empty, instead of waiting a fixed delay.
+    await waitUntil(() => device.setValue.called, { message: 'the scene to be executed' });
+    await waitUntil(() => sceneManager.queue.length === 0, { message: 'the scene queue to be empty' });
+    assert.calledOnce(device.setValue);
+    expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
   });
   it('should start timer to check now and re-send new value still validating the condition', async () => {
     await sceneManager.addScene({
@@ -406,18 +402,11 @@ describe('scene.triggers.deviceNewState', () => {
       previous_value: 14,
       last_value: 14,
     });
-    return new Promise((resolve, reject) => {
-      sceneManager.queue.start(async () => {
-        try {
-          await Promise.delay(10);
-          assert.calledOnce(device.setValue);
-          expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
+    // Same as above: the scene is only queued when the trigger timer fires.
+    await waitUntil(() => device.setValue.called, { message: 'the scene to be executed' });
+    await waitUntil(() => sceneManager.queue.length === 0, { message: 'the scene queue to be empty' });
+    assert.calledOnce(device.setValue);
+    expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
   });
   it('should start timer to check now and condition should not be valid on second call', async () => {
     await sceneManager.addScene({
@@ -454,18 +443,11 @@ describe('scene.triggers.deviceNewState', () => {
       previous_value: 14,
       last_value: 5,
     });
-    return new Promise((resolve, reject) => {
-      sceneManager.queue.start(async () => {
-        try {
-          await Promise.delay(5);
-          assert.notCalled(device.setValue);
-          expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
+    // The timer is cancelled synchronously by the second event, we wait longer than
+    // the trigger duration (10ms) to be sure it doesn't fire anyway.
+    await Promise.delay(100);
+    assert.notCalled(device.setValue);
+    expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
   });
   it('should execute scene with string value equality (text device feature like Shelly Button)', async () => {
     await sceneManager.addScene({

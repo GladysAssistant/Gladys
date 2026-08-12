@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import BatteryLevelFeature from '../../../../components/device/view/BatteryLevelFeature';
+import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 import {
   GITHUB_BASE_URL,
@@ -379,6 +380,10 @@ class NetatmoDeviceBox extends Component {
                         <Text id="integration.netatmo.device.saveNotAllowButton" />
                       </button>
                     </div>
+                  )}
+
+                  {validModel && deleteButton && (
+                    <MigrateDeviceButton device={device} onMigrated={this.props.getNetatmoDevices} />
                   )}
 
                   {validModel && deleteButton && (

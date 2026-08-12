@@ -15,10 +15,10 @@
     "start-gateway": "cross-env GATEWAY_MODE=true vite --port 1445",
     "start-demo": "cross-env DEMO_MODE=true vite --port 1445",
     "eslint": "eslint src cypress --ext .json --ext .js --ext .jsx",
-    "compare-translations": "comparejson -e ./src/config/i18n/*.json && node ./cli/check_translations.js",
+    "compare-translations": "comparejson -e ./src/config/i18n/*.json && comparejson -e ./src/config/i18n/icon-keywords/*.json && node ./cli/check_translations.js",
     "prettier-check": "prettier --check '**/*.js' '**/*.jsx' '**/*.json'",
     "prettier": "prettier --write '**/*.js' '**/*.jsx' '**/*.json'",
-    "start:cypress": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 npm run build && sirv build --port 1444 --cors --single",
+    "start:cypress": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 vite build --minify false --sourcemap false && sirv build --port 1444 --cors --single",
     "start:cypress:dev": "cross-env DEMO_MODE=false WEBSOCKET_URL=ws://localhost:1443 LOCAL_API_URL=http://localhost:1443 npm start",
     "cypress:open": "cypress open --config-file cypress/cypress.config.js",
     "cypress:run": "cypress run --config-file cypress/cypress.config.js"
@@ -27,6 +27,7 @@
     "esm": "npm:esm-wallaby@3.2.35"
   },
   "devDependencies": {
+    "@preact/async-loader": "^3.0.2",
     "@preact/preset-vite": "^2.10.2",
     "compare-json": "^0.4.0",
     "cross-env": "^5.2.0",
@@ -42,14 +43,13 @@
     "per-env": "^1.0.2",
     "prettier": "^1.17.1",
     "sirv-cli": "^3.0.1",
-    "@preact/async-loader": "^3.0.2",
     "vite": "^6.3.5",
     "vite-css-modules": "^1.16.0",
     "vite-plugin-static-copy": "^2.3.2"
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^4.19.1",
-    "@gladysassistant/theme-optimized": "^1.0.4",
+    "@gladysassistant/theme-optimized": "^2.1.0",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "4.5.0",
     "apexcharts": "^3.41.1",
@@ -59,6 +59,7 @@
     "date-fns": "^2.22.1",
     "dayjs": "^1.10.6",
     "debounce": "^1.2.1",
+    "dompurify": "^3.4.12",
     "dotenv": "^6.2.0",
     "eslint-plugin-i18n-json": "^4.0.0",
     "get-value": "^3.0.1",
@@ -67,6 +68,7 @@
     "js-confetti": "^0.11.0",
     "leaflet": "^1.7.1",
     "linkstate": "^1.1.1",
+    "marked": "^18.0.7",
     "p-limit": "^4.0.0",
     "preact": "^10.7.2",
     "preact-async-route": "^2.2.1",

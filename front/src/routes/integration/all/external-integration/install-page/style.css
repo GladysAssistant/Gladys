@@ -1,0 +1,18 @@
+.coverPlaceholder {
+  width: 100%;
+  padding-bottom: 40%;
+  position: relative;
+  background: linear-gradient(135deg, #467fcf 0%, #316cbe 100%);
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.coverPlaceholder i {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  color: #fff;
+  opacity: 0.85;
+}

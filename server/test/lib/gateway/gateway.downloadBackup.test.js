@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 const path = require('path');
 
@@ -77,8 +77,11 @@ describe('gateway.downloadBackup', () => {
     assert.calledOnceWithExactly(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BACKUP.DOWNLOADED,
       payload: {
-        duckDbBackupFolderPath: 'gladys-backups/restore/gladys-db-backup_2024-6-29-13-47-50_parquet_folder',
-        sqliteBackupFilePath: 'gladys-backups/restore/gladys-db-backup-2024-6-29-13-47-50.db',
+        duckDbBackupFolderPath: path.join(
+          getConfig().backupsFolder,
+          'restore/gladys-db-backup_2024-6-29-13-47-50_parquet_folder',
+        ),
+        sqliteBackupFilePath: path.join(getConfig().backupsFolder, 'restore/gladys-db-backup-2024-6-29-13-47-50.db'),
       },
     });
   });
@@ -90,7 +93,7 @@ describe('gateway.downloadBackup', () => {
       type: WEBSOCKET_MESSAGE_TYPES.BACKUP.DOWNLOADED,
       payload: {
         duckDbBackupFolderPath: null,
-        sqliteBackupFilePath: 'gladys-backups/restore/encoded-old-gladys-db-backup.db.gz.db',
+        sqliteBackupFilePath: path.join(getConfig().backupsFolder, 'restore/encoded-old-gladys-db-backup.db.gz.db'),
       },
     });
   });

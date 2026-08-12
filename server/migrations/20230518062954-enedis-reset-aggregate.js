@@ -6,6 +6,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../utils/co
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const service = await db.Service.findOne({
+      attributes: ['id', 'selector'],
       where: {
         name: 'enedis',
       },

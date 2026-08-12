@@ -5,7 +5,13 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 
 const logger = require('../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES, SYSTEM_VARIABLE_NAMES, AI_CHAT_PURPOSES } = require('../../utils/constants');
+const {
+  EVENTS,
+  WEBSOCKET_MESSAGE_TYPES,
+  SYSTEM_VARIABLE_NAMES,
+  AI_CHAT_PURPOSES,
+  AI_CHAT_TOOL_CATEGORIES,
+} = require('../../utils/constants');
 const { Error429 } = require('../../utils/httpErrors');
 const { resizeImage } = require('../../utils/resizeImage');
 const { mcpToolsToChatApiFormat, toolNameFromIntent } = require('../../services/mcp/lib/mcpToolsToChatApiFormat');
@@ -17,6 +23,22 @@ const MAX_TOOL_CALL_ITERATIONS = 5;
 const MAX_TOOL_RESULT_CHARS = 4000;
 const MAX_FALLBACK_ANSWER_CHARS = 2000;
 const MAX_NESTED_VALUE_CHARS = 2000;
+
+// Only pure "other" chat (general knowledge, greetings) may answer without tools.
+// Home actions, state queries and scenes must call tools first.
+// web_and_time is not forced: current date/time is already in the system prompt,
+// and simple clock questions should not require a tool call.
+const FORCE_TOOL_CHOICE_CATEGORIES = new Set([
+  AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY,
+  AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
+  AI_CHAT_TOOL_CATEGORIES.SCENES,
+]);
+
+const FORCE_TOOL_RETRY_MESSAGE =
+  'You must call a tool before answering. Use the available tools to fetch live data or perform the requested action.';
+
+const RAW_DATA_ANSWER_RETRY_MESSAGE =
+  'Your previous reply was raw data. Reply again with a short natural-language sentence in the language of the user, without JSON, code blocks, or raw tool output.';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -45,6 +67,40 @@ function buildSystemPromptWithCurrentTime(timezoneName, now = new Date(), { incl
     .format('dddd YYYY-MM-DD HH:mm');
   const basePrompt = includeSceneRules ? `${SYSTEM_PROMPT}\n${SCENES_SYSTEM_PROMPT}` : SYSTEM_PROMPT;
   return `${basePrompt}\n\nCurrent date and time (${timezoneName}): ${formattedNow}`;
+}
+
+/**
+ * @description Whether the classified intent should force at least one tool call.
+ * Forced for home/device/scene intents; not for web/time, pure "other" chat, or unknown routing.
+ * @param {Array<string>|null|undefined} toolCategories - Categories selected by the intent router.
+ * @returns {boolean} True when tool use must be required on the first model turn.
+ * @example
+ * shouldForceToolChoice(['device_query']);
+ */
+function shouldForceToolChoice(toolCategories) {
+  if (!Array.isArray(toolCategories) || toolCategories.length === 0) {
+    return false;
+  }
+  return toolCategories.some((category) => FORCE_TOOL_CHOICE_CATEGORIES.has(category));
+}
+
+/**
+ * @description Resolve OpenAI-compatible tool_choice for the current AI chat iteration.
+ * Force tools only before any tool has run when the intent requires tool use.
+ * After tools have executed, switch back to auto so the model can produce a final answer.
+ * @param {object} options - Resolution options.
+ * @param {boolean} options.forceToolUse - Whether the intent requires a tool call.
+ * @param {boolean} options.hasTools - Whether at least one tool is available to the model.
+ * @param {boolean} options.hasCompletedToolIteration - Whether a tool turn already ran.
+ * @returns {'required'|'auto'} tool_choice value for the API request.
+ * @example
+ * resolveToolChoice({ forceToolUse: true, hasTools: true, hasCompletedToolIteration: false });
+ */
+function resolveToolChoice({ forceToolUse, hasTools, hasCompletedToolIteration }) {
+  if (forceToolUse && hasTools && !hasCompletedToolIteration) {
+    return 'required';
+  }
+  return 'auto';
 }
 
 /**
@@ -349,6 +405,35 @@ function stripToolTraceEchoFromAnswer(answer) {
 }
 
 /**
+ * @description Detect a final answer that is raw structured data instead of natural language.
+ * Small models sometimes echo tool data (JSON) as their reply after a tool turn.
+ * Matches answers that are entirely a JSON object or array, optionally wrapped in a code fence.
+ * @param {string} text - Assistant final answer text.
+ * @returns {boolean} True when the answer looks like raw data.
+ * @example
+ * looksLikeRawDataAnswer('{"state": {"value": 850}}');
+ */
+function looksLikeRawDataAnswer(text) {
+  if (!text || typeof text !== 'string') {
+    return false;
+  }
+  let candidate = text.trim();
+  const fenced = candidate.match(/^```[^\n`]*\n([\s\S]*?)\s*```$/);
+  if (fenced) {
+    candidate = fenced[1].trim();
+  }
+  if (!candidate.startsWith('{') && !candidate.startsWith('[')) {
+    return false;
+  }
+  try {
+    const parsed = JSON.parse(candidate);
+    return typeof parsed === 'object' && parsed !== null;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
  * @public
  * @description Handle a new chat message sent by a user to Gladys Plus.
  * Tool calling loop is executed on the Gladys instance using MCP callbacks.
@@ -433,17 +518,28 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     let lastSceneCreateErrorText = null;
     let sceneCreateSuccessCount = 0;
     let toolIterations = 0;
+    const forceToolUse = shouldForceToolChoice(toolCategories) && toolsForApi.length > 0;
+    let forcedToolRetryUsed = false;
+    let rawDataAnswerRetryUsed = false;
     const selectedModel = resolveAiChatModel(message?.model);
     if (message?.model && selectedModel === null) {
       logger.warn(`[AI_CHAT] Ignoring invalid model=${message.model}`);
     }
+    if (forceToolUse) {
+      logger.info(`[AI_CHAT] Forcing tool_choice=required for categories=${(toolCategories || []).join(',')}`);
+    }
     // eslint-disable-next-line no-restricted-syntax
     for (let iteration = 0; iteration < MAX_TOOL_CALL_ITERATIONS; iteration += 1) {
       logger.debug(`[AI_CHAT] API call iteration=${iteration + 1}/${MAX_TOOL_CALL_ITERATIONS}`);
+      const toolChoice = resolveToolChoice({
+        forceToolUse,
+        hasTools: toolsForApi.length > 0,
+        hasCompletedToolIteration: toolIterations > 0,
+      });
       const aiChatRequest = {
         messages: messagesForApi,
         tools: toolsForApi,
-        tool_choice: 'auto',
+        tool_choice: toolChoice,
         purpose: AI_CHAT_PURPOSES.CHAT,
       };
       if (toolCategories) {
@@ -467,7 +563,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       logger.info(
         `[AI_CHAT] Assistant turn iteration=${iteration + 1} tool_calls=${
           toolCalls.length
-        }${toolNamesSuffix} content=${assistantContentPreview}`,
+        } tool_choice=${toolChoice}${toolNamesSuffix} content=${assistantContentPreview}`,
       );
       logger.debug(
         `[AI_CHAT] Assistant turn details iteration=${iteration +
@@ -475,6 +571,40 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
       );
 
       if (!toolCalls || toolCalls.length === 0) {
+        // Some providers may ignore tool_choice=required. Retry once with an
+        // explicit nudge before accepting an ungrounded device answer/action.
+        if (forceToolUse && toolIterations === 0 && !forcedToolRetryUsed) {
+          forcedToolRetryUsed = true;
+          logger.warn('[AI_CHAT] Forced tool use expected but model returned no tool_calls, retrying once');
+          messagesForApi.push({
+            role: 'user',
+            content: FORCE_TOOL_RETRY_MESSAGE,
+          });
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+        // Small models sometimes echo tool data (raw JSON) as their final reply
+        // instead of natural language. Retry once with an explicit reformulation
+        // request. Only after tool results exist in the conversation: without
+        // tools, a JSON answer may be intentional (the user asked for JSON).
+        if (
+          !rawDataAnswerRetryUsed &&
+          hadToolResultsInConversation(messagesForApi) &&
+          looksLikeRawDataAnswer(assistantMessage?.content)
+        ) {
+          rawDataAnswerRetryUsed = true;
+          logger.warn('[AI_CHAT] Assistant replied with raw data instead of natural language, retrying once');
+          messagesForApi.push({
+            role: 'assistant',
+            content: assistantMessage.content,
+          });
+          messagesForApi.push({
+            role: 'user',
+            content: RAW_DATA_ANSWER_RETRY_MESSAGE,
+          });
+          // eslint-disable-next-line no-continue
+          continue;
+        }
         break;
       }
 
@@ -673,6 +803,11 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
 module.exports = {
   forwardMessageToAiChat,
   buildSystemPromptWithCurrentTime,
+  shouldForceToolChoice,
+  resolveToolChoice,
+  FORCE_TOOL_RETRY_MESSAGE,
+  RAW_DATA_ANSWER_RETRY_MESSAGE,
+  looksLikeRawDataAnswer,
   debugPreview,
   extractAssistantMessage,
   extractMessageFilesFromToolResult,

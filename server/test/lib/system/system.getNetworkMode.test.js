@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
@@ -37,8 +37,10 @@ describe('system.getNetworkMode', () => {
   beforeEach(async () => {
     system = new System(sequelize, event, config, job);
     await system.init();
-    // Reset all fakes invoked within init call
+    // Reset all fakes invoked within init call (the Dockerode mock fakes live
+    // in the mock file's own sandbox, hence the dedicated reset)
     sinon.reset();
+    DockerodeMock.resetMockHistory();
   });
 
   afterEach(() => {
@@ -60,5 +62,24 @@ describe('system.getNetworkMode', () => {
     const network = await system.getNetworkMode();
     expect(network).to.eq('host');
     assert.calledOnce(system.dockerode.getContainer);
+  });
+
+  it('should return host-process mode when Gladys is not containerized', async () => {
+    system.networkMode = null;
+    system.getGladysContainerId = fake.rejects(new PlatformNotCompatible('DOCKER_CONTAINER_ID_NOT_AVAILABLE'));
+    const network = await system.getNetworkMode();
+    expect(network).to.eq('host-process');
+    assert.notCalled(system.dockerode.getContainer);
+  });
+
+  it('should rethrow unexpected errors of getGladysContainerId', async () => {
+    system.networkMode = null;
+    system.getGladysContainerId = fake.rejects(new Error('UNEXPECTED'));
+    try {
+      await system.getNetworkMode();
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e.message).to.eq('UNEXPECTED');
+    }
   });
 });

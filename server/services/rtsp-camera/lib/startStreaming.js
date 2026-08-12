@@ -167,6 +167,13 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
 
     args.splice(8, 0, '-vf', cameraRotationArgs);
 
+    // HLS input (e.g. Netatmo cameras): start reading at the live edge instead
+    // of the HLS demuxer default (3 segments behind it), which cuts several
+    // seconds of glass-to-glass latency. Input options must precede '-i'.
+    if (cameraUrlParam.value.includes('.m3u8')) {
+      args.unshift('-live_start_index', '-1');
+    }
+
     const options = {
       timeout: 5 * 60 * 1000, // 5 minutes
     };

@@ -1,9 +1,10 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 
 const getConfig = require('../../../utils/getConfig');
+const { EVENTS } = require('../../../utils/constants');
 const { Error403, Error500 } = require('../../../utils/httpErrors');
 
 const { fake, assert } = sinon;
@@ -86,5 +87,7 @@ describe('gateway.login', () => {
     assert.called(variable.getValue);
     assert.called(variable.setValue);
     assert.calledOnce(gateway.gladysGatewayClient.createInstance);
+    // Plus is now linked: external integration webhooks recompute
+    assert.calledWith(gateway.event.emit, EVENTS.GATEWAY.LINK_STATUS_CHANGED);
   });
 });

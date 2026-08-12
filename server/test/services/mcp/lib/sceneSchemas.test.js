@@ -1,6 +1,50 @@
 const { expect } = require('chai');
 
-const { flattenSceneActions, assertTriggerTypesNotInActions } = require('../../../../services/mcp/lib/sceneSchemas');
+const {
+  flattenSceneActions,
+  assertTriggerTypesNotInActions,
+  createSceneCreateInputSchema,
+} = require('../../../../services/mcp/lib/sceneSchemas');
+
+const buildSceneWithCondition = (condition) => ({
+  name: 'My scene',
+  icon: 'bell',
+  triggers: [{ type: 'system.start' }],
+  actions: [[{ type: 'condition.only-continue-if', conditions: [condition] }]],
+});
+
+describe('sceneSchemas condition', () => {
+  const schema = createSceneCreateInputSchema();
+
+  it('should accept a condition with only a variable', () => {
+    const result = schema.safeParse(buildSceneWithCondition({ variable: '0.0.last_value', operator: '>', value: 20 }));
+    expect(result.success).to.equal(true);
+  });
+
+  it('should accept a condition with only a device feature', () => {
+    const result = schema.safeParse(
+      buildSceneWithCondition({ device_feature: 'mqtt-temperature', operator: '>', value: 20 }),
+    );
+    expect(result.success).to.equal(true);
+  });
+
+  it('should reject a condition with neither a variable nor a device feature', () => {
+    const result = schema.safeParse(buildSceneWithCondition({ operator: '>', value: 20 }));
+    expect(result.success).to.equal(false);
+  });
+
+  it('should reject a condition with both a variable and a device feature', () => {
+    const result = schema.safeParse(
+      buildSceneWithCondition({
+        variable: '0.0.last_value',
+        device_feature: 'mqtt-temperature',
+        operator: '>',
+        value: 20,
+      }),
+    );
+    expect(result.success).to.equal(false);
+  });
+});
 
 describe('sceneSchemas helpers', () => {
   it('should flatten nested scene actions and ignore invalid entries', () => {

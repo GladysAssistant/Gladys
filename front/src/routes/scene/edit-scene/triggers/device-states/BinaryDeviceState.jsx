@@ -1,35 +1,45 @@
 import { Component, Fragment } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
+import get from 'get-value';
+
+import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 class BinaryDeviceState extends Component {
   handleValueChangeBinary = newValue => () => {
     this.props.updateTriggerProperty(this.props.index, 'value', newValue);
   };
 
-  getBinaryButton = (category, value) => (
-    <div class="col-6">
-      <button
-        class={cx('btn', 'btn-block', 'p-1', {
-          'btn-primary': this.props.trigger.value === value,
-          'btn-outline-primary': this.props.trigger.value !== value,
-          active: this.props.trigger.value === value
-        })}
-        onClick={this.handleValueChangeBinary(value)}
-      >
-        <Text id={`deviceFeatureValue.category.${category}.binary`} plural={value}>
-          <Text id={`editScene.triggersCard.newState.${value ? 'on' : 'off'}`} />
-        </Text>
-      </button>
-    </div>
-  );
+  getBinaryButton = (category, type, value) => {
+    // Some categories hold several binary types with their own labels (ex: water-valve),
+    // in that case prefer the type-specific translation over the generic category one.
+    const customText = get(this.props.intl.dictionary, `deviceFeatureValue.category.${category}.${type}`);
+
+    return (
+      <div class="col-6">
+        <button
+          class={cx('btn', 'btn-block', 'p-1', {
+            'btn-primary': this.props.trigger.value === value,
+            'btn-outline-primary': this.props.trigger.value !== value,
+            active: this.props.trigger.value === value
+          })}
+          onClick={this.handleValueChangeBinary(value)}
+        >
+          <Text id={`deviceFeatureValue.category.${category}.binary`} plural={value}>
+            {!customText && <Text id={`editScene.triggersCard.newState.${value ? 'on' : 'off'}`} />}
+            {customText && <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`} />}
+          </Text>
+        </button>
+      </div>
+    );
+  };
 
   componentWillMount() {
     this.props.updateTriggerProperty(this.props.index, 'operator', '=');
   }
 
   render({ selectedDeviceFeature }) {
-    const { category } = selectedDeviceFeature;
+    const { category, type } = selectedDeviceFeature;
 
     return (
       <Fragment>
@@ -45,8 +55,8 @@ class BinaryDeviceState extends Component {
         <div class="col-12 col-md-5">
           <div class="form-group mt-1">
             <div class="row d-flex justify-content-center">
-              {this.getBinaryButton(category, 1)}
-              {this.getBinaryButton(category, 0)}
+              {this.getBinaryButton(category, type, 1)}
+              {this.getBinaryButton(category, type, 0)}
             </div>
           </div>
         </div>
@@ -55,4 +65,4 @@ class BinaryDeviceState extends Component {
   }
 }
 
-export default BinaryDeviceState;
+export default withIntlAsProp(BinaryDeviceState);

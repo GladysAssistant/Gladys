@@ -1,6 +1,6 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const dayjs = require('dayjs');
 const timezone = require('dayjs/plugin/timezone');
 const { syncUserCalendars } = require('../../../../../services/caldav/lib/calendar/calendar.syncUserCalendars');
@@ -110,6 +110,9 @@ describe('CalDAV sync', () => {
       .withArgs(userId, { externalId: 'https://caldav.host.com/home/professional' })
       .resolves([
         {
+          id: 'a3e2a1f8-2e0b-4b3d-9f9a-6b2f1c4d5e6f',
+          selector: 'calendrier-2',
+          name: 'Calendrier 2',
           sync: '1',
           ctag: 'ctag21',
           sync_token: 'syncToken21',
@@ -199,6 +202,7 @@ describe('CalDAV sync', () => {
     ]);
 
     sync.gladys.calendar.getEvents
+      .resolves([])
       .withArgs(userId, { externalId: '49193db9-f666-4947-8ce6-3357ce3b7166' })
       .resolves([])
       .withArgs(userId, { externalId: '9daca4e5-80dc-4b3e-8b15-a26e19e35ea5' })
@@ -209,10 +213,18 @@ describe('CalDAV sync', () => {
           name: 'Evenement 3 to update',
         },
       ])
-      .withArgs(userId, { url: '/home/professional/event-3.ics' })
+      .withArgs(userId, { calendarId: 'a3e2a1f8-2e0b-4b3d-9f9a-6b2f1c4d5e6f' })
       .resolves([
+        // A recurring event is saved as one event per occurrence, all sharing the same URL
         {
-          selector: 'event-to-delete',
+          selector: 'event-to-delete-1',
+          external_id: 'event-3-2018-06-08-00-00',
+          url: '/home/professional/event-3.ics',
+        },
+        {
+          selector: 'event-to-delete-2',
+          external_id: 'event-3-2018-06-09-00-00',
+          url: '/home/professional/event-3.ics',
         },
       ]);
 
@@ -263,10 +275,13 @@ describe('CalDAV sync', () => {
     expect(sync.gladys.calendar.create.callCount).to.equal(1);
     expect(sync.gladys.calendar.createEvent.callCount).to.equal(2);
     expect(sync.gladys.calendar.get.callCount).to.equal(3);
-    expect(sync.gladys.calendar.update.callCount).to.equal(1);
-    expect(sync.gladys.calendar.getEvents.callCount).to.equal(4);
-    expect(sync.gladys.calendar.destroyEvent.callCount).to.equal(1);
-    expect(sync.gladys.calendar.destroyEvents.callCount).to.equal(1);
+    // The ctag & the sync token are saved once the events are synchronized,
+    // for the created calendar & for the updated one
+    expect(sync.gladys.calendar.update.callCount).to.equal(2);
+    expect(sync.gladys.calendar.getEvents.callCount).to.equal(5);
+    // The 2 occurrences of the deleted recurring event are deleted
+    expect(sync.gladys.calendar.destroyEvent.callCount).to.equal(2);
+    expect(sync.gladys.calendar.destroyEvent.args).to.eql([['event-to-delete-1'], ['event-to-delete-2']]);
   });
 
   it('should failed if no CALDAV_HOST', async () => {
@@ -428,5 +443,150 @@ describe('CalDAV sync', () => {
     await expect(sync.syncUserCalendars(userId))
       .to.be.rejectedWith(Error)
       .and.eventually.have.nested.property('message.message', 'CALDAV_FAILED_REQUEST_EVENTS');
+  });
+});
+
+describe('CalDAV sync of a calendar with recurring events', () => {
+  const calendarId = '402dd55b-6e06-4a7c-8164-ba3e4641c71b';
+  let sync;
+
+  const buildSync = () => ({
+    serviceId,
+    syncUserCalendars,
+    formatCalendars,
+    formatEvents,
+    formatRecurringEvents: sinon.stub().returns([]),
+    requestCalendars: sinon.stub().resolves([
+      {
+        data: {},
+        description: 'Chauffage',
+        timezone: 'Europe/Paris',
+        url: 'https://caldav.host.com/home/heating',
+        ctag: 'new-ctag',
+        displayName: 'Chauffage',
+        components: ['VEVENT'],
+        type: 'CALDAV',
+        syncToken: 'new-sync-token',
+      },
+    ]),
+    requestChanges: sinon.stub(),
+    requestEventsData: sinon.stub(),
+    gladys: {
+      calendar: {
+        create: sinon.stub(),
+        createEvent: sinon.stub().resolves(),
+        updateEvent: sinon.stub().resolves(),
+        get: sinon.stub().resolves([
+          {
+            id: calendarId,
+            selector: 'chauffage',
+            name: 'Chauffage',
+            sync: '1',
+            ctag: 'old-ctag',
+            sync_token: 'old-sync-token',
+            external_id: 'https://caldav.host.com/home/heating',
+            type: 'CALDAV',
+          },
+        ]),
+        update: sinon.stub().resolves(),
+        getEvents: sinon.stub().resolves([]),
+        destroyEvent: sinon.stub().resolves(),
+        destroyEvents: sinon.stub().resolves(),
+      },
+      variable: {
+        getValue: sinon
+          .stub()
+          .withArgs('CALDAV_HOST', serviceId, userId)
+          .returns('https://caldav.host.com')
+          .withArgs('CALDAV_HOME_URL', serviceId, userId)
+          .returns('https://caldav.host.com/home')
+          .withArgs('CALDAV_USERNAME', serviceId, userId)
+          .returns('tony')
+          .withArgs('CALDAV_PASSWORD', serviceId, userId)
+          .returns('12345'),
+      },
+    },
+    dayjs,
+    dav: {
+      transport: {
+        Basic: sinon.stub(),
+      },
+      Credentials: sinon.stub(),
+    },
+  });
+
+  beforeEach(() => {
+    sync = buildSync();
+  });
+
+  it('should delete all the occurrences of a recurring event deleted on the CalDAV server', async () => {
+    sync.requestChanges.resolves([{ href: '/home/heating/recurring-event.ics', props: {} }]);
+
+    sync.gladys.calendar.getEvents.withArgs(userId, { calendarId }).resolves([
+      { selector: 'heating-2026-01-01-08-00', url: '/home/heating/recurring-event.ics' },
+      { selector: 'heating-2026-01-02-08-00', url: '/home/heating/recurring-event.ics' },
+      { selector: 'heating-2026-01-03-08-00', url: '/home/heating/recurring-event.ics' },
+    ]);
+
+    await sync.syncUserCalendars(userId);
+
+    expect(sync.gladys.calendar.destroyEvent.callCount).to.equal(3);
+    expect(sync.requestEventsData.callCount).to.equal(0);
+    // The calendar is up to date, the new ctag & sync token are saved
+    expect(sync.gladys.calendar.update.args).to.eql([
+      [
+        'chauffage',
+        {
+          external_id: 'https://caldav.host.com/home/heating',
+          name: 'Chauffage',
+          description: 'Chauffage',
+          color: '#3174ad',
+          service_id: serviceId,
+          user_id: userId,
+          ctag: 'new-ctag',
+          sync_token: 'new-sync-token',
+          type: 'CALDAV',
+        },
+      ],
+    ]);
+  });
+
+  it('should delete occurrences that do not exist anymore on the CalDAV server', async () => {
+    sync.requestChanges.resolves([{ href: '/home/heating/recurring-event.ics', props: { etag: '91ca3c10' } }]);
+
+    sync.requestEventsData.resolves([
+      {
+        type: 'VEVENT',
+        uid: 'heating',
+        summary: 'Chauffage',
+        start: new Date('2026-01-01 08:00:00.000 +00:00'),
+        end: new Date('2026-01-01 09:00:00.000 +00:00'),
+        href: '/home/heating/recurring-event.ics',
+      },
+    ]);
+
+    sync.gladys.calendar.getEvents.withArgs(userId, { calendarId }).resolves([
+      { selector: 'heating', external_id: 'heating', url: '/home/heating/recurring-event.ics' },
+      // Occurrence removed from the recurrence rule, it is not returned by formatEvents anymore
+      {
+        selector: 'heating-2026-01-02-08-00',
+        external_id: 'heating2026-01-02-08-00',
+        url: '/home/heating/recurring-event.ics',
+      },
+    ]);
+
+    await sync.syncUserCalendars(userId);
+
+    expect(sync.gladys.calendar.destroyEvent.args).to.eql([['heating-2026-01-02-08-00']]);
+  });
+
+  it('should not save the new ctag if the events synchronization failed', async () => {
+    sync.requestChanges.rejects();
+
+    await expect(sync.syncUserCalendars(userId))
+      .to.be.rejectedWith(Error)
+      .and.eventually.have.nested.property('message.message', 'CALDAV_FAILED_REQUEST_CHANGES');
+
+    expect(sync.gladys.calendar.update.callCount).to.equal(0);
   });
 });

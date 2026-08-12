@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();

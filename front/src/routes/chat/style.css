@@ -86,7 +86,7 @@
   width: 100%;
 }
 
-.received_withd_msg p {
+.received_withd_msg .msg_txt_wrap {
   background: #f3f5f8;
   border-radius: 16px 16px 16px 4px;
   color: #202830;
@@ -120,7 +120,7 @@
   padding: 20px 20px 0;
 }
 
-.sent_msg p {
+.sent_msg .msg_txt_wrap {
   background: linear-gradient(135deg, #477fd2 0%, #3564be 100%);
   border-radius: 16px 16px 4px 16px;
   font-size: 15px;
@@ -280,6 +280,95 @@
 .msg_txt_wrap {
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* rendered markdown carries its own paragraphs and line breaks, so the
+   pre-wrap used for plain text would double every blank line */
+.markdown_content {
+  white-space: normal;
+}
+
+.markdown_content > *:first-child {
+  margin-top: 0;
+}
+
+.markdown_content > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown_content p,
+.markdown_content ul,
+.markdown_content ol,
+.markdown_content blockquote,
+.markdown_content pre,
+.markdown_content table {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.markdown_content h1,
+.markdown_content h2,
+.markdown_content h3,
+.markdown_content h4,
+.markdown_content h5,
+.markdown_content h6 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: inherit;
+}
+
+.markdown_content ul,
+.markdown_content ol {
+  padding-left: 1.25rem;
+}
+
+.markdown_content li + li {
+  margin-top: 0.15rem;
+}
+
+.markdown_content code {
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  background: rgba(15, 23, 42, 0.07);
+  color: inherit;
+  font-size: 0.9em;
+  word-break: break-word;
+}
+
+.markdown_content pre {
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.07);
+  overflow-x: auto;
+}
+
+.markdown_content pre code {
+  padding: 0;
+  background: none;
+}
+
+.markdown_content blockquote {
+  margin-left: 0;
+  padding-left: 0.65rem;
+  border-left: 3px solid rgba(15, 23, 42, 0.15);
+  color: inherit;
+}
+
+.markdown_content table {
+  width: auto;
+  max-width: 100%;
+  font-size: 0.9em;
+}
+
+.markdown_content img {
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.markdown_content hr {
+  margin: 0.5rem 0;
 }
 
 .received_withd_msg .msg_txt_wrap a {
@@ -540,8 +629,8 @@
     width: 100%;
   }
 
-  .received_withd_msg p,
-  .sent_msg p {
+  .received_withd_msg .msg_txt_wrap,
+  .sent_msg .msg_txt_wrap {
     font-size: 16px;
     padding: 11px 14px;
   }

@@ -3,7 +3,7 @@ import { Link } from 'preact-router/match';
 import { RequestStatus } from '../../../utils/consts';
 import cx from 'classnames';
 import get from 'get-value';
-import iconList from '../../../../../server/config/icons.json';
+import IconSelector from '../../../components/scene/IconSelector';
 import style from './style.css';
 
 const NewScenePage = ({ children, ...props }) => (
@@ -12,7 +12,7 @@ const NewScenePage = ({ children, ...props }) => (
       <Text id="global.backButton" />
     </Link>
     <div class="row">
-      <div class="col col-login mx-auto">
+      <div class={cx('col mx-auto', style.sceneFormCol)}>
         <form onSubmit={props.createScene} class="card">
           <div class="card-body p-6">
             <div class="card-title">
@@ -52,29 +52,7 @@ const NewScenePage = ({ children, ...props }) => (
                   <Text id="newScene.invalidIcon" />
                 </div>
               )}
-              <div class={cx('row', style.iconContainer)}>
-                {iconList.map(icon => (
-                  <div class="col-2">
-                    <div
-                      class={cx('text-center', style.iconDiv, {
-                        [style.iconDivChecked]: get(props, 'newScene.icon') === icon
-                      })}
-                    >
-                      <label class={style.iconLabel}>
-                        <input
-                          name="icon"
-                          type="radio"
-                          onChange={props.updateNewSceneIcon}
-                          checked={get(props, 'newScene.icon') === icon}
-                          value={icon}
-                          class={style.iconInput}
-                        />
-                        <i class={`fe fe-${icon}`} />
-                      </label>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <IconSelector value={get(props, 'newScene.icon')} onChange={props.updateNewSceneIcon} />
             </div>
 
             <div class="form-footer">

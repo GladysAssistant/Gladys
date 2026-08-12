@@ -1,4 +1,6 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const Job = require('../../../lib/job');

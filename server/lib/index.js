@@ -27,6 +27,7 @@ const services = require('../services');
 const Weather = require('./weather');
 const { EVENTS } = require('../utils/constants');
 const EnergyPrice = require('./energy-price');
+const ExternalIntegration = require('./external-integration');
 
 /**
  * @description Start a new Gladys instance.
@@ -43,6 +44,7 @@ const EnergyPrice = require('./energy-price');
  * @param {boolean} [params.disableJobInit] - If true, disable the pruning of background jobs.
  * @param {boolean} [params.disableDuckDbMigration] - If true, disable the DuckDB migration.
  * @param {boolean} [params.disableGladysUpgradedCheck] - If true, disable the check if Gladys is upgraded.
+ * @param {boolean} [params.disableExternalIntegration] - If true, disable the external integration supervisor.
  * @returns {object} Return gladys object.
  * @example
  * const gladys = Gladys();
@@ -60,7 +62,7 @@ function Gladys(params = {}) {
   const dashboard = new Dashboard();
   const stateManager = new StateManager(event);
   const session = new Session(params.jwtSecret, cache);
-  const house = new House(event, stateManager, session);
+  const house = new House(event, stateManager, session, variable);
   const room = new Room();
   const service = new Service(services, stateManager);
   const message = new MessageHandler(event, brain, service, stateManager, variable);
@@ -73,6 +75,16 @@ function Gladys(params = {}) {
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
   const energyPrice = new EnergyPrice(stateManager);
+  const externalIntegration = new ExternalIntegration(
+    event,
+    system,
+    service,
+    stateManager,
+    device,
+    variable,
+    params.jwtSecret,
+    cache,
+  );
   const gateway = new Gateway(
     variable,
     event,
@@ -104,6 +116,11 @@ function Gladys(params = {}) {
   );
   gateway.scene = scene;
   gateway.energyPrice = energyPrice;
+  // The device migration (device.migrate) rewrites scenes: the scene manager
+  // is created after the device manager, so it is attached post-construction
+  // (same pattern as gateway.scene above). Dashboards have no RAM cache and
+  // are rewritten straight through the DB model.
+  device.sceneManager = scene;
 
   const gladys = {
     version: '0.1.0', // todo, read package.json
@@ -132,6 +149,7 @@ function Gladys(params = {}) {
     variable,
     weather,
     energyPrice,
+    externalIntegration,
     start: async () => {
       // set wal mode
       await db.sequelize.query('PRAGMA journal_mode=WAL;');
@@ -156,6 +174,12 @@ function Gladys(params = {}) {
         await brain.load();
       }
 
+      // init the external integration supervisor before service.startAll, so
+      // the proxy services are registered and startAll starts internal and
+      // external integrations through the same path
+      if (!params.disableExternalIntegration) {
+        await externalIntegration.init();
+      }
       if (!params.disableService) {
         await service.load(gladys);
         await service.startAll();
@@ -181,7 +205,15 @@ function Gladys(params = {}) {
       gateway.init();
 
       if (!params.disableGladysUpgradedCheck) {
-        await system.checkIfGladysUpgraded(gateway);
+        // Voluntarily not awaited: the upgrade notification is forwarded to
+        // the outbound channels of the user, and an external integration
+        // container can only authenticate on the WebSocket once the HTTP
+        // server is listening — which happens after this boot sequence
+        // resolves. Blocking here would make the notification wait for a
+        // connection that cannot happen yet (and the server wait for the
+        // notification). checkIfGladysUpgraded catches its own errors and
+        // never rejects, so the promise can safely float.
+        system.checkIfGladysUpgraded(gateway);
       }
 
       event.emit(EVENTS.TRIGGERS.CHECK, {

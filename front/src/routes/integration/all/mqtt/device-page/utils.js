@@ -3,9 +3,14 @@ import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
-  DEVICE_FEATURE_UNITS_BY_CATEGORY
+  DEVICE_FEATURE_UNITS_BY_CATEGORY,
+  CHARGING_STATION_CONNECTOR_STATUS,
+  CHARGING_STATION_CHARGING_STATE,
+  WATER_HEATER_MODE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
+import { isPushButtonFeature } from '../../../../../utils/consts';
+import normalizeSearchText from '../../../../../utils/normalizeSearchText';
 
 const SENSOR_CATEGORY_SUFFIX = '-sensor';
 
@@ -47,29 +52,37 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.DATARATE ||
     category === DEVICE_FEATURE_CATEGORIES.DURATION ||
     category === DEVICE_FEATURE_CATEGORIES.TAMPER ||
-    category === DEVICE_FEATURE_CATEGORIES.INPUT
+    category === DEVICE_FEATURE_CATEGORIES.INPUT ||
+    category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE ||
+    category === DEVICE_FEATURE_CATEGORIES.DOORBELL ||
+    category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION
   ) {
     return true;
   }
   return category.endsWith(SENSOR_CATEGORY_SUFFIX) || category === DEVICE_FEATURE_CATEGORIES.SIGNAL;
 };
 
-export const normalizeForSearch = value =>
-  value
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+export const normalizeForSearch = normalizeSearchText;
 
 const categoryTypeKey = (category, type) => `${category}|${type}`;
 
 const MQTT_CATALOG_EXCLUDED_FEATURES = new Set([
-  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR)
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR),
+  // Water valve types are only exposed by Zigbee2mqtt for now: the MQTT catalog defaults
+  // (min/max and unit) are not accurate for them yet.
+  ...Object.values(DEVICE_FEATURE_TYPES.WATER_VALVE).map(type =>
+    categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_VALVE, type)
+  )
 ]);
 
 export const isMqttCatalogFeatureVisible = (category, type) =>
   !MQTT_CATALOG_EXCLUDED_FEATURES.has(categoryTypeKey(category, type));
 
 const CATEGORIES_WITHOUT_UNIT = new Set([
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.MODE),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING),
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'integer'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR, 'decimal'),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.FAN, DEVICE_FEATURE_TYPES.FAN.SPEED),
@@ -141,8 +154,19 @@ export const groupDevicesByRoom = (devices, houses) => {
 const flattenUnit = unit => (Array.isArray(unit) ? unit[0] : unit);
 
 const FEATURE_UNIT_BY_CATEGORY_TYPE = {
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
+    DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE
+  )]: DEVICE_FEATURE_UNITS.CELSIUS,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
+    DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.PPM,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.NO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.O3_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.LUX,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.LUX,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
@@ -429,6 +453,18 @@ export const getDefaultUnitForFeature = (category, type) => {
     }
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    // State of charge in percent, instantaneous powers in watt, and every
+    // cumulative index (*-index) or stored energy (battery-energy-remaining) in kWh.
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return DEVICE_FEATURE_UNITS.PERCENT;
+    }
+    if (typeof type === 'string' && type.endsWith('-power')) {
+      return DEVICE_FEATURE_UNITS.WATT;
+    }
+    return DEVICE_FEATURE_UNITS.KILOWATT_HOUR;
+  }
+
   const preferredUnit = PREFERRED_DEFAULT_UNIT_BY_CATEGORY[category];
   if (preferredUnit) {
     return preferredUnit;
@@ -455,32 +491,7 @@ const applyDefaultUnit = (defaults, category, type) => {
   return { ...defaults, unit };
 };
 
-const TELEVISION_CONTINUOUS_CONTROL_TYPES = new Set([
-  DEVICE_FEATURE_TYPES.TELEVISION.BINARY,
-  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
-  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL
-]);
-
-const MUSIC_CONTINUOUS_CONTROL_TYPES = new Set([
-  DEVICE_FEATURE_TYPES.MUSIC.VOLUME,
-  DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE
-]);
-
-export const isCatalogPushButtonFeature = (category, type) => {
-  if (category === DEVICE_FEATURE_CATEGORIES.BUTTON && type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
-    return true;
-  }
-
-  if (category === DEVICE_FEATURE_CATEGORIES.TELEVISION) {
-    return !TELEVISION_CONTINUOUS_CONTROL_TYPES.has(type);
-  }
-
-  if (category === DEVICE_FEATURE_CATEGORIES.MUSIC) {
-    return !MUSIC_CONTINUOUS_CONTROL_TYPES.has(type);
-  }
-
-  return false;
-};
+export const isCatalogPushButtonFeature = isPushButtonFeature;
 
 export const getCatalogPreviewMode = (category, type) => {
   if (isCatalogPushButtonFeature(category, type)) {
@@ -526,6 +537,37 @@ export const getFeatureDefaultValues = (category, type) => {
       category,
       type
     );
+  }
+
+  // water-heater is a mixed actuator/sensor category, so read_only is decided per type here and
+  // the category is deliberately absent from isSensorCategory (which is category-wide and would
+  // make every command read-only).
+  if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
+    // `binary` is deliberately absent: its string is shared with SWITCH.BINARY, whose branch
+    // above matches on the type alone and already yields these same defaults.
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: false }, category, type);
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 6, read_only: false }, category, type);
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE) {
+      return applyDefaultUnit(
+        { ...defaults, min: 30, max: 70, read_only: false, unit: DEVICE_FEATURE_UNITS.CELSIUS },
+        category,
+        type
+      );
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER) {
+      return applyDefaultUnit(
+        { ...defaults, min: 0, max: 100, read_only: true, unit: DEVICE_FEATURE_UNITS.PERCENT },
+        category,
+        type
+      );
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
+    }
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.MUSIC && type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE) {
@@ -576,6 +618,16 @@ export const getFeatureDefaultValues = (category, type) => {
       category,
       type
     );
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.MODE) {
+    // THERMOSTAT_MODE: OFF/HEATING/COOLING/AUTO
+    return applyDefaultUnit({ ...defaults, min: 0, max: 3, read_only: false }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT && type === DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE) {
+    // THERMOSTAT_OPERATING_STATE: IDLE/HEATING/COOLING
+    return applyDefaultUnit({ ...defaults, min: 0, max: 2, read_only: true }, category, type);
   }
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE) {
@@ -653,6 +705,18 @@ export const getFeatureDefaultValues = (category, type) => {
     );
   }
 
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.NO2_SENSOR ||
+    category === DEVICE_FEATURE_CATEGORIES.O3_SENSOR ||
+    category === DEVICE_FEATURE_CATEGORIES.SO2_SENSOR
+  ) {
+    return applyDefaultUnit(
+      { ...defaults, min: 0, max: 1000, read_only: true, unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER },
+      category,
+      type
+    );
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR) {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 100000, read_only: true, unit: DEVICE_FEATURE_UNITS.LUX },
@@ -685,6 +749,30 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 1000000000, unit: DEVICE_FEATURE_UNITS.EURO }, category, type);
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100 }, category, type);
+    }
+    if (typeof type === 'string' && type.endsWith('-power')) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 100000 }, category, type);
+    }
+    // *-index counters and battery-energy-remaining
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1000000 }, category, type);
+  }
+
+  // A doorbell ring is a read-only momentary event (0/1), not a 0-100 actuator.
+  if (category === DEVICE_FEATURE_CATEGORIES.DOORBELL) {
+    return applyDefaultUnit({ ...defaults, min: 0, max: 1, read_only: true }, category, type);
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.CHARGING_STATION) {
+    if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE) {
+      return applyDefaultUnit({ ...defaults, min: 0, max: 5, read_only: true }, category, type);
+    }
+
+    return applyDefaultUnit({ ...defaults, min: 0, max: 4, read_only: true }, category, type);
+  }
+
   if (!isSensorCategory(category)) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }
@@ -715,13 +803,38 @@ export const getCatalogPreviewLabelKey = (category, type) => {
     [categoryTypeKey(
       DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE,
       DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED
-    )]: 'deviceFeatureValue.category.electrical-vehicle-charge.plugged.1'
+    )]: 'deviceFeatureValue.category.electrical-vehicle-charge.plugged.1',
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
+      DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS
+    )]: `deviceFeatureValue.category.charging-station.connector-status.${CHARGING_STATION_CONNECTOR_STATUS.OCCUPIED}`,
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
+      DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE
+    )]: `deviceFeatureValue.category.charging-station.charging-state.${CHARGING_STATION_CHARGING_STATE.CHARGING}`
   };
 
   return labeledPreviewKeys[key] || null;
 };
 
 export const getFeaturePreviewValue = (category, type) => {
+  // Ahead of the branches below: `target-temperature` and `mode` are type strings other
+  // categories match on without a category guard, and they would shadow these values.
+  if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
+      return WATER_HEATER_MODE.ECO;
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE) {
+      return 55;
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER) {
+      return 80;
+    }
+    if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING) {
+      return 1;
+    }
+  }
+
   if (
     type === DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE ||
     type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE ||
@@ -732,6 +845,18 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (type === DEVICE_FEATURE_TYPES.SWITCH.BINARY || type === DEVICE_FEATURE_TYPES.LIGHT.BINARY) {
     return 1;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.DOORBELL) {
+    return 1;
+  }
+
+  if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS) {
+    return CHARGING_STATION_CONNECTOR_STATUS.OCCUPIED;
+  }
+
+  if (type === DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE) {
+    return CHARGING_STATION_CHARGING_STATE.CHARGING;
   }
 
   if (
@@ -806,6 +931,14 @@ export const getFeaturePreviewValue = (category, type) => {
 
   if (category === DEVICE_FEATURE_CATEGORIES.CO2_SENSOR) {
     return 850;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.NO2_SENSOR || category === DEVICE_FEATURE_CATEGORIES.SO2_SENSOR) {
+    return 25;
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.O3_SENSOR) {
+    return 70;
   }
 
   if (category === DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR) {
@@ -932,6 +1065,19 @@ export const getFeaturePreviewValue = (category, type) => {
     return 1;
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE) {
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_LEVEL) {
+      return 54;
+    }
+    if (type === DEVICE_FEATURE_TYPES.BATTERY_STORAGE.BATTERY_ENERGY_REMAINING) {
+      return 4.2;
+    }
+    if (typeof type === 'string' && type.endsWith('-index')) {
+      return 128.5;
+    }
+    return 320;
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR) {
     if (type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE) {
       return 230;
@@ -1056,6 +1202,12 @@ export const filterFeatureCatalogOptions = (options, search, dictionary) => {
   }
 
   const normalizedSearch = normalizeForSearch(search.trim());
+  // a search made of accents only folds down to nothing, and every string
+  // contains the empty string: without this it would list the whole catalog,
+  // as if the field were empty
+  if (!normalizedSearch.length) {
+    return [];
+  }
 
   return options
     .map(group => {

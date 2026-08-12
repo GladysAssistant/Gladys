@@ -3,7 +3,8 @@ import { Text, Localizer, MarkupText } from 'preact-i18n';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS_BY_CATEGORY
+  DEVICE_FEATURE_UNITS_BY_CATEGORY,
+  DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE
 } from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
@@ -31,8 +32,18 @@ class UpdateDeviceFeature extends Component {
   deleteFeature = () => this.props.deleteFeature(this.props.featureIndex);
 
   render({ feature, featureIndex, canEditCategory, device, ...props }) {
+    // The current category must belong to the compatible list: types are not unique across
+    // categories (SWITCH.BINARY and SENSOR.BINARY are both 'binary'), so checking the type
+    // alone would display the selector on read-only binary sensors and wipe their category.
+    const compatibleCategories = DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type];
     const allowModifyCategory =
-      canEditCategory && canEditCategory(device, feature) && DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type];
+      canEditCategory &&
+      canEditCategory(device, feature) &&
+      compatibleCategories &&
+      compatibleCategories.includes(feature.category);
+    const availableUnits =
+      get(DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE, `${feature.category}.${feature.type}`) ||
+      DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category];
 
     return (
       <div class="col-md-4">
@@ -70,9 +81,6 @@ class UpdateDeviceFeature extends Component {
                     onChange={this.updateCategory}
                     class="form-control"
                   >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
                     {DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type].map(type => (
                       <option value={type}>
                         <Text id={`deviceFeatureCategory.${type}.shortCategoryName`}>{type}</Text>
@@ -98,7 +106,7 @@ class UpdateDeviceFeature extends Component {
                 />
               </Localizer>
             </div>
-            {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category] && (
+            {availableUnits && availableUnits.length > 0 && (
               <div class="form-group">
                 <label class="form-label" for={`externalid_${featureIndex}`}>
                   <Text id="editDeviceForm.unitLabel" />
@@ -114,7 +122,7 @@ class UpdateDeviceFeature extends Component {
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category].map(unit => (
+                    {availableUnits.map(unit => (
                       <option value={unit}>
                         <Text id={`deviceFeatureUnit.${unit}`}>{unit}</Text>
                       </option>

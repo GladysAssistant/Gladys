@@ -1,6 +1,9 @@
 name: Build and publish demo website
 
 on:
+  # Dispatched on the new tag by the "Create release tag" workflow: a tag pushed
+  # with the default GITHUB_TOKEN does not trigger the `push` event below.
+  workflow_dispatch:
   push:
     tags:
       - 'v*.*.*'

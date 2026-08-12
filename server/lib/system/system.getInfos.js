@@ -154,6 +154,17 @@ async function getInfos() {
   };
   const cpuTemperature = readCpuTemperature();
   infos.cpu_temperature = cpuTemperature;
+  if (infos.is_docker) {
+    try {
+      const gladysImage = await this.getGladysImage();
+      infos.docker_image = gladysImage.image;
+      // an immutable reference can never receive an upgrade, the front warns about it
+      infos.docker_image_pinned = gladysImage.pinned;
+      infos.recommended_docker_image = gladysImage.recommended_image;
+    } catch (e) {
+      // the container running Gladys could not be identified, nothing to report
+    }
+  }
   if (this.latestGladysVersion && this.gladysVersion) {
     infos.new_release_available = semver.gt(this.latestGladysVersion, this.gladysVersion);
   } else {

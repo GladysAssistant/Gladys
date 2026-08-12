@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
@@ -82,5 +82,31 @@ describe('system.getInfos', () => {
 
     assert.notCalled(sequelize.close);
     assert.notCalled(event.on);
+  });
+
+  it('should describe the Docker image Gladys runs on', async () => {
+    system.isDocker = fake.resolves(true);
+    system.getGladysImage = fake.resolves({
+      container_name: 'gladys',
+      image: 'gladysassistant/gladys:v4',
+      tag: 'v4',
+      pinned: false,
+      recommended_image: 'gladysassistant/gladys:v4',
+    });
+
+    const infos = await system.getInfos();
+    expect(infos).to.have.property('docker_image', 'gladysassistant/gladys:v4');
+    expect(infos).to.have.property('docker_image_pinned', false);
+    expect(infos).to.have.property('recommended_docker_image', 'gladysassistant/gladys:v4');
+  });
+
+  it('should not report any image when the Gladys container is not identifiable', async () => {
+    system.isDocker = fake.resolves(true);
+    system.getGladysImage = fake.rejects(new Error('DOCKER_CONTAINER_ID_NOT_AVAILABLE'));
+
+    const infos = await system.getInfos();
+    expect(infos).to.not.have.property('docker_image');
+    expect(infos).to.not.have.property('docker_image_pinned');
+    expect(infos).to.not.have.property('recommended_docker_image');
   });
 });

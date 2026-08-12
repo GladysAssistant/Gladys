@@ -60,6 +60,15 @@ class Error422 extends HttpError {
   }
 }
 
+class Error413 extends HttpError {
+  constructor(message) {
+    super();
+    this.status = 413;
+    this.code = 'PAYLOAD_TOO_LARGE';
+    this.message = message;
+  }
+}
+
 class Error429 extends HttpError {
   constructor(properties) {
     super();
@@ -88,6 +97,7 @@ module.exports = {
   Error403,
   Error404,
   Error409,
+  Error413,
   Error422,
   Error429,
   Error500,

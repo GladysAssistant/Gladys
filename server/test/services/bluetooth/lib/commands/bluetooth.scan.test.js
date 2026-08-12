@@ -1,9 +1,10 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
 const BluetoothManager = require('../../../../../services/bluetooth/lib');
+const { TIMERS } = require('../../../../../services/bluetooth/lib/utils/bluetooth.constants');
 const { NotFoundError } = require('../../../../../utils/coreErrors');
 const BluetoothMock = require('../../BluetoothMock.test');
 
@@ -123,6 +124,44 @@ describe('bluetooth.scan command', () => {
     bluetooth.emit('scanStop');
     const result = await scanTimer;
     expect(result).to.be.deep.equal({});
+  });
+
+  it('should clear scan timer when scan stops right away', async () => {
+    bluetoothManager.ready = true;
+    // Scanning stops as soon as it starts
+    bluetooth.startScanning = fake(() => bluetooth.emit('scanStop'));
+
+    const peripherals = await bluetoothManager.scan(true);
+
+    expect(peripherals).to.be.deep.equal({});
+    expect(bluetoothManager.scanTimer).to.be.equal(undefined);
+    // No more listener
+    expect(bluetooth.eventNames()).is.lengthOf(0);
+
+    // No leaked timer stopping a scan started later
+    clock.tick(TIMERS.SCAN * 2);
+    assert.notCalled(bluetooth.stopScanning);
+  });
+
+  it('should clean up scan if scanning fails to start', async () => {
+    bluetoothManager.ready = true;
+    bluetooth.startScanning = fake.throws(new Error('Could not start scanning'));
+
+    try {
+      await bluetoothManager.scan(true);
+      assert.fail('Should have fail');
+    } catch (e) {
+      expect(e.message).to.be.equal('Could not start scanning');
+    }
+
+    expect(bluetoothManager.scanTimer).to.be.equal(undefined);
+    expect(bluetoothManager.scanCounter).to.be.equal(0);
+    // No more listener
+    expect(bluetooth.eventNames()).is.lengthOf(0);
+
+    // No leaked timer stopping a scan started later
+    clock.tick(TIMERS.SCAN * 2);
+    assert.notCalled(bluetooth.stopScanning);
   });
 
   it('should stop discover and reject if specific device is not found', async () => {

@@ -1,0 +1,146 @@
+{
+  "name": "TS0601_garage_door_opener",
+  "mqttDevice": {
+    "definition": {
+      "model": "TS0601_garage_door_opener",
+      "exposes": [
+        {
+          "access": 3,
+          "description": "Request door to close (= false) or open (= true), will not pulse output if contact shows door is already in requested state",
+          "name": "trigger",
+          "property": "trigger",
+          "type": "binary",
+          "value_off": false,
+          "value_on": true
+        },
+        {
+          "access": 3,
+          "description": "Countdown to trigger door movement after a certain time, will pulse output in all cases",
+          "name": "countdown",
+          "property": "countdown",
+          "type": "numeric",
+          "unit": "s",
+          "value_max": 43200,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Indicates if the garage door contact is closed (= true) or open (= false)",
+          "name": "garage_door_contact",
+          "property": "garage_door_contact",
+          "type": "binary",
+          "value_off": false,
+          "value_on": true
+        },
+        {
+          "access": 3,
+          "description": "Configure the time to wait for the door contact status to change before triggering a run time alarm",
+          "name": "run_time",
+          "property": "run_time",
+          "type": "numeric",
+          "unit": "s",
+          "value_max": 120,
+          "value_min": 0
+        },
+        {
+          "access": 3,
+          "description": "Configure the amount of time the door may be open before an open time alarm is triggered",
+          "name": "open_alarm_time",
+          "property": "open_alarm_time",
+          "type": "numeric",
+          "unit": "s",
+          "value_max": 86400,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Indicates run time alarm, door open alarm or normal status, will not return to normal until door is triggered again",
+          "name": "status",
+          "property": "status",
+          "type": "enum",
+          "values": ["Open Time Alarm", "Run Time Alarm", "Normal"]
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ]
+    },
+    "friendly_name": "Garage door",
+    "ieee_address": "0xa4c1382720b9e514"
+  },
+  "gladysDevice": {
+    "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a",
+    "external_id": "zigbee2mqtt:Garage door",
+    "ieee_address": "0xa4c1382720b9e514",
+    "features": [
+      {
+        "external_id": "zigbee2mqtt:Garage door:switch:binary:trigger",
+        "selector": "zigbee2mqtt-garage-door-switch-binary-trigger",
+        "name": "Trigger",
+        "category": "switch",
+        "type": "binary",
+        "min": 0,
+        "max": 1,
+        "unit": null,
+        "read_only": false,
+        "has_feedback": true
+      },
+      {
+        "external_id": "zigbee2mqtt:Garage door:opening-sensor:binary:garage_door_contact",
+        "selector": "zigbee2mqtt-garage-door-opening-sensor-binary-garage-door-contact",
+        "name": "Garage door contact",
+        "category": "opening-sensor",
+        "type": "binary",
+        "min": 0,
+        "max": 1,
+        "unit": null,
+        "read_only": true,
+        "has_feedback": false
+      },
+      {
+        "external_id": "zigbee2mqtt:Garage door:signal:integer:linkquality",
+        "selector": "zigbee2mqtt-garage-door-signal-integer-linkquality",
+        "name": "Linkquality",
+        "category": "signal",
+        "type": "integer",
+        "min": 0,
+        "max": 5,
+        "unit": null,
+        "read_only": true,
+        "has_feedback": false
+      }
+    ],
+    "name": "Garage door",
+    "model": "TS0601_garage_door_opener",
+    "should_poll": false
+  },
+  "values": [
+    {
+      "internal": 1,
+      "external": true,
+      "property": "trigger"
+    },
+    {
+      "internal": 0,
+      "external": false,
+      "property": "trigger"
+    },
+    {
+      "internal": 1,
+      "external": true,
+      "property": "garage_door_contact"
+    },
+    {
+      "internal": 0,
+      "external": false,
+      "property": "garage_door_contact"
+    }
+  ]
+}

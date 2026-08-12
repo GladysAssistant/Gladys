@@ -3,6 +3,8 @@ import { RequestStatus } from '../../../../utils/consts';
 import { USER_ROLE } from '../../../../../../server/utils/constants';
 import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const TelegramPage = ({ children, ...props }) => (
   <div class="page">
@@ -11,6 +13,7 @@ const TelegramPage = ({ children, ...props }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.telegram.title" />
               </h3>
@@ -32,6 +35,7 @@ const TelegramPage = ({ children, ...props }) => (
             </div>
 
             <div class="col-lg-9">
+              <DeprecationWarning />
               <div class="card">
                 <div class="card-header">
                   <h1 class="card-title">
@@ -94,6 +98,45 @@ const TelegramPage = ({ children, ...props }) => (
                           <p>
                             <Text id="integration.telegram.note" />
                           </p>
+                        </div>
+                      )}
+                      {props.telegramDisableStatus === RequestStatus.Success && (
+                        <div class="alert alert-success">
+                          <Text id="integration.telegram.disable.success" />
+                        </div>
+                      )}
+                      {props.user && props.user.role === USER_ROLE.ADMIN && props.telegramApiKey && (
+                        <div>
+                          <hr />
+                          <h4>
+                            <Text id="integration.telegram.disable.title" />
+                          </h4>
+                          {props.telegramDisableStatus === RequestStatus.Error && (
+                            <div class="alert alert-danger">
+                              <Text id="integration.telegram.disable.error" />
+                            </div>
+                          )}
+                          <p>
+                            <Text id="integration.telegram.disable.description" />
+                          </p>
+                          {!props.telegramDisableConfirmation && (
+                            <button class="btn btn-danger" onClick={props.showTelegramDisableConfirmation}>
+                              <Text id="integration.telegram.disable.button" />
+                            </button>
+                          )}
+                          {props.telegramDisableConfirmation && (
+                            <div class="alert alert-danger">
+                              <p>
+                                <Text id="integration.telegram.disable.confirmation" />
+                              </p>
+                              <button class="btn btn-danger mr-2" onClick={props.disableTelegram}>
+                                <Text id="integration.telegram.disable.confirmButton" />
+                              </button>
+                              <button class="btn btn-secondary" onClick={props.hideTelegramDisableConfirmation}>
+                                <Text id="integration.telegram.disable.cancelButton" />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

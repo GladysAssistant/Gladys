@@ -89,6 +89,37 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
         });
       });
   });
+  it('should get device aggregated state with offset', async () => {
+    const intervalInMinutes = 24 * 60;
+    const offsetInMinutes = 24 * 60;
+    // The states are inserted right before the request, and the request goes through
+    // the real HTTP layer, so a small tolerance is enough to absorb the elapsed time.
+    const toleranceInMs = 5 * 60 * 1000;
+    const now = Date.now();
+    const expectedEnd = now - offsetInMinutes * 60 * 1000;
+    const expectedStart = expectedEnd - intervalInMinutes * 60 * 1000;
+    await authenticatedRequest
+      .get('/api/v1/device_feature/aggregated_states')
+      .query({
+        interval: intervalInMinutes,
+        max_states: 100,
+        offset: offsetInMinutes,
+        device_features: 'test-device-feature',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.lengthOf(1);
+        const { values } = res.body[0];
+        expect(values).to.be.instanceOf(Array);
+        expect(values).to.not.have.lengthOf(0);
+        values.forEach((state) => {
+          const createdAt = new Date(state.created_at).getTime();
+          expect(createdAt).to.be.at.least(expectedStart - toleranceInMs);
+          expect(createdAt).to.be.at.most(expectedEnd + toleranceInMs);
+        });
+      });
+  });
 });
 
 describe('GET /api/v1/device_feature/states_history', () => {
@@ -383,5 +414,107 @@ describe('PATCH /api/v1/device_feature/:device_feature_selector', () => {
       .then((res) => {
         expect(res.body).to.have.property('selector', selector);
       });
+  });
+});
+
+describe('POST /api/v1/device/:device_selector/migrate', () => {
+  let migrationService;
+
+  beforeEach(async () => {
+    migrationService = await db.Service.create({
+      name: 'controller-migration-service',
+      selector: 'controller-migration-service',
+      version: '0.1.0',
+    });
+    const sourceDevice = await db.Device.create({
+      name: 'Controller migration source',
+      selector: 'controller-migration-source',
+      external_id: 'controller-migration-source',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+    });
+    const destinationDevice = await db.Device.create({
+      name: 'Controller migration destination',
+      selector: 'controller-migration-destination',
+      external_id: 'controller-migration-destination',
+      service_id: migrationService.id,
+    });
+    await db.DeviceFeature.create({
+      name: 'controller-migration-source-temp',
+      selector: 'controller-migration-source-temp',
+      external_id: 'controller-migration-source-temp',
+      category: 'temperature-sensor',
+      type: 'decimal',
+      read_only: true,
+      has_feedback: false,
+      keep_history: true,
+      min: 0,
+      max: 100,
+      device_id: sourceDevice.id,
+    });
+    await db.DeviceFeature.create({
+      name: 'controller-migration-destination-temp',
+      selector: 'controller-migration-destination-temp',
+      external_id: 'controller-migration-destination-temp',
+      category: 'temperature-sensor',
+      type: 'decimal',
+      read_only: true,
+      has_feedback: false,
+      keep_history: true,
+      min: 0,
+      max: 100,
+      device_id: destinationDevice.id,
+    });
+  });
+
+  afterEach(async () => {
+    await db.Device.destroy({
+      where: { selector: ['controller-migration-source', 'controller-migration-destination'] },
+    });
+    await db.Service.destroy({ where: { id: migrationService.id } });
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+  });
+
+  it('should migrate the device and return the report', async () => {
+    const sourceFeature = await db.DeviceFeature.findOne({
+      where: { selector: 'controller-migration-source-temp' },
+    });
+    await db.duckDbBatchInsertState(sourceFeature.id, [
+      { value: 20, created_at: new Date('2024-01-01T00:00:00.000Z') },
+      { value: 21, created_at: new Date('2024-01-02T00:00:00.000Z') },
+    ]);
+    await authenticatedRequest
+      .post('/api/v1/device/controller-migration-source/migrate')
+      .send({
+        destination_device_selector: 'controller-migration-destination',
+        features_mapping: {
+          'controller-migration-source-temp': 'controller-migration-destination-temp',
+        },
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success', true);
+        expect(res.body).to.have.property('duck_db_states_migrated', 2);
+      });
+    const sourceDevice = await db.Device.findOne({ where: { selector: 'controller-migration-source' } });
+    expect(sourceDevice).to.equal(null);
+  });
+
+  it('should return 404 when the source device does not exist', async () => {
+    await authenticatedRequest
+      .post('/api/v1/device/this-device-does-not-exist/migrate')
+      .send({
+        destination_device_selector: 'controller-migration-destination',
+      })
+      .expect('Content-Type', /json/)
+      .expect(404);
+  });
+
+  it('should return 400 when the destination selector is missing', async () => {
+    await authenticatedRequest
+      .post('/api/v1/device/controller-migration-source/migrate')
+      .send({})
+      .expect('Content-Type', /json/)
+      .expect(400);
   });
 });

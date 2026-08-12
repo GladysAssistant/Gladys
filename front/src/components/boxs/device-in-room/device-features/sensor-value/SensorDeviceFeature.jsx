@@ -8,6 +8,7 @@ import BatteryLevelFeature from './BatteryLevelFeature';
 import BinaryDeviceValue from './BinaryDeviceValue';
 import LastSeenDeviceValue from './LastSeenDeviceValue';
 import MotionSensorDeviceValue from './MotionSensorDeviceValue';
+import DoorbellRingDeviceValue from './DoorbellRingDeviceValue';
 import BadgeNumberDeviceValue from './BadgeNumberDeviceValue';
 import DistanceSensorDeviceValue from './DistanceSensorDeviceValue';
 import IconBinaryDeviceValue from './IconBinaryDeviceValue';
@@ -17,12 +18,26 @@ import TextDeviceValue from './TextDeviceValue';
 import NoRecentValueBadge from './NoRecentValueBadge';
 import TemperatureSensorDeviceValue from './TemperatureSensorDeviceValue';
 import LevelSensorDeviceValue from './LevelSensorDeviceValue';
+import WaterValveDeviceValue from './WaterValveDeviceValue';
 import PressureSensorDeviceValue from './PressureSensorDeviceValue';
 import FanSensorDeviceValue from './FanSensorDeviceValue';
 import VacuumCleanerStateDeviceValue from './VacuumCleanerStateDeviceValue';
+import ThermostatOperatingStateDeviceValue from './ThermostatOperatingStateDeviceValue';
+import ChargingStationConnectorStatusDeviceValue from './ChargingStationConnectorStatusDeviceValue';
+import ChargingStationChargingStateDeviceValue from './ChargingStationChargingStateDeviceValue';
+
+// Checked before the category map: a category whose renderer only makes sense for one of its
+// types needs an escape hatch. presence-sensor is historically a "push" category rendered as a
+// last-seen date, but cameras report presence as a binary, which deserves a Yes/No badge.
+const DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue
+  }
+};
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: MotionSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.DOORBELL]: DoorbellRingDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: LastSeenDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: BinaryDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.SIGNAL]: SignalQualityDeviceValue,
@@ -41,7 +56,10 @@ const DISPLAY_BY_FEATURE_CATEGORY = {
 const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE]: LevelSensorDeviceValue,
+  [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: WaterValveDeviceValue,
+  [DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH]: DistanceSensorDeviceValue,
+  [DEVICE_FEATURE_TYPES.SIREN.TEST_IN_PROGRESS]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.DOOR_OPENED]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED]: BinaryDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.WINDOW_OPENED]: BinaryDeviceValue,
@@ -54,7 +72,13 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_RANGE_ESTIMATE]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.ODOMETER]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.TIRE_PRESSURE]: PressureSensorDeviceValue,
-  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE]: VacuumCleanerStateDeviceValue
+  [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.STATE]: VacuumCleanerStateDeviceValue,
+  [DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE]: ThermostatOperatingStateDeviceValue,
+  [DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS]: ChargingStationConnectorStatusDeviceValue,
+  [DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE]: ChargingStationChargingStateDeviceValue,
+  // Registered by type, not by category: the category map is checked first and would force one
+  // renderer on every water-heater sensor. remaining-hot-water keeps the numeric-badge default.
+  [DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING]: BinaryDeviceValue
 };
 
 const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
@@ -68,7 +92,11 @@ const SensorDeviceType = ({ children, ...props }) => {
   const { deviceFeature: feature } = props;
   const { category, type } = feature;
 
-  let elementType = DISPLAY_BY_FEATURE_CATEGORY[category];
+  let elementType = get(DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE, `${category}.${type}`);
+
+  if (!elementType) {
+    elementType = DISPLAY_BY_FEATURE_CATEGORY[category];
+  }
 
   if (!elementType) {
     elementType = DISPLAY_BY_FEATURE_TYPE[type];

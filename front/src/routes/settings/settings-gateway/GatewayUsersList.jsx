@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import GatewayUserRow from './GatewayUserRow';
 import { RequestStatus } from '../../../utils/consts';
@@ -25,6 +25,12 @@ const GatewayUsersList = ({ children, ...props }) => (
           )}
           <p>
             <Text id="gateway.usersListDescription" />
+          </p>
+          <p>
+            <MarkupText id="gateway.usersListWhyAcceptDescription" />
+          </p>
+          <p class="text-muted small mb-0">
+            <Text id="gateway.usersListRevokedDescription" />
           </p>
         </div>
         <div class="table-responsive-lg">

@@ -1,3 +1,5 @@
+const { PlatformNotCompatible } = require('../../utils/coreErrors');
+
 /**
  * @description Compute basePath in host and container from mounted point or give default ones.
  * @returns {Promise} Base path in host/container to store files.
@@ -12,7 +14,17 @@ async function getGladysBasePath() {
     basePathOnContainer = base.substring(0, base.lastIndexOf('/'));
   }
   // Find mount linked to this path to fetch host path
-  const currentContainerId = await this.getGladysContainerId();
+  let currentContainerId;
+  try {
+    currentContainerId = await this.getGladysContainerId();
+  } catch (e) {
+    // Gladys runs directly on the host (no container): the path it reads and
+    // writes IS the host path, no container -> host translation is needed.
+    if (e instanceof PlatformNotCompatible) {
+      return { basePathOnContainer, basePathOnHost: basePathOnContainer };
+    }
+    throw e;
+  }
   const gladysMounts = await this.getContainerMounts(currentContainerId);
   if (gladysMounts) {
     const baseMount = gladysMounts.find((mount) => {

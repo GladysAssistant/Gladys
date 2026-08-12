@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { Link } from 'preact-router';
 import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 import { connect } from 'unistore/preact';
 import {
   normalizeBoolean,
@@ -494,6 +495,10 @@ class TuyaDeviceBox extends Component {
                         <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!canSave}>
                           <Text id="integration.tuya.saveButton" />
                         </button>
+                      )}
+
+                      {validModel && deleteButton && (
+                        <MigrateDeviceButton device={device} onMigrated={this.props.getTuyaDevices} />
                       )}
 
                       {validModel && deleteButton && (

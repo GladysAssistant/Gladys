@@ -12,17 +12,31 @@ const { inspectContainer } = require('./system.inspectContainer');
 const { getContainerLogs } = require('./system.getContainerLogs');
 const { getGladysLogs } = require('./system.getGladysLogs');
 const { getGladysContainerId } = require('./system.getGladysContainerId');
+const { getGladysImage } = require('./system.getGladysImage');
 const { getInfos } = require('./system.getInfos');
 const { getDiskSpace } = require('./system.getDiskSpace');
 const { saveLatestGladysVersion } = require('./system.saveLatestGladysVersion');
 
 const { pull } = require('./system.pull');
+const { getImagePullTime } = require('./system.getImagePullTime');
 const { exec } = require('./system.exec');
 const { createContainer } = require('./system.createContainer');
+const { updateContainer } = require('./system.updateContainer');
+const { createNetwork } = require('./system.createNetwork');
+const { connectToNetwork } = require('./system.connectToNetwork');
+const { inspectNetwork } = require('./system.inspectNetwork');
+const { removeNetwork } = require('./system.removeNetwork');
+const { getNetworks } = require('./system.getNetworks');
+const { detectHardwareClasses } = require('./system.detectHardwareClasses');
+const { getImageLabels } = require('./system.getImageLabels');
+const { imageExists } = require('./system.imageExists');
+const { listImages } = require('./system.listImages');
+const { removeImage } = require('./system.removeImage');
 const { restartContainer } = require('./system.restartContainer');
 const { removeContainer } = require('./system.removeContainer');
 const { stopContainer } = require('./system.stopContainer');
 const { getNetworkMode } = require('./system.getNetworkMode');
+const { hasCpuCfsSupport } = require('./system.hasCpuCfsSupport');
 const { vacuum } = require('./system.vacuum');
 const { checkIfGladysUpgraded } = require('./system.checkIfGladysUpgraded');
 const { setDuckDbTimezone } = require('./system.setDuckDbTimezone');
@@ -49,7 +63,13 @@ const System = function System(sequelize, event, config, job, variable, user, me
   // on timezone change, reset DuckDB timezone
   this.event.on(EVENTS.SYSTEM.TIMEZONE_CHANGED, eventFunctionWrapper(this.setDuckDbTimezone.bind(this)));
   this.networkMode = null;
+  this.cpuCfsSupport = null;
   this.gladysLogsCache = null;
+  this.gladysImage = null;
+  // image reference -> timestamp of the last pull, read by the external
+  // integration image cleanup so it never collects an image pulled seconds
+  // ago. Bounded in practice by the number of distinct images Gladys pulls.
+  this.imagePullTimes = new Map();
 };
 
 System.prototype.init = init;
@@ -62,18 +82,32 @@ System.prototype.getContainerLogs = getContainerLogs;
 System.prototype.getGladysLogs = getGladysLogs;
 System.prototype.getGladysBasePath = getGladysBasePath;
 System.prototype.getGladysContainerId = getGladysContainerId;
+System.prototype.getGladysImage = getGladysImage;
 System.prototype.getInfos = getInfos;
 System.prototype.getDiskSpace = getDiskSpace;
 System.prototype.saveLatestGladysVersion = saveLatestGladysVersion;
 System.prototype.checkIfGladysUpgraded = checkIfGladysUpgraded;
 
 System.prototype.pull = pull;
+System.prototype.getImagePullTime = getImagePullTime;
 System.prototype.exec = exec;
 System.prototype.createContainer = createContainer;
+System.prototype.updateContainer = updateContainer;
+System.prototype.createNetwork = createNetwork;
+System.prototype.connectToNetwork = connectToNetwork;
+System.prototype.inspectNetwork = inspectNetwork;
+System.prototype.removeNetwork = removeNetwork;
+System.prototype.getNetworks = getNetworks;
+System.prototype.detectHardwareClasses = detectHardwareClasses;
+System.prototype.getImageLabels = getImageLabels;
+System.prototype.imageExists = imageExists;
+System.prototype.listImages = listImages;
+System.prototype.removeImage = removeImage;
 System.prototype.restartContainer = restartContainer;
 System.prototype.removeContainer = removeContainer;
 System.prototype.stopContainer = stopContainer;
 System.prototype.getNetworkMode = getNetworkMode;
+System.prototype.hasCpuCfsSupport = hasCpuCfsSupport;
 System.prototype.vacuum = vacuum;
 System.prototype.setDuckDbTimezone = setDuckDbTimezone;
 System.prototype.shutdown = shutdown;

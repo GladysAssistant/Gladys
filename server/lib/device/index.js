@@ -45,6 +45,7 @@ const { saveMultipleHistoricalStates } = require('./device.saveMultipleHistorica
 const { getOldestStateFromDeviceFeatures } = require('./device.getOldestStateFromDeviceFeatures');
 const { destroyParam } = require('./device.destroyParam');
 const { destroyStatesFrom } = require('./device.destroyStatesFrom');
+const { migrate } = require('./device.migrate');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -70,13 +71,25 @@ const DeviceManager = function DeviceManager(
   this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH = 1000;
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
-  this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES = 10;
-  this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD = 1000000;
+  this.DUCKDB_STATES_PURGE_MAX_TIME_SLICES = 200;
+  // Also the target size of a purge slice: a single DELETE of a million states on a
+  // multi-GB history holds the write connection for minutes and inflates the file.
+  this.DUCKDB_STATES_PURGE_SINGLE_DELETE_THRESHOLD = 200000;
   // The orphaned-states purge sleeps this many times the duration of each
   // slice (at least the minimum below), so it only ever uses a fraction of
   // the CPU/disk/write connection
   this.ORPHANED_STATES_PURGE_PAUSE_FACTOR = 5;
   this.ORPHANED_STATES_PURGE_MIN_PAUSE_IN_MS = 1000;
+  // A device migration moves its history in slices of roughly this many states, so the
+  // memory a single statement needs stays bounded whatever the size of the database.
+  this.DUCKDB_STATES_MIGRATE_STATES_PER_SLICE = 200000;
+  this.DUCKDB_STATES_MIGRATE_MAX_TIME_SLICES = 200;
+  // Between two slices the migration sleeps as long as the slice took, so it never uses
+  // more than about half of the disk, the CPU and the DuckDB write connection: unlike the
+  // orphaned-states purge it is a foreground gesture, the user is waiting for it.
+  this.DUCKDB_STATES_MIGRATE_PAUSE_FACTOR = 1;
+  this.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 100;
+  this.DUCKDB_STATES_MIGRATE_MAX_PAUSE_IN_MS = 5000;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);
@@ -107,6 +120,11 @@ const DeviceManager = function DeviceManager(
     JOB_TYPES.MIGRATE_SQLITE_TO_DUCKDB,
     this.migrateFromSQLiteToDuckDb.bind(this),
   );
+
+  this.migrate = this.job.wrapper(JOB_TYPES.DEVICE_MIGRATE, this.migrate.bind(this));
+  // Selectors of devices with a migration in flight, to reject concurrent
+  // migrations of the same source (e.g. a client-timeout retry)
+  this.migrationsInProgress = new Set();
 
   // listen to events
   this.eventManager.on(EVENTS.DEVICE.NEW_STATE, this.newStateEvent.bind(this));
@@ -168,5 +186,6 @@ DeviceManager.prototype.saveMultipleHistoricalStates = saveMultipleHistoricalSta
 DeviceManager.prototype.getOldestStateFromDeviceFeatures = getOldestStateFromDeviceFeatures;
 DeviceManager.prototype.destroyParam = destroyParam;
 DeviceManager.prototype.destroyStatesFrom = destroyStatesFrom;
+DeviceManager.prototype.migrate = migrate;
 
 module.exports = DeviceManager;

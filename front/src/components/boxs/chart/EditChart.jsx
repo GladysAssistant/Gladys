@@ -174,9 +174,17 @@ class EditChart extends Component {
     const newDeviceFeature = this.state.selectedDeviceFeaturesOptions.map(o => {
       return o.value;
     });
+    // The units must always stay aligned with the device features: they are read by index
+    // in the chart. Re-computing them here keeps them in sync when features are re-ordered,
+    // and refreshes units that changed since the box was configured.
+    const newUnits = this.state.selectedDeviceFeaturesOptions.map(o => {
+      const deviceFeature = this.deviceFeatureBySelector.get(o.value);
+      return deviceFeature ? deviceFeature.unit : null;
+    });
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       device_feature_names: newDeviceFeatureNames,
-      device_features: newDeviceFeature
+      device_features: newDeviceFeature,
+      units: newUnits
     });
   };
 

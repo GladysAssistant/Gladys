@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
@@ -66,5 +66,21 @@ describe('service.getUsage', () => {
 
     expect(result).to.deep.equal({});
     assert.calledOnce(serviceImpl.isUsed);
+  });
+  it('should always report an installed external integration as used', async () => {
+    // no isUsed hook and nothing registered in the state manager: installed
+    // is enough for an external integration
+    await db.Service.create({
+      name: 'ext-terdious-gladys-tuya',
+      selector: 'ext-terdious-gladys-tuya',
+      version: '1.0.0',
+      type: 'external',
+    });
+
+    const result = await service.getUsage();
+
+    expect(result).to.deep.equal({
+      'ext-terdious-gladys-tuya': true,
+    });
   });
 });

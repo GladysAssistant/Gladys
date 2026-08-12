@@ -26,7 +26,8 @@
     "key": "philipsHue",
     "link": "philips-hue",
     "img": "/assets/integrations/cover/philips-hue.jpg",
-    "local": true
+    "local": true,
+    "deprecated": true
   },
   {
     "key": "tasmota",
@@ -38,7 +39,8 @@
     "link": "tp-link",
     "img": "/assets/integrations/cover/tp-link.jpg",
     "invertInDarkMode": true,
-    "local": true
+    "local": true,
+    "deprecated": true
   },
   {
     "key": "bluetooth",
@@ -91,14 +93,16 @@
     "link": "tuya",
     "img": "/assets/integrations/cover/tuya.jpg",
     "invertInDarkMode": true,
-    "cloud": true
+    "cloud": true,
+    "deprecated": true
   },
   {
     "key": "melcloud",
     "link": "melcloud",
     "img": "/assets/integrations/cover/melcloud.jpg",
     "whiteBackground": true,
-    "cloud": true
+    "cloud": true,
+    "deprecated": true
   },
   {
     "key": "nodeRed",
@@ -118,7 +122,8 @@
     "key": "netatmo",
     "link": "netatmo",
     "img": "/assets/integrations/cover/netatmo.jpg",
-    "cloud": true
+    "cloud": true,
+    "deprecated": true
   },
   {
     "key": "sonos",
@@ -132,7 +137,8 @@
     "link": "zwavejs-ui",
     "img": "/assets/integrations/cover/zwave-js-ui.jpg",
     "invertInDarkMode": true,
-    "local": true
+    "local": true,
+    "deprecated": true
   },
   {
     "key": "google-cast",

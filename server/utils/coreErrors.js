@@ -69,6 +69,13 @@ class AbortScene extends Error {
   }
 }
 
+class ExternalIntegrationUnavailableError extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
+
 module.exports = {
   PasswordNotMatchingError,
   NotFoundError,
@@ -80,4 +87,5 @@ module.exports = {
   ConflictError,
   ForbiddenError,
   TooManyRequests,
+  ExternalIntegrationUnavailableError,
 };

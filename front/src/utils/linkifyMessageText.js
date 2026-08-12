@@ -17,7 +17,7 @@ function getUrlHref(url) {
  * @param {string} url - Raw URL from message text.
  * @returns {string} User-visible link label.
  */
-function getUrlDisplayText(url) {
+export function getUrlDisplayText(url) {
   const href = getUrlHref(url);
   try {
     const parsed = new URL(href);

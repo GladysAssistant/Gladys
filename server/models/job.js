@@ -34,6 +34,19 @@ const dataKeysByJobType = {
     step: Joi.string().valid('deleting_states'),
     orphaned_states_count: countKey(),
   },
+  [JOB_TYPES.DEVICE_MIGRATE]: {
+    step: Joi.string().valid(
+      'moving_states',
+      'cleaning_sqlite',
+      'updating_references',
+      'rewriting_scenes',
+      'rewriting_dashboards',
+      'deleting_source_device',
+    ),
+    device_name: Joi.string(),
+    destination_device_name: Joi.string(),
+    states_migrated: countKey(),
+  },
 };
 
 const defaultDataSchema = Joi.object().keys(baseDataKeys);

@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import get from 'get-value';
@@ -55,7 +56,13 @@ class OnlyContinueIf extends Component {
             targetFeatures.push({
               value: feature.selector,
               label: getDeviceFeatureName(this.props.intl.dictionary, device, feature),
-              isDeviceFeature: true
+              isDeviceFeature: true,
+              // Same shape as the variables set by the "get device value" action, so that
+              // the condition can propose the list of values of the feature when it has one
+              data: {
+                device,
+                deviceFeature: feature
+              }
             });
           });
         });
@@ -142,6 +149,14 @@ class OnlyContinueIf extends Component {
 
     return (
       <div>
+        <div class="alert alert-secondary">
+          <div>
+            <Text id="editScene.actionsCard.onlyContinueIf.logicExplanationText" />
+          </div>
+          <div class="mt-2">
+            <Text id="editScene.actionsCard.onlyContinueIf.explanationText" />
+          </div>
+        </div>
         {props.action.conditions &&
           props.action.conditions.map((condition, index) => (
             <Condition

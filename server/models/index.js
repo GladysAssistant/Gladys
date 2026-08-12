@@ -91,11 +91,77 @@ Object.values(models)
 // DuckDB
 const duckDbFilePath = `${config.storage.replace('.db', '')}.duckdb`;
 // Configure DuckDB with memory limit to prevent excessive memory usage
-// Default to 30% of system RAM, can be overridden via DUCKDB_MEMORY_LIMIT env var
+// Default to 30% of the RAM available to this process, can be overridden via
+// DUCKDB_MEMORY_LIMIT env var.
+// In a container (Docker or LXC), os.totalmem() reports the HOST total memory:
+// Node.js implements it with the sysinfo syscall, which is not namespaced (and
+// lxcfs only virtualizes /proc files, not syscalls). process.constrainedMemory()
+// reads the cgroup memory limit of the container, so take the smallest of the
+// two when a limit is set — otherwise the default limit can exceed the memory
+// actually allocated to the container and get Gladys OOM-killed.
 const totalMemoryBytes = os.totalmem();
-const defaultMemoryLimitBytes = Math.floor(totalMemoryBytes * 0.3);
-const defaultMemoryLimitMB = Math.floor(defaultMemoryLimitBytes / (1024 * 1024));
+const constrainedMemoryBytes = process.constrainedMemory() || 0;
+const availableMemoryBytes =
+  constrainedMemoryBytes > 0 ? Math.min(totalMemoryBytes, constrainedMemoryBytes) : totalMemoryBytes;
+const defaultMemoryLimitBytes = Math.floor(availableMemoryBytes * 0.3);
+// Cap the default at 4GB: a typical Gladys workload gets no benefit from a
+// bigger DuckDB cache, and 30% of a large host would hold that memory forever.
+const defaultMemoryLimitMB = Math.min(4096, Math.floor(defaultMemoryLimitBytes / (1024 * 1024)));
 const duckDbMemoryLimit = process.env.DUCKDB_MEMORY_LIMIT || `${defaultMemoryLimitMB}MB`;
+
+// Parse a DuckDB memory limit string such as '512MB', '1.5GB' or '1024MiB'
+// into MB (possibly fractional, e.g. '512KB' -> 0.5), so the backup default
+// below can be compared against a user-provided DUCKDB_MEMORY_LIMIT. Returns
+// null when the format is not recognized.
+const parseMemoryLimitMB = (limit) => {
+  const match = /^\s*(\d+(?:\.\d+)?)\s*(B|KB|KIB|MB|MIB|GB|GIB|TB|TIB)\s*$/i.exec(limit || '');
+  if (!match) {
+    return null;
+  }
+  const mbPerUnit = {
+    B: 1 / (1024 * 1024),
+    KB: 1 / 1024,
+    KIB: 1 / 1024,
+    MB: 1,
+    MIB: 1,
+    GB: 1024,
+    GIB: 1024,
+    TB: 1024 * 1024,
+    TIB: 1024 * 1024,
+  };
+  return parseFloat(match[1]) * mbPerUnit[match[2].toUpperCase()];
+};
+
+// The nightly backup export runs on a separate, short-lived DuckDB instance
+// (see duckDbCreateBackupInstance) whose buffer pool adds up to the main one
+// while the export runs. The export is a streaming scan that only needs memory
+// for read and compression buffers, not a full-size cache, so it gets a much
+// smaller limit: min(1GB, effective main limit), so it never exceeds the main
+// limit even when DUCKDB_MEMORY_LIMIT is set below 1GB. When the effective main
+// limit is parseable and already at or below 1GB it is reused verbatim, which
+// also preserves sub-MB values without any unit conversion. Can be overridden
+// via DUCKDB_BACKUP_MEMORY_LIMIT env var.
+const mainMemoryLimitMB = parseMemoryLimitMB(duckDbMemoryLimit);
+let defaultBackupMemoryLimit;
+if (mainMemoryLimitMB === null) {
+  // Unparseable main limit: fall back on the computed default, capped at 1GB.
+  defaultBackupMemoryLimit = `${Math.min(1024, defaultMemoryLimitMB)}MB`;
+} else if (mainMemoryLimitMB <= 1024) {
+  defaultBackupMemoryLimit = duckDbMemoryLimit;
+} else {
+  defaultBackupMemoryLimit = '1024MB';
+}
+const duckDbBackupMemoryLimit = process.env.DUCKDB_BACKUP_MEMORY_LIMIT || defaultBackupMemoryLimit;
+
+// An explicit DUCKDB_MEMORY_LIMIT is applied as-is: warn when it exceeds the
+// memory this process can actually use (as far as it is detectable), because
+// the OOM protection above cannot help in that case.
+const availableMemoryLimitMB = Math.floor(availableMemoryBytes / (1024 * 1024));
+if (mainMemoryLimitMB !== null && mainMemoryLimitMB > availableMemoryLimitMB) {
+  logger.warn(
+    `DUCKDB_MEMORY_LIMIT (${duckDbMemoryLimit}) exceeds the memory available to this process (${availableMemoryLimitMB}MB): Gladys can get OOM-killed, especially during backups`,
+  );
+}
 
 // The DuckDB Node "Neo" API (@duckdb/node-api) replaces the deprecated `duckdb`
 // package. It is fully asynchronous: the database instance and its connections
@@ -151,9 +217,9 @@ const initializeDuckDb = async () => {
   duckDbWriteQueue = createSerialQueue();
   duckDbReadQueue = createSerialQueue();
   logger.info(
-    `DuckDB initialized with memory_limit=${duckDbMemoryLimit} (system RAM: ${Math.floor(
-      totalMemoryBytes / (1024 * 1024),
-    )}MB)`,
+    `DuckDB initialized with memory_limit=${duckDbMemoryLimit} (available RAM: ${Math.floor(
+      availableMemoryBytes / (1024 * 1024),
+    )}MB, system RAM: ${Math.floor(totalMemoryBytes / (1024 * 1024))}MB)`,
   );
 };
 
@@ -330,9 +396,15 @@ const duckDbSetTimezone = async (timezone) => {
  */
 const duckDbCreateBackupInstance = async () => {
   // Create a new database instance pointing to the same file
-  // This instance has its own buffer pool that will be released when closed
+  // This instance has its own buffer pool that will be released when closed.
+  // It gets the small dedicated backup memory limit, and few threads: part of
+  // the Parquet writer and compression buffers of the export is allocated
+  // outside the buffer pool that memory_limit accounts for, and that untracked
+  // memory grows with the number of threads.
+  logger.info(`DuckDB backup instance: opening with memory_limit=${duckDbBackupMemoryLimit}, threads=2, READ_ONLY`);
   const backupDatabase = await DuckDBInstance.create(duckDbFilePath, {
-    memory_limit: duckDbMemoryLimit,
+    memory_limit: duckDbBackupMemoryLimit,
+    threads: '2',
     access_mode: 'READ_ONLY',
   });
   const connection = await backupDatabase.connect();

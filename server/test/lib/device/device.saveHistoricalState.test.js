@@ -1,5 +1,7 @@
 const { expect, assert: chaiAssert } = require('chai');
-const { assert, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, stub } = sinon;
 const dayjs = require('dayjs');
 const db = require('../../../models');
 const Device = require('../../../lib/device');

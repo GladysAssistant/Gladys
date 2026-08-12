@@ -66,7 +66,26 @@
     "searchPlaceHolder": "Chercher un appareil",
     "noRoom": "Sans pièce",
     "noFeatures": "Aucune fonctionnalité",
-    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil."
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes ou quelques heures (selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\">ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil.",
+    "migrate": {
+      "button": "Migrer",
+      "modalTitle": "Migrer « {{name}} »",
+      "description": "Migrez cet appareil vers un appareil d'une autre intégration : son <b>historique d'états</b>, les <b>scènes</b> et les <b>tableaux de bord</b> qui l'utilisent seront déplacés vers l'appareil de destination, puis <b>cet appareil sera supprimé</b>. Si les deux appareils ont enregistré des états sur la même période, seul l'historique antérieur au premier état de la destination est déplacé, afin de ne rien compter en double.",
+      "destinationLabel": "Appareil de destination",
+      "featuresTitle": "Correspondance des fonctionnalités",
+      "doNotMigrate": "Ne pas migrer",
+      "typeMismatchWarning": "Cette fonctionnalité a un type différent de la fonctionnalité source : son historique risque de ne plus avoir de sens une fois migré.",
+      "unitMismatchWarning": "Cette fonctionnalité a une unité différente de la fonctionnalité source : les valeurs sont déplacées sans conversion, les graphiques risquent de devenir incohérents.",
+      "unmappedWarning": "Certaines fonctionnalités n'ont pas de correspondance : leur historique sera supprimé, et les scènes et tableaux de bord qui les utilisent ne seront pas mis à jour.",
+      "noDestinationAvailable": "Aucun appareil d'une autre intégration n'a été trouvé. Créez d'abord l'appareil de destination dans sa nouvelle intégration, puis revenez ici pour migrer.",
+      "loadError": "Impossible de charger la liste des appareils. Veuillez réessayer.",
+      "migrateError": "La migration a échoué. L'ancien appareil n'a pas été supprimé, mais une partie de l'historique a pu être déjà déplacée vers la destination. Vérifiez la page des tâches et votre liste d'appareils, puis réessayez : une nouvelle tentative ne migre que ce qu'il reste à migrer.",
+      "networkError": "La connexion a été perdue pendant la migration : elle est peut-être toujours en cours en arrière-plan. Vérifiez la <a href=\"/dashboard/settings/jobs\">page des tâches</a> et rafraîchissez la liste des appareils avant de réessayer.",
+      "successText": "Migration terminée ! <b>{{states}}</b> états historiques ont été déplacés, <b>{{scenes}}</b> scène(s) et <b>{{dashboards}}</b> tableaux de bord ont été mis à jour. L'ancien appareil a été supprimé.",
+      "confirmButton": "Migrer et supprimer l'ancien appareil",
+      "cancelButton": "Annuler",
+      "closeButton": "Fermer"
+    }
   },
   "login": {
     "title": "Gladys Assistant",
@@ -252,8 +271,10 @@
     "closeDefineTabletMode": "Fermer",
     "tabletMode": {
       "description": "Le mode tablette sert à la fonctionnalité alarme. Si vous armez l'alarme, toutes les tablettes de la maison seront verrouillées et afficheront un clavier virtuel pour désactiver l'alarme.",
+      "currentBrowserOnly": "<strong>Ce réglage s'applique uniquement à cet appareil.</strong> En enregistrant, vous déclarez que le navigateur que vous utilisez en ce moment est une tablette. Chaque appareil se configure séparément : n'activez le mode tablette que sur les appareils que vous acceptez de voir verrouillés quand l'alarme est armée.",
       "fullScreenForce": "Si vous voulez forcer une tablette à rester en mode plein écran, vous pouvez ajouter <code>?fullscreen=force</code> à l'URL.",
-      "houseLabel": "Maison",
+      "houseLabel": "Maison de cette tablette",
+      "howToDisable": "Pour désactiver le mode tablette sur un appareil, ouvrez ce menu depuis cet appareil et sélectionnez « Mode tablette désactivé ».",
       "tabletModeDisabled": "Mode tablette désactivé"
     },
     "duckDbMigrationInProgress": "Votre instance Gladys est en train de migrer sa base de données à DuckDb, un nouveau système de base de données plus performant pour les données time-series. Cette tâche peut prendre un certain temps, et pendant ce temps vos graphiques ne seront pas tous disponibles. Progression de la migration = {{progress}}%",
@@ -266,7 +287,7 @@
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
     "editDashboardVisibility": "Visibilité",
-    "editDashboardVisibilityDescription": "Les tableaux de bords publics seront visible par tous les membres de l'installation Gladys.",
+    "editDashboardVisibilityDescription": "Les tableaux de bord publics seront visibles par tous les membres de l'installation Gladys.",
     "editDashboardVisibilityNotEditableNotCreator": "Vous ne pouvez pas éditer le partage car vous n'êtes pas le créateur de ce tableau de bord.",
     "visibilities": {
       "private": "privé",
@@ -274,7 +295,7 @@
     },
     "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
-    "editDashboardMyDashboards": "Mes tableaux de bords",
+    "editDashboardMyDashboards": "Mes tableaux de bord",
     "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
     "reorderDashboardButton": "Re-ordonner",
     "stopReorderingDashboardButton": "Arrêter de réordonner",
@@ -299,7 +320,9 @@
       "gauge": "Jauge",
       "energy-consumption": "Consommation Énergétique",
       "voice-assistant": "Assistant vocal",
-      "link": "Lien"
+      "link": "Lien",
+      "photo": "Photo",
+      "sun": "Soleil"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -307,17 +330,75 @@
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
         "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
-        "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
-        "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échoué. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
-        "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
+        "serviceNotConfigured": "Aucun service météo n'est configuré. Veuillez accéder à l'onglet «Intégrations» et configurer une intégration météo (OpenWeather, ou une intégration météo du store).",
+        "requestToThirdPartyFailed": "La requête au fournisseur météo a échoué. Votre instance Gladys est-elle connectée à Internet ? Veuillez vous rendre dans le panneau des intégrations météo pour résoudre ce problème.",
+        "clickHere": "Cliquez ici pour accéder aux intégrations météo.",
         "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
+        "editProviderLabel": "Fournisseur météo :",
+        "providerAuto": "Automatique (premier fournisseur disponible)",
+        "providerInternalOpenWeather": "OpenWeather interne (déprécié)",
         "editModeLabel": "Mode d'affichage :",
         "displayModes": {
-          "advancedWeather": "Humidité et vitesse du vent",
+          "dateLocation": "Date et lieu",
+          "currentWeather": "Météo actuelle",
+          "alerts": "Alertes météo",
+          "advancedWeather": "Détails météo (humidité, vent, UV, lune…)",
           "hourlyForecast": "Prévisions pour les 24 prochaines heures",
-          "dailyForecast": "Prévisions pour les 5 prochains jours"
+          "dailyForecast": "Prévisions pour les 5 prochains jours",
+          "providerImages": "Images du fournisseur (carte de vigilance, radar de pluie…)"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "noModeSelected": "Sélectionnez au moins un mode d'affichage, sinon le widget restera vide.",
+        "minMaxDegreeValue": "{{min}}°/{{max}}°",
+        "uv": "UV",
+        "windGustTitle": "Rafales de vent (le fournisseur ne donne pas de vent moyen pour ce jour)",
+        "alertTypes": {
+          "wind": "Vent violent",
+          "rain": "Pluie-inondation",
+          "flood": "Inondation",
+          "thunderstorm": "Orages",
+          "snow": "Neige-verglas",
+          "heat": "Canicule",
+          "cold": "Grand froid",
+          "avalanche": "Avalanches",
+          "coastal": "Vagues-submersion",
+          "fog": "Brouillard"
+        },
+        "conditions": {
+          "clear": "Ciel dégagé",
+          "partly-cloudy": "Peu nuageux",
+          "cloud": "Nuageux",
+          "fog": "Brouillard",
+          "drizzle": "Bruine",
+          "rain": "Pluie",
+          "pouring": "Fortes pluies",
+          "sleet": "Pluie et neige mêlées",
+          "hail": "Grêle",
+          "snow": "Neige",
+          "thunderstorm": "Orages",
+          "wind": "Vent",
+          "night": "Nuit",
+          "unknown": "Indisponible"
+        },
+        "moonPhases": {
+          "0": "Nouvelle lune",
+          "1": "Premier croissant",
+          "2": "Premier quartier",
+          "3": "Gibbeuse croissante",
+          "4": "Pleine lune",
+          "5": "Gibbeuse décroissante",
+          "6": "Dernier quartier",
+          "7": "Dernier croissant"
+        },
+        "windCardinals": {
+          "n": "N",
+          "ne": "NE",
+          "e": "E",
+          "se": "SE",
+          "s": "S",
+          "sw": "SO",
+          "w": "O",
+          "nw": "NO"
+        }
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -328,6 +409,7 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Mouvement détecté",
+        "doorbellRinging": "Sonne",
         "pushButton": "Appuyer",
         "vacuumDock": "Retour à la base"
       },
@@ -429,7 +511,24 @@
           "week": "Semaine",
           "month": "Mois",
           "year": "Année"
-        }
+        },
+        "previousPeriod": "Période précédente",
+        "nextPeriod": "Période suivante",
+        "currentPeriod": "En cours",
+        "backToNow": "Revenir à maintenant"
+      },
+      "sun": {
+        "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour calculer la position du soleil.",
+        "sunrise": "Lever du soleil",
+        "sunset": "Coucher du soleil",
+        "dawn": "Aube",
+        "solarNoon": "Midi solaire",
+        "dusk": "Crépuscule",
+        "azimuth": "Azimut",
+        "elevation": "Élévation",
+        "noHouse": "Veuillez sélectionner une maison dans les paramètres du widget.",
+        "noCoordinates": "Cette maison n'a pas de coordonnées. Veuillez d'abord configurer sa localisation.",
+        "error": "Une erreur est survenue lors de la récupération des données du soleil, merci de réessayer."
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -485,6 +584,23 @@
           "cpu": "Appareil connecté",
           "home": "Maison"
         }
+      },
+      "photo": {
+        "description": "Affichez une ou plusieurs photos sur votre tableau de bord. Les images sont chargées par votre instance Gladys (et non par votre navigateur), ce qui permet d'afficher des photos hébergées sur un NAS local, y compris à distance via Gladys Plus.",
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Ex : Vacances 2025",
+        "photosLabel": "Photos",
+        "editUrlPlaceholder": "https://mon-nas.local/photos/vacances.jpg",
+        "editCaptionPlaceholder": "Légende (optionnelle)",
+        "addPhotoButton": "Ajouter une photo",
+        "fitLabel": "Affichage de l'image",
+        "fitCover": "Remplir (recadrer)",
+        "fitContain": "Contenir (image entière)",
+        "slideshowIntervalLabel": "Diaporama (secondes)",
+        "slideshowIntervalHelp": "0 pour désactiver le diaporama. Recommandé : 10-30 secondes.",
+        "showCaptionLabel": "Afficher les légendes",
+        "emptyPhotos": "Aucune photo configurée.",
+        "imageError": "Impossible de charger cette image."
       },
       "alarm": {
         "armButton": "Armer",
@@ -569,22 +685,37 @@
     "tags": {
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
-      "local": "Local"
+      "local": "Local",
+      "external": "Communauté",
+      "native": "Natif",
+      "deprecated": "Bientôt dépréciée"
     },
     "root": {
       "title": "Intégrations",
-      "subtitle": "{{length}} de {{total}} intégrations",
+      "subtitle": "{{length}} sur {{total}} intégrations",
+      "subtitleTotal": "{{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
       "noIntegrations": "Aucune intégration trouvée",
+      "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
       "noSearchResults": "Aucune intégration correspondant à « {{searchKeyword}} » n'a été trouvée.",
       "noSearchResultsSuggestion": "Essayez <a href=\"/dashboard/integration/device/matter\">Matter</a> pour les appareils compatibles Matter/Thread, ou <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> pour connecter des appareils Somfy, Shelly, Daikin et bien d'autres.",
+      "refreshStore": {
+        "hint": "Une intégration manque à l'appel ?",
+        "button": "Rafraîchir le catalogue",
+        "refreshing": "Rafraîchissement…",
+        "tooltip": "Re-télécharger la liste des intégrations de la communauté. Gladys la garde en cache et la rafraîchit toutes les 30 minutes.",
+        "success": "Catalogue à jour.",
+        "stale": "Gladys n'a pas pu joindre le store : ceci est toujours le catalogue en cache.",
+        "error": "Le catalogue n'a pas pu être rafraîchi. Vérifiez votre connexion internet."
+      },
       "gatewayBanner": {
         "title": "Votre appareil n'est pas dans la liste ?",
-        "description": "De nombreux appareils peuvent être connectés via <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocole universel) ou <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin…). Une fois connectés, ils sont contrôlables dans Gladys comme n'importe quel autre appareil."
+        "description": "De nombreux appareils peuvent être connectés via <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocole universel). Votre appareil peut aussi être pris en charge par une <b>intégration externe</b> de la communauté : chacun peut en créer une et la publier dans le store, elle apparaît alors dans cette liste. Consultez la <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">documentation des intégrations externes</a>."
       },
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
+        "updates": "À mettre à jour",
         "device": "Appareils",
         "communication": "Communication",
         "calendar": "Calendrier",
@@ -592,6 +723,296 @@
         "health": "Santé",
         "weather": "Météo",
         "navigation": "Navigation"
+      }
+    },
+    "externalIntegration": {
+      "updateAvailable": "Mise à jour disponible",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte",
+      "configTab": "Configuration",
+      "supervisionTab": "Supervision",
+      "logsTab": "Journaux",
+      "status": {
+        "UNKNOWN": "Inconnu",
+        "ENABLED": "Activée",
+        "DISABLED": "Désactivée",
+        "LOADING": "Chargement",
+        "RUNNING": "En cours d'exécution",
+        "DEGRADED": "Dégradée",
+        "STOPPED": "Arrêtée",
+        "ERROR": "Erreur"
+      },
+      "docs": {
+        "modalTitle": "Documentation",
+        "loadError": "Une erreur s'est produite lors du chargement de la documentation.",
+        "openRawLink": "Ouvrir dans un nouvel onglet"
+      },
+      "config": {
+        "title": "Configuration",
+        "docsLink": "Documentation",
+        "loadError": "Une erreur s'est produite lors du chargement de la configuration.",
+        "noConfig": "Cette intégration n'a pas d'options de configuration.",
+        "secretConfiguredPlaceholder": "Configuré. Laissez vide pour conserver la valeur actuelle.",
+        "saveSuccess": "Configuration enregistrée avec succès.",
+        "saveError": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
+        "saveButton": "Enregistrer la configuration",
+        "oauthConnectButton": "Connecter",
+        "oauthInvalidStateError": "Cette intégration ne fournit pas d'élément de sécurité exploitable pour la connexion (absent ou trop long). Elle ne peut pas être connectée tant que son développeur ne l'a pas corrigé.",
+        "oauthRedirectUriLabel": "Adresse de redirection à déclarer dans votre application développeur",
+        "oauthRedirectUriDescription": "Les services refusent une adresse locale : cette page HTTPS hébergée par Gladys vous renvoie vers votre instance une fois l'autorisation donnée. Elle fonctionne entièrement dans votre navigateur, Gladys n'enregistre ni n'utilise le code d'autorisation, et vos jetons d'accès sont échangés directement entre votre instance et le service.",
+        "oauthRedirectUriInstanceDescription": "Vous avez choisi d'utiliser l'adresse de votre instance : déclarez cette URL exacte dans votre application développeur. Le service reviendra directement sur votre Gladys, sans passer par la page de redirection Gladys.",
+        "oauthRedirectUriCopied": "Copié !",
+        "oauthUseInstanceRedirectLabel": "Utiliser plutôt l'adresse de mon instance (j'accède déjà à Gladys en HTTPS)",
+        "oauthConnectError": "Erreur au lancement de la connexion. Vérifiez que l'intégration est démarrée."
+      },
+      "actions": {
+        "title": "Actions",
+        "runButton": "Exécuter",
+        "error": "L'action a échoué. Vérifiez que l'intégration est démarrée.",
+        "resultRegionLabel": "Résultat de l'action"
+      },
+      "connection": {
+        "label": "Connexion",
+        "connectedBadge": "Connecté",
+        "disconnectedBadge": "Déconnecté"
+      },
+      "transport": {
+        "localBadge": "Local",
+        "cloudBadge": "Cloud",
+        "unreachableBadge": "Injoignable",
+        "localTooltip": "Cet appareil répond via le réseau local (LAN)",
+        "cloudTooltip": "Cet appareil répond via le cloud du fabricant",
+        "unreachableTooltip": "Cet appareil ne répond pas pour le moment",
+        "degradedBadge": "Dégradé",
+        "degradedTooltip": "Cet appareil fonctionne, mais pas en mode nominal",
+        "preferLocalLabel": "Privilégier la connexion locale (LAN) quand elle est disponible",
+        "preferLocalDescription": "L'intégration applique cette préférence quand elle le peut ; le macaron de chaque appareil indique le transport réellement utilisé."
+      },
+      "oauthCallback": {
+        "title": "Connexion du compte",
+        "relayingText": "Finalisation de la connexion avec l'intégration...",
+        "successText": "Compte connecté avec succès.",
+        "errorText": "L'intégration a refusé la connexion. Réessayez.",
+        "missingParamsText": "Il manque des paramètres de connexion à cette page. Relancez la connexion depuis l'écran Configuration.",
+        "closeText": "Vous pouvez fermer cette fenêtre.",
+        "backToConfigButton": "Retour à la configuration"
+      },
+      "supervision": {
+        "title": "Supervision",
+        "loadError": "Une erreur s'est produite lors du chargement de l'intégration.",
+        "actionError": "Une erreur s'est produite lors de l'exécution de cette action.",
+        "uninstallError": "Une erreur s'est produite lors de la désinstallation de cette intégration.",
+        "updateAvailableText": "Une nouvelle version de cette intégration est disponible.",
+        "updateSuccessText": "Intégration mise à jour en version {{version}}.",
+        "alreadyUpToDateText": "L'intégration est déjà à jour (version {{version}}) : l'image Docker a été re-téléchargée et le conteneur recréé.",
+        "statusLabel": "Statut",
+        "versionLabel": "Version",
+        "dockerImageLabel": "Image Docker",
+        "repoLabel": "Dépôt",
+        "startButton": "Démarrer",
+        "stopButton": "Arrêter",
+        "restartButton": "Redémarrer",
+        "updateButton": "Mettre à jour",
+        "forceUpdateButton": "Forcer la mise à jour",
+        "forceUpdateTitle": "Vérifie la dernière version publiée, re-télécharge l'image Docker et recrée le conteneur",
+        "logsButton": "Journaux",
+        "uninstallButton": "Désinstaller",
+        "containersTitle": "Conteneurs additionnels",
+        "containerRunning": "En fonctionnement",
+        "containerStopped": "Arrêté",
+        "openButton": "Ouvrir",
+        "uninstallWarning": "Êtes-vous sûr de vouloir désinstaller cette intégration ? Son conteneur et sa configuration seront supprimés. Les appareils créés par cette intégration resteront dans Gladys jusqu’à ce que vous les supprimiez.",
+        "confirmUninstallButton": "Oui, désinstaller",
+        "cancelUninstallButton": "Annuler",
+        "startedAtLabel": "En fonctionnement depuis"
+      },
+      "device": {
+        "title": "Appareils",
+        "refreshButton": "Rafraîchir",
+        "loadError": "Une erreur s'est produite lors du chargement des appareils.",
+        "noDevices": "Aucun appareil créé pour le moment. Rendez-vous dans l’onglet « Découverte » pour trouver des appareils.",
+        "noDevicesConfigureFirst": "Si vous venez d'installer cette intégration, commencez par renseigner l'onglet <a href=\"{{configUrl}}\">Configuration</a>, puis lancez une découverte.",
+        "saveError": "Une erreur s'est produite lors de l'enregistrement de cet appareil.",
+        "deleteError": "Une erreur s'est produite lors de la suppression de cet appareil.",
+        "nameLabel": "Nom",
+        "namePlaceholder": "Nom de l'appareil",
+        "roomLabel": "Pièce",
+        "featuresLabel": "Fonctionnalités",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer"
+      },
+      "deviceParams": {
+        "title": "Paramètres techniques"
+      },
+      "discover": {
+        "title": "Appareils découverts",
+        "scanButton": "Scanner",
+        "scanning": "Scan en cours...",
+        "scanningInProgress": "Scan en cours... Selon l'intégration, cela peut prendre jusqu'à une minute. La liste se mettra à jour automatiquement dès que des appareils seront publiés.",
+        "scanError": "Une erreur s'est produite lors du lancement du scan.",
+        "scanErrorDisconnected": "Impossible de lancer le scan : l'intégration n'est pas connectée. Vérifiez qu'elle est bien démarrée dans l'onglet « Configuration ».",
+        "loadError": "Une erreur s'est produite lors du chargement des appareils découverts.",
+        "noDevices": "Aucun appareil découvert pour le moment. Cliquez sur « Scanner » pour rechercher des appareils.",
+        "noDevicesConfigureFirst": "Rien trouvé ? Vérifiez que l'intégration est bien configurée dans l'onglet <a href=\"{{configUrl}}\">Configuration</a>, puis relancez un scan.",
+        "alreadyCreatedBadge": "Déjà ajouté",
+        "searchPlaceholder": "Rechercher un appareil",
+        "noSearchResults": "Aucun appareil découvert ne correspond à votre recherche.",
+        "error": {
+          "networkError": "Gladys n'a pas répondu à la demande d'ajout. Vérifiez que le serveur Gladys est bien démarré et accessible, puis réessayez.",
+          "badRequestError": "Gladys a refusé cet appareil : les données publiées par l'intégration sont incorrectes.",
+          "forbiddenError": "Vous n'avez pas les droits nécessaires pour ajouter cet appareil. Déconnectez-vous, reconnectez-vous, puis réessayez.",
+          "notFoundError": "La ressource demandée est introuvable côté serveur. Relancez un scan puis réessayez.",
+          "conflictError": "Cet appareil entre en conflit avec un appareil déjà présent dans Gladys.",
+          "externalIdConflictError": "Un appareil ou une fonctionnalité portant le même identifiant externe existe déjà dans Gladys. L'intégration publie probablement deux fois le même identifiant, ou cet appareil a déjà été ajouté par une autre intégration.",
+          "selectorConflictError": "Un autre appareil utilise déjà le même identifiant interne, en général parce qu'il porte le même nom. Renommez l'appareil existant puis réessayez.",
+          "validationError": "L'intégration a publié un appareil incomplet ou invalide : Gladys a refusé de l'enregistrer.",
+          "serverError": "Une erreur interne s'est produite dans Gladys pendant l'ajout de cet appareil.",
+          "unexpectedError": "Une erreur inattendue s'est produite lors de l'ajout de cet appareil.",
+          "rejectedFieldsTitle": "Champs refusés :",
+          "technicalDetail": "Détail technique :",
+          "apiFullResponse": "Réponse complète de l'API :",
+          "reportHint": "Copiez ce détail si vous demandez de l'aide sur le forum ou signalez le problème au développeur de l'intégration.",
+          "fieldLabels": {
+            "name": "Nom",
+            "external_id": "Identifiant externe",
+            "selector": "Identifiant interne",
+            "model": "Modèle",
+            "category": "Catégorie",
+            "type": "Type",
+            "unit": "Unité",
+            "min": "Valeur minimum",
+            "max": "Valeur maximum",
+            "read_only": "Lecture seule",
+            "keep_history": "Historisation",
+            "has_feedback": "Retour d'état",
+            "room_id": "Pièce",
+            "service_id": "Service",
+            "device_id": "Appareil",
+            "should_poll": "Interrogation périodique",
+            "poll_frequency": "Fréquence d'interrogation",
+            "value": "Valeur"
+          },
+          "contextTypes": {
+            "device_feature": "Fonctionnalité « {{name}} »"
+          },
+          "fieldErrorTypes": {
+            "notNullViolation": "champ obligatoire non renseigné par l'intégration",
+            "uniqueViolation": "valeur déjà utilisée par un autre appareil ou une autre fonctionnalité"
+          }
+        },
+        "featuresLabel": "Fonctionnalités",
+        "createButton": "Ajouter à Gladys",
+        "updateButton": "Mettre à jour",
+        "updateTitle": "L'intégration a re-publié cet appareil avec une structure différente : appliquer la nouvelle définition"
+      },
+      "install": {
+        "notFound": "Cette intégration n'a pas été trouvée dans le store.",
+        "starsLabel": "étoiles",
+        "lastPushLabel": "Dernière mise à jour :",
+        "warningTitle": "Intégration communautaire",
+        "warningText": "Cette intégration est développée par la communauté et n'est pas maintenue par l'équipe Gladys Assistant. Elle s'exécute dans un conteneur Docker isolé, mais vous ne devriez installer que des intégrations provenant de développeurs de confiance.",
+        "communicationWarningText": "Cette intégration est un canal de messagerie : une fois votre compte lié, elle pourra envoyer et recevoir des messages en votre nom (déclencher des scènes, contrôler votre maison via le cerveau de Gladys).",
+        "notCompatible": "Cette intégration n'est pas compatible avec votre installation de Gladys.",
+        "installError": "Une erreur s'est produite lors de l'installation de cette intégration.",
+        "alreadyInstalled": "Cette intégration est déjà installée.",
+        "goToIntegrationButton": "Accéder à l'intégration",
+        "installing": "Installation...",
+        "installButton": "Installer",
+        "networkDiscoveryTitle": "Demandes de découverte réseau",
+        "networkDiscoveryText": "Cette intégration demande à Gladys de capturer pour elle les annonces réseau suivantes. Elle ne pourra jamais rien capturer d'autre.",
+        "locationText": "Cette intégration demande l'accès aux coordonnées (latitude/longitude) des maisons configurées dans Gladys.",
+        "documentationLink": "Documentation",
+        "duplicateWarningTitle": "Une autre instance est déjà installée",
+        "duplicateWarningText": "« {name} » semble être une autre instance de cette intégration. Deux instances peuvent se disputer le même compte cloud ou les mêmes appareils — pensez à arrêter l'instance existante pendant vos tests. Installer quand même est un usage supporté (ex. une version dev à côté de la prod).",
+        "webhooksTitle": "Webhooks Internet (Gladys Plus)",
+        "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
+        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
+        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant)."
+      },
+      "networkDiscovery": {
+        "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
+        "udpActiveBroadcastText": "Émettre une requête de découverte en broadcast UDP sur les ports {ports} et recueillir les réponses",
+        "mdnsText": "Rechercher les services mDNS de type {service}",
+        "ssdpText": "Recherche SSDP de {st}"
+      },
+      "installFromGithub": {
+        "cardTitle": "Installer depuis GitHub",
+        "cardDescription": "Installez une intégration communautaire depuis un dépôt GitHub.",
+        "modalTitle": "Installer une intégration depuis GitHub",
+        "repoUrlLabel": "URL du dépôt GitHub",
+        "repoUrlPlaceholder": "https://github.com/owner/repository",
+        "installButton": "Installer",
+        "devModeLink": "Mode développeur : installer depuis une image Docker",
+        "devModeDescription": "Installez une intégration directement depuis une image Docker, avec un manifeste optionnel. L’image peut être construite localement avec docker build, sans registre. Réservé aux développeurs d’intégrations.",
+        "dockerImageLabel": "Image Docker",
+        "dockerImagePlaceholder": "ex. monuser/mon-integration:latest",
+        "manifestLabel": "Manifeste (JSON, optionnel)",
+        "manifestPlaceholder": "{ \"name\": \"Mon intégration\", ... }",
+        "errorUnknown": "Une erreur s'est produite lors de l'installation de cette intégration.",
+        "errorNotFound": "Dépôt introuvable, ou il ne contient pas d'intégration Gladys valide.",
+        "errorInvalidManifest": "Le manifeste de l'intégration est invalide.",
+        "manifestInvalidJson": "Le manifeste n'est pas un JSON valide.",
+        "errorDetailsTitle": "Détail des erreurs :"
+      },
+      "logs": {
+        "title": "Journaux",
+        "refreshButton": "Rafraîchir",
+        "error": "Une erreur s'est produite lors du chargement des journaux.",
+        "empty": "Aucun journal disponible.",
+        "containerSelectLabel": "Conteneur",
+        "mainContainerOption": "Conteneur principal"
+      },
+      "link": {
+        "title": "Lier mon compte",
+        "notLinkedText": "Votre compte n'est pas lié à ce canal de messagerie. Générez un code, puis envoyez-le au bot dans le canal externe pour lier votre compte.",
+        "linkedText": "Votre compte est lié à :",
+        "generateCodeButton": "Générer un code de liaison",
+        "codeText": "Envoyez ce code au bot :",
+        "codeExpiryText": "Ce code est à usage unique et expire dans 15 minutes.",
+        "unlinkButton": "Délier mon compte",
+        "error": "Une erreur s'est produite lors de la liaison du compte."
+      },
+      "subContainers": {
+        "title": "Conteneurs additionnels",
+        "description": "Cette intégration exécute les conteneurs suivants sur votre machine. Les ports listés seront accessibles depuis votre réseau local.",
+        "nameLabel": "Nom",
+        "imageLabel": "Image",
+        "limitsLabel": "Limites",
+        "portsLabel": "Ports exposés"
+      },
+      "hardware": {
+        "title": "Matériel",
+        "installDescription": "Cette intégration demande l'accès à du matériel de votre machine. Vous pouvez accorder ou refuser chaque accès, et le modifier à tout moment après l'installation.",
+        "configDescription": "Accès matériel accordés à cette intégration. Modifier un accès recrée les conteneurs concernés et notifie l'intégration.",
+        "detected": "Détecté",
+        "notDetected": "Non détecté",
+        "saveButton": "Enregistrer le matériel",
+        "saveError": "Une erreur s'est produite lors de l'enregistrement des accès matériel.",
+        "classes": {
+          "coral-usb": "Coral USB (tout le bus USB)",
+          "coral-pcie": "Coral PCIe",
+          "gpu": "GPU (accélération graphique)",
+          "video": "Caméras (périphériques vidéo)"
+        }
+      },
+      "webhooks": {
+        "title": "Webhooks Gladys Plus",
+        "plusRequiredText": "Cette intégration peut recevoir des événements depuis Internet via Gladys Plus. Liez votre compte Gladys Plus dans les Réglages pour activer les webhooks ; sans cela, l'intégration fonctionne uniquement en mode interrogation périodique.",
+        "explanationText": "Créez une clé Open API dans Gladys Plus (Réglages → Open API), puis collez-la ici. Gladys construit les URLs de webhook et l'intégration les enregistre auprès du service tiers.",
+        "openApiKeyLabel": "Clé Open API Gladys Plus",
+        "openApiKeyPlaceholder": "Collez votre clé Open API",
+        "saveKeyButton": "Enregistrer",
+        "saveKeyError": "Une erreur est survenue lors de l'enregistrement de la clé Open API.",
+        "notAvailableText": "Les webhooks ne sont pas encore actifs : enregistrez votre clé Open API pour les activer.",
+        "urlsText": "URLs de webhook (l'intégration les enregistre automatiquement quand c'est possible ; certains services demandent de les coller dans la console du fabricant). Ces URLs contiennent votre clé : ne les partagez qu'avec le service tiers."
+      },
+      "contactProfile": {
+        "title": "Mon compte",
+        "description": "Ce canal envoie des messages avec vos identifiants personnels. Chaque utilisateur saisit ses propres valeurs ; laissez vide pour ne rien recevoir. Effacer vos valeurs arrête les messages.",
+        "saveButton": "Enregistrer",
+        "clearButton": "Effacer mes valeurs",
+        "saveError": "Une erreur est survenue lors de l'enregistrement de vos valeurs.",
+        "saveSuccess": "Vos valeurs ont été enregistrées."
       }
     },
     "energyMonitoring": {
@@ -841,7 +1262,17 @@
       "note": "Ce lien est unique à votre compte, ne l'envoyez pas à d'autres utilisateurs.",
       "configurationError": "Nous n'avons pas pu configurer votre compte. Êtes-vous sûr que ce token (jeton) est valide?",
       "apiKey": "Clé API du Bot Telegram",
-      "saveButton": "Sauvegarder"
+      "saveButton": "Sauvegarder",
+      "disable": {
+        "title": "Désactiver l'intégration Telegram",
+        "description": "Cette intégration est dépréciée au profit de la nouvelle intégration Telegram externe. Désactiver l'intégration arrête le bot Telegram, supprime la clé API enregistrée et déconnecte tous les utilisateurs de leur compte Telegram. Vous pourrez ensuite installer la nouvelle intégration Telegram.",
+        "button": "Désactiver l'intégration Telegram",
+        "confirmation": "Êtes-vous sûr de vouloir désactiver l'intégration Telegram ? La clé API sera définitivement supprimée et les utilisateurs devront à nouveau lier leur compte Telegram.",
+        "confirmButton": "Oui, désactiver",
+        "cancelButton": "Annuler",
+        "success": "L'intégration Telegram a bien été désactivée, la clé API a été supprimée.",
+        "error": "Nous n'avons pas pu désactiver l'intégration Telegram. Merci de réessayer."
+      }
     },
     "nextcloudTalk": {
       "title": "Nextcloud Talk",
@@ -1392,6 +1823,13 @@
       "description": "Connectez Gladys à HomeKit et utilisez Siri pour lui parler.",
       "introduction": "Pour connecter Gladys à HomeKit, vous devez être en possession d'un appareil compatible Apple (iPhone, iPad, iPod touch).",
       "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
+      "exposure": "Par défaut Gladys expose tous les appareils compatibles à HomeKit. Vous pouvez à la place choisir les appareils que vous souhaitez voir dans l'application Maison.",
+      "exposureModeAll": "Exposer tous les appareils compatibles",
+      "exposureModeSelection": "Exposer uniquement les appareils sélectionnés",
+      "noCompatibleDevice": "Aucun appareil de votre Gladys ne peut encore être exposé à HomeKit.",
+      "saveExposureButton": "Enregistrer les appareils exposés",
+      "saveExposureSuccess": "Appareils exposés enregistrés. Le pont HomeKit redémarre automatiquement, votre appairage est conservé.",
+      "saveExposureError": "Une erreur est survenue lors de l'enregistrement des appareils exposés.",
       "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
       "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparaît pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
       "reloadButton": "Relancer",
@@ -1774,8 +2212,28 @@
       "description": "Créez des appareils virtuels contrôlables via MQTT.",
       "virtualDevicesExplanation": "Cette intégration permet de créer des appareils virtuels, qui sont contrôlables via MQTT, via HTTP, dans les scènes et sur le tableau de bord. Pour utiliser des appareils Zigbee, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a>. Pour utiliser des appareils Z-Wave, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a>. Pour utiliser des appareils MQTT Nuki, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/nuki\">Nuki</a>.",
       "deviceTab": "Appareils",
+      "discoverTab": "Découverte",
       "debugTab": "Debug MQTT",
       "setupTab": "Configuration",
+      "discover": {
+        "title": "Découverte Home Assistant",
+        "description": "Les appareils qui publient leur configuration sur le broker MQTT avec le protocole <b>Home Assistant Discovery</b> (topic <i>homeassistant/</i>) sont automatiquement découverts et affichés ci-dessous. Vous pouvez ensuite les ajouter à Gladys.",
+        "refreshButton": "Rafraîchir",
+        "hideExistingDevices": "Masquer les appareils déjà dans Gladys",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "roomLabel": "Pièce",
+        "modelLabel": "Modèle",
+        "externalIdLabel": "Identifiant externe",
+        "featuresLabel": "Fonctionnalités",
+        "saveButton": "Sauvegarder",
+        "updateButton": "Mettre à jour",
+        "alreadyExistsButton": "Déjà créé",
+        "saveError": "Une erreur s'est produite lors de la sauvegarde de cet appareil.",
+        "serverError": "Une erreur s'est produite lors de la récupération des appareils découverts.",
+        "deviceNotHandled": "Cet appareil n'expose aucune fonctionnalité actuellement supportée par Gladys.",
+        "noDeviceDiscovered": "Aucun appareil découvert pour le moment. Les appareils qui publient des messages de découverte Home Assistant persistants (retained) sur le broker MQTT apparaîtront ici automatiquement."
+      },
       "documentation": "Documentation MQTT",
       "apiDocumentation": "Documentation MQTT API",
       "status": {
@@ -1859,7 +2317,8 @@
           "button": "Déclenchez des actions à l'appui d'un bouton.",
           "text": "Affichez ou envoyez des valeurs texte.",
           "battery": "Surveillez le niveau de batterie de vos appareils.",
-          "currency": "Affichez des valeurs monétaires ou de cryptomonnaies."
+          "currency": "Affichez des valeurs monétaires ou de cryptomonnaies.",
+          "water-heater": "Pilotez un chauffe-eau : état, mode de fonctionnement, consigne d'eau chaude et boost."
         },
         "descriptions": {
           "light": {
@@ -1906,6 +2365,14 @@
           },
           "currency": {
             "decimal": "Affiche une valeur monétaire avec son unité."
+          },
+          "water-heater": {
+            "binary": "Allumez ou éteignez l'appareil.",
+            "mode": "Choisissez le mode de fonctionnement.",
+            "target-temperature": "Définissez la consigne d'eau chaude avec les boutons +/-.",
+            "remaining-hot-water": "Lisez la part d'eau chaude encore disponible.",
+            "heating": "Lisez si l'appareil est en train de chauffer l'eau.",
+            "boost": "Lancez ou annulez une chauffe forcée."
           }
         },
         "keywords": {
@@ -2520,7 +2987,9 @@
       "generateButton": "Générer",
       "keyNameLabel": "Clé :",
       "registeredLabel": "Enregistré le :"
-    }
+    },
+    "backToIntegrations": "Retour aux intégrations",
+    "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment."
   },
   "editScene": {
     "settings": "Configuration",
@@ -2637,6 +3106,8 @@
         "valueLabel": "Valeur",
         "valueTypeSimple": "Simple",
         "simpleExplanationText": "Entrez ici la nouvelle valeur que vous souhaitez assigner à votre appareil.",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
         "valueTypeComputed": "Calculée",
         "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc."
       },
@@ -2647,11 +3118,15 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
+        "logicExplanationText": "Les conditions de ce bloc sont reliées par un OU : le bloc est validé dès qu'une seule d'entre elles est réalisée. Pour faire un ET, ajoutez plusieurs blocs « Condition sur variables » : ils devront alors tous être validés.",
         "explanationText": "Choisissez ce que vous voulez comparer : la valeur instantanée d'un appareil (aucun bloc préalable nécessaire), ou une variable de scène définie dans un bloc précédent. Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
         "conditionDescription": "Si toutes les conditions sont réalisées, les actions du bloc \"Alors...\" seront exécutées. Sinon, les actions du bloc \"Sinon...\" seront exécutées.",
+        "conditionLogicDescription": "Les conditions ci-dessous sont reliées par un ET : elles doivent toutes être réalisées. Pour faire un OU, utilisez un seul bloc « Condition sur variables » et ajoutez-y plusieurs conditions avec le bouton « + OU ».",
         "noCondition": "Aucune condition ajoutée. Cliquez sur le bouton '+' pour ajouter une condition à ce bloc",
         "addCondition": "Ajouter une condition",
         "if": "Si",
@@ -2768,7 +3243,8 @@
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "gladys/my-topic",
+        "topicPlaceholder": "zigbee2mqtt/mon-appareil/set",
+        "topicExplanation": "Le topic est publié tel quel : vous devez écrire le topic MQTT complet, préfixe 'zigbee2mqtt/' inclus (par exemple 'zigbee2mqtt/mon-appareil/set').",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
@@ -2909,6 +3385,10 @@
       },
       "mqtt": {
         "received": "Recevoir un message MQTT"
+      },
+      "weather": {
+        "alert-raised": "Alerte météo déclenchée",
+        "alert-ended": "Alerte météo terminée"
       }
     },
     "triggersCard": {
@@ -2920,9 +3400,12 @@
         "lessOrEqual": "inférieur ou égal",
         "different": "différent",
         "valuePlaceholder": "Valeur",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
         "on": "On",
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
+        "doorbellRang": "Si la sonnette sonne",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
         "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : "
       },
@@ -3023,6 +3506,20 @@
         "messageLabel": "Message",
         "messagePlaceholder": "Entrez le message attendu",
         "messageDescription": "Entrez le message attendu ou laissez vide pour exécuter la scène quelque soit le message"
+      },
+      "weatherAlert": {
+        "alertRaisedDescription": "Se déclenche quand une alerte météo apparaît ou s'aggrave pour la maison sélectionnée (vérifié toutes les 30 minutes, ou dès que l'intégration météo signale un changement).",
+        "alertEndedDescription": "Se déclenche quand une alerte météo se termine pour la maison sélectionnée.",
+        "houseLabel": "Maison",
+        "typeLabel": "Type d'alerte",
+        "anyType": "Tous les types d'alerte",
+        "severityLabel": "Sévérité minimale",
+        "severities": {
+          "minor": "Mineure (bleu)",
+          "moderate": "Modérée (jaune)",
+          "severe": "Sévère (orange)",
+          "extreme": "Extrême (rouge)"
+        }
       }
     }
   },
@@ -3219,16 +3716,25 @@
       "target": "Cible : {{device}} › {{feature}}",
       "statesCounts": "États à supprimer : {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agrégats",
       "statesCountsDone": "États supprimés : {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} agrégats",
+      "migrationTarget": "Migration : {{source}} › {{destination}}",
       "steps": {
         "waiting_database": "En attente de la base de données…",
         "counting": "Calcul du nombre d'états…",
         "deleting_states": "Suppression des états…",
-        "deleting_aggregates": "Suppression des agrégats…"
+        "deleting_aggregates": "Suppression des agrégats…",
+        "moving_states": "Déplacement de l'historique d'états…",
+        "cleaning_sqlite": "Nettoyage des reliquats SQLite…",
+        "updating_references": "Mise à jour des références…",
+        "rewriting_scenes": "Réécriture des scènes…",
+        "rewriting_dashboards": "Réécriture des tableaux de bord…",
+        "deleting_source_device": "Suppression de l'ancien appareil…"
       },
+      "statesMigrated": "États d'historique déplacés : {{count}}",
       "orphanedStates": "États orphelins : {{count}}",
       "duration": "Durée : {{duration}}"
     },
     "jobTypes": {
+      "device-migrate": "Migration d'appareil",
       "monthly-device-state-aggregate": "Agrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Agrégation donnée capteur journalière",
       "hourly-device-state-aggregate": "Agrégation donnée capteur horaire",
@@ -3267,7 +3773,24 @@
     "operations": "Opérations",
     "upToDate": "Gladys est à jour",
     "newUpgradeAvailable": "Mise à jour disponible",
-    "newUpgradeAvailableText": "Gladys se mettra à jour automatiquement si vous utilisez Watchtower. Si vous voulez mettre à jour manuellement, cliquez sur le bouton ci-dessous. Cela lancera un container Watchtower qui mettra à jour tous les containers présents sur cette machine.",
+    "newUpgradeAvailableVersion": "Gladys {{version}} est disponible",
+    "checkForUpdates": "Vérifier les mises à jour",
+    "checkingForUpdates": "Vérification en cours...",
+    "checkForUpdatesText": "Gladys vérifie automatiquement si une nouvelle version est disponible. Cliquez ci-dessous pour vérifier maintenant.",
+    "checkForUpdatesError": "Impossible de vérifier les mises à jour. Vérifiez votre connexion internet et réessayez.",
+    "noUpdateAvailable": "Aucune nouvelle version disponible, vous utilisez la dernière version de Gladys.",
+    "newUpgradeAvailableText": "Gladys se mettra à jour automatiquement si vous utilisez Watchtower. Si vous voulez mettre à jour manuellement, cliquez sur le bouton ci-dessous. Cela lancera un container Watchtower qui mettra à jour uniquement le container Gladys, les autres containers de cette machine ne seront pas touchés.",
+    "pinnedImageTitle": "Mise à jour impossible avec cette image",
+    "pinnedImageText": "Votre container Gladys a été créé à partir de l'image « {{image}} », qui pointe vers une version figée. Une mise à jour retéléchargerait exactement la même image : Gladys ne peut donc pas se mettre à jour toute seule.",
+    "pinnedImageRecommendation": "Pour que la mise à jour fonctionne, recréez votre container avec l'image « {{recommendedImage}} », qui suit les nouvelles versions. Vos données ne sont pas dans le container, elles ne seront pas perdues.",
+    "upgradeError": {
+      "IMAGE_TAG_PINNED": "Mise à jour annulée : votre container utilise l'image figée « {{image}} ». Recréez-le avec « {{recommendedImage}} » pour pouvoir le mettre à jour.",
+      "NO_UPDATE_APPLIED": "Aucune mise à jour n'a été appliquée : Watchtower n'a trouvé aucune nouvelle image pour « {{image}} ». Réessayez dans quelques minutes, la nouvelle image n'est peut-être pas encore disponible pour votre architecture.",
+      "WATCHTOWER_FAILED": "La mise à jour a échoué : le container Watchtower s'est arrêté avec le code d'erreur {{statusCode}}. Consultez les logs de Gladys pour en savoir plus.",
+      "WATCHTOWER_TIMEOUT": "La mise à jour prend plus de temps que prévu et Gladys a cessé de la suivre. Elle est peut-être toujours en cours : rafraichissez cette page dans quelques minutes pour vérifier la version installée.",
+      "GLADYS_CONTAINER_NOT_FOUND": "Mise à jour impossible : Gladys n'a pas réussi à identifier son propre container. Vérifiez que Gladys est bien lancée via Docker avec le volume `-v /var/run/docker.sock:/var/run/docker.sock`.",
+      "UNKNOWN_ERROR": "La mise à jour a échoué. Consultez les logs de Gladys pour en savoir plus."
+    },
     "notConnectedToDocker": "Gladys n'est pas connectée à Docker. Pour avoir accès à Docker depuis Gladys, il faut lancer Gladys avec le bon volume `-v /var/run/docker.sock:/var/run/docker.sock`.",
     "updateNow": "Mettre à jour maintenant",
     "upgradeInProgress": "Mise à jour en cours...",
@@ -3343,6 +3866,10 @@
     "deleteAreaError": "Impossible de supprimer cette zone. Rafraichissez cette page et réessayez.",
     "getAreaError": "Impossible de récupérer les informations de cette zone. Merci de rafraichir cette page et de réessayer."
   },
+  "iconSelector": {
+    "searchPlaceholder": "Rechercher une icône (maison, cadenas, météo...)",
+    "noResult": "Aucune icône ne correspond à \"{{search}}\"."
+  },
   "newScene": {
     "cardTitle": "Nouvelle scène",
     "nameLabel": "Nom",
@@ -3391,7 +3918,9 @@
     "statusColumn": "Etat",
     "userRsaKey": "Clé RSA",
     "userEcdsaKey": "Clé ECDSA",
-    "usersListDescription": "Cette liste est synchronisée avec vos utilisateurs Gladys Plus. Pour garantir la sécurité de votre instance, vous devez accorder manuellement l'accès à chaque utilisateur. La suppression d'un utilisateur se fait depuis la gestion des utilisateurs Gladys Plus.",
+    "usersListDescription": "Cette liste est synchronisée avec vos utilisateurs Gladys Plus. Pour qu'un utilisateur (y compris vous-même) puisse accéder à votre instance à distance, vous devez l'autoriser ici en activant l'interrupteur en face de son nom.",
+    "usersListWhyAcceptDescription": "<b>Pourquoi cette étape ?</b> Chaque utilisateur Gladys Plus possède ses propres clés de chiffrement, dont les empreintes sont affichées ci-dessous. En autorisant un utilisateur, vous validez localement, sur votre instance, que ses clés sont acceptées : c'est cette validation locale qui protège votre maison des attaques « de l'homme du milieu » (man-in-the-middle). Personne, pas même les serveurs Gladys Plus, ne peut donner accès à votre instance sans cette validation faite chez vous.",
+    "usersListRevokedDescription": "Si les clés d'un utilisateur changent (par exemple lorsque sa double authentification a été réinitialisée), son accès est automatiquement révoqué par sécurité : il faudra l'autoriser à nouveau ici. La suppression d'un utilisateur se fait depuis la gestion des utilisateurs Gladys Plus.",
     "disconnectTitle": "Déconnectez votre compte Gladys Plus",
     "disconnectButton": "Déconnecter",
     "gatewayConnectedSuccessTitle": "Gladys Plus est connecté avec succès !",
@@ -3661,6 +4190,7 @@
     "liter": "Litre (l)",
     "milliliter": "Millilitre (ml)",
     "cubicmeter": "Mètre cube (m³)",
+    "cubic-meter-per-hour": "Mètre cube par heure (m³/h)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -3757,6 +4287,7 @@
     "liter": "l",
     "milliliter": "ml",
     "cubicmeter": "m³",
+    "cubic-meter-per-hour": "m³/h",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -3842,8 +4373,8 @@
             "1": "Activée"
           },
           "state": {
-            "0": "Activer",
-            "1": "Désactiver"
+            "0": "Désactiver",
+            "1": "Activer"
           }
         },
         "lock": {
@@ -3852,8 +4383,8 @@
             "1": "Verrouillée"
           },
           "state": {
-            "0": "Verrouiller",
-            "1": "Déverrouiller"
+            "0": "Déverrouiller",
+            "1": "Verrouiller"
           }
         }
       },
@@ -3864,8 +4395,8 @@
             "1": "Verrouillée"
           },
           "state": {
-            "0": "Verrouiller",
-            "1": "Déverrouiller"
+            "0": "Déverrouiller",
+            "1": "Verrouiller"
           }
         }
       },
@@ -3876,6 +4407,43 @@
           "heating": "Chauffage",
           "drying": "Déshu.",
           "fan": "Ventil."
+        },
+        "fan-speed": {
+          "auto": "Auto",
+          "low": "Faible",
+          "low-mid": "Faible-Moyen",
+          "mid": "Moyen",
+          "mid-high": "Moyen-Fort",
+          "high": "Fort",
+          "quiet": "Silencieux",
+          "turbo": "Turbo"
+        },
+        "swing-horizontal": {
+          "off": "Arrêt",
+          "swing": "Balancement",
+          "position-1": "Position 1 (Gauche)",
+          "position-2": "Position 2",
+          "position-3": "Position 3 (Centre)",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Droite)",
+          "swing-opposite": "Balancement inversé"
+        },
+        "swing-vertical": {
+          "off": "Arrêt",
+          "swing": "Balayage",
+          "position-1": "Position 1 (Haut)",
+          "position-2": "Position 2",
+          "position-3": "Position 3",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Bas)"
+        }
+      },
+      "thermostat": {
+        "mode": {
+          "off": "Arrêt",
+          "heating": "Chauffage",
+          "cooling": "Refroidissement",
+          "auto": "Auto"
         }
       },
       "heater": {
@@ -3909,6 +4477,37 @@
           "deep-clean": "Nettoyage profond",
           "vacuum": "Aspiration",
           "mop": "Serpillère"
+        }
+      },
+      "water-heater": {
+        "mode": {
+          "off": "Arrêt",
+          "auto": "Auto",
+          "eco": "Éco",
+          "boost": "Boost",
+          "manual": "Manuel",
+          "away": "Absence",
+          "program": "Programmation"
+        },
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Éteint",
+            "1": "Allumé"
+          },
+          "state": {
+            "0": "Éteindre",
+            "1": "Allumer"
+          }
+        },
+        "boost": {
+          "stateLiveFinished": {
+            "0": "Boost inactif",
+            "1": "Boost actif"
+          },
+          "state": {
+            "0": "Annuler le boost",
+            "1": "Lancer le boost"
+          }
         }
       }
     }
@@ -4101,6 +4700,49 @@
           "2": "Chauffage",
           "3": "Déshumidification",
           "4": "Ventilation"
+        },
+        "fan-speed": {
+          "0": "Auto",
+          "1": "Faible",
+          "2": "Faible-Moyen",
+          "3": "Moyen",
+          "4": "Moyen-Fort",
+          "5": "Fort",
+          "6": "Silencieux",
+          "7": "Turbo"
+        },
+        "swing-horizontal": {
+          "0": "Arrêt",
+          "1": "Balancement",
+          "2": "Position 1 (Gauche)",
+          "3": "Position 2",
+          "4": "Position 3 (Centre)",
+          "5": "Position 4",
+          "6": "Position 5 (Droite)",
+          "7": "Balancement inversé"
+        },
+        "swing-vertical": {
+          "0": "Arrêt",
+          "1": "Balayage",
+          "2": "Position 1 (Haut)",
+          "3": "Position 2",
+          "4": "Position 3",
+          "5": "Position 4",
+          "6": "Position 5 (Bas)"
+        }
+      },
+      "thermostat": {
+        "mode": {
+          "0": "Arrêt",
+          "1": "Chauffage",
+          "2": "Refroidissement",
+          "3": "Auto"
+        },
+        "operating-state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Inactif",
+          "1": "Chauffe",
+          "2": "Refroidit"
         }
       },
       "siren": {
@@ -4108,6 +4750,10 @@
           "0": "Faible",
           "1": "Moyen",
           "2": "Fort"
+        },
+        "test-in-progress": {
+          "0": "Non",
+          "1": "Oui"
         }
       },
       "music": {
@@ -4121,6 +4767,27 @@
           "other": "Aucune valeur reçue",
           "zero": "Ouvert",
           "one": "Fermé"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Pas de mouvement",
+          "one": "Mouvement détecté"
+        }
+      },
+      "presence-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Pas de présence",
+          "one": "Présence détectée"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Sain",
+          "one": "Fumée détectée"
         }
       },
       "co-sensor": {
@@ -4175,6 +4842,19 @@
           "unknown": "Inconnu"
         }
       },
+      "water-valve": {
+        "current-device-status": {
+          "0": "Normal",
+          "1": "Manque d'eau",
+          "2": "Fuite d'eau",
+          "3": "Manque et fuite d'eau",
+          "unknown": "{{value}} (inconnu)"
+        },
+        "valve-work-state": {
+          "0": "Au repos",
+          "1": "Irrigation en cours"
+        }
+      },
       "electrical-vehicle-state": {
         "door-opened": {
           "0": "Fermée(s)",
@@ -4185,10 +4865,35 @@
           "1": "Ouverte(s)"
         }
       },
+      "doorbell": {
+        "ring": {
+          "0": "Pas de sonnerie",
+          "1": "Sonnette actionnée"
+        }
+      },
       "electrical-vehicle-charge": {
         "plugged": {
           "0": "Déconnecté",
           "1": "Connecté"
+        }
+      },
+      "charging-station": {
+        "connector-status": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Disponible",
+          "1": "Occupé",
+          "2": "Réservé",
+          "3": "Indisponible",
+          "4": "En défaut"
+        },
+        "charging-state": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "En charge",
+          "1": "Véhicule connecté",
+          "2": "Suspendue (véhicule)",
+          "3": "Suspendue (borne)",
+          "4": "Inactive",
+          "5": "En décharge"
         }
       },
       "voc-matter-index-sensor": {
@@ -4227,6 +4932,41 @@
           "4": "Retour à la base",
           "5": "En charge",
           "6": "Sur la base"
+        },
+        "run-mode": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Repos",
+          "1": "Nettoyer",
+          "2": "Cartographier"
+        },
+        "clean-mode": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Auto",
+          "1": "Rapide",
+          "2": "Silencieux",
+          "3": "Faible bruit",
+          "4": "Nettoyage profond",
+          "5": "Aspiration",
+          "6": "Serpillère"
+        }
+      },
+      "water-heater": {
+        "mode": {
+          "0": "Arrêt",
+          "1": "Auto",
+          "2": "Éco",
+          "3": "Boost",
+          "4": "Manuel",
+          "5": "Absence",
+          "6": "Programmation"
+        },
+        "boost": {
+          "0": "Boost inactif",
+          "1": "Boost actif"
+        },
+        "heating": {
+          "0": "Au repos",
+          "1": "En chauffe"
         }
       }
     }
@@ -4270,7 +5010,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Détecteur de présence",
-      "push": "Présence"
+      "push": "Présence",
+      "binary": "Détection présence Oui/Non"
     },
     "rain-sensor": {
       "shortCategoryName": "Détecteur de pluie",
@@ -4296,9 +5037,37 @@
       "liquid-level-percent": "Niveau du liquide (Pourcentage)",
       "liquid-depth": "Profondeur du liquide"
     },
+    "water-heater": {
+      "shortCategoryName": "Chauffe-eau",
+      "binary": "État",
+      "mode": "Mode",
+      "target-temperature": "Consigne d'eau chaude",
+      "remaining-hot-water": "Eau chaude disponible",
+      "heating": "Chauffe en cours",
+      "boost": "Boost"
+    },
+    "water-valve": {
+      "shortCategoryName": "Vanne d'eau",
+      "current-device-status": "État de la vanne d'eau",
+      "flow": "Débit d'eau",
+      "auto-close-when-water-shortage": "Fermeture auto si manque d'eau",
+      "valve-work-state": "Programme d'irrigation en cours",
+      "real-time-irrigation-duration": "Durée d'irrigation en cours",
+      "real-time-irrigation-volume": "Volume d'irrigation en cours",
+      "daily-irrigation-volume": "Volume d'irrigation quotidien"
+    },
     "camera": {
       "shortCategoryName": "Caméra",
       "image": "Caméra (Image)"
+    },
+    "charging-station": {
+      "shortCategoryName": "Borne de recharge",
+      "connector-status": "Statut du connecteur",
+      "charging-state": "État de la charge"
+    },
+    "doorbell": {
+      "shortCategoryName": "Sonnette",
+      "ring": "Sonnerie"
     },
     "counter-sensor": {
       "shortCategoryName": "Compteur",
@@ -4337,7 +5106,8 @@
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
       "lmh_volume": "Volume de la sirène",
-      "melody": "Mélodie"
+      "melody": "Mélodie",
+      "test-in-progress": "Test en cours"
     },
     "cube": {
       "shortCategoryName": "Cube",
@@ -4382,6 +5152,18 @@
       "shortCategoryName": "Capteur Formaldéhyde",
       "decimal": "Formaldéhyde (Décimale)"
     },
+    "no2-sensor": {
+      "shortCategoryName": "Capteur de NO2",
+      "decimal": "NO2 (Décimale)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "Capteur d'O3",
+      "decimal": "O3 (Décimale)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "Capteur de SO2",
+      "decimal": "SO2 (Décimale)"
+    },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
       "binary": "Vibration (Oui/Non)",
@@ -4403,7 +5185,10 @@
       "shortCategoryName": "Climatisation",
       "binary": "Commutateur",
       "mode": "Mode",
-      "target-temperature": "Température de consigne"
+      "target-temperature": "Température de consigne",
+      "fan-speed": "Vitesse de ventilation",
+      "swing-horizontal": "Balayage horizontal",
+      "swing-vertical": "Balayage vertical"
     },
     "electrical-vehicle-battery": {
       "shortCategoryName": "Véhicule électrique - Batterie",
@@ -4519,6 +5304,15 @@
       "daily-production-revenue": "Revenu journalier",
       "thirty-minutes-production": "Production 30 minutes",
       "thirty-minutes-production-revenue": "Revenu 30 minutes"
+    },
+    "battery-storage": {
+      "shortCategoryName": "Batterie de stockage",
+      "battery-level": "Niveau de batterie",
+      "charge-power": "Puissance de charge",
+      "discharge-power": "Puissance de décharge",
+      "charge-index": "Index de charge",
+      "discharge-index": "Index de décharge",
+      "battery-energy-remaining": "Énergie restante en batterie"
     },
     "teleinformation": {
       "shortCategoryName": "Téléinformation",
@@ -4658,7 +5452,9 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Température de consigne"
+      "target-temperature": "Température de consigne",
+      "mode": "Mode du thermostat",
+      "operating-state": "État de fonctionnement du thermostat"
     },
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
@@ -4713,6 +5509,7 @@
       "binary": "Etat de l'entrée"
     },
     "unknown": {
+      "binary": "Binaire (on/off)",
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
     },
@@ -4843,6 +5640,7 @@
     "history": "Activité",
     "devices": "Appareils",
     "integrations": "Intégrations",
+    "integrationsToUpdate": "Intégrations à mettre à jour : {{count}}",
     "calendar": "Calendrier",
     "maps": "Plans",
     "scenes": "Scènes",
@@ -4854,11 +5652,19 @@
   "gatewayLinkUser": {
     "title": "Configurer Gladys Plus",
     "label": "Sélectionnez votre utilisateur Gladys",
-    "description": "Sélectionnez l'utilisateur Gladys auquel lier votre compte Gladys Plus. Cet utilisateur doit être accepté localement sur votre instance : dans les paramètres de votre instance, onglet \"Gladys Plus\", section \"Utilisateurs\".",
-    "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
-    "noInstanceFoundHelp": "Cela peut arriver si vous ne vous êtes jamais connecté à votre compte Gladys Plus dans votre instance locale, ou si votre 2FA a été réinitialisée. Dans les deux cas, ouvrez votre instance Gladys locale, allez dans les paramètres, onglet \"Gladys Plus\", et connectez-vous à votre compte. Besoin d'aide ? Contactez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
+    "description": "Sélectionnez l'utilisateur Gladys auquel lier votre compte Gladys Plus. Cet utilisateur doit être autorisé localement sur votre instance : dans les paramètres de votre instance, onglet « Gladys Plus », section « Utilisateurs distants ».",
+    "noInstanceFoundTitle": "Plus qu'une étape !",
+    "noInstanceFoundIntro": "Votre compte Gladys Plus est bien actif 🙂 Il ne reste plus qu'à connecter votre instance Gladys (celle installée chez vous) à votre compte Gladys Plus. C'est une étape normale lors de la première utilisation, rien n'est cassé ! Suivez ces étapes :",
+    "noInstanceFoundStepOpenLocalInstance": "Ouvrez votre instance Gladys <b>en local</b>, depuis votre réseau à la maison, via son adresse locale habituelle (par exemple <code>http://adresse-ip-de-votre-appareil</code>).",
+    "noInstanceFoundStepGoToSettings": "Connectez-vous, puis allez dans <b>Paramètres</b>, onglet <b>« Gladys Plus »</b>.",
+    "noInstanceFoundStepLogin": "Cliquez sur <b>« J'ai déjà un compte »</b>, puis identifiez-vous avec votre compte Gladys Plus (le même e-mail et mot de passe qu'ici).",
+    "noInstanceFoundStepAcceptUser": "Toujours dans l'onglet « Gladys Plus », section <b>« Utilisateurs distants »</b>, <b>autorisez votre utilisateur</b> en activant l'interrupteur en face de son nom. Cette validation locale garantit que seules les clés de chiffrement que vous avez approuvées chez vous peuvent accéder à votre instance (protection contre les attaques man-in-the-middle).",
+    "noInstanceFoundStepComeBack": "Revenez sur cette page, puis cliquez sur le bouton ci-dessous.",
+    "noInstanceFoundRetryButton": "J'ai connecté mon instance, réessayer",
+    "noInstanceFoundTutorialLink": "Besoin d'un guide pas à pas avec des captures d'écran ? <a href=\"https://gladysassistant.com/fr/docs/plus/connect-gladys-plus/\" target=\"_blank\" rel=\"noopener noreferrer\">Consultez le tutoriel dans notre documentation</a>.",
+    "noInstanceFoundNote": "Vous aviez déjà fait cette étape par le passé ? Il faut parfois la refaire, par exemple lorsque votre double authentification (2FA) a été réinitialisée : reconnectez-vous simplement dans l'onglet « Gladys Plus » de votre instance. Besoin d'aide ? Écrivez-nous à <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
-    "errorNotAcceptedLocally": "L'utilisateur n'a pas été accepté localement dans l'instance Gladys. Veuillez l'accepter dans les paramètres de votre instance.",
+    "errorNotAcceptedLocally": "L'utilisateur n'a pas encore été autorisé localement dans l'instance Gladys. Dans votre instance locale, allez dans les paramètres, onglet « Gladys Plus », section « Utilisateurs distants », et activez l'interrupteur en face de son nom.",
     "saveButton": "Sauvegarder",
     "manageBillingLink": "Gérer mon abonnement et mes factures",
     "logoutButton": "Se déconnecter"

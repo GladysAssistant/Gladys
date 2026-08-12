@@ -2,6 +2,7 @@ import { Text, MarkupText } from 'preact-i18n';
 import IntegrationMenu, { IntegrationMenuMobile } from './IntegrationMenu';
 import IntegrationCategory, { IntegrationListItem } from './IntegrationCategory';
 import IntegrationPageHeader from './IntegrationPageHeader';
+import StoreRefreshFooter from './all/external-integration/store-refresh/StoreRefreshFooter';
 import style from './style.css';
 
 const IntegrationPage = ({
@@ -13,7 +14,14 @@ const IntegrationPage = ({
   changeOrderDir,
   search,
   integrationCategories,
-  toggleFavorite
+  toggleFavorite,
+  showInstallFromGithub,
+  showStoreRefresh,
+  refreshStore,
+  refreshStoreStatus,
+  refreshStoreStale,
+  integrationsToUpdate,
+  category
 }) => (
   <div class="page">
     <div class="page-main">
@@ -27,8 +35,13 @@ const IntegrationPage = ({
               searchKeyword={searchKeyword || ''}
               integrationsLength={integrations.length}
               totalSize={totalSize}
+              showInstallFromGithub={showInstallFromGithub}
             />
-            <IntegrationMenuMobile integrationCategories={integrationCategories} />
+            <IntegrationMenuMobile
+              integrationCategories={integrationCategories}
+              integrationsToUpdate={integrationsToUpdate}
+              category={category}
+            />
             <div class="alert alert-info mb-4">
               <h4 class="alert-title">
                 <Text id="integration.root.gatewayBanner.title" />
@@ -37,7 +50,11 @@ const IntegrationPage = ({
             </div>
             <div class="row">
               <div class={`col-lg-3 ${style.desktopMenuCol}`}>
-                <IntegrationMenu integrationCategories={integrationCategories} />
+                <IntegrationMenu
+                  integrationCategories={integrationCategories}
+                  integrationsToUpdate={integrationsToUpdate}
+                  category={category}
+                />
               </div>
               <div class="col-lg-9">
                 <div class={`list-group list-group-flush ${style.mobileList}`}>
@@ -69,10 +86,15 @@ const IntegrationPage = ({
                         </p>
                         <MarkupText id="integration.root.noSearchResultsSuggestion" />
                       </div>
+                    ) : category === 'updates' ? (
+                      <Text id="integration.root.allIntegrationsUpToDate" />
                     ) : (
                       <Text id="integration.root.noIntegrations" />
                     )}
                   </div>
+                )}
+                {showStoreRefresh && (
+                  <StoreRefreshFooter onRefresh={refreshStore} status={refreshStoreStatus} stale={refreshStoreStale} />
                 )}
               </div>
             </div>

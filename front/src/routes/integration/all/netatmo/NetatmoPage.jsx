@@ -1,6 +1,8 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const NetatmoPage = props => (
   <div class="page">
@@ -9,6 +11,7 @@ const NetatmoPage = props => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.netatmo.title" />
               </h3>
@@ -61,7 +64,10 @@ const NetatmoPage = props => (
                 </div>
               </div>
             </div>
-            <div class="col-lg-9">{props.children}</div>
+            <div class="col-lg-9">
+              <DeprecationWarning />
+              {props.children}
+            </div>
           </div>
         </div>
       </div>

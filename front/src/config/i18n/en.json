@@ -66,7 +66,26 @@
     "searchPlaceHolder": "Search devices",
     "noRoom": "No room",
     "noFeatures": "No features",
-    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>."
+    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>.",
+    "migrate": {
+      "button": "Migrate",
+      "modalTitle": "Migrate \"{{name}}\"",
+      "description": "Migrate this device to a device of another integration: its <b>state history</b>, the <b>scenes</b> and the <b>dashboards</b> referencing it will be moved to the destination device, then <b>this device will be deleted</b>. If both devices recorded states during the same period, only the history older than the destination's first state is moved, so nothing is counted twice.",
+      "destinationLabel": "Destination device",
+      "featuresTitle": "Feature matching",
+      "doNotMigrate": "Do not migrate",
+      "typeMismatchWarning": "This feature has a different type than the source feature: its history may not make sense once migrated.",
+      "unitMismatchWarning": "This feature has a different unit than the source feature: values are moved without conversion, so charts may become inconsistent.",
+      "unmappedWarning": "Some features are not matched: their history will be deleted, and the scenes and dashboards using them will not be updated.",
+      "noDestinationAvailable": "No device from another integration was found. Create the destination device in its new integration first, then come back here to migrate.",
+      "loadError": "Unable to load the list of devices. Please try again.",
+      "migrateError": "The migration failed. The old device was not deleted, but some history may already have been moved to the destination. Check the jobs page and your device list, then try again: re-running only moves what remains to migrate.",
+      "networkError": "The connection was lost while the migration was running: it may still be running in background. Check the <a href=\"/dashboard/settings/jobs\">jobs page</a> and refresh the device list before trying again.",
+      "successText": "Migration complete! <b>{{states}}</b> historical states were moved, <b>{{scenes}}</b> scene(s) and <b>{{dashboards}}</b> dashboard(s) were updated. The old device has been deleted.",
+      "confirmButton": "Migrate and delete the old device",
+      "cancelButton": "Cancel",
+      "closeButton": "Close"
+    }
   },
   "login": {
     "title": "Gladys Assistant",
@@ -254,8 +273,10 @@
     "closeDefineTabletMode": "Close",
     "tabletMode": {
       "description": "Tablet mode is used for the alarm functionality. If you arm the alarm, all house tablets will be locked and display a virtual keyboard to deactivate the alarm.",
+      "currentBrowserOnly": "<strong>This setting only applies to this device.</strong> By saving, you declare that the browser you are currently using is a tablet. Each device is configured separately: only enable tablet mode on the devices you are happy to see locked when the alarm is armed.",
       "fullScreenForce": "If you want to force a tablet to stay in full-screen mode, you can add <code>?fullscreen=force</code> to the URL.",
-      "houseLabel": "House",
+      "houseLabel": "House of this tablet",
+      "howToDisable": "To turn tablet mode off on a device, open this menu from that device and select \"Tablet mode disabled\".",
       "tabletModeDisabled": "Tablet Mode Disabled"
     },
     "duckDbMigrationInProgress": "Your Gladys instance is migrating its database to DuckDB, a new, more powerful database system for time-series data. This task may take some time, during which time not all your charts will be available. Migration progress = {{progress}}%.",
@@ -299,7 +320,9 @@
       "gauge": "Gauge",
       "energy-consumption": "Energy Consumption",
       "voice-assistant": "Voice assistant",
-      "link": "Link"
+      "link": "Link",
+      "photo": "Photo",
+      "sun": "Sun"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -307,17 +330,75 @@
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
         "houseHasNoCoordinates": "Your house has no coordinates defined. Go to Gladys parameters to define the position of your house.",
-        "serviceNotConfigured": "The OpenWeather service is not configured. Please go to the 'Integrations' tab, and configure the OpenWeather service.",
-        "requestToThirdPartyFailed": "The request to OpenWeather API failed. Is your Gladys instance connected to the internet? Please go to the OpenWeather configuration panel to troubleshoot this problem.",
-        "clickHere": "Click here to access the OpenWeather configuration panel.",
+        "serviceNotConfigured": "No weather service is configured. Please go to the 'Integrations' tab and configure a weather integration (OpenWeather, or a weather integration from the store).",
+        "requestToThirdPartyFailed": "The request to the weather provider failed. Is your Gladys instance connected to the internet? Please go to the weather integrations panel to troubleshoot this problem.",
+        "clickHere": "Click here to access the weather integrations.",
         "unknownError": "We are unable to get the weather for this house. Did you define a house for this box?",
+        "editProviderLabel": "Weather provider:",
+        "providerAuto": "Automatic (first available provider)",
+        "providerInternalOpenWeather": "Internal OpenWeather (deprecated)",
         "editModeLabel": "Select display mode:",
         "displayModes": {
-          "advancedWeather": "Humidity and wind speed",
+          "dateLocation": "Date and location",
+          "currentWeather": "Current weather",
+          "alerts": "Weather alerts",
+          "advancedWeather": "Weather details (humidity, wind, UV, moon…)",
           "hourlyForecast": "Forecast for the next 24 hours",
-          "dailyForecast": "Forecast for the next 5 days"
+          "dailyForecast": "Forecast for the next 5 days",
+          "providerImages": "Provider images (vigilance map, rain radar…)"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "noModeSelected": "Select at least one display mode, otherwise the widget will stay empty.",
+        "minMaxDegreeValue": "{{min}}°/{{max}}°",
+        "uv": "UV",
+        "windGustTitle": "Wind gusts (the provider gives no average wind speed for this day)",
+        "alertTypes": {
+          "wind": "Strong wind",
+          "rain": "Heavy rain",
+          "flood": "Flood",
+          "thunderstorm": "Thunderstorms",
+          "snow": "Snow and ice",
+          "heat": "Heat wave",
+          "cold": "Extreme cold",
+          "avalanche": "Avalanches",
+          "coastal": "Coastal event",
+          "fog": "Fog"
+        },
+        "conditions": {
+          "clear": "Clear sky",
+          "partly-cloudy": "Partly cloudy",
+          "cloud": "Cloudy",
+          "fog": "Fog",
+          "drizzle": "Drizzle",
+          "rain": "Rain",
+          "pouring": "Heavy rain",
+          "sleet": "Sleet",
+          "hail": "Hail",
+          "snow": "Snow",
+          "thunderstorm": "Thunderstorm",
+          "wind": "Windy",
+          "night": "Night",
+          "unknown": "Unavailable"
+        },
+        "moonPhases": {
+          "0": "New moon",
+          "1": "Waxing crescent",
+          "2": "First quarter",
+          "3": "Waxing gibbous",
+          "4": "Full moon",
+          "5": "Waning gibbous",
+          "6": "Last quarter",
+          "7": "Waning crescent"
+        },
+        "windCardinals": {
+          "n": "N",
+          "ne": "NE",
+          "e": "E",
+          "se": "SE",
+          "s": "S",
+          "sw": "SW",
+          "w": "W",
+          "nw": "NW"
+        }
       },
       "devicesInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -328,6 +409,7 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Motion detected",
+        "doorbellRinging": "Ringing",
         "pushButton": "Push",
         "vacuumDock": "Return to Dock"
       },
@@ -429,7 +511,24 @@
           "week": "Week",
           "month": "Month",
           "year": "Year"
-        }
+        },
+        "previousPeriod": "Previous period",
+        "nextPeriod": "Next period",
+        "currentPeriod": "Live",
+        "backToNow": "Back to now"
+      },
+      "sun": {
+        "editHouseLabel": "Select a house. I will use its latitude/longitude to compute the sun position.",
+        "sunrise": "Sunrise",
+        "sunset": "Sunset",
+        "dawn": "Dawn",
+        "solarNoon": "Solar noon",
+        "dusk": "Dusk",
+        "azimuth": "Azimuth",
+        "elevation": "Elevation",
+        "noHouse": "Please select a house in the box settings.",
+        "noCoordinates": "This house has no coordinates. Please configure the house location first.",
+        "error": "An error occurred while getting the sun data. Please retry."
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -518,6 +617,23 @@
           "home": "Home"
         }
       },
+      "photo": {
+        "description": "Display one or more photos on your dashboard. Images are fetched by your Gladys instance (not by your browser), so photos hosted on a local NAS work remotely via Gladys Plus.",
+        "editNameLabel": "Widget name (optional)",
+        "editNamePlaceholder": "E.g. Summer vacation 2025",
+        "photosLabel": "Photos",
+        "editUrlPlaceholder": "https://my-nas.local/photos/vacation.jpg",
+        "editCaptionPlaceholder": "Caption (optional)",
+        "addPhotoButton": "Add a photo",
+        "fitLabel": "Image display",
+        "fitCover": "Fill (crop)",
+        "fitContain": "Contain (full image)",
+        "slideshowIntervalLabel": "Slideshow (seconds)",
+        "slideshowIntervalHelp": "Set to 0 to disable slideshow. Recommended: 10-30 seconds.",
+        "showCaptionLabel": "Show captions",
+        "emptyPhotos": "No photos configured.",
+        "imageError": "Unable to load this image."
+      },
       "alarm": {
         "armButton": "Arm",
         "disarmButton": "Disarm",
@@ -569,22 +685,37 @@
     "tags": {
       "gladysPlus": "Gladys Plus",
       "cloud": "Cloud",
-      "local": "Local"
+      "local": "Local",
+      "external": "Community",
+      "native": "Native",
+      "deprecated": "Soon deprecated"
     },
     "root": {
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
+      "subtitleTotal": "{{total}} integrations",
       "searchPlaceholder": "Search an integration",
       "noIntegrations": "No integration found",
+      "allIntegrationsUpToDate": "All your integrations are up to date.",
       "noSearchResults": "No integration matching \"{{searchKeyword}}\" was found.",
       "noSearchResultsSuggestion": "Try <a href=\"/dashboard/integration/device/matter\">Matter</a> for Matter/Thread compatible devices, or <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> to connect Somfy, Shelly, Daikin and many other devices.",
+      "refreshStore": {
+        "hint": "An integration missing from the list?",
+        "button": "Refresh catalog",
+        "refreshing": "Refreshing…",
+        "tooltip": "Re-download the list of community integrations. Gladys keeps it in cache and refreshes it every 30 minutes.",
+        "success": "Catalog up to date.",
+        "stale": "Gladys could not reach the store: this is still the cached catalog.",
+        "error": "The catalog could not be refreshed. Check your internet connection."
+      },
       "gatewayBanner": {
         "title": "Can't find your device?",
-        "description": "Many devices can be connected via <a href=\"/dashboard/integration/device/matter\">Matter</a> (universal protocol) or <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> (Somfy, Shelly, Daikin…). Once connected, they can be controlled in Gladys like any other device."
+        "description": "Many devices can be connected via <a href=\"/dashboard/integration/device/matter\">Matter</a> (universal protocol). Your device can also be supported by a community <b>external integration</b>: anyone can create one and publish it in the store, it then appears in this list. See the <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">external integrations documentation</a>."
       },
       "menu": {
         "all": "All integrations",
         "favorites": "Favorites",
+        "updates": "To update",
         "device": "Devices",
         "communication": "Communication",
         "calendar": "Calendar",
@@ -592,6 +723,296 @@
         "health": "Health",
         "weather": "Weather",
         "navigation": "Navigation"
+      }
+    },
+    "externalIntegration": {
+      "updateAvailable": "Update available",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "configTab": "Configuration",
+      "supervisionTab": "Supervision",
+      "logsTab": "Logs",
+      "status": {
+        "UNKNOWN": "Unknown",
+        "ENABLED": "Enabled",
+        "DISABLED": "Disabled",
+        "LOADING": "Loading",
+        "RUNNING": "Running",
+        "DEGRADED": "Degraded",
+        "STOPPED": "Stopped",
+        "ERROR": "Error"
+      },
+      "docs": {
+        "modalTitle": "Documentation",
+        "loadError": "There was an error loading the documentation.",
+        "openRawLink": "Open in a new tab"
+      },
+      "config": {
+        "title": "Configuration",
+        "docsLink": "Documentation",
+        "loadError": "There was an error loading the configuration.",
+        "noConfig": "This integration has no configuration options.",
+        "secretConfiguredPlaceholder": "Configured. Leave empty to keep the current value.",
+        "saveSuccess": "Configuration saved successfully.",
+        "saveError": "There was an error saving the configuration.",
+        "saveButton": "Save configuration",
+        "oauthConnectButton": "Connect",
+        "oauthInvalidStateError": "This integration did not provide a usable security state for the connection (missing or too long). It cannot be connected until its developer fixes it.",
+        "oauthRedirectUriLabel": "Redirect URI to declare in your developer application",
+        "oauthRedirectUriDescription": "Providers refuse a local address: this HTTPS page hosted by Gladys sends you back to your instance once you have authorized access. It runs entirely in your browser, Gladys neither stores nor uses the authorization code, and your access tokens are exchanged directly between your instance and the provider.",
+        "oauthRedirectUriInstanceDescription": "You chose to use the address of your instance: declare this exact URL in your developer application. The provider will come back to your Gladys directly, without going through the Gladys redirect page.",
+        "oauthRedirectUriCopied": "Copied!",
+        "oauthUseInstanceRedirectLabel": "Use the address of my instance instead (I already access Gladys over HTTPS)",
+        "oauthConnectError": "There was an error starting the connection. Check that the integration is running."
+      },
+      "actions": {
+        "title": "Actions",
+        "runButton": "Run",
+        "error": "The action failed. Check that the integration is running.",
+        "resultRegionLabel": "Action result"
+      },
+      "connection": {
+        "label": "Connection",
+        "connectedBadge": "Connected",
+        "disconnectedBadge": "Disconnected"
+      },
+      "transport": {
+        "localBadge": "Local",
+        "cloudBadge": "Cloud",
+        "unreachableBadge": "Unreachable",
+        "localTooltip": "This device answers through the local network (LAN)",
+        "cloudTooltip": "This device answers through the vendor cloud",
+        "unreachableTooltip": "This device does not answer at the moment",
+        "degradedBadge": "Degraded",
+        "degradedTooltip": "This device works, but not in its nominal mode",
+        "preferLocalLabel": "Prefer the local (LAN) connection when available",
+        "preferLocalDescription": "The integration applies this preference when it can; the badge of each device shows the transport really in use."
+      },
+      "oauthCallback": {
+        "title": "Account connection",
+        "relayingText": "Finalizing the connection with the integration...",
+        "successText": "Account connected successfully.",
+        "errorText": "The integration refused the connection. Please try again.",
+        "missingParamsText": "This page is missing its connection parameters. Restart the connection from the Configuration screen.",
+        "closeText": "You can close this window.",
+        "backToConfigButton": "Back to configuration"
+      },
+      "supervision": {
+        "title": "Supervision",
+        "loadError": "There was an error loading the integration.",
+        "actionError": "There was an error executing this action.",
+        "uninstallError": "There was an error uninstalling this integration.",
+        "updateAvailableText": "A new version of this integration is available.",
+        "updateSuccessText": "Integration updated to version {{version}}.",
+        "alreadyUpToDateText": "The integration is already up to date (version {{version}}): the Docker image was re-pulled and the container recreated.",
+        "statusLabel": "Status",
+        "versionLabel": "Version",
+        "dockerImageLabel": "Docker image",
+        "repoLabel": "Repository",
+        "startButton": "Start",
+        "stopButton": "Stop",
+        "restartButton": "Restart",
+        "updateButton": "Update",
+        "forceUpdateButton": "Force update",
+        "forceUpdateTitle": "Checks the latest published version, re-pulls the Docker image and recreates the container",
+        "logsButton": "Logs",
+        "uninstallButton": "Uninstall",
+        "containersTitle": "Additional containers",
+        "containerRunning": "Running",
+        "containerStopped": "Stopped",
+        "openButton": "Open",
+        "uninstallWarning": "Are you sure you want to uninstall this integration? Its container and configuration will be removed. Devices created by this integration will stay in Gladys until you delete them.",
+        "confirmUninstallButton": "Yes, uninstall",
+        "cancelUninstallButton": "Cancel",
+        "startedAtLabel": "Running since"
+      },
+      "device": {
+        "title": "Devices",
+        "refreshButton": "Refresh",
+        "loadError": "There was an error loading the devices.",
+        "noDevices": "No devices created yet. Go to the \"Discover\" tab to find devices.",
+        "noDevicesConfigureFirst": "If you just installed this integration, start by filling in the <a href=\"{{configUrl}}\">Configuration</a> tab, then launch a discovery.",
+        "saveError": "There was an error saving this device.",
+        "deleteError": "There was an error deleting this device.",
+        "nameLabel": "Name",
+        "namePlaceholder": "Device name",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "deleteButton": "Delete"
+      },
+      "deviceParams": {
+        "title": "Technical parameters"
+      },
+      "discover": {
+        "title": "Discovered devices",
+        "scanButton": "Scan",
+        "scanning": "Scanning...",
+        "scanningInProgress": "Scan in progress... Depending on the integration, this can take up to a minute. The list will refresh automatically as soon as devices are published.",
+        "scanError": "There was an error launching the scan.",
+        "scanErrorDisconnected": "Unable to launch the scan: the integration is not connected. Check that it is running in the \"Configuration\" tab.",
+        "loadError": "There was an error loading the discovered devices.",
+        "noDevices": "No devices discovered yet. Press \"Scan\" to search for devices.",
+        "noDevicesConfigureFirst": "Nothing found? Make sure the integration is configured in the <a href=\"{{configUrl}}\">Configuration</a> tab, then run a new scan.",
+        "alreadyCreatedBadge": "Already added",
+        "searchPlaceholder": "Search devices",
+        "noSearchResults": "No discovered device matches your search.",
+        "error": {
+          "networkError": "Gladys did not answer the add request. Check that the Gladys server is running and reachable, then try again.",
+          "badRequestError": "Gladys rejected this device: the data published by the integration is incorrect.",
+          "forbiddenError": "You are not allowed to add this device. Log out, log back in, then try again.",
+          "notFoundError": "The requested resource was not found on the server. Run a new scan, then try again.",
+          "conflictError": "This device conflicts with a device already present in Gladys.",
+          "externalIdConflictError": "A device or a feature with the same external id already exists in Gladys. The integration is probably publishing the same id twice, or this device was already added by another integration.",
+          "selectorConflictError": "Another device already uses the same internal id, usually because it has the same name. Rename the existing device, then try again.",
+          "validationError": "The integration published an incomplete or invalid device: Gladys refused to save it.",
+          "serverError": "An internal error happened in Gladys while adding this device.",
+          "unexpectedError": "An unexpected error happened while adding this device.",
+          "rejectedFieldsTitle": "Rejected fields:",
+          "technicalDetail": "Technical detail:",
+          "apiFullResponse": "Full API response:",
+          "reportHint": "Copy this detail if you ask for help on the forum or report the problem to the integration developer.",
+          "fieldLabels": {
+            "name": "Name",
+            "external_id": "External id",
+            "selector": "Internal id",
+            "model": "Model",
+            "category": "Category",
+            "type": "Type",
+            "unit": "Unit",
+            "min": "Minimum value",
+            "max": "Maximum value",
+            "read_only": "Read only",
+            "keep_history": "Keep history",
+            "has_feedback": "Has feedback",
+            "room_id": "Room",
+            "service_id": "Service",
+            "device_id": "Device",
+            "should_poll": "Polling",
+            "poll_frequency": "Poll frequency",
+            "value": "Value"
+          },
+          "contextTypes": {
+            "device_feature": "Feature \"{{name}}\""
+          },
+          "fieldErrorTypes": {
+            "notNullViolation": "required field not provided by the integration",
+            "uniqueViolation": "value already used by another device or feature"
+          }
+        },
+        "featuresLabel": "Features",
+        "createButton": "Add to Gladys",
+        "updateButton": "Update",
+        "updateTitle": "The integration re-published this device with a different structure: apply the new definition"
+      },
+      "install": {
+        "notFound": "This integration was not found in the store.",
+        "starsLabel": "stars",
+        "lastPushLabel": "Last update:",
+        "warningTitle": "Community integration",
+        "warningText": "This integration is developed by the community and is not maintained by the Gladys Assistant team. It runs in an isolated Docker container, but you should only install integrations from developers you trust.",
+        "communicationWarningText": "This integration is a messaging channel: once your account is linked, it will be able to send and receive messages on your behalf (trigger scenes, control your home through the Gladys brain).",
+        "notCompatible": "This integration is not compatible with your Gladys installation.",
+        "installError": "There was an error installing this integration.",
+        "alreadyInstalled": "This integration is already installed.",
+        "goToIntegrationButton": "Go to the integration",
+        "installing": "Installing...",
+        "installButton": "Install",
+        "networkDiscoveryTitle": "Network discovery requests",
+        "networkDiscoveryText": "This integration asks Gladys to capture the following network announcements on its behalf. It will never be able to capture anything else.",
+        "locationText": "This integration requests access to the coordinates (latitude/longitude) of the houses configured in Gladys.",
+        "documentationLink": "Documentation",
+        "duplicateWarningTitle": "Another instance is already installed",
+        "duplicateWarningText": "\"{name}\" looks like another instance of this integration. Two instances may fight over the same cloud account or the same devices — consider stopping the existing one during your tests. Installing anyway is supported (e.g. a dev build next to the production one).",
+        "webhooksTitle": "Internet webhooks (Gladys Plus)",
+        "webhooksText": "This integration will be able to receive the following events from the Internet through the Gladys Plus relay (requires a Gladys Plus subscription and an Open API key).",
+        "notificationWarningText": "This integration is a notification channel: it will be able to send you messages, but it can never receive messages nor act on your behalf (server-side guarantee).",
+        "weatherInfoText": "This integration is a weather provider: once installed, it will provide the weather displayed in Gladys (dashboard widget and assistant)."
+      },
+      "networkDiscovery": {
+        "udpBroadcastText": "Listen to UDP network announcements on ports {ports}",
+        "udpActiveBroadcastText": "Send a discovery request as a UDP broadcast on ports {ports} and collect the replies",
+        "mdnsText": "Browse mDNS services of type {service}",
+        "ssdpText": "SSDP search for {st}"
+      },
+      "installFromGithub": {
+        "cardTitle": "Install from GitHub",
+        "cardDescription": "Install a community integration from a GitHub repository.",
+        "modalTitle": "Install an integration from GitHub",
+        "repoUrlLabel": "GitHub repository URL",
+        "repoUrlPlaceholder": "https://github.com/owner/repository",
+        "installButton": "Install",
+        "devModeLink": "Developer mode: install from a Docker image",
+        "devModeDescription": "Install an integration directly from a Docker image, with an optional manifest. The image can be built locally with docker build, no registry needed. Only for integration developers.",
+        "dockerImageLabel": "Docker image",
+        "dockerImagePlaceholder": "e.g. myuser/my-integration:latest",
+        "manifestLabel": "Manifest (JSON, optional)",
+        "manifestPlaceholder": "{ \"name\": \"My integration\", ... }",
+        "errorUnknown": "There was an error installing this integration.",
+        "errorNotFound": "Repository not found, or it does not contain a valid Gladys integration.",
+        "errorInvalidManifest": "The integration manifest is invalid.",
+        "manifestInvalidJson": "The manifest is not valid JSON.",
+        "errorDetailsTitle": "Error details:"
+      },
+      "logs": {
+        "title": "Logs",
+        "refreshButton": "Refresh",
+        "error": "An error occurred while loading the logs.",
+        "empty": "No logs available.",
+        "containerSelectLabel": "Container",
+        "mainContainerOption": "Main container"
+      },
+      "link": {
+        "title": "Link my account",
+        "notLinkedText": "Your account is not linked to this messaging channel. Generate a code, then send it to the bot in the external channel to link your account.",
+        "linkedText": "Your account is linked to:",
+        "generateCodeButton": "Generate a link code",
+        "codeText": "Send this code to the bot:",
+        "codeExpiryText": "This code is single use and expires in 15 minutes.",
+        "unlinkButton": "Unlink my account",
+        "error": "An error occurred while linking the account."
+      },
+      "subContainers": {
+        "title": "Additional containers",
+        "description": "This integration runs the following containers on your machine. The listed ports will be reachable from your local network.",
+        "nameLabel": "Name",
+        "imageLabel": "Image",
+        "limitsLabel": "Limits",
+        "portsLabel": "Exposed ports"
+      },
+      "hardware": {
+        "title": "Hardware",
+        "installDescription": "This integration requests access to hardware on your machine. You can grant or refuse each access, and change it at any time after the install.",
+        "configDescription": "Hardware access granted to this integration. Changing an access recreates the affected containers and notifies the integration.",
+        "detected": "Detected",
+        "notDetected": "Not detected",
+        "saveButton": "Save hardware",
+        "saveError": "An error occurred while saving the hardware access.",
+        "classes": {
+          "coral-usb": "Coral USB (whole USB bus)",
+          "coral-pcie": "Coral PCIe",
+          "gpu": "GPU (graphics acceleration)",
+          "video": "Cameras (video devices)"
+        }
+      },
+      "webhooks": {
+        "title": "Gladys Plus webhooks",
+        "plusRequiredText": "This integration can receive events from the Internet through Gladys Plus. Link your Gladys Plus account in Settings to enable webhooks; without it, the integration works in polling mode only.",
+        "explanationText": "Create an Open API key in Gladys Plus (Settings → Open API), then paste it here. Gladys builds the webhook URLs and the integration registers them with the third-party service.",
+        "openApiKeyLabel": "Gladys Plus Open API key",
+        "openApiKeyPlaceholder": "Paste your Open API key",
+        "saveKeyButton": "Save",
+        "saveKeyError": "There was an error saving the Open API key.",
+        "notAvailableText": "Webhooks are not active yet: save your Open API key to activate them.",
+        "urlsText": "Webhook URLs (the integration registers them automatically when possible; some services require pasting them in the vendor console). These URLs contain your key: share them only with the third-party service."
+      },
+      "contactProfile": {
+        "title": "My account",
+        "description": "This channel sends messages using your personal credentials. Each user fills in their own values; leave empty to not receive anything. Deleting your values stops the messages.",
+        "saveButton": "Save",
+        "clearButton": "Delete my values",
+        "saveError": "There was an error saving your account values.",
+        "saveSuccess": "Your account values were saved."
       }
     },
     "telegram": {
@@ -603,7 +1024,17 @@
       "note": "This link is unique to your account, do not send it to other users.",
       "configurationError": "We were not able to configure your account. Are you sure this token is valid?",
       "apiKey": "Telegram Bot API Key",
-      "saveButton": "Save"
+      "saveButton": "Save",
+      "disable": {
+        "title": "Disable the Telegram integration",
+        "description": "This integration is deprecated in favor of the new external Telegram integration. Disabling the integration stops the Telegram bot, deletes the stored API key and unlinks all users from their Telegram account. You will then be able to install the new Telegram integration.",
+        "button": "Disable the Telegram integration",
+        "confirmation": "Are you sure you want to disable the Telegram integration? The API key will be permanently deleted and users will have to link their Telegram account again.",
+        "confirmButton": "Yes, disable",
+        "cancelButton": "Cancel",
+        "success": "The Telegram integration was disabled, the API key has been deleted.",
+        "error": "We were not able to disable the Telegram integration. Please try again."
+      }
     },
     "nextcloudTalk": {
       "title": "Nextcloud Talk",
@@ -1154,6 +1585,13 @@
       "description": "Connect Gladys to HomeKit and use Siri to control your devices.",
       "introduction": "To connect Gladys to HomeKit, you need an Apple device (iPhone, iPad, iPod touch).",
       "qrCode": "Scan this QR code from your iOS Home app to add Gladys and all compatible devices.",
+      "exposure": "By default Gladys exposes every compatible device to HomeKit. You can instead pick the devices you want to see in the Home app.",
+      "exposureModeAll": "Expose all compatible devices",
+      "exposureModeSelection": "Only expose the selected devices",
+      "noCompatibleDevice": "No device of your Gladys can be exposed to HomeKit yet.",
+      "saveExposureButton": "Save the exposed devices",
+      "saveExposureSuccess": "Exposed devices saved successfully. The HomeKit bridge restarts automatically, your pairing is kept.",
+      "saveExposureError": "An error occurred while saving the exposed devices.",
       "configurationError": "An error appears while getting settings.",
       "reload": "If you add a device recently on Gladys and it is not on Home app, try to reload the service with this button.",
       "reloadButton": "Reload",
@@ -1536,8 +1974,28 @@
       "description": "Create virtual devices controllable via MQTT.",
       "virtualDevicesExplanation": "This integration allows you to create virtual devices, which are controllable via MQTT, HTTP, in scenes and on the dashboard. To use Zigbee devices, please use the <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a> integration. To use Z-Wave devices, please use the <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a> integration. To use Nuki MQTT devices, please use the <a href=\"/dashboard/integration/device/nuki\">Nuki</a> integration.",
       "deviceTab": "Devices",
+      "discoverTab": "Discovery",
       "debugTab": "MQTT Debug",
       "setupTab": "Setup",
+      "discover": {
+        "title": "Home Assistant Discovery",
+        "description": "Devices publishing their configuration on the MQTT broker with the <b>Home Assistant Discovery</b> protocol (topic <i>homeassistant/</i>) are automatically discovered and displayed below. You can then add them to Gladys.",
+        "refreshButton": "Refresh",
+        "hideExistingDevices": "Hide devices already in Gladys",
+        "nameLabel": "Device name",
+        "namePlaceholder": "Enter the name of your device",
+        "roomLabel": "Room",
+        "modelLabel": "Model",
+        "externalIdLabel": "External ID",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "updateButton": "Update",
+        "alreadyExistsButton": "Already created",
+        "saveError": "There was an error saving this device.",
+        "serverError": "There was an error getting discovered devices.",
+        "deviceNotHandled": "This device does not expose any feature currently supported by Gladys.",
+        "noDeviceDiscovered": "No devices discovered yet. Devices publishing retained Home Assistant discovery messages on the MQTT broker will appear here automatically."
+      },
       "documentation": "MQTT documentation",
       "apiDocumentation": "MQTT API documentation ",
       "status": {
@@ -1621,7 +2079,8 @@
           "button": "Trigger actions on button press.",
           "text": "Display or send text values.",
           "battery": "Monitor battery level of your devices.",
-          "currency": "Display currency or cryptocurrency values."
+          "currency": "Display currency or cryptocurrency values.",
+          "water-heater": "Control a water heater: state, operating mode, hot water setpoint and boost."
         },
         "descriptions": {
           "light": {
@@ -1668,6 +2127,14 @@
           },
           "currency": {
             "decimal": "Displays a monetary value with its currency unit."
+          },
+          "water-heater": {
+            "binary": "Turn the appliance on or off.",
+            "mode": "Select the operating mode.",
+            "target-temperature": "Set the hot water setpoint with +/- buttons.",
+            "remaining-hot-water": "Read the share of hot water still available.",
+            "heating": "Read whether the appliance is currently heating water.",
+            "boost": "Start or cancel a forced heating cycle."
           }
         },
         "keywords": {
@@ -2520,7 +2987,9 @@
       "generateButton": "Generate",
       "keyNameLabel": "Key:",
       "registeredLabel": "Registered on:"
-    }
+    },
+    "backToIntegrations": "Back to integrations",
+    "deprecationWarning": "This built-in integration will soon be <b>deprecated</b> in favor of an equivalent community external integration. Both versions will co-exist in the catalog during the transition — you can keep using this one for now."
   },
   "editScene": {
     "settings": "Settings",
@@ -2637,6 +3106,8 @@
         "valueLabel": "Value",
         "valueTypeSimple": "Simple",
         "simpleExplanationText": "Enter the new value you wish to assign to your device here.",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
         "valueTypeComputed": "Computed",
         "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
@@ -2647,11 +3118,15 @@
         "removeLabel": "Remove",
         "orText": "OR",
         "orButton": "+ OR",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
+        "logicExplanationText": "The conditions in this box are combined with an OR: the box is satisfied as soon as one of them is met. To make an AND, add several \"Condition on variables\" boxes: they will then all have to be satisfied.",
         "explanationText": "Choose what you want to compare: the instantaneous value of a device (no prior block needed), or a scene variable defined in a previous block. In the value field, enter either a raw value or a calculation based on a scene variable. To inject a variable in the text, press '{{'."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
         "conditionDescription": "If all conditions are met, the actions in the \"Then\" block will be executed. If not, the \"Else\" block will be executed.",
+        "conditionLogicDescription": "The conditions below are combined with an AND: they all need to be met. To make an OR, use a single \"Condition on variables\" box and add several conditions to it with the \"+ OR\" button.",
         "noCondition": "No condition has been added yet. Click the '+' button to add a condition to this block",
         "addCondition": "Add condition",
         "if": "If",
@@ -2768,7 +3243,8 @@
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "gladys/my-topic",
+        "topicPlaceholder": "zigbee2mqtt/my-device/set",
+        "topicExplanation": "The topic is published as-is: you must write the full MQTT topic, including the 'zigbee2mqtt/' prefix (for example 'zigbee2mqtt/my-device/set').",
         "messageLabel": "Message",
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
@@ -2909,6 +3385,10 @@
       },
       "mqtt": {
         "received": "Receive message from MQTT"
+      },
+      "weather": {
+        "alert-raised": "Weather alert raised",
+        "alert-ended": "Weather alert ended"
       }
     },
     "triggersCard": {
@@ -2920,9 +3400,12 @@
         "lessOrEqual": "less or equal",
         "different": "different",
         "valuePlaceholder": "Value",
+        "useCustomValue": "Enter a custom value",
+        "useValueList": "Choose from the list of values",
         "on": "On",
         "off": "Off",
         "deviceSeen": "If the device is detected",
+        "doorbellRang": "If the doorbell rings",
         "onlyExecuteAtThreshold": "Execute only when threshold is passed (and not at every value sent by the device)",
         "activateOrDeactivateForDuration": "Run the scene after the condition has been valid for:"
       },
@@ -3023,6 +3506,20 @@
         "messageLabel": "Message",
         "messagePlaceholder": "Enter the expected message",
         "messageDescription": "Enter the expected message or leave blank to run the scene regardless of the message"
+      },
+      "weatherAlert": {
+        "alertRaisedDescription": "This will trigger when a weather alert appears or worsens for the selected house (checked every 30 minutes, or as soon as the weather integration signals a change).",
+        "alertEndedDescription": "This will trigger when a weather alert ends for the selected house.",
+        "houseLabel": "House",
+        "typeLabel": "Alert type",
+        "anyType": "Any alert type",
+        "severityLabel": "Minimal severity",
+        "severities": {
+          "minor": "Minor (blue)",
+          "moderate": "Moderate (yellow)",
+          "severe": "Severe (orange)",
+          "extreme": "Extreme (red)"
+        }
       }
     }
   },
@@ -3219,16 +3716,25 @@
       "target": "Target: {{device}} › {{feature}}",
       "statesCounts": "States to delete: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
       "statesCountsDone": "States deleted: {{duckdb}} DuckDB + {{sqlite}} SQLite — {{aggregates}} aggregates",
+      "migrationTarget": "Migration: {{source}} › {{destination}}",
       "steps": {
         "waiting_database": "Waiting for the database…",
         "counting": "Counting states…",
         "deleting_states": "Deleting states…",
-        "deleting_aggregates": "Deleting aggregates…"
+        "deleting_aggregates": "Deleting aggregates…",
+        "moving_states": "Moving state history…",
+        "cleaning_sqlite": "Cleaning SQLite leftovers…",
+        "updating_references": "Updating references…",
+        "rewriting_scenes": "Rewriting scenes…",
+        "rewriting_dashboards": "Rewriting dashboards…",
+        "deleting_source_device": "Deleting the old device…"
       },
+      "statesMigrated": "History states moved: {{count}}",
       "orphanedStates": "Orphaned states: {{count}}",
       "duration": "Duration: {{duration}}"
     },
     "jobTypes": {
+      "device-migrate": "Device migration",
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
       "hourly-device-state-aggregate": "Hourly sensors aggregation",
@@ -3267,7 +3773,24 @@
     "operations": "Operations",
     "upToDate": "Gladys is up to date",
     "newUpgradeAvailable": "New upgrade available",
-    "newUpgradeAvailableText": "Gladys will update automatically if you use Watchtower. If you want to update manually, click the button below. This will launch a Watchtower container that will update all containers present on this machine.",
+    "newUpgradeAvailableVersion": "Gladys {{version}} is available",
+    "checkForUpdates": "Check for updates",
+    "checkingForUpdates": "Checking for updates...",
+    "checkForUpdatesText": "Gladys checks for new versions automatically. Click below to check right now.",
+    "checkForUpdatesError": "Unable to check for updates. Check your internet connection and try again.",
+    "noUpdateAvailable": "No new version available, you are running the latest Gladys.",
+    "newUpgradeAvailableText": "Gladys will update automatically if you use Watchtower. If you want to update manually, click the button below. This will launch a Watchtower container that will only update the Gladys container, the other containers on this machine will be left untouched.",
+    "pinnedImageTitle": "This image cannot be updated",
+    "pinnedImageText": "Your Gladys container was created from the image \"{{image}}\", which points to a fixed version. An update would download the exact same image again, so Gladys cannot update itself.",
+    "pinnedImageRecommendation": "For updates to work, re-create your container with the image \"{{recommendedImage}}\", which follows new releases. Your data is not stored inside the container, so nothing will be lost.",
+    "upgradeError": {
+      "IMAGE_TAG_PINNED": "Update cancelled: your container uses the fixed image \"{{image}}\". Re-create it with \"{{recommendedImage}}\" to be able to update it.",
+      "NO_UPDATE_APPLIED": "No update was applied: Watchtower did not find any new image for \"{{image}}\". Try again in a few minutes, the new image may not be published yet for your architecture.",
+      "WATCHTOWER_FAILED": "The update failed: the Watchtower container exited with error code {{statusCode}}. Check the Gladys logs for more details.",
+      "WATCHTOWER_TIMEOUT": "The update is taking longer than expected and Gladys stopped following it. It may still be running: refresh this page in a few minutes to check the installed version.",
+      "GLADYS_CONTAINER_NOT_FOUND": "Update impossible: Gladys was not able to identify its own container. Make sure Gladys runs with Docker and the volume `-v /var/run/docker.sock:/var/run/docker.sock`.",
+      "UNKNOWN_ERROR": "The update failed. Check the Gladys logs for more details."
+    },
     "notConnectedToDocker": "Gladys is not connected to Docker. To access Docker from Gladys, you need to start Gladys with the correct volume `-v /var/run/docker.sock:/var/run/docker.sock`.",
     "updateNow": "Update now",
     "upgradeInProgress": "Upgrade in progress...",
@@ -3343,6 +3866,10 @@
     "getAreaError": "Unable to get data from this zone. Please refresh this page to retry.",
     "deleteAreaError": "Unable to delete this zone. Please refresh this page and retry."
   },
+  "iconSelector": {
+    "searchPlaceholder": "Search an icon (home, lock, weather...)",
+    "noResult": "No icon matches \"{{search}}\"."
+  },
   "newScene": {
     "cardTitle": "New scene",
     "nameLabel": "Name",
@@ -3391,7 +3918,9 @@
     "statusColumn": "Status",
     "userRsaKey": "RSA key:",
     "userEcdsaKey": "ECDSA key:",
-    "usersListDescription": "This list is synchronized with your Gladys Plus users. To ensure that your local instance remains secure, you need to manually grant access to each user. To remove a user, go to the Gladys Plus user management page.",
+    "usersListDescription": "This list is synchronized with your Gladys Plus users. For a user (including yourself) to access your instance remotely, you need to authorize them here by turning on the switch next to their name.",
+    "usersListWhyAcceptDescription": "<b>Why this step?</b> Each Gladys Plus user has their own encryption keys, whose fingerprints are displayed below. By authorizing a user, you validate locally, on your instance, that their keys are accepted: this local validation is what protects your home against man-in-the-middle attacks. Nobody, not even the Gladys Plus servers, can grant access to your instance without this validation done at your home.",
+    "usersListRevokedDescription": "If a user's keys change (for example when their two-factor authentication was reset), their access is automatically revoked for security: you will need to authorize them again here. To remove a user, go to the Gladys Plus user management page.",
     "disconnectTitle": "Disconnect your Plus account",
     "disconnectButton": "Disconnect",
     "gatewayConnectedSuccessTitle": "Gladys Plus connected with success!",
@@ -3661,6 +4190,7 @@
     "liter": "Liter (l)",
     "milliliter": "Milliliter (ml)",
     "cubicmeter": "Cubic meter (m³)",
+    "cubic-meter-per-hour": "Cubic meter per hour (m³/h)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -3757,6 +4287,7 @@
     "liter": "l",
     "milliliter": "ml",
     "cubicmeter": "m³",
+    "cubic-meter-per-hour": "m³/h",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -3842,8 +4373,8 @@
             "1": "Enabled"
           },
           "state": {
-            "0": "Enable",
-            "1": "Disable"
+            "0": "Disable",
+            "1": "Enable"
           }
         },
         "lock": {
@@ -3876,6 +4407,43 @@
           "heating": "Heat",
           "drying": "Dry",
           "fan": "Fan"
+        },
+        "fan-speed": {
+          "auto": "Auto",
+          "low": "Low",
+          "low-mid": "Low-Med",
+          "mid": "Medium",
+          "mid-high": "Med-High",
+          "high": "High",
+          "quiet": "Quiet",
+          "turbo": "Turbo"
+        },
+        "swing-horizontal": {
+          "off": "Off",
+          "swing": "Swing",
+          "position-1": "Position 1 (Left)",
+          "position-2": "Position 2",
+          "position-3": "Position 3 (Center)",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Right)",
+          "swing-opposite": "Opposite Swing"
+        },
+        "swing-vertical": {
+          "off": "Off",
+          "swing": "Swing",
+          "position-1": "Position 1 (Top)",
+          "position-2": "Position 2",
+          "position-3": "Position 3",
+          "position-4": "Position 4",
+          "position-5": "Position 5 (Bottom)"
+        }
+      },
+      "thermostat": {
+        "mode": {
+          "off": "Off",
+          "heating": "Heat",
+          "cooling": "Cool",
+          "auto": "Auto"
         }
       },
       "heater": {
@@ -3909,6 +4477,37 @@
           "deep-clean": "Deep Clean",
           "vacuum": "Vacuum",
           "mop": "Mop"
+        }
+      },
+      "water-heater": {
+        "mode": {
+          "off": "Off",
+          "auto": "Auto",
+          "eco": "Eco",
+          "boost": "Boost",
+          "manual": "Manual",
+          "away": "Away",
+          "program": "Schedule"
+        },
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Off",
+            "1": "On"
+          },
+          "state": {
+            "0": "Turn off",
+            "1": "Turn on"
+          }
+        },
+        "boost": {
+          "stateLiveFinished": {
+            "0": "Boost off",
+            "1": "Boost on"
+          },
+          "state": {
+            "0": "Cancel boost",
+            "1": "Start boost"
+          }
         }
       }
     }
@@ -4101,6 +4700,49 @@
           "2": "Heating",
           "3": "Drying",
           "4": "Fan"
+        },
+        "fan-speed": {
+          "0": "Auto",
+          "1": "Low",
+          "2": "Low-Med",
+          "3": "Medium",
+          "4": "Med-High",
+          "5": "High",
+          "6": "Quiet",
+          "7": "Turbo"
+        },
+        "swing-horizontal": {
+          "0": "Off",
+          "1": "Swing",
+          "2": "Position 1 (Left)",
+          "3": "Position 2",
+          "4": "Position 3 (Center)",
+          "5": "Position 4",
+          "6": "Position 5 (Right)",
+          "7": "Opposite Swing"
+        },
+        "swing-vertical": {
+          "0": "Off",
+          "1": "Swing",
+          "2": "Position 1 (Top)",
+          "3": "Position 2",
+          "4": "Position 3",
+          "5": "Position 4",
+          "6": "Position 5 (Bottom)"
+        }
+      },
+      "thermostat": {
+        "mode": {
+          "0": "Off",
+          "1": "Heating",
+          "2": "Cooling",
+          "3": "Auto"
+        },
+        "operating-state": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Idle",
+          "1": "Heating",
+          "2": "Cooling"
         }
       },
       "siren": {
@@ -4108,6 +4750,10 @@
           "0": "Low",
           "1": "Medium",
           "2": "High"
+        },
+        "test-in-progress": {
+          "0": "No",
+          "1": "Yes"
         }
       },
       "music": {
@@ -4121,6 +4767,27 @@
           "other": "No value received",
           "zero": "Opened",
           "one": "Closed"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No motion",
+          "one": "Motion detected"
+        }
+      },
+      "presence-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No presence",
+          "one": "Presence detected"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "Clear",
+          "one": "Smoke detected"
         }
       },
       "co-sensor": {
@@ -4175,6 +4842,19 @@
           "unknown": "Unknown"
         }
       },
+      "water-valve": {
+        "current-device-status": {
+          "0": "Normal",
+          "1": "Water shortage",
+          "2": "Water leakage",
+          "3": "Water shortage & leakage",
+          "unknown": "{{value}} (unknown)"
+        },
+        "valve-work-state": {
+          "0": "Idle",
+          "1": "Irrigation running"
+        }
+      },
       "electrical-vehicle-state": {
         "door-opened": {
           "0": "Closed",
@@ -4185,10 +4865,35 @@
           "1": "Open"
         }
       },
+      "doorbell": {
+        "ring": {
+          "0": "No ring",
+          "1": "Doorbell rang"
+        }
+      },
       "electrical-vehicle-charge": {
         "plugged": {
           "0": "Unplugged",
           "1": "Plugged"
+        }
+      },
+      "charging-station": {
+        "connector-status": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Available",
+          "1": "Occupied",
+          "2": "Reserved",
+          "3": "Unavailable",
+          "4": "Faulted"
+        },
+        "charging-state": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Charging",
+          "1": "Vehicle connected",
+          "2": "Paused (vehicle)",
+          "3": "Paused (charger)",
+          "4": "Idle",
+          "5": "Discharging"
         }
       },
       "voc-matter-index-sensor": {
@@ -4227,6 +4932,41 @@
           "4": "Returning to Dock",
           "5": "Charging",
           "6": "Docked"
+        },
+        "run-mode": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Idle",
+          "1": "Clean",
+          "2": "Map"
+        },
+        "clean-mode": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Auto",
+          "1": "Quick",
+          "2": "Quiet",
+          "3": "Low Noise",
+          "4": "Deep Clean",
+          "5": "Vacuum",
+          "6": "Mop"
+        }
+      },
+      "water-heater": {
+        "mode": {
+          "0": "Off",
+          "1": "Auto",
+          "2": "Eco",
+          "3": "Boost",
+          "4": "Manual",
+          "5": "Away",
+          "6": "Schedule"
+        },
+        "boost": {
+          "0": "Boost off",
+          "1": "Boost on"
+        },
+        "heating": {
+          "0": "Idle",
+          "1": "Heating"
         }
       }
     }
@@ -4270,7 +5010,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Presence sensor",
-      "push": "Presence"
+      "push": "Presence",
+      "binary": "Presence (binary)"
     },
     "rain-sensor": {
       "shortCategoryName": "Rain sensor",
@@ -4296,9 +5037,37 @@
       "liquid-level-percent": "Liquid level percent",
       "liquid-depth": "Liquid depth"
     },
+    "water-heater": {
+      "shortCategoryName": "Water heater",
+      "binary": "State",
+      "mode": "Mode",
+      "target-temperature": "Hot water setpoint",
+      "remaining-hot-water": "Available hot water",
+      "heating": "Heating",
+      "boost": "Boost"
+    },
+    "water-valve": {
+      "shortCategoryName": "Water valve",
+      "current-device-status": "Water valve status",
+      "flow": "Water flow",
+      "auto-close-when-water-shortage": "Auto close on water shortage",
+      "valve-work-state": "Valve work state",
+      "real-time-irrigation-duration": "Current irrigation duration",
+      "real-time-irrigation-volume": "Current irrigation volume",
+      "daily-irrigation-volume": "Daily irrigation volume"
+    },
     "camera": {
       "shortCategoryName": "Camera",
       "image": "Camera"
+    },
+    "charging-station": {
+      "shortCategoryName": "Charging station",
+      "connector-status": "Connector status",
+      "charging-state": "Charging state"
+    },
+    "doorbell": {
+      "shortCategoryName": "Doorbell",
+      "ring": "Ring"
     },
     "counter-sensor": {
       "shortCategoryName": "Counter",
@@ -4337,7 +5106,8 @@
       "shortCategoryName": "Siren",
       "binary": "Siren",
       "lmh_volume": "Siren volume",
-      "melody": "Melody"
+      "melody": "Melody",
+      "test-in-progress": "Test in progress"
     },
     "cube": {
       "shortCategoryName": "Cube",
@@ -4382,6 +5152,18 @@
       "shortCategoryName": "Formaldehyd sensor",
       "decimal": "Formaldehyd (decimal)"
     },
+    "no2-sensor": {
+      "shortCategoryName": "NO2 sensor",
+      "decimal": "NO2 (decimal)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "O3 sensor",
+      "decimal": "O3 (decimal)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "SO2 sensor",
+      "decimal": "SO2 (decimal)"
+    },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
       "binary": "Vibrate (yes/no)",
@@ -4403,7 +5185,10 @@
       "shortCategoryName": "Air Conditioning",
       "binary": "Switch (On/Off)",
       "mode": "Mode",
-      "target-temperature": "Target temperature"
+      "target-temperature": "Target temperature",
+      "fan-speed": "Fan speed",
+      "swing-horizontal": "Horizontal swing",
+      "swing-vertical": "Vertical swing"
     },
     "electrical-vehicle-battery": {
       "shortCategoryName": "Electric Vehicle - Battery",
@@ -4519,6 +5304,15 @@
       "daily-production-revenue": "Daily Revenue",
       "thirty-minutes-production": "30 Minutes Production",
       "thirty-minutes-production-revenue": "30 Minutes Revenue"
+    },
+    "battery-storage": {
+      "shortCategoryName": "Battery storage",
+      "battery-level": "Battery level",
+      "charge-power": "Charge power",
+      "discharge-power": "Discharge power",
+      "charge-index": "Charge index",
+      "discharge-index": "Discharge index",
+      "battery-energy-remaining": "Battery energy remaining"
     },
     "teleinformation": {
       "shortCategoryName": "Teleinformation",
@@ -4658,7 +5452,9 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Thermostat Temperature"
+      "target-temperature": "Thermostat Temperature",
+      "mode": "Thermostat Mode",
+      "operating-state": "Thermostat Operating State"
     },
     "airquality-sensor": {
       "shortCategoryName": "Air Quality",
@@ -4713,6 +5509,7 @@
       "binary": "State of input"
     },
     "unknown": {
+      "binary": "Binary (on/off)",
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
     },
@@ -4843,6 +5640,7 @@
     "history": "Activity",
     "devices": "Devices",
     "integrations": "Integrations",
+    "integrationsToUpdate": "Integrations to update: {{count}}",
     "calendar": "Calendar",
     "maps": "Maps",
     "scenes": "Scenes",
@@ -4853,12 +5651,20 @@
   },
   "gatewayLinkUser": {
     "title": "Configure Gladys Plus",
-    "label": "Select you Gladys user",
-    "description": "Select the Gladys user you want to link your Gladys Plus account to. This user must be accepted locally on your instance: in your instance settings, \"Gladys Plus\" tab, \"Users\" section.",
-    "noInstanceFound": "Your Gladys instance is not connected to the Gladys Gateway. Did you connect to your Gladys Plus account in your Gladys installation?",
-    "noInstanceFoundHelp": "This can happen if you never connected to your Gladys Plus account in your local instance, or if your 2FA was reset. In both cases, open your local Gladys instance, go to the settings, \"Gladys Plus\" tab, and log in to your account. Need help? Contact us at <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
+    "label": "Select your Gladys user",
+    "description": "Select the Gladys user you want to link your Gladys Plus account to. This user must be authorized locally on your instance: in your instance settings, \"Gladys Plus\" tab, \"Remote users\" section.",
+    "noInstanceFoundTitle": "One last step!",
+    "noInstanceFoundIntro": "Your Gladys Plus account is active 🙂 The only thing left is to connect your Gladys instance (the one installed at your home) to your Gladys Plus account. This is a normal step the first time you use Gladys Plus, nothing is broken! Follow these steps:",
+    "noInstanceFoundStepOpenLocalInstance": "Open your Gladys instance <b>locally</b>, from your home network, using its usual local address (for example <code>http://your-device-ip-address</code>).",
+    "noInstanceFoundStepGoToSettings": "Log in, then go to <b>Settings</b>, \"<b>Gladys Plus</b>\" tab.",
+    "noInstanceFoundStepLogin": "Click on \"<b>I already have an account</b>\", then sign in with your Gladys Plus account (the same email and password as here).",
+    "noInstanceFoundStepAcceptUser": "Still in the \"Gladys Plus\" tab, \"<b>Remote users</b>\" section, <b>authorize your user</b> by turning on the switch next to their name. This local validation guarantees that only the encryption keys you approved at your home can access your instance (protection against man-in-the-middle attacks).",
+    "noInstanceFoundStepComeBack": "Come back to this page, then click on the button below.",
+    "noInstanceFoundRetryButton": "I connected my instance, try again",
+    "noInstanceFoundTutorialLink": "Need a step-by-step guide with screenshots? <a href=\"https://gladysassistant.com/docs/plus/connect-gladys-plus/\" target=\"_blank\" rel=\"noopener noreferrer\">Check out the tutorial in our documentation</a>.",
+    "noInstanceFoundNote": "Already completed this step in the past? It sometimes needs to be done again, for example when your two-factor authentication (2FA) was reset: simply log in again in the \"Gladys Plus\" tab of your instance. Need help? Contact us at <a href=\"mailto:hello@gladysassistant.com\">hello@gladysassistant.com</a>.",
     "error": "An error occurred. Is your user accepted locally in your Gladys instance?",
-    "errorNotAcceptedLocally": "The user was not accepted locally in the Gladys instance. Please accept it in your instance settings.",
+    "errorNotAcceptedLocally": "The user has not been authorized locally in the Gladys instance yet. In your local instance, go to the settings, \"Gladys Plus\" tab, \"Remote users\" section, and turn on the switch next to their name.",
     "saveButton": "Save",
     "manageBillingLink": "Manage my subscription and invoices",
     "logoutButton": "Log out"

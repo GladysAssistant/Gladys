@@ -7,6 +7,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     // Get Zigbee2mqtt service
     const service = await db.Service.findOne({
+      attributes: ['id', 'selector'],
       where: {
         name: 'zigbee2mqtt',
       },

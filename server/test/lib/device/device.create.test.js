@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 const EventEmitter = require('events');
 
 const { DEVICE_POLL_FREQUENCIES, EVENTS } = require('../../../utils/constants');
@@ -1074,5 +1076,187 @@ describe('Device', () => {
 
     expect(updated).to.have.property('name', 'RENAMED_DEVICE');
     expect(updated).to.have.property('selector', 'test-device');
+  });
+  it('should name the rejected feature when a feature is invalid', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+
+    try {
+      await device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Device with invalid feature',
+        external_id: 'device-with-invalid-feature',
+        features: [
+          {
+            name: 'Temperature',
+            external_id: 'device-with-invalid-feature:temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            read_only: true,
+            keep_history: true,
+            has_feedback: false,
+            // min is missing, the integration published an incomplete feature
+            max: 100,
+          },
+        ],
+        params: [],
+      });
+      expect.fail('should have thrown');
+    } catch (error) {
+      expect(error).to.have.property('name', 'SequelizeValidationError');
+      expect(error.gladysContext).to.deep.equal({ type: 'device_feature', name: 'Temperature' });
+    }
+  });
+  it('should fallback on the feature external_id when the rejected feature has no name', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+
+    try {
+      await device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Device with unnamed feature',
+        external_id: 'device-with-unnamed-feature',
+        features: [
+          {
+            external_id: 'device-with-unnamed-feature:temperature',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            read_only: true,
+            keep_history: true,
+            has_feedback: false,
+            min: 0,
+            max: 100,
+          },
+        ],
+        params: [],
+      });
+      expect.fail('should have thrown');
+    } catch (error) {
+      expect(error).to.have.property('name', 'SequelizeValidationError');
+      expect(error.gladysContext).to.deep.equal({
+        type: 'device_feature',
+        name: 'device-with-unnamed-feature:temperature',
+      });
+    }
+  });
+  it('should name the rejected feature when an existing feature is updated with an invalid value', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const feature = {
+      name: 'Temperature',
+      external_id: 'device-with-updated-feature:temperature',
+      category: 'temperature-sensor',
+      type: 'decimal',
+      read_only: true,
+      keep_history: true,
+      has_feedback: false,
+      min: 0,
+      max: 100,
+    };
+    await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Device with updated feature',
+      external_id: 'device-with-updated-feature',
+      features: [feature],
+      params: [],
+    });
+
+    try {
+      // same external_id: the feature is matched, so it goes through the update path
+      await device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Device with updated feature',
+        external_id: 'device-with-updated-feature',
+        features: [{ ...feature, min: 'not-a-number' }],
+        params: [],
+      });
+      expect.fail('should have thrown');
+    } catch (error) {
+      expect(error).to.have.property('name', 'SequelizeValidationError');
+      expect(error.gladysContext).to.deep.equal({ type: 'device_feature', name: 'Temperature' });
+    }
+  });
+  it('should send a null feature name when the rejected feature is fully anonymous', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+
+    try {
+      await device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Device with anonymous feature',
+        external_id: 'device-with-anonymous-feature',
+        features: [
+          {
+            // neither name nor external_id: nothing to name the feature with
+            category: 'temperature-sensor',
+            type: 'decimal',
+            read_only: true,
+            keep_history: true,
+            has_feedback: false,
+            min: 0,
+            max: 100,
+          },
+        ],
+        params: [],
+      });
+      expect.fail('should have thrown');
+    } catch (error) {
+      expect(error).to.have.property('name', 'SequelizeValidationError');
+      expect(error.gladysContext).to.deep.equal({ type: 'device_feature', name: null });
+    }
+  });
+  it('should create devices sharing the same name with distinct selectors', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    // "test-device" and "test-device-2" are already taken by the seeders
+    const firstDevice = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Test device',
+      external_id: 'homonym-device-1',
+    });
+    const secondDevice = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Test device',
+      external_id: 'homonym-device-2',
+    });
+    expect(firstDevice).to.have.property('selector', 'test-device-3');
+    expect(secondDevice).to.have.property('selector', 'test-device-4');
+  });
+  it('should give distinct selectors to features sharing the same name', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const buildFeature = (externalId) => ({
+      name: 'Volume',
+      external_id: externalId,
+      category: 'music',
+      type: 'volume',
+      read_only: false,
+      keep_history: true,
+      has_feedback: false,
+      min: 0,
+      max: 100,
+    });
+    // two features of the same device, then a third one on another device:
+    // the selector is unique across the whole table, not per device
+    const firstDevice = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Speaker one',
+      external_id: 'homonym-features-device-1',
+      features: [buildFeature('homonym-features:1:volume'), buildFeature('homonym-features:2:volume')],
+    });
+    const secondDevice = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Speaker two',
+      external_id: 'homonym-features-device-2',
+      features: [buildFeature('homonym-features:3:volume')],
+    });
+    expect(firstDevice.features.map((feature) => feature.selector)).to.deep.equal(['volume', 'volume-2']);
+    expect(secondDevice.features.map((feature) => feature.selector)).to.deep.equal(['volume-3']);
   });
 });

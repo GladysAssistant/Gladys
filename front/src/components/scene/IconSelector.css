@@ -1,0 +1,92 @@
+/* The row is a flex container with a fixed height, so its columns would
+   stretch to fill it — a lone search result ended up as one tile 20rem tall.
+   Pin the lines to the top instead. */
+.iconContainer {
+  margin-top: 1rem;
+  /* max-height, not height: a search narrowed to two icons should not leave
+     18rem of empty box above the submit button. */
+  max-height: 20rem;
+  overflow-y: auto;
+  align-items: flex-start;
+  align-content: flex-start;
+}
+
+.iconCol {
+  margin-bottom: 0.5rem;
+}
+
+/* Fixed height so every tile — and so every selection outline — is the same
+   size whatever the label wraps to. */
+.iconDiv {
+  height: 5.5rem;
+  padding: 0.5rem 0.25rem;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Dark mode inverts the whole page, so a background tint alone is unreliable
+   here: it lands somewhere between "black hole" and invisible depending on the
+   card colour. The ring carries the selected state instead — invert()
+   + hue-rotate(180deg) round-trips a hue back to itself, so it stays blue in
+   both modes. */
+.iconDivChecked {
+  background-color: #f5f7fb;
+  box-shadow: inset 0 0 0 2px #467fcf;
+}
+
+/* The radio itself is visually hidden, so without this a keyboard user tabbing
+   into the grid gets no cue at all about where they are — the selection ring
+   only appears once an icon is picked. :focus-within rather than
+   :has(:focus-visible) because the latter is unsupported on Safari 13, which
+   the build still targets for old wall tablets: the rule would simply be
+   dropped there, exactly where the indicator matters most. */
+.iconDiv:focus-within {
+  outline: 2px solid #467fcf;
+  outline-offset: -1px;
+}
+
+/* The tile is a fixed height but its content is not — a one-line label is much
+   shorter than a three-line one. Centre it, otherwise short entries hang from
+   the top of the selection outline. */
+.iconLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.iconInput {
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+}
+
+.iconGlyph {
+  display: block;
+  font-size: 1.25rem;
+}
+
+/* Labels are translated, so they vary in length a lot ("Sun" vs "Aktualisieren
+   (gegen Uhrzeigersinn)"). Let them wrap and break rather than widen the tile,
+   and clamp the few that still overflow — the title attribute keeps the full
+   name reachable. */
+.iconName {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  margin-top: 0.35rem;
+  font-size: 0.6875rem;
+  line-height: 1.25;
+  color: #6e7687;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.noResult {
+  padding-top: 1rem;
+  text-align: center;
+}

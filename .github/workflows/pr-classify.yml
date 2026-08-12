@@ -1,0 +1,183 @@
+name: PR Type Classification
+
+# pull_request_target (not pull_request) so that secrets are available for PRs
+# coming from forks. SECURITY: this workflow must NEVER check out or execute
+# code from the PR head. It only reads PR metadata and the diff through the
+# GitHub API, and it does not check out anything at all.
+on:
+  pull_request_target:
+    # "opened" only: no re-classification during the PR lifetime, and a manual
+    # label fix is never overwritten on synchronize.
+    types: [opened]
+  # Manual backfill for existing PRs. Idempotent: PRs that already carry a
+  # type label are always skipped.
+  workflow_dispatch:
+    inputs:
+      pr_numbers:
+        description: >-
+          PR number(s) to classify, one per line. Leave empty to classify all
+          open PRs without a type label.
+        required: false
+        default: ''
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve PR numbers
+        id: prs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_PR: ${{ github.event.pull_request.number }}
+          INPUT_PRS: ${{ inputs.pr_numbers }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request_target" ]; then
+            PRS="$EVENT_PR"
+          elif [ -n "$INPUT_PRS" ]; then
+            PRS="$INPUT_PRS"
+          else
+            PRS=$(gh api --paginate "repos/$GH_REPO/pulls?state=open&per_page=100" --jq '.[].number')
+          fi
+          {
+            echo "numbers<<PRS_EOF"
+            echo "$PRS"
+            echo "PRS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Classify PR type with Scaleway Generative APIs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          SCALEWAY_API_KEY: ${{ secrets.SCALEWAY_API_KEY }}
+          PR_NUMBERS: ${{ steps.prs.outputs.numbers }}
+        run: |
+          set -uo pipefail
+
+          FAILED=0
+          warn() {
+            echo "::warning::PR #$1: $2. No label applied."
+            FAILED=1
+          }
+
+          while IFS= read -r PR; do
+            PR=$(echo "$PR" | tr -d '[:space:]')
+            [ -n "$PR" ] || continue
+            case "$PR" in
+              *[!0-9]*)
+                echo "::warning::Skipping invalid PR number '$PR'."
+                FAILED=1
+                continue
+                ;;
+            esac
+
+            # All PR data is fetched through the GitHub API: no checkout of
+            # the fork, no execution of untrusted code. Title and body are
+            # untrusted input: they only ever transit through shell variables
+            # and jq --arg, never interpolated into code.
+            PR_DATA=$(gh api "repos/$GH_REPO/pulls/$PR") \
+              || { warn "$PR" "could not fetch PR data"; continue; }
+
+            if echo "$PR_DATA" | jq -e '.labels | map(select(.name | startswith("type:"))) | length > 0' > /dev/null; then
+              echo "PR #$PR already has a type label, skipping."
+              continue
+            fi
+
+            # Exact logins only: a user named e.g. "dependabot-fan" must not
+            # be treated as a trusted dependency bot
+            LOGIN=$(echo "$PR_DATA" | jq -r '.user.login // empty')
+            case "$LOGIN" in
+              'dependabot[bot]' | 'renovate[bot]')
+                gh pr edit "$PR" --add-label "type:chore" \
+                  || { warn "$PR" "could not apply type:chore"; continue; }
+                echo "PR #$PR: dependency-bot author, applied type:chore."
+                continue
+                ;;
+            esac
+
+            PR_TITLE=$(echo "$PR_DATA" | jq -r '.title // ""')
+            PR_BODY=$(echo "$PR_DATA" | jq -r '.body // ""')
+            FILES=$(gh api "repos/$GH_REPO/pulls/$PR/files" --paginate --jq '.[].filename') \
+              || { warn "$PR" "could not fetch the list of changed files"; continue; }
+            # The diff endpoint rejects PRs above 300 files (HTTP 406): the
+            # title, description and file list are enough to classify those,
+            # so degrade to an empty diff instead of failing the run.
+            DIFF=$(gh api "repos/$GH_REPO/pulls/$PR" -H "Accept: application/vnd.github.diff") \
+              || { echo "PR #$PR: diff unavailable (probably >300 files), classifying without it"; DIFF=''; }
+            # Bound every free-form field so a huge PR can never overflow the
+            # model context. Truncate in bash: piping into `head -c` would
+            # kill gh with SIGPIPE on large payloads and fail the step under
+            # pipefail
+            [ ${#PR_BODY} -le 5000 ] || PR_BODY="${PR_BODY:0:5000}"$'\n[description truncated]'
+            [ ${#FILES} -le 10000 ] || FILES="${FILES:0:10000}"$'\n[file list truncated]'
+            DIFF=${DIFF:0:20000}
+
+            # Scaleway Generative APIs (serverless, OpenAI-compatible). The
+            # json_schema response format constrains the model output to one
+            # of the three allowed types; defensive parsing below is kept as
+            # backup.
+            REQUEST=$(jq -n \
+              --arg title "$PR_TITLE" \
+              --arg body "$PR_BODY" \
+              --arg files "$FILES" \
+              --arg diff "$DIFF" \
+              '{
+                model: "mistral-small-3.2-24b-instruct-2506",
+                max_tokens: 64,
+                temperature: 0,
+                response_format: {
+                  type: "json_schema",
+                  json_schema: {
+                    name: "pr_type",
+                    schema: {
+                      type: "object",
+                      properties: {type: {type: "string", enum: ["feature", "fix", "chore"]}},
+                      required: ["type"],
+                      additionalProperties: false
+                    }
+                  }
+                },
+                messages: [{
+                  role: "user",
+                  content: ("You are classifying a GitHub pull request of the Gladys Assistant home automation project.\n\nClassify the pull request as exactly one of these three types:\n- \"feature\": a new user-visible feature\n- \"fix\": a bug fix\n- \"chore\": dependencies, CI, refactoring, documentation - anything invisible in the user-facing changelog\n\nAnswer with strict JSON only, without any other text, in this exact format:\n{\"type\": \"feature\" | \"fix\" | \"chore\"}\n\nPR title:\n" + $title + "\n\nPR description:\n" + $body + "\n\nChanged files:\n" + $files + "\n\nDiff (truncated to 20000 characters):\n" + $diff)
+                }]
+              }') || { warn "$PR" "could not build the API request"; continue; }
+
+            RESPONSE=$(curl -sS --fail \
+              --max-time 120 \
+              https://api.scaleway.ai/v1/chat/completions \
+              -H "Authorization: Bearer $SCALEWAY_API_KEY" \
+              -H "content-type: application/json" \
+              -d "$REQUEST") || { warn "$PR" "Scaleway API call failed"; continue; }
+
+            TEXT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // empty')
+            [ -n "$TEXT" ] || { warn "$PR" "empty model response"; continue; }
+
+            # Defensive parsing: strip potential markdown fences before
+            # parsing.
+            CLEANED=$(echo "$TEXT" | sed -e 's/^[[:space:]]*```[a-zA-Z]*//' -e 's/```[[:space:]]*$//')
+            TYPE=$(echo "$CLEANED" | jq -r '.type // empty' 2> /dev/null) \
+              || { warn "$PR" "model response is not valid JSON"; continue; }
+
+            case "$TYPE" in
+              feature | fix | chore) ;;
+              *)
+                warn "$PR" "unexpected type value: '$TYPE'"
+                continue
+                ;;
+            esac
+
+            gh pr edit "$PR" --add-label "type:$TYPE" \
+              || { warn "$PR" "could not apply the label type:$TYPE"; continue; }
+            echo "PR #$PR: applied type:$TYPE"
+
+            # Be gentle with API rate limits during backfills
+            sleep 1
+          done <<< "$PR_NUMBERS"
+
+          exit "$FAILED"

@@ -3,7 +3,7 @@ import { Localizer, Text } from 'preact-i18n';
 import CreatableSelect from 'react-select/creatable';
 import { Component } from 'preact';
 import styles from './style.css';
-import iconList from '../../../../../server/config/icons.json';
+import IconSelector from '../../../components/scene/IconSelector';
 
 class Settings extends Component {
   constructor(props) {
@@ -104,29 +104,7 @@ class Settings extends Component {
                     <label className="form-label">
                       <Text id="editScene.iconLabel" />
                     </label>
-                    <div class={cx('row', styles.iconContainer)}>
-                      {iconList.map(icon => (
-                        <div class="col-2">
-                          <div
-                            class={cx('text-center', styles.iconDiv, {
-                              [styles.iconDivChecked]: props.scene.icon === icon
-                            })}
-                          >
-                            <label className={styles.iconLabel}>
-                              <input
-                                name="icon"
-                                type="radio"
-                                onChange={props.updateSceneIcon}
-                                checked={props.scene.icon === icon}
-                                value={icon}
-                                className={styles.iconInput}
-                              />
-                              <i class={`dark-mode-fe-none-filter fe fe-${icon}`} />
-                            </label>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <IconSelector value={props.scene.icon} onChange={props.updateSceneIcon} darkModeNoFilter />
                   </div>
                 </div>
               </div>

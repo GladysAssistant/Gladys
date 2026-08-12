@@ -1,9 +1,12 @@
 const { expect } = require('chai');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const EventEmitter = require('events');
 
 const MessageHandler = require('../../../../services/telegram/lib');
 const TelegramApiMock = require('../TelegramApiMock.test');
+const { NotFoundError } = require('../../../../utils/coreErrors');
 
 const User = require('../../../../lib/user');
 const Session = require('../../../../lib/session');
@@ -21,6 +24,9 @@ describe('Telegram.message', () => {
     cache: {
       set: fake.returns(null),
       get: fake.returns('0cd30aef-9c4e-4a23-88e3-3547971296e5'),
+    },
+    variable: {
+      destroy: fake.resolves(null),
     },
     event,
   };
@@ -72,5 +78,14 @@ describe('Telegram.message', () => {
       text: 'Hey',
       file: 'abase64fiulessdfdksjfksdljflskjfklsjflksjfldksjlkjfkjklj',
     });
+  });
+  it('should disable the integration', async () => {
+    await messageHandler.disable();
+    // the bot is stopped
+    expect(messageHandler.bot).to.equal(null);
+    // the API key is deleted
+    assert.calledWith(gladys.variable.destroy, 'TELEGRAM_API_KEY', '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4');
+    // users are unlinked from their Telegram account
+    await expect(user.getByTelegramUserId('6072774859')).to.be.rejectedWith(NotFoundError);
   });
 });

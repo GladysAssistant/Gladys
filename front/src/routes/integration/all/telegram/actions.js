@@ -53,6 +53,36 @@ const actions = store => ({
         telegramSaveApiKeyStatus: RequestStatus.Error
       });
     }
+  },
+  showTelegramDisableConfirmation() {
+    store.setState({
+      telegramDisableConfirmation: true,
+      telegramDisableStatus: undefined
+    });
+  },
+  hideTelegramDisableConfirmation() {
+    store.setState({
+      telegramDisableConfirmation: false
+    });
+  },
+  async disableTelegram(state) {
+    store.setState({
+      telegramDisableStatus: RequestStatus.Getting
+    });
+    try {
+      await state.httpClient.post('/api/v1/service/telegram/disable');
+      store.setState({
+        telegramApiKey: '',
+        telegramCustomLink: null,
+        telegramDisableConfirmation: false,
+        telegramSaveApiKeyStatus: undefined,
+        telegramDisableStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      store.setState({
+        telegramDisableStatus: RequestStatus.Error
+      });
+    }
   }
 });
 

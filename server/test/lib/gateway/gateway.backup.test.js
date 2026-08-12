@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
+const path = require('path');
+const { promises: fsPromises } = require('fs');
 const proxyquire = require('proxyquire').noCallThru();
 
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
@@ -87,6 +89,24 @@ describe('gateway.backup', async function describe() {
     assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
     assert.calledOnce(gateway.gladysGatewayClient.uploadOneBackupChunk);
     assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
+  });
+
+  it('should export the DuckDB backup as Parquet compressed with ZSTD', async () => {
+    // Make sure the exported table has at least one row group to inspect
+    await db.duckDbInsertState('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4', 12, new Date());
+
+    await gateway.backup();
+
+    const backupFiles = await fsPromises.readdir(gateway.config.backupsFolder);
+    const parquetFolder = backupFiles.find((file) => file.includes('_parquet_folder'));
+    expect(parquetFolder).to.not.equal(undefined);
+    const parquetMetadata = await db.duckDbReadConnectionAllAsync(
+      'SELECT DISTINCT compression FROM parquet_metadata(?)',
+      path.join(gateway.config.backupsFolder, parquetFolder, '*.parquet'),
+    );
+    const compressions = parquetMetadata.map((row) => row.compression);
+    expect(compressions.length).to.be.greaterThan(0);
+    expect(compressions.every((compression) => compression === 'ZSTD')).to.equal(true);
   });
 
   it('should start and abort backup', async () => {
