@@ -1222,9 +1222,7 @@ async function getAllTools(userId) {
           };
         }
 
-        if (useStringValue) {
-          await this.gladys.device.saveStringState(selectedDevice, selectedFeature, parsedValue);
-        }
+        // device.setValue persists string states of text features itself, nothing more to save
 
         return {
           content: [
