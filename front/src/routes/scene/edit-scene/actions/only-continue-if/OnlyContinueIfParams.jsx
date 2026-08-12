@@ -14,22 +14,22 @@ class OnlyContinueIf extends Component {
   handleConditionChange = (conditionIndex, condition) => {
     const newConditions = update(this.props.action.conditions, {
       [conditionIndex]: {
-        $set: condition,
-      },
+        $set: condition
+      }
     });
     this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
   addCondition = () => {
     const newConditions = update(this.props.action.conditions, {
-      $push: [{}],
+      $push: [{}]
     });
     this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
 
-  deleteCondition = (conditionIndex) => {
+  deleteCondition = conditionIndex => {
     const newConditions = update(this.props.action.conditions, {
-      $splice: [[conditionIndex, 1]],
+      $splice: [[conditionIndex, 1]]
     });
     this.props.updateActionProperty(this.props.path, 'conditions', newConditions);
   };
@@ -43,7 +43,7 @@ class OnlyContinueIf extends Component {
   render(props, {}) {
     const variableOptions = [];
 
-    Object.keys(props.variables).forEach((variablePath) => {
+    Object.keys(props.variables).forEach(variablePath => {
       // If the variable is defined before the current path, we can use it
       if (isVariableAvailableAtThisPath(variablePath, props.path)) {
         const action = get(props.allActions, variablePath);
@@ -52,14 +52,14 @@ class OnlyContinueIf extends Component {
           variableOptions.push({
             label: `${convertPathToText(variablePath, this.props.intl.dictionary)} ${get(
               this,
-              `props.intl.dictionary.editScene.actions.${action.type}`,
+              `props.intl.dictionary.editScene.actions.${action.type}`
             )}`,
-            options: props.variables[variablePath].map((option) => ({
+            options: props.variables[variablePath].map(option => ({
               label: option.label,
               value: `${variablePath}.${option.name}`,
               type: option.type,
-              data: option.data,
-            })),
+              data: option.data
+            }))
           });
         }
       }

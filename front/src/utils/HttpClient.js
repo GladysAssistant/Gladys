@@ -36,8 +36,8 @@ export class HttpClient {
       method: 'post',
       data: {
         refresh_token: this.session.getRefreshToken(),
-        scope: this.apiScopes,
-      },
+        scope: this.apiScopes
+      }
     });
     this.session.setAccessToken(data.access_token);
     // reconnect websocket
@@ -56,7 +56,7 @@ export class HttpClient {
         method,
         params: query,
         data: body,
-        headers: this.getAxiosHeaders(),
+        headers: this.getAxiosHeaders()
       });
       return data;
     } catch (e) {
@@ -124,8 +124,8 @@ export class HttpClient {
         signal,
         headers: {
           ...this.getAxiosHeaders(),
-          'Content-Type': contentType,
-        },
+          'Content-Type': contentType
+        }
       });
       return data;
     } catch (e) {

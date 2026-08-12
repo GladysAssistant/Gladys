@@ -2,7 +2,7 @@ import { connect } from 'unistore/preact';
 import TuyaPage from '../TuyaPage';
 import UpdateDevice from '../../../../../components/device';
 
-const EditTuyaDevice = (props) => (
+const EditTuyaDevice = props => (
   <TuyaPage user={props.user}>
     <UpdateDevice
       {...props}

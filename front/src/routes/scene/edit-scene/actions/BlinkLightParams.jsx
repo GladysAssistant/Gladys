@@ -8,16 +8,16 @@ class BlinkLight extends Component {
     try {
       const lightDevices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'light',
-        device_feature_type: 'binary',
+        device_feature_type: 'binary'
       });
       const switchDevices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'switch',
-        device_feature_type: 'binary',
+        device_feature_type: 'binary'
       });
       const deviceOptions = [...lightDevices, ...switchDevices]
-        .map((device) => ({
+        .map(device => ({
           value: device.selector,
-          label: device.name,
+          label: device.name
         }))
         .sort((d1, d2) => d1.label.localeCompare(d2.label));
       await this.setState({ deviceOptions });
@@ -27,26 +27,26 @@ class BlinkLight extends Component {
       console.error(e);
     }
   };
-  handleChange = (selectedOptions) => {
+  handleChange = selectedOptions => {
     if (selectedOptions) {
-      const devices = selectedOptions.map((selectedOption) => selectedOption.value);
+      const devices = selectedOptions.map(selectedOption => selectedOption.value);
       this.props.updateActionProperty(this.props.path, 'devices', devices);
     } else {
       this.props.updateActionProperty(this.props.path, 'devices', []);
     }
   };
-  handleChangeBlinkingTime = (e) => {
+  handleChangeBlinkingTime = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
     this.props.updateActionProperty(this.props.path, 'blinking_time', newValue);
   };
-  handleChangeBlinkingSpeed = (e) => {
+  handleChangeBlinkingSpeed = e => {
     this.props.updateActionProperty(this.props.path, 'blinking_speed', e.target.value);
   };
-  refreshSelectedOptions = (nextProps) => {
+  refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
     if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach((device) => {
-        const deviceOption = this.state.deviceOptions.find((deviceOption) => deviceOption.value === device);
+      nextProps.action.devices.forEach(device => {
+        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === device);
         if (deviceOption) {
           selectedOptions.push(deviceOption);
         }
@@ -59,7 +59,7 @@ class BlinkLight extends Component {
     super(props);
     this.state = {
       deviceOptions: null,
-      selectedOptions: [],
+      selectedOptions: []
     };
   }
   async componentDidMount() {

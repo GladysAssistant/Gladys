@@ -12,7 +12,7 @@ const GatewayBackupKey = ({ children, ...props }) => (
     </div>
     <div
       class={cx('dimmer', {
-        active: props.gatewaySaveBackupKeyStatus === RequestStatus.Getting,
+        active: props.gatewaySaveBackupKeyStatus === RequestStatus.Getting
       })}
     >
       <div class="loader" />

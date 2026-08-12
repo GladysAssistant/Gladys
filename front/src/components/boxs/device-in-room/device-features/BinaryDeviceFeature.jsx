@@ -38,7 +38,7 @@ const BinaryDeviceType = ({ children, ...props }) => {
           <div class="btn-group" role="group">
             <button
               class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === 0,
+                active: lastValue === 0
               })}
               onClick={updateValue}
               disabled={lastValue === 0}
@@ -51,7 +51,7 @@ const BinaryDeviceType = ({ children, ...props }) => {
             </button>
             <button
               class={cx('btn btn-sm', 'btn-secondary', {
-                active: lastValue === 1,
+                active: lastValue === 1
               })}
               onClick={updateValue}
               disabled={lastValue === 1}

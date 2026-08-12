@@ -26,7 +26,7 @@ export const EXTERNAL_INTEGRATION_STATUS_BADGES = {
   RUNNING: 'badge-success',
   DEGRADED: 'badge-warning',
   STOPPED: 'badge-secondary',
-  ERROR: 'badge-danger',
+  ERROR: 'badge-danger'
 };
 
 // Statuses that need no badge in the integration catalog: they are the
@@ -39,25 +39,25 @@ const EXTERNAL_INTEGRATION_NOMINAL_STATUSES = ['RUNNING', 'ENABLED'];
 // True when a status is worth a badge in the catalog: anything that is not
 // the nominal state (ERROR, DEGRADED, STOPPED, DISABLED, LOADING, UNKNOWN)
 // is what the user wants to spot at a glance among dozens of cards.
-export const isNoteworthyExternalIntegrationStatus = (status) =>
+export const isNoteworthyExternalIntegrationStatus = status =>
   Boolean(status) && !EXTERNAL_INTEGRATION_NOMINAL_STATUSES.includes(status);
 
-export const getGithubRepoUrl = (storeSlug) => (storeSlug ? `https://github.com/${storeSlug}` : null);
+export const getGithubRepoUrl = storeSlug => (storeSlug ? `https://github.com/${storeSlug}` : null);
 
 // Domain of an https URL, displayed next to section links (third-party
 // non-moderated content: the user sees where they click).
-export const getUrlDomain = (url) => (url || '').split('/')[2] || '';
+export const getUrlDomain = url => (url || '').split('/')[2] || '';
 
 // Assigned host ports of the manifest-named declared ports, from the
 // integration detail (containers[].ports[]). Feeds the {{port:<name>}}
 // placeholder resolution below.
-export const getAssignedPortsByName = (integration) => {
+export const getAssignedPortsByName = integration => {
   // null prototype: the allowed port name pattern ([a-z0-9_]) accepts
   // `constructor` and `__proto__`, which on a plain object would either
   // read an inherited value or silently fail to store one
   const portsByName = Object.create(null);
-  ((integration && integration.containers) || []).forEach((container) => {
-    (container.ports || []).forEach((port) => {
+  ((integration && integration.containers) || []).forEach(container => {
+    (container.ports || []).forEach(port => {
       if (port.name && port.host_port !== null && port.host_port !== undefined) {
         portsByName[port.name] = port.host_port;
       }
@@ -85,16 +85,16 @@ export const resolveManifestPlaceholders = (text, portsByName = {}) => {
   // otherwise stringify the inherited Object constructor instead of
   // staying unresolved
   return resolved.replace(/\{\{port:([a-z0-9_]+)\}\}/g, (token, name) =>
-    Object.prototype.hasOwnProperty.call(portsByName, name) ? `${portsByName[name]}` : token,
+    Object.prototype.hasOwnProperty.call(portsByName, name) ? `${portsByName[name]}` : token
   );
 };
 
 // Union of the hardware classes requested by the sub-container declarations
 // of a manifest, in declaration order.
-export const getRequestedHardwareClasses = (containers) => {
+export const getRequestedHardwareClasses = containers => {
   const requestedClasses = [];
-  (containers || []).forEach((container) => {
-    (container.devices || []).forEach((hardwareClass) => {
+  (containers || []).forEach(container => {
+    (container.devices || []).forEach(hardwareClass => {
       if (!requestedClasses.includes(hardwareClass)) {
         requestedClasses.push(hardwareClass);
       }
@@ -105,8 +105,8 @@ export const getRequestedHardwareClasses = (containers) => {
 
 // Effective transport of a device, reported by the integration through the
 // reserved GLADYS_TRANSPORT param (local | cloud | unreachable), or null.
-export const getDeviceTransport = (device) => {
-  const transportParam = ((device && device.params) || []).find((param) => param.name === 'GLADYS_TRANSPORT');
+export const getDeviceTransport = device => {
+  const transportParam = ((device && device.params) || []).find(param => param.name === 'GLADYS_TRANSPORT');
   return transportParam ? transportParam.value : null;
 };
 
@@ -114,15 +114,15 @@ export const getDeviceTransport = (device) => {
 // channel is used" vs "is it the nominal state"): the device works, but
 // not in its nominal mode — e.g. local detected but sessions refused,
 // falling back to cloud. Rendered as an orange dot on the transport badge.
-export const isDeviceTransportDegraded = (device) => {
-  const degradedParam = ((device && device.params) || []).find((param) => param.name === 'GLADYS_TRANSPORT_DEGRADED');
+export const isDeviceTransportDegraded = device => {
+  const degradedParam = ((device && device.params) || []).find(param => param.name === 'GLADYS_TRANSPORT_DEGRADED');
   return degradedParam ? degradedParam.value === 'true' : false;
 };
 
 // The reason of the degraded state (GLADYS_TRANSPORT_MESSAGE, a
 // multi-language object serialized as JSON), localized, or null.
 export const getDeviceTransportMessage = (device, language) => {
-  const messageParam = ((device && device.params) || []).find((param) => param.name === 'GLADYS_TRANSPORT_MESSAGE');
+  const messageParam = ((device && device.params) || []).find(param => param.name === 'GLADYS_TRANSPORT_MESSAGE');
   if (!messageParam) {
     return null;
   }

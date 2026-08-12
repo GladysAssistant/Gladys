@@ -5,19 +5,19 @@ import style from './style.css';
 
 class EmptyChat extends Component {
   state = {
-    gladysPlusConfigured: null,
+    gladysPlusConfigured: null
   };
 
   fetchStatus = async () => {
     try {
       const gatewayStatus = await this.props.httpClient.get('/api/v1/gateway/status');
       this.setState({
-        gladysPlusConfigured: gatewayStatus.configured === true,
+        gladysPlusConfigured: gatewayStatus.configured === true
       });
     } catch (e) {
       console.error(e);
       this.setState({
-        gladysPlusConfigured: false,
+        gladysPlusConfigured: false
       });
     }
   };

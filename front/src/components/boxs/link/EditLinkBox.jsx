@@ -7,15 +7,15 @@ const DEFAULT_ICON = 'link';
 const LINK_ICONS = ['link', 'globe', 'server', 'hard-drive', 'wifi', 'monitor', 'cpu', 'home'];
 
 class EditLinkBox extends Component {
-  updateTitle = (e) => {
+  updateTitle = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { title: e.target.value });
   };
 
-  updateUrl = (e) => {
+  updateUrl = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { url: e.target.value });
   };
 
-  updateIcon = (e) => {
+  updateIcon = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { icon: e.target.value });
   };
 
@@ -57,7 +57,7 @@ class EditLinkBox extends Component {
             <Text id="dashboard.boxes.link.editIconLabel" />
           </label>
           <select value={icon} onChange={this.updateIcon} class="form-control">
-            {LINK_ICONS.map((linkIcon) => (
+            {LINK_ICONS.map(linkIcon => (
               <option value={linkIcon}>
                 <Text id={`dashboard.boxes.link.icons.${linkIcon}`} />
               </option>

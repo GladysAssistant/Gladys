@@ -14,7 +14,7 @@ const NumberDeviceFeature = ({ children, ...props }) => {
           class={`fe fe-${get(
             DeviceFeatureCategoriesIcon,
             `${props.deviceFeature.category}.${props.deviceFeature.type}`,
-            { default: 'hash' },
+            { default: 'hash' }
           )}`}
         />
       </td>

@@ -31,7 +31,7 @@ const intervalByName = {
   'last-week': SEVEN_DAYS_IN_MINUTES,
   'last-month': THIRTY_DAYS_IN_MINUTES,
   'last-three-months': THREE_MONTHS_IN_MINUTES,
-  'last-year': ONE_YEAR_IN_MINUTES,
+  'last-year': ONE_YEAR_IN_MINUTES
 };
 
 const UNITS_WHEN_DOWN_IS_POSITIVE = [
@@ -43,14 +43,14 @@ const UNITS_WHEN_DOWN_IS_POSITIVE = [
   DEVICE_FEATURE_UNITS.PPM,
   DEVICE_FEATURE_UNITS.PPB,
   DEVICE_FEATURE_UNITS.DECIBEL,
-  DEVICE_FEATURE_UNITS.UV_INDEX,
+  DEVICE_FEATURE_UNITS.UV_INDEX
 ];
 
-const notNullNotUndefined = (value) => {
+const notNullNotUndefined = value => {
   return value !== undefined && value !== null;
 };
 
-const average = (arr) => arr.reduce((p, c) => p + c, 0) / arr.length;
+const average = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
 
 const getDeviceValueByAggregateFunction = (value, aggregateFunction) => {
   if (aggregateFunction === 'min') {
@@ -69,7 +69,7 @@ const getDeviceValueByAggregateFunction = (value, aggregateFunction) => {
   return value.value;
 };
 
-const roundWith2DecimalIfNeeded = (value) => {
+const roundWith2DecimalIfNeeded = value => {
   if (!notNullNotUndefined(value)) {
     return null;
   }
@@ -96,7 +96,7 @@ const calculateVariation = (firstValue, lastValue) => {
   return Math.round(((lastValue - firstValue) / Math.abs(firstValue)) * 100);
 };
 
-const allEqual = (arr) => arr.every((val) => val === arr[0]);
+const allEqual = arr => arr.every(val => val === arr[0]);
 
 const getPeriodLabel = (interval, offset, language) => {
   const endDate = dayjs().subtract(offset, 'minute');
@@ -114,13 +114,13 @@ const INTERVAL_LABELS = {
   [SEVEN_DAYS_IN_MINUTES]: 'dashboard.boxes.chart.lastSevenDays',
   [THIRTY_DAYS_IN_MINUTES]: 'dashboard.boxes.chart.lastThirtyDays',
   [THREE_MONTHS_IN_MINUTES]: 'dashboard.boxes.chart.lastThreeMonths',
-  [ONE_YEAR_IN_MINUTES]: 'dashboard.boxes.chart.lastYear',
+  [ONE_YEAR_IN_MINUTES]: 'dashboard.boxes.chart.lastYear'
 };
 
 class Chartbox extends Component {
   dropdownRef = createRef();
 
-  handleClickOutside = (event) => {
+  handleClickOutside = event => {
     if (this.dropdownRef.current && !this.dropdownRef.current.contains(event.target)) {
       this.setState({ dropdown: false });
     }
@@ -128,42 +128,42 @@ class Chartbox extends Component {
 
   toggleDropdown = () => {
     this.setState({
-      dropdown: !this.state.dropdown,
+      dropdown: !this.state.dropdown
     });
   };
-  switchToLastHourView = async (e) => {
+  switchToLastHourView = async e => {
     e.preventDefault();
     await this.setState({
       interval: ONE_HOUR_IN_MINUTES,
       offset: 0,
-      dropdown: false,
+      dropdown: false
     });
     this.getData();
   };
-  switchToLastTwelveHourView = async (e) => {
+  switchToLastTwelveHourView = async e => {
     e.preventDefault();
     await this.setState({
       interval: TWELVE_HOURS_IN_MINUTES,
       offset: 0,
-      dropdown: false,
+      dropdown: false
     });
     this.getData();
   };
-  switchToOneDayView = async (e) => {
+  switchToOneDayView = async e => {
     e.preventDefault();
     await this.setState({
       interval: ONE_DAY_IN_MINUTES,
       offset: 0,
-      dropdown: false,
+      dropdown: false
     });
     this.getData();
   };
-  switchTo7DaysView = async (e) => {
+  switchTo7DaysView = async e => {
     e.preventDefault();
     await this.setState({
       interval: SEVEN_DAYS_IN_MINUTES,
       offset: 0,
-      dropdown: false,
+      dropdown: false
     });
     this.getData();
   };
@@ -171,7 +171,7 @@ class Chartbox extends Component {
     await this.setState({
       interval: THIRTY_DAYS_IN_MINUTES,
       offset: 0,
-      dropdown: false,
+      dropdown: false
     });
     this.getData();
   };
@@ -179,7 +179,7 @@ class Chartbox extends Component {
     await this.setState({
       interval: THREE_MONTHS_IN_MINUTES,
       offset: 0,
-      dropdown: false,
+      dropdown: false
     });
     this.getData();
   };
@@ -187,13 +187,13 @@ class Chartbox extends Component {
     await this.setState({
       interval: ONE_YEAR_IN_MINUTES,
       offset: 0,
-      dropdown: false,
+      dropdown: false
     });
     this.getData();
   };
   navigateToPreviousPeriod = async () => {
-    await this.setState((prevState) => ({
-      offset: prevState.offset + prevState.interval,
+    await this.setState(prevState => ({
+      offset: prevState.offset + prevState.interval
     }));
     this.getData();
   };
@@ -201,8 +201,8 @@ class Chartbox extends Component {
     if (this.state.offset === 0) {
       return;
     }
-    await this.setState((prevState) => ({
-      offset: Math.max(0, prevState.offset - prevState.interval),
+    await this.setState(prevState => ({
+      offset: Math.max(0, prevState.offset - prevState.interval)
     }));
     this.getData();
   };
@@ -239,7 +239,7 @@ class Chartbox extends Component {
     if (deviceFeatures.length === 0) {
       await this.setState({
         emptySeries: true,
-        loading: false,
+        loading: false
       });
       return;
     }
@@ -251,7 +251,7 @@ class Chartbox extends Component {
         interval: this.state.interval,
         max_states: this.props.box.group_by ? undefined : maxStates,
         group_by: this.props.box.group_by,
-        device_features: deviceFeatures.join(','),
+        device_features: deviceFeatures.join(',')
       };
       if (this.state.offset > 0) {
         queryParams.offset = this.state.offset;
@@ -276,11 +276,11 @@ class Chartbox extends Component {
       if (this.props.box.chart_type === 'timeline') {
         const serie0 = {
           name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.off'),
-          data: [],
+          data: []
         };
         const serie1 = {
           name: get(this.props.intl.dictionary, 'dashboard.boxes.chart.on'),
-          data: [],
+          data: []
         };
         // Segments still open at the end of the displayed period are clamped to the end of
         // that period, so browsing a past period doesn't stretch the last bar until now.
@@ -295,7 +295,7 @@ class Chartbox extends Component {
           if (values.length === 0) {
             nbFeaturesDisplayed = nbFeaturesDisplayed - 1;
           } else {
-            values.forEach((value) => {
+            values.forEach(value => {
               emptySeries = false;
               const beginTime = Math.round(new Date(value.created_at).getTime() / 1000) * 1000;
               const endTime = value.end_time
@@ -303,7 +303,7 @@ class Chartbox extends Component {
                 : lastValueTime;
               const newData = {
                 x: deviceFeatureName,
-                y: [beginTime, endTime],
+                y: [beginTime, endTime]
               };
               if (value.value === 0) {
                 serie0.data.push(newData);
@@ -330,7 +330,7 @@ class Chartbox extends Component {
           const name = oneUnitTranslated ? `${deviceFeatureName} (${oneUnitTranslated})` : deviceFeatureName;
           return {
             name,
-            data: values.map((dataPoint) => {
+            data: values.map(dataPoint => {
               emptySeries = false;
               const rawValue = getDeviceValueByAggregateFunction(dataPoint, this.props.box.aggregate_function);
 
@@ -338,7 +338,7 @@ class Chartbox extends Component {
               const { value: displayValue } = checkAndConvertUnit(rawValue, oneUnit, userUnitPreference);
 
               return [Math.round(new Date(dataPoint.created_at).getTime() / 1000) * 1000, displayValue];
-            }),
+            })
           };
         });
       }
@@ -347,7 +347,7 @@ class Chartbox extends Component {
         loading: false,
         initialized: true,
         emptySeries,
-        nbFeaturesDisplayed,
+        nbFeaturesDisplayed
       };
 
       if (data.length > 0 && this.props.box.chart_type !== 'timeline') {
@@ -365,7 +365,7 @@ class Chartbox extends Component {
         if (allUnitsAreSame) {
           const lastValuesArray = [];
           const variationArray = [];
-          data.forEach((oneFeature) => {
+          data.forEach(oneFeature => {
             const { values } = oneFeature;
             if (values.length === 0) {
               return;
@@ -376,7 +376,7 @@ class Chartbox extends Component {
             const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
               firstElement.value,
               unit,
-              userUnitPreference,
+              userUnitPreference
             );
             const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
             firstElement.value = firstElementValue;
@@ -385,7 +385,7 @@ class Chartbox extends Component {
 
             const variation = calculateVariation(
               getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
-              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function),
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
             );
             const lastValue = getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function);
             variationArray.push(variation);
@@ -407,7 +407,7 @@ class Chartbox extends Component {
             const { value: firstElementValue, unit: firstElementUnit } = checkAndConvertUnit(
               firstElement.value,
               unit,
-              userUnitPreference,
+              userUnitPreference
             );
             const { value: lastElementValue } = checkAndConvertUnit(lastElement.value, unit, userUnitPreference);
             firstElement.value = firstElementValue;
@@ -416,11 +416,11 @@ class Chartbox extends Component {
 
             newState.variation = calculateVariation(
               getDeviceValueByAggregateFunction(firstElement, this.props.box.aggregate_function),
-              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function),
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
             );
             newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(unit);
             newState.lastValueRounded = roundWith2DecimalIfNeeded(
-              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function),
+              getDeviceValueByAggregateFunction(lastElement, this.props.box.aggregate_function)
             );
             newState.unit = displayUnit;
           }
@@ -433,11 +433,11 @@ class Chartbox extends Component {
       this.setState({
         loading: false,
         error: errorString,
-        errorDetail: errorDetailString,
+        errorDetail: errorDetailString
       });
     }
   };
-  updateDeviceStateWebsocket = (payload) => {
+  updateDeviceStateWebsocket = payload => {
     if (
       this.state.offset === 0 &&
       this.state.interval === intervalByName['last-hour'] &&
@@ -450,7 +450,7 @@ class Chartbox extends Component {
   updateInterval = async () => {
     await this.setState({
       interval: intervalByName[this.props.box.interval],
-      offset: 0,
+      offset: 0
     });
   };
   constructor(props) {
@@ -462,14 +462,14 @@ class Chartbox extends Component {
       loading: true,
       initialized: false,
       height: 'small',
-      nbFeaturesDisplayed: 0,
+      nbFeaturesDisplayed: 0
     };
   }
   componentDidMount() {
     this.getData();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket,
+      this.updateDeviceStateWebsocket
     );
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
     document.addEventListener('mousedown', this.handleClickOutside);
@@ -490,7 +490,7 @@ class Chartbox extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket,
+      this.updateDeviceStateWebsocket
     );
     this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
     document.removeEventListener('mousedown', this.handleClickOutside);
@@ -511,8 +511,8 @@ class Chartbox extends Component {
       unit,
       nbFeaturesDisplayed,
       error,
-      errorDetail,
-    },
+      errorDetail
+    }
   ) {
     const { box } = this.props;
     const displayVariation = box.display_variation;
@@ -561,12 +561,12 @@ class Chartbox extends Component {
 
                   <div
                     class={cx(style.dropdownMenuChart, {
-                      [style.dropdownMenuOpen]: dropdown,
+                      [style.dropdownMenuOpen]: dropdown
                     })}
                   >
                     <a
                       class={cx(style.dropdownItemChart, {
-                        [style.active]: interval === ONE_HOUR_IN_MINUTES,
+                        [style.active]: interval === ONE_HOUR_IN_MINUTES
                       })}
                       onClick={this.switchToLastHourView}
                     >
@@ -574,7 +574,7 @@ class Chartbox extends Component {
                     </a>
                     <a
                       class={cx(style.dropdownItemChart, {
-                        [style.active]: interval === TWELVE_HOURS_IN_MINUTES,
+                        [style.active]: interval === TWELVE_HOURS_IN_MINUTES
                       })}
                       onClick={this.switchToLastTwelveHourView}
                     >
@@ -582,7 +582,7 @@ class Chartbox extends Component {
                     </a>
                     <a
                       class={cx(style.dropdownItemChart, {
-                        [style.active]: interval === ONE_DAY_IN_MINUTES,
+                        [style.active]: interval === ONE_DAY_IN_MINUTES
                       })}
                       onClick={this.switchToOneDayView}
                     >
@@ -591,7 +591,7 @@ class Chartbox extends Component {
                     {props.box.chart_type !== 'timeline' && (
                       <a
                         className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === SEVEN_DAYS_IN_MINUTES,
+                          [style.active]: interval === SEVEN_DAYS_IN_MINUTES
                         })}
                         onClick={this.switchTo7DaysView}
                       >
@@ -601,7 +601,7 @@ class Chartbox extends Component {
                     {props.box.chart_type !== 'timeline' && (
                       <a
                         className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === THIRTY_DAYS_IN_MINUTES,
+                          [style.active]: interval === THIRTY_DAYS_IN_MINUTES
                         })}
                         onClick={this.switchTo30DaysView}
                       >
@@ -611,7 +611,7 @@ class Chartbox extends Component {
                     {props.box.chart_type !== 'timeline' && (
                       <a
                         className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === THREE_MONTHS_IN_MINUTES,
+                          [style.active]: interval === THREE_MONTHS_IN_MINUTES
                         })}
                         onClick={this.switchTo3monthsView}
                       >
@@ -621,7 +621,7 @@ class Chartbox extends Component {
                     {props.box.chart_type !== 'timeline' && (
                       <a
                         className={cx(style.dropdownItemChart, {
-                          [style.active]: interval === ONE_YEAR_IN_MINUTES,
+                          [style.active]: interval === ONE_YEAR_IN_MINUTES
                         })}
                         onClick={this.switchToYearlyView}
                       >
@@ -660,7 +660,7 @@ class Chartbox extends Component {
                         (variation > 0 && !variationDownIsPositive) || (variation < 0 && variationDownIsPositive),
                       [style.textYellow]: variation === 0,
                       [style.textRed]:
-                        (variation > 0 && variationDownIsPositive) || (variation < 0 && !variationDownIsPositive),
+                        (variation > 0 && variationDownIsPositive) || (variation < 0 && !variationDownIsPositive)
                     })}
                   >
                     {variation !== undefined && (
@@ -746,13 +746,13 @@ class Chartbox extends Component {
 
         <div
           class={cx('dimmer', {
-            active: loading && !initialized,
+            active: loading && !initialized
           })}
         >
           <div class="loader" />
           <div
             class={cx('dimmer-content', {
-              [style.minSizeChartLoading]: loading && !initialized,
+              [style.minSizeChartLoading]: loading && !initialized
             })}
           >
             {!props.box.chart_type && (

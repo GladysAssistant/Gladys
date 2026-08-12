@@ -6,16 +6,16 @@ import ForgotPassword from './ForgotPassword';
 class ForgotPasswordPage extends Component {
   state = {
     email: '',
-    forgotInProgress: false,
+    forgotInProgress: false
   };
 
-  sendResetPasswordLink = (e) => {
+  sendResetPasswordLink = e => {
     e.preventDefault();
     this.setState({ forgotInProgress: true });
     this.props.session.gatewayClient
       .forgotPassword(this.state.email)
       .then(() => this.setState({ success: true, forgotInProgress: false }))
-      .catch((e) => {
+      .catch(e => {
         console.error(e);
         this.setState({ success: true, forgotInProgress: false });
       });

@@ -17,39 +17,39 @@ class DiscoverTab extends Component {
 
   async getHouses() {
     this.setState({
-      housesGetStatus: RequestStatus.Getting,
+      housesGetStatus: RequestStatus.Getting
     });
     try {
       const params = {
-        expand: 'rooms',
+        expand: 'rooms'
       };
       const housesWithRooms = await this.props.httpClient.get(`/api/v1/house`, params);
       this.setState({
         housesWithRooms,
-        housesGetStatus: RequestStatus.Success,
+        housesGetStatus: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        housesGetStatus: RequestStatus.Error,
+        housesGetStatus: RequestStatus.Error
       });
     }
   }
 
   getDiscoveredDevices = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     try {
       const discoveredDevices = await this.props.httpClient.get('/api/v1/service/melcloud/discover');
       this.setState({
         discoveredDevices,
         loading: false,
-        errorLoading: false,
+        errorLoading: false
       });
     } catch (e) {
       this.setState({
         loading: false,
-        errorLoading: true,
+        errorLoading: true
       });
     }
   };
@@ -73,7 +73,7 @@ class DiscoverTab extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />

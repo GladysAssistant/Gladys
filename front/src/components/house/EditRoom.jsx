@@ -5,7 +5,7 @@ class EditRoom extends Component {
     this.props.removeRoom(this.props.index);
   };
 
-  editRoomLocal = (e) => {
+  editRoomLocal = e => {
     e.preventDefault();
 
     this.props.editRoom(this.props.index, 'name', e.target.value);

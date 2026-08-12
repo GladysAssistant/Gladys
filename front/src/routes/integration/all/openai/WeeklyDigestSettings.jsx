@@ -11,7 +11,7 @@ const WEEK_DAYS = [
   { value: '3', labelKey: 'integration.openai.weeklyDigest.dayWednesday' },
   { value: '4', labelKey: 'integration.openai.weeklyDigest.dayThursday' },
   { value: '5', labelKey: 'integration.openai.weeklyDigest.dayFriday' },
-  { value: '6', labelKey: 'integration.openai.weeklyDigest.daySaturday' },
+  { value: '6', labelKey: 'integration.openai.weeklyDigest.daySaturday' }
 ];
 
 class WeeklyDigestSettings extends Component {
@@ -24,7 +24,7 @@ class WeeklyDigestSettings extends Component {
       weeklyDigestDay: '0',
       weeklyDigestHour: '18',
       saving: false,
-      sending: false,
+      sending: false
     };
   }
 
@@ -34,7 +34,7 @@ class WeeklyDigestSettings extends Component {
       const [{ value: enabled }, { value: day }, { value: hour }] = await Promise.all([
         this.props.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_ENABLED}`),
         this.props.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_DAY}`),
-        this.props.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_HOUR}`),
+        this.props.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_HOUR}`)
       ]);
 
       this.setState({
@@ -42,7 +42,7 @@ class WeeklyDigestSettings extends Component {
         loadError: false,
         weeklyDigestEnabled: enabled === '1' || enabled === true || enabled === 'true',
         weeklyDigestDay: day != null ? day : '0',
-        weeklyDigestHour: hour != null ? hour : '18',
+        weeklyDigestHour: hour != null ? hour : '18'
       });
     } catch (e) {
       console.error(e);
@@ -50,7 +50,7 @@ class WeeklyDigestSettings extends Component {
     }
   };
 
-  saveAndReschedule = async (updates) => {
+  saveAndReschedule = async updates => {
     if (!this.state.settingsLoaded || this.state.loadError) {
       return;
     }
@@ -59,14 +59,14 @@ class WeeklyDigestSettings extends Component {
       const state = { ...this.state, ...updates };
       await Promise.all([
         this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_ENABLED}`, {
-          value: state.weeklyDigestEnabled ? '1' : '0',
+          value: state.weeklyDigestEnabled ? '1' : '0'
         }),
         this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_DAY}`, {
-          value: state.weeklyDigestDay,
+          value: state.weeklyDigestDay
         }),
         this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.AI_WEEKLY_DIGEST_HOUR}`, {
-          value: state.weeklyDigestHour,
-        }),
+          value: state.weeklyDigestHour
+        })
       ]);
       await this.props.httpClient.post('/api/v1/gateway/weekly-digest/reschedule');
     } catch (e) {
@@ -77,19 +77,19 @@ class WeeklyDigestSettings extends Component {
 
   updateEnabled = async () => {
     await this.saveAndReschedule({
-      weeklyDigestEnabled: !this.state.weeklyDigestEnabled,
+      weeklyDigestEnabled: !this.state.weeklyDigestEnabled
     });
   };
 
-  updateDay = async (e) => {
+  updateDay = async e => {
     await this.saveAndReschedule({
-      weeklyDigestDay: e.target.value,
+      weeklyDigestDay: e.target.value
     });
   };
 
-  updateHour = async (e) => {
+  updateHour = async e => {
     await this.saveAndReschedule({
-      weeklyDigestHour: e.target.value,
+      weeklyDigestHour: e.target.value
     });
   };
 
@@ -118,7 +118,7 @@ class WeeklyDigestSettings extends Component {
         <h4 class="card-header d-flex flex-row justify-content-between">
           <label
             className={cx('mb-0', {
-              'text-muted': settingsLoaded && !weeklyDigestEnabled,
+              'text-muted': settingsLoaded && !weeklyDigestEnabled
             })}
           >
             <Text id="integration.openai.weeklyDigest.title" />
@@ -153,7 +153,7 @@ class WeeklyDigestSettings extends Component {
           {settingsLoaded && (
             <p
               class={cx('mb-3', {
-                'text-muted': !weeklyDigestEnabled,
+                'text-muted': !weeklyDigestEnabled
               })}
             >
               <Text id="integration.openai.weeklyDigest.description" />
@@ -170,7 +170,7 @@ class WeeklyDigestSettings extends Component {
                 onChange={this.updateDay}
                 disabled={formDisabled || !weeklyDigestEnabled}
               >
-                {WEEK_DAYS.map((day) => (
+                {WEEK_DAYS.map(day => (
                   <option value={day.value}>
                     <Text id={day.labelKey} />
                   </option>

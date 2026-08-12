@@ -7,18 +7,18 @@ import { RequestStatus } from '../../../utils/consts';
 import {
   WEBSOCKET_MESSAGE_TYPES,
   DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_TYPES
 } from '../../../../../server/utils/constants';
 import DeviceCard from './DeviceCard';
 import debounce from 'debounce';
 
 const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
-  return deviceFeatures.map((feature) => {
+  return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
       return {
         ...feature,
         last_value: lastValue,
-        last_value_changed: lastValueChange,
+        last_value_changed: lastValueChange
       };
     }
     return feature;
@@ -26,12 +26,12 @@ const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, 
 };
 
 const updateDeviceFeaturesString = (deviceFeatures, deviceFeatureSelector, lastValueString, lastValueChange) => {
-  return deviceFeatures.map((feature) => {
+  return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
       return {
         ...feature,
         last_value_string: lastValueString,
-        last_value_changed: lastValueChange,
+        last_value_changed: lastValueChange
       };
     }
     return feature;
@@ -43,7 +43,7 @@ class DevicesComponent extends Component {
     super(props);
     this.state = {
       deviceFeatures: [],
-      status: RequestStatus.Getting,
+      status: RequestStatus.Getting
     };
     this.wasDisconnected = false;
   }
@@ -67,16 +67,16 @@ class DevicesComponent extends Component {
     try {
       const deviceFeatureSelectors = this.props.box.device_features;
       const devices = await this.props.httpClient.get(`/api/v1/device`, {
-        device_feature_selectors: deviceFeatureSelectors.join(','),
+        device_feature_selectors: deviceFeatureSelectors.join(',')
       });
       const deviceFeaturesFlat = [];
-      devices.forEach((device) => {
-        device.features.forEach((feature) => {
+      devices.forEach(device => {
+        device.features.forEach(feature => {
           deviceFeaturesFlat.push({ ...feature, device });
         });
       });
       const deviceFeaturesSorted = deviceFeaturesFlat.sort(
-        (a, b) => deviceFeatureSelectors.indexOf(a.selector) - deviceFeatureSelectors.indexOf(b.selector),
+        (a, b) => deviceFeatureSelectors.indexOf(a.selector) - deviceFeatureSelectors.indexOf(b.selector)
       );
       const deviceFeaturesNewNames = this.props.box.device_feature_names;
       if (deviceFeaturesNewNames) {
@@ -86,54 +86,54 @@ class DevicesComponent extends Component {
       }
       this.setState({
         deviceFeatures: deviceFeaturesSorted,
-        status: RequestStatus.Success,
+        status: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        status: RequestStatus.Error,
+        status: RequestStatus.Error
       });
     }
   };
 
-  updateDeviceStateWebsocket = (payload) => {
+  updateDeviceStateWebsocket = payload => {
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {
       deviceFeatures = updateDeviceFeatures(
         deviceFeatures,
         payload.device_feature_selector,
         payload.last_value,
-        payload.last_value_changed,
+        payload.last_value_changed
       );
       this.setState({
-        deviceFeatures,
+        deviceFeatures
       });
     }
   };
-  updateDeviceTextWebsocket = (payload) => {
+  updateDeviceTextWebsocket = payload => {
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {
       deviceFeatures = updateDeviceFeaturesString(
         deviceFeatures,
         payload.device_feature,
         payload.last_value_string,
-        payload.last_value_changed,
+        payload.last_value_changed
       );
       this.setState({
-        deviceFeatures,
+        deviceFeatures
       });
     }
   };
 
   setValueDevice = async (deviceFeature, value) => {
     await this.props.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
-      value,
+      value
     });
   };
 
   changeAllLightsStatusRoom = async () => {
     const newValue = this.getLightStatus() === 0 ? 1 : 0;
     // Foreach device features
-    await Promise.map(this.state.deviceFeatures, async (feature) => {
+    await Promise.map(this.state.deviceFeatures, async feature => {
       const isLightBinary =
         feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT && feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY;
       // if device feature is a light, we control it
@@ -146,7 +146,7 @@ class DevicesComponent extends Component {
   updateValue = async (deviceFeature, value) => {
     const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
     await this.setState({
-      deviceFeatures,
+      deviceFeatures
     });
     try {
       await this.setValueDevice(deviceFeature, value);
@@ -160,14 +160,14 @@ class DevicesComponent extends Component {
   updateValueWithDebounce = async (deviceFeature, value) => {
     const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
     this.setState({
-      deviceFeatures,
+      deviceFeatures
     });
     await this.setValueDeviceDebounce(deviceFeature, value);
   };
 
   getLightStatus = () => {
     let roomLightStatus = 0;
-    this.state.deviceFeatures.forEach((feature) => {
+    this.state.deviceFeatures.forEach(feature => {
       // if it's a light
       const isLight =
         feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
@@ -186,11 +186,11 @@ class DevicesComponent extends Component {
     this.refreshData();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket,
+      this.updateDeviceStateWebsocket
     );
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
-      this.updateDeviceTextWebsocket,
+      this.updateDeviceTextWebsocket
     );
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
@@ -205,11 +205,11 @@ class DevicesComponent extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket,
+      this.updateDeviceStateWebsocket
     );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
-      this.updateDeviceTextWebsocket,
+      this.updateDeviceTextWebsocket
     );
     this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }

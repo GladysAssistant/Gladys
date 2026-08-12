@@ -17,28 +17,28 @@ class EditHouseComponent extends Component {
     }
     return errors;
   };
-  updateNewRoomName = (e) => {
+  updateNewRoomName = e => {
     this.setState({
-      newRoomName: e.target.value,
+      newRoomName: e.target.value
     });
   };
-  updateHouseName = (e) => {
+  updateHouseName = e => {
     this.props.updateHouseName(e.target.value, this.props.houseIndex);
   };
-  updateHouseAlarmCode = (e) => {
+  updateHouseAlarmCode = e => {
     const alarmCode = e.target.value && e.target.value.length ? e.target.value : null;
     this.props.updateHouseAlarmCode(alarmCode, this.props.houseIndex);
   };
-  updateHouseDelayBeforeArming = (e) => {
+  updateHouseDelayBeforeArming = e => {
     this.props.updateHouseDelayBeforeArming(e.target.value, this.props.houseIndex);
   };
   addRoom = () => {
     this.props.addRoom(this.state.newRoomName, this.props.houseIndex);
     this.setState({
-      newRoomName: '',
+      newRoomName: ''
     });
   };
-  removeRoom = (roomIndex) => {
+  removeRoom = roomIndex => {
     this.props.removeRoom(this.props.houseIndex, roomIndex);
   };
   editRoom = (roomIndex, property, value) => {
@@ -46,40 +46,40 @@ class EditHouseComponent extends Component {
   };
   saveHouse = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     await this.props.saveHouse(this.props.houseIndex);
     this.setState({
-      loading: false,
+      loading: false
     });
   };
   deleteHouse = () => {
     this.setState({
-      wantToDeleteHouse: true,
+      wantToDeleteHouse: true
     });
   };
   confirmDeleteHouse = async () => {
     this.setState({
       wantToDeleteHouse: false,
-      loading: true,
+      loading: true
     });
     await this.props.deleteHouse(this.props.houseIndex);
     this.setState({
-      loading: false,
+      loading: false
     });
   };
   cancelDeleteHouse = () => {
     this.setState({
-      wantToDeleteHouse: false,
+      wantToDeleteHouse: false
     });
   };
-  onKeyPressRoomInput = (e) => {
+  onKeyPressRoomInput = e => {
     if (e.keyCode === 13) {
       this.addRoom();
     }
   };
   toggleAlarmCodePassword = () => {
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return { ...prevState, showAlarmCode: !this.state.showAlarmCode };
     });
   };
@@ -88,7 +88,7 @@ class EditHouseComponent extends Component {
     this.props = props;
     this.state = {
       newRoomName: '',
-      showAlarmCode: false,
+      showAlarmCode: false
     };
   }
 

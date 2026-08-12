@@ -75,7 +75,7 @@ class SetupTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: props.connectMqttStatus === RequestStatus.Getting,
+              active: props.connectMqttStatus === RequestStatus.Getting
             })}
           >
             <div class="loader" />

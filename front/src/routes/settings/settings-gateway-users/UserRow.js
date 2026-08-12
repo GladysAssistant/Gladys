@@ -2,7 +2,7 @@ import { Text } from 'preact-i18n';
 const dateDisplayOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 
 const UserRow = ({ children, ...props }) => {
-  let revokeUser = (e) => {
+  let revokeUser = e => {
     e.preventDefault();
     props.revokeUser(props.user, props.index);
   };

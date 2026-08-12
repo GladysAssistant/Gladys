@@ -6,14 +6,14 @@ import TextWithVariablesInjected from '../../../../components/scene/TextWithVari
 
 const helpTextStyle = {
   fontSize: 12,
-  marginBottom: '.375rem',
+  marginBottom: '.375rem'
 };
 
 class SendMqttMessage extends Component {
-  handleChangeTopic = (e) => {
+  handleChangeTopic = e => {
     this.props.updateActionProperty(this.props.path, 'topic', e.target.value);
   };
-  handleChangeMessage = (text) => {
+  handleChangeMessage = text => {
     const newMessage = text && text.length > 0 ? text : undefined;
     this.props.updateActionProperty(this.props.path, 'message', newMessage);
   };

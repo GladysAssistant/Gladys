@@ -23,7 +23,7 @@ class MqttExternalCredentials extends Component {
     }
   };
 
-  copyValue = async (value) => {
+  copyValue = async value => {
     if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(value);
       this.setState({ copiedField: value });
@@ -65,7 +65,7 @@ class MqttExternalCredentials extends Component {
                 <i
                   class={cx('fe', {
                     'fe-eye': !showPassword,
-                    'fe-eye-off': showPassword,
+                    'fe-eye-off': showPassword
                   })}
                 />
               </button>
@@ -133,18 +133,18 @@ class MqttExternalCredentials extends Component {
                 {this.renderCredentialRow(
                   'integration.mqtt.setup.urlLabel',
                   brokerUrl,
-                  'z2m-setup-local-mqtt-url-summary',
+                  'z2m-setup-local-mqtt-url-summary'
                 )}
                 {this.renderCredentialRow(
                   'integration.mqtt.setup.userLabel',
                   username,
-                  'z2m-setup-local-mqtt-username-summary',
+                  'z2m-setup-local-mqtt-username-summary'
                 )}
                 {this.renderCredentialRow(
                   'integration.mqtt.setup.passwordLabel',
                   mqttPassword,
                   'z2m-setup-local-mqtt-password-summary',
-                  { secret: true, showPassword },
+                  { secret: true, showPassword }
                 )}
               </tbody>
             </table>

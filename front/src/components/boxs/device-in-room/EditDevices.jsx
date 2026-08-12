@@ -9,28 +9,28 @@ import { DeviceListWithDragAndDrop } from '../../drag-and-drop/DeviceListWithDra
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 class EditDevices extends Component {
-  addDeviceFeature = async (selectedDeviceFeatureOption) => {
+  addDeviceFeature = async selectedDeviceFeatureOption => {
     const newSelectedDeviceFeaturesOptions = [...this.state.selectedDeviceFeaturesOptions, selectedDeviceFeatureOption];
     await this.setState({ selectedDeviceFeaturesOptions: newSelectedDeviceFeaturesOptions });
     this.refreshDeviceFeaturesNames();
   };
 
-  updateName = (e) => {
+  updateName = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      name: e.target.value,
+      name: e.target.value
     });
   };
 
   refreshDeviceFeaturesNames = () => {
-    const newDeviceFeatureNames = this.state.selectedDeviceFeaturesOptions.map((o) => {
+    const newDeviceFeatureNames = this.state.selectedDeviceFeaturesOptions.map(o => {
       return o.new_label !== undefined && o.new_label !== '' ? o.new_label : o.label;
     });
-    const newDeviceFeature = this.state.selectedDeviceFeaturesOptions.map((o) => {
+    const newDeviceFeature = this.state.selectedDeviceFeaturesOptions.map(o => {
       return o.value;
     });
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       device_feature_names: newDeviceFeatureNames,
-      device_features: newDeviceFeature,
+      device_features: newDeviceFeature
     });
   };
 
@@ -45,7 +45,7 @@ class EditDevices extends Component {
       return;
     }
     const { deviceOptions, selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(
-      this.state.devices,
+      this.state.devices
     );
     await this.setState({ deviceOptions, selectedDeviceFeaturesOptions });
   };
@@ -55,10 +55,10 @@ class EditDevices extends Component {
       selectedDeviceFeaturesOptions: {
         [index]: {
           new_label: {
-            $set: name,
-          },
-        },
-      },
+            $set: name
+          }
+        }
+      }
     });
     await this.setState(newState);
 
@@ -67,16 +67,16 @@ class EditDevices extends Component {
     }
   };
 
-  getSelectedDeviceFeaturesAndOptions = (devices) => {
+  getSelectedDeviceFeaturesAndOptions = devices => {
     const deviceOptions = [];
     let selectedDeviceFeaturesOptions = [];
 
-    devices.forEach((device) => {
+    devices.forEach(device => {
       const deviceFeatures = [];
-      device.features.forEach((feature) => {
+      device.features.forEach(feature => {
         const featureOption = {
           value: feature.selector,
-          label: getDeviceFeatureName(this.props.intl.dictionary, device, feature),
+          label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
         };
         deviceFeatures.push(featureOption);
         // If the feature is already selected
@@ -103,19 +103,19 @@ class EditDevices extends Component {
           return 0;
         });
         const filteredDeviceFeatures = deviceFeatures.filter(
-          (feature) => !selectedDeviceFeaturesOptions.some((selected) => selected.value === feature.value),
+          feature => !selectedDeviceFeaturesOptions.some(selected => selected.value === feature.value)
         );
         if (filteredDeviceFeatures.length > 0) {
           deviceOptions.push({
             label: device.name,
-            options: filteredDeviceFeatures,
+            options: filteredDeviceFeatures
           });
         }
       }
     });
     if (this.props.box.device_features) {
       selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions.sort(
-        (a, b) => this.props.box.device_features.indexOf(a.value) - this.props.box.device_features.indexOf(b.value),
+        (a, b) => this.props.box.device_features.indexOf(a.value) - this.props.box.device_features.indexOf(b.value)
       );
     }
     return { deviceOptions, selectedDeviceFeaturesOptions };
@@ -140,23 +140,23 @@ class EditDevices extends Component {
 
     const newStateWithoutElement = update(this.state, {
       selectedDeviceFeaturesOptions: {
-        $splice: [[currentIndex, 1]],
-      },
+        $splice: [[currentIndex, 1]]
+      }
     });
     const newState = update(newStateWithoutElement, {
       selectedDeviceFeaturesOptions: {
-        $splice: [[newIndex, 0, element]],
-      },
+        $splice: [[newIndex, 0, element]]
+      }
     });
     await this.setState(newState);
     this.refreshDeviceFeaturesNames();
   };
 
-  removeDevice = async (index) => {
+  removeDevice = async index => {
     const newStateWithoutElement = update(this.state, {
       selectedDeviceFeaturesOptions: {
-        $splice: [[index, 1]],
-      },
+        $splice: [[index, 1]]
+      }
     });
     await this.setState(newStateWithoutElement);
     this.refreshDeviceFeaturesNames();

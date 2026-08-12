@@ -5,17 +5,17 @@ function createActions(store) {
   const actions = {
     async getDevicesByRoom(state) {
       store.setState({
-        DeviceGetStatus: DeviceGetByRoomStatus.Getting,
+        DeviceGetStatus: DeviceGetByRoomStatus.Getting
       });
       try {
         const rooms = await state.httpClient.get('/api/v1/room', { expand: 'devices' });
         store.setState({
           rooms,
-          DeviceGetStatus: DeviceGetByRoomStatus.Success,
+          DeviceGetStatus: DeviceGetByRoomStatus.Success
         });
       } catch (e) {
         store.setState({
-          DeviceGetStatus: DeviceGetByRoomStatus.Error,
+          DeviceGetStatus: DeviceGetByRoomStatus.Error
         });
       }
     },
@@ -25,23 +25,23 @@ function createActions(store) {
         rooms: {
           [roomIndex]: {
             collapsed: {
-              $set: !state.rooms[roomIndex].collapsed,
-            },
-          },
-        },
+              $set: !state.rooms[roomIndex].collapsed
+            }
+          }
+        }
       });
       store.setState(newState);
     },
     async setValue(state, deviceFeatureSelector, value) {
       await state.httpClient.post(`/api/v1/device_feature/${deviceFeatureSelector}/value`, {
-        value,
+        value
       });
     },
     async updateValue(state, device, deviceFeature, roomIndex, deviceIndex, deviceFeatureIndex, value) {
       actions.updateLocalValue(state, roomIndex, deviceIndex, deviceFeatureIndex, value);
       if (deviceFeature.category === 'light' && deviceFeature.type === 'binary') {
         await state.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
-          value,
+          value
         });
       }
     },
@@ -55,18 +55,18 @@ function createActions(store) {
                 features: {
                   [deviceFeatureIndex]: {
                     last_value: {
-                      $set: value,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+                      $set: value
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       });
 
       store.setState(newState);
-    },
+    }
   };
   return actions;
 }

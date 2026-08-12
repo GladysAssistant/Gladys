@@ -38,11 +38,11 @@ class SetupTab extends Component {
     let error = false;
 
     this.setState({
-      matterbridgeStatus: RequestStatus.Getting,
+      matterbridgeStatus: RequestStatus.Getting
     });
 
     await this.props.httpClient.post('/api/v1/service/matterbridge/variable/MATTERBRIDGE_ENABLED', {
-      value: true,
+      value: true
     });
 
     try {
@@ -53,11 +53,11 @@ class SetupTab extends Component {
 
     if (error) {
       this.setState({
-        matterbridgeStatus: RequestStatus.Error,
+        matterbridgeStatus: RequestStatus.Error
       });
     } else {
       this.setState({
-        matterbridgeStatus: RequestStatus.Success,
+        matterbridgeStatus: RequestStatus.Success
       });
     }
     await this.checkStatus();
@@ -65,7 +65,7 @@ class SetupTab extends Component {
 
   stopContainer = async () => {
     await this.props.httpClient.post('/api/v1/service/matterbridge/variable/MATTERBRIDGE_ENABLED', {
-      value: false,
+      value: false
     });
 
     let error = false;
@@ -77,11 +77,11 @@ class SetupTab extends Component {
 
     if (error) {
       this.setState({
-        matterbridgeStatus: RequestStatus.Error,
+        matterbridgeStatus: RequestStatus.Error
       });
     } else {
       this.setState({
-        matterbridgeStatus: RequestStatus.Success,
+        matterbridgeStatus: RequestStatus.Success
       });
     }
     this.setState({ showConfirmDelete: false });
@@ -94,7 +94,7 @@ class SetupTab extends Component {
       matterbridgeRunning: false,
       matterbridgeEnabled: false,
       dockerBased: false,
-      networkModeValid: false,
+      networkModeValid: false
     };
     try {
       matterbridgeStatus = await this.props.httpClient.get('/api/v1/service/matterbridge/status');
@@ -105,7 +105,7 @@ class SetupTab extends Component {
       if (isGladysPlus === false && matterbridgeStatus.matterbridgeRunning) {
         try {
           const matterbridgePortVariable = await this.props.httpClient.get(
-            '/api/v1/service/matterbridge/variable/MATTERBRIDGE_PORT',
+            '/api/v1/service/matterbridge/variable/MATTERBRIDGE_PORT'
           );
           const url = new URL(config.localApiUrl);
           matterbridgeUrl = `${url.protocol}//${url.hostname}:${matterbridgePortVariable.value}`;
@@ -120,7 +120,7 @@ class SetupTab extends Component {
         matterbridgeEnabled: matterbridgeStatus.matterbridgeEnabled,
         dockerBased: matterbridgeStatus.dockerBased,
         networkModeValid: matterbridgeStatus.networkModeValid,
-        matterbridgeUrl,
+        matterbridgeUrl
       });
     }
   };
@@ -143,8 +143,8 @@ class SetupTab extends Component {
       matterbridgeRunning,
       matterbridgeUrl,
       matterbridgeStatus,
-      showConfirmDelete,
-    },
+      showConfirmDelete
+    }
   ) {
     return (
       <div class="card">
@@ -174,7 +174,7 @@ class SetupTab extends Component {
                   <MarkupText
                     id={`integration.matterbridge.setup.urlLabel`}
                     fields={{
-                      matterbridgeUrl,
+                      matterbridgeUrl
                     }}
                   />
                 </label>
@@ -259,7 +259,7 @@ class SetupTab extends Component {
                                 'fe-check': matterbridgeRunning,
                                 'fe-x': !matterbridgeRunning,
                                 greenIcon: matterbridgeRunning,
-                                redIcon: !matterbridgeRunning,
+                                redIcon: !matterbridgeRunning
                               })}
                             />
                             <hr className={style.line} />

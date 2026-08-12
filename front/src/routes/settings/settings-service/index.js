@@ -7,12 +7,12 @@ class SettingsServices extends Component {
   getServices = async (podId = null) => {
     try {
       const query = {
-        pod_id: podId,
+        pod_id: podId
       };
       const services = await this.props.httpClient.get(`/api/v1/service`, query);
       services.sort((s1, s2) => s1.name.localeCompare(s2.name));
       this.setState({
-        services,
+        services
       });
     } catch (e) {
       console.error(e);
@@ -20,17 +20,17 @@ class SettingsServices extends Component {
   };
   actionOnService = async (serviceName, action, podId = null) => {
     const query = {
-      pod_id: podId,
+      pod_id: podId
     };
     const service = await this.props.httpClient.post(`/api/v1/service/${serviceName}/${action}`, query);
 
-    const serviceIndex = this.state.services.findIndex((s) => s.selector === service.selector);
+    const serviceIndex = this.state.services.findIndex(s => s.selector === service.selector);
     const services = update(this.state.services, {
-      $splice: [[serviceIndex, 1, service]],
+      $splice: [[serviceIndex, 1, service]]
     });
 
     this.setState({
-      services,
+      services
     });
   };
   startService = async (serviceName, podId = null) => {

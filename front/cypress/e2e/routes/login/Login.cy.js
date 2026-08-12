@@ -11,8 +11,12 @@ describe('Login', () => {
 
     cy.get('input[type=email]').type('mon-adresse@email.com');
 
-    cy.contains('button', 'login.loginButtonText').should('not.be.disabled').click();
+    cy.contains('button', 'login.loginButtonText')
+      .should('not.be.disabled')
+      .click();
 
-    cy.get('.alert.alert-danger').should('be.visible').i18n('login.wrongCredentials');
+    cy.get('.alert.alert-danger')
+      .should('be.visible')
+      .i18n('login.wrongCredentials');
   });
 });

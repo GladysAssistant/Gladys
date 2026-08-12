@@ -5,15 +5,15 @@ import BaseEditBox from '../baseEditBox';
 import actions from '../../../actions/dashboard/boxActions';
 
 class EditAlarm extends Component {
-  updateBoxHouse = (e) => {
+  updateBoxHouse = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      house: e.target.value,
+      house: e.target.value
     });
   };
 
-  updateBoxName = (e) => {
+  updateBoxName = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      name: e.target.value,
+      name: e.target.value
     });
   };
 
@@ -21,18 +21,18 @@ class EditAlarm extends Component {
     try {
       await this.setState({
         error: false,
-        pending: true,
+        pending: true
       });
       const houses = await this.props.httpClient.get('/api/v1/house');
       this.setState({
         houses,
-        pending: false,
+        pending: false
       });
     } catch (e) {
       console.error(e);
       this.setState({
         error: true,
-        pending: false,
+        pending: false
       });
     }
   };
@@ -67,7 +67,7 @@ class EditAlarm extends Component {
               <Text id="global.emptySelectOption" />
             </option>
             {houses &&
-              houses.map((house) => (
+              houses.map(house => (
                 <option selected={house.selector === props.box.house} value={house.selector}>
                   {house.name}
                 </option>

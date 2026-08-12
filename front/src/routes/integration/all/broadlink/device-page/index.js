@@ -22,5 +22,5 @@ class BroadlinkDevicePage extends Component {
 
 export default connect(
   'session,user,broadlinkDevices,getBroadlinkDevicesStatus,getBroadlinkDeviceOrderDir,broadlinkDeviceSearch,housesWithRooms',
-  actions,
+  actions
 )(BroadlinkDevicePage);

@@ -9,7 +9,7 @@ class ConfigureTwoFactorPage extends Component {
     dataUrl: null,
     twoFactorCode: '',
     step: 1,
-    errored: false,
+    errored: false
   };
 
   getOtpAuthUrl = async () => {
@@ -35,7 +35,7 @@ class ConfigureTwoFactorPage extends Component {
     }
   };
 
-  updateTwoFactorCode = (event) => {
+  updateTwoFactorCode = event => {
     let newValue = event.target.value;
 
     // we add a space between the two group of 3 digits code
@@ -50,7 +50,7 @@ class ConfigureTwoFactorPage extends Component {
     this.setState({ twoFactorCode: newValue });
   };
 
-  enableTwoFactor = async (event) => {
+  enableTwoFactor = async event => {
     event.preventDefault();
     const accessToken = this.props.session.getTwoFactorAccessToken();
 

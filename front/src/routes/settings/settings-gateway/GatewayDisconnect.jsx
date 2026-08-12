@@ -11,7 +11,7 @@ const GatewayUsersList = ({ children, ...props }) => (
     </div>
     <div
       class={cx('dimmer', {
-        active: props.gatewayDisconnectStatus === RequestStatus.Getting,
+        active: props.gatewayDisconnectStatus === RequestStatus.Getting
       })}
     >
       <div class="loader" />

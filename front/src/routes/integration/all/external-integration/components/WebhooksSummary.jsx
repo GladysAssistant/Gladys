@@ -19,7 +19,7 @@ const WebhooksSummary = ({ webhooks, language }) => {
         <Text id="integration.externalIntegration.install.webhooksText" />
       </p>
       <ul class="mb-0">
-        {webhooks.map((webhook) => (
+        {webhooks.map(webhook => (
           <li>{getLocalizedText(webhook.label, language) || webhook.key}</li>
         ))}
       </ul>

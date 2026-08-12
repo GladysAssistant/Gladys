@@ -10,14 +10,14 @@ class SettingsBilling extends Component {
     const setupState = await this.props.session.gatewayClient.getSetupState();
     this.setState({
       setupState,
-      loading: false,
+      loading: false
     });
   };
   getCurrentPlan = async () => {
     try {
       const { plan } = await this.props.session.gatewayClient.getCurrentPlan();
       this.setState({
-        plan,
+        plan
       });
     } catch (e) {
       console.error(e);
@@ -25,7 +25,7 @@ class SettingsBilling extends Component {
   };
   openStripeBilling = async () => {
     window.open(
-      `${this.props.session.gladysGatewayApiUrl}/accounts/stripe_customer_portal/${this.state.setupState.stripe_portal_key}`,
+      `${this.props.session.gladysGatewayApiUrl}/accounts/stripe_customer_portal/${this.state.setupState.stripe_portal_key}`
     );
   };
 

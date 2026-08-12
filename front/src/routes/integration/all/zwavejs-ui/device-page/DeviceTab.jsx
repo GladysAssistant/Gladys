@@ -11,25 +11,25 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 
 class DeviceTab extends Component {
-  search = async (e) => {
+  search = async e => {
     await this.setState({
-      search: e.target.value,
+      search: e.target.value
     });
     this.getZwaveJSUIDevices();
   };
-  changeOrderDir = async (e) => {
+  changeOrderDir = async e => {
     await this.setState({
-      orderDir: e.target.value,
+      orderDir: e.target.value
     });
     this.getZwaveJSUIDevices();
   };
   getZwaveJSUIDevices = async () => {
     this.setState({
-      getZwaveJSUIStatus: RequestStatus.Getting,
+      getZwaveJSUIStatus: RequestStatus.Getting
     });
     try {
       const options = {
-        order_dir: this.state.orderDir || 'asc',
+        order_dir: this.state.orderDir || 'asc'
       };
       if (this.state.search && this.state.search.length) {
         options.search = this.state.search;
@@ -38,11 +38,11 @@ class DeviceTab extends Component {
       const zwaveJSUIDevices = await this.props.httpClient.get('/api/v1/service/zwavejs-ui/device', options);
       this.setState({
         zwaveJSUIDevices,
-        getZwaveJSUIStatus: RequestStatus.Success,
+        getZwaveJSUIStatus: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        getZwaveJSUIStatus: e.message,
+        getZwaveJSUIStatus: e.message
       });
     }
   };
@@ -58,20 +58,20 @@ class DeviceTab extends Component {
 
   async getHouses() {
     this.setState({
-      housesGetStatus: RequestStatus.Getting,
+      housesGetStatus: RequestStatus.Getting
     });
     try {
       const params = {
-        expand: 'rooms',
+        expand: 'rooms'
       };
       const housesWithRooms = await this.props.httpClient.get(`/api/v1/house`, params);
       this.setState({
         housesWithRooms,
-        housesGetStatus: RequestStatus.Success,
+        housesGetStatus: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        housesGetStatus: RequestStatus.Error,
+        housesGetStatus: RequestStatus.Error
       });
     }
   }
@@ -98,7 +98,7 @@ class DeviceTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: getZwaveJSUIStatus === RequestStatus.Getting,
+              active: getZwaveJSUIStatus === RequestStatus.Getting
             })}
           >
             <div class="loader" />

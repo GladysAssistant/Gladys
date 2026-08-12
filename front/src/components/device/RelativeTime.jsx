@@ -16,7 +16,7 @@ class RelativeTime extends Component {
       }
 
       this.setState({
-        relativeTime: relativeTime.locale(language).fromNow(),
+        relativeTime: relativeTime.locale(language).fromNow()
       });
     }
   };
@@ -25,7 +25,7 @@ class RelativeTime extends Component {
     super(props);
     this.props;
     this.state = {
-      relativeTime: '',
+      relativeTime: ''
     };
   }
 

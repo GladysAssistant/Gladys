@@ -16,7 +16,7 @@ const WEATHER_ALERT_TYPES = [
   'cold',
   'avalanche',
   'coastal',
-  'fog',
+  'fog'
 ];
 
 const WEATHER_ALERT_SEVERITIES = ['minor', 'moderate', 'severe', 'extreme'];
@@ -24,37 +24,37 @@ const WEATHER_ALERT_SEVERITIES = ['minor', 'moderate', 'severe', 'extreme'];
 class WeatherAlert extends Component {
   getHouses = async () => {
     this.setState({
-      SceneGetHouses: RequestStatus.Getting,
+      SceneGetHouses: RequestStatus.Getting
     });
     try {
       const houses = await this.props.httpClient.get('/api/v1/house');
       this.setState({
         houses,
-        SceneGetHouses: RequestStatus.Success,
+        SceneGetHouses: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        SceneGetHouses: RequestStatus.Error,
+        SceneGetHouses: RequestStatus.Error
       });
     }
   };
 
-  onHouseChange = (e) => {
+  onHouseChange = e => {
     this.props.updateTriggerProperty(this.props.index, 'house', e.target.value);
   };
 
-  onTypeChange = (e) => {
+  onTypeChange = e => {
     this.props.updateTriggerProperty(this.props.index, 'weather_alert_type', e.target.value);
   };
 
-  onSeverityChange = (e) => {
+  onSeverityChange = e => {
     this.props.updateTriggerProperty(this.props.index, 'weather_alert_severity', e.target.value);
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      houses: [],
+      houses: []
     };
   }
 
@@ -89,7 +89,7 @@ class WeatherAlert extends Component {
               <Text id="global.emptySelectOption" />
             </option>
             {houses &&
-              houses.map((house) => (
+              houses.map(house => (
                 <option selected={house.selector === this.props.trigger.house} value={house.selector}>
                   {house.name}
                 </option>
@@ -104,7 +104,7 @@ class WeatherAlert extends Component {
             <option selected={(this.props.trigger.weather_alert_type || 'any') === 'any'} value="any">
               <Text id="editScene.triggersCard.weatherAlert.anyType" />
             </option>
-            {WEATHER_ALERT_TYPES.map((type) => (
+            {WEATHER_ALERT_TYPES.map(type => (
               <option selected={type === this.props.trigger.weather_alert_type} value={type}>
                 <Text id={`dashboard.boxes.weather.alertTypes.${type}`} />
               </option>
@@ -116,7 +116,7 @@ class WeatherAlert extends Component {
             <Text id="editScene.triggersCard.weatherAlert.severityLabel" />
           </div>
           <select onChange={this.onSeverityChange} className="form-control">
-            {WEATHER_ALERT_SEVERITIES.map((severity) => (
+            {WEATHER_ALERT_SEVERITIES.map(severity => (
               <option selected={severity === (this.props.trigger.weather_alert_severity || 'minor')} value={severity}>
                 <Text id={`editScene.triggersCard.weatherAlert.severities.${severity}`} />
               </option>

@@ -7,30 +7,30 @@ class SettingsSystemKeepDeviceHistory extends Component {
   getDeviceStateHistoryPreference = async () => {
     try {
       const { value } = await this.props.httpClient.get(
-        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS}`,
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS}`
       );
       this.setState({
-        deviceStateHistoryInDays: value,
+        deviceStateHistoryInDays: value
       });
     } catch (e) {
       console.error(e);
     }
   };
 
-  updateDeviceStateHistory = async (e) => {
+  updateDeviceStateHistory = async e => {
     await this.setState({
       deviceStateHistoryInDays: e.target.value,
-      savingDeviceStateHistory: true,
+      savingDeviceStateHistory: true
     });
     try {
       await this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS}`, {
-        value: e.target.value,
+        value: e.target.value
       });
     } catch (e) {
       console.error(e);
     }
     await this.setState({
-      savingDeviceStateHistory: false,
+      savingDeviceStateHistory: false
     });
   };
 

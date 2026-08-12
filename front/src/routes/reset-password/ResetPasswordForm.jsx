@@ -9,7 +9,7 @@ const ResetPasswordForm = ({ children, ...props }) => (
     <form onSubmit={props.resetPassword} class="card">
       <div
         class={cx('dimmer', {
-          active: props.resetPasswordStatus === RequestStatus.Getting,
+          active: props.resetPasswordStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
@@ -61,7 +61,7 @@ const ResetPasswordForm = ({ children, ...props }) => (
                     <input
                       type="password"
                       class={cx('form-control', {
-                        'is-invalid': get(props, 'resetPasswordErrors.password'),
+                        'is-invalid': get(props, 'resetPasswordErrors.password')
                       })}
                       placeholder={<Text id="resetPassword.passwordPlaceholder" />}
                       value={props.resetPasswordPassword}
@@ -81,7 +81,7 @@ const ResetPasswordForm = ({ children, ...props }) => (
                     <input
                       type="password"
                       class={cx('form-control', {
-                        'is-invalid': get(props, 'resetPasswordErrors.passwordRepeat'),
+                        'is-invalid': get(props, 'resetPasswordErrors.passwordRepeat')
                       })}
                       placeholder={<Text id="resetPassword.passwordRepeatPlaceholder" />}
                       value={props.resetPasswordPasswordRepeat}

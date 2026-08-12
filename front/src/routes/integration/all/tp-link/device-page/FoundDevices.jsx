@@ -10,7 +10,7 @@ const createDevice = (props, device) => () => {
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 
-const createGithubUrl = (device) => {
+const createGithubUrl = device => {
   const title = encodeURIComponent(`TP-Link: Add device ${device.model}`);
   const body = encodeURIComponent(`\`\`\`\n${JSON.stringify(device, null, 2)}\n\`\`\``);
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
@@ -37,7 +37,7 @@ const FoundDevices = ({ children, ...props }) => (
         class={cx('dimmer', {
           active:
             props.getTpLinkNewDevicesStatus === RequestStatus.Getting ||
-            props.getTpLinkCreateDeviceStatus === RequestStatus.Getting,
+            props.getTpLinkCreateDeviceStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
@@ -52,7 +52,7 @@ const FoundDevices = ({ children, ...props }) => (
               </div>
             )}
             {props.tpLinkNewDevices &&
-              props.tpLinkNewDevices.map((device) => (
+              props.tpLinkNewDevices.map(device => (
                 <div class="col-md-4">
                   <div class="card">
                     <div class="card-header">

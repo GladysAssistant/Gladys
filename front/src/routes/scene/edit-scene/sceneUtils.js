@@ -47,7 +47,7 @@ const isVariableAvailableAtThisPath = (variableSourcePath, targetPath) => {
 const convertPathToText = (path, dictionary) => {
   const pathSegments = path.split('.');
   let text = pathSegments
-    .map((segment) => {
+    .map(segment => {
       if (segment === 'if') {
         return get(dictionary, 'editScene.actionsCard.conditionIfThenElse.shortIf');
       }

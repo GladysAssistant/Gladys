@@ -11,13 +11,13 @@ class LevelSensorDeviceState extends Component {
   };
 
   getOptions = () => {
-    const options = Object.keys(LIQUID_STATE).map((key) => {
+    const options = Object.keys(LIQUID_STATE).map(key => {
       const value = LIQUID_STATE[key];
       return {
         label: get(this.props.intl.dictionary, `deviceFeatureValue.category.level-sensor.liquid-state.${value}`, {
-          default: value,
+          default: value
         }),
-        value,
+        value
       };
     });
 
@@ -31,7 +31,7 @@ class LevelSensorDeviceState extends Component {
   }
 
   render({ trigger }, { options }) {
-    const defaultValue = options.find((option) => trigger.value === option.value);
+    const defaultValue = options.find(option => trigger.value === option.value);
 
     return (
       <Fragment>

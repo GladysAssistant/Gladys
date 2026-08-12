@@ -18,7 +18,7 @@ class DeviceTab extends Component {
       nukiDevices: [],
       loading: true,
       error: null,
-      nukiEnabled: null,
+      nukiEnabled: null
     };
     this.debouncedGetNukiDevices = debounce(this.getNukiDevices, 200).bind(this);
   }
@@ -34,7 +34,7 @@ class DeviceTab extends Component {
       await this.getNukiDevices();
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -43,12 +43,12 @@ class DeviceTab extends Component {
       const { mqttOk, webOk } = await this.props.httpClient.get('/api/v1/service/nuki/status');
       const nukiEnabled = mqttOk || webOk;
       await this.setState({
-        nukiEnabled,
+        nukiEnabled
       });
     } catch (e) {
       console.error(e);
       await this.setState({
-        nukiEnabled: false,
+        nukiEnabled: false
       });
       if (e.response && e.response.status !== 404) {
         this.setState({ error: RequestStatus.Error });
@@ -58,11 +58,11 @@ class DeviceTab extends Component {
 
   getNukiDevices = async () => {
     this.setState({
-      nukiGetStatus: RequestStatus.Getting,
+      nukiGetStatus: RequestStatus.Getting
     });
     try {
       const options = {
-        order_dir: this.state.orderDir || 'asc',
+        order_dir: this.state.orderDir || 'asc'
       };
       if (this.state.search && this.state.search.length) {
         options.search = this.state.search;
@@ -71,43 +71,43 @@ class DeviceTab extends Component {
       const nukiDevices = await this.props.httpClient.get('/api/v1/service/nuki/device', options);
       this.setState({
         nukiDevices,
-        nukiGetStatus: RequestStatus.Success,
+        nukiGetStatus: RequestStatus.Success
       });
     } catch (e) {
       console.error(e);
       this.setState({
-        nukiGetStatus: RequestStatus.Error,
+        nukiGetStatus: RequestStatus.Error
       });
     }
   };
-  search = async (e) => {
+  search = async e => {
     await this.setState({
-      search: e.target.value,
+      search: e.target.value
     });
     this.debouncedGetNukiDevices();
   };
-  changeOrderDir = async (e) => {
+  changeOrderDir = async e => {
     await this.setState({
-      orderDir: e.target.value,
+      orderDir: e.target.value
     });
     this.getNukiDevices();
   };
   async getHouses() {
     this.setState({
-      housesGetStatus: RequestStatus.Getting,
+      housesGetStatus: RequestStatus.Getting
     });
     try {
       const params = {
-        expand: 'rooms',
+        expand: 'rooms'
       };
       const housesWithRooms = await this.props.httpClient.get(`/api/v1/house`, params);
       this.setState({
         housesWithRooms,
-        housesGetStatus: RequestStatus.Success,
+        housesGetStatus: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        housesGetStatus: RequestStatus.Error,
+        housesGetStatus: RequestStatus.Error
       });
     }
   }
@@ -135,7 +135,7 @@ class DeviceTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: nukiGetStatus === RequestStatus.Getting,
+              active: nukiGetStatus === RequestStatus.Getting
             })}
           >
             <div class="loader" />

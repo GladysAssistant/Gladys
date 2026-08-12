@@ -68,7 +68,7 @@ const ACTION_ICON = {
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.AI.ASK]: 'fe fe-cpu',
-  [ACTIONS.SMS.SEND]: 'fe fe-message-circle',
+  [ACTIONS.SMS.SEND]: 'fe fe-message-circle'
 };
 
 const ACTION_COMPONENTS = {
@@ -104,7 +104,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
   [ACTIONS.AI.ASK]: AskAI,
   [ACTIONS.SMS.SEND]: SendSms,
-  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen,
+  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
@@ -134,21 +134,21 @@ const ActionCard = ({ children, ...props }) => {
     item: () => {
       return { path };
     },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
+    collect: monitor => ({
+      isDragging: !!monitor.isDragging()
+    })
   }));
   const [{ isActive }, drop] = useDrop({
     accept: getDragAndDropType(props.action.type, props.path),
-    collect: (monitor) => ({
-      isActive: monitor.canDrop() && monitor.isOver(),
+    collect: monitor => ({
+      isActive: monitor.canDrop() && monitor.isOver()
     }),
     drop(item) {
       if (!ref.current) {
         return;
       }
       props.moveCard(item.path, path);
-    },
+    }
   });
   preview(drop(ref));
   return (
@@ -168,14 +168,14 @@ const ActionCard = ({ children, ...props }) => {
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
           props.action.type !== ACTIONS.MESSAGE.SEND &&
           props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING &&
-          props.action.type !== ACTIONS.SMS.SEND,
+          props.action.type !== ACTIONS.SMS.SEND
       })}
     >
       <div
         ref={ref}
         class={cx('card cursor-pointer user-select-none', {
           [style.dropZoneActive]: isActive,
-          [style.dropZoneDragging]: isDragging,
+          [style.dropZoneDragging]: isDragging
         })}
       >
         <div ref={drag} class="card-header">
@@ -217,7 +217,7 @@ const ActionCard = ({ children, ...props }) => {
               addAction: props.addAction,
               moveCard: props.moveCard,
               moveCardGroup: props.moveCardGroup,
-              scene: props.scene,
+              scene: props.scene
             };
 
             return <Component {...commonProps} />;

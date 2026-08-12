@@ -11,11 +11,11 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/consta
 import {
   GITHUB_BASE_URL,
   PARAMS,
-  SUPPORTED_CATEGORY_TYPE,
+  SUPPORTED_CATEGORY_TYPE
 } from '../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 import styles from './style.css';
 
-const createGithubUrl = (device) => {
+const createGithubUrl = device => {
   const title = encodeURIComponent(`Netatmo: Add device ${device.model}`);
   const body = encodeURIComponent(`\`\`\`\n${JSON.stringify(device, null, 2)}\n\`\`\``);
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
@@ -25,44 +25,44 @@ class NetatmoDeviceBox extends Component {
   componentWillMount() {
     this.setState({
       device: this.props.device,
-      user: this.props.user,
+      user: this.props.user
     });
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      device: nextProps.device,
+      device: nextProps.device
     });
   }
 
-  updateName = (e) => {
+  updateName = e => {
     this.setState({
       device: {
         ...this.state.device,
-        name: e.target.value,
-      },
+        name: e.target.value
+      }
     });
   };
 
-  updateRoom = (e) => {
+  updateRoom = e => {
     this.setState({
       device: {
         ...this.state.device,
-        room_id: e.target.value,
-      },
+        room_id: e.target.value
+      }
     });
   };
 
   saveDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null,
+      errorMessage: null
     });
     try {
       const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
       this.setState({
         device: savedDevice,
-        isSaving: true,
+        isSaving: true
       });
     } catch (e) {
       let errorMessage = 'integration.netatmo.error.defaultError';
@@ -70,11 +70,11 @@ class NetatmoDeviceBox extends Component {
         errorMessage = 'integration.netatmo.error.conflictError';
       }
       this.setState({
-        errorMessage,
+        errorMessage
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -83,7 +83,7 @@ class NetatmoDeviceBox extends Component {
       loading: true,
       errorMessage: null,
       tooMuchStatesError: false,
-      statesNumber: undefined,
+      statesNumber: undefined
     });
     try {
       if (this.state.device.created_at) {
@@ -98,12 +98,12 @@ class NetatmoDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.netatmo.error.defaultDeletionError',
+          errorMessage: 'integration.netatmo.error.defaultDeletionError'
         });
       }
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -113,25 +113,25 @@ class NetatmoDeviceBox extends Component {
       return null;
     }
     const batteryLevelDeviceFeature = device.features.find(
-      (deviceFeature) => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY,
+      deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
     );
     const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
     let mostRecentValueAt = null;
-    device.features.forEach((feature) => {
+    device.features.forEach(feature => {
       if (feature.last_value_changed && new Date(feature.last_value_changed) > mostRecentValueAt) {
         mostRecentValueAt = new Date(feature.last_value_changed);
       }
     });
 
     let roomNameNetatmo = null;
-    const roomNameParam = device.params.find((param) => param.name === PARAMS.ROOM_NAME);
+    const roomNameParam = device.params.find(param => param.name === PARAMS.ROOM_NAME);
     if (roomNameParam) {
       roomNameNetatmo = roomNameParam.value;
     }
 
     let plugName = null;
-    const plugNameParam = device.params.find((param) => param.name === PARAMS.PLUG_NAME);
-    const plugIdParam = device.params.find((param) => param.name === PARAMS.PLUG_ID);
+    const plugNameParam = device.params.find(param => param.name === PARAMS.PLUG_NAME);
+    const plugIdParam = device.params.find(param => param.name === PARAMS.PLUG_ID);
     if (plugNameParam) {
       plugName = `${plugNameParam.value} (${plugIdParam.value})`;
     }
@@ -144,7 +144,7 @@ class NetatmoDeviceBox extends Component {
     }
     const isDeviceReachable = (device, now = new Date()) => {
       const isRecent = (date, time) => (now - new Date(date)) / (1000 * 60) <= time;
-      const hasRecentFeature = device.features.some((feature) => isRecent(feature.last_value_changed, 15));
+      const hasRecentFeature = device.features.some(feature => isRecent(feature.last_value_changed, 15));
       const isNetatmoDeviceReachable =
         device.deviceNetatmo &&
         (device.deviceNetatmo.reachable ||
@@ -162,7 +162,7 @@ class NetatmoDeviceBox extends Component {
       plugName,
       online,
       categoryAPI,
-      apiNotConfigured,
+      apiNotConfigured
     };
   };
 
@@ -175,13 +175,20 @@ class NetatmoDeviceBox extends Component {
       updateButton,
       alreadyCreatedButton,
       showMostRecentValueAt,
-      housesWithRooms,
+      housesWithRooms
     },
-    { device, user, loading, errorMessage, tooMuchStatesError, statesNumber },
+    { device, user, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = (device.features && device.features.length > 0) || !device.not_handled;
-    const { batteryLevel, mostRecentValueAt, roomNameNetatmo, plugName, online, categoryAPI, apiNotConfigured } =
-      this.getDeviceProperty();
+    const {
+      batteryLevel,
+      mostRecentValueAt,
+      roomNameNetatmo,
+      plugName,
+      online,
+      categoryAPI,
+      apiNotConfigured
+    } = this.getDeviceProperty();
     const sidDevice = device.external_id.replace('netatmo:', '') || (device.deviceNetatmo && device.deviceNetatmo.id);
     const saveButtonCondition =
       (saveButton && !alreadyCreatedButton) || (saveButton && !this.state.isSaving && alreadyCreatedButton);
@@ -204,7 +211,7 @@ class NetatmoDeviceBox extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />
@@ -223,7 +230,7 @@ class NetatmoDeviceBox extends Component {
                 <div class="form-group">
                   <img
                     src={modelImage}
-                    onError={(e) => {
+                    onError={e => {
                       e.target.onerror = null;
                       e.target.src = '/assets/integrations/cover/netatmo.jpg';
                     }}
@@ -318,9 +325,9 @@ class NetatmoDeviceBox extends Component {
                         <Text id="global.emptySelectOption" />
                       </option>
                       {housesWithRooms &&
-                        housesWithRooms.map((house) => (
+                        housesWithRooms.map(house => (
                           <optgroup label={house.name}>
-                            {house.rooms.map((room) => (
+                            {house.rooms.map(room => (
                               <option selected={room.id === device.room_id} value={room.id}>
                                 {room.name}
                               </option>
@@ -402,7 +409,9 @@ class NetatmoDeviceBox extends Component {
                         <Text
                           id="integration.mqtt.device.mostRecentValueAt"
                           fields={{
-                            mostRecentValueAt: dayjs(mostRecentValueAt).locale(user.language).fromNow(),
+                            mostRecentValueAt: dayjs(mostRecentValueAt)
+                              .locale(user.language)
+                              .fromNow()
                           }}
                         />
                       ) : (

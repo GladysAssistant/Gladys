@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-const VacuumCleanerStateDeviceValue = (props) => {
+const VacuumCleanerStateDeviceValue = props => {
   const { last_value: lastValue = null } = props.deviceFeature;
   const valued = lastValue !== null;
 
@@ -9,7 +9,7 @@ const VacuumCleanerStateDeviceValue = (props) => {
     <span
       class={cx('badge', {
         'bg-primary': valued,
-        'bg-secondary': !valued,
+        'bg-secondary': !valued
       })}
     >
       {!valued && <Text id="dashboard.boxes.devicesInRoom.noValue" />}

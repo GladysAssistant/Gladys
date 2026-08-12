@@ -7,11 +7,11 @@ import { normalizeBoolean, getLocalOverrideValue, getTuyaDeviceId } from './devi
 // so this order also returns faster in the common case.
 const TRY_PROTOCOLS = ['3.3', '3.1', '3.5', '3.4'];
 
-const isValidIpAddress = (ip) =>
+const isValidIpAddress = ip =>
   typeof ip === 'string' && /^(25[0-5]|2[0-4]\d|1?\d?\d)(\.(25[0-5]|2[0-4]\d|1?\d?\d)){3}$/.test(ip);
 
 const getParamValue = (params, name) => {
-  const found = params.find((param) => param.name === name);
+  const found = params.find(param => param.name === name);
   return found ? found.value : undefined;
 };
 
@@ -19,7 +19,7 @@ const upsertParam = (params, name, value) => {
   if (value === undefined || value === null || value === '') {
     return;
   }
-  const index = params.findIndex((param) => param.name === name);
+  const index = params.findIndex(param => param.name === name);
   if (index >= 0) {
     params[index] = { ...params[index], value };
   } else {
@@ -40,7 +40,7 @@ export const pollLocalDevice = async ({ httpClient, device, onProtocolAttempt })
 
   if (localOverride === true && localKey && deviceId && !isValidIpAddress(resolvedIp)) {
     const localScanResponse = await httpClient.post('/api/v1/service/tuya/local-scan', {
-      timeoutSeconds: 5,
+      timeoutSeconds: 5
     });
     const localDevices =
       localScanResponse && localScanResponse.local_devices && typeof localScanResponse.local_devices === 'object'
@@ -58,8 +58,8 @@ export const pollLocalDevice = async ({ httpClient, device, onProtocolAttempt })
     }
     if (Array.isArray(localScanResponse && localScanResponse.devices)) {
       scannedDevice =
-        localScanResponse.devices.find((localDevice) => localDevice.external_id === `tuya:${deviceId}`) ||
-        localScanResponse.devices.find((localDevice) => localDevice.external_id === currentDevice.external_id) ||
+        localScanResponse.devices.find(localDevice => localDevice.external_id === `tuya:${deviceId}`) ||
+        localScanResponse.devices.find(localDevice => localDevice.external_id === currentDevice.external_id) ||
         null;
     }
   }
@@ -67,13 +67,13 @@ export const pollLocalDevice = async ({ httpClient, device, onProtocolAttempt })
   const protocolList = selectedProtocol
     ? [selectedProtocol]
     : scannedProtocolVersion
-      ? [scannedProtocolVersion, ...TRY_PROTOCOLS.filter((protocol) => protocol !== scannedProtocolVersion)]
-      : TRY_PROTOCOLS;
+    ? [scannedProtocolVersion, ...TRY_PROTOCOLS.filter(protocol => protocol !== scannedProtocolVersion)]
+    : TRY_PROTOCOLS;
 
   let result = null;
   let usedProtocol = selectedProtocol;
   let latestDevice = null;
-  const isValidResult = (data) => data && typeof data === 'object' && data.dps;
+  const isValidResult = data => data && typeof data === 'object' && data.dps;
 
   for (let i = 0; i < protocolList.length; i += 1) {
     const protocolVersion = protocolList[i];
@@ -87,7 +87,7 @@ export const pollLocalDevice = async ({ httpClient, device, onProtocolAttempt })
         localKey,
         protocolVersion,
         timeoutMs: 3000,
-        fastScan: true,
+        fastScan: true
       });
       result = response && response.dps ? response : null;
       const updatedDevice = response && response.device ? response.device : null;
@@ -118,10 +118,10 @@ export const pollLocalDevice = async ({ httpClient, device, onProtocolAttempt })
   return {
     device: {
       ...baseDevice,
-      params: newParams,
+      params: newParams
     },
     dps: result ? result.dps : null,
     protocol: usedProtocol || '',
-    ip: resolvedIp || '',
+    ip: resolvedIp || ''
   };
 };

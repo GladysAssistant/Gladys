@@ -10,37 +10,37 @@ import style from './style.css';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 
-const createGithubUrl = (device) => {
+const createGithubUrl = device => {
   const title = encodeURIComponent(`Zigbee2mqtt: Add device ${device.model}`);
   const body = encodeURIComponent(`\`\`\`\n${JSON.stringify(device, null, 2)}\n\`\`\``);
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
 };
 
 class DiscoveredBox extends Component {
-  updateName = (e) => {
+  updateName = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'name', e.target.value);
   };
 
-  updateRoom = (e) => {
+  updateRoom = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
   saveDevice = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     try {
       await this.props.saveDevice(this.props.deviceIndex);
       this.setState({
-        saveError: null,
+        saveError: null
       });
     } catch (e) {
       this.setState({
-        saveError: RequestStatus.Error,
+        saveError: RequestStatus.Error
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -48,7 +48,7 @@ class DiscoveredBox extends Component {
     const { features = [], ieee_address = null } = device;
     const enableSaveButton = !device.created_at;
     const enableUpdateButton = device.updatable;
-    const supportedDevice = features.findIndex((f) => f.category !== DEVICE_FEATURE_CATEGORIES.BATTERY) >= 0;
+    const supportedDevice = features.findIndex(f => f.category !== DEVICE_FEATURE_CATEGORIES.BATTERY) >= 0;
     const alreadyExistsButton = supportedDevice && !enableSaveButton && !enableUpdateButton;
 
     return (
@@ -56,7 +56,7 @@ class DiscoveredBox extends Component {
         <div class="card">
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />
@@ -104,9 +104,9 @@ class DiscoveredBox extends Component {
                         <option value="">
                           <Text id="global.emptySelectOption" />
                         </option>
-                        {houses.map((house) => (
+                        {houses.map(house => (
                           <optgroup label={house.name}>
-                            {house.rooms.map((room) => (
+                            {house.rooms.map(room => (
                               <option selected={room.id === device.room_id} value={room.id}>
                                 {room.name}
                               </option>

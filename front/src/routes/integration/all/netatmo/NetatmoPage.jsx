@@ -4,7 +4,7 @@ import DeviceConfigurationLink from '../../../../components/documentation/Device
 import DeprecationWarning from '../../../../components/integration/DeprecationWarning';
 import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
-const NetatmoPage = (props) => (
+const NetatmoPage = props => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">

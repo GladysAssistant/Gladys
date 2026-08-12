@@ -25,5 +25,5 @@ class PhilipsHueDevicePage extends Component {
 
 export default connect(
   'session,user,philipsHueDevices,houses,getPhilipsHueDevicesStatus,philipsHueNewDevices,getPhilipsHueCreateDeviceStatus,getPhilipsHueNewDevicesStatus,philipsHueDeviceSearch,getPhilipsHueDeviceOrderDir',
-  actions,
+  actions
 )(PhilipsHueDevicePage);

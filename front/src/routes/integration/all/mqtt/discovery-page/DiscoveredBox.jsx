@@ -6,30 +6,30 @@ import { RequestStatus } from '../../../../../utils/consts';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
 class DiscoveredBox extends Component {
-  updateName = (e) => {
+  updateName = e => {
     this.props.updateDeviceField(this.props.device.external_id, 'name', e.target.value);
   };
 
-  updateRoom = (e) => {
+  updateRoom = e => {
     this.props.updateDeviceField(this.props.device.external_id, 'room_id', e.target.value);
   };
 
   saveDevice = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     try {
       await this.props.saveDevice(this.props.device.external_id);
       this.setState({
-        saveError: null,
+        saveError: null
       });
     } catch (e) {
       this.setState({
-        saveError: RequestStatus.Error,
+        saveError: RequestStatus.Error
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -48,7 +48,7 @@ class DiscoveredBox extends Component {
         <div class="card">
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />
@@ -91,9 +91,9 @@ class DiscoveredBox extends Component {
                         <option value="">
                           <Text id="global.emptySelectOption" />
                         </option>
-                        {houses.map((house) => (
+                        {houses.map(house => (
                           <optgroup key={house.id} label={house.name}>
-                            {house.rooms.map((room) => (
+                            {house.rooms.map(room => (
                               <option key={room.id} selected={room.id === device.room_id} value={room.id}>
                                 {room.name}
                               </option>

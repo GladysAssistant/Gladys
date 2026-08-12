@@ -12,25 +12,25 @@ import BatteryLevelFeature from '../../../../../components/device/view/BatteryLe
 import logoZigbee2mqtt from '../../../../../assets/integrations/logos/logo_zigbee2mqtt.png';
 
 class Zigbee2mqttBox extends Component {
-  updateName = (e) => {
+  updateName = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'name', e.target.value);
   };
 
-  updateRoom = (e) => {
+  updateRoom = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  updateModel = (e) => {
+  updateModel = e => {
     const selectedModel = e.target.value;
     const params = (this.props.device.params || []).slice();
-    const model = params.find((p) => p.name === 'model');
+    const model = params.find(p => p.name === 'model');
 
     if (model) {
       model.value = selectedModel;
     } else {
       params.push({
         name: 'model',
-        value: selectedModel,
+        value: selectedModel
       });
     }
 
@@ -41,20 +41,20 @@ class Zigbee2mqttBox extends Component {
 
   saveDevice = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     try {
       await this.props.saveDevice(this.props.deviceIndex);
       this.setState({
-        saveError: null,
+        saveError: null
       });
     } catch (e) {
       this.setState({
-        saveError: RequestStatus.Error,
+        saveError: RequestStatus.Error
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -62,7 +62,7 @@ class Zigbee2mqttBox extends Component {
     this.setState({
       loading: true,
       tooMuchStatesError: false,
-      statesNumber: undefined,
+      statesNumber: undefined
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
@@ -74,12 +74,12 @@ class Zigbee2mqttBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          deleteError: RequestStatus.Error,
+          deleteError: RequestStatus.Error
         });
       }
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -88,12 +88,12 @@ class Zigbee2mqttBox extends Component {
       return {};
     }
     const batteryLevelDeviceFeature = this.props.device.features.find(
-      (deviceFeature) => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY,
+      deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
     );
     const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
 
     return {
-      batteryLevel,
+      batteryLevel
     };
   };
 
@@ -112,7 +112,7 @@ class Zigbee2mqttBox extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />
@@ -153,9 +153,9 @@ class Zigbee2mqttBox extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {props.houses &&
-                      props.houses.map((house) => (
+                      props.houses.map(house => (
                         <optgroup label={house.name}>
-                          {house.rooms.map((room) => (
+                          {house.rooms.map(room => (
                             <option selected={room.id === props.device.room_id} value={room.id}>
                               {room.name}
                             </option>

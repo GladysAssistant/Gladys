@@ -25,11 +25,11 @@ function reflow(cardElement) {
   }
   const controls = [...entry.controls];
   // Start from the most expanded state, then collapse the widest ones until it fits.
-  controls.forEach((control) => control.show('buttons'));
+  controls.forEach(control => control.show('buttons'));
   let guard = 0;
   while (box.scrollWidth > box.clientWidth + 1 && guard < 30) {
     guard += 1;
-    const stillButtons = controls.filter((control) => control.mode === 'buttons');
+    const stillButtons = controls.filter(control => control.mode === 'buttons');
     if (stillButtons.length === 0) {
       break;
     }

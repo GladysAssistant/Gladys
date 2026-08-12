@@ -13,7 +13,7 @@ import {
   GetWeatherStatus,
   DEFAULT_ON_WEATHER_MODES,
   DASHBOARD_BOX_STATUS_KEY,
-  DASHBOARD_BOX_DATA_KEY,
+  DASHBOARD_BOX_DATA_KEY
 } from '../../../utils/consts';
 
 const BOX_KEY = 'Weather';
@@ -28,7 +28,7 @@ const ALERT_SEVERITY_STYLE = {
   minor: { background: '#45aaf2', color: '#fff' },
   moderate: { background: '#f7c600', color: '#212529' },
   severe: { background: '#f68f00', color: '#fff' },
-  extreme: { background: '#d63939', color: '#fff' },
+  extreme: { background: '#d63939', color: '#fff' }
 };
 
 // Emoji per generic alert phenomenon type; untyped alerts keep the
@@ -43,7 +43,7 @@ const ALERT_TYPE_EMOJIS = {
   cold: '🥶',
   avalanche: '🏔️',
   coastal: '🌊',
-  fog: '🌫️',
+  fog: '🌫️'
 };
 
 const MOON_EMOJIS = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
@@ -98,10 +98,10 @@ class WeatherBoxComponent extends Component {
   };
 
   // full alert bulletins fold to 3 lines, one click swaps folded/expanded
-  toggleAlertDescription = (alertKey) => {
+  toggleAlertDescription = alertKey => {
     const expandedAlerts = this.state.expandedAlerts || {};
     this.setState({
-      expandedAlerts: { ...expandedAlerts, [alertKey]: !expandedAlerts[alertKey] },
+      expandedAlerts: { ...expandedAlerts, [alertKey]: !expandedAlerts[alertKey] }
     });
   };
 
@@ -179,7 +179,7 @@ class WeatherBoxComponent extends Component {
       `${fromGust ? '~' : ''}${Math.round(isMetric ? speed * 3.6 : speed)} ${windUnit}`;
     // precipitation is always in mm in the pivot, whatever `units` says: the
     // server stamps the unit system but never converts the amounts
-    const formatRain = (amount) =>
+    const formatRain = amount =>
       isMetric ? `${Math.round(amount * 10) / 10} mm` : `${Math.round((amount / 25.4) * 100) / 100} in`;
 
     const temperature = Math.round(weather.temperature);
@@ -203,13 +203,13 @@ class WeatherBoxComponent extends Component {
 
     // a rain row is only drawn when at least one entry carries an amount:
     // most providers give none, and an empty line before the wind is noise
-    const hasHourlyRain = hours.some((hour) => typeof hour.precipitation === 'number');
-    const hasHourlyWind = hours.some((hour) => typeof hour.wind_speed === 'number');
-    const hasDailyRain = days.some((day) => typeof day.precipitation === 'number');
-    const hasDailyWind = days.some((day) => typeof day.wind_speed === 'number');
+    const hasHourlyRain = hours.some(hour => typeof hour.precipitation === 'number');
+    const hasHourlyWind = hours.some(hour => typeof hour.wind_speed === 'number');
+    const hasDailyRain = days.some(day => typeof day.precipitation === 'number');
+    const hasDailyWind = days.some(day => typeof day.wind_speed === 'number');
 
     // default to visible for widgets saved before these options existed
-    const isModeOn = (mode) => (DEFAULT_ON_WEATHER_MODES.includes(mode) ? modes[mode] !== false : Boolean(modes[mode]));
+    const isModeOn = mode => (DEFAULT_ON_WEATHER_MODES.includes(mode) ? modes[mode] !== false : Boolean(modes[mode]));
     const showDateLocation = isModeOn(GetWeatherModes.DateLocation);
     const showCurrentWeather = isModeOn(GetWeatherModes.CurrentWeather);
     const shownAlerts = isModeOn(GetWeatherModes.Alerts) ? alerts : [];
@@ -219,7 +219,7 @@ class WeatherBoxComponent extends Component {
     // so each text is printed once across the whole widget
     const seenDescriptions = new Set();
     const alertDescriptions = [];
-    shownAlerts.forEach((alert) => {
+    shownAlerts.forEach(alert => {
       const descriptions = alert.descriptions || (alert.description ? [alert.description] : []);
       descriptions.forEach((description, index) => {
         if (seenDescriptions.has(description)) {
@@ -228,7 +228,7 @@ class WeatherBoxComponent extends Component {
         seenDescriptions.add(description);
         alertDescriptions.push({
           alertKey: `${alert.severity}-${alert.event}-${alert.start || ''}-${index}`,
-          description,
+          description
         });
       });
     });
@@ -244,7 +244,7 @@ class WeatherBoxComponent extends Component {
         weather.sunset_beautiful);
     const showHourly = isModeOn(GetWeatherModes.HourlyForecast) && hours.length > 0;
     const showDaily = isModeOn(GetWeatherModes.DailyForecast) && days.length > 0;
-    const shownImages = isModeOn(GetWeatherModes.ProviderImages) ? images.filter((image) => image.src) : [];
+    const shownImages = isModeOn(GetWeatherModes.ProviderImages) ? images.filter(image => image.src) : [];
 
     // section separators are only useful when there is content above them
     const hasContentAboveHourly =
@@ -367,7 +367,7 @@ class WeatherBoxComponent extends Component {
           {/* Weather alerts */}
           {shownAlerts.length > 0 && (
             <div style="margin-bottom: 10px">
-              {shownAlerts.map((alert) => {
+              {shownAlerts.map(alert => {
                 const style = ALERT_SEVERITY_STYLE[alert.severity] || { background: '#ccc', color: '#333' };
                 return (
                   <span
@@ -397,7 +397,7 @@ class WeatherBoxComponent extends Component {
                     tabIndex="0"
                     aria-expanded={Boolean(expanded)}
                     onClick={() => this.toggleAlertDescription(alertKey)}
-                    onKeyDown={(e) => {
+                    onKeyDown={e => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
                         this.toggleAlertDescription(alertKey);
@@ -417,7 +417,7 @@ class WeatherBoxComponent extends Component {
           )}
 
           {/* Provider images (vigilance map, rain radar…) */}
-          {shownImages.map((image) => {
+          {shownImages.map(image => {
             const imageLabel =
               image.label && (image.label[userLanguage] || image.label.en || Object.values(image.label)[0]);
             return (
@@ -484,7 +484,7 @@ class WeatherBoxComponent extends Component {
               class={hasContentAboveDaily ? 'border-top' : ''}
               style="display: flex; justify-content: space-between; padding-top: 10px"
             >
-              {days.map((day) => (
+              {days.map(day => (
                 <div key={day.datetime} style="text-align: center; flex: 1">
                   <div
                     class="text-muted"

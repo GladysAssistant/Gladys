@@ -9,11 +9,11 @@ import { getDeviceTransport, getDeviceTransportMessage, isDeviceTransportDegrade
 import { RequestStatus } from '../../../../../utils/consts';
 
 class DeviceBox extends Component {
-  updateName = (e) => {
+  updateName = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'name', e.target.value);
   };
 
-  updateRoom = (e) => {
+  updateRoom = e => {
     this.props.updateDeviceField(this.props.deviceIndex, 'room_id', e.target.value || null);
   };
 
@@ -59,7 +59,7 @@ class DeviceBox extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />
@@ -99,9 +99,9 @@ class DeviceBox extends Component {
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {houses.map((house) => (
+                    {houses.map(house => (
                       <optgroup label={house.name}>
-                        {house.rooms.map((room) => (
+                        {house.rooms.map(room => (
                           <option selected={room.id === device.room_id} value={room.id}>
                             {room.name}
                           </option>

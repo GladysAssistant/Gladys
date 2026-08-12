@@ -21,7 +21,7 @@ class TurnOnLight extends Component {
     this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', undefined);
     this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', undefined);
   };
-  handleTypeChange = (e) => {
+  handleTypeChange = e => {
     const schedulerType = e.target.value;
     this.props.updateTriggerProperty(this.props.index, 'scheduler_type', schedulerType);
     this.resetForm();
@@ -36,7 +36,7 @@ class TurnOnLight extends Component {
         'thursday',
         'friday',
         'saturday',
-        'sunday',
+        'sunday'
       ]);
       this.props.updateTriggerProperty(this.props.index, 'time', '12:00');
     } else if (schedulerType === 'every-day') {
@@ -51,27 +51,27 @@ class TurnOnLight extends Component {
       this.props.updateTriggerProperty(this.props.index, 'interval', 30);
     }
   };
-  handleDateChange = (date) => {
+  handleDateChange = date => {
     this.props.updateTriggerProperty(this.props.index, 'date', format(date, 'yyyy-MM-dd'));
   };
-  handleTimeChange = (time) => {
+  handleTimeChange = time => {
     this.props.updateTriggerProperty(this.props.index, 'time', format(time, 'HH:mm'));
   };
-  handleIntervalChange = (e) => {
+  handleIntervalChange = e => {
     if (!isNaN(parseInt(e.target.value, 10))) {
       this.props.updateTriggerProperty(this.props.index, 'interval', parseInt(e.target.value, 10));
     } else {
       this.props.updateTriggerProperty(this.props.index, 'interval', null);
     }
   };
-  handleUnitChange = (e) => {
+  handleUnitChange = e => {
     this.props.updateTriggerProperty(this.props.index, 'unit', e.target.value);
   };
-  handleDayOfTheWeekChange = (options) => {
-    const values = options ? options.map((option) => option.value) : [];
+  handleDayOfTheWeekChange = options => {
+    const values = options ? options.map(option => option.value) : [];
     this.props.updateTriggerProperty(this.props.index, 'days_of_the_week', values);
   };
-  handleDayOfTheMonthChange = (e) => {
+  handleDayOfTheMonthChange = e => {
     this.props.updateTriggerProperty(this.props.index, 'day_of_the_month', e.target.value);
   };
 
@@ -82,9 +82,9 @@ class TurnOnLight extends Component {
       ? new Date().setHours(this.props.trigger.time.substr(0, 2), this.props.trigger.time.substr(3, 2))
       : null;
     const selectedWeekDaysOptions = this.props.trigger.days_of_the_week
-      ? this.props.trigger.days_of_the_week.map((day) => ({
+      ? this.props.trigger.days_of_the_week.map(day => ({
           value: day,
-          label: <Text id={`editScene.triggersCard.scheduledTrigger.daysOfTheWeek.${day}`} />,
+          label: <Text id={`editScene.triggersCard.scheduledTrigger.daysOfTheWeek.${day}`} />
         }))
       : [];
     const date = this.props.trigger.date ? new Date(this.props.trigger.date) : null;
@@ -237,32 +237,32 @@ class TurnOnLight extends Component {
                   options={[
                     {
                       value: 'monday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.monday" />,
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.monday" />
                     },
                     {
                       value: 'tuesday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.tuesday" />,
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.tuesday" />
                     },
                     {
                       value: 'wednesday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.wednesday" />,
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.wednesday" />
                     },
                     {
                       value: 'thursday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.thursday" />,
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.thursday" />
                     },
                     {
                       value: 'friday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.friday" />,
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.friday" />
                     },
                     {
                       value: 'saturday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.saturday" />,
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.saturday" />
                     },
                     {
                       value: 'sunday',
-                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.sunday" />,
-                    },
+                      label: <Text id="editScene.triggersCard.scheduledTrigger.daysOfTheWeek.sunday" />
+                    }
                   ]}
                 />
               </div>
@@ -302,7 +302,7 @@ class TurnOnLight extends Component {
                   value={this.props.trigger.day_of_the_month}
                   onChange={this.handleDayOfTheMonthChange}
                 >
-                  {DAYS_OF_THE_MONTH.map((value) => (
+                  {DAYS_OF_THE_MONTH.map(value => (
                     <option value={value}>{value}</option>
                   ))}
                 </select>

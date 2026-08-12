@@ -3,7 +3,7 @@ import cx from 'classnames';
 
 import { WATER_VALVE_CURRENT_DEVICE_STATUS } from '../../../../../../../server/utils/constants';
 
-const WaterValveDeviceValue = (props) => {
+const WaterValveDeviceValue = props => {
   const { last_value: lastValue = null } = props.deviceFeature;
   const valued = lastValue !== null;
   const leakage =
@@ -19,7 +19,7 @@ const WaterValveDeviceValue = (props) => {
         'bg-warning': shortage,
         'bg-success': normal,
         'bg-primary': valued && !leakage && !shortage && !normal,
-        'bg-secondary': !valued,
+        'bg-secondary': !valued
       })}
     >
       {!valued && <Text id="dashboard.boxes.devicesInRoom.noValue" />}

@@ -3,11 +3,11 @@ import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 
 class MQTTReceived extends Component {
-  updateTopicName = (e) => {
+  updateTopicName = e => {
     this.props.updateTriggerProperty(this.props.index, 'topic', e.target.value);
   };
 
-  updateMessage = (e) => {
+  updateMessage = e => {
     this.props.updateTriggerProperty(this.props.index, 'message', e.target.value);
   };
 

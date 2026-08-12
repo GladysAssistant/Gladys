@@ -1,20 +1,20 @@
-const createActions = (store) => {
+const createActions = store => {
   const actions = {
     async getStatus(state) {
       let bluetoothStatus = {
-        ready: false,
+        ready: false
       };
       try {
         bluetoothStatus = await state.httpClient.get('/api/v1/service/bluetooth/status');
       } finally {
         store.setState({
-          bluetoothStatus,
+          bluetoothStatus
         });
       }
     },
     async updateStatus(state, bluetoothStatus = { ready: false }) {
       store.setState({
-        bluetoothStatus,
+        bluetoothStatus
       });
     },
     async scan(state, selector) {
@@ -28,20 +28,20 @@ const createActions = (store) => {
 
       let bluetoothStatus = { ...state.bluetoothStatus, scanning: true, peripheralLookup: useSelector };
       store.setState({
-        bluetoothStatus,
+        bluetoothStatus
       });
 
       try {
         const uri = `/api/v1/service/bluetooth/scan${useSelector ? `/${selector}` : ''}`;
         bluetoothStatus = await state.httpClient.post(uri, {
-          scan: action,
+          scan: action
         });
       } finally {
         store.setState({
-          bluetoothStatus,
+          bluetoothStatus
         });
       }
-    },
+    }
   };
   return Object.assign({}, actions);
 };

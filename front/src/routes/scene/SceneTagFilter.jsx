@@ -9,36 +9,36 @@ class SceneTagFilter extends Component {
     super(props);
 
     this.state = {
-      tagFilterDropdownOpened: false,
+      tagFilterDropdownOpened: false
     };
     this.unselectTags = this.unselectTags.bind(this);
   }
 
-  setDropdownRef = (dropdownRef) => {
+  setDropdownRef = dropdownRef => {
     this.dropdownRef = dropdownRef;
   };
 
   toggleTagFilterDropdown = () => {
     this.setState({
-      tagFilterDropdownOpened: !this.state.tagFilterDropdownOpened,
+      tagFilterDropdownOpened: !this.state.tagFilterDropdownOpened
     });
   };
 
-  closeTagFilterDropdown = (e) => {
+  closeTagFilterDropdown = e => {
     if (e && this.dropdownRef && this.dropdownRef.contains(e.target)) {
       return;
     }
     this.setState({ tagFilterDropdownOpened: false });
   };
 
-  toggleTag = async (e) => {
+  toggleTag = async e => {
     e.preventDefault();
     const { sceneTagSearch } = this.props;
     const tagName = e.currentTarget.getAttribute('data-tag');
 
     // Check if the tag is already in the array
     const newTagArray = sceneTagSearch.includes(tagName)
-      ? sceneTagSearch.filter((tag) => tag !== tagName) // Remove tag if it exists
+      ? sceneTagSearch.filter(tag => tag !== tagName) // Remove tag if it exists
       : [...sceneTagSearch, tagName]; // Add tag if it doesn't exist
 
     this.props.searchTags(newTagArray);
@@ -61,7 +61,7 @@ class SceneTagFilter extends Component {
       <div
         ref={this.setDropdownRef}
         class={cx('mr-2', 'btn-group', {
-          show: tagFilterDropdownOpened,
+          show: tagFilterDropdownOpened
         })}
       >
         <button className="btn btn-secondary btn-sm dropdown-toggle" onClick={this.toggleTagFilterDropdown}>
@@ -72,7 +72,7 @@ class SceneTagFilter extends Component {
         </button>
         <div
           class={cx('dropdown-menu', {
-            show: tagFilterDropdownOpened,
+            show: tagFilterDropdownOpened
           })}
         >
           <div>
@@ -84,7 +84,7 @@ class SceneTagFilter extends Component {
             </li>
           </div>
           {props.tags &&
-            props.tags.map((tag) => (
+            props.tags.map(tag => (
               <div>
                 <li class="dropdown-item" onClick={this.toggleTag} data-tag={tag.name}>
                   <div class="custom-checkbox custom-control">

@@ -19,11 +19,10 @@ const SelectDeviceFeatureValue = ({ options, value, updateValue }) => {
   // Controlled, and null when the value is not in the list: a value the feature does not declare
   // must show as nothing selected rather than as a valid-looking choice.
   const selectedOption = isValueInOptions(options, value)
-    ? options.find((option) => `${option.value}` === `${value}`)
+    ? options.find(option => `${option.value}` === `${value}`)
     : null;
 
-  const handleChange = (selectedValueOption) =>
-    updateValue(selectedValueOption ? selectedValueOption.value : undefined);
+  const handleChange = selectedValueOption => updateValue(selectedValueOption ? selectedValueOption.value : undefined);
 
   return (
     <Select

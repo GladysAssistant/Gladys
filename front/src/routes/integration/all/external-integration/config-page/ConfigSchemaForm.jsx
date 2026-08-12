@@ -9,32 +9,32 @@ import integrationText from '../integrationText.css';
 
 // the redirect URI is meant to be copied into the developer application of the
 // provider: a click should select all of it
-const selectOnFocus = (e) => e.target.select();
+const selectOnFocus = e => e.target.select();
 
 class ConfigField extends Component {
-  onInput = (e) => {
+  onInput = e => {
     this.props.updateConfigValue(this.props.field, e.target.value);
   };
 
-  onCheck = (e) => {
+  onCheck = e => {
     this.props.updateConfigValue(this.props.field, e.target.checked);
   };
 
-  onMultiSelectToggle = (e) => {
+  onMultiSelectToggle = e => {
     const { field, values } = this.props;
     const currentValues = Array.isArray(values[field.key]) ? values[field.key] : [];
     const newValues = e.target.checked
       ? [...currentValues, e.target.value]
-      : currentValues.filter((value) => value !== e.target.value);
+      : currentValues.filter(value => value !== e.target.value);
     this.props.updateConfigValue(field, newValues);
   };
 
-  onOAuthConnect = (e) => {
+  onOAuthConnect = e => {
     e.preventDefault();
     this.props.connectOAuth(this.props.field);
   };
 
-  copyRedirectUri = async (value) => {
+  copyRedirectUri = async value => {
     let copied = false;
     if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
       try {
@@ -85,7 +85,7 @@ class ConfigField extends Component {
     oauthStatus,
     selector,
     dynamicOptions,
-    placeholderPorts,
+    placeholderPorts
   }) {
     const label = getLocalizedText(field.label, language) || field.key;
     const description = getLocalizedText(field.description, language);
@@ -111,7 +111,7 @@ class ConfigField extends Component {
               {resolveManifestPlaceholders(description, placeholderPorts)}
             </p>
           )}
-          {(field.links || []).map((link) => (
+          {(field.links || []).map(link => (
             <div>
               <a href={link.url} target="_blank" rel="noopener noreferrer">
                 <i class="fe fe-external-link mr-1" />
@@ -156,7 +156,7 @@ class ConfigField extends Component {
                 value={redirectUri}
                 readOnly
                 onFocus={selectOnFocus}
-                ref={(element) => {
+                ref={element => {
                   this.redirectUriInput = element;
                 }}
               />
@@ -187,7 +187,7 @@ class ConfigField extends Component {
             <button
               type="button"
               class={cx('btn btn-primary', {
-                'btn-loading': oauthStatus === RequestStatus.Getting,
+                'btn-loading': oauthStatus === RequestStatus.Getting
               })}
               disabled={oauthStatus === RequestStatus.Getting}
               onClick={this.onOAuthConnect}
@@ -256,7 +256,7 @@ class ConfigField extends Component {
             <option value="" selected={value === undefined || value === null || value === ''}>
               <Text id="global.emptySelectOption" />
             </option>
-            {options.map((option) => (
+            {options.map(option => (
               <option key={option.value} value={option.value} selected={`${value}` === `${option.value}`}>
                 {getLocalizedText(option.label, language) || option.value}
               </option>
@@ -265,7 +265,7 @@ class ConfigField extends Component {
         )}
         {field.type === 'select' && field.display === 'radio' && (
           <div>
-            {options.map((option) => (
+            {options.map(option => (
               <label key={option.value} class="custom-control custom-radio">
                 <input
                   type="radio"
@@ -282,7 +282,7 @@ class ConfigField extends Component {
         )}
         {field.type === 'multi_select' && (
           <div>
-            {options.map((option) => (
+            {options.map(option => (
               <label key={option.value} class="custom-control custom-checkbox">
                 <input
                   type="checkbox"
@@ -367,11 +367,11 @@ const ConfigSchemaForm = ({
   connectOAuth,
   selector,
   dynamicOptions,
-  placeholderPorts,
+  placeholderPorts
 }) => {
   // sections are presentational and oauth2 has its own Connect button: a
   // schema made only of those has nothing to save, hide the save button
-  const hasSavableField = schema.some((field) => field.type !== 'section' && field.type !== 'oauth2');
+  const hasSavableField = schema.some(field => field.type !== 'section' && field.type !== 'oauth2');
   return (
     <form onSubmit={saveConfig}>
       {saveConfigStatus === RequestStatus.Success && (
@@ -384,7 +384,7 @@ const ConfigSchemaForm = ({
           <Text id="integration.externalIntegration.config.saveError" />
         </div>
       )}
-      {schema.map((field) => (
+      {schema.map(field => (
         <ConfigField
           key={field.key}
           field={field}
@@ -409,7 +409,7 @@ const ConfigSchemaForm = ({
           <button
             type="submit"
             class={cx('btn btn-success', {
-              'btn-loading': saveConfigStatus === RequestStatus.Getting,
+              'btn-loading': saveConfigStatus === RequestStatus.Getting
             })}
             disabled={saveConfigStatus === RequestStatus.Getting}
           >

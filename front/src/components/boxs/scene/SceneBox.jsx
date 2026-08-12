@@ -13,15 +13,15 @@ class SceneBoxComponent extends Component {
     this.setState({ status: RequestStatus.Getting });
     try {
       const scenes = await this.props.httpClient.get(`/api/v1/scene`, {
-        selectors: this.props.box.scenes.join(','),
+        selectors: this.props.box.scenes.join(',')
       });
       this.setState({
         scenes,
-        status: RequestStatus.Success,
+        status: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        status: RequestStatus.Error,
+        status: RequestStatus.Error
       });
     }
   };
@@ -49,7 +49,7 @@ class SceneBoxComponent extends Component {
         )}
         <div
           class={cx('dimmer', {
-            active: loading,
+            active: loading
           })}
         >
           <div class="loader py-3" />
@@ -58,7 +58,7 @@ class SceneBoxComponent extends Component {
               <table className="table card-table table-vcenter">
                 <tbody>
                   {scenes &&
-                    scenes.map((scene) => (
+                    scenes.map(scene => (
                       <SceneRow
                         boxStatus={status}
                         name={scene.name}

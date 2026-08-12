@@ -11,7 +11,7 @@ const OPENING_VARIABLE = '{{';
 const CLOSING_VARIABLE = '}}';
 
 class TextWithVariablesInjected extends Component {
-  setRef = (dom) => (this.tagifyInputRef = dom);
+  setRef = dom => (this.tagifyInputRef = dom);
   initTagify = () => {
     if (this.tagify) {
       this.tagify.destroy();
@@ -26,10 +26,10 @@ class TextWithVariablesInjected extends Component {
         enabled: 1,
         position: 'text',
         mapValueTo: 'title',
-        maxItems: 200,
+        maxItems: 200
       },
       whitelist: this.state.variableWhileList,
-      mixTagsInterpolator: [OPENING_VARIABLE, CLOSING_VARIABLE],
+      mixTagsInterpolator: [OPENING_VARIABLE, CLOSING_VARIABLE]
     });
     const text = this.props.text || '';
     this.tagify.loadOriginalValues(text);
@@ -39,15 +39,15 @@ class TextWithVariablesInjected extends Component {
     });
   };
 
-  refreshVariables = async (nextProps) => {
+  refreshVariables = async nextProps => {
     const variableWhileList = [];
     let variablesKey = '';
     let variableReady = null;
 
-    Object.keys(nextProps.variables).forEach((variablePath) => {
+    Object.keys(nextProps.variables).forEach(variablePath => {
       // If the variable is defined before the current path, we can use it
       if (isVariableAvailableAtThisPath(variablePath, nextProps.path)) {
-        nextProps.variables[variablePath].forEach((option) => {
+        nextProps.variables[variablePath].forEach(option => {
           if (option.ready && variableReady === null) {
             variableReady = true;
           }
@@ -61,7 +61,7 @@ class TextWithVariablesInjected extends Component {
             id: `${variablePath}.${option.name}`,
             text: `${convertPathToText(variablePath, nextProps.intl.dictionary)} ${option.label}`,
             title: `${convertPathToText(variablePath, nextProps.intl.dictionary)} ${option.label}`,
-            value: `${variablePath}.${option.name}`,
+            value: `${variablePath}.${option.name}`
           });
         });
       }
@@ -69,7 +69,7 @@ class TextWithVariablesInjected extends Component {
 
     // Triggers variables
     nextProps.triggersVariables.forEach((triggerVariables, index) => {
-      triggerVariables.forEach((triggerVariable) => {
+      triggerVariables.forEach(triggerVariable => {
         if (triggerVariable.ready && variableReady === null) {
           variableReady = true;
         }
@@ -83,7 +83,7 @@ class TextWithVariablesInjected extends Component {
           id: `triggerEvent.${triggerVariable.name}`,
           text: `${index + 1}. ${triggerVariable.label}`,
           title: `${index + 1}. ${triggerVariable.label}`,
-          value: `triggerEvent.${triggerVariable.name}`,
+          value: `triggerEvent.${triggerVariable.name}`
         });
       });
     });
@@ -95,10 +95,10 @@ class TextWithVariablesInjected extends Component {
       this.initTagify();
     }
   };
-  parseText = async (textContent) => {
+  parseText = async textContent => {
     let text = textContent ? textContent : '';
     const variableWhileListSorted = this.state.variableWhileList.sort((a, b) => b.id.length - a.id.length);
-    variableWhileListSorted.forEach((variable) => {
+    variableWhileListSorted.forEach(variable => {
       text = text.replaceAll(variable.text, `${OPENING_VARIABLE}${variable.id}${CLOSING_VARIABLE}`);
     });
     text = text.replaceAll(`\n${OPENING_VARIABLE}`, OPENING_VARIABLE);
@@ -112,7 +112,7 @@ class TextWithVariablesInjected extends Component {
     this.props = props;
     this.state = {
       variableWhileList: [],
-      text: this.props.text,
+      text: this.props.text
     };
 
     this.refreshVariables(this.props);
@@ -129,12 +129,12 @@ class TextWithVariablesInjected extends Component {
       this.setState({ text: nextProps.text });
     }
     if (nextProps.class !== this.props.class) {
-      this.props.class.split(' ').forEach((oldClass) => {
+      this.props.class.split(' ').forEach(oldClass => {
         if (oldClass) {
           this.tagify.toggleClass(oldClass);
         }
       });
-      nextProps.class.split(' ').forEach((newClass) => {
+      nextProps.class.split(' ').forEach(newClass => {
         if (newClass) {
           this.tagify.toggleClass(newClass);
         }

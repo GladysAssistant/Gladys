@@ -14,7 +14,7 @@ import { DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants
 
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 const maxBoxes = 3;
-const getBoxesLength = (props) => {
+const getBoxesLength = props => {
   return props.homeDashboard.boxes.length;
 };
 
@@ -79,7 +79,7 @@ const EditBoxColumns = ({ children, ...props }) => (
               disabled={props.user.id !== props.homeDashboard.user_id}
               class="form-control"
             >
-              {DASHBOARD_VISIBILITY_LIST.map((dashboardVisibility) => (
+              {DASHBOARD_VISIBILITY_LIST.map(dashboardVisibility => (
                 <option value={dashboardVisibility}>
                   <Text id={`dashboard.visibilities.${dashboardVisibility}`} />
                 </option>
@@ -99,7 +99,7 @@ const EditBoxColumns = ({ children, ...props }) => (
         <button
           class={cx('btn', {
             'btn-secondary': !props.isMobileReordering,
-            'btn-warning': props.isMobileReordering,
+            'btn-warning': props.isMobileReordering
           })}
           onClick={props.toggleMobileReorder}
         >
@@ -118,7 +118,7 @@ const EditBoxColumns = ({ children, ...props }) => (
             <div
               class={cx('d-flex flex-column', style.column, stylePrimary.removePadding, {
                 [stylePrimary.removePaddingFirstCol]: x === 0,
-                [stylePrimary.removePaddingLastCol]: x === maxBoxes - 1,
+                [stylePrimary.removePaddingLastCol]: x === maxBoxes - 1
               })}
             >
               <div class={cx('d-flex', 'justify-content-center', style.columnBoxHeader)}>

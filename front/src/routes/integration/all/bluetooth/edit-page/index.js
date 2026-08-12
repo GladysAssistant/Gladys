@@ -4,7 +4,7 @@ import UpdateDevice from '../../../../../components/device';
 
 const BLUETOOTH_PAGE_PATH = '/dashboard/integration/device/bluetooth';
 
-const BluetoothEditDevicePage = (props) => (
+const BluetoothEditDevicePage = props => (
   <BluetoothPage user={props.user}>
     <UpdateDevice
       {...props}

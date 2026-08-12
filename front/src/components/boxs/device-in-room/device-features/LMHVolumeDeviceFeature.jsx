@@ -37,7 +37,7 @@ const LMHVolumeDeviceFeature = ({ children, ...props }) => {
           <div class="btn-group" role="group">
             <button
               class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === SIREN_LMH_VOLUME.LOW,
+                active: lastValue === SIREN_LMH_VOLUME.LOW
               })}
               onClick={low}
             >
@@ -45,7 +45,7 @@ const LMHVolumeDeviceFeature = ({ children, ...props }) => {
             </button>
             <button
               class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === SIREN_LMH_VOLUME.MEDIUM,
+                active: lastValue === SIREN_LMH_VOLUME.MEDIUM
               })}
               onClick={medium}
             >
@@ -53,7 +53,7 @@ const LMHVolumeDeviceFeature = ({ children, ...props }) => {
             </button>
             <button
               class={cx('btn btn-sm', 'btn-secondary', {
-                active: lastValue === SIREN_LMH_VOLUME.HIGH,
+                active: lastValue === SIREN_LMH_VOLUME.HIGH
               })}
               onClick={high}
             >

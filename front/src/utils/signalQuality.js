@@ -24,7 +24,7 @@ export const getSignalQualityLevel = (value, min = DEFAULT_SIGNAL_MIN, max = DEF
  * @param {number|null} level - Signal quality level from 0 to 5.
  * @returns {string|null} Tabler icon name.
  */
-export const getSignalQualityIcon = (level) => {
+export const getSignalQualityIcon = level => {
   if (level == null) {
     return null;
   }

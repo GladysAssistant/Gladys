@@ -248,5 +248,5 @@ export default [
   { offset: '+13:00', label: '(GMT+13:00) Fiji', value: 'Pacific/Fiji' },
   { offset: '+13:00', label: '(GMT+13:00) Tongatapu', value: 'Pacific/Tongatapu' },
   { offset: '+14:00', label: '(GMT+14:00) Apia', value: 'Pacific/Apia' },
-  { offset: '+14:00', label: '(GMT+14:00) Kiritimati', value: 'Pacific/Kiritimati' },
+  { offset: '+14:00', label: '(GMT+14:00) Kiritimati', value: 'Pacific/Kiritimati' }
 ];

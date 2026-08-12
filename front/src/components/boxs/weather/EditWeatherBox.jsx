@@ -21,7 +21,7 @@ const EditWeatherBox = ({ children, ...props }) => (
           <Text id="global.emptySelectOption" />
         </option>
         {props.houses &&
-          props.houses.map((house) => (
+          props.houses.map(house => (
             <option selected={house.selector === props.box.house} value={house.selector}>
               {house.name}
             </option>
@@ -37,7 +37,7 @@ const EditWeatherBox = ({ children, ...props }) => (
           <Text id="dashboard.boxes.weather.providerAuto" />
         </option>
         {props.providers &&
-          props.providers.map((provider) => (
+          props.providers.map(provider => (
             <option selected={provider.service_name === props.box.provider} value={provider.service_name}>
               {provider.service_name === 'openweather' ? (
                 <Text id="dashboard.boxes.weather.providerInternalOpenWeather" />
@@ -55,7 +55,7 @@ const EditWeatherBox = ({ children, ...props }) => (
         </label>
       </div>
       <div>
-        {Object.keys(GetWeatherModes).map((key) => {
+        {Object.keys(GetWeatherModes).map(key => {
           const mode = GetWeatherModes[key];
           const label = `dashboard.boxes.weather.displayModes.${mode}`;
           return (
@@ -84,26 +84,26 @@ const EditWeatherBox = ({ children, ...props }) => (
 );
 
 class EditWeatherBoxComponent extends Component {
-  updateBoxHouse = (e) => {
+  updateBoxHouse = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      house: e.target.value,
+      house: e.target.value
     });
   };
 
-  updateBoxModes = (e) => {
+  updateBoxModes = e => {
     // clone the modes object: mutating it in place would prevent
     // componentDidUpdate from detecting the change in the widget
     const modes = { ...(this.props.box.modes || {}) };
     modes[e.target.name] = e.target.checked;
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      modes,
+      modes
     });
   };
 
-  updateBoxProvider = (e) => {
+  updateBoxProvider = e => {
     // '' = automatic mode (first available provider, the default)
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      provider: e.target.value,
+      provider: e.target.value
     });
   };
 
@@ -121,18 +121,18 @@ class EditWeatherBoxComponent extends Component {
     try {
       await this.setState({
         error: false,
-        pending: true,
+        pending: true
       });
       const houses = await this.props.httpClient.get('/api/v1/house');
       this.setState({
         houses,
-        pending: false,
+        pending: false
       });
     } catch (e) {
       console.error(e);
       this.setState({
         error: true,
-        pending: false,
+        pending: false
       });
     }
   };
@@ -144,7 +144,7 @@ class EditWeatherBoxComponent extends Component {
 
   render(props, { houses, providers }) {
     const modes = props.box.modes || {};
-    const noModeSelected = !Object.keys(GetWeatherModes).some((key) => isModeChecked(modes, GetWeatherModes[key]));
+    const noModeSelected = !Object.keys(GetWeatherModes).some(key => isModeChecked(modes, GetWeatherModes[key]));
     return (
       <EditWeatherBox
         {...props}

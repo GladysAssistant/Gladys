@@ -17,7 +17,7 @@ import normalizeSearchText from '../../utils/normalizeSearchText';
 // "vergrossern" finds "vergrößern". Icons take a stricter fold than the rest
 // of the front on top of it: everything that is not a letter or a digit goes
 // too, so "door open", "door-open" and "dooropen" all match the same icon.
-const normalize = (value) => normalizeSearchText(value).replace(/[^a-z0-9]/g, '');
+const normalize = value => normalizeSearchText(value).replace(/[^a-z0-9]/g, '');
 
 const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
   const [search, setSearch] = useState('');
@@ -35,7 +35,7 @@ const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
         acc[icon] = normalize(`${icon} ${label} ${keywords}`);
         return acc;
       }, {}),
-    [translations],
+    [translations]
   );
 
   const icons = useMemo(() => {
@@ -43,12 +43,12 @@ const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
     if (searchTerm.length === 0) {
       return iconList;
     }
-    return iconList.filter((icon) => haystacks[icon].includes(searchTerm));
+    return iconList.filter(icon => haystacks[icon].includes(searchTerm));
   }, [search, haystacks]);
 
   // The selector lives inside the new/duplicate scene <form>, where Enter in a
   // text input submits it. Swallow it so searching never creates the scene.
-  const preventSubmitOnEnter = (e) => {
+  const preventSubmitOnEnter = e => {
     if (e.key === 'Enter') {
       e.preventDefault();
     }
@@ -65,20 +65,20 @@ const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
             type="text"
             class="form-control"
             value={search}
-            onInput={(e) => setSearch(e.target.value)}
+            onInput={e => setSearch(e.target.value)}
             onKeyDown={preventSubmitOnEnter}
             placeholder={<Text id="iconSelector.searchPlaceholder" />}
           />
         </Localizer>
       </div>
       <div class={cx('row', style.iconContainer)}>
-        {icons.map((icon) => {
+        {icons.map(icon => {
           const label = get(translations, `${icon}.label`) || icon;
           return (
             <div class={cx('col-4 col-sm-3', style.iconCol)} key={icon}>
               <div
                 class={cx('text-center', style.iconDiv, {
-                  [style.iconDivChecked]: value === icon,
+                  [style.iconDivChecked]: value === icon
                 })}
               >
                 {/* The tile is a fixed size, so a long label can be clamped:
@@ -94,7 +94,7 @@ const IconSelector = ({ value, onChange, darkModeNoFilter = false, user }) => {
                   />
                   <i
                     class={cx('fe', `fe-${icon}`, style.iconGlyph, {
-                      'dark-mode-fe-none-filter': darkModeNoFilter,
+                      'dark-mode-fe-none-filter': darkModeNoFilter
                     })}
                   />
                   <span class={style.iconName}>{label}</span>

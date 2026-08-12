@@ -7,7 +7,7 @@ import { DEFAULT_VALUE_HUMIDITY } from '../../../../../server/utils/constants';
 import RoomSelector from '../../house/RoomSelector';
 import cx from 'classnames';
 
-const updateBoxRoom = (updateBoxRoomFunc, x, y) => (room) => {
+const updateBoxRoom = (updateBoxRoomFunc, x, y) => room => {
   updateBoxRoomFunc(x, y, room.selector);
 };
 
@@ -38,7 +38,7 @@ const EditRoomHumidityBox = ({ children, unit, ...props }) => (
     <div class="form-group mb-2">
       <ReactSlider
         className={cx('humidity-slider', {
-          'opacity-60': !(props.box.humidity_use_custom_value || false),
+          'opacity-60': !(props.box.humidity_use_custom_value || false)
         })}
         thumbClassName="humidity-slider-thumb"
         trackClassName="humidity-slider-track"
@@ -48,7 +48,7 @@ const EditRoomHumidityBox = ({ children, unit, ...props }) => (
             {...props}
             style={{
               ...props.style,
-              transform: `translate( ${state.index === 0 ? '-75%' : '-25%'}, ${state.index === 0 ? '90%' : '-90%'})`,
+              transform: `translate( ${state.index === 0 ? '-75%' : '-25%'}, ${state.index === 0 ? '90%' : '-90%'})`
             }}
           >
             <div
@@ -78,20 +78,20 @@ const EditRoomHumidityBox = ({ children, unit, ...props }) => (
 class EditRoomHumidityBoxComponent extends Component {
   updateBoxRoom = (x, y, selector) => {
     this.props.updateBoxConfig(x, y, {
-      room: selector,
+      room: selector
     });
   };
 
-  updateBoxUseCustomValue = (e) => {
+  updateBoxUseCustomValue = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      humidity_use_custom_value: e.target.checked,
+      humidity_use_custom_value: e.target.checked
     });
   };
 
-  updateBoxValue = (values) => {
+  updateBoxValue = values => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       humidity_min: values[0],
-      humidity_max: values[1],
+      humidity_max: values[1]
     });
   };
 

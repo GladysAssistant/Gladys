@@ -28,5 +28,5 @@ class BluetoothSetupPage extends Component {
 
 export default connect(
   'user,session,bluetoothPeripheralUuids,bluetoothPeripherals,bluetoothStatus,currentIntegration',
-  actions,
+  actions
 )(BluetoothSetupPage);

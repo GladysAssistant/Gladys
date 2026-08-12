@@ -14,7 +14,7 @@ const EditCameraBox = ({ children, ...props }) => (
           <Text id="global.emptySelectOption" />
         </option>
         {props.cameras &&
-          props.cameras.map((camera) => (
+          props.cameras.map(camera => (
             <option selected={camera.selector === props.box.camera} value={camera.selector}>
               {camera.name}
             </option>
@@ -84,44 +84,44 @@ const EditCameraBox = ({ children, ...props }) => (
 );
 
 class EditCameraBoxComponent extends Component {
-  updateCamera = (e) => {
+  updateCamera = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      camera: e.target.value,
+      camera: e.target.value
     });
   };
 
-  updateBoxName = (e) => {
+  updateBoxName = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      name: e.target.value,
+      name: e.target.value
     });
   };
 
-  updateBoxLatency = (e) => {
+  updateBoxLatency = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      camera_latency: e.target.value,
+      camera_latency: e.target.value
     });
   };
 
-  updateCameraLiveAutoStart = (e) => {
+  updateCameraLiveAutoStart = e => {
     const newValue = e.target.checked;
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      camera_live_auto_start: newValue,
+      camera_live_auto_start: newValue
     });
   };
 
   getCameras = async () => {
     await this.setState({
-      loading: true,
+      loading: true
     });
     try {
       const cameras = await this.props.httpClient.get('/api/v1/camera');
       this.setState({
         cameras,
-        loading: false,
+        loading: false
       });
     } catch (e) {
       this.setState({
-        loading: false,
+        loading: false
       });
     }
   };
@@ -129,7 +129,7 @@ class EditCameraBoxComponent extends Component {
   initLatency = () => {
     if (!this.props.box.camera_latency) {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
-        camera_latency: 'low',
+        camera_latency: 'low'
       });
     }
   };

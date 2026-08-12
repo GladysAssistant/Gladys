@@ -19,13 +19,13 @@ class DiscoverTab extends Component {
 
   getDiscoveredDevices = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     try {
       const discoveredDevices = await this.props.httpClient.get('/api/v1/service/zwavejs-ui/node');
       const existingZwaveJSUIDevices = await this.props.httpClient.get('/api/v1/service/zwavejs-ui/device', {});
-      discoveredDevices.forEach((discoveredDevice) => {
-        const existingDevice = existingZwaveJSUIDevices.find((d) => d.external_id === discoveredDevice.external_id);
+      discoveredDevices.forEach(discoveredDevice => {
+        const existingDevice = existingZwaveJSUIDevices.find(d => d.external_id === discoveredDevice.external_id);
         if (existingDevice) {
           discoveredDevice.alreadyExist = true;
         }
@@ -33,12 +33,12 @@ class DiscoverTab extends Component {
       this.setState({
         discoveredDevices,
         loading: false,
-        errorLoading: false,
+        errorLoading: false
       });
     } catch (e) {
       this.setState({
         loading: false,
-        errorLoading: true,
+        errorLoading: true
       });
     }
   };
@@ -47,14 +47,14 @@ class DiscoverTab extends Component {
     this.getDiscoveredDevices();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.ZWAVEJS_UI.SCAN_COMPLETED,
-      this.getDiscoveredDevices,
+      this.getDiscoveredDevices
     );
   }
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.ZWAVEJS_UI.SCAN_COMPLETED,
-      this.getDiscoveredDevices,
+      this.getDiscoveredDevices
     );
   }
 
@@ -85,7 +85,7 @@ class DiscoverTab extends Component {
           )}
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />

@@ -7,7 +7,7 @@ import { WATER_HEATER_MODE } from '../../../../server/utils/constants';
 import { resolveFeatureOptions } from '../../utils/supportedOptions';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 
-const MODE_CATALOG = Object.keys(WATER_HEATER_MODE).map((key) => ({ value: WATER_HEATER_MODE[key] }));
+const MODE_CATALOG = Object.keys(WATER_HEATER_MODE).map(key => ({ value: WATER_HEATER_MODE[key] }));
 
 class SelectWaterHeaterMode extends Component {
   handleValueChange = ({ value }) => {
@@ -16,15 +16,15 @@ class SelectWaterHeaterMode extends Component {
 
   getLabel = (value, fallback) =>
     get(this.props.intl.dictionary, `deviceFeatureValue.category.water-heater.mode.${value}`, {
-      default: fallback || value,
+      default: fallback || value
     });
 
   getOptions = () => {
     // Only the modes this appliance declares, so an action cannot be saved on a mode the device
     // does not have. Falls back to the whole catalog when the feature carries no supported_options.
-    const deviceFeatureOptions = resolveFeatureOptions(this.props.deviceFeature, MODE_CATALOG).map((option) => ({
+    const deviceFeatureOptions = resolveFeatureOptions(this.props.deviceFeature, MODE_CATALOG).map(option => ({
       label: this.getLabel(option.value, option.label),
-      value: option.value,
+      value: option.value
     }));
 
     this.setState({ deviceFeatureOptions });
@@ -42,7 +42,7 @@ class SelectWaterHeaterMode extends Component {
     // mode the feature does not declare must show as nothing selected, not as a valid-looking
     // choice absent from the list, and options already carry the device's own label when the
     // value falls outside the catalog.
-    return deviceFeatureOptions.find((option) => option.value === value) || null;
+    return deviceFeatureOptions.find(option => option.value === value) || null;
   };
 
   componentDidMount() {

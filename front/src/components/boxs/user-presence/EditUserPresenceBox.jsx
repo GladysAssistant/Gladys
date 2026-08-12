@@ -36,9 +36,9 @@ class EditUserPresence extends Component {
     try {
       await this.setState({ loading: true });
       const users = await this.props.httpClient.get('/api/v1/user');
-      const usersSelect = users.map((u) => ({
+      const usersSelect = users.map(u => ({
         label: u.firstname,
-        value: u.selector,
+        value: u.selector
       }));
       await this.setState({ users: usersSelect, loading: false });
       this.updateSelectedUsers();
@@ -51,8 +51,8 @@ class EditUserPresence extends Component {
   updateSelectedUsers = () => {
     const selectedUsers = [];
     if (this.props.box.users) {
-      this.props.box.users.forEach((userSelector) => {
-        const userInUserSelect = this.state.users.find((u) => u.value === userSelector);
+      this.props.box.users.forEach(userSelector => {
+        const userInUserSelect = this.state.users.find(u => u.value === userSelector);
         if (userInUserSelect) {
           selectedUsers.push(userInUserSelect);
         }
@@ -61,13 +61,13 @@ class EditUserPresence extends Component {
     this.setState({ selectedUsers });
   };
 
-  updateUsers = (values) => {
+  updateUsers = values => {
     let usersSelector = [];
     if (values) {
-      usersSelector = values.map((u) => u.value);
+      usersSelector = values.map(u => u.value);
     }
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      users: usersSelector,
+      users: usersSelector
     });
   };
 
@@ -77,7 +77,7 @@ class EditUserPresence extends Component {
     this.state = {
       users: [],
       selectedUsers: [],
-      loading: false,
+      loading: false
     };
   }
 

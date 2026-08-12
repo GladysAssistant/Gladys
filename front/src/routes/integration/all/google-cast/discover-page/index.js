@@ -2,7 +2,7 @@ import { connect } from 'unistore/preact';
 import DiscoverTab from './DiscoverTab';
 import GoogleCastPage from '../GoogleCastPage';
 
-const GoogleCastDiscoverPage = (props) => (
+const GoogleCastDiscoverPage = props => (
   <GoogleCastPage user={props.user}>
     <DiscoverTab {...props} />
   </GoogleCastPage>

@@ -44,7 +44,7 @@ const DeviceTab = ({ children, ...props }) => {
 
         <div
           class={cx('dimmer', {
-            active: props.getMqttDevicesStatus === RequestStatus.Getting,
+            active: props.getMqttDevicesStatus === RequestStatus.Getting
           })}
         >
           <div class="loader" />
@@ -55,7 +55,7 @@ const DeviceTab = ({ children, ...props }) => {
                 <Text id="integration.mqtt.device.noDevices" />
               </div>
             )}
-            {deviceGroups.map((group) => (
+            {deviceGroups.map(group => (
               <div class={style.roomGroup} key={group.room ? group.room.id : 'unassigned'}>
                 <div class={style.roomGroupHeader}>
                   {group.room ? (
@@ -71,8 +71,8 @@ const DeviceTab = ({ children, ...props }) => {
                   <span class="badge badge-secondary ml-auto">{group.devices.length}</span>
                 </div>
                 <div class={style.deviceList}>
-                  {group.devices.map((device) => {
-                    const deviceIndex = props.mqttDevices.findIndex((d) => d.selector === device.selector);
+                  {group.devices.map(device => {
+                    const deviceIndex = props.mqttDevices.findIndex(d => d.selector === device.selector);
                     return (
                       <DeviceListItem
                         key={device.selector}

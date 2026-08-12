@@ -5,7 +5,7 @@ import { Text } from 'preact-i18n';
 // gesture — the effective mount is requested ∩ granted ∩ present.
 const HardwareSwitches = ({ requestedClasses, detectedClasses = {}, granted = [], onToggle, disabled }) => (
   <div>
-    {requestedClasses.map((hardwareClass) => (
+    {requestedClasses.map(hardwareClass => (
       <label class="custom-switch d-flex align-items-center mb-2">
         <input
           type="checkbox"

@@ -13,11 +13,11 @@ class PlayNotification extends Component {
     try {
       const devices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: DEVICE_FEATURE_CATEGORIES.MUSIC,
-        device_feature_type: DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION,
+        device_feature_type: DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION
       });
-      const devicesOptions = devices.map((device) => ({
+      const devicesOptions = devices.map(device => ({
         value: device.selector,
-        label: device.name,
+        label: device.name
       }));
 
       await this.setState({ devicesOptions });
@@ -27,13 +27,13 @@ class PlayNotification extends Component {
       console.error(e);
     }
   };
-  updateVolume = (e) => {
+  updateVolume = e => {
     this.props.updateActionProperty(this.props.path, 'volume', e.target.value);
   };
-  updateText = (text) => {
+  updateText = text => {
     this.props.updateActionProperty(this.props.path, 'text', text);
   };
-  handleDeviceChange = (selectedOption) => {
+  handleDeviceChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'device', selectedOption.value);
     } else {
@@ -41,10 +41,10 @@ class PlayNotification extends Component {
     }
   };
 
-  refreshSelectedOptions = (nextProps) => {
+  refreshSelectedOptions = nextProps => {
     let selectedDeviceFeatureOption = '';
     if (nextProps.action.device && this.state.devicesOptions) {
-      const deviceFeatureOption = this.state.devicesOptions.find((option) => option.value === nextProps.action.device);
+      const deviceFeatureOption = this.state.devicesOptions.find(option => option.value === nextProps.action.device);
 
       if (deviceFeatureOption) {
         selectedDeviceFeatureOption = deviceFeatureOption;
@@ -56,7 +56,7 @@ class PlayNotification extends Component {
     super(props);
     this.props = props;
     this.state = {
-      selectedDeviceFeatureOption: '',
+      selectedDeviceFeatureOption: ''
     };
   }
   componentDidMount() {
@@ -88,7 +88,7 @@ class PlayNotification extends Component {
           <Select
             styles={{
               // Fixes the overlapping problem of the component
-              menu: (provided) => ({ ...provided, zIndex: 2 }),
+              menu: provided => ({ ...provided, zIndex: 2 })
             }}
             options={devicesOptions}
             value={selectedDeviceFeatureOption}

@@ -9,7 +9,7 @@ import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import { RequestStatus } from '../../../../../utils/consts';
 
-const getDeviceRank = (device) => {
+const getDeviceRank = device => {
   const isCreated = !!device.created_at;
   const hasFeatures = device.features && device.features.length > 0;
   const isUpdatable = !!device.updatable;
@@ -28,7 +28,7 @@ const getDeviceRank = (device) => {
   return 4;
 };
 
-const sortDevices = (devices) =>
+const sortDevices = devices =>
   [...devices].sort((a, b) => {
     const rankDiff = getDeviceRank(a) - getDeviceRank(b);
     if (rankDiff !== 0) {
@@ -53,39 +53,39 @@ class DiscoverTab extends Component {
 
   async getHouses() {
     this.setState({
-      housesGetStatus: RequestStatus.Getting,
+      housesGetStatus: RequestStatus.Getting
     });
     try {
       const params = {
-        expand: 'rooms',
+        expand: 'rooms'
       };
       const housesWithRooms = await this.props.httpClient.get(`/api/v1/house`, params);
       this.setState({
         housesWithRooms,
-        housesGetStatus: RequestStatus.Success,
+        housesGetStatus: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        housesGetStatus: RequestStatus.Error,
+        housesGetStatus: RequestStatus.Error
       });
     }
   }
 
   getDiscoveredDevices = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     try {
       const discoveredDevices = await this.props.httpClient.get('/api/v1/service/tuya/discover');
       this.setState({
         discoveredDevices,
         loading: false,
-        errorLoading: false,
+        errorLoading: false
       });
     } catch (e) {
       this.setState({
         loading: false,
-        errorLoading: true,
+        errorLoading: true
       });
     }
   };
@@ -94,59 +94,59 @@ class DiscoverTab extends Component {
     this.setState({
       udpScanLoading: true,
       udpScanError: false,
-      udpScanPortErrors: null,
+      udpScanPortErrors: null
     });
     try {
       const response = await this.props.httpClient.post('/api/v1/service/tuya/local-scan', {
-        timeoutSeconds: 10,
+        timeoutSeconds: 10
       });
       if (response && response.devices) {
         this.setState({
-          discoveredDevices: response.devices,
+          discoveredDevices: response.devices
         });
       } else {
         await this.getDiscoveredDevices();
       }
       this.setState({
         udpScanLoading: false,
-        udpScanPortErrors: response && response.port_errors ? response.port_errors : null,
+        udpScanPortErrors: response && response.port_errors ? response.port_errors : null
       });
     } catch (e) {
       this.setState({
         udpScanLoading: false,
-        udpScanError: true,
+        udpScanError: true
       });
     }
   };
 
-  handleDeviceSaved = (savedDevice) => {
+  handleDeviceSaved = savedDevice => {
     if (!savedDevice || !savedDevice.external_id) {
       this.getDiscoveredDevices();
       return;
     }
-    this.setState((prevState) => {
+    this.setState(prevState => {
       const { discoveredDevices } = prevState;
       if (!Array.isArray(discoveredDevices)) {
         return null;
       }
       return {
-        discoveredDevices: discoveredDevices.map((device) => {
+        discoveredDevices: discoveredDevices.map(device => {
           if (device.external_id !== savedDevice.external_id) {
             return device;
           }
           return {
             ...device,
             ...savedDevice,
-            updatable: false,
+            updatable: false
           };
-        }),
+        })
       };
     });
   };
 
   render(
     props,
-    { loading, errorLoading, discoveredDevices, housesWithRooms, udpScanLoading, udpScanError, udpScanPortErrors },
+    { loading, errorLoading, discoveredDevices, housesWithRooms, udpScanLoading, udpScanError, udpScanPortErrors }
   ) {
     const isLoading = loading || udpScanLoading;
     const canScanCloud = !isLoading;
@@ -156,8 +156,8 @@ class DiscoverTab extends Component {
     const scanTextId = udpScanLoading
       ? localScanTextId
       : loading
-        ? 'integration.tuya.discover.scanCloudInProgress'
-        : null;
+      ? 'integration.tuya.discover.scanCloudInProgress'
+      : null;
     const portErrorPorts = udpScanPortErrors ? Object.keys(udpScanPortErrors) : [];
     const orderedDevices = Array.isArray(discoveredDevices) ? sortDevices(discoveredDevices) : [];
 
@@ -201,7 +201,7 @@ class DiscoverTab extends Component {
                   <Text
                     id="integration.tuya.discover.udpScanPortInUse"
                     fields={{
-                      ports: portErrorPorts.join(', '),
+                      ports: portErrorPorts.join(', ')
                     }}
                   />
                 </span>
@@ -210,7 +210,7 @@ class DiscoverTab extends Component {
           )}
           <div
             class={cx('dimmer', {
-              active: isLoading,
+              active: isLoading
             })}
           >
             <div class={cx('dimmer-content', style.tuyaListBody)}>

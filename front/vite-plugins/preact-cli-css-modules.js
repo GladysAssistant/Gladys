@@ -27,7 +27,7 @@ export function preactCliCssModules() {
             return match;
           }
           return `import ${binding} from ${quote}${cssPath.replace(/\.css$/, '.module.css')}${quote}`;
-        },
+        }
       );
 
       if (updatedCode === code) {
@@ -87,6 +87,6 @@ export function preactCliCssModules() {
       }
 
       return [...modules, virtualModule];
-    },
+    }
   };
 }

@@ -6,7 +6,7 @@ import get from 'get-value';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 class BinaryDeviceState extends Component {
-  handleValueChangeBinary = (newValue) => () => {
+  handleValueChangeBinary = newValue => () => {
     this.props.updateTriggerProperty(this.props.index, 'value', newValue);
   };
 
@@ -21,7 +21,7 @@ class BinaryDeviceState extends Component {
           class={cx('btn', 'btn-block', 'p-1', {
             'btn-primary': this.props.trigger.value === value,
             'btn-outline-primary': this.props.trigger.value !== value,
-            active: this.props.trigger.value === value,
+            active: this.props.trigger.value === value
           })}
           onClick={this.handleValueChangeBinary(value)}
         >

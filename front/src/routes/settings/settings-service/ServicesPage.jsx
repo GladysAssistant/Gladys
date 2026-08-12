@@ -25,7 +25,7 @@ const ServicesPage = ({ services, integrations, actionOnService }) => (
             </thead>
             <tbody>
               {services &&
-                services.map((service) => (
+                services.map(service => (
                   <ServiceItem service={service} integrations={integrations} actionOnService={actionOnService} />
                 ))}
             </tbody>

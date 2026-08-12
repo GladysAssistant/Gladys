@@ -10,10 +10,10 @@ class HouseEmptyOrNotCondition extends Component {
     try {
       const houses = await this.props.httpClient.get('/api/v1/house');
       const houseOptions = [];
-      houses.forEach((house) => {
+      houses.forEach(house => {
         houseOptions.push({
           label: house.name,
-          value: house.selector,
+          value: house.selector
         });
       });
       await this.setState({ houseOptions });
@@ -22,17 +22,17 @@ class HouseEmptyOrNotCondition extends Component {
       console.error(e);
     }
   };
-  handleHouseChange = (selectedOption) => {
+  handleHouseChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'house', selectedOption.value);
     } else {
       this.props.updateActionProperty(this.props.path, 'house', null);
     }
   };
-  refreshSelectedOptions = (nextProps) => {
+  refreshSelectedOptions = nextProps => {
     let selectedHouseOption = '';
     if (nextProps.action.house && this.state.houseOptions) {
-      const houseOption = this.state.houseOptions.find((option) => option.value === nextProps.action.house);
+      const houseOption = this.state.houseOptions.find(option => option.value === nextProps.action.house);
 
       if (houseOption) {
         selectedHouseOption = houseOption;
@@ -44,7 +44,7 @@ class HouseEmptyOrNotCondition extends Component {
     super(props);
     this.props = props;
     this.state = {
-      selectedHouseOption: '',
+      selectedHouseOption: ''
     };
   }
   componentDidMount() {

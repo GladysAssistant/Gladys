@@ -5,7 +5,7 @@ import uuid from 'uuid';
 const TYPING_MIN_TIME = 400;
 const TYPING_MAX_TIME = 600;
 
-const sortMessages = (messages) => messages.sort((a, b) => a.created_at - b.created_at);
+const sortMessages = messages => messages.sort((a, b) => a.created_at - b.created_at);
 
 function createActions(store) {
   const actions = {
@@ -19,64 +19,64 @@ function createActions(store) {
     },
     async getMessages(state) {
       store.setState({
-        MessageGetStatus: RequestStatus.Getting,
+        MessageGetStatus: RequestStatus.Getting
       });
       try {
         let messages = await state.httpClient.get('/api/v1/message');
         // Force date usage
-        messages.forEach((message) => (message.created_at = new Date(message.created_at)));
+        messages.forEach(message => (message.created_at = new Date(message.created_at)));
         messages = sortMessages(messages);
         store.setState({
           messages,
-          MessageGetStatus: RequestStatus.Success,
+          MessageGetStatus: RequestStatus.Success
         });
         actions.scrollToBottom();
       } catch (e) {
         store.setState({
-          MessageGetStatus: RequestStatus.Error,
+          MessageGetStatus: RequestStatus.Error
         });
       }
     },
     updateMessageTextInput(state, e) {
       store.setState({
-        currentMessageTextInput: e.target.value,
+        currentMessageTextInput: e.target.value
       });
     },
     syncMessage(state, message) {
       let newMessages = store.getState().messages;
       // Check if message is already in the list
-      if (message.id && newMessages.find((m) => m.id === message.id)) {
+      if (message.id && newMessages.find(m => m.id === message.id)) {
         return;
       }
       newMessages = update(store.getState().messages, {
-        $push: [message],
+        $push: [message]
       });
       newMessages = sortMessages(newMessages);
       store.setState({
         gladysIsTyping: false,
-        messages: newMessages,
+        messages: newMessages
       });
       actions.scrollToBottom();
     },
     setGladysTypingStatus(state, payload) {
       store.setState({
-        gladysIsTyping: Boolean(payload && payload.thinking),
+        gladysIsTyping: Boolean(payload && payload.thinking)
       });
     },
     pushMessage(state, message) {
       store.setState({
-        gladysIsTyping: true,
+        gladysIsTyping: true
       });
       actions.scrollToBottom();
       const randomWait = Math.floor(Math.random() * TYPING_MAX_TIME) + TYPING_MIN_TIME;
       setTimeout(() => {
         let newMessages = update(store.getState().messages, {
-          $push: [message],
+          $push: [message]
         });
         newMessages = sortMessages(newMessages);
         store.setState({
           gladysIsTyping: false,
-          messages: newMessages,
+          messages: newMessages
         });
         actions.scrollToBottom();
       }, randomWait);
@@ -92,7 +92,7 @@ function createActions(store) {
         return;
       }
       store.setState({
-        MessageSendStatus: RequestStatus.Getting,
+        MessageSendStatus: RequestStatus.Getting
       });
       const messageText = state.currentMessageTextInput;
       try {
@@ -100,11 +100,11 @@ function createActions(store) {
         const newMessage = {
           text: messageText,
           created_at: new Date(),
-          id,
+          id
         };
         const messagePayload = {
           text: messageText,
-          id,
+          id
         };
         if (aiChatModel && aiChatModel !== 'auto') {
           messagePayload.model = aiChatModel;
@@ -112,14 +112,14 @@ function createActions(store) {
         // we first push the message
         const newState = update(state, {
           messages: {
-            $push: [newMessage],
+            $push: [newMessage]
           },
           MessageSendStatus: {
-            $set: RequestStatus.Getting,
+            $set: RequestStatus.Getting
           },
           currentMessageTextInput: {
-            $set: '',
-          },
+            $set: ''
+          }
         });
         newState.messages = sortMessages(newState.messages);
         store.setState(newState);
@@ -128,23 +128,23 @@ function createActions(store) {
         // then we remove the message loading
         const finalState = update(state, {
           messages: {
-            $set: sortMessages(newState.messages),
+            $set: sortMessages(newState.messages)
           },
           MessageSendStatus: {
-            $set: RequestStatus.Success,
+            $set: RequestStatus.Success
           },
           currentMessageTextInput: {
-            $set: '',
-          },
+            $set: ''
+          }
         });
         store.setState(finalState);
         actions.scrollToBottom();
       } catch (e) {
         store.setState({
-          MessageSendStatus: RequestStatus.Error,
+          MessageSendStatus: RequestStatus.Error
         });
       }
-    },
+    }
   };
   return actions;
 }

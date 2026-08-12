@@ -4,7 +4,7 @@ import { connect } from 'unistore/preact';
 import {
   formatResetDuration,
   getQuotaProgressBarClass,
-  getQuotaUsedPercent,
+  getQuotaUsedPercent
 } from '../../../../../../server/utils/openAIQuota';
 
 const QUOTA_REFRESH_INTERVAL_MS = 60 * 1000;
@@ -13,7 +13,7 @@ class QuotaItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      resetInSeconds: props.quota.reset_in_seconds || 0,
+      resetInSeconds: props.quota.reset_in_seconds || 0
     };
   }
 
@@ -34,8 +34,8 @@ class QuotaItem extends Component {
   startCountdown = () => {
     this.stopCountdown();
     this.countdownInterval = setInterval(() => {
-      this.setState((prevState) => ({
-        resetInSeconds: prevState.resetInSeconds > 0 ? prevState.resetInSeconds - 1 : 0,
+      this.setState(prevState => ({
+        resetInSeconds: prevState.resetInSeconds > 0 ? prevState.resetInSeconds - 1 : 0
       }));
     }, 1000);
   };
@@ -63,7 +63,7 @@ class QuotaItem extends Component {
               id="integration.openai.quota.remaining"
               fields={{
                 remaining: quota.remaining,
-                max: quota.max,
+                max: quota.max
               }}
             />
           </span>
@@ -72,7 +72,7 @@ class QuotaItem extends Component {
           <div
             class={`progress-bar ${progressBarClass}`}
             style={{
-              width: `${usedPercent}%`,
+              width: `${usedPercent}%`
             }}
             role="progressbar"
             aria-valuenow={usedPercent}
@@ -103,7 +103,7 @@ class AiQuotaDisplay extends Component {
     this.state = {
       quota: null,
       loading: true,
-      loadError: false,
+      loadError: false
     };
   }
 
@@ -114,14 +114,14 @@ class AiQuotaDisplay extends Component {
       this.setState({
         quota,
         loading: false,
-        loadError: false,
+        loadError: false
       });
     } catch (e) {
       console.error(e);
       this.setState({
         quota: null,
         loading: false,
-        loadError: true,
+        loadError: true
       });
     }
   };

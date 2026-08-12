@@ -7,7 +7,7 @@ import JobData from './JobData';
 import style from './style.css';
 
 // Format a duration with an adaptive unit: "247 ms", "12 s", "3 min 05 s", "2 h 04 min"
-const formatJobDuration = (durationMs) => {
+const formatJobDuration = durationMs => {
   if (!Number.isFinite(durationMs) || durationMs < 0) {
     return null;
   }
@@ -95,7 +95,7 @@ const JobList = ({ children, ...props }) => (
         </thead>
         <tbody>
           {props.jobs &&
-            props.jobs.map((job) => (
+            props.jobs.map(job => (
               <tr>
                 <td>
                   <div>
@@ -130,7 +130,7 @@ const JobList = ({ children, ...props }) => (
                     class={cx('badge', {
                       'badge-success': job.status === JOB_STATUS.SUCCESS,
                       'badge-primary': job.status === JOB_STATUS.IN_PROGRESS,
-                      'badge-danger': job.status === JOB_STATUS.FAILED,
+                      'badge-danger': job.status === JOB_STATUS.FAILED
                     })}
                   >
                     {job.status !== JOB_STATUS.IN_PROGRESS && <Text id={`jobsSettings.jobStatuses.${job.status}`} />}

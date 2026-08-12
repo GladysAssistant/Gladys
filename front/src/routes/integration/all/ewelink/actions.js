@@ -19,7 +19,7 @@ function createActions(store) {
           eweLinkUsername: (eweLinkUsername || { value: '' }).value,
           eweLinkPassword,
           passwordChanges: false,
-          connected: false,
+          connected: false
         });
       }
     },
@@ -36,28 +36,28 @@ function createActions(store) {
       store.setState({
         connectEweLinkStatus: RequestStatus.Getting,
         eweLinkConnected: false,
-        eweLinkConnectionError: undefined,
+        eweLinkConnectionError: undefined
       });
       try {
         await state.httpClient.post('/api/v1/service/ewelink/variable/EWELINK_EMAIL', {
-          value: state.eweLinkUsername,
+          value: state.eweLinkUsername
         });
         if (state.passwordChanges) {
           await state.httpClient.post('/api/v1/service/ewelink/variable/EWELINK_PASSWORD', {
-            value: state.eweLinkPassword,
+            value: state.eweLinkPassword
           });
         }
         await state.httpClient.post(`/api/v1/service/ewelink/connect`);
 
         store.setState({
-          connectEweLinkStatus: RequestStatus.Success,
+          connectEweLinkStatus: RequestStatus.Success
         });
 
         setTimeout(() => store.setState({ connectEweLinkStatus: undefined }), 3000);
       } catch (e) {
         store.setState({
           connectEweLinkStatus: RequestStatus.Error,
-          passwordChanges: false,
+          passwordChanges: false
         });
       }
     },
@@ -65,31 +65,31 @@ function createActions(store) {
       // display 3 seconds a message "EweLink connected"
       store.setState({
         eweLinkConnected: true,
-        eweLinkConnectionError: undefined,
+        eweLinkConnectionError: undefined
       });
       setTimeout(
         () =>
           store.setState({
             eweLinkConnected: false,
-            connectEweLinkStatus: undefined,
+            connectEweLinkStatus: undefined
           }),
-        3000,
+        3000
       );
     },
     displayEweLinkError(state, error) {
       store.setState({
         eweLinkConnected: false,
         connectEweLinkStatus: undefined,
-        eweLinkConnectionError: error,
+        eweLinkConnectionError: error
       });
     },
     async getEweLinkDevices(state) {
       store.setState({
-        getEweLinkStatus: RequestStatus.Getting,
+        getEweLinkStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getEweLinkOrderDir || 'asc',
+          order_dir: state.getEweLinkOrderDir || 'asc'
         };
         if (state.eweLinkSearch && state.eweLinkSearch.length) {
           options.search = state.eweLinkSearch;
@@ -98,48 +98,48 @@ function createActions(store) {
         const eweLinkDevices = await state.httpClient.get('/api/v1/service/ewelink/device', options);
         store.setState({
           eweLinkDevices,
-          getEweLinkStatus: RequestStatus.Success,
+          getEweLinkStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getEweLinkStatus: e.message,
+          getEweLinkStatus: e.message
         });
       }
     },
     async getDiscoveredEweLinkDevices(state) {
       store.setState({
-        loading: true,
+        loading: true
       });
       try {
         const discoveredDevices = await state.httpClient.get('/api/v1/service/ewelink/discover');
         store.setState({
           discoveredDevices,
           loading: false,
-          errorLoading: false,
+          errorLoading: false
         });
       } catch (e) {
         store.setState({
           loading: false,
-          errorLoading: true,
+          errorLoading: true
         });
       }
     },
     async getHouses(state) {
       store.setState({
-        housesGetStatus: RequestStatus.Getting,
+        housesGetStatus: RequestStatus.Getting
       });
       try {
         const params = {
-          expand: 'rooms',
+          expand: 'rooms'
         };
         const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
         store.setState({
           housesWithRooms,
-          housesGetStatus: RequestStatus.Success,
+          housesGetStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          housesGetStatus: RequestStatus.Error,
+          housesGetStatus: RequestStatus.Error
         });
       }
     },
@@ -147,12 +147,12 @@ function createActions(store) {
       const devices = update(state[listName], {
         [index]: {
           [field]: {
-            $set: value,
-          },
-        },
+            $set: value
+          }
+        }
       });
       store.setState({
-        [listName]: devices,
+        [listName]: devices
       });
     },
     updateFeatureProperty(state, listName, deviceIndex, featureIndex, property, value) {
@@ -161,25 +161,25 @@ function createActions(store) {
           features: {
             [featureIndex]: {
               [property]: {
-                $set: value,
-              },
-            },
-          },
-        },
+                $set: value
+              }
+            }
+          }
+        }
       });
 
       store.setState({
-        [listName]: devices,
+        [listName]: devices
       });
     },
     async saveDevice(state, listName, index) {
       const device = state[listName][index];
       const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
       const devices = update(state[listName], {
-        $splice: [[index, 1, savedDevice]],
+        $splice: [[index, 1, savedDevice]]
       });
       store.setState({
-        [listName]: devices,
+        [listName]: devices
       });
     },
     async deleteDevice(state, index) {
@@ -188,24 +188,24 @@ function createActions(store) {
         await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       }
       const eweLinkDevices = update(state.eweLinkDevices, {
-        $splice: [[index, 1]],
+        $splice: [[index, 1]]
       });
       store.setState({
-        eweLinkDevices,
+        eweLinkDevices
       });
     },
     async search(state, e) {
       store.setState({
-        eweLinkSearch: e.target.value,
+        eweLinkSearch: e.target.value
       });
       await actions.getEweLinkDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getEweLinkOrderDir: e.target.value,
+        getEweLinkOrderDir: e.target.value
       });
       await actions.getEweLinkDevices(store.getState());
-    },
+    }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
 

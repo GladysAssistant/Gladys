@@ -9,7 +9,7 @@ async function fileToBase64(file) {
     }
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onloadend = function () {
+    reader.onloadend = function() {
       const base64data = reader.result;
       resolve(base64data);
     };
@@ -17,19 +17,19 @@ async function fileToBase64(file) {
 }
 
 async function getCropperBase64Image(cropper) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     if (!cropper) {
       return resolve(null);
     }
     const canva = cropper.getCroppedCanvas({
       width: 100,
-      height: 100,
+      height: 100
     });
 
     if (!canva) {
       return resolve(null);
     }
-    canva.toBlob(async (blob) => {
+    canva.toBlob(async blob => {
       const base64Image = await fileToBase64(blob);
       resolve(base64Image);
     });

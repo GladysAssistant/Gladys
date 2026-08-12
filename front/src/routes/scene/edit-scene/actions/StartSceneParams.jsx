@@ -6,7 +6,7 @@ import Select from 'react-select';
 import actions from '../../../../actions/scene';
 
 class StartSceneParams extends Component {
-  handleChange = (selectedOption) => {
+  handleChange = selectedOption => {
     if (selectedOption) {
       this.props.updateActionProperty(this.props.path, 'scene', selectedOption.value);
     } else {
@@ -14,22 +14,22 @@ class StartSceneParams extends Component {
     }
   };
 
-  refreshSelectedOptions = (nextProps) => {
+  refreshSelectedOptions = nextProps => {
     let selectedOption = null;
     let scenes = this.state.scenes || [];
     const currentScene = nextProps.scene.selector;
 
     if (scenes.length === 0 && nextProps.scenes) {
       scenes = nextProps.scenes
-        .filter((scene) => scene.selector !== currentScene)
-        .map((scene) => ({
+        .filter(scene => scene.selector !== currentScene)
+        .map(scene => ({
           value: scene.selector,
-          label: scene.name,
+          label: scene.name
         }));
     }
 
     if (nextProps.action.scene && scenes.length > 0) {
-      selectedOption = scenes.find((scene) => scene.value === nextProps.action.scene) || null;
+      selectedOption = scenes.find(scene => scene.value === nextProps.action.scene) || null;
     }
 
     this.setState({ selectedOption, scenes });
@@ -38,7 +38,7 @@ class StartSceneParams extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedOption: null,
+      selectedOption: null
     };
   }
 

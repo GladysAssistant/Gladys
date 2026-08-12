@@ -36,7 +36,7 @@ class ExternalIntegrationOAuthCallbackPage extends Component {
         key,
         code,
         state,
-        redirect_uri: redirectUri,
+        redirect_uri: redirectUri
       });
       localStorage.removeItem(`externalIntegrationOAuthKey:${selector}`);
       localStorage.removeItem(`externalIntegrationOAuthRedirectUri:${selector}`);
@@ -64,7 +64,7 @@ class ExternalIntegrationOAuthCallbackPage extends Component {
               </div>
               <div
                 class={cx('dimmer', {
-                  active: relayStatus === RequestStatus.Getting,
+                  active: relayStatus === RequestStatus.Getting
                 })}
               >
                 <div class="loader" />

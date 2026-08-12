@@ -7,14 +7,14 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/consta
 
 import style from './style.css';
 
-const isNullOrUndefined = (val) => val === null || val === undefined;
+const isNullOrUndefined = val => val === null || val === undefined;
 
 const SETPOINT_STEP_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: 1,
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: 1,
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE]: 1,
   // A storage tank is set in whole degrees; the 0.5 default is room-thermostat granularity.
-  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: 1,
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: 1
 };
 
 const DEFAULT_VALUE_BY_CATEGORY = {
@@ -23,7 +23,7 @@ const DEFAULT_VALUE_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CLIMATE]: 18,
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: 0,
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE]: 5,
-  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: 55,
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: 55
 };
 
 const SetpointDeviceFeature = ({ children, ...props }) => {
@@ -59,7 +59,7 @@ const SetpointDeviceFeature = ({ children, ...props }) => {
           class={`fe fe-${get(
             DeviceFeatureCategoriesIcon,
             `${props.deviceFeature.category}.${props.deviceFeature.type}`,
-            { default: 'hash' },
+            { default: 'hash' }
           )}`}
         />
       </td>

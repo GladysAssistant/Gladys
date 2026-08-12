@@ -14,7 +14,7 @@ function createActions(store) {
       try {
         const room = await state.httpClient.get(`/api/v1/room/${box.room}`, { expand: 'humidity,devices' });
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          room,
+          room
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
@@ -26,10 +26,8 @@ function createActions(store) {
       const devices = get(data, 'room.devices', { default: [] });
 
       // Search if feature is in room
-      const featureIndex = devices.findIndex((device) => {
-        const featureIndex = device.features.findIndex(
-          (feature) => feature.selector === payload.device_feature_selector,
-        );
+      const featureIndex = devices.findIndex(device => {
+        const featureIndex = device.features.findIndex(feature => feature.selector === payload.device_feature_selector);
         return featureIndex !== -1;
       });
 
@@ -38,7 +36,7 @@ function createActions(store) {
         // Refresh box value
         this.getHumidityInRoom(box, x, y);
       }
-    },
+    }
   };
   return Object.assign({}, actions);
 }

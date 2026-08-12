@@ -24,10 +24,10 @@ const colorSelectorStyles = {
       cursor: isDisabled ? 'not-allowed' : 'default',
       ':active': {
         ...styles[':active'],
-        backgroundColor: !isDisabled ? color : undefined,
-      },
+        backgroundColor: !isDisabled ? color : undefined
+      }
     };
-  },
+  }
 };
 
 const renderColorOption = ({ value, label }) => (
@@ -41,49 +41,49 @@ const renderColorOption = ({ value, label }) => (
 );
 
 class EditGaugeBoxComponent extends Component {
-  updateBoxName = (e) => {
+  updateBoxName = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      name: e.target.value,
+      name: e.target.value
     });
   };
 
-  updateDeviceFeature = (option) => {
+  updateDeviceFeature = option => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      device_feature: option ? option.value : null,
+      device_feature: option ? option.value : null
     });
     this.setState({ selectedDeviceFeatureOptions: option });
   };
 
-  updateBoxUseCustomValue = (e) => {
+  updateBoxUseCustomValue = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      gauge_use_custom_value: e.target.checked,
+      gauge_use_custom_value: e.target.checked
     });
   };
 
-  updateThresholds = (values) => {
+  updateThresholds = values => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       gauge_min: values[0],
-      gauge_max: values[1],
+      gauge_max: values[1]
     });
   };
 
-  updateColor = (key) => (option) => {
+  updateColor = key => option => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      [key]: option ? option.value : null,
+      [key]: option ? option.value : null
     });
   };
 
-  getSelectedDeviceFeatureAndOptions = (devices) => {
+  getSelectedDeviceFeatureAndOptions = devices => {
     const deviceOptions = [];
     let selectedDeviceFeatureOptions = null;
     let selectedFeature = null;
 
-    devices.forEach((device) => {
+    devices.forEach(device => {
       const deviceFeatures = [];
-      device.features.forEach((feature) => {
+      device.features.forEach(feature => {
         const featureOption = {
           value: feature.selector,
-          label: getDeviceFeatureName(this.props.intl.dictionary, device, feature),
+          label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
         };
         deviceFeatures.push(featureOption);
         if (this.props.box.device_feature === feature.selector) {
@@ -102,7 +102,7 @@ class EditGaugeBoxComponent extends Component {
         });
         deviceOptions.push({
           label: device.name,
-          options: deviceFeatures,
+          options: deviceFeatures
         });
       }
     });
@@ -113,8 +113,9 @@ class EditGaugeBoxComponent extends Component {
     try {
       this.setState({ loading: true });
       const devices = await this.props.httpClient.get(`/api/v1/device`);
-      const { deviceOptions, selectedDeviceFeatureOptions, selectedFeature } =
-        this.getSelectedDeviceFeatureAndOptions(devices);
+      const { deviceOptions, selectedDeviceFeatureOptions, selectedFeature } = this.getSelectedDeviceFeatureAndOptions(
+        devices
+      );
       this.setState({ deviceOptions, selectedDeviceFeatureOptions, selectedFeature, loading: false });
     } catch (e) {
       console.error(e);
@@ -168,16 +169,16 @@ class EditGaugeBoxComponent extends Component {
       value,
       label:
         (intl && intl.dictionary && intl.dictionary.color && intl.dictionary.color[DEFAULT_COLORS_NAME[i]]) ||
-        DEFAULT_COLORS_NAME[i],
+        DEFAULT_COLORS_NAME[i]
     }));
-    const colorOptionByValue = (value) => colorOptions.find((o) => o.value === value) || null;
+    const colorOptionByValue = value => colorOptions.find(o => o.value === value) || null;
 
     const unitShort =
       selectedFeature && selectedFeature.unit && intl && intl.dictionary && intl.dictionary.deviceFeatureUnitShort
         ? intl.dictionary.deviceFeatureUnitShort[selectedFeature.unit] || ''
         : '';
 
-    const formatThumbValue = (value) => {
+    const formatThumbValue = value => {
       const rounded = step < 1 ? Number(value).toFixed(1) : Math.round(value);
       return unitShort ? `${rounded} ${unitShort}` : `${rounded}`;
     };

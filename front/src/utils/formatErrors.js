@@ -1,6 +1,6 @@
 import get from 'get-value';
 
-const safeJsonStringify = (value) => {
+const safeJsonStringify = value => {
   try {
     return JSON.stringify(value, null, 2);
   } catch (e) {
@@ -8,7 +8,7 @@ const safeJsonStringify = (value) => {
   }
 };
 
-const serializeApiResponseBody = (data) => {
+const serializeApiResponseBody = data => {
   if (!data) {
     return null;
   }
@@ -18,7 +18,7 @@ const serializeApiResponseBody = (data) => {
   return safeJsonStringify(data);
 };
 
-const formatConflictErrorObject = (error) => {
+const formatConflictErrorObject = error => {
   if (!error) {
     return null;
   }
@@ -38,12 +38,12 @@ const formatConflictErrorObject = (error) => {
   return String(error);
 };
 
-const formatValidationProperties = (properties) => {
+const formatValidationProperties = properties => {
   if (!Array.isArray(properties)) {
     return null;
   }
   return properties
-    .map((property) => {
+    .map(property => {
       if (typeof property === 'string') {
         return property;
       }
@@ -52,7 +52,7 @@ const formatValidationProperties = (properties) => {
     .join('; ');
 };
 
-const formatApiErrorDetail = (error) => {
+const formatApiErrorDetail = error => {
   const data = get(error, 'response.data');
   if (!data) {
     return get(error, 'message') || null;
@@ -74,7 +74,7 @@ const formatApiErrorDetail = (error) => {
   return formatValidationProperties(data.properties);
 };
 
-const getUnknownErrorDetail = (error) => {
+const getUnknownErrorDetail = error => {
   const data = get(error, 'response.data');
   const serialized = serializeApiResponseBody(data);
   if (serialized) {
@@ -93,7 +93,7 @@ const getUnknownErrorDetail = (error) => {
   return safeJsonStringify(error);
 };
 
-const getMatterDeviceSaveError = (error) => {
+const getMatterDeviceSaveError = error => {
   const status = get(error, 'response.status');
   const data = get(error, 'response.data');
   const conflictAttribute = get(data, 'error.attribute');
@@ -108,7 +108,7 @@ const getMatterDeviceSaveError = (error) => {
     return {
       errorMessage,
       errorDetail: formatApiErrorDetail(error),
-      isKnownError: true,
+      isKnownError: true
     };
   }
 
@@ -116,7 +116,7 @@ const getMatterDeviceSaveError = (error) => {
     return {
       errorMessage: 'integration.matter.error.badRequestError',
       errorDetail: formatApiErrorDetail(error) || serializeApiResponseBody(data),
-      isKnownError: true,
+      isKnownError: true
     };
   }
 
@@ -124,7 +124,7 @@ const getMatterDeviceSaveError = (error) => {
     return {
       errorMessage: 'integration.matter.error.validationError',
       errorDetail: formatApiErrorDetail(error) || serializeApiResponseBody(data),
-      isKnownError: true,
+      isKnownError: true
     };
   }
 
@@ -132,7 +132,7 @@ const getMatterDeviceSaveError = (error) => {
     return {
       errorMessage: 'integration.matter.error.forbiddenError',
       errorDetail: formatApiErrorDetail(error) || serializeApiResponseBody(data),
-      isKnownError: true,
+      isKnownError: true
     };
   }
 
@@ -140,14 +140,14 @@ const getMatterDeviceSaveError = (error) => {
     return {
       errorMessage: 'integration.matter.error.notFoundError',
       errorDetail: formatApiErrorDetail(error) || serializeApiResponseBody(data),
-      isKnownError: true,
+      isKnownError: true
     };
   }
 
   return {
     errorMessage: 'integration.matter.error.unexpectedError',
     errorDetail: getUnknownErrorDetail(error),
-    isKnownError: false,
+    isKnownError: false
   };
 };
 
@@ -157,10 +157,10 @@ const DISCOVERED_DEVICE_ERROR_PREFIX = 'integration.externalIntegration.discover
 // else falls back to the raw message returned by the API.
 const VALIDATION_TYPE_KEYS = {
   'notNull Violation': 'notNullViolation',
-  'unique violation': 'uniqueViolation',
+  'unique violation': 'uniqueViolation'
 };
 
-const toValidationError = (property) => {
+const toValidationError = property => {
   if (!property || typeof property !== 'object' || !property.attribute) {
     return null;
   }
@@ -172,13 +172,13 @@ const toValidationError = (property) => {
     attribute: property.attribute,
     message: property.message || null,
     context,
-    typeKey: VALIDATION_TYPE_KEYS[property.type] || null,
+    typeKey: VALIDATION_TYPE_KEYS[property.type] || null
   };
 };
 
 // Turn the API payload into the list of precisely rejected fields, so the UI
 // can tell WHICH field of WHICH feature was refused instead of "an error occurred".
-const extractValidationErrors = (data) => {
+const extractValidationErrors = data => {
   const { properties, error } = data || {};
   if (Array.isArray(properties)) {
     return properties.map(toValidationError).filter(Boolean);
@@ -190,7 +190,7 @@ const extractValidationErrors = (data) => {
 const MAX_TECHNICAL_DETAIL_LENGTH = 1000;
 
 // Compact one-liner meant to be copy-pasted in a bug report.
-const buildTechnicalDetail = (error) => {
+const buildTechnicalDetail = error => {
   const status = get(error, 'response.status');
   const data = get(error, 'response.data');
   const parts = [];
@@ -220,7 +220,7 @@ const buildTechnicalDetail = (error) => {
  * @example
  * const { errorMessage, errorDetail } = getDiscoveredDeviceCreateError(e);
  */
-const getDiscoveredDeviceCreateError = (error) => {
+const getDiscoveredDeviceCreateError = error => {
   const status = get(error, 'response.status');
   const data = get(error, 'response.data');
 
@@ -234,14 +234,14 @@ const getDiscoveredDeviceCreateError = (error) => {
         errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.networkError`,
         errorDetail: get(error, 'message') || null,
         validationErrors: [],
-        isKnownError: true,
+        isKnownError: true
       };
     }
     return {
       errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.unexpectedError`,
       errorDetail: getUnknownErrorDetail(error),
       validationErrors: [],
-      isKnownError: false,
+      isKnownError: false
     };
   }
 
@@ -264,7 +264,7 @@ const getDiscoveredDeviceCreateError = (error) => {
       errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.validationError`,
       errorDetail,
       validationErrors,
-      isKnownError: true,
+      isKnownError: true
     };
   }
 
@@ -273,7 +273,7 @@ const getDiscoveredDeviceCreateError = (error) => {
       errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.badRequestError`,
       errorDetail,
       validationErrors,
-      isKnownError: true,
+      isKnownError: true
     };
   }
 
@@ -282,7 +282,7 @@ const getDiscoveredDeviceCreateError = (error) => {
       errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.forbiddenError`,
       errorDetail,
       validationErrors,
-      isKnownError: true,
+      isKnownError: true
     };
   }
 
@@ -291,7 +291,7 @@ const getDiscoveredDeviceCreateError = (error) => {
       errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.notFoundError`,
       errorDetail,
       validationErrors,
-      isKnownError: true,
+      isKnownError: true
     };
   }
 
@@ -300,7 +300,7 @@ const getDiscoveredDeviceCreateError = (error) => {
       errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.serverError`,
       errorDetail: errorDetail || getUnknownErrorDetail(error),
       validationErrors,
-      isKnownError: true,
+      isKnownError: true
     };
   }
 
@@ -308,11 +308,11 @@ const getDiscoveredDeviceCreateError = (error) => {
     errorMessage: `${DISCOVERED_DEVICE_ERROR_PREFIX}.unexpectedError`,
     errorDetail: getUnknownErrorDetail(error),
     validationErrors,
-    isKnownError: false,
+    isKnownError: false
   };
 };
 
-const formatHttpError = (error) => {
+const formatHttpError = error => {
   const errorString = error.toString();
   let errorDetailString = '';
   // If it's a standard Gladys HTTP error

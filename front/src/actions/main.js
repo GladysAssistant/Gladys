@@ -15,7 +15,7 @@ const OPEN_PAGES = [
   '/gateway-configure-two-factor',
   '/signup-gateway',
   '/subscribe-gateway',
-  '/confirm-email',
+  '/confirm-email'
 ];
 
 function createActions(store) {
@@ -28,22 +28,22 @@ function createActions(store) {
       store.setState({
         currentUrl: e.url,
         showDropDown: false,
-        showCollapsedMenu: false,
+        showCollapsedMenu: false
       });
     },
     toggleDropDown(state) {
       store.setState({
-        showDropDown: !state.showDropDown,
+        showDropDown: !state.showDropDown
       });
     },
     closeDropDown() {
       store.setState({
-        showDropDown: false,
+        showDropDown: false
       });
     },
     toggleCollapsedMenu(state) {
       store.setState({
-        showCollapsedMenu: !state.showCollapsedMenu,
+        showCollapsedMenu: !state.showCollapsedMenu
       });
     },
     redirectToLogin() {
@@ -54,7 +54,7 @@ function createActions(store) {
       try {
         const currentSession = await state.httpClient.get('/api/v1/session/tablet_mode');
         store.setState({
-          tabletMode: currentSession.tablet_mode,
+          tabletMode: currentSession.tablet_mode
         });
       } catch (e) {
         console.error(e);
@@ -73,11 +73,11 @@ function createActions(store) {
         const tasks = [
           state.httpClient.get('/api/v1/me'),
           actionsProfilePicture.loadProfilePicture(state),
-          actions.refreshTabletMode(state),
+          actions.refreshTabletMode(state)
         ];
         const [user] = await Promise.all(tasks);
         store.setState({
-          user,
+          user
         });
         // the "integrations to update" counter is displayed in the header, on
         // every page: it is loaded once the user (and their role) is known,
@@ -88,7 +88,7 @@ function createActions(store) {
           const now = new Date();
           if (new Date(gatewayUser.current_period_end) < now) {
             store.setState({
-              gatewayAccountExpired: true,
+              gatewayAccountExpired: true
             });
           }
         }
@@ -126,7 +126,7 @@ function createActions(store) {
       route('/login', true);
       const defaultState = getDefaultState();
       store.setState(defaultState, true);
-    },
+    }
   };
 
   return Object.assign(actions, actionsProfilePicture, actionsDarkMode, actionsExternalIntegrationUpdates);

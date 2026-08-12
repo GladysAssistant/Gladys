@@ -26,10 +26,7 @@ async function updateEvent(selector, calendarEvent, userId) {
     ],
   });
 
-  if (
-    existingCalendarEvent === null ||
-    (userId !== undefined && existingCalendarEvent.calendar.user_id !== userId)
-  ) {
+  if (existingCalendarEvent === null || (userId !== undefined && existingCalendarEvent.calendar.user_id !== userId)) {
     throw new NotFoundError('CalendarEvent not found');
   }
 

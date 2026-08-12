@@ -9,7 +9,7 @@ import style from './style.css';
 class ColorDeviceType extends Component {
   colorPickerRef = createRef();
 
-  blur = (event) => {
+  blur = event => {
     if (!event.composedPath().includes(this.colorPickerRef.current.parentElement)) {
       this.closeColorPicker(false);
     }
@@ -35,7 +35,7 @@ class ColorDeviceType extends Component {
     });
   };
 
-  updateValue = (color) => {
+  updateValue = color => {
     const colorInt = hexToInt(color.hexString);
     this.props.updateValue(this.props.deviceFeature, colorInt);
   };
@@ -56,11 +56,11 @@ class ColorDeviceType extends Component {
       layout: [
         {
           component: iro.ui.Wheel,
-          options: {},
-        },
-      ],
+          options: {}
+        }
+      ]
     });
-    this.colorPicker.on('input:end', (color) => this.updateValue(color));
+    this.colorPicker.on('input:end', color => this.updateValue(color));
   }
 
   componentWillUnmount() {
@@ -95,7 +95,7 @@ class ColorDeviceType extends Component {
               class={cx('fade', 'w-100', 'mw-100', style.deviceRowPopover, {
                 'd-none': !open,
                 popover: open,
-                show: open,
+                show: open
               })}
             >
               <div class="row justify-content-end">

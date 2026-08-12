@@ -41,7 +41,7 @@ const AlexaWelcomePage = ({ user }) => (
                 featureKeys={[
                   'gladysPlusUpsell.alexa.feature1',
                   'gladysPlusUpsell.alexa.feature2',
-                  'gladysPlusUpsell.alexa.feature3',
+                  'gladysPlusUpsell.alexa.feature3'
                 ]}
               />
               <div class="card">

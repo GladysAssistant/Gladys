@@ -43,8 +43,8 @@ class History extends Component {
     try {
       const devices = await this.props.httpClient.get('/api/v1/device');
       const featuresBySelector = new Map();
-      devices.forEach((device) => {
-        device.features.forEach((feature) => {
+      devices.forEach(device => {
+        device.features.forEach(feature => {
           featuresBySelector.set(feature.selector, {
             device_feature: {
               id: feature.id,
@@ -54,19 +54,19 @@ class History extends Component {
               type: feature.type,
               unit: feature.unit,
               min: feature.min,
-              max: feature.max,
+              max: feature.max
             },
             device: {
               name: device.name,
-              selector: device.selector,
+              selector: device.selector
             },
             room: device.room
               ? {
                   id: device.room.id,
                   name: device.room.name,
-                  selector: device.room.selector,
+                  selector: device.room.selector
                 }
-              : null,
+              : null
           });
         });
       });
@@ -79,11 +79,11 @@ class History extends Component {
 
   buildQueryParams = () => {
     const params = {
-      take: PAGE_SIZE,
+      take: PAGE_SIZE
     };
     const { selectedGroup, selectedRoomId, search } = this.state;
     if (selectedGroup) {
-      const group = ALL_GROUPS.find((oneGroup) => oneGroup.id === selectedGroup);
+      const group = ALL_GROUPS.find(oneGroup => oneGroup.id === selectedGroup);
       if (group) {
         params.categories = group.categories.join(',');
       }
@@ -121,7 +121,9 @@ class History extends Component {
         }
       } else if (this.state.selectedDate) {
         // Jump to the end of the selected day, in the user's timezone
-        before = dayjs(this.state.selectedDate).endOf('day').toDate();
+        before = dayjs(this.state.selectedDate)
+          .endOf('day')
+          .toDate();
       } else {
         before = new Date();
       }
@@ -137,7 +139,11 @@ class History extends Component {
       let firstBatch = reset;
       for (let i = 0; i <= SEARCH_WINDOWS_MONTHS.length && collected < PAGE_SIZE && !exhausted; i += 1) {
         const isFinalUnbounded = i === SEARCH_WINDOWS_MONTHS.length;
-        const since = isFinalUnbounded ? null : dayjs(before).subtract(SEARCH_WINDOWS_MONTHS[i], 'month').toDate();
+        const since = isFinalUnbounded
+          ? null
+          : dayjs(before)
+              .subtract(SEARCH_WINDOWS_MONTHS[i], 'month')
+              .toDate();
         const params = { ...baseParams, take: PAGE_SIZE - collected, before: windowUpper.toISOString() };
         if (windowUpperId) {
           params.before_id = windowUpperId;
@@ -156,7 +162,7 @@ class History extends Component {
         }
         const resetEvents = firstBatch;
         firstBatch = false;
-        this.setState((prevState) => {
+        this.setState(prevState => {
           let events = resetEvents ? newEvents : prevState.events.concat(newEvents);
           // Keep the array bounded during infinite scroll: drop the newest events
           // already scrolled past (array head) and keep the window being browsed.
@@ -167,7 +173,7 @@ class History extends Component {
             events,
             initialized: true,
             searchedUntil: since,
-            pendingLiveEvents: resetEvents ? [] : prevState.pendingLiveEvents,
+            pendingLiveEvents: resetEvents ? [] : prevState.pendingLiveEvents
           };
         });
         // The next window continues strictly below this one: states exactly on
@@ -213,24 +219,24 @@ class History extends Component {
     this.autoLoadsWithoutScroll = 0;
   };
 
-  selectGroup = (groupId) => {
+  selectGroup = groupId => {
     this.setState(
-      (prevState) => ({
+      prevState => ({
         selectedGroup: prevState.selectedGroup === groupId ? null : groupId,
-        expandedGroups: {},
+        expandedGroups: {}
       }),
-      this.refreshEvents,
+      this.refreshEvents
     );
   };
 
-  selectRoom = (e) => {
+  selectRoom = e => {
     this.setState({ selectedRoomId: e.target.value || null, expandedGroups: {} }, this.refreshEvents);
   };
 
-  selectDate = (e) => {
+  selectDate = e => {
     this.setState(
       { selectedDate: e.target.value || null, expandedGroups: {}, pendingLiveEvents: [] },
-      this.refreshEvents,
+      this.refreshEvents
     );
   };
 
@@ -239,24 +245,24 @@ class History extends Component {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  search = (e) => {
+  search = e => {
     this.setState({ search: e.target.value, expandedGroups: {} });
     this.debouncedRefreshEvents();
   };
 
-  toggleExpand = (groupKey) => {
-    this.setState((prevState) => ({
+  toggleExpand = groupKey => {
+    this.setState(prevState => ({
       expandedGroups: {
         ...prevState.expandedGroups,
-        [groupKey]: !prevState.expandedGroups[groupKey],
-      },
+        [groupKey]: !prevState.expandedGroups[groupKey]
+      }
     }));
   };
 
-  matchCurrentFilters = (event) => {
+  matchCurrentFilters = event => {
     const { selectedGroup, selectedRoomId, search } = this.state;
     if (selectedGroup) {
-      const group = ALL_GROUPS.find((oneGroup) => oneGroup.id === selectedGroup);
+      const group = ALL_GROUPS.find(oneGroup => oneGroup.id === selectedGroup);
       if (group && !group.categories.includes(event.device_feature.category)) {
         return false;
       }
@@ -270,7 +276,7 @@ class History extends Component {
     return true;
   };
 
-  onNewState = (payload) => {
+  onNewState = payload => {
     // When browsing a past date, don't disturb the view with live events
     if (this.state.selectedDate) {
       return;
@@ -285,7 +291,7 @@ class History extends Component {
     const event = {
       value: payload.last_value,
       created_at: payload.last_value_changed,
-      ...featureMetadata,
+      ...featureMetadata
     };
     if (!this.matchCurrentFilters(event)) {
       return;
@@ -318,23 +324,23 @@ class History extends Component {
     // at the top (it would move the content under their eyes). Store them
     // and display a "new events" button instead.
     const userIsAtTop = window.scrollY < 150;
-    this.setState((prevState) => {
+    this.setState(prevState => {
       if (userIsAtTop) {
         return {
-          events: [...buffered, ...prevState.events].slice(0, MAX_EVENTS_IN_MEMORY),
+          events: [...buffered, ...prevState.events].slice(0, MAX_EVENTS_IN_MEMORY)
         };
       }
       return {
-        pendingLiveEvents: [...buffered, ...prevState.pendingLiveEvents].slice(0, MAX_EVENTS_IN_MEMORY),
+        pendingLiveEvents: [...buffered, ...prevState.pendingLiveEvents].slice(0, MAX_EVENTS_IN_MEMORY)
       };
     });
   };
 
   showPendingLiveEvents = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       events: [...prevState.pendingLiveEvents, ...prevState.events].slice(0, MAX_EVENTS_IN_MEMORY),
-      pendingLiveEvents: [],
+      pendingLiveEvents: []
     }));
   };
 
@@ -354,7 +360,7 @@ class History extends Component {
       hasMore: false,
       error: false,
       featuresLoaded: false,
-      searchedUntil: null,
+      searchedUntil: null
     };
     this.featuresBySelector = null;
     this.liveEventBuffer = [];

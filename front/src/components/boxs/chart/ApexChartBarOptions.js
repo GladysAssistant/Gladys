@@ -8,7 +8,7 @@ const getApexChartBarOptions = ({
   locales,
   defaultLocale,
   yAxisFormatter: customYAxisFormatter,
-  disableZoom,
+  disableZoom
 }) => {
   const options = {
     chart: {
@@ -19,29 +19,29 @@ const getApexChartBarOptions = ({
       height: displayAxes ? 200 : 100,
       parentHeightOffset: 0,
       toolbar: {
-        show: false,
+        show: false
       },
       sparkline: {
-        enabled: !displayAxes,
+        enabled: !displayAxes
       },
       animations: {
-        enabled: false,
+        enabled: false
       },
       stacked: true,
       zoom: {
-        enabled: !disableZoom,
-      },
+        enabled: !disableZoom
+      }
     },
     plotOptions: {
       bar: {
-        columnWidth: '90%',
-      },
+        columnWidth: '90%'
+      }
     },
     dataLabels: {
-      enabled: false,
+      enabled: false
     },
     fill: {
-      opacity: 1,
+      opacity: 1
     },
     series,
     grid: {
@@ -49,39 +49,39 @@ const getApexChartBarOptions = ({
         top: -20,
         right: 0,
         left: -4,
-        bottom: -4,
+        bottom: -4
       },
       strokeDashArray: 4,
       xaxis: {
         lines: {
-          show: true,
-        },
-      },
+          show: true
+        }
+      }
     },
     xaxis: {
       labels: {
         padding: 0,
-        datetimeUTC: false,
+        datetimeUTC: false
       },
       tooltip: {
-        enabled: false,
+        enabled: false
       },
       axisBorder: {
-        show: false,
+        show: false
       },
-      type: 'datetime',
+      type: 'datetime'
     },
     yaxis: {
       labels: {
         padding: 4,
-        formatter: customYAxisFormatter || yAxisFormatter,
-      },
+        formatter: customYAxisFormatter || yAxisFormatter
+      }
     },
     colors,
     legend: {
       show: hideLegend ? false : displayAxes,
-      position: 'bottom',
-    },
+      position: 'bottom'
+    }
   };
   return options;
 };

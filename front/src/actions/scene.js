@@ -10,12 +10,12 @@ function createActions(store) {
   const actions = {
     async getScenes(state) {
       store.setState({
-        scenesGetStatus: RequestStatus.Getting,
+        scenesGetStatus: RequestStatus.Getting
       });
       try {
         const orderDir = state.getScenesOrderDir || 'asc';
         const params = {
-          order_dir: orderDir,
+          order_dir: orderDir
         };
         if (state.sceneSearch && state.sceneSearch.length) {
           params.search = state.sceneSearch;
@@ -23,26 +23,26 @@ function createActions(store) {
         const scenes = await state.httpClient.get('/api/v1/scene', params);
         store.setState({
           scenes,
-          scenesGetStatus: RequestStatus.Success,
+          scenesGetStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          scenesGetStatus: RequestStatus.Error,
+          scenesGetStatus: RequestStatus.Error
         });
       }
     },
     async search(state, e) {
       store.setState({
-        sceneSearch: e.target.value,
+        sceneSearch: e.target.value
       });
       await actions.getScenes(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getScenesOrderDir: e.target.value,
+        getScenesOrderDir: e.target.value
       });
       await actions.getScenes(store.getState());
-    },
+    }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
   return actions;

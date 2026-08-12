@@ -28,5 +28,5 @@ class XiaomiPage extends Component {
 
 export default connect(
   'user,session,xiaomiSensors,xiaomiDevices,houses,getXiaomiDevicesStatus,xiaomiDeviceSearch,getXiaomiDeviceOrderDir',
-  actions,
+  actions
 )(XiaomiPage);

@@ -13,7 +13,7 @@ const GatewayPage = ({ children, ...props }) => (
     </div>
     <div
       class={cx('dimmer', {
-        active: props.gatewayGetBackupsStatus === RequestStatus.Getting,
+        active: props.gatewayGetBackupsStatus === RequestStatus.Getting
       })}
     >
       <div class="loader" />
@@ -52,7 +52,7 @@ const GatewayPage = ({ children, ...props }) => (
                 </tr>
               </thead>
               <tbody>
-                {props.gatewayBackups.map((backup) => (
+                {props.gatewayBackups.map(backup => (
                   <RestoreBackupRow
                     key={backup.id}
                     backup={backup}

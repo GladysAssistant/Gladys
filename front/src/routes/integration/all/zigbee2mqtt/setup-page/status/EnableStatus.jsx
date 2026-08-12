@@ -4,10 +4,10 @@ import { MarkupText, Text } from 'preact-i18n';
 import { RequestStatus } from '../../../../../../utils/consts';
 
 class EnableStatus extends Component {
-  toggleZ2M = (e) => {
+  toggleZ2M = e => {
     const z2mEnabled = e.target.checked;
     this.setState({
-      z2mEnabled,
+      z2mEnabled
     });
     this.props.toggleZ2M(z2mEnabled);
   };
@@ -18,7 +18,7 @@ class EnableStatus extends Component {
     const { zigbee2mqttStatus = {} } = props;
     const { z2mEnabled } = zigbee2mqttStatus;
     this.state = {
-      z2mEnabled,
+      z2mEnabled
     };
   }
 
@@ -27,7 +27,7 @@ class EnableStatus extends Component {
     if (setupZigee2mqttStatus !== RequestStatus.Getting) {
       const { z2mEnabled } = zigbee2mqttStatus;
       this.setState({
-        z2mEnabled,
+        z2mEnabled
       });
     }
   }

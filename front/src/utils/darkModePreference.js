@@ -81,5 +81,5 @@ export {
   getDarkModePreference,
   isDarkModeEnabled,
   setDarkModePreference,
-  systemPrefersDarkMode,
+  systemPrefersDarkMode
 };

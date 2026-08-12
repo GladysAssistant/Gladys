@@ -18,7 +18,7 @@ export class GatewayHttpClient {
   }
 
   emptyQueue() {
-    this.queue.forEach((func) => {
+    this.queue.forEach(func => {
       func();
     });
     this.queue = [];
@@ -38,8 +38,8 @@ export class GatewayHttpClient {
       const error = {
         response: {
           status: e.status,
-          data: e,
-        },
+          data: e
+        }
       };
       throw error;
     }

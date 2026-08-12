@@ -132,7 +132,11 @@ describe('External integration management API: my calendars', () => {
     // the integration pushes a calendar for each of the two users
     const gladys = global.TEST_GLADYS_INSTANCE;
     const service = await gladys.externalIntegration.getBySelector('ext-dev-nextcloud-calendar');
-    await gladys.externalIntegration.saveCalendarAccount('ext-dev-nextcloud-calendar', '0cd30aef-9c4e-4a23-88e3-3547971296e5', {});
+    await gladys.externalIntegration.saveCalendarAccount(
+      'ext-dev-nextcloud-calendar',
+      '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      {},
+    );
     await gladys.externalIntegration.publishCalendars(service, {
       user: 'john',
       calendars: [{ external_id: 'ext:ext-dev-nextcloud-calendar:john:primary', name: 'Primary' }],
@@ -163,8 +167,6 @@ describe('External integration management API: my calendars', () => {
       selector: 'ext-dev-device',
       manifest: { ...CALENDAR_MANIFEST, type: 'device', account_schema: undefined },
     });
-    await authenticatedRequest
-      .get('/api/v1/external_integration/ext-dev-device/calendar/account')
-      .expect(404);
+    await authenticatedRequest.get('/api/v1/external_integration/ext-dev-device/calendar/account').expect(404);
   });
 });

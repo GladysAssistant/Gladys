@@ -1,6 +1,6 @@
 import { Text } from 'preact-i18n';
 
-const EditActions = (props) => (
+const EditActions = props => (
   <div class="fixed-bottom footer">
     <div class="container">
       <div class="row align-items-center flex-row-reverse">

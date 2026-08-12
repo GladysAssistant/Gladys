@@ -5,79 +5,79 @@ export const MANAGED_FEATURES = {
     [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: {
       feature: {
         min: -1,
-        max: 1,
+        max: 1
       },
-      values: [-1, 0, 1],
-    },
+      values: [-1, 0, 1]
+    }
   },
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: {
       feature: {
         min: 0,
-        max: 1,
+        max: 1
       },
-      values: [0, 1],
+      values: [0, 1]
     },
     [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: {
       feature: {
         min: 0,
-        max: 2,
+        max: 2
       },
-      values: [0, 2],
+      values: [0, 2]
     },
     [DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE]: {
       feature: {
         min: 0,
-        max: 2,
+        max: 2
       },
-      values: [0, 2],
-    },
+      values: [0, 2]
+    }
   },
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: {
       feature: {
         min: 0,
-        max: 1,
+        max: 1
       },
-      values: [0, 1],
+      values: [0, 1]
     },
     [DEVICE_FEATURE_TYPES.SWITCH.DIMMER]: {
       feature: {
         min: 0,
-        max: 1,
+        max: 1
       },
-      values: [0, 1],
-    },
+      values: [0, 1]
+    }
   },
   [DEVICE_FEATURE_CATEGORIES.SIREN]: {
     [DEVICE_FEATURE_TYPES.SIREN.BINARY]: {
       feature: {
         min: 0,
-        max: 1,
+        max: 1
       },
-      values: [0, 1],
-    },
+      values: [0, 1]
+    }
   },
   [DEVICE_FEATURE_CATEGORIES.SHUTTER]: {
     [DEVICE_FEATURE_TYPES.SHUTTER.STATE]: {
       feature: {
         min: -1,
-        max: 1,
+        max: 1
       },
-      values: [-1, 0, 1],
-    },
+      values: [-1, 0, 1]
+    }
   },
   [DEVICE_FEATURE_CATEGORIES.TELEVISION]: {
     [DEVICE_FEATURE_TYPES.TELEVISION.BINARY]: {
       feature: {
         min: 0,
-        max: 1,
+        max: 1
       },
-      values: [0, 1],
+      values: [0, 1]
     },
     [DEVICE_FEATURE_TYPES.TELEVISION.SOURCE]: {},
     [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL]: {
-      values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     },
     [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_DOWN]: {},
     [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_UP]: {},
@@ -102,8 +102,8 @@ export const MANAGED_FEATURES = {
     [DEVICE_FEATURE_TYPES.TELEVISION.NEXT]: {},
     [DEVICE_FEATURE_TYPES.TELEVISION.FORWARD]: {},
     [DEVICE_FEATURE_TYPES.TELEVISION.REWIND]: {},
-    [DEVICE_FEATURE_TYPES.TELEVISION.RECORD]: {},
-  },
+    [DEVICE_FEATURE_TYPES.TELEVISION.RECORD]: {}
+  }
 };
 
 export const MANAGED_CATEGORIES = Object.keys(MANAGED_FEATURES);

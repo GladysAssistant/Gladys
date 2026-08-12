@@ -1,7 +1,7 @@
 const {
   DEVICE_FEATURE_UNITS,
   DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_TYPES
 } = require('../../server/utils/constants');
 const fs = require('fs');
 const path = require('path');
@@ -21,8 +21,8 @@ const checkTranslation = (i18nKey, dataType, dataKey) => {
 
 // Check units
 const unitParentKeys = ['deviceFeatureUnit', 'deviceFeatureUnitShort'];
-unitParentKeys.forEach((parentKey) => {
-  Object.keys(DEVICE_FEATURE_UNITS).forEach((unitKey) => {
+unitParentKeys.forEach(parentKey => {
+  Object.keys(DEVICE_FEATURE_UNITS).forEach(unitKey => {
     const unit = DEVICE_FEATURE_UNITS[unitKey];
     checkTranslation(`${parentKey}.${unit}`, 'unit', unitKey);
   });
@@ -30,12 +30,12 @@ unitParentKeys.forEach((parentKey) => {
 
 // Check device categories / features
 const featureParentKey = ['deviceFeatureCategory'];
-featureParentKey.forEach((parentKey) => {
-  Object.keys(DEVICE_FEATURE_CATEGORIES).forEach((categoryKey) => {
+featureParentKey.forEach(parentKey => {
+  Object.keys(DEVICE_FEATURE_CATEGORIES).forEach(categoryKey => {
     const category = DEVICE_FEATURE_CATEGORIES[categoryKey];
     checkTranslation(`${parentKey}.${category}.shortCategoryName`, 'category', categoryKey);
 
-    Object.keys(DEVICE_FEATURE_TYPES[categoryKey] || {}).forEach((featureKey) => {
+    Object.keys(DEVICE_FEATURE_TYPES[categoryKey] || {}).forEach(featureKey => {
       const feature = DEVICE_FEATURE_TYPES[categoryKey][featureKey];
       checkTranslation(`${parentKey}.${category}.${feature}`, 'feature', `${categoryKey}.${featureKey}`);
     });
@@ -47,17 +47,17 @@ featureParentKey.forEach((parentKey) => {
 // without one would be unreachable through the search box in that language.
 // Entries for icons that no longer exist are reported too, so the files cannot
 // silently drift from icons.json.
-['en', 'fr', 'de'].forEach((language) => {
+['en', 'fr', 'de'].forEach(language => {
   // eslint-disable-next-line global-require, import/no-dynamic-require
   const icons = require(`../src/config/i18n/icon-keywords/${language}.json`);
 
-  iconList.forEach((icon) => {
+  iconList.forEach(icon => {
     if (!get(icons, `${icon}.label`)) {
       missingKeys.push(`icon label ${icon} ==> icon-keywords/${language}.json`);
     }
   });
 
-  Object.keys(icons).forEach((icon) => {
+  Object.keys(icons).forEach(icon => {
     if (!iconList.includes(icon)) {
       missingKeys.push(`unknown icon "${icon}" in icon-keywords/${language}.json ==> not in server/config/icons.json`);
     }
@@ -80,7 +80,7 @@ while (match !== null) {
 }
 
 const iconsByCodepoint = new Map();
-iconList.forEach((icon) => {
+iconList.forEach(icon => {
   const codepoint = codepoints.get(icon);
   if (!codepoint) {
     missingKeys.push(`icon ${icon} ==> no .fe-${icon} rule in the installed theme, it would render as a blank box`);
@@ -97,8 +97,8 @@ iconList.forEach((icon) => {
 if (missingKeys.length > 0) {
   console.error(
     `\x1b[31m\u001B[1m${missingKeys.length} translations are missing:`,
-    missingKeys.map((key) => `\n  - ${key}`).join(''),
-    '\u001B[22m\x1b[0m',
+    missingKeys.map(key => `\n  - ${key}`).join(''),
+    '\u001B[22m\x1b[0m'
   );
   throw new Error(`${missingKeys.length} translations are missing, please check upper list.`);
 }

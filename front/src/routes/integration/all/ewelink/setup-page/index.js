@@ -11,7 +11,7 @@ class EweLinkSetupPage extends Component {
     this.props.loadProps();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
-      this.props.displayConnectedMessage,
+      this.props.displayConnectedMessage
     );
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR, this.props.displayEweLinkError);
   }
@@ -19,7 +19,7 @@ class EweLinkSetupPage extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
-      this.props.displayConnectedMessage,
+      this.props.displayConnectedMessage
     );
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR, this.props.displayEweLinkError);
   }
@@ -35,5 +35,5 @@ class EweLinkSetupPage extends Component {
 
 export default connect(
   'user,session,eweLinkUsername,eweLinkPassword,connectEweLinkStatus,eweLinkConnected,eweLinkConnectionError',
-  actions,
+  actions
 )(EweLinkSetupPage);

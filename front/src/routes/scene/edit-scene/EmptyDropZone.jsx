@@ -10,22 +10,22 @@ const EmptyColumnDropZone = ({ children, ...props }) => {
   const ref = useRef(null);
   const [{ isActive }, drop] = useDrop({
     accept: ACTION_CARD_TYPE,
-    collect: (monitor) => ({
-      isActive: monitor.canDrop() && monitor.isOver(),
+    collect: monitor => ({
+      isActive: monitor.canDrop() && monitor.isOver()
     }),
     drop(item) {
       if (!ref.current) {
         return;
       }
       props.moveCard(item.path, `${props.path}.0`);
-    },
+    }
   });
   drop(ref);
   return (
     <div
       ref={ref}
       class={cx('d-flex justify-content-center text-center ', style.dropZone, {
-        [style.dropZoneActive]: isActive,
+        [style.dropZoneActive]: isActive
       })}
     >
       <div class="align-self-center">

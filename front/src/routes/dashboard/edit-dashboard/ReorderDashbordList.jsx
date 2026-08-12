@@ -18,21 +18,21 @@ const DashboardListItem = ({ children, ...props }) => {
     item: () => {
       return { index };
     },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
+    collect: monitor => ({
+      isDragging: !!monitor.isDragging()
+    })
   }));
   const [{ isActive }, drop] = useDrop({
     accept: DASHBOARD_LIST_ITEM_TYPE,
-    collect: (monitor) => ({
-      isActive: monitor.canDrop() && monitor.isOver(),
+    collect: monitor => ({
+      isActive: monitor.canDrop() && monitor.isOver()
     }),
     drop(item) {
       if (!ref.current) {
         return;
       }
       props.insertAtPosition(item.index, index);
-    },
+    }
   });
   const openEditPage = () => {
     route(`/dashboard/${props.selector}/edit`);
@@ -44,12 +44,12 @@ const DashboardListItem = ({ children, ...props }) => {
       ref={ref}
       onClick={openEditPage}
       class={cx('list-group-item', {
-        active: props.isSelected,
+        active: props.isSelected
       })}
       style={{
         opacity: isDragging ? 0.5 : 1,
         cursor: 'pointer',
-        backgroundColor: isActive ? '#ecf0f1' : undefined,
+        backgroundColor: isActive ? '#ecf0f1' : undefined
       }}
     >
       <i ref={drag} style={{ cursor: 'move' }} class="fe fe-list mr-2" /> {wrapEmojisJSX(props.name)}
@@ -66,8 +66,8 @@ class RedorderDashboardList extends Component {
     const newDashboards = update(dashboards, {
       $splice: [
         [sourceIndex, 1],
-        [destinationIndex, 0, element],
-      ],
+        [destinationIndex, 0, element]
+      ]
     });
     this.props.updateDashboardList(newDashboards);
   };

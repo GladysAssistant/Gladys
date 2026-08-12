@@ -5,14 +5,14 @@ import { DEVICE_POLL_FREQUENCIES } from '../../../../server/utils/constants';
 import DeviceFeatures from './view/DeviceFeatures';
 
 const maxWidth = {
-  maxWidth: '400px',
+  maxWidth: '400px'
 };
 
 class UpdateDeviceForm extends Component {
-  updateName = (e) => this.props.updateDeviceProperty('name', e.target.value);
-  updateRoom = (e) => this.props.updateDeviceProperty('room_id', e.target.value);
-  updatePollFrequency = (e) => this.props.updateDeviceProperty('poll_frequency', e.target.value);
-  updateExternalId = (e) => this.props.updateDeviceProperty('external_id', e.target.value);
+  updateName = e => this.props.updateDeviceProperty('name', e.target.value);
+  updateRoom = e => this.props.updateDeviceProperty('room_id', e.target.value);
+  updatePollFrequency = e => this.props.updateDeviceProperty('poll_frequency', e.target.value);
+  updateExternalId = e => this.props.updateDeviceProperty('external_id', e.target.value);
 
   render(props, {}) {
     return (
@@ -42,9 +42,9 @@ class UpdateDeviceForm extends Component {
               <Text id="global.emptySelectOption" />
             </option>
             {props.houses &&
-              props.houses.map((house) => (
+              props.houses.map(house => (
                 <optgroup label={house.name}>
-                  {house.rooms.map((room) => (
+                  {house.rooms.map(room => (
                     <option selected={room.id === props.device.room_id} value={room.id}>
                       {room.name}
                     </option>

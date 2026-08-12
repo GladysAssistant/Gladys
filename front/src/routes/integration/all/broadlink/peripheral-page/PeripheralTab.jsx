@@ -22,7 +22,7 @@ const PeripheralTab = ({ broadlinkPeripherals = [], housesWithRooms = [], ...pro
       )}
       <div
         class={cx('dimmer', {
-          active: props.getBroadlinkPeripheralsStatus === RequestStatus.Getting,
+          active: props.getBroadlinkPeripheralsStatus === RequestStatus.Getting
         })}
       >
         <div class={cx('loader', style.emptyStateDivBox)} />

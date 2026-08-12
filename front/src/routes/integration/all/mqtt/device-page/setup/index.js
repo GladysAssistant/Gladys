@@ -16,19 +16,19 @@ import {
   normalizeMqttExternalId,
   parseMqttDeviceValidationErrors,
   clearMqttDeviceValidationError,
-  isMqttCatalogFeatureVisible,
+  isMqttCatalogFeatureVisible
 } from '../utils';
 
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
+  DEVICE_FEATURE_UNITS
 } from '../../../../../../../../server/utils/constants';
 
 class MqttDeviceSetupPage extends Component {
   toggleFeatureCatalog() {
     this.setState({
-      showFeatureCatalog: !this.state.showFeatureCatalog,
+      showFeatureCatalog: !this.state.showFeatureCatalog
     });
   }
 
@@ -51,16 +51,16 @@ class MqttDeviceSetupPage extends Component {
             category,
             external_id: 'mqtt:',
             type,
-            ...defaultValues,
-          },
-        ],
-      },
+            ...defaultValues
+          }
+        ]
+      }
     });
 
     this.setState({
       device,
       showFeatureCatalog: false,
-      expandedFeatureIndices: [newFeatureIndex],
+      expandedFeatureIndices: [newFeatureIndex]
     });
   }
 
@@ -79,12 +79,12 @@ class MqttDeviceSetupPage extends Component {
     // Remove feature and params
     device = update(device, {
       features: {
-        $splice: [[featureIndex, 1]],
+        $splice: [[featureIndex, 1]]
       },
       params: {
         // The order matters, so we reverse the array to start from the end
-        $splice: paramsToDelete.map((index) => [index, 1]).reverse(),
-      },
+        $splice: paramsToDelete.map(index => [index, 1]).reverse()
+      }
     });
 
     const customizedFeatureExternalIds = { ...this.state.customizedFeatureExternalIds };
@@ -95,7 +95,7 @@ class MqttDeviceSetupPage extends Component {
     this.setState({
       device,
       customizedFeatureExternalIds,
-      featureExternalIdSuffixes,
+      featureExternalIdSuffixes
     });
   }
 
@@ -107,11 +107,11 @@ class MqttDeviceSetupPage extends Component {
     // Get translated names from dictionary
     const consumptionName = get(
       this.props.intl.dictionary,
-      `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR}.${DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION}`,
+      `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR}.${DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION}`
     );
     const costName = get(
       this.props.intl.dictionary,
-      `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR}.${DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST}`,
+      `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR}.${DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST}`
     );
 
     // Get default electric meter feature ID to set as energy_parent_id on the INDEX feature
@@ -136,7 +136,7 @@ class MqttDeviceSetupPage extends Component {
       keep_history: true,
       min: 0,
       max: 1000000000,
-      energy_parent_id: parentFeature.id,
+      energy_parent_id: parentFeature.id
     };
 
     // Create THIRTY_MINUTES_CONSUMPTION_COST feature with consumption as energy_parent_id
@@ -152,7 +152,7 @@ class MqttDeviceSetupPage extends Component {
       keep_history: true,
       min: 0,
       max: 1000000000,
-      energy_parent_id: consumptionFeatureId,
+      energy_parent_id: consumptionFeatureId
     };
 
     // Update parent feature with default electric meter feature ID if available
@@ -161,16 +161,16 @@ class MqttDeviceSetupPage extends Component {
       deviceUpdate = update(this.state.device, {
         features: {
           [featureIndex]: {
-            energy_parent_id: { $set: defaultElectricMeterFeatureId },
+            energy_parent_id: { $set: defaultElectricMeterFeatureId }
           },
-          $push: [consumptionFeature, costFeature],
-        },
+          $push: [consumptionFeature, costFeature]
+        }
       });
     } else {
       deviceUpdate = update(this.state.device, {
         features: {
-          $push: [consumptionFeature, costFeature],
-        },
+          $push: [consumptionFeature, costFeature]
+        }
       });
     }
 
@@ -179,8 +179,8 @@ class MqttDeviceSetupPage extends Component {
       customizedFeatureExternalIds: {
         ...this.state.customizedFeatureExternalIds,
         [consumptionFeatureId]: true,
-        [costFeatureId]: true,
-      },
+        [costFeatureId]: true
+      }
     });
   }
 
@@ -191,19 +191,19 @@ class MqttDeviceSetupPage extends Component {
       value = normalizeMqttExternalId(value);
       const device = update(this.state.device, {
         external_id: { $set: value },
-        selector: { $set: value },
+        selector: { $set: value }
       });
       this.setState({
         device,
         deviceExternalIdCustomized: true,
-        validationErrors,
+        validationErrors
       });
       return;
     }
 
     if (property === 'name') {
       let device = update(this.state.device, {
-        name: { $set: value },
+        name: { $set: value }
       });
 
       let nextValidationErrors = validationErrors;
@@ -214,7 +214,7 @@ class MqttDeviceSetupPage extends Component {
         if (!slug) {
           device = update(device, {
             external_id: { $set: 'mqtt:' },
-            selector: { $set: 'mqtt:' },
+            selector: { $set: 'mqtt:' }
           });
           stateUpdate.device = device;
           stateUpdate.deviceExternalIdSuffix = null;
@@ -227,7 +227,7 @@ class MqttDeviceSetupPage extends Component {
           const externalId = buildMqttExternalId(value, suffix);
           device = update(device, {
             external_id: { $set: externalId },
-            selector: { $set: externalId },
+            selector: { $set: externalId }
           });
           stateUpdate.device = device;
         }
@@ -241,20 +241,20 @@ class MqttDeviceSetupPage extends Component {
 
     const device = update(this.state.device, {
       [property]: {
-        $set: value,
-      },
+        $set: value
+      }
     });
 
     this.setState({
       device,
-      validationErrors,
+      validationErrors
     });
   }
 
   updateDeviceParam = (paramName, paramValue) => {
     let device;
     // Find if this param already exist
-    const paramIndex = this.state.device.params.findIndex((p) => p.name === paramName);
+    const paramIndex = this.state.device.params.findIndex(p => p.name === paramName);
 
     // If no, create it
     if (paramIndex === -1) {
@@ -263,10 +263,10 @@ class MqttDeviceSetupPage extends Component {
           $push: [
             {
               name: paramName,
-              value: paramValue,
-            },
-          ],
-        },
+              value: paramValue
+            }
+          ]
+        }
       });
     } else {
       // If yes, update value in the param
@@ -274,10 +274,10 @@ class MqttDeviceSetupPage extends Component {
         params: {
           [paramIndex]: {
             value: {
-              $set: paramValue,
-            },
-          },
-        },
+              $set: paramValue
+            }
+          }
+        }
       });
     }
     this.setState({ device });
@@ -298,17 +298,17 @@ class MqttDeviceSetupPage extends Component {
         features: {
           [featureIndex]: {
             external_id: { $set: value },
-            selector: { $set: value },
-          },
-        },
+            selector: { $set: value }
+          }
+        }
       });
       this.setState({
         device,
         customizedFeatureExternalIds: {
           ...this.state.customizedFeatureExternalIds,
-          [feature.id]: true,
+          [feature.id]: true
         },
-        validationErrors,
+        validationErrors
       });
       return;
     }
@@ -317,9 +317,9 @@ class MqttDeviceSetupPage extends Component {
       let device = update(this.state.device, {
         features: {
           [featureIndex]: {
-            name: { $set: value },
-          },
-        },
+            name: { $set: value }
+          }
+        }
       });
 
       let nextValidationErrors = validationErrors;
@@ -335,9 +335,9 @@ class MqttDeviceSetupPage extends Component {
             features: {
               [featureIndex]: {
                 external_id: { $set: 'mqtt:' },
-                selector: { $set: 'mqtt:' },
-              },
-            },
+                selector: { $set: 'mqtt:' }
+              }
+            }
           });
           stateUpdate.featureExternalIdSuffixes = featureExternalIdSuffixes;
         } else {
@@ -351,9 +351,9 @@ class MqttDeviceSetupPage extends Component {
             features: {
               [featureIndex]: {
                 external_id: { $set: externalId },
-                selector: { $set: externalId },
-              },
-            },
+                selector: { $set: externalId }
+              }
+            }
           });
           stateUpdate.featureExternalIdSuffixes = featureExternalIdSuffixes;
         }
@@ -370,15 +370,15 @@ class MqttDeviceSetupPage extends Component {
       features: {
         [featureIndex]: {
           [property]: {
-            $set: value,
-          },
-        },
-      },
+            $set: value
+          }
+        }
+      }
     });
 
     this.setState({
       device,
-      validationErrors,
+      validationErrors
     });
   }
 
@@ -390,7 +390,7 @@ class MqttDeviceSetupPage extends Component {
         message: 'name required',
         attribute: 'name',
         value: device.name || null,
-        type: 'notNull Violation',
+        type: 'notNull Violation'
       });
     }
 
@@ -399,17 +399,17 @@ class MqttDeviceSetupPage extends Component {
         message: 'external_id required',
         attribute: 'external_id',
         value: device.external_id || null,
-        type: 'notNull Violation',
+        type: 'notNull Violation'
       });
     }
 
-    (device.features || []).forEach((feature) => {
+    (device.features || []).forEach(feature => {
       if (!feature.name || feature.name.trim() === '') {
         properties.push({
           message: 'name required',
           attribute: 'name',
           value: feature.name || null,
-          type: 'notNull Violation',
+          type: 'notNull Violation'
         });
       }
 
@@ -418,7 +418,7 @@ class MqttDeviceSetupPage extends Component {
           message: 'external_id required',
           attribute: 'external_id',
           value: feature.external_id || null,
-          type: 'notNull Violation',
+          type: 'notNull Violation'
         });
       }
     });
@@ -429,7 +429,7 @@ class MqttDeviceSetupPage extends Component {
   async saveDevice() {
     this.setState({
       loading: true,
-      validationErrors: null,
+      validationErrors: null
     });
 
     const clientValidationErrors = this.buildClientValidationErrors(this.state.device);
@@ -439,7 +439,7 @@ class MqttDeviceSetupPage extends Component {
         saveStatus: RequestStatus.ValidationError,
         validationErrors,
         expandedFeatureIndices: validationErrors.expandedFeatureIndices,
-        loading: false,
+        loading: false
       });
       window.scrollTo(0, 0);
       return;
@@ -453,7 +453,7 @@ class MqttDeviceSetupPage extends Component {
           // if we are here, it means the device already exist
           this.setState({
             saveStatus: RequestStatus.ConflictError,
-            loading: false,
+            loading: false
           });
           return;
         } catch (e) {
@@ -471,7 +471,7 @@ class MqttDeviceSetupPage extends Component {
         ) {
           // We verify that the feature exist
           const featureId = param.name.split(':')[1];
-          const feature = this.state.device.features.find((f) => f.id === featureId);
+          const feature = this.state.device.features.find(f => f.id === featureId);
           if (!feature || !param.value) {
             // If the feature doesn't exist or the param was emptied, we delete the param
             paramsToDelete.push(paramIndex);
@@ -481,21 +481,21 @@ class MqttDeviceSetupPage extends Component {
       const deviceToPost = update(this.state.device, {
         params: {
           // The order matters, so we reverse the array to start from the end
-          $splice: paramsToDelete.map((index) => [index, 1]).reverse(),
-        },
+          $splice: paramsToDelete.map(index => [index, 1]).reverse()
+        }
       });
       const device = await this.props.httpClient.post('/api/v1/device', deviceToPost);
       this.setState({
         saveStatus: RequestStatus.Success,
         loading: false,
-        device,
+        device
       });
     } catch (e) {
       const status = get(e, 'response.status');
       if (status === 409) {
         await this.setState({
           saveStatus: RequestStatus.ConflictError,
-          loading: false,
+          loading: false
         });
       }
       if (status === 422) {
@@ -505,12 +505,12 @@ class MqttDeviceSetupPage extends Component {
           saveStatus: RequestStatus.ValidationError,
           validationErrors,
           expandedFeatureIndices: validationErrors.expandedFeatureIndices,
-          loading: false,
+          loading: false
         });
       } else {
         await this.setState({
           saveStatus: RequestStatus.Error,
-          loading: false,
+          loading: false
         });
       }
       // Scroll to top so the user sees the error
@@ -520,14 +520,14 @@ class MqttDeviceSetupPage extends Component {
 
   getDeviceFeaturesOptions = () => {
     const deviceFeaturesOptions = [];
-    Object.keys(DEVICE_FEATURE_CATEGORIES).forEach((category) => {
+    Object.keys(DEVICE_FEATURE_CATEGORIES).forEach(category => {
       const categoryValue = DEVICE_FEATURE_CATEGORIES[category];
       if (get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}`)) {
         const categoryFeatureTypeOptions = [];
 
         const types = Object.keys(get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}`));
 
-        types.forEach((type) => {
+        types.forEach(type => {
           const typeValue = type;
           if (
             get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`) &&
@@ -538,18 +538,18 @@ class MqttDeviceSetupPage extends Component {
               value: `${categoryValue}|${typeValue}`,
               label: get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`),
               category: categoryValue,
-              type: typeValue,
+              type: typeValue
             });
           }
         });
         deviceFeaturesOptions.push({
           label: get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.shortCategoryName`),
-          options: categoryFeatureTypeOptions,
+          options: categoryFeatureTypeOptions
         });
       }
     });
     this.setState({
-      deviceFeaturesOptions: deviceFeaturesOptions.filter((group) => group.options.length > 0),
+      deviceFeaturesOptions: deviceFeaturesOptions.filter(group => group.options.length > 0)
     });
   };
 
@@ -564,7 +564,7 @@ class MqttDeviceSetupPage extends Component {
       deviceExternalIdSuffix: null,
       customizedFeatureExternalIds: {},
       featureExternalIdSuffixes: {},
-      validationErrors: null,
+      validationErrors: null
     };
 
     this.toggleFeatureCatalog = this.toggleFeatureCatalog.bind(this);
@@ -592,7 +592,7 @@ class MqttDeviceSetupPage extends Component {
         selector: 'mqtt:',
         service_id: this.props.currentIntegration.id,
         features: [],
-        params: [],
+        params: []
       };
     } else {
       const loadedDevice = await this.props.httpClient.get(`/api/v1/device/${deviceSelector}`);
@@ -608,7 +608,7 @@ class MqttDeviceSetupPage extends Component {
 
     const customizedFeatureExternalIds = {};
     if (device && device.features) {
-      device.features.forEach((feature) => {
+      device.features.forEach(feature => {
         customizedFeatureExternalIds[feature.id] = true;
       });
     }
@@ -617,7 +617,7 @@ class MqttDeviceSetupPage extends Component {
       device,
       loading: false,
       deviceExternalIdCustomized: Boolean(device && device.created_at),
-      customizedFeatureExternalIds,
+      customizedFeatureExternalIds
     });
   }
 
@@ -642,5 +642,5 @@ class MqttDeviceSetupPage extends Component {
 }
 
 export default withIntlAsProp(
-  connect('session,user,httpClient,houses,currentIntegration', actions)(MqttDeviceSetupPage),
+  connect('session,user,httpClient,houses,currentIntegration', actions)(MqttDeviceSetupPage)
 );

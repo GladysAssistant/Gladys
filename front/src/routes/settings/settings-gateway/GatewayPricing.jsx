@@ -14,7 +14,7 @@ const FEATURES = [
   { key: 'cameraStreaming', icon: 'fe-video' },
   { key: 'enedis', icon: 'fe-zap' },
   { key: 'mcp', icon: 'fe-link' },
-  { key: 'openApi', icon: 'fe-code' },
+  { key: 'openApi', icon: 'fe-code' }
 ];
 
 const LITE_FEATURES = ['remoteAccess', 'voiceAssistants', 'openApi', 'familyAccounts'];
@@ -69,7 +69,7 @@ const GatewayPricing = ({ children, ...props }) => {
         </div>
       </div>
       <div class="row">
-        {FEATURES.map((feature) => (
+        {FEATURES.map(feature => (
           <div class="col-md-6 col-lg-3 mb-4">
             <div class={`card h-100 ${style.featureCard}`}>
               <div class="card-body text-center">
@@ -121,7 +121,7 @@ const GatewayPricing = ({ children, ...props }) => {
                 <Text id="gatewayPricing.litePlan.priceDetail" />
               </p>
               <ul class={`list-unstyled mb-4 ${style.planFeatureList}`}>
-                {LITE_FEATURES.map((k) => (
+                {LITE_FEATURES.map(k => (
                   <li class="mb-2">
                     <i class="fe fe-check text-success mr-2" />
                     <Text id={`gatewayPricing.litePlan.features.${k}`} />
@@ -160,7 +160,7 @@ const GatewayPricing = ({ children, ...props }) => {
                 <Text id="gatewayPricing.plusPlan.priceDetail" />
               </p>
               <ul class={`list-unstyled mb-4 ${style.planFeatureList}`}>
-                {PLUS_FEATURES.map((k) => (
+                {PLUS_FEATURES.map(k => (
                   <li class="mb-2">
                     <i class="fe fe-check text-success mr-2" />
                     <Text id={`gatewayPricing.plusPlan.features.${k}`} />

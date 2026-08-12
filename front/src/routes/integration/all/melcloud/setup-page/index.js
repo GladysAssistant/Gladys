@@ -2,7 +2,7 @@ import { connect } from 'unistore/preact';
 import SetupTab from './SetupTab';
 import MELCloudPage from '../MELCloudPage';
 
-const MELCloudSetupPage = (props) => (
+const MELCloudSetupPage = props => (
   <MELCloudPage user={props.user}>
     <SetupTab {...props} />
   </MELCloudPage>

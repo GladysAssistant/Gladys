@@ -11,15 +11,15 @@ class DefaultDeviceState extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      customValueSelector: null,
+      customValueSelector: null
     };
   }
 
-  handleOperatorChange = (e) => {
+  handleOperatorChange = e => {
     this.props.updateTriggerProperty(this.props.index, 'operator', e.target.value);
   };
 
-  handleValueChange = (e) => {
+  handleValueChange = e => {
     let value = e.target.value;
     const { selectedDeviceFeature } = this.props;
     const isTextFeature = selectedDeviceFeature && selectedDeviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT;
@@ -39,18 +39,18 @@ class DefaultDeviceState extends Component {
     }
   };
 
-  handleValueOptionChange = (value) => {
+  handleValueOptionChange = value => {
     this.props.updateTriggerProperty(this.props.index, 'value', value);
   };
 
-  displayCustomValue = (e) => {
+  displayCustomValue = e => {
     e.preventDefault();
     // Tied to the feature it was asked for: this component is not remounted when another feature is
     // selected, and the new one should start on its own list of values
     this.setState({ customValueSelector: this.props.selectedDeviceFeature.selector });
   };
 
-  displayValueOptions = (e) => {
+  displayValueOptions = e => {
     e.preventDefault();
     this.setState({ customValueSelector: null });
     // A value that cannot be pre-selected in the list is dropped, otherwise the select would
@@ -64,7 +64,7 @@ class DefaultDeviceState extends Component {
 
   // We display the list of values only if the feature holds constants, and if the current value can
   // be represented in that list (it's not a value saved before this list existed)
-  shouldDisplayValueOptions = (valueOptions) => {
+  shouldDisplayValueOptions = valueOptions => {
     if (!valueOptions || this.state.customValueSelector === this.props.selectedDeviceFeature.selector) {
       return false;
     }

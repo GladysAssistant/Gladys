@@ -15,7 +15,7 @@ class PushDeviceComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
+      loading: false
     };
   }
   push = async () => {
@@ -44,7 +44,7 @@ class PushDeviceComponent extends Component {
             aria-label={iconOnly ? props.rowName : undefined}
             title={iconOnly ? props.rowName : undefined}
             class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
-              'btn-loading': loading,
+              'btn-loading': loading
             })}
           >
             <i class={`fe fe-${icon}`} />

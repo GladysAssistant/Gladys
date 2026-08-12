@@ -23,7 +23,7 @@ const CalendarAccountCard = ({
   onDisable,
   onDisableConfirm,
   onDisableCancel,
-  onToggleCalendar,
+  onToggleCalendar
 }) => {
   const working = accountStatus === RequestStatus.Getting;
   const enabled = Boolean(account && account.enabled);
@@ -51,7 +51,7 @@ const CalendarAccountCard = ({
           </div>
         )}
         <form onSubmit={onSave}>
-          {accountSchema.map((field) => (
+          {accountSchema.map(field => (
             <ConfigField
               key={field.key}
               field={field}
@@ -80,7 +80,7 @@ const CalendarAccountCard = ({
                 <Text id="integration.externalIntegration.myCalendars.noCalendars" />
               </p>
             )}
-            {calendars.map((calendar) => (
+            {calendars.map(calendar => (
               <div key={calendar.selector} class="mb-3">
                 <div class="d-flex align-items-center">
                   <span
@@ -90,7 +90,7 @@ const CalendarAccountCard = ({
                       width: '12px',
                       height: '12px',
                       borderRadius: '50%',
-                      backgroundColor: calendar.color || '#3174ad',
+                      backgroundColor: calendar.color || '#3174ad'
                     }}
                   />
                   <strong>{calendar.name}</strong>
@@ -101,7 +101,7 @@ const CalendarAccountCard = ({
                       type="checkbox"
                       class="custom-switch-input"
                       checked={calendar.sync}
-                      onClick={(e) => onToggleCalendar(calendar.selector, 'sync', e.target.checked)}
+                      onClick={e => onToggleCalendar(calendar.selector, 'sync', e.target.checked)}
                       disabled={calendarToggleStatus === RequestStatus.Getting}
                     />
                     <span class="custom-switch-indicator" />
@@ -114,7 +114,7 @@ const CalendarAccountCard = ({
                       type="checkbox"
                       class="custom-switch-input"
                       checked={calendar.shared}
-                      onClick={(e) => onToggleCalendar(calendar.selector, 'shared', e.target.checked)}
+                      onClick={e => onToggleCalendar(calendar.selector, 'shared', e.target.checked)}
                       disabled={calendarToggleStatus === RequestStatus.Getting}
                     />
                     <span class="custom-switch-indicator" />

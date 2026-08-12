@@ -26,7 +26,7 @@ class XiaomiSensor extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />

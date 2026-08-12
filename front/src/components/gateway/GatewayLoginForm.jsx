@@ -9,7 +9,7 @@ const GatewayLoginForm = ({ children, ...props }) => (
     <div class="card-body p-6">
       <div
         class={cx('dimmer', {
-          active: props.gatewayLoginStatus === RequestStatus.Getting,
+          active: props.gatewayLoginStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
@@ -74,7 +74,7 @@ const GatewayLoginForm = ({ children, ...props }) => (
                 <input
                   type="email"
                   class={cx('form-control', {
-                    'is-invalid': props.gatewayLoginStatus === LoginStatus.WrongEmailError,
+                    'is-invalid': props.gatewayLoginStatus === LoginStatus.WrongEmailError
                   })}
                   placeholder={<Text id="gatewayLogin.emailPlaceholder" />}
                   value={props.gatewayLoginEmail}

@@ -5,21 +5,21 @@ import ConfirmEmail from './ConfirmEmail';
 class ConfirmEmailPage extends Component {
   state = {
     emailConfirmed: false,
-    error: false,
+    error: false
   };
 
   componentDidMount() {
     this.props.session.gatewayClient
       .confirmEmail(this.props.token)
-      .then((result) => {
+      .then(result => {
         this.setState({
           email: result.email,
-          emailConfirmed: true,
+          emailConfirmed: true
         });
       })
       .catch(() => {
         this.setState({
-          error: true,
+          error: true
         });
       });
   }

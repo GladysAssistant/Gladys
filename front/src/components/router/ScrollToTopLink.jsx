@@ -4,7 +4,7 @@ import { Link } from 'preact-router/match';
 // This component is used to scroll to the top when clicking on a link.
 // See : https://github.com/preactjs/preact-router/issues/319
 const ScrollToTopLink = ({ children, ...props }) => {
-  const handleClick = (e) => {
+  const handleClick = e => {
     // Call the original onClick if it exists
     if (props.onClick) {
       props.onClick(e);

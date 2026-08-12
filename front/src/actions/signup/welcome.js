@@ -6,7 +6,7 @@ function createActions(store) {
     async checkIfInstanceIsConfigured(state) {
       // check instance state
       store.setState({
-        checkIfInstanceIsConfiguredRequestState: RequestStatus.Getting,
+        checkIfInstanceIsConfiguredRequestState: RequestStatus.Getting
       });
       try {
         const instanceState = await state.httpClient.get('/api/v1/setup');
@@ -14,14 +14,14 @@ function createActions(store) {
           route('/login');
         }
         store.setState({
-          checkIfInstanceIsConfiguredRequestState: RequestStatus.Success,
+          checkIfInstanceIsConfiguredRequestState: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          checkIfInstanceIsConfiguredRequestState: RequestStatus.Error,
+          checkIfInstanceIsConfiguredRequestState: RequestStatus.Error
         });
       }
-    },
+    }
   };
 
   return actions;

@@ -25,7 +25,7 @@ const FanModeDeviceFeature = ({ children, ...props }) => {
         <div class="d-flex justify-content-end">
           <div class="form-group mb-0">
             <select value={deviceFeature.last_value} onChange={updateValue} class="form-control form-control-sm">
-              {modes.map((mode) => (
+              {modes.map(mode => (
                 <option key={mode} value={mode}>
                   <Text id={`deviceFeatureValue.category.fan.mode.${mode}`} />
                 </option>

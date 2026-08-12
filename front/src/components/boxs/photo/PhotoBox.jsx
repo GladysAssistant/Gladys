@@ -9,7 +9,7 @@ const DEFAULT_SLIDESHOW_INTERVAL = 10;
 const PHOTO_FIT_COVER = 'cover';
 const PHOTO_FIT_CONTAIN = 'contain';
 
-const getValidPhotos = (photos) => (Array.isArray(photos) ? photos.filter((photo) => photo && photo.url) : []);
+const getValidPhotos = photos => (Array.isArray(photos) ? photos.filter(photo => photo && photo.url) : []);
 
 const getPhotoUrlAtIndex = (photos, index) => {
   const photo = photos[index];
@@ -32,7 +32,7 @@ class PhotoBox extends Component {
       image: null,
       imageError: false,
       loading: false,
-      isTransitioning: false,
+      isTransitioning: false
     };
   }
 
@@ -94,7 +94,7 @@ class PhotoBox extends Component {
     return getPhotoUrlAtIndex(photos, this.state.currentIndex);
   };
 
-  fetchPhoto = async (url) => {
+  fetchPhoto = async url => {
     if (!url) {
       return null;
     }
@@ -166,11 +166,11 @@ class PhotoBox extends Component {
     if (photos.length <= 1) {
       return;
     }
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       currentIndex: (prevState.currentIndex + 1) % photos.length,
       image: null,
       imageError: false,
-      isTransitioning: true,
+      isTransitioning: true
     }));
     this.startTransition();
     this.startSlideshow();
@@ -181,17 +181,17 @@ class PhotoBox extends Component {
     if (photos.length <= 1) {
       return;
     }
-    this.setState((prevState) => ({
+    this.setState(prevState => ({
       currentIndex: (prevState.currentIndex - 1 + photos.length) % photos.length,
       image: null,
       imageError: false,
-      isTransitioning: true,
+      isTransitioning: true
     }));
     this.startTransition();
     this.startSlideshow();
   };
 
-  goToIndex = (index) => {
+  goToIndex = index => {
     this.setState({ currentIndex: index, image: null, imageError: false, isTransitioning: true });
     this.startTransition();
     this.startSlideshow();
@@ -235,7 +235,7 @@ class PhotoBox extends Component {
                 class={cx(style.photo, {
                   [style.photoCover]: fit === PHOTO_FIT_COVER,
                   [style.photoContain]: fit === PHOTO_FIT_CONTAIN,
-                  [style.photoTransitioning]: isTransitioning,
+                  [style.photoTransitioning]: isTransitioning
                 })}
                 loading="lazy"
               />

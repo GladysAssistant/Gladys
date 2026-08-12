@@ -2,7 +2,7 @@ import { connect } from 'unistore/preact';
 import MatterbridgePage from '../MatterbridgePage';
 import SetupTab from './SetupTab';
 
-const MatterbridgeSetupPage = (props) => (
+const MatterbridgeSetupPage = props => (
   <MatterbridgePage user={props.user}>
     <SetupTab {...props} />
   </MatterbridgePage>

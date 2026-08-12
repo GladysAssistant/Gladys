@@ -2,7 +2,7 @@ import { connect } from 'unistore/preact';
 import NodeRedPage from '../NodeRedPage';
 import SetupTab from './SetupTab';
 
-const NodeRedSetupPage = (props) => (
+const NodeRedSetupPage = props => (
   <NodeRedPage user={props.user}>
     <SetupTab {...props} />
   </NodeRedPage>

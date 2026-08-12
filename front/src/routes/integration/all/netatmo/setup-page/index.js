@@ -14,7 +14,7 @@ class NetatmoSetupPage extends Component {
       const result = await this.props.httpClient.post('/api/v1/service/netatmo/connect');
       const redirectUri = `${result.authUrl}&redirect_uri=${encodeURIComponent(this.state.redirectUriNetatmoSetup)}`;
       await this.setState({
-        redirectUri,
+        redirectUri
       });
     } catch (e) {
       console.error(e);
@@ -26,7 +26,7 @@ class NetatmoSetupPage extends Component {
     if (!this.props.session.gatewayClient) {
       this.setState({
         notOnGladysGateway: true,
-        redirectUriNetatmoSetup: `${window.location.origin}/dashboard/integration/device/netatmo/setup`,
+        redirectUriNetatmoSetup: `${window.location.origin}/dashboard/integration/device/netatmo/setup`
       });
     } else return;
   };
@@ -36,24 +36,24 @@ class NetatmoSetupPage extends Component {
       if (this.props.error === 'access_denied' || this.props.error === 'invalid_client') {
         this.props.httpClient.post('/api/v1/service/netatmo/status', {
           statusType: STATUS.ERROR.CONNECTING,
-          message: this.props.error,
+          message: this.props.error
         });
         await this.setState({
           connectNetatmoStatus: STATUS.DISCONNECTED,
           connected: false,
           configured: true,
           accessDenied: true,
-          messageAlert: this.props.error,
+          messageAlert: this.props.error
         });
       } else {
         this.props.httpClient.post('/api/v1/service/netatmo/status', {
           statusType: STATUS.ERROR.CONNECTING,
-          message: 'other_error',
+          message: 'other_error'
         });
         await this.setState({
           accessDenied: true,
           messageAlert: 'other_error',
-          errored: true,
+          errored: true
         });
         console.error('Logs error', this.props);
       }
@@ -65,22 +65,22 @@ class NetatmoSetupPage extends Component {
           connectNetatmoStatus: STATUS.PROCESSING_TOKEN,
           connected: false,
           configured: true,
-          errored: false,
+          errored: false
         });
         const response = await this.props.httpClient.post('/api/v1/service/netatmo/token', {
           codeOAuth: this.props.code,
           redirectUri: this.state.redirectUriNetatmoSetup,
-          state: this.props.state,
+          state: this.props.state
         });
         if (response) successfulNewToken = true;
         await this.props.httpClient.post('/api/v1/service/netatmo/variable/NETATMO_CONNECTED', {
-          value: successfulNewToken,
+          value: successfulNewToken
         });
         await this.setState({
           connectNetatmoStatus: STATUS.CONNECTED,
           connected: true,
           configured: true,
-          errored: false,
+          errored: false
         });
         await this.props.httpClient.get('/api/v1/service/netatmo/discover', { refresh: true });
         setTimeout(() => {
@@ -90,19 +90,19 @@ class NetatmoSetupPage extends Component {
         console.error(e);
         this.props.httpClient.post('/api/v1/service/netatmo/status', {
           statusType: STATUS.PROCESSING_TOKEN,
-          message: 'other_error',
+          message: 'other_error'
         });
         await this.setState({
           connectNetatmoStatus: STATUS.DISCONNECTED,
           connected: false,
           configured: true,
-          errored: true,
+          errored: true
         });
       }
     }
   };
 
-  saveConfiguration = async (e) => {
+  saveConfiguration = async e => {
     e.preventDefault();
 
     try {
@@ -110,22 +110,22 @@ class NetatmoSetupPage extends Component {
         clientId: this.state.netatmoClientId,
         clientSecret: this.state.netatmoClientSecret,
         energyApi: this.state.netatmoEnergyApi,
-        weatherApi: this.state.netatmoWeatherApi,
+        weatherApi: this.state.netatmoWeatherApi
       });
       await this.setState({
-        netatmoSaveSettingsStatus: RequestStatus.Success,
+        netatmoSaveSettingsStatus: RequestStatus.Success
       });
     } catch (e) {
       await this.setState({
         netatmoSaveSettingsStatus: RequestStatus.Error,
-        errored: true,
+        errored: true
       });
     }
     try {
       await this.setState({
         connectNetatmoStatus: STATUS.CONNECTING,
         connected: false,
-        configured: true,
+        configured: true
       });
       await this.getRedirectUri();
       const redirectUri = this.state.redirectUri;
@@ -135,13 +135,13 @@ class NetatmoSetupPage extends Component {
         await this.setState({
           connectNetatmoStatus: RequestStatus.Success,
           connected: false,
-          configured: true,
+          configured: true
         });
       } else {
         console.error('Missing redirect URL');
         await this.setState({
           connectNetatmoStatus: STATUS.ERROR.CONNECTING,
-          connected: false,
+          connected: false
         });
       }
     } catch (e) {
@@ -150,7 +150,7 @@ class NetatmoSetupPage extends Component {
       await this.setState({
         connectNetatmoStatus: STATUS.ERROR.CONNECTING,
         connected: false,
-        errored: true,
+        errored: true
       });
     }
   };
@@ -168,7 +168,7 @@ class NetatmoSetupPage extends Component {
         netatmoClientSecret: configuration.clientSecret,
         netatmoEnergyApi: configuration.energyApi,
         netatmoWeatherApi: configuration.weatherApi,
-        clientSecretChanges: false,
+        clientSecretChanges: false
       });
     }
   };
@@ -179,12 +179,12 @@ class NetatmoSetupPage extends Component {
       await this.setState({
         connectNetatmoStatus: netatmoStatus.status,
         connected: netatmoStatus.connected,
-        configured: netatmoStatus.configured,
+        configured: netatmoStatus.configured
       });
     } catch (e) {
       await this.setState({
         netatmoConnectionError: RequestStatus.NetworkError,
-        errored: true,
+        errored: true
       });
       console.error(e);
     }
@@ -196,7 +196,7 @@ class NetatmoSetupPage extends Component {
     await this.setState({ loading: false });
   };
 
-  updateStatus = async (state) => {
+  updateStatus = async state => {
     let connected = false;
     let configured = false;
     if (
@@ -216,11 +216,11 @@ class NetatmoSetupPage extends Component {
     await this.setState({
       connectNetatmoStatus: state.status,
       connected,
-      configured,
+      configured
     });
   };
 
-  updateStatusError = async (state) => {
+  updateStatusError = async state => {
     switch (state.statusType) {
       case STATUS.CONNECTING:
         if (state.status !== 'other_error') {
@@ -228,13 +228,13 @@ class NetatmoSetupPage extends Component {
             connectNetatmoStatus: STATUS.DISCONNECTED,
             connected: false,
             accessDenied: true,
-            messageAlert: state.status,
+            messageAlert: state.status
           });
         } else {
           this.setState({
             connectNetatmoStatus: STATUS.DISCONNECTED,
             connected: false,
-            errored: true,
+            errored: true
           });
         }
         break;
@@ -244,27 +244,27 @@ class NetatmoSetupPage extends Component {
             connectNetatmoStatus: STATUS.DISCONNECTED,
             connected: false,
             accessDenied: true,
-            messageAlert: state.status,
+            messageAlert: state.status
           });
         } else if (state.status === 'invalid_client') {
           this.setState({
             connectNetatmoStatus: STATUS.DISCONNECTED,
             connected: false,
             accessDenied: true,
-            messageAlert: state.status,
+            messageAlert: state.status
           });
         } else {
           this.setState({
             connectNetatmoStatus: STATUS.DISCONNECTED,
             connected: false,
-            errored: true,
+            errored: true
           });
         }
         break;
     }
   };
 
-  handleStateUpdateFromChild = (newState) => {
+  handleStateUpdateFromChild = newState => {
     this.setState(newState);
   };
 
@@ -276,18 +276,18 @@ class NetatmoSetupPage extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING, this.updateStatusError);
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
-      this.updateStatusError,
+      this.updateStatusError
     );
   }
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING,
-      this.updateStatusError,
+      this.updateStatusError
     );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
-      this.updateStatusError,
+      this.updateStatusError
     );
   }
 

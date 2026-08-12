@@ -9,7 +9,7 @@ class MqttDiscoveryPage extends Component {
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.MQTT.HA_DISCOVERY_DEVICES_UPDATED,
-      this.props.setDiscoveredDevices,
+      this.props.setDiscoveredDevices
     );
     this.props.getHouses();
     this.props.getDiscoveredDevices();
@@ -18,7 +18,7 @@ class MqttDiscoveryPage extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.MQTT.HA_DISCOVERY_DEVICES_UPDATED,
-      this.props.setDiscoveredDevices,
+      this.props.setDiscoveredDevices
     );
   }
 
@@ -33,5 +33,5 @@ class MqttDiscoveryPage extends Component {
 
 export default connect(
   'user,session,houses,mqttDiscoveredDevices,mqttDiscoveryLoading,mqttDiscoveryError,mqttDiscoveryFilterExisting',
-  actions,
+  actions
 )(MqttDiscoveryPage);

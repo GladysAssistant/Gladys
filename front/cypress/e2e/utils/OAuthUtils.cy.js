@@ -3,20 +3,20 @@ import {
   getAuthorizeUrlState,
   getOAuthCallbackPath,
   wrapAuthorizeUrl,
-  wrapOAuthState,
+  wrapOAuthState
 } from '../../../src/utils/oauth';
 
 // The authorize URL an integration would return for a Spotify account.
 const authorizeUrl = (state = 'integration-anti-csrf') =>
   `https://accounts.spotify.com/authorize?response_type=code&client_id=abc&scope=user-read-playback-state&redirect_uri=${encodeURIComponent(
-    OAUTH_REDIRECT_URI,
+    OAUTH_REDIRECT_URI
   )}&state=${encodeURIComponent(state)}`;
 
-const decodeWrappedState = (wrapped) => {
+const decodeWrappedState = wrapped => {
   const base64 = wrapped.replace(/-/g, '+').replace(/_/g, '/');
   const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
   const binary = atob(padded);
-  const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+  const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
   return JSON.parse(new TextDecoder('utf-8').decode(bytes));
 };
 
@@ -29,7 +29,7 @@ describe('OAuth2 redirect utils', () => {
 
   it('builds the callback path of an integration', () => {
     expect(getOAuthCallbackPath('ext-dev-spotify')).to.equal(
-      '/dashboard/integration/device/external/ext-dev-spotify/oauth-callback',
+      '/dashboard/integration/device/external/ext-dev-spotify/oauth-callback'
     );
   });
 
@@ -37,14 +37,14 @@ describe('OAuth2 redirect utils', () => {
     const wrapped = wrapOAuthState({
       origin: 'http://192.168.1.50:1443',
       path: getOAuthCallbackPath('ext-dev-spotify'),
-      state: 'integration-anti-csrf',
+      state: 'integration-anti-csrf'
     });
 
     expect(decodeWrappedState(wrapped)).to.deep.equal({
       v: 1,
       origin: 'http://192.168.1.50:1443',
       path: '/dashboard/integration/device/external/ext-dev-spotify/oauth-callback',
-      state: 'integration-anti-csrf',
+      state: 'integration-anti-csrf'
     });
   });
 
@@ -58,8 +58,8 @@ describe('OAuth2 redirect utils', () => {
     const url = new URL(
       wrapAuthorizeUrl(authorizeUrl(), {
         origin: 'http://192.168.1.50:1443',
-        path: getOAuthCallbackPath('ext-dev-spotify'),
-      }),
+        path: getOAuthCallbackPath('ext-dev-spotify')
+      })
     );
 
     expect(url.origin + url.pathname).to.equal('https://accounts.spotify.com/authorize');
@@ -74,15 +74,15 @@ describe('OAuth2 redirect utils', () => {
     const url = new URL(
       wrapAuthorizeUrl(authorizeUrl(), {
         origin: 'http://192.168.1.50:1443',
-        path: getOAuthCallbackPath('ext-dev-spotify'),
-      }),
+        path: getOAuthCallbackPath('ext-dev-spotify')
+      })
     );
 
     expect(decodeWrappedState(url.searchParams.get('state'))).to.deep.equal({
       v: 1,
       origin: 'http://192.168.1.50:1443',
       path: '/dashboard/integration/device/external/ext-dev-spotify/oauth-callback',
-      state: 'integration-anti-csrf',
+      state: 'integration-anti-csrf'
     });
   });
 
@@ -94,7 +94,7 @@ describe('OAuth2 redirect utils', () => {
     // no state means no way back from the redirect page, and no anti-CSRF
     // protection either: fail on "Connect", not after the user consented
     expect(() => getAuthorizeUrlState('https://accounts.spotify.com/authorize?client_id=abc')).to.throw(
-      'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE',
+      'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE'
     );
   });
 
@@ -103,7 +103,7 @@ describe('OAuth2 redirect utils', () => {
 
     expect(() => getAuthorizeUrlState(authorizeUrl(tooLong))).to.throw('EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE');
     expect(() =>
-      wrapAuthorizeUrl(authorizeUrl(tooLong), { origin: 'http://192.168.1.50:1443', path: '/callback' }),
+      wrapAuthorizeUrl(authorizeUrl(tooLong), { origin: 'http://192.168.1.50:1443', path: '/callback' })
     ).to.throw('EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE');
   });
 });

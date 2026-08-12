@@ -2,7 +2,9 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
   const SELECTED_DONGLE_NAME = "CircuitSetup's CC2652P2 USB Coordinator";
 
   const selectDongle = () => {
-    cy.get('[data-cy=z2m-setup-local-dongle-field]').children().as('dongleField');
+    cy.get('[data-cy=z2m-setup-local-dongle-field]')
+      .children()
+      .as('dongleField');
     cy.get('@dongleField').click();
     cy.get('@dongleField').type(`CircuitSetup{enter}`);
   };
@@ -14,20 +16,20 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: `${serverUrl}/api/v1/service/zigbee2mqtt/status`,
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/status`
       },
       {
-        fixture: 'integration/routes/integration/zigbee2mqtt/status_ready_to_setup.json',
-      },
+        fixture: 'integration/routes/integration/zigbee2mqtt/status_ready_to_setup.json'
+      }
     );
     cy.intercept(
       {
         method: 'GET',
-        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`,
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
       },
       {
-        body: {},
-      },
+        body: {}
+      }
     );
     cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
   });
@@ -55,11 +57,11 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: `${serverUrl}/api/v1/service/usb/port`,
+        url: `${serverUrl}/api/v1/service/usb/port`
       },
       {
-        fixture: 'integration/routes/integration/usb/get_available_usb_ports.json',
-      },
+        fixture: 'integration/routes/integration/usb/get_available_usb_ports.json'
+      }
     ).as('usbPorts');
 
     cy.get('[data-cy=z2m-setup-local-panel]').within(() => {
@@ -77,7 +79,9 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.get('[data-cy=z2m-setup-save]').should('be.disabled');
 
     // Start typing on USB port and abort
-    cy.get('[data-cy=z2m-setup-local-usb-field]').children().as('usbField');
+    cy.get('[data-cy=z2m-setup-local-usb-field]')
+      .children()
+      .as('usbField');
     cy.get('@usbField').click();
     cy.get('@usbField').type('invalid value{esc}');
 
@@ -85,7 +89,9 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.get('[data-cy=z2m-setup-save]').should('be.disabled');
 
     // Start typing on USB port and confirm
-    cy.get('[data-cy=z2m-setup-local-usb-field]').children().as('usbField');
+    cy.get('[data-cy=z2m-setup-local-usb-field]')
+      .children()
+      .as('usbField');
     cy.get('@usbField').click();
     cy.get('@usbField').type('{downArrow}{enter}');
 
@@ -97,8 +103,12 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
   });
 
   it('Check confirm configuration', () => {
-    cy.get('[data-cy=z2m-setup-save]').should('exist').should('not.be.disabled');
-    cy.get('[data-cy=z2m-setup-reset]').should('exist').should('not.be.disabled');
+    cy.get('[data-cy=z2m-setup-save]')
+      .should('exist')
+      .should('not.be.disabled');
+    cy.get('[data-cy=z2m-setup-reset]')
+      .should('exist')
+      .should('not.be.disabled');
   });
 
   it('Save configuration with error', () => {
@@ -106,7 +116,9 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.get('[data-cy=z2m-setup-save-error]').should('not.exist');
 
     // Re-fill form
-    cy.get('[data-cy=z2m-setup-local-usb-field]').children().as('portInput');
+    cy.get('[data-cy=z2m-setup-local-usb-field]')
+      .children()
+      .as('portInput');
 
     cy.get('@portInput').click();
     cy.get('@portInput').type('{downArrow}{enter}');
@@ -118,21 +130,23 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.intercept(
       {
         method: 'POST',
-        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`,
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
       },
       {
-        statusCode: 400,
-      },
+        statusCode: 400
+      }
     ).as('setup');
 
     cy.get('[data-cy=z2m-setup-save]').click();
 
-    cy.wait('@setup').its('request.body').should('deep.eq', {
-      ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
-      ZIGBEE_DONGLE_NAME: SELECTED_DONGLE_NAME,
-      Z2M_TCP_PORT: '12345',
-      Z2M_MQTT_MODE: 'local',
-    });
+    cy.wait('@setup')
+      .its('request.body')
+      .should('deep.eq', {
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+        ZIGBEE_DONGLE_NAME: SELECTED_DONGLE_NAME,
+        Z2M_TCP_PORT: '12345',
+        Z2M_MQTT_MODE: 'local'
+      });
 
     // Check error panel
     cy.get('[data-cy=z2m-setup-save-error]').should('exist');
@@ -152,26 +166,28 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.intercept(
       {
         method: 'POST',
-        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`,
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
       },
       {
         statusCode: 200,
         body: {
           ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
           ZIGBEE_DONGLE_NAME: SELECTED_DONGLE_NAME,
-          Z2M_TCP_PORT: '12000',
-        },
-      },
+          Z2M_TCP_PORT: '12000'
+        }
+      }
     ).as('setup');
 
     cy.get('[data-cy=z2m-setup-save]').click();
 
-    cy.wait('@setup').its('request.body').should('deep.eq', {
-      ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
-      ZIGBEE_DONGLE_NAME: SELECTED_DONGLE_NAME,
-      Z2M_TCP_PORT: null,
-      Z2M_MQTT_MODE: 'local',
-    });
+    cy.wait('@setup')
+      .its('request.body')
+      .should('deep.eq', {
+        ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+        ZIGBEE_DONGLE_NAME: SELECTED_DONGLE_NAME,
+        Z2M_TCP_PORT: null,
+        Z2M_MQTT_MODE: 'local'
+      });
 
     // Check error panel
     cy.get('[data-cy=z2m-setup-save-error]').should('not.exist');
@@ -193,8 +209,8 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
         zigbee2mqttConnected: true,
         z2mEnabled: true,
         dockerBased: true,
-        networkModeValid: true,
-      },
+        networkModeValid: true
+      }
     });
   });
 
@@ -203,7 +219,9 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     cy.get('[data-cy=z2m-setup-local-summary]')
       .should('exist')
       .within(() => {
-        cy.get('button').contains('integration.zigbee2mqtt.setup.changeButtonLabel').click();
+        cy.get('button')
+          .contains('integration.zigbee2mqtt.setup.changeButtonLabel')
+          .click();
       });
     cy.get('[data-cy=z2m-setup-reset]').click();
   });

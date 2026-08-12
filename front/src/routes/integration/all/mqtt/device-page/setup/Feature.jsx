@@ -7,7 +7,7 @@ import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
   DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE,
   DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_TYPES
 } from '../../../../../../../../server/utils/constants';
 import { ENERGY_INDEX_FEATURE_TYPES } from '../../../../../../../../server/services/energy-monitoring/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
@@ -33,7 +33,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
     <div
       class={cx(style.featureAccordion, {
         [style.featureAccordionExpanded]: props.isExpanded,
-        [style.featureAccordionError]: hasFieldError,
+        [style.featureAccordionError]: hasFieldError
       })}
     >
       <button type="button" class={style.featureAccordionHeader} onClick={props.toggleExpanded}>
@@ -132,7 +132,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
                       <option value="">
                         <Text id="global.emptySelectOption" />
                       </option>
-                      {availableUnits.map((unit) => (
+                      {availableUnits.map(unit => (
                         <option value={unit}>
                           <Text id={`deviceFeatureUnit.${unit}`}>{unit}</Text>
                         </option>
@@ -153,7 +153,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
                 <div class="form-label">
                   <Text id="integration.mqtt.feature.readOnlyLabel" />
                 </div>
-                <label class="custom-switch" onClick={(e) => e.stopPropagation()}>
+                <label class="custom-switch" onClick={e => e.stopPropagation()}>
                   <input
                     type="checkbox"
                     id={`read_only_${featureIndex}`}
@@ -180,7 +180,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
                   <div class="form-label">
                     <Text id="editDeviceForm.keepHistoryLabel" />
                   </div>
-                  <label class="custom-switch" onClick={(e) => e.stopPropagation()}>
+                  <label class="custom-switch" onClick={e => e.stopPropagation()}>
                     <input
                       id={`keep_history_${featureIndex}`}
                       type="checkbox"
@@ -361,7 +361,7 @@ class MqttFeatureBoxComponent extends Component {
     super(props);
     this.state = {
       isExpanded: props.initiallyExpanded || false,
-      showAdvancedSettings: false,
+      showAdvancedSettings: false
     };
   }
 
@@ -384,26 +384,26 @@ class MqttFeatureBoxComponent extends Component {
     this.setState({ isExpanded: !this.state.isExpanded });
   };
 
-  updateName = (e) => {
+  updateName = e => {
     this.props.updateFeatureProperty(e, 'name', this.props.featureIndex);
   };
-  updateExternalId = (e) => {
+  updateExternalId = e => {
     this.props.updateFeatureProperty(e, 'external_id', this.props.featureIndex);
   };
-  updateMin = (e) => {
+  updateMin = e => {
     this.props.updateFeatureProperty(e, 'min', this.props.featureIndex);
   };
-  updateMax = (e) => {
+  updateMax = e => {
     this.props.updateFeatureProperty(e, 'max', this.props.featureIndex);
   };
-  updateUnit = (e) => {
+  updateUnit = e => {
     this.props.updateFeatureProperty(e, 'unit', this.props.featureIndex);
   };
-  updateReadOnly = (e) => {
+  updateReadOnly = e => {
     e.stopPropagation();
     this.props.updateFeatureProperty(e, 'read_only', this.props.featureIndex);
   };
-  updateKeepHistory = (e) => {
+  updateKeepHistory = e => {
     e.stopPropagation();
     this.props.updateFeatureProperty(e, 'keep_history', this.props.featureIndex);
   };
@@ -419,10 +419,10 @@ class MqttFeatureBoxComponent extends Component {
   getCustomMqttObjectPathValue = () => {
     return getDeviceParam(this.props.device, this.getCustomMqttObjectPathParamPrefix());
   };
-  updateMqttCustomTopic = (e) => {
+  updateMqttCustomTopic = e => {
     this.props.updateDeviceParam(this.getCustomMqttTopicParamPrefix(), e.target.value);
   };
-  updateMqttCustomObjectPath = (e) => {
+  updateMqttCustomObjectPath = e => {
     this.props.updateDeviceParam(this.getCustomMqttObjectPathParamPrefix(), e.target.value);
   };
   deleteFeature = () => {
@@ -439,7 +439,7 @@ class MqttFeatureBoxComponent extends Component {
     const listenMqttTopic = `gladys/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
     return {
       publishMqttTopic,
-      listenMqttTopic,
+      listenMqttTopic
     };
   };
   isEnergyIndexFeature = () => {
@@ -452,8 +452,7 @@ class MqttFeatureBoxComponent extends Component {
     if (!device || !device.features) return false;
 
     const hasConsumption = device.features.some(
-      (f) =>
-        f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION && f.energy_parent_id === feature.id,
+      f => f.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION && f.energy_parent_id === feature.id
     );
 
     return hasConsumption;

@@ -1,76 +1,76 @@
 import { CalDAVStatus } from '../../../../../utils/consts';
 
-const actions = (store) => ({
+const actions = store => ({
   updateCalendarsToSync(state, e) {
     store.setState({
       calendarsToSync: {
         ...state.calendarsToSync,
-        [e.target.name]: e.target.checked,
-      },
+        [e.target.name]: e.target.checked
+      }
     });
   },
   async getCaldavSetting(state) {
     store.setState({
-      caldavGetSettingsStatus: CalDAVStatus.Getting,
+      caldavGetSettingsStatus: CalDAVStatus.Getting
     });
 
     let caldavCalendars = [];
 
     store.setState({
-      caldavCalendars,
+      caldavCalendars
     });
 
     try {
       const calendars = await state.httpClient.get('/api/v1/calendar', {
-        serviceName: 'caldav',
+        serviceName: 'caldav'
       });
       caldavCalendars = calendars;
 
       store.setState({
-        caldavGetSettingsStatus: CalDAVStatus.Success,
+        caldavGetSettingsStatus: CalDAVStatus.Success
       });
     } catch (e) {
       store.setState({
-        caldavGetSettingsStatus: CalDAVStatus.Error,
+        caldavGetSettingsStatus: CalDAVStatus.Error
       });
     }
 
     store.setState({
-      caldavCalendars,
+      caldavCalendars
     });
   },
   async saveCaldavSettings(state) {
     store.setState({
-      caldavSaveSyncStatus: CalDAVStatus.Getting,
+      caldavSaveSyncStatus: CalDAVStatus.Getting
     });
     try {
       // save calendars sync changes
       const updatedCalendars = await Promise.all(
-        Object.keys(state.calendarsToSync).map((selector) => {
+        Object.keys(state.calendarsToSync).map(selector => {
           return state.httpClient.patch(
             `/api/v1/service/caldav/${state.calendarsToSync[selector] ? 'enable' : 'disable'}`,
             {
-              selector,
-            },
+              selector
+            }
           );
-        }),
+        })
       );
       store.setState({
-        caldavCalendars: state.caldavCalendars.map((caldavCalendar) => {
+        caldavCalendars: state.caldavCalendars.map(caldavCalendar => {
           const currentUpdatedCalendar = updatedCalendars.filter(
-            (updatedCalendar) => updatedCalendar.id === caldavCalendar.id,
+            updatedCalendar => updatedCalendar.id === caldavCalendar.id
           );
           return currentUpdatedCalendar.length === 0 ? caldavCalendar : currentUpdatedCalendar[0];
         }),
         calendarsToSync: undefined,
-        caldavSaveSyncStatus: CalDAVStatus.Success,
+        caldavSaveSyncStatus: CalDAVStatus.Success
       });
     } catch (e) {
       store.setState({
-        caldavSaveSyncStatus: CalDAVStatus.Error,
+        caldavSaveSyncStatus: CalDAVStatus.Error
       });
     }
-  },
+  }
 });
 
 export default actions;

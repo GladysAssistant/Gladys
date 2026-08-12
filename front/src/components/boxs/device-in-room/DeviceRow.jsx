@@ -71,7 +71,7 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.DOCK]: VacuumCleanerDockDeviceFeature,
   [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.RUN_MODE]: VacuumCleanerModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.VACUUM_CLEANER.CLEAN_MODE]: VacuumCleanerCleanModeDeviceFeature,
-  [DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.WATER_VALVE.AUTO_CLOSE_WHEN_WATER_SHORTAGE]: BinaryDeviceFeature
 };
 
 // Some feature type strings are shared across categories (e.g. AIR_CONDITIONING.MODE and FAN.MODE
@@ -81,10 +81,10 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
 // order and stays correct when new categories reuse an existing type string.
 const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
-    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: AirConditioningModeDeviceFeature,
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: AirConditioningModeDeviceFeature
   },
   [DEVICE_FEATURE_CATEGORIES.FAN]: {
-    [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature,
+    [DEVICE_FEATURE_TYPES.FAN.MODE]: FanModeDeviceFeature
   },
   // `mode` and `target-temperature` are strings other categories already own, so routing them from
   // the type-keyed map would let declaration order decide the winner for every category. `binary`
@@ -94,17 +94,17 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
     [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: BinaryDeviceFeature,
     [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: WaterHeaterModeDeviceFeature,
     [DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE]: SetpointDeviceFeature,
-    [DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST]: BinaryDeviceFeature,
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST]: BinaryDeviceFeature
   },
   // Television remote-control orders (play, pause, channel up, ...) are write-only commands: they
   // are displayed as push buttons instead of falling back to a read-only sensor row.
   [DEVICE_FEATURE_CATEGORIES.TELEVISION]: TelevisionPushButtonFeatureTypes.reduce(
     (acc, type) => ({ ...acc, [type]: PushDeviceFeature }),
-    {},
+    {}
   ),
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
-    [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: ThermostatModeDeviceFeature,
-  },
+    [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: ThermostatModeDeviceFeature
+  }
 };
 
 const DeviceRow = ({ children, ...props }) => {

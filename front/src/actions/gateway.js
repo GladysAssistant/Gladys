@@ -10,17 +10,17 @@ function createActions(store) {
   const actions = {
     async getStatus(state) {
       store.setState({
-        gatewayGetStatusStatus: RequestStatus.Getting,
+        gatewayGetStatusStatus: RequestStatus.Getting
       });
       try {
         const gatewayStatus = await state.httpClient.get('/api/v1/gateway/status');
         store.setState({
           gatewayStatus,
-          gatewayGetStatusStatus: RequestStatus.Success,
+          gatewayGetStatusStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          gatewayGetStatusStatus: RequestStatus.Error,
+          gatewayGetStatusStatus: RequestStatus.Error
         });
       }
     },
@@ -30,22 +30,22 @@ function createActions(store) {
       }
       if (!validateEmail(state.gatewayLoginEmail)) {
         return store.setState({
-          gatewayLoginStatus: LoginStatus.WrongEmailError,
+          gatewayLoginStatus: LoginStatus.WrongEmailError
         });
       }
       store.setState({
-        gatewayLoginStatus: RequestStatus.Getting,
+        gatewayLoginStatus: RequestStatus.Getting
       });
       try {
         const gatewayLoginResults = await state.httpClient.post('/api/v1/gateway/login', {
           email: state.gatewayLoginEmail,
-          password: state.gatewayLoginPassword,
+          password: state.gatewayLoginPassword
         });
         if (gatewayLoginResults.two_factor_token) {
           store.setState({
             gatewayLoginResults,
             gatewayLoginStep2: true,
-            gatewayLoginStatus: RequestStatus.Success,
+            gatewayLoginStatus: RequestStatus.Success
           });
         } else {
           // Two-factor is not enabled yet on this Gladys Plus account: the Gateway
@@ -54,7 +54,7 @@ function createActions(store) {
           store.setState({
             gatewayConfigureTwoFactorAccessToken: gatewayLoginResults.access_token,
             displayGatewayConfigureTwoFactor: true,
-            gatewayConfigureTwoFactorCode: null,
+            gatewayConfigureTwoFactorCode: null
           });
           await actions.getTwoFactorSecret(store.getState());
         }
@@ -62,33 +62,33 @@ function createActions(store) {
         const error = get(e, 'response.data.error');
         if (error === ERROR_MESSAGES.NO_CONNECTED_TO_THE_INTERNET) {
           store.setState({
-            gatewayLoginStatus: RequestStatus.NetworkError,
+            gatewayLoginStatus: RequestStatus.NetworkError
           });
         } else {
           store.setState({
-            gatewayLoginStatus: LoginStatus.WrongCredentialsError,
+            gatewayLoginStatus: LoginStatus.WrongCredentialsError
           });
         }
       }
     },
     async getTwoFactorSecret(state) {
       store.setState({
-        gatewayLoginStatus: RequestStatus.Getting,
+        gatewayLoginStatus: RequestStatus.Getting
       });
       try {
         const { otpauth_url: otpauthUrl } = await state.httpClient.post('/api/v1/gateway/configure-two-factor', {
-          access_token: state.gatewayConfigureTwoFactorAccessToken,
+          access_token: state.gatewayConfigureTwoFactorAccessToken
         });
         const secret = new URL(otpauthUrl).searchParams.get('secret');
         const dataUrl = await QRCode.toDataURL(otpauthUrl);
         store.setState({
           gatewayConfigureTwoFactorDataUrl: dataUrl,
           gatewayConfigureTwoFactorSecret: secret,
-          gatewayLoginStatus: RequestStatus.Success,
+          gatewayLoginStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          gatewayLoginStatus: RequestStatus.Error,
+          gatewayLoginStatus: RequestStatus.Error
         });
       }
     },
@@ -97,22 +97,22 @@ function createActions(store) {
         e.preventDefault();
       }
       store.setState({
-        gatewayLoginStatus: RequestStatus.Getting,
+        gatewayLoginStatus: RequestStatus.Getting
       });
       try {
         await state.httpClient.post('/api/v1/gateway/enable-two-factor', {
           access_token: state.gatewayConfigureTwoFactorAccessToken,
-          two_factor_code: state.gatewayConfigureTwoFactorCode,
+          two_factor_code: state.gatewayConfigureTwoFactorCode
         });
       } catch (e) {
         const error = get(e, 'response.data.error');
         if (error === ERROR_MESSAGES.NO_CONNECTED_TO_THE_INTERNET) {
           store.setState({
-            gatewayLoginStatus: RequestStatus.NetworkError,
+            gatewayLoginStatus: RequestStatus.NetworkError
           });
         } else {
           store.setState({
-            gatewayLoginStatus: LoginStatus.WrongTwoFactorCodeError,
+            gatewayLoginStatus: LoginStatus.WrongTwoFactorCodeError
           });
         }
         return;
@@ -123,7 +123,7 @@ function createActions(store) {
         // a fresh code from their 2FA app.
         const gatewayLoginResults = await state.httpClient.post('/api/v1/gateway/login', {
           email: state.gatewayLoginEmail,
-          password: state.gatewayLoginPassword,
+          password: state.gatewayLoginPassword
         });
         store.setState({
           gatewayLoginResults,
@@ -135,11 +135,11 @@ function createActions(store) {
           gatewayTwoFactorJustEnabled: true,
           gatewayLoginTwoFactorCode: null,
           gatewayLoginStep2: true,
-          gatewayLoginStatus: RequestStatus.Success,
+          gatewayLoginStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          gatewayLoginStatus: RequestStatus.Error,
+          gatewayLoginStatus: RequestStatus.Error
         });
       }
     },
@@ -155,12 +155,12 @@ function createActions(store) {
         e.preventDefault();
       }
       store.setState({
-        gatewayLoginStatus: RequestStatus.Getting,
+        gatewayLoginStatus: RequestStatus.Getting
       });
       try {
         await state.httpClient.post('/api/v1/gateway/login-two-factor', {
           two_factor_token: state.gatewayLoginResults.two_factor_token,
-          two_factor_code: state.gatewayLoginTwoFactorCode,
+          two_factor_code: state.gatewayLoginTwoFactorCode
         });
         await actions.getStatus(store.getState());
         await actions.getKeys(store.getState());
@@ -171,121 +171,121 @@ function createActions(store) {
           displayGatewayLogin: false,
           gatewayLoginStep2: false,
           gatewayTwoFactorJustEnabled: false,
-          displayConnectedSuccess: true,
+          displayConnectedSuccess: true
         });
       } catch (e) {
         const status = get(e, 'response.status');
         if (status >= 400 && status < 500) {
           store.setState({
-            gatewayLoginStatus: LoginStatus.WrongTwoFactorCodeError,
+            gatewayLoginStatus: LoginStatus.WrongTwoFactorCodeError
           });
         } else {
           store.setState({
-            gatewayLoginStatus: RequestStatus.Error,
+            gatewayLoginStatus: RequestStatus.Error
           });
         }
       }
     },
     finalizeGatewaySetup() {
       store.setState({
-        displayConnectedSuccess: false,
+        displayConnectedSuccess: false
       });
     },
     async disconnect(state) {
       store.setState({
-        gatewayDisconnectStatus: RequestStatus.Getting,
+        gatewayDisconnectStatus: RequestStatus.Getting
       });
       try {
         await state.httpClient.post('/api/v1/gateway/logout');
         store.setState({
-          gatewayDisconnectStatus: RequestStatus.Success,
+          gatewayDisconnectStatus: RequestStatus.Success
         });
         actions.getStatus(store.getState());
       } catch (e) {
         store.setState({
-          gatewayDisconnectStatus: RequestStatus.Error,
+          gatewayDisconnectStatus: RequestStatus.Error
         });
       }
     },
     async getBackupKey(state) {
       store.setState({
-        gatewayGetBackupKeyStatus: RequestStatus.Getting,
+        gatewayGetBackupKeyStatus: RequestStatus.Getting
       });
       try {
         const data = await state.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_KEY}`);
         store.setState({
           gatewayBackupKey: data.value,
-          gatewayGetBackupKeyStatus: RequestStatus.Success,
+          gatewayGetBackupKeyStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          gatewayGetBackupKeyStatus: RequestStatus.Error,
+          gatewayGetBackupKeyStatus: RequestStatus.Error
         });
       }
     },
     async saveBackupKey(state) {
       store.setState({
-        gatewaySaveBackupKeyStatus: RequestStatus.Getting,
+        gatewaySaveBackupKeyStatus: RequestStatus.Getting
       });
       try {
         await state.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_BACKUP_KEY}`, {
-          value: state.gatewayBackupKey,
+          value: state.gatewayBackupKey
         });
         store.setState({
-          gatewaySaveBackupKeyStatus: RequestStatus.Success,
+          gatewaySaveBackupKeyStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          gatewaySaveBackupKeyStatus: RequestStatus.Error,
+          gatewaySaveBackupKeyStatus: RequestStatus.Error
         });
       }
     },
     async createBackup(state) {
       store.setState({
-        gatewayCreateBackupStatus: RequestStatus.Getting,
+        gatewayCreateBackupStatus: RequestStatus.Getting
       });
       try {
         await state.httpClient.post('/api/v1/gateway/backup');
         store.setState({
-          gatewayCreateBackupStatus: RequestStatus.Success,
+          gatewayCreateBackupStatus: RequestStatus.Success
         });
         // we remove the backup status after 1 second
         setTimeout(() => {
           store.setState({
-            gatewayCreateBackupStatus: null,
+            gatewayCreateBackupStatus: null
           });
           route('/dashboard/settings/jobs');
         }, 1000);
       } catch (e) {
         store.setState({
-          gatewayCreateBackupStatus: RequestStatus.Error,
+          gatewayCreateBackupStatus: RequestStatus.Error
         });
       }
     },
     async updateBackupKey(state, e) {
       store.setState({
-        gatewayBackupKey: e.target.value,
+        gatewayBackupKey: e.target.value
       });
     },
     async getKeys(state) {
       store.setState({
-        gatewayGetKeysStatus: RequestStatus.Getting,
+        gatewayGetKeysStatus: RequestStatus.Getting
       });
       try {
         const gatewayUsersKeys = await state.httpClient.get('/api/v1/gateway/key');
         store.setState({
           gatewayUsersKeys,
-          gatewayGetKeysStatus: RequestStatus.Success,
+          gatewayGetKeysStatus: RequestStatus.Success
         });
       } catch (e) {
         const error = get(e, 'response.data.error');
         if (error === ERROR_MESSAGES.NO_CONNECTED_TO_THE_INTERNET) {
           store.setState({
-            gatewayGetKeysStatus: RequestStatus.NetworkError,
+            gatewayGetKeysStatus: RequestStatus.NetworkError
           });
         } else {
           store.setState({
-            gatewayGetKeysStatus: LoginStatus.WrongCredentialsError,
+            gatewayGetKeysStatus: LoginStatus.WrongCredentialsError
           });
         }
       }
@@ -294,79 +294,79 @@ function createActions(store) {
       const newGatewayUsersKeys = update(state.gatewayUsersKeys, {
         [userIndex]: {
           accepted: {
-            $set: value,
-          },
-        },
+            $set: value
+          }
+        }
       });
       store.setState({
         gatewayUsersKeys: newGatewayUsersKeys,
-        gatewaySwitchUserKeyStatus: RequestStatus.Getting,
+        gatewaySwitchUserKeyStatus: RequestStatus.Getting
       });
       try {
         await state.httpClient.patch('/api/v1/gateway/key', newGatewayUsersKeys);
         store.setState({
-          gatewaySwitchUserKeyStatus: RequestStatus.Success,
+          gatewaySwitchUserKeyStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          gatewaySwitchUserKeyStatus: RequestStatus.Error,
+          gatewaySwitchUserKeyStatus: RequestStatus.Error
         });
       }
     },
     async getInstanceKeys(state) {
       store.setState({
-        gatewayGetInstanceKeysStatus: RequestStatus.Getting,
+        gatewayGetInstanceKeysStatus: RequestStatus.Getting
       });
       try {
         const gatewayInstanceKeys = await state.httpClient.get('/api/v1/gateway/instance/key');
         store.setState({
           gatewayInstanceKeys,
-          gatewayGetInstanceKeysStatus: RequestStatus.Success,
+          gatewayGetInstanceKeysStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          gatewayGetInstanceKeysStatus: RequestStatus.Error,
+          gatewayGetInstanceKeysStatus: RequestStatus.Error
         });
       }
     },
     async getBackups(state) {
       store.setState({
-        gatewayGetBackupsStatus: RequestStatus.Getting,
+        gatewayGetBackupsStatus: RequestStatus.Getting
       });
       try {
         const gatewayBackups = await state.httpClient.get('/api/v1/gateway/backup');
         store.setState({
           gatewayBackups,
-          gatewayGetBackupsStatus: RequestStatus.Success,
+          gatewayGetBackupsStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          gatewayGetBackupsStatus: RequestStatus.Error,
+          gatewayGetBackupsStatus: RequestStatus.Error
         });
       }
     },
     async restoreBackup(state, fileUrl) {
       store.setState({
-        gatewayRestoreBackupStatus: RequestStatus.Getting,
+        gatewayRestoreBackupStatus: RequestStatus.Getting
       });
       try {
         await state.httpClient.post('/api/v1/gateway/backup/restore', {
-          file_url: fileUrl,
+          file_url: fileUrl
         });
         store.setState({
           gatewayRestoreInProgress: true,
-          gatewayRestoreBackupStatus: RequestStatus.Success,
+          gatewayRestoreBackupStatus: RequestStatus.Success
         });
         actions.waitForRestoreToFinish(store.getState());
       } catch (e) {
         store.setState({
-          gatewayRestoreBackupStatus: RequestStatus.Error,
+          gatewayRestoreBackupStatus: RequestStatus.Error
         });
       }
     },
     async getRestoreStatus(state) {
       store.setState({
-        gatewayRestoreStatusStatus: RequestStatus.Getting,
+        gatewayRestoreStatusStatus: RequestStatus.Getting
       });
       try {
         const restoreStatus = await state.httpClient.get('/api/v1/gateway/backup/restore/status');
@@ -374,11 +374,11 @@ function createActions(store) {
           gatewayRestoreInProgress: restoreStatus.restore_in_progress,
           gatewayRestoreErrored: restoreStatus.restore_errored,
           gatewayRestoreStatusStatus: RequestStatus.Success,
-          gatewayGladysRestarting: false,
+          gatewayGladysRestarting: false
         });
       } catch (e) {
         store.setState({
-          gatewayRestoreStatusStatus: RequestStatus.Error,
+          gatewayRestoreStatusStatus: RequestStatus.Error
         });
       }
     },
@@ -393,7 +393,7 @@ function createActions(store) {
           store.setState({
             gatewayRestoreInProgress: false,
             gatewayRestoreErrored: true,
-            gatewayGladysRestarting: false,
+            gatewayGladysRestarting: false
           });
         } else {
           window.location = '/dashboard';
@@ -402,7 +402,7 @@ function createActions(store) {
         const status = get(e, 'response.status');
         if (e.message === 'Network Error') {
           store.setState({
-            gatewayGladysRestarting: true,
+            gatewayGladysRestarting: true
           });
         } else if (status === 401) {
           window.location = '/dashboard';
@@ -414,22 +414,22 @@ function createActions(store) {
     },
     updateLoginEmail(state, e) {
       store.setState({
-        gatewayLoginEmail: e.target.value,
+        gatewayLoginEmail: e.target.value
       });
     },
     updateUserCardName(state, e) {
       store.setState({
-        userCardName: e.target.value,
+        userCardName: e.target.value
       });
     },
     updateLoginPassword(state, e) {
       store.setState({
-        gatewayLoginPassword: e.target.value,
+        gatewayLoginPassword: e.target.value
       });
     },
     updateLoginTwoFactorCode(state, e) {
       store.setState({
-        gatewayLoginTwoFactorCode: e.target.value,
+        gatewayLoginTwoFactorCode: e.target.value
       });
       if (e.target.value.length === 6) {
         const upToDateState = store.getState();
@@ -438,7 +438,7 @@ function createActions(store) {
     },
     updateConfigureTwoFactorCode(state, e) {
       store.setState({
-        gatewayConfigureTwoFactorCode: e.target.value,
+        gatewayConfigureTwoFactorCode: e.target.value
       });
       if (e.target.value.length === 6) {
         const upToDateState = store.getState();
@@ -458,7 +458,7 @@ function createActions(store) {
         gatewayConfigureTwoFactorDataUrl: null,
         gatewayConfigureTwoFactorSecret: null,
         gatewayConfigureTwoFactorCode: null,
-        gatewayTwoFactorJustEnabled: false,
+        gatewayTwoFactorJustEnabled: false
       });
     },
     displayGatewayLoginForm(state, e) {
@@ -477,7 +477,7 @@ function createActions(store) {
         gatewayConfigureTwoFactorDataUrl: null,
         gatewayConfigureTwoFactorSecret: null,
         gatewayConfigureTwoFactorCode: null,
-        gatewayTwoFactorJustEnabled: false,
+        gatewayTwoFactorJustEnabled: false
       });
     },
     async refreshCard(state) {
@@ -497,21 +497,21 @@ function createActions(store) {
         store.setState({
           savingBillingError: false,
           paymentInProgress: false,
-          billingRequestStatus: RequestStatus.Success,
+          billingRequestStatus: RequestStatus.Success
         });
         await actions.refreshCard(store.getState());
       } catch (e) {
         store.setState({
           savingBillingError: true,
           paymentInProgress: false,
-          billingRequestStatus: RequestStatus.Error,
+          billingRequestStatus: RequestStatus.Error
         });
       }
     },
 
     async cancelMonthlySubscription(state) {
       store.setState({
-        billingRequestStatus: RequestStatus.Getting,
+        billingRequestStatus: RequestStatus.Getting
       });
       try {
         await state.session.gatewayClient.cancelMonthlyPlan();
@@ -519,7 +519,7 @@ function createActions(store) {
         store.setState({
           cancelMonthlySubscriptionSuccess: true,
           cancelMonthlySubscriptionError: false,
-          billingRequestStatus: RequestStatus.Success,
+          billingRequestStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({ cancelMonthlySubscriptionError: true, billingRequestStatus: RequestStatus.Error });
@@ -529,7 +529,7 @@ function createActions(store) {
       store.setState({
         billingRequestStatus: RequestStatus.Getting,
         cancelMonthlySubscriptionSuccess: false,
-        cancelMonthlySubscriptionError: false,
+        cancelMonthlySubscriptionError: false
       });
       try {
         await state.session.gatewayClient.reSubcribeMonthlyPlan();
@@ -541,7 +541,7 @@ function createActions(store) {
     },
     updateBillingRequestPending() {
       store.setState({
-        billingRequestStatus: RequestStatus.Getting,
+        billingRequestStatus: RequestStatus.Getting
       });
     },
     loadStripe(state) {
@@ -557,7 +557,7 @@ function createActions(store) {
       script.onload = () => {
         store.setState({ stripeLoaded: true });
       };
-    },
+    }
   };
   return actions;
 }

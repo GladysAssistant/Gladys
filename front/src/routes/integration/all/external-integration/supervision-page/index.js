@@ -18,7 +18,7 @@ class ExternalIntegrationSupervisionPage extends Component {
       loadStatus: RequestStatus.Getting,
       actionStatus: null,
       actionError: null,
-      updateResult: null,
+      updateResult: null
     });
     const { selector } = this.props;
     try {
@@ -37,12 +37,12 @@ class ExternalIntegrationSupervisionPage extends Component {
     }
   };
 
-  executeAction = async (action) => {
+  executeAction = async action => {
     const previousVersion = this.state.integration && this.state.integration.version;
     this.setState({ actionStatus: RequestStatus.Getting, actionError: null, updateResult: null });
     try {
       const integration = await this.props.httpClient.post(
-        `/api/v1/external_integration/${this.props.selector}/${action}`,
+        `/api/v1/external_integration/${this.props.selector}/${action}`
       );
       // an update that changes nothing is a legitimate outcome (already on
       // the latest version): without this the button looks like it did
@@ -82,20 +82,20 @@ class ExternalIntegrationSupervisionPage extends Component {
     }
   };
 
-  onStatusChanged = (payload) => {
+  onStatusChanged = payload => {
     if (payload && this.state.integration && payload.selector === this.props.selector) {
       this.setState({
-        integration: Object.assign({}, this.state.integration, { status: payload.status }),
+        integration: Object.assign({}, this.state.integration, { status: payload.status })
       });
     }
   };
 
-  onConnectionStatusUpdated = (payload) => {
+  onConnectionStatusUpdated = payload => {
     if (payload && this.state.integration && payload.selector === this.props.selector) {
       this.setState({
         integration: Object.assign({}, this.state.integration, {
-          connection_status: { connected: payload.connected, message: payload.message },
-        }),
+          connection_status: { connected: payload.connected, message: payload.message }
+        })
       });
     }
   };
@@ -103,11 +103,11 @@ class ExternalIntegrationSupervisionPage extends Component {
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
-      this.onStatusChanged,
+      this.onStatusChanged
     );
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
-      this.onConnectionStatusUpdated,
+      this.onConnectionStatusUpdated
     );
     this.loadData();
   }
@@ -121,11 +121,11 @@ class ExternalIntegrationSupervisionPage extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
-      this.onStatusChanged,
+      this.onStatusChanged
     );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
-      this.onConnectionStatusUpdated,
+      this.onConnectionStatusUpdated
     );
   }
 
@@ -171,5 +171,5 @@ class ExternalIntegrationSupervisionPage extends Component {
 
 export default connect(
   'user,session,httpClient',
-  createActionsExternalIntegrationUpdates,
+  createActionsExternalIntegrationUpdates
 )(ExternalIntegrationSupervisionPage);

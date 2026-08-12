@@ -26,7 +26,7 @@ class DeviceSetValue extends Component {
     this.props = props;
     this.state = {
       computed: props.action.evaluate_value !== undefined,
-      customValue: false,
+      customValue: false
     };
   }
 
@@ -64,12 +64,12 @@ class DeviceSetValue extends Component {
     this.setState({ deviceFeature, device });
   };
 
-  handleNewValue = (e) => {
+  handleNewValue = e => {
     this.props.updateActionProperty(this.props.path, 'value', e.target.value);
     this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
   };
 
-  handleNewPureValue = (value) => {
+  handleNewPureValue = value => {
     this.props.updateActionProperty(this.props.path, 'value', value);
     this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
   };
@@ -82,12 +82,12 @@ class DeviceSetValue extends Component {
     this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
   };
 
-  displayCustomValue = (e) => {
+  displayCustomValue = e => {
     e.preventDefault();
     this.setState({ customValue: true });
   };
 
-  displayValueOptions = (e) => {
+  displayValueOptions = e => {
     e.preventDefault();
     this.setState({ customValue: false });
     // A value that cannot be pre-selected in the list is dropped, otherwise the select would
@@ -102,7 +102,7 @@ class DeviceSetValue extends Component {
 
   // We display the list of values only if the feature holds constants, and if the current value can
   // be represented in that list (it's not a value saved before this list existed)
-  shouldDisplayValueOptions = (valueOptions) => {
+  shouldDisplayValueOptions = valueOptions => {
     if (!valueOptions || this.state.customValue) {
       return false;
     }
@@ -110,7 +110,7 @@ class DeviceSetValue extends Component {
     return value === undefined || value === null || value === '' || isValueInOptions(valueOptions, value);
   };
 
-  handleNewEvalValue = (text) => {
+  handleNewEvalValue = text => {
     this.props.updateActionProperty(this.props.path, 'value', undefined);
     this.props.updateActionProperty(this.props.path, 'evaluate_value', text);
   };
@@ -180,7 +180,7 @@ class DeviceSetValue extends Component {
 
     if (
       [DEVICE_FEATURE_TYPES.SHUTTER.STATE, DEVICE_FEATURE_TYPES.CURTAIN.STATE].includes(
-        this.state.deviceFeature.type,
+        this.state.deviceFeature.type
       ) &&
       [DEVICE_FEATURE_CATEGORIES.SHUTTER, DEVICE_FEATURE_CATEGORIES.CURTAIN].includes(this.state.deviceFeature.category)
     ) {
@@ -227,7 +227,7 @@ class DeviceSetValue extends Component {
       [
         DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
         DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
-        DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
+        DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION
       ].includes(this.state.deviceFeature.type)
     ) {
       return (
@@ -294,7 +294,7 @@ class DeviceSetValue extends Component {
             value={this.props.action.value}
             onChange={this.handleNewValue}
             class={cx('form-control custom-range', {
-              'light-temperature': this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+              'light-temperature': this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
             })}
             step="1"
             min={this.state.deviceFeature.min}

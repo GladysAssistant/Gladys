@@ -8,12 +8,12 @@ function createActions(store) {
   const actions = {
     async getBluetoothDevices(state) {
       store.setState({
-        getBluetoothDevicesStatus: RequestStatus.Getting,
+        getBluetoothDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
           service: 'bluetooth',
-          order_dir: state.getBluetoothDeviceOrderDir || 'asc',
+          order_dir: state.getBluetoothDeviceOrderDir || 'asc'
         };
         if (state.bluetoothDeviceSearch && state.bluetoothDeviceSearch.length) {
           options.search = state.bluetoothDeviceSearch;
@@ -21,11 +21,11 @@ function createActions(store) {
         const bluetoothDevices = await state.httpClient.get('/api/v1/service/bluetooth/device', options);
         store.setState({
           bluetoothDevices,
-          getBluetoothDevicesStatus: RequestStatus.Success,
+          getBluetoothDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getBluetoothDevicesStatus: RequestStatus.Error,
+          getBluetoothDevicesStatus: RequestStatus.Error
         });
       }
     },
@@ -37,10 +37,10 @@ function createActions(store) {
         bluetoothDevices: {
           [index]: {
             [property]: {
-              $set: value,
-            },
-          },
-        },
+              $set: value
+            }
+          }
+        }
       });
       store.setState(newState);
     },
@@ -48,23 +48,23 @@ function createActions(store) {
       await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       const newState = update(state, {
         bluetoothDevices: {
-          $splice: [[index, 1]],
-        },
+          $splice: [[index, 1]]
+        }
       });
       store.setState(newState);
     },
     async search(state, e) {
       store.setState({
-        bluetoothDeviceSearch: e.target.value,
+        bluetoothDeviceSearch: e.target.value
       });
       await actions.getBluetoothDevices(store.getState(), 20, 0);
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getBluetoothDeviceOrderDir: e.target.value,
+        getBluetoothDeviceOrderDir: e.target.value
       });
       await actions.getBluetoothDevices(store.getState(), 20, 0);
-    },
+    }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
   return Object.assign({}, houseActions, actions);

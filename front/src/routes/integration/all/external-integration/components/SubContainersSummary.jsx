@@ -32,7 +32,7 @@ const SubContainersSummary = ({ containers, language }) => (
           </tr>
         </thead>
         <tbody>
-          {containers.map((container) => (
+          {containers.map(container => (
             <tr>
               <td>{container.name}</td>
               <td>
@@ -45,7 +45,7 @@ const SubContainersSummary = ({ containers, language }) => (
                 {(container.ports || []).length === 0 ? (
                   <span class="text-muted">—</span>
                 ) : (
-                  (container.ports || []).map((port) => (
+                  (container.ports || []).map(port => (
                     <span class="badge badge-warning mr-1">
                       {getLocalizedText(port.label, language) || port.container_port}
                     </span>

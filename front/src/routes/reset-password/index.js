@@ -20,5 +20,5 @@ class ResetPassword extends Component {
 
 export default connect(
   'resetPasswordStatus,resetPasswordErrors,resetPasswordPassword,resetPasswordPasswordRepeat',
-  actions,
+  actions
 )(ResetPassword);

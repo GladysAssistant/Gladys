@@ -1,17 +1,17 @@
 import { CalDAVStatus } from '../../../../../utils/consts';
 
-const actions = (store) => ({
+const actions = store => ({
   updateCalendarSharing(state, e) {
     store.setState({
       calendarsSharing: {
         ...state.calendarsSharing,
-        [e.target.name]: e.target.checked,
-      },
+        [e.target.name]: e.target.checked
+      }
     });
   },
   async getCaldavSetting(state) {
     store.setState({
-      caldavGetSettingsStatus: CalDAVStatus.Getting,
+      caldavGetSettingsStatus: CalDAVStatus.Getting
     });
 
     let caldavCalendars = [];
@@ -19,67 +19,67 @@ const actions = (store) => ({
 
     store.setState({
       caldavCalendars,
-      gladysUsers,
+      gladysUsers
     });
 
     try {
       const calendars = await state.httpClient.get('/api/v1/calendar', {
-        serviceName: 'caldav',
+        serviceName: 'caldav'
       });
       caldavCalendars = calendars;
 
       const users = await state.httpClient.get('/api/v1/user');
       gladysUsers = users
-        .map((u) => ({
+        .map(u => ({
           label: u.firstname,
-          value: u.id,
+          value: u.id
         }))
-        .filter((u) => u.value !== state.session.user.id);
+        .filter(u => u.value !== state.session.user.id);
 
       store.setState({
-        caldavGetSettingsStatus: CalDAVStatus.Success,
+        caldavGetSettingsStatus: CalDAVStatus.Success
       });
     } catch (e) {
       store.setState({
-        caldavGetSettingsStatus: CalDAVStatus.Error,
+        caldavGetSettingsStatus: CalDAVStatus.Error
       });
     }
 
     store.setState({
       caldavCalendars,
-      gladysUsers,
+      gladysUsers
     });
   },
   async saveCaldavSettings(state) {
     store.setState({
-      caldavSaveSharingStatus: CalDAVStatus.Getting,
+      caldavSaveSharingStatus: CalDAVStatus.Getting
     });
     try {
       // save calendars sharing changes
       const updatedCalendars = await Promise.all(
-        Object.keys(state.calendarsSharing).map((selector) => {
+        Object.keys(state.calendarsSharing).map(selector => {
           return state.httpClient.patch(`/api/v1/calendar/${selector}`, {
             // selector
-            shared: state.calendarsSharing[selector],
+            shared: state.calendarsSharing[selector]
           });
-        }),
+        })
       );
       store.setState({
-        caldavCalendars: state.caldavCalendars.map((caldavCalendar) => {
+        caldavCalendars: state.caldavCalendars.map(caldavCalendar => {
           const currentUpdatedCalendar = updatedCalendars.filter(
-            (updatedCalendar) => updatedCalendar.id === caldavCalendar.id,
+            updatedCalendar => updatedCalendar.id === caldavCalendar.id
           );
           return currentUpdatedCalendar.length === 0 ? caldavCalendar : currentUpdatedCalendar[0];
         }),
         calendarsSharing: undefined,
-        caldavSaveSharingStatus: CalDAVStatus.Success,
+        caldavSaveSharingStatus: CalDAVStatus.Success
       });
     } catch (e) {
       store.setState({
-        caldavSaveSharingStatus: CalDAVStatus.Error,
+        caldavSaveSharingStatus: CalDAVStatus.Error
       });
     }
-  },
+  }
 });
 
 export default actions;

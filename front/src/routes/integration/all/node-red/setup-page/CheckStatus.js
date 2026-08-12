@@ -11,7 +11,7 @@ const CheckStatus = ({
   nodeRedRunning,
   dockerBased,
   networkModeValid,
-  nodeRedStatus,
+  nodeRedStatus
 }) => {
   let textLabel = null;
   if (nodeRedStatus === RequestStatus.Getting) {
@@ -39,7 +39,7 @@ const CheckStatus = ({
           'alert-success': nodeRedEnabled && nodeRedExist && nodeRedRunning,
           'alert-warning': nodeRedEnabled && nodeRedExist && !nodeRedRunning,
           'alert-danger': (nodeRedEnabled && !nodeRedExist) || !dockerBased || !networkModeValid,
-          'alert-info': !nodeRedEnabled,
+          'alert-info': !nodeRedEnabled
         })}
       >
         <div class={cx(style.textAlignMiddleContainer)}>

@@ -11,11 +11,11 @@ function createActions(store) {
   const actions = {
     async getMqttDevices(state) {
       store.setState({
-        getMqttDevicesStatus: RequestStatus.Getting,
+        getMqttDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getMqttDeviceOrderDir || 'asc',
+          order_dir: state.getMqttDeviceOrderDir || 'asc'
         };
         if (state.mqttDeviceSearch && state.mqttDeviceSearch.length) {
           options.search = state.mqttDeviceSearch;
@@ -23,12 +23,12 @@ function createActions(store) {
         const mqttDevices = await state.httpClient.get('/api/v1/service/mqtt/device', options);
         store.setState({
           mqttDevices,
-          getMqttDevicesStatus: RequestStatus.Success,
+          getMqttDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
           mqttDevices: [],
-          getMqttDevicesStatus: RequestStatus.Error,
+          getMqttDevicesStatus: RequestStatus.Error
         });
       }
     },
@@ -36,8 +36,8 @@ function createActions(store) {
       const savedDevice = await state.httpClient.post('/api/v1/device', device);
       const newState = update(state, {
         mqttDevices: {
-          $splice: [[index, 1, savedDevice]],
-        },
+          $splice: [[index, 1, savedDevice]]
+        }
       });
       store.setState(newState);
     },
@@ -46,10 +46,10 @@ function createActions(store) {
         mqttDevices: {
           [index]: {
             [property]: {
-              $set: value,
-            },
-          },
-        },
+              $set: value
+            }
+          }
+        }
       });
       store.setState(newState);
     },
@@ -57,20 +57,20 @@ function createActions(store) {
       await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       const newState = update(state, {
         mqttDevices: {
-          $splice: [[index, 1]],
-        },
+          $splice: [[index, 1]]
+        }
       });
       store.setState(newState);
     },
     async search(state, e) {
       await store.setState({
-        mqttDeviceSearch: e.target.value,
+        mqttDeviceSearch: e.target.value
       });
       actions.debouncedGetMqttDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getMqttDeviceOrderDir: e.target.value,
+        getMqttDeviceOrderDir: e.target.value
       });
       await actions.getMqttDevices(store.getState());
     },
@@ -85,15 +85,15 @@ function createActions(store) {
                 category,
                 type,
                 read_only: true,
-                has_feedback: false,
-              },
-            ],
-          },
-        },
+                has_feedback: false
+              }
+            ]
+          }
+        }
       });
 
       store.setState({
-        mqttDevices,
+        mqttDevices
       });
     },
     updateFeatureProperty(state, deviceIndex, featureIndex, property, value) {
@@ -102,30 +102,30 @@ function createActions(store) {
           features: {
             [featureIndex]: {
               [property]: {
-                $set: value,
-              },
-            },
-          },
-        },
+                $set: value
+              }
+            }
+          }
+        }
       });
 
       store.setState({
-        mqttDevices,
+        mqttDevices
       });
     },
     deleteFeature(state, deviceIndex, featureIndex) {
       const mqttDevices = update(state.mqttDevices, {
         [deviceIndex]: {
           features: {
-            $splice: [[featureIndex, 1]],
-          },
-        },
+            $splice: [[featureIndex, 1]]
+          }
+        }
       });
 
       store.setState({
-        mqttDevices,
+        mqttDevices
       });
-    },
+    }
   };
   actions.debouncedGetMqttDevices = debounce(actions.getMqttDevices, 200);
   return Object.assign({}, houseActions, integrationActions, actions);

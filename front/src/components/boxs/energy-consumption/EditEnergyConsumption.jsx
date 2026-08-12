@@ -20,12 +20,12 @@ const square = (color = 'transparent') => ({
     display: 'block',
     marginRight: 8,
     height: 10,
-    width: 10,
-  },
+    width: 10
+  }
 });
 
 const colorSelectorStyles = {
-  control: (styles) => ({ ...styles, backgroundColor: 'white' }),
+  control: styles => ({ ...styles, backgroundColor: 'white' }),
   option: (styles, { data, isDisabled, isFocused, isSelected }) => {
     const { value: color } = data;
     return {
@@ -36,13 +36,13 @@ const colorSelectorStyles = {
 
       ':active': {
         ...styles[':active'],
-        backgroundColor: !isDisabled ? color : undefined,
-      },
+        backgroundColor: !isDisabled ? color : undefined
+      }
     };
   },
-  input: (styles) => ({ ...styles, ...square() }),
-  placeholder: (styles) => ({ ...styles, ...square('#ccc') }),
-  singleValue: (styles, { data }) => ({ ...styles, ...square(data.value) }),
+  input: styles => ({ ...styles, ...square() }),
+  placeholder: styles => ({ ...styles, ...square('#ccc') }),
+  singleValue: (styles, { data }) => ({ ...styles, ...square(data.value) })
 };
 
 class EditEnergyConsumption extends Component {
@@ -51,7 +51,7 @@ class EditEnergyConsumption extends Component {
     this.state = {
       loading: true,
       devices: [],
-      deviceFeatures: [],
+      deviceFeatures: []
     };
   }
 
@@ -66,7 +66,7 @@ class EditEnergyConsumption extends Component {
 
       this.setState({
         devices,
-        loading: false,
+        loading: false
       });
     } catch (e) {
       console.error('Error fetching devices:', e);
@@ -74,27 +74,27 @@ class EditEnergyConsumption extends Component {
     }
   };
 
-  updateBoxName = (e) => {
+  updateBoxName = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      name: e.target.value,
+      name: e.target.value
     });
   };
 
-  updateDeviceFeatures = (selectedOptions) => {
+  updateDeviceFeatures = selectedOptions => {
     if (selectedOptions && selectedOptions.length > 0) {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
-        device_features: selectedOptions.map((option) => option.value),
+        device_features: selectedOptions.map(option => option.value)
       });
     } else {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
-        device_features: [],
+        device_features: []
       });
     }
   };
 
-  updateShowSubscriptionPrices = (e) => {
+  updateShowSubscriptionPrices = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      show_subscription_prices: e.target.checked,
+      show_subscription_prices: e.target.checked
     });
   };
 
@@ -123,32 +123,32 @@ class EditEnergyConsumption extends Component {
     if (!this.props.box.device_features) {
       return [];
     }
-    return this.props.box.device_features.map((deviceFeatureSelector) => {
-      const deviceFeature = this.state.deviceFeatures.find((d) => d.selector === deviceFeatureSelector);
+    return this.props.box.device_features.map(deviceFeatureSelector => {
+      const deviceFeature = this.state.deviceFeatures.find(d => d.selector === deviceFeatureSelector);
       if (!deviceFeature) {
         return {
           label: deviceFeatureSelector,
-          value: deviceFeatureSelector,
+          value: deviceFeatureSelector
         };
       }
       return {
         label: getDeviceFeatureName(this.state.devices, this.state.deviceFeatures, deviceFeature),
-        value: deviceFeature.selector,
+        value: deviceFeature.selector
       };
     });
   };
 
   getDeviceFeatureOptions = () => {
     const deviceFeaturesOptions = [];
-    this.state.devices.forEach((device) => {
-      device.features.forEach((feature) => {
+    this.state.devices.forEach(device => {
+      device.features.forEach(feature => {
         if (
           feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR &&
           feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST
         ) {
           deviceFeaturesOptions.push({
             label: getDeviceFeatureName(this.props.intl.dictionary, device, feature),
-            value: feature.selector,
+            value: feature.selector
           });
         }
       });
@@ -176,7 +176,7 @@ class EditEnergyConsumption extends Component {
     const manyFeatures = selectedDeviceFeatures && selectedDeviceFeatures.length > 1;
     const colorOptions = DEFAULT_COLORS.map((colorValue, i) => ({
       value: colorValue,
-      label: props.intl.dictionary.color[DEFAULT_COLORS_NAME[i]] || DEFAULT_COLORS_NAME[i],
+      label: props.intl.dictionary.color[DEFAULT_COLORS_NAME[i]] || DEFAULT_COLORS_NAME[i]
     }));
 
     return (

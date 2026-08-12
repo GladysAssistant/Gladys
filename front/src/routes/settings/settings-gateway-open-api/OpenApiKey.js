@@ -3,7 +3,7 @@ import { Text } from 'preact-i18n';
 const dateDisplayOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
 const OpenApiKey = ({ children, ...props }) => {
-  let revokeOpenApiKey = (e) => {
+  let revokeOpenApiKey = e => {
     e.preventDefault();
     props.revokeOpenApiKey(props.apiKey.id, props.index);
   };

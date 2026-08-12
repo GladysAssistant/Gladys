@@ -14,13 +14,13 @@ const SEGMENT_DURATIONS_PER_LATENCY = {
   'ultra-low': 1,
   low: 2,
   medium: 3,
-  standard: 6,
+  standard: 6
 };
 
 class CameraBoxComponent extends Component {
   videoRef = createRef();
   state = {
-    cameraStreamingErrorCount: 0,
+    cameraStreamingErrorCount: 0
   };
 
   refreshData = async () => {
@@ -43,21 +43,21 @@ class CameraBoxComponent extends Component {
     }
   };
 
-  updateDeviceStateWebsocket = (payload) => {
+  updateDeviceStateWebsocket = payload => {
     if (this.props.box.camera === payload.device) {
       this.setState({
         image: payload.last_value_string,
-        error: false,
+        error: false
       });
     }
   };
 
   newNetworkError = () => {
-    this.setState((prevState) => {
+    this.setState(prevState => {
       const { cameraStreamingErrorCount } = prevState;
       return {
         ...prevState,
-        cameraStreamingErrorCount: cameraStreamingErrorCount + 1,
+        cameraStreamingErrorCount: cameraStreamingErrorCount + 1
       };
     });
   };
@@ -71,7 +71,7 @@ class CameraBoxComponent extends Component {
       streaming: true,
       loading: true,
       liveStartError: false,
-      upgradeGladysPlusPlanRequired: false,
+      upgradeGladysPlusPlanRequired: false
     });
     try {
       const isGladysPlus = this.props.session.gatewayClient !== undefined;
@@ -84,9 +84,9 @@ class CameraBoxComponent extends Component {
         this.props.httpClient.post(`/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/start`, {
           origin: isGladysPlus ? config.gladysGatewayApiUrl : config.localApiUrl,
           is_gladys_gateway: isGladysPlus,
-          segment_duration: segmentationDuration,
+          segment_duration: segmentationDuration
         }),
-        isGladysPlus ? this.props.session.gatewayClient.cameraStartStreaming() : null,
+        isGladysPlus ? this.props.session.gatewayClient.cameraStartStreaming() : null
       ]);
       const { localApiUrl } = config;
       const cameraComponent = this;
@@ -96,7 +96,7 @@ class CameraBoxComponent extends Component {
         liveSyncDurationCount: 2,
         maxLiveSyncPlaybackRate: 1.5,
         liveDurationInfinity: true,
-        xhrSetup: (xhr) => {
+        xhrSetup: xhr => {
           // We set the correct access token (locally only)
           // On Gladys Plus, authentication is done with a temporary
           // token in the URL to avoid preflight requests
@@ -114,7 +114,7 @@ class CameraBoxComponent extends Component {
             // When using with Gladys Plus
             if (url && url.endsWith('index.m3u8.key')) {
               const onSuccess = callbacks.onSuccess;
-              callbacks.onSuccess = function (response, stats, context) {
+              callbacks.onSuccess = function(response, stats, context) {
                 const enc = new TextEncoder();
                 // Encryption key is replaced here:
                 response.data = enc.encode(streamingParams.encryption_key);
@@ -125,7 +125,7 @@ class CameraBoxComponent extends Component {
 
             if (url && url.endsWith('index.m3u8')) {
               const onSuccess = callbacks.onSuccess;
-              callbacks.onSuccess = function (response, stats, context) {
+              callbacks.onSuccess = function(response, stats, context) {
                 cameraComponent.setState({ cameraStreamingErrorCount: 0 });
 
                 if (!isGladysPlus) {
@@ -136,7 +136,7 @@ class CameraBoxComponent extends Component {
                   // We add the stream access key to the URL for authentication
                   response.data = response.data.replace(
                     '/index.m3u8.key',
-                    `/${gatewayStreaming.stream_access_key}/index.m3u8.key`,
+                    `/${gatewayStreaming.stream_access_key}/index.m3u8.key`
                   );
                 }
 
@@ -146,7 +146,7 @@ class CameraBoxComponent extends Component {
 
             super.load(context, config, callbacks);
           }
-        },
+        }
       });
       this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {});
       this.hls.on(Hls.Events.ERROR, (event, data) => {
@@ -168,11 +168,11 @@ class CameraBoxComponent extends Component {
       });
       if (isGladysPlus) {
         this.hls.loadSource(
-          `${config.gladysGatewayApiUrl}/cameras/${streamingParams.camera_folder}/${gatewayStreaming.stream_access_key}/index.m3u8`,
+          `${config.gladysGatewayApiUrl}/cameras/${streamingParams.camera_folder}/${gatewayStreaming.stream_access_key}/index.m3u8`
         );
       } else {
         this.hls.loadSource(
-          `${config.localApiUrl}/api/v1/service/rtsp-camera/camera/streaming/${streamingParams.camera_folder}/index.m3u8`,
+          `${config.localApiUrl}/api/v1/service/rtsp-camera/camera/streaming/${streamingParams.camera_folder}/index.m3u8`
         );
       }
 
@@ -236,7 +236,7 @@ class CameraBoxComponent extends Component {
     }
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
-      this.updateDeviceStateWebsocket,
+      this.updateDeviceStateWebsocket
     );
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
@@ -252,7 +252,7 @@ class CameraBoxComponent extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
-      this.updateDeviceStateWebsocket,
+      this.updateDeviceStateWebsocket
     );
     if (this.state.streaming) {
       this.stopStreaming();
@@ -270,15 +270,15 @@ class CameraBoxComponent extends Component {
       liveStartError,
       liveNotSupportedBrowser,
       liveTooManyRequestsError,
-      upgradeGladysPlusPlanRequired,
-    },
+      upgradeGladysPlusPlanRequired
+    }
   ) {
     if (streaming) {
       return (
         <div class="card">
           <div
             class={cx('dimmer card-img-top', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />

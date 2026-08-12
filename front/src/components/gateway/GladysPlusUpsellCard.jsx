@@ -26,7 +26,7 @@ const GladysPlusUpsellCard = ({
   variant = 'subscribe',
   icon = 'fe-zap',
   utmCampaign,
-  compact = false,
+  compact = false
 }) => {
   const language = get(user, 'language') || 'en';
   const isUpgrade = variant === 'upgrade';
@@ -80,7 +80,7 @@ const GladysPlusUpsellCard = ({
             </p>
             {featureKeys.length > 0 && (
               <ul class={`list-unstyled mb-3 ${style.upsellFeatureList}`}>
-                {featureKeys.map((k) => (
+                {featureKeys.map(k => (
                   <li class="mb-1">
                     <i class="fe fe-check text-success mr-2" />
                     <Text id={k} />

@@ -11,7 +11,7 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 const BUTTON_ARRAY = [
   [1, 2, 3],
   [4, 5, 6],
-  [7, 8, 9],
+  [7, 8, 9]
 ];
 
 const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
@@ -34,11 +34,11 @@ const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
         </button>
       </div>
     </div>
-    {BUTTON_ARRAY.map((row) => (
+    {BUTTON_ARRAY.map(row => (
       <div class="row">
-        {row.map((cell) => (
+        {row.map(cell => (
           <div class="col mt-4">
-            <button onClick={(e) => typeLetter(e, cell)} class={cx('btn btn-secondary btn-block', style.lockedButton)}>
+            <button onClick={e => typeLetter(e, cell)} class={cx('btn btn-secondary btn-block', style.lockedButton)}>
               {cell}
             </button>
           </div>
@@ -49,7 +49,7 @@ const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
     <div class="row">
       <div class="col mt-4" />
       <div class="col mt-4">
-        <button onClick={(e) => typeLetter(e, 0)} class={cx('btn btn-secondary btn-block', style.lockedButton)}>
+        <button onClick={e => typeLetter(e, 0)} class={cx('btn btn-secondary btn-block', style.lockedButton)}>
           0
         </button>
       </div>
@@ -59,17 +59,17 @@ const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
 );
 
 class Locked extends Component {
-  clearPreviousLetter = (e) => {
+  clearPreviousLetter = e => {
     e.preventDefault();
     if (this.state.currentCode.length > 0) {
-      this.setState((prevState) => {
+      this.setState(prevState => {
         return { ...prevState, currentCode: prevState.currentCode.slice(0, -1) };
       });
     }
   };
   typeLetter = (e, letter) => {
     e.preventDefault();
-    this.setState((prevState) => {
+    this.setState(prevState => {
       return { ...prevState, currentCode: prevState.currentCode + letter };
     });
   };
@@ -81,7 +81,7 @@ class Locked extends Component {
       // We make a dumb request just to verify if our token is valid
       await this.props.httpClient.post('/api/v1/access_token', {
         refresh_token: this.props.session.getRefreshToken(),
-        scope: ['dashboard:write'],
+        scope: ['dashboard:write']
       });
 
       // if this resolves, we redirect to dashboard
@@ -95,10 +95,10 @@ class Locked extends Component {
     super(props);
     this.props = props;
     this.state = {
-      currentCode: '',
+      currentCode: ''
     };
   }
-  disarmed = async (event) => {
+  disarmed = async event => {
     try {
       const houseSelector = this.props.session.getTabletModeCurrentHouseSelector();
       // If the same house was disarmed, redirect to dashboard
@@ -111,7 +111,7 @@ class Locked extends Component {
       console.error(e);
     }
   };
-  validateCode = async (e) => {
+  validateCode = async e => {
     e.preventDefault();
     try {
       await this.setState({
@@ -119,12 +119,12 @@ class Locked extends Component {
         wrongCode: false,
         tooManyRequests: false,
         errorMessage: null,
-        errorStatus: null,
+        errorStatus: null
       });
       const houseSelector = this.props.session.getTabletModeCurrentHouseSelector();
       await this.props.httpClient.refreshAccessToken();
       await this.props.httpClient.post(`/api/v1/house/${houseSelector}/disarm_with_code`, {
-        code: this.state.currentCode,
+        code: this.state.currentCode
       });
     } catch (e) {
       console.error(e);
@@ -134,7 +134,7 @@ class Locked extends Component {
       if (status === 429) {
         this.setState({
           tooManyRequests: true,
-          waitTimeInMinute: Math.round(get(e, 'response.data.properties.time_before_next', 5 * 60 * 1000) / 1000 / 60),
+          waitTimeInMinute: Math.round(get(e, 'response.data.properties.time_before_next', 5 * 60 * 1000) / 1000 / 60)
         });
       } else if (message === 'INVALID_CODE') {
         this.setState({ wrongCode: true });

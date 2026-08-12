@@ -29,8 +29,8 @@ const compareDevices = (deviceA, deviceB) => {
     return false;
   }
   // We sort all features by external_id
-  const deviceAFeaturesExternalIdSorted = deviceA.features.map((f) => f.external_id).sort();
-  const deviceBFeaturesExternalIdSorted = deviceB.features.map((f) => f.external_id).sort();
+  const deviceAFeaturesExternalIdSorted = deviceA.features.map(f => f.external_id).sort();
+  const deviceBFeaturesExternalIdSorted = deviceB.features.map(f => f.external_id).sort();
   // We compare all features external_id
   for (let i = 0; i < deviceAFeaturesExternalIdSorted.length; i++) {
     if (deviceAFeaturesExternalIdSorted[i] !== deviceBFeaturesExternalIdSorted[i]) {
@@ -38,8 +38,8 @@ const compareDevices = (deviceA, deviceB) => {
     }
   }
   // We compare all features unit
-  const deviceAFeaturesUnitSorted = deviceA.features.map((f) => f.unit || 'empty').sort();
-  const deviceBFeaturesUnitSorted = deviceB.features.map((f) => f.unit || 'empty').sort();
+  const deviceAFeaturesUnitSorted = deviceA.features.map(f => f.unit || 'empty').sort();
+  const deviceBFeaturesUnitSorted = deviceB.features.map(f => f.unit || 'empty').sort();
   for (let i = 0; i < deviceAFeaturesUnitSorted.length; i++) {
     if (deviceAFeaturesUnitSorted[i] !== deviceBFeaturesUnitSorted[i]) {
       return false;
@@ -47,7 +47,7 @@ const compareDevices = (deviceA, deviceB) => {
   }
   // We compare all params name & value
   for (let i = 0; i < deviceA.params.length; i++) {
-    const sameParamInDeviceB = deviceB.params.find((p) => p.name === deviceA.params[i].name);
+    const sameParamInDeviceB = deviceB.params.find(p => p.name === deviceA.params[i].name);
     if (!sameParamInDeviceB) {
       return false;
     }
@@ -59,7 +59,7 @@ const compareDevices = (deviceA, deviceB) => {
 };
 
 const findGladysDeviceByExternalId = (matterDevices, externalId) =>
-  matterDevices.find((device) => device.external_id === externalId);
+  matterDevices.find(device => device.external_id === externalId);
 
 class MatterDevices extends Component {
   constructor(props) {
@@ -76,7 +76,7 @@ class MatterDevices extends Component {
       devicesThatAlreadyExistButWithDifferentNodeId: new Map(),
       nodesIsConnected: new Map(),
       pairedDeviceErrors: new Map(),
-      pairedDeviceLoading: new Map(),
+      pairedDeviceLoading: new Map()
     };
     this.debouncedGetMatterDevices = debounce(this.getMatterDevices, 200).bind(this);
   }
@@ -95,12 +95,12 @@ class MatterDevices extends Component {
       const { value } = await this.props.httpClient.get('/api/v1/service/matter/variable/MATTER_ENABLED');
       const matterEnabled = value === 'true';
       await this.setState({
-        matterEnabled,
+        matterEnabled
       });
     } catch (e) {
       console.error(e);
       await this.setState({
-        matterEnabled: false,
+        matterEnabled: false
       });
       if (e.response && e.response.status !== 404) {
         this.setState({ error: RequestStatus.Error });
@@ -116,7 +116,7 @@ class MatterDevices extends Component {
     try {
       await this.setState({ getGladysDevicesLoading: true });
       const options = {
-        order_dir: this.state.orderDir || 'asc',
+        order_dir: this.state.orderDir || 'asc'
       };
       if (this.state.search && this.state.search.length) {
         options.search = this.state.search;
@@ -126,14 +126,14 @@ class MatterDevices extends Component {
       this.setState({
         matterDevices,
         error: null,
-        getGladysDevicesLoading: false,
+        getGladysDevicesLoading: false
       });
       await this.getNodes();
     } catch (e) {
       console.error(e);
       this.setState({
         error: RequestStatus.Error,
-        getGladysDevicesLoading: false,
+        getGladysDevicesLoading: false
       });
     }
   };
@@ -146,7 +146,7 @@ class MatterDevices extends Component {
       // Filter out devices that are already in Gladys
       const filteredPairedDevices = pairedDevices.filter(
         // We compare all devices by external_id and features external_id
-        (pairedDevice) => !this.state.matterDevices.some((gladysDevice) => compareDevices(gladysDevice, pairedDevice)),
+        pairedDevice => !this.state.matterDevices.some(gladysDevice => compareDevices(gladysDevice, pairedDevice))
       );
 
       const devicesThatAlreadyExistButWithDifferentNodeId = new Map();
@@ -156,11 +156,15 @@ class MatterDevices extends Component {
       // while the node id changes when a device is re-commissioned. We use UNIQUE_ID + device path
       // to reliably match a paired device with its already-existing counterpart in Gladys, even
       // when multiple endpoints of the same physical device share the same UNIQUE_ID.
-      const getDevicePath = (externalId) => externalId.split(':').slice(2).join(':');
+      const getDevicePath = externalId =>
+        externalId
+          .split(':')
+          .slice(2)
+          .join(':');
 
       // We index all devices already in Gladys by `<unique_id>::<device_path>`
       const existingDevicesByUniqueIdAndPath = new Map();
-      this.state.matterDevices.forEach((device) => {
+      this.state.matterDevices.forEach(device => {
         const deviceUniqueId = getDeviceParam(device, 'UNIQUE_ID');
         if (!deviceUniqueId) {
           return;
@@ -171,13 +175,13 @@ class MatterDevices extends Component {
       // For each paired device, we look for an existing Gladys device with the same UNIQUE_ID and
       // the same device path. If found and the external_id differs (i.e. the node id has changed),
       // we register it so the user can update the existing device instead of creating a duplicate.
-      pairedDevices.forEach((pairedDevice) => {
+      pairedDevices.forEach(pairedDevice => {
         const pairedDeviceUniqueId = getDeviceParam(pairedDevice, 'UNIQUE_ID');
         if (!pairedDeviceUniqueId) {
           return;
         }
         const existingDevice = existingDevicesByUniqueIdAndPath.get(
-          `${pairedDeviceUniqueId}::${getDevicePath(pairedDevice.external_id)}`,
+          `${pairedDeviceUniqueId}::${getDevicePath(pairedDevice.external_id)}`
         );
         if (existingDevice && existingDevice.external_id !== pairedDevice.external_id) {
           devicesThatAlreadyExistButWithDifferentNodeId.set(pairedDevice.external_id, existingDevice.external_id);
@@ -187,7 +191,7 @@ class MatterDevices extends Component {
       this.setState({
         pairedDevices: filteredPairedDevices,
         devicesThatAlreadyExistButWithDifferentNodeId,
-        getPairedDevicesLoading: false,
+        getPairedDevicesLoading: false
       });
     } catch (e) {
       console.error(e);
@@ -199,11 +203,11 @@ class MatterDevices extends Component {
     try {
       const nodes = await this.props.httpClient.get('/api/v1/service/matter/node');
       const nodesIsConnected = new Map();
-      nodes.forEach((node) => {
+      nodes.forEach(node => {
         nodesIsConnected.set(node.node_id, node.is_connected);
       });
       this.setState({
-        nodesIsConnected,
+        nodesIsConnected
       });
     } catch (e) {
       console.error(e);
@@ -211,7 +215,7 @@ class MatterDevices extends Component {
   };
 
   setPairedDeviceLoading = (externalId, loading) => {
-    this.setState((prevState) => {
+    this.setState(prevState => {
       const pairedDeviceLoading = new Map(prevState.pairedDeviceLoading);
       if (loading) {
         pairedDeviceLoading.set(externalId, true);
@@ -223,7 +227,7 @@ class MatterDevices extends Component {
   };
 
   setPairedDeviceError = (externalId, error) => {
-    this.setState((prevState) => {
+    this.setState(prevState => {
       const pairedDeviceErrors = new Map(prevState.pairedDeviceErrors);
       if (error) {
         pairedDeviceErrors.set(externalId, error);
@@ -234,7 +238,7 @@ class MatterDevices extends Component {
     });
   };
 
-  addDeviceToGladys = async (device) => {
+  addDeviceToGladys = async device => {
     const { external_id: externalId } = device;
     this.setPairedDeviceLoading(externalId, true);
     this.setPairedDeviceError(externalId, null);
@@ -250,12 +254,12 @@ class MatterDevices extends Component {
     }
   };
 
-  replaceGladysDevice = async (device) => {
+  replaceGladysDevice = async device => {
     const { external_id: externalId } = device;
     this.setPairedDeviceLoading(externalId, true);
     this.setPairedDeviceError(externalId, null);
     try {
-      const gladysDevice = this.state.matterDevices.find((gladysDevice) => {
+      const gladysDevice = this.state.matterDevices.find(gladysDevice => {
         return (
           gladysDevice.external_id === this.state.devicesThatAlreadyExistButWithDifferentNodeId.get(device.external_id)
         );
@@ -265,7 +269,7 @@ class MatterDevices extends Component {
         this.setPairedDeviceError(externalId, {
           errorMessage: 'integration.matter.error.replaceDeviceNotFound',
           errorDetail: null,
-          isKnownError: true,
+          isKnownError: true
         });
         return;
       }
@@ -280,9 +284,9 @@ class MatterDevices extends Component {
       device.name = gladysDevice.name;
       device.room = gladysDevice.room;
 
-      device.features = device.features.map((f) => {
+      device.features = device.features.map(f => {
         // try to find match feature to replace the external_id
-        const gladysFeature = gladysDevice.features.find((gladysF) => {
+        const gladysFeature = gladysDevice.features.find(gladysF => {
           return gladysF.external_id.replace(oldExternalId, newExternalId) === f.external_id;
         });
         // If a matching feature is found, give the id of the feature
@@ -305,35 +309,35 @@ class MatterDevices extends Component {
 
   async getHouses() {
     this.setState({
-      housesGetStatus: RequestStatus.Getting,
+      housesGetStatus: RequestStatus.Getting
     });
     try {
       const params = {
-        expand: 'rooms',
+        expand: 'rooms'
       };
       const housesWithRooms = await this.props.httpClient.get('/api/v1/house', params);
       this.setState({
         housesWithRooms,
-        housesGetStatus: RequestStatus.Success,
+        housesGetStatus: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        housesGetStatus: RequestStatus.Error,
+        housesGetStatus: RequestStatus.Error
       });
     }
   }
 
-  search = async (e) => {
+  search = async e => {
     await this.setState({
-      search: e.target.value,
+      search: e.target.value
     });
     this.debouncedGetMatterDevices();
     // No need to call getPairedDevices here as we filter them client-side in render
   };
 
-  changeOrderDir = async (e) => {
+  changeOrderDir = async e => {
     await this.setState({
-      orderDir: e.target.value,
+      orderDir: e.target.value
     });
     this.getMatterDevices();
     // No need to call getPairedDevices here as we sort them client-side in render
@@ -354,11 +358,11 @@ class MatterDevices extends Component {
       matterEnabled,
       nodesIsConnected,
       pairedDeviceErrors,
-      pairedDeviceLoading,
-    },
+      pairedDeviceLoading
+    }
   ) {
     // Apply client-side filtering to paired devices
-    const filteredPairedDevices = pairedDevices.filter((device) => {
+    const filteredPairedDevices = pairedDevices.filter(device => {
       // If no search term, include all devices
       if (!search || search.trim() === '') {
         return true;
@@ -409,7 +413,7 @@ class MatterDevices extends Component {
           <div class="card-body">
             <div
               class={cx('dimmer', {
-                active: getGladysDevicesLoading,
+                active: getGladysDevicesLoading
               })}
             >
               <div class="loader" />
@@ -439,7 +443,7 @@ class MatterDevices extends Component {
                       <Text id="integration.matter.device.pairedDevicesTitle" />
                     </h4>
                     <div class="row mt-4">
-                      {sortedPairedDevices.map((device) => {
+                      {sortedPairedDevices.map(device => {
                         const pairedError = pairedDeviceErrors.get(device.external_id);
                         const isPairedDeviceLoading = pairedDeviceLoading.get(device.external_id);
                         const isNodeIdChanged = devicesThatAlreadyExistButWithDifferentNodeId.has(device.external_id);
@@ -464,7 +468,7 @@ class MatterDevices extends Component {
                               </div>
                               <div
                                 class={cx('dimmer', {
-                                  active: isPairedDeviceLoading,
+                                  active: isPairedDeviceLoading
                                 })}
                               >
                                 <div class="loader" />
@@ -500,7 +504,7 @@ class MatterDevices extends Component {
                                         <button
                                           onClick={() => this.replaceGladysDevice(device)}
                                           class={cx('btn btn-info', {
-                                            loading: isPairedDeviceLoading,
+                                            loading: isPairedDeviceLoading
                                           })}
                                           disabled={isPairedDeviceLoading}
                                         >
@@ -513,7 +517,7 @@ class MatterDevices extends Component {
                                         <button
                                           onClick={() => this.addDeviceToGladys(device)}
                                           class={cx('btn', isUpdate ? 'btn-info' : 'btn-success', {
-                                            loading: isPairedDeviceLoading,
+                                            loading: isPairedDeviceLoading
                                           })}
                                           disabled={isPairedDeviceLoading}
                                         >

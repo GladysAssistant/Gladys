@@ -16,7 +16,7 @@ import GladysPlusUpsellCard from './GladysPlusUpsellCard';
  */
 class GladysPlusUpsell extends Component {
   state = {
-    gladysPlusConnected: null,
+    gladysPlusConnected: null
   };
 
   fetchStatus = async () => {

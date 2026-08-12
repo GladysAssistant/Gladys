@@ -22,7 +22,7 @@ const LogsTab = ({ logs, logsStatus, getLogs, subContainers = [], selectedContai
               <option value="main">
                 <Text id="integration.externalIntegration.logs.mainContainerOption" />
               </option>
-              {subContainers.map((name) => (
+              {subContainers.map(name => (
                 <option value={name}>{name}</option>
               ))}
             </select>
@@ -46,7 +46,7 @@ const LogsTab = ({ logs, logsStatus, getLogs, subContainers = [], selectedContai
       )}
       <div
         class={cx('dimmer', {
-          active: logsStatus === RequestStatus.Getting,
+          active: logsStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />

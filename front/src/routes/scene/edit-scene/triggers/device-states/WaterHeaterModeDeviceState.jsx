@@ -6,7 +6,7 @@ import { WATER_HEATER_MODE } from '../../../../../../../server/utils/constants';
 import { resolveFeatureOptions } from '../../../../../utils/supportedOptions';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
-const MODE_CATALOG = Object.keys(WATER_HEATER_MODE).map((key) => ({ value: WATER_HEATER_MODE[key] }));
+const MODE_CATALOG = Object.keys(WATER_HEATER_MODE).map(key => ({ value: WATER_HEATER_MODE[key] }));
 
 class WaterHeaterModeDeviceState extends Component {
   handleValueChange = ({ value }) => {
@@ -17,11 +17,11 @@ class WaterHeaterModeDeviceState extends Component {
     // Offer only the modes this appliance declares, so a trigger cannot be saved on a mode the
     // device never reports. resolveFeatureOptions returns the whole catalog when the feature
     // carries no supported_options, which keeps legacy and hand-made features usable.
-    const options = resolveFeatureOptions(this.props.selectedDeviceFeature, MODE_CATALOG).map((option) => ({
+    const options = resolveFeatureOptions(this.props.selectedDeviceFeature, MODE_CATALOG).map(option => ({
       label: get(this.props.intl.dictionary, `deviceFeatureValue.category.water-heater.mode.${option.value}`, {
-        default: option.label || option.value,
+        default: option.label || option.value
       }),
-      value: option.value,
+      value: option.value
     }));
 
     this.setState({ options });
@@ -45,7 +45,7 @@ class WaterHeaterModeDeviceState extends Component {
     // Controlled rather than defaultValue: the option list is recomputed when the selected feature
     // changes, and an uncontrolled select would keep displaying the previous device's mode. `null`
     // when nothing matches, so a mode the feature no longer declares shows as unselected.
-    const selectedOption = (options || []).find((option) => trigger.value === option.value) || null;
+    const selectedOption = (options || []).find(option => trigger.value === option.value) || null;
 
     return (
       <Fragment>

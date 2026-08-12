@@ -15,15 +15,15 @@ const getMenuItems = (integrationCategories, { integrationsToUpdate = 0, categor
           href: '/dashboard/integration/updates',
           icon: 'arrow-up-circle',
           labelKey: 'integration.root.menu.updates',
-          count: integrationsToUpdate,
-        },
+          count: integrationsToUpdate
+        }
       ]
     : []),
-  ...integrationCategories.map((integrationCategory) => ({
+  ...integrationCategories.map(integrationCategory => ({
     href: `/dashboard/integration/${integrationCategory.type}`,
     icon: integrationCategory.icon,
-    labelKey: `integration.root.menu.${integrationCategory.type}`,
-  })),
+    labelKey: `integration.root.menu.${integrationCategory.type}`
+  }))
 ];
 
 const MenuItemCount = ({ count, className = '' }) =>
@@ -32,7 +32,7 @@ const MenuItemCount = ({ count, className = '' }) =>
 export const IntegrationMenuMobile = ({ integrationCategories, integrationsToUpdate, category }) => (
   <nav class={style.mobileCategoryNav} aria-label="Integration categories">
     <div class={style.mobileCategoryScroll}>
-      {getMenuItems(integrationCategories, { integrationsToUpdate, category }).map((item) => (
+      {getMenuItems(integrationCategories, { integrationsToUpdate, category }).map(item => (
         <Link
           key={item.href}
           href={item.href}
@@ -50,7 +50,7 @@ export const IntegrationMenuMobile = ({ integrationCategories, integrationsToUpd
 
 const IntegrationMenu = ({ integrationCategories, integrationsToUpdate, category }) => (
   <div class="list-group list-group-transparent mb-0">
-    {getMenuItems(integrationCategories, { integrationsToUpdate, category }).map((item) => (
+    {getMenuItems(integrationCategories, { integrationsToUpdate, category }).map(item => (
       <Link
         key={item.href}
         href={item.href}

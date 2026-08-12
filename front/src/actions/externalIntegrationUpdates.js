@@ -52,11 +52,11 @@ function createActions(store) {
       }
       try {
         const integrations = await state.httpClient.get('/api/v1/external_integration');
-        applyCount(requestId, integrations.filter((integration) => integration.update_available).length);
+        applyCount(requestId, integrations.filter(integration => integration.update_available).length);
       } catch (e) {
         console.error(e);
       }
-    },
+    }
   };
 
   return actions;

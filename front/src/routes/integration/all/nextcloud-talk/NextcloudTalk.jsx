@@ -42,7 +42,7 @@ const NextcloudTalkPage = ({ children, ...props }) => (
                 <div class="card-body">
                   <div
                     class={cx('dimmer', {
-                      active: props.loading,
+                      active: props.loading
                     })}
                   >
                     <div class="loader" />

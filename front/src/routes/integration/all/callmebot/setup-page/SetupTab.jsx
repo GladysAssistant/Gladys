@@ -12,7 +12,7 @@ class SetupTab extends Component {
       messagingService: 'whatsapp',
       phoneNumber: '',
       getSettingsStatus: RequestStatus.Getting,
-      saveStatus: null,
+      saveStatus: null
     };
   }
 
@@ -22,71 +22,71 @@ class SetupTab extends Component {
 
   async getConfiguration() {
     this.setState({
-      getSettingsStatus: RequestStatus.Getting,
+      getSettingsStatus: RequestStatus.Getting
     });
 
     try {
       const [{ value: apiKey }, { value: messagingService }, { value: phoneNumber }] = await Promise.all([
         this.props.httpClient.get('/api/v1/service/callmebot/variable/CALLMEBOT_API_KEY', {
-          userRelated: true,
+          userRelated: true
         }),
         this.props.httpClient.get('/api/v1/service/callmebot/variable/CALLMEBOT_MESSAGING_SERVICE', {
-          userRelated: true,
+          userRelated: true
         }),
         this.props.httpClient.get('/api/v1/service/callmebot/variable/CALLMEBOT_PHONE_NUMBER', {
-          userRelated: true,
-        }),
+          userRelated: true
+        })
       ]);
 
       this.setState({
         apiKey: apiKey || '',
         messagingService: messagingService || 'whatsapp',
         phoneNumber: phoneNumber || '',
-        getSettingsStatus: RequestStatus.Success,
+        getSettingsStatus: RequestStatus.Success
       });
     } catch (e) {
       console.error(e);
       this.setState({
-        getSettingsStatus: RequestStatus.Error,
+        getSettingsStatus: RequestStatus.Error
       });
     }
   }
 
   async saveConfiguration() {
     this.setState({
-      saveStatus: RequestStatus.Getting,
+      saveStatus: RequestStatus.Getting
     });
 
     try {
       await Promise.all([
         this.props.httpClient.post('/api/v1/service/callmebot/variable/CALLMEBOT_API_KEY', {
           value: this.state.apiKey,
-          userRelated: true,
+          userRelated: true
         }),
         this.props.httpClient.post('/api/v1/service/callmebot/variable/CALLMEBOT_MESSAGING_SERVICE', {
           value: this.state.messagingService,
-          userRelated: true,
+          userRelated: true
         }),
         this.props.httpClient.post('/api/v1/service/callmebot/variable/CALLMEBOT_PHONE_NUMBER', {
           value: this.state.phoneNumber,
-          userRelated: true,
-        }),
+          userRelated: true
+        })
       ]);
 
       this.setState({
-        saveStatus: RequestStatus.Success,
+        saveStatus: RequestStatus.Success
       });
 
       // Reset status after 2 seconds
       setTimeout(() => {
         this.setState({
-          saveStatus: null,
+          saveStatus: null
         });
       }, 2000);
     } catch (e) {
       console.error(e);
       this.setState({
-        saveStatus: RequestStatus.Error,
+        saveStatus: RequestStatus.Error
       });
     }
   }
@@ -111,7 +111,7 @@ class SetupTab extends Component {
             <select
               class="form-control"
               value={messagingService}
-              onChange={(e) => this.setState({ messagingService: e.target.value })}
+              onChange={e => this.setState({ messagingService: e.target.value })}
               disabled={getSettingsStatus === RequestStatus.Getting}
             >
               <option value="whatsapp">WhatsApp</option>
@@ -132,7 +132,7 @@ class SetupTab extends Component {
                 class="form-control"
                 placeholder={<Text id="integration.callmebot.setup.phoneNumberPlaceholder" />}
                 value={phoneNumber}
-                onChange={(e) => this.setState({ phoneNumber: e.target.value })}
+                onChange={e => this.setState({ phoneNumber: e.target.value })}
                 disabled={getSettingsStatus === RequestStatus.Getting}
               />
             </Localizer>
@@ -155,7 +155,7 @@ class SetupTab extends Component {
                 class="form-control"
                 placeholder={<Text id="integration.callmebot.setup.apiKeyPlaceholder" />}
                 value={apiKey}
-                onChange={(e) => this.setState({ apiKey: e.target.value })}
+                onChange={e => this.setState({ apiKey: e.target.value })}
                 disabled={getSettingsStatus === RequestStatus.Getting}
               />
             </Localizer>
@@ -168,7 +168,7 @@ class SetupTab extends Component {
             <button
               onClick={() => this.saveConfiguration()}
               class={cx('btn btn-success', {
-                'btn-loading': saveStatus === RequestStatus.Getting,
+                'btn-loading': saveStatus === RequestStatus.Getting
               })}
               disabled={saveStatus === RequestStatus.Getting}
             >

@@ -10,58 +10,58 @@ const getApexChartAreaOptions = ({ displayAxes, height, series, colors, locales,
       height,
       parentHeightOffset: 0,
       sparkline: {
-        enabled: !displayAxes,
+        enabled: !displayAxes
       },
       toolbar: {
-        show: false,
+        show: false
       },
       animations: {
-        enabled: false,
-      },
+        enabled: false
+      }
     },
     dataLabels: {
-      enabled: false,
+      enabled: false
     },
     fill: {
       opacity: 0.16,
-      type: 'solid',
+      type: 'solid'
     },
     stroke: {
       width: 2,
       lineCap: 'round',
-      curve: 'smooth',
+      curve: 'smooth'
     },
     series,
     grid: {
       strokeDashArray: 4,
       padding: {
-        left: -4,
-      },
+        left: -4
+      }
     },
     xaxis: {
       labels: {
         padding: 0,
-        datetimeUTC: false,
+        datetimeUTC: false
       },
       tooltip: {
-        enabled: false,
+        enabled: false
       },
       axisBorder: {
-        show: false,
+        show: false
       },
-      type: 'datetime',
+      type: 'datetime'
     },
     yaxis: {
       labels: {
         padding: 4,
-        formatter: yAxisFormatter,
-      },
+        formatter: yAxisFormatter
+      }
     },
     colors,
     legend: {
       show: displayAxes,
-      position: 'bottom',
-    },
+      position: 'bottom'
+    }
   };
   return options;
 };

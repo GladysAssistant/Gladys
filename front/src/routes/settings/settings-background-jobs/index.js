@@ -12,22 +12,22 @@ class SettingsSystem extends Component {
    * Function to replace "2023-01-23 14:20:23.594 +00:00" by "2023-01-23T14:20:23.594+00:00"
    * to be Firefox compatible (ISO8601)
    */
-  convertGladysDateToISO8601 = (gladysDate) => {
+  convertGladysDateToISO8601 = gladysDate => {
     return gladysDate.replace(' ', 'T').replace(' ', '');
   };
 
-  getJobs = async (page) => {
+  getJobs = async page => {
     try {
       const skip = page * NUMBER_OF_JOBS_PER_PAGE;
       const jobs = await this.props.httpClient.get('/api/v1/job', { take: NUMBER_OF_JOBS_PER_PAGE, skip });
 
-      jobs.forEach((job) => (job.created_at = this.convertGladysDateToISO8601(job.created_at)));
+      jobs.forEach(job => (job.created_at = this.convertGladysDateToISO8601(job.created_at)));
 
       this.setState({
         jobs,
         isFirstPage: page === 0,
         isLastPage: jobs.length < NUMBER_OF_JOBS_PER_PAGE,
-        currentPage: page,
+        currentPage: page
       });
     } catch (e) {
       console.error(e);
@@ -44,34 +44,34 @@ class SettingsSystem extends Component {
     this.getJobs(currentPage - 1);
   };
 
-  search = async (e) => {
+  search = async e => {
     const text = e.target.value;
     await this.setState({
-      search: text,
+      search: text
     });
     this.getJobs(0);
   };
 
-  newJob = (payload) => {
+  newJob = payload => {
     const { jobs, currentPage } = this.state;
     // only add jobs to page if we are at the first page
     if (currentPage === 0) {
       payload.created_at = this.convertGladysDateToISO8601(payload.created_at);
       jobs.unshift(payload);
       this.setState({
-        jobs,
+        jobs
       });
     }
   };
 
-  jobUpdated = (payload) => {
+  jobUpdated = payload => {
     const { jobs } = this.state;
-    const previousJobIndex = jobs.findIndex((j) => j.id === payload.id);
+    const previousJobIndex = jobs.findIndex(j => j.id === payload.id);
     if (previousJobIndex !== -1) {
       payload.created_at = this.convertGladysDateToISO8601(payload.created_at);
       jobs[previousJobIndex] = payload;
       this.setState({
-        jobs,
+        jobs
       });
     }
   };
@@ -83,7 +83,7 @@ class SettingsSystem extends Component {
       currentPage: 0,
       isFirstPage: true,
       isLastPage: false,
-      jobs: [],
+      jobs: []
     };
   }
 

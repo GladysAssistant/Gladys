@@ -5,23 +5,23 @@ import debounce from 'debounce';
 import {
   DEVICE_POLL_FREQUENCIES,
   DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_TYPES
 } from '../../../../../../server/utils/constants';
 import createActionsIntegration from '../../../../actions/integration';
 
 function sortRoomsInHouses(houses) {
-  houses.forEach((house) => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
+  houses.forEach(house => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
 }
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
     async complete(camera) {
-      const cameraUrlParam = camera.params.find((param) => param.name === 'CAMERA_URL');
+      const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
       if (cameraUrlParam) {
         camera.cameraUrl = cameraUrlParam;
       }
-      const cameraRotationParam = camera.params.find((param) => param.name === 'CAMERA_ROTATION');
+      const cameraRotationParam = camera.params.find(param => param.name === 'CAMERA_ROTATION');
       if (cameraRotationParam) {
         camera.cameraRotation = cameraRotationParam;
       } else {
@@ -34,48 +34,48 @@ function createActions(store) {
     },
     async getRtspCameraDevices(state) {
       store.setState({
-        getRtspCameraStatus: RequestStatus.Getting,
+        getRtspCameraStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getRtspCameraOrderDir || 'asc',
+          order_dir: state.getRtspCameraOrderDir || 'asc'
         };
         if (state.rtspCameraSearch && state.rtspCameraSearch.length) {
           options.search = state.rtspCameraSearch;
         }
         const rtspCameras = await state.httpClient.get('/api/v1/service/rtsp-camera/device', options);
         // find camera params
-        rtspCameras.forEach((camera) => {
+        rtspCameras.forEach(camera => {
           actions.complete(camera);
         });
         store.setState({
           rtspCameras,
-          getRtspCameraStatus: RequestStatus.Success,
+          getRtspCameraStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
           philipsHueGetBridgesStatus: RequestStatus.Error,
-          getRtspCameraStatus: e.message,
+          getRtspCameraStatus: e.message
         });
       }
     },
     async getHouses(state) {
       store.setState({
-        housesGetStatus: RequestStatus.Getting,
+        housesGetStatus: RequestStatus.Getting
       });
       try {
         const params = {
-          expand: 'rooms',
+          expand: 'rooms'
         };
         const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
         sortRoomsInHouses(housesWithRooms);
         store.setState({
           housesWithRooms,
-          housesGetStatus: RequestStatus.Success,
+          housesGetStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          housesGetStatus: RequestStatus.Error,
+          housesGetStatus: RequestStatus.Error
         });
       }
     },
@@ -84,11 +84,11 @@ function createActions(store) {
       camera = actions.complete(camera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
-          $set: camera,
-        },
+          $set: camera
+        }
       });
       store.setState({
-        rtspCameras,
+        rtspCameras
       });
     },
     async addCamera(state) {
@@ -105,11 +105,11 @@ function createActions(store) {
             service_id: store.getState().currentIntegration.id,
             cameraUrl: {
               name: 'CAMERA_URL',
-              value: null,
+              value: null
             },
             cameraRotation: {
               name: 'CAMERA_ROTATION',
-              value: '0',
+              value: '0'
             },
             features: [
               {
@@ -122,83 +122,83 @@ function createActions(store) {
                 keep_history: false,
                 has_feedback: false,
                 min: 0,
-                max: 0,
-              },
+                max: 0
+              }
             ],
             params: [
               {
                 name: 'CAMERA_URL',
-                value: null,
+                value: null
               },
               {
                 name: 'CAMERA_ROTATION',
-                value: '0',
-              },
-            ],
-          },
-        ],
+                value: '0'
+              }
+            ]
+          }
+        ]
       });
       store.setState({
-        rtspCameras,
+        rtspCameras
       });
     },
     updateCameraField(state, index, field, value) {
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           [field]: {
-            $set: value,
-          },
-        },
+            $set: value
+          }
+        }
       });
       store.setState({
-        rtspCameras,
+        rtspCameras
       });
     },
     updateCameraUrl(state, index, value) {
       const trimmedValue = value && value.trim ? value.trim() : value;
-      let cameraUrlParamIndex = state.rtspCameras[index].params.findIndex((param) => param.name === 'CAMERA_URL');
+      let cameraUrlParamIndex = state.rtspCameras[index].params.findIndex(param => param.name === 'CAMERA_URL');
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           cameraUrl: {
             value: {
-              $set: trimmedValue,
-            },
+              $set: trimmedValue
+            }
           },
           params: {
             [cameraUrlParamIndex]: {
               value: {
-                $set: trimmedValue,
-              },
-            },
-          },
-        },
+                $set: trimmedValue
+              }
+            }
+          }
+        }
       });
       store.setState({
-        rtspCameras,
+        rtspCameras
       });
     },
     updateCameraRotation(state, index, value) {
       let cameraRotationParamIndex = state.rtspCameras[index].params.findIndex(
-        (param) => param.name === 'CAMERA_ROTATION',
+        param => param.name === 'CAMERA_ROTATION'
       );
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           cameraRotation: {
             value: {
-              $set: value,
-            },
+              $set: value
+            }
           },
           params: {
             [cameraRotationParamIndex]: {
               value: {
-                $set: value,
-              },
-            },
-          },
-        },
+                $set: value
+              }
+            }
+          }
+        }
       });
       store.setState({
-        rtspCameras,
+        rtspCameras
       });
     },
     async saveCamera(state, index) {
@@ -209,11 +209,11 @@ function createActions(store) {
       newCamera = await actions.complete(newCamera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
-          $set: newCamera,
-        },
+          $set: newCamera
+        }
       });
       store.setState({
-        rtspCameras,
+        rtspCameras
       });
     },
     async deleteCamera(state, index) {
@@ -222,10 +222,10 @@ function createActions(store) {
         await state.httpClient.delete(`/api/v1/device/${camera.selector}`);
       }
       const rtspCameras = update(state.rtspCameras, {
-        $splice: [[index, 1]],
+        $splice: [[index, 1]]
       });
       store.setState({
-        rtspCameras,
+        rtspCameras
       });
     },
     async testConnection(state, index) {
@@ -234,26 +234,26 @@ function createActions(store) {
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           cameraImage: {
-            $set: cameraImage,
-          },
-        },
+            $set: cameraImage
+          }
+        }
       });
       store.setState({
-        rtspCameras,
+        rtspCameras
       });
     },
     async search(state, e) {
       store.setState({
-        rtspCameraSearch: e.target.value,
+        rtspCameraSearch: e.target.value
       });
       await actions.getRtspCameraDevices(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getRtspCameraOrderDir: e.target.value,
+        getRtspCameraOrderDir: e.target.value
       });
       await actions.getRtspCameraDevices(store.getState());
-    },
+    }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
 

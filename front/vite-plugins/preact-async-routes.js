@@ -5,7 +5,7 @@ const PLUGIN_QUERY = '?preact-async-route';
 const ASYNC_LOADER_MODULE = '@preact/async-loader/async.js';
 const ROUTE_ENTRY_PATTERN = /\/src\/routes\/(?:[^/]+\.(?:jsx?|tsx?)|[^/]+\/index\.(?:jsx?|tsx?))$/;
 
-const cleanFilename = (name) => name.replace(/(^\/routes\/|(\/index)?\.[jt]sx?$)/g, '');
+const cleanFilename = name => name.replace(/(^\/routes\/|(\/index)?\.[jt]sx?$)/g, '');
 
 export function getRouteChunkName(filePath, srcRoot) {
   const relativePath = '/' + relative(srcRoot, filePath).replace(/\\/g, '/');
@@ -29,7 +29,7 @@ export function preactAsyncRoutes({ srcRoot = resolve(fileURLToPath(new URL('.',
       }
 
       const realSource = source.slice(0, -PLUGIN_QUERY.length);
-      return this.resolve(realSource, importer, { skipSelf: true }).then((resolved) => {
+      return this.resolve(realSource, importer, { skipSelf: true }).then(resolved => {
         if (!resolved) {
           return null;
         }
@@ -66,8 +66,8 @@ function load(cb) {
 
 export default async(load);
 `,
-        map: null,
+        map: null
       };
-    },
+    }
   };
 }

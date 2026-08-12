@@ -25,7 +25,7 @@ const DEFAULT_COLORS = [
   '#00cec9',
   '#e84393',
   '#e17055',
-  '#636e72',
+  '#636e72'
 ];
 const DEFAULT_COLORS_NAME = ['blue', 'red', 'green', 'yellow', 'purple', 'aqua', 'pink', 'orange', 'grey'];
 
@@ -34,12 +34,16 @@ class ApexChartComponent extends Component {
   addDateFormatter(options) {
     let formatter;
     if (this.props.interval <= 24 * 60) {
-      formatter = (value) => {
-        return dayjs(value).locale(this.props.user.language).format('LLL');
+      formatter = value => {
+        return dayjs(value)
+          .locale(this.props.user.language)
+          .format('LLL');
       };
     } else {
-      formatter = (value) => {
-        return dayjs(value).locale(this.props.user.language).format('LL');
+      formatter = value => {
+        return dayjs(value)
+          .locale(this.props.user.language)
+          .format('LL');
       };
     }
     // Configure tooltip with fixed position and date formatter
@@ -49,11 +53,11 @@ class ApexChartComponent extends Component {
         enabled: true,
         position: 'topLeft',
         offsetX: 0,
-        offsetY: -30,
+        offsetY: -30
       },
       x: {
-        formatter,
-      },
+        formatter
+      }
     };
   }
   addDateFormatterRangeBar(options) {
@@ -80,21 +84,29 @@ class ApexChartComponent extends Component {
     let formatter_custom;
     const dictionnary = this.props.dictionary.dashboard.boxes.chart;
     if (this.props.interval <= 24 * 60) {
-      formatter_custom = (opts) => {
-        const startDate = dayjs(opts.y1).locale(this.props.user.language).format('LL - LTS');
-        const endDate = dayjs(opts.y2).locale(this.props.user.language).format('LL - LTS');
+      formatter_custom = opts => {
+        const startDate = dayjs(opts.y1)
+          .locale(this.props.user.language)
+          .format('LL - LTS');
+        const endDate = dayjs(opts.y2)
+          .locale(this.props.user.language)
+          .format('LL - LTS');
 
         return createTooltipContent(opts, startDate, endDate);
       };
     } else {
-      formatter_custom = (opts) => {
-        const startDate = dayjs(opts.y1).locale(this.props.user.language).format('LL');
-        const endDate = dayjs(opts.y2).locale(this.props.user.language).format('LL');
+      formatter_custom = opts => {
+        const startDate = dayjs(opts.y1)
+          .locale(this.props.user.language)
+          .format('LL');
+        const endDate = dayjs(opts.y2)
+          .locale(this.props.user.language)
+          .format('LL');
 
         return createTooltipContent(opts, startDate, endDate);
       };
     }
-    options.tooltip.custom = function (opts) {
+    options.tooltip.custom = function(opts) {
       return formatter_custom(opts);
     };
   }
@@ -108,7 +120,7 @@ class ApexChartComponent extends Component {
       defaultLocale: this.props.user.language,
       yAxisFormatter: this.props.y_axis_formatter,
       yAxisUnit: this.props.y_axis_unit,
-      disableZoom: this.props.disable_zoom,
+      disableZoom: this.props.disable_zoom
     });
     this.addDateFormatter(options);
     // Apply custom tooltip formatters if provided
@@ -140,7 +152,7 @@ class ApexChartComponent extends Component {
       displayAxes: this.props.display_axes,
       colors: mergeArray(this.props.colors, DEFAULT_COLORS),
       locales: [fr, en, de],
-      defaultLocale: this.props.user.language,
+      defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
 
@@ -161,7 +173,7 @@ class ApexChartComponent extends Component {
       displayAxes: this.props.display_axes,
       series: this.props.series,
       locales: [fr, en, de],
-      defaultLocale: this.props.user.language,
+      defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
     return options;
@@ -181,7 +193,7 @@ class ApexChartComponent extends Component {
       displayAxes: this.props.display_axes,
       series: this.props.series,
       locales: [fr, en, de],
-      defaultLocale: this.props.user.language,
+      defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
     return options;
@@ -202,7 +214,7 @@ class ApexChartComponent extends Component {
       displayAxes: this.props.display_axes,
       series: this.props.series,
       locales: [fr, en, de],
-      defaultLocale: this.props.user.language,
+      defaultLocale: this.props.user.language
     });
     this.addDateFormatterRangeBar(options);
     return options;

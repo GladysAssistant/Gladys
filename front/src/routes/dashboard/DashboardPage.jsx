@@ -26,10 +26,10 @@ const DashboardPage = ({ children, ...props }) => (
                       </button>
                       <div
                         class={cx('dropdown-menu', {
-                          show: props.dashboardDropdownOpened,
+                          show: props.dashboardDropdownOpened
                         })}
                       >
-                        {props.dashboards.map((dashboard) => (
+                        {props.dashboards.map(dashboard => (
                           <Link
                             class={cx('dropdown-item', style.dropdownItemBiggerLines)}
                             href={`/dashboard/${dashboard.selector}`}

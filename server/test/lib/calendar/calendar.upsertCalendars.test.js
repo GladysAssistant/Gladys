@@ -26,10 +26,7 @@ describe('calendar.upsertCalendars', () => {
     expect(createdCalendar).to.have.property('shared', false);
 
     // The user takes ownership of sync/shared, then the integration republishes
-    await db.Calendar.update(
-      { sync: false, shared: true },
-      { where: { external_id: 'ext:my-int:john:primary' } },
-    );
+    await db.Calendar.update({ sync: false, shared: true }, { where: { external_id: 'ext:my-int:john:primary' } });
     const second = await calendar.upsertCalendars(USER_A, SERVICE_ID, [
       { external_id: 'ext:my-int:john:primary', name: 'Primary renamed', description: 'Desc', color: '#123456' },
     ]);

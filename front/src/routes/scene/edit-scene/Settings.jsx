@@ -9,13 +9,13 @@ class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      cardOpened: false,
+      cardOpened: false
     };
   }
 
   openCloseCard = () => {
     this.setState({
-      cardOpened: !this.state.cardOpened,
+      cardOpened: !this.state.cardOpened
     });
   };
 
@@ -28,7 +28,7 @@ class Settings extends Component {
             <i
               class={cx('fe', 'mr-2', {
                 'fe-chevron-right': !cardOpened,
-                'fe-chevron-down': cardOpened,
+                'fe-chevron-down': cardOpened
               })}
             />
             <h4 class="text-center card-title ">
@@ -38,12 +38,12 @@ class Settings extends Component {
           </div>
           <div
             class={cx('card-body', styles.settings, {
-              [styles.settingsOpen]: cardOpened,
+              [styles.settingsOpen]: cardOpened
             })}
           >
             <div
               class={cx('dimmer', {
-                active: props.saving,
+                active: props.saving
               })}
             >
               <div class="loader" />
@@ -84,13 +84,13 @@ class Settings extends Component {
                     </div>
                     <Localizer>
                       <CreatableSelect
-                        defaultValue={props.scene.tags.map((tag) => ({ value: tag.name, label: tag.name }))}
+                        defaultValue={props.scene.tags.map(tag => ({ value: tag.name, label: tag.name }))}
                         closeMenuOnSelect={false}
                         isMulti
-                        options={props.tags && props.tags.map((tag) => ({ value: tag.name, label: tag.name }))}
-                        onChange={(tags) => props.setTags(tags.map((tag) => tag.value))}
+                        options={props.tags && props.tags.map(tag => ({ value: tag.name, label: tag.name }))}
+                        onChange={tags => props.setTags(tags.map(tag => tag.value))}
                         placeholder={<Text id="editScene.editTagsPlaceholder" />}
-                        formatCreateLabel={(inputValue) => (
+                        formatCreateLabel={inputValue => (
                           <Text id="editScene.createTag" fields={{ tagName: inputValue }} />
                         )}
                         className="react-select-container"

@@ -8,30 +8,30 @@ function createActions(store) {
   const actions = {
     async getHouses(state) {
       store.setState({
-        housesGetStatus: RequestStatus.Getting,
+        housesGetStatus: RequestStatus.Getting
       });
       try {
         const params = {
-          expand: 'rooms',
+          expand: 'rooms'
         };
         const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
         store.setState({
           housesWithRooms,
-          housesGetStatus: RequestStatus.Success,
+          housesGetStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          housesGetStatus: RequestStatus.Error,
+          housesGetStatus: RequestStatus.Error
         });
       }
     },
     async getBroadlinkRemotes(state) {
       store.setState({
-        getBroadlinkDevicesStatus: RequestStatus.Getting,
+        getBroadlinkDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
-          order_dir: state.getBroadlinkDeviceOrderDir || 'asc',
+          order_dir: state.getBroadlinkDeviceOrderDir || 'asc'
         };
         if (state.broadlinkDeviceSearch && state.broadlinkDeviceSearch.length) {
           options.search = state.broadlinkDeviceSearch;
@@ -39,12 +39,12 @@ function createActions(store) {
         const broadlinkDevices = await state.httpClient.get('/api/v1/service/broadlink/device', options);
         store.setState({
           broadlinkDevices,
-          getBroadlinkDevicesStatus: RequestStatus.Success,
+          getBroadlinkDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
           broadlinkDevices: [],
-          getBroadlinkDevicesStatus: RequestStatus.Error,
+          getBroadlinkDevicesStatus: RequestStatus.Error
         });
       }
     },
@@ -52,8 +52,8 @@ function createActions(store) {
       const savedDevice = await state.httpClient.post('/api/v1/device', device);
       const newState = update(state, {
         broadlinkDevices: {
-          $splice: [[index, 1, savedDevice]],
-        },
+          $splice: [[index, 1, savedDevice]]
+        }
       });
       store.setState(newState);
     },
@@ -61,20 +61,20 @@ function createActions(store) {
       await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       const newState = update(state, {
         broadlinkDevices: {
-          $splice: [[index, 1]],
-        },
+          $splice: [[index, 1]]
+        }
       });
       store.setState(newState);
     },
     async search(state, e) {
       store.setState({
-        broadlinkDeviceSearch: e.target.value,
+        broadlinkDeviceSearch: e.target.value
       });
       await actions.getBroadlinkRemotes(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getBroadlinkDeviceOrderDir: e.target.value,
+        getBroadlinkDeviceOrderDir: e.target.value
       });
       await actions.getBroadlinkRemotes(store.getState());
     },
@@ -82,11 +82,11 @@ function createActions(store) {
       try {
         const broadlinkPeripherals = await state.httpClient.get('/api/v1/service/broadlink/peripheral');
         store.setState({
-          broadlinkPeripherals: broadlinkPeripherals.filter((p) => p.canLearn),
+          broadlinkPeripherals: broadlinkPeripherals.filter(p => p.canLearn)
         });
       } catch (e) {
         store.setState({
-          broadlinkPeripherals: [],
+          broadlinkPeripherals: []
         });
       }
     },
@@ -94,15 +94,15 @@ function createActions(store) {
       const broadlinkDevices = update(state.broadlinkDevices, {
         [remoteIndex]: {
           [property]: {
-            $set: value,
-          },
-        },
+            $set: value
+          }
+        }
       });
 
       store.setState({
-        broadlinkDevices,
+        broadlinkDevices
       });
-    },
+    }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
   return Object.assign({}, integrationActions, actions);

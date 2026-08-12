@@ -2,7 +2,7 @@ import { connect } from 'unistore/preact';
 import MELCloudPage from '../MELCloudPage';
 import UpdateDevice from '../../../../../components/device';
 
-const EditMELCloudDevice = (props) => (
+const EditMELCloudDevice = props => (
   <MELCloudPage user={props.user}>
     <UpdateDevice
       {...props}

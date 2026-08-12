@@ -6,14 +6,14 @@ const DEFAULT_OPTIONS = {
   speechThreshold: 0.015,
   silenceDurationMs: 1200,
   maxDurationMs: 30000,
-  maxWaitForSpeechMs: 12000,
+  maxWaitForSpeechMs: 12000
 };
 
 const SPEECH_AUDIO_CONSTRAINTS = {
   channelCount: 1,
   echoCancellation: true,
   noiseSuppression: true,
-  autoGainControl: true,
+  autoGainControl: true
 };
 
 const WORKLET_NAME = 'gladys-speech-command-recorder';
@@ -184,7 +184,7 @@ function isAbortError(error) {
  * stopStream(stream);
  */
 function stopStream(stream) {
-  stream.getTracks().forEach((track) => track.stop());
+  stream.getTracks().forEach(track => track.stop());
 }
 
 /**
@@ -248,7 +248,7 @@ function mergeChunks(chunks) {
   const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
   const samples = new Float32Array(totalLength);
   let offset = 0;
-  chunks.forEach((chunk) => {
+  chunks.forEach(chunk => {
     samples.set(chunk, offset);
     offset += chunk.length;
   });
@@ -428,7 +428,7 @@ function buildWorkletOptions(options) {
     speechThreshold: options.speechThreshold,
     silenceDurationMs: options.silenceDurationMs,
     maxDurationMs: options.maxDurationMs,
-    maxWaitForSpeechMs: options.maxWaitForSpeechMs,
+    maxWaitForSpeechMs: options.maxWaitForSpeechMs
   };
 }
 
@@ -459,7 +459,7 @@ async function recordWithAudioWorklet(stream, options) {
       numberOfInputs: 1,
       numberOfOutputs: 1,
       channelCount: 1,
-      processorOptions: buildWorkletOptions(options),
+      processorOptions: buildWorkletOptions(options)
     });
     silentGain = audioContext.createGain();
     silentGain.gain.value = 0;
@@ -518,7 +518,7 @@ async function recordWithAudioWorklet(stream, options) {
       options.signal.addEventListener('abort', abort, { once: true });
     }
 
-    recorderNode.port.onmessage = (event) => {
+    recorderNode.port.onmessage = event => {
       const { data } = event;
       if (!data) {
         return;
@@ -600,7 +600,7 @@ async function recordWithScriptProcessor(stream, options) {
   };
 
   return new Promise((resolve, reject) => {
-    const finish = (reason) => {
+    const finish = reason => {
       if (finished) {
         return;
       }
@@ -637,7 +637,7 @@ async function recordWithScriptProcessor(stream, options) {
       options.signal.addEventListener('abort', abort, { once: true });
     }
 
-    processor.onaudioprocess = (event) => {
+    processor.onaudioprocess = event => {
       if (finished) {
         return;
       }

@@ -8,18 +8,18 @@ import Select from 'react-select';
 import SubmitConfiguration from '../components/SubmitConfiguration';
 
 class SetupLocalOptions extends Component {
-  updateZigbeeDriverPath = (option) => {
+  updateZigbeeDriverPath = option => {
     const z2mDriverPath = get(option, 'value');
     this.setState({ z2mDriverPath });
   };
 
-  updateZigbeeDongleName = (option) => {
+  updateZigbeeDongleName = option => {
     const z2mDongleName = get(option, 'value');
     const z2mDongleConfigKey = get(option, 'configKey') || null;
     this.setState({ z2mDongleName, z2mDongleConfigKey });
   };
 
-  updateTcpPort = (e) => {
+  updateTcpPort = e => {
     const { value } = e.target;
     const z2mTcpPort = value.trim() === '' ? null : value;
     this.setState({ z2mTcpPort });
@@ -40,51 +40,51 @@ class SetupLocalOptions extends Component {
 
   loadUsbPorts = async () => {
     this.setState({
-      loadUsbPortsStatus: RequestStatus.Getting,
+      loadUsbPortsStatus: RequestStatus.Getting
     });
 
     try {
       const rawUsbPorts = await this.props.httpClient.get('/api/v1/service/usb/port');
       // Remove duplicated (dupe /dev/ttyUSB0 seen with Synology systems)
       const usbPortsMap = {};
-      rawUsbPorts.forEach((usbPort) => {
+      rawUsbPorts.forEach(usbPort => {
         const label = [usbPort.comPath, usbPort.comName, usbPort.comVID].filter(Boolean).join(' - ');
         usbPortsMap[usbPort.comPath] = { label, value: usbPort.comPath };
       });
       const usbPorts = Object.values(usbPortsMap);
       this.setState({
         usbPorts,
-        loadUsbPortsStatus: RequestStatus.Success,
+        loadUsbPortsStatus: RequestStatus.Success
       });
     } catch (e) {
       console.error('Failed to load USB ports', e);
       this.setState({
-        loadUsbPortsStatus: RequestStatus.Error,
+        loadUsbPortsStatus: RequestStatus.Error
       });
     }
   };
 
   loadZigbeeAdapters = async () => {
     this.setState({
-      loadZigbeeAdaptersStatus: RequestStatus.Getting,
+      loadZigbeeAdaptersStatus: RequestStatus.Getting
     });
 
     try {
       const adapters = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/adapter');
-      const zigbeeAdapters = adapters.map((adapter) => ({
+      const zigbeeAdapters = adapters.map(adapter => ({
         label: adapter.label,
         value: adapter.label,
-        configKey: adapter.configKey,
+        configKey: adapter.configKey
       }));
 
       this.setState({
         zigbeeAdapters,
-        loadZigbeeAdaptersStatus: RequestStatus.Success,
+        loadZigbeeAdaptersStatus: RequestStatus.Success
       });
     } catch (e) {
       console.error('Failed to load Zigbee adapters', e);
       this.setState({
-        loadZigbeeAdaptersStatus: RequestStatus.Error,
+        loadZigbeeAdaptersStatus: RequestStatus.Error
       });
     }
   };
@@ -106,7 +106,7 @@ class SetupLocalOptions extends Component {
     return majorrel < 7 || (majorrel === 7 && minorrel < 4);
   };
 
-  buildSelectOption = (value) => {
+  buildSelectOption = value => {
     if (value) {
       return { label: value, value };
     }
@@ -129,7 +129,7 @@ class SetupLocalOptions extends Component {
       zigbeeAdapters: [],
       loadZigbeeAdaptersStatus: RequestStatus.Getting,
       z2mTcpPort,
-      mqttMode: MQTT_MODE.LOCAL,
+      mqttMode: MQTT_MODE.LOCAL
     };
   }
 
@@ -140,15 +140,7 @@ class SetupLocalOptions extends Component {
 
   render(
     { disabled },
-    {
-      z2mDriverPath,
-      usbPorts,
-      loadUsbPortsStatus,
-      z2mDongleName,
-      zigbeeAdapters,
-      loadZigbeeAdaptersStatus,
-      z2mTcpPort,
-    },
+    { z2mDriverPath, usbPorts, loadUsbPortsStatus, z2mDongleName, zigbeeAdapters, loadZigbeeAdaptersStatus, z2mTcpPort }
   ) {
     const emberFirmwareTooOld = this.isEmberFirmwareTooOld();
     return (

@@ -11,17 +11,17 @@ class LevelMatterSensorDeviceState extends Component {
   };
 
   getOptions = () => {
-    const options = Object.keys(LEVEL_MATTER_STATE).map((key) => {
+    const options = Object.keys(LEVEL_MATTER_STATE).map(key => {
       const value = LEVEL_MATTER_STATE[key];
       return {
         label: get(
           this.props.intl.dictionary,
           `deviceFeatureValue.category.level-matter-index-sensor.level-state.${value}`,
           {
-            default: value,
-          },
+            default: value
+          }
         ),
-        value,
+        value
       };
     });
 
@@ -35,7 +35,7 @@ class LevelMatterSensorDeviceState extends Component {
   }
 
   render({ trigger }, { options }) {
-    const defaultValue = options.find((option) => trigger.value === option.value);
+    const defaultValue = options.find(option => trigger.value === option.value);
 
     return (
       <Fragment>

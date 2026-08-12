@@ -13,18 +13,18 @@ class NetatmoDiscoverPage extends Component {
       this.setState({
         connectNetatmoStatus: netatmoStatus.status,
         connected: netatmoStatus.connected,
-        configured: netatmoStatus.configured,
+        configured: netatmoStatus.configured
       });
     } catch (e) {
       this.setState({
         netatmoConnectionError: RequestStatus.NetworkError,
-        errored: true,
+        errored: true
       });
       console.error(e);
     }
   };
 
-  updateStatus = async (state) => {
+  updateStatus = async state => {
     let connected = false;
     let configured = false;
     if (
@@ -44,11 +44,11 @@ class NetatmoDiscoverPage extends Component {
     await this.setState({
       connectNetatmoStatus: state.status,
       connected,
-      configured,
+      configured
     });
   };
 
-  updateStatusError = async (state) => {
+  updateStatusError = async state => {
     switch (state.statusType) {
       case STATUS.CONNECTING:
         if (state.status !== 'other_error') {
@@ -56,13 +56,13 @@ class NetatmoDiscoverPage extends Component {
             connectNetatmoStatus: STATUS.DISCONNECTED,
             connected: false,
             accessDenied: true,
-            messageAlert: state.status,
+            messageAlert: state.status
           });
         } else {
           this.setState({
             connectNetatmoStatus: STATUS.DISCONNECTED,
             connected: false,
-            errored: true,
+            errored: true
           });
         }
         break;
@@ -72,27 +72,27 @@ class NetatmoDiscoverPage extends Component {
             connectNetatmoStatus: STATUS.DISCONNECTED,
             connected: false,
             accessDenied: true,
-            messageAlert: state.status,
+            messageAlert: state.status
           });
         } else if (state.status === 'invalid_client') {
           this.setState({
             connectNetatmoStatus: STATUS.DISCONNECTED,
             connected: false,
             accessDenied: true,
-            messageAlert: state.status,
+            messageAlert: state.status
           });
         } else {
           this.setState({
             connectNetatmoStatus: STATUS.DISCONNECTED,
             connected: false,
-            errored: true,
+            errored: true
           });
         }
         break;
     }
   };
 
-  handleStateUpdateFromChild = (newState) => {
+  handleStateUpdateFromChild = newState => {
     this.setState(newState);
   };
 
@@ -102,7 +102,7 @@ class NetatmoDiscoverPage extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING, this.updateStatusError);
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
-      this.updateStatus,
+      this.updateStatus
     );
   }
 
@@ -110,11 +110,11 @@ class NetatmoDiscoverPage extends Component {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING,
-      this.updateStatusError,
+      this.updateStatusError
     );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
-      this.updateStatus,
+      this.updateStatus
     );
   }
 

@@ -41,23 +41,23 @@ class MapComponent extends Component {
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://cartodb.com/attributions">CartoDB</a>',
         subdomains: 'abcd',
         maxZoom: 19,
-        noCache: true,
+        noCache: true
       })
       .addTo(this.leafletMap);
 
     this.leafletMap.on('click', this.onClickOnMap);
   };
 
-  onClickOnMap = (e) => {
+  onClickOnMap = e => {
     this.props.setLatLong(e.latlng.lat, e.latlng.lng);
   };
 
-  setPinMap = (props) => {
+  setPinMap = props => {
     if (this.areaCircle) {
       this.areaCircle.remove();
     } else if (!props.creationMode) {
       this.leafletMap.flyTo([props.latitude, props.longitude], 17, {
-        duration: 0.25,
+        duration: 0.25
       });
     }
     this.areaCircle = leaflet
@@ -65,18 +65,18 @@ class MapComponent extends Component {
         radius: props.radius,
         color: props.color,
         fillColor: props.color,
-        fillOpacity: 0.2,
+        fillOpacity: 0.2
       })
       .addTo(this.leafletMap);
   };
 
-  setMapRef = (map) => {
+  setMapRef = map => {
     this.map = map;
   };
 
   displayHouses = (props, options = {}) => {
     if (props.houses) {
-      props.houses.forEach((house) => {
+      props.houses.forEach(house => {
         if (this.houseMarkers[house.id]) {
           this.houseMarkers[house.id].remove();
         }
@@ -86,8 +86,8 @@ class MapComponent extends Component {
               icon: leaflet.icon({
                 iconUrl: '/assets/images/home-icon.png',
                 iconSize: [40, 40],
-                className: style.houseIconImage,
-              }),
+                className: style.houseIconImage
+              })
             })
             .addTo(this.leafletMap);
           this.markerArray.push(this.houseMarkers[house.id]);
@@ -132,14 +132,14 @@ class MapComponent extends Component {
           latitude: latlng.lat,
           longitude: latlng.lng,
           radius,
-          color: this.props.color || '#3498db', // Use current color or default
+          color: this.props.color || '#3498db' // Use current color or default
         };
       }
 
       // Reinitialize the map with the current view settings
       this.initMap({
         center: [center.lat, center.lng], // Pass as array format which Leaflet expects
-        zoom,
+        zoom
       });
 
       // Redisplay houses

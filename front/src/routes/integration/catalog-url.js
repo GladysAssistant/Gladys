@@ -10,10 +10,10 @@ const CATALOG_PATHS = new Set([
   CATALOG_BASE_URL,
   `${CATALOG_BASE_URL}/favorites`,
   `${CATALOG_BASE_URL}/updates`,
-  ...categories.map((category) => `${CATALOG_BASE_URL}/${category.type}`),
+  ...categories.map(category => `${CATALOG_BASE_URL}/${category.type}`)
 ]);
 
-export const getCatalogPath = (category) => (category ? `${CATALOG_BASE_URL}/${category}` : CATALOG_BASE_URL);
+export const getCatalogPath = category => (category ? `${CATALOG_BASE_URL}/${category}` : CATALOG_BASE_URL);
 
 const buildFilterParams = ({ searchKeyword, orderDir }) => {
   const urlParams = new URLSearchParams();
@@ -45,7 +45,7 @@ export const getCatalogFilters = (queryString = window.location.search) => {
     searchKeyword: urlParams.get('search') || '',
     // a hand-written URL could carry anything: an unknown direction would
     // leave the catalog unsorted and the sort selector out of sync
-    orderDir: ORDER_DIRS.includes(orderDir) ? orderDir : DEFAULT_ORDER_DIR,
+    orderDir: ORDER_DIRS.includes(orderDir) ? orderDir : DEFAULT_ORDER_DIR
   };
 };
 
@@ -67,7 +67,7 @@ export const getUrlFromCatalog = (path, { category, searchKeyword, orderDir }) =
 // falls back to the whole catalog.
 let lastCatalogUrl = null;
 
-export const rememberCatalogUrl = (url) => {
+export const rememberCatalogUrl = url => {
   lastCatalogUrl = url;
 };
 
@@ -75,7 +75,7 @@ export const rememberCatalogUrl = (url) => {
 // is compared to the known catalog views. It is written from getCatalogUrl()
 // alone today: checking it keeps the guarantee held by the "from" parameter,
 // that this helper never sends the user outside of the catalog
-const isCatalogUrl = (url) => typeof url === 'string' && CATALOG_PATHS.has(url.split('?')[0]);
+const isCatalogUrl = url => typeof url === 'string' && CATALOG_PATHS.has(url.split('?')[0]);
 
 export const getBackToCatalogUrl = (queryString = window.location.search) => {
   const from = new URLSearchParams(queryString).get('from');

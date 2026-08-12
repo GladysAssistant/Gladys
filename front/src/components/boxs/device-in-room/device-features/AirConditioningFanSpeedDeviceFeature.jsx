@@ -13,10 +13,10 @@ const FAN_SPEED_OPTIONS = [
   { value: AC_FAN_SPEED.MID_HIGH, i18nKey: 'mid-high' },
   { value: AC_FAN_SPEED.HIGH, i18nKey: 'high' },
   { value: AC_FAN_SPEED.QUIET, i18nKey: 'quiet' },
-  { value: AC_FAN_SPEED.TURBO, i18nKey: 'turbo' },
+  { value: AC_FAN_SPEED.TURBO, i18nKey: 'turbo' }
 ];
 
-const AirConditioningFanSpeedDeviceFeature = (props) => {
+const AirConditioningFanSpeedDeviceFeature = props => {
   const { deviceFeature } = props;
   const { category, type } = deviceFeature;
   const rawValue = deviceFeature.last_value;
@@ -25,7 +25,7 @@ const AirConditioningFanSpeedDeviceFeature = (props) => {
   // Only offer the speeds this AC supports (its supported_options); a feature without restrictions
   // keeps the full list. The control shows buttons when they fit on one line, a dropdown otherwise.
   const options = resolveFeatureOptions(deviceFeature, FAN_SPEED_OPTIONS);
-  const updateValue = (value) => props.updateValueWithDebounce(deviceFeature, value);
+  const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
 
   return (
     <tr>

@@ -7,37 +7,37 @@ class SettingsSystemTimeExpiryState extends Component {
   getNumberOfHoursBeforeStateIsOutdated = async () => {
     try {
       const { value } = await this.props.httpClient.get(
-        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED}`,
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED}`
       );
       this.setState({
-        numberOfHoursBeforeStateIsOutdated: value,
+        numberOfHoursBeforeStateIsOutdated: value
       });
     } catch (e) {
       console.error(e);
       // if variable doesn't exist, value is 48
       this.setState({
-        numberOfHoursBeforeStateIsOutdated: 48,
+        numberOfHoursBeforeStateIsOutdated: 48
       });
     }
   };
 
-  updateNumberOfHoursBeforeStateIsOutdated = async (e) => {
+  updateNumberOfHoursBeforeStateIsOutdated = async e => {
     await this.setState({
       numberOfHoursBeforeStateIsOutdated: e.target.value,
-      savingNumberOfHourseBeforeStateIsOutdated: true,
+      savingNumberOfHourseBeforeStateIsOutdated: true
     });
     try {
       await this.props.httpClient.post(
         `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED}`,
         {
-          value: e.target.value,
-        },
+          value: e.target.value
+        }
       );
     } catch (e) {
       console.error(e);
     }
     await this.setState({
-      savingNumberOfHourseBeforeStateIsOutdated: false,
+      savingNumberOfHourseBeforeStateIsOutdated: false
     });
   };
 

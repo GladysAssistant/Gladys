@@ -9,10 +9,10 @@ const MODE_OPTIONS = [
   { value: THERMOSTAT_MODE.OFF, i18nKey: 'off' },
   { value: THERMOSTAT_MODE.HEATING, i18nKey: 'heating' },
   { value: THERMOSTAT_MODE.COOLING, i18nKey: 'cooling' },
-  { value: THERMOSTAT_MODE.AUTO, i18nKey: 'auto' },
+  { value: THERMOSTAT_MODE.AUTO, i18nKey: 'auto' }
 ];
 
-const ThermostatModeDeviceFeature = (props) => {
+const ThermostatModeDeviceFeature = props => {
   const { deviceFeature } = props;
   const { category, type } = deviceFeature;
   const rawValue = deviceFeature.last_value;
@@ -27,10 +27,10 @@ const ThermostatModeDeviceFeature = (props) => {
     Array.isArray(deviceFeature.supported_options) && deviceFeature.supported_options.length > 0;
   const options = hasSupportedOptions
     ? resolveFeatureOptions(deviceFeature, MODE_OPTIONS)
-    : MODE_OPTIONS.filter((option) => option.value <= THERMOSTAT_MODE.HEATING || option.value <= deviceFeature.max).map(
-        (option) => ({ value: option.value, i18nKey: option.i18nKey }),
-      );
-  const updateValue = (value) => props.updateValueWithDebounce(deviceFeature, value);
+    : MODE_OPTIONS.filter(
+        option => option.value <= THERMOSTAT_MODE.HEATING || option.value <= deviceFeature.max
+      ).map(option => ({ value: option.value, i18nKey: option.i18nKey }));
+  const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
 
   return (
     <tr>

@@ -27,7 +27,7 @@ class SceneRow extends Component {
             onClick={this.startScene}
             type="button"
             class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
-              'btn-loading': loading,
+              'btn-loading': loading
             })}
             disabled={loading}
           >

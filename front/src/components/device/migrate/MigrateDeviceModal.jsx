@@ -18,7 +18,7 @@ class MigrateDeviceModal extends Component {
     loadError: false,
     migrateError: false,
     networkError: false,
-    report: null,
+    report: null
   };
 
   componentDidMount() {
@@ -30,13 +30,13 @@ class MigrateDeviceModal extends Component {
     document.removeEventListener('keydown', this.handleKeyDown);
   }
 
-  handleKeyDown = (e) => {
+  handleKeyDown = e => {
     if (e.key === 'Escape') {
       this.close();
     }
   };
 
-  handleOverlayClick = (e) => {
+  handleOverlayClick = e => {
     if (e.target === e.currentTarget) {
       this.close();
     }
@@ -61,7 +61,7 @@ class MigrateDeviceModal extends Component {
       // The destination cannot be the source itself, nor another device of
       // the same (deprecated) integration
       const candidates = devices.filter(
-        (device) => device.id !== this.props.device.id && device.service_id !== this.props.device.service_id,
+        device => device.id !== this.props.device.id && device.service_id !== this.props.device.service_id
       );
       this.setState({ devices: candidates, loading: false });
     } catch (e) {
@@ -70,12 +70,12 @@ class MigrateDeviceModal extends Component {
     }
   };
 
-  selectDestination = (option) => {
+  selectDestination = option => {
     if (!option) {
       this.setState({ destinationDevice: null, featuresMapping: {} });
       return;
     }
-    const destinationDevice = this.state.devices.find((device) => device.selector === option.value);
+    const destinationDevice = this.state.devices.find(device => device.selector === option.value);
     this.setState({ destinationDevice, featuresMapping: this.computeAutoMapping(destinationDevice) });
   };
 
@@ -90,22 +90,22 @@ class MigrateDeviceModal extends Component {
   // across a migration (like Z-Wave's `10-38-1-…` / `10-38-2-…`) then still
   // get an exact, unambiguous match instead of falling back to "do not
   // migrate" for every row.
-  computeAutoMapping = (destinationDevice) => {
+  computeAutoMapping = destinationDevice => {
     const featuresMapping = {};
     const usedSelectors = new Set();
-    (this.props.device.features || []).forEach((sourceFeature) => {
+    (this.props.device.features || []).forEach(sourceFeature => {
       const candidates = destinationDevice.features.filter(
-        (feature) =>
+        feature =>
           feature.category === sourceFeature.category &&
           feature.type === sourceFeature.type &&
           (feature.unit || null) === (sourceFeature.unit || null) &&
-          !usedSelectors.has(feature.selector),
+          !usedSelectors.has(feature.selector)
       );
       let match = null;
       if (candidates.length === 1) {
         match = candidates[0];
       } else if (candidates.length > 1) {
-        const sameName = candidates.filter((feature) => feature.name === sourceFeature.name);
+        const sameName = candidates.filter(feature => feature.name === sourceFeature.name);
         if (sameName.length === 1) {
           match = sameName[0];
         }
@@ -139,7 +139,7 @@ class MigrateDeviceModal extends Component {
     try {
       const report = await this.props.httpClient.post(`/api/v1/device/${this.props.device.selector}/migrate`, {
         destination_device_selector: this.state.destinationDevice.selector,
-        features_mapping: this.state.featuresMapping,
+        features_mapping: this.state.featuresMapping
       });
       this.setState({ report, migrating: false });
     } catch (e) {
@@ -156,29 +156,29 @@ class MigrateDeviceModal extends Component {
     }
   };
 
-  getFeatureLabel = (feature) => {
+  getFeatureLabel = feature => {
     const categoryTypeLabel = get(
       this.props,
-      `intl.dictionary.deviceFeatureCategory.${feature.category}.${feature.type}`,
+      `intl.dictionary.deviceFeatureCategory.${feature.category}.${feature.type}`
     );
     return categoryTypeLabel ? `${feature.name} (${categoryTypeLabel})` : feature.name;
   };
 
-  renderFeatureRow = (sourceFeature) => {
+  renderFeatureRow = sourceFeature => {
     const { destinationDevice, featuresMapping } = this.state;
     const selectedSelector = featuresMapping[sourceFeature.selector] || '';
     const usedElsewhere = new Set(
       Object.keys(featuresMapping)
-        .filter((selector) => selector !== sourceFeature.selector)
-        .map((selector) => featuresMapping[selector]),
+        .filter(selector => selector !== sourceFeature.selector)
+        .map(selector => featuresMapping[selector])
     );
-    const availableFeatures = destinationDevice.features.filter((feature) => !usedElsewhere.has(feature.selector));
+    const availableFeatures = destinationDevice.features.filter(feature => !usedElsewhere.has(feature.selector));
     // Same-type candidates first, so the compatible choices are on top
     const sortedFeatures = [
-      ...availableFeatures.filter((feature) => feature.type === sourceFeature.type),
-      ...availableFeatures.filter((feature) => feature.type !== sourceFeature.type),
+      ...availableFeatures.filter(feature => feature.type === sourceFeature.type),
+      ...availableFeatures.filter(feature => feature.type !== sourceFeature.type)
     ];
-    const selectedFeature = destinationDevice.features.find((feature) => feature.selector === selectedSelector);
+    const selectedFeature = destinationDevice.features.find(feature => feature.selector === selectedSelector);
     const typeMismatch = selectedFeature && selectedFeature.type !== sourceFeature.type;
     // History is moved as raw numbers with no conversion: a different unit
     // (e.g. celsius vs fahrenheit) corrupts charts even when the type matches
@@ -190,10 +190,10 @@ class MigrateDeviceModal extends Component {
         <select
           class="form-control"
           value={selectedSelector}
-          onChange={(e) => this.selectFeature(sourceFeature.selector, e)}
+          onChange={e => this.selectFeature(sourceFeature.selector, e)}
         >
           <option value="">{get(this.props, 'intl.dictionary.device.migrate.doNotMigrate')}</option>
-          {sortedFeatures.map((feature) => (
+          {sortedFeatures.map(feature => (
             <option value={feature.selector}>{this.getFeatureLabel(feature)}</option>
           ))}
         </select>
@@ -213,13 +213,13 @@ class MigrateDeviceModal extends Component {
 
   render(
     { device },
-    { loading, devices, destinationDevice, featuresMapping, migrating, loadError, migrateError, networkError, report },
+    { loading, devices, destinationDevice, featuresMapping, migrating, loadError, migrateError, networkError, report }
   ) {
     const sourceFeatures = device.features || [];
-    const unmappedFeatures = sourceFeatures.filter((feature) => !featuresMapping[feature.selector]);
-    const deviceOptions = devices.map((candidate) => ({
+    const unmappedFeatures = sourceFeatures.filter(feature => !featuresMapping[feature.selector]);
+    const deviceOptions = devices.map(candidate => ({
       value: candidate.selector,
-      label: candidate.name,
+      label: candidate.name
     }));
     return (
       <div class={style.modalOverlay} onClick={this.handleOverlayClick}>
@@ -237,7 +237,7 @@ class MigrateDeviceModal extends Component {
             </div>
             <div
               class={cx('dimmer', {
-                active: loading || migrating,
+                active: loading || migrating
               })}
             >
               <div class="loader" />
@@ -251,7 +251,7 @@ class MigrateDeviceModal extends Component {
                           fields={{
                             states: new Intl.NumberFormat().format(report.duck_db_states_migrated),
                             scenes: report.scenes_updated.length,
-                            dashboards: report.dashboards_updated.length,
+                            dashboards: report.dashboards_updated.length
                           }}
                         />
                       </div>

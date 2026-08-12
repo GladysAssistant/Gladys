@@ -8,18 +8,18 @@ import { DEVICE_FIRMWARE, DEVICE_ONLINE } from '../../../../../../server/service
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class EweLinkDeviceBox extends Component {
-  updateName = (e) => {
+  updateName = e => {
     this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'name', e.target.value);
   };
 
-  updateRoom = (e) => {
+  updateRoom = e => {
     this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'room_id', e.target.value);
   };
 
   saveDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null,
+      errorMessage: null
     });
     try {
       await this.props.saveDevice(this.props.listName, this.props.deviceIndex);
@@ -29,11 +29,11 @@ class EweLinkDeviceBox extends Component {
         errorMessage = 'integration.eWeLink.error.conflictError';
       }
       this.setState({
-        errorMessage,
+        errorMessage
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -42,7 +42,7 @@ class EweLinkDeviceBox extends Component {
       loading: true,
       errorMessage: null,
       tooMuchStatesError: false,
-      statesNumber: undefined,
+      statesNumber: undefined
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
@@ -54,22 +54,22 @@ class EweLinkDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.eWeLink.error.defaultDeletionError',
+          errorMessage: 'integration.eWeLink.error.defaultDeletionError'
         });
       }
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
   render(
     { deviceIndex, device, housesWithRooms, editable, ...props },
-    { loading, errorMessage, tooMuchStatesError, statesNumber },
+    { loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
-    const online = device.params.find((param) => param.name === DEVICE_ONLINE).value === '1';
-    const firmware = device.params.find((param) => param.name === DEVICE_FIRMWARE).value;
+    const online = device.params.find(param => param.name === DEVICE_ONLINE).value === '1';
+    const firmware = device.params.find(param => param.name === DEVICE_FIRMWARE).value;
 
     return (
       <div class="col-md-6">
@@ -82,14 +82,14 @@ class EweLinkDeviceBox extends Component {
               </div>
             </Localizer>
             <div class="page-options d-flex">
-              {device.params.find((param) => param.name === DEVICE_FIRMWARE) && (
+              {device.params.find(param => param.name === DEVICE_FIRMWARE) && (
                 <div class="tag tag-blue">{`Firmware: ${firmware}`}</div>
               )}
             </div>
           </div>
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />
@@ -149,9 +149,9 @@ class EweLinkDeviceBox extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {housesWithRooms &&
-                      housesWithRooms.map((house) => (
+                      housesWithRooms.map(house => (
                         <optgroup label={house.name}>
-                          {house.rooms.map((room) => (
+                          {house.rooms.map(room => (
                             <option selected={room.id === device.room_id} value={room.id}>
                               {room.name}
                             </option>

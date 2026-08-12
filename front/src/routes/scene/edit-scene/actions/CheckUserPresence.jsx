@@ -12,24 +12,24 @@ class CheckUserPresence extends Component {
         this.props.httpClient.get('/api/v1/user'),
         this.props.httpClient.get('/api/v1/house'),
         this.props.httpClient.get('/api/v1/device', {
-          device_feature_category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
-        }),
+          device_feature_category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR
+        })
       ]);
-      const userOptions = users.map((user) => ({
+      const userOptions = users.map(user => ({
         label: user.firstname,
-        value: user.selector,
+        value: user.selector
       }));
-      const houseOptions = houses.map((house) => ({
+      const houseOptions = houses.map(house => ({
         label: house.name,
-        value: house.selector,
+        value: house.selector
       }));
       const deviceOptions = [];
-      presenceDevices.forEach((device) => {
-        const feature = device.features.find((f) => f.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR);
+      presenceDevices.forEach(device => {
+        const feature = device.features.find(f => f.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR);
         if (feature) {
           deviceOptions.push({
             label: device.name,
-            value: feature.selector,
+            value: feature.selector
           });
         }
       });
@@ -39,45 +39,45 @@ class CheckUserPresence extends Component {
       console.error(e);
     }
   };
-  handleChange = (selectedOption) => {
+  handleChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
     } else {
       this.props.updateActionProperty(this.props.path, 'user', null);
     }
   };
-  handleHouseChange = (selectedOption) => {
+  handleHouseChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'house', selectedOption.value);
     } else {
       this.props.updateActionProperty(this.props.path, 'house', null);
     }
   };
-  handleDeviceChange = (selectedOptions) => {
+  handleDeviceChange = selectedOptions => {
     if (selectedOptions && selectedOptions.length) {
-      const deviceFeatures = selectedOptions.map((option) => option.value);
+      const deviceFeatures = selectedOptions.map(option => option.value);
       this.props.updateActionProperty(this.props.path, 'device_features', deviceFeatures);
     } else {
       this.props.updateActionProperty(this.props.path, 'device_features', []);
     }
   };
-  handleChangeDuration = (e) => {
+  handleChangeDuration = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
     this.props.updateActionProperty(this.props.path, 'minutes', newValue);
   };
-  refreshSelectedOptions = (nextProps) => {
+  refreshSelectedOptions = nextProps => {
     let selectedOption = '';
     let selectedHouseOption = '';
     let selectedDeviceOptions = [];
     if (nextProps.action.user && this.state.userOptions) {
-      const userOption = this.state.userOptions.find((option) => option.value === nextProps.action.user);
+      const userOption = this.state.userOptions.find(option => option.value === nextProps.action.user);
 
       if (userOption) {
         selectedOption = userOption;
       }
     }
     if (nextProps.action.house && this.state.houseOptions) {
-      const houseOption = this.state.houseOptions.find((option) => option.value === nextProps.action.house);
+      const houseOption = this.state.houseOptions.find(option => option.value === nextProps.action.house);
 
       if (houseOption) {
         selectedHouseOption = houseOption;
@@ -85,8 +85,8 @@ class CheckUserPresence extends Component {
     }
     if (nextProps.action.device_features && this.state.deviceOptions) {
       const deviceOptions = [];
-      nextProps.action.device_features.forEach((deviceFeature) => {
-        const featureOption = this.state.deviceOptions.find((option) => option.value === deviceFeature);
+      nextProps.action.device_features.forEach(deviceFeature => {
+        const featureOption = this.state.deviceOptions.find(option => option.value === deviceFeature);
         if (featureOption) {
           deviceOptions.push(featureOption);
         }
@@ -101,7 +101,7 @@ class CheckUserPresence extends Component {
     this.state = {
       selectedOption: '',
       selectedHouseOption: '',
-      selectedDeviceOption: '',
+      selectedDeviceOption: ''
     };
   }
   componentDidMount() {
@@ -114,8 +114,14 @@ class CheckUserPresence extends Component {
     this.refreshSelectedOptions(nextProps);
   }
   render(props, state) {
-    const { selectedOption, userOptions, houseOptions, selectedHouseOption, deviceOptions, selectedDeviceOptions } =
-      state;
+    const {
+      selectedOption,
+      userOptions,
+      houseOptions,
+      selectedHouseOption,
+      deviceOptions,
+      selectedDeviceOptions
+    } = state;
     return (
       <div>
         <p>

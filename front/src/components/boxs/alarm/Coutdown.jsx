@@ -5,13 +5,13 @@ class Countdown extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      seconds: props.seconds,
+      seconds: props.seconds
     };
   }
 
   updateCountdown() {
     if (this.state.seconds > 0) {
-      this.setState((prevState) => ({ seconds: prevState.seconds - 1, updated: true }));
+      this.setState(prevState => ({ seconds: prevState.seconds - 1, updated: true }));
 
       // Clear the "updated" class after the animation duration (0.5 seconds)
       setTimeout(() => {

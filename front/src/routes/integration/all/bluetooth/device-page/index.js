@@ -21,5 +21,5 @@ class BluetoothDevicePage extends Component {
 
 export default connect(
   'session,user,bluetoothDevices,houses,getBluetoothDevicesStatus,bluetoothDeviceSearch,getBluetoothDeviceOrderDir',
-  actions,
+  actions
 )(BluetoothDevicePage);

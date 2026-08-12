@@ -9,7 +9,7 @@ const MIN_SLIDESHOW_INTERVAL = 0;
 const MAX_SLIDESHOW_INTERVAL = 3600;
 const PREVIEW_DEBOUNCE_MS = 800;
 
-const clampInterval = (value) => Math.min(Math.max(value, MIN_SLIDESHOW_INTERVAL), MAX_SLIDESHOW_INTERVAL);
+const clampInterval = value => Math.min(Math.max(value, MIN_SLIDESHOW_INTERVAL), MAX_SLIDESHOW_INTERVAL);
 
 /**
  * Preview of a photo, loaded through the Gladys proxy like the widget itself, so a photo
@@ -80,7 +80,7 @@ class EditPhotoBox extends Component {
     this.state = { slideshowIntervalInput: null };
   }
 
-  updateName = (e) => {
+  updateName = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { name: e.target.value });
   };
 
@@ -101,17 +101,17 @@ class EditPhotoBox extends Component {
     this.props.updateBoxConfig(this.props.x, this.props.y, { photos });
   };
 
-  removePhoto = (index) => {
+  removePhoto = index => {
     const photos = [...(this.props.box.photos || [])];
     photos.splice(index, 1);
     this.props.updateBoxConfig(this.props.x, this.props.y, { photos });
   };
 
-  updateFit = (e) => {
+  updateFit = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { photo_fit: e.target.value });
   };
 
-  updateSlideshowInterval = (e) => {
+  updateSlideshowInterval = e => {
     const rawValue = e.target.value;
     this.setState({ slideshowIntervalInput: rawValue });
 
@@ -120,7 +120,7 @@ class EditPhotoBox extends Component {
     // it is validated on blur.
     if (!Number.isNaN(value)) {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
-        photo_slideshow_interval: Math.max(value, MIN_SLIDESHOW_INTERVAL),
+        photo_slideshow_interval: Math.max(value, MIN_SLIDESHOW_INTERVAL)
       });
     }
   };
@@ -135,11 +135,11 @@ class EditPhotoBox extends Component {
     const value = parseInt(slideshowIntervalInput, 10);
     this.setState({ slideshowIntervalInput: null });
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      photo_slideshow_interval: Number.isNaN(value) ? 0 : clampInterval(value),
+      photo_slideshow_interval: Number.isNaN(value) ? 0 : clampInterval(value)
     });
   };
 
-  updateShowCaption = (e) => {
+  updateShowCaption = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { photo_show_caption: e.target.checked });
   };
 
@@ -185,7 +185,7 @@ class EditPhotoBox extends Component {
                     class="form-control mb-2"
                     placeholder={<Text id="dashboard.boxes.photo.editUrlPlaceholder" />}
                     value={photo.url || ''}
-                    onInput={(e) => this.updatePhotoUrl(index, e)}
+                    onInput={e => this.updatePhotoUrl(index, e)}
                   />
                 </Localizer>
                 <Localizer>
@@ -194,7 +194,7 @@ class EditPhotoBox extends Component {
                     class="form-control"
                     placeholder={<Text id="dashboard.boxes.photo.editCaptionPlaceholder" />}
                     value={photo.caption || ''}
-                    onInput={(e) => this.updatePhotoCaption(index, e)}
+                    onInput={e => this.updatePhotoCaption(index, e)}
                   />
                 </Localizer>
               </div>

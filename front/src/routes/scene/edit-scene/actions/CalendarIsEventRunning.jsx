@@ -10,37 +10,37 @@ import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import style from './CalendarIsEventRunning.css';
 
-const isNullOrUndefined = (variable) => variable === null || variable === undefined;
+const isNullOrUndefined = variable => variable === null || variable === undefined;
 
 class CheckTime extends Component {
   getCalendars = async () => {
     this.setState({
-      status: RequestStatus.Getting,
+      status: RequestStatus.Getting
     });
     try {
       const calendars = await this.props.httpClient.get('/api/v1/calendar', {
-        shared: true,
+        shared: true
       });
-      const calendarsOptions = calendars.map((calendar) => ({
+      const calendarsOptions = calendars.map(calendar => ({
         value: calendar.selector,
-        label: calendar.name,
+        label: calendar.name
       }));
       await this.setState({
         calendarsOptions,
-        status: RequestStatus.Success,
+        status: RequestStatus.Success
       });
       this.refreshSelectedOptions(this.props.action);
     } catch (e) {
       this.setState({
-        status: RequestStatus.Error,
+        status: RequestStatus.Error
       });
     }
   };
-  updateCalendars = (selectedCalendarsOptions) => {
-    const calendars = selectedCalendarsOptions.map((o) => o.value);
+  updateCalendars = selectedCalendarsOptions => {
+    const calendars = selectedCalendarsOptions.map(o => o.value);
     this.props.updateActionProperty(this.props.path, 'calendars', calendars);
   };
-  handleComparator = (e) => {
+  handleComparator = e => {
     if (e.target.value) {
       this.props.updateActionProperty(this.props.path, 'calendar_event_name_comparator', e.target.value);
     } else {
@@ -48,17 +48,17 @@ class CheckTime extends Component {
     }
   };
 
-  handleNameChange = (e) => {
+  handleNameChange = e => {
     this.props.updateActionProperty(this.props.path, 'calendar_event_name', e.target.value);
   };
 
-  handleStopSceneIfEventFound = (e) => {
+  handleStopSceneIfEventFound = e => {
     const foundValue = e.target.value === 'stop';
     this.props.updateActionProperty(this.props.path, 'stop_scene_if_event_found', foundValue);
     this.props.updateActionProperty(this.props.path, 'stop_scene_if_event_not_found', !foundValue);
   };
 
-  initVariables = (action) => {
+  initVariables = action => {
     if (action.stop_scene_if_event_found === false) {
       this.setVariables();
     } else {
@@ -66,11 +66,11 @@ class CheckTime extends Component {
     }
   };
 
-  refreshSelectedOptions = (action) => {
+  refreshSelectedOptions = action => {
     const selectedCalendarsOptions = [];
     if (action.calendars && this.state.calendarsOptions) {
-      action.calendars.forEach((calendar) => {
-        const calendarOption = this.state.calendarsOptions.find((calendarOption) => calendarOption.value === calendar);
+      action.calendars.forEach(calendar => {
+        const calendarOption = this.state.calendarsOptions.find(calendarOption => calendarOption.value === calendar);
         if (calendarOption) {
           selectedCalendarsOptions.push(calendarOption);
         }
@@ -110,36 +110,36 @@ class CheckTime extends Component {
         type: 'calendar',
         ready: true,
         label: EVENT_NAME_VARIABLE,
-        data: {},
+        data: {}
       },
       {
         name: 'calendarEvent.location',
         type: 'calendar',
         ready: true,
         label: EVENT_LOCATION_VARIABLE,
-        data: {},
+        data: {}
       },
       {
         name: 'calendarEvent.description',
         type: 'calendar',
         ready: true,
         label: EVENT_DESCRIPTION_VARIABLE,
-        data: {},
+        data: {}
       },
       {
         name: 'calendarEvent.start',
         type: 'calendar',
         ready: true,
         label: EVENT_START_VARIABLE,
-        data: {},
+        data: {}
       },
       {
         name: 'calendarEvent.end',
         type: 'calendar',
         ready: true,
         label: EVENT_END_VARIABLE,
-        data: {},
-      },
+        data: {}
+      }
     ]);
   };
 

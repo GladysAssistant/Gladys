@@ -34,5 +34,5 @@ class CheckStatus extends Component {
 
 export default connect(
   'user,session,usbConfigured,z2mEnabled,zigbee2mqttStatusMqttConnected,zigbee2mqttStatusUsbConfigured,zigbee2mqttConnected',
-  actions,
+  actions
 )(CheckStatus);

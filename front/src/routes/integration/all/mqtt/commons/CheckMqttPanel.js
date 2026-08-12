@@ -36,5 +36,5 @@ class CheckMqttPanel extends Component {
 
 export default connect(
   'user,session,mqttStatusConnected,mqttStatusConfigured,mqttStatusLoaded',
-  actions,
+  actions
 )(CheckMqttPanel);

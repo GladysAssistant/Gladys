@@ -24,7 +24,7 @@ const SettingsSystemContainers = ({ systemContainers }) => (
         </thead>
         <tbody>
           {systemContainers &&
-            systemContainers.map((container) => (
+            systemContainers.map(container => (
               <tr>
                 <td>{container.name}</td>
                 <td>{container.created_at_formatted}</td>
@@ -32,7 +32,7 @@ const SettingsSystemContainers = ({ systemContainers }) => (
                   <span
                     class={cx('badge', {
                       'badge-success': container.state === 'running',
-                      'badge-warning': container.state !== 'running',
+                      'badge-warning': container.state !== 'running'
                     })}
                   >
                     <Text id={`systemSettings.containerState.${container.state}`} />

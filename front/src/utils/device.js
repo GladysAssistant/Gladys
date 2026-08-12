@@ -14,7 +14,7 @@ import get from 'get-value';
  * but it's irrelevant to do it for all.
  */
 const DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES = {
-  mqtt: true,
+  mqtt: true
 };
 
 const matchFeature = (feature, selector, category, type) => {
@@ -35,7 +35,7 @@ function getDeviceParam(device, paramName) {
   if (!get(device, 'params')) {
     return null;
   }
-  const param = device.params.find((oneParam) => oneParam.name === paramName);
+  const param = device.params.find(oneParam => oneParam.name === paramName);
   if (param) {
     return param.value;
   }
@@ -53,7 +53,7 @@ const shouldDisplayDeviceName = (device, deviceFeature) => {
   // Look for similar features
   const { features = [] } = device;
   const { category, type, selector } = deviceFeature;
-  const uniqueFeature = features.findIndex((feature) => matchFeature(feature, selector, category, type)) < 0;
+  const uniqueFeature = features.findIndex(feature => matchFeature(feature, selector, category, type)) < 0;
   return uniqueFeature;
 };
 

@@ -26,7 +26,7 @@ const cypressWebSockets = [];
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
-Cypress.on('window:before:load', (window) => {
+Cypress.on('window:before:load', window => {
   const lang = Cypress.env('language');
   Object.defineProperty(window.navigator, 'language', { value: lang });
 
@@ -81,7 +81,7 @@ Cypress.Commands.add('i18n', { prevSubject: 'element' }, (element, labelKey) => 
 // login
 Cypress.Commands.add('login', () => {
   const serverUrl = Cypress.env('serverUrl');
-  cy.task('loadVariable', 'tony').then((tony) => {
+  cy.task('loadVariable', 'tony').then(tony => {
     if (tony && tony.access_token) {
       cy.log(`Uses stored Tony's token`);
       window.localStorage.setItem('user', JSON.stringify(tony));
@@ -89,8 +89,8 @@ Cypress.Commands.add('login', () => {
       // Check instance is configured
       cy.request({
         method: 'GET',
-        url: `${serverUrl}/api/v1/setup`,
-      }).then((resp) => {
+        url: `${serverUrl}/api/v1/setup`
+      }).then(resp => {
         if (resp.body.account_configured) {
           return cy.onlyLogin();
         }
@@ -114,9 +114,9 @@ Cypress.Commands.add('onlyLogin', () => {
     url: `${serverUrl}/api/v1/login`,
     body: {
       email: tony.email,
-      password: tony.password,
-    },
-  }).then((resp) => {
+      password: tony.password
+    }
+  }).then(resp => {
     const { body } = resp;
     const newUser = { ...tony, ...body };
     window.localStorage.setItem('user', JSON.stringify(newUser));
@@ -136,14 +136,14 @@ Cypress.Commands.add('setupAccount', () => {
   const userToCreate = {
     ...tony,
     language,
-    birthdate: new Date(tony.birthYear, tony.birthMonth - 1, tony.birthDay),
+    birthdate: new Date(tony.birthYear, tony.birthMonth - 1, tony.birthDay)
   };
 
   cy.request({
     method: 'POST',
     url: `${serverUrl}/api/v1/signup`,
-    body: userToCreate,
-  }).then((resp) => {
+    body: userToCreate
+  }).then(resp => {
     const { body } = resp;
     const newUser = { ...tony, ...body };
 
@@ -157,17 +157,17 @@ Cypress.Commands.add('setupAccount', () => {
       url: `${serverUrl}/api/v1/house`,
       body: house,
       headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-    }).then((resp) => {
+        authorization: `Bearer ${accessToken}`
+      }
+    }).then(resp => {
       cy.request({
         method: 'POST',
         url: `${serverUrl}/api/v1/house/${resp.body.selector}/room`,
         body: house.rooms[0],
         headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
-      }).then((res) => {
+          authorization: `Bearer ${accessToken}`
+        }
+      }).then(res => {
         const house = Cypress.env('house');
         house.rooms[0] = res.body;
         Cypress.env('house', house);
@@ -178,7 +178,7 @@ Cypress.Commands.add('setupAccount', () => {
 
 // Add bearer to request
 Cypress.Commands.overwrite('request', (originalFn, options) => {
-  cy.task('loadVariable', 'tony').then((tony) => {
+  cy.task('loadVariable', 'tony').then(tony => {
     if (tony && tony.access_token) {
       options.headers = { Authorization: `Bearer ${tony.access_token}` };
     }
@@ -187,32 +187,32 @@ Cypress.Commands.overwrite('request', (originalFn, options) => {
   });
 });
 
-Cypress.Commands.add('sendWebSocket', (payload) => {
+Cypress.Commands.add('sendWebSocket', payload => {
   // Only target the Gladys websocket: the Vite dev server also opens a websocket
   // (HMR) on the front origin, which must never receive fake Gladys messages.
   const websocketUrl = Cypress.env('websocketUrl');
   cypressWebSockets
-    .filter((ws) => ws.url && ws.url.startsWith(websocketUrl) && typeof ws.onmessage === 'function')
-    .forEach((ws) => ws.onmessage({ data: JSON.stringify(payload) }));
+    .filter(ws => ws.url && ws.url.startsWith(websocketUrl) && typeof ws.onmessage === 'function')
+    .forEach(ws => ws.onmessage({ data: JSON.stringify(payload) }));
 });
 
 // Clean all devices according to a single service
-Cypress.Commands.add('deleteDevices', (service) => {
+Cypress.Commands.add('deleteDevices', service => {
   // Reset all Bluetooth devices
   const serverUrl = Cypress.env('serverUrl');
   cy.request({
     method: 'GET',
     url: `${serverUrl}/api/v1/device`,
     query: {
-      service,
-    },
-  }).then((res) => {
+      service
+    }
+  }).then(res => {
     const devices = res.body;
-    cy.wrap(devices).each((device) =>
+    cy.wrap(devices).each(device =>
       cy.request({
         method: 'DELETE',
-        url: `${serverUrl}/api/v1/device/${device.selector}`,
-      }),
+        url: `${serverUrl}/api/v1/device/${device.selector}`
+      })
     );
   });
 });
@@ -224,14 +224,14 @@ Cypress.Commands.add('createDevice', (device, service) => {
   // Get service
   cy.request({
     method: 'GET',
-    url: `${serverUrl}/api/v1/service/${service}`,
-  }).then((res) => {
+    url: `${serverUrl}/api/v1/service/${service}`
+  }).then(res => {
     const { id: serviceId } = res.body;
     const deviceWithService = { ...device, service_id: serviceId };
     cy.request({
       method: 'POST',
       url: `${serverUrl}/api/v1/device`,
-      body: deviceWithService,
+      body: deviceWithService
     });
   });
 });

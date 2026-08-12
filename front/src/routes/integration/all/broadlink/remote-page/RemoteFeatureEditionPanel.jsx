@@ -15,7 +15,7 @@ const renderSelectedAction = (intl, category, selectedFeature, selectedValue) =>
     intl && intl.dictionary,
     { selectedValue },
     selectedValue,
-    `${selectedValue}`,
+    `${selectedValue}`
   );
 
   return (
@@ -24,7 +24,7 @@ const renderSelectedAction = (intl, category, selectedFeature, selectedValue) =>
         id="integration.broadlink.setup.selectedActionInfoLabel"
         fields={{
           feature: <Text id={`deviceFeatureCategory.${category}.${selectedFeature}`} />,
-          action,
+          action
         }}
       />
     </div>
@@ -40,7 +40,7 @@ class RemoteFeatureEditionPanel extends Component {
     this.props.selectFeature(null);
 
     this.setState({
-      errorKey: undefined,
+      errorKey: undefined
     });
   };
 
@@ -52,16 +52,16 @@ class RemoteFeatureEditionPanel extends Component {
 
       this.props.httpClient.post(`/api/v1/service/broadlink/send`, {
         peripheral,
-        code,
+        code
       });
 
       this.setState({
-        errorKey: undefined,
+        errorKey: undefined
       });
     } catch (e) {
       console.error(e);
       this.setState({
-        errorKey: 'integration.broadlink.setup.testError',
+        errorKey: 'integration.broadlink.setup.testError'
       });
     }
   };
@@ -70,15 +70,15 @@ class RemoteFeatureEditionPanel extends Component {
     const { peripheral } = this.props;
     try {
       await this.props.httpClient.post('/api/v1/service/broadlink/learn', {
-        peripheral,
+        peripheral
       });
       this.setState({
-        errorKey: undefined,
+        errorKey: undefined
       });
       this.props.setLearning(true);
     } catch (e) {
       this.setState({
-        errorKey: 'integration.broadlink.setup.learnFailed',
+        errorKey: 'integration.broadlink.setup.learnFailed'
       });
     }
   };
@@ -98,15 +98,15 @@ class RemoteFeatureEditionPanel extends Component {
 
     try {
       await this.props.httpClient.post('/api/v1/service/broadlink/learn/cancel', {
-        peripheral,
+        peripheral
       });
       this.setState({
-        errorKey: undefined,
+        errorKey: undefined
       });
       this.props.setLearning(false);
     } catch (e) {
       this.setState({
-        errorKey: 'integration.broadlink.setup.cancelLearnFailed',
+        errorKey: 'integration.broadlink.setup.cancelLearnFailed'
       });
     }
   };
@@ -115,18 +115,18 @@ class RemoteFeatureEditionPanel extends Component {
     const newTimeLeft = this.state.timeLeft - 1;
     if (newTimeLeft > 0) {
       this.setState({
-        timeLeft: newTimeLeft,
+        timeLeft: newTimeLeft
       });
     } else {
       this.activateLearnMode();
       clearInterval(this.timer);
       this.setState({
-        timeLeft: undefined,
+        timeLeft: undefined
       });
     }
   };
 
-  enterLearnAllMode = async (start) => {
+  enterLearnAllMode = async start => {
     if (start) {
       if (!this.state.timeLeft) {
         this.setState({ timeLeft: 3 });
@@ -142,28 +142,28 @@ class RemoteFeatureEditionPanel extends Component {
     }
   };
 
-  learnModeUpdate = async (payload) => {
+  learnModeUpdate = async payload => {
     switch (payload.action) {
       case ACTIONS.LEARN.ERROR:
         this.setState({
-          errorKey: 'integration.broadlink.setup.peripheralNotLearn',
+          errorKey: 'integration.broadlink.setup.peripheralNotLearn'
         });
         break;
       case ACTIONS.LEARN.CANCEL_ERROR:
         this.setState({
-          errorKey: 'integration.broadlink.setup.cancelLearnFailed',
+          errorKey: 'integration.broadlink.setup.cancelLearnFailed'
         });
         break;
       case ACTIONS.LEARN.CANCEL_SUCCESS:
         this.setState({
-          errorKey: null,
+          errorKey: null
         });
         this.props.setLearning(false);
         break;
       case ACTIONS.LEARN.SUCCESS:
         if (this.props.learning) {
           this.setState({
-            errorKey: null,
+            errorKey: null
           });
 
           const learnAllMode = this.props.storeFeatureCode(payload.code);
@@ -178,7 +178,7 @@ class RemoteFeatureEditionPanel extends Component {
         break;
       case ACTIONS.LEARN.NO_PERIPHERAL:
         this.setState({
-          errorKey: 'integration.broadlink.setup.peripheralNotFound',
+          errorKey: 'integration.broadlink.setup.peripheralNotFound'
         });
         break;
     }
@@ -202,7 +202,7 @@ class RemoteFeatureEditionPanel extends Component {
 
   render(
     { selectedFeature, selectedValue, learnAllMode, editedFeatures, device, learning, ...props },
-    { timeLeft, errorKey },
+    { timeLeft, errorKey }
   ) {
     const { model: category } = device;
     const hasActions = get(MANAGED_FEATURES, `${category}.${selectedFeature}.values`) !== undefined;

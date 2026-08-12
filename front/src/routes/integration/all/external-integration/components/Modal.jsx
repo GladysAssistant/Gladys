@@ -10,13 +10,13 @@ class Modal extends Component {
     document.removeEventListener('keydown', this.handleKeyDown);
   }
 
-  handleKeyDown = (e) => {
+  handleKeyDown = e => {
     if (e.key === 'Escape' && this.props.onClose) {
       this.props.onClose();
     }
   };
 
-  handleOverlayClick = (e) => {
+  handleOverlayClick = e => {
     // Close only when the backdrop itself is clicked, not a click bubbling up
     // from inside the dialog.
     if (e.target === e.currentTarget && this.props.onClose) {

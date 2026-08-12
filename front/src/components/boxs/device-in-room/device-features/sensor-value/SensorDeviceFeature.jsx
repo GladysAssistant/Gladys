@@ -31,8 +31,8 @@ import ChargingStationChargingStateDeviceValue from './ChargingStationChargingSt
 // last-seen date, but cameras report presence as a binary, which deserves a Yes/No badge.
 const DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE = {
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
-    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue,
-  },
+    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue
+  }
 };
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
@@ -50,7 +50,7 @@ const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_DRIVE]: DistanceSensorDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CONSUMPTION]: DistanceSensorDeviceValue,
-  [DEVICE_FEATURE_CATEGORIES.FAN]: FanSensorDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.FAN]: FanSensorDeviceValue
 };
 
 const DISPLAY_BY_FEATURE_TYPE = {
@@ -78,14 +78,14 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE]: ChargingStationChargingStateDeviceValue,
   // Registered by type, not by category: the category map is checked first and would force one
   // renderer on every water-heater sensor. remaining-hot-water keeps the numeric-badge default.
-  [DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING]: BinaryDeviceValue,
+  [DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING]: BinaryDeviceValue
 };
 
 const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
   DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
   DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
   DEVICE_FEATURE_CATEGORIES.BUTTON,
-  DEVICE_FEATURE_CATEGORIES.TEXT,
+  DEVICE_FEATURE_CATEGORIES.TEXT
 ];
 
 const SensorDeviceType = ({ children, ...props }) => {

@@ -160,7 +160,7 @@ const EditScenePage = ({ children, ...props }) => (
                   path={`${index}`}
                   saving={props.saving}
                   actionsGroupsBefore={update(props.scene.actions, {
-                    $splice: [[index, props.scene.actions.length - index]],
+                    $splice: [[index, props.scene.actions.length - index]]
                   })}
                   firstActionGroup={index === 0}
                   lastActionGroup={index === props.scene.actions.length - 1}

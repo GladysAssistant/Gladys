@@ -7,7 +7,7 @@ const SignupLayout = ({ children, ...props }) => (
     <div
       class="page-single"
       style={{
-        marginTop: '10px',
+        marginTop: '10px'
       }}
     >
       <div class="container">
@@ -15,7 +15,7 @@ const SignupLayout = ({ children, ...props }) => (
           <div
             class="col mx-auto"
             style={{
-              maxWidth: '60rem',
+              maxWidth: '60rem'
             }}
           >
             <div class="text-center mb-6">
@@ -39,7 +39,7 @@ const SignupLayout = ({ children, ...props }) => (
               <div class="card-body">
                 <div
                   class={cx('dimmer', {
-                    active: props.loading,
+                    active: props.loading
                   })}
                 >
                   <div class="loader" />
@@ -110,8 +110,7 @@ const SignupLayout = ({ children, ...props }) => (
                             <option>
                               <Text id="global.emptySelectOption" />
                             </option>
-                            {props.users &&
-                              props.users.map((user) => <option value={user.id}>{user.firstname}</option>)}
+                            {props.users && props.users.map(user => <option value={user.id}>{user.firstname}</option>)}
                           </select>
                         </div>
                         <div class="form-group">

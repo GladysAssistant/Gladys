@@ -94,7 +94,7 @@ export function linkifyMessageText(text) {
     parts.push({
       type: 'link',
       content: match[1],
-      href: match[2],
+      href: match[2]
     });
 
     lastIndex = match.index + match[0].length;

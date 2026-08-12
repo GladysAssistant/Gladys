@@ -30,7 +30,7 @@ const GroupChipsScroll = ({ children }) => {
       return undefined;
     }
 
-    const onWheel = (event) => {
+    const onWheel = event => {
       if (el.scrollWidth <= el.clientWidth) {
         return;
       }
@@ -60,7 +60,7 @@ const GroupChipsScroll = ({ children }) => {
     };
   }, [updateScrollState]);
 
-  const scrollBy = (direction) => {
+  const scrollBy = direction => {
     scrollRef.current?.scrollBy({ left: direction * SCROLL_STEP, behavior: 'smooth' });
   };
 

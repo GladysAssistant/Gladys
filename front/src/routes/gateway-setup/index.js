@@ -11,15 +11,15 @@ class LinkGatewayUser extends Component {
     const setupState = await this.props.session.gatewayClient.getSetupState();
     this.setState({
       setupState,
-      loading: false,
+      loading: false
     });
   };
   openStripeBilling = async () => {
     window.open(
-      `${this.props.session.gladysGatewayApiUrl}/accounts/stripe_customer_portal/${this.state.setupState.stripe_portal_key}`,
+      `${this.props.session.gladysGatewayApiUrl}/accounts/stripe_customer_portal/${this.state.setupState.stripe_portal_key}`
     );
   };
-  logout = async (e) => {
+  logout = async e => {
     if (e) {
       e.preventDefault();
     }
@@ -37,9 +37,9 @@ class LinkGatewayUser extends Component {
     this.props.session.reset();
     window.location = '/login';
   };
-  selectUser = (e) => {
+  selectUser = e => {
     this.setState({
-      selectedUser: e.target.value,
+      selectedUser: e.target.value
     });
   };
   saveUser = async () => {
@@ -67,7 +67,7 @@ class LinkGatewayUser extends Component {
       // If the gateway gladys_4_user_id is defined and is equal to a local user, we redirect
       // automatically to the dashboard, as it's not necessary to select a user again
       if (gatewayUser && gatewayUser.gladys_4_user_id && this.props.users) {
-        const userIndeedExists = this.props.users.find((user) => user.id === gatewayUser.gladys_4_user_id);
+        const userIndeedExists = this.props.users.find(user => user.id === gatewayUser.gladys_4_user_id);
         if (userIndeedExists) {
           // We try to get the user details to confirm they still exist
           try {
@@ -93,7 +93,7 @@ class LinkGatewayUser extends Component {
     await Promise.all([this.props.getUsers(), this.getSetupState()]);
     await this.checkIfGladysUserIsLinkedToExistingUser();
   };
-  retry = async (e) => {
+  retry = async e => {
     if (e) {
       e.preventDefault();
     }

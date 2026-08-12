@@ -24,13 +24,13 @@ const PAGES_WITHOUT_HEADER = [
   '/confirm-email',
   '/dashboard/integration/device/google-home/authorize',
   '/dashboard/integration/device/alexa/authorize',
-  '/locked',
+  '/locked'
 ];
 
 class Header extends Component {
   dropdownRef = createRef(null);
 
-  handleClickOutside = (e) => {
+  handleClickOutside = e => {
     if (this.dropdownRef.current && !this.dropdownRef.current.contains(e.target)) {
       this.props.closeDropDown();
     }
@@ -85,7 +85,7 @@ class Header extends Component {
                   </a>
                   <div
                     class={cx('dropdown-menu', 'dropdown-menu-right', 'dropdown-menu-arrow', {
-                      show: props.showDropDown,
+                      show: props.showDropDown
                     })}
                   >
                     <a class="dropdown-item" href="/dashboard/profile">
@@ -129,7 +129,7 @@ class Header extends Component {
                     <Link
                       href="/dashboard"
                       class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard',
+                        active: props.currentUrl === '/dashboard'
                       })}
                     >
                       <i class="fe fe-home" /> <Text id="header.home" />
@@ -139,7 +139,7 @@ class Header extends Component {
                     <Link
                       href="/dashboard/history"
                       class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard/history',
+                        active: props.currentUrl === '/dashboard/history'
                       })}
                     >
                       <i class="fe fe-clock" /> <Text id="header.history" />
@@ -149,7 +149,7 @@ class Header extends Component {
                     <Link
                       href="/dashboard/chat"
                       class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard/chat',
+                        active: props.currentUrl === '/dashboard/chat'
                       })}
                     >
                       <i class="fe fe-message-square" /> <Text id="header.chat" />
@@ -191,7 +191,7 @@ class Header extends Component {
                     <Link
                       href="/dashboard/calendar"
                       class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard/calendar',
+                        active: props.currentUrl === '/dashboard/calendar'
                       })}
                     >
                       <i class="fe fe-calendar" /> <Text id="header.calendar" />
@@ -202,7 +202,7 @@ class Header extends Component {
                       activeClassName="active"
                       href="/dashboard/maps"
                       class={cx('nav-link', {
-                        active: props.currentUrl === '/dashboard/maps',
+                        active: props.currentUrl === '/dashboard/maps'
                       })}
                     >
                       <i class="fe fe-map" /> <Text id="header.maps" />

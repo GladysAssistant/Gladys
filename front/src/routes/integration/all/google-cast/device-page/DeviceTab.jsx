@@ -23,11 +23,11 @@ class DeviceTab extends Component {
 
   getGoogleCastDevices = async () => {
     this.setState({
-      getGoogleCastStatus: RequestStatus.Getting,
+      getGoogleCastStatus: RequestStatus.Getting
     });
     try {
       const options = {
-        order_dir: this.state.orderDir || 'asc',
+        order_dir: this.state.orderDir || 'asc'
       };
       if (this.state.search && this.state.search.length) {
         options.search = this.state.search;
@@ -36,45 +36,45 @@ class DeviceTab extends Component {
       const googleCastDevices = await this.props.httpClient.get('/api/v1/service/google-cast/device', options);
       this.setState({
         googleCastDevices,
-        getGoogleCastStatus: RequestStatus.Success,
+        getGoogleCastStatus: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        getGoogleCastStatus: e.message,
+        getGoogleCastStatus: e.message
       });
     }
   };
 
   async getHouses() {
     this.setState({
-      housesGetStatus: RequestStatus.Getting,
+      housesGetStatus: RequestStatus.Getting
     });
     try {
       const params = {
-        expand: 'rooms',
+        expand: 'rooms'
       };
       const housesWithRooms = await this.props.httpClient.get(`/api/v1/house`, params);
       this.setState({
         housesWithRooms,
-        housesGetStatus: RequestStatus.Success,
+        housesGetStatus: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        housesGetStatus: RequestStatus.Error,
+        housesGetStatus: RequestStatus.Error
       });
     }
   }
 
   async search(e) {
     await this.setState({
-      search: e.target.value,
+      search: e.target.value
     });
     this.getGoogleCastDevices();
   }
 
-  changeOrderDir = async (e) => {
+  changeOrderDir = async e => {
     await this.setState({
-      orderDir: e.target.value,
+      orderDir: e.target.value
     });
     this.getGoogleCastDevices();
   };
@@ -101,7 +101,7 @@ class DeviceTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: getGoogleCastStatus === RequestStatus.Getting,
+              active: getGoogleCastStatus === RequestStatus.Getting
             })}
           >
             <div class="loader" />

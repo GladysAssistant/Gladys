@@ -2,7 +2,7 @@ import { connect } from 'unistore/preact';
 import CallMeBotPage from '../CallMeBot';
 import SetupTab from './SetupTab';
 
-const CallMeBotSetupPage = (props) => (
+const CallMeBotSetupPage = props => (
   <CallMeBotPage user={props.user}>
     <SetupTab {...props} />
   </CallMeBotPage>

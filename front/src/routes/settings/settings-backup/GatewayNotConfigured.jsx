@@ -24,7 +24,7 @@ const GatewayNotConfigured = () => (
               featureKeys={[
                 'gladysPlusUpsell.backup.feature1',
                 'gladysPlusUpsell.backup.feature2',
-                'gladysPlusUpsell.backup.feature3',
+                'gladysPlusUpsell.backup.feature3'
               ]}
             />
           </div>

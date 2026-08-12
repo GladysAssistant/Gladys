@@ -13,7 +13,7 @@ const BluetoothPeripheralTab = ({
   bluetoothStatus = {},
   bluetoothGetPeripheralsStatus,
   bluetoothPeripherals = [],
-  currentIntegration = {},
+  currentIntegration = {}
 }) => {
   const scanning = bluetoothStatus.scanning || bluetoothGetPeripheralsStatus === RequestStatus.Getting;
 
@@ -27,7 +27,7 @@ const BluetoothPeripheralTab = ({
           <button
             class={cx('btn', {
               'btn-outline-danger': bluetoothStatus.scanning,
-              'btn-outline-primary': !bluetoothStatus.scanning,
+              'btn-outline-primary': !bluetoothStatus.scanning
             })}
             onClick={scan}
             disabled={!bluetoothStatus.ready || bluetoothStatus.peripheralLookup}
@@ -41,7 +41,7 @@ const BluetoothPeripheralTab = ({
         <div
           class={cx('dimmer', {
             active: scanning && !bluetoothStatus.peripheralLookup,
-            [style.bluetoothListBody]: scanning && !bluetoothStatus.peripheralLookup,
+            [style.bluetoothListBody]: scanning && !bluetoothStatus.peripheralLookup
           })}
         >
           <div class="loader" />

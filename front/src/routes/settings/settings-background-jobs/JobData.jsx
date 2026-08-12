@@ -24,7 +24,7 @@ const JobStatesCounts = ({ job, user }) =>
         fields={{
           duckdb: (job.data.duckdb_states_count || 0).toLocaleString(user.language),
           sqlite: (job.data.sqlite_states_count || 0).toLocaleString(user.language),
-          aggregates: (job.data.aggregates_count || 0).toLocaleString(user.language),
+          aggregates: (job.data.aggregates_count || 0).toLocaleString(user.language)
         }}
       />
     </div>
@@ -94,7 +94,7 @@ const JOB_DATA_RENDERERS = {
   [JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE]: PurgeSingleFeatureJobData,
   [JOB_TYPES.DEVICE_STATES_PURGE_ALL_SQLITE_STATES]: PurgeAllSqliteJobData,
   [JOB_TYPES.DEVICE_STATES_PURGE_ORPHANED_DUCKDB_STATES]: PurgeOrphanedJobData,
-  [JOB_TYPES.DEVICE_MIGRATE]: DeviceMigrateJobData,
+  [JOB_TYPES.DEVICE_MIGRATE]: DeviceMigrateJobData
 };
 
 // Structured facts attached by the job (job.data), rendered by the job type's own renderer

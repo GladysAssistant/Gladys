@@ -5,10 +5,10 @@ import { Text } from 'preact-i18n';
 import { CLOCK_TYPES_LIST } from './ClockTypes';
 
 class EditClock extends Component {
-  updateClockType = (e) => {
+  updateClockType = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { clock_type: e.target.value });
   };
-  updateClockDisplaySecond = (e) => {
+  updateClockDisplaySecond = e => {
     const valueBoolean = e.target.value === 'yes';
     this.props.updateBoxConfig(this.props.x, this.props.y, { clock_display_second: valueBoolean });
   };
@@ -21,7 +21,7 @@ class EditClock extends Component {
             <Text id="dashboard.boxes.clock.type" />
           </label>
           <select value={props.box.clock_type} onChange={this.updateClockType} className="form-control">
-            {CLOCK_TYPES_LIST.map((clockType) => (
+            {CLOCK_TYPES_LIST.map(clockType => (
               <option value={clockType}>
                 <Text id={`dashboard.boxes.clock.${clockType}`} />
               </option>

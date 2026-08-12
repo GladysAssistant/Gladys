@@ -23,5 +23,5 @@ class SyncPage extends Component {
 }
 
 export default withIntlAsProp(
-  connect('user,caldavCalendars,caldavSaveSyncStatus,caldavGetSettingsStatus,calendarsToSync', actions)(SyncPage),
+  connect('user,caldavCalendars,caldavSaveSyncStatus,caldavGetSettingsStatus,calendarsToSync', actions)(SyncPage)
 );

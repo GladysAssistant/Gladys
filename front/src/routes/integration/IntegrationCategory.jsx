@@ -4,7 +4,7 @@ import StatusBadge from './all/external-integration/components/StatusBadge';
 import { isNoteworthyExternalIntegrationStatus } from './all/external-integration/utils';
 import style from './style.css';
 
-const getImgClass = (integration) =>
+const getImgClass = integration =>
   `card-img-top ${integration.invertInDarkMode ? 'keep-dark' : ''} ${
     integration.whiteBackground ? 'white-bg' : ''
   }`.trim();
@@ -72,7 +72,7 @@ const IntegrationTags = ({ integration }) => (
 const FavoriteButton = ({ integration, toggleFavorite }) => {
   const isFavorite = !!integration.isFavorite;
 
-  const onToggleFavorite = (e) => {
+  const onToggleFavorite = e => {
     e.preventDefault();
     e.stopPropagation();
     if (toggleFavorite) {

@@ -15,7 +15,7 @@ class MatterDiscoverPage extends Component {
       loading: false,
       getDataLoading: true,
       matterEnabled: null,
-      error: null,
+      error: null
     };
   }
 
@@ -27,11 +27,11 @@ class MatterDiscoverPage extends Component {
     try {
       await this.setState({ getDataLoading: true });
       const { value: matterEnabled } = await this.props.httpClient.get(
-        '/api/v1/service/matter/variable/MATTER_ENABLED',
+        '/api/v1/service/matter/variable/MATTER_ENABLED'
       );
       await this.setState({
         matterEnabled: matterEnabled === 'true',
-        getDataLoading: false,
+        getDataLoading: false
       });
     } catch (e) {
       console.error(e);
@@ -40,18 +40,18 @@ class MatterDiscoverPage extends Component {
       }
       await this.setState({
         matterEnabled: false,
-        getDataLoading: false,
+        getDataLoading: false
       });
     }
   };
 
-  handleSubmit = async (e) => {
+  handleSubmit = async e => {
     e.preventDefault();
     this.setState({ loading: true, error: null });
 
     try {
       await this.props.httpClient.post('/api/v1/service/matter/pair-device', {
-        pairing_code: this.state.pairingCode,
+        pairing_code: this.state.pairingCode
       });
       route('/dashboard/integration/device/matter');
     } catch (e) {
@@ -121,7 +121,7 @@ class MatterDiscoverPage extends Component {
                           class="form-control"
                           placeholder={<Text id="integration.matter.discover.pairingCodePlaceholder" />}
                           value={this.state.pairingCode}
-                          onInput={(e) => this.setState({ pairingCode: e.target.value })}
+                          onInput={e => this.setState({ pairingCode: e.target.value })}
                           pattern="([0-9]{4}-[0-9]{3}-[0-9]{4})|([0-9]{11})|([0-9]{5}-[0-9]{5}-[0-9]{5}-[0-9]{6})|([0-9]{21})"
                           required
                           disabled={!this.state.matterEnabled}

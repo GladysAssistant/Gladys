@@ -8,19 +8,19 @@ import update from 'immutability-helper';
 class DashboardUsersPage extends Component {
   state = {
     users: [],
-    role: 'user',
+    role: 'user'
   };
 
   getUsers = () => {
-    this.props.session.gatewayClient.getUsersInAccount().then((users) => {
+    this.props.session.gatewayClient.getUsersInAccount().then(users => {
       this.setState({ users });
     });
   };
 
   inviteUser = () => {
-    this.props.session.gatewayClient.inviteUser(this.state.email, this.state.role).then((invitedUser) => {
+    this.props.session.gatewayClient.inviteUser(this.state.email, this.state.role).then(invitedUser => {
       let newState = update(this.state, {
-        users: { $push: [invitedUser] },
+        users: { $push: [invitedUser] }
       });
 
       this.setState(newState);
@@ -37,7 +37,7 @@ class DashboardUsersPage extends Component {
 
       const newState = update(this.state, {
         users: { $splice: [[index, 1]] },
-        revokeUserError: { $set: false },
+        revokeUserError: { $set: false }
       });
 
       this.setState(newState);

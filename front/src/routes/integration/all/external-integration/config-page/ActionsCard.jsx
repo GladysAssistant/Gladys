@@ -18,7 +18,7 @@ const ActionsCard = ({
   updateActionFieldValue,
   runAction,
   dynamicOptions,
-  placeholderPorts,
+  placeholderPorts
 }) => (
   <div class="card">
     <div class="card-header">
@@ -35,7 +35,7 @@ const ActionsCard = ({
           <div class={cx({ 'mb-5': index < actions.length - 1 })}>
             <h4>{getLocalizedText(action.label, language) || action.key}</h4>
             {description && <p class={cx('text-muted small', integrationText.integrationText)}>{description}</p>}
-            {(action.fields || []).map((field) => (
+            {(action.fields || []).map(field => (
               <ConfigField
                 key={field.key}
                 field={field}
@@ -51,7 +51,7 @@ const ActionsCard = ({
             <button
               type="button"
               class={cx('btn btn-primary', {
-                'btn-loading': running,
+                'btn-loading': running
               })}
               disabled={running}
               onClick={() => runAction(action)}
@@ -70,7 +70,7 @@ const ActionsCard = ({
                   class={cx(
                     'alert alert-success mt-3 mb-0',
                     integrationText.integrationText,
-                    integrationText.resultScroll,
+                    integrationText.resultScroll
                   )}
                   tabIndex={0}
                   role="region"
@@ -86,7 +86,7 @@ const ActionsCard = ({
                   class={cx(
                     'alert alert-danger mt-3 mb-0',
                     integrationText.integrationText,
-                    integrationText.resultScroll,
+                    integrationText.resultScroll
                   )}
                   tabIndex={0}
                   role="region"

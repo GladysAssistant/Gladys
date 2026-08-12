@@ -133,7 +133,9 @@ describe('Integration host API: calendar', () => {
     await integrationRequest(token)
       .delete(`/api/integration/v1/calendar?external_id=${encodeURIComponent(`${prefix}primary`)}`)
       .expect(200);
-    const afterDelete = await integrationRequest(token).get('/api/integration/v1/calendar').expect(200);
+    const afterDelete = await integrationRequest(token)
+      .get('/api/integration/v1/calendar')
+      .expect(200);
     expect(afterDelete.body).to.deep.equal([]);
   });
 
@@ -144,8 +146,12 @@ describe('Integration host API: calendar', () => {
       manifest: { ...CALENDAR_MANIFEST, type: 'device', account_schema: undefined },
     });
     const deviceToken = generateIntegrationToken(deviceService.id, 1, 'secret');
-    await integrationRequest(deviceToken).get('/api/integration/v1/calendar/account').expect(403);
-    await integrationRequest(deviceToken).get('/api/integration/v1/calendar').expect(403);
+    await integrationRequest(deviceToken)
+      .get('/api/integration/v1/calendar/account')
+      .expect(403);
+    await integrationRequest(deviceToken)
+      .get('/api/integration/v1/calendar')
+      .expect(403);
     await integrationRequest(deviceToken)
       .post('/api/integration/v1/calendar')
       .send({ user: 'john', calendars: [] })
@@ -221,7 +227,9 @@ describe('Integration host API: calendar', () => {
     });
     const otherToken = generateIntegrationToken(otherService.id, 1, 'secret');
     // the other integration sees nothing
-    const listRes = await integrationRequest(otherToken).get('/api/integration/v1/calendar').expect(200);
+    const listRes = await integrationRequest(otherToken)
+      .get('/api/integration/v1/calendar')
+      .expect(200);
     expect(listRes.body).to.deep.equal([]);
     // and cannot delete nor push events into the first one's calendar
     await integrationRequest(otherToken)

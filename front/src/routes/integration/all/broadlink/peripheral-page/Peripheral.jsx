@@ -9,11 +9,11 @@ class BroadlinkPeripheralBox extends Component {
     this.props.saveDevice(this.props.peripheralIndex);
   };
 
-  updateName = (e) => {
+  updateName = e => {
     this.props.updateDeviceProperty(this.props.peripheralIndex, 'name', e.target.value);
   };
 
-  updateRoom = (e) => {
+  updateRoom = e => {
     this.props.updateDeviceProperty(this.props.peripheralIndex, 'room_id', e.target.value);
   };
 
@@ -62,9 +62,9 @@ class BroadlinkPeripheralBox extends Component {
                   <option value="">
                     <Text id="global.emptySelectOption" />
                   </option>
-                  {housesWithRooms.map((house) => (
+                  {housesWithRooms.map(house => (
                     <optgroup label={house.name}>
-                      {house.rooms.map((room) => (
+                      {house.rooms.map(room => (
                         <option selected={room.id === device.room_id} value={room.id}>
                           {room.name}
                         </option>

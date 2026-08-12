@@ -15,5 +15,5 @@ class SettingsHouses extends Component {
 
 export default connect(
   'user,houses,housesSearch,housesGetStatus,houseUpdateStatus,getHousesOrderDir,housesSearch',
-  actions,
+  actions
 )(SettingsHouses);

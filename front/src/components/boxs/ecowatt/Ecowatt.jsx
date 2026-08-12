@@ -31,7 +31,7 @@ const EcowattBox = ({ hours, days, loading, error }) => (
             </h4>
             <div class="row">
               {hours &&
-                hours.map((hour) => (
+                hours.map(hour => (
                   <div style={{ width: '10%', margin: '0.25em 1.25%' }}>
                     <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>{hour.hour}</p>
                     <p style={{ margin: 'auto', textAlign: 'center' }}>
@@ -53,7 +53,7 @@ const EcowattBox = ({ hours, days, loading, error }) => (
               <ul class="list-unstyled list-separated mb-0">
                 <li class="list-separated-item">
                   {days &&
-                    days.map((day) => (
+                    days.map(day => (
                       <div class="row mb-1">
                         <div class="col">{day.day}</div>
                         <div class="col-auto">
@@ -94,29 +94,31 @@ class Ecowatt extends Component {
       const days = [];
       const currentHour = dayjs().hour();
       if (ecowattData.today) {
-        ecowattData.today.values.forEach((todayHour) => {
+        ecowattData.today.values.forEach(todayHour => {
           if (todayHour.pas >= currentHour && hours.length < 8) {
             hours.push({
               hour: todayHour.pas,
-              data: todayHour.hvalue,
+              data: todayHour.hvalue
             });
           }
         });
         if (hours.length < 8 && ecowattData.tomorrow) {
-          ecowattData.tomorrow.values.forEach((tomorrowHour) => {
+          ecowattData.tomorrow.values.forEach(tomorrowHour => {
             if (hours.length < 8) {
               hours.push({
                 hour: tomorrowHour.pas,
-                data: tomorrowHour.hvalue,
+                data: tomorrowHour.hvalue
               });
             }
           });
         }
       }
-      ecowattData.days.forEach((day) => {
+      ecowattData.days.forEach(day => {
         days.push({
-          day: dayjs(day.jour).locale(this.props.user.language).format('ddd LL'),
-          data: day.dvalue,
+          day: dayjs(day.jour)
+            .locale(this.props.user.language)
+            .format('ddd LL'),
+          data: day.dvalue
         });
       });
       this.setState({ hours, days, error: false, loading: false });
@@ -134,7 +136,7 @@ class Ecowatt extends Component {
     this.props = props;
     this.state = {
       loading: true,
-      error: false,
+      error: false
     };
   }
 

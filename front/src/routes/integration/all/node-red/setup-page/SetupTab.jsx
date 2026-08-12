@@ -10,7 +10,7 @@ import config from '../../../../../config';
 
 let cx = classNames.bind(style);
 
-const normalizeMajorVersion = (value) => {
+const normalizeMajorVersion = value => {
   if (value === undefined || value === null || value === '') {
     return null;
   }
@@ -38,10 +38,10 @@ class SetupTab extends Component {
 
     try {
       const nodeRedUsernameVariable = await this.props.httpClient.get(
-        '/api/v1/service/node-red/variable/NODE_RED_USERNAME',
+        '/api/v1/service/node-red/variable/NODE_RED_USERNAME'
       );
       const nodeRedPasswordVariable = await this.props.httpClient.get(
-        '/api/v1/service/node-red/variable/NODE_RED_PASSWORD',
+        '/api/v1/service/node-red/variable/NODE_RED_PASSWORD'
       );
 
       const isGladysPlus = this.props.session.gatewayClient !== undefined;
@@ -94,28 +94,28 @@ class SetupTab extends Component {
     const { selectedMajorVersion, dockerNodeRedVersion } = this.state;
 
     this.setState({
-      nodeRedStatus: RequestStatus.Getting,
+      nodeRedStatus: RequestStatus.Getting
     });
 
     if (selectedMajorVersion && selectedMajorVersion !== dockerNodeRedVersion) {
       try {
         const nodeRedConfiguration = await this.props.httpClient.post('/api/v1/service/node-red/configuration', {
-          dockerNodeRedVersion: selectedMajorVersion,
+          dockerNodeRedVersion: selectedMajorVersion
         });
         this.setState({
           dockerNodeRedVersion: normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion),
-          selectedMajorVersion: normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion),
+          selectedMajorVersion: normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion)
         });
       } catch (e) {
         this.setState({
-          nodeRedStatus: RequestStatus.Error,
+          nodeRedStatus: RequestStatus.Error
         });
         return;
       }
     }
 
     await this.props.httpClient.post('/api/v1/service/node-red/variable/NODERED_ENABLED', {
-      value: true,
+      value: true
     });
 
     try {
@@ -126,11 +126,11 @@ class SetupTab extends Component {
 
     if (error) {
       this.setState({
-        nodeRedStatus: RequestStatus.Error,
+        nodeRedStatus: RequestStatus.Error
       });
     } else {
       this.setState({
-        nodeRedStatus: RequestStatus.Success,
+        nodeRedStatus: RequestStatus.Success
       });
     }
     await this.getConfiguration();
@@ -139,7 +139,7 @@ class SetupTab extends Component {
 
   stopContainer = async () => {
     await this.props.httpClient.post('/api/v1/service/node-red/variable/NODERED_ENABLED', {
-      value: false,
+      value: false
     });
 
     let error = false;
@@ -151,11 +151,11 @@ class SetupTab extends Component {
 
     if (error) {
       this.setState({
-        nodeRedStatus: RequestStatus.Error,
+        nodeRedStatus: RequestStatus.Error
       });
     } else {
       this.setState({
-        nodeRedStatus: RequestStatus.Success,
+        nodeRedStatus: RequestStatus.Success
       });
     }
     this.setState({ showConfirmDelete: false });
@@ -169,7 +169,7 @@ class SetupTab extends Component {
       nodeRedRunning: false,
       nodeRedEnabled: false,
       dockerBased: false,
-      networkModeValid: false,
+      networkModeValid: false
     };
     try {
       nodeRedStatus = await this.props.httpClient.get('/api/v1/service/node-red/status');
@@ -179,7 +179,7 @@ class SetupTab extends Component {
         nodeRedRunning: nodeRedStatus.nodeRedRunning,
         nodeRedEnabled: nodeRedStatus.nodeRedEnabled,
         dockerBased: nodeRedStatus.dockerBased,
-        networkModeValid: nodeRedStatus.networkModeValid,
+        networkModeValid: nodeRedStatus.networkModeValid
       });
     }
   };
@@ -207,7 +207,7 @@ class SetupTab extends Component {
     this.setState({ showConfirmDelete: false });
   };
 
-  onMajorVersionChange = (event) => {
+  onMajorVersionChange = event => {
     this.setState({ selectedMajorVersion: normalizeMajorVersion(event.target.value) });
   };
 
@@ -219,24 +219,24 @@ class SetupTab extends Component {
     }
 
     this.setState({
-      nodeRedStatus: RequestStatus.Getting,
+      nodeRedStatus: RequestStatus.Getting
     });
 
     try {
       const nodeRedConfiguration = await this.props.httpClient.post('/api/v1/service/node-red/configuration', {
-        dockerNodeRedVersion: selectedMajorVersion,
+        dockerNodeRedVersion: selectedMajorVersion
       });
 
       this.setState({
         dockerNodeRedVersion: normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion),
         selectedMajorVersion: normalizeMajorVersion(nodeRedConfiguration.dockerNodeRedVersion),
-        nodeRedStatus: RequestStatus.Success,
+        nodeRedStatus: RequestStatus.Success
       });
       await this.checkStatus();
     } catch (e) {
       this.setState({
         nodeRedStatus: RequestStatus.Error,
-        selectedMajorVersion: normalizeMajorVersion(dockerNodeRedVersion),
+        selectedMajorVersion: normalizeMajorVersion(dockerNodeRedVersion)
       });
     }
   };
@@ -257,8 +257,8 @@ class SetupTab extends Component {
       showConfirmDelete,
       dockerNodeRedVersion,
       availableMajorVersions,
-      selectedMajorVersion,
-    },
+      selectedMajorVersion
+    }
   ) {
     const hasMajorVersionChanged =
       selectedMajorVersion && dockerNodeRedVersion && selectedMajorVersion !== dockerNodeRedVersion;
@@ -304,7 +304,7 @@ class SetupTab extends Component {
                 onChange={this.onMajorVersionChange}
                 disabled={nodeRedStatus === RequestStatus.Getting}
               >
-                {availableMajorVersions.map((majorVersion) => (
+                {availableMajorVersions.map(majorVersion => (
                   <option key={majorVersion} value={majorVersion}>
                     {majorVersion}
                   </option>
@@ -366,7 +366,7 @@ class SetupTab extends Component {
                     <i
                       class={cx('fe', {
                         'fe-eye': !showPassword,
-                        'fe-eye-off': showPassword,
+                        'fe-eye-off': showPassword
                       })}
                     />
                   </span>
@@ -379,7 +379,7 @@ class SetupTab extends Component {
                     <MarkupText
                       id={`integration.nodeRed.setup.urlLabel`}
                       fields={{
-                        nodeRedUrl,
+                        nodeRedUrl
                       }}
                     />
                   </label>
@@ -468,7 +468,7 @@ class SetupTab extends Component {
                                 'fe-check': nodeRedRunning,
                                 'fe-x': !nodeRedRunning,
                                 greenIcon: nodeRedRunning,
-                                redIcon: !nodeRedRunning,
+                                redIcon: !nodeRedRunning
                               })}
                             />
                             <hr className={style.line} />

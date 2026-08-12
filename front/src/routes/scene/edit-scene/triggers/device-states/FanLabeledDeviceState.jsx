@@ -14,11 +14,11 @@ class FanLabeledDeviceState extends Component {
     const { selectedDeviceFeature } = this.props;
     const { category, type, min, max } = selectedDeviceFeature;
 
-    const options = getFanFeatureOptions(type, min, max).map((value) => ({
+    const options = getFanFeatureOptions(type, min, max).map(value => ({
       label: get(this.props.intl.dictionary, `deviceFeatureValue.category.${category}.${type}.${value}`, {
-        default: value,
+        default: value
       }),
-      value,
+      value
     }));
 
     this.setState({ options });
@@ -36,7 +36,7 @@ class FanLabeledDeviceState extends Component {
   }
 
   render({ trigger }, { options }) {
-    const defaultValue = options && options.find((option) => trigger.value === option.value);
+    const defaultValue = options && options.find(option => trigger.value === option.value);
 
     return (
       <Fragment>

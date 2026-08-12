@@ -42,7 +42,7 @@ const DeviceTab = ({
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: getBroadlinkDevicesStatus === RequestStatus.Getting,
+          active: getBroadlinkDevicesStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />

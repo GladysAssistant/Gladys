@@ -914,7 +914,12 @@ function validateManifest(manifest) {
           // the per-user block is the one screen a non-admin reaches, and
           // their reduced view carries no container state
           rejectPerUserSchemaPortPlaceholders(field.label, `contact_schema[${index}].label`, errors, 'contact');
-          rejectPerUserSchemaPortPlaceholders(field.description, `contact_schema[${index}].description`, errors, 'contact');
+          rejectPerUserSchemaPortPlaceholders(
+            field.description,
+            `contact_schema[${index}].description`,
+            errors,
+            'contact',
+          );
         }
       });
     }
@@ -937,7 +942,12 @@ function validateManifest(manifest) {
           // the per-user block is the one screen a non-admin reaches, and
           // their reduced view carries no container state
           rejectPerUserSchemaPortPlaceholders(field.label, `account_schema[${index}].label`, errors, 'account');
-          rejectPerUserSchemaPortPlaceholders(field.description, `account_schema[${index}].description`, errors, 'account');
+          rejectPerUserSchemaPortPlaceholders(
+            field.description,
+            `account_schema[${index}].description`,
+            errors,
+            'account',
+          );
         }
       });
     }

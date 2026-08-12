@@ -19,5 +19,5 @@ class OpenWeatherIntegration extends Component {
 
 export default connect(
   'user,openWeatherApiKey,openWeatherSaveApiKeyStatus,openWeatherGetApiKeyStatus',
-  actions,
+  actions
 )(OpenWeatherIntegration);

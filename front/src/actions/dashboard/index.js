@@ -2,9 +2,9 @@ function createActions(store) {
   const actions = {
     setFullScreen(state, fullScreen) {
       store.setState({
-        fullScreen,
+        fullScreen
       });
-    },
+    }
   };
   return actions;
 }

@@ -38,7 +38,7 @@ const LANManagerDiscoverTab = ({
           <button
             class={cx('btn', {
               'btn-outline-danger': scanning,
-              'btn-outline-primary': !scanning,
+              'btn-outline-primary': !scanning
             })}
             onClick={scan}
           >
@@ -81,7 +81,7 @@ const LANManagerDiscoverTab = ({
         <div
           class={cx('dimmer', {
             active: displayLoader,
-            [style.lanManagerListBody]: displayLoader,
+            [style.lanManagerListBody]: displayLoader
           })}
         >
           <div class="loader" />

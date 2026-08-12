@@ -10,43 +10,43 @@ import { connect } from 'unistore/preact';
 class MELCloudDeviceBox extends Component {
   componentWillMount() {
     this.setState({
-      device: this.props.device,
+      device: this.props.device
     });
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      device: nextProps.device,
+      device: nextProps.device
     });
   }
 
-  updateName = (e) => {
+  updateName = e => {
     this.setState({
       device: {
         ...this.state.device,
-        name: e.target.value,
-      },
+        name: e.target.value
+      }
     });
   };
 
-  updateRoom = (e) => {
+  updateRoom = e => {
     this.setState({
       device: {
         ...this.state.device,
-        room_id: e.target.value,
-      },
+        room_id: e.target.value
+      }
     });
   };
 
   saveDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null,
+      errorMessage: null
     });
     try {
       const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
       this.setState({
-        device: savedDevice,
+        device: savedDevice
       });
     } catch (e) {
       let errorMessage = 'integration.melcloud.error.defaultError';
@@ -54,11 +54,11 @@ class MELCloudDeviceBox extends Component {
         errorMessage = 'integration.melcloud.error.conflictError';
       }
       this.setState({
-        errorMessage,
+        errorMessage
       });
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -67,7 +67,7 @@ class MELCloudDeviceBox extends Component {
       loading: true,
       errorMessage: null,
       tooMuchStatesError: false,
-      statesNumber: undefined,
+      statesNumber: undefined
     });
     try {
       if (this.state.device.created_at) {
@@ -82,12 +82,12 @@ class MELCloudDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.melcloud.error.defaultDeletionError',
+          errorMessage: 'integration.melcloud.error.defaultDeletionError'
         });
       }
     }
     this.setState({
-      loading: false,
+      loading: false
     });
   };
 
@@ -100,9 +100,9 @@ class MELCloudDeviceBox extends Component {
       saveButton,
       updateButton,
       alreadyCreatedButton,
-      housesWithRooms,
+      housesWithRooms
     },
-    { device, loading, errorMessage, tooMuchStatesError, statesNumber },
+    { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
     const online = device.online;
@@ -120,7 +120,7 @@ class MELCloudDeviceBox extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading,
+              active: loading
             })}
           >
             <div class="loader" />
@@ -180,9 +180,9 @@ class MELCloudDeviceBox extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {housesWithRooms &&
-                      housesWithRooms.map((house) => (
+                      housesWithRooms.map(house => (
                         <optgroup label={house.name}>
-                          {house.rooms.map((room) => (
+                          {house.rooms.map(room => (
                             <option selected={room.id === device.room_id} value={room.id}>
                               {room.name}
                             </option>

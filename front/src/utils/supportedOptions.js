@@ -18,13 +18,13 @@ function resolveFeatureOptions(deviceFeature, staticOptions) {
     deviceFeature && Array.isArray(deviceFeature.supported_options) ? deviceFeature.supported_options : null;
 
   if (!supportedOptions || supportedOptions.length === 0) {
-    return staticOptions.map((option) => ({ value: option.value, i18nKey: option.i18nKey }));
+    return staticOptions.map(option => ({ value: option.value, i18nKey: option.i18nKey }));
   }
 
-  const i18nKeyByValue = new Map(staticOptions.map((option) => [option.value, option.i18nKey]));
+  const i18nKeyByValue = new Map(staticOptions.map(option => [option.value, option.i18nKey]));
   return [...supportedOptions]
     .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
-    .map((option) => ({ value: option.value, i18nKey: i18nKeyByValue.get(option.value), label: option.label }));
+    .map(option => ({ value: option.value, i18nKey: i18nKeyByValue.get(option.value), label: option.label }));
 }
 
 export { resolveFeatureOptions };

@@ -6,20 +6,20 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: `${serverUrl}/api/v1/service/zigbee2mqtt/status`,
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/status`
       },
       {
-        fixture: 'integration/routes/integration/zigbee2mqtt/status_not_ready_to_setup.json',
-      },
+        fixture: 'integration/routes/integration/zigbee2mqtt/status_not_ready_to_setup.json'
+      }
     );
     cy.intercept(
       {
         method: 'GET',
-        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`,
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
       },
       {
-        body: {},
-      },
+        body: {}
+      }
     );
     cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
   });
@@ -56,18 +56,20 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
     cy.intercept(
       {
         method: 'POST',
-        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`,
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
       },
       {
-        statusCode: 400,
-      },
+        statusCode: 400
+      }
     ).as('setup');
 
     cy.get('[data-cy=z2m-setup-save]').click();
 
-    cy.wait('@setup').its('request.body').should('deep.eq', {
-      Z2M_MQTT_MODE: 'external',
-    });
+    cy.wait('@setup')
+      .its('request.body')
+      .should('deep.eq', {
+        Z2M_MQTT_MODE: 'external'
+      });
 
     // Check error panel
     cy.get('[data-cy=z2m-setup-save-error]').should('exist');
@@ -85,7 +87,7 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
     cy.intercept(
       {
         method: 'POST',
-        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`,
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
       },
       {
         statusCode: 200,
@@ -93,26 +95,28 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
           Z2M_MQTT_MODE: 'external',
           Z2M_MQTT_URL: 'mqtt://localhost',
           GLADYS_MQTT_USERNAME: 'admin',
-          GLADYS_MQTT_PASSWORD: 'test',
-        },
-      },
+          GLADYS_MQTT_PASSWORD: 'test'
+        }
+      }
     ).as('setup');
 
     cy.get('[data-cy=z2m-setup-save]').click();
 
-    cy.wait('@setup').its('request.body').should('deep.eq', {
-      Z2M_MQTT_MODE: 'external',
-      Z2M_MQTT_URL: 'mqtt://localhost',
-      GLADYS_MQTT_USERNAME: 'admin',
-      GLADYS_MQTT_PASSWORD: 'test',
-    });
+    cy.wait('@setup')
+      .its('request.body')
+      .should('deep.eq', {
+        Z2M_MQTT_MODE: 'external',
+        Z2M_MQTT_URL: 'mqtt://localhost',
+        GLADYS_MQTT_USERNAME: 'admin',
+        GLADYS_MQTT_PASSWORD: 'test'
+      });
 
     // Check error panel
     cy.get('[data-cy=z2m-setup-save-error]').should('not.exist');
 
     // Check summary
     cy.get('[data-cy=z2m-setup-remote-mqtt-mode-summary]').i18n(
-      'integration.zigbee2mqtt.setup.modes.remote.external.modeLabel',
+      'integration.zigbee2mqtt.setup.modes.remote.external.modeLabel'
     );
 
     cy.sendWebSocket({
@@ -127,8 +131,8 @@ describe('Zigbee2Mqtt setup wizard remote mode from scratch', () => {
         zigbee2mqttConnected: false,
         z2mEnabled: true,
         dockerBased: false,
-        networkModeValid: false,
-      },
+        networkModeValid: false
+      }
     });
   });
 });

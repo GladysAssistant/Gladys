@@ -23,22 +23,22 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
     item: () => {
       return { path };
     },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
+    collect: monitor => ({
+      isDragging: !!monitor.isDragging()
+    })
   }));
   const [{ isActive }, drop] = useDrop({
     // You can only drag & drop an action group of the same level
     accept: `${ACTION_GROUP_TYPE_LEVEL}_${pathLevel}`,
-    collect: (monitor) => ({
-      isActive: monitor.canDrop() && monitor.isOver(),
+    collect: monitor => ({
+      isActive: monitor.canDrop() && monitor.isOver()
     }),
     drop(item) {
       if (!ref.current) {
         return;
       }
       props.moveCardGroup(item.path, path);
-    },
+    }
   });
   preview(drop(ref));
   return (
@@ -47,7 +47,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
         ref={ref}
         class={cx('card cursor-pointer user-select-none', {
           [style.dropZoneActive]: isActive,
-          [style.dropZoneDragging]: isDragging,
+          [style.dropZoneDragging]: isDragging
         })}
       >
         <div class="card-status bg-green" />
@@ -69,7 +69,7 @@ const ActionGroupWithDragAndDrop = ({ children, ...props }) => {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: props.saving,
+              active: props.saving
             })}
           >
             <div class="loader" />
