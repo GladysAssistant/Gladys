@@ -1985,6 +1985,7 @@ const AI_CHAT_TOOL_CATEGORIES = {
   SCENES: 'scenes',
   DEVICE_CONTROL: 'device_control',
   DEVICE_QUERY: 'device_query',
+  WEATHER: 'weather',
   WEB_AND_TIME: 'web_and_time',
   OTHER: 'other',
 };

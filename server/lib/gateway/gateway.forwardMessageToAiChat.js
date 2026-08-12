@@ -25,13 +25,15 @@ const MAX_FALLBACK_ANSWER_CHARS = 2000;
 const MAX_NESTED_VALUE_CHARS = 2000;
 
 // Only pure "other" chat (general knowledge, greetings) may answer without tools.
-// Home actions, state queries and scenes must call tools first.
+// Home actions, state queries, scenes and weather must call tools first: a
+// forecast is live data, and a model answering it from memory invents it.
 // web_and_time is not forced: current date/time is already in the system prompt,
 // and simple clock questions should not require a tool call.
 const FORCE_TOOL_CHOICE_CATEGORIES = new Set([
   AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY,
   AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL,
   AI_CHAT_TOOL_CATEGORIES.SCENES,
+  AI_CHAT_TOOL_CATEGORIES.WEATHER,
 ]);
 
 const FORCE_TOOL_RETRY_MESSAGE =

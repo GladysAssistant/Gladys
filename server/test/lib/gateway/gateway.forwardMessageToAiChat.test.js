@@ -1620,6 +1620,7 @@ describe('gateway.forwardMessageToAiChat tool choice helpers', () => {
     expect(shouldForceToolChoice(['device_query'])).to.equal(true);
     expect(shouldForceToolChoice(['device_control', 'other'])).to.equal(true);
     expect(shouldForceToolChoice(['scenes'])).to.equal(true);
+    expect(shouldForceToolChoice(['weather'])).to.equal(true);
     expect(shouldForceToolChoice(['web_and_time'])).to.equal(false);
     expect(shouldForceToolChoice(['other'])).to.equal(false);
     expect(shouldForceToolChoice(null)).to.equal(false);

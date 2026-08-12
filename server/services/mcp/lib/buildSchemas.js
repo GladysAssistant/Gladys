@@ -5,6 +5,7 @@ const {
   DEVICE_FEATURE_TYPES,
   COVER_STATE,
   AI_CHAT_TOOL_CATEGORIES,
+  WEATHER_UNITS,
 } = require('../../../utils/constants');
 const { normalize } = require('../../../utils/device');
 const { hexToInt, kelvinToMired } = require('../../../utils/colors');
@@ -18,6 +19,7 @@ const {
 } = require('./sceneSchemas');
 const { fetchWebPage } = require('./webRequest');
 const { compareTimes } = require('./compareTimes');
+const { formatWeather } = require('./formatWeather');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
 
@@ -245,7 +247,13 @@ async function getAllTools(userId) {
   rooms.push(noRoom);
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
-  const houses = (await this.gladys.house.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const allHouses = await this.gladys.house.get();
+  const houses = allHouses.map(({ id, name, selector }) => ({ id, name, selector }));
+  // Weather is fetched from coordinates: a house without them has no weather to
+  // report, and the tool is not exposed at all rather than failing at call time.
+  const housesWithCoordinates = allHouses
+    .filter(({ latitude, longitude }) => Number.isFinite(latitude) && Number.isFinite(longitude))
+    .map(({ id, name, selector, latitude, longitude }) => ({ id, name, selector, latitude, longitude }));
   const calendars = userId
     ? (await this.gladys.calendar.get(userId)).map(({ id, name, selector }) => ({ id, name, selector }))
     : [];
@@ -1484,6 +1492,87 @@ async function getAllTools(userId) {
             {
               type: 'text',
               text: this.toon(response),
+            },
+          ],
+        };
+      },
+    });
+  }
+
+  if (housesWithCoordinates.length > 0) {
+    const defaultWeatherHouse = housesWithCoordinates[0];
+    tools.push({
+      intent: 'weather.get',
+      config: {
+        title: 'Get the weather at home',
+        description:
+          'Get the outside weather at the home location: the current conditions, the forecast for the coming hours ' +
+          'and the daily forecast for the coming days, plus the weather alerts published for that location. ' +
+          'Use it for every question about the weather, the outside temperature, rain, snow, wind, sun or ' +
+          'weather alerts, whether it is about now, today, tomorrow or one of the next days. ' +
+          'Never answer such a question from memory or from a previous answer: a forecast changes every hour. ' +
+          'The condition of a moment is one of clear, cloud, drizzle, fog, rain, sleet, snow, thunderstorm, wind, ' +
+          'night or unknown, and can be missing when the provider does not report it. ' +
+          'Temperatures, wind speeds and precipitation are expressed in the units given by the result. ' +
+          'The daily forecast is keyed by calendar date and does not necessarily start with today, ' +
+          'so always pick the date the user asked about instead of the first entry.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.WEATHER, AI_CHAT_TOOL_CATEGORIES.OTHER],
+        inputSchema: {
+          house: z
+            .enum([...new Set(housesWithCoordinates.map(({ name }) => name))])
+            .describe(`Home to get the weather for. Defaults to ${defaultWeatherHouse.name}.`)
+            .optional(),
+        },
+      },
+      cb: async ({ house }) => {
+        const houseFound = house ? this.findBySimilarity(housesWithCoordinates, house) : null;
+        const selectedHouse = houseFound?.selector ? houseFound : defaultWeatherHouse;
+
+        // The unit system and the language are the ones of the user talking to
+        // Gladys, like the weather routes: the provider answers in °C or °F
+        // depending on that preference. An MCP client without a Gladys user
+        // (Claude Desktop and friends) falls back to metric and English.
+        let units = WEATHER_UNITS.METRIC;
+        let language = 'en';
+        if (userId) {
+          try {
+            const user = await this.gladys.user.getById(userId);
+            units = user.distance_unit_preference || units;
+            language = user.language || language;
+          } catch (e) {
+            // an unknown user is not a reason to refuse the weather
+          }
+        }
+
+        let weather;
+        try {
+          weather = await this.gladys.weather.get({
+            latitude: selectedHouse.latitude,
+            longitude: selectedHouse.longitude,
+            language,
+            units,
+          });
+        } catch (e) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `weather.get: no weather available for ${selectedHouse.name} (${e.message}). ` +
+                  'A weather integration must be installed and configured in Gladys.',
+              },
+            ],
+          };
+        }
+
+        const configuredTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+        const timezoneName = configuredTimezone || DEFAULT_TIMEZONE;
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: this.toon(formatWeather(weather, { house: selectedHouse.name, timezone: timezoneName })),
             },
           ],
         };
