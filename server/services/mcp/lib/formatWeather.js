@@ -2,8 +2,17 @@ const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 
+// Weekday names are rendered in the language of the user talking to Gladys, so
+// "et samedi ?" matches a row of the payload as directly as "and saturday?".
+// English stays the fallback: dayjs silently keeps it for any locale that is
+// not loaded, so an unexpected language degrades instead of failing.
+require('dayjs/locale/fr');
+require('dayjs/locale/de');
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+const DEFAULT_LANGUAGE = 'en';
 
 // The pivot format allows up to 24 hourly and 8 daily entries (B.18). Hours are
 // capped shorter: a chat answer needs the coming hours, not tomorrow morning
@@ -33,7 +42,9 @@ const HOUR_NUMBER_FIELDS = [
   'temperature',
   'apparent_temperature',
   'humidity',
+  'pressure',
   'wind_speed',
+  'wind_direction',
   'wind_gust',
   'cloud_cover',
   'precipitation',
@@ -45,6 +56,7 @@ const DAY_NUMBER_FIELDS = [
   'temperature_max',
   'humidity',
   'wind_speed',
+  'wind_direction',
   'wind_gust',
   'precipitation',
   'precipitation_probability',
@@ -89,11 +101,12 @@ function copyNumberFields(source, fields, target) {
  * @param {any} value - Date, timestamp or date string.
  * @param {string} timezoneName - IANA timezone of the home.
  * @param {string} format - Format accepted by dayjs.
+ * @param {string} [language] - Language of the user, for the locale-aware parts of the format.
  * @returns {string|undefined} Formatted date, or undefined when unparseable.
  * @example
  * formatWeatherDate('2026-08-12T12:00:00Z', 'Europe/Paris', 'YYYY-MM-DD HH:mm');
  */
-function formatWeatherDate(value, timezoneName, format) {
+function formatWeatherDate(value, timezoneName, format, language = DEFAULT_LANGUAGE) {
   if (value === null || value === undefined) {
     return undefined;
   }
@@ -101,7 +114,10 @@ function formatWeatherDate(value, timezoneName, format) {
   if (!date.isValid()) {
     return undefined;
   }
-  return date.tz(timezoneName).format(format);
+  return date
+    .tz(timezoneName)
+    .locale(language)
+    .format(format);
 }
 
 /**
@@ -114,10 +130,11 @@ function formatWeatherDate(value, timezoneName, format) {
  * unitLabels('metric');
  */
 function unitLabels(units) {
+  // pressure is hPa in both systems (B.18 unit line), the others differ
   if (units === 'imperial' || units === 'us') {
-    return { temperature: '°F', wind_speed: 'mph', precipitation: 'in', visibility: 'mi' };
+    return { temperature: '°F', wind_speed: 'mph', precipitation: 'in', visibility: 'mi', pressure: 'hPa' };
   }
-  return { temperature: '°C', wind_speed: 'm/s', precipitation: 'mm', visibility: 'km' };
+  return { temperature: '°C', wind_speed: 'm/s', precipitation: 'mm', visibility: 'km', pressure: 'hPa' };
 }
 
 /**
@@ -159,11 +176,12 @@ function formatAlert(alert, timezoneName) {
  * @param {object} options - Formatting options.
  * @param {string} options.house - House name the weather was fetched for.
  * @param {string} options.timezone - IANA timezone of the home.
+ * @param {string} [options.language] - Language of the user, used for the weekday names.
  * @returns {object} Compact weather object for the model.
  * @example
- * formatWeather(weather, { house: 'Home', timezone: 'Europe/Paris' });
+ * formatWeather(weather, { house: 'Home', timezone: 'Europe/Paris', language: 'fr' });
  */
-function formatWeather(weather, { house, timezone: timezoneName }) {
+function formatWeather(weather, { house, timezone: timezoneName, language = DEFAULT_LANGUAGE }) {
   const units = weather.units === 'imperial' || weather.units === 'us' ? 'imperial' : 'metric';
   const labels = unitLabels(units);
 
@@ -195,6 +213,8 @@ function formatWeather(weather, { house, timezone: timezoneName }) {
     temperature_unit: labels.temperature,
     wind_speed_unit: labels.wind_speed,
     precipitation_unit: labels.precipitation,
+    visibility_unit: labels.visibility,
+    pressure_unit: labels.pressure,
     now,
   };
 
@@ -207,7 +227,13 @@ function formatWeather(weather, { house, timezone: timezoneName }) {
     if (hour.weather) {
       entry.weather = hour.weather;
     }
-    return copyNumberFields(hour, HOUR_NUMBER_FIELDS, entry);
+    copyNumberFields(hour, HOUR_NUMBER_FIELDS, entry);
+    // strict boolean only, like the current conditions: `weather` carries the
+    // meteorology and `is_day` the day/night half of it (B.18)
+    if (typeof hour.is_day === 'boolean') {
+      entry.is_day = hour.is_day;
+    }
+    return entry;
   });
   if (hours.length > 0) {
     formatted.hours = hours;
@@ -221,7 +247,7 @@ function formatWeather(weather, { house, timezone: timezoneName }) {
       // The weekday name saves the model from deriving it from the date: a
       // "what is the weather on saturday" question is answered by matching a
       // row, never by counting days from today.
-      entry.day_of_week = formatWeatherDate(day.datetime, timezoneName, 'dddd');
+      entry.day_of_week = formatWeatherDate(day.datetime, timezoneName, 'dddd', language);
     }
     if (day.weather) {
       entry.weather = day.weather;

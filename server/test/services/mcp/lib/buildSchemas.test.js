@@ -5,6 +5,7 @@ const { stub, fake } = sinon;
 const nock = require('nock');
 const dns = require('dns');
 const { SYSTEM_VARIABLE_NAMES, COVER_STATE, AI_CHAT_TOOL_CATEGORIES } = require('../../../../utils/constants');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const {
   getAllResources,
   getAllTools,
@@ -3682,6 +3683,8 @@ describe('build schemas', () => {
       expect(formatted.timezone).to.equal('Europe/Paris');
       expect(formatted.now.temperature).to.equal(27.3);
       expect(formatted.days[0].date).to.equal('2026-08-13');
+      // weekday name in the language of the user, like the provider request
+      expect(formatted.days[0].day_of_week).to.equal('jeudi');
     });
 
     it('should get the weather of the house asked by the model', async () => {
@@ -3697,12 +3700,26 @@ describe('build schemas', () => {
       });
     });
 
-    it('should fall back to the first house when the requested one does not match', async () => {
+    it('should refuse to guess a home when the requested one does not match', async () => {
       const mcpHandler = buildMcpHandler();
       const tools = await mcpHandler.getAllTools('user-1');
       const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
 
-      await weatherTool.cb({ house: 'Villa inconnue' });
+      const result = await weatherTool.cb({ house: 'Villa inconnue' });
+
+      expect(result.content[0].text).to.equal(
+        'weather.get: no home found matching "Villa inconnue". Available homes: Maison, Chalet. ' +
+          'Ask the user which one instead of reporting the weather of another home.',
+      );
+      expect(mcpHandler.gladys.weather.get.called).to.equal(false);
+    });
+
+    it('should answer for the only home when there is nothing to disambiguate', async () => {
+      const mcpHandler = buildMcpHandler({ houseList: [houses[0], houses[2]] });
+      const tools = await mcpHandler.getAllTools('user-1');
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      await weatherTool.cb({ house: 'Paris' });
 
       expect(mcpHandler.gladys.weather.get.firstCall.args[0]).to.deep.include({
         latitude: 48.8566,
@@ -3752,10 +3769,25 @@ describe('build schemas', () => {
       const result = await weatherTool.cb({});
 
       expect(result.content[0].text).to.equal(
-        'weather.get: no weather available for Maison (No weather provider is installed or configured.). ' +
-          'A weather integration must be installed and configured in Gladys.',
+        'weather.get: no weather available for Maison, the weather provider could not be reached. ' +
+          'Tell the user, and do not give a forecast of your own.',
       );
       expect(mcpHandler.toon.called).to.equal(false);
+    });
+
+    it('should tell the model when no weather integration is configured', async () => {
+      const mcpHandler = buildMcpHandler({
+        weatherGet: stub().rejects(new ServiceNotConfiguredError('No weather provider is installed or configured.')),
+      });
+      const tools = await mcpHandler.getAllTools('user-1');
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      const result = await weatherTool.cb({});
+
+      expect(result.content[0].text).to.equal(
+        'weather.get: no weather available for Maison, no weather integration is installed or configured in Gladys. ' +
+          'Tell the user, and do not give a forecast of your own.',
+      );
     });
 
     it('should not expose weather.get without a house with coordinates', async () => {

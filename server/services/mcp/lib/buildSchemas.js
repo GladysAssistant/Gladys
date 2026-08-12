@@ -7,6 +7,7 @@ const {
   AI_CHAT_TOOL_CATEGORIES,
   WEATHER_UNITS,
 } = require('../../../utils/constants');
+const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { normalize } = require('../../../utils/device');
 const { hexToInt, kelvinToMired } = require('../../../utils/colors');
 const {
@@ -1526,6 +1527,23 @@ async function getAllTools(userId) {
       },
       cb: async ({ house }) => {
         const houseFound = house ? this.findBySimilarity(housesWithCoordinates, house) : null;
+        // A home asked for but not recognized must not be answered with another
+        // home's forecast: on a multi-home install that is a wrong answer the
+        // user cannot detect. With a single home there is nothing to
+        // disambiguate, so the only known location answers.
+        if (house && !houseFound?.selector && housesWithCoordinates.length > 1) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `weather.get: no home found matching "${house}". ` +
+                  `Available homes: ${housesWithCoordinates.map(({ name }) => name).join(', ')}. ` +
+                  'Ask the user which one instead of reporting the weather of another home.',
+              },
+            ],
+          };
+        }
         const selectedHouse = houseFound?.selector ? houseFound : defaultWeatherHouse;
 
         // The unit system and the language are the ones of the user talking to
@@ -1553,13 +1571,20 @@ async function getAllTools(userId) {
             units,
           });
         } catch (e) {
+          // The two cases the user can act on, and nothing else: a raw provider
+          // message can carry transport internals (a request URL still holds
+          // its API key) and it would travel to the model, then to the chat.
+          const reason =
+            e instanceof ServiceNotConfiguredError
+              ? 'no weather integration is installed or configured in Gladys'
+              : 'the weather provider could not be reached';
           return {
             content: [
               {
                 type: 'text',
                 text:
-                  `weather.get: no weather available for ${selectedHouse.name} (${e.message}). ` +
-                  'A weather integration must be installed and configured in Gladys.',
+                  `weather.get: no weather available for ${selectedHouse.name}, ${reason}. ` +
+                  'Tell the user, and do not give a forecast of your own.',
               },
             ],
           };
@@ -1572,7 +1597,7 @@ async function getAllTools(userId) {
           content: [
             {
               type: 'text',
-              text: this.toon(formatWeather(weather, { house: selectedHouse.name, timezone: timezoneName })),
+              text: this.toon(formatWeather(weather, { house: selectedHouse.name, timezone: timezoneName, language })),
             },
           ],
         };

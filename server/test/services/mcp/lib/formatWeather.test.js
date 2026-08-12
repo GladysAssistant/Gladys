@@ -34,9 +34,17 @@ describe('formatWeather', () => {
             datetime: '2026-08-12T13:00:00.000Z',
             weather: 'cloud',
             temperature: 26.5,
+            apparent_temperature: 27.1,
+            humidity: 55,
+            pressure: 1004,
             precipitation: 0.2,
             precipitation_probability: 30,
             wind_speed: 4.2,
+            wind_direction: 200,
+            wind_gust: 9.6,
+            cloud_cover: 40,
+            uv_index: 5,
+            is_day: true,
           },
         ],
         days: [
@@ -45,8 +53,13 @@ describe('formatWeather', () => {
             weather: 'rain',
             temperature_min: 17.2,
             temperature_max: 24.8,
+            humidity: 70,
             precipitation: 5.4,
             precipitation_probability: 80,
+            wind_speed: 6.1,
+            wind_direction: 190,
+            wind_gust: 15.2,
+            uv_index: 3,
             sunrise: '2026-08-13T04:31:00.000Z',
             sunset: '2026-08-13T19:18:00.000Z',
           },
@@ -72,6 +85,8 @@ describe('formatWeather', () => {
       temperature_unit: '°C',
       wind_speed_unit: 'm/s',
       precipitation_unit: 'mm',
+      visibility_unit: 'km',
+      pressure_unit: 'hPa',
       now: {
         datetime: '2026-08-12 14:00',
         weather: 'clear',
@@ -95,9 +110,17 @@ describe('formatWeather', () => {
           datetime: '2026-08-12 15:00',
           weather: 'cloud',
           temperature: 26.5,
+          apparent_temperature: 27.1,
+          humidity: 55,
+          pressure: 1004,
           wind_speed: 4.2,
+          wind_direction: 200,
+          wind_gust: 9.6,
+          cloud_cover: 40,
           precipitation: 0.2,
           precipitation_probability: 30,
+          uv_index: 5,
+          is_day: true,
         },
       ],
       days: [
@@ -107,8 +130,13 @@ describe('formatWeather', () => {
           weather: 'rain',
           temperature_min: 17.2,
           temperature_max: 24.8,
+          humidity: 70,
+          wind_speed: 6.1,
+          wind_direction: 190,
+          wind_gust: 15.2,
           precipitation: 5.4,
           precipitation_probability: 80,
+          uv_index: 3,
           sunrise: '06:31',
           sunset: '21:18',
         },
@@ -168,6 +196,8 @@ describe('formatWeather', () => {
       temperature_unit: '°C',
       wind_speed_unit: 'm/s',
       precipitation_unit: 'mm',
+      visibility_unit: 'km',
+      pressure_unit: 'hPa',
       now: {},
     });
   });
@@ -188,6 +218,9 @@ describe('formatWeather', () => {
     expect(formatted.temperature_unit).to.equal('°F');
     expect(formatted.wind_speed_unit).to.equal('mph');
     expect(formatted.precipitation_unit).to.equal('in');
+    expect(formatted.visibility_unit).to.equal('mi');
+    // pressure is hPa in both unit systems
+    expect(formatted.pressure_unit).to.equal('hPa');
     expect(formatted.now.datetime).to.equal('2026-08-12 19:00');
     expect(formatted.now.is_day).to.equal(false);
   });
@@ -227,6 +260,25 @@ describe('formatWeather', () => {
     );
 
     expect(formatted.alerts[0].description).to.equal(`${'a'.repeat(MAX_ALERT_DESCRIPTION_CHARS)}...`);
+  });
+
+  it('should render the weekday names in the language of the user', () => {
+    const weather = {
+      temperature: 20,
+      units: 'metric',
+      days: [{ datetime: '2026-08-13T00:00:00.000Z', temperature_min: 17, temperature_max: 24 }],
+    };
+
+    const french = formatWeather(weather, { house: 'Home', timezone: 'Europe/Paris', language: 'fr' });
+    const german = formatWeather(weather, { house: 'Home', timezone: 'Europe/Paris', language: 'de' });
+    // an unknown language degrades to English instead of failing
+    const unknown = formatWeather(weather, { house: 'Home', timezone: 'Europe/Paris', language: 'xx' });
+
+    expect(french.days[0].day_of_week).to.equal('jeudi');
+    expect(german.days[0].day_of_week).to.equal('Donnerstag');
+    expect(unknown.days[0].day_of_week).to.equal('Thursday');
+    // the calendar date stays the language-independent key of a day
+    expect(french.days[0].date).to.equal('2026-08-13');
   });
 
   it('should drop an empty alert description', () => {
