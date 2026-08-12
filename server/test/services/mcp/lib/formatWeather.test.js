@@ -107,7 +107,7 @@ describe('formatWeather', () => {
       },
       hours: [
         {
-          datetime: '2026-08-12 15:00',
+          datetime: '2026-08-12 15:00+02:00',
           weather: 'cloud',
           temperature: 26.5,
           apparent_temperature: 27.1,
@@ -177,7 +177,7 @@ describe('formatWeather', () => {
       weather: 'fog',
       temperature: 12,
     });
-    expect(formatted.hours).to.deep.equal([{ datetime: '2026-01-05 10:00' }]);
+    expect(formatted.hours).to.deep.equal([{ datetime: '2026-01-05 10:00+01:00' }]);
     // no datetime on the day entry: no date and no weekday, only the measures
     expect(formatted.days).to.deep.equal([{ temperature_min: 3, temperature_max: 9 }]);
     expect(formatted.alerts).to.deep.equal([{ severity: 'minor', event: 'Vent' }]);
@@ -260,6 +260,46 @@ describe('formatWeather', () => {
     );
 
     expect(formatted.alerts[0].description).to.equal(`${'a'.repeat(MAX_ALERT_DESCRIPTION_CHARS)}...`);
+  });
+
+  it('should keep the two repeated hours of a fall-back night apart', () => {
+    const formatted = formatWeather(
+      {
+        temperature: 12,
+        units: 'metric',
+        hours: [
+          // both instants read 02:00 on the Paris clock, an hour apart
+          { datetime: '2025-10-26T00:00:00.000Z', temperature: 13 },
+          { datetime: '2025-10-26T01:00:00.000Z', temperature: 12 },
+        ],
+      },
+      { house: 'Home', timezone: 'Europe/Paris' },
+    );
+
+    expect(formatted.hours.map(({ datetime }) => datetime)).to.deep.equal([
+      '2025-10-26 02:00+02:00',
+      '2025-10-26 02:00+01:00',
+    ]);
+  });
+
+  it('should render the offset of a zone that is behind UTC or off the hour', () => {
+    const formatted = formatWeather(
+      {
+        units: 'metric',
+        hours: [
+          { datetime: '2026-01-05T12:00:00.000Z', temperature: 20 },
+          { datetime: '2026-01-05T12:00:30.500Z', temperature: 21 },
+        ],
+      },
+      { house: 'Home', timezone: 'America/St_Johns' },
+    );
+
+    // Newfoundland sits 3h30 behind UTC in winter, and the seconds of the
+    // second entry must not shift its offset
+    expect(formatted.hours.map(({ datetime }) => datetime)).to.deep.equal([
+      '2026-01-05 08:30-03:30',
+      '2026-01-05 08:30-03:30',
+    ]);
   });
 
   it('should render the weekday names in the language of the user', () => {

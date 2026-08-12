@@ -1,18 +1,21 @@
 const dayjs = require('dayjs');
-const utc = require('dayjs/plugin/utc');
-const timezone = require('dayjs/plugin/timezone');
 
-// Weekday names are rendered in the language of the user talking to Gladys, so
-// "et samedi ?" matches a row of the payload as directly as "and saturday?".
-// English stays the fallback: dayjs silently keeps it for any locale that is
-// not loaded, so an unexpected language degrades instead of failing.
-require('dayjs/locale/fr');
-require('dayjs/locale/de');
+const { AVAILABLE_LANGUAGES_LIST } = require('../../../utils/constants');
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
+// dayjs parses whatever shape a provider sends (ISO string, Date, timestamp),
+// but it never renders here: the timezone plugin of the version this service
+// bundles resolves the repeated hour of a fall-back night to the wrong local
+// hour when the process runs in the target zone — the standard Docker setup,
+// where TZ and the Gladys timezone are the same. Intl is correct by
+// specification and independent of the process timezone, so every zoned label
+// below is built from its parts.
 const DEFAULT_LANGUAGE = 'en';
+
+// One formatter per timezone, and per (locale, timezone) for the weekday:
+// building an Intl.DateTimeFormat is the expensive part, and a single weather
+// payload formats up to twenty-five instants in the same zone.
+const partsFormatters = new Map();
+const weekdayFormatters = new Map();
 
 // The pivot format allows up to 24 hourly and 8 daily entries (B.18). Hours are
 // capped shorter: a chat answer needs the coming hours, not tomorrow morning
@@ -97,16 +100,13 @@ function copyNumberFields(source, fields, target) {
 }
 
 /**
- * @description Format a pivot datetime in the home timezone.
- * @param {any} value - Date, timestamp or date string.
- * @param {string} timezoneName - IANA timezone of the home.
- * @param {string} format - Format accepted by dayjs.
- * @param {string} [language] - Language of the user, for the locale-aware parts of the format.
- * @returns {string|undefined} Formatted date, or undefined when unparseable.
+ * @description Parse a pivot datetime into an instant.
+ * @param {any} value - Date, timestamp or date string sent by the provider.
+ * @returns {number|undefined} Milliseconds since the epoch, or undefined when unparseable.
  * @example
- * formatWeatherDate('2026-08-12T12:00:00Z', 'Europe/Paris', 'YYYY-MM-DD HH:mm');
+ * toTimestamp('2026-08-12T12:00:00Z');
  */
-function formatWeatherDate(value, timezoneName, format, language = DEFAULT_LANGUAGE) {
+function toTimestamp(value) {
   if (value === null || value === undefined) {
     return undefined;
   }
@@ -114,10 +114,122 @@ function formatWeatherDate(value, timezoneName, format, language = DEFAULT_LANGU
   if (!date.isValid()) {
     return undefined;
   }
-  return date
-    .tz(timezoneName)
-    .locale(language)
-    .format(format);
+  return date.valueOf();
+}
+
+/**
+ * @description Calendar parts of an instant, read in a timezone.
+ * @param {number} timestamp - Instant, in milliseconds since the epoch.
+ * @param {string} timezoneName - IANA timezone of the home.
+ * @returns {object} Parts of the local clock reading, as zero-padded strings.
+ * @example
+ * zonedParts(Date.parse('2026-08-12T12:00:00Z'), 'Europe/Paris');
+ */
+function zonedParts(timestamp, timezoneName) {
+  let formatter = partsFormatters.get(timezoneName);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: timezoneName,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    });
+    partsFormatters.set(timezoneName, formatter);
+  }
+  return Object.fromEntries(formatter.formatToParts(new Date(timestamp)).map(({ type, value }) => [type, value]));
+}
+
+/**
+ * @description Calendar date of an instant in the home timezone.
+ * @param {number} timestamp - Instant, in milliseconds since the epoch.
+ * @param {string} timezoneName - IANA timezone of the home.
+ * @returns {string} Date as YYYY-MM-DD.
+ * @example
+ * formatZonedDate(Date.parse('2026-08-12T12:00:00Z'), 'Europe/Paris');
+ */
+function formatZonedDate(timestamp, timezoneName) {
+  const parts = zonedParts(timestamp, timezoneName);
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
+/**
+ * @description Clock reading of an instant in the home timezone.
+ * @param {number} timestamp - Instant, in milliseconds since the epoch.
+ * @param {string} timezoneName - IANA timezone of the home.
+ * @returns {string} Time as HH:mm.
+ * @example
+ * formatZonedTime(Date.parse('2026-08-12T12:00:00Z'), 'Europe/Paris');
+ */
+function formatZonedTime(timestamp, timezoneName) {
+  const parts = zonedParts(timestamp, timezoneName);
+  return `${parts.hour}:${parts.minute}`;
+}
+
+/**
+ * @description Date and clock reading of an instant in the home timezone.
+ * @param {number} timestamp - Instant, in milliseconds since the epoch.
+ * @param {string} timezoneName - IANA timezone of the home.
+ * @returns {string} Datetime as YYYY-MM-DD HH:mm.
+ * @example
+ * formatZonedDateTime(Date.parse('2026-08-12T12:00:00Z'), 'Europe/Paris');
+ */
+function formatZonedDateTime(timestamp, timezoneName) {
+  return `${formatZonedDate(timestamp, timezoneName)} ${formatZonedTime(timestamp, timezoneName)}`;
+}
+
+/**
+ * @description UTC offset of an instant in a timezone, formatted as +HH:mm.
+ * Computed from the parts above rather than read from a timeZoneName part: that
+ * field is CLDR text whose spelling moves with the ICU version, while the
+ * arithmetic is stable and gets the zones sitting on a half or quarter hour
+ * right for free.
+ * @param {number} timestamp - Instant, in milliseconds since the epoch.
+ * @param {string} timezoneName - IANA timezone of the home.
+ * @returns {string} Offset of that instant, for example '+02:00'.
+ * @example
+ * utcOffsetLabel(Date.parse('2025-10-26T01:00:00Z'), 'Europe/Paris');
+ */
+function utcOffsetLabel(timestamp, timezoneName) {
+  // floored to the minute: offsets are whole minutes, and the parts carry no
+  // seconds, so any seconds in the instant would skew the difference
+  const instant = Math.floor(timestamp / 60000) * 60000;
+  const parts = zonedParts(instant, timezoneName);
+  const localAsUtc = new Date(0);
+  localAsUtc.setUTCFullYear(Number(parts.year), Number(parts.month) - 1, Number(parts.day));
+  localAsUtc.setUTCHours(Number(parts.hour), Number(parts.minute), 0, 0);
+  const offsetMinutes = Math.round((localAsUtc.getTime() - instant) / 60000);
+  const sign = offsetMinutes < 0 ? '-' : '+';
+  const absoluteMinutes = Math.abs(offsetMinutes);
+  const hours = String(Math.floor(absoluteMinutes / 60)).padStart(2, '0');
+  const minutes = String(absoluteMinutes % 60).padStart(2, '0');
+  return `${sign}${hours}:${minutes}`;
+}
+
+/**
+ * @description Name of the weekday of an instant, in the language of the user.
+ * Rendered so that "et samedi ?" matches a row of the payload as directly as
+ * "and saturday?" does. Any language outside the ones Gladys supports falls back
+ * to English rather than to the locale of the host, which would make the payload
+ * depend on the machine.
+ * @param {number} timestamp - Instant, in milliseconds since the epoch.
+ * @param {string} timezoneName - IANA timezone of the home.
+ * @param {string} language - Language of the user.
+ * @returns {string} Weekday name, for example 'jeudi'.
+ * @example
+ * weekdayName(Date.parse('2026-08-13T00:00:00Z'), 'Europe/Paris', 'fr');
+ */
+function weekdayName(timestamp, timezoneName, language) {
+  const locale = AVAILABLE_LANGUAGES_LIST.includes(language) ? language : DEFAULT_LANGUAGE;
+  const key = `${locale}|${timezoneName}`;
+  let formatter = weekdayFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, { timeZone: timezoneName, weekday: 'long' });
+    weekdayFormatters.set(key, formatter);
+  }
+  return formatter.format(new Date(timestamp));
 }
 
 /**
@@ -150,13 +262,13 @@ function formatAlert(alert, timezoneName) {
   if (alert.type) {
     formatted.type = alert.type;
   }
-  const start = formatWeatherDate(alert.start, timezoneName, 'YYYY-MM-DD HH:mm');
-  if (start) {
-    formatted.start = start;
+  const start = toTimestamp(alert.start);
+  if (start !== undefined) {
+    formatted.start = formatZonedDateTime(start, timezoneName);
   }
-  const end = formatWeatherDate(alert.end, timezoneName, 'YYYY-MM-DD HH:mm');
-  if (end) {
-    formatted.end = end;
+  const end = toTimestamp(alert.end);
+  if (end !== undefined) {
+    formatted.end = formatZonedDateTime(end, timezoneName);
   }
   if (typeof alert.description === 'string' && alert.description.length > 0) {
     formatted.description =
@@ -186,9 +298,9 @@ function formatWeather(weather, { house, timezone: timezoneName, language = DEFA
   const labels = unitLabels(units);
 
   const now = {};
-  const datetime = formatWeatherDate(weather.datetime, timezoneName, 'YYYY-MM-DD HH:mm');
-  if (datetime) {
-    now.datetime = datetime;
+  const datetime = toTimestamp(weather.datetime);
+  if (datetime !== undefined) {
+    now.datetime = formatZonedDateTime(datetime, timezoneName);
   }
   if (weather.weather) {
     now.weather = weather.weather;
@@ -197,13 +309,13 @@ function formatWeather(weather, { house, timezone: timezoneName, language = DEFA
   if (typeof weather.is_day === 'boolean') {
     now.is_day = weather.is_day;
   }
-  const sunrise = formatWeatherDate(weather.sunrise, timezoneName, 'HH:mm');
-  if (sunrise) {
-    now.sunrise = sunrise;
+  const sunrise = toTimestamp(weather.sunrise);
+  if (sunrise !== undefined) {
+    now.sunrise = formatZonedTime(sunrise, timezoneName);
   }
-  const sunset = formatWeatherDate(weather.sunset, timezoneName, 'HH:mm');
-  if (sunset) {
-    now.sunset = sunset;
+  const sunset = toTimestamp(weather.sunset);
+  if (sunset !== undefined) {
+    now.sunset = formatZonedTime(sunset, timezoneName);
   }
 
   const formatted = {
@@ -220,9 +332,15 @@ function formatWeather(weather, { house, timezone: timezoneName, language = DEFA
 
   const hours = (Array.isArray(weather.hours) ? weather.hours : []).slice(0, MAX_HOURS).map((hour) => {
     const entry = {};
-    const hourDatetime = formatWeatherDate(hour.datetime, timezoneName, 'YYYY-MM-DD HH:mm');
-    if (hourDatetime) {
-      entry.datetime = hourDatetime;
+    const hourDatetime = toTimestamp(hour.datetime);
+    if (hourDatetime !== undefined) {
+      // The offset keeps hourly labels unique on the night a timezone falls
+      // back: in Paris, 2025-10-26T00:00Z and 2025-10-26T01:00Z are two
+      // different hours of the forecast that both read 02:00 on the local clock.
+      entry.datetime = `${formatZonedDateTime(hourDatetime, timezoneName)}${utcOffsetLabel(
+        hourDatetime,
+        timezoneName,
+      )}`;
     }
     if (hour.weather) {
       entry.weather = hour.weather;
@@ -241,25 +359,25 @@ function formatWeather(weather, { house, timezone: timezoneName, language = DEFA
 
   const days = (Array.isArray(weather.days) ? weather.days : []).slice(0, MAX_DAYS).map((day) => {
     const entry = {};
-    const date = formatWeatherDate(day.datetime, timezoneName, 'YYYY-MM-DD');
-    if (date) {
-      entry.date = date;
+    const dayDatetime = toTimestamp(day.datetime);
+    if (dayDatetime !== undefined) {
+      entry.date = formatZonedDate(dayDatetime, timezoneName);
       // The weekday name saves the model from deriving it from the date: a
       // "what is the weather on saturday" question is answered by matching a
       // row, never by counting days from today.
-      entry.day_of_week = formatWeatherDate(day.datetime, timezoneName, 'dddd', language);
+      entry.day_of_week = weekdayName(dayDatetime, timezoneName, language);
     }
     if (day.weather) {
       entry.weather = day.weather;
     }
     copyNumberFields(day, DAY_NUMBER_FIELDS, entry);
-    const daySunrise = formatWeatherDate(day.sunrise, timezoneName, 'HH:mm');
-    if (daySunrise) {
-      entry.sunrise = daySunrise;
+    const daySunrise = toTimestamp(day.sunrise);
+    if (daySunrise !== undefined) {
+      entry.sunrise = formatZonedTime(daySunrise, timezoneName);
     }
-    const daySunset = formatWeatherDate(day.sunset, timezoneName, 'HH:mm');
-    if (daySunset) {
-      entry.sunset = daySunset;
+    const daySunset = toTimestamp(day.sunset);
+    if (daySunset !== undefined) {
+      entry.sunset = formatZonedTime(daySunset, timezoneName);
     }
     return entry;
   });
