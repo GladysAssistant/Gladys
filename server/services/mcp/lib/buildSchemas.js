@@ -46,6 +46,35 @@ const intervalByName = {
 };
 
 /**
+ * @description Resolve a device type sent by the model to a feature category of this home.
+ * @param {string} requestedType - Device type as sent by the model.
+ * @param {Array<string>} availableDeviceTypes - Feature categories available in this home.
+ * @returns {string} Matching feature category, or the requested type when nothing matches.
+ * @example
+ * resolveDeviceType('temperature', ['temperature-sensor']);
+ */
+function resolveDeviceType(requestedType, availableDeviceTypes) {
+  const normalized = String(requestedType)
+    .trim()
+    .toLowerCase();
+
+  const exactMatch = availableDeviceTypes.find((category) => category.toLowerCase() === normalized);
+  if (exactMatch) {
+    return exactMatch;
+  }
+
+  // Models routinely drop the category suffix and ask for "temperature" instead of
+  // "temperature-sensor". Returning the requested type untouched when nothing
+  // matches keeps "this category does not exist in this home" a distinct outcome.
+  const prefixMatch = availableDeviceTypes.find((category) => category.toLowerCase().startsWith(`${normalized}-`));
+  if (prefixMatch) {
+    return prefixMatch;
+  }
+
+  return requestedType;
+}
+
+/**
  * @description Get all resources (room and devices) available for the MCP service.
  * @returns {Promise<Array>} Array of resources with home schema configuration.
  * @example
@@ -241,7 +270,12 @@ async function getAllResources() {
  * getAllTools('0cd30aef-9c4e-4a23-88e3-3547971296e5')
  */
 async function getAllTools(userId) {
-  const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector, house_id: houseId }) => ({
+    id,
+    name,
+    selector,
+    house_id: houseId,
+  }));
   rooms.push(noRoom);
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
@@ -324,6 +358,14 @@ async function getAllTools(userId) {
         })
         .flat(),
     ),
+  ];
+  const availableDeviceTypes = [
+    ...new Set([
+      ...availableSensorFeatureCategories,
+      ...availableSwitchableFeatureCategories,
+      ...availableLightControlFeatureCategories,
+      ...availableShutterFeatureCategories,
+    ]),
   ];
   const deviceFeatureSelectors = allDevices
     .map((device) => device.features.map((feature) => feature.selector))
@@ -504,16 +546,12 @@ async function getAllTools(userId) {
           room: z
             .enum(rooms.map(({ name }) => name))
             .optional()
-            .describe('Room to get information from, leave empty to select multiple rooms.'),
+            .describe(
+              'Room to get information from. Only a room name from the list is accepted, ' +
+                'leave empty to cover the whole home.',
+            ),
           device_type: z
-            .enum([
-              ...new Set([
-                ...availableSensorFeatureCategories,
-                ...availableSwitchableFeatureCategories,
-                ...availableLightControlFeatureCategories,
-                ...availableShutterFeatureCategories,
-              ]),
-            ])
+            .enum(availableDeviceTypes)
             .optional()
             .describe('Type of device to query, leave empty to retrieve all devices.'),
         },
@@ -522,15 +560,58 @@ async function getAllTools(userId) {
         const states = [];
 
         let selectedDevices = [...sensorDevices, ...switchableDevices, ...lightControlDevices, ...shutterDevices];
+        let scopeLabel = '';
 
+        // The chat gateway runs this callback with the raw arguments produced by the
+        // model, which is not bound by the enums above. "Températures de la maison"
+        // makes it pass the house as a room: that used to resolve to no selector at
+        // all, filter every device out, and the empty result then reads as "no
+        // temperature sensor is configured at home".
         if (room && room !== '') {
-          const { selector } = this.findBySimilarity(rooms, room);
-          selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
+          const selectedRoom = this.findBySimilarity(rooms, room);
+
+          if (selectedRoom?.selector) {
+            selectedDevices = selectedDevices.filter(
+              (d) => (d.room?.selector || noRoom.selector) === selectedRoom.selector,
+            );
+            scopeLabel = ` in room "${selectedRoom.name}"`;
+          } else {
+            const selectedHouse = this.findBySimilarity(houses, room);
+
+            if (selectedHouse?.id) {
+              // A house is the whole home, not a room: keep every device of its rooms,
+              // plus the devices that are not assigned to a room.
+              const houseRoomSelectors = rooms
+                .filter((r) => r.house_id === selectedHouse.id)
+                .map(({ selector }) => selector);
+              selectedDevices = selectedDevices.filter(
+                (d) => !d.room?.selector || houseRoomSelectors.includes(d.room.selector),
+              );
+              scopeLabel = ` in house "${selectedHouse.name}"`;
+            } else {
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text:
+                      `device.get-state: "${room}" is not a room of this home, no state was read. ` +
+                      `Available rooms: ${rooms.map(({ name }) => name).join(', ')}. ` +
+                      'Call this tool again with one of them, or without the room parameter to cover the whole home.',
+                  },
+                ],
+              };
+            }
+          }
         }
 
-        if (deviceType && deviceType.length > 0) {
+        const requestedDeviceTypes = (Array.isArray(deviceType) ? deviceType : [deviceType]).filter(Boolean);
+        const deviceTypes = requestedDeviceTypes.map((requestedType) =>
+          resolveDeviceType(requestedType, availableDeviceTypes),
+        );
+
+        if (deviceTypes.length > 0) {
           selectedDevices = selectedDevices.filter((device) => {
-            return device.features.some((feature) => deviceType.includes(feature.category));
+            return device.features.some((feature) => deviceTypes.includes(feature.category));
           });
         }
 
@@ -538,7 +619,7 @@ async function getAllTools(userId) {
           selectedDevices.map(async (device) => {
             const deviceLastState = await this.gladys.device.getBySelector(device.selector);
             return device.features.map((feature) => {
-              if (!deviceType || deviceType.length === 0 || deviceType.includes(feature.category)) {
+              if (deviceTypes.length === 0 || deviceTypes.includes(feature.category)) {
                 const featureLastState = deviceLastState.features.find((feat) => feat.id === feature.id);
 
                 states.push({
@@ -560,15 +641,14 @@ async function getAllTools(userId) {
         // An empty list is an ambiguous signal for the model, which tends to fill the
         // gap with a plausible value. Say explicitly that nothing is configured.
         if (states.length === 0) {
-          const typeLabel = deviceType && deviceType.length > 0 ? ` of type "${deviceType}"` : '';
-          const roomLabel = room && room !== '' ? ` in room "${room}"` : '';
+          const typeLabel = deviceTypes.length > 0 ? ` of type "${deviceTypes.join('", "')}"` : '';
 
           return {
             content: [
               {
                 type: 'text',
                 text:
-                  `device.get-state: no device${typeLabel} is configured${roomLabel}. ` +
+                  `device.get-state: no device${typeLabel} is configured${scopeLabel}. ` +
                   'No measurement exists for this query, do not report any value.',
               },
             ],
