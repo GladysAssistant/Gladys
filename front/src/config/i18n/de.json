@@ -5411,6 +5411,10 @@
       "shortCategoryName": "HEPA-Filterüberwachung",
       "filter-life-remaining": "Verbleibende Filterlebensdauer"
     },
+    "maintenance": {
+      "shortCategoryName": "Wartung",
+      "life-remaining": "Verbleibende Lebensdauer der Komponente"
+    },
     "duration": {
       "shortCategoryName": "Dauer",
       "decimal": "Dauer (dezimal)",
