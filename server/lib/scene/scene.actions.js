@@ -99,7 +99,7 @@ const actionsFunc = {
           noEscape: true,
         })(scope);
       }
-      if (value === undefined || value === null) {
+      if (value === undefined || value === null || value === '') {
         throw new AbortScene('ACTION_VALUE_EMPTY');
       }
       return self.device.setValue(device, deviceFeature, String(value));

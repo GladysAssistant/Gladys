@@ -595,6 +595,63 @@ describe('scene.executeActions', () => {
     );
     return chaiAssert.isRejected(promise, AbortScene, 'ACTION_VALUE_EMPTY');
   });
+  it('should abort scene when the value is an empty string on a text feature', async () => {
+    stateManager.setState('deviceFeature', 'my-text-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-text-feature',
+            value: '',
+          },
+        ],
+      ],
+      {},
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'ACTION_VALUE_EMPTY');
+  });
+  it('should abort scene when the text renders to an empty string on a text feature', async () => {
+    stateManager.setState('deviceFeature', 'my-text-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    // A variable which cannot be resolved is rendered as an empty string by Handlebars
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-text-feature',
+            evaluate_value: '{{missing.variable}}',
+          },
+        ],
+      ],
+      {},
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'ACTION_VALUE_EMPTY');
+  });
   it('should execute action device.setValue', async () => {
     const example = {
       stop: fake.resolves(null),
