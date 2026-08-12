@@ -260,15 +260,37 @@ describe('gateway.processVoiceMessage', () => {
     const eventEmit = fake();
     const ctx = buildContext({
       event: { emit: eventEmit },
-      tts: { getSpeechUrl: fake.rejects(new Error('tts down')) },
+      forwardMessageToAiChat: fake.rejects(new Error('ai down')),
     });
 
-    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), 'tts down');
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), 'ai down');
 
     const errorPayload = eventEmit
       .getCalls()
       .map((call) => call.args[1])
       .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
-    expect(errorPayload.payload).to.deep.equal({ error: 'unknown', message: 'tts down' });
+    expect(errorPayload.payload).to.deep.equal({ error: 'unknown', message: 'ai down' });
+  });
+
+  it('should return a text-only answer when the TTS provider is unavailable', async () => {
+    const eventEmit = fake();
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      tts: { getSpeechUrl: fake.rejects(new Error('tts down')) },
+    });
+
+    const result = await processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user });
+
+    expect(result).to.deep.equal({
+      transcription: 'allume la lumière',
+      answer: 'La lumière est allumée.',
+      ttsUrl: null,
+    });
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload).to.equal(undefined);
   });
 });

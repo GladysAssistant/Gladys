@@ -89,8 +89,14 @@ async function processVoiceMessage({ audio, contentType = 'application/octet-str
     if (answer) {
       // active provider dispatch (Gladys Plus by default, or a TTS provider
       // integration — see gladys.tts); attached post-construction in lib/index.js
-      const ttsResponse = await this.tts.getSpeechUrl({ text: answer, language: user.language });
-      ttsUrl = ttsResponse?.url ?? null;
+      // A TTS failure must not discard the transcription and the answer: the
+      // voice assistant degrades to a text-only reply.
+      try {
+        const ttsResponse = await this.tts.getSpeechUrl({ text: answer, language: user.language });
+        ttsUrl = ttsResponse?.url ?? null;
+      } catch (e) {
+        logger.warn(e);
+      }
     }
 
     return {
