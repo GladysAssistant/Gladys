@@ -691,7 +691,7 @@ Two more reserved keys cover the **degraded state** — the "it works, but not a
 
 **`POST /api/integration/v1/container/:name/restart`** — body `{}` → `200 { "success": true }`. Typical use: the integration has rewritten one of the sub-container's config files via `/data` (see B.2) and restarts it to apply.
 
-**`POST /api/integration/v1/network/wake`** - body `{ "mac": "64:e4:d5:b4:12:66", "address": "255.255.255.255", "port": 9, "sourcePort": 0 }` -> `200 { "success": true }`. sends a standard Wake-on-LAN magic packet from the Gladys core network namespace. **Requires `network_wake: true` in the manifest** (shown on the install screen); otherwise the core returns `403 FORBIDDEN`.
+**`POST /api/integration/v1/network/wake`** — body `{ "mac": "64:e4:d5:b4:12:66", "address": "255.255.255.255", "port": 9, "sourcePort": 0 }` → `200 { "success": true }`. Sends a standard Wake-on-LAN magic packet from the Gladys core network namespace. **Requires `network_wake: true` in the manifest** (shown on the install screen); otherwise the core returns `403 FORBIDDEN`.
 * mac is required. Accepted formats: 64:e4:d5:b4:12:66, 64-e4-d5-b4-12-66, or 64E4D5B41266.
 * address is optional and defaults to 255.255.255.255.
 * port is optional and defaults to UDP destination port 9.

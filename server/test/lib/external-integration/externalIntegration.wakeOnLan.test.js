@@ -190,7 +190,7 @@ describe('externalIntegration.wakeOnLan', () => {
           error = e;
         }
 
-        expect(error).to.be.instanceOf(Error);
+        expect(error).to.be.instanceOf(BadParameters);
       }),
     );
   });
@@ -214,7 +214,7 @@ describe('externalIntegration.wakeOnLan', () => {
           error = e;
         }
 
-        expect(error).to.be.instanceOf(Error);
+        expect(error).to.be.instanceOf(BadParameters);
       }),
     );
   });
