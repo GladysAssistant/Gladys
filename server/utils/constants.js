@@ -790,9 +790,14 @@ const DEVICE_FEATURE_CATEGORIES = {
   LEVEL_SENSOR: 'level-sensor',
   MOTION_SENSOR: 'motion-sensor',
   LOCK: 'lock',
-  // Generic consumable/wear-part monitoring (vacuum brushes, dust bags, filters...). One feature
-  // per component, the feature `name` identifies the component: don't add a new per-component
-  // type/category here when the value is just "remaining life in percent".
+  // Generic consumable/wear-part monitoring (vacuum brushes, dust bags, mop pads, softener resin,
+  // detergent...). One feature per component, the feature `name` identifies the component: don't
+  // add a new per-component type/category here when the value is just "remaining life in percent".
+  // Boundary with neighboring categories: filter life reported through the Matter Resource
+  // Monitoring model (HEPA and activated carbon filters) stays in HEPA_FILTER_MONITORING, every
+  // other consumable or wear part goes here, so the same quantity is never split across categories.
+  // The name `maintenance` is deliberate: it is a user-facing category name in the UI, kept broader
+  // and simpler than a Matter-style `consumable-monitoring`. Renaming it later would be breaking.
   MAINTENANCE: 'maintenance',
   MUSIC: 'music',
   NOISE_SENSOR: 'noise-sensor',
