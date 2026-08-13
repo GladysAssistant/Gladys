@@ -61,6 +61,24 @@ describe('sceneSchemas calendar.get-events action', () => {
     expect(schema.safeParse(buildScene({ time_range: 'today' })).success).to.equal(true);
   });
 
+  it('should accept a tomorrow range without a duration', () => {
+    expect(schema.safeParse(buildScene({ time_range: 'tomorrow' })).success).to.equal(true);
+  });
+
+  it('should reject an invalid time range', () => {
+    expect(schema.safeParse(buildScene({ time_range: 'next-week' })).success).to.equal(false);
+  });
+
+  it('should reject an action without calendars', () => {
+    expect(schema.safeParse(buildScene({ time_range: 'today', calendars: [] })).success).to.equal(false);
+  });
+
+  it('should reject an invalid stop_scene_if_no_events', () => {
+    expect(schema.safeParse(buildScene({ time_range: 'today', stop_scene_if_no_events: 'yes' })).success).to.equal(
+      false,
+    );
+  });
+
   it('should accept a next-x-hours range with a duration', () => {
     expect(schema.safeParse(buildScene({ time_range: 'next-x-hours', duration: 12 })).success).to.equal(true);
   });
@@ -71,5 +89,13 @@ describe('sceneSchemas calendar.get-events action', () => {
 
   it('should reject a next-x-hours range with a duration lower than one hour', () => {
     expect(schema.safeParse(buildScene({ time_range: 'next-x-hours', duration: 0 })).success).to.equal(false);
+  });
+
+  it('should reject a next-x-hours range with a fractional duration', () => {
+    expect(schema.safeParse(buildScene({ time_range: 'next-x-hours', duration: 1.5 })).success).to.equal(false);
+  });
+
+  it('should reject a next-x-hours range with an explicit null duration', () => {
+    expect(schema.safeParse(buildScene({ time_range: 'next-x-hours', duration: null })).success).to.equal(false);
   });
 });
