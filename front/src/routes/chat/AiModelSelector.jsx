@@ -8,7 +8,7 @@ class AiModelSelector extends Component {
   state = {
     models: [],
     loading: true,
-    loadError: false
+    loadError: false,
   };
 
   componentDidMount() {
@@ -21,24 +21,24 @@ class AiModelSelector extends Component {
       this.setState({
         models: response.models || [],
         loading: false,
-        loadError: false
+        loadError: false,
       });
     } catch (e) {
       console.error(e);
       this.setState({
         loading: false,
-        loadError: true
+        loadError: true,
       });
     }
   };
 
-  handleChange = e => {
+  handleChange = (e) => {
     if (this.props.onChange) {
       this.props.onChange(e.target.value);
     }
   };
 
-  formatModelLabel = model => `${model.id} · ${model.priceLabel}`;
+  formatModelLabel = (model) => `${model.id} · ${model.priceLabel}`;
 
   render({ value }, { models, loading, loadError }) {
     return (
@@ -56,7 +56,7 @@ class AiModelSelector extends Component {
           <option value="auto">
             <Text id="chat.modelSelector.auto" />
           </option>
-          {models.map(model => (
+          {models.map((model) => (
             <option key={model.id} value={model.id}>
               {this.formatModelLabel(model)}
             </option>

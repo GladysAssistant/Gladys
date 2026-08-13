@@ -9,36 +9,36 @@ class SettingsSystemDuckDbMigration extends Component {
     super(props);
     this.state = {
       confirmRestartingMigration: false,
-      confirmPurgingSQlite: false
+      confirmPurgingSQlite: false,
     };
   }
 
   getDuckDbMigrationState = async () => {
     this.setState({
-      loading: true
+      loading: true,
     });
     try {
       const migrationState = await this.props.httpClient.get('/api/v1/device/duckdb_migration_state');
       // Format with thousand separator
       migrationState.sqlite_db_device_state_count = new Intl.NumberFormat(this.props.user.language).format(
-        migrationState.sqlite_db_device_state_count
+        migrationState.sqlite_db_device_state_count,
       );
       migrationState.duck_db_device_count = new Intl.NumberFormat(this.props.user.language).format(
-        migrationState.duck_db_device_count
+        migrationState.duck_db_device_count,
       );
       this.setState({ migrationState });
     } catch (e) {
       console.error(e);
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
   migrateToDuckDb = async () => {
     this.setState({
       loading: true,
-      confirmRestartingMigration: false
+      confirmRestartingMigration: false,
     });
     try {
       await this.props.httpClient.post('/api/v1/device/migrate_from_sqlite_to_duckdb');
@@ -47,14 +47,14 @@ class SettingsSystemDuckDbMigration extends Component {
       console.error(e);
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
   purgeAllSqliteStates = async () => {
     this.setState({
       loading: true,
-      confirmPurgingSQlite: false
+      confirmPurgingSQlite: false,
     });
     try {
       await this.props.httpClient.post('/api/v1/device/purge_all_sqlite_state');
@@ -63,18 +63,18 @@ class SettingsSystemDuckDbMigration extends Component {
       console.error(e);
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
   togglePurgeConfirmation = () => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       return { ...prevState, confirmPurgingSQlite: !prevState.confirmPurgingSQlite };
     });
   };
 
   toggleMigrationConfirmation = () => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       return { ...prevState, confirmRestartingMigration: !prevState.confirmRestartingMigration };
     });
   };
@@ -93,7 +93,7 @@ class SettingsSystemDuckDbMigration extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader py-3" />

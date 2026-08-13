@@ -23,7 +23,6 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
-  // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');

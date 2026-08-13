@@ -12,14 +12,14 @@ class SettingsGateway extends Component {
     try {
       if (!this.props.session.gatewayClient) {
         this.setState({
-          isFullGladysPlus: true
+          isFullGladysPlus: true,
         });
         return;
       }
       const user = await this.props.session.gatewayClient.getMyself();
       const isFullGladysPlus = user.plan !== 'lite';
       this.setState({
-        isFullGladysPlus
+        isFullGladysPlus,
       });
     } catch (e) {
       console.error(e);
@@ -27,7 +27,7 @@ class SettingsGateway extends Component {
   };
 
   state = {
-    isFullGladysPlus: null
+    isFullGladysPlus: null,
   };
 
   componentWillMount() {
@@ -54,5 +54,5 @@ class SettingsGateway extends Component {
 
 export default connect(
   'user,session,gatewayStatus,gatewayBackups,gatewayRestoreInProgress,gatewayCreateBackupStatus,gatewayRestoreErrored,gatewayGladysRestarting',
-  actions
+  actions,
 )(SettingsGateway);

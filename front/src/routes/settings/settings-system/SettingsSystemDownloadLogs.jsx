@@ -5,7 +5,7 @@ import { Text } from 'preact-i18n';
 // Per-request chunk size (bytes). Stays well below Gladys Plus per-request size limit.
 const CHUNK_SIZE = 256 * 1024;
 
-const base64ToUint8Array = base64 => {
+const base64ToUint8Array = (base64) => {
   const binary = atob(base64);
   const len = binary.length;
   const bytes = new Uint8Array(len);
@@ -15,7 +15,7 @@ const base64ToUint8Array = base64 => {
   return bytes;
 };
 
-const formatBytes = bytes => {
+const formatBytes = (bytes) => {
   if (!bytes) {
     return '0 B';
   }
@@ -37,11 +37,11 @@ class SettingsSystemDownloadLogs extends Component {
       progress: 0,
       totalSize: 0,
       bytesDownloaded: 0,
-      error: null
+      error: null,
     };
   }
 
-  downloadLogs = async e => {
+  downloadLogs = async (e) => {
     if (e && typeof e.preventDefault === 'function') {
       e.preventDefault();
     }
@@ -50,18 +50,17 @@ class SettingsSystemDownloadLogs extends Component {
       progress: 0,
       totalSize: 0,
       bytesDownloaded: 0,
-      error: null
+      error: null,
     });
     try {
       const chunks = [];
       let offset = 0;
       let totalSize = 0;
       let refresh = true;
-      // eslint-disable-next-line no-constant-condition
+
       while (true) {
-        // eslint-disable-next-line no-await-in-loop
         const response = await this.props.httpClient.get(
-          `/api/v1/system/logs?offset=${offset}&limit=${CHUNK_SIZE}&refresh=${refresh}`
+          `/api/v1/system/logs?offset=${offset}&limit=${CHUNK_SIZE}&refresh=${refresh}`,
         );
         refresh = false;
         totalSize = response.size;
@@ -74,7 +73,7 @@ class SettingsSystemDownloadLogs extends Component {
         this.setState({
           progress,
           totalSize,
-          bytesDownloaded: offset
+          bytesDownloaded: offset,
         });
         if (offset >= totalSize) {
           break;
@@ -84,16 +83,16 @@ class SettingsSystemDownloadLogs extends Component {
       const totalLength = chunks.reduce((acc, c) => acc + c.length, 0);
       const merged = new Uint8Array(totalLength);
       let position = 0;
-      chunks.forEach(c => {
+      chunks.forEach((c) => {
         merged.set(c, position);
         position += c.length;
       });
       const blob = new Blob([merged], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const now = new Date();
-      const pad = n => String(n).padStart(2, '0');
+      const pad = (n) => String(n).padStart(2, '0');
       const fileName = `gladys-logs-${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(
-        now.getHours()
+        now.getHours(),
       )}${pad(now.getMinutes())}${pad(now.getSeconds())}.log`;
       const link = document.createElement('a');
       link.href = url;
@@ -104,13 +103,13 @@ class SettingsSystemDownloadLogs extends Component {
       URL.revokeObjectURL(url);
       this.setState({
         downloading: false,
-        progress: 100
+        progress: 100,
       });
     } catch (err) {
       console.error(err);
       this.setState({
         downloading: false,
-        error: true
+        error: true,
       });
     }
   };

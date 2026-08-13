@@ -194,10 +194,7 @@ async function getPhoto(url) {
     validateStatus: (status) => status >= 200 && status < 300,
   });
 
-  const contentType = (response.headers['content-type'] || '')
-    .split(';')[0]
-    .trim()
-    .toLowerCase();
+  const contentType = (response.headers['content-type'] || '').split(';')[0].trim().toLowerCase();
 
   // A missing Content-Type is rejected instead of being assumed to be an image,
   // otherwise the allowlist could simply be bypassed.

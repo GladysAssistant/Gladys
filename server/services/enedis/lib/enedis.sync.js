@@ -133,9 +133,7 @@ async function sync(fromStart = false, jobId = null) {
     const getSyncFromDate = (usagePoint, paramName) => {
       const lastDateSynced = getDeviceParam(usagePoint, paramName);
       if (lastDateSynced && !fromStart) {
-        return dayjs(lastDateSynced, 'YYYY-MM-DD')
-          .subtract(7, 'days')
-          .format('YYYY-MM-DD');
+        return dayjs(lastDateSynced, 'YYYY-MM-DD').subtract(7, 'days').format('YYYY-MM-DD');
       }
       return undefined;
     };

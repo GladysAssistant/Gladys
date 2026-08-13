@@ -7,10 +7,7 @@ const baseDataKeys = {
   error_type: Joi.string().valid(...JOB_ERROR_TYPES_LIST),
 };
 
-const countKey = () =>
-  Joi.number()
-    .integer()
-    .min(0);
+const countKey = () => Joi.number().integer().min(0);
 
 // Structured facts attached by jobs and translated by the front (never store sentences).
 // Each job type declares its own keys here: a key owned by one domain is rejected on

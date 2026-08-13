@@ -15,5 +15,5 @@ class Login extends Component {
 
 export default connect(
   'gatewayLoginStep2,gatewayLoginStatus,gatewayLoginError,gatewayTwoFactorJustEnabled',
-  actions
+  actions,
 )(Login);

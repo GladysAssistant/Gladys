@@ -78,9 +78,7 @@ describe('gateway.restoreBackup', () => {
       await gateway.restoreBackup(backupFilePath);
       assert.fail();
     } catch (e) {
-      expect(e)
-        .instanceOf(NotFoundError)
-        .haveOwnProperty('message', 'BACKUP_NOT_FOUND');
+      expect(e).instanceOf(NotFoundError).haveOwnProperty('message', 'BACKUP_NOT_FOUND');
     }
   });
 
@@ -100,9 +98,7 @@ describe('gateway.restoreBackup', () => {
       await gateway.restoreBackup(backupFilePath);
       assert.fail();
     } catch (e) {
-      expect(e)
-        .instanceOf(NotFoundError)
-        .haveOwnProperty('message', 'NO_USER_FOUND_IN_NEW_DB');
+      expect(e).instanceOf(NotFoundError).haveOwnProperty('message', 'NO_USER_FOUND_IN_NEW_DB');
     }
   });
 });

@@ -21,12 +21,8 @@ describe('scene.action.isEventRunning', () => {
   const calendar = new Calendar();
   let clock;
   const now = new Date();
-  const startDate = dayjs(now)
-    .subtract(45, 'minute')
-    .toDate();
-  const endDate = dayjs(now)
-    .add(45, 'minute')
-    .toDate();
+  const startDate = dayjs(now).subtract(45, 'minute').toDate();
+  const endDate = dayjs(now).add(45, 'minute').toDate();
   beforeEach(async () => {
     clock = useFakeTimers(now);
   });
@@ -71,20 +67,14 @@ describe('scene.action.isEventRunning', () => {
     );
     assert.calledWith(message.sendToUser, 'pepper', 'hello');
     expect(scope).to.deep.equal({
-      '0': [
+      0: [
         {
           calendarEvent: {
             name: 'my test event',
             description: 'my event description',
             location: 'school',
-            start: dayjs(startDate)
-              .tz('Europe/Paris')
-              .locale('en')
-              .format('LLL'),
-            end: dayjs(endDate)
-              .tz('Europe/Paris')
-              .locale('en')
-              .format('LLL'),
+            start: dayjs(startDate).tz('Europe/Paris').locale('en').format('LLL'),
+            end: dayjs(endDate).tz('Europe/Paris').locale('en').format('LLL'),
           },
         },
       ],
@@ -139,17 +129,11 @@ describe('scene.action.isEventRunning', () => {
       name: 'my test event',
       location: 'school',
       description: 'my event description',
-      start: dayjs(startDate)
-        .tz('Europe/Paris')
-        .locale('en')
-        .format('LLL'),
-      end: dayjs(endDate)
-        .tz('Europe/Paris')
-        .locale('en')
-        .format('LLL'),
+      start: dayjs(startDate).tz('Europe/Paris').locale('en').format('LLL'),
+      end: dayjs(endDate).tz('Europe/Paris').locale('en').format('LLL'),
     };
     expect(scope).to.deep.equal({
-      '0': [
+      0: [
         {
           calendarEvent,
         },
@@ -157,7 +141,7 @@ describe('scene.action.isEventRunning', () => {
           calendarEvent,
         },
       ],
-      '1': [
+      1: [
         {
           calendarEvent,
         },

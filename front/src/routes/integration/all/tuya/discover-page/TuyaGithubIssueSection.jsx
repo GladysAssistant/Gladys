@@ -7,7 +7,7 @@ import {
   buildGithubSearchUrl,
   checkGithubIssues,
   createGithubIssueData,
-  createEmptyGithubIssueUrl
+  createEmptyGithubIssueUrl,
 } from './githubIssue';
 import { getLocalPollDpsFromParams } from '../commons/deviceHelpers';
 
@@ -20,7 +20,7 @@ const buildInitialState = () => ({
   githubIssueOpened: false,
   githubIssueLatestIssueNumber: null,
   githubIssueTargetTitle: null,
-  githubIssueSkipDuplicateCheck: false
+  githubIssueSkipDuplicateCheck: false,
 });
 
 class TuyaGithubIssueSection extends Component {
@@ -43,7 +43,7 @@ class TuyaGithubIssueSection extends Component {
       githubIssuePayload,
       githubIssuePayloadUrl,
       githubIssueOpened,
-      githubIssueLatestIssueNumber
+      githubIssueLatestIssueNumber,
     } = this.state;
     const { device, localPollStatus, localPollError, localPollValidation, localPollDps } = this.props;
     if (!device) {
@@ -84,7 +84,7 @@ class TuyaGithubIssueSection extends Component {
             githubIssuePayloadUrl: null,
             githubIssueOpened: false,
             githubIssueTargetTitle: null,
-            githubIssueSkipDuplicateCheck: false
+            githubIssueSkipDuplicateCheck: false,
           });
         }
       } catch (error) {
@@ -108,7 +108,7 @@ class TuyaGithubIssueSection extends Component {
         githubIssuePayloadUrl: null,
         githubIssueOpened: false,
         githubIssueTargetTitle: null,
-        githubIssueSkipDuplicateCheck: false
+        githubIssueSkipDuplicateCheck: false,
       });
       return;
     }
@@ -120,7 +120,7 @@ class TuyaGithubIssueSection extends Component {
       localPollError,
       localPollValidation,
       effectiveLocalPollDps,
-      { title: targetIssueTitle }
+      { title: targetIssueTitle },
     );
     const issueUrl = issueData.url;
 
@@ -133,7 +133,7 @@ class TuyaGithubIssueSection extends Component {
         githubIssueOpened: false,
         githubIssueTargetTitle: targetIssueTitle,
         githubIssueSkipDuplicateCheck: skipDuplicateCheck || followUp,
-        githubIssueLatestIssueNumber: latestIssueNumber
+        githubIssueLatestIssueNumber: latestIssueNumber,
       });
       return;
     }
@@ -145,7 +145,7 @@ class TuyaGithubIssueSection extends Component {
       githubIssueOpened: true,
       githubIssueTargetTitle: targetIssueTitle,
       githubIssueSkipDuplicateCheck: skipDuplicateCheck || followUp,
-      githubIssueLatestIssueNumber: latestIssueNumber
+      githubIssueLatestIssueNumber: latestIssueNumber,
     });
 
     if (popup) {
@@ -155,21 +155,21 @@ class TuyaGithubIssueSection extends Component {
     window.open(issueUrl, '_blank');
   };
 
-  handleCreateGithubIssue = async e => {
+  handleCreateGithubIssue = async (e) => {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
     await this.startGithubIssueCreation({ skipDuplicateCheck: false, followUp: false });
   };
 
-  handleCreateGithubIssueAnyway = async e => {
+  handleCreateGithubIssueAnyway = async (e) => {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
     await this.startGithubIssueCreation({ skipDuplicateCheck: true, followUp: true });
   };
 
-  copyGithubIssuePayload = async e => {
+  copyGithubIssuePayload = async (e) => {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
@@ -201,7 +201,7 @@ class TuyaGithubIssueSection extends Component {
     this.setState({ githubIssuePayloadCopied: copied });
   };
 
-  openEmptyGithubIssue = async e => {
+  openEmptyGithubIssue = async (e) => {
     if (e && e.preventDefault) {
       e.preventDefault();
     }
@@ -211,7 +211,7 @@ class TuyaGithubIssueSection extends Component {
       githubIssueChecking,
       githubIssueOpened,
       githubIssueTargetTitle,
-      githubIssueSkipDuplicateCheck
+      githubIssueSkipDuplicateCheck,
     } = this.state;
     if (!device || !githubIssuePayloadUrl || githubIssueChecking || githubIssueOpened) {
       return;
@@ -241,7 +241,7 @@ class TuyaGithubIssueSection extends Component {
         }
         this.setState({
           githubIssueExists: true,
-          githubIssueLatestIssueNumber: searchResult.latestIssueNumber
+          githubIssueLatestIssueNumber: searchResult.latestIssueNumber,
         });
       }
     } catch (error) {
@@ -268,7 +268,7 @@ class TuyaGithubIssueSection extends Component {
       githubIssuePayloadCopied,
       githubIssuePayloadUrl,
       githubIssueOpened,
-      githubIssueLatestIssueNumber
+      githubIssueLatestIssueNumber,
     } = this.state;
     if (!device) {
       return null;
@@ -278,7 +278,7 @@ class TuyaGithubIssueSection extends Component {
     const disableGithubIssueCreateAnywayButton = githubIssueChecking || githubIssueOpened || githubIssuePayload;
     const shouldShowGithubIssuePayloadPanel = Boolean(githubIssuePayload || githubIssuePayloadCopied);
     const shouldShowGithubIssuePayloadInsideExistingInfo = Boolean(
-      githubIssueExists && (githubIssuePayload || githubIssuePayloadCopied || githubIssuePayloadUrl)
+      githubIssueExists && (githubIssuePayload || githubIssuePayloadCopied || githubIssuePayloadUrl),
     );
     const githubIssuesUrl = githubIssueExists ? buildGithubSearchUrl(buildIssueTitle(device)) : null;
 
@@ -290,7 +290,7 @@ class TuyaGithubIssueSection extends Component {
           rows="6"
           readOnly
           value={githubIssuePayload || ''}
-          ref={el => {
+          ref={(el) => {
             this.githubIssueTextarea = el;
           }}
         />

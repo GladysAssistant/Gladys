@@ -22,9 +22,9 @@ class BluetoothSettingsTab extends Component {
     const updatedConfig = update(this.state.config, {
       [configGroup]: {
         [configItem]: {
-          $set: value
-        }
-      }
+          $set: value,
+        },
+      },
     });
 
     this.setState({ config: updatedConfig, updated: true });
@@ -66,7 +66,7 @@ class BluetoothSettingsTab extends Component {
 
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />

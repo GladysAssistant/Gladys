@@ -4,7 +4,7 @@ import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
   LEVEL_MATTER_STATE,
-  getFanFeatureOptions
+  getFanFeatureOptions,
 } from '../../../server/utils/constants';
 import { resolveFeatureOptions } from './supportedOptions';
 
@@ -14,13 +14,13 @@ const NUMERIC_VALUE = /^-?\d+$/;
 const FAN_LABELED_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING,
   DEVICE_FEATURE_TYPES.FAN.WIND_SETTING,
-  DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION
+  DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION,
 ];
 
 // Matter index sensors all share the same level scale
 const MATTER_INDEX_SENSOR_CATEGORIES = [
   DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR,
-  DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR
+  DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR,
 ];
 
 const getValueLabel = (dictionary, path, value, fallback) =>
@@ -37,7 +37,7 @@ const getValueLabel = (dictionary, path, value, fallback) =>
 function isValueInOptions(options, value) {
   // Values saved in scenes are not always typed like the options: a value entered by hand in the
   // free input is a string, while the options built from the translations are numbers.
-  return Boolean(options && value !== undefined && options.some(option => `${option.value}` === `${value}`));
+  return Boolean(options && value !== undefined && options.some((option) => `${option.value}` === `${value}`));
 }
 
 /**
@@ -57,17 +57,17 @@ function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
 
   if (category === DEVICE_FEATURE_CATEGORIES.FAN && FAN_LABELED_FEATURE_TYPES.includes(type)) {
     // The device can declare min/max bounds outside of the enum, in that case there is no value to propose
-    const fanOptions = getFanFeatureOptions(type, min, max).map(value => ({
+    const fanOptions = getFanFeatureOptions(type, min, max).map((value) => ({
       value,
-      label: getValueLabel(dictionary, `deviceFeatureValue.category.${category}.${type}`, value)
+      label: getValueLabel(dictionary, `deviceFeatureValue.category.${category}.${type}`, value),
     }));
     return fanOptions.length > 0 ? fanOptions : null;
   }
 
   if (MATTER_INDEX_SENSOR_CATEGORIES.includes(category)) {
-    return Object.values(LEVEL_MATTER_STATE).map(value => ({
+    return Object.values(LEVEL_MATTER_STATE).map((value) => ({
       value,
-      label: getValueLabel(dictionary, 'deviceFeatureValue.category.level-matter-index-sensor.level-state', value)
+      label: getValueLabel(dictionary, 'deviceFeatureValue.category.level-matter-index-sensor.level-state', value),
     }));
   }
 
@@ -82,7 +82,7 @@ function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
     }
     return [
       { value: 1, label: labels.one },
-      { value: 0, label: labels.zero }
+      { value: 0, label: labels.zero },
     ];
   }
 
@@ -96,16 +96,16 @@ function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
   }
 
   const catalog = Object.keys(valueLabels || {})
-    .filter(key => NUMERIC_VALUE.test(key))
-    .map(key => ({ value: Number(key) }))
+    .filter((key) => NUMERIC_VALUE.test(key))
+    .map((key) => ({ value: Number(key) }))
     .sort((optionA, optionB) => optionA.value - optionB.value);
 
   // When the integration declares which values this appliance actually supports, they drive the
   // list and its order, so a scene cannot be built on a mode the device does not have. A supported
   // value the category knows nothing about keeps the label the device gave it.
-  const options = resolveFeatureOptions(deviceFeature, catalog).map(option => ({
+  const options = resolveFeatureOptions(deviceFeature, catalog).map((option) => ({
     value: option.value,
-    label: getValueLabel(dictionary, `deviceFeatureValue.category.${category}.${type}`, option.value, option.label)
+    label: getValueLabel(dictionary, `deviceFeatureValue.category.${category}.${type}`, option.value, option.label),
   }));
 
   return options.length > 0 ? options : null;

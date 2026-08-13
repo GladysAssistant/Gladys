@@ -10,20 +10,20 @@ class UserSeenAtHome extends Component {
     try {
       const [users, houses] = await Promise.all([
         this.props.httpClient.get('/api/v1/user'),
-        this.props.httpClient.get('/api/v1/house')
+        this.props.httpClient.get('/api/v1/house'),
       ]);
       const userOptions = [];
-      users.forEach(user => {
+      users.forEach((user) => {
         userOptions.push({
           label: user.firstname,
-          value: user.selector
+          value: user.selector,
         });
       });
       const houseOptions = [];
-      houses.forEach(house => {
+      houses.forEach((house) => {
         houseOptions.push({
           label: house.name,
-          value: house.selector
+          value: house.selector,
         });
       });
       await this.setState({ userOptions, houseOptions });
@@ -33,32 +33,32 @@ class UserSeenAtHome extends Component {
       console.error(e);
     }
   };
-  handleChange = selectedOption => {
+  handleChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
     } else {
       this.props.updateActionProperty(this.props.path, 'user', null);
     }
   };
-  handleHouseChange = selectedOption => {
+  handleHouseChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'house', selectedOption.value);
     } else {
       this.props.updateActionProperty(this.props.path, 'house', null);
     }
   };
-  refreshSelectedOptions = nextProps => {
+  refreshSelectedOptions = (nextProps) => {
     let selectedOption = '';
     let selectedHouseOption = '';
     if (nextProps.action.user && this.state.userOptions) {
-      const userOption = this.state.userOptions.find(option => option.value === nextProps.action.user);
+      const userOption = this.state.userOptions.find((option) => option.value === nextProps.action.user);
 
       if (userOption) {
         selectedOption = userOption;
       }
     }
     if (nextProps.action.house && this.state.houseOptions) {
-      const houseOption = this.state.houseOptions.find(option => option.value === nextProps.action.house);
+      const houseOption = this.state.houseOptions.find((option) => option.value === nextProps.action.house);
 
       if (houseOption) {
         selectedHouseOption = houseOption;
@@ -71,7 +71,7 @@ class UserSeenAtHome extends Component {
     this.props = props;
     this.state = {
       selectedOption: '',
-      selectedHouseOption: ''
+      selectedHouseOption: '',
     };
   }
   componentDidMount() {

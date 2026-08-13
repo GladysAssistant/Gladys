@@ -5,7 +5,7 @@ const local = {
   gatewayMode: process.env.GATEWAY_MODE === 'true',
   demoMode: process.env.DEMO_MODE === 'true',
   demoRequestTime: process.env.DEMO_REQUEST_TIME || 0,
-  enedisForceUsagePoints: process.env.ENEDIS_FORCE_USAGE_POINTS
+  enedisForceUsagePoints: process.env.ENEDIS_FORCE_USAGE_POINTS,
 };
 
 const prod = {
@@ -15,7 +15,7 @@ const prod = {
   gatewayMode: process.env.GATEWAY_MODE === 'true',
   demoMode: process.env.DEMO_MODE === 'true',
   demoRequestTime: process.env.DEMO_REQUEST_TIME || 0,
-  enedisForceUsagePoints: process.env.ENEDIS_FORCE_USAGE_POINTS
+  enedisForceUsagePoints: process.env.ENEDIS_FORCE_USAGE_POINTS,
 };
 
 const config = process.env.NODE_ENV === 'production' ? prod : local;

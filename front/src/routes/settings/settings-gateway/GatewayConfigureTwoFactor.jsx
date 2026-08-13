@@ -7,7 +7,7 @@ const GatewayConfigureTwoFactor = ({ children, ...props }) => (
     <div class="card-body p-6">
       <div
         class={cx('dimmer', {
-          active: props.gatewayLoginStatus === RequestStatus.Getting
+          active: props.gatewayLoginStatus === RequestStatus.Getting,
         })}
       >
         <div class="loader" />

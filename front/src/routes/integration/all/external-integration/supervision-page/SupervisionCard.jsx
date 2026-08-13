@@ -25,8 +25,8 @@ const SubContainerRow = ({ container, language }) => {
       </td>
       <td>
         {(container.ports || [])
-          .filter(port => port.host_port)
-          .map(port =>
+          .filter((port) => port.host_port)
+          .map((port) =>
             port.browsable === false ? (
               <span class="badge badge-secondary mr-1">
                 {getLocalizedText(port.label, language) || port.container_port}
@@ -48,7 +48,7 @@ const SubContainerRow = ({ container, language }) => {
                 <Text id="integration.externalIntegration.supervision.openButton" />{' '}
                 {getLocalizedText(port.label, language) || port.container_port}
               </a>
-            )
+            ),
           )}
       </td>
     </tr>
@@ -66,7 +66,7 @@ const SupervisionCard = ({
   executeAction,
   onAskUninstall,
   onCancelUninstall,
-  onUninstall
+  onUninstall,
 }) => {
   const repoUrl = getGithubRepoUrl(integration.store_slug);
   const actionInProgress = actionStatus === RequestStatus.Getting;
@@ -83,7 +83,7 @@ const SupervisionCard = ({
       </div>
       <div
         class={cx('dimmer', {
-          active: actionInProgress || uninstallStatus === RequestStatus.Getting
+          active: actionInProgress || uninstallStatus === RequestStatus.Getting,
         })}
       >
         <div class="loader" />
@@ -140,19 +140,19 @@ const SupervisionCard = ({
                       {getLocalizedText(integration.connection_status.message, language)}
                     </div>
                   )}
-                </dd>
+                </dd>,
               ]}
               {integration.started_at && [
                 <dt class="col-5 col-sm-4">
                   <Text id="integration.externalIntegration.supervision.startedAtLabel" />
                 </dt>,
-                <dd class="col-7 col-sm-8">{new Date(integration.started_at).toLocaleString(language)}</dd>
+                <dd class="col-7 col-sm-8">{new Date(integration.started_at).toLocaleString(language)}</dd>,
               ]}
               {integration.version && [
                 <dt class="col-5 col-sm-4">
                   <Text id="integration.externalIntegration.supervision.versionLabel" />
                 </dt>,
-                <dd class="col-7 col-sm-8">{integration.version}</dd>
+                <dd class="col-7 col-sm-8">{integration.version}</dd>,
               ]}
               {integration.docker_image && [
                 <dt class="col-5 col-sm-4">
@@ -160,7 +160,7 @@ const SupervisionCard = ({
                 </dt>,
                 <dd class="col-7 col-sm-8">
                   <code>{integration.docker_image}</code>
-                </dd>
+                </dd>,
               ]}
               {repoUrl && [
                 <dt class="col-5 col-sm-4">
@@ -171,7 +171,7 @@ const SupervisionCard = ({
                     <i class="fe fe-github mr-1" />
                     {integration.store_slug}
                   </a>
-                </dd>
+                </dd>,
               ]}
             </dl>
 
@@ -183,7 +183,7 @@ const SupervisionCard = ({
                 <div class="table-responsive">
                   <table class="table table-sm card-table">
                     <tbody>
-                      {subContainers.map(container => (
+                      {subContainers.map((container) => (
                         <SubContainerRow container={container} language={language} />
                       ))}
                     </tbody>

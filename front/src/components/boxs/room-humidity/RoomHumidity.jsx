@@ -7,7 +7,7 @@ import actions from '../../../actions/dashboard/boxes/humidityInRoom';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
 import { DEFAULT_VALUE_HUMIDITY, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
-const isNotNullOrUndefined = value => value !== undefined && value !== null;
+const isNotNullOrUndefined = (value) => value !== undefined && value !== null;
 
 const RoomHumidityBox = ({ children, ...props }) => (
   <div class="card p-3">
@@ -66,7 +66,7 @@ class RoomHumidityBoxComponent extends Component {
     }
   };
 
-  updateRoomHumidity = payload => {
+  updateRoomHumidity = (payload) => {
     this.props.deviceFeatureWebsocketEvent(this.props.box, this.props.x, this.props.y, payload);
   };
 
@@ -128,5 +128,5 @@ class RoomHumidityBoxComponent extends Component {
 
 export default connect(
   'session,DashboardBoxDataHumidityInRoom,DashboardBoxStatusHumidityInRoom',
-  actions
+  actions,
 )(RoomHumidityBoxComponent);

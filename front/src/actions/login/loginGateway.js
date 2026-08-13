@@ -14,7 +14,7 @@ function createActions(store) {
       // so we keep the step 2 form instead of resetting the login flow.
       if (state.gatewayLoginPreserveStateOnce) {
         const preservedState = {
-          gatewayLoginPreserveStateOnce: false
+          gatewayLoginPreserveStateOnce: false,
         };
         if (returnUrl && returnUrl.startsWith('/')) {
           preservedState.gatewayLoginReturnUrl = returnUrl;
@@ -28,7 +28,7 @@ function createActions(store) {
         gatewayLoginEmail: null,
         gatewayLoginPassword: null,
         gatewayLoginTwoFactorCode: null,
-        gatewayTwoFactorJustEnabled: false
+        gatewayTwoFactorJustEnabled: false,
       };
       // If there is a return URL and the URL is relative to this domain
       // (we want to avoid redirecting to another domain for security issues)
@@ -43,24 +43,24 @@ function createActions(store) {
       }
       if (!validateEmail(state.gatewayLoginEmail)) {
         return store.setState({
-          gatewayLoginStatus: LoginStatus.WrongEmailError
+          gatewayLoginStatus: LoginStatus.WrongEmailError,
         });
       }
       store.setState({
         gatewayLoginStatus: RequestStatus.Getting,
-        gatewayLoginError: null
+        gatewayLoginError: null,
       });
       try {
         const gatewayLoginResults = await state.session.gatewayClient.login(
           state.gatewayLoginEmail,
-          state.gatewayLoginPassword
+          state.gatewayLoginPassword,
         );
         if (gatewayLoginResults.two_factor_token) {
           store.setState({
             gatewayLoginResults,
             gatewayLoginStep2: true,
             gatewayTwoFactorJustEnabled: false,
-            gatewayLoginStatus: RequestStatus.Success
+            gatewayLoginStatus: RequestStatus.Success,
           });
         } else {
           state.session.saveTwoFactorAccessToken(gatewayLoginResults.access_token);
@@ -72,16 +72,16 @@ function createActions(store) {
 
         if (error === ERROR_MESSAGES.NO_CONNECTED_TO_THE_INTERNET) {
           store.setState({
-            gatewayLoginStatus: RequestStatus.NetworkError
+            gatewayLoginStatus: RequestStatus.NetworkError,
           });
         } else if (status === 403 || status === 404) {
           store.setState({
-            gatewayLoginStatus: LoginStatus.WrongCredentialsError
+            gatewayLoginStatus: LoginStatus.WrongCredentialsError,
           });
         } else {
           store.setState({
             gatewayLoginStatus: LoginStatus.UnknownError,
-            gatewayLoginError: e.message
+            gatewayLoginError: e.message,
           });
         }
       }
@@ -92,7 +92,7 @@ function createActions(store) {
       // enter a fresh code from their app to finalize the connection.
       const gatewayLoginResults = await state.session.gatewayClient.login(
         state.gatewayLoginEmail,
-        state.gatewayLoginPassword
+        state.gatewayLoginPassword,
       );
       store.setState({
         gatewayLoginResults,
@@ -100,7 +100,7 @@ function createActions(store) {
         gatewayLoginTwoFactorCode: null,
         gatewayTwoFactorJustEnabled: true,
         gatewayLoginPreserveStateOnce: true,
-        gatewayLoginStatus: RequestStatus.Success
+        gatewayLoginStatus: RequestStatus.Success,
       });
       route('/login');
     },
@@ -109,7 +109,7 @@ function createActions(store) {
         e.preventDefault();
       }
       store.setState({
-        gatewayLoginStatus: RequestStatus.Getting
+        gatewayLoginStatus: RequestStatus.Getting,
       });
       try {
         // login two factor
@@ -117,7 +117,7 @@ function createActions(store) {
           state.gatewayLoginResults.two_factor_token,
           state.gatewayLoginPassword,
           state.gatewayLoginTwoFactorCode,
-          window.navigator.userAgent
+          window.navigator.userAgent,
         );
         // save informations in localstorage
         state.session.saveLoginInformations(data);
@@ -127,7 +127,7 @@ function createActions(store) {
           // get user
           const user = await state.httpClient.get('/api/v1/me');
           store.setState({
-            user
+            user,
           });
           // save user
           state.session.saveUser(user);
@@ -153,42 +153,42 @@ function createActions(store) {
           route('/link-gateway-user');
         } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
           store.setState({
-            gatewayLoginStatus: RequestStatus.UserNotAcceptedLocally
+            gatewayLoginStatus: RequestStatus.UserNotAcceptedLocally,
           });
         } else if (errorMessage === 'NO_INSTANCE_FOUND') {
           store.setState({
-            gatewayLoginStatus: RequestStatus.GatewayNoInstanceFound
+            gatewayLoginStatus: RequestStatus.GatewayNoInstanceFound,
           });
         } else if (status >= 400 && status < 500) {
           store.setState({
-            gatewayLoginStatus: LoginStatus.WrongTwoFactorCodeError
+            gatewayLoginStatus: LoginStatus.WrongTwoFactorCodeError,
           });
         } else {
           store.setState({
-            gatewayLoginStatus: RequestStatus.Error
+            gatewayLoginStatus: RequestStatus.Error,
           });
         }
       }
     },
     updateLoginEmail(state, e) {
       store.setState({
-        gatewayLoginEmail: e.target.value
+        gatewayLoginEmail: e.target.value,
       });
     },
     updateLoginPassword(state, e) {
       store.setState({
-        gatewayLoginPassword: e.target.value
+        gatewayLoginPassword: e.target.value,
       });
     },
     updateLoginTwoFactorCode(state, e) {
       store.setState({
-        gatewayLoginTwoFactorCode: e.target.value
+        gatewayLoginTwoFactorCode: e.target.value,
       });
       if (e.target.value.length === 6) {
         const upToDateState = store.getState();
         actions.loginTwoFactor(upToDateState, e);
       }
-    }
+    },
   };
   return actions;
 }

@@ -23,11 +23,7 @@ describe('Light.buildLightObject', () => {
       ],
     };
     const light = deviceManager.lightManager.buildLightObject(device);
-    expect(light)
-      .to.have.property('turnOn')
-      .and.be.instanceOf(Function);
-    expect(light)
-      .to.have.property('turnOff')
-      .and.be.instanceOf(Function);
+    expect(light).to.have.property('turnOn').and.be.instanceOf(Function);
+    expect(light).to.have.property('turnOff').and.be.instanceOf(Function);
   });
 });

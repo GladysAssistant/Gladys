@@ -14,10 +14,7 @@ describe('LANManager getDiscoveredDevices', () => {
   beforeEach(() => {
     manager = new LANManager(gladys, serviceId, null);
     gladys.stateManager = {
-      get: stub()
-        .returns(null)
-        .onCall(0)
-        .returns({ id: 'existing-id', features: [] }),
+      get: stub().returns(null).onCall(0).returns({ id: 'existing-id', features: [] }),
     };
   });
 

@@ -45,7 +45,7 @@ const TelegramPage = ({ children, ...props }) => (
                 <div class="card-body">
                   <div
                     class={cx('dimmer', {
-                      active: props.loading
+                      active: props.loading,
                     })}
                   >
                     <div class="loader" />
@@ -91,7 +91,7 @@ const TelegramPage = ({ children, ...props }) => (
                             <MarkupText
                               id="integration.telegram.link"
                               fields={{
-                                link: props.telegramCustomLink
+                                link: props.telegramCustomLink,
                               }}
                             />
                           </p>

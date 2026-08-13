@@ -36,7 +36,7 @@ const TRIGGER_ICON = {
   [EVENTS.SYSTEM.START]: 'fe-activity',
   [EVENTS.MQTT.RECEIVED]: 'fe-hash',
   [EVENTS.WEATHER.ALERT_RAISED]: 'fe-alert-triangle',
-  [EVENTS.WEATHER.ALERT_ENDED]: 'fe-check-circle'
+  [EVENTS.WEATHER.ALERT_ENDED]: 'fe-check-circle',
 };
 
 const WEATHER_ALERT_TRIGGERS = [EVENTS.WEATHER.ALERT_RAISED, EVENTS.WEATHER.ALERT_ENDED];
@@ -47,7 +47,7 @@ const ALARM_TRIGGERS = [
   EVENTS.ALARM.DISARM,
   EVENTS.ALARM.PARTIAL_ARM,
   EVENTS.ALARM.PANIC,
-  EVENTS.ALARM.TOO_MANY_CODES_TESTS
+  EVENTS.ALARM.TOO_MANY_CODES_TESTS,
 ];
 
 const deleteTriggerFromList = (deleteTrigger, index) => () => {
@@ -65,11 +65,6 @@ const TriggerCard = ({ children, ...props }) => (
         {props.trigger.type === null && <Text id="editScene.newTrigger" />}
       </div>
       <div class="card-options">
-        {false && (
-          <a class="card-options-collapse">
-            <i class="fe fe-chevron-down" />
-          </a>
-        )}
         <a onClick={deleteTriggerFromList(props.deleteTrigger, props.index)} class="card-options-remove">
           <i class="fe fe-x" />
         </a>

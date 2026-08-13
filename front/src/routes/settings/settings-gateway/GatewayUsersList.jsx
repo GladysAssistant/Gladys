@@ -12,7 +12,7 @@ const GatewayUsersList = ({ children, ...props }) => (
     </div>
     <div
       class={cx('dimmer', {
-        active: props.gatewayGetKeysStatus === RequestStatus.Getting
+        active: props.gatewayGetKeysStatus === RequestStatus.Getting,
       })}
     >
       <div class="loader" />

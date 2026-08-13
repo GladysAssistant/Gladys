@@ -1,7 +1,7 @@
 const addYAxisStyles = () => {
   const yAxisLabel = document.querySelectorAll('.apexcharts-yaxis-label');
   let fontSize = '12px';
-  yAxisLabel.forEach(text => {
+  yAxisLabel.forEach((text) => {
     const title = text.querySelector('title');
     if (title) {
       const textContent = title.textContent;
@@ -30,7 +30,7 @@ const addYAxisStyles = () => {
     }
   });
 };
-const limitZoom = chartContext => {
+const limitZoom = (chartContext) => {
   const minZoomRange = 10000;
   const globals = chartContext.w.globals;
 
@@ -42,11 +42,11 @@ const limitZoom = chartContext => {
       {
         xaxis: {
           min: globals.minY,
-          max: globals.minY + minZoomRange
-        }
+          max: globals.minY + minZoomRange,
+        },
       },
       false,
-      false
+      false,
     );
   }
 };
@@ -62,38 +62,38 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
       height,
       parentHeightOffset: 0,
       sparkline: {
-        enabled: !displayAxes
+        enabled: !displayAxes,
       },
       toolbar: {
-        show: false
+        show: false,
       },
       animations: {
-        enabled: false
+        enabled: false,
       },
       events: {
         mounted: addYAxisStyles,
         updated: addYAxisStyles,
-        zoomed: function(chartContext) {
+        zoomed: function (chartContext) {
           limitZoom(chartContext);
-        }
-      }
+        },
+      },
     },
     grid: {
       strokeDashArray: 4,
       padding: {
-        left: 1
-      }
+        left: 1,
+      },
     },
     plotOptions: {
       bar: {
         horizontal: true,
         barHeight: '50%',
-        rangeBarGroupRows: true
-      }
+        rangeBarGroupRows: true,
+      },
     },
     colors,
     fill: {
-      type: 'solid'
+      type: 'solid',
     },
     xaxis: {
       labels: {
@@ -107,31 +107,31 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
           day: 'dd MMM',
           hour: 'HH:mm',
           minute: 'HH:mm:ss',
-          second: 'HH:mm:ss'
-        }
+          second: 'HH:mm:ss',
+        },
       },
       axisBorder: {
-        show: true
+        show: true,
       },
       type: 'datetime',
-      min: Math.floor(Math.min(...series.flatMap(s => s.data.map(d => d.y[0])))),
-      max: Math.floor(Math.max(...series.flatMap(s => s.data.map(d => d.y[1]))))
+      min: Math.floor(Math.min(...series.flatMap((s) => s.data.map((d) => d.y[0])))),
+      max: Math.floor(Math.max(...series.flatMap((s) => s.data.map((d) => d.y[1])))),
     },
     yaxis: {
       showAlways: true,
       dataLabels: {
         enabled: false,
-        textAnchor: 'start'
+        textAnchor: 'start',
       },
       axisBorder: {
-        show: true
+        show: true,
       },
       labels: {
         align: 'left',
         minWidth: 50,
         maxWidth: 100,
         margin: 5,
-        formatter: function(value) {
+        formatter: function (value) {
           const nbLines = 3;
           if (value.length > 15) {
             let [deviceName, featureName] = value.split(' (');
@@ -179,35 +179,35 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, colors, loca
           return value;
         },
         offsetX: -15,
-        offsetY: 0
-      }
+        offsetY: 0,
+      },
     },
     legend: {
       show: displayAxes,
       position: 'bottom',
       itemMargin: {
-        horizontal: 20
-      }
+        horizontal: 20,
+      },
     },
     tooltip: {
       //theme: 'dark',
       marker: {
-        show: true
+        show: true,
       },
       onDatasetHover: {
-        highlightDataSeries: false
+        highlightDataSeries: false,
       },
       items: {
-        display: 'flex'
+        display: 'flex',
       },
       fillSeriesColor: false,
       fixed: {
         enabled: true,
         position: 'topLeft',
         offsetX: 0,
-        offsetY: -70
-      }
-    }
+        offsetY: -70,
+      },
+    },
   };
   return options;
 };

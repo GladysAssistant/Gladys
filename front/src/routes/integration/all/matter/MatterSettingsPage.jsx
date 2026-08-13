@@ -12,7 +12,7 @@ const DeviceDisplay = ({
   visibleKeys,
   toggleDevice,
   toggleKeys,
-  parentPath = ''
+  parentPath = '',
 }) => {
   const devicePath = parentPath ? `${parentPath}-${device.number}` : `${nodeId}-${device.number}`;
   const isCollapsed = collapsedDevices[devicePath];
@@ -24,7 +24,7 @@ const DeviceDisplay = ({
         <i
           class={cx('fe me-2', {
             'fe-chevron-right': isCollapsed,
-            'fe-chevron-down': !isCollapsed
+            'fe-chevron-down': !isCollapsed,
           })}
         />
         <h6 class="mb-0">
@@ -47,7 +47,7 @@ const DeviceDisplay = ({
                 </tr>
               </thead>
               <tbody>
-                {device.cluster_clients.map(cluster => {
+                {device.cluster_clients.map((cluster) => {
                   const clusterKey = `${devicePath}-${cluster.id}`;
                   const areKeysVisible = visibleKeys[clusterKey];
 
@@ -58,7 +58,7 @@ const DeviceDisplay = ({
                         <td>{cluster.name}</td>
                         <td>
                           <ul class="list-unstyled mb-0">
-                            {cluster.attributes.map(attr => (
+                            {cluster.attributes.map((attr) => (
                               <li>
                                 <small>{attr}</small>
                               </li>
@@ -67,7 +67,7 @@ const DeviceDisplay = ({
                         </td>
                         <td>
                           <ul class="list-unstyled mb-0">
-                            {cluster.commands.map(cmd => (
+                            {cluster.commands.map((cmd) => (
                               <li>
                                 <small>{cmd}</small>
                               </li>
@@ -86,7 +86,7 @@ const DeviceDisplay = ({
                             <div class="p-2">
                               <small class="text-muted">All Keys:</small>
                               <div class="row mt-2">
-                                {cluster.all_keys.map(key => (
+                                {cluster.all_keys.map((key) => (
                                   <div class="col-lg-3 col-md-4 col-sm-6">
                                     <small>{key}</small>
                                   </div>
@@ -105,7 +105,7 @@ const DeviceDisplay = ({
 
           {device.child_endpoints && device.child_endpoints.length > 0 && (
             <div class="mt-4">
-              {device.child_endpoints.map(childDevice => (
+              {device.child_endpoints.map((childDevice) => (
                 <DeviceDisplay
                   device={childDevice}
                   nodeId={nodeId}
@@ -139,7 +139,7 @@ class MatterSettingsPage extends Component {
       visibleKeys: {},
       showConfirmReset: false,
       resetting: false,
-      resetError: null
+      resetError: null,
     };
   }
 
@@ -159,24 +159,23 @@ class MatterSettingsPage extends Component {
   loadConfiguration = async () => {
     try {
       const { value: matterEnabled } = await this.props.httpClient.get(
-        '/api/v1/service/matter/variable/MATTER_ENABLED'
+        '/api/v1/service/matter/variable/MATTER_ENABLED',
       );
       await this.setState({
-        matterEnabled: matterEnabled === 'true'
+        matterEnabled: matterEnabled === 'true',
       });
     } catch (e) {
       console.error(e);
       await this.setState({
-        matterEnabled: false
+        matterEnabled: false,
       });
     }
     try {
-      const { has_ipv6: hasIpv6, ipv6_interfaces: ipv6Interfaces } = await this.props.httpClient.get(
-        '/api/v1/service/matter/ipv6'
-      );
+      const { has_ipv6: hasIpv6, ipv6_interfaces: ipv6Interfaces } =
+        await this.props.httpClient.get('/api/v1/service/matter/ipv6');
       await this.setState({
         hasIpv6,
-        ipv6Interfaces
+        ipv6Interfaces,
       });
     } catch (e) {
       console.error(e);
@@ -191,8 +190,8 @@ class MatterSettingsPage extends Component {
 
       // Initialize all devices as collapsed
       const collapsedDevices = {};
-      nodes.forEach(node => {
-        node.devices.forEach(device => {
+      nodes.forEach((node) => {
+        node.devices.forEach((device) => {
           const deviceKey = `${node.node_id}-${device.number}`;
           collapsedDevices[deviceKey] = true;
         });
@@ -201,7 +200,7 @@ class MatterSettingsPage extends Component {
       this.setState({
         nodes,
         loadingNodes: false,
-        collapsedDevices
+        collapsedDevices,
       });
     } catch (e) {
       console.error(e);
@@ -213,7 +212,7 @@ class MatterSettingsPage extends Component {
     this.setState({ saving: true });
     try {
       await this.props.httpClient.post('/api/v1/service/matter/variable/MATTER_ENABLED', {
-        value: 'false'
+        value: 'false',
       });
       // stop service
       await this.props.httpClient.post('/api/v1/service/matter/stop');
@@ -221,7 +220,7 @@ class MatterSettingsPage extends Component {
         saving: false,
         error: null,
         nodes: [],
-        matterEnabled: false
+        matterEnabled: false,
       });
     } catch (e) {
       console.error(e);
@@ -229,12 +228,12 @@ class MatterSettingsPage extends Component {
     }
   };
 
-  decommissionNode = async nodeId => {
+  decommissionNode = async (nodeId) => {
     this.setState({
       decommissioningNodes: {
         ...this.state.decommissioningNodes,
-        [nodeId]: true
-      }
+        [nodeId]: true,
+      },
     });
     try {
       await this.props.httpClient.post(`/api/v1/service/matter/node/${nodeId}/decommission`);
@@ -245,8 +244,8 @@ class MatterSettingsPage extends Component {
     this.setState({
       decommissioningNodes: {
         ...this.state.decommissioningNodes,
-        [nodeId]: false
-      }
+        [nodeId]: false,
+      },
     });
   };
 
@@ -254,7 +253,7 @@ class MatterSettingsPage extends Component {
     this.setState({ saving: true });
     try {
       await this.props.httpClient.post('/api/v1/service/matter/variable/MATTER_ENABLED', {
-        value: 'true'
+        value: 'true',
       });
       // start service
       await this.props.httpClient.post('/api/v1/service/matter/start');
@@ -264,7 +263,7 @@ class MatterSettingsPage extends Component {
       this.setState({
         saving: false,
         error: null,
-        matterEnabled: true
+        matterEnabled: true,
       });
     } catch (e) {
       console.error(e);
@@ -272,21 +271,21 @@ class MatterSettingsPage extends Component {
     }
   };
 
-  toggleDevice = devicePath => {
-    this.setState(prevState => ({
+  toggleDevice = (devicePath) => {
+    this.setState((prevState) => ({
       collapsedDevices: {
         ...prevState.collapsedDevices,
-        [devicePath]: !prevState.collapsedDevices[devicePath]
-      }
+        [devicePath]: !prevState.collapsedDevices[devicePath],
+      },
     }));
   };
 
-  toggleKeys = clusterKey => {
-    this.setState(prevState => ({
+  toggleKeys = (clusterKey) => {
+    this.setState((prevState) => ({
       visibleKeys: {
         ...prevState.visibleKeys,
-        [clusterKey]: !prevState.visibleKeys[clusterKey]
-      }
+        [clusterKey]: !prevState.visibleKeys[clusterKey],
+      },
     }));
   };
 
@@ -306,7 +305,7 @@ class MatterSettingsPage extends Component {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
-        hour12: false
+        hour12: false,
       })
       .replace(/[/,:]/g, '-')
       .replace(/\s/g, '_');
@@ -337,7 +336,7 @@ class MatterSettingsPage extends Component {
       this.setState({
         resetting: false,
         matterEnabled: false,
-        nodes: []
+        nodes: [],
       });
     } catch (e) {
       console.error(e);
@@ -359,7 +358,7 @@ class MatterSettingsPage extends Component {
       hasIpv6,
       showConfirmReset,
       resetting,
-      resetError
+      resetError,
     } = this.state;
 
     return (
@@ -372,7 +371,7 @@ class MatterSettingsPage extends Component {
           </div>
           <div
             class={cx('card-body dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -431,14 +430,14 @@ class MatterSettingsPage extends Component {
 
                     <div
                       class={cx('dimmer', {
-                        active: loadingNodes
+                        active: loadingNodes,
                       })}
                     >
                       <div class="loader" />
                       <div class="dimmer-content">
                         {nodes && nodes.length > 0 ? (
                           <div class="table-responsive">
-                            {nodes.map(node => (
+                            {nodes.map((node) => (
                               <div class={cx('card mb-4', { 'dimmer active': decommissioningNodes[node.node_id] })}>
                                 {decommissioningNodes[node.node_id] && <div class="loader" />}
                                 <div class="dimmer-content">
@@ -456,7 +455,7 @@ class MatterSettingsPage extends Component {
                                       <button
                                         onClick={() => this.decommissionNode(node.node_id)}
                                         class={cx('btn btn-danger btn-sm flex-shrink-0 ml-2', {
-                                          loading: decommissioningNodes[node.node_id]
+                                          loading: decommissioningNodes[node.node_id],
                                         })}
                                         disabled={decommissioningNodes[node.node_id]}
                                       >
@@ -465,7 +464,7 @@ class MatterSettingsPage extends Component {
                                     </div>
                                   </div>
                                   <div class="card-body">
-                                    {node.devices.map(device => (
+                                    {node.devices.map((device) => (
                                       <DeviceDisplay
                                         device={device}
                                         nodeId={node.node_id}

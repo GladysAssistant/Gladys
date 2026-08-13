@@ -7,9 +7,9 @@ function createActions(store) {
       const tasks = [state.httpClient.get('/api/v1/me'), actionsProfilePicture.loadProfilePicture(state)];
       const [user] = await Promise.all(tasks);
       store.setState({
-        user
+        user,
       });
-    }
+    },
   };
   return actions;
 }

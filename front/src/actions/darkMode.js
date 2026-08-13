@@ -5,7 +5,7 @@ import {
   DARK_MODE_PREFERENCE_SYSTEM,
   getDarkModePreference,
   setDarkModePreference,
-  systemPrefersDarkMode
+  systemPrefersDarkMode,
 } from '../utils/darkModePreference';
 
 function createActionsDarkMode(store) {
@@ -49,7 +49,7 @@ function createActionsDarkMode(store) {
       applyDarkModeToDom(darkMode);
 
       return { darkMode };
-    }
+    },
   };
 
   return actions;

@@ -62,9 +62,7 @@ module.exports = {
     systemTimezone,
     { edfTempoHistoricalMap },
   ) => {
-    const consumptionDateHour = dayjs(consumptionDate)
-      .tz(systemTimezone)
-      .hour();
+    const consumptionDateHour = dayjs(consumptionDate).tz(systemTimezone).hour();
     let dateForColor = dayjs(consumptionDate).tz(systemTimezone);
     // For hours before 6AM strictly, we use the previous day to get the color
     if (consumptionDateHour < 6) {

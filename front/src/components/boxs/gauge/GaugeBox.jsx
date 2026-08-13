@@ -37,12 +37,12 @@ class GaugeBox extends Component {
   state = {
     deviceFeature: null,
     error: false,
-    noDeviceFeatureSelector: null
+    noDeviceFeatureSelector: null,
   };
   getDevice = async () => {
     try {
       await this.setState({
-        error: false
+        error: false,
       });
 
       if (!this.props.box.device_feature) {
@@ -51,7 +51,7 @@ class GaugeBox extends Component {
       }
 
       const devices = await this.props.httpClient.get('/api/v1/device', {
-        device_feature_selectors: this.props.box.device_feature
+        device_feature_selectors: this.props.box.device_feature,
       });
 
       if (!devices.length || !devices[0].features.length) {
@@ -61,39 +61,39 @@ class GaugeBox extends Component {
 
       const device = devices[0];
 
-      const deviceFeature = device.features.find(f => f.selector === this.props.box.device_feature);
+      const deviceFeature = device.features.find((f) => f.selector === this.props.box.device_feature);
 
       this.setState({
         device,
         deviceFeature,
-        noDeviceFeatureSelector: false
+        noDeviceFeatureSelector: false,
       });
     } catch (e) {
       console.error(e);
       this.setState({
         error: true,
-        noDeviceFeatureSelector: false
+        noDeviceFeatureSelector: false,
       });
     }
   };
 
-  updateDeviceStateWebsocket = payload => {
+  updateDeviceStateWebsocket = (payload) => {
     if (payload.device_feature_selector === this.props.box.device_feature) {
       const newDeviceFeature = {
         ...this.state.deviceFeature,
         last_value: payload.last_value,
-        last_value_changed: payload.last_value_changed
+        last_value_changed: payload.last_value_changed,
       };
       this.setState({ deviceFeature: newDeviceFeature });
     }
   };
 
-  updateChartValue = deviceFeature => {
+  updateChartValue = (deviceFeature) => {
     if (!deviceFeature || !this.chart) return;
 
     if (deviceFeature.last_value === null) {
       this.setState({
-        noDeviceFeatureLastValue: true
+        noDeviceFeatureLastValue: true,
       });
       return;
     }
@@ -115,11 +115,11 @@ class GaugeBox extends Component {
         radialBar: {
           dataLabels: {
             value: {
-              formatter: () => this.formatValueWithUnit(value, deviceFeature.unit)
-            }
-          }
-        }
-      }
+              formatter: () => this.formatValueWithUnit(value, deviceFeature.unit),
+            },
+          },
+        },
+      },
     };
     if (zoneColor) {
       updatedOptions.colors = [zoneColor];
@@ -133,8 +133,8 @@ class GaugeBox extends Component {
           inverseColors: false,
           opacityFrom: 1,
           opacityTo: 1,
-          stops: [0, 50, 65, 91]
-        }
+          stops: [0, 50, 65, 91],
+        },
       };
     }
     this.chart.updateOptions(updatedOptions);
@@ -189,7 +189,7 @@ class GaugeBox extends Component {
     this.getDevice();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket
+      this.updateDeviceStateWebsocket,
     );
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
@@ -197,7 +197,7 @@ class GaugeBox extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket
+      this.updateDeviceStateWebsocket,
     );
     this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
@@ -246,13 +246,13 @@ class GaugeBox extends Component {
 
     if (deviceFeature.last_value === null) {
       this.setState({
-        noDeviceFeatureLastValue: true
+        noDeviceFeatureLastValue: true,
       });
       return;
     }
 
     this.setState({
-      noDeviceFeatureLastValue: false
+      noDeviceFeatureLastValue: false,
     });
 
     // Get min and max from deviceFeature or use defaults
@@ -276,7 +276,7 @@ class GaugeBox extends Component {
       chart: {
         height: 250,
         type: 'radialBar',
-        offsetY: -10
+        offsetY: -10,
       },
       plotOptions: {
         radialBar: {
@@ -286,7 +286,7 @@ class GaugeBox extends Component {
             name: {
               fontSize: '16px',
               color: undefined,
-              offsetY: 120
+              offsetY: 120,
             },
             value: {
               offsetY: 76,
@@ -295,10 +295,10 @@ class GaugeBox extends Component {
               formatter: () => {
                 // Show actual value with unit if available
                 return this.formatValueWithUnit(value, deviceFeature.unit);
-              }
-            }
-          }
-        }
+              },
+            },
+          },
+        },
       },
       fill: zoneColor
         ? { type: 'solid', colors: [zoneColor] }
@@ -310,14 +310,14 @@ class GaugeBox extends Component {
               inverseColors: false,
               opacityFrom: 1,
               opacityTo: 1,
-              stops: [0, 50, 65, 91]
-            }
+              stops: [0, 50, 65, 91],
+            },
           },
       colors: zoneColor ? [zoneColor] : undefined,
       stroke: {
-        dashArray: 4
+        dashArray: 4,
       },
-      labels: [this.getDisplayLabel(device, deviceFeature)]
+      labels: [this.getDisplayLabel(device, deviceFeature)],
     };
 
     // Create and render the chart
@@ -365,7 +365,7 @@ class GaugeBox extends Component {
   render(props, { deviceFeature, error, noDeviceFeatureSelector, noDeviceFeatureLastValue }) {
     return (
       <div class="card">
-        {deviceFeature && <div ref={el => (this.chartElement = el)} class="gauge-chart" />}
+        {deviceFeature && <div ref={(el) => (this.chartElement = el)} class="gauge-chart" />}
         {this.renderThresholdsLegend()}
         {error && (
           <div class="card-body">

@@ -400,10 +400,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
         continue;
       }
       const valueStr = parts[0].replace(/^"|"$/g, '').trim();
-      const tsRaw = parts
-        .slice(1)
-        .join(',')
-        .trim();
+      const tsRaw = parts.slice(1).join(',').trim();
       const tsNoQuotes = tsRaw.replace(/^"|"$/g, '');
       const value = Number(valueStr);
       if (Number.isNaN(value)) {
@@ -443,16 +440,8 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
       let cursor = startUtc.clone();
       while (cursor.isBefore(endUtc) || cursor.isSame(endUtc)) {
         for (let h = 0; h < 24; h += 1) {
-          const t0 = cursor
-            .hour(h)
-            .minute(0)
-            .second(0)
-            .millisecond(0);
-          const t30 = cursor
-            .hour(h)
-            .minute(30)
-            .second(0)
-            .millisecond(0);
+          const t0 = cursor.hour(h).minute(0).second(0).millisecond(0);
+          const t30 = cursor.hour(h).minute(30).second(0).millisecond(0);
           const k0 = t0.format('YYYY-MM-DD HH:mm:ss[Z]');
           const k30 = t30.format('YYYY-MM-DD HH:mm:ss[Z]');
           if (!timesSet.has(k0)) {
@@ -478,9 +467,7 @@ describe('EnergyMonitoring.calculateCostFrom', function Describe() {
 
     // Calculate cost per month
     const costPerMonth = deviceFeatureState.reduce((acc, state) => {
-      const month = dayjs(state.created_at)
-        .tz('Europe/Paris')
-        .format('YYYY-MM');
+      const month = dayjs(state.created_at).tz('Europe/Paris').format('YYYY-MM');
       if (!acc[month]) {
         acc[month] = {
           total: 0,

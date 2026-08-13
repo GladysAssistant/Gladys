@@ -1,9 +1,6 @@
 const { expect } = require('chai');
 
-const {
-  FanControl,
-  // eslint-disable-next-line import/no-unresolved
-} = require('@matter/main/clusters');
+const { FanControl } = require('@matter/main/clusters');
 const { FAN_MODE, FAN_ROCK_SETTING, FAN_WIND_SETTING } = require('../../../../utils/constants');
 const {
   matterFanModeToGladys,

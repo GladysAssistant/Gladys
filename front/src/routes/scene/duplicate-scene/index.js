@@ -18,38 +18,38 @@ class DuplicateScene extends Component {
       loading: false,
       scene: {
         name: get(this.props.intl.dictionary, 'duplicateScene.nameAfterCopy').replace('{{name}}', scene.name),
-        icon: scene.icon
-      }
+        icon: scene.icon,
+      },
     });
   };
 
-  duplicateScene = async e => {
+  duplicateScene = async (e) => {
     e.preventDefault();
     // if errored, we don't continue
     if (this.checkErrors()) {
       return;
     }
     this.setState({
-      duplicateSceneStatus: RequestStatus.Getting
+      duplicateSceneStatus: RequestStatus.Getting,
     });
     try {
       const duplicatedScene = await this.props.httpClient.post(
         `/api/v1/scene/${this.props.scene_selector}/duplicate`,
-        this.state.scene
+        this.state.scene,
       );
       this.setState({
-        duplicateSceneStatus: RequestStatus.Success
+        duplicateSceneStatus: RequestStatus.Success,
       });
       route(`/dashboard/scene/${duplicatedScene.selector}`);
     } catch (e) {
       const status = get(e, 'response.status');
       if (status === 409) {
         this.setState({
-          duplicateSceneStatus: RequestStatus.ConflictError
+          duplicateSceneStatus: RequestStatus.ConflictError,
         });
       } else {
         this.setState({
-          duplicateSceneStatus: RequestStatus.Error
+          duplicateSceneStatus: RequestStatus.Error,
         });
       }
     }
@@ -64,29 +64,29 @@ class DuplicateScene extends Component {
       duplicateSceneErrors.icon = true;
     }
     this.setState({
-      duplicateSceneErrors
+      duplicateSceneErrors,
     });
     return Object.keys(duplicateSceneErrors).length > 0;
   };
 
-  updateDuplicateSceneName = e => {
+  updateDuplicateSceneName = (e) => {
     this.setState({
       scene: {
         name: e.target.value,
-        icon: this.state.scene.icon
-      }
+        icon: this.state.scene.icon,
+      },
     });
     if (this.state.duplicateSceneErrors) {
       this.checkErrors();
     }
   };
 
-  updateDuplicateSceneIcon = e => {
+  updateDuplicateSceneIcon = (e) => {
     this.setState({
       scene: {
         name: this.state.scene.name,
-        icon: e.target.value
-      }
+        icon: e.target.value,
+      },
     });
     if (this.state.duplicateSceneErrors) {
       this.checkErrors();
@@ -98,15 +98,15 @@ class DuplicateScene extends Component {
     this.state = {
       scene: {
         name: '',
-        icon: ''
+        icon: '',
       },
       sourceScene: {
         name: '',
-        icon: ''
+        icon: '',
       },
       loading: true,
       duplicateSceneErrors: null,
-      duplicateSceneStatus: null
+      duplicateSceneStatus: null,
     };
   }
 

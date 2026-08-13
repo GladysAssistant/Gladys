@@ -18,9 +18,7 @@ describe('GET /api/v1/gateway/backup', () => {
         is_deleted: false,
       },
     ];
-    nock(config.gladysGatewayServerUrl)
-      .get('/backups')
-      .reply(200, backups);
+    nock(config.gladysGatewayServerUrl).get('/backups').reply(200, backups);
     await authenticatedRequest
       .get('/api/v1/gateway/backup')
       .expect('Content-Type', /json/)
@@ -44,9 +42,7 @@ describe('GET /api/v1/gateway/key', () => {
         connected: false,
       },
     ];
-    nock(config.gladysGatewayServerUrl)
-      .get('/instances/users')
-      .reply(200, users);
+    nock(config.gladysGatewayServerUrl).get('/instances/users').reply(200, users);
     await authenticatedRequest
       .get('/api/v1/gateway/key')
       .expect('Content-Type', /json/)
@@ -75,20 +71,15 @@ describe('GET /api/v1/gateway/status', () => {
 
 describe('POST /api/v1/gateway/logout', () => {
   it('should disconnect gateway', async () => {
-    await authenticatedRequest
-      .post('/api/v1/gateway/logout')
-      .expect('Content-Type', /json/)
-      .expect(200);
+    await authenticatedRequest.post('/api/v1/gateway/logout').expect('Content-Type', /json/).expect(200);
   });
 });
 
 describe('POST /api/v1/gateway/configure-two-factor', () => {
   it('should return the otpauth url to configure two factor', async () => {
-    nock(config.gladysGatewayServerUrl)
-      .post('/users/two-factor-configure')
-      .reply(200, {
-        otpauth_url: 'otpauth://totp/Gladys%20Gateway?secret=THISISMYSECRET',
-      });
+    nock(config.gladysGatewayServerUrl).post('/users/two-factor-configure').reply(200, {
+      otpauth_url: 'otpauth://totp/Gladys%20Gateway?secret=THISISMYSECRET',
+    });
     await authenticatedRequest
       .post('/api/v1/gateway/configure-two-factor')
       .send({ access_token: 'my-access-token' })
@@ -101,9 +92,7 @@ describe('POST /api/v1/gateway/configure-two-factor', () => {
       });
   });
   it('should return 403 when the gateway refuses the access token', async () => {
-    nock(config.gladysGatewayServerUrl)
-      .post('/users/two-factor-configure')
-      .reply(401, {});
+    nock(config.gladysGatewayServerUrl).post('/users/two-factor-configure').reply(401, {});
     await authenticatedRequest
       .post('/api/v1/gateway/configure-two-factor')
       .send({ access_token: 'my-access-token' })
@@ -131,9 +120,7 @@ describe('POST /api/v1/gateway/enable-two-factor', () => {
       });
   });
   it('should return 403 when the two factor code is invalid', async () => {
-    nock(config.gladysGatewayServerUrl)
-      .post('/users/two-factor-enable')
-      .reply(422, {});
+    nock(config.gladysGatewayServerUrl).post('/users/two-factor-enable').reply(422, {});
     await authenticatedRequest
       .post('/api/v1/gateway/enable-two-factor')
       .send({ access_token: 'my-access-token', two_factor_code: '000000' })
@@ -245,9 +232,7 @@ describe('GET /api/v1/gateway/aichat/models', () => {
 
 describe('POST /api/v1/gateway/stt', () => {
   it('should return stt response', async () => {
-    nock(config.gladysGatewayServerUrl)
-      .post('/stt')
-      .reply(200, { text: 'bonjour gladys' });
+    nock(config.gladysGatewayServerUrl).post('/stt').reply(200, { text: 'bonjour gladys' });
     const response = await authenticatedRequest
       .post('/api/v1/gateway/stt')
       .set('Content-Type', 'audio/webm')
@@ -276,9 +261,7 @@ describe('POST /api/v1/gateway/voice', () => {
   });
 
   it('should process voice message end-to-end', async () => {
-    nock(config.gladysGatewayServerUrl)
-      .post('/stt')
-      .reply(200, { text: 'allume la lumière' });
+    nock(config.gladysGatewayServerUrl).post('/stt').reply(200, { text: 'allume la lumière' });
     nock(config.gladysGatewayServerUrl)
       .post('/openai/ask')
       .reply(200, {
@@ -290,9 +273,7 @@ describe('POST /api/v1/gateway/voice', () => {
           },
         ],
       });
-    nock(config.gladysGatewayServerUrl)
-      .post('/tts/token')
-      .reply(200, { url: 'http://tts.test/audio.mp3' });
+    nock(config.gladysGatewayServerUrl).post('/tts/token').reply(200, { url: 'http://tts.test/audio.mp3' });
 
     const response = await authenticatedRequest
       .post('/api/v1/gateway/voice')

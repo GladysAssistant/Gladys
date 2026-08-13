@@ -41,13 +41,10 @@ export function getOAuthCallbackPath(selector) {
 function base64UrlEncode(value) {
   const bytes = new TextEncoder().encode(value);
   let binary = '';
-  bytes.forEach(byte => {
+  bytes.forEach((byte) => {
     binary += String.fromCharCode(byte);
   });
-  return btoa(binary)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
 /**

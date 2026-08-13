@@ -6,7 +6,7 @@ const LANGUAGES_IN_DOCUMENTATION = ['en', 'fr'];
 
 const DEFAULT_LANGUAGE = 'en';
 
-const getLanguage = userLanguage =>
+const getLanguage = (userLanguage) =>
   LANGUAGES_IN_DOCUMENTATION.includes(userLanguage) ? userLanguage : DEFAULT_LANGUAGE;
 
 const DeviceConfigurationLink = ({ children, configurationKey, documentKey, user, linkClass }) => (
@@ -15,7 +15,7 @@ const DeviceConfigurationLink = ({ children, configurationKey, documentKey, user
     rel="noopener noreferrer"
     href={`${documentationURL}/${getLanguage(user.language)}/docs/${configurationKey}/${documentKey}`}
     class={cx({
-      [linkClass]: linkClass
+      [linkClass]: linkClass,
     })}
   >
     {children}

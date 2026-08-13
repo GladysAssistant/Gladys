@@ -11,9 +11,7 @@ const { queueWrapper } = require('../utils/queueWrapper');
  */
 async function calculateCostEveryThirtyMinutes(now, jobId) {
   return queueWrapper(this.queue, async () => {
-    const thirtyMinutesAgo = dayjs(now)
-      .subtract(30, 'minute')
-      .toDate();
+    const thirtyMinutesAgo = dayjs(now).subtract(30, 'minute').toDate();
     await this.calculateCostFrom(thirtyMinutesAgo, jobId);
   });
 }

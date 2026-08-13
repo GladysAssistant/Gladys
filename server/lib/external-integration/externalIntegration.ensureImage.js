@@ -23,7 +23,6 @@ const { BadParameters } = require('../../utils/coreErrors');
 async function ensureImage(image, { allowLocal = false } = {}) {
   try {
     await this.system.pull(image);
-    return;
   } catch (e) {
     let existsLocally = false;
     if (allowLocal) {

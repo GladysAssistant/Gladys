@@ -6,7 +6,7 @@ import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
   CHARGING_STATION_CONNECTOR_STATUS,
   CHARGING_STATION_CHARGING_STATE,
-  WATER_HEATER_MODE
+  WATER_HEATER_MODE,
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { isPushButtonFeature } from '../../../../../utils/consts';
@@ -31,7 +31,7 @@ export const buildMqttExternalId = (name, suffix) => {
   return `mqtt:${slug}-${suffix}`;
 };
 
-export const normalizeMqttExternalId = value => {
+export const normalizeMqttExternalId = (value) => {
   if (!value.startsWith('mqtt:')) {
     if (value.length < 5) {
       return 'mqtt:';
@@ -41,7 +41,7 @@ export const normalizeMqttExternalId = value => {
   return value;
 };
 
-export const isSensorCategory = category => {
+export const isSensorCategory = (category) => {
   if (
     category === DEVICE_FEATURE_CATEGORIES.BATTERY ||
     category === DEVICE_FEATURE_CATEGORIES.BATTERY_LOW ||
@@ -70,9 +70,9 @@ const MQTT_CATALOG_EXCLUDED_FEATURES = new Set([
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR),
   // Water valve types are only exposed by Zigbee2mqtt for now: the MQTT catalog defaults
   // (min/max and unit) are not accurate for them yet.
-  ...Object.values(DEVICE_FEATURE_TYPES.WATER_VALVE).map(type =>
-    categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_VALVE, type)
-  )
+  ...Object.values(DEVICE_FEATURE_TYPES.WATER_VALVE).map((type) =>
+    categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_VALVE, type),
+  ),
 ]);
 
 export const isMqttCatalogFeatureVisible = (category, type) =>
@@ -100,22 +100,22 @@ const CATEGORIES_WITHOUT_UNIT = new Set([
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.ADPS),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.ADIR1),
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.ADIR2),
-  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.ADIR3)
+  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TELEINFORMATION, DEVICE_FEATURE_TYPES.TELEINFORMATION.ADIR3),
 ]);
 
 export const groupDevicesByRoom = (devices, houses) => {
   const roomMap = {};
   const unassigned = [];
 
-  (houses || []).forEach(house => {
-    (house.rooms || []).forEach(room => {
+  (houses || []).forEach((house) => {
+    (house.rooms || []).forEach((room) => {
       roomMap[room.id] = { room, house };
     });
   });
 
   const groups = {};
 
-  (devices || []).forEach(device => {
+  (devices || []).forEach((device) => {
     if (device.room_id && roomMap[device.room_id]) {
       const { room, house } = roomMap[device.room_id];
       const groupKey = room.id;
@@ -123,7 +123,7 @@ export const groupDevicesByRoom = (devices, houses) => {
         groups[groupKey] = {
           room,
           house,
-          devices: []
+          devices: [],
         };
       }
       groups[groupKey].devices.push(device);
@@ -144,24 +144,20 @@ export const groupDevicesByRoom = (devices, houses) => {
     sortedGroups.push({
       room: null,
       house: null,
-      devices: unassigned
+      devices: unassigned,
     });
   }
 
   return sortedGroups;
 };
 
-const flattenUnit = unit => (Array.isArray(unit) ? unit[0] : unit);
+const flattenUnit = (unit) => (Array.isArray(unit) ? unit[0] : unit);
 
 const FEATURE_UNIT_BY_CATEGORY_TYPE = {
-  [categoryTypeKey(
-    DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
-    DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE
-  )]: DEVICE_FEATURE_UNITS.CELSIUS,
-  [categoryTypeKey(
-    DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
-    DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER
-  )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE)]:
+    DEVICE_FEATURE_UNITS.CELSIUS,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.WATER_HEATER, DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER)]:
+    DEVICE_FEATURE_UNITS.PERCENT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.PPM,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.NO2_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
@@ -171,34 +167,24 @@ const FEATURE_UNIT_BY_CATEGORY_TYPE = {
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.LUX,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR, 'decimal')]: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
-  [categoryTypeKey(
-    DEVICE_FEATURE_CATEGORIES.LIGHT,
-    DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS
-  )]: DEVICE_FEATURE_UNITS.PERCENT,
-  [categoryTypeKey(
-    DEVICE_FEATURE_CATEGORIES.SHUTTER,
-    DEVICE_FEATURE_TYPES.SHUTTER.POSITION
-  )]: DEVICE_FEATURE_UNITS.PERCENT,
-  [categoryTypeKey(
-    DEVICE_FEATURE_CATEGORIES.CURTAIN,
-    DEVICE_FEATURE_TYPES.CURTAIN.POSITION
-  )]: DEVICE_FEATURE_UNITS.PERCENT,
-  [categoryTypeKey(
-    DEVICE_FEATURE_CATEGORIES.SWITCH,
-    DEVICE_FEATURE_TYPES.SWITCH.ENERGY
-  )]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
-  [categoryTypeKey(
-    DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR,
-    'decimal'
-  )]: DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS)]:
+    DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SHUTTER, DEVICE_FEATURE_TYPES.SHUTTER.POSITION)]:
+    DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CURTAIN, DEVICE_FEATURE_TYPES.CURTAIN.POSITION)]:
+    DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.ENERGY)]:
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR, 'decimal')]:
+    DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR, 'integer')]: DEVICE_FEATURE_UNITS.MILLI_VOLT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LOCK, DEVICE_FEATURE_TYPES.LOCK.INTEGER)]: DEVICE_FEATURE_UNITS.PERCENT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.POWER)]: DEVICE_FEATURE_UNITS.WATT,
   [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CUBE, DEVICE_FEATURE_TYPES.CUBE.ROTATION)]: DEVICE_FEATURE_UNITS.DEGREE,
   [categoryTypeKey(
     DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING,
-    DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING
-  )]: DEVICE_FEATURE_UNITS.PERCENT
+    DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING,
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
 };
 
 const ELECTRICAL_VEHICLE_BATTERY_TYPE_UNITS = {
@@ -207,7 +193,7 @@ const ELECTRICAL_VEHICLE_BATTERY_TYPE_UNITS = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_POWER]: DEVICE_FEATURE_UNITS.KILOWATT,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_RANGE_ESTIMATE]: DEVICE_FEATURE_UNITS.KM,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_TEMPERATURE]: DEVICE_FEATURE_UNITS.CELSIUS,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_VOLTAGE]: DEVICE_FEATURE_UNITS.VOLT
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_BATTERY.BATTERY_VOLTAGE]: DEVICE_FEATURE_UNITS.VOLT,
 };
 
 const ELECTRICAL_VEHICLE_CHARGE_TYPE_UNITS = {
@@ -219,28 +205,28 @@ const ELECTRICAL_VEHICLE_CHARGE_TYPE_UNITS = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.LAST_CHARGE_ENERGY_ADDED]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.LAST_CHARGE_ENERGY_CONSUMPTION]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.TARGET_CHARGE_LIMIT]: DEVICE_FEATURE_UNITS.PERCENT,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.TARGET_CURRENT]: DEVICE_FEATURE_UNITS.AMPERE
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.TARGET_CURRENT]: DEVICE_FEATURE_UNITS.AMPERE,
 };
 
 const ELECTRICAL_VEHICLE_CLIMATE_TYPE_UNITS = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.INDOOR_TEMPERATURE]: DEVICE_FEATURE_UNITS.CELSIUS,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.TARGET_TEMPERATURE]: DEVICE_FEATURE_UNITS.CELSIUS
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CLIMATE.TARGET_TEMPERATURE]: DEVICE_FEATURE_UNITS.CELSIUS,
 };
 
 const ELECTRICAL_VEHICLE_DRIVE_TYPE_UNITS = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_DRIVE.DRIVE_ENERGY_CONSUMPTION_TOTAL]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_DRIVE.SPEED]: DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_DRIVE.SPEED]: DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR,
 };
 
 const ELECTRICAL_VEHICLE_CONSUMPTION_TYPE_UNITS = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CONSUMPTION.ENERGY_CONSUMPTION]:
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR_PER_100_KM,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CONSUMPTION.ENERGY_EFFICIENCY]: DEVICE_FEATURE_UNITS.KM_PER_KILOWATT_HOUR
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CONSUMPTION.ENERGY_EFFICIENCY]: DEVICE_FEATURE_UNITS.KM_PER_KILOWATT_HOUR,
 };
 
 const ELECTRICAL_VEHICLE_STATE_TYPE_UNITS = {
   [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.ODOMETER]: DEVICE_FEATURE_UNITS.KM,
-  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.TIRE_PRESSURE]: DEVICE_FEATURE_UNITS.BAR
+  [DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_STATE.TIRE_PRESSURE]: DEVICE_FEATURE_UNITS.BAR,
 };
 
 const TELEINFORMATION_ENERGY_TYPES = new Set([
@@ -263,7 +249,7 @@ const TELEINFORMATION_ENERGY_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEINFORMATION.ERQ1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.ERQ2,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.ERQ3,
-  DEVICE_FEATURE_TYPES.TELEINFORMATION.ERQ4
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.ERQ4,
 ]);
 
 const TELEINFORMATION_POWER_TYPES = new Set([
@@ -280,7 +266,7 @@ const TELEINFORMATION_POWER_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SMAXN3_1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS2,
-  DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS3
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.SINSTS3,
 ]);
 
 const TELEINFORMATION_VOLTAGE_TYPES = new Set([
@@ -289,7 +275,7 @@ const TELEINFORMATION_VOLTAGE_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEINFORMATION.UMOY3,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.URMS1,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.URMS2,
-  DEVICE_FEATURE_TYPES.TELEINFORMATION.URMS3
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.URMS3,
 ]);
 
 const TELEINFORMATION_CURRENT_TYPES = new Set([
@@ -298,10 +284,10 @@ const TELEINFORMATION_CURRENT_TYPES = new Set([
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IRMS3,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX2,
-  DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX3
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.IMAX3,
 ]);
 
-const getTeleinformationUnit = type => {
+const getTeleinformationUnit = (type) => {
   if (TELEINFORMATION_ENERGY_TYPES.has(type)) {
     return DEVICE_FEATURE_UNITS.KILOWATT_HOUR;
   }
@@ -331,14 +317,14 @@ const PREFERRED_DEFAULT_UNIT_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.NOISE_SENSOR]: DEVICE_FEATURE_UNITS.DECIBEL,
   [DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR]: DEVICE_FEATURE_UNITS.DEGREE,
   [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR,
-  [DEVICE_FEATURE_CATEGORIES.SURFACE]: DEVICE_FEATURE_UNITS.SQUARE_METER
+  [DEVICE_FEATURE_CATEGORIES.SURFACE]: DEVICE_FEATURE_UNITS.SQUARE_METER,
 };
 
 const SWITCH_TYPE_UNITS = {
   [DEVICE_FEATURE_TYPES.SWITCH.POWER]: DEVICE_FEATURE_UNITS.WATT,
   [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: DEVICE_FEATURE_UNITS.VOLT,
-  [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: DEVICE_FEATURE_UNITS.AMPERE
+  [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: DEVICE_FEATURE_UNITS.AMPERE,
 };
 
 const ENERGY_SENSOR_TYPE_UNITS = {
@@ -352,7 +338,7 @@ const ENERGY_SENSOR_TYPE_UNITS = {
   [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION_COST]: DEVICE_FEATURE_UNITS.EURO,
   [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
-  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST]: DEVICE_FEATURE_UNITS.EURO
+  [DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST]: DEVICE_FEATURE_UNITS.EURO,
 };
 
 const ENERGY_PRODUCTION_SENSOR_TYPE_UNITS = {
@@ -360,7 +346,7 @@ const ENERGY_PRODUCTION_SENSOR_TYPE_UNITS = {
   [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.DAILY_PRODUCTION]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.DAILY_PRODUCTION_REVENUE]: DEVICE_FEATURE_UNITS.EURO,
   [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION]: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
-  [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION_REVENUE]: DEVICE_FEATURE_UNITS.EURO
+  [DEVICE_FEATURE_TYPES.ENERGY_PRODUCTION_SENSOR.THIRTY_MINUTES_PRODUCTION_REVENUE]: DEVICE_FEATURE_UNITS.EURO,
 };
 
 export const getDefaultUnitForFeature = (category, type) => {
@@ -513,7 +499,7 @@ export const getFeatureDefaultValues = (category, type) => {
   const defaults = {
     read_only: isSensorCategory(category),
     keep_history: true,
-    has_feedback: false
+    has_feedback: false,
   };
 
   if (type === DEVICE_FEATURE_TYPES.LIGHT.BINARY && category === DEVICE_FEATURE_CATEGORIES.LIGHT) {
@@ -532,10 +518,10 @@ export const getFeatureDefaultValues = (category, type) => {
         min: readOnly ? 0 : 1,
         max: 1,
         read_only: readOnly,
-        keep_history: readOnly ? defaults.keep_history : false
+        keep_history: readOnly ? defaults.keep_history : false,
       },
       category,
-      type
+      type,
     );
   }
 
@@ -555,14 +541,14 @@ export const getFeatureDefaultValues = (category, type) => {
       return applyDefaultUnit(
         { ...defaults, min: 30, max: 70, read_only: false, unit: DEVICE_FEATURE_UNITS.CELSIUS },
         category,
-        type
+        type,
       );
     }
     if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER) {
       return applyDefaultUnit(
         { ...defaults, min: 0, max: 100, read_only: true, unit: DEVICE_FEATURE_UNITS.PERCENT },
         category,
-        type
+        type,
       );
     }
     if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING) {
@@ -613,10 +599,10 @@ export const getFeatureDefaultValues = (category, type) => {
         min: 5,
         max: 35,
         read_only: false,
-        unit: DEVICE_FEATURE_UNITS.CELSIUS
+        unit: DEVICE_FEATURE_UNITS.CELSIUS,
       },
       category,
-      type
+      type,
     );
   }
 
@@ -647,7 +633,7 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 500, read_only: true, unit: DEVICE_FEATURE_UNITS.WATT },
       category,
-      type
+      type,
     );
   }
 
@@ -664,7 +650,7 @@ export const getFeatureDefaultValues = (category, type) => {
       return applyDefaultUnit(
         { ...defaults, min: -180, max: 180, read_only: true, unit: DEVICE_FEATURE_UNITS.DEGREE },
         category,
-        type
+        type,
       );
     }
     return applyDefaultUnit({ ...defaults, min: 0, max: 8, read_only: true }, category, type);
@@ -677,7 +663,7 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 100, read_only: true, unit: DEVICE_FEATURE_UNITS.PERCENT },
       category,
-      type
+      type,
     );
   }
 
@@ -685,7 +671,7 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 100, read_only: true, unit: DEVICE_FEATURE_UNITS.PERCENT },
       category,
-      type
+      type,
     );
   }
 
@@ -701,7 +687,7 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 5000, read_only: true, unit: DEVICE_FEATURE_UNITS.PPM },
       category,
-      type
+      type,
     );
   }
 
@@ -713,7 +699,7 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 1000, read_only: true, unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER },
       category,
-      type
+      type,
     );
   }
 
@@ -721,7 +707,7 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 100000, read_only: true, unit: DEVICE_FEATURE_UNITS.LUX },
       category,
-      type
+      type,
     );
   }
 
@@ -729,7 +715,7 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit(
       { ...defaults, min: -40, max: 120, read_only: true, unit: DEVICE_FEATURE_UNITS.CELSIUS },
       category,
-      type
+      type,
     );
   }
 
@@ -783,35 +769,25 @@ export const getFeatureDefaultValues = (category, type) => {
 export const getCatalogPreviewLabelKey = (category, type) => {
   const key = categoryTypeKey(category, type);
   const labeledPreviewKeys = {
-    [categoryTypeKey(
-      DEVICE_FEATURE_CATEGORIES.LOCK,
-      DEVICE_FEATURE_TYPES.LOCK.STATE
-    )]: 'deviceFeatureValue.category.lock.state.1',
-    [categoryTypeKey(
-      DEVICE_FEATURE_CATEGORIES.CUBE,
-      DEVICE_FEATURE_TYPES.CUBE.MODE
-    )]: 'integration.mqtt.featureCatalog.previewValues.cube.mode',
-    [categoryTypeKey(
-      DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR,
-      'integer'
-    )]: 'deviceFeatureValue.category.voc-matter-index-sensor.integer.medium',
-    [categoryTypeKey(
-      DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR,
-      'integer'
-    )]: 'deviceFeatureValue.category.no2-matter-index-sensor.integer.medium',
+    [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.LOCK, DEVICE_FEATURE_TYPES.LOCK.STATE)]:
+      'deviceFeatureValue.category.lock.state.1',
+    [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CUBE, DEVICE_FEATURE_TYPES.CUBE.MODE)]:
+      'integration.mqtt.featureCatalog.previewValues.cube.mode',
+    [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR, 'integer')]:
+      'deviceFeatureValue.category.voc-matter-index-sensor.integer.medium',
+    [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR, 'integer')]:
+      'deviceFeatureValue.category.no2-matter-index-sensor.integer.medium',
     [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.RISK, 'integer')]: 'deviceFeatureValue.category.risk.integer.low-risk',
     [categoryTypeKey(
       DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE,
-      DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED
+      DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_CHARGE.PLUGGED,
     )]: 'deviceFeatureValue.category.electrical-vehicle-charge.plugged.1',
     [categoryTypeKey(
       DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
-      DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS
+      DEVICE_FEATURE_TYPES.CHARGING_STATION.CONNECTOR_STATUS,
     )]: `deviceFeatureValue.category.charging-station.connector-status.${CHARGING_STATION_CONNECTOR_STATUS.OCCUPIED}`,
-    [categoryTypeKey(
-      DEVICE_FEATURE_CATEGORIES.CHARGING_STATION,
-      DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE
-    )]: `deviceFeatureValue.category.charging-station.charging-state.${CHARGING_STATION_CHARGING_STATE.CHARGING}`
+    [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.CHARGING_STATION, DEVICE_FEATURE_TYPES.CHARGING_STATION.CHARGING_STATE)]:
+      `deviceFeatureValue.category.charging-station.charging-state.${CHARGING_STATION_CHARGING_STATE.CHARGING}`,
   };
 
   return labeledPreviewKeys[key] || null;
@@ -1210,15 +1186,15 @@ export const filterFeatureCatalogOptions = (options, search, dictionary) => {
   }
 
   return options
-    .map(group => {
-      const filteredOptions = group.options.filter(option => {
+    .map((group) => {
+      const filteredOptions = group.options.filter((option) => {
         const label = normalizeForSearch(option.label);
         const categoryLabel = normalizeForSearch(group.label);
         const description = normalizeForSearch(
-          get(dictionary, `integration.mqtt.featureCatalog.descriptions.${option.category}.${option.type}`, '')
+          get(dictionary, `integration.mqtt.featureCatalog.descriptions.${option.category}.${option.type}`, ''),
         );
         const keywords = normalizeForSearch(
-          get(dictionary, `integration.mqtt.featureCatalog.keywords.${option.category}.${option.type}`, '')
+          get(dictionary, `integration.mqtt.featureCatalog.keywords.${option.category}.${option.type}`, ''),
         );
 
         return (
@@ -1264,12 +1240,12 @@ const valuesMatch = (left, right) => {
 };
 
 const findFeatureIndexMatchingAllErrors = (features, errors) => {
-  return features.findIndex(feature => errors.every(error => valuesMatch(feature[error.attribute], error.value)));
+  return features.findIndex((feature) => errors.every((error) => valuesMatch(feature[error.attribute], error.value)));
 };
 
 const deviceMatchesAllErrors = (device, errors) => {
   return errors.every(
-    error => DEVICE_LEVEL_FIELDS.has(error.attribute) && valuesMatch(device[error.attribute], error.value)
+    (error) => DEVICE_LEVEL_FIELDS.has(error.attribute) && valuesMatch(device[error.attribute], error.value),
   );
 };
 
@@ -1280,11 +1256,11 @@ const assignFeatureError = (featureFields, featureIndex, field, property) => {
   featureFields[featureIndex][field] = property;
 };
 
-const normalizeValidationProperty = property => {
+const normalizeValidationProperty = (property) => {
   if (property.attribute === 'selector') {
     return {
       ...property,
-      attribute: 'name'
+      attribute: 'name',
     };
   }
   return property;
@@ -1296,7 +1272,9 @@ export const parseMqttDeviceValidationErrors = (properties, device) => {
   const errorItems = [];
 
   const features = (device && device.features) || [];
-  const errors = (properties || []).filter(property => property && property.attribute).map(normalizeValidationProperty);
+  const errors = (properties || [])
+    .filter((property) => property && property.attribute)
+    .map(normalizeValidationProperty);
 
   if (errors.length === 0) {
     return { deviceFields, featureFields, errorItems, expandedFeatureIndices: [] };
@@ -1304,7 +1282,7 @@ export const parseMqttDeviceValidationErrors = (properties, device) => {
 
   const matchingFeatureIndex = findFeatureIndexMatchingAllErrors(features, errors);
   if (matchingFeatureIndex !== -1) {
-    errors.forEach(error => {
+    errors.forEach((error) => {
       const { attribute: field } = error;
       assignFeatureError(featureFields, matchingFeatureIndex, field, error);
       errorItems.push({
@@ -1312,17 +1290,17 @@ export const parseMqttDeviceValidationErrors = (properties, device) => {
         featureIndex: matchingFeatureIndex,
         field,
         property: error,
-        feature: features[matchingFeatureIndex]
+        feature: features[matchingFeatureIndex],
       });
     });
   } else if (device && deviceMatchesAllErrors(device, errors)) {
-    errors.forEach(error => {
+    errors.forEach((error) => {
       const { attribute: field } = error;
       deviceFields[field] = error;
       errorItems.push({ scope: 'device', field, property: error });
     });
   } else {
-    errors.forEach(error => {
+    errors.forEach((error) => {
       const { attribute: field, value } = error;
       let assigned = false;
 
@@ -1335,17 +1313,17 @@ export const parseMqttDeviceValidationErrors = (properties, device) => {
       if (!assigned) {
         const matchingIndices = features
           .map((feature, index) => (valuesMatch(feature[field], value) ? index : -1))
-          .filter(index => index !== -1);
+          .filter((index) => index !== -1);
 
         if (matchingIndices.length > 0) {
-          matchingIndices.forEach(index => {
+          matchingIndices.forEach((index) => {
             assignFeatureError(featureFields, index, field, error);
             errorItems.push({
               scope: 'feature',
               featureIndex: index,
               field,
               property: error,
-              feature: features[index]
+              feature: features[index],
             });
           });
           assigned = true;
@@ -1372,7 +1350,7 @@ export const parseMqttDeviceValidationErrors = (properties, device) => {
               featureIndex: index,
               field,
               property: error,
-              feature
+              feature,
             });
           }
         });
@@ -1381,11 +1359,11 @@ export const parseMqttDeviceValidationErrors = (properties, device) => {
   }
 
   const expandedFeatureIndices = [
-    ...new Set(errorItems.filter(item => item.scope === 'feature').map(item => item.featureIndex))
+    ...new Set(errorItems.filter((item) => item.scope === 'feature').map((item) => item.featureIndex)),
   ];
 
   const seenErrorKeys = new Set();
-  const dedupedErrorItems = errorItems.filter(item => {
+  const dedupedErrorItems = errorItems.filter((item) => {
     const key = `${item.scope}-${
       item.featureIndex !== undefined && item.featureIndex !== null ? item.featureIndex : 'device'
     }-${item.field}`;
@@ -1406,9 +1384,9 @@ export const isDeviceFieldErrored = (validationErrors, field) => {
 export const isFeatureFieldErrored = (validationErrors, featureIndex, field) => {
   return Boolean(
     validationErrors &&
-      validationErrors.featureFields &&
-      validationErrors.featureFields[featureIndex] &&
-      validationErrors.featureFields[featureIndex][field]
+    validationErrors.featureFields &&
+    validationErrors.featureFields[featureIndex] &&
+    validationErrors.featureFields[featureIndex][field],
   );
 };
 
@@ -1421,7 +1399,7 @@ export const clearMqttDeviceValidationError = (validationErrors, field, featureI
     deviceFields: { ...validationErrors.deviceFields },
     featureFields: { ...validationErrors.featureFields },
     errorItems: [...validationErrors.errorItems],
-    expandedFeatureIndices: [...validationErrors.expandedFeatureIndices]
+    expandedFeatureIndices: [...validationErrors.expandedFeatureIndices],
   };
 
   if (featureIndex === undefined) {
@@ -1436,7 +1414,7 @@ export const clearMqttDeviceValidationError = (validationErrors, field, featureI
     }
   }
 
-  nextValidationErrors.errorItems = nextValidationErrors.errorItems.filter(item => {
+  nextValidationErrors.errorItems = nextValidationErrors.errorItems.filter((item) => {
     if (item.field !== field) {
       return true;
     }

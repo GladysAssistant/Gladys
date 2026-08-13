@@ -21,7 +21,7 @@ const IntegrationPage = ({
   refreshStoreStatus,
   refreshStoreStale,
   integrationsToUpdate,
-  category
+  category,
 }) => (
   <div class="page">
     <div class="page-main">
@@ -58,7 +58,7 @@ const IntegrationPage = ({
               </div>
               <div class="col-lg-9">
                 <div class={`list-group list-group-flush ${style.mobileList}`}>
-                  {integrations.map(integration => (
+                  {integrations.map((integration) => (
                     <IntegrationListItem
                       key={integration.key}
                       integration={integration}
@@ -68,7 +68,7 @@ const IntegrationPage = ({
                 </div>
                 <div class={style.desktopGrid}>
                   <div class="row row-cards">
-                    {integrations.map(integration => (
+                    {integrations.map((integration) => (
                       <IntegrationCategory
                         key={integration.key}
                         integration={integration}

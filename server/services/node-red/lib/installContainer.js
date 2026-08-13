@@ -42,7 +42,7 @@ async function installContainer(config = {}) {
     all: true,
     filters: { name: [containerDescriptor.name] },
   });
-  let [container] = dockerContainers;
+  let container;
 
   const majorVersion = resolveNodeRedMajorVersion(config);
   const nodeRedDockerImage = getNodeRedDockerImage(majorVersion);

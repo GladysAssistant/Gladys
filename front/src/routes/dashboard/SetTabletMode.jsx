@@ -10,7 +10,7 @@ class SetTabletMode extends Component {
     try {
       const houses = await this.props.httpClient.get('/api/v1/house');
       await this.setState({
-        houses
+        houses,
       });
     } catch (e) {
       console.error(e);
@@ -22,13 +22,13 @@ class SetTabletMode extends Component {
       const currentSession = await this.props.httpClient.get('/api/v1/session/tablet_mode');
       let selectedHouse = null;
       if (this.state.houses && currentSession.current_house_id) {
-        const houseFound = this.state.houses.find(h => h.id === currentSession.current_house_id);
+        const houseFound = this.state.houses.find((h) => h.id === currentSession.current_house_id);
         selectedHouse = houseFound ? houseFound.selector : null;
       }
       await this.setState({
         currentSession,
         selectedHouse,
-        selectedTabletMode: currentSession.tablet_mode
+        selectedTabletMode: currentSession.tablet_mode,
       });
     } catch (e) {
       console.error(e);
@@ -37,12 +37,12 @@ class SetTabletMode extends Component {
 
   saveTabletMode = async () => {
     await this.setState({
-      loading: true
+      loading: true,
     });
     try {
       await this.props.httpClient.post('/api/v1/session/tablet_mode', {
         tablet_mode: this.state.selectedHouse !== null,
-        house: this.state.selectedHouse
+        house: this.state.selectedHouse,
       });
       await this.props.refreshTabletMode();
       this.props.session.setTabletModeCurrentHouseSelector(this.state.selectedHouse);
@@ -51,29 +51,29 @@ class SetTabletMode extends Component {
       console.error(e);
     }
     await this.setState({
-      loading: false
+      loading: false,
     });
   };
 
   refreshData = async () => {
     await this.setState({
-      loading: true
+      loading: true,
     });
     await this.getHouses();
     await this.getTabletMode();
     await this.setState({
-      loading: false
+      loading: false,
     });
   };
 
-  onHouseChange = e => {
+  onHouseChange = (e) => {
     this.setState({ selectedHouse: e.target.value || null });
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      houses: []
+      houses: [],
     };
   }
 
@@ -85,7 +85,7 @@ class SetTabletMode extends Component {
     return (
       <div
         class={cx(style.tabletModeDiv, {
-          [style.tabletModeDivOpen]: defineTabletModeOpened
+          [style.tabletModeDivOpen]: defineTabletModeOpened,
         })}
       >
         <div class={style.tabletModeDivContent}>
@@ -109,7 +109,7 @@ class SetTabletMode extends Component {
                         <Text id="dashboard.tabletMode.tabletModeDisabled" />
                       </option>
                       {houses &&
-                        houses.map(house => (
+                        houses.map((house) => (
                           <option selected={house.selector === selectedHouse} value={house.selector}>
                             {house.name}
                           </option>

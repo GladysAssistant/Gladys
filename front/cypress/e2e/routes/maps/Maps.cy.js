@@ -4,13 +4,11 @@ describe('Maps view', () => {
   });
   it('Should create new area', () => {
     cy.visit('/dashboard/maps');
-    cy.contains('newArea.createNewZoneButton')
-      .should('have.class', 'btn-primary')
-      .click();
+    cy.contains('newArea.createNewZoneButton').should('have.class', 'btn-primary').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/maps/area/new`);
 
-    cy.get('input:visible').then(inputs => {
+    cy.get('input:visible').then((inputs) => {
       // Zone name
       cy.wrap(inputs[0]).type('My zone');
       // Radius
@@ -25,9 +23,7 @@ describe('Maps view', () => {
 
     cy.get('.leaflet-container').click(390, 250);
 
-    cy.contains('newArea.createButton')
-      .should('have.class', 'btn-primary')
-      .click();
+    cy.contains('newArea.createButton').should('have.class', 'btn-primary').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/maps`);
   });
@@ -35,7 +31,7 @@ describe('Maps view', () => {
     cy.login();
     cy.visit('/dashboard/maps/area/edit/my-zone');
 
-    cy.get('input:visible').then(inputs => {
+    cy.get('input:visible').then((inputs) => {
       // Zone name
       cy.wrap(inputs[0]).as('zoneInput');
       cy.get('@zoneInput').clear();
@@ -49,9 +45,7 @@ describe('Maps view', () => {
 
     cy.get('.leaflet-container').click(200, 250);
 
-    cy.contains('newArea.updateButton')
-      .should('have.class', 'btn-primary')
-      .click();
+    cy.contains('newArea.updateButton').should('have.class', 'btn-primary').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/maps`);
   });
@@ -59,9 +53,7 @@ describe('Maps view', () => {
     cy.login();
     cy.visit('/dashboard/maps/area/edit/my-zone');
 
-    cy.contains('newArea.deleteButton')
-      .should('have.class', 'btn-danger')
-      .click();
+    cy.contains('newArea.deleteButton').should('have.class', 'btn-danger').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/maps`);
   });

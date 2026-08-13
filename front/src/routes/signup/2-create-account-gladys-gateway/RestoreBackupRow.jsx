@@ -14,24 +14,20 @@ class GatewayBackupRow extends Component {
 
   askForConfirmation = () => {
     this.setState({
-      confirmBackup: true
+      confirmBackup: true,
     });
   };
 
   cancelConfirmation = () => {
     this.setState({
-      confirmBackup: false
+      confirmBackup: false,
     });
   };
 
   render(props, { confirmBackup }) {
     return (
       <tr>
-        <td>
-          {dayjs(props.backup.created_at)
-            .locale(props.user.language)
-            .fromNow()}
-        </td>
+        <td>{dayjs(props.backup.created_at).locale(props.user.language).fromNow()}</td>
         <td>{bytesFormatter(props.backup.size, props.user.language, this.props.intl.dictionary)}</td>
         <td class="text-right">
           {!confirmBackup && (

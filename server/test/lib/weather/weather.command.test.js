@@ -21,9 +21,7 @@ const fakeWeather = {
   weather: 'cloud',
   days: [
     {
-      datetime: TODAY.add(0, 'day')
-        .add(11, 'hour')
-        .toISOString(),
+      datetime: TODAY.add(0, 'day').add(11, 'hour').toISOString(),
       humidity: 65,
       pressure: 992,
       temperature_max: 11,
@@ -34,9 +32,7 @@ const fakeWeather = {
       wind_speed: 3.13,
     },
     {
-      datetime: TODAY.add(1, 'day')
-        .add(11, 'hour')
-        .toISOString(),
+      datetime: TODAY.add(1, 'day').add(11, 'hour').toISOString(),
       humidity: 57,
       pressure: 997,
       temperature_max: 9,
@@ -47,9 +43,7 @@ const fakeWeather = {
       wind_speed: 1.95,
     },
     {
-      datetime: TODAY.add(2, 'day')
-        .add(11, 'hour')
-        .toISOString(),
+      datetime: TODAY.add(2, 'day').add(11, 'hour').toISOString(),
       humidity: 67,
       pressure: 1000,
       temperature_max: 9,
@@ -60,9 +54,7 @@ const fakeWeather = {
       wind_speed: 3.23,
     },
     {
-      datetime: TODAY.add(3, 'day')
-        .add(11, 'hour')
-        .toISOString(),
+      datetime: TODAY.add(3, 'day').add(11, 'hour').toISOString(),
       humidity: 51,
       pressure: 1006,
       temperature_max: 10,
@@ -73,9 +65,7 @@ const fakeWeather = {
       wind_speed: 6.27,
     },
     {
-      datetime: TODAY.add(4, 'day')
-        .add(11, 'hour')
-        .toISOString(),
+      datetime: TODAY.add(4, 'day').add(11, 'hour').toISOString(),
       humidity: 86,
       pressure: 1004,
       temperature_max: 6,
@@ -86,9 +76,7 @@ const fakeWeather = {
       wind_speed: 2.14,
     },
     {
-      datetime: TODAY.add(5, 'day')
-        .add(11, 'hour')
-        .toISOString(),
+      datetime: TODAY.add(5, 'day').add(11, 'hour').toISOString(),
       humidity: 61,
       pressure: 1010,
       temperature_max: 9,
@@ -99,9 +87,7 @@ const fakeWeather = {
       wind_speed: 2.55,
     },
     {
-      datetime: TODAY.add(6, 'day')
-        .add(11, 'hour')
-        .toISOString(),
+      datetime: TODAY.add(6, 'day').add(11, 'hour').toISOString(),
       humidity: 60,
       pressure: 1010,
       temperature_max: 7,

@@ -10,7 +10,7 @@ const SetupModePanel = ({
   setupMode,
   selectSetupMode,
   resetSetupMode,
-  disabled
+  disabled,
 }) => {
   if (setupMode) {
     return (

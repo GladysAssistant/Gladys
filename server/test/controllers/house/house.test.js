@@ -202,15 +202,9 @@ describe('GET /api/v1/house/:house_selector/sun', () => {
       });
   });
   it('should return 400 when the house has no coordinates', async () => {
-    await authenticatedRequest
-      .get('/api/v1/house/pepper-house/sun')
-      .expect('Content-Type', /json/)
-      .expect(400);
+    await authenticatedRequest.get('/api/v1/house/pepper-house/sun').expect('Content-Type', /json/).expect(400);
   });
   it('should return 404 when the house does not exist', async () => {
-    await authenticatedRequest
-      .get('/api/v1/house/house-does-not-exist/sun')
-      .expect('Content-Type', /json/)
-      .expect(404);
+    await authenticatedRequest.get('/api/v1/house/house-does-not-exist/sun').expect('Content-Type', /json/).expect(404);
   });
 });

@@ -27,7 +27,7 @@ class SetupTab extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showConfirmReset: false
+      showConfirmReset: false,
     };
   }
 
@@ -38,7 +38,7 @@ class SetupTab extends Component {
       setupZigee2mqttStatus,
       toggleZigee2mqttStatus,
       resetZigbee2mqttStatus,
-      configuration = {}
+      configuration = {},
     } = props;
     const { z2mContainerError } = props.zigbee2mqttStatus || {};
     const loading = loadZigbee2mqttStatus === RequestStatus.Getting || loadZigbee2mqttConfig === RequestStatus.Getting;
@@ -62,7 +62,7 @@ class SetupTab extends Component {
         <div
           class={cx('dimmer', {
             active: loading,
-            'py-5': loading
+            'py-5': loading,
           })}
         >
           <div class="loader" />
@@ -92,7 +92,7 @@ class SetupTab extends Component {
                     <MarkupText
                       id="integration.zigbee2mqtt.setup.connectionUrl"
                       fields={{
-                        url: props.z2mUrl
+                        url: props.z2mUrl,
                       }}
                     />
                   </li>

@@ -12,10 +12,10 @@ const MODE_OPTIONS = [
   { value: WATER_HEATER_MODE.BOOST, i18nKey: 'boost' },
   { value: WATER_HEATER_MODE.MANUAL, i18nKey: 'manual' },
   { value: WATER_HEATER_MODE.AWAY, i18nKey: 'away' },
-  { value: WATER_HEATER_MODE.PROGRAM, i18nKey: 'program' }
+  { value: WATER_HEATER_MODE.PROGRAM, i18nKey: 'program' },
 ];
 
-const WaterHeaterModeDeviceFeature = props => {
+const WaterHeaterModeDeviceFeature = (props) => {
   const { deviceFeature } = props;
   const { category, type } = deviceFeature;
   const rawValue = deviceFeature.last_value;
@@ -28,7 +28,7 @@ const WaterHeaterModeDeviceFeature = props => {
   // carries no information about which modes exist, and filtering on it would hide valid modes, or
   // every mode at all when `max` is unset (a feature created by hand has no min/max).
   const options = resolveFeatureOptions(deviceFeature, MODE_OPTIONS);
-  const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
+  const updateValue = (value) => props.updateValueWithDebounce(deviceFeature, value);
 
   return (
     <tr>

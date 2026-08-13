@@ -3,7 +3,7 @@ import 'cropperjs/dist/cropper.css';
 import Cropper from 'cropperjs';
 
 const imageStyle = {
-  maxHeight: '15rem'
+  maxHeight: '15rem',
 };
 
 class EditableProfilePicture extends Component {
@@ -12,7 +12,7 @@ class EditableProfilePicture extends Component {
       this.cropper.destroy();
     }
     this.cropper = new Cropper(this.img, {
-      aspectRatio: 1
+      aspectRatio: 1,
     });
     this.props.setCropperInstance(this.cropper);
   };
@@ -45,7 +45,7 @@ class EditableProfilePicture extends Component {
   render(props, {}) {
     return (
       <div style={imageStyle}>
-        <img ref={img => (this.img = img)} src={props.newProfilePicture} />
+        <img ref={(img) => (this.img = img)} src={props.newProfilePicture} />
       </div>
     );
   }

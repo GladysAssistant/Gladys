@@ -1,5 +1,5 @@
 const Promise = require('bluebird');
-// eslint-disable-next-line import/no-unresolved
+
 const { BridgedDeviceBasicInformation } = require('@matter/main/clusters');
 
 const logger = require('../../../utils/logger');

@@ -13,7 +13,7 @@ const HIDDEN_ACTION_STATUS = [SERVICE_STATUS.UNKNOWN, SERVICE_STATUS.DISABLED];
 class ServiceItem extends Component {
   changeState = async () => {
     this.setState({
-      changeStatus: RequestStatus.Getting
+      changeStatus: RequestStatus.Getting,
     });
 
     try {
@@ -22,11 +22,11 @@ class ServiceItem extends Component {
       this.props.actionOnService(this.props.service.selector, action);
 
       this.setState({
-        changeStatus: RequestStatus.Success
+        changeStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        changeStatus: RequestStatus.Error
+        changeStatus: RequestStatus.Error,
       });
     }
   };
@@ -35,7 +35,7 @@ class ServiceItem extends Component {
     const started = STARTED_STATUS.includes(service.status);
     const displayAction = !HIDDEN_ACTION_STATUS.includes(service.status);
     const integrationPage = integrations.find(
-      integration => get(integration, 'link', { default: integration.key }).toLowerCase() === service.selector
+      (integration) => get(integration, 'link', { default: integration.key }).toLowerCase() === service.selector,
     );
     const integrationLink =
       integrationPage &&

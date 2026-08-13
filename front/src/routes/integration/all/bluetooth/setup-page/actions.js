@@ -5,54 +5,54 @@ import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsBluetooth from '../commons/actions';
 
-const createActions = store => {
+const createActions = (store) => {
   const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const bluetoothActions = createActionsBluetooth(store);
   const actions = {
     async getPeripherals(state) {
       store.setState({
-        bluetoothGetPeripheralsStatus: RequestStatus.Getting
+        bluetoothGetPeripheralsStatus: RequestStatus.Getting,
       });
       try {
         const bluetoothPeripherals = await state.httpClient.get('/api/v1/service/bluetooth/peripheral');
         store.setState({
           bluetoothPeripherals,
-          bluetoothGetPeripheralsStatus: RequestStatus.Success
+          bluetoothGetPeripheralsStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          bluetoothGetPeripheralsStatus: RequestStatus.Error
+          bluetoothGetPeripheralsStatus: RequestStatus.Error,
         });
       }
     },
     async addPeripheral(state, peripheral) {
       const peripheralKey = peripheral.selector;
       let bluetoothPeripherals = state.bluetoothPeripherals || [];
-      const currentIndex = bluetoothPeripherals.findIndex(p => p.selector === peripheralKey);
+      const currentIndex = bluetoothPeripherals.findIndex((p) => p.selector === peripheralKey);
 
       if (currentIndex >= 0) {
         bluetoothPeripherals = update(bluetoothPeripherals, {
-          [currentIndex]: { $set: peripheral }
+          [currentIndex]: { $set: peripheral },
         });
       } else {
         bluetoothPeripherals = update(bluetoothPeripherals, {
-          $push: [peripheral]
+          $push: [peripheral],
         });
       }
 
       store.setState({
-        bluetoothPeripherals
+        bluetoothPeripherals,
       });
     },
     async resetSaveStatus() {
       store.setState({
-        bluetoothSaveStatus: undefined
+        bluetoothSaveStatus: undefined,
       });
     },
     async createDevice(state, device) {
       store.setState({
-        bluetoothSaveStatus: RequestStatus.Getting
+        bluetoothSaveStatus: RequestStatus.Getting,
       });
 
       const { httpClient } = state;
@@ -61,14 +61,14 @@ const createActions = store => {
         await httpClient.post(`/api/v1/device`, device);
         store.setState({
           bluetoothSaveStatus: RequestStatus.Success,
-          bluetoothCreatedDevice: device
+          bluetoothCreatedDevice: device,
         });
       } catch (e) {
         store.setState({
-          bluetoothSaveStatus: RequestStatus.Error
+          bluetoothSaveStatus: RequestStatus.Error,
         });
       }
-    }
+    },
   };
   return Object.assign({}, actions, houseActions, integrationActions, bluetoothActions);
 };

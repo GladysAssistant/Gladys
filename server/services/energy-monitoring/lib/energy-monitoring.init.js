@@ -38,11 +38,7 @@ async function init() {
     rule.tz = systemTimezone;
     // Scheduling consumption and cost calculation every day at 11:10
     this.calculateConsumptionAndCostEvery24HoursJob = this.gladys.scheduler.scheduleJob(rule, async () => {
-      const yesterdayDate = dayjs
-        .tz(dayjs(), systemTimezone)
-        .subtract(1, 'day')
-        .startOf('day')
-        .toDate();
+      const yesterdayDate = dayjs.tz(dayjs(), systemTimezone).subtract(1, 'day').startOf('day').toDate();
 
       // Add to queue
       await this.calculateCostFromYesterday(yesterdayDate);
@@ -57,11 +53,7 @@ async function init() {
     rule.tz = systemTimezone;
     // Scheduling consumption and cost calculation every day at 16:10
     this.calculateConsumptionAndCostEvery24HoursLastJob = this.gladys.scheduler.scheduleJob(rule, async () => {
-      const yesterdayDate = dayjs
-        .tz(dayjs(), systemTimezone)
-        .subtract(1, 'day')
-        .startOf('day')
-        .toDate();
+      const yesterdayDate = dayjs.tz(dayjs(), systemTimezone).subtract(1, 'day').startOf('day').toDate();
 
       // Add to queue
       await this.calculateCostFromYesterday(yesterdayDate);

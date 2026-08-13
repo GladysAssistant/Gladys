@@ -25,7 +25,7 @@ const FanLabeledSelectDeviceFeature = ({ children, ...props }) => {
         <div class="d-flex justify-content-end">
           <div class="form-group mb-0">
             <select value={deviceFeature.last_value} onChange={updateValue} class="form-control form-control-sm">
-              {options.map(value => (
+              {options.map((value) => (
                 <option key={value} value={value}>
                   <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`} />
                 </option>

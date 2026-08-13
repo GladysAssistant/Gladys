@@ -37,7 +37,7 @@ const ACTION_LIST = [
   ACTIONS.ZIGBEE2MQTT.SEND,
   ACTIONS.MUSIC.PLAY_NOTIFICATION,
   ACTIONS.AI.ASK,
-  ACTIONS.SMS.SEND
+  ACTIONS.SMS.SEND,
 ];
 
 const TRANSLATIONS = ACTION_LIST.reduce((acc, action) => {
@@ -47,11 +47,11 @@ const TRANSLATIONS = ACTION_LIST.reduce((acc, action) => {
 
 class ChooseActionType extends Component {
   state = {
-    currentAction: null
+    currentAction: null,
   };
-  handleChange = selectedOption => {
+  handleChange = (selectedOption) => {
     this.setState({
-      currentAction: selectedOption
+      currentAction: selectedOption,
     });
     if (selectedOption) {
       this.props.updateActionProperty(this.props.path, 'type', selectedOption.value);
@@ -61,9 +61,9 @@ class ChooseActionType extends Component {
   render(props, { currentAction }) {
     const actionListFiltered = props.action && props.action.filter ? props.action.filter : ACTION_LIST;
     const options = actionListFiltered
-      .map(action => ({
+      .map((action) => ({
         value: action,
-        label: props[`editScene.actions.${action}`] || action
+        label: props[`editScene.actions.${action}`] || action,
       }))
       .sort((a, b) => a.label.localeCompare(b.label));
 

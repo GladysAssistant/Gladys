@@ -22,7 +22,7 @@ class BroadlinkDeviceSetupPage extends Component {
     super(props);
 
     this.state = {
-      loading: RequestStatus.Getting
+      loading: RequestStatus.Getting,
     };
   }
 
@@ -37,12 +37,12 @@ class BroadlinkDeviceSetupPage extends Component {
         const options = { service: 'broadlink' };
         device = await this.props.httpClient.get(`/api/v1/device/${deviceSelector}`, options);
 
-        const peripheralParam = device.params.find(param => param.name === PARAMS.PERIPHERAL);
+        const peripheralParam = device.params.find((param) => param.name === PARAMS.PERIPHERAL);
         if (peripheralParam) {
           peripheral = peripheralParam.value;
         }
 
-        const remoteType = device.params.find(param => param.name === PARAMS.PERIPHERAL);
+        const remoteType = device.params.find((param) => param.name === PARAMS.PERIPHERAL);
         isRemote = !!remoteType;
       } catch (e) {
         // Device not found
@@ -51,7 +51,7 @@ class BroadlinkDeviceSetupPage extends Component {
     } else {
       isRemote = true;
       device = {
-        id: uuid.v4()
+        id: uuid.v4(),
       };
     }
 
@@ -65,7 +65,7 @@ class BroadlinkDeviceSetupPage extends Component {
       loading,
       device,
       peripheral,
-      isRemote
+      isRemote,
     });
   }
 
@@ -74,7 +74,7 @@ class BroadlinkDeviceSetupPage extends Component {
       <BroadlinkPage user={props.user}>
         <div
           class={cx('dimmer', {
-            active: loading === RequestStatus.Getting
+            active: loading === RequestStatus.Getting,
           })}
         >
           <div class={cx('loader', 'bg-white', 'w-100', 'card', style.emptyDiv, style.emptyStateDivBox)} />
@@ -101,5 +101,5 @@ class BroadlinkDeviceSetupPage extends Component {
 
 export default connect(
   'session,user,httpClient,currentIntegration,housesWithRooms,broadlinkPeripherals',
-  actions
+  actions,
 )(BroadlinkDeviceSetupPage);

@@ -14,10 +14,7 @@ const buildConfigHash = (config = {}) => {
     secretKey: config.secretKey || '',
     appAccountId: config.appAccountId || '',
   });
-  return crypto
-    .createHash('sha256')
-    .update(payload)
-    .digest('hex');
+  return crypto.createHash('sha256').update(payload).digest('hex');
 };
 
 module.exports = {

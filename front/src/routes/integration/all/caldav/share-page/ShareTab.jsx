@@ -14,7 +14,7 @@ const ShareTab = ({ children, ...props }) => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.loading
+          active: props.loading,
         })}
       >
         <div class="loader" />
@@ -31,7 +31,7 @@ const ShareTab = ({ children, ...props }) => (
             <div class="form-group">
               <div className={style.switchGroup}>
                 {props.caldavCalendars &&
-                  props.caldavCalendars.map(calendar => {
+                  props.caldavCalendars.map((calendar) => {
                     return (
                       <label class={cx('custom-switch', style.switchLabel)}>
                         <input

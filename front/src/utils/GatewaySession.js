@@ -26,7 +26,7 @@ class GatewaySession {
     this.gladysGatewayApiUrl = config.gladysGatewayApiUrl;
     this.gatewayClient = new GladysGatewayClient({
       serverUrl: config.gladysGatewayApiUrl,
-      cryptoLib: window.crypto
+      cryptoLib: window.crypto,
     });
   }
 
@@ -109,7 +109,7 @@ class GatewaySession {
 
   setAccessToken(accessToken) {
     const newUser = Object.assign({}, this.user, {
-      access_token: accessToken
+      access_token: accessToken,
     });
     this.saveUser(newUser);
   }

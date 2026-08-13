@@ -3,34 +3,34 @@ import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../utils/consts';
 import createActionsHouse from '../../../../../actions/house';
 
-const createActions = store => {
+const createActions = (store) => {
   const houseActions = createActionsHouse(store);
   const actions = {
     async getDiscoveredDevices(state = {}) {
       store.setState({
-        lanManagerGetDiscoveredDevicesStatus: RequestStatus.Getting
+        lanManagerGetDiscoveredDevicesStatus: RequestStatus.Getting,
       });
       try {
         const { filterExisting = true } = state;
         const lanManagerDiscoveredDevices = await state.httpClient.get('/api/v1/service/lan-manager/discover', {
-          filterExisting
+          filterExisting,
         });
         store.setState({
           lanManagerDiscoveredDevices,
           lanManagerGetDiscoveredDevicesStatus: RequestStatus.Success,
-          lanManagerDiscoverUpdate: false
+          lanManagerDiscoverUpdate: false,
         });
       } catch (e) {
         console.error(e);
         store.setState({
-          lanManagerGetDiscoveredDevicesStatus: RequestStatus.Error
+          lanManagerGetDiscoveredDevicesStatus: RequestStatus.Error,
         });
       }
     },
     async toggleFilterOnExisting(state = {}) {
       const { filterExisting = true } = state;
       store.setState({
-        filterExisting: !filterExisting
+        filterExisting: !filterExisting,
       });
 
       await actions.getDiscoveredDevices(store.getState());
@@ -41,7 +41,7 @@ const createActions = store => {
         lanManagerStatus = await state.httpClient.get('/api/v1/service/lan-manager/status');
       } finally {
         store.setState({
-          lanManagerStatus
+          lanManagerStatus,
         });
       }
     },
@@ -56,18 +56,18 @@ const createActions = store => {
       try {
         const lanManagerStatus = await state.httpClient.post('/api/v1/service/lan-manager/discover', { scan: action });
         store.setState({
-          lanManagerStatus
+          lanManagerStatus,
         });
       } catch (e) {
         console.error(e);
         store.setState({
-          lanManagerStatus: { scanning: false }
+          lanManagerStatus: { scanning: false },
         });
       }
     },
     async handleStatus(state = {}, lanManagerStatus) {
       store.setState({
-        lanManagerStatus
+        lanManagerStatus,
       });
 
       const { lanManagerDiscoveredDevices = [], lanManagerGetDiscoveredDevicesStatus } = state;
@@ -76,7 +76,7 @@ const createActions = store => {
       if (!lanManagerStatus.scanning) {
         if (lanManagerStatus.success === false) {
           store.setState({
-            lanManagerGetDiscoveredDevicesStatus: RequestStatus.Error
+            lanManagerGetDiscoveredDevicesStatus: RequestStatus.Error,
           });
         } else if (lanManagerDiscoveredDevices.length === 0) {
           // if no device are currently fetched, refresh list
@@ -85,12 +85,12 @@ const createActions = store => {
           // or display refresh button
           store.setState({
             lanManagerDiscoverUpdate: true,
-            lanManagerGetDiscoveredDevicesStatus: RequestStatus.Success
+            lanManagerGetDiscoveredDevicesStatus: RequestStatus.Success,
           });
         }
       } else if (lanManagerGetDiscoveredDevicesStatus !== RequestStatus.Getting) {
         store.setState({
-          lanManagerGetDiscoveredDevicesStatus: RequestStatus.Getting
+          lanManagerGetDiscoveredDevicesStatus: RequestStatus.Getting,
         });
       }
     },
@@ -102,9 +102,9 @@ const createActions = store => {
         const newState = update(state, {
           lanManagerDiscoveredDevices: {
             [deviceIndex]: {
-              $set: savedDevice
-            }
-          }
+              $set: savedDevice,
+            },
+          },
         });
         store.setState(newState);
       } catch (e) {
@@ -117,13 +117,13 @@ const createActions = store => {
         lanManagerDiscoveredDevices: {
           [index]: {
             [property]: {
-              $set: value
-            }
-          }
-        }
+              $set: value,
+            },
+          },
+        },
       });
       store.setState(newState);
-    }
+    },
   };
   return Object.assign({}, actions, houseActions);
 };

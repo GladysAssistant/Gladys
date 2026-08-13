@@ -23,10 +23,7 @@ async function calculateCostFromDate(startAt) {
 
     if (typeof startAt === 'string' && DATE_ONLY_PATTERN.test(startAt)) {
       const systemTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
-      normalizedStartAt = dayjs
-        .tz(startAt, systemTimezone)
-        .startOf('day')
-        .toDate();
+      normalizedStartAt = dayjs.tz(startAt, systemTimezone).startOf('day').toDate();
     }
 
     await this.calculateCostFrom(normalizedStartAt);

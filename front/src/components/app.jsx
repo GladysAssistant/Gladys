@@ -206,7 +206,7 @@ import ExternalIntegrationOAuthCallbackPage from '../routes/integration/all/exte
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
-const SafeAsyncRoute = props => (
+const SafeAsyncRoute = (props) => (
   <div class="async-route-wrapper">
     <AsyncRoute {...props} loading={() => <div class="loading-placeholder" />} />
   </div>
@@ -214,8 +214,8 @@ const SafeAsyncRoute = props => (
 
 const AppRouter = connect(
   'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate',
-  actions
-)(props => (
+  actions,
+)((props) => (
   <div id="app">
     <Layout currentUrl={props.currentUrl}>
       <Header
@@ -444,7 +444,7 @@ class MainApp extends Component {
     // about a new version by asking again at the same cadence
     this.externalIntegrationUpdatesInterval = setInterval(
       this.props.refreshExternalIntegrationsToUpdate,
-      EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS
+      EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS,
     );
   }
 

@@ -15,21 +15,21 @@ import UpdateDeviceFeature from '../../../../../../components/device/UpdateDevic
 import BluetoothPeripheralFeatures from '../BluetoothPeripheralFeatures';
 
 class ConfigurePeripheralForm extends Component {
-  updateName = e => {
+  updateName = (e) => {
     this.setState({
       device: {
         ...this.state.device,
-        name: e.target.value
-      }
+        name: e.target.value,
+      },
     });
   };
 
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.setState({
       device: {
         ...this.state.device,
-        room_id: e.target.value
-      }
+        room_id: e.target.value,
+      },
     });
   };
 
@@ -49,18 +49,18 @@ class ConfigurePeripheralForm extends Component {
       features: {
         [featureIndex]: {
           [property]: {
-            $set: value
-          }
-        }
-      }
+            $set: value,
+          },
+        },
+      },
     });
 
     this.setState({
-      device
+      device,
     });
   };
 
-  createDevice = e => {
+  createDevice = (e) => {
     e.preventDefault();
 
     const { device } = this.state;
@@ -77,8 +77,8 @@ class ConfigurePeripheralForm extends Component {
     if (presenceSensorIndex >= 0) {
       updatedDevice = update(device, {
         features: {
-          $splice: [[presenceSensorIndex, 1]]
-        }
+          $splice: [[presenceSensorIndex, 1]],
+        },
       });
 
       updatedPresenceSensorIndex = -1;
@@ -89,7 +89,7 @@ class ConfigurePeripheralForm extends Component {
             {
               name: get(
                 this.props.intl.dictionary,
-                `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR}.${DEVICE_FEATURE_TYPES.SENSOR.PUSH}`
+                `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR}.${DEVICE_FEATURE_TYPES.SENSOR.PUSH}`,
               ),
               external_id: `${device.external_id}:${DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR}`,
               category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
@@ -98,10 +98,10 @@ class ConfigurePeripheralForm extends Component {
               max: 1,
               read_only: true,
               has_feedback: false,
-              keep_history: true
-            }
-          ]
-        }
+              keep_history: true,
+            },
+          ],
+        },
       });
 
       updatedPresenceSensorIndex = updatedDevice.features.length - 1;
@@ -109,7 +109,7 @@ class ConfigurePeripheralForm extends Component {
 
     this.setState({
       device: updatedDevice,
-      presenceSensorIndex: updatedPresenceSensorIndex
+      presenceSensorIndex: updatedPresenceSensorIndex,
     });
   };
 
@@ -118,12 +118,12 @@ class ConfigurePeripheralForm extends Component {
 
     const { device } = props;
     const presenceSensorIndex = device.features.findIndex(
-      f => f.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR
+      (f) => f.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
     );
 
     this.state = {
       device,
-      presenceSensorIndex
+      presenceSensorIndex,
     };
 
     this.createDevice = this.createDevice.bind(this);
@@ -154,7 +154,7 @@ class ConfigurePeripheralForm extends Component {
           <div>
             <div
               class={cx('form-group', {
-                'was-validated': !device.name || device.name.length === 0
+                'was-validated': !device.name || device.name.length === 0,
               })}
             >
               <label for="name" class="form-label">
@@ -189,9 +189,9 @@ class ConfigurePeripheralForm extends Component {
                   <Text id="global.emptySelectOption" />
                 </option>
                 {houses &&
-                  houses.map(house => (
+                  houses.map((house) => (
                     <optgroup label={house.name}>
-                      {house.rooms.map(room => (
+                      {house.rooms.map((room) => (
                         <option selected={room.id === device.room_id} value={room.id}>
                           {room.name}
                         </option>
@@ -255,5 +255,5 @@ class ConfigurePeripheralForm extends Component {
 }
 
 export default withIntlAsProp(
-  connect('session,httpClient,houses,currentIntegration', actions)(ConfigurePeripheralForm)
+  connect('session,httpClient,houses,currentIntegration', actions)(ConfigurePeripheralForm),
 );

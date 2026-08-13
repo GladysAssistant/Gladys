@@ -13,7 +13,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 // bundle. A modified click (ctrl, cmd, shift) keeps the browser behavior
 // and opens the raw file in a new tab, like the load-error fallback.
 class DocsLink extends Component {
-  handleOpen = e => {
+  handleOpen = (e) => {
     if (e.ctrlKey || e.metaKey || e.shiftKey) {
       return;
     }
@@ -29,8 +29,8 @@ class DocsLink extends Component {
         import('dompurify'),
         this.props.httpClient.get('/api/v1/external_integration/store/docs', {
           store_slug: this.props.storeSlug,
-          lang: this.props.lang
-        })
+          lang: this.props.lang,
+        }),
       ]);
       const html = this.buildHtml(markedModule.marked, dompurifyModule.default, docs.content, docs.url);
       this.setState({ html, status: RequestStatus.Success });
@@ -46,16 +46,16 @@ class DocsLink extends Component {
     // resolve the relative links and images of the doc folder, and keep
     // navigation out of the dashboard (sanitized first: the hrefs here
     // can only carry safe schemes)
-    template.content.querySelectorAll('a[href]').forEach(link => {
+    template.content.querySelectorAll('a[href]').forEach((link) => {
       link.setAttribute('href', new URL(link.getAttribute('href'), baseUrl).toString());
       link.setAttribute('target', '_blank');
       link.setAttribute('rel', 'noopener noreferrer');
     });
-    template.content.querySelectorAll('img[src]').forEach(image => {
+    template.content.querySelectorAll('img[src]').forEach((image) => {
       image.setAttribute('src', new URL(image.getAttribute('src'), baseUrl).toString());
       image.setAttribute('style', 'max-width: 100%;');
     });
-    template.content.querySelectorAll('table').forEach(table => {
+    template.content.querySelectorAll('table').forEach((table) => {
       table.setAttribute('class', 'table table-bordered');
     });
     return template.innerHTML;
@@ -85,7 +85,7 @@ class DocsLink extends Component {
               )}
               <div
                 class={cx('dimmer', {
-                  active: status === RequestStatus.Getting
+                  active: status === RequestStatus.Getting,
                 })}
               >
                 <div class="loader" />

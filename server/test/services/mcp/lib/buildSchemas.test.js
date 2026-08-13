@@ -1986,9 +1986,7 @@ describe('build schemas', () => {
   it('should run web.fetch and time.compare-times tools', async () => {
     const lookupStub = stub(dns.promises, 'lookup').resolves([{ address: '93.184.216.34', family: 4 }]);
 
-    nock('http://example.com')
-      .get('/hours')
-      .reply(200, 'open 09:00-18:00', { 'Content-Type': 'text/plain' });
+    nock('http://example.com').get('/hours').reply(200, 'open 09:00-18:00', { 'Content-Type': 'text/plain' });
 
     const mcpHandler = {
       serviceId: 'test',

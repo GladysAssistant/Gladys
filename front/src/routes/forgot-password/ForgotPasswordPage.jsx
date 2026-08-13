@@ -20,7 +20,7 @@ const ForgotPasswordPage = ({ children, ...props }) => (
           <div class="card-body p-6">
             <div
               class={cx('dimmer', {
-                active: props.forgotPasswordStatus === RequestStatus.Getting
+                active: props.forgotPasswordStatus === RequestStatus.Getting,
               })}
             >
               <div class="loader" />
@@ -75,7 +75,7 @@ const ForgotPasswordPage = ({ children, ...props }) => (
                         <input
                           type="email"
                           class={cx('form-control', {
-                            'is-invalid': props.forgotPasswordStatus === ForgotPasswordStatus.WrongEmailError
+                            'is-invalid': props.forgotPasswordStatus === ForgotPasswordStatus.WrongEmailError,
                           })}
                           placeholder={<Text id="forgotPassword.emailPlaceholder" />}
                           value={props.forgotPasswordEmail}

@@ -22,9 +22,9 @@ class LANManagerSettingsTab extends Component {
     const updatedConfig = update(this.state.config, {
       [configGroup]: {
         [configItem]: {
-          $set: value
-        }
-      }
+          $set: value,
+        },
+      },
     });
 
     this.setState({ config: updatedConfig, updated: true });
@@ -34,29 +34,29 @@ class LANManagerSettingsTab extends Component {
     const updatedConfig = update(this.state.config, {
       ipMasks: {
         [maskIndex]: {
-          $set: value
-        }
-      }
+          $set: value,
+        },
+      },
     });
 
     this.setState({ config: updatedConfig, updated: true });
   };
 
-  addMaskConfig = async value => {
+  addMaskConfig = async (value) => {
     const updatedConfig = update(this.state.config, {
       ipMasks: {
-        $push: [value]
-      }
+        $push: [value],
+      },
     });
 
     this.setState({ config: updatedConfig, updated: true });
   };
 
-  deleteMaskConfig = async maskIndex => {
+  deleteMaskConfig = async (maskIndex) => {
     const updatedConfig = update(this.state.config, {
       ipMasks: {
-        $splice: [[maskIndex, 1]]
-      }
+        $splice: [[maskIndex, 1]],
+      },
     });
 
     this.setState({ config: updatedConfig, updated: true });
@@ -88,7 +88,7 @@ class LANManagerSettingsTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />

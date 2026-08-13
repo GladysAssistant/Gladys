@@ -26,7 +26,7 @@ function parseExportEntries(body) {
   let depth = 0;
   let current = '';
 
-  const addName = trimmed => {
+  const addName = (trimmed) => {
     if (!trimmed || trimmed.startsWith('//')) {
       return;
     }
@@ -127,7 +127,7 @@ function appendNamedExports(code, exportNames) {
   }
 
   const replaced = code.replace(/export default (require_\w+\(\));/, (_, initializer) => {
-    const namedExports = exportNames.map(name => `export const ${name} = __cjsModule.${name};`).join('\n');
+    const namedExports = exportNames.map((name) => `export const ${name} = __cjsModule.${name};`).join('\n');
     return `const __cjsModule = ${initializer};\nexport default __cjsModule;\n${namedExports}`;
   });
 
@@ -150,7 +150,7 @@ export function serverCommonjsInterop() {
       // The bundled output inlines the whole require() graph: drop the whole
       // cache when a server file changes so edits show up without a restart.
       server.watcher.add(SERVER_ROOT);
-      server.watcher.on('change', filePath => {
+      server.watcher.on('change', (filePath) => {
         if (isServerModule(filePath)) {
           cache.clear();
           const mod = server.moduleGraph.getModuleById(filePath);
@@ -184,12 +184,12 @@ export function serverCommonjsInterop() {
         platform: 'node',
         absWorkingDir: REPO_ROOT,
         nodePaths: NODE_MODULE_PATHS,
-        logLevel: 'silent'
+        logLevel: 'silent',
       });
 
       const transformed = appendNamedExports(result.outputFiles[0].text, exportNames);
       cache.set(filePath, transformed);
       return transformed;
-    }
+    },
   };
 }

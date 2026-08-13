@@ -17,12 +17,12 @@ class SettingsUsers extends Component {
   };
   confirmUserDeletion = () => {
     this.setState({
-      confirmUserDeletion: true
+      confirmUserDeletion: true,
     });
   };
   cancelDeletion = () => {
     this.setState({
-      confirmUserDeletion: false
+      confirmUserDeletion: false,
     });
   };
   render({ user, loggedUser }, { confirmUserDeletion, loading }) {

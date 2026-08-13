@@ -10,7 +10,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 
 class InstallFromGithubCard extends Component {
-  openModal = e => {
+  openModal = (e) => {
     if (e) {
       e.preventDefault();
     }
@@ -22,7 +22,7 @@ class InstallFromGithubCard extends Component {
       manifestJson: '',
       installStatus: null,
       installError: null,
-      installErrorDetails: null
+      installErrorDetails: null,
     });
   };
 
@@ -30,28 +30,28 @@ class InstallFromGithubCard extends Component {
     this.setState({ modalOpen: false });
   };
 
-  toggleDevMode = e => {
+  toggleDevMode = (e) => {
     e.preventDefault();
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       devMode: !prevState.devMode,
       installError: null,
-      installErrorDetails: null
+      installErrorDetails: null,
     }));
   };
 
-  updateRepoUrl = e => {
+  updateRepoUrl = (e) => {
     this.setState({ repoUrl: e.target.value });
   };
 
-  updateDockerImage = e => {
+  updateDockerImage = (e) => {
     this.setState({ dockerImage: e.target.value });
   };
 
-  updateManifestJson = e => {
+  updateManifestJson = (e) => {
     this.setState({ manifestJson: e.target.value });
   };
 
-  install = async body => {
+  install = async (body) => {
     this.setState({ installStatus: RequestStatus.Getting, installError: null, installErrorDetails: null });
     try {
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
@@ -73,23 +73,23 @@ class InstallFromGithubCard extends Component {
       this.setState({
         installStatus: RequestStatus.Error,
         installError,
-        installErrorDetails: this.parseErrorDetails(properties)
+        installErrorDetails: this.parseErrorDetails(properties),
       });
     }
   };
 
-  parseErrorDetails = properties => {
+  parseErrorDetails = (properties) => {
     if (typeof properties !== 'string' || properties.trim().length === 0) {
       return null;
     }
     const details = properties
       .split(' ; ')
-      .map(detail => detail.trim())
-      .filter(detail => detail.length > 0);
+      .map((detail) => detail.trim())
+      .filter((detail) => detail.length > 0);
     return details.length > 0 ? details : null;
   };
 
-  installFromRepoUrl = e => {
+  installFromRepoUrl = (e) => {
     if (e) {
       e.preventDefault();
     }
@@ -100,7 +100,7 @@ class InstallFromGithubCard extends Component {
     this.install({ repo_url: repoUrl.trim() });
   };
 
-  installFromDockerImage = e => {
+  installFromDockerImage = (e) => {
     if (e) {
       e.preventDefault();
     }
@@ -116,7 +116,7 @@ class InstallFromGithubCard extends Component {
         this.setState({
           installStatus: RequestStatus.Error,
           installError: 'integration.externalIntegration.installFromGithub.manifestInvalidJson',
-          installErrorDetails: err.message ? [err.message] : null
+          installErrorDetails: err.message ? [err.message] : null,
         });
         return;
       }
@@ -141,7 +141,7 @@ class InstallFromGithubCard extends Component {
                     <Text id="integration.externalIntegration.installFromGithub.errorDetailsTitle" />
                   </div>
                   <ul class={style.errorDetails}>
-                    {installErrorDetails.map(detail => (
+                    {installErrorDetails.map((detail) => (
                       <li key={detail}>{detail}</li>
                     ))}
                   </ul>
@@ -168,7 +168,7 @@ class InstallFromGithubCard extends Component {
             <button
               type="submit"
               class={cx('btn btn-success', {
-                'btn-loading': installing && !devMode
+                'btn-loading': installing && !devMode,
               })}
               disabled={installing || !repoUrl || repoUrl.trim().length === 0}
             >
@@ -222,7 +222,7 @@ class InstallFromGithubCard extends Component {
               <button
                 type="submit"
                 class={cx('btn btn-primary', {
-                  'btn-loading': installing && devMode
+                  'btn-loading': installing && devMode,
                 })}
                 disabled={installing || !dockerImage || dockerImage.trim().length === 0}
               >

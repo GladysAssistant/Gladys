@@ -15,7 +15,7 @@ function hexToRgb(hex) {
     ? {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
+        b: parseInt(result[3], 16),
       }
     : null;
 }
@@ -36,13 +36,13 @@ const dot = (color = '#ccc') => ({
     display: 'block',
     marginRight: 8,
     height: 10,
-    width: 10
-  }
+    width: 10,
+  },
 });
 
 const colourStyles = {
-  menu: provided => ({ ...provided, zIndex: 2 }),
-  control: styles => ({ ...styles, backgroundColor: 'white' }),
+  menu: (provided) => ({ ...provided, zIndex: 2 }),
+  control: (styles) => ({ ...styles, backgroundColor: 'white' }),
   option: (styles, { data, isDisabled, isFocused, isSelected }) => {
     const color = data.value;
     return {
@@ -54,60 +54,60 @@ const colourStyles = {
       ':active': {
         ...styles[':active'],
         backgroundColor: !isDisabled && color,
-        opacity: !isDisabled && (isSelected ? 1 : 0.1)
-      }
+        opacity: !isDisabled && (isSelected ? 1 : 0.1),
+      },
     };
   },
-  input: styles => ({ ...styles, ...dot() }),
-  placeholder: styles => ({ ...styles, ...dot() }),
-  singleValue: (styles, { data }) => ({ ...styles, ...dot(data.value) })
+  input: (styles) => ({ ...styles, ...dot() }),
+  placeholder: (styles) => ({ ...styles, ...dot() }),
+  singleValue: (styles, { data }) => ({ ...styles, ...dot(data.value) }),
 };
 
 class ColorPicker extends Component {
-  initValue = props => {
+  initValue = (props) => {
     const colorOptions = [
       {
         value: '#3498db',
         label: this.props.intl.dictionary.color.blue,
-        contrast: 'white'
+        contrast: 'white',
       },
       {
         value: '#e74c3c',
         label: this.props.intl.dictionary.color.red,
-        contrast: 'white'
+        contrast: 'white',
       },
       {
         value: '#2ecc71',
         label: this.props.intl.dictionary.color.green,
-        contrast: 'white'
+        contrast: 'white',
       },
       {
         value: '#2c3e50',
         label: this.props.intl.dictionary.color.black,
-        contrast: 'white'
+        contrast: 'white',
       },
       {
         value: '#f1c40f',
         label: this.props.intl.dictionary.color.yellow,
-        contrast: 'black'
+        contrast: 'black',
       },
       {
         value: '#8e44ad',
         label: this.props.intl.dictionary.color.purple,
-        contrast: 'white'
-      }
+        contrast: 'white',
+      },
     ];
 
     this.setState({ colorOptions });
 
     if (props.value) {
-      const color = colorOptions.find(c => c.value === props.value);
+      const color = colorOptions.find((c) => c.value === props.value);
       if (color) {
         this.setState({ value: color });
       }
     }
   };
-  onChange = value => {
+  onChange = (value) => {
     this.props.setColor(value.value);
   };
   componentDidMount() {

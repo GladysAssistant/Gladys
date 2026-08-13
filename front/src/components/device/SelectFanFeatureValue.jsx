@@ -13,11 +13,11 @@ class SelectFanFeatureValue extends Component {
 
   getOptions = () => {
     const { category, type, min, max } = this.props.deviceFeature;
-    const deviceFeatureOptions = getFanFeatureOptions(type, min, max).map(value => ({
+    const deviceFeatureOptions = getFanFeatureOptions(type, min, max).map((value) => ({
       label: get(this.props.intl.dictionary, `deviceFeatureValue.category.${category}.${type}.${value}`, {
-        default: value
+        default: value,
       }),
-      value
+      value,
     }));
 
     this.setState({ deviceFeatureOptions });
@@ -30,9 +30,9 @@ class SelectFanFeatureValue extends Component {
     if (value !== undefined && value !== null) {
       return {
         label: get(this.props.intl.dictionary, `deviceFeatureValue.category.${category}.${type}.${value}`, {
-          default: value
+          default: value,
         }),
-        value
+        value,
       };
     }
     return undefined;

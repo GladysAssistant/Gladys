@@ -6,7 +6,6 @@ const { EVENTS } = require('../../utils/constants');
 const { mappings, readValues } = require('../../services/alexa/lib/deviceMappings');
 const { syncDeviceConverter, isFeatureExposedToAlexa } = require('../../services/alexa/lib/syncDeviceConverter');
 
-// eslint-disable-next-line jsdoc/require-returns
 /**
  * @description Send a current state to google.
  * @param {object} stateManager - The state manager.

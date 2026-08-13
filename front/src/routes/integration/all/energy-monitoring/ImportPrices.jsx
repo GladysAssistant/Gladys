@@ -7,7 +7,7 @@ import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS
+  DEVICE_FEATURE_UNITS,
 } from '../../../../../../server/utils/constants';
 
 const KNOWN_CONTRACT_TYPES = ['peak-off-peak', 'tempo', 'base'];
@@ -33,7 +33,7 @@ class ImportPricesPage extends Component {
     devicesError: null,
     importError: null,
     // Success
-    importSuccess: false
+    importSuccess: false,
   };
 
   componentDidMount() {
@@ -47,11 +47,11 @@ class ImportPricesPage extends Component {
       const contractsData = await this.props.httpClient.get('/api/v1/service/energy-monitoring/contracts');
 
       // Transform the contracts object into an array for easier handling
-      const contracts = Object.keys(contractsData).map(contractId => ({
+      const contracts = Object.keys(contractsData).map((contractId) => ({
         id: contractId,
         name: this.formatContractName(contractId),
         powers: Object.keys(contractsData[contractId]),
-        data: contractsData[contractId]
+        data: contractsData[contractId],
       }));
 
       this.setState({ contracts });
@@ -62,7 +62,7 @@ class ImportPricesPage extends Component {
     }
   };
 
-  formatContractName = contractId => {
+  formatContractName = (contractId) => {
     // Contract ID format: "provider-contract-type" (e.g., "edf-base", "edf-peak-off-peak")
     const parts = contractId.split('-');
 
@@ -85,7 +85,7 @@ class ImportPricesPage extends Component {
       }
     }
 
-    const provider = providerParts.map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+    const provider = providerParts.map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
 
     // Try to get translation for contract type
     const translation = get(this.props.intl.dictionary, `integration.energyMonitoring.contractTypes.${contractType}`);
@@ -97,7 +97,7 @@ class ImportPricesPage extends Component {
     // Fallback: capitalize each word of contract type
     const formattedContractType = contractType
       .split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
 
     return `${provider} ${formattedContractType}`;
@@ -110,9 +110,9 @@ class ImportPricesPage extends Component {
 
       // Filter devices to only show electric meters
       const electricMeters = devices.filter(
-        device =>
+        (device) =>
           device.features &&
-          device.features.some(feature => feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR)
+          device.features.some((feature) => feature.category === DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR),
       );
 
       this.setState({ devices: electricMeters });
@@ -123,7 +123,7 @@ class ImportPricesPage extends Component {
     }
   };
 
-  handleDeviceChange = async e => {
+  handleDeviceChange = async (e) => {
     const value = e.target.value;
 
     if (value === 'CREATE_NEW') {
@@ -163,10 +163,10 @@ class ImportPricesPage extends Component {
             read_only: true,
             has_feedback: false,
             min: 0,
-            max: 10000000000
-          }
+            max: 10000000000,
+          },
         ],
-        params: []
+        params: [],
       };
 
       const createdDevice = await this.props.httpClient.post('/api/v1/device', newDevice);
@@ -184,28 +184,28 @@ class ImportPricesPage extends Component {
     }
   };
 
-  handleContractChange = e => {
+  handleContractChange = (e) => {
     const selectedContractId = e.target.value;
-    const selectedContract = this.state.contracts.find(c => c.id === selectedContractId);
+    const selectedContract = this.state.contracts.find((c) => c.id === selectedContractId);
     // Set default name to contract name
     const contractName = selectedContract ? selectedContract.name : '';
     this.setState({ selectedContractId, contractName });
   };
 
-  handleNameChange = e => {
+  handleNameChange = (e) => {
     this.setState({ contractName: e.target.value });
   };
 
-  handlePowerChange = e => {
+  handlePowerChange = (e) => {
     // Reset hour slots when power changes
     this.setState({
       selectedPower: e.target.value,
-      peakHourSlots: new Set()
+      peakHourSlots: new Set(),
     });
   };
 
   // ----- TIME SLOT HELPERS -----
-  slotIndexToLabel = slot => {
+  slotIndexToLabel = (slot) => {
     if (!Number.isInteger(slot) || slot < 0 || slot > 47) return '';
     const hour = Math.floor(slot / 2);
     const minutes = slot % 2 === 1 ? '30' : '00';
@@ -213,13 +213,13 @@ class ImportPricesPage extends Component {
     return `${hh}:${minutes}`;
   };
 
-  formatSetToHourSlots = set => {
-    const arr = Array.from(set || []).filter(n => Number.isInteger(n));
+  formatSetToHourSlots = (set) => {
+    const arr = Array.from(set || []).filter((n) => Number.isInteger(n));
     arr.sort((a, b) => a - b);
     return arr.map(this.slotIndexToLabel).join(',');
   };
 
-  togglePeakSlot = slot => {
+  togglePeakSlot = (slot) => {
     this.setState(({ peakHourSlots }) => {
       const next = new Set(peakHourSlots);
       if (next.has(slot)) next.delete(slot);
@@ -233,7 +233,7 @@ class ImportPricesPage extends Component {
     const { selectedContractId, selectedPower, contracts } = this.state;
     if (!selectedContractId || !selectedPower) return false;
 
-    const selectedContract = contracts.find(c => c.id === selectedContractId);
+    const selectedContract = contracts.find((c) => c.id === selectedContractId);
     if (!selectedContract) return false;
 
     const powerData = selectedContract.data[selectedPower];
@@ -271,7 +271,7 @@ class ImportPricesPage extends Component {
     try {
       this.setState({ importing: true, importError: null });
 
-      const selectedContract = contracts.find(c => c.id === selectedContractId);
+      const selectedContract = contracts.find((c) => c.id === selectedContractId);
       if (!selectedContract) {
         throw new Error('Selected contract not found');
       }
@@ -290,7 +290,7 @@ class ImportPricesPage extends Component {
           ...priceData,
           contract_name: contractName,
           electric_meter_device_id: selectedDeviceId,
-          subscribed_power: selectedPower
+          subscribed_power: selectedPower,
         };
 
         // Replace TO_REPLACE_OFF_PEAK and TO_REPLACE_PEAK with actual hour slots
@@ -333,10 +333,10 @@ class ImportPricesPage extends Component {
       contractsError,
       devicesError,
       importError,
-      importSuccess
+      importSuccess,
     } = state;
 
-    const selectedContract = contracts.find(c => c.id === selectedContractId);
+    const selectedContract = contracts.find((c) => c.id === selectedContractId);
     const availablePowers = selectedContract ? selectedContract.powers || [] : [];
     const needsHourSlots = this.hasToReplaceHourSlots();
 
@@ -367,7 +367,7 @@ class ImportPricesPage extends Component {
                 type="button"
                 class={cx(
                   'btn btn-sm btn-block text-center py-2 text-nowrap',
-                  peakHourSlots.has(slot) ? 'btn-warning' : 'btn-outline-primary'
+                  peakHourSlots.has(slot) ? 'btn-warning' : 'btn-outline-primary',
                 )}
                 onClick={() => this.togglePeakSlot(slot)}
               >
@@ -448,7 +448,7 @@ class ImportPricesPage extends Component {
               <option value="CREATE_NEW">
                 <Text id="integration.energyMonitoring.createElectricMeter" defaultMessage="+ Create Electric Meter" />
               </option>
-              {devices.map(device => (
+              {devices.map((device) => (
                 <option key={device.id} value={device.id}>
                   {device.name}
                 </option>
@@ -474,7 +474,7 @@ class ImportPricesPage extends Component {
               <option value="">
                 <Text id="integration.energyMonitoring.selectContractPlaceholder" defaultMessage="Select a contract" />
               </option>
-              {contracts.map(contract => (
+              {contracts.map((contract) => (
                 <option key={contract.id} value={contract.id}>
                   {contract.name}
                 </option>
@@ -523,7 +523,7 @@ class ImportPricesPage extends Component {
                 <option value="">
                   <Text id="integration.energyMonitoring.selectPowerPlaceholder" defaultMessage="Select power" />
                 </option>
-                {availablePowers.map(power => (
+                {availablePowers.map((power) => (
                   <option key={power} value={power}>
                     {power} kVA
                   </option>

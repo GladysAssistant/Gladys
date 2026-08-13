@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();

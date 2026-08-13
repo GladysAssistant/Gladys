@@ -43,7 +43,7 @@ const Profile = ({ children, ...props }) => {
                 <input
                   type="text"
                   class={cx('form-control', {
-                    'is-invalid': get(props, 'errors.firstname')
+                    'is-invalid': get(props, 'errors.firstname'),
                   })}
                   value={props.newUser.firstname}
                   onInput={props.updateFirstname}
@@ -70,7 +70,7 @@ const Profile = ({ children, ...props }) => {
                 <input
                   type="text"
                   class={cx('form-control', {
-                    'is-invalid': get(props, 'errors.lastname')
+                    'is-invalid': get(props, 'errors.lastname'),
                   })}
                   value={props.newUser.lastname}
                   onInput={props.updateLastname}
@@ -110,7 +110,7 @@ const Profile = ({ children, ...props }) => {
           <input
             type="email"
             class={cx('form-control', {
-              'is-invalid': get(props, 'errors.email')
+              'is-invalid': get(props, 'errors.email'),
             })}
             value={props.newUser.email}
             onInput={props.updateEmail}
@@ -174,13 +174,13 @@ const Profile = ({ children, ...props }) => {
                 value={props.newUser.birthdateYear}
                 onInput={props.updateBirthdateYear}
                 class={cx('form-control', 'custom-select', {
-                  'is-invalid': get(props, 'errors.birthdate')
+                  'is-invalid': get(props, 'errors.birthdate'),
                 })}
               >
                 <option value="">
                   <Text id="profile.year" />
                 </option>
-                {props.years.map(year => (
+                {props.years.map((year) => (
                   <option value={year}>{year}</option>
                 ))}
               </select>
@@ -190,13 +190,13 @@ const Profile = ({ children, ...props }) => {
                 value={props.newUser.birthdateMonth}
                 onInput={props.updateBirthdateMonth}
                 class={cx('form-control', 'custom-select', {
-                  'is-invalid': get(props, 'errors.birthdate')
+                  'is-invalid': get(props, 'errors.birthdate'),
                 })}
               >
                 <option value="">
                   <Text id="profile.month" />
                 </option>
-                {props.months.map(month => (
+                {props.months.map((month) => (
                   <option value={month}>
                     {dayjs()
                       .set('month', month - 1)
@@ -211,13 +211,13 @@ const Profile = ({ children, ...props }) => {
                 value={props.newUser.birthdateDay}
                 onInput={props.updateBirthdateDay}
                 class={cx('form-control', 'custom-select', {
-                  'is-invalid': get(props, 'errors.birthdate')
+                  'is-invalid': get(props, 'errors.birthdate'),
                 })}
               >
                 <option value="">
                   <Text id="profile.day" />
                 </option>
-                {props.days.map(day => (
+                {props.days.map((day) => (
                   <option value={day}>{day}</option>
                 ))}
               </select>
@@ -226,7 +226,7 @@ const Profile = ({ children, ...props }) => {
           <input
             type="hidden"
             class={cx('form-control', {
-              'is-invalid': get(props, 'errors.birthdate')
+              'is-invalid': get(props, 'errors.birthdate'),
             })}
           />
           <div class="invalid-feedback">
@@ -308,7 +308,7 @@ const Profile = ({ children, ...props }) => {
               type="password"
               class={cx('form-control', {
                 'is-invalid': get(props, 'errors.password'),
-                'is-valid': props.validPassword && !get(props, 'errors.password')
+                'is-valid': props.validPassword && !get(props, 'errors.password'),
               })}
               value={props.newUser.password}
               onInput={props.updatePassword}
@@ -340,7 +340,7 @@ const Profile = ({ children, ...props }) => {
               type="password"
               class={cx('form-control', {
                 'is-invalid': get(props, 'errors.passwordRepeat'),
-                'is-valid': props.validPasswordRepeat && !get(props, 'errors.passwordRepeat')
+                'is-valid': props.validPasswordRepeat && !get(props, 'errors.passwordRepeat'),
               })}
               value={props.newUser.passwordRepeat}
               onInput={props.updatePasswordRepeat}

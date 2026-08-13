@@ -21,19 +21,13 @@ describe('GET /api/v1/user/:selector/weather', () => {
       });
   });
   it('should return 401 unauthorized', async () => {
-    await request
-      .get('/api/v1/user/john/weather')
-      .expect('Content-Type', /json/)
-      .expect(401);
+    await request.get('/api/v1/user/john/weather').expect('Content-Type', /json/).expect(401);
   });
 });
 
 describe('GET /api/v1/house/:selector/weather', () => {
   it('should return 400, house has no latitude/longitude specified', async () => {
-    await authenticatedRequest
-      .get('/api/v1/house/pepper-house/weather')
-      .expect('Content-Type', /json/)
-      .expect(400);
+    await authenticatedRequest.get('/api/v1/house/pepper-house/weather').expect('Content-Type', /json/).expect(400);
   });
   it('should return weather where house is', async () => {
     await authenticatedRequest
@@ -66,10 +60,7 @@ describe('GET /api/v1/house/:selector/weather', () => {
       });
   });
   it('should return 401 unauthorized', async () => {
-    await request
-      .get('/api/v1/user/test-house/weather')
-      .expect('Content-Type', /json/)
-      .expect(401);
+    await request.get('/api/v1/user/test-house/weather').expect('Content-Type', /json/).expect(401);
   });
   it('should return 400 service not configured when the pinned provider is gone', async () => {
     await authenticatedRequest
@@ -120,10 +111,7 @@ describe('GET /api/v1/weather/provider', () => {
       });
   });
   it('should return 401 unauthorized', async () => {
-    await request
-      .get('/api/v1/weather/provider')
-      .expect('Content-Type', /json/)
-      .expect(401);
+    await request.get('/api/v1/weather/provider').expect('Content-Type', /json/).expect(401);
   });
 });
 

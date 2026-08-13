@@ -61,8 +61,8 @@ const SystemPage = ({ children, ...props }) => (
                   props.systemInfos.cpu_temperature >= 75
                     ? 'bg-red'
                     : props.systemInfos.cpu_temperature >= 60
-                    ? 'bg-orange'
-                    : 'bg-green'
+                      ? 'bg-orange'
+                      : 'bg-green'
                 }`}
               >
                 <i class="fe fe-thermometer" />

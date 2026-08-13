@@ -6,37 +6,37 @@ function createActions(store) {
   const actions = {
     async getHouses(state) {
       store.setState({
-        housesGetStatus: RequestStatus.Getting
+        housesGetStatus: RequestStatus.Getting,
       });
       try {
         const params = {
-          expand: 'rooms'
+          expand: 'rooms',
         };
         const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
         store.setState({
           housesWithRooms,
-          housesGetStatus: RequestStatus.Success
+          housesGetStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          housesGetStatus: RequestStatus.Error
+          housesGetStatus: RequestStatus.Error,
         });
       }
     },
     async getBroadlinkPeripherals(state) {
       store.setState({
-        getBroadlinkPeripheralsStatus: RequestStatus.Getting
+        getBroadlinkPeripheralsStatus: RequestStatus.Getting,
       });
       try {
         const broadlinkPeripherals = await state.httpClient.get('/api/v1/service/broadlink/peripheral');
         store.setState({
           broadlinkPeripherals,
-          getBroadlinkPeripheralsStatus: RequestStatus.Success
+          getBroadlinkPeripheralsStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
           broadlinkPeripherals: [],
-          getBroadlinkPeripheralsStatus: RequestStatus.Error
+          getBroadlinkPeripheralsStatus: RequestStatus.Error,
         });
       }
     },
@@ -46,11 +46,11 @@ function createActions(store) {
           [index]: {
             device: {
               [property]: {
-                $set: value
-              }
-            }
-          }
-        }
+                $set: value,
+              },
+            },
+          },
+        },
       });
       store.setState(newState);
     },
@@ -62,13 +62,13 @@ function createActions(store) {
         broadlinkPeripherals: {
           [index]: {
             device: {
-              $set: savedDevice
-            }
-          }
-        }
+              $set: savedDevice,
+            },
+          },
+        },
       });
       store.setState(newState);
-    }
+    },
   };
   return Object.assign({}, actions);
 }

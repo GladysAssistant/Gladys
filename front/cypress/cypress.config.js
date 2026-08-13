@@ -14,10 +14,10 @@ module.exports = defineConfig({
           VARIABLES[key] = value;
           return null;
         },
-        loadVariable: key => {
+        loadVariable: (key) => {
           const value = VARIABLES[key];
           return value === undefined ? null : value;
-        }
+        },
       });
 
       // Load NODE env variables
@@ -54,9 +54,9 @@ module.exports = defineConfig({
         rooms: [
           {
             name: 'Living Room',
-            selector: 'living-room'
-          }
-        ]
+            selector: 'living-room',
+          },
+        ],
       },
       users: {
         tony: {
@@ -68,9 +68,9 @@ module.exports = defineConfig({
           password: 'ONvAayxwrK',
           birthYear: '2011',
           birthMonth: '2',
-          birthDay: '4'
-        }
-      }
-    }
-  }
+          birthDay: '4',
+        },
+      },
+    },
+  },
 });

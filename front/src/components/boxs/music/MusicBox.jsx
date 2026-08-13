@@ -4,25 +4,27 @@ import { connect } from 'unistore/preact';
 import {
   WEBSOCKET_MESSAGE_TYPES,
   DEVICE_FEATURE_TYPES,
-  MUSIC_PLAYBACK_STATE
+  MUSIC_PLAYBACK_STATE,
 } from '../../../../../server/utils/constants';
 
 class MusicComponent extends Component {
   state = {
-    isPlaying: null
+    isPlaying: null,
   };
   getDevice = async () => {
     try {
       await this.setState({
-        error: false
+        error: false,
       });
       const musicDevice = await this.props.httpClient.get(`/api/v1/device/${this.props.box.device}`, {});
-      const playFeature = musicDevice.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY);
-      const pauseFeature = musicDevice.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.PAUSE);
-      const previousFeature = musicDevice.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.PREVIOUS);
-      const nextFeature = musicDevice.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.NEXT);
-      const volumeFeature = musicDevice.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.VOLUME);
-      const playBackStateFeature = musicDevice.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE);
+      const playFeature = musicDevice.features.find((f) => f.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY);
+      const pauseFeature = musicDevice.features.find((f) => f.type === DEVICE_FEATURE_TYPES.MUSIC.PAUSE);
+      const previousFeature = musicDevice.features.find((f) => f.type === DEVICE_FEATURE_TYPES.MUSIC.PREVIOUS);
+      const nextFeature = musicDevice.features.find((f) => f.type === DEVICE_FEATURE_TYPES.MUSIC.NEXT);
+      const volumeFeature = musicDevice.features.find((f) => f.type === DEVICE_FEATURE_TYPES.MUSIC.VOLUME);
+      const playBackStateFeature = musicDevice.features.find(
+        (f) => f.type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE,
+      );
       const isPlaying = playBackStateFeature.last_value === MUSIC_PLAYBACK_STATE.PLAYING;
       this.setState({
         musicDevice,
@@ -32,12 +34,12 @@ class MusicComponent extends Component {
         nextFeature,
         volumeFeature,
         playBackStateFeature,
-        isPlaying
+        isPlaying,
       });
     } catch (e) {
       console.error(e);
       this.setState({
-        error: true
+        error: true,
       });
     }
   };
@@ -46,7 +48,7 @@ class MusicComponent extends Component {
     try {
       await this.setState({ error: false });
       await this.props.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
-        value
+        value,
       });
     } catch (e) {
       console.error(e);
@@ -68,14 +70,14 @@ class MusicComponent extends Component {
   previous = async () => {
     await this.setValueDevice(this.state.previousFeature, 1);
   };
-  changeVolume = async e => {
+  changeVolume = async (e) => {
     const volume = parseInt(e.target.value, 10);
     const newVolumeFeature = { ...this.state.volumeFeature, last_value: volume };
     await this.setState({ volumeFeature: newVolumeFeature });
     await this.setValueDevice(this.state.volumeFeature, volume, 10);
   };
 
-  updateDeviceStateWebsocket = payload => {
+  updateDeviceStateWebsocket = (payload) => {
     if (payload.device_feature_selector === this.state.playBackStateFeature.selector) {
       const isPlaying = payload.last_value === MUSIC_PLAYBACK_STATE.PLAYING;
       this.setState({ isPlaying });
@@ -100,7 +102,7 @@ class MusicComponent extends Component {
     this.getDevice();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket
+      this.updateDeviceStateWebsocket,
     );
     this.props.session.dispatcher.addListener('websocket.connected', this.handleWebsocketConnected);
   }
@@ -108,7 +110,7 @@ class MusicComponent extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket
+      this.updateDeviceStateWebsocket,
     );
     this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }

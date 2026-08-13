@@ -34,7 +34,6 @@ process.env.SQLITE_FILE_PATH = workerDb;
 // same pid would then boot on a stale file with a possibly different schema.
 // Purge every leftover of previous runs before this one starts.
 if (isMainMochaProcess) {
-  // eslint-disable-next-line global-require
   const { readdirSync, rmSync } = require('fs');
   const dbDir = path.dirname(path.resolve(workerDb));
   const dbPrefix = path.basename(process.env.SQLITE_FILE_PATH.replace(`-${process.pid}.db`, ''));
@@ -82,7 +81,6 @@ if (!process.env.GLADYS_TEST_TEMP_FOLDER_ROOT) {
 process.env.TEMP_FOLDER = `${process.env.GLADYS_TEST_TEMP_FOLDER_ROOT}-${process.pid}`;
 
 process.on('exit', () => {
-  // eslint-disable-next-line global-require
   const { unlinkSync, readdirSync, rmSync } = require('fs');
   try {
     rmSync(process.env.BACKUP_FOLDER, { recursive: true, force: true });

@@ -134,19 +134,19 @@ const NewAreaPage = ({ children, ...props }) => (
 );
 
 class NewArea extends Component {
-  setName = e => {
+  setName = (e) => {
     this.setState({ name: e.target.value });
   };
-  setColor = color => {
+  setColor = (color) => {
     this.setState({ color });
   };
-  setRadius = e => {
+  setRadius = (e) => {
     this.setState({ radius: e.target.value });
   };
   setLatLong = (latitude, longitude) => {
     this.setState({ latitude, longitude });
   };
-  createArea = async e => {
+  createArea = async (e) => {
     e.preventDefault();
     try {
       await this.setState({ loading: true, createAreaError: false });
@@ -155,7 +155,7 @@ class NewArea extends Component {
         color: this.state.color,
         radius: this.state.radius,
         latitude: this.state.latitude,
-        longitude: this.state.longitude
+        longitude: this.state.longitude,
       };
       if (this.props.areaSelector) {
         await this.props.httpClient.patch(`/api/v1/area/${this.props.areaSelector}`, newArea);
@@ -168,7 +168,7 @@ class NewArea extends Component {
       console.error(e);
     }
   };
-  deleteArea = async e => {
+  deleteArea = async (e) => {
     e.preventDefault();
     try {
       await this.setState({ loading: true, deleteAreaError: false });
@@ -183,7 +183,7 @@ class NewArea extends Component {
     try {
       const houses = await this.props.httpClient.get('/api/v1/house');
       this.setState({
-        houses
+        houses,
       });
     } catch (e) {
       console.error(e);
@@ -199,7 +199,7 @@ class NewArea extends Component {
         color: area.color,
         latitude: area.latitude,
         longitude: area.longitude,
-        loading: false
+        loading: false,
       });
     } catch (e) {
       this.setState({ loading: false, getAreaError: true });
@@ -215,7 +215,7 @@ class NewArea extends Component {
       name: '',
       latitude: null,
       longitude: null,
-      houses: []
+      houses: [],
     };
   }
   componentDidMount() {
@@ -226,7 +226,7 @@ class NewArea extends Component {
   }
   render(
     props,
-    { name, color, radius, latitude, longitude, houses, loading, createAreaError, deleteAreaError, getAreaError }
+    { name, color, radius, latitude, longitude, houses, loading, createAreaError, deleteAreaError, getAreaError },
   ) {
     return (
       <div class="page">

@@ -11,17 +11,17 @@ class WaterValveDeviceState extends Component {
   };
 
   getOptions = () => {
-    const options = Object.keys(WATER_VALVE_CURRENT_DEVICE_STATUS).map(key => {
+    const options = Object.keys(WATER_VALVE_CURRENT_DEVICE_STATUS).map((key) => {
       const value = WATER_VALVE_CURRENT_DEVICE_STATUS[key];
       return {
         label: get(
           this.props.intl.dictionary,
           `deviceFeatureValue.category.water-valve.current-device-status.${value}`,
           {
-            default: value
-          }
+            default: value,
+          },
         ),
-        value
+        value,
       };
     });
 
@@ -35,7 +35,7 @@ class WaterValveDeviceState extends Component {
   }
 
   render({ trigger }, { options }) {
-    const defaultValue = options.find(option => trigger.value === option.value);
+    const defaultValue = options.find((option) => trigger.value === option.value);
 
     return (
       <Fragment>

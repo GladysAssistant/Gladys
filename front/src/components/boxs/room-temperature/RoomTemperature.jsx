@@ -8,11 +8,11 @@ import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils
 import {
   DEFAULT_VALUE_TEMPERATURE,
   DEVICE_FEATURE_UNITS,
-  WEBSOCKET_MESSAGE_TYPES
+  WEBSOCKET_MESSAGE_TYPES,
 } from '../../../../../server/utils/constants';
 import { celsiusToFahrenheit } from '../../../../../server/utils/units';
 
-const isNotNullOrUndefined = value => value !== undefined && value !== null;
+const isNotNullOrUndefined = (value) => value !== undefined && value !== null;
 
 const RoomTemperatureBox = ({ children, ...props }) => (
   <div class="card p-3">
@@ -73,7 +73,7 @@ class RoomTemperatureBoxComponent extends Component {
     }
   };
 
-  updateRoomTemperature = payload => {
+  updateRoomTemperature = (payload) => {
     this.props.deviceFeatureWebsocketEvent(this.props.box, this.props.x, this.props.y, payload);
   };
 
@@ -140,5 +140,5 @@ class RoomTemperatureBoxComponent extends Component {
 
 export default connect(
   'session,DashboardBoxDataTemperatureInRoom,DashboardBoxStatusTemperatureInRoom',
-  actions
+  actions,
 )(RoomTemperatureBoxComponent);

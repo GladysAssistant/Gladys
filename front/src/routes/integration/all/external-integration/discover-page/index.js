@@ -30,7 +30,7 @@ class ExternalIntegrationDiscoverPage extends Component {
     this.scanToken = 0;
   }
 
-  searchDevices = e => {
+  searchDevices = (e) => {
     this.setState({ deviceSearch: e.target.value });
   };
 
@@ -61,7 +61,7 @@ class ExternalIntegrationDiscoverPage extends Component {
     this.setState({ getDiscoveredDevicesStatus: RequestStatus.Getting });
     try {
       const discoveredDevices = await this.props.httpClient.get(
-        `/api/v1/external_integration/${this.props.selector}/discovered_device`
+        `/api/v1/external_integration/${this.props.selector}/discovered_device`,
       );
       if (generation !== this.pageGeneration) {
         return;
@@ -104,12 +104,12 @@ class ExternalIntegrationDiscoverPage extends Component {
         scanError:
           status === 400
             ? 'integration.externalIntegration.discover.scanErrorDisconnected'
-            : 'integration.externalIntegration.discover.scanError'
+            : 'integration.externalIntegration.discover.scanError',
       });
     }
   };
 
-  finishScan = scanToken => {
+  finishScan = (scanToken) => {
     // called without a token by the websocket event (always the freshest
     // signal), with one by the 60s cap of a specific scan invocation
     if (scanToken !== undefined && scanToken !== this.scanToken) {
@@ -132,8 +132,8 @@ class ExternalIntegrationDiscoverPage extends Component {
   // by external_id, not by index: the Discovery screen filters the list
   // client-side, so an index in the filtered view does not point to the
   // same device in the full list
-  createDevice = async externalId => {
-    const discoveredDevice = this.state.discoveredDevices.find(device => device.external_id === externalId);
+  createDevice = async (externalId) => {
+    const discoveredDevice = this.state.discoveredDevices.find((device) => device.external_id === externalId);
     // the list can be re-published (websocket refresh) between render and
     // click: the clicked device may be gone from the fresh list, and the
     // re-render is about to remove its card anyway
@@ -150,7 +150,7 @@ class ExternalIntegrationDiscoverPage extends Component {
     await this.getDiscoveredDevices();
   };
 
-  onDiscoveredDevicesUpdated = payload => {
+  onDiscoveredDevicesUpdated = (payload) => {
     if (payload && payload.selector === this.props.selector) {
       this.finishScan();
       this.getDiscoveredDevices();
@@ -160,7 +160,7 @@ class ExternalIntegrationDiscoverPage extends Component {
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DISCOVERED_DEVICES_UPDATED,
-      this.onDiscoveredDevicesUpdated
+      this.onDiscoveredDevicesUpdated,
     );
     this.loadIntegrationPage();
   }
@@ -193,7 +193,7 @@ class ExternalIntegrationDiscoverPage extends Component {
     this.clearScanTimer();
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.DISCOVERED_DEVICES_UPDATED,
-      this.onDiscoveredDevicesUpdated
+      this.onDiscoveredDevicesUpdated,
     );
   }
 

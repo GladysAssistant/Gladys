@@ -12,12 +12,12 @@ class OpenAIGateway extends Component {
     try {
       const response = await this.props.httpClient.get('/api/v1/gateway/status');
       this.setState({
-        gladysPlusConnected: response.configured
+        gladysPlusConnected: response.configured,
       });
     } catch (e) {
       console.error(e);
       this.setState({
-        gladysPlusConnected: false
+        gladysPlusConnected: false,
       });
     }
   };
@@ -30,7 +30,7 @@ class OpenAIGateway extends Component {
     super(props);
     this.props = props;
     this.state = {
-      gladysPlusConnected: null
+      gladysPlusConnected: null,
     };
   }
 
@@ -54,7 +54,7 @@ class OpenAIGateway extends Component {
                   featureKeys={[
                     'gladysPlusUpsell.openai.feature1',
                     'gladysPlusUpsell.openai.feature2',
-                    'gladysPlusUpsell.openai.feature3'
+                    'gladysPlusUpsell.openai.feature3',
                   ]}
                 />
               </div>

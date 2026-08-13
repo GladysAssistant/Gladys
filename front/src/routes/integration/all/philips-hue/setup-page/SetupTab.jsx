@@ -13,7 +13,7 @@ class SetupTab extends Component {
     props.connectBridge(device);
   };
 
-  setmanualBridgeConfiguration = ipaddress => {
+  setmanualBridgeConfiguration = (ipaddress) => {
     this.setState({ manualBridgeConfiguration: { ipaddress: ipaddress.target.value } });
   };
 
@@ -35,7 +35,7 @@ class SetupTab extends Component {
             <div class="card-body">
               <div
                 class={cx('dimmer', {
-                  active: props.loading
+                  active: props.loading,
                 })}
               >
                 <div class="loader" />
@@ -92,7 +92,7 @@ class SetupTab extends Component {
               class={cx('dimmer', {
                 active:
                   props.philipsHueGetBridgesStatus === RequestStatus.Getting ||
-                  props.philipsHueCreateDeviceStatus === RequestStatus.Getting
+                  props.philipsHueCreateDeviceStatus === RequestStatus.Getting,
               })}
             >
               <div class="loader" />
@@ -149,7 +149,7 @@ class SetupTab extends Component {
                   </p>
                 )}
                 {props.philipsHueBridges &&
-                  props.philipsHueBridges.map(bridge => (
+                  props.philipsHueBridges.map((bridge) => (
                     <div class="col-md-4">
                       <div class="card">
                         <div class="card-header">

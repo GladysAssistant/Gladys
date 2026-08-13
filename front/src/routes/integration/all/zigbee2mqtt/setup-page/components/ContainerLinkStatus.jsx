@@ -8,7 +8,7 @@ const ContainerLinkStatus = ({ linked, loading }) => {
         class={cx('d-none', 'd-sm-block', {
           border: !loading,
           'bg-dark': !loading,
-          'loading-border': loading
+          'loading-border': loading,
         })}
       />
     </div>
@@ -24,7 +24,7 @@ const ContainerLinkStatus = ({ linked, loading }) => {
           'fe-x': !linked && !loading,
           'text-danger': !linked && !loading,
           'fe-refresh-cw': loading,
-          'text-info': loading
+          'text-info': loading,
         })}
       />
       {line}

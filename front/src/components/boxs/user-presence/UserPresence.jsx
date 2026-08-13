@@ -30,14 +30,14 @@ const UserPresence = ({ children, ...props }) => (
     <div class="card-body o-auto p-4">
       <div
         class={cx('dimmer', {
-          active: props.dashboardUserPresenceGetUsersStatus === RequestStatus.Getting && !props.usersWithPresence
+          active: props.dashboardUserPresenceGetUsersStatus === RequestStatus.Getting && !props.usersWithPresence,
         })}
       >
         <div class="loader" />
         <div
           class={cx('dimmer-content', {
             'py-4': !props.usersWithPresence,
-            'my-5': !props.usersWithPresence
+            'my-5': !props.usersWithPresence,
           })}
         >
           {props.usersWithPresence && props.usersWithPresence.length === 0 && (
@@ -49,7 +49,7 @@ const UserPresence = ({ children, ...props }) => (
           )}
           <ul class="list-unstyled list-separated mb-0">
             {props.usersWithPresence &&
-              props.usersWithPresence.map(user => (
+              props.usersWithPresence.map((user) => (
                 <li class="list-separated-item">
                   <div class="row align-items-center">
                     <div class="col-auto">
@@ -90,8 +90,8 @@ const UserPresence = ({ children, ...props }) => (
 );
 
 class UserPresenceComponent extends Component {
-  userChanged = user => {
-    const userIndex = this.state.usersWithPresence.findIndex(u => u.selector === user.selector);
+  userChanged = (user) => {
+    const userIndex = this.state.usersWithPresence.findIndex((u) => u.selector === user.selector);
     // if user is not found, we refresh the box
     if (userIndex === -1) {
       return this.getUsersWithPresence();
@@ -105,25 +105,25 @@ class UserPresenceComponent extends Component {
     const newState = update(this.state, {
       usersWithPresence: {
         [userIndex]: {
-          $merge: user
-        }
-      }
+          $merge: user,
+        },
+      },
     });
     this.setState(newState);
   };
   getUsersWithPresence = async () => {
     this.setState({
-      dashboardUserPresenceGetUsersStatus: RequestStatus.Getting
+      dashboardUserPresenceGetUsersStatus: RequestStatus.Getting,
     });
     try {
       let usersWithPresence = await this.props.httpClient.get(
-        '/api/v1/user?fields=firstname,lastname,role,selector,picture,current_house_id,last_house_changed'
+        '/api/v1/user?fields=firstname,lastname,role,selector,picture,current_house_id,last_house_changed',
       );
       if (this.props.box.users) {
-        usersWithPresence = usersWithPresence.filter(user => this.props.box.users.indexOf(user.selector) !== -1);
+        usersWithPresence = usersWithPresence.filter((user) => this.props.box.users.indexOf(user.selector) !== -1);
       }
       // calculate relative date
-      usersWithPresence.forEach(user => {
+      usersWithPresence.forEach((user) => {
         if (user.last_house_changed) {
           user.last_house_changed_relative_to_now = dayjs(user.last_house_changed)
             .locale(this.props.user.language)
@@ -132,11 +132,11 @@ class UserPresenceComponent extends Component {
       });
       this.setState({
         usersWithPresence,
-        dashboardUserPresenceGetUsersStatus: RequestStatus.Success
+        dashboardUserPresenceGetUsersStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        dashboardUserPresenceGetUsersStatus: RequestStatus.Error
+        dashboardUserPresenceGetUsersStatus: RequestStatus.Error,
       });
     }
   };
@@ -151,7 +151,7 @@ class UserPresenceComponent extends Component {
   };
   refreshRelativeTime = () => {
     if (this.state.usersWithPresence && this.state.usersWithPresence.length > 0) {
-      const usersWithPresence = this.state.usersWithPresence.map(user => {
+      const usersWithPresence = this.state.usersWithPresence.map((user) => {
         user.last_house_changed_relative_to_now = dayjs(user.last_house_changed)
           .locale(this.props.user.language)
           .fromNow();

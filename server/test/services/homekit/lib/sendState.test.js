@@ -872,9 +872,7 @@ describe('Send state to HomeKit', () => {
     // narrowed to the battery service, so picking the wrong one fails here rather than passing
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub()
-        .withArgs('BATTERY')
-        .returns({ updateCharacteristic, getCharacteristic }),
+      getService: stub().withArgs('BATTERY').returns({ updateCharacteristic, getCharacteristic }),
     };
 
     const feature = {

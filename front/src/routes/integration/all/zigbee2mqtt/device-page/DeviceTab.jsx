@@ -36,7 +36,7 @@ const DeviceTab = ({ children, ...props }) => (
 
       <div
         class={cx('dimmer', {
-          active: props.getZigbee2mqttStatus === RequestStatus.Getting
+          active: props.getZigbee2mqttStatus === RequestStatus.Getting,
         })}
       >
         <div class="loader" />

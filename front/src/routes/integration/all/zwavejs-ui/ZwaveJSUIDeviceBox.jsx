@@ -12,38 +12,38 @@ import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDe
 class ZwaveJSUIDeviceBox extends Component {
   componentWillMount() {
     this.setState({
-      device: this.props.device
+      device: this.props.device,
     });
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      device: nextProps.device
+      device: nextProps.device,
     });
   }
 
-  updateName = e => {
+  updateName = (e) => {
     this.setState({
       device: {
         ...this.state.device,
-        name: e.target.value
-      }
+        name: e.target.value,
+      },
     });
   };
 
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.setState({
       device: {
         ...this.state.device,
-        room_id: e.target.value
-      }
+        room_id: e.target.value,
+      },
     });
   };
 
   saveDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null
+      errorMessage: null,
     });
     try {
       let deviceDidNotExist = this.state.device.id === undefined;
@@ -52,7 +52,7 @@ class ZwaveJSUIDeviceBox extends Component {
         savedDevice.alreadyExist = true;
       }
       this.setState({
-        device: savedDevice
+        device: savedDevice,
       });
     } catch (e) {
       let errorMessage = 'integration.zwavejs-ui.error.defaultError';
@@ -60,11 +60,11 @@ class ZwaveJSUIDeviceBox extends Component {
         errorMessage = 'integration.zwavejs-ui.error.conflictError';
       }
       this.setState({
-        errorMessage
+        errorMessage,
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
@@ -73,7 +73,7 @@ class ZwaveJSUIDeviceBox extends Component {
       loading: true,
       errorMessage: null,
       tooMuchStatesError: false,
-      statesNumber: undefined
+      statesNumber: undefined,
     });
     try {
       if (this.state.device.created_at) {
@@ -88,12 +88,12 @@ class ZwaveJSUIDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.zwavejs-ui.error.defaultDeletionError'
+          errorMessage: 'integration.zwavejs-ui.error.defaultDeletionError',
         });
       }
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
@@ -104,7 +104,7 @@ class ZwaveJSUIDeviceBox extends Component {
     }
 
     let locationZwaveUi = null;
-    const locationZwaveUiParam = device.params.find(param => param.name === PARAMS.LOCATION);
+    const locationZwaveUiParam = device.params.find((param) => param.name === PARAMS.LOCATION);
     if (locationZwaveUiParam) {
       locationZwaveUi = locationZwaveUiParam.value;
     }
@@ -114,7 +114,7 @@ class ZwaveJSUIDeviceBox extends Component {
 
   render(
     { deviceIndex, editable, deleteButton, housesWithRooms, getZwaveJSUIDevices },
-    { device, loading, errorMessage, tooMuchStatesError, statesNumber }
+    { device, loading, errorMessage, tooMuchStatesError, statesNumber },
   ) {
     const validModel = device.features && device.features.length > 0;
     const { locationZwaveUi } = this.getDeviceProperty();
@@ -125,7 +125,7 @@ class ZwaveJSUIDeviceBox extends Component {
           <div class="card-header">{device.name}</div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -188,9 +188,9 @@ class ZwaveJSUIDeviceBox extends Component {
                         <Text id="global.emptySelectOption" />
                       </option>
                       {housesWithRooms &&
-                        housesWithRooms.map(house => (
+                        housesWithRooms.map((house) => (
                           <optgroup label={house.name}>
-                            {house.rooms.map(room => (
+                            {house.rooms.map((room) => (
                               <option selected={room.id === device.room_id} value={room.id}>
                                 {room.name}
                               </option>

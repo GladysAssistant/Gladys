@@ -26,7 +26,7 @@ function parseWebsocketMessage(message) {
     const parsedPayload = JSON.parse(message);
     return parsedPayload;
   } catch (e) {
-    throw new Error('Unable to parse websocket message');
+    throw new Error('Unable to parse websocket message', { cause: e });
   }
 }
 

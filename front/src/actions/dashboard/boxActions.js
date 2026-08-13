@@ -17,11 +17,11 @@ function createActions(store) {
           $auto: {
             [`${x}_${y}`]: {
               $auto: {
-                $set: status
-              }
-            }
-          }
-        }
+                $set: status,
+              },
+            },
+          },
+        },
       });
       // and we save the state
       store.setState(newState);
@@ -33,11 +33,11 @@ function createActions(store) {
           $auto: {
             [`${x}_${y}`]: {
               $auto: {
-                $merge: data
-              }
-            }
-          }
-        }
+                $merge: data,
+              },
+            },
+          },
+        },
       });
       // and we set the state
       store.setState(newState);
@@ -60,14 +60,14 @@ function createActions(store) {
           boxes: {
             [x]: {
               [y]: {
-                $merge: data
-              }
-            }
-          }
-        }
+                $merge: data,
+              },
+            },
+          },
+        },
       });
       store.setState(newState);
-    }
+    },
   };
   return actions;
 }

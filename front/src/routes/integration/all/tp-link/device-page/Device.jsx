@@ -24,7 +24,7 @@ class TpLinkDeviceBox extends Component {
       saveError: null,
       deleteError: null,
       tooMuchStatesError: false,
-      statesNumber: undefined
+      statesNumber: undefined,
     });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
@@ -48,7 +48,7 @@ class TpLinkDeviceBox extends Component {
           <div class="card-header">{props.device.name || <Text id="integration.tpLink.device.noNameLabel" />}</div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />

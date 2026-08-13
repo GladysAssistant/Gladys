@@ -19,7 +19,7 @@ export class Dispatcher {
     // Check if this event not exists
     if (this.events[event] === undefined) {
       this.events[event] = {
-        listeners: []
+        listeners: [],
       };
     }
 
@@ -34,7 +34,7 @@ export class Dispatcher {
     }
 
     this.events[event].listeners = this.events[event].listeners.filter(
-      listener => listener.toString() !== callback.toString()
+      (listener) => listener.toString() !== callback.toString(),
     );
   }
 
@@ -45,7 +45,7 @@ export class Dispatcher {
       return false;
     }
 
-    this.events[event].listeners.forEach(listener => {
+    this.events[event].listeners.forEach((listener) => {
       listener(details);
     });
   }

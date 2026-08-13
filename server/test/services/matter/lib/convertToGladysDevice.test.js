@@ -10,7 +10,6 @@ const {
   PowerSource,
   Thermostat,
   CarbonDioxideConcentrationMeasurement,
-  // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const {

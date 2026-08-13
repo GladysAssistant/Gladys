@@ -28,5 +28,5 @@ class ConfigureHouse extends Component {
 
 export default connect(
   'signupRooms,signupNewHouseName,signupNewRoomName,signupConfigureHouseErrors,darkMode',
-  actions
+  actions,
 )(ConfigureHouse);

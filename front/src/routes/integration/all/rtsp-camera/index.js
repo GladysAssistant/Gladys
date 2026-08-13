@@ -17,5 +17,5 @@ class RtspCameraIntegration extends Component {
 
 export default connect(
   'user,rtspCameras,housesWithRooms,getRtspCameraStatus,rtspCameraSearch,getRtspCameraOrderDir',
-  actions
+  actions,
 )(RtspCameraIntegration);

@@ -66,7 +66,7 @@ async function handleGatewayWebhook(data, cb) {
     }
   };
   const { selector, webhook_key: webhookKey, method, query, body, content_type: contentType } = data || {};
-  let service = null;
+  let service;
   try {
     service = await this.getBySelector(selector);
   } catch (e) {

@@ -23,8 +23,9 @@ async function updateMajorVersion(majorVersion) {
   const configuration = await this.getConfiguration();
 
   logger.info(
-    `Node-RED: updating major version from ${storedMajorVersion ||
-      configuration.dockerNodeRedVersion} to ${majorVersion}...`,
+    `Node-RED: updating major version from ${
+      storedMajorVersion || configuration.dockerNodeRedVersion
+    } to ${majorVersion}...`,
   );
 
   configuration.dockerNodeRedVersion = majorVersion;

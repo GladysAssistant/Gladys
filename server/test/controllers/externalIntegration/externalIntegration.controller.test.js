@@ -422,10 +422,7 @@ describe('External integration admin API', () => {
     });
 
     it('should return 400 without install mode', async () => {
-      await authenticatedRequest
-        .post('/api/v1/external_integration')
-        .send({})
-        .expect(400);
+      await authenticatedRequest.post('/api/v1/external_integration').send({}).expect(400);
     });
   });
 
@@ -563,10 +560,7 @@ describe('External integration admin API', () => {
     });
 
     it('should return 404 on an unknown integration', async () => {
-      await authenticatedRequest
-        .post('/api/v1/external_integration/ext-unknown/link_code')
-        .send({})
-        .expect(404);
+      await authenticatedRequest.post('/api/v1/external_integration/ext-unknown/link_code').send({}).expect(404);
     });
   });
 
@@ -743,10 +737,7 @@ describe('External integration admin API', () => {
       // a service without a manifest (interrupted install) is not a
       // communication integration either
       await seedExternalService({ name: 'ext-dev-no-manifest', selector: 'ext-dev-no-manifest', manifest: null });
-      const res = await nonAdminRequest
-        .get('/api/v1/external_integration')
-        .expect('Content-Type', /json/)
-        .expect(200);
+      const res = await nonAdminRequest.get('/api/v1/external_integration').expect('Content-Type', /json/).expect(200);
       expect(res.body).to.have.lengthOf(1);
       expect(res.body[0]).to.deep.equal({
         id: communicationService.id,

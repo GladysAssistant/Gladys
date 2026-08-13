@@ -35,16 +35,12 @@ describe('CaldavService', () => {
 
   it('should start service', async () => {
     await caldavService.start();
-    expect(caldavService)
-      .to.have.property('start')
-      .and.be.instanceOf(Function);
+    expect(caldavService).to.have.property('start').and.be.instanceOf(Function);
   });
 
   it('should stop service', async () => {
     await caldavService.stop();
-    expect(caldavService)
-      .to.have.property('stop')
-      .and.be.instanceOf(Function);
+    expect(caldavService).to.have.property('stop').and.be.instanceOf(Function);
   });
 
   it('should sync all users calendars', async () => {

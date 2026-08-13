@@ -34,10 +34,7 @@ describe('CalDAV sync', () => {
           get: sinon.stub(),
           update: sinon.stub().resolves(),
           getEvents: sinon.stub(),
-          destroyEvent: sinon
-            .stub()
-            .withArgs('event-to-delete')
-            .resolves(),
+          destroyEvent: sinon.stub().withArgs('event-to-delete').resolves(),
           destroyEvents: sinon.stub().resolves(),
         },
         variable: {

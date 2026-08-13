@@ -57,11 +57,7 @@ describe('EnergyMonitoring.calculateCostFromYesterday', () => {
   it('should calculate cost from yesterday', async () => {
     const energyMonitoring = new EnergyMonitoring(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     energyMonitoring.calculateCostFrom = fake.returns(null);
-    const yesterdayDate = dayjs
-      .tz(dayjs(), 'Europe/Paris')
-      .subtract(1, 'day')
-      .startOf('day')
-      .toDate();
+    const yesterdayDate = dayjs.tz(dayjs(), 'Europe/Paris').subtract(1, 'day').startOf('day').toDate();
     await energyMonitoring.calculateCostFromYesterday(yesterdayDate, '12345678-1234-1234-1234-1234567890ab');
     assert.calledOnce(energyMonitoring.calculateCostFrom);
   });

@@ -41,9 +41,7 @@ const normalizeCode = (code) => {
   if (!code) {
     return null;
   }
-  return String(code)
-    .trim()
-    .toLowerCase();
+  return String(code).trim().toLowerCase();
 };
 
 const normalizeStringSet = (setLike) =>

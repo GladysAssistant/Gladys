@@ -20,5 +20,5 @@ class TelegramIntegration extends Component {
 
 export default connect(
   'user,telegramApiKey,telegramCustomLink,telegramGetApiKeyStatus,telegramSaveApiKeyStatus,telegramDisableConfirmation,telegramDisableStatus',
-  actions
+  actions,
 )(TelegramIntegration);

@@ -15,7 +15,7 @@ class SetupTab extends Component {
       nukiConnectionError: null,
       nukiConnected: null,
       apiKeyChanges: false,
-      nukiApiKey: null
+      nukiApiKey: null,
     };
   }
   componentWillMount() {
@@ -37,12 +37,12 @@ class SetupTab extends Component {
       const key = configuration.apiKey;
       this.setState({
         nukiApiKey: key && `${key.replace(key.substring(3, key.length - 3), HIDDEN_API_KEY)}`,
-        apiKeyChanges: false
+        apiKeyChanges: false,
       });
     }
   };
 
-  updateConfiguration = e => {
+  updateConfiguration = (e) => {
     const data = {};
     data[e.target.name] = e.target.value;
     if (e.target.name === 'nukiApiKey') {
@@ -56,27 +56,27 @@ class SetupTab extends Component {
     this.setState({
       nukiConnectionStatus: RequestStatus.Getting,
       nukiConnected: false,
-      nukiConnectionError: undefined
+      nukiConnectionError: undefined,
     });
     try {
       const { nukiApiKey, apiKeyChanges } = this.state;
       await this.props.httpClient.post('/api/v1/service/nuki/config', {
-        apiKey: (apiKeyChanges && nukiApiKey) || undefined
+        apiKey: (apiKeyChanges && nukiApiKey) || undefined,
       });
       await this.props.httpClient.get(`/api/v1/service/nuki/connect`);
 
       this.setState({
-        nukiConnectionStatus: RequestStatus.Success
+        nukiConnectionStatus: RequestStatus.Success,
       });
 
       setTimeout(() => this.setState({ nukiConnectionStatus: undefined }), 3000);
     } catch (e) {
       await this.props.httpClient.post('/api/v1/service/nuki/config', {
-        apiKey: ''
+        apiKey: '',
       });
       this.setState({
         nukiConnectionStatus: RequestStatus.Error,
-        apiKeyChanges: false
+        apiKeyChanges: false,
       });
     }
   };
@@ -85,23 +85,23 @@ class SetupTab extends Component {
     // display 3 seconds a message "Nuki connected"
     this.setState({
       nukiConnected: true,
-      nukiConnectionError: undefined
+      nukiConnectionError: undefined,
     });
     setTimeout(
       () =>
         this.setState({
           nukiConnected: false,
-          nukiConnectionStatus: undefined
+          nukiConnectionStatus: undefined,
         }),
-      3000
+      3000,
     );
   };
 
-  displayNukiError = error => {
+  displayNukiError = (error) => {
     this.setState({
       nukiConnected: false,
       nukiConnectionStatus: undefined,
-      nukiConnectionError: error
+      nukiConnectionError: error,
     });
   };
 
@@ -117,7 +117,7 @@ class SetupTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: nukiConnectionStatus === RequestStatus.Getting
+              active: nukiConnectionStatus === RequestStatus.Getting,
             })}
           >
             <div class="loader" />

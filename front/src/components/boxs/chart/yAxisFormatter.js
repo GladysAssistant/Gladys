@@ -1,4 +1,4 @@
-const yAxisFormatter = value => {
+const yAxisFormatter = (value) => {
   // ApexCharts calls this formatter with undefined values when a series
   // is hidden through the legend, throwing here would break the tooltip
   if (value === null || value === undefined || Number.isNaN(value)) {

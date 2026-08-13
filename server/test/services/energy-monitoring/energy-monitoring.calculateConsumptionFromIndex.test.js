@@ -94,9 +94,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
   describe('Normal case with no ENERGY_INDEX_LAST_PROCESSED', () => {
     it('should calculate consumption from index states when no previous timestamp exists', async () => {
       const testTime = new Date('2023-10-03T14:00:00.000Z');
-      const windowStart = dayjs(testTime)
-        .subtract(30, 'minutes')
-        .toDate();
+      const windowStart = dayjs(testTime).subtract(30, 'minutes').toDate();
 
       // Mock device with no ENERGY_INDEX_LAST_PROCESSED param
       const deviceWithNoParam = {
@@ -567,9 +565,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
 
     it('should handle SWITCH.ENERGY type as index feature', async () => {
       const testTime = new Date('2023-10-03T14:00:00.000Z');
-      const windowStart = dayjs(testTime)
-        .subtract(30, 'minutes')
-        .toDate();
+      const windowStart = dayjs(testTime).subtract(30, 'minutes').toDate();
 
       // Mock device with SWITCH.ENERGY as index feature
       const deviceWithSwitchEnergy = {
@@ -599,15 +595,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       device.getDeviceFeatureStates = fake.returns([
         {
           value: 1000,
-          created_at: dayjs(windowStart)
-            .add(5, 'minutes')
-            .toDate(),
+          created_at: dayjs(windowStart).add(5, 'minutes').toDate(),
         },
         {
           value: 1200,
-          created_at: dayjs(windowStart)
-            .add(15, 'minutes')
-            .toDate(),
+          created_at: dayjs(windowStart).add(15, 'minutes').toDate(),
         },
       ]);
 
@@ -753,9 +745,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
 
     it('should handle TELEINFORMATION.EAST type as index feature', async () => {
       const testTime = new Date('2023-10-03T14:00:00.000Z');
-      const windowStart = dayjs(testTime)
-        .subtract(30, 'minutes')
-        .toDate();
+      const windowStart = dayjs(testTime).subtract(30, 'minutes').toDate();
 
       // Mock device with TELEINFORMATION.EAST as index feature
       const deviceWithTeleinformation = {
@@ -785,15 +775,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       device.getDeviceFeatureStates = fake.returns([
         {
           value: 5000,
-          created_at: dayjs(windowStart)
-            .add(5, 'minutes')
-            .toDate(),
+          created_at: dayjs(windowStart).add(5, 'minutes').toDate(),
         },
         {
           value: 5250,
-          created_at: dayjs(windowStart)
-            .add(15, 'minutes')
-            .toDate(),
+          created_at: dayjs(windowStart).add(15, 'minutes').toDate(),
         },
       ]);
 

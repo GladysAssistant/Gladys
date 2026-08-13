@@ -6,7 +6,7 @@ const BatteryLevelFeature = ({ batteryLevel }) => (
     class={cx('tag', {
       'tag-green': batteryLevel >= 25,
       'tag-warning': batteryLevel < 25 && batteryLevel >= 10,
-      'tag-danger': batteryLevel < 10
+      'tag-danger': batteryLevel < 10,
     })}
   >
     <Text id="global.percentValue" fields={{ value: batteryLevel }} />

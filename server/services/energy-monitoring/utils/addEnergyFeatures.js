@@ -28,7 +28,7 @@ const addEnergyFeatures = (device, defaultElectricMeterDeviceFeatureId) => {
         f.external_id === consumptionFeatureExternalId,
     );
 
-    let consumptionFeatureId = null;
+    let consumptionFeatureId;
 
     if (!consumptionFeature) {
       consumptionFeatureId = uuid.v4();

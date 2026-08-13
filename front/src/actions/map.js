@@ -4,38 +4,38 @@ function createActions(store) {
   const actions = {
     async getUsersWithLocation(state) {
       store.setState({
-        getUsersWithLocationStatus: RequestStatus.Getting
+        getUsersWithLocationStatus: RequestStatus.Getting,
       });
       try {
         const usersWithLocation = await state.httpClient.get(
-          '/api/v1/user?fields=id,firstname,selector,picture,last_latitude,last_longitude,last_altitude,last_accuracy,last_location_changed'
+          '/api/v1/user?fields=id,firstname,selector,picture,last_latitude,last_longitude,last_altitude,last_accuracy,last_location_changed',
         );
         store.setState({
           usersWithLocation,
-          getUsersWithLocationStatus: RequestStatus.Success
+          getUsersWithLocationStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          getUsersWithLocationStatus: RequestStatus.Error
+          getUsersWithLocationStatus: RequestStatus.Error,
         });
       }
     },
     async getHousesWithLocation(state) {
       store.setState({
-        getHousesWithLocation: RequestStatus.Getting
+        getHousesWithLocation: RequestStatus.Getting,
       });
       try {
         const housesWithLocation = await state.httpClient.get('/api/v1/house');
         store.setState({
           housesWithLocation,
-          getHousesWithLocation: RequestStatus.Success
+          getHousesWithLocation: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          getHousesWithLocation: RequestStatus.Error
+          getHousesWithLocation: RequestStatus.Error,
         });
       }
-    }
+    },
   };
   return actions;
 }

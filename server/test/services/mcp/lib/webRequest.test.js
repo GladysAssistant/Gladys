@@ -79,40 +79,32 @@ describe('webRequest', () => {
   });
 
   it('should fetch a public page and return extracted text', async () => {
-    nock('http://pool.example.com')
-      .get('/hours')
-      .reply(200, '<html><body><p>Today: pool is open</p></body></html>', {
-        'Content-Type': 'text/html; charset=utf-8',
-      });
+    nock('http://pool.example.com').get('/hours').reply(200, '<html><body><p>Today: pool is open</p></body></html>', {
+      'Content-Type': 'text/html; charset=utf-8',
+    });
 
     const text = await fetchWebPage({ url: 'http://pool.example.com/hours' });
     expect(text).to.equal('Today: pool is open');
   });
 
   it('should return plain text responses without HTML conversion', async () => {
-    nock('http://pool.example.com')
-      .get('/status.txt')
-      .reply(200, '  open now  ', {
-        'Content-Type': 'text/plain',
-      });
+    nock('http://pool.example.com').get('/status.txt').reply(200, '  open now  ', {
+      'Content-Type': 'text/plain',
+    });
 
     const text = await fetchWebPage({ url: 'http://pool.example.com/status.txt' });
     expect(text).to.equal('open now');
   });
 
   it('should return an empty string for empty responses', async () => {
-    nock('http://pool.example.com')
-      .get('/empty')
-      .reply(200, '', { 'Content-Type': 'text/plain' });
+    nock('http://pool.example.com').get('/empty').reply(200, '', { 'Content-Type': 'text/plain' });
 
     const text = await fetchWebPage({ url: 'http://pool.example.com/empty' });
     expect(text).to.equal('');
   });
 
   it('should truncate very long responses', async () => {
-    nock('http://pool.example.com')
-      .get('/long')
-      .reply(200, 'x'.repeat(13_000), { 'Content-Type': 'text/plain' });
+    nock('http://pool.example.com').get('/long').reply(200, 'x'.repeat(13_000), { 'Content-Type': 'text/plain' });
 
     const text = await fetchWebPage({ url: 'http://pool.example.com/long' });
     expect(text).to.include('... (truncated)');
@@ -120,9 +112,7 @@ describe('webRequest', () => {
   });
 
   it('should follow redirects when the target remains public', async () => {
-    nock('http://pool.example.com')
-      .get('/old')
-      .reply(302, undefined, { Location: '/new' });
+    nock('http://pool.example.com').get('/old').reply(302, undefined, { Location: '/new' });
     nock('http://pool.example.com')
       .get('/new')
       .reply(200, '<html><body><p>Redirected page</p></body></html>', { 'Content-Type': 'text/html' });
@@ -132,30 +122,18 @@ describe('webRequest', () => {
   });
 
   it('should surface HTTP and redirect errors', async () => {
-    nock('http://pool.example.com')
-      .get('/missing')
-      .reply(404, 'Not found');
+    nock('http://pool.example.com').get('/missing').reply(404, 'Not found');
     await expect(fetchWebPage({ url: 'http://pool.example.com/missing' })).to.be.rejectedWith('HTTP 404');
 
-    nock('http://pool.example.com')
-      .get('/redirect')
-      .reply(302, undefined, {});
+    nock('http://pool.example.com').get('/redirect').reply(302, undefined, {});
     await expect(fetchWebPage({ url: 'http://pool.example.com/redirect' })).to.be.rejectedWith(
       'Redirect response without Location header',
     );
 
-    nock('http://pool.example.com')
-      .get('/r1')
-      .reply(302, undefined, { Location: '/r2' });
-    nock('http://pool.example.com')
-      .get('/r2')
-      .reply(302, undefined, { Location: '/r3' });
-    nock('http://pool.example.com')
-      .get('/r3')
-      .reply(302, undefined, { Location: '/r4' });
-    nock('http://pool.example.com')
-      .get('/r4')
-      .reply(302, undefined, { Location: '/r5' });
+    nock('http://pool.example.com').get('/r1').reply(302, undefined, { Location: '/r2' });
+    nock('http://pool.example.com').get('/r2').reply(302, undefined, { Location: '/r3' });
+    nock('http://pool.example.com').get('/r3').reply(302, undefined, { Location: '/r4' });
+    nock('http://pool.example.com').get('/r4').reply(302, undefined, { Location: '/r5' });
     await expect(fetchWebPage({ url: 'http://pool.example.com/r1' })).to.be.rejectedWith('Too many redirects');
   });
 

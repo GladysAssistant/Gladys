@@ -41,10 +41,7 @@ function normalizeAudioContentType(raw) {
     return DEFAULT_AUDIO_CONTENT_TYPE;
   }
 
-  const contentType = raw
-    .split(';')[0]
-    .trim()
-    .toLowerCase();
+  const contentType = raw.split(';')[0].trim().toLowerCase();
   if (contentType.startsWith('audio/') || contentType === 'application/octet-stream') {
     return contentType;
   }

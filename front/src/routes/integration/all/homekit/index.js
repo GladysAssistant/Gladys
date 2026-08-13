@@ -21,5 +21,5 @@ class HomeKitIntegration extends Component {
 
 export default connect(
   'user,homekitSetupDataUrl,homekitMdnsAdvertiser,homekitSaveMDNSStatus,homkitGetSettingsStatus,homekitReloadStatus,homekitResetStatus,homekitExposureMode,homekitExposedDevices,homekitCompatibleDevices,homekitSaveExposureStatus',
-  actions
+  actions,
 )(HomeKitIntegration);

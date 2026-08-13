@@ -14,8 +14,8 @@ function getDefaultState() {
   const httpClient = config.demoMode
     ? new DemoHttpClient()
     : config.gatewayMode
-    ? new GatewayHttpClient(session)
-    : new HttpClient(session);
+      ? new GatewayHttpClient(session)
+      : new HttpClient(session);
 
   // Load language from local storage
   let language;
@@ -43,10 +43,10 @@ function getDefaultState() {
     session,
     currentUrl: getCurrentUrl(),
     user: {
-      language
+      language,
     },
     showDropDown: false,
-    darkMode
+    darkMode,
   };
   return state;
 }

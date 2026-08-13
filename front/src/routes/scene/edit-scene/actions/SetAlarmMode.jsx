@@ -7,7 +7,7 @@ import get from 'get-value';
 
 import { ALARM_MODES_LIST } from '../../../../../../server/utils/constants';
 
-const capitalizeFirstLetter = string => {
+const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
@@ -16,10 +16,10 @@ class SetAlarmMode extends Component {
     try {
       const houses = await this.props.httpClient.get('/api/v1/house');
       const houseOptions = [];
-      houses.forEach(house => {
+      houses.forEach((house) => {
         houseOptions.push({
           label: house.name,
-          value: house.selector
+          value: house.selector,
         });
       });
       await this.setState({ houseOptions });
@@ -28,24 +28,24 @@ class SetAlarmMode extends Component {
       console.error(e);
     }
   };
-  handleHouseChange = selectedOption => {
+  handleHouseChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'house', selectedOption.value);
     } else {
       this.props.updateActionProperty(this.props.path, 'house', null);
     }
   };
-  handleAlarmModeChange = selectedOption => {
+  handleAlarmModeChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'alarm_mode', selectedOption.value);
     } else {
       this.props.updateActionProperty(this.props.path, 'alarm_mode', null);
     }
   };
-  refreshSelectedOptions = nextProps => {
+  refreshSelectedOptions = (nextProps) => {
     let selectedHouseOption = '';
     if (nextProps.action.house && this.state.houseOptions) {
-      const houseOption = this.state.houseOptions.find(option => option.value === nextProps.action.house);
+      const houseOption = this.state.houseOptions.find((option) => option.value === nextProps.action.house);
 
       if (houseOption) {
         selectedHouseOption = houseOption;
@@ -53,7 +53,9 @@ class SetAlarmMode extends Component {
     }
     let selectedAlarmModeOption = '';
     if (nextProps.action.alarm_mode && this.state.alarmModesOptions) {
-      const alarmModeOption = this.state.alarmModesOptions.find(option => option.value === nextProps.action.alarm_mode);
+      const alarmModeOption = this.state.alarmModesOptions.find(
+        (option) => option.value === nextProps.action.alarm_mode,
+      );
 
       if (alarmModeOption) {
         selectedAlarmModeOption = alarmModeOption;
@@ -64,15 +66,15 @@ class SetAlarmMode extends Component {
   constructor(props) {
     super(props);
     this.props = props;
-    const alarmModesOptions = ALARM_MODES_LIST.map(alarmMode => {
+    const alarmModesOptions = ALARM_MODES_LIST.map((alarmMode) => {
       return {
         value: alarmMode,
-        label: capitalizeFirstLetter(get(props.intl.dictionary, `alarmModes.${alarmMode}`, { default: alarmMode }))
+        label: capitalizeFirstLetter(get(props.intl.dictionary, `alarmModes.${alarmMode}`, { default: alarmMode })),
       };
     });
     this.state = {
       alarmModesOptions,
-      selectedHouseOption: ''
+      selectedHouseOption: '',
     };
   }
   componentDidMount() {

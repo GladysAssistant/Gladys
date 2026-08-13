@@ -14,19 +14,19 @@ import { MANAGED_CATEGORIES, MANAGED_FEATURES } from './features';
 import RemoteFeatureTag from './edition/RemoteFeatureTag';
 
 class RemoteCreation extends Component {
-  updateDeviceName = e => {
+  updateDeviceName = (e) => {
     const name = e.target.value;
     const { device } = this.state;
     this.setState({ device: { ...device, name } });
   };
 
-  updateDeviceRoom = e => {
+  updateDeviceRoom = (e) => {
     const roomId = e.target.value;
     const { device } = this.state;
     this.setState({ device: { ...device, room_id: roomId } });
   };
 
-  updateDeviceModel = e => {
+  updateDeviceModel = (e) => {
     const model = e.target.value;
     const { device } = this.state;
     if (device.model !== model) {
@@ -34,7 +34,7 @@ class RemoteCreation extends Component {
     }
   };
 
-  updatePeripheralModel = e => {
+  updatePeripheralModel = (e) => {
     const peripheral = e.target.value;
     if (this.state.peripheral !== peripheral) {
       this.setState({ peripheral, selectedFeature: undefined });
@@ -44,19 +44,19 @@ class RemoteCreation extends Component {
   updateFeature = (type, updatedFeature) => {
     const editedFeatures = update(this.state.editedFeatures, {
       [type]: {
-        $set: updatedFeature
-      }
+        $set: updatedFeature,
+      },
     });
     this.setState({ editedFeatures });
   };
 
-  selectValue = selectedValue => {
+  selectValue = (selectedValue) => {
     this.setState({ selectedValue });
   };
 
   saveDevice = async () => {
     this.setState({
-      saveStatus: RequestStatus.Getting
+      saveStatus: RequestStatus.Getting,
     });
 
     const { device, editedFeatures, peripheral } = this.state;
@@ -67,28 +67,28 @@ class RemoteCreation extends Component {
     const params = [
       {
         name: PARAMS.PERIPHERAL,
-        value: peripheral
+        value: peripheral,
       },
       {
         name: PARAMS.REMOTE_TYPE,
-        value: category
-      }
+        value: category,
+      },
     ];
 
     const remoteFeatures = MANAGED_FEATURES[category];
 
     const deviceFeatures = [];
 
-    Object.keys(editedFeatures).forEach(type => {
+    Object.keys(editedFeatures).forEach((type) => {
       const { feature, codes } = editedFeatures[type];
       const { feature: defaultFeature = {} } = remoteFeatures[type];
       const featureExternalId = `${deviceExternalId}:${type}`;
 
       let nbCodes = 0;
-      Object.keys(codes).forEach(codeKey => {
+      Object.keys(codes).forEach((codeKey) => {
         params.push({
           name: `${PARAMS.IR_CODE}${codeKey}`,
-          value: codes[codeKey]
+          value: codes[codeKey],
         });
 
         nbCodes += 1;
@@ -107,7 +107,7 @@ class RemoteCreation extends Component {
           has_feedback: true,
           min: defaultFeature.min || 0,
           max: defaultFeature.max || 1,
-          ...feature
+          ...feature,
         });
       }
     });
@@ -119,27 +119,27 @@ class RemoteCreation extends Component {
       service_id: this.props.currentIntegration.id,
       model: category,
       features: deviceFeatures,
-      params
+      params,
     };
 
     try {
       await this.props.httpClient.post('/api/v1/device', deviceToCreate);
       this.setState({
-        saveStatus: RequestStatus.Success
+        saveStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        saveStatus: RequestStatus.Error
+        saveStatus: RequestStatus.Error,
       });
     }
   };
 
-  prepareEditedFeature = feature => {
+  prepareEditedFeature = (feature) => {
     const editedFeature = this.state.editedFeatures[feature] || {};
     return { codes: {}, ...editedFeature };
   };
 
-  storeFeatureCode = code => {
+  storeFeatureCode = (code) => {
     let { selectedFeature, learnAllMode, selectedValue, toLearn = [], editedFeatures } = this.state;
 
     let codeName = selectedFeature;
@@ -154,13 +154,13 @@ class RemoteCreation extends Component {
 
       editedFeatures = update(editedFeatures, {
         [selectedFeature]: {
-          $set: editedFeature
-        }
+          $set: editedFeature,
+        },
       });
     } else {
       // Clear saved code
-      editedFeatures = editedFeatures = update(editedFeatures, {
-        $unset: [selectedFeature]
+      editedFeatures = update(editedFeatures, {
+        $unset: [selectedFeature],
       });
     }
 
@@ -196,25 +196,25 @@ class RemoteCreation extends Component {
       toLearn,
       learnAllMode,
       selectedFeature,
-      selectedValue
+      selectedValue,
     });
 
     return learnAllMode;
   };
 
-  setLearning = learning => {
+  setLearning = (learning) => {
     this.setState({ learning });
   };
 
   learnAll = () => {
     const { model } = this.state.device;
     const features = MANAGED_FEATURES[model];
-    const toLearn = Object.keys(features).map(key => {
+    const toLearn = Object.keys(features).map((key) => {
       const { values = [] } = features[key];
 
       return {
         key,
-        values: Array.from(values)
+        values: Array.from(values),
       };
     });
 
@@ -227,7 +227,7 @@ class RemoteCreation extends Component {
       learnAllMode: true,
       toLearn,
       selectedFeature,
-      selectedValue
+      selectedValue,
     });
   };
 
@@ -237,25 +237,25 @@ class RemoteCreation extends Component {
       learnAllMode: false,
       toLearn: undefined,
       selectedFeature: undefined,
-      selectedValue: undefined
+      selectedValue: undefined,
     });
   };
 
-  selectFeature = selectedFeature => {
+  selectFeature = (selectedFeature) => {
     this.setState({
       selectedFeature,
-      selectedValue: undefined
+      selectedValue: undefined,
     });
   };
 
-  deleteFeature = feature => {
+  deleteFeature = (feature) => {
     const editedFeatures = update(this.state.editedFeatures, {
-      $unset: [feature]
+      $unset: [feature],
     });
 
     this.setState({
       editedFeatures,
-      selectedFeature: undefined
+      selectedFeature: undefined,
     });
   };
 
@@ -269,15 +269,15 @@ class RemoteCreation extends Component {
     const editedFeatures = {};
 
     // Prepares existing features
-    features.forEach(feature => {
+    features.forEach((feature) => {
       const { type } = feature;
       const codes = {};
 
       // Get feature codes
       const paramPrefix = `${PARAMS.IR_CODE}${type}`;
       params
-        .filter(param => param.name.startsWith(paramPrefix))
-        .forEach(param => {
+        .filter((param) => param.name.startsWith(paramPrefix))
+        .forEach((param) => {
           codes[param.name.replace(PARAMS.IR_CODE, '')] = param.value;
         });
 
@@ -287,13 +287,13 @@ class RemoteCreation extends Component {
     this.state = {
       device,
       editedFeatures,
-      peripheral
+      peripheral,
     };
   }
 
   render(
     { housesWithRooms = [], broadlinkPeripherals = [], ...props },
-    { device, selectedFeature, selectedValue, editedFeatures = {}, learning, learnAllMode, peripheral, saveStatus }
+    { device, selectedFeature, selectedValue, editedFeatures = {}, learning, learnAllMode, peripheral, saveStatus },
   ) {
     const canSave = Object.keys(editedFeatures).length === 0 || !device.name;
     const category = device.model;
@@ -301,7 +301,7 @@ class RemoteCreation extends Component {
     return (
       <div
         class={cx('dimmer', {
-          active: saveStatus === RequestStatus.Getting
+          active: saveStatus === RequestStatus.Getting,
         })}
       >
         <div class="loader" />
@@ -357,9 +357,9 @@ class RemoteCreation extends Component {
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {housesWithRooms.map(house => (
+                    {housesWithRooms.map((house) => (
                       <optgroup label={house.name}>
-                        {house.rooms.map(room => (
+                        {house.rooms.map((room) => (
                           <option selected={room.id === device.room_id} value={room.id}>
                             {room.name}
                           </option>
@@ -382,13 +382,13 @@ class RemoteCreation extends Component {
                     <option value="" disabled selected>
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {broadlinkPeripherals.map(availablePeripheral => (
+                    {broadlinkPeripherals.map((availablePeripheral) => (
                       <option selected={availablePeripheral.mac === peripheral} value={availablePeripheral.mac}>
                         <Text
                           id="integration.broadlink.setup.peripheralSelectLabel"
                           fields={{
                             name: availablePeripheral.name,
-                            address: availablePeripheral.address
+                            address: availablePeripheral.address,
                           }}
                         />
                       </option>
@@ -409,7 +409,7 @@ class RemoteCreation extends Component {
                     <option value="" disabled selected={!category}>
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {MANAGED_CATEGORIES.map(cat => (
+                    {MANAGED_CATEGORIES.map((cat) => (
                       <option value={cat} selected={cat === category}>
                         <Text id={`deviceFeatureCategory.${cat}.shortCategoryName`} />
                       </option>
@@ -424,7 +424,7 @@ class RemoteCreation extends Component {
                         <Text id="integration.broadlink.setup.featuresLabel" />
                       </label>
                       <div class="tags">
-                        {Object.keys(MANAGED_FEATURES[category]).map(type => (
+                        {Object.keys(MANAGED_FEATURES[category]).map((type) => (
                           <RemoteFeatureTag
                             disabled={learning}
                             category={category}

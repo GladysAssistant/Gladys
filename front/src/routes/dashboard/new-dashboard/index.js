@@ -56,7 +56,7 @@ const NewDashboardPage = ({ children, ...props }) => (
                     <input
                       type="text"
                       class={cx('form-control', {
-                        'is-invalid': props.dashboardAlreadyExistError || props.unknownError
+                        'is-invalid': props.dashboardAlreadyExistError || props.unknownError,
                       })}
                       placeholder={<Text id="newDashboard.nameLabel" />}
                       value={props.name}
@@ -73,7 +73,7 @@ const NewDashboardPage = ({ children, ...props }) => (
                   </small>
                   <Localizer>
                     <select value={props.visibility} onChange={props.updateVisibility} class="form-control">
-                      {DASHBOARD_VISIBILITY_LIST.map(dashboardVisibility => (
+                      {DASHBOARD_VISIBILITY_LIST.map((dashboardVisibility) => (
                         <option value={dashboardVisibility}>
                           <Text id={`dashboard.visibilities.${dashboardVisibility}`} />
                         </option>
@@ -97,28 +97,28 @@ const NewDashboardPage = ({ children, ...props }) => (
 );
 
 class Dashboard extends Component {
-  updateName = e => {
+  updateName = (e) => {
     this.setState({ name: e.target.value });
   };
-  updateVisibility = e => {
+  updateVisibility = (e) => {
     this.setState({ visibility: e.target.value });
   };
   goBack = () => {
     this.props.history.go(-1);
   };
-  createDashboard = async e => {
+  createDashboard = async (e) => {
     e.preventDefault();
     await this.setState({
       loading: true,
       dashboardAlreadyExistError: false,
-      unknownError: false
+      unknownError: false,
     });
     try {
       const newDashboard = {
         name: this.state.name,
         visibility: this.state.visibility,
         type: DASHBOARD_TYPE.MAIN,
-        boxes: [[], [], []]
+        boxes: [[], [], []],
       };
       const createDashboard = await this.props.httpClient.post('/api/v1/dashboard', newDashboard);
       this.setState({ loading: false, dashboardAlreadyExistError: false, unknownError: false });
@@ -139,7 +139,7 @@ class Dashboard extends Component {
     this.state = {
       name: '',
       visibility: 'private',
-      loading: false
+      loading: false,
     };
   }
   render(props, { name, visibility, loading, dashboardAlreadyExistError, unknownError }) {

@@ -18,57 +18,57 @@ class DiscoverTab extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.NUKI.NEW_HTTP_DEVICE,
-      this.addDiscoveredDevice
+      this.addDiscoveredDevice,
     );
   }
 
   searchDevices = async () => {
     this.setState({
-      loading: true
+      loading: true,
     });
     try {
       await this.props.httpClient.post(`/api/v1/service/nuki/discover/http`);
       this.setState({
         discoveredDevices: [],
-        errorLoading: false
+        errorLoading: false,
       });
 
       setTimeout(this.setState, 5000, {
-        loading: false
+        loading: false,
       });
     } catch (e) {
       this.setState({
         loading: false,
-        errorLoading: true
+        errorLoading: true,
       });
     }
   };
 
   getDiscoveredDevices = async () => {
     this.setState({
-      loading: true
+      loading: true,
     });
     try {
       const discoveredDevices = await this.props.httpClient.get(`/api/v1/service/nuki/discover/http`);
       this.setState({
         discoveredDevices,
         loading: false,
-        errorLoading: false
+        errorLoading: false,
       });
     } catch (e) {
       this.setState({
         loading: false,
-        errorLoading: true
+        errorLoading: true,
       });
     }
   };
 
-  addDiscoveredDevice = newDevice => {
+  addDiscoveredDevice = (newDevice) => {
     const existingDevices = this.state.discoveredDevices || [];
     const newDevices = [];
 
     let added = false;
-    existingDevices.forEach(device => {
+    existingDevices.forEach((device) => {
       if (device.external_id === newDevice.external_id) {
         newDevices.push(newDevice);
         added = true;
@@ -83,26 +83,26 @@ class DiscoverTab extends Component {
 
     this.setState({
       discoveredDevices: newDevices,
-      loading: false
+      loading: false,
     });
   };
 
   async getHouses() {
     this.setState({
-      housesGetStatus: RequestStatus.Getting
+      housesGetStatus: RequestStatus.Getting,
     });
     try {
       const params = {
-        expand: 'rooms'
+        expand: 'rooms',
       };
       const housesWithRooms = await this.props.httpClient.get(`/api/v1/house`, params);
       this.setState({
         housesWithRooms,
-        housesGetStatus: RequestStatus.Success
+        housesGetStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        housesGetStatus: RequestStatus.Error
+        housesGetStatus: RequestStatus.Error,
       });
     }
   }
@@ -126,7 +126,7 @@ class DiscoverTab extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />

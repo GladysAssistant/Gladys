@@ -41,7 +41,7 @@ const GoogleWelcomePage = ({ user }) => (
                 featureKeys={[
                   'gladysPlusUpsell.googleHome.feature1',
                   'gladysPlusUpsell.googleHome.feature2',
-                  'gladysPlusUpsell.googleHome.feature3'
+                  'gladysPlusUpsell.googleHome.feature3',
                 ]}
               />
               <div class="card">

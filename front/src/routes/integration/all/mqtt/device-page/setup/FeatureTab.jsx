@@ -44,7 +44,7 @@ const FeatureTab = ({ children, ...props }) => (
     </div>
     <div
       class={cx('dimmer', {
-        active: props.loading
+        active: props.loading,
       })}
     >
       <div class="loader" />
@@ -72,7 +72,7 @@ const FeatureTab = ({ children, ...props }) => (
                       const message = getValidationFieldMessage(
                         props.intl,
                         item.field,
-                        item.property && item.property.message
+                        item.property && item.property.message,
                       );
 
                       if (item.scope === 'device') {
@@ -93,7 +93,7 @@ const FeatureTab = ({ children, ...props }) => (
                             fields={{
                               featureName: getFeatureDisplayName(props.intl, item.feature),
                               field: fieldLabel,
-                              message
+                              message,
                             }}
                           />
                         </li>

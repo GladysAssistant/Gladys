@@ -83,10 +83,7 @@ const sceneConditionSchema = z
         'Scope path to compare, for example "0.0.last_value" after a device.get-value action in action group 0.',
       ),
     operator: comparisonOperatorSchema,
-    value: z
-      .union([z.number(), z.string()])
-      .optional()
-      .describe('Literal value to compare against.'),
+    value: z.union([z.number(), z.string()]).optional().describe('Literal value to compare against.'),
     evaluate_value: z
       .string()
       .optional()
@@ -219,14 +216,8 @@ function createSceneCreateInputSchema(
           ),
       }),
       actionSchemaByType(ACTIONS.CONDITION.CHECK_TIME, {
-        before: z
-          .string()
-          .regex(hhmmPattern)
-          .optional(),
-        after: z
-          .string()
-          .regex(hhmmPattern)
-          .optional(),
+        before: z.string().regex(hhmmPattern).optional(),
+        after: z.string().regex(hhmmPattern).optional(),
         days_of_the_week: z.array(weekDaysSchema).optional(),
       }),
       actionSchemaByType(ACTIONS.HOUSE.IS_EMPTY, {
@@ -290,12 +281,7 @@ function createSceneCreateInputSchema(
       actionSchemaByType(ACTIONS.MUSIC.PLAY_NOTIFICATION, {
         device: musicNotificationDevicesSchema,
         text: z.string(),
-        volume: z
-          .number()
-          .int()
-          .min(0)
-          .max(100)
-          .optional(),
+        volume: z.number().int().min(0).max(100).optional(),
       }),
       actionSchemaByType(ACTIONS.SMS.SEND, {
         text: z.string(),
@@ -332,10 +318,7 @@ function createSceneCreateInputSchema(
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
       scheduler_type: z.literal('every-month'),
-      day_of_the_month: z
-        .number()
-        .min(1)
-        .max(31),
+      day_of_the_month: z.number().min(1).max(31),
       time: z.string().regex(hhmmPattern),
       date: z.string().optional(),
       interval: z.number().optional(),
@@ -350,11 +333,7 @@ function createSceneCreateInputSchema(
       date: z.string().optional(),
       interval: z.number().optional(),
       unit: z.string().optional(),
-      day_of_the_month: z
-        .number()
-        .min(1)
-        .max(31)
-        .optional(),
+      day_of_the_month: z.number().min(1).max(31).optional(),
       key: z.string().optional(),
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
@@ -364,11 +343,7 @@ function createSceneCreateInputSchema(
       interval: z.number().optional(),
       unit: z.string().optional(),
       days_of_the_week: z.array(weekDaysSchema).optional(),
-      day_of_the_month: z
-        .number()
-        .min(1)
-        .max(31)
-        .optional(),
+      day_of_the_month: z.number().min(1).max(31).optional(),
       key: z.string().optional(),
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
@@ -378,11 +353,7 @@ function createSceneCreateInputSchema(
       interval: z.number().optional(),
       unit: z.string().optional(),
       days_of_the_week: z.array(weekDaysSchema).optional(),
-      day_of_the_month: z
-        .number()
-        .min(1)
-        .max(31)
-        .optional(),
+      day_of_the_month: z.number().min(1).max(31).optional(),
       key: z.string().optional(),
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
@@ -390,35 +361,18 @@ function createSceneCreateInputSchema(
       interval: z.number(),
       unit: z.enum(['second', 'minute', 'hour']),
       date: z.string().optional(),
-      time: z
-        .string()
-        .regex(hhmmPattern)
-        .optional(),
+      time: z.string().regex(hhmmPattern).optional(),
       days_of_the_week: z.array(weekDaysSchema).optional(),
-      day_of_the_month: z
-        .number()
-        .min(1)
-        .max(31)
-        .optional(),
+      day_of_the_month: z.number().min(1).max(31).optional(),
       key: z.string().optional(),
     }),
     triggerSchemaByType(EVENTS.TIME.SUNRISE, {
       house: houseSelectorSchema,
-      offset: z
-        .number()
-        .int()
-        .min(-1440)
-        .max(1440)
-        .optional(),
+      offset: z.number().int().min(-1440).max(1440).optional(),
     }),
     triggerSchemaByType(EVENTS.TIME.SUNSET, {
       house: houseSelectorSchema,
-      offset: z
-        .number()
-        .int()
-        .min(-1440)
-        .max(1440)
-        .optional(),
+      offset: z.number().int().min(-1440).max(1440).optional(),
     }),
     triggerSchemaByType(EVENTS.USER_PRESENCE.BACK_HOME, {
       user: userSelectorSchema,
@@ -473,10 +427,7 @@ function createSceneCreateInputSchema(
   ]);
 
   return z.object({
-    name: z
-      .string()
-      .min(1)
-      .describe('Scene name.'),
+    name: z.string().min(1).describe('Scene name.'),
     icon: z.enum(iconList).describe('Scene icon.'),
     triggers: z
       .array(sceneTriggerSchema)
@@ -490,14 +441,8 @@ function createSceneCreateInputSchema(
       .describe(
         'Top-level array of action groups run sequentially after a trigger fires. Each inner array runs in parallel. Example: [[{"type":"delay","unit":"minutes","value":45}],[{"type":"device.get-value","device_feature":"mqtt-co2"}]]. Never put device.new-state, time.changed or other trigger types here.',
       ),
-    description: z
-      .string()
-      .optional()
-      .describe('Optional scene description.'),
-    active: z
-      .boolean()
-      .optional()
-      .describe('Optional scene active flag.'),
+    description: z.string().optional().describe('Optional scene description.'),
+    active: z.boolean().optional().describe('Optional scene active flag.'),
     selector: z
       .string()
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)

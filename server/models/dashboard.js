@@ -64,10 +64,7 @@ const boxesSchema = Joi.array().items(
         )
         .max(100),
       photo_fit: Joi.string().valid('cover', 'contain'),
-      photo_slideshow_interval: Joi.number()
-        .integer()
-        .min(0)
-        .max(3600),
+      photo_slideshow_interval: Joi.number().integer().min(0).max(3600),
       photo_show_caption: Joi.boolean(),
     }),
   ),

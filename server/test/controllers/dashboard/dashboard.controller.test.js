@@ -198,9 +198,7 @@ describe('GET /api/v1/dashboard/photo/proxy', () => {
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
       'base64',
     );
-    nock('http://192.168.1.10')
-      .get('/photos/vacation.jpg')
-      .reply(200, inputBuffer, { 'Content-Type': 'image/png' });
+    nock('http://192.168.1.10').get('/photos/vacation.jpg').reply(200, inputBuffer, { 'Content-Type': 'image/png' });
 
     await authenticatedRequest
       .get('/api/v1/dashboard/photo/proxy')

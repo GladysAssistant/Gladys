@@ -25,5 +25,5 @@ class TpLinkDevicePage extends Component {
 
 export default connect(
   'session,user,tpLinkDevices,houses,getTpLinkDevicesStatus,tpLinkNewDevices,getTpLinkCreateDeviceStatus,getTpLinkNewDevicesStatus,getTpLinkDeviceOrderDir,tpLinkDeviceSearch',
-  actions
+  actions,
 )(TpLinkDevicePage);

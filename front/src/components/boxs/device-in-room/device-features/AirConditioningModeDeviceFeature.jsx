@@ -10,10 +10,10 @@ const MODE_OPTIONS = [
   { value: AC_MODE.COOLING, i18nKey: 'cooling' },
   { value: AC_MODE.HEATING, i18nKey: 'heating' },
   { value: AC_MODE.DRYING, i18nKey: 'drying' },
-  { value: AC_MODE.FAN, i18nKey: 'fan' }
+  { value: AC_MODE.FAN, i18nKey: 'fan' },
 ];
 
-const AirConditioningModeDeviceFeature = props => {
+const AirConditioningModeDeviceFeature = (props) => {
   const { deviceFeature } = props;
   const { category, type } = deviceFeature;
   const rawValue = deviceFeature.last_value;
@@ -27,10 +27,10 @@ const AirConditioningModeDeviceFeature = props => {
     Array.isArray(deviceFeature.supported_options) && deviceFeature.supported_options.length > 0;
   const options = hasSupportedOptions
     ? resolveFeatureOptions(deviceFeature, MODE_OPTIONS)
-    : MODE_OPTIONS.filter(
-        option => option.value <= AC_MODE.HEATING || option.value <= deviceFeature.max
-      ).map(option => ({ value: option.value, i18nKey: option.i18nKey }));
-  const updateValue = value => props.updateValueWithDebounce(deviceFeature, value);
+    : MODE_OPTIONS.filter((option) => option.value <= AC_MODE.HEATING || option.value <= deviceFeature.max).map(
+        (option) => ({ value: option.value, i18nKey: option.i18nKey }),
+      );
+  const updateValue = (value) => props.updateValueWithDebounce(deviceFeature, value);
 
   return (
     <tr>

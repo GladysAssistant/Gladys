@@ -23,7 +23,7 @@ const IntegrationPageHeader = ({
   searchKeyword,
   integrationsLength,
   totalSize,
-  showInstallFromGithub
+  showInstallFromGithub,
 }) => {
   const hasSearch = searchKeyword.length > 0;
   // a search matching every integration of the view leaves the list untouched,
@@ -33,7 +33,7 @@ const IntegrationPageHeader = ({
   // a message in the page body, "0 integrations" on top of it says nothing more
   const showCount = hasSearch || totalSize > 0;
   const searchPlaceholder = get(intl.dictionary, 'integration.root.searchPlaceholder', {
-    default: ''
+    default: '',
   });
 
   return (

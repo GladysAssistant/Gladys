@@ -2,7 +2,7 @@ import { connect } from 'unistore/preact';
 import DiscoverTab from './DiscoverTab';
 import MELCloudPage from '../MELCloudPage';
 
-const MELCloudDiscoverPage = props => (
+const MELCloudDiscoverPage = (props) => (
   <MELCloudPage user={props.user}>
     <DiscoverTab {...props} />
   </MELCloudPage>

@@ -14,7 +14,7 @@ const SetupTab = ({ children, ...props }) => {
       <div class="card-body">
         <div
           class={cx('dimmer', {
-            active: props.connectEweLinkStatus === RequestStatus.Getting
+            active: props.connectEweLinkStatus === RequestStatus.Getting,
           })}
         >
           <div class="loader" />

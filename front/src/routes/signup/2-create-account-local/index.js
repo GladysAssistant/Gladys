@@ -24,27 +24,27 @@ class CreateAccountLocal extends Component {
       birthdate: new Date(2000, 0, 1),
       language: getDefaultState().user.language,
       password: '',
-      passwordRepeat: ''
-    }
+      passwordRepeat: '',
+    },
   };
 
   validatePassword = () => {
     this.setState({
-      validPassword: this.state.user.password.length >= MIN_PASSWORD_LENGTH
+      validPassword: this.state.user.password.length >= MIN_PASSWORD_LENGTH,
     });
   };
 
   validatePasswordRepeat = () => {
     this.setState({
-      validPasswordRepeat: this.state.user.password === this.state.user.passwordRepeat
+      validPasswordRepeat: this.state.user.password === this.state.user.passwordRepeat,
     });
   };
 
-  updateFirstname = async e => {
+  updateFirstname = async (e) => {
     const newUser = {
       ...this.state.user,
       firstname: e.target.value,
-      selector: slugify(e.target.value)
+      selector: slugify(e.target.value),
     };
 
     await this.setState({ user: newUser });
@@ -53,10 +53,10 @@ class CreateAccountLocal extends Component {
       this.validateUser();
     }
   };
-  updateLastname = async e => {
+  updateLastname = async (e) => {
     const newUser = {
       ...this.state.user,
-      lastname: e.target.value
+      lastname: e.target.value,
     };
 
     await this.setState({ user: newUser });
@@ -65,37 +65,37 @@ class CreateAccountLocal extends Component {
       this.validateUser();
     }
   };
-  updateEmail = async e => {
+  updateEmail = async (e) => {
     const newUser = {
       ...this.state.user,
-      email: e.target.value
+      email: e.target.value,
     };
     await this.setState({ user: newUser });
     if (this.state.signupErrors) {
       this.validateUser();
     }
   };
-  updateLanguage = e => {
+  updateLanguage = (e) => {
     const newUser = {
       ...this.state.user,
-      language: e.target.value
+      language: e.target.value,
     };
     this.setState({ user: newUser });
   };
-  updatePassword = async e => {
+  updatePassword = async (e) => {
     const newUser = {
       ...this.state.user,
-      password: e.target.value
+      password: e.target.value,
     };
     await this.setState({ user: newUser });
     if (this.state.signupErrors) {
       this.validateUser();
     }
   };
-  updatePasswordRepeat = async e => {
+  updatePasswordRepeat = async (e) => {
     const newUser = {
       ...this.state.user,
-      passwordRepeat: e.target.value
+      passwordRepeat: e.target.value,
     };
     await this.setState({ user: newUser });
     if (this.state.signupErrors) {
@@ -140,14 +140,14 @@ class CreateAccountLocal extends Component {
       errors.password = true;
     }
     this.setState({
-      signupErrors: errors
+      signupErrors: errors,
     });
     return errored;
   };
 
   createUser = async () => {
     await this.setState({
-      signupAlreadySubmitted: true
+      signupAlreadySubmitted: true,
     });
     const errored = this.validateUser();
     if (errored) {
@@ -155,13 +155,13 @@ class CreateAccountLocal extends Component {
     }
     const { user: userToCreate } = this.state;
     this.setState({
-      createLocalAccountStatus: RequestStatus.Getting
+      createLocalAccountStatus: RequestStatus.Getting,
     });
     try {
       const user = await this.props.httpClient.post(`/api/v1/signup`, userToCreate);
       this.setState({
         user,
-        createLocalAccountStatus: RequestStatus.Success
+        createLocalAccountStatus: RequestStatus.Success,
       });
       this.props.session.saveUser(user);
       this.props.session.init();
@@ -173,17 +173,17 @@ class CreateAccountLocal extends Component {
       const message = get(e, 'response.data.message');
       if (!status) {
         this.setState({
-          createLocalAccountStatus: RequestStatus.NetworkError
+          createLocalAccountStatus: RequestStatus.NetworkError,
         });
       } else if (message === 'INSTANCE_ALREADY_CONFIGURED') {
         this.setState({
           createLocalAccountStatus: CreateUserErrors.InstanceAlreadyConfigured,
-          createLocalAccountError: e.response.data
+          createLocalAccountError: e.response.data,
         });
       } else {
         this.setState({
           createLocalAccountStatus: RequestStatus.Error,
-          createLocalAccountError: e.response.data
+          createLocalAccountError: e.response.data,
         });
       }
     }

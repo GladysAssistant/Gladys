@@ -6,9 +6,7 @@ const { BadParameters } = require('../../utils/coreErrors');
 const stateSchema = Joi.object({
   device_feature_id: Joi.string().required(),
   value: Joi.number().required(),
-  created_at: Joi.date()
-    .iso()
-    .required(),
+  created_at: Joi.date().iso().required(),
 });
 
 /**

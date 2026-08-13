@@ -27,17 +27,17 @@ const INTEGRATION = {
       {
         key: 'spotify_account',
         type: 'oauth2',
-        label: { en: 'Spotify account', fr: 'Compte Spotify' }
-      }
-    ]
-  }
+        label: { en: 'Spotify account', fr: 'Compte Spotify' },
+      },
+    ],
+  },
 };
 
-const decodeWrappedState = wrapped => {
+const decodeWrappedState = (wrapped) => {
   const base64 = wrapped.replace(/-/g, '+').replace(/_/g, '/');
   const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
   const binary = atob(padded);
-  const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+  const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
   return JSON.parse(new TextDecoder('utf-8').decode(bytes));
 };
 
@@ -48,12 +48,12 @@ describe('External integration - OAuth2 connection', () => {
     cy.intercept('GET', `**/api/v1/external_integration/${SELECTOR}`, INTEGRATION).as('getIntegration');
     cy.intercept('GET', `**/api/v1/external_integration/${SELECTOR}/config`, {
       config: {},
-      configured_secrets: []
+      configured_secrets: [],
     }).as('getConfig');
     cy.intercept('POST', `**/api/v1/external_integration/${SELECTOR}/oauth/authorize_url`, {
       authorize_url: `https://accounts.spotify.com/authorize?response_type=code&client_id=abc&scope=user-read-playback-state&redirect_uri=${encodeURIComponent(
-        REDIRECT_URI
-      )}&state=${INTEGRATION_STATE}`
+        REDIRECT_URI,
+      )}&state=${INTEGRATION_STATE}`,
     }).as('getAuthorizeUrl');
   });
 
@@ -71,7 +71,7 @@ describe('External integration - OAuth2 connection', () => {
     cy.visit(CONFIG_URL);
     cy.wait('@getIntegration');
 
-    cy.window().then(win => {
+    cy.window().then((win) => {
       cy.stub(win, 'open').as('windowOpen');
     });
 
@@ -87,7 +87,7 @@ describe('External integration - OAuth2 connection', () => {
     cy.visit(CONFIG_URL);
     cy.wait('@getIntegration');
 
-    cy.window().then(win => {
+    cy.window().then((win) => {
       cy.stub(win, 'open').as('windowOpen');
     });
 
@@ -95,7 +95,7 @@ describe('External integration - OAuth2 connection', () => {
     cy.wait('@getAuthorizeUrl');
 
     cy.get('@windowOpen').should('have.been.called');
-    cy.get('@windowOpen').then(open => {
+    cy.get('@windowOpen').then((open) => {
       const url = new URL(open.getCall(0).args[0]);
 
       // nothing of the provider URL may be altered except the state
@@ -107,7 +107,7 @@ describe('External integration - OAuth2 connection', () => {
         v: 1,
         origin: window.location.origin,
         path: CALLBACK_PATH,
-        state: INTEGRATION_STATE
+        state: INTEGRATION_STATE,
       });
     });
   });
@@ -116,7 +116,7 @@ describe('External integration - OAuth2 connection', () => {
     cy.visit(CONFIG_URL);
     cy.wait('@getIntegration');
 
-    cy.window().then(win => {
+    cy.window().then((win) => {
       cy.stub(win, 'open').as('windowOpen');
     });
 
@@ -125,7 +125,7 @@ describe('External integration - OAuth2 connection', () => {
 
     // written right after the response is handled: retry instead of asserting
     // on the same tick as the intercept
-    cy.window().should(win => {
+    cy.window().should((win) => {
       expect(win.localStorage.getItem(`externalIntegrationOAuthKey:${SELECTOR}`)).to.equal('spotify_account');
       expect(win.localStorage.getItem(`externalIntegrationOAuthRedirectUri:${SELECTOR}`)).to.equal(REDIRECT_URI);
     });
@@ -133,22 +133,20 @@ describe('External integration - OAuth2 connection', () => {
 
   it('refuses an authorize URL without a state instead of dead-ending after consent', () => {
     cy.intercept('POST', `**/api/v1/external_integration/${SELECTOR}/oauth/authorize_url`, {
-      authorize_url: 'https://accounts.spotify.com/authorize?response_type=code&client_id=abc'
+      authorize_url: 'https://accounts.spotify.com/authorize?response_type=code&client_id=abc',
     }).as('getAuthorizeUrlWithoutState');
 
     cy.visit(CONFIG_URL);
     cy.wait('@getIntegration');
 
-    cy.window().then(win => {
+    cy.window().then((win) => {
       cy.stub(win, 'open').as('windowOpen');
     });
 
     cy.contains('button', 'integration.externalIntegration.config.oauthConnectButton').click();
     cy.wait('@getAuthorizeUrlWithoutState');
 
-    cy.get('.alert-danger')
-      .should('exist')
-      .i18n('integration.externalIntegration.config.oauthInvalidStateError');
+    cy.get('.alert-danger').should('exist').i18n('integration.externalIntegration.config.oauthInvalidStateError');
     cy.get('@windowOpen').should('not.have.been.called');
   });
 
@@ -156,13 +154,11 @@ describe('External integration - OAuth2 connection', () => {
     cy.visit(CONFIG_URL);
     cy.wait('@getIntegration');
 
-    cy.window().then(win => {
+    cy.window().then((win) => {
       // navigator.clipboard only exists in a secure context: force the legacy
       // path the LAN users of this flow will actually take
       cy.stub(win.navigator.clipboard, 'writeText').rejects(new Error('not allowed'));
-      cy.stub(win.document, 'execCommand')
-        .returns(true)
-        .as('execCommand');
+      cy.stub(win.document, 'execCommand').returns(true).as('execCommand');
     });
 
     cy.get('.input-group .btn').click();

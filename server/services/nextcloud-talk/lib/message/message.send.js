@@ -47,8 +47,9 @@ async function send(token, message) {
   );
   if (message.file) {
     const now = new Date();
-    const id = `${now.getFullYear()}-${now.getMonth() +
-      1}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}${uuid.v4().split('-')[0]}`;
+    const id = `${now.getFullYear()}-${
+      now.getMonth() + 1
+    }-${now.getDate()}-${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}${uuid.v4().split('-')[0]}`;
 
     const path = `/Talk/${id}.jpg`;
     await this.gladys.http.request(

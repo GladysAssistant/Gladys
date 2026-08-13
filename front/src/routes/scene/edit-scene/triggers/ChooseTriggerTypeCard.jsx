@@ -28,14 +28,14 @@ const TRIGGER_LIST = [
   EVENTS.SYSTEM.START,
   EVENTS.MQTT.RECEIVED,
   EVENTS.WEATHER.ALERT_RAISED,
-  EVENTS.WEATHER.ALERT_ENDED
+  EVENTS.WEATHER.ALERT_ENDED,
 ];
 
 class ChooseTriggerType extends Component {
-  handleChange = selectedOption => {
+  handleChange = (selectedOption) => {
     if (selectedOption) {
       this.setState({
-        currentTrigger: selectedOption
+        currentTrigger: selectedOption,
       });
       this.props.updateTriggerProperty(this.props.index, 'type', selectedOption.value);
     }
@@ -44,16 +44,16 @@ class ChooseTriggerType extends Component {
   constructor(props) {
     super(props);
 
-    const options = TRIGGER_LIST.map(trigger => {
+    const options = TRIGGER_LIST.map((trigger) => {
       return {
         value: trigger,
-        label: get(props.intl.dictionary, `editScene.triggers.${trigger}`, { default: trigger })
+        label: get(props.intl.dictionary, `editScene.triggers.${trigger}`, { default: trigger }),
       };
     }).sort((a, b) => a.label.localeCompare(b.label));
 
     this.state = {
       options,
-      currentTrigger: null
+      currentTrigger: null,
     };
   }
 

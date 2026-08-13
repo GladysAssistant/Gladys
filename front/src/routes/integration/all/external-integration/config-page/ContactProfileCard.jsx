@@ -19,7 +19,7 @@ const ContactProfileCard = ({
   profileStatus,
   updateValue,
   onSave,
-  onClear
+  onClear,
 }) => {
   const working = profileStatus === RequestStatus.Getting;
   const configured = Boolean(profile && profile.configured);
@@ -46,7 +46,7 @@ const ContactProfileCard = ({
           </div>
         )}
         <form onSubmit={onSave}>
-          {contactSchema.map(field => (
+          {contactSchema.map((field) => (
             <ConfigField
               key={field.key}
               field={field}

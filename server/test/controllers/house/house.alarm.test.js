@@ -4,10 +4,7 @@ const db = require('../../../models');
 
 describe('House.alarm', () => {
   it('should arm house', async () => {
-    await authenticatedRequest
-      .post('/api/v1/house/test-house/arm')
-      .expect('Content-Type', /json/)
-      .expect(200);
+    await authenticatedRequest.post('/api/v1/house/test-house/arm').expect('Content-Type', /json/).expect(200);
   });
   it('should disarm house', async () => {
     const testHouse = await db.House.findOne({
@@ -16,10 +13,7 @@ describe('House.alarm', () => {
       },
     });
     await testHouse.update({ alarm_mode: 'armed' });
-    await authenticatedRequest
-      .post('/api/v1/house/test-house/disarm')
-      .expect('Content-Type', /json/)
-      .expect(200);
+    await authenticatedRequest.post('/api/v1/house/test-house/disarm').expect('Content-Type', /json/).expect(200);
   });
   it('should disarm house with code', async () => {
     const testHouse = await db.House.findOne({
@@ -126,15 +120,9 @@ describe('House.alarm', () => {
     });
   });
   it('should partially arm house', async () => {
-    await authenticatedRequest
-      .post('/api/v1/house/test-house/partial_arm')
-      .expect('Content-Type', /json/)
-      .expect(200);
+    await authenticatedRequest.post('/api/v1/house/test-house/partial_arm').expect('Content-Type', /json/).expect(200);
   });
   it('should put a house in panic mode', async () => {
-    await authenticatedRequest
-      .post('/api/v1/house/test-house/panic')
-      .expect('Content-Type', /json/)
-      .expect(200);
+    await authenticatedRequest.post('/api/v1/house/test-house/panic').expect('Content-Type', /json/).expect(200);
   });
 });
