@@ -1,11 +1,11 @@
 const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
+const proxyquire = require('proxyquire');
 
 const { assert, fake } = sinon;
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
-const logger = require('../../../../utils/logger');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
@@ -47,23 +47,22 @@ describe('zigbee2mqttManager.publish', () => {
     assert.calledWith(mqttClient.publish, 'toto', 'message');
   });
   it('should log the topic and the message published', () => {
-    const debugStub = sinon.stub(logger, 'debug');
-    try {
-      const mqttClient = {
-        publish: fake.returns(null),
-      };
-      const mqttLibrary = {
-        connect: fake.returns(mqttClient),
-      };
-      const zigbee2mqttManager = new Zigbee2mqttManager(gladys, mqttLibrary, serviceId);
-      zigbee2mqttManager.mqttClient = mqttClient;
-      zigbee2mqttManager.publish('zigbee2mqtt/my-device/set', '{"state":"ON"}');
+    // Stubbing the shared logger singleton is racy under mocha --parallel: test files
+    // using proxyquire.noPreserveCache() evict utils/logger from the require cache, so
+    // depending on the worker's file order this file and the already-cached publish.js
+    // can hold two different logger instances, and a stub on the test's instance never
+    // sees the call. Injecting the stub through proxyquire pins the instance instead.
+    const debugStub = sinon.stub();
+    const { publish } = proxyquire('../../../../services/zigbee2mqtt/lib/publish', {
+      '../../../utils/logger': { debug: debugStub },
+    });
+    const mqttClient = {
+      publish: fake.returns(null),
+    };
+    publish.call({ mqttClient }, 'zigbee2mqtt/my-device/set', '{"state":"ON"}');
 
-      assert.calledWith(mqttClient.publish, 'zigbee2mqtt/my-device/set', '{"state":"ON"}', undefined, sinon.match.func);
-      assert.calledWith(debugStub, sinon.match('zigbee2mqtt/my-device/set').and(sinon.match('{"state":"ON"}')));
-    } finally {
-      debugStub.restore();
-    }
+    assert.calledWith(mqttClient.publish, 'zigbee2mqtt/my-device/set', '{"state":"ON"}', undefined, sinon.match.func);
+    assert.calledWith(debugStub, sinon.match('zigbee2mqtt/my-device/set').and(sinon.match('{"state":"ON"}')));
   });
   it('should publish MQTT message with error', () => {
     const mqttClient = {
