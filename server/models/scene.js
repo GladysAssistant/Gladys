@@ -41,6 +41,14 @@ const actionSchema = Joi.object()
     calendar_event_name: Joi.string(),
     stop_scene_if_event_found: Joi.boolean(),
     stop_scene_if_event_not_found: Joi.boolean(),
+    stop_scene_if_no_events: Joi.boolean(),
+    time_range: Joi.string().valid('today', 'tomorrow', 'next-x-hours'),
+    // Null is allowed so that an action can be saved while the user has not
+    // filled the number of hours yet.
+    duration: Joi.number()
+      .integer()
+      .min(1)
+      .allow(null),
     request_response_keys: Joi.array().items(Joi.string()),
     ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),

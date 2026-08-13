@@ -272,6 +272,9 @@ function createSceneCreateInputSchema(
           .min(1)
           .optional(),
         stop_scene_if_no_events: z.boolean().optional(),
+      }).refine((action) => action.time_range !== 'next-x-hours' || typeof action.duration === 'number', {
+        message: 'duration is required when time_range is next-x-hours',
+        path: ['duration'],
       }),
       actionSchemaByType(ACTIONS.ECOWATT.CONDITION, {
         ecowatt_network_status: z.enum(['ok', 'warning', 'critical']),

@@ -1,6 +1,11 @@
 const { expect } = require('chai');
 
-const { flattenSceneActions, assertTriggerTypesNotInActions } = require('../../../../services/mcp/lib/sceneSchemas');
+const {
+  flattenSceneActions,
+  assertTriggerTypesNotInActions,
+  createSceneCreateInputSchema,
+} = require('../../../../services/mcp/lib/sceneSchemas');
+const { ACTIONS } = require('../../../../utils/constants');
 
 describe('sceneSchemas helpers', () => {
   it('should flatten nested scene actions and ignore invalid entries', () => {
@@ -40,5 +45,31 @@ describe('sceneSchemas helpers', () => {
     }
     expect(error).to.be.an('error');
     expect(error.message).to.contain('must be in the top-level triggers array');
+  });
+});
+
+describe('sceneSchemas calendar.get-events action', () => {
+  const schema = createSceneCreateInputSchema();
+  const buildScene = (action) => ({
+    name: 'Announce my agenda',
+    icon: 'activity',
+    triggers: [{ type: 'system.start' }],
+    actions: [[{ type: ACTIONS.CALENDAR.GET_EVENTS, calendars: ['my-calendar'], ...action }]],
+  });
+
+  it('should accept a today range without a duration', () => {
+    expect(schema.safeParse(buildScene({ time_range: 'today' })).success).to.equal(true);
+  });
+
+  it('should accept a next-x-hours range with a duration', () => {
+    expect(schema.safeParse(buildScene({ time_range: 'next-x-hours', duration: 12 })).success).to.equal(true);
+  });
+
+  it('should reject a next-x-hours range without a duration', () => {
+    expect(schema.safeParse(buildScene({ time_range: 'next-x-hours' })).success).to.equal(false);
+  });
+
+  it('should reject a next-x-hours range with a duration lower than one hour', () => {
+    expect(schema.safeParse(buildScene({ time_range: 'next-x-hours', duration: 0 })).success).to.equal(false);
   });
 });

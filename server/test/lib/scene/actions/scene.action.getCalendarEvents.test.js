@@ -287,4 +287,42 @@ describe('scene.action.getCalendarEvents', () => {
     );
     await chaiAssert.isRejected(promise, AbortScene);
   });
+  it('should stop the scene when the duration of the next x hours range is missing', async () => {
+    const stateManager = new StateManager(event);
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, calendar, timezone: 'Europe/Paris' },
+      [
+        [
+          {
+            type: ACTIONS.CALENDAR.GET_EVENTS,
+            calendars: ['test-calendar'],
+            time_range: 'next-x-hours',
+            duration: null,
+          },
+        ],
+      ],
+      scope,
+    );
+    await chaiAssert.isRejected(promise, AbortScene);
+  });
+  it('should stop the scene when the duration of the next x hours range is not a positive integer', async () => {
+    const stateManager = new StateManager(event);
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, calendar, timezone: 'Europe/Paris' },
+      [
+        [
+          {
+            type: ACTIONS.CALENDAR.GET_EVENTS,
+            calendars: ['test-calendar'],
+            time_range: 'next-x-hours',
+            duration: 0,
+          },
+        ],
+      ],
+      scope,
+    );
+    await chaiAssert.isRejected(promise, AbortScene);
+  });
 });

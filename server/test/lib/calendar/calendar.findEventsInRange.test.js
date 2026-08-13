@@ -28,6 +28,27 @@ describe('calendar.findEventsInRange', () => {
     expect(events[1]).to.have.property('name', 'Afternoon event');
     expect(events[0].calendar.creator).to.have.property('language', 'en');
   });
+  it('should return events starting exactly on the boundaries of the range', async () => {
+    await calendar.createEvent('test-calendar', {
+      name: 'Event starting exactly at the beginning of the range',
+      start: from,
+      end: new Date('2025-03-11T01:00:00.000Z'),
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Event starting exactly at the end of the range',
+      start: to,
+      end: new Date('2025-03-12T00:30:00.000Z'),
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Event starting just after the end of the range',
+      start: new Date('2025-03-12T00:00:00.000Z'),
+      end: new Date('2025-03-12T01:00:00.000Z'),
+    });
+    const events = await calendar.findEventsInRange(['test-calendar'], from, to);
+    expect(events).to.have.lengthOf(2);
+    expect(events[0]).to.have.property('name', 'Event starting exactly at the beginning of the range');
+    expect(events[1]).to.have.property('name', 'Event starting exactly at the end of the range');
+  });
   it('should not return events of a calendar which is not shared', async () => {
     const privateCalendar = await calendar.create({
       name: 'Private calendar',

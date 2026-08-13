@@ -8,6 +8,8 @@ import get from 'get-value';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 const isNullOrUndefined = variable => variable === null || variable === undefined;
+const isValidDuration = duration => Number.isInteger(duration) && duration >= 1;
+const DEFAULT_DURATION_IN_HOURS = 24;
 
 class CalendarGetEvents extends Component {
   getCalendars = async () => {
@@ -38,11 +40,17 @@ class CalendarGetEvents extends Component {
     this.props.updateActionProperty(this.props.path, 'calendars', calendars);
   };
   handleTimeRangeChange = e => {
-    this.props.updateActionProperty(this.props.path, 'time_range', e.target.value);
+    const timeRange = e.target.value;
+    this.props.updateActionProperty(this.props.path, 'time_range', timeRange);
+    // The duration is only used by the "next X hours" range, and it is required
+    // in that case, so a valid default is set when the user switches to it.
+    if (timeRange === 'next-x-hours' && !isValidDuration(get(this.props, 'action.duration'))) {
+      this.props.updateActionProperty(this.props.path, 'duration', DEFAULT_DURATION_IN_HOURS);
+    }
   };
   handleDurationChange = e => {
     const duration = parseInt(e.target.value, 10);
-    this.props.updateActionProperty(this.props.path, 'duration', Number.isNaN(duration) ? null : duration);
+    this.props.updateActionProperty(this.props.path, 'duration', isValidDuration(duration) ? duration : null);
   };
   handleStopSceneIfNoEvents = e => {
     this.props.updateActionProperty(this.props.path, 'stop_scene_if_no_events', e.target.value === 'stop');
@@ -76,6 +84,7 @@ class CalendarGetEvents extends Component {
   setVariables = () => {
     const EVENTS_TEXT_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendarEvents.text');
     const EVENTS_COUNT_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendarEvents.count');
+    const EVENTS_LIST_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendarEvents.events');
     this.props.setVariables(this.props.path, [
       {
         name: 'calendarEvents.text',
@@ -89,6 +98,13 @@ class CalendarGetEvents extends Component {
         type: 'calendar',
         ready: true,
         label: EVENTS_COUNT_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'calendarEvents.events',
+        type: 'calendar',
+        ready: true,
+        label: EVENTS_LIST_VARIABLE,
         data: {}
       }
     ]);

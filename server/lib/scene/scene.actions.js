@@ -578,6 +578,11 @@ const actionsFunc = {
         to = now.add(1, 'day').endOf('day');
         break;
       case 'next-x-hours':
+        // dayjs.add(undefined) returns an invalid date and dayjs.add(null) an empty
+        // range, so the duration is validated before building the range.
+        if (!Number.isInteger(action.duration) || action.duration < 1) {
+          throw new AbortScene('INVALID_DURATION');
+        }
         from = now;
         to = now.add(action.duration, 'hour');
         break;
