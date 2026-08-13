@@ -42,6 +42,11 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
     let count = existingCount;
     // eslint-disable-next-line no-restricted-syntax
     for (const event of events) {
+      // the lookup below is keyed by external_id: a missing one would match the
+      // manually created events (external_id NULL) and silently overwrite them
+      if (typeof event.external_id !== 'string' || event.external_id.length === 0) {
+        throw new BadParameters('external_id: must be a non-empty string');
+      }
       // eslint-disable-next-line no-await-in-loop
       const existing = await db.CalendarEvent.findOne({
         where: { external_id: event.external_id },
@@ -105,6 +110,11 @@ async function upsertEvents(calendarId, events, { window, prunePrefix } = {}) {
       }
     }
     if (window) {
+      // without it, startsWith(undefined) tests against the string "undefined":
+      // the prune would silently match nothing instead of failing
+      if (typeof prunePrefix !== 'string' || prunePrefix.length === 0) {
+        throw new BadParameters('prunePrefix: is required when a window is provided');
+      }
       // Overlap semantics: start < to, and end > from when end is set (the
       // exclusive-end convention: a full-day event ending exactly at `from`
       // does not overlap), else start >= from — a multi-day event straddling

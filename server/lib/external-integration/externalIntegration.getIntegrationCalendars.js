@@ -1,5 +1,5 @@
 const db = require('../../models');
-const { ForbiddenError } = require('../../utils/coreErrors');
+const { BadParameters, ForbiddenError } = require('../../utils/coreErrors');
 const { isCalendarIntegration } = require('./externalIntegration.getCalendarAccount');
 
 /**
@@ -16,6 +16,11 @@ const { isCalendarIntegration } = require('./externalIntegration.getCalendarAcco
 async function getIntegrationCalendars(service, userSelector) {
   if (!isCalendarIntegration(service.manifest)) {
     throw new ForbiddenError('CALENDAR_NOT_ALLOWED');
+  }
+  // ?user[]=a&user[]=b and ?user[x]=y reach the query parser as an array and an
+  // object: they must never be handed to Sequelize as a where value
+  if (userSelector !== undefined && (typeof userSelector !== 'string' || userSelector.length === 0)) {
+    throw new BadParameters('user: must be a non-empty string');
   }
   const include = [
     {

@@ -24,6 +24,24 @@ describe('calendar.upsertEvents', () => {
     await assert.isRejected(promise, 'Calendar not found');
   });
 
+  it('should reject an event without external_id', async () => {
+    // the upsert is keyed by external_id: a missing one would match the
+    // manually created events (external_id NULL)
+    const promise = calendar.upsertEvents(calendarA.id, [{ name: 'No key', start: '2026-08-14T09:00:00.000Z' }]);
+    await assert.isRejected(promise, 'external_id: must be a non-empty string');
+    const empty = calendar.upsertEvents(calendarA.id, [
+      { external_id: '', name: 'No key', start: '2026-08-14T09:00:00.000Z' },
+    ]);
+    await assert.isRejected(empty, 'external_id: must be a non-empty string');
+  });
+
+  it('should reject a window without prunePrefix', async () => {
+    const promise = calendar.upsertEvents(calendarA.id, [], {
+      window: { from: '2026-08-01T00:00:00.000Z', to: '2026-09-01T00:00:00.000Z' },
+    });
+    await assert.isRejected(promise, 'prunePrefix: is required when a window is provided');
+  });
+
   it('should create, then update an event idempotently', async () => {
     const first = await calendar.upsertEvents(calendarA.id, [
       {

@@ -324,16 +324,17 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   toggleUserCalendar = async (calendarSelector, key, checked) => {
-    // optimistic toggle, rolled back on failure (the preferLocal pattern)
-    const previous = this.state.calendarAccount;
-    const applyValue = value => ({
-      calendarAccount: Object.assign({}, this.state.calendarAccount, {
-        calendars: (get(this.state, 'calendarAccount.calendars') || []).map(calendar =>
+    // optimistic toggle, rolled back on failure (the preferLocal pattern).
+    // Both the patch and the rollback derive from the previous state and touch
+    // only this calendar: two toggles fired back to back never drop each other.
+    const patch = value => state => ({
+      calendarAccount: Object.assign({}, state.calendarAccount, {
+        calendars: (get(state, 'calendarAccount.calendars') || []).map(calendar =>
           calendar.selector === calendarSelector ? Object.assign({}, calendar, { [key]: value }) : calendar
         )
       })
     });
-    this.setState(Object.assign({ calendarToggleStatus: RequestStatus.Getting }, applyValue(checked)));
+    this.setState(state => Object.assign({ calendarToggleStatus: RequestStatus.Getting }, patch(checked)(state)));
     try {
       await this.props.httpClient.patch(
         `/api/v1/external_integration/${this.props.selector}/calendar/${calendarSelector}`,
@@ -342,7 +343,7 @@ class ExternalIntegrationConfigPage extends Component {
       this.setState({ calendarToggleStatus: RequestStatus.Success });
     } catch (err) {
       console.error(err);
-      this.setState(Object.assign({ calendarToggleStatus: RequestStatus.Error, calendarAccount: previous }));
+      this.setState(state => Object.assign({ calendarToggleStatus: RequestStatus.Error }, patch(!checked)(state)));
     }
   };
 

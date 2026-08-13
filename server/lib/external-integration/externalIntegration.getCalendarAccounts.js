@@ -30,7 +30,9 @@ async function getCalendarAccounts(service) {
     try {
       config = JSON.parse(variable.value);
     } catch (e) {
-      logger.warn(`Invalid stored calendar account of integration ${service.selector}`, e);
+      // the parse error is not logged: it embeds a snippet of the value, which
+      // carries the secret fields of the account schema
+      logger.warn(`Invalid stored calendar account of integration ${service.selector}`);
       config = {};
     }
     accounts.push({

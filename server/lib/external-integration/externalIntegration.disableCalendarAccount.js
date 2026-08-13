@@ -25,11 +25,12 @@ async function disableCalendarAccount(selector, userId) {
   });
   if (calendars.length > 0) {
     await db.Calendar.destroy({ where: { id: calendars.map((calendar) => calendar.id) } });
-    this.notifyCalendarUpdated(
-      userId,
-      calendars.map((calendar) => calendar.selector),
-      calendars.some((calendar) => calendar.shared),
-    );
+    // partitioned by prior visibility: a single broadcast would leak the
+    // selectors of the user's private calendars to every connected user
+    const sharedSelectors = calendars.filter((calendar) => calendar.shared).map((calendar) => calendar.selector);
+    const privateSelectors = calendars.filter((calendar) => !calendar.shared).map((calendar) => calendar.selector);
+    this.notifyCalendarUpdated(userId, sharedSelectors, true);
+    this.notifyCalendarUpdated(userId, privateSelectors, false);
   }
   await this.variable.destroy(CALENDAR_ACCOUNT_VARIABLE, service.id, userId);
   await this.notifyCalendarAccountUpdated(service, userId);
