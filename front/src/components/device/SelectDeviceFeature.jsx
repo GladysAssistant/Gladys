@@ -96,7 +96,8 @@ class SelectDeviceFeature extends Component {
       const selectedOptions = selectedOption || [];
       this.props.onDeviceFeaturesChange(
         selectedOptions.map(option => deviceFeaturesDictionnary[option.value]),
-        selectedOptions.map(option => deviceDictionnary[option.value])
+        selectedOptions.map(option => deviceDictionnary[option.value]),
+        true
       );
       return;
     }
@@ -134,12 +135,16 @@ class SelectDeviceFeature extends Component {
       await this.setState({ selectedOptions });
 
       // On first load, features are stored as selectors only: once resolved, the parent
-      // needs the full feature objects (to pick the right condition widget for example)
+      // needs the full feature objects (to pick the right condition widget for example).
+      // This resolution is display-only (isUserChange = false): a selector that cannot be
+      // resolved (deleted device, list still loading) must not be written back to the
+      // trigger, so the saved selection is never silently truncated.
       const getValues = options => options.map(option => option.value).join(',');
       if (getValues(originalSelectedOptions) !== getValues(selectedOptions)) {
         this.props.onDeviceFeaturesChange(
           selectedOptions.map(option => this.state.deviceFeaturesDictionnary[option.value]),
-          selectedOptions.map(option => this.state.deviceDictionnary[option.value])
+          selectedOptions.map(option => this.state.deviceDictionnary[option.value]),
+          false
         );
       }
       return;

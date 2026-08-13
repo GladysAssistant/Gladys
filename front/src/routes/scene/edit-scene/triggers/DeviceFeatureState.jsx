@@ -29,20 +29,27 @@ class TurnOnLight extends Component {
     return this.props.trigger.device_feature ? [this.props.trigger.device_feature] : [];
   };
 
-  onDeviceFeaturesChange = deviceFeatures => {
+  onDeviceFeaturesChange = (deviceFeatures, devices, isUserChange) => {
     const previousFeature = this.state.selectedDeviceFeature;
     // all selected features share the same category/type, the first one drives the condition widget
     const firstFeature = deviceFeatures.length > 0 ? deviceFeatures[0] : null;
     this.setState({ selectedDeviceFeature: firstFeature });
 
-    const selectors = deviceFeatures.map(feature => feature.selector);
-    const selectionChanged = selectors.join(',') !== this.getSelectedSelectors().join(',');
-    if (selectionChanged || this.props.trigger.device_feature) {
-      this.props.updateTriggerProperty(this.props.index, 'device_features', selectors);
-      // migrate away from the legacy single-feature format on first edit
-      if (this.props.trigger.device_feature) {
-        this.props.updateTriggerProperty(this.props.index, 'device_feature', undefined);
-      }
+    // Hydration only resolves the saved selectors for display: nothing is written back to
+    // the trigger, so an unresolvable feature (deleted device, list still loading) never
+    // silently truncates the saved selection or clears the saved condition value.
+    if (!isUserChange) {
+      return;
+    }
+
+    this.props.updateTriggerProperty(
+      this.props.index,
+      'device_features',
+      deviceFeatures.map(feature => feature.selector)
+    );
+    // migrate away from the legacy single-feature format when the user edits the selection
+    if (this.props.trigger.device_feature) {
+      this.props.updateTriggerProperty(this.props.index, 'device_feature', undefined);
     }
 
     // the saved value only stays meaningful while the kind of feature is unchanged
@@ -51,7 +58,7 @@ class TurnOnLight extends Component {
       !previousFeature ||
       firstFeature.category !== previousFeature.category ||
       firstFeature.type !== previousFeature.type;
-    if (selectionChanged && featureKindChanged) {
+    if (featureKindChanged) {
       this.props.updateTriggerProperty(this.props.index, 'value', null);
     }
   };

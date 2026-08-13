@@ -308,27 +308,42 @@ function createSceneCreateInputSchema(
     ]),
   );
 
+  // `device.new-state` accepts either a single `device_feature` (legacy) or a non-empty
+  // `device_features` array sharing the condition (the trigger fires when any matches).
+  // Both variants are in the union so the schema stays strict without allowing neither.
+  const deviceNewStateConditionShape = {
+    operator: comparisonOperatorSchema,
+    value: z
+      .number()
+      .describe(
+        'Numeric device state to match. For binary features (lights, switches, buttons): use 1 for ON and 0 for OFF. Never use strings like "ON" or "OFF". For sensors, use the numeric threshold (for example 2400 for CO2 ppm).',
+      ),
+    threshold_only: z
+      .boolean()
+      .optional()
+      .describe(
+        'When true, fire only on transition into the matching state (rising edge), not while the state stays matched.',
+      ),
+    for_duration: z
+      .number()
+      .optional()
+      .describe(
+        'Delay in milliseconds after the condition becomes true before the trigger fires. Example: 45 minutes = 2700000.',
+      ),
+  };
   const sceneTriggerSchema = z.union([
     triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
       device_feature: deviceFeatureSelectorSchema,
-      operator: comparisonOperatorSchema,
-      value: z
-        .number()
+      ...deviceNewStateConditionShape,
+    }),
+    triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
+      device_features: z
+        .array(deviceFeatureSelectorSchema)
+        .min(1)
         .describe(
-          'Numeric device state to match. For binary features (lights, switches, buttons): use 1 for ON and 0 for OFF. Never use strings like "ON" or "OFF". For sensors, use the numeric threshold (for example 2400 for CO2 ppm).',
+          'Several device features of the same type sharing one condition: the trigger fires as soon as any of them matches.',
         ),
-      threshold_only: z
-        .boolean()
-        .optional()
-        .describe(
-          'When true, fire only on transition into the matching state (rising edge), not while the state stays matched.',
-        ),
-      for_duration: z
-        .number()
-        .optional()
-        .describe(
-          'Delay in milliseconds after the condition becomes true before the trigger fires. Example: 45 minutes = 2700000.',
-        ),
+      ...deviceNewStateConditionShape,
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
       scheduler_type: z.literal('every-month'),

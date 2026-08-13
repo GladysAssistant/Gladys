@@ -31,8 +31,12 @@ const triggersFunc = {
     // a single one in `device_feature`. The trigger matches as soon as the event concerns
     // one of the selected features (OR logic), so the rest of the check — including the
     // `for_duration` timer key — is scoped to the event's feature, keeping one independent
-    // timer per selected feature.
-    const triggerDeviceFeatures = trigger.device_features || [trigger.device_feature];
+    // timer per selected feature. An empty array (rejected by validation but possible in
+    // hand-edited data) falls back to the legacy field instead of never matching.
+    const triggerDeviceFeatures =
+      trigger.device_features && trigger.device_features.length > 0
+        ? trigger.device_features
+        : [trigger.device_feature];
     if (!triggerDeviceFeatures.includes(event.device_feature)) {
       return false;
     }
