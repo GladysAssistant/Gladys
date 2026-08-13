@@ -3121,7 +3121,7 @@
         "useCustomValue": "Saisir une valeur personnalisée",
         "useValueList": "Choisir dans la liste des valeurs",
         "logicExplanationText": "Les conditions de ce bloc sont reliées par un OU : le bloc est validé dès qu'une seule d'entre elles est réalisée. Pour faire un ET, ajoutez plusieurs blocs « Condition sur variables » : ils devront alors tous être validés.",
-        "explanationText": "Choisissez ce que vous voulez comparer : la valeur instantanée d'un appareil (aucun bloc préalable nécessaire), ou une variable de scène définie dans un bloc précédent. Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'."
+        "explanationText": "Choisissez ce que vous voulez comparer : la valeur instantanée d'un appareil (aucun bloc préalable nécessaire), ou une variable de scène définie dans un bloc précédent. Dans le champ valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
