@@ -96,6 +96,135 @@ describe('scene.triggers.deviceNewState', () => {
       });
     });
   });
+  it('should execute scene when the event feature is one of the trigger device_features', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_features: ['motion-sensor-1', 'motion-sensor-2'],
+          value: 1,
+          operator: '=',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'motion-sensor-2',
+      last_value: 1,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should not execute scene when the event feature is not in the trigger device_features', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_features: ['motion-sensor-1', 'motion-sensor-2'],
+          value: 1,
+          operator: '=',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'motion-sensor-3',
+      last_value: 1,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should start one independent timer per feature of a multi-features trigger', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_features: ['motion-sensor-1', 'motion-sensor-2'],
+          value: 1,
+          operator: '=',
+          for_duration: 10 * 60 * 1000,
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'motion-sensor-1',
+      previous_value: 0,
+      last_value: 1,
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'motion-sensor-2',
+      previous_value: 0,
+      last_value: 1,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          expect(sceneManager.checkTriggersDurationTimer.size).to.equal(2);
+          const timerKeys = [];
+          sceneManager.checkTriggersDurationTimer.forEach((value, timeoutKey) => {
+            timerKeys.push(timeoutKey);
+            clearTimeout(value);
+          });
+          expect(timerKeys).to.have.members([
+            'device.new-state.my-scene.motion-sensor-1:=:1',
+            'device.new-state.my-scene.motion-sensor-2:=:1',
+          ]);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
   it('should not execute scene, scene not active', async () => {
     await sceneManager.addScene({
       selector: 'my-scene',

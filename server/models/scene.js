@@ -91,6 +91,7 @@ const triggersSchema = Joi.array().items(
     house: Joi.string(),
     device: Joi.string(),
     device_feature: Joi.string(),
+    device_features: Joi.array().items(Joi.string()),
     operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
     value: Joi.alternatives().try(Joi.number(), Joi.string()),
     user: Joi.string(),

@@ -20,15 +20,39 @@ import WaterValveDeviceState from './device-states/WaterValveDeviceState';
 import WaterHeaterModeDeviceState from './device-states/WaterHeaterModeDeviceState';
 
 class TurnOnLight extends Component {
-  onDeviceFeatureChange = deviceFeature => {
-    this.setState({ selectedDeviceFeature: deviceFeature });
-    if (deviceFeature) {
-      this.props.updateTriggerProperty(this.props.index, 'device_feature', deviceFeature.selector);
-      if (deviceFeature.selector !== this.props.trigger.device_feature) {
-        this.props.updateTriggerProperty(this.props.index, 'value', null);
+  // The trigger stores its features in `device_features`; triggers saved before
+  // multi-select stored a single selector in `device_feature`
+  getSelectedSelectors = () => {
+    if (this.props.trigger.device_features) {
+      return this.props.trigger.device_features;
+    }
+    return this.props.trigger.device_feature ? [this.props.trigger.device_feature] : [];
+  };
+
+  onDeviceFeaturesChange = deviceFeatures => {
+    const previousFeature = this.state.selectedDeviceFeature;
+    // all selected features share the same category/type, the first one drives the condition widget
+    const firstFeature = deviceFeatures.length > 0 ? deviceFeatures[0] : null;
+    this.setState({ selectedDeviceFeature: firstFeature });
+
+    const selectors = deviceFeatures.map(feature => feature.selector);
+    const selectionChanged = selectors.join(',') !== this.getSelectedSelectors().join(',');
+    if (selectionChanged || this.props.trigger.device_feature) {
+      this.props.updateTriggerProperty(this.props.index, 'device_features', selectors);
+      // migrate away from the legacy single-feature format on first edit
+      if (this.props.trigger.device_feature) {
+        this.props.updateTriggerProperty(this.props.index, 'device_feature', undefined);
       }
-    } else {
-      this.props.updateTriggerProperty(this.props.index, 'device_feature', null);
+    }
+
+    // the saved value only stays meaningful while the kind of feature is unchanged
+    const featureKindChanged =
+      !firstFeature ||
+      !previousFeature ||
+      firstFeature.category !== previousFeature.category ||
+      firstFeature.type !== previousFeature.type;
+    if (selectionChanged && featureKindChanged) {
+      this.props.updateTriggerProperty(this.props.index, 'value', null);
     }
   };
 
@@ -169,12 +193,18 @@ class TurnOnLight extends Component {
 
     return (
       <div>
+        <p>
+          <small>
+            <Text id="editScene.triggersCard.newState.multipleFeaturesNote" />
+          </small>
+        </p>
         <div class="row">
           <div class="col-12 col-md-5">
             <div class="form-group">
               <SelectDeviceFeature
-                value={props.trigger.device_feature}
-                onDeviceFeatureChange={this.onDeviceFeatureChange}
+                isMulti
+                value={this.getSelectedSelectors()}
+                onDeviceFeaturesChange={this.onDeviceFeaturesChange}
               />
             </div>
           </div>

@@ -27,8 +27,13 @@ const matchWeatherAlert = (self, sceneSelector, event, trigger) =>
 
 const triggersFunc = {
   [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {
-    // we check that we are talking about the same device feature
-    if (event.device_feature !== trigger.device_feature) {
+    // Multi-select triggers store their features in `device_features`, legacy triggers
+    // a single one in `device_feature`. The trigger matches as soon as the event concerns
+    // one of the selected features (OR logic), so the rest of the check — including the
+    // `for_duration` timer key — is scoped to the event's feature, keeping one independent
+    // timer per selected feature.
+    const triggerDeviceFeatures = trigger.device_features || [trigger.device_feature];
+    if (!triggerDeviceFeatures.includes(event.device_feature)) {
       return false;
     }
 
@@ -36,13 +41,13 @@ const triggersFunc = {
     const newValueValidateRule = compare(trigger.operator, event.last_value, trigger.value);
     const previousValueValidateRule = compare(trigger.operator, event.previous_value, trigger.value);
 
-    const triggerDurationKey = `device.new-state.${sceneSelector}.${trigger.device_feature}:${trigger.operator}:${trigger.value}`;
+    const triggerDurationKey = `device.new-state.${sceneSelector}.${event.device_feature}:${trigger.operator}:${trigger.value}`;
 
     // If the previous value was validating the rule, and the new value is not
     // We clear any timeout for this trigger
     if (previousValueValidateRule && !newValueValidateRule && self.checkTriggersDurationTimer.get(triggerDurationKey)) {
       logger.info(
-        `Cancelling timer on trigger for device_feature ${trigger.device_feature}, because condition is no longer valid`,
+        `Cancelling timer on trigger for device_feature ${event.device_feature}, because condition is no longer valid`,
       );
       clearTimeout(self.checkTriggersDurationTimer.get(triggerDurationKey));
       self.checkTriggersDurationTimer.delete(triggerDurationKey);
@@ -61,7 +66,7 @@ const triggersFunc = {
     // If the "for_duration_finished" is here, it means we are
     // checking the state after the timeout
     if (event.for_duration_finished && triggerDurationKey === event.trigger_duration_key) {
-      logger.info(`Scene trigger device.new-state: Timer for sensor ${trigger.device_feature} has finished.`);
+      logger.info(`Scene trigger device.new-state: Timer for sensor ${event.device_feature} has finished.`);
       clearTimeout(self.checkTriggersDurationTimer.get(triggerDurationKey));
       self.checkTriggersDurationTimer.delete(triggerDurationKey);
       return newValueValidateRule;
@@ -76,15 +81,15 @@ const triggersFunc = {
       // If the timeout already exist, don't re-create it
       const timeoutAlreadyExist = self.checkTriggersDurationTimer.get(triggerDurationKey);
       if (timeoutAlreadyExist) {
-        logger.info(`Timer for "${trigger.device_feature}" already exist, not re-creating.`);
+        logger.info(`Timer for "${event.device_feature}" already exist, not re-creating.`);
         return false;
       }
       logger.info(
-        `Scheduling timer to check for device_feature "${trigger.device_feature}" state in ${trigger.for_duration}ms`,
+        `Scheduling timer to check for device_feature "${event.device_feature}" state in ${trigger.for_duration}ms`,
       );
       // Create a timeout
       const timeoutId = setTimeout(() => {
-        const lastValue = self.stateManager.get('deviceFeature', trigger.device_feature).last_value;
+        const lastValue = self.stateManager.get('deviceFeature', event.device_feature).last_value;
         self.event.emit(EVENTS.TRIGGERS.CHECK, {
           ...cloneDeep(event),
           previous_value: event.last_value,
