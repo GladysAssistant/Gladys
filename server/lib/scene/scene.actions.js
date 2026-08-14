@@ -330,14 +330,16 @@ const actionsFunc = {
     const textWithVariables = Handlebars.compile(action.text, {
       noEscape: true,
     })(scope);
-    await self.message.sendToUser(action.user, textWithVariables);
+    // no `service` on the action = historical behaviour: broadcast to every
+    // channel the user has configured
+    await self.message.sendToUser(action.user, textWithVariables, null, { service: action.service });
   },
   [ACTIONS.MESSAGE.SEND_CAMERA]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text, {
       noEscape: true,
     })(scope);
     const image = await self.device.camera.getLiveImage(action.camera);
-    await self.message.sendToUser(action.user, textWithVariables, image);
+    await self.message.sendToUser(action.user, textWithVariables, image, { service: action.service });
   },
   [ACTIONS.AI.ASK]: async (self, action, scope, path) => {
     const textWithVariables = Handlebars.compile(action.text, {
