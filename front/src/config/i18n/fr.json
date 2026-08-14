@@ -705,7 +705,7 @@
       "noIntegrations": "Aucune intégration trouvée",
       "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
       "noSearchResults": "Aucune intégration correspondant à « {{searchKeyword}} » n'a été trouvée.",
-      "noSearchResultsSuggestion": "Essayez <a href=\"/dashboard/integration/device/matter\">Matter</a> pour les appareils compatibles Matter/Thread, ou <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> pour connecter des appareils Somfy, Shelly, Daikin et bien d'autres.",
+      "noSearchResultsSuggestion": "Essayez <a href=\"/dashboard/integration/device/matter\">Matter</a> pour les appareils compatibles Matter/Thread.",
       "refreshStore": {
         "hint": "Une intégration manque à l'appel ?",
         "button": "Rafraîchir le catalogue",
