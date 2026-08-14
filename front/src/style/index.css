@@ -462,6 +462,7 @@ body {
 body .apexcharts-tooltip {
   max-width: min(320px, 80vw);
   white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .rti--tag button:focus {
