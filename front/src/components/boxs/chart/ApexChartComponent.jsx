@@ -12,6 +12,7 @@ import { getApexChartAreaOptions } from './ApexChartAreaOptions';
 import { getApexChartLineOptions } from './ApexChartLineOptions';
 import { getApexChartStepLineOptions } from './ApexChartStepLineOptions';
 import { getApexChartTimelineOptions } from './ApexChartTimelineOptions';
+import { addTooltipPositioning } from './apexChartTooltipPositioning';
 import mergeArray from '../../../utils/mergeArray';
 
 dayjs.extend(localizedFormat);
@@ -229,6 +230,7 @@ class ApexChartComponent extends Component {
     } else {
       options = this.getAreaChartOptions();
     }
+    addTooltipPositioning(options);
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {

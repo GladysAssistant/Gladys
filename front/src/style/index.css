@@ -455,6 +455,15 @@ body {
   pointer-events: none;
 }
 
+/* Keep chart tooltips compact so they don't mask the curves: long device
+   names wrap on several lines instead of stretching the tooltip.
+   The body prefix wins over the same-specificity nowrap rule shipped by
+   ApexCharts, whose stylesheet can be injected after this one */
+body .apexcharts-tooltip {
+  max-width: min(320px, 80vw);
+  white-space: normal;
+}
+
 .rti--tag button:focus {
   outline: none !important;
 }
