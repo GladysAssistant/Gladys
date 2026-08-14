@@ -15,6 +15,8 @@ const {
   FAN_AIRFLOW_DIRECTION,
   LOCK,
   BUTTON_STATUS,
+  THERMOSTAT_MODE,
+  THERMOSTAT_OPERATING_STATE,
 } = require('../../../../utils/constants');
 
 describe('Send state to HomeKit', () => {
@@ -1570,6 +1572,72 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['TARGETHEATINGCOOLINGSTATE', 0]);
     expect(updateCharacteristic.args[1]).eql(['CURRENTHEATINGCOOLINGSTATE', 0]);
     expect(updateCharacteristic.args[2]).eql(['TARGETTEMPERATURE', 0]);
+  });
+
+  it('should notify a thermostat mode change', async () => {
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, undefined, 1) };
+    const thermostatService = {
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(thermostatService),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: THERMOSTAT_MODE.HEATING,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Mode',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['TARGETHEATINGCOOLINGSTATE', 1]);
+    expect(updateCharacteristic.args[1]).eql(['CURRENTHEATINGCOOLINGSTATE', 1]);
+    expect(updateCharacteristic.args[2]).eql(['TARGETTEMPERATURE', 1]);
+  });
+
+  it('should notify a thermostat operating state change', async () => {
+    const updateCharacteristic = stub().returns();
+    const characteristic = { emit: stub().callsArgWith(1, undefined, 0) };
+    const thermostatService = {
+      updateCharacteristic,
+      testCharacteristic: stub().returns(true),
+      getCharacteristic: stub().returns(characteristic),
+    };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns(thermostatService),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: THERMOSTAT_OPERATING_STATE.IDLE,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'État',
+      category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+      type: DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    // a read-only feature: only what the device is doing right now is refreshed
+    expect(updateCharacteristic.callCount).to.equal(1);
+    expect(updateCharacteristic.args[0]).eql(['CURRENTHEATINGCOOLINGSTATE', 0]);
   });
 
   it('should clamp temperatures pushed to a thermostat', async () => {
