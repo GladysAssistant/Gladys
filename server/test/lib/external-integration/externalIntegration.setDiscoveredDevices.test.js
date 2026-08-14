@@ -122,6 +122,32 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     await expectBadParameters([wrongUnit], 'unknown unit');
   });
 
+  it('should reject a non-positive or non-numeric step', async () => {
+    const zeroStep = buildDiscoveredDevice(service.selector);
+    zeroStep.features[0].step = 0;
+    await expectBadParameters([zeroStep], 'features[0].step: must be a positive number');
+    const stringStep = buildDiscoveredDevice(service.selector);
+    stringStep.features[0].step = '0.5';
+    await expectBadParameters([stringStep], 'features[0].step: must be a positive number');
+  });
+
+  it('should accept a valid step and hand it back untouched', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0].step = 0.5;
+    const count = await externalIntegration.setDiscoveredDevices(service, [device]);
+    expect(count).to.equal(1);
+    // the step has to survive the normalization: it is the whole point of
+    // publishing it, and the Discovery screen posts back what it reads here
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[0]).to.have.property('step', 0.5);
+  });
+
+  it('should hand back no step when the integration declares none', async () => {
+    await externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector)]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[0]).to.not.have.property('step');
+  });
+
   it('should reject an invalid poll_frequency', async () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 12345 };
     await expectBadParameters([device], 'poll_frequency');
