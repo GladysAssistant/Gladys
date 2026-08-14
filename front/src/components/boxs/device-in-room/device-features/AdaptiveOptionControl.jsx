@@ -111,6 +111,7 @@ class AdaptiveOptionControl extends Component {
                   // option as text, and numeric states keep matching their numeric options
                   active: value !== null && value !== undefined && `${value}` === `${option.value}`
                 })}
+                disabled={option.disabled}
                 onClick={() => this.props.updateValue(option.value)}
               >
                 {this.renderLabel(option)}
