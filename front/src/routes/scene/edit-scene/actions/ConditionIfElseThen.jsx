@@ -9,37 +9,37 @@ import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import { CONDITION_ACTIONS } from '../../../../../../server/utils/constants';
 
-const isNullOrUndefined = variable => variable === null || variable === undefined;
+const isNullOrUndefined = (variable) => variable === null || variable === undefined;
 
 class ConditionIfElseThen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       thenCollapsed: false,
-      elseCollapsed: true
+      elseCollapsed: true,
     };
   }
 
   toggleThenCollapse = () => {
-    this.setState(prevState => ({
-      thenCollapsed: !prevState.thenCollapsed
+    this.setState((prevState) => ({
+      thenCollapsed: !prevState.thenCollapsed,
     }));
   };
 
   toggleElseCollapse = () => {
-    this.setState(prevState => ({
-      elseCollapsed: !prevState.elseCollapsed
+    this.setState((prevState) => ({
+      elseCollapsed: !prevState.elseCollapsed,
     }));
   };
 
   getNumberOfActionsInThen = () => {
     if (!this.props.action || !this.props.action.then) return 0;
-    return this.props.action.then.map(actions => actions.length).reduce((a, b) => a + b, 0);
+    return this.props.action.then.map((actions) => actions.length).reduce((a, b) => a + b, 0);
   };
 
   getNumberOfActionsInElse = () => {
     if (!this.props.action || !this.props.action.else) return 0;
-    return this.props.action.else.map(actions => actions.length).reduce((a, b) => a + b, 0);
+    return this.props.action.else.map((actions) => actions.length).reduce((a, b) => a + b, 0);
   };
 
   initActionIfNeeded = () => {
@@ -143,7 +143,7 @@ class ConditionIfElseThen extends Component {
                     id="editScene.actionsCard.conditionIfThenElse.actionCount"
                     plural={this.getNumberOfActionsInThen()}
                     fields={{
-                      count: this.getNumberOfActionsInThen()
+                      count: this.getNumberOfActionsInThen(),
                     }}
                   />
                 </span>
@@ -192,7 +192,7 @@ class ConditionIfElseThen extends Component {
                     id="editScene.actionsCard.conditionIfThenElse.actionCount"
                     plural={this.getNumberOfActionsInElse()}
                     fields={{
-                      count: this.getNumberOfActionsInElse()
+                      count: this.getNumberOfActionsInElse(),
                     }}
                   />
                 </span>

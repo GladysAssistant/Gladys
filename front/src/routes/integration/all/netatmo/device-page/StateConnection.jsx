@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 
-const StateConnection = props => (
+const StateConnection = (props) => (
   <div>
     {!props.accessDenied &&
       ((props.connectNetatmoStatus === STATUS.DISCOVERING_DEVICES && (

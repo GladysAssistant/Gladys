@@ -23,11 +23,11 @@ class DeviceTab extends Component {
 
   getAirplayDevices = async () => {
     this.setState({
-      getAirplayStatus: RequestStatus.Getting
+      getAirplayStatus: RequestStatus.Getting,
     });
     try {
       const options = {
-        order_dir: this.state.orderDir || 'asc'
+        order_dir: this.state.orderDir || 'asc',
       };
       if (this.state.search && this.state.search.length) {
         options.search = this.state.search;
@@ -36,45 +36,45 @@ class DeviceTab extends Component {
       const airplayDevices = await this.props.httpClient.get('/api/v1/service/airplay/device', options);
       this.setState({
         airplayDevices,
-        getAirplayStatus: RequestStatus.Success
+        getAirplayStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        getAirplayStatus: e.message
+        getAirplayStatus: e.message,
       });
     }
   };
 
   async getHouses() {
     this.setState({
-      housesGetStatus: RequestStatus.Getting
+      housesGetStatus: RequestStatus.Getting,
     });
     try {
       const params = {
-        expand: 'rooms'
+        expand: 'rooms',
       };
       const housesWithRooms = await this.props.httpClient.get(`/api/v1/house`, params);
       this.setState({
         housesWithRooms,
-        housesGetStatus: RequestStatus.Success
+        housesGetStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        housesGetStatus: RequestStatus.Error
+        housesGetStatus: RequestStatus.Error,
       });
     }
   }
 
   async search(e) {
     await this.setState({
-      search: e.target.value
+      search: e.target.value,
     });
     this.getAirplayDevices();
   }
 
-  changeOrderDir = async e => {
+  changeOrderDir = async (e) => {
     await this.setState({
-      orderDir: e.target.value
+      orderDir: e.target.value,
     });
     this.getAirplayDevices();
   };
@@ -101,7 +101,7 @@ class DeviceTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: getAirplayStatus === RequestStatus.Getting
+              active: getAirplayStatus === RequestStatus.Getting,
             })}
           >
             <div class="loader" />

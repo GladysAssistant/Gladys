@@ -12,7 +12,7 @@ class SetupPanel extends Component {
     this.setState({ setupMode: null });
   };
 
-  selectSetupMode = setupMode => {
+  selectSetupMode = (setupMode) => {
     this.setState({ setupMode });
   };
 
@@ -21,7 +21,7 @@ class SetupPanel extends Component {
     this.setState({ configuration });
   };
 
-  saveConfiguration = configuration => {
+  saveConfiguration = (configuration) => {
     this.setState({ configuration });
     this.props.saveConfiguration(configuration);
   };
@@ -40,7 +40,7 @@ class SetupPanel extends Component {
     }
     this.state = {
       setupMode,
-      configuration
+      configuration,
     };
   }
 

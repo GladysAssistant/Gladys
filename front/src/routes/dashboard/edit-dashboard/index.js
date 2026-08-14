@@ -10,7 +10,7 @@ class EditDashboard extends Component {
     try {
       await this.setState({
         getDashboardsError: false,
-        loading: true
+        loading: true,
       });
       const dashboards = await this.props.httpClient.get('/api/v1/dashboard');
       let currentDashboardSelector;
@@ -23,7 +23,7 @@ class EditDashboard extends Component {
         dashboards,
         currentDashboardSelector,
         getDashboardsError: false,
-        loading: false
+        loading: false,
       });
     } catch (e) {
       console.error(e);
@@ -33,11 +33,11 @@ class EditDashboard extends Component {
       // in case we are on the gateway (Gladys Plus)
       if (status === 404 && errorMessage === 'NO_INSTANCE_FOUND') {
         this.setState({
-          gatewayInstanceNotFound: true
+          gatewayInstanceNotFound: true,
         });
       } else {
         this.setState({
-          getDashboardsError: true
+          getDashboardsError: true,
         });
       }
     }
@@ -47,15 +47,15 @@ class EditDashboard extends Component {
     try {
       await this.setState({ loading: true });
       const currentDashboard = await this.props.httpClient.get(
-        `/api/v1/dashboard/${this.state.currentDashboardSelector}`
+        `/api/v1/dashboard/${this.state.currentDashboardSelector}`,
       );
       this.setState({
         currentDashboard,
-        loading: false
+        loading: false,
       });
     } catch (e) {
       this.setState({
-        loading: false
+        loading: false,
       });
       console.error(e);
     }
@@ -87,32 +87,32 @@ class EditDashboard extends Component {
       currentDashboard: {
         boxes: {
           [originalX]: {
-            $splice: [[originalY, 1]]
-          }
-        }
-      }
+            $splice: [[originalY, 1]],
+          },
+        },
+      },
     });
     const newState = update(newStateWithoutElement, {
       currentDashboard: {
         boxes: {
           [destX]: {
-            $splice: [[destY, 0, element]]
-          }
-        }
-      }
+            $splice: [[destY, 0, element]],
+          },
+        },
+      },
     });
     await this.setState({ ...newState, boxNotEmptyError: false });
   };
 
-  addBox = x => {
+  addBox = (x) => {
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
           [x]: {
-            $push: [{}]
-          }
-        }
-      }
+            $push: [{}],
+          },
+        },
+      },
     });
     this.setState(newState);
   };
@@ -122,10 +122,10 @@ class EditDashboard extends Component {
       currentDashboard: {
         boxes: {
           [x]: {
-            $splice: [[y + 1, 0, {}]]
-          }
-        }
-      }
+            $splice: [[y + 1, 0, {}]],
+          },
+        },
+      },
     });
     this.setState(newState);
   };
@@ -135,48 +135,48 @@ class EditDashboard extends Component {
       currentDashboard: {
         boxes: {
           [x]: {
-            $splice: [[y, 1]]
-          }
-        }
-      }
+            $splice: [[y, 1]],
+          },
+        },
+      },
     });
     await this.setState({ ...newState, boxNotEmptyError: false });
   };
 
-  updateCurrentDashboardName = e => {
+  updateCurrentDashboardName = (e) => {
     const newState = update(this.state, {
       currentDashboard: {
         name: {
-          $set: e.target.value
-        }
-      }
+          $set: e.target.value,
+        },
+      },
     });
     this.setState(newState);
   };
 
-  updateCurrentDashboardVisibility = e => {
+  updateCurrentDashboardVisibility = (e) => {
     const newState = update(this.state, {
       currentDashboard: {
         visibility: {
-          $set: e.target.value
-        }
-      }
+          $set: e.target.value,
+        },
+      },
     });
     this.setState(newState);
   };
 
   updateBoxConfig = (x, y, data) => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       const newState = update(prevState, {
         currentDashboard: {
           boxes: {
             [x]: {
               [y]: {
-                $merge: data
-              }
-            }
-          }
-        }
+                $merge: data,
+              },
+            },
+          },
+        },
       });
       return { ...newState, boxNotEmptyError: false };
     });
@@ -196,10 +196,10 @@ class EditDashboard extends Component {
       currentDashboard: {
         boxes: {
           [x]: {
-            [y]: defaultBoxData
-          }
-        }
-      }
+            [y]: defaultBoxData,
+          },
+        },
+      },
     });
     this.setState(newState);
   };
@@ -207,26 +207,26 @@ class EditDashboard extends Component {
   removeEmptyBoxes = async () => {
     const { currentDashboard } = this.state;
     // new boxes without empty boxes
-    const newBoxes = currentDashboard.boxes.map(column => {
+    const newBoxes = currentDashboard.boxes.map((column) => {
       return column
-        .filter(box => {
+        .filter((box) => {
           return box.type !== undefined;
         })
-        .map(box => {
+        .map((box) => {
           // A photo box can contain rows the user started but never filled in, we don't save them
           if (box.type === 'photo' && Array.isArray(box.photos)) {
-            return { ...box, photos: box.photos.filter(photo => photo && photo.url) };
+            return { ...box, photos: box.photos.filter((photo) => photo && photo.url) };
           }
           return box;
         });
     });
     const newDashboard = update(currentDashboard, {
       boxes: {
-        $set: newBoxes
-      }
+        $set: newBoxes,
+      },
     });
     await this.setState({
-      currentDashboard: newDashboard
+      currentDashboard: newDashboard,
     });
   };
 
@@ -235,7 +235,7 @@ class EditDashboard extends Component {
       loading: true,
       dashboardValidationError: false,
       dashboardAlreadyExistError: false,
-      unknownError: false
+      unknownError: false,
     });
     try {
       // We purge all empty boxes
@@ -246,35 +246,35 @@ class EditDashboard extends Component {
 
       const currentDashboard = await this.props.httpClient.patch(
         `/api/v1/dashboard/${selector}`,
-        this.state.currentDashboard
+        this.state.currentDashboard,
       );
 
-      const currentDashboardIndex = dashboards.findIndex(d => d.selector === selector);
+      const currentDashboardIndex = dashboards.findIndex((d) => d.selector === selector);
       const updatedDashboards = update(dashboards, {
         [currentDashboardIndex]: {
-          $set: currentDashboard
-        }
+          $set: currentDashboard,
+        },
       });
 
       await this.setState({
         currentDashboard,
         loading: false,
-        dashboards: updatedDashboards
+        dashboards: updatedDashboards,
       });
       route(`/dashboard/${currentDashboard.selector}`);
     } catch (e) {
       console.error(e);
       if (e.response && e.response.status === 422) {
         this.setState({
-          dashboardValidationError: true
+          dashboardValidationError: true,
         });
       } else if (e.response && e.response.status === 409) {
         this.setState({
-          dashboardAlreadyExistError: true
+          dashboardAlreadyExistError: true,
         });
       } else {
         this.setState({
-          unknownError: true
+          unknownError: true,
         });
       }
     }
@@ -284,54 +284,54 @@ class EditDashboard extends Component {
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
-          $push: [[]]
-        }
-      }
+          $push: [[]],
+        },
+      },
     });
     this.setState({ ...newState, boxNotEmptyError: false });
   };
 
-  deleteCurrentColumn = async x => {
+  deleteCurrentColumn = async (x) => {
     const { boxes } = this.state.currentDashboard;
     if (boxes[x].length === 0) {
       const newState = update(this.state, {
         currentDashboard: {
           boxes: {
-            $splice: [[x, 1]]
-          }
-        }
+            $splice: [[x, 1]],
+          },
+        },
       });
       await this.setState({ ...newState, boxNotEmptyError: false });
     } else {
       this.setState({
         boxNotEmptyError: true,
-        columnBoxNotEmptyError: x
+        columnBoxNotEmptyError: x,
       });
     }
   };
 
   askDeleteCurrentDashboard = async () => {
     await this.setState({
-      askDeleteDashboard: true
+      askDeleteDashboard: true,
     });
   };
 
   cancelDeleteCurrentDashboard = async () => {
     await this.setState({
-      askDeleteDashboard: false
+      askDeleteDashboard: false,
     });
   };
 
   deleteCurrentDashboard = async () => {
     try {
       await this.props.httpClient.delete(`/api/v1/dashboard/${this.state.currentDashboard.selector}`);
-      const dashboardIndex = this.state.dashboards.findIndex(d => d.id === this.state.currentDashboard.id);
+      const dashboardIndex = this.state.dashboards.findIndex((d) => d.id === this.state.currentDashboard.id);
       const dashboards = update(this.state.dashboards, {
-        $splice: [[dashboardIndex, 1]]
+        $splice: [[dashboardIndex, 1]],
       });
       const currentDashboard = dashboards.length > 0 ? dashboards[0] : null;
       await this.setState({
-        askDeleteDashboard: false
+        askDeleteDashboard: false,
       });
       if (currentDashboard === null) {
         route('/dashboard');
@@ -343,24 +343,24 @@ class EditDashboard extends Component {
     }
   };
 
-  updateDashboardList = async newDashboards => {
+  updateDashboardList = async (newDashboards) => {
     await this.setState({
       savingNewDashboardList: true,
-      dashboards: newDashboards
+      dashboards: newDashboards,
     });
     try {
-      const dashboardSelectors = this.state.dashboards.map(d => d.selector);
+      const dashboardSelectors = this.state.dashboards.map((d) => d.selector);
       await this.props.httpClient.post('/api/v1/dashboard/order', dashboardSelectors);
     } catch (e) {
       console.error(e);
     }
     this.setState({
-      savingNewDashboardList: false
+      savingNewDashboardList: false,
     });
   };
 
   toggleMobileReorder = () => {
-    this.setState(prevState => ({ ...prevState, isMobileReordering: !prevState.isMobileReordering }));
+    this.setState((prevState) => ({ ...prevState, isMobileReordering: !prevState.isMobileReordering }));
   };
 
   constructor(props) {
@@ -373,7 +373,7 @@ class EditDashboard extends Component {
       askDeleteDashboard: false,
       boxNotEmptyError: false,
       columnBoxNotEmptyError: null,
-      isMobileReordering: false
+      isMobileReordering: false,
     };
   }
 
@@ -400,8 +400,8 @@ class EditDashboard extends Component {
       boxNotEmptyError,
       columnBoxNotEmptyError,
       savingNewDashboardList,
-      isMobileReordering
-    }
+      isMobileReordering,
+    },
   ) {
     return (
       <EditDashboardPage

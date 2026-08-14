@@ -6,7 +6,7 @@ import style from '../style.css';
 import TasmotaDeviceBox from '../TasmotaDeviceBox';
 import SearchForm from './SearchForm';
 
-const DeviceTab = props => (
+const DeviceTab = (props) => (
   <div class="card">
     <div class="card-header">
       <h1 class="card-title">
@@ -16,7 +16,7 @@ const DeviceTab = props => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.loading
+          active: props.loading,
         })}
       >
         <div class="loader" />

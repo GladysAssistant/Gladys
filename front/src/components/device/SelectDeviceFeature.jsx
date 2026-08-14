@@ -25,8 +25,8 @@ class SelectDeviceFeature extends Component {
       };
 
       const pushDeviceFeatures = (devices, targetFeatures) => {
-        devices.forEach(device => {
-          device.features.forEach(feature => {
+        devices.forEach((device) => {
+          device.features.forEach((feature) => {
             deviceFeaturesDictionnary[feature.selector] = feature;
             deviceDictionnary[feature.selector] = device;
 
@@ -36,20 +36,20 @@ class SelectDeviceFeature extends Component {
 
             targetFeatures.push({
               value: feature.selector,
-              label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+              label: getDeviceFeatureName(this.props.intl.dictionary, device, feature),
             });
           });
         });
       };
 
-      rooms.forEach(room => {
+      rooms.forEach((room) => {
         const roomDeviceFeatures = [];
         pushDeviceFeatures(room.devices, roomDeviceFeatures);
         if (roomDeviceFeatures.length > 0) {
           roomDeviceFeatures.sort(sortByLabel);
           deviceOptions.push({
             label: room.name,
-            options: roomDeviceFeatures
+            options: roomDeviceFeatures,
           });
         }
       });
@@ -57,7 +57,7 @@ class SelectDeviceFeature extends Component {
       let devicesWithoutRoom = [];
       try {
         const allDevices = await this.props.httpClient.get('/api/v1/device');
-        devicesWithoutRoom = allDevices.filter(device => !device.room_id);
+        devicesWithoutRoom = allDevices.filter((device) => !device.room_id);
       } catch (e) {
         console.error('Could not load devices without room', e);
       }
@@ -68,7 +68,7 @@ class SelectDeviceFeature extends Component {
         noRoomDeviceFeatures.sort(sortByLabel);
         deviceOptions.push({
           label: this.props.intl.dictionary.device.noRoom,
-          options: noRoomDeviceFeatures
+          options: noRoomDeviceFeatures,
         });
       }
 
@@ -79,25 +79,25 @@ class SelectDeviceFeature extends Component {
       console.error(e);
     }
   };
-  handleChange = selectedOption => {
+  handleChange = (selectedOption) => {
     const { deviceFeaturesDictionnary, deviceDictionnary } = this.state;
     if (selectedOption && selectedOption.value) {
       this.props.onDeviceFeatureChange(
         deviceFeaturesDictionnary[selectedOption.value],
-        deviceDictionnary[selectedOption.value]
+        deviceDictionnary[selectedOption.value],
       );
     } else {
       this.props.onDeviceFeatureChange(null);
     }
   };
-  refreshSelectedOptions = async nextProps => {
+  refreshSelectedOptions = async (nextProps) => {
     let selectedOption = '';
     const { selectedOption: originalSelected } = this.state;
     if (nextProps.value && this.state.deviceOptions) {
       let deviceOption;
       let i = 0;
       while (i < this.state.deviceOptions.length && deviceOption === undefined) {
-        deviceOption = this.state.deviceOptions[i].options.find(option => option.value === nextProps.value);
+        deviceOption = this.state.deviceOptions[i].options.find((option) => option.value === nextProps.value);
         i++;
       }
 
@@ -112,7 +112,7 @@ class SelectDeviceFeature extends Component {
       if (selectedOption) {
         this.props.onDeviceFeatureChange(
           this.state.deviceFeaturesDictionnary[selectedOption.value],
-          this.state.deviceDictionnary[selectedOption.value]
+          this.state.deviceDictionnary[selectedOption.value],
         );
       } else {
         this.props.onDeviceFeatureChange(null, null);
@@ -123,7 +123,7 @@ class SelectDeviceFeature extends Component {
     super(props);
     this.state = {
       deviceOptions: null,
-      selectedOption: ''
+      selectedOption: '',
     };
   }
 
@@ -146,7 +146,7 @@ class SelectDeviceFeature extends Component {
         value={selectedOption}
         onChange={this.handleChange}
         options={deviceOptions}
-        styles={{ menu: base => ({ ...base, zIndex: 2 }) }}
+        styles={{ menu: (base) => ({ ...base, zIndex: 2 }) }}
         className="react-select-container"
         classNamePrefix="react-select"
       />

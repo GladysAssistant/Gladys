@@ -14,9 +14,7 @@ describe('NukiService', () => {
   const nukiService = NukiService({}, serviceId);
 
   it('should have controllers', () => {
-    expect(nukiService)
-      .to.have.property('controllers')
-      .and.be.instanceOf(Object);
+    expect(nukiService).to.have.property('controllers').and.be.instanceOf(Object);
   });
 
   it('should start service', async () => {

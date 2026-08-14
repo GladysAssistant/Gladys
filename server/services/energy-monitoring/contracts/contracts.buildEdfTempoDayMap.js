@@ -20,9 +20,7 @@ const buildEdfTempoDayMap = async (gladys, startDate) => {
   const edfTempoHistoricalMap = new Map();
 
   // Generate all dates from startDate to today (in Europe/Paris timezone)
-  const today = dayjs()
-    .tz('Europe/Paris')
-    .format('YYYY-MM-DD');
+  const today = dayjs().tz('Europe/Paris').format('YYYY-MM-DD');
 
   const start = dayjs(startDate).tz('Europe/Paris');
   const end = dayjs(today).tz('Europe/Paris');

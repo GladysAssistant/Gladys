@@ -11,8 +11,8 @@ class CheckStatus extends Component {
 
   render(props, {}) {
     let messageKey;
-    let linkUrl = '';
-    let linkText = '';
+    let linkUrl;
+    let linkText;
     if (!props.z2mEnabled) {
       messageKey = 'integration.zigbee2mqtt.status.notEnabled';
       linkUrl = '/dashboard/integration/device/zigbee2mqtt/setup';
@@ -34,5 +34,5 @@ class CheckStatus extends Component {
 
 export default connect(
   'user,session,usbConfigured,z2mEnabled,zigbee2mqttStatusMqttConnected,zigbee2mqttStatusUsbConfigured,zigbee2mqttConnected',
-  actions
+  actions,
 )(CheckStatus);

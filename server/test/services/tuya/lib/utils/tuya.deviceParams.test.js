@@ -1,4 +1,3 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 const { expect } = require('chai');
 
 const {

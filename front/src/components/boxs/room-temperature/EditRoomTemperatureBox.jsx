@@ -9,7 +9,7 @@ import RoomSelector from '../../house/RoomSelector';
 import cx from 'classnames';
 import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
 
-const updateBoxRoom = (updateBoxRoomFunc, x, y) => room => {
+const updateBoxRoom = (updateBoxRoomFunc, x, y) => (room) => {
   updateBoxRoomFunc(x, y, room.selector);
 };
 
@@ -39,7 +39,7 @@ const EditRoomTemperatureBox = ({ children, unit, ...props }) => (
     <div class="form-group mb-2">
       <ReactSlider
         className={cx('temperature-slider', {
-          'opacity-60': !(props.box.temperature_use_custom_value || false)
+          'opacity-60': !(props.box.temperature_use_custom_value || false),
         })}
         thumbClassName="temperature-slider-thumb"
         trackClassName="temperature-slider-track"
@@ -49,7 +49,7 @@ const EditRoomTemperatureBox = ({ children, unit, ...props }) => (
             {...props}
             style={{
               ...props.style,
-              transform: `translate( ${state.index === 0 ? '-75%' : '-25%'}, ${state.index === 0 ? '90%' : '-90%'})`
+              transform: `translate( ${state.index === 0 ? '-75%' : '-25%'}, ${state.index === 0 ? '90%' : '-90%'})`,
             }}
           >
             <div
@@ -78,17 +78,17 @@ const EditRoomTemperatureBox = ({ children, unit, ...props }) => (
 class EditRoomTemperatureBoxComponent extends Component {
   updateBoxRoom = (x, y, room) => {
     this.props.updateBoxConfig(x, y, {
-      room
+      room,
     });
   };
 
-  updateBoxUseCustomValue = e => {
+  updateBoxUseCustomValue = (e) => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      temperature_use_custom_value: e.target.checked
+      temperature_use_custom_value: e.target.checked,
     });
   };
 
-  updateBoxValue = values => {
+  updateBoxValue = (values) => {
     let temperature_min = values[0];
     let temperature_max = values[1];
 
@@ -99,7 +99,7 @@ class EditRoomTemperatureBoxComponent extends Component {
 
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       temperature_min,
-      temperature_max
+      temperature_max,
     });
   };
 

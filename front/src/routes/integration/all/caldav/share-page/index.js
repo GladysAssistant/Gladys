@@ -26,6 +26,6 @@ class SharePage extends Component {
 export default withIntlAsProp(
   connect(
     'user,gladysUsers,caldavCalendars,caldavSaveSharingStatus,caldavGetSettingsStatus,calendarsSharing',
-    actions
-  )(SharePage)
+    actions,
+  )(SharePage),
 );

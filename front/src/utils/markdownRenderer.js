@@ -16,10 +16,10 @@ function buildRenderer(Marked, DOMPurify) {
   // own instance: the global marked options are shared with the rest of the app
   const marked = new Marked({ gfm: true, breaks: true });
 
-  return text => {
+  return (text) => {
     const template = document.createElement('template');
     template.innerHTML = DOMPurify.sanitize(marked.parse(text), { USE_PROFILES: { html: true } });
-    template.content.querySelectorAll('a[href]').forEach(link => {
+    template.content.querySelectorAll('a[href]').forEach((link) => {
       const href = link.getAttribute('href');
       const label = link.textContent;
       // an auto-linked URL keeps a short label (query params such as UTM stay
@@ -30,7 +30,7 @@ function buildRenderer(Marked, DOMPurify) {
       link.setAttribute('target', '_blank');
       link.setAttribute('rel', 'noopener noreferrer');
     });
-    template.content.querySelectorAll('table').forEach(table => {
+    template.content.querySelectorAll('table').forEach((table) => {
       table.setAttribute('class', 'table table-sm');
     });
     return template.innerHTML;
@@ -63,7 +63,7 @@ export function loadMarkdownRenderer() {
         renderer = buildRenderer(markedModule.Marked, dompurifyModule.default);
         return renderer;
       })
-      .catch(e => {
+      .catch((e) => {
         // a chunk that failed to download (offline, deploy in progress) must
         // not disable the markdown for the whole session: forget the failed
         // attempt so the next message retries

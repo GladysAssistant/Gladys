@@ -6,7 +6,7 @@ import SessionDeviceLabel from './SessionDeviceLabel';
 dayjs.extend(relativeTime);
 
 const SessionDevice = ({ children, ...props }) => {
-  let revokeSession = e => {
+  let revokeSession = (e) => {
     e.preventDefault();
     props.revokeSession(props.session.id, props.index);
   };
@@ -20,15 +20,13 @@ const SessionDevice = ({ children, ...props }) => {
         </div>
         <div class="small text-muted">
           <Text id="sessionsSettings.registered" />{' '}
-          {dayjs(props.session.created_at)
-            .locale(props.user.language)
-            .fromNow()}
+          {dayjs(props.session.created_at).locale(props.user.language).fromNow()}
         </div>
       </td>
       <td>
         <i
           style={{
-            cursor: 'pointer'
+            cursor: 'pointer',
           }}
           onClick={revokeSession}
           class="fe fe-trash-2"

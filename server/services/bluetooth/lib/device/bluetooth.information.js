@@ -31,10 +31,7 @@ const encodeParamValue = (value) => {
   let encodedValue;
 
   if (value) {
-    encodedValue = value
-      .toString('utf-8')
-      .replace('\u0000', '')
-      .trim();
+    encodedValue = value.toString('utf-8').replace('\u0000', '').trim();
   }
 
   if (encodedValue === '') {
@@ -46,7 +43,7 @@ const encodeParamValue = (value) => {
 
 const INFORMATION_SERVICES = {
   // Generic access
-  '1800': {
+  1800: {
     // Device name
     '2a00': {
       read: (device, value) => {
@@ -94,7 +91,7 @@ const INFORMATION_SERVICES = {
     },
   },
   // org.bluetooth.service.health_thermometer
-  '1809': {
+  1809: {
     // org.bluetooth.characteristic.temperature
     '2a6e': {
       discover: (serviceUuid, characteristic, device) => {

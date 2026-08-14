@@ -2,8 +2,8 @@ import { h } from 'preact';
 
 const NOT_MAIN_PAGES = ['/login'];
 
-const notMainPages = currentUrl => {
-  const found = NOT_MAIN_PAGES.find(page => {
+const notMainPages = (currentUrl) => {
+  const found = NOT_MAIN_PAGES.find((page) => {
     return currentUrl.startsWith(page);
   });
   if (found) {

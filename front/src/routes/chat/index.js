@@ -5,9 +5,9 @@ import ChatPage from './ChatPage';
 import actions from '../../actions/message';
 
 class Chat extends Component {
-  newChatMessage = payload => this.props.pushMessage(payload);
-  syncChatMessage = payload => this.props.syncMessage(payload);
-  aiThinkingStatus = payload => this.props.setGladysTypingStatus(payload);
+  newChatMessage = (payload) => this.props.pushMessage(payload);
+  syncChatMessage = (payload) => this.props.syncMessage(payload);
+  aiThinkingStatus = (payload) => this.props.setGladysTypingStatus(payload);
 
   componentDidMount() {
     this.props.getMessages();

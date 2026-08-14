@@ -14,31 +14,31 @@ class MatterDeviceBox extends Component {
     super(props);
     this.state = {
       device: this.props.device,
-      showParams: false
+      showParams: false,
     };
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      device: nextProps.device
+      device: nextProps.device,
     });
   }
 
-  updateName = e => {
+  updateName = (e) => {
     this.setState({
       device: {
         ...this.state.device,
-        name: e.target.value
-      }
+        name: e.target.value,
+      },
     });
   };
 
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.setState({
       device: {
         ...this.state.device,
-        room_id: e.target.value
-      }
+        room_id: e.target.value,
+      },
     });
   };
 
@@ -47,7 +47,7 @@ class MatterDeviceBox extends Component {
       loading: true,
       errorMessage: null,
       errorDetail: null,
-      isKnownError: true
+      isKnownError: true,
     });
     try {
       const deviceDidNotExist = this.state.device.id === undefined;
@@ -56,14 +56,14 @@ class MatterDeviceBox extends Component {
         savedDevice.alreadyExist = true;
       }
       this.setState({
-        device: savedDevice
+        device: savedDevice,
       });
     } catch (e) {
       console.error(e);
       this.setState(getMatterDeviceSaveError(e));
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
@@ -72,7 +72,7 @@ class MatterDeviceBox extends Component {
       loading: true,
       errorMessage: null,
       tooMuchStatesError: false,
-      statesNumber: undefined
+      statesNumber: undefined,
     });
     try {
       if (this.state.device.created_at) {
@@ -88,24 +88,24 @@ class MatterDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.matter.error.defaultDeletionError'
+          errorMessage: 'integration.matter.error.defaultDeletionError',
         });
       }
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
   toggleParams = () => {
     this.setState({
-      showParams: !this.state.showParams
+      showParams: !this.state.showParams,
     });
   };
 
   render(
     { deviceIndex, editable, deleteButton, housesWithRooms, nodesIsConnected },
-    { device, loading, errorMessage, errorDetail, isKnownError, tooMuchStatesError, statesNumber, showParams }
+    { device, loading, errorMessage, errorDetail, isKnownError, tooMuchStatesError, statesNumber, showParams },
   ) {
     const validModel = device.features && device.features.length > 0;
     const nodeId = device.external_id.split(':')[1];
@@ -129,7 +129,7 @@ class MatterDeviceBox extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -179,9 +179,9 @@ class MatterDeviceBox extends Component {
                         <Text id="global.emptySelectOption" />
                       </option>
                       {housesWithRooms &&
-                        housesWithRooms.map(house => (
+                        housesWithRooms.map((house) => (
                           <optgroup label={house.name}>
-                            {house.rooms.map(room => (
+                            {house.rooms.map((room) => (
                               <option selected={room.id === device.room_id} value={room.id}>
                                 {room.name}
                               </option>
@@ -227,7 +227,7 @@ class MatterDeviceBox extends Component {
                             </tr>
                           </thead>
                           <tbody>
-                            {device.params.map(param => (
+                            {device.params.map((param) => (
                               <tr key={param.name}>
                                 <td>
                                   <code>

@@ -4,15 +4,16 @@ import cx from 'classnames';
 
 import LANManagerIPLine from './LANManagerIPLine';
 
-const IPV4_CIDR_REGEX = /(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}\/(3[0-2]|[12]?[0-9])/;
+const IPV4_CIDR_REGEX =
+  /(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}\/(3[0-2]|[12]?[0-9])/;
 
 class LANManagerIPRange extends Component {
-  changeNewMaskName = e => {
+  changeNewMaskName = (e) => {
     const { value } = e.target;
     this.setState({ name: value });
   };
 
-  changeNewMask = e => {
+  changeNewMask = (e) => {
     const { value } = e.target;
     const valid = IPV4_CIDR_REGEX.test(value);
     this.setState({ mask: value, valid });
@@ -70,7 +71,7 @@ class LANManagerIPRange extends Component {
                         <input
                           type="text"
                           class={cx('form-control', 'form-control-sm', {
-                            'is-invalid': invalidMask
+                            'is-invalid': invalidMask,
                           })}
                           placeholder={<Text id="integration.lanManager.setup.maskTablePlaceholder" />}
                           disabled={disabled}

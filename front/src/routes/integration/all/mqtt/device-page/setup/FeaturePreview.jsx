@@ -14,7 +14,7 @@ import {
   getFeatureDefaultValues,
   getFeaturePreviewValue,
   getFeaturePreviewStringValue,
-  isSensorCategory
+  isSensorCategory,
 } from '../utils';
 
 const FeaturePreview = ({ category, type, label, intl, user }) => {
@@ -54,7 +54,7 @@ const FeaturePreview = ({ category, type, label, intl, user }) => {
 
   const mockDevice = {
     name: label,
-    selector: 'mqtt:preview-device'
+    selector: 'mqtt:preview-device',
   };
 
   const mockFeature = {
@@ -67,7 +67,7 @@ const FeaturePreview = ({ category, type, label, intl, user }) => {
     last_value_string: previewStringValue,
     min: defaults.min,
     max: defaults.max,
-    unit: defaults.unit
+    unit: defaults.unit,
   };
 
   return (

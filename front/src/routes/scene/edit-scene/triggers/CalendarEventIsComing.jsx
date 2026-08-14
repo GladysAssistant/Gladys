@@ -10,61 +10,61 @@ import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import style from './style.css';
 
-const isNullOrUndefined = variable => variable === null || variable === undefined;
+const isNullOrUndefined = (variable) => variable === null || variable === undefined;
 
 class CalendarEventIsComing extends Component {
   getCalendars = async () => {
     this.setState({
-      status: RequestStatus.Getting
+      status: RequestStatus.Getting,
     });
     try {
       const calendars = await this.props.httpClient.get('/api/v1/calendar', {
-        shared: true
+        shared: true,
       });
-      const calendarsOptions = calendars.map(calendar => ({
+      const calendarsOptions = calendars.map((calendar) => ({
         value: calendar.selector,
-        label: calendar.name
+        label: calendar.name,
       }));
       await this.setState({
         calendarsOptions,
-        status: RequestStatus.Success
+        status: RequestStatus.Success,
       });
       this.refreshSelectedOptions(this.props.trigger);
     } catch (e) {
       this.setState({
-        status: RequestStatus.Error
+        status: RequestStatus.Error,
       });
     }
   };
-  updateCalendars = selectedCalendarsOptions => {
-    const calendars = selectedCalendarsOptions.map(o => o.value);
+  updateCalendars = (selectedCalendarsOptions) => {
+    const calendars = selectedCalendarsOptions.map((o) => o.value);
     this.props.updateTriggerProperty(this.props.index, 'calendars', calendars);
   };
-  handleComparator = e => {
+  handleComparator = (e) => {
     if (e.target.value) {
       this.props.updateTriggerProperty(this.props.index, 'calendar_event_name_comparator', e.target.value);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'calendar_event_name_comparator', null);
     }
   };
-  handleCalendarEventAttributeChange = e => {
+  handleCalendarEventAttributeChange = (e) => {
     if (e.target.value) {
       this.props.updateTriggerProperty(this.props.index, 'calendar_event_attribute', e.target.value);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'calendar_event_attribute', 'start');
     }
   };
-  handleUnitChange = e => {
+  handleUnitChange = (e) => {
     if (e.target.value) {
       this.props.updateTriggerProperty(this.props.index, 'unit', e.target.value);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'unit', 'minute');
     }
   };
-  handleNameChange = e => {
+  handleNameChange = (e) => {
     this.props.updateTriggerProperty(this.props.index, 'calendar_event_name', e.target.value);
   };
-  handleDurationChange = e => {
+  handleDurationChange = (e) => {
     const value = e.target.value;
     if (!isNaN(parseInt(value, 10))) {
       this.props.updateTriggerProperty(this.props.index, 'duration', parseInt(value, 10));
@@ -72,11 +72,11 @@ class CalendarEventIsComing extends Component {
       this.props.updateTriggerProperty(this.props.index, 'duration', 0);
     }
   };
-  refreshSelectedOptions = trigger => {
+  refreshSelectedOptions = (trigger) => {
     const selectedCalendarsOptions = [];
     if (trigger.calendars && this.state.calendarsOptions) {
-      trigger.calendars.forEach(calendar => {
-        const calendarOption = this.state.calendarsOptions.find(calendarOption => calendarOption.value === calendar);
+      trigger.calendars.forEach((calendar) => {
+        const calendarOption = this.state.calendarsOptions.find((calendarOption) => calendarOption.value === calendar);
         if (calendarOption) {
           selectedCalendarsOptions.push(calendarOption);
         }
@@ -97,36 +97,36 @@ class CalendarEventIsComing extends Component {
         type: 'calendar',
         ready: true,
         label: EVENT_NAME_VARIABLE,
-        data: {}
+        data: {},
       },
       {
         name: 'calendarEvent.location',
         type: 'calendar',
         ready: true,
         label: EVENT_LOCATION_VARIABLE,
-        data: {}
+        data: {},
       },
       {
         name: 'calendarEvent.description',
         type: 'calendar',
         ready: true,
         label: EVENT_DESCRIPTION_VARIABLE,
-        data: {}
+        data: {},
       },
       {
         name: 'calendarEvent.start',
         type: 'calendar',
         ready: true,
         label: EVENT_START_VARIABLE,
-        data: {}
+        data: {},
       },
       {
         name: 'calendarEvent.end',
         type: 'calendar',
         ready: true,
         label: EVENT_END_VARIABLE,
-        data: {}
-      }
+        data: {},
+      },
     ]);
   };
 

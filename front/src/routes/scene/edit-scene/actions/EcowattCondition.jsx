@@ -3,10 +3,10 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import get from 'get-value';
 
-const isNullOrUndefined = variable => variable === null || variable === undefined;
+const isNullOrUndefined = (variable) => variable === null || variable === undefined;
 
 class EcowattCondition extends Component {
-  handleNetworkStatusChange = e => {
+  handleNetworkStatusChange = (e) => {
     this.props.updateActionProperty(this.props.path, 'ecowatt_network_status', e.target.value);
   };
 

@@ -6,7 +6,7 @@ import DiscoveredBox from './DiscoveredBox';
 import CheckMqttPanel from '../commons/CheckMqttPanel';
 import style from './style.css';
 
-const DiscoverTab = props => (
+const DiscoverTab = (props) => (
   <div class="card">
     <div class="card-header">
       <h1 class="card-title">
@@ -53,14 +53,14 @@ const DiscoverTab = props => (
 
       <div
         class={cx('dimmer', {
-          active: props.mqttDiscoveryLoading
+          active: props.mqttDiscoveryLoading,
         })}
       >
         <div class="loader" />
         <div class={cx('dimmer-content', style.mqttDiscoveryListBody)}>
           <div class="row">
             {props.mqttDiscoveredDevices &&
-              props.mqttDiscoveredDevices.map(device => (
+              props.mqttDiscoveredDevices.map((device) => (
                 <DiscoveredBox key={device.external_id} {...props} device={device} />
               ))}
             {(!props.mqttDiscoveredDevices || props.mqttDiscoveredDevices.length === 0) && <EmptyState />}

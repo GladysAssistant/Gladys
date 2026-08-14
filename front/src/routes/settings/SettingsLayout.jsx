@@ -30,7 +30,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     href="/dashboard/settings/user"
                     activeClassName="active"
                     class={cx('list-group-item list-group-item-action d-flex align-items-center', {
-                      active: props.currentUrl && props.currentUrl.startsWith('/dashboard/settings/user')
+                      active: props.currentUrl && props.currentUrl.startsWith('/dashboard/settings/user'),
                     })}
                   >
                     <span class="icon mr-3">

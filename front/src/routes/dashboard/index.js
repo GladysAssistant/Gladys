@@ -10,13 +10,13 @@ import get from 'get-value';
 
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       return { ...prevState, dashboardDropdownOpened: !this.state.dashboardDropdownOpened };
     });
   };
 
   toggleDefineTabletMode = () => {
-    this.setState(prevState => {
+    this.setState((prevState) => {
       return { ...prevState, defineTabletModeOpened: !this.state.defineTabletModeOpened };
     });
   };
@@ -24,7 +24,7 @@ class Dashboard extends Component {
   closeDashboardDropdown = () => {
     if (this.state.dashboardDropdownOpened) {
       this.setState({
-        dashboardDropdownOpened: false
+        dashboardDropdownOpened: false,
       });
     }
   };
@@ -33,7 +33,7 @@ class Dashboard extends Component {
     try {
       await this.setState({
         getDashboardsError: false,
-        loading: true
+        loading: true,
       });
       const dashboards = await this.props.httpClient.get('/api/v1/dashboard');
       let currentDashboardSelector;
@@ -46,7 +46,7 @@ class Dashboard extends Component {
         dashboards,
         currentDashboardSelector,
         getDashboardsError: false,
-        loading: false
+        loading: false,
       });
     } catch (e) {
       console.error(e);
@@ -56,11 +56,11 @@ class Dashboard extends Component {
       // in case we are on the gateway (Gladys Plus)
       if (status === 404 && errorMessage === 'NO_INSTANCE_FOUND') {
         this.setState({
-          gatewayInstanceNotFound: true
+          gatewayInstanceNotFound: true,
         });
       } else {
         this.setState({
-          getDashboardsError: true
+          getDashboardsError: true,
         });
       }
     }
@@ -70,11 +70,11 @@ class Dashboard extends Component {
     try {
       const jobs = await this.props.httpClient.get(`/api/v1/job`, {
         type: JOB_TYPES.MIGRATE_SQLITE_TO_DUCKDB,
-        take: 1
+        take: 1,
       });
       if (jobs.length > 0) {
         this.setState({
-          duckDbMigrationJob: jobs[0]
+          duckDbMigrationJob: jobs[0],
         });
       }
     } catch (e) {
@@ -82,7 +82,7 @@ class Dashboard extends Component {
     }
   };
 
-  jobUpdated = payload => {
+  jobUpdated = (payload) => {
     const { duckDbMigrationJob } = this.state;
     if (payload.id === duckDbMigrationJob.id) {
       this.setState({ duckDbMigrationJob: payload });
@@ -93,15 +93,15 @@ class Dashboard extends Component {
     try {
       await this.setState({ loading: true });
       const currentDashboard = await this.props.httpClient.get(
-        `/api/v1/dashboard/${this.state.currentDashboardSelector}`
+        `/api/v1/dashboard/${this.state.currentDashboardSelector}`,
       );
       this.setState({
         currentDashboard,
-        loading: false
+        loading: false,
       });
     } catch (e) {
       this.setState({
-        loading: false
+        loading: false,
       });
       console.error(e);
     }
@@ -127,7 +127,7 @@ class Dashboard extends Component {
 
   redirectToDashboard = () => {
     this.setState({
-      dashboardDropdownOpened: false
+      dashboardDropdownOpened: false,
     });
   };
 
@@ -136,12 +136,10 @@ class Dashboard extends Component {
   };
 
   isBrowserFullScreenCompatible = () => {
-    // eslint-disable-next-line compat/compat
     return document.fullscreenEnabled || document.webkitFullscreenEnabled;
   };
 
   isFullScreen = () => {
-    // eslint-disable-next-line compat/compat
     return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
   };
 
@@ -216,7 +214,7 @@ class Dashboard extends Component {
       browserFullScreenCompatible: this.isBrowserFullScreenCompatible(),
       dashboards: [],
       newSelectedBoxType: {},
-      askDeleteDashboard: false
+      askDeleteDashboard: false,
     };
   }
 
@@ -229,7 +227,7 @@ class Dashboard extends Component {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.alarmArmedOrPartiallyArmed);
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.ALARM.PARTIALLY_ARMED,
-      this.alarmArmedOrPartiallyArmed
+      this.alarmArmedOrPartiallyArmed,
     );
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
@@ -250,7 +248,7 @@ class Dashboard extends Component {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.alarmArmedOrPartiallyArmed);
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.ALARM.PARTIALLY_ARMED,
-      this.alarmArmedOrPartiallyArmed
+      this.alarmArmedOrPartiallyArmed,
     );
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
@@ -268,8 +266,8 @@ class Dashboard extends Component {
       gatewayInstanceNotFound,
       loading,
       browserFullScreenCompatible,
-      duckDbMigrationJob
-    }
+      duckDbMigrationJob,
+    },
   ) {
     const dashboardConfigured =
       currentDashboard &&
@@ -311,5 +309,5 @@ class Dashboard extends Component {
 
 export default connect(
   'user,session,fullScreen,currentUrl,httpClient,gatewayAccountExpired,tabletMode',
-  actions
+  actions,
 )(Dashboard);

@@ -15,38 +15,38 @@ function createActions(store) {
         errors.passwordRepeat = true;
       }
       store.setState({
-        resetPasswordErrors: errors
+        resetPasswordErrors: errors,
       });
       if (Object.keys(errors).length) {
         return null;
       }
       store.setState({
-        resetPasswordStatus: RequestStatus.Getting
+        resetPasswordStatus: RequestStatus.Getting,
       });
       try {
         await state.httpClient.post('/api/v1/reset_password', {
-          password: state.resetPasswordPassword
+          password: state.resetPasswordPassword,
         });
         store.setState({
-          resetPasswordStatus: RequestStatus.Success
+          resetPasswordStatus: RequestStatus.Success,
         });
       } catch (e) {
         const status = get(e, 'response.status');
         if (!status) {
           store.setState({
-            resetPasswordStatus: RequestStatus.NetworkError
+            resetPasswordStatus: RequestStatus.NetworkError,
           });
         } else if (status === 400) {
           store.setState({
-            resetPasswordStatus: ResetPasswordStatus.ResetTokenNotFound
+            resetPasswordStatus: ResetPasswordStatus.ResetTokenNotFound,
           });
         } else if (status === 429) {
           store.setState({
-            resetPasswordStatus: RequestStatus.RateLimitError
+            resetPasswordStatus: RequestStatus.RateLimitError,
           });
         } else {
           store.setState({
-            resetPasswordStatus: RequestStatus.Error
+            resetPasswordStatus: RequestStatus.Error,
           });
         }
       }
@@ -56,14 +56,14 @@ function createActions(store) {
     },
     updatePassword(state, e) {
       store.setState({
-        resetPasswordPassword: e.target.value
+        resetPasswordPassword: e.target.value,
       });
     },
     updatePasswordRepeat(state, e) {
       store.setState({
-        resetPasswordPasswordRepeat: e.target.value
+        resetPasswordPasswordRepeat: e.target.value,
       });
-    }
+    },
   };
 
   return actions;

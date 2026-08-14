@@ -7,15 +7,15 @@ class SetupForm extends Component {
   showPasswordTimer = null;
   copyTimer = null;
 
-  updateUrl = e => {
+  updateUrl = (e) => {
     this.props.updateConfiguration({ mqttUrl: e.target.value });
   };
 
-  updateUsername = e => {
+  updateUsername = (e) => {
     this.props.updateConfiguration({ mqttUsername: e.target.value });
   };
 
-  updatePassword = e => {
+  updatePassword = (e) => {
     this.props.updateConfiguration({ mqttPassword: e.target.value, passwordChanges: true });
   };
 
@@ -77,7 +77,7 @@ class SetupForm extends Component {
     );
   };
 
-  renderCopiedFeedback = fieldId => {
+  renderCopiedFeedback = (fieldId) => {
     const canCopy = typeof window !== 'undefined' && window.isSecureContext;
 
     if (!canCopy || this.state.copiedField !== fieldId) {
@@ -161,7 +161,7 @@ class SetupForm extends Component {
                 <i
                   class={cx('fe', {
                     'fe-eye': !showPassword,
-                    'fe-eye-off': showPassword
+                    'fe-eye-off': showPassword,
                   })}
                 />
               </span>

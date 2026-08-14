@@ -72,9 +72,7 @@ async function calculateConsumptionFromIndex(thirtyMinutesWindowTime, jobId) {
       const { device, indexFeature, consumptionFeature } = deviceInfo;
 
       // Calculate the 30-minute window boundaries
-      const windowStart = dayjs(thirtyMinutesWindowTime)
-        .subtract(30, 'minutes')
-        .toDate();
+      const windowStart = dayjs(thirtyMinutesWindowTime).subtract(30, 'minutes').toDate();
       const windowEnd = dayjs(thirtyMinutesWindowTime).toDate();
 
       logger.debug(`Processing device ${device.name} for window ${windowStart} to ${windowEnd}`);

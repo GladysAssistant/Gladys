@@ -7,15 +7,15 @@ import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures
 import { isDeviceFieldErrored } from './utils';
 
 class MqttDeviceForm extends Component {
-  updateName = e => {
+  updateName = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
 
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  updateExternalId = e => {
+  updateExternalId = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'external_id', e.target.value);
   };
 
@@ -77,9 +77,9 @@ class MqttDeviceForm extends Component {
               <Text id="global.emptySelectOption" />
             </option>
             {props.houses &&
-              props.houses.map(house => (
+              props.houses.map((house) => (
                 <optgroup label={house.name}>
-                  {house.rooms.map(room => (
+                  {house.rooms.map((room) => (
                     <option selected={room.id === props.device.room_id} value={room.id}>
                       {room.name}
                     </option>
@@ -105,9 +105,7 @@ class MqttDeviceForm extends Component {
                 <Text
                   id="integration.mqtt.device.mostRecentValueAt"
                   fields={{
-                    mostRecentValueAt: dayjs(props.mostRecentValueAt)
-                      .locale(props.user.language)
-                      .fromNow()
+                    mostRecentValueAt: dayjs(props.mostRecentValueAt).locale(props.user.language).fromNow(),
                   }}
                 />
               ) : (

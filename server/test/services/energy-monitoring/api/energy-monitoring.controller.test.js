@@ -17,7 +17,7 @@ describe('EnergyMonitoringController', () => {
       calculateConsumptionFromIndexFromBeginning: fake.resolves(null),
       getContracts: fake.resolves({
         'edf-base': {
-          '3': [
+          3: [
             {
               contract: 'base',
               price_type: 'consumption',
@@ -29,7 +29,7 @@ describe('EnergyMonitoringController', () => {
               day_type: null,
             },
           ],
-          '6': [
+          6: [
             {
               contract: 'base',
               price_type: 'consumption',
@@ -43,7 +43,7 @@ describe('EnergyMonitoringController', () => {
           ],
         },
         'edf-tempo': {
-          '6': [
+          6: [
             {
               contract: 'edf_tempo',
               price_type: 'consumption',
@@ -124,7 +124,7 @@ describe('EnergyMonitoringController', () => {
     it('should get contracts successfully', async () => {
       const expectedContracts = {
         'edf-base': {
-          '3': [
+          3: [
             {
               contract: 'base',
               price_type: 'consumption',
@@ -215,7 +215,7 @@ describe('EnergyMonitoringController', () => {
     it('should pass through handler responses correctly', async () => {
       const mockContracts = {
         'test-contract': {
-          '9': [
+          9: [
             {
               contract: 'test',
               price_type: 'consumption',
@@ -237,7 +237,7 @@ describe('EnergyMonitoringController', () => {
     it('should not modify handler responses', async () => {
       const originalContracts = {
         'edf-base': {
-          '6': [{ price: 1500, contract: 'base' }],
+          6: [{ price: 1500, contract: 'base' }],
         },
       };
 

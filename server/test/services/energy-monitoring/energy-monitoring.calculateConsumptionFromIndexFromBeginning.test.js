@@ -263,15 +263,11 @@ describe('EnergyMonitoring.calculateConsumptionFromIndexFromBeginning', () => {
         { value: 1000, created_at: device1OldestTime },
         {
           value: 1200,
-          created_at: dayjs(device1OldestTime)
-            .add(5, 'minutes')
-            .toDate(),
+          created_at: dayjs(device1OldestTime).add(5, 'minutes').toDate(),
         },
         {
           value: 1500,
-          created_at: dayjs(device1OldestTime)
-            .add(45, 'minutes')
-            .toDate(),
+          created_at: dayjs(device1OldestTime).add(45, 'minutes').toDate(),
         },
       ]);
 

@@ -3,7 +3,7 @@ import get from 'get-value';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS
+  DEVICE_FEATURE_UNITS,
 } from '../../../../../../server/utils/constants';
 
 const DEFAULT_MIN = 0;
@@ -13,7 +13,7 @@ const buildDailyConsumptionFeature = (usagePointId, intlDictionary, existingFeat
   if (existingFeature) {
     return {
       ...existingFeature,
-      energy_parent_id: null
+      energy_parent_id: null,
     };
   }
 
@@ -30,7 +30,7 @@ const buildDailyConsumptionFeature = (usagePointId, intlDictionary, existingFeat
     read_only: true,
     has_feedback: false,
     keep_history: true,
-    energy_parent_id: null
+    energy_parent_id: null,
   };
 };
 
@@ -47,7 +47,7 @@ const buildConsumptionLoadCurveFeature = (usagePointId, intlDictionary, dailyFea
   read_only: true,
   has_feedback: false,
   keep_history: true,
-  energy_parent_id: dailyFeatureId
+  energy_parent_id: dailyFeatureId,
 });
 
 const buildConsumptionLoadCurveCostFeature = (usagePointId, intlDictionary, consumptionFeatureId, existingFeature) => ({
@@ -63,38 +63,38 @@ const buildConsumptionLoadCurveCostFeature = (usagePointId, intlDictionary, cons
   read_only: true,
   has_feedback: false,
   keep_history: true,
-  energy_parent_id: consumptionFeatureId
+  energy_parent_id: consumptionFeatureId,
 });
 
 export const buildUsagePointDevicePayload = ({ usagePointId, serviceId, intlDictionary, existingDevice }) => {
   const existingFeatures = (existingDevice && existingDevice.features) || [];
 
   const oldDailyConsumptionFeature = existingFeatures.find(
-    feature => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION
+    (feature) => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
   );
   const oldConsumptionLoadCurveFeature = existingFeatures.find(
-    feature => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION
+    (feature) => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
   );
   const oldConsumptionLoadCurveCostFeature = existingFeatures.find(
-    feature => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST
+    (feature) => feature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION_COST,
   );
 
   const dailyConsumptionFeature = buildDailyConsumptionFeature(
     usagePointId,
     intlDictionary,
-    oldDailyConsumptionFeature
+    oldDailyConsumptionFeature,
   );
   const consumptionLoadCurveFeature = buildConsumptionLoadCurveFeature(
     usagePointId,
     intlDictionary,
     dailyConsumptionFeature.id,
-    oldConsumptionLoadCurveFeature
+    oldConsumptionLoadCurveFeature,
   );
   const consumptionLoadCurveCostFeature = buildConsumptionLoadCurveCostFeature(
     usagePointId,
     intlDictionary,
     consumptionLoadCurveFeature.id,
-    oldConsumptionLoadCurveCostFeature
+    oldConsumptionLoadCurveCostFeature,
   );
 
   return {
@@ -102,6 +102,6 @@ export const buildUsagePointDevicePayload = ({ usagePointId, serviceId, intlDict
     selector: `enedis-${usagePointId}`,
     external_id: `enedis:${usagePointId}`,
     service_id: serviceId,
-    features: [dailyConsumptionFeature, consumptionLoadCurveFeature, consumptionLoadCurveCostFeature]
+    features: [dailyConsumptionFeature, consumptionLoadCurveFeature, consumptionLoadCurveCostFeature],
   };
 };

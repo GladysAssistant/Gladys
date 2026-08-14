@@ -97,10 +97,7 @@ function readCpuTemperature() {
             const labelFile = file.replace('_input', '_label');
             let label = '';
             try {
-              label = fs
-                .readFileSync(path.join(hwmonPath, labelFile), 'utf8')
-                .trim()
-                .toLowerCase();
+              label = fs.readFileSync(path.join(hwmonPath, labelFile), 'utf8').trim().toLowerCase();
             } catch (e) {
               // no label
             }

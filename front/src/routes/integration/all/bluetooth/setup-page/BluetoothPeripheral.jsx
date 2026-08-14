@@ -14,7 +14,7 @@ class BluetoothPeripheral extends Component {
 
   render({ peripheral, currentIntegration }) {
     const params = peripheral.params || [];
-    const manufacturerParam = params.find(p => p.name === PARAMS.MANUFACTURER);
+    const manufacturerParam = params.find((p) => p.name === PARAMS.MANUFACTURER);
     const manufacturerValue = (manufacturerParam || { value: null }).value;
     const peripheralService = get(peripheral, 'service_id');
     const bluetoothDevice = !peripheralService || peripheralService === currentIntegration.id;

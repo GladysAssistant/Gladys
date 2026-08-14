@@ -3,7 +3,7 @@ import style from './style.css';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
 const countLightBinaryFeature = (features, featureSelectors) => {
-  return features.filter(feature => isLightBinaryFeature(feature, featureSelectors)).length;
+  return features.filter((feature) => isLightBinaryFeature(feature, featureSelectors)).length;
 };
 
 const isLightBinaryFeature = (feature, featureSelectors) => {

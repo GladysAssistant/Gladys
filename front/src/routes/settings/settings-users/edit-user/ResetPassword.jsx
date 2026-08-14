@@ -7,20 +7,20 @@ import cx from 'classnames';
 const MIN_PASSWORD_LENGTH = 8;
 
 class ResetPassword extends Component {
-  updatePassword = e => {
+  updatePassword = (e) => {
     this.setState({
-      password: e.target.value
+      password: e.target.value,
     });
   };
-  updatePasswordRepeat = e => {
+  updatePasswordRepeat = (e) => {
     this.setState({
-      passwordRepeat: e.target.value
+      passwordRepeat: e.target.value,
     });
   };
   validatePassword = (password, passwordRepeat) => {
     const errors = {
       password: password.length < MIN_PASSWORD_LENGTH,
-      passwordRepeat: password !== passwordRepeat
+      passwordRepeat: password !== passwordRepeat,
     };
     const valid = errors.password === false && errors.passwordRepeat === false;
     return { valid, errors };
@@ -36,18 +36,18 @@ class ResetPassword extends Component {
     await this.setState({ loading: true });
     try {
       await this.props.httpClient.patch(`/api/v1/user/${this.props.userSelector}`, {
-        password
+        password,
       });
       this.setState({
         loading: false,
         password: '',
-        passwordRepeat: ''
+        passwordRepeat: '',
       });
     } catch (e) {
       console.error(e);
       this.setState({
         loading: false,
-        valid: false
+        valid: false,
       });
     }
   };
@@ -55,7 +55,7 @@ class ResetPassword extends Component {
     super();
     this.state = {
       password: '',
-      passwordRepeat: ''
+      passwordRepeat: '',
     };
   }
   render(props, { loading, password, passwordRepeat, errors }) {
@@ -72,7 +72,7 @@ class ResetPassword extends Component {
                 type="password"
                 class={cx('form-control', {
                   'is-invalid': get(errors, 'password'),
-                  'is-valid': password && errors && !get(errors, 'password') === false
+                  'is-valid': password && errors && !get(errors, 'password') === false,
                 })}
                 value={password}
                 onInput={this.updatePassword}
@@ -93,7 +93,7 @@ class ResetPassword extends Component {
                 type="password"
                 class={cx('form-control', {
                   'is-invalid': get(errors, 'passwordRepeat'),
-                  'is-valid': passwordRepeat && errors && get(errors, 'passwordRepeat') === false
+                  'is-valid': passwordRepeat && errors && get(errors, 'passwordRepeat') === false,
                 })}
                 value={passwordRepeat}
                 onInput={this.updatePasswordRepeat}

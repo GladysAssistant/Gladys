@@ -28,7 +28,7 @@ const DeviceTab = ({ children, ...props }) => (
       </div>
       <div
         class={cx('dimmer', {
-          active: props.loading
+          active: props.loading,
         })}
       >
         <div class="loader" />

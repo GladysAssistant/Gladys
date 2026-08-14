@@ -41,7 +41,7 @@ function getYearsMonthsAndDays(selectedYear, selectedMonth) {
   return {
     days,
     months,
-    years
+    years,
   };
 }
 

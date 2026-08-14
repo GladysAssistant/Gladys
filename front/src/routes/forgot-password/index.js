@@ -7,7 +7,7 @@ import { ForgotPasswordStatus, RequestStatus } from '../../utils/consts';
 import ForgotPasswordPage from './ForgotPasswordPage';
 
 class ForgotPassword extends Component {
-  forgotPassword = async e => {
+  forgotPassword = async (e) => {
     const { forgotPasswordEmail } = this.state;
     if (e) {
       e.preventDefault();
@@ -15,48 +15,48 @@ class ForgotPassword extends Component {
 
     if (!validateEmail(forgotPasswordEmail)) {
       return this.setState({
-        forgotPasswordStatus: ForgotPasswordStatus.WrongEmailError
+        forgotPasswordStatus: ForgotPasswordStatus.WrongEmailError,
       });
     }
 
     this.setState({
-      forgotPasswordStatus: RequestStatus.Getting
+      forgotPasswordStatus: RequestStatus.Getting,
     });
 
     try {
       await this.props.httpClient.post('/api/v1/forgot_password', {
         email: forgotPasswordEmail,
-        origin: window.location.origin
+        origin: window.location.origin,
       });
 
       this.setState({
-        forgotPasswordStatus: RequestStatus.Success
+        forgotPasswordStatus: RequestStatus.Success,
       });
     } catch (e) {
       const status = get(e, 'response.status');
       if (!status) {
         this.setState({
-          forgotPasswordStatus: RequestStatus.NetworkError
+          forgotPasswordStatus: RequestStatus.NetworkError,
         });
       } else if (status === 404) {
         this.setState({
-          forgotPasswordStatus: ForgotPasswordStatus.UserNotFound
+          forgotPasswordStatus: ForgotPasswordStatus.UserNotFound,
         });
       } else if (status === 429) {
         this.setState({
-          forgotPasswordStatus: RequestStatus.RateLimitError
+          forgotPasswordStatus: RequestStatus.RateLimitError,
         });
       } else {
         this.setState({
-          forgotPasswordStatus: RequestStatus.Error
+          forgotPasswordStatus: RequestStatus.Error,
         });
       }
     }
   };
 
-  updateEmail = e => {
+  updateEmail = (e) => {
     this.setState({
-      forgotPasswordEmail: e.target.value
+      forgotPasswordEmail: e.target.value,
     });
   };
 

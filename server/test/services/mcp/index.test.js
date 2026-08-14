@@ -41,15 +41,11 @@ describe('MCPService', () => {
 
   it('should start service', async () => {
     await mcpService.start();
-    expect(mcpService)
-      .to.have.property('start')
-      .and.be.instanceOf(Function);
+    expect(mcpService).to.have.property('start').and.be.instanceOf(Function);
   });
 
   it('should stop service', async () => {
     await mcpService.stop();
-    expect(mcpService)
-      .to.have.property('stop')
-      .and.be.instanceOf(Function);
+    expect(mcpService).to.have.property('stop').and.be.instanceOf(Function);
   });
 });

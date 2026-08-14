@@ -28,7 +28,6 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
-  // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const MatterHandler = require('../../../../services/matter/lib');

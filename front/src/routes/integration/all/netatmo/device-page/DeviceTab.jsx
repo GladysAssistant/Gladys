@@ -24,11 +24,11 @@ class DeviceTab extends Component {
 
   getNetatmoDevices = async () => {
     this.setState({
-      getNetatmoStatus: RequestStatus.Getting
+      getNetatmoStatus: RequestStatus.Getting,
     });
     try {
       const options = {
-        order_dir: this.state.orderDir || 'asc'
+        order_dir: this.state.orderDir || 'asc',
       };
       if (this.state.search && this.state.search.length) {
         options.search = this.state.search;
@@ -37,44 +37,44 @@ class DeviceTab extends Component {
       const netatmoDevices = await this.props.httpClient.get('/api/v1/service/netatmo/device', options);
       this.setState({
         netatmoDevices,
-        getNetatmoStatus: RequestStatus.Success
+        getNetatmoStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        getNetatmoStatus: e.message
+        getNetatmoStatus: e.message,
       });
     }
   };
 
   async getHouses() {
     this.setState({
-      housesGetStatus: RequestStatus.Getting
+      housesGetStatus: RequestStatus.Getting,
     });
     try {
       const params = {
-        expand: 'rooms'
+        expand: 'rooms',
       };
       const housesWithRooms = await this.props.httpClient.get(`/api/v1/house`, params);
       this.setState({
         housesWithRooms,
-        housesGetStatus: RequestStatus.Success
+        housesGetStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        housesGetStatus: RequestStatus.Error
+        housesGetStatus: RequestStatus.Error,
       });
     }
   }
 
   async search(e) {
     await this.setState({
-      search: e.target.value
+      search: e.target.value,
     });
     this.getNetatmoDevices();
   }
   changeOrderDir(e) {
     this.setState({
-      orderDir: e.target.value
+      orderDir: e.target.value,
     });
     this.getNetatmoDevices();
   }
@@ -101,7 +101,7 @@ class DeviceTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: getNetatmoStatus === RequestStatus.Getting
+              active: getNetatmoStatus === RequestStatus.Getting,
             })}
           >
             <div class="loader" />

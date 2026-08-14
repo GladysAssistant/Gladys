@@ -10,7 +10,7 @@ import {
   OAUTH_REDIRECT_URI,
   getAuthorizeUrlState,
   getOAuthCallbackPath,
-  wrapAuthorizeUrl
+  wrapAuthorizeUrl,
 } from '../../../../../utils/oauth';
 import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
@@ -29,7 +29,7 @@ class ExternalIntegrationConfigPage extends Component {
     try {
       const [integration, configResponse] = await Promise.all([
         this.props.httpClient.get(`/api/v1/external_integration/${selector}`),
-        isAdmin ? this.props.httpClient.get(`/api/v1/external_integration/${selector}/config`) : Promise.resolve({})
+        isAdmin ? this.props.httpClient.get(`/api/v1/external_integration/${selector}/config`) : Promise.resolve({}),
       ]);
       if (selector !== this.props.selector) {
         // a newer request has started since, discard this stale result
@@ -42,7 +42,7 @@ class ExternalIntegrationConfigPage extends Component {
         configuredSecrets: configResponse.configured_secrets || [],
         touchedSecrets: {},
         grantedDevices: integration.granted_devices || [],
-        loadStatus: RequestStatus.Success
+        loadStatus: RequestStatus.Success,
       });
       if (get(integration, 'manifest.type') === 'communication') {
         // chat channels (receive true, the default) link by code;
@@ -70,7 +70,7 @@ class ExternalIntegrationConfigPage extends Component {
         integration: null,
         configValues: {},
         configuredSecrets: [],
-        touchedSecrets: {}
+        touchedSecrets: {},
       });
     }
   };
@@ -78,7 +78,7 @@ class ExternalIntegrationConfigPage extends Component {
   buildConfigValues = (integration, configResponse) => {
     const schema = get(integration, 'manifest.config_schema') || [];
     const configValues = Object.assign({}, configResponse.config);
-    schema.forEach(field => {
+    schema.forEach((field) => {
       const currentValue = configValues[field.key];
       if ((currentValue === undefined || currentValue === null) && field.type !== 'secret') {
         if (field.default !== undefined) {
@@ -98,7 +98,7 @@ class ExternalIntegrationConfigPage extends Component {
     this.setState(newState);
   };
 
-  saveConfig = async e => {
+  saveConfig = async (e) => {
     if (e) {
       e.preventDefault();
     }
@@ -106,7 +106,7 @@ class ExternalIntegrationConfigPage extends Component {
     const { integration, configValues = {}, touchedSecrets = {} } = this.state;
     const schema = get(integration, 'manifest.config_schema') || [];
     const config = {};
-    schema.forEach(field => {
+    schema.forEach((field) => {
       const value = configValues[field.key];
       if (field.type === 'secret') {
         // A secret set to null means "unchanged" on the server side
@@ -127,14 +127,14 @@ class ExternalIntegrationConfigPage extends Component {
     try {
       const configResponse = await this.props.httpClient.post(
         `/api/v1/external_integration/${this.props.selector}/config`,
-        { config }
+        { config },
       );
       const configValuesRefreshed = this.buildConfigValues(this.state.integration, configResponse);
       this.setState({
         configValues: configValuesRefreshed,
         configuredSecrets: configResponse.configured_secrets || [],
         touchedSecrets: {},
-        saveConfigStatus: RequestStatus.Success
+        saveConfigStatus: RequestStatus.Success,
       });
     } catch (err) {
       console.error(err);
@@ -154,12 +154,12 @@ class ExternalIntegrationConfigPage extends Component {
   loadContactProfile = async () => {
     try {
       const contactProfile = await this.props.httpClient.get(
-        `/api/v1/external_integration/${this.props.selector}/contact_profile`
+        `/api/v1/external_integration/${this.props.selector}/contact_profile`,
       );
       this.setState({
         contactProfile,
         contactProfileValues: Object.assign({}, contactProfile.values),
-        contactProfileTouchedSecrets: {}
+        contactProfileTouchedSecrets: {},
       });
     } catch (e) {
       console.error(e);
@@ -171,13 +171,13 @@ class ExternalIntegrationConfigPage extends Component {
     const newState = { contactProfileValues, contactProfileStatus: null };
     if (field.type === 'secret') {
       newState.contactProfileTouchedSecrets = Object.assign({}, this.state.contactProfileTouchedSecrets, {
-        [field.key]: true
+        [field.key]: true,
       });
     }
     this.setState(newState);
   };
 
-  saveContactProfile = async e => {
+  saveContactProfile = async (e) => {
     if (e) {
       e.preventDefault();
     }
@@ -185,7 +185,7 @@ class ExternalIntegrationConfigPage extends Component {
     const { integration, contactProfileValues = {}, contactProfileTouchedSecrets = {} } = this.state;
     const contactSchema = get(integration, 'manifest.contact_schema') || [];
     const values = {};
-    contactSchema.forEach(field => {
+    contactSchema.forEach((field) => {
       const value = contactProfileValues[field.key];
       if (field.type === 'secret') {
         // a secret set to null means "unchanged" on the server side
@@ -204,13 +204,13 @@ class ExternalIntegrationConfigPage extends Component {
     try {
       const contactProfile = await this.props.httpClient.post(
         `/api/v1/external_integration/${this.props.selector}/contact_profile`,
-        { values }
+        { values },
       );
       this.setState({
         contactProfile,
         contactProfileValues: Object.assign({}, contactProfile.values),
         contactProfileTouchedSecrets: {},
-        contactProfileStatus: RequestStatus.Success
+        contactProfileStatus: RequestStatus.Success,
       });
     } catch (err) {
       console.error(err);
@@ -230,7 +230,7 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  loadGatewayStatus = async integration => {
+  loadGatewayStatus = async (integration) => {
     // the webhooks block needs to know whether Gladys Plus is linked:
     // without it, an explanatory message replaces the key input
     if ((get(integration, 'manifest.webhooks') || []).length === 0) {
@@ -244,7 +244,7 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  updateOpenApiKey = e => {
+  updateOpenApiKey = (e) => {
     this.setState({ openApiKeyValue: e.target.value, openApiKeyStatus: null });
   };
 
@@ -253,7 +253,7 @@ class ExternalIntegrationConfigPage extends Component {
     try {
       const configResponse = await this.props.httpClient.post(
         `/api/v1/external_integration/${this.props.selector}/config`,
-        { config: { GLADYS_OPEN_API_KEY: this.state.openApiKeyValue } }
+        { config: { GLADYS_OPEN_API_KEY: this.state.openApiKeyValue } },
       );
       // the webhook URLs contain the key: refresh the detail to get them
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
@@ -261,7 +261,7 @@ class ExternalIntegrationConfigPage extends Component {
         integration,
         configuredSecrets: configResponse.configured_secrets || [],
         openApiKeyValue: '',
-        openApiKeyStatus: RequestStatus.Success
+        openApiKeyStatus: RequestStatus.Success,
       });
     } catch (e) {
       console.error(e);
@@ -269,32 +269,32 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  loadDynamicOptions = async integration => {
+  loadDynamicOptions = async (integration) => {
     // a select/multi_select of the config_schema (or of an action mini
     // form) can use the core-defined source "devices": its options are
     // the already-created devices of the integration (label = device
     // name, value = external_id), naturally scoped to its t_service
     const actionFields = (get(integration, 'manifest.actions') || []).reduce(
       (fields, action) => fields.concat(action.fields || []),
-      []
+      [],
     );
     const allFields = (get(integration, 'manifest.config_schema') || []).concat(actionFields);
-    if (!allFields.some(field => field.source === 'devices')) {
+    if (!allFields.some((field) => field.source === 'devices')) {
       return;
     }
     try {
       const devices = await this.props.httpClient.get(`/api/v1/service/${this.props.selector}/device`);
       this.setState({
         dynamicOptions: {
-          devices: devices.map(device => ({ value: device.external_id, label: device.name }))
-        }
+          devices: devices.map((device) => ({ value: device.external_id, label: device.name })),
+        },
       });
     } catch (e) {
       console.error(e);
     }
   };
 
-  loadHardwareDetection = async integration => {
+  loadHardwareDetection = async (integration) => {
     const requestedClasses = getRequestedHardwareClasses(get(integration, 'manifest.containers') || []);
     if (requestedClasses.length === 0) {
       return;
@@ -302,7 +302,7 @@ class ExternalIntegrationConfigPage extends Component {
     try {
       const { classes = [] } = await this.props.httpClient.get('/api/v1/external_integration/hardware');
       const detectedClasses = {};
-      classes.forEach(hardwareClass => {
+      classes.forEach((hardwareClass) => {
         detectedClasses[hardwareClass.class] = hardwareClass.detected;
       });
       this.setState({ detectedClasses });
@@ -316,7 +316,7 @@ class ExternalIntegrationConfigPage extends Component {
     try {
       const { code } = await this.props.httpClient.post(
         `/api/v1/external_integration/${this.props.selector}/link_code`,
-        {}
+        {},
       );
       this.setState({ linkCode: code, linkStatus: RequestStatus.Success });
     } catch (e) {
@@ -337,13 +337,13 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
-  toggleHardwareClass = hardwareClass => {
+  toggleHardwareClass = (hardwareClass) => {
     const { grantedDevices = [] } = this.state;
     this.setState({
       grantedDevices: grantedDevices.includes(hardwareClass)
-        ? grantedDevices.filter(grantedClass => grantedClass !== hardwareClass)
+        ? grantedDevices.filter((grantedClass) => grantedClass !== hardwareClass)
         : grantedDevices.concat([hardwareClass]),
-      hardwareStatus: null
+      hardwareStatus: null,
     });
   };
 
@@ -352,12 +352,12 @@ class ExternalIntegrationConfigPage extends Component {
     try {
       const integration = await this.props.httpClient.post(
         `/api/v1/external_integration/${this.props.selector}/hardware`,
-        { granted_devices: this.state.grantedDevices || [] }
+        { granted_devices: this.state.grantedDevices || [] },
       );
       this.setState({
         integration,
         grantedDevices: integration.granted_devices || [],
-        hardwareStatus: RequestStatus.Success
+        hardwareStatus: RequestStatus.Success,
       });
     } catch (e) {
       console.error(e);
@@ -371,14 +371,14 @@ class ExternalIntegrationConfigPage extends Component {
     this.setState({ actionFieldValues });
   };
 
-  runAction = async action => {
+  runAction = async (action) => {
     const actionStates = Object.assign({}, this.state.actionStates, {
-      [action.key]: { status: RequestStatus.Getting }
+      [action.key]: { status: RequestStatus.Getting },
     });
     this.setState({ actionStates });
     const rawValues = (this.state.actionFieldValues || {})[action.key] || {};
     const fields = {};
-    (action.fields || []).forEach(field => {
+    (action.fields || []).forEach((field) => {
       const value = rawValues[field.key];
       if (field.type === 'number') {
         const numericValue = value === '' || value === undefined || value === null ? NaN : Number(value);
@@ -394,12 +394,12 @@ class ExternalIntegrationConfigPage extends Component {
     try {
       const result = await this.props.httpClient.post(
         `/api/v1/external_integration/${this.props.selector}/action/${action.key}`,
-        { fields }
+        { fields },
       );
       this.setState({
         actionStates: Object.assign({}, this.state.actionStates, {
-          [action.key]: { status: RequestStatus.Success, message: result.message }
-        })
+          [action.key]: { status: RequestStatus.Success, message: result.message },
+        }),
       });
     } catch (e) {
       console.error(e);
@@ -407,35 +407,35 @@ class ExternalIntegrationConfigPage extends Component {
       const message = get(e, 'response.data.properties');
       this.setState({
         actionStates: Object.assign({}, this.state.actionStates, {
-          [action.key]: { status: RequestStatus.Error, message }
-        })
+          [action.key]: { status: RequestStatus.Error, message },
+        }),
       });
     }
   };
 
-  togglePreferLocal = async e => {
+  togglePreferLocal = async (e) => {
     const preferLocal = e.target.checked;
     // optimistic update, saved immediately (standard core toggle, outside
     // the manifest config_schema)
     this.setState({
       configValues: Object.assign({}, this.state.configValues, { GLADYS_PREFER_LOCAL: preferLocal }),
-      preferLocalStatus: RequestStatus.Getting
+      preferLocalStatus: RequestStatus.Getting,
     });
     try {
       await this.props.httpClient.post(`/api/v1/external_integration/${this.props.selector}/config`, {
-        config: { GLADYS_PREFER_LOCAL: preferLocal }
+        config: { GLADYS_PREFER_LOCAL: preferLocal },
       });
       this.setState({ preferLocalStatus: RequestStatus.Success });
     } catch (err) {
       console.error(err);
       this.setState({
         configValues: Object.assign({}, this.state.configValues, { GLADYS_PREFER_LOCAL: !preferLocal }),
-        preferLocalStatus: RequestStatus.Error
+        preferLocalStatus: RequestStatus.Error,
       });
     }
   };
 
-  toggleOAuthUseInstanceRedirect = e => {
+  toggleOAuthUseInstanceRedirect = (e) => {
     const useInstanceRedirect = e.target.checked;
     // remembered per browser and per origin, but not per integration: it
     // describes how this Gladys is reached, which does not change from one
@@ -446,7 +446,7 @@ class ExternalIntegrationConfigPage extends Component {
     this.setState({ oauthUseInstanceRedirect: useInstanceRedirect, oauthStatus: null });
   };
 
-  connectOAuth = async field => {
+  connectOAuth = async (field) => {
     this.setState({ oauthStatus: RequestStatus.Getting, oauthInvalidState: false });
     const { selector } = this.props;
     const callbackPath = getOAuthCallbackPath(selector);
@@ -461,8 +461,8 @@ class ExternalIntegrationConfigPage extends Component {
         `/api/v1/external_integration/${selector}/oauth/authorize_url`,
         {
           key: field.key,
-          redirect_uri: redirectUri
-        }
+          redirect_uri: redirectUri,
+        },
       );
       let urlToOpen;
       if (useInstanceRedirect) {
@@ -485,40 +485,40 @@ class ExternalIntegrationConfigPage extends Component {
       console.error(e);
       this.setState({
         oauthStatus: RequestStatus.Error,
-        oauthInvalidState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE'
+        oauthInvalidState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE',
       });
     }
   };
 
-  onStatusChanged = payload => {
+  onStatusChanged = (payload) => {
     if (payload && this.state.integration && payload.selector === this.props.selector) {
       this.setState({
-        integration: Object.assign({}, this.state.integration, { status: payload.status })
+        integration: Object.assign({}, this.state.integration, { status: payload.status }),
       });
     }
   };
 
-  onConnectionStatusUpdated = payload => {
+  onConnectionStatusUpdated = (payload) => {
     if (payload && this.state.integration && payload.selector === this.props.selector) {
       this.setState({
         integration: Object.assign({}, this.state.integration, {
-          connection_status: { connected: payload.connected, message: payload.message }
-        })
+          connection_status: { connected: payload.connected, message: payload.message },
+        }),
       });
     }
   };
 
   componentWillMount() {
     this.setState({
-      oauthUseInstanceRedirect: localStorage.getItem(OAUTH_USE_INSTANCE_REDIRECT_KEY) === 'true'
+      oauthUseInstanceRedirect: localStorage.getItem(OAUTH_USE_INSTANCE_REDIRECT_KEY) === 'true',
     });
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
-      this.onStatusChanged
+      this.onStatusChanged,
     );
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
-      this.onConnectionStatusUpdated
+      this.onConnectionStatusUpdated,
     );
     this.loadData();
   }
@@ -532,11 +532,11 @@ class ExternalIntegrationConfigPage extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
-      this.onStatusChanged
+      this.onStatusChanged,
     );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.CONNECTION_STATUS_UPDATED,
-      this.onConnectionStatusUpdated
+      this.onConnectionStatusUpdated,
     );
   }
 

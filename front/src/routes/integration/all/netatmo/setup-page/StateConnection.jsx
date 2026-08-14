@@ -1,7 +1,7 @@
 import { Text, MarkupText } from 'preact-i18n';
 import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 
-const StateConnection = props => (
+const StateConnection = (props) => (
   <div>
     {props.accessDenied && (
       <p class="text-center alert alert-warning">

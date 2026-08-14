@@ -26,7 +26,7 @@ const ContainerStatus = ({ imageSrc, title, loading, running, exists }) => {
           class={cx('tag', {
             'tag-success': running,
             'tag-secondary': !running,
-            'tag-info': loading
+            'tag-info': loading,
           })}
         >
           {containerStatus}

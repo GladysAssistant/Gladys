@@ -62,9 +62,7 @@ const SCENES_SYSTEM_PROMPT = fs.readFileSync(scenesPromptPath, 'utf8');
  * buildSystemPromptWithCurrentTime('Europe/Paris', new Date('2026-06-15T10:30:00Z'));
  */
 function buildSystemPromptWithCurrentTime(timezoneName, now = new Date(), { includeSceneRules = true } = {}) {
-  const formattedNow = dayjs(now)
-    .tz(timezoneName)
-    .format('dddd YYYY-MM-DD HH:mm');
+  const formattedNow = dayjs(now).tz(timezoneName).format('dddd YYYY-MM-DD HH:mm');
   const basePrompt = includeSceneRules ? `${SYSTEM_PROMPT}\n${SCENES_SYSTEM_PROMPT}` : SYSTEM_PROMPT;
   return `${basePrompt}\n\nCurrent date and time (${timezoneName}): ${formattedNow}`;
 }
@@ -92,7 +90,7 @@ function shouldForceToolChoice(toolCategories) {
  * @param {boolean} options.forceToolUse - Whether the intent requires a tool call.
  * @param {boolean} options.hasTools - Whether at least one tool is available to the model.
  * @param {boolean} options.hasCompletedToolIteration - Whether a tool turn already ran.
- * @returns {'required'|'auto'} tool_choice value for the API request.
+ * @returns {'required'|'auto'} The tool_choice value for the API request.
  * @example
  * resolveToolChoice({ forceToolUse: true, hasTools: true, hasCompletedToolIteration: false });
  */
@@ -528,7 +526,7 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
     if (forceToolUse) {
       logger.info(`[AI_CHAT] Forcing tool_choice=required for categories=${(toolCategories || []).join(',')}`);
     }
-    // eslint-disable-next-line no-restricted-syntax
+
     for (let iteration = 0; iteration < MAX_TOOL_CALL_ITERATIONS; iteration += 1) {
       logger.debug(`[AI_CHAT] API call iteration=${iteration + 1}/${MAX_TOOL_CALL_ITERATIONS}`);
       const toolChoice = resolveToolChoice({
@@ -566,8 +564,9 @@ async function forwardMessageToAiChat({ message, image, previousQuestions, conte
         } tool_choice=${toolChoice}${toolNamesSuffix} content=${assistantContentPreview}`,
       );
       logger.debug(
-        `[AI_CHAT] Assistant turn details iteration=${iteration +
-          1} contentType=${assistantContentType} content=${debugPreview(assistantMessage?.content, 400)}`,
+        `[AI_CHAT] Assistant turn details iteration=${
+          iteration + 1
+        } contentType=${assistantContentType} content=${debugPreview(assistantMessage?.content, 400)}`,
       );
 
       if (!toolCalls || toolCalls.length === 0) {

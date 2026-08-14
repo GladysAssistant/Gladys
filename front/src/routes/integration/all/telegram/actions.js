@@ -1,43 +1,43 @@
 import { RequestStatus } from '../../../../utils/consts';
 
-const actions = store => ({
+const actions = (store) => ({
   updateTelegramApiKey(state, e) {
     store.setState({
-      telegramApiKey: e.target.value
+      telegramApiKey: e.target.value,
     });
   },
   async getTelegramApiKey(state) {
     store.setState({
-      telegramGetApiKeyStatus: RequestStatus.Getting
+      telegramGetApiKeyStatus: RequestStatus.Getting,
     });
     try {
       const variable = await state.httpClient.get('/api/v1/service/telegram/variable/TELEGRAM_API_KEY');
       store.setState({
-        telegramApiKey: variable.value
+        telegramApiKey: variable.value,
       });
       const { link } = await state.httpClient.get('/api/v1/service/telegram/link');
       store.setState({
         telegramCustomLink: link,
-        telegramGetApiKeyStatus: RequestStatus.Success
+        telegramGetApiKeyStatus: RequestStatus.Success,
       });
     } catch (e) {
       store.setState({
-        telegramGetApiKeyStatus: RequestStatus.Error
+        telegramGetApiKeyStatus: RequestStatus.Error,
       });
     }
   },
   async saveTelegramApiKey(state, e) {
     e.preventDefault();
     store.setState({
-      telegramSaveApiKeyStatus: RequestStatus.Getting
+      telegramSaveApiKeyStatus: RequestStatus.Getting,
     });
     try {
       store.setState({
-        telegramApiKey: state.telegramApiKey.trim()
+        telegramApiKey: state.telegramApiKey.trim(),
       });
       // save telegram api key
       await state.httpClient.post('/api/v1/service/telegram/variable/TELEGRAM_API_KEY', {
-        value: state.telegramApiKey.trim()
+        value: state.telegramApiKey.trim(),
       });
       // start service
       await state.httpClient.post('/api/v1/service/telegram/start');
@@ -45,29 +45,29 @@ const actions = store => ({
       const { link } = await state.httpClient.get('/api/v1/service/telegram/link');
       store.setState({
         telegramCustomLink: link,
-        telegramSaveApiKeyStatus: RequestStatus.Success
+        telegramSaveApiKeyStatus: RequestStatus.Success,
       });
     } catch (e) {
       store.setState({
         telegramCustomLink: null,
-        telegramSaveApiKeyStatus: RequestStatus.Error
+        telegramSaveApiKeyStatus: RequestStatus.Error,
       });
     }
   },
   showTelegramDisableConfirmation() {
     store.setState({
       telegramDisableConfirmation: true,
-      telegramDisableStatus: undefined
+      telegramDisableStatus: undefined,
     });
   },
   hideTelegramDisableConfirmation() {
     store.setState({
-      telegramDisableConfirmation: false
+      telegramDisableConfirmation: false,
     });
   },
   async disableTelegram(state) {
     store.setState({
-      telegramDisableStatus: RequestStatus.Getting
+      telegramDisableStatus: RequestStatus.Getting,
     });
     try {
       await state.httpClient.post('/api/v1/service/telegram/disable');
@@ -76,14 +76,14 @@ const actions = store => ({
         telegramCustomLink: null,
         telegramDisableConfirmation: false,
         telegramSaveApiKeyStatus: undefined,
-        telegramDisableStatus: RequestStatus.Success
+        telegramDisableStatus: RequestStatus.Success,
       });
     } catch (e) {
       store.setState({
-        telegramDisableStatus: RequestStatus.Error
+        telegramDisableStatus: RequestStatus.Error,
       });
     }
-  }
+  },
 });
 
 export default actions;

@@ -7,18 +7,18 @@ import Select from 'react-select';
 import { RequestStatus } from '../../../utils/consts';
 
 class EditSceneBox extends Component {
-  updateScenes = selectedSceneOptions => {
+  updateScenes = (selectedSceneOptions) => {
     selectedSceneOptions = selectedSceneOptions || [];
-    const selectedScenes = selectedSceneOptions.map(option => option.value);
+    const selectedScenes = selectedSceneOptions.map((option) => option.value);
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      scenes: selectedScenes
+      scenes: selectedScenes,
     });
     this.setState({ selectedSceneOptions });
   };
 
-  updateName = e => {
+  updateName = (e) => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      name: e.target.value
+      name: e.target.value,
     });
   };
 
@@ -26,35 +26,35 @@ class EditSceneBox extends Component {
     try {
       this.setState({ status: RequestStatus.Getting });
       const params = {
-        order_dir: 'asc'
+        order_dir: 'asc',
       };
       const sceneOptions = [];
       const scenes = await this.props.httpClient.get(`/api/v1/scene`, params);
-      scenes.forEach(scene => {
+      scenes.forEach((scene) => {
         const sceneOption = {
           value: scene.selector,
-          label: scene.name
+          label: scene.name,
         };
         sceneOptions.push(sceneOption);
       });
 
       await this.setState({
         sceneOptions,
-        status: RequestStatus.Success
+        status: RequestStatus.Success,
       });
 
       await this.refreshSelectedOptions(this.props);
     } catch (e) {
       this.setState({
-        status: RequestStatus.Error
+        status: RequestStatus.Error,
       });
     }
   };
 
-  refreshSelectedOptions = async props => {
+  refreshSelectedOptions = async (props) => {
     const selectedSceneOptions = [];
     if (this.state.sceneOptions) {
-      this.state.sceneOptions.forEach(sceneOption => {
+      this.state.sceneOptions.forEach((sceneOption) => {
         if (props.box.scenes && props.box.scenes.indexOf(sceneOption.value) !== -1) {
           selectedSceneOptions.push(sceneOption);
         }

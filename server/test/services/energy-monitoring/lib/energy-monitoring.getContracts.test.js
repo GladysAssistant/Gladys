@@ -26,7 +26,7 @@ describe('EnergyMonitoring.getContracts', () => {
 
     const mockContracts = {
       'edf-base': {
-        '3': [
+        3: [
           {
             contract: 'base',
             price_type: 'consumption',
@@ -38,7 +38,7 @@ describe('EnergyMonitoring.getContracts', () => {
             day_type: null,
           },
         ],
-        '6': [
+        6: [
           {
             contract: 'base',
             price_type: 'consumption',
@@ -52,7 +52,7 @@ describe('EnergyMonitoring.getContracts', () => {
         ],
       },
       'edf-tempo': {
-        '6': [
+        6: [
           {
             contract: 'edf_tempo',
             price_type: 'consumption',

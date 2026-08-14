@@ -18,7 +18,7 @@ function createActions(store) {
         const z2mUrl = getZ2mUrl(configuration, hasGatewayClient);
         store.setState({
           z2mUrl,
-          showZ2mUrlWarning: shouldShowZ2mUrlWarning(configuration, hasGatewayClient, z2mUrl)
+          showZ2mUrlWarning: shouldShowZ2mUrlWarning(configuration, hasGatewayClient, z2mUrl),
         });
       } catch (e) {
         // z2mUrl stays undefined, link won't be shown
@@ -26,13 +26,13 @@ function createActions(store) {
     },
     async getZigbee2mqttDevices(state, take, skip) {
       store.setState({
-        getZigbee2mqttStatus: RequestStatus.Getting
+        getZigbee2mqttStatus: RequestStatus.Getting,
       });
       try {
         const options = {
           order_dir: state.getZigbee2mqttOrderDir || 'asc',
           take,
-          skip
+          skip,
         };
         if (state.zigbee2mqttSearch && state.zigbee2mqttSearch.length) {
           options.search = state.zigbee2mqttSearch;
@@ -40,16 +40,16 @@ function createActions(store) {
 
         const [zigbee2mqttsReceived, discoveredDevices] = await Promise.all([
           state.httpClient.get('/api/v1/service/zigbee2mqtt/device', options),
-          state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered', { filter_existing: false }).catch(() => [])
+          state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered', { filter_existing: false }).catch(() => []),
         ]);
 
         const discoveredMap = {};
-        discoveredDevices.forEach(d => {
+        discoveredDevices.forEach((d) => {
           discoveredMap[d.external_id] = d;
         });
 
-        zigbee2mqttsReceived.forEach(device => {
-          const model = device.params && device.params.find(p => p.name === 'model');
+        zigbee2mqttsReceived.forEach((device) => {
+          const model = device.params && device.params.find((p) => p.name === 'model');
           if (model) {
             device.model = model.value;
           }
@@ -65,17 +65,17 @@ function createActions(store) {
           zigbee2mqttDevices = zigbee2mqttsReceived;
         } else {
           zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
-            $push: zigbee2mqttsReceived
+            $push: zigbee2mqttsReceived,
           });
         }
         store.setState({
           zigbee2mqttDevices,
-          getZigbee2mqttStatus: RequestStatus.Success
+          getZigbee2mqttStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
           philipsHueGetBridgesStatus: RequestStatus.Error,
-          getZigbee2mqttStatus: e.message
+          getZigbee2mqttStatus: e.message,
         });
       }
     },
@@ -87,24 +87,24 @@ function createActions(store) {
             id: uniqueId,
             name: null,
             should_poll: false,
-            service_id: state.currentIntegration.id
-          }
-        ]
+            service_id: state.currentIntegration.id,
+          },
+        ],
       });
       store.setState({
-        zigbee2mqttDevices
+        zigbee2mqttDevices,
       });
     },
     updateDeviceField(state, index, field, value) {
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
         [index]: {
           [field]: {
-            $set: value
-          }
-        }
+            $set: value,
+          },
+        },
       });
       store.setState({
-        zigbee2mqttDevices
+        zigbee2mqttDevices,
       });
     },
     async saveDevice(state, index) {
@@ -113,10 +113,10 @@ function createActions(store) {
       savedDevice.model = device.model;
       savedDevice.ieee_address = device.ieee_address;
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
-        $splice: [[index, 1, savedDevice]]
+        $splice: [[index, 1, savedDevice]],
       });
       store.setState({
-        zigbee2mqttDevices
+        zigbee2mqttDevices,
       });
     },
     async deleteDevice(state, index) {
@@ -125,24 +125,24 @@ function createActions(store) {
         await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       }
       const zigbee2mqttDevices = update(state.zigbee2mqttDevices, {
-        $splice: [[index, 1]]
+        $splice: [[index, 1]],
       });
       store.setState({
-        zigbee2mqttDevices
+        zigbee2mqttDevices,
       });
     },
     async search(state, e) {
       await store.setState({
-        zigbee2mqttSearch: e.target.value
+        zigbee2mqttSearch: e.target.value,
       });
       actions.debouncedGetZigbee2mqttDevices(store.getState(), 20, 0);
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getZigbee2mqttOrderDir: e.target.value
+        getZigbee2mqttOrderDir: e.target.value,
       });
       await actions.getZigbee2mqttDevices(store.getState(), 20, 0);
-    }
+    },
   };
   actions.debouncedGetZigbee2mqttDevices = debounce(actions.getZigbee2mqttDevices, 200);
 

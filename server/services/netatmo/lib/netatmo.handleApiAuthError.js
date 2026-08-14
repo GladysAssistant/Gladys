@@ -9,7 +9,7 @@ const NETATMO_AUTH_ERROR_STATUSES = new Set([401, 403, 406]);
  * Statuses considered as auth/app errors:
  * - 401 Unauthorized (token rejected)
  * - 403 Forbidden (missing scopes / permission revoked)
- * - 406 Not Acceptable (Netatmo's way of signaling "Application is deactivated", error code 5)
+ * - 406 Not Acceptable (Netatmo's way of signaling "Application is deactivated", error code 5).
  *
  * The status is always flipped to `RECONNECTING` so the UI and downstream callers
  * (e.g. `refreshNetatmoValues`, `discoverDevices`) do not overwrite it with `CONNECTED`

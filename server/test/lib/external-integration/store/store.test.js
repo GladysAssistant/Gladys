@@ -44,9 +44,7 @@ describe('externalIntegration store', () => {
 
   describe('refreshIndex', () => {
     it('should download, cache and persist the index', async () => {
-      nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
+      nock(INDEX_URL_ORIGIN).get(INDEX_URL_PATH).reply(200, TEST_INDEX);
       const { externalIntegration, variable } = buildSupervisor();
       const index = await externalIntegration.refreshIndex();
       expect(index.integrations).to.have.lengthOf(2);
@@ -56,9 +54,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should reject an invalid index', async () => {
-      nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, { index_format: 99 });
+      nock(INDEX_URL_ORIGIN).get(INDEX_URL_PATH).reply(200, { index_format: 99 });
       const { externalIntegration } = buildSupervisor();
       try {
         await externalIntegration.refreshIndex();
@@ -70,9 +66,7 @@ describe('externalIntegration store', () => {
 
     it('should survive a manifest refresh failure of a not indexed install', async () => {
       await seedExternalService({ store_slug: 'bob/gladys-unreachable' });
-      nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
+      nock(INDEX_URL_ORIGIN).get(INDEX_URL_PATH).reply(200, TEST_INDEX);
       const { externalIntegration } = buildSupervisor();
       externalIntegration.fetchManifestFromRepo = fake.rejects(new Error('offline'));
       const index = await externalIntegration.refreshIndex();
@@ -82,9 +76,7 @@ describe('externalIntegration store', () => {
 
     it('should refresh the manifest of repo_url installs absent from the index', async () => {
       await seedExternalService({ store_slug: 'bob/gladys-not-indexed' });
-      nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(200, TEST_INDEX);
+      nock(INDEX_URL_ORIGIN).get(INDEX_URL_PATH).reply(200, TEST_INDEX);
       const { externalIntegration } = buildSupervisor();
       externalIntegration.fetchManifestFromRepo = fake.resolves({ ...TEST_MANIFEST, version: '9.9.9' });
       await externalIntegration.refreshIndex();
@@ -121,9 +113,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should fall back on the stale memory copy when the network fails', async () => {
-      nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(500);
+      nock(INDEX_URL_ORIGIN).get(INDEX_URL_PATH).reply(500);
       const { externalIntegration } = buildSupervisor();
       externalIntegration.storeIndex = TEST_INDEX;
       externalIntegration.storeIndexFetchedAt = 1;
@@ -132,9 +122,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should fall back on the persistent cache when offline', async () => {
-      nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(500);
+      nock(INDEX_URL_ORIGIN).get(INDEX_URL_PATH).reply(500);
       const { externalIntegration, variable } = buildSupervisor();
       await variable.setValue(
         'EXTERNAL_INTEGRATION_STORE_INDEX_CACHE',
@@ -146,18 +134,14 @@ describe('externalIntegration store', () => {
     });
 
     it('should return null when no index was ever fetched', async () => {
-      nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(500);
+      nock(INDEX_URL_ORIGIN).get(INDEX_URL_PATH).reply(500);
       const { externalIntegration } = buildSupervisor();
       const index = await externalIntegration.getIndex();
       expect(index).to.equal(null);
     });
 
     it('should survive an invalid persistent cache', async () => {
-      nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(500);
+      nock(INDEX_URL_ORIGIN).get(INDEX_URL_PATH).reply(500);
       const { externalIntegration, variable } = buildSupervisor();
       await variable.setValue('EXTERNAL_INTEGRATION_STORE_INDEX_CACHE', '{invalid');
       const index = await externalIntegration.getIndex();
@@ -174,9 +158,7 @@ describe('externalIntegration store', () => {
     };
 
     it('should download the doc in the requested language', async () => {
-      nock(INDEX_URL_ORIGIN)
-        .get('/docs/john--gladys-open-meteo-demo/fr.md')
-        .reply(200, '# Bonjour');
+      nock(INDEX_URL_ORIGIN).get('/docs/john--gladys-open-meteo-demo/fr.md').reply(200, '# Bonjour');
       const { externalIntegration } = buildSupervisorWithIndex();
       const docs = await externalIntegration.getDocsMarkdown('john/gladys-open-meteo-demo', 'fr');
       expect(docs).to.deep.equal({
@@ -187,9 +169,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should fall back on the English doc for a language without doc', async () => {
-      nock(INDEX_URL_ORIGIN)
-        .get('/docs/john--gladys-open-meteo-demo/en.md')
-        .reply(200, '# Hello');
+      nock(INDEX_URL_ORIGIN).get('/docs/john--gladys-open-meteo-demo/en.md').reply(200, '# Hello');
       const { externalIntegration } = buildSupervisorWithIndex();
       const docs = await externalIntegration.getDocsMarkdown('john/gladys-open-meteo-demo', 'de');
       expect(docs.url).to.equal(`${INDEX_URL_ORIGIN}/docs/john--gladys-open-meteo-demo/en.md`);
@@ -197,9 +177,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should keep a JSON-looking doc as raw text', async () => {
-      nock(INDEX_URL_ORIGIN)
-        .get('/docs/john--gladys-open-meteo-demo/en.md')
-        .reply(200, '{"not":"markdown"}');
+      nock(INDEX_URL_ORIGIN).get('/docs/john--gladys-open-meteo-demo/en.md').reply(200, '{"not":"markdown"}');
       const { externalIntegration } = buildSupervisorWithIndex();
       const docs = await externalIntegration.getDocsMarkdown('john/gladys-open-meteo-demo');
       expect(docs.content).to.equal('{"not":"markdown"}');
@@ -283,9 +261,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should return an empty catalog when no index is available', async () => {
-      nock(INDEX_URL_ORIGIN)
-        .get(INDEX_URL_PATH)
-        .reply(500);
+      nock(INDEX_URL_ORIGIN).get(INDEX_URL_PATH).reply(500);
       const { externalIntegration } = buildSupervisor();
       const catalog = await externalIntegration.getCatalog();
       expect(catalog.integrations).to.deep.equal([]);
@@ -330,9 +306,7 @@ describe('externalIntegration store', () => {
 
   describe('fetchManifestFromRepo', () => {
     it('should resolve the default branch and fetch the manifest', async () => {
-      nock('https://api.github.com')
-        .get('/repos/john/gladys-open-meteo-demo')
-        .reply(200, { default_branch: 'main' });
+      nock('https://api.github.com').get('/repos/john/gladys-open-meteo-demo').reply(200, { default_branch: 'main' });
       nock('https://raw.githubusercontent.com')
         .get('/john/gladys-open-meteo-demo/main/gladys-assistant-integration.json')
         .reply(200, JSON.stringify(TEST_MANIFEST));
@@ -342,9 +316,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should throw a 404 when the repo does not exist', async () => {
-      nock('https://api.github.com')
-        .get('/repos/john/unknown')
-        .reply(404);
+      nock('https://api.github.com').get('/repos/john/unknown').reply(404);
       const { externalIntegration } = buildSupervisor();
       try {
         await externalIntegration.fetchManifestFromRepo('john/unknown');
@@ -355,9 +327,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should throw a 422 when the manifest file is absent', async () => {
-      nock('https://api.github.com')
-        .get('/repos/john/no-manifest')
-        .reply(200, { default_branch: 'main' });
+      nock('https://api.github.com').get('/repos/john/no-manifest').reply(200, { default_branch: 'main' });
       nock('https://raw.githubusercontent.com')
         .get('/john/no-manifest/main/gladys-assistant-integration.json')
         .reply(404);
@@ -372,9 +342,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should throw a 422 when the manifest is not valid JSON', async () => {
-      nock('https://api.github.com')
-        .get('/repos/john/bad-json')
-        .reply(200, { default_branch: 'main' });
+      nock('https://api.github.com').get('/repos/john/bad-json').reply(200, { default_branch: 'main' });
       nock('https://raw.githubusercontent.com')
         .get('/john/bad-json/main/gladys-assistant-integration.json')
         .reply(200, '{invalid json');
@@ -389,9 +357,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should rethrow non-404 errors of the GitHub API', async () => {
-      nock('https://api.github.com')
-        .get('/repos/john/rate-limited')
-        .reply(500);
+      nock('https://api.github.com').get('/repos/john/rate-limited').reply(500);
       const { externalIntegration } = buildSupervisor();
       try {
         await externalIntegration.fetchManifestFromRepo('john/rate-limited');
@@ -402,9 +368,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should rethrow non-404 errors of the raw manifest fetch', async () => {
-      nock('https://api.github.com')
-        .get('/repos/john/raw-error')
-        .reply(200, { default_branch: 'main' });
+      nock('https://api.github.com').get('/repos/john/raw-error').reply(200, { default_branch: 'main' });
       nock('https://raw.githubusercontent.com')
         .get('/john/raw-error/main/gladys-assistant-integration.json')
         .reply(500);
@@ -418,9 +382,7 @@ describe('externalIntegration store', () => {
     });
 
     it('should throw a 422 when the manifest is invalid', async () => {
-      nock('https://api.github.com')
-        .get('/repos/john/invalid-manifest')
-        .reply(200, { default_branch: 'main' });
+      nock('https://api.github.com').get('/repos/john/invalid-manifest').reply(200, { default_branch: 'main' });
       nock('https://raw.githubusercontent.com')
         .get('/john/invalid-manifest/main/gladys-assistant-integration.json')
         .reply(200, JSON.stringify({ ...TEST_MANIFEST, version: 'nope' }));
@@ -473,9 +435,7 @@ describe('externalIntegration store', () => {
 
   describe('installFromRepoUrl', () => {
     it('should install from a GitHub repo URL', async () => {
-      nock('https://api.github.com')
-        .get('/repos/john/gladys-open-meteo-demo')
-        .reply(200, { default_branch: 'main' });
+      nock('https://api.github.com').get('/repos/john/gladys-open-meteo-demo').reply(200, { default_branch: 'main' });
       nock('https://raw.githubusercontent.com')
         .get('/john/gladys-open-meteo-demo/main/gladys-assistant-integration.json')
         .reply(200, JSON.stringify(TEST_MANIFEST));

@@ -9,9 +9,7 @@ const getFeatureCode = (feature) => {
   if (!feature || !feature.external_id) {
     return null;
   }
-  return String(feature.external_id)
-    .split(':')
-    .pop();
+  return String(feature.external_id).split(':').pop();
 };
 
 const removeCodeFromInput = (input, code) => {

@@ -3,13 +3,13 @@ import { RequestStatus } from '../../../../utils/consts';
 
 const EXPOSURE_MODES = {
   ALL: 'all',
-  SELECTION: 'selection'
+  SELECTION: 'selection',
 };
 
-const actions = store => ({
+const actions = (store) => ({
   async getHomeKitSettings(state) {
     store.setState({
-      homekitGetSettingsStatus: RequestStatus.Getting
+      homekitGetSettingsStatus: RequestStatus.Getting,
     });
     try {
       let homekitMdnsAdvertiser = 'bonjour-hap';
@@ -19,14 +19,14 @@ const actions = store => ({
       const { value: setupURI } = await state.httpClient.get('/api/v1/service/homekit/variable/HOMEKIT_SETUP_URI');
       try {
         ({ value: homekitMdnsAdvertiser } = await state.httpClient.get(
-          '/api/v1/service/homekit/variable/HOMEKIT_MDNS_ADVERTISER'
+          '/api/v1/service/homekit/variable/HOMEKIT_MDNS_ADVERTISER',
         ));
       } catch (e) {
         // Variable not set yet
       }
       try {
         ({ value: homekitExposureMode } = await state.httpClient.get(
-          '/api/v1/service/homekit/variable/HOMEKIT_EXPOSURE_MODE'
+          '/api/v1/service/homekit/variable/HOMEKIT_EXPOSURE_MODE',
         ));
       } catch (e) {
         // Variable not set yet: the bridge exposes every compatible device
@@ -53,23 +53,23 @@ const actions = store => ({
             homekitExposureMode === EXPOSURE_MODES.SELECTION ? homekitExposureMode : EXPOSURE_MODES.ALL,
           homekitExposedDevices: Array.isArray(homekitExposedDevices) ? homekitExposedDevices : [],
           homekitCompatibleDevices,
-          homekitGetSettingsStatus: RequestStatus.Success
+          homekitGetSettingsStatus: RequestStatus.Success,
         });
       });
     } catch (e) {
       store.setState({
-        homekitGetSettingsStatus: RequestStatus.Error
+        homekitGetSettingsStatus: RequestStatus.Error,
       });
     }
   },
   updateExposureMode(state, e) {
     store.setState({
-      homekitExposureMode: e.target.value
+      homekitExposureMode: e.target.value,
     });
   },
   updateExposedDevices(state, selectedOptions) {
     store.setState({
-      homekitExposedDevices: (selectedOptions || []).map(option => option.value)
+      homekitExposedDevices: (selectedOptions || []).map((option) => option.value),
     });
   },
   async saveExposure(state, e) {
@@ -80,10 +80,10 @@ const actions = store => ({
       // everything, which is the safe outcome. The other order would leave it in selection mode
       // with a stale list, and silently drop devices the user never removed.
       await state.httpClient.post('/api/v1/service/homekit/variable/HOMEKIT_EXPOSED_DEVICES', {
-        value: JSON.stringify(state.homekitExposedDevices)
+        value: JSON.stringify(state.homekitExposedDevices),
       });
       await state.httpClient.post('/api/v1/service/homekit/variable/HOMEKIT_EXPOSURE_MODE', {
-        value: state.homekitExposureMode
+        value: state.homekitExposureMode,
       });
       // Rebuild the bridge with the new device list, keeping the existing pairing
       await state.httpClient.get('/api/v1/service/homekit/reload');
@@ -94,7 +94,7 @@ const actions = store => ({
   },
   updateMDNSAdvertiser(state, e) {
     store.setState({
-      homekitMdnsAdvertiser: e.target.value
+      homekitMdnsAdvertiser: e.target.value,
     });
   },
   async saveMDNSAdvertiser(state, e) {
@@ -102,7 +102,7 @@ const actions = store => ({
     store.setState({ homekitSaveMDNSStatus: RequestStatus.Getting });
     try {
       await state.httpClient.post('/api/v1/service/homekit/variable/HOMEKIT_MDNS_ADVERTISER', {
-        value: state.homekitMdnsAdvertiser
+        value: state.homekitMdnsAdvertiser,
       });
       await state.httpClient.get('/api/v1/service/homekit/reload');
       store.setState({ homekitSaveMDNSStatus: RequestStatus.Success });
@@ -113,23 +113,23 @@ const actions = store => ({
   async refreshBridge(state, e) {
     e.preventDefault();
     store.setState({
-      homekitReloadStatus: RequestStatus.Getting
+      homekitReloadStatus: RequestStatus.Getting,
     });
     try {
       await state.httpClient.get('/api/v1/service/homekit/reload');
       store.setState({
-        homekitReloadStatus: RequestStatus.Success
+        homekitReloadStatus: RequestStatus.Success,
       });
     } catch (e) {
       store.setState({
-        homekitReloadStatus: RequestStatus.Error
+        homekitReloadStatus: RequestStatus.Error,
       });
     }
   },
   async resetBridge(state, e) {
     e.preventDefault();
     store.setState({
-      homekitResetStatus: RequestStatus.Getting
+      homekitResetStatus: RequestStatus.Getting,
     });
     try {
       await state.httpClient.get('/api/v1/service/homekit/reset');
@@ -138,15 +138,15 @@ const actions = store => ({
       QRCode.toDataURL(setupURI, (err, dataUrl) => {
         store.setState({
           homekitSetupDataUrl: dataUrl,
-          homekitResetStatus: RequestStatus.Success
+          homekitResetStatus: RequestStatus.Success,
         });
       });
     } catch (e) {
       store.setState({
-        homekitResetStatus: RequestStatus.Error
+        homekitResetStatus: RequestStatus.Error,
       });
     }
-  }
+  },
 });
 
 export { EXPOSURE_MODES };

@@ -15,7 +15,7 @@ class RemoteFeatureEdition extends Component {
     this.props.testFeature(this.props.type);
   };
 
-  updateName = e => {
+  updateName = (e) => {
     const name = e.target.value;
 
     const { type, featureWithCodes = {} } = this.props;
@@ -26,7 +26,7 @@ class RemoteFeatureEdition extends Component {
     this.props.updateFeature(type, newEditedFeature);
   };
 
-  selectValue = selectedValue => () => {
+  selectValue = (selectedValue) => () => {
     if (this.props.selectedValue !== selectedValue) {
       this.props.selectValue(selectedValue);
     }
@@ -74,7 +74,7 @@ class RemoteFeatureEdition extends Component {
             </div>
           </div>
           <div class="col btn-group">
-            {values.map(value => {
+            {values.map((value) => {
               const valued = codes[`${type}-${value}`];
               const selected = selectedValue === value;
 
@@ -86,7 +86,7 @@ class RemoteFeatureEdition extends Component {
                     active: !disabled && selected,
                     'btn-primary': disabled && valued && !selected,
                     'btn-secondary': disabled && !valued && !selected,
-                    'btn-dark': disabled && selected
+                    'btn-dark': disabled && selected,
                   })}
                   onClick={this.selectValue(value)}
                   disabled={disabled}

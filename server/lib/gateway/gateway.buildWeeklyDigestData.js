@@ -139,12 +139,8 @@ function belongsToMainMeterBranch(devices, feature, mainMeterDeviceId) {
  * buildDigestPeriods(new Date('2026-06-08T15:30:00'));
  */
 function buildDigestPeriods(now = new Date()) {
-  const periodStart = dayjs(now)
-    .startOf('day')
-    .subtract(6, 'day');
-  const periodEnd = dayjs(now)
-    .startOf('day')
-    .add(1, 'day');
+  const periodStart = dayjs(now).startOf('day').subtract(6, 'day');
+  const periodEnd = dayjs(now).startOf('day').add(1, 'day');
   const previousPeriodStart = periodStart.subtract(7, 'day');
 
   return {
@@ -159,8 +155,7 @@ function buildDigestPeriods(now = new Date()) {
       days_count: 7,
       aggregation: 'sum_of_daily_buckets',
       comparison_window: 'previous_7_calendar_days',
-      note:
-        'Seven calendar days including today, using local midnight boundaries like the energy dashboard day view. This is not the same as a dashboard month view from the 1st of the month.',
+      note: 'Seven calendar days including today, using local midnight boundaries like the energy dashboard day view. This is not the same as a dashboard month view from the 1st of the month.',
     },
   };
 }
@@ -492,8 +487,7 @@ async function buildWeeklyDigestData() {
     energy_context: {
       configured_main_meter_device_id: mainMeterDeviceId,
       feature_count: energy.length,
-      note:
-        'energy entries include all leaf consumption features with energy_parent_feature_id hierarchy. Siblings under the same parent are often tariff bands (e.g. Tempo HP/HC), not separate appliances. is_alternate_main_meter_source true means another view of the same main meter (e.g. Enedis API vs local Lixee TIC), not a separate load or activity trend. Do not sum parent and child values or duplicate main-meter sources. is_on_configured_main_meter_device marks the device linked to the energy price contract. Use period.from_date and period.to_date when stating totals. current_week_cost comes from linked daily-consumption-cost features only and excludes subscription charges.',
+      note: 'energy entries include all leaf consumption features with energy_parent_feature_id hierarchy. Siblings under the same parent are often tariff bands (e.g. Tempo HP/HC), not separate appliances. is_alternate_main_meter_source true means another view of the same main meter (e.g. Enedis API vs local Lixee TIC), not a separate load or activity trend. Do not sum parent and child values or duplicate main-meter sources. is_on_configured_main_meter_device marks the device linked to the energy price contract. Use period.from_date and period.to_date when stating totals. current_week_cost comes from linked daily-consumption-cost features only and excludes subscription charges.',
     },
     recent_scenes: recentlyExecutedScenes,
   };

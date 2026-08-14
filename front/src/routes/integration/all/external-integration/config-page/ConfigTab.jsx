@@ -13,7 +13,7 @@ import { getAssignedPortsByName, getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { USER_ROLE } from '../../../../../../../server/utils/constants';
 
-const ConfigTab = props => {
+const ConfigTab = (props) => {
   const { integration, loadStatus, user } = props;
   // the shared configuration of the integration (settings, webhooks,
   // actions, hardware) is administration; a non-admin user only gets the
@@ -76,7 +76,7 @@ const ConfigTab = props => {
             )}
             <div
               class={cx('dimmer', {
-                active: loadStatus === RequestStatus.Getting
+                active: loadStatus === RequestStatus.Getting,
               })}
             >
               <div class="loader" />

@@ -9,10 +9,10 @@ class ResetPasswordPage extends Component {
     passwordRepeat: '',
     twoFactorEnabled: null,
     success: false,
-    resetInProgress: false
+    resetInProgress: false,
   };
 
-  resetPassword = async e => {
+  resetPassword = async (e) => {
     e.preventDefault();
 
     if (this.state.password !== this.state.passwordRepeat) {
@@ -34,7 +34,7 @@ class ResetPasswordPage extends Component {
           user.email,
           this.state.password,
           this.props.token,
-          this.state.twoFactorCode
+          this.state.twoFactorCode,
         );
         this.setState({ success: true, resetInProgress: false });
       }
@@ -54,8 +54,8 @@ class ResetPasswordPage extends Component {
       twoFactorCode,
       passwordError,
       passwordNotMatching,
-      resetInProgress
-    }
+      resetInProgress,
+    },
   ) {
     return (
       <ResetPassword

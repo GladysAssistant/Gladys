@@ -10,7 +10,7 @@ import UpdateDevice from './UpdateDevice';
 class EditDevicePage extends Component {
   selectFeature(e) {
     this.setState({
-      selectedFeature: e.target.value
+      selectedFeature: e.target.value,
     });
   }
 
@@ -27,39 +27,39 @@ class EditDevicePage extends Component {
             type: featureData[1],
             read_only: true,
             has_feedback: false,
-            keep_history: true
-          }
-        ]
-      }
+            keep_history: true,
+          },
+        ],
+      },
     });
 
     this.setState({
       device,
-      selectedFeature: undefined
+      selectedFeature: undefined,
     });
   }
 
   deleteFeature(featureIndex) {
     const device = update(this.state.device, {
       features: {
-        $splice: [[featureIndex, 1]]
-      }
+        $splice: [[featureIndex, 1]],
+      },
     });
 
     this.setState({
-      device
+      device,
     });
   }
 
   updateDeviceProperty(property, value) {
     const device = update(this.state.device, {
       [property]: {
-        $set: value
-      }
+        $set: value,
+      },
     });
 
     this.setState({
-      device
+      device,
     });
   }
 
@@ -79,39 +79,39 @@ class EditDevicePage extends Component {
       features: {
         [featureIndex]: {
           [property]: {
-            $set: value
-          }
-        }
-      }
+            $set: value,
+          },
+        },
+      },
     });
 
     this.setState({
-      device
+      device,
     });
   }
 
   async saveDevice() {
     this.setState({
-      loading: true
+      loading: true,
     });
     try {
       const device = await this.props.httpClient.post('/api/v1/device', this.state.device);
       this.setState({
         saveStatus: RequestStatus.Success,
         loading: false,
-        device
+        device,
       });
     } catch (e) {
       const status = get(e, 'response.status');
       if (status === 409) {
         this.setState({
           saveStatus: RequestStatus.ConflictError,
-          loading: false
+          loading: false,
         });
       } else {
         this.setState({
           saveStatus: RequestStatus.Error,
-          loading: false
+          loading: false,
         });
       }
     }
@@ -121,7 +121,7 @@ class EditDevicePage extends Component {
     super(props);
 
     this.state = {
-      loading: true
+      loading: true,
     };
 
     this.selectFeature = this.selectFeature.bind(this);
@@ -147,7 +147,7 @@ class EditDevicePage extends Component {
           should_poll: false,
           external_id: uniqueId,
           service_id: this.props.currentIntegration.id,
-          features: []
+          features: [],
         };
       } else {
         const loadedDevice = await this.props.httpClient.get(`/api/v1/device/${deviceSelector}`);
@@ -163,7 +163,7 @@ class EditDevicePage extends Component {
 
       this.setState({
         device,
-        loading: false
+        loading: false,
       });
     } catch (e) {
       console.error(e);

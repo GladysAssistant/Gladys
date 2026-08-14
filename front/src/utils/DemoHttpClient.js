@@ -4,7 +4,7 @@ export class DemoHttpClient {
   getDemoFile = async () => {
     // Set a timer to see loaders
     if (config.demoRequestTime > 0) {
-      await new Promise(r => setTimeout(r, config.demoRequestTime));
+      await new Promise((r) => setTimeout(r, config.demoRequestTime));
     }
 
     if (this.responses) {

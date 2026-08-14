@@ -33,7 +33,7 @@ async function downloadBackup(fileUrl) {
   const compressedBackupFilePath = path.join(restoreFolderPath, `${encryptedBackupName}.gz`);
 
   let duckDbBackupFolderPath = null;
-  let sqliteBackupFilePath = null;
+  let sqliteBackupFilePath;
 
   // we create a stream
   const writeStream = fs.createWriteStream(encryptedBackupFilePath);

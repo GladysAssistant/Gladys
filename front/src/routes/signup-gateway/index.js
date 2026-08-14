@@ -19,15 +19,16 @@ class SignupPage extends Component {
     signupCompleted: false,
     unknownError: false,
     tokenError: false,
-    browserCompatible: window.crypto && window.crypto.subtle
+    browserCompatible: window.crypto && window.crypto.subtle,
   };
 
-  validateEmail = email => {
-    let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
+  validateEmail = (email) => {
+    let re =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
     return re.test(String(email).toLowerCase());
   };
 
-  validateData = data => {
+  validateData = (data) => {
     let fieldsErrored = [];
 
     if (!data.name || data.name.length < 2 || data.name.length > 30) {
@@ -45,7 +46,7 @@ class SignupPage extends Component {
     return fieldsErrored;
   };
 
-  validateForm = event => {
+  validateForm = (event) => {
     event.preventDefault();
 
     this.setState({ currentStep: 2 });
@@ -60,7 +61,7 @@ class SignupPage extends Component {
       name: this.state.name,
       email: this.state.email,
       password: this.state.password,
-      language: currentBrowserLanguage
+      language: currentBrowserLanguage,
     };
 
     let fieldsErrored = this.validateData(newUser);
@@ -84,15 +85,15 @@ class SignupPage extends Component {
             accountAlreadyExist: false,
             unknownError: false,
             tokenError: false,
-            signupCompleted: true
+            signupCompleted: true,
           });
         }, 1000);
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({ currentStep: 1 });
         if (error.response && error.response.status === 422 && error.response.data.details) {
           let fieldsErrored = [];
-          error.response.data.details.forEach(err => {
+          error.response.data.details.forEach((err) => {
             fieldsErrored.push(err.context.key);
           });
           this.setState({ fieldsErrored });
@@ -109,7 +110,7 @@ class SignupPage extends Component {
     if (this.props.token) {
       this.props.session.gatewayClient
         .getInvitation(this.props.token)
-        .then(invitation => this.setState({ email: invitation.email }))
+        .then((invitation) => this.setState({ email: invitation.email }))
         .catch(() => this.setState({ invitationError: true }));
     }
   };
@@ -128,8 +129,8 @@ class SignupPage extends Component {
       invitationError,
       isFireFox,
       unknownError,
-      tokenError
-    }
+      tokenError,
+    },
   ) {
     return (
       <SignupBase currentStep={currentStep}>

@@ -14,16 +14,16 @@ import fr from 'date-fns/locale/fr';
 const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 class CheckTime extends Component {
-  handleBeforeTimeChange = time => {
+  handleBeforeTimeChange = (time) => {
     const timeFormatted = time ? format(time, 'HH:mm') : undefined;
     this.props.updateActionProperty(this.props.path, 'before', timeFormatted);
   };
-  handleBeforeAfterChange = time => {
+  handleBeforeAfterChange = (time) => {
     const timeFormatted = time ? format(time, 'HH:mm') : undefined;
     this.props.updateActionProperty(this.props.path, 'after', timeFormatted);
   };
-  handleDayOfTheWeekChange = options => {
-    const values = options ? options.map(option => option.value) : undefined;
+  handleDayOfTheWeekChange = (options) => {
+    const values = options ? options.map((option) => option.value) : undefined;
     this.props.updateActionProperty(this.props.path, 'days_of_the_week', values);
   };
 
@@ -37,12 +37,12 @@ class CheckTime extends Component {
     const after = this.props.action.after
       ? new Date().setHours(this.props.action.after.substr(0, 2), this.props.action.after.substr(3, 2))
       : null;
-    const daysOfTheWeekOptions = weekDays.map(weekDay => ({
+    const daysOfTheWeekOptions = weekDays.map((weekDay) => ({
       value: weekDay,
-      label: <Text id={`editScene.triggersCard.scheduledTrigger.daysOfTheWeek.${weekDay}`} />
+      label: <Text id={`editScene.triggersCard.scheduledTrigger.daysOfTheWeek.${weekDay}`} />,
     }));
     const selectedWeekDaysOptions = this.props.action.days_of_the_week
-      ? this.props.action.days_of_the_week.map(day => daysOfTheWeekOptions.find(option => option.value === day))
+      ? this.props.action.days_of_the_week.map((day) => daysOfTheWeekOptions.find((option) => option.value === day))
       : [];
     return (
       <div>

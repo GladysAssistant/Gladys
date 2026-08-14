@@ -11,11 +11,11 @@ class MqttNodePage extends Component {
     try {
       const mqttStatus = await this.props.httpClient.get('/api/v1/service/mqtt/status');
       this.setState({
-        mqttConnected: mqttStatus.connected
+        mqttConnected: mqttStatus.connected,
       });
     } catch (e) {
       this.setState({
-        mqttConnectionError: RequestStatus.NetworkError
+        mqttConnectionError: RequestStatus.NetworkError,
       });
       console.error(e);
     }
@@ -36,21 +36,21 @@ class MqttNodePage extends Component {
         dockerBased: configuration.dockerBased,
         networkModeValid: configuration.networkModeValid,
         brokerContainerAvailable: configuration.brokerContainerAvailable,
-        passwordChanges: false
+        passwordChanges: false,
       });
     }
   };
 
-  updateConfiguration = config => {
+  updateConfiguration = (config) => {
     this.setState(config);
   };
 
-  saveConfiguration = async e => {
+  saveConfiguration = async (e) => {
     e.preventDefault();
     this.setState({
       connectMqttStatus: RequestStatus.Getting,
       mqttConnected: false,
-      mqttConnectionError: undefined
+      mqttConnectionError: undefined,
     });
     try {
       const { mqttUrl, mqttUsername, mqttPassword, useEmbeddedBroker } = this.state;
@@ -58,17 +58,17 @@ class MqttNodePage extends Component {
         mqttUrl,
         mqttUsername,
         mqttPassword,
-        useEmbeddedBroker
+        useEmbeddedBroker,
       });
 
       this.setState({
-        connectMqttStatus: RequestStatus.Success
+        connectMqttStatus: RequestStatus.Success,
       });
     } catch (e) {
       console.error(e);
       this.setState({
         connectMqttStatus: RequestStatus.Error,
-        passwordChanges: false
+        passwordChanges: false,
       });
     }
   };
@@ -78,15 +78,15 @@ class MqttNodePage extends Component {
     this.setState({
       mqttConnected: true,
       connectMqttStatus: undefined,
-      mqttConnectionError: undefined
+      mqttConnectionError: undefined,
     });
   };
 
-  displayMqttError = error => {
+  displayMqttError = (error) => {
     this.setState({
       mqttConnected: false,
       connectMqttStatus: undefined,
-      mqttConnectionError: error
+      mqttConnectionError: error,
     });
   };
 

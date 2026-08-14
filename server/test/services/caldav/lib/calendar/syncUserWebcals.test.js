@@ -31,10 +31,7 @@ describe('Webcal sync', () => {
           getEvents: sinon.stub(),
           createEvent: sinon.stub(),
           updateEvent: sinon.stub(),
-          destroyEvent: sinon
-            .stub()
-            .withArgs('event-to-delete')
-            .resolves(),
+          destroyEvent: sinon.stub().withArgs('event-to-delete').resolves(),
         },
         http: {
           request: sinon.stub(),

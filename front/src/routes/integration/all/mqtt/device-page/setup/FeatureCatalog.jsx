@@ -13,30 +13,30 @@ class FeatureCatalog extends Component {
     super(props);
     this.state = {
       search: '',
-      expandedCategories: {}
+      expandedCategories: {},
     };
   }
 
-  toggleCategory = categoryLabel => {
-    this.setState(prevState => ({
+  toggleCategory = (categoryLabel) => {
+    this.setState((prevState) => ({
       expandedCategories: {
         ...prevState.expandedCategories,
-        [categoryLabel]: !prevState.expandedCategories[categoryLabel]
-      }
+        [categoryLabel]: !prevState.expandedCategories[categoryLabel],
+      },
     }));
   };
 
   getDescription = (category, type) => {
     const specific = get(
       this.props.intl.dictionary,
-      `integration.mqtt.featureCatalog.descriptions.${category}.${type}`
+      `integration.mqtt.featureCatalog.descriptions.${category}.${type}`,
     );
     if (specific) {
       return specific;
     }
     const categoryDescription = get(
       this.props.intl.dictionary,
-      `integration.mqtt.featureCatalog.categoryDescriptions.${category}`
+      `integration.mqtt.featureCatalog.categoryDescriptions.${category}`,
     );
     if (categoryDescription) {
       return categoryDescription;
@@ -68,7 +68,7 @@ class FeatureCatalog extends Component {
               class="form-control"
               placeholder={<Text id="integration.mqtt.featureCatalog.searchPlaceholder" />}
               value={search}
-              onInput={e => this.setState({ search: e.target.value })}
+              onInput={(e) => this.setState({ search: e.target.value })}
             />
           </Localizer>
         </div>
@@ -80,7 +80,7 @@ class FeatureCatalog extends Component {
             </p>
           )}
 
-          {filteredOptions.map(group => {
+          {filteredOptions.map((group) => {
             const isExpanded = expandedCategories[group.label] !== false;
 
             return (
@@ -97,7 +97,7 @@ class FeatureCatalog extends Component {
 
                 {isExpanded && (
                   <div class={style.featureCatalogGrid}>
-                    {group.options.map(option => {
+                    {group.options.map((option) => {
                       const [category, type] = option.value.split('|');
                       const icon = get(DeviceFeatureCategoriesIcon, `${category}.${type}`, 'radio');
 

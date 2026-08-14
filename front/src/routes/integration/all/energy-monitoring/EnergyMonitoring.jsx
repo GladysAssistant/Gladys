@@ -10,13 +10,13 @@ import BackToIntegrationsLink from '../../../../components/integration/BackToInt
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS
+  DEVICE_FEATURE_UNITS,
 } from '../../../../../../server/utils/constants';
 
 const DEVICE_FEATURE_CATEGORIES_TO_DISPLAY = [
   DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
   DEVICE_FEATURE_CATEGORIES.SWITCH,
-  DEVICE_FEATURE_CATEGORIES.TELEINFORMATION
+  DEVICE_FEATURE_CATEGORIES.TELEINFORMATION,
 ];
 
 const DEVICE_FEATURE_TYPES_TO_DISPLAY = [
@@ -37,7 +37,7 @@ const DEVICE_FEATURE_TYPES_TO_DISPLAY = [
   DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF07,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF08,
   DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF09,
-  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF10
+  DEVICE_FEATURE_TYPES.TELEINFORMATION.EASF10,
 ];
 
 class EnergyMonitoringPage extends Component {
@@ -78,12 +78,12 @@ class EnergyMonitoringPage extends Component {
       day_type: 'any',
       price: '',
       hour_slots: '',
-      subscribed_power: ''
-    }
+      subscribed_power: '',
+    },
   };
 
   // ----- TIME SLOT HELPERS -----
-  slotIndexToLabel = slot => {
+  slotIndexToLabel = (slot) => {
     if (!Number.isInteger(slot) || slot < 0 || slot > 47) return '';
     const hour = Math.floor(slot / 2);
     const minutes = slot % 2 === 1 ? '30' : '00';
@@ -91,7 +91,7 @@ class EnergyMonitoringPage extends Component {
     return `${hh}:${minutes}`;
   };
 
-  labelToSlotIndex = label => {
+  labelToSlotIndex = (label) => {
     if (!label) return null;
     const s = String(label).trim();
     // Legacy numeric formats
@@ -113,22 +113,22 @@ class EnergyMonitoringPage extends Component {
     return hour * 2 + (minutes === 30 ? 1 : 0);
   };
 
-  parseHourSlotsToSet = raw => {
+  parseHourSlotsToSet = (raw) => {
     const set = new Set();
     if (!raw) return set;
     const parts = String(raw)
       .split(',')
-      .map(s => s.trim())
+      .map((s) => s.trim())
       .filter(Boolean);
-    parts.forEach(p => {
+    parts.forEach((p) => {
       const idx = this.labelToSlotIndex(p);
       if (idx !== null) set.add(idx);
     });
     return set;
   };
 
-  formatSetToHourSlots = set => {
-    const arr = Array.from(set || []).filter(n => Number.isInteger(n));
+  formatSetToHourSlots = (set) => {
+    const arr = Array.from(set || []).filter((n) => Number.isInteger(n));
     arr.sort((a, b) => a - b);
     return arr.map(this.slotIndexToLabel).join(',');
   };
@@ -152,11 +152,11 @@ class EnergyMonitoringPage extends Component {
       this.setState({
         calculatingConsumptionFromBeginning: true,
         consumptionSettingsError: null,
-        consumptionSettingsSuccess: null
+        consumptionSettingsSuccess: null,
       });
       await this.props.httpClient.post(
         '/api/v1/service/energy-monitoring/calculate-consumption-from-index-from-beginning',
-        {}
+        {},
       );
       this.setState({ consumptionSettingsSuccess: 'ok' });
       // Redirect to jobs page
@@ -231,7 +231,7 @@ class EnergyMonitoringPage extends Component {
       wizardEditingId: null,
       wizardStep: 0,
       wizardHourSlots: new Set(),
-      newPrice: { ...this.state.newPrice, hour_slots: '' }
+      newPrice: { ...this.state.newPrice, hour_slots: '' },
     });
     route('/dashboard/integration/device/energy-monitoring/prices/create');
   };
@@ -240,8 +240,8 @@ class EnergyMonitoringPage extends Component {
     route('/dashboard/integration/device/energy-monitoring/prices/import');
   };
 
-  startEditPrice = price => {
-    const p = price && price.id ? price : (this.state.prices || []).find(x => x.id === price);
+  startEditPrice = (price) => {
+    const p = price && price.id ? price : (this.state.prices || []).find((x) => x.id === price);
     if (p) {
       // Parse hour slots (supports legacy numeric formats and HH:MM)
       const slots = this.parseHourSlotsToSet(p.hour_slots || '');
@@ -260,14 +260,14 @@ class EnergyMonitoringPage extends Component {
           day_type: p.day_type || 'any',
           price: p.price != null && p.price !== '' ? p.price / 10000 : '',
           hour_slots: p.hour_slots || '',
-          subscribed_power: p.subscribed_power || ''
-        }
+          subscribed_power: p.subscribed_power || '',
+        },
       });
     }
     route(`/dashboard/integration/device/energy-monitoring/prices/edit/${p ? p.id : ''}`);
   };
 
-  togglePriceExpanded = id => {
+  togglePriceExpanded = (id) => {
     this.setState(({ expandedPriceIds }) => {
       const next = new Set(expandedPriceIds);
       if (next.has(id)) next.delete(id);
@@ -276,7 +276,7 @@ class EnergyMonitoringPage extends Component {
     });
   };
 
-  toggleContractGroupExpanded = groupName => {
+  toggleContractGroupExpanded = (groupName) => {
     this.setState(({ expandedContractGroups }) => {
       const next = new Set(expandedContractGroups);
       if (next.has(groupName)) next.delete(groupName);
@@ -285,9 +285,9 @@ class EnergyMonitoringPage extends Component {
     });
   };
 
-  deletePrice = async id => {
+  deletePrice = async (id) => {
     try {
-      const item = (this.state.prices || []).find(p => p.id === id);
+      const item = (this.state.prices || []).find((p) => p.id === id);
       const selector = item && item.selector;
       if (!selector) throw new Error('Missing selector for price.');
       await this.props.httpClient.delete(`/api/v1/energy_price/${selector}`);
@@ -297,10 +297,10 @@ class EnergyMonitoringPage extends Component {
     }
   };
 
-  deleteContractGroup = async contractName => {
+  deleteContractGroup = async (contractName) => {
     try {
       const pricesToDelete = (this.state.prices || []).filter(
-        p => (p.contract_name || p.contract || 'base') === contractName
+        (p) => (p.contract_name || p.contract || 'base') === contractName,
       );
       for (const item of pricesToDelete) {
         if (item.selector) {
@@ -336,7 +336,7 @@ class EnergyMonitoringPage extends Component {
         delete payload.price;
       }
       if (this.state.wizardEditingId) {
-        const existing = (this.state.prices || []).find(p => p.id === this.state.wizardEditingId);
+        const existing = (this.state.prices || []).find((p) => p.id === this.state.wizardEditingId);
         if (!existing || !existing.selector) throw new Error('Missing selector for update.');
         await this.props.httpClient.patch(`/api/v1/energy_price/${existing.selector}`, payload);
       } else {
@@ -390,10 +390,10 @@ class EnergyMonitoringPage extends Component {
             read_only: true,
             has_feedback: false,
             min: 0,
-            max: 10000000000
-          }
+            max: 10000000000,
+          },
         ],
-        params: []
+        params: [],
       };
 
       const createdDevice = await this.props.httpClient.post('/api/v1/device', newDevice);
@@ -403,7 +403,7 @@ class EnergyMonitoringPage extends Component {
 
       // Update the wizard form with the newly created device
       this.setState(({ newPrice }) => ({
-        newPrice: { ...newPrice, electric_meter_device_id: createdDevice.id }
+        newPrice: { ...newPrice, electric_meter_device_id: createdDevice.id },
       }));
     } catch (error) {
       console.error(error);
@@ -413,14 +413,14 @@ class EnergyMonitoringPage extends Component {
     }
   };
 
-  handleElectricMeterChange = async e => {
+  handleElectricMeterChange = async (e) => {
     const value = e.target.value;
 
     if (value === 'CREATE_NEW') {
       await this.createElectricMeter();
     } else {
       this.setState(({ newPrice }) => ({
-        newPrice: { ...newPrice, electric_meter_device_id: value }
+        newPrice: { ...newPrice, electric_meter_device_id: value },
       }));
     }
   };
@@ -428,15 +428,15 @@ class EnergyMonitoringPage extends Component {
   getAllFeatures() {
     const flat = [];
     const { devices } = this.state;
-    devices.forEach(device => {
+    devices.forEach((device) => {
       (device.features || [])
         .filter(
-          feature =>
+          (feature) =>
             feature &&
             DEVICE_FEATURE_CATEGORIES_TO_DISPLAY.includes(feature.category) &&
-            DEVICE_FEATURE_TYPES_TO_DISPLAY.includes(feature.type)
+            DEVICE_FEATURE_TYPES_TO_DISPLAY.includes(feature.type),
         )
-        .forEach(feature => {
+        .forEach((feature) => {
           flat.push({ ...feature, __device: device });
         });
     });
@@ -446,11 +446,11 @@ class EnergyMonitoringPage extends Component {
   detectCircularDependencies() {
     const allFeatures = this.getAllFeatures();
     const featureMap = new Map();
-    allFeatures.forEach(f => featureMap.set(f.id, f));
+    allFeatures.forEach((f) => featureMap.set(f.id, f));
 
     const circularDependencies = [];
 
-    allFeatures.forEach(feature => {
+    allFeatures.forEach((feature) => {
       if (!feature.energy_parent_id) return;
 
       const visited = new Set();
@@ -463,7 +463,7 @@ class EnergyMonitoringPage extends Component {
           circularDependencies.push({
             feature,
             chain: [...chain],
-            type: current.id === feature.id ? 'self' : 'cycle'
+            type: current.id === feature.id ? 'self' : 'cycle',
           });
           break;
         }
@@ -475,7 +475,7 @@ class EnergyMonitoringPage extends Component {
             feature,
             chain: [...chain],
             type: 'broken',
-            missingParentId: current.energy_parent_id
+            missingParentId: current.energy_parent_id,
           });
           break;
         }
@@ -520,14 +520,14 @@ class EnergyMonitoringPage extends Component {
       // Get all features to access by ID
       const allFeatures = this.getAllFeatures();
       const featureMap = new Map();
-      allFeatures.forEach(f => featureMap.set(f.id, f));
+      allFeatures.forEach((f) => featureMap.set(f.id, f));
 
       // Fix only the identified features
       for (const featureId of featuresToFix) {
         const feature = featureMap.get(featureId);
         if (feature && feature.selector) {
           await this.props.httpClient.patch(`/api/v1/device_feature/${feature.selector}`, {
-            energy_parent_id: null
+            energy_parent_id: null,
           });
         }
       }
@@ -543,11 +543,11 @@ class EnergyMonitoringPage extends Component {
   getTree() {
     const allFeatures = this.getAllFeatures();
     const children = new Map();
-    allFeatures.forEach(f => {
+    allFeatures.forEach((f) => {
       children.set(f.id, []);
     });
     const rootFeatures = [];
-    allFeatures.forEach(f => {
+    allFeatures.forEach((f) => {
       const parentId = f.energy_parent_id || null;
       if (parentId && children.has(parentId)) {
         children.get(parentId).push(f);
@@ -560,35 +560,35 @@ class EnergyMonitoringPage extends Component {
 
   async setParentLocal(featureId, newParentId) {
     const { allFeatures } = this.getTree();
-    const feature = allFeatures.find(f => f.id === featureId);
+    const feature = allFeatures.find((f) => f.id === featureId);
     const selector = feature && feature.selector;
     const previousParentId = feature ? feature.energy_parent_id || null : null;
 
     // optimistic update
     this.setState(({ devices }) => ({
-      devices: devices.map(d => ({
+      devices: devices.map((d) => ({
         ...d,
-        features: (d.features || []).map(f =>
-          f.id === featureId ? { ...f, energy_parent_id: newParentId || null } : f
-        )
-      }))
+        features: (d.features || []).map((f) =>
+          f.id === featureId ? { ...f, energy_parent_id: newParentId || null } : f,
+        ),
+      })),
     }));
 
     if (selector) {
       try {
         await this.props.httpClient.patch(`/api/v1/device_feature/${selector}`, {
-          energy_parent_id: newParentId || null
+          energy_parent_id: newParentId || null,
         });
       } catch (e) {
         // rollback on error
         this.setState(({ devices }) => ({
-          devices: devices.map(d => ({
+          devices: devices.map((d) => ({
             ...d,
-            features: (d.features || []).map(f =>
-              f.id === featureId ? { ...f, energy_parent_id: previousParentId } : f
-            )
+            features: (d.features || []).map((f) =>
+              f.id === featureId ? { ...f, energy_parent_id: previousParentId } : f,
+            ),
           })),
-          error: e
+          error: e,
         }));
       }
     }
@@ -598,7 +598,7 @@ class EnergyMonitoringPage extends Component {
     const { rootFeatures, childrenById, allFeatures } = this.getTree();
     const { loadingDevices, error } = state;
 
-    const getDescendantIds = id => {
+    const getDescendantIds = (id) => {
       const stack = [id];
       const visited = new Set();
       visited.add(id);
@@ -606,7 +606,7 @@ class EnergyMonitoringPage extends Component {
       while (stack.length) {
         const current = stack.pop();
         const children = childrenById.get(current) || [];
-        children.forEach(c => {
+        children.forEach((c) => {
           if (!visited.has(c.id)) {
             visited.add(c.id);
             result.add(c.id);
@@ -619,9 +619,9 @@ class EnergyMonitoringPage extends Component {
 
     const renderFeature = (feature, depth = 0) => {
       const paddingLeft = depth > 0 ? 8 + Math.min(depth, 2) * 12 : 0;
-      const label = `${feature.__device ? feature.__device.name : ''} - ${feature.name ||
-        feature.selector ||
-        feature.id}`;
+      const label = `${feature.__device ? feature.__device.name : ''} - ${
+        feature.name || feature.selector || feature.id
+      }`;
       const levelColors = ['#5c7cfa', '#40c057', '#fab005', '#fa5252', '#12b886', '#7950f2'];
       const color = levelColors[depth % levelColors.length];
       const descendantIds = getDescendantIds(feature.id);
@@ -663,14 +663,14 @@ class EnergyMonitoringPage extends Component {
                       class="form-control form-control-sm w-100"
                       style={{ minWidth: '200px' }}
                       value={feature.energy_parent_id || ''}
-                      onChange={e => this.setParentLocal(feature.id, e.target.value || null)}
+                      onChange={(e) => this.setParentLocal(feature.id, e.target.value || null)}
                     >
                       <option value="">
                         <Text id="integration.energyMonitoring.rootNotParent" />
                       </option>
                       {allFeatures
-                        .filter(f => f.id !== feature.id && !descendantIds.has(f.id))
-                        .map(f => (
+                        .filter((f) => f.id !== feature.id && !descendantIds.has(f.id))
+                        .map((f) => (
                           <option key={f.id} value={f.id}>
                             {(f.__device ? `${f.__device.name} - ` : '') + (f.name || f.selector || f.id)}
                           </option>
@@ -681,7 +681,7 @@ class EnergyMonitoringPage extends Component {
               </div>
             </div>
           </div>
-          {(childrenById.get(feature.id) || []).map(child => (
+          {(childrenById.get(feature.id) || []).map((child) => (
             <div key={`${feature.id}-${child.id}`}>{renderFeature(child, depth + 1)}</div>
           ))}
         </div>
@@ -708,7 +708,7 @@ class EnergyMonitoringPage extends Component {
     );
 
     // Helper to format stored hour slots
-    const formatStoredSlots = value => {
+    const formatStoredSlots = (value) => {
       if (!value) return '';
       const s = String(value);
       if (s.includes(':')) return s; // already HH:MM list
@@ -720,21 +720,21 @@ class EnergyMonitoringPage extends Component {
     // Determine if price is for peak hours based on hour_slots content
     // Peak hours are typically during the day (e.g., 08:00-12:00, 18:00-22:00)
     // Off-peak hours typically include night hours (00:00-06:00)
-    const isPeakPrice = p => {
+    const isPeakPrice = (p) => {
       if (!p.hour_slots || String(p.hour_slots).trim().length === 0) {
         // No hour slots = base contract, not peak/off-peak
         return null;
       }
       const slots = String(p.hour_slots)
         .split(',')
-        .map(s => s.trim())
+        .map((s) => s.trim())
         .filter(Boolean);
       if (slots.length === 0) return null;
 
       // Count how many slots are in typical off-peak night hours (00:00-06:00)
       // These are slots 0-11 (00:00, 00:30, 01:00, ..., 05:30)
       let nightSlotCount = 0;
-      slots.forEach(slot => {
+      slots.forEach((slot) => {
         const match = slot.match(/^(\d{1,2}):(\d{2})$/);
         if (match) {
           const hour = parseInt(match[1], 10);
@@ -751,7 +751,7 @@ class EnergyMonitoringPage extends Component {
     };
 
     // Get border color based on day_type (for Tempo contracts)
-    const getDayTypeBorderColor = dayType => {
+    const getDayTypeBorderColor = (dayType) => {
       switch (dayType) {
         case 'blue':
           return '#4dabf7'; // blue
@@ -765,7 +765,7 @@ class EnergyMonitoringPage extends Component {
     };
 
     // Get badge style for peak/off-peak
-    const getPeakBadgeStyle = isPeak => {
+    const getPeakBadgeStyle = (isPeak) => {
       if (isPeak === true) {
         return { background: '#fd7e14', color: '#fff' }; // orange for peak
       }
@@ -776,9 +776,9 @@ class EnergyMonitoringPage extends Component {
     };
 
     // Group prices by name
-    const groupPricesByName = prices => {
+    const groupPricesByName = (prices) => {
       const groups = {};
-      prices.forEach(p => {
+      prices.forEach((p) => {
         const name = p.contract_name || p.contract || 'base';
         if (!groups[name]) {
           groups[name] = [];
@@ -789,7 +789,7 @@ class EnergyMonitoringPage extends Component {
     };
 
     // Sort prices within a group: by day_type, then by peak/off-peak
-    const sortPricesInGroup = prices => {
+    const sortPricesInGroup = (prices) => {
       const dayTypeOrder = { blue: 0, white: 1, red: 2, any: 3 };
       return [...prices].sort((a, b) => {
         // First sort by day_type
@@ -803,9 +803,9 @@ class EnergyMonitoringPage extends Component {
       });
     };
 
-    const renderPriceRow = p => {
+    const renderPriceRow = (p) => {
       const expanded = state.expandedPriceIds.has(p.id);
-      const fmt = d => (d && d !== 'Invalid date' ? d : '');
+      const fmt = (d) => (d && d !== 'Invalid date' ? d : '');
       const dates = [fmt(p.start_date), fmt(p.end_date)].filter(Boolean);
       const period = dates.join(' → ');
       const dayTypeBorderColor = getDayTypeBorderColor(p.day_type);
@@ -834,7 +834,7 @@ class EnergyMonitoringPage extends Component {
                     class="badge mr-2"
                     style={{
                       background: getDayTypeBorderColor(p.day_type) || '#6c757d',
-                      color: '#fff'
+                      color: '#fff',
                     }}
                   >
                     <Text
@@ -935,7 +935,7 @@ class EnergyMonitoringPage extends Component {
               </div>
               <button
                 class="btn btn-sm btn-outline-danger"
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   if (window.confirm(this.props.intl.dictionary.integration.energyMonitoring.confirmDeleteContract)) {
                     this.deleteContractGroup(groupName);
@@ -948,14 +948,14 @@ class EnergyMonitoringPage extends Component {
           </div>
           {isExpanded && (
             <div class="pl-3 mt-2" style={{ borderLeft: '2px solid #e9ecef' }}>
-              {sortedPrices.map(p => renderPriceRow(p))}
+              {sortedPrices.map((p) => renderPriceRow(p))}
             </div>
           )}
         </div>
       );
     };
 
-    const updateNewPrice = patch => this.setState(({ newPrice }) => ({ newPrice: { ...newPrice, ...patch } }));
+    const updateNewPrice = (patch) => this.setState(({ newPrice }) => ({ newPrice: { ...newPrice, ...patch } }));
 
     const renderWizard = () => (
       <div>
@@ -977,7 +977,7 @@ class EnergyMonitoringPage extends Component {
           <div class="card-body">
             <div class="mb-4">
               <div class="d-flex align-items-center">
-                {[0, 1, 2].map(i => (
+                {[0, 1, 2].map((i) => (
                   <div
                     key={i}
                     class={cx('mr-3 d-flex align-items-center', i === state.wizardStep ? 'text-primary' : 'text-muted')}
@@ -1015,7 +1015,7 @@ class EnergyMonitoringPage extends Component {
                         type="text"
                         class="form-control"
                         value={state.newPrice.contract_name}
-                        onChange={e => updateNewPrice({ contract_name: e.target.value })}
+                        onChange={(e) => updateNewPrice({ contract_name: e.target.value })}
                         placeholder={this.props.intl.dictionary.integration.energyMonitoring.contractNamePlaceholder}
                       />
                     </div>
@@ -1028,7 +1028,7 @@ class EnergyMonitoringPage extends Component {
                       <select
                         class="form-control"
                         value={state.newPrice.contract}
-                        onChange={e => updateNewPrice({ contract: e.target.value })}
+                        onChange={(e) => updateNewPrice({ contract: e.target.value })}
                       >
                         <option value="base">
                           <Text id="integration.energyMonitoring.contractTypes.base" />
@@ -1052,7 +1052,7 @@ class EnergyMonitoringPage extends Component {
                       <select
                         class="form-control"
                         value={state.newPrice.price_type}
-                        onChange={e => updateNewPrice({ price_type: e.target.value })}
+                        onChange={(e) => updateNewPrice({ price_type: e.target.value })}
                       >
                         <option value="consumption">
                           <Text id="integration.energyMonitoring.priceTypes.consumption" />
@@ -1071,7 +1071,7 @@ class EnergyMonitoringPage extends Component {
                       <select
                         class="form-control"
                         value={state.newPrice.currency}
-                        onChange={e => updateNewPrice({ currency: e.target.value })}
+                        onChange={(e) => updateNewPrice({ currency: e.target.value })}
                       >
                         <option value="euro">
                           <Text id="integration.energyMonitoring.currencies.euro" />
@@ -1106,7 +1106,7 @@ class EnergyMonitoringPage extends Component {
                         type="date"
                         class="form-control"
                         value={state.newPrice.start_date}
-                        onChange={e => updateNewPrice({ start_date: e.target.value })}
+                        onChange={(e) => updateNewPrice({ start_date: e.target.value })}
                       />
                     </div>
                   </div>
@@ -1119,7 +1119,7 @@ class EnergyMonitoringPage extends Component {
                         type="date"
                         class="form-control"
                         value={state.newPrice.end_date || ''}
-                        onChange={e => updateNewPrice({ end_date: e.target.value })}
+                        onChange={(e) => updateNewPrice({ end_date: e.target.value })}
                       />
                     </div>
                   </div>
@@ -1131,7 +1131,7 @@ class EnergyMonitoringPage extends Component {
                       <select
                         class="form-control"
                         value={state.newPrice.day_type}
-                        onChange={e => updateNewPrice({ day_type: e.target.value })}
+                        onChange={(e) => updateNewPrice({ day_type: e.target.value })}
                       >
                         <option value="any">
                           <Text id="integration.energyMonitoring.dayTypeOptions.any" />
@@ -1167,9 +1167,10 @@ class EnergyMonitoringPage extends Component {
                         </option>
                         {state.devices
                           .filter(
-                            d => Array.isArray(d.features) && d.features.some(f => f && f.category === 'energy-sensor')
+                            (d) =>
+                              Array.isArray(d.features) && d.features.some((f) => f && f.category === 'energy-sensor'),
                           )
-                          .map(d => (
+                          .map((d) => (
                             <option key={d.id} value={d.id}>
                               {d.name || d.selector || d.id}
                             </option>
@@ -1198,7 +1199,7 @@ class EnergyMonitoringPage extends Component {
                         type="number"
                         class="form-control"
                         value={state.newPrice.price}
-                        onChange={e => updateNewPrice({ price: e.target.valueAsNumber || e.target.value })}
+                        onChange={(e) => updateNewPrice({ price: e.target.valueAsNumber || e.target.value })}
                       />
                     </div>
                   </div>
@@ -1239,7 +1240,7 @@ class EnergyMonitoringPage extends Component {
                               type="button"
                               class={cx(
                                 'btn btn-sm btn-block text-center py-2 text-nowrap',
-                                state.wizardHourSlots.has(slot) ? 'btn-primary' : 'btn-outline-secondary'
+                                state.wizardHourSlots.has(slot) ? 'btn-primary' : 'btn-outline-secondary',
                               )}
                               onClick={() =>
                                 this.setState(({ wizardHourSlots }) => {
@@ -1265,7 +1266,7 @@ class EnergyMonitoringPage extends Component {
                         {(() => {
                           const arr = Array.from(state.wizardHourSlots).sort((a, b) => a - b);
                           if (!arr.length) return <Text id="integration.energyMonitoring.none" />;
-                          const toLabel = slot => {
+                          const toLabel = (slot) => {
                             const hour = Math.floor(slot / 2);
                             const m = slot % 2 === 1 ? '30' : '00';
                             const hh = hour < 10 ? `0${hour}` : `${hour}`;
@@ -1287,7 +1288,7 @@ class EnergyMonitoringPage extends Component {
                         type="text"
                         class="form-control"
                         value={state.newPrice.subscribed_power || ''}
-                        onChange={e => updateNewPrice({ subscribed_power: e.target.value })}
+                        onChange={(e) => updateNewPrice({ subscribed_power: e.target.value })}
                       />
                     </div>
                   </div>
@@ -1353,7 +1354,7 @@ class EnergyMonitoringPage extends Component {
                         </strong>{' '}
                         {(() => {
                           const arr = Array.from(state.wizardHourSlots).sort((a, b) => a - b);
-                          const toLabel = slot => {
+                          const toLabel = (slot) => {
                             const hour = Math.floor(slot / 2);
                             const m = slot % 2 === 1 ? '30' : '00';
                             const hh = hour < 10 ? `0${hour}` : `${hour}`;
@@ -1532,7 +1533,7 @@ class EnergyMonitoringPage extends Component {
                       <Text id="integration.energyMonitoring.errorLoadingPrices" />
                     </div>
                   )}
-                  {sortedGroupNames.map(groupName => renderPriceGroup(groupName, priceGroups[groupName]))}
+                  {sortedGroupNames.map((groupName) => renderPriceGroup(groupName, priceGroups[groupName]))}
                   {state.prices.length === 0 && !state.loadingPrices && (
                     <div class="text-muted">
                       <Text id="global.noData" defaultMessage="No data" />
@@ -1646,8 +1647,9 @@ class EnergyMonitoringPage extends Component {
                                         <ul class="mb-0">
                                           {circularDeps.map((dep, idx) => {
                                             const featureName = dep.feature.__device
-                                              ? `${dep.feature.__device.name} - ${dep.feature.name ||
-                                                  dep.feature.selector}`
+                                              ? `${dep.feature.__device.name} - ${
+                                                  dep.feature.name || dep.feature.selector
+                                                }`
                                               : dep.feature.name || dep.feature.selector;
                                             return (
                                               <li key={idx}>
@@ -1703,7 +1705,7 @@ class EnergyMonitoringPage extends Component {
                               <Text id="integration.energyMonitoring.hierarchicalListDescription" />
                             </p>
                             <div>
-                              {rootFeatures.map(f => (
+                              {rootFeatures.map((f) => (
                                 <div key={f.id}>{renderFeature(f, 0)}</div>
                               ))}
                               {rootFeatures.length === 0 && !loadingDevices && (

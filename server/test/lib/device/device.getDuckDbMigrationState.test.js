@@ -19,9 +19,7 @@ describe('Device.getDuckDbMigrationState', () => {
     const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     const migrationState = await device.getDuckDbMigrationState();
     expect(migrationState).to.have.property('is_duck_db_migrated', false);
-    expect(migrationState)
-      .to.have.property('duck_db_device_count')
-      .that.is.a('number');
+    expect(migrationState).to.have.property('duck_db_device_count').that.is.a('number');
     expect(migrationState).to.have.property('sqlite_db_device_state_count', 0);
   });
   it('should return migration done', async () => {
@@ -32,9 +30,7 @@ describe('Device.getDuckDbMigrationState', () => {
     const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     const migrationState = await device.getDuckDbMigrationState();
     expect(migrationState).to.have.property('is_duck_db_migrated', true);
-    expect(migrationState)
-      .to.have.property('duck_db_device_count')
-      .that.is.a('number');
+    expect(migrationState).to.have.property('duck_db_device_count').that.is.a('number');
     expect(migrationState).to.have.property('sqlite_db_device_state_count', 0);
   });
 });

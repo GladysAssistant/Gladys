@@ -22,7 +22,7 @@ class ShutterButtons extends Component {
       <div class="btn-group" role="group">
         <button
           class={cx('btn btn-sm btn-secondary', {
-            active: value === COVER_STATE.OPEN
+            active: value === COVER_STATE.OPEN,
           })}
           onClick={this.open}
         >
@@ -34,13 +34,13 @@ class ShutterButtons extends Component {
         </button>
         <button
           class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
-            active: value === COVER_STATE.STOP
+            active: value === COVER_STATE.STOP,
           })}
           onClick={this.stop}
         />
         <button
           class={cx('btn btn-sm', 'btn-secondary', {
-            active: value === COVER_STATE.CLOSE
+            active: value === COVER_STATE.CLOSE,
           })}
           onClick={this.close}
         >

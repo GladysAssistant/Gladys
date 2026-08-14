@@ -7,7 +7,7 @@ import { intToHex, hexToInt } from '../../../../server/utils/colors';
 class ColorDeviceType extends Component {
   colorPickerRef = createRef();
 
-  updateValue = color => {
+  updateValue = (color) => {
     if (color) {
       const colorInt = hexToInt(color.hexString);
       this.props.updateValue(colorInt);
@@ -24,11 +24,11 @@ class ColorDeviceType extends Component {
       layout: [
         {
           component: iro.ui.Wheel,
-          options: {}
-        }
-      ]
+          options: {},
+        },
+      ],
     });
-    this.colorPicker.on('input:end', color => this.updateValue(color));
+    this.colorPicker.on('input:end', (color) => this.updateValue(color));
   }
 
   componentDidUpdate(previousProps) {
@@ -45,7 +45,7 @@ class ColorDeviceType extends Component {
     return (
       <div
         class={cx('fade', 'w-100', 'mw-100', {
-          show: true
+          show: true,
         })}
       >
         <div class="row justify-content-end">

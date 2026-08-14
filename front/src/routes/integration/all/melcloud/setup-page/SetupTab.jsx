@@ -19,60 +19,60 @@ class SetupTab extends Component {
     this.setState({
       melcloudGetSettingsStatus: RequestStatus.Getting,
       melCloudUsername,
-      melCloudPassword
+      melCloudPassword,
     });
     try {
       const { value: username } = await this.props.httpClient.get(
-        '/api/v1/service/melcloud/variable/MELCLOUD_USERNAME'
+        '/api/v1/service/melcloud/variable/MELCLOUD_USERNAME',
       );
       melCloudUsername = username;
 
       const { value: password } = await this.props.httpClient.get(
-        '/api/v1/service/melcloud/variable/MELCLOUD_PASSWORD'
+        '/api/v1/service/melcloud/variable/MELCLOUD_PASSWORD',
       );
       melCloudPassword = password;
 
       this.setState({
         melcloudGetSettingsStatus: RequestStatus.Success,
         melCloudUsername,
-        melCloudPassword
+        melCloudPassword,
       });
     } catch (e) {
       this.setState({
-        melcloudGetSettingsStatus: RequestStatus.Error
+        melcloudGetSettingsStatus: RequestStatus.Error,
       });
     }
   }
 
-  saveConfiguration = async e => {
+  saveConfiguration = async (e) => {
     e.preventDefault();
     this.setState({
-      melcloudSaveSettingsStatus: RequestStatus.Getting
+      melcloudSaveSettingsStatus: RequestStatus.Getting,
     });
     try {
       await this.props.httpClient.post('/api/v1/service/melcloud/variable/MELCLOUD_USERNAME', {
-        value: this.state.melCloudUsername.trim()
+        value: this.state.melCloudUsername.trim(),
       });
 
       await this.props.httpClient.post('/api/v1/service/melcloud/variable/MELCLOUD_PASSWORD', {
-        value: this.state.melCloudPassword.trim()
+        value: this.state.melCloudPassword.trim(),
       });
 
       // start service
       await this.props.httpClient.post('/api/v1/service/melcloud/start');
       this.setState({
-        melcloudSaveSettingsStatus: RequestStatus.Success
+        melcloudSaveSettingsStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        melcloudSaveSettingsStatus: RequestStatus.Error
+        melcloudSaveSettingsStatus: RequestStatus.Error,
       });
     }
   };
 
-  updateConfiguration = e => {
+  updateConfiguration = (e) => {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -102,7 +102,7 @@ class SetupTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: state.melcloudSaveSettingsStatus === RequestStatus.Getting
+              active: state.melcloudSaveSettingsStatus === RequestStatus.Getting,
             })}
           >
             <div class="loader" />
@@ -147,7 +147,7 @@ class SetupTab extends Component {
                       <i
                         class={cx('fe', {
                           'fe-eye': !state.showPassword,
-                          'fe-eye-off': state.showPassword
+                          'fe-eye-off': state.showPassword,
                         })}
                       />
                     </span>

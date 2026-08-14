@@ -18,7 +18,7 @@ const NetworkDiscoverySummary = ({ networkDiscovery }) => {
         <Text id="integration.externalIntegration.install.networkDiscoveryText" />
       </p>
       <ul class="mb-0">
-        {networkDiscovery.map(capture => (
+        {networkDiscovery.map((capture) => (
           <li>
             {capture.type === 'udp-broadcast' && (
               <Text

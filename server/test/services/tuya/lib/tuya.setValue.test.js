@@ -1,4 +1,4 @@
-/* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-jsdoc */
 const sinon = require('sinon').createSandbox();
 // No .noPreserveCache() here: proxyquire already compiles a fresh copy of the
 // module under test on every call, and in noPreserveCache mode it also evicts
@@ -569,7 +569,7 @@ describe('TuyaHandler.setValue', () => {
     // installed on the one the production modules never use and the assertion
     // fails with an empty call list, in whichever file mocha happened to
     // schedule next on that worker.
-    // eslint-disable-next-line global-require
+
     const sharedLogger = require('../../../../utils/logger');
     proxyquire('../../../../services/tuya/lib/tuya.setValue', {
       tuyapi: function TuyAPIStub() {},
@@ -577,7 +577,6 @@ describe('TuyaHandler.setValue', () => {
       '../../../utils/logger': { debug: sinon.stub(), warn: sinon.stub(), info: sinon.stub() },
     });
 
-    // eslint-disable-next-line global-require
     expect(require('../../../../utils/logger')).to.equal(sharedLogger);
   });
 });

@@ -8,7 +8,7 @@ import EditRoom from './EditRoom';
 const EditHouse = ({ children, ...props }) => (
   <div
     class={cx('dimmer', {
-      active: props.loading
+      active: props.loading,
     })}
   >
     <div class="loader" />
@@ -42,7 +42,7 @@ const EditHouse = ({ children, ...props }) => (
             type="text"
             value={props.house.name}
             class={cx('form-control', {
-              'is-invalid': get(props, 'errors.houseName')
+              'is-invalid': get(props, 'errors.houseName'),
             })}
             onInput={props.updateHouseName}
             placeholder={<Text id="signup.configureHouse.houseNamePlaceHolder" />}
@@ -112,7 +112,7 @@ const EditHouse = ({ children, ...props }) => (
                 placeholder={<Text id="signup.configureHouse.alarmCodePlaceholder" />}
                 value={props.house.alarm_code}
                 class={cx('form-control', {
-                  'is-invalid': get(props, 'errors.alarm_code')
+                  'is-invalid': get(props, 'errors.alarm_code'),
                 })}
                 onInput={props.updateHouseAlarmCode}
               />
@@ -121,14 +121,14 @@ const EditHouse = ({ children, ...props }) => (
               <i
                 class={cx('fe', {
                   'fe-eye': !props.showAlarmCode,
-                  'fe-eye-off': props.showAlarmCode
+                  'fe-eye-off': props.showAlarmCode,
                 })}
               />
             </span>
           </div>
           <div
             class={cx('invalid-feedback', {
-              'd-block': get(props, 'errors.alarm_code')
+              'd-block': get(props, 'errors.alarm_code'),
             })}
           >
             <Text id="signup.configureHouse.alarmCodeError" />

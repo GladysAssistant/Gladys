@@ -14,18 +14,18 @@ class DiscoverTab extends Component {
     loading: true,
     mqttUrl: '',
     mqttUsername: '',
-    mqttPassword: ''
+    mqttPassword: '',
   };
 
-  updateUrl = e => {
+  updateUrl = (e) => {
     this.setState({ mqttUrl: e.target.value });
   };
 
-  updateUsername = e => {
+  updateUsername = (e) => {
     this.setState({ mqttUsername: e.target.value });
   };
 
-  updatePassword = e => {
+  updatePassword = (e) => {
     this.setState({ mqttPassword: e.target.value });
   };
 
@@ -72,7 +72,7 @@ class DiscoverTab extends Component {
     await this.setState({ loading: false });
   };
 
-  saveConfiguration = async e => {
+  saveConfiguration = async (e) => {
     e.preventDefault();
     const { mqttUrl, mqttUsername, mqttPassword } = this.state;
     try {
@@ -80,7 +80,7 @@ class DiscoverTab extends Component {
       await this.props.httpClient.post('/api/v1/service/zwavejs-ui/configuration', {
         mqtt_url: mqttUrl,
         mqtt_username: mqttUsername,
-        mqtt_password: mqttPassword
+        mqtt_password: mqttPassword,
       });
       await this.props.httpClient.post('/api/v1/service/zwavejs-ui/connect');
     } catch (e) {
@@ -117,8 +117,8 @@ class DiscoverTab extends Component {
       mqttUrl,
       mqttUsername,
       mqttPassword,
-      showPassword
-    }
+      showPassword,
+    },
   ) {
     return (
       <ZwaveJSUIPage user={props.user}>
@@ -172,7 +172,7 @@ class DiscoverTab extends Component {
             )}
             <div
               class={cx('dimmer', {
-                active: loading
+                active: loading,
               })}
             >
               <div class="loader" />
@@ -232,7 +232,7 @@ class DiscoverTab extends Component {
                         <i
                           class={cx('fe', {
                             'fe-eye': !showPassword,
-                            'fe-eye-off': showPassword
+                            'fe-eye-off': showPassword,
                           })}
                         />
                       </span>

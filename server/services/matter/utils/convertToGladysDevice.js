@@ -25,7 +25,6 @@ const {
   RvcRunMode,
   RvcCleanMode,
   PowerSource,
-  // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 const Promise = require('bluebird');
 const {
@@ -105,12 +104,12 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
     params: [],
   };
   if (nodeDetailDeviceDataBasicInformation) {
-    gladysDevice.name = `${
-      nodeDetailDeviceDataBasicInformation.vendorName
-    } (${nodeDetailDeviceDataBasicInformation.nodeLabel ||
+    gladysDevice.name = `${nodeDetailDeviceDataBasicInformation.vendorName} (${
+      nodeDetailDeviceDataBasicInformation.nodeLabel ||
       nodeDetailDeviceDataBasicInformation.productLabel ||
       nodeDetailDeviceDataBasicInformation.productName ||
-      device.name})`;
+      device.name
+    })`;
     if (nodeDetailDeviceDataBasicInformation.uniqueId) {
       gladysDevice.params.push({
         name: 'UNIQUE_ID',

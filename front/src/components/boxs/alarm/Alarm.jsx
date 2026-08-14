@@ -40,7 +40,7 @@ class AlarmComponent extends Component {
     }
   };
 
-  callAlarmApi = async action => {
+  callAlarmApi = async (action) => {
     await this.setState({ loading: true });
     try {
       await this.props.httpClient.post(`/api/v1/house/${this.props.box.house}/${action}`);
@@ -132,7 +132,7 @@ class AlarmComponent extends Component {
                           disabled={armingDisabled}
                           class={cx('btn btn-block', style.alarmActionButton, {
                             'btn-outline-primary': house.alarm_mode !== ALARM_MODES.ARMED,
-                            'btn-primary': house.alarm_mode === ALARM_MODES.ARMED
+                            'btn-primary': house.alarm_mode === ALARM_MODES.ARMED,
                           })}
                         >
                           <div class="pb-2">
@@ -149,7 +149,7 @@ class AlarmComponent extends Component {
                           disabled={house.alarm_mode === ALARM_MODES.DISARMED}
                           class={cx('btn btn-block', style.alarmActionButton, {
                             'btn-outline-success': house.alarm_mode !== ALARM_MODES.DISARMED,
-                            'btn-success': house.alarm_mode === ALARM_MODES.DISARMED
+                            'btn-success': house.alarm_mode === ALARM_MODES.DISARMED,
                           })}
                         >
                           <div class="pb-2">
@@ -168,7 +168,7 @@ class AlarmComponent extends Component {
                           disabled={partialArmDisabled}
                           class={cx('btn btn-block', style.alarmActionButton, {
                             'btn-outline-dark': house.alarm_mode !== ALARM_MODES.PARTIALLY_ARMED,
-                            'btn-dark': house.alarm_mode === ALARM_MODES.PARTIALLY_ARMED
+                            'btn-dark': house.alarm_mode === ALARM_MODES.PARTIALLY_ARMED,
                           })}
                         >
                           <div class="pb-2">
@@ -187,7 +187,7 @@ class AlarmComponent extends Component {
                           disabled={house.alarm_mode === ALARM_MODES.PANIC}
                           class={cx('btn btn-block', style.alarmActionButton, {
                             'btn-outline-danger': house.alarm_mode !== ALARM_MODES.PANIC,
-                            'btn-danger': house.alarm_mode === ALARM_MODES.PANIC
+                            'btn-danger': house.alarm_mode === ALARM_MODES.PANIC,
                           })}
                         >
                           <div class="pb-2">

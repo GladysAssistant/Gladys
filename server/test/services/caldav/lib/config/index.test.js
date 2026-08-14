@@ -133,9 +133,7 @@ describe('CalDAV config', () => {
     } catch (error) {
       expect(error).to.be.instanceOf(Error);
       expect(error).to.have.nested.property('message.message', 'CALDAV_BAD_USERNAME_PASSWORD');
-      expect(error)
-        .to.have.nested.property('message.log')
-        .that.is.a('string');
+      expect(error).to.have.nested.property('message.log').that.is.a('string');
     }
   });
 
@@ -166,9 +164,7 @@ describe('CalDAV config', () => {
     } catch (error) {
       expect(error).to.be.instanceOf(Error);
       expect(error).to.have.nested.property('message.message', 'CALDAV_BAD_URL');
-      expect(error)
-        .to.have.nested.property('message.log')
-        .that.is.a('string');
+      expect(error).to.have.nested.property('message.log').that.is.a('string');
     }
   });
 
@@ -199,9 +195,7 @@ describe('CalDAV config', () => {
     } catch (error) {
       expect(error).to.be.instanceOf(Error);
       expect(error).to.have.nested.property('message.message', 'CALDAV_BAD_SETTINGS_PRINCIPAL_URL');
-      expect(error)
-        .to.have.nested.property('message.log')
-        .that.is.a('string');
+      expect(error).to.have.nested.property('message.log').that.is.a('string');
     }
   });
 
@@ -242,9 +236,7 @@ describe('CalDAV config', () => {
     } catch (error) {
       expect(error).to.be.instanceOf(Error);
       expect(error).to.have.nested.property('message.message', 'CALDAV_BAD_SETTINGS_HOME_URL');
-      expect(error)
-        .to.have.nested.property('message.log')
-        .that.is.a('string');
+      expect(error).to.have.nested.property('message.log').that.is.a('string');
     }
   });
 });

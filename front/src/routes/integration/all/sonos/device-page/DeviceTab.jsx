@@ -23,11 +23,11 @@ class DeviceTab extends Component {
 
   getSonosDevices = async () => {
     this.setState({
-      getSonosStatus: RequestStatus.Getting
+      getSonosStatus: RequestStatus.Getting,
     });
     try {
       const options = {
-        order_dir: this.state.orderDir || 'asc'
+        order_dir: this.state.orderDir || 'asc',
       };
       if (this.state.search && this.state.search.length) {
         options.search = this.state.search;
@@ -36,45 +36,45 @@ class DeviceTab extends Component {
       const sonosDevices = await this.props.httpClient.get('/api/v1/service/sonos/device', options);
       this.setState({
         sonosDevices,
-        getSonosStatus: RequestStatus.Success
+        getSonosStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        getSonosStatus: e.message
+        getSonosStatus: e.message,
       });
     }
   };
 
   async getHouses() {
     this.setState({
-      housesGetStatus: RequestStatus.Getting
+      housesGetStatus: RequestStatus.Getting,
     });
     try {
       const params = {
-        expand: 'rooms'
+        expand: 'rooms',
       };
       const housesWithRooms = await this.props.httpClient.get(`/api/v1/house`, params);
       this.setState({
         housesWithRooms,
-        housesGetStatus: RequestStatus.Success
+        housesGetStatus: RequestStatus.Success,
       });
     } catch (e) {
       this.setState({
-        housesGetStatus: RequestStatus.Error
+        housesGetStatus: RequestStatus.Error,
       });
     }
   }
 
   async search(e) {
     await this.setState({
-      search: e.target.value
+      search: e.target.value,
     });
     this.getSonosDevices();
   }
 
-  changeOrderDir = async e => {
+  changeOrderDir = async (e) => {
     await this.setState({
-      orderDir: e.target.value
+      orderDir: e.target.value,
     });
     this.getSonosDevices();
   };
@@ -101,7 +101,7 @@ class DeviceTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: getSonosStatus === RequestStatus.Getting
+              active: getSonosStatus === RequestStatus.Getting,
             })}
           >
             <div class="loader" />

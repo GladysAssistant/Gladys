@@ -2,7 +2,7 @@ import { connect } from 'unistore/preact';
 import EweLinkPage from '../EweLinkPage';
 import UpdateDevice from '../../../../../components/device';
 
-const EditEweLinkDevice = props => (
+const EditEweLinkDevice = (props) => (
   <EweLinkPage user={props.user}>
     <UpdateDevice
       {...props}

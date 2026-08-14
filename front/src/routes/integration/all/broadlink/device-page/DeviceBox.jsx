@@ -10,20 +10,20 @@ import { RequestStatus } from '../../../../../utils/consts';
 class DeviceBox extends Component {
   saveDevice = async () => {
     this.setState({
-      loading: true
+      loading: true,
     });
     try {
       await this.props.saveDevice(this.props.device, this.props.deviceIndex);
       this.setState({
-        saveError: null
+        saveError: null,
       });
     } catch (e) {
       this.setState({
-        saveError: RequestStatus.Error
+        saveError: RequestStatus.Error,
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
@@ -31,13 +31,13 @@ class DeviceBox extends Component {
     this.setState({
       loading: true,
       tooMuchStatesError: false,
-      statesNumber: undefined
+      statesNumber: undefined,
     });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
       this.setState({
         error: undefined,
-        saveError: undefined
+        saveError: undefined,
       });
     } catch (e) {
       const status = get(e, 'response.status');
@@ -50,15 +50,15 @@ class DeviceBox extends Component {
       }
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
-  updateDeviceName = e => {
+  updateDeviceName = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
 
-  updateDeviceRoom = e => {
+  updateDeviceRoom = (e) => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
@@ -69,7 +69,7 @@ class DeviceBox extends Component {
           <div class="card-header">{device.name}</div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -122,9 +122,9 @@ class DeviceBox extends Component {
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {housesWithRooms.map(house => (
+                    {housesWithRooms.map((house) => (
                       <optgroup label={house.name}>
-                        {house.rooms.map(room => (
+                        {house.rooms.map((room) => (
                           <option selected={room.id === device.room_id} value={room.id}>
                             {room.name}
                           </option>

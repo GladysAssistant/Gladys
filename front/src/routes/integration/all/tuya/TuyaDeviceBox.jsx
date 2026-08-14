@@ -14,7 +14,7 @@ import {
   getLocalPollDpsFromParams,
   getUnknownDpsKeys,
   getUnknownSpecificationCodes,
-  resolveOnlineStatus
+  resolveOnlineStatus,
 } from './commons/deviceHelpers';
 import TuyaLocalPollSection from './TuyaLocalPollSection';
 import TuyaGithubIssueSection from './discover-page/TuyaGithubIssueSection';
@@ -22,7 +22,7 @@ import TuyaGithubIssueSection from './discover-page/TuyaGithubIssueSection';
 const LOCAL_POLL_FREQUENCY = 10 * 1000;
 const CLOUD_POLL_FREQUENCY = 30 * 1000;
 
-const getDeviceDisplayData = device => {
+const getDeviceDisplayData = (device) => {
   const params = buildParamsMap(device);
   return {
     deviceId: params.DEVICE_ID || getTuyaDeviceId(device),
@@ -30,11 +30,11 @@ const getDeviceDisplayData = device => {
     productId: params.PRODUCT_ID || device.product_id || '',
     productKey: params.PRODUCT_KEY || device.product_key || '',
     localOverride: normalizeBoolean(getLocalOverrideValue(device)),
-    persistedLocalPollDps: getLocalPollDpsFromParams(device)
+    persistedLocalPollDps: getLocalPollDpsFromParams(device),
   };
 };
 
-const buildComparableDevice = device => {
+const buildComparableDevice = (device) => {
   if (!device) {
     return null;
   }
@@ -44,7 +44,7 @@ const buildComparableDevice = device => {
     room_id: device.room_id || null,
     ip: params.IP_ADDRESS || device.ip || '',
     protocol: params.PROTOCOL_VERSION || device.protocol_version || '',
-    local_override: normalizeBoolean(getLocalOverrideValue(device))
+    local_override: normalizeBoolean(getLocalOverrideValue(device)),
   };
 };
 
@@ -63,19 +63,19 @@ const hasDeviceChanged = (device, baselineDevice) => {
   );
 };
 
-const getLocalConfig = device => {
+const getLocalConfig = (device) => {
   if (!device) {
     return {
       ip: '',
       protocol: '',
-      localOverride: false
+      localOverride: false,
     };
   }
   const params = buildParamsMap(device);
   return {
     ip: params.IP_ADDRESS || device.ip || '',
     protocol: params.PROTOCOL_VERSION || device.protocol_version || '',
-    localOverride: normalizeBoolean(getLocalOverrideValue(device))
+    localOverride: normalizeBoolean(getLocalOverrideValue(device)),
   };
 };
 
@@ -100,7 +100,7 @@ const getLocalValidationState = (device, baselineDevice, localPollValidation) =>
     hasLocalChanges: hasDeviceChanged(device, baselineDevice),
     requiresLocalPollValidation,
     localPollValidated,
-    canSave: !requiresLocalPollValidation || localPollValidated
+    canSave: !requiresLocalPollValidation || localPollValidated,
   };
 };
 
@@ -117,7 +117,7 @@ class TuyaDeviceBox extends Component {
       device: this.props.device,
       baselineDevice: this.props.device,
       localPollValidation: null,
-      localPollDps: null
+      localPollDps: null,
     });
   }
 
@@ -143,42 +143,42 @@ class TuyaDeviceBox extends Component {
         device: mergedNextDevice,
         baselineDevice: mergedNextDevice,
         localPollValidation: null,
-        localPollDps: null
+        localPollDps: null,
       });
       return;
     }
     this.setState({
       device: mergedNextDevice,
-      baselineDevice: shouldRefreshBaseline ? mergedNextDevice : baselineDevice
+      baselineDevice: shouldRefreshBaseline ? mergedNextDevice : baselineDevice,
     });
   }
 
-  updateName = e => {
+  updateName = (e) => {
     this.setState({
       device: {
         ...this.state.device,
-        name: e.target.value
-      }
+        name: e.target.value,
+      },
     });
   };
 
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.setState({
       device: {
         ...this.state.device,
-        room_id: e.target.value
-      }
+        room_id: e.target.value,
+      },
     });
   };
 
-  handleLocalPollChange = patch => {
+  handleLocalPollChange = (patch) => {
     this.setState(patch);
   };
 
   saveDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null
+      errorMessage: null,
     });
     try {
       const localConfig = getLocalConfig(this.state.device);
@@ -193,7 +193,7 @@ class TuyaDeviceBox extends Component {
 
       const payload = {
         ...this.state.device,
-        poll_frequency: localConfig.localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY
+        poll_frequency: localConfig.localOverride ? LOCAL_POLL_FREQUENCY : CLOUD_POLL_FREQUENCY,
       };
       if (shouldFallbackToBaselineFeatures) {
         payload.features = baselineFeatures;
@@ -201,7 +201,7 @@ class TuyaDeviceBox extends Component {
       const savedDevice = await this.props.httpClient.post(`/api/v1/device`, payload);
       this.setState({
         device: savedDevice,
-        baselineDevice: savedDevice
+        baselineDevice: savedDevice,
       });
       if (typeof this.props.onDeviceSaved === 'function') {
         this.props.onDeviceSaved(savedDevice);
@@ -212,11 +212,11 @@ class TuyaDeviceBox extends Component {
         errorMessage = 'integration.tuya.error.conflictError';
       }
       this.setState({
-        errorMessage
+        errorMessage,
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
@@ -225,7 +225,7 @@ class TuyaDeviceBox extends Component {
       loading: true,
       errorMessage: null,
       tooMuchStatesError: false,
-      statesNumber: undefined
+      statesNumber: undefined,
     });
     try {
       if (this.state.device.created_at) {
@@ -240,12 +240,12 @@ class TuyaDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.tuya.error.defaultDeletionError'
+          errorMessage: 'integration.tuya.error.defaultDeletionError',
         });
       }
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
@@ -258,7 +258,7 @@ class TuyaDeviceBox extends Component {
       saveButton,
       updateButton,
       alreadyCreatedButton,
-      housesWithRooms
+      housesWithRooms,
     },
     {
       device,
@@ -270,18 +270,17 @@ class TuyaDeviceBox extends Component {
       localPollError,
       localPollProtocol,
       localPollValidation,
-      localPollDps
-    }
+      localPollDps,
+    },
   ) {
     const validModel = device.features && device.features.length > 0;
     const online = resolveOnlineStatus(device);
-    const { deviceId, localKey, productId, productKey, localOverride, persistedLocalPollDps } = getDeviceDisplayData(
-      device
-    );
+    const { deviceId, localKey, productId, productKey, localOverride, persistedLocalPollDps } =
+      getDeviceDisplayData(device);
     const { hasLocalChanges, requiresLocalPollValidation, localPollValidated, canSave } = getLocalValidationState(
       device,
       this.state.baselineDevice,
-      localPollValidation
+      localPollValidation,
     );
     const isDiscoverPage = !deleteButton;
     const showUpdateButton =
@@ -295,7 +294,7 @@ class TuyaDeviceBox extends Component {
         ? 'integration.tuya.device.partialFeaturesCountDiscover'
         : 'integration.tuya.device.partialFeaturesCount';
 
-    const renderGithubIssuePrepAlert = titleId => (
+    const renderGithubIssuePrepAlert = (titleId) => (
       <div class="alert alert-warning mt-3 mb-3">
         <div class="font-weight-bold h5 mb-2">
           <Text id={titleId} />
@@ -319,7 +318,7 @@ class TuyaDeviceBox extends Component {
           </div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -392,9 +391,9 @@ class TuyaDeviceBox extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {housesWithRooms &&
-                      housesWithRooms.map(house => (
+                      housesWithRooms.map((house) => (
                         <optgroup label={house.name}>
-                          {house.rooms.map(room => (
+                          {house.rooms.map((room) => (
                             <option selected={room.id === device.room_id} value={room.id}>
                               {room.name}
                             </option>

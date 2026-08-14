@@ -6,7 +6,7 @@ import Layout from './Layout';
 import style from './style.css';
 
 class GoogleHomeGateway extends Component {
-  cancel = async e => {
+  cancel = async (e) => {
     e.preventDefault();
     await this.setState({ loading: true });
     if (this.props.redirect_uri && this.props.state) {
@@ -16,14 +16,14 @@ class GoogleHomeGateway extends Component {
       this.setState({ loading: false, error: true });
     }
   };
-  link = async e => {
+  link = async (e) => {
     e.preventDefault();
     try {
       await this.setState({ loading: true, error: false });
       const responseAuthorize = await this.props.session.gatewayClient.googleHomeAuthorize({
         client_id: this.props.client_id,
         redirect_uri: this.props.redirect_uri,
-        state: this.props.state
+        state: this.props.state,
       });
       window.location.replace(responseAuthorize.redirectUrl);
     } catch (e) {
@@ -64,7 +64,7 @@ class GoogleHomeGateway extends Component {
 
                   <div
                     class={cx('dimmer', {
-                      active: loading
+                      active: loading,
                     })}
                   >
                     <div class="loader" />

@@ -36,7 +36,7 @@ const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevi
       <div
         class={cx('dimmer', {
           active: getBluetoothDevicesStatus === RequestStatus.Getting,
-          [style.bluetoothListBody]: getBluetoothDevicesStatus === RequestStatus.Getting
+          [style.bluetoothListBody]: getBluetoothDevicesStatus === RequestStatus.Getting,
         })}
       >
         <div class="loader" />

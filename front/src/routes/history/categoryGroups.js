@@ -11,20 +11,20 @@ const CATEGORY_GROUPS = [
       DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
       DEVICE_FEATURE_CATEGORIES.LOCK,
       DEVICE_FEATURE_CATEGORIES.SHUTTER,
-      DEVICE_FEATURE_CATEGORIES.CURTAIN
-    ]
+      DEVICE_FEATURE_CATEGORIES.CURTAIN,
+    ],
   },
   {
     id: 'motion',
     icon: 'eye',
     colorClass: 'green',
-    categories: [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]
+    categories: [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR],
   },
   {
     id: 'buttons',
     icon: 'target',
     colorClass: 'purple',
-    categories: [DEVICE_FEATURE_CATEGORIES.BUTTON, DEVICE_FEATURE_CATEGORIES.DOORBELL, DEVICE_FEATURE_CATEGORIES.CUBE]
+    categories: [DEVICE_FEATURE_CATEGORIES.BUTTON, DEVICE_FEATURE_CATEGORIES.DOORBELL, DEVICE_FEATURE_CATEGORIES.CUBE],
   },
   {
     id: 'lights',
@@ -33,8 +33,8 @@ const CATEGORY_GROUPS = [
     categories: [
       DEVICE_FEATURE_CATEGORIES.LIGHT,
       DEVICE_FEATURE_CATEGORIES.SWITCH,
-      DEVICE_FEATURE_CATEGORIES.TELEVISION
-    ]
+      DEVICE_FEATURE_CATEGORIES.TELEVISION,
+    ],
   },
   {
     id: 'climate',
@@ -63,8 +63,8 @@ const CATEGORY_GROUPS = [
       DEVICE_FEATURE_CATEGORIES.HEATER,
       DEVICE_FEATURE_CATEGORIES.FAN,
       DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-      DEVICE_FEATURE_CATEGORIES.WATER_HEATER
-    ]
+      DEVICE_FEATURE_CATEGORIES.WATER_HEATER,
+    ],
   },
   {
     id: 'security',
@@ -78,8 +78,8 @@ const CATEGORY_GROUPS = [
       DEVICE_FEATURE_CATEGORIES.TAMPER,
       DEVICE_FEATURE_CATEGORIES.SISMIC_SENSOR,
       DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR,
-      DEVICE_FEATURE_CATEGORIES.BATTERY_LOW
-    ]
+      DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
+    ],
   },
   {
     id: 'energy',
@@ -90,28 +90,28 @@ const CATEGORY_GROUPS = [
       DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR,
       DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_BATTERY,
       DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE,
-      DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_STATE
-    ]
-  }
+      DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_STATE,
+    ],
+  },
 ];
 
 // Categories not in any group above belong to the "other" group
 const GROUPED_CATEGORIES = CATEGORY_GROUPS.reduce((acc, group) => acc.concat(group.categories), []);
 const OTHER_CATEGORIES = Object.values(DEVICE_FEATURE_CATEGORIES).filter(
-  category => !GROUPED_CATEGORIES.includes(category)
+  (category) => !GROUPED_CATEGORIES.includes(category),
 );
 
 const OTHER_GROUP = {
   id: 'other',
   icon: 'activity',
   colorClass: 'gray',
-  categories: OTHER_CATEGORIES
+  categories: OTHER_CATEGORIES,
 };
 
 const ALL_GROUPS = [...CATEGORY_GROUPS, OTHER_GROUP];
 
-const getGroupOfCategory = category => {
-  const group = CATEGORY_GROUPS.find(oneGroup => oneGroup.categories.includes(category));
+const getGroupOfCategory = (category) => {
+  const group = CATEGORY_GROUPS.find((oneGroup) => oneGroup.categories.includes(category));
   return group || OTHER_GROUP;
 };
 

@@ -34,9 +34,6 @@ describe('GET /api/v1/user/:user_selector', () => {
       });
   });
   it('should return 404 not found', async () => {
-    await authenticatedRequest
-      .get('/api/v1/user/USER_DOES_NOT_EXIST')
-      .expect('Content-Type', /json/)
-      .expect(404);
+    await authenticatedRequest.get('/api/v1/user/USER_DOES_NOT_EXIST').expect('Content-Type', /json/).expect(404);
   });
 });

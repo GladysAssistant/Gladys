@@ -960,12 +960,8 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
   });
 
   it('should format tool call trace text fallback name', () => {
-    const {
-      formatToolCallTraceText,
-      isToolInvocationTraceLine,
-      stripToolTraceEchoFromAnswer,
-      debugPreview,
-    } = getModule();
+    const { formatToolCallTraceText, isToolInvocationTraceLine, stripToolTraceEchoFromAnswer, debugPreview } =
+      getModule();
     expect(formatToolCallTraceText('', {})).to.equal('tool_call');
     expect(isToolInvocationTraceLine('device_turn_on_off({"action":"off","device":"Lumière"})')).to.equal(true);
     expect(isToolInvocationTraceLine('device_get_state()')).to.equal(true);

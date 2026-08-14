@@ -13,10 +13,7 @@ describe('POST /api/v1/service/:service_name/start', () => {
   });
 
   it('should fail on unknwon service', async () => {
-    await authenticatedRequest
-      .post('/api/v1/service/example/start')
-      .expect('Content-Type', /json/)
-      .expect(404);
+    await authenticatedRequest.post('/api/v1/service/example/start').expect('Content-Type', /json/).expect(404);
   });
 });
 
@@ -32,10 +29,7 @@ describe('POST /api/v1/service/:service_name/stop', () => {
   });
 
   it('should fail on unknwon service', async () => {
-    await authenticatedRequest
-      .post('/api/v1/service/example/stop')
-      .expect('Content-Type', /json/)
-      .expect(404);
+    await authenticatedRequest.post('/api/v1/service/example/stop').expect('Content-Type', /json/).expect(404);
   });
 });
 

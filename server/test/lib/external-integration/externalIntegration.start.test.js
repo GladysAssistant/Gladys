@@ -82,12 +82,7 @@ describe('externalIntegration.start', () => {
     const service = await seedExternalService();
     const { externalIntegration, system } = buildSupervisor({
       system: {
-        restartContainer: sinon
-          .stub()
-          .onFirstCall()
-          .rejects(new Error('404'))
-          .onSecondCall()
-          .resolves(true),
+        restartContainer: sinon.stub().onFirstCall().rejects(new Error('404')).onSecondCall().resolves(true),
       },
     });
     await externalIntegration.start(service.selector);

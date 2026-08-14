@@ -10,11 +10,11 @@ class TurnOnOffLight extends Component {
     try {
       const devices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'light',
-        device_feature_type: 'binary'
+        device_feature_type: 'binary',
       });
-      const deviceOptions = devices.map(device => ({
+      const deviceOptions = devices.map((device) => ({
         value: device.selector,
-        label: device.name
+        label: device.name,
       }));
       await this.setState({ deviceOptions });
       this.refreshSelectedOptions(this.props);
@@ -23,19 +23,19 @@ class TurnOnOffLight extends Component {
       console.error(e);
     }
   };
-  handleChange = selectedOptions => {
+  handleChange = (selectedOptions) => {
     if (selectedOptions) {
-      const lights = selectedOptions.map(selectedOption => selectedOption.value);
+      const lights = selectedOptions.map((selectedOption) => selectedOption.value);
       this.props.updateActionProperty(this.props.path, 'devices', lights);
     } else {
       this.props.updateActionProperty(this.props.path, 'devices', []);
     }
   };
-  refreshSelectedOptions = nextProps => {
+  refreshSelectedOptions = (nextProps) => {
     const selectedOptions = [];
     if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach(light => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === light);
+      nextProps.action.devices.forEach((light) => {
+        const deviceOption = this.state.deviceOptions.find((deviceOption) => deviceOption.value === light);
         if (deviceOption) {
           selectedOptions.push(deviceOption);
         }
@@ -47,7 +47,7 @@ class TurnOnOffLight extends Component {
     super(props);
     this.state = {
       deviceOptions: null,
-      selectedOptions: []
+      selectedOptions: [],
     };
   }
   async componentDidMount() {

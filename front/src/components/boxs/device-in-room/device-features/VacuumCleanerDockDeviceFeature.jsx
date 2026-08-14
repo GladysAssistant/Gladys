@@ -7,7 +7,7 @@ class VacuumCleanerDockDeviceFeature extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false
+      loading: false,
     };
   }
 
@@ -31,7 +31,7 @@ class VacuumCleanerDockDeviceFeature extends Component {
             onClick={this.dock}
             type="button"
             class={cx('btn', 'btn-outline-primary', 'btn-sm', style.btnLoading, {
-              'btn-loading': loading
+              'btn-loading': loading,
             })}
           >
             <i class="fe fe-home" /> <Text id="dashboard.boxes.devicesInRoom.vacuumDock" />

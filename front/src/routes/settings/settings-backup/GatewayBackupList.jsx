@@ -49,7 +49,7 @@ const GatewayPage = ({ children, ...props }) => (
         </thead>
         <tbody>
           {props.gatewayBackups &&
-            props.gatewayBackups.map(backup => (
+            props.gatewayBackups.map((backup) => (
               <GatewayBackupRow backup={backup} user={props.user} restoreBackup={props.restoreBackup} />
             ))}
         </tbody>

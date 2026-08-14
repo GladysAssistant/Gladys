@@ -53,9 +53,7 @@ describe('dashboard.getPhoto', () => {
 
   it('should reject non-image content types', async () => {
     const dashboard = getDashboard(fake.resolves('image/jpeg;base64,'));
-    nock('http://192.168.1.10')
-      .get('/file.txt')
-      .reply(200, 'hello', { 'Content-Type': 'text/plain' });
+    nock('http://192.168.1.10').get('/file.txt').reply(200, 'hello', { 'Content-Type': 'text/plain' });
 
     const promise = dashboard.getPhoto('http://192.168.1.10/file.txt');
     await assert.isRejected(promise, BadParameters);
@@ -63,9 +61,7 @@ describe('dashboard.getPhoto', () => {
 
   it('should reject responses without a content-type', async () => {
     const dashboard = getDashboard(fake.resolves('image/jpeg;base64,'));
-    nock('http://192.168.1.10')
-      .get('/photos/no-content-type.jpg')
-      .reply(200, Buffer.from('fake-image'));
+    nock('http://192.168.1.10').get('/photos/no-content-type.jpg').reply(200, Buffer.from('fake-image'));
 
     const promise = dashboard.getPhoto('http://192.168.1.10/photos/no-content-type.jpg');
     await assert.isRejected(promise, BadParameters);
@@ -174,9 +170,7 @@ describe('dashboard.getPhoto', () => {
   it('should reject images that exceed the source size limit', async () => {
     const dashboard = getDashboard(fake.resolves('image/jpeg;base64,'));
     const imageBuffer = Buffer.alloc(25 * 1024 * 1024 + 1);
-    nock('http://192.168.1.10')
-      .get('/photos/huge.jpg')
-      .reply(200, imageBuffer, { 'Content-Type': 'image/jpeg' });
+    nock('http://192.168.1.10').get('/photos/huge.jpg').reply(200, imageBuffer, { 'Content-Type': 'image/jpeg' });
 
     const promise = dashboard.getPhoto('http://192.168.1.10/photos/huge.jpg');
     await assert.isRejected(promise);

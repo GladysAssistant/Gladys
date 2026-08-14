@@ -3,18 +3,18 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import get from 'get-value';
 
-const isNullOrUndefined = variable => variable === null || variable === undefined;
+const isNullOrUndefined = (variable) => variable === null || variable === undefined;
 
 class EdfTempoCondition extends Component {
-  handleDayChange = e => {
+  handleDayChange = (e) => {
     this.props.updateActionProperty(this.props.path, 'edf_tempo_day', e.target.value);
   };
 
-  handlePeakDayTypeChange = e => {
+  handlePeakDayTypeChange = (e) => {
     this.props.updateActionProperty(this.props.path, 'edf_tempo_peak_day_type', e.target.value);
   };
 
-  handlePeakHourTypeChange = e => {
+  handlePeakHourTypeChange = (e) => {
     this.props.updateActionProperty(this.props.path, 'edf_tempo_peak_hour_type', e.target.value);
   };
 

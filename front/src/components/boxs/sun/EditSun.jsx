@@ -15,7 +15,7 @@ const EditSunBox = ({ ...props }) => (
           <Text id="global.emptySelectOption" />
         </option>
         {props.houses &&
-          props.houses.map(house => (
+          props.houses.map((house) => (
             <option key={house.selector} selected={house.selector === props.box.house} value={house.selector}>
               {house.name}
             </option>
@@ -26,9 +26,9 @@ const EditSunBox = ({ ...props }) => (
 );
 
 class EditSunBoxComponent extends Component {
-  updateBoxHouse = e => {
+  updateBoxHouse = (e) => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      house: e.target.value
+      house: e.target.value,
     });
   };
 
@@ -36,18 +36,18 @@ class EditSunBoxComponent extends Component {
     try {
       await this.setState({
         error: false,
-        pending: true
+        pending: true,
       });
       const houses = await this.props.httpClient.get('/api/v1/house');
       this.setState({
         houses,
-        pending: false
+        pending: false,
       });
     } catch (e) {
       console.error(e);
       this.setState({
         error: true,
-        pending: false
+        pending: false,
       });
     }
   };

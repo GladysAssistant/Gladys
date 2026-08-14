@@ -182,12 +182,7 @@ function formatEvents(caldavEvents, gladysCalendar) {
 
       if (newEvent.full_day && !caldavEvent.end) {
         newEvent.end = this.dayjs
-          .tz(
-            this.dayjs(caldavEvent.start)
-              .add(1, 'day')
-              .format('YYYY-MM-DDTHH:mm:ss'),
-            caldavEvent.start.tz,
-          )
+          .tz(this.dayjs(caldavEvent.start).add(1, 'day').format('YYYY-MM-DDTHH:mm:ss'), caldavEvent.start.tz)
           .format();
       }
 

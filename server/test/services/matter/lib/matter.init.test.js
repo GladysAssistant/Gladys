@@ -7,7 +7,6 @@ const {
   ElectricalPowerMeasurement,
   ElectricalEnergyMeasurement,
   HepaFilterMonitoring,
-  // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
 
 const sinon = require('sinon').createSandbox();

@@ -14,24 +14,24 @@ class SetupTab extends Component {
     e.preventDefault();
 
     await this.setState({
-      netatmoDisconnectStatus: RequestStatus.Getting
+      netatmoDisconnectStatus: RequestStatus.Getting,
     });
     try {
       await this.props.httpClient.post('/api/v1/service/netatmo/disconnect');
       this.props.updateStateInIndex({ connectNetatmoStatus: STATUS.DISCONNECTED });
       await this.setState({
-        netatmoDisconnectStatus: RequestStatus.Success
+        netatmoDisconnectStatus: RequestStatus.Success,
       });
     } catch (e) {
       await this.setState({
-        netatmoSaveSettingsStatus: RequestStatus.Error
+        netatmoSaveSettingsStatus: RequestStatus.Error,
       });
     }
   }
-  updateClientId = e => {
+  updateClientId = (e) => {
     this.props.updateStateInIndex({ netatmoClientId: e.target.value });
   };
-  updateClientSecret = e => {
+  updateClientSecret = (e) => {
     this.props.updateStateInIndex({ netatmoClientSecret: e.target.value });
   };
   updateEnergyApi = () => {
@@ -81,7 +81,7 @@ class SetupTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -150,7 +150,7 @@ class SetupTab extends Component {
                       <i
                         class={cx('fe', {
                           'fe-eye': !state.showClientSecret,
-                          'fe-eye-off': state.showClientSecret
+                          'fe-eye-off': state.showClientSecret,
                         })}
                       />
                     </span>

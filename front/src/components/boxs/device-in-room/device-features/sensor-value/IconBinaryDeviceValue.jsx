@@ -5,18 +5,18 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 const ICON_MAP = {
   [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: {
     0: 'unlock',
-    1: 'lock'
+    1: 'lock',
   },
   [DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_STATE]: {
     0: 'unlock',
-    1: 'lock'
+    1: 'lock',
   },
   [DEVICE_FEATURE_CATEGORIES.LOCK]: {
     0: 'unlock',
     1: 'lock',
     2: 'activity',
-    3: 'alert-triangle'
-  }
+    3: 'alert-triangle',
+  },
 };
 const IconBinaryDeviceValue = ({ deviceFeature }) => {
   const { category, last_value: lastValue = null } = deviceFeature;

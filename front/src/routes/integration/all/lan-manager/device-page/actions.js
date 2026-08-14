@@ -8,12 +8,12 @@ function createActions(store) {
   const actions = {
     async getLANManagerDevices(state) {
       store.setState({
-        getLANManagerDevicesStatus: RequestStatus.Getting
+        getLANManagerDevicesStatus: RequestStatus.Getting,
       });
       try {
         const options = {
           service: 'lan-manager',
-          order_dir: state.getLANManagerDeviceOrderDir || 'asc'
+          order_dir: state.getLANManagerDeviceOrderDir || 'asc',
         };
         if (state.lanManagerDeviceSearch && state.lanManagerDeviceSearch.length) {
           options.search = state.lanManagerDeviceSearch;
@@ -21,11 +21,11 @@ function createActions(store) {
         const lanManagerDevices = await state.httpClient.get('/api/v1/service/lan-manager/device', options);
         store.setState({
           lanManagerDevices,
-          getLANManagerDevicesStatus: RequestStatus.Success
+          getLANManagerDevicesStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          getLANManagerDevicesStatus: RequestStatus.Error
+          getLANManagerDevicesStatus: RequestStatus.Error,
         });
       }
     },
@@ -37,9 +37,9 @@ function createActions(store) {
         const newState = update(state, {
           lanManagerDevices: {
             [deviceIndex]: {
-              $set: savedDevice
-            }
-          }
+              $set: savedDevice,
+            },
+          },
         });
         store.setState(newState);
       } catch (e) {
@@ -52,10 +52,10 @@ function createActions(store) {
         lanManagerDevices: {
           [index]: {
             [property]: {
-              $set: value
-            }
-          }
-        }
+              $set: value,
+            },
+          },
+        },
       });
       store.setState(newState);
     },
@@ -63,23 +63,23 @@ function createActions(store) {
       await state.httpClient.delete(`/api/v1/device/${device.selector}`);
       const newState = update(state, {
         lanManagerDevices: {
-          $splice: [[index, 1]]
-        }
+          $splice: [[index, 1]],
+        },
       });
       store.setState(newState);
     },
     async search(state, e) {
       store.setState({
-        lanManagerDeviceSearch: e.target.value
+        lanManagerDeviceSearch: e.target.value,
       });
       await actions.getLANManagerDevices(store.getState(), 20, 0);
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getLANManagerDeviceOrderDir: e.target.value
+        getLANManagerDeviceOrderDir: e.target.value,
       });
       await actions.getLANManagerDevices(store.getState(), 20, 0);
-    }
+    },
   };
   actions.debouncedSearch = debounce(actions.search, 200);
   return Object.assign({}, houseActions, actions);

@@ -7,26 +7,26 @@ import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class TasmotaDeviceBox extends Component {
-  updateName = e => {
+  updateName = (e) => {
     this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'name', e.target.value);
 
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
-  updateRoom = e => {
+  updateRoom = (e) => {
     this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'room_id', e.target.value);
 
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
   saveDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null
+      errorMessage: null,
     });
     try {
       await this.props.saveDevice(this.props.listName, this.props.deviceIndex);
@@ -36,11 +36,11 @@ class TasmotaDeviceBox extends Component {
         errorMessage = 'integration.tasmota.error.conflictError';
       }
       this.setState({
-        errorMessage
+        errorMessage,
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
@@ -49,7 +49,7 @@ class TasmotaDeviceBox extends Component {
       loading: true,
       errorMessage: null,
       tooMuchStatesError: false,
-      statesNumber: undefined
+      statesNumber: undefined,
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
@@ -61,22 +61,22 @@ class TasmotaDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.tasmota.error.defaultDeletionError'
+          errorMessage: 'integration.tasmota.error.defaultDeletionError',
         });
       }
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
-  updateUsername = e => {
+  updateUsername = (e) => {
     e.preventDefault();
 
     this.setState({ username: e.target.value });
   };
 
-  updatePassword = e => {
+  updatePassword = (e) => {
     e.preventDefault();
 
     this.setState({ password: e.target.value });
@@ -85,7 +85,7 @@ class TasmotaDeviceBox extends Component {
   connectAndScan = async () => {
     this.setState({
       loading: true,
-      authErrorMessage: null
+      authErrorMessage: null,
     });
     try {
       const { device, httpClient } = this.props;
@@ -93,28 +93,28 @@ class TasmotaDeviceBox extends Component {
       const options = {
         singleAddress: device.external_id.replace('tasmota:', ''),
         username,
-        password
+        password,
       };
       await httpClient.post('/api/v1/service/tasmota/discover/http', options);
     } catch (e) {
       console.error(e);
       this.setState({
-        authErrorMessage: 'integration.tasmota.discover.http.authError'
+        authErrorMessage: 'integration.tasmota.discover.http.authError',
       });
     }
     this.setState({
-      loading: false
+      loading: false,
     });
   };
 
   render(
     { deviceIndex, device, housesWithRooms, editable, ...props },
-    { loading, errorMessage, authErrorMessage, tooMuchStatesError, statesNumber }
+    { loading, errorMessage, authErrorMessage, tooMuchStatesError, statesNumber },
   ) {
     const validModel = device.features.length > 0 || device.needAuthentication;
     // default value is 'mqtt'
-    const deviceProtocol = ((device.params || []).find(p => p.name === 'protocol') || { value: 'mqtt' }).value;
-    const deviceIp = (device.params || []).find(p => p.name === 'ip');
+    const deviceProtocol = ((device.params || []).find((p) => p.name === 'protocol') || { value: 'mqtt' }).value;
+    const deviceIp = (device.params || []).find((p) => p.name === 'ip');
     const deviceIpValue = deviceIp ? deviceIp.value : null;
 
     return (
@@ -123,7 +123,7 @@ class TasmotaDeviceBox extends Component {
           <div class="card-header">{device.name}</div>
           <div
             class={cx('dimmer', {
-              active: loading
+              active: loading,
             })}
           >
             <div class="loader" />
@@ -180,7 +180,7 @@ class TasmotaDeviceBox extends Component {
 
               <div
                 class={cx('card-body', {
-                  invisible: device.needAuthentication
+                  invisible: device.needAuthentication,
                 })}
               >
                 {errorMessage && (
@@ -224,9 +224,9 @@ class TasmotaDeviceBox extends Component {
                       <Text id="global.emptySelectOption" />
                     </option>
                     {housesWithRooms &&
-                      housesWithRooms.map(house => (
+                      housesWithRooms.map((house) => (
                         <optgroup label={house.name}>
-                          {house.rooms.map(room => (
+                          {house.rooms.map((room) => (
                             <option selected={room.id === device.room_id} value={room.id}>
                               {room.name}
                             </option>

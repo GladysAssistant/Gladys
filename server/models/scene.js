@@ -60,9 +60,7 @@ const actionSchema = Joi.object()
     }),
     conditions: Joi.array().items({
       variable: Joi.string().required(),
-      operator: Joi.string()
-        .valid('=', '!=', '>', '>=', '<', '<=')
-        .required(),
+      operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<=').required(),
       value: Joi.alternatives().try(Joi.number(), Joi.string()),
       evaluate_value: Joi.string(),
     }),
@@ -71,10 +69,7 @@ const actionSchema = Joi.object()
     message: Joi.string().allow(''),
     blinking_time: Joi.number(),
     blinking_speed: Joi.string().valid('slow', 'medium', 'fast'),
-    volume: Joi.number()
-      .integer()
-      .max(100)
-      .min(0),
+    volume: Joi.number().integer().max(100).min(0),
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
@@ -117,16 +112,11 @@ const triggersSchema = Joi.array().items(
     days_of_the_week: Joi.array().items(
       Joi.string().valid('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
     ),
-    day_of_the_month: Joi.number()
-      .min(1)
-      .max(31),
+    day_of_the_month: Joi.number().min(1).max(31),
     threshold_only: Joi.boolean(),
     topic: Joi.string(),
     message: Joi.string().allow(''),
-    offset: Joi.number()
-      .integer()
-      .min(-1440)
-      .max(1440),
+    offset: Joi.number().integer().min(-1440).max(1440),
     // weather-alert triggers (B.18): phenomenon type filter and minimal severity
     weather_alert_type: Joi.string().valid(...WEATHER_ALERT_TYPES, 'any'),
     weather_alert_severity: Joi.string().valid(...WEATHER_ALERT_SEVERITIES),

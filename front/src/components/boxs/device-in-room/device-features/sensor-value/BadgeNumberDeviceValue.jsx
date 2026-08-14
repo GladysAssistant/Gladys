@@ -11,7 +11,7 @@ import RawDeviceValue from './RawDeviceValue';
 const microgramPerCubicMeterFactors = {
   [DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER]: 1000,
   [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER]: 1,
-  [DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER]: 0.001
+  [DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER]: 0.001,
 };
 
 // A feature that declares no unit is assumed to already report µg/m³, which is what the Zigbee and
@@ -43,7 +43,7 @@ const colorLowAsGreenWithAlert = (value, safeLimit, warnLimit, alertLimit) => {
   return 'danger';
 };
 
-const getAqiColor = value => {
+const getAqiColor = (value) => {
   if (value < 50) {
     // Safe
     return 'success';
@@ -64,7 +64,7 @@ const getAqiColor = value => {
   return 'danger';
 };
 
-const getVocIndexColor = value => {
+const getVocIndexColor = (value) => {
   if (value < 150) {
     return 'success';
   } else if (value < 250) {
@@ -80,10 +80,10 @@ const RISK_COLORS = {
   'low-risk': 'warning',
   'medium-risk': 'orange',
   'high-risk': 'danger',
-  unknown: 'secondary'
+  unknown: 'secondary',
 };
 
-const getRiskColor = value => {
+const getRiskColor = (value) => {
   return RISK_COLORS[value];
 };
 
@@ -92,22 +92,22 @@ const LEVEL_MATTER_INDEX_COLOR = {
   low: 'success',
   medium: 'warning',
   high: 'orange',
-  critical: 'danger'
+  critical: 'danger',
 };
 
-const getLevelMatterIndexColor = value => {
+const getLevelMatterIndexColor = (value) => {
   return LEVEL_MATTER_INDEX_COLOR[value];
 };
 
 const BADGE_CATEGORIES = {
-  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200),
-  [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: value => colorLowAsGreen(value, 250, 2000),
-  [DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR]: value => getVocIndexColor(value),
-  [DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR]: value => getLevelMatterIndexColor(value),
-  [DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR]: value => getLevelMatterIndexColor(value),
-  [DEVICE_FEATURE_CATEGORIES.PM10_SENSOR]: value => colorLowAsGreen(value, 30, 50),
-  [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: value => colorLowAsGreen(value, 15, 25),
-  [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: value => colorLowAsGreen(value, 50, 120),
+  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: (value) => colorLowAsGreen(value, 600, 1200),
+  [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: (value) => colorLowAsGreen(value, 250, 2000),
+  [DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR]: (value) => getVocIndexColor(value),
+  [DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR]: (value) => getLevelMatterIndexColor(value),
+  [DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR]: (value) => getLevelMatterIndexColor(value),
+  [DEVICE_FEATURE_CATEGORIES.PM10_SENSOR]: (value) => colorLowAsGreen(value, 30, 50),
+  [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: (value) => colorLowAsGreen(value, 15, 25),
+  [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: (value) => colorLowAsGreen(value, 50, 120),
   // Thresholds in µg/m³, so the value is normalized to that unit first.
   [DEVICE_FEATURE_CATEGORIES.NO2_SENSOR]: (value, unit) =>
     colorLowAsGreenWithAlert(toMicrogramPerCubicMeter(value, unit), 40, 100, 200),
@@ -115,8 +115,8 @@ const BADGE_CATEGORIES = {
     colorLowAsGreenWithAlert(toMicrogramPerCubicMeter(value, unit), 100, 160, 240),
   [DEVICE_FEATURE_CATEGORIES.SO2_SENSOR]: (value, unit) =>
     colorLowAsGreenWithAlert(toMicrogramPerCubicMeter(value, unit), 40, 100, 300),
-  [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: value => getAqiColor(value),
-  [DEVICE_FEATURE_CATEGORIES.RISK]: value => getRiskColor(value)
+  [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: (value) => getAqiColor(value),
+  [DEVICE_FEATURE_CATEGORIES.RISK]: (value) => getRiskColor(value),
 };
 
 const BADGE_VALUE_CONVERTERS = {
@@ -124,25 +124,25 @@ const BADGE_VALUE_CONVERTERS = {
     0: 'no-risk',
     1: 'low-risk',
     2: 'medium-risk',
-    3: 'high-risk'
+    3: 'high-risk',
   },
   [DEVICE_FEATURE_CATEGORIES.VOC_MATTER_INDEX_SENSOR]: {
     0: 'unknown',
     1: 'low',
     2: 'medium',
     3: 'high',
-    4: 'critical'
+    4: 'critical',
   },
   [DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR]: {
     0: 'unknown',
     1: 'low',
     2: 'medium',
     3: 'high',
-    4: 'critical'
-  }
+    4: 'critical',
+  },
 };
 
-const BadgeNumberDeviceValue = props => {
+const BadgeNumberDeviceValue = (props) => {
   const { category, type, last_value: lastValue = null, unit } = props.deviceFeature;
 
   const colorMethod = BADGE_CATEGORIES[category];

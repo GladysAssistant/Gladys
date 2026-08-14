@@ -45,13 +45,7 @@ describe('mqttHandler.getConfiguration', () => {
   it('should getConfiguration: Docker no container', async () => {
     const gladys = {
       variable: {
-        getValue: sinon
-          .stub()
-          .onCall(3)
-          .resolves(null)
-          .onCall(4)
-          .resolves(null)
-          .resolves('value'),
+        getValue: sinon.stub().onCall(3).resolves(null).onCall(4).resolves(null).resolves('value'),
       },
       system: {
         isDocker: fake.resolves(true),
@@ -84,13 +78,7 @@ describe('mqttHandler.getConfiguration', () => {
   it('should getConfiguration: Docker existing container', async () => {
     const gladys = {
       variable: {
-        getValue: sinon
-          .stub()
-          .onCall(3)
-          .resolves(null)
-          .onCall(4)
-          .resolves('2')
-          .resolves('value'),
+        getValue: sinon.stub().onCall(3).resolves(null).onCall(4).resolves('2').resolves('value'),
       },
       system: {
         isDocker: fake.resolves(true),
@@ -127,13 +115,7 @@ describe('mqttHandler.getConfiguration', () => {
   it('should getConfiguration: Docker existing container (not use embedded)', async () => {
     const gladys = {
       variable: {
-        getValue: sinon
-          .stub()
-          .onCall(3)
-          .resolves('0')
-          .onCall(4)
-          .resolves(null)
-          .resolves('value'),
+        getValue: sinon.stub().onCall(3).resolves('0').onCall(4).resolves(null).resolves('value'),
       },
       system: {
         isDocker: fake.resolves(true),

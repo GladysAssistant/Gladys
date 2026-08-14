@@ -19,7 +19,7 @@ const UpdateDevice = ({ children, ...props }) => (
     </div>
     <div
       class={cx('dimmer', {
-        active: props.loading
+        active: props.loading,
       })}
     >
       <div class="loader" />
@@ -60,12 +60,12 @@ const UpdateDevice = ({ children, ...props }) => (
                     <option value="" selected={!props.selectedFeature}>
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {DEVICE_FEATURE_CATEGORIES_LIST.map(category =>
-                      Object.keys(DeviceFeatureCategoriesIcon[category]).map(type => (
+                    {DEVICE_FEATURE_CATEGORIES_LIST.map((category) =>
+                      Object.keys(DeviceFeatureCategoriesIcon[category]).map((type) => (
                         <option value={`${category}|${type}`}>
                           <Text id={`deviceFeatureCategory.${category}.${type}`} />
                         </option>
-                      ))
+                      )),
                     )}
                   </select>
 

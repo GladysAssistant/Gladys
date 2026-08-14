@@ -11,9 +11,9 @@ const CheckStatus = ({
   matterbridgeRunning,
   dockerBased,
   networkModeValid,
-  matterbridgeStatus
+  matterbridgeStatus,
 }) => {
-  let textLabel = null;
+  let textLabel;
   if (matterbridgeStatus === RequestStatus.Getting) {
     textLabel = 'integration.matterbridge.setup.activationMatterbridge';
   } else if (!dockerBased) {
@@ -39,7 +39,7 @@ const CheckStatus = ({
           'alert-success': matterbridgeEnabled && matterbridgeExist && matterbridgeRunning,
           'alert-warning': matterbridgeEnabled && matterbridgeExist && !matterbridgeRunning,
           'alert-danger': (matterbridgeEnabled && !matterbridgeExist) || !dockerBased || !networkModeValid,
-          'alert-info': !matterbridgeEnabled
+          'alert-info': !matterbridgeEnabled,
         })}
       >
         <div class={cx(style.textAlignMiddleContainer)}>

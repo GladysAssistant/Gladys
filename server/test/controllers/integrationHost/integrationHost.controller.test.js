@@ -38,16 +38,10 @@ const seedExternalService = async (overrides = {}) =>
 const integrationRequest = (token) => ({
   get: (url) =>
     // @ts-ignore
-    request(TEST_BACKEND_APP)
-      .get(url)
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${token}`),
+    request(TEST_BACKEND_APP).get(url).set('Accept', 'application/json').set('Authorization', `Bearer ${token}`),
   post: (url) =>
     // @ts-ignore
-    request(TEST_BACKEND_APP)
-      .post(url)
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${token}`),
+    request(TEST_BACKEND_APP).post(url).set('Accept', 'application/json').set('Authorization', `Bearer ${token}`),
 });
 
 describe('Integration host API', () => {
@@ -71,15 +65,11 @@ describe('Integration host API', () => {
   describe('authentication', () => {
     it('should return 401 without token', async () => {
       // @ts-ignore
-      await request(TEST_BACKEND_APP)
-        .get('/api/integration/v1/status')
-        .expect(401);
+      await request(TEST_BACKEND_APP).get('/api/integration/v1/status').expect(401);
     });
 
     it('should return 401 with an invalid token', async () => {
-      await integrationRequest('invalid-token')
-        .get('/api/integration/v1/status')
-        .expect(401);
+      await integrationRequest('invalid-token').get('/api/integration/v1/status').expect(401);
     });
 
     it('should return 401 with a user access token (wrong audience)', async () => {
@@ -89,24 +79,18 @@ describe('Integration host API', () => {
         'baf1fa89-153b-4f2e-adf3-787e410ec291',
         'secret',
       );
-      await integrationRequest(userToken)
-        .get('/api/integration/v1/status')
-        .expect(401);
+      await integrationRequest(userToken).get('/api/integration/v1/status').expect(401);
     });
 
     it('should return 401 with a revoked token_version', async () => {
       const oldToken = generateIntegrationToken(service.id, 0, 'secret');
-      await integrationRequest(oldToken)
-        .get('/api/integration/v1/status')
-        .expect(401);
+      await integrationRequest(oldToken).get('/api/integration/v1/status').expect(401);
     });
 
     it('should return 401 with a token forged for an internal service', async () => {
       // test-service is an internal service from the seeds
       const internalToken = generateIntegrationToken('a810b8db-6d04-4697-bed3-c4b72c996279', 0, 'secret');
-      await integrationRequest(internalToken)
-        .get('/api/integration/v1/status')
-        .expect(401);
+      await integrationRequest(internalToken).get('/api/integration/v1/status').expect(401);
     });
   });
 
@@ -340,9 +324,7 @@ describe('Integration host API', () => {
         selector: 'not-my-device',
         external_id: 'other:device',
       });
-      const res = await integrationRequest(token)
-        .get('/api/integration/v1/device')
-        .expect(200);
+      const res = await integrationRequest(token).get('/api/integration/v1/device').expect(200);
       expect(res.body).to.have.lengthOf(1);
       expect(res.body[0]).to.have.property('external_id', `ext:${service.selector}:mine`);
     });
@@ -358,9 +340,7 @@ describe('Integration host API', () => {
         selector: 'ext-other-device',
         external_id: 'ext:ext-dev-other:x',
       });
-      const res = await integrationRequest(token)
-        .get('/api/integration/v1/device')
-        .expect(200);
+      const res = await integrationRequest(token).get('/api/integration/v1/device').expect(200);
       expect(res.body).to.have.lengthOf(0);
     });
   });
@@ -397,9 +377,7 @@ describe('Integration host API', () => {
     });
 
     it('should answer 403 without a location declaration in the manifest: server-side guarantee', async () => {
-      await integrationRequest(token)
-        .get('/api/integration/v1/house')
-        .expect(403);
+      await integrationRequest(token).get('/api/integration/v1/house').expect(403);
     });
 
     it('should answer 403 with location declared false', async () => {
@@ -409,9 +387,7 @@ describe('Integration host API', () => {
         manifest: { ...TEST_MANIFEST, location: false },
       });
       const noLocationToken = generateIntegrationToken(noLocationService.id, 1, 'secret');
-      await integrationRequest(noLocationToken)
-        .get('/api/integration/v1/house')
-        .expect(403);
+      await integrationRequest(noLocationToken).get('/api/integration/v1/house').expect(403);
     });
   });
 
@@ -442,18 +418,9 @@ describe('Integration host API', () => {
         device_feature_external_id: `ext:${service.selector}:x`,
         state: 1,
       }));
-      await integrationRequest(token)
-        .post('/api/integration/v1/state')
-        .send({ states: batch })
-        .expect(200);
-      await integrationRequest(token)
-        .post('/api/integration/v1/state')
-        .send({ states: batch })
-        .expect(200);
-      await integrationRequest(token)
-        .post('/api/integration/v1/state')
-        .send({ states: batch })
-        .expect(200);
+      await integrationRequest(token).post('/api/integration/v1/state').send({ states: batch }).expect(200);
+      await integrationRequest(token).post('/api/integration/v1/state').send({ states: batch }).expect(200);
+      await integrationRequest(token).post('/api/integration/v1/state').send({ states: batch }).expect(200);
       await integrationRequest(token)
         .post('/api/integration/v1/state')
         .send({ states: [batch[0]] })
@@ -467,9 +434,7 @@ describe('Integration host API', () => {
         .post('/api/integration/v1/config')
         .send({ config: { latitude: 48.85, api_key: 's3cr3t', internal_state: 'step-2' } })
         .expect(200);
-      const res = await integrationRequest(token)
-        .get('/api/integration/v1/config')
-        .expect(200);
+      const res = await integrationRequest(token).get('/api/integration/v1/config').expect(200);
       expect(res.body.config).to.deep.equal({
         latitude: 48.85,
         api_key: 's3cr3t',
@@ -526,9 +491,7 @@ describe('Integration host API', () => {
         .then((res) => {
           expect(res.body).to.deep.equal({ success: true });
         });
-      const contactsRes = await integrationRequest(communicationToken)
-        .get('/api/integration/v1/contact')
-        .expect(200);
+      const contactsRes = await integrationRequest(communicationToken).get('/api/integration/v1/contact').expect(200);
       expect(contactsRes.body).to.have.lengthOf(1);
       expect(contactsRes.body[0]).to.include({ contact_id: 'signal-12345', contact_name: 'John on Signal' });
       expect(contactsRes.body[0].user).to.deep.equal({ selector: 'john', first_name: 'John', language: 'en' });
@@ -553,9 +516,7 @@ describe('Integration host API', () => {
         .send({ code, contact_id: 'signal-12345' })
         .expect(404);
       // and the contacts of another integration stay invisible
-      const contactsRes = await integrationRequest(communicationToken)
-        .get('/api/integration/v1/contact')
-        .expect(200);
+      const contactsRes = await integrationRequest(communicationToken).get('/api/integration/v1/contact').expect(200);
       expect(contactsRes.body).to.deep.equal([]);
     });
   });
@@ -609,9 +570,7 @@ describe('Integration host API', () => {
     });
 
     it('should return an empty list without any declared webhook', async () => {
-      const res = await integrationRequest(token)
-        .get('/api/integration/v1/webhook')
-        .expect(200);
+      const res = await integrationRequest(token).get('/api/integration/v1/webhook').expect(200);
       expect(res.body).to.deep.equal({ available: false, webhooks: [] });
     });
   });
@@ -676,14 +635,8 @@ describe('Integration host API', () => {
         .post('/api/integration/v1/container/mqtt/start')
         .send({ env: { MQTT_PASSWORD: 's3cr3t' } })
         .expect(200);
-      await integrationRequest(token)
-        .post('/api/integration/v1/container/mqtt/stop')
-        .send({})
-        .expect(200);
-      await integrationRequest(token)
-        .post('/api/integration/v1/container/mqtt/restart')
-        .send({})
-        .expect(200);
+      await integrationRequest(token).post('/api/integration/v1/container/mqtt/stop').send({}).expect(200);
+      await integrationRequest(token).post('/api/integration/v1/container/mqtt/restart').send({}).expect(200);
     });
 
     it('should return 400 on a reserved env key', async () => {
@@ -694,10 +647,7 @@ describe('Integration host API', () => {
     });
 
     it('should return 404 on an undeclared container', async () => {
-      await integrationRequest(token)
-        .post('/api/integration/v1/container/unknown/start')
-        .send({})
-        .expect(404);
+      await integrationRequest(token).post('/api/integration/v1/container/unknown/start').send({}).expect(404);
     });
 
     it('should not let an integration drive the containers of another one', async () => {
@@ -708,13 +658,8 @@ describe('Integration host API', () => {
         manifest: TEST_MANIFEST,
       });
       const otherToken = generateIntegrationToken(otherService.id, 1, 'secret');
-      await integrationRequest(otherToken)
-        .post('/api/integration/v1/container/mqtt/start')
-        .send({})
-        .expect(404);
-      const res = await integrationRequest(otherToken)
-        .get('/api/integration/v1/container')
-        .expect(200);
+      await integrationRequest(otherToken).post('/api/integration/v1/container/mqtt/start').send({}).expect(404);
+      const res = await integrationRequest(otherToken).get('/api/integration/v1/container').expect(200);
       expect(res.body.containers).to.deep.equal([]);
     });
   });

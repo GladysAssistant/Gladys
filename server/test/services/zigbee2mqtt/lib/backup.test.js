@@ -47,9 +47,7 @@ describe('zigbee2mqtt backup', () => {
       await zigbee2MqttManager.backup(jobId);
       expect.fail();
     } catch (e) {
-      expect(e)
-        .instanceOf(ServiceNotConfiguredError)
-        .property('message', 'SERVICE_NOT_CONFIGURED');
+      expect(e).instanceOf(ServiceNotConfiguredError).property('message', 'SERVICE_NOT_CONFIGURED');
     }
     // ASSERT
     assert.notCalled(gladys.job.updateProgress);

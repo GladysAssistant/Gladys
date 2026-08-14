@@ -10,23 +10,23 @@ class WaitActionParams extends Component {
     super(props);
     this.props = props;
     this.state = {
-      computed: props.action.evaluate_value !== undefined
+      computed: props.action.evaluate_value !== undefined,
     };
   }
 
   toggleType = () => this.setState({ computed: !this.state.computed });
 
-  handleChangeDuration = e => {
+  handleChangeDuration = (e) => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
     this.props.updateActionProperty(this.props.path, 'value', newValue);
     this.props.updateActionProperty(this.props.path, 'evaluate_value', undefined);
   };
 
-  handleChangeUnit = e => {
+  handleChangeUnit = (e) => {
     this.props.updateActionProperty(this.props.path, 'unit', e.target.value);
   };
 
-  handleNewEvalValue = text => {
+  handleNewEvalValue = (text) => {
     this.props.updateActionProperty(this.props.path, 'value', undefined);
     this.props.updateActionProperty(this.props.path, 'evaluate_value', text);
   };

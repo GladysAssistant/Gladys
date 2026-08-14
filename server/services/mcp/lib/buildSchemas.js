@@ -448,11 +448,11 @@ async function getAllTools(userId) {
         } catch (e) {
           if (e?.name === 'ZodError') {
             const details = e.issues.map((issue) => formatSceneCreateZodIssue(issue, scene)).join('; ');
-            throw new Error(`scene.create validation failed (422): ${details}`);
+            throw new Error(`scene.create validation failed (422): ${details}`, { cause: e });
           }
           if (e?.name === 'SequelizeValidationError') {
             const details = (e.errors || []).map((error) => error.message).join('; ');
-            throw new Error(`scene.create failed (422): ${details || e.message}`);
+            throw new Error(`scene.create failed (422): ${details || e.message}`, { cause: e });
           }
           throw e;
         }
@@ -708,14 +708,8 @@ async function getAllTools(userId) {
             .enum([...new Set(historyDevices.map(({ name }) => name))])
             .describe('Device name to get history.')
             .optional(),
-          feature: z
-            .enum(availableHistoryFeature)
-            .describe('Type of device to query.')
-            .optional(),
-          interval: z
-            .enum(Object.keys(intervalByName))
-            .describe('Time interval to get history from.')
-            .optional(),
+          feature: z.enum(availableHistoryFeature).describe('Type of device to query.').optional(),
+          interval: z.enum(Object.keys(intervalByName)).describe('Time interval to get history from.').optional(),
         },
       },
       cb: async ({ room, device, feature, interval }) => {
@@ -811,10 +805,7 @@ async function getAllTools(userId) {
           'Open, close, stop or set the position of shutters and curtains. Use action for open/close/stop commands, or position (0-100) to set a percentage. Select the device by name, or by room and device category.',
         categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
-          action: z
-            .enum(['open', 'close', 'stop'])
-            .optional()
-            .describe('Action to perform on the shutter or curtain.'),
+          action: z.enum(['open', 'close', 'stop']).optional().describe('Action to perform on the shutter or curtain.'),
           position: z
             .number()
             .min(0)
@@ -969,12 +960,7 @@ async function getAllTools(userId) {
           'This tool does not turn lights on or off, use device_turn_on_off for that.',
         categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_CONTROL, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
-          brightness: z
-            .number()
-            .min(0)
-            .max(100)
-            .optional()
-            .describe('Brightness as a percentage, from 0 to 100.'),
+          brightness: z.number().min(0).max(100).optional().describe('Brightness as a percentage, from 0 to 100.'),
           color: z
             .string()
             .regex(/^#?[0-9a-fA-F]{6}$/)
@@ -1544,10 +1530,7 @@ async function getAllTools(userId) {
             .string()
             .optional()
             .describe('Reference time in HH:mm or HHhmm. Defaults to current home time.'),
-          compare_to: z
-            .string()
-            .optional()
-            .describe('Second time in HH:mm or HHhmm for before/after/same operators.'),
+          compare_to: z.string().optional().describe('Second time in HH:mm or HHhmm for before/after/same operators.'),
         },
       },
       cb: async ({ operator, ranges, reference_time: referenceTime, compare_to: compareTo }) => {

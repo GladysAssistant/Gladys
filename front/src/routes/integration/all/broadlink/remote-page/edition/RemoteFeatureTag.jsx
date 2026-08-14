@@ -24,7 +24,7 @@ class RemoteFeatureTag extends Component {
           'tag-primary': !disabled && withCodes && !selected,
           'tag-dark': !disabled && selected,
           'tag-info': disabled && withCodes && !selected,
-          'tag-secondary': disabled && selected
+          'tag-secondary': disabled && selected,
         })}
       >
         <Text id={`deviceFeatureCategory.${category}.${type}`} />

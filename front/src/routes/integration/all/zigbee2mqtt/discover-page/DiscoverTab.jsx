@@ -63,7 +63,7 @@ const DiscoverTab = ({ children, ...props }) => (
 
       <div
         class={cx('dimmer', {
-          active: props.discoverZigbee2mqtt
+          active: props.discoverZigbee2mqtt,
         })}
       >
         <div class="loader" />

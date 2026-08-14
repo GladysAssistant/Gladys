@@ -41,7 +41,7 @@ async function installContainer(config) {
     all: true,
     filters: { name: [containerDescriptor.name] },
   });
-  let [container] = dockerContainers;
+  let container;
 
   if (dockerContainers.length === 0) {
     try {

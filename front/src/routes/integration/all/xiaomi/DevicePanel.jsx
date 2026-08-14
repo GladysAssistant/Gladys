@@ -27,7 +27,7 @@ const DevicePanel = ({ children, ...props }) => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.getXiaomiDevicesStatus === RequestStatus.Getting
+          active: props.getXiaomiDevicesStatus === RequestStatus.Getting,
         })}
       >
         <div class="loader" />

@@ -12,13 +12,13 @@ class SelectPilotWireMode extends Component {
   };
 
   getOptions = () => {
-    const deviceFeatureOptions = Object.keys(PILOT_WIRE_MODE).map(key => {
+    const deviceFeatureOptions = Object.keys(PILOT_WIRE_MODE).map((key) => {
       const value = PILOT_WIRE_MODE[key];
       return {
         label: get(this.props.intl.dictionary, `deviceFeatureValue.category.heater.pilot-wire-mode.${value}`, {
-          default: value
+          default: value,
         }),
-        value
+        value,
       };
     });
 
@@ -31,13 +31,12 @@ class SelectPilotWireMode extends Component {
     if (value !== undefined) {
       return {
         label: get(this.props.intl.dictionary, `deviceFeatureValue.category.heater.pilot-wire-mode.${value}`, {
-          default: value
+          default: value,
         }),
-        value
+        value,
       };
-    } else {
-      return;
     }
+    return;
   };
 
   componentDidMount() {

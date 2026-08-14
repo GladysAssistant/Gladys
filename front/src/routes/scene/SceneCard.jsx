@@ -21,7 +21,7 @@ class SceneCard extends Component {
 
     // If there are tags
     if (this.props.sceneTagSearch && this.props.sceneTagSearch.length > 0) {
-      this.props.sceneTagSearch.forEach(tag => urlParams.append('tags', tag));
+      this.props.sceneTagSearch.forEach((tag) => urlParams.append('tags', tag));
     }
     // Redirect to the scene with the url params
     if (urlParams.toString()) {
@@ -56,7 +56,7 @@ class SceneCard extends Component {
           <a
             href={`/dashboard/scene/${props.scene.selector}`}
             class={cx('col-auto', {
-              [style.disabledSceneRow]: !props.scene.active
+              [style.disabledSceneRow]: !props.scene.active,
             })}
           >
             <i class={`fe fe-${props.scene.icon}`} />
@@ -64,14 +64,14 @@ class SceneCard extends Component {
           <a
             href={this.getSceneUrl()}
             class={cx('col', {
-              [style.disabledSceneRow]: !props.scene.active
+              [style.disabledSceneRow]: !props.scene.active,
             })}
           >
             <div class="text-reset d-block">{props.scene.name}</div>
             <div class="d-block text-secondary mt-n1">{props.scene.description}</div>
             <div>
               {props.scene.tags &&
-                props.scene.tags.map(tag => (
+                props.scene.tags.map((tag) => (
                   <span class="badge badge-secondary mr-1">
                     {tag.name.length > MAX_LENGTH_TAG ? `${tag.name.substring(0, MAX_LENGTH_TAG - 3)}...` : tag.name}
                   </span>
@@ -83,7 +83,7 @@ class SceneCard extends Component {
               onClick={this.startScene}
               type="button"
               class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
-                'btn-loading': saving
+                'btn-loading': saving,
               })}
             >
               <i class="fe fe-play" />
@@ -99,7 +99,7 @@ class SceneCard extends Component {
       <div class="col-lg-3 p-2">
         <div
           class={cx('dimmer h-100', {
-            active: saving
+            active: saving,
           })}
         >
           <div class="loader" />
@@ -126,7 +126,7 @@ class SceneCard extends Component {
                 <div class={`text-muted ${style.descriptionSceneEllipsis}`}>{props.scene.description}</div>
                 <div>
                   {props.scene.tags &&
-                    props.scene.tags.map(tag => (
+                    props.scene.tags.map((tag) => (
                       <span class="badge badge-secondary mr-1">
                         {tag.name.length > MAX_LENGTH_TAG
                           ? `${tag.name.substring(0, MAX_LENGTH_TAG - 3)}...`

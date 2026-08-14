@@ -42,9 +42,7 @@ describe('HomeKitService', () => {
 
     await homekitService.start();
 
-    expect(homekitService)
-      .to.have.property('start')
-      .and.be.instanceOf(Function);
+    expect(homekitService).to.have.property('start').and.be.instanceOf(Function);
     expect(setValue.callCount).to.equal(4);
     expect(setValue.args[0][1]).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
     expect(setValue.args[1][1]).to.match(/^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/);
@@ -59,9 +57,7 @@ describe('HomeKitService', () => {
 
     await homekitService.start();
 
-    expect(homekitService)
-      .to.have.property('start')
-      .and.be.instanceOf(Function);
+    expect(homekitService).to.have.property('start').and.be.instanceOf(Function);
     expect(setValue.callCount).to.equal(4);
     expect(setValue.args[0][1]).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
     expect(setValue.args[1][1]).to.match(/^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/);
@@ -71,8 +67,6 @@ describe('HomeKitService', () => {
 
   it('should stop service', async () => {
     await homekitService.stop();
-    expect(homekitService)
-      .to.have.property('stop')
-      .and.be.instanceOf(Function);
+    expect(homekitService).to.have.property('stop').and.be.instanceOf(Function);
   });
 });

@@ -68,7 +68,7 @@ const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, to
                     class={cx(
                       style.hourDisplay,
                       style.peakHour,
-                      'd-flex align-items-center justify-content-center dark-mode-no-invert'
+                      'd-flex align-items-center justify-content-center dark-mode-no-invert',
                     )}
                   >
                     <i class="fe fe-sun mr-4" />
@@ -80,7 +80,7 @@ const EdfTempoBox = ({ loading, error, today, tomorrow, currentHourPeakState, to
                     class={cx(
                       style.hourDisplay,
                       style.offPeakHour,
-                      'd-flex align-items-center justify-content-center dark-mode-no-invert'
+                      'd-flex align-items-center justify-content-center dark-mode-no-invert',
                     )}
                   >
                     <i class="fe fe-moon mr-4" />
@@ -118,13 +118,8 @@ class EdfTempo extends Component {
     try {
       await this.setState({ error: false, loading: true });
       const edfTempoData = await this.props.httpClient.get('/api/v1/service/edf-tempo/state');
-      const today = dayjs()
-        .locale(this.props.user.language)
-        .format('ddd LL');
-      const tomorrow = dayjs()
-        .add(1, 'day')
-        .locale(this.props.user.language)
-        .format('ddd LL');
+      const today = dayjs().locale(this.props.user.language).format('ddd LL');
+      const tomorrow = dayjs().add(1, 'day').locale(this.props.user.language).format('ddd LL');
 
       const todayPeakState = edfTempoData.today_peak_state;
       const tomorrowPeakState = edfTempoData.tomorrow_peak_state;
@@ -135,7 +130,7 @@ class EdfTempo extends Component {
         today,
         tomorrow,
         todayPeakState,
-        tomorrowPeakState
+        tomorrowPeakState,
       });
     } catch (e) {
       this.setState({ error: true, loading: false });
@@ -167,7 +162,7 @@ class EdfTempo extends Component {
     this.props = props;
     this.state = {
       loading: true,
-      error: false
+      error: false,
     };
   }
 

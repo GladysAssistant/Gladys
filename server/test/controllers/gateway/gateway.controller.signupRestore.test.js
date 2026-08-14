@@ -39,11 +39,7 @@ describe('Gladys Plus restore routes when instance is not configured', () => {
     expect(backupKey).to.equal('my-super-backup-key');
   });
   it('should return 400 when the backup key is missing', async () => {
-    await request
-      .post('/api/v1/gateway/backup-key')
-      .send({})
-      .expect('Content-Type', /json/)
-      .expect(400);
+    await request.post('/api/v1/gateway/backup-key').send({}).expect('Content-Type', /json/).expect(400);
   });
   it('should return restore status without authentication', async () => {
     await request

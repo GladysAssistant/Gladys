@@ -250,7 +250,7 @@ const MESSAGES = [
   },
   // unknown
   {
-    sid: `1245${(counter += 1)}`,
+    sid: `1245${counter + 1}`,
     model: 'unknown-device',
     data: JSON.stringify({
       voltage: 3000,

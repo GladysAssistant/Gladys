@@ -4,11 +4,9 @@ const { authenticatedRequest } = require('../request.test');
 
 describe('POST /api/v1/http/request', () => {
   it('should make GET HTTP request', async () => {
-    const scope = nock('http://test-http-request.com')
-      .get('/test/request')
-      .reply(200, {
-        hey: 'you',
-      });
+    const scope = nock('http://test-http-request.com').get('/test/request').reply(200, {
+      hey: 'you',
+    });
     await authenticatedRequest
       .post('/api/v1/http/request')
       .send({

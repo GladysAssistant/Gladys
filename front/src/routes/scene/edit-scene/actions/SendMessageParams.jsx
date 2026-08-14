@@ -10,10 +10,10 @@ class SendMessageParams extends Component {
     try {
       const users = await this.props.httpClient.get('/api/v1/user');
       const userOptions = [];
-      users.forEach(user => {
+      users.forEach((user) => {
         userOptions.push({
           label: user.firstname,
-          value: user.selector
+          value: user.selector,
         });
       });
       let selectedOption = '';
@@ -22,7 +22,7 @@ class SendMessageParams extends Component {
         actionUpdates.push(['user', userOptions[0].value]);
         selectedOption = userOptions[0];
       } else if (this.props.action.user) {
-        selectedOption = userOptions.find(option => option.value === this.props.action.user) || '';
+        selectedOption = userOptions.find((option) => option.value === this.props.action.user) || '';
       }
       this.setState({ userOptions, selectedOption }, () => {
         actionUpdates.forEach(([key, value]) => this.props.updateActionProperty(this.props.path, key, value));
@@ -32,20 +32,20 @@ class SendMessageParams extends Component {
       console.error(e);
     }
   };
-  updateText = text => {
+  updateText = (text) => {
     this.props.updateActionProperty(this.props.path, 'text', text);
   };
-  handleChange = selectedOption => {
+  handleChange = (selectedOption) => {
     if (selectedOption && selectedOption.value) {
       this.props.updateActionProperty(this.props.path, 'user', selectedOption.value);
     } else {
       this.props.updateActionProperty(this.props.path, 'user', null);
     }
   };
-  refreshSelectedOptions = nextProps => {
+  refreshSelectedOptions = (nextProps) => {
     let selectedOption = '';
     if (nextProps.action.user && this.state.userOptions) {
-      const userOption = this.state.userOptions.find(option => option.value === nextProps.action.user);
+      const userOption = this.state.userOptions.find((option) => option.value === nextProps.action.user);
 
       if (userOption) {
         selectedOption = userOption;
@@ -57,7 +57,7 @@ class SendMessageParams extends Component {
     super(props);
     this.props = props;
     this.state = {
-      selectedOption: ''
+      selectedOption: '',
     };
   }
   componentDidMount() {
@@ -79,7 +79,7 @@ class SendMessageParams extends Component {
           <Select
             styles={{
               // Fixes the overlapping problem of the component
-              menu: provided => ({ ...provided, zIndex: 2 })
+              menu: (provided) => ({ ...provided, zIndex: 2 }),
             }}
             options={userOptions}
             value={selectedOption}

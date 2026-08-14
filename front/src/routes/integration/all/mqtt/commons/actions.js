@@ -1,9 +1,9 @@
-const createActions = store => {
+const createActions = (store) => {
   const actions = {
     async checkStatus(state) {
       let mqttStatus = {
         configured: false,
-        connected: false
+        connected: false,
       };
       try {
         mqttStatus = await state.httpClient.get('/api/v1/service/mqtt/status');
@@ -11,10 +11,10 @@ const createActions = store => {
         store.setState({
           mqttStatusConfigured: mqttStatus.configured,
           mqttStatusConnected: mqttStatus.connected,
-          mqttStatusLoaded: true
+          mqttStatusLoaded: true,
         });
       }
-    }
+    },
   };
   return Object.assign({}, actions);
 };

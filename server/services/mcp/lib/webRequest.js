@@ -107,7 +107,7 @@ async function assertPublicUrl(urlString) {
   try {
     url = new URL(urlString);
   } catch (e) {
-    throw new Error(`Invalid URL: ${e.message}`);
+    throw new Error(`Invalid URL: ${e.message}`, { cause: e });
   }
 
   if (!['http:', 'https:'].includes(url.protocol)) {
@@ -146,7 +146,7 @@ async function assertPublicUrl(urlString) {
 async function fetchWebPage({ url }) {
   let currentUrl = await assertPublicUrl(url);
   let redirectCount = 0;
-  let keepFetching = true;
+  const keepFetching = true;
 
   while (keepFetching) {
     let response;
@@ -167,10 +167,10 @@ async function fetchWebPage({ url }) {
       });
     } catch (e) {
       if (e?.code === 'ECONNABORTED') {
-        throw new Error(`Request timed out after ${REQUEST_TIMEOUT_MS}ms`);
+        throw new Error(`Request timed out after ${REQUEST_TIMEOUT_MS}ms`, { cause: e });
       }
       if (e?.message?.includes('maxContentLength')) {
-        throw new Error(`Response too large (>${MAX_RESPONSE_BYTES} bytes)`);
+        throw new Error(`Response too large (>${MAX_RESPONSE_BYTES} bytes)`, { cause: e });
       }
       throw e;
     }
@@ -206,7 +206,6 @@ async function fetchWebPage({ url }) {
       text = body.trim();
     }
 
-    keepFetching = false;
     return truncateText(text, MAX_TEXT_CHARS);
   }
 

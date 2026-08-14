@@ -10,20 +10,20 @@ import get from 'get-value';
 import uuid from 'uuid';
 
 function sortRoomsInHouses(houses) {
-  houses.forEach(house => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
+  houses.forEach((house) => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
 }
 
 function createActions(store) {
   const actions = {
     async getHouses(state) {
       store.setState({
-        housesGetStatus: RequestStatus.Getting
+        housesGetStatus: RequestStatus.Getting,
       });
       const orderDir = state.getHousesOrderDir || 'asc';
       try {
         const params = {
           expand: 'rooms',
-          order_dir: orderDir
+          order_dir: orderDir,
         };
         if (state.housesSearch && state.housesSearch.length) {
           params.search = state.housesSearch;
@@ -32,23 +32,23 @@ function createActions(store) {
         sortRoomsInHouses(houses);
         store.setState({
           houses,
-          housesGetStatus: RequestStatus.Success
+          housesGetStatus: RequestStatus.Success,
         });
       } catch (e) {
         store.setState({
-          housesGetStatus: RequestStatus.Error
+          housesGetStatus: RequestStatus.Error,
         });
       }
     },
     async search(state, e) {
       store.setState({
-        housesSearch: e.target.value
+        housesSearch: e.target.value,
       });
       await actions.getHouses(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getHousesOrderDir: e.target.value
+        getHousesOrderDir: e.target.value,
       });
       await actions.getHouses(store.getState());
     },
@@ -57,10 +57,10 @@ function createActions(store) {
         houses: {
           [houseIndex]: {
             name: {
-              $set: name
-            }
-          }
-        }
+              $set: name,
+            },
+          },
+        },
       });
       store.setState(newState);
     },
@@ -69,10 +69,10 @@ function createActions(store) {
         houses: {
           [houseIndex]: {
             alarm_code: {
-              $set: code
-            }
-          }
-        }
+              $set: code,
+            },
+          },
+        },
       });
       store.setState(newState);
     },
@@ -81,10 +81,10 @@ function createActions(store) {
         houses: {
           [houseIndex]: {
             alarm_delay_before_arming: {
-              $set: parseInt(delayBeforeArming, 10)
-            }
-          }
-        }
+              $set: parseInt(delayBeforeArming, 10),
+            },
+          },
+        },
       });
       store.setState(newState);
     },
@@ -93,13 +93,13 @@ function createActions(store) {
         houses: {
           [houseIndex]: {
             latitude: {
-              $set: latitude
+              $set: latitude,
             },
             longitude: {
-              $set: longitude
-            }
-          }
-        }
+              $set: longitude,
+            },
+          },
+        },
       });
       store.setState(newState);
     },
@@ -107,20 +107,20 @@ function createActions(store) {
       if (name.length === 0) {
         return null;
       }
-      if (state.houses[houseIndex].rooms.find(room => room.name.toLowerCase() === name.toLowerCase())) {
+      if (state.houses[houseIndex].rooms.find((room) => room.name.toLowerCase() === name.toLowerCase())) {
         return null;
       }
       const newRoom = {
-        name
+        name,
       };
       const newState = update(state, {
         houses: {
           [houseIndex]: {
             rooms: {
-              $push: [newRoom]
-            }
-          }
-        }
+              $push: [newRoom],
+            },
+          },
+        },
       });
       store.setState(newState);
     },
@@ -131,22 +131,22 @@ function createActions(store) {
         action = {
           [roomIndex]: {
             to_delete: {
-              $set: true
-            }
-          }
+              $set: true,
+            },
+          },
         };
       } else {
         // if not, we remove it
         action = {
-          $splice: [[roomIndex, 1]]
+          $splice: [[roomIndex, 1]],
         };
       }
       const newState = update(state, {
         houses: {
           [houseIndex]: {
-            rooms: action
-          }
-        }
+            rooms: action,
+          },
+        },
       });
       store.setState(newState);
     },
@@ -157,15 +157,15 @@ function createActions(store) {
             rooms: {
               [roomIndex]: {
                 [property]: {
-                  $set: value
+                  $set: value,
                 },
                 to_update: {
-                  $set: true
-                }
-              }
-            }
-          }
-        }
+                  $set: true,
+                },
+              },
+            },
+          },
+        },
       });
       store.setState(newState);
     },
@@ -178,16 +178,16 @@ function createActions(store) {
               name: null,
               latitude: null,
               longitude: null,
-              rooms: []
-            }
-          ]
-        }
+              rooms: [],
+            },
+          ],
+        },
       });
       store.setState(newState);
     },
     async saveHouse(state, houseIndex) {
       store.setState({
-        houseUpdateStatus: RequestStatus.Getting
+        houseUpdateStatus: RequestStatus.Getting,
       });
       const house = state.houses[houseIndex];
       try {
@@ -200,7 +200,7 @@ function createActions(store) {
           houseCreatedOrUpdated = await state.httpClient.post(`/api/v1/house`, house);
         }
 
-        const promises = house.rooms.map(async room => {
+        const promises = house.rooms.map(async (room) => {
           if (room.to_delete) {
             return state.httpClient.delete(`/api/v1/room/${room.selector}`);
           }
@@ -213,32 +213,32 @@ function createActions(store) {
         });
 
         const rooms = await Promise.all(promises);
-        const roomsWithoutDeleted = rooms.filter(room => room.selector !== undefined);
+        const roomsWithoutDeleted = rooms.filter((room) => room.selector !== undefined);
 
         const newState = update(state, {
           houses: {
             [houseIndex]: {
               id: {
-                $set: houseCreatedOrUpdated.id
+                $set: houseCreatedOrUpdated.id,
               },
               selector: {
-                $set: houseCreatedOrUpdated.selector
+                $set: houseCreatedOrUpdated.selector,
               },
               rooms: {
-                $set: roomsWithoutDeleted
+                $set: roomsWithoutDeleted,
               },
               created_at: {
-                $set: houseCreatedOrUpdated.created_at
-              }
-            }
+                $set: houseCreatedOrUpdated.created_at,
+              },
+            },
           },
           houseUpdateStatus: {
             $auto: {
               [house.id]: {
-                $set: RequestStatus.Success
-              }
-            }
-          }
+                $set: RequestStatus.Success,
+              },
+            },
+          },
         });
         store.setState(newState);
       } catch (e) {
@@ -247,39 +247,39 @@ function createActions(store) {
         if (status === 409 && url.endsWith('/room')) {
           store.setState({
             houseUpdateStatus: {
-              [house.id]: RequestStatus.RoomConflictError
-            }
+              [house.id]: RequestStatus.RoomConflictError,
+            },
           });
         } else if (status === 409) {
           store.setState({
             houseUpdateStatus: {
-              [house.id]: RequestStatus.ConflictError
-            }
+              [house.id]: RequestStatus.ConflictError,
+            },
           });
         } else if (status === 422 && url.includes('/room')) {
           store.setState({
             houseUpdateStatus: {
-              [house.id]: RequestStatus.RoomValidationError
-            }
+              [house.id]: RequestStatus.RoomValidationError,
+            },
           });
         } else if (status === 422) {
           store.setState({
             houseUpdateStatus: {
-              [house.id]: RequestStatus.ValidationError
-            }
+              [house.id]: RequestStatus.ValidationError,
+            },
           });
         } else {
           store.setState({
             houseUpdateStatus: {
-              [house.id]: RequestStatus.Error
-            }
+              [house.id]: RequestStatus.Error,
+            },
           });
         }
       }
     },
     async deleteHouse(state, houseIndex) {
       store.setState({
-        houseUpdateStatus: RequestStatus.Getting
+        houseUpdateStatus: RequestStatus.Getting,
       });
       const house = state.houses[houseIndex];
       try {
@@ -288,15 +288,15 @@ function createActions(store) {
         }
         const newState = update(state, {
           houses: {
-            $splice: [[houseIndex, 1]]
+            $splice: [[houseIndex, 1]],
           },
           houseUpdateStatus: {
             $auto: {
               [house.id]: {
-                $set: RequestStatus.Success
-              }
-            }
-          }
+                $set: RequestStatus.Success,
+              },
+            },
+          },
         });
         store.setState(newState);
       } catch (e) {
@@ -304,13 +304,13 @@ function createActions(store) {
           houseUpdateStatus: {
             $auto: {
               [house.id]: {
-                $set: RequestStatus.Error
-              }
-            }
-          }
+                $set: RequestStatus.Error,
+              },
+            },
+          },
         });
       }
-    }
+    },
   };
   actions.debouncedSearch = debounce(actions.search, 200);
   return actions;

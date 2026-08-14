@@ -11,9 +11,9 @@ const CheckStatus = ({
   nodeRedRunning,
   dockerBased,
   networkModeValid,
-  nodeRedStatus
+  nodeRedStatus,
 }) => {
-  let textLabel = null;
+  let textLabel;
   if (nodeRedStatus === RequestStatus.Getting) {
     textLabel = 'integration.nodeRed.setup.activationNodeRed';
   } else if (!dockerBased) {
@@ -39,7 +39,7 @@ const CheckStatus = ({
           'alert-success': nodeRedEnabled && nodeRedExist && nodeRedRunning,
           'alert-warning': nodeRedEnabled && nodeRedExist && !nodeRedRunning,
           'alert-danger': (nodeRedEnabled && !nodeRedExist) || !dockerBased || !networkModeValid,
-          'alert-info': !nodeRedEnabled
+          'alert-info': !nodeRedEnabled,
         })}
       >
         <div class={cx(style.textAlignMiddleContainer)}>

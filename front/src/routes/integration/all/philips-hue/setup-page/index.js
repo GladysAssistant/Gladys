@@ -39,5 +39,5 @@ class PhilipsHueSetupPage extends Component {
 
 export default connect(
   'user,httpClient,philipsHueBridges,philipsHueBridgesDevices,philipsHueGetDevicesStatus,philipsHueCreateDeviceStatus,philipsHueGetBridgesStatus,philipsHueDeleteDeviceStatus',
-  actions
+  actions,
 )(PhilipsHueSetupPage);

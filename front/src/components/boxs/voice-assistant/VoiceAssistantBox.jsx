@@ -10,7 +10,7 @@ import {
   getSpeechRecordingUnavailableReason,
   isSpeechRecordingError,
   isSpeechRecordingSupported,
-  probeMicrophoneAvailability
+  probeMicrophoneAvailability,
 } from '../../../utils/speechMicrophoneAccess';
 import { prepareSpeechCommandRecording, preloadSpeechCommandRecorder } from '../../../utils/speechCommandRecorder';
 import { isRecordUntilSilenceAbortError, recordUntilSilence } from '../../../utils/recordUntilSilence';
@@ -22,7 +22,7 @@ const STATE = {
   LISTENING: 'listening',
   PROCESSING: 'processing',
   SPEAKING: 'speaking',
-  ERROR: 'error'
+  ERROR: 'error',
 };
 
 /** Delay after a completed turn before hiding transcription and response. */
@@ -33,7 +33,7 @@ const VOICE_ASSISTANT_UPSELL_PROPS = {
   icon: 'fe-mic',
   utmCampaign: 'dashboard_voice_assistant',
   titleKey: 'gladysPlusUpsell.voiceAssistant.title',
-  descriptionKey: 'gladysPlusUpsell.voiceAssistant.compactDescription'
+  descriptionKey: 'gladysPlusUpsell.voiceAssistant.compactDescription',
 };
 
 /** Download the audio instead of calling /api/v1/gateway/voice. */
@@ -149,7 +149,7 @@ class VoiceAssistantBox extends Component {
     errorMessage: null,
     gatewayConnected: null,
     microphoneAvailable: typeof window !== 'undefined' ? isSpeechRecordingSupported() : true,
-    microphoneUnavailableReason: typeof window !== 'undefined' ? getSpeechRecordingUnavailableReason() : null
+    microphoneUnavailableReason: typeof window !== 'undefined' ? getSpeechRecordingUnavailableReason() : null,
   };
 
   audioPlayer = null;
@@ -169,7 +169,7 @@ class VoiceAssistantBox extends Component {
     }
     this.setState({
       microphoneAvailable: reason === null,
-      microphoneUnavailableReason: reason
+      microphoneUnavailableReason: reason,
     });
   };
 
@@ -201,15 +201,15 @@ class VoiceAssistantBox extends Component {
     }
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.TRANSCRIPTION,
-      this.onTranscriptionWebsocket
+      this.onTranscriptionWebsocket,
     );
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.RESPONSE,
-      this.onResponseWebsocket
+      this.onResponseWebsocket,
     );
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.PROCESSING,
-      this.onProcessingWebsocket
+      this.onProcessingWebsocket,
     );
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR, this.onErrorWebsocket);
   }
@@ -219,15 +219,15 @@ class VoiceAssistantBox extends Component {
     this.cancelActiveVoiceSession();
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.TRANSCRIPTION,
-      this.onTranscriptionWebsocket
+      this.onTranscriptionWebsocket,
     );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.RESPONSE,
-      this.onResponseWebsocket
+      this.onResponseWebsocket,
     );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.PROCESSING,
-      this.onProcessingWebsocket
+      this.onProcessingWebsocket,
     );
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR, this.onErrorWebsocket);
     if (this.audioPlayer) {
@@ -237,7 +237,7 @@ class VoiceAssistantBox extends Component {
     this.clearMessagesClearTimeout();
   }
 
-  isVoiceSessionActive = generation => generation === this.voiceSessionGeneration;
+  isVoiceSessionActive = (generation) => generation === this.voiceSessionGeneration;
 
   cancelActiveVoiceSession = () => {
     this.voiceSessionGeneration += 1;
@@ -292,26 +292,26 @@ class VoiceAssistantBox extends Component {
     }
   };
 
-  onTranscriptionWebsocket = payload => {
+  onTranscriptionWebsocket = (payload) => {
     if (!this._isMounted || !payload || !payload.text) {
       return;
     }
     this.setState({ transcription: payload.text });
   };
 
-  onResponseWebsocket = payload => {
+  onResponseWebsocket = (payload) => {
     if (!this._isMounted || !payload || !payload.text) {
       return;
     }
     this.setState({ response: payload.text });
   };
 
-  onProcessingWebsocket = payload => {
+  onProcessingWebsocket = (payload) => {
     if (!this._isMounted || !payload) {
       return;
     }
     if (payload.processing) {
-      this.setState(prev => {
+      this.setState((prev) => {
         if (prev.uiState === STATE.ERROR || prev.uiState === STATE.SPEAKING) {
           return null;
         }
@@ -319,7 +319,7 @@ class VoiceAssistantBox extends Component {
       });
       return;
     }
-    this.setState(prev => {
+    this.setState((prev) => {
       if (prev.uiState === STATE.PROCESSING) {
         return { uiState: STATE.IDLE };
       }
@@ -327,7 +327,7 @@ class VoiceAssistantBox extends Component {
     });
   };
 
-  onErrorWebsocket = payload => {
+  onErrorWebsocket = (payload) => {
     if (!this._isMounted) {
       return;
     }
@@ -337,7 +337,7 @@ class VoiceAssistantBox extends Component {
     this.setState({
       uiState: STATE.ERROR,
       errorType: httpErrorState ? httpErrorState.errorType : 'http',
-      errorMessage: httpErrorState ? httpErrorState.errorMessage : message
+      errorMessage: httpErrorState ? httpErrorState.errorMessage : message,
     });
   };
 
@@ -381,7 +381,7 @@ class VoiceAssistantBox extends Component {
       this.setState({
         uiState: STATE.IDLE,
         errorType: null,
-        errorMessage: null
+        errorMessage: null,
       });
       return;
     }
@@ -401,9 +401,9 @@ class VoiceAssistantBox extends Component {
         {
           uiState: STATE.ERROR,
           errorType: reason === 'INSECURE_CONTEXT' ? 'insecure' : 'unsupported',
-          errorMessage: null
+          errorMessage: null,
         },
-        voiceSessionGeneration
+        voiceSessionGeneration,
       );
       return;
     }
@@ -419,9 +419,9 @@ class VoiceAssistantBox extends Component {
         transcription: '',
         response: '',
         errorType: null,
-        errorMessage: null
+        errorMessage: null,
       },
-      voiceSessionGeneration
+      voiceSessionGeneration,
     );
 
     try {
@@ -429,7 +429,7 @@ class VoiceAssistantBox extends Component {
         signal: abortController.signal,
         onReady: () => {
           this.safeSetState({ uiState: STATE.LISTENING }, voiceSessionGeneration);
-        }
+        },
       });
       if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
         return;
@@ -445,9 +445,9 @@ class VoiceAssistantBox extends Component {
         this.safeSetState(
           {
             uiState: STATE.IDLE,
-            transcription: `Debug: téléchargé (${audioBlob.size} octets, ${audioBlob.type || 'audio/wav'})`
+            transcription: `Debug: téléchargé (${audioBlob.size} octets, ${audioBlob.type || 'audio/wav'})`,
           },
-          voiceSessionGeneration
+          voiceSessionGeneration,
         );
         return;
       }
@@ -458,7 +458,7 @@ class VoiceAssistantBox extends Component {
         '/api/v1/gateway/voice',
         audioBlob,
         audioBlob.type || 'audio/wav',
-        { signal: abortController.signal }
+        { signal: abortController.signal },
       );
 
       if (!this.isVoiceSessionActive(voiceSessionGeneration)) {
@@ -480,9 +480,9 @@ class VoiceAssistantBox extends Component {
             {
               uiState: STATE.IDLE,
               errorType: null,
-              errorMessage: null
+              errorMessage: null,
             },
-            voiceSessionGeneration
+            voiceSessionGeneration,
           );
         }
         return;
@@ -502,9 +502,9 @@ class VoiceAssistantBox extends Component {
           uiState: STATE.ERROR,
           errorType,
           errorMessage,
-          ...microphoneState
+          ...microphoneState,
         },
-        voiceSessionGeneration
+        voiceSessionGeneration,
       );
     } finally {
       if (this.activeVoiceAbortController === abortController) {
@@ -537,7 +537,7 @@ class VoiceAssistantBox extends Component {
       errorMessage,
       gatewayConnected,
       microphoneAvailable,
-      microphoneUnavailableReason
+      microphoneUnavailableReason,
     } = state;
     const boxTitle = props.box.name;
     const isBusy = uiState === STATE.LISTENING || uiState === STATE.PROCESSING || uiState === STATE.SPEAKING;
@@ -552,7 +552,7 @@ class VoiceAssistantBox extends Component {
           'dark-mode-no-invert',
           'voice-assistant-card',
           style.card,
-          isDark ? style.cardDark : style.cardLight
+          isDark ? style.cardDark : style.cardLight,
         )}
       >
         {boxTitle && (
@@ -580,7 +580,7 @@ class VoiceAssistantBox extends Component {
                   [style.orbIdle]: uiState === STATE.IDLE || uiState === STATE.ERROR,
                   [style.orbListening]: uiState === STATE.LISTENING,
                   [style.orbProcessing]: uiState === STATE.PROCESSING,
-                  [style.orbSpeaking]: uiState === STATE.SPEAKING
+                  [style.orbSpeaking]: uiState === STATE.SPEAKING,
                 })}
               >
                 <span class={style.ring1} aria-hidden="true" />
@@ -612,7 +612,7 @@ class VoiceAssistantBox extends Component {
                         isBusy ? 'fe-square' : 'fe-mic',
                         'dark-mode-fe-none-filter',
                         style.micIcon,
-                        isBusy && style.stopIcon
+                        isBusy && style.stopIcon,
                       )}
                       aria-hidden="true"
                     />
