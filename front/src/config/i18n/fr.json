@@ -3142,6 +3142,20 @@
           "other": "{{count}} actions"
         }
       },
+      "conditionWhile": {
+        "conditions": "Conditions",
+        "conditionDescription": "Tant que toutes les conditions sont réalisées, les actions du bloc \"Répéter...\" seront exécutées en boucle. Contrairement aux autres blocs, les conditions sont évaluées l'une après l'autre, dans l'ordre d'affichage, et réévaluées avant chaque itération. Une action \"Récupérer le dernier état\" placée avant une condition rafraîchit donc sa valeur à chaque tour de boucle.",
+        "noCondition": "Aucune condition ajoutée. Cliquez sur le bouton '+' pour ajouter une condition à ce bloc. Sans condition, la boucle ne s'exécutera pas.",
+        "addCondition": "Ajouter une condition",
+        "repeat": "Répéter...",
+        "maxIterationsLabel": "Nombre maximum d'itérations (limite de sécurité)",
+        "maxIterationsDescription": "Lorsque cette limite est atteinte, seule la boucle s'arrête : les actions suivantes de la scène sont quand même exécutées.",
+        "actionCount": {
+          "zero": "Aucune action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
+      },
       "checkTime": {
         "description": "La scène continuera si l'heure actuelle est comprise entre les bornes spécifiées, aux jours spécifiés. Si une condition est vide, elle ne sera pas prise en compte.",
         "beforeLabel": "Avant",
@@ -3295,7 +3309,8 @@
       "condition": {
         "only-continue-if": "Condition sur variables",
         "check-time": "Condition temporelle",
-        "if-then-else": "Condition \"Si... Alors... Sinon...\""
+        "if-then-else": "Condition \"Si... Alors... Sinon...\"",
+        "while": "Boucle \"Tant que... Répéter...\""
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",

@@ -674,6 +674,7 @@ const ACTIONS = {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
     CHECK_TIME: 'condition.check-time',
     IF_THEN_ELSE: 'condition.if-then-else',
+    WHILE: 'condition.while',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',

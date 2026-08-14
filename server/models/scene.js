@@ -78,6 +78,10 @@ const actionSchema = Joi.object()
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
+    max_iterations: Joi.number()
+      .integer()
+      .min(1)
+      .max(10000),
   })
   .id('action');
 
