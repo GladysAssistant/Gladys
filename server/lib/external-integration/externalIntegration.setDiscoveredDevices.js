@@ -73,6 +73,13 @@ async function setDiscoveredDevices(service, devices) {
       if (feature.unit !== undefined && feature.unit !== null && !DEVICE_FEATURE_UNITS_LIST.includes(feature.unit)) {
         throw new BadParameters(`${featurePath}.unit: unknown unit`);
       }
+      if (
+        feature.step !== undefined &&
+        feature.step !== null &&
+        (typeof feature.step !== 'number' || !Number.isFinite(feature.step) || feature.step <= 0)
+      ) {
+        throw new BadParameters(`${featurePath}.step: must be a positive number`);
+      }
       // the selector is derived and made unique by the core at creation
       // (buildUniqueSelector): an integration publishes none, and dropping it
       // here keeps the Discovery screen from posting one back to POST /device
