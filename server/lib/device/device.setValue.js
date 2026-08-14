@@ -26,8 +26,15 @@ async function setValue(device, deviceFeature, value, options = {}) {
   const valueIsString = typeof value === 'string' || value instanceof String;
   const isTextFeature =
     deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT && deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT;
+  const isSelectFeature =
+    deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT &&
+    deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT;
   if (!deviceFeature.has_feedback) {
-    if (valueIsString) {
+    if (isSelectFeature) {
+      // A select state is always its string form, even when the selected option value
+      // looks numeric: select features have no numeric state (and no state history)
+      await this.saveStringState(device, deviceFeature, String(value));
+    } else if (valueIsString) {
       // A string is only a state on a text feature; on any other feature it is a
       // one-shot command (a music notification URL for example): nothing to save
       if (isTextFeature) {

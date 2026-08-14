@@ -103,8 +103,11 @@ function getDeviceFeatureValueOptions(dictionary, deviceFeature) {
   // When the integration declares which values this appliance actually supports, they drive the
   // list and its order, so a scene cannot be built on a mode the device does not have. A supported
   // value the category knows nothing about keeps the label the device gave it.
+  // Text features hold string states (last_value_string): their option values are stringified so
+  // the value a scene stores compares equal to the state the device reports.
+  const isTextCategory = category === DEVICE_FEATURE_CATEGORIES.TEXT;
   const options = resolveFeatureOptions(deviceFeature, catalog).map(option => ({
-    value: option.value,
+    value: isTextCategory ? `${option.value}` : option.value,
     label: getValueLabel(dictionary, `deviceFeatureValue.category.${category}.${type}`, option.value, option.label)
   }));
 

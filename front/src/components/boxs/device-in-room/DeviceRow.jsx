@@ -28,6 +28,7 @@ import CameraPresetDeviceFeature from './device-features/CameraPresetDeviceFeatu
 import VacuumCleanerModeDeviceFeature from './device-features/VacuumCleanerModeDeviceFeature';
 import VacuumCleanerCleanModeDeviceFeature from './device-features/VacuumCleanerCleanModeDeviceFeature';
 import WaterHeaterModeDeviceFeature from './device-features/WaterHeaterModeDeviceFeature';
+import TextSelectDeviceFeature from './device-features/TextSelectDeviceFeature';
 
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
@@ -110,6 +111,11 @@ const ROW_TYPE_BY_CATEGORY_AND_TYPE = {
   ),
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
     [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: ThermostatModeDeviceFeature
+  },
+  // A dynamic select: its options are string values discovered on the appliance by the
+  // integration (installed TV apps, HDMI sources...), declared through supported_options
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: {
+    [DEVICE_FEATURE_TYPES.TEXT.SELECT]: TextSelectDeviceFeature
   }
 };
 

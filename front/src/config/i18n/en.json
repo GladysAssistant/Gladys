@@ -2078,7 +2078,8 @@
           "external_id": "This field is required and must be unique",
           "unit": "The selected unit is not valid for this feature",
           "room_id": "The selected room is not valid",
-          "supported_options": "Each preset needs a name and a unique whole number value (0 or more)"
+          "supported_options": "Each preset needs a name and a unique whole number value (0 or more)",
+          "select_supported_options": "The selection needs at least one choice, each with a label and a unique value"
         },
         "saveConflictError": "Conflict: Are you sure all external IDs are unique?",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
@@ -2163,7 +2164,8 @@
             "push": "A button to trigger an action in Gladys or via MQTT."
           },
           "text": {
-            "text": "Displays a text value, useful for custom messages or data."
+            "text": "Displays a text value, useful for custom messages or data.",
+            "select": "A list of choices you define (scenes, modes, sources...): the selected value is published to your device."
           },
           "battery": {
             "integer": "Shows the battery level as a percentage."
@@ -2208,6 +2210,13 @@
         "readOnlyLabel": "Is it a sensor?",
         "readOnlyShortDescription": "Yes, it's a sensor",
         "readOnlyButton": "Yes, it's a sensor sending data to Gladys only.",
+        "selectOptions": {
+          "label": "Choices",
+          "description": "The list offered on the dashboard. The label is what you see, the value is what is published to your device.",
+          "labelPlaceholder": "Label (e.g. Movie night)",
+          "valuePlaceholder": "Value (e.g. movie-night)",
+          "addOption": "Add a choice"
+        },
         "addButton": "Add feature",
         "cameraMove": {
           "supportedMovementsLabel": "Supported movements",
@@ -5607,7 +5616,8 @@
     },
     "text": {
       "shortCategoryName": "Text",
-      "text": "Text"
+      "text": "Text",
+      "select": "Selection"
     },
     "surface": {
       "shortCategoryName": "Surface",

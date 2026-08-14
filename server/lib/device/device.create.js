@@ -242,7 +242,7 @@ async function create(device) {
       }
 
       savedFeature.supported_options = await syncFeatureSupportedOptions(
-        savedFeature.id,
+        savedFeature,
         payloadFeature.supported_options,
         transaction,
       );

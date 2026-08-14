@@ -92,12 +92,13 @@ const actionsFunc = {
 
     let { value } = action;
 
-    // A text feature (a message displayed on a TV, a text virtual sensor...) receives the
-    // value as a raw string with scene variables injected, and skips the math evaluation
-    // below which would reject any non-numeric text
+    // A text feature (a message displayed on a TV, a text virtual sensor, a select among
+    // string values discovered on the appliance...) receives the value as a raw string with
+    // scene variables injected, and skips the math evaluation below which would reject any
+    // non-numeric text
     if (
       deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT &&
-      deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT
+      (deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT || deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT)
     ) {
       if (action.evaluate_value !== undefined) {
         value = Handlebars.compile(action.evaluate_value, {

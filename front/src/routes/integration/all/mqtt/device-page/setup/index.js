@@ -17,7 +17,10 @@ import {
   normalizeMqttExternalId,
   parseMqttDeviceValidationErrors,
   clearMqttDeviceValidationError,
-  isMqttCatalogFeatureVisible
+  isMqttCatalogFeatureVisible,
+  isSelectFeature,
+  sanitizeSelectFeatureOptions,
+  getSelectFeatureOptionsError
 } from '../utils';
 
 import {
@@ -292,23 +295,6 @@ class MqttDeviceSetupPage extends Component {
     this.setState({ device });
   };
 
-  updateFeatureSupportedOptions(featureIndex, supportedOptions) {
-    const feature = this.state.device.features[featureIndex];
-    const featureUpdate = {
-      supported_options: { $set: supportedOptions }
-    };
-    if (feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.PRESET) {
-      // Keep max consistent with the highest preset value (spec camera-ptz-control.md, A.3)
-      featureUpdate.max = { $set: supportedOptions.reduce((max, option) => Math.max(max, option.value), 0) };
-    }
-    const device = update(this.state.device, {
-      features: {
-        [featureIndex]: featureUpdate
-      }
-    });
-    this.setState({ device });
-  }
-
   updateFeatureProperty(e, property, featureIndex) {
     let value = e.target.value;
     const feature = this.state.device.features[featureIndex];
@@ -408,6 +394,28 @@ class MqttDeviceSetupPage extends Component {
     });
   }
 
+  updateFeatureSupportedOptions(featureIndex, supportedOptions) {
+    const validationErrors = clearMqttDeviceValidationError(
+      this.state.validationErrors,
+      'supported_options',
+      featureIndex
+    );
+    const feature = this.state.device.features[featureIndex];
+    const featureUpdate = {
+      supported_options: { $set: supportedOptions }
+    };
+    if (feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.PRESET) {
+      // Keep max consistent with the highest preset value (spec camera-ptz-control.md, A.3)
+      featureUpdate.max = { $set: supportedOptions.reduce((max, option) => Math.max(max, option.value), 0) };
+    }
+    const device = update(this.state.device, {
+      features: {
+        [featureIndex]: featureUpdate
+      }
+    });
+    this.setState({ device, validationErrors });
+  }
+
   buildClientValidationErrors(device) {
     const properties = [];
 
@@ -448,6 +456,17 @@ class MqttDeviceSetupPage extends Component {
         });
       }
 
+      // A dynamic select is unusable without at least one complete, unambiguous choice
+      if (isSelectFeature(feature) && getSelectFeatureOptionsError(feature)) {
+        properties.push({
+          message: 'supported_options invalid',
+          attribute: 'supported_options',
+          // The array reference lets the error parser match this very feature
+          value: feature.supported_options,
+          type: 'notNull Violation'
+        });
+      }
+
       if (
         feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA &&
         feature.type === DEVICE_FEATURE_TYPES.CAMERA.PRESET
@@ -472,14 +491,19 @@ class MqttDeviceSetupPage extends Component {
   }
 
   async saveDevice() {
-    this.setState({
+    // Trim select options and drop rows left entirely empty, so an abandoned blank row
+    // does not fail validation nor reach the server
+    const device = sanitizeSelectFeatureOptions(this.state.device);
+
+    await this.setState({
+      device,
       loading: true,
       validationErrors: null
     });
 
-    const clientValidationErrors = this.buildClientValidationErrors(this.state.device);
+    const clientValidationErrors = this.buildClientValidationErrors(device);
     if (clientValidationErrors.length > 0) {
-      const validationErrors = parseMqttDeviceValidationErrors(clientValidationErrors, this.state.device);
+      const validationErrors = parseMqttDeviceValidationErrors(clientValidationErrors, device);
       await this.setState({
         saveStatus: RequestStatus.ValidationError,
         validationErrors,
