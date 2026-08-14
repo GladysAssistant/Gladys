@@ -24,10 +24,9 @@ class Condition extends Component {
     // If the new variable only accepts a list of values, we drop the previous value if it's not in that list
     const shouldResetValue = Boolean(valueOptions) && !this.isValueInValueOptions(valueOptions);
 
-    const newCondition = update(this.props.condition, {
-      variable: {
-        $set: selectedOption && selectedOption.value ? selectedOption.value : null
-      },
+    // A condition compares either a device feature (instantaneous value) or a scene variable
+    let newCondition = update(this.props.condition, {
+      $unset: ['variable', 'device_feature'],
       ...(shouldResetValue
         ? {
             value: { $set: undefined },
@@ -35,6 +34,19 @@ class Condition extends Component {
           }
         : {})
     });
+    if (selectedOption && selectedOption.value) {
+      newCondition = update(newCondition, {
+        [selectedOption.isDeviceFeature ? 'device_feature' : 'variable']: {
+          $set: selectedOption.value
+        }
+      });
+    } else {
+      newCondition = update(newCondition, {
+        variable: {
+          $set: null
+        }
+      });
+    }
     if (shouldResetValue) {
       this.setState({ customValue: false });
     }
@@ -137,7 +149,11 @@ class Condition extends Component {
     let selectedOption = null;
 
     this.props.variableOptions.forEach(variableOption => {
-      const foundOption = variableOption.options.find(option => this.props.condition.variable === option.value);
+      const foundOption = variableOption.options.find(option =>
+        option.isDeviceFeature
+          ? this.props.condition.device_feature === option.value
+          : this.props.condition.variable === option.value
+      );
       if (foundOption) {
         selectedOption = foundOption;
       }

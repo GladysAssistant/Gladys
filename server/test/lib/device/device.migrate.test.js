@@ -156,6 +156,15 @@ describe('Device.migrate', () => {
             else: [[{ type: 'message.send-camera', camera: 'migration-source', user: 'john' }]],
           },
         ],
+        [
+          {
+            type: 'condition.only-continue-if',
+            conditions: [
+              { device_feature: 'migration-source-temp', operator: '>', value: 20 },
+              { variable: '{{0.0.temp}}', operator: '<', value: 30 },
+            ],
+          },
+        ],
       ],
       triggers: [{ type: 'device.new-state', device_feature: 'migration-source-temp', operator: '=', value: 20 }],
     });
@@ -231,6 +240,15 @@ describe('Device.migrate', () => {
             if: [{ type: 'device.get-value', device_feature: 'migration-destination-temp' }],
             then: [[{ type: 'light.turn-on', devices: ['migration-destination'] }]],
             else: [[{ type: 'message.send-camera', camera: 'migration-destination', user: 'john' }]],
+          },
+        ],
+        [
+          {
+            type: 'condition.only-continue-if',
+            conditions: [
+              { device_feature: 'migration-destination-temp', operator: '>', value: 20 },
+              { variable: '{{0.0.temp}}', operator: '<', value: 30 },
+            ],
           },
         ],
       ],
