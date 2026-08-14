@@ -224,7 +224,12 @@
       "houseNameLabel": "Nom",
       "houseNamePlaceHolder": "Entrez le nom de votre maison",
       "houseNameError": "Le nom de la maison est requis",
-      "houseLocationLabel": "Sélectionnez l'emplacement de votre maison",
+      "houseLocationLabel": "Recherchez votre adresse ou cliquez sur la carte pour situer votre maison",
+      "addressSearchPlaceholder": "Tapez l'adresse de votre maison",
+      "addressSearchButton": "Rechercher",
+      "addressSearchPrivacyNotice": "La recherche d'adresse utilise OpenStreetMap (Nominatim) : l'adresse saisie est envoyée à ce service tiers.",
+      "addressSearchNoResults": "Aucun résultat trouvé, essayez en précisant la ville ou le pays.",
+      "addressSearchError": "Impossible de rechercher l'adresse, vérifiez votre connexion internet.",
       "roomsLabel": "Ajoutez toutes les pièces de votre maison",
       "roomNamePlaceHolder": "Entrez une nouvelle pièce pour l'ajouter",
       "addRoomButton": "Ajouter",
@@ -1827,6 +1832,7 @@
       "exposureModeAll": "Exposer tous les appareils compatibles",
       "exposureModeSelection": "Exposer uniquement les appareils sélectionnés",
       "noCompatibleDevice": "Aucun appareil de votre Gladys ne peut encore être exposé à HomeKit.",
+      "alarmLabel": "Alarme",
       "saveExposureButton": "Enregistrer les appareils exposés",
       "saveExposureSuccess": "Appareils exposés enregistrés. Le pont HomeKit redémarre automatiquement, votre appairage est conservé.",
       "saveExposureError": "Une erreur est survenue lors de l'enregistrement des appareils exposés.",
@@ -3038,6 +3044,10 @@
       },
       "messageSend": {
         "userLabel": "Utilisateur",
+        "serviceLabel": "Envoyer via",
+        "allServicesLabel": "Tous les services configurés",
+        "serviceExplanation": "Choisissez le service de messagerie qui enverra ce message. Par défaut, le message est envoyé sur tous les services configurés par l'utilisateur.",
+        "serviceUnavailable": "indisponible",
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
@@ -3120,7 +3130,8 @@
         "useCustomValue": "Saisir une valeur personnalisée",
         "useValueList": "Choisir dans la liste des valeurs",
         "valueTypeComputed": "Calculée",
-        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc."
+        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc.",
+        "textExplanationText": "Entrez ici le texte à envoyer à votre appareil. Pour injecter une variable de scène dans le texte, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
@@ -3146,6 +3157,20 @@
         "shortIf": "S",
         "shortThen": "A",
         "shortElse": "S",
+        "actionCount": {
+          "zero": "Aucune action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
+      },
+      "conditionWhile": {
+        "conditions": "Conditions",
+        "conditionDescription": "Tant que toutes les conditions sont réalisées, les actions du bloc \"Répéter...\" seront exécutées en boucle. Contrairement aux autres blocs, les conditions sont évaluées l'une après l'autre, dans l'ordre d'affichage, et réévaluées avant chaque itération. Une action \"Récupérer le dernier état\" placée avant une condition rafraîchit donc sa valeur à chaque tour de boucle.",
+        "noCondition": "Aucune condition ajoutée. Cliquez sur le bouton '+' pour ajouter une condition à ce bloc. Sans condition, la boucle ne s'exécutera pas.",
+        "addCondition": "Ajouter une condition",
+        "repeat": "Répéter...",
+        "maxIterationsLabel": "Nombre maximum d'itérations (limite de sécurité)",
+        "maxIterationsDescription": "Lorsque cette limite est atteinte, seule la boucle s'arrête : les actions suivantes de la scène sont quand même exécutées.",
         "actionCount": {
           "zero": "Aucune action",
           "one": "1 action",
@@ -3305,7 +3330,8 @@
       "condition": {
         "only-continue-if": "Condition sur variables",
         "check-time": "Condition temporelle",
-        "if-then-else": "Condition \"Si... Alors... Sinon...\""
+        "if-then-else": "Condition \"Si... Alors... Sinon...\"",
+        "while": "Boucle \"Tant que... Répéter...\""
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
@@ -3771,6 +3797,8 @@
       "energy-monitoring-cost-calculation-beginning": "Calcul du coût énergétique (depuis le début)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Calcul de la consommation énergétique depuis l'index (30 minutes)",
       "energy-monitoring-consumption-from-index-beginning": "Calcul de la consommation énergétique depuis l'index (depuis le début)",
+      "energy-monitoring-production-from-index-thirty-minutes": "Calcul de la production énergétique depuis l'index (30 minutes)",
+      "energy-monitoring-production-from-index-beginning": "Calcul de la production énergétique depuis l'index (depuis le début)",
       "service-enedis-sync": "Synchronisation des données Enedis",
       "ai-weekly-digest": "Résumé hebdomadaire IA"
     },
@@ -5429,6 +5457,10 @@
     "hepa-filter-monitoring": {
       "shortCategoryName": "Surveillance filtre HEPA",
       "filter-life-remaining": "Durée de vie restante du filtre"
+    },
+    "maintenance": {
+      "shortCategoryName": "Maintenance",
+      "life-remaining": "Durée de vie restante du composant"
     },
     "duration": {
       "shortCategoryName": "Durée",

@@ -161,7 +161,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
           },
         ],
       });
-      expect(setParamCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
+      expect(setParamCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED_b2c3d4e5-f6a7-8901-bcde-f12345678901');
       expect(setParamCall.args[2]).to.equal('2023-10-03T13:50:00.000Z');
     });
   });
@@ -205,7 +205,8 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       const testTime = new Date('2023-10-03T14:00:00.000Z');
       const lastProcessedTime = '2023-10-03T13:45:00.000Z';
 
-      // Mock device with existing ENERGY_INDEX_LAST_PROCESSED param
+      // Mock device with existing legacy device-level ENERGY_INDEX_LAST_PROCESSED param
+      // (installs migrated from before the cursor became per-feature)
       const deviceWithParam = {
         ...mockDevice,
         params: [{ name: 'ENERGY_INDEX_LAST_PROCESSED', value: lastProcessedTime }],
@@ -336,7 +337,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
           },
         ],
       });
-      expect(setParamCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
+      expect(setParamCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED_b2c3d4e5-f6a7-8901-bcde-f12345678901');
       expect(setParamCall.args[2]).to.equal(lastProcessedTime);
     });
   });
@@ -452,7 +453,7 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
           },
         ],
       });
-      expect(setParamCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED');
+      expect(setParamCall.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED_b2c3d4e5-f6a7-8901-bcde-f12345678901');
       expect(setParamCall.args[2]).to.equal('2023-10-03T13:30:00.000Z');
     });
 
@@ -563,6 +564,85 @@ describe('EnergyMonitoring.calculateConsumptionFromIndex', () => {
       // Should process both index/consumption pairs
       // getDeviceFeatureStates should be called twice (once for each index)
       expect(device.getDeviceFeatureStates.callCount).to.equal(2);
+    });
+
+    it('should keep an independent last processed cursor per index feature', async () => {
+      const testTime = new Date('2023-10-03T14:00:00.000Z');
+
+      // Device with two index/consumption pairs, each pair having its own cursor
+      const deviceWithMultipleIndexes = {
+        id: 'a7b8c9d0-e1f2-3456-1234-567890123456',
+        name: 'Multi Index Device',
+        params: [
+          {
+            name: 'ENERGY_INDEX_LAST_PROCESSED_b8c9d0e1-f2a3-4567-2345-678901234567',
+            value: '2023-10-03T13:30:00.000Z',
+          },
+          {
+            name: 'ENERGY_INDEX_LAST_PROCESSED_d0e1f2a3-b4c5-6789-4567-890123456789',
+            value: '2023-10-03T13:00:00.000Z',
+          },
+        ],
+        features: [
+          {
+            id: 'b8c9d0e1-f2a3-4567-2345-678901234567',
+            selector: 'test-device-index-1',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
+          },
+          {
+            id: 'c9d0e1f2-a3b4-5678-3456-789012345678',
+            selector: 'test-device-consumption-1',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'b8c9d0e1-f2a3-4567-2345-678901234567',
+          },
+          {
+            id: 'd0e1f2a3-b4c5-6789-4567-890123456789',
+            selector: 'test-device-index-2',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+            energy_parent_id: null,
+          },
+          {
+            id: 'e1f2a3b4-c5d6-7890-5678-901234567890',
+            selector: 'test-device-consumption-2',
+            category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+            type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.THIRTY_MINUTES_CONSUMPTION,
+            energy_parent_id: 'd0e1f2a3-b4c5-6789-4567-890123456789',
+          },
+        ],
+      };
+      device.get = fake.returns([deviceWithMultipleIndexes]);
+
+      device.getDeviceFeatureStates = fake((selector) => {
+        if (selector === 'test-device-index-1') {
+          return [
+            { created_at: '2023-10-03T13:30:00.000Z', value: 100 },
+            { created_at: '2023-10-03T13:55:00.000Z', value: 110 },
+          ];
+        }
+        return [
+          { created_at: '2023-10-03T13:00:00.000Z', value: 500 },
+          { created_at: '2023-10-03T13:50:00.000Z', value: 520 },
+        ];
+      });
+
+      await energyMonitoring.calculateConsumptionFromIndex(testTime, 'job-123');
+
+      // Each pair must read from its own cursor...
+      expect(device.getDeviceFeatureStates.getCall(0).args[1].toISOString()).to.equal('2023-10-03T13:30:00.000Z');
+      expect(device.getDeviceFeatureStates.getCall(1).args[1].toISOString()).to.equal('2023-10-03T13:00:00.000Z');
+
+      // ...and write back to its own cursor, without touching the other one
+      expect(device.setParam.callCount).to.equal(2);
+      const firstSetParam = device.setParam.getCall(0);
+      expect(firstSetParam.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED_b8c9d0e1-f2a3-4567-2345-678901234567');
+      expect(firstSetParam.args[2]).to.equal('2023-10-03T13:55:00.000Z');
+      const secondSetParam = device.setParam.getCall(1);
+      expect(secondSetParam.args[1]).to.equal('ENERGY_INDEX_LAST_PROCESSED_d0e1f2a3-b4c5-6789-4567-890123456789');
+      expect(secondSetParam.args[2]).to.equal('2023-10-03T13:50:00.000Z');
     });
 
     it('should handle SWITCH.ENERGY type as index feature', async () => {

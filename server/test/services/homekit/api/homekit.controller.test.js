@@ -18,6 +18,9 @@ const homekitHandler = {
       features: [],
     },
   ]),
+  getCompatibleAlarms: fake.resolves([
+    { name: 'Maison', selector: 'house-alarm:maison', house: { selector: 'maison' } },
+  ]),
 };
 
 describe('HomeKitController GET /api/v1/service/homekit/device', () => {
@@ -37,10 +40,13 @@ describe('HomeKitController GET /api/v1/service/homekit/device', () => {
     await controller['get /api/v1/service/homekit/device'].controller(req, res);
 
     assert.calledOnce(homekitHandler.getCompatibleDevices);
-    // only what the selection screen needs, not the whole device with its features
+    assert.calledOnce(homekitHandler.getCompatibleAlarms);
+    // only what the selection screen needs, not the whole device with its features — and the house
+    // alarm alongside them, so it can be left out like any other accessory
     assert.calledWith(res.json, [
       { name: 'Lampe salon', selector: 'lampe-salon' },
       { name: 'Détecteur de fumée', selector: 'detecteur-fumee' },
+      { name: 'Maison', selector: 'house-alarm:maison' },
     ]);
   });
 });

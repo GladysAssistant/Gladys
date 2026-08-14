@@ -224,7 +224,12 @@
       "houseNameLabel": "Name",
       "houseNamePlaceHolder": "Gib den Namen deines Zuhauses ein",
       "houseNameError": "Name deines Zuhauses ist erforderlich",
-      "houseLocationLabel": "Wähle dein Zuhause auf der Karte aus",
+      "houseLocationLabel": "Suche deine Adresse oder wähle dein Zuhause auf der Karte aus",
+      "addressSearchPlaceholder": "Gib deine Wohnadresse ein",
+      "addressSearchButton": "Suchen",
+      "addressSearchPrivacyNotice": "Die Adresssuche verwendet OpenStreetMap (Nominatim): Die eingegebene Adresse wird an diesen Drittanbieter gesendet.",
+      "addressSearchNoResults": "Keine Ergebnisse gefunden, versuche es mit Stadt oder Land.",
+      "addressSearchError": "Die Adresse konnte nicht gesucht werden, überprüfe deine Internetverbindung.",
       "roomsLabel": "Füge alle Räume deines Zuhauses hinzu",
       "roomNamePlaceHolder": "Gib einen neuen Raum ein, um ihn hinzuzufügen",
       "addRoomButton": "Hinzufügen",
@@ -1694,6 +1699,7 @@
       "exposureModeAll": "Alle kompatiblen Geräte bereitstellen",
       "exposureModeSelection": "Nur die ausgewählten Geräte bereitstellen",
       "noCompatibleDevice": "Noch kein Gerät Ihres Gladys kann in HomeKit bereitgestellt werden.",
+      "alarmLabel": "Alarm",
       "saveExposureButton": "Bereitgestellte Geräte speichern",
       "saveExposureSuccess": "Bereitgestellte Geräte gespeichert. Die HomeKit-Bridge startet automatisch neu, Ihre Kopplung bleibt erhalten.",
       "saveExposureError": "Beim Speichern der bereitgestellten Geräte ist ein Fehler aufgetreten.",
@@ -3038,6 +3044,10 @@
       },
       "messageSend": {
         "userLabel": "Benutzer",
+        "serviceLabel": "Senden über",
+        "allServicesLabel": "Alle konfigurierten Dienste",
+        "serviceExplanation": "Wähle den Nachrichtendienst, der diese Nachricht sendet. Standardmäßig wird die Nachricht an alle vom Benutzer konfigurierten Dienste gesendet.",
+        "serviceUnavailable": "nicht verfügbar",
         "textLabel": "Nachricht",
         "textPlaceholder": "Nachrichtentext",
         "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
@@ -3120,7 +3130,8 @@
         "useCustomValue": "Eigenen Wert eingeben",
         "useValueList": "Aus der Werteliste auswählen",
         "valueTypeComputed": "Berechnet",
-        "computedExplanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
+        "computedExplanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
+        "textExplanationText": "Gib hier den Text ein, der an dein Gerät gesendet werden soll. Um eine Szenenvariable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
@@ -3146,6 +3157,20 @@
         "shortIf": "W",
         "shortThen": "D",
         "shortElse": "S",
+        "actionCount": {
+          "zero": "Keine Aktionen",
+          "one": "1 Aktion",
+          "other": "{{count}} Aktionen"
+        }
+      },
+      "conditionWhile": {
+        "conditions": "Bedingungen",
+        "conditionDescription": "Solange alle Bedingungen erfüllt sind, werden die Aktionen im \"Wiederholen...\"-Block in einer Schleife ausgeführt. Anders als in anderen Blöcken werden die Bedingungen nacheinander in der angezeigten Reihenfolge ausgewertet und vor jeder Iteration neu ausgewertet. Eine Aktion \"Letzten Zustand abrufen\" vor einer Bedingung aktualisiert deren Wert somit bei jedem Durchlauf.",
+        "noCondition": "Es wurde noch keine Bedingung hinzugefügt. Klicken Sie auf die '+'-Schaltfläche, um diesem Block eine Bedingung hinzuzufügen. Ohne Bedingung wird die Schleife nicht ausgeführt.",
+        "addCondition": "Bedingung hinzufügen",
+        "repeat": "Wiederholen...",
+        "maxIterationsLabel": "Maximale Anzahl an Iterationen (Sicherheitslimit)",
+        "maxIterationsDescription": "Wenn dieses Limit erreicht ist, wird nur die Schleife beendet: die folgenden Aktionen der Szene werden trotzdem ausgeführt.",
         "actionCount": {
           "zero": "Keine Aktionen",
           "one": "1 Aktion",
@@ -3305,7 +3330,8 @@
       "condition": {
         "only-continue-if": "Nur fortsetzen, wenn",
         "check-time": "Zeitbedingung",
-        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\""
+        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\"",
+        "while": "Schleife: \"Solange... wiederholen...\""
       },
       "user": {
         "set-seen-at-home": "Benutzer zu Hause gesehen",
@@ -3771,6 +3797,8 @@
       "energy-monitoring-cost-calculation-beginning": "Energiekostenberechnung (von Anfang an)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Energieverbrauchsberechnung aus Index (30 Minuten)",
       "energy-monitoring-consumption-from-index-beginning": "Energieverbrauchsberechnung aus Index (von Anfang an)",
+      "energy-monitoring-production-from-index-thirty-minutes": "Energieerzeugungsberechnung aus Index (30 Minuten)",
+      "energy-monitoring-production-from-index-beginning": "Energieerzeugungsberechnung aus Index (von Anfang an)",
       "service-enedis-sync": "Enedis-Datensynchronisation",
       "ai-weekly-digest": "KI-Wochenzusammenfassung"
     },
@@ -5429,6 +5457,10 @@
     "hepa-filter-monitoring": {
       "shortCategoryName": "HEPA-Filterüberwachung",
       "filter-life-remaining": "Verbleibende Filterlebensdauer"
+    },
+    "maintenance": {
+      "shortCategoryName": "Wartung",
+      "life-remaining": "Verbleibende Lebensdauer der Komponente"
     },
     "duration": {
       "shortCategoryName": "Dauer",

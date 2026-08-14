@@ -115,9 +115,42 @@ class DeviceSetValue extends Component {
     this.props.updateActionProperty(this.props.path, 'evaluate_value', text);
   };
 
+  isTextFeature = () =>
+    this.state.deviceFeature &&
+    this.state.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT &&
+    this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT;
+
   getDeviceFeatureControl = () => {
     if (!this.state.deviceFeature) {
       return null;
+    }
+
+    // A text feature always receives free text with scene variables injected,
+    // the simple/computed distinction does not apply
+    if (this.isTextFeature()) {
+      return (
+        <div>
+          <div className={style.explanationText}>
+            <Text id="editScene.actionsCard.deviceSetValue.textExplanationText" />
+          </div>
+          <div class="input-group">
+            <Localizer>
+              <TextWithVariablesInjected
+                text={
+                  this.props.action.evaluate_value !== undefined
+                    ? this.props.action.evaluate_value
+                    : this.props.action.value
+                }
+                triggersVariables={this.props.triggersVariables}
+                actionsGroupsBefore={this.props.actionsGroupsBefore}
+                variables={this.props.variables}
+                path={this.props.path}
+                updateText={this.handleNewEvalValue}
+              />
+            </Localizer>
+          </div>
+        </div>
+      );
     }
 
     if (this.state.computed) {
@@ -334,22 +367,24 @@ class DeviceSetValue extends Component {
             onDeviceFeatureChange={this.onDeviceFeatureChange}
           />
         </div>
-        <div class="form-group">
-          <div className={cx('nav-tabs', style.valueTypeTab)}>
-            <span
-              class={cx('nav-link', style.valueTypeLink, { active: !this.state.computed })}
-              onClick={this.toggleType}
-            >
-              <Text id="editScene.actionsCard.deviceSetValue.valueTypeSimple" />
-            </span>
-            <span
-              class={cx('nav-link', style.valueTypeLink, { active: this.state.computed })}
-              onClick={this.toggleType}
-            >
-              <Text id="editScene.actionsCard.deviceSetValue.valueTypeComputed" />
-            </span>
+        {!this.isTextFeature() && (
+          <div class="form-group">
+            <div className={cx('nav-tabs', style.valueTypeTab)}>
+              <span
+                class={cx('nav-link', style.valueTypeLink, { active: !this.state.computed })}
+                onClick={this.toggleType}
+              >
+                <Text id="editScene.actionsCard.deviceSetValue.valueTypeSimple" />
+              </span>
+              <span
+                class={cx('nav-link', style.valueTypeLink, { active: this.state.computed })}
+                onClick={this.toggleType}
+              >
+                <Text id="editScene.actionsCard.deviceSetValue.valueTypeComputed" />
+              </span>
+            </div>
           </div>
-        </div>
+        )}
         <div class="form-group">{this.getDeviceFeatureControl()}</div>
       </div>
     );

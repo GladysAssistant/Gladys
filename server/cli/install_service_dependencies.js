@@ -26,7 +26,7 @@ async function installServiceDependencies() {
     async (directory) => {
       logger.info(`Installing dependencies in folder ${directory}`);
       try {
-        await exec(`cd "${directory}" && npm install --unsafe-perm`);
+        await exec(`cd "${directory}" && npm install`);
       } catch (e) {
         logger.warn(e);
 
