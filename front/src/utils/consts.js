@@ -93,10 +93,22 @@ export const GetWeatherStatus = {
 };
 
 export const GetWeatherModes = {
+  DateLocation: 'dateLocation',
+  CurrentWeather: 'currentWeather',
+  Alerts: 'alerts',
   AdvancedWeather: 'advancedWeather',
   HourlyForecast: 'hourlyForecast',
-  DailyForecast: 'dailyForecast'
+  DailyForecast: 'dailyForecast',
+  ProviderImages: 'providerImages'
 };
+
+// Modes enabled by default for widgets saved before they existed: the
+// blocks the widget has always displayed unconditionally
+export const DEFAULT_ON_WEATHER_MODES = [
+  GetWeatherModes.DateLocation,
+  GetWeatherModes.CurrentWeather,
+  GetWeatherModes.Alerts
+];
 
 export const DASHBOARD_BOX_STATUS_KEY = 'DashboardBoxStatus';
 export const DASHBOARD_BOX_DATA_KEY = 'DashboardBoxData';
@@ -128,6 +140,7 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: 'eye'
   },
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'users',
     [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: 'users'
   },
   [DEVICE_FEATURE_CATEGORIES.SISMIC_SENSOR]: {
@@ -244,7 +257,7 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: 'sliders'
   },
   [DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR]: {
-    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'wind',
+    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'alarm-smoke',
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'wind'
   },
   [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: {
@@ -258,7 +271,8 @@ export const DeviceFeatureCategoriesIcon = {
   [DEVICE_FEATURE_CATEGORIES.SIREN]: {
     [DEVICE_FEATURE_TYPES.SIREN.BINARY]: 'bell',
     [DEVICE_FEATURE_TYPES.SIREN.LMH_VOLUME]: 'volume-1',
-    [DEVICE_FEATURE_TYPES.SIREN.MELODY]: 'music'
+    [DEVICE_FEATURE_TYPES.SIREN.MELODY]: 'music',
+    [DEVICE_FEATURE_TYPES.SIREN.TEST_IN_PROGRESS]: 'wrench'
   },
   [DEVICE_FEATURE_CATEGORIES.TAMPER]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'shield'
@@ -290,6 +304,15 @@ export const DeviceFeatureCategoriesIcon = {
   [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'bar-chart-2'
   },
+  [DEVICE_FEATURE_CATEGORIES.NO2_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'bar-chart-2'
+  },
+  [DEVICE_FEATURE_CATEGORIES.O3_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'bar-chart-2'
+  },
+  [DEVICE_FEATURE_CATEGORIES.SO2_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: 'bar-chart-2'
+  },
   [DEVICE_FEATURE_CATEGORIES.CO_SENSOR]: {
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'alert-circle'
   },
@@ -305,6 +328,14 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_STATE]: 'droplet',
     [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_LEVEL_PERCENT]: 'droplet',
     [DEVICE_FEATURE_TYPES.LEVEL_SENSOR.LIQUID_DEPTH]: 'droplet'
+  },
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: 'heater',
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: 'sliders',
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE]: 'thermometer',
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER]: 'shower-head',
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING]: 'flame',
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST]: 'zap'
   },
   [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: {
     [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: 'droplet',
@@ -483,7 +514,8 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: 'rotate-cw'
   },
   [DEVICE_FEATURE_CATEGORIES.UNKNOWN]: {
-    [DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN]: 'help-circle'
+    [DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN]: 'help-circle',
+    [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: 'help-circle'
   },
   [DEVICE_FEATURE_CATEGORIES.MUSIC]: {
     [DEVICE_FEATURE_TYPES.MUSIC.VOLUME]: 'volume-1',

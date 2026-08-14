@@ -5,15 +5,21 @@ import { route } from 'preact-router';
 
 import IntegrationPage from './IntegrationPage';
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import normalizeSearchText from '../../utils/normalizeSearchText';
 import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import debounce from 'debounce';
 import { integrations, integrationsByType, categories } from '../../config/integrations';
 import { getLocalizedText } from './all/external-integration/utils';
-import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog } from './catalog-url';
+import { getCatalogFilters, getCatalogUrl, getUrlFromCatalog, rememberCatalogUrl } from './catalog-url';
+import createActionsExternalIntegrationUpdates from '../../actions/externalIntegrationUpdates';
 import { RequestStatus } from '../../utils/consts';
 
 const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
 const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
+// cross-cutting views: they are not integration types, they filter the whole
+// catalog (a favorite, or an integration with a pending update, can be of any
+// type) — so no type filter must be applied to them
+const VIRTUAL_CATEGORIES = ['favorites', 'updates'];
 
 class Integration extends Component {
   constructor(props) {
@@ -35,8 +41,13 @@ class Integration extends Component {
   // a render, the new value is not readable in the state right away
   updateURL(filters = this.state) {
     const { searchKeyword, orderDir } = filters;
+    const url = getCatalogUrl({ category: this.props.category, searchKeyword, orderDir });
+    // the list is only reloaded 300ms later (the search is debounced): without
+    // this, opening an integration in between would send its back link to the
+    // previous view, while the browser back button already goes to this one
+    rememberCatalogUrl(url);
     // replace and not push: filtering should not fill the browser history
-    route(getCatalogUrl({ category: this.props.category, searchKeyword, orderDir }), true);
+    route(url, true);
   }
 
   componentWillMount() {
@@ -84,7 +95,10 @@ class Integration extends Component {
     // never the store: installing is an admin gesture
     const isAdmin = user.role === USER_ROLE.ADMIN;
     const [externalInstalled, externalStoreResponse] = await Promise.all([
-      httpClient.get('/api/v1/external_integration').catch(() => []),
+      // null and not []: a failed request means "unknown", not "nothing
+      // installed". An empty array would be counted as zero integration to
+      // update and would clear the header counter on a network hiccup
+      httpClient.get('/api/v1/external_integration').catch(() => null),
       isAdmin ? httpClient.get('/api/v1/external_integration/store').catch(() => null) : Promise.resolve(null)
     ]);
     await this.setState({
@@ -155,14 +169,26 @@ class Integration extends Component {
     if (prevUserId !== currentUserId) {
       this.loadExternalIntegrations();
     }
+    // the periodic poll only refreshes the global counter: on a catalog left
+    // open, the menu entry and the "to update" list would keep showing the
+    // state of the last load while the header already says otherwise
+    const sharedCount = this.props.externalIntegrationsToUpdate;
+    if (
+      prevProps.externalIntegrationsToUpdate !== sharedCount &&
+      sharedCount !== this.state.integrationsToUpdate &&
+      prevUserId === currentUserId
+    ) {
+      this.loadExternalIntegrations();
+    }
   }
 
   buildExternalIntegrationCards() {
     const { user = {}, category } = this.props;
     // external integrations live in the category matching their manifest
-    // type ("device" or "communication"), and can also be favorites
-    const EXTERNAL_CATEGORIES = ['device', 'communication'];
-    if (category && !EXTERNAL_CATEGORIES.includes(category) && category !== 'favorites') {
+    // type ("device", "communication" or "weather"), and can also be
+    // favorites
+    const EXTERNAL_CATEGORIES = ['device', 'communication', 'weather'];
+    if (category && !EXTERNAL_CATEGORIES.includes(category) && !VIRTUAL_CATEGORIES.includes(category)) {
       return [];
     }
     const isAdmin = user.role === USER_ROLE.ADMIN;
@@ -185,10 +211,22 @@ class Integration extends Component {
 
     const externalCards = [];
 
-    // a communication integration has no device screens: its card lands
-    // straight on the configuration screen
+    // the manifest declares the channels the integration knows how to use
+    // ("local", "cloud", or both): this is the same information the native
+    // integrations carry in their JSON config, so the catalog can show the
+    // Local/Cloud tags on a community integration too
+    const getTransportTags = manifest => {
+      const transports = manifest.transports || [];
+      return {
+        local: transports.includes('local'),
+        cloud: transports.includes('cloud')
+      };
+    };
+
+    // communication and weather integrations have no device screens: their
+    // card lands straight on the configuration screen
     const getInstalledUrl = (selector, manifest) =>
-      manifest.type === 'communication'
+      ['communication', 'weather'].includes(manifest.type)
         ? `/dashboard/integration/device/external/${selector}/config`
         : `/dashboard/integration/device/external/${selector}`;
 
@@ -202,13 +240,14 @@ class Integration extends Component {
         key: `external-${integration.store_slug || integration.selector}`,
         external: true,
         externalInstalled: true,
-        type: manifest.type === 'communication' ? 'communication' : 'device',
+        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || integration.name || integration.selector,
         description: getLocalizedText(manifest.description, language),
         url: getInstalledUrl(integration.selector, manifest),
         img: (storeIntegration && storeIntegration.cover_url) || manifest.cover_image || null,
         status: integration.status,
-        updateAvailable: integration.update_available
+        updateAvailable: integration.update_available,
+        ...getTransportTags(manifest)
       });
     });
 
@@ -223,7 +262,7 @@ class Integration extends Component {
         key: `external-${storeIntegration.store_slug}`,
         external: true,
         externalInstalled: !!isInstalled,
-        type: manifest.type === 'communication' ? 'communication' : 'device',
+        type: ['communication', 'weather'].includes(manifest.type) ? manifest.type : 'device',
         name: manifest.name || storeIntegration.store_slug,
         description: getLocalizedText(manifest.description, language),
         url: isInstalled
@@ -236,12 +275,14 @@ class Integration extends Component {
               orderDir: this.state.orderDir
             }),
         img: storeIntegration.cover_url || manifest.cover_image || null,
-        updateAvailable: isInstalled ? storeIntegration.update_available : false
+        updateAvailable: isInstalled ? storeIntegration.update_available : false,
+        ...getTransportTags(manifest)
       });
     });
 
-    // the favorites view keeps every type, the favorite filter comes later
-    if (category && category !== 'favorites') {
+    // the favorites and updates views keep every type, their own filter
+    // comes later
+    if (category && !VIRTUAL_CATEGORIES.includes(category)) {
       return externalCards.filter(card => card.type === category);
     }
     return externalCards;
@@ -252,11 +293,10 @@ class Integration extends Component {
     const { searchKeyword = '', orderDir = 'asc' } = this.state;
 
     // Load all or category related integrations
-    let selectedIntegrations = category && category !== 'favorites' ? integrationsByType[category] || [] : integrations;
+    let selectedIntegrations =
+      category && !VIRTUAL_CATEGORIES.includes(category) ? integrationsByType[category] || [] : integrations;
     // Load all categories
     let integrationCategories = categories;
-    // Total size
-    let totalSize = integrations.length;
 
     // Filter integrations and categories according to user role
     if (user.role !== USER_ROLE.ADMIN) {
@@ -269,8 +309,6 @@ class Integration extends Component {
       integrationCategories = integrationCategories.filter(
         i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1
       );
-
-      totalSize = integrations.filter(i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1).length;
     }
 
     // Get favorites (use cached state if available, otherwise empty)
@@ -302,24 +340,41 @@ class Integration extends Component {
       isFavorite: favorites.includes(card.key)
     }));
     selectedIntegrations = selectedIntegrations.concat(externalCards);
-    totalSize += externalCards.length;
 
     // If we are in favorites view, only display favorites
     if (category === 'favorites') {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.isFavorite);
-      totalSize = selectedIntegrations.length;
     }
+
+    // If we are in updates view, only display the integrations to update
+    if (category === 'updates') {
+      selectedIntegrations = selectedIntegrations.filter(integration => integration.updateAvailable);
+    }
+
+    // the total is the size of the view the user is currently looking at, once
+    // every filter that defines this view has been applied (role, category,
+    // favorites, updates) but before the search: it is the reference the search
+    // result count is compared to. Computing it any earlier would mix scopes,
+    // e.g. counting the integrations of every type while displaying only one
+    const totalSize = selectedIntegrations.length;
 
     // Filter
     if (searchKeyword && searchKeyword.length > 0) {
-      const lowerCaseSearchKeyword = searchKeyword.toLowerCase();
-      selectedIntegrations = selectedIntegrations.filter(integration => {
-        const { name, description } = integration;
-        return (
-          name.toLowerCase().includes(lowerCaseSearchKeyword) ||
-          description.toLowerCase().includes(lowerCaseSearchKeyword)
-        );
-      });
+      // both sides are stripped of their accents: "meteo" has to find "Météo",
+      // and typing "Météo" has to keep finding it
+      const normalizedSearchKeyword = normalizeSearchText(searchKeyword);
+      // a keyword made of accents only folds down to nothing, and every string
+      // contains the empty string: without this, such a search would display
+      // the whole catalog as if the field were empty
+      selectedIntegrations = normalizedSearchKeyword.length
+        ? selectedIntegrations.filter(integration => {
+            const { name, description } = integration;
+            return (
+              normalizeSearchText(name).includes(normalizedSearchKeyword) ||
+              normalizeSearchText(description).includes(normalizedSearchKeyword)
+            );
+          })
+        : [];
     }
 
     // Sort
@@ -329,13 +384,48 @@ class Integration extends Component {
       selectedIntegrations.sort((a, b) => b.name.localeCompare(a.name));
     }
 
+    // the counter is computed from the installed integrations, not from the
+    // cards being displayed: it must stay the same in every category
+    const integrationsToUpdate = this.countIntegrationsToUpdate();
+
+    // the integration pages send the user back here: this runs on mount and on
+    // every filter change, so the remembered view is always the current one
+    rememberCatalogUrl(getCatalogUrl({ category, searchKeyword, orderDir }));
+
     this.setState({
       integrations: selectedIntegrations,
       totalSize,
       integrationCategories,
+      integrationsToUpdate,
       searchKeyword,
       orderDir
     });
+  }
+
+  // the header counter is shared by every page, so the catalog refreshes it
+  // from the list it just downloaded instead of letting it go stale
+  countIntegrationsToUpdate() {
+    const { externalInstalled } = this.state;
+    if (!externalInstalled) {
+      // the installed list is still loading (loadFavorites finishes first and
+      // calls getIntegrations on its way): counting 0 here would hide the
+      // "to update" menu entry until it lands, while the header keeps showing
+      // its count. Falling back on the shared value keeps the two consistent
+      return this.props.externalIntegrationsToUpdate || 0;
+    }
+    const integrationsToUpdate = externalInstalled.filter(integration => integration.update_available).length;
+    // compared to the shared value and not to the local one: getIntegrations()
+    // runs on every keystroke of the search field, so an unchanged count must
+    // not re-render every component reading it — but a fresh fetch that
+    // disagrees with the poll has to correct it, otherwise the header stays on
+    // a count the catalog no longer shows
+    if (
+      this.props.setExternalIntegrationsToUpdate &&
+      integrationsToUpdate !== this.props.externalIntegrationsToUpdate
+    ) {
+      this.props.setExternalIntegrationsToUpdate(integrationsToUpdate);
+    }
+    return integrationsToUpdate;
   }
 
   toggleFavorite = async integrationKey => {
@@ -396,4 +486,7 @@ class Integration extends Component {
   }
 }
 
-export default connect('user,session,httpClient', {})(withIntlAsProp(Integration));
+export default connect(
+  'user,session,httpClient,externalIntegrationsToUpdate',
+  createActionsExternalIntegrationUpdates
+)(withIntlAsProp(Integration));

@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, assert: sinonAssert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert } = sinon;
 
 const { buildSupervisor } = require('./testUtils.test');
 
@@ -22,7 +24,7 @@ describe('externalIntegration.upsertFeatureSupportedOptions', () => {
 
   beforeEach(() => {
     ({ externalIntegration, device } = buildSupervisor());
-    device.syncFeatureSupportedOptions = fake.resolves([{ value: 1, label: 'Entrance', sort_order: 0 }]);
+    device.syncFeatureSupportedOptions = sinon.fake.resolves([{ value: 1, label: 'Entrance', sort_order: 0 }]);
   });
 
   it('should sync the options and patch the in-memory feature', async () => {

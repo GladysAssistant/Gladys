@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 const { MockedMqttClient } = require('./mocks.test');
@@ -13,6 +13,9 @@ const gladys = {
   },
   system: {
     isDocker: fake.resolves(false),
+  },
+  device: {
+    get: fake.resolves([]),
   },
 };
 
@@ -34,7 +37,7 @@ describe('MqttHandler', () => {
   it('should have binded topics', async () => {
     await mqttHandler.init();
 
-    expect(Object.keys(mqttHandler.topicBinds)).deep.eq(['gladys/master/#']);
+    expect(Object.keys(mqttHandler.topicBinds)).deep.eq(['gladys/master/#', 'homeassistant/#']);
 
     assert.callCount(gladys.variable.getValue, 3);
     assert.calledOnce(MockedMqttClient.internalConnect);

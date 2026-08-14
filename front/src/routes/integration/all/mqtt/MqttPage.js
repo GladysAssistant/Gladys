@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const MqttPage = ({ children, user }) => (
   <div class="page">
@@ -9,6 +10,7 @@ const MqttPage = ({ children, user }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.mqtt.title" />
               </h3>
@@ -23,6 +25,17 @@ const MqttPage = ({ children, user }) => (
                       <i class="fe fe-radio" />
                     </span>
                     <Text id="integration.mqtt.deviceTab" />
+                  </Link>
+
+                  <Link
+                    href="/dashboard/integration/device/mqtt/discovery"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-search" />
+                    </span>
+                    <Text id="integration.mqtt.discoverTab" />
                   </Link>
 
                   <Link

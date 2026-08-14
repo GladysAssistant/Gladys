@@ -1,5 +1,7 @@
 const EventEmitter = require('events');
-const { assert, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, stub } = sinon;
 
 const Device = require('../../../lib/device');
 

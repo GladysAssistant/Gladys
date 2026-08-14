@@ -1,5 +1,6 @@
 const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const { HOME_ASSISTANT } = require('./homeAssistant/constants');
 
 /**
  * @description Control a remote MQTT device.
@@ -17,6 +18,12 @@ async function setValue(device, deviceFeature, value) {
 
   if (!this.mqttClient) {
     throw new ServiceNotConfiguredError();
+  }
+
+  // Devices created through the Home Assistant discovery protocol
+  // are controlled with their own command topics
+  if (device.external_id.startsWith(`${HOME_ASSISTANT.EXTERNAL_ID_PREFIX}:`)) {
+    return this.setValueHomeAssistant(device, deviceFeature, value);
   }
 
   const topic = `gladys/device/${device.external_id}/feature/${deviceFeature.external_id}/state`;

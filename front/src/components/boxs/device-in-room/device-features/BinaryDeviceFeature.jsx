@@ -7,8 +7,12 @@ const BinaryDeviceType = ({ children, ...props }) => {
   const customText =
     dictionary.deviceFeatureAction.category[category] && dictionary.deviceFeatureAction.category[category][type];
 
+  // Both buttons write the opposite of the current value, so the enabled one must be labelled
+  // with the action that applies that target value, not with the value the device is already in.
+  const targetValue = lastValue === 0 ? 1 : 0;
+
   function updateValue() {
-    props.updateValue(props.deviceFeature, lastValue === 0 ? 1 : 0);
+    props.updateValue(props.deviceFeature, targetValue);
   }
 
   return (
@@ -42,7 +46,7 @@ const BinaryDeviceType = ({ children, ...props }) => {
               {lastValue === 0 ? (
                 <Text id={`deviceFeatureAction.category.${category}.${type}.stateLiveFinished.${lastValue}`} />
               ) : (
-                <Text id={`deviceFeatureAction.category.${category}.${type}.state.${lastValue}`} />
+                <Text id={`deviceFeatureAction.category.${category}.${type}.state.${targetValue}`} />
               )}
             </button>
             <button
@@ -55,7 +59,7 @@ const BinaryDeviceType = ({ children, ...props }) => {
               {lastValue === 1 ? (
                 <Text id={`deviceFeatureAction.category.${category}.${type}.stateLiveFinished.${lastValue}`} />
               ) : (
-                <Text id={`deviceFeatureAction.category.${category}.${type}.state.${lastValue}`} />
+                <Text id={`deviceFeatureAction.category.${category}.${type}.state.${targetValue}`} />
               )}
             </button>
           </div>

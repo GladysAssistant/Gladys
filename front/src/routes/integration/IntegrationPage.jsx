@@ -19,7 +19,9 @@ const IntegrationPage = ({
   showStoreRefresh,
   refreshStore,
   refreshStoreStatus,
-  refreshStoreStale
+  refreshStoreStale,
+  integrationsToUpdate,
+  category
 }) => (
   <div class="page">
     <div class="page-main">
@@ -35,7 +37,11 @@ const IntegrationPage = ({
               totalSize={totalSize}
               showInstallFromGithub={showInstallFromGithub}
             />
-            <IntegrationMenuMobile integrationCategories={integrationCategories} />
+            <IntegrationMenuMobile
+              integrationCategories={integrationCategories}
+              integrationsToUpdate={integrationsToUpdate}
+              category={category}
+            />
             <div class="alert alert-info mb-4">
               <h4 class="alert-title">
                 <Text id="integration.root.gatewayBanner.title" />
@@ -44,7 +50,11 @@ const IntegrationPage = ({
             </div>
             <div class="row">
               <div class={`col-lg-3 ${style.desktopMenuCol}`}>
-                <IntegrationMenu integrationCategories={integrationCategories} />
+                <IntegrationMenu
+                  integrationCategories={integrationCategories}
+                  integrationsToUpdate={integrationsToUpdate}
+                  category={category}
+                />
               </div>
               <div class="col-lg-9">
                 <div class={`list-group list-group-flush ${style.mobileList}`}>
@@ -76,6 +86,8 @@ const IntegrationPage = ({
                         </p>
                         <MarkupText id="integration.root.noSearchResultsSuggestion" />
                       </div>
+                    ) : category === 'updates' ? (
+                      <Text id="integration.root.allIntegrationsUpToDate" />
                     ) : (
                       <Text id="integration.root.noIntegrations" />
                     )}

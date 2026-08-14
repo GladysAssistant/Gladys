@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const SonosController = require('../../../../services/sonos/api/sonos.controller');
 
 const { assert, fake } = sinon;

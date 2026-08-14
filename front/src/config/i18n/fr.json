@@ -320,7 +320,9 @@
       "gauge": "Jauge",
       "energy-consumption": "Consommation Énergétique",
       "voice-assistant": "Assistant vocal",
-      "link": "Lien"
+      "link": "Lien",
+      "photo": "Photo",
+      "sun": "Soleil"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -328,17 +330,75 @@
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
         "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
-        "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
-        "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échoué. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
-        "clickHere": "Cliquez ici pour accéder au panneau de configuration de OpenWeather.",
+        "serviceNotConfigured": "Aucun service météo n'est configuré. Veuillez accéder à l'onglet «Intégrations» et configurer une intégration météo (OpenWeather, ou une intégration météo du store).",
+        "requestToThirdPartyFailed": "La requête au fournisseur météo a échoué. Votre instance Gladys est-elle connectée à Internet ? Veuillez vous rendre dans le panneau des intégrations météo pour résoudre ce problème.",
+        "clickHere": "Cliquez ici pour accéder aux intégrations météo.",
         "unknownError": "Nous ne pouvons pas obtenir la météo pour cette maison. Avez-vous défini une maison pour cette box ?",
+        "editProviderLabel": "Fournisseur météo :",
+        "providerAuto": "Automatique (premier fournisseur disponible)",
+        "providerInternalOpenWeather": "OpenWeather interne (déprécié)",
         "editModeLabel": "Mode d'affichage :",
         "displayModes": {
-          "advancedWeather": "Humidité et vitesse du vent",
+          "dateLocation": "Date et lieu",
+          "currentWeather": "Météo actuelle",
+          "alerts": "Alertes météo",
+          "advancedWeather": "Détails météo (humidité, vent, UV, lune…)",
           "hourlyForecast": "Prévisions pour les 24 prochaines heures",
-          "dailyForecast": "Prévisions pour les 5 prochains jours"
+          "dailyForecast": "Prévisions pour les 5 prochains jours",
+          "providerImages": "Images du fournisseur (carte de vigilance, radar de pluie…)"
         },
-        "minMaxDegreeValue": "{{min}}°/{{max}}°"
+        "noModeSelected": "Sélectionnez au moins un mode d'affichage, sinon le widget restera vide.",
+        "minMaxDegreeValue": "{{min}}°/{{max}}°",
+        "uv": "UV",
+        "windGustTitle": "Rafales de vent (le fournisseur ne donne pas de vent moyen pour ce jour)",
+        "alertTypes": {
+          "wind": "Vent violent",
+          "rain": "Pluie-inondation",
+          "flood": "Inondation",
+          "thunderstorm": "Orages",
+          "snow": "Neige-verglas",
+          "heat": "Canicule",
+          "cold": "Grand froid",
+          "avalanche": "Avalanches",
+          "coastal": "Vagues-submersion",
+          "fog": "Brouillard"
+        },
+        "conditions": {
+          "clear": "Ciel dégagé",
+          "partly-cloudy": "Peu nuageux",
+          "cloud": "Nuageux",
+          "fog": "Brouillard",
+          "drizzle": "Bruine",
+          "rain": "Pluie",
+          "pouring": "Fortes pluies",
+          "sleet": "Pluie et neige mêlées",
+          "hail": "Grêle",
+          "snow": "Neige",
+          "thunderstorm": "Orages",
+          "wind": "Vent",
+          "night": "Nuit",
+          "unknown": "Indisponible"
+        },
+        "moonPhases": {
+          "0": "Nouvelle lune",
+          "1": "Premier croissant",
+          "2": "Premier quartier",
+          "3": "Gibbeuse croissante",
+          "4": "Pleine lune",
+          "5": "Gibbeuse décroissante",
+          "6": "Dernier quartier",
+          "7": "Dernier croissant"
+        },
+        "windCardinals": {
+          "n": "N",
+          "ne": "NE",
+          "e": "E",
+          "se": "SE",
+          "s": "S",
+          "sw": "SO",
+          "w": "O",
+          "nw": "NO"
+        }
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -455,7 +515,24 @@
           "week": "Semaine",
           "month": "Mois",
           "year": "Année"
-        }
+        },
+        "previousPeriod": "Période précédente",
+        "nextPeriod": "Période suivante",
+        "currentPeriod": "En cours",
+        "backToNow": "Revenir à maintenant"
+      },
+      "sun": {
+        "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour calculer la position du soleil.",
+        "sunrise": "Lever du soleil",
+        "sunset": "Coucher du soleil",
+        "dawn": "Aube",
+        "solarNoon": "Midi solaire",
+        "dusk": "Crépuscule",
+        "azimuth": "Azimut",
+        "elevation": "Élévation",
+        "noHouse": "Veuillez sélectionner une maison dans les paramètres du widget.",
+        "noCoordinates": "Cette maison n'a pas de coordonnées. Veuillez d'abord configurer sa localisation.",
+        "error": "Une erreur est survenue lors de la récupération des données du soleil, merci de réessayer."
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -511,6 +588,23 @@
           "cpu": "Appareil connecté",
           "home": "Maison"
         }
+      },
+      "photo": {
+        "description": "Affichez une ou plusieurs photos sur votre tableau de bord. Les images sont chargées par votre instance Gladys (et non par votre navigateur), ce qui permet d'afficher des photos hébergées sur un NAS local, y compris à distance via Gladys Plus.",
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Ex : Vacances 2025",
+        "photosLabel": "Photos",
+        "editUrlPlaceholder": "https://mon-nas.local/photos/vacances.jpg",
+        "editCaptionPlaceholder": "Légende (optionnelle)",
+        "addPhotoButton": "Ajouter une photo",
+        "fitLabel": "Affichage de l'image",
+        "fitCover": "Remplir (recadrer)",
+        "fitContain": "Contenir (image entière)",
+        "slideshowIntervalLabel": "Diaporama (secondes)",
+        "slideshowIntervalHelp": "0 pour désactiver le diaporama. Recommandé : 10-30 secondes.",
+        "showCaptionLabel": "Afficher les légendes",
+        "emptyPhotos": "Aucune photo configurée.",
+        "imageError": "Impossible de charger cette image."
       },
       "alarm": {
         "armButton": "Armer",
@@ -602,9 +696,11 @@
     },
     "root": {
       "title": "Intégrations",
-      "subtitle": "{{length}} de {{total}} intégrations",
+      "subtitle": "{{length}} sur {{total}} intégrations",
+      "subtitleTotal": "{{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
       "noIntegrations": "Aucune intégration trouvée",
+      "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
       "noSearchResults": "Aucune intégration correspondant à « {{searchKeyword}} » n'a été trouvée.",
       "noSearchResultsSuggestion": "Essayez <a href=\"/dashboard/integration/device/matter\">Matter</a> pour les appareils compatibles Matter/Thread, ou <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a> pour connecter des appareils Somfy, Shelly, Daikin et bien d'autres.",
       "refreshStore": {
@@ -623,6 +719,7 @@
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
+        "updates": "À mettre à jour",
         "device": "Appareils",
         "communication": "Communication",
         "calendar": "Calendrier",
@@ -675,7 +772,8 @@
       "actions": {
         "title": "Actions",
         "runButton": "Exécuter",
-        "error": "L'action a échoué. Vérifiez que l'intégration est démarrée."
+        "error": "L'action a échoué. Vérifiez que l'intégration est démarrée.",
+        "resultRegionLabel": "Résultat de l'action"
       },
       "connection": {
         "label": "Connexion",
@@ -812,7 +910,6 @@
         "updateTitle": "L'intégration a re-publié cet appareil avec une structure différente : appliquer la nouvelle définition"
       },
       "install": {
-        "backToCatalog": "Retour aux intégrations",
         "notFound": "Cette intégration n'a pas été trouvée dans le store.",
         "starsLabel": "étoiles",
         "lastPushLabel": "Dernière mise à jour :",
@@ -827,12 +924,14 @@
         "installButton": "Installer",
         "networkDiscoveryTitle": "Demandes de découverte réseau",
         "networkDiscoveryText": "Cette intégration demande à Gladys de capturer pour elle les annonces réseau suivantes. Elle ne pourra jamais rien capturer d'autre.",
+        "locationText": "Cette intégration demande l'accès aux coordonnées (latitude/longitude) des maisons configurées dans Gladys.",
         "documentationLink": "Documentation",
         "duplicateWarningTitle": "Une autre instance est déjà installée",
         "duplicateWarningText": "« {name} » semble être une autre instance de cette intégration. Deux instances peuvent se disputer le même compte cloud ou les mêmes appareils — pensez à arrêter l'instance existante pendant vos tests. Installer quand même est un usage supporté (ex. une version dev à côté de la prod).",
         "webhooksTitle": "Webhooks Internet (Gladys Plus)",
         "webhooksText": "Cette intégration pourra recevoir les événements suivants depuis Internet via le relais Gladys Plus (nécessite un abonnement Gladys Plus et une clé Open API).",
-        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur)."
+        "notificationWarningText": "Cette intégration est un canal de notification : elle pourra vous envoyer des messages, mais elle ne pourra jamais recevoir de messages ni agir en votre nom (garantie côté serveur).",
+        "weatherInfoText": "Cette intégration est un fournisseur météo : une fois installée, elle fournira la météo affichée dans Gladys (widget du tableau de bord et assistant)."
       },
       "networkDiscovery": {
         "udpBroadcastText": "Écouter les annonces réseau UDP sur les ports {ports}",
@@ -848,7 +947,7 @@
         "repoUrlPlaceholder": "https://github.com/owner/repository",
         "installButton": "Installer",
         "devModeLink": "Mode développeur : installer depuis une image Docker",
-        "devModeDescription": "Installez une intégration directement depuis une image Docker, avec un manifeste optionnel. Réservé aux développeurs d’intégrations.",
+        "devModeDescription": "Installez une intégration directement depuis une image Docker, avec un manifeste optionnel. L’image peut être construite localement avec docker build, sans registre. Réservé aux développeurs d’intégrations.",
         "dockerImageLabel": "Image Docker",
         "dockerImagePlaceholder": "ex. monuser/mon-integration:latest",
         "manifestLabel": "Manifeste (JSON, optionnel)",
@@ -1728,6 +1827,13 @@
       "description": "Connectez Gladys à HomeKit et utilisez Siri pour lui parler.",
       "introduction": "Pour connecter Gladys à HomeKit, vous devez être en possession d'un appareil compatible Apple (iPhone, iPad, iPod touch).",
       "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
+      "exposure": "Par défaut Gladys expose tous les appareils compatibles à HomeKit. Vous pouvez à la place choisir les appareils que vous souhaitez voir dans l'application Maison.",
+      "exposureModeAll": "Exposer tous les appareils compatibles",
+      "exposureModeSelection": "Exposer uniquement les appareils sélectionnés",
+      "noCompatibleDevice": "Aucun appareil de votre Gladys ne peut encore être exposé à HomeKit.",
+      "saveExposureButton": "Enregistrer les appareils exposés",
+      "saveExposureSuccess": "Appareils exposés enregistrés. Le pont HomeKit redémarre automatiquement, votre appairage est conservé.",
+      "saveExposureError": "Une erreur est survenue lors de l'enregistrement des appareils exposés.",
       "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
       "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparaît pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
       "reloadButton": "Relancer",
@@ -2110,8 +2216,28 @@
       "description": "Créez des appareils virtuels contrôlables via MQTT.",
       "virtualDevicesExplanation": "Cette intégration permet de créer des appareils virtuels, qui sont contrôlables via MQTT, via HTTP, dans les scènes et sur le tableau de bord. Pour utiliser des appareils Zigbee, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/zigbee2mqtt\">Zigbee2mqtt</a>. Pour utiliser des appareils Z-Wave, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/zwavejs-ui\">ZWaveJS UI</a>. Pour utiliser des appareils MQTT Nuki, veuillez utiliser l'intégration <a href=\"/dashboard/integration/device/nuki\">Nuki</a>.",
       "deviceTab": "Appareils",
+      "discoverTab": "Découverte",
       "debugTab": "Debug MQTT",
       "setupTab": "Configuration",
+      "discover": {
+        "title": "Découverte Home Assistant",
+        "description": "Les appareils qui publient leur configuration sur le broker MQTT avec le protocole <b>Home Assistant Discovery</b> (topic <i>homeassistant/</i>) sont automatiquement découverts et affichés ci-dessous. Vous pouvez ensuite les ajouter à Gladys.",
+        "refreshButton": "Rafraîchir",
+        "hideExistingDevices": "Masquer les appareils déjà dans Gladys",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "roomLabel": "Pièce",
+        "modelLabel": "Modèle",
+        "externalIdLabel": "Identifiant externe",
+        "featuresLabel": "Fonctionnalités",
+        "saveButton": "Sauvegarder",
+        "updateButton": "Mettre à jour",
+        "alreadyExistsButton": "Déjà créé",
+        "saveError": "Une erreur s'est produite lors de la sauvegarde de cet appareil.",
+        "serverError": "Une erreur s'est produite lors de la récupération des appareils découverts.",
+        "deviceNotHandled": "Cet appareil n'expose aucune fonctionnalité actuellement supportée par Gladys.",
+        "noDeviceDiscovered": "Aucun appareil découvert pour le moment. Les appareils qui publient des messages de découverte Home Assistant persistants (retained) sur le broker MQTT apparaîtront ici automatiquement."
+      },
       "documentation": "Documentation MQTT",
       "apiDocumentation": "Documentation MQTT API",
       "status": {
@@ -2199,7 +2325,8 @@
           "button": "Déclenchez des actions à l'appui d'un bouton.",
           "text": "Affichez ou envoyez des valeurs texte.",
           "battery": "Surveillez le niveau de batterie de vos appareils.",
-          "currency": "Affichez des valeurs monétaires ou de cryptomonnaies."
+          "currency": "Affichez des valeurs monétaires ou de cryptomonnaies.",
+          "water-heater": "Pilotez un chauffe-eau : état, mode de fonctionnement, consigne d'eau chaude et boost."
         },
         "descriptions": {
           "light": {
@@ -2246,6 +2373,14 @@
           },
           "currency": {
             "decimal": "Affiche une valeur monétaire avec son unité."
+          },
+          "water-heater": {
+            "binary": "Allumez ou éteignez l'appareil.",
+            "mode": "Choisissez le mode de fonctionnement.",
+            "target-temperature": "Définissez la consigne d'eau chaude avec les boutons +/-.",
+            "remaining-hot-water": "Lisez la part d'eau chaude encore disponible.",
+            "heating": "Lisez si l'appareil est en train de chauffer l'eau.",
+            "boost": "Lancez ou annulez une chauffe forcée."
           }
         },
         "keywords": {
@@ -2873,6 +3008,7 @@
       "keyNameLabel": "Clé :",
       "registeredLabel": "Enregistré le :"
     },
+    "backToIntegrations": "Retour aux intégrations",
     "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment."
   },
   "editScene": {
@@ -2990,6 +3126,8 @@
         "valueLabel": "Valeur",
         "valueTypeSimple": "Simple",
         "simpleExplanationText": "Entrez ici la nouvelle valeur que vous souhaitez assigner à votre appareil.",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
         "valueTypeComputed": "Calculée",
         "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc."
       },
@@ -3125,7 +3263,8 @@
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "gladys/my-topic",
+        "topicPlaceholder": "zigbee2mqtt/mon-appareil/set",
+        "topicExplanation": "Le topic est publié tel quel : vous devez écrire le topic MQTT complet, préfixe 'zigbee2mqtt/' inclus (par exemple 'zigbee2mqtt/mon-appareil/set').",
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
@@ -3266,6 +3405,10 @@
       },
       "mqtt": {
         "received": "Recevoir un message MQTT"
+      },
+      "weather": {
+        "alert-raised": "Alerte météo déclenchée",
+        "alert-ended": "Alerte météo terminée"
       }
     },
     "triggersCard": {
@@ -3277,6 +3420,8 @@
         "lessOrEqual": "inférieur ou égal",
         "different": "différent",
         "valuePlaceholder": "Valeur",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
         "on": "On",
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
@@ -3381,6 +3526,20 @@
         "messageLabel": "Message",
         "messagePlaceholder": "Entrez le message attendu",
         "messageDescription": "Entrez le message attendu ou laissez vide pour exécuter la scène quelque soit le message"
+      },
+      "weatherAlert": {
+        "alertRaisedDescription": "Se déclenche quand une alerte météo apparaît ou s'aggrave pour la maison sélectionnée (vérifié toutes les 30 minutes, ou dès que l'intégration météo signale un changement).",
+        "alertEndedDescription": "Se déclenche quand une alerte météo se termine pour la maison sélectionnée.",
+        "houseLabel": "Maison",
+        "typeLabel": "Type d'alerte",
+        "anyType": "Tous les types d'alerte",
+        "severityLabel": "Sévérité minimale",
+        "severities": {
+          "minor": "Mineure (bleu)",
+          "moderate": "Modérée (jaune)",
+          "severe": "Sévère (orange)",
+          "extreme": "Extrême (rouge)"
+        }
       }
     }
   },
@@ -4245,8 +4404,8 @@
             "1": "Activée"
           },
           "state": {
-            "0": "Activer",
-            "1": "Désactiver"
+            "0": "Désactiver",
+            "1": "Activer"
           }
         },
         "lock": {
@@ -4255,8 +4414,8 @@
             "1": "Verrouillée"
           },
           "state": {
-            "0": "Verrouiller",
-            "1": "Déverrouiller"
+            "0": "Déverrouiller",
+            "1": "Verrouiller"
           }
         }
       },
@@ -4267,8 +4426,8 @@
             "1": "Verrouillée"
           },
           "state": {
-            "0": "Verrouiller",
-            "1": "Déverrouiller"
+            "0": "Déverrouiller",
+            "1": "Verrouiller"
           }
         }
       },
@@ -4349,6 +4508,37 @@
           "deep-clean": "Nettoyage profond",
           "vacuum": "Aspiration",
           "mop": "Serpillère"
+        }
+      },
+      "water-heater": {
+        "mode": {
+          "off": "Arrêt",
+          "auto": "Auto",
+          "eco": "Éco",
+          "boost": "Boost",
+          "manual": "Manuel",
+          "away": "Absence",
+          "program": "Programmation"
+        },
+        "binary": {
+          "stateLiveFinished": {
+            "0": "Éteint",
+            "1": "Allumé"
+          },
+          "state": {
+            "0": "Éteindre",
+            "1": "Allumer"
+          }
+        },
+        "boost": {
+          "stateLiveFinished": {
+            "0": "Boost inactif",
+            "1": "Boost actif"
+          },
+          "state": {
+            "0": "Annuler le boost",
+            "1": "Lancer le boost"
+          }
         }
       }
     }
@@ -4591,6 +4781,10 @@
           "0": "Faible",
           "1": "Moyen",
           "2": "Fort"
+        },
+        "test-in-progress": {
+          "0": "Non",
+          "1": "Oui"
         }
       },
       "music": {
@@ -4611,6 +4805,13 @@
           "other": "Aucune valeur reçue",
           "zero": "Pas de mouvement",
           "one": "Mouvement détecté"
+        }
+      },
+      "presence-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Pas de présence",
+          "one": "Présence détectée"
         }
       },
       "smoke-sensor": {
@@ -4762,6 +4963,41 @@
           "4": "Retour à la base",
           "5": "En charge",
           "6": "Sur la base"
+        },
+        "run-mode": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Repos",
+          "1": "Nettoyer",
+          "2": "Cartographier"
+        },
+        "clean-mode": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Auto",
+          "1": "Rapide",
+          "2": "Silencieux",
+          "3": "Faible bruit",
+          "4": "Nettoyage profond",
+          "5": "Aspiration",
+          "6": "Serpillère"
+        }
+      },
+      "water-heater": {
+        "mode": {
+          "0": "Arrêt",
+          "1": "Auto",
+          "2": "Éco",
+          "3": "Boost",
+          "4": "Manuel",
+          "5": "Absence",
+          "6": "Programmation"
+        },
+        "boost": {
+          "0": "Boost inactif",
+          "1": "Boost actif"
+        },
+        "heating": {
+          "0": "Au repos",
+          "1": "En chauffe"
         }
       }
     }
@@ -4805,7 +5041,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Détecteur de présence",
-      "push": "Présence"
+      "push": "Présence",
+      "binary": "Détection présence Oui/Non"
     },
     "rain-sensor": {
       "shortCategoryName": "Détecteur de pluie",
@@ -4830,6 +5067,15 @@
       "liquid-state": "État du niveau",
       "liquid-level-percent": "Niveau du liquide (Pourcentage)",
       "liquid-depth": "Profondeur du liquide"
+    },
+    "water-heater": {
+      "shortCategoryName": "Chauffe-eau",
+      "binary": "État",
+      "mode": "Mode",
+      "target-temperature": "Consigne d'eau chaude",
+      "remaining-hot-water": "Eau chaude disponible",
+      "heating": "Chauffe en cours",
+      "boost": "Boost"
     },
     "water-valve": {
       "shortCategoryName": "Vanne d'eau",
@@ -4896,7 +5142,8 @@
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
       "lmh_volume": "Volume de la sirène",
-      "melody": "Mélodie"
+      "melody": "Mélodie",
+      "test-in-progress": "Test en cours"
     },
     "cube": {
       "shortCategoryName": "Cube",
@@ -4940,6 +5187,18 @@
     "formaldehyd-sensor": {
       "shortCategoryName": "Capteur Formaldéhyde",
       "decimal": "Formaldéhyde (Décimale)"
+    },
+    "no2-sensor": {
+      "shortCategoryName": "Capteur de NO2",
+      "decimal": "NO2 (Décimale)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "Capteur d'O3",
+      "decimal": "O3 (Décimale)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "Capteur de SO2",
+      "decimal": "SO2 (Décimale)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
@@ -5286,6 +5545,7 @@
       "binary": "Etat de l'entrée"
     },
     "unknown": {
+      "binary": "Binaire (on/off)",
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
     },
@@ -5416,6 +5676,7 @@
     "history": "Activité",
     "devices": "Appareils",
     "integrations": "Intégrations",
+    "integrationsToUpdate": "Intégrations à mettre à jour : {{count}}",
     "calendar": "Calendrier",
     "maps": "Plans",
     "scenes": "Scènes",

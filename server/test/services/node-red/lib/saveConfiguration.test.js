@@ -1,5 +1,6 @@
-const sinon = require('sinon');
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 
 const NodeRedManager = require('../../../../services/node-red/lib');
 

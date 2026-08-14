@@ -1,5 +1,6 @@
-const sinon = require('sinon');
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 const { expect } = require('chai');
 const MockExpressRequest = require('mock-express-request');
 

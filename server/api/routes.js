@@ -184,6 +184,11 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: dashboardController.updateOrder,
     },
+    'get /api/v1/dashboard/photo/proxy': {
+      authenticated: true,
+      rateLimit: true,
+      controller: dashboardController.getPhotoProxy,
+    },
     'get /api/v1/dashboard/:dashboard_selector': {
       authenticated: true,
       controller: dashboardController.getBySelector,
@@ -285,6 +290,10 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/room': {
       authenticated: true,
       controller: houseController.getRooms,
+    },
+    'get /api/v1/house/:house_selector/sun': {
+      authenticated: true,
+      controller: houseController.getSunState,
     },
     'post /api/v1/house/:house_selector/user/:user_selector/seen': {
       authenticated: true,
@@ -681,6 +690,11 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.getDevices,
     },
+    'get /api/integration/v1/house': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getHouses,
+    },
     'post /api/integration/v1/state': {
       authenticated: false,
       externalIntegrationAuth: true,
@@ -903,6 +917,10 @@ function getRoutes(gladys) {
       controller: userController.create,
     },
     // weather
+    'get /api/v1/weather/provider': {
+      authenticated: true,
+      controller: weatherController.getProviders,
+    },
     'get /api/v1/user/:user_selector/weather': {
       authenticated: true,
       controller: weatherController.getByUser,
@@ -910,6 +928,10 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather': {
       authenticated: true,
       controller: weatherController.getByHouse,
+    },
+    'get /api/v1/house/:house_selector/weather/image/:image_key': {
+      authenticated: true,
+      controller: weatherController.getImage,
     },
     // energy price
     'get /api/v1/energy_price': {

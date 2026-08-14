@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, assert: sinonAssert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert } = sinon;
 
 const { BadParameters } = require('../../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
@@ -171,7 +173,7 @@ describe('externalIntegration.setDiscoveredDevices', () => {
   });
 
   it('should upsert the supported_options of an already-created device', async () => {
-    deviceLib.syncFeatureSupportedOptions = fake.resolves([{ value: 1, label: 'Entrance', sort_order: 0 }]);
+    deviceLib.syncFeatureSupportedOptions = sinon.fake.resolves([{ value: 1, label: 'Entrance', sort_order: 0 }]);
     const device = buildDiscoveredDevice(service.selector);
     device.params = [];
     device.features[0].supported_options = [{ value: 1, label: 'Entrance' }];

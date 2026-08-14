@@ -44,15 +44,18 @@ jobs:
         working-directory: ./front
         run: |
           npm run compare-translations
-  test-server:
-    name: Server test
+  lint-server:
+    name: Server lint
     runs-on: ubuntu-22.04
+    # This job only reads the repository, so restrict the GITHUB_TOKEN
+    # accordingly (npm ci runs dependency lifecycle scripts).
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
       - name: 💽 Setup nodejs
+        id: setup-node
         uses: actions/setup-node@v3
         with:
           node-version-file: 'server/package.json'
@@ -62,10 +65,21 @@ jobs:
         run: |
           sudo apt update
           sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
+      # Same server node_modules cache as the "Server test" job (shared key).
+      - name: 💾 Restore NPM dependencies cache
+        id: deps-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            server/node_modules
+            server/services/*/node_modules
+          key: server-deps-v1-${{ runner.os }}-node${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('server/**/package-lock.json') }}
       - name: 📦 Install Global NPM Packages
+        if: steps.deps-cache.outputs.cache-hit != 'true'
         run: |
           sudo npm install typescript node-gyp -g
       - name: 📦 Install NPM server packages
+        if: steps.deps-cache.outputs.cache-hit != 'true'
         working-directory: ./server
         run: |
           npm ci
@@ -77,13 +91,55 @@ jobs:
         working-directory: ./server
         run: |
           npm run eslint
+      - name: 🔐 Dependencies security audit
+        working-directory: ./server
+        run: npm audit --production --audit-level=critical || true
+  test-server:
+    name: Server test
+    runs-on: ubuntu-22.04
+    steps:
+      - name: ⬇️ Checkout Gladys code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: 💽 Setup nodejs
+        id: setup-node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: 'server/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - name: 💽 Install System Dependencies
+        run: |
+          sudo apt update
+          sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
+      # Installing the server dependencies takes ~40s on every run: cache the
+      # installed node_modules keyed on the lockfiles and skip the install on a
+      # cache hit (same pattern as the Cypress job). server/services/*/node_modules
+      # matters because the server postinstall installs every service's own
+      # dependencies. The node version is part of the key because the trees
+      # contain native addons built for the running node.
+      - name: 💾 Restore NPM dependencies cache
+        id: deps-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            server/node_modules
+            server/services/*/node_modules
+          key: server-deps-v1-${{ runner.os }}-node${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('server/**/package-lock.json') }}
+      - name: 📦 Install Global NPM Packages
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo npm install typescript node-gyp -g
+      - name: 📦 Install NPM server packages
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        working-directory: ./server
+        run: |
+          npm ci
       - name: ✅ Test with coverage
         working-directory: ./server
         run: |
           npm run coverage
-      - name: 🔐 Dependencies security audit
-        working-directory: ./server
-        run: npm audit --production --audit-level=critical || true
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v4
         with:
@@ -103,6 +159,7 @@ jobs:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v3
       - name: 💽 Setup nodejs
+        id: setup-node
         uses: actions/setup-node@v3
         with:
           node-version-file: 'front/package.json'
@@ -112,7 +169,26 @@ jobs:
         run: |
           sudo apt update
           sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
+      # Installing the root + front + server dependencies takes ~1min20 on every
+      # run, so cache the installed node_modules (and the Cypress binary) keyed
+      # on the lockfiles, and skip the install entirely on a cache hit.
+      # server/services/*/node_modules matters: the server postinstall installs
+      # every service's own dependencies, and the server does not boot without
+      # them. The node version is part of the key because the trees contain
+      # native addons built for the running node.
+      - name: 💾 Restore NPM dependencies cache
+        id: deps-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            front/node_modules
+            server/node_modules
+            server/services/*/node_modules
+            ~/.cache/Cypress
+          key: cypress-deps-v1-${{ runner.os }}-node${{ steps.setup-node.outputs.node-version }}-${{ hashFiles('**/package-lock.json') }}
       - name: 📦 Install NPM packages
+        if: steps.deps-cache.outputs.cache-hit != 'true'
         run: |
           npm ci && npm run install-server:dev
       - name: ✅ Cypress run

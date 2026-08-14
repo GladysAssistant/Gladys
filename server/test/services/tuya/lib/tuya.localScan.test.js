@@ -1,5 +1,5 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc, class-methods-use-this */
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const { mergeTuyaReport } = require('../../../../services/tuya/lib/utils/tuya.report');

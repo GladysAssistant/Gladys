@@ -1,10 +1,11 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 
 const { assert, fake } = sinon;
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const logger = require('../../../../utils/logger');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
@@ -44,6 +45,25 @@ describe('zigbee2mqttManager.publish', () => {
     zigbee2mqttManager.mqttClient = mqttClient;
     zigbee2mqttManager.publish('toto', 'message');
     assert.calledWith(mqttClient.publish, 'toto', 'message');
+  });
+  it('should log the topic and the message published', () => {
+    const debugStub = sinon.stub(logger, 'debug');
+    try {
+      const mqttClient = {
+        publish: fake.returns(null),
+      };
+      const mqttLibrary = {
+        connect: fake.returns(mqttClient),
+      };
+      const zigbee2mqttManager = new Zigbee2mqttManager(gladys, mqttLibrary, serviceId);
+      zigbee2mqttManager.mqttClient = mqttClient;
+      zigbee2mqttManager.publish('zigbee2mqtt/my-device/set', '{"state":"ON"}');
+
+      assert.calledWith(mqttClient.publish, 'zigbee2mqtt/my-device/set', '{"state":"ON"}', undefined, sinon.match.func);
+      assert.calledWith(debugStub, sinon.match('zigbee2mqtt/my-device/set').and(sinon.match('{"state":"ON"}')));
+    } finally {
+      debugStub.restore();
+    }
   });
   it('should publish MQTT message with error', () => {
     const mqttClient = {

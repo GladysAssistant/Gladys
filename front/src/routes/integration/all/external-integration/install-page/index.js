@@ -7,7 +7,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses } from '../utils';
-import { getBackToCatalogUrl } from '../../../catalog-url';
+import BackToIntegrationsLink from '../../../../../components/integration/BackToIntegrationsLink';
 import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
@@ -15,6 +15,7 @@ import WebhooksSummary from '../components/WebhooksSummary';
 import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
+import integrationText from '../integrationText.css';
 
 class ExternalIntegrationInstallPage extends Component {
   getStoreIntegration = async () => {
@@ -102,11 +103,12 @@ class ExternalIntegrationInstallPage extends Component {
         body.granted_devices = this.state.grantedDevices || [];
       }
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      // a communication integration has no device screens, and an
-      // integration with settings needs them filled before any device can
-      // be discovered: both land on the configuration screen after install
+      // communication and weather integrations have no device screens, and
+      // an integration with settings needs them filled before any device
+      // can be discovered: all land on the configuration screen after
+      // install
       const configSchema = get(installed, 'manifest.config_schema') || [];
-      if (get(installed, 'manifest.type') === 'communication' || configSchema.length > 0) {
+      if (['communication', 'weather'].includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
         route(`/dashboard/integration/device/external/${installed.selector}/config`);
       } else {
         route(`/dashboard/integration/device/external/${installed.selector}`);
@@ -146,12 +148,7 @@ class ExternalIntegrationInstallPage extends Component {
             <div class="container">
               <div class="row justify-content-center">
                 <div class="col-lg-8">
-                  <div class="mb-4">
-                    <Link href={getBackToCatalogUrl()} class="btn btn-secondary btn-sm">
-                      <i class="fe fe-arrow-left mr-1" />
-                      <Text id="integration.externalIntegration.install.backToCatalog" />
-                    </Link>
-                  </div>
+                  <BackToIntegrationsLink />
                   <div
                     class={cx('dimmer', {
                       active: loadStatus === RequestStatus.Getting
@@ -210,7 +207,9 @@ class ExternalIntegrationInstallPage extends Component {
                                 />
                               )}
                             </div>
-                            <p>{getLocalizedText(manifest.description, language)}</p>
+                            <p class={integrationText.integrationText}>
+                              {getLocalizedText(manifest.description, language)}
+                            </p>
 
                             <div class="alert alert-warning">
                               <h4 class="alert-title">
@@ -231,6 +230,13 @@ class ExternalIntegrationInstallPage extends Component {
                               <div class="alert alert-info">
                                 <i class="fe fe-bell mr-1" />
                                 <Text id="integration.externalIntegration.install.notificationWarningText" />
+                              </div>
+                            )}
+
+                            {manifest.type === 'weather' && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-cloud mr-1" />
+                                <Text id="integration.externalIntegration.install.weatherInfoText" />
                               </div>
                             )}
 
@@ -257,6 +263,13 @@ class ExternalIntegrationInstallPage extends Component {
                             )}
 
                             <NetworkDiscoverySummary networkDiscovery={manifest.network_discovery} />
+
+                            {manifest.location === true && (
+                              <div class="alert alert-info">
+                                <i class="fe fe-map-pin mr-1" />
+                                <Text id="integration.externalIntegration.install.locationText" />
+                              </div>
+                            )}
 
                             <WebhooksSummary webhooks={manifest.webhooks} language={language} />
 

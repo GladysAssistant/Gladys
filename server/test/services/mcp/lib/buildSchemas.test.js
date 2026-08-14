@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { stub, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub, fake } = sinon;
 const nock = require('nock');
 const dns = require('dns');
 const { SYSTEM_VARIABLE_NAMES, COVER_STATE, AI_CHAT_TOOL_CATEGORIES } = require('../../../../utils/constants');
@@ -3598,5 +3600,105 @@ describe('build schemas', () => {
     // A room that does have the sensor still returns the regular payload.
     const withSensor = await getStateTool.cb({ room: 'Salon', device_type: 'humidity-sensor' });
     expect(withSensor.content[0].text).to.eq('toonmockdata');
+  });
+
+  it('should answer device.get-state when the model targets the house or shortens the device type', async () => {
+    const rooms = [
+      { id: 'room-1', name: 'Salon', selector: 'salon', house_id: 'house-1' },
+      { id: 'room-2', name: 'Cuisine', selector: 'cuisine', house_id: 'house-1' },
+    ];
+    const houses = [{ id: 'house-1', name: 'Maison', selector: 'maison' }];
+
+    const buildSensor = (suffix, roomSelector, roomName, value) => ({
+      selector: `capteur-${suffix}`,
+      name: `Capteur ${suffix}`,
+      room: roomSelector ? { selector: roomSelector, name: roomName } : null,
+      features: [
+        {
+          id: `feature-${suffix}`,
+          selector: `capteur-${suffix}-temperature`,
+          name: 'Température',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          unit: 'celsius',
+          last_value: value,
+        },
+      ],
+    });
+
+    // One sensor per room, plus one that was never assigned to a room.
+    const sensors = [
+      buildSensor('salon', 'salon', 'Salon', 21),
+      buildSensor('cuisine', 'cuisine', 'Cuisine', 23),
+      buildSensor('garage', null, null, 17),
+    ];
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({ value: feature.last_value, unit: feature.unit, age: '2min' })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves(houses) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(sensors),
+          getBySelector: stub().callsFake(async (selector) => sensors.find((s) => s.selector === selector)),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(10) },
+      toon: stub().callsFake((data) => JSON.stringify(data)),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const getStateTool = tools.find((tool) => tool.intent === 'device.get-state');
+
+    // "Températures de la maison": the model targets the house, which is not a room,
+    // and shortens the category. Both used to return "no sensor is configured".
+    const wholeHome = await getStateTool.cb({ room: 'maison', device_type: 'temperature' });
+    const wholeHomeStates = JSON.parse(wholeHome.content[0].text);
+    expect(wholeHomeStates.map(({ room, value }) => ({ room, value }))).to.deep.equal([
+      { room: 'Salon', value: 21 },
+      { room: 'Cuisine', value: 23 },
+      { room: 'No room', value: 17 },
+    ]);
+    expect(wholeHomeStates.every(({ category }) => category === 'temperature-sensor')).to.eq(true);
+
+    // The shortened category alone resolves too.
+    const shortType = await getStateTool.cb({ room: undefined, device_type: 'temperature' });
+    expect(JSON.parse(shortType.content[0].text).length).to.eq(3);
+
+    // A real room is still the narrow filter it used to be.
+    const inRoom = await getStateTool.cb({ room: 'Salon', device_type: 'temperature' });
+    expect(JSON.parse(inRoom.content[0].text).map(({ room }) => room)).to.deep.equal(['Salon']);
+
+    // An unknown target is reported as such instead of claiming nothing is configured.
+    const unknownRoom = await getStateTool.cb({ room: 'Véranda', device_type: 'temperature' });
+    expect(unknownRoom.content[0].text).to.eq(
+      'device.get-state: "Véranda" is not a room of this home, no state was read. ' +
+        'Available rooms: Salon, Cuisine. ' +
+        'Call this tool again with one of them, or without the room parameter to cover the whole home.',
+    );
+
+    // A category that does not exist in this home keeps the explicit empty answer.
+    const unknownType = await getStateTool.cb({ room: 'maison', device_type: 'co2' });
+    expect(unknownType.content[0].text).to.eq(
+      'device.get-state: no device of type "co2" is configured in house "Maison". ' +
+        'No measurement exists for this query, do not report any value.',
+    );
   });
 });
