@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -y \
          python3-pip \
          git \
          libffi-dev \
-         && npm ci --unsafe-perm --production \
+         && npm ci --production \
          && npm cache clean --force \
          && apt-get autoremove -y build-essential python3 python3-pip git libffi-dev \
          && apt-get purge -y --auto-remove \
