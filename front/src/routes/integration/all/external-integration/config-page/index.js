@@ -8,6 +8,7 @@ import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import {
   OAUTH_REDIRECT_URI,
+  assertOpenableUrl,
   getAuthorizeUrlState,
   getOAuthCallbackPath,
   wrapAuthorizeUrl
@@ -447,9 +448,16 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   connectOAuth = async field => {
-    this.setState({ oauthStatus: RequestStatus.Getting, oauthInvalidState: false });
+    this.setState({ oauthStatus: RequestStatus.Getting, oauthInvalidState: false, oauthInvalidUrl: false });
     const { selector } = this.props;
     const callbackPath = getOAuthCallbackPath(selector);
+    // an account_link provider never comes back to Gladys: the user approves it
+    // elsewhere and the integration notices on its own side. There is no
+    // redirect URI to declare, no state to carry across a round trip, and no
+    // callback tab to prime — the URL is opened as it was built. Same predicate
+    // as in ConfigSchemaForm: only `oauth2` is redirect-based, so a future
+    // account field type gets the account_link behaviour on both sides.
+    const usesRedirect = field.type === 'oauth2';
     // providers refuse a plain HTTP redirect URI, which is how most people
     // reach their Gladys: the flow goes through the HTTPS redirect page, which
     // sends the browser back here. Users who already serve Gladys over HTTPS
@@ -461,31 +469,37 @@ class ExternalIntegrationConfigPage extends Component {
         `/api/v1/external_integration/${selector}/oauth/authorize_url`,
         {
           key: field.key,
-          redirect_uri: redirectUri
+          redirect_uri: usesRedirect ? redirectUri : undefined
         }
       );
-      let urlToOpen;
-      if (useInstanceRedirect) {
-        // nothing to wrap, the provider comes back here directly, but the
-        // anti-CSRF state stays mandatory
-        getAuthorizeUrlState(authorizeUrl);
-        urlToOpen = authorizeUrl;
-      } else {
-        urlToOpen = wrapAuthorizeUrl(authorizeUrl, { origin: window.location.origin, path: callbackPath });
+      let urlToOpen = assertOpenableUrl(authorizeUrl);
+      if (usesRedirect) {
+        if (useInstanceRedirect) {
+          // nothing to wrap, the provider comes back here directly, but the
+          // anti-CSRF state stays mandatory
+          getAuthorizeUrlState(authorizeUrl);
+        } else {
+          urlToOpen = wrapAuthorizeUrl(authorizeUrl, { origin: window.location.origin, path: callbackPath });
+        }
+        // the callback popup is a new tab: it recovers the oauth2 key and the
+        // redirect_uri used through localStorage (shared across same-origin
+        // tabs). The token exchange fails unless the exact same redirect_uri
+        // comes back.
+        localStorage.setItem(`externalIntegrationOAuthKey:${selector}`, field.key);
+        localStorage.setItem(`externalIntegrationOAuthRedirectUri:${selector}`, redirectUri);
       }
-      // the callback popup is a new tab: it recovers the oauth2 key and the
-      // redirect_uri used through localStorage (shared across same-origin
-      // tabs). The token exchange fails unless the exact same redirect_uri
-      // comes back.
-      localStorage.setItem(`externalIntegrationOAuthKey:${selector}`, field.key);
-      localStorage.setItem(`externalIntegrationOAuthRedirectUri:${selector}`, redirectUri);
-      window.open(urlToOpen, '_blank', 'noopener');
+      // An account_link sign-in page is opened with noreferrer: the address of
+      // the instance (often a private LAN one) has no business leaking to a
+      // provider that will never talk to it, and some of them — Xiaomi among
+      // them — reject a sign-in URL opened with a cross-site Referer outright.
+      window.open(urlToOpen, '_blank', usesRedirect ? 'noopener' : 'noopener,noreferrer');
       this.setState({ oauthStatus: RequestStatus.Success });
     } catch (e) {
       console.error(e);
       this.setState({
         oauthStatus: RequestStatus.Error,
-        oauthInvalidState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE'
+        oauthInvalidState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE',
+        oauthInvalidUrl: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_URL'
       });
     }
   };

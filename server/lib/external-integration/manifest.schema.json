@@ -142,7 +142,7 @@
     },
     "contact_schema": {
       "type": "array",
-      "description": "Send-only communication channels only (messaging.receive false): per-user identity form rendered by the core as a \"My account\" block on the Configuration screen (every user fills their OWN values, stored per user). Same flat format as config_schema; oauth2 fields are not allowed (the OAuth relay is integration-scoped, never per user).",
+      "description": "Send-only communication channels only (messaging.receive false): per-user identity form rendered by the core as a \"My account\" block on the Configuration screen (every user fills their OWN values, stored per user). Same flat format as config_schema; oauth2 and account_link fields are not allowed (linking a provider account is integration-scoped, never per user).",
       "items": {
         "allOf": [
           {
@@ -152,7 +152,7 @@
             "properties": {
               "type": {
                 "not": {
-                  "const": "oauth2"
+                  "enum": ["oauth2", "account_link"]
                 }
               }
             }
@@ -219,8 +219,18 @@
         },
         "type": {
           "type": "string",
-          "enum": ["string", "number", "boolean", "select", "multi_select", "secret", "oauth2", "section"],
-          "description": "Field widget type. `secret` values are never sent back to the frontend; `oauth2` renders a Connect button (relayed OAuth2 authorization-code flow, tokens stored off-schema by the integration); `multi_select` renders checkboxes and stores an array of option values; `section` is a purely presentational intro block (title + plain-text description + typed https links) splitting the form — no stored value, its key is never accepted in a config payload."
+          "enum": [
+            "string",
+            "number",
+            "boolean",
+            "select",
+            "multi_select",
+            "secret",
+            "oauth2",
+            "account_link",
+            "section"
+          ],
+          "description": "Field widget type. `secret` values are never sent back to the frontend; `oauth2` renders a Connect button (relayed OAuth2 authorization-code flow, tokens stored off-schema by the integration); `account_link` renders a Connect button too, for a provider that never redirects back (a QR sign-in the user approves in the vendor app, a pairing to confirm on a device): no redirect URI, no anti-CSRF state and no callback are involved, the integration detects the approval on its side and reports it through the connection status; `multi_select` renders checkboxes and stores an array of option values; `section` is a purely presentational intro block (title + plain-text description + typed https links) splitting the form — no stored value, its key is never accepted in a config payload."
         },
         "label": {
           "$ref": "#/definitions/multiLanguageText"
@@ -237,7 +247,7 @@
           "default": false
         },
         "default": {
-          "description": "Default value. Must match the field type (code-enforced); not allowed for `secret` and `oauth2` fields."
+          "description": "Default value. Must match the field type (code-enforced); not allowed for `secret`, `oauth2`, `account_link` and `section` fields."
         },
         "min": {
           "type": "number",

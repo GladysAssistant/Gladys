@@ -28,6 +28,7 @@ const {
   MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
+  ACCOUNT_FIELD_TYPES,
 } = require('./constants');
 
 // These rules are the exact mirror of the canonical manifest schema owned by
@@ -101,7 +102,17 @@ const NETWORK_DISCOVERY_FIELDS = {
 // standard DNS-SD service type, e.g. _hue._tcp
 const MDNS_SERVICE_REGEX = /^_[a-z0-9-]+\._(tcp|udp)$/;
 const SSDP_ST_MAX_LENGTH = 200;
-const CONFIG_FIELD_TYPES = ['string', 'number', 'boolean', 'select', 'multi_select', 'secret', 'oauth2', 'section'];
+const CONFIG_FIELD_TYPES = [
+  'string',
+  'number',
+  'boolean',
+  'select',
+  'multi_select',
+  'secret',
+  'oauth2',
+  'account_link',
+  'section',
+];
 const OPTION_FIELD_TYPES = ['select', 'multi_select'];
 // `section` intro blocks: purely presentational chapters splitting the
 // generated form (title + plain text + typed https links) — the
@@ -249,7 +260,8 @@ function validateConfigFieldDefault(field, path, errors) {
     }
     default:
       // secret: it would end up published in the store ;
-      // oauth2: the value is the Connect flow, tokens live off-schema ;
+      // oauth2 / account_link: the value is the Connect flow, the credentials
+      // live off-schema ;
       // section: purely presentational, no value at all
       errors.push(`${path}.default: not allowed for ${field.type} fields`);
   }
@@ -918,9 +930,9 @@ function validateManifest(manifest) {
       const seenContactKeys = new Set();
       manifest.contact_schema.forEach((field, index) => {
         validateConfigField(field, index, seenContactKeys, errors, 'contact_schema', declaredPortNames);
-        if (field && field.type === 'oauth2') {
-          // the OAuth relay is integration-scoped, never per user
-          errors.push(`contact_schema[${index}].type: oauth2 is not allowed in the per-user contact schema`);
+        if (field && ACCOUNT_FIELD_TYPES.includes(field.type)) {
+          // linking a provider account is integration-scoped, never per user
+          errors.push(`contact_schema[${index}].type: ${field.type} is not allowed in the per-user contact schema`);
         }
         if (field && field.type === 'section') {
           // the per-user block is the one screen a non-admin reaches, and

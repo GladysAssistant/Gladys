@@ -794,6 +794,7 @@
         "saveButton": "Konfiguration speichern",
         "oauthConnectButton": "Verbinden",
         "oauthInvalidStateError": "Diese Integration liefert keinen brauchbaren Sicherheits-State für die Verbindung (fehlt oder zu lang). Sie kann nicht verbunden werden, bis der Entwickler das behoben hat.",
+        "oauthInvalidUrlError": "Diese Integration hat eine ungültige Anmeldeadresse geliefert. Sie kann nicht verbunden werden, bis der Entwickler das behoben hat.",
         "oauthRedirectUriLabel": "Weiterleitungsadresse, die in Ihrer Entwickler-Anwendung einzutragen ist",
         "oauthRedirectUriDescription": "Die Dienste akzeptieren keine lokale Adresse: diese von Gladys gehostete HTTPS-Seite schickt Sie nach der Autorisierung zu Ihrer Instanz zurück. Sie läuft vollständig in Ihrem Browser, Gladys speichert und verwendet den Autorisierungscode nicht, und Ihre Zugriffstoken werden direkt zwischen Ihrer Instanz und dem Dienst ausgetauscht.",
         "oauthRedirectUriInstanceDescription": "Sie haben die Adresse Ihrer Instanz gewählt: tragen Sie genau diese URL in Ihrer Entwickler-Anwendung ein. Der Dienst kommt dann direkt zu Ihrem Gladys zurück, ohne den Umweg über die Gladys-Weiterleitungsseite.",

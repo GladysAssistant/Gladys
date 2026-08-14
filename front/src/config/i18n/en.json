@@ -794,6 +794,7 @@
         "saveButton": "Save configuration",
         "oauthConnectButton": "Connect",
         "oauthInvalidStateError": "This integration did not provide a usable security state for the connection (missing or too long). It cannot be connected until its developer fixes it.",
+        "oauthInvalidUrlError": "This integration provided an invalid sign-in address. It cannot be connected until its developer fixes it.",
         "oauthRedirectUriLabel": "Redirect URI to declare in your developer application",
         "oauthRedirectUriDescription": "Providers refuse a local address: this HTTPS page hosted by Gladys sends you back to your instance once you have authorized access. It runs entirely in your browser, Gladys neither stores nor uses the authorization code, and your access tokens are exchanged directly between your instance and the provider.",
         "oauthRedirectUriInstanceDescription": "You chose to use the address of your instance: declare this exact URL in your developer application. The provider will come back to your Gladys directly, without going through the Gladys redirect page.",

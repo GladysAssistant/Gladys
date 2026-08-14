@@ -794,6 +794,7 @@
         "saveButton": "Enregistrer la configuration",
         "oauthConnectButton": "Connecter",
         "oauthInvalidStateError": "Cette intégration ne fournit pas d'élément de sécurité exploitable pour la connexion (absent ou trop long). Elle ne peut pas être connectée tant que son développeur ne l'a pas corrigé.",
+        "oauthInvalidUrlError": "Cette intégration a fourni une adresse de connexion invalide. Elle ne peut pas être connectée tant que son développeur ne l'a pas corrigé.",
         "oauthRedirectUriLabel": "Adresse de redirection à déclarer dans votre application développeur",
         "oauthRedirectUriDescription": "Les services refusent une adresse locale : cette page HTTPS hébergée par Gladys vous renvoie vers votre instance une fois l'autorisation donnée. Elle fonctionne entièrement dans votre navigateur, Gladys n'enregistre ni n'utilise le code d'autorisation, et vos jetons d'accès sont échangés directement entre votre instance et le service.",
         "oauthRedirectUriInstanceDescription": "Vous avez choisi d'utiliser l'adresse de votre instance : déclarez cette URL exacte dans votre application développeur. Le service reviendra directement sur votre Gladys, sans passer par la page de redirection Gladys.",

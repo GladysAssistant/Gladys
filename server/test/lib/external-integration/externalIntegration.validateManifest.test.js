@@ -303,6 +303,11 @@ describe('externalIntegration.validateManifest', () => {
       { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'oauth2', label: { en: 'L' }, default: 'x' }] },
       'config_schema[0].default: not allowed for oauth2 fields',
     );
+    // same for account_link: the credentials live off-schema too
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ key: 'k', type: 'account_link', label: { en: 'L' }, default: 'x' }] },
+      'config_schema[0].default: not allowed for account_link fields',
+    );
   });
 
   it('should accept an oauth2 config field without placeholder', () => {
@@ -316,6 +321,29 @@ describe('externalIntegration.validateManifest', () => {
       {
         ...TEST_MANIFEST,
         config_schema: [{ key: 'k', type: 'oauth2', label: { en: 'L' }, placeholder: { en: 'x' } }],
+      },
+      'config_schema[0].placeholder: only allowed on',
+    );
+  });
+
+  it('should accept an account_link config field, for a provider that never redirects back', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      config_schema: [
+        {
+          key: 'xiaomi_account',
+          type: 'account_link',
+          label: { en: 'Xiaomi account', fr: 'Compte Xiaomi' },
+          description: { en: 'Approve the sign-in in the Xiaomi Home app.' },
+        },
+      ],
+    };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+    // it holds no value either, so a placeholder makes no sense
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        config_schema: [{ key: 'k', type: 'account_link', label: { en: 'L' }, placeholder: { en: 'x' } }],
       },
       'config_schema[0].placeholder: only allowed on',
     );
@@ -1053,10 +1081,14 @@ describe('externalIntegration.validateManifest', () => {
       },
       'contact_schema[1].key: duplicate key "dup"',
     );
-    // the OAuth relay is integration-scoped, never per user
+    // linking a provider account is integration-scoped, never per user
     expect422(
       { ...base, contact_schema: [{ key: 'account', type: 'oauth2', label: { en: 'Account' } }] },
       'contact_schema[0].type: oauth2 is not allowed in the per-user contact schema',
+    );
+    expect422(
+      { ...base, contact_schema: [{ key: 'account', type: 'account_link', label: { en: 'Account' } }] },
+      'contact_schema[0].type: account_link is not allowed in the per-user contact schema',
     );
   });
 

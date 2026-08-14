@@ -257,6 +257,14 @@ const MAX_TRANSPORT_MESSAGE_LENGTH = 200;
 // writable by it).
 const MANIFEST_TRANSPORTS = ['local', 'cloud'];
 const PREFER_LOCAL_CONFIG_KEY = 'GLADYS_PREFER_LOCAL';
+// The two config field types that link a provider account instead of holding a
+// value: both render a Connect button fed by the connection status, and both
+// keep their credentials off-schema. `oauth2` is the redirect-based OAuth2 flow
+// (the provider comes back to a redirect URI with a code); `account_link` is for
+// a provider that never redirects back — a QR sign-in approved in the vendor
+// app, a pairing confirmed on a device — so it has no redirect URI, no anti-CSRF
+// state and no callback, and the integration reports the approval itself.
+const ACCOUNT_FIELD_TYPES = ['oauth2', 'account_link'];
 // Optional `categories` manifest field: browse categories of the integration
 // catalog (docs/specs/integration-catalog-categories.md). More than 3 means
 // the assignment is lazy, not the vocabulary too narrow.
@@ -377,6 +385,7 @@ module.exports = {
   MAX_TRANSPORT_MESSAGE_LENGTH,
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
+  ACCOUNT_FIELD_TYPES,
   MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,

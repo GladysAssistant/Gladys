@@ -80,6 +80,18 @@ describe('externalIntegration.validateConfigValue', () => {
       expect(e.properties).to.include('oauth2 fields cannot be set directly');
     }
   });
+
+  it('should reject a direct value on an account_link field', () => {
+    // it holds no value either: the credentials are stored off-schema by the
+    // integration once the user has approved the provider
+    try {
+      validateConfigValue({ key: 'xiaomi_account', type: 'account_link' }, 'anything');
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.include('account_link fields cannot be set directly');
+    }
+  });
 });
 
 describe('externalIntegration config', () => {
@@ -499,6 +511,59 @@ describe('externalIntegration config', () => {
       expect(config).to.deep.equal({ netatmo_access_token: 'token', netatmo_refresh_token: 'refresh' });
       const front = await externalIntegration.getConfigForFront(oauthService.selector);
       expect(front.config).to.not.have.property('netatmo_access_token');
+    });
+  });
+
+  describe('account_link config fields', () => {
+    let linkService;
+
+    beforeEach(async () => {
+      linkService = await seedExternalService({
+        name: 'ext-dev-xiaomi-demo',
+        selector: 'ext-dev-xiaomi-demo',
+        manifest: {
+          ...service.manifest,
+          config_schema: [
+            ...service.manifest.config_schema,
+            { key: 'xiaomi_account', type: 'account_link', label: { en: 'Xiaomi account' } },
+          ],
+        },
+      });
+    });
+
+    it('should always return null for an account_link key, even with a stored value', async () => {
+      await variable.setValue('XIAOMI_ACCOUNT', JSON.stringify('leaked'), linkService.id);
+      const result = await externalIntegration.getConfigForFront(linkService.selector);
+      expect(result.config).to.have.property('xiaomi_account', null);
+      expect(result.configured_secrets).to.deep.equal([]);
+    });
+
+    it('should refuse an account_link key from the frontend', async () => {
+      try {
+        await externalIntegration.saveConfigFromFront(linkService.selector, { xiaomi_account: 'value' });
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+        expect(e.properties).to.include('account_link fields cannot be set directly');
+      }
+    });
+
+    it('should refuse the account_link key itself but accept the off-schema session keys', async () => {
+      try {
+        await externalIntegration.setIntegrationConfig(linkService, { xiaomi_account: 'value' });
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+      }
+      // the session obtained once the user approved the sign-in lives off-schema
+      await externalIntegration.setIntegrationConfig(linkService, {
+        session_xiaomi_user_id: '12345',
+        session_xiaomi_pass_token: 'ptoken',
+      });
+      const config = await externalIntegration.getIntegrationConfig(linkService);
+      expect(config).to.deep.equal({ session_xiaomi_user_id: '12345', session_xiaomi_pass_token: 'ptoken' });
+      const front = await externalIntegration.getConfigForFront(linkService.selector);
+      expect(front.config).to.not.have.property('session_xiaomi_pass_token');
     });
   });
 });

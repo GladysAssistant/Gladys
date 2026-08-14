@@ -5,6 +5,7 @@ import cx from 'classnames';
 import { getLocalizedText, getUrlDomain, resolveManifestPlaceholders } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
 import { OAUTH_REDIRECT_URI, getOAuthCallbackPath } from '../../../../../utils/oauth';
+import { ACCOUNT_FIELD_TYPES } from '../../../../../../../server/lib/external-integration/constants';
 import integrationText from '../integrationText.css';
 
 // the redirect URI is meant to be copied into the developer application of the
@@ -81,7 +82,6 @@ class ConfigField extends Component {
     values,
     configuredSecrets,
     touchedSecrets,
-    connectionStatus,
     oauthStatus,
     selector,
     dynamicOptions,
@@ -124,10 +124,21 @@ class ConfigField extends Component {
       );
     }
 
-    if (field.type === 'oauth2') {
-      // the whole OAuth2 flow is relayed: the integration builds the
-      // authorize URL, the tokens never transit through the frontend
-      const canUseInstanceRedirect = typeof window !== 'undefined' && window.location.protocol === 'https:';
+    if (ACCOUNT_FIELD_TYPES.includes(field.type)) {
+      // Both link a provider account and hold no value: the integration builds
+      // the sign-in URL and the credentials never transit through the frontend.
+      //
+      // They differ on the way back. `oauth2` is the redirect-based flow: the
+      // provider returns to a redirect URI with an authorization code, so that
+      // URI has to be declared in the developer application and an anti-CSRF
+      // state is mandatory. `account_link` never comes back: the user approves
+      // the provider somewhere else — a QR sign-in validated in the vendor app,
+      // a pairing confirmed on a device — and the integration notices on its own
+      // side, then reports it through the connection status. Showing a redirect
+      // URI to declare, or requiring a state, would be meaningless there.
+      const usesRedirect = field.type === 'oauth2';
+      const canUseInstanceRedirect =
+        usesRedirect && typeof window !== 'undefined' && window.location.protocol === 'https:';
       const useInstanceRedirect = canUseInstanceRedirect && this.props.oauthUseInstanceRedirect;
       const redirectUri =
         useInstanceRedirect && selector
@@ -138,51 +149,55 @@ class ConfigField extends Component {
           <label class="form-label">{label}</label>
           {oauthStatus === RequestStatus.Error && (
             <div class="alert alert-danger">
-              {this.props.oauthInvalidState ? (
+              {this.props.oauthInvalidState && (
                 <Text id="integration.externalIntegration.config.oauthInvalidStateError" />
-              ) : (
+              )}
+              {this.props.oauthInvalidUrl && <Text id="integration.externalIntegration.config.oauthInvalidUrlError" />}
+              {!this.props.oauthInvalidState && !this.props.oauthInvalidUrl && (
                 <Text id="integration.externalIntegration.config.oauthConnectError" />
               )}
             </div>
           )}
-          <div class="mb-3">
-            <small class="form-text text-muted mb-1">
-              <Text id="integration.externalIntegration.config.oauthRedirectUriLabel" />
-            </small>
-            <div class="input-group">
-              <input
-                type="text"
-                class="form-control"
-                value={redirectUri}
-                readOnly
-                onFocus={selectOnFocus}
-                ref={element => {
-                  this.redirectUriInput = element;
-                }}
-              />
-              <span class="input-group-append">
-                <button
-                  type="button"
-                  class="btn btn-outline-secondary"
-                  onClick={() => this.copyRedirectUri(redirectUri)}
-                >
-                  <i class="fe fe-copy" />
-                </button>
-              </span>
-            </div>
-            {this.state.redirectUriCopied && (
-              <small class="text-success d-block mt-1">
-                <Text id="integration.externalIntegration.config.oauthRedirectUriCopied" />
+          {usesRedirect && (
+            <div class="mb-3">
+              <small class="form-text text-muted mb-1">
+                <Text id="integration.externalIntegration.config.oauthRedirectUriLabel" />
               </small>
-            )}
-            <small class="form-text text-muted">
-              {useInstanceRedirect ? (
-                <Text id="integration.externalIntegration.config.oauthRedirectUriInstanceDescription" />
-              ) : (
-                <Text id="integration.externalIntegration.config.oauthRedirectUriDescription" />
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  value={redirectUri}
+                  readOnly
+                  onFocus={selectOnFocus}
+                  ref={element => {
+                    this.redirectUriInput = element;
+                  }}
+                />
+                <span class="input-group-append">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    onClick={() => this.copyRedirectUri(redirectUri)}
+                  >
+                    <i class="fe fe-copy" />
+                  </button>
+                </span>
+              </div>
+              {this.state.redirectUriCopied && (
+                <small class="text-success d-block mt-1">
+                  <Text id="integration.externalIntegration.config.oauthRedirectUriCopied" />
+                </small>
               )}
-            </small>
-          </div>
+              <small class="form-text text-muted">
+                {useInstanceRedirect ? (
+                  <Text id="integration.externalIntegration.config.oauthRedirectUriInstanceDescription" />
+                ) : (
+                  <Text id="integration.externalIntegration.config.oauthRedirectUriDescription" />
+                )}
+              </small>
+            </div>
+          )}
           <div>
             <button
               type="button"
@@ -195,15 +210,6 @@ class ConfigField extends Component {
               <i class="fe fe-link mr-1" />
               <Text id="integration.externalIntegration.config.oauthConnectButton" />
             </button>
-            {connectionStatus && (
-              <span class={cx('badge ml-2', connectionStatus.connected ? 'badge-success' : 'badge-danger')}>
-                {connectionStatus.connected ? (
-                  <Text id="integration.externalIntegration.connection.connectedBadge" />
-                ) : (
-                  <Text id="integration.externalIntegration.connection.disconnectedBadge" />
-                )}
-              </span>
-            )}
           </div>
           {canUseInstanceRedirect && (
             <label class="custom-control custom-checkbox mt-3">
@@ -218,11 +224,11 @@ class ConfigField extends Component {
               </span>
             </label>
           )}
-          {connectionStatus && connectionStatus.message && (
-            <small class={cx('form-text text-muted', integrationText.integrationText)}>
-              {getLocalizedText(connectionStatus.message, language)}
-            </small>
-          )}
+          {/* the message that goes with the badge is integration-level, not
+              field-level: it is rendered once for the whole screen (see
+              ConfigTab), because an integration may well link more than one
+              account and a message glued here would look like it described THIS
+              one */}
           {description && (
             <small class={cx('form-text text-muted', integrationText.integrationText)}>{description}</small>
           )}
@@ -359,9 +365,9 @@ const ConfigSchemaForm = ({
   saveConfigStatus,
   updateConfigValue,
   saveConfig,
-  connectionStatus,
   oauthStatus,
   oauthInvalidState,
+  oauthInvalidUrl,
   oauthUseInstanceRedirect,
   toggleOAuthUseInstanceRedirect,
   connectOAuth,
@@ -369,9 +375,9 @@ const ConfigSchemaForm = ({
   dynamicOptions,
   placeholderPorts
 }) => {
-  // sections are presentational and oauth2 has its own Connect button: a
-  // schema made only of those has nothing to save, hide the save button
-  const hasSavableField = schema.some(field => field.type !== 'section' && field.type !== 'oauth2');
+  // sections are presentational and the account fields have their own Connect
+  // button: a schema made only of those has nothing to save, hide the save button
+  const hasSavableField = schema.some(field => field.type !== 'section' && !ACCOUNT_FIELD_TYPES.includes(field.type));
   return (
     <form onSubmit={saveConfig}>
       {saveConfigStatus === RequestStatus.Success && (
@@ -393,9 +399,9 @@ const ConfigSchemaForm = ({
           configuredSecrets={configuredSecrets}
           touchedSecrets={touchedSecrets}
           updateConfigValue={updateConfigValue}
-          connectionStatus={connectionStatus}
           oauthStatus={oauthStatus}
           oauthInvalidState={oauthInvalidState}
+          oauthInvalidUrl={oauthInvalidUrl}
           oauthUseInstanceRedirect={oauthUseInstanceRedirect}
           toggleOAuthUseInstanceRedirect={toggleOAuthUseInstanceRedirect}
           connectOAuth={connectOAuth}

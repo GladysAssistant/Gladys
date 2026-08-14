@@ -64,6 +64,32 @@ export function wrapOAuthState({ origin, path, state }) {
 }
 
 /**
+ * @description Check that a sign-in URL built by an integration can be opened
+ * safely. Only `http(s)` is allowed: `window.open('javascript:…')` runs in a
+ * document that inherits this origin, so a buggy or hostile manifest must never
+ * reach it. The oauth2 path parses the URL anyway to wrap its state; an
+ * `account_link` one has no state to wrap, hence this explicit check.
+ * @param {string} url - The URL returned by the integration.
+ * @returns {string} The same URL, safe to open.
+ * @throws {Error} When it is not a valid http(s) URL.
+ * @example assertOpenableUrl('https://eu.account.xiaomi.com/longPolling/login?ticket=lp_42');
+ */
+export function assertOpenableUrl(url) {
+  let parsed;
+  try {
+    parsed = new URL(url);
+  } catch (e) {
+    throw new Error('EXTERNAL_INTEGRATION_OAUTH_INVALID_URL');
+  }
+  // http is kept: a provider approved on the local network (a device pairing
+  // page) has no certificate to offer
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    throw new Error('EXTERNAL_INTEGRATION_OAUTH_INVALID_URL');
+  }
+  return url;
+}
+
+/**
  * @description Read the anti-CSRF state of an authorize URL. It is mandatory
  * whichever redirect URI is in use: without it the integration has no anti-CSRF
  * protection, and through the redirect page there is no way back either.
