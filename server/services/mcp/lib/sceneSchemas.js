@@ -148,6 +148,12 @@ function createSceneCreateInputSchema(
   const deviceFeatureSelectorSchema = deviceFeatureSelectors.length > 0 ? z.enum(deviceFeatureSelectors) : z.string();
   const calendarSelectorSchema = calendarSelectors.length > 0 ? z.enum(calendarSelectors) : z.string();
   const areaSelectorSchema = areaSelectors.length > 0 ? z.enum(areaSelectors) : z.string();
+  const messageServiceSchema = z
+    .string()
+    .nullish()
+    .describe(
+      'Name of the messaging service to send through (example: "telegram"). Omit or set to null to send to every messaging channel the user configured.',
+    );
   const sceneActionSchema = z.lazy(() =>
     z.discriminatedUnion('type', [
       actionSchemaByType(ACTIONS.DEVICE.SET_VALUE, {
@@ -155,7 +161,7 @@ function createSceneCreateInputSchema(
         device: z.string().optional(),
         feature_category: z.string().optional(),
         feature_type: z.string().optional(),
-        value: z.number().optional(),
+        value: z.union([z.number(), z.string()]).optional(),
         evaluate_value: z.string().optional(),
       }),
       actionSchemaByType(ACTIONS.LIGHT.TURN_ON, {
@@ -192,11 +198,13 @@ function createSceneCreateInputSchema(
       actionSchemaByType(ACTIONS.MESSAGE.SEND, {
         user: userSelectorSchema,
         text: z.string(),
+        service: messageServiceSchema,
       }),
       actionSchemaByType(ACTIONS.MESSAGE.SEND_CAMERA, {
         user: userSelectorSchema,
         text: z.string(),
         camera: z.string(),
+        service: messageServiceSchema,
       }),
       actionSchemaByType(ACTIONS.AI.ASK, {
         user: userSelectorSchema,
@@ -209,6 +217,26 @@ function createSceneCreateInputSchema(
       }),
       actionSchemaByType(ACTIONS.DEVICE.GET_VALUE, {
         device_feature: deviceFeatureSelectorSchema,
+      }),
+      actionSchemaByType(ACTIONS.VARIABLE.SET, {
+        name: z
+          .string()
+          .optional()
+          .describe('Human readable name of the variable, only displayed in the scene editor.'),
+        text: z
+          .string()
+          .optional()
+          .describe(
+            'Text value of the variable. It can contain Handlebars variables, for example {{0.0.last_value}}. Mutually exclusive with evaluate_value. The result is available in the next actions as {{<action coordinates>.value}}, for example {{1.0.value}}.',
+          ),
+        evaluate_value: z
+          .string()
+          .optional()
+          .describe(
+            'Formula evaluated to a number, for example {{0.0.last_value}} * 2. Mutually exclusive with text. The result is available in the next actions as {{<action coordinates>.value}}, for example {{1.0.value}}.',
+          ),
+      }).refine((action) => action.text === undefined || action.evaluate_value === undefined, {
+        message: 'text and evaluate_value cannot be used at the same time',
       }),
       actionSchemaByType(ACTIONS.CONDITION.ONLY_CONTINUE_IF, {
         conditions: z
@@ -263,6 +291,19 @@ function createSceneCreateInputSchema(
         stop_scene_if_event_found: z.boolean().optional(),
         stop_scene_if_event_not_found: z.boolean().optional(),
       }),
+      actionSchemaByType(ACTIONS.CALENDAR.GET_EVENTS, {
+        calendars: z.array(calendarSelectorSchema).min(1),
+        time_range: z.enum(['today', 'tomorrow', 'next-x-hours']),
+        duration: z
+          .number()
+          .int()
+          .min(1)
+          .optional(),
+        stop_scene_if_no_events: z.boolean().optional(),
+      }).refine((action) => action.time_range !== 'next-x-hours' || typeof action.duration === 'number', {
+        message: 'duration is required when time_range is next-x-hours',
+        path: ['duration'],
+      }),
       actionSchemaByType(ACTIONS.ECOWATT.CONDITION, {
         ecowatt_network_status: z.enum(['ok', 'warning', 'critical']),
       }),
@@ -305,30 +346,59 @@ function createSceneCreateInputSchema(
         then: z.array(z.array(sceneActionSchema)),
         else: z.array(z.array(sceneActionSchema)),
       }),
+      actionSchemaByType(ACTIONS.CONDITION.WHILE, {
+        if: z
+          .array(sceneActionSchema)
+          .min(1)
+          .describe('Conditions re-evaluated before each iteration. The loop stops when one of them fails.'),
+        then: z.array(z.array(sceneActionSchema)).describe('Actions executed on each iteration of the loop.'),
+        max_iterations: z
+          .number()
+          .int()
+          .min(1)
+          .max(10000)
+          .optional()
+          .describe('Safety limit for the number of iterations (default 1000).'),
+      }),
     ]),
   );
 
+  // `device.new-state` accepts either a single `device_feature` (legacy) or a non-empty
+  // `device_features` array sharing the condition (the trigger fires when any matches).
+  // Both variants are in the union so the schema stays strict without allowing neither.
+  const deviceNewStateConditionShape = {
+    operator: comparisonOperatorSchema,
+    value: z
+      .number()
+      .describe(
+        'Numeric device state to match. For binary features (lights, switches, buttons): use 1 for ON and 0 for OFF. Never use strings like "ON" or "OFF". For sensors, use the numeric threshold (for example 2400 for CO2 ppm).',
+      ),
+    threshold_only: z
+      .boolean()
+      .optional()
+      .describe(
+        'When true, fire only on transition into the matching state (rising edge), not while the state stays matched.',
+      ),
+    for_duration: z
+      .number()
+      .optional()
+      .describe(
+        'Delay in milliseconds after the condition becomes true before the trigger fires. Example: 45 minutes = 2700000.',
+      ),
+  };
   const sceneTriggerSchema = z.union([
     triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
       device_feature: deviceFeatureSelectorSchema,
-      operator: comparisonOperatorSchema,
-      value: z
-        .number()
+      ...deviceNewStateConditionShape,
+    }),
+    triggerSchemaByType(EVENTS.DEVICE.NEW_STATE, {
+      device_features: z
+        .array(deviceFeatureSelectorSchema)
+        .min(1)
         .describe(
-          'Numeric device state to match. For binary features (lights, switches, buttons): use 1 for ON and 0 for OFF. Never use strings like "ON" or "OFF". For sensors, use the numeric threshold (for example 2400 for CO2 ppm).',
+          'Several device features of the same type sharing one condition: the trigger fires as soon as any of them matches.',
         ),
-      threshold_only: z
-        .boolean()
-        .optional()
-        .describe(
-          'When true, fire only on transition into the matching state (rising edge), not while the state stays matched.',
-        ),
-      for_duration: z
-        .number()
-        .optional()
-        .describe(
-          'Delay in milliseconds after the condition becomes true before the trigger fires. Example: 45 minutes = 2700000.',
-        ),
+      ...deviceNewStateConditionShape,
     }),
     triggerSchemaByType(EVENTS.TIME.CHANGED, {
       scheduler_type: z.literal('every-month'),

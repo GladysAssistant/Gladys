@@ -1,8 +1,11 @@
 const { expect } = require('chai');
-const { stub, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub, fake } = sinon;
 const nock = require('nock');
 const dns = require('dns');
 const { SYSTEM_VARIABLE_NAMES, COVER_STATE, AI_CHAT_TOOL_CATEGORIES } = require('../../../../utils/constants');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const {
   getAllResources,
   getAllTools,
@@ -2149,8 +2152,8 @@ describe('build schemas', () => {
     });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
     expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq('AB-123-CD');
-    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
-    expect(mcpHandler.gladys.device.saveStringState.firstCall.args[2]).to.eq('AB-123-CD');
+    // device.setValue persists string states of text features itself
+    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(0);
     expect(textResult.content[0].text).to.eq('sensor.set-state: set License Plate Sensor / Plate to AB-123-CD');
   });
 
@@ -2699,7 +2702,10 @@ describe('build schemas', () => {
       value: 'AB-123-CD',
     });
 
-    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq('AB-123-CD');
+    // device.setValue persists string states of text features itself
+    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(0);
   });
 
   it('should expose shutters in home schema and device.set-shutter tool', async () => {
@@ -3598,5 +3604,300 @@ describe('build schemas', () => {
     // A room that does have the sensor still returns the regular payload.
     const withSensor = await getStateTool.cb({ room: 'Salon', device_type: 'humidity-sensor' });
     expect(withSensor.content[0].text).to.eq('toonmockdata');
+  });
+
+  it('should answer device.get-state when the model targets the house or shortens the device type', async () => {
+    const rooms = [
+      { id: 'room-1', name: 'Salon', selector: 'salon', house_id: 'house-1' },
+      { id: 'room-2', name: 'Cuisine', selector: 'cuisine', house_id: 'house-1' },
+    ];
+    const houses = [{ id: 'house-1', name: 'Maison', selector: 'maison' }];
+
+    const buildSensor = (suffix, roomSelector, roomName, value) => ({
+      selector: `capteur-${suffix}`,
+      name: `Capteur ${suffix}`,
+      room: roomSelector ? { selector: roomSelector, name: roomName } : null,
+      features: [
+        {
+          id: `feature-${suffix}`,
+          selector: `capteur-${suffix}-temperature`,
+          name: 'Température',
+          category: 'temperature-sensor',
+          type: 'decimal',
+          unit: 'celsius',
+          last_value: value,
+        },
+      ],
+    });
+
+    // One sensor per room, plus one that was never assigned to a room.
+    const sensors = [
+      buildSensor('salon', 'salon', 'Salon', 21),
+      buildSensor('cuisine', 'cuisine', 'Cuisine', 23),
+      buildSensor('garage', null, null, 17),
+    ];
+
+    const mcpHandler = {
+      serviceId: 'test',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      formatValue: stub().callsFake((feature) => ({ value: feature.last_value, unit: feature.unit, age: '2min' })),
+      findBySimilarity,
+      gladys: {
+        room: { getAll: stub().resolves(rooms) },
+        user: { get: stub().resolves([]) },
+        house: { get: stub().resolves(houses) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub().resolves({}) },
+        device: {
+          get: stub().resolves(sensors),
+          getBySelector: stub().callsFake(async (selector) => sensors.find((s) => s.selector === selector)),
+          setValue: stub().resolves(),
+          getDeviceFeaturesAggregates: stub().resolves({ values: [] }),
+          camera: { getImagesInRoom: stub().resolves([]) },
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(10) },
+      toon: stub().callsFake((data) => JSON.stringify(data)),
+    };
+
+    const tools = await mcpHandler.getAllTools();
+    const getStateTool = tools.find((tool) => tool.intent === 'device.get-state');
+
+    // "Températures de la maison": the model targets the house, which is not a room,
+    // and shortens the category. Both used to return "no sensor is configured".
+    const wholeHome = await getStateTool.cb({ room: 'maison', device_type: 'temperature' });
+    const wholeHomeStates = JSON.parse(wholeHome.content[0].text);
+    expect(wholeHomeStates.map(({ room, value }) => ({ room, value }))).to.deep.equal([
+      { room: 'Salon', value: 21 },
+      { room: 'Cuisine', value: 23 },
+      { room: 'No room', value: 17 },
+    ]);
+    expect(wholeHomeStates.every(({ category }) => category === 'temperature-sensor')).to.eq(true);
+
+    // The shortened category alone resolves too.
+    const shortType = await getStateTool.cb({ room: undefined, device_type: 'temperature' });
+    expect(JSON.parse(shortType.content[0].text).length).to.eq(3);
+
+    // A real room is still the narrow filter it used to be.
+    const inRoom = await getStateTool.cb({ room: 'Salon', device_type: 'temperature' });
+    expect(JSON.parse(inRoom.content[0].text).map(({ room }) => room)).to.deep.equal(['Salon']);
+
+    // An unknown target is reported as such instead of claiming nothing is configured.
+    const unknownRoom = await getStateTool.cb({ room: 'Véranda', device_type: 'temperature' });
+    expect(unknownRoom.content[0].text).to.eq(
+      'device.get-state: "Véranda" is not a room of this home, no state was read. ' +
+        'Available rooms: Salon, Cuisine. ' +
+        'Call this tool again with one of them, or without the room parameter to cover the whole home.',
+    );
+
+    // A category that does not exist in this home keeps the explicit empty answer.
+    const unknownType = await getStateTool.cb({ room: 'maison', device_type: 'co2' });
+    expect(unknownType.content[0].text).to.eq(
+      'device.get-state: no device of type "co2" is configured in house "Maison". ' +
+        'No measurement exists for this query, do not report any value.',
+    );
+  });
+  describe('weather.get tool', () => {
+    const houses = [
+      { id: 'house-1', name: 'Maison', selector: 'maison', latitude: 48.8566, longitude: 2.3522 },
+      { id: 'house-2', name: 'Chalet', selector: 'chalet', latitude: 45.9237, longitude: 6.8694 },
+      { id: 'house-3', name: 'Bureau', selector: 'bureau', latitude: null, longitude: null },
+    ];
+
+    const pivotWeather = {
+      temperature: 27.28,
+      humidity: 58,
+      datetime: '2026-08-12T12:00:00.000Z',
+      units: 'metric',
+      weather: 'clear',
+      days: [{ datetime: '2026-08-13T00:00:00.000Z', weather: 'rain', temperature_min: 17, temperature_max: 24 }],
+    };
+
+    const buildMcpHandler = ({
+      houseList = houses,
+      weatherGet = stub().resolves(pivotWeather),
+      getById = stub().resolves({ id: 'user-1', language: 'fr', distance_unit_preference: 'us' }),
+      timezoneValue = 'Europe/Paris',
+    } = {}) => ({
+      serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
+      getAllTools,
+      isSensorFeature,
+      isSwitchableFeature,
+      isLightControlFeature,
+      isShutterFeature,
+      isHistoryFeature,
+      isWritableSensorFeature,
+      findBySimilarity,
+      formatValue: stub().returns({ value: 1 }),
+      toon: stub().callsFake((value) => JSON.stringify(value)),
+      gladys: {
+        room: { getAll: stub().resolves([{ id: 'room-1', name: 'Salon', selector: 'salon' }]) },
+        user: { get: stub().resolves([]), getById },
+        house: { get: stub().resolves(houseList) },
+        calendar: { get: stub().resolves([]) },
+        area: { get: stub().resolves([]) },
+        scene: { get: stub().resolves([]), create: stub() },
+        device: { get: stub().resolves([]) },
+        weather: { get: weatherGet },
+        variable: {
+          getValue: stub().callsFake((name) => {
+            if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
+              return Promise.resolve(timezoneValue);
+            }
+            return Promise.resolve(null);
+          }),
+        },
+        event: { emit: fake() },
+      },
+      levenshtein: { distance: stub().returns(10) },
+    });
+
+    it('should get the weather of the first house with coordinates, with the user preferences', async () => {
+      const mcpHandler = buildMcpHandler();
+      const tools = await mcpHandler.getAllTools('user-1');
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      expect(weatherTool.config.categories).to.deep.equal([
+        AI_CHAT_TOOL_CATEGORIES.WEATHER,
+        AI_CHAT_TOOL_CATEGORIES.OTHER,
+      ]);
+      // only the houses that have coordinates are proposed to the model
+      const { parameters } = mcpToolsToChatApiFormat([weatherTool])[0].function;
+      expect(parameters.properties.house.enum).to.deep.equal(['Maison', 'Chalet']);
+
+      const result = await weatherTool.cb({});
+
+      expect(mcpHandler.gladys.weather.get.firstCall.args[0]).to.deep.equal({
+        latitude: 48.8566,
+        longitude: 2.3522,
+        language: 'fr',
+        units: 'us',
+      });
+      const formatted = JSON.parse(result.content[0].text);
+      expect(formatted.house).to.equal('Maison');
+      expect(formatted.timezone).to.equal('Europe/Paris');
+      expect(formatted.now.temperature).to.equal(27.3);
+      expect(formatted.days[0].date).to.equal('2026-08-13');
+      // weekday name in the language of the user, like the provider request
+      expect(formatted.days[0].day_of_week).to.equal('jeudi');
+    });
+
+    it('should get the weather of the house asked by the model', async () => {
+      const mcpHandler = buildMcpHandler();
+      const tools = await mcpHandler.getAllTools('user-1');
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      await weatherTool.cb({ house: 'Chalet' });
+
+      expect(mcpHandler.gladys.weather.get.firstCall.args[0]).to.deep.include({
+        latitude: 45.9237,
+        longitude: 6.8694,
+      });
+    });
+
+    it('should refuse to guess a home when the requested one does not match', async () => {
+      const mcpHandler = buildMcpHandler();
+      const tools = await mcpHandler.getAllTools('user-1');
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      const result = await weatherTool.cb({ house: 'Villa inconnue' });
+
+      expect(result.content[0].text).to.equal(
+        'weather.get: no home found matching "Villa inconnue". Available homes: Maison, Chalet. ' +
+          'Ask the user which one instead of reporting the weather of another home.',
+      );
+      expect(mcpHandler.gladys.weather.get.called).to.equal(false);
+    });
+
+    it('should answer for the only home when there is nothing to disambiguate', async () => {
+      const mcpHandler = buildMcpHandler({ houseList: [houses[0], houses[2]] });
+      const tools = await mcpHandler.getAllTools('user-1');
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      await weatherTool.cb({ house: 'Paris' });
+
+      expect(mcpHandler.gladys.weather.get.firstCall.args[0]).to.deep.include({
+        latitude: 48.8566,
+        longitude: 2.3522,
+      });
+    });
+
+    it('should default to metric, English and Europe/Paris without user or timezone', async () => {
+      const mcpHandler = buildMcpHandler({ timezoneValue: null });
+      const tools = await mcpHandler.getAllTools();
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      const result = await weatherTool.cb({});
+
+      expect(mcpHandler.gladys.user.getById.called).to.equal(false);
+      expect(mcpHandler.gladys.weather.get.firstCall.args[0]).to.deep.include({ language: 'en', units: 'metric' });
+      expect(JSON.parse(result.content[0].text).timezone).to.equal('Europe/Paris');
+    });
+
+    it('should default the units and the language when the user has no preference', async () => {
+      const mcpHandler = buildMcpHandler({ getById: stub().resolves({ id: 'user-1' }) });
+      const tools = await mcpHandler.getAllTools('user-1');
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      await weatherTool.cb({});
+
+      expect(mcpHandler.gladys.weather.get.firstCall.args[0]).to.deep.include({ language: 'en', units: 'metric' });
+    });
+
+    it('should keep answering when the user cannot be loaded', async () => {
+      const mcpHandler = buildMcpHandler({ getById: stub().rejects(new Error('User not found')) });
+      const tools = await mcpHandler.getAllTools('unknown-user');
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      await weatherTool.cb({});
+
+      expect(mcpHandler.gladys.weather.get.firstCall.args[0]).to.deep.include({ language: 'en', units: 'metric' });
+    });
+
+    it('should report a provider failure instead of throwing', async () => {
+      const mcpHandler = buildMcpHandler({
+        weatherGet: stub().rejects(new Error('No weather provider is installed or configured.')),
+      });
+      const tools = await mcpHandler.getAllTools('user-1');
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      const result = await weatherTool.cb({});
+
+      expect(result.content[0].text).to.equal(
+        'weather.get: no weather available for Maison, the weather provider could not be reached. ' +
+          'Tell the user, and do not give a forecast of your own.',
+      );
+      expect(mcpHandler.toon.called).to.equal(false);
+    });
+
+    it('should tell the model when no weather integration is configured', async () => {
+      const mcpHandler = buildMcpHandler({
+        weatherGet: stub().rejects(new ServiceNotConfiguredError('No weather provider is installed or configured.')),
+      });
+      const tools = await mcpHandler.getAllTools('user-1');
+      const weatherTool = tools.find((tool) => tool.intent === 'weather.get');
+
+      const result = await weatherTool.cb({});
+
+      expect(result.content[0].text).to.equal(
+        'weather.get: no weather available for Maison, no weather integration is installed or configured in Gladys. ' +
+          'Tell the user, and do not give a forecast of your own.',
+      );
+    });
+
+    it('should not expose weather.get without a house with coordinates', async () => {
+      const mcpHandler = buildMcpHandler({ houseList: [houses[2]] });
+      const tools = await mcpHandler.getAllTools('user-1');
+
+      expect(tools.find((tool) => tool.intent === 'weather.get')).to.equal(undefined);
+    });
   });
 });

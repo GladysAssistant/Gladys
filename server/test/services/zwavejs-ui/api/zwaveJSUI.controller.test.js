@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const ZwaveJSUIController = require('../../../../services/zwavejs-ui/api/zwaveJSUI.controller');
 
 const { assert, fake } = sinon;

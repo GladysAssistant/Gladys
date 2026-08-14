@@ -69,15 +69,46 @@ class TurnOnLight extends Component {
     this.setVariables();
   }
 
-  onDeviceFeatureChange = deviceFeature => {
-    this.setState({ selectedDeviceFeature: deviceFeature });
-    if (deviceFeature) {
-      this.props.updateTriggerProperty(this.props.index, 'device_feature', deviceFeature.selector);
-      if (deviceFeature.selector !== this.props.trigger.device_feature) {
-        this.props.updateTriggerProperty(this.props.index, 'value', null);
-      }
-    } else {
-      this.props.updateTriggerProperty(this.props.index, 'device_feature', null);
+  // The trigger stores its features in `device_features`; triggers saved before
+  // multi-select stored a single selector in `device_feature`
+  getSelectedSelectors = () => {
+    if (this.props.trigger.device_features) {
+      return this.props.trigger.device_features;
+    }
+    return this.props.trigger.device_feature ? [this.props.trigger.device_feature] : [];
+  };
+
+  onDeviceFeaturesChange = (deviceFeatures, devices, isUserChange) => {
+    const previousFeature = this.state.selectedDeviceFeature;
+    // all selected features share the same category/type, the first one drives the condition widget
+    const firstFeature = deviceFeatures.length > 0 ? deviceFeatures[0] : null;
+    this.setState({ selectedDeviceFeature: firstFeature });
+
+    // Hydration only resolves the saved selectors for display: nothing is written back to
+    // the trigger, so an unresolvable feature (deleted device, list still loading) never
+    // silently truncates the saved selection or clears the saved condition value.
+    if (!isUserChange) {
+      return;
+    }
+
+    this.props.updateTriggerProperty(
+      this.props.index,
+      'device_features',
+      deviceFeatures.map(feature => feature.selector)
+    );
+    // migrate away from the legacy single-feature format when the user edits the selection
+    if (this.props.trigger.device_feature) {
+      this.props.updateTriggerProperty(this.props.index, 'device_feature', undefined);
+    }
+
+    // the saved value only stays meaningful while the kind of feature is unchanged
+    const featureKindChanged =
+      !firstFeature ||
+      !previousFeature ||
+      firstFeature.category !== previousFeature.category ||
+      firstFeature.type !== previousFeature.type;
+    if (featureKindChanged) {
+      this.props.updateTriggerProperty(this.props.index, 'value', null);
     }
   };
 
@@ -160,7 +191,12 @@ class TurnOnLight extends Component {
         type === DEVICE_FEATURE_TYPES.WATER_VALVE.VALVE_WORK_STATE ||
         (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER &&
           (type === DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST || type === DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING));
-      presenceDevice = category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR;
+      // Scoped to `push`: the locked "device seen" widget only makes sense for a heartbeat
+      // sensor. A binary presence sensor (a camera reporting a person) shares the 'binary'
+      // string with SWITCH, so it is already served by BinaryDeviceState above, and both
+      // widgets would show up side by side if this test stayed on the category alone.
+      presenceDevice =
+        category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR && type === DEVICE_FEATURE_TYPES.SENSOR.PUSH;
       buttonClickDevice = category === DEVICE_FEATURE_CATEGORIES.BUTTON;
       doorbellRingDevice = category === DEVICE_FEATURE_CATEGORIES.DOORBELL;
       pilotWireModeDevice = category === DEVICE_FEATURE_CATEGORIES.HEATER;
@@ -213,12 +249,18 @@ class TurnOnLight extends Component {
 
     return (
       <div>
+        <p>
+          <small>
+            <Text id="editScene.triggersCard.newState.multipleFeaturesNote" />
+          </small>
+        </p>
         <div class="row">
           <div class="col-12 col-md-5">
             <div class="form-group">
               <SelectDeviceFeature
-                value={props.trigger.device_feature}
-                onDeviceFeatureChange={this.onDeviceFeatureChange}
+                isMulti
+                value={this.getSelectedSelectors()}
+                onDeviceFeaturesChange={this.onDeviceFeaturesChange}
               />
             </div>
           </div>

@@ -1,0 +1,423 @@
+name: Scheduled Claude autofix
+run-name: Scheduled Claude autofix${{ inputs.dry_run == true && ' (dry run)' || '' }}
+
+# Once a day, find the open pull requests that carry review-bot feedback
+# (Cursor, CodeRabbit) nobody has handled yet, and launch ONE Claude Code
+# cloud session per PR to address it. This replaces the event-driven Claude
+# automation, whose cost was unbounded: a PR left open for two weeks kept
+# being reprocessed even though nothing had changed.
+#
+# The anti-loop core (do not simplify):
+#   - every pass replies to EVERY comment it considered, with a hidden
+#     "Autofix-Handled: rc-<id> / ic-<id>" marker; a marked comment (or a
+#     thread with an autofix reply, or a resolved thread) is never
+#     selected again, even when the fix was declined;
+#   - markers, not dates, are the source of truth for "handled": a session
+#     that pushed but died before replying leaves its comments unmarked, so
+#     they come back the next day and burn another pass until MAX_PASSES
+#     flips the PR to "exhausted" for a human. A wasted pass is visible;
+#     silently orphaned feedback is not possible.
+# Hard caps on top: MAX_PASSES autofix passes per PR (then the PR is
+# labeled and left to a human) and MAX_PRS PRs per day.
+#
+# Two jobs:
+#   select - pure bash + gh api, no LLM call. Computes the eligible PR list
+#            and exposes it as JSON.
+#   fire   - matrix over that list, one job per PR. Fires the "Gladys
+#            scheduled PR autofix" routine, which starts a Claude Code
+#            CLOUD session (visible at claude.ai/code) working on that PR.
+#            The session clones the repo, checks out the PR branch, fixes,
+#            pushes and replies by itself; the runner only makes one HTTP
+#            call. Sessions act under the routine owner's GitHub identity,
+#            so their pushes trigger the PR CI like any human push.
+#
+# See .github/CLAUDE_AUTOFIX.md for the full picture, the role of every
+# constant below, and the procedure when a PR gets exhausted.
+#
+# Required configuration (see the README for the one-time setup):
+#   vars.CLAUDE_AUTOFIX_FIRE_URL      - the routine's API trigger URL
+#                                       (https://api.anthropic.com/v1/claude_code/routines/trig_.../fire)
+#   secrets.CLAUDE_AUTOFIX_ROUTINE_TOKEN - the routine's bearer token
+#                                       (sk-ant-oat01-..., shown once when
+#                                       generated on the routine's page)
+
+on:
+  schedule:
+    # Daily, before the (European) workday starts.
+    - cron: '30 4 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: >-
+          Run the selection and print the detailed list (passes done and
+          retained comments per PR) without firing any cloud session and
+          without writing anything (no labels, no comments).
+        type: boolean
+        required: false
+        default: false
+
+# All the tuning knobs live here.
+env:
+  # Hard cap of autofix commits per PR, counted via the "Autofix-Pass: <n>"
+  # commit-message trailer. When a PR still has unhandled feedback after
+  # this many passes, it gets EXHAUSTED_LABEL and a human takes over.
+  MAX_PASSES: 3
+  # Budget circuit breaker: at most this many PRs processed per run. The
+  # eligible list is sorted by last activity (oldest first) before
+  # truncating, so long-waiting PRs are served first. Cloud sessions also
+  # count against the account's daily routine-run allowance.
+  MAX_PRS: 8
+  # A comment younger than this many hours is not processed yet: it lets a
+  # review round finish (and a human veto it) before Claude reacts.
+  QUIET_PERIOD_HOURS: 2
+  # Logins of the review bots whose comments are actionable feedback.
+  # Space-separated, REST form; the "[bot]" suffix is stripped internally
+  # because GraphQL returns the bare app slug ("cursor", "coderabbitai").
+  REVIEW_BOT_LOGINS: 'cursor[bot] coderabbitai[bot]'
+  # Logins under which autofix replies may appear. Cloud sessions act under
+  # the routine owner's GitHub identity, so their replies are authored by
+  # that user; the bot logins cover replies posted by earlier tooling.
+  AUTOFIX_ACTOR_LOGINS: 'Pierre-Gilles github-actions[bot] claude[bot]'
+  # Cloud sessions may only push to claude/-prefixed branches (other
+  # branches are rejected when they carry commits by someone else), so
+  # only PRs from such branches are eligible.
+  HEAD_BRANCH_PREFIX: 'claude/'
+  # Minutes each matrix slot is held after firing. Combined with
+  # max-parallel 2 this staggers session LAUNCHES (about two fires per
+  # window) so pushes do not all land at once; it does NOT bound how many
+  # sessions are alive concurrently, since sessions outlive the job and no
+  # public API exposes their completion.
+  FIRE_STAGGER_MINUTES: 8
+  # Label that permanently stops the scheduled autofix on a PR (posed
+  # automatically at MAX_PASSES).
+  EXHAUSTED_LABEL: 'claude:autofix-exhausted'
+  # Label a human can pose to opt a PR out of the scheduled autofix.
+  SKIP_LABEL: 'claude:autofix-skip'
+  # Issue comments containing this marker are ignored: CodeRabbit tags all
+  # its non-actionable chatter (walkthroughs, status notes) with it, and
+  # its actionable feedback lives in review threads anyway.
+  NOISE_MARKER: 'This is an auto-generated comment'
+
+# Never two daily runs at the same time (a manual dispatch during the
+# scheduled run would double-process PRs).
+concurrency:
+  group: claude-scheduled-autofix
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  select:
+    name: Select eligible PRs
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      # Creating labels and commenting on exhausted PRs. A PR is an issue
+      # for the labels/comments endpoints, hence both scopes (same reason
+      # as in cursor-automation-webhook.yml).
+      pull-requests: write
+      issues: write
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
+      has_prs: ${{ steps.select.outputs.has_prs }}
+    steps:
+      - name: Compute the eligible PR list
+        id: select
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          DRY_RUN: ${{ inputs.dry_run == true }}
+        run: |
+          set -uo pipefail
+
+          OWNER=${GH_REPO%/*}
+          REPO_NAME=${GH_REPO#*/}
+          # Eligibility window upper bound: now minus the quiet period.
+          CUTOFF=$(date -u -d "${QUIET_PERIOD_HOURS} hours ago" '+%Y-%m-%dT%H:%M:%SZ')
+
+          # Bot logins as JSON arrays without the "[bot]" suffix: REST says
+          # "cursor[bot]" where GraphQL says "cursor", so every comparison
+          # below strips the suffix first.
+          # tr instead of unquoted expansion so "[bot]" can never glob.
+          to_json_list() { tr ' ' '\n' <<< "$1" | sed '/^$/d; s/\[bot\]$//' | jq -R . | jq -sc .; }
+          REVIEW_JSON=$(to_json_list "$REVIEW_BOT_LOGINS")
+          AUTOFIX_JSON=$(to_json_list "$AUTOFIX_ACTOR_LOGINS")
+
+          # Review threads come from GraphQL: isResolved does not exist in
+          # the REST payloads.
+          THREADS_QUERY='query($owner:String!,$name:String!,$number:Int!,$cursor:String){
+            repository(owner:$owner,name:$name){pullRequest(number:$number){
+              reviewThreads(first:100,after:$cursor){
+                pageInfo{hasNextPage endCursor}
+                nodes{isResolved comments(first:100){nodes{databaseId createdAt body author{login}}}}}}}}'
+
+          fetch_threads() {
+            local num=$1 cursor='' all='[]' resp page
+            while :; do
+              if [ -n "$cursor" ]; then
+                resp=$(gh api graphql -f query="$THREADS_QUERY" -f owner="$OWNER" -f name="$REPO_NAME" -F number="$num" -f cursor="$cursor") || return 1
+              else
+                resp=$(gh api graphql -f query="$THREADS_QUERY" -f owner="$OWNER" -f name="$REPO_NAME" -F number="$num") || return 1
+              fi
+              page=$(echo "$resp" | jq '.data.repository.pullRequest.reviewThreads') || return 1
+              all=$(jq -n --argjson a "$all" --argjson p "$page" \
+                '$a + [$p.nodes[] | {isResolved, comments: [.comments.nodes[]
+                   | {id: .databaseId, created: .createdAt, body, login: (.author.login // "")}]}]') || return 1
+              [ "$(echo "$page" | jq -r '.pageInfo.hasNextPage')" = "true" ] || break
+              cursor=$(echo "$page" | jq -r '.pageInfo.endCursor')
+            done
+            echo "$all"
+          }
+
+          skip() { echo "PR #${NUM}: skipped — $1"; }
+
+          MATRIX='[]'
+          EXHAUSTED='[]'
+
+          PR_NUMBERS=$(gh api --paginate "repos/$GH_REPO/pulls?state=open&per_page=100" \
+            | jq -rs 'add // [] | .[].number' | sort -n) \
+            || { echo "::error::Could not list the open pull requests"; exit 1; }
+
+          for NUM in $PR_NUMBERS; do
+            # The list payload has no mergeable_state: fetch each PR.
+            PR=$(gh api "repos/$GH_REPO/pulls/$NUM") \
+              || { echo "::warning::PR #$NUM: could not fetch, skipping"; continue; }
+
+            # 1. Open (guaranteed by the listing), not draft, no conflict.
+            [ "$(echo "$PR" | jq -r '.draft')" = "false" ] || { skip 'draft'; continue; }
+            # Fork PRs are out: the fired cloud session pushes to the head
+            # branch, which only works for branches of this repository.
+            [ "$(echo "$PR" | jq -r '.head.repo.full_name // ""')" = "$GH_REPO" ] \
+              || { skip 'fork PR'; continue; }
+            # Cloud sessions can only push claude/-prefixed branches.
+            BRANCH=$(echo "$PR" | jq -r '.head.ref')
+            case "$BRANCH" in
+              "$HEAD_BRANCH_PREFIX"*) ;;
+              *) skip "branch $BRANCH is not ${HEAD_BRANCH_PREFIX}-prefixed"; continue ;;
+            esac
+            # "dirty" is the only state that positively means a conflict;
+            # "unknown" just means GitHub has not computed it yet.
+            [ "$(echo "$PR" | jq -r '.mergeable_state // "unknown"')" != "dirty" ] \
+              || { skip 'merge conflict'; continue; }
+
+            # 3. Opt-out labels.
+            LABELS=$(echo "$PR" | jq -r '[.labels[].name] | join("\n")')
+            echo "$LABELS" | grep -qxF "$EXHAUSTED_LABEL" && { skip "label $EXHAUSTED_LABEL"; continue; }
+            echo "$LABELS" | grep -qxF "$SKIP_LABEL" && { skip "label $SKIP_LABEL"; continue; }
+
+            # 2. Autofix passes already burnt: the highest "Autofix-Pass:
+            # <n>" commit-message trailer on the branch (the author of
+            # automated commits is ambiguous, the trailer is not). The
+            # highest value rather than the commit count, so an amended or
+            # rebased pass cannot burn the budget twice.
+            COMMITS=$(gh api --paginate "repos/$GH_REPO/pulls/$NUM/commits?per_page=100" | jq -s 'add // []') \
+              || { echo "::warning::PR #$NUM: could not fetch commits, skipping"; continue; }
+            PASSES=$(echo "$COMMITS" | jq '[.[].commit.message
+              | capture("(^|\n)Autofix-Pass: *(?<n>[0-9]+)").n | tonumber] | max // 0')
+
+            ISSUE_COMMENTS=$(gh api --paginate "repos/$GH_REPO/issues/$NUM/comments?per_page=100" | jq -s 'add // []') \
+              || { echo "::warning::PR #$NUM: could not fetch issue comments, skipping"; continue; }
+            THREADS=$(fetch_threads "$NUM") \
+              || { echo "::warning::PR #$NUM: could not fetch review threads, skipping"; continue; }
+
+            # 5c. A comment is "handled" once an autofix reply carries its
+            # "Autofix-Handled: rc-<id>" (review comment) or "ic-<id>"
+            # (issue comment) marker. Collect every marker posted by the
+            # autofix actors anywhere on the PR, one per line.
+            HANDLED=$( { echo "$ISSUE_COMMENTS" | jq -r --argjson af "$AUTOFIX_JSON" \
+                           '.[] | select(((.user.login // "") | sub("\\[bot\\]$";"")) as $l | ($af | index($l)) != null) | .body';
+                         echo "$THREADS" | jq -r --argjson af "$AUTOFIX_JSON" \
+                           '.[].comments[] | select((.login | sub("\\[bot\\]$";"")) as $l | ($af | index($l)) != null) | .body'; } \
+                       | { grep -oE 'Autofix-Handled: *[ri]c-[0-9]+' || true; } | sed -E 's/Autofix-Handled: *//' | sort -u)
+
+            # 5. Eligible review comments: root of an unresolved thread,
+            # opened by a review bot, with no in-thread autofix reply and
+            # no handled marker, older than the quiet period. Deliberately
+            # NO lower date bound: markers are the source of truth for
+            # "handled", so a comment a session failed to reply to stays
+            # eligible and is retried (at the price of a pass) instead of
+            # falling out of a date window and being orphaned.
+            RC=$(echo "$THREADS" | jq --argjson bots "$REVIEW_JSON" --argjson af "$AUTOFIX_JSON" \
+                   --arg cutoff "$CUTOFF" --arg handled "$HANDLED" '
+              [ .[]
+                | select(.isResolved | not)
+                | . as $t
+                | ($t.comments[0] // empty)
+                | select((.login | sub("\\[bot\\]$";"")) as $l | ($bots | index($l)) != null)
+                | select(([$t.comments[1:][] | (.login | sub("\\[bot\\]$";""))]
+                          | any(. as $l | ($af | index($l)) != null)) | not)
+                | ("rc-" + (.id | tostring)) as $tok
+                | select(($handled | split("\n") | index($tok)) == null)
+                | select(.created < $cutoff)
+                | {id, created, author: .login, excerpt: (.body | gsub("[\\r\\n]+"; " ") | .[0:110])}
+              ]')
+
+            # Same for issue comments (no resolution concept there), minus
+            # the auto-generated CodeRabbit chatter.
+            IC=$(echo "$ISSUE_COMMENTS" | jq --argjson bots "$REVIEW_JSON" \
+                   --arg cutoff "$CUTOFF" --arg handled "$HANDLED" --arg noise "$NOISE_MARKER" '
+              [ .[]
+                | select(((.user.login // "") | sub("\\[bot\\]$";"")) as $l | ($bots | index($l)) != null)
+                | select((.body | contains($noise)) | not)
+                | ("ic-" + (.id | tostring)) as $tok
+                | select(($handled | split("\n") | index($tok)) == null)
+                | select(.created_at < $cutoff)
+                | {id, created: .created_at, author: .user.login, excerpt: (.body | gsub("[\\r\\n]+"; " ") | .[0:110])}
+              ]')
+
+            PENDING=$(jq -n --argjson rc "$RC" --argjson ic "$IC" '($rc | length) + ($ic | length)')
+            [ "$PENDING" -gt 0 ] || { skip 'no unhandled review-bot feedback'; continue; }
+
+            if [ "$PASSES" -ge "$MAX_PASSES" ]; then
+              echo "PR #$NUM: $PENDING unhandled comment(s) but already $PASSES/$MAX_PASSES autofix passes -> exhausted"
+              EXHAUSTED=$(echo "$EXHAUSTED" | jq --argjson n "$NUM" '. + [$n]')
+              continue
+            fi
+
+            echo "PR #$NUM: ELIGIBLE — passes done: $PASSES, next pass: $((PASSES + 1)), unhandled comments: $PENDING, quiet-period cutoff: $CUTOFF"
+            jq -rn --argjson rc "$RC" --argjson ic "$IC" '
+              ($rc[] | "    - review comment rc-\(.id) by \(.author) at \(.created): \(.excerpt)"),
+              ($ic[] | "    - issue comment ic-\(.id) by \(.author) at \(.created): \(.excerpt)")'
+
+            ENTRY=$(jq -n --argjson n "$NUM" --argjson p "$PASSES" \
+              --arg b "$BRANCH" --arg u "$(echo "$PR" | jq -r '.updated_at')" \
+              --argjson rc "$RC" --argjson ic "$IC" '
+              {number: $n, branch: $b, pass: ($p + 1),
+               rc_ids: ($rc | map(.id | tostring) | join(" ")),
+               ic_ids: ($ic | map(.id | tostring) | join(" ")),
+               updated_at: $u}')
+            MATRIX=$(echo "$MATRIX" | jq --argjson e "$ENTRY" '. + [$e]')
+          done
+
+          # Budget circuit breaker: least recently active PRs first, hard
+          # cap at MAX_PRS.
+          MATRIX=$(echo "$MATRIX" | jq 'sort_by(.updated_at)')
+          TOTAL=$(echo "$MATRIX" | jq 'length')
+          if [ "$TOTAL" -gt "$MAX_PRS" ]; then
+            DROPPED=$(echo "$MATRIX" | jq -r --argjson m "$MAX_PRS" '[.[$m:][].number | "#\(.)"] | join(" ")')
+            echo "Budget cap: $TOTAL eligible PRs, keeping the $MAX_PRS least recently active, postponing: $DROPPED"
+          fi
+          MATRIX=$(echo "$MATRIX" | jq -c --argjson m "$MAX_PRS" '.[:$m] | map(del(.updated_at))')
+
+          if [ "$DRY_RUN" = 'true' ]; then
+            echo "Dry run: no cloud session will be fired, no label or comment will be written."
+            [ "$(echo "$EXHAUSTED" | jq 'length')" -eq 0 ] \
+              || echo "Dry run: would label as exhausted: $(echo "$EXHAUSTED" | jq -cr '[.[] | "#\(.)"] | join(" ")')"
+          else
+            # Both labels are created idempotently (POST fails silently
+            # when the label already exists).
+            gh api -X POST "repos/$GH_REPO/labels" -f name="$EXHAUSTED_LABEL" -f color='B60205' \
+              -f description='Scheduled Claude autofix reached its pass limit; a human must take over' > /dev/null 2>&1 || true
+            gh api -X POST "repos/$GH_REPO/labels" -f name="$SKIP_LABEL" -f color='ededed' \
+              -f description='Exclude this PR from the scheduled Claude autofix' > /dev/null 2>&1 || true
+
+            for NUM in $(echo "$EXHAUSTED" | jq -r '.[]'); do
+              BODY=$(printf '🛑 **Scheduled autofix stopped for this pull request.**\n\nIt already received %s automated fix passes and still has unhandled review-bot feedback, so the daily autofix will not process it anymore (label `%s`).\n\nPlease review the remaining bot comments manually. See `.github/CLAUDE_AUTOFIX.md` for details.' \
+                "$MAX_PASSES" "$EXHAUSTED_LABEL")
+              gh api --silent -X POST "repos/$GH_REPO/issues/$NUM/labels" -f "labels[]=$EXHAUSTED_LABEL" \
+                || echo "::warning::PR #$NUM: could not add the $EXHAUSTED_LABEL label"
+              gh api --silent -X POST "repos/$GH_REPO/issues/$NUM/comments" -f body="$BODY" \
+                || echo "::warning::PR #$NUM: could not post the exhausted comment"
+            done
+          fi
+
+          {
+            echo "matrix=$MATRIX"
+            if [ "$(echo "$MATRIX" | jq 'length')" -gt 0 ]; then
+              echo 'has_prs=true'
+            else
+              echo 'has_prs=false'
+            fi
+          } >> "$GITHUB_OUTPUT"
+
+  fire:
+    name: 'Fire cloud session for PR #${{ matrix.pr.number }} (pass ${{ matrix.pr.pass }})'
+    needs: select
+    # An empty list must not start any fire job, and a dry run never fires
+    # a session (inputs.dry_run is null on schedule, which is != true).
+    if: needs.select.outputs.has_prs == 'true' && inputs.dry_run != true
+    runs-on: ubuntu-latest
+    # Covers the API call plus the stagger hold below.
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      # Together with the stagger hold, spaces the session launches out
+      # (about two fires per stagger window).
+      max-parallel: 2
+      matrix:
+        pr: ${{ fromJSON(needs.select.outputs.matrix) }}
+    # One autofix fire at a time per PR, whatever run it belongs to.
+    concurrency:
+      group: claude-autofix-pr-${{ matrix.pr.number }}
+      cancel-in-progress: false
+    # The job only calls the Anthropic routine API: it needs no repository
+    # access at all. The cloud session brings its own GitHub access.
+    permissions: {}
+    steps:
+      - name: 🚀 Fire a Claude Code cloud session
+        env:
+          # The URL is not sensitive (the token is), so it belongs in a
+          # repository variable — but a secret of the same name works too,
+          # since mixing up the two tabs of Settings > Secrets and
+          # variables is an easy mistake.
+          FIRE_URL: ${{ vars.CLAUDE_AUTOFIX_FIRE_URL || secrets.CLAUDE_AUTOFIX_FIRE_URL }}
+          FIRE_TOKEN: ${{ secrets.CLAUDE_AUTOFIX_ROUTINE_TOKEN }}
+          PR_NUMBER: ${{ matrix.pr.number }}
+          PR_BRANCH: ${{ matrix.pr.branch }}
+          PR_PASS: ${{ matrix.pr.pass }}
+          RC_IDS: ${{ matrix.pr.rc_ids }}
+          IC_IDS: ${{ matrix.pr.ic_ids }}
+        run: |
+          set -uo pipefail
+
+          MISSING=''
+          [ -n "${FIRE_URL:-}" ] || MISSING="CLAUDE_AUTOFIX_FIRE_URL (repository variable, or secret)"
+          [ -n "${FIRE_TOKEN:-}" ] || MISSING="${MISSING:+$MISSING and }CLAUDE_AUTOFIX_ROUTINE_TOKEN (repository secret)"
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing: $MISSING. Both live under Settings > Secrets and variables > Actions. See .github/CLAUDE_AUTOFIX.md for the one-time routine setup."
+            exit 1
+          fi
+
+          # The payload reaches the routine wrapped in an untrusted
+          # <routine-fire-payload> block; the routine's saved prompt
+          # explicitly opts in to acting on it and treats every field as
+          # data, never as instructions.
+          PAYLOAD=$(jq -cn --argjson number "$PR_NUMBER" --arg branch "$PR_BRANCH" \
+            --argjson pass "$PR_PASS" --argjson max "$MAX_PASSES" \
+            --arg rc "$RC_IDS" --arg ic "$IC_IDS" \
+            '{number: $number, branch: $branch, pass: $pass, max_passes: $max, rc_ids: $rc, ic_ids: $ic}')
+          BODY=$(jq -cn --arg text "$PAYLOAD" '{text: $text}')
+
+          HTTP_CODE=$(curl -sS -o /tmp/fire-response.json -w '%{http_code}' \
+            -X POST "$FIRE_URL" \
+            -H "Authorization: Bearer ${FIRE_TOKEN}" \
+            -H 'anthropic-beta: experimental-cc-routine-2026-04-01' \
+            -H 'anthropic-version: 2023-06-01' \
+            -H 'Content-Type: application/json' \
+            -d "$BODY")
+
+          case "$HTTP_CODE" in
+            2*)
+              SESSION_URL=$(jq -r '.claude_code_session_url // empty' /tmp/fire-response.json)
+              echo "PR #${PR_NUMBER}: cloud session started (pass ${PR_PASS}): ${SESSION_URL}"
+              echo "- PR [#${PR_NUMBER}](https://github.com/${GITHUB_REPOSITORY}/pull/${PR_NUMBER}) — pass ${PR_PASS} — [cloud session](${SESSION_URL})" >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            *)
+              echo "::error::PR #${PR_NUMBER}: routine fire failed with HTTP ${HTTP_CODE} (401: bad or revoked token; 429: daily routine cap or rate limit reached)"
+              head -c 2000 /tmp/fire-response.json
+              echo
+              exit 1
+              ;;
+          esac
+
+      - name: ⏳ Hold the slot to stagger launches
+        run: |
+          # No public API exposes the cloud session's completion, so this
+          # only staggers the LAUNCHES (with max-parallel 2, about two
+          # fires per window) instead of starting MAX_PRS sessions at the
+          # same instant. It spreads the review-bot and CI load of the
+          # resulting pushes; it does not bound how many sessions are
+          # alive at once.
+          sleep $(( FIRE_STAGGER_MINUTES * 60 ))

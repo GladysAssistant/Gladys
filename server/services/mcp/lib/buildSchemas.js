@@ -5,7 +5,9 @@ const {
   DEVICE_FEATURE_TYPES,
   COVER_STATE,
   AI_CHAT_TOOL_CATEGORIES,
+  WEATHER_UNITS,
 } = require('../../../utils/constants');
+const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { normalize } = require('../../../utils/device');
 const { hexToInt, kelvinToMired } = require('../../../utils/colors');
 const {
@@ -18,6 +20,7 @@ const {
 } = require('./sceneSchemas');
 const { fetchWebPage } = require('./webRequest');
 const { compareTimes } = require('./compareTimes');
+const { formatWeather } = require('./formatWeather');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
 
@@ -44,6 +47,37 @@ const intervalByName = {
   'last-three-months': THREE_MONTHS_IN_MINUTES,
   'last-year': ONE_YEAR_IN_MINUTES,
 };
+
+/**
+ * @description Resolve a device type sent by the model to the feature categories of this home.
+ * @param {string} requestedType - Device type as sent by the model.
+ * @param {Array<string>} availableDeviceTypes - Feature categories available in this home.
+ * @returns {Array<string>} Matching feature categories, or the requested type when nothing matches.
+ * @example
+ * resolveDeviceTypes('temperature', ['temperature-sensor']);
+ */
+function resolveDeviceTypes(requestedType, availableDeviceTypes) {
+  const normalized = String(requestedType)
+    .trim()
+    .toLowerCase();
+
+  const exactMatch = availableDeviceTypes.find((category) => category.toLowerCase() === normalized);
+  if (exactMatch) {
+    return [exactMatch];
+  }
+
+  // Models routinely drop the category suffix and ask for "temperature" instead of
+  // "temperature-sensor". Several categories can share a prefix ("energy-sensor" and
+  // "energy-production-sensor"), so keep them all instead of silently picking whichever
+  // comes first. Returning the requested type untouched when nothing matches keeps
+  // "this category does not exist in this home" a distinct outcome.
+  const prefixMatches = availableDeviceTypes.filter((category) => category.toLowerCase().startsWith(`${normalized}-`));
+  if (prefixMatches.length > 0) {
+    return prefixMatches;
+  }
+
+  return [requestedType];
+}
 
 /**
  * @description Get all resources (room and devices) available for the MCP service.
@@ -241,11 +275,22 @@ async function getAllResources() {
  * getAllTools('0cd30aef-9c4e-4a23-88e3-3547971296e5')
  */
 async function getAllTools(userId) {
-  const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const rooms = (await this.gladys.room.getAll()).map(({ id, name, selector, house_id: houseId }) => ({
+    id,
+    name,
+    selector,
+    house_id: houseId,
+  }));
   rooms.push(noRoom);
   const scenes = (await this.gladys.scene.get()).map(({ id, name, selector }) => ({ id, name, selector }));
   const users = (await this.gladys.user.get()).map(({ id, name, selector }) => ({ id, name, selector }));
-  const houses = (await this.gladys.house.get()).map(({ id, name, selector }) => ({ id, name, selector }));
+  const allHouses = await this.gladys.house.get();
+  const houses = allHouses.map(({ id, name, selector }) => ({ id, name, selector }));
+  // Weather is fetched from coordinates: a house without them has no weather to
+  // report, and the tool is not exposed at all rather than failing at call time.
+  const housesWithCoordinates = allHouses
+    .filter(({ latitude, longitude }) => Number.isFinite(latitude) && Number.isFinite(longitude))
+    .map(({ id, name, selector, latitude, longitude }) => ({ id, name, selector, latitude, longitude }));
   const calendars = userId
     ? (await this.gladys.calendar.get(userId)).map(({ id, name, selector }) => ({ id, name, selector }))
     : [];
@@ -324,6 +369,14 @@ async function getAllTools(userId) {
         })
         .flat(),
     ),
+  ];
+  const availableDeviceTypes = [
+    ...new Set([
+      ...availableSensorFeatureCategories,
+      ...availableSwitchableFeatureCategories,
+      ...availableLightControlFeatureCategories,
+      ...availableShutterFeatureCategories,
+    ]),
   ];
   const deviceFeatureSelectors = allDevices
     .map((device) => device.features.map((feature) => feature.selector))
@@ -504,16 +557,12 @@ async function getAllTools(userId) {
           room: z
             .enum(rooms.map(({ name }) => name))
             .optional()
-            .describe('Room to get information from, leave empty to select multiple rooms.'),
+            .describe(
+              'Room to get information from. Only a room name from the list is accepted, ' +
+                'leave empty to cover the whole home.',
+            ),
           device_type: z
-            .enum([
-              ...new Set([
-                ...availableSensorFeatureCategories,
-                ...availableSwitchableFeatureCategories,
-                ...availableLightControlFeatureCategories,
-                ...availableShutterFeatureCategories,
-              ]),
-            ])
+            .enum(availableDeviceTypes)
             .optional()
             .describe('Type of device to query, leave empty to retrieve all devices.'),
         },
@@ -522,15 +571,65 @@ async function getAllTools(userId) {
         const states = [];
 
         let selectedDevices = [...sensorDevices, ...switchableDevices, ...lightControlDevices, ...shutterDevices];
+        let scopeLabel = '';
 
+        // The chat gateway runs this callback with the raw arguments produced by the
+        // model, which is not bound by the enums above. "Températures de la maison"
+        // makes it pass the house as a room: that used to resolve to no selector at
+        // all, filter every device out, and the empty result then reads as "no
+        // temperature sensor is configured at home".
         if (room && room !== '') {
-          const { selector } = this.findBySimilarity(rooms, room);
-          selectedDevices = selectedDevices.filter((d) => (d.room?.selector || noRoom.selector) === selector);
+          const selectedRoom = this.findBySimilarity(rooms, room);
+
+          if (selectedRoom?.selector) {
+            selectedDevices = selectedDevices.filter(
+              (d) => (d.room?.selector || noRoom.selector) === selectedRoom.selector,
+            );
+            scopeLabel = ` in room "${selectedRoom.name}"`;
+          } else {
+            const selectedHouse = this.findBySimilarity(houses, room);
+
+            if (selectedHouse?.id) {
+              // A house is the whole home, not a room: keep every device of its rooms,
+              // plus the devices that are not assigned to a room.
+              const houseRoomSelectors = rooms
+                .filter((r) => r.house_id === selectedHouse.id)
+                .map(({ selector }) => selector);
+              selectedDevices = selectedDevices.filter(
+                (d) => !d.room?.selector || houseRoomSelectors.includes(d.room.selector),
+              );
+              scopeLabel = ` in house "${selectedHouse.name}"`;
+            } else {
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text:
+                      `device.get-state: "${room}" is not a room of this home, no state was read. ` +
+                      // "No room" is the sentinel holding the devices that were never assigned
+                      // to a room, not a room the model should be invited to retry with.
+                      `Available rooms: ${rooms
+                        .filter(({ selector }) => selector !== noRoom.selector)
+                        .map(({ name }) => name)
+                        .join(', ')}. ` +
+                      'Call this tool again with one of them, or without the room parameter to cover the whole home.',
+                  },
+                ],
+              };
+            }
+          }
         }
 
-        if (deviceType && deviceType.length > 0) {
+        const requestedDeviceTypes = (Array.isArray(deviceType) ? deviceType : [deviceType]).filter(Boolean);
+        const deviceTypes = [
+          ...new Set(
+            requestedDeviceTypes.flatMap((requestedType) => resolveDeviceTypes(requestedType, availableDeviceTypes)),
+          ),
+        ];
+
+        if (deviceTypes.length > 0) {
           selectedDevices = selectedDevices.filter((device) => {
-            return device.features.some((feature) => deviceType.includes(feature.category));
+            return device.features.some((feature) => deviceTypes.includes(feature.category));
           });
         }
 
@@ -538,7 +637,7 @@ async function getAllTools(userId) {
           selectedDevices.map(async (device) => {
             const deviceLastState = await this.gladys.device.getBySelector(device.selector);
             return device.features.map((feature) => {
-              if (!deviceType || deviceType.length === 0 || deviceType.includes(feature.category)) {
+              if (deviceTypes.length === 0 || deviceTypes.includes(feature.category)) {
                 const featureLastState = deviceLastState.features.find((feat) => feat.id === feature.id);
 
                 states.push({
@@ -560,15 +659,14 @@ async function getAllTools(userId) {
         // An empty list is an ambiguous signal for the model, which tends to fill the
         // gap with a plausible value. Say explicitly that nothing is configured.
         if (states.length === 0) {
-          const typeLabel = deviceType && deviceType.length > 0 ? ` of type "${deviceType}"` : '';
-          const roomLabel = room && room !== '' ? ` in room "${room}"` : '';
+          const typeLabel = deviceTypes.length > 0 ? ` of type "${deviceTypes.join('", "')}"` : '';
 
           return {
             content: [
               {
                 type: 'text',
                 text:
-                  `device.get-state: no device${typeLabel} is configured${roomLabel}. ` +
+                  `device.get-state: no device${typeLabel} is configured${scopeLabel}. ` +
                   'No measurement exists for this query, do not report any value.',
               },
             ],
@@ -1222,9 +1320,7 @@ async function getAllTools(userId) {
           };
         }
 
-        if (useStringValue) {
-          await this.gladys.device.saveStringState(selectedDevice, selectedFeature, parsedValue);
-        }
+        // device.setValue persists string states of text features itself, nothing more to save
 
         return {
           content: [
@@ -1484,6 +1580,111 @@ async function getAllTools(userId) {
             {
               type: 'text',
               text: this.toon(response),
+            },
+          ],
+        };
+      },
+    });
+  }
+
+  if (housesWithCoordinates.length > 0) {
+    const defaultWeatherHouse = housesWithCoordinates[0];
+    tools.push({
+      intent: 'weather.get',
+      config: {
+        title: 'Get the weather at home',
+        description:
+          'Get the outside weather at the home location: the current conditions, the forecast for the coming hours ' +
+          'and the daily forecast for the coming days, plus the weather alerts published for that location. ' +
+          'Use it for every question about the weather, the outside temperature, rain, snow, wind, sun or ' +
+          'weather alerts, whether it is about now, today, tomorrow or one of the next days. ' +
+          'Never answer such a question from memory or from a previous answer: a forecast changes every hour. ' +
+          'The condition of a moment is one of clear, cloud, drizzle, fog, rain, sleet, snow, thunderstorm, wind, ' +
+          'night or unknown, and can be missing when the provider does not report it. ' +
+          'Temperatures, wind speeds and precipitation are expressed in the units given by the result. ' +
+          'The daily forecast is keyed by calendar date and does not necessarily start with today, ' +
+          'so always pick the date the user asked about instead of the first entry.',
+        categories: [AI_CHAT_TOOL_CATEGORIES.WEATHER, AI_CHAT_TOOL_CATEGORIES.OTHER],
+        inputSchema: {
+          house: z
+            .enum([...new Set(housesWithCoordinates.map(({ name }) => name))])
+            .describe(`Home to get the weather for. Defaults to ${defaultWeatherHouse.name}.`)
+            .optional(),
+        },
+      },
+      cb: async ({ house }) => {
+        const houseFound = house ? this.findBySimilarity(housesWithCoordinates, house) : null;
+        // A home asked for but not recognized must not be answered with another
+        // home's forecast: on a multi-home install that is a wrong answer the
+        // user cannot detect. With a single home there is nothing to
+        // disambiguate, so the only known location answers.
+        if (house && !houseFound?.selector && housesWithCoordinates.length > 1) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `weather.get: no home found matching "${house}". ` +
+                  `Available homes: ${housesWithCoordinates.map(({ name }) => name).join(', ')}. ` +
+                  'Ask the user which one instead of reporting the weather of another home.',
+              },
+            ],
+          };
+        }
+        const selectedHouse = houseFound?.selector ? houseFound : defaultWeatherHouse;
+
+        // The unit system and the language are the ones of the user talking to
+        // Gladys, like the weather routes: the provider answers in °C or °F
+        // depending on that preference. An MCP client without a Gladys user
+        // (Claude Desktop and friends) falls back to metric and English.
+        let units = WEATHER_UNITS.METRIC;
+        let language = 'en';
+        if (userId) {
+          try {
+            const user = await this.gladys.user.getById(userId);
+            units = user.distance_unit_preference || units;
+            language = user.language || language;
+          } catch (e) {
+            // an unknown user is not a reason to refuse the weather
+          }
+        }
+
+        let weather;
+        try {
+          weather = await this.gladys.weather.get({
+            latitude: selectedHouse.latitude,
+            longitude: selectedHouse.longitude,
+            language,
+            units,
+          });
+        } catch (e) {
+          // The two cases the user can act on, and nothing else: a raw provider
+          // message can carry transport internals (a request URL still holds
+          // its API key) and it would travel to the model, then to the chat.
+          const reason =
+            e instanceof ServiceNotConfiguredError
+              ? 'no weather integration is installed or configured in Gladys'
+              : 'the weather provider could not be reached';
+          return {
+            content: [
+              {
+                type: 'text',
+                text:
+                  `weather.get: no weather available for ${selectedHouse.name}, ${reason}. ` +
+                  'Tell the user, and do not give a forecast of your own.',
+              },
+            ],
+          };
+        }
+
+        const configuredTimezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+        const timezoneName = configuredTimezone || DEFAULT_TIMEZONE;
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: this.toon(formatWeather(weather, { house: selectedHouse.name, timezone: timezoneName, language })),
             },
           ],
         };

@@ -1,4 +1,6 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const PhilipsHueControllers = require('../../../../services/philips-hue/api/hue.controller');
 
 const philipsHueLightService = {

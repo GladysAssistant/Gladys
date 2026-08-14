@@ -1,7 +1,8 @@
 const EventEmitter = require('events');
 const { expect } = require('chai');
-const { assert, fake } = require('sinon');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const Device = require('../../../../lib/device');
 const Room = require('../../../../lib/room');
 const StateManager = require('../../../../lib/state');

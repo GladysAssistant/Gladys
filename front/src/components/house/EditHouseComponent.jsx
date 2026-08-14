@@ -32,6 +32,9 @@ class EditHouseComponent extends Component {
   updateHouseDelayBeforeArming = e => {
     this.props.updateHouseDelayBeforeArming(e.target.value, this.props.houseIndex);
   };
+  selectHouseLocation = (latitude, longitude) => {
+    this.props.updateHouseLocation(latitude, longitude, this.props.houseIndex);
+  };
   addRoom = () => {
     this.props.addRoom(this.state.newRoomName, this.props.houseIndex);
     this.setState({
@@ -102,6 +105,7 @@ class EditHouseComponent extends Component {
         updateNewRoomName={this.updateNewRoomName}
         updateHouseAlarmCode={this.updateHouseAlarmCode}
         updateHouseDelayBeforeArming={this.updateHouseDelayBeforeArming}
+        selectHouseLocation={this.selectHouseLocation}
         newRoomName={newRoomName}
         addRoom={this.addRoom}
         removeRoom={this.removeRoom}

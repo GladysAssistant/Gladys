@@ -24,6 +24,7 @@ import CheckUserPresence from './actions/CheckUserPresence';
 import CheckTime from './actions/CheckTime';
 import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
 import CalendarIsEventRunning from './actions/CalendarIsEventRunning';
+import CalendarGetEvents from './actions/CalendarGetEvents';
 import EcowattCondition from './actions/EcowattCondition';
 import SendMessageCameraParams from './actions/SendMessageCameraParams';
 import CheckAlarmMode from './actions/CheckAlarmMode';
@@ -35,6 +36,8 @@ import EdfTempoCondition from './actions/EdfTempoCondition';
 import AskAI from './actions/AskAI';
 import SendSms from './actions/SendSms';
 import ConditionIfElseThen from './actions/ConditionIfElseThen';
+import ConditionWhile from './actions/ConditionWhile';
+import SetVariable from './actions/SetVariable';
 
 const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
@@ -48,6 +51,7 @@ const ACTION_ICON = {
   [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square',
   [ACTIONS.MESSAGE.SEND_CAMERA]: 'fe fe-message-square',
   [ACTIONS.CONDITION.IF_THEN_ELSE]: 'fe fe-shuffle',
+  [ACTIONS.CONDITION.WHILE]: 'fe fe-repeat',
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',
   [ACTIONS.DEVICE.GET_VALUE]: 'fe fe-refresh-cw',
   [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
@@ -60,6 +64,7 @@ const ACTION_ICON = {
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
   [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
   [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar',
+  [ACTIONS.CALENDAR.GET_EVENTS]: 'fe fe-calendar',
   [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap',
   [ACTIONS.EDF_TEMPO.CONDITION]: 'fe fe-zap',
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
@@ -68,7 +73,8 @@ const ACTION_ICON = {
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.AI.ASK]: 'fe fe-cpu',
-  [ACTIONS.SMS.SEND]: 'fe fe-message-circle'
+  [ACTIONS.SMS.SEND]: 'fe fe-message-circle',
+  [ACTIONS.VARIABLE.SET]: 'fe fe-hash'
 };
 
 const ACTION_COMPONENTS = {
@@ -95,6 +101,7 @@ const ACTION_COMPONENTS = {
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: HouseEmptyOrNotCondition,
   [ACTIONS.DEVICE.SET_VALUE]: DeviceSetValue,
   [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: CalendarIsEventRunning,
+  [ACTIONS.CALENDAR.GET_EVENTS]: CalendarGetEvents,
   [ACTIONS.ECOWATT.CONDITION]: EcowattCondition,
   [ACTIONS.EDF_TEMPO.CONDITION]: EdfTempoCondition,
   [ACTIONS.ALARM.CHECK_ALARM_MODE]: CheckAlarmMode,
@@ -104,7 +111,9 @@ const ACTION_COMPONENTS = {
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: PlayNotification,
   [ACTIONS.AI.ASK]: AskAI,
   [ACTIONS.SMS.SEND]: SendSms,
-  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen
+  [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen,
+  [ACTIONS.CONDITION.WHILE]: ConditionWhile,
+  [ACTIONS.VARIABLE.SET]: SetVariable
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
@@ -115,7 +124,7 @@ const getDragAndDropType = (actionType, path) => {
   if (path.includes('if')) {
     return CONDITION_CARD_TYPE;
   }
-  if (actionType === ACTIONS.CONDITION.IF_THEN_ELSE) {
+  if (actionType === ACTIONS.CONDITION.IF_THEN_ELSE || actionType === ACTIONS.CONDITION.WHILE) {
     return ACTION_CARD_IF_THEN_ELSE_TYPE;
   }
   return ACTION_CARD_TYPE;
@@ -156,18 +165,23 @@ const ActionCard = ({ children, ...props }) => {
       class={cx({
         'col-lg-12':
           props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF ||
-          props.action.type === ACTIONS.CONDITION.IF_THEN_ELSE,
+          props.action.type === ACTIONS.CONDITION.IF_THEN_ELSE ||
+          props.action.type === ACTIONS.CONDITION.WHILE,
         'col-lg-6':
           props.action.type === ACTIONS.MESSAGE.SEND ||
           props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
+          props.action.type === ACTIONS.CALENDAR.GET_EVENTS ||
           props.action.type === ACTIONS.MQTT.SEND ||
           props.action.type === ACTIONS.ZIGBEE2MQTT.SEND ||
           props.action.type === ACTIONS.LIGHT.BLINK ||
           props.action.type === ACTIONS.SMS.SEND,
         'col-lg-4':
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
+          props.action.type !== ACTIONS.CONDITION.IF_THEN_ELSE &&
+          props.action.type !== ACTIONS.CONDITION.WHILE &&
           props.action.type !== ACTIONS.MESSAGE.SEND &&
           props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING &&
+          props.action.type !== ACTIONS.CALENDAR.GET_EVENTS &&
           props.action.type !== ACTIONS.SMS.SEND
       })}
     >

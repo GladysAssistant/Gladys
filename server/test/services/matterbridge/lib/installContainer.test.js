@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 
@@ -79,9 +79,9 @@ describe('Matterbridge installContainer', () => {
     expect(createContainerCall.name).to.equal('gladys-matterbridge');
     expect(createContainerCall.Image).to.equal('luligu/matterbridge:latest');
     expect(createContainerCall.HostConfig.Binds).to.deep.equal([
-      '../.tmp/matterbridge/Matterbridge:/root/Matterbridge',
-      '../.tmp/matterbridge/.matterbridge:/root/.matterbridge',
-      '../.tmp/matterbridge/.mattercert:/root/.mattercert',
+      `${TEMP_GLADYS_FOLDER}/matterbridge/Matterbridge:/root/Matterbridge`,
+      `${TEMP_GLADYS_FOLDER}/matterbridge/.matterbridge:/root/.matterbridge`,
+      `${TEMP_GLADYS_FOLDER}/matterbridge/.mattercert:/root/.mattercert`,
     ]);
     expect(createContainerCall.HostConfig.NetworkMode).to.equal('host');
 

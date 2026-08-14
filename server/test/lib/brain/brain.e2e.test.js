@@ -1,4 +1,6 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const { expect } = require('chai');
 const MessageHandler = require('../../../lib/message');
 const { EVENTS } = require('../../../utils/constants');

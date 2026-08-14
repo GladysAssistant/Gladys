@@ -4,8 +4,8 @@
   "description": "A privacy-first, open-source home assistant",
   "main": "index.js",
   "engines": {
-    "node": "22.x",
-    "npm": "10.x"
+    "node": "24.x",
+    "npm": "11.x"
   },
   "scripts": {
     "postinstall": "npm run install-front:dev",

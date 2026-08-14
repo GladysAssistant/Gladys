@@ -25,7 +25,25 @@ module.exports = function HomeKitController(homekitHandler) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/service/homekit/device Get HomeKit compatible devices
+   * @apiName getDevices
+   * @apiGroup HomeKit
+   */
+  async function getDevices(req, res) {
+    const devices = await homekitHandler.getCompatibleDevices();
+    // House alarms are offered alongside the devices: they are not devices, but the exposure
+    // setting is a single allow list of selectors and they have to be selectable like the rest.
+    const alarms = await homekitHandler.getCompatibleAlarms();
+    res.json([...devices, ...alarms].map(({ name, selector }) => ({ name, selector })));
+  }
+
   return {
+    'get /api/v1/service/homekit/device': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(getDevices),
+    },
     'get /api/v1/service/homekit/reload': {
       authenticated: true,
       admin: true,

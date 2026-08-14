@@ -3,13 +3,14 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "22.x",
-    "npm": "10.x"
+    "node": "24.x",
+    "npm": "11.x"
   },
   "scripts": {
     "postinstall": "node ./cli/install_service_dependencies.js",
-    "test": "cross-env NODE_ENV=test SQLITE_FILE_PATH=./gladys-test.db ./node_modules/mocha/bin/mocha --require ./test/setup-env.js --recursive ./test/bootstrap.test.js \"./test/**/*.test.js\" --exit",
-    "test-service": "cross-env NODE_ENV=test SQLITE_FILE_PATH=/tmp/gladys-test.db ./node_modules/mocha/bin/mocha --require ./test/setup-env.js --recursive ./test/bootstrap.test.js \"./test/services/$npm_config_service/*.test.js\" \"./test/services/$npm_config_service/**/*.test.js\" --exit",
+    "test": "cross-env NODE_ENV=test SQLITE_FILE_PATH=./gladys-test.db ./node_modules/mocha/bin/mocha --require ./test/setup-env.js --require ./test/hooks.js --parallel --recursive \"./test/**/*.test.js\" --exit",
+    "test-serial": "cross-env NODE_ENV=test SQLITE_FILE_PATH=./gladys-test.db ./node_modules/mocha/bin/mocha --require ./test/setup-env.js --require ./test/hooks.js --recursive \"./test/**/*.test.js\" --exit",
+    "test-service": "cross-env NODE_ENV=test SQLITE_FILE_PATH=/tmp/gladys-test.db ./node_modules/mocha/bin/mocha --require ./test/setup-env.js --require ./test/hooks.js \"./test/services/$npm_config_service/*.test.js\" \"./test/services/$npm_config_service/**/*.test.js\" --exit",
     "coverage": "c8 npm test && c8 report --reporter=text-lcov > coverage.lcov",
     "prettier-check": "prettier --check '**/*.js' '**/*.json'",
     "prettier": "prettier --write '**/*.js' '**/*.json'",
@@ -108,7 +109,7 @@
     "queue": "^6.0.2",
     "rate-limiter-flexible": "^3.0.2",
     "semver": "^7.3.8",
-    "sequelize": "^6.26.0",
+    "sequelize": "^6.29.0",
     "sequelize-cli": "^6.5.2",
     "set-value": "^4.1.0",
     "sharp": "^0.33.2",

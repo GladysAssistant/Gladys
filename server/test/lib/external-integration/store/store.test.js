@@ -1,6 +1,8 @@
 const { expect } = require('chai');
 const nock = require('nock');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 
 const { NotFoundError, BadParameters, ConflictError } = require('../../../../utils/coreErrors');
 const { Error422 } = require('../../../../utils/httpErrors');
@@ -253,6 +255,33 @@ describe('externalIntegration store', () => {
       const incompatibleEntry = catalog.integrations.find((entry) => entry.store_slug === 'jane/gladys-incompatible');
       expect(incompatibleEntry).to.include({ installed: false, compatible: false });
       expect(incompatibleEntry.docs).to.equal(null);
+    });
+
+    it('should project the indexer categories, dropping unknown keys, and first_seen_at', async () => {
+      const { externalIntegration } = buildSupervisor();
+      externalIntegration.storeIndex = {
+        index_format: 1,
+        integrations: [
+          {
+            store_slug: 'john/gladys-categorized',
+            manifest: TEST_MANIFEST,
+            // 'brand-new-shelf' comes from a newer vocabulary than this
+            // instance: dropped from the projection, never a rejection
+            categories: ['climate', 'brand-new-shelf', 'energy'],
+            first_seen_at: '2026-08-01T00:00:00.000Z',
+          },
+          {
+            store_slug: 'jane/gladys-uncategorized',
+            manifest: TEST_MANIFEST,
+          },
+        ],
+      };
+      externalIntegration.storeIndexFetchedAt = Date.now();
+      const catalog = await externalIntegration.getCatalog();
+      expect(catalog.integrations[0].categories).to.deep.equal(['climate', 'energy']);
+      expect(catalog.integrations[0].first_seen_at).to.equal('2026-08-01T00:00:00.000Z');
+      expect(catalog.integrations[1].categories).to.deep.equal([]);
+      expect(catalog.integrations[1].first_seen_at).to.equal(null);
     });
 
     it('should treat a malformed gladys_version range as incompatible', async () => {

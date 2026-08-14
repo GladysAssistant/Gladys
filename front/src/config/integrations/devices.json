@@ -3,36 +3,42 @@
     "key": "rtspCamera",
     "link": "rtsp-camera",
     "img": "/assets/integrations/cover/rtsp-camera.jpg",
-    "local": true
+    "local": true,
+    "categories": ["security"]
   },
   {
     "key": "xiaomi",
     "img": "/assets/integrations/cover/xiaomi.jpg",
-    "local": true
+    "local": true,
+    "categories": ["protocols"]
   },
   {
     "key": "mqtt",
     "img": "/assets/integrations/cover/mqtt.jpg",
     "whiteBackground": true,
-    "local": true
+    "local": true,
+    "categories": ["protocols"]
   },
   {
     "key": "zigbee2mqtt",
     "img": "/assets/integrations/cover/zigbee2mqtt.jpg",
     "whiteBackground": true,
-    "local": true
+    "local": true,
+    "categories": ["protocols"]
   },
   {
     "key": "philipsHue",
     "link": "philips-hue",
     "img": "/assets/integrations/cover/philips-hue.jpg",
     "local": true,
-    "deprecated": true
+    "deprecated": true,
+    "categories": ["lighting"]
   },
   {
     "key": "tasmota",
     "img": "/assets/integrations/cover/tasmota.jpg",
-    "local": true
+    "local": true,
+    "categories": ["lighting", "energy"]
   },
   {
     "key": "tpLink",
@@ -40,31 +46,36 @@
     "img": "/assets/integrations/cover/tp-link.jpg",
     "invertInDarkMode": true,
     "local": true,
-    "deprecated": true
+    "deprecated": true,
+    "categories": ["lighting"]
   },
   {
     "key": "bluetooth",
     "img": "/assets/integrations/cover/bluetooth.jpg",
     "whiteBackground": true,
-    "local": true
+    "local": true,
+    "categories": ["network", "protocols"]
   },
   {
     "key": "eWeLink",
     "img": "/assets/integrations/cover/ewelink.jpg",
     "whiteBackground": true,
-    "cloud": true
+    "cloud": true,
+    "categories": ["lighting"]
   },
   {
     "key": "owntracks",
     "img": "/assets/integrations/cover/owntracks.jpg",
     "whiteBackground": true,
-    "gladysPlus": true
+    "gladysPlus": true,
+    "categories": ["network"]
   },
   {
     "key": "broadlink",
     "img": "/assets/integrations/cover/broadlink.jpg",
     "whiteBackground": true,
-    "local": true
+    "local": true,
+    "categories": ["protocols", "multimedia"]
   },
   {
     "key": "nuki",
@@ -72,21 +83,24 @@
     "img": "/assets/integrations/cover/nuki.jpg",
     "whiteBackground": true,
     "local": true,
-    "cloud": true
+    "cloud": true,
+    "categories": ["security"]
   },
   {
     "key": "enedis",
     "img": "/assets/integrations/cover/enedis.jpg",
     "whiteBackground": true,
     "gladysPlus": true,
-    "cloud": true
+    "cloud": true,
+    "categories": ["energy"]
   },
   {
     "key": "lanManager",
     "link": "lan-manager",
     "img": "/assets/integrations/cover/lan-manager.jpg",
     "invertInDarkMode": true,
-    "local": true
+    "local": true,
+    "categories": ["network"]
   },
   {
     "key": "tuya",
@@ -94,7 +108,8 @@
     "img": "/assets/integrations/cover/tuya.jpg",
     "invertInDarkMode": true,
     "cloud": true,
-    "deprecated": true
+    "deprecated": true,
+    "categories": ["lighting", "climate"]
   },
   {
     "key": "melcloud",
@@ -102,68 +117,79 @@
     "img": "/assets/integrations/cover/melcloud.jpg",
     "whiteBackground": true,
     "cloud": true,
-    "deprecated": true
+    "deprecated": true,
+    "categories": ["climate"]
   },
   {
     "key": "nodeRed",
     "link": "node-red",
     "img": "/assets/integrations/cover/node-red.jpg",
     "whiteBackground": true,
-    "local": true
+    "local": true,
+    "categories": ["protocols"]
   },
   {
     "key": "matterbridge",
     "link": "matterbridge",
     "img": "/assets/integrations/cover/matterbridge.jpg",
     "whiteBackground": true,
-    "local": true
+    "local": true,
+    "categories": ["protocols"]
   },
   {
     "key": "netatmo",
     "link": "netatmo",
     "img": "/assets/integrations/cover/netatmo.jpg",
     "cloud": true,
-    "deprecated": true
+    "deprecated": true,
+    "categories": ["climate", "security", "environment"]
   },
   {
     "key": "sonos",
     "link": "sonos",
     "img": "/assets/integrations/cover/sonos.jpg",
     "invertInDarkMode": true,
-    "local": true
+    "local": true,
+    "categories": ["multimedia"]
   },
   {
     "key": "zwavejs-ui",
     "link": "zwavejs-ui",
     "img": "/assets/integrations/cover/zwave-js-ui.jpg",
     "invertInDarkMode": true,
-    "local": true
+    "local": true,
+    "deprecated": true,
+    "categories": ["protocols"]
   },
   {
     "key": "google-cast",
     "link": "google-cast",
     "img": "/assets/integrations/cover/google-cast.jpg",
-    "local": true
+    "local": true,
+    "categories": ["multimedia"]
   },
   {
     "key": "airplay",
     "link": "airplay",
     "img": "/assets/integrations/cover/airplay.jpg",
     "invertInDarkMode": true,
-    "local": true
+    "local": true,
+    "categories": ["multimedia"]
   },
   {
     "key": "matter",
     "link": "matter",
     "img": "/assets/integrations/cover/matter.jpg",
     "invertInDarkMode": true,
-    "local": true
+    "local": true,
+    "categories": ["protocols"]
   },
   {
     "key": "energyMonitoring",
     "link": "energy-monitoring",
     "img": "/assets/integrations/cover/energy-monitoring.jpg",
     "invertInDarkMode": true,
-    "local": true
+    "local": true,
+    "categories": ["energy"]
   }
 ]

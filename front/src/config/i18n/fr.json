@@ -87,6 +87,25 @@
       "closeButton": "Fermer"
     }
   },
+  "devicesList": {
+    "title": "Appareils",
+    "deviceCount": {
+      "one": "1 appareil",
+      "other": "{{count}} appareils"
+    },
+    "searchPlaceholder": "Rechercher des appareils",
+    "allRooms": "Toutes les pièces",
+    "noRoom": "Aucune pièce",
+    "allIntegrations": "Toutes les intégrations",
+    "device": "Appareil",
+    "room": "Pièce",
+    "integration": "Intégration",
+    "features": "Fonctionnalités",
+    "openInIntegration": "Ouvrir dans l'intégration",
+    "emptyState": "Aucun appareil trouvé. Ajoutez des appareils depuis la page des intégrations, ou modifiez votre recherche et vos filtres.",
+    "emptyStateButton": "Parcourir les intégrations",
+    "error": "Une erreur est survenue lors du chargement des appareils. Veuillez réessayer plus tard."
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Bienvenue",
@@ -224,7 +243,12 @@
       "houseNameLabel": "Nom",
       "houseNamePlaceHolder": "Entrez le nom de votre maison",
       "houseNameError": "Le nom de la maison est requis",
-      "houseLocationLabel": "Sélectionnez l'emplacement de votre maison",
+      "houseLocationLabel": "Recherchez votre adresse ou cliquez sur la carte pour situer votre maison",
+      "addressSearchPlaceholder": "Tapez l'adresse de votre maison",
+      "addressSearchButton": "Rechercher",
+      "addressSearchPrivacyNotice": "La recherche d'adresse utilise OpenStreetMap (Nominatim) : l'adresse saisie est envoyée à ce service tiers.",
+      "addressSearchNoResults": "Aucun résultat trouvé, essayez en précisant la ville ou le pays.",
+      "addressSearchError": "Impossible de rechercher l'adresse, vérifiez votre connexion internet.",
       "roomsLabel": "Ajoutez toutes les pièces de votre maison",
       "roomNamePlaceHolder": "Entrez une nouvelle pièce pour l'ajouter",
       "addRoomButton": "Ajouter",
@@ -321,7 +345,8 @@
       "energy-consumption": "Consommation Énergétique",
       "voice-assistant": "Assistant vocal",
       "link": "Lien",
-      "photo": "Photo"
+      "photo": "Photo",
+      "sun": "Soleil"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -338,13 +363,18 @@
         "providerInternalOpenWeather": "OpenWeather interne (déprécié)",
         "editModeLabel": "Mode d'affichage :",
         "displayModes": {
-          "advancedWeather": "Humidité et vitesse du vent",
+          "dateLocation": "Date et lieu",
+          "currentWeather": "Météo actuelle",
+          "alerts": "Alertes météo",
+          "advancedWeather": "Détails météo (humidité, vent, UV, lune…)",
           "hourlyForecast": "Prévisions pour les 24 prochaines heures",
           "dailyForecast": "Prévisions pour les 5 prochains jours",
           "providerImages": "Images du fournisseur (carte de vigilance, radar de pluie…)"
         },
+        "noModeSelected": "Sélectionnez au moins un mode d'affichage, sinon le widget restera vide.",
         "minMaxDegreeValue": "{{min}}°/{{max}}°",
         "uv": "UV",
+        "windGustTitle": "Rafales de vent (le fournisseur ne donne pas de vent moyen pour ce jour)",
         "alertTypes": {
           "wind": "Vent violent",
           "rain": "Pluie-inondation",
@@ -356,6 +386,42 @@
           "avalanche": "Avalanches",
           "coastal": "Vagues-submersion",
           "fog": "Brouillard"
+        },
+        "conditions": {
+          "clear": "Ciel dégagé",
+          "partly-cloudy": "Peu nuageux",
+          "cloud": "Nuageux",
+          "fog": "Brouillard",
+          "drizzle": "Bruine",
+          "rain": "Pluie",
+          "pouring": "Fortes pluies",
+          "sleet": "Pluie et neige mêlées",
+          "hail": "Grêle",
+          "snow": "Neige",
+          "thunderstorm": "Orages",
+          "wind": "Vent",
+          "night": "Nuit",
+          "unknown": "Indisponible"
+        },
+        "moonPhases": {
+          "0": "Nouvelle lune",
+          "1": "Premier croissant",
+          "2": "Premier quartier",
+          "3": "Gibbeuse croissante",
+          "4": "Pleine lune",
+          "5": "Gibbeuse décroissante",
+          "6": "Dernier quartier",
+          "7": "Dernier croissant"
+        },
+        "windCardinals": {
+          "n": "N",
+          "ne": "NE",
+          "e": "E",
+          "se": "SE",
+          "s": "S",
+          "sw": "SO",
+          "w": "O",
+          "nw": "NO"
         }
       },
       "devicesInRoom": {
@@ -367,6 +433,7 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Mouvement détecté",
+        "noMotionDetected": "Pas de mouvement",
         "doorbellRinging": "Sonne",
         "pushButton": "Appuyer",
         "vacuumDock": "Retour à la base"
@@ -474,6 +541,19 @@
         "nextPeriod": "Période suivante",
         "currentPeriod": "En cours",
         "backToNow": "Revenir à maintenant"
+      },
+      "sun": {
+        "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour calculer la position du soleil.",
+        "sunrise": "Lever du soleil",
+        "sunset": "Coucher du soleil",
+        "dawn": "Aube",
+        "solarNoon": "Midi solaire",
+        "dusk": "Crépuscule",
+        "azimuth": "Azimut",
+        "elevation": "Élévation",
+        "noHouse": "Veuillez sélectionner une maison dans les paramètres du widget.",
+        "noCoordinates": "Cette maison n'a pas de coordonnées. Veuillez d'abord configurer sa localisation.",
+        "error": "Une erreur est survenue lors de la récupération des données du soleil, merci de réessayer."
       },
       "ecowatt": {
         "title": "Ecowatt France",
@@ -633,11 +713,13 @@
       "local": "Local",
       "external": "Communauté",
       "native": "Natif",
-      "deprecated": "Bientôt dépréciée"
+      "deprecated": "Bientôt dépréciée",
+      "new": "Nouveau"
     },
     "root": {
       "title": "Intégrations",
-      "subtitle": "{{length}} de {{total}} intégrations",
+      "subtitle": "{{length}} sur {{total}} intégrations",
+      "subtitleTotal": "{{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
       "noIntegrations": "Aucune intégration trouvée",
       "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
@@ -656,17 +738,23 @@
         "title": "Votre appareil n'est pas dans la liste ?",
         "description": "De nombreux appareils peuvent être connectés via <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocole universel). Votre appareil peut aussi être pris en charge par une <b>intégration externe</b> de la communauté : chacun peut en créer une et la publier dans le store, elle apparaît alors dans cette liste. Consultez la <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">documentation des intégrations externes</a>."
       },
+      "orderDirNewest": "Nouveautés d'abord",
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
         "updates": "À mettre à jour",
-        "device": "Appareils",
-        "communication": "Communication",
-        "calendar": "Calendrier",
-        "music": "Musique",
-        "health": "Santé",
-        "weather": "Météo",
-        "navigation": "Navigation"
+        "climate": "Chauffage & climatisation",
+        "lighting": "Éclairage, prises & volets",
+        "energy": "Énergie",
+        "security": "Caméras & sécurité",
+        "multimedia": "Multimédia",
+        "appliances": "Électroménager & jardin",
+        "environment": "Météo & environnement",
+        "protocols": "Protocoles & passerelles",
+        "network": "Réseau & présence",
+        "notifications": "Messages & notifications",
+        "assistants": "Assistants vocaux & IA",
+        "services": "Services"
       }
     },
     "externalIntegration": {
@@ -850,7 +938,6 @@
         "updateTitle": "L'intégration a re-publié cet appareil avec une structure différente : appliquer la nouvelle définition"
       },
       "install": {
-        "backToCatalog": "Retour aux intégrations",
         "notFound": "Cette intégration n'a pas été trouvée dans le store.",
         "starsLabel": "étoiles",
         "lastPushLabel": "Dernière mise à jour :",
@@ -865,6 +952,8 @@
         "installButton": "Installer",
         "networkDiscoveryTitle": "Demandes de découverte réseau",
         "networkDiscoveryText": "Cette intégration demande à Gladys de capturer pour elle les annonces réseau suivantes. Elle ne pourra jamais rien capturer d'autre.",
+        "networkWakeTitle": "Accès Wake-on-LAN",
+        "networkWakeText": "Cette intégration demande l’autorisation d’envoyer des paquets Wake-on-LAN via Gladys sur votre réseau local.",
         "locationText": "Cette intégration demande l'accès aux coordonnées (latitude/longitude) des maisons configurées dans Gladys.",
         "documentationLink": "Documentation",
         "duplicateWarningTitle": "Une autre instance est déjà installée",
@@ -888,7 +977,7 @@
         "repoUrlPlaceholder": "https://github.com/owner/repository",
         "installButton": "Installer",
         "devModeLink": "Mode développeur : installer depuis une image Docker",
-        "devModeDescription": "Installez une intégration directement depuis une image Docker, avec un manifeste optionnel. Réservé aux développeurs d’intégrations.",
+        "devModeDescription": "Installez une intégration directement depuis une image Docker, avec un manifeste optionnel. L’image peut être construite localement avec docker build, sans registre. Réservé aux développeurs d’intégrations.",
         "dockerImageLabel": "Image Docker",
         "dockerImagePlaceholder": "ex. monuser/mon-integration:latest",
         "manifestLabel": "Manifeste (JSON, optionnel)",
@@ -1768,6 +1857,14 @@
       "description": "Connectez Gladys à HomeKit et utilisez Siri pour lui parler.",
       "introduction": "Pour connecter Gladys à HomeKit, vous devez être en possession d'un appareil compatible Apple (iPhone, iPad, iPod touch).",
       "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
+      "exposure": "Par défaut Gladys expose tous les appareils compatibles à HomeKit. Vous pouvez à la place choisir les appareils que vous souhaitez voir dans l'application Maison.",
+      "exposureModeAll": "Exposer tous les appareils compatibles",
+      "exposureModeSelection": "Exposer uniquement les appareils sélectionnés",
+      "noCompatibleDevice": "Aucun appareil de votre Gladys ne peut encore être exposé à HomeKit.",
+      "alarmLabel": "Alarme",
+      "saveExposureButton": "Enregistrer les appareils exposés",
+      "saveExposureSuccess": "Appareils exposés enregistrés. Le pont HomeKit redémarre automatiquement, votre appairage est conservé.",
+      "saveExposureError": "Une erreur est survenue lors de l'enregistrement des appareils exposés.",
       "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
       "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparaît pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
       "reloadButton": "Relancer",
@@ -2746,11 +2843,12 @@
       "firstExplanation": "Gladys peut utiliser une intelligence artificielle (modèles IA open-weight, hébergés en France chez Scaleway) pour vous permettre de communiquer avec votre maison connectée.",
       "examplesIntro": "Voici ce que tu peux faire avec l'IA :",
       "examplesChatTitle": "Dans le chat Gladys",
-      "examplesChatHint": "Actions disponibles : lumières et prises par pièce, caméras, scènes, température et humidité.",
+      "examplesChatHint": "Actions disponibles : lumières et prises par pièce, caméras, scènes, température, humidité et météo.",
       "exampleChat1": "« Allume la lumière du salon. »",
       "exampleChat2": "« Montre-moi la caméra du garage. »",
       "exampleChat3": "« Lance la scène « Bonne nuit ». »",
       "exampleChat4": "« Quelle température fait-il dans la chambre ? »",
+      "exampleChat5": "« Quel temps fera-t-il demain ? »",
       "examplesSceneTitle": "Dans tes scènes (IA proactive)",
       "examplesSceneIntro": "L'action « Demander à l'IA » peut s'exécuter à intervalle régulier pour surveiller ta maison et réagir automatiquement.",
       "exampleScene1": "Toutes les 30 minutes : analyse la caméra de l'entrée et vérifie si la voiture garée devant correspond bien à ma plaque d'immatriculation.",
@@ -2926,6 +3024,7 @@
       "keyNameLabel": "Clé :",
       "registeredLabel": "Enregistré le :"
     },
+    "backToIntegrations": "Retour aux intégrations",
     "deprecationWarning": "Cette intégration native sera bientôt <b>dépréciée</b> au profit d'une intégration externe équivalente maintenue par la communauté. Les deux versions vont co-exister dans le catalogue pendant la transition — vous pouvez continuer à utiliser celle-ci pour le moment."
   },
   "editScene": {
@@ -2975,16 +3074,20 @@
       },
       "messageSend": {
         "userLabel": "Utilisateur",
+        "serviceLabel": "Envoyer via",
+        "allServicesLabel": "Tous les services configurés",
+        "serviceExplanation": "Choisissez le service de messagerie qui enverra ce message. Par défaut, le message est envoyé sur tous les services configurés par l'utilisateur.",
+        "serviceUnavailable": "indisponible",
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
-        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
       },
       "messageCameraSend": {
         "userLabel": "Utilisateur",
         "cameraLabel": "Camera",
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
-        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
       },
       "askAi": {
         "description": "Cette action enverra un message à l'IA via Gladys Plus et vous répondra par message. Si vous joignez une image de caméra, l'IA pourra voir ce qu'il y a sur l'image et même faire une action en conséquence.",
@@ -2992,11 +3095,11 @@
         "cameraLabel": "Joindre une image de caméra (optionnel)",
         "textLabel": "Ma question pour l'IA",
         "textPlaceholder": "Texte du message",
-        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
       },
       "smsSend": {
         "textLabel": "Message",
-        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
       "turnOnLights": {
@@ -3037,14 +3140,28 @@
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
         "deviceLabel": "Sélectionnez un appareil"
       },
+      "setVariable": {
+        "description": "Cette action vous permet de définir une variable, que vous pourrez ensuite réutiliser dans les actions suivantes de la scène.",
+        "nameLabel": "Nom de la variable",
+        "namePlaceholder": "Ex : temps d'attente",
+        "valueTypeText": "Texte",
+        "valueTypeComputed": "Calculée",
+        "textExplanationText": "Entrez ici la valeur de la variable. Pour injecter une autre variable dans le texte, tapez '{{'.",
+        "textPlaceholder": "Valeur de la variable",
+        "computedExplanationText": "Entrez ici un calcul, son résultat sera stocké dans la variable. Pour injecter une variable dans le calcul, tapez '{{'.",
+        "computedPlaceholder": "Ex : 2 * 3"
+      },
       "deviceSetValue": {
         "description": "Cette action vous permet de contrôler un appareil.",
         "deviceLabel": "Appareil",
         "valueLabel": "Valeur",
         "valueTypeSimple": "Simple",
         "simpleExplanationText": "Entrez ici la nouvelle valeur que vous souhaitez assigner à votre appareil.",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
         "valueTypeComputed": "Calculée",
-        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc."
+        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc.",
+        "textExplanationText": "Entrez ici le texte à envoyer à votre appareil. Pour injecter une variable de scène dans le texte, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
@@ -3056,7 +3173,7 @@
         "useCustomValue": "Saisir une valeur personnalisée",
         "useValueList": "Choisir dans la liste des valeurs",
         "logicExplanationText": "Les conditions de ce bloc sont reliées par un OU : le bloc est validé dès qu'une seule d'entre elles est réalisée. Pour faire un ET, ajoutez plusieurs blocs « Condition sur variables » : ils devront alors tous être validés.",
-        "explanationText": "Dans le champ de valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
+        "explanationText": "Dans le champ de valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc condition."
       },
       "conditionIfThenElse": {
         "conditions": "Conditions",
@@ -3070,6 +3187,20 @@
         "shortIf": "S",
         "shortThen": "A",
         "shortElse": "S",
+        "actionCount": {
+          "zero": "Aucune action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
+      },
+      "conditionWhile": {
+        "conditions": "Conditions",
+        "conditionDescription": "Tant que toutes les conditions sont réalisées, les actions du bloc \"Répéter...\" seront exécutées en boucle. Contrairement aux autres blocs, les conditions sont évaluées l'une après l'autre, dans l'ordre d'affichage, et réévaluées avant chaque itération. Une action \"Récupérer le dernier état\" placée avant une condition rafraîchit donc sa valeur à chaque tour de boucle.",
+        "noCondition": "Aucune condition ajoutée. Cliquez sur le bouton '+' pour ajouter une condition à ce bloc. Sans condition, la boucle ne s'exécutera pas.",
+        "addCondition": "Ajouter une condition",
+        "repeat": "Répéter...",
+        "maxIterationsLabel": "Nombre maximum d'itérations (limite de sécurité)",
+        "maxIterationsDescription": "Lorsque cette limite est atteinte, seule la boucle s'arrête : les actions suivantes de la scène sont quand même exécutées.",
         "actionCount": {
           "zero": "Aucune action",
           "one": "1 action",
@@ -3114,7 +3245,7 @@
         "headersValuePlaceholder": "Valeur",
         "responseData": "Réponse",
         "tryButton": "Essayer",
-        "variablesExplanation": "Pour injecter une variable défini dans un bloc \"Récupérer le dernier état\", tapez \"{{\". Cette variable ne sera injecté que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
+        "variablesExplanation": "Pour injecter une variable définie dans un bloc \"Définir une variable\" ou \"Récupérer le dernier état\", tapez \"{{\". Cette variable ne sera injectée que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
         "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
       },
       "scene": {
@@ -3133,6 +3264,19 @@
         "namePlaceholder": "Entrez un nom",
         "whenFoundLabel": "Si un évènement est trouvé",
         "whenNotFoundLabel": "Si aucun évènement n'est trouvé",
+        "stopScene": "Arrêter la scène",
+        "continueScene": "Continuer la scène"
+      },
+      "calendarGetEvents": {
+        "description": "Cette action récupère la liste des évènements qui commencent sur la période sélectionnée (un évènement ayant commencé avant le début de la période n'est pas retourné), et les rend disponibles sous forme de variables (une phrase prête à l'emploi, le nombre d'évènements et la liste des évènements) pour les actions suivantes de la scène. Seuls les calendriers partagés sont affichés ici.",
+        "calendarLabel": "Dans les calendriers partagés suivants",
+        "timeRangeLabel": "Récupérer les évènements",
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "nextXHours": "Dans les X prochaines heures",
+        "durationLabel": "Nombre d'heures",
+        "durationPlaceholder": "Nombre d'heures",
+        "whenNoEventsLabel": "Si aucun évènement n'est trouvé",
         "stopScene": "Arrêter la scène",
         "continueScene": "Continuer la scène"
       },
@@ -3173,14 +3317,15 @@
         "topic": "Topic",
         "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
-        "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
       "zigbee2mqttMessage": {
         "topic": "Topic",
-        "topicPlaceholder": "gladys/my-topic",
+        "topicPlaceholder": "zigbee2mqtt/mon-appareil/set",
+        "topicExplanation": "Le topic est publié tel quel : vous devez écrire le topic MQTT complet, préfixe 'zigbee2mqtt/' inclus (par exemple 'zigbee2mqtt/mon-appareil/set').",
         "messageLabel": "Message",
-        "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
       "playNotification": {
@@ -3188,12 +3333,13 @@
         "deviceLabel": "Enceinte",
         "volumeLabel": "Volume",
         "textLabel": "Message à dire sur l'enceinte",
-        "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
       }
     },
     "actions": {
       "calendar": {
-        "is-event-running": "Condition sur un évènement d'un calendrier"
+        "is-event-running": "Condition sur un évènement d'un calendrier",
+        "get-events": "Récupérer les évènements d'un calendrier"
       },
       "device": {
         "get-value": "Récupérer le dernier état",
@@ -3228,7 +3374,8 @@
       "condition": {
         "only-continue-if": "Condition sur variables",
         "check-time": "Condition temporelle",
-        "if-then-else": "Condition \"Si... Alors... Sinon...\""
+        "if-then-else": "Condition \"Si... Alors... Sinon...\"",
+        "while": "Boucle \"Tant que... Répéter...\""
       },
       "user": {
         "set-seen-at-home": "Utilisateur vu à la maison",
@@ -3263,6 +3410,9 @@
       },
       "ai": {
         "ask": "Demander à l'IA"
+      },
+      "variable": {
+        "set": "Définir une variable"
       }
     },
     "variables": {
@@ -3284,8 +3434,18 @@
         "eventStart": "Date de début",
         "eventEnd": "Date de fin"
       },
+      "calendarEvents": {
+        "text": "Phrase résumant les évènements",
+        "count": "Nombre d'évènements",
+        "events": "Liste des évènements"
+      },
       "askAi": {
         "answer": "Réponse de l'IA"
+      },
+      "variable": {
+        "set": {
+          "value": "Variable"
+        }
       }
     },
     "triggers": {
@@ -3340,12 +3500,15 @@
         "lessOrEqual": "inférieur ou égal",
         "different": "différent",
         "valuePlaceholder": "Valeur",
+        "useCustomValue": "Saisir une valeur personnalisée",
+        "useValueList": "Choisir dans la liste des valeurs",
         "on": "On",
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
         "doorbellRang": "Si la sonnette sonne",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
-        "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : "
+        "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : ",
+        "multipleFeaturesNote": "Vous pouvez sélectionner plusieurs fonctionnalités du même type : la scène démarrera dès que l'une d'elles remplit la condition."
       },
       "scheduledTrigger": {
         "typeLabel": "Type",
@@ -3690,6 +3853,8 @@
       "energy-monitoring-cost-calculation-beginning": "Calcul du coût énergétique (depuis le début)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Calcul de la consommation énergétique depuis l'index (30 minutes)",
       "energy-monitoring-consumption-from-index-beginning": "Calcul de la consommation énergétique depuis l'index (depuis le début)",
+      "energy-monitoring-production-from-index-thirty-minutes": "Calcul de la production énergétique depuis l'index (30 minutes)",
+      "energy-monitoring-production-from-index-beginning": "Calcul de la production énergétique depuis l'index (depuis le début)",
       "service-enedis-sync": "Synchronisation des données Enedis",
       "ai-weekly-digest": "Résumé hebdomadaire IA"
     },
@@ -4688,6 +4853,10 @@
           "0": "Faible",
           "1": "Moyen",
           "2": "Fort"
+        },
+        "test-in-progress": {
+          "0": "Non",
+          "1": "Oui"
         }
       },
       "music": {
@@ -4708,6 +4877,13 @@
           "other": "Aucune valeur reçue",
           "zero": "Pas de mouvement",
           "one": "Mouvement détecté"
+        }
+      },
+      "presence-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Pas de présence",
+          "one": "Présence détectée"
         }
       },
       "smoke-sensor": {
@@ -4859,6 +5035,22 @@
           "4": "Retour à la base",
           "5": "En charge",
           "6": "Sur la base"
+        },
+        "run-mode": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Repos",
+          "1": "Nettoyer",
+          "2": "Cartographier"
+        },
+        "clean-mode": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Auto",
+          "1": "Rapide",
+          "2": "Silencieux",
+          "3": "Faible bruit",
+          "4": "Nettoyage profond",
+          "5": "Aspiration",
+          "6": "Serpillère"
         }
       },
       "water-heater": {
@@ -4921,7 +5113,8 @@
     },
     "presence-sensor": {
       "shortCategoryName": "Détecteur de présence",
-      "push": "Présence"
+      "push": "Présence",
+      "binary": "Détection présence Oui/Non"
     },
     "rain-sensor": {
       "shortCategoryName": "Détecteur de pluie",
@@ -5016,7 +5209,8 @@
       "shortCategoryName": "Sirène",
       "binary": "Sirène On/Off",
       "lmh_volume": "Volume de la sirène",
-      "melody": "Mélodie"
+      "melody": "Mélodie",
+      "test-in-progress": "Test en cours"
     },
     "cube": {
       "shortCategoryName": "Cube",
@@ -5060,6 +5254,18 @@
     "formaldehyd-sensor": {
       "shortCategoryName": "Capteur Formaldéhyde",
       "decimal": "Formaldéhyde (Décimale)"
+    },
+    "no2-sensor": {
+      "shortCategoryName": "Capteur de NO2",
+      "decimal": "NO2 (Décimale)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "Capteur d'O3",
+      "decimal": "O3 (Décimale)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "Capteur de SO2",
+      "decimal": "SO2 (Décimale)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
@@ -5307,6 +5513,10 @@
     "hepa-filter-monitoring": {
       "shortCategoryName": "Surveillance filtre HEPA",
       "filter-life-remaining": "Durée de vie restante du filtre"
+    },
+    "maintenance": {
+      "shortCategoryName": "Maintenance",
+      "life-remaining": "Durée de vie restante du composant"
     },
     "duration": {
       "shortCategoryName": "Durée",

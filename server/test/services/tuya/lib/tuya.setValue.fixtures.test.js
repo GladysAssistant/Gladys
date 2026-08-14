@@ -1,8 +1,9 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
-const proxyquire = require('proxyquire')
-  .noCallThru()
-  .noPreserveCache();
+// No .noPreserveCache(): it would evict the stubbed dependencies from
+// require.cache after each call, handing every module loaded later a second
+// copy of them (see tuya.setValue.test.js for the failure this causes).
+const proxyquire = require('proxyquire').noCallThru();
 
 const { loadFixtureCases } = require('../fixtures/fixtureHelper');
 

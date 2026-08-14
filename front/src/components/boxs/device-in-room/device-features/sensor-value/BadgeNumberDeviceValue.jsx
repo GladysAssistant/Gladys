@@ -2,14 +2,42 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
 
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../../../server/utils/constants';
 import RawDeviceValue from './RawDeviceValue';
+
+// Mass concentrations are declared in milligrams, micrograms or nanograms per cubic meter, while
+// the thresholds below are in µg/m³. Without this conversion a sensor reporting mg/m³ would stay
+// green a thousand times too long.
+const microgramPerCubicMeterFactors = {
+  [DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER]: 1000,
+  [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER]: 1,
+  [DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER]: 0.001
+};
+
+// A feature that declares no unit is assumed to already report µg/m³, which is what the Zigbee and
+// Matter clusters use.
+const toMicrogramPerCubicMeter = (value, unit) =>
+  value * (microgramPerCubicMeterFactors[unit] === undefined ? 1 : microgramPerCubicMeterFactors[unit]);
 
 const colorLowAsGreen = (value, safeLimit, warnLimit) => {
   if (value < safeLimit) {
     return 'success';
   } else if (value < warnLimit) {
     return 'warning';
+  }
+
+  return 'danger';
+};
+
+// Same as colorLowAsGreen, with the intermediate "orange" step the air quality guidelines for
+// gaseous pollutants use between the informational and the alert threshold.
+const colorLowAsGreenWithAlert = (value, safeLimit, warnLimit, alertLimit) => {
+  if (value < safeLimit) {
+    return 'success';
+  } else if (value < warnLimit) {
+    return 'warning';
+  } else if (value < alertLimit) {
+    return 'orange';
   }
 
   return 'danger';
@@ -80,6 +108,13 @@ const BADGE_CATEGORIES = {
   [DEVICE_FEATURE_CATEGORIES.PM10_SENSOR]: value => colorLowAsGreen(value, 30, 50),
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: value => colorLowAsGreen(value, 15, 25),
   [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: value => colorLowAsGreen(value, 50, 120),
+  // Thresholds in µg/m³, so the value is normalized to that unit first.
+  [DEVICE_FEATURE_CATEGORIES.NO2_SENSOR]: (value, unit) =>
+    colorLowAsGreenWithAlert(toMicrogramPerCubicMeter(value, unit), 40, 100, 200),
+  [DEVICE_FEATURE_CATEGORIES.O3_SENSOR]: (value, unit) =>
+    colorLowAsGreenWithAlert(toMicrogramPerCubicMeter(value, unit), 100, 160, 240),
+  [DEVICE_FEATURE_CATEGORIES.SO2_SENSOR]: (value, unit) =>
+    colorLowAsGreenWithAlert(toMicrogramPerCubicMeter(value, unit), 40, 100, 300),
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: value => getAqiColor(value),
   [DEVICE_FEATURE_CATEGORIES.RISK]: value => getRiskColor(value)
 };
@@ -126,7 +161,7 @@ const BadgeNumberDeviceValue = props => {
     valueIsEnum = true;
   }
 
-  const colorClass = `bg-${valued ? colorMethod(value) : 'secondary'}`;
+  const colorClass = `bg-${valued ? colorMethod(value, unit) : 'secondary'}`;
 
   return (
     <span class={cx('badge', colorClass)}>

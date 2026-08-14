@@ -1,6 +1,8 @@
 const EventEmitter = require('events');
 const { assert, expect } = require('chai');
-const { fake, assert: sinonAssert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert: sinonAssert } = sinon;
 const uuid = require('uuid');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
@@ -155,7 +157,15 @@ describe('Device.migrate', () => {
           },
         ],
       ],
-      triggers: [{ type: 'device.new-state', device_feature: 'migration-source-temp', operator: '=', value: 20 }],
+      triggers: [
+        { type: 'device.new-state', device_feature: 'migration-source-temp', operator: '=', value: 20 },
+        {
+          type: 'device.new-state',
+          device_features: ['migration-source-temp', 'some-other-feature'],
+          operator: '=',
+          value: 20,
+        },
+      ],
     });
     await db.Scene.create({
       name: 'Migration scene untouched',
@@ -232,7 +242,15 @@ describe('Device.migrate', () => {
           },
         ],
       ],
-      triggers: [{ type: 'device.new-state', device_feature: 'migration-destination-temp', operator: '=', value: 20 }],
+      triggers: [
+        { type: 'device.new-state', device_feature: 'migration-destination-temp', operator: '=', value: 20 },
+        {
+          type: 'device.new-state',
+          device_features: ['migration-destination-temp', 'some-other-feature'],
+          operator: '=',
+          value: 20,
+        },
+      ],
     });
     // Dashboard rewritten in DB, positional companion arrays untouched
     const refreshedDashboard = await db.Dashboard.findOne({ where: { id: dashboard.id } });
