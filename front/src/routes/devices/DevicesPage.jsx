@@ -3,6 +3,7 @@ import cx from 'classnames';
 
 import CardFilter from '../../components/layout/CardFilter';
 import DeviceRow from './DeviceRow';
+import DeviceMobileItem from './DeviceMobileItem';
 import EmptyState from './EmptyState';
 import style from './style.css';
 
@@ -72,7 +73,16 @@ const DevicesPage = ({ children, ...props }) => (
             <div class="loader" />
             <div class={cx('dimmer-content', style.devicesListContainer)}>
               {props.initialized && props.filteredDevices.length > 0 && (
-                <div class="card">
+                <div class="card d-md-none">
+                  <div class="list-group list-group-flush">
+                    {props.filteredDevices.map(({ device, integration }) => (
+                      <DeviceMobileItem key={device.id} device={device} integration={integration} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {props.initialized && props.filteredDevices.length > 0 && (
+                <div class="card d-none d-md-block">
                   <div class="table-responsive">
                     <table class="table table-hover table-outline table-vcenter card-table">
                       <thead>
