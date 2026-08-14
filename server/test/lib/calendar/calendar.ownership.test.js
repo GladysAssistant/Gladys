@@ -18,6 +18,32 @@ describe('calendar ownership checks', () => {
     const promise = calendar.update('test-calendar', { name: 'New name' }, USER_B);
     return assert.isRejected(promise, 'Calendar not found');
   });
+  it('should ignore the ownership columns of a user-initiated calendar update', async () => {
+    // owning a calendar must not be a way to hand it — and its events — over
+    // to someone else
+    await calendar.update(
+      'test-calendar',
+      {
+        name: 'New name',
+        user_id: USER_B,
+        selector: 'stolen-selector',
+        external_id: 'stolen-external-id',
+      },
+      USER_A,
+    );
+    const row = await db.Calendar.findOne({ where: { selector: 'test-calendar' } });
+    expect(row.name).to.equal('New name');
+    expect(row.user_id).to.equal(USER_A);
+    expect(row.selector).to.equal('test-calendar');
+    expect(row.external_id).to.equal('750db5b7-233b-41d1-89eb-d3aa4e959295');
+  });
+  it('should still write the full row of a calendar for an internal caller (no userId)', async () => {
+    // the CalDAV sync republishes whole calendars, external_id included
+    await calendar.update('test-calendar', { name: 'Synced', external_id: 'new-calendar-external-id' });
+    const row = await db.Calendar.findOne({ where: { selector: 'test-calendar' } });
+    expect(row.name).to.equal('Synced');
+    expect(row.external_id).to.equal('new-calendar-external-id');
+  });
   it('should refuse to destroy a calendar of another user', async () => {
     const promise = calendar.destroy('test-calendar', USER_B);
     return assert.isRejected(promise, 'Calendar not found');

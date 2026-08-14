@@ -63,15 +63,22 @@ async function uninstall(selector) {
     attributes: ['selector', 'shared', 'user_id'],
   });
   await db.Calendar.destroy({ where: { service_id: service.id } });
+  // partitioned by prior visibility, like disableCalendarAccount: broadcasting
+  // a user's whole set as soon as one calendar is shared would leak the
+  // selectors of their private calendars to every connected user
   const calendarsByUser = new Map();
   calendars.forEach((calendar) => {
-    const entry = calendarsByUser.get(calendar.user_id) || { selectors: [], anyShared: false };
-    entry.selectors.push(calendar.selector);
-    entry.anyShared = entry.anyShared || calendar.shared;
+    const entry = calendarsByUser.get(calendar.user_id) || { sharedSelectors: [], privateSelectors: [] };
+    if (calendar.shared) {
+      entry.sharedSelectors.push(calendar.selector);
+    } else {
+      entry.privateSelectors.push(calendar.selector);
+    }
     calendarsByUser.set(calendar.user_id, entry);
   });
   calendarsByUser.forEach((entry, userId) => {
-    this.notifyCalendarUpdated(userId, entry.selectors, entry.anyShared);
+    this.notifyCalendarUpdated(userId, entry.sharedSelectors, true);
+    this.notifyCalendarUpdated(userId, entry.privateSelectors, false);
   });
   await db.Variable.destroy({ where: { service_id: service.id } });
   await db.Service.destroy({ where: { id: service.id } });

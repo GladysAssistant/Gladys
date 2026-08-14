@@ -67,6 +67,45 @@ describe('externalIntegration.uninstall', () => {
     expect(externalIntegration.discoveredDevices.has(service.id)).to.equal(false);
   });
 
+  it('should keep the private calendars of the uninstalled integration out of the broadcast', async () => {
+    const service = await seedExternalService();
+    const { externalIntegration, event } = buildSupervisor();
+    const userId = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
+    await db.Calendar.create({
+      name: 'Shared calendar',
+      description: '',
+      selector: 'ext-test-shared-calendar',
+      user_id: userId,
+      service_id: service.id,
+      shared: true,
+      external_id: `ext:${service.selector}:john:shared`,
+    });
+    await db.Calendar.create({
+      name: 'Private calendar',
+      description: '',
+      selector: 'ext-test-private-calendar',
+      user_id: userId,
+      service_id: service.id,
+      external_id: `ext:${service.selector}:john:private`,
+    });
+
+    await externalIntegration.uninstall(service.selector);
+
+    const updatedCalls = (channel) =>
+      event.emit
+        .getCalls()
+        .filter((call) => call.args[0] === channel)
+        .filter((call) => call.args[1].type === 'calendar.updated');
+    // the shared one goes to everyone, the private one only to its owner
+    const sendAllCalls = updatedCalls('websocket.send-all');
+    expect(sendAllCalls).to.have.lengthOf(1);
+    expect(sendAllCalls[0].args[1].payload).to.deep.equal({ calendar_selectors: ['ext-test-shared-calendar'] });
+    const sendCalls = updatedCalls('websocket.send');
+    expect(sendCalls).to.have.lengthOf(1);
+    expect(sendCalls[0].args[1].payload).to.deep.equal({ calendar_selectors: ['ext-test-private-calendar'] });
+    expect(sendCalls[0].args[1].userId).to.equal(userId);
+  });
+
   it('should uninstall even when the container cannot be removed', async () => {
     const service = await seedExternalService();
     const { externalIntegration } = buildSupervisor({
