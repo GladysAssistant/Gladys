@@ -436,6 +436,7 @@
         "noMotionDetected": "Keine Bewegung",
         "doorbellRinging": "Klingelt",
         "pushButton": "Schieben",
+        "cameraPresetPlaceholder": "Preset aufrufen...",
         "vacuumDock": "Zurück zur Ladestation"
       },
       "devices": {
@@ -475,6 +476,9 @@
         "tooManyRequests": "Du hast dein monatliches Videobandbreitenlimit erreicht. Kontaktiere uns per E-Mail oder im Forum, um mehr Bandbreite zu erhalten!",
         "liveAutoStartLabel": "Starte den Livestream automatisch",
         "liveAutoStartDescription": "Warnung: Dies kann die Belastung deines Gerätes sowie Netzwerks erhöhen.",
+        "presetPlaceholder": "Presets...",
+        "ptzControlsLabel": "Kamerasteuerung anzeigen (PTZ)",
+        "ptzControlsDescription": "Wenn das Kameragerät Bewegungs- oder Preset-Funktionen hat, werden ein Steuerkreuz und eine Preset-Auswahl in der Live-Ansicht angezeigt (obere rechte Ecke, nur während des Streamings).",
         "latency": {
           "ultraLow": "Sehr niedrig",
           "low": "Niedrig",
@@ -2178,7 +2182,8 @@
           "max": "Dieses Feld ist erforderlich und muss eine Zahl sein",
           "external_id": "Dieses Feld ist erforderlich und muss eindeutig sein",
           "unit": "Die gewählte Einheit ist für diese Funktion ungültig",
-          "room_id": "Der gewählte Raum ist ungültig"
+          "room_id": "Der gewählte Raum ist ungültig",
+          "supported_options": "Jedes Preset braucht einen Namen und einen eindeutigen ganzzahligen Wert (0 oder mehr)"
         },
         "saveConflictError": "Konflikt: Sind alle externen IDs wirklich eindeutig?",
         "mostRecentValueAt": "Zuletzt empfangener Wert {{mostRecentValueAt}}.",
@@ -2195,6 +2200,9 @@
         "closeButton": "Katalog schließen",
         "previewLabel": "Dashboard-Vorschau",
         "cameraPreviewNotice": "Diese Funktion wird im Kamera-Dashboard-Widget angezeigt, nicht in der Geräteliste.",
+        "cameraPtzPreviewNotice": "Die Kamerasteuerung wird auch im Kamera-Widget des Dashboards über dem Kamerabild angezeigt.",
+        "cameraPresetExample1": "Eingang",
+        "cameraPresetExample2": "Garten",
         "previewValues": {
           "cube": {
             "mode": "Rotation (Xiaomi Cube Geste)"
@@ -2306,6 +2314,18 @@
         "readOnlyShortDescription": "Ja, es ist ein Sensor",
         "readOnlyButton": "Ja, es ist ein Sensor, der nur Daten an Gladys sendet.",
         "addButton": "Funktion hinzufügen",
+        "cameraMove": {
+          "supportedMovementsLabel": "Unterstützte Bewegungen",
+          "supportedMovementsDescription": "Deaktiviere die Bewegungen, die deine Kamera nicht unterstützt: das Dashboard zeigt nur die unterstützten Tasten an."
+        },
+        "cameraPreset": {
+          "presetsLabel": "Presets",
+          "presetsDescription": "Jedes Preset hat einen in Gladys angezeigten Namen und einen numerischen Wert, der beim Aufrufen an die Kamera gesendet wird.",
+          "labelPlaceholder": "Name (z. B. Eingang)",
+          "valuePlaceholder": "Wert",
+          "removePresetLabel": "Dieses Preset entfernen",
+          "addPresetLabel": "Preset hinzufügen"
+        },
         "mqttTopicToPublishExampleLabel": "MQTT-Veröffentlichungsthema",
         "mqttTopicToPublishExampleDescription": "Gladys hört auf dieses Topic. Wenn du einen Wert in diesem Thema veröffentlichst, wird er diesem Gerät zugeordnet. (siehe <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation</a>)",
         "mqttTopicToListenExampleLabel": "MQTT-Hörensthema",
@@ -4439,6 +4459,17 @@
   },
   "deviceFeatureAction": {
     "category": {
+      "camera": {
+        "move": {
+          "stop": "Stopp",
+          "pan-left": "Links",
+          "pan-right": "Rechts",
+          "tilt-up": "Hoch",
+          "tilt-down": "Runter",
+          "zoom-in": "Vergrößern",
+          "zoom-out": "Verkleinern"
+        }
+      },
       "shutter": {
         "stateLiveFinished": {
           "zero": "Stoppen",
@@ -5155,7 +5186,12 @@
     },
     "camera": {
       "shortCategoryName": "Kamera",
-      "image": "Kamera"
+      "image": "Kamera",
+      "move": "Kamerabewegung (PTZ)",
+      "preset": "Kamera-Preset",
+      "pan-position": "Kamera-Schwenkposition",
+      "tilt-position": "Kamera-Neigeposition",
+      "zoom-position": "Kamera-Zoomposition"
     },
     "charging-station": {
       "shortCategoryName": "Ladestation",
