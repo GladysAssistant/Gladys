@@ -677,6 +677,11 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.networkDiscoveryScan,
     },
+    'post /api/integration/v1/network/wake': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.networkWake,
+    },
     'post /api/integration/v1/camera/image': {
       authenticated: false,
       externalIntegrationAuth: true,

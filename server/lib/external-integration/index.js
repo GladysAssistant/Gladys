@@ -105,6 +105,7 @@ const { installFromStore } = require('./store/store.installFromStore');
 const { installFromRepoUrl } = require('./store/store.installFromRepoUrl');
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
+const { wakeOnLan } = require('./externalIntegration.wakeOnLan');
 
 /**
  * @description External integration supervisor: complete lifecycle of the
@@ -158,6 +159,8 @@ const ExternalIntegration = function ExternalIntegration(
   this.networkDiscoveryScans = new Set();
   // serviceId -> timestamp of the last active broadcast scan (1/10s)
   this.networkDiscoveryActiveScanTimes = new Map();
+  // serviceId -> timestamp of the last Wake-on-LAN emission (1/2s)
+  this.networkWakeTimes = new Map();
   // supervision timers
   this.startupTimers = new Map();
   this.restartTimers = new Map();
@@ -296,5 +299,6 @@ ExternalIntegration.prototype.getDocsMarkdown = getDocsMarkdown;
 ExternalIntegration.prototype.fetchManifestFromRepo = fetchManifestFromRepo;
 ExternalIntegration.prototype.installFromStore = installFromStore;
 ExternalIntegration.prototype.installFromRepoUrl = installFromRepoUrl;
+ExternalIntegration.prototype.wakeOnLan = wakeOnLan;
 
 module.exports = ExternalIntegration;
