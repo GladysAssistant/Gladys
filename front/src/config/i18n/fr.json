@@ -3190,7 +3190,7 @@
         "headersValuePlaceholder": "Valeur",
         "responseData": "Réponse",
         "tryButton": "Essayer",
-        "variablesExplanation": "Pour injecter une variable définie dans un bloc \"Définir une variable\" ou \"Récupérer le dernier état\", tapez \"{{\". Cette variable ne sera injecté que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
+        "variablesExplanation": "Pour injecter une variable définie dans un bloc \"Définir une variable\" ou \"Récupérer le dernier état\", tapez \"{{\". Cette variable ne sera injectée que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
         "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
       },
       "scene": {
@@ -3249,7 +3249,7 @@
         "topic": "Topic",
         "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
-        "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
       "zigbee2mqttMessage": {
@@ -3257,7 +3257,7 @@
         "topicPlaceholder": "zigbee2mqtt/mon-appareil/set",
         "topicExplanation": "Le topic est publié tel quel : vous devez écrire le topic MQTT complet, préfixe 'zigbee2mqtt/' inclus (par exemple 'zigbee2mqtt/mon-appareil/set').",
         "messageLabel": "Message",
-        "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message.",
         "messagePlaceholder": "Mon message"
       },
       "playNotification": {
@@ -3265,7 +3265,7 @@
         "deviceLabel": "Enceinte",
         "volumeLabel": "Volume",
         "textLabel": "Message à dire sur l'enceinte",
-        "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
+        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Définir une variable' ou 'Récupérer le dernier état' placée avant ce bloc message."
       }
     },
     "actions": {

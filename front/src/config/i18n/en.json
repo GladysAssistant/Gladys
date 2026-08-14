@@ -3055,7 +3055,7 @@
         "cameraLabel": "Attach a camera image (optional)",
         "textLabel": "My question for the AI",
         "textPlaceholder": "Message text",
-        "explanationText": "To insert a variable, type '{{'. Be careful, you must have defined a variable beforehand in a 'Retrieve the last state' action placed before this message block."
+        "explanationText": "To insert a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
       },
       "smsSend": {
         "textLabel": "Message",
@@ -3249,7 +3249,7 @@
         "topic": "Topic",
         "topicPlaceholder": "gladys/my-topic",
         "messageLabel": "Message",
-        "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
+        "variablesExplanation": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
       },
       "zigbee2mqttMessage": {
@@ -3257,7 +3257,7 @@
         "topicPlaceholder": "zigbee2mqtt/my-device/set",
         "topicExplanation": "The topic is published as-is: you must write the full MQTT topic, including the 'zigbee2mqtt/' prefix (for example 'zigbee2mqtt/my-device/set').",
         "messageLabel": "Message",
-        "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
+        "variablesExplanation": "To inject a variable in the text, press '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
       },
       "playNotification": {
@@ -3265,7 +3265,7 @@
         "deviceLabel": "Speaker",
         "volumeLabel": "Volume",
         "textLabel": "Message to speak on the speaker",
-        "variablesExplanation": "To inject a variable, type '{{ '. Note: You must have defined a variable beforehand in a 'Retrieve Last State' action placed before this message block."
+        "variablesExplanation": "To inject a variable, type '{{'. To set a variable value, you need to use a 'Set a variable' or 'Get device value' box before this one."
       }
     },
     "actions": {
