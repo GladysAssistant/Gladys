@@ -724,7 +724,7 @@
       "noIntegrations": "Keine Integrationen gefunden",
       "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
-      "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
+      "noSearchResultsSuggestion": "Dein Gerät wird vielleicht von einer externen <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">Community-Integration</a> unterstützt – dem empfohlenen Weg, neue Kompatibilitäten hinzuzufügen. Und wenn es sie noch nicht gibt, kannst du ganz einfach <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">deine eigene erstellen</a>!",
       "refreshStore": {
         "hint": "Fehlt eine Integration in der Liste?",
         "button": "Katalog aktualisieren",
