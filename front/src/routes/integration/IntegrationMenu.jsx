@@ -20,9 +20,9 @@ const getMenuItems = (integrationCategories, { integrationsToUpdate = 0, categor
       ]
     : []),
   ...integrationCategories.map(integrationCategory => ({
-    href: `/dashboard/integration/${integrationCategory.type}`,
+    href: `/dashboard/integration/${integrationCategory.key}`,
     icon: integrationCategory.icon,
-    labelKey: `integration.root.menu.${integrationCategory.type}`
+    labelKey: `integration.root.menu.${integrationCategory.key}`
   }))
 ];
 

@@ -13,7 +13,7 @@ const SearchInput = ({ searchPlaceHolder, search, searchValue }) => {
   return <Localizer>{input}</Localizer>;
 };
 
-const CardFilter = ({ changeOrderDir, orderValue = 'asc', search, searchValue, searchPlaceHolder }) => (
+const CardFilter = ({ changeOrderDir, orderValue = 'asc', search, searchValue, searchPlaceHolder, extraOrderDirs }) => (
   <Fragment>
     <select onChange={changeOrderDir} class="form-control custom-select w-auto">
       <option value="asc" selected={orderValue === 'asc'}>
@@ -22,6 +22,11 @@ const CardFilter = ({ changeOrderDir, orderValue = 'asc', search, searchValue, s
       <option value="desc" selected={orderValue === 'desc'}>
         <Text id="global.orderDirDesc" />
       </option>
+      {(extraOrderDirs || []).map(({ value, labelId }) => (
+        <option key={value} value={value} selected={orderValue === value}>
+          <Text id={labelId} />
+        </option>
+      ))}
     </select>
 
     <div class="input-icon ml-2">

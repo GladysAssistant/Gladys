@@ -688,7 +688,8 @@
       "local": "Local",
       "external": "Communauté",
       "native": "Natif",
-      "deprecated": "Bientôt dépréciée"
+      "deprecated": "Bientôt dépréciée",
+      "new": "Nouveau"
     },
     "root": {
       "title": "Intégrations",
@@ -712,17 +713,23 @@
         "title": "Votre appareil n'est pas dans la liste ?",
         "description": "De nombreux appareils peuvent être connectés via <a href=\"/dashboard/integration/device/matter\">Matter</a> (protocole universel). Votre appareil peut aussi être pris en charge par une <b>intégration externe</b> de la communauté : chacun peut en créer une et la publier dans le store, elle apparaît alors dans cette liste. Consultez la <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">documentation des intégrations externes</a>."
       },
+      "orderDirNewest": "Nouveautés d'abord",
       "menu": {
         "all": "Toutes les intégrations",
         "favorites": "Favoris",
         "updates": "À mettre à jour",
-        "device": "Appareils",
-        "communication": "Communication",
-        "calendar": "Calendrier",
-        "music": "Musique",
-        "health": "Santé",
-        "weather": "Météo",
-        "navigation": "Navigation"
+        "climate": "Chauffage & climatisation",
+        "lighting": "Éclairage, prises & volets",
+        "energy": "Énergie",
+        "security": "Caméras & sécurité",
+        "multimedia": "Multimédia",
+        "appliances": "Électroménager & jardin",
+        "environment": "Météo & environnement",
+        "protocols": "Protocoles & passerelles",
+        "network": "Réseau & présence",
+        "notifications": "Messages & notifications",
+        "assistants": "Assistants vocaux & IA",
+        "services": "Services"
       }
     },
     "externalIntegration": {

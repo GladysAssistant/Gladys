@@ -493,6 +493,7 @@ Complete example (the PoC's):
 | `containers` | array | no | additional **sub-containers**, max 5 (see below) |
 | `actions` | array | no | **on-demand actions** displayed on the Configuration screen, max 10 (see below) |
 | `transports` | array | no | supported channels, subset of `["local", "cloud"]`; both present → standard "Prefer local connection" toggle (see below) |
+| `categories` | array | no | browse categories of the integration catalog, 1..3 unique non-empty strings. Two-stage validation (see `integration-catalog-categories.md` §6.2): the shape rejects, the vocabulary filters — unknown keys are dropped with a warning, never a rejection. Declaring the field requires `gladys_version` ≥ the first release whose validator accepts it (older cores reject unknown manifest fields) |
 | `location` | boolean | no | `true` = requests access to the coordinates of the houses configured in Gladys (`GET /house`, see C.3). The home location is sensitive personal data: the request is shown on the install screen, and an undeclared access gets a `403` — **enforced server-side**, same authorization-contract pattern as `network_discovery` |
 
 No `permissions` field in v1: outbound network access is open and the install screen says so — we do not specify what we cannot enforce (see B.14). The field may appear in a future `manifest_version` when a real restriction exists. What does exist are **targeted, enforceable authorization contracts** — `containers`, `network_discovery`, `webhooks`, `location` — each declared in the manifest, shown to the user before install, and enforced server-side.
@@ -739,7 +740,7 @@ Routes `/api/v1/external_integration`, standard Gladys user auth; **admin** requ
 |---|---|
 | `GET /api/v1/external_integration` | → `[ { "id", "name", "selector", "status", "version", "docker_image", "store_slug", "manifest", "update_available" } ]`; **non-admin**: only the installed `type: "communication"` integrations, in their reduced view |
 | `GET .../:selector` | → detail (same fields, + the main container's `"started_at"`, + `"connection_status": { "connected", "message" }` (C.3), + `"containers": [ { "name", "status", "desired", "started_at", "ports": [{ "container_port", "protocol", "host_port", "label", "name", "browsable" }], "devices": [{ "class", "granted", "available" }] } ]` for multi-container ones — the same state as `GET /container` (C.3), from which the frontend derives the "Open" links (`browsable: false` → host port displayed without link) and the `{{port:<name>}}` placeholder values (C.1)); **non-admin**: the reduced view on a communication integration, `404` on any other (indistinguishable from an unknown selector) |
-| `GET /api/v1/external_integration/store` *(admin)* | → `{ "refreshed_at", "integrations": [ { "store_slug", "manifest": <manifest>, "github": { "stars", "pushed_at" }, "installed": false, "update_available": false, "compatible": true } ] }` (filtered by `gladys_version`) |
+| `GET /api/v1/external_integration/store` *(admin)* | → `{ "refreshed_at", "integrations": [ { "store_slug", "manifest": <manifest>, "github": { "stars", "pushed_at" }, "categories": ["climate"], "first_seen_at": "2026-08-01T00:00:00.000Z", "installed": false, "update_available": false, "compatible": true } ] }` (filtered by `gladys_version`). `categories` is the index-level value (C.6) filtered against the vocabulary the core knows — unknown keys are dropped, `[]` = uncategorized; `first_seen_at` is passed through, `null` when the index does not carry it |
 | `POST .../store/refresh` *(admin)* | `{}` → index re-downloaded, same response as `GET .../store` |
 | `GET /api/v1/external_integration/hardware` *(admin)* | → `{ "classes": [ { "class": "coral-usb", "detected": true }, { "class": "gpu", "detected": false }, ... ] }` — detection on the host (`system.detectHardwareClasses()`, see B.2); feeds the install screen's toggles |
 | `POST /api/v1/external_integration` *(admin)* | `{ "store_slug": "john/gladys-open-meteo-demo" }` **or** `{ "repo_url": "https://github.com/john/gladys-open-meteo-demo" }` **or** `{ "docker_image": "...", "manifest": {...} }` (dev mode); + optional `"granted_devices": ["coral-usb"]` (the install screen's toggles; classes not requested by the manifest → `422`) → `201` detail; `repo_url`: `422` if the manifest is absent/invalid in the repo, `404` if the repo is not found |
@@ -772,11 +773,15 @@ Routes `/api/v1/external_integration`, standard Gladys user auth; **admin** requ
         "en": "https://<store-pages>/docs/john--gladys-open-meteo-demo/en.md",
         "fr": "https://<store-pages>/docs/john--gladys-open-meteo-demo/fr.md"
       },
-      "github": { "stars": 12, "pushed_at": "2026-07-10T12:00:00.000Z", "owner_avatar_url": "https://..." }
+      "github": { "stars": 12, "pushed_at": "2026-07-10T12:00:00.000Z", "owner_avatar_url": "https://..." },
+      "categories": ["environment"],
+      "first_seen_at": "2026-08-01T00:00:00.000Z"
     }
   ]
 }
 ```
+
+Two entry-level fields feed the catalog navigation (`integration-catalog-categories.md`): **`categories`** — the manifest's `categories` when present and valid, else the entry of the fallback mapping file maintained in this repo (keyed by `store_slug`), else `[]` (uncategorized, author-facing warning in `rejected.json`) — and **`first_seen_at`** — first indexing date of the `store_slug`, persisted across rebuilds and seeded on backfill from the repo `created_at`, else the first commit date, else the `generated_at` of the oldest index containing the slug (never `github.pushed_at`). Cores that predate these fields ignore them: their `getCatalog` projection copies an explicit list of entry fields.
 
 **`rejected.json`** (public self-service diagnosis; `level: "error"` = not indexed, `level: "warning"` = indexed with degradation, e.g. cover replaced by a placeholder):
 ```json

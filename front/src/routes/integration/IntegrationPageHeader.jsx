@@ -64,6 +64,7 @@ const IntegrationPageHeader = ({
               search={search}
               searchValue={searchKeyword}
               searchPlaceHolder={searchPlaceholder}
+              extraOrderDirs={[{ value: 'newest', labelId: 'integration.root.orderDirNewest' }]}
             />
           </div>
         </div>
@@ -80,6 +81,9 @@ const IntegrationPageHeader = ({
             </option>
             <option value="desc">
               <Text id="global.orderDirDesc" />
+            </option>
+            <option value="newest">
+              <Text id="integration.root.orderDirNewest" />
             </option>
           </select>
         </div>
