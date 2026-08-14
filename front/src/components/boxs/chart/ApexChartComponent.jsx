@@ -46,15 +46,10 @@ class ApexChartComponent extends Component {
           .format('LL');
       };
     }
-    // Configure tooltip with fixed position and date formatter
+    // Configure tooltip with date formatter. The tooltip follows the cursor
+    // so it doesn't permanently mask the curves (see community feedback)
     options.tooltip = {
-      followCursor: false,
-      fixed: {
-        enabled: true,
-        position: 'topLeft',
-        offsetX: 0,
-        offsetY: -30
-      },
+      followCursor: true,
       x: {
         formatter
       }
