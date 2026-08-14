@@ -1,6 +1,8 @@
 const semver = require('semver');
 
+const logger = require('../../utils/logger');
 const { Error422 } = require('../../utils/httpErrors');
+const { INTEGRATION_CATALOG_CATEGORIES } = require('../../utils/constants');
 const {
   SUPPORTED_MANIFEST_VERSION,
   MAX_SUB_CONTAINERS,
@@ -23,6 +25,7 @@ const {
   ACTION_MIN_TIMEOUT_SECONDS,
   ACTION_MAX_TIMEOUT_SECONDS,
   MANIFEST_TRANSPORTS,
+  MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
 } = require('./constants');
@@ -47,10 +50,17 @@ const MANIFEST_FIELDS = [
   'network_discovery',
   'actions',
   'transports',
+  'categories',
   'webhooks',
   'messaging',
   'contact_schema',
 ];
+// Browse categories of the catalog (docs/specs/integration-catalog-
+// categories.md §6.2), validated in two ordered stages: the SHAPE (1..3
+// unique non-empty strings) rejects like any other malformed field, then the
+// VOCABULARY filters — unknown keys are dropped with a warning, never a
+// rejection, so an integration published with a newer vocabulary than this
+// instance knows still installs.
 // communication type only: chat channels (receive true, the default —
 // inbound + outbound, code-based link) vs notification channels (receive
 // false — send only, per-user identity through contact_schema)
@@ -939,6 +949,36 @@ function validateManifest(manifest) {
       new Set(manifest.transports).size !== manifest.transports.length
     ) {
       errors.push(`transports: must be a non-empty subset of ${MANIFEST_TRANSPORTS.join(', ')}`);
+    }
+  }
+  if (manifest.categories !== undefined) {
+    if (
+      !Array.isArray(manifest.categories) ||
+      manifest.categories.length === 0 ||
+      manifest.categories.length > MAX_MANIFEST_CATEGORIES ||
+      !manifest.categories.every((category) => typeof category === 'string' && category.length > 0) ||
+      new Set(manifest.categories).size !== manifest.categories.length
+    ) {
+      errors.push(`categories: must be 1-${MAX_MANIFEST_CATEGORIES} unique non-empty strings`);
+    } else {
+      const knownCategories = manifest.categories.filter((category) =>
+        INTEGRATION_CATALOG_CATEGORIES.includes(category),
+      );
+      if (knownCategories.length !== manifest.categories.length) {
+        const unknownCategories = manifest.categories.filter(
+          (category) => !INTEGRATION_CATALOG_CATEGORIES.includes(category),
+        );
+        logger.warn(`validateManifest: dropping unknown categories ${unknownCategories.join(', ')}`);
+      }
+      // an all-unknown declaration is "uncategorized", not an error: the field
+      // is REMOVED rather than set to [] — the install and update flows
+      // validate the same manifest object again, and a stored empty array
+      // would fail the shape stage on that second pass
+      if (knownCategories.length === 0) {
+        delete manifest.categories;
+      } else {
+        manifest.categories = knownCategories;
+      }
     }
   }
   if (errors.length > 0) {

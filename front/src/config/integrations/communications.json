@@ -3,55 +3,64 @@
     "key": "telegram",
     "img": "/assets/integrations/cover/telegram.jpg",
     "cloud": true,
-    "deprecated": true
+    "deprecated": true,
+    "categories": ["notifications"]
   },
   {
     "key": "nextcloudTalk",
     "img": "/assets/integrations/cover/nextcloud-talk.jpg",
-    "local": true
+    "local": true,
+    "categories": ["notifications"]
   },
   {
     "key": "alexa",
     "img": "/assets/integrations/cover/alexa.jpg",
     "whiteBackground": true,
     "gladysPlus": true,
-    "cloud": true
+    "cloud": true,
+    "categories": ["assistants"]
   },
   {
     "key": "googleHome",
     "img": "/assets/integrations/cover/google-home.jpg",
     "whiteBackground": true,
     "gladysPlus": true,
-    "cloud": true
+    "cloud": true,
+    "categories": ["assistants"]
   },
   {
     "key": "homekit",
     "img": "/assets/integrations/cover/homekit.jpg",
     "whiteBackground": true,
-    "local": true
+    "local": true,
+    "categories": ["assistants"]
   },
   {
     "key": "openai",
     "img": "/assets/integrations/cover/openai.jpg",
     "gladysPlus": true,
-    "cloud": true
+    "cloud": true,
+    "categories": ["assistants"]
   },
   {
     "key": "free-mobile",
     "link": "free-mobile",
     "img": "/assets/integrations/cover/free-mobile.jpg",
     "whiteBackground": true,
-    "cloud": true
+    "cloud": true,
+    "categories": ["notifications"]
   },
   {
     "key": "callmebot",
     "img": "/assets/integrations/cover/callmebot.jpg",
-    "cloud": true
+    "cloud": true,
+    "categories": ["notifications"]
   },
   {
     "key": "mcp",
     "img": "/assets/integrations/cover/mcp.jpg",
     "gladysPlus": true,
-    "local": true
+    "local": true,
+    "categories": ["assistants"]
   }
 ]

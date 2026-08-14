@@ -109,6 +109,17 @@
       },
       "description": "Channels the integration knows how to use. When both are declared, Gladys renders the standard core-translated \"Prefer local (LAN) connection\" toggle, stored as the reserved GLADYS_PREFER_LOCAL config key (boolean, default true) — readable by the integration, never writable by it. The preference is a wish; the per-device reality is reported through the GLADYS_TRANSPORT param."
     },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Browse categories of the integration catalog: the domains of use under which the integration is listed, fully decoupled from the technical `type`. Deliberately no enum here — the schema only rejects the shape; the controlled vocabulary is matched in code as a second, filtering stage (unknown keys are dropped with a warning, never a rejection), so a manifest published with a newer vocabulary than the running instance still installs. Declaring the field requires gladys_version >= the first release accepting it (older cores reject unknown manifest fields)."
+    },
     "webhooks": {
       "type": "array",
       "minItems": 1,

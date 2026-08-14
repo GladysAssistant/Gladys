@@ -9,6 +9,7 @@ import { IntlProvider } from 'preact-i18n';
 import translations from '../config/i18n';
 import actions from '../actions/main';
 import { EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS } from '../actions/externalIntegrationUpdates';
+import { catalogCategories } from '../config/integrations';
 
 import { getDefaultState } from '../utils/getDefaultState';
 
@@ -269,13 +270,22 @@ const AppRouter = connect(
 
         <IntegrationPage path="/dashboard/integration/favorites" category="favorites" />
         <IntegrationPage path="/dashboard/integration/updates" category="updates" />
-        <IntegrationPage path="/dashboard/integration/device" category="device" />
-        <IntegrationPage path="/dashboard/integration/communication" category="communication" />
-        <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
-        <IntegrationPage path="/dashboard/integration/music" category="music" />
-        <IntegrationPage path="/dashboard/integration/health" category="health" />
-        <IntegrationPage path="/dashboard/integration/weather" category="weather" />
-        <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
+        {/* browse categories of the catalog (docs/specs/integration-catalog-categories.md):
+            display metadata decoupled from the technical `type` still carried
+            by the integration page URLs right below */}
+        {catalogCategories.map(({ key }) => (
+          <IntegrationPage path={`/dashboard/integration/${key}`} category={key} />
+        ))}
+        {/* legacy type-based catalog views (spec §5): a 1:1 bucket goes to its
+            new shelf, a bucket split across several shelves goes to the
+            catalog root — redirecting it to one shelf would hide the others */}
+        <Redirect path="/dashboard/integration/device" to="/dashboard/integration" />
+        <Redirect path="/dashboard/integration/communication" to="/dashboard/integration" />
+        <Redirect path="/dashboard/integration/calendar" to="/dashboard/integration/services" />
+        <Redirect path="/dashboard/integration/weather" to="/dashboard/integration/environment" />
+        <Redirect path="/dashboard/integration/music" to="/dashboard/integration" />
+        <Redirect path="/dashboard/integration/health" to="/dashboard/integration" />
+        <Redirect path="/dashboard/integration/navigation" to="/dashboard/integration" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <Redirect

@@ -960,6 +960,49 @@ describe('externalIntegration.validateManifest', () => {
     });
   });
 
+  it('should accept a valid categories declaration', () => {
+    const manifest = { ...TEST_MANIFEST, categories: ['climate', 'energy'] };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should drop unknown category keys and keep the known ones', () => {
+    // forward compatibility (spec §6.2 stage 2): an integration published
+    // with a newer vocabulary than this instance knows must still install —
+    // the unknown keys are filtered out with a warning, never rejected
+    const manifest = { ...TEST_MANIFEST, categories: ['climate', 'brand-new-shelf'] };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated.categories).to.deep.equal(['climate']);
+  });
+
+  it('should treat a declaration made only of unknown keys as uncategorized, not as an error', () => {
+    const manifest = { ...TEST_MANIFEST, categories: ['brand-new-shelf'] };
+    const validated = externalIntegration.validateManifest(manifest);
+    // removed, not [], so the manifest stays valid on re-validation (below)
+    expect(validated).to.not.have.property('categories');
+  });
+
+  it('should stay valid when validated twice, the install and update flows do it', () => {
+    // installFromStore and fetchManifestFromRepo validate the manifest, then
+    // install()/buildUpdateCandidates validate the SAME object again: the
+    // filtered result of the first pass must pass the shape stage of the next
+    [['climate', 'brand-new-shelf'], ['brand-new-shelf']].forEach((categories) => {
+      const manifest = { ...TEST_MANIFEST, categories };
+      const firstPass = externalIntegration.validateManifest(manifest);
+      const secondPass = externalIntegration.validateManifest(firstPass);
+      expect(secondPass).to.deep.equal(firstPass);
+    });
+  });
+
+  it('should reject a malformed categories declaration', () => {
+    // spec §6.2 stage 1 (shape): not an array, empty, more than 3 items,
+    // duplicates, non-string or empty-string items
+    ['climate', [], ['climate', 'energy', 'security', 'lighting'], ['climate', 'climate'], [null], [42], ['']].forEach(
+      (categories) => {
+        expect422({ ...TEST_MANIFEST, categories }, 'categories: must be 1-3 unique non-empty strings');
+      },
+    );
+  });
+
   it('should accept the messaging declaration and its contact_schema on send-only channels', () => {
     const chatManifest = { ...TEST_MANIFEST, type: 'communication', messaging: { receive: true } };
     expect(externalIntegration.validateManifest(chatManifest)).to.deep.equal(chatManifest);
