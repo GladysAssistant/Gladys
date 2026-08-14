@@ -1,9 +1,10 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
 const { expect } = require('chai');
 
-const proxyquire = require('proxyquire')
-  .noCallThru()
-  .noPreserveCache();
+// No .noPreserveCache(): it would evict the stubbed '../mappings' module from
+// require.cache after each call, handing every module loaded later a second
+// copy of it (see tuya.setValue.test.js for the failure this causes).
+const proxyquire = require('proxyquire').noCallThru();
 
 const {
   addFallbackBinaryFeature,

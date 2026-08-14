@@ -17,8 +17,11 @@ const actionSchema = Joi.object()
     house: Joi.string(),
     scene: Joi.string(),
     camera: Joi.string(),
+    // messaging channel of a "send message" action: null/absent means
+    // broadcast to every channel the user configured
+    service: Joi.string().allow(null),
     text: Joi.string(),
-    value: Joi.number(),
+    value: Joi.alternatives().try(Joi.number(), Joi.string()),
     evaluate_value: Joi.string(),
     minutes: Joi.number(),
     unit: Joi.string(),
@@ -78,6 +81,10 @@ const actionSchema = Joi.object()
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
+    max_iterations: Joi.number()
+      .integer()
+      .min(1)
+      .max(10000),
   })
   .id('action');
 

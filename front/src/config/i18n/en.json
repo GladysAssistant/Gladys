@@ -224,7 +224,12 @@
       "houseNameLabel": "Name",
       "houseNamePlaceHolder": "Enter your house name",
       "houseNameError": "House name is required",
-      "houseLocationLabel": "Click where your house is located",
+      "houseLocationLabel": "Search for your address or click on the map to set your house location",
+      "addressSearchPlaceholder": "Type your home address",
+      "addressSearchButton": "Search",
+      "addressSearchPrivacyNotice": "The address search is powered by OpenStreetMap (Nominatim): the address you type is sent to this third-party service.",
+      "addressSearchNoResults": "No results found, try adding the city or the country.",
+      "addressSearchError": "Unable to search for this address, check your internet connection.",
       "roomsLabel": "Add all rooms in your house",
       "roomNamePlaceHolder": "Type a new room to add",
       "addRoomButton": "Add",
@@ -1589,6 +1594,7 @@
       "exposureModeAll": "Expose all compatible devices",
       "exposureModeSelection": "Only expose the selected devices",
       "noCompatibleDevice": "No device of your Gladys can be exposed to HomeKit yet.",
+      "alarmLabel": "Alarm",
       "saveExposureButton": "Save the exposed devices",
       "saveExposureSuccess": "Exposed devices saved successfully. The HomeKit bridge restarts automatically, your pairing is kept.",
       "saveExposureError": "An error occurred while saving the exposed devices.",
@@ -3039,6 +3045,10 @@
       },
       "messageSend": {
         "userLabel": "User",
+        "serviceLabel": "Send through",
+        "allServicesLabel": "All configured services",
+        "serviceExplanation": "Choose the messaging service which will send this message. By default, the message is sent to every service configured by the user.",
+        "serviceUnavailable": "unavailable",
         "textLabel": "Message",
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
@@ -3110,7 +3120,8 @@
         "useCustomValue": "Enter a custom value",
         "useValueList": "Choose from the list of values",
         "valueTypeComputed": "Computed",
-        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one.",
+        "textExplanationText": "Enter here the text to send to your device. To inject a scene variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
@@ -3136,6 +3147,20 @@
         "shortIf": "I",
         "shortThen": "T",
         "shortElse": "E",
+        "actionCount": {
+          "zero": "No action",
+          "one": "1 action",
+          "other": "{{count}} actions"
+        }
+      },
+      "conditionWhile": {
+        "conditions": "Conditions",
+        "conditionDescription": "As long as all conditions are met, the actions in the \"Repeat...\" block will be executed in a loop. Unlike other blocks, the conditions are evaluated one after the other, in the order they are displayed, and re-evaluated before each iteration. A \"Get last state\" action placed before a condition therefore refreshes its value on every loop.",
+        "noCondition": "No condition has been added yet. Click the '+' button to add a condition to this block. Without condition, the loop will not run.",
+        "addCondition": "Add condition",
+        "repeat": "Repeat...",
+        "maxIterationsLabel": "Maximum number of iterations (safety limit)",
+        "maxIterationsDescription": "When this limit is reached, only the loop stops: the following actions of the scene are still executed.",
         "actionCount": {
           "zero": "No action",
           "one": "1 action",
@@ -3295,7 +3320,8 @@
       "condition": {
         "only-continue-if": "Condition on variables",
         "check-time": "Time condition",
-        "if-then-else": "Condition: If...then...else..."
+        "if-then-else": "Condition: If...then...else...",
+        "while": "Loop: As long as... repeat..."
       },
       "user": {
         "set-seen-at-home": "User seen at home",
@@ -3753,6 +3779,8 @@
       "energy-monitoring-cost-calculation-beginning": "Energy cost calculation (from beginning)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Energy consumption calculation from index (30 minutes)",
       "energy-monitoring-consumption-from-index-beginning": "Energy consumption calculation from index (from beginning)",
+      "energy-monitoring-production-from-index-thirty-minutes": "Energy production calculation from index (30 minutes)",
+      "energy-monitoring-production-from-index-beginning": "Energy production calculation from index (from beginning)",
       "service-enedis-sync": "Enedis data synchronization",
       "ai-weekly-digest": "AI weekly digest"
     },
@@ -5411,6 +5439,10 @@
     "hepa-filter-monitoring": {
       "shortCategoryName": "HEPA filter monitoring",
       "filter-life-remaining": "Filter life remaining"
+    },
+    "maintenance": {
+      "shortCategoryName": "Maintenance",
+      "life-remaining": "Component life remaining"
     },
     "duration": {
       "shortCategoryName": "Duration",
