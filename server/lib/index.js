@@ -84,6 +84,7 @@ function Gladys(params = {}) {
     variable,
     params.jwtSecret,
     cache,
+    calendar,
   );
   const gateway = new Gateway(
     variable,

@@ -138,6 +138,23 @@ const LINK_CODE_CACHE_PREFIX = 'external-integration-link-code';
 const LINK_CODE_TTL_MS = 15 * 60 * 1000;
 const LINK_CODE_LENGTH = 8;
 const MAX_MESSAGE_TEXT_LENGTH = 4096;
+
+// Calendar integrations (B.19): per-user account variable (one JSON object
+// per (service_id, user_id), the CONTACT_PROFILE pattern — its presence is
+// the enablement marker, so "enabled with zero fields" is a first-class
+// state), and the normalization bounds of the calendar host endpoints.
+const CALENDAR_ACCOUNT_VARIABLE = 'EXTERNAL_INTEGRATION_CALENDAR_ACCOUNT';
+const MAX_CALENDARS_PER_USER = 50;
+const MAX_CALENDAR_EVENTS_PER_REQUEST = 500;
+const MAX_CALENDAR_WRITES_PER_MINUTE = 30;
+const MAX_CALENDAR_NAME_LENGTH = 100;
+const MAX_CALENDAR_DESCRIPTION_LENGTH = 500;
+const CALENDAR_COLOR_REGEX = /^#[0-9a-f]{6}$/;
+const MAX_CALENDAR_EVENT_NAME_LENGTH = 200;
+const MAX_CALENDAR_EVENT_LOCATION_LENGTH = 500;
+const MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH = 1000;
+const MAX_CALENDAR_EVENT_URL_LENGTH = 500;
+const MAX_CALENDAR_EXTERNAL_ID_LENGTH = 255;
 // Mediated network discovery (B.16): the core captures and emits from
 // its network=host position, the integration interprets and forges (it
 // knows the protocol, the core never parses nor builds a payload).
@@ -326,6 +343,18 @@ module.exports = {
   MAX_STATES_PER_MINUTE,
   CONTACT_VARIABLE,
   CONTACT_PROFILE_VARIABLE,
+  CALENDAR_ACCOUNT_VARIABLE,
+  MAX_CALENDARS_PER_USER,
+  MAX_CALENDAR_EVENTS_PER_REQUEST,
+  MAX_CALENDAR_WRITES_PER_MINUTE,
+  MAX_CALENDAR_NAME_LENGTH,
+  MAX_CALENDAR_DESCRIPTION_LENGTH,
+  CALENDAR_COLOR_REGEX,
+  MAX_CALENDAR_EVENT_NAME_LENGTH,
+  MAX_CALENDAR_EVENT_LOCATION_LENGTH,
+  MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH,
+  MAX_CALENDAR_EVENT_URL_LENGTH,
+  MAX_CALENDAR_EXTERNAL_ID_LENGTH,
   LINK_CODE_CACHE_PREFIX,
   LINK_CODE_TTL_MS,
   LINK_CODE_LENGTH,

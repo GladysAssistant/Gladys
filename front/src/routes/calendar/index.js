@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import actions from '../../actions/calendar';
 import { isBright } from '../../utils/color';
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -23,7 +24,15 @@ class Map extends Component {
       from = dayjs(range.start).toDate();
       to = dayjs(range.end).toDate();
     }
+    // remembered so a calendar.updated push can refetch the displayed range
+    this.currentRange = { from, to };
     this.props.getEventsInRange(from, to);
+  };
+
+  onCalendarUpdated = () => {
+    if (this.currentRange) {
+      this.props.getEventsInRange(this.currentRange.from, this.currentRange.to);
+    }
   };
 
   eventPropGetter = event =>
@@ -76,7 +85,20 @@ class Map extends Component {
           .toDate();
         break;
     }
+    this.currentRange = { from, to };
     this.props.getEventsInRange(from, to);
+  }
+
+  componentDidMount() {
+    if (this.props.session && this.props.session.dispatcher) {
+      this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED, this.onCalendarUpdated);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.session && this.props.session.dispatcher) {
+      this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.CALENDAR.UPDATED, this.onCalendarUpdated);
+    }
   }
 
   render(props, {}) {
@@ -124,4 +146,4 @@ class Map extends Component {
   }
 }
 
-export default connect('eventsFormated,calendars,user', actions, dayjs)(withIntlAsProp(Map));
+export default connect('eventsFormated,calendars,user,session', actions, dayjs)(withIntlAsProp(Map));

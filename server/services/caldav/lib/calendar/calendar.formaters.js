@@ -1,3 +1,5 @@
+const { CALENDAR_TYPES } = require('../../../../utils/constants');
+
 // From : https://github.com/peterbraden/ical.js/blob/master/example_rrule.js
 /**
  * @description Format recurring events.
@@ -221,7 +223,7 @@ function formatCalendars(caldavCalendars, userId) {
       ctag: caldavCalendar.ctag,
       sync_token: caldavCalendar.syncToken,
       type: caldavCalendar.type,
-      sync: caldavCalendar.type === 'CALDAV',
+      sync: caldavCalendar.type === CALENDAR_TYPES.CALDAV,
     };
 
     calendars.push(newCalendar);

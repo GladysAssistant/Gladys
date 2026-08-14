@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
 const { slugify } = require('../../../../utils/slugify');
+const { CALENDAR_TYPES } = require('../../../../utils/constants');
 
 /**
  * @description Start user's WEBCAL calendars synchronization.
@@ -11,7 +12,7 @@ const { slugify } = require('../../../../utils/slugify');
  */
 async function syncUserWebcals(userId) {
   // List user Webcals
-  const gladysWebcals = await this.gladys.calendar.get(userId, { sync: true, type: 'WEBCAL' });
+  const gladysWebcals = await this.gladys.calendar.get(userId, { sync: true, type: CALENDAR_TYPES.WEBCAL });
 
   logger.info(`Webcal : Found ${gladysWebcals.length} calendars.`);
 

@@ -103,12 +103,15 @@ class ExternalIntegrationInstallPage extends Component {
         body.granted_devices = this.state.grantedDevices || [];
       }
       const installed = await this.props.httpClient.post('/api/v1/external_integration', body);
-      // communication and weather integrations have no device screens, and
+      // communication, weather and calendar integrations have no device screens, and
       // an integration with settings needs them filled before any device
       // can be discovered: all land on the configuration screen after
       // install
       const configSchema = get(installed, 'manifest.config_schema') || [];
-      if (['communication', 'weather'].includes(get(installed, 'manifest.type')) || configSchema.length > 0) {
+      if (
+        ['communication', 'weather', 'calendar'].includes(get(installed, 'manifest.type')) ||
+        configSchema.length > 0
+      ) {
         route(`/dashboard/integration/device/external/${installed.selector}/config`);
       } else {
         route(`/dashboard/integration/device/external/${installed.selector}`);

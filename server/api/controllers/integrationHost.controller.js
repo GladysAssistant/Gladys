@@ -230,6 +230,78 @@ module.exports = function IntegrationHostController(gladys) {
   }
 
   /**
+   * @api {get} /api/integration/v1/calendar/account getCalendarAccounts
+   * @apiName getCalendarAccounts
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The users who enabled this calendar integration, with
+   * their account values (secrets included: this is the integration side).
+   * Calendar integrations only (403 otherwise).
+   */
+  async function getCalendarAccounts(req, res) {
+    const accounts = await gladys.externalIntegration.getCalendarAccounts(req.externalIntegrationService);
+    res.json(accounts);
+  }
+
+  /**
+   * @api {get} /api/integration/v1/calendar getIntegrationCalendars
+   * @apiName getIntegrationCalendars
+   * @apiGroup IntegrationHostApi
+   * @apiDescription The integration's calendars, with the user-owned sync
+   * flag telling which to skip; ?user=<selector> restricts to one user,
+   * without it every enabled user's calendars come back (startup resync).
+   */
+  async function getIntegrationCalendars(req, res) {
+    const calendars = await gladys.externalIntegration.getIntegrationCalendars(
+      req.externalIntegrationService,
+      req.query.user,
+    );
+    res.json(calendars);
+  }
+
+  /**
+   * @api {post} /api/integration/v1/calendar publishCalendars
+   * @apiName publishCalendars
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Upsert of the calendars of one enabled user, keyed by
+   * external_id (user-scoped prefix enforced). Integration-owned fields
+   * (name, description, color) are overwritten, user-owned ones (sync,
+   * shared, selector) never touched.
+   */
+  async function publishCalendars(req, res) {
+    const result = await gladys.externalIntegration.publishCalendars(req.externalIntegrationService, req.body);
+    res.json(result);
+  }
+
+  /**
+   * @api {delete} /api/integration/v1/calendar deleteIntegrationCalendar
+   * @apiName deleteIntegrationCalendar
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Destroy one of the integration's calendars and its
+   * events (?external_id=...) — how a provider-side deletion propagates.
+   */
+  async function deleteIntegrationCalendar(req, res) {
+    const result = await gladys.externalIntegration.deleteIntegrationCalendar(
+      req.externalIntegrationService,
+      req.query.external_id,
+    );
+    res.json(result);
+  }
+
+  /**
+   * @api {post} /api/integration/v1/calendar/event publishCalendarEvents
+   * @apiName publishCalendarEvents
+   * @apiGroup IntegrationHostApi
+   * @apiDescription Upsert of a batch of events in one of the integration's
+   * calendars, keyed by external_id; with a window ({ from, to }), the
+   * integration's events overlapping the window and absent from the list
+   * are pruned (manually created events never are).
+   */
+  async function publishCalendarEvents(req, res) {
+    const result = await gladys.externalIntegration.publishCalendarEvents(req.externalIntegrationService, req.body);
+    res.json(result);
+  }
+
+  /**
    * @api {get} /api/integration/v1/webhook getWebhooks
    * @apiName getWebhooks
    * @apiGroup IntegrationHostApi
@@ -322,6 +394,11 @@ module.exports = function IntegrationHostController(gladys) {
     publishMessage: asyncMiddleware(publishMessage),
     linkContact: asyncMiddleware(linkContact),
     getContacts: asyncMiddleware(getContacts),
+    getCalendarAccounts: asyncMiddleware(getCalendarAccounts),
+    getIntegrationCalendars: asyncMiddleware(getIntegrationCalendars),
+    publishCalendars: asyncMiddleware(publishCalendars),
+    deleteIntegrationCalendar: asyncMiddleware(deleteIntegrationCalendar),
+    publishCalendarEvents: asyncMiddleware(publishCalendarEvents),
     getWebhooks: asyncMiddleware(getWebhooks),
     getContainers: asyncMiddleware(getContainers),
     startContainer: asyncMiddleware(startContainer),

@@ -1006,6 +1006,22 @@
         "notAvailableText": "Die Webhooks sind noch nicht aktiv: Speichern Sie Ihren Open-API-Schlüssel, um sie zu aktivieren.",
         "urlsText": "Webhook-URLs (die Integration registriert sie automatisch, wenn möglich; manche Dienste verlangen das Einfügen in die Anbieterkonsole). Diese URLs enthalten Ihren Schlüssel: Teilen Sie sie nur mit dem Drittanbieterdienst."
       },
+      "myCalendars": {
+        "title": "Meine Kalender",
+        "description": "Diese Integration erstellt Kalender und Termine in Gladys für die Benutzer, die sie aktivieren. Aktivieren Sie sie mit Ihrem eigenen Konto, um ihre Kalender in Ihrer Kalenderansicht zu sehen; das Deaktivieren löscht Ihre Kalender aus Gladys (beim Anbieter bleiben sie unberührt).",
+        "enableButton": "Für mich aktivieren",
+        "saveButton": "Speichern",
+        "disableButton": "Deaktivieren und meine Kalender löschen",
+        "disableConfirmText": "Ihre Kalender aus dieser Integration und deren Termine werden aus Gladys gelöscht. Die Kalender beim Anbieter bleiben unberührt, und eine erneute Aktivierung stellt bei der nächsten Synchronisierung alles wieder her.",
+        "disableConfirmButton": "Meine Kalender löschen",
+        "cancelButton": "Abbrechen",
+        "saveError": "Beim Speichern Ihres Kontos ist ein Fehler aufgetreten.",
+        "saveSuccess": "Ihr Konto wurde gespeichert.",
+        "noCalendars": "Noch kein Kalender: die Integration überträgt Ihre Kalender bei der nächsten Synchronisierung.",
+        "syncLabel": "Diesen Kalender synchronisieren",
+        "sharedLabel": "Mit dem Haushalt teilen",
+        "sharedHelp": "Ein geteilter Kalender ist für den ganzen Haushalt sichtbar und kann Szenen auslösen."
+      },
       "contactProfile": {
         "title": "Mein Konto",
         "description": "Dieser Kanal sendet Nachrichten mit Ihren persönlichen Zugangsdaten. Jeder Benutzer trägt seine eigenen Werte ein; leer lassen, um nichts zu erhalten. Das Löschen Ihrer Werte stoppt die Nachrichten.",

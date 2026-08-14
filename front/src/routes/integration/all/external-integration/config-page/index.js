@@ -54,6 +54,10 @@ class ExternalIntegrationConfigPage extends Component {
           await this.loadContactProfile();
         }
       }
+      if (get(integration, 'manifest.type') === 'calendar') {
+        // the per-user "My calendars" block (B.19)
+        await this.loadCalendarAccount();
+      }
       if (isAdmin) {
         await this.loadGatewayStatus(integration);
         await this.loadDynamicOptions(integration);
@@ -227,6 +231,119 @@ class ExternalIntegrationConfigPage extends Component {
     } catch (e) {
       console.error(e);
       this.setState({ contactProfileStatus: RequestStatus.Error });
+    }
+  };
+
+  loadCalendarAccount = async () => {
+    try {
+      const calendarAccount = await this.props.httpClient.get(
+        `/api/v1/external_integration/${this.props.selector}/calendar/account`
+      );
+      this.setState({
+        calendarAccount,
+        calendarAccountValues: Object.assign({}, calendarAccount.config),
+        calendarAccountTouchedSecrets: {},
+        calendarDisableConfirming: false
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  updateCalendarAccountValue = (field, value) => {
+    const calendarAccountValues = Object.assign({}, this.state.calendarAccountValues, { [field.key]: value });
+    const newState = { calendarAccountValues, calendarAccountStatus: null };
+    if (field.type === 'secret') {
+      newState.calendarAccountTouchedSecrets = Object.assign({}, this.state.calendarAccountTouchedSecrets, {
+        [field.key]: true
+      });
+    }
+    this.setState(newState);
+  };
+
+  saveCalendarAccount = async e => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState({ calendarAccountStatus: RequestStatus.Getting });
+    const { integration, calendarAccountValues = {}, calendarAccountTouchedSecrets = {} } = this.state;
+    const accountSchema = get(integration, 'manifest.account_schema') || [];
+    const config = {};
+    accountSchema.forEach(field => {
+      const value = calendarAccountValues[field.key];
+      if (field.type === 'secret') {
+        // a secret set to null means "unchanged" on the server side
+        config[field.key] = calendarAccountTouchedSecrets[field.key] ? value : null;
+      } else if (field.type === 'number') {
+        const numericValue = value === '' || value === undefined || value === null ? NaN : Number(value);
+        if (!Number.isNaN(numericValue)) {
+          config[field.key] = numericValue;
+        }
+      } else if (field.type === 'boolean') {
+        config[field.key] = !!value;
+      } else if (value !== undefined && value !== null) {
+        config[field.key] = value;
+      }
+    });
+    try {
+      const calendarAccount = await this.props.httpClient.post(
+        `/api/v1/external_integration/${this.props.selector}/calendar/account`,
+        { config }
+      );
+      this.setState({
+        calendarAccount,
+        calendarAccountValues: Object.assign({}, calendarAccount.config),
+        calendarAccountTouchedSecrets: {},
+        calendarAccountStatus: RequestStatus.Success
+      });
+    } catch (err) {
+      console.error(err);
+      this.setState({ calendarAccountStatus: RequestStatus.Error });
+    }
+  };
+
+  armDisableCalendarAccount = () => {
+    // disabling destroys the user's calendars: explicit confirmation first
+    this.setState({ calendarDisableConfirming: true, calendarAccountStatus: null });
+  };
+
+  cancelDisableCalendarAccount = () => {
+    this.setState({ calendarDisableConfirming: false });
+  };
+
+  disableCalendarAccount = async () => {
+    this.setState({ calendarAccountStatus: RequestStatus.Getting });
+    try {
+      await this.props.httpClient.delete(`/api/v1/external_integration/${this.props.selector}/calendar/account`);
+      this.setState({ calendarAccountStatus: null, calendarDisableConfirming: false });
+      await this.loadCalendarAccount();
+    } catch (e) {
+      console.error(e);
+      this.setState({ calendarAccountStatus: RequestStatus.Error });
+    }
+  };
+
+  toggleUserCalendar = async (calendarSelector, key, checked) => {
+    // optimistic toggle, rolled back on failure (the preferLocal pattern).
+    // Both the patch and the rollback derive from the previous state and touch
+    // only this calendar: two toggles fired back to back never drop each other.
+    const patch = value => state => ({
+      calendarAccount: Object.assign({}, state.calendarAccount, {
+        calendars: (get(state, 'calendarAccount.calendars') || []).map(calendar =>
+          calendar.selector === calendarSelector ? Object.assign({}, calendar, { [key]: value }) : calendar
+        )
+      })
+    });
+    this.setState(state => Object.assign({ calendarToggleStatus: RequestStatus.Getting }, patch(checked)(state)));
+    try {
+      await this.props.httpClient.patch(
+        `/api/v1/external_integration/${this.props.selector}/calendar/${calendarSelector}`,
+        { [key]: checked }
+      );
+      this.setState({ calendarToggleStatus: RequestStatus.Success });
+    } catch (err) {
+      console.error(err);
+      this.setState(state => Object.assign({ calendarToggleStatus: RequestStatus.Error }, patch(!checked)(state)));
     }
   };
 
@@ -562,6 +679,12 @@ class ExternalIntegrationConfigPage extends Component {
           updateContactProfileValue={this.updateContactProfileValue}
           saveContactProfile={this.saveContactProfile}
           clearContactProfile={this.clearContactProfile}
+          updateCalendarAccountValue={this.updateCalendarAccountValue}
+          saveCalendarAccount={this.saveCalendarAccount}
+          armDisableCalendarAccount={this.armDisableCalendarAccount}
+          cancelDisableCalendarAccount={this.cancelDisableCalendarAccount}
+          disableCalendarAccount={this.disableCalendarAccount}
+          toggleUserCalendar={this.toggleUserCalendar}
           toggleHardwareClass={this.toggleHardwareClass}
           saveHardware={this.saveHardware}
         />

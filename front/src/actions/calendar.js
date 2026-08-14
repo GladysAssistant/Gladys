@@ -14,12 +14,15 @@ function createActions(store) {
         });
         const calendars = await state.httpClient.get('/api/v1/calendar');
         const eventsFormated = events.map(event => {
+          // the event may belong to a shared calendar absent from the list:
+          // never crash the view on a missing calendar or color
+          const calendar = calendars.find(oneCalendar => oneCalendar.id === event.calendar_id);
           return {
             title: event.name,
             start: new Date(event.start),
             end: new Date(event.end),
             allDay: event.full_day,
-            color: calendars.find(calendar => calendar.id === event.calendar_id).color
+            color: (calendar && calendar.color) || null
           };
         });
         store.setState({
