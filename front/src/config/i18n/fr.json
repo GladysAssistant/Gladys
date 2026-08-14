@@ -414,6 +414,7 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Mouvement détecté",
+        "noMotionDetected": "Pas de mouvement",
         "doorbellRinging": "Sonne",
         "pushButton": "Appuyer",
         "vacuumDock": "Retour à la base"
