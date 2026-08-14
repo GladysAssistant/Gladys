@@ -30,12 +30,18 @@ class AddressSearch extends Component {
     });
     try {
       const results = await searchAddress(query);
+      if (this.unmounted) {
+        return;
+      }
       this.setState({
         results,
         loading: false
       });
     } catch (e) {
       console.error(e);
+      if (this.unmounted) {
+        return;
+      }
       this.setState({
         error: true,
         loading: false
@@ -58,6 +64,10 @@ class AddressSearch extends Component {
       loading: false,
       error: false
     };
+  }
+
+  componentWillUnmount() {
+    this.unmounted = true;
   }
 
   render(props, { query, results, loading, error }) {
@@ -87,6 +97,9 @@ class AddressSearch extends Component {
               <Text id="signup.configureHouse.addressSearchButton" />
             </button>
           </span>
+        </div>
+        <div class="text-muted small mt-1">
+          <Text id="signup.configureHouse.addressSearchPrivacyNotice" />
         </div>
         {error && (
           <div class="text-danger small mt-1">
