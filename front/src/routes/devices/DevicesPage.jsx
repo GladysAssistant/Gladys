@@ -12,20 +12,18 @@ const DevicesPage = ({ children, ...props }) => (
       <div class="my-3 my-md-5">
         <div class="container">
           <div class={cx('page-header', style.pageHeaderResponsive)}>
-            <div>
-              <h1 class="page-title">
-                <Text id="devicesList.title" />
-              </h1>
-              {props.initialized && (
-                <div class="page-subtitle">
-                  <Text
-                    id="devicesList.deviceCount"
-                    plural={props.filteredDevices.length}
-                    fields={{ count: props.filteredDevices.length }}
-                  />
-                </div>
-              )}
-            </div>
+            <h1 class="page-title">
+              <Text id="devicesList.title" />
+            </h1>
+            {props.initialized && (
+              <div class="page-subtitle">
+                <Text
+                  id="devicesList.deviceCount"
+                  plural={props.filteredDevices.length}
+                  fields={{ count: props.filteredDevices.length }}
+                />
+              </div>
+            )}
             <div class={cx('page-options', 'd-flex', style.pageOptions)}>
               <select onChange={props.selectRoom} class="form-control custom-select w-auto mr-2">
                 <option value="">
