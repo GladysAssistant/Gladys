@@ -11,17 +11,27 @@ module.exports = {
 
     // A string option has no meaningful integer value (the column keeps a filler), so the
     // composite unique index splits into two partial ones, each covering one value kind.
-    await queryInterface.removeIndex('t_device_feature_supported_option', ['device_feature_id', 'value']);
-    await queryInterface.sequelize.query(
-      `CREATE UNIQUE INDEX \`t_device_feature_supported_option_device_feature_id_value\`
-        ON \`t_device_feature_supported_option\` (\`device_feature_id\`, \`value\`)
-        WHERE \`value_string\` IS NULL;`,
-    );
-    await queryInterface.sequelize.query(
-      `CREATE UNIQUE INDEX \`t_device_feature_supported_option_feature_id_value_string\`
-        ON \`t_device_feature_supported_option\` (\`device_feature_id\`, \`value_string\`)
-        WHERE \`value_string\` IS NOT NULL;`,
-    );
+    // SQLite DDL is transactional: the swap runs in one transaction so a failure cannot
+    // leave the table without its uniqueness guarantee.
+    await queryInterface.sequelize.transaction(async (transaction) => {
+      await queryInterface.removeIndex('t_device_feature_supported_option', ['device_feature_id', 'value'], {
+        transaction,
+      });
+      await queryInterface.sequelize.query(
+        `CREATE UNIQUE INDEX \`t_device_feature_supported_option_device_feature_id_value\`
+          ON \`t_device_feature_supported_option\` (\`device_feature_id\`, \`value\`)
+          WHERE \`value_string\` IS NULL;`,
+        { transaction },
+      );
+      await queryInterface.sequelize.query(
+        `CREATE UNIQUE INDEX \`t_device_feature_supported_option_feature_id_value_string\`
+          ON \`t_device_feature_supported_option\` (\`device_feature_id\`, \`value_string\`)
+          WHERE \`value_string\` IS NOT NULL;`,
+        { transaction },
+      );
+    });
   },
+  // Purely additive: nothing destructive to undo, and an older Gladys simply ignores the
+  // extra nullable column, so downgrading with the column in place is harmless.
   down: async () => {},
 };

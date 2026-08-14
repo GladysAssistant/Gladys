@@ -39,10 +39,13 @@ describe('normalizeSupportedOptions', () => {
   });
 
   it('should accept string values for dynamic selects', () => {
-    const options = normalizeSupportedOptions([
-      { value: 'netflix', label: 'Netflix' },
-      { value: 'com.disney.disneyplus-prod', label: 'Disney+' },
-    ]);
+    const options = normalizeSupportedOptions(
+      [
+        { value: 'netflix', label: 'Netflix' },
+        { value: 'com.disney.disneyplus-prod', label: 'Disney+' },
+      ],
+      { allowStringValues: true },
+    );
 
     expect(options).to.deep.equal([
       { value: 'netflix', label: 'Netflix', sort_order: 0 },
@@ -50,21 +53,31 @@ describe('normalizeSupportedOptions', () => {
     ]);
   });
 
+  it('should reject string values when they are not allowed (enum-like features)', () => {
+    expect(() => normalizeSupportedOptions([{ value: 'netflix', label: 'Netflix' }])).to.throw(BadParameters);
+  });
+
   it('should keep a numeric-looking string value as a string', () => {
-    expect(normalizeSupportedOptions([{ value: '5', label: 'Five' }])).to.deep.equal([
+    expect(normalizeSupportedOptions([{ value: '5', label: 'Five' }], { allowStringValues: true })).to.deep.equal([
       { value: '5', label: 'Five', sort_order: 0 },
     ]);
   });
 
   it('should strip the internal value_string column from round-tripped options', () => {
-    expect(normalizeSupportedOptions([{ value: 'netflix', value_string: 'netflix', label: 'Netflix' }])).to.deep.equal([
-      { value: 'netflix', label: 'Netflix', sort_order: 0 },
-    ]);
+    expect(
+      normalizeSupportedOptions([{ value: 'netflix', value_string: 'netflix', label: 'Netflix' }], {
+        allowStringValues: true,
+      }),
+    ).to.deep.equal([{ value: 'netflix', label: 'Netflix', sort_order: 0 }]);
   });
 
   it('should reject an empty string value', () => {
-    expect(() => normalizeSupportedOptions([{ value: '', label: 'On' }])).to.throw(BadParameters);
-    expect(() => normalizeSupportedOptions([{ value: '   ', label: 'On' }])).to.throw(BadParameters);
+    expect(() => normalizeSupportedOptions([{ value: '', label: 'On' }], { allowStringValues: true })).to.throw(
+      BadParameters,
+    );
+    expect(() => normalizeSupportedOptions([{ value: '   ', label: 'On' }], { allowStringValues: true })).to.throw(
+      BadParameters,
+    );
   });
 
   it('should reject invalid types', () => {
@@ -78,10 +91,13 @@ describe('normalizeSupportedOptions', () => {
 
   it('should reject duplicates between an integer and its string form', () => {
     expect(() =>
-      normalizeSupportedOptions([
-        { value: 1, label: 'On' },
-        { value: '1', label: 'On again' },
-      ]),
+      normalizeSupportedOptions(
+        [
+          { value: 1, label: 'On' },
+          { value: '1', label: 'On again' },
+        ],
+        { allowStringValues: true },
+      ),
     ).to.throw(BadParameters, /duplicate values/);
   });
 

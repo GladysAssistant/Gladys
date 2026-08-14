@@ -12,16 +12,20 @@ import {
 import DeviceCard from './DeviceCard';
 import debounce from 'debounce';
 
+// A dynamic select holds a string state: its widget reads last_value_string
+const isTextSelectFeature = feature =>
+  feature.category === DEVICE_FEATURE_CATEGORIES.TEXT && feature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT;
+
 const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
   return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
-      // A string value is a string state (text select): it lives in last_value_string,
-      // and writing it to last_value would leave the control stuck on the old choice
-      // until the websocket event comes back
-      if (typeof lastValue === 'string') {
+      // The branch is on the FEATURE, not on typeof lastValue: numeric widgets (sliders,
+      // number inputs...) pass the raw DOM string while still reading last_value, so a
+      // typeof check would break their optimistic update
+      if (isTextSelectFeature(feature)) {
         return {
           ...feature,
-          last_value_string: lastValue,
+          last_value_string: `${lastValue}`,
           last_value_changed: lastValueChange
         };
       }

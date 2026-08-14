@@ -1005,6 +1005,37 @@ describe('Device', () => {
       expect(error).to.be.instanceOf(BadParameters);
     }
   });
+  it('should reject string supported_options on an enum-like feature', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+
+    try {
+      await device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'String options on enum device',
+        external_id: 'string-options-on-enum',
+        features: [
+          {
+            name: 'Run mode',
+            external_id: 'string-options:run-mode',
+            category: 'vacuum-cleaner',
+            type: 'mode',
+            read_only: false,
+            keep_history: true,
+            has_feedback: true,
+            min: 0,
+            max: 5,
+            supported_options: [{ value: 'turbo', label: 'Turbo' }],
+          },
+        ],
+        params: [],
+      });
+      expect.fail('should have thrown');
+    } catch (error) {
+      expect(error).to.be.instanceOf(BadParameters);
+    }
+  });
   it('should reject device create without external_id', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
