@@ -17,7 +17,19 @@ class SetVariable extends Component {
     };
   }
 
-  toggleType = () => this.setState({ computed: !this.state.computed });
+  // Switching the value type clears the value of the other type, so the action never keeps
+  // both a "text" and an "evaluate_value": the server refuses ambiguous actions.
+  selectValueType = computed => {
+    if (computed === this.state.computed) {
+      return;
+    }
+    this.setState({ computed });
+    this.props.updateActionProperty(this.props.path, computed ? 'text' : 'evaluate_value', undefined);
+  };
+
+  selectTextType = () => this.selectValueType(false);
+
+  selectComputedType = () => this.selectValueType(true);
 
   handleChangeName = e => {
     const newName = e.target.value;
@@ -62,7 +74,7 @@ class SetVariable extends Component {
           <div className="tags-input">
             <Localizer>
               <TextWithVariablesInjected
-                text={this.props.action.evaluate_value}
+                text={this.props.action.evaluate_value || ''}
                 triggersVariables={this.props.triggersVariables}
                 actionsGroupsBefore={this.props.actionsGroupsBefore}
                 variables={this.props.variables}
@@ -84,7 +96,7 @@ class SetVariable extends Component {
         <div className="tags-input">
           <Localizer>
             <TextWithVariablesInjected
-              text={this.props.action.text}
+              text={this.props.action.text || ''}
               triggersVariables={this.props.triggersVariables}
               actionsGroupsBefore={this.props.actionsGroupsBefore}
               variables={this.props.variables}
@@ -120,10 +132,10 @@ class SetVariable extends Component {
         </div>
         <div class="form-group">
           <div className={cx('nav-tabs', style.valueTypeTab)}>
-            <span class={cx('nav-link', style.valueTypeLink, { active: !computed })} onClick={this.toggleType}>
+            <span class={cx('nav-link', style.valueTypeLink, { active: !computed })} onClick={this.selectTextType}>
               <Text id="editScene.actionsCard.setVariable.valueTypeText" />
             </span>
-            <span class={cx('nav-link', style.valueTypeLink, { active: computed })} onClick={this.toggleType}>
+            <span class={cx('nav-link', style.valueTypeLink, { active: computed })} onClick={this.selectComputedType}>
               <Text id="editScene.actionsCard.setVariable.valueTypeComputed" />
             </span>
           </div>

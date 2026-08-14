@@ -181,6 +181,58 @@ describe('scene.setVariable', () => {
     await expect(promise).to.be.rejectedWith(AbortScene, 'VARIABLE_VALUE_NOT_A_NUMBER');
   });
 
+  it('should abort the scene if the formula overflows to a non-finite number', async () => {
+    const stateManager = new StateManager(event);
+    const promise = executeActions(
+      { stateManager, event },
+      [
+        [
+          {
+            type: ACTIONS.VARIABLE.SET,
+            evaluate_value: '1e309',
+          },
+        ],
+      ],
+      {},
+    );
+    await expect(promise).to.be.rejectedWith(AbortScene, 'VARIABLE_VALUE_NOT_A_NUMBER');
+  });
+
+  it('should abort the scene if the text template is invalid', async () => {
+    const stateManager = new StateManager(event);
+    const promise = executeActions(
+      { stateManager, event },
+      [
+        [
+          {
+            type: ACTIONS.VARIABLE.SET,
+            text: 'Hello {{#each}}',
+          },
+        ],
+      ],
+      {},
+    );
+    await expect(promise).to.be.rejectedWith(AbortScene, 'VARIABLE_TEXT_NOT_VALID');
+  });
+
+  it('should abort the scene if both a text and a formula are configured', async () => {
+    const stateManager = new StateManager(event);
+    const promise = executeActions(
+      { stateManager, event },
+      [
+        [
+          {
+            type: ACTIONS.VARIABLE.SET,
+            text: 'Hello',
+            evaluate_value: '2 * 3',
+          },
+        ],
+      ],
+      {},
+    );
+    await expect(promise).to.be.rejectedWith(AbortScene, 'VARIABLE_VALUE_AMBIGUOUS');
+  });
+
   it('should abort the scene if the formula does not return a number', async () => {
     const stateManager = new StateManager(event);
     const promise = executeActions(

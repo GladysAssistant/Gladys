@@ -219,7 +219,7 @@ function createSceneCreateInputSchema(
           .string()
           .optional()
           .describe(
-            'Text value of the variable. It can contain Handlebars variables, for example {{0.0.last_value}}. Mutually exclusive with evaluate_value.',
+            'Text value of the variable. It can contain Handlebars variables, for example {{0.0.last_value}}. Mutually exclusive with evaluate_value. The result is available in the next actions as {{<action coordinates>.value}}, for example {{1.0.value}}.',
           ),
         evaluate_value: z
           .string()
@@ -227,6 +227,8 @@ function createSceneCreateInputSchema(
           .describe(
             'Formula evaluated to a number, for example {{0.0.last_value}} * 2. Mutually exclusive with text. The result is available in the next actions as {{<action coordinates>.value}}, for example {{1.0.value}}.',
           ),
+      }).refine((action) => action.text === undefined || action.evaluate_value === undefined, {
+        message: 'text and evaluate_value cannot be used at the same time',
       }),
       actionSchemaByType(ACTIONS.CONDITION.ONLY_CONTINUE_IF, {
         conditions: z
