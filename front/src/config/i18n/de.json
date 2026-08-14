@@ -87,6 +87,25 @@
       "closeButton": "Schließen"
     }
   },
+  "devicesList": {
+    "title": "Geräte",
+    "deviceCount": {
+      "one": "1 Gerät",
+      "other": "{{count}} Geräte"
+    },
+    "searchPlaceholder": "Geräte suchen",
+    "allRooms": "Alle Räume",
+    "noRoom": "Kein Raum",
+    "allIntegrations": "Alle Integrationen",
+    "device": "Gerät",
+    "room": "Raum",
+    "integration": "Integration",
+    "features": "Funktionen",
+    "openInIntegration": "In der Integration öffnen",
+    "emptyState": "Keine Geräte gefunden. Füge Geräte über die Integrationsseite hinzu oder passe deine Suche und Filter an.",
+    "emptyStateButton": "Integrationen durchsuchen",
+    "error": "Beim Laden der Geräte ist ein Fehler aufgetreten. Bitte versuche es später erneut."
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Willkommen",

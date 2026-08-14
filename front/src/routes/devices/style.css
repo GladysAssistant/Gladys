@@ -1,0 +1,33 @@
+@media (max-width: 992px) {
+  .pageHeaderResponsive {
+    margin-top: 0rem;
+  }
+}
+
+.pageOptions {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+}
+
+.devicesListContainer {
+  min-height: 200px;
+}
+
+.emptyStateDivBox {
+  width: 60%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 80px;
+  margin-bottom: 80px;
+}
+
+.emptyStateIcon {
+  font-size: 4rem;
+  color: #9aa0ac;
+}
+
+.emptyStateText {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
