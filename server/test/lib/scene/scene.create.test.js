@@ -142,7 +142,7 @@ describe('SceneManager', () => {
       ],
       tags: [],
     });
-    await assert.isRejected(promise);
+    await assert.isRejected(promise, /conflict between optional exclusive peers \[text, evaluate_value\]/);
   });
 
   it('should create one scene with a variable.set action', async () => {
