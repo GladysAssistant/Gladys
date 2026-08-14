@@ -90,7 +90,7 @@ function shouldForceToolChoice(toolCategories) {
  * @param {boolean} options.forceToolUse - Whether the intent requires a tool call.
  * @param {boolean} options.hasTools - Whether at least one tool is available to the model.
  * @param {boolean} options.hasCompletedToolIteration - Whether a tool turn already ran.
- * @returns {'required'|'auto'} Tool_choice value for the API request.
+ * @returns {'required'|'auto'} The tool_choice value for the API request.
  * @example
  * resolveToolChoice({ forceToolUse: true, hasTools: true, hasCompletedToolIteration: false });
  */

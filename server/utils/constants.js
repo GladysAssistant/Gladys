@@ -1255,7 +1255,7 @@ const FAN_SETTING_ENUM_BY_FEATURE_TYPE = {
 
 /**
  * @description Get valid fan feature option values for a feature type within min/max bounds.
- * @param {string} featureType - Device feature type (e.g. Rock-setting).
+ * @param {string} featureType - Device feature type (for example, rock-setting).
  * @param {number} min - Minimum value supported by the device.
  * @param {number} max - Maximum value supported by the device.
  * @returns {number[]} List of option values.
