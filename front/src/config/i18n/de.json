@@ -2143,7 +2143,8 @@
           "max": "Dieses Feld ist erforderlich und muss eine Zahl sein",
           "external_id": "Dieses Feld ist erforderlich und muss eindeutig sein",
           "unit": "Die gewählte Einheit ist für diese Funktion ungültig",
-          "room_id": "Der gewählte Raum ist ungültig"
+          "room_id": "Der gewählte Raum ist ungültig",
+          "supported_options": "Die Auswahl benötigt mindestens eine Option, jeweils mit Beschriftung und eindeutigem Wert"
         },
         "saveConflictError": "Konflikt: Sind alle externen IDs wirklich eindeutig?",
         "mostRecentValueAt": "Zuletzt empfangener Wert {{mostRecentValueAt}}.",
@@ -2225,7 +2226,8 @@
             "push": "Eine Taste zum Auslösen einer Aktion in Gladys oder über MQTT."
           },
           "text": {
-            "text": "Zeigt einen Textwert an, nützlich für benutzerdefinierte Nachrichten oder Daten."
+            "text": "Zeigt einen Textwert an, nützlich für benutzerdefinierte Nachrichten oder Daten.",
+            "select": "Eine Liste von Auswahlmöglichkeiten, die Sie definieren (Szenen, Modi, Quellen...): der ausgewählte Wert wird an Ihr Gerät gesendet."
           },
           "battery": {
             "integer": "Zeigt den Batteriestand als Prozentsatz an."
@@ -2270,6 +2272,13 @@
         "readOnlyLabel": "Ist es ein Sensor?",
         "readOnlyShortDescription": "Ja, es ist ein Sensor",
         "readOnlyButton": "Ja, es ist ein Sensor, der nur Daten an Gladys sendet.",
+        "selectOptions": {
+          "label": "Auswahlmöglichkeiten",
+          "description": "Die Liste, die auf dem Dashboard angeboten wird. Die Beschriftung ist sichtbar, der Wert wird an das Gerät gesendet.",
+          "labelPlaceholder": "Beschriftung (z. B. Filmabend)",
+          "valuePlaceholder": "Wert (z. B. filmabend)",
+          "addOption": "Auswahl hinzufügen"
+        },
         "addButton": "Funktion hinzufügen",
         "mqttTopicToPublishExampleLabel": "MQTT-Veröffentlichungsthema",
         "mqttTopicToPublishExampleDescription": "Gladys hört auf dieses Topic. Wenn du einen Wert in diesem Thema veröffentlichst, wird er diesem Gerät zugeordnet. (siehe <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation</a>)",

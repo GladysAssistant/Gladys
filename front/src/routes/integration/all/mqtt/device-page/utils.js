@@ -68,9 +68,6 @@ const categoryTypeKey = (category, type) => `${category}|${type}`;
 
 const MQTT_CATALOG_EXCLUDED_FEATURES = new Set([
   categoryTypeKey(DEVICE_FEATURE_CATEGORIES.SWITCH, DEVICE_FEATURE_TYPES.SWITCH.BURGLAR),
-  // A dynamic select only makes sense when an integration declares the options discovered
-  // on the appliance: there is no UI to type supported_options by hand on an MQTT device.
-  categoryTypeKey(DEVICE_FEATURE_CATEGORIES.TEXT, DEVICE_FEATURE_TYPES.TEXT.SELECT),
   // Water valve types are only exposed by Zigbee2mqtt for now: the MQTT catalog defaults
   // (min/max and unit) are not accurate for them yet.
   ...Object.values(DEVICE_FEATURE_TYPES.WATER_VALVE).map(type =>
@@ -591,6 +588,12 @@ export const getFeatureDefaultValues = (category, type) => {
 
   if (type === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 0, keep_history: false }, category, type);
+  }
+
+  // A dynamic select is a control: the user picks a value that is published to the
+  // device. Its choices live in supported_options, edited in the feature form.
+  if (category === DEVICE_FEATURE_CATEGORIES.TEXT && type === DEVICE_FEATURE_TYPES.TEXT.SELECT) {
+    return { ...defaults, min: 0, max: 0, read_only: false, keep_history: false, supported_options: [] };
   }
 
   if (
@@ -1196,6 +1199,21 @@ export const getFeaturePreviewStringValue = (category, type) => {
   if (type === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
     return 'Hello Gladys';
   }
+  if (category === DEVICE_FEATURE_CATEGORIES.TEXT && type === DEVICE_FEATURE_TYPES.TEXT.SELECT) {
+    return 'option-1';
+  }
+  return null;
+};
+
+// Sample choices so the catalog preview of a dynamic select shows a working control
+// instead of an empty button group (a real feature starts with no option declared)
+export const getFeaturePreviewSupportedOptions = (category, type) => {
+  if (category === DEVICE_FEATURE_CATEGORIES.TEXT && type === DEVICE_FEATURE_TYPES.TEXT.SELECT) {
+    return [
+      { value: 'option-1', label: 'Option 1', sort_order: 0 },
+      { value: 'option-2', label: 'Option 2', sort_order: 1 }
+    ];
+  }
   return null;
 };
 
@@ -1239,6 +1257,53 @@ export const filterFeatureCatalogOptions = (options, search, dictionary) => {
       return { ...group, options: filteredOptions };
     })
     .filter(Boolean);
+};
+
+export const isSelectFeature = feature =>
+  feature && feature.category === DEVICE_FEATURE_CATEGORIES.TEXT && feature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT;
+
+// A dynamic select is saved with tidy options: labels and values trimmed, rows the user
+// left entirely empty dropped, and sort_order following the visual order
+export const sanitizeSelectFeatureOptions = device => {
+  if (!device || !Array.isArray(device.features)) {
+    return device;
+  }
+  const features = device.features.map(feature => {
+    if (!isSelectFeature(feature)) {
+      return feature;
+    }
+    const supportedOptions = (feature.supported_options || [])
+      .map(option => ({
+        ...option,
+        value: typeof option.value === 'string' ? option.value.trim() : option.value,
+        label: (option.label || '').trim()
+      }))
+      .filter(option => {
+        const value = option.value === null || option.value === undefined ? '' : `${option.value}`;
+        return value !== '' || option.label !== '';
+      })
+      .map((option, index) => ({ ...option, sort_order: index }));
+    return { ...feature, supported_options: supportedOptions };
+  });
+  return { ...device, features };
+};
+
+// The select needs at least one complete choice, and two choices sharing a value would be
+// indistinguishable once selected (the server enforces the same rules)
+export const getSelectFeatureOptionsError = feature => {
+  const options = feature.supported_options || [];
+  if (options.length === 0) {
+    return 'empty';
+  }
+  const values = options.map(option => (option.value === null || option.value === undefined ? '' : `${option.value}`));
+  const hasIncompleteRow = options.some((option, index) => values[index] === '' || !(option.label || '').trim());
+  if (hasIncompleteRow) {
+    return 'incomplete';
+  }
+  if (new Set(values).size !== values.length) {
+    return 'duplicate';
+  }
+  return null;
 };
 
 export const featureNeedsMinMax = (category, type) => {

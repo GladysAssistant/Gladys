@@ -16,7 +16,10 @@ import {
   normalizeMqttExternalId,
   parseMqttDeviceValidationErrors,
   clearMqttDeviceValidationError,
-  isMqttCatalogFeatureVisible
+  isMqttCatalogFeatureVisible,
+  isSelectFeature,
+  sanitizeSelectFeatureOptions,
+  getSelectFeatureOptionsError
 } from '../utils';
 
 import {
@@ -382,6 +385,24 @@ class MqttDeviceSetupPage extends Component {
     });
   }
 
+  updateFeatureSupportedOptions(featureIndex, supportedOptions) {
+    const validationErrors = clearMqttDeviceValidationError(
+      this.state.validationErrors,
+      'supported_options',
+      featureIndex
+    );
+    const device = update(this.state.device, {
+      features: {
+        [featureIndex]: {
+          supported_options: {
+            $set: supportedOptions
+          }
+        }
+      }
+    });
+    this.setState({ device, validationErrors });
+  }
+
   buildClientValidationErrors(device) {
     const properties = [];
 
@@ -421,20 +442,36 @@ class MqttDeviceSetupPage extends Component {
           type: 'notNull Violation'
         });
       }
+
+      // A dynamic select is unusable without at least one complete, unambiguous choice
+      if (isSelectFeature(feature) && getSelectFeatureOptionsError(feature)) {
+        properties.push({
+          message: 'supported_options invalid',
+          attribute: 'supported_options',
+          // The array reference lets the error parser match this very feature
+          value: feature.supported_options,
+          type: 'notNull Violation'
+        });
+      }
     });
 
     return properties;
   }
 
   async saveDevice() {
-    this.setState({
+    // Trim select options and drop rows left entirely empty, so an abandoned blank row
+    // does not fail validation nor reach the server
+    const device = sanitizeSelectFeatureOptions(this.state.device);
+
+    await this.setState({
+      device,
       loading: true,
       validationErrors: null
     });
 
-    const clientValidationErrors = this.buildClientValidationErrors(this.state.device);
+    const clientValidationErrors = this.buildClientValidationErrors(device);
     if (clientValidationErrors.length > 0) {
-      const validationErrors = parseMqttDeviceValidationErrors(clientValidationErrors, this.state.device);
+      const validationErrors = parseMqttDeviceValidationErrors(clientValidationErrors, device);
       await this.setState({
         saveStatus: RequestStatus.ValidationError,
         validationErrors,
@@ -572,6 +609,7 @@ class MqttDeviceSetupPage extends Component {
     this.deleteFeature = this.deleteFeature.bind(this);
     this.updateDeviceProperty = this.updateDeviceProperty.bind(this);
     this.updateFeatureProperty = this.updateFeatureProperty.bind(this);
+    this.updateFeatureSupportedOptions = this.updateFeatureSupportedOptions.bind(this);
     this.saveDevice = this.saveDevice.bind(this);
     this.createEnergyConsumptionFeatures = this.createEnergyConsumptionFeatures.bind(this);
   }
@@ -632,6 +670,7 @@ class MqttDeviceSetupPage extends Component {
           deleteFeature={this.deleteFeature}
           updateDeviceProperty={this.updateDeviceProperty}
           updateFeatureProperty={this.updateFeatureProperty}
+          updateFeatureSupportedOptions={this.updateFeatureSupportedOptions}
           updateDeviceParam={this.updateDeviceParam}
           saveDevice={this.saveDevice}
           createEnergyConsumptionFeatures={this.createEnergyConsumptionFeatures}

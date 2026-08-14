@@ -2276,7 +2276,8 @@
           "max": "Le champ est obligatoire et doit être un nombre",
           "external_id": "Le champ est obligatoire et doit être unique",
           "unit": "L'unité sélectionnée n'est pas valide pour cette fonctionnalité",
-          "room_id": "La pièce sélectionnée n'est pas valide"
+          "room_id": "La pièce sélectionnée n'est pas valide",
+          "supported_options": "La sélection nécessite au moins un choix, chacun avec un libellé et une valeur unique"
         },
         "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes sont uniques ?",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
@@ -2358,7 +2359,8 @@
             "push": "Un bouton pour déclencher une action dans Gladys ou via MQTT."
           },
           "text": {
-            "text": "Affiche une valeur texte, utile pour des messages ou données personnalisés."
+            "text": "Affiche une valeur texte, utile pour des messages ou données personnalisés.",
+            "select": "Une liste de choix que vous définissez (scènes, modes, sources...) : la valeur sélectionnée est publiée vers votre appareil."
           },
           "battery": {
             "integer": "Affiche le niveau de batterie en pourcentage."
@@ -2403,6 +2405,13 @@
         "readOnlyLabel": "Est-ce un capteur ?",
         "readOnlyShortDescription": "Oui, c'est un capteur",
         "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
+        "selectOptions": {
+          "label": "Choix",
+          "description": "La liste proposée sur le tableau de bord. Le libellé est ce que vous voyez, la valeur est ce qui est publié vers votre appareil.",
+          "labelPlaceholder": "Libellé (ex : Soirée film)",
+          "valuePlaceholder": "Valeur (ex : soiree-film)",
+          "addOption": "Ajouter un choix"
+        },
         "addButton": "Ajouter une fonctionnalité",
         "mqttTopicToPublishExampleLabel": "Topic MQTT pour publier",
         "mqttTopicToPublishExampleDescription": "Gladys écoute ce topic. Si vous publiez une valeur dedans, Gladys l'associera à cette fonctionnalité. ( voir <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a> )",
