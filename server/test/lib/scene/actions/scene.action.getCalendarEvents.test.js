@@ -140,6 +140,41 @@ describe('scene.action.getCalendarEvents', () => {
     expect(calendarEvents.text).to.equal(`Spring holidays, Party at ${formatTime(partyStart)}`);
     expect(calendarEvents.events[0]).to.have.property('summary', 'Spring holidays');
   });
+  it('should get the full-day events of the day in a timezone west of UTC', async () => {
+    // Full-day events are stored at midnight UTC. In New York, the local day starts at
+    // 04:00 UTC, so matching them on the local bounds of the range would miss the full-day
+    // event of the day and return the one of the next day instead.
+    const stateManager = new StateManager(event);
+    const scope = {};
+    await calendar.createEvent('test-calendar', {
+      name: 'Birthday',
+      start: new Date('2025-03-10T00:00:00.000Z'),
+      end: new Date('2025-03-11T00:00:00.000Z'),
+      full_day: true,
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Holidays tomorrow',
+      start: new Date('2025-03-11T00:00:00.000Z'),
+      end: new Date('2025-03-12T00:00:00.000Z'),
+      full_day: true,
+    });
+    await executeActions(
+      { stateManager, event, calendar, timezone: 'America/New_York' },
+      [
+        [
+          {
+            type: ACTIONS.CALENDAR.GET_EVENTS,
+            calendars: ['test-calendar'],
+            time_range: 'today',
+          },
+        ],
+      ],
+      scope,
+    );
+    const { calendarEvents } = scope['0'][0];
+    expect(calendarEvents.count).to.equal(1);
+    expect(calendarEvents.text).to.equal('Birthday');
+  });
   it('should only get events in the next x hours', async () => {
     const stateManager = new StateManager(event);
     const scope = {};

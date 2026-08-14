@@ -567,15 +567,19 @@ const actionsFunc = {
     const now = dayjs.tz(dayjs(), self.timezone);
     let from;
     let to;
+    // The day ranges are calendar days, the "next x hours" range is a rolling time window.
+    let dayRange = false;
     // eslint-disable-next-line default-case
     switch (action.time_range) {
       case 'today':
         from = now.startOf('day');
         to = now.endOf('day');
+        dayRange = true;
         break;
       case 'tomorrow':
         from = now.add(1, 'day').startOf('day');
         to = now.add(1, 'day').endOf('day');
+        dayRange = true;
         break;
       case 'next-x-hours':
         // dayjs.add(undefined) returns an invalid date and dayjs.add(null) an empty
@@ -591,7 +595,27 @@ const actionsFunc = {
       throw new AbortScene('INVALID_TIME_RANGE');
     }
 
-    const events = await self.calendar.findEventsInRange(action.calendars, from.toDate(), to.toDate());
+    // Full-day events are stored at midnight UTC, so on a calendar day range they are
+    // matched on the UTC days covered by the range instead of its local bounds. Otherwise
+    // a full-day event of the day is missed in the timezones west of UTC (and the one of
+    // the next day returned instead).
+    let fullDayFrom;
+    let fullDayTo;
+    if (dayRange) {
+      fullDayFrom = dayjs.utc(from.format('YYYY-MM-DD')).toDate();
+      fullDayTo = dayjs
+        .utc(to.format('YYYY-MM-DD'))
+        .endOf('day')
+        .toDate();
+    }
+
+    const events = await self.calendar.findEventsInRange(
+      action.calendars,
+      from.toDate(),
+      to.toDate(),
+      fullDayFrom,
+      fullDayTo,
+    );
 
     if (events.length === 0 && action.stop_scene_if_no_events === true) {
       throw new AbortScene('NO_EVENTS_FOUND');

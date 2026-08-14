@@ -49,6 +49,33 @@ describe('calendar.findEventsInRange', () => {
     expect(events[0]).to.have.property('name', 'Event starting exactly at the beginning of the range');
     expect(events[1]).to.have.property('name', 'Event starting exactly at the end of the range');
   });
+  it('should match full-day events on the dedicated range when one is given', async () => {
+    // Range of a local day in a timezone west of UTC: the full-day events of that day are
+    // stored at midnight UTC, before the beginning of the local range.
+    const localFrom = new Date('2025-03-11T04:00:00.000Z');
+    const localTo = new Date('2025-03-12T03:59:59.999Z');
+    await calendar.createEvent('test-calendar', {
+      name: 'Full-day event of the day',
+      start: new Date('2025-03-11T00:00:00.000Z'),
+      end: new Date('2025-03-12T00:00:00.000Z'),
+      full_day: true,
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Full-day event of the next day',
+      start: new Date('2025-03-12T00:00:00.000Z'),
+      end: new Date('2025-03-13T00:00:00.000Z'),
+      full_day: true,
+    });
+    await calendar.createEvent('test-calendar', {
+      name: 'Event of the day',
+      start: new Date('2025-03-11T14:00:00.000Z'),
+      end: new Date('2025-03-11T15:00:00.000Z'),
+    });
+    const events = await calendar.findEventsInRange(['test-calendar'], localFrom, localTo, from, to);
+    expect(events).to.have.lengthOf(2);
+    expect(events[0]).to.have.property('name', 'Full-day event of the day');
+    expect(events[1]).to.have.property('name', 'Event of the day');
+  });
   it('should not return events of a calendar which is not shared', async () => {
     const privateCalendar = await calendar.create({
       name: 'Private calendar',
