@@ -5441,12 +5441,28 @@
       "thirty-minutes-consumption-cost": "Coût 30 minutes"
     },
     "energy-production-sensor": {
+      "power": "Puissance de production",
       "shortCategoryName": "Capteur de production d'énergie",
       "index": "Index",
       "daily-production": "Production journalière",
       "daily-production-revenue": "Revenu journalier",
       "thirty-minutes-production": "Production 30 minutes",
       "thirty-minutes-production-revenue": "Revenu 30 minutes"
+    },
+    "grid-sensor": {
+      "shortCategoryName": "Capteur réseau électrique",
+      "input-power": "Puissance importée du réseau",
+      "output-power": "Puissance exportée vers le réseau",
+      "power": "Échange réseau électrique (import +, export −)",
+      "input-index": "Index import réseau électrique",
+      "output-index": "Index export réseau électrique"
+    },
+    "home-output-sensor": {
+      "shortCategoryName": "Capteur de sortie maison",
+      "power": "Puissance vers la maison",
+      "index": "Index sortie maison",
+      "off-grid-power": "Puissance sortie secours",
+      "off-grid-index": "Index sortie secours"
     },
     "battery-storage": {
       "shortCategoryName": "Batterie de stockage",
