@@ -161,7 +161,7 @@ function createSceneCreateInputSchema(
         device: z.string().optional(),
         feature_category: z.string().optional(),
         feature_type: z.string().optional(),
-        value: z.number().optional(),
+        value: z.union([z.number(), z.string()]).optional(),
         evaluate_value: z.string().optional(),
       }),
       actionSchemaByType(ACTIONS.LIGHT.TURN_ON, {

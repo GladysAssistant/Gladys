@@ -99,9 +99,12 @@ environment. What remains is web-UI-only:
    **API** trigger.
 2. Copy the trigger URL
    (`https://api.anthropic.com/v1/claude_code/routines/trig_.../fire`) into
-   the repository **variable** `CLAUDE_AUTOFIX_FIRE_URL`.
+   the repository **variable** `CLAUDE_AUTOFIX_FIRE_URL` (Settings →
+   Secrets and variables → Actions → **Variables** tab; a secret of the
+   same name works too, the workflow accepts either).
 3. Click **Generate token** and store the `sk-ant-oat01-...` value (shown
-   once) as the repository **secret** `CLAUDE_AUTOFIX_ROUTINE_TOKEN`.
+   once) as the repository **secret** `CLAUDE_AUTOFIX_ROUTINE_TOKEN`
+   (**Secrets** tab).
 
 No Anthropic API key and no PAT are needed: sessions bill the claude.ai
 subscription, and their GitHub access comes from the account's GitHub

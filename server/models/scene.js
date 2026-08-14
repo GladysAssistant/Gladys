@@ -21,7 +21,7 @@ const actionSchema = Joi.object()
     // broadcast to every channel the user configured
     service: Joi.string().allow(null),
     text: Joi.string(),
-    value: Joi.number(),
+    value: Joi.alternatives().try(Joi.number(), Joi.string()),
     evaluate_value: Joi.string(),
     minutes: Joi.number(),
     unit: Joi.string(),

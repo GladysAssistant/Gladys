@@ -1,6 +1,7 @@
 const get = require('get-value');
 
 const { NotFoundError } = require('../../utils/coreErrors');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 
 /**
  * @description Control a specific device.
@@ -21,11 +22,20 @@ async function setValue(device, deviceFeature, value, options = {}) {
   }
   await service.device.setValue(device, deviceFeature, value, options);
   // If device has feedback, the feedback will be sent and saved
-  // If value is a string, no need to save it
   // @ts-ignore
   const valueIsString = typeof value === 'string' || value instanceof String;
-  if (!deviceFeature.has_feedback && !valueIsString) {
-    await this.saveState(deviceFeature, value);
+  const isTextFeature =
+    deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT && deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT;
+  if (!deviceFeature.has_feedback) {
+    if (valueIsString) {
+      // A string is only a state on a text feature; on any other feature it is a
+      // one-shot command (a music notification URL for example): nothing to save
+      if (isTextFeature) {
+        await this.saveStringState(device, deviceFeature, String(value));
+      }
+    } else {
+      await this.saveState(deviceFeature, value);
+    }
   }
 }
 

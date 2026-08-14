@@ -2,7 +2,9 @@ const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
 const { stub } = sinon;
+const logger = require('../../../../utils/logger');
 const { sendState } = require('../../../../services/homekit/lib/sendState');
+const { indexFeatureService } = require('../../../../services/homekit/lib/featureServices');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -36,6 +38,7 @@ describe('Send state to HomeKit', () => {
         CurrentHeatingCoolingState: 'CURRENTHEATINGCOOLINGSTATE',
         TargetTemperature: 'TARGETTEMPERATURE',
         MotionDetected: 'MOTIONDETECTED',
+        OccupancyDetected: 'OCCUPANCYDETECTED',
         CurrentTemperature: 'CURRENTTEMPERATURE',
         CurrentPosition: 'CURRENTPOSITION',
         Active: 'ACTIVE',
@@ -59,11 +62,15 @@ describe('Send state to HomeKit', () => {
         ProgrammableSwitchEvent: 'PROGRAMMABLESWITCHEVENT',
         PM2_5Density: 'PM25DENSITY',
         PM10Density: 'PM10DENSITY',
+        NitrogenDioxideDensity: 'NO2DENSITY',
+        OzoneDensity: 'O3DENSITY',
+        SulphurDioxideDensity: 'SO2DENSITY',
       },
       CharacteristicEventTypes: { GET: 'get', SET: 'set' },
       Service: {
         ContactSensor: 'CONTACTSENSOR',
         MotionSensor: 'MOTIONSENSOR',
+        OccupancySensor: 'OCCUPANCYSENSOR',
         WindowCovering: 'WINDOWCOVERING',
         Thermostat: 'THERMOSTAT',
         TemperatureSensor: 'TEMPERATURESENSOR',
@@ -194,6 +201,39 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     expect(updateCharacteristic.args[0]).eql(['MOTIONDETECTED', 0]);
+  });
+
+  it('should notify presence sensor', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Presence',
+      category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.PUSH,
+    };
+
+    // the scanner reports the device answering, then no longer answering
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 });
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 0 });
+
+    // an integration exposing presence as a plain binary reaches the same branch
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, type: DEVICE_FEATURE_TYPES.SENSOR.BINARY },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 },
+    );
+
+    expect(updateCharacteristic.args).eql([
+      ['OCCUPANCYDETECTED', 1],
+      ['OCCUPANCYDETECTED', 0],
+      ['OCCUPANCYDETECTED', 1],
+    ]);
   });
 
   it('should notify light brightness', async () => {
@@ -690,6 +730,57 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[2]).eql(['PM10DENSITY', 8]);
   });
 
+  it('should notify gas densities', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({
+      props: {
+        minValue: 0,
+        maxValue: 1000,
+      },
+    });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'NO2 sensor',
+      category: DEVICE_FEATURE_CATEGORIES.NO2_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+    };
+    const event = { type: EVENTS.DEVICE.NEW_STATE, last_value: 35 };
+
+    await homekitHandler.sendState(accessory, feature, event);
+    // 0.12 mg/m³ is 120 µg/m³, on the O3 category
+    await homekitHandler.sendState(
+      accessory,
+      {
+        ...feature,
+        category: DEVICE_FEATURE_CATEGORIES.O3_SENSOR,
+        unit: DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
+      },
+      { ...event, last_value: 0.12 },
+    );
+    // 45000 ng/m³ is 45 µg/m³, on the SO2 category
+    await homekitHandler.sendState(
+      accessory,
+      {
+        ...feature,
+        category: DEVICE_FEATURE_CATEGORIES.SO2_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
+      },
+      { ...event, last_value: 45000 },
+    );
+
+    expect(updateCharacteristic.args[0]).eql(['NO2DENSITY', 35]);
+    expect(updateCharacteristic.args[1]).eql(['O3DENSITY', 120]);
+    expect(updateCharacteristic.args[2]).eql(['SO2DENSITY', 45]);
+  });
+
   it('should notify smoke sensor', async () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
@@ -1041,37 +1132,110 @@ describe('Send state to HomeKit', () => {
   it('should notify the button that was actually pressed on a multi-button remote', async () => {
     const firstButton = stub();
     const secondButton = stub();
+    const leftFeature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      selector: 'remote-button-left',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Left',
+      category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+      type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+    };
+    const rightFeature = { ...leftFeature, selector: 'remote-button-right', name: 'Right' };
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      services: [
-        {
-          subtype: 'button 1',
-          displayName: 'Left',
-          getCharacteristic: stub().returns({ sendEventNotification: firstButton }),
-        },
-        {
-          subtype: 'button 2',
-          displayName: 'Right',
-          getCharacteristic: stub().returns({ sendEventNotification: secondButton }),
-        },
-      ],
       getService: stub().returns({ getCharacteristic: stub().returns({ sendEventNotification: firstButton }) }),
     };
 
-    await homekitHandler.sendState(
-      accessory,
-      {
-        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
-        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
-        name: 'Right',
-        category: DEVICE_FEATURE_CATEGORIES.BUTTON,
-        type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
-      },
-      { type: EVENTS.DEVICE.NEW_STATE, last_value: BUTTON_STATUS.CLICK },
-    );
+    // The remote carries one StatelessProgrammableSwitch service per button, as buildAccessory
+    // builds them.
+    indexFeatureService(accessory, { getCharacteristic: stub().returns({ sendEventNotification: firstButton }) }, [
+      leftFeature,
+    ]);
+    indexFeatureService(accessory, { getCharacteristic: stub().returns({ sendEventNotification: secondButton }) }, [
+      rightFeature,
+    ]);
+
+    await homekitHandler.sendState(accessory, rightFeature, {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: BUTTON_STATUS.CLICK,
+    });
 
     expect(secondButton.args).eql([[0]]);
     expect(firstButton.callCount).to.equal(0);
+    // getService — which returns the first service of a type — is never consulted
+    expect(accessory.getService.callCount).to.equal(0);
+  });
+
+  it('should notify a shutter position on the shutter it belongs to', async () => {
+    const firstShutter = stub();
+    const secondShutter = stub();
+    const getCharacteristic = stub().returns({ props: { minValue: 0, maxValue: 100 } });
+    const leftFeature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      selector: 'shutter-left-position',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Volet gauche',
+      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+      min: 0,
+      max: 100,
+    };
+    const rightFeature = { ...leftFeature, selector: 'shutter-right-position', name: 'Volet droit' };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic: firstShutter, getCharacteristic }),
+    };
+
+    indexFeatureService(accessory, { updateCharacteristic: firstShutter, getCharacteristic }, [leftFeature]);
+    indexFeatureService(accessory, { updateCharacteristic: secondShutter, getCharacteristic }, [rightFeature]);
+
+    await homekitHandler.sendState(accessory, rightFeature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 42 });
+
+    expect(secondShutter.args).eql([
+      ['CURRENTPOSITION', 42],
+      ['TARGETPOSITION', 42],
+    ]);
+    expect(firstShutter.callCount).to.equal(0);
+  });
+
+  it('should notify the temperature merged into a thermostat rather than a standalone sensor', async () => {
+    const thermostat = stub();
+    const standaloneSensor = stub();
+    const getCharacteristic = stub().returns({ props: { minValue: -270, maxValue: 100 } });
+    const mergedFeature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      selector: 'thermostat-room-temperature',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Température intérieure',
+      category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+    };
+    const outsideFeature = { ...mergedFeature, selector: 'thermostat-outside-temperature', name: 'Extérieur' };
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      // the extra sensor keeps its own TemperatureSensor service, and comes first
+      getService: stub().returns({
+        updateCharacteristic: standaloneSensor,
+        getCharacteristic,
+        testCharacteristic: stub().returns(false),
+      }),
+    };
+
+    indexFeatureService(
+      accessory,
+      { updateCharacteristic: standaloneSensor, getCharacteristic, testCharacteristic: stub().returns(false) },
+      [outsideFeature],
+    );
+    indexFeatureService(
+      accessory,
+      { updateCharacteristic: thermostat, getCharacteristic, testCharacteristic: stub().returns(false) },
+      [mergedFeature],
+    );
+
+    await homekitHandler.sendState(accessory, mergedFeature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 21 });
+
+    expect(thermostat.args).eql([['CURRENTTEMPERATURE', 21]]);
+    expect(standaloneSensor.callCount).to.equal(0);
   });
 
   it('should notify fan mode, speed, oscillation and direction', async () => {
@@ -1466,5 +1630,61 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     expect(updateCharacteristic.callCount).eql(0);
+  });
+
+  it('should warn when the type fallback cannot tell two services of the same type apart', async () => {
+    const updateCharacteristic = stub().returns();
+    // an accessory that was not built by buildAccessory: nothing is indexed, and it exposes two
+    // Switch services, so getService can only return the first one
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      services: [{ UUID: 'switch-uuid' }, { UUID: 'switch-uuid' }],
+      getService: stub().returns({ updateCharacteristic }),
+    };
+    homekitHandler.hap.Service.Switch = { UUID: 'switch-uuid' };
+    const warn = stub(logger, 'warn');
+
+    const feature = {
+      selector: 'switch-2',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Switch 2',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 });
+    warn.restore();
+    delete homekitHandler.hap.Service.Switch;
+
+    expect(warn.callCount).to.equal(1);
+    expect(warn.args[0][0]).to.contain('switch-2');
+    // the update is still sent, on the service getService returned
+    expect(updateCharacteristic.args[0]).eql(['ON', 1]);
+  });
+
+  it('should not warn when the type fallback has a single service to choose from', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      services: [{ UUID: 'switch-uuid' }],
+      getService: stub().returns({ updateCharacteristic }),
+    };
+    homekitHandler.hap.Service.Switch = { UUID: 'switch-uuid' };
+    const warn = stub(logger, 'warn');
+
+    const feature = {
+      selector: 'switch-1',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Switch 1',
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 });
+    warn.restore();
+    delete homekitHandler.hap.Service.Switch;
+
+    expect(warn.callCount).to.equal(0);
+    expect(updateCharacteristic.args[0]).eql(['ON', 1]);
   });
 });

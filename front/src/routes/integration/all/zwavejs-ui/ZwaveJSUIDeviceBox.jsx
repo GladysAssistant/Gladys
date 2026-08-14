@@ -7,6 +7,7 @@ import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import { PARAMS } from '../../../../../../server/services/zwavejs-ui/lib/constants';
 
 import { connect } from 'unistore/preact';
+import MigrateDeviceButton from '../../../../components/device/migrate/MigrateDeviceButton';
 
 class ZwaveJSUIDeviceBox extends Component {
   componentWillMount() {
@@ -112,7 +113,7 @@ class ZwaveJSUIDeviceBox extends Component {
   };
 
   render(
-    { deviceIndex, editable, deleteButton, housesWithRooms },
+    { deviceIndex, editable, deleteButton, housesWithRooms, getZwaveJSUIDevices },
     { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
@@ -229,9 +230,12 @@ class ZwaveJSUIDeviceBox extends Component {
                   )}
 
                   {deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
-                      <Text id="integration.zwavejs-ui.deleteButton" />
-                    </button>
+                    <>
+                      <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
+                        <Text id="integration.zwavejs-ui.deleteButton" />
+                      </button>
+                      <MigrateDeviceButton device={device} onMigrated={getZwaveJSUIDevices} />
+                    </>
                   )}
                 </div>
               </div>

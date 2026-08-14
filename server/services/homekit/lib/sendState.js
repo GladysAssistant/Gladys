@@ -1,3 +1,4 @@
+const logger = require('../../../utils/logger');
 const { intToRgb, rgbToHsb } = require('../../../utils/colors');
 const {
   DEVICE_FEATURE_CATEGORIES,
@@ -21,6 +22,7 @@ const {
   buttonEventMapping,
 } = require('./deviceMappings');
 const { toCelsius } = require('./buildThermostatService');
+const { findFeatureService } = require('./featureServices');
 
 /**
  * @description Recompute a thermostat characteristic through the GET handler built by buildService
@@ -56,21 +58,52 @@ function refreshCharacteristic(hap, service, characteristicType) {
  */
 function sendState(hkAccessory, feature, event) {
   const { Characteristic, Service } = this.hap;
+
+  // Look the service up by the feature it was built from, not by its type: a device carrying
+  // several services of the same kind — one per button on a remote, one per shutter, a Thermostat
+  // next to a standalone TemperatureSensor — would otherwise have every update funnelled into the
+  // first one by getService, silently. The type lookup stays as a fallback for a service that was
+  // not built by buildAccessory.
+  const serviceFor = () => {
+    const featureService = findFeatureService(hkAccessory, feature);
+
+    if (featureService) {
+      return featureService;
+    }
+
+    const serviceType = Service[mappings[feature.category].service];
+    // The fallback returns the first service of the type, which is only the right one while the
+    // accessory carries a single one. Say so instead of updating the wrong service silently.
+    const sameTypeServices = (hkAccessory.services || []).filter(
+      (service) => service.UUID !== undefined && service.UUID === serviceType.UUID,
+    );
+
+    if (sameTypeServices.length > 1) {
+      logger.warn(
+        `HomeKit: feature ${feature.selector} is not indexed and its accessory exposes ` +
+          `${sameTypeServices.length} ${mappings[feature.category].service} services, ` +
+          `the update may be sent to the wrong one`,
+      );
+    }
+
+    return hkAccessory.getService(serviceType);
+  };
+
   switch (`${feature.category}:${feature.type}`) {
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`:
     case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`:
     case `${DEVICE_FEATURE_CATEGORIES.SIREN}:${DEVICE_FEATURE_TYPES.SIREN.BINARY}`:
     case `${DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
+    case `${DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.PUSH}`:
+    case `${DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
     case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
     case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
     case `${DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
     case `${DEVICE_FEATURE_CATEGORIES.CO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          event.last_value,
-        );
+      serviceFor().updateCharacteristic(
+        Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+        event.last_value,
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.BUTTON}:${DEVICE_FEATURE_TYPES.BUTTON.CLICK}`:
@@ -78,34 +111,20 @@ function sendState(hkAccessory, feature, event) {
       const buttonEvent = buttonEventMapping[event.last_value];
       // A press HomeKit has no equivalent for is dropped rather than reported as another one.
       if (buttonEvent !== undefined) {
-        // A remote carries one service per button, so getService — which returns the first match —
-        // would report every press on button one. buildAccessory gives those services a subtype
-        // prefixed with the category and names them after their feature, which pins the right one.
-        const subtypePrefix = `${feature.category} `;
-        const service =
-          (hkAccessory.services || []).find(
-            (candidate) =>
-              typeof candidate.subtype === 'string' &&
-              candidate.subtype.startsWith(subtypePrefix) &&
-              candidate.displayName === feature.name,
-          ) || hkAccessory.getService(Service[mappings[feature.category].service]);
-
         // sendEventNotification and not updateCharacteristic: the latter only notifies when the
         // value changes, so two single presses in a row — both mapping to 0 — would be reported
         // once. A button press must always be delivered.
-        service
+        serviceFor()
           .getCharacteristic(Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]])
           .sendEventNotification(buttonEvent);
       }
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          +!event.last_value,
-        );
+      serviceFor().updateCharacteristic(
+        Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+        +!event.last_value,
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`:
@@ -113,7 +132,7 @@ function sendState(hkAccessory, feature, event) {
     case `${DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
     case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.POSITION}`:
     case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.POSITION}`: {
-      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const service = serviceFor();
       const { characteristics } = mappings[feature.category].capabilities[feature.type];
       characteristics.forEach((c) => {
         const characteristic = service.getCharacteristic(Characteristic[c]);
@@ -134,8 +153,7 @@ function sendState(hkAccessory, feature, event) {
       const rgb = intToRgb(event.last_value);
       const [h, s] = rgbToHsb(rgb);
 
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
+      serviceFor()
         .updateCharacteristic(
           Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
           h,
@@ -154,7 +172,7 @@ function sendState(hkAccessory, feature, event) {
         currentTemp = fahrenheitToCelsius(currentTemp);
       }
       // On a heating or cooling device the temperature sensor is merged into the Thermostat service.
-      const service = hkAccessory.getService(Service.TemperatureSensor) || hkAccessory.getService(Service.Thermostat);
+      const service = serviceFor() || hkAccessory.getService(Service.Thermostat);
       // Clamped like the GET path: HAP throws on a value outside the characteristic bounds, and a
       // sensor reporting an out-of-range reading must not take the bridge down.
       service.updateCharacteristic(
@@ -167,7 +185,7 @@ function sendState(hkAccessory, feature, event) {
     }
     case `${DEVICE_FEATURE_CATEGORIES.THERMOSTAT}:${DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE}`:
     case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE}`: {
-      const service = hkAccessory.getService(Service.Thermostat);
+      const service = serviceFor();
       const thresholdCharacteristic =
         feature.category === DEVICE_FEATURE_CATEGORIES.THERMOSTAT
           ? Characteristic.HeatingThresholdTemperature
@@ -189,7 +207,7 @@ function sendState(hkAccessory, feature, event) {
     }
     case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE}`:
     case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY}`: {
-      const service = hkAccessory.getService(Service.Thermostat);
+      const service = serviceFor();
       refreshCharacteristic(this.hap, service, Characteristic.TargetHeatingCoolingState);
       refreshCharacteristic(this.hap, service, Characteristic.CurrentHeatingCoolingState);
       refreshCharacteristic(this.hap, service, Characteristic.TargetTemperature);
@@ -197,7 +215,7 @@ function sendState(hkAccessory, feature, event) {
     }
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
-      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const service = serviceFor();
       const characteristicName = mappings[feature.category].capabilities[feature.type].characteristics[0];
       const characteristic = service.getCharacteristic(Characteristic[characteristicName]);
 
@@ -210,8 +228,14 @@ function sendState(hkAccessory, feature, event) {
     case `${DEVICE_FEATURE_CATEGORIES.PM25_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
     case `${DEVICE_FEATURE_CATEGORIES.PM25_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
     case `${DEVICE_FEATURE_CATEGORIES.PM10_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
-    case `${DEVICE_FEATURE_CATEGORIES.PM10_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
-      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+    case `${DEVICE_FEATURE_CATEGORIES.PM10_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
+    case `${DEVICE_FEATURE_CATEGORIES.NO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.NO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
+    case `${DEVICE_FEATURE_CATEGORIES.O3_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.O3_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
+    case `${DEVICE_FEATURE_CATEGORIES.SO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
+    case `${DEVICE_FEATURE_CATEGORIES.SO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
+      const service = serviceFor();
       const characteristicName = mappings[feature.category].capabilities[feature.type].characteristics[0];
       const characteristic = service.getCharacteristic(Characteristic[characteristicName]);
 
@@ -224,7 +248,7 @@ function sendState(hkAccessory, feature, event) {
     case `${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.BATTERY.INTEGER}`:
     case `${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
     case `${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.LOCK.INTEGER}`: {
-      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const service = serviceFor();
       const [levelName] = mappings[feature.category].capabilities[feature.type].characteristics;
       const levelCharacteristic = service.getCharacteristic(Characteristic[levelName]);
 
@@ -254,19 +278,17 @@ function sendState(hkAccessory, feature, event) {
     }
     case `${DEVICE_FEATURE_CATEGORIES.BATTERY_LOW}:${DEVICE_FEATURE_TYPES.BATTERY_LOW.BINARY}`:
     case `${DEVICE_FEATURE_CATEGORIES.BATTERY_LOW}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          event.last_value ? 1 : 0,
-        );
+      serviceFor().updateCharacteristic(
+        Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+        event.last_value ? 1 : 0,
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
     case `${DEVICE_FEATURE_CATEGORIES.CO_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`:
     case `${DEVICE_FEATURE_CATEGORIES.CO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:
     case `${DEVICE_FEATURE_CATEGORIES.CO2_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`: {
-      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const service = serviceFor();
       const [levelName, detectedName] = mappings[feature.category].capabilities[feature.type].characteristics;
       const levelCharacteristic = service.getCharacteristic(Characteristic[levelName]);
 
@@ -282,16 +304,14 @@ function sendState(hkAccessory, feature, event) {
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR}:${DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          aqiToAirQuality(event.last_value),
-        );
+      serviceFor().updateCharacteristic(
+        Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+        aqiToAirQuality(event.last_value),
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.LOCK}:${DEVICE_FEATURE_TYPES.LOCK.BINARY}`: {
-      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const service = serviceFor();
       const [targetStateName, currentStateName] = mappings[feature.category].capabilities[feature.type].characteristics;
       const lockState = event.last_value ? 1 : 0;
 
@@ -316,21 +336,17 @@ function sendState(hkAccessory, feature, event) {
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.LOCK}:${DEVICE_FEATURE_TYPES.LOCK.STATE}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          lockStateMapping[event.last_value],
-        );
+      serviceFor().updateCharacteristic(
+        Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+        lockStateMapping[event.last_value],
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.MODE}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          event.last_value === FAN_MODE.OFF ? 0 : 1,
-        );
+      serviceFor().updateCharacteristic(
+        Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+        event.last_value === FAN_MODE.OFF ? 0 : 1,
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.PERCENT}`:
@@ -350,7 +366,7 @@ function sendState(hkAccessory, feature, event) {
         }
       }
 
-      const service = hkAccessory.getService(Service[mappings[feature.category].service]);
+      const service = serviceFor();
       const [rotationSpeedName] = mappings[feature.category].capabilities[feature.type].characteristics;
       const rotationSpeedCharacteristic = service.getCharacteristic(Characteristic[rotationSpeedName]);
 
@@ -367,28 +383,22 @@ function sendState(hkAccessory, feature, event) {
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.ROCK_SETTING}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          event.last_value === FAN_ROCK_SETTING.OFF ? 0 : 1,
-        );
+      serviceFor().updateCharacteristic(
+        Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+        event.last_value === FAN_ROCK_SETTING.OFF ? 0 : 1,
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.FAN}:${DEVICE_FEATURE_TYPES.FAN.AIRFLOW_DIRECTION}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          event.last_value === FAN_AIRFLOW_DIRECTION.REVERSE ? 1 : 0,
-        );
+      serviceFor().updateCharacteristic(
+        Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+        event.last_value === FAN_AIRFLOW_DIRECTION.REVERSE ? 1 : 0,
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.CURTAIN}:${DEVICE_FEATURE_TYPES.CURTAIN.STATE}`:
     case `${DEVICE_FEATURE_CATEGORIES.SHUTTER}:${DEVICE_FEATURE_TYPES.SHUTTER.STATE}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(Characteristic.PositionState, coverStateMapping[event.last_value]);
+      serviceFor().updateCharacteristic(Characteristic.PositionState, coverStateMapping[event.last_value]);
       break;
     }
     default:

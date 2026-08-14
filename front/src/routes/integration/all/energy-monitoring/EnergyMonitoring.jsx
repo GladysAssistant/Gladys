@@ -6,6 +6,7 @@ import cx from 'classnames';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import ImportPricesPage from './ImportPrices';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -1557,6 +1558,7 @@ class EnergyMonitoringPage extends Component {
             <div class="container">
               <div class="row">
                 <div class="col-lg-3">
+                  <BackToIntegrationsLink />
                   <h3 class="page-title mb-5">
                     <Text id="integration.energyMonitoring.title" />
                   </h3>

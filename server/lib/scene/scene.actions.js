@@ -54,6 +54,25 @@ const { evaluate } = create({
   randomDependencies,
 });
 
+/**
+ * @description Warn the user when a rendered MQTT payload looks like JSON but is not valid JSON.
+ * This is the usual symptom of a `{{variable}}` which could not be resolved and was
+ * rendered as an empty string by Handlebars.
+ * @param {string} actionName - Name of the scene action, used as log prefix.
+ * @param {string} topic - Topic the message is published to.
+ * @param {string} message - Message after Handlebars rendering.
+ * @example warnIfInvalidJsonMessage('MQTT', 'my/topic', '{"state":}');
+ */
+function warnIfInvalidJsonMessage(actionName, topic, message) {
+  const trimmedMessage = String(message).trim();
+  if (trimmedMessage.startsWith('{') && typeof parseJsonIfJson(trimmedMessage) === 'string') {
+    logger.warn(
+      `${actionName}: the message sent on topic "${topic}" looks like JSON but is not valid JSON. ` +
+        `It's usually the sign of a variable which could not be resolved. Message sent: ${message}`,
+    );
+  }
+}
+
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope) => {
     let device;
@@ -67,6 +86,25 @@ const actionsFunc = {
     }
 
     let { value } = action;
+
+    // A text feature (a message displayed on a TV, a text virtual sensor...) receives the
+    // value as a raw string with scene variables injected, and skips the math evaluation
+    // below which would reject any non-numeric text
+    if (
+      deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT &&
+      deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT
+    ) {
+      if (action.evaluate_value !== undefined) {
+        value = Handlebars.compile(action.evaluate_value, {
+          noEscape: true,
+        })(scope);
+      }
+      if (value === undefined || value === null || value === '') {
+        throw new AbortScene('ACTION_VALUE_EMPTY');
+      }
+      return self.device.setValue(device, deviceFeature, String(value));
+    }
+
     if (action.evaluate_value !== undefined) {
       value = evaluate(
         Handlebars.compile(action.evaluate_value, {
@@ -626,6 +664,7 @@ const actionsFunc = {
       const messageWithVariables = Handlebars.compile(action.message, {
         noEscape: true,
       })(scope);
+      warnIfInvalidJsonMessage('MQTT', action.topic, messageWithVariables);
       mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
@@ -636,6 +675,7 @@ const actionsFunc = {
       const messageWithVariables = Handlebars.compile(action.message, {
         noEscape: true,
       })(scope);
+      warnIfInvalidJsonMessage('Zigbee2mqtt', action.topic, messageWithVariables);
       zigbee2mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
