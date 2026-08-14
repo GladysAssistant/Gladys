@@ -1,20 +1,17 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import debounce from 'debounce';
 
 import DevicesPage from './DevicesPage';
 import { getDeviceIntegration } from './integrationLinks';
 
 class Devices extends Component {
+  // The endpoint returns the whole list: load it once, then search, order
+  // and filter on the client. Searching client-side also matches the
+  // selector displayed in the table, which the server search does not.
   getDevices = async () => {
     this.setState({ loading: true, error: false });
     try {
-      const params = { order_dir: this.state.orderDir };
-      if (this.state.search && this.state.search.length) {
-        // the server compares the search term to lowercased columns
-        params.search = this.state.search.trim().toLowerCase();
-      }
-      const devices = await this.props.httpClient.get('/api/v1/device', params);
+      const devices = await this.props.httpClient.get('/api/v1/device');
       this.setState({ devices, loading: false });
     } catch (e) {
       console.error(e);
@@ -33,11 +30,10 @@ class Devices extends Component {
 
   search = e => {
     this.setState({ search: e.target.value });
-    this.debouncedGetDevices();
   };
 
   changeOrderDir = e => {
-    this.setState({ orderDir: e.target.value }, this.getDevices);
+    this.setState({ orderDir: e.target.value });
   };
 
   selectRoom = e => {
@@ -46,6 +42,16 @@ class Devices extends Component {
 
   selectIntegration = e => {
     this.setState({ selectedIntegration: e.target.value || null });
+  };
+
+  matchSearch = device => {
+    const query = this.state.search.trim().toLowerCase();
+    if (!query.length) {
+      return true;
+    }
+    return [device.name, device.selector, device.external_id].some(
+      value => value && value.toLowerCase().includes(query)
+    );
   };
 
   matchRoomFilter = device => {
@@ -71,7 +77,6 @@ class Devices extends Component {
       loading: true,
       error: false
     };
-    this.debouncedGetDevices = debounce(this.getDevices.bind(this), 300);
   }
 
   componentDidMount() {
@@ -85,8 +90,9 @@ class Devices extends Component {
       integration: getDeviceIntegration(device)
     }));
 
-    // The integration filter options are built from the loaded devices, so
-    // the list only shows integrations the user actually has devices in
+    // The integration filter options are built from the full device list, so
+    // it only shows integrations the user actually has devices in, and a
+    // selected option never disappears when another filter is applied
     const integrationOptions = [];
     const seenSlugs = new Set();
     devicesWithIntegration.forEach(({ integration }) => {
@@ -98,11 +104,18 @@ class Devices extends Component {
     integrationOptions.sort((a, b) => a.slug.localeCompare(b.slug));
 
     const filteredDevices = devicesWithIntegration
+      .filter(({ device }) => this.matchSearch(device))
       .filter(({ device }) => this.matchRoomFilter(device))
       .filter(
         ({ integration }) =>
           !state.selectedIntegration || (integration && integration.slug === state.selectedIntegration)
-      );
+      )
+      .sort((a, b) => {
+        const comparison = (a.device.name || '').localeCompare(b.device.name || '', undefined, {
+          sensitivity: 'base'
+        });
+        return state.orderDir === 'desc' ? -comparison : comparison;
+      });
 
     return (
       <DevicesPage
