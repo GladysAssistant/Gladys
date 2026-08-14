@@ -135,7 +135,7 @@ Validation runs in **two ordered stages**, and the distinction matters: a strict
 1. **Shape — rejecting.** `categories` must be an array of 1 to 3 unique, non-empty strings. Anything else (not an array, empty array, more than 3 items, duplicates, non-string items) is a **validation error**: the manifest is malformed and is rejected exactly like any other bad field. This stage is expressible in JSON Schema (`type`, `minItems`, `maxItems`, `uniqueItems`, `items.type: string`) and is what `manifest.schema.json` carries — deliberately **without** an `enum` on the items.
 2. **Vocabulary — filtering.** Each item is then matched against the §3 enum *in code* (`externalIntegration.validateManifest.js`): unknown keys are **dropped with a warning**, known keys are kept. An integration is never rejected because it declares a category the instance has not heard of.
 
-If every declared key is unknown, the result is `[]` — the integration is treated as uncategorized (§5: visible under `All` and search, not promoted), **not** as a validation error. The store index applies the same fallback chain as any other uncategorized entry (§6.3).
+If every declared key is unknown, the integration is treated as uncategorized (§5: visible under `All` and search, not promoted), **not** as a validation error. Implementation note: the core expresses this outcome by **removing** the field from the validated manifest rather than storing an empty array — the install and update flows validate the same manifest object more than once, and a stored `[]` would fail the shape stage on the second pass. The store index applies the same fallback chain as any other uncategorized entry (§6.3).
 
 The core and the canonical schema owned by `GladysAssistant/integration-store` implement both stages identically and are kept in lockstep, as today. The only permitted asymmetry: the store indexer, which always knows the current vocabulary, surfaces the stage-2 drop as an author-facing warning, while an instance running an older core drops silently.
 
@@ -173,7 +173,7 @@ Because §6.2 and §6.3 alter the manifest and the indexer formats, whose source
 
 ## 7. Proposed assignment of the current catalog
 
-Full assignment of the 81 integrations (native + community store as of 2026-08). Native/community duplicates (Philips Hue, Tuya, Telegram…) are expected — they are migrations in progress — and naturally receive the same categories. Resulting distribution (multi-membership, so the sum exceeds 81):
+Full assignment of the 81 integrations — snapshot of 2026-08-14: the 36 native entries of `front/src/config/integrations/*.json` on this branch, plus the 45 community entries of the public store index (`generated_at: 2026-08-13T17:08:35Z`); rerun the counts against a fresh index to detect catalog drift. Native/community duplicates (Philips Hue, Tuya, Telegram…) are expected — they are migrations in progress — and naturally receive the same categories. Resulting distribution (multi-membership, so the sum exceeds 81):
 
 `climate` 13 · `lighting` 13 · `environment` 11 · `protocols` 11 · `notifications` 9 · `energy` 8 · `multimedia` 8 · `network` 7 · `security` 7 · `assistants` 5 · `appliances` 4 · `services` 1
 
@@ -279,6 +279,8 @@ Three phases, each independently shippable:
 - **Phase A — contracts (no visible change).** Core: accept the optional `categories` manifest field (validator + schema, two-stage validation §6.2), add `categories` and `first_seen_at` to the `getCatalog` field allowlist, and update `docs/specs/external-integrations.md` (§C.1, §C.5, §C.6) in the same diff — it is the source of truth for those formats, and this RFC stays non-normative until it does. Store repo: canonical schema update, fallback mapping seeded with §7 (keyed by `store_slug`), `first_seen_at` persistence and backfill (§4), author-facing validation warnings.
 - **Phase B — catalog UI.** Sidebar driven by categories (§5) with the redirects — including the three dead legacy routes (`music`, `health`, `navigation`) — facet chips with the transport normalization (§4), "Newest first" sort and "New" badge, i18n labels. This is the phase that removes the "Devices" trap and delivers the visible value of topic 10419. Includes the `transports` completion pass on existing store manifests (or accepting their "unspecified" state in the transport facet).
 - **Phase C — ecosystem adoption.** Website developer docs, SDK template and example manifests updated to declare `categories`; the fallback mapping shrinks as authors adopt the field.
+
+**Cross-repository release order.** "Same diff" cannot span repositories: the monorepo side of phases A and B ships together (the front only reads what its own core projects, so a front without the extended `getCatalog` projection never exists), and the `GladysAssistant/integration-store` side may ship before or after — index entries with the new fields are ignored by cores that predate the projection (§6.3 matrix), and a core that predates the index fields simply shows community integrations as uncategorized until the indexer ships.
 
 **Explicitly out of scope**: a global "My devices" inventory page. It is the other half of the original feedback (users looking for their devices), it deserves its own spec, and nothing here blocks it — but no catalog re-labeling replaces it.
 

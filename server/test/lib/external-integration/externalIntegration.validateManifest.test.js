@@ -977,7 +977,20 @@ describe('externalIntegration.validateManifest', () => {
   it('should treat a declaration made only of unknown keys as uncategorized, not as an error', () => {
     const manifest = { ...TEST_MANIFEST, categories: ['brand-new-shelf'] };
     const validated = externalIntegration.validateManifest(manifest);
-    expect(validated.categories).to.deep.equal([]);
+    // removed, not [], so the manifest stays valid on re-validation (below)
+    expect(validated).to.not.have.property('categories');
+  });
+
+  it('should stay valid when validated twice, the install and update flows do it', () => {
+    // installFromStore and fetchManifestFromRepo validate the manifest, then
+    // install()/buildUpdateCandidates validate the SAME object again: the
+    // filtered result of the first pass must pass the shape stage of the next
+    [['climate', 'brand-new-shelf'], ['brand-new-shelf']].forEach((categories) => {
+      const manifest = { ...TEST_MANIFEST, categories };
+      const firstPass = externalIntegration.validateManifest(manifest);
+      const secondPass = externalIntegration.validateManifest(firstPass);
+      expect(secondPass).to.deep.equal(firstPass);
+    });
   });
 
   it('should reject a malformed categories declaration', () => {

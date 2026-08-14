@@ -966,8 +966,15 @@ function validateManifest(manifest) {
         );
         logger.warn(`validateManifest: dropping unknown categories ${unknownCategories.join(', ')}`);
       }
-      // an empty result is "uncategorized", not an error: the §5 rules apply
-      manifest.categories = knownCategories;
+      // an all-unknown declaration is "uncategorized", not an error: the field
+      // is REMOVED rather than set to [] — the install and update flows
+      // validate the same manifest object again, and a stored empty array
+      // would fail the shape stage on that second pass
+      if (knownCategories.length === 0) {
+        delete manifest.categories;
+      } else {
+        manifest.categories = knownCategories;
+      }
     }
   }
   if (errors.length > 0) {
