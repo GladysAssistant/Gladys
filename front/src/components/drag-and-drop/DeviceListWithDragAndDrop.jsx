@@ -1,9 +1,8 @@
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { TouchBackend } from 'react-dnd-touch-backend';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useRef, useState } from 'preact/hooks';
 import cx from 'classnames';
 import style from './style.css';
+import { getDragAndDropBackend } from '../../utils/dragAndDropBackend';
 
 const DEVICE_TYPE = 'DEVICE_TYPE';
 
@@ -76,14 +75,15 @@ const DeviceRow = ({ selectedDeviceFeature, moveDevice, index, removeDevice, upd
   );
 };
 
+const { backend: dragAndDropBackend, options: dragAndDropBackendOptions } = getDragAndDropBackend();
+
 const DeviceListWithDragAndDrop = ({
   selectedDeviceFeaturesOptions,
-  isTouchDevice,
   moveDevice,
   removeDevice,
   updateDeviceFeatureName
 }) => (
-  <DndProvider backend={isTouchDevice ? TouchBackend : HTML5Backend}>
+  <DndProvider backend={dragAndDropBackend} options={dragAndDropBackendOptions}>
     {selectedDeviceFeaturesOptions.map((selectedDeviceFeature, index) => (
       <DeviceRow
         selectedDeviceFeature={selectedDeviceFeature}
