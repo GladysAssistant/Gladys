@@ -36,6 +36,7 @@ import AskAI from './actions/AskAI';
 import SendSms from './actions/SendSms';
 import ConditionIfElseThen from './actions/ConditionIfElseThen';
 import ConditionWhile from './actions/ConditionWhile';
+import SetVariable from './actions/SetVariable';
 
 const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
@@ -70,7 +71,8 @@ const ACTION_ICON = {
   [ACTIONS.MUSIC.PLAY_NOTIFICATION]: 'fe fe-speaker',
   [ACTIONS.ZIGBEE2MQTT.SEND]: 'fe fe-message-square',
   [ACTIONS.AI.ASK]: 'fe fe-cpu',
-  [ACTIONS.SMS.SEND]: 'fe fe-message-circle'
+  [ACTIONS.SMS.SEND]: 'fe fe-message-circle',
+  [ACTIONS.VARIABLE.SET]: 'fe fe-hash'
 };
 
 const ACTION_COMPONENTS = {
@@ -107,7 +109,8 @@ const ACTION_COMPONENTS = {
   [ACTIONS.AI.ASK]: AskAI,
   [ACTIONS.SMS.SEND]: SendSms,
   [ACTIONS.CONDITION.IF_THEN_ELSE]: ConditionIfElseThen,
-  [ACTIONS.CONDITION.WHILE]: ConditionWhile
+  [ACTIONS.CONDITION.WHILE]: ConditionWhile,
+  [ACTIONS.VARIABLE.SET]: SetVariable
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';

@@ -21,6 +21,7 @@ const actionSchema = Joi.object()
     // broadcast to every channel the user configured
     service: Joi.string().allow(null),
     text: Joi.string(),
+    name: Joi.string(),
     value: Joi.alternatives().try(Joi.number(), Joi.string()),
     evaluate_value: Joi.string(),
     minutes: Joi.number(),
@@ -85,6 +86,11 @@ const actionSchema = Joi.object()
       .integer()
       .min(1)
       .max(10000),
+  })
+  // A "variable.set" action holds either a text or a formula, never both: the runtime
+  // would only evaluate the formula and silently drop the text.
+  .when(Joi.object({ type: Joi.valid(ACTIONS.VARIABLE.SET) }).unknown(), {
+    then: Joi.object().oxor('text', 'evaluate_value'),
   })
   .id('action');
 
