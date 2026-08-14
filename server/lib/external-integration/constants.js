@@ -257,6 +257,10 @@ const MAX_TRANSPORT_MESSAGE_LENGTH = 200;
 // writable by it).
 const MANIFEST_TRANSPORTS = ['local', 'cloud'];
 const PREFER_LOCAL_CONFIG_KEY = 'GLADYS_PREFER_LOCAL';
+// Optional `categories` manifest field: browse categories of the integration
+// catalog (docs/specs/integration-catalog-categories.md). More than 3 means
+// the assignment is lazy, not the vocabulary too narrow.
+const MAX_MANIFEST_CATEGORIES = 3;
 // Inbound webhooks via Gladys Plus (B.17): the gateway relays third-party
 // webhook calls to the instance under a single integration-agnostic action;
 // the supervisor routes them to the declared integration. Two modes exist
@@ -373,6 +377,7 @@ module.exports = {
   MAX_TRANSPORT_MESSAGE_LENGTH,
   MANIFEST_TRANSPORTS,
   PREFER_LOCAL_CONFIG_KEY,
+  MAX_MANIFEST_CATEGORIES,
   MAX_WEBHOOKS,
   WEBHOOK_MODES,
   WEBHOOK_DEFAULT_MODE,

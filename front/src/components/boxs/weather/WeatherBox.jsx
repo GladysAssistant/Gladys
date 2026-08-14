@@ -142,7 +142,7 @@ class WeatherBoxComponent extends Component {
       return (
         <ErrorCard messageId="dashboard.boxes.weather.requestToThirdPartyFailed">
           {' '}
-          <Link href="/dashboard/integration/weather">
+          <Link href="/dashboard/integration/environment">
             <Text id="dashboard.boxes.weather.clickHere" />
           </Link>
         </ErrorCard>

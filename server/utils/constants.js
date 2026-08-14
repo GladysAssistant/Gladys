@@ -394,6 +394,28 @@ const SERVICE_TYPES = {
   EXTERNAL: 'external',
 };
 
+// Browse categories of the integration catalog (docs/specs/
+// integration-catalog-categories.md): display metadata describing the domain
+// of use, fully decoupled from the technical `type` of an integration. The
+// array order is the sidebar order. Shared with the frontend (single source
+// of truth of the controlled vocabulary on the instance side); the canonical
+// enum used by the store indexer lives in GladysAssistant/integration-store
+// and is mirrored in lib/external-integration/manifest.schema.json.
+const INTEGRATION_CATALOG_CATEGORIES = [
+  'climate',
+  'lighting',
+  'energy',
+  'security',
+  'multimedia',
+  'appliances',
+  'environment',
+  'protocols',
+  'network',
+  'notifications',
+  'assistants',
+  'services',
+];
+
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS: 'DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS',
@@ -2125,6 +2147,8 @@ module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
 
 module.exports.SERVICE_TYPES = SERVICE_TYPES;
 module.exports.SERVICE_TYPES_LIST = createList(SERVICE_TYPES);
+
+module.exports.INTEGRATION_CATALOG_CATEGORIES = INTEGRATION_CATALOG_CATEGORIES;
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
 
