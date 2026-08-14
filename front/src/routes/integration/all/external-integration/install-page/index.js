@@ -16,6 +16,7 @@ import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import integrationText from '../integrationText.css';
+import NetworkWakeSummary from '../components/NetworkWakeSummary';
 
 class ExternalIntegrationInstallPage extends Component {
   getStoreIntegration = async () => {
@@ -263,6 +264,7 @@ class ExternalIntegrationInstallPage extends Component {
                             )}
 
                             <NetworkDiscoverySummary networkDiscovery={manifest.network_discovery} />
+                            <NetworkWakeSummary networkWake={manifest.network_wake} />
 
                             {manifest.location === true && (
                               <div class="alert alert-info">

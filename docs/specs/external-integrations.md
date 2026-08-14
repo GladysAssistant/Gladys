@@ -374,7 +374,7 @@ Goal: that weather providers — Météo France (the pilot port, PR #2626, initi
 
 **State before this workstream (verified in the code at the time)** — one hardcoded name, one implicit pivot format:
 - `weather.get.js` did `service.getService('openweather')` — the exact block that forbade any new provider without touching the core (the `message.sendToUser` situation before B.15). It is now the generic provider loop of point 1 below.
-- The pivot format already existed de facto: the object built by `openweather/lib/formatResults.js` (current conditions + `hours` + `days`), consumed by the dashboard widget, the `GET .../weather` routes and the chat intent. It became the **contractual** pivot format, extended (point 3) so richer providers fit without provider-specific code.
+- The pivot format already existed de facto: the object built by `openweather/lib/formatResults.js` (current conditions + `hours` + `days`), consumed by the dashboard widget, the `GET .../weather` routes, the chat intent and the AI chat `weather_get` tool (the MCP tool that answers weather questions in the assistant, whatever the provider). It became the **contractual** pivot format, extended (point 3) so richer providers fit without provider-specific code.
 
 **1. Core refactor (the B.15 loop, transposed)**: `weather.get` enumerates the stateManager and keeps every service exposing `weather.get(options)` — the interface `openweather` already implements, and the proxy service of any external "weather" integration (below). Weather is single-valued (one answer, not a fan-out like messages), so the policy is: candidates sorted by service name, tried **in order**, first success wins; a failing candidate (not configured, stopped integration, third-party API down, invalid payload) falls through to the next. Sorting is name-agnostic but has the right emergent property: `ext-*` selectors sort before `openweather`, so **installing an external weather provider takes precedence with zero configuration**, and stopping/uninstalling it falls back to `openweather`. Error surfacing: if every candidate threw "not configured" → `ServiceNotConfiguredError` (the frontend shows its "configure a weather service" call to action); otherwise the **first real failure** is rethrown (a provider exists but is broken — more actionable than "not configured"), with one translation: an external-integration transport/payload failure (disconnected, ack timeout, invalid payload) surfaces as the standard `REQUEST_TO_THIRD_PARTY_FAILED` error the weather widget already maps to its call to action — internal error codes never leak to the user as an opaque "unknown error". No candidate at all → `ServiceNotConfiguredError`. A per-instance provider preference (or per-widget) is a later improvement that will not change the integration contract.
 
@@ -494,8 +494,9 @@ Complete example (the PoC's):
 | `actions` | array | no | **on-demand actions** displayed on the Configuration screen, max 10 (see below) |
 | `transports` | array | no | supported channels, subset of `["local", "cloud"]`; both present → standard "Prefer local connection" toggle (see below) |
 | `location` | boolean | no | `true` = requests access to the coordinates of the houses configured in Gladys (`GET /house`, see C.3). The home location is sensitive personal data: the request is shown on the install screen, and an undeclared access gets a `403` — **enforced server-side**, same authorization-contract pattern as `network_discovery` |
+| `network_wake` | boolean | no | `true` = requests permission to send Wake-on-LAN magic packets through the Gladys core (`POST /network/wake`, see C.3). The request is shown on the install screen and an undeclared access gets a `403`, enforced server-side. |
 
-No `permissions` field in v1: outbound network access is open and the install screen says so — we do not specify what we cannot enforce (see B.14). The field may appear in a future `manifest_version` when a real restriction exists. What does exist are **targeted, enforceable authorization contracts** — `containers`, `network_discovery`, `webhooks`, `location` — each declared in the manifest, shown to the user before install, and enforced server-side.
+No `permissions` field in v1: outbound network access is open and the install screen says so — we do not specify what we cannot enforce (see B.14). The field may appear in a future `manifest_version` when a real restriction exists. What does exist are **targeted, enforceable authorization contracts** — `containers`, `network_discovery`, `webhooks`, `location`, `network_wake` — each declared in the manifest, shown to the user before install, and enforced server-side.
 
 **Cover re-hosted by the indexer**: at each crawl, the indexer downloads the `cover_image`, validates it (JPEG/PNG magic bytes, 800×534, ≤ 150 KB) and publishes a copy on GitHub Pages; **that URL** is the one the index references (`cover_url`, see C.6). Three benefits: no dead link in the catalog, no user IP leak to a third-party server on every catalog display, and guaranteed weight/format. An absent or invalid cover does not reject the integration: it is indexed with a placeholder, and a warning (`level: "warning"`) is published in `rejected.json`.
 
@@ -691,6 +692,15 @@ Two more reserved keys cover the **degraded state** — the "it works, but not a
 **`POST /api/integration/v1/container/:name/stop`** — body `{}` → `200 { "success": true }`. Stops the container and removes it from the desired state: the supervisor will not restart it.
 
 **`POST /api/integration/v1/container/:name/restart`** — body `{}` → `200 { "success": true }`. Typical use: the integration has rewritten one of the sub-container's config files via `/data` (see B.2) and restarts it to apply.
+
+**`POST /api/integration/v1/network/wake`** — body `{ "mac": "64:e4:d5:b4:12:66", "address": "255.255.255.255", "port": 9, "sourcePort": 0 }` → `200 { "success": true }`. Sends a standard Wake-on-LAN magic packet from the Gladys core network namespace. **Requires `network_wake: true` in the manifest** (shown on the install screen); otherwise the core returns `403 FORBIDDEN`.
+* mac is required. Accepted formats: 64:e4:d5:b4:12:66, 64-e4-d5-b4-12-66, or 64E4D5B41266.
+* address is optional and defaults to 255.255.255.255.
+* port is optional and defaults to UDP destination port 9.
+* sourcePort is optional and defaults to 0 (ephemeral UDP source port chosen by the operating system).
+* The core always builds the standard fixed 102-byte Wake-on-LAN magic packet (6 × 0xFF followed by the target MAC repeated 16 times). The integration cannot provide an arbitrary UDP payload, so this endpoint is not a general UDP proxy.
+* The emission rate is bounded to 1 wake per 2 seconds per integration (`429 RATE_LIMIT_EXCEEDED` otherwise) — enough for the usual "retry until the device wakes up" loop, not enough to flood from the core's network namespace.
+* A successful send returns 200 { "success": true }. This confirms that the packet was emitted by Gladys, not that the target device actually woke up.
 
 ### C.4 Integration WebSocket: protocol
 

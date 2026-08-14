@@ -501,6 +501,13 @@ function getRoutes(gladys) {
       admin: true,
       controller: serviceController.stop,
     },
+    // ⚠️ the literal `message` route must be declared BEFORE `:service_name`
+    // (setupRoutes registers routes in declaration order), otherwise it would
+    // be swallowed and read as a service named "message".
+    'get /api/v1/service/message': {
+      authenticated: true,
+      controller: serviceController.getMessageServices,
+    },
     'get /api/v1/service/:service_name': {
       authenticated: true,
       controller: serviceController.getByName,
@@ -669,6 +676,11 @@ function getRoutes(gladys) {
       authenticated: false,
       externalIntegrationAuth: true,
       controller: integrationHostController.networkDiscoveryScan,
+    },
+    'post /api/integration/v1/network/wake': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.networkWake,
     },
     'post /api/integration/v1/camera/image': {
       authenticated: false,

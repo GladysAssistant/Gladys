@@ -43,6 +43,7 @@ const MANIFEST_FIELDS = [
   'config_schema',
   'containers',
   'location',
+  'network_wake',
   'network_discovery',
   'actions',
   'transports',
@@ -849,6 +850,9 @@ function validateManifest(manifest) {
   }
   if (manifest.location !== undefined && typeof manifest.location !== 'boolean') {
     errors.push('location: must be a boolean');
+  }
+  if (manifest.network_wake !== undefined && typeof manifest.network_wake !== 'boolean') {
+    errors.push('network_wake: must be a boolean');
   }
   if (manifest.network_discovery !== undefined) {
     if (

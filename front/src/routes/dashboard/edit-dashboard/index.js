@@ -366,7 +366,6 @@ class EditDashboard extends Component {
   constructor(props) {
     super(props);
     this.props = props;
-    this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     this.state = {
       dashboards: [],
       newSelectedBoxType: {},
@@ -406,7 +405,6 @@ class EditDashboard extends Component {
     return (
       <EditDashboardPage
         user={props.user}
-        isTouchDevice={this.isTouchDevice}
         dashboards={dashboards}
         currentDashboard={currentDashboard}
         loading={loading}

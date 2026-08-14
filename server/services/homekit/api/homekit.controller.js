@@ -32,7 +32,10 @@ module.exports = function HomeKitController(homekitHandler) {
    */
   async function getDevices(req, res) {
     const devices = await homekitHandler.getCompatibleDevices();
-    res.json(devices.map(({ name, selector }) => ({ name, selector })));
+    // House alarms are offered alongside the devices: they are not devices, but the exposure
+    // setting is a single allow list of selectors and they have to be selectable like the rest.
+    const alarms = await homekitHandler.getCompatibleAlarms();
+    res.json([...devices, ...alarms].map(({ name, selector }) => ({ name, selector })));
   }
 
   return {

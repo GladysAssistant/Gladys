@@ -148,6 +148,12 @@ function createSceneCreateInputSchema(
   const deviceFeatureSelectorSchema = deviceFeatureSelectors.length > 0 ? z.enum(deviceFeatureSelectors) : z.string();
   const calendarSelectorSchema = calendarSelectors.length > 0 ? z.enum(calendarSelectors) : z.string();
   const areaSelectorSchema = areaSelectors.length > 0 ? z.enum(areaSelectors) : z.string();
+  const messageServiceSchema = z
+    .string()
+    .nullish()
+    .describe(
+      'Name of the messaging service to send through (example: "telegram"). Omit or set to null to send to every messaging channel the user configured.',
+    );
   const sceneActionSchema = z.lazy(() =>
     z.discriminatedUnion('type', [
       actionSchemaByType(ACTIONS.DEVICE.SET_VALUE, {
@@ -155,7 +161,7 @@ function createSceneCreateInputSchema(
         device: z.string().optional(),
         feature_category: z.string().optional(),
         feature_type: z.string().optional(),
-        value: z.number().optional(),
+        value: z.union([z.number(), z.string()]).optional(),
         evaluate_value: z.string().optional(),
       }),
       actionSchemaByType(ACTIONS.LIGHT.TURN_ON, {
@@ -192,11 +198,13 @@ function createSceneCreateInputSchema(
       actionSchemaByType(ACTIONS.MESSAGE.SEND, {
         user: userSelectorSchema,
         text: z.string(),
+        service: messageServiceSchema,
       }),
       actionSchemaByType(ACTIONS.MESSAGE.SEND_CAMERA, {
         user: userSelectorSchema,
         text: z.string(),
         camera: z.string(),
+        service: messageServiceSchema,
       }),
       actionSchemaByType(ACTIONS.AI.ASK, {
         user: userSelectorSchema,
@@ -209,6 +217,26 @@ function createSceneCreateInputSchema(
       }),
       actionSchemaByType(ACTIONS.DEVICE.GET_VALUE, {
         device_feature: deviceFeatureSelectorSchema,
+      }),
+      actionSchemaByType(ACTIONS.VARIABLE.SET, {
+        name: z
+          .string()
+          .optional()
+          .describe('Human readable name of the variable, only displayed in the scene editor.'),
+        text: z
+          .string()
+          .optional()
+          .describe(
+            'Text value of the variable. It can contain Handlebars variables, for example {{0.0.last_value}}. Mutually exclusive with evaluate_value. The result is available in the next actions as {{<action coordinates>.value}}, for example {{1.0.value}}.',
+          ),
+        evaluate_value: z
+          .string()
+          .optional()
+          .describe(
+            'Formula evaluated to a number, for example {{0.0.last_value}} * 2. Mutually exclusive with text. The result is available in the next actions as {{<action coordinates>.value}}, for example {{1.0.value}}.',
+          ),
+      }).refine((action) => action.text === undefined || action.evaluate_value === undefined, {
+        message: 'text and evaluate_value cannot be used at the same time',
       }),
       actionSchemaByType(ACTIONS.CONDITION.ONLY_CONTINUE_IF, {
         conditions: z
@@ -317,6 +345,20 @@ function createSceneCreateInputSchema(
         if: z.array(sceneActionSchema).min(1),
         then: z.array(z.array(sceneActionSchema)),
         else: z.array(z.array(sceneActionSchema)),
+      }),
+      actionSchemaByType(ACTIONS.CONDITION.WHILE, {
+        if: z
+          .array(sceneActionSchema)
+          .min(1)
+          .describe('Conditions re-evaluated before each iteration. The loop stops when one of them fails.'),
+        then: z.array(z.array(sceneActionSchema)).describe('Actions executed on each iteration of the loop.'),
+        max_iterations: z
+          .number()
+          .int()
+          .min(1)
+          .max(10000)
+          .optional()
+          .describe('Safety limit for the number of iterations (default 1000).'),
       }),
     ]),
   );

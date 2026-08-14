@@ -675,6 +675,7 @@ const ACTIONS = {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
     CHECK_TIME: 'condition.check-time',
     IF_THEN_ELSE: 'condition.if-then-else',
+    WHILE: 'condition.while',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
@@ -705,6 +706,9 @@ const ACTIONS = {
   },
   SMS: {
     SEND: 'sms.send',
+  },
+  VARIABLE: {
+    SET: 'variable.set',
   },
 };
 
@@ -792,6 +796,15 @@ const DEVICE_FEATURE_CATEGORIES = {
   LEVEL_SENSOR: 'level-sensor',
   MOTION_SENSOR: 'motion-sensor',
   LOCK: 'lock',
+  // Generic consumable/wear-part monitoring (vacuum brushes, dust bags, mop pads, softener resin,
+  // detergent...). One feature per component, the feature `name` identifies the component: don't
+  // add a new per-component type/category here when the value is just "remaining life in percent".
+  // Boundary with neighboring categories: filter life reported through the Matter Resource
+  // Monitoring model (HEPA and activated carbon filters) stays in HEPA_FILTER_MONITORING, every
+  // other consumable or wear part goes here, so the same quantity is never split across categories.
+  // The name `maintenance` is deliberate: it is a user-facing category name in the UI, kept broader
+  // and simpler than a Matter-style `consumable-monitoring`. Renaming it later would be breaking.
+  MAINTENANCE: 'maintenance',
   MUSIC: 'music',
   NOISE_SENSOR: 'noise-sensor',
   OPENING_SENSOR: 'opening-sensor',
@@ -1241,6 +1254,9 @@ const DEVICE_FEATURE_TYPES = {
   FILTER_MONITORING: {
     FILTER_LIFE_REMAINING: 'filter-life-remaining', // Remaining life of the HEPA filter in percent (integer - sensor)
   },
+  MAINTENANCE: {
+    LIFE_REMAINING: 'life-remaining', // Remaining life of a consumable/wear part in percent (integer - sensor)
+  },
   VACUUM_CLEANER: {
     STATE: 'state', // Operational state of the vacuum (integer - sensor)
     RUN_MODE: 'run-mode', // Run mode of the vacuum (integer - command)
@@ -1438,6 +1454,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.PERCENT,
   ],
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
+  [DEVICE_FEATURE_CATEGORIES.MAINTENANCE]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.SOIL_MOISTURE_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: [DEVICE_FEATURE_UNITS.LUX],
   [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [
@@ -1930,6 +1947,8 @@ const JOB_TYPES = {
   ENERGY_MONITORING_COST_CALCULATION_BEGINNING: 'energy-monitoring-cost-calculation-beginning',
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_THIRTY_MINUTES: 'energy-monitoring-consumption-from-index-thirty-minutes',
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING: 'energy-monitoring-consumption-from-index-beginning',
+  ENERGY_MONITORING_PRODUCTION_FROM_INDEX_THIRTY_MINUTES: 'energy-monitoring-production-from-index-thirty-minutes',
+  ENERGY_MONITORING_PRODUCTION_FROM_INDEX_BEGINNING: 'energy-monitoring-production-from-index-beginning',
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
   DEVICE_MIGRATE: 'device-migrate',
@@ -1987,6 +2006,7 @@ const AI_CHAT_TOOL_CATEGORIES = {
   SCENES: 'scenes',
   DEVICE_CONTROL: 'device_control',
   DEVICE_QUERY: 'device_query',
+  WEATHER: 'weather',
   WEB_AND_TIME: 'web_and_time',
   OTHER: 'other',
 };

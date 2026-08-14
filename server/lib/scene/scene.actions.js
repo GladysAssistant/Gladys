@@ -54,6 +54,11 @@ const { evaluate } = create({
   randomDependencies,
 });
 
+// Safety limits for the "while" loop action
+const WHILE_DEFAULT_MAX_ITERATIONS = 1000;
+const WHILE_ABSOLUTE_MAX_ITERATIONS = 10000;
+const WHILE_MIN_ITERATION_TIME_MS = 100;
+
 /**
  * @description Warn the user when a rendered MQTT payload looks like JSON but is not valid JSON.
  * This is the usual symptom of a `{{variable}}` which could not be resolved and was
@@ -86,6 +91,25 @@ const actionsFunc = {
     }
 
     let { value } = action;
+
+    // A text feature (a message displayed on a TV, a text virtual sensor...) receives the
+    // value as a raw string with scene variables injected, and skips the math evaluation
+    // below which would reject any non-numeric text
+    if (
+      deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT &&
+      deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT
+    ) {
+      if (action.evaluate_value !== undefined) {
+        value = Handlebars.compile(action.evaluate_value, {
+          noEscape: true,
+        })(scope);
+      }
+      if (value === undefined || value === null || value === '') {
+        throw new AbortScene('ACTION_VALUE_EMPTY');
+      }
+      return self.device.setValue(device, deviceFeature, String(value));
+    }
+
     if (action.evaluate_value !== undefined) {
       value = evaluate(
         Handlebars.compile(action.evaluate_value, {
@@ -306,14 +330,16 @@ const actionsFunc = {
     const textWithVariables = Handlebars.compile(action.text, {
       noEscape: true,
     })(scope);
-    await self.message.sendToUser(action.user, textWithVariables);
+    // no `service` on the action = historical behaviour: broadcast to every
+    // channel the user has configured
+    await self.message.sendToUser(action.user, textWithVariables, null, { service: action.service });
   },
   [ACTIONS.MESSAGE.SEND_CAMERA]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text, {
       noEscape: true,
     })(scope);
     const image = await self.device.camera.getLiveImage(action.camera);
-    await self.message.sendToUser(action.user, textWithVariables, image);
+    await self.message.sendToUser(action.user, textWithVariables, image, { service: action.service });
   },
   [ACTIONS.AI.ASK]: async (self, action, scope, path) => {
     const textWithVariables = Handlebars.compile(action.text, {
@@ -345,6 +371,61 @@ const actionsFunc = {
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, path) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
     set(scope, path, cloneDeep(deviceFeature), { merge: true });
+  },
+  [ACTIONS.VARIABLE.SET]: async (self, action, scope, path) => {
+    let value;
+
+    // "text" and "evaluate_value" are mutually exclusive. The scene editor never sets both,
+    // but an action written by hand could: in that case we cannot guess which one was meant,
+    // so we fail closed instead of silently ignoring one of them.
+    if (action.text !== undefined && action.evaluate_value !== undefined) {
+      logger.warn('Set variable: "text" and "evaluate_value" cannot be used at the same time.');
+      throw new AbortScene('VARIABLE_VALUE_AMBIGUOUS');
+    }
+
+    // If the value should be calculated from a formula
+    if (action.evaluate_value !== undefined) {
+      try {
+        value = evaluate(
+          Handlebars.compile(action.evaluate_value, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
+      } catch (e) {
+        logger.warn(`Set variable: Error evaluating value: ${action.evaluate_value}`);
+        logger.warn(e);
+        throw new AbortScene('VARIABLE_VALUE_NOT_A_NUMBER');
+      }
+      // mathjs can return something which is not a usable number: a string, a matrix, or
+      // Infinity when the formula overflows (1e309). The next actions expect a real number,
+      // so anything else aborts the scene instead of storing an unusable variable.
+      if (typeof value !== 'number' || !Number.isFinite(value)) {
+        logger.warn(`Set variable: Value is not a number: ${value}`);
+        throw new AbortScene('VARIABLE_VALUE_NOT_A_NUMBER');
+      }
+    } else {
+      // Otherwise, the text is a simple template which can contain other variables.
+      // Like the formula branch, an invalid template aborts the scene: the following
+      // actions rely on this variable being set.
+      try {
+        value = Handlebars.compile(action.text || '', {
+          noEscape: true,
+        })(scope);
+      } catch (e) {
+        logger.warn(`Set variable: Error rendering text: ${action.text}`);
+        logger.warn(e);
+        throw new AbortScene('VARIABLE_TEXT_NOT_VALID');
+      }
+      // A text which renders to a plain number ("123", or an injected numeric variable)
+      // is stored as a number: "only continue if" compares strictly, so keeping the
+      // string would make an equality between identical values fail (123 !== '123').
+      const valueAsNumber = Number(value);
+      if (value.trim() !== '' && Number.isFinite(valueAsNumber)) {
+        value = valueAsNumber;
+      }
+    }
+
+    set(scope, path, { value }, { merge: true });
   },
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
     let oneConditionVerified = false;
@@ -789,14 +870,79 @@ const actionsFunc = {
       freeMobileService.sms.send(textWithVariables);
     }
   },
+  [ACTIONS.CONDITION.WHILE]: async (self, action, scope, path) => {
+    const { if: conditionActions, then: loopActions } = action;
+    const { executeAction, executeActions } = executeActionsFactory(actionsFunc);
+
+    // Without conditions, the loop would run until the max iterations safety limit
+    if (!conditionActions || conditionActions.length === 0) {
+      throw new AbortScene('WHILE_CONDITION_EMPTY');
+    }
+
+    // A loop with an empty body would only burn iterations doing nothing
+    const numberOfActionsInLoop = (loopActions || []).reduce((acc, group) => acc + group.length, 0);
+    if (numberOfActionsInLoop === 0) {
+      throw new AbortScene('WHILE_ACTIONS_EMPTY');
+    }
+
+    const maxIterations = Math.min(
+      action.max_iterations !== undefined ? action.max_iterations : WHILE_DEFAULT_MAX_ITERATIONS,
+      WHILE_ABSOLUTE_MAX_ITERATIONS,
+    );
+
+    const verifyConditions = async () => {
+      try {
+        // Unlike "if-then-else", conditions are executed in serie: it allows a "device.get-value"
+        // placed before a condition to refresh the scope with the live value of the device
+        // on each iteration, instead of comparing a value read once before the loop.
+        // The path matches the path used by the scene editor, so variables can be re-used.
+        await Promise.mapSeries(conditionActions, (conditionAction, index) =>
+          executeAction(self, conditionAction, scope, `${path}.if.${index}`, { throwUnknownError: true }),
+        );
+        return true;
+      } catch (e) {
+        if (e instanceof AbortScene) {
+          return false;
+        }
+        throw e;
+      }
+    };
+
+    let iterations = 0;
+    /* eslint-disable no-await-in-loop */
+    // Iterations are sequential by design: conditions are re-evaluated before each one.
+    // The max iterations limit is checked first, so conditions are never evaluated
+    // one extra time after the last allowed iteration.
+    while (iterations < maxIterations) {
+      if (!(await verifyConditions())) {
+        // Conditions are not verified anymore: this is the normal end of the loop
+        return;
+      }
+      const iterationStartTime = Date.now();
+      await executeActions(self, loopActions, scope, `${path}.then`);
+      iterations += 1;
+      // Safety: prevent CPU-intensive tight loops when the executed actions are instantaneous
+      const iterationDuration = Date.now() - iterationStartTime;
+      if (iterationDuration < WHILE_MIN_ITERATION_TIME_MS) {
+        await Promise.delay(WHILE_MIN_ITERATION_TIME_MS - iterationDuration);
+      }
+    }
+    /* eslint-enable no-await-in-loop */
+    logger.warn(`While loop: max number of iterations reached (${maxIterations}), stopping the loop.`);
+  },
   [ACTIONS.CONDITION.IF_THEN_ELSE]: async (self, action, scope, path) => {
     const { if: ifActions, then: thenActions, else: elseActions } = action;
-    const { executeActions } = executeActionsFactory(actionsFunc);
+    const { executeAction, executeActions } = executeActionsFactory(actionsFunc);
 
     // verify the conditions
     let conditionsVerified;
     try {
-      await executeActions(self, [ifActions], scope, `${path}.if`, { throwUnknownError: true });
+      // Conditions are executed in parallel, but each one writes in the scope at the path
+      // used by the scene editor, so a variable declared by a condition (for example the
+      // event of a "calendar.is-event-running") can be re-used in the branches.
+      await Promise.map(ifActions, (ifAction, index) =>
+        executeAction(self, ifAction, scope, `${path}.if.${index}`, { throwUnknownError: true }),
+      );
       conditionsVerified = true;
     } catch (e) {
       if (e instanceof AbortScene) {

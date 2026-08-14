@@ -156,6 +156,12 @@ const NETWORK_DISCOVERY_DEFAULT_TIMEOUT_SECONDS = 10;
 // small payload, one scan per 10 seconds per integration.
 const MAX_ACTIVE_BROADCAST_PAYLOAD_BYTES = 512;
 const ACTIVE_BROADCAST_MIN_INTERVAL_MS = 10 * 1000;
+// Wake-on-LAN (POST /network/wake): the payload is the fixed magic packet
+// (never integration-provided bytes), and the emission rate is bounded so
+// the primitive cannot be turned into a UDP flood from the core's network
+// namespace. 2 seconds still allows the usual "send a few packets until
+// the device wakes up" retry loop.
+const NETWORK_WAKE_MIN_INTERVAL_MS = 2 * 1000;
 // Camera images: pushed through POST /camera/image (core's 150 KB bound),
 // never through POST /state (dedicated saveStringState path, no state
 // history). Continuous video streaming is out of the v1 scope.
@@ -335,6 +341,7 @@ module.exports = {
   MAX_UDP_BROADCAST_PORTS,
   MAX_ACTIVE_BROADCAST_PAYLOAD_BYTES,
   ACTIVE_BROADCAST_MIN_INTERVAL_MS,
+  NETWORK_WAKE_MIN_INTERVAL_MS,
   NETWORK_DISCOVERY_MIN_TIMEOUT_SECONDS,
   NETWORK_DISCOVERY_MAX_TIMEOUT_SECONDS,
   NETWORK_DISCOVERY_DEFAULT_TIMEOUT_SECONDS,
