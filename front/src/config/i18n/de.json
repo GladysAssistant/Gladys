@@ -414,6 +414,7 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Bewegung erkannt",
+        "noMotionDetected": "Keine Bewegung",
         "doorbellRinging": "Klingelt",
         "pushButton": "Schieben",
         "vacuumDock": "Zurück zur Ladestation"
