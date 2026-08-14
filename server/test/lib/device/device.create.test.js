@@ -916,6 +916,9 @@ describe('Device', () => {
     expect(storedDevice.features[0].supported_options).to.have.lengthOf(2);
     const storedValues = storedDevice.features[0].supported_options.map((option) => option.value).sort();
     expect(storedValues).to.deep.equal(['netflix', 'youtube.leanback.v4']);
+    // String values live in the value_string column, mirroring last_value_string
+    const storedStringValues = storedDevice.features[0].supported_options.map((option) => option.value_string).sort();
+    expect(storedStringValues).to.deep.equal(['netflix', 'youtube.leanback.v4']);
   });
   it('should sync supported_options when feature payload only has id', async () => {
     const stateManager = new StateManager(event);

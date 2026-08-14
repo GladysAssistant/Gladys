@@ -1,22 +1,12 @@
 const Joi = require('joi');
 const { BadParameters } = require('./coreErrors');
 
-// Option values are either integers (enum-like features: modes, fan speeds...) or free
-// strings (dynamic selects: installed TV apps, HDMI sources...). A string holding a
-// round-trippable safe integer is canonicalized to a number so every value has exactly
-// one stored form and integer options declared as '5' or 5 cannot coexist.
-const canonicalizeOptionValue = (value) => {
-  if (typeof value === 'string' && /^-?\d+$/.test(value)) {
-    const parsedValue = parseInt(value, 10);
-    if (Number.isSafeInteger(parsedValue) && `${parsedValue}` === value) {
-      return parsedValue;
-    }
-  }
-  return value;
-};
-
 // Devices loaded from the API carry the full DeviceFeatureSupportedOption rows,
-// so DB metadata fields must be stripped when the device is saved again
+// so DB metadata fields must be stripped when the device is saved again.
+// `value` is polymorphic: an integer for enum-like options (modes, fan speeds...), a
+// free string for dynamic selects (installed TV apps, HDMI sources...). The storage
+// split between the `value` and `value_string` columns is internal to the sync layer,
+// so the `value_string` a round-tripped device carries is stripped like the metadata.
 const supportedOptionSchema = Joi.object({
   id: Joi.string()
     .uuid()
@@ -36,6 +26,7 @@ const supportedOptionSchema = Joi.object({
   sort_order: Joi.number()
     .integer()
     .optional(),
+  value_string: Joi.any().strip(),
   device_feature_id: Joi.any().strip(),
   created_at: Joi.any().strip(),
   updated_at: Joi.any().strip(),
@@ -45,7 +36,9 @@ const supportedOptionsSchema = Joi.array()
   .items(supportedOptionSchema)
   .required()
   .custom((options, helpers) => {
-    const values = options.map((option) => `${canonicalizeOptionValue(option.value)}`);
+    // Compared in string form: an integer and its string twin ('5' and 5) would be
+    // indistinguishable in the UI and match the same state, so they count as duplicates
+    const values = options.map((option) => `${option.value}`);
     const uniqueValues = new Set(values);
     if (uniqueValues.size !== values.length) {
       return helpers.error('any.custom', { message: 'supported_options must not contain duplicate values' });
@@ -75,7 +68,6 @@ function normalizeSupportedOptions(options) {
 
   return value.map((option, index) => ({
     ...option,
-    value: canonicalizeOptionValue(option.value),
     sort_order: option.sort_order !== undefined ? option.sort_order : index,
   }));
 }

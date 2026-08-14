@@ -50,15 +50,15 @@ describe('normalizeSupportedOptions', () => {
     ]);
   });
 
-  it('should canonicalize an integer-looking string value to a number', () => {
+  it('should keep a numeric-looking string value as a string', () => {
     expect(normalizeSupportedOptions([{ value: '5', label: 'Five' }])).to.deep.equal([
-      { value: 5, label: 'Five', sort_order: 0 },
+      { value: '5', label: 'Five', sort_order: 0 },
     ]);
   });
 
-  it('should keep a non-round-trippable numeric string as a string', () => {
-    expect(normalizeSupportedOptions([{ value: '0123', label: 'Padded' }])).to.deep.equal([
-      { value: '0123', label: 'Padded', sort_order: 0 },
+  it('should strip the internal value_string column from round-tripped options', () => {
+    expect(normalizeSupportedOptions([{ value: 'netflix', value_string: 'netflix', label: 'Netflix' }])).to.deep.equal([
+      { value: 'netflix', label: 'Netflix', sort_order: 0 },
     ]);
   });
 

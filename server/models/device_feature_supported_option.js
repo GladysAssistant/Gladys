@@ -19,29 +19,26 @@ module.exports = (sequelize, DataTypes) => {
       },
       value: {
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         validate: {
-          isNotEmpty(value) {
-            if (value === null || value === undefined || `${value}`.trim().length === 0) {
-              throw new Error('Validation isNotEmpty on value failed');
-            }
-          },
+          isInt: true,
         },
-        // The column stores every value as a string; integer values (the historical
-        // format, still used by enum-like features) are restored as numbers so option
-        // values keep matching the numeric feature states they refer to.
+        // Like last_value / last_value_string on t_device_feature, an option value lives
+        // in exactly one of the two columns: `value` for enum-like integer options,
+        // `value_string` for dynamic selects (installed TV apps, HDMI sources...) — the
+        // integer column then only holds a filler. This getter exposes the one that is
+        // set, so every consumer reads a single polymorphic `value`.
         get() {
-          const rawValue = this.getDataValue('value');
-          if (typeof rawValue === 'string' && /^-?\d+$/.test(rawValue)) {
-            const parsedValue = parseInt(rawValue, 10);
-            // Only round-trippable integers are restored ('0123' or an id larger than
-            // Number.MAX_SAFE_INTEGER stays a string, unchanged)
-            if (Number.isSafeInteger(parsedValue) && `${parsedValue}` === rawValue) {
-              return parsedValue;
-            }
+          const stringValue = this.getDataValue('value_string');
+          if (stringValue !== null && stringValue !== undefined) {
+            return stringValue;
           }
-          return rawValue;
+          return this.getDataValue('value');
         },
+      },
+      value_string: {
+        allowNull: true,
+        type: DataTypes.STRING,
       },
       label: {
         allowNull: false,
