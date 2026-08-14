@@ -104,6 +104,7 @@ class AdaptiveOptionControl extends Component {
                 type="button"
                 key={option.value}
                 class={cx('btn btn-sm btn-secondary', { active: value === option.value })}
+                disabled={option.disabled}
                 onClick={() => this.props.updateValue(option.value)}
               >
                 {this.renderLabel(option)}
