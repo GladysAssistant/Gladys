@@ -1,3 +1,10 @@
+// This module only creates fresh fakes inside its factory functions, never
+// module-level shared ones, so consumers never need their history reset from
+// the outside. They are deliberately created on the sinon singleton: a per-file
+// sandbox would accumulate thousands of factory-built fakes over the suite and
+// make every resetHistory() pass over them (nothing ever iterates the
+// singleton's collection).
+// eslint-disable-next-line no-restricted-syntax
 const { fake } = require('sinon');
 
 const ExternalIntegration = require('../../../lib/external-integration');
@@ -95,6 +102,21 @@ const TEST_NOTIFICATION_MANIFEST = {
   ],
 };
 
+// Weather-provider fixture (B.18): a dedicated provider API — answers the
+// core's weather requests over WebSocket, no device screens.
+const TEST_WEATHER_MANIFEST = {
+  manifest_version: 1,
+  type: 'weather',
+  name: 'Meteo France Demo',
+  description: {
+    en: 'Meteo France weather provider demo integration.',
+    fr: 'Intégration démo : fournisseur météo Météo France.',
+  },
+  version: '1.0.0',
+  docker_image: 'ghcr.io/john/gladys-meteo-france:1.0.0',
+  gladys_version: '>=4.62.0',
+};
+
 // Netatmo-like fixture: inbound webhooks relayed by the Gladys Plus
 // gateway — one fire-and-forget event stream (default mode) and one sync
 // challenge/response registration callback.
@@ -129,7 +151,7 @@ const TEST_CONTAINERS_MANIFEST = {
       cpu: 1,
       env: { LIBVA_DRIVER_NAME: 'i965' },
       command: ['python3', '-u', '-m', 'frigate'],
-      ports: [{ container_port: 5000, label: { en: 'Frigate UI', fr: 'Interface Frigate' } }],
+      ports: [{ container_port: 5000, name: 'frigate_ui', label: { en: 'Frigate UI', fr: 'Interface Frigate' } }],
       devices: ['coral-usb', 'gpu'],
     },
   ],
@@ -189,6 +211,12 @@ function buildFakeSystem(overrides = {}) {
     }),
     getGladysContainerId: fake.resolves('gladys-container-id'),
     getImageLabels: fake.resolves({}),
+    // no image is present locally by default: the local fallback of
+    // ensureImage stays out of the way unless a test opts in
+    imageExists: fake.resolves(false),
+    listImages: fake.resolves([]),
+    getImagePullTime: fake.returns(undefined),
+    removeImage: fake.resolves(true),
     detectHardwareClasses: fake.resolves(TEST_DETECTED_CLASSES),
     ...overrides,
   };
@@ -253,6 +281,7 @@ module.exports = {
   TEST_MANIFEST,
   TEST_COMMUNICATION_MANIFEST,
   TEST_NOTIFICATION_MANIFEST,
+  TEST_WEATHER_MANIFEST,
   TEST_WEBHOOKS_MANIFEST,
   TEST_CONTAINERS_MANIFEST,
   TEST_DETECTED_CLASSES,

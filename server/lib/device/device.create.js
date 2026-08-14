@@ -2,6 +2,7 @@ const Promise = require('bluebird');
 const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
 const { EVENTS } = require('../../utils/constants');
+const { buildUniqueSelector } = require('../../utils/addSelector');
 const { resolveEnergyParentId } = require('../../utils/resolveEnergyParentId');
 const { getStandardDeviceIncludes } = require('../../utils/deviceQueryIncludes');
 const logger = require('../../utils/logger');
@@ -100,6 +101,14 @@ async function create(device) {
 
     // if it doesn't exist, we create it
     if (deviceInDb === null) {
+      // The selector is derived from the name (addSelector hook) and is unique
+      // in DB: two devices sharing a name would collide. The caller does not
+      // choose it (the frontend sends no selector when creating a discovered
+      // device), so the conflict was a dead end for the user.
+      const uniqueSelector = await buildUniqueSelector(db.Device, device.selector || device.name, { transaction });
+      if (uniqueSelector) {
+        device.selector = uniqueSelector;
+      }
       deviceInDb = await db.Device.create(device, { transaction });
     } else {
       actionEvent = EVENTS.DEVICE.UPDATE;
@@ -144,6 +153,25 @@ async function create(device) {
       delete featureToSave.energy_parent_id;
       delete featureToSave.supported_options;
       return featureToSave;
+    });
+
+    // Feature selectors are unique in DB too, and feature names collide even
+    // more easily than device names (a "Volume" on each speaker published by
+    // the same integration). They are resolved before the insert pass, one at
+    // a time: two features of the same batch must not pick the same candidate,
+    // and the pass below runs them concurrently.
+    const featureSelectorsTaken = new Set();
+    await Promise.each(featuresToSave, async (feature) => {
+      if (matchFeatureInList(feature, deviceToReturn.features)) {
+        return;
+      }
+      const uniqueSelector = await buildUniqueSelector(db.DeviceFeature, feature.selector || feature.name, {
+        transaction,
+        taken: featureSelectorsTaken,
+      });
+      if (uniqueSelector) {
+        feature.selector = uniqueSelector;
+      }
     });
 
     // Save features first without energy_parent_id, then resolve parent links in a second pass
@@ -214,7 +242,7 @@ async function create(device) {
       }
 
       savedFeature.supported_options = await syncFeatureSupportedOptions(
-        savedFeature.id,
+        savedFeature,
         payloadFeature.supported_options,
         transaction,
       );

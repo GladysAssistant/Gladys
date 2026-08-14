@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
 // Create a mock for sharp
@@ -116,5 +118,48 @@ describe('resizeImage', () => {
 
     expect(result).to.equal(`data:image/jpeg;base64,${outputBuffer.toString('base64')}`);
     expect(sharpMock.calledOnce).to.equal(true);
+  });
+
+  it('should resize an image buffer and return a JPEG data URI', async () => {
+    const inputBuffer = Buffer.from('source-image');
+    const outputBuffer = Buffer.from('resized-image-data');
+    const sharpMock = createSharpMock(outputBuffer);
+
+    const { resizeImageBuffer } = proxyquire('../../utils/resizeImage', {
+      sharp: sharpMock,
+    });
+
+    const result = await resizeImageBuffer(inputBuffer, {
+      maxWidth: 800,
+      maxHeight: 400,
+      quality: 80,
+    });
+
+    expect(result).to.equal(`image/jpeg;base64,${outputBuffer.toString('base64')}`);
+    expect(sharpMock.instance.resize.firstCall.args).to.deep.equal([
+      800,
+      400,
+      { fit: 'inside', withoutEnlargement: true },
+    ]);
+  });
+
+  it('should resize an image buffer with the default options', async () => {
+    const inputBuffer = Buffer.from('raw-image-data');
+    const outputBuffer = Buffer.from('resized-image-data');
+    const sharpMock = createSharpMock(outputBuffer);
+
+    const { resizeImageBuffer, DEFAULT_MAX_WIDTH, DEFAULT_MAX_HEIGHT } = proxyquire('../../utils/resizeImage', {
+      sharp: sharpMock,
+    });
+
+    const result = await resizeImageBuffer(inputBuffer);
+
+    expect(result).to.equal(`image/jpeg;base64,${outputBuffer.toString('base64')}`);
+    expect(sharpMock.instance.resize.firstCall.args).to.deep.equal([
+      DEFAULT_MAX_WIDTH,
+      DEFAULT_MAX_HEIGHT,
+      { fit: 'inside', withoutEnlargement: true },
+    ]);
+    expect(sharpMock.instance.jpeg.firstCall.args).to.deep.equal([{ quality: 80 }]);
   });
 });

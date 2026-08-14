@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 
 const db = require('../../../models');
 const {
@@ -827,7 +829,16 @@ describe('External integration admin API', () => {
           status: 'stopped',
           desired: 'running',
           started_at: null,
-          ports: [{ container_port: 5000, protocol: 'tcp', host_port: null, label: { en: 'Frigate UI' } }],
+          ports: [
+            {
+              container_port: 5000,
+              protocol: 'tcp',
+              host_port: null,
+              label: { en: 'Frigate UI' },
+              name: null,
+              browsable: true,
+            },
+          ],
           devices: [],
         },
       ]);

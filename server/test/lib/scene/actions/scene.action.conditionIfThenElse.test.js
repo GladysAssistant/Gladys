@@ -1,4 +1,6 @@
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 const EventEmitter = require('events');
 
 const { ACTIONS } = require('../../../../utils/constants');
@@ -189,6 +191,55 @@ describe('scene.conditionIfThenElse', () => {
       scope,
     );
     assert.calledWith(message.sendToUser, 'pepper', 'Then executed, last value = 15');
+  });
+  it('should expose a variable declared by a condition at the path used by the scene editor', async () => {
+    const message = {
+      sendToUser: fake.resolves(null),
+    };
+    const calendar = {
+      findCurrentlyRunningEvent: fake.resolves([
+        {
+          name: 'Dentist',
+          location: 'Paris',
+          description: '',
+          start: new Date('2022-01-01T10:00:00Z'),
+          end: new Date('2022-01-01T11:00:00Z'),
+          calendar: { creator: { language: 'en' } },
+        },
+      ]),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, message, calendar, timezone: 'Europe/Paris' },
+      [
+        [
+          {
+            type: ACTIONS.CONDITION.IF_THEN_ELSE,
+            if: [
+              {
+                type: ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+                calendars: ['my-calendar'],
+                calendar_event_name_comparator: 'has-any-name',
+                stop_scene_if_event_not_found: true,
+              },
+            ],
+            then: [
+              [
+                {
+                  type: ACTIONS.MESSAGE.SEND,
+                  user: 'pepper',
+                  // The editor offers this path for a variable declared by a condition
+                  text: 'Event = {{0.0.if.0.calendarEvent.name}}',
+                },
+              ],
+            ],
+            else: [],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(message.sendToUser, 'pepper', 'Event = Dentist');
   });
   it('should throw error, error happened in the scene', async () => {
     stateManager.setState('deviceFeature', 'my-device-feature', {

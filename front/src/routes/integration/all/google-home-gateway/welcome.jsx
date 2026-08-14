@@ -2,6 +2,7 @@ import { Text, MarkupText } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import GladysPlusUpsell from '../../../../components/gateway/GladysPlusUpsell';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const GoogleWelcomePage = ({ user }) => (
   <div class="page">
@@ -10,6 +11,7 @@ const GoogleWelcomePage = ({ user }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.googleHome.title" />
               </h3>

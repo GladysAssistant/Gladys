@@ -51,8 +51,10 @@ class SettingsSystem extends Component {
       this.props.ping();
     }, 3000);
 
+    // the background refresh is silent: dimming the whole card every 30 seconds
+    // would look like something is happening when nothing is
     this.refreshInfosIntervalId = setInterval(() => {
-      this.getInfos();
+      this.getInfos({ silent: true });
     }, 30000);
 
     // Listen to Watchtower logs
@@ -92,24 +94,32 @@ class SettingsSystem extends Component {
   };
 
   checkForUpdates = async () => {
+    // this check has its own status: the button reports its own progress and
+    // result, so the card doesn't need to be dimmed while it runs
+    this.setState({
+      CheckForUpdatesStatus: RequestStatus.Getting
+    });
     try {
-      this.setState({
-        SystemGetInfosStatus: RequestStatus.Getting
-      });
       await this.props.httpClient.post('/api/v1/gateway/refresh-latest-gladys-version');
-      await this.getInfos();
     } catch (e) {
       console.error(e);
       this.setState({
-        SystemGetInfosStatus: RequestStatus.Error
+        CheckForUpdatesStatus: RequestStatus.Error
       });
+      return;
     }
+    const success = await this.getInfos({ silent: true });
+    this.setState({
+      CheckForUpdatesStatus: success ? RequestStatus.Success : RequestStatus.Error
+    });
   };
 
-  getInfos = async () => {
-    this.setState({
-      SystemGetInfosStatus: RequestStatus.Getting
-    });
+  getInfos = async ({ silent = false } = {}) => {
+    if (!silent) {
+      this.setState({
+        SystemGetInfosStatus: RequestStatus.Getting
+      });
+    }
     try {
       const systemInfos = await this.props.httpClient.get('/api/v1/system/info');
       const today = new Date().getTime();
@@ -121,17 +131,27 @@ class SettingsSystem extends Component {
         systemInfos,
         SystemGetInfosStatus: RequestStatus.Success
       });
+      return true;
     } catch (e) {
       console.error(e);
       this.setState({
         SystemGetInfosStatus: RequestStatus.Error
       });
+      return false;
     }
   };
 
   render(
     props,
-    { SystemUpgradeStatus, watchtowerLogs, upgradeError, websocketConnected, SystemGetInfosStatus, systemInfos }
+    {
+      SystemUpgradeStatus,
+      watchtowerLogs,
+      upgradeError,
+      websocketConnected,
+      SystemGetInfosStatus,
+      CheckForUpdatesStatus,
+      systemInfos
+    }
   ) {
     return (
       <SettingsSystemPage
@@ -143,6 +163,7 @@ class SettingsSystem extends Component {
         websocketConnected={websocketConnected}
         checkForUpdates={this.checkForUpdates}
         SystemGetInfosStatus={SystemGetInfosStatus}
+        CheckForUpdatesStatus={CheckForUpdatesStatus}
         getInfos={this.getInfos}
         systemInfos={systemInfos}
       />

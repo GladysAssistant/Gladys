@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 const EventEmitter = require('events');
 
 const { DEVICE_POLL_FREQUENCIES, EVENTS } = require('../../../utils/constants');
@@ -240,6 +242,7 @@ describe('Device', () => {
         has_feedback: false,
         min: 0,
         max: 100,
+        step: null,
         keep_history: true,
         last_value: 0,
         last_daily_aggregate: null,
@@ -349,6 +352,7 @@ describe('Device', () => {
         has_feedback: false,
         min: 0,
         max: 100,
+        step: null,
         keep_history: true,
         last_value: 0,
         last_daily_aggregate: null,
@@ -836,6 +840,88 @@ describe('Device', () => {
     ).get({ plain: true });
     expect(storedDevice.features[0].supported_options).to.have.lengthOf(2);
   });
+  it('should create and sync string-valued supported_options on a select feature', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const created = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'TV device',
+      external_id: 'tv-app-select',
+      features: [
+        {
+          name: 'Current app',
+          external_id: 'tv:app',
+          category: 'text',
+          type: 'select',
+          read_only: false,
+          keep_history: false,
+          has_feedback: false,
+          min: 0,
+          max: 0,
+          supported_options: [
+            { value: 'netflix', label: 'Netflix', sort_order: 0 },
+            { value: 'com.disney.disneyplus-prod', label: 'Disney+', sort_order: 1 },
+          ],
+        },
+      ],
+      params: [],
+    });
+
+    expect(created.features).to.have.lengthOf(1);
+    expect(created.features[0].supported_options).to.have.lengthOf(2);
+    expect(created.features[0].supported_options[0]).to.include({
+      value: 'netflix',
+      label: 'Netflix',
+      sort_order: 0,
+    });
+    expect(created.features[0].supported_options[1]).to.include({
+      value: 'com.disney.disneyplus-prod',
+      label: 'Disney+',
+      sort_order: 1,
+    });
+
+    // The TV now reports a different app list: matched values update, gone values leave
+    const updated = await device.create({
+      id: created.id,
+      service_id: created.service_id,
+      name: created.name,
+      external_id: created.external_id,
+      features: [
+        {
+          ...created.features[0],
+          supported_options: [
+            { value: 'netflix', label: 'Netflix 4K', sort_order: 0 },
+            { value: 'youtube.leanback.v4', label: 'YouTube', sort_order: 1 },
+          ],
+        },
+      ],
+      params: [],
+    });
+
+    expect(updated.features[0].supported_options).to.have.lengthOf(2);
+    expect(updated.features[0].supported_options[0]).to.include({
+      value: 'netflix',
+      label: 'Netflix 4K',
+    });
+    expect(updated.features[0].supported_options[1]).to.include({
+      value: 'youtube.leanback.v4',
+      label: 'YouTube',
+    });
+
+    const storedDevice = (
+      await db.Device.findOne({
+        where: { external_id: 'tv-app-select' },
+        include: getStandardDeviceIncludes(),
+      })
+    ).get({ plain: true });
+    expect(storedDevice.features[0].supported_options).to.have.lengthOf(2);
+    const storedValues = storedDevice.features[0].supported_options.map((option) => option.value).sort();
+    expect(storedValues).to.deep.equal(['netflix', 'youtube.leanback.v4']);
+    // String values live in the value_string column, mirroring last_value_string
+    const storedStringValues = storedDevice.features[0].supported_options.map((option) => option.value_string).sort();
+    expect(storedStringValues).to.deep.equal(['netflix', 'youtube.leanback.v4']);
+  });
   it('should sync supported_options when feature payload only has id', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
@@ -912,6 +998,37 @@ describe('Device', () => {
             min: 0,
             max: 5,
             supported_options: [{ value: 1, label: '' }],
+          },
+        ],
+        params: [],
+      });
+      expect.fail('should have thrown');
+    } catch (error) {
+      expect(error).to.be.instanceOf(BadParameters);
+    }
+  });
+  it('should reject string supported_options on an enum-like feature', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+
+    try {
+      await device.create({
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'String options on enum device',
+        external_id: 'string-options-on-enum',
+        features: [
+          {
+            name: 'Run mode',
+            external_id: 'string-options:run-mode',
+            category: 'vacuum-cleaner',
+            type: 'mode',
+            read_only: false,
+            keep_history: true,
+            has_feedback: true,
+            min: 0,
+            max: 5,
+            supported_options: [{ value: 'turbo', label: 'Turbo' }],
           },
         ],
         params: [],
@@ -1206,5 +1323,55 @@ describe('Device', () => {
       expect(error).to.have.property('name', 'SequelizeValidationError');
       expect(error.gladysContext).to.deep.equal({ type: 'device_feature', name: null });
     }
+  });
+  it('should create devices sharing the same name with distinct selectors', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    // "test-device" and "test-device-2" are already taken by the seeders
+    const firstDevice = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Test device',
+      external_id: 'homonym-device-1',
+    });
+    const secondDevice = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Test device',
+      external_id: 'homonym-device-2',
+    });
+    expect(firstDevice).to.have.property('selector', 'test-device-3');
+    expect(secondDevice).to.have.property('selector', 'test-device-4');
+  });
+  it('should give distinct selectors to features sharing the same name', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const buildFeature = (externalId) => ({
+      name: 'Volume',
+      external_id: externalId,
+      category: 'music',
+      type: 'volume',
+      read_only: false,
+      keep_history: true,
+      has_feedback: false,
+      min: 0,
+      max: 100,
+    });
+    // two features of the same device, then a third one on another device:
+    // the selector is unique across the whole table, not per device
+    const firstDevice = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Speaker one',
+      external_id: 'homonym-features-device-1',
+      features: [buildFeature('homonym-features:1:volume'), buildFeature('homonym-features:2:volume')],
+    });
+    const secondDevice = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'Speaker two',
+      external_id: 'homonym-features-device-2',
+      features: [buildFeature('homonym-features:3:volume')],
+    });
+    expect(firstDevice.features.map((feature) => feature.selector)).to.deep.equal(['volume', 'volume-2']);
+    expect(secondDevice.features.map((feature) => feature.selector)).to.deep.equal(['volume-3']);
   });
 });

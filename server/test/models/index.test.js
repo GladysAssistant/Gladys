@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-syntax -- deliberate singleton use, see the sandbox comment below
 const sinon = require('sinon');
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();

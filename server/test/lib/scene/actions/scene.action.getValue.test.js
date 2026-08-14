@@ -1,4 +1,6 @@
-const { fake, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, stub } = sinon;
 const { expect } = require('chai');
 const EventEmitter = require('events');
 

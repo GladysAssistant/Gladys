@@ -2,8 +2,14 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-import { getLocalizedText, getUrlDomain } from '../utils';
+import { getLocalizedText, getUrlDomain, resolveManifestPlaceholders } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
+import { OAUTH_REDIRECT_URI, getOAuthCallbackPath } from '../../../../../utils/oauth';
+import integrationText from '../integrationText.css';
+
+// the redirect URI is meant to be copied into the developer application of the
+// provider: a click should select all of it
+const selectOnFocus = e => e.target.select();
 
 class ConfigField extends Component {
   onInput = e => {
@@ -28,6 +34,47 @@ class ConfigField extends Component {
     this.props.connectOAuth(this.props.field);
   };
 
+  copyRedirectUri = async value => {
+    let copied = false;
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(value);
+        copied = true;
+      } catch (error) {
+        copied = false;
+      }
+    }
+    // navigator.clipboard only exists in a secure context, and the users this
+    // whole flow unblocks are precisely the ones on a plain-HTTP local
+    // address: fall back to the legacy selection-based copy, as the Tuya
+    // screen already does
+    if (!copied && this.redirectUriInput) {
+      try {
+        this.redirectUriInput.focus();
+        this.redirectUriInput.select();
+        this.redirectUriInput.setSelectionRange(0, this.redirectUriInput.value.length);
+        copied = document.execCommand('copy');
+      } catch (error) {
+        copied = false;
+      }
+    }
+    if (!copied) {
+      return;
+    }
+    this.setState({ redirectUriCopied: true });
+    if (this.copyTimer) {
+      clearTimeout(this.copyTimer);
+    }
+    this.copyTimer = setTimeout(() => this.setState({ redirectUriCopied: false }), 2000);
+  };
+
+  componentWillUnmount() {
+    if (this.copyTimer) {
+      clearTimeout(this.copyTimer);
+      this.copyTimer = null;
+    }
+  }
+
   render({
     field,
     language,
@@ -36,7 +83,9 @@ class ConfigField extends Component {
     touchedSecrets,
     connectionStatus,
     oauthStatus,
-    dynamicOptions
+    selector,
+    dynamicOptions,
+    placeholderPorts
   }) {
     const label = getLocalizedText(field.label, language) || field.key;
     const description = getLocalizedText(field.description, language);
@@ -51,11 +100,17 @@ class ConfigField extends Component {
     if (field.type === 'section') {
       // purely presentational intro block splitting the form: title,
       // plain text and typed links opened in a new tab with the target
-      // domain displayed (no value, no input)
+      // domain displayed (no value, no input). The {{gladys_host}} and
+      // {{port:<name>}} placeholders are substituted here — only the
+      // browser knows the address the user reaches Gladys by
       return (
         <div class="form-group mt-4">
-          <h4 class="mb-1">{label}</h4>
-          {description && <p class="text-muted small mb-2">{description}</p>}
+          <h4 class="mb-1">{resolveManifestPlaceholders(label, placeholderPorts)}</h4>
+          {description && (
+            <p class={cx('text-muted small mb-2', integrationText.integrationText)}>
+              {resolveManifestPlaceholders(description, placeholderPorts)}
+            </p>
+          )}
           {(field.links || []).map(link => (
             <div>
               <a href={link.url} target="_blank" rel="noopener noreferrer">
@@ -72,14 +127,62 @@ class ConfigField extends Component {
     if (field.type === 'oauth2') {
       // the whole OAuth2 flow is relayed: the integration builds the
       // authorize URL, the tokens never transit through the frontend
+      const canUseInstanceRedirect = typeof window !== 'undefined' && window.location.protocol === 'https:';
+      const useInstanceRedirect = canUseInstanceRedirect && this.props.oauthUseInstanceRedirect;
+      const redirectUri =
+        useInstanceRedirect && selector
+          ? `${window.location.origin}${getOAuthCallbackPath(selector)}`
+          : OAUTH_REDIRECT_URI;
       return (
         <div class="form-group">
           <label class="form-label">{label}</label>
           {oauthStatus === RequestStatus.Error && (
             <div class="alert alert-danger">
-              <Text id="integration.externalIntegration.config.oauthConnectError" />
+              {this.props.oauthInvalidState ? (
+                <Text id="integration.externalIntegration.config.oauthInvalidStateError" />
+              ) : (
+                <Text id="integration.externalIntegration.config.oauthConnectError" />
+              )}
             </div>
           )}
+          <div class="mb-3">
+            <small class="form-text text-muted mb-1">
+              <Text id="integration.externalIntegration.config.oauthRedirectUriLabel" />
+            </small>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                value={redirectUri}
+                readOnly
+                onFocus={selectOnFocus}
+                ref={element => {
+                  this.redirectUriInput = element;
+                }}
+              />
+              <span class="input-group-append">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  onClick={() => this.copyRedirectUri(redirectUri)}
+                >
+                  <i class="fe fe-copy" />
+                </button>
+              </span>
+            </div>
+            {this.state.redirectUriCopied && (
+              <small class="text-success d-block mt-1">
+                <Text id="integration.externalIntegration.config.oauthRedirectUriCopied" />
+              </small>
+            )}
+            <small class="form-text text-muted">
+              {useInstanceRedirect ? (
+                <Text id="integration.externalIntegration.config.oauthRedirectUriInstanceDescription" />
+              ) : (
+                <Text id="integration.externalIntegration.config.oauthRedirectUriDescription" />
+              )}
+            </small>
+          </div>
           <div>
             <button
               type="button"
@@ -102,10 +205,27 @@ class ConfigField extends Component {
               </span>
             )}
           </div>
-          {connectionStatus && connectionStatus.message && (
-            <small class="form-text text-muted">{getLocalizedText(connectionStatus.message, language)}</small>
+          {canUseInstanceRedirect && (
+            <label class="custom-control custom-checkbox mt-3">
+              <input
+                type="checkbox"
+                class="custom-control-input"
+                checked={useInstanceRedirect}
+                onClick={this.props.toggleOAuthUseInstanceRedirect}
+              />
+              <span class="custom-control-label">
+                <Text id="integration.externalIntegration.config.oauthUseInstanceRedirectLabel" />
+              </span>
+            </label>
           )}
-          {description && <small class="form-text text-muted">{description}</small>}
+          {connectionStatus && connectionStatus.message && (
+            <small class={cx('form-text text-muted', integrationText.integrationText)}>
+              {getLocalizedText(connectionStatus.message, language)}
+            </small>
+          )}
+          {description && (
+            <small class={cx('form-text text-muted', integrationText.integrationText)}>{description}</small>
+          )}
         </div>
       );
     }
@@ -118,7 +238,9 @@ class ConfigField extends Component {
             <span class="custom-switch-indicator" />
             <span class="custom-switch-description">{label}</span>
           </label>
-          {description && <small class="form-text text-muted">{description}</small>}
+          {description && (
+            <small class={cx('form-text text-muted', integrationText.integrationText)}>{description}</small>
+          )}
         </div>
       );
     }
@@ -218,7 +340,9 @@ class ConfigField extends Component {
             required={field.required}
           />
         )}
-        {description && <small class="form-text text-muted">{description}</small>}
+        {description && (
+          <small class={cx('form-text text-muted', integrationText.integrationText)}>{description}</small>
+        )}
       </div>
     );
   }
@@ -237,8 +361,13 @@ const ConfigSchemaForm = ({
   saveConfig,
   connectionStatus,
   oauthStatus,
+  oauthInvalidState,
+  oauthUseInstanceRedirect,
+  toggleOAuthUseInstanceRedirect,
   connectOAuth,
-  dynamicOptions
+  selector,
+  dynamicOptions,
+  placeholderPorts
 }) => {
   // sections are presentational and oauth2 has its own Connect button: a
   // schema made only of those has nothing to save, hide the save button
@@ -266,8 +395,13 @@ const ConfigSchemaForm = ({
           updateConfigValue={updateConfigValue}
           connectionStatus={connectionStatus}
           oauthStatus={oauthStatus}
+          oauthInvalidState={oauthInvalidState}
+          oauthUseInstanceRedirect={oauthUseInstanceRedirect}
+          toggleOAuthUseInstanceRedirect={toggleOAuthUseInstanceRedirect}
           connectOAuth={connectOAuth}
+          selector={selector}
           dynamicOptions={dynamicOptions}
+          placeholderPorts={placeholderPorts}
         />
       ))}
       {hasSavableField && (

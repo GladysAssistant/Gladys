@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-syntax -- needs createSandbox to build per-test sandboxes
 const { assert, fake, createSandbox } = require('sinon');
 const EventEmitter = require('events');
 const { expect } = require('chai');

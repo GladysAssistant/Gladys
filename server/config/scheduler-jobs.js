@@ -22,9 +22,19 @@ const jobs = [
     event: EVENTS.MESSAGE.PURGE_OLD_MESSAGES,
   },
   {
+    name: 'daily-cleanup-of-unused-integration-images',
+    rule: '0 30 3 * * *', // At 3:30 AM every day
+    event: EVENTS.EXTERNAL_INTEGRATION.CLEAN_IMAGES,
+  },
+  {
     name: 'check-device-batteries',
     rule: '0 0 9 * * 6', // At 09:00 AM, only on Saturday
     event: EVENTS.DEVICE.CHECK_BATTERIES,
+  },
+  {
+    name: 'check-weather-alerts',
+    rule: '0 */30 * * * *', // every 30 minutes
+    event: EVENTS.WEATHER.CHECK_ALERTS,
   },
 ];
 

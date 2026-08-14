@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import get from 'get-value';
 
@@ -144,7 +144,7 @@ class MatterDeviceBox extends Component {
                 )}
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">
-                    <Text id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 <div class="form-group">

@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, assert, stub, useFakeTimers } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert, stub, useFakeTimers } = sinon;
 
 const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const {

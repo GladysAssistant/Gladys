@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const assertChai = require('chai').assert;
 
 const { assert, fake } = sinon;
@@ -40,5 +40,24 @@ describe('mqtt.setValue', () => {
       undefined,
       sinon.match.func,
     );
+  });
+
+  it('should publish on the Home Assistant command topic for Home Assistant devices', async () => {
+    await mqttHandler.connect({ mqttUrl: 'url' });
+    await mqttHandler.setValue(
+      {
+        external_id: 'homeassistant:my-device',
+        params: [
+          {
+            name: 'ha_discovery_config:switch:relay',
+            value: JSON.stringify({ command_topic: 'my-device/set' }),
+          },
+        ],
+      },
+      { external_id: 'homeassistant:my-device:switch:relay' },
+      1,
+    );
+
+    assert.calledWith(mqttApi.publish, 'my-device/set', 'ON', undefined, sinon.match.func);
   });
 });

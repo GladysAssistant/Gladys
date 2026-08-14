@@ -1,0 +1,107 @@
+@media (max-width: 992px) {
+  .pageHeaderResponsive {
+    margin-top: 0rem;
+  }
+}
+
+.pageOptions {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+}
+
+.devicesListContainer {
+  min-height: 200px;
+}
+
+.emptyStateDivBox {
+  width: 60%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 80px;
+  margin-bottom: 80px;
+}
+
+.emptyStateIcon {
+  font-size: 4rem;
+  color: #9aa0ac;
+}
+
+.emptyStateText {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.featureIcons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.featureIcon {
+  font-size: 1rem;
+  color: #9aa0ac;
+}
+
+.deviceStamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mobileItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobileItemBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.mobileItemName {
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobileItemDetails {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mobileItemChevron {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+}
+
+/* Below the desktop breakpoint (also on tablet, where the table is too
+   cramped), the filters stack like a native app: the two selects share
+   a row, the ordering select and the search bar share the next one */
+@media (max-width: 991.98px) {
+  .pageOptions {
+    width: 100%;
+  }
+
+  .pageOptions > select {
+    flex: 1 1 calc(50% - 2rem);
+  }
+
+  /* the ordering select keeps its natural width so the search bar
+     fits next to it on the same row */
+  .pageOptions > select:nth-of-type(3) {
+    flex: 0 1 auto;
+  }
+
+  .pageOptions > div {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}

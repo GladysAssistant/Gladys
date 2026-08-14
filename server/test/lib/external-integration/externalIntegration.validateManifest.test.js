@@ -30,6 +30,11 @@ describe('externalIntegration.validateManifest', () => {
     expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
   });
 
+  it('should accept a weather manifest', () => {
+    const manifest = { ...TEST_MANIFEST, type: 'weather' };
+    expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
+  });
+
   it('should accept a manifest without optional fields', () => {
     const { cover_image: coverImage, config_schema: configSchema, ...minimalManifest } = TEST_MANIFEST;
     const validated = externalIntegration.validateManifest(minimalManifest);
@@ -54,7 +59,7 @@ describe('externalIntegration.validateManifest', () => {
   });
 
   it('should reject an unknown type', () => {
-    expect422({ ...TEST_MANIFEST, type: 'weather' }, 'type: must be one of device');
+    expect422({ ...TEST_MANIFEST, type: 'tts' }, 'type: must be one of device');
   });
 
   it('should reject a name out of bounds', () => {
@@ -85,6 +90,12 @@ describe('externalIntegration.validateManifest', () => {
 
   it('should reject unknown manifest fields', () => {
     expect422({ ...TEST_MANIFEST, homepage: 'https://example.com' }, 'homepage: unknown field');
+  });
+
+  it('should accept a location declaration and reject a non-boolean one', () => {
+    const manifest = { ...TEST_MANIFEST, location: true };
+    expect(externalIntegration.validateManifest(manifest)).to.equal(manifest);
+    expect422({ ...TEST_MANIFEST, location: 'yes' }, 'location: must be a boolean');
   });
 
   it('should reject an invalid semver version', () => {
@@ -581,6 +592,102 @@ describe('externalIntegration.validateManifest', () => {
     );
   });
 
+  it('should accept section placeholders referencing a declared port name', () => {
+    // the OCPP case: the section text shows a URL pointing at Gladys,
+    // resolved by the frontend ({{gladys_host}} + {{port:<name>}})
+    const manifest = {
+      ...TEST_MANIFEST,
+      containers: [
+        {
+          name: 'ocpp',
+          docker_image: 'img:1.0.0',
+          ports: [{ container_port: 9000, name: 'ocpp', label: { en: 'OCPP endpoint' } }],
+        },
+      ],
+      config_schema: [
+        {
+          key: 'intro',
+          type: 'section',
+          label: { en: 'Charge point setup' },
+          description: {
+            en: 'Point your charge point to ws://{{gladys_host}}:{{port:ocpp}}',
+            fr: 'Faites pointer votre borne vers ws://{{gladys_host}}:{{port:ocpp}}',
+          },
+        },
+      ],
+    };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should reject a section placeholder referencing an unknown port name', () => {
+    // an unknown reference would sit unresolved on screen forever
+    const section = {
+      key: 'intro',
+      type: 'section',
+      label: { en: 'Intro' },
+      description: { en: 'ws://{{gladys_host}}:{{port:ocpp}}' },
+    };
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [section] },
+      'config_schema[0].description.en: {{port:ocpp}} does not reference any declared port name',
+    );
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, description: undefined, label: { en: '{{port:ocpp}}' } }] },
+      'config_schema[0].label.en: {{port:ocpp}} does not reference any declared port name',
+    );
+    // same engine, same rule inside the action mini forms
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        actions: [{ key: 'pair', label: { en: 'Pair' }, fields: [section] }],
+      },
+      'actions[0].fields[0].description.en: {{port:ocpp}} does not reference any declared port name',
+    );
+    // a non-string translation is caught by the multi-language check, and
+    // the placeholder scan skips it instead of choking on it
+    expect422(
+      { ...TEST_MANIFEST, config_schema: [{ ...section, description: { en: 'Intro', fr: 42 } }] },
+      'config_schema[0].description.fr: must be a string of 1-1000 characters',
+    );
+  });
+
+  it('should refuse a {{port}} placeholder in the per-user contact schema, but allow {{gladys_host}}', () => {
+    // the per-user block is the one screen a non-admin reaches, and their
+    // reduced view carries no container state: the token would resolve for
+    // an admin and stay raw for everyone else
+    const sendOnlyChannel = {
+      ...TEST_MANIFEST,
+      type: 'communication',
+      messaging: { receive: false },
+      containers: [
+        {
+          name: 'gateway',
+          docker_image: 'img:1.0.0',
+          ports: [{ container_port: 9000, name: 'ocpp', label: { en: 'Gateway' } }],
+        },
+      ],
+    };
+    const section = { key: 'intro', type: 'section', label: { en: 'Intro' } };
+    // the browser resolves {{gladys_host}} whatever the role
+    const acceptedManifest = {
+      ...sendOnlyChannel,
+      contact_schema: [{ ...section, description: { en: 'Open http://{{gladys_host}} on your phone.' } }],
+    };
+    expect(externalIntegration.validateManifest(acceptedManifest)).to.deep.equal(acceptedManifest);
+    // declared port name, and still refused here
+    expect422(
+      {
+        ...sendOnlyChannel,
+        contact_schema: [{ ...section, description: { en: 'ws://{{gladys_host}}:{{port:ocpp}}' } }],
+      },
+      'contact_schema[0].description.en: {{port:ocpp}} is not available in the per-user contact schema',
+    );
+    expect422(
+      { ...sendOnlyChannel, contact_schema: [{ ...section, label: { en: '{{port:ocpp}}' } }] },
+      'contact_schema[0].label.en: {{port:ocpp}} is not available in the per-user contact schema',
+    );
+  });
+
   it('should accept a valid actions list', () => {
     const manifest = {
       ...TEST_MANIFEST,
@@ -662,7 +769,11 @@ describe('externalIntegration.validateManifest', () => {
           cpu: 1,
           env: { LIBVA_DRIVER_NAME: 'i965' },
           command: ['python3', '-m', 'frigate'],
-          ports: [{ container_port: 5000, protocol: 'tcp', label: { en: 'Frigate UI' } }],
+          ports: [
+            { container_port: 5000, protocol: 'tcp', label: { en: 'Frigate UI' } },
+            // WebSocket endpoint for devices (the OCPP case): no "Open" link
+            { container_port: 9000, label: { en: 'OCPP WebSocket' }, browsable: false },
+          ],
           devices: ['coral-usb', 'gpu'],
         },
       ],
@@ -771,6 +882,40 @@ describe('externalIntegration.validateManifest', () => {
       },
       'containers[0].ports[0].host_port: unknown field',
     );
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        containers: [{ ...base, ports: [{ container_port: 80, label: { en: 'UI' }, browsable: 'no' }] }],
+      },
+      'containers[0].ports[0].browsable: must be a boolean',
+    );
+  });
+
+  it('should validate the optional port names, unique across the whole manifest', () => {
+    const base = { name: 'ui', docker_image: 'img:1.0.0' };
+    const namedPort = { container_port: 80, name: 'web_ui', label: { en: 'UI' } };
+    const manifest = { ...TEST_MANIFEST, containers: [{ ...base, ports: [namedPort] }] };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ ...namedPort, name: 'UI' }] }] },
+      'containers[0].ports[0].name: must be a string matching [a-z0-9_]{2,20}',
+    );
+    expect422(
+      { ...TEST_MANIFEST, containers: [{ ...base, ports: [{ ...namedPort, name: 42 }] }] },
+      'containers[0].ports[0].name: must be a string matching [a-z0-9_]{2,20}',
+    );
+    // {{port:<name>}} carries no container prefix: names are unique
+    // manifest-wide, even across containers
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        containers: [
+          { ...base, ports: [namedPort] },
+          { name: 'api', docker_image: 'img:1.0.0', ports: [{ ...namedPort, container_port: 81 }] },
+        ],
+      },
+      'containers[1].ports[0].name: duplicate port name "web_ui"',
+    );
   });
 
   it('should reject invalid sub-container hardware classes', () => {
@@ -813,6 +958,49 @@ describe('externalIntegration.validateManifest', () => {
     [[], ['satellite'], ['local', 'local'], 'local'].forEach((transports) => {
       expect422({ ...TEST_MANIFEST, transports }, 'transports: must be a non-empty subset of local, cloud');
     });
+  });
+
+  it('should accept a valid categories declaration', () => {
+    const manifest = { ...TEST_MANIFEST, categories: ['climate', 'energy'] };
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+
+  it('should drop unknown category keys and keep the known ones', () => {
+    // forward compatibility (spec §6.2 stage 2): an integration published
+    // with a newer vocabulary than this instance knows must still install —
+    // the unknown keys are filtered out with a warning, never rejected
+    const manifest = { ...TEST_MANIFEST, categories: ['climate', 'brand-new-shelf'] };
+    const validated = externalIntegration.validateManifest(manifest);
+    expect(validated.categories).to.deep.equal(['climate']);
+  });
+
+  it('should treat a declaration made only of unknown keys as uncategorized, not as an error', () => {
+    const manifest = { ...TEST_MANIFEST, categories: ['brand-new-shelf'] };
+    const validated = externalIntegration.validateManifest(manifest);
+    // removed, not [], so the manifest stays valid on re-validation (below)
+    expect(validated).to.not.have.property('categories');
+  });
+
+  it('should stay valid when validated twice, the install and update flows do it', () => {
+    // installFromStore and fetchManifestFromRepo validate the manifest, then
+    // install()/buildUpdateCandidates validate the SAME object again: the
+    // filtered result of the first pass must pass the shape stage of the next
+    [['climate', 'brand-new-shelf'], ['brand-new-shelf']].forEach((categories) => {
+      const manifest = { ...TEST_MANIFEST, categories };
+      const firstPass = externalIntegration.validateManifest(manifest);
+      const secondPass = externalIntegration.validateManifest(firstPass);
+      expect(secondPass).to.deep.equal(firstPass);
+    });
+  });
+
+  it('should reject a malformed categories declaration', () => {
+    // spec §6.2 stage 1 (shape): not an array, empty, more than 3 items,
+    // duplicates, non-string or empty-string items
+    ['climate', [], ['climate', 'energy', 'security', 'lighting'], ['climate', 'climate'], [null], [42], ['']].forEach(
+      (categories) => {
+        expect422({ ...TEST_MANIFEST, categories }, 'categories: must be 1-3 unique non-empty strings');
+      },
+    );
   });
 
   it('should accept the messaging declaration and its contact_schema on send-only channels', () => {
@@ -938,6 +1126,23 @@ describe('externalIntegration.validateManifest', () => {
         ],
       },
       'config_schema[0].options[0].icon: unknown field',
+    );
+  });
+  it('should accept network_wake boolean', () => {
+    const manifest = {
+      ...TEST_MANIFEST,
+      network_wake: true,
+    };
+
+    expect(externalIntegration.validateManifest(manifest)).to.deep.equal(manifest);
+  });
+  it('should reject network_wake when it is not a boolean', () => {
+    expect422(
+      {
+        ...TEST_MANIFEST,
+        network_wake: 'true',
+      },
+      'network_wake: must be a boolean',
     );
   });
 });

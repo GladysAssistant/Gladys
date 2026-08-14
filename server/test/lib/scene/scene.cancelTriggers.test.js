@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { EVENTS } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 
@@ -84,6 +84,17 @@ describe('SceneManager.cancelTriggers', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('jsInterval');
     sceneManager.cancelTriggers(scene.selector);
     expect(sceneManager.scenes[scene.selector].triggers[0]).not.to.have.property('jsInterval');
+  });
+  it('should clear pending for_duration timers of this scene only', async () => {
+    const thisSceneTimeout = setTimeout(() => {}, 60 * 1000);
+    const otherSceneTimeout = setTimeout(() => {}, 60 * 1000);
+    sceneManager.checkTriggersDurationTimer.set('device.new-state.a-test-scene.light-1:=:1', thisSceneTimeout);
+    sceneManager.checkTriggersDurationTimer.set('device.new-state.another-scene.light-1:=:1', otherSceneTimeout);
+    sceneManager.cancelTriggers('a-test-scene');
+    expect(sceneManager.checkTriggersDurationTimer.has('device.new-state.a-test-scene.light-1:=:1')).to.equal(false);
+    expect(sceneManager.checkTriggersDurationTimer.has('device.new-state.another-scene.light-1:=:1')).to.equal(true);
+    clearTimeout(otherSceneTimeout);
+    sceneManager.checkTriggersDurationTimer.clear();
   });
   it('should cancel a message received trigger', async () => {
     const scene = await sceneManager.create({

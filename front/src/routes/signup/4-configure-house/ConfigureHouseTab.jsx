@@ -1,6 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import style from '../style.css';
+import AddressSearch from '../../../components/house/AddressSearch';
 
 const removeRoomLocal = (index, removeRoom) => () => {
   removeRoom(index);
@@ -38,6 +39,7 @@ const ConfigureHouseTab = ({ children, ...props }) => (
         <label class="form-label">
           <Text id="signup.configureHouse.houseLocationLabel" />
         </label>
+        <AddressSearch onSelectLocation={props.selectHouseLocation} />
         <div id="select-house-location-map" style="width: 100%; height: 300px;" />
       </div>
       <div class="form-group">

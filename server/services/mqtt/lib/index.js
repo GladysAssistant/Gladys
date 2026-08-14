@@ -18,6 +18,20 @@ const { updateContainer } = require('./updateContainer');
 const { checkDockerNetwork } = require('./checkDockerNetwork');
 const { setValue } = require('./setValue');
 const { setDebugMode } = require('./setDebugMode');
+const { postCreate, postUpdate, postDelete } = require('./postCreate');
+const {
+  handleHomeAssistantDiscoveryMessage,
+  emitHomeAssistantDiscoveredDevices,
+  removeHomeAssistantEntitiesFromTopic,
+  registerHomeAssistantEntity,
+} = require('./homeAssistant/handleHomeAssistantDiscoveryMessage');
+const { getHomeAssistantDiscoveredDevices } = require('./homeAssistant/getHomeAssistantDiscoveredDevices');
+const {
+  listenToHomeAssistantDeviceStateIfNeeded,
+  unListenToHomeAssistantDevice,
+} = require('./homeAssistant/listenToHomeAssistantDevice');
+const { handleHomeAssistantStateMessage } = require('./homeAssistant/handleHomeAssistantStateMessage');
+const { setValueHomeAssistant } = require('./homeAssistant/setValueHomeAssistant');
 
 /**
  * @description Add ability to connect to a MQTT broker.
@@ -35,6 +49,11 @@ const MqttHandler = function MqttHandler(gladys, mqttLibrary, serviceId) {
 
   this.topicBinds = {};
   this.deviceFeatureCustomMqttTopics = [];
+  // Home Assistant discovery
+  this.haDiscoveredDevices = {};
+  this.haEntitiesByTopic = {};
+  this.haStateBindings = {};
+  this.haDiscoveryEmitTimeout = null;
   this.configured = false;
   this.connected = false;
   this.debugMode = false;
@@ -61,5 +80,17 @@ MqttHandler.prototype.updateContainer = updateContainer;
 MqttHandler.prototype.checkDockerNetwork = checkDockerNetwork;
 MqttHandler.prototype.setValue = setValue;
 MqttHandler.prototype.setDebugMode = setDebugMode;
+MqttHandler.prototype.postCreate = postCreate;
+MqttHandler.prototype.postUpdate = postUpdate;
+MqttHandler.prototype.postDelete = postDelete;
+MqttHandler.prototype.handleHomeAssistantDiscoveryMessage = handleHomeAssistantDiscoveryMessage;
+MqttHandler.prototype.emitHomeAssistantDiscoveredDevices = emitHomeAssistantDiscoveredDevices;
+MqttHandler.prototype.removeHomeAssistantEntitiesFromTopic = removeHomeAssistantEntitiesFromTopic;
+MqttHandler.prototype.registerHomeAssistantEntity = registerHomeAssistantEntity;
+MqttHandler.prototype.getHomeAssistantDiscoveredDevices = getHomeAssistantDiscoveredDevices;
+MqttHandler.prototype.listenToHomeAssistantDeviceStateIfNeeded = listenToHomeAssistantDeviceStateIfNeeded;
+MqttHandler.prototype.unListenToHomeAssistantDevice = unListenToHomeAssistantDevice;
+MqttHandler.prototype.handleHomeAssistantStateMessage = handleHomeAssistantStateMessage;
+MqttHandler.prototype.setValueHomeAssistant = setValueHomeAssistant;
 
 module.exports = MqttHandler;

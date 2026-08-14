@@ -1,4 +1,5 @@
-import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
+import { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } from '../../../../../server/utils/constants';
+import { TelevisionPushButtonFeatureTypes } from '../../../utils/consts';
 
 const SUPPORTED_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.LIGHT.BINARY,
@@ -12,6 +13,7 @@ const SUPPORTED_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
   DEVICE_FEATURE_TYPES.SHUTTER.STATE,
   DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+  DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
   DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
   DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE,
   DEVICE_FEATURE_TYPES.FAN.MODE,
@@ -39,4 +41,23 @@ const SUPPORTED_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.ELECTRICAL_VEHICLE_COMMAND.LOCK
 ];
 
-export default SUPPORTED_FEATURE_TYPES;
+// Some feature types are only supported for a given category, because the type string alone is
+// ambiguous (television "play" and music "play" share the same type). They are listed here so that
+// they don't leak into every other category.
+const SUPPORTED_FEATURE_TYPES_BY_CATEGORY = {
+  [DEVICE_FEATURE_CATEGORIES.TELEVISION]: TelevisionPushButtonFeatureTypes,
+  [DEVICE_FEATURE_CATEGORIES.CAMERA]: [DEVICE_FEATURE_TYPES.CAMERA.MOVE, DEVICE_FEATURE_TYPES.CAMERA.PRESET],
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: [
+    DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY,
+    DEVICE_FEATURE_TYPES.WATER_HEATER.MODE,
+    DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE,
+    DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST
+  ],
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: [DEVICE_FEATURE_TYPES.TEXT.SELECT]
+};
+
+const isSupportedFeature = ({ category, type }) =>
+  SUPPORTED_FEATURE_TYPES.includes(type) || (SUPPORTED_FEATURE_TYPES_BY_CATEGORY[category] || []).includes(type);
+
+export { SUPPORTED_FEATURE_TYPES, isSupportedFeature };
+export default isSupportedFeature;

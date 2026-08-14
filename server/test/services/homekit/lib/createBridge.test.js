@@ -1,7 +1,9 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub } = sinon;
 const { createBridge } = require('../../../../services/homekit/lib/createBridge');
-const { DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 describe('Create bridge', () => {
   it('should create a bridge', async () => {
@@ -11,19 +13,26 @@ describe('Create bridge', () => {
       serviceId: '7056e3d4-31cc-4d2a-bbdd-128cd49755e6',
       createBridge,
       buildAccessory: stub().returns({ UUID: '78a7b724-18e8-4c15-ab30-c8486c253f36' }),
+      buildAlarmAccessory: stub().returns({ UUID: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55' }),
+      getExposedAlarms: stub().resolves([
+        {
+          name: 'Maison',
+          selector: 'house-alarm:maison',
+          house: { id: 'e1b0a9cf', name: 'Maison', selector: 'maison' },
+        },
+      ]),
+      getExposedDevices: stub().resolves([
+        {
+          id: '07f16117-8556-4b50-b9f0-e190d08f8d92',
+          name: 'Lampe bureau',
+          selector: 'lampe-bureau',
+          features: [{ category: DEVICE_FEATURE_CATEGORIES.LIGHT, type: DEVICE_FEATURE_TYPES.LIGHT.BINARY }],
+        },
+      ]),
       gladys: {
         variable: {
           getValue: stub().resolves(null),
           setValue: stub().resolves(),
-        },
-        device: {
-          get: stub().resolves([
-            {
-              id: '07f16117-8556-4b50-b9f0-e190d08f8d92',
-              name: 'Lampe bureau',
-              features: [{ category: DEVICE_FEATURE_CATEGORIES.LIGHT }],
-            },
-          ]),
         },
         event: {
           on: stub().returns(),
@@ -47,7 +56,13 @@ describe('Create bridge', () => {
 
     expect(homekitHandler.hap.Bridge.args[0][0]).to.equal('Gladys');
     expect(homekitHandler.hap.Bridge.args[0][1]).not.equal(null);
-    expect(addBridgedAccessories.args[0][0]).to.deep.members([{ UUID: '78a7b724-18e8-4c15-ab30-c8486c253f36' }]);
+    // the house alarm is exposed alongside the devices, and is indexed by selector so an alarm
+    // event can find its accessory again
+    expect(addBridgedAccessories.args[0][0]).to.deep.members([
+      { UUID: '78a7b724-18e8-4c15-ab30-c8486c253f36' },
+      { UUID: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55' },
+    ]);
+    expect(homekitHandler.alarmAccessories.get('maison')).to.eql({ UUID: 'e1b0a9cf-3f6f-4f2e-9f6b-2c0a7f4a1d55' });
     expect(publish.args[0][0]).to.eql({
       username: 'C4:D0:AB:12:BC:51',
       pincode: '123-45-678',

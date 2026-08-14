@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
@@ -15,6 +15,9 @@ const gladys = {
   },
   system: {
     isDocker: fake.resolves(false),
+  },
+  device: {
+    get: fake.resolves([]),
   },
 };
 

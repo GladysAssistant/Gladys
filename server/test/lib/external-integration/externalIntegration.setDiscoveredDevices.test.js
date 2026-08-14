@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { assert: sinonAssert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert } = sinon;
 
 const { BadParameters } = require('../../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
@@ -29,11 +31,12 @@ describe('externalIntegration.setDiscoveredDevices', () => {
   let externalIntegration;
   let event;
   let stateManager;
+  let deviceLib;
   let service;
 
   beforeEach(async () => {
     service = await seedExternalService();
-    ({ externalIntegration, event, stateManager } = buildSupervisor());
+    ({ externalIntegration, event, stateManager, device: deviceLib } = buildSupervisor());
   });
 
   it('should store the discovered devices and notify the frontend', async () => {
@@ -47,6 +50,18 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     expect(devices).to.have.lengthOf(1);
     expect(devices[0]).to.have.property('service_id', service.id);
     expect(devices[0]).to.have.property('created', false);
+  });
+
+  it('should drop a selector published by the integration', async () => {
+    // the selector is derived by the core at creation, and made unique there:
+    // an integration does not choose it (C.3)
+    const device = buildDiscoveredDevice(service.selector);
+    device.selector = 'chosen-by-the-integration';
+    device.features[0].selector = 'chosen-by-the-integration-feature';
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0]).to.not.have.property('selector');
+    expect(devices[0].features[0]).to.not.have.property('selector');
   });
 
   it('should replace the previous list', async () => {
@@ -107,6 +122,32 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     await expectBadParameters([wrongUnit], 'unknown unit');
   });
 
+  it('should reject a non-positive or non-numeric step', async () => {
+    const zeroStep = buildDiscoveredDevice(service.selector);
+    zeroStep.features[0].step = 0;
+    await expectBadParameters([zeroStep], 'features[0].step: must be a positive number');
+    const stringStep = buildDiscoveredDevice(service.selector);
+    stringStep.features[0].step = '0.5';
+    await expectBadParameters([stringStep], 'features[0].step: must be a positive number');
+  });
+
+  it('should accept a valid step and hand it back untouched', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0].step = 0.5;
+    const count = await externalIntegration.setDiscoveredDevices(service, [device]);
+    expect(count).to.equal(1);
+    // the step has to survive the normalization: it is the whole point of
+    // publishing it, and the Discovery screen posts back what it reads here
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[0]).to.have.property('step', 0.5);
+  });
+
+  it('should hand back no step when the integration declares none', async () => {
+    await externalIntegration.setDiscoveredDevices(service, [buildDiscoveredDevice(service.selector)]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[0]).to.not.have.property('step');
+  });
+
   it('should reject an invalid poll_frequency', async () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 12345 };
     await expectBadParameters([device], 'poll_frequency');
@@ -129,6 +170,54 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 60000 };
     const count = await externalIntegration.setDiscoveredDevices(service, [device]);
     expect(count).to.equal(1);
+  });
+
+  it('should normalize the supported_options of a feature', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0].supported_options = [
+      { value: 1, label: 'Entrance' },
+      { value: 2, label: 'Garden' },
+    ];
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[0].supported_options).to.deep.equal([
+      { value: 1, label: 'Entrance', sort_order: 0 },
+      { value: 2, label: 'Garden', sort_order: 1 },
+    ]);
+  });
+
+  it('should reject invalid supported_options', async () => {
+    const duplicatedValues = buildDiscoveredDevice(service.selector);
+    duplicatedValues.features[0].supported_options = [
+      { value: 1, label: 'Entrance' },
+      { value: 1, label: 'Garden' },
+    ];
+    await expectBadParameters([duplicatedValues], 'features[0].supported_options');
+    const emptyLabel = buildDiscoveredDevice(service.selector);
+    emptyLabel.features[0].supported_options = [{ value: 1, label: '' }];
+    await expectBadParameters([emptyLabel], 'features[0].supported_options');
+  });
+
+  it('should upsert the supported_options of an already-created device', async () => {
+    deviceLib.syncFeatureSupportedOptions = sinon.fake.resolves([{ value: 1, label: 'Entrance', sort_order: 0 }]);
+    const device = buildDiscoveredDevice(service.selector);
+    device.params = [];
+    device.features[0].supported_options = [{ value: 1, label: 'Entrance' }];
+    stateManager.setState('deviceByExternalId', device.external_id, {
+      id: 'device-id',
+      service_id: service.id,
+      features: [
+        {
+          id: 'feature-id',
+          external_id: device.features[0].external_id,
+          supported_options: [],
+        },
+      ],
+    });
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    sinonAssert.calledWith(deviceLib.syncFeatureSupportedOptions, 'feature-id', [
+      { value: 1, label: 'Entrance', sort_order: 0 },
+    ]);
   });
 });
 
