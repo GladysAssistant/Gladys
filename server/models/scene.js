@@ -80,6 +80,11 @@ const actionSchema = Joi.object()
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
   })
+  // A "variable.set" action holds either a text or a formula, never both: the runtime
+  // would only evaluate the formula and silently drop the text.
+  .when(Joi.object({ type: Joi.valid(ACTIONS.VARIABLE.SET) }).unknown(), {
+    then: Joi.object().oxor('text', 'evaluate_value'),
+  })
   .id('action');
 
 const actionsSchema = Joi.array().items(Joi.array().items(actionSchema));

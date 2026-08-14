@@ -132,12 +132,20 @@ class SetVariable extends Component {
         </div>
         <div class="form-group">
           <div className={cx('nav-tabs', style.valueTypeTab)}>
-            <span class={cx('nav-link', style.valueTypeLink, { active: !computed })} onClick={this.selectTextType}>
+            <button
+              type="button"
+              class={cx('nav-link', style.valueTypeLink, { active: !computed })}
+              onClick={this.selectTextType}
+            >
               <Text id="editScene.actionsCard.setVariable.valueTypeText" />
-            </span>
-            <span class={cx('nav-link', style.valueTypeLink, { active: computed })} onClick={this.selectComputedType}>
+            </button>
+            <button
+              type="button"
+              class={cx('nav-link', style.valueTypeLink, { active: computed })}
+              onClick={this.selectComputedType}
+            >
               <Text id="editScene.actionsCard.setVariable.valueTypeComputed" />
-            </span>
+            </button>
           </div>
         </div>
         <div class="form-group">{this.getValueInput()}</div>
