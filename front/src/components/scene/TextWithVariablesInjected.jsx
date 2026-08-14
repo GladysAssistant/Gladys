@@ -5,6 +5,7 @@ import './TextWithVariablesInjected.css';
 import get from 'get-value';
 
 import withIntlAsProp from '../../utils/withIntlAsProp';
+import { EVENTS } from '../../../../server/utils/constants';
 import { isVariableAvailableAtThisPath, convertPathToText } from '../../routes/scene/edit-scene/sceneUtils';
 
 const OPENING_VARIABLE = '{{';
@@ -68,6 +69,10 @@ class TextWithVariablesInjected extends Component {
     });
 
     // Triggers variables
+    // Device state variables always describe the trigger which fired the scene, whichever
+    // it is, so they are displayed once, without a trigger number, even when several
+    // device state triggers exist.
+    const genericTriggerVariableIds = new Set();
     nextProps.triggersVariables.forEach((triggerVariables, index) => {
       triggerVariables.forEach(triggerVariable => {
         if (triggerVariable.ready && variableReady === null) {
@@ -76,14 +81,27 @@ class TextWithVariablesInjected extends Component {
         if (!triggerVariable.ready) {
           variableReady = false;
         }
+        const variableId = `triggerEvent.${triggerVariable.name}`;
+        const isGenericTriggerVariable = triggerVariable.type === EVENTS.DEVICE.NEW_STATE;
+        if (isGenericTriggerVariable) {
+          if (genericTriggerVariableIds.has(variableId)) {
+            return;
+          }
+          genericTriggerVariableIds.add(variableId);
+        }
+        const variableLabel = isGenericTriggerVariable
+          ? triggerVariable.label
+          : `${index + 1}. ${triggerVariable.label}`;
         // we create a "variablesKey" string to quickly compare the variables displayed
         // instead of having to loop through 2 arrays. It's quicker :)
-        variablesKey += `trigger.${index}.${triggerVariable.name}.${triggerVariable.label}.${triggerVariable.ready}`;
+        variablesKey += `trigger.${isGenericTriggerVariable ? 'any' : index}.${triggerVariable.name}.${
+          triggerVariable.label
+        }.${triggerVariable.ready}`;
         variableWhileList.push({
-          id: `triggerEvent.${triggerVariable.name}`,
-          text: `${index + 1}. ${triggerVariable.label}`,
-          title: `${index + 1}. ${triggerVariable.label}`,
-          value: `triggerEvent.${triggerVariable.name}`
+          id: variableId,
+          text: variableLabel,
+          title: variableLabel,
+          value: variableId
         });
       });
     });

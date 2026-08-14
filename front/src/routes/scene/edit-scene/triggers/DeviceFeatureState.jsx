@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } from '../../../../../../server/utils/constants';
 
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
@@ -36,28 +36,28 @@ class TurnOnLight extends Component {
     this.props.setVariablesTrigger(this.props.index, [
       {
         name: 'device.name',
-        type: 'device.new-state',
+        type: EVENTS.DEVICE.NEW_STATE,
         ready: true,
         label: DEVICE_NAME_VARIABLE,
         data: {}
       },
       {
         name: 'deviceFeature.name',
-        type: 'device.new-state',
+        type: EVENTS.DEVICE.NEW_STATE,
         ready: true,
         label: DEVICE_FEATURE_NAME_VARIABLE,
         data: {}
       },
       {
         name: 'last_value',
-        type: 'device.new-state',
+        type: EVENTS.DEVICE.NEW_STATE,
         ready: true,
         label: LAST_VALUE_VARIABLE,
         data: {}
       },
       {
         name: 'previous_value',
-        type: 'device.new-state',
+        type: EVENTS.DEVICE.NEW_STATE,
         ready: true,
         label: PREVIOUS_VALUE_VARIABLE,
         data: {}
