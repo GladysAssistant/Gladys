@@ -644,6 +644,114 @@ const actionsFunc = {
       );
     }
   },
+  [ACTIONS.CALENDAR.GET_EVENTS]: async (self, action, scope, path) => {
+    const now = dayjs.tz(dayjs(), self.timezone);
+    let from;
+    let to;
+    // The day ranges are calendar days, the "next x hours" range is a rolling time window.
+    let dayRange = false;
+    // eslint-disable-next-line default-case
+    switch (action.time_range) {
+      case 'today':
+        from = now.startOf('day');
+        to = now.endOf('day');
+        dayRange = true;
+        break;
+      case 'tomorrow':
+        from = now.add(1, 'day').startOf('day');
+        to = now.add(1, 'day').endOf('day');
+        dayRange = true;
+        break;
+      case 'next-x-hours':
+        // dayjs.add(undefined) returns an invalid date and dayjs.add(null) an empty
+        // range, so the duration is validated before building the range.
+        if (!Number.isInteger(action.duration) || action.duration < 1) {
+          throw new AbortScene('INVALID_DURATION');
+        }
+        from = now;
+        to = now.add(action.duration, 'hour');
+        break;
+    }
+    if (!from || !to) {
+      throw new AbortScene('INVALID_TIME_RANGE');
+    }
+
+    // Full-day events are stored at midnight UTC, so on a calendar day range they are
+    // matched on the UTC days covered by the range instead of its local bounds. Otherwise
+    // a full-day event of the day is missed in the timezones west of UTC (and the one of
+    // the next day returned instead).
+    let fullDayFrom;
+    let fullDayTo;
+    if (dayRange) {
+      fullDayFrom = dayjs.utc(from.format('YYYY-MM-DD')).toDate();
+      fullDayTo = dayjs
+        .utc(to.format('YYYY-MM-DD'))
+        .endOf('day')
+        .toDate();
+    }
+
+    const events = await self.calendar.findEventsInRange(
+      action.calendars,
+      from.toDate(),
+      to.toDate(),
+      fullDayFrom,
+      fullDayTo,
+    );
+
+    if (events.length === 0 && action.stop_scene_if_no_events === true) {
+      throw new AbortScene('NO_EVENTS_FOUND');
+    }
+
+    // Small translation map for the generated summary sentence, as the
+    // server has no i18n system. Falls back to english.
+    const AT_TRANSLATIONS = {
+      en: 'at',
+      fr: 'à',
+      de: 'um',
+    };
+
+    const eventsFormatted = events.map((eventRaw) => {
+      const language = get(eventRaw, 'calendar.creator.language') || 'en';
+      const startDayjs = dayjs(eventRaw.start)
+        .tz(self.timezone)
+        .locale(language);
+      let summary;
+      if (eventRaw.full_day) {
+        summary = eventRaw.name;
+      } else {
+        // Events starting on the same day as the range are announced with the
+        // time only, events further away with the full date.
+        const startFormatted = startDayjs.isSame(from, 'day') ? startDayjs.format('LT') : startDayjs.format('LLL');
+        summary = `${eventRaw.name} ${AT_TRANSLATIONS[language] || AT_TRANSLATIONS.en} ${startFormatted}`;
+      }
+      return {
+        name: eventRaw.name,
+        location: eventRaw.location,
+        description: eventRaw.description,
+        start: startDayjs.format('LLL'),
+        end: eventRaw.end
+          ? dayjs(eventRaw.end)
+              .tz(self.timezone)
+              .locale(language)
+              .format('LLL')
+          : null,
+        summary,
+      };
+    });
+
+    set(
+      scope,
+      path,
+      {
+        calendarEvents: {
+          text: eventsFormatted.map((event) => event.summary).join(', '),
+          count: eventsFormatted.length,
+          events: eventsFormatted,
+        },
+      },
+      { merge: true },
+    );
+  },
   [ACTIONS.ECOWATT.CONDITION]: async (self, action) => {
     try {
       const data = await self.gateway.getEcowattSignals();
