@@ -920,7 +920,7 @@
         "installButton": "Installieren",
         "networkDiscoveryTitle": "Anfragen zur Netzwerkerkennung",
         "networkDiscoveryText": "Diese Integration bittet Gladys, die folgenden Netzwerkankündigungen für sie zu erfassen. Sie kann niemals etwas anderes erfassen.",
-        "networkWakeTitle": "Anfragen zur Wake-On-LAN",
+        "networkWakeTitle": "Wake-on-LAN-Zugriff",
         "networkWakeText": "Diese Integration bittet um die Berechtigung, Wake-on-LAN-Magic-Pakete über Gladys im lokalen Netzwerk zu senden.",
         "locationText": "Diese Integration fordert Zugriff auf die Koordinaten (Breiten-/Längengrad) der in Gladys konfigurierten Häuser an.",
         "documentationLink": "Dokumentation",

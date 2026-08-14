@@ -2,7 +2,8 @@ const dgram = require('dgram');
 const { expect } = require('chai');
 const sinon = require('sinon').createSandbox();
 
-const { BadParameters, ForbiddenError } = require('../../../utils/coreErrors');
+const { BadParameters, ForbiddenError, TooManyRequests } = require('../../../utils/coreErrors');
+const { NETWORK_WAKE_MIN_INTERVAL_MS } = require('../../../lib/external-integration/constants');
 const { buildSupervisor } = require('./testUtils.test');
 
 const externalIntegrationService = {
@@ -45,6 +46,12 @@ const getFreeUdpPort = async () => {
 };
 
 describe('externalIntegration.wakeOnLan', () => {
+  // restore stubs even when an assertion fails mid-test, so a stubbed
+  // dgram.createSocket can never leak into the rest of the test run
+  afterEach(() => {
+    sinon.restore();
+  });
+
   it('should send a valid Wake-on-LAN magic packet', async () => {
     const { externalIntegration } = buildSupervisor();
 
@@ -120,11 +127,16 @@ describe('externalIntegration.wakeOnLan', () => {
 
         const receivedPromise = waitForUdpMessage(receiver);
 
-        await externalIntegration.wakeOnLan(externalIntegrationService, {
-          mac,
-          address: '127.0.0.1',
-          port: receiver.address().port,
-        });
+        // one service per MAC format: the wakes run concurrently and the
+        // rate limit is per integration
+        await externalIntegration.wakeOnLan(
+          { id: `service-${mac}`, manifest: { network_wake: true } },
+          {
+            mac,
+            address: '127.0.0.1',
+            port: receiver.address().port,
+          },
+        );
 
         const { message } = await receivedPromise;
 
@@ -293,7 +305,7 @@ describe('externalIntegration.wakeOnLan', () => {
       close: sinon.stub().callsFake((callback) => callback()),
     };
 
-    const createSocketStub = sinon.stub(dgram, 'createSocket').returns(socket);
+    sinon.stub(dgram, 'createSocket').returns(socket);
 
     let error;
 
@@ -304,8 +316,6 @@ describe('externalIntegration.wakeOnLan', () => {
       });
     } catch (e) {
       error = e;
-    } finally {
-      createSocketStub.restore();
     }
 
     expect(error).to.equal(expectedError);
@@ -323,7 +333,7 @@ describe('externalIntegration.wakeOnLan', () => {
       close: sinon.stub().callsFake((callback) => callback()),
     };
 
-    const createSocketStub = sinon.stub(dgram, 'createSocket').returns(socket);
+    sinon.stub(dgram, 'createSocket').returns(socket);
 
     let error;
 
@@ -334,8 +344,6 @@ describe('externalIntegration.wakeOnLan', () => {
       });
     } catch (e) {
       error = e;
-    } finally {
-      createSocketStub.restore();
     }
 
     expect(error).to.equal(expectedError);
@@ -371,8 +379,6 @@ describe('externalIntegration.wakeOnLan', () => {
       mac: '64:e4:d5:b4:12:66',
       address: '127.0.0.1',
     });
-
-    sinon.restore();
   });
 
   it('should reject missing or null MAC with BadParameters', async () => {
@@ -432,10 +438,84 @@ describe('externalIntegration.wakeOnLan', () => {
       });
     } catch (e) {
       error = e;
-    } finally {
-      sinon.restore();
     }
 
     expect(error).to.equal(expectedError);
+  });
+
+  it('should rate limit consecutive Wake-on-LAN requests', async () => {
+    const { externalIntegration } = buildSupervisor();
+
+    const service = {
+      id: 'wake-rate-limited-service',
+      manifest: {
+        network_wake: true,
+      },
+    };
+
+    const receiver = dgram.createSocket('udp4');
+
+    await bindUdpSocket(receiver);
+
+    const receivedPromise = waitForUdpMessage(receiver);
+
+    const wakeOptions = {
+      mac: '64:e4:d5:b4:12:66',
+      address: '127.0.0.1',
+      port: receiver.address().port,
+    };
+
+    await externalIntegration.wakeOnLan(service, wakeOptions);
+
+    await receivedPromise;
+
+    let error;
+
+    try {
+      await externalIntegration.wakeOnLan(service, wakeOptions);
+    } catch (e) {
+      error = e;
+    }
+
+    await new Promise((resolve) => {
+      receiver.close(resolve);
+    });
+
+    expect(error).to.be.instanceOf(TooManyRequests);
+    expect(error.timeBeforeNext).to.be.a('number');
+    expect(error.timeBeforeNext).to.be.within(1, NETWORK_WAKE_MIN_INTERVAL_MS / 1000);
+  });
+
+  it('should allow a new wake once the rate limit interval has elapsed', async () => {
+    const { externalIntegration } = buildSupervisor();
+
+    const service = {
+      id: 'wake-rate-limit-elapsed-service',
+      manifest: {
+        network_wake: true,
+      },
+    };
+
+    externalIntegration.networkWakeTimes.set(service.id, Date.now() - NETWORK_WAKE_MIN_INTERVAL_MS);
+
+    const receiver = dgram.createSocket('udp4');
+
+    await bindUdpSocket(receiver);
+
+    const receivedPromise = waitForUdpMessage(receiver);
+
+    await externalIntegration.wakeOnLan(service, {
+      mac: '64:e4:d5:b4:12:66',
+      address: '127.0.0.1',
+      port: receiver.address().port,
+    });
+
+    const { message } = await receivedPromise;
+
+    await new Promise((resolve) => {
+      receiver.close(resolve);
+    });
+
+    expect(message).to.have.lengthOf(102);
   });
 });

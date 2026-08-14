@@ -699,6 +699,7 @@ Two more reserved keys cover the **degraded state** — the "it works, but not a
 * port is optional and defaults to UDP destination port 9.
 * sourcePort is optional and defaults to 0 (ephemeral UDP source port chosen by the operating system).
 * The core always builds the standard fixed 102-byte Wake-on-LAN magic packet (6 × 0xFF followed by the target MAC repeated 16 times). The integration cannot provide an arbitrary UDP payload, so this endpoint is not a general UDP proxy.
+* The emission rate is bounded to 1 wake per 2 seconds per integration (`429 RATE_LIMIT_EXCEEDED` otherwise) — enough for the usual "retry until the device wakes up" loop, not enough to flood from the core's network namespace.
 * A successful send returns 200 { "success": true }. This confirms that the packet was emitted by Gladys, not that the target device actually woke up.
 
 ### C.4 Integration WebSocket: protocol

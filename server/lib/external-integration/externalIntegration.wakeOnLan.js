@@ -1,7 +1,8 @@
 const dgram = require('dgram');
 const net = require('net');
 
-const { BadParameters, ForbiddenError } = require('../../utils/coreErrors');
+const { BadParameters, ForbiddenError, TooManyRequests } = require('../../utils/coreErrors');
+const { NETWORK_WAKE_MIN_INTERVAL_MS } = require('./constants');
 
 const DEFAULT_SOURCE_PORT = 0;
 const DEFAULT_PORT = 9;
@@ -44,6 +45,7 @@ function buildMagicPacket(mac) {
 /**
  * @description Send a Wake-on-LAN magic packet to a target device.
  * @param {object} service - The external integration service (plain object).
+ * @param {string} [service.id] - The service id, key of the per-integration rate limit.
  * @param {object} service.manifest - The external integration manifest.
  * @param {boolean} [service.manifest.network_wake] - Whether Wake-on-LAN is allowed for this integration.
  * @param {object} options - Wake-on-LAN options.
@@ -56,6 +58,12 @@ function buildMagicPacket(mac) {
  * await gladys.externalIntegration.wakeOnLan(service, { mac: '00:11:22:33:44:55' });
  */
 async function wakeOnLan(service, options) {
+  // authorization contract first, like the other host API primitives:
+  // an undeclared access is a 403 whatever the payload looks like
+  if (!service.manifest || service.manifest.network_wake !== true) {
+    throw new ForbiddenError('Wake-on-LAN is not allowed for this integration');
+  }
+
   if (!options || typeof options !== 'object' || Array.isArray(options)) {
     throw new BadParameters('Invalid Wake-on-LAN options');
   }
@@ -74,10 +82,19 @@ async function wakeOnLan(service, options) {
     throw new BadParameters('sourcePort: must be an integer between 0 and 65535');
   }
 
-  if (!service.manifest || service.manifest.network_wake !== true) {
-    throw new ForbiddenError('Wake-on-LAN is not allowed for this integration');
-  }
   const payload = buildMagicPacket(mac);
+
+  // the core emits on behalf of a third party: bound the emission rate so
+  // the endpoint cannot be used to flood from the core's network namespace
+  const lastWakeAt = this.networkWakeTimes.get(service.id);
+  const now = Date.now();
+  if (lastWakeAt !== undefined && now - lastWakeAt < NETWORK_WAKE_MIN_INTERVAL_MS) {
+    throw new TooManyRequests(
+      `RATE_LIMIT_EXCEEDED: max 1 wake per ${NETWORK_WAKE_MIN_INTERVAL_MS / 1000} seconds`,
+      Math.ceil((lastWakeAt + NETWORK_WAKE_MIN_INTERVAL_MS - now) / 1000),
+    );
+  }
+  this.networkWakeTimes.set(service.id, now);
 
   const socket = dgram.createSocket({
     type: 'udp4',

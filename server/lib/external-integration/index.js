@@ -159,6 +159,8 @@ const ExternalIntegration = function ExternalIntegration(
   this.networkDiscoveryScans = new Set();
   // serviceId -> timestamp of the last active broadcast scan (1/10s)
   this.networkDiscoveryActiveScanTimes = new Map();
+  // serviceId -> timestamp of the last Wake-on-LAN emission (1/2s)
+  this.networkWakeTimes = new Map();
   // supervision timers
   this.startupTimers = new Map();
   this.restartTimers = new Map();
