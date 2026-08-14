@@ -64,6 +64,58 @@ describe('scene.setVariable', () => {
     });
   });
 
+  it('should store a numeric text as a number', async () => {
+    const stateManager = new StateManager(event);
+    const scope = {};
+    await executeActions(
+      { stateManager, event },
+      [
+        [
+          {
+            type: ACTIONS.VARIABLE.SET,
+            name: 'My variable',
+            text: '123',
+          },
+        ],
+      ],
+      scope,
+    );
+    expect(scope).to.deep.equal({
+      0: [{ value: 123 }],
+    });
+  });
+
+  it('should verify an equality condition on a numeric text variable', async () => {
+    const stateManager = new StateManager(event);
+    const scope = {};
+    await executeActions(
+      { stateManager, event },
+      [
+        [
+          {
+            type: ACTIONS.VARIABLE.SET,
+            name: 'My variable',
+            text: '123',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.value',
+                operator: '=',
+                value: 123,
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+    expect(scope[0]).to.deep.equal([{ value: 123 }]);
+  });
+
   it('should set a text variable containing another variable', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {

@@ -416,6 +416,13 @@ const actionsFunc = {
         logger.warn(e);
         throw new AbortScene('VARIABLE_TEXT_NOT_VALID');
       }
+      // A text which renders to a plain number ("123", or an injected numeric variable)
+      // is stored as a number: "only continue if" compares strictly, so keeping the
+      // string would make an equality between identical values fail (123 !== '123').
+      const valueAsNumber = Number(value);
+      if (value.trim() !== '' && Number.isFinite(valueAsNumber)) {
+        value = valueAsNumber;
+      }
     }
 
     set(scope, path, { value }, { merge: true });
