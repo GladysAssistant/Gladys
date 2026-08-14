@@ -517,3 +517,14 @@ body .apexcharts-tooltip {
   font-size: 0.7rem;
   margin-right: 6px;
 }
+
+/* The theme pins nav badges to the top-right corner of the nav item. That looks
+   right on the horizontal desktop tabs, where the item hugs its link, but the
+   collapsed mobile menu stacks full-width items, so the badge drifts to the
+   edge of the screen, away from the label it counts. Below the lg breakpoint,
+   let it flow inline after the text instead (spacing comes from its ml-2). */
+@media (max-width: 991.98px) {
+  #headerMenuCollapse .nav-tabs .nav-link .badge {
+    position: static;
+  }
+}
