@@ -80,7 +80,7 @@ Two replacement maps are built once: `featureReplacements` (mapped source featur
 
 Fields rewritten — this list is **exhaustive and must stay in sync with the Joi schemas** of `server/models/scene.js` and `server/models/dashboard.js` (both reject unknown keys, so any new device-referencing field lands here in the same diff):
 - **Scene actions** (`t_scene.actions`, array of arrays, recursing into `condition.if-then-else`'s `if` / `then` / `else`): `device_feature` (feature), `device_features[]` (features), `device` (device), `devices[]` (devices), `camera` (device).
-- **Scene triggers** (`t_scene.triggers`, flat array): `device_feature` (feature), `device` (device — schema-declared legacy field, rewritten for safety).
+- **Scene triggers** (`t_scene.triggers`, flat array): `device_feature` (feature), `device_features[]` (features), `device` (device — schema-declared legacy field, rewritten for safety).
 - **Dashboard boxes** (`t_dashboard.boxes`, array of arrays): `device_feature` (feature), `device_features[]` (features), `device` (device), `camera` (device). Values are replaced **in place**; array length and order never change, keeping `device_feature_names` / `units` / `colors` index-aligned.
 
 Only scenes/dashboards that actually changed are saved. Rewritten scenes go through `SceneManager.addScene` so the RAM copy (`this.scenes`, the one `checkTrigger` iterates) and its scheduled triggers are replaced atomically with the DB copy — the same path as `scene.update`. Dashboards have no RAM cache. References to **unmapped** source features are intentionally left dangling (existing deletion semantics; the UI warned).
