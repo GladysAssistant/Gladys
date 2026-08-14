@@ -3,11 +3,10 @@ import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import { route } from 'preact-router';
 import { DndProvider } from 'react-dnd';
-import { TouchBackend } from 'react-dnd-touch-backend';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import get from 'get-value'; // Import get-value package
 
 import { RequestStatus } from '../../../utils/consts';
+import { getDragAndDropBackend } from '../../../utils/dragAndDropBackend';
 import EditScenePage from './EditScenePage';
 
 import { ACTIONS } from '../../../../../server/utils/constants';
@@ -21,6 +20,8 @@ const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MQTT.SEND]: ['message'],
   [ACTIONS.ZIGBEE2MQTT.SEND]: ['message'],
   [ACTIONS.DEVICE.SET_VALUE]: ['evaluate_value'],
+  [ACTIONS.TIME.DELAY]: ['evaluate_value'],
+  [ACTIONS.VARIABLE.SET]: ['text', 'evaluate_value'],
   [ACTIONS.HTTP.REQUEST]: ['body'],
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable']
 };
@@ -1126,7 +1127,6 @@ class EditScene extends Component {
 
   constructor(props) {
     super(props);
-    this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     this.state = {
       scene: null,
       variables: {},
@@ -1151,10 +1151,11 @@ class EditScene extends Component {
 
   render(props, { saving, error, errorMessage, variables, scene, triggersVariables, tags, askDeleteScene }) {
     const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
+    const { backend, options } = getDragAndDropBackend();
     return (
       scene && (
         <div>
-          <DndProvider backend={this.isTouchDevice ? TouchBackend : HTML5Backend}>
+          <DndProvider backend={backend} options={options}>
             <EditScenePage
               {...props}
               scene={scene}

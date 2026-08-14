@@ -273,4 +273,32 @@ describe('Notify change to HomeKit', () => {
       },
     ]);
   });
+  it('should forward an alarm change without any debounce', async () => {
+    homekitHandler.sendAlarmState = stub().resolves();
+
+    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.ARM, house: 'maison' });
+    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.DISARM, house: 'maison' });
+    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.PARTIAL_ARM, house: 'maison' });
+    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.PANIC, house: 'maison' });
+
+    // an alarm arming or going off is exactly what HomeKit must hear about at once
+    expect(homekitHandler.sendAlarmState.args).to.eql([['maison'], ['maison'], ['maison'], ['maison']]);
+
+    // arming only announces the delay before the house actually arms: the mode has not changed yet
+    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.ARMING, house: 'maison' });
+
+    expect(homekitHandler.sendAlarmState.callCount).to.equal(4);
+  });
+
+  it('should not leave an alarm forwarding failure unhandled', async () => {
+    homekitHandler.sendAlarmState = stub().rejects(new Error('House not found'));
+
+    // this runs from an event listener: a dropped rejection would go unhandled
+    await homekitHandler.notifyChange([], { type: EVENTS.ALARM.ARM, house: 'maison' });
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+
+    expect(homekitHandler.sendAlarmState.callCount).to.equal(1);
+  });
 });

@@ -205,12 +205,23 @@ function sendState(hkAccessory, feature, event) {
       refreshCharacteristic(this.hap, service, Characteristic.CurrentHeatingCoolingState);
       break;
     }
+    case `${DEVICE_FEATURE_CATEGORIES.THERMOSTAT}:${DEVICE_FEATURE_TYPES.THERMOSTAT.MODE}`:
     case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE}`:
     case `${DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING}:${DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY}`: {
       const service = serviceFor();
       refreshCharacteristic(this.hap, service, Characteristic.TargetHeatingCoolingState);
       refreshCharacteristic(this.hap, service, Characteristic.CurrentHeatingCoolingState);
       refreshCharacteristic(this.hap, service, Characteristic.TargetTemperature);
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.THERMOSTAT}:${DEVICE_FEATURE_TYPES.THERMOSTAT.OPERATING_STATE}`: {
+      // Read-only feature: it only tells HomeKit whether the device is currently heating, cooling
+      // or idle, so nothing else has to be recomputed.
+      refreshCharacteristic(
+        this.hap,
+        hkAccessory.getService(Service.Thermostat),
+        Characteristic.CurrentHeatingCoolingState,
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`:

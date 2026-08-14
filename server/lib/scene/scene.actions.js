@@ -372,6 +372,61 @@ const actionsFunc = {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
     set(scope, path, cloneDeep(deviceFeature), { merge: true });
   },
+  [ACTIONS.VARIABLE.SET]: async (self, action, scope, path) => {
+    let value;
+
+    // "text" and "evaluate_value" are mutually exclusive. The scene editor never sets both,
+    // but an action written by hand could: in that case we cannot guess which one was meant,
+    // so we fail closed instead of silently ignoring one of them.
+    if (action.text !== undefined && action.evaluate_value !== undefined) {
+      logger.warn('Set variable: "text" and "evaluate_value" cannot be used at the same time.');
+      throw new AbortScene('VARIABLE_VALUE_AMBIGUOUS');
+    }
+
+    // If the value should be calculated from a formula
+    if (action.evaluate_value !== undefined) {
+      try {
+        value = evaluate(
+          Handlebars.compile(action.evaluate_value, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
+      } catch (e) {
+        logger.warn(`Set variable: Error evaluating value: ${action.evaluate_value}`);
+        logger.warn(e);
+        throw new AbortScene('VARIABLE_VALUE_NOT_A_NUMBER');
+      }
+      // mathjs can return something which is not a usable number: a string, a matrix, or
+      // Infinity when the formula overflows (1e309). The next actions expect a real number,
+      // so anything else aborts the scene instead of storing an unusable variable.
+      if (typeof value !== 'number' || !Number.isFinite(value)) {
+        logger.warn(`Set variable: Value is not a number: ${value}`);
+        throw new AbortScene('VARIABLE_VALUE_NOT_A_NUMBER');
+      }
+    } else {
+      // Otherwise, the text is a simple template which can contain other variables.
+      // Like the formula branch, an invalid template aborts the scene: the following
+      // actions rely on this variable being set.
+      try {
+        value = Handlebars.compile(action.text || '', {
+          noEscape: true,
+        })(scope);
+      } catch (e) {
+        logger.warn(`Set variable: Error rendering text: ${action.text}`);
+        logger.warn(e);
+        throw new AbortScene('VARIABLE_TEXT_NOT_VALID');
+      }
+      // A text which renders to a plain number ("123", or an injected numeric variable)
+      // is stored as a number: "only continue if" compares strictly, so keeping the
+      // string would make an equality between identical values fail (123 !== '123').
+      const valueAsNumber = Number(value);
+      if (value.trim() !== '' && Number.isFinite(valueAsNumber)) {
+        value = valueAsNumber;
+      }
+    }
+
+    set(scope, path, { value }, { merge: true });
+  },
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
     let oneConditionVerified = false;
     action.conditions.forEach((condition) => {

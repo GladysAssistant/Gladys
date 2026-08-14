@@ -706,6 +706,9 @@ const ACTIONS = {
   SMS: {
     SEND: 'sms.send',
   },
+  VARIABLE: {
+    SET: 'variable.set',
+  },
 };
 
 // List of actions that can be used as conditions
@@ -2001,6 +2004,7 @@ const AI_CHAT_TOOL_CATEGORIES = {
   SCENES: 'scenes',
   DEVICE_CONTROL: 'device_control',
   DEVICE_QUERY: 'device_query',
+  WEATHER: 'weather',
   WEB_AND_TIME: 'web_and_time',
   OTHER: 'other',
 };

@@ -126,6 +126,43 @@ describe('SceneManager', () => {
     await assert.isRejected(promise);
   });
 
+  it('should return validation error when variable.set action has both a text and a formula', async () => {
+    const promise = sceneManager.create({
+      name: 'Ambiguous variable scene',
+      icon: 'bell',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.VARIABLE.SET,
+            text: 'Hello',
+            evaluate_value: '2 * 3',
+          },
+        ],
+      ],
+      tags: [],
+    });
+    await assert.isRejected(promise, /conflict between optional exclusive peers \[text, evaluate_value\]/);
+  });
+
+  it('should create one scene with a variable.set action', async () => {
+    const scene = await sceneManager.create({
+      name: 'Variable scene',
+      icon: 'bell',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.VARIABLE.SET,
+            evaluate_value: '2 * 3',
+          },
+        ],
+      ],
+      tags: [],
+    });
+    expect(scene).to.have.property('selector');
+  });
+
   it('should format joi error fallback when details are absent', () => {
     expect(sceneModel.formatJoiValidationError()).to.equal('Invalid schema');
     expect(sceneModel.formatJoiValidationError({ message: 'Validation failed' })).to.equal('Validation failed');
