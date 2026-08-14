@@ -13,7 +13,7 @@ import { ENERGY_INDEX_FEATURE_TYPES } from '../../../../../../../../server/servi
 import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
 import { getDeviceParam } from '../../../../../../utils/device';
 import { CAMERA_MOVE_OPTIONS } from '../../../../../../utils/cameraMove';
-import { buildCameraMoveSupportedOptions, featureNeedsMinMax, isFeatureFieldErrored } from '../utils';
+import { buildCameraMoveSupportedOptions, featureNeedsMinMax, isFeatureFieldErrored, isSelectFeature } from '../utils';
 import style from '../style.css';
 
 const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...props }) => {
@@ -26,12 +26,14 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
   const supportedMoveValues = new Set(supportedOptions.map(option => option.value));
   const featureLabel = feature.name || <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />;
   const showMinMax = featureNeedsMinMax(feature.category, feature.type);
+  const isSelect = isSelectFeature(feature);
   const nameErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'name');
   const externalIdErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'external_id');
   const unitErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'unit');
   const minErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'min');
   const maxErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'max');
   const supportedOptionsErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'supported_options');
+  const optionsErrored = supportedOptionsErrored;
   const hasFieldError =
     nameErrored || externalIdErrored || unitErrored || minErrored || maxErrored || supportedOptionsErrored;
   const availableUnits =
@@ -206,6 +208,63 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
               </div>
             )}
           </div>
+
+          {isSelect && (
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="integration.mqtt.feature.selectOptions.label" />
+              </label>
+              <p class="mb-2">
+                <small>
+                  <Text id="integration.mqtt.feature.selectOptions.description" />
+                </small>
+              </p>
+              {(feature.supported_options || []).map((option, optionIndex) => (
+                <div class="row mb-2">
+                  <div class="col-5">
+                    <Localizer>
+                      <input
+                        type="text"
+                        value={option.label}
+                        onInput={e => props.updateSupportedOptionProperty(optionIndex, 'label', e)}
+                        class={cx('form-control', { 'is-invalid': optionsErrored })}
+                        placeholder={<Text id="integration.mqtt.feature.selectOptions.labelPlaceholder" />}
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="col-5">
+                    <Localizer>
+                      <input
+                        type="text"
+                        value={option.value}
+                        onInput={e => props.updateSupportedOptionProperty(optionIndex, 'value', e)}
+                        class={cx('form-control', { 'is-invalid': optionsErrored })}
+                        placeholder={<Text id="integration.mqtt.feature.selectOptions.valuePlaceholder" />}
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="col-2">
+                    <button
+                      type="button"
+                      onClick={() => props.deleteSupportedOption(optionIndex)}
+                      class="btn btn-outline-danger"
+                    >
+                      <i class="fe fe-trash-2" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {optionsErrored && (
+                <div class="invalid-feedback d-block">
+                  <Text id="integration.mqtt.device.validationErrors.select_supported_options" />
+                </div>
+              )}
+              <button type="button" onClick={props.addSupportedOption} class="btn btn-outline-primary btn-sm mt-1">
+                <i class="fe fe-plus mr-1" />
+                <Text id="integration.mqtt.feature.selectOptions.addOption" />
+              </button>
+            </div>
+          )}
 
           {isCameraMove && (
             <div class="form-group">
@@ -512,6 +571,22 @@ class MqttFeatureBoxComponent extends Component {
   getSupportedOptions = () => {
     return Array.isArray(this.props.feature.supported_options) ? this.props.feature.supported_options : [];
   };
+  updateSupportedOptionProperty = (optionIndex, property, e) => {
+    const supportedOptions = this.getSupportedOptions().map((option, index) =>
+      index === optionIndex ? { ...option, [property]: e.target.value } : option
+    );
+    this.props.updateFeatureSupportedOptions(this.props.featureIndex, supportedOptions);
+  };
+  addSupportedOption = () => {
+    this.props.updateFeatureSupportedOptions(this.props.featureIndex, [
+      ...this.getSupportedOptions(),
+      { label: '', value: '' }
+    ]);
+  };
+  deleteSupportedOption = optionIndex => {
+    const supportedOptions = this.getSupportedOptions().filter((option, index) => index !== optionIndex);
+    this.props.updateFeatureSupportedOptions(this.props.featureIndex, supportedOptions);
+  };
   toggleCameraMoveOption = value => {
     const selectedValues = new Set(this.getSupportedOptions().map(option => option.value));
     if (selectedValues.has(value)) {
@@ -624,6 +699,9 @@ class MqttFeatureBoxComponent extends Component {
         updateUnit={this.updateUnit}
         updateReadOnly={this.updateReadOnly}
         updateKeepHistory={this.updateKeepHistory}
+        updateSupportedOptionProperty={this.updateSupportedOptionProperty}
+        addSupportedOption={this.addSupportedOption}
+        deleteSupportedOption={this.deleteSupportedOption}
         toggleCameraMoveOption={this.toggleCameraMoveOption}
         addPresetOption={this.addPresetOption}
         updatePresetOption={this.updatePresetOption}

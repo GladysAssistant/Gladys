@@ -15,6 +15,7 @@ import {
   getFeatureDefaultValues,
   getFeaturePreviewValue,
   getFeaturePreviewStringValue,
+  getFeaturePreviewSupportedOptions,
   isSensorCategory
 } from '../utils';
 
@@ -68,7 +69,8 @@ const FeaturePreview = ({ category, type, label, intl, user }) => {
     last_value_string: previewStringValue,
     min: defaults.min,
     max: defaults.max,
-    unit: defaults.unit
+    unit: defaults.unit,
+    supported_options: getFeaturePreviewSupportedOptions(category, type)
   };
 
   const isCameraPtz =

@@ -164,7 +164,11 @@ class DeviceSetValue extends Component {
               <TextWithVariablesInjected
                 text={
                   this.props.action.value !== undefined
-                    ? Number(this.props.action.value).toString()
+                    ? // A select feature can carry a non-numeric value ('netflix'): it is kept
+                      // as-is instead of being displayed as NaN
+                      Number.isNaN(Number(this.props.action.value))
+                      ? `${this.props.action.value}`
+                      : Number(this.props.action.value).toString()
                     : this.props.action.evaluate_value
                 }
                 triggersVariables={this.props.triggersVariables}
