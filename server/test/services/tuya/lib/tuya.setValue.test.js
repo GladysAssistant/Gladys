@@ -1,8 +1,13 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-const sinon = require('sinon');
-const proxyquire = require('proxyquire')
-  .noCallThru()
-  .noPreserveCache();
+const sinon = require('sinon').createSandbox();
+// No .noPreserveCache() here: proxyquire already compiles a fresh copy of the
+// module under test on every call, and in noPreserveCache mode it also evicts
+// every *stubbed* dependency from require.cache once the call is done. This
+// file stubs '../../../utils/logger', a singleton several other test files
+// stub methods on: evicting it makes the next require() return a brand new
+// logger object while the production modules already loaded keep the old one,
+// so those stubs end up installed on an object nobody ever logs to.
+const proxyquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
 
@@ -550,5 +555,29 @@ describe('TuyaHandler.setValue', () => {
     // a TypeError.
     const warnMessages = logger.warn.getCalls().map((c) => c.args[0]);
     expect(warnMessages.some((msg) => msg.includes('connector unavailable'))).to.equal(true);
+  });
+
+  it('should leave the shared logger in the require cache after stubbing it', () => {
+    // Guards the proxyquire configuration at the top of this file. In
+    // noPreserveCache mode proxyquire evicts every stubbed dependency from
+    // require.cache once the call returns: the tests above stub
+    // '../../../utils/logger', so the next require() of the logger anywhere in
+    // the worker would build a second, unrelated logger object. Test files
+    // loaded after this one (mqtt/zigbee2mqtt publish, tuya.convertDevice)
+    // run sinon.stub(logger, 'debug') and assert the code under test logs
+    // through that stub — with two logger objects around, the stub is
+    // installed on the one the production modules never use and the assertion
+    // fails with an empty call list, in whichever file mocha happened to
+    // schedule next on that worker.
+    // eslint-disable-next-line global-require
+    const sharedLogger = require('../../../../utils/logger');
+    proxyquire('../../../../services/tuya/lib/tuya.setValue', {
+      tuyapi: function TuyAPIStub() {},
+      '@demirdeniz/tuyapi-newgen': function TuyAPINewGenStub() {},
+      '../../../utils/logger': { debug: sinon.stub(), warn: sinon.stub(), info: sinon.stub() },
+    });
+
+    // eslint-disable-next-line global-require
+    expect(require('../../../../utils/logger')).to.equal(sharedLogger);
   });
 });

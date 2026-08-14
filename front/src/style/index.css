@@ -455,6 +455,16 @@ body {
   pointer-events: none;
 }
 
+/* Keep chart tooltips compact so they don't mask the curves: long device
+   names wrap on several lines instead of stretching the tooltip.
+   The body prefix wins over the same-specificity nowrap rule shipped by
+   ApexCharts, whose stylesheet can be injected after this one */
+body .apexcharts-tooltip {
+  max-width: min(320px, 80vw);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .rti--tag button:focus {
   outline: none !important;
 }
@@ -506,4 +516,15 @@ body {
 .integration-tag {
   font-size: 0.7rem;
   margin-right: 6px;
+}
+
+/* The theme pins nav badges to the top-right corner of the nav item. That looks
+   right on the horizontal desktop tabs, where the item hugs its link, but the
+   collapsed mobile menu stacks full-width items, so the badge drifts to the
+   edge of the screen, away from the label it counts. Below the lg breakpoint,
+   let it flow inline after the text instead (spacing comes from its ml-2). */
+@media (max-width: 991.98px) {
+  #headerMenuCollapse .nav-tabs .nav-link .badge {
+    position: static;
+  }
 }

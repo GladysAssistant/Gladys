@@ -38,13 +38,12 @@ async function install({ dockerImage, manifest, storeSlug = null, grantedDevices
       throw new ConflictError('EXTERNAL_INTEGRATION_ALREADY_INSTALLED');
     }
   }
-  try {
-    await this.system.pull(image);
-  } catch (e) {
-    logger.warn(`Unable to pull image ${image}`, e);
-    // an amd64-only image on a Raspberry Pi fails here: explicit message, not a raw Docker error
-    throw new BadParameters(`UNABLE_TO_PULL_IMAGE: image may not exist or may not be available for your architecture`);
-  }
+  // dev installs only (no storeSlug) fall back on a locally present image
+  // when the pull fails: a dev install can run an image built with
+  // `docker build` on the host, which exists in no registry. Store installs
+  // keep failing closed — a leftover local tag must never shadow the registry
+  const allowLocal = !storeSlug;
+  await this.ensureImage(image, { allowLocal });
   let finalManifest = manifest;
   if (!finalManifest) {
     // dev install by image name without repo: the manifest is read from the image labels
@@ -73,17 +72,10 @@ async function install({ dockerImage, manifest, storeSlug = null, grantedDevices
       throw new Error422(`granted_devices: ${unknownClasses.join(', ')} not requested by the manifest`);
     }
   }
-  // install = pull of every image (main + sub-containers), so a start
-  // never depends on the network
+  // install = every image (main + sub-containers) made available now, so a
+  // start never depends on the network
   await Promise.each(finalManifest.containers || [], async (entry) => {
-    try {
-      await this.system.pull(entry.docker_image);
-    } catch (e) {
-      logger.warn(`Unable to pull image ${entry.docker_image}`, e);
-      throw new BadParameters(
-        `UNABLE_TO_PULL_IMAGE: image may not exist or may not be available for your architecture`,
-      );
-    }
+    await this.ensureImage(entry.docker_image, { allowLocal });
   });
   const selector = await this.buildSelector({ storeSlug, manifestName: finalManifest.name });
   const existingSelector = await db.Service.findOne({ where: { selector } });

@@ -1,4 +1,6 @@
-const { fake, stub, assert, match } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, stub, assert, match } = sinon;
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 
@@ -1257,7 +1259,21 @@ describe('gateway.forwardMessageToAiChat helpers', () => {
     });
 
     it('should accept the answer after a failed forced-tool retry', async () => {
-      const tools = buildRoutedTools();
+      // carries a device_query tool on purpose: forcing only applies when a
+      // selected tool can serve the classified category
+      const tools = [
+        ...buildRoutedTools(),
+        {
+          intent: 'device.get-state',
+          config: {
+            title: 'Get device state',
+            description: 'Get the state of devices',
+            categories: ['device_query', 'other'],
+            inputSchema: { room: z.string().optional() },
+          },
+          cb: fake.resolves({ content: [{ type: 'text', text: '22' }] }),
+        },
+      ];
       const { forwardMessageToAiChat } = getModule({ tools });
       const aiChat = stub();
       aiChat.onCall(0).resolves({
@@ -1618,10 +1634,30 @@ describe('gateway.forwardMessageToAiChat tool choice helpers', () => {
     expect(shouldForceToolChoice(['device_query'])).to.equal(true);
     expect(shouldForceToolChoice(['device_control', 'other'])).to.equal(true);
     expect(shouldForceToolChoice(['scenes'])).to.equal(true);
+    expect(shouldForceToolChoice(['weather'])).to.equal(true);
     expect(shouldForceToolChoice(['web_and_time'])).to.equal(false);
     expect(shouldForceToolChoice(['other'])).to.equal(false);
     expect(shouldForceToolChoice(null)).to.equal(false);
     expect(shouldForceToolChoice([])).to.equal(false);
+  });
+
+  it('shouldForceToolChoice should not force a category no selected tool can serve', () => {
+    const { shouldForceToolChoice } = getModule();
+    const weatherTool = { intent: 'weather.get', config: { categories: ['weather', 'other'] } };
+    const deviceTool = { intent: 'device.get-state', config: { categories: ['device_query', 'other'] } };
+    const untaggedTool = { intent: 'some.future-tool', config: {} };
+
+    // a house without coordinates leaves no weather tool: the category filter falls
+    // back to the full list, and forcing a call would run an unrelated tool
+    expect(shouldForceToolChoice(['weather'], [deviceTool])).to.equal(false);
+    expect(shouldForceToolChoice(['weather'], [])).to.equal(false);
+    expect(shouldForceToolChoice(['weather'], [deviceTool, weatherTool])).to.equal(true);
+    // an untagged tool can serve any intent, like the category filter assumes
+    expect(shouldForceToolChoice(['weather'], [untaggedTool])).to.equal(true);
+    // a non-forced category stays unforced whatever the tools are
+    expect(shouldForceToolChoice(['other'], [weatherTool])).to.equal(false);
+    // without a tool list the check stays on the categories alone
+    expect(shouldForceToolChoice(['weather'], null)).to.equal(true);
   });
 
   it('resolveToolChoice should require tools only before the first tool iteration', () => {

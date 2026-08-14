@@ -1,5 +1,5 @@
 /* eslint-disable require-jsdoc, jsdoc/require-jsdoc */
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const { BadParameters } = require('../../../../utils/coreErrors');

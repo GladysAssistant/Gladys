@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const db = require('../../../models');
 const User = require('../../../lib/user');

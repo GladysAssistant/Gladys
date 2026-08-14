@@ -71,14 +71,20 @@ function buildUpdateCandidates(supervisor, service, indexManifest, repoManifest)
  * pulled. A version bumped on the default branch before its image is
  * published (the release workflow is still building) must not turn the
  * update into a dead end: the next candidate — the indexed release, then the
- * running image — takes over.
+ * running image — takes over. For dev installs only (`allowLocal`), a failed
+ * pull additionally falls back on the image already present locally
+ * (ensureImage: the dev workflow rebuilds an image with `docker build` that
+ * exists in no registry). Store updates keep the strict pull rule: a remote
+ * failure fails closed instead of silently recreating from a local tag.
  * @param {object} supervisor - The external integration service.
  * @param {Array} candidates - The candidates built by buildUpdateCandidates.
- * @returns {Promise<object|null>} The applied candidate, null if none could be pulled.
+ * @param {object} options - Options.
+ * @param {boolean} options.allowLocal - Local fallback (dev installs only).
+ * @returns {Promise<object|null>} The applied candidate, null if none is available.
  * @example
- * const applied = await pullFirstAvailable(this, candidates);
+ * const applied = await pullFirstAvailable(this, candidates, { allowLocal: false });
  */
-async function pullFirstAvailable(supervisor, candidates) {
+async function pullFirstAvailable(supervisor, candidates, { allowLocal }) {
   return Promise.reduce(
     candidates,
     async (applied, candidate) => {
@@ -86,10 +92,10 @@ async function pullFirstAvailable(supervisor, candidates) {
         return applied;
       }
       try {
-        await supervisor.system.pull(candidate.image);
+        await supervisor.ensureImage(candidate.image, { allowLocal });
         return candidate;
       } catch (e) {
-        logger.warn(`Unable to pull image ${candidate.image}`, e);
+        logger.warn(`Unable to get image ${candidate.image}`, e);
         return null;
       }
     },
@@ -104,7 +110,11 @@ async function pullFirstAvailable(supervisor, candidates) {
  * actually be pulled and recreate the container (which rotates the
  * integration token: the previous JWT is instantly invalidated). For dev
  * installs without a store_slug, the image tag installed by the user is
- * re-pulled and the manifest is refreshed from the labels of the new image.
+ * re-pulled — or, for an image only built locally, re-read from the local
+ * store — and the manifest is refreshed from the labels of the new image.
+ * Once the new containers have started, the images the previous version left
+ * behind are removed — an integration updated a dozen times used to cost a
+ * dozen images.
  * Updates are an explicit admin gesture — no auto-update in v1.
  * @param {string} selector - The selector of the external integration.
  * @returns {Promise<object>} Resolve with the updated integration.
@@ -143,7 +153,8 @@ async function update(selector) {
     }
   }
   const candidates = buildUpdateCandidates(this, service, indexManifest, repoManifest);
-  const applied = await pullFirstAvailable(this, candidates);
+  const allowLocal = !service.store_slug;
+  const applied = await pullFirstAvailable(this, candidates, { allowLocal });
   if (applied === null) {
     throw new BadParameters(`UNABLE_TO_PULL_IMAGE: image may not exist or may not be available for your architecture`);
   }
@@ -188,15 +199,15 @@ async function update(selector) {
     }
   }
   await Promise.each((manifest && manifest.containers) || [], async (entry) => {
-    try {
-      await this.system.pull(entry.docker_image);
-    } catch (e) {
-      logger.warn(`Unable to pull image ${entry.docker_image}`, e);
-      throw new BadParameters(
-        `UNABLE_TO_PULL_IMAGE: image may not exist or may not be available for your architecture`,
-      );
-    }
+    await this.ensureImage(entry.docker_image, { allowLocal });
   });
+  // captured before the row is rewritten: what the integration ran *until now*.
+  // Whatever the new manifest still declares is filtered back out by
+  // removeImages, so a sub-container image kept across the update survives.
+  const previousImages = [
+    service.docker_image,
+    ...this.getManifestContainers(service).map((entry) => entry.docker_image),
+  ];
   if (service.container_id) {
     try {
       await this.system.stopContainer(service.container_id);
@@ -215,7 +226,15 @@ async function update(selector) {
   await db.Service.update({ version: manifest.version, manifest, docker_image: image }, { where: { id: service.id } });
   service = await this.getBySelector(selector);
   await this.createIntegrationContainer(service);
-  return this.start(selector);
+  const started = await this.start(selector);
+  // only once start() has gone through: it resolves on LOADING, not RUNNING, so
+  // this buys the container being created and started, not a healthy
+  // integration. A release that starts and never authenticates still gets its
+  // predecessor collected — rolling back then means re-pulling the old tag.
+  // Keeping the cleanup after start() is still what we want: a start that
+  // throws (no image, no network, Docker down) skips it entirely.
+  await this.removeImages(previousImages);
+  return started;
 }
 
 module.exports = {

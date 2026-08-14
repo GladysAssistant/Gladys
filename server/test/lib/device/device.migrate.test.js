@@ -1,6 +1,8 @@
 const EventEmitter = require('events');
 const { assert, expect } = require('chai');
-const { fake, assert: sinonAssert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert: sinonAssert } = sinon;
 const uuid = require('uuid');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
@@ -155,7 +157,15 @@ describe('Device.migrate', () => {
           },
         ],
       ],
-      triggers: [{ type: 'device.new-state', device_feature: 'migration-source-temp', operator: '=', value: 20 }],
+      triggers: [
+        { type: 'device.new-state', device_feature: 'migration-source-temp', operator: '=', value: 20 },
+        {
+          type: 'device.new-state',
+          device_features: ['migration-source-temp', 'some-other-feature'],
+          operator: '=',
+          value: 20,
+        },
+      ],
     });
     await db.Scene.create({
       name: 'Migration scene untouched',
@@ -232,7 +242,15 @@ describe('Device.migrate', () => {
           },
         ],
       ],
-      triggers: [{ type: 'device.new-state', device_feature: 'migration-destination-temp', operator: '=', value: 20 }],
+      triggers: [
+        { type: 'device.new-state', device_feature: 'migration-destination-temp', operator: '=', value: 20 },
+        {
+          type: 'device.new-state',
+          device_features: ['migration-destination-temp', 'some-other-feature'],
+          operator: '=',
+          value: 20,
+        },
+      ],
     });
     // Dashboard rewritten in DB, positional companion arrays untouched
     const refreshedDashboard = await db.Dashboard.findOne({ where: { id: dashboard.id } });
@@ -292,6 +310,234 @@ describe('Device.migrate', () => {
     const refreshedDestination = await db.Device.findOne({ where: { id: destinationDevice.id } });
     expect(refreshedDestination.room_id).to.equal(SEEDED_ROOM_ID);
     sinonAssert.notCalled(sceneManagerFake.update);
+  });
+
+  it('should move the whole history in slices, with one cutoff per feature', async () => {
+    // One state per month on the source features
+    const sourceTempStates = [...Array(12)].map((value, month) => ({
+      value: 20 + month,
+      created_at: new Date(Date.UTC(2024, month, 1)),
+    }));
+    const sourceBinaryStates = [...Array(12)].map((value, month) => ({
+      value: month % 2,
+      created_at: new Date(Date.UTC(2024, month, 15)),
+    }));
+    await db.duckDbBatchInsertState(sourceTempFeature.id, sourceTempStates);
+    await db.duckDbBatchInsertState(sourceBinaryFeature.id, sourceBinaryStates);
+    // The two destination features have their own cutoff: the temperature one already has
+    // history since July, the binary one has none and takes everything.
+    await db.duckDbBatchInsertState(destinationTempFeature.id, [
+      { value: 30, created_at: new Date(Date.UTC(2024, 6, 1)) },
+    ]);
+    const destinationBinaryFeature = await db.DeviceFeature.findOne({
+      where: { selector: 'migration-destination-binary' },
+    });
+    // Small enough to force one slice per state: the slice bounds, the first slice
+    // (no lower bound) and the last one (no upper bound) are all exercised.
+    deviceManager.DUCKDB_STATES_MIGRATE_STATES_PER_SLICE = 1;
+    deviceManager.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 0;
+    deviceManager.DUCKDB_STATES_MIGRATE_PAUSE_FACTOR = 0;
+
+    const result = await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: {
+        'migration-source-temp': 'migration-destination-temp',
+        'migration-source-binary': 'migration-destination-binary',
+      },
+    });
+
+    // 6 temperature states before July + the 12 binary states
+    expect(result.duck_db_states_migrated).to.equal(18);
+    expect(await countDuckDbStates(destinationTempFeature.id)).to.equal(7);
+    expect(await countDuckDbStates(destinationBinaryFeature.id)).to.equal(12);
+    expect(await countDuckDbStates(sourceTempFeature.id)).to.equal(0);
+    expect(await countDuckDbStates(sourceBinaryFeature.id)).to.equal(0);
+    // The moved values are the right ones, in the right order
+    const movedStates = await db.duckDbReadConnectionAllAsync(
+      'SELECT value FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID) ORDER BY created_at',
+      destinationTempFeature.id,
+    );
+    expect(movedStates.map((state) => state.value)).to.deep.equal([20, 21, 22, 23, 24, 25, 30]);
+    // The job reports how many states were moved, live
+    const migrationJob = await db.Job.findOne({ where: { type: 'device-migrate' }, order: [['created_at', 'DESC']] });
+    expect(migrationJob.data.states_migrated).to.equal(18);
+  });
+
+  it('should cap each statement when every state shares the same timestamp', async () => {
+    // Degenerate history: no time spread at all, so the time slices cannot split anything
+    // and everything falls into the last (unbounded) slice. The cardinality cap is then
+    // the only thing keeping a statement small.
+    const sameDate = new Date('2024-01-01T00:00:00.000Z');
+    await db.duckDbBatchInsertState(
+      sourceTempFeature.id,
+      [...Array(20)].map(() => ({ value: 20, created_at: sameDate })),
+    );
+    // Unmapped feature on the same timestamp: its history is deleted, not moved, so the
+    // capped DELETE has to repeat too, not only the capped UPDATE.
+    await db.duckDbBatchInsertState(
+      sourceBinaryFeature.id,
+      [...Array(11)].map(() => ({ value: 1, created_at: sameDate })),
+    );
+    const CAP = 3;
+    deviceManager.DUCKDB_STATES_MIGRATE_STATES_PER_SLICE = CAP;
+    deviceManager.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 0;
+    deviceManager.DUCKDB_STATES_MIGRATE_PAUSE_FACTOR = 0;
+    // Assert the property rather than the SQL text: no single write statement may report
+    // more than CAP affected rows. Final counts alone would also pass uncapped.
+    const realWrite = db.duckDbWriteConnectionAllAsync;
+    const affectedRowCounts = [];
+    db.duckDbWriteConnectionAllAsync = async (query, ...params) => {
+      const result = await realWrite(query, ...params);
+      if (result && result[0] && result[0].Count !== undefined) {
+        affectedRowCounts.push({ query, count: Number(result[0].Count) });
+      }
+      return result;
+    };
+
+    let result;
+    try {
+      result = await deviceManager.migrate('migration-source', {
+        destination_device_selector: 'migration-destination',
+        features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+      });
+    } finally {
+      db.duckDbWriteConnectionAllAsync = realWrite;
+    }
+
+    expect(result.duck_db_states_migrated).to.equal(20);
+    expect(await countDuckDbStates(destinationTempFeature.id)).to.equal(20);
+    expect(await countDuckDbStates(sourceTempFeature.id)).to.equal(0);
+    expect(await countDuckDbStates(sourceBinaryFeature.id)).to.equal(0);
+    // Both write paths had to repeat, and none of them ever exceeded the cap
+    const updates = affectedRowCounts.filter((statement) => statement.query.includes('UPDATE'));
+    const deletes = affectedRowCounts.filter((statement) => statement.query.includes('DELETE'));
+    expect(updates.filter((statement) => statement.count === CAP).length).to.be.at.least(6);
+    expect(deletes.filter((statement) => statement.count === CAP).length).to.be.at.least(3);
+    expect(Math.max(...affectedRowCounts.map((statement) => statement.count))).to.equal(CAP);
+  });
+
+  it('should move a state published by the source device while the last slice was draining', async () => {
+    await db.duckDbBatchInsertState(sourceTempFeature.id, [
+      { value: 20, created_at: new Date('2024-01-01T00:00:00.000Z') },
+      { value: 21, created_at: new Date('2024-06-01T00:00:00.000Z') },
+      { value: 22, created_at: new Date('2024-12-01T00:00:00.000Z') },
+    ]);
+    deviceManager.DUCKDB_STATES_MIGRATE_STATES_PER_SLICE = 1;
+    deviceManager.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 0;
+    deviceManager.DUCKDB_STATES_MIGRATE_PAUSE_FACTOR = 0;
+    // The old integration is still polling: a state lands after the last slice was
+    // drained. The destination feature has no history, so the mapping asks to keep it.
+    const realUpdateProgress = deviceManager.job.updateProgress.bind(deviceManager.job);
+    let lateStateWritten = false;
+    deviceManager.job.updateProgress = async (...args) => {
+      const returnedValue = await realUpdateProgress(...args);
+      if (!lateStateWritten && args[1] === 40) {
+        lateStateWritten = true;
+        await db.duckDbBatchInsertState(sourceTempFeature.id, [
+          { value: 99, created_at: new Date('2025-01-01T00:00:00.000Z') },
+        ]);
+      }
+      return returnedValue;
+    };
+
+    let result;
+    try {
+      result = await deviceManager.migrate('migration-source', {
+        destination_device_selector: 'migration-destination',
+        features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+      });
+    } finally {
+      deviceManager.job.updateProgress = realUpdateProgress;
+    }
+
+    expect(lateStateWritten).to.equal(true);
+    // Moved, not deleted, and counted
+    expect(result.duck_db_states_migrated).to.equal(4);
+    expect(await countDuckDbStates(destinationTempFeature.id)).to.equal(4);
+    expect(await countDuckDbStates(sourceTempFeature.id)).to.equal(0);
+    const movedStates = await db.duckDbReadConnectionAllAsync(
+      'SELECT value FROM t_device_feature_state WHERE device_feature_id = CAST(? AS UUID) ORDER BY created_at',
+      destinationTempFeature.id,
+    );
+    expect(movedStates.map((state) => state.value)).to.deep.equal([20, 21, 22, 99]);
+  });
+
+  it('should sweep a state back-dated into an already processed slice', async () => {
+    await db.duckDbBatchInsertState(sourceTempFeature.id, [
+      { value: 20, created_at: new Date('2024-01-01T00:00:00.000Z') },
+      { value: 21, created_at: new Date('2024-06-01T00:00:00.000Z') },
+      { value: 22, created_at: new Date('2024-12-01T00:00:00.000Z') },
+    ]);
+    deviceManager.DUCKDB_STATES_MIGRATE_STATES_PER_SLICE = 1;
+    deviceManager.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 0;
+    deviceManager.DUCKDB_STATES_MIGRATE_PAUSE_FACTOR = 0;
+    // The point of the sweep: `destroy` refuses to delete a device that still has states,
+    // and it counts them before the migration gets a chance to clean up. Zero tolerance
+    // here, so a single state left behind fails the migration instead of passing silently.
+    deviceManager.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 0;
+    // The source device is still alive while the migration runs: simulate a state written
+    // with a past timestamp, right after the slice covering that timestamp was processed.
+    const realUpdateProgress = deviceManager.job.updateProgress.bind(deviceManager.job);
+    let backDatedStateWritten = false;
+    deviceManager.job.updateProgress = async (...args) => {
+      const returnedValue = await realUpdateProgress(...args);
+      if (!backDatedStateWritten && args[1] > 5) {
+        backDatedStateWritten = true;
+        await db.duckDbBatchInsertState(sourceTempFeature.id, [
+          { value: 99, created_at: new Date('2024-01-01T12:00:00.000Z') },
+        ]);
+      }
+      return returnedValue;
+    };
+
+    try {
+      await deviceManager.migrate('migration-source', {
+        destination_device_selector: 'migration-destination',
+        features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+      });
+    } finally {
+      deviceManager.job.updateProgress = realUpdateProgress;
+    }
+
+    expect(backDatedStateWritten).to.equal(true);
+    // The back-dated state is dropped, not moved, but nothing is left on the source: the
+    // destroy at the end of the migration would refuse to run otherwise.
+    expect(await countDuckDbStates(sourceTempFeature.id)).to.equal(0);
+    expect(await countDuckDbStates(destinationTempFeature.id)).to.equal(3);
+    expect(await db.Device.findOne({ where: { selector: 'migration-source' } })).to.equal(null);
+  });
+
+  it('should delete the whole history when nothing is mapped', async () => {
+    // "Migrate without history": the user maps no feature at all, the source history is
+    // dropped rather than moved, and no UPDATE is ever built.
+    await db.duckDbBatchInsertState(sourceTempFeature.id, [
+      { value: 20, created_at: new Date('2024-01-01T00:00:00.000Z') },
+      { value: 21, created_at: new Date('2024-02-01T00:00:00.000Z') },
+    ]);
+    deviceManager.DUCKDB_STATES_MIGRATE_MIN_PAUSE_IN_MS = 0;
+
+    const result = await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: {},
+    });
+
+    expect(result.duck_db_states_migrated).to.equal(0);
+    expect(await countDuckDbStates(sourceTempFeature.id)).to.equal(0);
+    expect(await countDuckDbStates(destinationTempFeature.id)).to.equal(0);
+    expect(await db.Device.findOne({ where: { selector: 'migration-source' } })).to.equal(null);
+  });
+
+  it('should report a zero count when the mapped features have no history', async () => {
+    const result = await deviceManager.migrate('migration-source', {
+      destination_device_selector: 'migration-destination',
+      features_mapping: { 'migration-source-temp': 'migration-destination-temp' },
+    });
+
+    expect(result.duck_db_states_migrated).to.equal(0);
+    // The count is published up front, so the jobs page shows "0 states moved" rather
+    // than nothing at all when the history move returns early.
+    const migrationJob = await db.Job.findOne({ where: { type: 'device-migrate' }, order: [['created_at', 'DESC']] });
+    expect(migrationJob.data.states_migrated).to.equal(0);
   });
 
   it('should migrate a device without features and with an empty mapping', async () => {

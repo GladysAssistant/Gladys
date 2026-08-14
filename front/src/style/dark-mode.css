@@ -199,3 +199,39 @@ body.dark-mode {
 .dark-mode .mode-toggle:hover {
   background-color: rgba(0, 0, 0, 0.1); /* Keep the same in dark mode due to global inversion */
 }
+
+/* Weather provider images (vigilance map, rain radar…): pre-darkening keeps the
+   double inversion within gamut, so the image keeps its real hues (yellow/orange/red)
+   instead of washed-out ones */
+.dark-mode img.weather-provider-image {
+  filter: brightness(0.6) invert(100%) hue-rotate(180deg) !important;
+}
+
+/* Weather widget emojis, badges and colored icons: same pre-darkening trick as
+   the provider images. Plain dark-mode-no-invert only cancels the global
+   inversion, which leaves these washed out — the brightness step keeps the
+   real colors (yellow/orange suns, alert badges, UV index) */
+.dark-mode .weather-real-colors {
+  filter: brightness(0.7) invert(100%) hue-rotate(180deg) !important;
+}
+
+/* A fullscreen element is painted in the browser's top layer, where the global
+   html.dark-mode inversion does not apply anymore. Every counter-inversion above only
+   exists to cancel that global filter, so in fullscreen it inverts the media for real:
+   the camera live stream was displayed as a photo negative once put in fullscreen.
+   Kept last in the file so it wins over the other !important filters. */
+.dark-mode video:fullscreen,
+.dark-mode img:fullscreen,
+.dark-mode iframe:fullscreen,
+.dark-mode .dark-mode-no-invert:fullscreen {
+  filter: none !important;
+}
+
+/* Same rule for Safari < 16.4, which only knows the prefixed pseudo-class. It has to
+   live in its own block: an unknown pseudo-class invalidates the whole selector list. */
+.dark-mode video:-webkit-full-screen,
+.dark-mode img:-webkit-full-screen,
+.dark-mode iframe:-webkit-full-screen,
+.dark-mode .dark-mode-no-invert:-webkit-full-screen {
+  filter: none !important;
+}

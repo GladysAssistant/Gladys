@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
@@ -450,12 +450,42 @@ describe('externalIntegration.getSubContainersState', () => {
             protocol: 'tcp',
             host_port: 42115,
             label: { en: 'Frigate UI', fr: 'Interface Frigate' },
+            name: 'frigate_ui',
+            browsable: true,
           },
         ],
         devices: [
           { class: 'coral-usb', granted: true, available: true },
           { class: 'gpu', granted: false, available: true },
         ],
+      },
+    ]);
+  });
+
+  it('should expose browsable false on ports that do not serve a web UI', async () => {
+    const { externalIntegration, variable } = buildSupervisor();
+    // OCPP-like case: a WebSocket port for devices, no "Open" link in the UI
+    const manifest = {
+      ...TEST_CONTAINERS_MANIFEST,
+      containers: [
+        {
+          name: 'ocpp',
+          docker_image: 'img:1.0.0',
+          ports: [{ container_port: 9000, label: { en: 'OCPP WebSocket' }, browsable: false }],
+        },
+      ],
+    };
+    const service = await seedExternalService({ manifest });
+    await variable.setValue(SUB_CONTAINER_PORTS_VARIABLE, JSON.stringify({ 'ocpp/9000/tcp': 42116 }), service.id);
+    const state = await externalIntegration.getSubContainersState(service);
+    expect(state[0].ports).to.deep.equal([
+      {
+        container_port: 9000,
+        protocol: 'tcp',
+        host_port: 42116,
+        label: { en: 'OCPP WebSocket' },
+        name: null,
+        browsable: false,
       },
     ]);
   });

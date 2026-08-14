@@ -1,7 +1,9 @@
 const dgram = require('dgram');
 const os = require('os');
 const { expect } = require('chai');
-const { fake, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, stub } = sinon;
 const multicastDns = require('multicast-dns');
 
 const { BadParameters, ForbiddenError, ConflictError, TooManyRequests } = require('../../../utils/coreErrors');
@@ -453,6 +455,47 @@ describe('externalIntegration.scanMdns', () => {
         host: null,
         addresses: [],
         port: null,
+        txt: [],
+      },
+    ]);
+  });
+
+  it('should ignore SRV/TXT records of services that were not queried', async () => {
+    const { externalIntegration } = buildSupervisor();
+    const mdnsPort = await getFreeUdpPort();
+    const responder = multicastDns({ port: mdnsPort, ip: '127.0.0.1', multicast: false });
+    const mdnsOptions = { port: mdnsPort, ip: '127.0.0.1', multicast: false, bind: false };
+    responder.on('query', (query, remoteInfo) => {
+      // during the scan window the socket also sees unsolicited
+      // announcements of foreign services (SSH here): their SRV/TXT must
+      // not leak into the results as instances with arbitrary host/port
+      responder.respond(
+        {
+          answers: [
+            { name: '_hue._tcp.local', type: 'PTR', data: 'Hue Bridge._hue._tcp.local' },
+            { name: '_ssh._tcp.local', type: 'PTR', data: 'NAS._ssh._tcp.local' },
+            { name: 'NAS._ssh._tcp.local', type: 'SRV', data: { target: 'nas.local', port: 22 } },
+            { name: 'NAS._ssh._tcp.local', type: 'TXT', data: [Buffer.from('key=value')] },
+          ],
+          additionals: [
+            { name: 'Hue Bridge._hue._tcp.local', type: 'SRV', data: { target: 'hue.local', port: 443 } },
+            { name: 'hue.local', type: 'A', data: '192.168.1.40' },
+            { name: 'nas.local', type: 'A', data: '192.168.1.94' },
+          ],
+        },
+        remoteInfo,
+      );
+    });
+    const results = await externalIntegration.scanMdns({ service: '_hue._tcp', timeoutMs: 700, mdnsOptions });
+    await new Promise((resolve) => {
+      responder.destroy(resolve);
+    });
+    expect(results).to.deep.equal([
+      {
+        name: 'Hue Bridge._hue._tcp.local',
+        host: 'hue.local',
+        addresses: ['192.168.1.40'],
+        port: 443,
         txt: [],
       },
     ]);

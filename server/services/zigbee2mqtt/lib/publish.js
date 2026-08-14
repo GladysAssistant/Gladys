@@ -11,7 +11,7 @@ function publish(topic, message) {
   if (!this.mqttClient) {
     throw new ServiceNotConfiguredError('MQTT is not configured.');
   }
-  logger.debug(`Publishing MQTT message on topic ${topic}`);
+  logger.debug(`Publishing MQTT message on topic ${topic}: ${message}`);
   this.mqttClient.publish(topic, message, undefined, (err) => {
     if (err) {
       logger.warn(`MQTT - Error publishing to ${topic} : ${err}`);

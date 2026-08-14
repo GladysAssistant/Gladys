@@ -37,6 +37,27 @@ async function installZ2mContainer(config, setupMode = false) {
       await this.gladys.system.stopContainer(container.id);
       await this.gladys.system.removeContainer(container.id);
       creationNeeded = true;
+    } else {
+      // An existing container never gets its HostConfig reconciled with the current descriptor,
+      // so a container whose restart policy differs from the descriptor keeps it forever.
+      // Enforce the expected restart policy so the container self-heals after a Zigbee
+      // adapter/dongle crash instead of staying "Exited" until a human runs `docker start`.
+      const expectedRestartPolicy = containerDescriptor.HostConfig.RestartPolicy;
+      const currentRestartPolicyName =
+        containerDescription.HostConfig.RestartPolicy && containerDescription.HostConfig.RestartPolicy.Name;
+      if (expectedRestartPolicy && currentRestartPolicyName !== expectedRestartPolicy.Name) {
+        logger.info(
+          `Zigbee2mqtt container restart policy is "${currentRestartPolicyName}", updating it to "${expectedRestartPolicy.Name}" so it restarts automatically after a crash...`,
+        );
+        // Best-effort: this only heals the restart policy. If the Docker engine rejects the
+        // update, keep going — failing here would prevent Zigbee2mqtt from starting at all,
+        // which is worse than leaving the stale policy in place.
+        try {
+          await this.gladys.system.updateContainer(container.id, { RestartPolicy: expectedRestartPolicy });
+        } catch (e) {
+          logger.warn('Zigbee2mqtt container restart policy failed to update:', e);
+        }
+      }
     }
   }
 

@@ -184,6 +184,11 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: dashboardController.updateOrder,
     },
+    'get /api/v1/dashboard/photo/proxy': {
+      authenticated: true,
+      rateLimit: true,
+      controller: dashboardController.getPhotoProxy,
+    },
     'get /api/v1/dashboard/:dashboard_selector': {
       authenticated: true,
       controller: dashboardController.getBySelector,
@@ -285,6 +290,10 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/room': {
       authenticated: true,
       controller: houseController.getRooms,
+    },
+    'get /api/v1/house/:house_selector/sun': {
+      authenticated: true,
+      controller: houseController.getSunState,
     },
     'post /api/v1/house/:house_selector/user/:user_selector/seen': {
       authenticated: true,
@@ -492,6 +501,13 @@ function getRoutes(gladys) {
       admin: true,
       controller: serviceController.stop,
     },
+    // ⚠️ the literal `message` route must be declared BEFORE `:service_name`
+    // (setupRoutes registers routes in declaration order), otherwise it would
+    // be swallowed and read as a service named "message".
+    'get /api/v1/service/message': {
+      authenticated: true,
+      controller: serviceController.getMessageServices,
+    },
     'get /api/v1/service/:service_name': {
       authenticated: true,
       controller: serviceController.getByName,
@@ -661,6 +677,11 @@ function getRoutes(gladys) {
       externalIntegrationAuth: true,
       controller: integrationHostController.networkDiscoveryScan,
     },
+    'post /api/integration/v1/network/wake': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.networkWake,
+    },
     'post /api/integration/v1/camera/image': {
       authenticated: false,
       externalIntegrationAuth: true,
@@ -680,6 +701,11 @@ function getRoutes(gladys) {
       authenticated: false,
       externalIntegrationAuth: true,
       controller: integrationHostController.getDevices,
+    },
+    'get /api/integration/v1/house': {
+      authenticated: false,
+      externalIntegrationAuth: true,
+      controller: integrationHostController.getHouses,
     },
     'post /api/integration/v1/state': {
       authenticated: false,
@@ -903,6 +929,10 @@ function getRoutes(gladys) {
       controller: userController.create,
     },
     // weather
+    'get /api/v1/weather/provider': {
+      authenticated: true,
+      controller: weatherController.getProviders,
+    },
     'get /api/v1/user/:user_selector/weather': {
       authenticated: true,
       controller: weatherController.getByUser,
@@ -910,6 +940,10 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather': {
       authenticated: true,
       controller: weatherController.getByHouse,
+    },
+    'get /api/v1/house/:house_selector/weather/image/:image_key': {
+      authenticated: true,
+      controller: weatherController.getImage,
     },
     // energy price
     'get /api/v1/energy_price': {

@@ -1,4 +1,6 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
 const EventEmitter = require('events');
@@ -74,6 +76,41 @@ describe('message.sendToUser', () => {
     expect(message).to.have.property('text', 'coucou');
     assert.calledOnce(failingSendToUser);
     assert.calledOnce(workingSendToUser);
+  });
+
+  it('should forward the message only to the requested service', async () => {
+    const event = new EventEmitter();
+    const stateManager = new StateManager();
+    const telegramSendToUser = fake.resolves(true);
+    const smsSendToUser = fake.resolves(true);
+    stateManager.setState('service', 'telegram', { message: { sendToUser: telegramSendToUser } });
+    stateManager.setState('service', 'ext-john-free-mobile', { message: { sendToUser: smsSendToUser } });
+    const messageHandler = new MessageHandler(event, {}, buildServiceManager(stateManager), stateManager);
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+    };
+    stateManager.setState('user', 'test-user', user);
+    const message = await messageHandler.sendToUser('test-user', 'coucou', null, {
+      service: 'ext-john-free-mobile',
+    });
+    expect(message).to.have.property('text', 'coucou');
+    assert.notCalled(telegramSendToUser);
+    assert.calledOnce(smsSendToUser);
+    assert.calledWith(smsSendToUser, user);
+  });
+
+  it('should not broadcast when the requested service does not exist', async () => {
+    const event = new EventEmitter();
+    const stateManager = new StateManager();
+    const telegramSendToUser = fake.resolves(true);
+    stateManager.setState('service', 'telegram', { message: { sendToUser: telegramSendToUser } });
+    const messageHandler = new MessageHandler(event, {}, buildServiceManager(stateManager), stateManager);
+    stateManager.setState('user', 'test-user', {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+    });
+    const message = await messageHandler.sendToUser('test-user', 'coucou', null, { service: 'deleted-service' });
+    expect(message).to.have.property('text', 'coucou');
+    assert.notCalled(telegramSendToUser);
   });
 
   it('should throw error, user not found', async () => {

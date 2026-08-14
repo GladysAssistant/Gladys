@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { stub } = sinon;
 
 const HomeKitService = require('../../../services/homekit/index');
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
@@ -24,6 +26,9 @@ describe('HomeKitService', () => {
       },
       system: {
         isDocker: stub().resolves(true),
+      },
+      house: {
+        get: stub().resolves([]),
       },
       event: {
         on: stub().returns(),

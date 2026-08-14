@@ -2,7 +2,7 @@ const chai = require('chai');
 
 const { expect } = chai;
 
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 const { serviceId } = require('../../mocks/consts.test');

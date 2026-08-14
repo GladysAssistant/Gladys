@@ -1,6 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import ScrollToTopLink from '../../components/router/ScrollToTopLink';
 import StatusBadge from './all/external-integration/components/StatusBadge';
+import { isNoteworthyExternalIntegrationStatus } from './all/external-integration/utils';
 import style from './style.css';
 
 const getImgClass = integration =>
@@ -10,6 +11,14 @@ const getImgClass = integration =>
 
 const IntegrationTags = ({ integration }) => (
   <div class="integration-tags mt-2">
+    {/* first weeks of a community integration in the store index: the badge
+        answers "what's new?" at a glance, the "Newest first" sort gathers them */}
+    {integration.isNew && (
+      <span class="badge badge-primary integration-tag">
+        <i class="fe fe-star mr-1" />
+        <Text id="integration.tags.new" />
+      </span>
+    )}
     {!integration.external && (
       <span class="badge badge-dark integration-tag">
         <i class="fe fe-check-circle mr-1" />
@@ -22,14 +31,24 @@ const IntegrationTags = ({ integration }) => (
         <Text id="integration.tags.external" />
       </span>
     )}
-    {integration.external && integration.status && (
+    {integration.external && isNoteworthyExternalIntegrationStatus(integration.status) && (
       <StatusBadge status={integration.status} className="integration-tag" />
     )}
+    {/* icon only: the label is the longest of the whole row, and the catalog
+        just needs to signal the update — the wording is in the tooltip, and
+        the integration page carries the full update section. aria-label as
+        well as title: on a non-interactive span, title alone is not reliably
+        announced by screen readers, and the icon carries no text */}
     {integration.external && integration.updateAvailable && (
-      <span class="badge badge-primary integration-tag">
-        <i class="fe fe-arrow-up-circle mr-1" />
-        <Text id="integration.externalIntegration.updateAvailable" />
-      </span>
+      <Localizer>
+        <span
+          class="badge badge-primary integration-tag"
+          title={<Text id="integration.externalIntegration.updateAvailable" />}
+          aria-label={<Text id="integration.externalIntegration.updateAvailable" />}
+        >
+          <i class="fe fe-arrow-up-circle" />
+        </span>
+      </Localizer>
     )}
     {integration.deprecated && (
       <span class="badge badge-danger integration-tag">

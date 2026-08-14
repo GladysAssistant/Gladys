@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { assert, fake } = sinon;
 const TasmotaController = require('../../../../services/tasmota/api/tasmota.controller');

@@ -6,6 +6,7 @@ import { Text } from 'preact-i18n';
 import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import SupervisionCard from './SupervisionCard';
 import { RequestStatus } from '../../../../../utils/consts';
+import createActionsExternalIntegrationUpdates from '../../../../../actions/externalIntegrationUpdates';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import style from './style.css';
 
@@ -51,6 +52,11 @@ class ExternalIntegrationSupervisionPage extends Component {
           ? { version: integration.version, upToDate: integration.version === previousVersion }
           : null;
       this.setState({ integration, actionStatus: RequestStatus.Success, updateResult });
+      if (action === 'update') {
+        // the header counter must drop right away, the user just did the
+        // update it was asking for
+        this.props.refreshExternalIntegrationsToUpdate();
+      }
     } catch (e) {
       console.error(e);
       this.setState({ actionStatus: RequestStatus.Error, actionError: action, updateResult: null });
@@ -163,4 +169,7 @@ class ExternalIntegrationSupervisionPage extends Component {
   }
 }
 
-export default connect('user,session,httpClient')(ExternalIntegrationSupervisionPage);
+export default connect(
+  'user,session,httpClient',
+  createActionsExternalIntegrationUpdates
+)(ExternalIntegrationSupervisionPage);

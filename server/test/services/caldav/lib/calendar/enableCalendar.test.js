@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { enableCalendar } = require('../../../../../services/caldav/lib/calendar/calendar.enableCalendar');
 
 describe('Enable CalDAV calendar', () => {

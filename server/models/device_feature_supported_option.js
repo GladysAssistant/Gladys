@@ -23,6 +23,22 @@ module.exports = (sequelize, DataTypes) => {
         validate: {
           isInt: true,
         },
+        // Like last_value / last_value_string on t_device_feature, an option value lives
+        // in exactly one of the two columns: `value` for enum-like integer options,
+        // `value_string` for dynamic selects (installed TV apps, HDMI sources...) — the
+        // integer column then only holds a filler. This getter exposes the one that is
+        // set, so every consumer reads a single polymorphic `value`.
+        get() {
+          const stringValue = this.getDataValue('value_string');
+          if (stringValue !== null && stringValue !== undefined) {
+            return stringValue;
+          }
+          return this.getDataValue('value');
+        },
+      },
+      value_string: {
+        allowNull: true,
+        type: DataTypes.STRING,
       },
       label: {
         allowNull: false,

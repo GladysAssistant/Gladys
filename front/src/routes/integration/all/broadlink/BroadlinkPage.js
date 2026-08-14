@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
 
 const BroadlinkPage = ({ children, user }) => (
   <div class="page">
@@ -9,6 +10,7 @@ const BroadlinkPage = ({ children, user }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
+              <BackToIntegrationsLink />
               <h3 class="page-title mb-5">
                 <Text id="integration.broadlink.title" />
               </h3>

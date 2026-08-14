@@ -62,6 +62,12 @@ const names = {
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     },
   },
+  test: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.SIREN,
+      type: DEVICE_FEATURE_TYPES.SIREN.TEST_IN_PROGRESS,
+    },
+  },
   child_lock: {
     feature: {
       category: DEVICE_FEATURE_CATEGORIES.CHILD_LOCK,

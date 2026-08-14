@@ -499,7 +499,6 @@ class EditChart extends Component {
                   moveDevice={this.moveDevice}
                   removeDevice={this.removeDevice}
                   updateDeviceFeatureName={this.updateDeviceFeatureName}
-                  isTouchDevice={false}
                 />
               )}
             </div>
