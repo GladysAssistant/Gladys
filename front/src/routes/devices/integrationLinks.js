@@ -1,12 +1,14 @@
-import { integrationsByType } from '../../config/integrations';
+import { integrations } from '../../config/integrations';
 
 // The URL segment of an integration page is also the service name on the
 // server side (see server/services/index.js), so it lets us link a device
 // back to the integration it comes from.
 const integrationBySlug = {};
-integrationsByType.device.forEach(integration => {
-  integrationBySlug[(integration.link || integration.key).toLowerCase()] = integration;
-});
+integrations
+  .filter(integration => integration.type === 'device')
+  .forEach(integration => {
+    integrationBySlug[(integration.link || integration.key).toLowerCase()] = integration;
+  });
 
 // Integrations whose device list lives on a sub-page of the integration
 const DEVICE_LIST_SUFFIX = {
