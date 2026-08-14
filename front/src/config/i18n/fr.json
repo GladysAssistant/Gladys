@@ -705,7 +705,7 @@
       "noIntegrations": "Aucune intégration trouvée",
       "allIntegrationsUpToDate": "Toutes vos intégrations sont à jour.",
       "noSearchResults": "Aucune intégration correspondant à « {{searchKeyword}} » n'a été trouvée.",
-      "noSearchResultsSuggestion": "Essayez <a href=\"/dashboard/integration/device/matter\">Matter</a> pour les appareils compatibles Matter/Thread.",
+      "noSearchResultsSuggestion": "Votre appareil est peut-être pris en charge par une <a href=\"https://gladysassistant.com/fr/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">intégration externe</a> de la communauté : c'est la façon recommandée d'ajouter de nouvelles compatibilités. Et si elle n'existe pas encore, vous pouvez <a href=\"https://gladysassistant.com/fr/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">créer la vôtre très simplement</a> !",
       "refreshStore": {
         "hint": "Une intégration manque à l'appel ?",
         "button": "Rafraîchir le catalogue",

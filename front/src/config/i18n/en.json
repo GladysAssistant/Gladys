@@ -705,7 +705,7 @@
       "noIntegrations": "No integration found",
       "allIntegrationsUpToDate": "All your integrations are up to date.",
       "noSearchResults": "No integration matching \"{{searchKeyword}}\" was found.",
-      "noSearchResultsSuggestion": "Try <a href=\"/dashboard/integration/device/matter\">Matter</a> for Matter/Thread compatible devices.",
+      "noSearchResultsSuggestion": "Your device may be supported by a community <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">external integration</a>: they are the recommended way to add new compatibilities. And if it doesn't exist yet, you can <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">easily create your own</a>!",
       "refreshStore": {
         "hint": "An integration missing from the list?",
         "button": "Refresh catalog",
