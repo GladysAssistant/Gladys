@@ -1,4 +1,5 @@
 import cx from 'classnames';
+import get from 'get-value';
 import { Text } from 'preact-i18n';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../../server/utils/constants';
 import DeviceRow from '../../../../../../components/boxs/device-in-room/DeviceRow';
@@ -19,7 +20,7 @@ import {
 } from '../utils';
 
 const FeaturePreview = ({ category, type, label, intl, user }) => {
-  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA) {
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.IMAGE) {
     return (
       <div class={cx(style.featurePreview, style.cameraFeaturePreviewWrapper, 'dark-mode-no-invert')}>
         <CameraFeaturePreview label={label} />
@@ -72,8 +73,26 @@ const FeaturePreview = ({ category, type, label, intl, user }) => {
     supported_options: getFeaturePreviewSupportedOptions(category, type)
   };
 
+  const isCameraPtz =
+    category === DEVICE_FEATURE_CATEGORIES.CAMERA &&
+    (type === DEVICE_FEATURE_TYPES.CAMERA.MOVE || type === DEVICE_FEATURE_TYPES.CAMERA.PRESET);
+
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.PRESET) {
+    // The preset row renders nothing without options: show two example presets
+    mockFeature.supported_options = [1, 2].map(value => ({
+      value,
+      label: get(intl, `dictionary.integration.mqtt.featureCatalog.cameraPresetExample${value}`) || `Preset ${value}`,
+      sort_order: value - 1
+    }));
+  }
+
   return (
     <div class={cx(style.featurePreview, 'dark-mode-no-invert')}>
+      {isCameraPtz && (
+        <p class={style.cameraFeaturePreviewNotice}>
+          <Text id="integration.mqtt.featureCatalog.cameraPtzPreviewNotice" />
+        </p>
+      )}
       <div class="table-responsive">
         <table class="table card-table table-vcenter table-sm mb-0">
           <tbody>

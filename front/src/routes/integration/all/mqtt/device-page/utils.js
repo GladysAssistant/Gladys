@@ -9,6 +9,7 @@ import {
   WATER_HEATER_MODE
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
+import { CAMERA_MOVE_OPTIONS } from '../../../../../utils/cameraMove';
 import { isPushButtonFeature } from '../../../../../utils/consts';
 import normalizeSearchText from '../../../../../utils/normalizeSearchText';
 
@@ -48,6 +49,7 @@ export const isSensorCategory = category => {
     category === DEVICE_FEATURE_CATEGORIES.CURRENCY ||
     category === DEVICE_FEATURE_CATEGORIES.TEXT ||
     category === DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING ||
+    category === DEVICE_FEATURE_CATEGORIES.MAINTENANCE ||
     category === DEVICE_FEATURE_CATEGORIES.DATA ||
     category === DEVICE_FEATURE_CATEGORIES.DATARATE ||
     category === DEVICE_FEATURE_CATEGORIES.DURATION ||
@@ -198,6 +200,10 @@ const FEATURE_UNIT_BY_CATEGORY_TYPE = {
   [categoryTypeKey(
     DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING,
     DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING
+  )]: DEVICE_FEATURE_UNITS.PERCENT,
+  [categoryTypeKey(
+    DEVICE_FEATURE_CATEGORIES.MAINTENANCE,
+    DEVICE_FEATURE_TYPES.MAINTENANCE.LIFE_REMAINING
   )]: DEVICE_FEATURE_UNITS.PERCENT
 };
 
@@ -582,6 +588,16 @@ export const getFeatureDefaultValues = (category, type) => {
     return { ...defaults, min: 1, max: 1, read_only: false, keep_history: false };
   }
 
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.MOVE) {
+    // min/max cover the CAMERA_MOVE canonical values (STOP=0 .. ZOOM_OUT=6)
+    return { ...defaults, min: 0, max: 6, read_only: false, keep_history: false };
+  }
+
+  if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.PRESET) {
+    // max follows the highest preset value, kept in sync when the preset list is edited
+    return { ...defaults, min: 0, max: 0, read_only: false, keep_history: false };
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.SIGNAL) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: true }, category, type);
   }
@@ -677,8 +693,9 @@ export const getFeatureDefaultValues = (category, type) => {
   }
 
   if (
-    category === DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING &&
-    type === DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING
+    (category === DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING &&
+      type === DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING) ||
+    (category === DEVICE_FEATURE_CATEGORIES.MAINTENANCE && type === DEVICE_FEATURE_TYPES.MAINTENANCE.LIFE_REMAINING)
   ) {
     return applyDefaultUnit(
       { ...defaults, min: 0, max: 100, read_only: true, unit: DEVICE_FEATURE_UNITS.PERCENT },
@@ -921,8 +938,9 @@ export const getFeaturePreviewValue = (category, type) => {
   }
 
   if (
-    category === DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING &&
-    type === DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING
+    (category === DEVICE_FEATURE_CATEGORIES.HEPA_FILTER_MONITORING &&
+      type === DEVICE_FEATURE_TYPES.FILTER_MONITORING.FILTER_LIFE_REMAINING) ||
+    (category === DEVICE_FEATURE_CATEGORIES.MAINTENANCE && type === DEVICE_FEATURE_TYPES.MAINTENANCE.LIFE_REMAINING)
   ) {
     return 72;
   }
@@ -1306,11 +1324,30 @@ export const getSelectFeatureOptionsError = feature => {
   return null;
 };
 
+// Build the supported_options rows of a camera move feature from the selected CAMERA_MOVE
+// values (all movements when values is omitted). Labels are stored in the current locale as a
+// fallback: control surfaces always render from the canonical values, not from these labels.
+export const buildCameraMoveSupportedOptions = (dictionary, values) => {
+  const selected = values ? new Set(values) : null;
+  return CAMERA_MOVE_OPTIONS.filter(option => !selected || selected.has(option.value)).map((option, index) => ({
+    value: option.value,
+    label: get(dictionary, `deviceFeatureAction.category.camera.move.${option.i18nKey}`) || option.i18nKey,
+    sort_order: index
+  }));
+};
+
 export const featureNeedsMinMax = (category, type) => {
   if (category === DEVICE_FEATURE_CATEGORIES.TEXT) {
     return false;
   }
   if (type === DEVICE_FEATURE_TYPES.BUTTON.PUSH) {
+    return false;
+  }
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.CAMERA &&
+    (type === DEVICE_FEATURE_TYPES.CAMERA.MOVE || type === DEVICE_FEATURE_TYPES.CAMERA.PRESET)
+  ) {
+    // min/max are derived from the supported movements / preset list, not edited by hand
     return false;
   }
   return true;

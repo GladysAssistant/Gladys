@@ -986,10 +986,55 @@ const data = {
   ],
   'get /api/v1/device': [
     {
+      id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+      name: 'Main Lamp',
+      selector: 'main-lamp',
+      room_id: '1c634ff4-0476-4733-a084-b4a43d649c84',
+      room: {
+        id: '1c634ff4-0476-4733-a084-b4a43d649c84',
+        name: 'Living Room',
+        selector: 'living-room'
+      },
+      service: {
+        name: 'zigbee2mqtt',
+        selector: 'zigbee2mqtt',
+        type: 'internal'
+      },
+      features: [
+        {
+          name: 'On/Off',
+          selector: 'main-lamp-binary',
+          category: 'light',
+          type: 'binary',
+          min: 0,
+          max: 1,
+          read_only: false,
+          last_value: 1,
+          last_value_changed: '2023-01-23 08:50:06.556 +00:00'
+        },
+        {
+          name: 'Brightness',
+          selector: 'main-lamp-brightness',
+          category: 'light',
+          type: 'brightness',
+          min: 0,
+          max: 100,
+          read_only: false,
+          last_value: 80,
+          last_value_changed: '2023-01-23 08:50:06.556 +00:00'
+        }
+      ]
+    },
+    {
       id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
       name: 'Unassigned sensor',
       selector: 'unassigned-sensor',
       room_id: null,
+      service: {
+        name: 'mqtt',
+        selector: 'mqtt',
+        type: 'internal'
+      },
       features: [
         {
           name: 'Temperature',
@@ -1001,6 +1046,29 @@ const data = {
           read_only: true,
           last_value: 21,
           unit: 'celsius',
+          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+        },
+        {
+          name: 'Humidity',
+          selector: 'unassigned-humidity-sensor',
+          category: 'humidity-sensor',
+          type: 'decimal',
+          min: 0,
+          max: 100,
+          read_only: true,
+          last_value: 45,
+          unit: 'percent',
+          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+        },
+        {
+          name: 'Battery',
+          selector: 'unassigned-battery',
+          category: 'battery',
+          type: 'integer',
+          min: 0,
+          max: 100,
+          read_only: true,
+          last_value: 92,
           last_value_changed: '2019-02-12 07:49:07.556 +00:00'
         }
       ]

@@ -11,6 +11,7 @@ import { slugify } from '../../../../../../../../server/utils/slugify';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import {
   getFeatureDefaultValues,
+  buildCameraMoveSupportedOptions,
   buildMqttExternalId,
   generateMqttExternalIdSuffix,
   normalizeMqttExternalId,
@@ -45,6 +46,14 @@ class MqttDeviceSetupPage extends Component {
     const type = featureData[1];
     const defaultValues = getFeatureDefaultValues(category, type);
     const newFeatureIndex = this.state.device.features.length;
+
+    if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.MOVE) {
+      // All movements supported by default; the user unchecks the ones the camera lacks
+      defaultValues.supported_options = buildCameraMoveSupportedOptions(get(this.props, 'intl.dictionary') || {});
+    }
+    if (category === DEVICE_FEATURE_CATEGORIES.CAMERA && type === DEVICE_FEATURE_TYPES.CAMERA.PRESET) {
+      defaultValues.supported_options = [];
+    }
 
     const device = update(this.state.device, {
       features: {
@@ -391,13 +400,17 @@ class MqttDeviceSetupPage extends Component {
       'supported_options',
       featureIndex
     );
+    const feature = this.state.device.features[featureIndex];
+    const featureUpdate = {
+      supported_options: { $set: supportedOptions }
+    };
+    if (feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.PRESET) {
+      // Keep max consistent with the highest preset value (spec camera-ptz-control.md, A.3)
+      featureUpdate.max = { $set: supportedOptions.reduce((max, option) => Math.max(max, option.value), 0) };
+    }
     const device = update(this.state.device, {
       features: {
-        [featureIndex]: {
-          supported_options: {
-            $set: supportedOptions
-          }
-        }
+        [featureIndex]: featureUpdate
       }
     });
     this.setState({ device, validationErrors });
@@ -452,6 +465,25 @@ class MqttDeviceSetupPage extends Component {
           value: feature.supported_options,
           type: 'notNull Violation'
         });
+      }
+
+      if (
+        feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA &&
+        feature.type === DEVICE_FEATURE_TYPES.CAMERA.PRESET
+      ) {
+        const options = feature.supported_options || [];
+        const hasEmptyLabel = options.some(option => !option.label || option.label.trim() === '');
+        const values = options.map(option => option.value);
+        const hasDuplicateValue = new Set(values).size !== values.length;
+        const hasInvalidValue = values.some(value => !Number.isInteger(value) || value < 0);
+        if (hasEmptyLabel || hasDuplicateValue || hasInvalidValue) {
+          properties.push({
+            message: 'supported_options invalid',
+            attribute: 'supported_options',
+            value: feature.supported_options,
+            type: 'notNull Violation'
+          });
+        }
       }
     });
 

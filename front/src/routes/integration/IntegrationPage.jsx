@@ -1,6 +1,7 @@
 import { Text, MarkupText } from 'preact-i18n';
 import IntegrationMenu, { IntegrationMenuMobile } from './IntegrationMenu';
 import IntegrationCategory, { IntegrationListItem } from './IntegrationCategory';
+import IntegrationFacets from './IntegrationFacets';
 import IntegrationPageHeader from './IntegrationPageHeader';
 import StoreRefreshFooter from './all/external-integration/store-refresh/StoreRefreshFooter';
 import style from './style.css';
@@ -21,7 +22,13 @@ const IntegrationPage = ({
   refreshStoreStatus,
   refreshStoreStale,
   integrationsToUpdate,
-  category
+  category,
+  origin,
+  transports,
+  gladysPlus,
+  setOriginFacet,
+  setTransportFacet,
+  toggleGladysPlusFacet
 }) => (
   <div class="page">
     <div class="page-main">
@@ -41,6 +48,14 @@ const IntegrationPage = ({
               integrationCategories={integrationCategories}
               integrationsToUpdate={integrationsToUpdate}
               category={category}
+            />
+            <IntegrationFacets
+              origin={origin}
+              transports={transports}
+              gladysPlus={gladysPlus}
+              setOriginFacet={setOriginFacet}
+              setTransportFacet={setTransportFacet}
+              toggleGladysPlusFacet={toggleGladysPlusFacet}
             />
             <div class="alert alert-info mb-4">
               <h4 class="alert-title">

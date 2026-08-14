@@ -11,6 +11,14 @@ const getImgClass = integration =>
 
 const IntegrationTags = ({ integration }) => (
   <div class="integration-tags mt-2">
+    {/* first weeks of a community integration in the store index: the badge
+        answers "what's new?" at a glance, the "Newest first" sort gathers them */}
+    {integration.isNew && (
+      <span class="badge badge-primary integration-tag">
+        <i class="fe fe-star mr-1" />
+        <Text id="integration.tags.new" />
+      </span>
+    )}
     {!integration.external && (
       <span class="badge badge-dark integration-tag">
         <i class="fe fe-check-circle mr-1" />

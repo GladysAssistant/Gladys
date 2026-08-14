@@ -5,6 +5,7 @@ const db = require('../../../models');
 const { generateIntegrationToken } = require('../../../utils/integrationToken');
 const { generateAccessToken } = require('../../../utils/accessToken');
 const { SERVICE_STATUS, SERVICE_TYPES } = require('../../../utils/constants');
+const IntegrationHostController = require('../../../api/controllers/integrationHost.controller');
 
 const TEST_MANIFEST = {
   manifest_version: 1,
@@ -716,6 +717,94 @@ describe('Integration host API', () => {
         .get('/api/integration/v1/container')
         .expect(200);
       expect(res.body.containers).to.deep.equal([]);
+    });
+  });
+  describe('networkWake', () => {
+    it('should call wakeOnLan with the external integration service and body', async () => {
+      const externalIntegrationService = {
+        manifest: {
+          network_wake: true,
+        },
+      };
+
+      const body = {
+        mac: '64:e4:d5:b4:12:66',
+        address: '192.168.1.255',
+        port: 9,
+        sourcePort: 9,
+      };
+
+      let receivedService;
+      let receivedOptions;
+      let response;
+
+      const mockedGladys = {
+        externalIntegration: {
+          wakeOnLan: async (integrationService, options) => {
+            receivedService = integrationService;
+            receivedOptions = options;
+          },
+        },
+      };
+
+      const controller = IntegrationHostController(mockedGladys);
+      const req = {
+        externalIntegrationService,
+        body,
+      };
+
+      const res = {
+        json: (result) => {
+          response = result;
+        },
+      };
+
+      await controller.networkWake(req, res, () => {});
+      expect(receivedService).to.equal(externalIntegrationService);
+      expect(receivedOptions).to.equal(body);
+      expect(response).to.deep.equal({
+        success: true,
+      });
+    });
+
+    it('should propagate wakeOnLan errors', async () => {
+      const expectedError = new Error('Wake-on-LAN failed');
+
+      let forwardedError;
+
+      const externalIntegrationService = {
+        manifest: {
+          network_wake: true,
+        },
+      };
+
+      const mockedGladys = {
+        externalIntegration: {
+          wakeOnLan: async () => {
+            throw expectedError;
+          },
+        },
+      };
+
+      const controller = IntegrationHostController(mockedGladys);
+
+      const req = {
+        externalIntegrationService,
+
+        body: {
+          mac: '64:e4:d5:b4:12:66',
+        },
+      };
+
+      const res = {
+        json: () => {},
+      };
+
+      await controller.networkWake(req, res, (error) => {
+        forwardedError = error;
+      });
+
+      expect(forwardedError).to.equal(expectedError);
     });
   });
 });

@@ -1,4 +1,5 @@
 import { Text, MarkupText } from 'preact-i18n';
+import get from 'get-value';
 import Select from 'react-select';
 import { RequestStatus } from '../../../../utils/consts';
 import { USER_ROLE } from '../../../../../../server/utils/constants';
@@ -7,6 +8,7 @@ import style from './style.css';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import { EXPOSURE_MODES } from './actions';
 import BackToIntegrationsLink from '../../../../components/integration/BackToIntegrationsLink';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 const mdnsAdvertisers = {
   AVAHI: 'avahi',
@@ -15,10 +17,16 @@ const mdnsAdvertisers = {
   RESOLVED: 'resolved'
 };
 
-const ExposedDevicesSelect = ({ homekitCompatibleDevices, homekitExposedDevices, updateExposedDevices }) => {
+// The house alarm is offered in the same list as the devices, under a prefixed selector. Its name
+// is the name of the house, which on its own reads like a device, so it is labelled here — the
+// server has no translations.
+const ALARM_SELECTOR_PREFIX = 'house-alarm:';
+
+const ExposedDevicesSelect = ({ homekitCompatibleDevices, homekitExposedDevices, updateExposedDevices, intl }) => {
+  const alarmLabel = get(intl.dictionary, 'integration.homekit.alarmLabel');
   const deviceOptions = (homekitCompatibleDevices || []).map(device => ({
     value: device.selector,
-    label: device.name
+    label: device.selector.startsWith(ALARM_SELECTOR_PREFIX) ? `${alarmLabel} — ${device.name}` : device.name
   }));
 
   if (deviceOptions.length === 0) {
@@ -41,6 +49,8 @@ const ExposedDevicesSelect = ({ homekitCompatibleDevices, homekitExposedDevices,
     />
   );
 };
+
+const ExposedDevicesSelectWithIntl = withIntlAsProp(ExposedDevicesSelect);
 
 const HomKitPage = ({ children, ...props }) => (
   <div class="page">
@@ -152,7 +162,7 @@ const HomKitPage = ({ children, ...props }) => (
                           </select>
                           {props.homekitExposureMode === EXPOSURE_MODES.SELECTION && (
                             <div class="mb-2">
-                              <ExposedDevicesSelect {...props} />
+                              <ExposedDevicesSelectWithIntl {...props} />
                             </div>
                           )}
                           <button class="btn btn-success" onClick={props.saveExposure}>

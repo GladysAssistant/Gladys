@@ -87,6 +87,25 @@
       "closeButton": "Schließen"
     }
   },
+  "devicesList": {
+    "title": "Geräte",
+    "deviceCount": {
+      "one": "1 Gerät",
+      "other": "{{count}} Geräte"
+    },
+    "searchPlaceholder": "Geräte suchen",
+    "allRooms": "Alle Räume",
+    "noRoom": "Kein Raum",
+    "allIntegrations": "Alle Integrationen",
+    "device": "Gerät",
+    "room": "Raum",
+    "integration": "Integration",
+    "features": "Funktionen",
+    "openInIntegration": "In der Integration öffnen",
+    "emptyState": "Keine Geräte gefunden. Füge Geräte über die Integrationsseite hinzu oder passe deine Suche und Filter an.",
+    "emptyStateButton": "Integrationen durchsuchen",
+    "error": "Beim Laden der Geräte ist ein Fehler aufgetreten. Bitte versuche es später erneut."
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Willkommen",
@@ -224,7 +243,12 @@
       "houseNameLabel": "Name",
       "houseNamePlaceHolder": "Gib den Namen deines Zuhauses ein",
       "houseNameError": "Name deines Zuhauses ist erforderlich",
-      "houseLocationLabel": "Wähle dein Zuhause auf der Karte aus",
+      "houseLocationLabel": "Suche deine Adresse oder wähle dein Zuhause auf der Karte aus",
+      "addressSearchPlaceholder": "Gib deine Wohnadresse ein",
+      "addressSearchButton": "Suchen",
+      "addressSearchPrivacyNotice": "Die Adresssuche verwendet OpenStreetMap (Nominatim): Die eingegebene Adresse wird an diesen Drittanbieter gesendet.",
+      "addressSearchNoResults": "Keine Ergebnisse gefunden, versuche es mit Stadt oder Land.",
+      "addressSearchError": "Die Adresse konnte nicht gesucht werden, überprüfe deine Internetverbindung.",
       "roomsLabel": "Füge alle Räume deines Zuhauses hinzu",
       "roomNamePlaceHolder": "Gib einen neuen Raum ein, um ihn hinzuzufügen",
       "addRoomButton": "Hinzufügen",
@@ -409,8 +433,10 @@
         "addButton": "+",
         "substractButton": "-",
         "motionDetected": "Bewegung erkannt",
+        "noMotionDetected": "Keine Bewegung",
         "doorbellRinging": "Klingelt",
         "pushButton": "Schieben",
+        "cameraPresetPlaceholder": "Preset aufrufen...",
         "vacuumDock": "Zurück zur Ladestation"
       },
       "devices": {
@@ -450,6 +476,9 @@
         "tooManyRequests": "Du hast dein monatliches Videobandbreitenlimit erreicht. Kontaktiere uns per E-Mail oder im Forum, um mehr Bandbreite zu erhalten!",
         "liveAutoStartLabel": "Starte den Livestream automatisch",
         "liveAutoStartDescription": "Warnung: Dies kann die Belastung deines Gerätes sowie Netzwerks erhöhen.",
+        "presetPlaceholder": "Presets...",
+        "ptzControlsLabel": "Kamerasteuerung anzeigen (PTZ)",
+        "ptzControlsDescription": "Wenn das Kameragerät Bewegungs- oder Preset-Funktionen hat, werden ein Steuerkreuz und eine Preset-Auswahl in der Live-Ansicht angezeigt (obere rechte Ecke, nur während des Streamings).",
         "latency": {
           "ultraLow": "Sehr niedrig",
           "low": "Niedrig",
@@ -688,7 +717,8 @@
       "local": "Lokal",
       "external": "Community",
       "native": "Nativ",
-      "deprecated": "Bald veraltet"
+      "deprecated": "Bald veraltet",
+      "new": "Neu"
     },
     "root": {
       "title": "Integrationen",
@@ -698,7 +728,7 @@
       "noIntegrations": "Keine Integrationen gefunden",
       "allIntegrationsUpToDate": "Alle Ihre Integrationen sind auf dem neuesten Stand.",
       "noSearchResults": "Keine Integration für „{{searchKeyword}}“ gefunden.",
-      "noSearchResultsSuggestion": "Versuche <a href=\"/dashboard/integration/device/matter\">Matter</a> für Matter/Thread-kompatible Geräte oder <a href=\"/dashboard/integration/device/matterbridge\">Matterbridge</a>, um Somfy-, Shelly-, Daikin- und viele weitere Geräte anzubinden.",
+      "noSearchResultsSuggestion": "Dein Gerät wird vielleicht von einer externen <a href=\"https://gladysassistant.com/docs/integrations/external/\" target=\"_blank\" rel=\"noopener noreferrer\">Community-Integration</a> unterstützt – dem empfohlenen Weg, neue Kompatibilitäten hinzuzufügen. Und wenn es sie noch nicht gibt, kannst du ganz einfach <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">deine eigene erstellen</a>!",
       "refreshStore": {
         "hint": "Fehlt eine Integration in der Liste?",
         "button": "Katalog aktualisieren",
@@ -712,17 +742,23 @@
         "title": "Dein Gerät ist nicht in der Liste?",
         "description": "Viele Geräte können über <a href=\"/dashboard/integration/device/matter\">Matter</a> (Universalprotokoll) verbunden werden. Dein Gerät kann auch von einer externen <b>Community-Integration</b> unterstützt werden: Jeder kann eine erstellen und im Store veröffentlichen, sie erscheint dann in dieser Liste. Siehe die <a href=\"https://gladysassistant.com/docs/dev/external-integrations/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation zu externen Integrationen</a>."
       },
+      "orderDirNewest": "Neueste zuerst",
       "menu": {
         "all": "Alle Integrationen",
         "favorites": "Favoriten",
         "updates": "Zu aktualisieren",
-        "device": "Geräte",
-        "communication": "Kommunikation",
-        "calendar": "Kalender",
-        "music": "Musik",
-        "health": "Gesundheit",
-        "weather": "Wetter",
-        "navigation": "Navigation"
+        "climate": "Heizung & Klima",
+        "lighting": "Beleuchtung, Steckdosen & Rollläden",
+        "energy": "Energie",
+        "security": "Kameras & Sicherheit",
+        "multimedia": "Multimedia",
+        "appliances": "Haushaltsgeräte & Garten",
+        "environment": "Wetter & Umwelt",
+        "protocols": "Protokolle & Gateways",
+        "network": "Netzwerk & Anwesenheit",
+        "notifications": "Nachrichten & Benachrichtigungen",
+        "assistants": "Sprachassistenten & KI",
+        "services": "Dienste"
       }
     },
     "externalIntegration": {
@@ -920,6 +956,8 @@
         "installButton": "Installieren",
         "networkDiscoveryTitle": "Anfragen zur Netzwerkerkennung",
         "networkDiscoveryText": "Diese Integration bittet Gladys, die folgenden Netzwerkankündigungen für sie zu erfassen. Sie kann niemals etwas anderes erfassen.",
+        "networkWakeTitle": "Wake-on-LAN-Zugriff",
+        "networkWakeText": "Diese Integration bittet um die Berechtigung, Wake-on-LAN-Magic-Pakete über Gladys im lokalen Netzwerk zu senden.",
         "locationText": "Diese Integration fordert Zugriff auf die Koordinaten (Breiten-/Längengrad) der in Gladys konfigurierten Häuser an.",
         "documentationLink": "Dokumentation",
         "duplicateWarningTitle": "Eine andere Instanz ist bereits installiert",
@@ -1694,6 +1732,7 @@
       "exposureModeAll": "Alle kompatiblen Geräte bereitstellen",
       "exposureModeSelection": "Nur die ausgewählten Geräte bereitstellen",
       "noCompatibleDevice": "Noch kein Gerät Ihres Gladys kann in HomeKit bereitgestellt werden.",
+      "alarmLabel": "Alarm",
       "saveExposureButton": "Bereitgestellte Geräte speichern",
       "saveExposureSuccess": "Bereitgestellte Geräte gespeichert. Die HomeKit-Bridge startet automatisch neu, Ihre Kopplung bleibt erhalten.",
       "saveExposureError": "Beim Speichern der bereitgestellten Geräte ist ein Fehler aufgetreten.",
@@ -2144,7 +2183,8 @@
           "external_id": "Dieses Feld ist erforderlich und muss eindeutig sein",
           "unit": "Die gewählte Einheit ist für diese Funktion ungültig",
           "room_id": "Der gewählte Raum ist ungültig",
-          "supported_options": "Die Auswahl benötigt mindestens eine Option, jeweils mit Beschriftung und eindeutigem Wert"
+          "supported_options": "Jedes Preset braucht einen Namen und einen eindeutigen ganzzahligen Wert (0 oder mehr)",
+          "select_supported_options": "Die Auswahl benötigt mindestens eine Option, jeweils mit Beschriftung und eindeutigem Wert"
         },
         "saveConflictError": "Konflikt: Sind alle externen IDs wirklich eindeutig?",
         "mostRecentValueAt": "Zuletzt empfangener Wert {{mostRecentValueAt}}.",
@@ -2161,6 +2201,9 @@
         "closeButton": "Katalog schließen",
         "previewLabel": "Dashboard-Vorschau",
         "cameraPreviewNotice": "Diese Funktion wird im Kamera-Dashboard-Widget angezeigt, nicht in der Geräteliste.",
+        "cameraPtzPreviewNotice": "Die Kamerasteuerung wird auch im Kamera-Widget des Dashboards über dem Kamerabild angezeigt.",
+        "cameraPresetExample1": "Eingang",
+        "cameraPresetExample2": "Garten",
         "previewValues": {
           "cube": {
             "mode": "Rotation (Xiaomi Cube Geste)"
@@ -2280,6 +2323,18 @@
           "addOption": "Auswahl hinzufügen"
         },
         "addButton": "Funktion hinzufügen",
+        "cameraMove": {
+          "supportedMovementsLabel": "Unterstützte Bewegungen",
+          "supportedMovementsDescription": "Deaktiviere die Bewegungen, die deine Kamera nicht unterstützt: das Dashboard zeigt nur die unterstützten Tasten an."
+        },
+        "cameraPreset": {
+          "presetsLabel": "Presets",
+          "presetsDescription": "Jedes Preset hat einen in Gladys angezeigten Namen und einen numerischen Wert, der beim Aufrufen an die Kamera gesendet wird.",
+          "labelPlaceholder": "Name (z. B. Eingang)",
+          "valuePlaceholder": "Wert",
+          "removePresetLabel": "Dieses Preset entfernen",
+          "addPresetLabel": "Preset hinzufügen"
+        },
         "mqttTopicToPublishExampleLabel": "MQTT-Veröffentlichungsthema",
         "mqttTopicToPublishExampleDescription": "Gladys hört auf dieses Topic. Wenn du einen Wert in diesem Thema veröffentlichst, wird er diesem Gerät zugeordnet. (siehe <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">Dokumentation</a>)",
         "mqttTopicToListenExampleLabel": "MQTT-Hörensthema",
@@ -2817,11 +2872,12 @@
       "firstExplanation": "Gladys kann künstliche Intelligenz (Open-Weight-KI-Modelle über Gladys Plus) nutzen, um dir bei der Kommunikation mit deinem vernetzten Zuhause zu helfen.",
       "examplesIntro": "Das kannst du mit der KI machen:",
       "examplesChatTitle": "Im Gladys-Chat",
-      "examplesChatHint": "Verfügbare Aktionen: Licht und Steckdosen pro Raum, Kameras, Szenen, Temperatur und Luftfeuchtigkeit.",
+      "examplesChatHint": "Verfügbare Aktionen: Licht und Steckdosen pro Raum, Kameras, Szenen, Temperatur, Luftfeuchtigkeit und Wetter.",
       "exampleChat1": "„Schalte das Licht im Wohnzimmer ein.“",
       "exampleChat2": "„Zeige mir die Garagenkamera.“",
       "exampleChat3": "„Starte die Szene ‚Gute Nacht‘.“",
       "exampleChat4": "„Wie warm ist es im Schlafzimmer?“",
+      "exampleChat5": "„Wie wird das Wetter morgen?“",
       "examplesSceneTitle": "In deinen Szenen (proaktive KI)",
       "examplesSceneIntro": "Die Aktion „KI fragen“ kann in regelmäßigen Abständen laufen, um dein Zuhause zu überwachen und automatisch zu reagieren.",
       "exampleScene1": "Alle 30 Minuten: analysiere die Eingangskamera und prüfe, ob das Auto vor dem Haus zu meinem Kennzeichen passt.",
@@ -3043,20 +3099,24 @@
         "hours": "Stunden",
         "valueTypeSimple": "Einfach",
         "valueTypeComputed": "Berechnet",
-        "computedExplanationText": "Stattdessen können Sie hier eine Berechnung basierend auf einer Szenario-Variable eingeben. Um eine Variable in den Text einzufügen, drücken Sie '{{'. Um einen Variablenwert festzulegen, müssen Sie das Feld 'Gerätewert abrufen' verwenden."
+        "computedExplanationText": "Stattdessen können Sie hier eine Berechnung basierend auf einer Szenario-Variable eingeben. Um eine Variable in den Text einzufügen, drücken Sie '{{'. Um einen Variablenwert festzulegen, müssen Sie das Feld 'Eine Variable definieren' oder 'Gerätewert abrufen' verwenden."
       },
       "messageSend": {
         "userLabel": "Benutzer",
+        "serviceLabel": "Senden über",
+        "allServicesLabel": "Alle konfigurierten Dienste",
+        "serviceExplanation": "Wähle den Nachrichtendienst, der diese Nachricht sendet. Standardmäßig wird die Nachricht an alle vom Benutzer konfigurierten Dienste gesendet.",
+        "serviceUnavailable": "nicht verfügbar",
         "textLabel": "Nachricht",
         "textPlaceholder": "Nachrichtentext",
-        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
       },
       "messageCameraSend": {
         "userLabel": "Benutzer",
         "cameraLabel": "Kamera",
         "textLabel": "Nachricht",
         "textPlaceholder": "Nachrichtentext",
-        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
       },
       "askAi": {
         "description": "Diese Aktion sendet eine Nachricht an die KI über Gladys Plus und antwortet Ihnen mit einer Nachricht. Wenn Sie ein Kamerabild anhängen, kann die KI sehen, was auf dem Bild ist, und sogar entsprechend handeln.",
@@ -3068,7 +3128,7 @@
       },
       "smsSend": {
         "textLabel": "Nachricht",
-        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden.",
+        "explanationText": "Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
       },
       "turnOnLights": {
@@ -3109,6 +3169,17 @@
         "description": "Dies wird den letzten Wert des ausgewählten Geräts abrufen, damit du ihn später in der Szene verwenden kannst.",
         "deviceLabel": "Gerät auswählen"
       },
+      "setVariable": {
+        "description": "Mit dieser Aktion kannst du eine Variable definieren, die du in den nächsten Aktionen der Szene wiederverwenden kannst.",
+        "nameLabel": "Name der Variable",
+        "namePlaceholder": "Z.B.: Wartezeit",
+        "valueTypeText": "Text",
+        "valueTypeComputed": "Berechnet",
+        "textExplanationText": "Gib hier den Wert der Variable ein. Um eine andere Variable in den Text einzufügen, drücke '{{'.",
+        "textPlaceholder": "Wert der Variable",
+        "computedExplanationText": "Gib hier eine Berechnung ein, ihr Ergebnis wird in der Variable gespeichert. Um eine Variable in die Berechnung einzufügen, drücke '{{'.",
+        "computedPlaceholder": "Z.B.: 2 * 3"
+      },
       "deviceSetValue": {
         "description": "Diese Aktion ermöglicht es, ein Gerät zu steuern.",
         "deviceLabel": "Gerät",
@@ -3118,8 +3189,8 @@
         "useCustomValue": "Eigenen Wert eingeben",
         "useValueList": "Aus der Werteliste auswählen",
         "valueTypeComputed": "Berechnet",
-        "computedExplanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden.",
-        "textExplanationText": "Gib hier den Text ein, der an dein Gerät gesendet werden soll. Um eine Szenenvariable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+        "computedExplanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
+        "textExplanationText": "Gib hier den Text ein, der an dein Gerät gesendet werden soll. Um eine Szenenvariable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
@@ -3131,7 +3202,7 @@
         "useCustomValue": "Eigenen Wert eingeben",
         "useValueList": "Aus der Werteliste auswählen",
         "logicExplanationText": "Die Bedingungen in diesem Block sind mit ODER verknüpft: Der Block ist erfüllt, sobald eine davon zutrifft. Für ein UND fügst du mehrere Blöcke \"Nur fortsetzen, wenn\" hinzu: Dann müssen alle erfüllt sein.",
-        "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Gerätewert abrufen\" verwenden."
+        "explanationText": "Anstelle eines festen Werts kannst du hier eine Berechnung auf Basis einer Szenenvariable eingeben. Um eine Variable in den Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du zuerst das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden."
       },
       "conditionIfThenElse": {
         "conditions": "Bedingungen",
@@ -3145,6 +3216,20 @@
         "shortIf": "W",
         "shortThen": "D",
         "shortElse": "S",
+        "actionCount": {
+          "zero": "Keine Aktionen",
+          "one": "1 Aktion",
+          "other": "{{count}} Aktionen"
+        }
+      },
+      "conditionWhile": {
+        "conditions": "Bedingungen",
+        "conditionDescription": "Solange alle Bedingungen erfüllt sind, werden die Aktionen im \"Wiederholen...\"-Block in einer Schleife ausgeführt. Anders als in anderen Blöcken werden die Bedingungen nacheinander in der angezeigten Reihenfolge ausgewertet und vor jeder Iteration neu ausgewertet. Eine Aktion \"Letzten Zustand abrufen\" vor einer Bedingung aktualisiert deren Wert somit bei jedem Durchlauf.",
+        "noCondition": "Es wurde noch keine Bedingung hinzugefügt. Klicken Sie auf die '+'-Schaltfläche, um diesem Block eine Bedingung hinzuzufügen. Ohne Bedingung wird die Schleife nicht ausgeführt.",
+        "addCondition": "Bedingung hinzufügen",
+        "repeat": "Wiederholen...",
+        "maxIterationsLabel": "Maximale Anzahl an Iterationen (Sicherheitslimit)",
+        "maxIterationsDescription": "Wenn dieses Limit erreicht ist, wird nur die Schleife beendet: die folgenden Aktionen der Szene werden trotzdem ausgeführt.",
         "actionCount": {
           "zero": "Keine Aktionen",
           "one": "1 Aktion",
@@ -3189,7 +3274,7 @@
         "headersValuePlaceholder": "Value",
         "responseData": "Response",
         "tryButton": "Try request",
-        "variablesExplanation": "Um eine Variable einzufügen, die in einer \"Gerätewert abrufen\"-Aktion definierte wurde, gib \"{{\" ein. Diese Variable wird nur während der Ausführung der Szene injiziert, nicht beim Klicken auf \"Anfrage versuchen\".",
+        "variablesExplanation": "Um eine Variable einzufügen, die in einer \"Eine Variable definieren\"- oder \"Gerätewert abrufen\"-Aktion definiert wurde, gib \"{{\" ein. Diese Variable wird nur während der Ausführung der Szene injiziert, nicht beim Klicken auf \"Anfrage versuchen\".",
         "requestError": "Beim Erstellen der Anfrage ist ein Fehler aufgetreten. Bist du sicher, dass die Parameter richtig sind?"
       },
       "scene": {
@@ -3208,6 +3293,19 @@
         "namePlaceholder": "Gib einen Namen ein",
         "whenFoundLabel": "Wenn ein Ereignis gefunden wird",
         "whenNotFoundLabel": "Wenn kein Ereignis gefunden wird",
+        "stopScene": "Szene stoppen",
+        "continueScene": "Szene fortsetzen"
+      },
+      "calendarGetEvents": {
+        "description": "Diese Aktion ruft die Liste der Ereignisse ab, die im ausgewählten Zeitraum beginnen (ein Ereignis, das vor dem Beginn des Zeitraums begonnen hat, wird nicht zurückgegeben), und stellt sie als Variablen (ein fertiger Satz, die Anzahl der Ereignisse und die Liste der Ereignisse) für die nächsten Aktionen der Szene bereit. Es werden nur freigegebene Kalender angezeigt.",
+        "calendarLabel": "Suche in den folgenden freigegebenen Kalendern",
+        "timeRangeLabel": "Ereignisse abrufen",
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "nextXHours": "In den nächsten X Stunden",
+        "durationLabel": "Anzahl der Stunden",
+        "durationPlaceholder": "Anzahl der Stunden",
+        "whenNoEventsLabel": "Wenn kein Ereignis gefunden wird",
         "stopScene": "Szene stoppen",
         "continueScene": "Szene fortsetzen"
       },
@@ -3248,7 +3346,7 @@
         "topic": "Topic",
         "topicPlaceholder": "gladys/mein-topic",
         "messageLabel": "Message",
-        "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das das Feld \"Gerätewert abrufen\" verwenden.",
+        "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
       },
       "zigbee2mqttMessage": {
@@ -3256,7 +3354,7 @@
         "topicPlaceholder": "zigbee2mqtt/mein-geraet/set",
         "topicExplanation": "Das Topic wird unverändert veröffentlicht: Du musst das vollständige MQTT-Topic angeben, einschließlich des Präfixes \"zigbee2mqtt/\" (zum Beispiel \"zigbee2mqtt/mein-geraet/set\").",
         "messageLabel": "Message",
-        "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das das Feld \"Gerätewert abrufen\" verwenden.",
+        "variablesExplanation": "Um eine Variable im Text einzufügen, gib \"{{\" ein. Um einen Variablenwert festzulegen, musst du vor diesem Feld das Feld \"Eine Variable definieren\" oder \"Gerätewert abrufen\" verwenden.",
         "messagePlaceholder": "Meine Message"
       },
       "playNotification": {
@@ -3269,7 +3367,8 @@
     },
     "actions": {
       "calendar": {
-        "is-event-running": "Bedingung für Kalenderereignisse"
+        "is-event-running": "Bedingung für Kalenderereignisse",
+        "get-events": "Kalenderereignisse abrufen"
       },
       "device": {
         "get-value": "Gerätewert abrufen",
@@ -3304,7 +3403,8 @@
       "condition": {
         "only-continue-if": "Nur fortsetzen, wenn",
         "check-time": "Zeitbedingung",
-        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\""
+        "if-then-else": "Bedingung: \"Wenn...dann...sonst...\"",
+        "while": "Schleife: \"Solange... wiederholen...\""
       },
       "user": {
         "set-seen-at-home": "Benutzer zu Hause gesehen",
@@ -3339,6 +3439,9 @@
       },
       "ai": {
         "ask": "Frage die KI"
+      },
+      "variable": {
+        "set": "Eine Variable definieren"
       }
     },
     "variables": {
@@ -3354,8 +3457,18 @@
         "eventStart": "Startdatum",
         "eventEnd": "Enddatum"
       },
+      "calendarEvents": {
+        "text": "Satz mit der Zusammenfassung der Ereignisse",
+        "count": "Anzahl der Ereignisse",
+        "events": "Liste der Ereignisse"
+      },
       "askAi": {
         "answer": "AI Antwort"
+      },
+      "variable": {
+        "set": {
+          "value": "Variable"
+        }
       }
     },
     "triggers": {
@@ -3417,7 +3530,8 @@
         "deviceSeen": "Wenn das Gerät erkannt wird",
         "doorbellRang": "Wenn die Türklingel klingelt",
         "onlyExecuteAtThreshold": "Nur ausführen, wenn der Schwellenwert überschritten wird (und nicht bei jedem vom Gerät gesendeten Wert)",
-        "activateOrDeactivateForDuration": "Szene ausführen, nachdem die Bedingung für die Dauer gültig war:"
+        "activateOrDeactivateForDuration": "Szene ausführen, nachdem die Bedingung für die Dauer gültig war:",
+        "multipleFeaturesNote": "Sie können mehrere Funktionen desselben Typs auswählen: die Szene startet, sobald eine davon die Bedingung erfüllt."
       },
       "scheduledTrigger": {
         "typeLabel": "Typ",
@@ -3762,6 +3876,8 @@
       "energy-monitoring-cost-calculation-beginning": "Energiekostenberechnung (von Anfang an)",
       "energy-monitoring-consumption-from-index-thirty-minutes": "Energieverbrauchsberechnung aus Index (30 Minuten)",
       "energy-monitoring-consumption-from-index-beginning": "Energieverbrauchsberechnung aus Index (von Anfang an)",
+      "energy-monitoring-production-from-index-thirty-minutes": "Energieerzeugungsberechnung aus Index (30 Minuten)",
+      "energy-monitoring-production-from-index-beginning": "Energieerzeugungsberechnung aus Index (von Anfang an)",
       "service-enedis-sync": "Enedis-Datensynchronisation",
       "ai-weekly-digest": "KI-Wochenzusammenfassung"
     },
@@ -4352,6 +4468,17 @@
   },
   "deviceFeatureAction": {
     "category": {
+      "camera": {
+        "move": {
+          "stop": "Stopp",
+          "pan-left": "Links",
+          "pan-right": "Rechts",
+          "tilt-up": "Hoch",
+          "tilt-down": "Runter",
+          "zoom-in": "Vergrößern",
+          "zoom-out": "Verkleinern"
+        }
+      },
       "shutter": {
         "stateLiveFinished": {
           "zero": "Stoppen",
@@ -5068,7 +5195,12 @@
     },
     "camera": {
       "shortCategoryName": "Kamera",
-      "image": "Kamera"
+      "image": "Kamera",
+      "move": "Kamerabewegung (PTZ)",
+      "preset": "Kamera-Preset",
+      "pan-position": "Kamera-Schwenkposition",
+      "tilt-position": "Kamera-Neigeposition",
+      "zoom-position": "Kamera-Zoomposition"
     },
     "charging-station": {
       "shortCategoryName": "Ladestation",
@@ -5420,6 +5552,10 @@
     "hepa-filter-monitoring": {
       "shortCategoryName": "HEPA-Filterüberwachung",
       "filter-life-remaining": "Verbleibende Filterlebensdauer"
+    },
+    "maintenance": {
+      "shortCategoryName": "Wartung",
+      "life-remaining": "Verbleibende Lebensdauer der Komponente"
     },
     "duration": {
       "shortCategoryName": "Dauer",
