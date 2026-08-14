@@ -31,3 +31,14 @@
   margin-top: 20px;
   margin-bottom: 20px;
 }
+
+.featureIcons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.featureIcon {
+  font-size: 1rem;
+  color: #9aa0ac;
+}

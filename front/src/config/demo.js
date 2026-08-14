@@ -1011,6 +1011,17 @@ const data = {
           read_only: false,
           last_value: 1,
           last_value_changed: '2023-01-23 08:50:06.556 +00:00'
+        },
+        {
+          name: 'Brightness',
+          selector: 'main-lamp-brightness',
+          category: 'light',
+          type: 'brightness',
+          min: 0,
+          max: 100,
+          read_only: false,
+          last_value: 80,
+          last_value_changed: '2023-01-23 08:50:06.556 +00:00'
         }
       ]
     },
@@ -1035,6 +1046,29 @@ const data = {
           read_only: true,
           last_value: 21,
           unit: 'celsius',
+          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+        },
+        {
+          name: 'Humidity',
+          selector: 'unassigned-humidity-sensor',
+          category: 'humidity-sensor',
+          type: 'decimal',
+          min: 0,
+          max: 100,
+          read_only: true,
+          last_value: 45,
+          unit: 'percent',
+          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+        },
+        {
+          name: 'Battery',
+          selector: 'unassigned-battery',
+          category: 'battery',
+          type: 'integer',
+          min: 0,
+          max: 100,
+          read_only: true,
+          last_value: 92,
           last_value_changed: '2019-02-12 07:49:07.556 +00:00'
         }
       ]

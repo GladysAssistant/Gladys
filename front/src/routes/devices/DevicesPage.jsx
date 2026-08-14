@@ -77,6 +77,7 @@ const DevicesPage = ({ children, ...props }) => (
                     <table class="table table-hover table-outline table-vcenter card-table">
                       <thead>
                         <tr>
+                          <th class="w-1" />
                           <th>
                             <Text id="devicesList.device" />
                           </th>
@@ -86,7 +87,7 @@ const DevicesPage = ({ children, ...props }) => (
                           <th>
                             <Text id="devicesList.integration" />
                           </th>
-                          <th class="text-center">
+                          <th>
                             <Text id="devicesList.features" />
                           </th>
                           <th class="text-right" />
