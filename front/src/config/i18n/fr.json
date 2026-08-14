@@ -3100,6 +3100,17 @@
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
         "deviceLabel": "Sélectionnez un appareil"
       },
+      "setVariable": {
+        "description": "Cette action vous permet de définir une variable, que vous pourrez ensuite réutiliser dans les actions suivantes de la scène.",
+        "nameLabel": "Nom de la variable",
+        "namePlaceholder": "Ex : temps d'attente",
+        "valueTypeText": "Texte",
+        "valueTypeComputed": "Calculée",
+        "textExplanationText": "Entrez ici la valeur de la variable. Pour injecter une autre variable dans le texte, tapez '{{'.",
+        "textPlaceholder": "Valeur de la variable",
+        "computedExplanationText": "Entrez ici un calcul, son résultat sera stocké dans la variable. Pour injecter une variable dans le calcul, tapez '{{'.",
+        "computedPlaceholder": "Ex : 2 * 3"
+      },
       "deviceSetValue": {
         "description": "Cette action vous permet de contrôler un appareil.",
         "deviceLabel": "Appareil",
@@ -3329,6 +3340,9 @@
       },
       "ai": {
         "ask": "Demander à l'IA"
+      },
+      "variable": {
+        "set": "Définir une variable"
       }
     },
     "variables": {
@@ -3346,6 +3360,11 @@
       },
       "askAi": {
         "answer": "Réponse de l'IA"
+      },
+      "variable": {
+        "set": {
+          "value": "Variable"
+        }
       }
     },
     "triggers": {

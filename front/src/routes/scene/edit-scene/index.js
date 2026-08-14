@@ -21,6 +21,7 @@ const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MQTT.SEND]: ['message'],
   [ACTIONS.ZIGBEE2MQTT.SEND]: ['message'],
   [ACTIONS.DEVICE.SET_VALUE]: ['evaluate_value'],
+  [ACTIONS.VARIABLE.SET]: ['text', 'evaluate_value'],
   [ACTIONS.HTTP.REQUEST]: ['body'],
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable']
 };

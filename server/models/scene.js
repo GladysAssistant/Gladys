@@ -18,6 +18,7 @@ const actionSchema = Joi.object()
     scene: Joi.string(),
     camera: Joi.string(),
     text: Joi.string(),
+    name: Joi.string(),
     value: Joi.number(),
     evaluate_value: Joi.string(),
     minutes: Joi.number(),

@@ -1,8 +1,26 @@
 const { expect } = require('chai');
 
-const { flattenSceneActions, assertTriggerTypesNotInActions } = require('../../../../services/mcp/lib/sceneSchemas');
+const {
+  flattenSceneActions,
+  assertTriggerTypesNotInActions,
+  createSceneCreateInputSchema,
+} = require('../../../../services/mcp/lib/sceneSchemas');
 
 describe('sceneSchemas helpers', () => {
+  it('should accept a variable.set action', () => {
+    const schema = createSceneCreateInputSchema();
+    const result = schema.safeParse({
+      name: 'My scene',
+      icon: 'lightbulb',
+      triggers: [{ type: 'system.start' }],
+      actions: [
+        [{ type: 'variable.set', name: 'Waiting time', evaluate_value: '{{0.0.last_value}} * 2' }],
+        [{ type: 'variable.set', text: 'Hello' }],
+      ],
+    });
+    expect(result.success).to.equal(true);
+  });
+
   it('should flatten nested scene actions and ignore invalid entries', () => {
     expect(flattenSceneActions(null)).to.deep.equal([]);
     expect(flattenSceneActions('invalid')).to.deep.equal([]);

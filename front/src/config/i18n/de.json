@@ -3100,6 +3100,17 @@
         "description": "Dies wird den letzten Wert des ausgewählten Geräts abrufen, damit du ihn später in der Szene verwenden kannst.",
         "deviceLabel": "Gerät auswählen"
       },
+      "setVariable": {
+        "description": "Mit dieser Aktion kannst du eine Variable definieren, die du in den nächsten Aktionen der Szene wiederverwenden kannst.",
+        "nameLabel": "Name der Variable",
+        "namePlaceholder": "Z.B.: Wartezeit",
+        "valueTypeText": "Text",
+        "valueTypeComputed": "Berechnet",
+        "textExplanationText": "Gib hier den Wert der Variable ein. Um eine andere Variable in den Text einzufügen, drücke '{{'.",
+        "textPlaceholder": "Wert der Variable",
+        "computedExplanationText": "Gib hier eine Berechnung ein, ihr Ergebnis wird in der Variable gespeichert. Um eine Variable in die Berechnung einzufügen, drücke '{{'.",
+        "computedPlaceholder": "Z.B.: 2 * 3"
+      },
       "deviceSetValue": {
         "description": "Diese Aktion ermöglicht es, ein Gerät zu steuern.",
         "deviceLabel": "Gerät",
@@ -3329,6 +3340,9 @@
       },
       "ai": {
         "ask": "Frage die KI"
+      },
+      "variable": {
+        "set": "Eine Variable definieren"
       }
     },
     "variables": {
@@ -3346,6 +3360,11 @@
       },
       "askAi": {
         "answer": "AI Antwort"
+      },
+      "variable": {
+        "set": {
+          "value": "Variable"
+        }
       }
     },
     "triggers": {

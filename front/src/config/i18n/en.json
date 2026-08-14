@@ -3100,6 +3100,17 @@
         "description": "This will get the last value of the selected device, so you can use it later in the scene.",
         "deviceLabel": "Select a device"
       },
+      "setVariable": {
+        "description": "This action lets you define a variable, which you can then re-use in the next actions of the scene.",
+        "nameLabel": "Variable name",
+        "namePlaceholder": "Ex: waiting time",
+        "valueTypeText": "Text",
+        "valueTypeComputed": "Computed",
+        "textExplanationText": "Enter here the value of the variable. To inject another variable in the text, press '{{'.",
+        "textPlaceholder": "Value of the variable",
+        "computedExplanationText": "Enter here a calculation, its result will be stored in the variable. To inject a variable in the calculation, press '{{'.",
+        "computedPlaceholder": "Ex: 2 * 3"
+      },
       "deviceSetValue": {
         "description": "This action let you control a device.",
         "deviceLabel": "Device",
@@ -3329,6 +3340,9 @@
       },
       "ai": {
         "ask": "Ask AI"
+      },
+      "variable": {
+        "set": "Set a variable"
       }
     },
     "variables": {
@@ -3346,6 +3360,11 @@
       },
       "askAi": {
         "answer": "AI answer"
+      },
+      "variable": {
+        "set": {
+          "value": "Variable"
+        }
       }
     },
     "triggers": {

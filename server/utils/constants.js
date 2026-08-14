@@ -705,6 +705,9 @@ const ACTIONS = {
   SMS: {
     SEND: 'sms.send',
   },
+  VARIABLE: {
+    SET: 'variable.set',
+  },
 };
 
 // List of actions that can be used as conditions

@@ -346,6 +346,36 @@ const actionsFunc = {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
     set(scope, path, cloneDeep(deviceFeature), { merge: true });
   },
+  [ACTIONS.VARIABLE.SET]: async (self, action, scope, path) => {
+    let value;
+
+    // If the value should be calculated from a formula
+    if (action.evaluate_value !== undefined) {
+      try {
+        value = evaluate(
+          Handlebars.compile(action.evaluate_value, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
+      } catch (e) {
+        logger.warn(`Set variable: Error evaluating value: ${action.evaluate_value}`);
+        logger.warn(e);
+        throw new AbortScene('VARIABLE_VALUE_NOT_A_NUMBER');
+      }
+      if (Number.isNaN(Number(value))) {
+        logger.warn(`Set variable: Value is not a number: ${value}`);
+        throw new AbortScene('VARIABLE_VALUE_NOT_A_NUMBER');
+      }
+      value = Number(value);
+    } else {
+      // Otherwise, the text is a simple template which can contain other variables
+      value = Handlebars.compile(action.text || '', {
+        noEscape: true,
+      })(scope);
+    }
+
+    set(scope, path, { value }, { merge: true });
+  },
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
     let oneConditionVerified = false;
     action.conditions.forEach((condition) => {
