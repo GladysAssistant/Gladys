@@ -1594,6 +1594,7 @@
       "exposureModeAll": "Expose all compatible devices",
       "exposureModeSelection": "Only expose the selected devices",
       "noCompatibleDevice": "No device of your Gladys can be exposed to HomeKit yet.",
+      "alarmLabel": "Alarm",
       "saveExposureButton": "Save the exposed devices",
       "saveExposureSuccess": "Exposed devices saved successfully. The HomeKit bridge restarts automatically, your pairing is kept.",
       "saveExposureError": "An error occurred while saving the exposed devices.",
