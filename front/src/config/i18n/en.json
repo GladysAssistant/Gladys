@@ -87,6 +87,25 @@
       "closeButton": "Close"
     }
   },
+  "devicesList": {
+    "title": "Devices",
+    "deviceCount": {
+      "one": "1 device",
+      "other": "{{count}} devices"
+    },
+    "searchPlaceholder": "Search devices",
+    "allRooms": "All rooms",
+    "noRoom": "No room",
+    "allIntegrations": "All integrations",
+    "device": "Device",
+    "room": "Room",
+    "integration": "Integration",
+    "features": "Features",
+    "openInIntegration": "Open in integration",
+    "emptyState": "No device found. Add devices from the integrations page, or adjust your search and filters.",
+    "emptyStateButton": "Browse integrations",
+    "error": "There was an error loading the devices. Please try again later."
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Welcome",

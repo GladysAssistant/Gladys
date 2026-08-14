@@ -87,6 +87,25 @@
       "closeButton": "Fermer"
     }
   },
+  "devicesList": {
+    "title": "Appareils",
+    "deviceCount": {
+      "one": "1 appareil",
+      "other": "{{count}} appareils"
+    },
+    "searchPlaceholder": "Rechercher des appareils",
+    "allRooms": "Toutes les pièces",
+    "noRoom": "Aucune pièce",
+    "allIntegrations": "Toutes les intégrations",
+    "device": "Appareil",
+    "room": "Pièce",
+    "integration": "Intégration",
+    "features": "Fonctionnalités",
+    "openInIntegration": "Ouvrir dans l'intégration",
+    "emptyState": "Aucun appareil trouvé. Ajoutez des appareils depuis la page des intégrations, ou modifiez votre recherche et vos filtres.",
+    "emptyStateButton": "Parcourir les intégrations",
+    "error": "Une erreur est survenue lors du chargement des appareils. Veuillez réessayer plus tard."
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Bienvenue",
