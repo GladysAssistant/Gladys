@@ -485,6 +485,87 @@ describe('scene.executeActions', () => {
       'The meal is ready!',
     );
   });
+  it('should execute action device.setValue with a string option value on a select feature', async () => {
+    stateManager.setState('deviceFeature', 'my-select-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-select-feature',
+            value: 'com.disney.disneyplus-prod',
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [],
+      },
+      {
+        device_id: 'device-id',
+        category: DEVICE_FEATURE_CATEGORIES.TEXT,
+        type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+      },
+      'com.disney.disneyplus-prod',
+    );
+  });
+  it('should not apply math evaluation to a numeric-looking value on a select feature', async () => {
+    stateManager.setState('deviceFeature', 'my-select-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-select-feature',
+            value: 5,
+          },
+        ],
+      ],
+      {},
+    );
+    // A select value is delivered as its string form, never as a number
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [],
+      },
+      {
+        device_id: 'device-id',
+        category: DEVICE_FEATURE_CATEGORIES.TEXT,
+        type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+      },
+      '5',
+    );
+  });
   it('should execute action device.setValue with text and variables on a text feature', async () => {
     stateManager.setState('deviceFeature', 'my-text-feature', {
       device_id: 'device-id',

@@ -19,9 +19,28 @@ module.exports = (sequelize, DataTypes) => {
       },
       value: {
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         validate: {
-          isInt: true,
+          isNotEmpty(value) {
+            if (value === null || value === undefined || `${value}`.trim().length === 0) {
+              throw new Error('Validation isNotEmpty on value failed');
+            }
+          },
+        },
+        // The column stores every value as a string; integer values (the historical
+        // format, still used by enum-like features) are restored as numbers so option
+        // values keep matching the numeric feature states they refer to.
+        get() {
+          const rawValue = this.getDataValue('value');
+          if (typeof rawValue === 'string' && /^-?\d+$/.test(rawValue)) {
+            const parsedValue = parseInt(rawValue, 10);
+            // Only round-trippable integers are restored ('0123' or an id larger than
+            // Number.MAX_SAFE_INTEGER stays a string, unchanged)
+            if (Number.isSafeInteger(parsedValue) && `${parsedValue}` === rawValue) {
+              return parsedValue;
+            }
+          }
+          return rawValue;
         },
       },
       label: {

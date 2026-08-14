@@ -34,6 +34,13 @@ async function newStateEvent(event) {
     ) {
       // If the feature is a text, we save as string
       await this.saveStringState(device, deviceFeature, event.state);
+    } else if (
+      deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT &&
+      deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT
+    ) {
+      // A select state is always its string form, even when the reported option value
+      // looks numeric: select features have no numeric state
+      await this.saveStringState(device, deviceFeature, String(event.state));
     } else if (event.created_at) {
       await this.saveHistoricalState(deviceFeature, event.state, event.created_at);
     } else {

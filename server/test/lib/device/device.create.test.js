@@ -838,6 +838,85 @@ describe('Device', () => {
     ).get({ plain: true });
     expect(storedDevice.features[0].supported_options).to.have.lengthOf(2);
   });
+  it('should create and sync string-valued supported_options on a select feature', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job, brain);
+    const created = await device.create({
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      name: 'TV device',
+      external_id: 'tv-app-select',
+      features: [
+        {
+          name: 'Current app',
+          external_id: 'tv:app',
+          category: 'text',
+          type: 'select',
+          read_only: false,
+          keep_history: false,
+          has_feedback: false,
+          min: 0,
+          max: 0,
+          supported_options: [
+            { value: 'netflix', label: 'Netflix', sort_order: 0 },
+            { value: 'com.disney.disneyplus-prod', label: 'Disney+', sort_order: 1 },
+          ],
+        },
+      ],
+      params: [],
+    });
+
+    expect(created.features).to.have.lengthOf(1);
+    expect(created.features[0].supported_options).to.have.lengthOf(2);
+    expect(created.features[0].supported_options[0]).to.include({
+      value: 'netflix',
+      label: 'Netflix',
+      sort_order: 0,
+    });
+    expect(created.features[0].supported_options[1]).to.include({
+      value: 'com.disney.disneyplus-prod',
+      label: 'Disney+',
+      sort_order: 1,
+    });
+
+    // The TV now reports a different app list: matched values update, gone values leave
+    const updated = await device.create({
+      id: created.id,
+      service_id: created.service_id,
+      name: created.name,
+      external_id: created.external_id,
+      features: [
+        {
+          ...created.features[0],
+          supported_options: [
+            { value: 'netflix', label: 'Netflix 4K', sort_order: 0 },
+            { value: 'youtube.leanback.v4', label: 'YouTube', sort_order: 1 },
+          ],
+        },
+      ],
+      params: [],
+    });
+
+    expect(updated.features[0].supported_options).to.have.lengthOf(2);
+    expect(updated.features[0].supported_options[0]).to.include({
+      value: 'netflix',
+      label: 'Netflix 4K',
+    });
+    expect(updated.features[0].supported_options[1]).to.include({
+      value: 'youtube.leanback.v4',
+      label: 'YouTube',
+    });
+
+    const storedDevice = (
+      await db.Device.findOne({
+        where: { external_id: 'tv-app-select' },
+        include: getStandardDeviceIncludes(),
+      })
+    ).get({ plain: true });
+    expect(storedDevice.features[0].supported_options).to.have.lengthOf(2);
+    const storedValues = storedDevice.features[0].supported_options.map((option) => option.value).sort();
+    expect(storedValues).to.deep.equal(['netflix', 'youtube.leanback.v4']);
+  });
   it('should sync supported_options when feature payload only has id', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);

@@ -493,7 +493,8 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.ORP_SENSOR.DECIMAL]: 'zap'
   },
   [DEVICE_FEATURE_CATEGORIES.TEXT]: {
-    [DEVICE_FEATURE_TYPES.TEXT.TEXT]: 'type'
+    [DEVICE_FEATURE_TYPES.TEXT.TEXT]: 'type',
+    [DEVICE_FEATURE_TYPES.TEXT.SELECT]: 'list'
   },
   [DEVICE_FEATURE_CATEGORIES.SURFACE]: {
     [DEVICE_FEATURE_TYPES.SURFACE.DECIMAL]: 'crop'
@@ -582,7 +583,7 @@ export const DeviceFeatureCategoriesIcon = {
   }
 };
 
-export const DeviceFeatureTypesString = [DEVICE_FEATURE_TYPES.TEXT.TEXT];
+export const DeviceFeatureTypesString = [DEVICE_FEATURE_TYPES.TEXT.TEXT, DEVICE_FEATURE_TYPES.TEXT.SELECT];
 
 // Television and music features come in two flavours: continuous controls, which carry a value the
 // user reads and adjusts, and remote-control orders, which are one-shot commands with no meaningful

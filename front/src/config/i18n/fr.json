@@ -5471,7 +5471,8 @@
     },
     "text": {
       "shortCategoryName": "Texte",
-      "text": "Texte"
+      "text": "Texte",
+      "select": "Sélection"
     },
     "surface": {
       "shortCategoryName": "Surface",

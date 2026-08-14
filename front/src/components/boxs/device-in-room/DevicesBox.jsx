@@ -15,6 +15,16 @@ import debounce from 'debounce';
 const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
   return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
+      // A string value is a string state (text select): it lives in last_value_string,
+      // and writing it to last_value would leave the control stuck on the old choice
+      // until the websocket event comes back
+      if (typeof lastValue === 'string') {
+        return {
+          ...feature,
+          last_value_string: lastValue,
+          last_value_changed: lastValueChange
+        };
+      }
       return {
         ...feature,
         last_value: lastValue,

@@ -5471,7 +5471,8 @@
     },
     "text": {
       "shortCategoryName": "Text",
-      "text": "Text"
+      "text": "Text",
+      "select": "Auswahl"
     },
     "surface": {
       "shortCategoryName": "Fläche",

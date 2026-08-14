@@ -78,7 +78,10 @@ class AdaptiveOptionControl extends Component {
   }
 
   updateFromSelect = e => {
-    this.props.updateValue(Number(e.currentTarget.value));
+    // The DOM select yields strings: the matching option gives the value back with its
+    // real type (number for enum-like features, string for dynamic text selects)
+    const selectedOption = this.props.options.find(option => `${option.value}` === e.currentTarget.value);
+    this.props.updateValue(selectedOption ? selectedOption.value : Number(e.currentTarget.value));
   };
 
   renderLabel(option) {
@@ -103,7 +106,11 @@ class AdaptiveOptionControl extends Component {
               <button
                 type="button"
                 key={option.value}
-                class={cx('btn btn-sm btn-secondary', { active: value === option.value })}
+                class={cx('btn btn-sm btn-secondary', {
+                  // Stringified comparison: a string select state always compares to its
+                  // option as text, and numeric states keep matching their numeric options
+                  active: value !== null && value !== undefined && `${value}` === `${option.value}`
+                })}
                 onClick={() => this.props.updateValue(option.value)}
               >
                 {this.renderLabel(option)}

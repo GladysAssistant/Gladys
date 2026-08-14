@@ -38,12 +38,51 @@ describe('normalizeSupportedOptions', () => {
     ).to.throw(BadParameters, /duplicate values/);
   });
 
+  it('should accept string values for dynamic selects', () => {
+    const options = normalizeSupportedOptions([
+      { value: 'netflix', label: 'Netflix' },
+      { value: 'com.disney.disneyplus-prod', label: 'Disney+' },
+    ]);
+
+    expect(options).to.deep.equal([
+      { value: 'netflix', label: 'Netflix', sort_order: 0 },
+      { value: 'com.disney.disneyplus-prod', label: 'Disney+', sort_order: 1 },
+    ]);
+  });
+
+  it('should canonicalize an integer-looking string value to a number', () => {
+    expect(normalizeSupportedOptions([{ value: '5', label: 'Five' }])).to.deep.equal([
+      { value: 5, label: 'Five', sort_order: 0 },
+    ]);
+  });
+
+  it('should keep a non-round-trippable numeric string as a string', () => {
+    expect(normalizeSupportedOptions([{ value: '0123', label: 'Padded' }])).to.deep.equal([
+      { value: '0123', label: 'Padded', sort_order: 0 },
+    ]);
+  });
+
+  it('should reject an empty string value', () => {
+    expect(() => normalizeSupportedOptions([{ value: '', label: 'On' }])).to.throw(BadParameters);
+    expect(() => normalizeSupportedOptions([{ value: '   ', label: 'On' }])).to.throw(BadParameters);
+  });
+
   it('should reject invalid types', () => {
-    expect(() => normalizeSupportedOptions([{ value: '1', label: 'On' }])).to.throw(BadParameters);
+    expect(() => normalizeSupportedOptions([{ value: true, label: 'On' }])).to.throw(BadParameters);
+    expect(() => normalizeSupportedOptions([{ value: {}, label: 'On' }])).to.throw(BadParameters);
   });
 
   it('should reject decimal values', () => {
     expect(() => normalizeSupportedOptions([{ value: 1.5, label: 'On' }])).to.throw(BadParameters);
+  });
+
+  it('should reject duplicates between an integer and its string form', () => {
+    expect(() =>
+      normalizeSupportedOptions([
+        { value: 1, label: 'On' },
+        { value: '1', label: 'On again' },
+      ]),
+    ).to.throw(BadParameters, /duplicate values/);
   });
 
   it('should accept an empty array', () => {
@@ -88,7 +127,7 @@ describe('normalizeSupportedOptions', () => {
 
   it('should aggregate multiple validation errors', () => {
     try {
-      normalizeSupportedOptions([{ value: 'bad', label: '' }]);
+      normalizeSupportedOptions([{ value: true, label: '' }]);
       expect.fail('should have thrown');
     } catch (error) {
       expect(error).to.be.instanceOf(BadParameters);

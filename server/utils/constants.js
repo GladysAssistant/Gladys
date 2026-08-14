@@ -1144,6 +1144,14 @@ const DEVICE_FEATURE_TYPES = {
   },
   TEXT: {
     TEXT: 'text',
+    // A choice among string values the integration discovers on the appliance itself
+    // (installed TV apps, HDMI sources, vacuum rooms, native scenes...): the choices are
+    // declared per-device through supported_options ({ value, label }) and are NOT part of
+    // the taxonomy. The state is the selected option's value, stored as a string
+    // (last_value_string, no history). Enum-like capabilities standards cover (AC modes,
+    // fan speeds...) keep their own category/type with integer values: this type is only
+    // for lists no generic value set can describe.
+    SELECT: 'select',
   },
   RISK: {
     INTEGER: 'integer',
