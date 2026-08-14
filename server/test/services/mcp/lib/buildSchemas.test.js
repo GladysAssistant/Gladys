@@ -2151,8 +2151,8 @@ describe('build schemas', () => {
     });
     expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
     expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq('AB-123-CD');
-    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
-    expect(mcpHandler.gladys.device.saveStringState.firstCall.args[2]).to.eq('AB-123-CD');
+    // device.setValue persists string states of text features itself
+    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(0);
     expect(textResult.content[0].text).to.eq('sensor.set-state: set License Plate Sensor / Plate to AB-123-CD');
   });
 
@@ -2701,7 +2701,10 @@ describe('build schemas', () => {
       value: 'AB-123-CD',
     });
 
-    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.callCount).to.eq(1);
+    expect(mcpHandler.gladys.device.setValue.firstCall.args[2]).to.eq('AB-123-CD');
+    // device.setValue persists string states of text features itself
+    expect(mcpHandler.gladys.device.saveStringState.callCount).to.eq(0);
   });
 
   it('should expose shutters in home schema and device.set-shutter tool', async () => {

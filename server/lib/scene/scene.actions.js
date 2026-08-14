@@ -86,6 +86,25 @@ const actionsFunc = {
     }
 
     let { value } = action;
+
+    // A text feature (a message displayed on a TV, a text virtual sensor...) receives the
+    // value as a raw string with scene variables injected, and skips the math evaluation
+    // below which would reject any non-numeric text
+    if (
+      deviceFeature.category === DEVICE_FEATURE_CATEGORIES.TEXT &&
+      deviceFeature.type === DEVICE_FEATURE_TYPES.TEXT.TEXT
+    ) {
+      if (action.evaluate_value !== undefined) {
+        value = Handlebars.compile(action.evaluate_value, {
+          noEscape: true,
+        })(scope);
+      }
+      if (value === undefined || value === null || value === '') {
+        throw new AbortScene('ACTION_VALUE_EMPTY');
+      }
+      return self.device.setValue(device, deviceFeature, String(value));
+    }
+
     if (action.evaluate_value !== undefined) {
       value = evaluate(
         Handlebars.compile(action.evaluate_value, {

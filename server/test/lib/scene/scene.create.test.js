@@ -53,6 +53,24 @@ describe('SceneManager', () => {
     });
     expect(scene).to.have.property('selector', 'my-custom-selector');
   });
+  it('should create one scene with a text value in a device.set-value action', async () => {
+    const scene = await sceneManager.create({
+      name: 'Send message to TV',
+      icon: 'bell',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-tv-text-feature',
+            value: 'The meal is ready!',
+          },
+        ],
+      ],
+      tags: [],
+    });
+    expect(scene).to.have.property('selector');
+  });
   it('should return validation error, invalid actions', async () => {
     const promise = sceneManager.create({
       name: 'My living room',

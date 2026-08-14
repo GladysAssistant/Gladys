@@ -18,7 +18,7 @@ const actionSchema = Joi.object()
     scene: Joi.string(),
     camera: Joi.string(),
     text: Joi.string(),
-    value: Joi.number(),
+    value: Joi.alternatives().try(Joi.number(), Joi.string()),
     evaluate_value: Joi.string(),
     minutes: Joi.number(),
     unit: Joi.string(),
