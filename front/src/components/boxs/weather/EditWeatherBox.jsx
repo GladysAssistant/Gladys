@@ -3,7 +3,12 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
 import actions from '../../../actions/dashboard/boxActions';
-import { GetWeatherModes } from '../../../utils/consts';
+import { GetWeatherModes, DEFAULT_ON_WEATHER_MODES } from '../../../utils/consts';
+
+// modes on by default stay checked until explicitly unchecked, so widgets
+// saved before they existed keep their current look
+const isModeChecked = (modes, mode) =>
+  DEFAULT_ON_WEATHER_MODES.includes(mode) ? modes[mode] !== false : Boolean(modes[mode]);
 
 const EditWeatherBox = ({ children, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.weather">
@@ -59,7 +64,7 @@ const EditWeatherBox = ({ children, ...props }) => (
                 type="checkbox"
                 className="form-check-input"
                 name={mode}
-                checked={props.box.modes !== undefined && props.box.modes[mode]}
+                checked={isModeChecked(props.box.modes || {}, mode)}
                 onChange={props.updateBoxModes}
               />
               <label className="form-check-label">
@@ -69,6 +74,11 @@ const EditWeatherBox = ({ children, ...props }) => (
           );
         })}
       </div>
+      {props.noModeSelected && (
+        <div className="alert alert-warning mt-3 mb-0">
+          <Text id="dashboard.boxes.weather.noModeSelected" />
+        </div>
+      )}
     </div>
   </BaseEditBox>
 );
@@ -81,7 +91,9 @@ class EditWeatherBoxComponent extends Component {
   };
 
   updateBoxModes = e => {
-    const modes = this.props.box.modes || {};
+    // clone the modes object: mutating it in place would prevent
+    // componentDidUpdate from detecting the change in the widget
+    const modes = { ...(this.props.box.modes || {}) };
     modes[e.target.name] = e.target.checked;
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       modes
@@ -131,11 +143,14 @@ class EditWeatherBoxComponent extends Component {
   }
 
   render(props, { houses, providers }) {
+    const modes = props.box.modes || {};
+    const noModeSelected = !Object.keys(GetWeatherModes).some(key => isModeChecked(modes, GetWeatherModes[key]));
     return (
       <EditWeatherBox
         {...props}
         houses={houses}
         providers={providers}
+        noModeSelected={noModeSelected}
         updateBoxHouse={this.updateBoxHouse}
         updateBoxModes={this.updateBoxModes}
         updateBoxProvider={this.updateBoxProvider}

@@ -12,11 +12,18 @@ import {
 import { ENERGY_INDEX_FEATURE_TYPES } from '../../../../../../../../server/services/energy-monitoring/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../../utils/consts';
 import { getDeviceParam } from '../../../../../../utils/device';
-import { featureNeedsMinMax, isFeatureFieldErrored } from '../utils';
+import { CAMERA_MOVE_OPTIONS } from '../../../../../../utils/cameraMove';
+import { buildCameraMoveSupportedOptions, featureNeedsMinMax, isFeatureFieldErrored } from '../utils';
 import style from '../style.css';
 
 const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...props }) => {
   const icon = get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`, 'radio');
+  const isCameraMove =
+    feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.MOVE;
+  const isCameraPreset =
+    feature.category === DEVICE_FEATURE_CATEGORIES.CAMERA && feature.type === DEVICE_FEATURE_TYPES.CAMERA.PRESET;
+  const supportedOptions = Array.isArray(feature.supported_options) ? feature.supported_options : [];
+  const supportedMoveValues = new Set(supportedOptions.map(option => option.value));
   const featureLabel = feature.name || <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />;
   const showMinMax = featureNeedsMinMax(feature.category, feature.type);
   const nameErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'name');
@@ -24,7 +31,9 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
   const unitErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'unit');
   const minErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'min');
   const maxErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'max');
-  const hasFieldError = nameErrored || externalIdErrored || unitErrored || minErrored || maxErrored;
+  const supportedOptionsErrored = isFeatureFieldErrored(validationErrors, featureIndex, 'supported_options');
+  const hasFieldError =
+    nameErrored || externalIdErrored || unitErrored || minErrored || maxErrored || supportedOptionsErrored;
   const availableUnits =
     get(DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE, `${feature.category}.${feature.type}`) ||
     DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category];
@@ -197,6 +206,99 @@ const MqttFeatureBox = ({ children, feature, featureIndex, validationErrors, ...
               </div>
             )}
           </div>
+
+          {isCameraMove && (
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="integration.mqtt.feature.cameraMove.supportedMovementsLabel" />
+              </label>
+              <p>
+                <small>
+                  <Text id="integration.mqtt.feature.cameraMove.supportedMovementsDescription" />
+                </small>
+              </p>
+              <div>
+                {CAMERA_MOVE_OPTIONS.map(option => (
+                  <label class="custom-control custom-checkbox custom-control-inline" key={option.value}>
+                    <input
+                      type="checkbox"
+                      class="custom-control-input"
+                      checked={supportedMoveValues.has(option.value)}
+                      // an empty list would fall back to "all movements supported" (spec A.2):
+                      // the last checked movement cannot be removed
+                      disabled={supportedMoveValues.size === 1 && supportedMoveValues.has(option.value)}
+                      onChange={() => props.toggleCameraMoveOption(option.value)}
+                    />
+                    <span class="custom-control-label">
+                      <i class={`fe fe-${option.icon} mr-1`} />
+                      <Text id={`deviceFeatureAction.category.camera.move.${option.i18nKey}`} />
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {isCameraPreset && (
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="integration.mqtt.feature.cameraPreset.presetsLabel" />
+              </label>
+              <p>
+                <small>
+                  <Text id="integration.mqtt.feature.cameraPreset.presetsDescription" />
+                </small>
+              </p>
+              {supportedOptions.map((option, optionIndex) => (
+                <div class="row mb-2" key={optionIndex}>
+                  <div class="col-6">
+                    <Localizer>
+                      <input
+                        type="text"
+                        value={option.label}
+                        onInput={e => props.updatePresetOption(optionIndex, 'label', e.target.value)}
+                        class="form-control"
+                        placeholder={<Text id="integration.mqtt.feature.cameraPreset.labelPlaceholder" />}
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="col-4">
+                    <Localizer>
+                      <input
+                        type="number"
+                        min="0"
+                        value={option.value}
+                        onInput={e => props.updatePresetOption(optionIndex, 'value', e.target.value)}
+                        class="form-control"
+                        placeholder={<Text id="integration.mqtt.feature.cameraPreset.valuePlaceholder" />}
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="col-2">
+                    <Localizer>
+                      <button
+                        type="button"
+                        onClick={() => props.removePresetOption(optionIndex)}
+                        class="btn btn-outline-danger"
+                        aria-label={<Text id="integration.mqtt.feature.cameraPreset.removePresetLabel" />}
+                      >
+                        <i class="fe fe-trash-2" />
+                      </button>
+                    </Localizer>
+                  </div>
+                </div>
+              ))}
+              <button type="button" onClick={props.addPresetOption} class="btn btn-outline-primary btn-sm">
+                <i class="fe fe-plus mr-1" />
+                <Text id="integration.mqtt.feature.cameraPreset.addPresetLabel" />
+              </button>
+              {supportedOptionsErrored && (
+                <div class="invalid-feedback d-block">
+                  <Text id="integration.mqtt.device.validationErrors.supported_options" />
+                </div>
+              )}
+            </div>
+          )}
 
           <div class="form-group">
             <button type="button" onClick={props.toggleAdvancedSettings} class="btn btn-outline-secondary btn-sm">
@@ -407,6 +509,44 @@ class MqttFeatureBoxComponent extends Component {
     e.stopPropagation();
     this.props.updateFeatureProperty(e, 'keep_history', this.props.featureIndex);
   };
+  getSupportedOptions = () => {
+    return Array.isArray(this.props.feature.supported_options) ? this.props.feature.supported_options : [];
+  };
+  toggleCameraMoveOption = value => {
+    const selectedValues = new Set(this.getSupportedOptions().map(option => option.value));
+    if (selectedValues.has(value)) {
+      selectedValues.delete(value);
+    } else {
+      selectedValues.add(value);
+    }
+    const options = buildCameraMoveSupportedOptions(get(this.props, 'intl.dictionary') || {}, [...selectedValues]);
+    this.props.updateFeatureSupportedOptions(this.props.featureIndex, options);
+  };
+  addPresetOption = () => {
+    const options = this.getSupportedOptions();
+    const nextValue = options.reduce((max, option) => Math.max(max, option.value), 0) + 1;
+    this.props.updateFeatureSupportedOptions(this.props.featureIndex, [
+      ...options,
+      { value: nextValue, label: '', sort_order: options.length }
+    ]);
+  };
+  updatePresetOption = (optionIndex, field, rawValue) => {
+    const options = this.getSupportedOptions().map((option, index) => {
+      if (index !== optionIndex) {
+        return option;
+      }
+      // an emptied value field stays empty (flagged by validation) instead of silently becoming 0
+      const value = field === 'value' && rawValue !== '' ? Number(rawValue) : rawValue;
+      return { ...option, [field]: value };
+    });
+    this.props.updateFeatureSupportedOptions(this.props.featureIndex, options);
+  };
+  removePresetOption = optionIndex => {
+    const options = this.getSupportedOptions()
+      .filter((option, index) => index !== optionIndex)
+      .map((option, index) => ({ ...option, sort_order: index }));
+    this.props.updateFeatureSupportedOptions(this.props.featureIndex, options);
+  };
   getCustomMqttTopicParamPrefix = () => {
     return `mqtt_custom_topic_feature:${this.props.feature.id}`;
   };
@@ -484,6 +624,10 @@ class MqttFeatureBoxComponent extends Component {
         updateUnit={this.updateUnit}
         updateReadOnly={this.updateReadOnly}
         updateKeepHistory={this.updateKeepHistory}
+        toggleCameraMoveOption={this.toggleCameraMoveOption}
+        addPresetOption={this.addPresetOption}
+        updatePresetOption={this.updatePresetOption}
+        removePresetOption={this.removePresetOption}
         deleteFeature={this.deleteFeature}
         publishMqttTopic={publishMqttTopic}
         listenMqttTopic={listenMqttTopic}

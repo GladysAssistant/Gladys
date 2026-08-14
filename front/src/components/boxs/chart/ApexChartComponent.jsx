@@ -12,6 +12,7 @@ import { getApexChartAreaOptions } from './ApexChartAreaOptions';
 import { getApexChartLineOptions } from './ApexChartLineOptions';
 import { getApexChartStepLineOptions } from './ApexChartStepLineOptions';
 import { getApexChartTimelineOptions } from './ApexChartTimelineOptions';
+import { createTooltipPositioning } from './apexChartTooltipPositioning';
 import mergeArray from '../../../utils/mergeArray';
 
 dayjs.extend(localizedFormat);
@@ -31,6 +32,9 @@ const DEFAULT_COLORS_NAME = ['blue', 'red', 'green', 'yellow', 'purple', 'aqua',
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
+  // One instance for the life of the chart, so the tooltip positioning state
+  // (cursor position, observer) survives live data re-renders
+  tooltipPositioning = createTooltipPositioning();
   addDateFormatter(options) {
     let formatter;
     if (this.props.interval <= 24 * 60) {
@@ -46,15 +50,10 @@ class ApexChartComponent extends Component {
           .format('LL');
       };
     }
-    // Configure tooltip with fixed position and date formatter
+    // Configure tooltip with date formatter. The tooltip follows the cursor
+    // so it doesn't permanently mask the curves (see community feedback)
     options.tooltip = {
-      followCursor: false,
-      fixed: {
-        enabled: true,
-        position: 'topLeft',
-        offsetX: 0,
-        offsetY: -30
-      },
+      followCursor: true,
       x: {
         formatter
       }
@@ -234,6 +233,7 @@ class ApexChartComponent extends Component {
     } else {
       options = this.getAreaChartOptions();
     }
+    this.tooltipPositioning.addToOptions(options);
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {
@@ -272,6 +272,7 @@ class ApexChartComponent extends Component {
     }
   }
   componentWillUnmount() {
+    this.tooltipPositioning.dispose();
     if (this.chart && typeof this.chart.destroy === 'function') {
       this.chart.destroy();
     }

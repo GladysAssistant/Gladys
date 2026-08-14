@@ -16,6 +16,8 @@ import GaugeBox from '../../components/boxs/gauge/GaugeBox';
 import EnergyConsumptionBox from '../../components/boxs/energy-consumption/EnergyConsumption';
 import VoiceAssistantBox from '../../components/boxs/voice-assistant/VoiceAssistantBox';
 import LinkBox from '../../components/boxs/link/LinkBox';
+import PhotoBox from '../../components/boxs/photo/PhotoBox';
+import SunBox from '../../components/boxs/sun/Sun';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -55,6 +57,10 @@ const Box = ({ children, ...props }) => {
       return <VoiceAssistantBox {...props} />;
     case 'link':
       return <LinkBox {...props} />;
+    case 'photo':
+      return <PhotoBox {...props} />;
+    case 'sun':
+      return <SunBox {...props} />;
   }
 };
 

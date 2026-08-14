@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const os = require('os');
 const { constants } = require('fs');
 const proxiquire = require('proxyquire').noCallThru();

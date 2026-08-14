@@ -48,7 +48,6 @@ const EditDashboard = ({ children, ...props }) => (
                         <EditBoxColumns
                           addBoxAtPosition={props.addBoxAtPosition}
                           user={props.user}
-                          isTouchDevice={props.isTouchDevice}
                           dashboards={props.dashboards}
                           updateCurrentDashboardName={props.updateCurrentDashboardName}
                           updateCurrentDashboardVisibility={props.updateCurrentDashboardVisibility}

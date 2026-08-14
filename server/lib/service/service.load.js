@@ -39,7 +39,9 @@ async function load(gladys) {
         // saving service in stateManager
         this.stateManager.setState('service', service, newServiceObject);
         this.stateManager.setState('serviceById', serviceInDb.id, newServiceObject);
-        if (newServiceObject.message && newServiceObject.message.send) {
+        // sendToUser is the outbound interface used by forwardToChannels:
+        // a send-only channel has it without exposing the reply path `send`
+        if (newServiceObject.message && (newServiceObject.message.send || newServiceObject.message.sendToUser)) {
           serviceToInsertOrUpdate.has_message_feature = true;
         }
       } catch (e) {

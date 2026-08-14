@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const TuyaHandler = require('../../../../services/tuya/lib/index');
 const { STATUS } = require('../../../../services/tuya/lib/utils/tuya.constants');

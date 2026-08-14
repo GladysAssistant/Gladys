@@ -7,7 +7,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import { getLocalizedText, getGithubRepoUrl, getRequestedHardwareClasses } from '../utils';
-import { getBackToCatalogUrl } from '../../../catalog-url';
+import BackToIntegrationsLink from '../../../../../components/integration/BackToIntegrationsLink';
 import SubContainersSummary from '../components/SubContainersSummary';
 import HardwareSwitches from '../components/HardwareSwitches';
 import NetworkDiscoverySummary from '../components/NetworkDiscoverySummary';
@@ -16,6 +16,7 @@ import DocsLink from '../components/DocsLink';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import integrationText from '../integrationText.css';
+import NetworkWakeSummary from '../components/NetworkWakeSummary';
 
 class ExternalIntegrationInstallPage extends Component {
   getStoreIntegration = async () => {
@@ -148,12 +149,7 @@ class ExternalIntegrationInstallPage extends Component {
             <div class="container">
               <div class="row justify-content-center">
                 <div class="col-lg-8">
-                  <div class="mb-4">
-                    <Link href={getBackToCatalogUrl()} class="btn btn-secondary btn-sm">
-                      <i class="fe fe-arrow-left mr-1" />
-                      <Text id="integration.externalIntegration.install.backToCatalog" />
-                    </Link>
-                  </div>
+                  <BackToIntegrationsLink />
                   <div
                     class={cx('dimmer', {
                       active: loadStatus === RequestStatus.Getting
@@ -268,6 +264,7 @@ class ExternalIntegrationInstallPage extends Component {
                             )}
 
                             <NetworkDiscoverySummary networkDiscovery={manifest.network_discovery} />
+                            <NetworkWakeSummary networkWake={manifest.network_wake} />
 
                             {manifest.location === true && (
                               <div class="alert alert-info">

@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 
 const { Error429 } = require('../../../utils/httpErrors');
 const { USER_ROLE, AI_CHAT_PURPOSES } = require('../../../utils/constants');

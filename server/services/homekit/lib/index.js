@@ -2,11 +2,14 @@ const { createBridge } = require('./createBridge');
 const { stopBridge } = require('./stopBridge');
 const { resetBridge } = require('./resetBridge');
 const { buildAccessory } = require('./buildAccessory');
+const { buildAlarmAccessory } = require('./buildAlarmAccessory');
 const { buildService } = require('./buildService');
 const { newPinCode } = require('./newPinCode');
 const { newUsername } = require('./newUsername');
 const { notifyChange } = require('./notifyChange');
 const { sendState } = require('./sendState');
+const { sendAlarmState } = require('./sendAlarmState');
+const { getCompatibleDevices, getCompatibleAlarms, getExposedDevices, getExposedAlarms } = require('./exposedDevices');
 
 /**
  * @description Add ability to connect to HomeKit.
@@ -22,6 +25,7 @@ const HomeKitHandler = function HomeKitHandler(gladys, serviceId, hap) {
   this.hap = hap;
   this.bridge = null;
   this.notifyTimeouts = {};
+  this.alarmAccessories = new Map();
   this.notifyCb = null;
 };
 
@@ -31,8 +35,14 @@ HomeKitHandler.prototype.createBridge = createBridge;
 HomeKitHandler.prototype.stopBridge = stopBridge;
 HomeKitHandler.prototype.resetBridge = resetBridge;
 HomeKitHandler.prototype.buildAccessory = buildAccessory;
+HomeKitHandler.prototype.buildAlarmAccessory = buildAlarmAccessory;
 HomeKitHandler.prototype.buildService = buildService;
 HomeKitHandler.prototype.notifyChange = notifyChange;
 HomeKitHandler.prototype.sendState = sendState;
+HomeKitHandler.prototype.sendAlarmState = sendAlarmState;
+HomeKitHandler.prototype.getCompatibleDevices = getCompatibleDevices;
+HomeKitHandler.prototype.getCompatibleAlarms = getCompatibleAlarms;
+HomeKitHandler.prototype.getExposedDevices = getExposedDevices;
+HomeKitHandler.prototype.getExposedAlarms = getExposedAlarms;
 
 module.exports = HomeKitHandler;

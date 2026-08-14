@@ -82,7 +82,14 @@ class MigrateDeviceModal extends Component {
   // A source feature is auto-matched when exactly one unused destination
   // feature has the same category, type and unit (values are moved without
   // conversion, so a sole °F candidate must not be silently pre-selected
-  // for a °C source — the user can still pick it manually, with a warning)
+  // for a °C source — the user can still pick it manually, with a warning).
+  // Multi-endpoint devices (e.g. a 2-gang Z-Wave switch) commonly have
+  // several features sharing that triplet; when the triplet alone is
+  // ambiguous, narrow the candidates down to those whose name is identical
+  // to the source feature's — integrations that preserve endpoint naming
+  // across a migration (like Z-Wave's `10-38-1-…` / `10-38-2-…`) then still
+  // get an exact, unambiguous match instead of falling back to "do not
+  // migrate" for every row.
   computeAutoMapping = destinationDevice => {
     const featuresMapping = {};
     const usedSelectors = new Set();
@@ -94,9 +101,18 @@ class MigrateDeviceModal extends Component {
           (feature.unit || null) === (sourceFeature.unit || null) &&
           !usedSelectors.has(feature.selector)
       );
+      let match = null;
       if (candidates.length === 1) {
-        featuresMapping[sourceFeature.selector] = candidates[0].selector;
-        usedSelectors.add(candidates[0].selector);
+        match = candidates[0];
+      } else if (candidates.length > 1) {
+        const sameName = candidates.filter(feature => feature.name === sourceFeature.name);
+        if (sameName.length === 1) {
+          match = sameName[0];
+        }
+      }
+      if (match) {
+        featuresMapping[sourceFeature.selector] = match.selector;
+        usedSelectors.add(match.selector);
       }
     });
     return featuresMapping;

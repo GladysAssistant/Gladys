@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { assert: sinonAssert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert: sinonAssert } = sinon;
 
 const { BadParameters } = require('../../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
@@ -29,11 +31,12 @@ describe('externalIntegration.setDiscoveredDevices', () => {
   let externalIntegration;
   let event;
   let stateManager;
+  let deviceLib;
   let service;
 
   beforeEach(async () => {
     service = await seedExternalService();
-    ({ externalIntegration, event, stateManager } = buildSupervisor());
+    ({ externalIntegration, event, stateManager, device: deviceLib } = buildSupervisor());
   });
 
   it('should store the discovered devices and notify the frontend', async () => {
@@ -167,6 +170,54 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     const device = { ...buildDiscoveredDevice(service.selector), poll_frequency: 60000 };
     const count = await externalIntegration.setDiscoveredDevices(service, [device]);
     expect(count).to.equal(1);
+  });
+
+  it('should normalize the supported_options of a feature', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0].supported_options = [
+      { value: 1, label: 'Entrance' },
+      { value: 2, label: 'Garden' },
+    ];
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[0].supported_options).to.deep.equal([
+      { value: 1, label: 'Entrance', sort_order: 0 },
+      { value: 2, label: 'Garden', sort_order: 1 },
+    ]);
+  });
+
+  it('should reject invalid supported_options', async () => {
+    const duplicatedValues = buildDiscoveredDevice(service.selector);
+    duplicatedValues.features[0].supported_options = [
+      { value: 1, label: 'Entrance' },
+      { value: 1, label: 'Garden' },
+    ];
+    await expectBadParameters([duplicatedValues], 'features[0].supported_options');
+    const emptyLabel = buildDiscoveredDevice(service.selector);
+    emptyLabel.features[0].supported_options = [{ value: 1, label: '' }];
+    await expectBadParameters([emptyLabel], 'features[0].supported_options');
+  });
+
+  it('should upsert the supported_options of an already-created device', async () => {
+    deviceLib.syncFeatureSupportedOptions = sinon.fake.resolves([{ value: 1, label: 'Entrance', sort_order: 0 }]);
+    const device = buildDiscoveredDevice(service.selector);
+    device.params = [];
+    device.features[0].supported_options = [{ value: 1, label: 'Entrance' }];
+    stateManager.setState('deviceByExternalId', device.external_id, {
+      id: 'device-id',
+      service_id: service.id,
+      features: [
+        {
+          id: 'feature-id',
+          external_id: device.features[0].external_id,
+          supported_options: [],
+        },
+      ],
+    });
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    sinonAssert.calledWith(deviceLib.syncFeatureSupportedOptions, 'feature-id', [
+      { value: 1, label: 'Entrance', sort_order: 0 },
+    ]);
   });
 });
 

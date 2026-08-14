@@ -1,4 +1,6 @@
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const dayjs = require('dayjs');

@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const { STATUS } = require('../../../services/melcloud/lib/utils/melcloud.constants');

@@ -1,5 +1,6 @@
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { NotFoundError } = require('../../utils/coreErrors');
+const logger = require('../../utils/logger');
 const db = require('../../models');
 
 /**
@@ -9,14 +10,18 @@ const db = require('../../models');
  * @param {string} [file] - An optional file sent with the message.
  * @param {object} [options] - Extra message options.
  * @param {string} [options.messageType='chat'] - Message display type.
+ * @param {string} [options.service] - Send through this single channel instead of every one.
  * @returns {Promise} Resolve with created message.
  * @example
  * sendToUser('tony', 'Bonjour, voici votre bilan.', null, { messageType: 'notification' });
  */
 async function sendToUser(userSelector, text, file = null, options = {}) {
-  const { messageType = 'chat' } = options;
+  const { messageType = 'chat', service = null } = options;
   const user = this.state.get('user', userSelector);
   if (user === null) {
+    // a scene action pointing at a deleted/renamed user selector used to
+    // fail without saying which selector was wrong
+    logger.warn(`Unable to send message: user "${userSelector}" not found.`);
     throw new NotFoundError(`User ${userSelector} not found`);
   }
   // first, we insert the message in database
@@ -34,10 +39,11 @@ async function sendToUser(userSelector, text, file = null, options = {}) {
     userId: user.id,
     payload: messageCreated,
   });
-  // forward to every outbound channel of the user: every service exposing
+  // forward to the outbound channels of the user: every service exposing
   // message.sendToUser resolves its own identity and no-ops when the user
-  // is not linked — the core does not know any channel by name
-  await this.forwardToChannels(user, messageCreated);
+  // is not linked — the core does not know any channel by name. When a
+  // service is given, only that channel is used.
+  await this.forwardToChannels(user, messageCreated, service);
   return messageCreated;
 }
 

@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const Promise = require('bluebird');
@@ -8,6 +8,7 @@ const { assert, fake } = sinon;
 const { EVENTS, ACTIONS } = require('../../../../utils/constants');
 const SceneManager = require('../../../../lib/scene');
 const StateManager = require('../../../../lib/state');
+const { waitUntil } = require('../../../helpers/waitUntil');
 
 const event = new EventEmitter();
 
@@ -94,6 +95,182 @@ describe('scene.triggers.deviceNewState', () => {
         }
       });
     });
+  });
+  it('should execute scene when the event feature is one of the trigger device_features', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_features: ['motion-sensor-1', 'motion-sensor-2'],
+          value: 1,
+          operator: '=',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'motion-sensor-2',
+      last_value: 1,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should not execute scene when the event feature is not in the trigger device_features', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_features: ['motion-sensor-1', 'motion-sensor-2'],
+          value: 1,
+          operator: '=',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'motion-sensor-3',
+      last_value: 1,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should start one independent timer per feature of a multi-features trigger', async () => {
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_features: ['motion-sensor-1', 'motion-sensor-2'],
+          value: 1,
+          operator: '=',
+          for_duration: 10 * 60 * 1000,
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'motion-sensor-1',
+      previous_value: 0,
+      last_value: 1,
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'motion-sensor-2',
+      previous_value: 0,
+      last_value: 1,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          expect(sceneManager.checkTriggersDurationTimer.size).to.equal(2);
+          const timerKeys = [];
+          sceneManager.checkTriggersDurationTimer.forEach((value, timeoutKey) => {
+            timerKeys.push(timeoutKey);
+            clearTimeout(value);
+          });
+          expect(timerKeys).to.have.members([
+            'device.new-state.my-scene.motion-sensor-1:=:1',
+            'device.new-state.my-scene.motion-sensor-2:=:1',
+          ]);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+  it('should run each duration timer of a multi-features trigger independently', async () => {
+    sceneManager.stateManager.setState('deviceFeature', 'motion-sensor-1', {
+      last_value: 1,
+    });
+    sceneManager.stateManager.setState('deviceFeature', 'motion-sensor-2', {
+      last_value: 1,
+    });
+    await sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_features: ['motion-sensor-1', 'motion-sensor-2'],
+          value: 1,
+          operator: '=',
+          for_duration: 0, // now
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'motion-sensor-1',
+      previous_value: 0,
+      last_value: 1,
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'motion-sensor-2',
+      previous_value: 0,
+      last_value: 1,
+    });
+    // Each feature schedules its own timer: when both fire, each callback re-checks the
+    // state of its own feature and the scene runs once per feature.
+    await waitUntil(() => device.setValue.calledTwice, { message: 'the scene to be executed twice' });
+    await waitUntil(() => sceneManager.queue.length === 0, { message: 'the scene queue to be empty' });
+    assert.calledTwice(device.setValue);
+    expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
   });
   it('should not execute scene, scene not active', async () => {
     await sceneManager.addScene({
@@ -358,18 +535,13 @@ describe('scene.triggers.deviceNewState', () => {
       previous_value: 11,
       last_value: 14,
     });
-    return new Promise((resolve, reject) => {
-      sceneManager.queue.start(async () => {
-        try {
-          await Promise.delay(5);
-          assert.calledOnce(device.setValue);
-          expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
+    // The scene is not executed synchronously: the trigger first schedules a timer,
+    // and the scene is only queued when this timer fires. So we wait for the scene
+    // to be executed, then for the queue to be empty, instead of waiting a fixed delay.
+    await waitUntil(() => device.setValue.called, { message: 'the scene to be executed' });
+    await waitUntil(() => sceneManager.queue.length === 0, { message: 'the scene queue to be empty' });
+    assert.calledOnce(device.setValue);
+    expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
   });
   it('should start timer to check now and re-send new value still validating the condition', async () => {
     await sceneManager.addScene({
@@ -406,18 +578,11 @@ describe('scene.triggers.deviceNewState', () => {
       previous_value: 14,
       last_value: 14,
     });
-    return new Promise((resolve, reject) => {
-      sceneManager.queue.start(async () => {
-        try {
-          await Promise.delay(10);
-          assert.calledOnce(device.setValue);
-          expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
+    // Same as above: the scene is only queued when the trigger timer fires.
+    await waitUntil(() => device.setValue.called, { message: 'the scene to be executed' });
+    await waitUntil(() => sceneManager.queue.length === 0, { message: 'the scene queue to be empty' });
+    assert.calledOnce(device.setValue);
+    expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
   });
   it('should start timer to check now and condition should not be valid on second call', async () => {
     await sceneManager.addScene({
@@ -454,18 +619,11 @@ describe('scene.triggers.deviceNewState', () => {
       previous_value: 14,
       last_value: 5,
     });
-    return new Promise((resolve, reject) => {
-      sceneManager.queue.start(async () => {
-        try {
-          await Promise.delay(5);
-          assert.notCalled(device.setValue);
-          expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
-    });
+    // The timer is cancelled synchronously by the second event, we wait longer than
+    // the trigger duration (10ms) to be sure it doesn't fire anyway.
+    await Promise.delay(100);
+    assert.notCalled(device.setValue);
+    expect(sceneManager.checkTriggersDurationTimer.size).to.equal(0);
   });
   it('should execute scene with string value equality (text device feature like Shelly Button)', async () => {
     await sceneManager.addScene({
