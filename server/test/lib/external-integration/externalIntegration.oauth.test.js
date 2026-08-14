@@ -191,6 +191,32 @@ describe('externalIntegration.getOAuthAuthorizeUrl', () => {
     });
   });
 
+  it('should not forward a client-supplied redirect_uri on an account_link field', async () => {
+    // the wire format is the spec: `redirect_uri` is absent for an account_link
+    // field, so a value a client still POSTs is ignored, not relayed — an
+    // integration distinguishing the two flows by its presence must never see it
+    const service = await seedExternalService({ manifest: TEST_ACCOUNT_LINK_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    const ws = buildFakeWs();
+    externalIntegration.connections.set(service.id, ws);
+    externalIntegration.getBySelector = fake.resolves(service);
+    const resultPromise = externalIntegration.getOAuthAuthorizeUrl(service.selector, {
+      key: 'xiaomi_account',
+      redirect_uri: REDIRECT_URI,
+    });
+    await waitForSend(ws);
+    const sentMessage = JSON.parse(ws.send.firstCall.args[0]);
+    expect(sentMessage.payload).to.not.have.property('redirect_uri');
+    externalIntegration.handleCommandResult(service, {
+      message_id: sentMessage.payload.message_id,
+      success: true,
+      data: { authorize_url: 'https://eu.account.xiaomi.com/longPolling/login?ticket=lp_42' },
+    });
+    expect(await resultPromise).to.deep.equal({
+      authorize_url: 'https://eu.account.xiaomi.com/longPolling/login?ticket=lp_42',
+    });
+  });
+
   it('should refuse a key that is neither an oauth2 nor an account_link field', async () => {
     const service = await seedOAuthService();
     const { externalIntegration } = buildSupervisor();

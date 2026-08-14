@@ -454,8 +454,10 @@ class ExternalIntegrationConfigPage extends Component {
     // an account_link provider never comes back to Gladys: the user approves it
     // elsewhere and the integration notices on its own side. There is no
     // redirect URI to declare, no state to carry across a round trip, and no
-    // callback tab to prime — the URL is opened as it was built.
-    const usesRedirect = field.type !== 'account_link';
+    // callback tab to prime — the URL is opened as it was built. Same predicate
+    // as in ConfigSchemaForm: only `oauth2` is redirect-based, so a future
+    // account field type gets the account_link behaviour on both sides.
+    const usesRedirect = field.type === 'oauth2';
     // providers refuse a plain HTTP redirect URI, which is how most people
     // reach their Gladys: the flow goes through the HTTPS redirect page, which
     // sends the browser back here. Users who already serve Gladys over HTTPS

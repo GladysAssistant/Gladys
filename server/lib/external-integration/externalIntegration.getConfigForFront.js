@@ -1,4 +1,4 @@
-const { PREFER_LOCAL_CONFIG_KEY, OPEN_API_KEY_CONFIG_KEY } = require('./constants');
+const { ACCOUNT_FIELD_TYPES, PREFER_LOCAL_CONFIG_KEY, OPEN_API_KEY_CONFIG_KEY } = require('./constants');
 const { hasDualTransports } = require('./externalIntegration.getIntegrationConfig');
 const { hasWebhooks } = require('./externalIntegration.getWebhooks');
 
@@ -33,7 +33,7 @@ async function getConfigForFront(selector) {
       if (hasValue) {
         configuredSecrets.push(field.key);
       }
-    } else if (field.type === 'oauth2' || field.type === 'account_link') {
+    } else if (ACCOUNT_FIELD_TYPES.includes(field.type)) {
       // nothing is ever stored under those keys (the credentials live
       // off-schema): the front renders a Connect button, fed by
       // connection_status

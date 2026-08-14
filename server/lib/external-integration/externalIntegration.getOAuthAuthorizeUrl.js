@@ -38,9 +38,12 @@ async function getOAuthAuthorizeUrl(selector, { key, redirect_uri: redirectUri }
   if (field.type === 'oauth2' && (typeof redirectUri !== 'string' || redirectUri.length === 0)) {
     throw new BadParameters('redirect_uri: must be a non-empty string');
   }
+  // the payload is built explicitly so the wire format cannot drift from the
+  // spec: `redirect_uri` is only ever relayed for an `oauth2` field — a value a
+  // client would POST for an `account_link` field is ignored, not forwarded
   const result = await this.sendCommand(service, WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.OAUTH_GET_AUTHORIZE_URL, {
     key,
-    redirect_uri: redirectUri,
+    redirect_uri: field.type === 'oauth2' ? redirectUri : undefined,
   });
   const authorizeUrl = result && result.data && result.data.authorize_url;
   if (typeof authorizeUrl !== 'string' || authorizeUrl.length === 0) {
