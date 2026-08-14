@@ -87,6 +87,25 @@
       "closeButton": "Close"
     }
   },
+  "devicesList": {
+    "title": "Devices",
+    "deviceCount": {
+      "one": "1 device",
+      "other": "{{count}} devices"
+    },
+    "searchPlaceholder": "Search devices",
+    "allRooms": "All rooms",
+    "noRoom": "No room",
+    "allIntegrations": "All integrations",
+    "device": "Device",
+    "room": "Room",
+    "integration": "Integration",
+    "features": "Features",
+    "openInIntegration": "Open in integration",
+    "emptyState": "No device found. Add devices from the integrations page, or adjust your search and filters.",
+    "emptyStateButton": "Browse integrations",
+    "error": "There was an error loading the devices. Please try again later."
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Welcome",
@@ -3248,6 +3267,19 @@
         "stopScene": "Stop the scene",
         "continueScene": "Continue the scene"
       },
+      "calendarGetEvents": {
+        "description": "This action gets the list of events starting in the selected time range (an event which started before the beginning of the range is not returned), and makes them available as variables (a ready-to-use sentence, the number of events and the list of events) for the next actions of the scene. Only shared calendars are displayed here.",
+        "calendarLabel": "Look in the following shared calendars",
+        "timeRangeLabel": "Get events",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "nextXHours": "In the next X hours",
+        "durationLabel": "Number of hours",
+        "durationPlaceholder": "Number of hours",
+        "whenNoEventsLabel": "If no event is found",
+        "stopScene": "Stop the scene",
+        "continueScene": "Continue the scene"
+      },
       "ecowattCondition": {
         "description": "This conditions lets you check the status of the french electricity network",
         "knowMore": "Read more",
@@ -3306,7 +3338,8 @@
     },
     "actions": {
       "calendar": {
-        "is-event-running": "Condition on calendar events"
+        "is-event-running": "Condition on calendar events",
+        "get-events": "Get calendar events"
       },
       "device": {
         "get-value": "Get device value",
@@ -3394,6 +3427,11 @@
         "eventDescription": "Event description",
         "eventStart": "Start date",
         "eventEnd": "End date"
+      },
+      "calendarEvents": {
+        "text": "Events summary sentence",
+        "count": "Number of events",
+        "events": "List of events"
       },
       "askAi": {
         "answer": "AI answer"

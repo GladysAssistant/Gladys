@@ -6,6 +6,7 @@ const { update } = require('./calendar.update');
 const { createEvent } = require('./calendar.createEvent');
 const { destroyEvent } = require('./calendar.destroyEvent');
 const { findCurrentlyRunningEvent } = require('./calendar.findCurrentlyRunningEvent');
+const { findEventsInRange } = require('./calendar.findEventsInRange');
 const { destroyEvents } = require('./calendar.destroyEvents');
 const { updateEvent } = require('./calendar.updateEvent');
 
@@ -21,6 +22,7 @@ Calendar.prototype.update = update;
 Calendar.prototype.createEvent = createEvent;
 Calendar.prototype.destroyEvent = destroyEvent;
 Calendar.prototype.findCurrentlyRunningEvent = findCurrentlyRunningEvent;
+Calendar.prototype.findEventsInRange = findEventsInRange;
 Calendar.prototype.destroyEvents = destroyEvents;
 Calendar.prototype.updateEvent = updateEvent;
 

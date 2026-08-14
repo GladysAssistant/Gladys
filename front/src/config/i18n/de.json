@@ -87,6 +87,25 @@
       "closeButton": "Schließen"
     }
   },
+  "devicesList": {
+    "title": "Geräte",
+    "deviceCount": {
+      "one": "1 Gerät",
+      "other": "{{count}} Geräte"
+    },
+    "searchPlaceholder": "Geräte suchen",
+    "allRooms": "Alle Räume",
+    "noRoom": "Kein Raum",
+    "allIntegrations": "Alle Integrationen",
+    "device": "Gerät",
+    "room": "Raum",
+    "integration": "Integration",
+    "features": "Funktionen",
+    "openInIntegration": "In der Integration öffnen",
+    "emptyState": "Keine Geräte gefunden. Füge Geräte über die Integrationsseite hinzu oder passe deine Suche und Filter an.",
+    "emptyStateButton": "Integrationen durchsuchen",
+    "error": "Beim Laden der Geräte ist ein Fehler aufgetreten. Bitte versuche es später erneut."
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Willkommen",
@@ -3248,6 +3267,19 @@
         "stopScene": "Szene stoppen",
         "continueScene": "Szene fortsetzen"
       },
+      "calendarGetEvents": {
+        "description": "Diese Aktion ruft die Liste der Ereignisse ab, die im ausgewählten Zeitraum beginnen (ein Ereignis, das vor dem Beginn des Zeitraums begonnen hat, wird nicht zurückgegeben), und stellt sie als Variablen (ein fertiger Satz, die Anzahl der Ereignisse und die Liste der Ereignisse) für die nächsten Aktionen der Szene bereit. Es werden nur freigegebene Kalender angezeigt.",
+        "calendarLabel": "Suche in den folgenden freigegebenen Kalendern",
+        "timeRangeLabel": "Ereignisse abrufen",
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "nextXHours": "In den nächsten X Stunden",
+        "durationLabel": "Anzahl der Stunden",
+        "durationPlaceholder": "Anzahl der Stunden",
+        "whenNoEventsLabel": "Wenn kein Ereignis gefunden wird",
+        "stopScene": "Szene stoppen",
+        "continueScene": "Szene fortsetzen"
+      },
       "ecowattCondition": {
         "description": "Diese Bedingung ermöglicht es dir, den Status des französischen Stromnetzes zu überprüfen",
         "knowMore": "Mehr erfahren",
@@ -3306,7 +3338,8 @@
     },
     "actions": {
       "calendar": {
-        "is-event-running": "Bedingung für Kalenderereignisse"
+        "is-event-running": "Bedingung für Kalenderereignisse",
+        "get-events": "Kalenderereignisse abrufen"
       },
       "device": {
         "get-value": "Gerätewert abrufen",
@@ -3394,6 +3427,11 @@
         "eventDescription": "Ereignisbeschreibung",
         "eventStart": "Startdatum",
         "eventEnd": "Enddatum"
+      },
+      "calendarEvents": {
+        "text": "Satz mit der Zusammenfassung der Ereignisse",
+        "count": "Anzahl der Ereignisse",
+        "events": "Liste der Ereignisse"
       },
       "askAi": {
         "answer": "AI Antwort"
