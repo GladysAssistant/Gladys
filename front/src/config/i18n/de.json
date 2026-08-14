@@ -945,7 +945,7 @@
         "repoUrlPlaceholder": "https://github.com/owner/repository",
         "installButton": "Installieren",
         "devModeLink": "Entwicklermodus: von einem Docker-Image installieren",
-        "devModeDescription": "Installiere eine Integration direkt aus einem Docker-Image, mit optionalem Manifest. Nur für Integrationsentwickler.",
+        "devModeDescription": "Installiere eine Integration direkt aus einem Docker-Image, mit optionalem Manifest. Das Image kann lokal mit docker build gebaut werden, ohne Registry. Nur für Integrationsentwickler.",
         "dockerImageLabel": "Docker-Image",
         "dockerImagePlaceholder": "z. B. meinuser/meine-integration:latest",
         "manifestLabel": "Manifest (JSON, optional)",
@@ -5153,6 +5153,18 @@
     "formaldehyd-sensor": {
       "shortCategoryName": "Formaldehyd-Sensor",
       "decimal": "Formaldehyd (Dezimal)"
+    },
+    "no2-sensor": {
+      "shortCategoryName": "NO2-Sensor",
+      "decimal": "NO2 (Dezimal)"
+    },
+    "o3-sensor": {
+      "shortCategoryName": "O3-Sensor",
+      "decimal": "O3 (Dezimal)"
+    },
+    "so2-sensor": {
+      "shortCategoryName": "SO2-Sensor",
+      "decimal": "SO2 (Dezimal)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Vibrationssensor",

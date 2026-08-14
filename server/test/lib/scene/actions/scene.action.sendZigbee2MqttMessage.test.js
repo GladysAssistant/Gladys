@@ -8,11 +8,17 @@ const executeActionsFactory = require('../../../../lib/scene/scene.executeAction
 const actionsFunc = require('../../../../lib/scene/scene.actions');
 
 const StateManager = require('../../../../lib/state');
+const logger = require('../../../../utils/logger');
 
 const event = new EventEmitter();
 
 describe('scene.send-zigbee2mqtt-message', () => {
   const { executeActions } = executeActionsFactory(actionsFunc);
+
+  afterEach(() => {
+    sinon.restore();
+  });
+
   it('should send message with value injected from device get-value', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {
@@ -87,5 +93,76 @@ describe('scene.send-zigbee2mqtt-message', () => {
       scope,
     );
     assert.calledWith(zigbee2MqttService.device.publish, '/my/mqtt/topic', 'Temperature in the living room is 15 °C.');
+  });
+  it('should send a valid JSON message without warning', async () => {
+    const loggerWarn = sinon.stub(logger, 'warn');
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const zigbee2MqttService = {
+      device: {
+        publish: fake.resolves(null),
+      },
+    };
+    const service = {
+      getService: fake.returns(zigbee2MqttService),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, service },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.ZIGBEE2MQTT.SEND,
+            topic: 'zigbee2mqtt/my-device/set',
+            message: '{"state":"ON","on_time":{{0.0.last_value}} }',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(zigbee2MqttService.device.publish, 'zigbee2mqtt/my-device/set', '{"state":"ON","on_time":15 }');
+    assert.notCalled(loggerWarn);
+  });
+  it('should warn when the message looks like JSON but is not valid JSON', async () => {
+    const loggerWarn = sinon.stub(logger, 'warn');
+    const stateManager = new StateManager(event);
+    const zigbee2MqttService = {
+      device: {
+        publish: fake.resolves(null),
+      },
+    };
+    const service = {
+      getService: fake.returns(zigbee2MqttService),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, service },
+      [
+        [
+          {
+            type: ACTIONS.ZIGBEE2MQTT.SEND,
+            topic: 'zigbee2mqtt/my-device/set',
+            message: '{"state":"ON","on_time":{{unknown_variable}} }',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(zigbee2MqttService.device.publish, 'zigbee2mqtt/my-device/set', '{"state":"ON","on_time": }');
+    assert.calledOnce(loggerWarn);
+    assert.calledWith(
+      loggerWarn,
+      sinon.match('zigbee2mqtt/my-device/set').and(sinon.match('Message sent: {"state":"ON","on_time": }')),
+    );
   });
 });

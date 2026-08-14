@@ -36,6 +36,7 @@ describe('Send state to HomeKit', () => {
         CurrentHeatingCoolingState: 'CURRENTHEATINGCOOLINGSTATE',
         TargetTemperature: 'TARGETTEMPERATURE',
         MotionDetected: 'MOTIONDETECTED',
+        OccupancyDetected: 'OCCUPANCYDETECTED',
         CurrentTemperature: 'CURRENTTEMPERATURE',
         CurrentPosition: 'CURRENTPOSITION',
         Active: 'ACTIVE',
@@ -59,11 +60,15 @@ describe('Send state to HomeKit', () => {
         ProgrammableSwitchEvent: 'PROGRAMMABLESWITCHEVENT',
         PM2_5Density: 'PM25DENSITY',
         PM10Density: 'PM10DENSITY',
+        NitrogenDioxideDensity: 'NO2DENSITY',
+        OzoneDensity: 'O3DENSITY',
+        SulphurDioxideDensity: 'SO2DENSITY',
       },
       CharacteristicEventTypes: { GET: 'get', SET: 'set' },
       Service: {
         ContactSensor: 'CONTACTSENSOR',
         MotionSensor: 'MOTIONSENSOR',
+        OccupancySensor: 'OCCUPANCYSENSOR',
         WindowCovering: 'WINDOWCOVERING',
         Thermostat: 'THERMOSTAT',
         TemperatureSensor: 'TEMPERATURESENSOR',
@@ -194,6 +199,39 @@ describe('Send state to HomeKit', () => {
     await homekitHandler.sendState(accessory, feature, event);
 
     expect(updateCharacteristic.args[0]).eql(['MOTIONDETECTED', 0]);
+  });
+
+  it('should notify presence sensor', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Presence',
+      category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.PUSH,
+    };
+
+    // the scanner reports the device answering, then no longer answering
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 });
+    await homekitHandler.sendState(accessory, feature, { type: EVENTS.DEVICE.NEW_STATE, last_value: 0 });
+
+    // an integration exposing presence as a plain binary reaches the same branch
+    await homekitHandler.sendState(
+      accessory,
+      { ...feature, type: DEVICE_FEATURE_TYPES.SENSOR.BINARY },
+      { type: EVENTS.DEVICE.NEW_STATE, last_value: 1 },
+    );
+
+    expect(updateCharacteristic.args).eql([
+      ['OCCUPANCYDETECTED', 1],
+      ['OCCUPANCYDETECTED', 0],
+      ['OCCUPANCYDETECTED', 1],
+    ]);
   });
 
   it('should notify light brightness', async () => {
@@ -688,6 +726,57 @@ describe('Send state to HomeKit', () => {
     expect(updateCharacteristic.args[0]).eql(['PM25DENSITY', 42]);
     expect(updateCharacteristic.args[1]).eql(['PM25DENSITY', 50]);
     expect(updateCharacteristic.args[2]).eql(['PM10DENSITY', 8]);
+  });
+
+  it('should notify gas densities', async () => {
+    const updateCharacteristic = stub().returns();
+    const getCharacteristic = stub().returns({
+      props: {
+        minValue: 0,
+        maxValue: 1000,
+      },
+    });
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic, getCharacteristic }),
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'NO2 sensor',
+      category: DEVICE_FEATURE_CATEGORIES.NO2_SENSOR,
+      type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+      unit: DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+    };
+    const event = { type: EVENTS.DEVICE.NEW_STATE, last_value: 35 };
+
+    await homekitHandler.sendState(accessory, feature, event);
+    // 0.12 mg/m³ is 120 µg/m³, on the O3 category
+    await homekitHandler.sendState(
+      accessory,
+      {
+        ...feature,
+        category: DEVICE_FEATURE_CATEGORIES.O3_SENSOR,
+        unit: DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
+      },
+      { ...event, last_value: 0.12 },
+    );
+    // 45000 ng/m³ is 45 µg/m³, on the SO2 category
+    await homekitHandler.sendState(
+      accessory,
+      {
+        ...feature,
+        category: DEVICE_FEATURE_CATEGORIES.SO2_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
+      },
+      { ...event, last_value: 45000 },
+    );
+
+    expect(updateCharacteristic.args[0]).eql(['NO2DENSITY', 35]);
+    expect(updateCharacteristic.args[1]).eql(['O3DENSITY', 120]);
+    expect(updateCharacteristic.args[2]).eql(['SO2DENSITY', 45]);
   });
 
   it('should notify smoke sensor', async () => {

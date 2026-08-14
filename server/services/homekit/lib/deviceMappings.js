@@ -44,6 +44,21 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: {
+    service: 'OccupancySensor',
+    capabilities: {
+      // The push flavour is what lan-manager creates, and despite its name it carries a lasting
+      // state rather than an event: the scanner emits 1 when the device answers and 0 when it stops
+      // answering, and reads the stored value back before emitting so the same one is not repeated.
+      // Gladys and HomeKit agree that 1 means occupied, so the value goes through untouched.
+      [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: {
+        characteristics: ['OccupancyDetected'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
+        characteristics: ['OccupancyDetected'],
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR]: {
     service: 'LeakSensor',
     capabilities: {
@@ -130,6 +145,39 @@ const mappings = {
       },
       [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: {
         characteristics: ['PM10Density'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.NO2_SENSOR]: {
+    service: 'AirQualitySensor',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: {
+        characteristics: ['NitrogenDioxideDensity'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: {
+        characteristics: ['NitrogenDioxideDensity'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.O3_SENSOR]: {
+    service: 'AirQualitySensor',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: {
+        characteristics: ['OzoneDensity'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: {
+        characteristics: ['OzoneDensity'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.SO2_SENSOR]: {
+    service: 'AirQualitySensor',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: {
+        characteristics: ['SulphurDioxideDensity'],
+      },
+      [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: {
+        characteristics: ['SulphurDioxideDensity'],
       },
     },
   },
@@ -385,7 +433,7 @@ function clampToCharacteristic(value, props = {}) {
 }
 
 // HomeKit exposes air quality as a single AirQualitySensor service carrying the index and the
-// particulate densities, while Gladys splits them across categories. The first host category present
+// pollutant densities, while Gladys splits them across categories. The first host category present
 // on a device owns the service and absorbs the features of the other categories listed here.
 const mergedServiceCategories = [
   {
@@ -393,6 +441,9 @@ const mergedServiceCategories = [
       DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR,
       DEVICE_FEATURE_CATEGORIES.PM25_SENSOR,
       DEVICE_FEATURE_CATEGORIES.PM10_SENSOR,
+      DEVICE_FEATURE_CATEGORIES.NO2_SENSOR,
+      DEVICE_FEATURE_CATEGORIES.O3_SENSOR,
+      DEVICE_FEATURE_CATEGORIES.SO2_SENSOR,
     ],
     merged: [],
   },
