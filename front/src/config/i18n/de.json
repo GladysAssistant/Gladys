@@ -341,6 +341,7 @@
       "clock": "Uhr",
       "scene": "Szene",
       "music": "Musik",
+      "television": "Medienplayer",
       "gauge": "Messanzeige",
       "energy-consumption": "Energieverbrauch",
       "voice-assistant": "Sprachassistent",
@@ -661,6 +662,11 @@
       },
       "music": {
         "selectDeviceLabel": "Wähle das zu steuernde Gerät aus"
+      },
+      "television": {
+        "selectDeviceLabel": "Wähle das zu steuernde Gerät aus",
+        "remoteToggle": "Fernbedienung",
+        "returnButton": "Zurück"
       },
       "energyConsumption": {
         "editName": "Widget-Name (optional)",
