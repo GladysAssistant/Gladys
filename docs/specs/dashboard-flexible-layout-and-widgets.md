@@ -152,12 +152,14 @@ Three visual pickers in the dashboard settings, no per-box styling — appearanc
 
 ## Phases
 
+Ordering principle, decided with the maintainer: **plumbing first, showcase widgets last.** The layout engine, the density widgets, the asset storage, and the appearance layer are what unlock every future dashboard; the flashy visualizations come once that foundation is in place.
+
 1. **Sections layout** (A) — in progress with a community contributor (forum 10553), including selective stretch (A.4). Ships alone; pure layout, no new widget.
 2. **Density widgets**: chips bar (B) + scene state subtitle (C). Small, independent, high visual impact.
-3. **Energy flow** (D).
-4. **House view** (E) with bundled gallery + upload + pins. Includes the dashboard-asset storage decision.
+3. **Appearance (G) + tablet tab bar (H)** — independent of the widget phases, can ship anytime after 1.
+4. **House view** (E) with bundled gallery + upload + pins. Includes the dashboard-asset storage decision, which is plumbing reused by G (uploaded backgrounds) and F.
 5. **Plus AI generation** (F) — requires the Gladys Plus backend endpoint; front/server land behind the existing Plus feature detection.
-6. **Appearance (G) + tablet tab bar (H)** — independent of 2–5, can ship anytime after 1.
+6. **Energy flow** (D) — deliberately last: it is a self-contained visualization that depends on nothing above and unlocks nothing else, whereas everything before it is foundation.
 
 Each phase is a separate PR (or PR series) that updates this spec in the same diff.
 
