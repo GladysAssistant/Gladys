@@ -19,6 +19,7 @@ import LinkBox from '../../components/boxs/link/LinkBox';
 import PhotoBox from '../../components/boxs/photo/PhotoBox';
 import SunBox from '../../components/boxs/sun/Sun';
 import ChipsBox from '../../components/boxs/chips/ChipsBox';
+import HouseViewBox from '../../components/boxs/house-view/HouseViewBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -64,6 +65,8 @@ const Box = ({ children, ...props }) => {
       return <SunBox {...props} />;
     case 'chips':
       return <ChipsBox {...props} />;
+    case 'house-view':
+      return <HouseViewBox {...props} />;
   }
 };
 

@@ -1996,6 +1996,7 @@ const DASHBOARD_BOX_TYPE = {
   PHOTO: 'photo',
   SUN: 'sun',
   CHIPS: 'chips',
+  HOUSE_VIEW: 'house-view',
 };
 
 const DASHBOARD_CARD_STYLE = {

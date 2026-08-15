@@ -243,6 +243,10 @@ class EditDashboard extends Component {
           if (box.type === 'chips' && Array.isArray(box.chips)) {
             return { ...box, chips: box.chips.filter(chip => chip && chip.chip_type) };
           }
+          // Same for house-view pins the user placed but never assigned a feature
+          if (box.type === 'house-view' && Array.isArray(box.pins)) {
+            return { ...box, pins: box.pins.filter(pin => pin && pin.device_feature) };
+          }
           return box;
         });
     });

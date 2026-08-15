@@ -120,6 +120,58 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[0].columns[0][0].chips).to.have.lengthOf(4);
   });
 
+  it('should save a house-view box with pins', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [
+            [
+              {
+                type: DASHBOARD_BOX_TYPE.HOUSE_VIEW,
+                image: 'gallery:house-solar',
+                pins: [
+                  { x_pct: 32.5, y_pct: 18, device_feature: 'solar-power', label: 'Solaire', icon: 'sun' },
+                  { x_pct: 70, y_pct: 60, device_feature: 'house-power' },
+                ],
+              },
+            ],
+          ],
+        },
+      ],
+    });
+    expect(updatedDashboard.boxes[0].columns[0][0].pins).to.have.lengthOf(2);
+  });
+
+  it('should reject a house-view image outside gallery/asset references', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [[{ type: DASHBOARD_BOX_TYPE.HOUSE_VIEW, image: 'https://evil.com/image.png' }]],
+        },
+      ],
+    });
+    return assert.isRejected(promise);
+  });
+
+  it('should reject a house-view pin outside the image bounds', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [
+            [
+              {
+                type: DASHBOARD_BOX_TYPE.HOUSE_VIEW,
+                image: 'gallery:house-solar',
+                pins: [{ x_pct: 120, y_pct: 18, device_feature: 'solar-power' }],
+              },
+            ],
+          ],
+        },
+      ],
+    });
+    return assert.isRejected(promise);
+  });
+
   it('should save a scene box with status features', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [

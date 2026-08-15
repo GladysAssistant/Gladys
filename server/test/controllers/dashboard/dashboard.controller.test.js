@@ -205,6 +205,29 @@ describe('DELETE /api/v1/dashboard/:dashboard_selector', () => {
   });
 });
 
+describe('POST /api/v1/dashboard_asset/:dashboard_selector', () => {
+  it('should create then serve a dashboard asset', async () => {
+    const pngBase64 =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    let assetId;
+    await authenticatedRequest
+      .post('/api/v1/dashboard_asset/test-dashboard')
+      .send({ content_type: 'image/png', data: pngBase64 })
+      .expect('Content-Type', /json/)
+      .expect(201)
+      .then((res) => {
+        expect(res.body).to.have.property('id');
+        assetId = res.body.id;
+      });
+    await authenticatedRequest
+      .get(`/api/v1/dashboard_asset/${assetId}`)
+      .expect(200)
+      .then((res) => {
+        expect(res.text).to.equal(`image/png;base64,${pngBase64}`);
+      });
+  });
+});
+
 describe('GET /api/v1/dashboard/photo/proxy', () => {
   afterEach(() => {
     nock.cleanAll();

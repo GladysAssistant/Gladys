@@ -348,7 +348,8 @@
       "link": "Link",
       "photo": "Photo",
       "sun": "Sun",
-      "chips": "Status chips"
+      "chips": "Status chips",
+      "house-view": "House view"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -734,6 +735,22 @@
           "partially-armed": "Partially armed",
           "panic": "Panic"
         }
+      },
+      "house-view": {
+        "editNameLabel": "Widget name (optional)",
+        "editNamePlaceholder": "e.g. My house",
+        "editGalleryLabel": "Pick an illustration",
+        "editUploadLabel": "Or upload your own image",
+        "uploading": "Uploading...",
+        "uploadError": "The image could not be uploaded. Try a smaller image.",
+        "editPinsLabel": "Live values on the image",
+        "editPinsDescription": "Click on the image to place a pin, then pick the device feature it displays. To move a pin, remove it and place it again.",
+        "editPinLabel": "Pin {{index}}",
+        "editPinFeatureLabel": "Device feature",
+        "editPinLabelLabel": "Label (optional)",
+        "editPinLabelPlaceholder": "e.g. Solar",
+        "noImage": "Pick an illustration in the widget settings.",
+        "error": "The image could not be loaded."
       }
     },
     "editDashboardBackgroundImageLabel": "Background image (optional)",

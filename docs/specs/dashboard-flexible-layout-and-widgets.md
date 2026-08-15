@@ -2,7 +2,7 @@
 
 > **Living specification — source of truth.** This document specifies the evolution of the Gladys dashboard towards wall-panel-grade layouts: section-based flexible layout, compact "chip" widgets, scene buttons with live state, an energy-flow widget, a "house view" widget (image with live data pins, optionally AI-generated through Gladys Plus), per-dashboard appearance, and icon-based tablet navigation. **Rule: any PR that changes one of these behaviors or contracts modifies this file in the same diff** — spec first, code second.
 >
-> Status: **phases 1–3 implemented** (sections layout, chips bar + scene status subtitles, appearance + tablet tab bar — see Phases). Phases 4–6 are design only.
+> Status: **phases 1–4 implemented** (sections layout, chips bar + scene status subtitles, appearance + tablet tab bar, house-view widget with asset storage — see Phases). Phases 5–6 are design only.
 
 ## Context
 
@@ -106,16 +106,19 @@ A real-time energy synthesis replacing hand-assembled gauge/chart combinations: 
 
 The signature widget: an illustration (typically the user's house) with live device values pinned on it.
 
-- New `DASHBOARD_BOX_TYPE.HOUSE_VIEW = 'house-view'`, `canStretch: true`.
-- Config:
-  - `image`: reference to the illustration (see storage below);
-  - `pins`: array of `{ x_pct, y_pct, device_feature, label?, icon? }` — coordinates in percent so the image scales freely. Pins are placed by tapping/dragging on the image in the editor; values render as small floating badges (same visual family as chips).
+- New `DASHBOARD_BOX_TYPE.HOUSE_VIEW = 'house-view'`, stretching as a *tile* (the illustration keeps its aspect ratio, the card centers it in the extra height — see A.4).
+- Config **as implemented**:
+  - `image`: illustration reference, validated as `gallery:<key>` (bundled) or `asset:<id>` (uploaded);
+  - `pins`: array of `{ x_pct, y_pct, device_feature, label?, icon? }` (max 20) — coordinates in percent of the image so it scales freely. In the editor, clicking the image places a pin (moving one = remove + place again; drag may come later); values render as floating badges in the chips visual family, updated live over websocket, with the icon derived from the feature category.
 - **Image sources**, in order of effort:
-  1. **Bundled gallery**: 4–5 house illustrations shipped with Gladys, all in the same fixed visual style (isometric, soft palette, transparent background — works on light and dark themes). This is the no-Plus, zero-effort path and the showcase of the expected rendering.
-  2. **Upload**: any user image (floor plan, garden photo, custom render).
-  3. **AI-generated via Gladys Plus** (section F): the user's actual house, in the gallery's exact style.
-- **Storage**: uploaded/generated images must not inflate the `boxes` JSON (dashboards are fetched on every load) and must not depend on an external URL. They are stored server-side as a dashboard asset (small dedicated table holding the binary + content type, referenced by id from the box config, served with long cache headers). *Open question: exact table/endpoint shape — to be settled in the implementing PR and folded back into this spec.*
-- Optional **night variant**: a second image auto-swapped by sun state (the `sun` box logic already computes it). One extra field, no extra concept.
+  1. **Bundled gallery** (implemented): 4 isometric house illustrations shipped with the frontend (`house-solar`, `house-family`, `house-modern`, `apartment`), generated from a small projection script so style, palette and lighting stay consistent. This is the no-Plus, zero-effort path and the showcase of the expected rendering.
+  2. **Upload** (implemented): any user image (floor plan, garden photo, custom render). The frontend downscales it in a canvas (max 1600 px, JPEG/PNG) before upload, so the payload stays small whatever the source photo.
+  3. **AI-generated via Gladys Plus** (section F, phase 5): the user's actual house, in the gallery's exact style.
+- **Storage — decided and implemented**: uploaded images live in a dedicated `t_dashboard_asset` table (`id`, `dashboard_id` FK with `ON DELETE CASCADE`, `content_type`, `data` BLOB — migration `20260816000000`), referenced from the box config by id so the `boxes` JSON stays small.
+  - `POST /api/v1/dashboard_asset/:dashboard_selector` uploads `{ content_type, data }` (base64). Server-side bounds in `dashboard.createAsset`: raster types only (`image/png`, `image/jpeg`, `image/webp`), valid base64, ≤ 4 MB of base64. The route carries a dedicated 6 MB JSON body bound mounted **behind authentication** (`largeJsonBody` route flag), following the host-API precedent — the global 100 kB bound is untouched.
+  - `GET /api/v1/dashboard_asset/:id` returns `content-type;base64,data`, the exact shape of the photo proxy, consumed as a data URI — same access rules as the dashboard (owner or public).
+  - Assets are deleted with their dashboard (FK cascade). An asset orphaned by replacing a box image lives until then; a cleanup pass can come later if it ever matters.
+- Optional **night variant**: a second image auto-swapped by sun state — **deferred**, one additive field when it comes, no schema impact.
 
 ## F. AI illustration generation through Gladys Plus
 
@@ -160,7 +163,7 @@ Ordering principle, decided with the maintainer: **plumbing first, showcase widg
 1. **Sections layout** (A) — **implemented**, including selective stretch (A.4). Also covers the community prototype work from forum 10553.
 2. **Density widgets**: chips bar (B) + scene state subtitle (C) — **implemented**.
 3. **Appearance (G) + tablet tab bar (H)** — **implemented** (background as a URL for now; `theme` override deferred, see G).
-4. **House view** (E) with bundled gallery + upload + pins. Includes the dashboard-asset storage decision, which is plumbing reused by G (uploaded backgrounds) and F.
+4. **House view** (E) — **implemented** with bundled gallery + upload + pins, including the dashboard-asset storage (plumbing reused later by G uploaded backgrounds and F).
 5. **Plus AI generation** (F) — requires the Gladys Plus backend endpoint; front/server land behind the existing Plus feature detection.
 6. **Energy flow** (D) — deliberately last: it is a self-contained visualization that depends on nothing above and unlocks nothing else, whereas everything before it is foundation.
 

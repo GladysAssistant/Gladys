@@ -348,7 +348,8 @@
       "link": "Lien",
       "photo": "Photo",
       "sun": "Soleil",
-      "chips": "Pastilles d'état"
+      "chips": "Pastilles d'état",
+      "house-view": "Vue de la maison"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -734,6 +735,22 @@
           "partially-armed": "Partiellement activée",
           "panic": "Panique"
         }
+      },
+      "house-view": {
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "ex : Ma maison",
+        "editGalleryLabel": "Choisissez une illustration",
+        "editUploadLabel": "Ou envoyez votre propre image",
+        "uploading": "Envoi en cours...",
+        "uploadError": "L'image n'a pas pu être envoyée. Essayez une image plus légère.",
+        "editPinsLabel": "Valeurs en direct sur l'image",
+        "editPinsDescription": "Cliquez sur l'image pour poser une épingle, puis choisissez la fonctionnalité qu'elle affiche. Pour déplacer une épingle, supprimez-la et reposez-la.",
+        "editPinLabel": "Épingle {{index}}",
+        "editPinFeatureLabel": "Fonctionnalité de l'appareil",
+        "editPinLabelLabel": "Libellé (optionnel)",
+        "editPinLabelPlaceholder": "ex : Solaire",
+        "noImage": "Choisissez une illustration dans les réglages du widget.",
+        "error": "L'image n'a pas pu être chargée."
       }
     },
     "editDashboardBackgroundImageLabel": "Image de fond (optionnel)",

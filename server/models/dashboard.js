@@ -71,6 +71,27 @@ const boxSchema = Joi.object().keys({
       }),
     )
     .max(100),
+  // house-view box: an illustration with live device values pinned on it.
+  // The image is either a bundled illustration ("gallery:<key>") or an
+  // uploaded dashboard asset ("asset:<id>").
+  image: Joi.string().pattern(/^(gallery|asset):[a-zA-Z0-9-]+$/),
+  pins: Joi.array()
+    .items(
+      Joi.object().keys({
+        x_pct: Joi.number()
+          .min(0)
+          .max(100)
+          .required(),
+        y_pct: Joi.number()
+          .min(0)
+          .max(100)
+          .required(),
+        device_feature: Joi.string().required(),
+        label: Joi.string().allow(''),
+        icon: Joi.string(),
+      }),
+    )
+    .max(20),
   // chips box: an ordered list of compact state pills
   chips: Joi.array()
     .items(

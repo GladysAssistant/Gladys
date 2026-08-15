@@ -348,7 +348,8 @@
       "link": "Link",
       "photo": "Foto",
       "sun": "Sonne",
-      "chips": "Status-Chips"
+      "chips": "Status-Chips",
+      "house-view": "Hausansicht"
     },
     "boxes": {
       "column": "Spalte {{index}}",
@@ -734,6 +735,22 @@
           "partially-armed": "Teilweise aktiviert",
           "panic": "Panik"
         }
+      },
+      "house-view": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "z. B. Mein Haus",
+        "editGalleryLabel": "Illustration auswählen",
+        "editUploadLabel": "Oder eigenes Bild hochladen",
+        "uploading": "Wird hochgeladen...",
+        "uploadError": "Das Bild konnte nicht hochgeladen werden. Versuchen Sie ein kleineres Bild.",
+        "editPinsLabel": "Live-Werte auf dem Bild",
+        "editPinsDescription": "Klicken Sie auf das Bild, um einen Pin zu setzen, und wählen Sie dann die Gerätefunktion aus. Zum Verschieben einen Pin entfernen und neu setzen.",
+        "editPinLabel": "Pin {{index}}",
+        "editPinFeatureLabel": "Gerätefunktion",
+        "editPinLabelLabel": "Beschriftung (optional)",
+        "editPinLabelPlaceholder": "z. B. Solar",
+        "noImage": "Wählen Sie eine Illustration in den Widget-Einstellungen.",
+        "error": "Das Bild konnte nicht geladen werden."
       }
     },
     "editDashboardBackgroundImageLabel": "Hintergrundbild (optional)",

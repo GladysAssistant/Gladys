@@ -10,7 +10,12 @@ export const MAX_COLUMNS_PER_SECTION = 4;
 // Media boxes stretch by letting their image absorb the extra height,
 // tile boxes stretch by vertically centering their content in the card.
 const MEDIA_STRETCH_BOX_TYPES = [DASHBOARD_BOX_TYPE.CAMERA, DASHBOARD_BOX_TYPE.PHOTO];
-const TILE_STRETCH_BOX_TYPES = [DASHBOARD_BOX_TYPE.TEMPERATURE_IN_ROOM, DASHBOARD_BOX_TYPE.HUMIDITY_IN_ROOM];
+const TILE_STRETCH_BOX_TYPES = [
+  DASHBOARD_BOX_TYPE.TEMPERATURE_IN_ROOM,
+  DASHBOARD_BOX_TYPE.HUMIDITY_IN_ROOM,
+  // the illustration keeps its aspect ratio, the card centers it in the extra height
+  DASHBOARD_BOX_TYPE.HOUSE_VIEW
+];
 
 export const canBoxStretch = box =>
   box && (MEDIA_STRETCH_BOX_TYPES.includes(box.type) || TILE_STRETCH_BOX_TYPES.includes(box.type));
