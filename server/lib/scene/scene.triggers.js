@@ -22,12 +22,27 @@ const getSunPositionCondition = (operator, value) => {
   return Number.isFinite(numericValue) ? { operator, value: numericValue } : null;
 };
 
-const sunPositionAxisVerified = (condition, currentValue) => {
+// The azimuth is an angle on a compass: 359.9° and 0.1° are 0.2° apart, not 359.8°.
+const circularDistanceInDegree = (a, b) => {
+  const distance = Math.abs(a - b) % 360;
+  return Math.min(distance, 360 - distance);
+};
+
+// `circular` is true for the azimuth only: the altitude is a plain elevation angle.
+// It changes how "=" measures the distance to the configured value, so that "= 0"
+// also matches an azimuth of 359.8°. ">" and "<" stay plain comparisons on [0, 360[,
+// even for the azimuth: a half-plane has no wrap-aware meaning on a circle, so an
+// azimuth area crossing North (for example from 350° to 10°) cannot be described with
+// a single condition. The UI help text documents it.
+const sunPositionAxisVerified = (condition, currentValue, circular) => {
   if (condition === null) {
     return true;
   }
   if (condition.operator === '=') {
-    return Math.abs(currentValue - condition.value) <= SUN_POSITION_EQUALITY_TOLERANCE_IN_DEGREE;
+    const distance = circular
+      ? circularDistanceInDegree(currentValue, condition.value)
+      : Math.abs(currentValue - condition.value);
+    return distance <= SUN_POSITION_EQUALITY_TOLERANCE_IN_DEGREE;
   }
   return compare(condition.operator, currentValue, condition.value);
 };
@@ -46,11 +61,11 @@ const matchSunPosition = (self, sceneSelector, event, trigger) => {
     return false;
   }
   const verified =
-    sunPositionAxisVerified(altitudeCondition, event.altitude) &&
-    sunPositionAxisVerified(azimuthCondition, event.azimuth);
+    sunPositionAxisVerified(altitudeCondition, event.altitude, false) &&
+    sunPositionAxisVerified(azimuthCondition, event.azimuth, true);
   const previouslyVerified =
-    sunPositionAxisVerified(altitudeCondition, event.previous_altitude) &&
-    sunPositionAxisVerified(azimuthCondition, event.previous_azimuth);
+    sunPositionAxisVerified(altitudeCondition, event.previous_altitude, false) &&
+    sunPositionAxisVerified(azimuthCondition, event.previous_azimuth, true);
   return verified && !previouslyVerified;
 };
 

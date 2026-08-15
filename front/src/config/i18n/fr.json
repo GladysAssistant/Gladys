@@ -3583,7 +3583,7 @@
         "altitudeLabel": "Altitude du soleil",
         "altitudeHelp": "Hauteur du soleil au-dessus de l'horizon, en degrés : 0° au lever et au coucher du soleil, 90° au zénith, négative la nuit.",
         "azimuthLabel": "Azimut du soleil",
-        "azimuthHelp": "Direction du soleil à la boussole, en degrés depuis le Nord : 0° = Nord, 90° = Est, 180° = Sud, 270° = Ouest."
+        "azimuthHelp": "Direction du soleil à la boussole, en degrés depuis le Nord : 0° = Nord, 90° = Est, 180° = Sud, 270° = Ouest. Autour du minuit solaire, le soleil est plein Nord, sous l'horizon : combinez l'azimut avec une condition sur l'altitude (par exemple altitude > 0) si la scène ne doit démarrer que le jour. Une seule condition ne peut pas décrire une zone qui traverse le Nord, par exemple de 350° à 10°."
       },
       "userPresence": {
         "backAtHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné rentrera à la maison sélectionnée.",

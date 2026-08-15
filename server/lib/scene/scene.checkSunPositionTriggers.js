@@ -16,9 +16,15 @@ const RADIAN_TO_DEGREE = 180 / Math.PI;
  * const position = convertSunPositionToDegrees({ altitude: 0, azimuth: 0 });
  */
 function convertSunPositionToDegrees({ altitude, azimuth }) {
+  // The JS remainder keeps the sign of its left operand, so a second modulo is needed
+  // to always land in [0, 360[.
+  const azimuthInDegree = (((azimuth * RADIAN_TO_DEGREE + 180) % 360) + 360) % 360;
+  const roundedAzimuth = Math.round(azimuthInDegree * 100) / 100;
   return {
     altitude: Math.round(altitude * RADIAN_TO_DEGREE * 100) / 100,
-    azimuth: Math.round(((azimuth * RADIAN_TO_DEGREE + 180) % 360) * 100) / 100,
+    // Rounding an azimuth just below North (359.999°) gives exactly 360: bring it back
+    // to 0, so that North is always exposed as 0 and never as 360.
+    azimuth: roundedAzimuth >= 360 ? roundedAzimuth - 360 : roundedAzimuth,
   };
 }
 

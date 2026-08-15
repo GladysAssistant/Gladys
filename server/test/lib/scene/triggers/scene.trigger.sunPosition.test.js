@@ -176,6 +176,29 @@ describe('Scene.triggers.sunPosition', () => {
     expect(triggersFunc[EVENTS.TIME.SUN_POSITION](sceneManager, 'scene-1', sunPositionEvent, trigger)).to.equal(false);
   });
 
+  it('should match with the "=" operator on the azimuth across North', () => {
+    const trigger = {
+      type: EVENTS.TIME.SUN_POSITION,
+      house: 'my-house',
+      sun_azimuth_operator: '=',
+      sun_azimuth: 0,
+    };
+    // The sun is 0.2° west of North: the circular distance to 0° is 0.2°, not 359.8°
+    const sunAlmostNorth = { ...sunPositionEvent, azimuth: 359.8, previous_azimuth: 359 };
+    expect(triggersFunc[EVENTS.TIME.SUN_POSITION](sceneManager, 'scene-1', sunAlmostNorth, trigger)).to.equal(true);
+  });
+
+  it('should not match with the "=" operator when the azimuth is far from the value on the compass', () => {
+    const trigger = {
+      type: EVENTS.TIME.SUN_POSITION,
+      house: 'my-house',
+      sun_azimuth_operator: '=',
+      sun_azimuth: 180,
+    };
+    const sunAlmostNorth = { ...sunPositionEvent, azimuth: 359.8, previous_azimuth: 359 };
+    expect(triggersFunc[EVENTS.TIME.SUN_POSITION](sceneManager, 'scene-1', sunAlmostNorth, trigger)).to.equal(false);
+  });
+
   it('should not match twice while the sun stays in the configured area', () => {
     const trigger = {
       type: EVENTS.TIME.SUN_POSITION,

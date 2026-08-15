@@ -76,6 +76,14 @@ describe('scene.checkSunPositionTriggers', () => {
     });
   });
 
+  it('should convert an azimuth just below North to 0 and never to 360', () => {
+    // Just below North: the rounding to 2 decimals would give 360 without the normalization
+    const justBelowNorth = convertSunPositionToDegrees({ altitude: 0, azimuth: Math.PI - 0.0000001 });
+    expect(justBelowNorth.azimuth).to.equal(0);
+    const justAboveNorth = convertSunPositionToDegrees({ altitude: 0, azimuth: -Math.PI + 0.0000001 });
+    expect(justAboveNorth.azimuth).to.equal(0);
+  });
+
   it('should do nothing when no active scene has a sun position trigger', async () => {
     await sceneManager.addScene({
       ...sunPositionScene,

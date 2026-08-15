@@ -3583,7 +3583,7 @@
         "altitudeLabel": "Sun altitude",
         "altitudeHelp": "Elevation angle of the sun above the horizon, in degrees: 0° at sunrise and sunset, 90° at the zenith, negative at night.",
         "azimuthLabel": "Sun azimuth",
-        "azimuthHelp": "Compass direction of the sun, in degrees from North: 0° = North, 90° = East, 180° = South, 270° = West."
+        "azimuthHelp": "Compass direction of the sun, in degrees from North: 0° = North, 90° = East, 180° = South, 270° = West. Around solar midnight the sun is due North, below the horizon: combine the azimuth with an altitude condition (for example altitude > 0) if the scene must only start during the day. A single condition cannot describe an area crossing North, for example from 350° to 10°."
       },
       "userPresence": {
         "backAtHomeDescription": "This will trigger when the selected user is back at the selected home.",
