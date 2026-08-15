@@ -2,7 +2,11 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import {
+  ANY_CHANGE_OPERATOR,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES
+} from '../../../../../../server/utils/constants';
 
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
 import BinaryDeviceState from './device-states/BinaryDeviceState';
@@ -52,14 +56,34 @@ class TurnOnLight extends Component {
       this.props.updateTriggerProperty(this.props.index, 'device_feature', undefined);
     }
 
-    // the saved value only stays meaningful while the kind of feature is unchanged
+    // the saved value only stays meaningful while the kind of feature is unchanged. In
+    // "any change" mode there is no value at all, and re-adding an empty one would break
+    // the trigger validation.
     const featureKindChanged =
       !firstFeature ||
       !previousFeature ||
       firstFeature.category !== previousFeature.category ||
       firstFeature.type !== previousFeature.type;
-    if (featureKindChanged) {
+    if (featureKindChanged && !this.isAnyStateChange()) {
       this.props.updateTriggerProperty(this.props.index, 'value', null);
+    }
+  };
+
+  isAnyStateChange = () => this.props.trigger.operator === ANY_CHANGE_OPERATOR;
+
+  enableOrDisableAnyStateChange = e => {
+    if (e.target.checked) {
+      this.props.updateTriggerProperty(this.props.index, 'operator', ANY_CHANGE_OPERATOR);
+      // an "any change" trigger compares the new state with the previous one: there is no
+      // value to match, and neither the threshold nor the duration option applies to a
+      // change, which is instantaneous
+      this.props.updateTriggerProperty(this.props.index, 'value', undefined);
+      this.props.updateTriggerProperty(this.props.index, 'threshold_only', undefined);
+      this.props.updateTriggerProperty(this.props.index, 'for_duration', undefined);
+      this.props.updateTriggerProperty(this.props.index, 'unit', undefined);
+    } else {
+      // back to the condition widgets, which set the operator matching the selected feature
+      this.props.updateTriggerProperty(this.props.index, 'operator', undefined);
     }
   };
 
@@ -118,6 +142,9 @@ class TurnOnLight extends Component {
   };
 
   render(props, { selectedDeviceFeature }) {
+    // in "any change" mode the scene starts on every state change: no condition widget, no
+    // threshold and no duration is displayed, they don't apply
+    const anyStateChange = this.isAnyStateChange();
     let binaryDevice = false;
     let presenceDevice = false;
     let buttonClickDevice = false;
@@ -130,7 +157,7 @@ class TurnOnLight extends Component {
     let waterValveStatusDevice = false;
     let waterHeaterModeDevice = false;
 
-    if (selectedDeviceFeature) {
+    if (selectedDeviceFeature && !anyStateChange) {
       const { category, type } = selectedDeviceFeature;
 
       // water-heater's own `binary` shares the 'binary' string with SWITCH, so it is already
@@ -173,6 +200,7 @@ class TurnOnLight extends Component {
 
     const defaultDevice =
       selectedDeviceFeature &&
+      !anyStateChange &&
       !binaryDevice &&
       !presenceDevice &&
       !buttonClickDevice &&
@@ -187,6 +215,7 @@ class TurnOnLight extends Component {
 
     const thresholdDevice =
       selectedDeviceFeature &&
+      !anyStateChange &&
       !presenceDevice &&
       !buttonClickDevice &&
       !doorbellRingDevice &&
@@ -230,23 +259,40 @@ class TurnOnLight extends Component {
           )}
           {defaultDevice && <DefaultDeviceState {...props} selectedDeviceFeature={selectedDeviceFeature} />}
         </div>
-        {thresholdDevice && <ThresholdDeviceState {...props} />}
         <div class="row">
           <div class="col-12">
             <label class="form-check form-switch">
               <input
                 class="form-check-input"
                 type="checkbox"
-                checked={props.trigger.for_duration !== undefined}
-                onChange={this.enableOrDisableForDuration}
+                checked={anyStateChange}
+                onChange={this.enableOrDisableAnyStateChange}
               />
               <span class="form-check-label">
-                <Text id="editScene.triggersCard.newState.activateOrDeactivateForDuration" />
+                <Text id="editScene.triggersCard.newState.anyStateChange" />
               </span>
             </label>
           </div>
         </div>
-        {props.trigger.for_duration !== undefined && (
+        {thresholdDevice && <ThresholdDeviceState {...props} />}
+        {!anyStateChange && (
+          <div class="row">
+            <div class="col-12">
+              <label class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  checked={props.trigger.for_duration !== undefined}
+                  onChange={this.enableOrDisableForDuration}
+                />
+                <span class="form-check-label">
+                  <Text id="editScene.triggersCard.newState.activateOrDeactivateForDuration" />
+                </span>
+              </label>
+            </div>
+          </div>
+        )}
+        {!anyStateChange && props.trigger.for_duration !== undefined && (
           <div class="row">
             <div class="col">
               <div class="form-group">

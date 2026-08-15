@@ -1,5 +1,5 @@
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
-const { ACTION_LIST, ACTIONS, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
+const { ACTION_LIST, ACTIONS, EVENT_LIST, ALARM_MODES_LIST, TRIGGER_OPERATORS } = require('../utils/constants');
 const { WEATHER_ALERT_TYPES, WEATHER_ALERT_SEVERITIES } = require('../lib/external-integration/constants');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
@@ -115,7 +115,8 @@ const triggersSchema = Joi.array().items(
     device_features: Joi.array()
       .items(Joi.string())
       .min(1),
-    operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
+    // `changed` fires on any state change of the device feature, no value is needed
+    operator: Joi.string().valid(...TRIGGER_OPERATORS),
     value: Joi.alternatives().try(Joi.number(), Joi.string()),
     user: Joi.string(),
     area: Joi.string(),

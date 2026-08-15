@@ -3530,6 +3530,7 @@
         "off": "Off",
         "deviceSeen": "Si l'appareil est détecté",
         "doorbellRang": "Si la sonnette sonne",
+        "anyStateChange": "Démarrer la scène à chaque changement d'état, quelle que soit la valeur",
         "onlyExecuteAtThreshold": "Exécuter seulement lorsque le seuil est passé ( et non pas à chaque valeur envoyée )",
         "activateOrDeactivateForDuration": "Exécuter la scène après que la condition ait été valide pendant : ",
         "multipleFeaturesNote": "Vous pouvez sélectionner plusieurs fonctionnalités du même type : la scène démarrera dès que l'une d'elles remplit la condition."
