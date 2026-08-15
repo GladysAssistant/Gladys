@@ -120,6 +120,20 @@
   justify-content: center;
 }
 
+/* On large screens a stretched value tile's height is imposed by its
+   column, so its wrapper can be a size container: the tile content adapts
+   to the real rendered height (see components/boxs/roomTile.css). The
+   container is the padding-less wrapper, not the card, because container
+   queries evaluate against the content box. The min-height keeps a
+   sensible tile when every box of a section is a value tile. Not applied
+   on mobile, where columns stack and heights are natural. */
+@media (min-width: 992px) {
+  .adaptiveTile {
+    container-type: size;
+    min-height: 6rem;
+  }
+}
+
 @media (min-width: 992px) {
   .smallButtonOnBigScreen {
     padding: 0.25rem 0.5rem;

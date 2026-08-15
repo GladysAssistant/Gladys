@@ -1,7 +1,7 @@
 import Box from './Box';
 import cx from 'classnames';
 import style from './style.css';
-import { canBoxStretch, isTileStretchBox } from '../../utils/dashboardSections';
+import { canBoxStretch, isTileStretchBox, isValueTileBox } from '../../utils/dashboardSections';
 
 const BoxColumns = ({ children, ...props }) => {
   let columnOffset = 0;
@@ -27,7 +27,10 @@ const BoxColumns = ({ children, ...props }) => {
                       canBoxStretch(box) ? (
                         <div
                           key={`${props.homeDashboard.id}-${x}-${y}`}
-                          class={cx(style.stretchableBox, { [style.stretchableTile]: isTileStretchBox(box) })}
+                          class={cx(style.stretchableBox, {
+                            [style.stretchableTile]: isTileStretchBox(box),
+                            [style.adaptiveTile]: isValueTileBox(box)
+                          })}
                         >
                           <Box box={box} x={x} y={y} />
                         </div>

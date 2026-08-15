@@ -22,6 +22,14 @@ export const canBoxStretch = box =>
 
 export const isTileStretchBox = box => box && TILE_STRETCH_BOX_TYPES.includes(box.type);
 
+// Value tiles (a number + a label) additionally become a size container when
+// stretched, so their layout can adapt to the real rendered height. The
+// house-view is excluded: its natural height (the illustration) is what
+// drives the section height, so it must not be size-contained.
+const VALUE_TILE_BOX_TYPES = [DASHBOARD_BOX_TYPE.TEMPERATURE_IN_ROOM, DASHBOARD_BOX_TYPE.HUMIDITY_IN_ROOM];
+
+export const isValueTileBox = box => box && VALUE_TILE_BOX_TYPES.includes(box.type);
+
 // The editor works on a flat list of columns (so drag & drop coordinates stay
 // global) plus the number of columns of each section.
 export const flattenSections = sections => {
