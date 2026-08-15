@@ -12,15 +12,19 @@ class DeviceHistory extends Component {
     this.setState({ loadingDevice: true, deviceError: false });
     try {
       const device = await this.props.httpClient.get(`/api/v1/device/${this.props.device_selector}`);
-      const features = device.features || [];
-      this.setState({
-        device,
-        loadingDevice: false,
-        selectedFeatureSelector: features.length > 0 ? features[0].selector : null
-      });
-      if (features.length > 0) {
-        this.getStates();
-      }
+      // Features with history disabled have no recorded value to display or correct.
+      const features = (device.features || []).filter(feature => feature.keep_history !== false);
+      // getStates reads the selected feature from the state, so it can only run once the
+      // new state is applied: setState is asynchronous in Preact.
+      this.setState(
+        {
+          device,
+          features,
+          loadingDevice: false,
+          selectedFeatureSelector: features.length > 0 ? features[0].selector : null
+        },
+        this.getStates
+      );
     } catch (e) {
       console.error(e);
       this.setState({ loadingDevice: false, deviceError: true });
@@ -151,6 +155,7 @@ class DeviceHistory extends Component {
     super(props);
     this.state = {
       device: null,
+      features: [],
       selectedFeatureSelector: null,
       from: dayjs()
         .subtract(DEFAULT_RANGE_IN_DAYS, 'day')
@@ -177,13 +182,11 @@ class DeviceHistory extends Component {
   }
 
   render(props, state) {
-    const features = (state.device && state.device.features) || [];
-    const selectedFeature = features.find(feature => feature.selector === state.selectedFeatureSelector) || null;
+    const selectedFeature = state.features.find(feature => feature.selector === state.selectedFeatureSelector) || null;
     return (
       <DeviceHistoryPage
         {...state}
         pageSize={PAGE_SIZE}
-        features={features}
         selectedFeature={selectedFeature}
         user={props.user}
         selectFeature={this.selectFeature}

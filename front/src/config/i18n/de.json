@@ -126,6 +126,7 @@
     "pagination": "{{from}} - {{to}} von {{total}} Werten",
     "emptyState": "In diesem Zeitraum wurde für diese Funktion kein Wert aufgezeichnet.",
     "noFeature": "Dieses Gerät hat keine Funktion.",
+    "noFeatureWithHistory": "Keine Funktion dieses Geräts speichert einen Verlauf ihrer Werte.",
     "error": "Beim Laden der aufgezeichneten Werte ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
     "deviceError": "Beim Laden dieses Geräts ist ein Fehler aufgetreten. Bitte versuche es später erneut.",
     "actionError": "Der Wert konnte nicht gespeichert werden. Bitte prüfe den Wert und versuche es erneut.",

@@ -47,10 +47,11 @@ async function updateState(deviceFeatureSelector, createdAt, newValue) {
   }
 
   // The last value of the feature is a denormalized copy of the most recent state: it is
-  // only stale when the state that was corrected is that most recent one.
+  // only stale when the state that was corrected is that most recent one. In that case the
+  // corrected state is the new last value, so there is nothing to look up in the history.
   const lastValueChanged = deviceFeature.last_value_changed ? new Date(deviceFeature.last_value_changed) : null;
   if (lastValueChanged === null || createdAtDate.getTime() >= lastValueChanged.getTime()) {
-    await this.refreshFeatureLastValue(deviceFeature);
+    await this.refreshFeatureLastValue(deviceFeature, { lastState: { value: newValue, created_at: createdAtDate } });
   }
 
   return {

@@ -121,7 +121,11 @@ const DeviceHistoryPage = props => {
 
             {!props.deviceError && !props.loadingDevice && props.features.length === 0 && (
               <div class="alert alert-info">
-                <Text id="deviceHistory.noFeature" />
+                {props.device && props.device.features && props.device.features.length > 0 ? (
+                  <Text id="deviceHistory.noFeatureWithHistory" />
+                ) : (
+                  <Text id="deviceHistory.noFeature" />
+                )}
               </div>
             )}
 
@@ -144,7 +148,9 @@ const DeviceHistoryPage = props => {
                             value={feature.selector}
                             selected={feature.selector === props.selectedFeatureSelector}
                           >
-                            {feature.name}
+                            {feature.name} (
+                            <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`}>{feature.type}</Text>
+                            )
                           </option>
                         ))}
                       </select>

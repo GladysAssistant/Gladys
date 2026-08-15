@@ -41,10 +41,11 @@ async function destroyState(deviceFeatureSelector, createdAt) {
   }
 
   // The last value of the feature is a denormalized copy of the most recent state: when
-  // that state is the one being deleted, the feature falls back to the previous state.
+  // that state is the one being deleted, the feature falls back to the most recent state
+  // still recorded before it.
   const lastValueChanged = deviceFeature.last_value_changed ? new Date(deviceFeature.last_value_changed) : null;
   if (lastValueChanged === null || createdAtDate.getTime() >= lastValueChanged.getTime()) {
-    await this.refreshFeatureLastValue(deviceFeature);
+    await this.refreshFeatureLastValue(deviceFeature, { before: createdAtDate });
   }
 }
 

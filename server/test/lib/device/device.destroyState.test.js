@@ -86,6 +86,22 @@ describe('Device.destroyState', () => {
     });
   });
 
+  it('should fall back to a previous state older than the first time windows', async () => {
+    const newestDate = new Date(LAST_VALUE_CHANGED.getTime() + 60 * 1000);
+    // Outside the 1 hour and 1 day windows: only the wider windows can find it
+    const previousDate = new Date(newestDate.getTime() - 2 * 24 * 60 * 60 * 1000);
+    await db.duckDbBatchInsertState(DEVICE_FEATURE_ID, [
+      { value: 1, created_at: previousDate },
+      { value: 9999, created_at: newestDate },
+    ]);
+
+    await deviceInstance.destroyState('test-device-feature', newestDate);
+
+    const deviceFeature = await db.DeviceFeature.findOne({ where: { selector: 'test-device-feature' } });
+    expect(deviceFeature.last_value).to.equal(1);
+    expect(new Date(deviceFeature.last_value_changed).getTime()).to.equal(previousDate.getTime());
+  });
+
   it('should reset the last value when the whole history is gone', async () => {
     const newestDate = new Date(LAST_VALUE_CHANGED.getTime() + 60 * 1000);
     await db.duckDbBatchInsertState(DEVICE_FEATURE_ID, [{ value: 9999, created_at: newestDate }]);

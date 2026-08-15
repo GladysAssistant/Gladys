@@ -126,6 +126,7 @@
     "pagination": "{{from}} - {{to}} of {{total}} values",
     "emptyState": "No value recorded for this feature over this period.",
     "noFeature": "This device has no feature.",
+    "noFeatureWithHistory": "No feature of this device keeps a history of its values.",
     "error": "There was an error loading the recorded values. Please try again later.",
     "deviceError": "There was an error loading this device. Please try again later.",
     "actionError": "The value could not be saved. Please check the value and try again.",
