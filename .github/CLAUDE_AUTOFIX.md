@@ -1,6 +1,7 @@
 # Scheduled Claude autofix
 
-`claude-scheduled-autofix.yml` runs once a day and launches Claude Code
+`claude-scheduled-autofix.yml` runs every 3 hours (04:30–19:30 UTC, 6
+runs a day; an empty run is free since nothing is fired) and launches Claude Code
 **cloud sessions** (claude.ai/code) to address the review-bot feedback
 (Cursor, CodeRabbit) left on open pull requests — with hard caps, and without
 the runaway loop of the event-driven mode (Claude pushes → the bots re-review
@@ -75,7 +76,7 @@ also marks the whole thread, and resolving a thread by hand excludes it too.
 | Constant | Value | Role |
 | --- | --- | --- |
 | `MAX_PASSES` | 3 | Hard cap of autofix passes per PR (highest trailer value). Reached with feedback still pending → exhausted. |
-| `MAX_PRS` | 8 | Budget circuit breaker: max PRs per daily run, oldest activity first. Each fire also draws down the account's daily routine-run allowance. |
+| `MAX_PRS` | 10 | Budget circuit breaker: max PRs per run, oldest activity first. Each fire also draws down the account's daily routine-run allowance. |
 | `QUIET_PERIOD_HOURS` | 2 | A comment younger than this is left for the next run, so a review round can finish (and a human can veto). |
 | `REVIEW_BOT_LOGINS` | `cursor[bot]`, `coderabbitai[bot]` | Whose comments count as actionable feedback. |
 | `AUTOFIX_ACTOR_LOGINS` | `Pierre-Gilles`, `github-actions[bot]`, `claude[bot]` | Whose replies/markers count as "handled". Cloud sessions post as the routine owner (first login). |
@@ -153,20 +154,22 @@ excerpt). Nothing is written and no cloud session is fired.
 - **Fire and forget**: the `/fire` API returns the session URL (logged in the
   job summary) but there is no public endpoint to poll for completion, so the
   workflow cannot fail when a session fails — check claude.ai/code or the
-  next day's selection (an untouched PR simply comes back).
+  next run's selection (an untouched PR simply comes back).
 - The `/fire` endpoint is in research preview behind the
   `experimental-cc-routine-2026-04-01` beta header; Anthropic may change it.
 - Routine runs count against the account's **daily routine-run cap** and
   subscription usage; HTTP 429 on the fire call means the cap was hit.
-- The fire is not idempotent: manually re-running the workflow while the
-  daily run's sessions are still working can fire a second session for the
-  same PR and pass. Consequences are bounded (the pass counter takes the
+- The fire is not idempotent: manually re-running the workflow while a
+  previous run's sessions are still working can fire a second session for
+  the same PR and pass. Consequences are bounded (the pass counter takes the
   highest trailer, and markers prevent re-selection on *later* runs — they
   are not concurrency control, so two live sessions can post duplicate
-  replies and overlapping commits). Avoid manual dispatches right after the
-  scheduled run.
-- A comment posted less than `QUIET_PERIOD_HOURS` before the daily run waits
-  for the next day: worst-case latency is ~26 h.
+  replies and overlapping commits). Avoid manual dispatches right after a
+  scheduled run — and keep the schedule spacing well above a session's
+  lifetime (3 h is fine, hourly would not be) for the same reason.
+- A comment posted less than `QUIET_PERIOD_HOURS` before a run waits for the
+  next one: worst-case latency is ~5 h (2 h quiet period + 3 h to the next
+  run, ~11 h across the overnight gap).
 - Review threads with more than 100 replies are read truncated when looking
   for autofix replies (unreachable in practice on this repo's PRs).
 - `mergeable_state` is computed asynchronously by GitHub; a PR in `unknown`
