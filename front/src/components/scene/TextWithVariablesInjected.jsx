@@ -13,7 +13,9 @@ const CLOSING_VARIABLE = '}}';
 
 class TextWithVariablesInjected extends Component {
   setRef = dom => (this.tagifyInputRef = dom);
-  initTagify = () => {
+  // The whitelist can be passed explicitly by the caller: `setState` is asynchronous in Preact,
+  // so right after a state update `this.state.variableWhileList` may still hold the previous list.
+  initTagify = (variableWhileList = this.state.variableWhileList) => {
     if (this.tagify) {
       this.tagify.destroy();
     }
@@ -29,7 +31,7 @@ class TextWithVariablesInjected extends Component {
         mapValueTo: 'title',
         maxItems: 200
       },
-      whitelist: this.state.variableWhileList,
+      whitelist: variableWhileList,
       mixTagsInterpolator: [OPENING_VARIABLE, CLOSING_VARIABLE]
     });
     const text = this.props.text || '';
@@ -110,7 +112,7 @@ class TextWithVariablesInjected extends Component {
     // we compare here the previous variables key
     // and the new one, and we compare if they are the same
     if (variablesKey !== previousVariablesKey) {
-      this.initTagify();
+      this.initTagify(variableWhileList);
     }
   };
   parseText = async textContent => {
