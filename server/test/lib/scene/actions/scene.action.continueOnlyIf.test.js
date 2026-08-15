@@ -119,9 +119,10 @@ describe('scene.continue-only-if', () => {
               {
                 variable: '0.0.last_value',
                 operator: '=',
-                // "sqrt" is not part of the restricted formula engine namespace,
-                // so evaluating this condition throws.
-                evaluate_value: 'sqrt(400)',
+                // "unknownFunction" is not part of the restricted formula engine namespace,
+                // so evaluating this condition throws. It is deliberately a name mathjs will
+                // never define, so extending the namespace cannot make this formula valid.
+                evaluate_value: 'unknownFunction(400)',
               },
             ],
           },

@@ -322,9 +322,10 @@ describe('scene.formula', () => {
           {
             type: ACTIONS.DEVICE.SET_VALUE,
             device_feature: 'my-device-feature',
-            // "compareText" is not part of the restricted formula engine namespace,
-            // so evaluating this formula throws.
-            evaluate_value: 'compareText("a", "b")',
+            // "unknownFunction" is not part of the restricted formula engine namespace,
+            // so evaluating this formula throws. It is deliberately a name mathjs will never
+            // define, so extending the namespace cannot make this formula valid.
+            evaluate_value: 'unknownFunction(1)',
           },
         ],
       ],
@@ -333,5 +334,50 @@ describe('scene.formula', () => {
     await chaiAssert.isRejected(promise, AbortScene, 'ACTION_VALUE_NOT_A_NUMBER');
     // The guard must fail closed: the device value must not have been changed.
     expect(device.setValue.callCount).to.equal(0);
+  });
+
+  it('should abort the scene when the formula overflows to a non-finite number', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'brightness',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-device-feature',
+            // exp() overflows to Infinity without throwing: a device cannot be set to it.
+            evaluate_value: 'exp(1000)',
+          },
+        ],
+      ],
+      {},
+    );
+    await chaiAssert.isRejected(promise, AbortScene, 'ACTION_VALUE_NOT_A_NUMBER');
+    expect(device.setValue.callCount).to.equal(0);
+  });
+
+  it('should abort the scene when a delay formula returns a non-finite number', async () => {
+    const promise = executeActions(
+      { stateManager, event },
+      [
+        [
+          {
+            type: ACTIONS.TIME.DELAY,
+            unit: 'seconds',
+            // log(0) is -Infinity: waiting for it would hang the scene instead of failing it.
+            evaluate_value: 'log(0)',
+          },
+        ],
+      ],
+      {},
+    );
+    await chaiAssert.isRejected(promise, AbortScene, 'ACTION_VALUE_NOT_A_NUMBER');
   });
 });

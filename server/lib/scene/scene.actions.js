@@ -93,7 +93,9 @@ const actionsFunc = {
       }
     }
 
-    if (Number.isNaN(Number(value))) {
+    // Infinity is rejected like NaN: a formula can overflow to it (exp(1000)) or reach it
+    // through a logarithm of zero (log(0)), and a device cannot be set to an infinite value.
+    if (!Number.isFinite(Number(value))) {
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
     }
 
@@ -258,7 +260,10 @@ const actionsFunc = {
       }
     }
 
-    if (Number.isNaN(Number(value))) {
+    // Infinity is rejected like NaN: a formula can overflow to it (exp(1000)) or reach it
+    // through a logarithm of zero (log(0)), and waiting for an infinite delay would hang
+    // the scene instead of failing it.
+    if (!Number.isFinite(Number(value))) {
       logger.warn(`Delay: Value is not a number: ${value}`);
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
     }

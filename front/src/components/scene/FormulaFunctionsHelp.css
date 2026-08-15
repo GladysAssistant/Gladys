@@ -10,5 +10,5 @@
 .formulaHelp code {
   background: none;
   padding: 0;
-  word-break: break-word;
+  overflow-wrap: anywhere;
 }

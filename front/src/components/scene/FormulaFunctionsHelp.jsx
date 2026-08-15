@@ -24,6 +24,9 @@ const FormulaFunctionsHelp = () => (
     <div>
       <Text id="editScene.actionsCard.formulaHelp.example" />
     </div>
+    <div>
+      <Text id="editScene.actionsCard.formulaHelp.caveats" />
+    </div>
   </div>
 );
 

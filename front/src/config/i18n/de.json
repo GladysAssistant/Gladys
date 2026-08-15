@@ -3095,7 +3095,8 @@
         "operators": "Verfügbare Operatoren:",
         "functions": "Verfügbare Funktionen:",
         "constants": "Verfügbare Konstanten:",
-        "example": "Eine Funktion nimmt ihre Argumente in Klammern, durch Kommas getrennt. Z.B.: round(min(100, 3 * 45) / 2)"
+        "example": "Eine Funktion nimmt ihre Argumente in Klammern, durch Kommas getrennt. Z.B.: round(min(100, 3 * 45) / 2)",
+        "caveats": "Achtung: Trigonometrische Funktionen arbeiten im Bogenmaß (sin(pi/2), nicht sin(90)), log ist der natürliche Logarithmus (nutze log10 für Basis 10), randomInt(min, max) gibt nie max zurück, und Konstanten müssen explizit multipliziert werden (2*pi, nicht 2 pi)."
       },
       "delay": {
         "label": " Dieser Block wartet für die angegebene Dauer.",
