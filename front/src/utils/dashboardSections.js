@@ -7,9 +7,15 @@ export const MAX_COLUMNS_PER_SECTION = 4;
 // with columns of different heights don't leave blank space. This is a
 // per-type constant, not a user setting: charts are excluded for now
 // because their height is fixed by the chart library options.
-const STRETCHABLE_BOX_TYPES = [DASHBOARD_BOX_TYPE.CAMERA, DASHBOARD_BOX_TYPE.PHOTO];
+// Media boxes stretch by letting their image absorb the extra height,
+// tile boxes stretch by vertically centering their content in the card.
+const MEDIA_STRETCH_BOX_TYPES = [DASHBOARD_BOX_TYPE.CAMERA, DASHBOARD_BOX_TYPE.PHOTO];
+const TILE_STRETCH_BOX_TYPES = [DASHBOARD_BOX_TYPE.TEMPERATURE_IN_ROOM, DASHBOARD_BOX_TYPE.HUMIDITY_IN_ROOM];
 
-export const canBoxStretch = box => box && STRETCHABLE_BOX_TYPES.includes(box.type);
+export const canBoxStretch = box =>
+  box && (MEDIA_STRETCH_BOX_TYPES.includes(box.type) || TILE_STRETCH_BOX_TYPES.includes(box.type));
+
+export const isTileStretchBox = box => box && TILE_STRETCH_BOX_TYPES.includes(box.type);
 
 // The editor works on a flat list of columns (so drag & drop coordinates stay
 // global) plus the number of columns of each section.

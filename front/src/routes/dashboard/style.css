@@ -114,6 +114,12 @@
   min-height: 0;
 }
 
+/* Tile boxes (room temperature/humidity) center their content in the
+   extra height instead of leaving it under the card */
+.stretchableTile > div {
+  justify-content: center;
+}
+
 @media (min-width: 992px) {
   .smallButtonOnBigScreen {
     padding: 0.25rem 0.5rem;
