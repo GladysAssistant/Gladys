@@ -3195,6 +3195,7 @@
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
+        "triggerVariablesLabel": "Déclencheurs de la scène",
         "operatorLabel": "Opérateur",
         "valueLabel": "Valeur",
         "removeLabel": "Effacer",
@@ -3463,6 +3464,10 @@
         "count": "Nombre d'évènements",
         "events": "Liste des évènements"
       },
+      "mqtt": {
+        "topic": "Topic MQTT reçu",
+        "message": "Message MQTT reçu"
+      },
       "askAi": {
         "answer": "Réponse de l'IA"
       },
@@ -3630,6 +3635,7 @@
         "topicPlaceholder": "Entrez votre topic",
         "messageLabel": "Message",
         "messagePlaceholder": "Entrez le message attendu",
+        "variablesDescription": "Le topic et le message reçus peuvent être utilisés dans les actions suivantes de la scène : tapez '{{' dans un champ texte pour les injecter.",
         "messageDescription": "Entrez le message attendu ou laissez vide pour exécuter la scène quelque soit le message"
       },
       "weatherAlert": {

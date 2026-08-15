@@ -43,6 +43,26 @@ class OnlyContinueIf extends Component {
   render(props, {}) {
     const variableOptions = [];
 
+    // Variables coming from the triggers of the scene are always available,
+    // whatever the position of this action in the scene
+    const triggersVariablesOptions = [];
+    (props.triggersVariables || []).forEach((triggerVariables, index) => {
+      triggerVariables.forEach(option => {
+        triggersVariablesOptions.push({
+          label: `${index + 1}. ${option.label}`,
+          value: `triggerEvent.${option.name}`,
+          type: option.type,
+          data: option.data
+        });
+      });
+    });
+    if (triggersVariablesOptions.length > 0) {
+      variableOptions.push({
+        label: get(this, 'props.intl.dictionary.editScene.actionsCard.onlyContinueIf.triggerVariablesLabel'),
+        options: triggersVariablesOptions
+      });
+    }
+
     Object.keys(props.variables).forEach(variablePath => {
       // If the variable is defined before the current path, we can use it
       if (isVariableAvailableAtThisPath(variablePath, props.path)) {

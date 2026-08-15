@@ -3195,6 +3195,7 @@
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
+        "triggerVariablesLabel": "Auslöser der Szene",
         "operatorLabel": "Operator",
         "valueLabel": "Wert",
         "removeLabel": "Entfernen",
@@ -3463,6 +3464,10 @@
         "count": "Anzahl der Ereignisse",
         "events": "Liste der Ereignisse"
       },
+      "mqtt": {
+        "topic": "Empfangenes MQTT-Topic",
+        "message": "Empfangene MQTT-Message"
+      },
       "askAi": {
         "answer": "AI Antwort"
       },
@@ -3630,6 +3635,7 @@
         "topicPlaceholder": "Gib dein Topic ein",
         "messageLabel": "Message",
         "messagePlaceholder": "Gib die erwartete Message ein",
+        "variablesDescription": "Das empfangene Topic und die empfangene Message können in den folgenden Aktionen der Szene verwendet werden: Gib '{{' in einem Textfeld ein, um sie einzufügen.",
         "messageDescription": "Gib die erwartete Message ein oder lasse das Feld leer, um die Szene unabhängig von der Message auszuführen"
       },
       "weatherAlert": {
