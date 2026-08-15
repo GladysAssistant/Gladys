@@ -2,6 +2,8 @@ const { BadParameters } = require('../../utils/coreErrors');
 const {
   EVENTS,
   WEBSOCKET_MESSAGE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_CATEGORIES_LIST,
   DEVICE_FEATURE_TYPES_LIST,
   DEVICE_FEATURE_UNITS_LIST,
@@ -85,9 +87,15 @@ async function setDiscoveredDevices(service, devices) {
       // here keeps the Discovery screen from posting one back to POST /device
       const { selector: publishedFeatureSelector, ...featureWithoutSelector } = feature;
       if (feature.supported_options !== undefined) {
-        // labeled option lists (camera presets, supported movements, AC modes...)
+        // labeled option lists (camera presets, supported movements, AC modes...);
+        // string option values only exist on dynamic selects (installed TV apps,
+        // HDMI sources...), like in device.syncFeatureSupportedOptions
+        const allowStringValues =
+          feature.category === DEVICE_FEATURE_CATEGORIES.TEXT && feature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT;
         try {
-          featureWithoutSelector.supported_options = normalizeSupportedOptions(feature.supported_options);
+          featureWithoutSelector.supported_options = normalizeSupportedOptions(feature.supported_options, {
+            allowStringValues,
+          });
         } catch (e) {
           throw new BadParameters(`${featurePath}.supported_options: ${e.message}`);
         }
