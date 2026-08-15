@@ -5719,6 +5719,16 @@
       "label": "Modèle IA",
       "auto": "Auto",
       "priceLegend": "€ économique · €€ moyen · €€€ premium"
+    },
+    "voiceInput": {
+      "startListening": "Dicter un message",
+      "stopListening": "Arrêter la dictée",
+      "error": "La reconnaissance vocale a échoué. Veuillez réessayer.",
+      "errorNoSpeech": "Aucune voix détectée. Vérifiez que votre micro est activé, puis réessayez.",
+      "errorPermissionDenied": "L'accès au micro a été refusé. Autorisez-le dans les réglages de votre navigateur pour dicter un message.",
+      "errorNoMicrophone": "Aucun micro détecté. Branchez ou activez un micro dans les réglages système.",
+      "errorNetwork": "La reconnaissance vocale est indisponible, votre navigateur n'a pas pu joindre son service vocal.",
+      "errorNotSupported": "La reconnaissance vocale n'est pas disponible dans ce navigateur."
     }
   },
   "history": {

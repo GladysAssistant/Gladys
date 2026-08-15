@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { connect } from 'unistore/preact';
 import actions from '../../actions/message';
 import { RequestStatus } from '../../utils/consts';
+import { isSpeechRecognitionSupported } from '../../utils/speechRecognition';
 import ChatItems from './ChatItems';
 import EmptyChat from './EmptyChat';
 import AiModelSelector from './AiModelSelector';
+import ChatVoiceInputButton from './ChatVoiceInputButton';
 import style from './style.css';
 
 const IntegrationPage = connect(
@@ -19,14 +21,20 @@ const IntegrationPage = connect(
     MessageGetStatus,
     currentMessageTextInput,
     updateMessageTextInput,
+    setMessageTextInput,
     onKeyPress,
     sendMessage,
     gladysIsTyping,
     httpClient
   }) => {
     const textareaRef = useRef(null);
+    const voiceInputRef = useRef(null);
     const [selectedModel, setSelectedModel] = useState('auto');
     const [gladysPlusConfigured, setGladysPlusConfigured] = useState(null);
+    const [voiceInputError, setVoiceInputError] = useState(null);
+    // Browsers without the Web Speech API (Firefox for example) simply don't
+    // get a microphone button.
+    const [voiceInputSupported] = useState(isSpeechRecognitionSupported);
     const hasMessageToSend = Boolean(currentMessageTextInput && currentMessageTextInput.trim().length > 0);
 
     useEffect(() => {
@@ -63,13 +71,16 @@ const IntegrationPage = connect(
     };
 
     const handleSendMessage = () => {
+      if (voiceInputRef.current) {
+        voiceInputRef.current.cancelListening();
+      }
       sendMessage(selectedModel);
     };
 
     const handleKeyPress = e => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        sendMessage(selectedModel);
+        handleSendMessage();
         return;
       }
       onKeyPress(e);
@@ -109,13 +120,24 @@ const IntegrationPage = connect(
                             <textarea
                               ref={textareaRef}
                               rows="1"
-                              class={cx('form-control', style.chatInput)}
+                              class={cx('form-control', style.chatInput, {
+                                [style.chatInputWithVoice]: voiceInputSupported
+                              })}
                               placeholder={<Text id="chat.messagePlaceholder" />}
                               value={currentMessageTextInput}
                               onInput={onComposerInput}
                               onKeyPress={handleKeyPress}
                             />
                           </Localizer>
+                          {voiceInputSupported && (
+                            <ChatVoiceInputButton
+                              ref={voiceInputRef}
+                              language={user && user.language}
+                              currentText={currentMessageTextInput}
+                              onTranscript={setMessageTextInput}
+                              onError={setVoiceInputError}
+                            />
+                          )}
                           <button
                             type="button"
                             class={cx('btn', style.sendButton, {
@@ -128,6 +150,11 @@ const IntegrationPage = connect(
                             <i class="fe fe-send" />
                           </button>
                         </div>
+                        {voiceInputError && (
+                          <p class={style.voiceInputError}>
+                            <Text id={`chat.voiceInput.${voiceInputError}`} />
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

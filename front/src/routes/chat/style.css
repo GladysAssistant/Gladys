@@ -530,6 +530,11 @@
   overflow-y: hidden;
 }
 
+/* Leave room for the microphone button next to the send button. */
+.chatInputWithVoice {
+  padding-right: 92px;
+}
+
 .chatInput:focus {
   border-color: #467fcf;
   box-shadow: 0 0 0 0.2rem rgba(70, 127, 207, 0.18);
@@ -572,6 +577,55 @@
 .sendButtonIdle:focus {
   background: #eef2f6;
   color: #9aa7b5;
+}
+
+.voiceInputButton {
+  position: absolute;
+  right: 48px;
+  bottom: 8px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50% !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2f6;
+  color: #6c7a89;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.voiceInputButton:hover,
+.voiceInputButton:focus {
+  background: #e2e9f0;
+  color: #3564be;
+}
+
+.voiceInputButtonListening,
+.voiceInputButtonListening:hover,
+.voiceInputButtonListening:focus {
+  background: #e74c3c;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+  animation: voiceInputPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes voiceInputPulse {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 2px 14px rgba(231, 76, 60, 0.75);
+  }
+}
+
+.voiceInputError {
+  margin: 8px 4px 0;
+  font-size: 13px;
+  color: #cd201f;
 }
 
 .emptyChatState {
