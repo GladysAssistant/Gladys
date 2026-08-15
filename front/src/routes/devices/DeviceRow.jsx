@@ -1,5 +1,4 @@
 import { Text } from 'preact-i18n';
-import { Link } from 'preact-router/match';
 
 import { DeviceStamp, FeatureIcons, IntegrationName } from './helpers';
 
@@ -26,14 +25,6 @@ const DeviceRow = ({ device, integration }) => (
     </td>
     <td>
       <FeatureIcons device={device} />
-    </td>
-    <td class="text-right text-nowrap">
-      {integration && integration.deviceUrl && (
-        <Link href={integration.deviceUrl} class="btn btn-sm btn-outline-primary">
-          <i class="fe fe-external-link mr-1" />
-          <Text id="devicesList.openInIntegration" />
-        </Link>
-      )}
     </td>
   </tr>
 );
