@@ -3635,7 +3635,7 @@
         "topicPlaceholder": "Gib dein Topic ein",
         "messageLabel": "Message",
         "messagePlaceholder": "Gib die erwartete Message ein",
-        "variablesDescription": "Das empfangene Topic und die empfangene Message können in den folgenden Aktionen der Szene verwendet werden: Gib '{{' in einem Textfeld ein, um sie einzufügen.",
+        "variablesDescription": "Das empfangene Topic und die empfangene Message können in den folgenden Aktionen der Szene verwendet werden: Gib '{{' in einem Textfeld ein, um sie einzufügen. Beachte, dass MQTT-Messages immer als Text verglichen werden: Eine Message wie '23' passt daher nicht zu einem numerischen Wert in einer \"Nur fortfahren wenn\"-Bedingung.",
         "messageDescription": "Gib die erwartete Message ein oder lasse das Feld leer, um die Szene unabhängig von der Message auszuführen"
       },
       "weatherAlert": {
