@@ -735,6 +735,15 @@
           "panic": "Panic"
         }
       }
+    },
+    "editDashboardBackgroundImageLabel": "Background image (optional)",
+    "editDashboardBackgroundImagePlaceholder": "https://... URL of an image",
+    "editDashboardCardStyleLabel": "Card style",
+    "editDashboardIconLabel": "Icon (optional)",
+    "editDashboardIconDescription": "Shown in the dashboard tab bar in tablet mode.",
+    "cardStyles": {
+      "default": "Default",
+      "glass": "Glass (translucent)"
     }
   },
   "newDashboard": {

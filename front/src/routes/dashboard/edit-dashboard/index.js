@@ -176,6 +176,17 @@ class EditDashboard extends Component {
     this.setState(newState);
   };
 
+  updateCurrentDashboardProperty = (property, value) => {
+    const newState = update(this.state, {
+      currentDashboard: {
+        [property]: {
+          $set: value
+        }
+      }
+    });
+    this.setState(newState);
+  };
+
   updateBoxConfig = (x, y, data) => {
     this.setState(prevState => {
       const newState = update(prevState, {
@@ -481,6 +492,7 @@ class EditDashboard extends Component {
         updateBoxConfig={this.updateBoxConfig}
         updateCurrentDashboardName={this.updateCurrentDashboardName}
         updateCurrentDashboardVisibility={this.updateCurrentDashboardVisibility}
+        updateCurrentDashboardProperty={this.updateCurrentDashboardProperty}
         askDeleteCurrentDashboard={this.askDeleteCurrentDashboard}
         cancelDeleteCurrentDashboard={this.cancelDeleteCurrentDashboard}
         deleteCurrentDashboard={this.deleteCurrentDashboard}

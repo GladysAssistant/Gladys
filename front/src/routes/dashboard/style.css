@@ -40,6 +40,57 @@
   }
 }
 
+.dashboardBackground {
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Translucent cards over the dashboard background image */
+.glassCards :global(.card) {
+  background-color: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+:global(.dark-mode) .glassCards :global(.card) {
+  background-color: rgba(30, 33, 43, 0.72);
+}
+
+.dashboardTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dashboardTab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.375rem;
+  height: 2.375rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 40, 100, 0.12);
+  background-color: #fff;
+  color: #495057;
+  font-size: 1rem;
+}
+
+.dashboardTab:hover {
+  color: #467fcf;
+  text-decoration: none;
+}
+
+.dashboardTabActive {
+  background-color: #467fcf;
+  border-color: #467fcf;
+  color: #fff;
+}
+
+.dashboardTabActive:hover {
+  color: #fff;
+}
+
 /* Boxes of a stretchable type absorb the remaining height of their column so
    sections with columns of different heights don't leave blank space */
 .stretchableBox {

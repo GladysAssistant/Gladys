@@ -1,7 +1,12 @@
 const Joi = require('joi');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const { normalizeDashboardBoxes } = require('../utils/dashboardSections');
-const { DASHBOARD_BOX_TYPE_LIST, DASHBOARD_TYPE_LIST, DASHBOARD_VISIBILITY_LIST } = require('../utils/constants');
+const {
+  DASHBOARD_BOX_TYPE_LIST,
+  DASHBOARD_TYPE_LIST,
+  DASHBOARD_VISIBILITY_LIST,
+  DASHBOARD_CARD_STYLE_LIST,
+} = require('../utils/constants');
 
 const MAX_COLUMNS_PER_SECTION = 4;
 
@@ -142,6 +147,21 @@ module.exports = (sequelize, DataTypes) => {
       visibility: {
         allowNull: false,
         type: DataTypes.ENUM(DASHBOARD_VISIBILITY_LIST),
+      },
+      icon: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
+      background_image: {
+        allowNull: true,
+        type: DataTypes.TEXT,
+      },
+      card_style: {
+        allowNull: true,
+        type: DataTypes.ENUM(DASHBOARD_CARD_STYLE_LIST),
+        validate: {
+          isIn: [DASHBOARD_CARD_STYLE_LIST],
+        },
       },
       boxes: {
         allowNull: false,

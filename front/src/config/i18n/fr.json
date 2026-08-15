@@ -735,6 +735,15 @@
           "panic": "Panique"
         }
       }
+    },
+    "editDashboardBackgroundImageLabel": "Image de fond (optionnel)",
+    "editDashboardBackgroundImagePlaceholder": "https://... URL d'une image",
+    "editDashboardCardStyleLabel": "Style des cartes",
+    "editDashboardIconLabel": "Icône (optionnel)",
+    "editDashboardIconDescription": "Affichée dans la barre d'onglets des tableaux de bord en mode tablette.",
+    "cardStyles": {
+      "default": "Par défaut",
+      "glass": "Verre dépoli (translucide)"
     }
   },
   "newDashboard": {

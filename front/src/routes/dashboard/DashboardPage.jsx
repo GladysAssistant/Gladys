@@ -9,97 +9,125 @@ import { wrapEmojisJSX } from '../../utils/emojiWrapper';
 
 import style from './style.css';
 
-const DashboardPage = ({ children, ...props }) => (
-  <div class="page">
-    <div class="page-main">
-      <div class={props.loading ? 'dimmer active' : 'dimmer'}>
-        <div class="loader" />
-        <div class="dimmer-content">
-          <div class="my-3 my-md-5 dashboard">
-            <div class={cx('container')}>
-              <div class="page-header">
-                <div>
-                  {!props.dashboardListEmpty && (
-                    <div class="dropdown">
-                      <button class="btn btn-secondary dropdown-toggle" onClick={props.toggleDashboardDropdown}>
-                        {props.currentDashboard && wrapEmojisJSX(props.currentDashboard.name)}
-                      </button>
-                      <div
-                        class={cx('dropdown-menu', {
-                          show: props.dashboardDropdownOpened
-                        })}
-                      >
+const DashboardPage = ({ children, ...props }) => {
+  const backgroundImage = props.currentDashboard && props.currentDashboard.background_image;
+  const glassCards = props.currentDashboard && props.currentDashboard.card_style === 'glass';
+  return (
+    <div class="page">
+      <div
+        class={cx('page-main', { [style.dashboardBackground]: backgroundImage })}
+        style={backgroundImage ? `background-image: url(${JSON.stringify(backgroundImage)})` : undefined}
+      >
+        <div class={props.loading ? 'dimmer active' : 'dimmer'}>
+          <div class="loader" />
+          <div class="dimmer-content">
+            <div class="my-3 my-md-5 dashboard">
+              <div class={cx('container')}>
+                <div class="page-header">
+                  <div>
+                    {!props.dashboardListEmpty && props.tabletMode && (
+                      <div class={style.dashboardTabs}>
                         {props.dashboards.map(dashboard => (
                           <Link
-                            class={cx('dropdown-item', style.dropdownItemBiggerLines)}
                             href={`/dashboard/${dashboard.selector}`}
                             onClick={props.redirectToDashboard}
+                            class={cx(style.dashboardTab, {
+                              [style.dashboardTabActive]:
+                                props.currentDashboard && dashboard.selector === props.currentDashboard.selector
+                            })}
+                            title={dashboard.name}
                           >
-                            {wrapEmojisJSX(dashboard.name)}
+                            <i class={`fe fe-${dashboard.icon || 'home'}`} />
                           </Link>
                         ))}
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                    {!props.dashboardListEmpty && !props.tabletMode && (
+                      <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" onClick={props.toggleDashboardDropdown}>
+                          {props.currentDashboard && wrapEmojisJSX(props.currentDashboard.name)}
+                        </button>
+                        <div
+                          class={cx('dropdown-menu', {
+                            show: props.dashboardDropdownOpened
+                          })}
+                        >
+                          {props.dashboards.map(dashboard => (
+                            <Link
+                              class={cx('dropdown-item', style.dropdownItemBiggerLines)}
+                              href={`/dashboard/${dashboard.selector}`}
+                              onClick={props.redirectToDashboard}
+                            >
+                              {wrapEmojisJSX(dashboard.name)}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                <div class="page-options d-flex align-content-between flex-wrap">
-                  {!props.isGladysPlus && (
-                    <button onClick={props.toggleDefineTabletMode} class={cx('btn btn-outline-secondary ml-2')}>
-                      <span class={style.editDashboardText}>
-                        {props.defineTabletModeOpened ? (
-                          <Text id="dashboard.closeDefineTabletMode" />
-                        ) : (
-                          <Text id="dashboard.toggleDefineTabletMode" />
-                        )}
-                      </span>{' '}
-                      <i class="fe fe-tablet" />
-                    </button>
-                  )}
-                  {!props.dashboardNotConfigured &&
-                    props.browserFullScreenCompatible &&
-                    !props.hideExitFullScreenButton && (
-                      <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2 btn-sm')}>
-                        <span>
-                          {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
-                          {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
-                          {!props.fullScreen && <i class="fe fe-maximize-2" />}
-                          {props.fullScreen && <i class="fe fe-minimize-2" />}
-                        </span>
+                  <div class="page-options d-flex align-content-between flex-wrap">
+                    {!props.isGladysPlus && (
+                      <button onClick={props.toggleDefineTabletMode} class={cx('btn btn-outline-secondary ml-2')}>
+                        <span class={style.editDashboardText}>
+                          {props.defineTabletModeOpened ? (
+                            <Text id="dashboard.closeDefineTabletMode" />
+                          ) : (
+                            <Text id="dashboard.toggleDefineTabletMode" />
+                          )}
+                        </span>{' '}
+                        <i class="fe fe-tablet" />
                       </button>
                     )}
-                  {props.currentDashboard && !props.hideExitFullScreenButton && (
-                    <button onClick={props.editDashboard} class={cx('btn btn-outline-primary ml-2')}>
-                      <span class={style.editDashboardText}>
-                        <Text id="dashboard.editDashboardButton" />
-                      </span>{' '}
-                      <i class="fe fe-edit" />
-                    </button>
-                  )}
+                    {!props.dashboardNotConfigured &&
+                      props.browserFullScreenCompatible &&
+                      !props.hideExitFullScreenButton && (
+                        <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2 btn-sm')}>
+                          <span>
+                            {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
+                            {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
+                            {!props.fullScreen && <i class="fe fe-maximize-2" />}
+                            {props.fullScreen && <i class="fe fe-minimize-2" />}
+                          </span>
+                        </button>
+                      )}
+                    {props.currentDashboard && !props.hideExitFullScreenButton && (
+                      <button onClick={props.editDashboard} class={cx('btn btn-outline-primary ml-2')}>
+                        <span class={style.editDashboardText}>
+                          <Text id="dashboard.editDashboardButton" />
+                        </span>{' '}
+                        <i class="fe fe-edit" />
+                      </button>
+                    )}
+                  </div>
                 </div>
+                {props.gatewayInstanceNotFound && (
+                  <div class="alert alert-warning">
+                    <Text id="dashboard.gatewayInstanceNotFoundError" />
+                  </div>
+                )}
+                <SetTabletMode
+                  toggleDefineTabletMode={props.toggleDefineTabletMode}
+                  defineTabletModeOpened={props.defineTabletModeOpened}
+                />
+                {props.duckDbMigrationJob && props.duckDbMigrationJob.status === JOB_STATUS.IN_PROGRESS && (
+                  <div class="alert alert-info">
+                    <Text id="dashboard.duckDbMigrationInProgress" fields={props.duckDbMigrationJob} />
+                  </div>
+                )}
+                {props.dashboardNotConfigured && <EmptyState dashboardListEmpty={props.dashboardListEmpty} />}
+                {!props.dashboardNotConfigured && (
+                  <div class={cx({ [style.glassCards]: glassCards })}>
+                    <BoxColumns homeDashboard={props.currentDashboard} />
+                  </div>
+                )}
               </div>
-              {props.gatewayInstanceNotFound && (
-                <div class="alert alert-warning">
-                  <Text id="dashboard.gatewayInstanceNotFoundError" />
-                </div>
-              )}
-              <SetTabletMode
-                toggleDefineTabletMode={props.toggleDefineTabletMode}
-                defineTabletModeOpened={props.defineTabletModeOpened}
-              />
-              {props.duckDbMigrationJob && props.duckDbMigrationJob.status === JOB_STATUS.IN_PROGRESS && (
-                <div class="alert alert-info">
-                  <Text id="dashboard.duckDbMigrationInProgress" fields={props.duckDbMigrationJob} />
-                </div>
-              )}
-              {props.dashboardNotConfigured && <EmptyState dashboardListEmpty={props.dashboardListEmpty} />}
-              {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default DashboardPage;

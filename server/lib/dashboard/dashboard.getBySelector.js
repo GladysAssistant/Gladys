@@ -13,7 +13,20 @@ const { normalizeDashboardBoxes } = require('../../utils/dashboardSections');
  */
 async function getBySelector(userId, selector) {
   const dashboard = await db.Dashboard.findOne({
-    attributes: ['id', 'name', 'selector', 'type', 'visibility', 'user_id', 'created_at', 'updated_at', 'boxes'],
+    attributes: [
+      'id',
+      'name',
+      'selector',
+      'type',
+      'visibility',
+      'user_id',
+      'icon',
+      'background_image',
+      'card_style',
+      'created_at',
+      'updated_at',
+      'boxes',
+    ],
     where: {
       // I can see dashboard I created or public dashboard
       [Op.or]: [

@@ -51,6 +51,7 @@ const EditDashboard = ({ children, ...props }) => (
                           dashboards={props.dashboards}
                           updateCurrentDashboardName={props.updateCurrentDashboardName}
                           updateCurrentDashboardVisibility={props.updateCurrentDashboardVisibility}
+                          updateCurrentDashboardProperty={props.updateCurrentDashboardProperty}
                           editDashboardDragEnable={props.editDashboardDragEnable}
                           moveCard={props.moveCard}
                           moveBoxUp={props.moveBoxUp}

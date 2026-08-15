@@ -7,10 +7,11 @@ import EmptyColumnDropZone from './EmptyColumnDropZone';
 import BottomDropZone from './BottomDropZone';
 import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
 import { getDragAndDropBackend } from '../../../utils/dragAndDropBackend';
+import IconSelector from '../../../components/scene/IconSelector';
 import { getSectionOffsets, MAX_COLUMNS_PER_SECTION } from '../../../utils/dashboardSections';
 import style from './style.css';
 import stylePrimary from '../style.css';
-import { DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
+import { DASHBOARD_VISIBILITY_LIST, DASHBOARD_CARD_STYLE_LIST } from '../../../../../server/utils/constants';
 
 const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 const getTotalColumns = props => {
@@ -87,6 +88,58 @@ const EditBoxColumns = ({ children, ...props }) => (
               ))}
             </select>
           </Localizer>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="dashboard.editDashboardBackgroundImageLabel" />
+          </label>
+          <Localizer>
+            <input
+              type="text"
+              class="form-control"
+              placeholder={<Text id="dashboard.editDashboardBackgroundImagePlaceholder" />}
+              value={props.homeDashboard.background_image}
+              onInput={e => props.updateCurrentDashboardProperty('background_image', e.target.value || null)}
+            />
+          </Localizer>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="dashboard.editDashboardCardStyleLabel" />
+          </label>
+          <select
+            class="form-control"
+            value={props.homeDashboard.card_style || 'default'}
+            onChange={e =>
+              props.updateCurrentDashboardProperty('card_style', e.target.value === 'default' ? null : e.target.value)
+            }
+          >
+            {DASHBOARD_CARD_STYLE_LIST.map(cardStyle => (
+              <option value={cardStyle}>
+                <Text id={`dashboard.cardStyles.${cardStyle}`} />
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="dashboard.editDashboardIconLabel" />
+          </label>
+          <small class="d-block mb-2">
+            <Text id="dashboard.editDashboardIconDescription" />
+          </small>
+          <IconSelector
+            value={props.homeDashboard.icon}
+            onChange={e => props.updateCurrentDashboardProperty('icon', e.target.value)}
+          />
         </div>
       </div>
     </div>

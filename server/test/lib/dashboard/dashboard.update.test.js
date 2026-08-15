@@ -75,6 +75,24 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[1].columns).to.have.lengthOf(4);
   });
 
+  it('should update the dashboard appearance', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      icon: 'home',
+      background_image: 'https://example.com/background.jpg',
+      card_style: 'glass',
+    });
+    expect(updatedDashboard).to.have.property('icon', 'home');
+    expect(updatedDashboard).to.have.property('background_image', 'https://example.com/background.jpg');
+    expect(updatedDashboard).to.have.property('card_style', 'glass');
+  });
+
+  it('should reject an unknown card style', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      card_style: 'neon',
+    });
+    return assert.isRejected(promise);
+  });
+
   it('should save a chips box', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [
