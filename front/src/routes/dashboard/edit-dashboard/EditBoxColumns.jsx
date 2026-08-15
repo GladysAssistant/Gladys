@@ -1,13 +1,12 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { DndProvider } from 'react-dnd';
-import { TouchBackend } from 'react-dnd-touch-backend';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import EditBox from './EditBox';
 import EmptyColumnDropZone from './EmptyColumnDropZone';
 import BottomDropZone from './BottomDropZone';
 import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
+import { getDragAndDropBackend } from '../../../utils/dragAndDropBackend';
 import style from './style.css';
 import stylePrimary from '../style.css';
 import { DASHBOARD_VISIBILITY_LIST } from '../../../../../server/utils/constants';
@@ -17,6 +16,8 @@ const maxBoxes = 3;
 const getBoxesLength = props => {
   return props.homeDashboard.boxes.length;
 };
+
+const { backend: dragAndDropBackend, options: dragAndDropBackendOptions } = getDragAndDropBackend();
 
 const EditBoxColumns = ({ children, ...props }) => (
   <div class="pb-6">
@@ -109,7 +110,7 @@ const EditBoxColumns = ({ children, ...props }) => (
         </button>
       </div>
     </div>
-    <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
+    <DndProvider backend={dragAndDropBackend} options={dragAndDropBackendOptions}>
       {props.isMobileReordering && <AutoScrollMobile position="top" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
       <div class={cx('d-flex align-items-start', style.columnsCard)}>
         {props.homeDashboard &&

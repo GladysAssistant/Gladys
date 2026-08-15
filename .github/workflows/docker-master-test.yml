@@ -61,14 +61,16 @@ jobs:
         with:
           name: static
           path: front/build
-  test-server:
-    name: Server test
+  lint-server:
+    name: Server lint
     runs-on: ubuntu-22.04
+    # This job only reads the repository, so restrict the GITHUB_TOKEN
+    # accordingly (npm ci runs dependency lifecycle scripts).
+    permissions:
+      contents: read
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
@@ -94,13 +96,38 @@ jobs:
         working-directory: ./server
         run: |
           npm run eslint
+      - name: 🔐 Dependencies security audit
+        working-directory: ./server
+        run: npm audit --production --audit-level=critical || true
+  test-server:
+    name: Server test
+    runs-on: ubuntu-22.04
+    steps:
+      - name: ⬇️ Checkout Gladys code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: 'server/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - name: 💽 Install System Dependencies
+        run: |
+          sudo apt update
+          sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
+      - name: 📦 Install Global NPM Packages
+        run: |
+          sudo npm install typescript node-gyp -g
+      - name: 📦 Install NPM server packages
+        working-directory: ./server
+        run: |
+          npm ci
       - name: ✅ Test with coverage
         working-directory: ./server
         run: |
           npm run coverage
-      - name: 🔐 Dependencies security audit
-        working-directory: ./server
-        run: npm audit --production --audit-level=critical || true
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v4
         with:

@@ -6,7 +6,16 @@ import ExternalIntegrationPage from '../ExternalIntegrationPage';
 import ConfigTab from './ConfigTab';
 import { getRequestedHardwareClasses } from '../utils';
 import { RequestStatus } from '../../../../../utils/consts';
+import {
+  OAUTH_REDIRECT_URI,
+  assertOpenableUrl,
+  getAuthorizeUrlState,
+  getOAuthCallbackPath,
+  wrapAuthorizeUrl
+} from '../../../../../utils/oauth';
 import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
+
+const OAUTH_USE_INSTANCE_REDIRECT_KEY = 'externalIntegrationOAuthUseInstanceRedirect';
 
 class ExternalIntegrationConfigPage extends Component {
   // a non-admin user only gets the "my account" part of this screen: the
@@ -427,26 +436,71 @@ class ExternalIntegrationConfigPage extends Component {
     }
   };
 
+  toggleOAuthUseInstanceRedirect = e => {
+    const useInstanceRedirect = e.target.checked;
+    // remembered per browser and per origin, but not per integration: it
+    // describes how this Gladys is reached, which does not change from one
+    // provider to the next (reaching the same instance through Gladys Plus is
+    // another origin, hence another preference — which is what we want, that
+    // one is already HTTPS)
+    localStorage.setItem(OAUTH_USE_INSTANCE_REDIRECT_KEY, useInstanceRedirect ? 'true' : 'false');
+    this.setState({ oauthUseInstanceRedirect: useInstanceRedirect, oauthStatus: null });
+  };
+
   connectOAuth = async field => {
-    this.setState({ oauthStatus: RequestStatus.Getting });
+    this.setState({ oauthStatus: RequestStatus.Getting, oauthInvalidState: false, oauthInvalidUrl: false });
     const { selector } = this.props;
-    const redirectUri = `${window.location.origin}/dashboard/integration/device/external/${selector}/oauth-callback`;
+    const callbackPath = getOAuthCallbackPath(selector);
+    // an account_link provider never comes back to Gladys: the user approves it
+    // elsewhere and the integration notices on its own side. There is no
+    // redirect URI to declare, no state to carry across a round trip, and no
+    // callback tab to prime — the URL is opened as it was built. Same predicate
+    // as in ConfigSchemaForm: only `oauth2` is redirect-based, so a future
+    // account field type gets the account_link behaviour on both sides.
+    const usesRedirect = field.type === 'oauth2';
+    // providers refuse a plain HTTP redirect URI, which is how most people
+    // reach their Gladys: the flow goes through the HTTPS redirect page, which
+    // sends the browser back here. Users who already serve Gladys over HTTPS
+    // can opt out and declare their own address at the provider.
+    const useInstanceRedirect = this.state.oauthUseInstanceRedirect && window.location.protocol === 'https:';
+    const redirectUri = useInstanceRedirect ? `${window.location.origin}${callbackPath}` : OAUTH_REDIRECT_URI;
     try {
       const { authorize_url: authorizeUrl } = await this.props.httpClient.post(
         `/api/v1/external_integration/${selector}/oauth/authorize_url`,
         {
           key: field.key,
-          redirect_uri: redirectUri
+          redirect_uri: usesRedirect ? redirectUri : undefined
         }
       );
-      // the callback popup is a new tab: it recovers the oauth2 key
-      // through localStorage (shared across same-origin tabs)
-      localStorage.setItem(`externalIntegrationOAuthKey:${selector}`, field.key);
-      window.open(authorizeUrl, '_blank', 'noopener');
+      let urlToOpen = assertOpenableUrl(authorizeUrl);
+      if (usesRedirect) {
+        if (useInstanceRedirect) {
+          // nothing to wrap, the provider comes back here directly, but the
+          // anti-CSRF state stays mandatory
+          getAuthorizeUrlState(authorizeUrl);
+        } else {
+          urlToOpen = wrapAuthorizeUrl(authorizeUrl, { origin: window.location.origin, path: callbackPath });
+        }
+        // the callback popup is a new tab: it recovers the oauth2 key and the
+        // redirect_uri used through localStorage (shared across same-origin
+        // tabs). The token exchange fails unless the exact same redirect_uri
+        // comes back.
+        localStorage.setItem(`externalIntegrationOAuthKey:${selector}`, field.key);
+        localStorage.setItem(`externalIntegrationOAuthRedirectUri:${selector}`, redirectUri);
+      }
+      // An account_link sign-in page is opened with noreferrer: the address of
+      // the instance (often a private LAN one) has no business leaking to a
+      // provider that will never talk to it, and some of them — Xiaomi among
+      // them — reject a sign-in URL opened with a cross-site Referer outright.
+      window.open(urlToOpen, '_blank', usesRedirect ? 'noopener' : 'noopener,noreferrer');
       this.setState({ oauthStatus: RequestStatus.Success });
     } catch (e) {
       console.error(e);
-      this.setState({ oauthStatus: RequestStatus.Error });
+      this.setState({
+        oauthStatus: RequestStatus.Error,
+        oauthInvalidState: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_STATE',
+        oauthInvalidUrl: e.message === 'EXTERNAL_INTEGRATION_OAUTH_INVALID_URL'
+      });
     }
   };
 
@@ -469,6 +523,9 @@ class ExternalIntegrationConfigPage extends Component {
   };
 
   componentWillMount() {
+    this.setState({
+      oauthUseInstanceRedirect: localStorage.getItem(OAUTH_USE_INSTANCE_REDIRECT_KEY) === 'true'
+    });
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.STATUS_CHANGED,
       this.onStatusChanged
@@ -502,11 +559,13 @@ class ExternalIntegrationConfigPage extends Component {
       <ExternalIntegrationPage selector={props.selector} integration={state.integration}>
         <ConfigTab
           {...state}
+          selector={props.selector}
           user={props.user}
           httpClient={props.httpClient}
           updateConfigValue={this.updateConfigValue}
           saveConfig={this.saveConfig}
           connectOAuth={this.connectOAuth}
+          toggleOAuthUseInstanceRedirect={this.toggleOAuthUseInstanceRedirect}
           togglePreferLocal={this.togglePreferLocal}
           updateActionFieldValue={this.updateActionFieldValue}
           runAction={this.runAction}

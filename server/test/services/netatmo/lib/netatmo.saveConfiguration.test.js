@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 

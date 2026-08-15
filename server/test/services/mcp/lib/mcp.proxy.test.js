@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, stub } = sinon;
 const { proxy } = require('../../../../services/mcp/lib/mcp.proxy');
 
 describe('handle mcp connection', () => {

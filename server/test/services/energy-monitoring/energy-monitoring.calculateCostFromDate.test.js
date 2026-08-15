@@ -1,4 +1,6 @@
-const { assert, fake, stub } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake, stub } = sinon;
 
 const EnergyMonitoring = require('../../../services/energy-monitoring/lib');
 

@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { SUPPORTED_MODULE_TYPE } = require('../../../../../services/netatmo/lib/utils/netatmo.constants');
 const devicesNetatmoMock = JSON.parse(JSON.stringify(require('../../netatmo.loadDevices.mock.test.json')));

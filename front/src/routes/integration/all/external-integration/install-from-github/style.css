@@ -32,6 +32,17 @@
   color: inherit;
 }
 
+.errorDetails {
+  margin-bottom: 0;
+  padding-left: 1.25rem;
+  font-family: SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+  /* an invalid manifest can pile up dozens of errors: keep the modal usable */
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
 .listIcon {
   width: 48px;
   height: 48px;

@@ -22,8 +22,18 @@ function isUpdateAvailable(service) {
       latestVersion = indexEntry.manifest.version;
     }
   }
-  if (latestVersion === null && this.repoManifests.has(service.store_slug)) {
-    latestVersion = this.repoManifests.get(service.store_slug).version;
+  if (this.repoManifests.has(service.store_slug)) {
+    // the index lags behind the repo by up to 1h30 (hourly rebuild + 30 min
+    // client cache): whenever we already read the repo manifest (integration
+    // absent from the index, or update forced by the admin), the highest of
+    // the two known versions is the one to compare against
+    const repoVersion = this.repoManifests.get(service.store_slug).version;
+    if (
+      semver.valid(repoVersion) !== null &&
+      (semver.valid(latestVersion) === null || semver.gt(repoVersion, latestVersion))
+    ) {
+      latestVersion = repoVersion;
+    }
   }
   if (latestVersion === null || semver.valid(latestVersion) === null || semver.valid(service.version) === null) {
     return false;

@@ -1,8 +1,9 @@
 const EventEmitter = require('events');
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const WebSocket = require('ws');
-const { assert: sinonAssert, fake } = require('sinon');
+
+const { assert: sinonAssert, fake } = sinon;
 
 const { ExternalIntegrationUnavailableError, BadParameters } = require('../../../utils/coreErrors');
 const { Error422 } = require('../../../utils/httpErrors');
@@ -18,6 +19,20 @@ const TEST_OAUTH_MANIFEST = {
       key: 'netatmo_account',
       type: 'oauth2',
       label: { en: 'Netatmo account', fr: 'Compte Netatmo' },
+    },
+  ],
+};
+
+// manifest of an integration whose provider never redirects back: the account is
+// linked by approving a QR sign-in in the vendor app (Xiaomi Home case)
+const TEST_ACCOUNT_LINK_MANIFEST = {
+  ...TEST_MANIFEST,
+  config_schema: [
+    ...TEST_MANIFEST.config_schema,
+    {
+      key: 'xiaomi_account',
+      type: 'account_link',
+      label: { en: 'Xiaomi account', fr: 'Compte Xiaomi' },
     },
   ],
 };
@@ -149,7 +164,60 @@ describe('externalIntegration.getOAuthAuthorizeUrl', () => {
     }
   });
 
-  it('should refuse a key that is not an oauth2 field', async () => {
+  it('should relay an account_link request, which has no redirect_uri at all', async () => {
+    // an account_link provider never comes back to Gladys: the user approves it
+    // elsewhere (a QR sign-in in the vendor app, a pairing on a device) and the
+    // integration reports it through the connection status
+    const service = await seedExternalService({ manifest: TEST_ACCOUNT_LINK_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    const ws = buildFakeWs();
+    externalIntegration.connections.set(service.id, ws);
+    externalIntegration.getBySelector = fake.resolves(service);
+    const resultPromise = externalIntegration.getOAuthAuthorizeUrl(service.selector, {
+      key: 'xiaomi_account',
+    });
+    await waitForSend(ws);
+    const sentMessage = JSON.parse(ws.send.firstCall.args[0]);
+    expect(sentMessage.payload).to.have.property('key', 'xiaomi_account');
+    expect(sentMessage.payload.redirect_uri).to.equal(undefined);
+    externalIntegration.handleCommandResult(service, {
+      message_id: sentMessage.payload.message_id,
+      success: true,
+      // no client_id, no state: this is not an OAuth2 URL
+      data: { authorize_url: 'https://eu.account.xiaomi.com/longPolling/login?ticket=lp_42' },
+    });
+    expect(await resultPromise).to.deep.equal({
+      authorize_url: 'https://eu.account.xiaomi.com/longPolling/login?ticket=lp_42',
+    });
+  });
+
+  it('should not forward a client-supplied redirect_uri on an account_link field', async () => {
+    // the wire format is the spec: `redirect_uri` is absent for an account_link
+    // field, so a value a client still POSTs is ignored, not relayed — an
+    // integration distinguishing the two flows by its presence must never see it
+    const service = await seedExternalService({ manifest: TEST_ACCOUNT_LINK_MANIFEST });
+    const { externalIntegration } = buildSupervisor();
+    const ws = buildFakeWs();
+    externalIntegration.connections.set(service.id, ws);
+    externalIntegration.getBySelector = fake.resolves(service);
+    const resultPromise = externalIntegration.getOAuthAuthorizeUrl(service.selector, {
+      key: 'xiaomi_account',
+      redirect_uri: REDIRECT_URI,
+    });
+    await waitForSend(ws);
+    const sentMessage = JSON.parse(ws.send.firstCall.args[0]);
+    expect(sentMessage.payload).to.not.have.property('redirect_uri');
+    externalIntegration.handleCommandResult(service, {
+      message_id: sentMessage.payload.message_id,
+      success: true,
+      data: { authorize_url: 'https://eu.account.xiaomi.com/longPolling/login?ticket=lp_42' },
+    });
+    expect(await resultPromise).to.deep.equal({
+      authorize_url: 'https://eu.account.xiaomi.com/longPolling/login?ticket=lp_42',
+    });
+  });
+
+  it('should refuse a key that is neither an oauth2 nor an account_link field', async () => {
     const service = await seedOAuthService();
     const { externalIntegration } = buildSupervisor();
     await Promise.all(
@@ -159,7 +227,26 @@ describe('externalIntegration.getOAuthAuthorizeUrl', () => {
           throw new Error('should have thrown');
         } catch (e) {
           expect(e).to.be.instanceOf(BadParameters);
-          expect(e.message).to.include('not an oauth2 field');
+          expect(e.message).to.include('not an oauth2 or account_link field');
+        }
+      }),
+    );
+  });
+
+  it('should still require a redirect_uri on an oauth2 field', async () => {
+    // the provider comes back to it with the authorization code: without it
+    // there is nowhere to come back to
+    const service = await seedOAuthService();
+    const { externalIntegration } = buildSupervisor();
+    externalIntegration.getBySelector = fake.resolves(service);
+    await Promise.all(
+      [{ key: 'netatmo_account' }, { key: 'netatmo_account', redirect_uri: '' }].map(async (params) => {
+        try {
+          await externalIntegration.getOAuthAuthorizeUrl(service.selector, params);
+          throw new Error('should have thrown');
+        } catch (e) {
+          expect(e).to.be.instanceOf(BadParameters);
+          expect(e.message).to.include('redirect_uri');
         }
       }),
     );
@@ -168,16 +255,14 @@ describe('externalIntegration.getOAuthAuthorizeUrl', () => {
   it('should refuse malformed parameters', async () => {
     const { externalIntegration } = buildSupervisor();
     await Promise.all(
-      [{}, { key: 'netatmo_account' }, { redirect_uri: REDIRECT_URI }, { key: '', redirect_uri: '' }].map(
-        async (params) => {
-          try {
-            await externalIntegration.getOAuthAuthorizeUrl('ext-dev-open-meteo-demo', params);
-            throw new Error('should have thrown');
-          } catch (e) {
-            expect(e).to.be.instanceOf(BadParameters);
-          }
-        },
-      ),
+      [{}, { redirect_uri: REDIRECT_URI }, { key: '', redirect_uri: '' }].map(async (params) => {
+        try {
+          await externalIntegration.getOAuthAuthorizeUrl('ext-dev-open-meteo-demo', params);
+          throw new Error('should have thrown');
+        } catch (e) {
+          expect(e).to.be.instanceOf(BadParameters);
+        }
+      }),
     );
   });
 });

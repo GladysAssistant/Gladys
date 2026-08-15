@@ -1,11 +1,9 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const proxyquire = require('proxyquire').noCallThru();
 const path = require('path');
 
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
-const db = require('../../../models');
-const { cleanDb } = require('../../helpers/db.test');
 const getConfig = require('../../../utils/getConfig');
 
 const { fake, assert } = sinon;
@@ -41,7 +39,13 @@ describe('gateway.restoreBackupEvent', () => {
 
     system.shutdown = fake.resolves(true);
 
-    const config = getConfig();
+    // Restore into a throwaway file, NOT the worker's live test database: the
+    // backup fixtures carry the schema of old real instances (e.g. a t_session
+    // client_id column left over from removed OAuth migrations), and restoring
+    // them over the live database would poison every test running after this
+    // file. Spread getConfig()'s result: it returns a shared object, mutating
+    // it would leak the storage override to the whole process.
+    const config = { ...getConfig(), storage: `/tmp/gladys-database-restore-test-${process.pid}.db` };
 
     const scheduler = {
       scheduleJob: (rule, callback) => {
@@ -58,8 +62,6 @@ describe('gateway.restoreBackupEvent', () => {
 
   afterEach(async () => {
     sinon.reset();
-    await db.umzug.up();
-    await cleanDb();
   });
 
   it('should download and restore new backup (sqlite + parquet), then shutdown', async () => {

@@ -166,6 +166,11 @@ function init() {
             await this.gladys.externalIntegration.handleHeartbeat(integrationService);
           }
           break;
+        case WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEATHER_REFRESH:
+          if (integrationService) {
+            this.gladys.externalIntegration.handleWeatherRefresh(integrationService);
+          }
+          break;
         default:
           logger.debug(`Message type not handled`);
       }

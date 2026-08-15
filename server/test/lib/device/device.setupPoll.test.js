@@ -1,5 +1,7 @@
 const EventEmitter = require('events');
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 const Device = require('../../../lib/device');
 const { DEVICE_POLL_FREQUENCIES } = require('../../../utils/constants');
 const StateManager = require('../../../lib/state');

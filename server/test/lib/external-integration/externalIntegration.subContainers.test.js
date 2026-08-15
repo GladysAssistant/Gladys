@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
@@ -225,6 +225,53 @@ describe('externalIntegration.startSubContainer', () => {
     assert.calledOnce(system.createContainer);
     assert.calledWith(system.restartContainer, 'sub-2');
   });
+
+  it('should recreate the container when its stored CPU limit is rejected at start', async () => {
+    const nanoCpusError = Object.assign(
+      new Error(
+        '(HTTP code 400) unexpected - NanoCPUs can not be set, as your kernel does not support CPU CFS scheduler or the cgroup is not mounted',
+      ),
+      { statusCode: 400 },
+    );
+    const restartContainer = sinon.stub();
+    restartContainer.onFirstCall().rejects(nanoCpusError);
+    restartContainer.onSecondCall().resolves(true);
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getContainers: fake.resolves([{ id: 'sub-1' }]),
+        createContainer: fake.resolves({ id: 'sub-2' }),
+        restartContainer,
+      },
+    });
+    const service = await seedMultiContainerService();
+    const entry = TEST_CONTAINERS_MANIFEST.containers[0];
+    const container = await externalIntegration.startSubContainer(service, entry);
+    expect(container).to.deep.equal({ id: 'sub-2' });
+    // remembered so the new descriptor directly omits the CPU limit
+    expect(system.cpuCfsSupport).to.equal(false);
+    assert.calledWith(system.removeContainer, 'sub-1', { force: true });
+    assert.calledOnce(system.createContainer);
+    assert.calledWith(restartContainer.secondCall, 'sub-2');
+  });
+
+  it('should not recreate the container on another start failure', async () => {
+    const error = new Error('DOCKER_DAEMON_DOWN');
+    const { externalIntegration, system } = buildSupervisor({
+      system: {
+        getContainers: fake.resolves([{ id: 'sub-1' }]),
+        restartContainer: fake.rejects(error),
+      },
+    });
+    const service = await seedMultiContainerService();
+    const entry = TEST_CONTAINERS_MANIFEST.containers[0];
+    try {
+      await externalIntegration.startSubContainer(service, entry);
+      assert.fail('should have fail');
+    } catch (e) {
+      expect(e.message).to.equal('DOCKER_DAEMON_DOWN');
+    }
+    assert.notCalled(system.createContainer);
+  });
 });
 
 describe('externalIntegration.ensureSubContainers', () => {
@@ -403,12 +450,42 @@ describe('externalIntegration.getSubContainersState', () => {
             protocol: 'tcp',
             host_port: 42115,
             label: { en: 'Frigate UI', fr: 'Interface Frigate' },
+            name: 'frigate_ui',
+            browsable: true,
           },
         ],
         devices: [
           { class: 'coral-usb', granted: true, available: true },
           { class: 'gpu', granted: false, available: true },
         ],
+      },
+    ]);
+  });
+
+  it('should expose browsable false on ports that do not serve a web UI', async () => {
+    const { externalIntegration, variable } = buildSupervisor();
+    // OCPP-like case: a WebSocket port for devices, no "Open" link in the UI
+    const manifest = {
+      ...TEST_CONTAINERS_MANIFEST,
+      containers: [
+        {
+          name: 'ocpp',
+          docker_image: 'img:1.0.0',
+          ports: [{ container_port: 9000, label: { en: 'OCPP WebSocket' }, browsable: false }],
+        },
+      ],
+    };
+    const service = await seedExternalService({ manifest });
+    await variable.setValue(SUB_CONTAINER_PORTS_VARIABLE, JSON.stringify({ 'ocpp/9000/tcp': 42116 }), service.id);
+    const state = await externalIntegration.getSubContainersState(service);
+    expect(state[0].ports).to.deep.equal([
+      {
+        container_port: 9000,
+        protocol: 'tcp',
+        host_port: 42116,
+        label: { en: 'OCPP WebSocket' },
+        name: null,
+        browsable: false,
       },
     ]);
   });

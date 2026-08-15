@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, useFakeTimers } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, useFakeTimers } = sinon;
 const EcowattService = require('../../../services/ecowatt');
 const EcowattController = require('../../../services/ecowatt/controllers/ecowatt.controller');
 const ecowattData = require('./ecowatt.data');

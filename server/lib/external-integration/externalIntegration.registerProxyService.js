@@ -1,9 +1,14 @@
 const db = require('../../models');
-const { ExternalIntegrationUnavailableError } = require('../../utils/coreErrors');
+const { ExternalIntegrationUnavailableError, NotFoundError } = require('../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, SERVICE_STATUS } = require('../../utils/constants');
 const { isReceivingChannel } = require('./externalIntegration.getContactProfile');
+const { normalizeWeather } = require('./externalIntegration.normalizeWeather');
+const { normalizeWeatherImage } = require('./externalIntegration.normalizeWeatherImage');
 const {
   CAMERA_GET_IMAGE_TIMEOUT_MS,
+  WEATHER_GET_TIMEOUT_MS,
+  WEATHER_IMAGE_CACHE_TTL_MS,
+  WEATHER_IMAGE_CACHE_PREFIX,
   TTS_SYNTHESIZE_TIMEOUT_MS,
   MAX_TTS_AUDIO_SIZE_BYTES,
   MAX_TTS_TEXT_LENGTH,
@@ -83,7 +88,70 @@ function registerProxyService(service) {
         }),
       }
     : {};
-  // TTS provider integrations (B.20) expose the generic provider interface
+  // weather integrations expose the generic provider interface
+  // weather.get(options) — the same interface the internal openweather
+  // service implements, duck-typed by lib/weather's provider loop (B.18).
+  // The returned payload is normalized and bounded before entering the
+  // core: unaudited code never hands raw data to the widget or the chat.
+  const isWeather = service.manifest && service.manifest.type === 'weather';
+  // allowlist of the image keys declared in the last normalized payload of
+  // this integration: getImage only ever relays a declared key, so an
+  // authenticated caller can neither probe the integration with arbitrary
+  // keys nor grow the image cache past the declared set (≤ 3 entries, the
+  // images cap of normalizeWeather)
+  const declaredImageKeys = new Set();
+  const weatherCapability = isWeather
+    ? {
+        weather: Object.freeze({
+          get: async (options) => {
+            // a fresh third-party API call can be slow: 15s ack deadline
+            const result = await this.sendCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEATHER_GET,
+              {
+                options: {
+                  latitude: options.latitude,
+                  longitude: options.longitude,
+                  language: options.language,
+                  units: options.units,
+                },
+              },
+              { timeoutMs: WEATHER_GET_TIMEOUT_MS },
+            );
+            const payload = result && result.data && result.data.weather;
+            const weather = normalizeWeather(payload, options.units);
+            declaredImageKeys.clear();
+            (weather.images || []).forEach((image) => declaredImageKeys.add(image.key));
+            return weather;
+          },
+          getImage: async (key) => {
+            if (!declaredImageKeys.has(key)) {
+              // undeclared (or not yet declared) key: 404 without a
+              // single byte sent to the integration
+              throw new NotFoundError('EXTERNAL_INTEGRATION_WEATHER_IMAGE_NOT_DECLARED');
+            }
+            // validated provider images are cached: the dashboard refresh
+            // never hammers the integration (nor the third party behind it)
+            const cacheKey = `${WEATHER_IMAGE_CACHE_PREFIX}:${service.id}:${key}`;
+            const cached = this.cache.get(cacheKey);
+            if (cached && cached.expiresAt > Date.now()) {
+              return cached.image;
+            }
+            const result = await this.sendCommand(
+              service,
+              WEBSOCKET_MESSAGE_TYPES.EXTERNAL_INTEGRATION.WEATHER_GET_IMAGE,
+              { key },
+              { timeoutMs: WEATHER_GET_TIMEOUT_MS },
+            );
+            const image = normalizeWeatherImage(result && result.data && result.data.image);
+            this.cache.set(cacheKey, { image, expiresAt: Date.now() + WEATHER_IMAGE_CACHE_TTL_MS });
+            return image;
+          },
+        }),
+      }
+    : {};
+
+  // TTS provider integrations (B.21) expose the generic provider interface
   // tts.synthesize: the core tts manager dispatches to any service exposing
   // it, without knowing any engine by name. The audio comes back in the
   // command-result as a data-URI, validated here (curated content types,
@@ -133,6 +201,7 @@ function registerProxyService(service) {
       await this.stop(service.selector);
     },
     ...messageCapability,
+    ...weatherCapability,
     ...ttsCapability,
     device: Object.freeze({
       setValue: async (device, deviceFeature, value) => {

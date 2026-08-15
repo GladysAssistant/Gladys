@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, assert } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, assert } = sinon;
 const { Op } = require('sequelize');
 const db = require('../../../models');
 const MessageHandler = require('../../../lib/message');

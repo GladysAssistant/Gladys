@@ -1,5 +1,7 @@
 const { expect } = require('chai');
-const { fake, useFakeTimers } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake, useFakeTimers } = sinon;
 const EdfTempoService = require('../../../services/edf-tempo');
 const EdfTempoController = require('../../../services/edf-tempo/controllers/edf-tempo.controller');
 

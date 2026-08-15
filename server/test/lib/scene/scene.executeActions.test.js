@@ -1,4 +1,6 @@
-const { assert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { assert, fake } = sinon;
 const chaiAssert = require('chai').assert;
 const EventEmitter = require('events');
 const cloneDeep = require('lodash.clonedeep');
@@ -442,6 +444,367 @@ describe('scene.executeActions', () => {
       { device_id: 'device-id' },
       11,
     );
+  });
+  it('should execute action device.setValue with text on a text feature', async () => {
+    stateManager.setState('deviceFeature', 'my-text-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-text-feature',
+            value: 'The meal is ready!',
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [],
+      },
+      {
+        device_id: 'device-id',
+        category: DEVICE_FEATURE_CATEGORIES.TEXT,
+        type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+      },
+      'The meal is ready!',
+    );
+  });
+  it('should execute action device.setValue with a string option value on a select feature', async () => {
+    stateManager.setState('deviceFeature', 'my-select-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-select-feature',
+            value: 'com.disney.disneyplus-prod',
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [],
+      },
+      {
+        device_id: 'device-id',
+        category: DEVICE_FEATURE_CATEGORIES.TEXT,
+        type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+      },
+      'com.disney.disneyplus-prod',
+    );
+  });
+  it('should not apply math evaluation to a numeric-looking value on a select feature', async () => {
+    stateManager.setState('deviceFeature', 'my-select-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-select-feature',
+            value: 5,
+          },
+        ],
+      ],
+      {},
+    );
+    // A select value is delivered as its string form, never as a number
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [],
+      },
+      {
+        device_id: 'device-id',
+        category: DEVICE_FEATURE_CATEGORIES.TEXT,
+        type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+      },
+      '5',
+    );
+  });
+  it('should execute action device.setValue with variables on a select feature', async () => {
+    stateManager.setState('deviceFeature', 'my-select-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-select-feature',
+            evaluate_value: '{{0.0.last_value_string}}',
+          },
+        ],
+      ],
+      {
+        '0': { '0': { last_value_string: 'com.webos.app.hdmi1' } },
+      },
+    );
+    // The variable is injected as-is, no math evaluation is applied
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [],
+      },
+      {
+        device_id: 'device-id',
+        category: DEVICE_FEATURE_CATEGORIES.TEXT,
+        type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+      },
+      'com.webos.app.hdmi1',
+    );
+  });
+  it('should abort scene when the evaluated value is empty on a select feature', async () => {
+    stateManager.setState('deviceFeature', 'my-select-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.SELECT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-select-feature',
+            evaluate_value: '{{0.0.does_not_exist}}',
+          },
+        ],
+      ],
+      {
+        '0': { '0': {} },
+      },
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'ACTION_VALUE_EMPTY');
+  });
+  it('should execute action device.setValue with text and variables on a text feature', async () => {
+    stateManager.setState('deviceFeature', 'my-text-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-text-feature',
+            evaluate_value: 'Temperature is {{0.0.last_value}} °C',
+          },
+        ],
+      ],
+      {
+        '0': { '0': { last_value: 21.5 } },
+      },
+    );
+    // Spaces are preserved, no math evaluation is applied
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [],
+      },
+      {
+        device_id: 'device-id',
+        category: DEVICE_FEATURE_CATEGORIES.TEXT,
+        type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+      },
+      'Temperature is 21.5 °C',
+    );
+  });
+  it('should convert a numeric value to string on a text feature', async () => {
+    stateManager.setState('deviceFeature', 'my-text-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-text-feature',
+            value: 42,
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [],
+      },
+      {
+        device_id: 'device-id',
+        category: DEVICE_FEATURE_CATEGORIES.TEXT,
+        type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+      },
+      '42',
+    );
+  });
+  it('should abort scene when no value is provided on a text feature', async () => {
+    stateManager.setState('deviceFeature', 'my-text-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-text-feature',
+          },
+        ],
+      ],
+      {},
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'ACTION_VALUE_EMPTY');
+  });
+  it('should abort scene when the value is an empty string on a text feature', async () => {
+    stateManager.setState('deviceFeature', 'my-text-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-text-feature',
+            value: '',
+          },
+        ],
+      ],
+      {},
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'ACTION_VALUE_EMPTY');
+  });
+  it('should abort scene when the text renders to an empty string on a text feature', async () => {
+    stateManager.setState('deviceFeature', 'my-text-feature', {
+      device_id: 'device-id',
+      category: DEVICE_FEATURE_CATEGORIES.TEXT,
+      type: DEVICE_FEATURE_TYPES.TEXT.TEXT,
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    // A variable which cannot be resolved is rendered as an empty string by Handlebars
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-text-feature',
+            evaluate_value: '{{missing.variable}}',
+          },
+        ],
+      ],
+      {},
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'ACTION_VALUE_EMPTY');
   });
   it('should execute action device.setValue', async () => {
     const example = {

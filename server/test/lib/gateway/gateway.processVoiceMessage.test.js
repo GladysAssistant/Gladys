@@ -1,5 +1,5 @@
 const { expect, assert } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert: sinonAssert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
@@ -292,5 +292,37 @@ describe('gateway.processVoiceMessage', () => {
       .map((call) => call.args[1])
       .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
     expect(errorPayload).to.equal(undefined);
+  });
+
+  it('should emit forbidden websocket error and rethrow Error403 coming from the TTS provider', async () => {
+    const eventEmit = fake();
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      tts: { getSpeechUrl: fake.rejects(new Error403('no gladys plus')) },
+    });
+
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), Error403);
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload.payload).to.deep.equal({ error: 'forbidden', message: 'no gladys plus' });
+  });
+
+  it('should emit rate limit websocket error and rethrow Error429 coming from the TTS provider', async () => {
+    const eventEmit = fake();
+    const ctx = buildContext({
+      event: { emit: eventEmit },
+      tts: { getSpeechUrl: fake.rejects(new Error429('tts quota reached')) },
+    });
+
+    await assert.isRejected(processVoiceMessage.call(ctx, { audio: Buffer.from('audio'), user }), Error429);
+
+    const errorPayload = eventEmit
+      .getCalls()
+      .map((call) => call.args[1])
+      .find((payload) => payload.type === WEBSOCKET_MESSAGE_TYPES.VOICE_ASSISTANT.ERROR);
+    expect(errorPayload.payload).to.deep.equal({ error: 'too_many_requests', message: '' });
   });
 });

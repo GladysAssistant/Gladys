@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const { fake, assert } = sinon;
 
@@ -54,19 +54,33 @@ describe('system.hasCpuCfsSupport', () => {
   });
 
   it('should return true when the kernel supports CPU CFS', async () => {
-    system.dockerode.info = fake.resolves({ CPUCfsQuota: true });
+    // real casing of the /info API JSON keys (moby json struct tags)
+    system.dockerode.info = fake.resolves({ CpuCfsQuota: true, CpuCfsPeriod: true });
     const cpuCfsSupported = await system.hasCpuCfsSupport();
     expect(cpuCfsSupported).to.equal(true);
   });
 
   it('should return false when the kernel has no CPU CFS support', async () => {
-    system.dockerode.info = fake.resolves({ CPUCfsQuota: false });
+    // what a Synology DSM daemon actually returns
+    system.dockerode.info = fake.resolves({ CpuCfsQuota: false, CpuCfsPeriod: false });
+    const cpuCfsSupported = await system.hasCpuCfsSupport();
+    expect(cpuCfsSupported).to.equal(false);
+  });
+
+  it('should return false when only the CFS period is unsupported', async () => {
+    system.dockerode.info = fake.resolves({ CpuCfsQuota: true, CpuCfsPeriod: false });
+    const cpuCfsSupported = await system.hasCpuCfsSupport();
+    expect(cpuCfsSupported).to.equal(false);
+  });
+
+  it('should also accept the Go field name casing of the flags', async () => {
+    system.dockerode.info = fake.resolves({ CPUCfsQuota: false, CPUCfsPeriod: false });
     const cpuCfsSupported = await system.hasCpuCfsSupport();
     expect(cpuCfsSupported).to.equal(false);
   });
 
   it('should cache the result', async () => {
-    const info = fake.resolves({ CPUCfsQuota: false });
+    const info = fake.resolves({ CpuCfsQuota: false, CpuCfsPeriod: false });
     system.dockerode.info = info;
     await system.hasCpuCfsSupport();
     const cpuCfsSupported = await system.hasCpuCfsSupport();

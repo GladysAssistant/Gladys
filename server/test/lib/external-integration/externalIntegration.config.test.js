@@ -1,12 +1,18 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
-const { assert: sinonAssert, fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
 
+const { assert: sinonAssert, fake } = sinon;
+
+const db = require('../../../models');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { Error422 } = require('../../../utils/httpErrors');
 const { WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { validateConfigValue } = require('../../../lib/external-integration/externalIntegration.validateConfigValue');
-const { buildSupervisor, seedExternalService } = require('./testUtils.test');
+const { getDynamicOptions } = require('../../../lib/external-integration/externalIntegration.getDynamicOptions');
+const { buildSupervisor, seedExternalService, TEST_NOTIFICATION_MANIFEST } = require('./testUtils.test');
+
+// John, seeded by the test database
+const JOHN_USER_ID = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
 
 describe('externalIntegration.validateConfigValue', () => {
   it('should reject an unknown field type', () => {
@@ -38,6 +44,33 @@ describe('externalIntegration.validateConfigValue', () => {
     });
   });
 
+  it('should validate a select/multi_select against the values of its dynamic source', () => {
+    const selectField = { key: 'main_station', type: 'select', source: 'devices' };
+    const multiSelectField = { key: 'stations', type: 'multi_select', source: 'devices' };
+    const dynamicOptions = { devices: ['ext:demo:station-1', 'ext:demo:station-2'] };
+    expect(validateConfigValue(selectField, 'ext:demo:station-2', dynamicOptions)).to.equal('ext:demo:station-2');
+    expect(validateConfigValue(multiSelectField, ['ext:demo:station-1'], dynamicOptions)).to.deep.equal([
+      'ext:demo:station-1',
+    ]);
+    try {
+      validateConfigValue(selectField, 'ext:demo:unknown', dynamicOptions);
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.include('must be one of ext:demo:station-1, ext:demo:station-2');
+    }
+  });
+
+  it('should tell that a dynamic source is empty instead of listing nothing', () => {
+    try {
+      validateConfigValue({ key: 'main_station', type: 'select', source: 'devices' }, 'ext:demo:station-1');
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.include('must be one of the devices of the integration (none available yet)');
+    }
+  });
+
   it('should reject a direct value on an oauth2 field', () => {
     try {
       validateConfigValue({ key: 'netatmo_account', type: 'oauth2' }, 'anything');
@@ -45,6 +78,18 @@ describe('externalIntegration.validateConfigValue', () => {
     } catch (e) {
       expect(e).to.be.instanceOf(Error422);
       expect(e.properties).to.include('oauth2 fields cannot be set directly');
+    }
+  });
+
+  it('should reject a direct value on an account_link field', () => {
+    // it holds no value either: the credentials are stored off-schema by the
+    // integration once the user has approved the provider
+    try {
+      validateConfigValue({ key: 'xiaomi_account', type: 'account_link' }, 'anything');
+      throw new Error('should have thrown');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error422);
+      expect(e.properties).to.include('account_link fields cannot be set directly');
     }
   });
 });
@@ -199,6 +244,177 @@ describe('externalIntegration config', () => {
     });
   });
 
+  describe('fields fed by the "devices" source', () => {
+    // the OCPP case: the station to act on is picked among the devices
+    // already created by the integration, never typed by hand
+    const OWN_DEVICE = 'ext:ext-dev-ocpp:station-1';
+    const FOREIGN_DEVICE = 'ext:ext-dev-open-meteo-demo:sensor-1';
+    let devicesService;
+
+    const expect422 = async (promise, messagePart) => {
+      try {
+        await promise;
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+        expect(e.properties).to.include(messagePart);
+      }
+    };
+
+    beforeEach(async () => {
+      devicesService = await seedExternalService({
+        name: 'ext-dev-ocpp',
+        selector: 'ext-dev-ocpp',
+        manifest: {
+          ...service.manifest,
+          config_schema: [
+            { key: 'main_station', type: 'select', source: 'devices', label: { en: 'Main charging station' } },
+            { key: 'stations', type: 'multi_select', source: 'devices', label: { en: 'Charging stations' } },
+          ],
+          actions: [
+            {
+              key: 'reset_station',
+              label: { en: 'Reset a charging station' },
+              fields: [{ key: 'station', type: 'select', source: 'devices', label: { en: 'Station' } }],
+            },
+          ],
+        },
+      });
+      await db.Device.create({
+        service_id: devicesService.id,
+        name: 'Borne garage',
+        selector: 'ext-ocpp-station-1',
+        external_id: OWN_DEVICE,
+      });
+      // a device of ANOTHER integration, never a valid value here
+      await db.Device.create({
+        service_id: service.id,
+        name: 'Capteur météo',
+        selector: 'ext-open-meteo-sensor',
+        external_id: FOREIGN_DEVICE,
+      });
+      externalIntegration.sendMessage = fake.returns(true);
+    });
+
+    describe('config from the front', () => {
+      it('should accept an existing device', async () => {
+        const result = await externalIntegration.saveConfigFromFront(devicesService.selector, {
+          main_station: OWN_DEVICE,
+          stations: [OWN_DEVICE],
+        });
+        expect(result.config).to.deep.equal({ main_station: OWN_DEVICE, stations: [OWN_DEVICE] });
+      });
+
+      it('should reject a device of another integration', async () => {
+        await expect422(
+          externalIntegration.saveConfigFromFront(devicesService.selector, { main_station: FOREIGN_DEVICE }),
+          `must be one of ${OWN_DEVICE}`,
+        );
+        await expect422(
+          externalIntegration.saveConfigFromFront(devicesService.selector, { stations: [FOREIGN_DEVICE] }),
+          `must be an array of unique values among ${OWN_DEVICE}`,
+        );
+      });
+    });
+
+    describe('config from the integration itself', () => {
+      it('should accept an existing device', async () => {
+        await externalIntegration.setIntegrationConfig(devicesService, { main_station: OWN_DEVICE });
+        expect(await externalIntegration.getIntegrationConfig(devicesService)).to.deep.equal({
+          main_station: OWN_DEVICE,
+        });
+      });
+
+      it('should reject a device of another integration', async () => {
+        await expect422(
+          externalIntegration.setIntegrationConfig(devicesService, { main_station: FOREIGN_DEVICE }),
+          `must be one of ${OWN_DEVICE}`,
+        );
+      });
+    });
+
+    describe('action fields', () => {
+      beforeEach(() => {
+        externalIntegration.sendCommand = fake.resolves({ success: true, data: {} });
+      });
+
+      it('should accept an existing device and relay it to the integration', async () => {
+        const result = await externalIntegration.runAction(devicesService.selector, 'reset_station', {
+          station: OWN_DEVICE,
+        });
+        expect(result).to.deep.equal({ success: true, message: null });
+        const [, , payload] = externalIntegration.sendCommand.firstCall.args;
+        expect(payload).to.deep.equal({ key: 'reset_station', fields: { station: OWN_DEVICE } });
+      });
+
+      it('should reject a device of another integration without relaying anything', async () => {
+        await expect422(
+          externalIntegration.runAction(devicesService.selector, 'reset_station', { station: FOREIGN_DEVICE }),
+          `must be one of ${OWN_DEVICE}`,
+        );
+        sinonAssert.notCalled(externalIntegration.sendCommand);
+      });
+    });
+
+    describe('per-user contact profile', () => {
+      // a contact_schema lives on a send-only channel; its select fields go
+      // through the very same validation engine
+      const seedContactService = async () => {
+        const contactService = await seedExternalService({
+          name: 'ext-dev-sms-devices',
+          selector: 'ext-dev-sms-devices',
+          has_message_feature: true,
+          manifest: {
+            ...TEST_NOTIFICATION_MANIFEST,
+            contact_schema: [{ key: 'gateway', type: 'select', source: 'devices', label: { en: 'SMS gateway' } }],
+          },
+        });
+        await db.Device.create({
+          service_id: contactService.id,
+          name: 'Passerelle SMS',
+          selector: 'ext-sms-gateway-1',
+          external_id: 'ext:ext-dev-sms-devices:gateway-1',
+        });
+        return contactService;
+      };
+
+      it('should accept an existing device', async () => {
+        const contactService = await seedContactService();
+        const profile = await externalIntegration.saveContactProfile(contactService, JOHN_USER_ID, {
+          gateway: 'ext:ext-dev-sms-devices:gateway-1',
+        });
+        expect(profile.values).to.deep.equal({ gateway: 'ext:ext-dev-sms-devices:gateway-1' });
+      });
+
+      it('should reject a device of another integration', async () => {
+        const contactService = await seedContactService();
+        await expect422(
+          externalIntegration.saveContactProfile(contactService, JOHN_USER_ID, { gateway: FOREIGN_DEVICE }),
+          'must be one of ext:ext-dev-sms-devices:gateway-1',
+        );
+      });
+    });
+
+    describe('getDynamicOptions', () => {
+      it('should return the external_ids of the devices of the integration only', async () => {
+        expect(await getDynamicOptions(devicesService, devicesService.manifest.config_schema)).to.deep.equal({
+          devices: [OWN_DEVICE],
+        });
+      });
+
+      it('should not query the devices when no field declares a source', async () => {
+        const findAll = sinon.spy(db.Device, 'findAll');
+        try {
+          expect(await getDynamicOptions(service, service.manifest.config_schema)).to.deep.equal({});
+          expect(await getDynamicOptions(service, undefined)).to.deep.equal({});
+          sinonAssert.notCalled(findAll);
+        } finally {
+          findAll.restore();
+        }
+      });
+    });
+  });
+
   describe('section config fields', () => {
     let sectionService;
 
@@ -295,6 +511,59 @@ describe('externalIntegration config', () => {
       expect(config).to.deep.equal({ netatmo_access_token: 'token', netatmo_refresh_token: 'refresh' });
       const front = await externalIntegration.getConfigForFront(oauthService.selector);
       expect(front.config).to.not.have.property('netatmo_access_token');
+    });
+  });
+
+  describe('account_link config fields', () => {
+    let linkService;
+
+    beforeEach(async () => {
+      linkService = await seedExternalService({
+        name: 'ext-dev-xiaomi-demo',
+        selector: 'ext-dev-xiaomi-demo',
+        manifest: {
+          ...service.manifest,
+          config_schema: [
+            ...service.manifest.config_schema,
+            { key: 'xiaomi_account', type: 'account_link', label: { en: 'Xiaomi account' } },
+          ],
+        },
+      });
+    });
+
+    it('should always return null for an account_link key, even with a stored value', async () => {
+      await variable.setValue('XIAOMI_ACCOUNT', JSON.stringify('leaked'), linkService.id);
+      const result = await externalIntegration.getConfigForFront(linkService.selector);
+      expect(result.config).to.have.property('xiaomi_account', null);
+      expect(result.configured_secrets).to.deep.equal([]);
+    });
+
+    it('should refuse an account_link key from the frontend', async () => {
+      try {
+        await externalIntegration.saveConfigFromFront(linkService.selector, { xiaomi_account: 'value' });
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+        expect(e.properties).to.include('account_link fields cannot be set directly');
+      }
+    });
+
+    it('should refuse the account_link key itself but accept the off-schema session keys', async () => {
+      try {
+        await externalIntegration.setIntegrationConfig(linkService, { xiaomi_account: 'value' });
+        throw new Error('should have thrown');
+      } catch (e) {
+        expect(e).to.be.instanceOf(Error422);
+      }
+      // the session obtained once the user approved the sign-in lives off-schema
+      await externalIntegration.setIntegrationConfig(linkService, {
+        session_xiaomi_user_id: '12345',
+        session_xiaomi_pass_token: 'ptoken',
+      });
+      const config = await externalIntegration.getIntegrationConfig(linkService);
+      expect(config).to.deep.equal({ session_xiaomi_user_id: '12345', session_xiaomi_pass_token: 'ptoken' });
+      const front = await externalIntegration.getConfigForFront(linkService.selector);
+      expect(front.config).to.not.have.property('session_xiaomi_pass_token');
     });
   });
 });

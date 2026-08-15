@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 
 const migration = require('../../migrations/20260629180000-classify-notification-messages');
 

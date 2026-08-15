@@ -1,4 +1,4 @@
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const path = require('path');
 const fse = require('fs-extra');
 const { expect } = require('chai');
@@ -15,7 +15,7 @@ describe('Matter.reset', () => {
 
   beforeEach(async () => {
     previousMatterPath = process.env.MATTER_FOLDER_PATH;
-    testMatterPath = '/tmp/gladys-matter-reset-test';
+    testMatterPath = `/tmp/gladys-matter-reset-test-${process.pid}`;
     process.env.MATTER_FOLDER_PATH = testMatterPath;
 
     // Create test directory with some files

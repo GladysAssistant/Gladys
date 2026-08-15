@@ -34,6 +34,30 @@ describe('dashboard.update', () => {
     expect(updatedDashboard).to.have.property('selector', publicDashboard.selector);
   });
 
+  it('should save a weather box carrying a pinned provider', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        [
+          {
+            type: DASHBOARD_BOX_TYPE.WEATHER,
+            house: 'test-house',
+            provider: 'ext-meteo-france',
+          },
+        ],
+        [
+          {
+            type: DASHBOARD_BOX_TYPE.WEATHER,
+            house: 'test-house',
+            // '' = automatic mode, what the select stores when unpinning
+            provider: '',
+          },
+        ],
+      ],
+    });
+    expect(updatedDashboard.boxes[0][0]).to.have.property('provider', 'ext-meteo-france');
+    expect(updatedDashboard.boxes[1][0]).to.have.property('provider', '');
+  });
+
   it('should return not found', async () => {
     const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'not-found-dashboard', {
       name: 'new name',

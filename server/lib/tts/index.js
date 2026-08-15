@@ -12,7 +12,7 @@ const { getLocalApiBaseUrl } = require('./tts.getLocalApiBaseUrl');
  * providers. A provider is any stateManager service exposing
  * tts.synthesize({ text, language }) — the core knows no engine by name;
  * Gladys Plus stays the built-in provider under the reserved id
- * 'gladys-plus' (see docs/specs/external-integrations.md, B.20).
+ * 'gladys-plus' (see docs/specs/external-integrations.md, B.21).
  * @param {object} variable - Variable manager.
  * @param {object} service - Service manager.
  * @param {object} stateManager - State manager.

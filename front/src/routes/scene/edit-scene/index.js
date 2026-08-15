@@ -3,11 +3,10 @@ import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import { route } from 'preact-router';
 import { DndProvider } from 'react-dnd';
-import { TouchBackend } from 'react-dnd-touch-backend';
-import { HTML5Backend } from 'react-dnd-html5-backend';
 import get from 'get-value'; // Import get-value package
 
 import { RequestStatus } from '../../../utils/consts';
+import { getDragAndDropBackend } from '../../../utils/dragAndDropBackend';
 import EditScenePage from './EditScenePage';
 
 import { ACTIONS } from '../../../../../server/utils/constants';
@@ -21,6 +20,8 @@ const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.MQTT.SEND]: ['message'],
   [ACTIONS.ZIGBEE2MQTT.SEND]: ['message'],
   [ACTIONS.DEVICE.SET_VALUE]: ['evaluate_value'],
+  [ACTIONS.TIME.DELAY]: ['evaluate_value'],
+  [ACTIONS.VARIABLE.SET]: ['text', 'evaluate_value'],
   [ACTIONS.HTTP.REQUEST]: ['body'],
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable']
 };
@@ -59,7 +60,13 @@ const initializeSceneVariables = (actions, parentPath = '') => {
       variables[currentPath] = [];
 
       // Handle nested conditions
-      if (action && action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+      if (action && (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE)) {
+        // "if" is a flat list of conditions, each one can declare a variable (device.get-value)
+        if (Array.isArray(action.if)) {
+          action.if.forEach((condition, conditionIndex) => {
+            variables[`${currentPath}.if.${conditionIndex}`] = [];
+          });
+        }
         if (Array.isArray(action.then)) {
           const thenVariables = initializeSceneVariables(action.then, `${currentPath}.then`);
           variables = { ...variables, ...thenVariables };
@@ -224,7 +231,7 @@ class EditScene extends Component {
     // Process nested conditions
     actions.forEach((actionGroup, groupIndex) => {
       actionGroup.forEach((action, actionIndex) => {
-        if (action && action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+        if (action && (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE)) {
           if (Array.isArray(action.then)) {
             const thenPath = path ? `${path}.${groupIndex}.${actionIndex}.then` : `${groupIndex}.${actionIndex}.then`;
             const thenUpdates = this.checkAndAddEmptyGroups(action.then, thenPath, currentState);
@@ -342,7 +349,7 @@ class EditScene extends Component {
               }
 
               // Check for nested actions in if/then/else blocks
-              if (action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+              if (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE) {
                 // Process 'if' branch if it exists
                 if (Array.isArray(action.if)) {
                   processActions([action.if]);
@@ -1097,7 +1104,7 @@ class EditScene extends Component {
           const actionPath = `${groupPath}.${actionIndex}`;
 
           // Check if this is a conditional action with nested actions
-          if (action && action.type === ACTIONS.CONDITION.IF_THEN_ELSE) {
+          if (action && (action.type === ACTIONS.CONDITION.IF_THEN_ELSE || action.type === ACTIONS.CONDITION.WHILE)) {
             // Process 'then' branch
             if (Array.isArray(action.then)) {
               const thenTypes = this.generateActionGroupTypes(action.then, `${actionPath}.then`);
@@ -1120,7 +1127,6 @@ class EditScene extends Component {
 
   constructor(props) {
     super(props);
-    this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     this.state = {
       scene: null,
       variables: {},
@@ -1145,10 +1151,11 @@ class EditScene extends Component {
 
   render(props, { saving, error, errorMessage, variables, scene, triggersVariables, tags, askDeleteScene }) {
     const actionsGroupTypes = this.generateActionGroupTypes(scene ? scene.actions : []);
+    const { backend, options } = getDragAndDropBackend();
     return (
       scene && (
         <div>
-          <DndProvider backend={this.isTouchDevice ? TouchBackend : HTML5Backend}>
+          <DndProvider backend={backend} options={options}>
             <EditScenePage
               {...props}
               scene={scene}

@@ -14,17 +14,19 @@ class ExternalIntegrationDevicePage extends Component {
   getIntegration = async () => {
     try {
       const integration = await this.props.httpClient.get(`/api/v1/external_integration/${this.props.selector}`);
-      // a communication or tts integration has no device screens: direct
-      // URL access lands on the configuration screen instead
+      // communication, weather and tts integrations have no device screens:
+      // direct URL access lands on the configuration screen instead
       if (isConfigOnlyIntegrationType(get(integration, 'manifest.type'))) {
         route(`/dashboard/integration/device/external/${this.props.selector}/config`, true);
-        return true;
+        return false;
       }
       this.setState({ integration });
     } catch (e) {
       console.error(e);
+      // no confirmed metadata: do not fire the device-specific requests
+      return false;
     }
-    return false;
+    return true;
   };
 
   getDevices = async () => {
@@ -79,10 +81,11 @@ class ExternalIntegrationDevicePage extends Component {
   };
 
   loadData = async () => {
-    // resolve the integration type first: a configuration-only integration
-    // redirects, and its device requests must never fire
-    const redirected = await this.getIntegration();
-    if (redirected) {
+    // the integration metadata comes first: a communication or weather
+    // integration redirects to the configuration screen before any
+    // device-specific request is fired
+    const hasDeviceScreens = await this.getIntegration();
+    if (!hasDeviceScreens) {
       return;
     }
     this.getDevices();

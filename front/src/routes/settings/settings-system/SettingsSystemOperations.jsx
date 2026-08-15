@@ -12,9 +12,11 @@ const SettingsSystemOperations = ({
   upgradeError,
   websocketConnected,
   SystemGetInfosStatus,
+  CheckForUpdatesStatus,
   checkForUpdates
 }) => {
   const imagePinned = systemInfos && systemInfos.docker_image_pinned === true;
+  const checkingForUpdates = CheckForUpdatesStatus === RequestStatus.Getting;
   // an error code we don't know how to translate must not leak to the user.
   // hasOwnProperty, so an inherited key like "constructor" cannot pass as valid.
   const upgradeErrorCode =
@@ -27,22 +29,24 @@ const SettingsSystemOperations = ({
       <div class={SystemGetInfosStatus === RequestStatus.Getting ? 'dimmer active' : 'dimmer'}>
         <div class="loader" />
         <div class="dimmer-content">
-          <div class="card-header d-flex justify-content-between align-items-center">
+          <div class="card-header">
             <h4 class="mb-0">
               <Text id="systemSettings.operations" />
             </h4>
-            {systemInfos && systemInfos.new_release_available === false && (
-              <button class={`btn btn-link ${style.textDecorationNone}`} onClick={checkForUpdates}>
-                <i class="fe fe-refresh-cw" />
-              </button>
-            )}
           </div>
 
           {systemInfos && systemInfos.new_release_available === true && (
             <div class="card-body">
               <div>
                 <h4>
-                  <Text id="systemSettings.newUpgradeAvailable" />
+                  {systemInfos.latest_gladys_version ? (
+                    <Text
+                      id="systemSettings.newUpgradeAvailableVersion"
+                      fields={{ version: systemInfos.latest_gladys_version }}
+                    />
+                  ) : (
+                    <Text id="systemSettings.newUpgradeAvailable" />
+                  )}
                 </h4>
                 <p>
                   <Text id="systemSettings.newUpgradeAvailableText" />
@@ -138,21 +142,47 @@ const SettingsSystemOperations = ({
           )}
 
           {systemInfos && systemInfos.new_release_available === false && (
-            <div class="table-responsive">
-              <table className="table table-hover table-outline table-vcenter text-nowrap card-table">
-                <tbody>
-                  <tr>
-                    <td>
-                      <Text id="systemSettings.upToDate" />
-                    </td>
-                    <td className="text-right">
-                      <span class="badge badge-success">
-                        <Text id="systemSettings.gladysVersionValue" fields={{ version: systemInfos.gladys_version }} />
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <div>
+              <div class="table-responsive">
+                <table className="table table-hover table-outline table-vcenter text-nowrap card-table">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <Text id="systemSettings.upToDate" />
+                      </td>
+                      <td className="text-right">
+                        <span class="badge badge-success">
+                          <Text
+                            id="systemSettings.gladysVersionValue"
+                            fields={{ version: systemInfos.gladys_version }}
+                          />
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card-body">
+                <p class="text-muted">
+                  <Text id="systemSettings.checkForUpdatesText" />
+                </p>
+                {CheckForUpdatesStatus === RequestStatus.Success && (
+                  <div class="alert alert-success">
+                    <Text id="systemSettings.noUpdateAvailable" />
+                  </div>
+                )}
+                {CheckForUpdatesStatus === RequestStatus.Error && (
+                  <div class="alert alert-danger">
+                    <Text id="systemSettings.checkForUpdatesError" />
+                  </div>
+                )}
+                <button class="btn btn-outline-primary" onClick={checkForUpdates} disabled={checkingForUpdates}>
+                  <i class={`fe fe-refresh-cw mr-2 ${checkingForUpdates ? style.spin : ''}`} />
+                  <Text
+                    id={checkingForUpdates ? 'systemSettings.checkingForUpdates' : 'systemSettings.checkForUpdates'}
+                  />
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -1,5 +1,6 @@
 const Joi = require('@hapi/joi').extend(require('@hapi/joi-date'));
 const { ACTION_LIST, ACTIONS, EVENT_LIST, ALARM_MODES_LIST } = require('../utils/constants');
+const { WEATHER_ALERT_TYPES, WEATHER_ALERT_SEVERITIES } = require('../lib/external-integration/constants');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
 const iconList = require('../config/icons.json');
 
@@ -16,8 +17,12 @@ const actionSchema = Joi.object()
     house: Joi.string(),
     scene: Joi.string(),
     camera: Joi.string(),
+    // messaging channel of a "send message" action: null/absent means
+    // broadcast to every channel the user configured
+    service: Joi.string().allow(null),
     text: Joi.string(),
-    value: Joi.number(),
+    name: Joi.string(),
+    value: Joi.alternatives().try(Joi.number(), Joi.string()),
     evaluate_value: Joi.string(),
     minutes: Joi.number(),
     unit: Joi.string(),
@@ -40,6 +45,14 @@ const actionSchema = Joi.object()
     calendar_event_name: Joi.string(),
     stop_scene_if_event_found: Joi.boolean(),
     stop_scene_if_event_not_found: Joi.boolean(),
+    stop_scene_if_no_events: Joi.boolean(),
+    time_range: Joi.string().valid('today', 'tomorrow', 'next-x-hours'),
+    // Null is allowed so that an action can be saved while the user has not
+    // filled the number of hours yet.
+    duration: Joi.number()
+      .integer()
+      .min(1)
+      .allow(null),
     request_response_keys: Joi.array().items(Joi.string()),
     ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
     edf_tempo_peak_day_type: Joi.string().valid('blue', 'white', 'red', 'no-check'),
@@ -77,6 +90,15 @@ const actionSchema = Joi.object()
     if: Joi.array().items(Joi.link('#action')),
     then: Joi.array().items(Joi.array().items(Joi.link('#action'))),
     else: Joi.array().items(Joi.array().items(Joi.link('#action'))),
+    max_iterations: Joi.number()
+      .integer()
+      .min(1)
+      .max(10000),
+  })
+  // A "variable.set" action holds either a text or a formula, never both: the runtime
+  // would only evaluate the formula and silently drop the text.
+  .when(Joi.object({ type: Joi.valid(ACTIONS.VARIABLE.SET) }).unknown(), {
+    then: Joi.object().oxor('text', 'evaluate_value'),
   })
   .id('action');
 
@@ -90,6 +112,9 @@ const triggersSchema = Joi.array().items(
     house: Joi.string(),
     device: Joi.string(),
     device_feature: Joi.string(),
+    device_features: Joi.array()
+      .items(Joi.string())
+      .min(1),
     operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
     value: Joi.alternatives().try(Joi.number(), Joi.string()),
     user: Joi.string(),
@@ -126,6 +151,9 @@ const triggersSchema = Joi.array().items(
       .integer()
       .min(-1440)
       .max(1440),
+    // weather-alert triggers (B.18): phenomenon type filter and minimal severity
+    weather_alert_type: Joi.string().valid(...WEATHER_ALERT_TYPES, 'any'),
+    weather_alert_severity: Joi.string().valid(...WEATHER_ALERT_SEVERITIES),
   }),
 );
 

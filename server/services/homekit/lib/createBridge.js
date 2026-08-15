@@ -1,7 +1,6 @@
 const uuid = require('uuid');
 const { EVENTS } = require('../../../utils/constants');
 const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
-const { mappings } = require('./deviceMappings');
 
 /**
  * @description Create HomeKit bridge.
@@ -33,15 +32,22 @@ async function createBridge() {
     pincode = await this.newPinCode();
   }
 
-  const devices = await this.gladys.device.get();
-  const compatibleDevices = devices.filter((device) => {
-    return device.features.find((feature) => {
-      return Object.keys(mappings).includes(feature.category);
-    });
-  });
-  const accessories = compatibleDevices
+  const exposedDevices = await this.getExposedDevices();
+  const accessories = exposedDevices
     .map((device) => this.buildAccessory(device))
     .filter((accessory) => accessory !== null);
+
+  // The alarm is not a device: it lives on the house, so one accessory per house is built here
+  // rather than from the device list. Several houses give several alarms in the Home app, each
+  // named after its own. They go through the same exposure setting as the devices, so someone who
+  // does not use the Gladys alarm can leave it out.
+  const exposedAlarms = await this.getExposedAlarms();
+  this.alarmAccessories = new Map();
+  exposedAlarms.forEach(({ house }) => {
+    const alarmAccessory = this.buildAlarmAccessory(house);
+    this.alarmAccessories.set(house.selector, alarmAccessory);
+    accessories.push(alarmAccessory);
+  });
 
   if (this.bridge) {
     await this.stopBridge();

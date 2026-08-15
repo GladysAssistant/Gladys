@@ -8,6 +8,8 @@ import AsyncRoute from 'preact-async-route';
 import { IntlProvider } from 'preact-i18n';
 import translations from '../config/i18n';
 import actions from '../actions/main';
+import { EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS } from '../actions/externalIntegrationUpdates';
+import { catalogCategories } from '../config/integrations';
 
 import { getDefaultState } from '../utils/getDefaultState';
 
@@ -46,6 +48,7 @@ import NewDashboard from '../routes/dashboard/new-dashboard';
 import EditDashboard from '../routes/dashboard/edit-dashboard';
 
 import IntegrationPage from '../routes/integration';
+import DevicesListPage from '../routes/devices';
 import HistoryPage from '../routes/history';
 import ChatPage from '../routes/chat';
 import MapPage from '../routes/map';
@@ -104,6 +107,7 @@ import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
 import MqttSetupPage from '../routes/integration/all/mqtt/setup-page';
 import MqttDebugPage from '../routes/integration/all/mqtt/debug-page/Debug';
+import MqttDiscoveryPage from '../routes/integration/all/mqtt/discovery-page';
 
 // Zigbee2mqtt
 import Zigbee2mqttPage from '../routes/integration/all/zigbee2mqtt/device-page';
@@ -211,7 +215,7 @@ const SafeAsyncRoute = props => (
 );
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen,externalIntegrationsToUpdate',
   actions
 )(props => (
   <div id="app">
@@ -219,6 +223,7 @@ const AppRouter = connect(
       <Header
         currentUrl={props.currentUrl}
         user={props.user}
+        externalIntegrationsToUpdate={props.externalIntegrationsToUpdate}
         fullScreen={props.fullScreen}
         profilePicture={props.profilePicture}
         toggleDropDown={props.toggleDropDown}
@@ -265,14 +270,24 @@ const AppRouter = connect(
         <SafeAsyncRoute path="/dashboard/integration" component={IntegrationPage} />
 
         <IntegrationPage path="/dashboard/integration/favorites" category="favorites" />
-        <IntegrationPage path="/dashboard/integration/device" category="device" />
-        <IntegrationPage path="/dashboard/integration/communication" category="communication" />
-        <IntegrationPage path="/dashboard/integration/calendar" category="calendar" />
-        <IntegrationPage path="/dashboard/integration/music" category="music" />
-        <IntegrationPage path="/dashboard/integration/health" category="health" />
-        <IntegrationPage path="/dashboard/integration/weather" category="weather" />
-        <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
-        <IntegrationPage path="/dashboard/integration/tts" category="tts" />
+        <IntegrationPage path="/dashboard/integration/updates" category="updates" />
+        {/* browse categories of the catalog (docs/specs/integration-catalog-categories.md):
+            display metadata decoupled from the technical `type` still carried
+            by the integration page URLs right below */}
+        {catalogCategories.map(({ key }) => (
+          <IntegrationPage path={`/dashboard/integration/${key}`} category={key} />
+        ))}
+        {/* legacy type-based catalog views (spec §5): a 1:1 bucket goes to its
+            new shelf, a bucket split across several shelves goes to the
+            catalog root — redirecting it to one shelf would hide the others */}
+        <Redirect path="/dashboard/integration/device" to="/dashboard/integration" />
+        <Redirect path="/dashboard/integration/communication" to="/dashboard/integration" />
+        <Redirect path="/dashboard/integration/calendar" to="/dashboard/integration/services" />
+        <Redirect path="/dashboard/integration/weather" to="/dashboard/integration/environment" />
+        <Redirect path="/dashboard/integration/music" to="/dashboard/integration" />
+        <Redirect path="/dashboard/integration/health" to="/dashboard/integration" />
+        <Redirect path="/dashboard/integration/navigation" to="/dashboard/integration" />
+        <Redirect path="/dashboard/integration/tts" to="/dashboard/integration" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
         <Redirect
@@ -299,6 +314,7 @@ const AppRouter = connect(
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit/:deviceSelector" />
         <MqttSetupPage path="/dashboard/integration/device/mqtt/setup" />
         <MqttDebugPage path="/dashboard/integration/device/mqtt/debug" />
+        <MqttDiscoveryPage path="/dashboard/integration/device/mqtt/discovery" />
         <Zigbee2mqttPage path="/dashboard/integration/device/zigbee2mqtt" />
         <Zigbee2mqttDiscoverPage path="/dashboard/integration/device/zigbee2mqtt/discover" />
         <Zigbee2mqttSetupPage path="/dashboard/integration/device/zigbee2mqtt/setup" />
@@ -399,6 +415,7 @@ const AppRouter = connect(
         <EnedisGatewayUsagePoints path="/dashboard/integration/device/enedis/usage-points" />
         <EnedisGateway path="/dashboard/integration/device/enedis/redirect" />
 
+        <SafeAsyncRoute path="/dashboard/devices" component={DevicesListPage} />
         <SafeAsyncRoute path="/dashboard/history" component={HistoryPage} />
         <SafeAsyncRoute path="/dashboard/chat" component={ChatPage} />
         <SafeAsyncRoute path="/dashboard/maps" component={MapPage} />
@@ -435,11 +452,19 @@ class MainApp extends Component {
     // Listen for system preference change
     const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)');
     prefersDarkMode.addEventListener('change', this.handleSystemPreferenceChange);
+    // Gladys never pushes the "update available" flag: it is recomputed when
+    // the server refreshes the store index, so a long-opened tab only learns
+    // about a new version by asking again at the same cadence
+    this.externalIntegrationUpdatesInterval = setInterval(
+      this.props.refreshExternalIntegrationsToUpdate,
+      EXTERNAL_INTEGRATION_UPDATES_REFRESH_INTERVAL_MS
+    );
   }
 
   componentWillUnmount() {
     // Remove event listener to prevent memory leaks
     window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', this.handleSystemPreferenceChange);
+    clearInterval(this.externalIntegrationUpdatesInterval);
   }
 
   handleSystemPreferenceChange = () => {

@@ -147,6 +147,32 @@ const AC_MODE = {
   FAN: 4,
 };
 
+// Canonical values of the camera "move" feature (spec docs/specs/camera-ptz-control.md, A.2).
+// A movement value (1..6) starts a bounded move or one step; STOP (0) halts all movement and is
+// always supported (never listed in supported_options — options declare the movements only).
+const CAMERA_MOVE = {
+  STOP: 0,
+  PAN_LEFT: 1,
+  PAN_RIGHT: 2,
+  TILT_UP: 3,
+  TILT_DOWN: 4,
+  ZOOM_IN: 5,
+  ZOOM_OUT: 6,
+};
+
+const THERMOSTAT_MODE = {
+  OFF: 0,
+  HEATING: 1,
+  COOLING: 2,
+  AUTO: 3,
+};
+
+const THERMOSTAT_OPERATING_STATE = {
+  IDLE: 0,
+  HEATING: 1,
+  COOLING: 2,
+};
+
 const FAN_MODE = {
   OFF: 0,
   LOW: 1,
@@ -246,6 +272,22 @@ const WATER_VALVE_CURRENT_DEVICE_STATUS = {
   WATER_SHORTAGE_AND_WATER_LEAKAGE: 3,
 };
 
+// Operating modes of a domestic hot water appliance. This is the full generic set:
+// an appliance supporting only some of them declares its subset through the
+// supported_options of its `mode` feature, never by narrowing this enum.
+// Values are append-only: an existing integer never changes meaning, because it is
+// stored in device states and hard-coded in users' scenes.
+const WATER_HEATER_MODE = {
+  OFF: 0, // appliance stopped (frost protection may remain active)
+  AUTO: 1, // the appliance decides, learning the household's consumption
+  ECO: 2, // energy-saving mode: heat-pump-only on a heat-pump appliance,
+  // consumption learning on a plain electric tank
+  BOOST: 3, // the fastest heating the appliance is capable of
+  MANUAL: 4, // fixed setpoint, no learning
+  AWAY: 5, // holiday / away, minimum temperature kept
+  PROGRAM: 6, // follows the schedule stored in the appliance
+};
+
 const LEVEL_MATTER_STATE = {
   LOW: 1,
   MEDIUM: 2,
@@ -277,6 +319,58 @@ const VACUUM_CLEANER_CLEAN_MODE = {
   DEEP_CLEAN: 4,
   VACUUM: 5,
   MOP: 6,
+};
+
+// Generic charging station connector status - values align with OCPP 2.0.1/
+// 2.1's StatusNotification.connectorStatus field, reported independently of
+// any charging session. Not itself protocol-specific: any charging station
+// integration (OCPP-based or not) reporting a comparable connector
+// availability can map onto it.
+// Source (OCPP 2.0.1's own data-dictionary type name for this field is
+// ConnectorStatusEnumType, not reproduced verbatim on every third-party
+// reference site - verified against implementation source instead):
+// https://github.com/lorenzodonini/ocpp-go/blob/master/ocpp2.0.1/availability/status_notification.go
+const CHARGING_STATION_CONNECTOR_STATUS = {
+  AVAILABLE: 0,
+  OCCUPIED: 1,
+  RESERVED: 2,
+  UNAVAILABLE: 3,
+  FAULTED: 4,
+};
+
+// Generic charging session state - values align with OCPP 2.0.1/2.1's
+// TransactionEvent.transactionInfo.chargingState field. Only meaningful
+// while a charging session/transaction is in progress
+// (CHARGING_STATION_CONNECTOR_STATUS is OCCUPIED); has no value the rest of
+// the time.
+// Source (OCPP 2.0.1's own data-dictionary type name for this field is
+// ChargingStateEnumType, not reproduced verbatim on every third-party
+// reference site - verified against implementation source instead):
+// https://github.com/lorenzodonini/ocpp-go/blob/master/ocpp2.0.1/transactions/transaction_event.go
+//
+// OCPP 1.6 integrations report a single, more granular ChargePointStatus and
+// must split it across both enums:
+//   Available      -> CONNECTOR_STATUS.AVAILABLE
+//   Preparing      -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.EV_CONNECTED
+//   Charging       -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.CHARGING
+//   SuspendedEVSE  -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.PAUSED_BY_CHARGER
+//   SuspendedEV    -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.PAUSED_BY_VEHICLE
+//   Finishing      -> CONNECTOR_STATUS.OCCUPIED   + CHARGING_STATE.IDLE
+//   Reserved       -> CONNECTOR_STATUS.RESERVED
+//   Unavailable    -> CONNECTOR_STATUS.UNAVAILABLE
+//   Faulted        -> CONNECTOR_STATUS.FAULTED
+//
+// DISCHARGING is not part of OCPP 2.0.1 (so not covered by the source link
+// above) and is therefore not in that mapping: it comes from OCPP 2.1, which
+// added Discharging to ChargingStateEnumType, and matches Matter Energy EVSE's
+// PluggedInDischarging. It covers the vehicle feeding energy back (V2G/V2L).
+const CHARGING_STATION_CHARGING_STATE = {
+  CHARGING: 0,
+  EV_CONNECTED: 1,
+  PAUSED_BY_VEHICLE: 2,
+  PAUSED_BY_CHARGER: 3,
+  IDLE: 4,
+  DISCHARGING: 5,
 };
 
 const USER_ROLE = {
@@ -312,6 +406,28 @@ const SERVICE_TYPES = {
   INTERNAL: 'internal',
   EXTERNAL: 'external',
 };
+
+// Browse categories of the integration catalog (docs/specs/
+// integration-catalog-categories.md): display metadata describing the domain
+// of use, fully decoupled from the technical `type` of an integration. The
+// array order is the sidebar order. Shared with the frontend (single source
+// of truth of the controlled vocabulary on the instance side); the canonical
+// enum used by the store indexer lives in GladysAssistant/integration-store
+// and is mirrored in lib/external-integration/manifest.schema.json.
+const INTEGRATION_CATALOG_CATEGORIES = [
+  'climate',
+  'lighting',
+  'energy',
+  'security',
+  'multimedia',
+  'appliances',
+  'environment',
+  'protocols',
+  'network',
+  'notifications',
+  'assistants',
+  'services',
+];
 
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
@@ -482,11 +598,17 @@ const EVENTS = {
   MQTT: {
     RECEIVED: 'mqtt.received',
   },
+  WEATHER: {
+    CHECK_ALERTS: 'weather.check-alerts',
+    ALERT_RAISED: 'weather.alert-raised',
+    ALERT_ENDED: 'weather.alert-ended',
+  },
   EXTERNAL_INTEGRATION: {
     STATUS_CHANGED: 'external-integration.status-changed',
     DISCOVERED_DEVICES_UPDATED: 'external-integration.discovered-devices-updated',
     CONNECTION_STATUS_UPDATED: 'external-integration.connection-status-updated',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
+    CLEAN_IMAGES: 'external-integration.clean-images',
   },
 };
 
@@ -558,6 +680,7 @@ const ACTIONS = {
   },
   CALENDAR: {
     IS_EVENT_RUNNING: 'calendar.is-event-running',
+    GET_EVENTS: 'calendar.get-events',
   },
   DEVICE: {
     SET_VALUE: 'device.set-value',
@@ -588,6 +711,7 @@ const ACTIONS = {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
     CHECK_TIME: 'condition.check-time',
     IF_THEN_ELSE: 'condition.if-then-else',
+    WHILE: 'condition.while',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
@@ -619,6 +743,9 @@ const ACTIONS = {
   SMS: {
     SEND: 'sms.send',
   },
+  VARIABLE: {
+    SET: 'variable.set',
+  },
 };
 
 // List of actions that can be used as conditions
@@ -628,6 +755,7 @@ const CONDITION_ACTIONS = [
   ACTIONS.EDF_TEMPO.CONDITION,
   ACTIONS.ALARM.CHECK_ALARM_MODE,
   ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+  ACTIONS.CALENDAR.GET_EVENTS,
   ACTIONS.ECOWATT.CONDITION,
   ACTIONS.HOUSE.IS_EMPTY,
   ACTIONS.HOUSE.IS_NOT_EMPTY,
@@ -672,6 +800,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   BATTERY_STORAGE: 'battery-storage',
   BUTTON: 'button',
   CAMERA: 'camera',
+  CHARGING_STATION: 'charging-station',
   CUBE: 'cube',
   CURRENCY: 'currency',
   CO_SENSOR: 'co-sensor',
@@ -694,8 +823,10 @@ const DEVICE_FEATURE_CATEGORIES = {
   ENERGY_SENSOR: 'energy-sensor',
   ENERGY_PRODUCTION_SENSOR: 'energy-production-sensor',
   FAN: 'fan',
+  GRID_SENSOR: 'grid-sensor',
   HEATER: 'heater',
   HEPA_FILTER_MONITORING: 'hepa-filter-monitoring',
+  HOME_OUTPUT_SENSOR: 'home-output-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
   LEAK_SENSOR: 'leak-sensor',
   LIGHT: 'light',
@@ -703,6 +834,15 @@ const DEVICE_FEATURE_CATEGORIES = {
   LEVEL_SENSOR: 'level-sensor',
   MOTION_SENSOR: 'motion-sensor',
   LOCK: 'lock',
+  // Generic consumable/wear-part monitoring (vacuum brushes, dust bags, mop pads, softener resin,
+  // detergent...). One feature per component, the feature `name` identifies the component: don't
+  // add a new per-component type/category here when the value is just "remaining life in percent".
+  // Boundary with neighboring categories: filter life reported through the Matter Resource
+  // Monitoring model (HEPA and activated carbon filters) stays in HEPA_FILTER_MONITORING, every
+  // other consumable or wear part goes here, so the same quantity is never split across categories.
+  // The name `maintenance` is deliberate: it is a user-facing category name in the UI, kept broader
+  // and simpler than a Matter-style `consumable-monitoring`. Renaming it later would be breaking.
+  MAINTENANCE: 'maintenance',
   MUSIC: 'music',
   NOISE_SENSOR: 'noise-sensor',
   OPENING_SENSOR: 'opening-sensor',
@@ -711,6 +851,16 @@ const DEVICE_FEATURE_CATEGORIES = {
   PM25_SENSOR: 'pm25-sensor',
   PM10_SENSOR: 'pm10-sensor',
   FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
+  // Gaseous air pollutants, one category per gas, holding the raw mass concentration measured in
+  // the air (µg/m³ by default, non-negative). Boundary with the neighbouring air quality
+  // categories: an index synthesizing several pollutants goes to `airquality-sensor`, and a
+  // protocol-specific severity level (Matter reports these gases as a 0-4 LevelValue, see
+  // `no2-matter-index-sensor`) is not a concentration and must not be published here. Whichever
+  // form the device natively reports is the one the integration maps, never both for the same
+  // measurement.
+  NO2_SENSOR: 'no2-sensor',
+  O3_SENSOR: 'o3-sensor',
+  SO2_SENSOR: 'so2-sensor',
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
@@ -741,6 +891,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VACUUM_CLEANER: 'vacuum-cleaner',
   TEXT: 'text',
   INPUT: 'input',
+  WATER_HEATER: 'water-heater',
   WATER_VALVE: 'water-valve',
 };
 
@@ -785,6 +936,21 @@ const DEVICE_FEATURE_TYPES = {
   },
   CAMERA: {
     IMAGE: 'image',
+    // PTZ control (spec docs/specs/camera-ptz-control.md). MOVE: one command feature for all
+    // movements, values from CAMERA_MOVE, per-camera subset declared via supported_options.
+    // PRESET: recall a saved position; the labeled list lives in supported_options, the value
+    // sent is the option's integer (the integration maps it to its protocol token).
+    // *_POSITION: optional absolute position, numeric read/write, bounds declared by the
+    // integration via min/max (units are integration-defined: normalized ONVIF space, degrees...).
+    MOVE: 'move',
+    PRESET: 'preset',
+    PAN_POSITION: 'pan-position',
+    TILT_POSITION: 'tilt-position',
+    ZOOM_POSITION: 'zoom-position',
+  },
+  CHARGING_STATION: {
+    CONNECTOR_STATUS: 'connector-status',
+    CHARGING_STATE: 'charging-state',
   },
   DOORBELL: {
     RING: 'ring',
@@ -793,6 +959,7 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     LMH_VOLUME: 'lmh_volume',
     MELODY: 'melody',
+    TEST_IN_PROGRESS: 'test-in-progress', // Alarm testing status (binary - sensor)
   },
   CHILD_LOCK: {
     BINARY: 'binary',
@@ -906,11 +1073,38 @@ const DEVICE_FEATURE_TYPES = {
     THIRTY_MINUTES_CONSUMPTION_COST: 'thirty-minutes-consumption-cost',
   },
   ENERGY_PRODUCTION_SENSOR: {
+    POWER: 'power', // instantaneous production power, in W (>= 0)
     INDEX: 'index',
     DAILY_PRODUCTION: 'daily-production',
     DAILY_PRODUCTION_REVENUE: 'daily-production-revenue',
     THIRTY_MINUTES_PRODUCTION: 'thirty-minutes-production',
     THIRTY_MINUTES_PRODUCTION_REVENUE: 'thirty-minutes-production-revenue',
+  },
+  // Exchange with the public grid (the connection point), whatever the
+  // measuring device: a plug-in battery's grid port, an EM clamp or a
+  // whole-home meter all publish here, so the same physical quantity never
+  // splits across categories. (teleinformation stays as-is for Linky legacy.)
+  // Import/export are split so core automations can tell direction apart;
+  // `power` is the signed single value some devices report instead
+  // (import > 0, export < 0). An integration maps whichever form its device
+  // NATIVELY reports - never both for the same measurement.
+  GRID_SENSOR: {
+    INPUT_POWER: 'input-power', // instantaneous power imported from the grid, W (>= 0)
+    OUTPUT_POWER: 'output-power', // instantaneous power exported to the grid, W (>= 0)
+    POWER: 'power', // signed grid exchange when the device reports a single value (import > 0, export < 0), W
+    INPUT_INDEX: 'input-index', // cumulative imported-energy meter index, kWh (>= 0)
+    OUTPUT_INDEX: 'output-index', // cumulative exported-energy meter index, kWh (>= 0)
+  },
+  // The power the device ITSELF delivers to the installation it feeds (e.g. a
+  // storage inverter's home output), plus its backup/off-grid output.
+  // House consumption measured by an inverter (the "load power" many hybrid
+  // inverters report, which can exceed the inverter's own output when the
+  // grid tops up) is NOT this category - it goes to energy-sensor.
+  HOME_OUTPUT_SENSOR: {
+    POWER: 'power', // instantaneous power delivered to the home, W (>= 0)
+    INDEX: 'index', // cumulative delivered-energy meter index, kWh (>= 0)
+    OFF_GRID_POWER: 'off-grid-power', // instantaneous power on the backup/off-grid output, W (>= 0)
+    OFF_GRID_INDEX: 'off-grid-index', // cumulative backup-output energy meter index, kWh (>= 0)
   },
   BATTERY_STORAGE: {
     BATTERY_LEVEL: 'battery-level', // state of charge, % (0..100)
@@ -1027,6 +1221,8 @@ const DEVICE_FEATURE_TYPES = {
   },
   THERMOSTAT: {
     TARGET_TEMPERATURE: 'target-temperature',
+    MODE: 'mode',
+    OPERATING_STATE: 'operating-state',
   },
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
@@ -1039,6 +1235,14 @@ const DEVICE_FEATURE_TYPES = {
   },
   TEXT: {
     TEXT: 'text',
+    // A choice among string values the integration discovers on the appliance itself
+    // (installed TV apps, HDMI sources, vacuum rooms, native scenes...): the choices are
+    // declared per-device through supported_options ({ value, label }) and are NOT part of
+    // the taxonomy. The state is the selected option's value, stored as a string
+    // (last_value_string, no history). Enum-like capabilities standards cover (AC modes,
+    // fan speeds...) keep their own category/type with integer values: this type is only
+    // for lists no generic value set can describe.
+    SELECT: 'select',
   },
   RISK: {
     INTEGER: 'integer',
@@ -1051,6 +1255,24 @@ const DEVICE_FEATURE_TYPES = {
     LIQUID_STATE: 'liquid-state',
     LIQUID_LEVEL_PERCENT: 'liquid-level-percent',
     LIQUID_DEPTH: 'liquid-depth',
+  },
+  // Domestic hot water appliances: electric storage tanks, heat-pump water heaters,
+  // gas-fired water heaters. Scope is limited to producing and storing hot water.
+  // Boundary with neighboring categories: the water temperature measured in the tank
+  // is a temperature-sensor/decimal feature, electrical consumption is energy-sensor,
+  // and room heating stays in heater/thermostat — a water heater device carries those
+  // features alongside its water-heater ones.
+  // Value conventions: all commands are non-negative integers; `mode` is an index into
+  // WATER_HEATER_MODE, `binary`/`heating`/`boost` are 0/1. Boosting exists both as a
+  // mode value and as the `boost` command: an integration maps whichever form its
+  // appliance natively reports, never both for the same function.
+  WATER_HEATER: {
+    BINARY: 'binary', // appliance on/off (command)
+    MODE: 'mode', // operating mode, WATER_HEATER_MODE (command)
+    TARGET_TEMPERATURE: 'target-temperature', // hot water setpoint (command)
+    REMAINING_HOT_WATER: 'remaining-hot-water', // hot water available, % or litres V40 (sensor)
+    HEATING: 'heating', // actively heating water or not (sensor)
+    BOOST: 'boost', // forced heating on/off (command)
   },
   WATER_VALVE: {
     // Types used by the SONOFF SWV in Zigbee2mqtt
@@ -1115,6 +1337,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   FILTER_MONITORING: {
     FILTER_LIFE_REMAINING: 'filter-life-remaining', // Remaining life of the HEPA filter in percent (integer - sensor)
+  },
+  MAINTENANCE: {
+    LIFE_REMAINING: 'life-remaining', // Remaining life of a consumable/wear part in percent (integer - sensor)
   },
   VACUUM_CLEANER: {
     STATE: 'state', // Operational state of the vacuum (integer - sensor)
@@ -1313,6 +1538,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.PERCENT,
   ],
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
+  [DEVICE_FEATURE_CATEGORIES.MAINTENANCE]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.SOIL_MOISTURE_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: [DEVICE_FEATURE_UNITS.LUX],
   [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [
@@ -1347,6 +1573,26 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
     DEVICE_FEATURE_UNITS.EURO,
     DEVICE_FEATURE_UNITS.DOLLAR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.ENERGY_PRODUCTION_SENSOR]: [
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.WATT_HOUR,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.EURO,
+    DEVICE_FEATURE_UNITS.DOLLAR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.GRID_SENSOR]: [
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.WATT_HOUR,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.HOME_OUTPUT_SENSOR]: [
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.WATT_HOUR,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
   ],
   [DEVICE_FEATURE_CATEGORIES.BATTERY_STORAGE]: [
     DEVICE_FEATURE_UNITS.PERCENT,
@@ -1405,6 +1651,12 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.LITER,
     DEVICE_FEATURE_UNITS.MILLILITER,
     DEVICE_FEATURE_UNITS.CUBIC_METER,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: [
+    DEVICE_FEATURE_UNITS.CELSIUS,
+    DEVICE_FEATURE_UNITS.FAHRENHEIT,
+    DEVICE_FEATURE_UNITS.PERCENT,
+    DEVICE_FEATURE_UNITS.LITER,
   ],
   [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: [
     DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR,
@@ -1484,6 +1736,21 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
     [DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER],
   ],
+  [DEVICE_FEATURE_CATEGORIES.NO2_SENSOR]: [
+    DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.O3_SENSOR]: [
+    DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.SO2_SENSOR]: [
+    DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.MILLIGRAM_PER_CUBIC_METER,
+    DEVICE_FEATURE_UNITS.NANOGRAM_PER_CUBIC_METER,
+  ],
   [DEVICE_FEATURE_CATEGORIES.SURFACE]: [
     DEVICE_FEATURE_UNITS.SQUARE_CENTIMETER,
     DEVICE_FEATURE_UNITS.SQUARE_METER,
@@ -1495,6 +1762,17 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
 // when the category-level list mixes units of different dimensions.
 // An empty array means the feature type has no unit at all.
 const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: [],
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: [],
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.TARGET_TEMPERATURE]: [
+      DEVICE_FEATURE_UNITS.CELSIUS,
+      DEVICE_FEATURE_UNITS.FAHRENHEIT,
+    ],
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.REMAINING_HOT_WATER]: [DEVICE_FEATURE_UNITS.PERCENT, DEVICE_FEATURE_UNITS.LITER],
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.HEATING]: [],
+    [DEVICE_FEATURE_TYPES.WATER_HEATER.BOOST]: [],
+  },
   [DEVICE_FEATURE_CATEGORIES.WATER_VALVE]: {
     [DEVICE_FEATURE_TYPES.WATER_VALVE.CURRENT_DEVICE_STATUS]: [],
     [DEVICE_FEATURE_TYPES.WATER_VALVE.FLOW]: [DEVICE_FEATURE_UNITS.CUBIC_METER_PER_HOUR],
@@ -1597,6 +1875,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ERROR: 'mqtt.error',
     INSTALLATION_STATUS: 'mqtt.install-status',
     DEBUG_NEW_MQTT_MESSAGE: 'mqtt.debug.new-mqtt-message',
+    HA_DISCOVERY_DEVICES_UPDATED: 'mqtt.ha-discovery.devices-updated',
   },
   ZWAVEJS_UI: {
     CONNECTED: 'zwavejs-ui.connected',
@@ -1677,6 +1956,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     OAUTH_CALLBACK: 'external-integration.oauth.callback',
     ACTION_RUN: 'external-integration.action.run',
     CAMERA_GET_IMAGE: 'external-integration.camera.get-image',
+    WEATHER_GET: 'external-integration.weather.get',
+    WEATHER_GET_IMAGE: 'external-integration.weather.get-image',
+    WEATHER_REFRESH: 'external-integration.weather.refresh',
     TTS_SYNTHESIZE: 'external-integration.tts.synthesize',
     DEVICE_TRANSPORT_UPDATED: 'external-integration.device-transport-updated',
     WEBHOOK_RECEIVED: 'external-integration.webhook.received',
@@ -1713,6 +1995,8 @@ const DASHBOARD_BOX_TYPE = {
   ENERGY_CONSUMPTION: 'energy-consumption',
   VOICE_ASSISTANT: 'voice-assistant',
   LINK: 'link',
+  PHOTO: 'photo',
+  SUN: 'sun',
 };
 
 const ERROR_MESSAGES = {
@@ -1768,6 +2052,8 @@ const JOB_TYPES = {
   ENERGY_MONITORING_COST_CALCULATION_BEGINNING: 'energy-monitoring-cost-calculation-beginning',
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_THIRTY_MINUTES: 'energy-monitoring-consumption-from-index-thirty-minutes',
   ENERGY_MONITORING_CONSUMPTION_FROM_INDEX_BEGINNING: 'energy-monitoring-consumption-from-index-beginning',
+  ENERGY_MONITORING_PRODUCTION_FROM_INDEX_THIRTY_MINUTES: 'energy-monitoring-production-from-index-thirty-minutes',
+  ENERGY_MONITORING_PRODUCTION_FROM_INDEX_BEGINNING: 'energy-monitoring-production-from-index-beginning',
   SERVICE_ENEDIS_SYNC: 'service-enedis-sync',
   AI_WEEKLY_DIGEST: 'ai-weekly-digest',
   DEVICE_MIGRATE: 'device-migrate',
@@ -1825,6 +2111,7 @@ const AI_CHAT_TOOL_CATEGORIES = {
   SCENES: 'scenes',
   DEVICE_CONTROL: 'device_control',
   DEVICE_QUERY: 'device_query',
+  WEATHER: 'weather',
   WEB_AND_TIME: 'web_and_time',
   OTHER: 'other',
 };
@@ -1883,6 +2170,9 @@ module.exports.COVER_STATE = COVER_STATE;
 module.exports.LOCK = LOCK;
 module.exports.SIREN_LMH_VOLUME = SIREN_LMH_VOLUME;
 module.exports.AC_MODE = AC_MODE;
+module.exports.CAMERA_MOVE = CAMERA_MOVE;
+module.exports.THERMOSTAT_MODE = THERMOSTAT_MODE;
+module.exports.THERMOSTAT_OPERATING_STATE = THERMOSTAT_OPERATING_STATE;
 module.exports.FAN_MODE = FAN_MODE;
 module.exports.FAN_AIRFLOW_DIRECTION = FAN_AIRFLOW_DIRECTION;
 module.exports.FAN_ROCK_SETTING = FAN_ROCK_SETTING;
@@ -1895,7 +2185,10 @@ module.exports.PILOT_WIRE_MODE = PILOT_WIRE_MODE;
 module.exports.VACUUM_CLEANER_STATE = VACUUM_CLEANER_STATE;
 module.exports.VACUUM_CLEANER_MODE = VACUUM_CLEANER_MODE;
 module.exports.VACUUM_CLEANER_CLEAN_MODE = VACUUM_CLEANER_CLEAN_MODE;
+module.exports.CHARGING_STATION_CONNECTOR_STATUS = CHARGING_STATION_CONNECTOR_STATUS;
+module.exports.CHARGING_STATION_CHARGING_STATE = CHARGING_STATION_CHARGING_STATE;
 module.exports.LIQUID_STATE = LIQUID_STATE;
+module.exports.WATER_HEATER_MODE = WATER_HEATER_MODE;
 module.exports.WATER_VALVE_CURRENT_DEVICE_STATUS = WATER_VALVE_CURRENT_DEVICE_STATUS;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
@@ -1940,6 +2233,8 @@ module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);
 
 module.exports.SERVICE_TYPES = SERVICE_TYPES;
 module.exports.SERVICE_TYPES_LIST = createList(SERVICE_TYPES);
+
+module.exports.INTEGRATION_CATALOG_CATEGORIES = INTEGRATION_CATALOG_CATEGORIES;
 
 module.exports.SYSTEM_VARIABLE_NAMES = SYSTEM_VARIABLE_NAMES;
 
