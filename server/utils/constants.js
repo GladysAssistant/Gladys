@@ -299,7 +299,9 @@ const LEVEL_MATTER_STATE = {
 // one standards use for an overall air quality verdict (Matter AirQuality cluster, and the same
 // levels in Zigbee air quality sensors): a device publishes the verdict it computes itself, not a
 // value Gladys derives from concentrations. `UNKNOWN` is what a device reports while it has no
-// verdict yet (warm-up, sensor fault), it is not a quality level and must not be charted as one.
+// verdict yet (warm-up, sensor fault): it is not a quality level, but it stays part of the value
+// range (feature `min` and `supported_options`) so scenes can match it, so a 0 does show up in
+// history charts and is to be read as "no verdict", not as the best air on the scale.
 const AIR_QUALITY_LEVEL = {
   UNKNOWN: 0,
   GOOD: 1,
