@@ -1,7 +1,7 @@
 name: Scheduled Claude autofix
 run-name: Scheduled Claude autofix${{ inputs.dry_run == true && ' (dry run)' || '' }}
 
-# Once a day, find the open pull requests that carry review-bot feedback
+# Twice a day, find the open pull requests that carry review-bot feedback
 # (Cursor, CodeRabbit) nobody has handled yet, and launch ONE Claude Code
 # cloud session per PR to address it. This replaces the event-driven Claude
 # automation, whose cost was unbounded: a PR left open for two weeks kept
@@ -43,8 +43,13 @@ run-name: Scheduled Claude autofix${{ inputs.dry_run == true && ' (dry run)' || 
 
 on:
   schedule:
-    # Daily, before the (European) workday starts.
+    # Twice a day: before the (European) workday starts, so overnight
+    # review-bot feedback is fixed by morning, and around European midday,
+    # so feedback from the morning review round is fixed the same
+    # afternoon instead of waiting for the next day. Each run has its own
+    # MAX_PRS budget, so the daily ceiling is 2 * MAX_PRS sessions.
     - cron: '30 4 * * *'
+    - cron: '30 11 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -62,11 +67,12 @@ env:
   # commit-message trailer. When a PR still has unhandled feedback after
   # this many passes, it gets EXHAUSTED_LABEL and a human takes over.
   MAX_PASSES: 3
-  # Budget circuit breaker: at most this many PRs processed per run. The
+  # Budget circuit breaker: at most this many PRs processed per run (the
+  # schedule fires twice a day, so up to 2 * MAX_PRS sessions daily). The
   # eligible list is sorted by last activity (oldest first) before
   # truncating, so long-waiting PRs are served first. Cloud sessions also
   # count against the account's daily routine-run allowance.
-  MAX_PRS: 8
+  MAX_PRS: 10
   # A comment younger than this many hours is not processed yet: it lets a
   # review round finish (and a human veto it) before Claude reacts.
   QUIET_PERIOD_HOURS: 2
@@ -83,11 +89,11 @@ env:
   # only PRs from such branches are eligible.
   HEAD_BRANCH_PREFIX: 'claude/'
   # Minutes each matrix slot is held after firing. Combined with
-  # max-parallel 2 this staggers session LAUNCHES (about two fires per
+  # max-parallel 3 this staggers session LAUNCHES (about three fires per
   # window) so pushes do not all land at once; it does NOT bound how many
   # sessions are alive concurrently, since sessions outlive the job and no
   # public API exposes their completion.
-  FIRE_STAGGER_MINUTES: 8
+  FIRE_STAGGER_MINUTES: 5
   # Label that permanently stops the scheduled autofix on a PR (posed
   # automatically at MAX_PASSES).
   EXHAUSTED_LABEL: 'claude:autofix-exhausted'
@@ -344,8 +350,8 @@ jobs:
     strategy:
       fail-fast: false
       # Together with the stagger hold, spaces the session launches out
-      # (about two fires per stagger window).
-      max-parallel: 2
+      # (about three fires per stagger window).
+      max-parallel: 3
       matrix:
         pr: ${{ fromJSON(needs.select.outputs.matrix) }}
     # One autofix fire at a time per PR, whatever run it belongs to.
