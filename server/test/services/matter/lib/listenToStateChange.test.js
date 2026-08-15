@@ -13,6 +13,7 @@ const {
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  AirQuality,
   NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
   CarbonDioxideConcentrationMeasurement,
@@ -32,7 +33,7 @@ const { expect } = require('chai');
 
 const { fake, assert } = sinon;
 
-const { EVENTS, STATE, BUTTON_STATUS, FAN_MODE, AC_MODE } = require('../../../../utils/constants');
+const { EVENTS, STATE, BUTTON_STATUS, FAN_MODE, AC_MODE, AIR_QUALITY_LEVEL } = require('../../../../utils/constants');
 
 const MatterHandler = require('../../../../services/matter/lib');
 
@@ -309,6 +310,23 @@ describe('Matter.listenToStateChange', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'matter:1234:1:1069',
       state: 100,
+    });
+  });
+  it('should listen to state change (AirQuality)', async () => {
+    const clusterClient = {
+      id: AirQuality.Complete.id,
+      addAirQualityAttributeListener: (callback) => {
+        callback(AIR_QUALITY_LEVEL.MODERATE);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${AirQuality.Complete.id}`,
+      state: AIR_QUALITY_LEVEL.MODERATE,
     });
   });
   it('should listen to state change (TotalVolatileOrganicCompoundsConcentrationMeasurement)', async () => {

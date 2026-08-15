@@ -10,6 +10,7 @@ const {
   ColorControl,
   RelativeHumidityMeasurement,
   Thermostat,
+  AirQuality,
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   ConcentrationMeasurement,
@@ -40,6 +41,7 @@ const {
 const { slugify } = require('../../../utils/slugify');
 const { matterAttributeToNumber } = require('./fanMatterMapping');
 const { getAcModeSupportedOptions } = require('./thermostatMatterMapping');
+const { getAirQualityLevelSupportedOptions } = require('./airQualityMatterMapping');
 
 /**
  * @description Build a stable Gladys selector from a Matter external_id.
@@ -321,6 +323,21 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             supported_options: acModeSupportedOptions,
           });
         }
+      } else if (clusterIndex === AirQuality.Complete.id) {
+        // Only Unknown, Good and Poor are always reportable: the four other levels are optional
+        // cluster features, so the device itself tells us which verdicts it can publish
+        const airQualityLevelOptions = getAirQualityLevelSupportedOptions(clusterClient.supportedFeatures);
+        gladysDevice.features.push({
+          ...commonNewFeature,
+          category: DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL,
+          read_only: true,
+          has_feedback: true,
+          external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}`,
+          min: airQualityLevelOptions[0].value,
+          max: airQualityLevelOptions[airQualityLevelOptions.length - 1].value,
+          supported_options: airQualityLevelOptions,
+        });
       } else if (clusterIndex === Pm25ConcentrationMeasurement.Complete.id) {
         const measurementUnit = await clusterClient.getMeasurementUnitAttribute();
         const deviceFeatureUnit = convertMeasurementUnitToDeviceFeatureUnits(measurementUnit);

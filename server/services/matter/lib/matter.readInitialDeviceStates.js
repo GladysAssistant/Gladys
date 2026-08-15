@@ -9,6 +9,7 @@ const {
   ColorControl,
   RelativeHumidityMeasurement,
   Thermostat,
+  AirQuality,
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
@@ -149,6 +150,12 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
     if (value !== undefined) {
       emitState(`matter:${nodeId}:${devicePath}:${RelativeHumidityMeasurement.Complete.id}`, value / 100);
     }
+  }
+
+  const airQuality = device.getClusterClientById(AirQuality.Complete.id);
+  if (airQuality) {
+    const value = await safeReadAttribute(() => airQuality.getAirQualityAttribute());
+    emitState(`matter:${nodeId}:${devicePath}:${AirQuality.Complete.id}`, value);
   }
 
   const pm25ConcentrationMeasurement = device.getClusterClientById(Pm25ConcentrationMeasurement.Complete.id);

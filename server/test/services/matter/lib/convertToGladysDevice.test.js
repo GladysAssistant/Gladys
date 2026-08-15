@@ -9,6 +9,7 @@ const {
   RvcCleanMode,
   PowerSource,
   Thermostat,
+  AirQuality,
   CarbonDioxideConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
@@ -17,7 +18,7 @@ const {
   convertToGladysDevice,
   matterExternalIdToSelector,
 } = require('../../../../services/matter/utils/convertToGladysDevice');
-const { AC_MODE } = require('../../../../utils/constants');
+const { AC_MODE, AIR_QUALITY_LEVEL } = require('../../../../utils/constants');
 
 describe('Matter.convertToGladysDevice', () => {
   const serviceId = 'service-1';
@@ -365,6 +366,81 @@ describe('Matter.convertToGladysDevice', () => {
     const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '2');
 
     expect(gladysDevice.features).to.have.lengthOf(0);
+  });
+
+  it('should create an air quality level feature for AirQuality cluster', async () => {
+    const clusterClient = {
+      id: AirQuality.Complete.id,
+      name: 'AirQuality',
+      endpointId: 1,
+      supportedFeatures: {
+        fair: true,
+        moderate: true,
+        veryPoor: true,
+        extremelyPoor: true,
+      },
+    };
+
+    const device = {
+      name: 'Air Quality Sensor',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.equal({
+      name: 'AirQuality - 1',
+      selector: matterExternalIdToSelector(`matter:12345:1:${AirQuality.Complete.id}`),
+      category: 'airquality-sensor',
+      type: 'level',
+      read_only: true,
+      has_feedback: true,
+      external_id: `matter:12345:1:${AirQuality.Complete.id}`,
+      min: AIR_QUALITY_LEVEL.UNKNOWN,
+      max: AIR_QUALITY_LEVEL.EXTREMELY_POOR,
+      supported_options: [
+        { value: AIR_QUALITY_LEVEL.UNKNOWN, label: 'Unknown' },
+        { value: AIR_QUALITY_LEVEL.GOOD, label: 'Good' },
+        { value: AIR_QUALITY_LEVEL.FAIR, label: 'Fair' },
+        { value: AIR_QUALITY_LEVEL.MODERATE, label: 'Moderate' },
+        { value: AIR_QUALITY_LEVEL.POOR, label: 'Poor' },
+        { value: AIR_QUALITY_LEVEL.VERY_POOR, label: 'Very poor' },
+        { value: AIR_QUALITY_LEVEL.EXTREMELY_POOR, label: 'Extremely poor' },
+      ],
+    });
+  });
+
+  it('should only expose the mandatory air quality levels when the cluster declares no feature', async () => {
+    const clusterClient = {
+      id: AirQuality.Complete.id,
+      name: 'AirQuality',
+      endpointId: 1,
+    };
+
+    const device = {
+      name: 'Air Quality Sensor',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    };
+
+    const gladysDevice = await convertToGladysDevice(serviceId, nodeId, device, basicInformation, '1');
+
+    expect(gladysDevice.features).to.have.lengthOf(1);
+    expect(gladysDevice.features[0]).to.deep.include({
+      category: 'airquality-sensor',
+      type: 'level',
+      min: AIR_QUALITY_LEVEL.UNKNOWN,
+      max: AIR_QUALITY_LEVEL.POOR,
+      supported_options: [
+        { value: AIR_QUALITY_LEVEL.UNKNOWN, label: 'Unknown' },
+        { value: AIR_QUALITY_LEVEL.GOOD, label: 'Good' },
+        { value: AIR_QUALITY_LEVEL.POOR, label: 'Poor' },
+      ],
+    });
   });
 
   it('should create a CO2 sensor feature for CarbonDioxideConcentrationMeasurement cluster', async () => {

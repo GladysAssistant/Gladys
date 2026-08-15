@@ -5034,6 +5034,18 @@
           "5": "Discharging"
         }
       },
+      "airquality-sensor": {
+        "level": {
+          "unknown": "{{value}} (unknown)",
+          "0": "Unknown",
+          "1": "Good",
+          "2": "Fair",
+          "3": "Moderate",
+          "4": "Poor",
+          "5": "Very poor",
+          "6": "Extremely poor"
+        }
+      },
       "voc-matter-index-sensor": {
         "integer": {
           "unknown": "Unknown",
@@ -5621,7 +5633,8 @@
     },
     "airquality-sensor": {
       "shortCategoryName": "Air Quality",
-      "aqi": "Air Quality Index"
+      "aqi": "Air Quality Index",
+      "level": "Air Quality Level"
     },
     "ph-sensor": {
       "shortCategoryName": "pH Sensor",

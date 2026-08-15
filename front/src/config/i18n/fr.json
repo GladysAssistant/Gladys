@@ -5034,6 +5034,18 @@
           "5": "En décharge"
         }
       },
+      "airquality-sensor": {
+        "level": {
+          "unknown": "{{value}} (inconnu)",
+          "0": "Inconnue",
+          "1": "Bonne",
+          "2": "Correcte",
+          "3": "Moyenne",
+          "4": "Mauvaise",
+          "5": "Très mauvaise",
+          "6": "Extrêmement mauvaise"
+        }
+      },
       "voc-matter-index-sensor": {
         "integer": {
           "unknown": "Inconnu",
@@ -5621,7 +5633,8 @@
     },
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
-      "aqi": "Indice de qualité de l'air"
+      "aqi": "Indice de qualité de l'air",
+      "level": "Niveau de qualité de l'air"
     },
     "ph-sensor": {
       "shortCategoryName": "Capteur de pH",

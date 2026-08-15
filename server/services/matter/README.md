@@ -4,9 +4,9 @@ This file documents Matter cluster compatibility in the Gladys Matter integratio
 
 - `matter.js` source: `@matter/main` / `@matter/types` `0.17.4`
 - Clusters exposed by `matter.js`: **132**
-- Clusters handled by Gladys today: **26**
-- Compatibility progress: **19.7%**
-- Clusters with an existing Gladys feature (easy to wire): **26** additional
+- Clusters handled by Gladys today: **27**
+- Compatibility progress: **20.5%**
+- Clusters with an existing Gladys feature (easy to wire): **25** additional
 
 A cluster is marked as handled when the current Gladys Matter integration contains explicit mapping logic for discovery, state reading/listening, and/or commands for that cluster.
 
@@ -19,7 +19,7 @@ The **Gladys feature** column lists matching `category/type` pairs from `server/
 | `Actions` | This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose logical grouping and actions. | No | — | Not explicitly handled in `server/services/matter`. |
 | `ActivatedCarbonFilterMonitoring` | Reports the condition and remaining lifetime of an activated carbon filter. | No | hepa-filter-monitoring/filter-life-remaining (easy) | Not explicitly handled in `server/services/matter`. |
 | `AdministratorCommissioning` | This cluster is used to trigger a Node to allow a new Administrator to commission it. | No | — | Not explicitly handled in `server/services/matter`. |
-| `AirQuality` | This cluster provides an interface to air quality classification using distinct levels with human-readable labels. | No | airquality-sensor/aqi (easy) | Not explicitly handled in `server/services/matter`. |
+| `AirQuality` | This cluster provides an interface to air quality classification using distinct levels with human-readable labels. | Yes | airquality-sensor/level | Overall air quality level (Unknown/Good/Fair/Moderate/Poor/VeryPoor/ExtremelyPoor), read-only. |
 | `ApplicationBasic` | This cluster provides information about a Content App running on a Video Player device which is represented as an endpoint (see Device Type Library document). | No | — | Not explicitly handled in `server/services/matter`. |
 | `ApplicationLauncher` | This cluster provides an interface for launching applications on a Video Player device such as a TV. | No | — | Not explicitly handled in `server/services/matter`. |
 | `AudioOutput` | This cluster provides an interface for controlling the Output on a Video Player device such as a TV. | No | television/volume (easy) | Not explicitly handled in `server/services/matter`. |
@@ -149,7 +149,7 @@ The **Gladys feature** column lists matching `category/type` pairs from `server/
 
 ## How the percentage is calculated
 
-`26 / 132 = 19.7%`
+`27 / 132 = 20.5%`
 
 This percentage reflects the number of Matter cluster definitions exported by `matter.js` that have explicit support in the current Gladys integration. It is a cluster support coverage indicator, not a guarantee that every device implementing a supported cluster will be fully interoperable across all feature combinations.
 
