@@ -5716,7 +5716,8 @@
       "errorPermissionDenied": "Der Mikrofonzugriff wurde verweigert. Erlaube ihn in den Einstellungen deines Browsers, um eine Nachricht zu diktieren.",
       "errorNoMicrophone": "Kein Mikrofon erkannt. Schließe eines an oder aktiviere es in den Systemeinstellungen.",
       "errorNetwork": "Die Spracherkennung ist nicht verfügbar, dein Browser konnte seinen Sprachdienst nicht erreichen.",
-      "errorNotSupported": "Spracherkennung ist in diesem Browser nicht verfügbar."
+      "errorNotSupported": "Spracherkennung ist in diesem Browser nicht verfügbar.",
+      "browserTranscriptionNotice": "Dein Browser transkribiert, was du sagst: Gladys nimmt kein Audio auf und lädt keines hoch. Je nach Browser kann das Audio an dessen eigenen Spracherkennungsdienst gesendet werden (Google bei Chrome, lokale Verarbeitung bei Safari)."
     },
     "sidebar": {
       "title": "Wie funktioniert der Chat?",

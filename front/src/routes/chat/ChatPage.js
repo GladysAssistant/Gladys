@@ -32,6 +32,10 @@ const IntegrationPage = connect(
     const [selectedModel, setSelectedModel] = useState('auto');
     const [gladysPlusConfigured, setGladysPlusConfigured] = useState(null);
     const [voiceInputError, setVoiceInputError] = useState(null);
+    // While the microphone is on, the transcription rewrites the whole input:
+    // the textarea is read-only so an edit cannot be overwritten by the next
+    // interim result.
+    const [voiceInputListening, setVoiceInputListening] = useState(false);
     // Browsers without the Web Speech API (Firefox for example) simply don't
     // get a microphone button.
     const [voiceInputSupported] = useState(isSpeechRecognitionSupported);
@@ -125,6 +129,7 @@ const IntegrationPage = connect(
                               })}
                               placeholder={<Text id="chat.messagePlaceholder" />}
                               value={currentMessageTextInput}
+                              readOnly={voiceInputListening}
                               onInput={onComposerInput}
                               onKeyPress={handleKeyPress}
                             />
@@ -136,6 +141,7 @@ const IntegrationPage = connect(
                               currentText={currentMessageTextInput}
                               onTranscript={setMessageTextInput}
                               onError={setVoiceInputError}
+                              onListeningChange={setVoiceInputListening}
                             />
                           )}
                           <button
@@ -150,6 +156,11 @@ const IntegrationPage = connect(
                             <i class="fe fe-send" />
                           </button>
                         </div>
+                        {voiceInputListening && (
+                          <p class={style.voiceInputNotice}>
+                            <Text id="chat.voiceInput.browserTranscriptionNotice" />
+                          </p>
+                        )}
                         {voiceInputError && (
                           <p class={style.voiceInputError}>
                             <Text id={`chat.voiceInput.${voiceInputError}`} />

@@ -59,16 +59,20 @@ export function getSpeechRecognitionLocale(language) {
 /**
  * @description Translate a SpeechRecognition error code to a Gladys i18n key suffix.
  * @param {string} error - Error code given by the browser.
+ * @param {boolean} [hasTranscript] - Whether something was already transcribed in this session.
  * @returns {string|null} i18n key suffix, or null when the error must be ignored.
  * @example getSpeechRecognitionErrorKey('not-allowed');
  */
-export function getSpeechRecognitionErrorKey(error) {
+export function getSpeechRecognitionErrorKey(error, hasTranscript = false) {
   switch (error) {
     case 'aborted':
       // The user stopped the recognition himself, this is not an error.
       return null;
     case 'no-speech':
-      return 'errorNoSpeech';
+      // Chrome fires no-speech after a few seconds of silence, even when the
+      // user already dictated a sentence. In that case this is just the normal
+      // end of the session, not something to complain about.
+      return hasTranscript ? null : 'errorNoSpeech';
     case 'not-allowed':
     case 'service-not-allowed':
       return 'errorPermissionDenied';
@@ -106,6 +110,7 @@ export function createSpeechRecognition({ language, onTranscript, onError, onEnd
   recognition.interimResults = true;
 
   let finalTranscript = '';
+  let hasTranscript = false;
   let stopped = false;
 
   recognition.onresult = event => {
@@ -119,11 +124,15 @@ export function createSpeechRecognition({ language, onTranscript, onError, onEnd
         interimTranscript += transcript;
       }
     }
-    onTranscript(`${finalTranscript}${interimTranscript}`);
+    const fullTranscript = `${finalTranscript}${interimTranscript}`;
+    if (fullTranscript.trim().length > 0) {
+      hasTranscript = true;
+    }
+    onTranscript(fullTranscript);
   };
 
   recognition.onerror = event => {
-    const errorKey = getSpeechRecognitionErrorKey(event.error);
+    const errorKey = getSpeechRecognitionErrorKey(event.error, hasTranscript);
     if (errorKey && onError) {
       onError(errorKey);
     }
@@ -136,12 +145,19 @@ export function createSpeechRecognition({ language, onTranscript, onError, onEnd
   };
 
   return {
+    /**
+     * @description Start listening.
+     * @returns {boolean} True when the browser accepted to start listening.
+     */
     start() {
       try {
         recognition.start();
+        return true;
       } catch (e) {
-        // start() throws when the recognition is already running, nothing to do.
+        // start() throws when a recognition is already running: onend will
+        // never be called for this session, so the caller has to know it.
         console.error(e);
+        return false;
       }
     },
     stop() {

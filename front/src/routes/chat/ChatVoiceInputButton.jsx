@@ -20,12 +20,33 @@ class ChatVoiceInputButton extends Component {
 
   recognition = null;
 
+  /**
+   * Incremented at each new session, so a session which is ending cannot reset
+   * the state of the session which just started.
+   */
+  recognitionGeneration = 0;
+
+  /** True when the user asked to listen again while the previous session was still ending. */
+  restartWhenEnded = false;
+
   componentWillUnmount() {
+    this.recognitionGeneration += 1;
+    this.restartWhenEnded = false;
     if (this.recognition) {
       this.recognition.abort();
       this.recognition = null;
     }
   }
+
+  setListening = listening => {
+    if (this.state.listening === listening) {
+      return;
+    }
+    this.setState({ listening });
+    if (this.props.onListeningChange) {
+      this.props.onListeningChange(listening);
+    }
+  };
 
   handleTranscript = transcript => {
     const trimmedTranscript = transcript.trim();
@@ -41,38 +62,80 @@ class ChatVoiceInputButton extends Component {
     this.props.onError(errorKey);
   };
 
-  handleEnd = () => {
+  handleEnd = generation => {
+    if (generation !== this.recognitionGeneration) {
+      // An older session ended after a new one started: it must not stop it.
+      return;
+    }
     this.recognition = null;
-    this.setState({ listening: false });
+    if (this.restartWhenEnded) {
+      this.restartWhenEnded = false;
+      this.startRecognition();
+      return;
+    }
+    this.setListening(false);
+  };
+
+  /**
+   * @description Create and start a new recognition session.
+   */
+  startRecognition = () => {
+    this.baseText = this.props.currentText || '';
+    this.recognitionGeneration += 1;
+    const generation = this.recognitionGeneration;
+    const isCurrentSession = () => generation === this.recognitionGeneration;
+    const recognition = createSpeechRecognition({
+      language: this.props.language,
+      onTranscript: transcript => {
+        if (isCurrentSession()) {
+          this.handleTranscript(transcript);
+        }
+      },
+      onError: errorKey => {
+        if (isCurrentSession()) {
+          this.handleError(errorKey);
+        }
+      },
+      onEnd: () => this.handleEnd(generation)
+    });
+    if (!recognition) {
+      this.props.onError('errorNotSupported');
+      this.setListening(false);
+      return;
+    }
+    this.recognition = recognition;
+    this.setListening(true);
+    if (!recognition.start()) {
+      // The browser refused to start: don't leave a button saying we listen.
+      this.recognition = null;
+      this.setListening(false);
+      this.props.onError('error');
+    }
   };
 
   startListening = () => {
     this.props.onError(null);
-    this.baseText = this.props.currentText || '';
-    const recognition = createSpeechRecognition({
-      language: this.props.language,
-      onTranscript: this.handleTranscript,
-      onError: this.handleError,
-      onEnd: this.handleEnd
-    });
-    if (!recognition) {
-      this.props.onError('errorNotSupported');
+    if (this.recognition) {
+      // The previous session has not ended yet, starting a new one now would
+      // throw: it is started when the browser tells us that one ended.
+      this.restartWhenEnded = true;
+      this.setListening(true);
       return;
     }
-    this.recognition = recognition;
-    this.setState({ listening: true });
-    recognition.start();
+    this.startRecognition();
   };
 
   /**
    * @description Stop listening, keeping what was already transcribed in the input.
    */
   stopListening = () => {
+    this.restartWhenEnded = false;
     if (this.recognition) {
+      // The session is kept until the browser tells us it ended, so the next
+      // one is not started while this one is still running.
       this.recognition.stop();
-      this.recognition = null;
     }
-    this.setState({ listening: false });
+    this.setListening(false);
   };
 
   /**
@@ -81,13 +144,13 @@ class ChatVoiceInputButton extends Component {
    * the input the user just emptied.
    */
   cancelListening = () => {
+    this.restartWhenEnded = false;
+    this.recognitionGeneration += 1;
     if (this.recognition) {
       this.recognition.abort();
       this.recognition = null;
     }
-    if (this.state.listening) {
-      this.setState({ listening: false });
-    }
+    this.setListening(false);
   };
 
   handleClick = () => {

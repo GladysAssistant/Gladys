@@ -5728,7 +5728,8 @@
       "errorPermissionDenied": "Microphone access was denied. Allow it in your browser settings to dictate a message.",
       "errorNoMicrophone": "No microphone detected. Plug one in or enable it in system settings.",
       "errorNetwork": "Speech recognition is unavailable, your browser could not reach its speech service.",
-      "errorNotSupported": "Speech recognition is not available in this browser."
+      "errorNotSupported": "Speech recognition is not available in this browser.",
+      "browserTranscriptionNotice": "Your browser transcribes what you say: Gladys neither records nor uploads any audio. Depending on your browser, the audio can be sent to its own speech recognition service (Google for Chrome, on-device for Safari)."
     }
   },
   "history": {
