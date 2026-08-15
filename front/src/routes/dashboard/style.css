@@ -44,6 +44,7 @@
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+  min-height: 100vh;
 }
 
 /* Translucent cards over the dashboard background image */
