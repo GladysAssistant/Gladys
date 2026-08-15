@@ -1,7 +1,7 @@
 name: Scheduled Claude autofix
 run-name: Scheduled Claude autofix${{ inputs.dry_run == true && ' (dry run)' || '' }}
 
-# Twice a day, find the open pull requests that carry review-bot feedback
+# Every few hours, find the open pull requests that carry review-bot feedback
 # (Cursor, CodeRabbit) nobody has handled yet, and launch ONE Claude Code
 # cloud session per PR to address it. This replaces the event-driven Claude
 # automation, whose cost was unbounded: a PR left open for two weeks kept
@@ -43,13 +43,19 @@ run-name: Scheduled Claude autofix${{ inputs.dry_run == true && ' (dry run)' || 
 
 on:
   schedule:
-    # Twice a day: before the (European) workday starts, so overnight
-    # review-bot feedback is fixed by morning, and around European midday,
-    # so feedback from the morning review round is fixed the same
-    # afternoon instead of waiting for the next day. Each run has its own
-    # MAX_PRS budget, so the daily ceiling is 2 * MAX_PRS sessions.
-    - cron: '30 4 * * *'
-    - cron: '30 11 * * *'
+    # Every 3 hours across the (European) day. Frequent runs are cheap:
+    # the select job is pure bash + gh api, and when it finds nothing the
+    # fire job is skipped entirely — an empty run costs ~1 minute of free
+    # runner time. Real spend is bounded PER PR, not per run: the
+    # Autofix-Handled markers plus MAX_PASSES cap every PR at MAX_PASSES
+    # sessions total, however often the schedule fires. More runs only
+    # cut the latency between a bot comment and its fix.
+    # Do NOT go much denser than this (e.g. hourly): a session still
+    # working on a PR has not posted its markers yet, so a run firing
+    # while it is in flight would select the same PR again and push a
+    # second session onto the same branch. Three hours is comfortably
+    # longer than any session's lifetime.
+    - cron: '30 4,7,10,13,16,19 * * *'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -67,11 +73,12 @@ env:
   # commit-message trailer. When a PR still has unhandled feedback after
   # this many passes, it gets EXHAUSTED_LABEL and a human takes over.
   MAX_PASSES: 3
-  # Budget circuit breaker: at most this many PRs processed per run (the
-  # schedule fires twice a day, so up to 2 * MAX_PRS sessions daily). The
-  # eligible list is sorted by last activity (oldest first) before
-  # truncating, so long-waiting PRs are served first. Cloud sessions also
-  # count against the account's daily routine-run allowance.
+  # Budget circuit breaker: at most this many PRs processed per run. This
+  # caps the burst size of one run, not the daily spend — that is bounded
+  # per PR by MAX_PASSES (see the schedule comment above). The eligible
+  # list is sorted by last activity (oldest first) before truncating, so
+  # long-waiting PRs are served first. Cloud sessions also count against
+  # the account's daily routine-run allowance.
   MAX_PRS: 10
   # A comment younger than this many hours is not processed yet: it lets a
   # review round finish (and a human veto it) before Claude reacts.
