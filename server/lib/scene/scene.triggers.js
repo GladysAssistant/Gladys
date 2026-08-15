@@ -7,6 +7,53 @@ const { compare } = require('../../utils/compare');
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
   event.house.selector === trigger.house && (event.offset || 0) === (trigger.offset || 0);
 
+// Tolerance used by the "=" operator of the sun position trigger: the sun position is
+// checked every minute, so it never matches an exact degree. "= 31" means
+// "the sun altitude rounds to 31°".
+const SUN_POSITION_EQUALITY_TOLERANCE_IN_DEGREE = 0.5;
+
+// A sun position trigger has an optional condition on the altitude and an optional
+// one on the azimuth. An axis without operator or without value is not checked.
+const getSunPositionCondition = (operator, value) => {
+  if (!operator || value === undefined || value === null || value === '') {
+    return null;
+  }
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? { operator, value: numericValue } : null;
+};
+
+const sunPositionAxisVerified = (condition, currentValue) => {
+  if (condition === null) {
+    return true;
+  }
+  if (condition.operator === '=') {
+    return Math.abs(currentValue - condition.value) <= SUN_POSITION_EQUALITY_TOLERANCE_IN_DEGREE;
+  }
+  return compare(condition.operator, currentValue, condition.value);
+};
+
+// Same house, and the sun just entered the area described by the trigger: the position is
+// checked every minute, so the scene is executed when the conditions become verified, and
+// not again at every check while the sun stays in the area.
+const matchSunPosition = (self, sceneSelector, event, trigger) => {
+  if (event.house.selector !== trigger.house) {
+    return false;
+  }
+  const altitudeCondition = getSunPositionCondition(trigger.sun_altitude_operator, trigger.sun_altitude);
+  const azimuthCondition = getSunPositionCondition(trigger.sun_azimuth_operator, trigger.sun_azimuth);
+  // A trigger without any condition would match at every check: it never starts the scene.
+  if (altitudeCondition === null && azimuthCondition === null) {
+    return false;
+  }
+  const verified =
+    sunPositionAxisVerified(altitudeCondition, event.altitude) &&
+    sunPositionAxisVerified(azimuthCondition, event.azimuth);
+  const previouslyVerified =
+    sunPositionAxisVerified(altitudeCondition, event.previous_altitude) &&
+    sunPositionAxisVerified(azimuthCondition, event.previous_azimuth);
+  return verified && !previouslyVerified;
+};
+
 // severity scale of the generic weather alerts (B.18)
 const WEATHER_ALERT_SEVERITY_RANK = {
   minor: 1,
@@ -113,6 +160,7 @@ const triggersFunc = {
   [EVENTS.TIME.CHANGED]: (self, sceneSelector, event, trigger) => event.key === trigger.key,
   [EVENTS.TIME.SUNRISE]: matchSunEvent,
   [EVENTS.TIME.SUNSET]: matchSunEvent,
+  [EVENTS.TIME.SUN_POSITION]: matchSunPosition,
   [EVENTS.USER_PRESENCE.BACK_HOME]: (self, sceneSelector, event, trigger) =>
     event.house === trigger.house && event.user === trigger.user,
   [EVENTS.USER_PRESENCE.LEFT_HOME]: (self, sceneSelector, event, trigger) =>

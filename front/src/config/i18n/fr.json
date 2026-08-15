@@ -3479,7 +3479,8 @@
       "time": {
         "changed": "Déclenchement programmé",
         "sunrise": "A chaque lever de soleil",
-        "sunset": "A chaque coucher de soleil"
+        "sunset": "A chaque coucher de soleil",
+        "sun-position": "Position du soleil"
       },
       "user": {
         "back-home": "Retour à la maison",
@@ -3574,6 +3575,15 @@
         "before": "Avant",
         "after": "Après",
         "minutes": "minutes"
+      },
+      "sunPosition": {
+        "description": "Cette scène se déclenchera lorsque le soleil atteindra la position configurée, par exemple pour ouvrir ou fermer les volets de la façade que le soleil éclaire. La position est vérifiée chaque minute, et la scène est démarrée une fois, lorsque le soleil entre dans la zone configurée.",
+        "houseLabel": "Maison",
+        "noCondition": "Aucune condition",
+        "altitudeLabel": "Altitude du soleil",
+        "altitudeHelp": "Hauteur du soleil au-dessus de l'horizon, en degrés : 0° au lever et au coucher du soleil, 90° au zénith, négative la nuit.",
+        "azimuthLabel": "Azimut du soleil",
+        "azimuthHelp": "Direction du soleil à la boussole, en degrés depuis le Nord : 0° = Nord, 90° = Est, 180° = Sud, 270° = Ouest."
       },
       "userPresence": {
         "backAtHomeDescription": "Cette scène s'exécutera lorsque l'utilisateur sélectionné rentrera à la maison sélectionnée.",

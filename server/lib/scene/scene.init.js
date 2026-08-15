@@ -39,6 +39,9 @@ async function init() {
   //  At every minute, check if calendar event is coming
   this.scheduler.scheduleJob('* * * * *', () => this.event.emit(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING));
 
+  //  At every minute, check if the sun position matches a scene trigger
+  this.scheduler.scheduleJob('* * * * *', () => this.event.emit(EVENTS.TIME.CHECK_SUN_POSITION));
+
   return plainScenes;
 }
 

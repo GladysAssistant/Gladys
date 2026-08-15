@@ -154,6 +154,20 @@ const triggersSchema = Joi.array().items(
     // weather-alert triggers (B.18): phenomenon type filter and minimal severity
     weather_alert_type: Joi.string().valid(...WEATHER_ALERT_TYPES, 'any'),
     weather_alert_severity: Joi.string().valid(...WEATHER_ALERT_SEVERITIES),
+    // sun position trigger: altitude in degrees above the horizon (-90 to 90) and
+    // azimuth in degrees from North (0 = North, 90 = East, 180 = South, 270 = West).
+    // Null is allowed so that a trigger can be saved while the user has not filled
+    // the value yet.
+    sun_altitude_operator: Joi.string().valid('=', '>', '<'),
+    sun_altitude: Joi.number()
+      .min(-90)
+      .max(90)
+      .allow(null),
+    sun_azimuth_operator: Joi.string().valid('=', '>', '<'),
+    sun_azimuth: Joi.number()
+      .min(0)
+      .max(360)
+      .allow(null),
   }),
 );
 
