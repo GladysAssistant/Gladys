@@ -295,6 +295,21 @@ const LEVEL_MATTER_STATE = {
   CRITICAL: 4,
 };
 
+// Qualitative air quality classification, ordered from the best to the worst air. The scale is the
+// one standards use for an overall air quality verdict (Matter AirQuality cluster, and the same
+// levels in Zigbee air quality sensors): a device publishes the verdict it computes itself, not a
+// value Gladys derives from concentrations. `UNKNOWN` is what a device reports while it has no
+// verdict yet (warm-up, sensor fault), it is not a quality level and must not be charted as one.
+const AIR_QUALITY_LEVEL = {
+  UNKNOWN: 0,
+  GOOD: 1,
+  FAIR: 2,
+  MODERATE: 3,
+  POOR: 4,
+  VERY_POOR: 5,
+  EXTREMELY_POOR: 6,
+};
+
 const VACUUM_CLEANER_STATE = {
   STOPPED: 0,
   RUNNING: 1,
@@ -1224,7 +1239,13 @@ const DEVICE_FEATURE_TYPES = {
     OPERATING_STATE: 'operating-state',
   },
   AIRQUALITY_SENSOR: {
+    // Numeric air quality index, on the open-ended scale the AQI unit defines (0-500).
     AQI: 'aqi',
+    // Overall qualitative verdict the device computes itself, one of the AIR_QUALITY_LEVEL values.
+    // Boundary with `aqi`: an integration maps whichever form its device natively reports, never
+    // both for the same measurement, and the raw concentrations behind the verdict keep going to
+    // their own per-pollutant categories (`pm25-sensor`, `co2-sensor`, `voc-sensor`...).
+    LEVEL: 'level',
   },
   PH_SENSOR: {
     DECIMAL: 'decimal',
@@ -1761,6 +1782,11 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
 // when the category-level list mixes units of different dimensions.
 // An empty array means the feature type has no unit at all.
 const DEVICE_FEATURE_UNITS_BY_CATEGORY_AND_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.AQI]: [DEVICE_FEATURE_UNITS.AQI],
+    // The qualitative level is an enum, it carries no unit.
+    [DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL]: [],
+  },
   [DEVICE_FEATURE_CATEGORIES.WATER_HEATER]: {
     [DEVICE_FEATURE_TYPES.WATER_HEATER.BINARY]: [],
     [DEVICE_FEATURE_TYPES.WATER_HEATER.MODE]: [],
@@ -2281,3 +2307,4 @@ module.exports.ENERGY_PRICE_DAY_TYPES = ENERGY_PRICE_DAY_TYPES;
 module.exports.ENERGY_PRICE_DAY_TYPES_LIST = ENERGY_PRICE_DAY_TYPES_LIST;
 
 module.exports.LEVEL_MATTER_STATE = LEVEL_MATTER_STATE;
+module.exports.AIR_QUALITY_LEVEL = AIR_QUALITY_LEVEL;

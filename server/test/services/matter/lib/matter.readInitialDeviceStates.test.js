@@ -17,6 +17,7 @@ const {
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
+  AirQuality,
   NitrogenDioxideConcentrationMeasurement,
   FormaldehydeConcentrationMeasurement,
   CarbonDioxideConcentrationMeasurement,
@@ -32,7 +33,7 @@ const {
 } = require('@matter/main/clusters');
 
 const MatterHandler = require('../../../../services/matter/lib');
-const { EVENTS, STATE, FAN_MODE, AC_MODE } = require('../../../../utils/constants');
+const { EVENTS, STATE, FAN_MODE, AC_MODE, AIR_QUALITY_LEVEL } = require('../../../../utils/constants');
 
 describe('Matter.readInitialDeviceStates', () => {
   let matterHandler;
@@ -102,6 +103,9 @@ describe('Matter.readInitialDeviceStates', () => {
       },
       [RelativeHumidityMeasurement.Complete.id]: {
         getMeasuredValueAttribute: fake.resolves(4500),
+      },
+      [AirQuality.Complete.id]: {
+        getAirQualityAttribute: fake.resolves(AIR_QUALITY_LEVEL.FAIR),
       },
       [Pm25ConcentrationMeasurement.Complete.id]: {
         getMeasuredValueAttribute: fake.resolves(12),
@@ -202,6 +206,10 @@ describe('Matter.readInitialDeviceStates', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `matter:${nodeId}:${devicePath}:${CarbonDioxideConcentrationMeasurement.Complete.id}`,
       state: 650,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:${nodeId}:${devicePath}:${AirQuality.Complete.id}`,
+      state: AIR_QUALITY_LEVEL.FAIR,
     });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `matter:${nodeId}:${devicePath}:${ElectricalPowerMeasurement.Complete.id}:power`,

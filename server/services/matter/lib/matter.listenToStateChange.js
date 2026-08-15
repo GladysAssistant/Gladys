@@ -10,6 +10,7 @@ const {
   ColorControl,
   RelativeHumidityMeasurement,
   Thermostat,
+  AirQuality,
   Pm25ConcentrationMeasurement,
   Pm10ConcentrationMeasurement,
   TotalVolatileOrganicCompoundsConcentrationMeasurement,
@@ -248,6 +249,20 @@ async function listenToStateChange(nodeId, devicePath, device) {
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: `matter:${nodeId}:${devicePath}:${RelativeHumidityMeasurement.Complete.id}`,
         state: value / 100,
+      });
+    });
+  }
+
+  const airQuality = device.getClusterClientById(AirQuality.Complete.id);
+  if (airQuality && !this.stateChangeListeners.has(airQuality)) {
+    logger.debug(`Matter: Adding state change listener for AirQuality cluster ${airQuality.name}`);
+    this.stateChangeListeners.add(airQuality);
+    // Subscribe to AirQuality attribute changes
+    airQuality.addAirQualityAttributeListener((value) => {
+      logger.debug(`Matter: AirQuality attribute changed to ${value}`);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `matter:${nodeId}:${devicePath}:${AirQuality.Complete.id}`,
+        state: value,
       });
     });
   }

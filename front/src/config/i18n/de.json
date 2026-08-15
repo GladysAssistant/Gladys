@@ -5034,6 +5034,18 @@
           "5": "Entlädt"
         }
       },
+      "airquality-sensor": {
+        "level": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Unbekannt",
+          "1": "Gut",
+          "2": "Ausreichend",
+          "3": "Mäßig",
+          "4": "Schlecht",
+          "5": "Sehr schlecht",
+          "6": "Extrem schlecht"
+        }
+      },
       "voc-matter-index-sensor": {
         "integer": {
           "unknown": "Unbekannt",
@@ -5621,7 +5633,8 @@
     },
     "airquality-sensor": {
       "shortCategoryName": "Luftqualität",
-      "aqi": "Luftqualitätsindex"
+      "aqi": "Luftqualitätsindex",
+      "level": "Luftqualitätsstufe"
     },
     "ph-sensor": {
       "shortCategoryName": "pH-Sensor",

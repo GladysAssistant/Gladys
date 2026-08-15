@@ -6,7 +6,8 @@ import {
   DEVICE_FEATURE_UNITS_BY_CATEGORY,
   CHARGING_STATION_CONNECTOR_STATUS,
   CHARGING_STATION_CHARGING_STATE,
-  WATER_HEATER_MODE
+  WATER_HEATER_MODE,
+  AIR_QUALITY_LEVEL
 } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import { CAMERA_MOVE_OPTIONS } from '../../../../../utils/cameraMove';
@@ -837,6 +838,18 @@ export const getFeatureDefaultValues = (category, type) => {
     return applyDefaultUnit({ ...defaults, min: 0, max: 4, read_only: true }, category, type);
   }
 
+  // The qualitative air quality level is an enum (Unknown to Extremely poor), not a 0-100 index.
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR &&
+    type === DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL
+  ) {
+    return applyDefaultUnit(
+      { ...defaults, min: AIR_QUALITY_LEVEL.UNKNOWN, max: AIR_QUALITY_LEVEL.EXTREMELY_POOR, read_only: true },
+      category,
+      type
+    );
+  }
+
   if (!isSensorCategory(category)) {
     return applyDefaultUnit({ ...defaults, min: 0, max: 100, read_only: false }, category, type);
   }
@@ -863,6 +876,10 @@ export const getCatalogPreviewLabelKey = (category, type) => {
       DEVICE_FEATURE_CATEGORIES.NO2_MATTER_INDEX_SENSOR,
       'integer'
     )]: 'deviceFeatureValue.category.no2-matter-index-sensor.integer.medium',
+    [categoryTypeKey(
+      DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR,
+      DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL
+    )]: `deviceFeatureValue.category.airquality-sensor.level.${AIR_QUALITY_LEVEL.GOOD}`,
     [categoryTypeKey(DEVICE_FEATURE_CATEGORIES.RISK, 'integer')]: 'deviceFeatureValue.category.risk.integer.low-risk',
     [categoryTypeKey(
       DEVICE_FEATURE_CATEGORIES.ELECTRICAL_VEHICLE_CHARGE,
@@ -884,6 +901,13 @@ export const getCatalogPreviewLabelKey = (category, type) => {
 export const getFeaturePreviewValue = (category, type) => {
   // Category-specific blocks first: some of their types ('power', 'index', 'target-temperature',
   // 'mode') also exist in other categories matched below by type only.
+  if (
+    category === DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR &&
+    type === DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL
+  ) {
+    return AIR_QUALITY_LEVEL.GOOD;
+  }
+
   if (category === DEVICE_FEATURE_CATEGORIES.WATER_HEATER) {
     if (type === DEVICE_FEATURE_TYPES.WATER_HEATER.MODE) {
       return WATER_HEATER_MODE.ECO;

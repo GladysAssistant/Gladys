@@ -2,7 +2,12 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS } from '../../../../../../../server/utils/constants';
+import {
+  AIR_QUALITY_LEVEL,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS
+} from '../../../../../../../server/utils/constants';
 import RawDeviceValue from './RawDeviceValue';
 
 // Mass concentrations are declared in milligrams, micrograms or nanograms per cubic meter, while
@@ -99,6 +104,22 @@ const getLevelMatterIndexColor = value => {
   return LEVEL_MATTER_INDEX_COLOR[value];
 };
 
+// Same palette as the numeric air quality index, so the two ways of reporting air quality read
+// the same on a dashboard mixing devices.
+const AIR_QUALITY_LEVEL_COLOR = {
+  [AIR_QUALITY_LEVEL.UNKNOWN]: 'secondary',
+  [AIR_QUALITY_LEVEL.GOOD]: 'success',
+  [AIR_QUALITY_LEVEL.FAIR]: 'warning',
+  [AIR_QUALITY_LEVEL.MODERATE]: 'orange',
+  [AIR_QUALITY_LEVEL.POOR]: 'pink',
+  [AIR_QUALITY_LEVEL.VERY_POOR]: 'purple',
+  [AIR_QUALITY_LEVEL.EXTREMELY_POOR]: 'danger'
+};
+
+const getAirQualityLevelColor = value => {
+  return AIR_QUALITY_LEVEL_COLOR[value] || 'secondary';
+};
+
 const BADGE_CATEGORIES = {
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200),
   [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: value => colorLowAsGreen(value, 250, 2000),
@@ -142,10 +163,25 @@ const BADGE_VALUE_CONVERTERS = {
   }
 };
 
+// A category can mix value scales across its types: air quality reports either a numeric index or
+// a qualitative level, and a level read on the index scale would stay green whatever the air is.
+// A type-specific color method therefore takes precedence over the category one.
+const BADGE_CATEGORIES_BY_TYPE = {
+  [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: {
+    [DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL]: value => getAirQualityLevelColor(value)
+  }
+};
+
+// Enum features whose translation key is the raw value, with no string conversion step: the
+// "unknown" label below catches a value the enum does not know.
+const BADGE_ENUM_TYPES_BY_CATEGORY = {
+  [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: [DEVICE_FEATURE_TYPES.AIRQUALITY_SENSOR.LEVEL]
+};
+
 const BadgeNumberDeviceValue = props => {
   const { category, type, last_value: lastValue = null, unit } = props.deviceFeature;
 
-  const colorMethod = BADGE_CATEGORIES[category];
+  const colorMethod = get(BADGE_CATEGORIES_BY_TYPE, `${category}.${type}`) || BADGE_CATEGORIES[category];
   if (!colorMethod) {
     return <RawDeviceValue {...props} />;
   }
@@ -158,6 +194,8 @@ const BadgeNumberDeviceValue = props => {
   // We need to convert the string to text
   if (BADGE_VALUE_CONVERTERS[category]) {
     value = get(BADGE_VALUE_CONVERTERS[category], value, 'unknown');
+    valueIsEnum = true;
+  } else if ((BADGE_ENUM_TYPES_BY_CATEGORY[category] || []).includes(type)) {
     valueIsEnum = true;
   }
 
@@ -174,7 +212,9 @@ const BadgeNumberDeviceValue = props => {
       )}
       {valued && valueIsEnum && (
         <span>
-          <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`} />
+          <Text id={`deviceFeatureValue.category.${category}.${type}.${value}`}>
+            <Text id={`deviceFeatureValue.category.${category}.${type}.unknown`} fields={{ value: lastValue }} />
+          </Text>
         </span>
       )}
     </span>
