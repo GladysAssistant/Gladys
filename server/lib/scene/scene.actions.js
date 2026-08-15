@@ -427,9 +427,12 @@ const actionsFunc = {
         }
       }
 
-      // For numeric comparison operators (>, >=, <, <=), value must be a number
+      // For numeric comparison operators (>, >=, <, <=), value must be a number.
+      // Infinity is rejected like NaN, as in the three other formula actions: a formula
+      // overflowing to it (exp(1000)) or reaching it through log(0) would otherwise make
+      // the comparison silently always true or always false instead of failing the scene.
       const numericOperators = ['>', '>=', '<', '<='];
-      if (numericOperators.includes(condition.operator) && Number.isNaN(Number(value))) {
+      if (numericOperators.includes(condition.operator) && !Number.isFinite(Number(value))) {
         throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
       }
 
