@@ -9,7 +9,8 @@ class SettingsSystemDuckDbMigration extends Component {
     super(props);
     this.state = {
       confirmRestartingMigration: false,
-      confirmPurgingSQlite: false
+      confirmPurgingSQlite: false,
+      migrationStateLoaded: false
     };
   }
 
@@ -31,7 +32,8 @@ class SettingsSystemDuckDbMigration extends Component {
       console.error(e);
     }
     this.setState({
-      loading: false
+      loading: false,
+      migrationStateLoaded: true
     });
   };
 
@@ -83,7 +85,12 @@ class SettingsSystemDuckDbMigration extends Component {
     this.getDuckDbMigrationState();
   }
 
-  render({}, { loading, migrationState, confirmRestartingMigration, confirmPurgingSQlite }) {
+  render({}, { loading, migrationState, migrationStateLoaded, confirmRestartingMigration, confirmPurgingSQlite }) {
+    // Nothing is displayed until we know if there is still something to migrate,
+    // and the card is hidden for good once the legacy SQLite states are all gone.
+    if (!migrationStateLoaded || (migrationState && !migrationState.is_migration_needed)) {
+      return null;
+    }
     return (
       <div class="card">
         <h4 class="card-header">

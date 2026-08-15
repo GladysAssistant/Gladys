@@ -24,6 +24,9 @@ async function getDuckDbMigrationState() {
     is_duck_db_migrated: isDuckDbMigrated === 'true',
     duck_db_device_count: Number(duckDbDeviceStateCount),
     sqlite_db_device_state_count: sqliteDeviceStateCount,
+    // Migrating/purging states is only useful while states remain in the legacy SQLite table.
+    // SQLite is still used for all the other data (users, devices, scenes...).
+    is_migration_needed: sqliteDeviceStateCount > 0,
   };
 }
 
