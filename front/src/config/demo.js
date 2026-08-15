@@ -1,5 +1,19 @@
 import dayjs from 'dayjs';
 
+// One page of raw recorded values, as returned by the device feature history
+// editor route (`get /api/v1/device_feature/:device_feature_selector/state`).
+const buildDeviceFeatureStates = values => ({
+  total: values.length,
+  take: 50,
+  skip: 0,
+  states: values.map((value, index) => ({
+    value,
+    created_at: dayjs()
+      .subtract(index * 30 + 5, 'minute')
+      .toISOString()
+  }))
+});
+
 const data = {
   'post /api/v1/login': {
     id: '215811c9-c0aa-4148-8a4b-e02892d7446f',
@@ -1074,6 +1088,89 @@ const data = {
       ]
     }
   ],
+  'get /api/v1/device/main-lamp': {
+    id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+    name: 'Main Lamp',
+    selector: 'main-lamp',
+    room_id: '1c634ff4-0476-4733-a084-b4a43d649c84',
+    features: [
+      {
+        name: 'On/Off',
+        selector: 'main-lamp-binary',
+        category: 'light',
+        type: 'binary',
+        min: 0,
+        max: 1,
+        read_only: false,
+        last_value: 1
+      },
+      {
+        name: 'Brightness',
+        selector: 'main-lamp-brightness',
+        category: 'light',
+        type: 'brightness',
+        min: 0,
+        max: 100,
+        read_only: false,
+        last_value: 80
+      }
+    ]
+  },
+  'get /api/v1/device/unassigned-sensor': {
+    id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    name: 'Unassigned sensor',
+    selector: 'unassigned-sensor',
+    room_id: null,
+    features: [
+      {
+        name: 'Temperature',
+        selector: 'unassigned-temperature-sensor',
+        category: 'temperature-sensor',
+        type: 'decimal',
+        min: -20,
+        max: 255,
+        read_only: true,
+        last_value: 21,
+        unit: 'celsius'
+      },
+      {
+        name: 'Humidity',
+        selector: 'unassigned-humidity-sensor',
+        category: 'humidity-sensor',
+        type: 'decimal',
+        min: 0,
+        max: 100,
+        read_only: true,
+        last_value: 45,
+        unit: 'percent'
+      },
+      {
+        name: 'Battery',
+        selector: 'unassigned-battery',
+        category: 'battery',
+        type: 'integer',
+        min: 0,
+        max: 100,
+        read_only: true,
+        last_value: 92
+      }
+    ]
+  },
+  'get /api/v1/device_feature/main-lamp-binary/state': buildDeviceFeatureStates([1, 0, 1, 0]),
+  'get /api/v1/device_feature/main-lamp-brightness/state': buildDeviceFeatureStates([80, 60, 45, 100]),
+  'get /api/v1/device_feature/unassigned-temperature-sensor/state': buildDeviceFeatureStates([21, 20.8, 98.6, 20.5]),
+  'get /api/v1/device_feature/unassigned-humidity-sensor/state': buildDeviceFeatureStates([45, 46, 47, 44]),
+  'get /api/v1/device_feature/unassigned-battery/state': buildDeviceFeatureStates([92, 93, 94, 95]),
+  'patch /api/v1/device_feature/main-lamp-binary/state': { created_at: dayjs().toISOString(), value: 1 },
+  'patch /api/v1/device_feature/main-lamp-brightness/state': { created_at: dayjs().toISOString(), value: 80 },
+  'patch /api/v1/device_feature/unassigned-temperature-sensor/state': { created_at: dayjs().toISOString(), value: 21 },
+  'patch /api/v1/device_feature/unassigned-humidity-sensor/state': { created_at: dayjs().toISOString(), value: 45 },
+  'patch /api/v1/device_feature/unassigned-battery/state': { created_at: dayjs().toISOString(), value: 92 },
+  'delete /api/v1/device_feature/main-lamp-binary/state': { success: true },
+  'delete /api/v1/device_feature/main-lamp-brightness/state': { success: true },
+  'delete /api/v1/device_feature/unassigned-temperature-sensor/state': { success: true },
+  'delete /api/v1/device_feature/unassigned-humidity-sensor/state': { success: true },
+  'delete /api/v1/device_feature/unassigned-battery/state': { success: true },
   'post /api/v1/light/main-lamp/on': {
     type: 'light.turn-on',
     device: 'main-lamp',

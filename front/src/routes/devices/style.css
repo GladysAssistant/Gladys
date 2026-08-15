@@ -82,6 +82,20 @@
   font-size: 1.25rem;
 }
 
+/* The tappable part of the row: it keeps the flex layout the list item had
+   back when it was itself the link, so both variants look identical */
+.mobileItemLink {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.mobileItemHistoryButton {
+  flex-shrink: 0;
+}
+
 /* Below the desktop breakpoint (also on tablet, where the table is too
    cramped), the filters stack like a native app: the two selects share
    a row, the ordering select and the search bar share the next one */

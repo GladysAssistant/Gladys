@@ -518,3 +518,98 @@ describe('POST /api/v1/device/:device_selector/migrate', () => {
       .expect(400);
   });
 });
+
+describe('Device feature state edition', () => {
+  const DEVICE_FEATURE_ID = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4';
+  const FIRST_STATE_DATE = new Date('2018-01-01T10:00:00.000Z');
+  const SECOND_STATE_DATE = new Date('2018-01-01T11:00:00.000Z');
+
+  beforeEach(async () => {
+    await db.duckDbWriteConnectionAllAsync('DELETE FROM t_device_feature_state');
+    await db.duckDbBatchInsertState(DEVICE_FEATURE_ID, [
+      { value: 1, created_at: FIRST_STATE_DATE },
+      { value: 2, created_at: SECOND_STATE_DATE },
+    ]);
+  });
+
+  describe('GET /api/v1/device_feature/:device_feature_selector/state', () => {
+    it('should get the states of a device feature', async () => {
+      await authenticatedRequest
+        .get('/api/v1/device_feature/test-device-feature/state')
+        .query({
+          from: FIRST_STATE_DATE.toISOString(),
+          to: SECOND_STATE_DATE.toISOString(),
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.have.property('total', 2);
+          expect(res.body.states).to.have.lengthOf(2);
+          expect(res.body.states[0]).to.have.property('value', 2);
+        });
+    });
+
+    it('should return 404 when the device feature does not exist', async () => {
+      await authenticatedRequest
+        .get('/api/v1/device_feature/this-feature-does-not-exist/state')
+        .expect('Content-Type', /json/)
+        .expect(404);
+    });
+  });
+
+  describe('PATCH /api/v1/device_feature/:device_feature_selector/state', () => {
+    it('should correct one state', async () => {
+      await authenticatedRequest
+        .patch('/api/v1/device_feature/test-device-feature/state')
+        .send({
+          created_at: FIRST_STATE_DATE.toISOString(),
+          value: 42,
+        })
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.have.property('value', 42);
+        });
+      const states = await db.duckDbReadConnectionAllAsync(
+        'SELECT * FROM t_device_feature_state WHERE device_feature_id = ? ORDER BY created_at',
+        DEVICE_FEATURE_ID,
+      );
+      expect(states[0].value).to.equal(42);
+    });
+
+    it('should return 404 when no state exists at this date', async () => {
+      await authenticatedRequest
+        .patch('/api/v1/device_feature/test-device-feature/state')
+        .send({
+          created_at: '2017-01-01T10:00:00.000Z',
+          value: 42,
+        })
+        .expect('Content-Type', /json/)
+        .expect(404);
+    });
+  });
+
+  describe('DELETE /api/v1/device_feature/:device_feature_selector/state', () => {
+    it('should destroy one state', async () => {
+      await authenticatedRequest
+        .delete(`/api/v1/device_feature/test-device-feature/state?created_at=${FIRST_STATE_DATE.toISOString()}`)
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((res) => {
+          expect(res.body).to.deep.equal({ success: true });
+        });
+      const states = await db.duckDbReadConnectionAllAsync(
+        'SELECT * FROM t_device_feature_state WHERE device_feature_id = ?',
+        DEVICE_FEATURE_ID,
+      );
+      expect(states).to.have.lengthOf(1);
+    });
+
+    it('should return 400 when the date is invalid', async () => {
+      await authenticatedRequest
+        .delete('/api/v1/device_feature/test-device-feature/state?created_at=not-a-date')
+        .expect('Content-Type', /json/)
+        .expect(400);
+    });
+  });
+});

@@ -123,6 +123,49 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/device_feature/:device_feature_selector/state getDeviceFeatureStatesPaginated
+   * @apiName getDeviceFeatureStatesPaginated
+   * @apiGroup Device
+   * @apiParam {String} [from] Only return states created at or after this date.
+   * @apiParam {String} [to] Only return states created at or before this date.
+   * @apiParam {Number} [take] Max number of states to return.
+   * @apiParam {Number} [skip] Number of states to skip.
+   */
+  async function getDeviceFeatureStatesPaginated(req, res) {
+    const result = await gladys.device.getDeviceFeatureStatesPaginated(req.params.device_feature_selector, req.query);
+    res.json(result);
+  }
+
+  /**
+   * @api {patch} /api/v1/device_feature/:device_feature_selector/state updateDeviceFeatureState
+   * @apiName updateDeviceFeatureState
+   * @apiGroup Device
+   * @apiParam {String} created_at Date of the state to correct.
+   * @apiParam {Number} value New value of this state.
+   */
+  async function updateDeviceFeatureState(req, res) {
+    const state = await gladys.device.updateState(
+      req.params.device_feature_selector,
+      req.body.created_at,
+      req.body.value,
+    );
+    res.json(state);
+  }
+
+  /**
+   * @api {delete} /api/v1/device_feature/:device_feature_selector/state destroyDeviceFeatureState
+   * @apiName destroyDeviceFeatureState
+   * @apiGroup Device
+   * @apiParam {String} created_at Date of the state to destroy.
+   */
+  async function destroyDeviceFeatureState(req, res) {
+    await gladys.device.destroyState(req.params.device_feature_selector, req.query.created_at);
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
    * @api {get} /api/v1/device_feature/energy_consumption getConsumptionByDates
    * @apiName getConsumptionByDates
    * @apiGroup Device
@@ -198,6 +241,9 @@ module.exports = function DeviceController(gladys) {
     setValueFeature: asyncMiddleware(setValueFeature),
     getDeviceFeaturesAggregated: asyncMiddleware(getDeviceFeaturesAggregated),
     getDeviceStatesHistory: asyncMiddleware(getDeviceStatesHistory),
+    getDeviceFeatureStatesPaginated: asyncMiddleware(getDeviceFeatureStatesPaginated),
+    updateDeviceFeatureState: asyncMiddleware(updateDeviceFeatureState),
+    destroyDeviceFeatureState: asyncMiddleware(destroyDeviceFeatureState),
     getConsumptionByDates: asyncMiddleware(getConsumptionByDates),
     purgeAllSqliteStates: asyncMiddleware(purgeAllSqliteStates),
     getDuckDbMigrationState: asyncMiddleware(getDuckDbMigrationState),

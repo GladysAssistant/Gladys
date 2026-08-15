@@ -1,0 +1,29 @@
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  flex: 1 1 180px;
+}
+
+.tableContainer {
+  min-height: 120px;
+}
+
+.valueInput {
+  max-width: 160px;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

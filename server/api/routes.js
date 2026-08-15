@@ -263,6 +263,18 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.getConsumptionByDates,
     },
+    'get /api/v1/device_feature/:device_feature_selector/state': {
+      authenticated: true,
+      controller: deviceController.getDeviceFeatureStatesPaginated,
+    },
+    'patch /api/v1/device_feature/:device_feature_selector/state': {
+      authenticated: true,
+      controller: deviceController.updateDeviceFeatureState,
+    },
+    'delete /api/v1/device_feature/:device_feature_selector/state': {
+      authenticated: true,
+      controller: deviceController.destroyDeviceFeatureState,
+    },
     // house
     'post /api/v1/house': {
       authenticated: true,
