@@ -186,6 +186,35 @@ describe('externalIntegration.setDiscoveredDevices', () => {
     ]);
   });
 
+  it('should accept string option values on a text/select feature', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features.push({
+      name: 'Application',
+      external_id: `ext:${service.selector}:paris:app`,
+      category: 'text',
+      type: 'select',
+      read_only: false,
+      has_feedback: false,
+      keep_history: false,
+      supported_options: [
+        { value: 'netflix', label: 'Netflix' },
+        { value: 'youtube.leanback.v4', label: 'YouTube' },
+      ],
+    });
+    await externalIntegration.setDiscoveredDevices(service, [device]);
+    const devices = await externalIntegration.getDiscoveredDevices(service.selector);
+    expect(devices[0].features[1].supported_options).to.deep.equal([
+      { value: 'netflix', label: 'Netflix', sort_order: 0 },
+      { value: 'youtube.leanback.v4', label: 'YouTube', sort_order: 1 },
+    ]);
+  });
+
+  it('should keep rejecting string option values outside text/select', async () => {
+    const device = buildDiscoveredDevice(service.selector);
+    device.features[0].supported_options = [{ value: 'high', label: 'High' }];
+    await expectBadParameters([device], 'features[0].supported_options');
+  });
+
   it('should reject invalid supported_options', async () => {
     const duplicatedValues = buildDiscoveredDevice(service.selector);
     duplicatedValues.features[0].supported_options = [
@@ -215,7 +244,9 @@ describe('externalIntegration.setDiscoveredDevices', () => {
       ],
     });
     await externalIntegration.setDiscoveredDevices(service, [device]);
-    sinonAssert.calledWith(deviceLib.syncFeatureSupportedOptions, 'feature-id', [
+    // the full in-memory feature is passed: syncFeatureSupportedOptions needs its
+    // category/type to allow string values on dynamic selects
+    sinonAssert.calledWith(deviceLib.syncFeatureSupportedOptions, sinon.match({ id: 'feature-id' }), [
       { value: 1, label: 'Entrance', sort_order: 0 },
     ]);
   });
