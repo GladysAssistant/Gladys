@@ -49,12 +49,13 @@ what a previous one already answered, and feedback the bots post after an
 autofix push can trigger at most one more pass. There is deliberately **no
 lower date bound** on comments: markers, not dates, are the source of truth
 for "handled", so a session that pushed but died before posting its replies
-leaves its comments eligible — they are retried the next day (burning another
-pass) instead of silently falling out of a date window. A stuck PR therefore
-always ends up either fixed or visibly `exhausted`; feedback is never
-orphaned. `MAX_PASSES` bounds the total no matter what. (A fire that fails
-before a session starts — daily routine cap, bad token — burns no pass and
-simply retries the next day, at the cost of one HTTP call and a red job.)
+leaves its comments eligible — they are retried at the next run (burning
+another pass) instead of silently falling out of a date window. A stuck PR
+therefore always ends up either fixed or visibly `exhausted`; feedback is
+never orphaned. `MAX_PASSES` bounds the total no matter what. (A fire that
+fails before a session starts — daily routine cap, bad token — burns no pass
+and simply retries at the next run, at the cost of one HTTP call and a red
+job.)
 
 ## How a comment is marked handled
 
@@ -81,7 +82,7 @@ also marks the whole thread, and resolving a thread by hand excludes it too.
 | `REVIEW_BOT_LOGINS` | `cursor[bot]`, `coderabbitai[bot]` | Whose comments count as actionable feedback. |
 | `AUTOFIX_ACTOR_LOGINS` | `Pierre-Gilles`, `github-actions[bot]`, `claude[bot]` | Whose replies/markers count as "handled". Cloud sessions post as the routine owner (first login). |
 | `HEAD_BRANCH_PREFIX` | `claude/` | Cloud sessions can only push branches with this prefix; other PRs are skipped. |
-| `FIRE_STAGGER_MINUTES` | 8 | How long each matrix slot is held after firing. With `max-parallel: 2`, staggers session *launches* (~2 fires per window); it does not bound how many sessions run concurrently. |
+| `FIRE_STAGGER_MINUTES` | 5 | How long each matrix slot is held after firing. With `max-parallel: 3`, staggers session *launches* (~3 fires per window); it does not bound how many sessions run concurrently. |
 | `EXHAUSTED_LABEL` | `claude:autofix-exhausted` | Permanently stops the autofix on a PR. Posted automatically. |
 | `SKIP_LABEL` | `claude:autofix-skip` | Manual opt-out for a PR. |
 | `NOISE_MARKER` | `This is an auto-generated comment` | Filters CodeRabbit's non-actionable issue comments (walkthroughs, status notes). |
