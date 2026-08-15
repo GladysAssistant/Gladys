@@ -2,7 +2,7 @@
 
 > **Living specification — source of truth.** This document specifies the evolution of the Gladys dashboard towards wall-panel-grade layouts: section-based flexible layout, compact "chip" widgets, scene buttons with live state, an energy-flow widget, a "house view" widget (image with live data pins, optionally AI-generated through Gladys Plus), per-dashboard appearance, and icon-based tablet navigation. **Rule: any PR that changes one of these behaviors or contracts modifies this file in the same diff** — spec first, code second.
 >
-> Status: **design — nothing implemented yet.** Section A (flexible layout) is being prototyped by a community contributor; everything else is unscheduled.
+> Status: **phases 1–3 implemented** (sections layout, chips bar + scene status subtitles, appearance + tablet tab bar — see Phases). Phases 4–6 are design only.
 
 ## Context
 
@@ -43,8 +43,9 @@ Decided with the maintainer in forum topic 10553: instead of a per-row column co
 ]
 ```
 
-- **No SQL migration**: the column stays JSON. The Joi schema accepts both shapes.
-- **Lazy, lossless migration**: on read, a legacy value (array of arrays) is normalized to a single section `[{ columns: legacyValue }]`; on the first save, the new shape is written. `dashboard.get` / `dashboard.getBySelector` return the normalized shape so the frontend only ever sees sections.
+- **No SQL migration**: the column stays JSON. Legacy values are normalized in a `beforeValidate` hook (`server/utils/dashboardSections.js`), so validation only ever sees the section shape and any save — even one that doesn't touch `boxes` — lazily migrates the row.
+- **Lazy, lossless migration**: on read, a legacy value (array of arrays) is normalized to a single section `[{ columns: legacyValue }]`; on the first save, the new shape is written. `dashboard.getBySelector` returns the normalized shape so the frontend only ever sees sections.
+- **Editor implementation note**: the editor keeps working on a *flat* list of columns plus a `sectionSizes` array (`front/src/utils/dashboardSections.js`), so drag & drop coordinates stay global and none of the box-level editing code changed; sections are reassembled on save.
 - Column count per section: **1 to 4**. More than 4 columns is intentionally not supported — dense rows of small items are the job of the chips bar (section B), not of many narrow columns.
 - A section carries no name or title in phase 1 (`{ columns }` only); an optional `name` field may be added later without migration.
 
@@ -57,8 +58,9 @@ The edit mode keeps the current interaction model, per section: add/remove secti
 Sections of different heights create blank space below short columns. Resolution, decided over masonry (see Alternatives):
 
 - Within a section, columns stretch to the height of the tallest one (flexbox `align-items: stretch`, already the container behavior in `BoxColumns.jsx`).
-- Each box type declares a static `canStretch` flag **in the frontend code** (not user-facing): stretchable boxes (`chart`, `camera`, `photo`, and the new `house-view`) get `flex-grow` and absorb the remaining height of their column; fixed-content boxes (clock, chips, scenes…) keep their natural height.
+- Each box type declares a static stretchable flag **in the frontend code** (not user-facing, `front/src/utils/dashboardSections.js`): stretchable boxes get `flex-grow` and absorb the remaining height of their column; fixed-content boxes (clock, chips, scenes…) keep their natural height.
 - This is a per-type constant, not a per-box user setting: zero configuration, and blank space disappears in the common layouts.
+- **As implemented**: `camera` and `photo` stretch (their content is an image that absorbs height cleanly). `chart` is deliberately excluded for now — its height is fixed by the charting library options — and joins the list once chart heights are responsive. The future `house-view` will stretch.
 
 ### A.5 Mobile
 
@@ -73,21 +75,22 @@ A **full-width bar of compact pills**, each pill summarizing one state with an a
 
 | Kind | Config | Renders |
 |---|---|---|
-| `device-feature` | `device_feature`, optional `label` | icon + label + last value, icon and color derived from the feature category (same derivation as existing device boxes) |
-| `openings` | `house` or `room` | aggregate over all opening/lock sensors in scope: "All closed" (neutral) or "2 open" (warning color) |
-| `alarm` | `house` | current alarm mode, reusing the alarm box's state mapping |
-| `calendar-next-event` | `calendar`, optional name filter | next matching event: name + date (covers "next trash collection" from a synced calendar) |
+| `device-feature` | `device_feature`, optional `label` | icon + label + last value, icon derived from the feature category (`DeviceFeatureCategoriesIcon`) |
+| `openings` | `house` and/or `room` | aggregate over the opening sensors in scope: "All closed" (neutral) or "2 open" (warning color) |
+| `alarm` | `house` | current alarm mode |
+| `calendar-next-event` | optional `calendars`, optional name filter | next matching event: name + date (covers "next trash collection" from a synced calendar) |
 
-- Joi schema: a `chips` array is added to the box schema in `server/models/dashboard.js`, each item validated per kind.
-- The `openings` aggregate is computed frontend-side from the already-loaded device features in scope (no new server endpoint); `calendar-next-event` reuses the existing calendar API.
-- Tapping a chip is **not** an action in phase 1 (display only); tap-to-detail may come later.
+- Joi schema: a `chips` array (max 20, each item `{ chip_type, ... }`) is added to the box schema in `server/models/dashboard.js`; an optional per-chip `icon` overrides the automatic one.
+- **As implemented**: every chip resolves through existing endpoints — `GET /api/v1/device?device_feature_selectors=`, `GET /api/v1/room?expand=devices` (+ `GET /api/v1/house/:selector` for house scoping), `GET /api/v1/calendar/event` — no new server endpoint. The openings aggregate counts `opening-sensor` binary features (`OPENING_SENSOR_STATE.OPEN`). Device and openings chips update live over the device websocket; the alarm chip refreshes on alarm websocket events.
+- Tapping a chip is **not** an action in phase 2 (display only); tap-to-detail may come later.
 
 ## C. Scene box: live state subtitle
 
 The scene box (`front/src/components/boxs/scene/`) gains an **optional state subtitle** per scene button:
 
-- Config: for each selected scene, an optional `status_device_feature` (single feature — "Michel: ready") **or** an openings-style counter scope (`house`/`room` + category — "0/4 open").
-- Rendered as a muted second line under the scene name. No subtitle configured → the box renders exactly as today.
+- Config **as implemented**: `scene_status_features`, a map of scene selector → device feature selector on the scene box. The feature's compact value renders as a muted second line under the scene name and updates live over websocket. No subtitle configured → the box renders exactly as today.
+- The compact value rendering is shared with the chips bar through `front/src/components/device/DeviceFeatureValueText.jsx` (open/closed for opening sensors, on/off for binaries, rounded value + short unit otherwise).
+- An openings-style counter subtitle ("0/4 open") is **not** implemented yet; it can be added later as an alternative entry in the same map without breaking the shape.
 - Joi: additive fields on the scene box schema; fully backward compatible.
 
 ## D. New box type: `energy-flow`
@@ -137,26 +140,26 @@ Generating the `house-view` illustration is the one step that cannot be beautifu
 
 ## G. Per-dashboard appearance
 
-Additive, optional fields on `t_dashboard` (JSON-level, Joi-validated; absent fields = exactly today's rendering):
+Additive, optional (nullable) columns on `t_dashboard` (migration `20260815000000`; absent fields = exactly today's rendering):
 
-- `background`: none (default) | a bundled wallpaper | an uploaded image (dashboard asset);
-- `card_style`: `default` | `glass` (translucent cards with backdrop blur — only meaningful over a background);
-- `theme`: `auto` (default, follows the app) | `light` | `dark`.
+- `background_image`: none (default) | an image URL for now — switches to a dashboard asset reference (bundled wallpapers, uploads) when the asset storage lands in phase 4;
+- `card_style`: `default` | `glass` (`DASHBOARD_CARD_STYLE` in `server/utils/constants.js` — translucent cards with backdrop blur, with a dark-mode variant);
+- `icon`: feather icon shown in the tablet tab bar (section H), picked with the existing `IconSelector`.
 
-Three visual pickers in the dashboard settings, no per-box styling — appearance stays a dashboard-level decision so every widget remains consistent.
+A `theme` override (`auto`/`light`/`dark`) was considered and **deferred**: the app-level dark mode is a user preference and per-dashboard overrides need a clean way to scope it; revisit after phase 4. Appearance stays a dashboard-level decision so every widget remains consistent — no per-box styling.
 
 ## H. Tablet navigation: icon tab bar
 
-- Each dashboard gains an optional `icon` (picker from the existing icon set) next to its name.
-- In tablet mode (`session.tablet_mode`, `front/src/routes/dashboard/SetTabletMode.jsx`), the dashboard selector renders as a **horizontal icon tab bar** (current dashboard highlighted) instead of the dropdown — matching touch usage on a wall panel. Outside tablet mode, the dropdown remains.
+- Each dashboard gains an optional `icon` (picker from the existing icon set) next to its name; `GET /api/v1/dashboard` returns it in the list payload.
+- In tablet mode (the `tabletMode` store flag, fed by `session.tablet_mode`), the dashboard selector renders as a **horizontal icon tab bar** (current dashboard highlighted, `home` as the fallback icon) instead of the dropdown — matching touch usage on a wall panel. Outside tablet mode, the dropdown remains.
 
 ## Phases
 
 Ordering principle, decided with the maintainer: **plumbing first, showcase widgets last.** The layout engine, the density widgets, the asset storage, and the appearance layer are what unlock every future dashboard; the flashy visualizations come once that foundation is in place.
 
-1. **Sections layout** (A) — in progress with a community contributor (forum 10553), including selective stretch (A.4). Ships alone; pure layout, no new widget.
-2. **Density widgets**: chips bar (B) + scene state subtitle (C). Small, independent, high visual impact.
-3. **Appearance (G) + tablet tab bar (H)** — independent of the widget phases, can ship anytime after 1.
+1. **Sections layout** (A) — **implemented**, including selective stretch (A.4). Also covers the community prototype work from forum 10553.
+2. **Density widgets**: chips bar (B) + scene state subtitle (C) — **implemented**.
+3. **Appearance (G) + tablet tab bar (H)** — **implemented** (background as a URL for now; `theme` override deferred, see G).
 4. **House view** (E) with bundled gallery + upload + pins. Includes the dashboard-asset storage decision, which is plumbing reused by G (uploaded backgrounds) and F.
 5. **Plus AI generation** (F) — requires the Gladys Plus backend endpoint; front/server land behind the existing Plus feature detection.
 6. **Energy flow** (D) — deliberately last: it is a self-contained visualization that depends on nothing above and unlocks nothing else, whereas everything before it is foundation.
