@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import cx from 'classnames';
 import style from './style.css';
+import DeviceFeatureValueText from '../../device/DeviceFeatureValueText';
 
 class SceneRow extends Component {
   startScene = async () => {
@@ -21,7 +22,14 @@ class SceneRow extends Component {
         <td>
           <i className={`fe fe-${props.icon}`} />
         </td>
-        <td>{props.name}</td>
+        <td>
+          {props.name}
+          {props.statusFeature && (
+            <div class="text-muted small">
+              <DeviceFeatureValueText feature={props.statusFeature} />
+            </div>
+          )}
+        </td>
         <td className="text-right">
           <button
             onClick={this.startScene}

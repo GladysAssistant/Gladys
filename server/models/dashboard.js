@@ -35,6 +35,8 @@ const boxSchema = Joi.object().keys({
   camera_latency: Joi.string(),
   camera_live_auto_start: Joi.boolean(),
   scenes: Joi.array().items(Joi.string()),
+  // scene box: optional live status subtitle per scene button (scene selector -> device feature selector)
+  scene_status_features: Joi.object().pattern(Joi.string(), Joi.string()),
   humidity_use_custom_value: Joi.boolean(),
   humidity_min: Joi.number(),
   humidity_max: Joi.number(),
@@ -64,6 +66,23 @@ const boxSchema = Joi.object().keys({
       }),
     )
     .max(100),
+  // chips box: an ordered list of compact state pills
+  chips: Joi.array()
+    .items(
+      Joi.object().keys({
+        chip_type: Joi.string()
+          .valid('device-feature', 'openings', 'alarm', 'calendar-next-event')
+          .required(),
+        device_feature: Joi.string(),
+        label: Joi.string().allow(''),
+        icon: Joi.string(),
+        house: Joi.string(),
+        room: Joi.string(),
+        calendars: Joi.array().items(Joi.string()),
+        calendar_event_name_filter: Joi.string().allow(''),
+      }),
+    )
+    .max(20),
   photo_fit: Joi.string().valid('cover', 'contain'),
   photo_slideshow_interval: Joi.number()
     .integer()

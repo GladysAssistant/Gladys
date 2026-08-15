@@ -1995,6 +1995,7 @@ const DASHBOARD_BOX_TYPE = {
   LINK: 'link',
   PHOTO: 'photo',
   SUN: 'sun',
+  CHIPS: 'chips',
 };
 
 const ERROR_MESSAGES = {

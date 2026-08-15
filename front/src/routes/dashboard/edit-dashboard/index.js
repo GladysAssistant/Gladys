@@ -228,6 +228,10 @@ class EditDashboard extends Component {
           if (box.type === 'photo' && Array.isArray(box.photos)) {
             return { ...box, photos: box.photos.filter(photo => photo && photo.url) };
           }
+          // Same for chips the user added but never gave a type
+          if (box.type === 'chips' && Array.isArray(box.chips)) {
+            return { ...box, chips: box.chips.filter(chip => chip && chip.chip_type) };
+          }
           return box;
         });
     });

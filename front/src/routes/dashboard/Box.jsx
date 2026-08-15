@@ -18,6 +18,7 @@ import VoiceAssistantBox from '../../components/boxs/voice-assistant/VoiceAssist
 import LinkBox from '../../components/boxs/link/LinkBox';
 import PhotoBox from '../../components/boxs/photo/PhotoBox';
 import SunBox from '../../components/boxs/sun/Sun';
+import ChipsBox from '../../components/boxs/chips/ChipsBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -61,6 +62,8 @@ const Box = ({ children, ...props }) => {
       return <PhotoBox {...props} />;
     case 'sun':
       return <SunBox {...props} />;
+    case 'chips':
+      return <ChipsBox {...props} />;
   }
 };
 

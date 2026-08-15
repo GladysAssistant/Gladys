@@ -21,6 +21,7 @@ import EditVoiceAssistantBox from '../../../components/boxs/voice-assistant/Edit
 import EditLinkBox from '../../../components/boxs/link/EditLinkBox';
 import EditPhotoBox from '../../../components/boxs/photo/EditPhotoBox';
 import EditSunBox from '../../../components/boxs/sun/EditSun';
+import EditChipsBox from '../../../components/boxs/chips/EditChipsBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -64,6 +65,8 @@ const Box = ({ children, ...props }) => {
       return <EditPhotoBox {...props} />;
     case 'sun':
       return <EditSunBox {...props} />;
+    case 'chips':
+      return <EditChipsBox {...props} />;
     default:
       return <SelectBoxType {...props} />;
   }

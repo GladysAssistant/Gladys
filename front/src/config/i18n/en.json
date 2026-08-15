@@ -347,7 +347,8 @@
       "voice-assistant": "Voice assistant",
       "link": "Link",
       "photo": "Photo",
-      "sun": "Sun"
+      "sun": "Sun",
+      "chips": "Status chips"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -628,7 +629,9 @@
       "scene": {
         "editNameLabel": "Widget Name (optional)",
         "editNamePlaceholder": "Name displayed on the dashboard",
-        "editSceneLabel": "Select the scene you want to display here."
+        "editSceneLabel": "Select the scene you want to display here.",
+        "editStatusFeatureLabel": "Live status under each button (optional)",
+        "editStatusFeatureDescription": "Pick a device feature to display its state under the scene button, e.g. shutter position or vacuum status."
       },
       "link": {
         "editTitleLabel": "Title",
@@ -700,6 +703,37 @@
         "errorNoTranscription": "I could not understand your message. Speak closer to the microphone and try again.",
         "configDescription": "This widget uses Gladys Plus for speech recognition, AI and text-to-speech. Connect your instance to Gladys Plus to use it.",
         "plusRequiredHint": "Connect Gladys Plus to enable the microphone."
+      },
+      "chips": {
+        "editDescription": "A compact bar of status chips. Add chips and pick what each one shows.",
+        "editChipLabel": "Chip {{index}}",
+        "editChipTypeLabel": "What does this chip show?",
+        "chipTypes": {
+          "device-feature": "A device state",
+          "openings": "Openings summary (doors/windows)",
+          "alarm": "Alarm status",
+          "calendar-next-event": "Next calendar event"
+        },
+        "editDeviceFeatureLabel": "Device feature",
+        "editHouseLabel": "House",
+        "editRoomLabel": "Room (optional, to narrow the scope)",
+        "editCalendarLabel": "Calendar",
+        "allCalendars": "All calendars",
+        "editEventNameFilterLabel": "Only events containing (optional)",
+        "editEventNameFilterPlaceholder": "e.g. Trash",
+        "editLabelLabel": "Label (optional)",
+        "editLabelPlaceholder": "e.g. Garage",
+        "addChipButton": "Add a chip",
+        "openings": "{{count}} open",
+        "allClosed": "All closed",
+        "noEvent": "No upcoming event",
+        "error": "Error",
+        "alarmModes": {
+          "disarmed": "Disarmed",
+          "armed": "Armed",
+          "partially-armed": "Partially armed",
+          "panic": "Panic"
+        }
       }
     }
   },
@@ -4653,463 +4687,11 @@
     }
   },
   "deviceFeatureValue": {
-    "type": {
-      "binary": {
-        "other": "No value received",
-        "zero": "Inactive",
-        "one": "Active"
-      }
-    },
-    "category": {
-      "button": {
-        "click": {
-          "unknown": "{{value}} (unknown value)",
-          "1": "Simple click",
-          "2": "Double click",
-          "3": "Long click press",
-          "4": "Long click release",
-          "5": "Hold click",
-          "6": "Long click",
-          "7": "On",
-          "8": "Off",
-          "9": "Brightness down",
-          "10": "Brightness up",
-          "11": "Brightness stop",
-          "12": "Left arrow click",
-          "13": "Right arrow click",
-          "14": "Left arrow held",
-          "15": "Right arrow held",
-          "16": "Left arrow release",
-          "17": "Right arrow release",
-          "18": "Triple click",
-          "19": "Quadruple click",
-          "20": "Click released",
-          "21": "Many clicks",
-          "22": "Cube shake",
-          "23": "Cube throw",
-          "24": "Cube wake up",
-          "25": "Cube fall",
-          "26": "Cube tap",
-          "27": "Cube slide",
-          "28": "Cube flip 180°",
-          "29": "Cube flip 90°",
-          "30": "Cube rotate left",
-          "31": "Cube rotate right",
-          "32": "Vibration",
-          "33": "Tilt",
-          "34": "Drop",
-          "35": "Emergency",
-          "36": "Disarm",
-          "37": "Arm day zones",
-          "38": "Arm all zones",
-          "39": "On press",
-          "40": "On hold",
-          "41": "Up press",
-          "42": "Up hold",
-          "43": "Down press",
-          "44": "Down hold",
-          "45": "Off press",
-          "46": "Off hold",
-          "47": "Single press",
-          "48": "Long press",
-          "49": "Short release",
-          "50": "Long release",
-          "51": "Double press",
-          "52": "Toggle",
-          "53": "Toggle Hold",
-          "54": "Brightness Up Click",
-          "55": "Brightness Up Hold",
-          "56": "Brightness Up Release",
-          "57": "Brightness Down Click",
-          "58": "Brightness Down Hold",
-          "59": "Brightness Down Release",
-          "60": "Pressed",
-          "61": "Simple Left",
-          "62": "Simple Right",
-          "63": "Simple Both",
-          "64": "Double Left",
-          "65": "Double Right",
-          "66": "Double Both",
-          "67": "Triple Left",
-          "68": "Triple Right",
-          "69": "Triple Both",
-          "70": "Hold Left",
-          "71": "Hold Right",
-          "72": "Hold Both",
-          "73": "Simple Click Plus",
-          "74": "Simple Click Center",
-          "75": "Simple Click Minus",
-          "76": "Double Click Plus",
-          "77": "Double Click Center",
-          "78": "Double Click Minus",
-          "79": "Hold Plus",
-          "80": "Hold Center",
-          "81": "Hold Minus",
-          "82": "Release Plus (Aqara W100)",
-          "83": "Release Center (Aqara W100)",
-          "84": "Release Minus (Aqara W100)",
-          "85": "On double",
-          "86": "Off double",
-          "87": "Arm night zones",
-          "88": "Exit delay",
-          "89": "Button 1 single click",
-          "90": "Button 1 double click",
-          "91": "Button 1 long click",
-          "92": "Button 1 triple click",
-          "93": "Button 2 single click",
-          "94": "Button 2 double click",
-          "95": "Button 2 long click",
-          "96": "Button 2 triple click",
-          "97": "Button 3 single click",
-          "98": "Button 3 double click",
-          "99": "Button 3 long click",
-          "100": "Button 3 triple click",
-          "101": "Button 4 single click",
-          "102": "Button 4 double click",
-          "103": "Button 4 long click",
-          "104": "Button 4 triple click"
-        }
-      },
-      "fan": {
-        "mode": {
-          "0": "Off",
-          "1": "Low",
-          "2": "Medium",
-          "3": "High",
-          "4": "Auto"
-        },
-        "percent": {},
-        "speed": {},
-        "airflow-direction": {
-          "0": "Forward",
-          "1": "Reverse"
-        },
-        "rock-setting": {
-          "0": "Off",
-          "1": "Left/Right",
-          "2": "Up/Down",
-          "3": "Left/Right + Up/Down",
-          "4": "Round",
-          "5": "Left/Right + Round",
-          "6": "Up/Down + Round",
-          "7": "All"
-        },
-        "wind-setting": {
-          "0": "Off",
-          "1": "Sleep wind",
-          "2": "Natural wind",
-          "3": "Sleep + Natural wind"
-        }
-      },
-      "heater": {
-        "pilot-wire-mode": {
-          "0": "Off",
-          "1": "Frost Protection",
-          "2": "Eco",
-          "3": "Comfort -1°C",
-          "4": "Comfort -2°C",
-          "5": "Comfort"
-        }
-      },
-      "shutter": {
-        "state": {
-          "-1": "Closed",
-          "0": "Stopped",
-          "1": "Open"
-        }
-      },
-      "curtain": {
-        "state": {
-          "-1": "Closed",
-          "0": "Stopped",
-          "1": "Open"
-        }
-      },
-      "lock": {
-        "state": {
-          "0": "Unlocked",
-          "1": "Locked",
-          "2": "Activity",
-          "3": "Error"
-        }
-      },
-      "air-conditioning": {
-        "mode": {
-          "0": "Auto",
-          "1": "Cooling",
-          "2": "Heating",
-          "3": "Drying",
-          "4": "Fan"
-        },
-        "fan-speed": {
-          "0": "Auto",
-          "1": "Low",
-          "2": "Low-Med",
-          "3": "Medium",
-          "4": "Med-High",
-          "5": "High",
-          "6": "Quiet",
-          "7": "Turbo"
-        },
-        "swing-horizontal": {
-          "0": "Off",
-          "1": "Swing",
-          "2": "Position 1 (Left)",
-          "3": "Position 2",
-          "4": "Position 3 (Center)",
-          "5": "Position 4",
-          "6": "Position 5 (Right)",
-          "7": "Opposite Swing"
-        },
-        "swing-vertical": {
-          "0": "Off",
-          "1": "Swing",
-          "2": "Position 1 (Top)",
-          "3": "Position 2",
-          "4": "Position 3",
-          "5": "Position 4",
-          "6": "Position 5 (Bottom)"
-        }
-      },
-      "thermostat": {
-        "mode": {
-          "0": "Off",
-          "1": "Heating",
-          "2": "Cooling",
-          "3": "Auto"
-        },
-        "operating-state": {
-          "unknown": "{{value}} (unknown)",
-          "0": "Idle",
-          "1": "Heating",
-          "2": "Cooling"
-        }
-      },
-      "siren": {
-        "lmh_volume": {
-          "0": "Low",
-          "1": "Medium",
-          "2": "High"
-        },
-        "test-in-progress": {
-          "0": "No",
-          "1": "Yes"
-        }
-      },
-      "music": {
-        "playback_state": {
-          "0": "Paused",
-          "1": "Playing"
-        }
-      },
-      "opening-sensor": {
-        "binary": {
-          "other": "No value received",
-          "zero": "Opened",
-          "one": "Closed"
-        }
-      },
-      "motion-sensor": {
-        "binary": {
-          "other": "No value received",
-          "zero": "No motion",
-          "one": "Motion detected"
-        }
-      },
-      "presence-sensor": {
-        "binary": {
-          "other": "No value received",
-          "zero": "No presence",
-          "one": "Presence detected"
-        }
-      },
-      "smoke-sensor": {
-        "binary": {
-          "other": "No value received",
-          "zero": "Clear",
-          "one": "Smoke detected"
-        }
-      },
-      "co-sensor": {
-        "binary": {
-          "other": "No value received",
-          "zero": "Healthy",
-          "one": "CO detected"
-        }
-      },
-      "leak-sensor": {
-        "binary": {
-          "other": "No value received",
-          "zero": "No",
-          "one": "Yes"
-        }
-      },
-      "battery-low": {
-        "binary": {
-          "other": "No value received",
-          "zero": "No",
-          "one": "Yes"
-        }
-      },
-      "tamper": {
-        "binary": {
-          "other": "No value received",
-          "zero": "No",
-          "one": "Yes"
-        }
-      },
-      "input": {
-        "binary": {
-          "other": "No value received",
-          "zero": "Off",
-          "one": "On"
-        }
-      },
-      "risk": {
-        "integer": {
-          "no-risk": "No Risk",
-          "low-risk": "Low",
-          "medium-risk": "Medium",
-          "high-risk": "High",
-          "unknown": "Unknown"
-        }
-      },
-      "level-sensor": {
-        "liquid-state": {
-          "0": "Low",
-          "1": "Normal",
-          "2": "High",
-          "unknown": "Unknown"
-        }
-      },
-      "water-valve": {
-        "current-device-status": {
-          "0": "Normal",
-          "1": "Water shortage",
-          "2": "Water leakage",
-          "3": "Water shortage & leakage",
-          "unknown": "{{value}} (unknown)"
-        },
-        "valve-work-state": {
-          "0": "Idle",
-          "1": "Irrigation running"
-        }
-      },
-      "electrical-vehicle-state": {
-        "door-opened": {
-          "0": "Closed",
-          "1": "Open"
-        },
-        "window-opened": {
-          "0": "Closed",
-          "1": "Open"
-        }
-      },
-      "doorbell": {
-        "ring": {
-          "0": "No ring",
-          "1": "Doorbell rang"
-        }
-      },
-      "electrical-vehicle-charge": {
-        "plugged": {
-          "0": "Unplugged",
-          "1": "Plugged"
-        }
-      },
-      "charging-station": {
-        "connector-status": {
-          "unknown": "{{value}} (unknown)",
-          "0": "Available",
-          "1": "Occupied",
-          "2": "Reserved",
-          "3": "Unavailable",
-          "4": "Faulted"
-        },
-        "charging-state": {
-          "unknown": "{{value}} (unknown)",
-          "0": "Charging",
-          "1": "Vehicle connected",
-          "2": "Paused (vehicle)",
-          "3": "Paused (charger)",
-          "4": "Idle",
-          "5": "Discharging"
-        }
-      },
-      "voc-matter-index-sensor": {
-        "integer": {
-          "unknown": "Unknown",
-          "low": "Low",
-          "medium": "Medium",
-          "high": "High",
-          "critical": "Critical"
-        }
-      },
-      "no2-matter-index-sensor": {
-        "integer": {
-          "unknown": "Unknown",
-          "low": "Low",
-          "medium": "Medium",
-          "high": "High",
-          "critical": "Critical"
-        }
-      },
-      "level-matter-index-sensor": {
-        "level-state": {
-          "1": "Low",
-          "2": "Medium",
-          "3": "High",
-          "4": "Critical"
-        }
-      },
-      "vacuum-cleaner": {
-        "state": {
-          "unknown": "{{value}} (unknown)",
-          "0": "Stopped",
-          "1": "Running",
-          "2": "Paused",
-          "3": "Error",
-          "4": "Returning to Dock",
-          "5": "Charging",
-          "6": "Docked"
-        },
-        "run-mode": {
-          "unknown": "{{value}} (unknown)",
-          "0": "Idle",
-          "1": "Clean",
-          "2": "Map"
-        },
-        "clean-mode": {
-          "unknown": "{{value}} (unknown)",
-          "0": "Auto",
-          "1": "Quick",
-          "2": "Quiet",
-          "3": "Low Noise",
-          "4": "Deep Clean",
-          "5": "Vacuum",
-          "6": "Mop"
-        }
-      },
-      "water-heater": {
-        "mode": {
-          "0": "Off",
-          "1": "Auto",
-          "2": "Eco",
-          "3": "Boost",
-          "4": "Manual",
-          "5": "Away",
-          "6": "Schedule"
-        },
-        "boost": {
-          "0": "Boost off",
-          "1": "Boost on"
-        },
-        "heating": {
-          "0": "Idle",
-          "1": "Heating"
-        }
-      }
-    }
+    "noValue": "No value",
+    "open": "Open",
+    "closed": "Closed",
+    "on": "On",
+    "off": "Off"
   },
   "deviceFeatureCategory": {
     "light": {

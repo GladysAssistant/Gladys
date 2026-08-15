@@ -75,6 +75,65 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[1].columns).to.have.lengthOf(4);
   });
 
+  it('should save a chips box', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [
+            [
+              {
+                type: DASHBOARD_BOX_TYPE.CHIPS,
+                chips: [
+                  { chip_type: 'device-feature', device_feature: 'my-sensor', label: 'Garage' },
+                  { chip_type: 'openings', house: 'my-house' },
+                  { chip_type: 'alarm', house: 'my-house' },
+                  {
+                    chip_type: 'calendar-next-event',
+                    calendars: ['trash-calendar'],
+                    calendar_event_name_filter: 'poubelle',
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+      ],
+    });
+    expect(updatedDashboard.boxes[0].columns[0][0].chips).to.have.lengthOf(4);
+  });
+
+  it('should save a scene box with status features', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [
+            [
+              {
+                type: DASHBOARD_BOX_TYPE.SCENE,
+                scenes: ['open-shutters'],
+                scene_status_features: { 'open-shutters': 'shutter-position' },
+              },
+            ],
+          ],
+        },
+      ],
+    });
+    expect(updatedDashboard.boxes[0].columns[0][0].scene_status_features).to.deep.equal({
+      'open-shutters': 'shutter-position',
+    });
+  });
+
+  it('should reject a chip with an unknown chip_type', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [[{ type: DASHBOARD_BOX_TYPE.CHIPS, chips: [{ chip_type: 'invalid' }] }]],
+        },
+      ],
+    });
+    return assert.isRejected(promise);
+  });
+
   it('should reject a section with more than 4 columns', async () => {
     const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [
