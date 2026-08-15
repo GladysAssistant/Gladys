@@ -7,6 +7,12 @@ import DeviceMobileItem from './DeviceMobileItem';
 import EmptyState from './EmptyState';
 import style from './style.css';
 
+const IntegrationOption = ({ integration, selectedIntegration }) => (
+  <option value={integration.slug} selected={selectedIntegration === integration.slug}>
+    {integration.i18nKey ? <Text id={integration.i18nKey}>{integration.name}</Text> : integration.name}
+  </option>
+);
+
 const DevicesPage = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
@@ -43,11 +49,26 @@ const DevicesPage = ({ children, ...props }) => (
                 <option value="">
                   <Text id="devicesList.allIntegrations" />
                 </option>
-                {props.integrationOptions.map(integration => (
-                  <option value={integration.slug} selected={props.selectedIntegration === integration.slug}>
-                    {integration.i18nKey ? <Text id={integration.i18nKey}>{integration.name}</Text> : integration.name}
-                  </option>
-                ))}
+                {/* built-in and community integrations are grouped, so both
+                    families stay identifiable even when they share a name */}
+                {props.nativeIntegrationOptions.length > 0 && (
+                  <Localizer>
+                    <optgroup label={<Text id="devicesList.nativeIntegrations" />}>
+                      {props.nativeIntegrationOptions.map(integration => (
+                        <IntegrationOption integration={integration} selectedIntegration={props.selectedIntegration} />
+                      ))}
+                    </optgroup>
+                  </Localizer>
+                )}
+                {props.communityIntegrationOptions.length > 0 && (
+                  <Localizer>
+                    <optgroup label={<Text id="devicesList.communityIntegrations" />}>
+                      {props.communityIntegrationOptions.map(integration => (
+                        <IntegrationOption integration={integration} selectedIntegration={props.selectedIntegration} />
+                      ))}
+                    </optgroup>
+                  </Localizer>
+                )}
               </select>
               <Localizer>
                 <CardFilter

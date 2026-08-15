@@ -97,6 +97,8 @@
     "allRooms": "Toutes les pièces",
     "noRoom": "Aucune pièce",
     "allIntegrations": "Toutes les intégrations",
+    "nativeIntegrations": "Intégrations natives",
+    "communityIntegrations": "Intégrations communautaires",
     "device": "Appareil",
     "room": "Pièce",
     "integration": "Intégration",

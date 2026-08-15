@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 
 import DevicesPage from './DevicesPage';
-import { getDeviceIntegration } from './integrationLinks';
+import { getDeviceIntegration, disambiguateIntegrationNames } from './integrationLinks';
 
 class Devices extends Component {
   // The endpoint returns the whole list: load it once, then search, order
@@ -85,10 +85,17 @@ class Devices extends Component {
   }
 
   render(props, state) {
-    const devicesWithIntegration = (state.devices || []).map(device => ({
-      device,
-      integration: getDeviceIntegration(device)
-    }));
+    const integrations = (state.devices || []).map(device => getDeviceIntegration(device));
+    // names are resolved on the whole list: whether an integration needs its
+    // technical identity displayed depends on the other integrations present
+    const nameBySlug = disambiguateIntegrationNames(integrations);
+    const devicesWithIntegration = (state.devices || []).map((device, index) => {
+      const integration = integrations[index];
+      return {
+        device,
+        integration: integration ? { ...integration, name: nameBySlug.get(integration.slug) } : null
+      };
+    });
 
     // The integration filter options are built from the full device list, so
     // it only shows integrations the user actually has devices in, and a
@@ -101,7 +108,12 @@ class Devices extends Component {
         integrationOptions.push(integration);
       }
     });
-    integrationOptions.sort((a, b) => a.slug.localeCompare(b.slug));
+    integrationOptions.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    // Built-in and community integrations live in the same list: the filter
+    // groups them so a community integration named like a built-in one (or
+    // like another community one) is still identifiable
+    const nativeIntegrationOptions = integrationOptions.filter(integration => !integration.external);
+    const communityIntegrationOptions = integrationOptions.filter(integration => integration.external);
 
     const filteredDevices = devicesWithIntegration
       .filter(({ device }) => this.matchSearch(device))
@@ -122,7 +134,8 @@ class Devices extends Component {
         {...state}
         initialized={state.devices !== null}
         filteredDevices={filteredDevices}
-        integrationOptions={integrationOptions}
+        nativeIntegrationOptions={nativeIntegrationOptions}
+        communityIntegrationOptions={communityIntegrationOptions}
         searchValue={state.search}
         search={this.search}
         changeOrderDir={this.changeOrderDir}

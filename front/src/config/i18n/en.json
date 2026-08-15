@@ -97,6 +97,8 @@
     "allRooms": "All rooms",
     "noRoom": "No room",
     "allIntegrations": "All integrations",
+    "nativeIntegrations": "Native integrations",
+    "communityIntegrations": "Community integrations",
     "device": "Device",
     "room": "Room",
     "integration": "Integration",
