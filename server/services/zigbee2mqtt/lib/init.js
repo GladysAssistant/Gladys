@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { CONFIGURATION, MQTT_MODE } = require('./constants');
+const { CONFIGURATION, MQTT_MODE, ADAPTER_MODE } = require('./constants');
 const { generate } = require('../../../utils/password');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 
@@ -13,6 +13,7 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 async function init(setupMode = false) {
   // Reset status
   this.usbConfigured = false;
+  this.networkAdapterConfigured = false;
   this.mqttExist = false;
   this.mqttRunning = false;
   this.mqttContainerRunning = false;
@@ -27,7 +28,7 @@ async function init(setupMode = false) {
 
   // Load stored configuration
   const configuration = await this.getConfiguration();
-  const { z2mDriverPath, mqttPassword, mqttMode, mqttUrl } = configuration;
+  const { z2mDriverPath, mqttPassword, mqttMode, mqttUrl, z2mAdapterMode, z2mNetworkAdapterUrl } = configuration;
 
   try {
     const dockerBased = await this.gladys.system.isDocker();
@@ -51,9 +52,17 @@ async function init(setupMode = false) {
   this.networkModeValid = true;
   this.emitStatusEvent();
 
-  // Test if dongle is present
+  // Test if the coordinator is present: either reachable over the network, or plugged in USB
   this.usbConfigured = false;
-  if (!z2mDriverPath) {
+  this.networkAdapterConfigured = false;
+  if (z2mAdapterMode === ADAPTER_MODE.NETWORK) {
+    if (z2mNetworkAdapterUrl) {
+      logger.info(`Zigbee2mqtt network coordinator configured on ${z2mNetworkAdapterUrl}`);
+      this.networkAdapterConfigured = true;
+    } else {
+      logger.info(`Zigbee2mqtt network coordinator not configured`);
+    }
+  } else if (!z2mDriverPath) {
     logger.info(`Zigbee2mqtt USB dongle not attached`);
   } else {
     const usb = this.gladys.service.getService('usb');
@@ -96,7 +105,7 @@ async function init(setupMode = false) {
     }
   }
 
-  if (this.usbConfigured) {
+  if (this.usbConfigured || this.networkAdapterConfigured) {
     logger.debug('Zibgee2mqtt: installing and starting required docker containers...');
     // We force set the mqttMode to local for existing instances
     configuration.mqttMode = MQTT_MODE.LOCAL;
