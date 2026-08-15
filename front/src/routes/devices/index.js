@@ -1,6 +1,8 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import get from 'get-value';
 
+import withIntlAsProp from '../../utils/withIntlAsProp';
 import DevicesPage from './DevicesPage';
 import { getDeviceIntegration, disambiguateIntegrationNames } from './integrationLinks';
 
@@ -108,7 +110,14 @@ class Devices extends Component {
         integrationOptions.push(integration);
       }
     });
-    integrationOptions.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }));
+    // sorted on the label the option actually displays: a built-in integration
+    // is listed under its translated title, which its service name does not
+    // always match (in French, the "rtsp-camera" service reads "Caméras")
+    const getOptionLabel = integration =>
+      (integration.i18nKey && get(props.intl.dictionary, integration.i18nKey)) || integration.name;
+    integrationOptions.sort((a, b) =>
+      getOptionLabel(a).localeCompare(getOptionLabel(b), undefined, { sensitivity: 'base' })
+    );
     // Built-in and community integrations live in the same list: the filter
     // groups them so a community integration named like a built-in one (or
     // like another community one) is still identifiable
@@ -146,4 +155,4 @@ class Devices extends Component {
   }
 }
 
-export default connect('httpClient', {})(Devices);
+export default withIntlAsProp(connect('httpClient', {})(Devices));
