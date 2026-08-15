@@ -4,6 +4,13 @@ import { route } from 'preact-router';
 import update from 'immutability-helper';
 import EditDashboardPage from './EditDashboard';
 import get from 'get-value';
+import {
+  MAX_COLUMNS_PER_SECTION,
+  flattenSections,
+  buildSections,
+  getSectionOffsets,
+  findSectionIndex
+} from '../../../utils/dashboardSections';
 
 class EditDashboard extends Component {
   getDashboards = async () => {
@@ -49,8 +56,12 @@ class EditDashboard extends Component {
       const currentDashboard = await this.props.httpClient.get(
         `/api/v1/dashboard/${this.state.currentDashboardSelector}`
       );
+      // The editor works on a flat list of columns so drag & drop coordinates
+      // stay global, the section sizes are kept aside and reassembled on save
+      const { columns, sectionSizes } = flattenSections(currentDashboard.boxes);
       this.setState({
-        currentDashboard,
+        currentDashboard: { ...currentDashboard, boxes: columns },
+        sectionSizes,
         loading: false
       });
     } catch (e) {
@@ -241,13 +252,13 @@ class EditDashboard extends Component {
       // We purge all empty boxes
       await this.removeEmptyBoxes();
 
-      const { currentDashboard: selectedDashboard, dashboards } = this.state;
+      const { currentDashboard: selectedDashboard, dashboards, sectionSizes } = this.state;
       const { selector } = selectedDashboard;
 
-      const currentDashboard = await this.props.httpClient.patch(
-        `/api/v1/dashboard/${selector}`,
-        this.state.currentDashboard
-      );
+      const currentDashboard = await this.props.httpClient.patch(`/api/v1/dashboard/${selector}`, {
+        ...selectedDashboard,
+        boxes: buildSections(selectedDashboard.boxes, sectionSizes)
+      });
 
       const currentDashboardIndex = dashboards.findIndex(d => d.selector === selector);
       const updatedDashboards = update(dashboards, {
@@ -256,8 +267,10 @@ class EditDashboard extends Component {
         }
       });
 
+      const { columns, sectionSizes: newSectionSizes } = flattenSections(currentDashboard.boxes);
       await this.setState({
-        currentDashboard,
+        currentDashboard: { ...currentDashboard, boxes: columns },
+        sectionSizes: newSectionSizes,
         loading: false,
         dashboards: updatedDashboards
       });
@@ -280,12 +293,37 @@ class EditDashboard extends Component {
     }
   };
 
-  addColumn = () => {
+  addColumn = sectionIndex => {
+    const { sectionSizes } = this.state;
+    if (sectionSizes[sectionIndex] >= MAX_COLUMNS_PER_SECTION) {
+      return;
+    }
+    // the new column goes at the end of its section, in the flat column list
+    const insertAt = getSectionOffsets(sectionSizes)[sectionIndex] + sectionSizes[sectionIndex];
+    const newState = update(this.state, {
+      currentDashboard: {
+        boxes: {
+          $splice: [[insertAt, 0, []]]
+        }
+      },
+      sectionSizes: {
+        [sectionIndex]: {
+          $set: sectionSizes[sectionIndex] + 1
+        }
+      }
+    });
+    this.setState({ ...newState, boxNotEmptyError: false });
+  };
+
+  addSection = () => {
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
           $push: [[]]
         }
+      },
+      sectionSizes: {
+        $push: [1]
       }
     });
     this.setState({ ...newState, boxNotEmptyError: false });
@@ -294,12 +332,23 @@ class EditDashboard extends Component {
   deleteCurrentColumn = async x => {
     const { boxes } = this.state.currentDashboard;
     if (boxes[x].length === 0) {
+      const sectionIndex = findSectionIndex(this.state.sectionSizes, x);
+      const newSectionSize = this.state.sectionSizes[sectionIndex] - 1;
       const newState = update(this.state, {
         currentDashboard: {
           boxes: {
             $splice: [[x, 1]]
           }
-        }
+        },
+        // a section left without any column disappears
+        sectionSizes:
+          newSectionSize === 0
+            ? { $splice: [[sectionIndex, 1]] }
+            : {
+                [sectionIndex]: {
+                  $set: newSectionSize
+                }
+              }
       });
       await this.setState({ ...newState, boxNotEmptyError: false });
     } else {
@@ -368,6 +417,7 @@ class EditDashboard extends Component {
     this.props = props;
     this.state = {
       dashboards: [],
+      sectionSizes: [],
       newSelectedBoxType: {},
       askDeleteDashboard: false,
       boxNotEmptyError: false,
@@ -391,6 +441,7 @@ class EditDashboard extends Component {
     {
       dashboards,
       currentDashboard,
+      sectionSizes,
       loading,
       dashboardValidationError,
       dashboardAlreadyExistError,
@@ -435,6 +486,8 @@ class EditDashboard extends Component {
         toggleMobileReorder={this.toggleMobileReorder}
         isMobileReordering={isMobileReordering}
         addColumn={this.addColumn}
+        addSection={this.addSection}
+        sectionSizes={sectionSizes}
         deleteCurrentColumn={this.deleteCurrentColumn}
         boxNotEmptyError={boxNotEmptyError}
         columnBoxNotEmptyError={columnBoxNotEmptyError}

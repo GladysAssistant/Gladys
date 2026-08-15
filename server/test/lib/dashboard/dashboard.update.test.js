@@ -54,8 +54,43 @@ describe('dashboard.update', () => {
         ],
       ],
     });
-    expect(updatedDashboard.boxes[0][0]).to.have.property('provider', 'ext-meteo-france');
-    expect(updatedDashboard.boxes[1][0]).to.have.property('provider', '');
+    // legacy column-based boxes are normalized to a single section on save
+    expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('provider', 'ext-meteo-france');
+    expect(updatedDashboard.boxes[0].columns[1][0]).to.have.property('provider', '');
+  });
+
+  it('should save section-based boxes as-is', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [[{ type: DASHBOARD_BOX_TYPE.CLOCK }], []],
+        },
+        {
+          columns: [[], [{ type: DASHBOARD_BOX_TYPE.USER_PRESENCE }], [], []],
+        },
+      ],
+    });
+    expect(updatedDashboard.boxes).to.have.lengthOf(2);
+    expect(updatedDashboard.boxes[0].columns[0][0]).to.have.property('type', DASHBOARD_BOX_TYPE.CLOCK);
+    expect(updatedDashboard.boxes[1].columns).to.have.lengthOf(4);
+  });
+
+  it('should reject a section with more than 4 columns', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [[], [], [], [], []],
+        },
+      ],
+    });
+    return assert.isRejected(promise);
+  });
+
+  it('should reject a section without columns', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [{ type: DASHBOARD_BOX_TYPE.CLOCK }],
+    });
+    return assert.isRejected(promise);
   });
 
   it('should return not found', async () => {

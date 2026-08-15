@@ -1,76 +1,87 @@
 const Joi = require('joi');
 const { addSelectorBeforeValidateHook } = require('../utils/addSelector');
+const { normalizeDashboardBoxes } = require('../utils/dashboardSections');
 const { DASHBOARD_BOX_TYPE_LIST, DASHBOARD_TYPE_LIST, DASHBOARD_VISIBILITY_LIST } = require('../utils/constants');
 
+const MAX_COLUMNS_PER_SECTION = 4;
+
+const boxSchema = Joi.object().keys({
+  type: Joi.string()
+    .valid(...DASHBOARD_BOX_TYPE_LIST)
+    .required(),
+  house: Joi.string(),
+  room: Joi.string(),
+  camera: Joi.string(),
+  name: Joi.string().allow(''),
+  modes: Joi.object(),
+  // weather box: provider pinned in the widget configuration, '' = automatic
+  provider: Joi.string().allow(''),
+  device: Joi.string(),
+  device_features: Joi.array().items(Joi.string()),
+  device_feature_names: Joi.array().items(Joi.string()),
+  device_feature: Joi.string(),
+  unit: Joi.string(),
+  units: Joi.array().items(Joi.string().allow(null)),
+  title: Joi.string(),
+  interval: Joi.string(),
+  aggregate_function: Joi.string().valid('avg', 'sum', 'max', 'min', 'count'),
+  group_by: Joi.string().valid('hour', 'day', 'week', 'month', 'year'),
+  display_axes: Joi.boolean(),
+  display_variation: Joi.boolean(),
+  chart_type: Joi.string(),
+  users: Joi.array().items(Joi.string()),
+  clock_type: Joi.string(),
+  clock_display_second: Joi.boolean(),
+  camera_latency: Joi.string(),
+  camera_live_auto_start: Joi.boolean(),
+  scenes: Joi.array().items(Joi.string()),
+  humidity_use_custom_value: Joi.boolean(),
+  humidity_min: Joi.number(),
+  humidity_max: Joi.number(),
+  temperature_use_custom_value: Joi.boolean(),
+  temperature_min: Joi.number(),
+  temperature_max: Joi.number(),
+  gauge_use_custom_value: Joi.boolean(),
+  gauge_min: Joi.number(),
+  gauge_max: Joi.number(),
+  gauge_color_low: Joi.string(),
+  gauge_color_in_range: Joi.string(),
+  gauge_color_high: Joi.string(),
+  colors: Joi.array().items(Joi.string()),
+  show_subscription_prices: Joi.boolean(),
+  url: Joi.string().uri({ scheme: ['http', 'https'] }),
+  icon: Joi.string(),
+  photos: Joi.array()
+    .items(
+      Joi.object().keys({
+        // An empty URL is allowed so a widget being configured can still be saved,
+        // empty rows are filtered out by the front-end before saving.
+        url: Joi.string()
+          .uri({ scheme: ['http', 'https'] })
+          .allow('')
+          .required(),
+        caption: Joi.string().allow(''),
+      }),
+    )
+    .max(100),
+  photo_fit: Joi.string().valid('cover', 'contain'),
+  photo_slideshow_interval: Joi.number()
+    .integer()
+    .min(0)
+    .max(3600),
+  photo_show_caption: Joi.boolean(),
+});
+
+// A dashboard is a stack of sections, each section holding its own columns
+// (1 to MAX_COLUMNS_PER_SECTION). Legacy column-based values are normalized
+// to this shape in a beforeValidate hook, so validation only sees sections.
 const boxesSchema = Joi.array().items(
-  Joi.array().items(
-    Joi.object().keys({
-      type: Joi.string()
-        .valid(...DASHBOARD_BOX_TYPE_LIST)
-        .required(),
-      house: Joi.string(),
-      room: Joi.string(),
-      camera: Joi.string(),
-      name: Joi.string().allow(''),
-      modes: Joi.object(),
-      // weather box: provider pinned in the widget configuration, '' = automatic
-      provider: Joi.string().allow(''),
-      device: Joi.string(),
-      device_features: Joi.array().items(Joi.string()),
-      device_feature_names: Joi.array().items(Joi.string()),
-      device_feature: Joi.string(),
-      unit: Joi.string(),
-      units: Joi.array().items(Joi.string().allow(null)),
-      title: Joi.string(),
-      interval: Joi.string(),
-      aggregate_function: Joi.string().valid('avg', 'sum', 'max', 'min', 'count'),
-      group_by: Joi.string().valid('hour', 'day', 'week', 'month', 'year'),
-      display_axes: Joi.boolean(),
-      display_variation: Joi.boolean(),
-      chart_type: Joi.string(),
-      users: Joi.array().items(Joi.string()),
-      clock_type: Joi.string(),
-      clock_display_second: Joi.boolean(),
-      camera_latency: Joi.string(),
-      camera_live_auto_start: Joi.boolean(),
-      scenes: Joi.array().items(Joi.string()),
-      humidity_use_custom_value: Joi.boolean(),
-      humidity_min: Joi.number(),
-      humidity_max: Joi.number(),
-      temperature_use_custom_value: Joi.boolean(),
-      temperature_min: Joi.number(),
-      temperature_max: Joi.number(),
-      gauge_use_custom_value: Joi.boolean(),
-      gauge_min: Joi.number(),
-      gauge_max: Joi.number(),
-      gauge_color_low: Joi.string(),
-      gauge_color_in_range: Joi.string(),
-      gauge_color_high: Joi.string(),
-      colors: Joi.array().items(Joi.string()),
-      show_subscription_prices: Joi.boolean(),
-      url: Joi.string().uri({ scheme: ['http', 'https'] }),
-      icon: Joi.string(),
-      photos: Joi.array()
-        .items(
-          Joi.object().keys({
-            // An empty URL is allowed so a widget being configured can still be saved,
-            // empty rows are filtered out by the front-end before saving.
-            url: Joi.string()
-              .uri({ scheme: ['http', 'https'] })
-              .allow('')
-              .required(),
-            caption: Joi.string().allow(''),
-          }),
-        )
-        .max(100),
-      photo_fit: Joi.string().valid('cover', 'contain'),
-      photo_slideshow_interval: Joi.number()
-        .integer()
-        .min(0)
-        .max(3600),
-      photo_show_caption: Joi.boolean(),
-    }),
-  ),
+  Joi.object().keys({
+    columns: Joi.array()
+      .items(Joi.array().items(boxSchema))
+      .max(MAX_COLUMNS_PER_SECTION)
+      .required(),
+  }),
 );
 
 module.exports = (sequelize, DataTypes) => {
@@ -130,6 +141,11 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   dashboard.beforeValidate(addSelectorBeforeValidateHook);
+  dashboard.beforeValidate((instance) => {
+    if (instance.boxes) {
+      instance.boxes = normalizeDashboardBoxes(instance.boxes);
+    }
+  });
 
   return dashboard;
 };

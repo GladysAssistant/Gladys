@@ -274,9 +274,7 @@ class Dashboard extends Component {
     const dashboardConfigured =
       currentDashboard &&
       currentDashboard.boxes &&
-      ((currentDashboard.boxes[0] && currentDashboard.boxes[0].length > 0) ||
-        (currentDashboard.boxes[1] && currentDashboard.boxes[1].length > 0) ||
-        (currentDashboard.boxes[2] && currentDashboard.boxes[2].length > 0));
+      currentDashboard.boxes.some(section => section.columns && section.columns.some(column => column.length > 0));
     const dashboardListEmpty = !(dashboards && dashboards.length > 0);
     const dashboardNotConfigured = !dashboardConfigured;
     if (props.gatewayAccountExpired === true) {

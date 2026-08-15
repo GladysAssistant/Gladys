@@ -68,6 +68,8 @@ const EditDashboard = ({ children, ...props }) => (
                           toggleMobileReorder={props.toggleMobileReorder}
                           deleteCurrentColumn={props.deleteCurrentColumn}
                           addColumn={props.addColumn}
+                          addSection={props.addSection}
+                          sectionSizes={props.sectionSizes}
                           boxNotEmptyError={props.boxNotEmptyError}
                           columnBoxNotEmptyError={props.columnBoxNotEmptyError}
                         />

@@ -52,7 +52,7 @@ describe('POST /api/v1/dashboard', () => {
       .expect(201)
       .then((res) => {
         expect(res.body).to.have.property('name', 'photo dashboard');
-        expect(res.body.boxes[0][0]).to.have.property('type', 'photo');
+        expect(res.body.boxes[0].columns[0][0]).to.have.property('type', 'photo');
       });
   });
 
@@ -79,7 +79,7 @@ describe('POST /api/v1/dashboard', () => {
       .expect('Content-Type', /json/)
       .expect(201)
       .then((res) => {
-        expect(res.body.boxes[0][0]).to.have.property('type', 'photo');
+        expect(res.body.boxes[0].columns[0][0]).to.have.property('type', 'photo');
       });
   });
 });
@@ -116,12 +116,17 @@ describe('GET /api/v1/dashboard/:dashboard_selector', () => {
           name: 'Test dashboard',
           selector: 'test-dashboard',
           type: 'main',
+          // stored with the legacy column-based shape, normalized to sections on read
           boxes: [
-            [
-              {
-                type: 'weather',
-              },
-            ],
+            {
+              columns: [
+                [
+                  {
+                    type: 'weather',
+                  },
+                ],
+              ],
+            },
           ],
           user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           visibility: 'private',
@@ -150,12 +155,17 @@ describe('PATCH /api/v1/dashboard/:dashboard_selector', () => {
           user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           visibility: 'private',
           type: 'main',
+          // stored with the legacy column-based shape, normalized to sections on read
           boxes: [
-            [
-              {
-                type: 'weather',
-              },
-            ],
+            {
+              columns: [
+                [
+                  {
+                    type: 'weather',
+                  },
+                ],
+              ],
+            },
           ],
           updated_at: res.body.updated_at,
           created_at: '2019-02-12T07:49:07.556Z',

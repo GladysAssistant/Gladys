@@ -318,6 +318,7 @@
       "public": "öffentlich"
     },
     "editDashboardAddColumnButton": "Eine Spalte zum Dashboard hinzufügen",
+    "editDashboardAddSectionButton": "Einen Abschnitt hinzufügen",
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
     "editDashboardExplanation": "Jedes Dashboard hat 3 Spalten, die du nach Belieben füllen kannst. Klicke auf \"+\", um ein neues Widget hinzuzufügen. Du kannst dieses Widget bewegen, indem du es greifst und verschiebst.",
@@ -350,6 +351,7 @@
     },
     "boxes": {
       "column": "Spalte {{index}}",
+      "section": "Abschnitt {{index}}",
       "deleteButton": "Löschen",
       "weather": {
         "editHouseLabel": "Wähle ein Zuhause aus. Ich werde seine Breiten- und Längengrade verwenden, um das Wetter abzurufen.",

@@ -318,6 +318,7 @@
       "public": "public"
     },
     "editDashboardAddColumnButton": "Ajouter une colonne au tableau de bord",
+    "editDashboardAddSectionButton": "Ajouter une section",
     "editDashboardBoxNotEmpty": "Vous ne pouvez pas supprimer cette colonne car elle contient des widgets.",
     "editDashboardMyDashboards": "Mes tableaux de bord",
     "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
@@ -350,6 +351,7 @@
     },
     "boxes": {
       "column": "Colonne {{index}}",
+      "section": "Section {{index}}",
       "deleteButton": "Supprimer",
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",

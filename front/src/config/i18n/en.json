@@ -318,6 +318,7 @@
       "public": "public"
     },
     "editDashboardAddColumnButton": "Add a column on dashboard",
+    "editDashboardAddSectionButton": "Add a section",
     "editDashboardBoxNotEmpty": "You cannot delete this column as it contains widgets.",
     "editDashboardMyDashboards": "My dashboards",
     "editDashboardExplanation": "Each dashboard has 3 columns, which you can fill in according to your preferences. Click on the + button to add a new widget. You can move this widget by grabbing it and moving it around.",
@@ -350,6 +351,7 @@
     },
     "boxes": {
       "column": "Column {{index}}",
+      "section": "Section {{index}}",
       "deleteButton": "Delete",
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",

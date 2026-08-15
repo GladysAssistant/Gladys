@@ -21,6 +21,10 @@ describe('dashboard.create', () => {
     });
     expect(newDashboard).to.have.property('name', 'My new dashboard');
     expect(newDashboard).to.have.property('selector', 'my-new-dashboard');
+    // legacy column-based boxes are normalized to a single section on save
+    expect(newDashboard.get({ plain: true }).boxes).to.deep.equal([
+      { columns: [[{ type: DASHBOARD_BOX_TYPE.USER_PRESENCE }]] },
+    ]);
   });
   it('should return error, missing box type', async () => {
     const promise = dashboard.create('0cd30aef-9c4e-4a23-88e3-3547971296e5', {

@@ -118,7 +118,7 @@ class Dashboard extends Component {
         name: this.state.name,
         visibility: this.state.visibility,
         type: DASHBOARD_TYPE.MAIN,
-        boxes: [[], [], []]
+        boxes: [{ columns: [[], [], []] }]
       };
       const createDashboard = await this.props.httpClient.post('/api/v1/dashboard', newDashboard);
       this.setState({ loading: false, dashboardAlreadyExistError: false, unknownError: false });
