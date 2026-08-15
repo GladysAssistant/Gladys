@@ -1350,13 +1350,20 @@ async function getAllTools(userId) {
       config: {
         title: 'Get battery levels of devices',
         description:
-          'Get the current battery level, in percent, of the battery powered devices of the home. ' +
-          'Use it for every question about batteries: the level of one device, the levels of all of them, ' +
+          'Get the current battery level, in percent, of the battery powered devices of the home ' +
+          '(sensors, remotes, door sensors and the like, the ones whose batteries are replaced or recharged). ' +
+          'Use it for every question about their batteries: the level of one device, the levels of all of them, ' +
           'which batteries are low or have to be replaced. ' +
+          'It does not cover the battery of an electric vehicle nor a home energy storage battery, ' +
+          'which are separate device categories. ' +
           'Call it without any parameter to cover the whole home, or narrow it down with device or room. ' +
           'Results are sorted from the lowest level to the highest, so the batteries to replace come first. ' +
+          'When warning_threshold is present, it is the battery warning threshold configured in this Gladys, ' +
+          'in percent, and below_warning_threshold tells which levels are under it: use it as the meaning of ' +
+          '"low" and of "to be replaced" instead of deciding yourself. ' +
           'Devices that do not report a battery level are never part of the result: they are either mains ' +
-          'powered or their integration does not publish it, so do not report a level for them.',
+          'powered, or their integration only publishes a low battery alert instead of a level, ' +
+          'so do not report a level for them.',
         categories: [AI_CHAT_TOOL_CATEGORIES.DEVICE_QUERY, AI_CHAT_TOOL_CATEGORIES.OTHER],
         inputSchema: {
           device: z
@@ -1374,33 +1381,49 @@ async function getAllTools(userId) {
         let scopeLabel = '';
 
         // Same reasoning as device.get-state: the chat gateway calls this callback with
-        // the raw arguments of the model, which is not bound by the enums above.
+        // the raw arguments of the model, which is not bound by the enums above. "État
+        // des piles de la maison" makes it pass the house as a room, and the whole-home
+        // question is precisely the primary one for this tool.
         if (room && room !== '') {
           const selectedRoom = this.findBySimilarity(rooms, room);
 
-          if (!selectedRoom?.selector) {
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text:
-                    `device.get-battery-levels: "${room}" is not a room of this home, no battery level was read. ` +
-                    // "No room" is the sentinel holding the devices that were never assigned
-                    // to a room, not a room the model should be invited to retry with.
-                    `Available rooms: ${rooms
-                      .filter(({ selector }) => selector !== noRoom.selector)
-                      .map(({ name }) => name)
-                      .join(', ')}. ` +
-                    'Call this tool again with one of them, or without the room parameter to cover the whole home.',
-                },
-              ],
-            };
-          }
+          if (selectedRoom?.selector) {
+            selectedDevices = selectedDevices.filter(
+              (d) => (d.room?.selector || noRoom.selector) === selectedRoom.selector,
+            );
+            scopeLabel = ` in room "${selectedRoom.name}"`;
+          } else {
+            const selectedHouse = this.findBySimilarity(houses, room);
 
-          selectedDevices = selectedDevices.filter(
-            (d) => (d.room?.selector || noRoom.selector) === selectedRoom.selector,
-          );
-          scopeLabel = ` in room "${selectedRoom.name}"`;
+            if (selectedHouse?.id) {
+              // A house is the whole home, not a room: keep every battery device of its
+              // rooms, plus the devices that are not assigned to a room.
+              const houseRoomSelectors = rooms
+                .filter((r) => r.house_id === selectedHouse.id)
+                .map(({ selector }) => selector);
+              selectedDevices = selectedDevices.filter(
+                (d) => !d.room?.selector || houseRoomSelectors.includes(d.room.selector),
+              );
+              scopeLabel = ` in house "${selectedHouse.name}"`;
+            } else {
+              return {
+                content: [
+                  {
+                    type: 'text',
+                    text:
+                      `device.get-battery-levels: "${room}" is not a room of this home, no battery level was read. ` +
+                      // "No room" is the sentinel holding the devices that were never assigned
+                      // to a room, not a room the model should be invited to retry with.
+                      `Available rooms: ${rooms
+                        .filter(({ selector }) => selector !== noRoom.selector)
+                        .map(({ name }) => name)
+                        .join(', ')}. ` +
+                      'Call this tool again with one of them, or without the room parameter to cover the whole home.',
+                  },
+                ],
+              };
+            }
+          }
         }
 
         if (device && device !== '') {
@@ -1440,6 +1463,15 @@ async function getAllTools(userId) {
           };
         }
 
+        // "Which batteries are low" already has an answer in Gladys: the threshold of the
+        // battery warning of this instance, used by device.checkBatteries and the weekly
+        // digest. Surface it so the model does not invent its own meaning of "low".
+        const configuredThreshold = await this.gladys.variable.getValue(
+          SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD,
+        );
+        const warningThreshold = Number.parseFloat(configuredThreshold);
+        const hasWarningThreshold = Number.isFinite(warningThreshold);
+
         const batteryLevels = [];
 
         await Promise.all(
@@ -1448,13 +1480,19 @@ async function getAllTools(userId) {
 
             d.features.forEach((feature) => {
               const featureLastState = deviceLastState.features.find((feat) => feat.id === feature.id);
+              const formattedValue = this.formatValue(featureLastState);
 
               batteryLevels.push({
                 room: d.room?.name || noRoom.name,
                 device: d.name,
                 feature: featureLastState.name,
                 category: featureLastState.category,
-                ...this.formatValue(featureLastState),
+                ...formattedValue,
+                // Only a level that exists can be compared to the threshold: a device that
+                // never reported one is neither below nor above it.
+                ...(hasWarningThreshold && typeof formattedValue.value === 'number'
+                  ? { below_warning_threshold: formattedValue.value < warningThreshold }
+                  : {}),
               });
             });
           }),
@@ -1481,7 +1519,10 @@ async function getAllTools(userId) {
           content: [
             {
               type: 'text',
-              text: this.toon(batteryLevels),
+              text: this.toon({
+                ...(hasWarningThreshold ? { warning_threshold: warningThreshold } : {}),
+                batteries: batteryLevels,
+              }),
             },
           ],
         };

@@ -1683,9 +1683,9 @@ describe('build schemas', () => {
 
   const buildBatteryMcpHandler = () => {
     const rooms = [
-      { id: 'room-1', name: 'Salon', selector: 'salon' },
-      { id: 'room-2', name: 'Chambre', selector: 'chambre' },
-      { id: 'room-3', name: 'Cuisine', selector: 'cuisine' },
+      { id: 'room-1', name: 'Salon', selector: 'salon', house_id: 'house-1' },
+      { id: 'room-2', name: 'Chambre', selector: 'chambre', house_id: 'house-1' },
+      { id: 'room-3', name: 'Cuisine', selector: 'cuisine', house_id: 'house-1' },
     ];
 
     const devices = [
@@ -1861,7 +1861,10 @@ describe('build schemas', () => {
     // and the devices that never reported a level at the end.
     const allBatteriesResult = await batteryTool.cb({});
     expect(allBatteriesResult.content[0].text).to.eq('toonmockdata');
-    expect(mcpHandler.toon.firstCall.args[0]).to.deep.equal([
+    // No battery warning threshold configured in this instance: no threshold is
+    // exposed, and no level is flagged as below it.
+    expect(Object.keys(mcpHandler.toon.firstCall.args[0])).to.deep.equal(['batteries']);
+    expect(mcpHandler.toon.firstCall.args[0].batteries).to.deep.equal([
       {
         room: 'Chambre',
         device: 'Capteur porte chambre',
@@ -1919,7 +1922,7 @@ describe('build schemas', () => {
     // "quel est l'état de la pile du capteur température salon"
     const singleDeviceResult = await batteryTool.cb({ device: 'Capteur température salon' });
     expect(singleDeviceResult.content[0].text).to.eq('toonmockdata');
-    expect(mcpHandler.toon.firstCall.args[0]).to.deep.equal([
+    expect(mcpHandler.toon.firstCall.args[0].batteries).to.deep.equal([
       {
         room: 'Salon',
         device: 'Capteur température salon',
@@ -1935,9 +1938,57 @@ describe('build schemas', () => {
 
     const roomResult = await batteryTool.cb({ room: 'Chambre' });
     expect(roomResult.content[0].text).to.eq('toonmockdata');
-    expect(mcpHandler.toon.firstCall.args[0].map(({ device, value }) => ({ device, value }))).to.deep.equal([
+    expect(mcpHandler.toon.firstCall.args[0].batteries.map(({ device, value }) => ({ device, value }))).to.deep.equal([
       { device: 'Capteur porte chambre', value: 12 },
       { device: 'Télécommande chambre', value: null },
+    ]);
+  });
+
+  it('should read device.get-battery-levels of a whole house passed as a room', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+    // The chat gateway calls the tool with the raw arguments of the model, which is not
+    // bound by the room enum: "l'état des piles de la maison" passes the house name.
+    mcpHandler.gladys.house.get = stub().resolves([{ id: 'house-1', name: 'Maison', selector: 'maison' }]);
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    const houseResult = await batteryTool.cb({ room: 'Maison' });
+    expect(houseResult.content[0].text).to.eq('toonmockdata');
+    // Every battery of the rooms of that house, plus the device without a room.
+    expect(mcpHandler.toon.firstCall.args[0].batteries.map(({ device }) => device)).to.deep.equal([
+      'Capteur porte chambre',
+      'Capteur humidité salon',
+      'Capteur température salon',
+      'Détecteur de fumée',
+      'Télécommande chambre',
+    ]);
+  });
+
+  it('should flag device.get-battery-levels levels below the battery warning threshold', async () => {
+    const mcpHandler = buildBatteryMcpHandler();
+    mcpHandler.gladys.variable.getValue = stub().resolves('20');
+
+    const tools = await mcpHandler.getAllTools();
+    const batteryTool = tools.find((tool) => tool.intent === 'device.get-battery-levels');
+
+    const allBatteriesResult = await batteryTool.cb({});
+    expect(allBatteriesResult.content[0].text).to.eq('toonmockdata');
+    expect(mcpHandler.gladys.variable.getValue.firstCall.args[0]).to.eq('DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD');
+    expect(mcpHandler.toon.firstCall.args[0].warning_threshold).to.eq(20);
+    // A device that never reported a level is neither below nor above the threshold.
+    expect(
+      mcpHandler.toon.firstCall.args[0].batteries.map(({ device, value, below_warning_threshold: below }) => ({
+        device,
+        value,
+        below,
+      })),
+    ).to.deep.equal([
+      { device: 'Capteur porte chambre', value: 12, below: true },
+      { device: 'Capteur humidité salon', value: 50, below: false },
+      { device: 'Capteur température salon', value: 87, below: false },
+      { device: 'Détecteur de fumée', value: null, below: undefined },
+      { device: 'Télécommande chambre', value: null, below: undefined },
     ]);
   });
 
