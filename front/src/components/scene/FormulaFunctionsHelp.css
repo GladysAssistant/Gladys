@@ -1,0 +1,14 @@
+/* Kept smaller and dimmer than the explanation text above it: this is a reference list the
+   user only scans when writing a formula, it must not compete with the input itself. */
+.formulaHelp {
+  font-size: 11px;
+  line-height: 1.5;
+  opacity: .75;
+  margin-bottom: .375rem;
+}
+
+.formulaHelp code {
+  background: none;
+  padding: 0;
+  word-break: break-word;
+}

@@ -1,22 +1,6 @@
 const Promise = require('bluebird');
 const Handlebars = require('handlebars');
 const cloneDeep = require('lodash.clonedeep');
-const {
-  create,
-  addDependencies,
-  divideDependencies,
-  evaluateDependencies,
-  largerDependencies,
-  largerEqDependencies,
-  modDependencies,
-  multiplyDependencies,
-  roundDependencies,
-  smallerDependencies,
-  smallerEqDependencies,
-  subtractDependencies,
-  unaryMinusDependencies,
-  randomDependencies,
-} = require('mathjs');
 const set = require('set-value');
 const get = require('get-value');
 const dayjs = require('dayjs');
@@ -30,29 +14,10 @@ const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
 const executeActionsFactory = require('./scene.executeActions');
+const { evaluate } = require('./scene.formula');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-
-// Every operator the formula engine supports must be listed explicitly here.
-// mathjs only exposes in the "math" namespace what is passed to create(), so an operator
-// that is only pulled in transitively by another factory (multiply through divide, for example)
-// is not guaranteed to stay available across mathjs releases.
-const { evaluate } = create({
-  addDependencies,
-  divideDependencies,
-  evaluateDependencies,
-  largerDependencies,
-  smallerDependencies,
-  largerEqDependencies,
-  modDependencies,
-  multiplyDependencies,
-  smallerEqDependencies,
-  subtractDependencies,
-  unaryMinusDependencies,
-  roundDependencies,
-  randomDependencies,
-});
 
 // Safety limits for the "while" loop action
 const WHILE_DEFAULT_MAX_ITERATIONS = 1000;
@@ -112,11 +77,20 @@ const actionsFunc = {
     }
 
     if (action.evaluate_value !== undefined) {
-      value = evaluate(
-        Handlebars.compile(action.evaluate_value, {
-          noEscape: true,
-        })(scope).replace(/\s/g, ''),
-      );
+      // A formula which cannot be evaluated (unknown function, wrong number of arguments)
+      // must not let the scene continue with the previous value: like the other formula
+      // actions, we abort the scene.
+      try {
+        value = evaluate(
+          Handlebars.compile(action.evaluate_value, {
+            noEscape: true,
+          })(scope).replace(/\s/g, ''),
+        );
+      } catch (e) {
+        logger.warn(`Device set value: Error evaluating value: ${action.evaluate_value}`);
+        logger.warn(e);
+        throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+      }
     }
 
     if (Number.isNaN(Number(value))) {

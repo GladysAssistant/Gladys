@@ -3091,6 +3091,12 @@
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
     "actionsCard": {
+      "formulaHelp": {
+        "operators": "Available operators:",
+        "functions": "Available functions:",
+        "constants": "Available constants:",
+        "example": "A function takes its arguments between parenthesis, separated by commas. Ex: round(min(100, 3 * 45) / 2)"
+      },
       "delay": {
         "label": " This block will wait the specified duration.",
         "inputPlaceholder": "Duration",

@@ -3091,6 +3091,12 @@
     "addNewTriggerButton": "Auslöser hinzufügen",
     "saveSceneError": "Beim Sichern deiner Szene ist ein Fehler aufgetreten. Bitte überprüfe, ob alle Aktionen/Auslöser ausgefüllt und korrekt sind.",
     "actionsCard": {
+      "formulaHelp": {
+        "operators": "Verfügbare Operatoren:",
+        "functions": "Verfügbare Funktionen:",
+        "constants": "Verfügbare Konstanten:",
+        "example": "Eine Funktion nimmt ihre Argumente in Klammern, durch Kommas getrennt. Z.B.: round(min(100, 3 * 45) / 2)"
+      },
       "delay": {
         "label": " Dieser Block wartet für die angegebene Dauer.",
         "inputPlaceholder": "Dauer",

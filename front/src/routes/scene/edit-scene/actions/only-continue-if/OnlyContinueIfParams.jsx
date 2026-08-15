@@ -5,6 +5,7 @@ import update from 'immutability-helper';
 import get from 'get-value';
 
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
+import FormulaFunctionsHelp from '../../../../../components/scene/FormulaFunctionsHelp';
 
 import { isVariableAvailableAtThisPath, convertPathToText } from '../../sceneUtils';
 
@@ -73,6 +74,9 @@ class OnlyContinueIf extends Component {
           </div>
           <div class="mt-2">
             <Text id="editScene.actionsCard.onlyContinueIf.explanationText" />
+          </div>
+          <div class="mt-2">
+            <FormulaFunctionsHelp />
           </div>
         </div>
         {props.action.conditions &&
