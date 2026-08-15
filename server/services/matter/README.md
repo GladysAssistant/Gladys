@@ -25,7 +25,7 @@ The **Gladys feature** column lists matching `category/type` pairs from `server/
 | `AudioOutput` | This cluster provides an interface for controlling the Output on a Video Player device such as a TV. | No | television/volume (easy) | Not explicitly handled in `server/services/matter`. |
 | `BasicInformation` | This cluster provides attributes and events for determining basic information about Nodes, which supports both Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number, which apply to the whole Node. | Yes | device metadata (vendor, product, serial) | Used to populate device vendor/product identity and onboarding params (via Matter node basic information). |
 | `Binding` | Defines bindings between local endpoints and remote targets so commands and reports can be routed automatically. | No | — | Not explicitly handled in `server/services/matter`. |
-| `BooleanState` | This cluster provides an interface to a boolean state. | Yes | switch/binary | Binary state, read-only. |
+| `BooleanState` | This cluster provides an interface to a boolean state. | Yes | leak-sensor/binary, opening-sensor/binary, rain-sensor/binary, switch/binary | Binary state, read-only. The Gladys category depends on the Matter device type of the endpoint, see [BooleanState device types](#booleanstate-device-types). |
 | `BooleanStateConfiguration` | This cluster is used to configure a boolean sensor, including optional state change alarm features and configuration of the sensitivity level associated with the sensor. | No | — | Not explicitly handled in `server/services/matter`. |
 | `BridgedDeviceBasicInformation` | This cluster provides attributes and events for determining basic information about Bridged Nodes. | Yes | device metadata (bridged endpoint) | Used to populate bridged endpoint metadata (vendorName/nodeLabel/productLabel/productName/uniqueId/serialNumber). |
 | `CameraAvSettingsUserLevelManagement` | This cluster provides an interface into controls associated with the operation of a camera that provides pan, tilt, and zoom functions, either mechanically, or against a digital image. | No | — | Not explicitly handled in `server/services/matter`. |
@@ -146,6 +146,30 @@ The **Gladys feature** column lists matching `category/type` pairs from `server/
 | `WiFiNetworkManagement` | This cluster provides an interface for getting information about the Wi-Fi network that a Network Infrastructure Manager device type provides. | No | — | Not explicitly handled in `server/services/matter`. |
 | `WindowCovering` | The window covering cluster provides an interface for controlling and adjusting automatic window coverings such as drapery motors, automatic shades, curtains and blinds. | Yes | shutter/position, shutter/state | Position + open/close/stop commands. |
 | `ZoneManagement` | This cluster provides an interface to manage regions of interest, or Zones, which can be either manufacturer or user defined. | No | — | Not explicitly handled in `server/services/matter`. |
+
+## BooleanState device types
+
+The `BooleanState` cluster only exposes a raw `StateValue` boolean, without saying what that boolean
+means. Matter distinguishes the sensors built on top of it through the **device type** of the
+endpoint (read with `endpoint.getDeviceTypes()`), so Gladys uses that device type to pick the right
+category. The mapping lives in `server/services/matter/utils/booleanStateMatterMapping.js`.
+
+| Matter device type | ID | Gladys feature | `StateValue = true` | `StateValue = false` |
+| --- | --- | --- | --- | --- |
+| Water Leak Detector | `0x0043` | `leak-sensor/binary` | `1` — leak detected | `0` — no leak |
+| Contact Sensor | `0x0015` | `opening-sensor/binary` | `1` — closed (`OPENING_SENSOR_STATE.CLOSE`) | `0` — open (`OPENING_SENSOR_STATE.OPEN`) |
+| Rain Sensor | `0x0044` | `rain-sensor/binary` | `1` — rain detected | `0` — no rain |
+| Water Freeze Detector | `0x0041` | `switch/binary` (fallback) | `1` — freeze detected | `0` — no freeze |
+| Any other / unknown device type | — | `switch/binary` (fallback) | `1` | `0` |
+
+The polarity is the same for every mapped device type (`StateValue ? 1 : 0`), so
+`matter.listenToStateChange` and `matter.readInitialDeviceStates` emit the raw boolean as
+`STATE.ON` / `STATE.OFF` for all of them.
+
+The Water Freeze Detector device type keeps the generic read-only switch feature because Gladys has
+no frost/freeze category yet. The generic `switch/binary` fallback is also what any endpoint with an
+unknown (or vendor-specific) device type gets, so devices paired before this mapping existed keep
+working.
 
 ## How the percentage is calculated
 
