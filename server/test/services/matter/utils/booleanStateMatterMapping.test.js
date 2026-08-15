@@ -41,11 +41,13 @@ describe('Matter booleanStateMatterMapping', () => {
     });
   });
 
-  it('should find the known device type among several device types', () => {
+  it('should find the known device type among several device types, on a bridged endpoint', () => {
+    // A leak detector behind a Thread/Matter bridge (IKEA Klippbox behind an Aqara M100) declares
+    // the Bridged Node device type (0x0013) first, before its own Water Leak Detector device type.
     const device = {
       getDeviceTypes: () => [
         null,
-        { name: 'MA-powersource', code: 0x0011 },
+        { name: 'MA-bridgednode', code: 0x0013 },
         { name: 'MA-waterleakdetector', code: MATTER_DEVICE_TYPE.WATER_LEAK_DETECTOR },
       ],
     };

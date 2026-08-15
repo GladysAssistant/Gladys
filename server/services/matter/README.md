@@ -171,6 +171,15 @@ no frost/freeze category yet. The generic `switch/binary` fallback is also what 
 unknown (or vendor-specific) device type gets, so devices paired before this mapping existed keep
 working.
 
+**Devices already saved in Gladys are not remapped.** The category is only computed at discovery
+time, and the paired-device filter of the Matter integration (`compareDevices` in
+`front/src/routes/integration/all/matter/MatterDevices.jsx`) matches a discovered device with an
+existing one on the feature `external_id`, unit and params — not on the category or the type. None
+of those change here, so a leak detector already stored as `switch/binary` is still considered
+already paired and is not offered again: refreshing the discovery page does **not** remap it. The
+only upgrade path is to delete the device in Gladys and add it again, which resets the history
+selectors and the scenes referencing its features.
+
 ## How the percentage is calculated
 
 `26 / 132 = 19.7%`
