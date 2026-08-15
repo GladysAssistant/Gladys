@@ -26,6 +26,21 @@ const insertSqliteStates = async () => {
   ]);
 };
 
+const insertSqliteStateAggregates = async () => {
+  const queryInterface = db.sequelize.getQueryInterface();
+  const date = new Date();
+  await queryInterface.bulkInsert('t_device_feature_state_aggregate', [
+    {
+      id: uuid.v4(),
+      type: 'hourly',
+      device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+      value: 12,
+      created_at: date,
+      updated_at: date,
+    },
+  ]);
+};
+
 describe('Device.getDuckDbMigrationState', () => {
   it('should return migration not done', async () => {
     const stateManager = new StateManager(event);
@@ -65,6 +80,18 @@ describe('Device.getDuckDbMigrationState', () => {
     const migrationState = await device.getDuckDbMigrationState();
     expect(migrationState).to.have.property('is_duck_db_migrated', true);
     expect(migrationState).to.have.property('sqlite_db_device_state_count', 1);
+    expect(migrationState).to.have.property('is_migration_needed', true);
+  });
+  it('should return that a migration is needed when only aggregates remain in SQLite', async () => {
+    await insertSqliteStateAggregates();
+    const stateManager = new StateManager(event);
+    const variable = {
+      getValue: fake.resolves('true'),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const migrationState = await device.getDuckDbMigrationState();
+    expect(migrationState).to.have.property('is_duck_db_migrated', true);
+    expect(migrationState).to.have.property('sqlite_db_device_state_count', 0);
     expect(migrationState).to.have.property('is_migration_needed', true);
   });
 });

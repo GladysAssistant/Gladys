@@ -88,7 +88,8 @@ class SettingsSystemDuckDbMigration extends Component {
   render({}, { loading, migrationState, migrationStateLoaded, confirmRestartingMigration, confirmPurgingSQlite }) {
     // Nothing is displayed until we know if there is still something to migrate,
     // and the card is hidden for good once the legacy SQLite states are all gone.
-    if (!migrationStateLoaded || (migrationState && !migrationState.is_migration_needed)) {
+    // If the request failed, migrationState is unset: the card stays hidden as well.
+    if (!migrationStateLoaded || !migrationState || !migrationState.is_migration_needed) {
       return null;
     }
     return (
