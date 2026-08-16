@@ -6,7 +6,7 @@ import { route } from 'preact-router';
 import IntegrationPage from './IntegrationPage';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import normalizeSearchText from '../../utils/normalizeSearchText';
-import { USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
+import { SERVICE_STATUS, USER_ROLE, WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import debounce from 'debounce';
 import { integrations, catalogCategories } from '../../config/integrations';
 import { getLocalizedText } from './all/external-integration/utils';
@@ -21,7 +21,7 @@ const HIDDEN_INTEGRATIONS_FOR_NON_ADMIN_USERS = ['homekit'];
 // cross-cutting views: they are not browse categories, they filter the whole
 // catalog (a favorite, or an integration with a pending update, can be of any
 // category) — so no category filter must be applied to them
-const VIRTUAL_CATEGORIES = ['favorites', 'updates'];
+const VIRTUAL_CATEGORIES = ['favorites', 'updates', 'installed'];
 // a category earns its sidebar entry with enough visible integrations
 // (spec §5): below the bar it stays routable by URL and its integrations
 // remain reachable through "All", the search and the favorites
@@ -35,6 +35,20 @@ const NEW_BADGE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 const getFirstSeenTimestamp = card => {
   const timestamp = card.firstSeenAt ? Date.parse(card.firstSeenAt) : NaN;
   return Number.isNaN(timestamp) ? 0 : timestamp;
+};
+
+// Breakdown of the live states of the installed community integrations
+// ({ RUNNING: 3, ERROR: 1 }), feeding the summary of the "Installed" view.
+// An installed integration whose status is not known yet is counted as
+// UNKNOWN — a state of the supervisor's model — rather than dropped: the
+// total of the breakdown must always match the number of installed cards.
+const countInstalledByStatus = installedIntegrations => {
+  const counts = {};
+  installedIntegrations.forEach(integration => {
+    const status = integration.status || SERVICE_STATUS.UNKNOWN;
+    counts[status] = (counts[status] || 0) + 1;
+  });
+  return counts;
 };
 
 class Integration extends Component {
@@ -396,6 +410,14 @@ class Integration extends Component {
       selectedIntegrations = selectedIntegrations.filter(integration => integration.updateAvailable);
     }
 
+    // If we are in the installed view, only display what actually runs on this
+    // instance: the community integrations installed here. Native integrations
+    // ship with Gladys and are never "installed on the instance", so they have
+    // no place in this inventory
+    if (category === 'installed') {
+      selectedIntegrations = selectedIntegrations.filter(integration => integration.externalInstalled);
+    }
+
     // the facets (spec §4) are technical attributes, orthogonal to the browse
     // categories: cumulative filters that define the view, like the category
     if (origin === 'native') {
@@ -461,6 +483,12 @@ class Integration extends Component {
     // cards being displayed: it must stay the same in every category
     const integrationsToUpdate = this.countIntegrationsToUpdate();
 
+    // same rule for the inventory of what runs on this instance: it is read
+    // from the whole catalog visible to this user, so the menu entry and the
+    // summary keep saying the same thing whatever category, facet or search
+    // is currently applied
+    const installedIntegrations = catalog.filter(integration => integration.externalInstalled);
+
     // the integration pages send the user back here: this runs on mount and on
     // every filter change, so the remembered view is always the current one
     rememberCatalogUrl(getCatalogUrl({ category, searchKeyword, orderDir, origin, transports, gladysPlus }));
@@ -470,6 +498,8 @@ class Integration extends Component {
       totalSize,
       integrationCategories,
       integrationsToUpdate,
+      installedIntegrationsCount: installedIntegrations.length,
+      installedStatusCounts: countInstalledByStatus(installedIntegrations),
       searchKeyword,
       orderDir
     });

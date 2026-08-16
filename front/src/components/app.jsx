@@ -271,6 +271,7 @@ const AppRouter = connect(
 
         <IntegrationPage path="/dashboard/integration/favorites" category="favorites" />
         <IntegrationPage path="/dashboard/integration/updates" category="updates" />
+        <IntegrationPage path="/dashboard/integration/installed" category="installed" />
         {/* browse categories of the catalog (docs/specs/integration-catalog-categories.md):
             display metadata decoupled from the technical `type` still carried
             by the integration page URLs right below */}

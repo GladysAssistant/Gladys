@@ -3,6 +3,7 @@ import IntegrationMenu, { IntegrationMenuMobile } from './IntegrationMenu';
 import IntegrationCategory, { IntegrationListItem } from './IntegrationCategory';
 import IntegrationFacets from './IntegrationFacets';
 import IntegrationPageHeader from './IntegrationPageHeader';
+import InstalledIntegrationsSummary from './InstalledIntegrationsSummary';
 import StoreRefreshFooter from './all/external-integration/store-refresh/StoreRefreshFooter';
 import style from './style.css';
 
@@ -22,6 +23,8 @@ const IntegrationPage = ({
   refreshStoreStatus,
   refreshStoreStale,
   integrationsToUpdate,
+  installedIntegrationsCount,
+  installedStatusCounts,
   category,
   origin,
   transports,
@@ -47,6 +50,7 @@ const IntegrationPage = ({
             <IntegrationMenuMobile
               integrationCategories={integrationCategories}
               integrationsToUpdate={integrationsToUpdate}
+              installedIntegrationsCount={installedIntegrationsCount}
               category={category}
             />
             <IntegrationFacets
@@ -68,16 +72,28 @@ const IntegrationPage = ({
                 <IntegrationMenu
                   integrationCategories={integrationCategories}
                   integrationsToUpdate={integrationsToUpdate}
+                  installedIntegrationsCount={installedIntegrationsCount}
                   category={category}
                 />
               </div>
               <div class="col-lg-9">
+                {/* the "Installed" view is the inventory of what runs on this
+                    instance: it opens on the live state breakdown, and every
+                    card wears its status badge — including the nominal ones,
+                    hidden everywhere else in the catalog */}
+                {category === 'installed' && installedIntegrationsCount > 0 && (
+                  <InstalledIntegrationsSummary
+                    installedIntegrationsCount={installedIntegrationsCount}
+                    installedStatusCounts={installedStatusCounts}
+                  />
+                )}
                 <div class={`list-group list-group-flush ${style.mobileList}`}>
                   {integrations.map(integration => (
                     <IntegrationListItem
                       key={integration.key}
                       integration={integration}
                       toggleFavorite={toggleFavorite}
+                      alwaysShowStatus={category === 'installed'}
                     />
                   ))}
                 </div>
@@ -88,6 +104,7 @@ const IntegrationPage = ({
                         key={integration.key}
                         integration={integration}
                         toggleFavorite={toggleFavorite}
+                        alwaysShowStatus={category === 'installed'}
                       />
                     ))}
                   </div>
@@ -103,6 +120,8 @@ const IntegrationPage = ({
                       </div>
                     ) : category === 'updates' ? (
                       <Text id="integration.root.allIntegrationsUpToDate" />
+                    ) : category === 'installed' ? (
+                      <Text id="integration.root.noInstalledIntegrations" />
                     ) : (
                       <Text id="integration.root.noIntegrations" />
                     )}
