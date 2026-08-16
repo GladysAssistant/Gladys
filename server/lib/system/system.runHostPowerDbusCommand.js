@@ -45,7 +45,7 @@ function buildDbusArgv(method) {
 
 /**
  * @description Run the command directly (Gladys runs on the host, not in Docker).
- * @param {string} method - logind Manager method.
+ * @param {string} method - Method name on the logind Manager interface.
  * @returns {Promise<string>} Resolve with the command stdout.
  * @example
  * await runLocal('CanReboot');
@@ -61,7 +61,7 @@ async function runLocal(method) {
  * into the helper, so we can reach systemd-logind even though the Gladys
  * container itself has no /run/dbus mount. Uses the Gladys image (ships
  * dbus-send) so nothing needs to be pulled.
- * @param {string} method - logind Manager method.
+ * @param {string} method - Method name on the logind Manager interface.
  * @returns {Promise<string>} Resolve with the container output (dbus-send reply).
  * @example
  * await runViaHelperContainer('Reboot');
