@@ -601,6 +601,8 @@ const EVENTS = {
     CHECK_ALERTS: 'weather.check-alerts',
     ALERT_RAISED: 'weather.alert-raised',
     ALERT_ENDED: 'weather.alert-ended',
+    CHECK_TRIGGERS: 'weather.check-triggers',
+    MATCHED: 'weather.matched',
   },
   EXTERNAL_INTEGRATION: {
     STATUS_CHANGED: 'external-integration.status-changed',
@@ -1504,6 +1506,18 @@ const WEATHER_UNITS = {
   METRIC: 'metric',
 };
 
+// The pivot weather properties a "weather" scene trigger can watch. The
+// core always polls the provider in metric units, so the compared values
+// are: °C for the temperature, km/h for the wind speed (the pivot carries
+// m/s, the trigger converts it like the dashboard widget does), % for the
+// humidity and the pivot condition enum for the condition.
+const WEATHER_TRIGGER_FIELDS = {
+  TEMPERATURE: 'temperature',
+  WIND_SPEED: 'wind_speed',
+  HUMIDITY: 'humidity',
+  CONDITION: 'condition',
+};
+
 const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: [
     DEVICE_FEATURE_UNITS.AMPERE,
@@ -2246,6 +2260,8 @@ module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
 
 module.exports.WEATHER_UNITS = WEATHER_UNITS;
+module.exports.WEATHER_TRIGGER_FIELDS = WEATHER_TRIGGER_FIELDS;
+module.exports.WEATHER_TRIGGER_FIELDS_LIST = createList(WEATHER_TRIGGER_FIELDS);
 
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES = DEVICE_FEATURE_STATE_AGGREGATE_TYPES;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST;

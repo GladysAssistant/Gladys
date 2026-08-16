@@ -1,7 +1,7 @@
 const cloneDeep = require('lodash.clonedeep');
 
 const logger = require('../../utils/logger');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, WEATHER_TRIGGER_FIELDS } = require('../../utils/constants');
 const { compare } = require('../../utils/compare');
 
 const matchSunEvent = (self, sceneSelector, event, trigger) =>
@@ -24,6 +24,56 @@ const matchWeatherAlert = (self, sceneSelector, event, trigger) =>
     event.alert.type === trigger.weather_alert_type) &&
   WEATHER_ALERT_SEVERITY_RANK[event.alert.severity] >=
     (WEATHER_ALERT_SEVERITY_RANK[trigger.weather_alert_severity] || 1);
+
+// How each watched property of a weather trigger is read in a pivot
+// weather payload. The core always polls in metric units, so the compared
+// values are °C, % and the pivot condition enum as-is. The pivot wind
+// speed is in m/s: it is converted to km/h, the unit the dashboard widget
+// displays and the one users configure their scenes with.
+const WEATHER_TRIGGER_VALUE_GETTERS = {
+  [WEATHER_TRIGGER_FIELDS.TEMPERATURE]: (weather) => weather.temperature,
+  [WEATHER_TRIGGER_FIELDS.HUMIDITY]: (weather) => weather.humidity,
+  [WEATHER_TRIGGER_FIELDS.WIND_SPEED]: (weather) =>
+    typeof weather.wind_speed === 'number' ? weather.wind_speed * 3.6 : undefined,
+  [WEATHER_TRIGGER_FIELDS.CONDITION]: (weather) => weather.weather,
+};
+
+// undefined when there is no payload (first poll of the house) or when the
+// provider does not expose the watched property (everything but the
+// temperature and the condition is optional in the pivot format)
+const getWeatherTriggerValue = (weather, field) => {
+  const getter = WEATHER_TRIGGER_VALUE_GETTERS[field];
+  if (weather === undefined || weather === null || getter === undefined) {
+    return undefined;
+  }
+  return getter(weather);
+};
+
+// Same house, and the watched property matches the rule *now* while it did
+// not at the previous poll: the trigger is a transition, so a scene does
+// not re-run every poll for as long as it keeps raining. The event carries
+// both payloads, so the matcher stays stateless and editing a scene never
+// resets anything.
+const matchWeather = (self, sceneSelector, event, trigger) => {
+  if (event.house !== trigger.house) {
+    return false;
+  }
+  // the condition is compared as a string of the pivot enum, everything
+  // else as a number — a value left empty in the UI never matches
+  const isCondition = trigger.weather_field === WEATHER_TRIGGER_FIELDS.CONDITION;
+  const expectedValue = isCondition ? trigger.value : Number(trigger.value);
+  if (!isCondition && Number.isNaN(expectedValue)) {
+    return false;
+  }
+  const currentValue = getWeatherTriggerValue(event.weather, trigger.weather_field);
+  if (currentValue === undefined || currentValue === null) {
+    return false;
+  }
+  const previousValue = getWeatherTriggerValue(event.previous_weather, trigger.weather_field);
+  const previousValueValidateRule =
+    previousValue !== undefined && previousValue !== null && compare(trigger.operator, previousValue, expectedValue);
+  return compare(trigger.operator, currentValue, expectedValue) && !previousValueValidateRule;
+};
 
 const triggersFunc = {
   [EVENTS.DEVICE.NEW_STATE]: (self, sceneSelector, event, trigger) => {
@@ -134,6 +184,7 @@ const triggersFunc = {
     event.topic === trigger.topic && (!trigger.message || trigger.message === event.message),
   [EVENTS.WEATHER.ALERT_RAISED]: matchWeatherAlert,
   [EVENTS.WEATHER.ALERT_ENDED]: matchWeatherAlert,
+  [EVENTS.WEATHER.MATCHED]: matchWeather,
 };
 
 module.exports = {

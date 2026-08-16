@@ -36,6 +36,11 @@ const jobs = [
     rule: '0 */30 * * * *', // every 30 minutes
     event: EVENTS.WEATHER.CHECK_ALERTS,
   },
+  {
+    name: 'check-weather-triggers',
+    rule: '0 */15 * * * *', // every 15 minutes
+    event: EVENTS.WEATHER.CHECK_TRIGGERS,
+  },
 ];
 
 module.exports = jobs;

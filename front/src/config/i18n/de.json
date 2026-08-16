@@ -3512,7 +3512,8 @@
       },
       "weather": {
         "alert-raised": "Wetterwarnung ausgelöst",
-        "alert-ended": "Wetterwarnung beendet"
+        "alert-ended": "Wetterwarnung beendet",
+        "matched": "Wetter"
       }
     },
     "triggersCard": {
@@ -3645,6 +3646,22 @@
           "severe": "Schwer (orange)",
           "extreme": "Extrem (rot)"
         }
+      },
+      "weather": {
+        "description": "Dieser Auslöser wird ausgelöst, sobald das Wetter des ausgewählten Hauses die untenstehende Regel erfüllt. Das Wetter wird alle 15 Minuten geprüft: Die Szene wird nur beim Wechsel ausgeführt und startet daher nicht erneut, solange die Regel weiterhin zutrifft.",
+        "houseLabel": "Haus",
+        "fieldLabel": "Wetterwert",
+        "fields": {
+          "temperature": "Temperatur",
+          "wind_speed": "Windgeschwindigkeit",
+          "humidity": "Luftfeuchtigkeit",
+          "condition": "Wetterlage"
+        },
+        "operatorLabel": "Operator",
+        "valueLabel": "Wert",
+        "unitTemperature": "°C",
+        "unitWindSpeed": "km/h",
+        "unitHumidity": "%"
       }
     }
   },
