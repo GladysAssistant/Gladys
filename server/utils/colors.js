@@ -216,6 +216,50 @@ function xyToInt(x, y) {
 }
 
 /**
+ * @description Gamma correction applied when converting a sRGB channel to linear RGB.
+ * @param {number} value - Color channel between 0 and 1.
+ * @returns {number} GammaCorrectedValue - Linear color channel between 0 and 1.
+ * @example
+ * const value = getGammaCorrectedValue(0.5);
+ * console.log(value === 0.21404114048223255);
+ */
+function getGammaCorrectedValue(value) {
+  return value > 0.04045 ? ((value + 0.055) / (1.0 + 0.055)) ** 2.4 : value / 12.92;
+}
+
+/**
+ * @description Converts an int color to XY color (CIE 1931 color space).
+ * This is the reverse conversion of `xyToInt`.
+ * @param {number} intColor - Color between 0 and 16777215.
+ * @returns {object} Object with x and y properties, both between 0 and 1.
+ * @example
+ * const { x, y } = intToXy(16711680);
+ * console.log(x === 0.7006);
+ */
+function intToXy(intColor) {
+  const [red, green, blue] = intToRgb(intColor);
+
+  // Convert the sRGB values to linear RGB
+  const r = getGammaCorrectedValue(red / 255);
+  const g = getGammaCorrectedValue(green / 255);
+  const b = getGammaCorrectedValue(blue / 255);
+
+  // Convert to XYZ using the Wide RGB D50 conversion (inverse matrix of the one used in xyToInt)
+  const X = r * 0.664511 + g * 0.154324 + b * 0.162028;
+  const Y = r * 0.283881 + g * 0.668433 + b * 0.047685;
+  const Z = r * 0.000088 + g * 0.07231 + b * 0.986039;
+
+  const sum = X + Y + Z;
+
+  // Black has no chromaticity, we return 0,0 to avoid a division by zero
+  if (sum === 0) {
+    return { x: 0, y: 0 };
+  }
+
+  return { x: X / sum, y: Y / sum };
+}
+
+/**
  * @description Converts int color to HSB (Hue, Saturation, Brightness).
  * @param {number} intColor - Color between 0 and 16777215.
  * @returns {Array} [hue, saturation, brightness] - Hue (0-360), Saturation (0-100), Brightness (0-100).
@@ -256,6 +300,7 @@ module.exports = {
   intToHex,
   hexToInt,
   xyToInt,
+  intToXy,
   hsbToRgb,
   rgbToHsb,
   intToHsb,

@@ -453,6 +453,159 @@ describe('Matter.setValue', () => {
     });
     assert.calledOnce(onOff.on);
   });
+  it('should control a light color with the XY mode', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+    };
+
+    const clusterClients = new Map();
+
+    const clusterClient = {
+      moveToColor: fake.resolves(null),
+      moveToHueAndSaturation: fake.resolves(null),
+      supportedFeatures: {
+        xy: true,
+      },
+    };
+    clusterClients.set(768, clusterClient);
+    const onOff = {
+      on: fake.resolves(null),
+    };
+    clusterClients.set(6, onOff);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, 16711680);
+
+    assert.notCalled(clusterClient.moveToHueAndSaturation);
+    assert.calledWith(clusterClient.moveToColor, {
+      colorX: 45915,
+      colorY: 19615,
+      transitionTime: 0,
+      optionsMask: 1,
+      optionsOverride: 1,
+    });
+    assert.calledOnce(onOff.on);
+  });
+
+  it('should fail to control a light color when no color mode is supported', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+    };
+
+    const clusterClients = new Map();
+    clusterClients.set(768, { supportedFeatures: undefined });
+    clusterClients.set(6, { on: fake.resolves(null) });
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await chaiAssert.isRejected(
+      matterHandler.setValue(gladysDevice, gladysFeature, 16711680),
+      'Device does not support any ColorControl color mode',
+    );
+  });
+
+  it('should control a light color temperature', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+    };
+
+    const clusterClients = new Map();
+
+    const clusterClient = {
+      moveToColorTemperature: fake.resolves(null),
+      supportedFeatures: {
+        colorTemperature: true,
+      },
+    };
+    clusterClients.set(768, clusterClient);
+    const onOff = {
+      on: fake.resolves(null),
+    };
+    clusterClients.set(6, onOff);
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: (id) => clusterClients.get(id),
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await matterHandler.setValue(gladysDevice, gladysFeature, 370.4);
+
+    assert.calledWith(clusterClient.moveToColorTemperature, {
+      colorTemperatureMireds: 370,
+      transitionTime: 0,
+      optionsMask: 1,
+      optionsOverride: 1,
+    });
+    assert.calledOnce(onOff.on);
+  });
+
+  it('should fail to control a light color temperature without ColorControl cluster', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+    };
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: () => undefined,
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await chaiAssert.isRejected(
+      matterHandler.setValue(gladysDevice, gladysFeature, 300),
+      'Device does not support ColorControl cluster',
+    );
+  });
+
   it('should control a thermostat target temperature (heating)', async () => {
     const gladysDevice = {
       external_id: 'matter:12345:1',

@@ -673,4 +673,88 @@ describe('Matter.readInitialDeviceStates', () => {
 
     assert.notCalled(gladys.event.emit);
   });
+  it('should emit the color state from the XY mode', async () => {
+    const colorControl = {
+      supportedFeatures: { xy: true },
+      getCurrentXAttribute: fake.resolves(45915),
+      getCurrentYAttribute: fake.resolves(19615),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === ColorControl.Complete.id ? colorControl : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${ColorControl.Complete.id}:color`,
+      state: 16711680,
+    });
+  });
+
+  it('should skip the XY color when an attribute is not readable', async () => {
+    const colorControl = {
+      supportedFeatures: { xy: true },
+      getCurrentXAttribute: fake.rejects(new Error('read failed')),
+      getCurrentYAttribute: fake.resolves(19615),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === ColorControl.Complete.id ? colorControl : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should prefer the hue/saturation mode when both modes are supported', async () => {
+    const colorControl = {
+      supportedFeatures: { hueSaturation: true, xy: true },
+      getCurrentHueAttribute: fake.resolves(100),
+      getCurrentSaturationAttribute: fake.resolves(40),
+      getCurrentXAttribute: fake.resolves(45915),
+      getCurrentYAttribute: fake.resolves(19615),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === ColorControl.Complete.id ? colorControl : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(colorControl.getCurrentXAttribute);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${ColorControl.Complete.id}:color`,
+      state: 14090213,
+    });
+  });
+
+  it('should emit the color temperature state in mireds', async () => {
+    const colorControl = {
+      supportedFeatures: { colorTemperature: true },
+      getColorTemperatureMiredsAttribute: fake.resolves(370),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === ColorControl.Complete.id ? colorControl : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `matter:1234:1:${ColorControl.Complete.id}:temperature`,
+      state: 370,
+    });
+  });
+
+  it('should skip the color temperature when the attribute is not readable', async () => {
+    const colorControl = {
+      supportedFeatures: { colorTemperature: true },
+      getColorTemperatureMiredsAttribute: fake.rejects(new Error('read failed')),
+    };
+    const device = {
+      getClusterClientById: (id) => (id === ColorControl.Complete.id ? colorControl : null),
+    };
+
+    await matterHandler.readInitialDeviceStates(1234n, '1', device);
+
+    assert.notCalled(gladys.event.emit);
+  });
 });

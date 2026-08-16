@@ -1002,4 +1002,85 @@ describe('Matter.listenToStateChange', () => {
       state: 75,
     });
   });
+  it('should listen to state change (ColorControl XY)', async () => {
+    let clusterClient;
+    const promise = new Promise((resolve) => {
+      let callCount = 0;
+      const checkThatEveryThingWasCalled = () => {
+        callCount += 1;
+        if (callCount === 4) {
+          resolve();
+        }
+      };
+      clusterClient = {
+        id: ColorControl.Complete.id,
+        supportedFeatures: {
+          xy: true,
+        },
+        addCurrentHueAttributeListener: () => {
+          throw new Error('Should not be called');
+        },
+        addCurrentXAttributeListener: (callback) => {
+          callback(45915);
+          checkThatEveryThingWasCalled();
+        },
+        addCurrentYAttributeListener: (callback) => {
+          callback(19615);
+          checkThatEveryThingWasCalled();
+        },
+        getCurrentXAttribute: () => {
+          checkThatEveryThingWasCalled();
+          return 45915;
+        },
+        getCurrentYAttribute: () => {
+          checkThatEveryThingWasCalled();
+          return 19615;
+        },
+      };
+    });
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    // We need to make sure that we called all 4 functions before checking the events
+    await promise;
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:768:color',
+      state: 16711680,
+    });
+  });
+  it('should listen to state change (ColorControl color temperature)', async () => {
+    const clusterClient = {
+      id: ColorControl.Complete.id,
+      supportedFeatures: {
+        colorTemperature: true,
+      },
+      addColorTemperatureMiredsAttributeListener: (callback) => {
+        callback(370);
+      },
+      getColorTemperatureMiredsAttribute: fake.resolves(370),
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'matter:1234:1:768:temperature',
+      state: 370,
+    });
+  });
+  it('should not listen to any color attribute when no color mode is supported', async () => {
+    const clusterClient = {
+      id: ColorControl.Complete.id,
+      supportedFeatures: {},
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.notCalled(gladys.event.emit);
+  });
 });
