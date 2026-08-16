@@ -84,8 +84,8 @@ describe('mqttHandler.listenToHomeAssistantDeviceStateIfNeeded', () => {
   });
 
   it('should not subscribe to a state topic with a wildcard inside a level', () => {
-    // "+" is a wildcard only when it takes a whole level
-    ['foo+bar', 'sensor/foo+/state'].forEach((stateTopic) => {
+    // "+" is a wildcard only when it takes a whole level, and "#" is refused wherever it appears
+    ['foo+bar', 'sensor/foo+/state', 'foo#bar'].forEach((stateTopic) => {
       mqttHandler.haStateBindings = {};
       mqttHandler.listenToHomeAssistantDeviceStateIfNeeded({
         external_id: 'homeassistant:my-device',
