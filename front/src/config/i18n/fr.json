@@ -5729,7 +5729,7 @@
       "errorNoMicrophone": "Aucun micro détecté. Branchez ou activez un micro dans les réglages système.",
       "errorNetwork": "La reconnaissance vocale est indisponible, votre navigateur n'a pas pu joindre son service vocal.",
       "errorNotSupported": "La reconnaissance vocale n'est pas disponible dans ce navigateur.",
-      "browserTranscriptionNotice": "C'est votre navigateur qui transcrit ce que vous dites : Gladys n'enregistre et n'envoie aucun audio. Selon votre navigateur, l'audio peut être envoyé à son propre service de reconnaissance vocale (Google pour Chrome, traitement local pour Safari)."
+      "browserTranscriptionNotice": "Si vous dictez un message, c'est votre navigateur qui transcrit ce que vous dites : Gladys n'enregistre et n'envoie aucun audio. Selon votre navigateur, l'audio peut être envoyé à son propre service de reconnaissance vocale (Google pour Chrome, traitement local pour Safari)."
     }
   },
   "history": {

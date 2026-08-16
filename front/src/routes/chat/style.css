@@ -622,6 +622,14 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .voiceInputButtonListening,
+  .voiceInputButtonListening:hover,
+  .voiceInputButtonListening:focus {
+    animation: none !important;
+  }
+}
+
 .voiceInputError {
   margin: 8px 4px 0;
   font-size: 13px;

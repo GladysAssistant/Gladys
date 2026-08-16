@@ -20,21 +20,28 @@ class ChatVoiceInputButton extends Component {
 
   recognition = null;
 
+  /** Previous session which was asked to end and has not fired `onend` yet. */
+  endingRecognition = null;
+
   /**
    * Incremented at each new session, so a session which is ending cannot reset
    * the state of the session which just started.
    */
   recognitionGeneration = 0;
 
-  /** True when the user asked to listen again while the previous session was still ending. */
-  restartWhenEnded = false;
+  /** True when the browser refused to start while the previous session was still running. */
+  startWhenPreviousEnded = false;
 
   componentWillUnmount() {
     this.recognitionGeneration += 1;
-    this.restartWhenEnded = false;
+    this.startWhenPreviousEnded = false;
     if (this.recognition) {
       this.recognition.abort();
       this.recognition = null;
+    }
+    if (this.endingRecognition) {
+      this.endingRecognition.abort();
+      this.endingRecognition = null;
     }
   }
 
@@ -64,15 +71,17 @@ class ChatVoiceInputButton extends Component {
 
   handleEnd = generation => {
     if (generation !== this.recognitionGeneration) {
-      // An older session ended after a new one started: it must not stop it.
+      // An older session ended after a new one started: it must not stop it. It
+      // can only unblock it, when the browser refused to start while it was
+      // still running.
+      this.endingRecognition = null;
+      if (this.startWhenPreviousEnded) {
+        this.startWhenPreviousEnded = false;
+        this.startRecognition();
+      }
       return;
     }
     this.recognition = null;
-    if (this.restartWhenEnded) {
-      this.restartWhenEnded = false;
-      this.startRecognition();
-      return;
-    }
     this.setListening(false);
   };
 
@@ -105,22 +114,32 @@ class ChatVoiceInputButton extends Component {
     }
     this.recognition = recognition;
     this.setListening(true);
-    if (!recognition.start()) {
-      // The browser refused to start: don't leave a button saying we listen.
-      this.recognition = null;
-      this.setListening(false);
-      this.props.onError('error');
+    if (recognition.start()) {
+      return;
     }
+    this.recognition = null;
+    if (this.endingRecognition) {
+      // Chromium refuses a new session while the previous one is still running:
+      // it is started again as soon as the browser tells us that one ended.
+      this.startWhenPreviousEnded = true;
+      return;
+    }
+    // The browser refused to start: don't leave a button saying we listen.
+    this.setListening(false);
+    this.props.onError('error');
   };
 
   startListening = () => {
     this.props.onError(null);
     if (this.recognition) {
-      // The previous session has not ended yet, starting a new one now would
-      // throw: it is started when the browser tells us that one ended.
-      this.restartWhenEnded = true;
-      this.setListening(true);
-      return;
+      // The previous session was stopped and has not ended yet. The new one is
+      // still started right away, in the same click: Safari (especially on iOS)
+      // refuses `start()` outside of the gesture which granted the microphone,
+      // so waiting for `onend` to start would break dictating there. Browsers
+      // which refuse a second session instead (Chromium) go through the
+      // `startWhenPreviousEnded` path, which does not need a gesture.
+      this.endingRecognition = this.recognition;
+      this.recognition = null;
     }
     this.startRecognition();
   };
@@ -129,7 +148,7 @@ class ChatVoiceInputButton extends Component {
    * @description Stop listening, keeping what was already transcribed in the input.
    */
   stopListening = () => {
-    this.restartWhenEnded = false;
+    this.startWhenPreviousEnded = false;
     if (this.recognition) {
       // The session is kept until the browser tells us it ended, so the next
       // one is not started while this one is still running.
@@ -144,11 +163,15 @@ class ChatVoiceInputButton extends Component {
    * the input the user just emptied.
    */
   cancelListening = () => {
-    this.restartWhenEnded = false;
+    this.startWhenPreviousEnded = false;
     this.recognitionGeneration += 1;
     if (this.recognition) {
       this.recognition.abort();
       this.recognition = null;
+    }
+    if (this.endingRecognition) {
+      this.endingRecognition.abort();
+      this.endingRecognition = null;
     }
     this.setListening(false);
   };
