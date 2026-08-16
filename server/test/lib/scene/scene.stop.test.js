@@ -188,9 +188,6 @@ describe('scene.stop', () => {
   });
 
   it('should abort a delay whose signal was already aborted before it started waiting', async () => {
-    // An already-aborted AbortSignal never fires its 'abort' listeners, so a
-    // stop landing between executeAction's check and the delay's listener
-    // registration must still interrupt the wait instead of sleeping an hour.
     const abortController = new AbortController();
     abortController.abort();
 
@@ -208,7 +205,6 @@ describe('scene.stop', () => {
 
     expect(caught).to.be.an('error');
     expect(caught.message).to.equal('SCENE_STOPPED');
-    // It rejected immediately rather than waiting out the 60 minute timer.
     expect(Date.now() - start).to.be.below(1000);
   });
 

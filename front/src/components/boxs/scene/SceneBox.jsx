@@ -29,8 +29,7 @@ class SceneBoxComponent extends Component {
   };
 
   getRunningScenes = async () => {
-    // Collect the stops received while the request is in flight: the response
-    // was built before them and would otherwise resurrect those executions.
+    // stops received while the request is in flight would be undone by the response
     const stoppedDuringFetch = new Set();
     this.stoppedDuringFetch = stoppedDuringFetch;
     try {

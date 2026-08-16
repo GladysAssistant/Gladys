@@ -99,9 +99,10 @@
 }
 
 /* Explicit colors (text + icon) so the surrounding context — e.g. the scene
-   list card `.card-footer` which sets a grey color — cannot leak in. */
+   list card `.card-footer` which sets a grey color — cannot leak in.
+   Darker than Tabler's #5eba00, which is only 2.5:1 on white (this one is 4.5:1). */
 .runningStopButton .runningContent {
-  color: #5eba00;
+  color: #3f8600;
 }
 
 .runningStopButton .stopContent {
@@ -122,19 +123,35 @@
 }
 
 /* Doubled class to beat `.btn-outline-success:hover` (which would fill green) */
-.runningStopButton.runningStopButton:hover,
-.runningStopButton.runningStopButton:focus {
+@media (hover: hover) {
+  .runningStopButton.runningStopButton:hover,
+  .runningStopButton.runningStopButton:focus {
+    color: #cd201f;
+    background-color: transparent;
+    border-color: #cd201f;
+  }
+
+  .runningStopButton:hover .runningContent,
+  .runningStopButton:focus .runningContent {
+    visibility: hidden;
+  }
+
+  .runningStopButton:hover .stopContent,
+  .runningStopButton:focus .stopContent {
+    visibility: visible;
+  }
+}
+
+.runningStopButton.armed.armed {
   color: #cd201f;
   background-color: transparent;
   border-color: #cd201f;
 }
 
-.runningStopButton:hover .runningContent,
-.runningStopButton:focus .runningContent {
+.runningStopButton.armed .runningContent {
   visibility: hidden;
 }
 
-.runningStopButton:hover .stopContent,
-.runningStopButton:focus .stopContent {
+.runningStopButton.armed .stopContent {
   visibility: visible;
 }

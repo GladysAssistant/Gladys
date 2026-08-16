@@ -24,11 +24,8 @@ export const computeRunningInfo = (runningScenes, sceneSelector, now) => {
  * late-resolving fetch overwriting updates already applied by websocket events
  * (scene.started / scene.stopped) received while the fetch was in flight.
  *
- * Websocket removals are authoritative: an execution the server still listed
- * when the request was built may have finished before the response landed, so
- * every id reported stopped while the fetch was in flight is dropped. Without
- * it a stale response resurrects a finished execution and the UI stays stuck on
- * "running" until the next event.
+ * Websocket removals win: a response built before a scene.stopped event would
+ * otherwise resurrect a finished execution.
  * @param {Array} fetched - The list returned by GET /api/v1/scene/running.
  * @param {Array} current - The running scenes currently in the state.
  * @param {Set} [stoppedDuringFetch] - Execution ids stopped while fetching.

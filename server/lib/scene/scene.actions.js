@@ -321,9 +321,8 @@ const actionsFunc = {
       if (!abortSignal) {
         return;
       }
-      // An already-aborted signal never fires its 'abort' listeners, so a stop
-      // landing between executeAction's check and this registration would leave
-      // the timer running for the whole delay: re-check before subscribing.
+      // An already-aborted signal never fires its 'abort' listeners, so re-check
+      // before subscribing.
       if (abortSignal.aborted) {
         clearTimeout(timer);
         reject(new AbortScene('SCENE_STOPPED'));
