@@ -167,6 +167,9 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
   ) {
     const colorControl = targetDevice.getClusterClientById(ColorControl.Complete.id);
+    if (!colorControl) {
+      throw new Error('Device does not support ColorControl cluster');
+    }
     const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
     const colorControlFeatures = colorControl.supportedFeatures || {};
 

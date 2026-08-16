@@ -227,13 +227,24 @@ async function listenToStateChange(nodeId, devicePath, device) {
     // Function to convert the XY (CIE 1931) color to integer and emit state change
     const emitXyColorState = async () => {
       logger.debug(`Matter: Emitting XY color state`);
-      const currentX = await colorControl.getCurrentXAttribute();
-      const currentY = await colorControl.getCurrentYAttribute();
+      try {
+        const currentX = await colorControl.getCurrentXAttribute();
+        const currentY = await colorControl.getCurrentYAttribute();
 
-      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: `matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}:color`,
-        state: matterXyToInt(currentX, currentY),
-      });
+        // A bulb currently in color temperature mode can report no XY coordinate at all,
+        // in that case we keep the last known color instead of emitting a black state
+        if (!Number.isFinite(currentX) || !Number.isFinite(currentY)) {
+          logger.debug(`Matter: Ignoring XY color state, invalid coordinates (${currentX}, ${currentY})`);
+          return;
+        }
+
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}:color`,
+          state: matterXyToInt(currentX, currentY),
+        });
+      } catch (error) {
+        logger.debug(`Matter: Could not read the XY color attributes: ${error.message}`);
+      }
     };
 
     if (colorControl.supportedFeatures.hueSaturation) {
@@ -262,6 +273,10 @@ async function listenToStateChange(nodeId, devicePath, device) {
       // Gladys stores the color temperature in mireds, which is the unit used by Matter
       colorControl.addColorTemperatureMiredsAttributeListener((value) => {
         logger.debug(`Matter: ColorControl colorTemperatureMireds attribute changed to ${value}`);
+        // Like on the initial read, a non-numeric value is ignored so it doesn't wipe the saved state
+        if (!Number.isFinite(value)) {
+          return;
+        }
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}:temperature`,
           state: value,

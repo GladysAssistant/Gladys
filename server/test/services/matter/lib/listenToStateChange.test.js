@@ -1071,6 +1071,73 @@ describe('Matter.listenToStateChange', () => {
       state: 370,
     });
   });
+  it('should not emit any color state when the XY attributes cannot be read', async () => {
+    const clusterClient = {
+      id: ColorControl.Complete.id,
+      supportedFeatures: {
+        xy: true,
+      },
+      addCurrentXAttributeListener: (callback) => {
+        callback(45915);
+      },
+      addCurrentYAttributeListener: (callback) => {
+        callback(19615);
+      },
+      getCurrentXAttribute: fake.rejects(new Error('Attribute not available')),
+      getCurrentYAttribute: fake.rejects(new Error('Attribute not available')),
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    assert.notCalled(gladys.event.emit);
+  });
+  it('should not emit any color state when the XY attributes are not numbers', async () => {
+    const clusterClient = {
+      id: ColorControl.Complete.id,
+      supportedFeatures: {
+        xy: true,
+      },
+      addCurrentXAttributeListener: (callback) => {
+        callback(null);
+      },
+      addCurrentYAttributeListener: (callback) => {
+        callback(null);
+      },
+      getCurrentXAttribute: fake.resolves(null),
+      getCurrentYAttribute: fake.resolves(undefined),
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    await new Promise((resolve) => {
+      setImmediate(resolve);
+    });
+    assert.notCalled(gladys.event.emit);
+  });
+  it('should not emit any color temperature state when the value is not a number', async () => {
+    const clusterClient = {
+      id: ColorControl.Complete.id,
+      supportedFeatures: {
+        colorTemperature: true,
+      },
+      addColorTemperatureMiredsAttributeListener: (callback) => {
+        callback(null);
+      },
+    };
+    const device = {
+      number: 1,
+      getClusterClientById: (id) => (id === clusterClient.id ? clusterClient : null),
+    };
+    await matterHandler.listenToStateChange(1234n, '1', device);
+    assert.notCalled(gladys.event.emit);
+  });
   it('should not listen to any color attribute when no color mode is supported', async () => {
     const clusterClient = {
       id: ColorControl.Complete.id,

@@ -533,6 +533,33 @@ describe('Matter.setValue', () => {
     );
   });
 
+  it('should fail to control a light color without ColorControl cluster', async () => {
+    const gladysDevice = {
+      external_id: 'matter:12345:1',
+    };
+
+    const gladysFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+    };
+
+    matterHandler.nodesMap.set(12345n, {
+      isConnected: true,
+      getDevices: fake.returns([
+        {
+          number: 1,
+          getClusterClientById: () => undefined,
+          getChildEndpoints: () => [],
+        },
+      ]),
+    });
+
+    await chaiAssert.isRejected(
+      matterHandler.setValue(gladysDevice, gladysFeature, 16711680),
+      'Device does not support ColorControl cluster',
+    );
+  });
+
   it('should control a light color temperature', async () => {
     const gladysDevice = {
       external_id: 'matter:12345:1',
