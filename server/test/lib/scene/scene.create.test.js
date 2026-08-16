@@ -3,7 +3,7 @@ const sinon = require('sinon').createSandbox();
 
 const { fake } = sinon;
 const EventEmitter = require('events');
-const { ACTIONS } = require('../../../utils/constants');
+const { ACTIONS, ANY_CHANGE_OPERATOR, EVENTS } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const sceneModel = require('../../../models/scene');
 
@@ -105,6 +105,62 @@ describe('SceneManager', () => {
       tags: [],
     });
     await assert.isRejected(promise);
+  });
+
+  it('should create one scene with an "any state change" trigger', async () => {
+    const scene = await sceneManager.create({
+      name: 'Any state change scene',
+      icon: 'bell',
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_features: ['my-thermostat-mode'],
+          operator: ANY_CHANGE_OPERATOR,
+        },
+      ],
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+          },
+        ],
+      ],
+      tags: [],
+    });
+    expect(scene).to.have.property('selector');
+  });
+
+  // A "changed" trigger compares the new state with the previous one: there is no value to
+  // match, and neither the threshold nor the duration option applies to an instantaneous change
+  const invalidAnyChangeProperties = [
+    { key: 'value', value: 1 },
+    { key: 'threshold_only', value: true },
+    { key: 'for_duration', value: 2700000 },
+  ];
+  invalidAnyChangeProperties.forEach(({ key, value }) => {
+    it(`should return validation error, "any state change" trigger with a ${key}`, async () => {
+      const promise = sceneManager.create({
+        name: `Invalid any state change scene with ${key}`,
+        icon: 'bell',
+        triggers: [
+          {
+            type: EVENTS.DEVICE.NEW_STATE,
+            device_features: ['my-thermostat-mode'],
+            operator: ANY_CHANGE_OPERATOR,
+            [key]: value,
+          },
+        ],
+        actions: [
+          [
+            {
+              type: ACTIONS.LIGHT.TURN_ON,
+            },
+          ],
+        ],
+        tags: [],
+      });
+      await assert.isRejected(promise);
+    });
   });
 
   it('should return validation error when http.request action has no headers', async () => {

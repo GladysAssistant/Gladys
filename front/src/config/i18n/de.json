@@ -3531,7 +3531,7 @@
         "deviceSeen": "Wenn das Gerät erkannt wird",
         "doorbellRang": "Wenn die Türklingel klingelt",
         "anyStateChange": "Die Szene bei jeder Zustandsänderung starten, unabhängig vom Wert",
-        "anyStateChangeNote": "Die Szene wird bei jedem neuen vom Gerät gemeldeten Wert gestartet, einschließlich kleiner Schwankungen eines Sensors.",
+        "anyStateChangeNote": "Die Szene wird gestartet, wenn das Gerät seinen ersten Wert oder einen vom vorherigen abweichenden Wert meldet, einschließlich kleiner Schwankungen eines Sensors.",
         "onlyExecuteAtThreshold": "Nur ausführen, wenn der Schwellenwert überschritten wird (und nicht bei jedem vom Gerät gesendeten Wert)",
         "activateOrDeactivateForDuration": "Szene ausführen, nachdem die Bedingung für die Dauer gültig war:",
         "multipleFeaturesNote": "Sie können mehrere Funktionen desselben Typs auswählen: die Szene startet, sobald eine davon die Bedingung erfüllt."
