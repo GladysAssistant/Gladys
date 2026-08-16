@@ -38,7 +38,8 @@ function execute(sceneSelector, scope = {}) {
       };
       // Controller used to abort this execution (e.g. a manual "stop").
       // The signal is passed through the scope so abortable actions (like
-      // the "delay" action) can react to it.
+      // the "delay" action) can react to it. The scope is not copied: callers
+      // read back the action results written into it.
       const abortController = new AbortController();
       scope.abortSignal = abortController.signal;
       // register this execution so it can be listed and stopped while running

@@ -347,8 +347,11 @@ const actionsFunc = {
       return;
     }
     // we clone the scope so that the new scene is not polluting
-    // other scenes writing on the same scope: it needs to be a fresh object
-    self.execute(action.scene, cloneDeep(scope));
+    // other scenes writing on the same scope: it needs to be a fresh object.
+    // The signal is dropped rather than deep-cloned, execute() gives the child
+    // its own.
+    const { abortSignal, ...scopeToClone } = scope;
+    self.execute(action.scene, cloneDeep(scopeToClone));
   },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text, {
