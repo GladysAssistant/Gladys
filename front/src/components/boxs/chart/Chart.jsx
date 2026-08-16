@@ -125,6 +125,10 @@ class Chartbox extends Component {
   dropdownRef = createRef();
 
   handleClickOutside = event => {
+    // The export spinner lives in the dropdown, so the menu stays open until the export is done
+    if (this.state.exportingCsv) {
+      return;
+    }
     if (this.dropdownRef.current && !this.dropdownRef.current.contains(event.target)) {
       this.setState({ dropdown: false });
     }
@@ -211,7 +215,9 @@ class Chartbox extends Component {
     if (deviceFeatures.length === 0) {
       return;
     }
-    await this.setState({ exportingCsv: true, exportError: null, exportErrorDetail: null, dropdown: false });
+    // The dropdown is kept open while the export runs: it holds the only progress indicator.
+    // It is closed once the export is done, see the end of this function.
+    await this.setState({ exportingCsv: true, exportError: null, exportErrorDetail: null });
     try {
       // The exported period is exactly the period currently displayed on the chart,
       // so the user can browse to a past period and export it.
@@ -239,7 +245,7 @@ class Chartbox extends Component {
       const { errorDetailString } = formatHttpError(err);
       this.setState({ exportError: true, exportErrorDetail: errorDetailString });
     }
-    this.setState({ exportingCsv: false });
+    this.setState({ exportingCsv: false, dropdown: false });
   };
   navigateToPreviousPeriod = async () => {
     await this.setState(prevState => ({
