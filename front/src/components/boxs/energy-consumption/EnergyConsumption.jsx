@@ -406,12 +406,13 @@ class EnergyConsumption extends Component {
     const from = dayjs(startDate)
       .locale(this.props.user.language)
       .format('DD MMM YYYY');
-    // The end date is exclusive: display the last day included in the period
+    // The end date is exclusive (the period stops at midnight on that day): display it as-is and
+    // separate it with an arrow, so the label reads like the bill it is compared with
+    // ("from the 5th to the 5th") instead of looking like a day is missing.
     const to = dayjs(endDate)
-      .subtract(1, 'day')
       .locale(this.props.user.language)
       .format('DD MMM YYYY');
-    return `${from} - ${to}`;
+    return `${from} → ${to}`;
   };
 
   getDatePickerView = () => {
