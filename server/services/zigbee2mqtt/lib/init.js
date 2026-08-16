@@ -52,12 +52,16 @@ async function init(setupMode = false) {
   this.networkModeValid = true;
   this.emitStatusEvent();
 
-  // Test if the coordinator is present: either reachable over the network, or plugged in USB
+  // Test if the coordinator is usable: a USB dongle is checked against the ports actually plugged in,
+  // while a network coordinator is only checked for being configured. Its reachability is not probed
+  // here, as a TCP test on every start could hang; if it is down, Zigbee2mqtt will keep restarting.
   this.usbConfigured = false;
   this.networkAdapterConfigured = false;
   if (z2mAdapterMode === ADAPTER_MODE.NETWORK) {
     if (z2mNetworkAdapterUrl) {
-      logger.info(`Zigbee2mqtt network coordinator configured on ${z2mNetworkAdapterUrl}`);
+      logger.info(
+        `Zigbee2mqtt network coordinator configured on ${z2mNetworkAdapterUrl} (reachability is not verified)`,
+      );
       this.networkAdapterConfigured = true;
     } else {
       logger.info(`Zigbee2mqtt network coordinator not configured`);

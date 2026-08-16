@@ -92,7 +92,20 @@ describe('zigbee2mqtt validateSetup', () => {
     };
     // EXECUTE
     expect(() => validateSetup(config)).to.throw(
-      'Zigbee2mqtt: network coordinator URL "http://192.168.1.20:6638" is invalid, expected format is "tcp://<host>:<port>"',
+      'Zigbee2mqtt: network coordinator scheme "http" is invalid, expected one of tcp, socket, mdns',
+    );
+  });
+
+  it('should fail with an invalid mDNS network adapter URL', () => {
+    // PREPARE
+    const config = {
+      Z2M_ADAPTER_MODE: 'network',
+      Z2M_NETWORK_ADAPTER_TYPE: 'ember',
+      Z2M_NETWORK_ADAPTER_URL: 'mdns://',
+    };
+    // EXECUTE
+    expect(() => validateSetup(config)).to.throw(
+      'Zigbee2mqtt: network coordinator URL "mdns://" is invalid, expected format is "mdns://<service>"',
     );
   });
 
@@ -136,6 +149,40 @@ describe('zigbee2mqtt validateSetup', () => {
       Z2M_ADAPTER_MODE: 'network',
       Z2M_NETWORK_ADAPTER_TYPE: 'zstack',
       Z2M_NETWORK_ADAPTER_URL: 'tcp://192.168.1.20:6638',
+    });
+  });
+
+  it('should normalize a socket scheme, an uppercase scheme and a trailing slash', () => {
+    // PREPARE
+    const config = {
+      Z2M_ADAPTER_MODE: 'network',
+      Z2M_NETWORK_ADAPTER_TYPE: 'ember',
+      Z2M_NETWORK_ADAPTER_URL: 'SOCKET://192.168.1.20:6638/',
+    };
+    // EXECUTE
+    const result = validateSetup(config);
+    // ASSERT
+    expect(result).to.deep.equal({
+      Z2M_ADAPTER_MODE: 'network',
+      Z2M_NETWORK_ADAPTER_TYPE: 'ember',
+      Z2M_NETWORK_ADAPTER_URL: 'tcp://192.168.1.20:6638',
+    });
+  });
+
+  it('should accept an mDNS network adapter URL', () => {
+    // PREPARE
+    const config = {
+      Z2M_ADAPTER_MODE: 'network',
+      Z2M_NETWORK_ADAPTER_TYPE: 'ember',
+      Z2M_NETWORK_ADAPTER_URL: ' MDNS://slzb-06 ',
+    };
+    // EXECUTE
+    const result = validateSetup(config);
+    // ASSERT
+    expect(result).to.deep.equal({
+      Z2M_ADAPTER_MODE: 'network',
+      Z2M_NETWORK_ADAPTER_TYPE: 'ember',
+      Z2M_NETWORK_ADAPTER_URL: 'mdns://slzb-06',
     });
   });
 

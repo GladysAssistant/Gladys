@@ -147,9 +147,12 @@ class SetupLocalOptions extends Component {
   isEmberFirmwareTooOld = () => {
     const { zigbee2mqttStatus = {} } = this.props;
     const { coordinatorFirmware } = zigbee2mqttStatus;
-    const { z2mDongleConfigKey } = this.state;
+    const { z2mAdapterMode, z2mDongleConfigKey, z2mNetworkAdapterType } = this.state;
 
-    if (z2mDongleConfigKey !== 'ember' || !coordinatorFirmware) {
+    // In network mode the USB dongle model is not selected, the adapter type is chosen directly
+    const adapterConfigKey = z2mAdapterMode === ADAPTER_MODE.NETWORK ? z2mNetworkAdapterType : z2mDongleConfigKey;
+
+    if (adapterConfigKey !== 'ember' || !coordinatorFirmware) {
       return false;
     }
 
