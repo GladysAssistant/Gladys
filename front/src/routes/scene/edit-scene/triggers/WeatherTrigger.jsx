@@ -52,11 +52,15 @@ const isImperialTemperature = user => !!user && user.temperature_unit_preference
 const isImperialWindSpeed = user => !!user && user.distance_unit_preference === MEASUREMENT_UNITS.US;
 
 // the matcher compares the observed value as the dashboard widget displays
-// it (Math.round on °C, km/h and %), so a threshold only means what it says
-// on that same integer grid: 20 mph stored as the raw 32.1868 km/h would
-// never match the 32 km/h the widget shows. Both ends of the conversion are
-// therefore rounded, which also keeps the round-trip stable (20 mph -> 32
-// km/h stored -> 20 mph displayed).
+// it (Math.round on °C, km/h and %), and it puts the threshold on that same
+// integer grid itself (`Math.round(Number(trigger.value))`), so what is
+// stored here only has to survive the round-trip. What the user typed is
+// therefore what they read back: the displayed value is rounded, the stored
+// °F -> °C conversion is not. Rounding it would move the threshold under the
+// user (71 °F -> 22 °C -> 72 °F on the next open: 71 of the 161 integer °F
+// values between -40 and 120 drift by one degree), without changing a single
+// match. The mph -> km/h conversion is rounded because it round-trips exactly
+// (no drift over the same kind of range) and keeps the stored value tidy.
 const toDisplayValue = (value, field, user) => {
   if (typeof value !== 'number') {
     return value;
@@ -72,7 +76,7 @@ const toDisplayValue = (value, field, user) => {
 
 const toStoredValue = (value, field, user) => {
   if (field === WEATHER_TRIGGER_FIELDS.TEMPERATURE && isImperialTemperature(user)) {
-    return Math.round(fahrenheitToCelsius(value));
+    return fahrenheitToCelsius(value);
   }
   if (field === WEATHER_TRIGGER_FIELDS.WIND_SPEED && isImperialWindSpeed(user)) {
     return Math.round(value * KM_PER_MILE);
