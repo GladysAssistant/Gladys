@@ -14,6 +14,11 @@ async function shutdownHost() {
   if (!mechanism) {
     throw new PlatformNotCompatible('HOST_POWER_MANAGEMENT_NOT_AVAILABLE');
   }
+  // Fail closed on the action itself: a host may allow reboot but refuse
+  // power-off, and an API client is not gated by the UI's per-button check.
+  if (!this.hostPowerCapabilities || !this.hostPowerCapabilities.shutdown) {
+    throw new PlatformNotCompatible('HOST_POWER_SHUTDOWN_NOT_AVAILABLE');
+  }
   logger.info(`System: powering off host (mechanism: ${mechanism})`);
   await this.runHostPowerDbusCommand('PowerOff', mechanism);
 }
