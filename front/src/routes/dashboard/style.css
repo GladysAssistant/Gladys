@@ -410,6 +410,14 @@
   overflow: hidden;
 }
 
+/* The collapse animation needs the overflow: hidden above, which would clip
+   the large glass shadow into a faint dark rectangle behind the card (square
+   corners, hard bottom edge). This panel card goes flat — the glass surface
+   and border carry it. */
+:global(.glass-theme) .tabletModeDivContent :global(.card) {
+  box-shadow: none;
+}
+
 .tabletModeDivOpen {
   visibility: visible;
   opacity: 1;
