@@ -123,6 +123,40 @@ describe('Scene.triggers.weather', () => {
     expect(matcher(null, 'scene', buildEvent({ temperature: 12 }, { wind_speed: 1 }), trigger)).to.equal(false);
   });
 
+  it('should compare the numbers as the dashboard widget displays them', () => {
+    const windTrigger = {
+      house: 'my-house',
+      weather_field: WEATHER_TRIGGER_FIELDS.WIND_SPEED,
+      operator: '>=',
+      value: 20,
+    };
+    // 5.55 m/s = 19.98 km/h, displayed as "20 km/h" by the widget: the
+    // rule the user reads on their dashboard must match
+    expect(matcher(null, 'scene', buildEvent({ wind_speed: 5.55 }, { wind_speed: 1 }), windTrigger)).to.equal(true);
+    // 5.41 m/s = 19.47 km/h, displayed as "19 km/h": still below
+    expect(matcher(null, 'scene', buildEvent({ wind_speed: 5.41 }, { wind_speed: 1 }), windTrigger)).to.equal(false);
+
+    // same display-vs-compare rule for the temperature and the humidity
+    const frostTrigger = {
+      house: 'my-house',
+      weather_field: WEATHER_TRIGGER_FIELDS.TEMPERATURE,
+      operator: '<=',
+      value: 0,
+    };
+    // 0.4 °C is displayed as "0°": the frost alert fires
+    expect(matcher(null, 'scene', buildEvent({ temperature: 0.4 }, { temperature: 5 }), frostTrigger)).to.equal(true);
+    expect(matcher(null, 'scene', buildEvent({ temperature: 0.6 }, { temperature: 5 }), frostTrigger)).to.equal(false);
+
+    const humidityTrigger = {
+      house: 'my-house',
+      weather_field: WEATHER_TRIGGER_FIELDS.HUMIDITY,
+      operator: '>=',
+      value: 90,
+    };
+    expect(matcher(null, 'scene', buildEvent({ humidity: 89.5 }, { humidity: 40 }), humidityTrigger)).to.equal(true);
+    expect(matcher(null, 'scene', buildEvent({ humidity: 89.4 }, { humidity: 40 }), humidityTrigger)).to.equal(false);
+  });
+
   it('should only fire on the transition, not while the rule stays true', () => {
     const trigger = {
       house: 'my-house',

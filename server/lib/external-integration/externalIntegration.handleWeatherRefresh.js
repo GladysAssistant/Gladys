@@ -7,7 +7,10 @@ const { WEATHER_REFRESH_MIN_INTERVAL_MS } = require('./constants');
  * (B.18 point 5, "trigger, not data"): re-run the same gated alert check
  * as the 30-min scheduled poll, and the same gated weather-trigger check
  * as the 15-min one — the data re-enters through the audited pull path,
- * the nudge itself carries nothing. Fire-and-forget: a nudge from a
+ * the nudge itself carries nothing. Both checks keep their own gate and
+ * their own in-flight guard, but they run at once here: they share one
+ * `weather.get` per house (see weather.pullForChecks), so a nudge costs a
+ * provider a single call per watched house. Fire-and-forget: a nudge from a
  * non-weather integration or beyond the rate limit is silently dropped
  * (no error path, the scheduled floors catch up).
  * @param {object} service - The sending integration service.

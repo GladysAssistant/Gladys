@@ -3660,7 +3660,9 @@
         "operatorLabel": "Operator",
         "valueLabel": "Value",
         "unitTemperature": "°C",
+        "unitTemperatureImperial": "°F",
         "unitWindSpeed": "km/h",
+        "unitWindSpeedImperial": "mph",
         "unitHumidity": "%"
       }
     }

@@ -3,7 +3,12 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 
 import { RequestStatus } from '../../../../utils/consts';
-import { WEATHER_TRIGGER_FIELDS } from '../../../../../../server/utils/constants';
+import {
+  WEATHER_TRIGGER_FIELDS,
+  DEVICE_FEATURE_UNITS,
+  MEASUREMENT_UNITS
+} from '../../../../../../server/utils/constants';
+import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../../server/utils/units';
 
 // the generic condition enum of the weather pivot format (B.18). 'night'
 // and 'unknown' are left out on purpose: they are not weather situations
@@ -35,14 +40,59 @@ const OPERATOR_LABELS = {
   '!=': 'editScene.triggersCard.newState.different'
 };
 
-const UNIT_LABELS = {
-  [WEATHER_TRIGGER_FIELDS.TEMPERATURE]: 'editScene.triggersCard.weather.unitTemperature',
-  [WEATHER_TRIGGER_FIELDS.WIND_SPEED]: 'editScene.triggersCard.weather.unitWindSpeed',
-  [WEATHER_TRIGGER_FIELDS.HUMIDITY]: 'editScene.triggersCard.weather.unitHumidity'
+// the core polls the provider in metric and compares in °C / km/h / %, so
+// a trigger always *stores* a metric value. The editor displays and reads
+// it in the unit system of the user (same preferences as the weather
+// widget and EditRoomTemperatureBox), otherwise a user on Fahrenheit would
+// copy a threshold from their dashboard and save a rule meaning something
+// else.
+const KM_PER_MILE = 1.60934;
+
+const isImperialTemperature = user => !!user && user.temperature_unit_preference === DEVICE_FEATURE_UNITS.FAHRENHEIT;
+const isImperialWindSpeed = user => !!user && user.distance_unit_preference === MEASUREMENT_UNITS.US;
+
+const roundValue = value => Math.round(value * 10) / 10;
+
+const toDisplayValue = (value, field, user) => {
+  if (typeof value !== 'number') {
+    return value;
+  }
+  if (field === WEATHER_TRIGGER_FIELDS.TEMPERATURE && isImperialTemperature(user)) {
+    return roundValue(celsiusToFahrenheit(value));
+  }
+  if (field === WEATHER_TRIGGER_FIELDS.WIND_SPEED && isImperialWindSpeed(user)) {
+    return roundValue(value / KM_PER_MILE);
+  }
+  return value;
+};
+
+const toStoredValue = (value, field, user) => {
+  if (field === WEATHER_TRIGGER_FIELDS.TEMPERATURE && isImperialTemperature(user)) {
+    return fahrenheitToCelsius(value);
+  }
+  if (field === WEATHER_TRIGGER_FIELDS.WIND_SPEED && isImperialWindSpeed(user)) {
+    return value * KM_PER_MILE;
+  }
+  return value;
+};
+
+const getUnitLabel = (field, user) => {
+  if (field === WEATHER_TRIGGER_FIELDS.TEMPERATURE) {
+    return isImperialTemperature(user)
+      ? 'editScene.triggersCard.weather.unitTemperatureImperial'
+      : 'editScene.triggersCard.weather.unitTemperature';
+  }
+  if (field === WEATHER_TRIGGER_FIELDS.WIND_SPEED) {
+    return isImperialWindSpeed(user)
+      ? 'editScene.triggersCard.weather.unitWindSpeedImperial'
+      : 'editScene.triggersCard.weather.unitWindSpeed';
+  }
+  return 'editScene.triggersCard.weather.unitHumidity';
 };
 
 // the wind speed rule of the original request, so a freshly added trigger
-// is already meaningful
+// is already meaningful. Metric, like every stored value: an imperial user
+// sees it converted (20 km/h -> 12.4 mph)
 const DEFAULT_FIELD = WEATHER_TRIGGER_FIELDS.WIND_SPEED;
 const DEFAULT_OPERATOR = '>';
 const DEFAULT_VALUE = 20;
@@ -79,7 +129,7 @@ class WeatherTrigger extends Component {
       this.props.updateTriggerProperty(this.props.index, 'operator', '=');
       this.props.updateTriggerProperty(this.props.index, 'value', WEATHER_CONDITIONS[0]);
     } else {
-      this.setState({ valueInput: String(DEFAULT_VALUE) });
+      this.setState({ valueInput: String(toDisplayValue(DEFAULT_VALUE, field, this.props.user)) });
       this.props.updateTriggerProperty(this.props.index, 'operator', DEFAULT_OPERATOR);
       this.props.updateTriggerProperty(this.props.index, 'value', DEFAULT_VALUE);
     }
@@ -97,9 +147,16 @@ class WeatherTrigger extends Component {
     const raw = e.target.value;
     this.setState({ valueInput: raw });
     const value = parseFloat(raw.replace(',', '.'));
+    const field = this.props.trigger.weather_field || DEFAULT_FIELD;
     // an empty or unparseable input leaves no `value` at all on the trigger:
-    // the scene stays saveable, and a rule without a value never matches
-    this.props.updateTriggerProperty(this.props.index, 'value', Number.isNaN(value) ? undefined : value);
+    // the scene stays saveable, and a rule without a value never matches.
+    // What the user types is in their own unit system, what is stored is
+    // metric
+    this.props.updateTriggerProperty(
+      this.props.index,
+      'value',
+      Number.isNaN(value) ? undefined : toStoredValue(value, field, this.props.user)
+    );
   };
 
   constructor(props) {
@@ -108,9 +165,9 @@ class WeatherTrigger extends Component {
     const isCondition = props.trigger.weather_field === WEATHER_TRIGGER_FIELDS.CONDITION;
     let valueInput = '';
     if (isFreshTrigger) {
-      valueInput = String(DEFAULT_VALUE);
+      valueInput = String(toDisplayValue(DEFAULT_VALUE, DEFAULT_FIELD, props.user));
     } else if (!isCondition && props.trigger.value !== undefined) {
-      valueInput = String(props.trigger.value);
+      valueInput = String(toDisplayValue(props.trigger.value, props.trigger.weather_field, props.user));
     }
     this.state = {
       houses: [],
@@ -128,7 +185,7 @@ class WeatherTrigger extends Component {
     }
   }
 
-  render({ trigger }, { houses, valueInput }) {
+  render({ trigger, user }, { houses, valueInput }) {
     const field = trigger.weather_field || DEFAULT_FIELD;
     const isCondition = field === WEATHER_TRIGGER_FIELDS.CONDITION;
     const operators = isCondition ? CONDITION_OPERATORS : NUMERIC_OPERATORS;
@@ -198,7 +255,7 @@ class WeatherTrigger extends Component {
                   <input type="text" className="form-control" value={valueInput} onInput={this.onValueChange} />
                   <span className="input-group-append">
                     <span className="input-group-text">
-                      <Text id={UNIT_LABELS[field]} />
+                      <Text id={getUnitLabel(field, user)} />
                     </span>
                   </span>
                 </div>

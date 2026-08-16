@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const db = require('../../models');
 const logger = require('../../utils/logger');
-const { EVENTS, WEATHER_UNITS } = require('../../utils/constants');
+const { EVENTS } = require('../../utils/constants');
 
 /**
  * @description The actual check, always called under the in-flight guard
@@ -18,24 +18,40 @@ async function runCheck() {
     where: { active: true },
     attributes: ['triggers'],
   });
-  // the triggers column is NOT NULL: every scene carries an array
-  const someSceneListens = activeScenes.some((scene) =>
-    scene.triggers.some((trigger) => trigger.type === EVENTS.WEATHER.MATCHED),
+  // the triggers column is NOT NULL: every scene carries an array. Only
+  // the houses actually watched by a trigger are polled: a trigger matches
+  // on its own house, so polling the others would buy nothing and cost a
+  // provider call every 15 min
+  const watchedHouses = new Set();
+  activeScenes.forEach((scene) =>
+    scene.triggers.forEach((trigger) => {
+      if (trigger.type === EVENTS.WEATHER.MATCHED && trigger.house) {
+        watchedHouses.add(trigger.house);
+      }
+    }),
   );
-  if (!someSceneListens) {
+  if (watchedHouses.size === 0) {
+    this.houseWeather.clear();
     return;
   }
   const houses = await this.house.get();
-  const locatedHouses = houses.filter((house) => house.latitude !== null && house.longitude !== null);
-  await Promise.each(locatedHouses, async (house) => {
+  const housesToCheck = houses.filter(
+    (house) => house.latitude !== null && house.longitude !== null && watchedHouses.has(house.selector),
+  );
+  // a house leaving the watched set (scene deactivated, trigger removed)
+  // drops its baseline: coming back, its first poll re-baselines instead
+  // of comparing against a payload from another day
+  const checkedSelectors = new Set(housesToCheck.map((house) => house.selector));
+  this.houseWeather.forEach((payload, selector) => {
+    if (!checkedSelectors.has(selector)) {
+      this.houseWeather.delete(selector);
+    }
+  });
+  await Promise.each(housesToCheck, async (house) => {
     let weather;
     try {
-      weather = await this.get({
-        latitude: house.latitude,
-        longitude: house.longitude,
-        language: 'en',
-        units: WEATHER_UNITS.METRIC,
-      });
+      // shared with the alert check when both run at once
+      weather = await this.pullForChecks(house);
     } catch (e) {
       // no provider configured or provider down: nothing to compare, the
       // previous payload is kept so recovery does not fire a scene on a
@@ -60,12 +76,13 @@ async function runCheck() {
 }
 
 /**
- * @description Poll the weather of every located house and feed the
- * dedicated weather scene trigger with the current and the previous
- * payload, so the scene engine only fires on a transition. Runs every 15
- * minutes (scheduler job check-weather-triggers) and on an integration
- * freshness nudge. Gated: no active scene with a weather trigger means
- * zero third-party calls.
+ * @description Poll the weather of the houses watched by a weather scene
+ * trigger and feed the trigger with the current and the previous payload,
+ * so the scene engine only fires on a transition. Runs every 15 minutes
+ * (scheduler job check-weather-triggers) and on an integration freshness
+ * nudge. Gated: no active scene with a weather trigger means zero
+ * third-party calls, and a house no trigger watches is never polled. The
+ * pull is shared with the alert check when both run at once.
  * @returns {Promise} Resolves when every house has been checked.
  * @example
  * await weather.checkTriggers();
@@ -80,9 +97,11 @@ async function checkTriggers() {
     return;
   }
   this.checkTriggersRunning = true;
+  this.beginSharedPulls();
   try {
     await runCheck.call(this);
   } finally {
+    this.endSharedPulls();
     this.checkTriggersRunning = false;
   }
 }

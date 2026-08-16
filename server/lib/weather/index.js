@@ -4,6 +4,7 @@ const { getProviders } = require('./weather.getProviders');
 const { command } = require('./weather.command');
 const { checkAlerts } = require('./weather.checkAlerts');
 const { checkTriggers } = require('./weather.checkTriggers');
+const { beginSharedPulls, endSharedPulls, pullForChecks } = require('./weather.pullForChecks');
 const { INTENTS, EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
@@ -24,6 +25,12 @@ const Weather = function Weather(service, event, messageManager, house) {
   this.houseWeather = new Map();
   // in-flight guard of checkTriggers, same reason as checkAlerts
   this.checkTriggersRunning = false;
+  // weather pulls shared between the scene checks running right now, so
+  // the alert check and the weather-trigger check overlapping on the same
+  // tick (or relaunched together by a freshness nudge) cost one provider
+  // call per house instead of two; emptied when the last run ends
+  this.checkPulls = new Map();
+  this.sharedPullRuns = 0;
   this.event.on(INTENTS.WEATHER.GET, this.command.bind(this));
   this.event.on(INTENTS.WEATHER.TOMORROW, this.command.bind(this));
   this.event.on(INTENTS.WEATHER.AFTER_TOMORROW, this.command.bind(this));
@@ -38,5 +45,8 @@ Weather.prototype.getProviders = getProviders;
 Weather.prototype.command = command;
 Weather.prototype.checkAlerts = checkAlerts;
 Weather.prototype.checkTriggers = checkTriggers;
+Weather.prototype.beginSharedPulls = beginSharedPulls;
+Weather.prototype.endSharedPulls = endSharedPulls;
+Weather.prototype.pullForChecks = pullForChecks;
 
 module.exports = Weather;

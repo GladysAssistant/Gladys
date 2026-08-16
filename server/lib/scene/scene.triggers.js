@@ -30,11 +30,17 @@ const matchWeatherAlert = (self, sceneSelector, event, trigger) =>
 // values are °C, % and the pivot condition enum as-is. The pivot wind
 // speed is in m/s: it is converted to km/h, the unit the dashboard widget
 // displays and the one users configure their scenes with.
+// The numbers are compared **as the widget displays them** (Math.round,
+// like WeatherBox): a user writes a rule from what they read on their
+// dashboard, so 5.55 m/s — shown as 20 km/h — must match `>= 20` instead
+// of silently comparing 19.98.
 const WEATHER_TRIGGER_VALUE_GETTERS = {
-  [WEATHER_TRIGGER_FIELDS.TEMPERATURE]: (weather) => weather.temperature,
-  [WEATHER_TRIGGER_FIELDS.HUMIDITY]: (weather) => weather.humidity,
+  [WEATHER_TRIGGER_FIELDS.TEMPERATURE]: (weather) =>
+    typeof weather.temperature === 'number' ? Math.round(weather.temperature) : undefined,
+  [WEATHER_TRIGGER_FIELDS.HUMIDITY]: (weather) =>
+    typeof weather.humidity === 'number' ? Math.round(weather.humidity) : undefined,
   [WEATHER_TRIGGER_FIELDS.WIND_SPEED]: (weather) =>
-    typeof weather.wind_speed === 'number' ? weather.wind_speed * 3.6 : undefined,
+    typeof weather.wind_speed === 'number' ? Math.round(weather.wind_speed * 3.6) : undefined,
   [WEATHER_TRIGGER_FIELDS.CONDITION]: (weather) => weather.weather,
 };
 

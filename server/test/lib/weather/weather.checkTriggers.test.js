@@ -8,6 +8,8 @@ const Weather = require('../../../lib/weather');
 const { EVENTS, WEATHER_TRIGGER_FIELDS } = require('../../../utils/constants');
 
 const HOUSE = { selector: 'weather-trigger-house', latitude: 48.85, longitude: 2.35 };
+// located, but no weather trigger watches it: the check must never poll it
+const OTHER_HOUSE = { selector: 'other-house', latitude: 45.76, longitude: 4.83 };
 
 const buildWeather = (getResults) => {
   // getResults: array of payloads (or Error) returned by successive polls
@@ -31,7 +33,9 @@ const buildWeather = (getResults) => {
     },
   };
   const event = { on: fake.returns(null), emit: fake.returns(null) };
-  const house = { get: fake.resolves([HOUSE, { selector: 'no-gps-house', latitude: null, longitude: null }]) };
+  const house = {
+    get: fake.resolves([HOUSE, OTHER_HOUSE, { selector: 'no-gps-house', latitude: null, longitude: null }]),
+  };
   const weather = new Weather(service, event, {}, house);
   return { weather, event, provider, house };
 };
@@ -92,8 +96,55 @@ describe('weather.checkTriggers', () => {
       weather: second,
       previous_weather: first,
     });
-    // the house without coordinates is skipped: one call per poll
+    // the house without coordinates and the house no trigger watches are
+    // both skipped: one call per poll
     expect(provider.weather.get.callCount).to.equal(2);
+  });
+
+  it('should only poll the houses watched by a weather trigger', async () => {
+    const { weather, provider } = buildWeather([{ temperature: 12 }]);
+    await weather.checkTriggers();
+    expect(provider.weather.get.callCount).to.equal(1);
+    expect(provider.weather.get.firstCall.args[0]).to.include({
+      latitude: HOUSE.latitude,
+      longitude: HOUSE.longitude,
+    });
+  });
+
+  it('should re-baseline a house that left the watched set', async () => {
+    const { weather, event, provider } = buildWeather([{ wind_speed: 2 }, { wind_speed: 8 }]);
+    // baseline
+    await weather.checkTriggers();
+    // the scene is deactivated: nothing is polled and the baseline is dropped
+    await db.Scene.update({ active: false }, { where: { id: scene.id } });
+    await weather.checkTriggers();
+    expect(provider.weather.get.callCount).to.equal(1);
+    // back: the first poll baselines again instead of comparing against a
+    // payload from another day
+    await db.Scene.update({ active: true }, { where: { id: scene.id } });
+    await weather.checkTriggers();
+    expect(triggerCheckCalls(event)).to.have.lengthOf(0);
+  });
+
+  it('should share one provider call per house with the alert check', async () => {
+    // an alert scene polls every located house, the trigger scene only its
+    // own: running both at once must cost one call per house, not two for
+    // the house they both need
+    await db.Scene.create({
+      name: 'Weather alert scene test',
+      icon: 'fe-cloud',
+      active: true,
+      triggers: [{ type: EVENTS.WEATHER.ALERT_RAISED, house: HOUSE.selector }],
+      actions: [[]],
+    });
+    const { weather, provider } = buildWeather([{ temperature: 12, alerts: [] }]);
+    await Promise.all([weather.checkAlerts(), weather.checkTriggers()]);
+    // HOUSE (both checks) + OTHER_HOUSE (alert check only)
+    expect(provider.weather.get.callCount).to.equal(2);
+    const watchedHouseCalls = provider.weather.get
+      .getCalls()
+      .filter((callObject) => callObject.args[0].latitude === HOUSE.latitude);
+    expect(watchedHouseCalls).to.have.lengthOf(1);
   });
 
   it('should drop a check landing while another one is still in flight', async () => {
