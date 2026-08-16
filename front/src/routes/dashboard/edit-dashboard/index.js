@@ -310,6 +310,10 @@ class EditDashboard extends Component {
     }
   };
 
+  duplicateCurrentDashboard = () => {
+    route(`/dashboard/${this.state.currentDashboard.selector}/duplicate`);
+  };
+
   askDeleteCurrentDashboard = async () => {
     await this.setState({
       askDeleteDashboard: true
@@ -426,6 +430,7 @@ class EditDashboard extends Component {
         updateBoxConfig={this.updateBoxConfig}
         updateCurrentDashboardName={this.updateCurrentDashboardName}
         updateCurrentDashboardVisibility={this.updateCurrentDashboardVisibility}
+        duplicateCurrentDashboard={this.duplicateCurrentDashboard}
         askDeleteCurrentDashboard={this.askDeleteCurrentDashboard}
         cancelDeleteCurrentDashboard={this.cancelDeleteCurrentDashboard}
         deleteCurrentDashboard={this.deleteCurrentDashboard}

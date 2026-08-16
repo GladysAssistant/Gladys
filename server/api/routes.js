@@ -201,6 +201,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: dashboardController.destroy,
     },
+    'post /api/v1/dashboard/:dashboard_selector/duplicate': {
+      authenticated: true,
+      controller: dashboardController.duplicate,
+    },
     // device
     'post /api/v1/device': {
       authenticated: true,

@@ -174,6 +174,42 @@ describe('POST /api/v1/dashboard/order', () => {
   });
 });
 
+describe('POST /api/v1/dashboard/:dashboard_selector/duplicate', () => {
+  it('should duplicate a dashboard', async () => {
+    await authenticatedRequest
+      .post('/api/v1/dashboard/test-dashboard/duplicate')
+      .send({
+        name: 'Copy of Test dashboard',
+      })
+      .expect('Content-Type', /json/)
+      .expect(201)
+      .then((res) => {
+        expect(res.body).to.have.property('name', 'Copy of Test dashboard');
+        expect(res.body).to.have.property('type', 'main');
+        expect(res.body).to.have.property('visibility', DASHBOARD_VISIBILITY.PRIVATE);
+        expect(res.body).to.have.property('user_id', '0cd30aef-9c4e-4a23-88e3-3547971296e5');
+        expect(res.body.selector).to.contain('copy-of-test-dashboard');
+        expect(res.body.boxes).to.deep.equal([
+          [
+            {
+              type: 'weather',
+            },
+          ],
+        ]);
+      });
+  });
+
+  it('should return 404, dashboard not found', async () => {
+    await authenticatedRequest
+      .post('/api/v1/dashboard/not-found-dashboard/duplicate')
+      .send({
+        name: 'Copy of a dashboard',
+      })
+      .expect('Content-Type', /json/)
+      .expect(404);
+  });
+});
+
 describe('DELETE /api/v1/dashboard/:dashboard_selector', () => {
   it('should patch dashboard', async () => {
     await authenticatedRequest

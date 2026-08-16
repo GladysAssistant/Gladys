@@ -12,6 +12,9 @@ const EditActions = props => (
             <button onClick={props.askDeleteCurrentDashboard} className="btn btn-outline-danger btn-sm ml-2">
               <Text id="dashboard.editDashboardDeleteButton" /> <i class="fe fe-trash" />
             </button>
+            <button onClick={props.duplicateCurrentDashboard} className="btn btn-outline-secondary btn-sm ml-2">
+              <Text id="dashboard.editDashboardDuplicateButton" /> <i class="fe fe-copy" />
+            </button>
             <button onClick={props.saveDashboard} className="btn btn-outline-primary btn-sm ml-2">
               <Text id="dashboard.editDashboardSaveButton" /> <i class="fe fe-check" />
             </button>
