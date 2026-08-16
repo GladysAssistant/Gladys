@@ -486,12 +486,20 @@ describe('networkDiscovery.readArpTable', () => {
 192.168.1.71     0x1         0x2         64:E4:A5:B4:88:74     *        eth0
 192.168.1.72     0x1         0x0         00:00:00:00:00:00     *        eth0
 192.168.1.73     0x1         0x0         incomplete            *        eth0
+192.168.1.75     0x1         0x0         AA:BB:CC:DD:EE:FF     *        eth0
+192.168.1.76     0x1         0x6         11:22:33:44:55:66     *        eth0
 192.168.1.74
 
 `,
     );
     const macByIp = await readArpTable(arpTablePath);
-    expect([...macByIp.entries()]).to.deep.equal([['192.168.1.71', '64:e4:a5:b4:88:74']]);
+    // 192.168.1.75 looks resolved but ATF_COM (0x2) is not set: the kernel
+    // gave up on it and kept the address it last saw, which may be stale.
+    // 192.168.1.76 is permanent (ATF_PERM | ATF_COM) and must be kept.
+    expect([...macByIp.entries()]).to.deep.equal([
+      ['192.168.1.71', '64:e4:a5:b4:88:74'],
+      ['192.168.1.76', '11:22:33:44:55:66'],
+    ]);
   });
 
   it('should return an empty map when the neighbour table cannot be read', async () => {

@@ -9,12 +9,16 @@ const ARP_TABLE_PATH = '/proc/net/arp';
 // an incomplete neighbour entry is listed with an all-zero hardware address
 const EMPTY_MAC_ADDRESS = '00:00:00:00:00:00';
 const MAC_ADDRESS_REGEX = /^([0-9a-f]{2}:){5}[0-9a-f]{2}$/i;
+// ATF_COM: the kernel only sets this flag on a resolved entry. An entry it
+// failed to resolve, or that it gave up on, keeps whatever hardware address
+// it last had — reading it would hand the integration a stale MAC.
+const ATF_COM = 0x2;
 
 /**
  * @description Read the kernel neighbour (ARP) table of the core, which
- * runs network=host: an IP that just answered a scan is in it. Reading it
- * is best-effort — a non-Linux host, a missing /proc or an entry the
- * kernel never resolved simply yields no MAC, never an error.
+ * runs network=host. Reading it is best-effort — a non-Linux host, a
+ * missing /proc or an entry the kernel never resolved simply yields no
+ * MAC, never an error.
  * @param {string} [arpTablePath] - Path of the kernel ARP table (tests only).
  * @returns {Promise<Map>} Resolve with a Map of IPv4 address -> MAC address.
  * @example
@@ -34,8 +38,12 @@ async function readArpTable(arpTablePath = ARP_TABLE_PATH) {
     .split('\n')
     .slice(1)
     .forEach((line) => {
-      const [ip, , , mac] = line.trim().split(/\s+/);
+      const [ip, , flags, mac] = line.trim().split(/\s+/);
       if (!ip || !mac || mac === EMPTY_MAC_ADDRESS || !MAC_ADDRESS_REGEX.test(mac)) {
+        return;
+      }
+      // eslint-disable-next-line no-bitwise
+      if (!(parseInt(flags, 16) & ATF_COM)) {
         return;
       }
       macByIp.set(ip, mac.toLowerCase());
@@ -48,8 +56,9 @@ async function readArpTable(arpTablePath = ARP_TABLE_PATH) {
  * search target and collect the raw response headers of each responder.
  * The integration parses the headers itself. Each responder IP is also
  * looked up in the neighbour table, and `source_mac` is added when the
- * kernel already knows it — the integration gets a stable identifier
- * (Wake-on-LAN, matching across DHCP leases) without asking the user.
+ * kernel happens to know it — the integration gets a stable identifier
+ * (Wake-on-LAN, matching across DHCP leases) without asking the user. The
+ * field is best-effort: an integration must handle its absence.
  * @param {object} options - Scan options.
  * @param {string} options.st - The declared SSDP search target.
  * @param {number} options.timeoutMs - Listen duration in milliseconds.
@@ -103,8 +112,10 @@ async function scanSsdp({
   // the socket is always implicitly bound by the send, even when the
   // M-SEARCH itself failed: close never throws here
   socket.close();
-  // the neighbour table is read once, after the scan: the responders have
-  // just talked to us, so the kernel resolved them on the way
+  // the neighbour table is read once, after the scan. Receiving a unicast
+  // response does not populate it by itself: the entry is normally there
+  // because the responder ARPed for us before answering, which it skips
+  // when it already had our address cached. A miss is expected, not a bug.
   const macByIp = await readArpTable(arpTablePath);
   return results.map((result) => {
     const mac = macByIp.get(result.source_ip);
