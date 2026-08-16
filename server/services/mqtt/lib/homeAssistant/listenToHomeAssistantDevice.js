@@ -42,13 +42,20 @@ function getStateTopic(component, property, config) {
  * same sensor. A discovery payload is untrusted input though, so filters that would pull in
  * traffic far beyond the device they claim to describe are still refused: "#", which matches
  * every remaining level, and filters without a single concrete level ("+", "+/+"...).
- * @param {string} topic - The state topic advertised in the discovery payload.
+ * A discovery payload can also hold anything in "state_topic" ({}, true, 1...), so this
+ * helper never assumes a string and never throws: it just refuses what it cannot subscribe to.
+ * @param {any} topic - The state topic advertised in the discovery payload.
  * @returns {boolean} True when the topic can be subscribed to.
  * @example
  * isSubscribableStateTopic('+/+/BTtoMQTT/A4C138800021');
  */
 function isSubscribableStateTopic(topic) {
-  return !topic.includes('#') && topic.split('/').some((level) => level !== '+');
+  if (typeof topic !== 'string' || topic.length === 0 || topic.includes('#')) {
+    return false;
+  }
+  const levels = topic.split('/');
+  // "+" is a wildcard only when it takes a whole level: "foo+bar" is not a valid filter
+  return levels.every((level) => level === '+' || !level.includes('+')) && levels.some((level) => level !== '+');
 }
 
 /**
@@ -118,7 +125,7 @@ function listenToHomeAssistantDeviceStateIfNeeded(device) {
           return;
         }
         if (!isSubscribableStateTopic(topic)) {
-          logger.warn(`MQTT Home Assistant: ignoring state topic ${topic}, this filter is too broad`);
+          logger.warn(`MQTT Home Assistant: ignoring state topic ${topic}, this filter is invalid or too broad`);
           return;
         }
         if (!this.haStateBindings[topic]) {
