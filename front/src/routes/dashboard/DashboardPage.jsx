@@ -15,7 +15,12 @@ const DashboardPage = ({ children, ...props }) => {
   return (
     <div class="page">
       <div
-        class={cx('page-main', { [style.dashboardBackground]: backgroundImage })}
+        class={cx('page-main', {
+          [style.dashboardBackground]: backgroundImage || glassCards,
+          // default glass scene, only when no background image is configured
+          [style.glassScene]: glassCards && !backgroundImage,
+          'glass-theme': glassCards
+        })}
         style={backgroundImage ? `background-image: url(${JSON.stringify(backgroundImage)})` : undefined}
       >
         <div class={props.loading ? 'dimmer active' : 'dimmer'}>
@@ -116,11 +121,7 @@ const DashboardPage = ({ children, ...props }) => {
                   </div>
                 )}
                 {props.dashboardNotConfigured && <EmptyState dashboardListEmpty={props.dashboardListEmpty} />}
-                {!props.dashboardNotConfigured && (
-                  <div class={cx({ [style.glassCards]: glassCards })}>
-                    <BoxColumns homeDashboard={props.currentDashboard} />
-                  </div>
-                )}
+                {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
               </div>
             </div>
           </div>

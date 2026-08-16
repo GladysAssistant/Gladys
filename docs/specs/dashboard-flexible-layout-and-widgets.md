@@ -89,7 +89,8 @@ A **full-width bar of compact pills**, each pill summarizing one state with an a
 
 The scene box (`front/src/components/boxs/scene/`) gains an **optional state subtitle** per scene button:
 
-- Config **as implemented**: `scene_status_features`, a map of scene selector → device feature selector on the scene box. The feature's compact value renders as a muted second line under the scene name and updates live over websocket. No subtitle configured → the box renders exactly as today.
+- Config **as implemented**: `scene_status_features`, a map of scene selector → device feature selector on the scene box. The feature's compact value renders as a muted second line under the scene name and updates live over websocket.
+- **Scene rows are pills** (all card styles, since the Horizon work): each scene renders as its own rounded row — tinted icon square, name + optional status subtitle, start button — instead of a table row. The default style keeps a quiet gray pill; the glass theme makes it translucent. Start-button markup and i18n are unchanged.
 - The compact value rendering is shared with the chips bar through `front/src/components/device/DeviceFeatureValueText.jsx` (open/closed for opening sensors, on/off for binaries, rounded value + short unit otherwise).
 - An openings-style counter subtitle ("0/4 open") is **not** implemented yet; it can be added later as an alternative entry in the same map without breaking the shape.
 - Joi: additive fields on the scene box schema; fully backward compatible.
@@ -147,7 +148,12 @@ Generating the `house-view` illustration is the one step that cannot be beautifu
 Additive, optional (nullable) columns on `t_dashboard` (migration `20260815000000`; absent fields = exactly today's rendering):
 
 - `background_image`: none (default) | an image URL for now — switches to a dashboard asset reference (bundled wallpapers, uploads) when the asset storage lands in phase 4;
-- `card_style`: `default` | `glass` (`DASHBOARD_CARD_STYLE` in `server/utils/constants.js` — translucent cards with backdrop blur, with a dark-mode variant);
+- `card_style`: `default` | `glass` (`DASHBOARD_CARD_STYLE` in `server/utils/constants.js`). **`glass` is the "Horizon" theme**, a full wall-panel-grade restyle of the dashboard page, not just translucent cards:
+  - a global `glass-theme` class on the dashboard page gates the whole theme; tokens (`--gl-*`: ink/muted/accent, radii, glass surfaces, borders, shadows) live in `front/src/routes/dashboard/style.css`, and component variants (chips, house-view pins, value tiles, clock, scenes, tablet dock) compose on the same class next to their component;
+  - deep glass cards (blur + saturate, 26px radius, layered shadows), uppercase micro-label card titles, two-level ink discipline, pastel tinted stamps, soft pill action buttons, frosted page controls and tablet dock (active tab inverted);
+  - **default scene**: when `glass` is selected and no `background_image` is set, a pure-CSS scene (radial glows over a diagonal gradient) is applied — the wow in one click, no wallpaper hunt; a configured image wins over it;
+  - **dark mode by inversion**: the app darkens through the global inversion filter (`style/dark-mode.css`), so the theme deliberately authors NO dark colors — the light glass, scene, and pastels invert into coherent dark counterparts, and images (house illustration, backgrounds set inline) are double-inverted back by the existing rules;
+  - **degradation**: browsers without `backdrop-filter` get more opaque surfaces via `@supports`, keeping text readable on old wall tablets;
 - `icon`: feather icon shown in the tablet tab bar (section H), picked with the existing `IconSelector`.
 
 A `theme` override (`auto`/`light`/`dark`) was considered and **deferred**: the app-level dark mode is a user preference and per-dashboard overrides need a clean way to scope it; revisit after phase 4. Appearance stays a dashboard-level decision so every widget remains consistent — no per-box styling.

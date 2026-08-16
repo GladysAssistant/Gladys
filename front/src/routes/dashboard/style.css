@@ -47,15 +47,184 @@
   min-height: 100vh;
 }
 
-/* Translucent cards over the dashboard background image */
-.glassCards :global(.card) {
-  background-color: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* ==================================================================
+   "Horizon" glass theme — applied to the whole dashboard page when the
+   dashboard's card_style is 'glass'. Everything is driven by the tokens
+   below. Component-specific variants (chips, pins, tiles, clock,
+   scenes) live next to their component and compose on the same global
+   .glass-theme class.
+   Dark mode: the app darkens through the global inversion filter
+   (style/dark-mode.css), so this theme deliberately defines NO dark
+   colors — the light glass and its scene invert into their dark
+   counterparts like the rest of the app.
+   ================================================================== */
+
+:global(.glass-theme) {
+  --gl-ink: #1c2334;
+  --gl-muted: #7c8396;
+  --gl-accent: #3d6df0;
+  --gl-radius-lg: 26px;
+  --gl-radius-md: 18px;
+  --gl-card-bg: rgba(255, 255, 255, 0.52);
+  --gl-card-nested-bg: rgba(255, 255, 255, 0.4);
+  --gl-surface-strong: rgba(255, 255, 255, 0.78);
+  --gl-border: rgba(255, 255, 255, 0.85);
+  --gl-shadow: 0 18px 50px rgba(44, 62, 118, 0.13), 0 2px 8px rgba(44, 62, 118, 0.05);
+  --gl-shadow-soft: 0 4px 16px rgba(44, 62, 118, 0.09);
+  --gl-icon-tint-bg: #e3ebfb;
+  --gl-success-bg: rgba(56, 158, 90, 0.12);
+  --gl-success-ink: #2e8f5b;
+  --gl-row-border: rgba(44, 62, 118, 0.07);
+  color: var(--gl-ink);
 }
 
-:global(.dark-mode) .glassCards :global(.card) {
-  background-color: rgba(30, 33, 43, 0.72);
+/* Default scene when the dashboard has no background image of its own:
+   soft radial glows over a diagonal gradient — pure CSS, one click.
+   An inline background-image set from the dashboard config wins over this. */
+.glassScene {
+  background-image: radial-gradient(1100px 700px at 12% -10%, rgba(126, 166, 233, 0.55), transparent 60%),
+    radial-gradient(900px 650px at 95% 8%, rgba(244, 190, 148, 0.5), transparent 55%),
+    radial-gradient(1000px 800px at 85% 100%, rgba(187, 160, 228, 0.42), transparent 60%),
+    radial-gradient(900px 700px at 10% 105%, rgba(150, 212, 195, 0.4), transparent 55%),
+    linear-gradient(160deg, #eef3fb 0%, #eeeaf7 48%, #f7efe6 100%);
+}
+
+/* Cards become deep glass */
+:global(.glass-theme .card) {
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border: 1px solid var(--gl-border);
+  border-radius: var(--gl-radius-lg);
+  box-shadow: var(--gl-shadow);
+  overflow: hidden;
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme .card .card) {
+  background: var(--gl-card-nested-bg);
+  border-radius: var(--gl-radius-md);
+  box-shadow: none;
+}
+
+:global(.glass-theme .card-header) {
+  border-bottom: none;
+  background: transparent;
+  padding-bottom: 0;
+}
+
+:global(.glass-theme .card-title) {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme h4),
+:global(.glass-theme .card p) {
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme .text-muted),
+:global(.glass-theme small) {
+  color: var(--gl-muted) !important;
+}
+
+/* Value stamps become soft tinted rounded squares */
+:global(.glass-theme .stamp) {
+  border-radius: 14px;
+  width: 46px;
+  height: 46px;
+  line-height: 46px;
+  font-size: 1.15rem;
+}
+
+:global(.glass-theme .stamp.bg-green) {
+  background: #def0e2 !important;
+  color: #2e8f5b !important;
+}
+
+:global(.glass-theme .stamp.bg-blue) {
+  background: #dde9fb !important;
+  color: #3d6df0 !important;
+}
+
+:global(.glass-theme .stamp.bg-red) {
+  background: #fbe3de !important;
+  color: #d4593f !important;
+}
+
+:global(.glass-theme .stamp.bg-warning),
+:global(.glass-theme .stamp.bg-yellow) {
+  background: #f9eeda !important;
+  color: #c98a2c !important;
+}
+
+/* Start/action buttons become soft pills */
+:global(.glass-theme .btn-outline-success) {
+  background: var(--gl-success-bg);
+  border: none;
+  color: var(--gl-success-ink);
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.35rem 1rem;
+}
+
+/* Remaining tables (device lists) lose their heavy borders */
+:global(.glass-theme .table td),
+:global(.glass-theme .table th) {
+  border-top: none;
+}
+
+:global(.glass-theme .table tbody tr + tr td) {
+  border-top: 1px solid var(--gl-row-border);
+}
+
+/* Page controls become quiet frosted pills */
+:global(.glass-theme .page-options .btn),
+:global(.glass-theme .dropdown > .btn) {
+  border-radius: 999px;
+  border: 1px solid var(--gl-border);
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  font-weight: 600;
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme .dropdown > .btn) {
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme .page-options .btn-outline-primary) {
+  color: var(--gl-accent);
+}
+
+/* Tablet dock: frosted pill, active tab inverted */
+:global(.glass-theme) .dashboardTabs {
+  background: var(--gl-card-bg);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid var(--gl-border);
+  border-radius: 999px;
+  padding: 5px;
+  box-shadow: var(--gl-shadow-soft);
+  gap: 4px;
+}
+
+:global(.glass-theme) .dashboardTab {
+  border: none;
+  background: transparent;
+  width: 2.6rem;
+  height: 2.6rem;
+  color: var(--gl-muted);
+}
+
+:global(.glass-theme) .dashboardTabActive {
+  background: var(--gl-ink);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(28, 35, 52, 0.35);
 }
 
 .dashboardTabs {
@@ -192,4 +361,16 @@
   grid-template-rows: 1fr;
   /* Opening stays immediate */
   transition-delay: 0s, 0s, 0s;
+}
+
+/* Old wall tablets without backdrop-filter support get a more opaque
+   glass so text stays readable over the scene */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :global(.glass-theme .card) {
+    background: rgba(255, 255, 255, 0.92);
+  }
+
+  :global(.glass-theme) {
+    --gl-surface-strong: rgba(255, 255, 255, 0.95);
+  }
 }

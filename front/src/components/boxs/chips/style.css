@@ -34,3 +34,30 @@
 .chipValue {
   font-weight: 600;
 }
+
+/* Horizon glass theme */
+:global(.glass-theme) .chip {
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border-color: var(--gl-border);
+  box-shadow: var(--gl-shadow-soft);
+  padding: 6px 14px;
+}
+
+:global(.glass-theme) .chipLabel {
+  color: var(--gl-muted);
+  font-weight: 500;
+}
+
+:global(.glass-theme) .chipValue {
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .chip .chipIcon {
+  color: var(--gl-accent);
+}
+
+:global(.glass-theme) .chipWarning .chipIcon {
+  color: #e74c3c;
+}

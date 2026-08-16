@@ -31,3 +31,14 @@
     font-size: clamp(0.85rem, 8cqh, 1.05rem);
   }
 }
+
+/* Horizon glass theme */
+:global(.glass-theme) .tileValue {
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+:global(.glass-theme) .tileLabel {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}

@@ -82,3 +82,26 @@
   justify-content: center;
   box-shadow: 0 2px 6px rgba(31, 45, 61, 0.25);
 }
+
+/* Horizon glass theme */
+:global(.glass-theme) .pin {
+  background-color: var(--gl-surface-strong);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border-color: var(--gl-border);
+  box-shadow: 0 8px 24px rgba(44, 62, 118, 0.16);
+  padding: 5px 14px;
+}
+
+:global(.glass-theme) .pinLabel {
+  color: var(--gl-muted);
+  font-weight: 500;
+}
+
+:global(.glass-theme) .pinValue {
+  color: var(--gl-ink);
+}
+
+:global(.glass-theme) .pin .pinIcon {
+  color: var(--gl-accent);
+}

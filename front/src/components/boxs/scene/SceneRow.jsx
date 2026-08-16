@@ -18,32 +18,30 @@ class SceneRow extends Component {
 
   render({ children, ...props }, { loading }) {
     return (
-      <tr>
-        <td>
+      <div class={style.sceneRow}>
+        <span class={style.sceneIcon}>
           <i className={`fe fe-${props.icon}`} />
-        </td>
-        <td>
-          {props.name}
+        </span>
+        <div class={style.sceneInfo}>
+          <div class={style.sceneName}>{props.name}</div>
           {props.statusFeature && (
             <div class="text-muted small">
               <DeviceFeatureValueText feature={props.statusFeature} />
             </div>
           )}
-        </td>
-        <td className="text-right">
-          <button
-            onClick={this.startScene}
-            type="button"
-            class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
-              'btn-loading': loading
-            })}
-            disabled={loading}
-          >
-            <i class="fe fe-play" />
-            <Text id="scene.startButton" />
-          </button>
-        </td>
-      </tr>
+        </div>
+        <button
+          onClick={this.startScene}
+          type="button"
+          class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
+            'btn-loading': loading
+          })}
+          disabled={loading}
+        >
+          <i class="fe fe-play" />
+          <Text id="scene.startButton" />
+        </button>
+      </div>
     );
   }
 }

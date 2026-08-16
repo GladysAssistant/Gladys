@@ -48,3 +48,20 @@
   width: inherit !important;
   padding-top: 100%;
 }
+
+/* Horizon glass theme: thin, large, non-monospace time */
+:global(.glass-theme) .digitalTime {
+  font-family: inherit;
+  font-weight: 200;
+  font-size: 56px;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+:global(.glass-theme) .digitalDate {
+  color: var(--gl-muted);
+  font-weight: 500;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  padding-top: 4px;
+}

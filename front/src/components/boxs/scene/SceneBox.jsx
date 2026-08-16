@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import { RequestStatus } from '../../../utils/consts';
 import SceneRow from './SceneRow';
 import cx from 'classnames';
+import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
 class SceneBoxComponent extends Component {
@@ -111,26 +112,22 @@ class SceneBoxComponent extends Component {
         >
           <div class="loader py-3" />
           <div class="dimmer-content">
-            <div class="table-responsive">
-              <table className="table card-table table-vcenter">
-                <tbody>
-                  {scenes &&
-                    scenes.map(scene => (
-                      <SceneRow
-                        boxStatus={status}
-                        name={scene.name}
-                        icon={scene.icon}
-                        user={props.user}
-                        sceneSelector={scene.selector}
-                        statusFeature={
-                          featuresBySelector &&
-                          props.box.scene_status_features &&
-                          featuresBySelector[props.box.scene_status_features[scene.selector]]
-                        }
-                      />
-                    ))}
-                </tbody>
-              </table>
+            <div class={style.sceneList}>
+              {scenes &&
+                scenes.map(scene => (
+                  <SceneRow
+                    boxStatus={status}
+                    name={scene.name}
+                    icon={scene.icon}
+                    user={props.user}
+                    sceneSelector={scene.selector}
+                    statusFeature={
+                      featuresBySelector &&
+                      props.box.scene_status_features &&
+                      featuresBySelector[props.box.scene_status_features[scene.selector]]
+                    }
+                  />
+                ))}
             </div>
           </div>
         </div>
