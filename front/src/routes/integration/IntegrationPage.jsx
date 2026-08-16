@@ -25,6 +25,7 @@ const IntegrationPage = ({
   integrationsToUpdate,
   installedIntegrationsCount,
   installedStatusCounts,
+  installedInventoryKnown,
   category,
   origin,
   transports,
@@ -120,7 +121,12 @@ const IntegrationPage = ({
                       </div>
                     ) : category === 'updates' ? (
                       <Text id="integration.root.allIntegrationsUpToDate" />
-                    ) : category === 'installed' ? (
+                    ) : /* "nothing is installed here" is only true when the inventory is known
+                         to be empty. A facet kept from another category can empty the card list
+                         while integrations are installed, and a failed fetch leaves the inventory
+                         unknown: both fall back to the generic empty state, so the body never
+                         contradicts the summary above it */
+                    category === 'installed' && installedInventoryKnown && installedIntegrationsCount === 0 ? (
                       <Text id="integration.root.noInstalledIntegrations" />
                     ) : (
                       <Text id="integration.root.noIntegrations" />

@@ -135,7 +135,7 @@ class Integration extends Component {
     // (to link their own account, like on the native Telegram service), but
     // never the store: installing is an admin gesture
     const isAdmin = user.role === USER_ROLE.ADMIN;
-    const [externalInstalled, externalStoreResponse] = await Promise.all([
+    const [externalInstalledResponse, externalStoreResponse] = await Promise.all([
       // null and not []: a failed request means "unknown", not "nothing
       // installed". An empty array would be counted as zero integration to
       // update and would clear the header counter on a network hiccup
@@ -143,7 +143,11 @@ class Integration extends Component {
       isAdmin ? httpClient.get('/api/v1/external_integration/store').catch(() => null) : Promise.resolve(null)
     ]);
     await this.setState({
-      externalInstalled,
+      // this list is reloaded on a user change and whenever the shared "to
+      // update" counter moves: a failed reload must not erase what we already
+      // know, or a network hiccup would make the installed cards, their menu
+      // entry and their inventory count blink out until the next reload
+      externalInstalled: externalInstalledResponse || this.state.externalInstalled || null,
       externalStore: externalStoreResponse ? externalStoreResponse.integrations : []
     });
     this.getIntegrations();
@@ -489,6 +493,11 @@ class Integration extends Component {
     // is currently applied
     const installedIntegrations = catalog.filter(integration => integration.externalInstalled);
 
+    // an inventory of zero only means "nothing is installed" once the list has
+    // actually been downloaded: while it is loading, or after a failed fetch,
+    // the count is unknown and the view must not claim the instance is empty
+    const installedInventoryKnown = !!this.state.externalInstalled;
+
     // the integration pages send the user back here: this runs on mount and on
     // every filter change, so the remembered view is always the current one
     rememberCatalogUrl(getCatalogUrl({ category, searchKeyword, orderDir, origin, transports, gladysPlus }));
@@ -500,6 +509,7 @@ class Integration extends Component {
       integrationsToUpdate,
       installedIntegrationsCount: installedIntegrations.length,
       installedStatusCounts: countInstalledByStatus(installedIntegrations),
+      installedInventoryKnown,
       searchKeyword,
       orderDir
     });
