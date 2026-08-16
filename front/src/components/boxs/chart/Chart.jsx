@@ -293,7 +293,9 @@ class Chartbox extends Component {
       });
       return;
     }
-    await this.setState({ loading: true, error: null, errorDetail: null });
+    // A failed export is about the period the user was looking at: it is cleared
+    // as soon as the chart displays something else.
+    await this.setState({ loading: true, error: null, errorDetail: null, exportError: null, exportErrorDetail: null });
     try {
       const maxStates = 300;
 
@@ -682,15 +684,21 @@ class Chartbox extends Component {
                       </a>
                     )}
                     <div class={style.dropdownDivider} />
-                    <a class={style.dropdownItemChart} onClick={this.exportCsv}>
+                    <button
+                      type="button"
+                      class={style.dropdownItemChart}
+                      onClick={this.exportCsv}
+                      disabled={exportingCsv}
+                    >
                       <i
                         class={cx('fe', 'mr-2', {
                           'fe-download': !exportingCsv,
-                          'fe-loader': exportingCsv
+                          'fe-loader': exportingCsv,
+                          [style.spinning]: exportingCsv
                         })}
                       />
                       <Text id="dashboard.boxes.chart.exportCsv" />
-                    </a>
+                    </button>
                   </div>
                 </div>
 

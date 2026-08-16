@@ -132,13 +132,21 @@ module.exports = function DeviceController(gladys) {
    */
   async function exportStatesToCsv(req, res) {
     const deviceFeatures = req.query.device_features ? req.query.device_features.split(',') : [];
-    const csv = await gladys.device.exportStatesToCsv(deviceFeatures, req.query.start, req.query.end);
-    // The dates are already validated by the export itself, so they can safely be
-    // used to build a filename explaining what the file contains.
-    const startDay = new Date(req.query.start).toISOString().slice(0, 10);
-    const endDay = new Date(req.query.end).toISOString().slice(0, 10);
-    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="gladys-history-${startDay}-${endDay}.csv"`);
+    // Calls coming from Gladys Plus are answered through the gateway, whose response
+    // object only implements send/json/status: there is no header to set, and the
+    // payload has to stay small enough to travel over the websocket.
+    const isHttpResponse = typeof res.setHeader === 'function';
+    const csv = await gladys.device.exportStatesToCsv(deviceFeatures, req.query.start, req.query.end, {
+      maxSizeInBytes: isHttpResponse ? undefined : gladys.device.MAX_CSV_EXPORT_SIZE_THROUGH_GATEWAY_IN_BYTES,
+    });
+    if (isHttpResponse) {
+      // The dates are already validated by the export itself, so they can safely be
+      // used to build a filename explaining what the file contains.
+      const startDay = new Date(req.query.start).toISOString().slice(0, 10);
+      const endDay = new Date(req.query.end).toISOString().slice(0, 10);
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="gladys-history-${startDay}-${endDay}.csv"`);
+    }
     res.send(csv);
   }
 

@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const db = require('../../../models');
 
 const { authenticatedRequest } = require('../request.test');
+const { EVENTS } = require('../../../utils/constants');
 
 const insertStates = async (intervalInMinutes) => {
   const deviceFeatureStateToInsert = [];
@@ -198,6 +199,34 @@ describe('GET /api/v1/device_feature/states_csv', () => {
       })
       .expect('Content-Type', /json/)
       .expect(400);
+  });
+  it('should export device feature states as CSV through the Gladys Gateway', (done) => {
+    const user = {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      firstname: 'John',
+      lastname: 'Doe',
+      selector: 'john',
+      email: 'demo@demo.com',
+      language: 'en',
+    };
+    // The gateway response object has no setHeader: the export must answer the CSV
+    // instead of crashing on the missing method.
+    // @ts-ignore
+    global.TEST_GLADYS_INSTANCE.event.emit(
+      EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
+      user,
+      'GET',
+      '/api/v1/device_feature/states_csv?device_features=test-device-feature&start=2025-08-28T00:00:00.000Z&end=2025-08-29T00:00:00.000Z',
+      {},
+      {},
+      (data) => {
+        expect(data).to.be.a('string');
+        const lines = data.split('\n');
+        expect(lines).to.have.lengthOf(3);
+        expect(lines[0]).to.equal('date,device,feature,unit,value');
+        done();
+      },
+    );
   });
 });
 

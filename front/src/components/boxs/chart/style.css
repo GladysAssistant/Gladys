@@ -80,6 +80,22 @@
   text-decoration: none;
 }
 
+/* The loader icon is a static glyph: it only looks like a loader when it turns. */
+.spinning {
+  display: inline-block;
+  animation: dropdownItemChartSpin 1s linear infinite;
+}
+
+@keyframes dropdownItemChartSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .dropdownItemChart:focus,
 .dropdownItemChart:hover {
   color: inherit;

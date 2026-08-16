@@ -134,6 +134,117 @@ describe('Device.exportStatesToCsv', function Describe() {
     );
   });
 
+  it('should neutralize values a spreadsheet would run as a formula', async () => {
+    await db.duckDbBatchInsertState(FEATURE_1_ID, [{ value: -1.5, created_at: new Date('2025-08-28T15:00:00.000Z') }]);
+    const stateManager = buildStateManager(
+      {
+        'my-feature': {
+          id: FEATURE_1_ID,
+          name: '@SUM(A1)',
+          unit: '-cmd',
+          device_id: 'device-1',
+        },
+      },
+      { 'device-1': { name: '=1+1' } },
+    );
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const csv = await deviceInstance.exportStatesToCsv(
+      ['my-feature'],
+      '2025-08-28T15:00:00.000Z',
+      '2025-08-28T15:30:00.000Z',
+    );
+    expect(csv).to.equal(
+      [
+        'date,device,feature,unit,value',
+        // The negative value stays a number: only text values are prefixed.
+        `2025-08-28T15:00:00.000Z,'=1+1,'@SUM(A1),'-cmd,-1.5`,
+      ].join('\n'),
+    );
+  });
+
+  it('should quote values containing a carriage return', async () => {
+    await db.duckDbBatchInsertState(FEATURE_1_ID, [{ value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') }]);
+    const stateManager = buildStateManager(
+      {
+        'my-feature': {
+          id: FEATURE_1_ID,
+          name: 'Temperature',
+          unit: 'celsius',
+          device_id: 'device-1',
+        },
+      },
+      { 'device-1': { name: 'Kitchen\r\nsecond line' } },
+    );
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    const csv = await deviceInstance.exportStatesToCsv(
+      ['my-feature'],
+      '2025-08-28T15:00:00.000Z',
+      '2025-08-28T15:30:00.000Z',
+    );
+    expect(csv).to.equal(
+      [
+        'date,device,feature,unit,value',
+        '2025-08-28T15:00:00.000Z,"Kitchen\r\nsecond line",Temperature,celsius,1',
+      ].join('\n'),
+    );
+  });
+
+  it('should export a device feature only once when it is selected several times', async () => {
+    await db.duckDbBatchInsertState(FEATURE_1_ID, [
+      { value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') },
+      { value: 2, created_at: new Date('2025-08-28T15:01:00.000Z') },
+    ]);
+    const stateManager = buildStateManager(
+      {
+        'my-feature': {
+          id: FEATURE_1_ID,
+          name: 'Temperature',
+          unit: 'celsius',
+          device_id: 'device-1',
+        },
+      },
+      { 'device-1': { name: 'Living room sensor' } },
+    );
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    // The count query deduplicates selectors, so loading them twice would export
+    // more states than the limit that was checked.
+    deviceInstance.MAX_STATES_TO_EXPORT_IN_CSV = 2;
+    const csv = await deviceInstance.exportStatesToCsv(
+      ['my-feature', 'my-feature'],
+      '2025-08-28T15:00:00.000Z',
+      '2025-08-28T15:30:00.000Z',
+    );
+    expect(csv).to.equal(
+      [
+        'date,device,feature,unit,value',
+        '2025-08-28T15:00:00.000Z,Living room sensor,Temperature,celsius,1',
+        '2025-08-28T15:01:00.000Z,Living room sensor,Temperature,celsius,2',
+      ].join('\n'),
+    );
+  });
+
+  it('should throw BadParameters when the file is bigger than the maximum size', async () => {
+    await db.duckDbBatchInsertState(FEATURE_1_ID, [{ value: 1, created_at: new Date('2025-08-28T15:00:00.000Z') }]);
+    const stateManager = buildStateManager(
+      {
+        'my-feature': {
+          id: FEATURE_1_ID,
+          name: 'Temperature',
+          unit: 'celsius',
+          device_id: 'device-1',
+        },
+      },
+      { 'device-1': { name: 'Living room sensor' } },
+    );
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
+    await assert.isRejected(
+      deviceInstance.exportStatesToCsv(['my-feature'], '2025-08-28T15:00:00.000Z', '2025-08-28T15:30:00.000Z', {
+        maxSizeInBytes: 10,
+      }),
+      'Please export a shorter period.',
+    );
+  });
+
   it('should return only the header when there is no state in the period', async () => {
     const stateManager = buildStateManager(
       {
