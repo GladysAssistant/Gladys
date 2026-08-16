@@ -65,9 +65,14 @@ const matchWeather = (self, sceneSelector, event, trigger) => {
     return false;
   }
   // the condition is compared as a string of the pivot enum, everything
-  // else as a number — a value left empty in the UI never matches
+  // else as a number — a value left empty in the UI never matches.
+  // The threshold is put on the same integer grid as the observed value:
+  // a value stored by an imperial editor is a converted float (20 mph =
+  // 32.1868 km/h, 70 °F = 21.111 °C), and comparing it against the rounded
+  // 32 km/h / 21 °C the dashboard displays would miss the rule the user
+  // copied from their widget.
   const isCondition = trigger.weather_field === WEATHER_TRIGGER_FIELDS.CONDITION;
-  const expectedValue = isCondition ? trigger.value : Number(trigger.value);
+  const expectedValue = isCondition ? trigger.value : Math.round(Number(trigger.value));
   if (!isCondition && Number.isNaN(expectedValue)) {
     return false;
   }

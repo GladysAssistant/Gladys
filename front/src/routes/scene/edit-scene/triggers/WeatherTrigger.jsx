@@ -51,29 +51,33 @@ const KM_PER_MILE = 1.60934;
 const isImperialTemperature = user => !!user && user.temperature_unit_preference === DEVICE_FEATURE_UNITS.FAHRENHEIT;
 const isImperialWindSpeed = user => !!user && user.distance_unit_preference === MEASUREMENT_UNITS.US;
 
-const roundValue = value => Math.round(value * 10) / 10;
-
+// the matcher compares the observed value as the dashboard widget displays
+// it (Math.round on °C, km/h and %), so a threshold only means what it says
+// on that same integer grid: 20 mph stored as the raw 32.1868 km/h would
+// never match the 32 km/h the widget shows. Both ends of the conversion are
+// therefore rounded, which also keeps the round-trip stable (20 mph -> 32
+// km/h stored -> 20 mph displayed).
 const toDisplayValue = (value, field, user) => {
   if (typeof value !== 'number') {
     return value;
   }
   if (field === WEATHER_TRIGGER_FIELDS.TEMPERATURE && isImperialTemperature(user)) {
-    return roundValue(celsiusToFahrenheit(value));
+    return Math.round(celsiusToFahrenheit(value));
   }
   if (field === WEATHER_TRIGGER_FIELDS.WIND_SPEED && isImperialWindSpeed(user)) {
-    return roundValue(value / KM_PER_MILE);
+    return Math.round(value / KM_PER_MILE);
   }
-  return value;
+  return Math.round(value);
 };
 
 const toStoredValue = (value, field, user) => {
   if (field === WEATHER_TRIGGER_FIELDS.TEMPERATURE && isImperialTemperature(user)) {
-    return fahrenheitToCelsius(value);
+    return Math.round(fahrenheitToCelsius(value));
   }
   if (field === WEATHER_TRIGGER_FIELDS.WIND_SPEED && isImperialWindSpeed(user)) {
-    return value * KM_PER_MILE;
+    return Math.round(value * KM_PER_MILE);
   }
-  return value;
+  return Math.round(value);
 };
 
 const getUnitLabel = (field, user) => {
@@ -92,7 +96,7 @@ const getUnitLabel = (field, user) => {
 
 // the wind speed rule of the original request, so a freshly added trigger
 // is already meaningful. Metric, like every stored value: an imperial user
-// sees it converted (20 km/h -> 12.4 mph)
+// sees it converted (20 km/h -> 12 mph)
 const DEFAULT_FIELD = WEATHER_TRIGGER_FIELDS.WIND_SPEED;
 const DEFAULT_OPERATOR = '>';
 const DEFAULT_VALUE = 20;

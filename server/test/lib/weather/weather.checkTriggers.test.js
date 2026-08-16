@@ -126,6 +126,67 @@ describe('weather.checkTriggers', () => {
     expect(triggerCheckCalls(event)).to.have.lengthOf(0);
   });
 
+  it('should drop only the baseline of the house that left the watched set', async () => {
+    // two watched houses, one of them stops being watched: its baseline is
+    // dropped while the other one keeps being compared. Each poll of a
+    // house returns a payload it has never returned before, so a stale
+    // baseline would show up as an event.
+    const otherScene = await db.Scene.create({
+      name: 'Weather trigger scene test, other house',
+      icon: 'fe-cloud',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.WEATHER.MATCHED,
+          house: OTHER_HOUSE.selector,
+          weather_field: WEATHER_TRIGGER_FIELDS.WIND_SPEED,
+          operator: '>',
+          value: 20,
+        },
+      ],
+      actions: [[]],
+    });
+    const pollsPerHouse = new Map();
+    const provider = {
+      weather: {
+        get: fake(async ({ latitude }) => {
+          const poll = (pollsPerHouse.get(latitude) || 0) + 1;
+          pollsPerHouse.set(latitude, poll);
+          return { wind_speed: poll };
+        }),
+      },
+    };
+    const service = { getService: () => provider, stateManager: { getAllKeys: () => ['ext-fake-weather'] } };
+    const event = { on: fake.returns(null), emit: fake.returns(null) };
+    const house = { get: fake.resolves([HOUSE, OTHER_HOUSE]) };
+    const weather = new Weather(service, event, {}, house);
+
+    // poll 1: both houses baseline
+    await weather.checkTriggers();
+    expect(triggerCheckCalls(event)).to.have.lengthOf(0);
+    expect(provider.weather.get.callCount).to.equal(2);
+
+    // OTHER_HOUSE is no longer watched: it is not polled and its baseline
+    // is dropped, while HOUSE keeps comparing against its own
+    await db.Scene.update({ active: false }, { where: { id: otherScene.id } });
+    await weather.checkTriggers();
+    expect(provider.weather.get.callCount).to.equal(3);
+    let calls = triggerCheckCalls(event);
+    expect(calls).to.have.lengthOf(1);
+    expect(calls[0].args[1]).to.include({ house: HOUSE.selector });
+    expect(calls[0].args[1].previous_weather).to.deep.equal({ wind_speed: 1 });
+
+    // watched again: its first poll re-baselines instead of firing against
+    // the payload it left with
+    await db.Scene.update({ active: true }, { where: { id: otherScene.id } });
+    await weather.checkTriggers();
+    expect(provider.weather.get.callCount).to.equal(5);
+    calls = triggerCheckCalls(event);
+    expect(calls).to.have.lengthOf(2);
+    expect(calls[1].args[1]).to.include({ house: HOUSE.selector });
+    expect(calls.filter((callObject) => callObject.args[1].house === OTHER_HOUSE.selector)).to.have.lengthOf(0);
+  });
+
   it('should share one provider call per house with the alert check', async () => {
     // an alert scene polls every located house, the trigger scene only its
     // own: running both at once must cost one call per house, not two for

@@ -8,6 +8,7 @@ const StateManager = require('../../../../lib/state');
 const SceneManager = require('../../../../lib/scene');
 const { triggersFunc } = require('../../../../lib/scene/scene.triggers');
 const { ACTIONS, EVENTS, WEATHER_TRIGGER_FIELDS } = require('../../../../utils/constants');
+const { fahrenheitToCelsius } = require('../../../../utils/units');
 
 const event = new EventEmitter();
 
@@ -155,6 +156,48 @@ describe('Scene.triggers.weather', () => {
     };
     expect(matcher(null, 'scene', buildEvent({ humidity: 89.5 }, { humidity: 40 }), humidityTrigger)).to.equal(true);
     expect(matcher(null, 'scene', buildEvent({ humidity: 89.4 }, { humidity: 40 }), humidityTrigger)).to.equal(false);
+  });
+
+  it('should compare a threshold converted from an imperial unit on the same grid', () => {
+    // what the editor stores for a rule typed in mph / °F: a converted
+    // float. The observed value is rounded like the widget displays it, so
+    // the threshold has to be read on that same integer grid — otherwise
+    // the rule copied from the dashboard silently never fires.
+    const windTrigger = {
+      house: 'my-house',
+      weather_field: WEATHER_TRIGGER_FIELDS.WIND_SPEED,
+      operator: '>=',
+      // "wind >= 20 mph" -> 32.1868 km/h
+      value: 20 * 1.60934,
+    };
+    // 8.94 m/s is displayed as "20 mph" (32 km/h) by the widget
+    expect(matcher(null, 'scene', buildEvent({ wind_speed: 8.94 }, { wind_speed: 1 }), windTrigger)).to.equal(true);
+    // 8.6 m/s = 31 km/h, "19 mph": still below
+    expect(matcher(null, 'scene', buildEvent({ wind_speed: 8.6 }, { wind_speed: 1 }), windTrigger)).to.equal(false);
+
+    const temperatureTrigger = {
+      house: 'my-house',
+      weather_field: WEATHER_TRIGGER_FIELDS.TEMPERATURE,
+      operator: '>=',
+      // "temperature >= 70 °F" -> 21.111… °C
+      value: fahrenheitToCelsius(70),
+    };
+    // 21.1 °C is displayed as "21°" (70 °F)
+    expect(matcher(null, 'scene', buildEvent({ temperature: 21.1 }, { temperature: 12 }), temperatureTrigger)).to.equal(
+      true,
+    );
+    expect(matcher(null, 'scene', buildEvent({ temperature: 20.4 }, { temperature: 12 }), temperatureTrigger)).to.equal(
+      false,
+    );
+
+    // 32 °F converts exactly, so frost keeps working either way
+    const frostTrigger = {
+      house: 'my-house',
+      weather_field: WEATHER_TRIGGER_FIELDS.TEMPERATURE,
+      operator: '<=',
+      value: fahrenheitToCelsius(32),
+    };
+    expect(matcher(null, 'scene', buildEvent({ temperature: -2 }, { temperature: 5 }), frostTrigger)).to.equal(true);
   });
 
   it('should only fire on the transition, not while the rule stays true', () => {
