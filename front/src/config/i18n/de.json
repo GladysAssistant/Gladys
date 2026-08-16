@@ -4016,7 +4016,8 @@
     "invalidName": "Name ist erforderlich",
     "dashboardAlreadyExist": "Ein Dashboard mit diesem Namen existiert bereits.",
     "unknownError": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut!",
-    "nameAfterCopy": "Kopie von {{name}}"
+    "nameAfterCopy": "Kopie von {{name}}",
+    "savedVersionInfo": "Die Kopie wird von der zuletzt gespeicherten Version dieses Dashboards erstellt. Nicht gespeicherte Änderungen werden nicht kopiert."
   },
   "duplicateScene": {
     "cardTitle": "Szene \"{{name}}\" duplizieren",

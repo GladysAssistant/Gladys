@@ -21,6 +21,9 @@ const DuplicateDashboardPage = ({ children, ...props }) => (
                 <div class="card-title">
                   <Text id="duplicateDashboard.cardTitle" fields={{ name: props.sourceDashboard.name }} />
                 </div>
+                <div class="alert alert-info">
+                  <Text id="duplicateDashboard.savedVersionInfo" />
+                </div>
                 {props.duplicateDashboardStatus === RequestStatus.ConflictError && (
                   <div class="alert alert-danger">
                     <Text id="duplicateDashboard.dashboardAlreadyExist" />

@@ -4016,7 +4016,8 @@
     "invalidName": "Le nom est requis",
     "dashboardAlreadyExist": "Un tableau de bord avec le même nom existe déjà.",
     "unknownError": "Une erreur inconnue est survenue. Veuillez réessayer !",
-    "nameAfterCopy": "Copie de {{name}}"
+    "nameAfterCopy": "Copie de {{name}}",
+    "savedVersionInfo": "La copie est réalisée à partir de la dernière version enregistrée de ce tableau de bord. Les modifications non enregistrées ne seront pas copiées."
   },
   "duplicateScene": {
     "cardTitle": "Dupliquer la scène \"{{name}}\"",

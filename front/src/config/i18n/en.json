@@ -4016,7 +4016,8 @@
     "invalidName": "Name is required",
     "dashboardAlreadyExist": "A dashboard with this name already exists.",
     "unknownError": "An unknown error occurred. Please retry!",
-    "nameAfterCopy": "Copy of {{name}}"
+    "nameAfterCopy": "Copy of {{name}}",
+    "savedVersionInfo": "The copy is made from the last saved version of this dashboard. Any change not saved yet will not be copied."
   },
   "duplicateScene": {
     "cardTitle": "Duplicate scene \"{{name}}\"",

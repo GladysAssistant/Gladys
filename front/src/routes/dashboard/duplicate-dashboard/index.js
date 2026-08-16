@@ -34,9 +34,9 @@ class DuplicateDashboard extends Component {
     }
   };
 
-  checkErrors = () => {
+  checkErrors = (name = this.state.dashboard.name) => {
     const duplicateDashboardErrors = {};
-    if (!this.state.dashboard.name) {
+    if (!name) {
       duplicateDashboardErrors.name = true;
     }
     this.setState({
@@ -46,13 +46,15 @@ class DuplicateDashboard extends Component {
   };
 
   updateDuplicateDashboardName = e => {
+    const { value } = e.target;
     this.setState({
       dashboard: {
-        name: e.target.value
+        name: value
       }
     });
     if (this.state.duplicateDashboardErrors) {
-      this.checkErrors();
+      // setState is asynchronous, so we validate the new value directly
+      this.checkErrors(value);
     }
   };
 
