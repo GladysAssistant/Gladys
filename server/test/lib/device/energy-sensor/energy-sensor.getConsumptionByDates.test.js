@@ -2149,7 +2149,13 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
         });
 
         after(() => {
-          process.env.TZ = originalTimezone;
+          // TZ is often unset in CI: assigning undefined would store the string 'undefined'
+          // and leave the rest of the run in UTC.
+          if (originalTimezone === undefined) {
+            delete process.env.TZ;
+          } else {
+            process.env.TZ = originalTimezone;
+          }
         });
 
         it('should return exactly 12 monthly periods over a year, on the billing day', () => {
