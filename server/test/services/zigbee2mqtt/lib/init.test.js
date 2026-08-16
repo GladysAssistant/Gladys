@@ -201,6 +201,8 @@ describe('zigbee2mqtt init', () => {
     await zigbee2mqttManager.init();
     // ASSERT
     expect(zigbee2mqttManager.networkAdapterConfigured).to.equal(false);
+    assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
+    assert.notCalled(zigbee2mqttManager.installMqttContainer);
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.connect);
   });

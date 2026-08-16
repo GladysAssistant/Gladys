@@ -60,6 +60,7 @@ describe('zigbee2mqtt reset', () => {
     zigbee2MqttManager.dockerBased = true;
     zigbee2MqttManager.networkModeValid = true;
     zigbee2MqttManager.usbConfigured = true;
+    zigbee2MqttManager.networkAdapterConfigured = true;
     zigbee2MqttManager.mqttExist = true;
     zigbee2MqttManager.mqttRunning = true;
     zigbee2MqttManager.zigbee2mqttExist = true;
@@ -111,6 +112,7 @@ describe('zigbee2mqtt reset', () => {
     expect(zigbee2MqttManager.discoveredDevices).to.deep.equal({});
     expect(zigbee2MqttManager.topicBinds).to.deep.equal({});
     expect(zigbee2MqttManager.usbConfigured).to.equal(false);
+    expect(zigbee2MqttManager.networkAdapterConfigured).to.equal(false);
     expect(zigbee2MqttManager.mqttExist).to.equal(false);
     expect(zigbee2MqttManager.mqttRunning).to.equal(false);
     expect(zigbee2MqttManager.mqttContainerRunning).to.equal(false);

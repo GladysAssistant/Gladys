@@ -307,6 +307,22 @@ describe('zigbee2mqtt configureContainer', () => {
     expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
   });
 
+  ['socket://192.168.1.20:6638', 'MDNS://slzb-06', 'mdns://slzb-06'].forEach((networkSerialPort) => {
+    it(`it should restore the USB serial port when switching back from "${networkSerialPort}"`, async () => {
+      // PREPARE
+      const networkConfigContent = fs.readFileSync(networkAdapterConfigFilePath, 'utf8');
+      fs.writeFileSync(configFilePath, networkConfigContent.replace('tcp://192.168.1.20:6638', networkSerialPort));
+      const config = { z2mAdapterMode: 'usb', z2mDongleName: ADAPTERS_BY_CONFIG_KEY[CONFIG_KEYS.EMBER][0] };
+      // EXECUTE
+      const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+      // ASSERT
+      const resultContent = fs.readFileSync(configFilePath, 'utf8');
+      const expectedContent = fs.readFileSync(emberConfigFilePath, 'utf8');
+      expect(resultContent).to.equal(expectedContent);
+      expect(changed).to.deep.equal({ configChanged: true, adapterChanged: true });
+    });
+  });
+
   it('it should remove serial adapter (unknown adapter)', async () => {
     // PREPARE
     fs.copyFileSync(ezspConfigFilePath, configFilePath);

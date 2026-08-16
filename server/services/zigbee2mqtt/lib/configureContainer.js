@@ -9,7 +9,9 @@ const { DEFAULT, ADAPTER_MODE } = require('./constants');
 const { DEFAULT_KEY, CONFIG_KEYS, ADAPTERS_BY_CONFIG_KEY } = require('../adapters');
 
 const YAML_CONFIG = { singleQuote: true };
-const NETWORK_SERIAL_PORT_PREFIX = 'tcp://';
+// A network coordinator serial port is a URL ('tcp://', 'socket://', 'mdns://'...),
+// while a USB one is a device path
+const NETWORK_SERIAL_PORT_REGEX = /^[a-z][a-z0-9+.-]*:\/\//i;
 
 /**
  * @description Configure Z2M container.
@@ -69,7 +71,7 @@ async function configureContainer(basePathOnContainer, config, setupMode = false
     );
     // Set default adapter if not found
     adapterKey = adapterKey || DEFAULT_KEY;
-    if (`${serialPort}`.startsWith(NETWORK_SERIAL_PORT_PREFIX)) {
+    if (NETWORK_SERIAL_PORT_REGEX.test(`${serialPort}`)) {
       // Coming back from a network coordinator: restore the USB device path bound in the container
       serialPort = DEFAULT.CONFIGURATION_CONTENT.serial.port;
     }
