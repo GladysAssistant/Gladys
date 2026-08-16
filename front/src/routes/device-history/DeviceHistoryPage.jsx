@@ -2,8 +2,11 @@ import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 
 import style from './style.css';
+
+dayjs.extend(localizedFormat);
 
 const StateRow = ({ state, ...props }) => {
   const isEditing = props.editingCreatedAt === state.created_at;
@@ -11,7 +14,11 @@ const StateRow = ({ state, ...props }) => {
 
   return (
     <tr>
-      <td class="text-nowrap">{dayjs(state.created_at).format('DD/MM/YYYY HH:mm:ss')}</td>
+      <td class="text-nowrap">
+        {dayjs(state.created_at)
+          .locale((props.user && props.user.language) || 'en')
+          .format('L LTS')}
+      </td>
       <td>
         {isEditing ? (
           <input
