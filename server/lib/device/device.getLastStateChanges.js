@@ -24,12 +24,13 @@ const PROGRESSIVE_WINDOWS_IN_MS = [
  * @description Keep, among the given features, only those whose history holds at least two
  * distinct values.
  *
- * A feature whose value never changed matches nothing in any bounded window, so it always reaches
- * the unbounded one: without this filter, every sensor that has never flipped (a smoke or leak
- * sensor reporting 0 for years, a door that has only ever been closed) would run a `LAG` over its
- * whole history on each dashboard load. That window function has to sort the whole partition,
- * while `MIN`/`MAX` only stream over it — and `duckDbReadConnectionAllAsync` is serialized on a
- * single read queue shared with the charts, the history page and the aggregates.
+ * A feature whose value never changed matches nothing in any bounded window, so it goes through
+ * every one of them and then through the unbounded one: without this filter, every sensor that has
+ * never flipped (a smoke or leak sensor reporting 0 for years, a door that has only ever been
+ * closed) would run a `LAG` over a year of heartbeats, then over its whole history, on each
+ * dashboard load. Those window functions have to sort the whole partition, while `MIN`/`MAX` only
+ * stream over it — and `duckDbReadConnectionAllAsync` is serialized on a single read queue shared
+ * with the charts, the history page and the aggregates.
  * @param {Array} featureIds - The ids of the device features to look at.
  * @returns {Promise<Array>} Resolve with the ids of the features whose value changed at least once.
  * @example
@@ -96,14 +97,19 @@ async function getLastStateChanges(deviceFeatureSelectors) {
   const windowReference = mostRecentActivity !== null && mostRecentActivity < now ? mostRecentActivity : now;
 
   let remainingFeatureIds = Array.from(selectorByFeatureId.keys());
+  let neverChangedFeaturesRemoved = false;
 
   for (let i = 0; i < PROGRESSIVE_WINDOWS_IN_MS.length && remainingFeatureIds.length > 0; i += 1) {
     const windowInMs = PROGRESSIVE_WINDOWS_IN_MS[i];
-    if (windowInMs === null) {
-      // Last resort: the window function is about to run over the whole history of the features
-      // still without an answer, so those which simply never changed are answered here instead.
+    // A feature left without an answer by the narrowest window is a quiet one, and quiet features
+    // are mostly sensors which never flipped at all. Answering them here, with a single aggregate,
+    // keeps them out of every wider window: waiting for the unbounded one would make each of them
+    // run a `LAG` over up to a year of heartbeats first. The common case (a door opened in the last
+    // hour) is answered by the first window and never pays for this query.
+    if (!neverChangedFeaturesRemoved && (i > 0 || windowInMs === null)) {
       // eslint-disable-next-line no-await-in-loop
       remainingFeatureIds = await keepFeaturesWhoseValueChanged(remainingFeatureIds);
+      neverChangedFeaturesRemoved = true;
       if (remainingFeatureIds.length === 0) {
         break;
       }

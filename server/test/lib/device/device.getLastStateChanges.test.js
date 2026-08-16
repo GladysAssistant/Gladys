@@ -139,11 +139,15 @@ describe('Device.getLastStateChanges', function Describe() {
     const lastStateChanges = await deviceInstance.getLastStateChanges(['door']);
 
     expect(lastStateChanges).to.deep.equal({ door: null });
-    const unboundedWindowQueries = readSpy
+    const windowQueries = readSpy
       .getCalls()
       .map((call) => call.args[0])
-      .filter((query) => query.includes('LAG(') && !query.includes('created_at >='));
+      .filter((query) => query.includes('LAG('));
+    const unboundedWindowQueries = windowQueries.filter((query) => !query.includes('created_at >='));
     expect(unboundedWindowQueries).to.deep.equal([]);
+    // The feature is dropped right after the narrowest window came back empty, so the wider
+    // bounded windows never run their window function over it either.
+    expect(windowQueries).to.have.lengthOf(1);
   });
 
   it('should return null when the feature has no state at all', async () => {

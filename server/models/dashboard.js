@@ -27,6 +27,7 @@ const boxesSchema = Joi.array().items(
       group_by: Joi.string().valid('hour', 'day', 'week', 'month', 'year'),
       display_axes: Joi.boolean(),
       display_variation: Joi.boolean(),
+      display_last_state_change: Joi.boolean(),
       chart_type: Joi.string(),
       users: Joi.array().items(Joi.string()),
       clock_type: Joi.string(),
