@@ -1,4 +1,6 @@
-const { fake } = require('sinon');
+const sinon = require('sinon').createSandbox();
+
+const { fake } = sinon;
 
 const Tts = require('../../../lib/tts');
 const StateManager = require('../../../lib/state');

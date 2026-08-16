@@ -1,16 +1,15 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const sinon = require('sinon').createSandbox();
 const os = require('os');
 
 const { buildTts } = require('./testUtils.test');
 
 describe('tts.getLocalApiBaseUrl', () => {
-  // Use a dedicated sandbox for the os.networkInterfaces stub: calling
-  // sinon.restore() on the DEFAULT sandbox would untrack the fakes that other
-  // test files create at load time, so their sinon.reset() cleanup would stop
+  // The os.networkInterfaces stub is restored after every test through this
+  // file's own sandbox: restoring the DEFAULT sandbox would untrack the fakes
+  // that other test files create at load time, so their cleanup would stop
   // clearing call history and every suite running after this file would leak
-  // call counts between tests (same pattern as test/models/index.test.js).
-  const sandbox = sinon.createSandbox();
+  // call counts between tests.
   let previousServerPort;
 
   beforeEach(() => {
@@ -23,13 +22,13 @@ describe('tts.getLocalApiBaseUrl', () => {
     } else {
       process.env.SERVER_PORT = previousServerPort;
     }
-    sandbox.restore();
+    sinon.restore();
   });
 
   it('should build the URL from the first non-internal IPv4 and SERVER_PORT', () => {
     const { tts } = buildTts();
     process.env.SERVER_PORT = '8080';
-    sandbox.stub(os, 'networkInterfaces').returns({
+    sinon.stub(os, 'networkInterfaces').returns({
       lo: [{ family: 'IPv4', internal: true, address: '127.0.0.1' }],
       eth0: [
         { family: 'IPv6', internal: false, address: 'fe80::1' },
@@ -42,7 +41,7 @@ describe('tts.getLocalApiBaseUrl', () => {
   it('should prefer the physical NIC over tunnels and Docker bridges on a multi-homed host', () => {
     const { tts } = buildTts();
     delete process.env.SERVER_PORT;
-    sandbox.stub(os, 'networkInterfaces').returns({
+    sinon.stub(os, 'networkInterfaces').returns({
       // Docker bridges are never candidates: a speaker cannot fetch there
       docker0: [{ family: 'IPv4', internal: false, address: '172.17.0.1' }],
       'br-42ab': [{ family: 'IPv4', internal: false, address: '172.30.0.1' }],
@@ -59,7 +58,7 @@ describe('tts.getLocalApiBaseUrl', () => {
   it('should fall back to a tunnel RFC1918 address when no physical NIC has one', () => {
     const { tts } = buildTts();
     delete process.env.SERVER_PORT;
-    sandbox.stub(os, 'networkInterfaces').returns({
+    sinon.stub(os, 'networkInterfaces').returns({
       wg0: [{ family: 'IPv4', internal: false, address: '172.22.0.3' }],
       eth0: [{ family: 'IPv4', internal: false, address: '203.0.113.7' }],
     });
@@ -69,7 +68,7 @@ describe('tts.getLocalApiBaseUrl', () => {
   it('should fall back to the first non-internal IPv4 without any RFC1918 address', () => {
     const { tts } = buildTts();
     delete process.env.SERVER_PORT;
-    sandbox.stub(os, 'networkInterfaces').returns({
+    sinon.stub(os, 'networkInterfaces').returns({
       // the Docker bridge stays excluded even as a last resort
       docker0: [{ family: 'IPv4', internal: false, address: '172.17.0.1' }],
       eth0: [{ family: 'IPv4', internal: false, address: '203.0.113.7' }],
@@ -80,7 +79,7 @@ describe('tts.getLocalApiBaseUrl', () => {
   it('should fall back to localhost and the default port without an external IPv4', () => {
     const { tts } = buildTts();
     delete process.env.SERVER_PORT;
-    sandbox.stub(os, 'networkInterfaces').returns({
+    sinon.stub(os, 'networkInterfaces').returns({
       lo: [{ family: 'IPv4', internal: true, address: '127.0.0.1' }],
       empty: undefined,
     });
