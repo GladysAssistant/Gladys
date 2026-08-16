@@ -29,6 +29,7 @@ const {
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
 const { matterSystemModeToGladysAcMode } = require('../utils/thermostatMatterMapping');
+const { matterXyToInt } = require('../utils/colorControlMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE } = require('../../../utils/constants');
 const {
@@ -132,14 +133,30 @@ async function readInitialDeviceStates(nodeId, devicePath, device) {
   }
 
   const colorControl = device.getClusterClientById(ColorControl.Complete.id);
-  if (colorControl && colorControl.supportedFeatures.hueSaturation) {
-    const currentHue = await safeReadAttribute(() => colorControl.getCurrentHueAttribute());
-    const currentSaturation = await safeReadAttribute(() => colorControl.getCurrentSaturationAttribute());
-    if (currentHue !== undefined && currentSaturation !== undefined) {
-      const hue = Math.round((currentHue / 254) * 360);
-      const saturation = Math.round((currentSaturation / 254) * 100);
-      const rgb = hsbToRgb([hue, saturation, 100]);
-      emitState(`matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}:color`, rgbToInt(rgb));
+  if (colorControl) {
+    if (colorControl.supportedFeatures.hueSaturation) {
+      const currentHue = await safeReadAttribute(() => colorControl.getCurrentHueAttribute());
+      const currentSaturation = await safeReadAttribute(() => colorControl.getCurrentSaturationAttribute());
+      if (currentHue !== undefined && currentSaturation !== undefined) {
+        const hue = Math.round((currentHue / 254) * 360);
+        const saturation = Math.round((currentSaturation / 254) * 100);
+        const rgb = hsbToRgb([hue, saturation, 100]);
+        emitState(`matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}:color`, rgbToInt(rgb));
+      }
+    } else if (colorControl.supportedFeatures.xy) {
+      const currentX = await safeReadAttribute(() => colorControl.getCurrentXAttribute());
+      const currentY = await safeReadAttribute(() => colorControl.getCurrentYAttribute());
+      if (currentX !== undefined && currentY !== undefined) {
+        emitState(
+          `matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}:color`,
+          matterXyToInt(currentX, currentY),
+        );
+      }
+    }
+    if (colorControl.supportedFeatures.colorTemperature) {
+      const colorTemperatureMireds = await safeReadAttribute(() => colorControl.getColorTemperatureMiredsAttribute());
+      // Gladys stores the color temperature in mireds, which is the unit used by Matter
+      emitState(`matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}:temperature`, colorTemperatureMireds);
     }
   }
 

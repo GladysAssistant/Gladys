@@ -9,6 +9,7 @@ const {
   RvcCleanMode,
   PowerSource,
   Thermostat,
+  ColorControl,
   CarbonDioxideConcentrationMeasurement,
   // eslint-disable-next-line import/no-unresolved
 } = require('@matter/main/clusters');
@@ -545,5 +546,113 @@ describe('Matter.convertToGladysDevice', () => {
 
     const modeFeatures = gladysDevice.features.filter((feature) => feature.type === 'mode');
     expect(modeFeatures).to.have.lengthOf(0);
+  });
+  describe('ColorControl cluster', () => {
+    const buildDevice = (clusterClient) => ({
+      name: 'Bulb',
+      number: 1,
+      getAllClusterClients: () => [clusterClient],
+      getChildEndpoints: () => [],
+    });
+
+    it('should create a color feature when the bulb supports the hue/saturation mode', async () => {
+      const clusterClient = {
+        id: ColorControl.Complete.id,
+        name: 'ColorControl',
+        endpointId: 1,
+        supportedFeatures: { hueSaturation: true },
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, buildDevice(clusterClient), null, '1');
+
+      expect(gladysDevice.features).to.have.lengthOf(1);
+      expect(gladysDevice.features[0]).to.deep.equal({
+        name: 'ColorControl - 1 (Color)',
+        selector: matterExternalIdToSelector('matter:12345:1:768:color'),
+        category: 'light',
+        type: 'color',
+        read_only: false,
+        has_feedback: true,
+        external_id: 'matter:12345:1:768:color',
+        min: 0,
+        max: 6579300,
+      });
+    });
+
+    it('should create a color feature when the bulb only supports the XY mode', async () => {
+      const clusterClient = {
+        id: ColorControl.Complete.id,
+        name: 'ColorControl',
+        endpointId: 1,
+        supportedFeatures: { xy: true },
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, buildDevice(clusterClient), null, '1');
+
+      expect(gladysDevice.features).to.have.lengthOf(1);
+      expect(gladysDevice.features[0]).to.deep.include({
+        type: 'color',
+        external_id: 'matter:12345:1:768:color',
+      });
+    });
+
+    it('should create a color temperature feature with the physical range of the bulb', async () => {
+      const clusterClient = {
+        id: ColorControl.Complete.id,
+        name: 'ColorControl',
+        endpointId: 1,
+        supportedFeatures: { xy: true, colorTemperature: true },
+        getColorTempPhysicalMinMiredsAttribute: () => Promise.resolve(200),
+        getColorTempPhysicalMaxMiredsAttribute: () => Promise.resolve(454),
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, buildDevice(clusterClient), null, '1');
+
+      expect(gladysDevice.features).to.have.lengthOf(2);
+      expect(gladysDevice.features[1]).to.deep.equal({
+        name: 'ColorControl - 1 (Color temperature)',
+        selector: matterExternalIdToSelector('matter:12345:1:768:temperature'),
+        category: 'light',
+        type: 'temperature',
+        read_only: false,
+        has_feedback: true,
+        external_id: 'matter:12345:1:768:temperature',
+        min: 200,
+        max: 454,
+      });
+    });
+
+    it('should fallback to the default mireds range when the bulb does not expose the physical range', async () => {
+      const clusterClient = {
+        id: ColorControl.Complete.id,
+        name: 'ColorControl',
+        endpointId: 1,
+        supportedFeatures: { colorTemperature: true },
+        getColorTempPhysicalMinMiredsAttribute: () => Promise.reject(new Error('Attribute not supported')),
+        getColorTempPhysicalMaxMiredsAttribute: () => Promise.reject(new Error('Attribute not supported')),
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, buildDevice(clusterClient), null, '1');
+
+      expect(gladysDevice.features).to.have.lengthOf(1);
+      expect(gladysDevice.features[0]).to.deep.include({
+        type: 'temperature',
+        min: 153,
+        max: 500,
+      });
+    });
+
+    it('should not create any feature when the bulb supports no color mode', async () => {
+      const clusterClient = {
+        id: ColorControl.Complete.id,
+        name: 'ColorControl',
+        endpointId: 1,
+        supportedFeatures: undefined,
+      };
+
+      const gladysDevice = await convertToGladysDevice(serviceId, nodeId, buildDevice(clusterClient), null, '1');
+
+      expect(gladysDevice.features).to.have.lengthOf(0);
+    });
   });
 });

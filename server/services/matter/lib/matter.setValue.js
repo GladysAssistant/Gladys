@@ -20,6 +20,7 @@ const {
 } = require('../utils/fanMatterMapping');
 const { convertGladysRunModeToMatter, convertGladysCleanModeToMatter } = require('../utils/vacuumCleanerStateMapping');
 const { gladysAcModeToMatterSystemMode } = require('../utils/thermostatMatterMapping');
+const { intToMatterXy } = require('../utils/colorControlMatterMapping');
 
 /**
  * @description Find a device recursively through child endpoints.
@@ -166,23 +167,64 @@ async function setValue(gladysDevice, gladysFeature, value) {
     gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR
   ) {
     const colorControl = targetDevice.getClusterClientById(ColorControl.Complete.id);
+    if (!colorControl) {
+      throw new Error('Device does not support ColorControl cluster');
+    }
     const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
-    const [hue, saturation] = intToHsb(value);
+    const colorControlFeatures = colorControl.supportedFeatures || {};
 
-    // Convert from standard HSB ranges to Matter ranges
-    // Matter uses hue in range 0-254, saturation in range 0-254
-    // Our HSB values are in ranges: hue (0-360), saturation (0-100), brightness (0-100)
-    const matterHue = Math.round((hue / 360) * 254);
-    const matterSaturation = Math.round((saturation / 100) * 254);
+    if (colorControlFeatures.hueSaturation) {
+      const [hue, saturation] = intToHsb(value);
 
-    await colorControl.moveToHueAndSaturation({
-      hue: matterHue,
-      saturation: matterSaturation,
+      // Convert from standard HSB ranges to Matter ranges
+      // Matter uses hue in range 0-254, saturation in range 0-254
+      // Our HSB values are in ranges: hue (0-360), saturation (0-100), brightness (0-100)
+      const matterHue = Math.round((hue / 360) * 254);
+      const matterSaturation = Math.round((saturation / 100) * 254);
+
+      await colorControl.moveToHueAndSaturation({
+        hue: matterHue,
+        saturation: matterSaturation,
+        transitionTime: 0,
+        optionsMask: 1, // bitmap: bit 0 = executeIfOff
+        optionsOverride: 1, // bitmap: bit 0 = executeIfOff
+      });
+    } else if (colorControlFeatures.xy) {
+      // Bulbs that don't support Hue/Saturation report and accept their color
+      // through the XY (CIE 1931) mode of the ColorControl cluster
+      const { colorX, colorY } = intToMatterXy(value);
+      await colorControl.moveToColor({
+        colorX,
+        colorY,
+        transitionTime: 0,
+        optionsMask: 1, // bitmap: bit 0 = executeIfOff
+        optionsOverride: 1, // bitmap: bit 0 = executeIfOff
+      });
+    } else {
+      throw new Error('Device does not support any ColorControl color mode');
+    }
+    // If the user changes the color, we needs to turn on the light
+    await onOff.on();
+  }
+
+  // Handle light color temperature
+  if (
+    gladysFeature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
+    gladysFeature.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
+  ) {
+    const colorControl = targetDevice.getClusterClientById(ColorControl.Complete.id);
+    if (!colorControl) {
+      throw new Error('Device does not support ColorControl cluster');
+    }
+    const onOff = targetDevice.getClusterClientById(OnOff.Complete.id);
+    // Gladys stores the color temperature in mireds, which is the unit used by Matter
+    await colorControl.moveToColorTemperature({
+      colorTemperatureMireds: Math.round(value),
       transitionTime: 0,
       optionsMask: 1, // bitmap: bit 0 = executeIfOff
       optionsOverride: 1, // bitmap: bit 0 = executeIfOff
     });
-    // If the user changes the color, we needs to turn on the light
+    // If the user changes the color temperature, we need to turn on the light
     await onOff.on();
   }
 

@@ -30,6 +30,7 @@ const {
 const logger = require('../../../utils/logger');
 const { matterFanModeToGladys, matterAttributeToNumber } = require('../utils/fanMatterMapping');
 const { matterSystemModeToGladysAcMode } = require('../utils/thermostatMatterMapping');
+const { matterXyToInt } = require('../utils/colorControlMatterMapping');
 const { hsbToRgb, rgbToInt } = require('../../../utils/colors');
 const { EVENTS, STATE, BUTTON_STATUS } = require('../../../utils/constants');
 const {
@@ -223,6 +224,29 @@ async function listenToStateChange(nodeId, devicePath, device) {
       });
     };
 
+    // Function to convert the XY (CIE 1931) color to integer and emit state change
+    const emitXyColorState = async () => {
+      logger.debug(`Matter: Emitting XY color state`);
+      try {
+        const currentX = await colorControl.getCurrentXAttribute();
+        const currentY = await colorControl.getCurrentYAttribute();
+
+        // A bulb currently in color temperature mode can report no XY coordinate at all,
+        // in that case we keep the last known color instead of emitting a black state
+        if (!Number.isFinite(currentX) || !Number.isFinite(currentY)) {
+          logger.debug(`Matter: Ignoring XY color state, invalid coordinates (${currentX}, ${currentY})`);
+          return;
+        }
+
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}:color`,
+          state: matterXyToInt(currentX, currentY),
+        });
+      } catch (error) {
+        logger.debug(`Matter: Could not read the XY color attributes: ${error.message}`);
+      }
+    };
+
     if (colorControl.supportedFeatures.hueSaturation) {
       // Listen for hue changes
       colorControl.addCurrentHueAttributeListener(() => {
@@ -232,6 +256,31 @@ async function listenToStateChange(nodeId, devicePath, device) {
       // Listen for saturation changes
       colorControl.addCurrentSaturationAttributeListener(() => {
         emitColorState();
+      });
+    } else if (colorControl.supportedFeatures.xy) {
+      // Listen for X changes
+      colorControl.addCurrentXAttributeListener(() => {
+        emitXyColorState();
+      });
+
+      // Listen for Y changes
+      colorControl.addCurrentYAttributeListener(() => {
+        emitXyColorState();
+      });
+    }
+
+    if (colorControl.supportedFeatures.colorTemperature) {
+      // Gladys stores the color temperature in mireds, which is the unit used by Matter
+      colorControl.addColorTemperatureMiredsAttributeListener((value) => {
+        logger.debug(`Matter: ColorControl colorTemperatureMireds attribute changed to ${value}`);
+        // Like on the initial read, a non-numeric value is ignored so it doesn't wipe the saved state
+        if (!Number.isFinite(value)) {
+          return;
+        }
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `matter:${nodeId}:${devicePath}:${ColorControl.Complete.id}:temperature`,
+          state: value,
+        });
       });
     }
   }

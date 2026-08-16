@@ -5,6 +5,7 @@ const {
   intToRgb,
   rgbToInt,
   xyToInt,
+  intToXy,
   hsbToRgb,
   rgbToHsb,
   kelvinToRGB,
@@ -79,6 +80,36 @@ describe('colors', () => {
         expect(value).to.equal(int);
       });
     }
+  });
+
+  const intToXyTable = [
+    { name: 'red', int: 16711680, x: 0.7006, y: 0.2993 },
+    { name: 'lime', int: 65280, x: 0.1724, y: 0.7468 },
+    { name: 'blue', int: 255, x: 0.1355, y: 0.0399 },
+    { name: 'white', int: 16777215, x: 0.3227, y: 0.329 },
+    { name: 'black', int: 0, x: 0, y: 0 },
+  ];
+
+  intToXyTable.forEach(({ name, int, x, y }) => {
+    it(`[${name}] intToXy (${int} -> ${x}, ${y})`, () => {
+      const value = intToXy(int);
+      expect(value.x).to.be.closeTo(x, 0.001);
+      expect(value.y).to.be.closeTo(y, 0.001);
+    });
+  });
+
+  it('intToXy should be the reverse of xyToInt for saturated colors', () => {
+    [16711680, 65280, 255, 16777215, 65535, 16776960].forEach((int) => {
+      const { x, y } = intToXy(int);
+      expect(xyToInt(x, y)).to.equal(int);
+    });
+  });
+
+  it('intToXy should handle dark colors below the gamma correction threshold', () => {
+    // 0x020202 has all its channels below the 0.04045 gamma correction threshold
+    const { x, y } = intToXy(131586);
+    expect(x).to.be.closeTo(0.3227, 0.001);
+    expect(y).to.be.closeTo(0.329, 0.001);
   });
 });
 

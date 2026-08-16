@@ -40,6 +40,22 @@ const {
 const { slugify } = require('../../../utils/slugify');
 const { matterAttributeToNumber } = require('./fanMatterMapping');
 const { getAcModeSupportedOptions } = require('./thermostatMatterMapping');
+const { getColorTemperatureMiredsRange } = require('./colorControlMatterMapping');
+
+/**
+ * @description Read an attribute and ignore errors when the device does not expose it.
+ * @param {Function} readAttribute - Async function that reads the attribute.
+ * @returns {Promise<any|undefined>} Attribute value or undefined.
+ * @example
+ * const value = await safeReadAttribute(() => colorControl.getColorTempPhysicalMinMiredsAttribute());
+ */
+async function safeReadAttribute(readAttribute) {
+  try {
+    return await readAttribute();
+  } catch (error) {
+    return undefined;
+  }
+}
 
 /**
  * @description Build a stable Gladys selector from a Matter external_id.
@@ -244,7 +260,10 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
           max: maxLevel,
         });
       } else if (clusterIndex === ColorControl.Complete.id) {
-        if (clusterClient.supportedFeatures.hueSaturation) {
+        const colorControlFeatures = clusterClient.supportedFeatures || {};
+        // The bulb can report its color either through the Hue/Saturation mode
+        // or through the XY (CIE 1931) mode of the ColorControl cluster
+        if (colorControlFeatures.hueSaturation || colorControlFeatures.xy) {
           gladysDevice.features.push({
             name: `${clusterClient.name} - ${clusterClient.endpointId} (Color)`,
             category: DEVICE_FEATURE_CATEGORIES.LIGHT,
@@ -254,6 +273,25 @@ async function convertToGladysDevice(serviceId, nodeId, device, nodeDetailDevice
             external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:color`,
             min: 0,
             max: 6579300,
+          });
+        }
+        if (colorControlFeatures.colorTemperature) {
+          const physicalMinMireds = await safeReadAttribute(() =>
+            clusterClient.getColorTempPhysicalMinMiredsAttribute(),
+          );
+          const physicalMaxMireds = await safeReadAttribute(() =>
+            clusterClient.getColorTempPhysicalMaxMiredsAttribute(),
+          );
+          const { min, max } = getColorTemperatureMiredsRange(physicalMinMireds, physicalMaxMireds);
+          gladysDevice.features.push({
+            name: `${clusterClient.name} - ${clusterClient.endpointId} (Color temperature)`,
+            category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+            type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+            read_only: false,
+            has_feedback: true,
+            external_id: `matter:${nodeId}:${devicePath}:${clusterIndex}:temperature`,
+            min,
+            max,
           });
         }
       } else if (clusterIndex === RelativeHumidityMeasurement.Complete.id) {
