@@ -345,7 +345,10 @@ class EditScene extends Component {
   addActionGroupAfter = async index => {
     // Update variable paths for all actions after the inserted group
     await this.setState(prevState => {
-      const newVariables = { ...prevState.variables };
+      // The new paths are written in a fresh map: copying the previous variables and deleting the
+      // renamed paths would drop a variable whose new path is the previous path of another one
+      // (e.g. "1.0" renamed to "2.0", then "2.0" renamed to "3.0" and its previous path deleted).
+      const newVariables = {};
 
       const pathToUpdateInVariables = [];
 
@@ -363,8 +366,8 @@ class EditScene extends Component {
             if (groupIndex >= index + 1) {
               const newPath = `${groupIndex + 1}.${pathSegments[1]}`;
               newVariables[newPath] = value;
-              delete newVariables[path];
               pathToUpdateInVariables.push({ prevPath: path, newPath, groupIndex });
+              return;
             }
           } else {
             // Handle nested paths (e.g., "1.0.then.0.0" or "1.0.else.0.0")
@@ -379,11 +382,14 @@ class EditScene extends Component {
               const newPath = newPathSegments.join('.');
 
               newVariables[newPath] = value;
-              delete newVariables[path];
               pathToUpdateInVariables.push({ prevPath: path, newPath, groupIndex: rootGroupIndex });
+              return;
             }
           }
         }
+
+        // The paths which are not affected by the insertion are kept as they are
+        newVariables[path] = value;
       });
 
       const newScene = update(prevState.scene, {
