@@ -151,8 +151,6 @@ async function getInfos() {
     gladys_version: this.gladysVersion,
     latest_gladys_version: this.latestGladysVersion,
     is_docker: await this.isDocker(),
-    host_power_management_available: this.isHostPowerManagementAvailable(),
-    host_power_management_mechanism: this.hostPowerManagement || null,
     host_power_reboot_available: this.hostPowerCapabilities ? this.hostPowerCapabilities.reboot === true : false,
     host_power_shutdown_available: this.hostPowerCapabilities ? this.hostPowerCapabilities.shutdown === true : false,
   };

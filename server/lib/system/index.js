@@ -44,7 +44,6 @@ const { setDuckDbTimezone } = require('./system.setDuckDbTimezone');
 const { shutdown } = require('./system.shutdown');
 const { rebootHost } = require('./system.rebootHost');
 const { shutdownHost } = require('./system.shutdownHost');
-const { isHostPowerManagementAvailable } = require('./system.isHostPowerManagementAvailable');
 const { detectHostPowerManagement } = require('./system.detectHostPowerManagement');
 const { runHostPowerDbusCommand } = require('./system.runHostPowerDbusCommand');
 
@@ -123,7 +122,6 @@ System.prototype.setDuckDbTimezone = setDuckDbTimezone;
 System.prototype.shutdown = shutdown;
 System.prototype.rebootHost = rebootHost;
 System.prototype.shutdownHost = shutdownHost;
-System.prototype.isHostPowerManagementAvailable = isHostPowerManagementAvailable;
 System.prototype.detectHostPowerManagement = detectHostPowerManagement;
 System.prototype.runHostPowerDbusCommand = runHostPowerDbusCommand;
 

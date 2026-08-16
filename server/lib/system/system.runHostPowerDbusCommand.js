@@ -83,8 +83,12 @@ async function runViaHelperContainer(method) {
   let timeout;
   try {
     await container.start();
+    // On timeout this promise loses the race but stays pending: swallow a late
+    // rejection (e.g. the kill below fails) so it never becomes an unhandled one.
+    const waitPromise = container.wait();
+    waitPromise.catch(() => {});
     const { StatusCode } = await Promise.race([
-      container.wait(),
+      waitPromise,
       new Promise((resolve, reject) => {
         timeout = setTimeout(
           () => reject(new Error(`Host power helper container timed out after ${HELPER_TIMEOUT_MS}ms`)),
