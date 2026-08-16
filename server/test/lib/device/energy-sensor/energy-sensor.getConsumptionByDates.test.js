@@ -11,6 +11,8 @@ const db = require('../../../../models');
 const EnergySensorManager = require('../../../../lib/device/energy-sensor');
 const {
   calculateSubscriptionPrices,
+  buildOffsetDateExpression,
+  shouldOffsetPeriods,
 } = require('../../../../lib/device/energy-sensor/energy-sensor.getConsumptionByDates');
 
 // Extend Day.js with plugins
@@ -1833,6 +1835,299 @@ describe('EnergySensorManager.getConsumptionByDates', function Describe() {
       const expectedDailyPrice = 15 / 31;
       expect(result[0].sum_value).to.be.closeTo(expectedDailyPrice, 0.001);
       expect(result[0].contract_name).to.equal('Test Contract');
+    });
+  });
+
+  describe('Billing period start day', () => {
+    const DEVICE_FEATURE_ID = 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e7';
+
+    const buildStateManager = () => ({
+      get: fake((type) => {
+        if (type === 'deviceFeature') {
+          return {
+            id: DEVICE_FEATURE_ID,
+            name: 'Energy Consumption',
+            device_id: 'device-1',
+          };
+        }
+        if (type === 'deviceById') {
+          return {
+            name: 'Smart Meter',
+          };
+        }
+        return null;
+      }),
+    });
+
+    const insertStatesAtDates = async (dates) => {
+      await db.duckDbBatchInsertState(
+        DEVICE_FEATURE_ID,
+        dates.map((date) => ({ value: 1, created_at: new Date(date) })),
+      );
+    };
+
+    // The tests run with the process timezone (UTC in CI), which is also the
+    // DuckDB session timezone: period boundaries are at midnight UTC.
+    const bucketDates = (values) => values.map((value) => new Date(value.created_at).toISOString());
+
+    it('should group months on the billing start day', async () => {
+      await insertStatesAtDates([
+        '2023-01-05T00:00:00.000Z',
+        '2023-01-20T10:00:00.000Z',
+        '2023-02-04T23:00:00.000Z',
+        '2023-02-05T00:00:00.000Z',
+        '2023-03-01T10:00:00.000Z',
+      ]);
+
+      const energySensorManager = new EnergySensorManager(buildStateManager());
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from: new Date('2023-01-05T00:00:00.000Z'),
+        to: new Date('2023-03-05T00:00:00.000Z'),
+        group_by: 'month',
+        display_mode: 'kwh',
+        period_start_day: 5,
+      });
+
+      expect(bucketDates(results[0].values)).to.deep.equal(['2023-01-05T00:00:00.000Z', '2023-02-05T00:00:00.000Z']);
+      // 5th of January, 20th of January and 4th of February are in the first period
+      expect(results[0].values[0].count_value).to.equal(3);
+      expect(results[0].values[1].count_value).to.equal(2);
+    });
+
+    it('should keep calendar months when the start day is 1', async () => {
+      await insertStatesAtDates([
+        '2023-01-05T00:00:00.000Z',
+        '2023-01-20T10:00:00.000Z',
+        '2023-02-04T23:00:00.000Z',
+        '2023-02-05T00:00:00.000Z',
+      ]);
+
+      const energySensorManager = new EnergySensorManager(buildStateManager());
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from: new Date('2023-01-01T00:00:00.000Z'),
+        to: new Date('2023-03-01T00:00:00.000Z'),
+        group_by: 'month',
+        display_mode: 'kwh',
+        period_start_day: 1,
+      });
+
+      expect(bucketDates(results[0].values)).to.deep.equal(['2023-01-01T00:00:00.000Z', '2023-02-01T00:00:00.000Z']);
+      expect(results[0].values[0].count_value).to.equal(2);
+      expect(results[0].values[1].count_value).to.equal(2);
+    });
+
+    it('should start the period on the last day of the month when the month is too short', async () => {
+      await insertStatesAtDates([
+        '2023-01-31T00:00:00.000Z',
+        '2023-02-27T10:00:00.000Z',
+        '2023-02-28T00:00:00.000Z',
+        '2023-03-30T10:00:00.000Z',
+      ]);
+
+      const energySensorManager = new EnergySensorManager(buildStateManager());
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from: new Date('2023-01-31T00:00:00.000Z'),
+        to: new Date('2023-03-31T00:00:00.000Z'),
+        group_by: 'month',
+        display_mode: 'kwh',
+        period_start_day: 31,
+      });
+
+      // February 2023 has 28 days: the period starts on the 28th
+      expect(bucketDates(results[0].values)).to.deep.equal(['2023-01-31T00:00:00.000Z', '2023-02-28T00:00:00.000Z']);
+      expect(results[0].values[0].count_value).to.equal(2);
+      expect(results[0].values[1].count_value).to.equal(2);
+    });
+
+    it('should start the period on the 29th of February on a leap year', async () => {
+      await insertStatesAtDates([
+        '2024-01-31T00:00:00.000Z',
+        '2024-02-28T10:00:00.000Z',
+        '2024-02-29T00:00:00.000Z',
+        '2024-03-15T10:00:00.000Z',
+      ]);
+
+      const energySensorManager = new EnergySensorManager(buildStateManager());
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from: new Date('2024-01-31T00:00:00.000Z'),
+        to: new Date('2024-03-31T00:00:00.000Z'),
+        group_by: 'month',
+        display_mode: 'kwh',
+        period_start_day: 31,
+      });
+
+      expect(bucketDates(results[0].values)).to.deep.equal(['2024-01-31T00:00:00.000Z', '2024-02-29T00:00:00.000Z']);
+      expect(results[0].values[0].count_value).to.equal(2);
+      expect(results[0].values[1].count_value).to.equal(2);
+    });
+
+    it('should group years on the billing start day', async () => {
+      await insertStatesAtDates([
+        '2023-01-05T00:00:00.000Z',
+        '2023-06-15T10:00:00.000Z',
+        '2024-01-04T23:00:00.000Z',
+        '2024-01-05T00:00:00.000Z',
+        '2024-06-15T10:00:00.000Z',
+      ]);
+
+      const energySensorManager = new EnergySensorManager(buildStateManager());
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from: new Date('2023-01-05T00:00:00.000Z'),
+        to: new Date('2025-01-05T00:00:00.000Z'),
+        group_by: 'year',
+        display_mode: 'kwh',
+        period_start_day: 5,
+      });
+
+      expect(bucketDates(results[0].values)).to.deep.equal(['2023-01-05T00:00:00.000Z', '2024-01-05T00:00:00.000Z']);
+      // 5th of January 2023, 15th of June 2023 and 4th of January 2024 are in the first period
+      expect(results[0].values[0].count_value).to.equal(3);
+      expect(results[0].values[1].count_value).to.equal(2);
+    });
+
+    it('should not change daily buckets', async () => {
+      await insertStatesAtDates(['2023-01-05T00:00:00.000Z', '2023-01-05T10:00:00.000Z', '2023-01-06T10:00:00.000Z']);
+
+      const energySensorManager = new EnergySensorManager(buildStateManager());
+
+      const results = await energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from: new Date('2023-01-05T00:00:00.000Z'),
+        to: new Date('2023-01-07T00:00:00.000Z'),
+        group_by: 'day',
+        display_mode: 'kwh',
+        period_start_day: 5,
+      });
+
+      expect(bucketDates(results[0].values)).to.deep.equal(['2023-01-05T00:00:00.000Z', '2023-01-06T00:00:00.000Z']);
+    });
+
+    it('should throw an error when the start day is not a valid day of month', async () => {
+      const energySensorManager = new EnergySensorManager(buildStateManager());
+
+      const promise = energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from: new Date('2023-01-05T00:00:00.000Z'),
+        to: new Date('2023-02-05T00:00:00.000Z'),
+        group_by: 'month',
+        period_start_day: 32,
+      });
+
+      return assert.isRejected(promise, '"period_start_day" must be an integer between 1 and 31');
+    });
+
+    it('should throw an error when the start day is not a number', async () => {
+      const energySensorManager = new EnergySensorManager(buildStateManager());
+
+      const promise = energySensorManager.getConsumptionByDates(['test-device-feature'], {
+        from: new Date('2023-01-05T00:00:00.000Z'),
+        to: new Date('2023-02-05T00:00:00.000Z'),
+        group_by: 'month',
+        period_start_day: 'not-a-day',
+      });
+
+      return assert.isRejected(promise, '"period_start_day" must be an integer between 1 and 31');
+    });
+
+    describe('shouldOffsetPeriods', () => {
+      it('should not offset when the start day is the 1st', () => {
+        expect(shouldOffsetPeriods('month', 1)).to.equal(false);
+        expect(shouldOffsetPeriods('year', 1)).to.equal(false);
+      });
+      it('should not offset hourly, daily and weekly buckets', () => {
+        expect(shouldOffsetPeriods('hour', 5)).to.equal(false);
+        expect(shouldOffsetPeriods('day', 5)).to.equal(false);
+        expect(shouldOffsetPeriods('week', 5)).to.equal(false);
+        expect(shouldOffsetPeriods(null, 5)).to.equal(false);
+      });
+      it('should offset monthly and yearly buckets', () => {
+        expect(shouldOffsetPeriods('month', 5)).to.equal(true);
+        expect(shouldOffsetPeriods('year', 5)).to.equal(true);
+      });
+    });
+
+    describe('buildOffsetDateExpression', () => {
+      it('should build a yearly expression', () => {
+        expect(buildOffsetDateExpression('year', 5)).to.contain("DATE_TRUNC('year', created_at)");
+        expect(buildOffsetDateExpression('year', 5)).to.contain('TO_DAYS(4)');
+      });
+      it('should build a monthly expression', () => {
+        expect(buildOffsetDateExpression('month', 5)).to.contain("DATE_TRUNC('month', created_at)");
+        expect(buildOffsetDateExpression('month', 5)).to.contain('LEAST(5,');
+      });
+    });
+
+    describe('subscription prices', () => {
+      const subscriptionPrices = [
+        {
+          price: 150000, // 15€/month
+          start_date: '2023-01-01',
+          end_date: null,
+          contract_name: 'Test Contract',
+        },
+      ];
+
+      it('should follow the offset monthly periods', () => {
+        const result = calculateSubscriptionPrices(
+          subscriptionPrices,
+          new Date('2023-01-05T00:00:00.000Z'),
+          new Date('2023-03-05T00:00:00.000Z'),
+          'month',
+          5,
+        );
+
+        expect(result.map((value) => value.created_at)).to.deep.equal([
+          '2023-01-05T00:00:00.000Z',
+          '2023-02-05T00:00:00.000Z',
+        ]);
+      });
+
+      it('should follow the offset monthly periods when a month is too short', () => {
+        const result = calculateSubscriptionPrices(
+          subscriptionPrices,
+          new Date('2023-01-31T00:00:00.000Z'),
+          new Date('2023-03-31T00:00:00.000Z'),
+          'month',
+          31,
+        );
+
+        expect(result.map((value) => value.created_at)).to.deep.equal([
+          '2023-01-31T00:00:00.000Z',
+          '2023-02-28T00:00:00.000Z',
+        ]);
+      });
+
+      it('should follow the offset yearly periods', () => {
+        const result = calculateSubscriptionPrices(
+          subscriptionPrices,
+          new Date('2023-01-05T00:00:00.000Z'),
+          new Date('2025-01-05T00:00:00.000Z'),
+          'year',
+          5,
+        );
+
+        expect(result.map((value) => value.created_at)).to.deep.equal([
+          '2023-01-05T00:00:00.000Z',
+          '2024-01-05T00:00:00.000Z',
+        ]);
+      });
+
+      it('should keep calendar months when the start day is 1', () => {
+        const result = calculateSubscriptionPrices(
+          subscriptionPrices,
+          new Date('2023-01-01T00:00:00.000Z'),
+          new Date('2023-03-01T00:00:00.000Z'),
+          'month',
+        );
+
+        expect(result.map((value) => value.created_at)).to.deep.equal([
+          '2023-01-01T00:00:00.000Z',
+          '2023-02-01T00:00:00.000Z',
+        ]);
+      });
     });
   });
 });

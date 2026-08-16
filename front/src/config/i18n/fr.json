@@ -677,7 +677,9 @@
         "error": "Erreur lors du chargement des données de consommation énergétique",
         "noData": "Aucune donnée de consommation énergétique disponible pour cette période",
         "showSubscriptionPrices": "Afficher les prix d'abonnement",
-        "showSubscriptionPricesDescription": "Affiche le coût mensuel de l'abonnement en plus des données de consommation dans le graphique."
+        "showSubscriptionPricesDescription": "Affiche le coût mensuel de l'abonnement en plus des données de consommation dans le graphique.",
+        "periodStartDay": "Jour de départ de la période de facturation",
+        "periodStartDayDescription": "Jour du mois où commence la période de facturation de votre fournisseur d'énergie. Les vues mensuelle et annuelle iront alors de ce jour au même jour de la période suivante (ex : du 5 au 5), afin de pouvoir les comparer à votre facture. Si un mois est plus court que ce jour, la période démarre le dernier jour de ce mois."
       },
       "voice-assistant": {
         "speak": "Parler",

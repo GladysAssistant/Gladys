@@ -621,7 +621,9 @@
         "error": "Error loading energy consumption data",
         "noData": "No energy consumption data available for this period",
         "showSubscriptionPrices": "Show subscription prices",
-        "showSubscriptionPricesDescription": "Display the monthly subscription cost alongside consumption data in the chart."
+        "showSubscriptionPricesDescription": "Display the monthly subscription cost alongside consumption data in the chart.",
+        "periodStartDay": "Billing period start day",
+        "periodStartDayDescription": "Day of the month your energy bill period starts on. The monthly and yearly views then run from this day to the same day of the next period (ex: from the 5th to the 5th), so they can be compared with your bill. If a month is shorter than this day, the period starts on the last day of that month."
       },
       "scene": {
         "editNameLabel": "Widget Name (optional)",

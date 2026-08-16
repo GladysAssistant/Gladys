@@ -7,6 +7,14 @@ import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent, { DEFAULT_COLORS } from '../chart/ApexChartComponent';
 import { formatHttpError } from '../../../utils/formatErrors';
 import dayjs from 'dayjs';
+import {
+  DEFAULT_ENERGY_PERIOD_START_DAY,
+  parseEnergyPeriodStartDay,
+  getEnergyPeriodStart,
+  getEnergyPeriodStartInCalendarUnit,
+  getNextEnergyPeriodStart,
+  getPreviousEnergyPeriodStart
+} from '../../../../../server/utils/energyPeriod';
 
 import fr from 'date-fns/locale/fr';
 
@@ -16,6 +24,11 @@ const PERIODS = {
   YEAR: 'year',
   MONTH: 'month',
   DAY: 'day'
+};
+
+const getPeriodStartDay = box => {
+  const periodStartDay = parseEnergyPeriodStartDay(box && box.period_start_day);
+  return periodStartDay === null ? DEFAULT_ENERGY_PERIOD_START_DAY : periodStartDay;
 };
 
 const DISPLAY_MODES = {
@@ -104,6 +117,8 @@ class EnergyConsumption extends Component {
       seriesColors: [],
       emptySeries: true,
       selectedPeriod: PERIODS.MONTH,
+      // Any date inside the displayed period: the exact start of the period is
+      // always derived from it and from the billing period start day
       selectedDate: now,
       displayMode: DISPLAY_MODES.CURRENCY,
       currencyUnit: null
@@ -117,7 +132,8 @@ class EnergyConsumption extends Component {
   componentDidUpdate(prevProps) {
     if (
       prevProps.box.device_features !== this.props.box.device_features ||
-      prevProps.box.title !== this.props.box.title
+      prevProps.box.title !== this.props.box.title ||
+      prevProps.box.period_start_day !== this.props.box.period_start_day
     ) {
       this.refreshData();
     }
@@ -143,7 +159,8 @@ class EnergyConsumption extends Component {
         from: startDate.toISOString(),
         to: endDate.toISOString(),
         group_by: this.getGroupBy(),
-        display_mode: this.state.displayMode
+        display_mode: this.state.displayMode,
+        period_start_day: getPeriodStartDay(this.props.box)
       });
 
       let emptySeries = true;
@@ -252,27 +269,17 @@ class EnergyConsumption extends Component {
     }
   };
 
-  getDateRange = () => {
+  getPeriodStart = () => {
     const { selectedPeriod, selectedDate } = this.state;
-    let startDate, endDate;
+    return getEnergyPeriodStart(selectedDate, selectedPeriod, getPeriodStartDay(this.props.box));
+  };
 
-    switch (selectedPeriod) {
-      case PERIODS.YEAR:
-        startDate = new Date(selectedDate.getFullYear(), 0, 1, 0, 0, 0, 0);
-        endDate = new Date(selectedDate.getFullYear() + 1, 0, 1, 0, 0, 0, 0);
-        break;
-      case PERIODS.MONTH:
-        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1, 0, 0, 0, 0);
-        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1, 0, 0, 0, 0);
-        break;
-      case PERIODS.DAY:
-        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate(), 0, 0, 0, 0);
-        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate() + 1, 0, 0, 0, 0);
-        break;
-      default:
-        startDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1, 0, 0, 0, 0);
-        endDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 1, 0, 0, 0, 0);
-    }
+  getDateRange = () => {
+    const { selectedPeriod } = this.state;
+    const periodStartDay = getPeriodStartDay(this.props.box);
+
+    const startDate = this.getPeriodStart();
+    const endDate = getNextEnergyPeriodStart(startDate, selectedPeriod, periodStartDay);
 
     return { startDate, endDate };
   };
@@ -312,45 +319,28 @@ class EnergyConsumption extends Component {
   };
 
   navigatePrevious = () => {
-    const { selectedPeriod, selectedDate } = this.state;
-    let newDate = new Date(selectedDate);
-
-    switch (selectedPeriod) {
-      case PERIODS.YEAR:
-        newDate.setFullYear(selectedDate.getFullYear() - 1);
-        break;
-      case PERIODS.MONTH:
-        newDate.setMonth(selectedDate.getMonth() - 1);
-        break;
-      case PERIODS.DAY:
-        newDate.setDate(selectedDate.getDate() - 1);
-        break;
-    }
+    const { selectedPeriod } = this.state;
+    const periodStartDay = getPeriodStartDay(this.props.box);
+    const newDate = getPreviousEnergyPeriodStart(this.getPeriodStart(), selectedPeriod, periodStartDay);
 
     this.setState({ selectedDate: newDate }, this.refreshData);
   };
 
   navigateNext = () => {
-    const { selectedPeriod, selectedDate } = this.state;
-    let newDate = new Date(selectedDate);
-
-    switch (selectedPeriod) {
-      case PERIODS.YEAR:
-        newDate.setFullYear(selectedDate.getFullYear() + 1);
-        break;
-      case PERIODS.MONTH:
-        newDate.setMonth(selectedDate.getMonth() + 1);
-        break;
-      case PERIODS.DAY:
-        newDate.setDate(selectedDate.getDate() + 1);
-        break;
-    }
+    const { selectedPeriod } = this.state;
+    const periodStartDay = getPeriodStartDay(this.props.box);
+    const newDate = getNextEnergyPeriodStart(this.getPeriodStart(), selectedPeriod, periodStartDay);
 
     this.setState({ selectedDate: newDate }, this.refreshData);
   };
 
   onDateChange = date => {
-    this.setState({ selectedDate: date }, this.refreshData);
+    const periodStartDay = getPeriodStartDay(this.props.box);
+    // The date picker returns a month (or a year): display the billing period starting in it
+    this.setState(
+      { selectedDate: getEnergyPeriodStartInCalendarUnit(date, this.state.selectedPeriod, periodStartDay) },
+      this.refreshData
+    );
   };
 
   changeDisplayMode = mode => {
@@ -409,6 +399,19 @@ class EnergyConsumption extends Component {
         .locale(this.props.user.language)
         .format('MMM YYYY');
     }
+  };
+
+  getPeriodRangeLabel = () => {
+    const { startDate, endDate } = this.getDateRange();
+    const from = dayjs(startDate)
+      .locale(this.props.user.language)
+      .format('DD MMM YYYY');
+    // The end date is exclusive: display the last day included in the period
+    const to = dayjs(endDate)
+      .subtract(1, 'day')
+      .locale(this.props.user.language)
+      .format('DD MMM YYYY');
+    return `${from} - ${to}`;
   };
 
   getDatePickerView = () => {
@@ -495,7 +498,7 @@ class EnergyConsumption extends Component {
                 <div class="flex-fill mx-3">
                   <DatePicker
                     locale={localeSet}
-                    selected={this.state.selectedDate}
+                    selected={this.getPeriodStart()}
                     onChange={this.onDateChange}
                     dateFormat={this.getDateFormat()}
                     showMonthYearPicker={selectedPeriod === PERIODS.MONTH}
@@ -511,6 +514,15 @@ class EnergyConsumption extends Component {
               </div>
             </div>
           </div>
+
+          {/* Billing period range, only displayed when the period does not start on the 1st */}
+          {getPeriodStartDay(props.box) !== DEFAULT_ENERGY_PERIOD_START_DAY && selectedPeriod !== PERIODS.DAY && (
+            <div class="row mb-2">
+              <div class="col-12 text-center">
+                <small class="text-muted">{this.getPeriodRangeLabel()}</small>
+              </div>
+            </div>
+          )}
 
           {/* Display Mode Toggle */}
           <div class="row mb-3">

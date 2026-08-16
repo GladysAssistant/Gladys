@@ -677,7 +677,9 @@
         "error": "Fehler beim Laden der Energieverbrauchsdaten",
         "noData": "Keine Energieverbrauchsdaten für diesen Zeitraum verfügbar",
         "showSubscriptionPrices": "Abonnementpreise anzeigen",
-        "showSubscriptionPricesDescription": "Zeigt die monatlichen Abonnementkosten zusammen mit den Verbrauchsdaten im Diagramm an."
+        "showSubscriptionPricesDescription": "Zeigt die monatlichen Abonnementkosten zusammen mit den Verbrauchsdaten im Diagramm an.",
+        "periodStartDay": "Starttag des Abrechnungszeitraums",
+        "periodStartDayDescription": "Tag des Monats, an dem der Abrechnungszeitraum Ihres Energieversorgers beginnt. Die Monats- und Jahresansicht laufen dann von diesem Tag bis zum gleichen Tag des nächsten Zeitraums (z. B. vom 5. bis zum 5.), damit sie mit Ihrer Rechnung verglichen werden können. Ist ein Monat kürzer als dieser Tag, beginnt der Zeitraum am letzten Tag dieses Monats."
       },
       "voice-assistant": {
         "speak": "Sprechen",
