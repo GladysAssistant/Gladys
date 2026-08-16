@@ -65,7 +65,11 @@ describe('mqttHandler.handleHomeAssistantStateMessage', () => {
         config: { state_topic: '+/+/BTtoMQTT/A4C138800021', value_template: '{{ value_json.tempc }}' },
       },
     ];
-    mqttHandler.handleHomeAssistantStateMessage('blegateway/office/BTtoMQTT/A4C138800021', '{"tempc": 21.5}');
+    mqttHandler.handleHomeAssistantStateMessage(
+      'blegateway/office/BTtoMQTT/A4C138800021',
+      '{"tempc": 21.5}',
+      '+/+/BTtoMQTT/A4C138800021',
+    );
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'homeassistant:A4C138800021:sensor:temperature',
       state: 21.5,
@@ -73,8 +77,45 @@ describe('mqttHandler.handleHomeAssistantStateMessage', () => {
 
     // A message from another sensor must not match the binding
     gladys.event.emit.resetHistory();
-    mqttHandler.handleHomeAssistantStateMessage('blegateway/office/BTtoMQTT/FFFFFFFFFFFF', '{"tempc": 21.5}');
+    mqttHandler.handleHomeAssistantStateMessage(
+      'blegateway/office/BTtoMQTT/FFFFFFFFFFFF',
+      '{"tempc": 21.5}',
+      '+/+/BTtoMQTT/A4C138800021',
+    );
     assert.notCalled(gladys.event.emit);
+  });
+
+  it('should only emit the bindings of the filter it was subscribed with', () => {
+    // handleNewMessage dispatches a message to every matching filter, so a handler must not
+    // emit the bindings of another filter, otherwise overlapping filters emit duplicates
+    mqttHandler.haStateBindings['+/+/BTtoMQTT/A4C138800021'] = [
+      {
+        deviceExternalId: 'homeassistant:A4C138800021',
+        featureExternalId: 'homeassistant:A4C138800021:sensor:temperature',
+        component: 'sensor',
+        property: 'state',
+        config: { state_topic: '+/+/BTtoMQTT/A4C138800021', value_template: '{{ value_json.tempc }}' },
+      },
+    ];
+    mqttHandler.haStateBindings['blegateway/+/BTtoMQTT/A4C138800021'] = [
+      {
+        deviceExternalId: 'homeassistant:A4C138800021',
+        featureExternalId: 'homeassistant:A4C138800021:sensor:humidity',
+        component: 'sensor',
+        property: 'state',
+        config: { state_topic: 'blegateway/+/BTtoMQTT/A4C138800021', value_template: '{{ value_json.hum }}' },
+      },
+    ];
+    mqttHandler.handleHomeAssistantStateMessage(
+      'blegateway/office/BTtoMQTT/A4C138800021',
+      '{"tempc": 21.5, "hum": 55}',
+      '+/+/BTtoMQTT/A4C138800021',
+    );
+    assert.calledOnce(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'homeassistant:A4C138800021:sensor:temperature',
+      state: 21.5,
+    });
   });
 
   it('should not emit when the state cannot be parsed', () => {

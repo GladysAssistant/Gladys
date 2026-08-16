@@ -209,15 +209,21 @@ function parseHomeAssistantIncomingState(binding, message) {
  * created through the Home Assistant discovery protocol.
  * @param {string} topic - The topic where the message was published.
  * @param {string} message - The MQTT message.
+ * @param {string} [filter] - The topic filter this handler was subscribed with, which can
+ * contain wildcards. Defaults to the topic itself, for an exact subscription.
  * @example
  * this.handleHomeAssistantStateMessage('my-device/state', 'ON');
  */
-function handleHomeAssistantStateMessage(topic, message) {
-  // Bindings are stored by state topic, which can be a wildcard filter: the message
-  // arrives on a concrete topic, so each binding topic is matched as a filter
-  const bindings = Object.keys(this.haStateBindings)
-    .filter((bindingTopic) => mqttTopicMatches(bindingTopic, topic))
-    .flatMap((bindingTopic) => this.haStateBindings[bindingTopic]);
+function handleHomeAssistantStateMessage(topic, message, filter = topic) {
+  // Bindings are stored by the topic filter they were subscribed with, which can contain
+  // wildcards while the message always arrives on a concrete topic. handleNewMessage
+  // dispatches a message to every matching filter, so handling only the bindings of the
+  // filter this callback was registered for keeps the lookup a single map read and emits
+  // each binding once, even when two filters match the same topic.
+  if (!mqttTopicMatches(filter, topic)) {
+    return;
+  }
+  const bindings = this.haStateBindings[filter] || [];
   bindings.forEach((binding) => {
     try {
       const state = parseHomeAssistantIncomingState(binding, message);

@@ -36,6 +36,22 @@ function getStateTopic(component, property, config) {
 }
 
 /**
+ * @description Check if a state topic advertised in a discovery payload can be subscribed to.
+ * A state topic is a subscription filter, so "+" is valid there: Theengs gateways advertise
+ * topics such as "+/+/BTtoMQTT/<id>" so that several gateways can publish the state of the
+ * same sensor. A discovery payload is untrusted input though, so filters that would pull in
+ * traffic far beyond the device they claim to describe are still refused: "#", which matches
+ * every remaining level, and filters without a single concrete level ("+", "+/+"...).
+ * @param {string} topic - The state topic advertised in the discovery payload.
+ * @returns {boolean} True when the topic can be subscribed to.
+ * @example
+ * isSubscribableStateTopic('+/+/BTtoMQTT/A4C138800021');
+ */
+function isSubscribableStateTopic(topic) {
+  return !topic.includes('#') && topic.split('/').some((level) => level !== '+');
+}
+
+/**
  * @description Stop listening to the state topics of a Home Assistant device.
  * @param {object} device - Gladys device.
  * @example
@@ -101,12 +117,18 @@ function listenToHomeAssistantDeviceStateIfNeeded(device) {
         if (!topic) {
           return;
         }
-        // State topics are subscription filters, so wildcards are valid there: gateways like
-        // Theengs advertise topics such as "+/+/BTtoMQTT/<id>" so that several gateways can
-        // publish the state of the same sensor
+        if (!isSubscribableStateTopic(topic)) {
+          logger.warn(`MQTT Home Assistant: ignoring state topic ${topic}, this filter is too broad`);
+          return;
+        }
         if (!this.haStateBindings[topic]) {
           this.haStateBindings[topic] = [];
-          this.subscribe(topic, this.handleHomeAssistantStateMessage.bind(this));
+          // The callback is bound to the filter it was subscribed with: handleNewMessage
+          // dispatches a message to every matching filter, so each one must only handle
+          // the bindings it holds itself
+          this.subscribe(topic, (receivedTopic, receivedMessage) =>
+            this.handleHomeAssistantStateMessage(receivedTopic, receivedMessage, topic),
+          );
         }
         this.haStateBindings[topic].push({
           deviceExternalId: device.external_id,

@@ -63,6 +63,26 @@ describe('mqttHandler.listenToHomeAssistantDeviceStateIfNeeded', () => {
     sinon.assert.calledWith(mqttHandler.subscribe, '+/+/BTtoMQTT/A4C138800021');
   });
 
+  it('should not subscribe to a state topic matching too many topics', () => {
+    // A discovery payload is untrusted input: "#" and filters without a concrete
+    // level would subscribe Gladys to traffic unrelated to the device
+    ['#', 'sensor/#', '+', '+/+'].forEach((stateTopic) => {
+      mqttHandler.haStateBindings = {};
+      mqttHandler.listenToHomeAssistantDeviceStateIfNeeded({
+        external_id: 'homeassistant:my-device',
+        params: [
+          {
+            name: 'ha_discovery_config:sensor:temperature',
+            value: JSON.stringify({ state_topic: stateTopic, device_class: 'temperature' }),
+          },
+        ],
+        features: [{ external_id: 'homeassistant:my-device:sensor:temperature' }],
+      });
+      expect(mqttHandler.haStateBindings).to.deep.equal({});
+    });
+    sinon.assert.notCalled(mqttHandler.subscribe);
+  });
+
   it('should listen to the state topic of a sensor', () => {
     const device = {
       external_id: 'homeassistant:my-device',
