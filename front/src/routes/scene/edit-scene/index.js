@@ -26,6 +26,11 @@ const VARIABLES_ATTRIBUTES_IN_ACTION = {
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: ['conditions[].evaluate_value', 'conditions[].variable']
 };
 
+// Attributes holding a raw variable path (e.g. "1.0.last_value").
+// All the other attributes are texts or formulas where the variables are wrapped
+// in double curly braces (e.g. "The temperature is {{1.0.last_value}}°C").
+const RAW_VARIABLE_PATH_ATTRIBUTES = ['conditions[].variable'];
+
 // Helper function to merge update objects
 const deepMergeUpdates = (target, source) => {
   if (!source) return target;
@@ -47,6 +52,24 @@ const deepMergeUpdates = (target, source) => {
 
   return result;
 };
+
+// Replaces a variable path in a value holding a raw path (e.g. "1.0.last_value").
+// The match is anchored on the path separator, so "1.0" never matches "11.0.last_value".
+const replaceVariablePathInRawPath = (value, prevPath, newPath) => {
+  if (value === prevPath) {
+    return newPath;
+  }
+  if (value.startsWith(`${prevPath}.`)) {
+    return `${newPath}${value.slice(prevPath.length)}`;
+  }
+  return value;
+};
+
+// Replaces every reference to a variable path in a text or a formula
+// (e.g. "The temperature is {{1.0.last_value}}°C").
+// All the occurrences are replaced, and the "{{" prefix and the "." suffix anchor the match,
+// so "{{1.0." never matches "{{11.0.last_value}}" nor a number like "10.05".
+const replaceVariablePathInText = (value, prevPath, newPath) => value.split(`{{${prevPath}.`).join(`{{${newPath}.`);
 
 // Helper function to replace all references to a variable path by a new variable path
 // in a list of action groups, including the actions nested in if/then/else blocks.
@@ -72,16 +95,20 @@ const replaceVariablePathInActions = (actions, prevPath, newPath) => {
             if (attributePath[0].endsWith('[]') && action[attributePath[0].slice(0, -2)]) {
               // We loop through the array
               action[attributePath[0].slice(0, -2)].forEach(subAction => {
-                if (subAction[attributePath[1]] && subAction[attributePath[1]].includes(prevPath)) {
-                  // And replace the second part if it is a variable
-                  // Here, we don't prefix prevPath by {{ because if it's a variable, it's not prefixed by {{
-                  subAction[attributePath[1]] = subAction[attributePath[1]].replace(prevPath, newPath);
+                const value = subAction && subAction[attributePath[1]];
+                if (typeof value !== 'string') {
+                  return;
                 }
+                // And replace the second part, either as a raw path (it's a variable, so it's
+                // not prefixed by {{) or as a text depending on what the attribute holds.
+                subAction[attributePath[1]] = RAW_VARIABLE_PATH_ATTRIBUTES.includes(attribute)
+                  ? replaceVariablePathInRawPath(value, prevPath, newPath)
+                  : replaceVariablePathInText(value, prevPath, newPath);
               });
             }
-          } else if (action[attribute]) {
+          } else if (typeof action[attribute] === 'string') {
             // In that case, we prefix prevPath by {{ because it's usually a text like "The temperature is {{variable}}°C".
-            action[attribute] = action[attribute].replace(`{{${prevPath}.`, `{{${newPath}.`);
+            action[attribute] = replaceVariablePathInText(action[attribute], prevPath, newPath);
           }
         });
       }
