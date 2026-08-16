@@ -176,6 +176,13 @@ module.exports = (sequelize, DataTypes) => {
       background_image: {
         allowNull: true,
         type: DataTypes.TEXT,
+        validate: {
+          isHttpUrl(value) {
+            if (value !== null && value !== undefined && !/^https?:\/\//.test(value)) {
+              throw new Error('background_image must be an http(s) URL');
+            }
+          },
+        },
       },
       card_style: {
         allowNull: true,

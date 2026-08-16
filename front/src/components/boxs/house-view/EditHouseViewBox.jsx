@@ -53,13 +53,10 @@ class EditHouseViewBox extends Component {
     this.setState({ uploading: true, uploadError: false });
     try {
       const { contentType, data } = await fileToResizedBase64(file);
-      const { id } = await this.props.httpClient.post(
-        `/api/v1/dashboard_asset/${this.props.homeDashboard.selector}`,
-        {
-          content_type: contentType,
-          data
-        }
-      );
+      const { id } = await this.props.httpClient.post(`/api/v1/dashboard_asset/${this.props.homeDashboard.selector}`, {
+        content_type: contentType,
+        data
+      });
       this.props.updateBoxConfig(this.props.x, this.props.y, { image: `asset:${id}` });
     } catch (err) {
       console.error(err);
@@ -147,7 +144,12 @@ class EditHouseViewBox extends Component {
           <label class="form-label">
             <Text id="dashboard.boxes.house-view.editUploadLabel" />
           </label>
-          <input type="file" accept="image/png,image/jpeg,image/webp" class="form-control" onChange={this.uploadImage} />
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            class="form-control"
+            onChange={this.uploadImage}
+          />
           {uploading && (
             <small class="d-block mt-1">
               <Text id="dashboard.boxes.house-view.uploading" />

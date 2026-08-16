@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const nock = require('nock');
-const { authenticatedRequest } = require('../request.test');
+const { authenticatedRequest, request } = require('../request.test');
 const { DASHBOARD_VISIBILITY } = require('../../../utils/constants');
 
 describe('POST /api/v1/dashboard', () => {
@@ -225,6 +225,30 @@ describe('POST /api/v1/dashboard_asset/:dashboard_selector', () => {
       .then((res) => {
         expect(res.text).to.equal(`image/png;base64,${pngBase64}`);
       });
+  });
+});
+
+describe('POST /api/v1/dashboard_asset (large body)', () => {
+  // ~180 kB of base64: over the global 100 kB JSON bound, under the
+  // dedicated 6 MB bound mounted behind authentication on this route
+  const largeBase64 = Buffer.alloc(135 * 1024, 7).toString('base64');
+
+  it('should accept an upload larger than the global JSON body bound', async () => {
+    await authenticatedRequest
+      .post('/api/v1/dashboard_asset/test-dashboard')
+      .send({ content_type: 'image/jpeg', data: largeBase64 })
+      .expect('Content-Type', /json/)
+      .expect(201)
+      .then((res) => {
+        expect(res.body).to.have.property('id');
+      });
+  });
+
+  it('should answer 401 before parsing a large unauthenticated upload', async () => {
+    await request
+      .post('/api/v1/dashboard_asset/test-dashboard')
+      .send({ content_type: 'image/jpeg', data: largeBase64 })
+      .expect(401);
   });
 });
 

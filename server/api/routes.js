@@ -187,6 +187,7 @@ function getRoutes(gladys) {
     'post /api/v1/dashboard_asset/:dashboard_selector': {
       authenticated: true,
       largeJsonBody: true,
+      rateLimit: true,
       controller: dashboardController.createAsset,
     },
     'get /api/v1/dashboard_asset/:dashboard_asset_id': {

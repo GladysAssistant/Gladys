@@ -180,6 +180,8 @@ describe('Device.migrate', () => {
       user_id: SEEDED_USER_ID,
       type: 'main',
       visibility: 'private',
+      // legacy column shape on purpose: creation normalizes it to sections,
+      // and the migration must rewrite inside the section shape
       boxes: [
         [
           {
@@ -189,6 +191,20 @@ describe('Device.migrate', () => {
             title: 'Temp',
           },
           { type: 'devices', device_features: ['migration-source-binary'] },
+          {
+            type: 'chips',
+            chips: [{ chip_type: 'device-feature', device_feature: 'migration-source-temp' }],
+          },
+          {
+            type: 'house-view',
+            image: 'gallery:house-solar',
+            pins: [{ x_pct: 10, y_pct: 20, device_feature: 'migration-source-temp' }],
+          },
+          {
+            type: 'scene',
+            scenes: ['some-scene'],
+            scene_status_features: { 'some-scene': 'migration-source-temp' },
+          },
         ],
       ],
     });
@@ -252,18 +268,37 @@ describe('Device.migrate', () => {
         },
       ],
     });
-    // Dashboard rewritten in DB, positional companion arrays untouched
+    // Dashboard rewritten in DB inside the normalized section shape,
+    // positional companion arrays untouched
     const refreshedDashboard = await db.Dashboard.findOne({ where: { id: dashboard.id } });
     expect(refreshedDashboard.boxes).to.deep.equal([
-      [
-        {
-          type: 'chart',
-          device_features: ['migration-destination-temp', 'some-other-feature'],
-          device_feature_names: ['My temp', 'Other'],
-          title: 'Temp',
-        },
-        { type: 'devices', device_features: ['migration-source-binary'] },
-      ],
+      {
+        columns: [
+          [
+            {
+              type: 'chart',
+              device_features: ['migration-destination-temp', 'some-other-feature'],
+              device_feature_names: ['My temp', 'Other'],
+              title: 'Temp',
+            },
+            { type: 'devices', device_features: ['migration-source-binary'] },
+            {
+              type: 'chips',
+              chips: [{ chip_type: 'device-feature', device_feature: 'migration-destination-temp' }],
+            },
+            {
+              type: 'house-view',
+              image: 'gallery:house-solar',
+              pins: [{ x_pct: 10, y_pct: 20, device_feature: 'migration-destination-temp' }],
+            },
+            {
+              type: 'scene',
+              scenes: ['some-scene'],
+              scene_status_features: { 'some-scene': 'migration-destination-temp' },
+            },
+          ],
+        ],
+      },
     ]);
     // Scene in DB untouched by the migration itself (the fake scene manager owns persistence)
     const untouchedScene = await db.Scene.findOne({ where: { id: scene.id } });

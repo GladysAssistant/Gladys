@@ -49,11 +49,12 @@
   padding-top: 100%;
 }
 
-/* Horizon glass theme: thin, large, non-monospace time */
+/* Horizon glass theme: thin, large, non-monospace time.
+   Clamped so the clock stays inside narrow (3-4 column) sections. */
 :global(.glass-theme) .digitalTime {
   font-family: inherit;
   font-weight: 200;
-  font-size: 56px;
+  font-size: clamp(2.2rem, 4.5cqw + 1rem, 3.5rem);
   letter-spacing: 0.01em;
   font-variant-numeric: tabular-nums;
 }

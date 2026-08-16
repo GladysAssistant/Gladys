@@ -124,7 +124,11 @@ class ChipsBox extends Component {
       if (!chip || !data) {
         return data;
       }
-      if (chip.chip_type === 'device-feature' && data.feature && payload.device_feature_selector === chip.device_feature) {
+      if (
+        chip.chip_type === 'device-feature' &&
+        data.feature &&
+        payload.device_feature_selector === chip.device_feature
+      ) {
         hasChanged = true;
         return {
           ...data,

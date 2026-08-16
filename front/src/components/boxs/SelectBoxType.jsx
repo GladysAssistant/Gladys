@@ -26,7 +26,7 @@ class SelectBoxType extends Component {
           <label>
             <Text id="dashboard.selectBoxTypeLabel" />
           </label>
-          <select onChange={this.selectType} class="form-control">
+          <select onChange={this.selectType} class="form-control" data-cy="select-box-type">
             <option>
               <Text id="global.emptySelectOption" />
             </option>

@@ -86,6 +86,13 @@ describe('dashboard.update', () => {
     expect(updatedDashboard).to.have.property('card_style', 'glass');
   });
 
+  it('should reject a non-http background image', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      background_image: 'javascript:alert(1)',
+    });
+    return assert.isRejected(promise);
+  });
+
   it('should reject an unknown card style', async () => {
     const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       card_style: 'neon',

@@ -321,7 +321,7 @@
     "editDashboardAddSectionButton": "Einen Abschnitt hinzufügen",
     "editDashboardBoxNotEmpty": "Sie können diese Spalte nicht löschen, da sie Widgets enthält.",
     "editDashboardMyDashboards": "Meine Dashboards",
-    "editDashboardExplanation": "Jedes Dashboard hat 3 Spalten, die du nach Belieben füllen kannst. Klicke auf \"+\", um ein neues Widget hinzuzufügen. Du kannst dieses Widget bewegen, indem du es greifst und verschiebst.",
+    "editDashboardExplanation": "Ein Dashboard ist ein Stapel von Abschnitten, jeder mit eigenen Spalten (maximal 4). Klicke auf \"+\", um ein Widget, eine Spalte oder einen Abschnitt hinzuzufügen. Du kannst ein Widget bewegen, indem du es greifst und verschiebst.",
     "reorderDashboardButton": "Dashboards neu anordnen",
     "stopReorderingDashboardButton": "Anordnen der Dashboards beenden",
     "addBoxButton": "Hinzufügen",
@@ -4713,11 +4713,463 @@
     }
   },
   "deviceFeatureValue": {
-    "noValue": "Kein Wert",
-    "open": "Offen",
-    "closed": "Geschlossen",
-    "on": "An",
-    "off": "Aus"
+    "type": {
+      "binary": {
+        "other": "Kein Wert empfangen",
+        "zero": "Inaktiv",
+        "one": "Aktiv"
+      }
+    },
+    "category": {
+      "button": {
+        "click": {
+          "unknown": "{{value}} (unbekannter Wert)",
+          "1": "Einfacher Klick",
+          "2": "Doppelter Klick",
+          "3": "Langer Klick (drücken)",
+          "4": "Langer Klick (loslassen)",
+          "5": "Klick halten",
+          "6": "Langer Klick",
+          "7": "An",
+          "8": "Aus",
+          "9": "Helligkeit verringern",
+          "10": "Helligkeit erhöhen",
+          "11": "Helligkeit stoppen",
+          "12": "Linker Pfeilklick",
+          "13": "Rechter Pfeilklick",
+          "14": "Linker Pfeil gehalten",
+          "15": "Rechter Pfeil gehalten",
+          "16": "Linker Pfeil loslassen",
+          "17": "Rechter Pfeil loslassen",
+          "18": "Dreifacher Klick",
+          "19": "Vierfacher Klick",
+          "20": "Klick losgelassen",
+          "21": "Viele Klicks",
+          "22": "Würfel schütteln",
+          "23": "Würfel werfen",
+          "24": "Würfel aufwachen",
+          "25": "Würfel fallen",
+          "26": "Würfel tippen",
+          "27": "Würfel schieben",
+          "28": "Würfel 180° drehen",
+          "29": "Würfel 90° drehen",
+          "30": "Würfel nach links drehen",
+          "31": "Würfel nach rechts drehen",
+          "32": "Vibration",
+          "33": "Neigen",
+          "34": "Fallenlassen",
+          "35": "Notfall",
+          "36": "Alarm ausschalten",
+          "37": "Alarm für Tageszonen scharf schalten",
+          "38": "Alarm für alle Zonen scharf schalten",
+          "39": "An-Taste gedrückt",
+          "40": "An-Taste gehalten",
+          "41": "Auf-Taste gedrückt",
+          "42": "Auf-Taste gehalten",
+          "43": "Ab-Taste gedrückt",
+          "44": "Ab-Taste gehalten",
+          "45": "Aus-Taste gedrückt",
+          "46": "Aus-Taste gehalten",
+          "47": "Einmaliges Drücken",
+          "48": "Langer Druck",
+          "49": "Kurzes Loslassen",
+          "50": "Langes Loslassen",
+          "51": "Doppeltes Drücken",
+          "52": "Umschalten",
+          "53": "Umschalten Gehalten",
+          "54": "Helligkeit Auf-Taste gedrückt",
+          "55": "Helligkeit Auf-Taste gehalten",
+          "56": "Helligkeit Auf-Taste Loslassen",
+          "57": "Helligkeit Ab-Taste gedrückt",
+          "58": "Helligkeit Ab-Taste gehalten",
+          "59": "Helligkeit Ab-Taste Loslassen",
+          "60": "Gedrückt",
+          "61": "Einfach Links",
+          "62": "Einfach Rechts",
+          "63": "Einfach Beide",
+          "64": "Doppelt Links",
+          "65": "Doppelt Rechts",
+          "66": "Doppelt Beide",
+          "67": "Dreifach Links",
+          "68": "Dreifach Rechts",
+          "69": "Dreifach Beide",
+          "70": "Halten Links",
+          "71": "Halten Rechts",
+          "72": "Halten Beide",
+          "73": "Einfacher Klick Plus",
+          "74": "Einfacher Klick Mitte",
+          "75": "Einfacher Klick Minus",
+          "76": "Doppelklick Plus",
+          "77": "Doppelklick Mitte",
+          "78": "Doppelklick Minus",
+          "79": "Halten Plus",
+          "80": "Halten Mitte",
+          "81": "Halten Minus",
+          "82": "Loslassen Plus",
+          "83": "Loslassen Mitte",
+          "84": "Loslassen Minus",
+          "85": "Doppelt Ein",
+          "86": "Doppelt Aus",
+          "87": "Alarm für Nachtzonen scharf schalten",
+          "88": "Ausgangsverzögerung",
+          "89": "Taste 1 einfacher Klick",
+          "90": "Taste 1 doppelter Klick",
+          "91": "Taste 1 langer Klick",
+          "92": "Taste 1 dreifacher Klick",
+          "93": "Taste 2 einfacher Klick",
+          "94": "Taste 2 doppelter Klick",
+          "95": "Taste 2 langer Klick",
+          "96": "Taste 2 dreifacher Klick",
+          "97": "Taste 3 einfacher Klick",
+          "98": "Taste 3 doppelter Klick",
+          "99": "Taste 3 langer Klick",
+          "100": "Taste 3 dreifacher Klick",
+          "101": "Taste 4 einfacher Klick",
+          "102": "Taste 4 doppelter Klick",
+          "103": "Taste 4 langer Klick",
+          "104": "Taste 4 dreifacher Klick"
+        }
+      },
+      "fan": {
+        "mode": {
+          "0": "Aus",
+          "1": "Niedrig",
+          "2": "Mittel",
+          "3": "Hoch",
+          "4": "Auto"
+        },
+        "percent": {},
+        "speed": {},
+        "airflow-direction": {
+          "0": "Vorwärts",
+          "1": "Rückwärts"
+        },
+        "rock-setting": {
+          "0": "Aus",
+          "1": "Links/Rechts",
+          "2": "Hoch/Runter",
+          "3": "Links/Rechts + Hoch/Runter",
+          "4": "Rund",
+          "5": "Links/Rechts + Rund",
+          "6": "Hoch/Runter + Rund",
+          "7": "Alle"
+        },
+        "wind-setting": {
+          "0": "Aus",
+          "1": "Schlafwind",
+          "2": "Naturwind",
+          "3": "Schlaf- + Naturwind"
+        }
+      },
+      "heater": {
+        "pilot-wire-mode": {
+          "0": "Aus",
+          "1": "Frostschutz",
+          "2": "Öko",
+          "3": "Komfort -1°C",
+          "4": "Komfort -2°C",
+          "5": "Komfort"
+        }
+      },
+      "shutter": {
+        "state": {
+          "-1": "Geschlossen",
+          "0": "Gestoppt",
+          "1": "Geöffnet"
+        }
+      },
+      "curtain": {
+        "state": {
+          "-1": "Geschlossen",
+          "0": "Gestoppt",
+          "1": "Geöffnet"
+        }
+      },
+      "lock": {
+        "state": {
+          "0": "Entriegelt",
+          "1": "Verriegelt",
+          "2": "Aktivität",
+          "3": "Fehler"
+        }
+      },
+      "air-conditioning": {
+        "mode": {
+          "0": "Automatisch",
+          "1": "Kühlen",
+          "2": "Heizen",
+          "3": "Entfeuchten",
+          "4": "Lüften"
+        },
+        "fan-speed": {
+          "0": "Automatisch",
+          "1": "Niedrig",
+          "2": "Niedrig-Mittel",
+          "3": "Mittel",
+          "4": "Mittel-Hoch",
+          "5": "Hoch",
+          "6": "Leise",
+          "7": "Turbo"
+        },
+        "swing-horizontal": {
+          "0": "Aus",
+          "1": "Schwenk",
+          "2": "Position 1 (Links)",
+          "3": "Position 2",
+          "4": "Position 3 (Mitte)",
+          "5": "Position 4",
+          "6": "Position 5 (Rechts)",
+          "7": "Gegenläufiger Schwenk"
+        },
+        "swing-vertical": {
+          "0": "Aus",
+          "1": "Schwenken",
+          "2": "Position 1 (Oben)",
+          "3": "Position 2",
+          "4": "Position 3",
+          "5": "Position 4",
+          "6": "Position 5 (Unten)"
+        }
+      },
+      "thermostat": {
+        "mode": {
+          "0": "Aus",
+          "1": "Heizen",
+          "2": "Kühlen",
+          "3": "Automatisch"
+        },
+        "operating-state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Inaktiv",
+          "1": "Heizt",
+          "2": "Kühlt"
+        }
+      },
+      "siren": {
+        "lmh_volume": {
+          "0": "Niedrig",
+          "1": "Mittel",
+          "2": "Hoch"
+        },
+        "test-in-progress": {
+          "0": "Nein",
+          "1": "Ja"
+        }
+      },
+      "music": {
+        "playback_state": {
+          "0": "Pausiert",
+          "1": "Wird abgespielt"
+        }
+      },
+      "opening-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Geöffnet",
+          "one": "Geschlossen"
+        }
+      },
+      "motion-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Keine Bewegung",
+          "one": "Bewegung erkannt"
+        }
+      },
+      "presence-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Keine Anwesenheit",
+          "one": "Anwesenheit erkannt"
+        }
+      },
+      "smoke-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Kein Rauch",
+          "one": "Rauch erkannt"
+        }
+      },
+      "co-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Gesund",
+          "one": "CO erkannt"
+        }
+      },
+      "leak-sensor": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Nein",
+          "one": "Ja"
+        }
+      },
+      "battery-low": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Nein",
+          "one": "Ja"
+        }
+      },
+      "tamper": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Nein",
+          "one": "Ja"
+        }
+      },
+      "input": {
+        "binary": {
+          "other": "Kein Wert empfangen",
+          "zero": "Aus",
+          "one": "An"
+        }
+      },
+      "risk": {
+        "integer": {
+          "no-risk": "Kein Risiko",
+          "low-risk": "Niedrig",
+          "medium-risk": "Mittel",
+          "high-risk": "Hoch",
+          "unknown": "Unbekannt"
+        }
+      },
+      "level-sensor": {
+        "liquid-state": {
+          "0": "Niedrig",
+          "1": "Normal",
+          "2": "Hoch",
+          "unknown": "Unbekannt"
+        }
+      },
+      "water-valve": {
+        "current-device-status": {
+          "0": "Normal",
+          "1": "Wassermangel",
+          "2": "Wasserleck",
+          "3": "Wassermangel und Wasserleck",
+          "unknown": "{{value}} (unbekannt)"
+        },
+        "valve-work-state": {
+          "0": "Inaktiv",
+          "1": "Bewässerung läuft"
+        }
+      },
+      "electrical-vehicle-state": {
+        "door-opened": {
+          "0": "Geschlossen",
+          "1": "Offen"
+        },
+        "window-opened": {
+          "0": "Geschlossen",
+          "1": "Offen"
+        }
+      },
+      "doorbell": {
+        "ring": {
+          "0": "Kein Klingeln",
+          "1": "Hat geklingelt"
+        }
+      },
+      "electrical-vehicle-charge": {
+        "plugged": {
+          "0": "Nicht geladen",
+          "1": "Geladen"
+        }
+      },
+      "charging-station": {
+        "connector-status": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Verfügbar",
+          "1": "Belegt",
+          "2": "Reserviert",
+          "3": "Nicht verfügbar",
+          "4": "Fehler"
+        },
+        "charging-state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Lädt",
+          "1": "Fahrzeug verbunden",
+          "2": "Angehalten (Fahrzeug)",
+          "3": "Angehalten (Ladestation)",
+          "4": "Inaktiv",
+          "5": "Entlädt"
+        }
+      },
+      "voc-matter-index-sensor": {
+        "integer": {
+          "unknown": "Unbekannt",
+          "low": "Niedrig",
+          "medium": "Mittel",
+          "high": "Hoch",
+          "critical": "Netz kritisch"
+        }
+      },
+      "no2-matter-index-sensor": {
+        "integer": {
+          "unknown": "Unbekannt",
+          "low": "Niedrig",
+          "medium": "Mittel",
+          "high": "Hoch",
+          "critical": "Netz kritisch"
+        }
+      },
+      "level-matter-index-sensor": {
+        "level-state": {
+          "1": "Niedrig",
+          "2": "Mittel",
+          "3": "Hoch",
+          "4": "Netz kritisch"
+        }
+      },
+      "vacuum-cleaner": {
+        "state": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Gestoppt",
+          "1": "Läuft",
+          "2": "Pausiert",
+          "3": "Fehler",
+          "4": "Kehrt zur Ladestation zurück",
+          "5": "Lädt",
+          "6": "Angedockt"
+        },
+        "run-mode": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Leerlauf",
+          "1": "Reinigen",
+          "2": "Kartieren"
+        },
+        "clean-mode": {
+          "unknown": "{{value}} (unbekannt)",
+          "0": "Auto",
+          "1": "Schnell",
+          "2": "Leise",
+          "3": "Geräuscharm",
+          "4": "Tiefenreinigung",
+          "5": "Saugen",
+          "6": "Wischen"
+        }
+      },
+      "water-heater": {
+        "mode": {
+          "0": "Aus",
+          "1": "Auto",
+          "2": "Öko",
+          "3": "Boost",
+          "4": "Manuell",
+          "5": "Abwesenheit",
+          "6": "Zeitplan"
+        },
+        "boost": {
+          "0": "Boost aus",
+          "1": "Boost ein"
+        },
+        "heating": {
+          "0": "Bereit",
+          "1": "Heizt"
+        }
+      }
+    }
   },
   "deviceFeatureCategory": {
     "light": {
@@ -5599,5 +6051,12 @@
     "cancelUpgradeToYearly": "Abbrechen",
     "upgradeYearlyError": "Beim Wechsel in das jährliche Abomodell ist ein Fehler aufgetreten. Bitte kontaktiere uns per E-Mail.",
     "upgradeYearlySuccess": "Vielen Dank, dass du in das jährliche Abmodell gewechselt bist!"
+  },
+  "deviceFeatureValueText": {
+    "noValue": "Kein Wert",
+    "open": "Offen",
+    "closed": "Geschlossen",
+    "on": "An",
+    "off": "Aus"
   }
 }

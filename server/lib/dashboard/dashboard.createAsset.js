@@ -8,6 +8,10 @@ const ALLOWED_CONTENT_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 // ~3 MB of binary once decoded, sized under the route's JSON body bound.
 const MAX_BASE64_LENGTH = 4 * 1024 * 1024;
 const BASE64_REGEX = /^[A-Za-z0-9+/]+={0,2}$/;
+// Uploads replace references, not rows, so old assets linger until the
+// dashboard is deleted: the per-dashboard cap bounds what a dashboard can
+// accumulate in the SQLite file (25 x 3 MB worst case).
+const MAX_ASSETS_PER_DASHBOARD = 25;
 
 /**
  * @description Create an image asset attached to a dashboard.
@@ -48,6 +52,15 @@ async function createAsset(userId, selector, asset) {
 
   if (dashboard === null) {
     throw new NotFoundError('Dashboard not found');
+  }
+
+  const existingAssets = await db.DashboardAsset.count({
+    where: {
+      dashboard_id: dashboard.id,
+    },
+  });
+  if (existingAssets >= MAX_ASSETS_PER_DASHBOARD) {
+    throw new BadParameters(`This dashboard already has ${MAX_ASSETS_PER_DASHBOARD} assets`);
   }
 
   const dashboardAsset = await db.DashboardAsset.create({

@@ -51,7 +51,7 @@ Decided with the maintainer in forum topic 10553: instead of a per-row column co
 
 ### A.3 Editor UX
 
-The edit mode keeps the current interaction model, per section: add/remove section, choose its column count (visual picker, like the existing new-dashboard flow), drag & drop boxes within and across sections/columns (the existing drag & drop and drop-zone components are reused per section).
+The edit mode keeps the current interaction model, per section: an "Add a section" button appends a one-column section, a per-section **+** button adds a column (up to 4) and a per-column trash removes an empty one (removing the last column removes the section); drag & drop moves boxes within and across sections/columns (the existing drag & drop and drop-zone components are reused per section). There is no separate column-count picker.
 
 ### A.4 Heights: selective stretch, not masonry
 
@@ -69,7 +69,7 @@ On small screens sections keep today's behavior: columns collapse to a single co
 
 ## B. New box type: `chips`
 
-A **full-width bar of compact pills**, each pill summarizing one state with an automatic icon and color. One chips box replaces what would otherwise be a pathological "7-column section".
+A **full-width bar of compact pills**, each pill summarizing one state with an automatic icon and color. One chips box replaces what would otherwise be a pathological "7-column section". Boxes have no span field: a chips bar takes the full dashboard width by living in its own **1-column section**, which is the intended composition.
 
 - New `DASHBOARD_BOX_TYPE.CHIPS = 'chips'` in `server/utils/constants.js`, rendered as a `flex-wrap` row — responsive for free, on desktop and mobile alike.
 - Box config: an ordered list of chips. Each chip is one of four kinds:
@@ -100,7 +100,7 @@ The scene box (`front/src/components/boxs/scene/`) gains an **optional state sub
 A real-time energy synthesis replacing hand-assembled gauge/chart combinations: a stats banner (production, grid import, grid export, self-consumption %) plus a live flow diagram (solar → home / battery / grid).
 
 - New `DASHBOARD_BOX_TYPE.ENERGY_FLOW = 'energy-flow'`.
-- Config: the user assigns existing device features to **roles**: `production`, `consumption`, `grid_import`, `grid_export`, `battery_level` (all optional except `consumption` or `production`). That is the entire configuration — the widget computes self-consumption and draws the flow from whichever roles are present.
+- Config: the user assigns existing device features to **roles mapped 1:1 on the energy taxonomy that already shipped**: production (`energy-sensor`/`home-output-sensor` power), home consumption, grid exchange (a **signed** `grid-sensor.power`, import > 0 / export < 0 — not separate import/export slots), and battery (`battery-storage` charge/discharge power, with the SoC shown from the battery feature itself). The widget computes self-consumption and draws the flow from whichever roles are present; it must not invent a solar-specific import/export/SoC model that fights those categories.
 - Periods: instantaneous values from the latest states; daily totals reuse the aggregate mechanisms already backing the `chart` and `energy-consumption` boxes. No new storage.
 - The diagram is a fixed, designed rendering (SVG), not user-customizable. Roles not configured simply do not appear.
 
@@ -147,7 +147,7 @@ Generating the `house-view` illustration is the one step that cannot be beautifu
 
 Additive, optional (nullable) columns on `t_dashboard` (migration `20260815000000`; absent fields = exactly today's rendering):
 
-- `background_image`: none (default) | an image URL for now — switches to a dashboard asset reference (bundled wallpapers, uploads) when the asset storage lands in phase 4;
+- `background_image`: none (default) | an **http(s) URL, validated on save** (model-level check) and re-checked by the frontend before being interpolated into the CSS `url()` — this free URL is the lasting contract for backgrounds. Uploaded backgrounds through a dashboard-asset reference (the `t_dashboard_asset` plumbing from phase 4) are a planned **additive** follow-up (`background_asset` or an `asset:` form), not a replacement of the URL. When the glass style is selected and no background is set, the built-in CSS scene applies (see below);
 - `card_style`: `default` | `glass` (`DASHBOARD_CARD_STYLE` in `server/utils/constants.js`). **`glass` is the "Horizon" theme**, a full wall-panel-grade restyle of the dashboard page, not just translucent cards:
   - a global `glass-theme` class on the dashboard page gates the whole theme; tokens (`--gl-*`: ink/muted/accent, radii, glass surfaces, borders, shadows) live in `front/src/routes/dashboard/style.css`, and component variants (chips, house-view pins, value tiles, clock, scenes, tablet dock) compose on the same class next to their component;
   - deep glass cards (blur + saturate, 26px radius, layered shadows), uppercase micro-label card titles, two-level ink discipline, pastel tinted stamps, soft pill action buttons, frosted page controls and tablet dock (active tab inverted);

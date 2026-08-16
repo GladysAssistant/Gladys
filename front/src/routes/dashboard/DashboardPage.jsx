@@ -10,7 +10,11 @@ import { wrapEmojisJSX } from '../../utils/emojiWrapper';
 import style from './style.css';
 
 const DashboardPage = ({ children, ...props }) => {
-  const backgroundImage = props.currentDashboard && props.currentDashboard.background_image;
+  const rawBackgroundImage = props.currentDashboard && props.currentDashboard.background_image;
+  // Server-side validation enforces this too; the front never interpolates
+  // anything but an http(s) URL into the CSS url() (JSON quoting escapes
+  // quotes and backslashes, the scheme check closes the rest)
+  const backgroundImage = rawBackgroundImage && /^https?:\/\//.test(rawBackgroundImage) ? rawBackgroundImage : null;
   const glassCards = props.currentDashboard && props.currentDashboard.card_style === 'glass';
   return (
     <div class="page">

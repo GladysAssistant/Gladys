@@ -53,6 +53,16 @@ function rewriteReferences(item, featureReplacements, deviceReplacements) {
   FEATURE_ARRAY_FIELDS.forEach((field) => replaceArray(field, featureReplacements));
   DEVICE_STRING_FIELDS.forEach((field) => replaceString(field, deviceReplacements));
   DEVICE_ARRAY_FIELDS.forEach((field) => replaceArray(field, deviceReplacements));
+  // scene box: map of scene selector -> device feature selector (values only)
+  if (item.scene_status_features && typeof item.scene_status_features === 'object') {
+    Object.keys(item.scene_status_features).forEach((sceneSelector) => {
+      const featureSelector = item.scene_status_features[sceneSelector];
+      if (typeof featureSelector === 'string' && featureReplacements[featureSelector] !== undefined) {
+        item.scene_status_features[sceneSelector] = featureReplacements[featureSelector];
+        changed = true;
+      }
+    });
+  }
   return changed;
 }
 
@@ -87,6 +97,17 @@ function rewriteItems(items, featureReplacements, deviceReplacements) {
       changed = true;
     }
     if (Array.isArray(item.else) && rewriteItems(item.else, featureReplacements, deviceReplacements)) {
+      changed = true;
+    }
+    // dashboard sections carry their boxes in `columns` (array of arrays of boxes)
+    if (Array.isArray(item.columns) && rewriteItems(item.columns, featureReplacements, deviceReplacements)) {
+      changed = true;
+    }
+    // chips bar and house-view boxes carry selector-holding sub-objects
+    if (Array.isArray(item.chips) && rewriteItems(item.chips, featureReplacements, deviceReplacements)) {
+      changed = true;
+    }
+    if (Array.isArray(item.pins) && rewriteItems(item.pins, featureReplacements, deviceReplacements)) {
       changed = true;
     }
   });

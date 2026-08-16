@@ -89,7 +89,9 @@
     linear-gradient(160deg, #eef3fb 0%, #eeeaf7 48%, #f7efe6 100%);
 }
 
-/* Cards become deep glass */
+/* Cards become deep glass. No overflow: hidden — it would clip house-view
+   pins near the image edges and in-card dropdown menus; media corners are
+   rounded on the images themselves below. */
 :global(.glass-theme .card) {
   background: var(--gl-card-bg);
   backdrop-filter: blur(28px) saturate(1.6);
@@ -97,8 +99,28 @@
   border: 1px solid var(--gl-border);
   border-radius: var(--gl-radius-lg);
   box-shadow: var(--gl-shadow);
-  overflow: hidden;
   color: var(--gl-ink);
+}
+
+:global(.glass-theme .card .card-img-top) {
+  border-radius: var(--gl-radius-lg) var(--gl-radius-lg) 0 0;
+}
+
+/* dark-mode.css paints .card/.card-header/.card-body with a solid
+   !important background: restore the translucent glass with the same
+   weight — the inversion filter then derives the dark glass from these
+   light values, like the rest of the theme */
+:global(.dark-mode .glass-theme .card-header),
+:global(.dark-mode .glass-theme .card-body) {
+  background-color: transparent !important;
+}
+
+:global(.dark-mode .glass-theme .card) {
+  background-color: var(--gl-card-bg) !important;
+}
+
+:global(.dark-mode .glass-theme .card .card) {
+  background-color: var(--gl-card-nested-bg) !important;
 }
 
 :global(.glass-theme .card .card) {

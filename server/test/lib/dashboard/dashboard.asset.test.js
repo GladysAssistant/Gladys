@@ -44,6 +44,49 @@ describe('dashboard.createAsset', () => {
     });
     return assert.isRejected(promise, 'valid base64');
   });
+  it('should reject uploads past the per-dashboard cap', async () => {
+    const dashboardRow = await dashboard.create('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      name: 'Asset cap dashboard',
+      type: 'main',
+      visibility: 'private',
+      position: 0,
+      boxes: [[]],
+    });
+    const db = require('../../../models');
+    const rows = [];
+    for (let i = 0; i < 25; i += 1) {
+      rows.push({
+        dashboard_id: dashboardRow.id,
+        content_type: 'image/png',
+        data: Buffer.from(PNG_BASE64, 'base64'),
+      });
+    }
+    await db.DashboardAsset.bulkCreate(rows);
+    const promise = dashboard.createAsset('0cd30aef-9c4e-4a23-88e3-3547971296e5', dashboardRow.selector, {
+      content_type: 'image/png',
+      data: PNG_BASE64,
+    });
+    return assert.isRejected(promise, 'already has 25 assets');
+  });
+
+  it('should delete the assets of a destroyed dashboard even without FK enforcement', async () => {
+    const dashboardRow = await dashboard.create('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      name: 'Asset cleanup dashboard',
+      type: 'main',
+      visibility: 'private',
+      position: 0,
+      boxes: [[]],
+    });
+    await dashboard.createAsset('0cd30aef-9c4e-4a23-88e3-3547971296e5', dashboardRow.selector, {
+      content_type: 'image/png',
+      data: PNG_BASE64,
+    });
+    const db = require('../../../models');
+    await dashboard.destroy('0cd30aef-9c4e-4a23-88e3-3547971296e5', dashboardRow.selector);
+    const remaining = await db.DashboardAsset.count({ where: { dashboard_id: dashboardRow.id } });
+    expect(remaining).to.equal(0);
+  });
+
   it('should return not found on a dashboard I cannot edit', async () => {
     const promise = dashboard.createAsset('7a137a56-069e-4996-8816-36558174b727', 'test-dashboard', {
       content_type: 'image/png',
