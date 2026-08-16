@@ -128,7 +128,9 @@ const EditBoxColumns = ({ children, ...props }) => (
           </select>
         </div>
       </div>
-      <div class="col-md-4">
+    </div>
+    <div class="row">
+      <div class="col-md-8">
         <div class="form-group">
           <label class="form-label">
             <Text id="dashboard.editDashboardIconLabel" />

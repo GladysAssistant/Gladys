@@ -2,7 +2,9 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 1rem;
+  /* Same bottom spacing as a card, so the gap between a chips section and
+     the next section matches the gap between two card sections */
+  margin-bottom: 1.5rem;
 }
 
 .chip {
