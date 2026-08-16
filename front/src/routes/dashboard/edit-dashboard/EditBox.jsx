@@ -22,6 +22,7 @@ import EditLinkBox from '../../../components/boxs/link/EditLinkBox';
 import EditPhotoBox from '../../../components/boxs/photo/EditPhotoBox';
 import EditSunBox from '../../../components/boxs/sun/EditSun';
 import EditChipsBox from '../../../components/boxs/chips/EditChipsBox';
+import EditActionsBox from '../../../components/boxs/actions/EditActionsBox';
 import EditHouseViewBox from '../../../components/boxs/house-view/EditHouseViewBox';
 
 const Box = ({ children, ...props }) => {
@@ -70,6 +71,8 @@ const Box = ({ children, ...props }) => {
       return <EditChipsBox {...props} />;
     case 'house-view':
       return <EditHouseViewBox {...props} />;
+    case 'actions':
+      return <EditActionsBox {...props} />;
     default:
       return <SelectBoxType {...props} />;
   }

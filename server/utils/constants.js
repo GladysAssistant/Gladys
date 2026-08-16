@@ -1997,6 +1997,7 @@ const DASHBOARD_BOX_TYPE = {
   SUN: 'sun',
   CHIPS: 'chips',
   HOUSE_VIEW: 'house-view',
+  ACTIONS: 'actions',
 };
 
 const DASHBOARD_CARD_STYLE = {

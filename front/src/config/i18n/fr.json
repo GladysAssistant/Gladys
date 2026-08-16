@@ -349,6 +349,7 @@
       "photo": "Photo",
       "sun": "Soleil",
       "chips": "Pastilles d'état",
+      "actions": "Actions rapides",
       "house-view": "Vue de la maison"
     },
     "boxes": {
@@ -735,6 +736,28 @@
           "partially-armed": "Partiellement activée",
           "panic": "Panique"
         }
+      },
+      "actions": {
+        "editNameLabel": "Nom du widget (optionnel)",
+        "editNamePlaceholder": "Volets, Lumières…",
+        "actionLabel": "Action {{index}}",
+        "actionTypeLabel": "Type d'action",
+        "actionTypes": {
+          "scene": "Démarrer une scène",
+          "device-feature": "Contrôler un appareil"
+        },
+        "sceneLabel": "Scène",
+        "deviceFeatureLabel": "Fonctionnalité de l'appareil",
+        "commandLabel": "Commande",
+        "commands": {
+          "open": "Ouvrir",
+          "stop": "Stop",
+          "close": "Fermer"
+        },
+        "labelLabel": "Libellé du bouton (optionnel)",
+        "labelPlaceholder": "Ouvrir RDC…",
+        "addActionButton": "Ajouter une action",
+        "noActions": "Aucune action configurée pour l'instant. Éditez le tableau de bord pour en ajouter."
       },
       "house-view": {
         "editNameLabel": "Nom du widget (optionnel)",

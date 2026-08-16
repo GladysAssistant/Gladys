@@ -143,6 +143,40 @@ describe('dashboard.update', () => {
     expect(updatedDashboard.boxes[0].columns[0][0].chips).to.have.lengthOf(4);
   });
 
+  it('should save a quick-actions box', async () => {
+    const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [
+            [
+              {
+                type: DASHBOARD_BOX_TYPE.ACTIONS,
+                name: 'Volets',
+                actions: [
+                  { action_type: 'scene', scene: 'good-night', label: 'Bonne nuit' },
+                  { action_type: 'device-feature', device_feature: 'living-room-light' },
+                  { action_type: 'device-feature', device_feature: 'shutters-state', value: -1, label: 'Fermer' },
+                ],
+              },
+            ],
+          ],
+        },
+      ],
+    });
+    expect(updatedDashboard.boxes[0].columns[0][0].actions).to.have.lengthOf(3);
+  });
+
+  it('should reject a quick action with an unknown action_type', async () => {
+    const promise = dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
+      boxes: [
+        {
+          columns: [[{ type: DASHBOARD_BOX_TYPE.ACTIONS, actions: [{ action_type: 'webhook', scene: 'x' }] }]],
+        },
+      ],
+    });
+    return assert.isRejected(promise);
+  });
+
   it('should save a house-view box with pins', async () => {
     const updatedDashboard = await dashboard.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', 'test-dashboard', {
       boxes: [

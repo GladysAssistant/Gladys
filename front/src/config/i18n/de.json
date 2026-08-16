@@ -349,6 +349,7 @@
       "photo": "Foto",
       "sun": "Sonne",
       "chips": "Status-Chips",
+      "actions": "Schnellaktionen",
       "house-view": "Hausansicht"
     },
     "boxes": {
@@ -735,6 +736,28 @@
           "partially-armed": "Teilweise aktiviert",
           "panic": "Panik"
         }
+      },
+      "actions": {
+        "editNameLabel": "Widget-Name (optional)",
+        "editNamePlaceholder": "Rollläden, Lichter…",
+        "actionLabel": "Aktion {{index}}",
+        "actionTypeLabel": "Aktionstyp",
+        "actionTypes": {
+          "scene": "Szene starten",
+          "device-feature": "Gerät steuern"
+        },
+        "sceneLabel": "Szene",
+        "deviceFeatureLabel": "Gerätefunktion",
+        "commandLabel": "Befehl",
+        "commands": {
+          "open": "Öffnen",
+          "stop": "Stopp",
+          "close": "Schließen"
+        },
+        "labelLabel": "Button-Beschriftung (optional)",
+        "labelPlaceholder": "EG öffnen…",
+        "addActionButton": "Aktion hinzufügen",
+        "noActions": "Noch keine Aktion konfiguriert. Bearbeite das Dashboard, um welche hinzuzufügen."
       },
       "house-view": {
         "editNameLabel": "Widget-Name (optional)",

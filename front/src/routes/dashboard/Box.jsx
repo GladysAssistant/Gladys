@@ -19,6 +19,7 @@ import LinkBox from '../../components/boxs/link/LinkBox';
 import PhotoBox from '../../components/boxs/photo/PhotoBox';
 import SunBox from '../../components/boxs/sun/Sun';
 import ChipsBox from '../../components/boxs/chips/ChipsBox';
+import ActionsBox from '../../components/boxs/actions/ActionsBox';
 import HouseViewBox from '../../components/boxs/house-view/HouseViewBox';
 
 const Box = ({ children, ...props }) => {
@@ -67,6 +68,8 @@ const Box = ({ children, ...props }) => {
       return <ChipsBox {...props} />;
     case 'house-view':
       return <HouseViewBox {...props} />;
+    case 'actions':
+      return <ActionsBox {...props} />;
   }
 };
 

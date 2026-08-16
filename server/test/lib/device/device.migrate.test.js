@@ -205,6 +205,10 @@ describe('Device.migrate', () => {
             scenes: ['some-scene'],
             scene_status_features: { 'some-scene': 'migration-source-temp' },
           },
+          {
+            type: 'actions',
+            actions: [{ action_type: 'device-feature', device_feature: 'migration-source-temp', value: 1 }],
+          },
         ],
       ],
     });
@@ -295,6 +299,10 @@ describe('Device.migrate', () => {
               type: 'scene',
               scenes: ['some-scene'],
               scene_status_features: { 'some-scene': 'migration-destination-temp' },
+            },
+            {
+              type: 'actions',
+              actions: [{ action_type: 'device-feature', device_feature: 'migration-destination-temp', value: 1 }],
             },
           ],
         ],

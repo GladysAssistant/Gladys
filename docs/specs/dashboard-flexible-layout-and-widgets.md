@@ -2,7 +2,7 @@
 
 > **Living specification — source of truth.** This document specifies the evolution of the Gladys dashboard towards wall-panel-grade layouts: section-based flexible layout, compact "chip" widgets, scene buttons with live state, an energy-flow widget, a "house view" widget (image with live data pins, optionally AI-generated through Gladys Plus), per-dashboard appearance, and icon-based tablet navigation. **Rule: any PR that changes one of these behaviors or contracts modifies this file in the same diff** — spec first, code second.
 >
-> Status: **phases 1–4 implemented** (sections layout, chips bar + scene status subtitles, appearance + tablet tab bar, house-view widget with asset storage — see Phases). Phases 5–6 are design only.
+> Status: **phases 1–4 implemented** (sections layout, chips bar + quick actions + scene status subtitles, appearance + tablet tab bar, house-view widget with asset storage — see Phases). Phases 5–6 are design only.
 
 ## Context
 
@@ -85,6 +85,25 @@ A **full-width bar of compact pills**, each pill summarizing one state with an a
 - Joi schema: a `chips` array (max 20, each item `{ chip_type, ... }`) is added to the box schema in `server/models/dashboard.js`; an optional per-chip `icon` overrides the automatic one.
 - **As implemented**: every chip resolves through existing endpoints — `GET /api/v1/device?device_feature_selectors=`, `GET /api/v1/room?expand=devices` (+ `GET /api/v1/house/:selector` for house scoping), `GET /api/v1/calendar/event` — no new server endpoint. The openings aggregate counts `opening-sensor` binary features (`OPENING_SENSOR_STATE.OPEN`). Device and openings chips update live over the device websocket; the alarm chip refreshes on alarm websocket events.
 - Tapping a chip is **not** an action in phase 2 (display only); tap-to-detail may come later.
+
+## B2. New box type: `actions` (quick actions)
+
+The command-side sibling of the chips bar (community request, forum 10614): chips are compact *states* to read, quick actions are compact *commands* to tap. One card holds a wrapping row of touch-friendly buttons — "one tap = one action" — replacing what a wall-tablet user would otherwise build with several one-action widgets.
+
+- New `DASHBOARD_BOX_TYPE.ACTIONS = 'actions'`; box config `{ type, name?, actions: [...] }` (Joi: max 20 items). Each action is one of:
+
+| Kind | Config | Tap does | Active state |
+|---|---|---|---|
+| `scene` | `{ action_type: 'scene', scene, label? }` | `POST /api/v1/scene/:selector/start` (same call as the scene box) | none (momentary spinner) — icon is the scene's own icon |
+| `device-feature` (binary) | `{ action_type: 'device-feature', device_feature, label? }` | toggles 0/1 via `POST /api/v1/device_feature/:selector/value` | tinted when `last_value = 1` |
+| `device-feature` (command) | same + `value` | sends the configured value (shutter/curtain state: `COVER_STATE` open `1` / stop `0` / close `-1`) | tinted when `last_value` equals `value` |
+
+- **Automatic state colors, zero styling config**: active positive commands and binary "on" tint green; an active *close* command (`value < 0`, e.g. shutters closed) tints red — which is exactly the red-closed/green-open code the forum asked for, derived from the semantics instead of configured. Inactive buttons stay neutral.
+- Icons are automatic: the scene's configured icon for scenes, the device-feature category icon for toggles, up/stop/down arrows for cover commands. An optional per-action `icon` override is accepted by the schema (parity with chips) but not surfaced in the editor yet.
+- Editor UX: per action — kind select (scene / device), then a single scene select or the existing `SelectDeviceFeature`; picking a shutter/curtain *state* feature reveals a command select (open/stop/close). Optional short label (defaults to the scene or device name). Unfinished rows (no target) are dropped on save like unfinished chips.
+- Live updates over the device websocket like the chips bar; features are loaded in one `GET /api/v1/device?device_feature_selectors=` batch.
+- Rendering: `flex-wrap` row of pill buttons inside a normal card (optional header), responsive for free; glass theme composes its own variant on `.glass-theme` like every widget.
+- **Not** a generic container: HA-style nestable horizontal/vertical stacks were considered and rejected (see Alternatives) — dense command rows are a widget concern, like dense state rows.
 
 ## C. Scene box: live state subtitle
 
@@ -170,7 +189,7 @@ A `theme` override (`auto`/`light`/`dark`) was considered and **deferred**: the 
 Ordering principle, decided with the maintainer: **plumbing first, showcase widgets last.** The layout engine, the density widgets, the asset storage, and the appearance layer are what unlock every future dashboard; the flashy visualizations come once that foundation is in place.
 
 1. **Sections layout** (A) — **implemented**, including selective stretch (A.4). Also covers the community prototype work from forum 10553.
-2. **Density widgets**: chips bar (B) + scene state subtitle (C) — **implemented**.
+2. **Density widgets**: chips bar (B) + scene state subtitle (C) — **implemented**; quick actions (B2) — **implemented** (added on community feedback, forum 10614).
 3. **Appearance (G) + tablet tab bar (H)** — **implemented** (background as a URL for now; `theme` override deferred, see G).
 4. **House view** (E) — **implemented** with bundled gallery + upload + pins, including the dashboard-asset storage (plumbing reused later by G uploaded backgrounds and F).
 5. **Plus AI generation** (F) — requires the Gladys Plus backend endpoint; front/server land behind the existing Plus feature detection.
@@ -187,6 +206,7 @@ Each phase is a separate PR (or PR series) that updates this spec in the same di
 - **Client-side style prompt**: rejected — the style must be a server-side guarantee (consistency across users and improvable without a release).
 - **Plus-only house-view widget**: rejected. The widget ships with a bundled gallery and upload; Plus personalizes it.
 - **Many narrow columns for chip rows**: rejected (capped at 6 columns, and 5–6 are only comfortable on `width: full`) — compact rows are a widget concern (`chips`), not a layout concern.
+- **Generic nestable stacks** (Home Assistant horizontal/vertical stacks, forum 10614): rejected. A layout language the user composes by hand is configuration without an end and every combination must look good in every theme; Gladys ships finished widgets instead — chips for dense states, quick actions (B2) for dense commands, whose combinations reproduce the real-world HA stacks that were shown.
 
 ## Out of scope
 

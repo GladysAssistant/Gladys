@@ -110,6 +110,23 @@ const boxSchema = Joi.object().keys({
       }),
     )
     .max(20),
+  // actions box: an ordered list of compact command buttons. A device-feature
+  // action without a value toggles a binary feature; with a value it sends
+  // that value (e.g. COVER_STATE open/stop/close for shutters).
+  actions: Joi.array()
+    .items(
+      Joi.object().keys({
+        action_type: Joi.string()
+          .valid('scene', 'device-feature')
+          .required(),
+        scene: Joi.string(),
+        device_feature: Joi.string(),
+        label: Joi.string().allow(''),
+        icon: Joi.string(),
+        value: Joi.number(),
+      }),
+    )
+    .max(20),
   photo_fit: Joi.string().valid('cover', 'contain'),
   photo_slideshow_interval: Joi.number()
     .integer()

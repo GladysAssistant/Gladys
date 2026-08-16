@@ -349,6 +349,7 @@
       "photo": "Photo",
       "sun": "Sun",
       "chips": "Status chips",
+      "actions": "Quick actions",
       "house-view": "House view"
     },
     "boxes": {
@@ -735,6 +736,28 @@
           "partially-armed": "Partially armed",
           "panic": "Panic"
         }
+      },
+      "actions": {
+        "editNameLabel": "Widget name (optional)",
+        "editNamePlaceholder": "Shutters, Lights…",
+        "actionLabel": "Action {{index}}",
+        "actionTypeLabel": "Action type",
+        "actionTypes": {
+          "scene": "Start a scene",
+          "device-feature": "Control a device"
+        },
+        "sceneLabel": "Scene",
+        "deviceFeatureLabel": "Device feature",
+        "commandLabel": "Command",
+        "commands": {
+          "open": "Open",
+          "stop": "Stop",
+          "close": "Close"
+        },
+        "labelLabel": "Button label (optional)",
+        "labelPlaceholder": "Open ground floor…",
+        "addActionButton": "Add an action",
+        "noActions": "No action configured yet. Edit the dashboard to add some."
       },
       "house-view": {
         "editNameLabel": "Widget name (optional)",

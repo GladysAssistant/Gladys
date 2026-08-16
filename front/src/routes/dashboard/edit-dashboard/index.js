@@ -247,6 +247,15 @@ class EditDashboard extends Component {
           if (box.type === 'house-view' && Array.isArray(box.pins)) {
             return { ...box, pins: box.pins.filter(pin => pin && pin.device_feature) };
           }
+          // Same for quick actions the user added but never gave a target
+          if (box.type === 'actions' && Array.isArray(box.actions)) {
+            return {
+              ...box,
+              actions: box.actions.filter(
+                action => action && (action.action_type === 'scene' ? action.scene : action.device_feature)
+              )
+            };
+          }
           return box;
         });
     });

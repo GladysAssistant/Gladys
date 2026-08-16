@@ -110,6 +110,10 @@ function rewriteItems(items, featureReplacements, deviceReplacements) {
     if (Array.isArray(item.pins) && rewriteItems(item.pins, featureReplacements, deviceReplacements)) {
       changed = true;
     }
+    // quick-actions boxes carry their buttons in `actions` ({ device_feature } items)
+    if (Array.isArray(item.actions) && rewriteItems(item.actions, featureReplacements, deviceReplacements)) {
+      changed = true;
+    }
   });
   return changed;
 }
