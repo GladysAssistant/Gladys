@@ -46,21 +46,21 @@ describe('mqttHandler.listenToHomeAssistantDeviceStateIfNeeded', () => {
     expect(mqttHandler.haStateBindings).to.deep.equal({});
   });
 
-  it('should not subscribe to a wildcard state topic', () => {
-    ['#', 'my-device/+/state', 'my-device/#'].forEach((stateTopic) => {
-      mqttHandler.haStateBindings = {};
-      mqttHandler.listenToHomeAssistantDeviceStateIfNeeded({
-        external_id: 'homeassistant:my-device',
-        params: [
-          {
-            name: 'ha_discovery_config:sensor:temperature',
-            value: JSON.stringify({ state_topic: stateTopic, device_class: 'temperature' }),
-          },
-        ],
-        features: [{ external_id: 'homeassistant:my-device:sensor:temperature' }],
-      });
-      expect(mqttHandler.haStateBindings).to.deep.equal({});
+  it('should subscribe to a wildcard state topic', () => {
+    // Theengs gateways advertise wildcard state topics so that several
+    // gateways can publish the state of the same BLE sensor
+    mqttHandler.listenToHomeAssistantDeviceStateIfNeeded({
+      external_id: 'homeassistant:my-device',
+      params: [
+        {
+          name: 'ha_discovery_config:sensor:temperature',
+          value: JSON.stringify({ state_topic: '+/+/BTtoMQTT/A4C138800021', device_class: 'temperature' }),
+        },
+      ],
+      features: [{ external_id: 'homeassistant:my-device:sensor:temperature' }],
     });
+    expect(mqttHandler.haStateBindings['+/+/BTtoMQTT/A4C138800021']).to.have.lengthOf(1);
+    sinon.assert.calledWith(mqttHandler.subscribe, '+/+/BTtoMQTT/A4C138800021');
   });
 
   it('should listen to the state topic of a sensor', () => {

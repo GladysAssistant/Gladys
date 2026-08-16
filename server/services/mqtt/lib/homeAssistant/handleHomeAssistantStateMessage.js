@@ -7,6 +7,7 @@ const {
   BINARY_SENSOR_DEVICE_CLASSES,
 } = require('./constants');
 const { applyValueTemplate } = require('./applyValueTemplate');
+const { mqttTopicMatches } = require('../mqttTopicMatches');
 
 /**
  * @description Convert a Home Assistant RGB color to the Gladys integer format.
@@ -212,7 +213,11 @@ function parseHomeAssistantIncomingState(binding, message) {
  * this.handleHomeAssistantStateMessage('my-device/state', 'ON');
  */
 function handleHomeAssistantStateMessage(topic, message) {
-  const bindings = this.haStateBindings[topic] || [];
+  // Bindings are stored by state topic, which can be a wildcard filter: the message
+  // arrives on a concrete topic, so each binding topic is matched as a filter
+  const bindings = Object.keys(this.haStateBindings)
+    .filter((bindingTopic) => mqttTopicMatches(bindingTopic, topic))
+    .flatMap((bindingTopic) => this.haStateBindings[bindingTopic]);
   bindings.forEach((binding) => {
     try {
       const state = parseHomeAssistantIncomingState(binding, message);

@@ -53,6 +53,30 @@ describe('mqttHandler.handleHomeAssistantStateMessage', () => {
     });
   });
 
+  it('should emit a new state event for a wildcard state topic', () => {
+    // Theengs gateways use wildcard state topics such as "+/+/BTtoMQTT/<id>",
+    // while messages arrive on the concrete topic of each gateway
+    mqttHandler.haStateBindings['+/+/BTtoMQTT/A4C138800021'] = [
+      {
+        deviceExternalId: 'homeassistant:A4C138800021',
+        featureExternalId: 'homeassistant:A4C138800021:sensor:temperature',
+        component: 'sensor',
+        property: 'state',
+        config: { state_topic: '+/+/BTtoMQTT/A4C138800021', value_template: '{{ value_json.tempc }}' },
+      },
+    ];
+    mqttHandler.handleHomeAssistantStateMessage('blegateway/office/BTtoMQTT/A4C138800021', '{"tempc": 21.5}');
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'homeassistant:A4C138800021:sensor:temperature',
+      state: 21.5,
+    });
+
+    // A message from another sensor must not match the binding
+    gladys.event.emit.resetHistory();
+    mqttHandler.handleHomeAssistantStateMessage('blegateway/office/BTtoMQTT/FFFFFFFFFFFF', '{"tempc": 21.5}');
+    assert.notCalled(gladys.event.emit);
+  });
+
   it('should not emit when the state cannot be parsed', () => {
     mqttHandler.haStateBindings['my-device/temperature'] = [
       {
