@@ -208,6 +208,63 @@ describe('scene.stop', () => {
     expect(Date.now() - start).to.be.below(1000);
   });
 
+  it('should not run the else branch when the scene is stopped during an if condition', async () => {
+    const abortController = new AbortController();
+    abortController.abort();
+
+    let caught;
+    try {
+      await actionsFunc[ACTIONS.CONDITION.IF_THEN_ELSE](
+        sceneManager,
+        {
+          type: ACTIONS.CONDITION.IF_THEN_ELSE,
+          if: [{ type: ACTIONS.CONDITION.CHECK_TIME, before: '10:00' }],
+          then: [[{ type: ACTIONS.LIGHT.TURN_ON, devices: ['light-1'] }]],
+          else: [[{ type: ACTIONS.LIGHT.TURN_OFF, devices: ['light-1'] }]],
+        },
+        { abortSignal: abortController.signal },
+        '0.0',
+      );
+    } catch (e) {
+      caught = e;
+    }
+
+    expect(caught).to.be.an('error');
+    expect(caught.message).to.equal('SCENE_STOPPED');
+    expect(device.setValue.called).to.equal(false);
+  });
+
+  it('should not run the actions after a while loop when the scene is stopped', async () => {
+    const scene = {
+      selector: 'my-scene',
+      name: 'My scene',
+      icon: 'zap',
+      triggers: [],
+      actions: [
+        [
+          {
+            type: ACTIONS.CONDITION.WHILE,
+            if: [{ type: ACTIONS.TIME.DELAY, value: 60, unit: 'minutes' }],
+            then: [[{ type: ACTIONS.LIGHT.TURN_ON, devices: ['light-1'] }]],
+          },
+        ],
+        [{ type: ACTIONS.LIGHT.TURN_OFF, devices: ['light-1'] }],
+      ],
+    };
+    await sceneManager.addScene(scene);
+
+    const started = waitForWebsocket(WEBSOCKET_MESSAGE_TYPES.SCENE.STARTED);
+    sceneManager.execute('my-scene');
+    const { executionId } = (await started).payload;
+
+    const stopped = waitForWebsocket(WEBSOCKET_MESSAGE_TYPES.SCENE.STOPPED);
+    expect(sceneManager.stop(executionId)).to.equal(true);
+    await stopped;
+
+    expect(sceneManager.getRunning()).to.have.lengthOf(0);
+    expect(device.setValue.called).to.equal(false);
+  });
+
   it('should wait normally when no abort signal is provided', async () => {
     await actionsFunc[ACTIONS.TIME.DELAY](
       sceneManager,

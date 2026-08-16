@@ -25,7 +25,7 @@ const timezone = require('dayjs/plugin/timezone');
 
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
-const { AbortScene } = require('../../utils/coreErrors');
+const { AbortScene, SceneStopped } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
@@ -325,14 +325,14 @@ const actionsFunc = {
       // before subscribing.
       if (abortSignal.aborted) {
         clearTimeout(timer);
-        reject(new AbortScene('SCENE_STOPPED'));
+        reject(new SceneStopped('SCENE_STOPPED'));
         return;
       }
       abortSignal.addEventListener(
         'abort',
         () => {
           clearTimeout(timer);
-          reject(new AbortScene('SCENE_STOPPED'));
+          reject(new SceneStopped('SCENE_STOPPED'));
         },
         { once: true },
       );
@@ -928,7 +928,7 @@ const actionsFunc = {
         );
         return true;
       } catch (e) {
-        if (e instanceof AbortScene) {
+        if (e instanceof AbortScene && !(e instanceof SceneStopped)) {
           return false;
         }
         throw e;
@@ -972,7 +972,7 @@ const actionsFunc = {
       );
       conditionsVerified = true;
     } catch (e) {
-      if (e instanceof AbortScene) {
+      if (e instanceof AbortScene && !(e instanceof SceneStopped)) {
         conditionsVerified = false;
       } else {
         throw e;
