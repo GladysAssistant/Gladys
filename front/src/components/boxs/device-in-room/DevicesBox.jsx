@@ -16,6 +16,11 @@ import debounce from 'debounce';
 const isTextSelectFeature = feature =>
   feature.category === DEVICE_FEATURE_CATEGORIES.TEXT && feature.type === DEVICE_FEATURE_TYPES.TEXT.SELECT;
 
+// Any read-only binary feature (opening sensor, motion sensor, presence, leak...) can display
+// the date at which its current state was reached.
+const isBinarySensorFeature = feature =>
+  feature.read_only === true && feature.type === DEVICE_FEATURE_TYPES.SENSOR.BINARY;
+
 const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
   return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
@@ -57,6 +62,7 @@ class DevicesComponent extends Component {
     super(props);
     this.state = {
       deviceFeatures: [],
+      lastStateChanges: {},
       status: RequestStatus.Getting
     };
     this.wasDisconnected = false;
@@ -102,6 +108,7 @@ class DevicesComponent extends Component {
         deviceFeatures: deviceFeaturesSorted,
         status: RequestStatus.Success
       });
+      this.getLastStateChanges(deviceFeaturesSorted);
     } catch (e) {
       this.setState({
         status: RequestStatus.Error
@@ -109,9 +116,36 @@ class DevicesComponent extends Component {
     }
   };
 
+  // `last_value_changed` is refreshed on every state report, even when the device re-publishes
+  // the value it already had, so the real date of the last state change is asked to the server,
+  // which reads it from the state history.
+  getLastStateChanges = async deviceFeatures => {
+    if (!this.props.box.display_last_state_change) {
+      return;
+    }
+    const binarySensorSelectors = deviceFeatures.filter(isBinarySensorFeature).map(feature => feature.selector);
+    if (binarySensorSelectors.length === 0) {
+      return;
+    }
+    try {
+      const lastStateChanges = await this.props.httpClient.get('/api/v1/device_feature/last_state_changes', {
+        device_feature_selectors: binarySensorSelectors.join(',')
+      });
+      this.setState({ lastStateChanges });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   updateDeviceStateWebsocket = payload => {
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {
+      const lastStateChanges = this.getUpdatedLastStateChanges(
+        deviceFeatures,
+        payload.device_feature_selector,
+        payload.last_value,
+        payload.last_value_changed
+      );
       deviceFeatures = updateDeviceFeatures(
         deviceFeatures,
         payload.device_feature_selector,
@@ -119,9 +153,23 @@ class DevicesComponent extends Component {
         payload.last_value_changed
       );
       this.setState({
-        deviceFeatures
+        deviceFeatures,
+        lastStateChanges
       });
     }
+  };
+
+  // A new state is a state change only when the value actually differs from the one displayed,
+  // so a sensor re-publishing the same value never resets the displayed date.
+  getUpdatedLastStateChanges = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
+    const { lastStateChanges } = this.state;
+    const feature = deviceFeatures.find(
+      f => f.selector === deviceFeatureSelector && isBinarySensorFeature(f) && f.last_value !== lastValue
+    );
+    if (!feature) {
+      return lastStateChanges;
+    }
+    return { ...lastStateChanges, [deviceFeatureSelector]: lastValueChange };
   };
   updateDeviceTextWebsocket = payload => {
     let { deviceFeatures } = this.state;
@@ -211,8 +259,12 @@ class DevicesComponent extends Component {
 
   componentDidUpdate(previousProps) {
     const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
+    const displayLastStateChangeChanged =
+      get(previousProps, 'box.display_last_state_change') !== get(this.props, 'box.display_last_state_change');
     if (deviceFeaturesChanged) {
       this.refreshData();
+    } else if (displayLastStateChangeChanged) {
+      this.getLastStateChanges(this.state.deviceFeatures);
     }
   }
 
@@ -228,7 +280,7 @@ class DevicesComponent extends Component {
     this.props.session.dispatcher.removeListener('websocket.connected', this.handleWebsocketConnected);
   }
 
-  render(props, { deviceFeatures, status }) {
+  render(props, { deviceFeatures, lastStateChanges, status }) {
     const boxTitle = props.box.name;
     const loading = status === RequestStatus.Getting;
     const roomLightStatus = this.getLightStatus();
@@ -239,6 +291,7 @@ class DevicesComponent extends Component {
         loading={loading}
         boxTitle={boxTitle}
         deviceFeatures={deviceFeatures}
+        lastStateChanges={lastStateChanges}
         roomLightStatus={roomLightStatus}
         updateValue={this.updateValue}
         updateValueWithDebounce={this.updateValueWithDebounce}

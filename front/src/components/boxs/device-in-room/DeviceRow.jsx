@@ -130,6 +130,8 @@ const DeviceRow = ({ children, ...props }) => {
         user={props.user}
         device={device}
         deviceFeature={deviceFeature}
+        displayLastStateChange={props.displayLastStateChange}
+        lastStateChange={props.lastStateChange}
         rowName={rowName}
         intl={props.intl}
       />
@@ -147,6 +149,8 @@ const DeviceRow = ({ children, ...props }) => {
         user={props.user}
         device={device}
         deviceFeature={deviceFeature}
+        displayLastStateChange={props.displayLastStateChange}
+        lastStateChange={props.lastStateChange}
         rowName={rowName}
         intl={props.intl}
       />

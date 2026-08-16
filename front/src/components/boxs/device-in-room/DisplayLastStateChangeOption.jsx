@@ -1,0 +1,32 @@
+import { Text } from 'preact-i18n';
+
+/**
+ * Shared editor option of the "devices" and "devices in room" boxes: when enabled, every
+ * binary sensor of the box displays, under its state, the date at which this state was
+ * reached (door opened/closed, motion detected...).
+ */
+const DisplayLastStateChangeOption = ({ box, updateDisplayLastStateChange }) => (
+  <div class="form-group">
+    <label class="custom-switch">
+      <input
+        type="checkbox"
+        id="displayLastStateChange"
+        name="displayLastStateChange"
+        class="custom-switch-input"
+        checked={box.display_last_state_change === true}
+        onClick={updateDisplayLastStateChange}
+      />
+      <span class="custom-switch-indicator" />
+      <span class="custom-switch-description">
+        <Text id="dashboard.boxes.devicesInRoom.displayLastStateChangeLabel" />
+      </span>
+    </label>
+    <p class="mt-2">
+      <small class="text-muted">
+        <Text id="dashboard.boxes.devicesInRoom.displayLastStateChangeDescription" />
+      </small>
+    </p>
+  </div>
+);
+
+export default DisplayLastStateChangeOption;

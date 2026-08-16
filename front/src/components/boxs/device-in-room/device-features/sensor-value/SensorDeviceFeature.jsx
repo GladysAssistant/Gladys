@@ -1,8 +1,10 @@
 import { createElement } from 'preact';
+import { Text } from 'preact-i18n';
 import get from 'get-value';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
+import RelativeTime from '../../../../device/RelativeTime';
 
 import BatteryLevelFeature from './BatteryLevelFeature';
 import BinaryDeviceValue from './BinaryDeviceValue';
@@ -89,8 +91,12 @@ const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
 ];
 
 const SensorDeviceType = ({ children, ...props }) => {
-  const { deviceFeature: feature } = props;
+  const { deviceFeature: feature, displayLastStateChange, lastStateChange, user } = props;
   const { category, type } = feature;
+
+  // Enabled per box in the box editor. A binary state alone does not tell when the door was
+  // opened: the date of the last state change is displayed right under the state.
+  const showLastStateChange = displayLastStateChange === true && type === DEVICE_FEATURE_TYPES.SENSOR.BINARY;
 
   let elementType = get(DISPLAY_BY_FEATURE_CATEGORY_AND_TYPE, `${category}.${type}`);
 
@@ -118,7 +124,18 @@ const SensorDeviceType = ({ children, ...props }) => {
         <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`)}`} />
       </td>
       <td>{props.rowName}</td>
-      <td class="text-right">{createElement(elementType, props)}</td>
+      <td class="text-right">
+        {createElement(elementType, props)}
+        {showLastStateChange && (
+          <div class="small text-muted">
+            {lastStateChange ? (
+              <RelativeTime datetime={lastStateChange} language={user ? user.language : null} futureDisabled />
+            ) : (
+              <Text id="dashboard.boxes.devicesInRoom.noLastStateChange" />
+            )}
+          </div>
+        )}
+      </td>
     </tr>
   );
 };

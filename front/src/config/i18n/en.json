@@ -437,7 +437,10 @@
         "doorbellRinging": "Ringing",
         "pushButton": "Push",
         "cameraPresetPlaceholder": "Recall a preset...",
-        "vacuumDock": "Return to Dock"
+        "vacuumDock": "Return to Dock",
+        "displayLastStateChangeLabel": "Display the date of the last state change",
+        "displayLastStateChangeDescription": "For each binary sensor of this box (door, motion, presence...), display under its state the date at which this state was reached.",
+        "noLastStateChange": "No state change recorded"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Select the devices you want to display:",

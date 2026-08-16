@@ -437,7 +437,10 @@
         "doorbellRinging": "Sonne",
         "pushButton": "Appuyer",
         "cameraPresetPlaceholder": "Rappeler une position...",
-        "vacuumDock": "Retour à la base"
+        "vacuumDock": "Retour à la base",
+        "displayLastStateChangeLabel": "Afficher la date du dernier changement d'état",
+        "displayLastStateChangeDescription": "Pour chaque capteur binaire de cette boîte (ouverture, mouvement, présence...), affiche sous son état la date à laquelle cet état a été atteint.",
+        "noLastStateChange": "Aucun changement d'état enregistré"
       },
       "devices": {
         "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
